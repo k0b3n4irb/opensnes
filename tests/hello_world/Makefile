@@ -1,11 +1,11 @@
-# Minimal OpenSNES Test ROM Makefile
+# Hello World OpenSNES Test ROM Makefile
 
 OPENSNES = ../..
 CC = $(OPENSNES)/bin/816-tcc
 AS = $(OPENSNES)/bin/wla-65816
 LD = $(OPENSNES)/bin/wlalink
 
-ROM = minimal.sfc
+ROM = hello_world.sfc
 
 .PHONY: all clean
 
@@ -17,7 +17,7 @@ all: $(ROM)
 main.ps: main.c
 	$(CC) -I$(OPENSNES)/lib/include -c $< -o $@
 
-# Combine crt0 + main into single assembly (simpler for minimal test)
+# Combine crt0 + main into single assembly
 combined.asm: crt0.asm main.ps hdr.asm
 	@cat crt0.asm > $@
 	@echo "" >> $@
@@ -42,6 +42,12 @@ $(ROM): linkfile combined.obj
 	$(LD) -v -S $< $@
 
 clean:
-	rm -f *.obj *.ps *.asm *.sfc *.sym linkfile
-	@# Keep source files
-	@git checkout -- crt0.asm hdr.asm 2>/dev/null || true
+	rm -f *.obj *.ps combined.asm *.sfc *.sym linkfile
+
+.gitignore:
+	@echo "*.obj" > $@
+	@echo "*.ps" >> $@
+	@echo "*.sfc" >> $@
+	@echo "*.sym" >> $@
+	@echo "linkfile" >> $@
+	@echo "combined.asm" >> $@
