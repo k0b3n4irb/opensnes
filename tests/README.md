@@ -1,0 +1,210 @@
+# OpenSNES Test Suite
+
+Automated testing infrastructure for OpenSNES SDK.
+
+## Philosophy
+
+**Every feature must have tests.** We follow a test-first development approach:
+1. Write test specification
+2. Implement feature
+3. Verify tests pass
+4. Document the feature
+
+## Test Categories
+
+| Category | Description | Location |
+|----------|-------------|----------|
+| `unit/` | Low-level function tests (math, memory) | `tests/unit/` |
+| `hardware/` | SNES hardware feature tests | `tests/hardware/` |
+| `integration/` | Full system tests | `tests/integration/` |
+| `templates/` | Template smoke tests | `tests/templates/` |
+
+## Prerequisites
+
+- **Mesen2 Emulator**: Required for running ROM-based tests
+  - macOS: Build from source or use release
+  - Path: Set `MESEN_PATH` environment variable
+
+```bash
+export MESEN_PATH=/path/to/Mesen
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+./run_tests.sh
+
+# Run specific category
+./run_tests.sh unit
+./run_tests.sh hardware
+
+# Run single test
+./run_tests.sh unit/math
+
+# Verbose output
+./run_tests.sh -v
+```
+
+## Test Structure
+
+Each test is a directory containing:
+
+```
+tests/unit/math/
+├── README.md           # Test documentation
+├── Makefile           # Build configuration
+├── test_math.c        # Test source code
+├── test_math.lua      # Mesen2 test runner script
+└── expected.txt       # Expected results (optional)
+```
+
+## Writing Tests
+
+### 1. Create Test Directory
+
+```bash
+mkdir -p tests/unit/my_feature
+```
+
+### 2. Write Test Documentation (README.md)
+
+```markdown
+# my_feature Test
+
+## Purpose
+Tests the my_feature functionality.
+
+## What is Tested
+- Feature behavior A
+- Edge case B
+- Error condition C
+
+## Expected Results
+- All assertions pass
+- No crashes or hangs
+```
+
+### 3. Write Test Code
+
+```c
+// test_my_feature.c
+#include <snes.h>
+#include "test_harness.h"
+
+void test_feature_basic(void) {
+    // Arrange
+    int input = 5;
+
+    // Act
+    int result = my_feature(input);
+
+    // Assert
+    TEST_ASSERT_EQUAL(10, result);
+}
+
+int main(void) {
+    test_init();
+
+    RUN_TEST(test_feature_basic);
+
+    test_report();
+    return 0;
+}
+```
+
+### 4. Write Mesen2 Test Script
+
+```lua
+-- test_my_feature.lua
+local test = require("test_harness")
+
+test.init()
+test.run_until_complete(5000)  -- 5 second timeout
+test.check_results()
+test.exit()
+```
+
+## Test Harness API
+
+### C API (test_harness.h)
+
+```c
+// Initialize test system
+void test_init(void);
+
+// Run a test function
+void RUN_TEST(void (*test_func)(void));
+
+// Assertions
+void TEST_ASSERT(int condition);
+void TEST_ASSERT_EQUAL(int expected, int actual);
+void TEST_ASSERT_EQUAL_U16(u16 expected, u16 actual);
+void TEST_ASSERT_EQUAL_PTR(void* expected, void* actual);
+void TEST_ASSERT_MEM_EQUAL(void* expected, void* actual, u16 size);
+
+// Mark test result
+void TEST_PASS(void);
+void TEST_FAIL(const char* message);
+
+// Report results (writes to known memory address for Mesen2)
+void test_report(void);
+```
+
+### Lua API (test_harness.lua)
+
+```lua
+-- Initialize test runner
+test.init()
+
+-- Run emulator until test completes or timeout
+test.run_until_complete(timeout_ms)
+
+-- Check test results from memory
+test.check_results()
+
+-- Read memory
+test.read_byte(address)
+test.read_word(address)
+
+-- Exit emulator with result code
+test.exit()
+```
+
+## Memory Layout for Test Results
+
+Tests report results to fixed memory addresses:
+
+| Address | Size | Description |
+|---------|------|-------------|
+| $7F0000 | 1 | Test status: 0=running, 1=pass, 2=fail |
+| $7F0001 | 2 | Tests run count |
+| $7F0003 | 2 | Tests passed count |
+| $7F0005 | 2 | Tests failed count |
+| $7F0010 | 64 | Failure message (null-terminated) |
+
+## Continuous Integration
+
+Tests run automatically on:
+- Every push to main
+- Every pull request
+
+GitHub Actions workflow: `.github/workflows/tests.yml`
+
+## Coverage Goals
+
+| Component | Target Coverage |
+|-----------|----------------|
+| Math functions | 100% |
+| Memory management | 100% |
+| Input handling | 90% |
+| Sprite system | 80% |
+| Background system | 80% |
+| Audio system | 70% |
+
+## Adding New Test Categories
+
+1. Create directory under `tests/`
+2. Add to `run_tests.sh` category list
+3. Document in this README
+4. Add to CI workflow
