@@ -1,0 +1,10 @@
+# Build artifacts
+*.obj
+*.ps
+*.sfc
+*.sym
+linkfile
+
+# Generated assembly
+combined.asm
+main.asm
