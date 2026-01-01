@@ -17,10 +17,10 @@
 #
 #==============================================================================
 
-.PHONY: all compiler lib tools clean test help submodules
+.PHONY: all compiler wla-dx lib tools clean test help submodules
 
 # Default target
-all: submodules compiler lib
+all: submodules compiler wla-dx lib
 	@echo ""
 	@echo "=========================================="
 	@echo "OpenSNES SDK build complete!"
@@ -49,6 +49,21 @@ compiler: submodules
 	@mkdir -p bin
 	@cp compiler/tcc/816-tcc bin/
 	@echo "[COMPILER] Done. Binary: bin/816-tcc"
+
+#------------------------------------------------------------------------------
+# WLA-DX Assembler/Linker
+#------------------------------------------------------------------------------
+
+wla-dx: submodules
+	@echo "[WLA-DX] Building assembler and linker..."
+	@mkdir -p compiler/wla-dx/build
+	@cd compiler/wla-dx/build && cmake .. -DCMAKE_BUILD_TYPE=Release > /dev/null
+	$(MAKE) -C compiler/wla-dx/build wla-65816 wla-spc700 wlalink
+	@mkdir -p bin
+	@cp compiler/wla-dx/build/binaries/wla-65816 bin/
+	@cp compiler/wla-dx/build/binaries/wla-spc700 bin/
+	@cp compiler/wla-dx/build/binaries/wlalink bin/
+	@echo "[WLA-DX] Done. Binaries: bin/wla-65816, bin/wla-spc700, bin/wlalink"
 
 #------------------------------------------------------------------------------
 # Library
@@ -83,6 +98,7 @@ test:
 clean:
 	@echo "[CLEAN] Cleaning build artifacts..."
 	-$(MAKE) -C compiler/tcc clean 2>/dev/null || true
+	-rm -rf compiler/wla-dx/build 2>/dev/null || true
 	-$(MAKE) -C lib clean 2>/dev/null || true
 	-$(MAKE) -C tools clean 2>/dev/null || true
 	-rm -rf bin/
@@ -97,7 +113,8 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  all       - Build everything (default)"
-	@echo "  compiler  - Build 816-tcc compiler"
+	@echo "  compiler  - Build 816-tcc C compiler"
+	@echo "  wla-dx    - Build WLA-DX assembler/linker"
 	@echo "  lib       - Build OpenSNES library"
 	@echo "  tools     - Build asset conversion tools"
 	@echo "  test      - Run test suite"
