@@ -1,0 +1,6 @@
+[submodule "compiler/tcc"]
+	path = compiler/tcc
+	url = https://github.com/alekmaul/tcc.git
+[submodule "compiler/qbe"]
+	path = compiler/qbe
+	url = git://c9x.me/qbe.git
