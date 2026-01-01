@@ -1,0 +1,44 @@
+{
+  "$schema": "https://claude.ai/code/settings-schema.json",
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(make clean:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(md5:*)",
+      "Bash(chmod:*)",
+      "Bash(timeout:*)",
+
+      "Bash(git:*)",
+      "Bash(gh:*)",
+
+      "Bash(python3:*)",
+
+      "Bash(./run_tests.sh:*)",
+      "Bash(./build.sh:*)",
+
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:c9x.me)",
+      "WebFetch(domain:snes.nesdev.org)",
+      "WebFetch(domain:wiki.superfamicom.org)"
+    ],
+    "deny": []
+  },
+  "env": {
+    "OPENSNES_HOME": "/Users/k0b3/workspaces/github/opensnes"
+  },
+  "mcpServers": {
+    "context7": {
+      "description": "Documentation lookup for SNES/65816 programming",
+      "usage": [
+        "Use /websites/snes_nesdev_wiki for SNES hardware documentation",
+        "Use /websites/cc65_github_io_doc for 6502/65816 assembly reference"
+      ]
+    }
+  }
+}

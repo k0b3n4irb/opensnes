@@ -1,0 +1,44 @@
+# Build outputs
+*.o
+*.obj
+*.a
+*.lib
+*.sfc
+*.sym
+*.map
+
+# Compiler intermediates
+*.ps
+*.asp
+
+# Tool outputs
+*.pic
+*.pal
+*.brr
+*.pc7
+*.mp7
+*.bnk
+
+# WLA-DX
+linkfile
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Build directories
+build/
+bin/
+release/
+
+# Temporary files
+*.log
+*.tmp
