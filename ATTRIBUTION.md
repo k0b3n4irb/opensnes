@@ -14,21 +14,37 @@ OpenSNES is a spiritual successor to PVSnesLib, building upon the work of many c
   - Build system patterns
 - **Status**: OpenSNES is inspired by PVSnesLib but is a separate project with different goals
 
-### 816-tcc (Initial Compiler)
-- **Author**: Alekmaul, based on TinyCC by Fabrice Bellard
-- **Repository**: https://github.com/alekmaul/tcc
-- **License**: LGPL
-- **What we use**: Initially used as compiler, to be replaced by QBE-based compiler
-- **Status**: Temporary, will be replaced
+## Compiler Stack
 
-## Future Components
-
-### QBE Compiler Backend (Planned)
+### QBE (Query Compiler Backend)
 - **Author**: Quentin Carbonneaux
 - **Repository**: https://c9x.me/compile/
 - **License**: MIT
-- **What we will use**: Compiler infrastructure for our 65816 backend
-- **Status**: Planned - new 65816 backend to be developed
+- **What we use**: Compiler infrastructure with our custom w65816 backend
+- **Status**: Active - our 65816 backend generates working SNES code
+
+### cproc (C Compiler Frontend)
+- **Author**: Michael Forney
+- **Repository**: https://git.sr.ht/~mcf/cproc
+- **License**: ISC
+- **What we use**: C11 frontend that outputs QBE IL
+- **Status**: Active - integrated with our QBE backend
+
+### WLA-DX (Assembler/Linker)
+- **Author**: Ville Helin
+- **Repository**: https://github.com/vhelin/wla-dx
+- **License**: GPL-2.0
+- **What we use**: wla-65816 assembler, wla-spc700 for audio, wlalink
+- **Status**: Active - used for all assembly and linking
+
+## Historical
+
+### 816-tcc (No Longer Used)
+- **Author**: Alekmaul, based on TinyCC by Fabrice Bellard
+- **Repository**: https://github.com/alekmaul/tcc
+- **License**: LGPL
+- **What we used**: Initially considered as compiler
+- **Status**: Removed - replaced by QBE-based cc65816
 
 ## Documentation Sources
 
@@ -81,10 +97,12 @@ When adding code from external sources:
 OpenSNES uses MIT license. Compatible source licenses:
 - MIT (fully compatible)
 - BSD 2/3-clause (compatible)
+- ISC (compatible)
 - CC0/Public Domain (compatible)
-- LGPL (for tools/compiler, with care)
 - CC-BY-SA (for documentation only)
 
+Note: WLA-DX is GPL-2.0 but used as a separate tool (not linked), which is acceptable.
+
 Incompatible (do not use without isolation):
-- GPL (viral, would require relicensing)
+- GPL (for library code - would require relicensing)
 - Proprietary (obviously)

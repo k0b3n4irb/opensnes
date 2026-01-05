@@ -1,0 +1,86 @@
+#!/bin/bash
+# cc65816 - C compiler for 65816/SNES
+# Uses cproc (C frontend) + QBE (optimizer) to generate WLA-DX assembly
+#
+# Usage: cc65816 input.c [-o output.asm]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CPROC="$SCRIPT_DIR/cproc-qbe"
+QBE="$SCRIPT_DIR/qbe"
+
+usage() {
+    echo "Usage: cc65816 input.c [-o output.asm]"
+    echo "  Compiles C source to 65816 assembly for SNES"
+    echo ""
+    echo "Options:"
+    echo "  -o FILE    Output assembly to FILE (default: stdout)"
+    echo "  -I DIR     Add include directory"
+    echo "  -D NAME    Define preprocessor macro"
+    echo "  -h         Show this help"
+    exit 1
+}
+
+INPUT=""
+OUTPUT=""
+CFLAGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o)
+            OUTPUT="$2"
+            shift 2
+            ;;
+        -I|-D)
+            CFLAGS+=("$1" "$2")
+            shift 2
+            ;;
+        -I*|-D*)
+            CFLAGS+=("$1")
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            usage
+            ;;
+        *)
+            if [[ -z "$INPUT" ]]; then
+                INPUT="$1"
+            else
+                echo "Multiple input files not supported" >&2
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$INPUT" ]]; then
+    echo "Error: No input file specified" >&2
+    usage
+fi
+
+if [[ ! -f "$INPUT" ]]; then
+    echo "Error: Input file not found: $INPUT" >&2
+    exit 1
+fi
+
+# Create unique temp file using mktemp
+# -t template: portable across macOS, Linux, and Git Bash/MSYS on Windows
+TMPFILE=$(mktemp -t cc65816.XXXXXX) || TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+# Pipeline: cc -E (preprocess) -> cproc-qbe (C -> QBE IL) -> qbe (QBE IL -> 65816 asm)
+# We use the system preprocessor to work around cproc's limited preprocessor
+cc -E "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
+
+if [[ -z "$OUTPUT" ]]; then
+    "$CPROC" "$TMPFILE" | "$QBE" -t w65816
+else
+    "$CPROC" "$TMPFILE" | "$QBE" -t w65816 > "$OUTPUT"
+    echo "Generated: $OUTPUT"
+fi

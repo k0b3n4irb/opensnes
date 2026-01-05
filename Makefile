@@ -3,106 +3,81 @@
 #==============================================================================
 #
 # Usage:
-#   make              Build everything (compiler, tools, library)
-#   make compiler     Build 816-tcc compiler only
+#   make              Build everything (compiler, tools, library, examples)
+#   make compiler     Build compiler only (cc65816/QBE + wla-dx)
+#   make tools        Build tools only (font2snes, etc.)
 #   make lib          Build library only
-#   make tools        Build tools only
+#   make examples     Build all examples
 #   make clean        Clean all build artifacts
-#   make test         Run test suite
-#
-# Prerequisites:
-#   - GCC or Clang
-#   - Make
-#   - Git (for submodules)
+#   make install      Install binaries to bin/
 #
 #==============================================================================
 
-.PHONY: all compiler wla-dx lib tools clean test help submodules
+# Parallel builds
+UNAME := $(shell uname -s)
+ifeq ($(OS),Windows_NT)
+    MAKEFLAGS += -j$(NUMBER_OF_PROCESSORS)
+else ifeq ($(UNAME),Darwin)
+    MAKEFLAGS += -j$(shell sysctl -n hw.ncpu)
+else ifeq ($(UNAME),Linux)
+    MAKEFLAGS += -j$(shell nproc)
+endif
 
-# Default target
-all: submodules compiler wla-dx lib
+# Paths
+COMPILER_PATH := compiler
+TOOLS_PATH    := tools
+LIB_PATH      := lib
+EXAMPLES_PATH := examples
+TESTS_PATH    := tests
+
+.DEFAULT_GOAL := all
+.PHONY: all clean install compiler tools lib examples tests submodules help
+
+#------------------------------------------------------------------------------
+# Main targets
+#------------------------------------------------------------------------------
+
+all: submodules compiler tools examples
 	@echo ""
 	@echo "=========================================="
 	@echo "OpenSNES SDK build complete!"
 	@echo "=========================================="
-	@echo ""
-	@echo "Next steps:"
-	@echo "  export OPENSNES_HOME=$(shell pwd)"
-	@echo "  cd templates/platformer && make"
-	@echo ""
+
+clean:
+	$(MAKE) -C $(COMPILER_PATH) clean
+	$(MAKE) -C $(TOOLS_PATH) clean
+	$(MAKE) -C $(LIB_PATH) clean
+	$(MAKE) -C $(EXAMPLES_PATH) clean
+	$(MAKE) -C $(TESTS_PATH) clean
+	-rm -rf bin/
+
+install: compiler tools
+	$(MAKE) -C $(COMPILER_PATH) install
+	$(MAKE) -C $(TOOLS_PATH) install
 
 #------------------------------------------------------------------------------
-# Submodules
+# Components
 #------------------------------------------------------------------------------
 
 submodules:
-	@echo "[SUBMODULES] Initializing..."
 	@git submodule update --init --recursive
 
-#------------------------------------------------------------------------------
-# Compiler (816-tcc)
-#------------------------------------------------------------------------------
-
 compiler: submodules
-	@echo "[COMPILER] Building 816-tcc..."
-	$(MAKE) -C compiler/tcc
-	@mkdir -p bin
-	@cp compiler/tcc/816-tcc bin/
-	@echo "[COMPILER] Done. Binary: bin/816-tcc"
+	$(MAKE) -C $(COMPILER_PATH)
+	$(MAKE) -C $(COMPILER_PATH) install
 
-#------------------------------------------------------------------------------
-# WLA-DX Assembler/Linker
-#------------------------------------------------------------------------------
+tools: compiler
+	$(MAKE) -C $(TOOLS_PATH)
+	$(MAKE) -C $(TOOLS_PATH) install
 
-wla-dx: submodules
-	@echo "[WLA-DX] Building assembler and linker..."
-	@mkdir -p compiler/wla-dx/build
-	@cd compiler/wla-dx/build && cmake .. -DCMAKE_BUILD_TYPE=Release > /dev/null
-	$(MAKE) -C compiler/wla-dx/build wla-65816 wla-spc700 wlalink
-	@mkdir -p bin
-	@cp compiler/wla-dx/build/binaries/wla-65816 bin/
-	@cp compiler/wla-dx/build/binaries/wla-spc700 bin/
-	@cp compiler/wla-dx/build/binaries/wlalink bin/
-	@echo "[WLA-DX] Done. Binaries: bin/wla-65816, bin/wla-spc700, bin/wlalink"
+lib: compiler
+	$(MAKE) -C $(LIB_PATH)
 
-#------------------------------------------------------------------------------
-# Library
-#------------------------------------------------------------------------------
+examples: compiler tools
+	$(MAKE) -C $(EXAMPLES_PATH)
 
-lib:
-	@echo "[LIBRARY] Building OpenSNES library..."
-	$(MAKE) -C lib
-	@echo "[LIBRARY] Done."
-
-#------------------------------------------------------------------------------
-# Tools
-#------------------------------------------------------------------------------
-
-tools:
-	@echo "[TOOLS] Building tools..."
-	$(MAKE) -C tools
-	@echo "[TOOLS] Done."
-
-#------------------------------------------------------------------------------
-# Testing
-#------------------------------------------------------------------------------
-
-test:
-	@echo "[TEST] Running test suite..."
-	@cd tests && ./run_tests.sh
-
-#------------------------------------------------------------------------------
-# Clean
-#------------------------------------------------------------------------------
-
-clean:
-	@echo "[CLEAN] Cleaning build artifacts..."
-	-$(MAKE) -C compiler/tcc clean 2>/dev/null || true
-	-rm -rf compiler/wla-dx/build 2>/dev/null || true
-	-$(MAKE) -C lib clean 2>/dev/null || true
-	-$(MAKE) -C tools clean 2>/dev/null || true
-	-rm -rf bin/
-	@echo "[CLEAN] Done."
+tests: compiler tools
+	$(MAKE) -C $(TESTS_PATH)
 
 #------------------------------------------------------------------------------
 # Help
@@ -113,13 +88,11 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  all       - Build everything (default)"
-	@echo "  compiler  - Build 816-tcc C compiler"
-	@echo "  wla-dx    - Build WLA-DX assembler/linker"
+	@echo "  compiler  - Build cc65816 (cproc+QBE) and WLA-DX"
+	@echo "  tools     - Build asset tools (font2snes)"
 	@echo "  lib       - Build OpenSNES library"
-	@echo "  tools     - Build asset conversion tools"
-	@echo "  test      - Run test suite"
-	@echo "  clean     - Remove build artifacts"
+	@echo "  examples  - Build all example ROMs"
+	@echo "  tests     - Build test ROMs"
+	@echo "  clean     - Clean all build artifacts"
+	@echo "  install   - Install binaries to bin/"
 	@echo "  help      - Show this help"
-	@echo ""
-	@echo "Environment:"
-	@echo "  OPENSNES_HOME - Set to SDK root directory"

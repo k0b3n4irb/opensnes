@@ -1,0 +1,177 @@
+name: OpenSNES Build & Test
+
+# ------------------------------------ #
+# Events to trigger the action         #
+# ------------------------------------ #
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "develop"
+  pull_request:
+    branches:
+      - "develop"
+      - "main"
+
+# ------------------------------------ #
+# Set O.S matrix                       #
+# ------------------------------------ #
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+          - os: windows-latest
+            name: windows
+          - os: macos-latest
+            name: darwin
+
+    steps:
+      # ------------------------------------ #
+      # Install dependencies                 #
+      # ------------------------------------ #
+      - name: Install dependencies for Linux
+        if: matrix.name == 'linux'
+        run: |
+          sudo apt update -y
+          sudo apt-get install -y build-essential \
+              gcc \
+              cmake \
+              make \
+              git
+
+      - name: Install dependencies for Windows
+        if: matrix.name == 'windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          msystem: UCRT64
+          install: >-
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            base-devel
+            git
+
+      - name: Install dependencies for macOS
+        if: matrix.name == 'darwin'
+        run: |
+          brew update || true
+          # Xcode Command Line Tools should provide everything needed
+
+      # ------------------------------------ #
+      # Checkout the project                 #
+      # ------------------------------------ #
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # ------------------------------------ #
+      # Build the SDK                        #
+      # ------------------------------------ #
+      - name: Build OpenSNES for Linux
+        if: matrix.name == 'linux'
+        run: |
+          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+
+      - name: Build OpenSNES for Windows
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+
+      - name: Build OpenSNES for macOS
+        if: matrix.name == 'darwin'
+        run: |
+          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Build tests                          #
+      # ------------------------------------ #
+      - name: Build tests for Linux
+        if: matrix.name == 'linux'
+        run: |
+          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      - name: Build tests for Windows
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      - name: Build tests for macOS
+        if: matrix.name == 'darwin'
+        run: |
+          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Verify built artifacts               #
+      # ------------------------------------ #
+      - name: Verify built ROMs
+        if: matrix.name != 'windows'
+        run: |
+          echo "=== Built Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          find examples -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Built Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          find tests -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Toolchain ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ls -la bin/ | tee -a opensnes_build_${{ matrix.name }}.log
+
+      - name: Verify built ROMs (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          echo "=== Built Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          find examples -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Built Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          find tests -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Toolchain ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ls -la bin/ | tee -a opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Check library linking                #
+      # ------------------------------------ #
+      - name: Check library linking (macOS)
+        if: matrix.name == 'darwin'
+        run: |
+          echo "=== Library Linking ===" | tee opensnes_linking_${{ matrix.name }}.log
+          otool -L bin/* 2>/dev/null | tee -a opensnes_linking_${{ matrix.name }}.log || true
+
+      - name: Check library linking (Linux)
+        if: matrix.name == 'linux'
+        run: |
+          echo "=== Library Linking ===" | tee opensnes_linking_${{ matrix.name }}.log
+          ldd bin/* 2>/dev/null | tee -a opensnes_linking_${{ matrix.name }}.log || true
+
+      - name: Check library linking (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          echo "=== Library Linking ===" | tee opensnes_linking_${{ matrix.name }}.log
+          ldd bin/*.exe 2>/dev/null | tee -a opensnes_linking_${{ matrix.name }}.log || true
+
+      # ------------------------------------ #
+      # Upload build logs                    #
+      # ------------------------------------ #
+      - name: Upload build logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OpenSNES Build Logs (${{ matrix.name }})
+          path: "*.log"
+
+      # ------------------------------------ #
+      # Upload built ROMs                    #
+      # ------------------------------------ #
+      - name: Upload example ROMs
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenSNES Example ROMs (${{ matrix.name }})
+          path: |
+            examples/**/*.sfc
+            tests/**/*.sfc
