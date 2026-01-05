@@ -96,7 +96,9 @@ $(CPROC_DIR)/config.h:
 	@echo 'static const char *const endfiles[] = {NULL};' >> $@
 
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
-	$(MAKE) -C $(CPROC_DIR)
+# cproc Makefile uses 'c99' which doesn't exist on MSYS2/Windows
+# Use 'cc -std=c99' instead (works on all platforms)
+	$(MAKE) -C $(CPROC_DIR) CC="cc -std=c99"
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
