@@ -122,4 +122,8 @@ wla-clean:
 
 wla-install:
 	@mkdir -p $(BIN_DIR)
+ifeq ($(OS),Windows_NT)
+	@cp $(WLA_DIR)/binaries/wla-65816.exe $(WLA_DIR)/binaries/wla-spc700.exe $(WLA_DIR)/binaries/wlalink.exe $(BIN_DIR)/
+else
 	@cp $(WLA_DIR)/binaries/wla-65816 $(WLA_DIR)/binaries/wla-spc700 $(WLA_DIR)/binaries/wlalink $(BIN_DIR)/
+endif
