@@ -110,13 +110,21 @@ typedef volatile s32 vs32;
  * @{
  */
 
+/*
+ * Bool type compatibility:
+ * - C11 compilers (cproc) have built-in bool/_Bool
+ * - Legacy compilers (816-tcc) need typedef
+ * We check for __STDC_VERSION__ >= C99 as indicator of modern compiler
+ */
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef unsigned char bool;
+#define false 0
+#define true  1
+#endif
 
+/* SNES-specific TRUE/FALSE (0xFF for TRUE is common in SNES code) */
 #define FALSE 0
 #define TRUE  0xFF
-
-#define false 0
-#define true  0xFF
 
 /** @} */
 

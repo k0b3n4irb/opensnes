@@ -147,15 +147,15 @@ _snes_init:
 
     ; $2105-$210C: BG mode and tilemap addresses - clear
     ldx #$2105
--   stz $0000,x
+-   stz.w $0000,x
     inx
     cpx #$210D
     bne -
 
     ; $210D-$2114: BG scroll registers - clear (write twice each)
     ldx #$210D
--   stz $0000,x
-    stz $0000,x         ; Second write for high bits
+-   stz.w $0000,x
+    stz.w $0000,x         ; Second write for high bits
     inx
     cpx #$2115
     bne -
@@ -178,8 +178,8 @@ _snes_init:
 
     ; $211C-$211D: Mode 7 matrix B, C - clear
     ldx #$211C
--   stz $0000,x
-    stz $0000,x
+-   stz.w $0000,x
+    stz.w $0000,x
     inx
     cpx #$211E
     bne -
@@ -199,7 +199,7 @@ _snes_init:
 
     ; $2123-$212B: Window settings - clear
     ldx #$2123
--   stz $0000,x
+-   stz.w $0000,x
     inx
     cpx #$212C
     bne -
@@ -234,7 +234,7 @@ _snes_init:
 
     ; $4202-$420D: Math and DMA registers - clear
     ldx #$4202
--   stz $0000,x
+-   stz.w $0000,x
     inx
     cpx #$420E
     bne -
@@ -285,7 +285,7 @@ _start:
 
     ; Set Direct Page to imaginary registers
     lda #tcc__r0
-    tad
+    tcd
 
     ; Set up empty NMI handler
     lda #_EmptyNMI
@@ -337,15 +337,21 @@ _start:
     stz frame_count_svg
     stz lag_frame_counter
 
+    ; Reset Data Bank to $00 for hardware register access
+    ; (was set to $7E for .bss clearing above)
+    pea $0000
+    plb
+    plb
+
     ; Initialize console (sets up VBlank handler, etc.)
     jsl consoleInit
 
-    ; Call main()
-    jsr main
+    ; Call main() - use JSL since QBE generates RTL returns
+    jsl main
 
     ; Main returned - halt
     ; Store return value at $FFFD for test runners
-    lda tcc__r0
+    ; QBE returns value in A register (already there after jsl main returns)
     sep #$20
     sta $FFFD
     rep #$20
@@ -378,7 +384,7 @@ _nmi_handler:
 
     ; Set direct page to our registers
     lda #tcc__r0
-    tad
+    tcd
 
     ; Set data bank to $00
     pea $0000

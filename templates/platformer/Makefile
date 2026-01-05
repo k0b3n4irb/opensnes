@@ -17,16 +17,16 @@
 # Project name (output ROM name)
 PROJECT = platformer
 
-# OpenSNES SDK location
-OPENSNES_HOME ?= ../..
+# OpenSNES SDK location (absolute path)
+OPENSNES_HOME := $(shell cd ../.. && pwd)
 
 #------------------------------------------------------------------------------
 # Tools
 #------------------------------------------------------------------------------
 
-CC = $(OPENSNES_HOME)/bin/816-tcc
-AS = wla-65816
-LD = wlalink
+CC = $(OPENSNES_HOME)/bin/cc65816
+AS = $(OPENSNES_HOME)/bin/wla-65816
+LD = $(OPENSNES_HOME)/bin/wlalink
 GFX = $(OPENSNES_HOME)/bin/gfx4snes
 
 #------------------------------------------------------------------------------
@@ -85,11 +85,16 @@ $(ROM): $(ALL_OBJECTS) linkfile
 	@echo "[LD] Linking $@"
 	$(LD) -v -S $(SYM) linkfile $@
 
-# C source compilation
+# C source compilation (using new QBE-based compiler)
 $(BUILDDIR)/%.obj: $(SRCDIR)/%.c | $(BUILDDIR)
 	@echo "[CC] $<"
-	$(CC) $(CFLAGS) -c $< -o $(BUILDDIR)/$*.ps
-	# TODO: Run through 816-opt and constify
+	$(CC) $(CFLAGS) $< -o $(BUILDDIR)/$*.c.asm
+	@sed -e '/^\.data/d' \
+	     -e '/^\/\* end/d' \
+	     -e '/^\.balign/d' \
+	     -e '/^\.GLOBAL/d' \
+	     -e 's/\.byte/.db/g' \
+	     $(BUILDDIR)/$*.c.asm > $(BUILDDIR)/$*.asm
 	$(AS) $(ASFLAGS) $@ $(BUILDDIR)/$*.asm
 
 # Assembly source
@@ -115,7 +120,7 @@ clean:
 	@echo "[CLEAN] Removing build files..."
 	-rm -rf $(BUILDDIR)
 	-rm -f $(ROM) $(SYM) linkfile
-	-rm -f $(SRCDIR)/*.ps $(SRCDIR)/*.asm
+	-rm -f $(SRCDIR)/*.c.asm $(SRCDIR)/*.asm
 
 run: $(ROM)
 	@echo "[RUN] Starting emulator..."

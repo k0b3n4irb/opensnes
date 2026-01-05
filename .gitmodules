@@ -1,9 +1,9 @@
-[submodule "compiler/tcc"]
-	path = compiler/tcc
-	url = https://github.com/alekmaul/tcc.git
 [submodule "compiler/qbe"]
 	path = compiler/qbe
 	url = git://c9x.me/qbe.git
 [submodule "compiler/wla-dx"]
 	path = compiler/wla-dx
 	url = https://github.com/vhelin/wla-dx.git
+[submodule "compiler/cproc"]
+	path = compiler/cproc
+	url = https://git.sr.ht/~mcf/cproc
