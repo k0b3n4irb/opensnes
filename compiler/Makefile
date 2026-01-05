@@ -53,13 +53,56 @@ cc65816: $(QBE_DIR)/qbe $(CPROC_DIR)/cproc-qbe
 $(QBE_DIR)/qbe:
 	$(MAKE) -C $(QBE_DIR)
 
-$(CPROC_DIR)/cproc-qbe:
+# Generate cproc config.h if missing (required for non-Linux platforms)
+$(CPROC_DIR)/config.h:
+	@echo "[CPROC] Generating config.h for w65816 target..."
+	@echo '/* cproc configuration for w65816 (SNES) target */' > $@
+	@echo '' >> $@
+	@echo 'static const char target[] = "w65816";' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const defaultdefines[] = {' >> $@
+	@echo '    "-D", "__w65816__",' >> $@
+	@echo '    "-D", "__SNES__",' >> $@
+	@echo '    "-D", "__INT_MAX__=32767",' >> $@
+	@echo '    "-D", "__LONG_MAX__=2147483647",' >> $@
+	@echo '    "-D", "__SIZEOF_INT__=2",' >> $@
+	@echo '    "-D", "__SIZEOF_LONG__=4",' >> $@
+	@echo '    "-D", "__SIZEOF_POINTER__=2",' >> $@
+	@echo '    NULL,' >> $@
+	@echo '};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const defaultlinkflags[] = {NULL};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const preprocesscmd[] = {' >> $@
+	@echo '    "cpp",' >> $@
+	@echo '    "-U", "__GNUC__",' >> $@
+	@echo '    "-P",' >> $@
+	@echo '};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const codegencmd[] = {' >> $@
+	@echo '    "../qbe/qbe",' >> $@
+	@echo '};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const assemblecmd[] = {' >> $@
+	@echo '    "wla-65816",' >> $@
+	@echo '    "-o",' >> $@
+	@echo '};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const linkcmd[] = {' >> $@
+	@echo '    "wlalink",' >> $@
+	@echo '};' >> $@
+	@echo '' >> $@
+	@echo 'static const char *const startfiles[] = {NULL};' >> $@
+	@echo 'static const char *const endfiles[] = {NULL};' >> $@
+
+$(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 	$(MAKE) -C $(CPROC_DIR)
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
 	$(MAKE) -C $(CPROC_DIR) clean
-	-rm -f $(BIN_DIR)/qbe $(BIN_DIR)/cproc-qbe
+	-rm -f $(BIN_DIR)/qbe $(BIN_DIR)/cproc-qbe $(BIN_DIR)/cc65816
+	-rm -f $(CPROC_DIR)/config.h
 
 cc65816-install: cc65816
 	@echo "[INSTALL] cc65816 installed to $(BIN_DIR)/"
