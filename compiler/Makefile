@@ -45,8 +45,13 @@ install: cc65816-install wla-install
 cc65816: $(QBE_DIR)/qbe $(CPROC_DIR)/cproc-qbe
 	@echo "[CC65816] Installing compiler..."
 	@mkdir -p $(BIN_DIR)
+ifeq ($(OS),Windows_NT)
+	@cp $(QBE_DIR)/qbe.exe $(BIN_DIR)/qbe.exe
+	@cp $(CPROC_DIR)/cproc-qbe.exe $(BIN_DIR)/cproc-qbe.exe
+else
 	@cp $(QBE_DIR)/qbe $(BIN_DIR)/qbe
 	@cp $(CPROC_DIR)/cproc-qbe $(BIN_DIR)/cproc-qbe
+endif
 	@cp scripts/cc65816 $(BIN_DIR)/cc65816
 	@chmod +x $(BIN_DIR)/cc65816
 
