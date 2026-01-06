@@ -1,6 +1,6 @@
 [submodule "compiler/wla-dx"]
 	path = compiler/wla-dx
-	url = https://github.com/vhelin/wla-dx.git
+	url = https://github.com/k0b3n4irb/wla-dx.git
 [submodule "compiler/cproc"]
 	path = compiler/cproc
-	url = https://git.sr.ht/~mcf/cproc
+	url = https://github.com/k0b3n4irb/cproc.git
