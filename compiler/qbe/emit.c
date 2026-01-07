@@ -6,50 +6,31 @@ enum {
 	SecBss,
 };
 
+static int datasec_counter = 0;
+
 void
 emitlnk(char *n, Lnk *l, int s, FILE *f)
 {
-	static char *sec[2][3] = {
-		[0][SecText] = ".text",
-		[0][SecData] = ".data",
-		[0][SecBss] = ".bss",
-		[1][SecText] = ".abort \"unreachable\"",
-		[1][SecData] = ".section .tdata,\"awT\"",
-		[1][SecBss] = ".section .tbss,\"awT\"",
-	};
-	char *pfx, *sfx;
+	char *pfx;
+	(void)l;  /* WLA-DX doesn't use linkage flags */
 
 	pfx = n[0] == '"' ? "" : T.assym;
-	sfx = "";
-	if (T.apple && l->thread) {
-		l->sec = "__DATA";
-		l->secf = "__thread_data,thread_local_regular";
-		sfx = "$tlv$init";
-		fputs(
-			".section __DATA,__thread_vars,"
-			"thread_local_variables\n",
-			f
-		);
-		fprintf(f, "%s%s:\n", pfx, n);
-		fprintf(f,
-			"\t.quad __tlv_bootstrap\n"
-			"\t.quad 0\n"
-			"\t.quad %s%s%s\n\n",
-			pfx, n, sfx
-		);
+
+	/* WLA-DX compatible section syntax for w65816 */
+	switch (s) {
+	case SecText:
+		fprintf(f, ".SECTION \".text.%s\" SUPERFREE\n", n);
+		break;
+	case SecData:
+		fprintf(f, ".SECTION \".rodata.%d\" SUPERFREE\n", ++datasec_counter);
+		break;
+	case SecBss:
+		fprintf(f, ".SECTION \".bss.%d\" SUPERFREE\n", ++datasec_counter);
+		break;
 	}
-	if (l->sec) {
-		fprintf(f, ".section %s", l->sec);
-		if (l->secf)
-			fprintf(f, ",%s", l->secf);
-	} else
-		fputs(sec[l->thread != 0][s], f);
-	fputc('\n', f);
-	if (l->align)
-		fprintf(f, ".balign %d\n", l->align);
-	if (l->export)
-		fprintf(f, ".globl %s%s\n", pfx, n);
-	fprintf(f, "%s%s%s:\n", pfx, n, sfx);
+	/* WLA-DX: skip .globl since we compile as single file.
+	 * Symbols are visible within the same compilation unit. */
+	fprintf(f, "%s%s:\n", pfx, n);
 }
 
 void
@@ -61,11 +42,12 @@ emitfnlnk(char *n, Lnk *l, FILE *f)
 void
 emitdat(Dat *d, FILE *f)
 {
+	/* Use WLA-DX compatible directives for w65816 target */
 	static char *dtoa[] = {
-		[DB] = "\t.byte",
-		[DH] = "\t.short",
-		[DW] = "\t.int",
-		[DL] = "\t.quad"
+		[DB] = "\t.db",
+		[DH] = "\t.dw",
+		[DW] = "\t.dd",
+		[DL] = "\t.dd"  /* 8-byte emitted as two 4-byte */
 	};
 	static int64_t zero;
 	char *p;
@@ -87,7 +69,11 @@ emitdat(Dat *d, FILE *f)
 		}
 		else if (zero != -1) {
 			emitlnk(d->name, d->lnk, SecBss, f);
-			fprintf(f, "\t.fill %"PRId64",1,0\n", zero);
+			fprintf(f, "\t.dsb %"PRId64"\n", zero);  /* WLA-DX: define storage bytes */
+			fputs(".ENDS\n", f);
+		} else {
+			/* Data section was emitted, close it */
+			fputs(".ENDS\n", f);
 		}
 		break;
 	case DZ:

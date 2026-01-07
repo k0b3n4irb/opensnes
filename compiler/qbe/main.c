@@ -95,9 +95,12 @@ func(Fn *fn)
 	if (!T.skiprega) {
 		spill(fn);
 		rega(fn);
+		fillcfg(fn);
+		simpljmp(fn);
 	}
-	fillcfg(fn);
-	simpljmp(fn);
+	/* When skiprega is set (w65816), phi nodes are preserved and
+	 * lowered to copies by the emit code (emitphimoves).
+	 * We skip simpljmp since it requires phi nodes to be gone. */
 	fillcfg(fn);
 	assert(fn->rpo[0] == fn->start);
 	for (n=0;; n++)
