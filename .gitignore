@@ -43,3 +43,11 @@ release/
 # Temporary files
 *.log
 *.tmp
+
+# Build artifacts
+*.asm
+*.obj
+*.sfc
+*.h
+!lib/include/**/*.h
+
