@@ -324,6 +324,23 @@ oam_set_tile:
     plp
     rtl                 ; Return from JSL (not RTS!)
 
+;------------------------------------------------------------------------------
+; oam_set_pos - Set sprite 0's X and Y position
+; void oam_set_pos(u8 x, u8 y)
+; Stack: [P:1] [retaddr:3] [y:2] [x:2] -> x at 7, y at 5
+;------------------------------------------------------------------------------
+oam_set_pos:
+    php
+    sep #$20            ; 8-bit A
+    stz $2102           ; OAMADDL = 0 (sprite 0, byte 0)
+    stz $2103           ; OAMADDH = 0
+    lda 7,s             ; Get X param
+    sta $2104           ; OAMDATA = X
+    lda 5,s             ; Get Y param
+    sta $2104           ; OAMDATA = Y
+    plp
+    rtl
+
 .ENDS
 
 ;==============================================================================
