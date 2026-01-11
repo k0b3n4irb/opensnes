@@ -1,15 +1,11 @@
 /**
  * @file main.c
- * @brief Sprite Animation Example
+ * @brief Animated Sprite Example
  *
- * Demonstrates actual sprite animation on SNES.
- * A single sprite cycles through 4 walk animation frames.
+ * Port of pvsneslib AnimatedSprite example.
+ * Move sprite with D-pad, sprite animates while moving.
  *
- * Note: Uses assembly helper for OAM updates due to 816-tcc
- * code generation issues with volatile pointer writes.
- *
- * @author OpenSNES Team
- * @license CC0 (Public Domain)
+ * Sprite from Stephen "Redshrike" Challener, http://opengameart.org
  */
 
 typedef unsigned char u8;
@@ -21,9 +17,6 @@ typedef unsigned short u16;
 
 #define REG_INIDISP  (*(volatile u8*)0x2100)
 #define REG_OBJSEL   (*(volatile u8*)0x2101)
-#define REG_OAMADDL  (*(volatile u8*)0x2102)
-#define REG_OAMADDH  (*(volatile u8*)0x2103)
-#define REG_OAMDATA  (*(volatile u8*)0x2104)
 #define REG_VMAIN    (*(volatile u8*)0x2115)
 #define REG_VMADDL   (*(volatile u8*)0x2116)
 #define REG_VMADDH   (*(volatile u8*)0x2117)
@@ -32,38 +25,22 @@ typedef unsigned short u16;
 #define REG_CGADD    (*(volatile u8*)0x2121)
 #define REG_CGDATA   (*(volatile u8*)0x2122)
 #define REG_TM       (*(volatile u8*)0x212C)
-#define REG_NMITIMEN (*(volatile u8*)0x4200)
-#define REG_HVBJOY   (*(volatile u8*)0x4212)
 
-#include "spritesheet.h"
+#include "sprites.h"
 
 /*============================================================================
- * Assembly Helper (defined in crt0.asm)
+ * Assembly Functions (in helpers.asm)
  *============================================================================*/
 
-/* Set sprite 0's tile number - works around 816-tcc volatile write bug */
-extern void oam_set_tile(u8 tile);
+extern void game_init(void);
+extern void read_pad(void);
+extern void update_monster(void);
+extern void update_oam(void);
+extern void wait_vblank(void);
 
 /*============================================================================
- * Animation
+ * Graphics Loading
  *============================================================================*/
-
-#define ANIM_SPEED  8   /* Frames between animation updates */
-
-/* Tile numbers for each animation frame */
-#define FRAME_0_TILE  0
-#define FRAME_1_TILE  2
-#define FRAME_2_TILE  4
-#define FRAME_3_TILE  6
-
-/*============================================================================
- * Functions
- *============================================================================*/
-
-static void wait_vblank(void) {
-    while (REG_HVBJOY & 0x80) {}
-    while (!(REG_HVBJOY & 0x80)) {}
-}
 
 static void load_sprite_tiles(void) {
     u16 i;
@@ -71,21 +48,31 @@ static void load_sprite_tiles(void) {
     REG_VMADDL = 0x00;
     REG_VMADDH = 0x00;
 
-    for (i = 0; i < spritesheet_TILES_SIZE; i += 2) {
-        REG_VMDATAL = spritesheet_tiles[i];
-        REG_VMDATAH = spritesheet_tiles[i + 1];
+    for (i = 0; i < sprites_TILES_SIZE; i += 2) {
+        REG_VMDATAL = sprites_tiles[i];
+        REG_VMDATAH = sprites_tiles[i + 1];
     }
 }
 
 static void load_sprite_palette(void) {
     u8 i;
-    REG_CGADD = 128;
+    REG_CGADD = 128;  /* Sprite palettes start at 128 */
 
-    for (i = 0; i < spritesheet_PAL_COUNT; i++) {
-        u16 color = spritesheet_pal[i];
+    for (i = 0; i < sprites_PAL_COUNT; i++) {
+        u16 color = sprites_pal[i];
         REG_CGDATA = color & 0xFF;
         REG_CGDATA = (color >> 8) & 0xFF;
     }
+}
+
+static void set_background_color(void) {
+    /* Set background color (CGRAM index 0) */
+    /* Use a nice dark blue: RGB(4, 6, 14) in 5-bit = 0x1CC4 */
+    /* SNES format: 0bbbbbgg gggrrrrr */
+    u16 color = (14 << 10) | (6 << 5) | 4;  /* Dark blue */
+    REG_CGADD = 0;
+    REG_CGDATA = color & 0xFF;
+    REG_CGDATA = (color >> 8) & 0xFF;
 }
 
 /*============================================================================
@@ -93,73 +80,36 @@ static void load_sprite_palette(void) {
  *============================================================================*/
 
 int main(void) {
-    u16 i;
-    u8 counter;
-    u8 frame;
-    u8 tile;
+    /* Configure sprites: 16x16 small / 32x32 large */
+    REG_OBJSEL = 0x60;
 
-    REG_OBJSEL = 0x00;
-
+    /* Load graphics */
     load_sprite_tiles();
     load_sprite_palette();
+    set_background_color();
 
-    /* Initialize OAM (works fine before screen on) */
-    REG_OAMADDL = 0;
-    REG_OAMADDH = 0;
+    /* Initialize game state */
+    game_init();
 
-    /* Sprite 0: X=120, Y=104, Tile=0, Priority=3 */
-    REG_OAMDATA = 120;
-    REG_OAMDATA = 104;
-    REG_OAMDATA = 0;
-    REG_OAMDATA = 0x30;
-
-    /* Hide sprites 1-127 */
-    for (i = 1; i < 128; i++) {
-        REG_OAMDATA = 0;
-        REG_OAMDATA = 240;
-        REG_OAMDATA = 0;
-        REG_OAMDATA = 0;
-    }
-
-    /* High table: sprite 0 = large */
-    REG_OAMDATA = 0x02;
-    for (i = 1; i < 32; i++) {
-        REG_OAMDATA = 0;
-    }
-
-    REG_NMITIMEN = 0x81;
+    /* Enable sprites on main screen */
     REG_TM = 0x10;
+
+    /* Screen on */
     REG_INIDISP = 0x0F;
 
-    counter = 0;
-    frame = 0;
-
-    /* Main loop with animation */
+    /* Main loop - order matches pvsneslib */
     while (1) {
+        /* Read joypad first */
+        read_pad();
+
+        /* Update monster position/animation/tile based on input */
+        update_monster();
+
+        /* Wait for VBlank */
         wait_vblank();
 
-        counter++;
-        if (counter >= ANIM_SPEED) {
-            counter = 0;
-            frame++;
-            if (frame >= 4) {
-                frame = 0;
-            }
-
-            /* Calculate tile for current frame */
-            if (frame == 0) {
-                tile = FRAME_0_TILE;
-            } else if (frame == 1) {
-                tile = FRAME_1_TILE;
-            } else if (frame == 2) {
-                tile = FRAME_2_TILE;
-            } else {
-                tile = FRAME_3_TILE;
-            }
-
-            /* Update sprite tile using assembly helper */
-            oam_set_tile(tile);
-        }
+        /* Update OAM during VBlank with the freshly calculated tile */
+        update_oam();
     }
 
     return 0;
