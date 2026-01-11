@@ -1,5 +1,5 @@
-# Animation Example
-# Uses shared OpenSNES templates
+# Animated Sprite Example
+# Port of pvsneslib AnimatedSprite
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
@@ -7,10 +7,13 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := animation.sfc
 ROM_NAME := OPENSNES ANIMATION
 
-# Graphics conversion for spritesheet asset
-GFXSRC      := assets/spritesheet.png
+# Graphics conversion
+GFXSRC      := assets/sprites.png
 SPRITE_SIZE := 16
 BPP         := 4
+
+# Additional assembly
+ASMSRC := helpers.asm
 
 # Include shared build rules
 include $(OPENSNES)/make/common.mk
