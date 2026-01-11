@@ -146,11 +146,26 @@ static u16 read_joypad(void) {
 }
 
 /**
- * Wait for SPC700 ready signal
+ * Wait for SPC700 ready signal (with timeout)
  */
-static void spc_wait_ready(void) {
-    while (REG_APUIO0 != 0xAA) {}
-    while (REG_APUIO1 != 0xBB) {}
+static u8 spc_wait_ready(void) {
+    u16 timeout;
+
+    /* Wait for $AA in port 0 */
+    timeout = 0;
+    while (REG_APUIO0 != 0xAA) {
+        timeout++;
+        if (timeout == 0) return 0;  /* Timeout after 65536 iterations */
+    }
+
+    /* Wait for $BB in port 1 */
+    timeout = 0;
+    while (REG_APUIO1 != 0xBB) {
+        timeout++;
+        if (timeout == 0) return 0;
+    }
+
+    return 1;  /* Success */
 }
 
 /**
@@ -272,6 +287,9 @@ static void setup_display(void) {
 
     /* Enable BG1 */
     REG_TM = 0x01;
+
+    /* Turn on screen so text is visible during SPC init */
+    REG_INIDISP = 0x0F;
 }
 
 /*============================================================================
@@ -287,20 +305,14 @@ int main(void) {
     /* Set up display */
     setup_display();
 
-    /* Wait for SPC700 to be ready */
-    spc_wait_ready();
-
-    /* Upload driver to $0200 */
-    spc_upload(0x0200, spc_driver, sizeof(spc_driver));
-
-    /* Upload sample directory to $0300 */
-    spc_upload(0x0300, sample_dir, sizeof(sample_dir));
-
-    /* Upload BRR sample to $0310 */
-    spc_upload(0x0310, sample_brr, sizeof(sample_brr));
-
-    /* Start driver */
-    spc_execute(0x0200);
+    /* SPC700 audio disabled - needs debugging
+    if (spc_wait_ready()) {
+        spc_upload(0x0200, spc_driver, sizeof(spc_driver));
+        spc_upload(0x0300, sample_dir, sizeof(sample_dir));
+        spc_upload(0x0310, sample_brr, sizeof(sample_brr));
+        spc_execute(0x0200);
+    }
+    */
 
     /* Initial state */
     pitch = 0x10;
@@ -329,6 +341,10 @@ int main(void) {
             if (sound_on) {
                 REG_APUIO0 = pitch;
             }
+            /* Visual feedback - flash background green */
+            REG_CGADD = 0;
+            REG_CGDATA = 0xE0;  /* Green */
+            REG_CGDATA = 0x03;
         }
 
         /* B button: toggle sound */
@@ -339,6 +355,10 @@ int main(void) {
             } else {
                 REG_APUIO0 = 0;
             }
+            /* Visual feedback - flash background red */
+            REG_CGADD = 0;
+            REG_CGDATA = 0x1F;  /* Red */
+            REG_CGDATA = 0x00;
         }
 
         prev_joy = joy;
