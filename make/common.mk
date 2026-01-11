@@ -113,10 +113,16 @@ project_hdr.asm: $(TEMPLATES)/hdr.asm
 	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(TEMPLATES)/hdr.asm > $@
 
 # Combine all assembly sources
-# crt0.asm includes project_hdr.asm, then we append compiled C
-combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC)
+# crt0.asm includes project_hdr.asm, then we append library and compiled C
+combined.asm: $(TEMPLATES)/crt0.asm $(TEMPLATES)/libsnes.asm main.c.asm project_hdr.asm $(ASMSRC)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
+	@echo "" >> $@
+	@echo ";==============================================================================" >> $@
+	@echo "; OpenSNES Library" >> $@
+	@echo ";==============================================================================" >> $@
+	@echo "" >> $@
+	@cat $(TEMPLATES)/libsnes.asm >> $@
 	@echo "" >> $@
 	@echo ";==============================================================================" >> $@
 	@echo "; Compiled C Code" >> $@
