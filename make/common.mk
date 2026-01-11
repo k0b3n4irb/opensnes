@@ -122,7 +122,9 @@ combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC)
 	@echo "; Compiled C Code" >> $@
 	@echo ";==============================================================================" >> $@
 	@echo "" >> $@
-	@awk '/^\/\* end data \*\//{next} \
+	@awk 'BEGIN{n=0} \
+	     /^\.data/{n++; print ".SECTION \".rodata." n "\" SUPERFREE"; next} \
+	     /^\/\* end data \*\//{print ".ENDS"; next} \
 	     /^\/\* end/{next} \
 	     /^\.balign/{next} \
 	     /^\.GLOBAL/{next} \
