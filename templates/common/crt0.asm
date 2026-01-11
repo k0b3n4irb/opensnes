@@ -51,6 +51,18 @@
 
 .RAMSECTION ".system" BANK 0 SLOT 1
     vblank_flag     dsb 1   ; Set by NMI handler, cleared by WaitVBlank
+    oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
+.ENDS
+
+;------------------------------------------------------------------------------
+; OAM Shadow Buffer
+;------------------------------------------------------------------------------
+; OAM is 544 bytes: 512 for main table (128 sprites × 4 bytes) + 32 for extra
+; We use a RAM buffer and DMA transfer during VBlank for reliable updates.
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".oam_buffer" BANK 0 SLOT 1
+    oamMemory       dsb 544 ; Shadow buffer for OAM
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -142,9 +154,8 @@ InitHardware:
     cpx #$212C
     bne -
 
-    ; Main screen - BG1 enabled
-    lda #$01
-    sta $212C
+    ; Main screen - all layers disabled (examples enable what they need)
+    stz $212C
 
     ; Sub screen disabled
     stz $212D
@@ -210,8 +221,9 @@ Start:
     ; Initialize hardware
     jsr InitHardware
 
-    ; Clear VBlank flag
+    ; Clear system flags
     stz vblank_flag
+    stz oam_update_flag
 
     ; Switch to 16-bit mode
     rep #$30
@@ -261,7 +273,7 @@ Start:
 ; NmiHandler - VBlank Interrupt
 ;------------------------------------------------------------------------------
 ; Called at the start of each VBlank period (~60Hz).
-; Sets vblank_flag for synchronization.
+; Transfers OAM buffer to hardware if needed, then sets vblank_flag.
 ;------------------------------------------------------------------------------
 NmiHandler:
     rep #$30
@@ -284,6 +296,14 @@ NmiHandler:
     sep #$20
     lda $4210
 
+    ; OAM buffer transfer disabled - examples use direct OAM writes
+    ; If using the buffer system, uncomment below:
+    ; lda oam_update_flag
+    ; beq +
+    ; stz oam_update_flag
+    ; jsr oamUpdate
+    ;+
+
     ; Set VBlank flag
     lda #$01
     sta vblank_flag
@@ -300,46 +320,164 @@ NmiHandler:
 .ENDS
 
 ;==============================================================================
+; IRQ Handler
+;==============================================================================
+
+.SECTION ".irq" SEMIFREE
+
+;------------------------------------------------------------------------------
+; IrqHandler - Hardware IRQ (H/V counter, etc.)
+;------------------------------------------------------------------------------
+IrqHandler:
+    rti                     ; Just return for now
+
+.ENDS
+
+;==============================================================================
 ; OAM Helper Functions
 ;==============================================================================
-; These assembly helpers work around 816-tcc code generation issues
-; with volatile pointer writes in the main loop.
+; These functions write to the OAM shadow buffer in RAM.
+; The NMI handler transfers the buffer to OAM via DMA.
 ;==============================================================================
 
 .SECTION ".oam_helpers" SEMIFREE
 
 ;------------------------------------------------------------------------------
-; oam_set_tile - Set sprite 0's tile number
-; Called via JSL, so use RTL to return
-; Stack after JSL+PHP: [P:1] [retaddr:3] [param:1] -> param at offset 5
+; oam_set_tile - Set sprite 0's tile number in buffer
+; void oam_set_tile(u8 tile)
+; Stack: [P:1] [retaddr:3] [tile:2] -> tile at offset 5
 ;------------------------------------------------------------------------------
 oam_set_tile:
     php
     sep #$20            ; 8-bit A
-    lda #$02            ; OAM address = byte 2 (tile)
-    sta $2102           ; OAMADDL
-    stz $2103           ; OAMADDH = 0
-    lda 5,s             ; Get tile param (JSL pushes 3 bytes, PHP pushes 1)
-    sta $2104           ; OAMDATA = tile
+    lda 5,s             ; Get tile param
+    sta oamMemory+2     ; Write to buffer byte 2 (tile)
+    lda #$01
+    sta oam_update_flag ; Mark buffer as needing update
     plp
-    rtl                 ; Return from JSL (not RTS!)
+    rtl
 
 ;------------------------------------------------------------------------------
-; oam_set_pos - Set sprite 0's X and Y position
+; oam_init_sprite0 - Initialize sprite 0 with full attributes
+; void oam_init_sprite0(u8 x, u8 y, u8 tile, u8 attr)
+; Stack: [P:1] [retaddr:3] [attr:2] [tile:2] [y:2] [x:2]
+;        attr at 5, tile at 7, y at 9, x at 11
+; Note: With OBJSEL=0x60, small=16x16, large=32x32. We use small size.
+;------------------------------------------------------------------------------
+oam_init_sprite0:
+    php
+    sep #$20            ; 8-bit A
+    lda 11,s            ; Get X
+    sta oamMemory+0
+    lda 9,s             ; Get Y
+    sta oamMemory+1
+    lda 7,s             ; Get tile
+    sta oamMemory+2
+    lda 5,s             ; Get attr (priority, palette, etc)
+    sta oamMemory+3
+    ; High table byte 0: sprite 0 uses bits 0-1
+    ; Bit 0 = X high bit (keep 0 for X < 256)
+    ; Bit 1 = size (0=small=16x16, 1=large=32x32)
+    stz oamMemory+512   ; Small size, X bit 8 = 0
+    lda #$01
+    sta oam_update_flag
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; oam_hide_all - Hide all 128 sprites (set Y=240 for each)
+; Call this during initialization
+;------------------------------------------------------------------------------
+oam_hide_all:
+    php
+    rep #$10            ; 16-bit X/Y
+    sep #$20            ; 8-bit A
+    ldx #0
+-   stz oamMemory,x     ; X = 0
+    lda #240
+    sta oamMemory+1,x   ; Y = 240 (off screen)
+    stz oamMemory+2,x   ; Tile = 0
+    stz oamMemory+3,x   ; Attr = 0
+    inx
+    inx
+    inx
+    inx
+    cpx #512            ; 128 sprites * 4 bytes
+    bne -
+    ; Clear high table (32 bytes)
+    ldx #512
+-   stz oamMemory,x
+    inx
+    cpx #544
+    bne -
+    lda #$01
+    sta oam_update_flag
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; oam_set_pos - Set sprite 0's X and Y position in buffer
 ; void oam_set_pos(u8 x, u8 y)
 ; Stack: [P:1] [retaddr:3] [y:2] [x:2] -> x at 7, y at 5
 ;------------------------------------------------------------------------------
 oam_set_pos:
     php
     sep #$20            ; 8-bit A
-    stz $2102           ; OAMADDL = 0 (sprite 0, byte 0)
-    stz $2103           ; OAMADDH = 0
     lda 7,s             ; Get X param
-    sta $2104           ; OAMDATA = X
+    sta oamMemory+0     ; Write to buffer byte 0 (X)
     lda 5,s             ; Get Y param
-    sta $2104           ; OAMDATA = Y
+    sta oamMemory+1     ; Write to buffer byte 1 (Y)
+    lda #$01
+    sta oam_update_flag ; Mark buffer as needing update
     plp
     rtl
+
+;------------------------------------------------------------------------------
+; oam_set_attr - Set sprite 0's attribute byte
+; void oam_set_attr(u8 attr)
+; Attribute byte format: vhoopppc
+;   v=vflip, h=hflip, oo=priority, ppp=palette, c=tile high bit
+; Stack: [P:1] [retaddr:3] [attr:2] -> attr at 5
+;------------------------------------------------------------------------------
+oam_set_attr:
+    php
+    sep #$20            ; 8-bit A
+    lda 5,s             ; Get attr param
+    sta oamMemory+3     ; Write to buffer byte 3 (attr)
+    lda #$01
+    sta oam_update_flag
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; oamUpdate - DMA transfer OAM buffer to hardware
+; Called during VBlank from NMI handler
+;------------------------------------------------------------------------------
+oamUpdate:
+    php
+    rep #$20            ; 16-bit A
+
+    lda #$0000
+    sta $2102           ; OAM address = 0
+
+    lda #$0400          ; DMA mode: CPU->PPU, auto-increment, target $2104
+    sta $4300
+
+    lda #544            ; Transfer size = 544 bytes (full OAM)
+    sta $4305
+
+    lda #oamMemory
+    sta $4302           ; DMA source address (low word)
+
+    sep #$20            ; 8-bit A
+    lda #:oamMemory
+    sta $4304           ; DMA source bank
+
+    lda #$01            ; Enable DMA channel 0
+    sta $420B
+
+    plp
+    rts
 
 .ENDS
 

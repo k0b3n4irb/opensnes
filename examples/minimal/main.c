@@ -13,9 +13,13 @@ typedef unsigned char u8;
 #define REG_INIDISP  (*(volatile u8*)0x2100)
 #define REG_CGADD    (*(volatile u8*)0x2121)
 #define REG_CGDATA   (*(volatile u8*)0x2122)
+#define REG_TM       (*(volatile u8*)0x212C)
 
 int main(void) {
-    /* Set palette color 0 to red */
+    /* Disable all BG layers - show only backdrop color */
+    REG_TM = 0x00;
+
+    /* Set palette color 0 (backdrop) to red */
     /* SNES color format: 0bbbbbgg gggrrrrr */
     REG_CGADD = 0;          /* Palette index 0 */
     REG_CGDATA = 0x1F;      /* Red low byte (r=31, g=0) */
