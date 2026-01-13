@@ -154,8 +154,9 @@ InitHardware:
     cpx #$212C
     bne -
 
-    ; Main screen - all layers disabled (examples enable what they need)
-    stz $212C
+    ; Main screen - BG1 enabled
+    lda #$01
+    sta $212C
 
     ; Sub screen disabled
     stz $212D

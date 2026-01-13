@@ -343,44 +343,10 @@ Currently all frames are used for all directions. Try:
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Initialization, graphics loading, main loop |
-| `helpers.asm` | 65816 assembly: input, animation, OAM updates |
-| `assets/sprites.png` | 9-frame sprite sheet (3 directions × 3 frames) |
-| `sprites.h` | Generated tile/palette data |
+| `main.c` | Animation logic (timing, state, flip) |
+| `assets/spritesheet.png` | 4-frame animation strip |
+| `spritesheet.h` | Generated tile data |
 | `Makefile` | Build + asset conversion |
-
-### Assembly Functions (helpers.asm)
-
-The animation logic is implemented in 65816 assembly for efficiency:
-
-| Function | Purpose |
-|----------|---------|
-| `game_init` | Initialize game state, center sprite, clear OAM |
-| `read_pad` | Read joypad via auto-read with proper timing |
-| `update_monster` | Process D-pad input, update position/state/animation |
-| `update_oam` | Write sprite data to OAM during VBlank |
-| `wait_vblank` | Wait for VBlank period |
-
-### Main Loop Order
-
-```c
-while (1) {
-    read_pad();        /* 1. Read input */
-    update_monster();  /* 2. Process input, calculate tile */
-    wait_vblank();     /* 3. Wait for VBlank */
-    update_oam();      /* 4. Write to OAM during VBlank */
-}
-```
-
-### Sprite Tile Layout
-
-```
-sprite_tiles[] = {0, 2, 4, 6, 8, 10, 12, 14, 32}
-
-State 0 (DOWN):  tiles 0, 2, 4   (indices 0-2)
-State 1 (UP):    tiles 6, 8, 10  (indices 3-5)
-State 2 (SIDE):  tiles 12, 14, 32 (indices 6-8)
-```
 
 ---
 

@@ -1,8 +1,8 @@
 /**
  * @file main.c
- * @brief Minimal OpenSNES Example - Red Screen
+ * @brief Minimal OpenSNES Example
  *
- * Displays a solid red screen. The simplest possible visual output.
+ * Tests the new cc65816 compiler with functions and for-loops.
  *
  * License: CC0 (Public Domain)
  */
@@ -11,26 +11,41 @@ typedef unsigned char u8;
 
 /* SNES hardware registers */
 #define REG_INIDISP  (*(volatile u8*)0x2100)
-#define REG_CGADD    (*(volatile u8*)0x2121)
-#define REG_CGDATA   (*(volatile u8*)0x2122)
-#define REG_TM       (*(volatile u8*)0x212C)
+#define REG_VMDATAL  (*(volatile u8*)0x2118)
 
+/* Simple function */
+int add(int a, int b) {
+    return a + b;
+}
+
+/* Function with for-loop */
+int sum_to_n(int n) {
+    int i;
+    int total = 0;
+    for (i = 1; i <= n; i++) {
+        total = total + i;
+    }
+    return total;
+}
+
+/* Main entry point */
 int main(void) {
-    /* Disable all BG layers - show only backdrop color */
-    REG_TM = 0x00;
+    int x;
+    int y;
+    int sum;
+    int result;
 
-    /* Set palette color 0 (backdrop) to red */
-    /* SNES color format: 0bbbbbgg gggrrrrr */
-    REG_CGADD = 0;          /* Palette index 0 */
-    REG_CGDATA = 0x1F;      /* Red low byte (r=31, g=0) */
-    REG_CGDATA = 0x00;      /* Red high byte (b=0) */
+    /* Test simple function */
+    x = 10;
+    y = 5;
+    sum = add(x, y);
 
-    /* Turn on screen at full brightness */
+    /* Test for-loop: sum 1+2+3+4+5 = 15 */
+    result = sum_to_n(5);
+
+    /* Enable display */
     REG_INIDISP = 0x0F;
 
-    /* Infinite loop */
-    while (1) {
-    }
-
-    return 0;
+    /* Return sum of both results (15 + 15 = 30) */
+    return sum + result;
 }

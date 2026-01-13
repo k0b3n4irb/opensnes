@@ -23,9 +23,11 @@ endif
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)/gfx2snes.c | $(BUILD)
-	@echo "[CC] $<"
-	@$(CC) $(CFLAGS) -I$(SRC) $< -o $@ -lm
+SRCS := $(SRC)/gfx2snes.c $(SRC)/loadbmp.c
+
+$(TARGET): $(SRCS) | $(BUILD)
+	@echo "[CC] gfx2snes"
+	@$(CC) $(CFLAGS) -I$(SRC) $(SRCS) -o $@ -lm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
