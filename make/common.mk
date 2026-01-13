@@ -63,7 +63,7 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 #------------------------------------------------------------------------------
 
 # Generate header filenames from graphics sources (output to current dir)
-GFX_HEADERS := $(notdir $(GFXSRC:.png=.h))
+GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
 
 # Object files
 OBJS := combined.obj
@@ -87,7 +87,7 @@ all: $(TARGET)
 # Convert each PNG in GFXSRC to a .h file in current directory
 # We define explicit rules for each graphics file
 define GFX_RULE
-$(notdir $(1:.png=.h)): $(1)
+$(notdir $(basename $(1)).h): $(1)
 	@echo "[GFX] $$< -> $$@"
 	@$$(GFX2SNES) -s $$(SPRITE_SIZE) -b $$(BPP) -c $$< $$@
 endef
@@ -122,14 +122,7 @@ combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC)
 	@echo "; Compiled C Code" >> $@
 	@echo ";==============================================================================" >> $@
 	@echo "" >> $@
-	@awk 'BEGIN{n=0} \
-	     /^\.data/{n++; print ".SECTION \".rodata." n "\" SUPERFREE"; next} \
-	     /^\/\* end data \*\//{print ".ENDS"; next} \
-	     /^\/\* end/{next} \
-	     /^\.balign/{next} \
-	     /^\.GLOBAL/{next} \
-	     {gsub(/\.byte/, ".db"); print}' \
-	     main.c.asm >> $@
+	@grep -v '^/\* end' main.c.asm >> $@
 ifneq ($(ASMSRC),)
 	@echo "" >> $@
 	@echo ";==============================================================================" >> $@

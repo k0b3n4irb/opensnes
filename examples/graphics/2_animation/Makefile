@@ -8,7 +8,7 @@ TARGET   := animation.sfc
 ROM_NAME := OPENSNES ANIMATION
 
 # Graphics conversion
-GFXSRC      := assets/sprites.png
+GFXSRC      := assets/sprites.bmp
 SPRITE_SIZE := 16
 BPP         := 4
 

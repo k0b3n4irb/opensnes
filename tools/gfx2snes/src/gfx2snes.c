@@ -1,6 +1,6 @@
 /**
  * @file gfx2snes.c
- * @brief Convert PNG images to SNES tile format
+ * @brief Convert PNG/BMP images to SNES tile format
  *
  * Follows pvsneslib's gfx4snes approach:
  * 1. Reorganize image to 128 pixels wide (VRAM layout)
@@ -16,6 +16,9 @@
 #include <stdint.h>
 #include <getopt.h>
 #include <libgen.h>
+#include <ctype.h>
+
+#include "loadbmp.h"
 
 #define STBI_ONLY_PNG
 #define STBI_NO_LINEAR
@@ -98,6 +101,23 @@ static int add_color(Palette *pal, Color c, int max_colors)
 
     pal->colors[pal->count] = c;
     return pal->count++;
+}
+
+/**
+ * Check if filename has .bmp extension (case insensitive)
+ */
+static int is_bmp_file(const char *filename)
+{
+    const char *dot = strrchr(filename, '.');
+    if (!dot) return 0;
+
+    if ((dot[1] == 'b' || dot[1] == 'B') &&
+        (dot[2] == 'm' || dot[2] == 'M') &&
+        (dot[3] == 'p' || dot[3] == 'P') &&
+        dot[4] == '\0') {
+        return 1;
+    }
+    return 0;
 }
 
 static int build_palette(const uint8_t *img, int w, int h, int channels,
@@ -315,52 +335,119 @@ static void write_binary(const char *basename,
 
 static int convert_image(void)
 {
-    int w, h, channels;
-    uint8_t *img = stbi_load(opts.input, &w, &h, &channels, 3);
+    int w, h;
+    uint8_t *indexed = NULL;
+    Palette pal = {0};
+    int max_colors = (opts.bpp == 2) ? 4 : 16;
+    int tile_size = (opts.bpp == 2) ? 16 : 32;
 
-    if (!img) {
-        fprintf(stderr, "Error: Cannot load '%s'\n", opts.input);
-        return 1;
+    if (is_bmp_file(opts.input)) {
+        /* Load BMP with indexed palette preserved */
+        unsigned char *bmp_data = NULL;
+        size_t bmp_size = 0;
+        unsigned err = bmp_load_file(&bmp_data, &bmp_size, opts.input);
+        if (err) {
+            fprintf(stderr, "Error: Cannot load '%s': %s\n", opts.input, bmp_error_text(err));
+            return 1;
+        }
+
+        BMPState state;
+        memset(&state, 0, sizeof(state));
+        unsigned int uw, uh;
+        err = bmp_decode(&indexed, &state, &uw, &uh, bmp_data, bmp_size);
+        free(bmp_data);
+
+        if (err) {
+            fprintf(stderr, "Error: Cannot decode BMP '%s': %s\n", opts.input, bmp_error_text(err));
+            return 1;
+        }
+
+        w = (int)uw;
+        h = (int)uh;
+
+        /* BMP palette has fixed size based on bit depth (e.g., 256 for 8-bit).
+         * We need to extract only the actually-used colors and remap indices. */
+        int bmp_palette_size = (int)state.info_bmp.palettesize;
+        uint8_t color_used[256] = {0};
+        uint8_t color_remap[256] = {0};
+
+        /* Find which palette entries are actually used */
+        for (int i = 0; i < w * h; i++) {
+            color_used[indexed[i]] = 1;
+        }
+
+        /* Build our palette from only used colors, preserve order starting with index 0 */
+        pal.count = 0;
+        for (int i = 0; i < bmp_palette_size && i < 256; i++) {
+            if (color_used[i]) {
+                if (pal.count >= max_colors) {
+                    fprintf(stderr, "Error: BMP uses more than %d colors (limit for %dbpp)\n",
+                            max_colors, opts.bpp);
+                    free(indexed);
+                    return 1;
+                }
+                pal.colors[pal.count].r = state.info_bmp.palette[i].red;
+                pal.colors[pal.count].g = state.info_bmp.palette[i].green;
+                pal.colors[pal.count].b = state.info_bmp.palette[i].blue;
+                color_remap[i] = pal.count;
+                pal.count++;
+            }
+        }
+
+        /* Remap pixel indices to our compact palette */
+        for (int i = 0; i < w * h; i++) {
+            indexed[i] = color_remap[indexed[i]];
+        }
+
+        if (opts.verbose) {
+            printf("BMP Input: %dx%d, %d colors used (from %d palette entries), block size %d, %dbpp\n",
+                   w, h, pal.count, bmp_palette_size, opts.block_size, opts.bpp);
+        }
+    } else {
+        /* Load PNG with stb_image (converts to RGB) */
+        int channels;
+        uint8_t *img = stbi_load(opts.input, &w, &h, &channels, 3);
+
+        if (!img) {
+            fprintf(stderr, "Error: Cannot load '%s'\n", opts.input);
+            return 1;
+        }
+
+        if (opts.verbose) {
+            printf("PNG Input: %dx%d, block size %d, %dbpp\n", w, h, opts.block_size, opts.bpp);
+        }
+
+        /* Build palette from RGB image */
+        if (build_palette(img, w, h, 3, &pal, max_colors) < 0) {
+            stbi_image_free(img);
+            return 1;
+        }
+
+        /* Convert RGB image to indexed */
+        indexed = malloc(w * h);
+        if (!indexed) {
+            fprintf(stderr, "Error: Out of memory\n");
+            stbi_image_free(img);
+            return 1;
+        }
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int idx = (y * w + x) * 3;
+                Color c = {img[idx], img[idx+1], img[idx+2]};
+                indexed[y * w + x] = find_color(&pal, c);
+            }
+        }
+        stbi_image_free(img);
     }
 
     /* Validate dimensions */
     if (w % opts.block_size != 0 || h % opts.block_size != 0) {
         fprintf(stderr, "Error: Image dimensions (%dx%d) must be multiple of block size (%d)\n",
                 w, h, opts.block_size);
-        stbi_image_free(img);
+        free(indexed);
         return 1;
     }
-
-    int max_colors = (opts.bpp == 2) ? 4 : 16;
-    int tile_size = (opts.bpp == 2) ? 16 : 32;
-
-    if (opts.verbose) {
-        printf("Input: %dx%d, block size %d, %dbpp\n", w, h, opts.block_size, opts.bpp);
-    }
-
-    /* Build palette from RGB image */
-    Palette pal = {0};
-    if (build_palette(img, w, h, 3, &pal, max_colors) < 0) {
-        stbi_image_free(img);
-        return 1;
-    }
-
-    /* Convert RGB image to indexed */
-    uint8_t *indexed = malloc(w * h);
-    if (!indexed) {
-        fprintf(stderr, "Error: Out of memory\n");
-        stbi_image_free(img);
-        return 1;
-    }
-
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            int idx = (y * w + x) * 3;
-            Color c = {img[idx], img[idx+1], img[idx+2]};
-            indexed[y * w + x] = find_color(&pal, c);
-        }
-    }
-    stbi_image_free(img);
 
     /* Reorganize image to 128 pixels wide (VRAM layout) */
     int new_w, new_h;
