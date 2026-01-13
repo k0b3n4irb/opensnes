@@ -1,14 +1,15 @@
-# Tone Generator Example
-# Generates a simple tone using the SPC700 DSP
+# TADA Sound Example
+# Plays TADA sample using the SPC700 DSP
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
 # ROM Configuration
 TARGET   := tone.sfc
-ROM_NAME := OPENSNES TONE
+ROM_NAME := OPENSNES TADA
 
 # Source files
 CSRC     := main.c
+ASMSRC   := spc.asm data.asm
 
 # Include shared build rules
 include $(OPENSNES)/make/common.mk

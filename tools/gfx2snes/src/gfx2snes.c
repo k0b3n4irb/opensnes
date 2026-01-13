@@ -179,7 +179,13 @@ static uint8_t *reorganize_for_vram(const uint8_t *img, int w, int h,
                w, h, new_width, new_height, total_blocks);
     }
 
-    uint8_t *buffer = calloc(new_width * new_height, 1);
+    /* Integer overflow check before allocation */
+    if (new_width <= 0 || new_height <= 0 || (size_t)new_height > SIZE_MAX / (size_t)new_width) {
+        fprintf(stderr, "Error: Reorganized dimensions cause integer overflow\n");
+        return NULL;
+    }
+
+    uint8_t *buffer = calloc((size_t)new_width * (size_t)new_height, 1);
     if (!buffer) return NULL;
 
     /* Copy blocks to new positions */
@@ -365,6 +371,14 @@ static int convert_image(void)
         w = (int)uw;
         h = (int)uh;
 
+        /* Integer overflow check for dimensions */
+        if (w <= 0 || h <= 0 || (size_t)h > SIZE_MAX / (size_t)w) {
+            fprintf(stderr, "Error: Invalid or overflowing image dimensions\n");
+            free(indexed);
+            return 1;
+        }
+        size_t pixel_count = (size_t)w * (size_t)h;
+
         /* BMP palette has fixed size based on bit depth (e.g., 256 for 8-bit).
          * We need to extract only the actually-used colors and remap indices. */
         int bmp_palette_size = (int)state.info_bmp.palettesize;
@@ -372,7 +386,7 @@ static int convert_image(void)
         uint8_t color_remap[256] = {0};
 
         /* Find which palette entries are actually used */
-        for (int i = 0; i < w * h; i++) {
+        for (size_t i = 0; i < pixel_count; i++) {
             color_used[indexed[i]] = 1;
         }
 
@@ -395,7 +409,7 @@ static int convert_image(void)
         }
 
         /* Remap pixel indices to our compact palette */
-        for (int i = 0; i < w * h; i++) {
+        for (size_t i = 0; i < pixel_count; i++) {
             indexed[i] = color_remap[indexed[i]];
         }
 
@@ -423,8 +437,15 @@ static int convert_image(void)
             return 1;
         }
 
+        /* Integer overflow check for allocation */
+        if (w <= 0 || h <= 0 || (size_t)h > SIZE_MAX / (size_t)w) {
+            fprintf(stderr, "Error: Invalid or overflowing image dimensions\n");
+            stbi_image_free(img);
+            return 1;
+        }
+
         /* Convert RGB image to indexed */
-        indexed = malloc(w * h);
+        indexed = malloc((size_t)w * (size_t)h);
         if (!indexed) {
             fprintf(stderr, "Error: Out of memory\n");
             stbi_image_free(img);
@@ -468,8 +489,15 @@ static int convert_image(void)
         printf("Output: %d tiles (%dx%d grid)\n", tile_count, tiles_x, tiles_y);
     }
 
+    /* Integer overflow check for tile allocation */
+    if (tile_count <= 0 || tile_size <= 0 || (size_t)tile_size > SIZE_MAX / (size_t)tile_count) {
+        fprintf(stderr, "Error: Tile buffer size causes integer overflow\n");
+        free(reorganized);
+        return 1;
+    }
+
     /* Allocate tile output buffer */
-    uint8_t *tiles = malloc(tile_count * tile_size);
+    uint8_t *tiles = malloc((size_t)tile_count * (size_t)tile_size);
     if (!tiles) {
         fprintf(stderr, "Error: Out of memory\n");
         free(reorganized);
