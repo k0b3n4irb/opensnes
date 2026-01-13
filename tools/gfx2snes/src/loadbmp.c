@@ -29,6 +29,7 @@
 #include "loadbmp.h"
 
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -194,7 +195,8 @@ unsigned bmp_load_file(unsigned char** out, size_t* outsize, const char* filenam
     return bmp_buffer_file(*out, (size_t)size, filename);
 }
 
-void BMP_BI_RLE8_Load(unsigned char** image,
+// Returns 0 on success, non-zero on error (buffer overflow detected)
+static unsigned BMP_BI_RLE8_Load(unsigned char* image, size_t buffer_size,
                       const bmp_header *const bmphead, const bmp_info_header *const bmpinfohead,
                       const unsigned char *inbuf)
 {
@@ -202,12 +204,19 @@ void BMP_BI_RLE8_Load(unsigned char** image,
     // https://technet.microsoft.com/ru-ru/dd183383
     unsigned long line, i, count;
     // offset in image buffer where current line starts
-    unsigned int pos;
+    size_t pos;
     unsigned char ch, ch2;
+    unsigned int width = bmpinfohead->biWidth;
+    unsigned int height = bmpinfohead->biHeight;
+
+    // Validate dimensions
+    if (width == 0 || height == 0 || buffer_size == 0) {
+        return 83; // memory allocation failed / invalid
+    }
 
     // start from bottom line
-    line = bmpinfohead->biHeight;
-    pos = (line - 1) * bmpinfohead->biWidth;
+    line = height;
+    pos = (line - 1) * (size_t)width;
 
     count = 0;
     // read all image bytes
@@ -220,8 +229,13 @@ void BMP_BI_RLE8_Load(unsigned char** image,
             // repeat byte
             ch2 = *inbuf++;
             ++count;
-            for (i = 0; i < ch; ++i)
-                *image[pos++] = ch2;
+            for (i = 0; i < ch; ++i) {
+                // Bounds check before write
+                if (pos >= buffer_size) {
+                    return 83; // buffer overflow
+                }
+                image[pos++] = ch2;
+            }
             continue;
         }
 
@@ -233,9 +247,16 @@ void BMP_BI_RLE8_Load(unsigned char** image,
             // End of line.
 
             // go one line up
+            if (line == 0) {
+                return 83; // underflow protection
+            }
             --line;
+            if (line == 0) {
+                // Reached line 0, done with image
+                break;
+            }
             // start of this line.
-            pos = (line - 1) * bmpinfohead->biWidth;
+            pos = (line - 1) * (size_t)width;
         }
         else if (ch == 1)
         {
@@ -251,28 +272,45 @@ void BMP_BI_RLE8_Load(unsigned char** image,
 
             ch = *inbuf++;
             ++count;
-            // go right in the buffer
+            // go right in the buffer - check for overflow
+            if (pos > buffer_size - ch) {
+                return 83; // would overflow
+            }
             pos += ch;
 
             ch = *inbuf++;
             ++count;
-            // go given lines up
+            // go given lines up - check for underflow
+            if (ch > line) {
+                return 83; // would underflow
+            }
             line -= ch;
-            pos -= bmpinfohead->biWidth * ch;
+            if (line == 0) {
+                break; // reached top of image
+            }
+            // Recalculate pos based on new line
+            size_t line_start = (line - 1) * (size_t)width;
+            size_t col_offset = pos % width; // preserve column position
+            pos = line_start + col_offset;
+            if (pos >= buffer_size) {
+                return 83; // invalid position
+            }
         }
         else
         {
             // Absolute mode.
             // The second byte represents the number of bytes that follow,
             // each of which contains the color index of a single pixel.
-            ch = *inbuf++;
-            ++count;
             for (i = 0; i < ch; ++i)
             {
-                *image[pos++] = *inbuf++;
+                // Bounds check before write
+                if (pos >= buffer_size) {
+                    return 83; // buffer overflow
+                }
+                image[pos++] = *inbuf++;
                 ++count;
             }
-            if (i % 2)
+            if (ch % 2)
             {
                 // Each run must be aligned on a word boundary.
                 // Read and throw away the placeholder.
@@ -281,6 +319,7 @@ void BMP_BI_RLE8_Load(unsigned char** image,
             }
         }
     }
+    return 0; // success
 } 
 
 //-------------------------------------------------------------------------------------------------
@@ -342,44 +381,56 @@ unsigned bmp_decode(unsigned char** out, BMPState* state, unsigned int *w, unsig
         // read the bitmaps size and try to allocate memory
         *w = iwidth=bmpinfohead.biWidth;
         *h = iheight=bmpinfohead.biHeight;
-        *out=(unsigned char *) malloc(iwidth*iheight);
-        if (*out == NULL)
-        {
-            state_error=83;
+
+        // Check for integer overflow before allocation
+        if (iwidth > 0 && iheight > SIZE_MAX / iwidth) {
+            state_error = 83; // overflow would occur
         }
-        else 
-        {
-            // read the uncompressed or compressed bitmap
-            if (bmpinfohead.biCompression == 0)
+        else {
+            size_t buffer_size = (size_t)iwidth * (size_t)iheight;
+            *out=(unsigned char *) malloc(buffer_size);
+            if (*out == NULL)
             {
-                for (index = (iheight - 1) * iwidth; index >= 0; index -= iwidth)
+                state_error=83;
+            }
+            else
+            {
+                // read the uncompressed or compressed bitmap
+                if (bmpinfohead.biCompression == 0)
                 {
-                    if (bmpinfohead.biBitCount==4) // 16 colors mode, 1 byte = 2 pixels
+                    for (index = (iheight - 1) * iwidth; index >= 0; index -= iwidth)
                     {
-                        for (i = 0; i < iwidth; )
+                        if (bmpinfohead.biBitCount==4) // 16 colors mode, 1 byte = 2 pixels
                         {
-                            pix4bits=*(in+currentseek+(i>>1));
-                            *(*out+index + i) = (pix4bits>>4) & 0x0F;
-                            i++;
-                            *(*out+index + i) = pix4bits & 0x0F;
-                            i++;
+                            for (i = 0; i < iwidth; )
+                            {
+                                pix4bits=*(in+currentseek+(i>>1));
+                                *(*out+index + i) = (pix4bits>>4) & 0x0F;
+                                i++;
+                                *(*out+index + i) = pix4bits & 0x0F;
+                                i++;
+                            }
+                            currentseek+=iwidth>>1;
                         }
-                        currentseek+=iwidth>>1;
-                    }
-                    else                            // 256 colors mode, 1 byte = 1 pixel
-                    {
-                        for (i = 0; i < iwidth; i++)
+                        else                            // 256 colors mode, 1 byte = 1 pixel
                         {
-                            *(*out+index + i) = *(in+currentseek+i);
+                            for (i = 0; i < iwidth; i++)
+                            {
+                                *(*out+index + i) = *(in+currentseek+i);
+                            }
+                            currentseek+=iwidth;
                         }
-                        currentseek+=iwidth;
                     }
                 }
-            }
-            else if (bmpinfohead.biCompression == 1)
-            {
-                // BI_RLE8
-                BMP_BI_RLE8_Load(out, &bmphead, &bmpinfohead, in+currentseek);
+                else if (bmpinfohead.biCompression == 1)
+                {
+                    // BI_RLE8
+                    state_error = BMP_BI_RLE8_Load(*out, buffer_size, &bmphead, &bmpinfohead, in+currentseek);
+                    if (state_error != 0) {
+                        free(*out);
+                        *out = NULL;
+                    }
+                }
             }
         }
     }
