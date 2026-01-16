@@ -50,29 +50,32 @@ game_init:
     sta.l pad_current
     sta.l pad_current+1
 
-    ; Clear OAM hardware - hide all 128 sprites
-    stz $2102
-    stz $2103
-
+    ; Clear oamMemory buffer - hide all 128 sprites (Y=240)
     rep #$10
     ldx #0
 @clear_loop:
     sep #$20
-    stz $2104           ; X = 0
-    lda #240
-    sta $2104           ; Y = 240 (hidden)
-    stz $2104           ; Tile = 0
-    stz $2104           ; Attr = 0
-    rep #$20
+    lda #0
+    sta.l oamMemory,x     ; X = 0
     inx
-    cpx #128
+    lda #240
+    sta.l oamMemory,x     ; Y = 240 (hidden)
+    inx
+    lda #0
+    sta.l oamMemory,x     ; Tile = 0
+    inx
+    sta.l oamMemory,x     ; Attr = 0
+    inx
+    rep #$20
+    cpx #512              ; 128 sprites * 4 bytes
     bne @clear_loop
 
-    ; Clear high table (32 bytes)
+    ; Clear high table (32 bytes) - small size, X < 256 for all
     sep #$20
+    lda #0
     ldx #0
 @clear_high:
-    stz $2104
+    sta.l oamMemory+512,x
     inx
     cpx #32
     bne @clear_high
@@ -90,13 +93,14 @@ read_pad:
     sep #$20
 
     ; Wait for auto-read to complete
--   lda $4212
+    ; Use long addressing for CPU registers (DBR may be $7E)
+-   lda.l $004212
     and #$01
     bne -
 
     ; Read and store joypad
     rep #$20
-    lda $4218
+    lda.l $004218
     sta.l pad_current
 
     plp
@@ -224,41 +228,50 @@ update_monster:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; update_oam - Write monster sprite to OAM
+; update_oam - Write monster sprite to OAM buffer and DMA transfer
 ;------------------------------------------------------------------------------
 .SECTION ".update_oam" SUPERFREE
 update_oam:
     php
     sep #$20
+    rep #$10            ; 16-bit X/Y for indexing
 
-    ; Set OAM address to sprite 0
-    stz $2102
-    stz $2103
-
-    ; Sprite 0: monster at (monster_x, monster_y)
+    ; Write sprite 0 to oamMemory buffer
+    ; OAM format: X, Y, Tile, Attr (4 bytes per sprite)
     lda.l monster_x
-    sta $2104           ; X position
+    sta.l oamMemory+0   ; X position (low 8 bits)
     lda.l monster_y
-    sta $2104           ; Y position
+    sta.l oamMemory+1   ; Y position
     lda.l monster_tile
-    sta $2104           ; tile number
-    ; Attributes: vhoopppc (v=vflip, h=hflip, oo=priority, ppp=palette, c=tile bit9)
-    ; Priority = 3 (in front of BG), palette = 0
+    sta.l oamMemory+2   ; Tile number
+    ; Attributes: vhoopppc
     lda.l monster_flipx
     beq +
     lda #$70            ; hflip + priority 3
     bra ++
 +   lda #$30            ; no flip + priority 3
-++  sta $2104           ; attr
+++  sta.l oamMemory+3   ; attr
 
-    ; Hide remaining sprites 1-127 by setting Y=240
-    ; (actually just hide sprite 1 for now to save cycles)
+    ; Hide sprite 1 by setting Y=240
     lda #0
-    sta $2104           ; X = 0
+    sta.l oamMemory+4   ; X = 0
     lda #240
-    sta $2104           ; Y = 240 (hidden)
-    stz $2104           ; tile = 0
-    stz $2104           ; attr = 0
+    sta.l oamMemory+5   ; Y = 240 (off-screen)
+    lda #0
+    sta.l oamMemory+6   ; tile = 0
+    sta.l oamMemory+7   ; attr = 0
+
+    ; High table byte 0: bits for sprites 0-3
+    ; Each sprite uses 2 bits: bit0 = X high bit, bit1 = size
+    ; Sprite 0: small size, X < 256 so high bit = 0 -> bits = 00
+    ; Sprite 1: small size, X < 256 -> bits = 00
+    ; Result: 0b00000000
+    lda #$00
+    sta.l oamMemory+512
+
+    ; Set flag for NMI handler to DMA transfer buffer to OAM
+    lda #$01
+    sta.l oam_update_flag
 
     plp
     rtl
@@ -271,9 +284,10 @@ update_oam:
 wait_vblank:
     php
     sep #$20
--   lda $4212
+    ; Use long addressing for CPU registers (DBR may be $7E)
+-   lda.l $004212
     bmi -
--   lda $4212
+-   lda.l $004212
     bpl -
     plp
     rtl

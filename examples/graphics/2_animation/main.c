@@ -17,6 +17,9 @@ typedef unsigned short u16;
 
 #define REG_INIDISP  (*(volatile u8*)0x2100)
 #define REG_OBJSEL   (*(volatile u8*)0x2101)
+#define REG_OAMADDL  (*(volatile u8*)0x2102)
+#define REG_OAMADDH  (*(volatile u8*)0x2103)
+#define REG_OAMDATA  (*(volatile u8*)0x2104)
 #define REG_VMAIN    (*(volatile u8*)0x2115)
 #define REG_VMADDL   (*(volatile u8*)0x2116)
 #define REG_VMADDH   (*(volatile u8*)0x2117)
@@ -48,31 +51,38 @@ static void load_sprite_tiles(void) {
     REG_VMADDL = 0x00;
     REG_VMADDH = 0x00;
 
-    for (i = 0; i < sprites_TILES_SIZE; i += 2) {
-        REG_VMDATAL = sprites_tiles[i];
-        REG_VMDATAH = sprites_tiles[i + 1];
+    /* Write tiles byte by byte to avoid compiler bug with i+1 indexing */
+    for (i = 0; i < sprites_TILES_SIZE; i++) {
+        u8 byte = sprites_tiles[i];
+        if ((i & 1) == 0) {
+            REG_VMDATAL = byte;
+        } else {
+            REG_VMDATAH = byte;
+        }
     }
 }
 
 static void load_sprite_palette(void) {
     u8 i;
+    /* Cast to byte pointer - avoids compiler bug with >> 8 shift */
+    const u8 *pal_bytes = (const u8 *)sprites_pal;
+
     REG_CGADD = 128;  /* Sprite palettes start at 128 */
 
-    for (i = 0; i < sprites_PAL_COUNT; i++) {
-        u16 color = sprites_pal[i];
-        REG_CGDATA = color & 0xFF;
-        REG_CGDATA = (color >> 8) & 0xFF;
+    /* Write palette as bytes (little endian: low byte first) */
+    for (i = 0; i < sprites_PAL_COUNT * 2; i++) {
+        REG_CGDATA = pal_bytes[i];
     }
 }
 
 static void set_background_color(void) {
     /* Set background color (CGRAM index 0) */
-    /* Use a nice dark blue: RGB(4, 6, 14) in 5-bit = 0x1CC4 */
+    /* Use a nice dark blue: RGB(4, 6, 14) in 5-bit = 0x38C4 */
     /* SNES format: 0bbbbbgg gggrrrrr */
-    u16 color = (14 << 10) | (6 << 5) | 4;  /* Dark blue */
+    /* Pre-computed: (14 << 10) | (6 << 5) | 4 = 0x38C4 */
     REG_CGADD = 0;
-    REG_CGDATA = color & 0xFF;
-    REG_CGDATA = (color >> 8) & 0xFF;
+    REG_CGDATA = 0xC4;  /* Low byte */
+    REG_CGDATA = 0x38;  /* High byte */
 }
 
 /*============================================================================
@@ -91,25 +101,28 @@ int main(void) {
     /* Initialize game state */
     game_init();
 
+    /* Initial OAM update before screen on */
+    update_oam();
+
     /* Enable sprites on main screen */
     REG_TM = 0x10;
 
     /* Screen on */
     REG_INIDISP = 0x0F;
 
-    /* Main loop - order matches pvsneslib */
+    /* Main loop */
     while (1) {
-        /* Read joypad first */
+        /* Read joypad */
         read_pad();
 
         /* Update monster position/animation/tile based on input */
         update_monster();
 
-        /* Wait for VBlank */
-        wait_vblank();
-
-        /* Update OAM during VBlank with the freshly calculated tile */
+        /* Update OAM buffer - will be DMA'd during next VBlank */
         update_oam();
+
+        /* Wait for VBlank (NMI handler transfers OAM) */
+        wait_vblank();
     }
 
     return 0;

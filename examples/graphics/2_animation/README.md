@@ -358,3 +358,41 @@ Now you can animate sprites! Next lessons will cover:
 - **Multiple sprites:** Managing many animated objects
 
 **Next:** 3. Background *(coming soon)* →
+
+---
+
+## Testing
+
+Automated tests verify this example works correctly:
+
+```bash
+# Run from project root
+cd tests
+./run_tests.sh examples
+```
+
+Or run the specific test in Mesen2:
+```
+tests/examples/animation/test_animation.lua
+```
+
+### Test Coverage
+
+- ROM boots and reaches `main()`
+- Monster sprite initializes at correct position
+- **WRAM mirroring fix verified** - `oamMemory` at `$7E:0300` (safe address)
+- Monster position not corrupted by OAM operations
+- Input affects monster position (movement works)
+- OAM is transferred to hardware during VBlank
+- Visible sprites on screen
+- No WRAM mirror overlaps
+
+### Historical Note: WRAM Mirroring Bug
+
+This example was the subject of a critical bug fix in January 2026. The original code placed `oamMemory` at `$7E:0000`, which overlaps with Bank `$00` variables due to WRAM mirroring. When `oamInit()` cleared the buffer, it corrupted `monster_x` and other game variables.
+
+**The fix:** Place `oamMemory` at `$7E:0300` using `ORGA $0300 FORCE` in the assembly.
+
+See [KNOWLEDGE.md](../../../.claude/KNOWLEDGE.md) Section 3 for details on WRAM mirroring.
+
+See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.

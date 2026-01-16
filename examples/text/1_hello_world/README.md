@@ -207,6 +207,33 @@ Display two lines of text.
 
 ---
 
+## Testing
+
+Automated tests verify this example works correctly:
+
+```bash
+# Run from project root
+cd tests
+./run_tests.sh examples
+```
+
+Or run the specific test in Mesen2:
+```
+tests/examples/hello_world/test_hello_world.lua
+```
+
+### Test Coverage
+
+- ROM boots and reaches `main()`
+- Hardware initialization (`InitHardware`)
+- VBlank handler is operational
+- OAM buffer is initialized
+- No WRAM mirror overlaps
+
+See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.
+
+---
+
 ## What's Next?
 
 In the next lesson, we'll:

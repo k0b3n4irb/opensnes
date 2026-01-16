@@ -14,10 +14,27 @@ Automated testing infrastructure for OpenSNES SDK.
 
 | Category | Description | Location |
 |----------|-------------|----------|
+| `examples/` | Example ROM tests (snesdbg-based) | `tests/examples/` |
 | `unit/` | Low-level function tests (math, memory) | `tests/unit/` |
 | `hardware/` | SNES hardware feature tests | `tests/hardware/` |
 | `integration/` | Full system tests | `tests/integration/` |
 | `templates/` | Template smoke tests | `tests/templates/` |
+
+## Example Tests
+
+The `examples/` category tests the working example ROMs using the `snesdbg` Lua library:
+
+| Test | ROM | What it tests |
+|------|-----|---------------|
+| hello_world | text/1_hello_world | Basic boot, hardware init, VBlank |
+| custom_font | text/2_custom_font | Font loading, message display |
+| animation | graphics/2_animation | **WRAM mirroring fix**, sprite movement, OAM transfer |
+| tone | audio/1_tone | SPC700 init, audio playback |
+
+Run example tests:
+```bash
+./run_tests.sh examples
+```
 
 ## Prerequisites
 
