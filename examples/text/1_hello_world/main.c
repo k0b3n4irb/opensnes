@@ -1,24 +1,34 @@
 /**
  * @file main.c
- * @brief Hello World - OpenSNES Library Example
+ * @brief Hello World - OpenSNES Text Display
  *
- * Demonstrates using the OpenSNES library for basic console functions.
- * Uses:
- * - consoleInit() for hardware initialization
- * - setMode() for video mode
- * - setScreenOn() to enable display
- * - WaitForVBlank() for timing
- *
- * Text rendering is done directly to keep the example simple.
+ * Displays "HELLO WORLD!" using BG tiles.
+ * Uses a simple lookup table instead of switch statements.
  *
  * License: CC0 (Public Domain)
  */
 
-#include <snes.h>
+typedef unsigned char u8;
+typedef unsigned short u16;
+
+/* Hardware registers */
+#define REG_INIDISP  (*(volatile u8*)0x2100)
+#define REG_BGMODE   (*(volatile u8*)0x2105)
+#define REG_BG1SC    (*(volatile u8*)0x2107)
+#define REG_BG12NBA  (*(volatile u8*)0x210B)
+#define REG_VMAIN    (*(volatile u8*)0x2115)
+#define REG_VMADDL   (*(volatile u8*)0x2116)
+#define REG_VMADDH   (*(volatile u8*)0x2117)
+#define REG_VMDATAL  (*(volatile u8*)0x2118)
+#define REG_VMDATAH  (*(volatile u8*)0x2119)
+#define REG_CGADD    (*(volatile u8*)0x2121)
+#define REG_CGDATA   (*(volatile u8*)0x2122)
+#define REG_TM       (*(volatile u8*)0x212C)
 
 /*
  * Font tiles (2bpp format, 16 bytes per tile)
  * Each row is 2 bytes: bitplane0, bitplane1
+ * We only use bitplane0 for single-color text (color 1)
  */
 static const u8 font_tiles[] = {
     /* Tile 0: Space (blank) */
@@ -58,7 +68,8 @@ static const u8 font_tiles[] = {
     0x18, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00,
 };
 
-/* Message: HELLO WORLD! as tile indices */
+/* Message to display: HELLO WORLD! */
+/* Encoded as tile indices: H=1, E=2, L=3, O=4, space=0, W=5, R=6, D=7, !=8 */
 static const u8 message[] = {
     1, 2, 3, 3, 4,  /* HELLO */
     0,              /* space */
@@ -72,21 +83,21 @@ int main(void) {
     u16 addr;
     u8 tile;
 
-    /* Initialize console hardware using library */
-    consoleInit();
+    /* Set up Mode 0 (4 BG layers, all 2bpp) */
+    REG_BGMODE = 0x00;
 
-    /* Set Mode 0 using library */
-    setMode(BGMODE_MODE0);
+    /* BG1 tilemap at word $0400 */
+    REG_BG1SC = 0x04;
 
-    /* Configure BG1 for text display */
-    REG_BG1SC = 0x04;   /* Tilemap at $0400, 32x32 */
-    REG_BG12NBA = 0x00; /* BG1 tiles at $0000 */
+    /* BG1 tiles at word $0000 */
+    REG_BG12NBA = 0x00;
 
     /* Load font tiles to VRAM $0000 */
     REG_VMAIN = 0x80;
     REG_VMADDL = 0x00;
     REG_VMADDH = 0x00;
 
+    /* Write 9 tiles * 16 bytes = 144 bytes = 72 words */
     for (i = 0; i < 144; i += 2) {
         REG_VMDATAL = font_tiles[i];
         REG_VMDATAH = font_tiles[i + 1];
@@ -94,12 +105,14 @@ int main(void) {
 
     /* Set up palette */
     REG_CGADD = 0;
-    REG_CGDATA = 0x00;  /* Color 0: Dark blue */
+    /* Color 0: Dark blue (background) */
+    REG_CGDATA = 0x00;
     REG_CGDATA = 0x28;
-    REG_CGDATA = 0xFF;  /* Color 1: White */
+    /* Color 1: White (text) */
+    REG_CGDATA = 0xFF;
     REG_CGDATA = 0x7F;
 
-    /* Fill tilemap with spaces */
+    /* Fill tilemap with spaces (tile 0) */
     REG_VMADDL = 0x00;
     REG_VMADDH = 0x04;
     for (i = 0; i < 1024; i++) {
@@ -108,10 +121,12 @@ int main(void) {
     }
 
     /* Write message at row 14, column 10 */
+    /* word addr = $0400 + 14*32 + 10 = $05CA */
     addr = 0x05CA;
     REG_VMADDL = addr & 0xFF;
     REG_VMADDH = addr >> 8;
 
+    /* Write each character */
     i = 0;
     while (1) {
         tile = message[i];
@@ -124,14 +139,13 @@ int main(void) {
     }
 
     /* Enable BG1 on main screen */
-    REG_TM = TM_BG1;
+    REG_TM = 0x01;
 
-    /* Turn on screen using library */
-    setScreenOn();
+    /* Turn on screen at full brightness */
+    REG_INIDISP = 0x0F;
 
-    /* Main loop using library */
+    /* Infinite loop */
     while (1) {
-        WaitForVBlank();
     }
 
     return 0;
