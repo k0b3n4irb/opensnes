@@ -1,15 +1,12 @@
 ; Library memory map for compiling library object files
-; This provides minimal configuration for wla-65816 to create .o files
+; Must match the ROM's LoROM configuration for linking compatibility
 
 .MEMORYMAP
-  SLOTSIZE $10000
-  DEFAULTSLOT 0
-  SLOT 0 $0000 SIZE $10000 "RAMSECTION"
-  SLOT 1 $0000 SIZE $10000 "CODE"
+    SLOTSIZE $8000          ; 32KB per slot (LoROM)
+    DEFAULTSLOT 0
+    SLOT 0 $8000            ; ROM mapped at $8000-$FFFF
+    SLOT 1 $0000            ; RAM at $0000-$1FFF (DP/Stack)
 .ENDME
 
-.ROMBANKMAP
-  BANKSTOTAL 2
-  BANKSIZE $10000
-  BANKS 2
-.ENDRO
+.ROMBANKSIZE $8000          ; 32KB banks (LoROM)
+.ROMBANKS 2                 ; Match ROM configuration

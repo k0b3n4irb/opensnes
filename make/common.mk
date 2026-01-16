@@ -52,6 +52,22 @@ GFXSRC      ?=
 SPRITE_SIZE ?= 8
 BPP         ?= 4
 
+# Library usage (set USE_LIB=1 to link with OpenSNES library)
+USE_LIB     ?= 0
+
+# Library object files (when USE_LIB=1)
+# By default, only link core modules. Set LIB_MODULES to customize.
+LIBDIR      := $(OPENSNES)/lib/build
+LIB_MODULES ?= console
+LIB_OBJS    := $(foreach mod,$(LIB_MODULES),$(LIBDIR)/$(mod).o)
+
+# OAM helpers (when USE_LIB=0, we need standalone OAM functions)
+ifeq ($(USE_LIB),0)
+OAM_HELPERS := $(TEMPLATES)/oam_helpers.asm
+else
+OAM_HELPERS :=
+endif
+
 # Include paths
 INCLUDES := -I$(OPENSNES)/lib/include -I.
 
@@ -99,9 +115,22 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 #------------------------------------------------------------------------------
 
 # cc65816 (cproc+QBE): compile C to WLA-DX assembly
+# Apply post-processing to fix wla-65816 syntax compatibility
 main.c.asm: $(CSRC) $(GFX_HEADERS)
 	@echo "[CC] $(CSRC)"
-	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@
+	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@.raw
+	@sed -e '/^\.data/d' \
+	     -e '/^\/\* end/d' \
+	     -e '/^\.balign/d' \
+	     -e '/^\.GLOBAL/d' \
+	     -e 's/\.byte/.db/g' \
+	     -e 's/\.word/.dw/g' \
+	     -e 's/\.long/.dl/g' \
+	     -e 's/\.ascii/.ASC/g' \
+	     -e 's/\\000/", 0, "/g' \
+	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
+	     $@.raw > $@
+	@rm -f $@.raw
 
 #------------------------------------------------------------------------------
 # Assembly Generation
@@ -112,11 +141,26 @@ project_hdr.asm: $(TEMPLATES)/hdr.asm
 	@echo "[HDR] Generating project header..."
 	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(TEMPLATES)/hdr.asm > $@
 
+# Runtime library (math functions, etc.)
+RUNTIME := $(TEMPLATES)/runtime.asm
+
 # Combine all assembly sources
-# crt0.asm includes project_hdr.asm, then we append compiled C
-combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC)
+# crt0.asm includes project_hdr.asm, then we append runtime and compiled C
+combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
+	@echo "" >> $@
+	@echo ";==============================================================================" >> $@
+	@echo "; C Runtime Library" >> $@
+	@echo ";==============================================================================" >> $@
+	@cat $(RUNTIME) >> $@
+ifeq ($(USE_LIB),0)
+	@echo "" >> $@
+	@echo ";==============================================================================" >> $@
+	@echo "; OAM Helper Functions (standalone)" >> $@
+	@echo ";==============================================================================" >> $@
+	@cat $(OAM_HELPERS) >> $@
+endif
 	@echo "" >> $@
 	@echo ";==============================================================================" >> $@
 	@echo "; Compiled C Code" >> $@
@@ -144,6 +188,9 @@ combined.obj: combined.asm
 linkfile: combined.obj
 	@echo "[objects]" > $@
 	@echo "combined.obj" >> $@
+ifeq ($(USE_LIB),1)
+	@for obj in $(LIB_OBJS); do echo "$$obj" >> $@; done
+endif
 
 # Link to final ROM
 $(TARGET): combined.obj linkfile
