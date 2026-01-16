@@ -67,6 +67,9 @@
 /* DMA */
 #include <snes/dma.h>
 
+/* Text */
+#include <snes/text.h>
+
 /* Interrupts */
 #include <snes/interrupt.h>
 

@@ -1,5 +1,5 @@
 # Hello World Example
-# Uses shared OpenSNES templates
+# Uses OpenSNES library for text display
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
@@ -7,7 +7,13 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := hello_world.sfc
 ROM_NAME := OPENSNES HELLO WORLD
 
-# Full version with for-loops (now working with new compiler)
+# Use OpenSNES library
+USE_LIB  := 1
+
+# Library modules to link (console for init/VBlank, sprite for OAM update in NMI)
+LIB_MODULES := console sprite
+
+# Source files
 CSRC     := main.c
 
 # Include shared build rules
