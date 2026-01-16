@@ -242,6 +242,34 @@ Make sure `assets/myfont.png` exists and the path is correct.
 
 ---
 
+## Testing
+
+Automated tests verify this example works correctly:
+
+```bash
+# Run from project root
+cd tests
+./run_tests.sh examples
+```
+
+Or run the specific test in Mesen2:
+```
+tests/examples/custom_font/test_custom_font.lua
+```
+
+### Test Coverage
+
+- ROM boots and reaches `main()`
+- Hardware initialization (`InitHardware`)
+- Font tiles symbol exists
+- Message strings are present
+- VBlank handler is operational
+- No WRAM mirror overlaps
+
+See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.
+
+---
+
 ## What's Next?
 
 Now that you understand the asset pipeline, let's apply it to graphics:

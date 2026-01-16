@@ -61,8 +61,8 @@
 ; We use a RAM buffer and DMA transfer during VBlank for reliable updates.
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".oam_buffer" BANK 0 SLOT 1
-    oamMemory       dsb 544 ; Shadow buffer for OAM
+.RAMSECTION ".oam_buffer" BANK $7E SLOT 1 ORGA $0300 FORCE
+    oamMemory       dsb 544 ; Shadow buffer for OAM ($7E:0300-$7E:051F)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -297,13 +297,12 @@ NmiHandler:
     sep #$20
     lda $4210
 
-    ; OAM buffer transfer disabled - examples use direct OAM writes
-    ; If using the buffer system, uncomment below:
-    ; lda oam_update_flag
-    ; beq +
-    ; stz oam_update_flag
-    ; jsr oamUpdate
-    ;+
+    ; Transfer OAM buffer to hardware during VBlank
+    lda oam_update_flag
+    beq +
+    stz oam_update_flag
+    jsl oamUpdate
++
 
     ; Set VBlank flag
     lda #$01
@@ -452,33 +451,43 @@ oam_set_attr:
 
 ;------------------------------------------------------------------------------
 ; oamUpdate - DMA transfer OAM buffer to hardware
-; Called during VBlank from NMI handler
+; Called during VBlank (can be called from C code where DBR=$7E)
+; Sets DBR to $00 temporarily to ensure hardware register access
 ;------------------------------------------------------------------------------
 oamUpdate:
     php
+    phb                 ; Save current data bank
+
+    ; Set DBR to $00 for hardware register access
+    pea $0000
+    plb
+    plb                 ; DBR = $00
+
     rep #$20            ; 16-bit A
 
     lda #$0000
     sta $2102           ; OAM address = 0
 
+    ; Use DMA channel 7 (like pvsneslib)
     lda #$0400          ; DMA mode: CPU->PPU, auto-increment, target $2104
-    sta $4300
+    sta $4370
 
     lda #544            ; Transfer size = 544 bytes (full OAM)
-    sta $4305
+    sta $4375
 
     lda #oamMemory
-    sta $4302           ; DMA source address (low word)
+    sta $4372           ; DMA source address (low word)
 
     sep #$20            ; 8-bit A
-    lda #:oamMemory
-    sta $4304           ; DMA source bank
+    lda #:oamMemory     ; Get bank of oamMemory
+    sta $4374           ; DMA source bank
 
-    lda #$01            ; Enable DMA channel 0
+    lda #$80            ; Enable DMA channel 7
     sta $420B
 
+    plb                 ; Restore data bank
     plp
-    rts
+    rtl                 ; Return long (called with JSL)
 
 .ENDS
 

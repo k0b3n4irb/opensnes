@@ -55,6 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo "  hardware         Run hardware tests"
             echo "  integration      Run integration tests"
             echo "  templates        Run template smoke tests"
+            echo "  examples         Run example ROM tests"
             echo ""
             echo "Environment:"
             echo "  MESEN_PATH       Path to Mesen2 executable"
@@ -160,16 +161,54 @@ run_test() {
     # Check for test script
     local lua_script="$test_dir/test.lua"
     if [[ ! -f "$lua_script" ]]; then
+        # Check for test_*.lua pattern
+        lua_script=$(find "$test_dir" -name "test_*.lua" -type f | head -1)
+    fi
+    if [[ -z "$lua_script" || ! -f "$lua_script" ]]; then
         lua_script="$SCRIPT_DIR/harness/test_harness.lua"
     fi
 
-    # Build the test
-    local rom
-    rom=$(build_test "$test_dir") || {
-        log_error "SKIP: Build failed for $test_name"
-        ((SKIPPED_TESTS++))
-        return
-    }
+    local rom=""
+
+    # Check if this is an example test (no Makefile, ROM in examples/)
+    if [[ ! -f "$test_dir/Makefile" ]]; then
+        # Look for ROM mapping for example tests
+        case "$test_name" in
+            hello_world)
+                rom="$OPENSNES_HOME/examples/text/1_hello_world/hello_world.sfc"
+                ;;
+            custom_font)
+                rom="$OPENSNES_HOME/examples/text/2_custom_font/custom_font.sfc"
+                ;;
+            animation)
+                rom="$OPENSNES_HOME/examples/graphics/2_animation/animation.sfc"
+                ;;
+            tone)
+                rom="$OPENSNES_HOME/examples/audio/1_tone/tone.sfc"
+                ;;
+            calculator)
+                rom="$OPENSNES_HOME/examples/basics/1_calculator/calculator.sfc"
+                ;;
+            *)
+                log_warn "Unknown example test: $test_name, skipping"
+                ((SKIPPED_TESTS++))
+                return
+                ;;
+        esac
+
+        if [[ ! -f "$rom" ]]; then
+            log_warn "SKIP: ROM not found for $test_name: $rom"
+            ((SKIPPED_TESTS++))
+            return
+        fi
+    else
+        # Build the test
+        rom=$(build_test "$test_dir") || {
+            log_error "SKIP: Build failed for $test_name"
+            ((SKIPPED_TESTS++))
+            return
+        }
+    fi
 
     log_verbose "ROM: $rom"
     log_verbose "Script: $lua_script"
@@ -198,6 +237,9 @@ run_test() {
 
     # Check output for pass/fail
     if echo "$output" | grep -q "Status: PASS"; then
+        log_info "PASS: $test_name"
+        ((PASSED_TESTS++))
+    elif echo "$output" | grep -q "ALL TESTS PASSED"; then
         log_info "PASS: $test_name"
         ((PASSED_TESTS++))
     else
@@ -258,7 +300,7 @@ main() {
         run_category "$CATEGORY"
     else
         # Run all categories
-        for category in unit hardware integration templates; do
+        for category in unit hardware integration templates examples; do
             if [[ -d "$SCRIPT_DIR/$category" ]]; then
                 run_category "$category"
             fi
