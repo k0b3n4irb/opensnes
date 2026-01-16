@@ -48,12 +48,18 @@ $(LIBRARY): $(OBJECTS) | $(LIBDIR)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
 	@echo "[CC] $<"
 	$(CC) $(CFLAGS) $< -o $(BUILDDIR)/$*.c.asm
+	@cat $(SRCDIR)/lib_memmap.inc > $(BUILDDIR)/$*.asm
 	@sed -e '/^\.data/d' \
 	     -e '/^\/\* end/d' \
 	     -e '/^\.balign/d' \
 	     -e '/^\.GLOBAL/d' \
 	     -e 's/\.byte/.db/g' \
-	     $(BUILDDIR)/$*.c.asm > $(BUILDDIR)/$*.asm
+	     -e 's/\.word/.dw/g' \
+	     -e 's/\.long/.dl/g' \
+	     -e 's/\.ascii/.ASC/g' \
+	     -e 's/\\000/", 0, "/g' \
+	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
+	     $(BUILDDIR)/$*.c.asm >> $(BUILDDIR)/$*.asm
 	$(AS) $(ASFLAGS) $@ $(BUILDDIR)/$*.asm
 
 $(BUILDDIR)/%.obj: $(SRCDIR)/%.asm | $(BUILDDIR)
