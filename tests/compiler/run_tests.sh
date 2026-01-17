@@ -306,6 +306,62 @@ test_processed_assembly() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Static variable stores use proper symbol references
+# BUG: Compiler was generating "sta.l $000000" instead of "sta.l symbol"
+#------------------------------------------------------------------------------
+test_static_var_stores() {
+    local name="static_var_stores"
+    local src="$SCRIPT_DIR/test_static_vars.c"
+    local out="$BUILD/test_static_vars.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/static_vars_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/static_vars_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for the bug: stores to literal $000000
+    # Valid: sta.l my_static_byte or sta my_static_byte
+    # Invalid: sta.l $000000
+    if grep -E 'sta\.l\s+\$000000' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found 'sta.l \$000000' - stores to static vars broken!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Offending lines:"
+            grep -n -E 'sta\.l\s+\$000000' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify symbols are defined
+    if ! grep -E '^my_static_byte:' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Symbol 'my_static_byte' not defined"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! grep -E '^my_static_word:' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Symbol 'my_static_word' not defined"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
 
@@ -341,6 +397,7 @@ main() {
     test_correct_directives || true   # May fail, that's what we're fixing
     test_assemble_output || true      # May fail before fixes
     test_processed_assembly || true   # Test with post-processing
+    test_static_var_stores           # CRITICAL: Static var stores must use symbols
 
     echo ""
     echo "========================================"
