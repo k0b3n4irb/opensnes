@@ -25,7 +25,8 @@ emitlnk(char *n, Lnk *l, int s, FILE *f)
 		fprintf(f, ".SECTION \".rodata.%d\" SUPERFREE\n", ++datasec_counter);
 		break;
 	case SecBss:
-		fprintf(f, ".SECTION \".bss.%d\" SUPERFREE\n", ++datasec_counter);
+		/* BSS goes to RAM (SLOT 1) not ROM */
+		fprintf(f, ".RAMSECTION \".bss.%d\" BANK 0 SLOT 1\n", ++datasec_counter);
 		break;
 	}
 	/* WLA-DX: skip .globl since we compile as single file.
@@ -69,7 +70,8 @@ emitdat(Dat *d, FILE *f)
 		}
 		else if (zero != -1) {
 			emitlnk(d->name, d->lnk, SecBss, f);
-			fprintf(f, "\t.dsb %"PRId64"\n", zero);  /* WLA-DX: define storage bytes */
+			/* RAMSECTION uses 'dsb' without dot and without fill value */
+			fprintf(f, "\tdsb %"PRId64"\n", zero);
 			fputs(".ENDS\n", f);
 		} else {
 			/* Data section was emitted, close it */
