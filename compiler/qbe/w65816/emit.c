@@ -551,9 +551,18 @@ emitins(Ins *i, Fn *fn)
             } else if (isvreg(r1)) {
                 fprintf(outf, "\tsta ($%02X)\n", regaddr(r1.val));
             } else if (rtype(r1) == RCon) {
-                /* Direct address constant */
+                /* Direct address constant or symbol */
                 c = &fn->con[r1.val];
-                fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+                if (c->type == CAddr) {
+                    /* Symbol address - emit symbol name */
+                    fprintf(outf, "\tsta.l %s", str(c->sym.id));
+                    if (c->bits.i)
+                        fprintf(outf, "+%d", (int)c->bits.i);
+                    fprintf(outf, "\n");
+                } else {
+                    /* Literal address */
+                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+                }
             } else {
                 /* Address in temp - indirect store */
                 fprintf(outf, "\tpha\n");
@@ -577,9 +586,18 @@ emitins(Ins *i, Fn *fn)
             } else if (isvreg(r1)) {
                 fprintf(outf, "\tsta ($%02X)\n", regaddr(r1.val));
             } else if (rtype(r1) == RCon) {
-                /* Direct address constant */
+                /* Direct address constant or symbol */
                 c = &fn->con[r1.val];
-                fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+                if (c->type == CAddr) {
+                    /* Symbol address - emit symbol name */
+                    fprintf(outf, "\tsta.l %s", str(c->sym.id));
+                    if (c->bits.i)
+                        fprintf(outf, "+%d", (int)c->bits.i);
+                    fprintf(outf, "\n");
+                } else {
+                    /* Literal address */
+                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+                }
             } else {
                 /* Address in temp - indirect store */
                 /* A already has the value, load addr to X, then store */
