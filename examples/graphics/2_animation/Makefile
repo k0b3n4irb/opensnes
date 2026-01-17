@@ -7,6 +7,10 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := animation.sfc
 ROM_NAME := OPENSNES ANIMATION
 
+# Enable OpenSNES library
+USE_LIB     := 1
+LIB_MODULES := console sprite input
+
 # Graphics conversion
 GFXSRC      := assets/sprites.bmp
 SPRITE_SIZE := 16
