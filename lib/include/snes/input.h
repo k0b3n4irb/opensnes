@@ -54,18 +54,33 @@
  * @{
  */
 
-#define KEY_A       BIT(7)   /**< A button */
+/*
+ * SNES Joypad Register Layout (16-bit read from $4218):
+ *   Bits 15-12: B, Y, Select, Start (from $4219 bits 7-4)
+ *   Bits 11-8:  Up, Down, Left, Right (from $4219 bits 3-0)
+ *   Bits 7-4:   A, X, L, R (from $4218 bits 7-4)
+ *   Bits 3-0:   Controller ID (from $4218 bits 3-0, should be 0)
+ *
+ * These values match pvsneslib and are verified on real hardware.
+ */
+
+/* High byte buttons ($4219 bits 7-4 → result bits 15-12) */
 #define KEY_B       BIT(15)  /**< B button */
-#define KEY_X       BIT(6)   /**< X button */
 #define KEY_Y       BIT(14)  /**< Y button */
-#define KEY_L       BIT(5)   /**< L shoulder */
-#define KEY_R       BIT(4)   /**< R shoulder */
-#define KEY_START   BIT(12)  /**< Start button */
 #define KEY_SELECT  BIT(13)  /**< Select button */
+#define KEY_START   BIT(12)  /**< Start button */
+
+/* High byte D-pad ($4219 bits 3-0 → result bits 11-8) */
 #define KEY_UP      BIT(11)  /**< D-pad up */
 #define KEY_DOWN    BIT(10)  /**< D-pad down */
 #define KEY_LEFT    BIT(9)   /**< D-pad left */
 #define KEY_RIGHT   BIT(8)   /**< D-pad right */
+
+/* Low byte buttons ($4218 bits 7-4 → result bits 7-4) */
+#define KEY_A       BIT(7)   /**< A button */
+#define KEY_X       BIT(6)   /**< X button */
+#define KEY_L       BIT(5)   /**< L shoulder */
+#define KEY_R       BIT(4)   /**< R shoulder */
 
 /** @brief All D-pad directions */
 #define KEY_DPAD    (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)

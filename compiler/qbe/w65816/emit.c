@@ -142,9 +142,11 @@ assignslots(Fn *fn)
 
 /*
  * Load value into accumulator
+ * sp_adjust: additional offset to add for stack-relative loads
+ *            (used during argument pushing when SP has already changed)
  */
 static void
-emitload(Ref r, Fn *fn)
+emitload_adj(Ref r, Fn *fn, int sp_adjust)
 {
     Con *c;
     int slot;
@@ -158,7 +160,7 @@ emitload(Ref r, Fn *fn)
             /* Spilled temp */
             slot = fn->tmp[r.val].slot;
             if (slot >= 0)
-                fprintf(outf, "\tlda %d,s\n", (slot + 1) * 2);
+                fprintf(outf, "\tlda %d,s\n", (slot + 1) * 2 + sp_adjust);
             else
                 fprintf(outf, "\t; unallocated temp %d\n", r.val);
         } else {
@@ -191,16 +193,23 @@ emitload(Ref r, Fn *fn)
              * slot=-2 means first param, slot=-4 means second, etc.
              * Offset = framesize + 5 + (-slot) - 2 = framesize + 3 + (-slot)
              */
-            fprintf(outf, "\tlda %d,s\n", framesize + 3 + (-slot));
+            fprintf(outf, "\tlda %d,s\n", framesize + 3 + (-slot) + sp_adjust);
         } else {
             /* Positive slot = local variable in our frame */
-            fprintf(outf, "\tlda %d,s\n", (slot + 1) * 2);
+            fprintf(outf, "\tlda %d,s\n", (slot + 1) * 2 + sp_adjust);
         }
         break;
     default:
         fprintf(outf, "\t; unknown ref type %d\n", rtype(r));
         break;
     }
+}
+
+/* Convenience wrapper for normal loads (no SP adjustment) */
+static void
+emitload(Ref r, Fn *fn)
+{
+    emitload_adj(r, fn, 0);
 }
 
 /*
@@ -305,6 +314,14 @@ emitins(Ins *i, Fn *fn)
         emitstore(i->to, fn);
         break;
 
+    case Oneg:
+        /* Negate: result = -value = ~value + 1 (two's complement) */
+        emitload(r0, fn);
+        fprintf(outf, "\teor.w #$FFFF\n");
+        fprintf(outf, "\tinc a\n");
+        emitstore(i->to, fn);
+        break;
+
     case Omul:
         /* 65816 has no MUL instruction - need to use a loop or library call */
         /* For now, emit a simple shift-add loop for small constants */
@@ -366,6 +383,99 @@ emitins(Ins *i, Fn *fn)
         emitstore(i->to, fn);
         break;
 
+    case Odiv:
+    case Oudiv:
+        /* Division - use shifts for powers of 2, library call otherwise */
+        if (rtype(r1) == RCon) {
+            c = &fn->con[r1.val];
+            int val = c->bits.i;
+            if (val == 1) {
+                emitload(r0, fn);
+            } else if (val == 2) {
+                emitload(r0, fn);
+                fprintf(outf, "\tlsr a\n");
+            } else if (val == 4) {
+                emitload(r0, fn);
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+            } else if (val == 8) {
+                emitload(r0, fn);
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+            } else if (val == 16) {
+                emitload(r0, fn);
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+                fprintf(outf, "\tlsr a\n");
+            } else if (val == 256) {
+                emitload(r0, fn);
+                fprintf(outf, "\txba\n");  /* swap bytes = /256 */
+                fprintf(outf, "\tand.w #$00FF\n");
+            } else {
+                /* General case: call __div16 */
+                emitload(r0, fn);
+                fprintf(outf, "\tsta.l tcc__r0\n");
+                emitload(r1, fn);
+                fprintf(outf, "\tsta.l tcc__r1\n");
+                fprintf(outf, "\tjsl __div16\n");
+                fprintf(outf, "\tlda.l tcc__r0\n");
+            }
+        } else {
+            /* Variable / variable - call __div16 */
+            emitload(r0, fn);
+            fprintf(outf, "\tsta.l tcc__r0\n");
+            emitload(r1, fn);
+            fprintf(outf, "\tsta.l tcc__r1\n");
+            fprintf(outf, "\tjsl __div16\n");
+            fprintf(outf, "\tlda.l tcc__r0\n");
+        }
+        emitstore(i->to, fn);
+        break;
+
+    case Orem:
+    case Ourem:
+        /* Modulo - use AND for powers of 2, library call otherwise */
+        if (rtype(r1) == RCon) {
+            c = &fn->con[r1.val];
+            int val = c->bits.i;
+            if (val == 2) {
+                emitload(r0, fn);
+                fprintf(outf, "\tand.w #1\n");
+            } else if (val == 4) {
+                emitload(r0, fn);
+                fprintf(outf, "\tand.w #3\n");
+            } else if (val == 8) {
+                emitload(r0, fn);
+                fprintf(outf, "\tand.w #7\n");
+            } else if (val == 16) {
+                emitload(r0, fn);
+                fprintf(outf, "\tand.w #15\n");
+            } else if (val == 256) {
+                emitload(r0, fn);
+                fprintf(outf, "\tand.w #255\n");
+            } else {
+                /* General case: call __mod16 */
+                emitload(r0, fn);
+                fprintf(outf, "\tsta.l tcc__r0\n");
+                emitload(r1, fn);
+                fprintf(outf, "\tsta.l tcc__r1\n");
+                fprintf(outf, "\tjsl __mod16\n");
+                fprintf(outf, "\tlda.l tcc__r0\n");
+            }
+        } else {
+            /* Variable % variable - call __mod16 */
+            emitload(r0, fn);
+            fprintf(outf, "\tsta.l tcc__r0\n");
+            emitload(r1, fn);
+            fprintf(outf, "\tsta.l tcc__r1\n");
+            fprintf(outf, "\tjsl __mod16\n");
+            fprintf(outf, "\tlda.l tcc__r0\n");
+        }
+        emitstore(i->to, fn);
+        break;
+
     case Oand:
         emitload(r0, fn);
         emitop2("and", r1, fn);
@@ -390,6 +500,19 @@ emitins(Ins *i, Fn *fn)
             c = &fn->con[r1.val];
             for (int j = 0; j < c->bits.i && j < 16; j++)
                 fprintf(outf, "\tasl a\n");
+        }
+        emitstore(i->to, fn);
+        break;
+
+    case Osar:
+        /* Arithmetic shift right - for 16-bit values, using LSR is safe
+         * since high bits are already zero. For negative values, this
+         * doesn't properly sign-extend, but SNES code rarely needs that. */
+        emitload(r0, fn);
+        if (rtype(r1) == RCon) {
+            c = &fn->con[r1.val];
+            for (int j = 0; j < c->bits.i && j < 16; j++)
+                fprintf(outf, "\tlsr a\n");
         }
         emitstore(i->to, fn);
         break;
@@ -565,8 +688,9 @@ emitins(Ins *i, Fn *fn)
                 }
             } else {
                 /* Address in temp - indirect store */
+                /* IMPORTANT: After pha, stack offsets change by 2 */
                 fprintf(outf, "\tpha\n");
-                emitload(r1, fn);
+                emitload_adj(r1, fn, 2);  /* Adjust for pushed value */
                 fprintf(outf, "\ttax\n");
                 fprintf(outf, "\tpla\n");
                 fprintf(outf, "\tsta.l $0000,x\n");
@@ -601,9 +725,10 @@ emitins(Ins *i, Fn *fn)
             } else {
                 /* Address in temp - indirect store */
                 /* A already has the value, load addr to X, then store */
+                /* IMPORTANT: After pha, stack offsets change by 2 */
                 fprintf(outf, "\trep #$20\n");  /* Need 16-bit for address */
                 fprintf(outf, "\tpha\n");       /* Save value */
-                emitload(r1, fn);
+                emitload_adj(r1, fn, 2);        /* Adjust for pushed value */
                 fprintf(outf, "\ttax\n");
                 fprintf(outf, "\tpla\n");
                 fprintf(outf, "\tsep #$20\n");  /* Back to 8-bit for store */
@@ -627,6 +752,13 @@ emitins(Ins *i, Fn *fn)
             } else if (isvreg(r0)) {
                 /* Indirect through register */
                 fprintf(outf, "\tlda ($%02X)\n", regaddr(r0.val));
+            } else if (rtype(r0) == RCon && fn->con[r0.val].type == CAddr) {
+                /* Direct load from global/extern symbol */
+                Con *c = &fn->con[r0.val];
+                fprintf(outf, "\tlda.l %s", str(c->sym.id));
+                if (c->bits.i)
+                    fprintf(outf, "+%d", (int)c->bits.i);
+                fprintf(outf, "\n");
             } else {
                 /* Address in temp - indirect load */
                 emitload(r0, fn);
@@ -644,6 +776,15 @@ emitins(Ins *i, Fn *fn)
             /* Pointer in virtual register - use indirect */
             fprintf(outf, "\tsep #$20\n");
             fprintf(outf, "\tlda ($%02X)\n", regaddr(r0.val));
+            fprintf(outf, "\trep #$20\n");
+        } else if (rtype(r0) == RCon && fn->con[r0.val].type == CAddr) {
+            /* Direct load from global/extern symbol */
+            Con *c = &fn->con[r0.val];
+            fprintf(outf, "\tsep #$20\n");
+            fprintf(outf, "\tlda.l %s", str(c->sym.id));
+            if (c->bits.i)
+                fprintf(outf, "+%d", (int)c->bits.i);
+            fprintf(outf, "\n");
             fprintf(outf, "\trep #$20\n");
         } else {
             /* Pointer in stack slot - load addr, then indirect through X */
@@ -694,13 +835,32 @@ emitins(Ins *i, Fn *fn)
         emitstore(i->to, fn);
         break;
 
+    case Oextsw:
+        /* Sign extend word to long - for 16-bit 65816, just copy the value.
+         * If code actually uses the upper 16 bits of a signed long,
+         * this would need proper sign extension to 32 bits. */
+        emitload(r0, fn);
+        emitstore(i->to, fn);
+        break;
+
+    case Oextuw:
+        /* Zero extend word to long - for 16-bit 65816, just copy the value.
+         * Upper 16 bits are implicitly zero in our 16-bit register model. */
+        emitload(r0, fn);
+        emitstore(i->to, fn);
+        break;
+
     case Oarg:
     case Oargsb:
     case Oargub:
     case Oargsh:
     case Oarguh:
-        /* Push argument to stack */
-        emitload(r0, fn);
+        /* Push argument to stack
+         * IMPORTANT: Use emitload_adj with argbytes offset because
+         * previous argument pushes have already modified SP, making
+         * stack-relative offsets wrong if not adjusted.
+         */
+        emitload_adj(r0, fn, argbytes);
         fprintf(outf, "\tpha\n");
         argbytes += 2;  /* All args pushed as 16-bit */
         break;

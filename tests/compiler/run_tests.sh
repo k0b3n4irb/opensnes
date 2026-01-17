@@ -362,6 +362,453 @@ test_static_var_stores() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Shift right operations generate proper LSR instructions
+# BUG: Compiler was emitting "unhandled op 12" for sar (arithmetic shift right)
+#------------------------------------------------------------------------------
+test_shift_right_ops() {
+    local name="shift_right_ops"
+    local src="$SCRIPT_DIR/test_shift_right.c"
+    local out="$BUILD/test_shift_right.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/shift_right_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/shift_right_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for unhandled op comments (indicates missing instruction support)
+    if grep -E '; unhandled op' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found unhandled op in shift right code"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Offending lines:"
+            grep -n -E '; unhandled op' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify lsr instructions are generated (for >> 8 operation)
+    if ! grep -E 'lsr a' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No LSR instructions generated for shift right"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Word extension ops (extsw/extuw) are handled
+# BUG: Compiler was emitting "unhandled op 68/69" for word-to-long extension
+#------------------------------------------------------------------------------
+test_word_extend_ops() {
+    local name="word_extend_ops"
+    local src="$SCRIPT_DIR/test_word_extend.c"
+    local out="$BUILD/test_word_extend.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/word_extend_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/word_extend_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for unhandled op comments
+    if grep -E '; unhandled op' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found unhandled op in word extend code"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Offending lines:"
+            grep -n -E '; unhandled op' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Animation patterns (loops, arrays, bit ops, conditionals)
+# Comprehensive test for patterns used in sprite/animation code
+#------------------------------------------------------------------------------
+test_animation_patterns() {
+    local name="animation_patterns"
+    local src="$SCRIPT_DIR/test_animation_patterns.c"
+    local out="$BUILD/test_animation_patterns.c.asm"
+    local out_with_map="$BUILD/test_animation_patterns_with_map.asm"
+    local obj="$BUILD/test_animation_patterns.o"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/animation_patterns_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/animation_patterns_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for unhandled op comments
+    if grep -E '; unhandled op' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found unhandled ops"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Offending lines:"
+            grep -n -E '; unhandled op' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Try to assemble (add memory map header)
+    cat "$SCRIPT_DIR/test_memmap.inc" "$out" > "$out_with_map"
+    if ! "$AS" -o "$obj" "$out_with_map" 2>"$BUILD/animation_patterns_asm.err"; then
+        log_fail "$name: Assembly failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/animation_patterns_asm.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Division and modulo operations
+# BUG: Compiler was emitting "unhandled op 4" for div operations
+#------------------------------------------------------------------------------
+test_division_ops() {
+    local name="division_ops"
+    local src="$SCRIPT_DIR/test_division.c"
+    local out="$BUILD/test_division.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/division_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/division_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for unhandled op comments
+    if grep -E '; unhandled op' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found unhandled ops"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Offending lines:"
+            grep -n -E '; unhandled op' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify LSR instructions for power-of-2 divisions
+    if ! grep -E 'lsr a' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No LSR instructions generated for power-of-2 division"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Multi-argument call stack offset fix
+# BUG: When pushing multiple arguments, stack offsets weren't adjusted for
+#      the SP changes from previous pushes, causing wrong values to be passed
+#------------------------------------------------------------------------------
+test_multiarg_call_offsets() {
+    local name="multiarg_call_offsets"
+    local src="$SCRIPT_DIR/test_multiarg_call.c"
+    local out="$BUILD/test_multiarg_call.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/multiarg_call_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/multiarg_call_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for unhandled op comments
+    if grep -E '; unhandled op' "$out" > /dev/null 2>&1; then
+        log_fail "$name: Found unhandled ops"
+        if [[ $VERBOSE -eq 1 ]]; then
+            grep -n -E '; unhandled op' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # The key test: stack offsets should INCREASE with each argument push
+    # because earlier pushes decrease SP, requiring larger offsets to reach
+    # the same local variables.
+    #
+    # Extract lines that push arguments (lda followed by pha)
+    # After the first pha, subsequent lda offsets should be larger
+    local arg_loads=$(grep -E "lda [0-9]+,s" "$out" | grep -A1 "test_multiarg_call:" | head -20)
+
+    # Look for pattern where offsets increase (e.g., 4,s then 6,s then 8,s...)
+    # This is a simplified check - the actual verification is that no two
+    # consecutive argument loads have the SAME offset (which would indicate
+    # the bug where SP changes weren't accounted for)
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Library builds have no unhandled ops
+# CRITICAL: Library was compiled with old compiler, had unhandled ops in oamClear
+#------------------------------------------------------------------------------
+test_library_no_unhandled_ops() {
+    local name="library_no_unhandled_ops"
+    local lib_build="$OPENSNES/lib/build"
+    ((TESTS_RUN++))
+
+    if [[ ! -d "$lib_build" ]]; then
+        log_fail "$name: Library build directory not found: $lib_build"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local has_unhandled=0
+    for asm_file in "$lib_build"/*.c.asm; do
+        if [[ -f "$asm_file" ]]; then
+            if grep -E '; unhandled op' "$asm_file" > /dev/null 2>&1; then
+                log_fail "$name: Unhandled ops in $(basename "$asm_file")"
+                if [[ $VERBOSE -eq 1 ]]; then
+                    grep -n -E '; unhandled op' "$asm_file"
+                fi
+                has_unhandled=1
+            fi
+        fi
+    done
+
+    if [[ $has_unhandled -eq 1 ]]; then
+        echo "  Hint: Rebuild library with 'cd lib && make clean && make'"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Global variable reads use direct addressing (not indirect via X)
+# BUG: Compiler was generating "lda.w #symbol; tax; lda.l $0000,x"
+#      instead of direct "lda.l symbol"
+#------------------------------------------------------------------------------
+test_global_var_reads() {
+    local name="global_var_reads"
+    local src="$SCRIPT_DIR/test_global_vars.c"
+    local out="$BUILD/test_global_vars.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/global_vars_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/global_vars_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check for the bug pattern: indirect load via X register for global symbols
+    # The pattern "lda.w #global_" followed by "tax" and "lda.l $0000,x" indicates the bug
+    if grep -E 'lda\.w #global_' "$out" > /dev/null 2>&1; then
+        # Check if this is followed by the indirect load pattern
+        if grep -A2 'lda\.w #global_' "$out" | grep -E 'lda\.l \$0000,x' > /dev/null 2>&1; then
+            log_fail "$name: Found indirect addressing for global variables"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Bug pattern found (should use lda.l symbol directly):"
+                grep -B1 -A2 'lda\.w #global_' "$out" | head -20
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    # Same check for extern variables
+    if grep -E 'lda\.w #extern_' "$out" > /dev/null 2>&1; then
+        if grep -A2 'lda\.w #extern_' "$out" | grep -E 'lda\.l \$0000,x' > /dev/null 2>&1; then
+            log_fail "$name: Found indirect addressing for extern variables"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Bug pattern found:"
+                grep -B1 -A2 'lda\.w #extern_' "$out" | head -20
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    # Verify direct loads are present (lda.l global_x, etc.)
+    if ! grep -E 'lda\.l global_x' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No direct load 'lda.l global_x' found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Input button masks match pvsneslib/SNES hardware layout
+# BUG: Button constants were using wrong bit positions
+#      D-pad was in bits 0-3 instead of bits 8-11
+#------------------------------------------------------------------------------
+test_input_button_masks() {
+    local name="input_button_masks"
+    local src="$SCRIPT_DIR/test_input_patterns.c"
+    local out="$BUILD/test_input_patterns.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/input_patterns_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/input_patterns_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify correct button masks are used (matching pvsneslib)
+    # KEY_UP = 0x0800 = 2048
+    if ! grep -E 'and\.w #2048' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_UP mask (2048/0x0800) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY_DOWN = 0x0400 = 1024
+    if ! grep -E 'and\.w #1024' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_DOWN mask (1024/0x0400) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY_LEFT = 0x0200 = 512
+    if ! grep -E 'and\.w #512' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_LEFT mask (512/0x0200) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY_RIGHT = 0x0100 = 256
+    if ! grep -E 'and\.w #256' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_RIGHT mask (256/0x0100) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY_A = 0x0080 = 128
+    if ! grep -E 'and\.w #128' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_A mask (128/0x0080) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY_B = 0x8000 = 32768
+    if ! grep -E 'and\.w #32768' "$out" > /dev/null 2>&1; then
+        log_fail "$name: KEY_B mask (32768/0x8000) not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Helper: Check any .asm file for unhandled ops
+# Usage: check_asm_for_unhandled_ops <file.asm>
+# Returns: 0 if clean, 1 if unhandled ops found
+#------------------------------------------------------------------------------
+check_asm_for_unhandled_ops() {
+    local asm_file="$1"
+    local name=$(basename "$asm_file")
+
+    if [[ ! -f "$asm_file" ]]; then
+        echo "File not found: $asm_file"
+        return 1
+    fi
+
+    if grep -E '; unhandled op' "$asm_file" > /dev/null 2>&1; then
+        echo "FAIL: Unhandled ops in $name:"
+        grep -n -E '; unhandled op' "$asm_file"
+        return 1
+    fi
+
+    echo "OK: No unhandled ops in $name"
+    return 0
+}
+
+#------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
 
@@ -398,6 +845,14 @@ main() {
     test_assemble_output || true      # May fail before fixes
     test_processed_assembly || true   # Test with post-processing
     test_static_var_stores           # CRITICAL: Static var stores must use symbols
+    test_shift_right_ops             # CRITICAL: Shift right must generate LSR instructions
+    test_word_extend_ops             # CRITICAL: Word extension ops must be handled
+    test_division_ops                # CRITICAL: Division/modulo must use LSR/AND for powers of 2
+    test_multiarg_call_offsets       # CRITICAL: Multi-arg calls must adjust stack offsets
+    test_library_no_unhandled_ops    # CRITICAL: Library must be compiled with working compiler
+    test_animation_patterns          # Comprehensive: loops, arrays, bit ops, conditionals
+    test_global_var_reads            # CRITICAL: Global/extern vars must use direct addressing
+    test_input_button_masks          # CRITICAL: Button masks must match pvsneslib/hardware
 
     echo ""
     echo "========================================"

@@ -49,19 +49,30 @@ void padUpdate(void) {
 
 u16 padPressed(u8 pad) {
     if (pad >= 4) return 0;
+    u16 current = pad_current[pad];
+    u16 previous = pad_previous[pad];
+    /* Disconnected controller reads as $FFFF - treat as no input */
+    if (current == 0xFFFF) return 0;
     /* Buttons that are down now but weren't last frame */
-    return pad_current[pad] & ~pad_previous[pad];
+    return current & ~previous;
 }
 
 u16 padHeld(u8 pad) {
     if (pad >= 4) return 0;
-    return pad_current[pad];
+    u16 state = pad_current[pad];
+    /* Disconnected controller reads as $FFFF - treat as no input */
+    if (state == 0xFFFF) return 0;
+    return state;
 }
 
 u16 padReleased(u8 pad) {
     if (pad >= 4) return 0;
+    u16 current = pad_current[pad];
+    u16 previous = pad_previous[pad];
+    /* Disconnected controller reads as $FFFF - treat as no input */
+    if (previous == 0xFFFF) return 0;
     /* Buttons that were down last frame but aren't now */
-    return pad_previous[pad] & ~pad_current[pad];
+    return previous & ~current;
 }
 
 u16 padRaw(u8 pad) {
