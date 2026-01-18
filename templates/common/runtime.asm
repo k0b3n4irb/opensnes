@@ -8,12 +8,19 @@
 ; License: MIT
 ;==============================================================================
 
+; Export runtime function names for the linker
+; (Labels starting with _ are local in WLA-DX, so we create global aliases)
+.DEFINE __mul16 tcc_mul16
+.DEFINE __div16 tcc_div16
+.DEFINE __mod16 tcc_mod16
+.EXPORT __mul16
+.EXPORT __div16
+.EXPORT __mod16
+
 .SECTION ".runtime" SEMIFREE
 
-; Note: Labels defined in a .SECTION are automatically available to the linker
-
 ;------------------------------------------------------------------------------
-; __mul16 - Signed 16-bit multiplication
+; tcc_mul16 - Signed 16-bit multiplication
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = multiplicand
 ;         tcc__r1 = multiplier
@@ -31,7 +38,7 @@
 ; Since we only need the low 16 bits:
 ;   result_lo = a_lo*b_lo + (a_hi*b_lo + a_lo*b_hi)*256 (low byte only of this)
 ;------------------------------------------------------------------------------
-__mul16:
+tcc_mul16:
     php
     rep #$30            ; 16-bit A, X/Y
 
@@ -109,7 +116,7 @@ __mul16:
     rtl
 
 ;------------------------------------------------------------------------------
-; __div16 - Unsigned 16-bit division
+; tcc_div16 - Unsigned 16-bit division
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor (must be <= 255 for hardware, else software)
@@ -118,7 +125,7 @@ __mul16:
 ;
 ; Uses hardware division ($4204-$4206, result at $4214-$4217)
 ;------------------------------------------------------------------------------
-__div16:
+tcc_div16:
     php
     rep #$30
 
@@ -196,14 +203,14 @@ __div16:
     rtl
 
 ;------------------------------------------------------------------------------
-; __mod16 - Unsigned 16-bit modulo
+; tcc_mod16 - Unsigned 16-bit modulo
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor
 ; Output: tcc__r0 = remainder
 ;------------------------------------------------------------------------------
-__mod16:
-    jsl __div16
+tcc_mod16:
+    jsl tcc_div16
     lda tcc__r1         ; Remainder is in tcc__r1
     sta tcc__r0
     rtl

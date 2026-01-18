@@ -7,7 +7,11 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := calculator.sfc
 ROM_NAME := SNES CALCULATOR
 
+# Source files
 CSRC     := main.c
-ASMSRC   := calc_loop.asm
+
+# Enable OpenSNES library
+USE_LIB     := 1
+LIB_MODULES := console input sprite
 
 include $(OPENSNES)/make/common.mk
