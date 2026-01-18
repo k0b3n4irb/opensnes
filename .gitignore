@@ -54,4 +54,6 @@ release/
 !lib/source/*.asm
 !lib/include/**/*.h
 !templates/**/*.asm
+!examples/**/data.asm
+!examples/**/spc.asm
 
