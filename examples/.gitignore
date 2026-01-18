@@ -1,0 +1,21 @@
+# Build artifacts
+*.obj
+*.sfc
+*.sym
+*.ps
+*.c.asm
+combined.asm
+combined.obj
+linkfile
+project_hdr.asm
+
+# Generated files
+myfont.h
+sprites.h
+soundbank.asm
+soundbank.bnk
+soundbank.h
+
+# Debug/test files
+*_debug.*
+*.debug

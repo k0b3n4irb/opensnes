@@ -1,14 +1,14 @@
 # Lesson 1: Hello World
 
-Your first SNES ROM! Display "HELLO WORLD" on screen.
+Your first SNES ROM! Display "HELLO WORLD!" on screen.
 
 ## Learning Objectives
 
 After this lesson, you will understand:
-- ✅ How VRAM stores tile graphics
-- ✅ How tilemaps create the display
-- ✅ Basic PPU register setup
-- ✅ The ROM build process
+- How VRAM stores tile graphics (2bpp format)
+- How tilemaps create the display
+- Basic PPU register setup
+- The ROM build process with OpenSNES
 
 ## Prerequisites
 
@@ -23,109 +23,158 @@ After this lesson, you will understand:
 Display this on screen:
 
 ```
-┌────────────────────────────────────┐
-│                                    │
-│                                    │
-│          HELLO WORLD!              │
-│                                    │
-│                                    │
-└────────────────────────────────────┘
++------------------------------------+
+|                                    |
+|                                    |
+|          HELLO WORLD!              |
+|                                    |
+|                                    |
++------------------------------------+
 ```
 
 Seems simple? On the SNES, there's no `printf()`. We need to:
-1. Create font graphics (tiles)
+1. Create font graphics (tiles) in 2bpp format
 2. Load them to VRAM
 3. Create a tilemap that spells our message
 4. Configure the PPU to display it
 
 ---
 
+## Code Type
+
+**Mixed C + Direct Register Access**
+
+| Component | Type |
+|-----------|------|
+| Hardware init | Library (`consoleInit()`) |
+| Video mode | Library (`setMode()`) |
+| Screen enable | Library (`setScreenOn()`) |
+| VBlank sync | Library (`WaitForVBlank()`) |
+| Font tiles | C const array (embedded 2bpp) |
+| VRAM writes | Direct register access |
+| Palette | Direct register access |
+
+---
+
 ## Step-by-Step Explanation
 
-### Step 1: Define the Font
-
-We create a minimal font with just the letters we need:
+### Step 1: Hardware Initialization
 
 ```c
-/* Each letter is 8 bytes (1bpp bitmap) */
-static const u8 font_1bpp[] = {
-    /* H */  0x66, 0x66, 0x66, 0x7E, 0x66, 0x66, 0x66, 0x00,
-    /* E */  0x7E, 0x60, 0x60, 0x7C, 0x60, 0x60, 0x7E, 0x00,
-    /* L */  0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x7E, 0x00,
-    /* O */  0x3C, 0x66, 0x66, 0x66, 0x66, 0x66, 0x3C, 0x00,
-    /* ... */
+#include <snes.h>
+
+int main(void) {
+    consoleInit();              /* Initialize SNES hardware */
+    setMode(BGMODE_MODE0);      /* Mode 0: 4 BG layers, all 2bpp */
+```
+
+`consoleInit()` sets up the SNES hardware to a known state:
+- Disables interrupts during setup
+- Clears all PPU registers
+- Sets up default timing
+
+`setMode()` configures Mode 0, which gives us 4 background layers at 2 bits per pixel (4 colors each).
+
+### Step 2: Define the Font (2bpp Format)
+
+```c
+static const u8 font_tiles[] = {
+    /* Tile 0: Space (blank) */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+
+    /* Tile 1: H */
+    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x7E, 0x00,
+    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x00, 0x00,
+    /* ... more tiles ... */
 };
 ```
 
-Each byte represents one row of pixels. For example, `0x66` = `01100110` in binary:
+Each 8x8 tile is 16 bytes in 2bpp format. Every pair of bytes represents one row:
+- First byte: Bitplane 0 (LSB of each pixel)
+- Second byte: Bitplane 1 (MSB of each pixel)
 
-```
-0x66 = . # # . . # # .
-       ↑           ↑
-   H's left leg   right leg
-```
+For a simple font, we only use bitplane 0, so colors alternate between 0 and 1.
 
-### Step 2: Load Tiles to VRAM
-
-VRAM stores graphics. We write our font tiles there:
+### Step 3: Configure Background Layer
 
 ```c
-/* Set VRAM address to 0 */
-REG_VMAIN = 0x80;    /* Auto-increment after high byte write */
-REG_VMADDL = 0x00;   /* Address low byte */
-REG_VMADDH = 0x00;   /* Address high byte */
+REG_BG1SC = 0x04;   /* Tilemap at VRAM $0400, 32x32 tiles */
+REG_BG12NBA = 0x00; /* BG1 tiles at VRAM $0000 */
+```
 
-/* Write each tile */
-for (i = 0; i < num_tiles; i++) {
-    for (j = 0; j < 8; j++) {
-        REG_VMDATAL = font_1bpp[i * 8 + j];  /* Bitplane 0 */
-        REG_VMDATAH = 0x00;                   /* Bitplane 1 */
-    }
+| Register | Value | Meaning |
+|----------|-------|---------|
+| BG1SC | $04 | Tilemap at VRAM $0400, 32x32 tiles |
+| BG12NBA | $00 | BG1 tiles at VRAM $0000 |
+
+### Step 4: Upload Font Tiles to VRAM
+
+```c
+REG_VMAIN = 0x80;   /* Auto-increment after high byte write */
+REG_VMADDL = 0x00;  /* VRAM address = $0000 */
+REG_VMADDH = 0x00;
+
+for (i = 0; i < 144; i += 2) {
+    REG_VMDATAL = font_tiles[i];     /* Bitplane 0 */
+    REG_VMDATAH = font_tiles[i + 1]; /* Bitplane 1 */
 }
 ```
 
-**Why two writes per row?** SNES tiles use planar format. In 2bpp mode:
-- Bitplane 0: Least significant bit of each pixel
-- Bitplane 1: Most significant bit of each pixel
+`REG_VMAIN = 0x80` enables auto-increment mode after writing to the high byte, allowing sequential VRAM writes.
 
-Since we want a simple 2-color font (background + text), we only use bitplane 0.
-
-### Step 3: Set Up the Tilemap
-
-The tilemap tells the PPU which tile to show at each position:
+### Step 5: Set Up the Palette
 
 ```c
-/* Tilemap at VRAM $0800 */
-u16 addr = 0x0800 + (y * 32) + x;  /* 32 tiles per row */
+REG_CGADD = 0;      /* Start at color 0 */
+REG_CGDATA = 0x00;  /* Color 0: Dark blue (low byte) */
+REG_CGDATA = 0x28;  /* Color 0: Dark blue (high byte) */
+REG_CGDATA = 0xFF;  /* Color 1: White (low byte) */
+REG_CGDATA = 0x7F;  /* Color 1: White (high byte) */
+```
 
-REG_VMAIN = 0x80;
+SNES colors are 15-bit BGR format: `0BBBBBGG GGGRRRRR`
+
+### Step 6: Write the Message to the Tilemap
+
+The message is encoded as tile indices:
+
+```c
+static const u8 message[] = {
+    1, 2, 3, 3, 4,  /* HELLO */
+    0,              /* space */
+    5, 4, 6, 3, 7,  /* WORLD */
+    8,              /* ! */
+    0xFF            /* end marker */
+};
+```
+
+Written to VRAM at tilemap position (row 14, column 10):
+
+```c
+addr = 0x05CA;  /* 0x0400 + (14 * 32 + 10) */
 REG_VMADDL = addr & 0xFF;
 REG_VMADDH = addr >> 8;
 
-/* Write tile numbers */
-while (*str) {
-    u8 tile = char_to_tile(*str);
+i = 0;
+while (1) {
+    tile = message[i];
+    if (tile == 0xFF) break;
     REG_VMDATAL = tile;   /* Tile number */
-    REG_VMDATAH = 0x00;   /* Attributes */
-    str++;
+    REG_VMDATAH = 0;      /* Attributes (palette 0, no flip) */
+    i++;
 }
 ```
 
-### Step 4: Configure the PPU
+### Step 7: Enable Display and Main Loop
 
 ```c
-/* Mode 0: Four 2bpp backgrounds */
-REG_BGMODE = 0x00;
+REG_TM = TM_BG1;  /* Enable BG1 on main screen */
+setScreenOn();    /* Turn on display */
 
-/* BG1 tilemap at $0800, tiles at $0000 */
-REG_BG1SC = 0x08;     /* ($0800 / $400) << 2 = 0x08 */
-REG_BG12NBA = 0x00;   /* Tiles at $0000 */
-
-/* Enable BG1 on main screen */
-REG_TM = 0x01;
-
-/* Turn on display */
-REG_INIDISP = 0x0F;   /* Full brightness */
+while (1) {
+    WaitForVBlank();  /* Sync to 60Hz refresh */
+}
 ```
 
 ---
@@ -135,8 +184,8 @@ REG_INIDISP = 0x0F;   /* Full brightness */
 ### VRAM Layout
 
 ```
-$0000-$07FF: Tile data (our font - 64 tiles max)
-$0800-$0FFF: BG1 tilemap (32×32 entries)
+$0000-$01FF: Font tiles (9 tiles x 16 bytes = 144 bytes)
+$0400-$07FF: BG1 tilemap (32x32 = 1024 words)
 ```
 
 ### Tilemap Entry Format
@@ -171,15 +220,19 @@ make clean && make
 /path/to/Mesen hello_world.sfc
 ```
 
+This produces `hello_world.sfc` (128KB ROM).
+
+---
+
 ## Exercises
 
 ### Exercise 1: Change the Message
-Edit `main.c` to display your name instead of "HELLO WORLD".
+Edit `main.c` to display your name instead of "HELLO WORLD!".
 
-**Hint:** You'll need to add letters to the font if they're not included.
+**Hint:** You'll need to add font tiles for letters not already included (H, E, L, O, W, R, D, !).
 
 ### Exercise 2: Change Colors
-Modify `set_palette()` to use different colors.
+Modify the palette writes to use different colors.
 
 **Hint:** SNES colors are 15-bit BGR (5 bits each):
 ```c
@@ -190,9 +243,9 @@ u16 blue = 0x7C00;   /* R=0, G=0, B=31 */
 ```
 
 ### Exercise 3: Add a Second Line
-Display two lines of text.
+Display two lines of text by writing to two different tilemap addresses.
 
-**Hint:** Call `print_at()` with a different Y coordinate.
+**Hint:** Row N is at offset `(N * 32)` from the tilemap base.
 
 ---
 
@@ -201,44 +254,28 @@ Display two lines of text.
 | File | Purpose |
 |------|---------|
 | `main.c` | All the code (self-contained) |
-| `crt0.asm` | Startup code (CPU init) |
-| `hdr.asm` | ROM header (memory map) |
-| `Makefile` | Build script |
+| `Makefile` | Build configuration |
 
----
-
-## Testing
-
-Automated tests verify this example works correctly:
-
-```bash
-# Run from project root
-cd tests
-./run_tests.sh examples
-```
-
-Or run the specific test in Mesen2:
-```
-tests/examples/hello_world/test_hello_world.lua
-```
-
-### Test Coverage
-
-- ROM boots and reaches `main()`
-- Hardware initialization (`InitHardware`)
-- VBlank handler is operational
-- OAM buffer is initialized
-- No WRAM mirror overlaps
-
-See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.
+Generated files (after build):
+| File | Purpose |
+|------|---------|
+| `combined.asm` | Generated assembly from C code |
+| `hello_world.sfc` | Output ROM file |
+| `hello_world.sym` | Symbol table for debugging |
 
 ---
 
 ## What's Next?
 
 In the next lesson, we'll:
-- Use an external font image
+- Use an external font image file
 - Learn the `font2snes` tool
-- Display the full ASCII character set
+- Display more characters
 
-**Next:** [2. Custom Font](../2_custom_font/) →
+**Next:** [2. Custom Font](../2_custom_font/)
+
+---
+
+## License
+
+CC0 (Public Domain)

@@ -1,253 +1,228 @@
-# Lesson 2: Animation
+# Animation Example
 
-Animate a sprite with multiple frames and timing control.
+A movable, animated sprite demonstrating character animation on the SNES.
 
 ## Learning Objectives
 
 After this lesson, you will understand:
 - How sprite animation works on SNES
-- Frame-based timing systems
-- Tile swapping for animation
-- Animation state machines
+- Tile swapping for animation frames
+- Animation state machines (walk direction)
 - Horizontal sprite flipping
+- Mixing C and assembly for performance
 
 ## Prerequisites
 
-- Completed [1. Sprite](../1_sprite/)
 - Understanding of OAM and tile loading
+- Completed text examples (for graphics basics)
 
 ---
 
-## Animation Fundamentals
+## What This Example Does
 
-### The Illusion of Motion
-
-Animation is simply showing different images in sequence:
-
-```
-Frame 0     Frame 1     Frame 2     Frame 3     Frame 0...
-┌────┐      ┌────┐      ┌────┐      ┌────┐      ┌────┐
-│ o  │  →   │ o  │  →   │ o  │  →   │ o  │  →   │ o  │
-│/|\ │      │/|\ │      │\|/ │      │/|\ │      │/|\ │
-│/ \ │      │ | │      │ | │      │ |\ │      │/ \ │
-└────┘      └────┘      └────┘      └────┘      └────┘
-Standing    Walk L      Squat       Walk R      Standing
-```
-
-At 60fps, cycling through 4 frames every 8 VBlanks = 7.5 animation cycles/second.
-
-### Sprite Sheet Organization
-
-Store all frames in one image, convert once:
+A 16x16 monster sprite that:
+- Moves with D-pad in any direction
+- Animates while moving (3 frames per direction)
+- Flips horizontally when moving left
+- Uses different animation rows for up/down/left-right
 
 ```
-Source PNG (64×16):
-┌────────────────────────────────────────────────────────────────┐
-│ Frame 0  │ Frame 1  │ Frame 2  │ Frame 3  │
-│ Stand    │ Walk 1   │ Squat    │ Walk 2   │
-└────────────────────────────────────────────────────────────────┘
++----------------------------------------+
+|                                        |
+|                                        |
+|                                        |
+|               [SPRITE]                 |
+|                                        |
+|                                        |
+|                                        |
++----------------------------------------+
 ```
 
-In VRAM (128 pixels wide, tiles numbered):
-```
-┌────┬────┬────┬────┬────┬────┬────┬────┬────┐...
-│ T0 │ T1 │ T2 │ T3 │ T4 │ T5 │ T6 │ T7 │    │
-├────┼────┼────┼────┼────┼────┼────┼────┼────┤
-│T16 │T17 │T18 │T19 │T20 │T21 │T22 │T23 │    │
-└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+**Controls:**
+- D-pad: Move the monster
+- Sprite animates while moving
 
-Frame 0: tiles 0-1, 16-17  (tile index = 0)
-Frame 1: tiles 2-3, 18-19  (tile index = 2)
-Frame 2: tiles 4-5, 20-21  (tile index = 4)
-Frame 3: tiles 6-7, 22-23  (tile index = 6)
+---
+
+## Code Type
+
+**Mixed C + Assembly**
+
+| Component | Type |
+|-----------|------|
+| Main loop | C (`main.c`) |
+| Input handling | C (direct register reads) |
+| Sprite update | Library (`oamSet`, `oamUpdate`) |
+| Game state | Assembly variables (`helpers.asm`) |
+| Tile calculation | Assembly (avoids multiplication) |
+| Graphics loading | C (direct VRAM writes) |
+
+---
+
+## Animation System
+
+### Sprite Sheet Layout
+
+The monster has 9 animation frames in a 3x3 grid:
+
+```
+Row 0 (state 0): Walk Down   - frames 0, 2, 4
+Row 1 (state 1): Walk Up     - frames 6, 8, 10
+Row 2 (state 2): Walk Right  - frames 12, 14, 32
+```
+
+### Tile Lookup Table
+
+Instead of runtime multiplication, a lookup table is used:
+
+```asm
+sprite_tiles:
+    .db 0, 2, 4      ; Walk down frames (state 0)
+    .db 6, 8, 10     ; Walk up frames (state 1)
+    .db 12, 14, 32   ; Walk right/left frames (state 2)
+```
+
+### State Variables
+
+```asm
+.RAMSECTION ".game_vars" BANK 0 SLOT 1
+    monster_x       dsb 2    ; 16-bit X position
+    monster_y       dsb 2    ; 16-bit Y position
+    monster_state   dsb 1    ; 0=down, 1=up, 2=left/right
+    monster_anim    dsb 1    ; Animation frame (0-2)
+    monster_flipx   dsb 1    ; Horizontal flip flag
+    monster_tile    dsb 1    ; Current tile number
+.ENDS
 ```
 
 ---
 
-## Frame Timing
+## How Animation Works
 
-### VBlank as Your Clock
-
-The SNES runs at ~60fps (NTSC) or ~50fps (PAL). Each VBlank = 1 frame.
+### 1. Input Updates State
 
 ```c
-#define ANIM_SPEED_WALK   8    /* Change frame every 8 VBlanks */
-#define ANIM_SPEED_IDLE   15   /* Slower when standing still */
-
-static u8 anim_timer;
-
-void update_animation(void) {
-    anim_timer--;
-
-    if (anim_timer == 0) {
-        /* Advance to next frame */
-        anim_frame++;
-        if (anim_frame >= NUM_FRAMES) {
-            anim_frame = 0;
-        }
-
-        /* Reset timer */
-        anim_timer = ANIM_SPEED_WALK;
-    }
+if (pad & KEY_DOWN) {
+    monster_state = 0;  /* Walk down */
+    monster_flipx = 0;
+    monster_y++;
+}
+if (pad & KEY_LEFT) {
+    monster_state = 2;  /* Walk sideways */
+    monster_flipx = 1;  /* Flip horizontally */
+    monster_x--;
 }
 ```
 
-### Speed Examples
-
-| Timer Value | FPS | Frames/Cycle | Animation Speed |
-|-------------|-----|--------------|-----------------|
-| 4 | 60 | 15/sec | Very fast |
-| 8 | 60 | 7.5/sec | Walk speed |
-| 15 | 60 | 4/sec | Idle bob |
-| 30 | 60 | 2/sec | Very slow |
-
----
-
-## Tile Swapping
-
-### How It Works
-
-You don't re-upload tile data. Instead, change the tile number in OAM:
+### 2. Animation Advances on Input
 
 ```c
-/* Get tile number for 16×16 sprite in horizontal strip */
-u8 get_tile_for_frame(u8 frame) {
-    return frame * 2;  /* 0, 2, 4, 6 */
+/* Advance animation on any input */
+monster_anim = monster_anim + 1;
+if (monster_anim >= 3) {
+    monster_anim = 0;
 }
-
-/* In main loop: */
-u8 tile = get_tile_for_frame(anim_frame);
-oam_set(0, sprite_x, sprite_y, tile, attr);
 ```
 
-### Why frame × 2?
+### 3. Tile Calculated from State + Frame
 
-A 16×16 sprite occupies 2 tiles horizontally:
+```asm
+; tile = sprite_tiles[state * 3 + anim]
+calc_tile:
+    lda.l monster_state
+    asl a               ; state * 2
+    clc
+    adc.l monster_state ; state * 3
+    clc
+    adc.l monster_anim  ; + anim
+    tax
+    lda.l sprite_tiles,x
+    sta.l monster_tile
 ```
-Frame 0:  T0, T1      → tile index 0
-Frame 1:  T2, T3      → tile index 2
-Frame 2:  T4, T5      → tile index 4
-Frame 3:  T6, T7      → tile index 6
+
+### 4. OAM Updated with Flip Flag
+
+```c
+u8 flags = monster_flipx ? 0x40 : 0x00;
+oamSet(0, monster_x, monster_y, monster_tile, 0, 3, flags);
 ```
 
 ---
 
 ## Horizontal Flipping
 
-### Mirroring Sprites
-
-Instead of storing separate left/right graphics, flip the sprite:
+Instead of separate left-facing graphics, the right-facing frames are flipped:
 
 ```c
-u8 attr = 0x30;  /* Priority 3 */
-
-if (facing_left) {
-    attr |= 0x40;  /* Set H-flip bit */
-}
-
-oam_set(0, sprite_x, sprite_y, tile, attr);
+/* OAM attribute bit 6 = horizontal flip */
+u8 flags = monster_flipx ? 0x40 : 0x00;
 ```
 
-### OAM Attribute Bits
-
+**OAM Attribute Byte:**
 ```
-Byte 3 of OAM entry:
-  Bit 7: Vertical flip   (v)
-  Bit 6: Horizontal flip (h)
-  Bit 5-4: Priority      (pp)
-  Bit 3-1: Palette       (ccc)
-  Bit 0: Tile high bit   (t)
-
-  vhppccct
-  0100 0000 = 0x40 = H-flip only
-  1000 0000 = 0x80 = V-flip only
-  1100 0000 = 0xC0 = Both flips
+vhppccct
+||||||+- Tile high bit
+|||||+-- Unused
+||||+--- Palette (0-7)
+||++---- Priority (0-3)
+|+------ Horizontal flip
++------- Vertical flip
 ```
 
 ---
 
-## Animation State Machine
+## Loading Graphics
 
-### Managing Multiple States
+### Sprite Tiles to VRAM
 
 ```c
-typedef enum {
-    STATE_IDLE,
-    STATE_WALKING,
-    STATE_JUMPING
-} PlayerState;
+static void load_sprite_tiles(void) {
+    u16 i;
+    REG_VMAIN = 0x80;
+    REG_VMADDL = 0x00;
+    REG_VMADDH = 0x00;
 
-static PlayerState current_state;
-static u8 anim_frame;
-static u8 anim_timer;
-
-void update_animation(void) {
-    anim_timer--;
-    if (anim_timer == 0) {
-        switch (current_state) {
-            case STATE_IDLE:
-                /* Single frame or breathing animation */
-                anim_frame = 0;
-                anim_timer = 30;
-                break;
-
-            case STATE_WALKING:
-                /* Cycle through walk frames */
-                anim_frame = (anim_frame + 1) % 4;
-                anim_timer = 8;
-                break;
-
-            case STATE_JUMPING:
-                /* Hold jump frame */
-                anim_frame = 4;
-                anim_timer = 1;
-                break;
+    for (i = 0; i < sprites_TILES_SIZE; i++) {
+        u8 byte = sprites_tiles[i];
+        if ((i & 1) == 0) {
+            REG_VMDATAL = byte;
+        } else {
+            REG_VMDATAH = byte;
         }
     }
 }
 ```
 
----
-
-## The Code Explained
-
-### Animation Variables
+### Sprite Palette to CGRAM
 
 ```c
-static u8 anim_frame;      /* Current frame index (0-3) */
-static u8 anim_timer;      /* Countdown to next frame */
-static u8 is_moving;       /* Was there input this frame? */
-static u8 facing_left;     /* Direction for H-flip */
+static void load_sprite_palette(void) {
+    u8 i;
+    const u8 *pal_bytes = (const u8 *)sprites_pal;
+
+    REG_CGADD = 128;  /* Sprite palettes start at 128 */
+
+    for (i = 0; i < sprites_PAL_COUNT * 2; i++) {
+        REG_CGDATA = pal_bytes[i];
+    }
+}
 ```
 
-### Main Loop Flow
+---
+
+## Main Loop
 
 ```c
 while (1) {
-    wait_vblank();
+    /* Handle input (reads joypad, updates state) */
+    handle_input();
 
-    /* 1. Read input */
-    joy = read_joypad();
+    /* Update sprite in OAM buffer */
+    update_sprite();
 
-    /* 2. Update position & track if moving */
-    is_moving = 0;
-    if (joy & KEY_LEFT) {
-        sprite_x--;
-        is_moving = 1;
-        facing_left = 1;
-    }
-    /* ... other directions ... */
-
-    /* 3. Update animation state */
-    update_animation();
-
-    /* 4. Calculate tile and attributes */
-    tile = get_tile_for_frame(anim_frame);
-    attr = facing_left ? 0x70 : 0x30;  /* H-flip if left */
-
-    /* 5. Update OAM */
-    oam_set(0, sprite_x, sprite_y, tile, attr);
-    oam_update();
+    /* Wait for VBlank and transfer OAM */
+    WaitForVBlank();
+    oamUpdate();
 }
 ```
 
@@ -259,140 +234,100 @@ while (1) {
 cd examples/graphics/2_animation
 make clean && make
 
-# Test with emulator
+# Run in emulator
 /path/to/Mesen animation.sfc
 ```
 
-**Controls:**
-- D-pad: Move character (triggers walk animation)
-- Stand still: Returns to idle pose
+---
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `main.c` | C code for main loop, input, graphics loading |
+| `helpers.asm` | Assembly: game state variables, tile lookup |
+| `Makefile` | Build configuration |
+| `assets/sprites.bmp` | Source sprite sheet |
+| `sprites.h` | Generated tile and palette data |
+
+---
+
+## Why Mixed C + Assembly?
+
+**Assembly is used for:**
+1. **RAM variables** - Direct control over memory layout
+2. **Tile calculation** - Avoids compiler-generated multiplication which can have issues
+
+**C is used for:**
+1. **Main loop logic** - Easier to read and modify
+2. **Input handling** - Simple conditionals
+3. **Graphics loading** - Straightforward loops
 
 ---
 
 ## Exercises
 
 ### Exercise 1: Speed Control
+Make the character move faster when holding the B button.
 
-Make the animation speed up when running (holding a button):
-
+### Exercise 2: Animation Speed
+Currently animation advances every frame of input. Add a timer to slow it down:
 ```c
-#define KEY_B 0x8000  /* B button */
-
-if (joy & KEY_B) {
-    anim_timer = ANIM_SPEED_WALK / 2;  /* Double speed */
+static u8 anim_timer = 0;
+anim_timer++;
+if (anim_timer >= 4) {
+    anim_timer = 0;
+    monster_anim = (monster_anim + 1) % 3;
 }
 ```
 
-### Exercise 2: Jump Animation
+### Exercise 3: Add a Jump
+Make the character jump when pressing A:
+1. Add `monster_vy` for vertical velocity
+2. On A press, set `monster_vy = -4`
+3. Each frame, add gravity and update position
+4. Stop when hitting the ground
 
-Add a jump when pressing A:
-1. Set a `jumping` flag
-2. Apply upward velocity
-3. Display a jump frame
-4. Apply gravity until landing
-
-### Exercise 3: Create Your Own Animation
-
-1. Edit `assets/spritesheet.png` with new frames
-2. Keep the 64×16 layout (4 frames × 16×16)
-3. Rebuild and test
-
-### Exercise 4: Two-Direction Walk
-
-Currently all frames are used for all directions. Try:
-- Frames 0-1: Walk right
-- Frames 2-3: Walk left
-- Modify `get_tile_for_frame()` to use different frames
+### Exercise 4: Create Your Own Animation
+1. Edit `assets/sprites.bmp` with new graphics
+2. Keep the same layout (16x16 tiles in a grid)
+3. Rebuild with `make clean && make`
 
 ---
 
-## Common Issues
+## Technical Notes
 
-### Animation doesn't change
-- Check `anim_timer` is being decremented
-- Verify `anim_frame` changes are reaching `oam_set()`
-- Ensure `oam_update()` is called after changes
+### Sprite Sizing
 
-### Sprite flickers between frames
-- Make sure you're only calling `oam_update()` during VBlank
-- Don't update OAM mid-frame
+Initialized with `oamInitEx(OBJ_SIZE16_L32, 0)`:
+- Small sprites: 16x16 pixels
+- Large sprites: 32x32 pixels
+- OAM table at address 0
 
-### Wrong tiles displayed
-- Verify tile indices match your sprite sheet layout
-- Remember: 16×16 sprites use tile index × 2
+### Screen Setup
 
-### Flipping doesn't work
-- Check attribute byte format: `0x40` = H-flip
-- Ensure you're not overwriting the flip bit
+```c
+REG_TM = 0x10;       /* Enable sprites on main screen */
+REG_INIDISP = 0x0F;  /* Full brightness */
+```
 
 ---
 
-## Key Concepts Summary
+## Sprite Credit
 
-| Concept | Implementation |
-|---------|----------------|
-| Timing | Count VBlanks, act when timer hits 0 |
-| Tile swap | Change tile number in OAM, not VRAM |
-| Sprite sheet | All frames in one image → VRAM |
-| H-flip | Attribute bit 6 mirrors sprite |
-| State machine | Track state, choose frames accordingly |
-
----
-
-## Files in This Example
-
-| File | Purpose |
-|------|---------|
-| `main.c` | Animation logic (timing, state, flip) |
-| `assets/spritesheet.png` | 4-frame animation strip |
-| `spritesheet.h` | Generated tile data |
-| `Makefile` | Build + asset conversion |
+Sprite artwork by Stephen "Redshrike" Challener from [OpenGameArt.org](http://opengameart.org).
 
 ---
 
 ## What's Next?
 
-Now you can animate sprites! Next lessons will cover:
-- **Backgrounds:** Tilemaps, scrolling, parallax
-- **Collision:** Detecting sprite overlaps
-- **Multiple sprites:** Managing many animated objects
+**Audio:** [Tone Example](../../audio/1_tone/) - SPC700 sound
 
-**Next:** 3. Background *(coming soon)* →
+**Text:** [Calculator Example](../../basics/1_calculator/) - Interactive UI
 
 ---
 
-## Testing
+## License
 
-Automated tests verify this example works correctly:
-
-```bash
-# Run from project root
-cd tests
-./run_tests.sh examples
-```
-
-Or run the specific test in Mesen2:
-```
-tests/examples/animation/test_animation.lua
-```
-
-### Test Coverage
-
-- ROM boots and reaches `main()`
-- Monster sprite initializes at correct position
-- **WRAM mirroring fix verified** - `oamMemory` at `$7E:0300` (safe address)
-- Monster position not corrupted by OAM operations
-- Input affects monster position (movement works)
-- OAM is transferred to hardware during VBlank
-- Visible sprites on screen
-- No WRAM mirror overlaps
-
-### Historical Note: WRAM Mirroring Bug
-
-This example was the subject of a critical bug fix in January 2026. The original code placed `oamMemory` at `$7E:0000`, which overlaps with Bank `$00` variables due to WRAM mirroring. When `oamInit()` cleared the buffer, it corrupted `monster_x` and other game variables.
-
-**The fix:** Place `oamMemory` at `$7E:0300` using `ORGA $0300 FORCE` in the assembly.
-
-See [KNOWLEDGE.md](../../../.claude/KNOWLEDGE.md) Section 3 for details on WRAM mirroring.
-
-See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.
+Art: CC-BY 3.0 (see OpenGameArt)
+Code: MIT
