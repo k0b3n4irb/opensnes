@@ -245,11 +245,16 @@ combined.obj: combined.asm
 	@$(AS) -o $@ $<
 
 # Create linker file
+# Note: On MSYS2/Windows, wlalink needs Windows-style paths, so we use cygpath -m
 linkfile: combined.obj
 	@echo "[objects]" > $@
 	@echo "combined.obj" >> $@
 ifeq ($(USE_LIB),1)
+ifeq ($(OS),Windows_NT)
+	@for obj in $(LIB_OBJS); do echo "$$(cygpath -m $$obj)" >> $@; done
+else
 	@for obj in $(LIB_OBJS); do echo "$$obj" >> $@; done
+endif
 endif
 
 # Link to final ROM
