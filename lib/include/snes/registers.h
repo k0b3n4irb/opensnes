@@ -348,6 +348,36 @@
 /** @} */ /* end of dma_regs */
 
 /*============================================================================
+ * APU Registers ($2140-$2143)
+ *============================================================================*/
+
+/**
+ * @defgroup apu_regs APU Registers
+ * @brief Audio Processing Unit I/O ports
+ *
+ * These four ports are used for communication between the main CPU
+ * and the SPC700 audio processor. Both CPUs can read and write to
+ * their respective sides - writes go to output latches visible to
+ * the other processor.
+ *
+ * @{
+ */
+
+/** @brief APU I/O port 0 (R/W) */
+#define REG_APUIO0      (*(vu8*)0x2140)
+
+/** @brief APU I/O port 1 (R/W) */
+#define REG_APUIO1      (*(vu8*)0x2141)
+
+/** @brief APU I/O port 2 (R/W) */
+#define REG_APUIO2      (*(vu8*)0x2142)
+
+/** @brief APU I/O port 3 (R/W) */
+#define REG_APUIO3      (*(vu8*)0x2143)
+
+/** @} */ /* end of apu_regs */
+
+/*============================================================================
  * Register Value Constants
  *============================================================================*/
 
