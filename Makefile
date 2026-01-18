@@ -37,7 +37,7 @@ TESTS_PATH    := tests
 # Main targets
 #------------------------------------------------------------------------------
 
-all: submodules compiler tools examples
+all: submodules compiler tools lib examples
 	@echo ""
 	@echo "=========================================="
 	@echo "OpenSNES SDK build complete!"
@@ -73,7 +73,7 @@ tools: compiler
 lib: compiler
 	$(MAKE) -C $(LIB_PATH)
 
-examples: compiler tools
+examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
 tests: compiler tools
