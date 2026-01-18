@@ -1,12 +1,12 @@
 # Audio Example: Sound Effects
 
-A minimal sound effect demo using the OpenSNES audio library.
+A minimal sound effect demo using bare-metal SPC700 programming (like 1_tone).
 
 ## What This Example Does
 
-- Initializes the audio system
-- Plays a sound effect when A button is pressed
-- Visual feedback: screen color changes when playing
+- Uploads a minimal SPC driver (~100 bytes) and BRR sample to SPC RAM
+- Plays the TADA sound when A button is pressed
+- Visual feedback: GREEN screen = ready, BLUE flash = sound playing
 
 **Controls:**
 - A button: Play sound effect
@@ -15,22 +15,46 @@ A minimal sound effect demo using the OpenSNES audio library.
 
 ## Code Type
 
-**C + Assembly Audio Library**
+**C + Bare-metal Assembly**
 
 | Component | Type |
 |-----------|------|
 | Hardware init | Direct register access |
-| Audio | Library (`audioInit`, `audioPlaySample`) |
+| Audio | Custom SPC driver (`spc_init`, `spc_play`) |
 | Input | Direct register access |
 
 ---
 
-## Key Functions
+## Architecture
 
-```c
-extern void audioInit(void);          /* Initialize audio system */
-extern void audioPlaySample(u8 id);   /* Play sample by ID */
-extern void audioSetVolume(u8 vol);   /* Set volume (0-127) */
+```
+┌─────────────────┐     ┌─────────────────┐
+│  Main CPU       │     │  SPC700         │
+│  (65816)        │     │  Audio CPU      │
+├─────────────────┤     ├─────────────────┤
+│ spc_init()      │────>│ Upload driver   │
+│                 │     │ + sample as one │
+│                 │     │ blob to $0200   │
+├─────────────────┤     ├─────────────────┤
+│ spc_play()      │────>│ Key-on voice 0  │
+│                 │     │ via port0       │
+└─────────────────┘     └─────────────────┘
+        │                       │
+        │   4 I/O ports         │
+        │   ($2140-$2143)       │
+        └───────────────────────┘
+```
+
+This uses the same approach as 1_tone - a simple custom SPC driver.
+
+---
+
+## SPC Memory Layout
+
+```
+$0200 - Driver code (~100 bytes)
+$0300 - Sample directory (4 bytes per entry)
+$0304 - BRR sample data
 ```
 
 ---
@@ -51,16 +75,17 @@ make clean && make
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Main program |
-| `data.asm` | Audio library and sample data |
+| `main.c` | Main program with input handling |
+| `spc.asm` | SPC driver, upload code, BRR sample |
+| `tada.brr` | BRR audio sample |
 | `Makefile` | Build configuration |
 
 ---
 
 ## See Also
 
-- [1_tone](../1_tone/) - Bare-metal SPC700 programming
-- [6_snesmod_music](../6_snesmod_music/) - Full music playback
+- [1_tone](../1_tone/) - Similar bare-metal approach with text display
+- [6_snesmod_music](../6_snesmod_music/) - Full music playback with SNESMOD
 
 ---
 
