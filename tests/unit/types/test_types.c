@@ -7,6 +7,7 @@
 
 #include <snes.h>
 #include "../../harness/test_harness.h"
+#include "../../harness/test_harness.c"
 
 /*============================================================================
  * Type Size Tests

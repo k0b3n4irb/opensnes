@@ -12,8 +12,12 @@
  * Test State
  *============================================================================*/
 
-const char* _test_current_name = "";
-u8 _test_current_failed = 0;
+/* NOTE: These must be uninitialized (BSS) to work with WLA-DX linking.
+ * Initialized globals go to SUPERFREE sections which cause linker issues.
+ * We initialize them in test_init() instead.
+ */
+const char* _test_current_name;
+u8 _test_current_failed;
 
 /*============================================================================
  * String Helpers
@@ -38,8 +42,11 @@ static u16 _strlen(const char* s) {
  *============================================================================*/
 
 void test_init(void) {
-    /* Initialize SNES hardware */
-    consoleInit();
+    /* Note: SNES hardware is already initialized by crt0.asm */
+
+    /* Initialize test state */
+    _test_current_name = "";
+    _test_current_failed = 0;
 
     /* Clear test result memory */
     *TEST_STATUS_ADDR = TEST_STATUS_RUNNING;
@@ -112,6 +119,6 @@ void test_report(void) {
 
     /* Infinite loop - emulator reads results from memory */
     while (1) {
-        WaitForVBlank();
+        /* Simple busy wait - the emulator test runner will read results */
     }
 }
