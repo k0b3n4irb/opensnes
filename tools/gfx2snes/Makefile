@@ -25,7 +25,9 @@ all: $(TARGET)
 # Compile from src directory to avoid MSYS2 path issues with includes
 $(TARGET): src/gfx2snes.c src/loadbmp.c | $(BUILD)
 	@echo "[CC] gfx2snes"
-	cd src && $(CC) $(CFLAGS) -I. gfx2snes.c loadbmp.c -o ../$(TARGET) -lm
+	@echo "Current dir: $(CURDIR)"
+	@ls -la src/
+	cd src && pwd && ls -la && $(CC) $(CFLAGS) -I. gfx2snes.c loadbmp.c -o ../$(TARGET) -lm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
