@@ -1,192 +1,194 @@
 # Lesson 2: Custom Font
 
-Create your own font and use the asset pipeline.
+Display text using a complete embedded font with letters, numbers, and punctuation.
 
 ## Learning Objectives
 
 After this lesson, you will understand:
-- ✅ The asset conversion pipeline
-- ✅ How to use the `font2snes` tool
-- ✅ Full ASCII character support (32-127)
-- ✅ Organizing assets in your project
+- Building a complete font tileset (A-Z, 0-9, punctuation)
+- Pre-encoding messages as tile indices
+- Creating reusable text rendering functions
+- The `font2snes` tool for asset conversion (alternative approach)
 
 ## Prerequisites
 
 - Completed [1. Hello World](../1_hello_world/)
-- An image editor (any that saves PNG)
+- Understanding of 2bpp tile format
 
 ---
 
-## The Problem with Inline Fonts
+## What This Example Does
 
-In Hello World, we defined fonts directly in code:
+Displays multiple text elements on screen:
+- A title bar: `=== CUSTOM FONT ===`
+- "HELLO WORLD!"
+- The complete alphabet: A-Z
+- Numbers: 0-9
+- "OPENSNES" logo text
+
+```
++----------------------------------------+
+|                                        |
+|      === CUSTOM FONT ===               |
+|                                        |
+|         HELLO WORLD!                   |
+|                                        |
+|          ABCDEFGHIJ                    |
+|          KLMNOPQRST                    |
+|            UVWXYZ                      |
+|                                        |
+|          0123456789                    |
+|                                        |
+|           OPENSNES                     |
++----------------------------------------+
+```
+
+---
+
+## Code Type
+
+**Mixed C + Direct Register Access**
+
+| Component | Type |
+|-----------|------|
+| Hardware init | Library (`consoleInit()`) |
+| Video mode | Library (`setMode()`) |
+| Screen enable | Library (`setScreenOn()`) |
+| VBlank sync | Library (`WaitForVBlank()`) |
+| Font tiles | C const array (42 tiles, 672 bytes) |
+| Text rendering | Helper function (`print_msg()`) |
+| VRAM writes | Direct register access |
+
+---
+
+## The Font Tileset
+
+The font contains 42 tiles covering essential characters:
+
+| Index | Character |
+|-------|-----------|
+| 0 | Space |
+| 1-26 | A-Z |
+| 27-36 | 0-9 |
+| 37 | ! |
+| 38 | . |
+| 39 | : |
+| 40 | - |
+| 41 | = |
+
+Each tile is 16 bytes (8x8 pixels, 2bpp format):
 
 ```c
-static const u8 font_1bpp[] = {
-    0x66, 0x66, 0x66, 0x7E, 0x66, 0x66, 0x66, 0x00,  /* H */
-    /* ... 100+ more lines ... */
+static const u8 font_tiles[] = {
+    /* 0: Space */
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    /* 1: A */
+    0x18,0x00, 0x3C,0x00, 0x66,0x00, 0x7E,0x00,
+    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
+    /* 2: B */
+    0x7C,0x00, 0x66,0x00, 0x7C,0x00, 0x66,0x00,
+    0x66,0x00, 0x66,0x00, 0x7C,0x00, 0x00,0x00,
+    /* ... more tiles ... */
 };
 ```
 
-This works, but:
-- ❌ Hard to edit
-- ❌ Can't visualize easily
-- ❌ Error-prone
-- ❌ Doesn't scale
+---
 
-## The Solution: Asset Pipeline
+## Pre-Encoded Messages
 
+Instead of runtime character conversion (which causes compiler issues), messages are stored as arrays of tile indices:
+
+```c
+/* "=== CUSTOM FONT ===" */
+static const u8 msg_title[] = {
+    41,41,41, 0, 3,21,19,20,15,13, 0, 6,15,14,20, 0, 41,41,41, 0xFF
+};
+/*  =  =  =  SP C  U  S  T  O  M  SP F  O  N  T  SP =  =  =  END */
+
+/* "HELLO WORLD!" */
+static const u8 msg_hello[] = {
+    8,5,12,12,15, 0, 23,15,18,12,4, 37, 0xFF
+};
+/* H E  L  L  O  SP W  O  R  L  D  !  END */
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  myfont.png │ ──▶ │  font2snes  │ ──▶ │  myfont.h   │
-│  (artwork)  │     │   (tool)    │     │  (C header) │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                               │
-                                               ▼
-                                        ┌─────────────┐
-                                        │   main.c    │
-                                        │ #include    │
-                                        └─────────────┘
-```
 
-Now you can:
-- ✅ Edit fonts visually
-- ✅ Use any image editor
-- ✅ Regenerate with one command
-- ✅ Version control the source PNG
+The `0xFF` byte marks the end of each message.
 
 ---
 
-## Creating a Font Image
+## The Text Rendering Function
 
-### Layout Requirements
+A simple helper function writes messages to the tilemap:
 
-The `font2snes` tool expects:
-- **Dimensions:** Multiples of 8 pixels
-- **Character size:** 8×8 pixels each
-- **Characters:** ASCII 32-127 (96 total)
-- **Recommended layout:** 128×48 pixels (16×6 grid)
+```c
+static void print_msg(u16 addr, const u8 *msg) {
+    u16 i;
 
+    REG_VMADDL = addr & 0xFF;
+    REG_VMADDH = addr >> 8;
+
+    i = 0;
+    while (msg[i] != 0xFF) {
+        REG_VMDATAL = msg[i];  /* Tile index */
+        REG_VMDATAH = 0;       /* Attributes (palette 0) */
+        i++;
+    }
+}
 ```
-Row 0: SP ! " # $ % & ' ( ) * + , - . /   (ASCII 32-47)
-Row 1: 0 1 2 3 4 5 6 7 8 9 : ; < = > ?    (ASCII 48-63)
-Row 2: @ A B C D E F G H I J K L M N O    (ASCII 64-79)
-Row 3: P Q R S T U V W X Y Z [ \ ] ^ _    (ASCII 80-95)
-Row 4: ` a b c d e f g h i j k l m n o    (ASCII 96-111)
-Row 5: p q r s t u v w x y z { | } ~ DEL  (ASCII 112-127)
-```
 
-### Color Limits
+### Calculating Tilemap Addresses
 
-For 2bpp (text): **4 colors maximum**
-```
-Color 0: Background (transparent)
-Color 1: Text color
-Color 2: Shadow/outline (optional)
-Color 3: Highlight (optional)
+The tilemap is at VRAM $0400. Each row has 32 tiles.
+
+```c
+/* Address = base + (row * 32) + column */
+print_msg(0x0400 + 3*32 + 6, msg_title);    /* Row 3, column 6 */
+print_msg(0x0400 + 7*32 + 10, msg_hello);   /* Row 7, column 10 */
 ```
 
 ---
 
-## Using font2snes
+## Alternative: Using font2snes
 
-### Basic Usage
+For larger projects, you can use the `font2snes` tool to convert a PNG font image:
+
+### Create a Font Image
+
+Requirements:
+- Dimensions: Multiples of 8 pixels
+- Characters: 8x8 pixels each
+- Layout: ASCII 32-127 (96 characters)
+- Colors: 4 maximum (2bpp)
+
+```
+Row 0: SP ! " # $ % & ' ( ) * + , - . /
+Row 1: 0 1 2 3 4 5 6 7 8 9 : ; < = > ?
+Row 2: @ A B C D E F G H I J K L M N O
+Row 3: P Q R S T U V W X Y Z [ \ ] ^ _
+Row 4: ` a b c d e f g h i j k l m n o
+Row 5: p q r s t u v w x y z { | } ~ DEL
+```
+
+### Convert the Image
 
 ```bash
-# Convert PNG to C header
 font2snes -c assets/myfont.png myfont.h
-
-# Specify bits per pixel
-font2snes -b 2 -c assets/myfont.png myfont.h  # 2bpp (4 colors)
-font2snes -b 4 -c assets/myfont.png myfont.h  # 4bpp (16 colors)
 ```
 
-### Generated Header
-
-```c
-/* myfont.h - Generated by font2snes */
-
-const unsigned short myfont_pal[4] = {
-    0x0000, 0x7FFF, 0x294A, 0x0000
-};
-
-const unsigned char myfont_tiles[1536] = {
-    /* Tile 0 (space) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    /* Tile 1 (!) */
-    /* ... */
-};
-
-#define myfont_TILES_COUNT 96
-#define myfont_TILES_SIZE 1536
-#define myfont_PAL_COUNT 4
-```
-
----
-
-## Project Structure
-
-```
-2_custom_font/
-├── assets/
-│   └── myfont.png      # Source artwork
-├── main.c              # Your code
-├── myfont.h            # Generated (don't edit!)
-├── crt0.asm
-├── hdr.asm
-└── Makefile
-```
+This generates a C header with the tile data and palette.
 
 ### Makefile Integration
 
+The Makefile already includes rules for this:
+
 ```makefile
-# Generate header from PNG (automatic)
-myfont.h: assets/myfont.png
-    $(FONT2SNES) -c $< $@
+FONT_PNG  := assets/myfont.png
+FONT_H    := myfont.h
 
-# main.c depends on the header
-main.ps: main.c myfont.h
-    $(CC) $(CFLAGS) -c main.c -o $@
-```
-
----
-
-## Using the Font in Code
-
-```c
-#include "myfont.h"
-
-/* Load tiles to VRAM */
-void load_font(void) {
-    u16 i;
-
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
-
-    for (i = 0; i < myfont_TILES_SIZE; i += 2) {
-        REG_VMDATAL = myfont_tiles[i];
-        REG_VMDATAH = myfont_tiles[i + 1];
-    }
-}
-
-/* Load palette to CGRAM */
-void load_palette(void) {
-    u8 i;
-
-    REG_CGADD = 0;
-    for (i = 0; i < myfont_PAL_COUNT; i++) {
-        REG_CGDATA = myfont_pal[i] & 0xFF;
-        REG_CGDATA = myfont_pal[i] >> 8;
-    }
-}
-
-/* Convert ASCII to tile number */
-u8 ascii_to_tile(char c) {
-    if (c < 32 || c > 127) return 0;  /* Space for invalid */
-    return c - 32;  /* ASCII 32 = tile 0, etc. */
-}
+$(FONT_H): $(FONT_PNG)
+    @echo "[FONT] $< -> $@"
+    @$(FONT2SNES) -c $< $@
 ```
 
 ---
@@ -197,37 +199,18 @@ u8 ascii_to_tile(char c) {
 cd examples/text/2_custom_font
 make clean && make
 
-# The Makefile automatically runs font2snes
+# Run in emulator
+/path/to/Mesen custom_font.sfc
 ```
 
 ---
 
-## Exercises
+## VRAM Memory Map
 
-### Exercise 1: Create Your Own Font
-1. Open `assets/myfont.png` in an image editor
-2. Modify some letters
-3. Run `make clean && make`
-4. Test in emulator
-
-### Exercise 2: Add Special Characters
-Modify the font to include custom symbols (arrows, hearts, etc.) in the unused positions.
-
-### Exercise 3: Different Font Styles
-Create a second font with different styling (bold, outline) and switch between them.
-
----
-
-## Common Issues
-
-### "Too many colors"
-Your PNG has more than 4 colors. Reduce the palette in your image editor.
-
-### Characters look wrong
-Check that your grid is exactly 8×8 per character and the layout matches the expected ASCII positions.
-
-### Build fails with "myfont.h not found"
-Make sure `assets/myfont.png` exists and the path is correct.
+```
+$0000-$02A0: Font tiles (42 tiles x 16 bytes = 672 bytes)
+$0400-$07FF: BG1 tilemap (32x32 = 1024 words)
+```
 
 ---
 
@@ -235,46 +218,53 @@ Make sure `assets/myfont.png` exists and the path is correct.
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Display logic |
-| `assets/myfont.png` | Font artwork (edit this!) |
-| `myfont.h` | Generated (don't edit) |
-| `Makefile` | Build + asset conversion |
+| `main.c` | Complete font and text rendering code |
+| `Makefile` | Build configuration + font conversion rules |
+| `assets/myfont.png` | Source font image (for font2snes pipeline) |
+| `myfont.h` | Generated header (if using font2snes) |
 
 ---
 
-## Testing
+## Exercises
 
-Automated tests verify this example works correctly:
+### Exercise 1: Add More Characters
+Add lowercase letters (a-z) to the font tileset.
 
-```bash
-# Run from project root
-cd tests
-./run_tests.sh examples
-```
+**Hint:** Follow the same 2bpp format pattern.
 
-Or run the specific test in Mesen2:
-```
-tests/examples/custom_font/test_custom_font.lua
-```
+### Exercise 2: Multiple Palettes
+Use different palettes for different text (e.g., title in yellow, body in white).
 
-### Test Coverage
+**Hint:** The high byte of tilemap entries contains palette bits.
 
-- ROM boots and reaches `main()`
-- Hardware initialization (`InitHardware`)
-- Font tiles symbol exists
-- Message strings are present
-- VBlank handler is operational
-- No WRAM mirror overlaps
+### Exercise 3: Scrolling Text
+Make the text scroll across the screen by modifying the BG1HOFS register.
 
-See [snesdbg](../../../tools/snesdbg/) for the debug library used in tests.
+---
+
+## Key Differences from Hello World
+
+| Aspect | Hello World | Custom Font |
+|--------|-------------|-------------|
+| Font size | 9 tiles | 42 tiles |
+| Characters | H,E,L,O,W,R,D,! | A-Z, 0-9, punctuation |
+| Message encoding | Manual array | Pre-encoded arrays |
+| Text rendering | Inline loop | Reusable function |
 
 ---
 
 ## What's Next?
 
-Now that you understand the asset pipeline, let's apply it to graphics:
-- Convert sprite images
-- Display moving characters
-- Handle player input
+Now that you can display text, let's make things interactive:
 
-**Next Topic:** [Graphics](../../graphics/) →
+**Next:** [Basics - Calculator](../../basics/1_calculator/) - Handle user input
+
+Or explore graphics:
+
+**See also:** [Graphics - Animation](../../graphics/2_animation/)
+
+---
+
+## License
+
+MIT
