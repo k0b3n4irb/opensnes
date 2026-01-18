@@ -27,7 +27,7 @@ SRCS := $(SRC)/gfx2snes.c $(SRC)/loadbmp.c
 
 $(TARGET): $(SRCS) | $(BUILD)
 	@echo "[CC] gfx2snes"
-	@$(CC) $(CFLAGS) -I$(SRC) $(SRCS) -o $@ -lm
+	$(CC) $(CFLAGS) -I./$(SRC) $(SRCS) -o $@ -lm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
