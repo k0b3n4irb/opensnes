@@ -7,8 +7,6 @@ CC      := gcc
 CFLAGS  := -Wall -Wextra -O2 -pedantic
 CFLAGS  += -DVERSION=\"$(VERSION)\"
 
-# Use absolute path for includes (fixes MSYS2 issues)
-SRCDIR  := $(CURDIR)/src
 BUILD   := build
 TARGET  := gfx2snes
 
@@ -24,11 +22,10 @@ endif
 
 all: $(TARGET)
 
-SRCS := $(SRCDIR)/gfx2snes.c $(SRCDIR)/loadbmp.c
-
-$(TARGET): $(SRCS) | $(BUILD)
+# Compile from src directory to avoid MSYS2 path issues with includes
+$(TARGET): src/gfx2snes.c src/loadbmp.c | $(BUILD)
 	@echo "[CC] gfx2snes"
-	$(CC) $(CFLAGS) -I$(SRCDIR) $(SRCS) -o $@ -lm
+	cd src && $(CC) $(CFLAGS) gfx2snes.c loadbmp.c -o ../$(TARGET) -lm
 
 $(BUILD):
 	@mkdir -p $(BUILD)
