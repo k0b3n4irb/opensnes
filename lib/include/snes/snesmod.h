@@ -326,10 +326,10 @@ void snesmodAllocateSoundRegion(u8 size);
  * @{
  */
 
-/** @brief Standard pitch values */
-#define SNESMOD_PITCH_NORMAL    0x1000  /**< Normal playback speed */
-#define SNESMOD_PITCH_HALF      0x0800  /**< Half speed (octave down) */
-#define SNESMOD_PITCH_DOUBLE    0x2000  /**< Double speed (octave up) */
+/** @brief Standard pitch values (sample rate multiplier, 0-15 range) */
+#define SNESMOD_PITCH_LOW       4       /**< Low pitch (16kHz) */
+#define SNESMOD_PITCH_NORMAL    8       /**< Normal playback (32kHz) */
+#define SNESMOD_PITCH_HIGH      12      /**< High pitch (48kHz) */
 
 /** @} */
 

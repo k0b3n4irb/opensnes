@@ -10,6 +10,9 @@
 #define ERRORPINK(STRING) "\x1B[35m" STRING "\033[0m"
 #define ERRORBRIGHT(STRING) "\x1B[97m" STRING "\033[0m"
 
+extern bool NO_HEADER;
+extern std::string SYMBOL_PREFIX;
+
 u8 CurrentInstrument = 0;
 u8 patch_byte = 0x3C;
 u8 max_instruments = 64; // changing these values breaks
@@ -1005,10 +1008,12 @@ namespace IT2SPC
                 "; snesmod soundbank data                        *\n"
                 "; total size: %10i bytes                  *\n"
                 ";************************************************\n"
-                "\n"
-                ".include \"hdr.asm\"\n"
                 "\n",
                 size);
+
+        // Optionally include hdr.asm (skip with -n flag)
+        if (!NO_HEADER)
+            fprintf(f, ".include \"hdr.asm\"\n\n");
 
         int banksize;
         
@@ -1022,8 +1027,8 @@ namespace IT2SPC
             fprintf(f,
                     ".BANK %i\n"
                     ".SECTION \"SOUNDBANK\" ; need dedicated bank(s)\n\n"
-                    "SOUNDBANK__:\n",
-                    BANKNUM);
+                    "%s:\n",
+                    BANKNUM, SYMBOL_PREFIX.c_str());
 
             std::string foo = inputfile;
 
@@ -1050,8 +1055,8 @@ namespace IT2SPC
                 fprintf(f,
                         ".BANK %i\n"
                         ".SECTION \"SOUNDBANK%i\" ; need dedicated bank(s)\n\n"
-                        "SOUNDBANK__%i:\n",
-                        BANKNUM + j, j, j);
+                        "%s%i:\n",
+                        BANKNUM + j, j, SYMBOL_PREFIX.c_str(), j);
 
                 std::string foo = inputfile;
 

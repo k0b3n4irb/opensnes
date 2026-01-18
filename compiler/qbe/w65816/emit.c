@@ -14,6 +14,18 @@
 
 #include "all.h"
 
+/* Strip .L prefix from symbol names for WLA-DX compatibility.
+ * WLA-DX doesn't support labels starting with '.'
+ * e.g., ".Lstring.1" becomes "string.1"
+ */
+static char *
+stripsym(char *name)
+{
+    if (name[0] == '.' && name[1] == 'L')
+        return name + 2;
+    return name;
+}
+
 static FILE *outf;
 static int framesize;  /* Current function's frame size */
 static int argbytes;   /* Bytes of arguments pushed for current call */
@@ -172,7 +184,7 @@ emitload_adj(Ref r, Fn *fn, int sp_adjust)
         if (c->type == CBits) {
             fprintf(outf, "\tlda.w #%d\n", (int)(c->bits.i & 0xFFFF));
         } else if (c->type == CAddr) {
-            fprintf(outf, "\tlda.w #%s", str(c->sym.id));
+            fprintf(outf, "\tlda.w #%s", stripsym(str(c->sym.id)));
             if (c->bits.i)
                 fprintf(outf, "+%d", (int)c->bits.i);
             fprintf(outf, "\n");
@@ -269,7 +281,7 @@ emitop2(char *op, Ref r, Fn *fn)
         if (c->type == CBits) {
             fprintf(outf, "\t%s.w #%d\n", op, (int)(c->bits.i & 0xFFFF));
         } else if (c->type == CAddr) {
-            fprintf(outf, "\t%s.w #%s", op, str(c->sym.id));
+            fprintf(outf, "\t%s.w #%s", op, stripsym(str(c->sym.id)));
             if (c->bits.i)
                 fprintf(outf, "+%d", (int)c->bits.i);
             fprintf(outf, "\n");
@@ -678,7 +690,7 @@ emitins(Ins *i, Fn *fn)
                 c = &fn->con[r1.val];
                 if (c->type == CAddr) {
                     /* Symbol address - emit symbol name */
-                    fprintf(outf, "\tsta.l %s", str(c->sym.id));
+                    fprintf(outf, "\tsta.l %s", stripsym(str(c->sym.id)));
                     if (c->bits.i)
                         fprintf(outf, "+%d", (int)c->bits.i);
                     fprintf(outf, "\n");
@@ -714,7 +726,7 @@ emitins(Ins *i, Fn *fn)
                 c = &fn->con[r1.val];
                 if (c->type == CAddr) {
                     /* Symbol address - emit symbol name */
-                    fprintf(outf, "\tsta.l %s", str(c->sym.id));
+                    fprintf(outf, "\tsta.l %s", stripsym(str(c->sym.id)));
                     if (c->bits.i)
                         fprintf(outf, "+%d", (int)c->bits.i);
                     fprintf(outf, "\n");
@@ -755,7 +767,7 @@ emitins(Ins *i, Fn *fn)
             } else if (rtype(r0) == RCon && fn->con[r0.val].type == CAddr) {
                 /* Direct load from global/extern symbol */
                 Con *c = &fn->con[r0.val];
-                fprintf(outf, "\tlda.l %s", str(c->sym.id));
+                fprintf(outf, "\tlda.l %s", stripsym(str(c->sym.id)));
                 if (c->bits.i)
                     fprintf(outf, "+%d", (int)c->bits.i);
                 fprintf(outf, "\n");
@@ -781,7 +793,7 @@ emitins(Ins *i, Fn *fn)
             /* Direct load from global/extern symbol */
             Con *c = &fn->con[r0.val];
             fprintf(outf, "\tsep #$20\n");
-            fprintf(outf, "\tlda.l %s", str(c->sym.id));
+            fprintf(outf, "\tlda.l %s", stripsym(str(c->sym.id)));
             if (c->bits.i)
                 fprintf(outf, "+%d", (int)c->bits.i);
             fprintf(outf, "\n");
@@ -867,7 +879,7 @@ emitins(Ins *i, Fn *fn)
 
     case Ocall:
         c = &fn->con[r0.val];
-        fprintf(outf, "\tjsl %s\n", str(c->sym.id));
+        fprintf(outf, "\tjsl %s\n", stripsym(str(c->sym.id)));
         {
             int cleanup = argbytes;
             argbytes = 0;

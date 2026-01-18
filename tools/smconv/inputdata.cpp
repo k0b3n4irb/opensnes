@@ -69,6 +69,8 @@ namespace ConversionInput
         verbose_mode = false;
         check_effect_size = false;
         banknumber = 5;
+        no_header = false;
+        symbol_prefix = "SOUNDBANK__";
 
         // search for params
         for (int arg = 1; arg < argc;)
@@ -120,6 +122,20 @@ namespace ConversionInput
                 else if (TESTARG2("--effectsize", "-f"))
                 {
                     check_effect_size = true;
+                }
+                else if (TESTARG2("--no-header", "-n"))
+                {
+                    no_header = true;
+                }
+                else if (TESTARG2("--prefix", "-p"))
+                {
+                    arg++;
+                    if (arg == argc)
+                    {
+                        printf ("%s: " ERRORRED("fatal error") ": No symbol prefix specified\n", ERRORBRIGHT("smconv"));
+                        return;
+                    }
+                    symbol_prefix = argv[arg];
                 }
                 else if (strmatch(argv[arg], "-b"))
                 {

@@ -872,6 +872,11 @@ snesmodFadeVolume:
 ; snesmodPlayEffect - Play a sound effect
 ;------------------------------------------------------------------------------
 ; u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch);
+; Stack layout after preamble (cproc pushes left-to-right):
+;   6,s  = pitch (u16)
+;   8,s  = pan (u8, stored as u16)
+;   10,s = volume (u8, stored as u16)
+;   12,s = effectId (u16)
 ; Returns: channel used (0-7)
 ;------------------------------------------------------------------------------
 snesmodPlayEffect:
@@ -882,24 +887,42 @@ snesmodPlayEffect:
     pha
     plb
 
-    ; Get parameters
+    ; Get parameters from stack
     rep #$20
-    lda 6,s                     ; pitch
-    tay
-    lda 8,s                     ; effectId
-    tax
+    lda 6,s                     ; pitch (u16)
+    sta spc2                    ; Save pitch
+    lda 12,s                    ; effectId (u16)
+    tax                         ; X = effectId
     sep #$20
-    lda 10,s                    ; volpan (packed: vol<<4 | pan)
 
-    sta spc1                    ; spc1.l = "vp"
-    sty spc2                    ; Save pitch
-    txa
+    ; Pack volume and pan into volpan byte
+    ; Format: high nibble = volume/8, low nibble = pan/16
+    lda 10,s                    ; volume (0-127)
+    lsr                         ; /2
+    lsr                         ; /4
+    lsr                         ; /8 -> 0-15
     asl
     asl
     asl
+    asl                         ; shift to high nibble
+    sta spc1                    ; temp store
+
+    lda 8,s                     ; pan (0-255, 128=center)
+    lsr                         ; /2
+    lsr                         ; /4
+    lsr                         ; /8
+    lsr                         ; /16 -> 0-15
+    ora spc1                    ; combine with volume
+    sta spc1                    ; spc1.l = volpan
+
+    ; Pack effectId and pitch (low byte)
+    txa                         ; A = effectId
     asl
-    ora spc2                    ; spc1.h = "id<<4 | pitch_h"
-    sta spc1+1
+    asl
+    asl
+    asl                         ; effectId << 4
+    ora spc2                    ; | pitch_low (not high!)
+    sta spc1+1                  ; spc1.h = id<<4 | pitch_low
 
     lda #CMD_FX
     jmp QueueMessage

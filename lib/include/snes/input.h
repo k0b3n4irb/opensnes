@@ -64,20 +64,18 @@
  * These values match pvsneslib and are verified on real hardware.
  */
 
-/* High byte buttons ($4219 bits 7-4 → result bits 15-12) */
-#define KEY_B       BIT(15)  /**< B button */
+/* High byte ($4219 → result bits 15-8) */
+#define KEY_A       BIT(15)  /**< A button (fixed) */
 #define KEY_Y       BIT(14)  /**< Y button */
 #define KEY_SELECT  BIT(13)  /**< Select button */
 #define KEY_START   BIT(12)  /**< Start button */
-
-/* High byte D-pad ($4219 bits 3-0 → result bits 11-8) */
 #define KEY_UP      BIT(11)  /**< D-pad up */
 #define KEY_DOWN    BIT(10)  /**< D-pad down */
 #define KEY_LEFT    BIT(9)   /**< D-pad left */
 #define KEY_RIGHT   BIT(8)   /**< D-pad right */
 
-/* Low byte buttons ($4218 bits 7-4 → result bits 7-4) */
-#define KEY_A       BIT(7)   /**< A button */
+/* Low byte ($4218 → result bits 7-0) */
+#define KEY_B       BIT(7)   /**< B button (fixed) */
 #define KEY_X       BIT(6)   /**< X button */
 #define KEY_L       BIT(5)   /**< L shoulder */
 #define KEY_R       BIT(4)   /**< R shoulder */

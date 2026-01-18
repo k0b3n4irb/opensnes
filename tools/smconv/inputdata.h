@@ -98,6 +98,8 @@ namespace ConversionInput
         bool show_version;
         bool check_effect_size;
         int banknumber;
+        bool no_header;           // Skip .include "hdr.asm"
+        std::string symbol_prefix; // Symbol prefix (default "SOUNDBANK__")
     };
 }
 

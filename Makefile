@@ -31,7 +31,7 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules help
+.PHONY: all clean install compiler tools lib examples tests submodules docs help
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -79,6 +79,11 @@ examples: compiler tools lib
 tests: compiler tools
 	$(MAKE) -C $(TESTS_PATH)
 
+docs:
+	cd docs && doxygen Doxyfile
+	@echo "Documentation generated in docs/build/html/"
+	@echo "Open docs/build/html/index.html in a browser to view"
+
 #------------------------------------------------------------------------------
 # Help
 #------------------------------------------------------------------------------
@@ -93,6 +98,7 @@ help:
 	@echo "  lib       - Build OpenSNES library"
 	@echo "  examples  - Build all example ROMs"
 	@echo "  tests     - Build test ROMs"
+	@echo "  docs      - Generate API documentation (requires doxygen)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  help      - Show this help"

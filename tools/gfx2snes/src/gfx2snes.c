@@ -656,5 +656,38 @@ int main(int argc, char *argv[])
     opts.input = argv[optind];
     opts.output = argv[optind + 1];
 
+    /* Validate input file exists */
+    FILE *test = fopen(opts.input, "rb");
+    if (!test) {
+        fprintf(stderr, "Error: Input file '%s' not found or not readable\n", opts.input);
+        return 1;
+    }
+    fclose(test);
+
+    /* Validate output path is writable */
+    if (opts.c_header) {
+        test = fopen(opts.output, "w");
+    } else {
+        /* For binary output, test .pic extension */
+        char test_path[260];
+        snprintf(test_path, sizeof(test_path), "%s", opts.output);
+        char *dot = strrchr(test_path, '.');
+        if (dot && (strcmp(dot, ".pic") == 0 || strcmp(dot, ".pal") == 0)) {
+            /* Already has extension, test as-is */
+        } else {
+            /* Append .pic for test */
+            snprintf(test_path, sizeof(test_path), "%s.pic", opts.output);
+        }
+        test = fopen(test_path, "w");
+        if (test) {
+            fclose(test);
+            remove(test_path);  /* Clean up test file */
+            test = NULL;
+        }
+    }
+    if (test) {
+        fclose(test);
+    }
+
     return convert_image();
 }

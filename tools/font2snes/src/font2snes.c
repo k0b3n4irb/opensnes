@@ -170,6 +170,16 @@ int main(int argc, char *argv[])
     input_path = argv[optind];
     output_path = argv[optind + 1];
 
+    /* Validate input file exists */
+    {
+        FILE *test = fopen(input_path, "rb");
+        if (!test) {
+            fprintf(stderr, "Error: Input file '%s' not found or not readable\n", input_path);
+            return 1;
+        }
+        fclose(test);
+    }
+
     if (verbose) {
         printf("Input:  %s\n", input_path);
         printf("Output: %s\n", output_path);

@@ -73,6 +73,9 @@
 /* Interrupts */
 #include <snes/interrupt.h>
 
+/* Mode 7 */
+#include <snes/mode7.h>
+
 /*============================================================================
  * Optional Headers (include separately if needed)
  *============================================================================*/
