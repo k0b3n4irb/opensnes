@@ -24,12 +24,13 @@ ASFLAGS = -o
 
 # Source files
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
+# Note: sm_spc.asm is included by snesmod.asm, so we exclude it from direct compilation
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
-ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm, $(wildcard $(SRCDIR)/*.asm))
+ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm, $(wildcard $(SRCDIR)/*.asm))
 
-# Object files
+# Object files (use .o extension for both C and ASM for consistency)
 C_OBJECTS = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
-ASM_OBJECTS = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR)/%.obj)
+ASM_OBJECTS = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR)/%-asm.o)
 
 OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
 
@@ -62,9 +63,9 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
 	     $(BUILDDIR)/$*.c.asm >> $(BUILDDIR)/$*.asm
 	$(AS) $(ASFLAGS) $@ $(BUILDDIR)/$*.asm
 
-$(BUILDDIR)/%.obj: $(SRCDIR)/%.asm | $(BUILDDIR)
+$(BUILDDIR)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR)
 	@echo "[AS] $<"
-	$(AS) $(ASFLAGS) $@ $<
+	$(AS) -I $(SRCDIR) $(ASFLAGS) $@ $<
 
 $(BUILDDIR):
 	@mkdir -p $(BUILDDIR)

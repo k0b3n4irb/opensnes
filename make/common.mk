@@ -16,6 +16,11 @@
 #   SPRITE_SIZE - Sprite size for gfx2snes (default: 8)
 #   BPP       - Bits per pixel for graphics (default: 4)
 #
+# SNESMOD audio options:
+#   USE_SNESMOD   - Set to 1 to enable SNESMOD tracker audio
+#   SOUNDBANK_SRC - IT files to convert (e.g., music.it sfx.it)
+#   SOUNDBANK_OUT - Output name (default: soundbank)
+#
 # Usage:
 #   OPENSNES := $(shell cd ../../.. && pwd)
 #   TARGET   := mygame.sfc
@@ -38,6 +43,7 @@ CC       := $(OPENSNES)/bin/cc65816
 AS       := $(OPENSNES)/bin/wla-65816
 LD       := $(OPENSNES)/bin/wlalink
 GFX2SNES := $(OPENSNES)/bin/gfx2snes
+SMCONV   := $(OPENSNES)/bin/smconv
 
 # Shared templates
 TEMPLATES := $(OPENSNES)/templates/common
@@ -55,11 +61,9 @@ BPP         ?= 4
 # Library usage (set USE_LIB=1 to link with OpenSNES library)
 USE_LIB     ?= 0
 
-# Library object files (when USE_LIB=1)
-# By default, only link core modules. Set LIB_MODULES to customize.
+# Library directory
 LIBDIR      := $(OPENSNES)/lib/build
 LIB_MODULES ?= console
-LIB_OBJS    := $(foreach mod,$(LIB_MODULES),$(LIBDIR)/$(mod).o)
 
 # OAM helpers (when USE_LIB=0, we need standalone OAM functions)
 ifeq ($(USE_LIB),0)
@@ -67,6 +71,28 @@ OAM_HELPERS := $(TEMPLATES)/oam_helpers.asm
 else
 OAM_HELPERS :=
 endif
+
+#------------------------------------------------------------------------------
+# SNESMOD Configuration (set USE_SNESMOD=1 to enable tracker-based audio)
+#------------------------------------------------------------------------------
+
+USE_SNESMOD    ?= 0
+SOUNDBANK_SRC  ?=
+SOUNDBANK_OUT  ?= soundbank
+
+ifeq ($(USE_SNESMOD),1)
+# Auto-add snesmod to library modules
+LIB_MODULES += snesmod
+endif
+
+#------------------------------------------------------------------------------
+# Library Object Resolution (must come after SNESMOD module addition)
+#------------------------------------------------------------------------------
+# Links both C objects (.o) and assembly objects (-asm.o) if they exist.
+
+LIB_OBJS_C  := $(foreach mod,$(LIB_MODULES),$(wildcard $(LIBDIR)/$(mod).o))
+LIB_OBJS_ASM := $(foreach mod,$(LIB_MODULES),$(wildcard $(LIBDIR)/$(mod)-asm.o))
+LIB_OBJS    := $(LIB_OBJS_C) $(LIB_OBJS_ASM)
 
 # Include paths
 INCLUDES := -I$(OPENSNES)/lib/include -I.
@@ -95,6 +121,36 @@ all: $(TARGET)
 	@echo "  Built: $(TARGET)"
 	@echo "  Size: $$(wc -c < $(TARGET) | tr -d ' ') bytes"
 	@echo "==============================================="
+
+#------------------------------------------------------------------------------
+# SNESMOD Soundbank Conversion
+#------------------------------------------------------------------------------
+
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+
+# Generate soundbank from IT files
+$(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
+	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
+	@$(SMCONV) -s -o $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+	@# Post-process soundbank.asm for OpenSNES compatibility
+	@sed -i.bak \
+		-e '/\.include "hdr\.asm"/d' \
+		-e 's/\.BANK [0-9]*/.BANK 1/' \
+		-e 's/SOUNDBANK__/soundbank/' \
+		$(SOUNDBANK_OUT).asm
+	@rm -f $(SOUNDBANK_OUT).asm.bak
+	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
+	@sed -i.bak \
+		-e 's/#endif \/\/ __SOUNDBANK_DEFINITIONS__/#define SOUNDBANK_BANK                  	1\n\n#endif \/\/ __SOUNDBANK_DEFINITIONS__/' \
+		$(SOUNDBANK_OUT).h
+	@rm -f $(SOUNDBANK_OUT).h.bak
+
+# Add soundbank header to graphics headers (for dependency tracking)
+GFX_HEADERS += $(SOUNDBANK_OUT).h
+
+endif
+endif
 
 #------------------------------------------------------------------------------
 # Graphics Conversion
@@ -126,9 +182,11 @@ main.c.asm: $(CSRC) $(GFX_HEADERS)
 	     -e 's/\.byte/.db/g' \
 	     -e 's/\.word/.dw/g' \
 	     -e 's/\.long/.dl/g' \
+	     -e 's/	\.dd /.dl /g' \
 	     -e 's/\.ascii/.ASC/g' \
 	     -e 's/\\000/", 0, "/g' \
 	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
+	     -e 's/\.Lstring/string/g' \
 	     $@.raw > $@
 	@rm -f $@.raw
 
@@ -144,9 +202,20 @@ project_hdr.asm: $(TEMPLATES)/hdr.asm
 # Runtime library (math functions, etc.)
 RUNTIME := $(TEMPLATES)/runtime.asm
 
+# Soundbank dependency (when USE_SNESMOD=1)
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+SOUNDBANK_DEP := $(SOUNDBANK_OUT).asm
+else
+SOUNDBANK_DEP :=
+endif
+else
+SOUNDBANK_DEP :=
+endif
+
 # Combine all assembly sources
-# crt0.asm includes project_hdr.asm, then we append runtime and compiled C
-combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME)
+# crt0.asm includes project_hdr.asm, then runtime, then compiled C
+combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
 	@echo "" >> $@
@@ -173,6 +242,15 @@ ifneq ($(ASMSRC),)
 	@echo "; Additional Assembly" >> $@
 	@echo ";==============================================================================" >> $@
 	@for f in $(ASMSRC); do cat $$f >> $@; echo "" >> $@; done
+endif
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+	@echo "" >> $@
+	@echo ";==============================================================================" >> $@
+	@echo "; SNESMOD Soundbank" >> $@
+	@echo ";==============================================================================" >> $@
+	@cat $(SOUNDBANK_OUT).asm >> $@
+endif
 endif
 
 #------------------------------------------------------------------------------
@@ -206,4 +284,9 @@ clean:
 	@rm -f *.c.asm combined.asm project_hdr.asm *.obj linkfile *.sym $(TARGET)
 ifneq ($(GFX_HEADERS),)
 	@rm -f $(GFX_HEADERS)
+endif
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h
+endif
 endif
