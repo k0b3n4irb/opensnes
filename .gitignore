@@ -44,10 +44,14 @@ release/
 *.log
 *.tmp
 
-# Build artifacts
+# Build artifacts (generated files)
 *.asm
 *.obj
 *.sfc
 *.h
+
+# But track source files
+!lib/source/*.asm
 !lib/include/**/*.h
+!templates/**/*.asm
 

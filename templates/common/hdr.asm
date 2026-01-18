@@ -22,14 +22,16 @@
 ;------------------------------------------------------------------------------
 
 .MEMORYMAP
-    SLOTSIZE $8000          ; 32KB per slot
+    SLOTSIZE $8000          ; 32KB per slot (default)
     DEFAULTSLOT 0
-    SLOT 0 $8000            ; ROM mapped at $8000-$FFFF
-    SLOT 1 $0000            ; RAM at $0000-$1FFF (DP/Stack)
+    SLOT 0 $8000 $8000      ; ROM mapped at $8000-$FFFF (32KB)
+    SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
+    SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
+    SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB)
 .ENDME
 
 .ROMBANKSIZE $8000          ; 32KB banks
-.ROMBANKS 2                 ; 64KB ROM (expandable)
+.ROMBANKS 8                 ; 256KB ROM (for soundbanks)
 
 ;------------------------------------------------------------------------------
 ; SNES Header (located at $00:FFB0-FFDF)
