@@ -1,0 +1,154 @@
+#---------------------------------------------------------------------------
+# OpenSNES Documentation Configuration
+#---------------------------------------------------------------------------
+# Doxygen configuration for generating API reference and tutorials
+# Uses doxygen-awesome-css theme for modern styling
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# Project Information
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "OpenSNES"
+PROJECT_NUMBER         = "1.0"
+PROJECT_BRIEF          = "Modern Open-Source SNES Development SDK"
+PROJECT_LOGO           =
+
+OUTPUT_DIRECTORY       = build
+CREATE_SUBDIRS         = NO
+
+#---------------------------------------------------------------------------
+# Input Sources
+#---------------------------------------------------------------------------
+
+# Library headers (API reference)
+INPUT                  = mainpage.md \
+                         ../lib/include/snes \
+                         ../lib/include/snes.h \
+                         tutorials/ \
+                         GETTING_STARTED.md \
+                         EXAMPLE_WALKTHROUGHS.md \
+                         CONTRIBUTING.md \
+                         CODE_STYLE.md
+
+# File patterns to process
+FILE_PATTERNS          = *.h *.md
+
+# Recursive search
+RECURSIVE              = YES
+
+# Exclude patterns
+EXCLUDE_PATTERNS       = */doxygen-awesome-css/*
+
+# Use markdown
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+USE_MDFILE_AS_MAINPAGE = mainpage.md
+
+# Image path for documentation images (uncomment when images are added)
+# IMAGE_PATH             = images
+
+#---------------------------------------------------------------------------
+# Build Configuration
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+
+# Show all members
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+# Brief descriptions
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+ALWAYS_DETAILED_SEC    = NO
+
+# Sorting
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = YES
+SORT_GROUP_NAMES       = YES
+
+# Preprocessing (for SNES headers)
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = __attribute__(x)=
+
+#---------------------------------------------------------------------------
+# Output Configuration
+#---------------------------------------------------------------------------
+
+# HTML output
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+
+# Disable other outputs
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+
+#---------------------------------------------------------------------------
+# doxygen-awesome-css Theme Configuration
+#---------------------------------------------------------------------------
+
+# Use custom CSS
+HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css \
+                         doxygen-awesome-css/doxygen-awesome-sidebar-only.css \
+                         doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css
+
+# JavaScript for dark mode toggle
+HTML_EXTRA_FILES       = doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js \
+                         doxygen-awesome-css/doxygen-awesome-fragment-copy-button.js \
+                         doxygen-awesome-css/doxygen-awesome-paragraph-link.js
+
+# Use default header (doxygen-awesome works without custom header)
+# HTML_HEADER            = header.html
+
+# Theme settings
+HTML_COLORSTYLE        = LIGHT
+HTML_COLORSTYLE_HUE    = 209
+HTML_COLORSTYLE_SAT    = 255
+HTML_COLORSTYLE_GAMMA  = 113
+
+# Navigation
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+
+# Search
+SEARCHENGINE           = YES
+SERVER_BASED_SEARCH    = NO
+
+#---------------------------------------------------------------------------
+# Source Browsing
+#---------------------------------------------------------------------------
+
+SOURCE_BROWSER         = NO
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = NO
+REFERENCES_RELATION    = NO
+
+#---------------------------------------------------------------------------
+# Graphs (disabled for simplicity)
+#---------------------------------------------------------------------------
+
+HAVE_DOT               = NO
+CLASS_GRAPH            = NO
+COLLABORATION_GRAPH    = NO
+INCLUDE_GRAPH          = NO
+INCLUDED_BY_GRAPH      = NO
+
+#---------------------------------------------------------------------------
+# Warnings
+#---------------------------------------------------------------------------
+
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO

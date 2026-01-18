@@ -8,18 +8,81 @@ enum {
 
 static int datasec_counter = 0;
 
+/* Emit a string with proper handling of null terminators for WLA-DX.
+ * WLA-DX doesn't support \000 escape sequences, so we convert them to:
+ * "Hello\000World" -> "Hello", 0, "World"
+ */
+static void
+emit_wladx_string(char *str, FILE *f)
+{
+	char *p = str;
+	int in_string = 0;
+	int need_comma = 0;
+
+	/* Skip opening quote if present */
+	if (*p == '"')
+		p++;
+
+	fputs("\t.ASC ", f);
+
+	while (*p) {
+		/* Check for \000 escape sequence (4 chars) */
+		if (p[0] == '\\' && p[1] == '0' && p[2] == '0' && p[3] == '0') {
+			if (in_string) {
+				fputc('"', f);
+				in_string = 0;
+			}
+			if (need_comma)
+				fputs(", ", f);
+			fputs("0", f);
+			need_comma = 1;
+			p += 4;
+			continue;
+		}
+		/* Check for closing quote */
+		if (*p == '"' && p[1] == '\0') {
+			if (in_string)
+				fputc('"', f);
+			break;
+		}
+		/* Regular character */
+		if (!in_string) {
+			if (need_comma)
+				fputs(", ", f);
+			fputc('"', f);
+			in_string = 1;
+			need_comma = 1;
+		}
+		fputc(*p, f);
+		p++;
+	}
+
+	/* Close string if still open and not ended by closing quote */
+	if (in_string && *p != '"')
+		fputc('"', f);
+
+	fputc('\n', f);
+}
+
 void
 emitlnk(char *n, Lnk *l, int s, FILE *f)
 {
 	char *pfx;
+	char *name;
 	(void)l;  /* WLA-DX doesn't use linkage flags */
 
 	pfx = n[0] == '"' ? "" : T.assym;
 
+	/* WLA-DX: strip .L prefix from local labels (e.g., .Lstring.1 -> string.1)
+	 * WLA-DX doesn't support labels starting with '.' */
+	name = n;
+	if (n[0] == '.' && n[1] == 'L')
+		name = n + 2;
+
 	/* WLA-DX compatible section syntax for w65816 */
 	switch (s) {
 	case SecText:
-		fprintf(f, ".SECTION \".text.%s\" SUPERFREE\n", n);
+		fprintf(f, ".SECTION \".text.%s\" SUPERFREE\n", name);
 		break;
 	case SecData:
 		fprintf(f, ".SECTION \".rodata.%d\" SUPERFREE\n", ++datasec_counter);
@@ -31,7 +94,7 @@ emitlnk(char *n, Lnk *l, int s, FILE *f)
 	}
 	/* WLA-DX: skip .globl since we compile as single file.
 	 * Symbols are visible within the same compilation unit. */
-	fprintf(f, "%s%s:\n", pfx, n);
+	fprintf(f, "%s%s:\n", pfx, name);
 }
 
 void
@@ -47,8 +110,8 @@ emitdat(Dat *d, FILE *f)
 	static char *dtoa[] = {
 		[DB] = "\t.db",
 		[DH] = "\t.dw",
-		[DW] = "\t.dd",
-		[DL] = "\t.dd"  /* 8-byte emitted as two 4-byte */
+		[DW] = "\t.dl",  /* WLA-DX uses .dl for 32-bit (long) */
+		[DL] = "\t.dl"   /* 8-byte emitted as two 4-byte .dl */
 	};
 	static int64_t zero;
 	char *p;
@@ -82,24 +145,28 @@ emitdat(Dat *d, FILE *f)
 		if (zero != -1)
 			zero += d->u.num;
 		else
-			fprintf(f, "\t.fill %"PRId64",1,0\n", d->u.num);
+			fprintf(f, "\t.dsb %"PRId64", 0\n", d->u.num);  /* WLA-DX syntax */
 		break;
 	default:
 		if (zero != -1) {
 			emitlnk(d->name, d->lnk, SecData, f);
 			if (zero > 0)
-				fprintf(f, "\t.fill %"PRId64",1,0\n", zero);
+				fprintf(f, "\t.dsb %"PRId64", 0\n", zero);  /* WLA-DX syntax */
 			zero = -1;
 		}
 		if (d->isstr) {
 			if (d->type != DB)
 				err("strings only supported for 'b' currently");
-			fprintf(f, "\t.ascii %s\n", d->u.str);
+			emit_wladx_string(d->u.str, f);  /* WLA-DX with null handling */
 		}
 		else if (d->isref) {
-			p = d->u.ref.name[0] == '"' ? "" : T.assym;
+			char *refname = d->u.ref.name;
+			/* Strip .L prefix from references for WLA-DX */
+			if (refname[0] == '.' && refname[1] == 'L')
+				refname = refname + 2;
+			p = refname[0] == '"' ? "" : T.assym;
 			fprintf(f, "%s %s%s%+"PRId64"\n",
-				dtoa[d->type], p, d->u.ref.name,
+				dtoa[d->type], p, refname,
 				d->u.ref.off);
 		}
 		else {

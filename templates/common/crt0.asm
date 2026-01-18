@@ -166,12 +166,10 @@ InitHardware:
     stz $212E
     stz $212F
 
-    ; Color math
-    lda #$30
-    sta $2130
-    stz $2131
-    lda #$E0
-    sta $2132
+    ; Color math - disabled (backdrop color comes from CGRAM[0])
+    stz $2130           ; CGWSEL: no clipping, no color math prevention
+    stz $2131           ; CGADSUB: no color addition/subtraction
+    stz $2132           ; COLDATA: leave at power-on default (not used)
 
     ; Screen mode
     stz $2133
@@ -343,8 +341,13 @@ NmiHandler:
 ;------------------------------------------------------------------------------
 ; IrqHandler - Hardware IRQ (H/V counter, etc.)
 ;------------------------------------------------------------------------------
+; Called when H/V timer IRQ fires (if enabled via $4200).
+; Must read TIMEUP ($4211) to acknowledge the interrupt.
+;------------------------------------------------------------------------------
 IrqHandler:
-    rti                     ; Just return for now
+    sep #$20            ; 8-bit A
+    lda $4211           ; Read TIMEUP to acknowledge IRQ
+    rti
 
 .ENDS
 

@@ -129,22 +129,17 @@ all: $(TARGET)
 ifeq ($(USE_SNESMOD),1)
 ifneq ($(SOUNDBANK_SRC),)
 
+# Soundbank bank number (default: 1)
+SOUNDBANK_BANK ?= 1
+
 # Generate soundbank from IT files
+# smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix)
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
-	@$(SMCONV) -s -o $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
-	@# Post-process soundbank.asm for OpenSNES compatibility
-	@sed -i.bak \
-		-e '/\.include "hdr\.asm"/d' \
-		-e 's/\.BANK [0-9]*/.BANK 1/' \
-		-e 's/SOUNDBANK__/soundbank/' \
-		$(SOUNDBANK_OUT).asm
-	@rm -f $(SOUNDBANK_OUT).asm.bak
+	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
 	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
-	@sed -i.bak \
-		-e 's/#endif \/\/ __SOUNDBANK_DEFINITIONS__/#define SOUNDBANK_BANK                  	1\n\n#endif \/\/ __SOUNDBANK_DEFINITIONS__/' \
-		$(SOUNDBANK_OUT).h
-	@rm -f $(SOUNDBANK_OUT).h.bak
+	@echo "" >> $(SOUNDBANK_OUT).h
+	@echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)" >> $(SOUNDBANK_OUT).h
 
 # Add soundbank header to graphics headers (for dependency tracking)
 GFX_HEADERS += $(SOUNDBANK_OUT).h
@@ -171,33 +166,20 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 #------------------------------------------------------------------------------
 
 # cc65816 (cproc+QBE): compile C to WLA-DX assembly
-# Apply post-processing to fix wla-65816 syntax compatibility
+# The QBE w65816 backend now emits WLA-DX compatible assembly directly
 main.c.asm: $(CSRC) $(GFX_HEADERS)
 	@echo "[CC] $(CSRC)"
-	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@.raw
-	@sed -e '/^\.data/d' \
-	     -e '/^\/\* end/d' \
-	     -e '/^\.balign/d' \
-	     -e '/^\.GLOBAL/d' \
-	     -e 's/\.byte/.db/g' \
-	     -e 's/\.word/.dw/g' \
-	     -e 's/\.long/.dl/g' \
-	     -e 's/	\.dd /.dl /g' \
-	     -e 's/\.ascii/.ASC/g' \
-	     -e 's/\\000/", 0, "/g' \
-	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
-	     -e 's/\.Lstring/string/g' \
-	     $@.raw > $@
-	@rm -f $@.raw
+	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@
 
 #------------------------------------------------------------------------------
 # Assembly Generation
 #------------------------------------------------------------------------------
 
 # Generate project-specific header with ROM name
+# Use shell variable substitution to avoid sed
 project_hdr.asm: $(TEMPLATES)/hdr.asm
 	@echo "[HDR] Generating project header..."
-	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(TEMPLATES)/hdr.asm > $@
+	@ROM_NAME='$(ROM_NAME)' && cat $(TEMPLATES)/hdr.asm | while IFS= read -r line; do echo "$${line//__ROM_NAME__/$$ROM_NAME}"; done > $@
 
 # Runtime library (math functions, etc.)
 RUNTIME := $(TEMPLATES)/runtime.asm
@@ -235,7 +217,7 @@ endif
 	@echo "; Compiled C Code" >> $@
 	@echo ";==============================================================================" >> $@
 	@echo "" >> $@
-	@grep -v '^/\* end' main.c.asm >> $@
+	@cat main.c.asm >> $@
 ifneq ($(ASMSRC),)
 	@echo "" >> $@
 	@echo ";==============================================================================" >> $@

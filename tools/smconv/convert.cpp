@@ -27,7 +27,9 @@ const char USAGE[] = {
     "\n                  (Can specify multiple files with soundbank mode.)"
     "\n                  (Otherwise specify only one file for SPC creation.)"
     "\n                  (Default is SPC creation mode)"
-    "\n-b#               Bank number specification (Default is 5)"
+    "\n-b [num]          Bank number specification (Default is 5)"
+    "\n-n, --no-header   Skip .include \"hdr.asm\" in output"
+    "\n-p, --prefix [name] Set symbol prefix (Default is SOUNDBANK__)"
     "\n\nFile options:"
     "\n-o [file]         Specify output file or file base"
     "\n                  (Specify SPC file for -s option)"
@@ -43,6 +45,8 @@ const char USAGE[] = {
     "\n\nTips:"
     "\nTypical options to create soundbank for project:"
     "\n  smconv -s -o build/soundbank input1.it input2.it"
+    "\n\nFor OpenSNES projects (no header, custom prefix):"
+    "\n  smconv -s -o soundbank -b 1 -n -p soundbank input.it"
     "\n\nAnd for IT->SPC:"
     "\n  smconv input.it"
     "\n\nUse -V to view how much RAM the modules will use.\n"};
@@ -55,6 +59,8 @@ const char VERSION[] = {
 std::string PATH;
 bool VERBOSE;
 int BANKNUM;
+bool NO_HEADER;
+std::string SYMBOL_PREFIX;
 
 int main(int argc, char *argv[])
 {
@@ -62,6 +68,8 @@ int main(int argc, char *argv[])
 
     VERBOSE = od.verbose_mode;
     BANKNUM = od.banknumber;
+    NO_HEADER = od.no_header;
+    SYMBOL_PREFIX = od.symbol_prefix;
 
     if (od.show_help)
     {

@@ -61,7 +61,7 @@
     BRK EmptyHandler        ; Break instruction
     ABORT EmptyHandler      ; Abort (not used on SNES)
     NMI NmiHandler          ; VBlank interrupt
-    IRQ EmptyHandler        ; Hardware IRQ
+    IRQ IrqHandler          ; Hardware IRQ (H/V timer, etc.)
 .ENDNATIVEVECTOR
 
 ;------------------------------------------------------------------------------

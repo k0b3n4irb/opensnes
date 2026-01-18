@@ -43,7 +43,8 @@ jobs:
               gcc \
               cmake \
               make \
-              git
+              git \
+              doxygen
 
       - name: Install dependencies for Windows
         if: matrix.name == 'windows'
@@ -54,6 +55,7 @@ jobs:
           install: >-
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-doxygen
             base-devel
             git
 
@@ -61,7 +63,8 @@ jobs:
         if: matrix.name == 'darwin'
         run: |
           brew update || true
-          # Xcode Command Line Tools should provide everything needed
+          brew install doxygen || true
+          # Xcode Command Line Tools provides the compiler
 
       # ------------------------------------ #
       # Checkout the project                 #
@@ -175,3 +178,30 @@ jobs:
           path: |
             examples/**/*.sfc
             tests/**/*.sfc
+
+      # ------------------------------------ #
+      # Build documentation                  #
+      # ------------------------------------ #
+      - name: Build documentation (Linux)
+        if: matrix.name == 'linux'
+        run: |
+          make docs
+
+      - name: Build documentation (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          make docs
+
+      - name: Build documentation (macOS)
+        if: matrix.name == 'darwin'
+        run: |
+          make docs
+
+      # Upload docs only from Linux to avoid duplicates
+      - name: Upload documentation
+        if: matrix.name == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenSNES Documentation
+          path: docs/build/html/

@@ -4,3 +4,6 @@
 [submodule "compiler/cproc"]
 	path = compiler/cproc
 	url = https://github.com/k0b3n4irb/cproc.git
+[submodule "docs/doxygen-awesome-css"]
+	path = docs/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
