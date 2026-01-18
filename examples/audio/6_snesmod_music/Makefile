@@ -15,18 +15,9 @@
 #   - Keep total sample data under 58KB
 #   - Export as Impulse Tracker format (.it)
 #
-# Requirements:
-#   - smconv tool (requires Go to build)
-#
 #==============================================================================
 
 OPENSNES := $(shell cd ../../.. && pwd)
-
-# Check if smconv is available
-SMCONV := $(OPENSNES)/bin/smconv
-SMCONV_EXISTS := $(shell test -x $(SMCONV) && echo yes)
-
-ifeq ($(SMCONV_EXISTS),yes)
 
 TARGET   := music.sfc
 ROM_NAME := OPENSNES SNESMOD MUS
@@ -42,16 +33,3 @@ LIB_MODULES    := console sprite input
 SOUNDBANK_SRC  := music/pollen8.it
 
 include $(OPENSNES)/make/common.mk
-
-else
-
-# smconv not available - skip this example
-.PHONY: all clean
-
-all:
-	@echo "[SKIP] 6_snesmod_music - smconv not installed (requires Go)"
-
-clean:
-	@rm -f *.sfc *.sym combined.* linkfile *.o *.obj soundbank.* *.asm
-
-endif
