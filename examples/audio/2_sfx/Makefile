@@ -1,5 +1,5 @@
 # Sound Effects Demo
-# Uses the OpenSNES audio library
+# Uses bare-metal SPC700 programming (like 1_tone)
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
@@ -9,11 +9,7 @@ ROM_NAME := OPENSNES SFX DEMO
 
 # Source files
 CSRC     := main.c
-ASMSRC   := data.asm
-
-# Use library modules (console and sprite are required by crt0.asm)
-USE_LIB     := 1
-LIB_MODULES := console sprite audio
+ASMSRC   := spc.asm
 
 # Include shared build rules
 include $(OPENSNES)/make/common.mk

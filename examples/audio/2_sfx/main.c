@@ -1,6 +1,9 @@
 /**
  * @file main.c
- * @brief Audio test - diagnose where audioInit hangs
+ * @brief Sound Effects Demo - Simple bare-metal SPC700 audio
+ *
+ * Press A to play a beep sound effect.
+ * Uses a minimal SPC driver (~100 bytes) with embedded BRR sample.
  */
 
 typedef unsigned char u8;
@@ -15,10 +18,9 @@ typedef unsigned short u16;
 #define REG_NMITIMEN (*(volatile u8*)0x4200)
 #define REG_HVBJOY   (*(volatile u8*)0x4212)
 
-/* Audio functions */
-extern void audioInit(void);
-extern void audioPlaySample(u8 id);
-extern void audioSetVolume(u8 vol);
+/* Audio functions from spc.asm */
+extern void spc_init(void);
+extern void spc_play(void);
 
 int main(void) {
     u8 prev_a = 0;
@@ -37,8 +39,8 @@ int main(void) {
     REG_CGDATA = 0xE0;
     REG_CGDATA = 0x03;
 
-    /* Initialize audio */
-    audioInit();
+    /* Initialize audio - uploads driver + sample to SPC */
+    spc_init();
 
     /* Enable joypad auto-read */
     REG_NMITIMEN = 0x01;
@@ -56,11 +58,13 @@ int main(void) {
 
         /* A button pressed (new press only) */
         if ((joy & 0x80) && !prev_a) {
-            audioPlaySample(0);
-            /* Flash blue when playing */
+            /* Flash blue */
             REG_CGADD = 0;
             REG_CGDATA = 0x00;
             REG_CGDATA = 0x7C;
+
+            /* Play sound */
+            spc_play();
         }
         prev_a = joy & 0x80;
 
