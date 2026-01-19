@@ -43,6 +43,35 @@
     tcc__r9h    dsb 2
     tcc__r10    dsb 2
     tcc__r10h   dsb 2
+    ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
+    nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
+.ENDS
+
+;------------------------------------------------------------------------------
+; NMI Handler Registers (separate from main code to prevent corruption)
+;------------------------------------------------------------------------------
+; The VBlank callback runs C code which uses tcc__r0-r10 for calculations.
+; Using the same registers as the main loop would corrupt its state.
+; PVSnesLib solves this with a separate 48-byte register area for NMI.
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ORGA $0080 FORCE
+    tcc__nmi_r0     dsb 2
+    tcc__nmi_r0h    dsb 2
+    tcc__nmi_r1     dsb 2
+    tcc__nmi_r1h    dsb 2
+    tcc__nmi_r2     dsb 2
+    tcc__nmi_r2h    dsb 2
+    tcc__nmi_r3     dsb 2
+    tcc__nmi_r3h    dsb 2
+    tcc__nmi_r4     dsb 2
+    tcc__nmi_r4h    dsb 2
+    tcc__nmi_r5     dsb 2
+    tcc__nmi_r5h    dsb 2
+    tcc__nmi_r9     dsb 2
+    tcc__nmi_r9h    dsb 2
+    tcc__nmi_r10    dsb 2
+    tcc__nmi_r10h   dsb 2
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -227,6 +256,14 @@ Start:
     stz vblank_flag
     stz oam_update_flag
 
+    ; Initialize VBlank callback to default (does nothing)
+    rep #$20
+    lda #DefaultNmiCallback
+    sta nmi_callback
+    sep #$20
+    lda #:DefaultNmiCallback
+    sta nmi_callback+2
+
     ; Clear frame counters (16-bit)
     rep #$20
     stz frame_count
@@ -310,6 +347,100 @@ NmiHandler:
     inc frame_count
     sep #$20
 
+    ; Call user VBlank callback (BEFORE OAM update for max VBlank time)
+    ; Always called - default callback does nothing (just RTL)
+    ;
+    ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
+    ; because JML [dp] reads from address D+dp. We save the main loop's registers
+    ; to the NMI register area, then restore them after the callback.
+    rep #$30            ; 16-bit A/X/Y
+
+    ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
+    ; The C callback may use any of these registers
+    lda tcc__r0
+    sta tcc__nmi_r0
+    lda tcc__r0h
+    sta tcc__nmi_r0h
+    lda tcc__r1
+    sta tcc__nmi_r1
+    lda tcc__r1h
+    sta tcc__nmi_r1h
+    lda tcc__r2
+    sta tcc__nmi_r2
+    lda tcc__r2h
+    sta tcc__nmi_r2h
+    lda tcc__r3
+    sta tcc__nmi_r3
+    lda tcc__r3h
+    sta tcc__nmi_r3h
+    lda tcc__r4
+    sta tcc__nmi_r4
+    lda tcc__r4h
+    sta tcc__nmi_r4h
+    lda tcc__r5
+    sta tcc__nmi_r5
+    lda tcc__r5h
+    sta tcc__nmi_r5h
+    lda tcc__r9
+    sta tcc__nmi_r9
+    lda tcc__r9h
+    sta tcc__nmi_r9h
+    lda tcc__r10
+    sta tcc__nmi_r10
+    lda tcc__r10h
+    sta tcc__nmi_r10h
+
+    ; Set data bank to $7E for C variable access
+    pea $7E7E
+    plb
+    plb
+    ; Push return address - 1 for RTL (bank:addr-1)
+    phk                 ; Push current program bank
+    pea @callback_done-1
+    jml [nmi_callback]  ; Indirect long jump (D=0, reads from address 0+nmi_callback)
+@callback_done:
+
+    ; Restore data bank to $00 for hardware register access
+    pea $0000
+    plb
+    plb
+
+    ; Restore ALL main loop's compiler registers from NMI area
+    lda tcc__nmi_r0
+    sta tcc__r0
+    lda tcc__nmi_r0h
+    sta tcc__r0h
+    lda tcc__nmi_r1
+    sta tcc__r1
+    lda tcc__nmi_r1h
+    sta tcc__r1h
+    lda tcc__nmi_r2
+    sta tcc__r2
+    lda tcc__nmi_r2h
+    sta tcc__r2h
+    lda tcc__nmi_r3
+    sta tcc__r3
+    lda tcc__nmi_r3h
+    sta tcc__r3h
+    lda tcc__nmi_r4
+    sta tcc__r4
+    lda tcc__nmi_r4h
+    sta tcc__r4h
+    lda tcc__nmi_r5
+    sta tcc__r5
+    lda tcc__nmi_r5h
+    sta tcc__r5h
+    lda tcc__nmi_r9
+    sta tcc__r9
+    lda tcc__nmi_r9h
+    sta tcc__r9h
+    lda tcc__nmi_r10
+    sta tcc__r10
+    lda tcc__nmi_r10h
+    sta tcc__r10h
+
+    sep #$20            ; Back to 8-bit A
+
     ; Transfer OAM buffer to hardware during VBlank
     lda oam_update_flag
     beq +
@@ -329,6 +460,15 @@ NmiHandler:
     plx
     pla
     rti
+
+;------------------------------------------------------------------------------
+; DefaultNmiCallback - Default VBlank callback (does nothing)
+;------------------------------------------------------------------------------
+; This is called by NmiHandler when no user callback is registered.
+; Simply returns immediately.
+;------------------------------------------------------------------------------
+DefaultNmiCallback:
+    rtl
 
 .ENDS
 

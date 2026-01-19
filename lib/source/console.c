@@ -23,6 +23,8 @@
 
 extern volatile u8 vblank_flag;
 extern volatile u16 frame_count;
+extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
+extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
 
 /*============================================================================
  * Static Variables
@@ -165,4 +167,35 @@ void srand(u16 seed) {
 
 void setMode(u8 mode) {
     REG_BGMODE = mode & 0x07;
+}
+
+/*============================================================================
+ * VBlank Callback
+ *============================================================================*/
+
+void nmiSetBank(VBlankCallback callback, u8 bank) {
+    /* Disable NMI during pointer write to prevent partial reads */
+    REG_NMITIMEN = 0;
+
+    /* Store 24-bit callback pointer (little-endian: addr_lo, addr_hi, bank) */
+    nmi_callback[0] = (u16)callback & 0xFF;
+    nmi_callback[1] = ((u16)callback >> 8) & 0xFF;
+    nmi_callback[2] = bank;
+    nmi_callback[3] = 0x00;  /* Padding */
+
+    /* Clear NMI flag to prevent spurious interrupt */
+    (void)REG_RDNMI;
+
+    /* Re-enable NMI and auto-joypad */
+    REG_NMITIMEN = NMITIMEN_NMI_ENABLE | NMITIMEN_JOY_ENABLE;
+}
+
+void nmiSet(VBlankCallback callback) {
+    /* Default to bank 0 - works for most small/medium projects */
+    nmiSetBank(callback, 0);
+}
+
+void nmiClear(void) {
+    /* Restore default callback */
+    nmiSetBank((VBlankCallback)DefaultNmiCallback, 0);
 }
