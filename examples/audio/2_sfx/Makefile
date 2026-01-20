@@ -1,11 +1,15 @@
 # Sound Effects Demo
-# Uses bare-metal SPC700 programming (like 1_tone)
+# Uses library for input, bare-metal SPC700 for audio
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
 # ROM Configuration
 TARGET   := sfx_demo.sfc
 ROM_NAME := OPENSNES SFX DEMO
+
+# Use the library for input handling
+USE_LIB     := 1
+LIB_MODULES := console input sprite dma
 
 # Source files
 CSRC     := main.c

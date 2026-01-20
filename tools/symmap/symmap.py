@@ -167,6 +167,49 @@ class SymbolTable:
                 results.append(symbol)
         return sorted(results, key=lambda s: s.name)
 
+    @staticmethod
+    def _is_real_variable(sym: Symbol) -> bool:
+        """
+        Check if a symbol represents a real variable vs WLA-DX metadata or
+        compiler infrastructure.
+
+        Filtered out:
+        - _sizeof_* : WLA-DX size calculation symbols
+        - RAM_USAGE_* : RAM usage tracking markers
+        - Labels with @, . suffixes: Compiler-generated internal labels
+        - tcc__* : Compiler imaginary registers (intentionally in direct page)
+        - __* : Other compiler internal symbols
+        """
+        name = sym.name
+
+        # Skip WLA-DX size symbols
+        if name.startswith('_sizeof_'):
+            return False
+
+        # Skip RAM usage markers
+        if name.startswith('RAM_USAGE_'):
+            return False
+
+        # Skip compiler-generated internal labels (contain @ or end with .number)
+        if '@' in name:
+            return False
+
+        # Skip section info labels
+        if name.endswith('_START') or name.endswith('_END'):
+            return False
+
+        # Skip compiler imaginary registers (tcc__r0, tcc__r0h, tcc__r1, etc.)
+        # These are intentionally in direct page ($00:0000-$00FF) and don't
+        # actually conflict with WRAM bank $7E
+        if name.startswith('tcc__'):
+            return False
+
+        # Skip other compiler internal symbols
+        if name.startswith('__'):
+            return False
+
+        return True
+
     def check_wram_overlap(self) -> list[Overlap]:
         """
         Check for WRAM mirroring overlaps.
@@ -177,11 +220,11 @@ class SymbolTable:
         """
         overlaps = []
 
-        # Get symbols in the mirror ranges
+        # Get real variable symbols in the mirror ranges (filter out WLA-DX metadata)
         bank0_mirror = [s for s in self.banks.get(0x00, [])
-                        if s.address < 0x2000]
+                        if s.address < 0x2000 and self._is_real_variable(s)]
         bank7e_mirror = [s for s in self.banks.get(0x7E, [])
-                         if s.address < 0x2000]
+                         if s.address < 0x2000 and self._is_real_variable(s)]
 
         if not bank0_mirror or not bank7e_mirror:
             return []
@@ -286,9 +329,11 @@ def print_overlap_check(table: SymbolTable) -> int:
     """Check and print WRAM mirror overlaps. Returns exit code."""
     overlaps = table.check_wram_overlap()
 
-    # Get symbols in each mirror range
-    bank0_mirror = [s for s in table.banks.get(0x00, []) if s.address < 0x2000]
-    bank7e_mirror = [s for s in table.banks.get(0x7E, []) if s.address < 0x2000]
+    # Get REAL variable symbols in each mirror range (filter out WLA-DX metadata)
+    bank0_mirror = [s for s in table.banks.get(0x00, [])
+                    if s.address < 0x2000 and table._is_real_variable(s)]
+    bank7e_mirror = [s for s in table.banks.get(0x7E, [])
+                     if s.address < 0x2000 and table._is_real_variable(s)]
 
     if not bank0_mirror and not bank7e_mirror:
         print(f"{Colors.GREEN}OK: No symbols in WRAM mirror range{Colors.RESET}")
@@ -296,43 +341,65 @@ def print_overlap_check(table: SymbolTable) -> int:
 
     if not bank0_mirror or not bank7e_mirror:
         print(f"{Colors.GREEN}OK: Only one bank uses WRAM mirror range{Colors.RESET}")
-        print(f"  Bank $00: {len(bank0_mirror)} symbols in $0000-$1FFF")
-        print(f"  Bank $7E: {len(bank7e_mirror)} symbols in $0000-$1FFF")
+        print(f"  Bank $00: {len(bank0_mirror)} real variables in $0000-$1FFF")
+        print(f"  Bank $7E: {len(bank7e_mirror)} real variables in $0000-$1FFF")
         return 0
 
-    # Both banks have symbols - check for actual overlap
+    # Both banks have symbols - check for EXACT address collisions
+    # We only flag an error if the SAME address is used in BOTH banks
     bank0_max = max(s.address for s in bank0_mirror)
     bank7e_min = min(s.address for s in bank7e_mirror)
+    bank7e_max = max(s.address for s in bank7e_mirror)
 
-    if bank0_max < bank7e_min:
-        print(f"{Colors.GREEN}OK: No overlap detected{Colors.RESET}")
+    # Build address sets for precise collision detection
+    bank0_addresses = set(s.address for s in bank0_mirror)
+    bank7e_addresses = set(s.address for s in bank7e_mirror)
+
+    # Check for oamMemory buffer range (544 bytes starting at its address)
+    OAM_BUFFER_SIZE = 544  # 512 main + 32 high table
+    for s in bank7e_mirror:
+        if s.name == 'oamMemory':
+            # Add all addresses in the oamMemory buffer to the collision set
+            for i in range(OAM_BUFFER_SIZE):
+                bank7e_addresses.add(s.address + i)
+            break
+
+    # Find actual collisions - addresses used in BOTH banks
+    collisions = bank0_addresses & bank7e_addresses
+
+    if not collisions:
+        print(f"{Colors.GREEN}OK: No address collisions detected{Colors.RESET}")
         print(f"  Bank $00: $0000-${bank0_max:04X} ({len(bank0_mirror)} symbols)")
-        print(f"  Bank $7E: ${bank7e_min:04X}-... ({len(bank7e_mirror)} symbols)")
+        print(f"  Bank $7E: ${bank7e_min:04X}-${bank7e_max:04X} ({len(bank7e_mirror)} symbols)")
         return 0
 
-    # OVERLAP DETECTED!
-    print(f"{Colors.RED}{Colors.BOLD}ERROR: WRAM Mirror Overlap Detected!{Colors.RESET}\n")
+    # Get the actual colliding symbols
+    bank0_colliding = [s for s in bank0_mirror if s.address in collisions]
+    bank7e_colliding = [s for s in bank7e_mirror if s.address in collisions]
 
-    print(f"{Colors.YELLOW}Bank $00 (LoROM Mirror) symbols in $0000-$1FFF:{Colors.RESET}")
-    for s in bank0_mirror[:10]:  # Show first 10
+    # COLLISION DETECTED!
+    print(f"{Colors.RED}{Colors.BOLD}ERROR: WRAM Mirror Collision Detected!{Colors.RESET}\n")
+
+    print(f"{Colors.YELLOW}Bank $00 symbols at collision addresses:{Colors.RESET}")
+    for s in bank0_colliding[:10]:
         print(f"  ${s.address:04X}  {s.name}")
-    if len(bank0_mirror) > 10:
-        print(f"  ... and {len(bank0_mirror) - 10} more")
+    if len(bank0_colliding) > 10:
+        print(f"  ... and {len(bank0_colliding) - 10} more")
 
     print()
-    print(f"{Colors.YELLOW}Bank $7E (WRAM) symbols in $0000-$1FFF:{Colors.RESET}")
-    for s in bank7e_mirror[:10]:
+    print(f"{Colors.YELLOW}Bank $7E symbols at collision addresses:{Colors.RESET}")
+    for s in bank7e_colliding[:10]:
         print(f"  ${s.address:04X}  {s.name}")
-    if len(bank7e_mirror) > 10:
-        print(f"  ... and {len(bank7e_mirror) - 10} more")
+    if len(bank7e_colliding) > 10:
+        print(f"  ... and {len(bank7e_colliding) - 10} more")
 
     print()
-    print(f"{Colors.RED}COLLISION:{Colors.RESET} Both banks have symbols at overlapping addresses!")
-    print(f"  Bank $00 range: $0000-${bank0_max:04X}")
-    print(f"  Bank $7E range: ${bank7e_min:04X}-${max(s.address for s in bank7e_mirror):04X}")
+    print(f"{Colors.RED}COLLISION:{Colors.RESET} {len(collisions)} address(es) used in BOTH Bank $00 and Bank $7E!")
+    collision_list = sorted(collisions)[:5]
+    print(f"  Colliding addresses: {', '.join(f'${a:04X}' for a in collision_list)}")
     print()
-    print(f"{Colors.CYAN}FIX:{Colors.RESET} Add 'ORGA $0300 FORCE' to Bank $7E RAMSECTION definitions")
-    print(f"     to place them above the Bank $00 mirror range ($0000-$1FFF)")
+    print(f"{Colors.CYAN}FIX:{Colors.RESET} Use ORGA to place Bank $7E buffers above ${bank0_max + 1:04X}")
+    print(f"     Example: .RAMSECTION \"buffer\" BANK $7E SLOT 1 ORGA ${bank0_max + 0x100:04X} FORCE")
 
     return 1
 

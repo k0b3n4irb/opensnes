@@ -31,9 +31,12 @@ linkfile
 # macOS
 .DS_Store
 
-# Claude Code (not part of the project)
-CLAUDE.md
-.claude/
+# Claude Code session data (transient)
+.claude/plans/
+.claude/projects/
+.claude/settings.json
+# Track CLAUDE.md and .claude/KNOWLEDGE.md (important documentation)
+# Track .claude/skills/ (automation skills)
 
 # Build directories
 build/

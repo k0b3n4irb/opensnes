@@ -1,36 +1,30 @@
 /**
  * @file main.c
  * @brief TADA Sound Example - Press A to play sound
+ *
+ * Uses OpenSNES library for initialization and input handling.
  */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
+#include <snes.h>
 
-/* Hardware registers */
-#define REG_INIDISP  (*(volatile u8*)0x2100)
-#define REG_BGMODE   (*(volatile u8*)0x2105)
-#define REG_BG1SC    (*(volatile u8*)0x2107)
-#define REG_BG12NBA  (*(volatile u8*)0x210B)
-#define REG_TM       (*(volatile u8*)0x212C)
-#define REG_CGADD    (*(volatile u8*)0x2121)
-#define REG_CGDATA   (*(volatile u8*)0x2122)
-#define REG_NMITIMEN (*(volatile u8*)0x4200)
-#define REG_HVBJOY   (*(volatile u8*)0x4212)
-#define REG_JOY1H    (*(volatile u8*)0x4219)
-
-/* Assembly functions */
+/* Assembly functions for SPC audio */
 extern void spc_init(void);
 extern void spc_play(void);
 extern void vram_init_text(void);
 
 int main(void) {
-    u8 prev_a = 0;
+    u16 pad;
+    u16 pad_prev;
+    u16 pad_pressed;
+
+    /* Initialize console (sets up hardware) */
+    consoleInit();
 
     /* Force blank during setup */
     REG_INIDISP = 0x80;
 
     /* Mode 0: 4 BG layers, all 2bpp */
-    REG_BGMODE = 0x00;
+    setMode(BG_MODE0, 0);
 
     /* BG1 tilemap at $0400 (word address $0200), 32x32 */
     REG_BG1SC = 0x04;
@@ -47,7 +41,10 @@ int main(void) {
     REG_CGDATA = 0x7F;
 
     /* Initialize SPC and upload driver + sample */
+    /* Disable NMI during upload - timing-critical on accurate emulators */
+    REG_NMITIMEN = 0x00;
     spc_init();
+    REG_NMITIMEN = 0x81;  /* Re-enable NMI + auto-joypad */
 
     /* Upload font and "TADA" text to VRAM */
     vram_init_text();
@@ -56,28 +53,30 @@ int main(void) {
     REG_TM = 0x01;
 
     /* Screen on, full brightness */
-    REG_INIDISP = 0x0F;
+    setScreenOn();
 
-    /* Enable joypad auto-read */
-    REG_NMITIMEN = 0x01;
+    /* Initialize pad_prev */
+    WaitForVBlank();
+    while (REG_HVBJOY & 0x01) {}
+    pad_prev = REG_JOY1L | (REG_JOY1H << 8);
 
     /* Main loop */
     while (1) {
-        u8 joy;
+        WaitForVBlank();
 
-        /* Wait for auto-read complete */
+        /* Wait for auto-read complete, then read joypad */
         while (REG_HVBJOY & 0x01) {}
-        joy = REG_JOY1H;
+        pad = REG_JOY1L | (REG_JOY1H << 8);
+        pad_pressed = pad & ~pad_prev;
+        pad_prev = pad;
 
-        /* A button pressed (new press only)? */
-        if ((joy & 0x80) && !prev_a) {
+        /* Skip if controller disconnected */
+        if (pad == 0xFFFF) pad_pressed = 0;
+
+        /* A button pressed? */
+        if (pad_pressed & KEY_A) {
             spc_play();
         }
-        prev_a = joy & 0x80;
-
-        /* VBlank wait */
-        while (!(REG_HVBJOY & 0x80)) {}
-        while (REG_HVBJOY & 0x80) {}
     }
 
     return 0;
