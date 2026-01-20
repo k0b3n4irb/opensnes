@@ -202,11 +202,54 @@ Tests report results to fixed memory addresses:
 
 ## Continuous Integration
 
-Tests run automatically on:
-- Every push to main
-- Every pull request
+The CI pipeline runs automatically on:
+- Every push to `main` or `develop` branches
+- Every pull request to `main` or `develop`
 
-GitHub Actions workflow: `.github/workflows/tests.yml`
+### What CI Checks
+
+| Check | Description |
+|-------|-------------|
+| Build toolchain | Compiles cc65816, WLA-DX, gfx2snes, smconv |
+| Build examples | Builds all 19 example ROMs |
+| Build tests | Compiles test ROMs |
+| Validate examples | Checks for memory overlaps (symmap.py) |
+| Compiler tests | Runs compiler regression tests |
+| Example count | Verifies all 19 examples built successfully |
+
+### CI Workflow
+
+GitHub Actions workflow: `.github/workflows/opensnes_build.yml`
+
+Runs on 3 platforms:
+- **Linux** (ubuntu-latest)
+- **Windows** (windows-latest with MSYS2)
+- **macOS** (macos-latest)
+
+### Local CI Validation
+
+Before pushing, you can run the same checks locally:
+
+```bash
+# Full build
+make clean && make
+
+# Validate all examples (checks for memory overlaps, ROM sizes)
+./tests/examples/validate_examples.sh --quick
+
+# Run compiler tests
+./tests/compiler/run_tests.sh
+
+# Verify example count
+echo "Examples built: $(find examples -name '*.sfc' | wc -l)"
+```
+
+### Artifacts
+
+CI uploads the following artifacts for debugging:
+- **Build logs**: Full build output for each platform
+- **Example ROMs**: All compiled .sfc files
+- **Documentation**: Generated API docs (from Linux build)
 
 ## Coverage Goals
 

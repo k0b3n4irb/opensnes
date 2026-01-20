@@ -1,29 +1,24 @@
 /**
  * @file main.c
- * @brief Sound Effects Demo - Simple bare-metal SPC700 audio
+ * @brief Sound Effects Demo - Press A to play beep
  *
- * Press A to play a beep sound effect.
- * Uses a minimal SPC driver (~100 bytes) with embedded BRR sample.
+ * Uses OpenSNES library for initialization and input handling.
+ * Screen flashes blue when sound plays.
  */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-
-/* Hardware registers */
-#define REG_INIDISP  (*(volatile u8*)0x2100)
-#define REG_BGMODE   (*(volatile u8*)0x2105)
-#define REG_TM       (*(volatile u8*)0x212C)
-#define REG_CGADD    (*(volatile u8*)0x2121)
-#define REG_CGDATA   (*(volatile u8*)0x2122)
-#define REG_NMITIMEN (*(volatile u8*)0x4200)
-#define REG_HVBJOY   (*(volatile u8*)0x4212)
+#include <snes.h>
 
 /* Audio functions from spc.asm */
 extern void spc_init(void);
 extern void spc_play(void);
 
 int main(void) {
-    u8 prev_a = 0;
+    u16 pad;
+    u16 pad_prev;
+    u16 pad_pressed;
+
+    /* Initialize console (sets up hardware) */
+    consoleInit();
 
     /* Force blank */
     REG_INIDISP = 0x80;
@@ -31,33 +26,40 @@ int main(void) {
     /* Disable all layers */
     REG_TM = 0x00;
 
-    /* Set Mode 0 */
-    REG_BGMODE = 0x00;
-
     /* Set backdrop to GREEN (audio ready) */
     REG_CGADD = 0;
     REG_CGDATA = 0xE0;
     REG_CGDATA = 0x03;
 
     /* Initialize audio - uploads driver + sample to SPC */
+    /* Disable NMI during upload - timing-critical on accurate emulators */
+    REG_NMITIMEN = 0x00;
     spc_init();
-
-    /* Enable joypad auto-read */
-    REG_NMITIMEN = 0x01;
+    REG_NMITIMEN = 0x81;  /* Re-enable NMI + auto-joypad */
 
     /* Screen on */
-    REG_INIDISP = 0x0F;
+    setScreenOn();
+
+    /* Initialize pad_prev */
+    WaitForVBlank();
+    while (REG_HVBJOY & 0x01) {}
+    pad_prev = REG_JOY1L | (REG_JOY1H << 8);
 
     /* Main loop - press A to play sound */
     while (1) {
-        u8 joy;
+        WaitForVBlank();
 
-        /* Wait for auto-read complete */
-        while (REG_HVBJOY & 0x01) { }
-        joy = *((volatile u8*)0x4219);  /* JOY1H: A is bit 7 */
+        /* Wait for auto-read complete, then read joypad */
+        while (REG_HVBJOY & 0x01) {}
+        pad = REG_JOY1L | (REG_JOY1H << 8);
+        pad_pressed = pad & ~pad_prev;
+        pad_prev = pad;
 
-        /* A button pressed (new press only) */
-        if ((joy & 0x80) && !prev_a) {
+        /* Skip if controller disconnected */
+        if (pad == 0xFFFF) pad_pressed = 0;
+
+        /* A button pressed? */
+        if (pad_pressed & KEY_A) {
             /* Flash blue */
             REG_CGADD = 0;
             REG_CGDATA = 0x00;
@@ -66,11 +68,6 @@ int main(void) {
             /* Play sound */
             spc_play();
         }
-        prev_a = joy & 0x80;
-
-        /* VBlank wait */
-        while (!(REG_HVBJOY & 0x80)) { }
-        while (REG_HVBJOY & 0x80) { }
     }
 
     return 0;

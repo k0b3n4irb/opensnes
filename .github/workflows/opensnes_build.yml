@@ -7,11 +7,12 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - "main"
       - "develop"
   pull_request:
     branches:
-      - "develop"
       - "main"
+      - "develop"
 
 # ------------------------------------ #
 # Set O.S matrix                       #
@@ -113,6 +114,38 @@ jobs:
           make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
 
       # ------------------------------------ #
+      # Validate examples (memory overlaps)  #
+      # ------------------------------------ #
+      - name: Validate examples (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          echo "=== Validating Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      - name: Validate examples (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          echo "=== Validating Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Run compiler tests                   #
+      # ------------------------------------ #
+      - name: Run compiler tests (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          echo "=== Compiler Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      - name: Run compiler tests (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          echo "=== Compiler Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
+          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
       # Verify built artifacts               #
       # ------------------------------------ #
       - name: Verify built ROMs
@@ -135,6 +168,43 @@ jobs:
           find tests -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
           echo "=== Toolchain ===" | tee -a opensnes_build_${{ matrix.name }}.log
           ls -la bin/ | tee -a opensnes_build_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Verify expected example count        #
+      # ------------------------------------ #
+      - name: Verify example count (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          EXPECTED_EXAMPLES=19
+          ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
+          echo "Expected examples: $EXPECTED_EXAMPLES"
+          echo "Actual examples:   $ACTUAL_EXAMPLES"
+          if [ "$ACTUAL_EXAMPLES" -lt "$EXPECTED_EXAMPLES" ]; then
+            echo "ERROR: Expected at least $EXPECTED_EXAMPLES examples, but only found $ACTUAL_EXAMPLES"
+            echo "Missing examples:"
+            # Find directories with Makefiles but no .sfc
+            for dir in $(find examples -name "Makefile" -exec dirname {} \;); do
+              if [ ! -f "$dir"/*.sfc 2>/dev/null ]; then
+                echo "  - $(basename $dir)"
+              fi
+            done
+            exit 1
+          fi
+          echo "✓ All $ACTUAL_EXAMPLES examples built successfully"
+
+      - name: Verify example count (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          EXPECTED_EXAMPLES=19
+          ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
+          echo "Expected examples: $EXPECTED_EXAMPLES"
+          echo "Actual examples:   $ACTUAL_EXAMPLES"
+          if [ "$ACTUAL_EXAMPLES" -lt "$EXPECTED_EXAMPLES" ]; then
+            echo "ERROR: Expected at least $EXPECTED_EXAMPLES examples, but only found $ACTUAL_EXAMPLES"
+            exit 1
+          fi
+          echo "All $ACTUAL_EXAMPLES examples built successfully"
 
       # ------------------------------------ #
       # Check library linking                #
