@@ -25,7 +25,7 @@ CSRC     := main.c
 # Enable SNESMOD audio system
 USE_SNESMOD    := 1
 USE_LIB        := 1
-LIB_MODULES    := console sprite input
+LIB_MODULES    := console sprite dma input
 
 # Soundbank source files (effects only, no music module)
 SOUNDBANK_SRC  := sfx/effectssfx.it

@@ -11,7 +11,7 @@ ROM_NAME := OPENSNES HELLO WORLD
 USE_LIB  := 1
 
 # Library modules to link
-LIB_MODULES := console sprite
+LIB_MODULES := console sprite dma
 
 # Source files
 CSRC     := main.c

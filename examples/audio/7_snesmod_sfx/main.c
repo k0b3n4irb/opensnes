@@ -171,7 +171,7 @@ int main(void) {
     consoleInit();
 
     /* Set Mode 0 */
-    setMode(BGMODE_MODE0);
+    setMode(BG_MODE0, 0);
 
     /* Configure BG1 for text display */
     REG_BG1SC = 0x04;

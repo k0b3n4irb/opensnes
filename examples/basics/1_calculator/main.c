@@ -416,7 +416,7 @@ int main(void) {
 
     /* Initialize hardware */
     consoleInit();
-    setMode(BGMODE_MODE0);
+    setMode(BG_MODE0, 0);
 
     /* Load font tiles */
     load_font();

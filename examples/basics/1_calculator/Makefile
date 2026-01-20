@@ -12,6 +12,6 @@ CSRC     := main.c
 
 # Enable OpenSNES library
 USE_LIB     := 1
-LIB_MODULES := console input sprite
+LIB_MODULES := console input sprite dma
 
 include $(OPENSNES)/make/common.mk
