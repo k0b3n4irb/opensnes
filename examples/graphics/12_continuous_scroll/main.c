@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Continuous Scroll Example
+ * @brief Continuous Scroll Example (Pure C Version)
  *
  * Port of PVSnesLib Mode1ContinuousScroll example.
  * Demonstrates:
@@ -8,6 +8,7 @@
  * - Player-controlled sprite movement
  * - D-pad controlled scrolling
  * - VBlank callback (nmiSet) for timing-critical scroll updates
+ * - Pure C graphics loading using library functions
  *
  * Original by odelot
  * Sprite from Calciumtrice (CC-BY 3.0)
@@ -16,9 +17,32 @@
 
 #include <snes.h>
 
-/* External assembly functions */
-extern void load_scroll_graphics(void);
-extern void setup_scroll_regs(void);
+/*============================================================================
+ * External Graphics Data (defined in data.asm)
+ *============================================================================*/
+
+/* BG1 - Main scrolling background */
+extern u8 bg1_tiles[], bg1_tiles_end[];
+extern u8 bg1_pal[], bg1_pal_end[];
+extern u8 bg1_map[], bg1_map_end[];
+
+/* BG2 - Sub scrolling background (parallax) */
+extern u8 bg2_tiles[], bg2_tiles_end[];
+extern u8 bg2_pal[], bg2_pal_end[];
+extern u8 bg2_map[], bg2_map_end[];
+
+/* BG3 - Static HUD/overlay */
+extern u8 bg3_tiles[], bg3_tiles_end[];
+extern u8 bg3_pal[], bg3_pal_end[];
+extern u8 bg3_map[], bg3_map_end[];
+
+/* Character sprite */
+extern u8 char_tiles[], char_tiles_end[];
+extern u8 char_pal[], char_pal_end[];
+
+/*============================================================================
+ * Game State
+ *============================================================================*/
 
 /* Scroll positions */
 static u16 bg1_scroll_x;
@@ -38,6 +62,10 @@ static u16 player_y;
 /* Flag to signal scroll update needed */
 static u8 need_scroll_update;
 
+/*============================================================================
+ * VBlank Callback
+ *============================================================================*/
+
 /**
  * VBlank callback - updates scroll registers at the start of VBlank
  *
@@ -53,24 +81,83 @@ void myVBlankHandler(void) {
     }
 }
 
+/*============================================================================
+ * Main Program
+ *============================================================================*/
+
 int main(void) {
     u16 pad;
 
     /* Force blank during setup */
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
-    /* Load all graphics first */
-    load_scroll_graphics();
+    /*------------------------------------------------------------------------
+     * Configure Background Tilemaps (where tilemap data goes in VRAM)
+     *------------------------------------------------------------------------*/
 
-    /* Configure PPU registers */
-    setup_scroll_regs();
+    /* BG1 tilemap at VRAM $0000, 32x32 tiles */
+    bgSetMapPtr(0, 0x0000, SC_32x32);
 
-    /* Initialize sprite system with correct settings */
-    /* OBJ_SIZE16_L32 = 16x16 small, 32x32 large */
-    /* tileBase = 3 for sprites at VRAM $6000 ($6000 / $2000 = 3) */
-    oamInitEx(OBJ_SIZE16_L32, 3);
+    /* BG2 tilemap at VRAM $0800, 32x32 tiles */
+    bgSetMapPtr(1, 0x0800, SC_32x32);
 
-    /* Initialize positions */
+    /* BG3 tilemap at VRAM $1000, 32x32 tiles */
+    bgSetMapPtr(2, 0x1000, SC_32x32);
+
+    /*------------------------------------------------------------------------
+     * Load Background Tiles and Palettes
+     *------------------------------------------------------------------------*/
+
+    /* BG1: tiles at $2000, palette at slot 2 (offset 32) */
+    bgInitTileSet(0, bg1_tiles, bg1_pal, 2,
+                  bg1_tiles_end - bg1_tiles,
+                  bg1_pal_end - bg1_pal,
+                  BG_16COLORS, 0x2000);
+
+    /* BG2: tiles at $3000, palette at slot 4 (offset 64) */
+    bgInitTileSet(1, bg2_tiles, bg2_pal, 4,
+                  bg2_tiles_end - bg2_tiles,
+                  bg2_pal_end - bg2_pal,
+                  BG_16COLORS, 0x3000);
+
+    /* BG3: tiles at $4000, palette at slot 0 (offset 0) */
+    bgInitTileSet(2, bg3_tiles, bg3_pal, 0,
+                  bg3_tiles_end - bg3_tiles,
+                  bg3_pal_end - bg3_pal,
+                  BG_4COLORS, 0x4000);
+
+    /*------------------------------------------------------------------------
+     * Load Tilemap Data
+     *------------------------------------------------------------------------*/
+
+    /* Load initial tilemaps (first 2KB of each) */
+    dmaCopyVram(bg1_map, 0x0000, 2048);
+    dmaCopyVram(bg2_map, 0x0800, 2048);
+    dmaCopyVram(bg3_map, 0x1000, bg3_map_end - bg3_map);
+
+    /*------------------------------------------------------------------------
+     * Load Sprite Graphics
+     *------------------------------------------------------------------------*/
+
+    /* Sprite tiles at $6000, palette 0 (colors 128-143) */
+    oamInitGfxSet(char_tiles, char_tiles_end - char_tiles,
+                  char_pal, char_pal_end - char_pal,
+                  0, 0x6000, OBJ_SIZE16_L32);
+
+    /*------------------------------------------------------------------------
+     * Configure Video Mode
+     *------------------------------------------------------------------------*/
+
+    /* Mode 1 with BG3 priority (for HUD overlay) */
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+
+    /* Enable BG1, BG2, BG3, and sprites on main screen */
+    REG_TM = 0x17;  /* TM = 00010111 = OBJ + BG3 + BG2 + BG1 */
+
+    /*------------------------------------------------------------------------
+     * Initialize Game State
+     *------------------------------------------------------------------------*/
+
     player_x = 20;
     player_y = 100;
     bg1_scroll_x = 0;
@@ -90,10 +177,13 @@ int main(void) {
     /* Transfer OAM buffer to hardware before turning screen on */
     oamUpdate();
 
-    /* Enable display */
+    /* Enable display at full brightness */
     REG_INIDISP = INIDISP_BRIGHTNESS(15);
 
-    /* Main loop */
+    /*------------------------------------------------------------------------
+     * Main Loop
+     *------------------------------------------------------------------------*/
+
     while (1) {
         /* Wait for auto-joypad read to complete */
         while (REG_HVBJOY & 0x01) { }
