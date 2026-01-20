@@ -45,6 +45,23 @@ void oamInitEx(u8 size, u8 tileBase) {
     oamClear();
 }
 
+void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
+                   u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize) {
+    /* Load sprite tiles to VRAM */
+    dmaCopyVram(tileSource, vramAddr, tileSize);
+
+    /* Load sprite palette to CGRAM (sprites use colors 128-255) */
+    /* Each sprite palette is 16 colors = 32 bytes, starting at color 128 */
+    u16 palOffset = 128 + (paletteEntry * 16);
+    dmaCopyCGram(tilePalette, palOffset, paletteSize);
+
+    /* Calculate tile base from VRAM address (divide by 0x2000) */
+    u8 tileBase = (vramAddr >> 13) & 0x07;
+
+    /* Initialize OAM with size and tile base */
+    oamInitEx(oamSize, tileBase);
+}
+
 /*============================================================================
  * Sprite Properties
  *============================================================================*/
@@ -140,6 +157,18 @@ void oamSetSize(u8 id, u8 large) {
         oam_buffer[ext_offset] |= (0x01 << bit_offset);
     } else {
         oam_buffer[ext_offset] &= mask;
+    }
+}
+
+void oamSetEx(u8 id, u8 size, u8 visible) {
+    if (id >= MAX_SPRITES) return;
+
+    /* Set size */
+    oamSetSize(id, size);
+
+    /* Set visibility */
+    if (!visible) {
+        oamHide(id);
     }
 }
 

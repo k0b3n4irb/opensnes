@@ -56,6 +56,14 @@
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
 
+/** @brief Sprite visibility */
+#define OBJ_SHOW    1   /**< Sprite visible */
+#define OBJ_HIDE    0   /**< Sprite hidden */
+
+/** @brief Sprite size selection */
+#define OBJ_SMALL   0   /**< Use small sprite size */
+#define OBJ_LARGE   1   /**< Use large sprite size */
+
 /*============================================================================
  * Initialization
  *============================================================================*/
@@ -75,6 +83,39 @@ void oamInit(void);
  * @param tileBase Base address for sprite tiles in VRAM (word address >> 13)
  */
 void oamInitEx(u8 size, u8 tileBase);
+
+/**
+ * @brief Initialize sprite graphics and palette (PVSnesLib compatible)
+ *
+ * Loads sprite tiles to VRAM and palette to CGRAM, and configures
+ * the sprite tile base address and sizes.
+ *
+ * @param tileSource Address of sprite tile graphics
+ * @param tileSize Size of tile data in bytes
+ * @param tilePalette Address of sprite palette data
+ * @param paletteSize Size of palette data in bytes
+ * @param paletteEntry Palette number (0-7, placed at color 128+entry*16)
+ * @param vramAddr VRAM address for tiles (must be 8KB aligned)
+ * @param oamSize Sprite size configuration (OBJ_SIZE_*)
+ *
+ * @code
+ * extern char sprite_tiles[], sprite_tiles_end[];
+ * extern char sprite_pal[];
+ * oamInitGfxSet(sprite_tiles, sprite_tiles_end - sprite_tiles,
+ *               sprite_pal, 32, 0, 0x6000, OBJ_SIZE16_L32);
+ * @endcode
+ */
+void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
+                   u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize);
+
+/**
+ * @brief Set sprite extended attributes
+ *
+ * @param id Sprite ID (0-127)
+ * @param size Size selection (OBJ_SMALL or OBJ_LARGE)
+ * @param visible Visibility (OBJ_SHOW or OBJ_HIDE)
+ */
+void oamSetEx(u8 id, u8 size, u8 visible);
 
 /*============================================================================
  * Sprite Properties

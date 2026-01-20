@@ -165,8 +165,13 @@ void srand(u16 seed) {
  * Video Mode
  *============================================================================*/
 
-void setMode(u8 mode) {
-    REG_BGMODE = mode & 0x07;
+void setMode(u8 mode, u8 flags) {
+    /* BGMODE register format: 4321pmmm
+     * 4,3,2,1 = BG tile size (0=8x8, 1=16x16)
+     * p = BG3 priority in Mode 1 (0=normal, 1=high)
+     * mmm = Mode (0-7)
+     */
+    REG_BGMODE = (flags & 0xF8) | (mode & 0x07);
 }
 
 /*============================================================================

@@ -68,6 +68,11 @@ void dmaFillVRAM(u16 value, u16 dest, u16 size) {
     REG_MDMAEN = 0x01;
 }
 
+void dmaClearVRAM(void) {
+    /* Clear all 64KB of VRAM to 0 */
+    dmaFillVRAM(0, 0, 0);  /* Size 0 = 65536 bytes (full wraparound) */
+}
+
 /*============================================================================
  * CGRAM (Palette) Transfers
  *============================================================================*/
