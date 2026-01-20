@@ -9,7 +9,7 @@ ROM_NAME   := TWO PLAYERS DEMO
 
 # Use the OpenSNES library
 USE_LIB    := 1
-LIB_MODULES := console input sprite text
+LIB_MODULES := console input sprite dma text
 
 # Source files
 CSRC       := main.c

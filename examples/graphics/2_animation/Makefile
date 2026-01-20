@@ -9,7 +9,7 @@ ROM_NAME := OPENSNES ANIMATION
 
 # Enable OpenSNES library
 USE_LIB     := 1
-LIB_MODULES := console sprite input
+LIB_MODULES := console sprite dma input
 
 # Graphics conversion
 GFXSRC      := assets/sprites.bmp
