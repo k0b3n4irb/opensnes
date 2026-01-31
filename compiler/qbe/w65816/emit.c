@@ -372,25 +372,29 @@ emitins(Ins *i, Fn *fn)
                 /* General case: use stack for multiplier, call __mul */
                 emitload(r1, fn);
                 fprintf(outf, "\tpha\n");
-                emitload(r0, fn);
+                emitload_adj(r0, fn, 2);  /* Adjust for pushed value */
                 fprintf(outf, "\tpha\n");
                 fprintf(outf, "\tjsl __mul16\n");
+                fprintf(outf, "\ttax\n");  /* Save result in X */
                 fprintf(outf, "\ttsa\n");
                 fprintf(outf, "\tclc\n");
                 fprintf(outf, "\tadc.w #4\n");
                 fprintf(outf, "\ttas\n");
+                fprintf(outf, "\ttxa\n");  /* Restore result to A */
             }
         } else {
             /* Variable * variable - call __mul16 */
             emitload(r1, fn);
             fprintf(outf, "\tpha\n");
-            emitload(r0, fn);
+            emitload_adj(r0, fn, 2);  /* Adjust for pushed value */
             fprintf(outf, "\tpha\n");
             fprintf(outf, "\tjsl __mul16\n");
+            fprintf(outf, "\ttax\n");  /* Save result in X */
             fprintf(outf, "\ttsa\n");
             fprintf(outf, "\tclc\n");
             fprintf(outf, "\tadc.w #4\n");
             fprintf(outf, "\ttas\n");
+            fprintf(outf, "\ttxa\n");  /* Restore result to A */
         }
         emitstore(i->to, fn);
         break;
@@ -673,6 +677,54 @@ emitins(Ins *i, Fn *fn)
         fprintf(outf, "+\tlda.w #0\n");
         fprintf(outf, "++\n");
         emitstore(i->to, fn);
+        break;
+
+    case Ostorel:
+        /* Store long (32-bit) - store low word then high word at +2 */
+        /* For 65816, we treat this as storing a 32-bit value in two parts */
+        emitload(r0, fn);  /* Load low 16 bits */
+        {
+            int aslot = getallocslot(r1, fn);
+            if (aslot >= 0) {
+                /* Store to stack-allocated local variable */
+                fprintf(outf, "\tsta %d,s\n", (aslot + 1) * 2);
+                /* High word is typically 0 for near pointers */
+                fprintf(outf, "\tlda.w #0\n");
+                fprintf(outf, "\tsta %d,s\n", (aslot + 1) * 2 + 2);
+            } else if (isvreg(r1)) {
+                fprintf(outf, "\tsta ($%02X)\n", regaddr(r1.val));
+                fprintf(outf, "\tlda.w #0\n");
+                fprintf(outf, "\tldy.w #2\n");
+                fprintf(outf, "\tsta ($%02X),y\n", regaddr(r1.val));
+            } else if (rtype(r1) == RCon) {
+                /* Direct address constant or symbol */
+                c = &fn->con[r1.val];
+                if (c->type == CAddr) {
+                    fprintf(outf, "\tsta.l %s", stripsym(str(c->sym.id)));
+                    if (c->bits.i)
+                        fprintf(outf, "+%d", (int)c->bits.i);
+                    fprintf(outf, "\n");
+                    /* Store high word */
+                    fprintf(outf, "\tlda.w #0\n");
+                    fprintf(outf, "\tsta.l %s", stripsym(str(c->sym.id)));
+                    fprintf(outf, "+%d\n", (int)c->bits.i + 2);
+                } else {
+                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+                    fprintf(outf, "\tlda.w #0\n");
+                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i + 2);
+                }
+            } else {
+                /* Address in temp - indirect store */
+                fprintf(outf, "\tpha\n");
+                emitload_adj(r1, fn, 2);
+                fprintf(outf, "\ttax\n");
+                fprintf(outf, "\tpla\n");
+                fprintf(outf, "\tsta.l $0000,x\n");
+                /* Store high word at +2 */
+                fprintf(outf, "\tlda.w #0\n");
+                fprintf(outf, "\tsta.l $0002,x\n");
+            }
+        }
         break;
 
     case Ostorew:
