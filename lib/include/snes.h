@@ -82,5 +82,9 @@
 
 /* Audio: #include <snes/audio.h> */
 /* Math: #include <snes/math.h> */
+/* SRAM: #include <snes/sram.h> */
+/* Animation: #include <snes/animation.h> */
+/* Collision: #include <snes/collision.h> */
+/* Entity: #include <snes/entity.h> */
 
 #endif /* OPENSNES_H */
