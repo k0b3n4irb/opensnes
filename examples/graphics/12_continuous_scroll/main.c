@@ -4,7 +4,7 @@
  *
  * Port of PVSnesLib Mode1ContinuousScroll example.
  * Demonstrates:
- * - Multi-layer parallax scrolling
+ * - Two-layer parallax scrolling (BG1 + BG2)
  * - Player-controlled sprite movement
  * - D-pad controlled scrolling
  * - VBlank callback (nmiSet) for timing-critical scroll updates
@@ -31,10 +31,7 @@ extern u8 bg2_tiles[], bg2_tiles_end[];
 extern u8 bg2_pal[], bg2_pal_end[];
 extern u8 bg2_map[], bg2_map_end[];
 
-/* BG3 - Static HUD/overlay */
-extern u8 bg3_tiles[], bg3_tiles_end[];
-extern u8 bg3_pal[], bg3_pal_end[];
-extern u8 bg3_map[], bg3_map_end[];
+/* BG3 assets not used in this example */
 
 /* Character sprite */
 extern u8 char_tiles[], char_tiles_end[];
@@ -101,30 +98,27 @@ int main(void) {
     /* BG2 tilemap at VRAM $0800, 32x32 tiles */
     bgSetMapPtr(1, 0x0800, SC_32x32);
 
-    /* BG3 tilemap at VRAM $1000, 32x32 tiles */
-    bgSetMapPtr(2, 0x1000, SC_32x32);
+    /* BG3 disabled - this example focuses on parallax scrolling */
 
     /*------------------------------------------------------------------------
      * Load Background Tiles and Palettes
      *------------------------------------------------------------------------*/
 
-    /* BG1: tiles at $2000, palette at slot 2 (offset 32) */
+    /* BG1: tiles at $2000, palette at slot 2 (offset 32)
+     * BG1 tiles = 7552 bytes, occupies $2000-$3D7F */
     bgInitTileSet(0, bg1_tiles, bg1_pal, 2,
                   bg1_tiles_end - bg1_tiles,
                   bg1_pal_end - bg1_pal,
                   BG_16COLORS, 0x2000);
 
-    /* BG2: tiles at $3000, palette at slot 4 (offset 64) */
+    /* BG2: tiles at $4000, palette at slot 4 (offset 64)
+     * Must not overlap with BG1! */
     bgInitTileSet(1, bg2_tiles, bg2_pal, 4,
                   bg2_tiles_end - bg2_tiles,
                   bg2_pal_end - bg2_pal,
-                  BG_16COLORS, 0x3000);
+                  BG_16COLORS, 0x4000);
 
-    /* BG3: tiles at $4000, palette at slot 0 (offset 0) */
-    bgInitTileSet(2, bg3_tiles, bg3_pal, 0,
-                  bg3_tiles_end - bg3_tiles,
-                  bg3_pal_end - bg3_pal,
-                  BG_4COLORS, 0x4000);
+    /* BG3 disabled - not loading tiles */
 
     /*------------------------------------------------------------------------
      * Load Tilemap Data
@@ -133,7 +127,6 @@ int main(void) {
     /* Load initial tilemaps (first 2KB of each) */
     dmaCopyVram(bg1_map, 0x0000, 2048);
     dmaCopyVram(bg2_map, 0x0800, 2048);
-    dmaCopyVram(bg3_map, 0x1000, bg3_map_end - bg3_map);
 
     /*------------------------------------------------------------------------
      * Load Sprite Graphics
@@ -148,11 +141,11 @@ int main(void) {
      * Configure Video Mode
      *------------------------------------------------------------------------*/
 
-    /* Mode 1 with BG3 priority (for HUD overlay) */
-    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+    /* Mode 1 for parallax scrolling */
+    setMode(BG_MODE1, 0);
 
-    /* Enable BG1, BG2, BG3, and sprites on main screen */
-    REG_TM = 0x17;  /* TM = 00010111 = OBJ + BG3 + BG2 + BG1 */
+    /* Enable BG1, BG2, and sprites on main screen */
+    REG_TM = 0x13;  /* TM = 00010011 = OBJ + BG2 + BG1 */
 
     /*------------------------------------------------------------------------
      * Initialize Game State

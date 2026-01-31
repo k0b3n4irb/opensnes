@@ -11,11 +11,6 @@ ROM_NAME := OPENSNES ANIMATION
 USE_LIB     := 1
 LIB_MODULES := console sprite dma input
 
-# Graphics conversion
-GFXSRC      := assets/sprites.bmp
-SPRITE_SIZE := 16
-BPP         := 4
-
 # Additional assembly
 ASMSRC := helpers.asm
 

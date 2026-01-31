@@ -8,7 +8,7 @@ Learn how to display sprites, animate them, and create scrolling backgrounds.
 - 4bpp tile format (16 colors)
 - Sprite sizes and priorities
 - Background scrolling
-- Using the gfx2snes tool
+- Using the gfx4snes tool
 
 ## SNES Graphics Architecture
 
@@ -121,7 +121,7 @@ Display a sprite and move it with the D-pad.
 - Loading tiles to VRAM
 - Loading palettes to CGRAM
 - Reading controller input
-- The gfx2snes tool
+- The gfx4snes tool
 
 **Key Registers:**
 - `$2101` OBJSEL - Sprite size/base
