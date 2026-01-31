@@ -51,6 +51,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -h, --help       Show this help"
             echo ""
             echo "Categories:"
+            echo "  black_screen     Quick smoke test - detect broken ROMs"
             echo "  unit             Run unit tests"
             echo "  hardware         Run hardware tests"
             echo "  integration      Run integration tests"
@@ -251,9 +252,41 @@ run_test() {
     fi
 }
 
+# Run black screen smoke tests (special handler)
+run_black_screen_tests() {
+    log_info "Running black screen smoke tests..."
+
+    local black_screen_script="$SCRIPT_DIR/run_black_screen_tests.sh"
+    if [[ ! -x "$black_screen_script" ]]; then
+        log_error "Black screen test script not found: $black_screen_script"
+        return 1
+    fi
+
+    local verbose_flag=""
+    if [[ $VERBOSE -eq 1 ]]; then
+        verbose_flag="--verbose"
+    fi
+
+    # Run the black screen test script
+    if "$black_screen_script" "$MESEN_PATH" $verbose_flag; then
+        log_info "Black screen tests: PASS"
+        return 0
+    else
+        log_error "Black screen tests: FAIL"
+        return 1
+    fi
+}
+
 # Run all tests in a category
 run_category() {
     local category="$1"
+
+    # Special handler for black_screen
+    if [[ "$category" == "black_screen" ]]; then
+        run_black_screen_tests
+        return $?
+    fi
+
     local category_dir="$SCRIPT_DIR/$category"
 
     if [[ ! -d "$category_dir" ]]; then
@@ -299,7 +332,9 @@ main() {
         # Run specific category
         run_category "$CATEGORY"
     else
-        # Run all categories
+        # Run all categories (black_screen first as smoke test)
+        run_category "black_screen"
+
         for category in unit hardware integration templates examples; do
             if [[ -d "$SCRIPT_DIR/$category" ]]; then
                 run_category "$category"
