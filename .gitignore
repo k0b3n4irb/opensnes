@@ -6,6 +6,15 @@
 *.sfc
 *.sym
 *.map
+*.oops
+
+# Binary executables (rebuilt from source)
+tools/font2snes/font2snes
+tools/gfx4snes/gfx4snes
+tools/smconv/smconv
+
+# Generated documentation
+doc/
 
 # Compiler intermediates
 *.ps
@@ -21,6 +30,7 @@
 
 # WLA-DX
 linkfile
+testlink
 
 # IDE
 .vscode/
