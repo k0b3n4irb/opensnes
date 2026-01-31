@@ -1,6 +1,6 @@
 # SNES Development Knowledge Base
 
-**Last Updated:** January 20, 2026
+**Last Updated:** January 31, 2026
 
 This file contains accumulated knowledge and gotchas from SNES development work with OpenSNES. Use it as a quick reference.
 
@@ -23,6 +23,13 @@ This file contains accumulated knowledge and gotchas from SNES development work 
 13. [VBlank Callbacks](#13-vblank-callbacks-january-2026)
 14. [Joypad Input](#14-joypad-input-january-2026)
 15. [CI Regression Testing](#15-ci-regression-testing-january-2026)
+16. [Example Architecture](#16-example-architecture-january-2026)
+17. [VBlank Timing Constraints](#17-vblank-timing-constraints-january-2026)
+18. [HDMA (Horizontal DMA)](#18-hdma-horizontal-dma-january-2026)
+19. [Background Modes](#19-background-modes-january-2026)
+20. [Color Format - BGR555](#20-color-format---bgr555-january-2026)
+21. [VRAM Tilemap Overlap and DMA Timing](#21-vram-tilemap-overlap-and-dma-timing-january-2026)
+22. [Bug Fix Verification Protocol](#22-bug-fix-verification-protocol-january-2026)
 
 ---
 
@@ -44,6 +51,30 @@ This file contains accumulated knowledge and gotchas from SNES development work 
 - Finding test cases and .sym files for debugging tools
 
 **Key difference:** OpenSNES uses QBE-based compiler (cproc), PVSnesLib uses 816-tcc.
+
+### ⚠️ MANDATORY: Consult Reference Documentation First
+
+**Before developing ANY new feature, ALWAYS read these files:**
+
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| **SNES_HARDWARE_REFERENCE.md** | Complete SNES technical reference (CPU, PPU, APU, DMA, timing) | Understanding hardware behavior, register usage, timing constraints |
+| **SNES_ROSETTA_STONE.md** | OpenSNES vs PVSnesLib comparison, SDK patterns, API mapping | Implementing SDK features, understanding existing patterns |
+
+**Why this matters:**
+1. **Avoid reinventing the wheel** - The reference docs contain solutions to common problems
+2. **Understand hardware constraints** - SNES has strict timing, memory, and DMA limitations
+3. **Follow existing patterns** - Consistency with PVSnesLib makes code easier to understand
+4. **Prevent subtle bugs** - Many SNES bugs come from misunderstanding hardware behavior
+
+**Quick reference workflow:**
+```bash
+# Before implementing a feature:
+1. Read relevant sections in SNES_HARDWARE_REFERENCE.md
+2. Check SNES_ROSETTA_STONE.md for OpenSNES patterns
+3. Look at PVSnesLib examples for working implementations
+4. Then start coding
+```
 
 ---
 
@@ -183,6 +214,8 @@ sta $4374        ; Store to DMA bank register
 
 ## 5. OAM and Sprites
 
+**See also:** `.claude/PVSNESLIB_SPRITES.md` for comprehensive sprite documentation.
+
 ### OAM Structure
 
 OAM is 544 bytes total:
@@ -211,6 +244,41 @@ Sprites in VRAM are arranged with 128 pixels per row:
 - 8×8 sprites: 16 per row
 - 16×16 sprites: 8 per row
 - 32×32 sprites: 4 per row
+
+### Dynamic Sprite System (January 2026)
+
+**Key Data Structures:**
+- `oamMemory[]` (544 bytes): Hardware OAM shadow buffer
+- `oambuffer[]` (128 × 16 bytes): Dynamic sprite state (t_sprites)
+- `oamQueueEntry[]` (128 × 6 bytes): VRAM upload queue
+
+**t_sprites structure (16 bytes):**
+```c
+typedef struct {
+    s16 oamx;           // 0-1: X position
+    s16 oamy;           // 2-3: Y position
+    u16 oamframeid;     // 4-5: Animation frame
+    u8 oamattribute;    // 6: vhoopppc (flip, priority, palette)
+    u8 oamrefresh;      // 7: Set to 1 to upload graphics
+    u16 oamgraphics;    // 8-9: Graphics address
+    u8 oamgfxbank;      // 10: Graphics bank
+    u8 _pad;            // 11: Padding
+    u16 _reserved[2];   // 12-15: Alignment
+} t_sprites;
+```
+
+**Frame Update Sequence (CRITICAL ORDER):**
+1. Update positions/animation in `oambuffer[]`
+2. Set `oamrefresh = 1` for changed sprites
+3. Call `oamDynamic*Draw()` for each sprite
+4. Call `oamInitDynamicSpriteEndFrame()`
+5. Call `WaitForVBlank()`
+6. Call `oamVramQueueUpdate()`
+
+**Lookup Tables:**
+- `lkup16oamS[]`: Source offsets in sprite sheet (by frameid)
+- `lkup16idT[]`/`lkup16idT0[]`: OAM tile numbers
+- `lkup16idB[]`: VRAM destination blocks
 
 ---
 
@@ -1052,7 +1120,7 @@ make clean && make
 # Run compiler tests
 ./tests/compiler/run_tests.sh
 
-# Verify example count (should be 20)
+# Verify example count (should be 19)
 echo "Examples: $(find examples -name '*.sfc' | wc -l)"
 ```
 
@@ -1113,7 +1181,7 @@ python3 tools/symmap/symmap.py --check-overlap game.sym
 
 | Component | Current | Target |
 |-----------|---------|--------|
-| Examples build | 100% (20/20) | 100% |
+| Examples build | 100% (19/19) | 100% |
 | Memory overlap check | 100% | 100% |
 | Compiler regression | ~80% | 100% |
 | Library functions | ~60% | 100% |
@@ -1156,6 +1224,737 @@ When to update `.github/workflows/opensnes_build.yml`:
 - New platform needed → Add to matrix
 - Expected counts change → Update verification numbers
 - New validation tool → Add validation step
+
+---
+
+## 16. Example Architecture (January 2026)
+
+### Ideal Pattern: C + Library DMA
+
+The recommended example architecture uses **C code with library functions** for graphics loading, keeping ASM files data-only:
+
+**main.c** - Uses library DMA functions:
+```c
+#include <snes.h>
+
+extern u8 tiles[], tiles_end[];
+extern u8 tilemap[], tilemap_end[];
+extern u8 palette[], palette_end[];
+
+int main(void) {
+    REG_INIDISP = INIDISP_FORCE_BLANK;
+
+    // Configure tilemap location
+    bgSetMapPtr(0, 0x0000, SC_32x32);
+
+    // Load tiles and palette via DMA
+    bgInitTileSet(0, tiles, palette, 0,
+                  tiles_end - tiles,
+                  palette_end - palette,
+                  BG_16COLORS, 0x4000);
+
+    // Load tilemap via DMA
+    dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
+
+    // Configure video mode
+    setMode(BG_MODE1, 0);
+    REG_TM = TM_BG1;
+    bgSetScroll(0, 0, 0);
+
+    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+
+    while (1) { WaitForVBlank(); }
+}
+```
+
+**data.asm** - Data definitions only (no DMA code):
+```asm
+.section ".rodata1" superfree
+tiles: .incbin "res/tiles.pic"
+tiles_end:
+tilemap: .incbin "res/tiles.map"
+tilemap_end:
+palette: .incbin "res/tiles.pal"
+palette_end:
+.ends
+```
+
+**Makefile** - Include required library modules:
+```makefile
+LIB_MODULES := console sprite dma background
+```
+
+### Example Classification (January 2026)
+
+| Example | Architecture | Notes |
+|---------|--------------|-------|
+| `5_mode1` | C + Library DMA | Ideal pattern |
+| `6_simple_sprite` | C + Library DMA | Uses `oamInitGfxSet()` |
+| `7_fading` | C + Library DMA | Ideal pattern |
+| `11_mode5` | C + Library DMA | Hi-res mode |
+| `4_scrolling` | C + Library DMA | 2 backgrounds |
+| `12_continuous_scroll` | C + Library DMA | VBlank callback demo |
+| `6_snesmod_music` | C + Library DMA | SNESMOD example |
+| `7_snesmod_sfx` | C + Library DMA | SNESMOD example |
+| `3_mode7` | C + ASM DMA | Mode 7 interleaved VRAM (library doesn't support) |
+| `8_mode0` | C + ASM DMA | 4-BG parallax (educational for Mode 0) |
+| `9_parallax` | C + ASM DMA | Parallax scrolling demo |
+| `10_mode3` | C + ASM DMA | Split DMA for >32KB tiles |
+| `2_animation` | C + ASM DMA | Sprite animation |
+| `1_tone` | C + ASM | Low-level SPC700 demo |
+| `2_sfx` | C + Library | Legacy audio |
+| `2_custom_font` | Standalone | Font rendering demo |
+| `1_calculator` | Standalone | No graphics, logic demo |
+| `1_hello_world` | C + Library | Text console |
+| `2_two_players` | C + Library | Input demo |
+
+### When to Keep ASM
+
+ASM DMA code is appropriate when:
+
+1. **Mode 7**: Interleaved VRAM layout (tilemap in low bytes, characters in high bytes) - library doesn't support
+2. **Split DMA**: Tile data >32KB requires multiple DMA transfers from different banks
+3. **Timing-critical**: Parallax scrolling with per-scanline updates
+4. **Educational**: Showing how hardware registers work at low level
+
+### Converting Examples to Library DMA
+
+To convert an example from ASM DMA to library DMA:
+
+1. **Update main.c**:
+   - Remove `extern void load_graphics(void);`
+   - Add extern declarations for data: `extern u8 tiles[], tiles_end[];`
+   - Replace `load_graphics()` with library calls:
+     - `bgInitTileSet()` for tiles + palette
+     - `dmaCopyVram()` for tilemap
+     - `oamInitGfxSet()` for sprite graphics
+
+2. **Update data.asm**:
+   - Remove the `load_graphics:` function and all DMA code
+   - Keep only `.incbin` directives with labels and `_end` labels
+
+3. **Update Makefile**:
+   - Add `background` to `LIB_MODULES` if using `bgInitTileSet()`, `bgSetMapPtr()`
+
+4. **Build and validate**:
+   ```bash
+   make clean && make
+   python3 tools/symmap/symmap.py --check-overlap game.sym
+   ```
+
+### Library DMA Functions Reference
+
+| Function | Purpose | Notes |
+|----------|---------|-------|
+| `bgInitTileSet()` | Load tiles + palette, set gfx pointer | Handles 24-bit ROM addresses |
+| `dmaCopyVram()` | Copy data to VRAM | For tilemaps, extra tiles |
+| `dmaCopyCGram()` | Copy palette data | For additional palettes |
+| `oamInitGfxSet()` | Load sprite tiles + palette | Also sets OBJSEL |
+| `bgSetMapPtr()` | Configure tilemap address/size | Sets BGxSC register |
+| `bgSetGfxPtr()` | Configure tile graphics address | Sets BG12NBA/BG34NBA |
+| `bgSetScroll()` | Set scroll position | Shadow registers for write-only regs |
+
+---
+
+## 17. VBlank Timing Constraints (January 2026)
+
+### Overview
+
+VBlank is the only safe time to update VRAM, OAM, and CGRAM. Understanding timing limits is critical for stable games.
+
+### VBlank Duration
+
+| Region | VBlank Lines | VBlank Time | Safe DMA |
+|--------|--------------|-------------|----------|
+| NTSC | ~37 lines | ~2,273 µs | ~6KB |
+| PAL | ~70 lines | ~4,300 µs | ~12KB |
+
+**Practical recommendation:** Limit DMA to **~4KB per frame** to leave headroom for:
+- OAM transfer (544 bytes)
+- Scroll register updates
+- Palette updates
+- User VBlank callback code
+
+### DMA Transfer Rates
+
+```
+DMA speed: 2.68 MB/second (Bus A to Bus B)
+VBlank NTSC: ~2,273 µs available
+Max theoretical: 2.68 × 2.273ms ≈ 6KB
+
+But you need time for:
+- NMI handler overhead (~50 cycles)
+- OAM DMA (544 bytes → ~200 µs)
+- Scroll/palette writes (~50 µs)
+- User callback code (variable)
+
+Safe budget: 4KB DMA + 544 OAM + misc = ~5KB total
+```
+
+### What Happens If You Exceed VBlank
+
+If DMA isn't complete before rendering starts:
+- **VRAM writes**: Corrupted graphics, visual glitches
+- **OAM writes**: Sprites in wrong positions or invisible
+- **CGRAM writes**: Wrong colors, color flashing
+
+### Strategies for Large Transfers
+
+**1. Spread across frames:**
+```c
+// Load 16KB tileset over 4 frames
+static u8 load_phase = 0;
+void loadTilesetAsync(void) {
+    switch (load_phase) {
+        case 0: dmaCopyVram(tiles,      0x0000, 4096); break;
+        case 1: dmaCopyVram(tiles+4096, 0x0800, 4096); break;
+        case 2: dmaCopyVram(tiles+8192, 0x1000, 4096); break;
+        case 3: dmaCopyVram(tiles+12288,0x1800, 4096); break;
+    }
+    load_phase++;
+}
+```
+
+**2. Load during forced blank:**
+```c
+// Disable rendering for large loads (screen goes black)
+REG_INIDISP = INIDISP_FORCE_BLANK;
+dmaCopyVram(large_tileset, 0x0000, 32768);  // 32KB - no time limit!
+REG_INIDISP = INIDISP_BRIGHTNESS(15);
+```
+
+**3. Stream during gameplay:**
+```c
+// Update only changed tiles each frame
+#define TILES_PER_FRAME 8  // 8 tiles × 32 bytes = 256 bytes
+void streamTileUpdates(void) {
+    if (dirty_tile_count > 0) {
+        u8 count = (dirty_tile_count > TILES_PER_FRAME) ?
+                   TILES_PER_FRAME : dirty_tile_count;
+        // DMA only the changed tiles
+        dmaCopyVram(dirty_tiles, dirty_vram_addr, count * 32);
+        dirty_tile_count -= count;
+    }
+}
+```
+
+### Animated Sprite Considerations
+
+From Wikibooks: "DMA isn't all that fast - you only have time to DMA up to 6kB during v-blank, and even less if you take into account scrolling and OAM updating. For practical purposes, about 4kB is recommended."
+
+For sprite animation, consider:
+- Pre-load all animation frames to VRAM at level start
+- Use tile index changes (OAM only, no VRAM DMA needed)
+- If you must stream: limit to 4KB/frame
+
+---
+
+## 18. HDMA (Horizontal DMA) (January 2026)
+
+### Overview
+
+HDMA transfers small amounts of data **during each H-blank** (between scanlines). This enables per-scanline effects impossible with regular DMA.
+
+### HDMA vs Regular DMA
+
+| Feature | Regular DMA | HDMA |
+|---------|-------------|------|
+| When | VBlank only | Every H-blank |
+| Data per transfer | Up to 64KB | 1-4 bytes |
+| Use case | Bulk loading | Per-scanline effects |
+| Channels | 0-7 | 0-7 (shared with DMA) |
+
+### HDMA Transfer Modes
+
+| Mode | Bytes/Scanline | Pattern | Use Case |
+|------|----------------|---------|----------|
+| 0 | 1 byte | `a` | Single register (scroll, mosaic) |
+| 1 | 2 bytes | `a, a+1` | Word to consecutive registers |
+| 2 | 2 bytes | `a, a` | Two writes to same register |
+| 3 | 4 bytes | `a, a, a+1, a+1` | Two words alternating |
+| 4 | 4 bytes | `a, a+1, a, a+1` | Two words to consecutive |
+
+### Common HDMA Effects
+
+**1. Color Gradient (Sky/Water):**
+```c
+// Table: scanline count, then RGB values
+static const u8 sky_gradient[] = {
+    32,  0x00, 0x40,  // 32 lines of dark blue
+    32,  0x00, 0x50,  // 32 lines of medium blue
+    32,  0x00, 0x60,  // 32 lines of light blue
+    0                 // End marker
+};
+// Target: CGRAM address $00 (backdrop color)
+```
+
+**2. Parallax Scrolling:**
+```c
+// Different scroll values per screen section
+static const u8 parallax_table[] = {
+    64, 0x00, 0x00,   // Top 64 lines: no scroll
+    64, 0x40, 0x00,   // Next 64: scroll 64px
+    64, 0x80, 0x00,   // Next 64: scroll 128px
+    32, 0xC0, 0x00,   // Bottom 32: scroll 192px
+    0
+};
+// Target: BG1HOFS ($210D)
+```
+
+**3. Wavy Water Effect:**
+```c
+// Sine wave offset table (256 entries for smooth wave)
+static u8 wave_table[256];
+void initWaveTable(void) {
+    for (int i = 0; i < 256; i++) {
+        wave_table[i] = (fixSin(i) >> 5) + 128;
+    }
+}
+// Animate by rotating table start each frame
+```
+
+**4. Window/Spotlight:**
+```c
+// Shrink window per scanline for spotlight
+static const u8 spotlight[] = {
+    1, 128, 128,  // Line 0: window at center (closed)
+    1, 120, 136,  // Line 1: slightly open
+    1, 112, 144,  // Line 2: more open
+    // ... continues expanding then contracting
+    0
+};
+// Target: WH0/WH1 ($2126/$2127)
+```
+
+### HDMA Registers
+
+| Register | Purpose |
+|----------|---------|
+| $43x0 | HDMA control (same as DMA, bit 6 = HDMA enable) |
+| $43x1 | B-bus destination |
+| $43x2-3 | Table address (A-bus) |
+| $43x4 | Table bank |
+| $43x5-6 | Indirect address (for indirect mode) |
+| $43x7 | Indirect bank |
+| $43x8-9 | Current table address (read-only) |
+| $43xA | Line counter (read-only) |
+| $420C | HDMA enable (bit per channel) |
+
+### HDMA Table Format
+
+**Direct mode:**
+```
+[count] [data...]    ; count > 0: repeat data for 'count' lines
+[count] [data...]    ; count = 0: end of table
+[0x80|count] [data...] ; count | 0x80: continuous mode (new data each line)
+```
+
+**Indirect mode:**
+```
+[count] [pointer_lo] [pointer_hi]  ; Points to data elsewhere
+```
+
+### HDMA Limitations
+
+1. **Channels shared with DMA** - Don't use same channel for both
+2. **Limited bytes** - Only 1-4 bytes per scanline
+3. **Table in ROM/WRAM** - Must be accessible during rendering
+4. **CPU overhead** - Each active channel costs ~18 cycles/scanline
+
+### Best Practices
+
+```c
+// Reserve channels: 0-5 for DMA, 6-7 for HDMA
+#define HDMA_CHANNEL_GRADIENT 6
+#define HDMA_CHANNEL_SCROLL   7
+
+// Disable HDMA before modifying tables
+REG_HDMAEN = 0;
+updateGradientTable();
+REG_HDMAEN = (1 << HDMA_CHANNEL_GRADIENT);
+```
+
+---
+
+## 19. Background Modes (January 2026)
+
+### Mode Overview
+
+The SNES has 8 background modes (0-7). Mode is set via register `$2105` (BGMODE).
+
+| Mode | BG1 | BG2 | BG3 | BG4 | Colors | Common Use |
+|------|-----|-----|-----|-----|--------|------------|
+| **0** | 2bpp | 2bpp | 2bpp | 2bpp | 4×4 = 16 | Status bars, 4-layer parallax |
+| **1** | 4bpp | 4bpp | 2bpp | - | 16+16+4 | **Most common** (SMW, SF2) |
+| **2** | 4bpp | 4bpp | OPT | - | 16+16 | Offset-per-tile scrolling |
+| **3** | 8bpp | 4bpp | - | - | 256+16 | Photorealistic BG + UI |
+| **4** | 8bpp | 2bpp | OPT | - | 256+4 | 256-color + simple overlay |
+| **5** | 4bpp | 2bpp | - | - | 16+4 | Hi-res (512×224) |
+| **6** | 4bpp | - | OPT | - | 16 | Hi-res + offset-per-tile |
+| **7** | 8bpp | - | - | - | 256 | Rotation/scaling (F-Zero) |
+
+### Mode 1 (Most Common)
+
+```
+BG1: 4bpp (16 colors) - Foreground/playfield
+BG2: 4bpp (16 colors) - Background scenery
+BG3: 2bpp (4 colors)  - Status bar/HUD overlay
+
+Total: 36 colors from 256 palette
+```
+
+**Typical usage in platformers:**
+- BG1: Interactive level tiles (player walks on)
+- BG2: Parallax background (mountains, clouds)
+- BG3: Score, lives, timer display
+
+**Example setup:**
+```c
+setMode(BG_MODE1, 0);
+REG_TM = TM_BG1 | TM_BG2 | TM_BG3;  // Enable all 3 layers
+REG_BG3PRIO = 1;  // BG3 highest priority (in front)
+```
+
+### Mode 0 (4 Layers)
+
+```
+BG1-BG4: All 2bpp (4 colors each from different palettes)
+Total: 16 colors (4 per layer)
+```
+
+**Use case:** Complex parallax with many layers
+- Contra III uses Mode 0 for some stages
+- Good for "behind the scenes" depth effects
+
+### Mode 3 (256 Colors)
+
+```
+BG1: 8bpp (256 colors) - Full palette access
+BG2: 4bpp (16 colors)  - Overlay/UI
+```
+
+**Use case:** Photo-realistic backgrounds, pre-rendered art
+
+### Mode 7 (Rotation/Scaling)
+
+```
+BG1: 8bpp (256 colors), affine transformation
+- Single 128×128 or 256×256 tile map
+- Hardware rotation, scaling, perspective
+- Used for: F-Zero, Mario Kart, Pilotwings
+```
+
+**Mode 7 VRAM layout (interleaved):**
+```
+$0000: Tilemap byte 0, Tile 0 byte 0
+$0001: Tilemap byte 1, Tile 0 byte 1
+$0002: Tilemap byte 2, Tile 0 byte 2
+...
+```
+
+**Mode 7 registers:**
+| Register | Purpose |
+|----------|---------|
+| $211A | Mode 7 settings (flip, wrap) |
+| $211B-C | Matrix A (cos θ × scale) |
+| $211D-E | Matrix B (sin θ × scale) |
+| $211F-20 | Matrix C (-sin θ × scale) |
+| $2121-22 | Matrix D (cos θ × scale) |
+| $211F-20 | Center X |
+| $2121-22 | Center Y |
+
+### Hi-Res Modes (5, 6)
+
+```
+Resolution: 512×224 (vs normal 256×224)
+- Pixels are half-width
+- Text looks sharper
+- Used for: RPG menus, visual novels
+```
+
+**Limitation:** 16+4 colors only, no Mode 7
+
+### Tile Size
+
+All modes support 8×8 or 16×16 tiles per layer (set in BGMODE register):
+
+```c
+// 8x8 tiles (default)
+setMode(BG_MODE1, 0);
+
+// 16x16 tiles for BG1
+setMode(BG_MODE1, BG1_TILE_16x16);
+
+// 16x16 for BG1 and BG2
+setMode(BG_MODE1, BG1_TILE_16x16 | BG2_TILE_16x16);
+```
+
+### Priority System
+
+Each BG has 2 priority levels (set in tilemap). Sprites also have 4 priority levels.
+
+**Default front-to-back order (Mode 1):**
+```
+1. Sprites (priority 3)
+2. BG1 tiles (priority 1)
+3. Sprites (priority 2)
+4. BG2 tiles (priority 1)
+5. Sprites (priority 1)
+6. BG1 tiles (priority 0)
+7. Sprites (priority 0)
+8. BG2 tiles (priority 0)
+9. BG3 tiles (priority 1) - if BG3PRIO=1
+10. BG3 tiles (priority 0)
+```
+
+---
+
+## 20. Color Format - BGR555 (January 2026)
+
+### SNES Color Format
+
+The SNES uses **15-bit BGR555** color:
+
+```
+Bit:  15   14-10    9-5     4-0
+      0    BBBBB   GGGGG   RRRRR
+
+      (bit 15 is always 0)
+```
+
+Each channel (R, G, B) has **5 bits = 32 levels** (0-31).
+
+### Total Colors
+
+- **Palette capacity:** 256 entries (512 bytes in CGRAM)
+- **Colors per entry:** 32,768 possible (2^15)
+- **Max on-screen:** 256 (from palette) but up to 32,768 using color math
+
+### Color Calculation
+
+```c
+// Create BGR555 color from RGB values (0-31 each)
+#define RGB555(r, g, b) ((b << 10) | (g << 5) | r)
+
+// Examples:
+#define COLOR_BLACK   RGB555(0,  0,  0)   // 0x0000
+#define COLOR_WHITE   RGB555(31, 31, 31)  // 0x7FFF
+#define COLOR_RED     RGB555(31, 0,  0)   // 0x001F
+#define COLOR_GREEN   RGB555(0,  31, 0)   // 0x03E0
+#define COLOR_BLUE    RGB555(0,  0,  31)  // 0x7C00
+#define COLOR_YELLOW  RGB555(31, 31, 0)   // 0x03FF
+#define COLOR_CYAN    RGB555(0,  31, 31)  // 0x7FE0
+#define COLOR_MAGENTA RGB555(31, 0,  31)  // 0x7C1F
+```
+
+### CGRAM Layout
+
+```
+$00-$1F:  BG palette 0 (32 bytes = 16 colors)
+$20-$3F:  BG palette 1
+$40-$5F:  BG palette 2
+$60-$7F:  BG palette 3
+$80-$9F:  BG palette 4
+$A0-$BF:  BG palette 5
+$C0-$DF:  BG palette 6
+$E0-$FF:  BG palette 7
+$100-$11F: Sprite palette 0
+$120-$13F: Sprite palette 1
+$140-$15F: Sprite palette 2
+$160-$17F: Sprite palette 3
+$180-$19F: Sprite palette 4
+$1A0-$1BF: Sprite palette 5
+$1C0-$1DF: Sprite palette 6
+$1E0-$1FF: Sprite palette 7
+```
+
+**Note:** Color 0 of each BG palette is transparent (shows backdrop). Color 0 of sprite palettes is also transparent.
+
+### Backdrop Color
+
+Address `$00` in CGRAM is the **backdrop** - visible where no BG or sprite covers it.
+
+```c
+// Set backdrop to dark blue
+REG_CGADD = 0;
+REG_CGDATA = RGB555(0, 0, 16) & 0xFF;
+REG_CGDATA = RGB555(0, 0, 16) >> 8;
+```
+
+### Color Math (Transparency Effects)
+
+The SNES can blend colors mathematically for transparency:
+
+| Operation | Effect |
+|-----------|--------|
+| Add | Brighten (fire, glow) |
+| Subtract | Darken (shadows) |
+| Add/2 | 50% transparency |
+
+**Registers:**
+- `$2130` (CGWSEL): Color math enable/window
+- `$2131` (CGADSUB): Add/subtract select per layer
+- `$2132` (COLDATA): Fixed color for math
+
+```c
+// 50% transparent BG2 over BG1
+REG_CGWSEL = 0x02;  // Apply to BG2
+REG_CGADSUB = 0x22; // Add, half, BG2
+```
+
+### Converting from 24-bit RGB
+
+When converting from standard 24-bit RGB (0-255 per channel):
+
+```c
+// 24-bit to BGR555
+u16 rgb24_to_bgr555(u8 r, u8 g, u8 b) {
+    return ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
+}
+
+// Example: Orange (255, 128, 0) in 24-bit
+// → (31, 16, 0) in 5-bit
+// → BGR555: 0x0000 | 0x0200 | 0x001F = 0x021F
+```
+
+### Palette Organization Tips
+
+1. **Color 0 = transparent** - Don't put important colors there
+2. **Share palettes** - Enemies with similar colors can share
+3. **Reserve backdrop** - Plan for it (usually sky/water color)
+4. **Gradient optimization** - Place gradient colors consecutively for HDMA
+
+```c
+// Example: 16-color palette for grass tileset
+const u16 grass_palette[] = {
+    RGB555(0, 0, 0),    // 0: Transparent
+    RGB555(8, 20, 4),   // 1: Dark grass
+    RGB555(12, 24, 8),  // 2: Medium grass
+    RGB555(16, 28, 12), // 3: Light grass
+    RGB555(4, 8, 2),    // 4: Shadow
+    RGB555(20, 16, 8),  // 5: Dirt dark
+    RGB555(24, 20, 12), // 6: Dirt light
+    RGB555(28, 24, 16), // 7: Sand
+    // ... etc
+};
+```
+
+---
+
+## 21. VRAM Tilemap Overlap and DMA Timing (January 2026)
+
+### The Problem
+
+When multiple background tilemaps share overlapping VRAM regions, splitting DMA uploads across VBlanks causes **visual corruption** during the intermediate frame.
+
+### Case Study: Breakout Pink Border Bug
+
+**Symptom:** Pink border appeared during level transitions, then disappeared.
+
+**VRAM Layout:**
+```
+BG1 tilemap: 0x0000-0x07FF (2KB)
+BG3 tilemap: 0x0400-0x0BFF (2KB)
+Overlap:     0x0400-0x07FF (1KB shared)
+```
+
+**Broken Code (Split DMAs):**
+```c
+WaitForVBlank();
+dmaCopyCGram((u8 *)pal, 0, 512);
+dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);  // Writes 0x0000-0x07FF
+WaitForVBlank();  // <<< FRAME RENDERED WITH CORRUPT BG3!
+dmaCopyVram((u8 *)backmap, 0x0400, 0x800);   // Writes 0x0400-0x0BFF
+```
+
+**What Happened:**
+1. First VBlank: BG1 tilemap uploaded to 0x0000-0x07FF
+2. Frame rendered: BG3 reads from 0x0400-0x0BFF
+   - 0x0400-0x07FF contains BG1 blockmap data (wrong!)
+   - 0x0800-0x0BFF contains old/garbage data
+3. Pink showed through transparent border pixels from corrupt BG3
+
+**Fixed Code (Atomic DMAs):**
+```c
+WaitForVBlank();
+dmaCopyCGram((u8 *)pal, 0, 512);
+dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+dmaCopyVram((u8 *)backmap, 0x0400, 0x800);  // All in same VBlank!
+```
+
+### The Rule
+
+**When VRAM regions overlap, ALL overlapping DMAs must complete in the SAME VBlank.**
+
+This is more important than staying under the "safe" 4KB DMA budget. PVSnesLib routinely does 4.5KB+ in a single VBlank for this reason.
+
+### Why Overlap Exists
+
+Overlapping tilemaps save VRAM by sharing unused portions:
+- BG1 uses rows 0-15 (0x0000-0x03FF)
+- BG3 uses rows 16-31 of BG1's space + its own rows 0-15 (0x0400-0x0BFF)
+- Net savings: 1KB VRAM
+
+This is intentional and works fine when DMAs are atomic.
+
+### Detecting Overlap Issues
+
+**Symptoms:**
+- Brief color corruption during screen transitions
+- Garbage appearing for 1 frame then disappearing
+- Effects only visible during level loads or screen changes
+
+**Debug Steps:**
+1. Check VRAM layout in code/documentation
+2. Look for `WaitForVBlank()` calls between related DMA operations
+3. Compare against PVSnesLib reference - it does atomic DMAs
+
+### General Principles
+
+1. **Reference implementations matter more than theory** - PVSnesLib's DMA timing is battle-tested
+2. **Don't over-optimize DMA budget** - Splitting for "safety" introduced the bug
+3. **Transparency creates layer interactions** - Corrupt lower layers show through
+4. **Trace exact frame sequence** when debugging visual glitches
+
+---
+
+## 22. Bug Fix Verification Protocol (January 2026)
+
+### Lesson Learned
+
+**Always verify a bug still exists before implementing a fix.**
+
+We wasted significant time planning and analyzing a "for-loop compiler bug" that had already been fixed. The plan was based on analyzing a stale `.asm` file generated with an older compiler version.
+
+### The Protocol
+
+**Before implementing ANY bug fix:**
+
+1. **Reproduce the bug with current code first**
+   ```bash
+   # Quick compile test for compiler bugs
+   echo "test code" | cc -E -x c - | ./compiler/cproc/cproc-qbe | ./compiler/qbe/qbe -t w65816
+   ```
+
+2. **Don't trust old generated files** - Regenerate `.asm`, `.obj`, `.sym` files before analysis
+
+3. **Check git history** for recent fixes to the affected code:
+   ```bash
+   git log --oneline -10 -- path/to/file.c
+   ```
+
+4. **Build and test the current code** before diving into implementation
+
+### Red Flags That a Bug May Be Fixed
+
+- The "buggy" file is old (check timestamps)
+- Current builds work but old artifacts show problems
+- Git history shows recent changes to related code
+- Workarounds exist in code but might no longer be needed
+
+### Time Cost
+
+Skipping verification can waste hours on non-existent bugs. A 30-second test at the start saves significant time.
 
 ---
 
