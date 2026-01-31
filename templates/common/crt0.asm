@@ -84,6 +84,10 @@
     frame_count     dsb 2   ; Frame counter (incremented by NMI handler)
     frame_count_svg dsb 2   ; Saved frame count
     lag_frame_counter dsb 2 ; Lag frame detection
+    ; Input state (read in VBlank ISR like PVSnesLib)
+    pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
+    pad_keysold     dsb 10  ; Previous frame button state
+    pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -95,6 +99,47 @@
 
 .RAMSECTION ".oam_buffer" BANK $7E SLOT 1 ORGA $0300 FORCE
     oamMemory       dsb 544 ; Shadow buffer for OAM ($7E:0300-$7E:051F)
+.ENDS
+
+;------------------------------------------------------------------------------
+; Dynamic Sprite Engine RAM
+;------------------------------------------------------------------------------
+; oambuffer: Game-level sprite state (128 sprites × 16 bytes = 2048 bytes)
+; oamQueueEntry: VRAM upload queue (128 entries × 6 bytes = 768 bytes)
+; State variables for sprite management
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".dynamic_sprite_buffer" BANK $7E SLOT 1 ORGA $0520 FORCE
+    oambuffer       dsb 2048    ; 128 × 16 bytes ($7E:0520-$7E:0D1F)
+.ENDS
+
+.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 1 ORGA $0D20 FORCE
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:0D20-$7E:101F)
+.ENDS
+
+.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 1 ORGA $1020 FORCE
+    ; Temporary values for sprite calculations
+    sprit_val0      dsb 1       ; Temporary value #0
+    sprit_val1      dsb 1       ; Temporary value #1
+    sprit_val2      dsb 2       ; Temporary value #2 (16-bit)
+
+    ; Queue state
+    oamqueuenumber          dsb 2   ; Current position in VRAM upload queue
+
+    ; Per-frame sprite tracking
+    oamnumberperframe       dsb 2   ; Number of sprites drawn this frame (×4)
+    oamnumberperframeold    dsb 2   ; Number of sprites drawn last frame (×4)
+
+    ; Sprite slot counters (for each size category)
+    oamnumberspr0           dsb 2   ; Current large sprite slot
+    oamnumberspr0Init       dsb 2   ; Initial large sprite slot
+    oamnumberspr1           dsb 2   ; Current small sprite slot
+    oamnumberspr1Init       dsb 2   ; Initial small sprite slot
+
+    ; VRAM base addresses
+    spr0addrgfx             dsb 2   ; VRAM address for large sprites ($0000)
+    spr1addrgfx             dsb 2   ; VRAM address for small sprites ($1000)
+    spr16addrgfx            dsb 2   ; VRAM address for 16x16 sprites (context-dependent)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -345,6 +390,44 @@ NmiHandler:
     ; Increment frame counter
     rep #$20
     inc frame_count
+
+    ;--------------------------------------------------------------------------
+    ; Read Joypads (like PVSnesLib - read in VBlank ISR for reliability)
+    ;--------------------------------------------------------------------------
+    ; Wait for auto-joypad read to complete
+-   lda $4212
+    and #$0001
+    bne -
+
+    ; Save previous state
+    lda pad_keys
+    sta pad_keysold
+    lda pad_keys+2
+    sta pad_keysold+2
+
+    ; Read joypad 1 (16-bit load gets both JOY1L and JOY1H)
+    lda $4218           ; 16-bit: A = JOY1H:JOY1L
+    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
+    beq +
+        lda #$0000      ; Invalid input - clear it
++   sta pad_keys
+
+    ; Compute edge detection: (current ^ old) & current = newly pressed
+    eor pad_keysold
+    and pad_keys
+    sta pad_keysdown
+
+    ; Read joypad 2
+    lda $421A           ; 16-bit: A = JOY2H:JOY2L
+    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
+    beq ++
+        lda #$0000      ; Invalid input - clear it
+++  sta pad_keys+2
+
+    eor pad_keysold+2
+    and pad_keys+2
+    sta pad_keysdown+2
+
     sep #$20
 
     ; Call user VBlank callback (BEFORE OAM update for max VBlank time)

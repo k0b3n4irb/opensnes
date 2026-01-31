@@ -11,9 +11,9 @@
 # Optional variables:
 #   CSRC      - C source files (default: main.c)
 #   ASMSRC    - Additional ASM files to include
-#   GFXSRC    - PNG files to convert (uses gfx2snes)
+#   GFXSRC    - PNG files to convert (uses gfx4snes, outputs .pic/.pal)
 #   CFLAGS    - Additional C compiler flags
-#   SPRITE_SIZE - Sprite size for gfx2snes (default: 8)
+#   SPRITE_SIZE - Sprite/tile size for gfx4snes (default: 8)
 #   BPP       - Bits per pixel for graphics (default: 4)
 #
 # SNESMOD audio options:
@@ -42,7 +42,7 @@ endif
 CC       := $(OPENSNES)/bin/cc65816
 AS       := $(OPENSNES)/bin/wla-65816
 LD       := $(OPENSNES)/bin/wlalink
-GFX2SNES := $(OPENSNES)/bin/gfx2snes
+GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
 
 # Shared templates
@@ -70,6 +70,25 @@ ifeq ($(USE_LIB),0)
 OAM_HELPERS := $(TEMPLATES)/oam_helpers.asm
 else
 OAM_HELPERS :=
+endif
+
+#------------------------------------------------------------------------------
+# SRAM Configuration (set USE_SRAM=1 to enable battery-backed save)
+#------------------------------------------------------------------------------
+# USE_SRAM    - Set to 1 to enable SRAM for save games
+# SRAM_SIZE   - SRAM size code: 0=None, 1=2KB, 2=4KB, 3=8KB, 4=16KB, 5=32KB
+
+USE_SRAM    ?= 0
+SRAM_SIZE   ?= 3
+
+# When SRAM is enabled, add the sram module to library modules
+ifeq ($(USE_SRAM),1)
+LIB_MODULES += sram
+CARTRIDGETYPE := $$02
+SRAMSIZE := $$0$(SRAM_SIZE)
+else
+CARTRIDGETYPE := $$00
+SRAMSIZE := $$00
 endif
 
 #------------------------------------------------------------------------------
@@ -151,12 +170,12 @@ endif
 # Graphics Conversion
 #------------------------------------------------------------------------------
 
-# Convert each PNG in GFXSRC to a .h file in current directory
-# We define explicit rules for each graphics file
+# Convert each PNG in GFXSRC to .pic and .pal files using gfx4snes
+# Output: basename.pic (tiles) and basename.pal (palette)
 define GFX_RULE
-$(notdir $(basename $(1)).h): $(1)
-	@echo "[GFX] $$< -> $$@"
-	@$$(GFX2SNES) -s $$(SPRITE_SIZE) -b $$(BPP) -c $$< $$@
+$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1)
+	@echo "[GFX] $$< -> $$(notdir $$(basename $$<)).pic/.pal"
+	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
 endef
 
 $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
@@ -175,11 +194,14 @@ main.c.asm: $(CSRC) $(GFX_HEADERS)
 # Assembly Generation
 #------------------------------------------------------------------------------
 
-# Generate project-specific header with ROM name
-# Use shell variable substitution to avoid sed
+# Generate project-specific header with ROM name and SRAM settings
+# Uses sed for reliable multi-pattern substitution
 project_hdr.asm: $(TEMPLATES)/hdr.asm
 	@echo "[HDR] Generating project header..."
-	@ROM_NAME='$(ROM_NAME)' && cat $(TEMPLATES)/hdr.asm | while IFS= read -r line; do echo "$${line//__ROM_NAME__/$$ROM_NAME}"; done > $@
+	@sed -e 's/__ROM_NAME__/$(ROM_NAME)/g' \
+	     -e 's/__CARTRIDGETYPE__/$(CARTRIDGETYPE)/g' \
+	     -e 's/__SRAMSIZE__/$(SRAMSIZE)/g' \
+	     $(TEMPLATES)/hdr.asm > $@
 
 # Runtime library (math functions, etc.)
 RUNTIME := $(TEMPLATES)/runtime.asm
