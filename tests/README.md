@@ -14,11 +14,38 @@ Automated testing infrastructure for OpenSNES SDK.
 
 | Category | Description | Location |
 |----------|-------------|----------|
+| `black_screen` | Smoke test - detects broken ROMs | `tests/black_screen_test.lua` |
 | `examples/` | Example ROM tests (snesdbg-based) | `tests/examples/` |
 | `unit/` | Low-level function tests (math, memory) | `tests/unit/` |
 | `hardware/` | SNES hardware feature tests | `tests/hardware/` |
 | `integration/` | Full system tests | `tests/integration/` |
-| `templates/` | Template smoke tests | `tests/templates/` |
+| `compiler/` | Compiler regression tests | `tests/compiler/` |
+
+## Quick Smoke Test: Black Screen Detection
+
+The fastest way to check if all ROMs are working is the **black screen test**. A black screen after initialization typically means the ROM is broken.
+
+```bash
+# Run black screen test on all examples
+./tests/run_black_screen_tests.sh /path/to/Mesen
+
+# With verbose output
+./tests/run_black_screen_tests.sh /path/to/Mesen --verbose
+
+# Save screenshots for inspection
+./tests/run_black_screen_tests.sh /path/to/Mesen --save-screenshots
+```
+
+**How it works:**
+1. Loads each ROM in Mesen
+2. Waits 90 frames (1.5 seconds)
+3. Analyzes screen buffer for non-black pixels
+4. PASS if >0.5% of pixels are non-black
+5. FAIL if screen is black (likely broken ROM)
+
+**Output:**
+- Screenshots of failed ROMs saved to `tests/screenshots/FAIL_*.png`
+- Exit code 0 = all pass, 1 = failures detected
 
 ## Example Tests
 
@@ -210,12 +237,12 @@ The CI pipeline runs automatically on:
 
 | Check | Description |
 |-------|-------------|
-| Build toolchain | Compiles cc65816, WLA-DX, gfx2snes, smconv |
-| Build examples | Builds all 19 example ROMs |
+| Build toolchain | Compiles cc65816, WLA-DX, gfx4snes, smconv |
+| Build examples | Builds all 27 example ROMs |
 | Build tests | Compiles test ROMs |
 | Validate examples | Checks for memory overlaps (symmap.py) |
 | Compiler tests | Runs compiler regression tests |
-| Example count | Verifies all 19 examples built successfully |
+| Example count | Verifies all 27 examples built successfully |
 
 ### CI Workflow
 

@@ -32,6 +32,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES_HOME="${OPENSNES_HOME:-$(dirname "$(dirname "$SCRIPT_DIR")")}"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
 SYMMAP="$OPENSNES_HOME/tools/symmap/symmap.py"
+VRAMCHECK="$OPENSNES_HOME/tools/vramcheck/vramcheck.py"
 
 # Counters
 TOTAL=0
@@ -216,6 +217,42 @@ check_required_symbols() {
     return 0
 }
 
+# Check for VRAM layout issues (overlapping regions, split DMA patterns)
+check_vram_layout() {
+    local dir="$1"
+    local name=$(basename "$dir")
+
+    # Only check if vramcheck tool exists
+    if [[ ! -f "$VRAMCHECK" ]]; then
+        return 0
+    fi
+
+    # Only check directories with C files
+    local c_files=$(find "$dir" -maxdepth 1 -name "*.c" -type f | head -1)
+    if [[ -z "$c_files" ]]; then
+        return 0
+    fi
+
+    log_verbose "Checking VRAM layout for $name..."
+
+    local output
+    output=$(python3 "$VRAMCHECK" --dir "$dir" --no-color 2>&1)
+    local exit_code=$?
+
+    # vramcheck returns 1 on errors (dangerous split DMA with overlapping regions)
+    if [[ $exit_code -ne 0 ]]; then
+        log_error "$name: VRAM layout issues detected!"
+        echo "$output" | grep -E "^DANGEROUS:|^ERRORS" | head -5
+        return 1
+    else
+        # Check for warnings (informational, don't fail)
+        if echo "$output" | grep -q "WARNINGS"; then
+            log_verbose "$name: VRAM layout has warnings (informational)"
+        fi
+        return 0
+    fi
+}
+
 # Validate a single example
 validate_example() {
     local dir="$1"
@@ -245,6 +282,11 @@ validate_example() {
 
     # Check memory overlaps
     if ! check_memory_overlaps "$dir"; then
+        failed=1
+    fi
+
+    # Check VRAM layout (only fails on dangerous patterns)
+    if ! check_vram_layout "$dir"; then
         failed=1
     fi
 
