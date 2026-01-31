@@ -11,15 +11,12 @@ Run tests for OpenSNES SDK.
 ```
 
 ## Requirements
-- Mesen2 emulator for ROM testing
-- Default path: `/Users/k0b3/workspaces/github/Mesen2/bin/osx-arm64/Release/Mesen`
+- Mesen2 emulator for ROM testing (must be in PATH or at `$HOME/bin/Mesen`)
 
 ## Implementation
 
 ### Build Validation
 ```bash
-cd /Users/k0b3/workspaces/github/opensnes
-
 # Build all examples and check for errors
 for dir in examples/*/; do
     for example in "$dir"*/; do
@@ -35,10 +32,7 @@ done
 ### ROM Testing
 ```bash
 # Launch ROM in Mesen2
-MESEN=/Users/k0b3/workspaces/github/Mesen2/bin/osx-arm64/Release/Mesen
-ROM=/Users/k0b3/workspaces/github/opensnes/examples/$1/*.sfc
-
-$MESEN $ROM &
+Mesen examples/$1/*.sfc &
 ```
 
 ### Lua Test Scripts (if available)

@@ -10,7 +10,7 @@ This project is deeply built upon the incredible work of **Alekmaul** and all th
 
 - The complete hardware abstraction library
 - SNESMOD audio engine integration
-- Asset conversion tools (gfx2snes, smconv)
+- Asset conversion tools (gfx4snes, smconv)
 - Decades of SNES development knowledge
 - 80+ working examples that taught us how SNES development works
 
@@ -25,7 +25,7 @@ OpenSNES is a fork that focuses on **modernizing the compiler toolchain** while 
 | **C Compiler** | 816-tcc (based on TinyCC) | cc65816 (cproc + QBE backend) |
 | **Assembler** | WLA-DX | WLA-DX (same) |
 | **Library** | PVSnesLib | Based on PVSnesLib |
-| **Tools** | gfx2snes, smconv, etc. | Same tools |
+| **Tools** | gfx4snes, smconv, etc. | Same tools (gfx4snes from PVSnesLib) |
 
 ### Why a New Compiler?
 

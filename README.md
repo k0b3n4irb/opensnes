@@ -38,7 +38,7 @@ make
 | Library | **Working** | Console, input, sprites, text, DMA, audio |
 | Audio (Legacy) | **Working** | Simple BRR sample playback, 8 voices |
 | Audio (SNESMOD) | **Working** | Impulse Tracker modules, SFX, echo/reverb |
-| Tools | **Working** | gfx2snes, font2snes, smconv |
+| Tools | **Working** | gfx4snes, font2snes, smconv |
 | Test Suite | **Working** | Mesen2-based automated testing |
 
 ## Examples
@@ -147,7 +147,7 @@ include $(OPENSNES)/make/common.mk
 
 | Tool | Purpose |
 |------|---------|
-| `gfx2snes` | Convert PNG to SNES tile format (2/4/8 bpp) |
+| `gfx4snes` | Convert PNG to SNES tiles, sprites, metasprites (from PVSnesLib) |
 | `font2snes` | Convert font images to SNES format |
 | `smconv` | Convert Impulse Tracker (.it) to SNESMOD soundbank |
 
