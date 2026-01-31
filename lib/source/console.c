@@ -22,6 +22,7 @@
  *============================================================================*/
 
 extern volatile u8 vblank_flag;
+extern volatile u8 oam_update_flag;    /* Set to trigger OAM DMA during VBlank */
 extern volatile u16 frame_count;
 extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
 extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
@@ -44,6 +45,9 @@ static u16 rand_seed;
  *============================================================================*/
 
 void consoleInit(void) {
+    /* Force blank - MUST be first to allow safe PPU register writes */
+    REG_INIDISP = INIDISP_FORCE_BLANK;
+
     /* Detect PAL/NTSC */
     is_pal_system = (REG_STAT78 & 0x10) ? TRUE : FALSE;
 
@@ -106,6 +110,9 @@ u8 getBrightness(void) {
  *============================================================================*/
 
 void WaitForVBlank(void) {
+    /* Mark OAM buffer for transfer during VBlank */
+    oam_update_flag = 1;
+
     /* Wait for VBlank flag to be set by NMI handler */
     while (!vblank_flag) {
         /* Idle - could use WAI instruction for power saving */
@@ -178,6 +185,9 @@ void setMode(u8 mode, u8 flags) {
  * VBlank Callback
  *============================================================================*/
 
+/* Assembly helper to read REG_RDNMI - compiler optimizes away volatile reads */
+extern void clearNmiFlag(void);
+
 void nmiSetBank(VBlankCallback callback, u8 bank) {
     /* Disable NMI during pointer write to prevent partial reads */
     REG_NMITIMEN = 0;
@@ -189,15 +199,16 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
     nmi_callback[3] = 0x00;  /* Padding */
 
     /* Clear NMI flag to prevent spurious interrupt */
-    (void)REG_RDNMI;
+    clearNmiFlag();
 
     /* Re-enable NMI and auto-joypad */
     REG_NMITIMEN = NMITIMEN_NMI_ENABLE | NMITIMEN_JOY_ENABLE;
 }
 
 void nmiSet(VBlankCallback callback) {
-    /* Default to bank 0 - works for most small/medium projects */
-    nmiSetBank(callback, 0);
+    /* Extract bank byte from 24-bit function pointer */
+    u8 bank = (u8)((unsigned long)callback >> 16);
+    nmiSetBank(callback, bank);
 }
 
 void nmiClear(void) {

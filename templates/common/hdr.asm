@@ -42,9 +42,9 @@
     NAME "__ROM_NAME__"     ; Game title (21 chars, pad with spaces)
     SLOWROM                 ; 2.68MHz ROM access
     LOROM                   ; LoROM memory mapping
-    CARTRIDGETYPE $00       ; ROM only (no special chips)
+    CARTRIDGETYPE __CARTRIDGETYPE__  ; $00=ROM, $02=ROM+SRAM
     ROMSIZE $06             ; 512Kbit = 64KB
-    SRAMSIZE $00            ; No SRAM
+    SRAMSIZE __SRAMSIZE__   ; $00=None, $03=8KB
     COUNTRY $01             ; North America (NTSC)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0
