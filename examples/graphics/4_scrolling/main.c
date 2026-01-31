@@ -13,8 +13,19 @@
 
 #include <snes.h>
 
-/* External data from assembly */
-extern void load_graphics(void);
+/*============================================================================
+ * External Graphics Data (defined in data.asm)
+ *============================================================================*/
+
+/* Foreground layer (shader) - scrolls at full speed */
+extern u8 shader_tiles[], shader_tiles_end[];
+extern u8 shader_map[], shader_map_end[];
+extern u8 shader_pal[], shader_pal_end[];
+
+/* Background layer (pvsneslib logo) - scrolls at half speed */
+extern u8 bg_tiles[], bg_tiles_end[];
+extern u8 bg_map[], bg_map_end[];
+extern u8 bg_pal[], bg_pal_end[];
 
 /* Scroll positions */
 s16 scroll_x;
@@ -34,29 +45,52 @@ int main(void) {
     /* Force blank during setup */
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
-    /* Load background graphics */
-    load_graphics();
+    /*------------------------------------------------------------------------
+     * Configure Background Tilemaps
+     *------------------------------------------------------------------------*/
+
+    /* BG1 (foreground) tilemap at VRAM $1800, 32x32 tiles */
+    bgSetMapPtr(0, 0x1800, SC_32x32);
+
+    /* BG2 (background) tilemap at VRAM $1400, 32x32 tiles */
+    bgSetMapPtr(1, 0x1400, SC_32x32);
+
+    /*------------------------------------------------------------------------
+     * Load Background Tiles and Palettes
+     *------------------------------------------------------------------------*/
+
+    /* BG1: tiles at $4000, palette at slot 1 (offset 16) */
+    bgInitTileSet(0, shader_tiles, shader_pal, 1,
+                  shader_tiles_end - shader_tiles,
+                  shader_pal_end - shader_pal,
+                  BG_16COLORS, 0x4000);
+
+    /* BG2: tiles at $5000, palette at slot 0 (offset 0) */
+    bgInitTileSet(1, bg_tiles, bg_pal, 0,
+                  bg_tiles_end - bg_tiles,
+                  bg_pal_end - bg_pal,
+                  BG_16COLORS, 0x5000);
+
+    /*------------------------------------------------------------------------
+     * Load Tilemap Data
+     *------------------------------------------------------------------------*/
+
+    dmaCopyVram(shader_map, 0x1800, shader_map_end - shader_map);
+    dmaCopyVram(bg_map, 0x1400, bg_map_end - bg_map);
+
+    /*------------------------------------------------------------------------
+     * Configure Video Mode
+     *------------------------------------------------------------------------*/
 
     /* Set Mode 1 (two 16-color BGs + one 4-color BG) */
-    REG_BGMODE = 0x01;
-
-    /* BG1 tilemap at $1800, 32x32 tiles */
-    REG_BG1SC = 0x18;
-    /* BG2 tilemap at $1400, 32x32 tiles */
-    REG_BG2SC = 0x14;
-
-    /* BG1 tiles at $4000, BG2 tiles at $5000 */
-    /* Format: (BG2_addr >> 12) << 4 | (BG1_addr >> 12) */
-    REG_BG12NBA = 0x54;
+    setMode(BG_MODE1, 0);
 
     /* Enable BG1 and BG2 on main screen */
     REG_TM = TM_BG1 | TM_BG2;
 
     /* Set initial scroll (0,0) */
-    REG_BG1HOFS = 0; REG_BG1HOFS = 0;
-    REG_BG1VOFS = 0; REG_BG1VOFS = 0;
-    REG_BG2HOFS = 0; REG_BG2HOFS = 0;
-    REG_BG2VOFS = 0; REG_BG2VOFS = 0;
+    bgSetScroll(0, 0, 0);
+    bgSetScroll(1, 0, 0);
 
     /* Enable display at full brightness */
     REG_INIDISP = INIDISP_BRIGHTNESS(15);

@@ -9,7 +9,7 @@
  */
 
 #include <snes.h>
-#include "sprites.h"
+#include "assets/sprites.h"
 
 /*============================================================================
  * Game State Variables (defined in helpers.asm)

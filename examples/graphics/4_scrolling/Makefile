@@ -9,7 +9,7 @@ ROM_NAME   := SCROLLING DEMO
 
 # Use the OpenSNES library
 USE_LIB    := 1
-LIB_MODULES := console input sprite dma
+LIB_MODULES := console input sprite dma background
 
 # Source files
 CSRC       := main.c
