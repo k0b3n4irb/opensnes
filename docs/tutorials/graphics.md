@@ -164,16 +164,32 @@ REG_BG2HOFS = (u8)(scroll_x >> 1);
 REG_BG2HOFS = (u8)((scroll_x >> 1) >> 8);
 ```
 
-## Using gfx2snes
+## Using gfx4snes
 
-Convert PNG images to SNES format:
+Convert PNG images to SNES format using gfx4snes (based on PVSnesLib):
 
 ```bash
-# Convert 8x8 tiles, 4bpp
-gfx2snes -s 8 -b 4 -c tiles.png tiles.h
+# Convert 8x8 tiles with palette output
+gfx4snes -s 8 -p -i tiles.png
+# Output: tiles.pic (tile data), tiles.pal (palette)
 
-# Convert 16x16 sprites
-gfx2snes -s 16 -b 4 -c sprites.png sprites.h
+# Convert 16x16 sprites with palette
+gfx4snes -s 16 -p -i sprites.png
+
+# Convert with metasprite definition (for animation)
+gfx4snes -s 16 -p -T -X 32 -Y 48 -i character.png
+# Output: character.pic, character.pal, character_meta.inc
+```
+
+Include the generated data in your assembly file:
+```asm
+sprite_tiles:
+.incbin "res/sprites.pic"
+sprite_tiles_end:
+
+sprite_pal:
+.incbin "res/sprites.pal"
+sprite_pal_end:
 ```
 
 ## Example: Complete Background Setup

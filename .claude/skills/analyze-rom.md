@@ -47,9 +47,8 @@ grep -E "^[0-9A-F]+:" <rom>.sym | wc -l
 
 ### Mesen2 Debug Launch
 ```bash
-# Launch in debugger mode
-MESEN=/Users/k0b3/workspaces/github/Mesen2/bin/osx-arm64/Release/Mesen
-$MESEN --debugger <rom>.sfc &
+# Launch in debugger mode (Mesen must be in PATH)
+Mesen --debugger <rom>.sfc &
 ```
 
 ## Output

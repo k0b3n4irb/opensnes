@@ -14,11 +14,9 @@ Build the entire SDK or specific components.
 
 ## Implementation
 
-When invoked, execute:
+When invoked, execute from the opensnes root directory:
 
 ```bash
-cd /Users/k0b3/workspaces/github/opensnes
-
 # Parse argument
 case "$1" in
   "clean")
