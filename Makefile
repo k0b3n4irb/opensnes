@@ -80,9 +80,11 @@ tests: compiler tools
 	$(MAKE) -C $(TESTS_PATH)
 
 docs:
-	cd docs && doxygen Doxyfile
-	@echo "Documentation generated in docs/build/html/"
-	@echo "Open docs/build/html/index.html in a browser to view"
+	doxygen Doxyfile
+	@echo "========================================="
+	@echo "Documentation generated in doc/html/"
+	@echo "Open doc/html/index.html in a browser"
+	@echo "========================================="
 
 #------------------------------------------------------------------------------
 # Help
