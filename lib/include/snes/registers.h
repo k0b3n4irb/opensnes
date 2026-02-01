@@ -132,6 +132,15 @@
 /** @brief CGRAM data write (W) */
 #define REG_CGDATA      (*(vu8*)0x2122)
 
+/** @brief BG1/BG2 window mask settings (W) */
+#define REG_W12SEL      (*(vu8*)0x2123)
+
+/** @brief BG3/BG4 window mask settings (W) */
+#define REG_W34SEL      (*(vu8*)0x2124)
+
+/** @brief OBJ/MATH window mask settings (W) */
+#define REG_WOBJSEL     (*(vu8*)0x2125)
+
 /** @brief Window 1 left position (W) */
 #define REG_WH0         (*(vu8*)0x2126)
 
@@ -144,10 +153,10 @@
 /** @brief Window 2 right position (W) */
 #define REG_WH3         (*(vu8*)0x2129)
 
-/** @brief BG window enable (W) */
+/** @brief BG1-4 window logic (W) */
 #define REG_WBGLOG      (*(vu8*)0x212A)
 
-/** @brief OBJ window enable (W) */
+/** @brief OBJ/MATH window logic (W) */
 #define REG_WOBJLOG     (*(vu8*)0x212B)
 
 /** @brief Main screen designation (W) */

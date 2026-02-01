@@ -76,6 +76,15 @@
 /* Mode 7 */
 #include <snes/mode7.h>
 
+/* HDMA */
+#include <snes/hdma.h>
+
+/* Window/Masking */
+#include <snes/window.h>
+
+/* Color Math */
+#include <snes/colormath.h>
+
 /*============================================================================
  * Optional Headers (include separately if needed)
  *============================================================================*/

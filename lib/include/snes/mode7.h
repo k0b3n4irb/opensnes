@@ -111,4 +111,102 @@ void mode7SetCenter(s16 x, s16 y);
  */
 void mode7SetScroll(s16 x, s16 y);
 
+/*============================================================================
+ * Higher-Level Mode 7 Functions
+ *============================================================================*/
+
+/**
+ * @brief Set rotation in degrees (0-359)
+ *
+ * Convenience function that converts degrees to the internal 0-255 format.
+ *
+ * @param degrees Rotation angle in degrees (0-359)
+ *
+ * @code
+ * mode7Rotate(45);   // Rotate 45 degrees
+ * mode7Rotate(180);  // Rotate 180 degrees
+ * @endcode
+ */
+void mode7Rotate(u16 degrees);
+
+/**
+ * @brief Set rotation and scale together
+ *
+ * Combined transformation with rotation in degrees and percentage-based scaling.
+ *
+ * @param degrees Rotation angle in degrees (0-359)
+ * @param scalePercent Scale as percentage (100 = normal, 50 = half, 200 = double)
+ *
+ * @code
+ * mode7Transform(45, 100);   // 45 degree rotation, normal scale
+ * mode7Transform(0, 50);     // No rotation, 2x zoom in
+ * mode7Transform(90, 200);   // 90 degrees, 0.5x zoom out
+ * @endcode
+ */
+void mode7Transform(u16 degrees, u16 scalePercent);
+
+/**
+ * @brief Set pivot point (screen coordinates)
+ *
+ * Sets the rotation center using screen coordinates (0-255).
+ * The pivot point is where the Mode 7 plane appears to rotate around.
+ *
+ * @param x Screen X coordinate (0-255)
+ * @param y Screen Y coordinate (0-223)
+ *
+ * @code
+ * mode7SetPivot(128, 112);  // Center of screen
+ * mode7SetPivot(0, 0);      // Top-left corner
+ * @endcode
+ */
+void mode7SetPivot(u8 x, u8 y);
+
+/**
+ * @brief Set Mode 7 matrix directly
+ *
+ * For advanced users who need direct control over the transformation matrix.
+ * Bypasses the angle/scale system.
+ *
+ * The matrix maps screen (x,y) to Mode 7 plane (X,Y):
+ * X = A*(x-cx) + B*(y-cy) + sx + cx
+ * Y = C*(x-cx) + D*(y-cy) + sy + cy
+ *
+ * @param a Matrix A (1.7.8 fixed point)
+ * @param b Matrix B (1.7.8 fixed point)
+ * @param c Matrix C (1.7.8 fixed point)
+ * @param d Matrix D (1.7.8 fixed point)
+ */
+void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d);
+
+/**
+ * @brief Set Mode 7 settings register
+ *
+ * Controls flipping and out-of-bounds behavior.
+ *
+ * @param settings M7SEL value:
+ *   Bit 7: Flip vertically
+ *   Bit 6: Flip horizontally
+ *   Bits 7-6: Out of bounds behavior (0=wrap, 0x80=transparent, 0xC0=tile 0)
+ */
+void mode7SetSettings(u8 settings);
+
+/*============================================================================
+ * Mode 7 Settings Constants
+ *============================================================================*/
+
+/** @brief Wrap around when out of bounds (default) */
+#define MODE7_WRAP          0x00
+
+/** @brief Show transparent when out of bounds */
+#define MODE7_TRANSPARENT   0x80
+
+/** @brief Show tile 0 when out of bounds */
+#define MODE7_TILE0         0xC0
+
+/** @brief Flip Mode 7 plane horizontally */
+#define MODE7_FLIP_H        0x01
+
+/** @brief Flip Mode 7 plane vertically */
+#define MODE7_FLIP_V        0x02
+
 #endif /* OPENSNES_MODE7_H */
