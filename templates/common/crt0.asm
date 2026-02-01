@@ -145,9 +145,17 @@
 ;------------------------------------------------------------------------------
 ; ROM Setup
 ;------------------------------------------------------------------------------
+; LoROM: Slot 0 starts at $8000, so .ORG 0 = address $8000
+; HiROM: Slot 0 starts at $0000 (64KB banks), so .ORG $8000 = address $8000
+;        Code must be at $8000+ to be accessible via bank $00 mirror.
+;------------------------------------------------------------------------------
 
 .BANK 0
-.ORG 0
+.ifdef HIROM
+.ORG $8000              ; HiROM: 64KB bank, place code at $8000+
+.else
+.ORG 0                  ; LoROM: Slot starts at $8000, so .ORG 0 = $8000
+.endif
 .EMPTYFILL $00
 
 ;------------------------------------------------------------------------------
@@ -582,6 +590,15 @@ IrqHandler:
 ;
 ; The NMI handler calls oamUpdate if oam_update_flag is set.
 ; This function must be provided by either the library or oam_helpers.asm.
+;==============================================================================
+
+;==============================================================================
+; Note on C Code Placement
+;==============================================================================
+; The compiler generates data accesses using `lda.l $0000,x` which reads from
+; bank $00. In both LoROM and HiROM modes, bank $00:$8000-$FFFF contains ROM.
+; C code sections use SUPERFREE and will be placed in available ROM space.
+; No special BASE directive is needed since code stays in bank $00.
 ;==============================================================================
 
 ;==============================================================================

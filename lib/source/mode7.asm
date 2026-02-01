@@ -5,7 +5,11 @@
 ; Based on PVSnesLib Mode 7 implementation by Alekmaul (zlib license)
 ;==============================================================================
 
-.INCLUDE "lib_memmap.inc"
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
+.include "lib_memmap.inc"
+.endif
 
 ;------------------------------------------------------------------------------
 ; RAM variables for Mode 7

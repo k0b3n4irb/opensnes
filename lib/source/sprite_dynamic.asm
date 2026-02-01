@@ -13,7 +13,11 @@
 ; License: MIT (original code zlib by Alekmaul)
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 ;------------------------------------------------------------------------------
 ; Constants
