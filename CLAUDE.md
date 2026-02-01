@@ -4,7 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-OpenSNES is a modern, open-source SDK for Super Nintendo (SNES) development. It provides a QBE-based C compiler (cc65816), WLA-DX assembler, and a library for SNES hardware abstraction.
+OpenSNES is a modern, open-source SDK for Super Nintendo (SNES) development, forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib) with a focus on **ease of use** and **developer experience**.
+
+### Mission
+
+Make SNES development accessible to anyone with:
+- Basic C programming knowledge
+- Curiosity about how the SNES hardware works
+
+The SDK should feel familiar to modern developers while respecting SNES constraints. No arcane setup, no cryptic errors, no guessing what went wrong.
+
+### What Makes OpenSNES Different
+
+| PVSnesLib | OpenSNES |
+|-----------|----------|
+| tcc-based compiler | QBE-based compiler (cc65816) with better diagnostics |
+| Complex build setup | Simple `make` with sensible defaults |
+| Scattered documentation | Consolidated guides and working examples |
+| Trial-and-error debugging | symmap overlap checker, black screen tests |
+| Windows-centric | Cross-platform (Linux, macOS, Windows) |
+
+### Current Status: v0.1.0 (Alpha)
+
+The SDK is functional and approaching production-ready. All core modules work, 30 examples build and run, CI passes on all platforms. See [ROADMAP.md](ROADMAP.md) for detailed status.
+
+### Components
+
+- **C Compiler (cc65816)**: QBE-based compiler targeting the 65816 CPU
+- **Assembler (WLA-DX)**: Industry-standard assembler for 65816 and SPC700
+- **Hardware Library**: Clean C API for PPU, input, DMA, sprites, text, and audio
+- **Asset Tools**: gfx4snes, font2snes, smconv
 
 ## Build Commands
 

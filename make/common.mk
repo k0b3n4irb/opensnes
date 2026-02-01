@@ -35,7 +35,12 @@
 
 # OPENSNES must be set by the including Makefile (absolute path)
 ifndef OPENSNES
-$(error OPENSNES is not set. Set it to the absolute path of the opensnes directory)
+$(error OPENSNES is not set. Add this to your Makefile: OPENSNES := /path/to/opensnes)
+endif
+
+# Check that OPENSNES directory exists
+ifeq ($(wildcard $(OPENSNES)/make/common.mk),)
+$(error OPENSNES path is invalid: $(OPENSNES) - directory does not exist or is not an OpenSNES installation)
 endif
 
 # Tool binaries
@@ -44,6 +49,22 @@ AS       := $(OPENSNES)/bin/wla-65816
 LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
+
+# Check that compiler toolchain exists
+ifeq ($(wildcard $(CC)),)
+$(info )
+$(info ========================================================================)
+$(info  ERROR: OpenSNES compiler not found at $(CC))
+$(info )
+$(info  The compiler toolchain has not been built. Run:)
+$(info    cd $(OPENSNES) && make compiler)
+$(info )
+$(info  If that fails, ensure submodules are initialized:)
+$(info    cd $(OPENSNES) && git submodule update --init --recursive)
+$(info ========================================================================)
+$(info )
+$(error Compiler not built - see instructions above)
+endif
 
 # Shared templates
 TEMPLATES := $(OPENSNES)/templates/common
@@ -64,6 +85,25 @@ USE_LIB     ?= 0
 # Library directory
 LIBDIR      := $(OPENSNES)/lib/build
 LIB_MODULES ?= console
+
+# Check library is built when USE_LIB=1
+ifeq ($(USE_LIB),1)
+ifeq ($(wildcard $(LIBDIR)/console.o),)
+$(info )
+$(info ========================================================================)
+$(info  ERROR: OpenSNES library not built)
+$(info )
+$(info  Your project uses USE_LIB=1 but the library has not been compiled.)
+$(info  Run:)
+$(info    cd $(OPENSNES) && make lib)
+$(info )
+$(info  Or build everything:)
+$(info    cd $(OPENSNES) && make)
+$(info ========================================================================)
+$(info )
+$(error Library not built - see instructions above)
+endif
+endif
 
 # OAM helpers (when USE_LIB=0, we need standalone OAM functions)
 ifeq ($(USE_LIB),0)
