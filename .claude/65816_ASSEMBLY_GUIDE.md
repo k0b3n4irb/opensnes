@@ -249,7 +249,7 @@ SNES Examples:
 | 16 | Indirect Long,Y | LDA [$12],Y | 2 | [24-bit]+Y |
 | 17 | Stack Relative | LDA $12,S | 2 | $00:(S+$12) |
 | 18 | Stack Relative Indirect,Y | LDA ($12,S),Y | 2 | DB:[S+$12]+Y |
-| 19 | Block Move | MVN #$7E,#$7F | 3 | Source bank, Dest bank |
+| 19 | Block Move | MVN src,dst | 3 | Block memory move (see section 9.3) |
 
 ### 4.2 Addressing Mode Diagrams
 
@@ -691,7 +691,7 @@ NMI_HANDLER:
         RTI
 ```
 
-> **SNES Note**: You MUST read $4210 (RDNMI) to acknowledge the NMI, otherwise it may not trigger again properly.
+> **SNES Note**: Reading $4210 (RDNMI) clears the NMI flag. While not strictly required for the current NMI to complete, failing to read it can cause issues detecting subsequent VBlanks. Best practice: always read $4210 early in your NMI handler.
 
 ### 7.4 Waiting for VBlank
 
@@ -712,10 +712,12 @@ WAIT_NMI:
 ; Method 3: Use a VBlank counter (set by NMI handler)
 WAIT_VBLANK:
         LDA     VBLANK_COUNT
--       CMP     VBLANK_COUNT
-        BEQ     -           ; Wait for it to change
+-       CMP     VBLANK_COUNT    ; WLA-DX anonymous label: - and +
+        BEQ     -               ; Branch back to previous -
         RTS
 ```
+
+> **Note**: The `-` and `+` are WLA-DX anonymous labels. `-` branches backward to the previous `-` label, `+` branches forward to the next `+` label.
 
 ---
 
@@ -747,11 +749,12 @@ WAIT_VBLANK:
 
 ```asm
 ; Copy data to VRAM using DMA channel 0
-        STZ     $2115       ; VRAM increment mode
+        LDA     #$80
+        STA     $2115       ; VRAM: increment by 1 word after high byte write
 
         REP     #$20
         LDA     #VRAM_DEST
-        STA     $2116       ; VRAM address
+        STA     $2116       ; VRAM address (word address)
 
         LDA     #.LOWORD(SOURCE_DATA)
         STA     $4302       ; Source address (low)
@@ -823,25 +826,32 @@ WAIT_VBLANK:
 ### 9.1 Memory Fill
 
 ```asm
-; Fill COUNT bytes at ADDR with VALUE
-; Uses 16-bit operations when possible
+; Fill COUNT bytes at ADDR with VALUE (8-bit version, simple)
 MEMFILL:
-        REP     #$30        ; 16-bit A and X
+        SEP     #$20        ; 8-bit A
+        REP     #$10        ; 16-bit X
         LDA     VALUE
         LDX     COUNT
         BEQ     DONE
 LOOP:
         DEX
-        DEX
         STA     ADDR,X
         BNE     LOOP
-        ; Handle odd byte
-        CPX     #0
-        BPL     DONE
-        SEP     #$20
-        STA     ADDR
 DONE:
-        SEP     #$30
+        RTS
+
+; Fill COUNT bytes at ADDR with VALUE (16-bit optimized)
+; COUNT must be even, ADDR must be word-aligned
+MEMFILL_FAST:
+        REP     #$30        ; 16-bit A and X
+        LDA     VALUE       ; 16-bit value (low byte duplicated)
+        LDX     COUNT
+        BEQ     +
+-       DEX
+        DEX
+        STA     ADDR,X
+        BNE     -
++       SEP     #$30
         RTS
 ```
 
@@ -869,17 +879,21 @@ LOOP:
 ```asm
 ; Move 4096 bytes from $7E2000 to $7F0000
         REP     #$30            ; 16-bit A and X/Y
-        LDA     #4096-1         ; Count - 1
+        LDA     #4096-1         ; Count - 1 (in C register)
         LDX     #$2000          ; Source offset
         LDY     #$0000          ; Dest offset
-        MVN     $7F,$7E         ; Dest bank, Source bank (!)
+        MVN     $7E,$7F         ; WLA-DX syntax: source_bank, dest_bank
         SEP     #$30
-
-; Note: MVN operand order is counter-intuitive!
-; MVN dest_bank, source_bank
 ```
 
-> **SNES Note**: MVN/MVP are very fast for large copies but tie up the CPU. For VRAM transfers, use DMA instead.
+> **WARNING - Assembler syntax varies!**
+> - **WLA-DX**: `MVN source_bank, dest_bank` (as shown above)
+> - **ca65**: `MVN dest_bank, source_bank` (opposite order!)
+> - **Opcode encoding**: Always dest first, then source in the bytes
+>
+> Always verify with your assembler's documentation!
+
+> **SNES Note**: MVN/MVP are fast for RAM-to-RAM copies but tie up the CPU entirely. For VRAM/CGRAM/OAM transfers, use DMA instead (DMA is faster and doesn't block interrupts).
 
 ### 9.4 16-Bit Signed Comparison
 
@@ -935,12 +949,18 @@ LESS_THAN:
 
 ### 10.3 VBlank Timing Budget
 
-> **SNES Note**: VBlank lasts approximately:
-> - NTSC: ~2,273 scanlines × 4 cycles = ~9,092 master cycles ≈ **2,662 CPU cycles** at fast speed
-> - PAL: ~2,273 scanlines × 4 cycles = ~9,092 master cycles ≈ **2,662 CPU cycles**
+> **SNES Note**: VBlank timing:
+> - NTSC: 262 total scanlines, VBlank is ~37 scanlines (225-261)
+> - PAL: 312 total scanlines, VBlank is ~87 scanlines (225-311)
+> - Each scanline: 1364 master cycles
 >
-> DMA transfers consume: ~8 master cycles per byte
-> Safe VBlank DMA budget: **~4 KB** (leaves time for CPU work)
+> **Usable VBlank time:**
+> - NTSC: ~37 × 1364 = ~50,468 master cycles ≈ **2,500-3,000 CPU cycles**
+> - PAL: ~87 × 1364 = ~118,668 master cycles ≈ **6,000-7,000 CPU cycles**
+>
+> **DMA transfer speed:** ~8 master cycles per byte (CPU halted during DMA)
+>
+> **Safe DMA budget:** ~4 KB (NTSC) to leave time for CPU work (scroll updates, OAM, etc.)
 
 ---
 
