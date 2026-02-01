@@ -45,13 +45,9 @@ testlink
 .DS_Store
 **/.DS_Store
 
-# Claude Code session data (transient)
-.claude/plans/
-.claude/projects/
-.claude/settings.json
-.claude/settings.local.json
-# Track CLAUDE.md and .claude/KNOWLEDGE.md (important documentation)
-# Track .claude/skills/ (automation skills)
+# Claude
+.claude/
+CLAUDE.md
 
 # Build directories
 build/

@@ -7,10 +7,6 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := tone.sfc
 ROM_NAME := OPENSNES TADA
 
-# Use the library for input handling
-USE_LIB     := 1
-LIB_MODULES := console input sprite dma
-
 # Source files
 CSRC     := main.c
 ASMSRC   := spc.asm data.asm
