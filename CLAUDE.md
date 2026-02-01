@@ -38,7 +38,7 @@ python3 tools/symmap/symmap.py --check-overlap game.sym
 # Full build - must pass
 make clean && make
 
-# Verify example count (CI expects 27+)
+# Verify example count (CI expects 30)
 find examples -name "*.sfc" | wc -l
 
 # Run compiler tests
@@ -106,13 +106,25 @@ C Code → cproc → QBE IR → w65816 backend → 65816 Assembly (.asm)
 
 ### Directory Structure
 
-- `compiler/` - Compiler toolchain (cproc, qbe, wla-dx as submodules)
+- `compiler/` - Compiler toolchain (cproc, qbe, wla-dx as git submodules with fork/upstream remotes)
 - `lib/` - OpenSNES library (headers in `include/snes/`, source in `source/`)
 - `examples/` - Working examples organized by category (text, graphics, audio, basics, game)
 - `templates/common/` - Shared runtime files (crt0.asm, hdr.asm, runtime.asm)
 - `tools/` - Asset converters (gfx4snes, font2snes, smconv) and debugging tools (symmap)
 - `tests/` - Test infrastructure with Mesen2 Lua integration
-- `.claude/skills/` - Automation skills (build, test, new-example, analyze-rom, spc700-audio)
+- `.claude/skills/` - Automation skills (build, test, new-example, analyze-rom, spc700-audio, submodules)
+
+### Git Submodules
+
+The compiler toolchain uses git submodules with a fork/upstream structure:
+
+| Submodule | Origin (fork) | Upstream (original) |
+|-----------|---------------|---------------------|
+| compiler/wla-dx | k0b3n4irb/wla-dx | vhelin/wla-dx |
+| compiler/cproc | k0b3n4irb/cproc | ~mcf/cproc (sr.ht) |
+| compiler/qbe | k0b3n4irb/qbe | c9x.me/git/qbe |
+
+Use `/submodules check` to see upstream updates, `/submodules sync <name>` to merge them.
 
 ### Build System
 
@@ -214,8 +226,9 @@ grep -E "(7e:00[0-2]|00:00[0-2])" game.sym
 
 | Document | Purpose |
 |----------|---------|
+| **`.claude/65816_ASSEMBLY_GUIDE.md`** | 65816 CPU programming: instructions, addressing modes, techniques (with SNES annotations) |
 | **`.claude/SNES_HARDWARE_REFERENCE.md`** | Complete SNES technical bible (CPU, PPU, APU, DMA, timing, cartridge format) |
 | **`.claude/SNES_ROSETTA_STONE.md`** | OpenSNES vs PVSnesLib comparison, SDK patterns, API mapping |
 | **`.claude/KNOWLEDGE.md`** | Debugging knowledge (22 sections: memory, DMA, HDMA, BG modes, color format, audio, fixed compiler bugs, OAM/sprites) |
-| **`.claude/skills/`** | Automation skills (build, test, new-example, analyze-rom, spc700-audio) |
+| **`.claude/skills/`** | Automation skills (build, test, new-example, analyze-rom, spc700-audio, submodules) |
 | **PVSnesLib** | Reference SDK with 80+ working examples for comparison |
