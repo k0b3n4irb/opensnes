@@ -11,7 +11,7 @@
 #ifndef OPENSNES_TEXT_H
 #define OPENSNES_TEXT_H
 
-#include "types.h"
+#include <snes/types.h>
 
 /**
  * @brief Text rendering configuration

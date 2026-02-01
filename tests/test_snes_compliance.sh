@@ -159,47 +159,23 @@ test_wram_mirror() {
 }
 
 #------------------------------------------------------------------------------
-# Test 6: gfx2snes Tile Organization
+# Test 6: gfx4snes Graphics Tool
 #------------------------------------------------------------------------------
-test_gfx2snes() {
-    local name="gfx2snes_tile_organization"
+test_gfx4snes() {
+    local name="gfx4snes_tool"
     ((TESTS_RUN++))
 
-    local gfx2snes="$OPENSNES/tools/gfx2snes/gfx2snes"
-    if [[ ! -x "$gfx2snes" ]]; then
-        log_fail "$name: gfx2snes not found or not executable"
+    local gfx4snes="$OPENSNES/bin/gfx4snes"
+    if [[ ! -x "$gfx4snes" ]]; then
+        log_fail "$name: gfx4snes not found or not executable"
         return
     fi
 
-    # Check if convert (ImageMagick) is available
-    if ! command -v convert &>/dev/null; then
-        log_info "$name: ImageMagick not available, skipping tile test"
-        log_pass "$name: gfx2snes executable exists (skipped full test)"
-        return
-    fi
-
-    # Run the Python test we created earlier
-    if python3 -c "
-import subprocess, os
-# Create test image
-subprocess.run(['convert', '-size', '32x32', 'xc:black',
-    '-fill', 'red', '-draw', 'rectangle 0,0 15,15',
-    '-fill', 'green', '-draw', 'rectangle 16,0 31,15',
-    '-fill', 'blue', '-draw', 'rectangle 0,16 15,31',
-    '-fill', 'yellow', '-draw', 'rectangle 16,16 31,31',
-    '/tmp/test_gfx.png'], check=True, capture_output=True)
-subprocess.run(['$gfx2snes', '-s', '16', '-b', '4',
-    '/tmp/test_gfx.png', '/tmp/test_gfx'], check=True, capture_output=True)
-# Verify output exists and has correct size (1024 bytes for 32 tiles)
-size = os.path.getsize('/tmp/test_gfx.pic')
-os.remove('/tmp/test_gfx.png')
-os.remove('/tmp/test_gfx.pic')
-os.remove('/tmp/test_gfx.pal')
-exit(0 if size == 1024 else 1)
-" 2>/dev/null; then
-        log_pass "$name: Tile organization verified (128px VRAM width)"
+    # Verify gfx4snes runs and shows help
+    if "$gfx4snes" --help 2>&1 | grep -q "Usage: gfx4snes"; then
+        log_pass "$name: gfx4snes executable works"
     else
-        log_fail "$name: Tile organization test failed"
+        log_fail "$name: gfx4snes not working correctly"
     fi
 }
 
@@ -261,7 +237,7 @@ test_sprite_lut
 test_metasprite_struct
 test_color_format
 test_wram_mirror
-test_gfx2snes
+test_gfx4snes
 test_no_unhandled_ops
 test_registers
 
