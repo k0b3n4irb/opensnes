@@ -175,7 +175,7 @@ jobs:
       - name: Verify example count (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
-          EXPECTED_EXAMPLES=25
+          EXPECTED_EXAMPLES=30
           ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
           echo "Expected examples: $EXPECTED_EXAMPLES"
           echo "Actual examples:   $ACTUAL_EXAMPLES"
@@ -196,7 +196,7 @@ jobs:
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          EXPECTED_EXAMPLES=25
+          EXPECTED_EXAMPLES=30
           ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
           echo "Expected examples: $EXPECTED_EXAMPLES"
           echo "Actual examples:   $ACTUAL_EXAMPLES"
