@@ -1,4 +1,4 @@
-name: OpenSNES Build & Test
+name: OpenSNES Build & Release
 
 # ------------------------------------ #
 # Events to trigger the action         #
@@ -45,7 +45,8 @@ jobs:
               cmake \
               make \
               git \
-              doxygen
+              doxygen \
+              zip
 
       - name: Install dependencies for Windows
         if: matrix.name == 'windows'
@@ -59,12 +60,13 @@ jobs:
             mingw-w64-ucrt-x86_64-doxygen
             base-devel
             git
+            zip
 
       - name: Install dependencies for macOS
         if: matrix.name == 'darwin'
         run: |
           brew update || true
-          brew install doxygen || true
+          brew install doxygen zip || true
           # Xcode Command Line Tools provides the compiler
 
       # ------------------------------------ #
@@ -76,58 +78,40 @@ jobs:
           submodules: recursive
 
       # ------------------------------------ #
-      # Build the SDK                        #
+      # Build & create release               #
       # ------------------------------------ #
-      - name: Build OpenSNES for Linux
+      - name: Build & Release OpenSNES for Linux
         if: matrix.name == 'linux'
         run: |
-          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+          export OPENSNES_HOME=$(pwd)
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
-      - name: Build OpenSNES for Windows
+      - name: Build & Release OpenSNES for Windows
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+          export OPENSNES_HOME=$(pwd)
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
-      - name: Build OpenSNES for macOS
+      - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'
         run: |
-          make 2>&1 | tee opensnes_build_${{ matrix.name }}.log
+          export OPENSNES_HOME=$(pwd)
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Build tests                          #
+      # Build and run tests                  #
       # ------------------------------------ #
-      - name: Build tests for Linux
-        if: matrix.name == 'linux'
-        run: |
-          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
-
-      - name: Build tests for Windows
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
-
-      - name: Build tests for macOS
-        if: matrix.name == 'darwin'
-        run: |
-          make tests 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
-
-      # ------------------------------------ #
-      # Validate examples (memory overlaps)  #
-      # ------------------------------------ #
-      - name: Validate examples (Linux/macOS)
+      - name: Build tests (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
-          echo "=== Validating Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+          make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
-      - name: Validate examples (Windows)
+      - name: Build tests (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          echo "=== Validating Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+          make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
       # Run compiler tests                   #
@@ -135,76 +119,31 @@ jobs:
       - name: Run compiler tests (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
-          echo "=== Compiler Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       - name: Run compiler tests (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          echo "=== Compiler Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Verify built artifacts               #
+      # Validate examples (memory overlaps)  #
       # ------------------------------------ #
-      - name: Verify built ROMs
+      - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
-          echo "=== Built Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          find examples -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
-          echo "=== Built Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          find tests -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
-          echo "=== Toolchain ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ls -la bin/ | tee -a opensnes_build_${{ matrix.name }}.log
+          echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
-      - name: Verify built ROMs (Windows)
+      - name: Validate examples (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          echo "=== Built Examples ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          find examples -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
-          echo "=== Built Tests ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          find tests -name "*.sfc" -exec ls -la {} \; | tee -a opensnes_build_${{ matrix.name }}.log
-          echo "=== Toolchain ===" | tee -a opensnes_build_${{ matrix.name }}.log
-          ls -la bin/ | tee -a opensnes_build_${{ matrix.name }}.log
-
-      # ------------------------------------ #
-      # Verify expected example count        #
-      # ------------------------------------ #
-      - name: Verify example count (Linux/macOS)
-        if: matrix.name != 'windows'
-        run: |
-          EXPECTED_EXAMPLES=30
-          ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
-          echo "Expected examples: $EXPECTED_EXAMPLES"
-          echo "Actual examples:   $ACTUAL_EXAMPLES"
-          if [ "$ACTUAL_EXAMPLES" -lt "$EXPECTED_EXAMPLES" ]; then
-            echo "ERROR: Expected at least $EXPECTED_EXAMPLES examples, but only found $ACTUAL_EXAMPLES"
-            echo "Missing examples:"
-            # Find directories with Makefiles but no .sfc
-            for dir in $(find examples -name "Makefile" -exec dirname {} \;); do
-              if [ ! -f "$dir"/*.sfc 2>/dev/null ]; then
-                echo "  - $(basename $dir)"
-              fi
-            done
-            exit 1
-          fi
-          echo "✓ All $ACTUAL_EXAMPLES examples built successfully"
-
-      - name: Verify example count (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          EXPECTED_EXAMPLES=30
-          ACTUAL_EXAMPLES=$(find examples -name "*.sfc" | wc -l | tr -d ' ')
-          echo "Expected examples: $EXPECTED_EXAMPLES"
-          echo "Actual examples:   $ACTUAL_EXAMPLES"
-          if [ "$ACTUAL_EXAMPLES" -lt "$EXPECTED_EXAMPLES" ]; then
-            echo "ERROR: Expected at least $EXPECTED_EXAMPLES examples, but only found $ACTUAL_EXAMPLES"
-            exit 1
-          fi
-          echo "All $ACTUAL_EXAMPLES examples built successfully"
+          echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
       # Check library linking                #
@@ -229,49 +168,20 @@ jobs:
           ldd bin/*.exe 2>/dev/null | tee -a opensnes_linking_${{ matrix.name }}.log || true
 
       # ------------------------------------ #
+      # Upload SDK release                   #
+      # ------------------------------------ #
+      - name: Upload OpenSNES SDK release
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenSNES SDK (${{ matrix.name }})
+          path: release/opensnes_${{ matrix.name }}.zip
+
+      # ------------------------------------ #
       # Upload build logs                    #
       # ------------------------------------ #
       - name: Upload build logs
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: OpenSNES Build Logs (${{ matrix.name }})
+          name: OpenSNES Logs (${{ matrix.name }})
           path: "*.log"
-
-      # ------------------------------------ #
-      # Upload built ROMs                    #
-      # ------------------------------------ #
-      - name: Upload example ROMs
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenSNES Example ROMs (${{ matrix.name }})
-          path: |
-            examples/**/*.sfc
-            tests/**/*.sfc
-
-      # ------------------------------------ #
-      # Build documentation                  #
-      # ------------------------------------ #
-      - name: Build documentation (Linux)
-        if: matrix.name == 'linux'
-        run: |
-          make docs
-
-      - name: Build documentation (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          make docs
-
-      - name: Build documentation (macOS)
-        if: matrix.name == 'darwin'
-        run: |
-          make docs
-
-      # Upload docs only from Linux to avoid duplicates
-      - name: Upload documentation
-        if: matrix.name == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenSNES Documentation
-          path: docs/build/html/

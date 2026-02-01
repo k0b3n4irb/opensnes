@@ -30,8 +30,20 @@ LIB_PATH      := lib
 EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
+# Platform detection for release naming
+ifeq ($(OS),Windows_NT)
+    PLATFORM := windows
+else ifeq ($(UNAME),Darwin)
+    PLATFORM := darwin
+else
+    PLATFORM := linux
+endif
+
+RELEASE_DIR := release
+RELEASE_NAME := opensnes_$(PLATFORM)
+
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules docs help
+.PHONY: all clean install compiler tools lib examples tests submodules docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -87,6 +99,42 @@ docs:
 	@echo "========================================="
 
 #------------------------------------------------------------------------------
+# Release packaging
+#------------------------------------------------------------------------------
+
+release: all docs
+	@echo ""
+	@echo "=========================================="
+	@echo "Creating OpenSNES SDK release package..."
+	@echo "=========================================="
+	@mkdir -p $(RELEASE_DIR)/opensnes
+	@mkdir -p $(RELEASE_DIR)/opensnes/bin
+	@mkdir -p $(RELEASE_DIR)/opensnes/lib
+	@mkdir -p $(RELEASE_DIR)/opensnes/make
+	@mkdir -p $(RELEASE_DIR)/opensnes/templates
+	@mkdir -p $(RELEASE_DIR)/opensnes/tools
+	@mkdir -p $(RELEASE_DIR)/opensnes/docs
+	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
+	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
+	@cp -r lib/lib $(RELEASE_DIR)/opensnes/lib/ 2>/dev/null || true
+	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
+	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
+	@cp -r tools/symmap $(RELEASE_DIR)/opensnes/tools/
+	@cp -r tools/vramcheck $(RELEASE_DIR)/opensnes/tools/
+	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
+	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
+	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
+	@cd $(RELEASE_DIR) && zip -q -r $(RELEASE_NAME).zip opensnes
+	@rm -rf $(RELEASE_DIR)/opensnes
+	@echo ""
+	@echo "=========================================="
+	@echo "Release created: $(RELEASE_DIR)/$(RELEASE_NAME).zip"
+	@echo "=========================================="
+
+clean-release:
+	-rm -rf $(RELEASE_DIR)
+
+#------------------------------------------------------------------------------
 # Help
 #------------------------------------------------------------------------------
 
@@ -101,6 +149,7 @@ help:
 	@echo "  examples  - Build all example ROMs"
 	@echo "  tests     - Build test ROMs"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
+	@echo "  release   - Create SDK release package (zip)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  help      - Show this help"
