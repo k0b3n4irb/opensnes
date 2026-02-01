@@ -11,7 +11,11 @@
 ;   - Leftmost argument is furthest from SP
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 ; SRAM bank for LoROM
 .EQU SRAM_BANK $70

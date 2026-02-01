@@ -11,7 +11,11 @@
 ; The linker places data and we need to DMA from the correct bank.
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 .SECTION ".dma_asm" SUPERFREE
 

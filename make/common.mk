@@ -82,8 +82,14 @@ BPP         ?= 4
 # Library usage (set USE_LIB=1 to link with OpenSNES library)
 USE_LIB     ?= 0
 
-# Library directory
-LIBDIR      := $(OPENSNES)/lib/build
+# Library directory (select lorom or hirom based on USE_HIROM)
+ifeq ($(USE_HIROM),1)
+LIBDIR      := $(OPENSNES)/lib/build/hirom
+LIBMODE     := HiROM
+else
+LIBDIR      := $(OPENSNES)/lib/build/lorom
+LIBMODE     := LoROM
+endif
 LIB_MODULES ?= console
 
 # Check library is built when USE_LIB=1
@@ -91,9 +97,9 @@ ifeq ($(USE_LIB),1)
 ifeq ($(wildcard $(LIBDIR)/console.o),)
 $(info )
 $(info ========================================================================)
-$(info  ERROR: OpenSNES library not built)
+$(info  ERROR: OpenSNES library ($(LIBMODE)) not built)
 $(info )
-$(info  Your project uses USE_LIB=1 but the library has not been compiled.)
+$(info  Your project uses USE_LIB=1 but the $(LIBMODE) library has not been compiled.)
 $(info  Run:)
 $(info    cd $(OPENSNES) && make lib)
 $(info )
@@ -129,6 +135,31 @@ SRAMSIZE := $$0$(SRAM_SIZE)
 else
 CARTRIDGETYPE := $$00
 SRAMSIZE := $$00
+endif
+
+#------------------------------------------------------------------------------
+# HiROM Configuration (set USE_HIROM=1 for 64KB bank ROM layout)
+#------------------------------------------------------------------------------
+# HiROM uses 64KB banks instead of LoROM's 32KB banks.
+# This allows larger contiguous ROM access without frequent bank switching.
+# Note: USE_SRAM + USE_HIROM is not yet fully supported (SRAM location differs).
+
+USE_HIROM      ?= 0
+
+# Override cartridge type for HiROM mode
+ifeq ($(USE_HIROM),1)
+ifeq ($(USE_SRAM),1)
+CARTRIDGETYPE := $$23    # HiROM + SRAM
+else
+CARTRIDGETYPE := $$21    # HiROM only
+endif
+endif
+
+# Select header template based on ROM mode
+ifeq ($(USE_HIROM),1)
+HDR_TEMPLATE := $(TEMPLATES)/hdr_hirom.asm
+else
+HDR_TEMPLATE := $(TEMPLATES)/hdr.asm
 endif
 
 #------------------------------------------------------------------------------
@@ -191,11 +222,18 @@ ifneq ($(SOUNDBANK_SRC),)
 # Soundbank bank number (default: 1)
 SOUNDBANK_BANK ?= 1
 
+# HiROM flag for smconv (-i enables HiROM address mapping)
+ifeq ($(USE_HIROM),1)
+SMCONV_HIROM_FLAG := -i
+else
+SMCONV_HIROM_FLAG :=
+endif
+
 # Generate soundbank from IT files
-# smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix)
+# smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix), -i (HiROM)
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
-	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
-	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)$(if $(SMCONV_HIROM_FLAG), (HiROM mode),)"
+	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SMCONV_HIROM_FLAG) $(SOUNDBANK_SRC)
 	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
 	@echo "" >> $(SOUNDBANK_OUT).h
 	@echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)" >> $(SOUNDBANK_OUT).h
@@ -236,12 +274,13 @@ main.c.asm: $(CSRC) $(GFX_HEADERS)
 
 # Generate project-specific header with ROM name and SRAM settings
 # Uses sed for reliable multi-pattern substitution
-project_hdr.asm: $(TEMPLATES)/hdr.asm
-	@echo "[HDR] Generating project header..."
+# HDR_TEMPLATE is set based on USE_HIROM (hdr.asm or hdr_hirom.asm)
+project_hdr.asm: $(HDR_TEMPLATE)
+	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
 	@sed -e 's/__ROM_NAME__/$(ROM_NAME)/g' \
 	     -e 's/__CARTRIDGETYPE__/$(CARTRIDGETYPE)/g' \
 	     -e 's/__SRAMSIZE__/$(SRAMSIZE)/g' \
-	     $(TEMPLATES)/hdr.asm > $@
+	     $(HDR_TEMPLATE) > $@
 
 # Runtime library (math functions, etc.)
 RUNTIME := $(TEMPLATES)/runtime.asm
@@ -302,9 +341,16 @@ endif
 #------------------------------------------------------------------------------
 
 # Assemble to object file
+# Pass -D HIROM for HiROM builds so crt0.asm can use ORGA $8000
+ifeq ($(USE_HIROM),1)
+ASFLAGS := -D HIROM
+else
+ASFLAGS :=
+endif
+
 combined.obj: combined.asm
 	@echo "[AS] $<"
-	@$(AS) -o $@ $<
+	@$(AS) $(ASFLAGS) -o $@ $<
 
 # Create linker file
 # Note: On MSYS2/Windows, wlalink needs Windows-style paths, so we use cygpath -m

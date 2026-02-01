@@ -5,7 +5,11 @@
 ; The C version can't handle this correctly, so we need assembly.
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 .SECTION ".hdma_asm" SUPERFREE
 

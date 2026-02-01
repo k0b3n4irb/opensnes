@@ -143,6 +143,16 @@ SOUNDBANK_SRC := music.it
 include $(OPENSNES)/make/common.mk
 ```
 
+### HiROM Mode
+
+For games that need larger contiguous ROM access (64KB banks instead of 32KB):
+
+```makefile
+USE_HIROM := 1
+```
+
+HiROM is useful for games with large data tables or streaming assets. The library is automatically built for both LoROM and HiROM modes. See `examples/basics/5_hirom_demo` for a working example.
+
 ## Tools
 
 | Tool | Purpose |

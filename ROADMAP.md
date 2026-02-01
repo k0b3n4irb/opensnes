@@ -43,12 +43,12 @@ The SDK is functional for basic SNES game development.
 | `sram` | Save RAM support | Done |
 | `interrupt` | NMI/IRQ handlers | Done |
 
-### Examples (30 total)
+### Examples (31 total)
 - **Text**: Hello World, Custom Font
 - **Graphics**: Tiles, Animation, Sprites, Mode 1, Fading, Mode 0, Parallax, Mode 7, HDMA Gradient
 - **Input**: Joypad, Two Players
 - **Audio**: Sound Effects, SNESMOD Music
-- **Basics**: Collision Demo
+- **Basics**: Collision Demo, HiROM Demo
 - **Game**: Breakout, Pong
 
 ### Build System
@@ -57,6 +57,10 @@ The SDK is functional for basic SNES game development.
 - [x] Parallel builds
 - [x] CI/CD pipeline (GitHub Actions)
 - [x] SDK release packaging
+
+### ROM Modes
+- [x] **LoROM** - Standard 32KB bank mode (default)
+- [x] **HiROM Basic** - 64KB bank mode without library (February 2026)
 
 ### Documentation
 - [x] Doxygen API documentation
@@ -68,6 +72,16 @@ The SDK is functional for basic SNES game development.
 
 ## In Progress
 
+### HiROM Phase 2 - Library Support (Partial)
+- [x] Library builds for HiROM mode (dual builds: `lib/build/lorom/` and `lib/build/hirom/`)
+- [x] HiROM demo using library (console, DMA, VBlank work correctly)
+- [x] Documentation updates (KNOWLEDGE.md, CLAUDE.md)
+- [~] **BLOCKED:** C library functions with return values don't work in HiROM mode
+  - Workaround: Use direct memory access (e.g., `*((volatile u16*)0x002C)` for input)
+  - Root cause: Compiler ABI issue with function return values, needs investigation
+- [ ] SNESMOD support for HiROM (soundbank addressing) - blocked by above
+
+### Game Examples (paused)
 - [ ] More game examples (platformer, RPG, shmup)
 - [ ] Template projects with full game structure
 
@@ -106,6 +120,7 @@ The SDK is functional for basic SNES game development.
 2. **32-bit operations slow** - Prefer `u16`/`s16` when possible
 3. **~4KB VBlank DMA budget** - Don't exceed per-frame transfer limits
 4. **Static initializers in ROM** - Use `static u8 x;` not `static u8 x = 0;`
+5. **HiROM function returns** - C functions with return values don't work in HiROM mode; use direct memory access as workaround (see KNOWLEDGE.md)
 
 ---
 
