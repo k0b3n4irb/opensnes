@@ -56,7 +56,7 @@ endif
 	@chmod +x $(BIN_DIR)/cc65816
 
 $(QBE_DIR)/qbe:
-	$(MAKE) -C $(QBE_DIR)
+	$(MAKE) -C $(QBE_DIR) CC=clang
 
 # Generate cproc config.h if missing (required for non-Linux platforms)
 $(CPROC_DIR)/config.h:
@@ -102,9 +102,8 @@ $(CPROC_DIR)/config.h:
 
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
-# cproc Makefile uses 'c99' which doesn't exist on MSYS2/Windows
-# Use 'cc -std=c99' instead (works on all platforms)
-	$(MAKE) -C $(CPROC_DIR) CC="cc -std=c99" cproc-qbe
+# Use clang for consistent builds across all platforms
+	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" cproc-qbe
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
@@ -120,7 +119,7 @@ cc65816-install: cc65816
 #------------------------------------------------------------------------------
 
 wla:
-	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" . && $(MAKE) wla-65816 wla-spc700 wlalink
+	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang . && $(MAKE) wla-65816 wla-spc700 wlalink
 
 wla-clean:
 	-cd $(WLA_DIR) && $(MAKE) clean 2>/dev/null || true

@@ -3,7 +3,7 @@
 
 VERSION := 1.0.0
 
-CC      := gcc
+CC      := clang
 CFLAGS  := -Wall -Wextra -O2 -pedantic
 CFLAGS  += -DVERSION=\"$(VERSION)\"
 
