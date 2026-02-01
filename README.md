@@ -61,14 +61,6 @@ OpenSNES builds upon decades of SNES homebrew community work:
 - **[SNESMOD](https://github.com/mukunda-/snesmod)** by Mukunda Johnson - Tracker audio driver
 - **sixpack/optimore** by Mic_ - Audio tools
 
-### PVSnesLib Contributors
-Special thanks to all PVSnesLib contributors whose work made this possible:
-- [RetroAntho](https://github.com/RetroAntho) - WLA-DX updates, Makefile optimizations
-- [DigiDwrf](https://github.com/DigiDwrf/) - HiROM/FastROM support, mouse & superscope
-- [Mills32](https://github.com/mills32/) - Mode 7 examples
-- [undisbeliever](https://github.com/undisbeliever/) - VBlank code, map engine
-- And the entire [PVSnesLib Discord community](https://discord.gg/DzEFnhB)
-
 ## Contributing
 
 Contributions are welcome! Please check the [Issues](https://github.com/k0b3n4irb/opensnes/issues) for open tasks.
