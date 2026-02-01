@@ -284,4 +284,146 @@ mode7SetScroll:
     plp
     rtl
 
+;------------------------------------------------------------------------------
+; mode7Rotate - Set rotation in degrees (0-359)
+; Input: 5,s = degrees (16-bit)
+; Converts degrees to 0-255 range: angle = degrees * 256 / 360
+;------------------------------------------------------------------------------
+mode7Rotate:
+    php
+    rep #$20
+
+    ; degrees * 256 / 360 ≈ degrees * 91 / 128
+    ; We use the hardware multiplier for this
+    lda 5,s             ; Get degrees
+    sta.l $4202         ; WRMPYA (8-bit, but we'll handle 16-bit separately)
+
+    ; For simplicity, we do: (degrees * 182) >> 8
+    ; 182 / 256 ≈ 0.711 ≈ 256/360
+    sep #$20
+    lda 5,s             ; degrees low byte
+    sta.l $4202         ; WRMPYA
+    lda #182            ; Conversion factor
+    sta.l $4203         ; WRMPYB - triggers multiply
+
+    ; Wait 8 cycles for result
+    nop
+    nop
+    nop
+    nop
+
+    lda.l $4217         ; RDMPYH (high byte of result)
+    pha                 ; Save converted angle
+
+    ; Call mode7SetAngle with the converted angle
+    jsl mode7SetAngle
+
+    pla                 ; Clean up stack
+
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; mode7Transform - Set rotation and scale together
+; Input: 5,s = degrees, 7,s = scalePercent (100 = 1.0)
+;------------------------------------------------------------------------------
+mode7Transform:
+    php
+    rep #$20
+
+    ; Convert percentage to 8.8 fixed point
+    ; scalePercent * 256 / 100 = scalePercent * 2.56 ≈ scalePercent * 656 / 256
+    ; Simplified: (scalePercent * 256 + 50) / 100
+    ; Even simpler approximation: scalePercent * 2 + scalePercent/2 + scalePercent/16
+
+    ; For now, use: scale = (percent << 8) / 100
+    ; We'll use a simpler approximation: scale = percent * 2 + percent/2
+
+    lda 7,s             ; scalePercent
+    asl a               ; * 2
+    sta.l m7_scale_x
+    lda 7,s
+    lsr a               ; / 2
+    clc
+    adc.l m7_scale_x    ; * 2.5 (close enough to * 2.56)
+    sta.l m7_scale_x
+    sta.l m7_scale_y
+
+    plp
+
+    ; Now call mode7Rotate with the degrees parameter
+    ; We need to call it with the same stack layout
+    jmp mode7Rotate     ; Tail call (degrees is still at 5,s)
+
+;------------------------------------------------------------------------------
+; mode7SetPivot - Set pivot point (screen coordinates)
+; Input: 5,s = x (8-bit), 6,s = y (8-bit)
+;------------------------------------------------------------------------------
+mode7SetPivot:
+    php
+    sep #$20
+
+    ; Set center point
+    lda 5,s             ; X
+    sta.l $211F         ; M7X low
+    lda #0
+    sta.l $211F         ; M7X high
+
+    lda 6,s             ; Y
+    sta.l $2120         ; M7Y low
+    lda #0
+    sta.l $2120         ; M7Y high
+
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; mode7SetMatrix - Set matrix values directly
+; Input: 5,s = a, 7,s = b, 9,s = c, 11,s = d
+;------------------------------------------------------------------------------
+mode7SetMatrix:
+    php
+    sep #$20
+
+    ; Write M7A
+    lda 5,s
+    sta.l $211B
+    lda 6,s
+    sta.l $211B
+
+    ; Write M7B
+    lda 7,s
+    sta.l $211C
+    lda 8,s
+    sta.l $211C
+
+    ; Write M7C
+    lda 9,s
+    sta.l $211D
+    lda 10,s
+    sta.l $211D
+
+    ; Write M7D
+    lda 11,s
+    sta.l $211E
+    lda 12,s
+    sta.l $211E
+
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; mode7SetSettings - Set M7SEL register
+; Input: 5,s = settings (8-bit)
+;------------------------------------------------------------------------------
+mode7SetSettings:
+    php
+    sep #$20
+
+    lda 5,s
+    sta.l $211A         ; M7SEL
+
+    plp
+    rtl
+
 .ENDS
