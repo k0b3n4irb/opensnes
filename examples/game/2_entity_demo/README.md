@@ -153,7 +153,7 @@ while (1) {
 ## Build and Run
 
 ```bash
-cd examples/game/1_entity_demo
+cd examples/game/2_entity_demo
 make clean && make
 
 # Run in emulator

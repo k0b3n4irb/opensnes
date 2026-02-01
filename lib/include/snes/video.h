@@ -67,6 +67,13 @@ void setMode(u8 mode, u8 flags);
  *
  * @param index Color index (0-255 for BG, 128-255 for sprites)
  * @param color 15-bit BGR color (0bBBBBBGGGGGRRRRR)
+ *
+ * @todo Not yet implemented - use direct register writes:
+ * @code
+ * REG_CGADD = index;
+ * REG_CGDATA = color & 0xFF;
+ * REG_CGDATA = color >> 8;
+ * @endcode
  */
 void setPaletteColor(u8 index, u16 color);
 

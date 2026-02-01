@@ -55,7 +55,7 @@ void dmaCopyVram(u8 *source, u16 vramAddr, u16 size);
  * @param size Number of bytes to copy
  *
  * @note Must be called during VBlank!
- * @deprecated Use dmaCopyVram() instead
+ * @deprecated Use dmaCopyVram() instead for ROM/RAM sources
  */
 void dmaCopyToVRAM(const void* src, u16 dest, u16 size);
 
@@ -104,7 +104,7 @@ void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
  * @param dest Starting color index (0-255)
  * @param count Number of colors to copy
  *
- * @deprecated Use dmaCopyCGram() instead
+ * @deprecated Use dmaCopyCGram() instead for ROM/RAM sources
  */
 void dmaCopyToCGRAM(const void* src, u8 dest, u16 count);
 
@@ -130,7 +130,7 @@ void dmaCopyOam(u8 *source, u16 size);
  * @param src Source address (544 bytes)
  * @param size Number of bytes to copy (usually 544)
  *
- * @deprecated Use dmaCopyOam() instead
+ * @deprecated Use dmaCopyOam() instead for ROM/RAM sources
  */
 void dmaCopyToOAM(const void* src, u16 size);
 
