@@ -59,7 +59,6 @@ OpenSNES builds upon decades of SNES homebrew community work:
 
 ### Audio
 - **[SNESMOD](https://github.com/mukunda-/snesmod)** by Mukunda Johnson - Tracker audio driver
-- **sixpack/optimore** by Mic_ - Audio tools
 
 ## Contributing
 
