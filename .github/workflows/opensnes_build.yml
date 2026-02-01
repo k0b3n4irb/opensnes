@@ -41,7 +41,7 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt-get install -y build-essential \
-              gcc \
+              clang \
               cmake \
               make \
               git \
@@ -55,7 +55,7 @@ jobs:
           update: true
           msystem: UCRT64
           install: >-
-            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-clang
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-doxygen
             base-devel

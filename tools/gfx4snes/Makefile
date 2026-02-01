@@ -7,7 +7,7 @@ VERSION    := 2.0.0
 DATESTRING := $(shell date +%Y%m%d)
 
 # Compiler and compiler flags
-CC     := gcc
+CC     := clang
 CFLAGS  = -g -Wall -O2 -pedantic -D__BUILD_DATE="\"$(DATESTRING)\"" -D__BUILD_VERSION="\"$(VERSION)\""
 
 # Define the libraries and compilation flags to be used depending on the OS.
