@@ -85,6 +85,9 @@
 /* Color Math */
 #include <snes/colormath.h>
 
+/* Mosaic Effects */
+#include <snes/mosaic.h>
+
 /*============================================================================
  * Optional Headers (include separately if needed)
  *============================================================================*/
