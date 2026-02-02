@@ -297,44 +297,25 @@ SOUNDBANK_DEP :=
 endif
 
 # Combine all assembly sources
-# crt0.asm includes project_hdr.asm, then runtime, then compiled C
+# Order: crt0 -> runtime -> data_init_start -> compiled C -> data_init_end
 combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
-	@echo "" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "; C Runtime Library" >> $@
-	@echo ";==============================================================================" >> $@
 	@cat $(RUNTIME) >> $@
 ifeq ($(USE_LIB),0)
-	@echo "" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "; OAM Helper Functions (standalone)" >> $@
-	@echo ";==============================================================================" >> $@
 	@cat $(OAM_HELPERS) >> $@
 endif
-	@echo "" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "; Compiled C Code" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "" >> $@
+	@cat $(TEMPLATES)/data_init_start.asm >> $@
 	@cat main.c.asm >> $@
 ifneq ($(ASMSRC),)
-	@echo "" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "; Additional Assembly" >> $@
-	@echo ";==============================================================================" >> $@
-	@for f in $(ASMSRC); do cat $$f >> $@; echo "" >> $@; done
+	@for f in $(ASMSRC); do cat $$f >> $@; done
 endif
 ifeq ($(USE_SNESMOD),1)
 ifneq ($(SOUNDBANK_SRC),)
-	@echo "" >> $@
-	@echo ";==============================================================================" >> $@
-	@echo "; SNESMOD Soundbank" >> $@
-	@echo ";==============================================================================" >> $@
 	@cat $(SOUNDBANK_OUT).asm >> $@
 endif
 endif
+	@cat $(TEMPLATES)/data_init_end.asm >> $@
 
 #------------------------------------------------------------------------------
 # Linking
