@@ -211,7 +211,7 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
 This is usually a compiler limitation. Check:
 - Are you using `u32`/`s32`? Prefer `u16`/`s16` when possible
-- Static variables with initializers? Use `static u8 x;` not `static u8 x = 0;`
+- Both `static u8 x = 0;` and `static u8 x;` work correctly
 
 ## Getting Help
 

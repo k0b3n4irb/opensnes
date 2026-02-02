@@ -88,9 +88,9 @@ extern u8  blocks[];    /* Brick state array - 100 bytes */
 /*============================================================================
  * Game State Variables
  *
- * NOTE: Static variables without initializers are zero-initialized per C
- * standard. Do NOT use "static u8 x = 0;" as QBE places initialized statics
- * in ROM (read-only), causing silent write failures.
+ * Static variables without initializers are zero-initialized per C standard.
+ * Initialized statics (e.g., "static u8 x = 5;") also work correctly -
+ * their values are copied from ROM to RAM at startup.
  *============================================================================*/
 
 static u8  i, j, k;          /* Loop variables (global to reduce stack usage) */

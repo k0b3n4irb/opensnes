@@ -17,9 +17,8 @@
  * to allow read-modify-write operations.
  *============================================================================*/
 
-/* NOTE: Do NOT initialize these with "= 0" - QBE puts initialized statics
- * in ROM (.rodata), but we need these in RAM to be writable.
- * C standard guarantees uninitialized statics are zero-initialized.
+/* Shadow registers for read-modify-write operations.
+ * Zero-initialized by C standard (uninitialized statics are zero).
  */
 static u8 bg12nba_shadow;  /* Shadow for REG_BG12NBA ($210B) */
 static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
