@@ -12,9 +12,9 @@ else ifeq ($(UNAME),Linux)
     MAKEFLAGS += -j$(shell nproc)
 endif
 
-# Find all example directories with Makefiles
+# Find all example directories with Makefiles (up to 3 levels deep)
 # Note: $(dir ...) produces trailing slashes; we strip them for cleaner target names
-EXAMPLES_RAW := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+EXAMPLES_RAW := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile) $(wildcard */*/*/Makefile))
 EXAMPLES := $(patsubst %/,%,$(EXAMPLES_RAW))
 
 # Create build targets for each example
