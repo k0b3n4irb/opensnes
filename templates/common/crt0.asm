@@ -112,6 +112,20 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
+; Reserved Bank $00 Region (WRAM Mirror Protection)
+;------------------------------------------------------------------------------
+; Bank $00 addresses $0000-$1FFF mirror Bank $7E's $0000-$1FFF.
+; We reserve $0300-$051F in Bank $00 to prevent the linker from placing
+; variables there, avoiding collision with Bank $7E's OAM buffer.
+; Note: Dynamic sprite buffers ($0520+) are only used by advanced projects
+; that typically manage their own memory layout.
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".reserved_7e_mirror" BANK 0 SLOT 1 ORGA $0300 FORCE
+    _reserved_7e_mirror dsb 544 ; Reserved: mirrors Bank $7E oamMemory
+.ENDS
+
+;------------------------------------------------------------------------------
 ; OAM Shadow Buffer
 ;------------------------------------------------------------------------------
 ; OAM is 544 bytes: 512 for main table (128 sprites × 4 bytes) + 32 for extra
@@ -128,17 +142,20 @@
 ; oambuffer: Game-level sprite state (128 sprites × 16 bytes = 2048 bytes)
 ; oamQueueEntry: VRAM upload queue (128 entries × 6 bytes = 768 bytes)
 ; State variables for sprite management
+;
+; IMPORTANT: These buffers are placed at $2000+ to avoid collision with
+; Bank $00 variables (Bank $00 $0000-$1FFF mirrors Bank $7E $0000-$1FFF).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".dynamic_sprite_buffer" BANK $7E SLOT 1 ORGA $0520 FORCE
-    oambuffer       dsb 2048    ; 128 × 16 bytes ($7E:0520-$7E:0D1F)
+.RAMSECTION ".dynamic_sprite_buffer" BANK $7E SLOT 2 ORGA $2000 FORCE
+    oambuffer       dsb 2048    ; 128 × 16 bytes ($7E:2000-$7E:27FF)
 .ENDS
 
-.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 1 ORGA $0D20 FORCE
-    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:0D20-$7E:101F)
+.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 2 ORGA $2800 FORCE
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:2800-$7E:2AFF)
 .ENDS
 
-.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 1 ORGA $1020 FORCE
+.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 2 ORGA $2B00 FORCE
     ; Temporary values for sprite calculations
     sprit_val0      dsb 1       ; Temporary value #0
     sprit_val1      dsb 1       ; Temporary value #1
