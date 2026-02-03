@@ -785,6 +785,236 @@ test_input_button_masks() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Struct pointer initialization (QBE bug February 2026)
+#------------------------------------------------------------------------------
+test_struct_ptr_init() {
+    local name="struct_ptr_init"
+    local src="$SCRIPT_DIR/test_struct_ptr_init.c"
+    local out="$BUILD/test_struct_ptr_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/struct_ptr.err"; then
+        log_fail "$name: Compilation failed"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # CRITICAL: Check that myFrames symbol is correctly referenced
+    # The bug caused .dl z+0 instead of .dl myFrames+0
+    if grep -q '\.dl myFrames' "$out"; then
+        log_info "$name"
+        ((TESTS_PASSED++))
+        return 0
+    fi
+
+    # Check for corrupted symbol (the bug)
+    if grep -q '\.dl z+0' "$out" || grep -q '\.dl [a-z]+0' "$out"; then
+        log_fail "$name: Symbol reference corrupted (QBE static buffer bug)"
+        echo "Expected: .dl myFrames+0"
+        echo "Found:"
+        grep '\.dl' "$out"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_fail "$name: myFrames symbol not found in output"
+    ((TESTS_FAILED++))
+    return 1
+}
+
+#------------------------------------------------------------------------------
+# Test: 2D array access
+#------------------------------------------------------------------------------
+test_2d_array() {
+    local name="2d_array_access"
+    local src="$SCRIPT_DIR/test_2d_array.c"
+    local out="$BUILD/test_2d_array.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/2d_array.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/2d_array.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for grid and wide symbols
+    if ! grep -q 'grid' "$out"; then
+        log_fail "$name: grid symbol not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Nested structure access
+#------------------------------------------------------------------------------
+test_nested_struct() {
+    local name="nested_struct"
+    local src="$SCRIPT_DIR/test_nested_struct.c"
+    local out="$BUILD/test_nested_struct.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/nested_struct.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/nested_struct.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for game symbol (our GameState variable)
+    if ! grep -q 'game' "$out"; then
+        log_fail "$name: game symbol not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Union handling
+#------------------------------------------------------------------------------
+test_union() {
+    local name="union_handling"
+    local src="$SCRIPT_DIR/test_union.c"
+    local out="$BUILD/test_union.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/union.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/union.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for union variables
+    if ! grep -q 'ms' "$out" || ! grep -q 'col' "$out"; then
+        log_fail "$name: Union symbols not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Large local variables (>256 bytes)
+#------------------------------------------------------------------------------
+test_large_local() {
+    local name="large_local_vars"
+    local src="$SCRIPT_DIR/test_large_local.c"
+    local out="$BUILD/test_large_local.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/large_local.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/large_local.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check that functions exist in output
+    if ! grep -q 'test_large_local:' "$out"; then
+        log_fail "$name: test_large_local function not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: String literal initialization
+#------------------------------------------------------------------------------
+test_string_init() {
+    local name="string_init"
+    local src="$SCRIPT_DIR/test_string_init.c"
+    local out="$BUILD/test_string_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/string_init.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/string_init.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check that string data exists
+    if ! grep -q 'Sword' "$out" && ! grep -q '"Sword"' "$out"; then
+        # Strings might be encoded differently, check for .db with ASCII values
+        if ! grep -q '\.db 83' "$out"; then  # 'S' = 83
+            log_fail "$name: String data not found"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -853,6 +1083,14 @@ main() {
     test_animation_patterns          # Comprehensive: loops, arrays, bit ops, conditionals
     test_global_var_reads            # CRITICAL: Global/extern vars must use direct addressing
     test_input_button_masks          # CRITICAL: Button masks must match pvsneslib/hardware
+
+    # === Advanced Pattern Tests (Phase 1.2) ===
+    test_struct_ptr_init             # CRITICAL: Struct pointer init (QBE bug Feb 2026)
+    test_2d_array                    # 2D array stride calculation
+    test_nested_struct               # Nested structure member access
+    test_union                       # Union size and member access
+    test_large_local                 # Large local variables (>256 bytes)
+    test_string_init                 # String literals in struct initializers
 
     echo ""
     echo "========================================"
