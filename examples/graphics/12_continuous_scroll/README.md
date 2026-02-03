@@ -57,6 +57,26 @@ A complete scrolling game framework:
 
 ---
 
+## Game State Pattern
+
+### Required Struct Pattern
+
+Using a struct with `s16` coordinates is required for reliable sprite movement.
+Separate `u16` variables cause horizontal movement issues due to a compiler quirk.
+
+```c
+typedef struct {
+    s16 player_x, player_y;
+    s16 bg1_scroll_x, bg1_scroll_y;
+    s16 bg2_scroll_x, bg2_scroll_y;
+    u8 need_scroll_update;
+} GameState;
+
+GameState game = {20, 100, 0, 32, 0, 32, 1};
+```
+
+---
+
 ## Camera System
 
 ### Screen Space vs World Space
@@ -72,15 +92,17 @@ screen_y = world_y - camera_y
 ### Threshold-Based Scrolling
 
 ```c
-#define SCROLL_THRESHOLD_L 64
-#define SCROLL_THRESHOLD_R 192
+#define SCROLL_THRESHOLD_LEFT  80
+#define SCROLL_THRESHOLD_RIGHT 140
 
 /* Check if player crossed threshold */
-if (player_screen_x > SCROLL_THRESHOLD_R) {
-    camera_x += player_screen_x - SCROLL_THRESHOLD_R;
+if (game.player_x > SCROLL_THRESHOLD_RIGHT && game.bg1_scroll_x < MAX_SCROLL_X) {
+    game.bg1_scroll_x++;
+    game.player_x--;  /* Push player back */
 }
-if (player_screen_x < SCROLL_THRESHOLD_L) {
-    camera_x -= SCROLL_THRESHOLD_L - player_screen_x;
+if (game.player_x < SCROLL_THRESHOLD_LEFT && game.bg1_scroll_x > 0) {
+    game.bg1_scroll_x--;
+    game.player_x++;  /* Push player forward */
 }
 ```
 
@@ -91,23 +113,17 @@ if (player_screen_x < SCROLL_THRESHOLD_L) {
 ### Position Update
 
 ```c
-if (pad & KEY_RIGHT) player_x += 2;
-if (pad & KEY_LEFT) player_x -= 2;
-if (pad & KEY_DOWN) player_y += 2;
-if (pad & KEY_UP) player_y -= 2;
-
-/* Clamp to world bounds */
-if (player_x < 0) player_x = 0;
-if (player_x > WORLD_WIDTH - 16) player_x = WORLD_WIDTH - 16;
+if (pad & KEY_RIGHT) { if (game.player_x < 230) game.player_x += 2; }
+if (pad & KEY_LEFT)  { if (game.player_x > 8) game.player_x -= 2; }
+if (pad & KEY_DOWN)  { if (game.player_y < 200) game.player_y += 2; }
+if (pad & KEY_UP)    { if (game.player_y > 32) game.player_y -= 2; }
 ```
 
-### Screen Position Calculation
+### Sprite Update
 
 ```c
-s16 screen_x = player_x - camera_x;
-s16 screen_y = player_y - camera_y;
-
-oamSetXY(0, screen_x, screen_y);
+/* Use oamSet() instead of oamSetXY() for reliable updates */
+oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
 ```
 
 ---
@@ -117,16 +133,17 @@ oamSetXY(0, screen_x, screen_y);
 For smooth updates, use NMI (VBlank interrupt):
 
 ```c
-void nmiCallback(void) {
-    /* Update scroll registers */
-    bgSetScroll(0, camera_x, camera_y);
-
-    /* Update OAM */
-    oamUpdate();
+void myVBlankHandler(void) {
+    if (game.need_scroll_update) {
+        /* Update scroll registers during VBlank */
+        bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
+        bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
+        game.need_scroll_update = 0;
+    }
 }
 
-/* In main() */
-nmiSetBank(0);  /* Set callback bank */
+/* In main() - check .sym file for correct bank number */
+nmiSetBank(myVBlankHandler, 1);
 ```
 
 ---
@@ -159,24 +176,24 @@ make clean && make
 
 Add camera smoothing (lerp toward target):
 ```c
-s16 target_x = player_x - 128;  /* Center player */
-camera_x += (target_x - camera_x) >> 3;  /* Smooth follow */
+s16 target_x = game.player_x - 128;  /* Center player */
+game.bg1_scroll_x += (target_x - game.bg1_scroll_x) >> 3;  /* Smooth follow */
 ```
 
 ### Exercise 2: Camera Bounds
 
 Prevent camera from showing beyond level edges:
 ```c
-if (camera_x < 0) camera_x = 0;
-if (camera_x > LEVEL_WIDTH - 256) camera_x = LEVEL_WIDTH - 256;
+if (game.bg1_scroll_x < 0) game.bg1_scroll_x = 0;
+if (game.bg1_scroll_x > LEVEL_WIDTH - 256) game.bg1_scroll_x = LEVEL_WIDTH - 256;
 ```
 
 ### Exercise 3: Parallax Background
 
-Add a slower-scrolling background layer:
+Add a slower-scrolling background layer (already implemented in this example):
 ```c
-bgSetScroll(0, camera_x, camera_y);       /* Main layer */
-bgSetScroll(1, camera_x >> 1, camera_y);  /* Parallax */
+bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);       /* Main layer */
+bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);       /* Parallax */
 ```
 
 ### Exercise 4: Multiple Sprites
@@ -184,9 +201,9 @@ bgSetScroll(1, camera_x >> 1, camera_y);  /* Parallax */
 Add enemies that also scroll with camera:
 ```c
 for (u8 i = 0; i < enemy_count; i++) {
-    s16 sx = enemies[i].x - camera_x;
-    s16 sy = enemies[i].y - camera_y;
-    oamSetXY(i + 1, sx, sy);
+    s16 sx = enemies[i].x - game.bg1_scroll_x;
+    s16 sy = enemies[i].y - game.bg1_scroll_y;
+    oamSet(i + 1, sx, sy, enemy_tile, 0, 2, 0);
 }
 ```
 

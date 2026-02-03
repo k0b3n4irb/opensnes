@@ -82,34 +82,40 @@ u16 pad2 = REG_JOY2L | (REG_JOY2H << 8);
 
 ---
 
+## Player State
+
+### Struct Pattern (Required)
+
+Using a struct with `s16` coordinates is required for reliable movement.
+Separate `u16` variables cause horizontal movement issues due to a compiler quirk.
+
+```c
+typedef struct {
+    s16 x, y;
+} Player;
+
+Player p1 = {64, 112};
+Player p2 = {192, 112};
+```
+
+---
+
 ## Player Movement
 
 ### Independent Control
 
 ```c
 /* Player 1 movement */
-if (pad1 & KEY_RIGHT) p1_x += 2;
-if (pad1 & KEY_LEFT) p1_x -= 2;
-if (pad1 & KEY_DOWN) p1_y += 2;
-if (pad1 & KEY_UP) p1_y -= 2;
+if (pad1 & KEY_RIGHT) { if (p1.x < 248) p1.x++; }
+if (pad1 & KEY_LEFT)  { if (p1.x > 0) p1.x--; }
+if (pad1 & KEY_DOWN)  { if (p1.y < 224) p1.y++; }
+if (pad1 & KEY_UP)    { if (p1.y > 0) p1.y--; }
 
 /* Player 2 movement */
-if (pad2 & KEY_RIGHT) p2_x += 2;
-if (pad2 & KEY_LEFT) p2_x -= 2;
-if (pad2 & KEY_DOWN) p2_y += 2;
-if (pad2 & KEY_UP) p2_y -= 2;
-```
-
-### Boundary Checking
-
-```c
-/* Clamp both players to screen */
-if (p1_x < 0) p1_x = 0;
-if (p1_x > 248) p1_x = 248;
-if (p1_y < 0) p1_y = 0;
-if (p1_y > 224) p1_y = 224;
-
-/* Same for player 2 */
+if (pad2 & KEY_RIGHT) { if (p2.x < 248) p2.x++; }
+if (pad2 & KEY_LEFT)  { if (p2.x > 0) p2.x--; }
+if (pad2 & KEY_DOWN)  { if (p2.y < 224) p2.y++; }
+if (pad2 & KEY_UP)    { if (p2.y > 0) p2.y--; }
 ```
 
 ---
@@ -132,10 +138,10 @@ REG_CGDATA = 0x1F; REG_CGDATA = 0x00;  /* Red */
 
 ```c
 /* Player 1: Palette 0 (blue) */
-oamSet(0, p1_x, p1_y, 0, 0, 3, 0);
+oamSet(0, p1.x, p1.y, 0, 0, 3, 0);
 
 /* Player 2: Palette 1 (red) */
-oamSet(1, p2_x, p2_y, 0, 1, 3, 0);
+oamSet(1, p2.x, p2.y, 0, 1, 3, 0);
 ```
 
 ---
@@ -192,7 +198,7 @@ Note: Configure emulator for two controllers.
 
 Detect when players touch:
 ```c
-if (abs(p1_x - p2_x) < 16 && abs(p1_y - p2_y) < 16) {
+if (abs(p1.x - p2.x) < 16 && abs(p1.y - p2.y) < 16) {
     /* Players colliding! */
 }
 ```

@@ -85,34 +85,34 @@ static u8 idle_frames[]   = { 4 };
 static u8 walk_frames[]   = { 5, 4, 6, 4 };
 static u8 jump_frames[]   = { 7, 7, 7, 4 };
 
-/* Animation definitions */
-static Animation anim_bounce = {
-    bounce_frames,
-    6,      /* frameCount */
-    8,      /* frameDelay (8 VBlanks = ~7.5 FPS) */
-    1       /* loop */
-};
+/* Animation definitions - initialized at runtime due to compiler limitation
+ * with pointer-to-array initializers in static structs */
+static Animation anim_bounce;
+static Animation anim_idle;
+static Animation anim_walk;
+static Animation anim_jump;
 
-static Animation anim_idle = {
-    idle_frames,
-    1,
-    60,     /* slow - just repeat same frame */
-    1
-};
+static void init_animations(void) {
+    anim_bounce.frames = bounce_frames;
+    anim_bounce.frameCount = 6;
+    anim_bounce.frameDelay = 8;   /* 8 VBlanks = ~7.5 FPS */
+    anim_bounce.loop = 1;
 
-static Animation anim_walk = {
-    walk_frames,
-    4,
-    6,      /* 10 FPS */
-    1
-};
+    anim_idle.frames = idle_frames;
+    anim_idle.frameCount = 1;
+    anim_idle.frameDelay = 60;    /* slow - just repeat same frame */
+    anim_idle.loop = 1;
 
-static Animation anim_jump = {
-    jump_frames,
-    4,
-    8,
-    0       /* one-shot */
-};
+    anim_walk.frames = walk_frames;
+    anim_walk.frameCount = 4;
+    anim_walk.frameDelay = 6;     /* 10 FPS */
+    anim_walk.loop = 1;
+
+    anim_jump.frames = jump_frames;
+    anim_jump.frameCount = 4;
+    anim_jump.frameDelay = 8;
+    anim_jump.loop = 0;           /* one-shot */
+}
 
 /*============================================================================
  * Game State
@@ -359,6 +359,9 @@ int main(void) {
     consoleInit();
     setMode(BG_MODE0, 0);
     oamInit();
+
+    /* Initialize animation definitions (runtime init due to compiler limitation) */
+    init_animations();
 
     /* Load graphics */
     load_font();

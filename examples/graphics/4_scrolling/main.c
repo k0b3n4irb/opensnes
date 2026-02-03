@@ -75,6 +75,11 @@ int main(void) {
      * Load Tilemap Data
      *------------------------------------------------------------------------*/
 
+    /* Clear tilemap VRAM areas first (prevents garbage when scrolling
+     * beyond the actual tilemap data - pvsneslib.bmp is only 224 pixels tall) */
+    dmaFillVRAM(0, 0x1400, 2048);  /* BG2 tilemap: 32x32 tiles = 2KB */
+    dmaFillVRAM(0, 0x1800, 2048);  /* BG1 tilemap: 32x32 tiles = 2KB */
+
     dmaCopyVram(shader_map, 0x1800, shader_map_end - shader_map);
     dmaCopyVram(bg_map, 0x1400, bg_map_end - bg_map);
 

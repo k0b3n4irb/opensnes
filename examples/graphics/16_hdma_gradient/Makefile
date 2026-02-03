@@ -10,7 +10,7 @@ ROM_NAME   := HDMA GRADIENT
 
 # Use the OpenSNES library
 USE_LIB    := 1
-LIB_MODULES := console sprite dma input background hdma
+LIB_MODULES := console sprite dma input background hdma math
 
 # Source files
 CSRC       := main.c
