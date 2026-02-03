@@ -57,6 +57,19 @@
  * @note HDMA channels 6-7 are recommended to avoid conflicts with DMA.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
+ * ## IMPORTANT: Scroll Registers Require Repeat Mode
+ *
+ * BG scroll registers (BG1HOFS, BG1VOFS, etc.) require REPEAT mode (bit 7 = 1)
+ * in the HDMA line count. Direct mode (bit 7 = 0) does NOT work for scroll.
+ *
+ * ```
+ * // WRONG - Direct mode doesn't work for scroll:
+ * .db 32, $20, $00    ; Won't scroll!
+ *
+ * // CORRECT - Repeat mode for scroll registers:
+ * .db $A0, $20, $00   ; $A0 = $80 | 32 = repeat for 32 lines
+ * ```
+ *
  * @author OpenSNES Team
  * @copyright MIT License
  */
@@ -294,5 +307,67 @@ void hdmaGradient(u8 channel, const void *colorTable);
  * @note Uses mode 2REG to write both WH0 and WH1
  */
 void hdmaWindowShape(u8 channel, const void *windowTable);
+
+/*============================================================================
+ * HDMA Wave Effect Functions
+ *============================================================================*/
+
+/**
+ * @brief Initialize HDMA wave effect system
+ *
+ * Must be called once before using wave effects. Allocates internal
+ * buffers and sets up the wave state.
+ */
+void hdmaWaveInit(void);
+
+/**
+ * @brief Set up horizontal wave effect (water reflection)
+ *
+ * Creates a wavy horizontal distortion, commonly used for:
+ * - Water reflections
+ * - Heat shimmer
+ * - Dream/flashback sequences
+ *
+ * @param channel HDMA channel to use (6 or 7 recommended)
+ * @param bg Background layer to affect (1-3)
+ * @param amplitude Wave amplitude in pixels (1-16)
+ * @param frequency Wave frequency (1=long waves, 8=short waves)
+ *
+ * @code
+ * hdmaWaveInit();
+ * hdmaWaveH(HDMA_CHANNEL_6, 1, 4, 2);  // Gentle water reflection on BG1
+ * hdmaEnable(1 << HDMA_CHANNEL_6);
+ *
+ * while (1) {
+ *     WaitForVBlank();
+ *     hdmaWaveUpdate();  // Animate the wave
+ * }
+ * @endcode
+ */
+void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency);
+
+/**
+ * @brief Update wave animation
+ *
+ * Call this once per frame (after WaitForVBlank) to animate
+ * the wave effect. Updates the HDMA table with new wave values.
+ *
+ * @note Only needed if wave effects are active
+ */
+void hdmaWaveUpdate(void);
+
+/**
+ * @brief Stop wave effect and disable HDMA channel
+ *
+ * Disables the wave effect and frees the HDMA channel.
+ */
+void hdmaWaveStop(void);
+
+/**
+ * @brief Set wave speed
+ *
+ * @param speed Animation speed (1=slow, 4=fast, default=2)
+ */
+void hdmaWaveSetSpeed(u8 speed);
 
 #endif /* OPENSNES_HDMA_H */
