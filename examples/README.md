@@ -4,96 +4,99 @@ Welcome to the OpenSNES learning path! This tutorial will guide you from your fi
 
 ## How to Use This Tutorial
 
-Each example is a **lesson** designed to teach specific concepts. Work through them in order within each topic - they build on each other.
+Each example is a **lesson** designed to teach specific concepts. The number prefix indicates complexity:
+- `1_` = Beginner (simplest concepts)
+- `2_` = Easy (basic usage)
+- `3_` = Intermediate (multiple concepts)
+- `4_` = Advanced (complex features)
 
 ```
-📁 examples/
-├── 📁 text/          ← Start here! Learn the basics
-├── 📁 basics/        ← Core concepts (HiROM, SRAM)
-├── 📁 graphics/      ← Sprites, backgrounds, effects
-├── 📁 input/         ← Controller handling
-├── 📁 audio/         ← Sound effects and music
-└── 📁 game/          ← Complete game examples
+examples/
+├── text/                    # Start here! Learn the basics
+│   ├── 1_hello_world/
+│   └── 2_custom_font/
+│
+├── graphics/
+│   ├── backgrounds/         # Background modes and scrolling
+│   ├── sprites/             # Sprite handling
+│   └── effects/             # Visual effects (HDMA, windows, etc.)
+│
+├── input/                   # Controller handling
+├── audio/                   # Sound effects and music
+├── memory/                  # SRAM saves, HiROM mode
+├── basics/                  # Utility examples
+└── games/                   # Complete game examples
 ```
 
 ## Learning Path
 
-### 🎯 Beginner: Text & Basics
-**Goal:** Understand SNES architecture and display text on screen.
+### 1. Start Here: Text
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [text/1_hello_world](text/1_hello_world/) | 1 | VRAM, tilemaps, Mode 0, your first ROM |
+| [text/2_custom_font](text/2_custom_font/) | 2 | Asset pipeline, 2bpp tiles, font2snes |
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [text/1_hello_world](text/1_hello_world/) | VRAM, tilemaps, Mode 0, your first ROM |
-| 2 | [text/2_custom_font](text/2_custom_font/) | Asset pipeline, 2bpp tiles, font2snes tool |
+### 2. Graphics: Backgrounds
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [graphics/backgrounds/1_mode0](graphics/backgrounds/1_mode0/) | 1 | Mode 0: 4 BG layers, 2bpp |
+| [graphics/backgrounds/1_mode1](graphics/backgrounds/1_mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp |
+| [graphics/backgrounds/2_scrolling](graphics/backgrounds/2_scrolling/) | 2 | Basic scrolling |
+| [graphics/backgrounds/3_mode3](graphics/backgrounds/3_mode3/) | 3 | 256-color mode |
+| [graphics/backgrounds/3_mode5](graphics/backgrounds/3_mode5/) | 3 | Hi-res mode |
+| [graphics/backgrounds/3_parallax](graphics/backgrounds/3_parallax/) | 3 | Multi-layer parallax |
+| [graphics/backgrounds/4_mode7](graphics/backgrounds/4_mode7/) | 4 | Rotation/scaling |
+| [graphics/backgrounds/4_continuous_scroll](graphics/backgrounds/4_continuous_scroll/) | 4 | Dynamic tile loading |
 
-### 🎮 Intermediate: Graphics
-**Goal:** Display and animate sprites, create backgrounds.
+### 3. Graphics: Sprites
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [graphics/sprites/1_simple_sprite](graphics/sprites/1_simple_sprite/) | 1 | OAM, basic sprite display |
+| [graphics/sprites/2_animated_sprite](graphics/sprites/2_animated_sprite/) | 2 | Frame animation |
+| [graphics/sprites/3_animation_system](graphics/sprites/3_animation_system/) | 3 | State machine animation |
+| [graphics/sprites/3_metasprite](graphics/sprites/3_metasprite/) | 3 | Multi-tile sprites |
+| [graphics/sprites/4_dynamic_sprite](graphics/sprites/4_dynamic_sprite/) | 4 | VRAM management |
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [graphics/6_simple_sprite](graphics/6_simple_sprite/) | OAM, sprites, 4bpp tiles, controller input |
-| 2 | [graphics/21_animated_sprite](graphics/21_animated_sprite/) | Frame animation, timing |
-| 3 | [graphics/4_scrolling](graphics/4_scrolling/) | Tilemaps, scrolling |
-| 4 | [graphics/5_mode1](graphics/5_mode1/) | Mode 1 backgrounds |
-| 5 | [graphics/9_parallax](graphics/9_parallax/) | Parallax scrolling effects |
+### 4. Graphics: Effects
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [graphics/effects/1_fading](graphics/effects/1_fading/) | 1 | Screen brightness |
+| [graphics/effects/2_mosaic](graphics/effects/2_mosaic/) | 2 | Pixelation effect |
+| [graphics/effects/2_window](graphics/effects/2_window/) | 2 | Hardware windows |
+| [graphics/effects/3_transparency](graphics/effects/3_transparency/) | 3 | Color math |
+| [graphics/effects/3_hdma_gradient](graphics/effects/3_hdma_gradient/) | 3 | Per-scanline colors |
 
-See [graphics/README.md](graphics/README.md) for the complete list of 20+ graphics examples.
+### 5. Input
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [input/2_two_players](input/2_two_players/) | 2 | Auto-read, multiplayer input |
 
-### 🕹️ Intermediate: Input
-**Goal:** Handle player input from controllers.
+### 6. Audio
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [audio/1_tone](audio/1_tone/) | 1 | Basic sound generation |
+| [audio/2_sfx](audio/2_sfx/) | 2 | Sound effects |
+| [audio/3_snesmod_music](audio/3_snesmod_music/) | 3 | Tracker music |
+| [audio/3_snesmod_sfx](audio/3_snesmod_sfx/) | 3 | SNESMOD SFX |
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [input/2_two_players](input/2_two_players/) | Auto-read, button states, multiplayer input |
+### 7. Memory
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [memory/2_save_game](memory/2_save_game/) | 2 | SRAM saves |
+| [memory/3_hirom_demo](memory/3_hirom_demo/) | 3 | HiROM mode |
 
-### 🔊 Advanced: Audio
-**Goal:** Add sound effects and music.
+### 8. Basics
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [basics/2_calculator](basics/2_calculator/) | 2 | Math operations |
+| [basics/3_collision_demo](basics/3_collision_demo/) | 3 | Collision detection |
+| [basics/3_smooth_movement](basics/3_smooth_movement/) | 3 | Interpolation |
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [audio/1_tone](audio/1_tone/) | SPC700, BRR samples, tone generation |
-| 2 | [audio/2_sfx](audio/2_sfx/) | Sound effects |
-| 3 | [audio/6_snesmod_music](audio/6_snesmod_music/) | Tracker music with SNESMOD |
-| 4 | [audio/7_snesmod_sfx](audio/7_snesmod_sfx/) | SNESMOD sound effects |
-
----
-
-## SNES Architecture Overview
-
-Before diving in, here's what you need to know about the SNES:
-
-### The Two Processors
-
-```
-┌─────────────────┐     ┌─────────────────┐
-│   65816 CPU     │     │   SPC700 APU    │
-│  (Main CPU)     │────▶│  (Audio CPU)    │
-│   ~3.58 MHz     │     │   ~1.024 MHz    │
-└────────┬────────┘     └─────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│      PPU        │
-│ (Picture Proc.) │
-│  Video output   │
-└─────────────────┘
-```
-
-### Memory You'll Use
-
-| Memory | Size | Purpose |
-|--------|------|---------|
-| **VRAM** | 64 KB | Tile graphics, tilemaps |
-| **CGRAM** | 512 bytes | Color palettes (256 colors) |
-| **OAM** | 544 bytes | Sprite attributes (128 sprites) |
-| **WRAM** | 128 KB | Your variables, game state |
-
-### Display Basics
-
-- **Resolution:** 256×224 pixels (NTSC) or 256×239 (PAL)
-- **Colors:** 256 colors on screen (from 32,768 possible)
-- **Sprites:** Up to 128 sprites, 32 per scanline
-- **Backgrounds:** Up to 4 layers depending on mode
+### 9. Complete Games
+| Example | Complexity | What You'll Learn |
+|---------|------------|-------------------|
+| [games/4_breakout](games/4_breakout/) | 4 | Complete game structure |
+| [games/4_entity_demo](games/4_entity_demo/) | 4 | Entity system |
 
 ---
 
@@ -117,7 +120,6 @@ make clean && make
 We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulation:
 
 ```bash
-# Open ROM in Mesen
 /path/to/Mesen examples/text/1_hello_world/hello_world.sfc
 ```
 
@@ -128,13 +130,13 @@ We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulatio
 1. **Read the code comments** - They explain the "why"
 2. **Experiment** - Change values and see what happens
 3. **Use Mesen's debugger** - View VRAM, OAM, registers in real-time
-4. **One concept at a time** - Don't skip ahead
+4. **Follow the complexity order** - Start with 1_, then 2_, etc.
 
 ## Getting Help
 
-- 📖 [SNESdev Wiki](https://snes.nesdev.org/wiki/) - Hardware reference
-- 💬 [SNESdev Discord](https://discord.gg/snesdev) - Community help
-- 🐛 [OpenSNES Issues](https://github.com/opensnes/opensnes/issues) - Report bugs
+- [SNESdev Wiki](https://snes.nesdev.org/wiki/) - Hardware reference
+- [SNESdev Discord](https://discord.gg/snesdev) - Community help
+- [OpenSNES Issues](https://github.com/opensnes/opensnes/issues) - Report bugs
 
 ---
 
