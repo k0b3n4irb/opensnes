@@ -82,6 +82,28 @@ BPP         ?= 4
 # Library usage (set USE_LIB=1 to link with OpenSNES library)
 USE_LIB     ?= 0
 
+#------------------------------------------------------------------------------
+# Library Module Dependencies
+#------------------------------------------------------------------------------
+# When using specific library modules, some depend on others:
+#
+#   sprite  -> dma      (OAM buffer is DMA'd to hardware in NMI handler)
+#   text    -> dma      (Font loading uses DMA transfers)
+#   snesmod -> console  (SNESMOD requires NMI handling from console)
+#   hdma    -> (none)   (Standalone, but often used with console for VBlank)
+#
+# The build system does NOT auto-resolve dependencies. If you use 'sprite',
+# you MUST also include 'dma' in LIB_MODULES:
+#
+#   LIB_MODULES = console sprite dma    # Correct
+#   LIB_MODULES = console sprite        # Wrong - missing dma!
+#
+# Common module combinations:
+#   Basic game:     console sprite dma input background
+#   With audio:     console sprite dma input snesmod
+#   With effects:   console sprite dma hdma
+#------------------------------------------------------------------------------
+
 # Library directory (select lorom or hirom based on USE_HIROM)
 ifeq ($(USE_HIROM),1)
 LIBDIR      := $(OPENSNES)/lib/build/hirom
@@ -231,12 +253,15 @@ endif
 
 # Generate soundbank from IT files
 # smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix), -i (HiROM)
+# Note: We generate to a temp file first, then append SOUNDBANK_BANK and move atomically
+# to avoid incomplete files from interrupted builds
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)$(if $(SMCONV_HIROM_FLAG), (HiROM mode),)"
 	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SMCONV_HIROM_FLAG) $(SOUNDBANK_SRC)
 	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
-	@echo "" >> $(SOUNDBANK_OUT).h
-	@echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)" >> $(SOUNDBANK_OUT).h
+	@mv $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).h.tmp
+	@{ cat $(SOUNDBANK_OUT).h.tmp; echo ""; echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)"; } > $(SOUNDBANK_OUT).h
+	@rm -f $(SOUNDBANK_OUT).h.tmp
 
 # Add soundbank header to graphics headers (for dependency tracking)
 GFX_HEADERS += $(SOUNDBANK_OUT).h
@@ -264,6 +289,17 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 
 # cc65816 (cproc+QBE): compile C to WLA-DX assembly
 # The QBE w65816 backend now emits WLA-DX compatible assembly directly
+#
+# LIMITATION: Only a single C source file (main.c) is supported by this pipeline.
+# The build system compiles all files listed in CSRC together into a single
+# main.c.asm output. While CSRC can technically contain multiple files, only
+# main.c is used as the primary entry point.
+#
+# Workarounds for multi-file projects:
+#   1. Use additional assembly files via ASMSRC variable
+#   2. #include other C files directly into main.c
+#   3. Implement additional logic in assembly and link via ASMSRC
+#
 main.c.asm: $(CSRC) $(GFX_HEADERS)
 	@echo "[CC] $(CSRC)"
 	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@

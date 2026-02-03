@@ -9,6 +9,24 @@
 ;
 ; For LoROM with SUPERFREE sections, data can be in any bank.
 ; The linker places data and we need to DMA from the correct bank.
+;
+;==============================================================================
+; BANK LIMITATION
+;==============================================================================
+; The current implementation of dmaCopyVram() and dmaCopyCGram() assumes
+; source data is in bank $00 for ROM addresses ($8000-$FFFF). This works
+; for most cases because:
+;
+;   1. Small ROMs (< 32KB code) fit entirely in bank 0
+;   2. SUPERFREE sections typically land in bank 0 for small projects
+;   3. Graphics data defined in the same compilation unit is usually nearby
+;
+; For projects with data in higher banks, use dmaCopyVramBank() with an
+; explicit bank parameter, or restructure data placement.
+;
+; Technical reason: The cproc compiler only passes 16-bit pointers. We cannot
+; determine the bank from the pointer alone, so we default to bank 0 for
+; ROM addresses and bank $7E for RAM addresses.
 ;==============================================================================
 
 .ifdef HIROM

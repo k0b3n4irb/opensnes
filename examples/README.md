@@ -9,9 +9,11 @@ Each example is a **lesson** designed to teach specific concepts. Work through t
 ```
 📁 examples/
 ├── 📁 text/          ← Start here! Learn the basics
-├── 📁 graphics/      ← Sprites, backgrounds, tiles
+├── 📁 basics/        ← Core concepts (HiROM, SRAM)
+├── 📁 graphics/      ← Sprites, backgrounds, effects
 ├── 📁 input/         ← Controller handling
-└── 📁 audio/         ← Sound effects and music
+├── 📁 audio/         ← Sound effects and music
+└── 📁 game/          ← Complete game examples
 ```
 
 ## Learning Path
@@ -29,23 +31,30 @@ Each example is a **lesson** designed to teach specific concepts. Work through t
 
 | # | Example | What You'll Learn |
 |---|---------|-------------------|
-| 1 | [graphics/1_sprite](graphics/1_sprite/) | OAM, sprites, 4bpp tiles, controller input |
-| 2 | graphics/2_animation | *(coming soon)* Frame animation, timing |
-| 3 | graphics/3_background | *(coming soon)* Tilemaps, scrolling |
+| 1 | [graphics/6_simple_sprite](graphics/6_simple_sprite/) | OAM, sprites, 4bpp tiles, controller input |
+| 2 | [graphics/21_animated_sprite](graphics/21_animated_sprite/) | Frame animation, timing |
+| 3 | [graphics/4_scrolling](graphics/4_scrolling/) | Tilemaps, scrolling |
+| 4 | [graphics/5_mode1](graphics/5_mode1/) | Mode 1 backgrounds |
+| 5 | [graphics/9_parallax](graphics/9_parallax/) | Parallax scrolling effects |
+
+See [graphics/README.md](graphics/README.md) for the complete list of 20+ graphics examples.
 
 ### 🕹️ Intermediate: Input
 **Goal:** Handle player input from controllers.
 
 | # | Example | What You'll Learn |
 |---|---------|-------------------|
-| 1 | input/1_controller | *(coming soon)* Auto-read, button states |
+| 1 | [input/2_two_players](input/2_two_players/) | Auto-read, button states, multiplayer input |
 
 ### 🔊 Advanced: Audio
 **Goal:** Add sound effects and music.
 
 | # | Example | What You'll Learn |
 |---|---------|-------------------|
-| 1 | audio/1_sound | *(coming soon)* SPC700, BRR samples |
+| 1 | [audio/1_tone](audio/1_tone/) | SPC700, BRR samples, tone generation |
+| 2 | [audio/2_sfx](audio/2_sfx/) | Sound effects |
+| 3 | [audio/6_snesmod_music](audio/6_snesmod_music/) | Tracker music with SNESMOD |
+| 4 | [audio/7_snesmod_sfx](audio/7_snesmod_sfx/) | SNESMOD sound effects |
 
 ---
 

@@ -15,6 +15,27 @@
 ; License: MIT
 ;
 ;==============================================================================
+; WLA-DX Section Types Used in This File
+;==============================================================================
+;
+; FORCE    - Section placed at an exact address. The ORGA directive specifies
+;            the absolute address. Content MUST fit exactly. Used for hardware
+;            requirements like compiler registers at $0000 and OAM buffer at
+;            $7E:0300 (avoiding WRAM mirror overlap).
+;
+; SEMIFREE - Section placed after a specified ORG within the bank, but the
+;            linker can move it if needed. Good for startup code that needs
+;            to be in bank 0 but doesn't need a specific address.
+;
+; SUPERFREE - Section can be placed in ANY bank with available space. Used
+;             for library code and data that doesn't need specific placement.
+;             The linker optimizes placement automatically.
+;
+; RAMSECTION - Allocates RAM without generating ROM data. Combined with
+;              ORGA FORCE for precise placement or without for automatic.
+;
+; For more details, see .claude/WLA-DX.md
+;==============================================================================
 
 ; Include ROM header (memory map, vectors)
 .include "project_hdr.asm"
@@ -269,6 +290,48 @@ InitHardware:
     inx
     cpx #$420E
     bne -
+
+    ;--------------------------------------------------------------------------
+    ; Initialize OAM buffer to hide all sprites
+    ;--------------------------------------------------------------------------
+    ; The NMI handler DMAs oamMemory to hardware OAM every frame.
+    ; If not initialized, garbage sprites appear on screen.
+    ; Y position = 240 ($F0) hides sprites below visible screen.
+    ;--------------------------------------------------------------------------
+    ; Set data bank to $7E to access oamMemory with absolute addressing
+    pea $7E7E
+    plb
+    plb
+
+    rep #$20            ; 16-bit A
+    ldx #0
+    lda #$00F0          ; Little-endian: low byte=$F0 (Y=240), high byte=$00 (tile=0)
+@oam_clear_loop:
+    stz.w oamMemory,x   ; X position = 0
+    sta.w oamMemory+1,x ; Y = 240, tile = 0
+    stz.w oamMemory+3,x ; attributes = 0 (only low byte matters)
+    inx
+    inx
+    inx
+    inx
+    cpx #512            ; 128 sprites × 4 bytes
+    bne @oam_clear_loop
+
+    ; Clear OAM extension table (32 bytes)
+    ldx #0
+@oam_ext_clear:
+    stz.w oamMemory+512,x
+    inx
+    inx
+    cpx #32
+    bne @oam_ext_clear
+
+    sep #$20            ; Back to 8-bit A
+
+    ; Restore data bank to $00
+    pea $0000
+    plb
+    plb
 
     rts
 
