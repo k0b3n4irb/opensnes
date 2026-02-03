@@ -13,7 +13,9 @@ else ifeq ($(UNAME),Linux)
 endif
 
 # Find all example directories with Makefiles
-EXAMPLES := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+# Note: $(dir ...) produces trailing slashes; we strip them for cleaner target names
+EXAMPLES_RAW := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+EXAMPLES := $(patsubst %/,%,$(EXAMPLES_RAW))
 
 # Create build targets for each example
 EXAMPLE_TARGETS := $(EXAMPLES:%=build-%)
