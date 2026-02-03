@@ -41,23 +41,51 @@ extern u8 char_pal[], char_pal_end[];
  * Game State
  *============================================================================*/
 
-/* Scroll positions */
-static u16 bg1_scroll_x;
-static u16 bg1_scroll_y;
-static u16 bg2_scroll_x;
-static u16 bg2_scroll_y;
+/** @name Scroll Configuration
+ *  @brief Constants controlling the auto-scroll behavior
+ *  @{
+ */
+#define MAX_SCROLL_X 512            /**< Maximum horizontal scroll (depends on tilemap size) */
+#define SCROLL_THRESHOLD_RIGHT 140  /**< When player X > this, scroll right */
+#define SCROLL_THRESHOLD_LEFT  80   /**< When player X < this, scroll left */
+/** @} */
 
-/* Player position (screen coordinates) */
-static u16 player_x;
-static u16 player_y;
+/**
+ * @struct GameState
+ * @brief Centralized game state structure
+ *
+ * @note IMPORTANT COMPILER PATTERN:
+ * Using a global struct with s16 types is the REQUIRED pattern for sprite
+ * coordinates in OpenSNES. The following patterns FAIL:
+ *
+ * @code
+ * // BAD - causes LEFT/RIGHT movement to fail while UP/DOWN works:
+ * static u16 player_x;
+ * static u16 player_y;
+ *
+ * // GOOD - all movement directions work correctly:
+ * typedef struct { s16 x, y; } Player;
+ * Player player = {100, 100};
+ * @endcode
+ *
+ * This is due to a compiler quirk where separate static u16 variables
+ * generate different (broken) code compared to struct member access.
+ * See .claude/KNOWLEDGE.md for detailed documentation.
+ *
+ * @see animated_sprite example for reference implementation
+ */
+typedef struct {
+    s16 player_x;       /**< Player X position (screen coords) - MUST be s16 */
+    s16 player_y;       /**< Player Y position (screen coords) - MUST be s16 */
+    s16 bg1_scroll_x;   /**< BG1 horizontal scroll offset */
+    s16 bg1_scroll_y;   /**< BG1 vertical scroll offset */
+    s16 bg2_scroll_x;   /**< BG2 horizontal scroll offset (parallax) */
+    s16 bg2_scroll_y;   /**< BG2 vertical scroll offset */
+    u8 need_scroll_update; /**< Flag: set to trigger scroll register update in VBlank */
+} GameState;
 
-/* Scroll limits - how far the background can scroll */
-#define MAX_SCROLL_X 512   /* Maximum horizontal scroll (depends on tilemap size) */
-#define SCROLL_THRESHOLD_RIGHT 140  /* When player X > this, scroll right */
-#define SCROLL_THRESHOLD_LEFT  80   /* When player X < this, scroll left */
-
-/* Flag to signal scroll update needed */
-static u8 need_scroll_update;
+/** @brief Global game state instance with initial values */
+GameState game = {20, 100, 0, 32, 0, 32, 1};
 
 /*============================================================================
  * VBlank Callback
@@ -70,11 +98,11 @@ static u8 need_scroll_update;
  * visual glitches. The VBlank callback is the perfect place for this.
  */
 void myVBlankHandler(void) {
-    if (need_scroll_update) {
+    if (game.need_scroll_update) {
         /* Update scroll registers during VBlank for glitch-free scrolling */
-        bgSetScroll(0, bg1_scroll_x, bg1_scroll_y);
-        bgSetScroll(1, bg2_scroll_x, bg2_scroll_y);
-        need_scroll_update = 0;
+        bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
+        bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
+        game.need_scroll_update = 0;
     }
 }
 
@@ -148,16 +176,8 @@ int main(void) {
     REG_TM = 0x13;  /* TM = 00010011 = OBJ + BG2 + BG1 */
 
     /*------------------------------------------------------------------------
-     * Initialize Game State
+     * Initialize Game State (values already set in global initializer)
      *------------------------------------------------------------------------*/
-
-    player_x = 20;
-    player_y = 100;
-    bg1_scroll_x = 0;
-    bg1_scroll_y = 32;
-    bg2_scroll_x = 0;
-    bg2_scroll_y = 32;
-    need_scroll_update = 1;
 
     /* Register VBlank callback for scroll updates */
     /* Note: Use nmiSetBank with bank 1 because myVBlankHandler is placed in bank 1 */
@@ -165,7 +185,7 @@ int main(void) {
     nmiSetBank(myVBlankHandler, 1);
 
     /* Set initial sprite - tile 0, palette 0, priority 2 */
-    oamSet(0, player_x, (u8)player_y, 0, 0, 2, 0);
+    oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
 
     /* Transfer OAM buffer to hardware before turning screen on */
     oamUpdate();
@@ -178,50 +198,56 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     while (1) {
+        /* Wait for VBlank first - auto-joypad runs during VBlank */
+        WaitForVBlank();
+
         /* Wait for auto-joypad read to complete */
         while (REG_HVBJOY & 0x01) { }
 
         /* Read joypad directly from hardware */
         pad = REG_JOY1L | (REG_JOY1H << 8);
 
+        /* Skip if controller disconnected */
+        if (pad == 0xFFFF) continue;
+
         /* Handle vertical movement - player moves freely */
         if (pad & KEY_UP) {
-            if (player_y > 32) player_y -= 2;
+            if (game.player_y > 32) game.player_y -= 2;
         }
         if (pad & KEY_DOWN) {
-            if (player_y < 200) player_y += 2;
+            if (game.player_y < 200) game.player_y += 2;
         }
 
         /* Handle horizontal movement - player always moves when pressing D-pad */
         if (pad & KEY_LEFT) {
-            if (player_x > 8) player_x -= 2;
+            if (game.player_x > 8) game.player_x -= 2;
         }
         if (pad & KEY_RIGHT) {
-            if (player_x < 230) player_x += 2;
+            if (game.player_x < 230) game.player_x += 2;
         }
 
         /* PVSnesLib-style auto-scroll: when player passes threshold, scroll background */
         /* and push player back to keep them visually centered */
-        if (player_x > SCROLL_THRESHOLD_RIGHT && bg1_scroll_x < MAX_SCROLL_X) {
-            bg1_scroll_x += 1;
-            bg2_scroll_x += 1;  /* Parallax: could use slower increment */
-            player_x -= 1;      /* Push player back to keep them in place */
+        if (game.player_x > SCROLL_THRESHOLD_RIGHT && game.bg1_scroll_x < MAX_SCROLL_X) {
+            game.bg1_scroll_x += 1;
+            game.bg2_scroll_x += 1;  /* Parallax: could use slower increment */
+            game.player_x -= 1;      /* Push player back to keep them in place */
         }
-        if (player_x < SCROLL_THRESHOLD_LEFT && bg1_scroll_x > 0) {
-            bg1_scroll_x -= 1;
-            bg2_scroll_x -= 1;
-            player_x += 1;      /* Push player forward to keep them in place */
+        if (game.player_x < SCROLL_THRESHOLD_LEFT && game.bg1_scroll_x > 0) {
+            game.bg1_scroll_x -= 1;
+            game.bg2_scroll_x -= 1;
+            game.player_x += 1;      /* Push player forward to keep them in place */
         }
 
-        /* Update sprite position */
-        oamSetXY(0, player_x, (u8)player_y);
+        /* Update sprite position
+         * NOTE: Use oamSet() instead of oamSetXY() for reliable updates.
+         * The NMI handler automatically transfers OAM buffer to hardware
+         * when WaitForVBlank() is called, so no manual oamUpdate() needed.
+         */
+        oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
 
         /* Signal scroll update - VBlank callback will apply it */
-        need_scroll_update = 1;
-
-        /* Wait for VBlank and update OAM */
-        WaitForVBlank();
-        oamUpdate();
+        game.need_scroll_update = 1;
     }
 
     return 0;
