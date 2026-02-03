@@ -106,12 +106,14 @@ jobs:
       - name: Build tests (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
+          set -o pipefail
           make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       - name: Build tests (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
+          set -o pipefail
           make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
@@ -120,6 +122,7 @@ jobs:
       - name: Run compiler tests (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
+          set -o pipefail
           echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
           ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
@@ -127,6 +130,7 @@ jobs:
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
+          set -o pipefail
           echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
           ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
@@ -136,6 +140,7 @@ jobs:
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
+          set -o pipefail
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
@@ -143,6 +148,7 @@ jobs:
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
+          set -o pipefail
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
