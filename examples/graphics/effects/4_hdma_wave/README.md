@@ -13,7 +13,7 @@ Demonstrates animated wave distortion using HDMA per-scanline horizontal scroll 
 | Button | Action |
 |--------|--------|
 | A | Toggle wave effect on/off |
-| Left/Right | Adjust amplitude (4 levels: 2, 4, 8, 16 pixels) |
+| Left/Right | Change amplitude (4 levels: 2, 4, 8, 16 pixels) |
 | Up | Start wave animation |
 | Down | Stop wave animation (freeze) |
 
@@ -24,11 +24,12 @@ The HDMA system writes different horizontal scroll values to BG1HOFS on each sca
 ## API Functions
 
 ```c
-hdmaWaveInit();                         // Initialize wave system
+hdmaWaveInit();                          // Initialize wave system
 hdmaWaveH(channel, bg, amplitude, freq); // Setup horizontal wave
 hdmaWaveSetSpeed(speed);                 // Animation speed (1-4)
 hdmaWaveUpdate();                        // Call each frame to animate
 hdmaWaveStop();                          // Disable wave effect
+hdmaEnable(1 << channel);                // Enable HDMA channel
 ```
 
 ## Technical Notes
@@ -37,3 +38,4 @@ hdmaWaveStop();                          // Disable wave effect
 - Wave table is 224 entries (one per visible scanline)
 - Higher frequency = more wave cycles on screen
 - Higher amplitude = more horizontal displacement
+- Displays vertical stripes that wave when effect is active
