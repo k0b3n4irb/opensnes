@@ -111,7 +111,43 @@ Row 7: bp0, bp1    Row 7: bp2, bp3
 
 ## Lessons
 
-### [1. Sprite](1_sprite/)
+### [3. Mode 7](3_mode7/)
+**Difficulty:** ⭐⭐⭐⭐ Advanced
+
+Mode 7 rotation and scaling effects.
+
+**Concepts:**
+- Mode 7 matrix transformation
+- Rotation and scaling math
+- HDMA for per-scanline effects
+
+---
+
+### [4. Scrolling](4_scrolling/)
+**Difficulty:** ⭐⭐ Beginner+
+
+Basic background scrolling with D-pad control.
+
+**Concepts:**
+- Scroll registers (BGxHOFS, BGxVOFS)
+- Large tilemaps for scrolling
+- Camera movement
+
+---
+
+### [5. Mode 1](5_mode1/)
+**Difficulty:** ⭐⭐ Beginner+
+
+Mode 1 with multiple background layers.
+
+**Concepts:**
+- Mode 1 setup (2 4bpp layers + 1 2bpp layer)
+- Layer priorities
+- Tilemap setup
+
+---
+
+### [6. Simple Sprite](6_simple_sprite/)
 **Difficulty:** ⭐⭐ Beginner+
 
 Display a sprite and move it with the D-pad.
@@ -130,7 +166,177 @@ Display a sprite and move it with the D-pad.
 
 ---
 
-### [2. Animation](2_animation/)
+### [7. Fading](7_fading/)
+**Difficulty:** ⭐⭐ Beginner+
+
+Screen brightness fading effects.
+
+**Concepts:**
+- INIDISP register ($2100)
+- Brightness levels (0-15)
+- Smooth fade transitions
+
+---
+
+### [8. Mode 0](8_mode0/)
+**Difficulty:** ⭐⭐ Beginner+
+
+Mode 0 with 4 background layers.
+
+**Concepts:**
+- Mode 0 (4 × 2bpp backgrounds)
+- 4 palettes per layer
+- Layer setup
+
+---
+
+### [9. Parallax](9_parallax/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Multi-layer parallax scrolling.
+
+**Concepts:**
+- Different scroll speeds per layer
+- Depth illusion
+- HDMA-based per-scanline scroll
+
+---
+
+### [10. Mode 3](10_mode3/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Mode 3 with 256-color direct color.
+
+**Concepts:**
+- Mode 3 (1 × 8bpp + 1 × 4bpp)
+- Direct color mode
+- Large tile graphics
+
+---
+
+### [11. Mode 5](11_mode5/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Mode 5 hi-res mode (512×224).
+
+**Concepts:**
+- Interlaced/hi-res display
+- Mode 5 setup
+- 16×8 tiles
+
+---
+
+### [12. Continuous Scroll](12_continuous_scroll/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Seamless infinite scrolling with dynamic tile loading.
+
+**Concepts:**
+- Tilemap streaming
+- Edge detection for loading
+- Wrap-around handling
+
+**Important:** This example documents the struct coordinate pattern.
+
+---
+
+### [13. Animation System](13_animation_system/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Flexible sprite animation framework.
+
+**Concepts:**
+- Animation state machine
+- Frame timing
+- Direction handling
+
+---
+
+### [14. Metasprite](14_metasprite/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Multi-tile sprites (metasprites).
+
+**Concepts:**
+- Combining multiple hardware sprites
+- Metasprite data format
+- Flip support for metasprites
+
+---
+
+### [15. Dynamic Sprite](15_dynamic_sprite/)
+**Difficulty:** ⭐⭐⭐⭐ Advanced
+
+Dynamic sprite engine with VRAM management.
+
+**Concepts:**
+- On-demand VRAM loading
+- Sprite slot management
+- oambuffer system
+
+---
+
+### [16. HDMA Gradient](16_hdma_gradient/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+HDMA-based color gradient effects.
+
+**Concepts:**
+- HDMA setup and tables
+- Fixed color register ($2132)
+- Sky/water gradients
+
+---
+
+### [17. Transparency](17_transparency/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Color math and transparency effects.
+
+**Concepts:**
+- Color addition/subtraction
+- Half-transparent sprites
+- Window-based masking
+
+---
+
+### [18. Window](18_window/)
+**Difficulty:** ⭐⭐⭐ Intermediate
+
+Hardware window effects.
+
+**Concepts:**
+- Window 1 and Window 2
+- Window logic (AND, OR, XOR)
+- Per-layer window enable
+
+---
+
+### [19. Mosaic](19_mosaic/)
+**Difficulty:** ⭐⭐ Beginner+
+
+Mosaic pixelation effect.
+
+**Concepts:**
+- Mosaic register ($2106)
+- Per-BG mosaic enable
+- Mosaic size (1-16)
+
+---
+
+### [20. HDMA Wave](20_hdma_wave/)
+**Difficulty:** ⭐⭐⭐⭐ Advanced
+
+Wavy distortion effects using HDMA.
+
+**Concepts:**
+- Per-scanline scroll modification
+- Sine wave tables
+- Water/heat shimmer effects
+
+---
+
+### [21. Animated Sprite](21_animated_sprite/)
 **Difficulty:** ⭐⭐⭐ Intermediate
 
 Animate a sprite with multiple frames.
@@ -145,18 +351,6 @@ Animate a sprite with multiple frames.
 - Timer countdown for frame changes
 - Sprite sheets (multiple frames in VRAM)
 - Attribute bit 6 for H-flip
-
----
-
-### 3. Background *(coming soon)*
-**Difficulty:** ⭐⭐⭐ Intermediate
-
-Create a scrolling background.
-
-**Concepts:**
-- Mode 1 setup
-- Large tilemaps
-- Scroll registers
 
 ---
 
@@ -196,4 +390,4 @@ oam_lo[sprite_id * 4 + 1] = 240;
 
 **Previous Topic:** [Text](../text/) ← Display text on screen
 
-**Next Topic:** Input *(coming soon)* → Handle controller input
+**Next Topic:** [Input](../input/) → Handle controller input

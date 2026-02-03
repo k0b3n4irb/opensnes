@@ -14,6 +14,24 @@
  * DMA is much faster than CPU copying and should be used for
  * all bulk transfers during VBlank.
  *
+ * ## VBlank Timing Requirement
+ *
+ * @warning **CRITICAL**: VRAM, CGRAM, and OAM can only be safely accessed
+ * during VBlank (vertical blanking period) or when the screen is in force blank
+ * mode (INIDISP bit 7 set). Accessing these memories during active display
+ * causes visual corruption and undefined behavior.
+ *
+ * @warning **VBlank Budget**: You have approximately 2,200 CPU cycles during
+ * VBlank for DMA transfers. This translates to roughly **4KB of data** that
+ * can be safely transferred per frame. While the theoretical maximum is higher,
+ * 4KB is a safe practical limit that accounts for NMI handler overhead.
+ *
+ * ## Bank Limitation
+ *
+ * @note The current implementation assumes source data is in bank $00 for
+ * ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using
+ * dmaCopyVramBank() with an explicit bank parameter.
+ *
  * @author OpenSNES Team
  * @copyright MIT License
  */
@@ -40,10 +58,15 @@
  * @code
  * extern char tileset[];
  * extern char tileset_end[];
+ * WaitForVBlank();
  * dmaCopyVram(tileset, 0x0000, tileset_end - tileset);
  * @endcode
  *
- * @note Must be called during VBlank or force blank!
+ * @warning Must be called during VBlank or force blank! Calling during
+ * active display causes visual corruption.
+ *
+ * @note Source data must be in bank $00 (LoROM $00:8000-$FFFF). For data
+ * in other banks, use dmaCopyVramBank().
  */
 void dmaCopyVram(u8 *source, u16 vramAddr, u16 size);
 
@@ -90,10 +113,15 @@ void dmaClearVRAM(void);
  *
  * @code
  * extern char palette[];
+ * WaitForVBlank();
  * dmaCopyCGram(palette, 0, 32);  // 16 colors * 2 bytes
  * @endcode
  *
- * @note Must be called during VBlank or force blank!
+ * @warning Must be called during VBlank or force blank! Calling during
+ * active display causes palette corruption.
+ *
+ * @note Source data must be in bank $00. For data in other banks,
+ * manual DMA setup with explicit bank is required.
  */
 void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
 

@@ -3,6 +3,20 @@
 ;
 ; HDMA requires 24-bit source addresses for tables in ROM.
 ; The C version can't handle this correctly, so we need assembly.
+;
+;==============================================================================
+; BANK LIMITATION (same as DMA)
+;==============================================================================
+; HDMA table bank handling:
+;   - ROM addresses ($8000+): Bank is set to $00
+;   - RAM addresses (< $8000): Bank is set to $7E
+;
+; This means HDMA tables in ROM must be in bank 0 for correct operation.
+; For most projects this is not a limitation since HDMA tables are small
+; and typically placed via SUPERFREE which lands in bank 0.
+;
+; If you need HDMA tables in higher banks, you would need to modify
+; hdmaSetup() to accept an explicit bank parameter.
 ;==============================================================================
 
 .ifdef HIROM
