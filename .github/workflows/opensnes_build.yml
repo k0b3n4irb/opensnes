@@ -135,8 +135,23 @@ jobs:
           ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Validate examples (memory overlaps)  #
+      # Build and validate examples          #
       # ------------------------------------ #
+      - name: Build examples (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          set -o pipefail
+          echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Build examples (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
