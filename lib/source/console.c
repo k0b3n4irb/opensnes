@@ -61,6 +61,9 @@ void consoleInit(void) {
     /* Set up Mode 1 as default */
     REG_BGMODE = BGMODE_MODE1;
 
+    /* Disable mosaic effect (register can have garbage on power-up) */
+    REG_MOSAIC = 0;
+
     /* Clear palettes to black */
     REG_CGADD = 0;
     u16 i;
