@@ -9,8 +9,11 @@
 #include "snes/registers.h"
 #include "snes/dma.h"
 
-/* Include the font data */
-#include "opensnes_font_2bpp.h"
+/* Font data defined in text_data.asm */
+extern const unsigned char opensnes_font_2bpp[];
+
+/* Font size constants */
+#define FONT_SIZE 1536  /* 96 chars * 16 bytes per tile */
 
 /* Global text configuration */
 TextConfig text_config;
@@ -91,7 +94,7 @@ void textLoadFont(u16 vram_addr) {
      * 2bpp format: 16 bytes per tile
      * 96 characters = 1536 bytes = 768 words
      */
-    for (i = 0; i < sizeof(opensnes_font_2bpp); i += 2) {
+    for (i = 0; i < FONT_SIZE; i += 2) {
         REG_VMDATAL = opensnes_font_2bpp[i];
         REG_VMDATAH = opensnes_font_2bpp[i + 1];
     }
