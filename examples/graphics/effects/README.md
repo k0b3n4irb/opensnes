@@ -11,6 +11,7 @@ Learn SNES special effects: fading, windows, transparency, and HDMA.
 | [2_window](2_window/) | 2 | Hardware window masking |
 | [3_transparency](3_transparency/) | 3 | Color math (add/subtract) |
 | [3_hdma_gradient](3_hdma_gradient/) | 3 | HDMA color gradients |
+| [4_hdma_wave](4_hdma_wave/) | 4 | HDMA wave distortion |
 
 ## Key Concepts
 
