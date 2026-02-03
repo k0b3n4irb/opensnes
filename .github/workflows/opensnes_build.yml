@@ -168,6 +168,24 @@ jobs:
           ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
+      # Check memory overlaps                #
+      # ------------------------------------ #
+      - name: Check memory overlaps (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          set -o pipefail
+          echo "=== Memory Overlap Check ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/ci/check_memory_overlaps.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Check memory overlaps (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          echo "=== Memory Overlap Check ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/ci/check_memory_overlaps.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      # ------------------------------------ #
       # Check library linking                #
       # ------------------------------------ #
       - name: Check library linking (macOS)
