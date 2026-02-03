@@ -13,9 +13,9 @@ Demonstrates animated wave distortion using HDMA per-scanline horizontal scroll 
 | Button | Action |
 |--------|--------|
 | A | Toggle wave effect on/off |
-| Left/Right | Adjust amplitude (1-8 pixels) |
-| Up/Down | Adjust frequency (1-8) |
-| L/R | Adjust animation speed (1-4) |
+| Left/Right | Adjust amplitude (4 levels: 2, 4, 8, 16 pixels) |
+| Up | Start wave animation |
+| Down | Stop wave animation (freeze) |
 
 ## How It Works
 

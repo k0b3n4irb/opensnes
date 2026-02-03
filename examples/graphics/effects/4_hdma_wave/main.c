@@ -1,14 +1,14 @@
 /**
  * HDMA Wave Demo
  *
- * Demonstrates the hdmaWave* functions for animated wave distortion effects.
- * Commonly used for water reflections, heat shimmer, or dream sequences.
+ * Demonstrates HDMA wave distortion effects for water reflections,
+ * heat shimmer, or dream sequences.
  *
  * Controls:
  *   A: Toggle wave effect on/off
- *   LEFT/RIGHT: Adjust wave amplitude (1-8)
- *   UP/DOWN: Adjust wave frequency (1-8)
- *   L/R: Adjust animation speed (1-4)
+ *   LEFT/RIGHT: Adjust wave amplitude (4 levels)
+ *   UP: Start wave animation
+ *   DOWN: Stop wave animation (freeze)
  */
 #include <snes.h>
 #include <snes/console.h>
@@ -27,36 +27,43 @@ static const u8 tiles[] = {
     0xF0, 0x00, 0xF0, 0x00, 0xF0, 0x00, 0xF0, 0x00,
 };
 
+/* Amplitude levels (pixels of displacement) */
+static const u8 amplitudeLevels[] = { 2, 4, 8, 16 };
+
 /* State variables */
 static u8 wave_enabled;
-static u8 amplitude;
-static u8 frequency;
-static u8 speed;
+static u8 animating;
+static u8 amplitudeLevel;  /* 0-3 index into amplitudeLevels */
 
 /* Display current settings */
 void updateDisplay(void) {
-    textSetPos(1, 26);
-    textPrint("AMP:");
-    textPrintU16(amplitude);
-    textPrint(" FREQ:");
-    textPrintU16(frequency);
-    textPrint(" SPD:");
-    textPrintU16(speed);
-    textPrint("  ");
-
+    /* Line 1: Wave status */
     if (wave_enabled) {
-        textPrintAt(1, 27, "WAVE: ON ");
+        textPrintAt(1, 25, "WAVE: ON ");
     } else {
-        textPrintAt(1, 27, "WAVE: OFF");
+        textPrintAt(1, 25, "WAVE: OFF");
     }
+
+    /* Line 2: Animation status */
+    if (animating) {
+        textPrintAt(1, 26, "ANIM: RUNNING");
+    } else {
+        textPrintAt(1, 26, "ANIM: STOPPED");
+    }
+
+    /* Line 3: Amplitude */
+    textSetPos(1, 27);
+    textPrint("AMPLITUDE: ");
+    textPrintU16(amplitudeLevels[amplitudeLevel]);
+    textPrint("px ");
 }
 
-/* Reinitialize wave with current settings */
+/* Apply wave settings with current amplitude */
 void applyWaveSettings(void) {
     if (wave_enabled) {
         hdmaWaveStop();
-        hdmaWaveH(HDMA_CHANNEL_6, 1, amplitude, frequency);
-        hdmaWaveSetSpeed(speed);
+        hdmaWaveH(HDMA_CHANNEL_6, 1, amplitudeLevels[amplitudeLevel], 2);
+        hdmaWaveSetSpeed(2);
         hdmaEnable(1 << HDMA_CHANNEL_6);
     }
 }
@@ -66,9 +73,8 @@ int main(void) {
 
     /* Initialize state */
     wave_enabled = 1;
-    amplitude = 4;
-    frequency = 2;
-    speed = 2;
+    animating = 1;
+    amplitudeLevel = 1;  /* Start at level 1 (4 pixels) */
 
     consoleInit();
     setMode(BG_MODE0, 0);
@@ -105,15 +111,14 @@ int main(void) {
 
     /* Initialize and start HDMA wave effect */
     hdmaWaveInit();
-    hdmaWaveH(HDMA_CHANNEL_6, 1, amplitude, frequency);
-    hdmaWaveSetSpeed(speed);
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    applyWaveSettings();
 
     textPrintAt(1, 1, "HDMA WAVE DEMO");
-    textPrintAt(1, 3, "A: Toggle wave");
-    textPrintAt(1, 4, "L/R: Amplitude");
-    textPrintAt(1, 5, "U/D: Frequency");
-    textPrintAt(1, 6, "LR Buttons: Speed");
+    textPrintAt(1, 3, "Controls:");
+    textPrintAt(1, 4, "  A: Toggle wave on/off");
+    textPrintAt(1, 5, "  LEFT/RIGHT: Amplitude");
+    textPrintAt(1, 6, "  UP: Start animation");
+    textPrintAt(1, 7, "  DOWN: Stop animation");
     updateDisplay();
 
     setScreenOn();
@@ -126,9 +131,7 @@ int main(void) {
         if (padPressed(0) & KEY_A) {
             wave_enabled = !wave_enabled;
             if (wave_enabled) {
-                hdmaWaveH(HDMA_CHANNEL_6, 1, amplitude, frequency);
-                hdmaWaveSetSpeed(speed);
-                hdmaEnable(1 << HDMA_CHANNEL_6);
+                applyWaveSettings();
             } else {
                 hdmaWaveStop();
                 /* Reset scroll to remove distortion */
@@ -138,56 +141,42 @@ int main(void) {
             updateDisplay();
         }
 
-        /* LEFT/RIGHT: Adjust amplitude */
+        /* RIGHT: Increase amplitude */
         if (padPressed(0) & KEY_RIGHT) {
-            if (amplitude < 8) {
-                amplitude++;
+            if (amplitudeLevel < 3) {
+                amplitudeLevel++;
                 applyWaveSettings();
                 updateDisplay();
             }
         }
+
+        /* LEFT: Decrease amplitude */
         if (padPressed(0) & KEY_LEFT) {
-            if (amplitude > 1) {
-                amplitude--;
+            if (amplitudeLevel > 0) {
+                amplitudeLevel--;
                 applyWaveSettings();
                 updateDisplay();
             }
         }
 
-        /* UP/DOWN: Adjust frequency */
+        /* UP: Start animation */
         if (padPressed(0) & KEY_UP) {
-            if (frequency < 8) {
-                frequency++;
-                applyWaveSettings();
+            if (!animating) {
+                animating = 1;
                 updateDisplay();
             }
         }
+
+        /* DOWN: Stop animation (freeze) */
         if (padPressed(0) & KEY_DOWN) {
-            if (frequency > 1) {
-                frequency--;
-                applyWaveSettings();
+            if (animating) {
+                animating = 0;
                 updateDisplay();
             }
         }
 
-        /* L/R: Adjust speed */
-        if (padPressed(0) & KEY_R) {
-            if (speed < 4) {
-                speed++;
-                hdmaWaveSetSpeed(speed);
-                updateDisplay();
-            }
-        }
-        if (padPressed(0) & KEY_L) {
-            if (speed > 1) {
-                speed--;
-                hdmaWaveSetSpeed(speed);
-                updateDisplay();
-            }
-        }
-
-        /* Update wave animation */
-        if (wave_enabled) {
+        /* Update wave animation only if animating */
+        if (wave_enabled && animating) {
             hdmaWaveUpdate();
         }
     }
