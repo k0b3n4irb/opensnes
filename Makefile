@@ -63,7 +63,7 @@ clean:
 	$(MAKE) -C $(TESTS_PATH) clean
 	-rm -rf bin/
 
-install: compiler tools
+install: compiler tools lib
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
 
@@ -102,7 +102,7 @@ docs:
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: all docs
+release: install docs
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."
