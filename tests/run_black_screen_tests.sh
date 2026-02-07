@@ -146,7 +146,9 @@ echo "Lua script: $LUA_SCRIPT"
 # Try running Mesen briefly to check for missing libraries or startup errors
 FIRST_ROM=$(echo "$ROMS" | head -1)
 echo "Testing with: $FIRST_ROM"
-timeout 15 "$MESEN_PATH" --testrunner "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1 || true
+timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1
+PREFLIGHT_EXIT=$?
+echo "Pre-flight exit code: $PREFLIGHT_EXIT (124=timeout, 0=PASS, 1=FAIL)"
 echo "--- Pre-flight output (first 30 lines) ---"
 head -30 /tmp/opensnes_preflight.txt 2>/dev/null || echo "(no output)"
 echo "--- Pre-flight output size: $(wc -c < /tmp/opensnes_preflight.txt 2>/dev/null || echo 0) bytes ---"
@@ -193,15 +195,21 @@ for ROM in $ROMS; do
     fi
 
     # Run Mesen in testrunner mode with timeout (output captured to file)
-    # Syntax: Mesen --testrunner <rom> <lua_script>
-    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner "$ROM" "$LUA_SCRIPT" || true
+    # Syntax: Mesen --testrunner --enablestdout <rom> <lua_script>
+    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner --enablestdout "$ROM" "$LUA_SCRIPT"
+    MESEN_EXIT=$?
     OUTPUT=$(cat "$OUTPUT_FILE" 2>/dev/null || true)
 
-    # Check result from stdout (BLACKTEST_RESULT:PASS/FAIL:details)
-    # Also check file as fallback
+    # Check result: prefer stdout output, fallback to exit code
     RESULT=""
     if echo "$OUTPUT" | grep -q "BLACKTEST_RESULT:"; then
         RESULT=$(echo "$OUTPUT" | grep "BLACKTEST_RESULT:" | tail -1 | sed 's/BLACKTEST_RESULT://')
+    elif [ "$MESEN_EXIT" -eq 0 ]; then
+        # emu.stop(0) = PASS (exit code 0, no stdout needed)
+        RESULT="PASS:exit code 0"
+    elif [ "$MESEN_EXIT" -eq 1 ]; then
+        # emu.stop(1) = FAIL (exit code 1)
+        RESULT="FAIL:exit code 1 (black screen)"
     elif [ -f "$RESULT_FILE" ]; then
         RESULT=$(cat "$RESULT_FILE")
     fi
