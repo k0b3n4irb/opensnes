@@ -18,23 +18,27 @@
  *
  * ## Table Format
  *
- * Direct mode (bit 7 = 0): Write different data each scanline
+ * Non-repeat mode (bit 7 = 0): Write data ONCE, then skip N-1 scanlines
  * ```
- * .db 3        ; Apply next value for 3 lines
- * .db $1F, $00 ; Data (2 bytes for mode 1)
- * .db 5        ; Apply next value for 5 lines
+ * .db 32       ; Write data once, hold for 32 scanlines
+ * .db $1F, $00 ; Data (2 bytes for transfer mode 1)
+ * .db 16       ; Write data once, hold for 16 scanlines
  * .db $1F, $08 ; Data
  * .db 0        ; End of table
  * ```
+ * Use for registers that hold their value (COLDATA, CGADD).
+ * Efficient: 1 data set per group, regardless of line count.
  *
- * Repeat mode (bit 7 = 1): Write same data for N lines, then advance
+ * Repeat mode (bit 7 = 1): Write same data EVERY scanline for N lines
  * ```
- * .db $82      ; Repeat next value for 2 lines ($80 | 2)
- * .db $1F, $00 ; Data
- * .db $85      ; Repeat next value for 5 lines
+ * .db $82      ; Write data every scanline for 2 lines ($80 | 2)
+ * .db $1F, $00 ; Data written on each of the 2 scanlines
+ * .db $85      ; Write data every scanline for 5 lines
  * .db $1F, $08 ; Data
  * .db 0        ; End of table
  * ```
+ * REQUIRED for scroll registers (BG1HOFS, etc.) and other write-twice/
+ * latched registers that need re-writing every scanline.
  *
  * ## Usage Example
  *
@@ -59,16 +63,24 @@
  *
  * ## IMPORTANT: Scroll Registers Require Repeat Mode
  *
- * BG scroll registers (BG1HOFS, BG1VOFS, etc.) require REPEAT mode (bit 7 = 1)
- * in the HDMA line count. Direct mode (bit 7 = 0) does NOT work for scroll.
+ * BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that
+ * require being written EVERY scanline to maintain their value. Use REPEAT
+ * mode (bit 7 = 1) in the HDMA line count for these registers.
+ *
+ * Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the
+ * scroll value is lost on subsequent scanlines — causing visible glitches.
  *
  * ```
- * // WRONG - Direct mode doesn't work for scroll:
- * .db 32, $20, $00    ; Won't scroll!
+ * // WRONG - Non-repeat writes once then skips, scroll value lost:
+ * .db 32, $20, $00    ; Writes on line 1 only, lines 2-32 get stale value
  *
- * // CORRECT - Repeat mode for scroll registers:
- * .db $A0, $20, $00   ; $A0 = $80 | 32 = repeat for 32 lines
+ * // CORRECT - Repeat writes every scanline, scroll value maintained:
+ * .db $A0, $20, $00   ; $A0 = $80 | 32 = write every scanline for 32 lines
  * ```
+ *
+ * Summary:
+ * - COLDATA ($2132), CGADD/CGDATA: non-repeat OK (registers hold value)
+ * - BG scroll, window, Mode 7 matrix: MUST use repeat mode
  *
  * @author OpenSNES Team
  * @copyright MIT License
