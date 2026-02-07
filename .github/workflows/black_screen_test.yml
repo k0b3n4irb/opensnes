@@ -62,14 +62,21 @@ jobs:
           make -C examples/text/1_hello_world 2>&1 | tail -5
           ls -la examples/text/1_hello_world/*.sfc
 
-      # Mesen2 shows a first-run wizard (Avalonia UI) if no config exists.
-      # This happens BEFORE the --testrunner check in Program.Main().
-      # Pre-creating settings.json skips the wizard and reaches testrunner mode.
+      # Mesen2 Program.Main() flow:
+      #   1. If no settings.json → show first-run wizard (Avalonia UI) → blocks
+      #   2. If settings.json exists → Deserialize it
+      #   3. If deserialization fails → CreateConfig() with proper defaults
+      #   4. Check --testrunner → run headless
+      #
+      # Strategy: create settings.json with INVALID content so that:
+      #   - File.Exists check passes → wizard is skipped
+      #   - Deserialization fails → falls back to CreateConfig() with proper defaults
+      #   - TestRunner path is reached with a fully initialized Configuration
       - name: Pre-create Mesen config (skip first-run wizard)
         run: |
           mkdir -p ~/.config/Mesen2
-          echo '{}' > ~/.config/Mesen2/settings.json
-          echo "Created ~/.config/Mesen2/settings.json"
+          echo 'FORCE_DEFAULTS' > ~/.config/Mesen2/settings.json
+          echo "Created ~/.config/Mesen2/settings.json (invalid JSON → CreateConfig fallback)"
 
       # Test 3 methods: no display, xvfb, xvfb+no-audio
       - name: Run Mesen2 testrunner (single ROM)
