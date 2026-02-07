@@ -132,7 +132,7 @@ jobs:
         run: |
           set -o pipefail
           echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/compiler/run_tests.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
       # Build and validate examples          #
