@@ -151,9 +151,26 @@ echo "--- Dependency check ---"
 ldd "$MESEN_PATH" 2>&1 | grep -i "not found" || echo "All dependencies satisfied"
 echo "---"
 
+# Test 1: check if Mesen responds to --help or any flag
+echo "--- Test: Mesen version/help ---"
+HELP_EXIT=0
+timeout 5 "$MESEN_PATH" --help > /tmp/opensnes_help.txt 2>&1 || HELP_EXIT=$?
+echo "Help exit code: $HELP_EXIT"
+head -10 /tmp/opensnes_help.txt 2>/dev/null || echo "(no help output)"
+
+# Test 2: try testrunner with --enablestdout
+echo "--- Test: testrunner mode ---"
 PREFLIGHT_EXIT=0
 timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1 || PREFLIGHT_EXIT=$?
 echo "Pre-flight exit code: $PREFLIGHT_EXIT (124=timeout, 0=PASS, 1=FAIL)"
+
+# Test 3: try without --testrunner to see if Mesen loads at all
+echo "--- Test: Mesen GUI mode (5s) ---"
+GUI_EXIT=0
+timeout 5 "$MESEN_PATH" "$FIRST_ROM" > /tmp/opensnes_gui.txt 2>&1 || GUI_EXIT=$?
+echo "GUI exit code: $GUI_EXIT"
+echo "GUI output size: $(wc -c < /tmp/opensnes_gui.txt 2>/dev/null || echo 0) bytes"
+head -5 /tmp/opensnes_gui.txt 2>/dev/null || echo "(no gui output)"
 echo "--- Pre-flight output (first 30 lines) ---"
 head -30 /tmp/opensnes_preflight.txt 2>/dev/null || echo "(no output)"
 echo "--- Pre-flight output size: $(wc -c < /tmp/opensnes_preflight.txt 2>/dev/null || echo 0) bytes ---"
