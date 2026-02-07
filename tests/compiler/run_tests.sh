@@ -908,8 +908,11 @@ test_nested_struct() {
     echo "Generated: $out"
 
     # Check for game symbol (our GameState variable)
-    if ! grep -q 'game' "$out"; then
+    # Use -a to force text mode (MSYS2/Windows may detect CRLF files as binary)
+    if ! grep -aq 'game' "$out"; then
         log_fail "$name: game symbol not found"
+        log_verbose "File size: $(wc -c < "$out") bytes, first 5 lines:"
+        log_verbose "$(head -5 "$out")"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -944,8 +947,11 @@ test_union() {
     echo "Generated: $out"
 
     # Check for union variables
-    if ! grep -q 'ms' "$out" || ! grep -q 'col' "$out"; then
+    # Use -a to force text mode (MSYS2/Windows may detect CRLF files as binary)
+    if ! grep -aq 'ms' "$out" || ! grep -aq 'col' "$out"; then
         log_fail "$name: Union symbols not found"
+        log_verbose "File size: $(wc -c < "$out") bytes, first 5 lines:"
+        log_verbose "$(head -5 "$out")"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -1324,7 +1330,7 @@ test_variable_shift() {
 
     # Extract the body of shift_left_var function (between label and next label/section)
     local func_body
-    func_body=$(sed -n '/^shift_left_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+    func_body=$(sed -n '/^shift_left_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
     # Check for actual shift instructions in shift_left_var
     # Must contain asl (shift left) or a call to __shl (shift helper)
@@ -1340,7 +1346,7 @@ test_variable_shift() {
 
     # Check compute_bitmask also has shifts
     local bitmask_body
-    bitmask_body=$(sed -n '/^compute_bitmask:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+    bitmask_body=$(sed -n '/^compute_bitmask:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
     if ! echo "$bitmask_body" | grep -qE '(asl|__shl)'; then
         log_fail "$name: compute_bitmask has NO asl/__shl — 1<<idx broken!"
@@ -1385,7 +1391,7 @@ test_ssa_phi_locals() {
 
     # Extract test_many_locals function body
     local func_body
-    func_body=$(sed -n '/^test_many_locals:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+    func_body=$(sed -n '/^test_many_locals:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
     # Check that all 12 expected constants are present:
     # Initial values: 1, 2, 3, 4, 5, 6
@@ -1609,7 +1615,7 @@ test_multiply() {
     local inline_muls=(mul_by_3 mul_by_5 mul_by_6 mul_by_7 mul_by_9 mul_by_10)
     for func in "${inline_muls[@]}"; do
         local func_body
-        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | head -n -1)
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
 
         if echo "$func_body" | grep -q '__mul16'; then
             log_fail "$name: ${func} calls __mul16 instead of using inline shift+add"
@@ -1626,7 +1632,7 @@ test_multiply() {
 
     # Check that variable * variable calls __mul16 with stack convention (pha)
     local var_body
-    var_body=$(sed -n '/^mul_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+    var_body=$(sed -n '/^mul_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
     if ! echo "$var_body" | grep -q '__mul16'; then
         log_fail "$name: mul_var missing __mul16 call"
@@ -1642,7 +1648,7 @@ test_multiply() {
 
     # Check non-special constant (*13) also calls __mul16
     local const_body
-    const_body=$(sed -n '/^mul_by_13:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+    const_body=$(sed -n '/^mul_by_13:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
     if ! echo "$const_body" | grep -q '__mul16'; then
         log_fail "$name: mul_by_13 missing __mul16 call"
