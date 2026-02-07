@@ -166,7 +166,8 @@ for ROM in $ROMS; do
     fi
 
     # Run Mesen in testrunner mode with timeout (output captured to file)
-    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" "$ROM" --testrunner --lua "$LUA_SCRIPT" || true
+    # Syntax: Mesen --testrunner <rom> <lua_script>
+    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner "$ROM" "$LUA_SCRIPT" || true
     OUTPUT=$(cat "$OUTPUT_FILE" 2>/dev/null || true)
 
     # Check result from stdout (BLACKTEST_RESULT:PASS/FAIL:details)
