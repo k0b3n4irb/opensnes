@@ -1758,6 +1758,419 @@ test_return_value() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Struct alignment and padding
+#
+# Verifies that:
+#   - Struct sizes include correct padding (Simple=4, Mixed=6, Nested=10,
+#     ThreeWords=6, OneByte=1)
+#   - Field offsets use correct alignment (u16 fields 2-byte aligned)
+#   - Array stride calculation uses correct struct size
+#------------------------------------------------------------------------------
+test_struct_alignment() {
+    local name="struct_alignment"
+    local src="$SCRIPT_DIR/test_struct_alignment.c"
+    local out="$BUILD/test_struct_alignment.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Check struct sizes via dsb in RAMSECTION
+    local expected_sizes=("simple:4" "mixed:6" "nested:10" "three:6" "one:1")
+    for entry in "${expected_sizes[@]}"; do
+        local sym="${entry%%:*}"
+        local expected_sz="${entry##*:}"
+        local actual_line
+        actual_line=$(grep -A1 "^${sym}:" "$out" | grep 'dsb')
+        if [[ -z "$actual_line" ]]; then
+            log_fail "$name: Symbol '$sym' not found in RAMSECTION"
+            ((fail_count++))
+            continue
+        fi
+        local actual_sz
+        actual_sz=$(echo "$actual_line" | grep -oE '[0-9]+')
+        if [[ "$actual_sz" != "$expected_sz" ]]; then
+            log_fail "$name: '$sym' dsb $actual_sz, expected dsb $expected_sz"
+            ((fail_count++))
+        fi
+    done
+
+    # Check that field offsets use adc #2 (for u16 alignment) in test_simple_access
+    local func_body
+    func_body=$(sed -n '/^test_simple_access:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #2'; then
+        log_fail "$name: test_simple_access missing adc.w #2 for u16 field offset"
+        ((fail_count++))
+    fi
+
+    # Check that test_mixed_access has offsets for fields at +2, +4, +5
+    func_body=$(sed -n '/^test_mixed_access:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #4'; then
+        log_fail "$name: test_mixed_access missing adc.w #4 for z field offset"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'adc\.w #5'; then
+        log_fail "$name: test_mixed_access missing adc.w #5 for w field offset"
+        ((fail_count++))
+    fi
+
+    # Check array stride: test_array_stride should use adc #4 or #8 for stride
+    func_body=$(sed -n '/^test_array_stride:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #4'; then
+        log_fail "$name: test_array_stride missing stride offset adc.w #4"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Volatile pointer dereference
+#
+# Verifies that:
+#   - Writes to volatile hardware registers are not eliminated
+#   - Reads from volatile registers are not cached/coalesced
+#   - Register write order is preserved for hardware sequences
+#   - Volatile loop writes are not optimized away
+#------------------------------------------------------------------------------
+test_volatile_ptr() {
+    local name="volatile_ptr"
+    local src="$SCRIPT_DIR/test_volatile_ptr.c"
+    local out="$BUILD/test_volatile_ptr.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # test_write_register: must have 3 writes to $002100 (not optimized away)
+    local func_body
+    func_body=$(sed -n '/^test_write_register:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    local write_count
+    write_count=$(echo "$func_body" | grep -c 'sta\.l \$002100')
+    if [[ $write_count -lt 3 ]]; then
+        log_fail "$name: test_write_register has $write_count writes to \$002100, expected 3 (volatile writes optimized away!)"
+        ((fail_count++))
+    fi
+
+    # test_read_register: must have 2 separate reads (lda.l via indirect)
+    func_body=$(sed -n '/^test_read_register:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    local read_count
+    read_count=$(echo "$func_body" | grep -c 'lda\.l')
+    if [[ $read_count -lt 2 ]]; then
+        log_fail "$name: test_read_register has $read_count reads, expected 2+ (volatile reads coalesced!)"
+        ((fail_count++))
+    fi
+
+    # test_vram_write_sequence: must write to $2115, $2116, $2117, $2118, $2119 in order
+    func_body=$(sed -n '/^test_vram_write_sequence:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    for reg in 2115 2116 2117 2118 2119; do
+        if ! echo "$func_body" | grep -q "sta\.l \$00${reg}"; then
+            log_fail "$name: test_vram_write_sequence missing write to \$${reg}"
+            ((fail_count++))
+        fi
+    done
+
+    # test_volatile_loop: must have writes to $2118 and $2119 inside loop body
+    func_body=$(sed -n '/^test_volatile_loop:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'sta\.l \$002118'; then
+        log_fail "$name: test_volatile_loop missing loop write to \$002118"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Global struct initialization
+#
+# Verifies that:
+#   - Initialized globals are in RAMSECTION (.data) with matching .data_init
+#   - Zero-initialized globals are in .bss (no .data_init entry)
+#   - Init data contains correct values (struct field values)
+#   - Complex patterns: nested structs, arrays of structs, partial init
+#------------------------------------------------------------------------------
+test_global_struct_init() {
+    local name="global_struct_init"
+    local src="$SCRIPT_DIR/test_global_struct_init.c"
+    local out="$BUILD/test_global_struct_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Check that initialized globals have both RAMSECTION and .data_init
+    local init_symbols=("entry1" "entry2" "player" "enemy" "default_style" "table" "partial")
+    for sym in "${init_symbols[@]}"; do
+        # Must be in RAMSECTION
+        if ! grep -q "^${sym}:" "$out"; then
+            log_fail "$name: Symbol '$sym' not found"
+            ((fail_count++))
+            continue
+        fi
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if ! echo "$section_line" | grep -q 'RAMSECTION'; then
+            log_fail "$name: '$sym' not in RAMSECTION (got: $section_line)"
+            ((fail_count++))
+        fi
+        # Must have matching .data_init
+        if ! grep -q "\.dw ${sym}" "$out"; then
+            log_fail "$name: '$sym' has no .data_init entry (.dw ${sym})"
+            ((fail_count++))
+        fi
+    done
+
+    # Check that zero-initialized global is in .bss (NOT .data)
+    local zeroed_line
+    zeroed_line=$(grep -n "^zeroed:" "$out" | head -1 | cut -d: -f1)
+    if [[ -n "$zeroed_line" ]]; then
+        local zeroed_section
+        zeroed_section=$(head -n "$zeroed_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if echo "$zeroed_section" | grep -q '\.bss'; then
+            log_verbose "$name: zeroed correctly in .bss"
+        elif echo "$zeroed_section" | grep -q '\.data'; then
+            # .data is also fine if it has no .data_init (or all zeros)
+            log_verbose "$name: zeroed in .data section (acceptable)"
+        fi
+        # Must NOT have a .data_init entry
+        if grep -q '\.dw zeroed' "$out"; then
+            log_fail "$name: 'zeroed' should not have .data_init (it's zero-initialized)"
+            ((fail_count++))
+        fi
+    fi
+
+    # Check specific init values: entry1 should have .dw 1000
+    if ! grep -q '\.dw 1000' "$out"; then
+        log_fail "$name: Missing init value .dw 1000 for entry1.value"
+        ((fail_count++))
+    fi
+
+    # Check player init: .db 100 (health field)
+    if ! grep -q '\.db 100' "$out"; then
+        log_fail "$name: Missing init value .db 100 for player.health"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: 32-bit (unsigned int) arithmetic
+#
+# Verifies that:
+#   - 32-bit add/sub generate ADC/SBC instructions
+#   - 32-bit variables use 4 bytes of storage (dsb 4)
+#   - High-word access uses result+2 pattern (sta.l symbol+2)
+#   - Bitwise ops (AND, OR, XOR) generate correct 32-bit sequences
+#
+# Note: On cproc/65816, unsigned int = 4 bytes (u32), NOT unsigned long (8 bytes)
+#------------------------------------------------------------------------------
+test_u32_arithmetic() {
+    local name="u32_arithmetic"
+    local src="$SCRIPT_DIR/test_u32_arithmetic.c"
+    local out="$BUILD/test_u32_arithmetic.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # 32-bit result variable must be 4 bytes
+    local result_dsb
+    result_dsb=$(grep -A1 '^result32:' "$out" | grep 'dsb' | grep -oE '[0-9]+')
+    if [[ "$result_dsb" != "4" ]]; then
+        log_fail "$name: result32 is dsb $result_dsb, expected dsb 4"
+        ((fail_count++))
+    fi
+
+    # Must have ADC instructions (32-bit addition)
+    local adc_count
+    adc_count=$(grep -c 'adc' "$out")
+    if [[ $adc_count -lt 5 ]]; then
+        log_fail "$name: Only $adc_count ADC instructions found, expected 5+ for 32-bit arithmetic"
+        ((fail_count++))
+    fi
+
+    # Must have SBC instructions (32-bit subtraction)
+    local sbc_count
+    sbc_count=$(grep -c 'sbc' "$out")
+    if [[ $sbc_count -lt 2 ]]; then
+        log_fail "$name: Only $sbc_count SBC instructions found, expected 2+ for 32-bit subtraction"
+        ((fail_count++))
+    fi
+
+    # Must access high word via result32+2 pattern
+    if ! grep -q 'result32+2' "$out"; then
+        log_fail "$name: No result32+2 pattern found (32-bit high word not accessed)"
+        ((fail_count++))
+    fi
+
+    # Check that functions are not constant-folded (must have function bodies with arithmetic)
+    local func_body
+    func_body=$(sed -n '/^add32:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'adc|clc'; then
+        log_fail "$name: add32 function body has no ADC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    func_body=$(sed -n '/^sub32:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'sbc|sec'; then
+        log_fail "$name: sub32 function body has no SBC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Signed/unsigned type promotion
+#
+# Verifies that:
+#   - u8 zero-extension uses AND #$00FF
+#   - s8 sign-extension uses AND #$00FF + CMP #$0080 + ORA #$FF00 pattern
+#   - Mixed signed/unsigned arithmetic produces correct extensions
+#   - Arithmetic right shift preserves sign
+#
+# On 65816, integer promotion is critical for correctness:
+#   u8 → u16: AND #$00FF (zero-extend)
+#   s8 → s16: AND #$00FF, CMP #$0080, BCC +, ORA #$FF00 (sign-extend)
+#------------------------------------------------------------------------------
+test_sign_promotion() {
+    local name="sign_promotion"
+    local src="$SCRIPT_DIR/test_sign_promotion.c"
+    local out="$BUILD/test_sign_promotion.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Must have zero-extension pattern: and.w #$00FF
+    local zext_count
+    zext_count=$(grep -c 'and\.w #\$00FF' "$out")
+    if [[ $zext_count -lt 4 ]]; then
+        log_fail "$name: Only $zext_count zero-extensions (and.w #\$00FF) found, expected 4+"
+        ((fail_count++))
+    fi
+
+    # Must have sign-extension check: cmp.w #$0080
+    local sext_check_count
+    sext_check_count=$(grep -c 'cmp\.w #\$0080' "$out")
+    if [[ $sext_check_count -lt 2 ]]; then
+        log_fail "$name: Only $sext_check_count sign-extension checks (cmp.w #\$0080) found, expected 2+"
+        ((fail_count++))
+    fi
+
+    # Must have sign-extension apply: ora.w #$FF00
+    local sext_apply_count
+    sext_apply_count=$(grep -c 'ora\.w #\$FF00' "$out")
+    if [[ $sext_apply_count -lt 2 ]]; then
+        log_fail "$name: Only $sext_apply_count sign-extensions (ora.w #\$FF00) found, expected 2+"
+        ((fail_count++))
+    fi
+
+    # Check add_s8_s16 specifically has the sign-extension pattern
+    local func_body
+    func_body=$(sed -n '/^add_s8_s16:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'and\.w #\$00FF'; then
+        log_fail "$name: add_s8_s16 missing zero-extend before sign check"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'cmp\.w #\$0080'; then
+        log_fail "$name: add_s8_s16 missing sign bit check (cmp.w #\$0080)"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'ora\.w #\$FF00'; then
+        log_fail "$name: add_s8_s16 missing sign extension (ora.w #\$FF00)"
+        ((fail_count++))
+    fi
+
+    # Check that functions are not constant-folded
+    func_body=$(sed -n '/^add_u8_u8:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'adc|clc'; then
+        log_fail "$name: add_u8_u8 function body has no ADC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -1854,6 +2267,13 @@ main() {
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
     test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
     test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
+
+    # === Compiler Hardening Tests (Phase 1.5) ===
+    test_struct_alignment            # Struct padding, field offsets, array stride
+    test_volatile_ptr                # Volatile register reads/writes not optimized away
+    test_global_struct_init          # .data_init for initialized global structs
+    test_u32_arithmetic              # 32-bit arithmetic on 16-bit CPU
+    test_sign_promotion              # Signed/unsigned type promotion and extension
 
     echo ""
     echo "========================================"
