@@ -136,6 +136,32 @@ if [ "$TOTAL" -eq 0 ]; then
 fi
 
 #------------------------------------------------------------------------------
+# Pre-flight: verify Mesen can start
+#------------------------------------------------------------------------------
+echo "--- Mesen pre-flight check ---"
+echo "Binary: $MESEN_PATH"
+echo "File type: $(file "$MESEN_PATH" 2>/dev/null | head -1)"
+echo "Lua script: $LUA_SCRIPT"
+
+# Try running Mesen briefly to check for missing libraries or startup errors
+FIRST_ROM=$(echo "$ROMS" | head -1)
+echo "Testing with: $FIRST_ROM"
+timeout 15 "$MESEN_PATH" --testrunner "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1 || true
+echo "--- Pre-flight output (first 30 lines) ---"
+head -30 /tmp/opensnes_preflight.txt 2>/dev/null || echo "(no output)"
+echo "--- Pre-flight output size: $(wc -c < /tmp/opensnes_preflight.txt 2>/dev/null || echo 0) bytes ---"
+
+# Check if result was produced
+if grep -q "BLACKTEST_RESULT:" /tmp/opensnes_preflight.txt 2>/dev/null; then
+    echo "Pre-flight: Mesen testrunner is working!"
+else
+    echo "WARNING: Mesen did not produce expected output."
+    echo "Full output:"
+    cat /tmp/opensnes_preflight.txt 2>/dev/null || echo "(empty)"
+fi
+echo "-------------------------------"
+
+#------------------------------------------------------------------------------
 # Run tests
 #------------------------------------------------------------------------------
 echo "========================================"
@@ -152,6 +178,7 @@ PASSED=0
 FAILED=0
 ERRORS=0
 FAILED_ROMS=""
+FIRST_ERROR_DUMPED=0
 
 for ROM in $ROMS; do
     ROM_NAME=$(basename "$ROM" .sfc)
@@ -217,6 +244,13 @@ for ROM in $ROMS; do
         # Timeout or crash - no result found
         ERRORS=$((ERRORS + 1))
         echo -e "${YELLOW}[ERROR]${NC} $ROM_DIR/$ROM_NAME - Timeout or crash (no result)"
+        # Dump first error output for debugging
+        if [ "$FIRST_ERROR_DUMPED" -eq 0 ]; then
+            FIRST_ERROR_DUMPED=1
+            echo "  --- Debug output for first error ---"
+            head -20 "$OUTPUT_FILE" 2>/dev/null || echo "  (no output file)"
+            echo "  --- End debug output ---"
+        fi
     fi
 done
 
