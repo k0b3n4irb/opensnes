@@ -21,8 +21,8 @@ on:
 
 jobs:
   black-screen-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     continue-on-error: true
 
     steps:
@@ -30,28 +30,43 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt-get install -y build-essential clang cmake make git \
-              xvfb libsdl2-2.0-0
+              xvfb libsdl2-dev
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Check out OpenSNES
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Cache Mesen emulator
+      # Cache the built Mesen2 to avoid rebuilding every time
+      - name: Cache Mesen build
         id: cache-mesen
         uses: actions/cache@v4
         with:
-          path: ~/mesen
-          key: mesen-${{ env.MESEN_VERSION }}-linux-x64
+          path: ~/mesen-build
+          key: mesen-build-${{ env.MESEN_VERSION }}-ubuntu2404-net8
 
-      - name: Download Mesen
+      # Build Mesen2 from source as framework-dependent (.NET).
+      # The NativeAOT release binary crashes with std::bad_cast in
+      # testrunner mode — building from source avoids this issue.
+      - name: Build Mesen from source
         if: steps.cache-mesen.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/mesen
-          curl -sL "https://github.com/SourMesen/Mesen2/releases/download/${{ env.MESEN_VERSION }}/Mesen_${{ env.MESEN_VERSION }}_Linux_x64.zip" -o /tmp/mesen.zip
-          unzip /tmp/mesen.zip -d ~/mesen
-          chmod +x ~/mesen/Mesen
-          ls -la ~/mesen/
+          set -o pipefail
+          git clone --depth 1 --branch "$MESEN_VERSION" \
+            https://github.com/SourMesen/Mesen2.git ~/mesen-src 2>&1 || \
+          git clone --depth 1 https://github.com/SourMesen/Mesen2.git ~/mesen-src 2>&1
+          cd ~/mesen-src
+          make 2>&1 | tail -20
+          mkdir -p ~/mesen-build
+          cp -r bin/linux-x64/Release/net8.0/publish/* ~/mesen-build/ 2>/dev/null || \
+          cp -r bin/linux-x64/Release/net8.0/* ~/mesen-build/ 2>/dev/null || \
+          cp -r bin/*/*/net*/* ~/mesen-build/
+          ls -la ~/mesen-build/
 
       # Build only hello_world (fastest example to compile)
       - name: Build SDK and single example
@@ -62,72 +77,52 @@ jobs:
           make -C examples/text/1_hello_world 2>&1 | tail -5
           ls -la examples/text/1_hello_world/*.sfc
 
-      # Mesen2 Program.Main() flow:
-      #   1. If no settings.json → show first-run wizard (Avalonia UI) → blocks
-      #   2. If settings.json exists → Deserialize it
-      #   3. If deserialization fails → CreateConfig() with proper defaults
-      #   4. Check --testrunner → run headless
-      #
-      # Strategy: create settings.json with INVALID content so that:
-      #   - File.Exists check passes → wizard is skipped
-      #   - Deserialization fails → falls back to CreateConfig() with proper defaults
-      #   - TestRunner path is reached with a fully initialized Configuration
-      - name: Pre-create Mesen config (skip first-run wizard)
+      # Pre-create config to skip first-run wizard
+      - name: Pre-create Mesen config
         run: |
           mkdir -p ~/.config/Mesen2
           echo 'FORCE_DEFAULTS' > ~/.config/Mesen2/settings.json
-          echo "Created ~/.config/Mesen2/settings.json (invalid JSON → CreateConfig fallback)"
 
-      # Test 3 methods: no display, xvfb, xvfb+no-audio
-      - name: Run Mesen2 testrunner (single ROM)
+      - name: Run black screen test
         run: |
-          MESEN="$HOME/mesen/Mesen"
           ROM="examples/text/1_hello_world/hello_world.sfc"
           LUA="tests/black_screen_test.lua"
 
-          echo "=== Mesen2 v${{ env.MESEN_VERSION }} testrunner ==="
+          echo "=== Mesen2 testrunner (framework-dependent build) ==="
           echo "ROM: $ROM ($(stat -c%s "$ROM") bytes)"
           echo ""
 
-          # Test 1: No display at all (testrunner should bypass Avalonia)
-          echo "--- Test 1: No display (SDL dummy) ---"
+          # Test 1: No display (testrunner should bypass Avalonia)
+          echo "--- Test 1: No display ---"
           EXIT=0
           env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
+            timeout 20 dotnet ~/mesen-build/Mesen.dll \
+            --testrunner --enablestdout "$ROM" "$LUA" \
             > /tmp/test1.txt 2>&1 || EXIT=$?
           echo "exit=$EXIT  output=$(wc -c < /tmp/test1.txt)B"
-          cat /tmp/test1.txt
+          cat /tmp/test1.txt 2>/dev/null
           echo "---"
 
-          # Test 2: xvfb + no audio (if testrunner still needs X11)
+          # Test 2: xvfb + no audio
           echo "--- Test 2: xvfb + no-audio ---"
           EXIT=0
           env SDL_AUDIODRIVER=dummy \
             xvfb-run --auto-servernum -- \
-            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
+            timeout 20 dotnet ~/mesen-build/Mesen.dll \
+            --testrunner --enablestdout "$ROM" "$LUA" \
             > /tmp/test2.txt 2>&1 || EXIT=$?
           echo "exit=$EXIT  output=$(wc -c < /tmp/test2.txt)B"
-          cat /tmp/test2.txt
+          cat /tmp/test2.txt 2>/dev/null
           echo "---"
 
-          # Test 3: xvfb + full SDL (fallback)
-          echo "--- Test 3: xvfb full ---"
-          EXIT=0
-          xvfb-run --auto-servernum -- \
-            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
-            > /tmp/test3.txt 2>&1 || EXIT=$?
-          echo "exit=$EXIT  output=$(wc -c < /tmp/test3.txt)B"
-          cat /tmp/test3.txt
-          echo "---"
-
-          # Check if any test produced a BLACKTEST_RESULT
+          # Summary
           echo ""
           echo "=== RESULTS ==="
-          for i in 1 2 3; do
+          for i in 1 2; do
             if grep -q "BLACKTEST_RESULT:" /tmp/test$i.txt 2>/dev/null; then
               RESULT=$(grep "BLACKTEST_RESULT:" /tmp/test$i.txt | tail -1)
               echo "Test $i: $RESULT"
             else
-              echo "Test $i: NO RESULT (exit=$(head -1 /tmp/test${i}_exit.txt 2>/dev/null || echo '?'))"
+              echo "Test $i: NO RESULT"
             fi
           done
