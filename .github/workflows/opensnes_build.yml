@@ -208,6 +208,26 @@ jobs:
           ldd bin/*.exe 2>/dev/null | tee -a opensnes_linking_${{ matrix.name }}.log || true
 
       # ------------------------------------ #
+      # Black screen test (Linux only)       #
+      # ------------------------------------ #
+      - name: Black screen test (Linux)
+        if: matrix.name == 'linux'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          echo "=== Black Screen Test ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          # Check if Mesen is available (pre-installed or cached)
+          MESEN_PATH="${MESEN_PATH:-/usr/local/bin/Mesen}"
+          if [ -x "$MESEN_PATH" ]; then
+            # Install xvfb for headless rendering
+            sudo apt-get install -y xvfb 2>/dev/null || true
+            xvfb-run ./tests/run_black_screen_tests.sh "$MESEN_PATH" --save-screenshots 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          else
+            echo "Mesen not found at $MESEN_PATH - skipping black screen tests" | tee -a opensnes_release_${{ matrix.name }}.log
+            echo "Set MESEN_PATH environment variable to enable black screen testing" | tee -a opensnes_release_${{ matrix.name }}.log
+          fi
+
+      # ------------------------------------ #
       # Upload SDK release                   #
       # ------------------------------------ #
       - name: Upload OpenSNES SDK release
@@ -225,3 +245,11 @@ jobs:
         with:
           name: OpenSNES Logs (${{ matrix.name }})
           path: "*.log"
+
+      - name: Upload black screen test screenshots
+        uses: actions/upload-artifact@v4
+        if: always() && matrix.name == 'linux'
+        with:
+          name: Black Screen Screenshots
+          path: tests/screenshots/
+          if-no-files-found: ignore

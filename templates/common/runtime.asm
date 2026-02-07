@@ -42,18 +42,19 @@ tcc_mul16:
     php
     rep #$30            ; 16-bit A, X/Y
 
-    ; Save inputs to stack
-    lda tcc__r0
-    pha                 ; [SP] = multiplicand
-    lda tcc__r1
-    pha                 ; [SP+2] = multiplier
+    ; Compiler calling convention: args pushed on stack
+    ; Stack layout after jsl + php:
+    ;   SP+1: P register (1 byte)
+    ;   SP+2,3,4: return address (3 bytes)
+    ;   SP+5,6: arg1 = multiplicand (pushed second)
+    ;   SP+7,8: arg2 = multiplier (pushed first)
 
     sep #$20            ; 8-bit A
 
     ; --- a_lo * b_lo ---
-    lda 3,s             ; a_lo
+    lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
-    lda 1,s             ; b_lo
+    lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB - triggers multiply
 
     nop                 ; Wait 8 cycles for result
@@ -68,9 +69,9 @@ tcc_mul16:
     sep #$20
 
     ; --- a_hi * b_lo ---
-    lda 4,s             ; a_hi
+    lda 6,s             ; a_hi (multiplicand high byte)
     sta $4202           ; WRMPYA
-    lda 1,s             ; b_lo
+    lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB
 
     nop
@@ -90,9 +91,9 @@ tcc_mul16:
     sep #$20
 
     ; --- a_lo * b_hi ---
-    lda 3,s             ; a_lo
+    lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
-    lda 2,s             ; b_hi
+    lda 8,s             ; b_hi (multiplier high byte)
     sta $4203           ; WRMPYB
 
     nop
@@ -105,12 +106,7 @@ tcc_mul16:
     xba                 ; Multiply by 256
     and #$FF00
     clc
-    adc tcc__r2
-    sta tcc__r0         ; Final result in tcc__r0
-
-    ; Clean up stack
-    pla
-    pla
+    adc tcc__r2         ; Final result in A (returned to caller)
 
     plp
     rtl

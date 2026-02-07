@@ -61,6 +61,20 @@ void consoleInit(void) {
     /* Set up Mode 1 as default */
     REG_BGMODE = BGMODE_MODE1;
 
+    /* Set default BG memory layout.
+     * Without this, crt0 leaves $2107-$210C at zero, which puts both
+     * tilemap and tile data at VRAM $0000 (overlapping = garbage).
+     *
+     * Default layout:
+     *   BG1 tilemap at VRAM $0400 (BG1SC = $04, 32x32)
+     *   BG1 tile data at VRAM $0000 (BG12NBA low nibble = $0)
+     *
+     * Users can override with bgSetMapPtr() / bgSetGfxPtr() after init.
+     * We use direct register writes to avoid depending on the background module.
+     */
+    *(volatile u8*)0x2107 = 0x04;  /* BG1SC: tilemap at VRAM $0400, 32x32 */
+    *(volatile u8*)0x210B = 0x00;  /* BG12NBA: BG1 tiles at VRAM $0000 */
+
     /* Disable mosaic effect (register can have garbage on power-up) */
     REG_MOSAIC = 0;
 
