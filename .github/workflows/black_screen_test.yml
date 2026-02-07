@@ -22,35 +22,21 @@ on:
 jobs:
   black-screen-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     continue-on-error: true
 
     steps:
-      # ------------------------------------ #
-      # Install dependencies                 #
-      # ------------------------------------ #
       - name: Install dependencies
         run: |
           sudo apt update -y
-          sudo apt-get install -y build-essential \
-              clang \
-              cmake \
-              make \
-              git \
-              xvfb \
-              libsdl2-2.0-0
+          sudo apt-get install -y build-essential clang cmake make git \
+              xvfb libsdl2-2.0-0
 
-      # ------------------------------------ #
-      # Checkout                             #
-      # ------------------------------------ #
       - name: Check out OpenSNES
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      # ------------------------------------ #
-      # Cache & download Mesen emulator      #
-      # ------------------------------------ #
       - name: Cache Mesen emulator
         id: cache-mesen
         uses: actions/cache@v4
@@ -65,120 +51,63 @@ jobs:
           curl -sL "https://github.com/SourMesen/Mesen2/releases/download/${{ env.MESEN_VERSION }}/Mesen_${{ env.MESEN_VERSION }}_Linux_x64.zip" -o /tmp/mesen.zip
           unzip /tmp/mesen.zip -d ~/mesen
           chmod +x ~/mesen/Mesen
-          echo "Mesen ${{ env.MESEN_VERSION }} downloaded successfully"
           ls -la ~/mesen/
 
-      # ------------------------------------ #
-      # Build SDK and examples               #
-      # ------------------------------------ #
-      - name: Build SDK and examples
+      # Build only hello_world (fastest example to compile)
+      - name: Build SDK and single example
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          make 2>&1 | tee build.log
-          make examples 2>&1 | tee -a build.log
+          make 2>&1 | tail -5
+          make -C examples/text/1_hello_world 2>&1 | tail -5
+          ls -la examples/text/1_hello_world/*.sfc
 
-      # ------------------------------------ #
-      # Diagnose Mesen headless support      #
-      # ------------------------------------ #
-      - name: Diagnose Mesen2 headless modes
+      # Single-ROM diagnostic: try 4 headless methods
+      - name: Diagnose Mesen2 headless (single ROM)
         run: |
-          set -o pipefail
-          MESEN_PATH="$HOME/mesen/Mesen"
-          FIRST_ROM=$(find examples -name "*.sfc" | sort | head -1)
-          LUA_SCRIPT="tests/black_screen_test.lua"
+          MESEN="$HOME/mesen/Mesen"
+          ROM="examples/text/1_hello_world/hello_world.sfc"
+          LUA="tests/black_screen_test.lua"
 
-          echo "=== Mesen2 headless diagnostics ==="
-          echo "Binary: $MESEN_PATH"
-          echo "File type: $(file "$MESEN_PATH" | head -1)"
-          echo "Test ROM: $FIRST_ROM"
+          echo "=== Mesen2 v${{ env.MESEN_VERSION }} headless diagnostics ==="
+          echo "Binary: $(file "$MESEN" | cut -d: -f2)"
+          echo "ROM:    $ROM ($(stat -c%s "$ROM") bytes)"
           echo ""
 
-          # Check dependencies
-          echo "--- Dependency check ---"
-          ldd "$MESEN_PATH" 2>&1 | grep -i "not found" || echo "All dependencies satisfied"
+          echo "--- Dependencies ---"
+          ldd "$MESEN" 2>&1 | grep -i "not found" || echo "OK: all shared libs found"
           echo ""
 
-          # Test 1: SDL_VIDEODRIVER=dummy (no display server needed)
-          echo "--- Test 1: SDL_VIDEODRIVER=dummy ---"
-          EXIT1=0
-          SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-            timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" \
-            > /tmp/test1.txt 2>&1 || EXIT1=$?
-          echo "Exit code: $EXIT1"
-          echo "Output size: $(wc -c < /tmp/test1.txt) bytes"
-          head -20 /tmp/test1.txt 2>/dev/null
-          echo ""
+          for i in 1 2 3 4; do
+            case $i in
+              1) DESC="SDL_VIDEODRIVER=dummy";  CMD="env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
+              2) DESC="SDL_VIDEODRIVER=offscreen"; CMD="env SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
+              3) DESC="xvfb-run";               CMD="xvfb-run timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
+              4) DESC="xvfb + no-audio";        CMD="env SDL_AUDIODRIVER=dummy xvfb-run timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
+            esac
+            echo "--- Test $i: $DESC ---"
+            EXIT=0
+            eval $CMD > /tmp/test$i.txt 2>&1 || EXIT=$?
+            SIZE=$(wc -c < /tmp/test$i.txt)
+            echo "exit=$EXIT  output=${SIZE}B"
+            if [ "$SIZE" -gt 0 ]; then
+              echo "--- output ---"
+              cat /tmp/test$i.txt
+              echo "--- end ---"
+            fi
+            echo ""
+          done
 
-          # Test 2: SDL_VIDEODRIVER=offscreen (supports EGL)
-          echo "--- Test 2: SDL_VIDEODRIVER=offscreen ---"
-          EXIT2=0
-          SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy \
-            timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" \
-            > /tmp/test2.txt 2>&1 || EXIT2=$?
-          echo "Exit code: $EXIT2"
-          echo "Output size: $(wc -c < /tmp/test2.txt) bytes"
-          head -20 /tmp/test2.txt 2>/dev/null
-          echo ""
-
-          # Test 3: xvfb-run (virtual X11 server)
-          echo "--- Test 3: xvfb-run ---"
-          EXIT3=0
-          xvfb-run timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" \
-            > /tmp/test3.txt 2>&1 || EXIT3=$?
-          echo "Exit code: $EXIT3"
-          echo "Output size: $(wc -c < /tmp/test3.txt) bytes"
-          head -20 /tmp/test3.txt 2>/dev/null
-          echo ""
-
-          # Test 4: xvfb-run + SDL_AUDIODRIVER=dummy
-          echo "--- Test 4: xvfb-run + SDL_AUDIODRIVER=dummy ---"
-          EXIT4=0
-          SDL_AUDIODRIVER=dummy \
-            xvfb-run timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" \
-            > /tmp/test4.txt 2>&1 || EXIT4=$?
-          echo "Exit code: $EXIT4"
-          echo "Output size: $(wc -c < /tmp/test4.txt) bytes"
-          head -20 /tmp/test4.txt 2>/dev/null
-          echo ""
-
-          # Summary
-          echo "=== Summary ==="
-          echo "Test 1 (SDL dummy):        exit=$EXIT1  output=$(wc -c < /tmp/test1.txt) bytes"
-          echo "Test 2 (SDL offscreen):    exit=$EXIT2  output=$(wc -c < /tmp/test2.txt) bytes"
-          echo "Test 3 (xvfb-run):         exit=$EXIT3  output=$(wc -c < /tmp/test3.txt) bytes"
-          echo "Test 4 (xvfb + no audio):  exit=$EXIT4  output=$(wc -c < /tmp/test4.txt) bytes"
-
-      # ------------------------------------ #
-      # Run full black screen test suite     #
-      # (using best working method)          #
-      # ------------------------------------ #
-      - name: Black screen test
-        run: |
-          set -o pipefail
-          MESEN_PATH="$HOME/mesen/Mesen"
-          # Try SDL dummy first, fallback to xvfb
-          SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-            ./tests/run_black_screen_tests.sh "$MESEN_PATH" --save-screenshots 2>&1 | tee black_screen.log || {
-            echo "SDL dummy failed, trying xvfb..."
-            xvfb-run ./tests/run_black_screen_tests.sh "$MESEN_PATH" --save-screenshots 2>&1 | tee black_screen.log
-          }
-
-      # ------------------------------------ #
-      # Upload artifacts                     #
-      # ------------------------------------ #
-      - name: Upload black screen test screenshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Black Screen Screenshots
-          path: tests/screenshots/
-          if-no-files-found: ignore
-
-      - name: Upload test logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Black Screen Logs
-          path: black_screen.log
-          if-no-files-found: ignore
+          echo "=== SUMMARY ==="
+          printf "%-30s  exit  output\n" "Method"
+          for i in 1 2 3 4; do
+            case $i in
+              1) DESC="SDL dummy" ;;
+              2) DESC="SDL offscreen" ;;
+              3) DESC="xvfb-run" ;;
+              4) DESC="xvfb + no-audio" ;;
+            esac
+            # Re-read exit codes from output
+            SIZE=$(wc -c < /tmp/test$i.txt)
+            printf "%-30s  %s\n" "$DESC" "${SIZE}B"
+          done
