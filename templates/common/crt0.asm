@@ -501,6 +501,10 @@ CopyInitData:
     sta tcc__r1         ; tcc__r1 = ROM source address
 
     ; Copy loop: copy tcc__r4 bytes from [tcc__r1] to [tcc__r2]
+    ; IMPORTANT: Use 8-bit A to copy exactly 1 byte per iteration.
+    ; 16-bit lda/sta would write 2 bytes per iteration, causing a
+    ; 1-byte overrun past the target on the final iteration.
+    sep #$20            ; 8-bit A (X/Y remain 16-bit)
     ldy #0
 @copy_byte:
     lda (tcc__r1),y
@@ -508,6 +512,7 @@ CopyInitData:
     iny
     cpy tcc__r4
     bne @copy_byte
+    rep #$20            ; restore 16-bit A
 
 @next_record:
     ; Move to next init record: tcc__r0 += 4 + size

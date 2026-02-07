@@ -249,3 +249,30 @@ hdmaSetTable:
 .RAMSECTION ".hdma_state" BANK 0 SLOT 1
     hdma_enabled_state: dsb 1
 .ENDS
+
+;------------------------------------------------------------------------------
+; RAM for HDMA wave effect (double-buffered tables)
+;
+; Tables use 4-line chunks: 224 / 4 = 56 entries * 3 bytes + 1 = 169 bytes
+; Format per entry: [0x84 = repeat 4 lines] [scroll_lo] [scroll_hi]
+;
+; Tables are in bank $7E above the WRAM mirror ($2000+).
+; C code writes to them via the WRAM data port ($2180-$2183) since the
+; compiler's sta.l $0000,x only accesses bank $00 (I/O above $1FFF).
+; HDMA reads directly from bank $7E via the bank byte set in hdmaSetup.
+;------------------------------------------------------------------------------
+.RAMSECTION ".hdma_wave_tables" BANK $7E SLOT 2
+    hdma_table_a:         dsb 169    ; Buffer A
+    hdma_table_b:         dsb 169    ; Buffer B
+.ENDS
+
+.RAMSECTION ".hdma_wave_state" BANK 0 SLOT 1
+    hdma_active_buffer:   dsb 1      ; 0 = buffer A active, 1 = buffer B active
+    hdma_wave_frame:      dsb 1      ; Animation frame counter
+    hdma_wave_amplitude:  dsb 1      ; Wave amplitude (pixels)
+    hdma_wave_frequency:  dsb 1      ; Wave frequency multiplier
+    hdma_wave_channel:    dsb 1      ; HDMA channel being used
+    hdma_wave_enabled:    dsb 1      ; 1 = wave effect active
+    hdma_wave_speed:      dsb 1      ; Animation speed (frames per update)
+    hdma_wave_dest_reg:   dsb 1      ; Destination register (BG1HOFS, etc.)
+.ENDS

@@ -8,9 +8,10 @@
 # 3. Assembly -> Object file
 #
 # Usage:
-#   ./run_tests.sh           # Run all tests
-#   ./run_tests.sh -v        # Verbose output
-#   ./run_tests.sh test_X    # Run specific test
+#   ./run_tests.sh                    # Run all tests (strict mode)
+#   ./run_tests.sh -v                 # Verbose output
+#   ./run_tests.sh --allow-known-bugs # Known bugs warn instead of fail
+#   ./run_tests.sh test_X             # Run specific test
 #==============================================================================
 
 # Don't exit on error - we want to run all tests
@@ -36,8 +37,10 @@ AS="$BIN/wla-65816"
 TESTS_RUN=0
 TESTS_PASSED=0
 TESTS_FAILED=0
+TESTS_KNOWN_BUGS=0
 
 VERBOSE=0
+ALLOW_KNOWN_BUGS=0
 
 #------------------------------------------------------------------------------
 # Helpers
@@ -58,6 +61,18 @@ log_warn() {
 log_verbose() {
     if [[ $VERBOSE -eq 1 ]]; then
         echo "[DEBUG] $1"
+    fi
+}
+
+# Log a known bug failure. In --allow-known-bugs mode, counts as warning.
+# In strict mode (default), counts as failure.
+log_known_bug() {
+    if [[ $ALLOW_KNOWN_BUGS -eq 1 ]]; then
+        echo -e "${YELLOW}[KNOWN_BUG]${NC} $1"
+        ((TESTS_KNOWN_BUGS++))
+    else
+        log_fail "$1 (known bug — use --allow-known-bugs to suppress)"
+        ((TESTS_FAILED++))
     fi
 }
 
@@ -1075,10 +1090,44 @@ test_switch() {
 #------------------------------------------------------------------------------
 test_function_ptr() {
     local name="function_ptr"
+    local src="$SCRIPT_DIR/test_function_ptr.c"
+    local out="$BUILD/test_function_ptr.c.asm"
     ((TESTS_RUN++))
 
-    log_warn "$name: SKIPPED (QBE function pointer bug)"
-    ((TESTS_PASSED++))  # Count as passed since it's a known issue
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/function_ptr.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/function_ptr.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for indirect call mechanism (jml [tcc__r9] for indirect calls)
+    # OR direct calls only (if optimizer resolves all pointers)
+    if ! grep -qE '(jml \[tcc__r9\]|jsl increment|jsl execute_action)' "$out"; then
+        log_fail "$name: No call instructions found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that execute_action function exists and handles indirect call
+    if ! grep -q 'execute_action:' "$out"; then
+        log_fail "$name: execute_action function not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
 }
 
 #------------------------------------------------------------------------------
@@ -1241,6 +1290,434 @@ test_type_cast() {
 }
 
 #------------------------------------------------------------------------------
+# Phase 1.3: HDMA Wave Regression Tests
+# These test bugs discovered during HDMA wave demo development.
+# The bugs produce NO warnings — code compiles but generates wrong assembly.
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Test: Variable-count shifts generate actual shift instructions
+# BUG: `1 << variable` compiles to just `lda.w #1` — shift is dropped
+#      Constant shifts are folded at compile time, masking the bug.
+#------------------------------------------------------------------------------
+test_variable_shift() {
+    local name="variable_shift"
+    local src="$SCRIPT_DIR/test_variable_shift.c"
+    local out="$BUILD/test_variable_shift.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/variable_shift_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/variable_shift_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Extract the body of shift_left_var function (between label and next label/section)
+    local func_body
+    func_body=$(sed -n '/^shift_left_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+
+    # Check for actual shift instructions in shift_left_var
+    # Must contain asl (shift left) or a call to __shl (shift helper)
+    if ! echo "$func_body" | grep -qE '(asl|__shl)'; then
+        log_fail "$name: shift_left_var has NO asl/__shl — variable shift dropped!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body of shift_left_var:"
+            echo "$func_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check compute_bitmask also has shifts
+    local bitmask_body
+    bitmask_body=$(sed -n '/^compute_bitmask:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+
+    if ! echo "$bitmask_body" | grep -qE '(asl|__shl)'; then
+        log_fail "$name: compute_bitmask has NO asl/__shl — 1<<idx broken!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body of compute_bitmask:"
+            echo "$bitmask_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: SSA phi-node resolution with 6+ locals in nested if/else
+# BUG: Wrong values stored to wrong stack slots when many locals are
+#      modified in separate conditional branches
+#------------------------------------------------------------------------------
+test_ssa_phi_locals() {
+    local name="ssa_phi_locals"
+    local src="$SCRIPT_DIR/test_ssa_phi_locals.c"
+    local out="$BUILD/test_ssa_phi_locals.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/ssa_phi_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/ssa_phi_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Extract test_many_locals function body
+    local func_body
+    func_body=$(sed -n '/^test_many_locals:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+
+    # Check that all 12 expected constants are present:
+    # Initial values: 1, 2, 3, 4, 5, 6
+    # Branch values: 10, 20, 30, 40, 50, 60
+    local missing=0
+    for val in 10 20 30 40 50 60; do
+        if ! echo "$func_body" | grep -qE "lda\.w #$val\b"; then
+            log_verbose "Missing constant #$val in test_many_locals"
+            ((missing++))
+        fi
+    done
+
+    if [[ $missing -gt 0 ]]; then
+        log_fail "$name: Missing $missing/6 branch constants — phi-node values lost!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$func_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that at least 6 unique stack slot offsets are used for stores
+    # Pattern: sta N,s where N is the stack offset
+    local unique_slots
+    unique_slots=$(echo "$func_body" | grep -oE 'sta [0-9]+,s' | sort -u | wc -l)
+
+    if [[ $unique_slots -lt 6 ]]; then
+        log_fail "$name: Only $unique_slots unique stack slots (need 6+) — phi-node confusion!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Stack stores found:"
+            echo "$func_body" | grep -E 'sta [0-9]+,s' | sort -u
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Mutable static variables are placed in RAM, not ROM
+# BUG: `static int counter = 0;` placed in .SECTION ".rodata" SUPERFREE (ROM)
+#      Writes to these variables are silently ignored on hardware.
+#------------------------------------------------------------------------------
+test_static_mutable() {
+    local name="static_mutable"
+    local src="$SCRIPT_DIR/test_static_mutable.c"
+    local out="$BUILD/test_static_mutable.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/static_mutable_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/static_mutable_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check each mutable static symbol: it must NOT be in a SUPERFREE section
+    # Strategy: search backward from symbol label to find containing section directive
+    local symbols=(uninit_counter zero_counter init_counter byte_flag word_state byte_counter word_accumulator)
+    local rom_count=0
+
+    for sym in "${symbols[@]}"; do
+        # Find line number of the symbol label
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+
+        if [[ -z "$sym_line" ]]; then
+            log_verbose "Symbol $sym not found in assembly"
+            continue
+        fi
+
+        # Search backward from symbol to find the containing section directive
+        # Look for .SECTION or .RAMSECTION
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+        if echo "$section_line" | grep -q 'SUPERFREE'; then
+            log_verbose "$sym is in ROM (SUPERFREE): $section_line"
+            ((rom_count++))
+        elif echo "$section_line" | grep -q '\.RAMSECTION'; then
+            log_verbose "$sym is in RAM (RAMSECTION): $section_line"
+        fi
+    done
+
+    if [[ $rom_count -gt 0 ]]; then
+        log_fail "$name: $rom_count/$((${#symbols[@]})) mutable statics placed in ROM (SUPERFREE)!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Section directives in assembly:"
+            grep -n -E '\.(SECTION|RAMSECTION)' "$out"
+            echo ""
+            echo "Symbol locations:"
+            for sym in "${symbols[@]}"; do
+                grep -n "^${sym}:" "$out"
+            done
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_const_data() {
+    local name="const_data"
+    local src="$SCRIPT_DIR/test_const_data.c"
+    local out="$BUILD/test_const_data.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/const_data_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/const_data_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check const arrays are in ROM (SUPERFREE), not RAMSECTION
+    local const_symbols=(const_arr const_u8_arr)
+    local ram_count=0
+
+    for sym in "${const_symbols[@]}"; do
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+
+        if [[ -z "$sym_line" ]]; then
+            log_verbose "Symbol $sym not found in assembly"
+            continue
+        fi
+
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+        if echo "$section_line" | grep -q '\.RAMSECTION'; then
+            log_verbose "$sym is in RAM (RAMSECTION): $section_line"
+            ((ram_count++))
+        elif echo "$section_line" | grep -q 'SUPERFREE'; then
+            log_verbose "$sym is in ROM (SUPERFREE): $section_line"
+        fi
+    done
+
+    if [[ $ram_count -gt 0 ]]; then
+        log_fail "$name: $ram_count const array(s) placed in RAM instead of ROM!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check mutable array is in RAMSECTION (not ROM)
+    local mut_line
+    mut_line=$(grep -n "^mut_arr:" "$out" | head -1 | cut -d: -f1)
+    if [[ -n "$mut_line" ]]; then
+        local mut_section
+        mut_section=$(head -n "$mut_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if echo "$mut_section" | grep -q 'SUPERFREE'; then
+            log_fail "$name: mutable array placed in ROM instead of RAM!"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Multiplication code generation
+#
+# Verifies that:
+#   - Small constant multipliers (*3, *5, *6, *7, *9, *10) use inline shift+add
+#   - Variable multiplication and non-special constants call __mul16
+#   - __mul16 uses stack-based calling convention (pha, not sta.l tcc__r0)
+#
+# Bug history:
+#   __mul16 runtime read from tcc__r0/tcc__r1 (register convention) but the
+#   compiler pushed arguments on the stack. Fixed in runtime.asm to read
+#   from stack offsets SP+5,6 (arg1) and SP+7,8 (arg2).
+#------------------------------------------------------------------------------
+test_multiply() {
+    local name="multiply"
+    local src="$SCRIPT_DIR/test_multiply.c"
+    local out="$BUILD/test_multiply.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/multiply_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/multiply_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check inline multiplications use tcc__r9 (shift+add pattern), NOT __mul16
+    local inline_muls=(mul_by_3 mul_by_5 mul_by_6 mul_by_7 mul_by_9 mul_by_10)
+    for func in "${inline_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | head -n -1)
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using inline shift+add"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: ${func} missing tcc__r9 (no inline shift+add pattern)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check that variable * variable calls __mul16 with stack convention (pha)
+    local var_body
+    var_body=$(sed -n '/^mul_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+
+    if ! echo "$var_body" | grep -q '__mul16'; then
+        log_fail "$name: mul_var missing __mul16 call"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$var_body" | grep -q 'pha'; then
+        log_fail "$name: mul_var missing pha (stack-based calling convention)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check non-special constant (*13) also calls __mul16
+    local const_body
+    const_body=$(sed -n '/^mul_by_13:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | head -n -1)
+
+    if ! echo "$const_body" | grep -q '__mul16'; then
+        log_fail "$name: mul_by_13 missing __mul16 call"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Function return values are preserved through epilogue
+# BUG: `tsa` in epilogue overwrites return value in A register.
+#      Every non-void function with framesize > 2 returned garbage.
+# FIX: tax (save A) → tsa; adc; tas (adjust SP) → txa (restore A)
+#------------------------------------------------------------------------------
+test_return_value() {
+    local name="return_value"
+    local src="$SCRIPT_DIR/test_return_value.c"
+    local out="$BUILD/test_return_value.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/return_value_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/return_value_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # For each function with locals (framesize > 2), check the epilogue pattern:
+    # The return sequence must be: tax → tsa → ... → tas → txa → plp → rtl
+    # NOT: tsa → ... → tas → plp → rtl (which destroys A)
+
+    local functions=(compute_with_locals compute_complex call_and_return compute_byte)
+    local fail_count=0
+
+    for func in "${functions[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|; End of/p" "$out")
+
+        # Check if function has stack frame (tsa in body = stack adjustment)
+        if ! echo "$func_body" | grep -q 'tsa'; then
+            log_verbose "$func: no stack frame, skip epilogue check"
+            continue
+        fi
+
+        # Count epilogue pattern: must have tax before the final tsa, and txa after tas
+        # The epilogue pattern should be: tax → tsa → clc → adc → tas → txa → plp → rtl
+        # Extract the last occurrence of tax...txa...rtl
+        if ! echo "$func_body" | grep -A8 'tax' | grep -q 'txa'; then
+            log_fail "$name: ${func} epilogue missing tax/txa — return value destroyed!"
+            ((fail_count++))
+        fi
+    done
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -1274,6 +1751,10 @@ main() {
         case $1 in
             -v|--verbose)
                 VERBOSE=1
+                shift
+                ;;
+            --allow-known-bugs)
+                ALLOW_KNOWN_BUGS=1
                 shift
                 ;;
             *)
@@ -1326,9 +1807,20 @@ main() {
     test_volatiles                   # Volatile variable handling
     test_type_cast                   # Type casting and conversions
 
+    # === HDMA Wave Regression Tests (Phase 1.3) ===
+    test_variable_shift              # FIXED: Variable-count shifts now emit loop
+    test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
+    test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
+    test_const_data                  # Const arrays placed in ROM (SUPERFREE)
+    test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
+    test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
+
     echo ""
     echo "========================================"
     echo "Results: $TESTS_PASSED/$TESTS_RUN passed"
+    if [[ $TESTS_KNOWN_BUGS -gt 0 ]]; then
+        echo -e "${YELLOW}$TESTS_KNOWN_BUGS known bug(s)${NC}"
+    fi
     if [[ $TESTS_FAILED -gt 0 ]]; then
         echo -e "${RED}$TESTS_FAILED tests failed${NC}"
         exit 1

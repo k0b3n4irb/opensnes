@@ -6,6 +6,6 @@ ROM_NAME := HDMA WAVE DEMO
 
 CSRC     := main.c
 USE_LIB  := 1
-LIB_MODULES := console hdma dma sprite math
+LIB_MODULES := console dma sprite input
 
 include $(OPENSNES)/make/common.mk
