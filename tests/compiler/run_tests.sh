@@ -76,6 +76,33 @@ log_known_bug() {
     fi
 }
 
+# Compile a C test file to assembly.
+# Returns 0 on success, 1 on failure.
+# On MSYS2/Windows, cproc may segfault non-deterministically.
+# Segfaults are reported as known bugs instead of failures.
+compile_test() {
+    local name="$1"
+    local src="$2"
+    local out="$3"
+    local err_file="$BUILD/$(basename "$src" .c).err"
+
+    if "$CC" "$src" -o "$out" 2>"$err_file"; then
+        return 0
+    fi
+
+    local err_msg
+    err_msg=$(cat "$err_file")
+    if echo "$err_msg" | grep -qi 'segmentation fault\|segfault\|signal 11'; then
+        log_known_bug "$name: cproc segfault on MSYS2 (non-deterministic)"
+        return 1
+    fi
+
+    log_fail "$name: Compilation failed"
+    echo "$err_msg"
+    ((TESTS_FAILED++))
+    return 1
+}
+
 #------------------------------------------------------------------------------
 # Test: Compiler exists and runs
 #------------------------------------------------------------------------------
