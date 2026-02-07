@@ -146,8 +146,13 @@ echo "Lua script: $LUA_SCRIPT"
 # Try running Mesen briefly to check for missing libraries or startup errors
 FIRST_ROM=$(echo "$ROMS" | head -1)
 echo "Testing with: $FIRST_ROM"
-timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1
-PREFLIGHT_EXIT=$?
+# Check for missing shared libraries first
+echo "--- Dependency check ---"
+ldd "$MESEN_PATH" 2>&1 | grep -i "not found" || echo "All dependencies satisfied"
+echo "---"
+
+PREFLIGHT_EXIT=0
+timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1 || PREFLIGHT_EXIT=$?
 echo "Pre-flight exit code: $PREFLIGHT_EXIT (124=timeout, 0=PASS, 1=FAIL)"
 echo "--- Pre-flight output (first 30 lines) ---"
 head -30 /tmp/opensnes_preflight.txt 2>/dev/null || echo "(no output)"
@@ -196,8 +201,8 @@ for ROM in $ROMS; do
 
     # Run Mesen in testrunner mode with timeout (output captured to file)
     # Syntax: Mesen --testrunner --enablestdout <rom> <lua_script>
-    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner --enablestdout "$ROM" "$LUA_SCRIPT"
-    MESEN_EXIT=$?
+    MESEN_EXIT=0
+    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner --enablestdout "$ROM" "$LUA_SCRIPT" || MESEN_EXIT=$?
     OUTPUT=$(cat "$OUTPUT_FILE" 2>/dev/null || true)
 
     # Check result: prefer stdout output, fallback to exit code
