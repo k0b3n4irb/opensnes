@@ -1,5 +1,8 @@
 name: OpenSNES Build & Release
 
+env:
+  MESEN_VERSION: "2.1.1"
+
 # ------------------------------------ #
 # Events to trigger the action         #
 # ------------------------------------ #
@@ -46,7 +49,9 @@ jobs:
               make \
               git \
               doxygen \
-              zip
+              zip \
+              xvfb \
+              libsdl2-2.0-0
 
       - name: Install dependencies for Windows
         if: matrix.name == 'windows'
@@ -77,6 +82,27 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # ------------------------------------ #
+      # Cache & download Mesen emulator      #
+      # ------------------------------------ #
+      - name: Cache Mesen emulator
+        if: matrix.name == 'linux'
+        id: cache-mesen
+        uses: actions/cache@v4
+        with:
+          path: ~/mesen
+          key: mesen-${{ env.MESEN_VERSION }}-linux-x64
+
+      - name: Download Mesen
+        if: matrix.name == 'linux' && steps.cache-mesen.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/mesen
+          curl -sL "https://github.com/SourMesen/Mesen2/releases/download/${{ env.MESEN_VERSION }}/Mesen_${{ env.MESEN_VERSION }}_Linux_x64.zip" -o /tmp/mesen.zip
+          unzip /tmp/mesen.zip -d ~/mesen
+          chmod +x ~/mesen/Mesen
+          echo "Mesen ${{ env.MESEN_VERSION }} downloaded successfully"
+          ls -la ~/mesen/
 
       # ------------------------------------ #
       # Build & create release               #
@@ -223,15 +249,13 @@ jobs:
         run: |
           set -o pipefail
           echo "=== Black Screen Test ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          # Check if Mesen is available (pre-installed or cached)
-          MESEN_PATH="${MESEN_PATH:-/usr/local/bin/Mesen}"
+          MESEN_PATH="$HOME/mesen/Mesen"
           if [ -x "$MESEN_PATH" ]; then
-            # Install xvfb for headless rendering
-            sudo apt-get install -y xvfb 2>/dev/null || true
             xvfb-run ./tests/run_black_screen_tests.sh "$MESEN_PATH" --save-screenshots 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
           else
-            echo "Mesen not found at $MESEN_PATH - skipping black screen tests" | tee -a opensnes_release_${{ matrix.name }}.log
-            echo "Set MESEN_PATH environment variable to enable black screen testing" | tee -a opensnes_release_${{ matrix.name }}.log
+            echo "ERROR: Mesen not found at $MESEN_PATH" | tee -a opensnes_release_${{ matrix.name }}.log
+            ls -la ~/mesen/ 2>/dev/null || echo "Mesen directory does not exist"
+            exit 1
           fi
 
       # ------------------------------------ #
