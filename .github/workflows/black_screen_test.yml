@@ -62,52 +62,65 @@ jobs:
           make -C examples/text/1_hello_world 2>&1 | tail -5
           ls -la examples/text/1_hello_world/*.sfc
 
-      # Single-ROM diagnostic: try 4 headless methods
-      - name: Diagnose Mesen2 headless (single ROM)
+      # Mesen2 shows a first-run wizard (Avalonia UI) if no config exists.
+      # This happens BEFORE the --testrunner check in Program.Main().
+      # Pre-creating settings.json skips the wizard and reaches testrunner mode.
+      - name: Pre-create Mesen config (skip first-run wizard)
+        run: |
+          mkdir -p ~/.config/Mesen2
+          echo '{}' > ~/.config/Mesen2/settings.json
+          echo "Created ~/.config/Mesen2/settings.json"
+
+      # Test 3 methods: no display, xvfb, xvfb+no-audio
+      - name: Run Mesen2 testrunner (single ROM)
         run: |
           MESEN="$HOME/mesen/Mesen"
           ROM="examples/text/1_hello_world/hello_world.sfc"
           LUA="tests/black_screen_test.lua"
 
-          echo "=== Mesen2 v${{ env.MESEN_VERSION }} headless diagnostics ==="
-          echo "Binary: $(file "$MESEN" | cut -d: -f2)"
-          echo "ROM:    $ROM ($(stat -c%s "$ROM") bytes)"
+          echo "=== Mesen2 v${{ env.MESEN_VERSION }} testrunner ==="
+          echo "ROM: $ROM ($(stat -c%s "$ROM") bytes)"
           echo ""
 
-          echo "--- Dependencies ---"
-          ldd "$MESEN" 2>&1 | grep -i "not found" || echo "OK: all shared libs found"
-          echo ""
+          # Test 1: No display at all (testrunner should bypass Avalonia)
+          echo "--- Test 1: No display (SDL dummy) ---"
+          EXIT=0
+          env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
+            > /tmp/test1.txt 2>&1 || EXIT=$?
+          echo "exit=$EXIT  output=$(wc -c < /tmp/test1.txt)B"
+          cat /tmp/test1.txt
+          echo "---"
 
-          for i in 1 2 3 4; do
-            case $i in
-              1) DESC="SDL_VIDEODRIVER=dummy";  CMD="env SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
-              2) DESC="SDL_VIDEODRIVER=offscreen"; CMD="env SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
-              3) DESC="xvfb-run";               CMD="xvfb-run timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
-              4) DESC="xvfb + no-audio";        CMD="env SDL_AUDIODRIVER=dummy xvfb-run timeout 15 $MESEN --testrunner --enablestdout $ROM $LUA" ;;
-            esac
-            echo "--- Test $i: $DESC ---"
-            EXIT=0
-            eval $CMD > /tmp/test$i.txt 2>&1 || EXIT=$?
-            SIZE=$(wc -c < /tmp/test$i.txt)
-            echo "exit=$EXIT  output=${SIZE}B"
-            if [ "$SIZE" -gt 0 ]; then
-              echo "--- output ---"
-              cat /tmp/test$i.txt
-              echo "--- end ---"
+          # Test 2: xvfb + no audio (if testrunner still needs X11)
+          echo "--- Test 2: xvfb + no-audio ---"
+          EXIT=0
+          env SDL_AUDIODRIVER=dummy \
+            xvfb-run --auto-servernum -- \
+            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
+            > /tmp/test2.txt 2>&1 || EXIT=$?
+          echo "exit=$EXIT  output=$(wc -c < /tmp/test2.txt)B"
+          cat /tmp/test2.txt
+          echo "---"
+
+          # Test 3: xvfb + full SDL (fallback)
+          echo "--- Test 3: xvfb full ---"
+          EXIT=0
+          xvfb-run --auto-servernum -- \
+            timeout 20 "$MESEN" --testrunner --enablestdout "$ROM" "$LUA" \
+            > /tmp/test3.txt 2>&1 || EXIT=$?
+          echo "exit=$EXIT  output=$(wc -c < /tmp/test3.txt)B"
+          cat /tmp/test3.txt
+          echo "---"
+
+          # Check if any test produced a BLACKTEST_RESULT
+          echo ""
+          echo "=== RESULTS ==="
+          for i in 1 2 3; do
+            if grep -q "BLACKTEST_RESULT:" /tmp/test$i.txt 2>/dev/null; then
+              RESULT=$(grep "BLACKTEST_RESULT:" /tmp/test$i.txt | tail -1)
+              echo "Test $i: $RESULT"
+            else
+              echo "Test $i: NO RESULT (exit=$(head -1 /tmp/test${i}_exit.txt 2>/dev/null || echo '?'))"
             fi
-            echo ""
-          done
-
-          echo "=== SUMMARY ==="
-          printf "%-30s  exit  output\n" "Method"
-          for i in 1 2 3 4; do
-            case $i in
-              1) DESC="SDL dummy" ;;
-              2) DESC="SDL offscreen" ;;
-              3) DESC="xvfb-run" ;;
-              4) DESC="xvfb + no-audio" ;;
-            esac
-            # Re-read exit codes from output
-            SIZE=$(wc -c < /tmp/test$i.txt)
-            printf "%-30s  %s\n" "$DESC" "${SIZE}B"
           done
