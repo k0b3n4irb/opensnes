@@ -167,26 +167,15 @@ In HiROM mode, the RESET vector stores a 16-bit address (e.g., `$80A7`). The CPU
 | WLA-DX SLOT 0 start | $8000 | $0000 (but reserve $0000-$7FFF) |
 | Code placement | Automatic at $8000+ | Must force to $8000+ |
 
-### ⚠️ HiROM Function Return Value Issue (February 2026)
+### ✅ HiROM Function Return Value Issue — RESOLVED (February 2026)
 
-**Problem:** C library functions that return values (like `padHeld()`, `padPressed()`) don't work correctly in HiROM mode. The return value appears corrupted.
+**Problem (now fixed):** C library functions that return values (like `padHeld()`, `padPressed()`) previously didn't work correctly in HiROM mode. The return value appeared corrupted.
 
-**Symptoms:**
-- Functions return garbage values (e.g., always reports button pressed)
-- Same code works when inlined but fails when called through a function
+**Root Cause:** Same function epilogue bug that affected all non-void functions — the `tsa` instruction in the epilogue overwrote the return value in the A register with the stack pointer. This was NOT HiROM-specific.
 
-**Root Cause:** Under investigation. Likely related to compiler's function prologue/epilogue (`php`/`plp`) interaction with processor mode flags in HiROM memory configuration.
+**Fix:** The `tax`/`txa` pair in emit.c preserves A across the stack adjustment in the function epilogue. This fix resolved the issue for both LoROM and HiROM modes.
 
-**Workaround:** For input reading in HiROM mode, use direct memory access instead of library functions:
-
-```c
-/* Instead of: pressed = padHeld(0); */
-/* Use direct access to pad_keys (populated by NMI handler): */
-#define PAD_KEYS ((volatile u16*)0x002C)
-pressed = *PAD_KEYS;
-```
-
-**Note:** Library functions that don't return values (like `WaitForVBlank()`, `consoleInit()`, `dmaCopyVram()`) work correctly in HiROM mode.
+**Verified:** hirom_demo tested in Mesen2 — `padHeld(0)` returns correct values, A button changes background color as expected.
 
 ### Important Addresses
 
