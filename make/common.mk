@@ -50,7 +50,8 @@ LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
 
-# Check that compiler toolchain exists
+# Check that compiler toolchain exists (skip for 'clean' target)
+ifneq ($(MAKECMDGOALS),clean)
 ifeq ($(wildcard $(CC)),)
 $(info )
 $(info ========================================================================)
@@ -64,6 +65,7 @@ $(info    cd $(OPENSNES) && git submodule update --init --recursive)
 $(info ========================================================================)
 $(info )
 $(error Compiler not built - see instructions above)
+endif
 endif
 
 # Shared templates
@@ -114,7 +116,8 @@ LIBMODE     := LoROM
 endif
 LIB_MODULES ?= console
 
-# Check library is built when USE_LIB=1
+# Check library is built when USE_LIB=1 (skip for 'clean' target)
+ifneq ($(MAKECMDGOALS),clean)
 ifeq ($(USE_LIB),1)
 ifeq ($(wildcard $(LIBDIR)/console.o),)
 $(info )
@@ -130,6 +133,7 @@ $(info    cd $(OPENSNES) && make)
 $(info ========================================================================)
 $(info )
 $(error Library not built - see instructions above)
+endif
 endif
 endif
 

@@ -168,8 +168,17 @@ void oamSetVisible(u8 id, u8 visible) {
 
 void oamHide(u8 id) {
     if (id >= MAX_SPRITES) return;
-    /* Y = 240 is off-screen (below visible area) */
-    oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y;
+    /* Y=240 + X=256 (high bit set) to hide off-screen.
+     * Y=240 alone wraps for sprites > 16px tall.
+     */
+    oam_buffer[(id << 2) + 0] = 0;          /* X low = 0 */
+    oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y; /* Y = 240 */
+
+    /* Set X high bit in extension table */
+    u16 ext_offset = 512 + (id >> 2);
+    u8 slot = id & 0x03;
+    oam_buffer[ext_offset] |= xhi_bit[slot];
+
     oam_update_flag = 1;
 }
 
@@ -258,7 +267,11 @@ void oamUpdate(void) {
 void oamClear(void) {
     u8 i;
 
-    /* Hide all sprites by setting Y = 240 */
+    /* Hide all sprites: Y=240 + X=256 (high bit set).
+     * Y=240 alone causes large sprites (32x32, 64x64) to wrap to
+     * the top of the screen. Setting X bit 8 = 1 pushes them
+     * off-screen to the right, safe for any sprite size.
+     */
     for (i = 0; i < 128; i++) {
         u16 offset = i << 2;
         oam_buffer[offset + 0] = 0;
@@ -267,9 +280,12 @@ void oamClear(void) {
         oam_buffer[offset + 3] = 0;
     }
 
-    /* Clear extension table */
+    /* Extension table: set X high bit (bit 0 of each 2-bit pair) for all sprites.
+     * Each byte covers 4 sprites: bits 0,2,4,6 = X high; bits 1,3,5,7 = size.
+     * Pattern 0x55 = 01010101 = all X high bits set, all size bits clear.
+     */
     for (i = 0; i < 32; i++) {
-        oam_buffer[512 + i] = 0;
+        oam_buffer[512 + i] = 0x55;
     }
 
     oam_update_flag = 1;
