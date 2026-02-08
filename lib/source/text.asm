@@ -213,3 +213,65 @@ opensnes_font_2bpp:
 opensnes_font_2bpp_end:
 
 .ENDS
+
+;==============================================================================
+; Assembly Helpers for Text Module Performance
+;==============================================================================
+; These functions replace slow compiled C loops with DMA and tight assembly.
+; Called from text.c via extern declarations.
+;==============================================================================
+
+.SECTION ".text_dma_font" SUPERFREE
+
+;------------------------------------------------------------------------------
+; asm_textDMAFont - DMA font data from ROM to VRAM
+;------------------------------------------------------------------------------
+; Caller must set VMAIN and VMADDL/H before calling.
+; Uses DMA channel 0 to transfer 1536 bytes of font data.
+; C prototype: extern void asm_textDMAFont(void);
+;------------------------------------------------------------------------------
+asm_textDMAFont:
+    php
+    rep #$20            ; 16-bit A
+    lda #$1801          ; Mode $01 (word write ab), target $18 (VMDATAL)
+    sta $4300
+    lda #opensnes_font_2bpp
+    sta $4302           ; Source address (low word)
+    sep #$20
+    lda #:opensnes_font_2bpp
+    sta $4304           ; Source bank
+    rep #$20
+    lda #1536           ; Transfer size (96 chars x 16 bytes)
+    sta $4305
+    sep #$20
+    lda #$01            ; Enable DMA channel 0
+    sta $420B
+    plp
+    rtl
+
+.ENDS
+
+.SECTION ".text_fill_buffer" SUPERFREE
+
+;------------------------------------------------------------------------------
+; asm_textFillBuffer - Fill tilemapBuffer with a 16-bit value
+;------------------------------------------------------------------------------
+; C prototype: extern void asm_textFillBuffer(u16 value);
+; Reads buffer address from tilemap_src_addr (set by textInit).
+; Fills 2048 bytes (1024 words).
+;------------------------------------------------------------------------------
+asm_textFillBuffer:
+    php
+    rep #$30            ; 16-bit A and X/Y
+    lda 5,s             ; Get fill value (past P + 3-byte return addr)
+    ldx tilemap_src_addr ; Buffer base address (bank $00)
+    ldy #1024           ; Word count
+-   sta.l $0000,x       ; Store 16-bit value at bank $00:X
+    inx
+    inx
+    dey
+    bne -
+    plp
+    rtl
+
+.ENDS

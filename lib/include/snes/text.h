@@ -155,6 +155,15 @@ void textClearRect(u8 x, u8 y, u8 w, u8 h);
 void textFillRect(u8 x, u8 y, u8 w, u8 h, char c);
 
 /**
+ * @brief Request tilemap DMA transfer to VRAM
+ *
+ * Marks the tilemap buffer as dirty. The actual transfer happens
+ * during the next VBlank via DMA, ensuring safe VRAM access.
+ * Call after modifying text to make changes visible.
+ */
+void textFlush(void);
+
+/**
  * @brief Draw a box using box-drawing characters
  *
  * Uses ASCII characters for simple box borders.
