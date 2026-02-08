@@ -72,14 +72,14 @@ The SDK is functional for basic SNES game development.
 
 ## In Progress
 
-### HiROM Phase 2 - Library Support (Partial)
+### HiROM Phase 2 - Library Support
 - [x] Library builds for HiROM mode (dual builds: `lib/build/lorom/` and `lib/build/hirom/`)
 - [x] HiROM demo using library (console, DMA, VBlank work correctly)
 - [x] Documentation updates (KNOWLEDGE.md, CLAUDE.md)
-- [~] **BLOCKED:** C library functions with return values don't work in HiROM mode
-  - Workaround: Use direct memory access (e.g., `*((volatile u16*)0x002C)` for input)
-  - Root cause: Compiler ABI issue with function return values, needs investigation
-- [ ] SNESMOD support for HiROM (soundbank addressing) - blocked by above
+- [x] C library functions with return values work correctly in HiROM mode
+  - Was the same function epilogue bug (`tsa` overwriting return value in A) that affected all modes
+  - Fixed by the `tax`/`txa` pair to preserve A across stack adjustment in emit.c
+- [ ] SNESMOD support for HiROM (soundbank addressing)
 
 ### Game Examples (paused)
 - [ ] More game examples (platformer, RPG, shmup)
@@ -120,7 +120,7 @@ The SDK is functional for basic SNES game development.
 2. **32-bit operations slow** - Prefer `u16`/`s16` when possible
 3. **~4KB VBlank DMA budget** - Don't exceed per-frame transfer limits
 4. **Static initializers in ROM** - Use `static u8 x;` not `static u8 x = 0;`
-5. **HiROM function returns** - C functions with return values don't work in HiROM mode; use direct memory access as workaround (see KNOWLEDGE.md)
+5. ~~**HiROM function returns**~~ - Resolved. Was the same function epilogue bug fixed in emit.c
 
 ---
 
@@ -130,4 +130,4 @@ See [README.md](README.md) for build instructions and contribution guidelines.
 
 ---
 
-*Last updated: 2026-02-01*
+*Last updated: 2026-02-08*
