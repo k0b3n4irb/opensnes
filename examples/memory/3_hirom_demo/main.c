@@ -15,21 +15,12 @@
  *
  * This example displays "HIROM MODE" and responds to joypad input
  * to confirm the ROM and library are correctly configured.
- *
- * KNOWN LIMITATION (HiROM Phase 2):
- * Library input functions (padHeld, padPressed, etc.) have a return value
- * issue in HiROM mode due to compiler ABI behavior. As a workaround, this
- * demo reads input directly from the pad_keys RAM address ($002C) which
- * is populated by the NMI handler. This is functionally equivalent to
- * padHeld(0) but bypasses the function call overhead.
  */
 
 #include <snes.h>
 #include <snes/console.h>
 #include <snes/dma.h>
-
-/* Direct access to pad_keys - workaround for HiROM function return issue */
-#define PAD_KEYS ((volatile u16*)0x002C)
+#include <snes/input.h>
 
 
 /*============================================================================
@@ -179,8 +170,8 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* Read input directly (HiROM workaround - see file header) */
-        pressed = *PAD_KEYS;
+        /* Read input using library function */
+        pressed = padHeld(0);
 
         /* Change background color on A button */
         if (pressed & KEY_A) {

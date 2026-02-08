@@ -204,7 +204,7 @@ fix(compiler): resolve struct pointer initialization bug
 
 Detailed description of what was fixed and why.
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```
@@ -219,7 +219,7 @@ cd compiler/qbe
 git add .
 git commit -m "fix(emit): description
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 # 2. Push submodule
 export GH_TOKEN=$(grep GH_TOKEN ../../.env | cut -d'=' -f2)
@@ -230,7 +230,7 @@ cd ../..
 git add compiler/qbe
 git commit -m "chore: update qbe submodule
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
 ---
