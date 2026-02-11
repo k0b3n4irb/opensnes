@@ -210,6 +210,7 @@ Bank $00:0000-$1FFF  ═══  Bank $7E:0000-$1FFF   (SAME 8KB of RAM)
 - **Division**: Power-of-2 optimized; others are slow.
 - **Static variables**: `static u8 x = 5;` works — ROM→RAM copy at startup via `CopyInitData` in crt0.
 - **VBlank DMA budget**: ~4KB per frame safe.
+- **Signed right shift (`>>`) BUG**: The QBE w65816 backend generates `lsr` (logical shift right) for ALL `>>` operations, even on signed types. For negative values, this produces wrong results (e.g., `-320 >> 8` gives `254` instead of `-2`). **Workaround**: use `asr8()` helper (invert-shift-invert for negatives), or cast to unsigned when sign doesn't matter. See `examples/games/1_likemario/main.c` for the pattern.
 
 ### Joypad Input
 
