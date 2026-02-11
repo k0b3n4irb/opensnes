@@ -146,6 +146,70 @@ void test_compound(void) {
     }
 }
 
+// u16 high-value comparisons (regression: bcc not bmi)
+// Use parameters to prevent constant folding — the compiler
+// must emit actual comparison instructions at runtime.
+void test_u16_high_less(unsigned short a, unsigned short b) {
+    // Call with a=50000, b=60000
+    if (a < b) u_result = 1;
+    else u_result = 0;
+    // u_result = 1 (50000 < 60000, unsigned)
+}
+
+void test_u16_vs_constant(unsigned short val) {
+    // Call with val=50000
+    if (val >= 10000) u_result = 1;
+    else u_result = 0;
+    // u_result = 1
+}
+
+void test_u16_shift_right(unsigned short val) {
+    // Call with val=0xC000
+    unsigned short result = val >> 1;
+    // result should be 0x6000 (logical), NOT 0xE000 (arithmetic)
+    if (result == 0x6000) u_result = 1;
+    else u_result = 0;
+}
+
+void test_u16_div(unsigned short a, unsigned short b) {
+    // Call with a=50000, b=10
+    unsigned short result = a / b;
+    // result should be 5000 (unsigned div), NOT some negative-signed result
+    if (result == 5000) u_result = 1;
+    else u_result = 0;
+}
+
+void test_u16_mod(unsigned short a, unsigned short b) {
+    // Call with a=50003, b=10
+    unsigned short result = a % b;
+    // result should be 3 (unsigned mod)
+    if (result == 3) u_result = 1;
+    else u_result = 0;
+}
+
+// Ternary value used as function argument (regression: GVN+fusion bug)
+// GVN may replace the ternary's phi with the comparison result directly.
+// The comparison+branch fusion must NOT skip the comparison instruction
+// when its result is also used as a value (not just by jnz).
+extern void use_val(unsigned short v);
+unsigned char cflags;
+
+void test_ternary_value_used(void) {
+    unsigned short palette;
+    palette = (cflags != 0) ? 1 : 0;
+    use_val(palette);
+}
+
+short test_s16_shift_right(short val) {
+    /* Signed right shift by 8: -320 >> 8 should give -2, not 254 */
+    return val >> 8;
+}
+
+short test_s16_shift_right_1(short val) {
+    /* Signed right shift by 1: -4 >> 1 should give -2, not 32766 */
+    return val >> 1;
+}
+
 int main(void) {
     test_unsigned_less();
     test_unsigned_greater();
@@ -157,5 +221,12 @@ int main(void) {
     test_word_compare();
     test_zero_compare();
     test_compound();
+    test_u16_high_less(50000, 60000);
+    test_u16_vs_constant(50000);
+    test_u16_shift_right(0xC000);
+    test_u16_div(50000, 10);
+    test_u16_mod(50003, 10);
+    test_s16_shift_right(-320);
+    test_s16_shift_right_1(-4);
     return (int)u_result;
 }
