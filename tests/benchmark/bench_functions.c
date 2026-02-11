@@ -122,3 +122,53 @@ unsigned short clamp(unsigned short val, unsigned short lo, unsigned short hi) {
     if (val > hi) return hi;
     return val;
 }
+
+/* --- 21. Signed right shift by 8 (tests sar codegen: cmp+ror vs lsr) --- */
+signed short signed_shift_right_8(signed short x) {
+    return x >> 8;
+}
+
+/* --- 22. Signed right shift by 1 (minimal sar) --- */
+signed short signed_shift_right_1(signed short x) {
+    return x >> 1;
+}
+
+/* --- 23. Byte store loop (8-bit ops: sep/rep tracking) --- */
+void byte_store_loop(unsigned char *dst, unsigned char val, unsigned short len) {
+    unsigned short i;
+    for (i = 0; i < len; i++) {
+        dst[i] = val;
+    }
+}
+
+/* --- 24. Global variable increment (lda.w vs lda.l pattern) --- */
+unsigned short g_counter;
+void global_increment(void) {
+    g_counter++;
+}
+
+/* --- 25. Zero store to global (stz pattern) --- */
+unsigned short g_value;
+void zero_store_global(void) {
+    g_value = 0;
+}
+
+/* --- 26. Compare and branch (comparison+branch fusion) --- */
+unsigned short compare_and_branch(unsigned short a, unsigned short b) {
+    if (a == b) return 1;
+    if (a < b) return 2;
+    return 3;
+}
+
+/* --- 27. Call chain (non-leaf function overhead) --- */
+unsigned short helper(unsigned short x) {
+    return x + 1;
+}
+unsigned short call_chain(unsigned short x) {
+    return helper(helper(x));
+}
+
+/* --- 28. Constant args (pea.w pattern) --- */
+unsigned short pea_constant_args(void) {
+    return add_u16(42, 100);
+}
