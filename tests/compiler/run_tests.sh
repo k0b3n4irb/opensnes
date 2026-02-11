@@ -741,9 +741,9 @@ test_global_var_reads() {
         fi
     fi
 
-    # Verify direct loads are present (lda.l global_x, etc.)
-    if ! grep -E 'lda\.l global_x' "$out" > /dev/null 2>&1; then
-        log_fail "$name: No direct load 'lda.l global_x' found"
+    # Verify direct loads are present (lda.w global_x or lda.l global_x)
+    if ! grep -E 'lda\.(w|l) global_x' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No direct load 'lda.w/l global_x' found"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -1267,6 +1267,81 @@ test_comparisons() {
     # Check for comparison-related instructions (branch or compare)
     if ! grep -qE '(bne|beq|bcc|bcs|bmi|bpl|sec|sbc)' "$out"; then
         log_fail "$name: Comparison instructions not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify unsigned short comparisons use unsigned branches (bcc/bcs),
+    # NOT signed branches (bmi/bpl). The compiler bug caused u16 >= constant
+    # to use bmi (signed), which breaks for values >= 32768.
+    local u16_funcs=(test_u16_high_less test_u16_vs_constant)
+    for func in "${u16_funcs[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+        if echo "$func_body" | grep -qE '\bbmi\b|\bbpl\b'; then
+            log_fail "$name: ${func} uses signed branch (bmi/bpl) instead of unsigned (bcc/bcs)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$func_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Verify ternary value is materialized when used as function argument.
+    # Regression: GVN replaces the phi with the comparison result, then
+    # comparison+branch fusion incorrectly skips the comparison instruction,
+    # leaving the ternary value uninitialized.
+    local ternary_body
+    ternary_body=$(sed -n '/^test_ternary_value_used:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$ternary_body" | grep -qE 'lda\.w #[01]'; then
+        log_fail "$name: test_ternary_value_used missing boolean materialization (lda.w #0/#1)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$ternary_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify u16 shift right uses lsr (logical), NOT asr-like pattern
+    local shift_body
+    shift_body=$(sed -n '/^test_u16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$shift_body" | grep -qE 'lsr'; then
+        log_fail "$name: test_u16_shift_right missing lsr (logical shift right)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify s16 signed shift right uses cmp+ror (arithmetic), NOT lsr
+    local signed_shift_body
+    signed_shift_body=$(sed -n '/^test_s16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$signed_shift_body" | grep -qE 'cmp\.w #\$8000'; then
+        log_fail "$name: test_s16_shift_right missing 'cmp.w #\$8000' (sign bit extraction)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    if ! echo "$signed_shift_body" | grep -qE 'ror a'; then
+        log_fail "$name: test_s16_shift_right missing 'ror a' (arithmetic shift)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    # Ensure signed shift does NOT use lsr (that would be the old buggy behavior)
+    if echo "$signed_shift_body" | grep -qE 'lsr'; then
+        log_fail "$name: test_s16_shift_right uses lsr (should use cmp+ror for arithmetic shift)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift_body"
+        fi
         ((TESTS_FAILED++))
         return 1
     fi
