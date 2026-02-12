@@ -159,13 +159,15 @@ MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
 ; oamQueueEntry: VRAM upload queue (128 entries × 6 bytes = 768 bytes)
 ; State variables for sprite management
 ;
-; IMPORTANT: These buffers are placed at $2000+ to avoid collision with
-; Bank $00 variables (Bank $00 $0000-$1FFF mirrors Bank $7E $0000-$1FFF).
+; oambuffer MUST be in Bank $00 mirror range ($0000-$1FFF) because the C
+; compiler generates `sta.l $0000,x` which always writes to bank $00.
+; Address $0520 is right after oamMemory ($0300-$051F).
+; Assembly code with DB=$7E reads $7E:0520 = same physical RAM (mirror).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".dynamic_sprite_buffer" BANK $7E SLOT 2 ORGA $2000 FORCE
-    oambuffer       dsb 2048    ; 128 × 16 bytes ($7E:2000-$7E:27FF)
-.ENDS
+; oambuffer (2048 bytes) is defined in sprite_dynamic.asm (BANK 0 SLOT 1)
+; so C code can access it via sta.l $0000,x. Only projects using
+; LIB_MODULES := ... sprite_dynamic ... allocate it.
 
 .RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 2 ORGA $2800 FORCE
     oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:2800-$7E:2AFF)

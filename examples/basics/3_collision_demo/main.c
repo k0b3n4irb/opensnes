@@ -69,26 +69,31 @@ static u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
  * Sprite Graphics
  *============================================================================*/
 
-/* Player sprite (8x8, 4bpp) - blue square */
+/* Player sprite (8x8, 4bpp) - color 1 filled square */
 static const u8 player_tile[] = {
-    0xFF,0xFF, 0x81,0x81, 0x81,0x81, 0x81,0x81,
-    0x81,0x81, 0x81,0x81, 0x81,0x81, 0xFF,0xFF,
-    0x00,0x00, 0x7E,0x00, 0x7E,0x00, 0x7E,0x00,
-    0x7E,0x00, 0x7E,0x00, 0x7E,0x00, 0x00,0x00,
+    /* Bitplanes 0,1: bp0=1,bp1=0 → color 1 */
+    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
+    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
+    /* Bitplanes 2,3: all zero */
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
-/* Enemy sprite (8x8, 4bpp) - red square */
+/* Enemy sprite (8x8, 4bpp) - color 2 filled square */
 static const u8 enemy_tile[] = {
+    /* Bitplanes 0,1: bp0=0,bp1=1 → color 2 */
+    0x00,0xFF, 0x00,0xFF, 0x00,0xFF, 0x00,0xFF,
+    0x00,0xFF, 0x00,0xFF, 0x00,0xFF, 0x00,0xFF,
+    /* Bitplanes 2,3: all zero */
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+};
+
+/* Wall tile for BG (8x8, 2bpp) - color 1 outlined square */
+static const u8 wall_tile[] = {
+    /* bp0=1,bp1=0 → color 1 for border, color 0 for interior */
     0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
     0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
-    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
-    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
-};
-
-/* Wall tile for BG (8x8, 2bpp) */
-static const u8 wall_tile[] = {
-    0xFF,0xFF, 0x81,0x81, 0x81,0x81, 0x81,0x81,
-    0x81,0x81, 0x81,0x81, 0x81,0x81, 0xFF,0xFF,
 };
 
 /* Empty tile (8x8, 2bpp) */
@@ -101,11 +106,23 @@ static const u8 empty_tile[] = {
  * Sprite Palette
  *============================================================================*/
 
+/* Sprite palette 0 (CGRAM 128-143): normal colors */
 static const u8 sprite_palette[] = {
-    0x00, 0x00,  /* Transparent */
-    0xE0, 0x03,  /* Blue */
-    0x00, 0x7C,  /* Red */
-    0x1F, 0x00,  /* Green (collision indicator) */
+    0x00, 0x00,  /* Color 0: Transparent */
+    0xFF, 0x7F,  /* Color 1: White (player) - BGR555: max all channels */
+    0x1F, 0x00,  /* Color 2: Red (enemy) - BGR555: B=0,G=0,R=31 */
+    0xE0, 0x03,  /* Color 3: Green - BGR555: B=0,G=31,R=0 */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+/* Sprite palette 1 (CGRAM 144-159): collision indicator colors */
+static const u8 collision_palette[] = {
+    0x00, 0x00,  /* Color 0: Transparent */
+    0xE0, 0x03,  /* Color 1: Green (player colliding) */
+    0xE0, 0x03,  /* Color 2: Green (enemy colliding) */
+    0xFF, 0x7F,  /* Color 3: White */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -151,26 +168,41 @@ static void load_graphics(void) {
         REG_VMDATAH = enemy_tile[i + 1];
     }
 
-    /* Load sprite palette */
+    /* Load sprite palette 0 (CGRAM 128) */
     REG_CGADD = 128;
     for (i = 0; i < 32; i++) {
         REG_CGDATA = sprite_palette[i];
     }
 
+    /* Load sprite palette 1 (CGRAM 144) for collision indicator */
+    REG_CGADD = 144;
+    for (i = 0; i < 32; i++) {
+        REG_CGDATA = collision_palette[i];
+    }
+
     /* Load BG palette */
     REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Black BG */
-    REG_CGDATA = 0x94; REG_CGDATA = 0x52;  /* Gray walls */
+    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 0: Black (background) */
+    REG_CGDATA = 0x94; REG_CGDATA = 0x52;  /* Color 1: Gray (walls) */
 }
 
 static void draw_tilemap(void) {
     u8 tx, ty;
     u16 addr;
     u8 tile;
+    u16 i;
 
-    /* Set tilemap at $0400 */
     REG_VMAIN = 0x80;
 
+    /* Clear entire 32x32 tilemap at $0400 with tile 0 (empty) */
+    REG_VMADDL = 0x00;
+    REG_VMADDH = 0x04;
+    for (i = 0; i < 1024; i++) {
+        REG_VMDATAL = 0;
+        REG_VMDATAH = 0;
+    }
+
+    /* Draw collision map tiles */
     for (ty = 0; ty < MAP_HEIGHT; ty++) {
         for (tx = 0; tx < MAP_WIDTH; tx++) {
             /* Calculate screen position */
@@ -252,7 +284,7 @@ static u8 check_wall_collision(s16 new_x, s16 new_y) {
  *============================================================================*/
 
 int main(void) {
-    u16 pad, pad_prev;
+    u16 pad;
     s16 new_x, new_y;
 
     /* Initialize */
@@ -267,53 +299,43 @@ int main(void) {
     draw_tilemap();
 
     /* Configure BG1 */
-    REG_BG1SC = 0x04;  /* Tilemap at $0800 */
+    REG_BG1SC = 0x04;  /* Tilemap at $0400, 32x32 */
     REG_BG12NBA = 0x00;
     REG_TM = TM_BG1 | TM_OBJ;
 
     /* Object settings */
     REG_OBJSEL = 0x02;  /* 8x8/16x16, tiles at $4000 */
 
-    /* Initialize player position (center of map) */
+    /* Initialize player position - tile (7,7) = open area below center platform */
     player_x = MAP_OFFSET_X + 56;
-    player_y = MAP_OFFSET_Y + 48;
+    player_y = MAP_OFFSET_Y + 56;
 
-    /* Initialize enemy positions */
-    enemy_x[0] = MAP_OFFSET_X + 24;
-    enemy_y[0] = MAP_OFFSET_Y + 24;
+    /* Initialize enemy positions - in the 4 open corners */
+    enemy_x[0] = MAP_OFFSET_X + 16;   /* tile (2,2) - top-left open area */
+    enemy_y[0] = MAP_OFFSET_Y + 16;
 
-    enemy_x[1] = MAP_OFFSET_X + 88;
-    enemy_y[1] = MAP_OFFSET_Y + 24;
+    enemy_x[1] = MAP_OFFSET_X + 104;  /* tile (13,2) - top-right open area */
+    enemy_y[1] = MAP_OFFSET_Y + 16;
 
-    enemy_x[2] = MAP_OFFSET_X + 24;
-    enemy_y[2] = MAP_OFFSET_Y + 80;
+    enemy_x[2] = MAP_OFFSET_X + 16;   /* tile (2,11) - bottom-left open area */
+    enemy_y[2] = MAP_OFFSET_Y + 88;
 
-    enemy_x[3] = MAP_OFFSET_X + 88;
-    enemy_y[3] = MAP_OFFSET_Y + 80;
+    enemy_x[3] = MAP_OFFSET_X + 104;  /* tile (13,11) - bottom-right open area */
+    enemy_y[3] = MAP_OFFSET_Y + 88;
 
     /* Initial update */
     check_collisions();
     update_sprites();
-    oamUpdate();
 
     /* Enable screen */
     setScreenOn();
-
-    /* Input state */
-    WaitForVBlank();
-    while (REG_HVBJOY & 0x01) {}
-    pad_prev = REG_JOY1L | (REG_JOY1H << 8);
 
     /* Main loop */
     while (1) {
         WaitForVBlank();
 
         /* Read input */
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-        pad_prev = pad;
-
-        if (pad == 0xFFFF) continue;
+        pad = padHeld(0);
 
         /* Calculate new position */
         new_x = player_x;
@@ -352,7 +374,6 @@ int main(void) {
 
         /* Update display */
         update_sprites();
-        oamUpdate();
     }
 
     return 0;

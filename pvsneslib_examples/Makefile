@@ -3,7 +3,7 @@
 # These examples are ported from PVSnesLib to validate the OpenSNES SDK.
 # Each example uses only the OpenSNES API — no PVSnesLib compatibility layer.
 
-EXAMPLES := hello_world random typeconsole input/controller
+EXAMPLES := hello_world random typeconsole input/controller timer testregion breakpoints debug scoring arithmetic memory_mapping benchmark sram/sramsimple sram/sramoffset graphics/palette/getcolors graphics/sprites/objectsize graphics/effects/gradientcolors
 
 .PHONY: all clean $(EXAMPLES)
 

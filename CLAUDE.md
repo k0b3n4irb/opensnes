@@ -192,6 +192,11 @@ Before modifying `compiler/cproc` or `compiler/qbe`:
 
 After modifying `templates/common/crt0.asm` or any RAMSECTION, rebuild everything and run `validate_examples.sh`. If it shows "COLLISION", DO NOT COMMIT.
 
+### Rule 5: Test-Driven Development Protocol
+
+Every change MUST follow the validation protocol:
+@.claude/TESTING_PROTOCOL.md
+
 ## SNES Development Knowledge
 
 ### WRAM Mirroring

@@ -3,8 +3,27 @@
 ## Philosophy
 
 > **"CI green means nothing. Local verification means everything."**
+> **"One atomic change -> build -> test 7 examples -> commit. No exceptions."**
 
 This workflow exists because bugs went undetected for months due to CI silently masking failures. Every rule here prevents a real bug that caused real problems.
+
+---
+
+## MANDATORY: Change Validation Protocol
+
+**Before ANY change to compiler, library, runtime, or examples, follow the protocol in:**
+
+> **`.claude/TESTING_PROTOCOL.md`**
+
+This protocol defines:
+- **Test-Driven Development**: every change MUST come with a test that catches regressions
+- **7 reference examples** that MUST ALL pass after every change
+- **Change classification** (A=Compiler, B=Library, C=Example, D=Tools)
+- **Step-by-step validation** (baseline -> write test -> atomic change -> automated tests -> manual test 7 -> commit)
+- **Regression analysis** methodology (bisection, root cause classification)
+- **Submodule change protocol** for compiler/qbe and compiler/cproc
+
+**The golden rule: Write the test FIRST. ONE change at a time. Test. Commit. Then next change.**
 
 ---
 
@@ -409,4 +428,4 @@ export GH_TOKEN=$(grep GH_TOKEN .env | cut -d'=' -f2)
 
 ---
 
-*Last updated: February 2026 - After discovering CI masking and memory corruption bugs*
+*Last updated: February 2026 - Added TESTING_PROTOCOL.md reference after oambuffer regression*

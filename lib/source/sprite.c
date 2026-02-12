@@ -216,24 +216,6 @@ void oamSetEx(u8 id, u8 size, u8 visible) {
 }
 
 /*============================================================================
- * Dynamic Sprite Graphics Pointer
- *============================================================================*/
-
-/* External reference to dynamic sprite buffer (defined in sprite_dynamic.asm) */
-extern t_sprites oambuffer[];
-
-void oamSetGfx(u16 id, u8 *gfx) {
-    if (id >= MAX_SPRITES) return;
-
-    /* Store the 24-bit address as separate 16-bit addr + 8-bit bank
-     * This ensures correct alignment with 16-byte structure
-     * Assembly reads: addr16 at offset 8-9, bank at offset 10
-     */
-    oambuffer[id].oamgfxaddr = (u16)(unsigned long)gfx;
-    oambuffer[id].oamgfxbank = (u8)((unsigned long)gfx >> 16);
-}
-
-/*============================================================================
  * OAM Update
  *============================================================================*/
 
