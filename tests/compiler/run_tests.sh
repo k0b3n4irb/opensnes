@@ -440,9 +440,9 @@ test_shift_right_ops() {
         return 1
     fi
 
-    # Verify lsr instructions are generated (for >> 8 operation)
-    if ! grep -E 'lsr a' "$out" > /dev/null 2>&1; then
-        log_fail "$name: No LSR instructions generated for shift right"
+    # Verify shift-by-8 uses xba optimization (or lsr for non-8 shifts)
+    if ! grep -E 'xba|lsr a' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No shift right instructions generated (expected xba or lsr)"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -1314,7 +1314,7 @@ test_comparisons() {
         return 1
     fi
 
-    # Verify s16 signed shift right uses cmp+ror (arithmetic), NOT lsr
+    # Verify s16 signed shift-by-8 uses cmp+ror (arithmetic shift), NOT lsr
     local signed_shift_body
     signed_shift_body=$(sed -n '/^test_s16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
     if ! echo "$signed_shift_body" | grep -qE 'cmp\.w #\$8000'; then
@@ -1335,12 +1335,34 @@ test_comparisons() {
         ((TESTS_FAILED++))
         return 1
     fi
-    # Ensure signed shift does NOT use lsr (that would be the old buggy behavior)
+    # Ensure signed shift-by-8 does NOT use lsr (that would be unsigned, wrong for signed)
     if echo "$signed_shift_body" | grep -qE 'lsr'; then
         log_fail "$name: test_s16_shift_right uses lsr (should use cmp+ror for arithmetic shift)"
         if [[ $VERBOSE -eq 1 ]]; then
             echo "Function body:"
             echo "$signed_shift_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify s16 signed shift-by-1 still uses cmp+ror (arithmetic), NOT lsr
+    local signed_shift1_body
+    signed_shift1_body=$(sed -n '/^test_s16_shift_right_1:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$signed_shift1_body" | grep -qE 'cmp\.w #\$8000'; then
+        log_fail "$name: test_s16_shift_right_1 missing 'cmp.w #\$8000' (sign bit extraction)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift1_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    if ! echo "$signed_shift1_body" | grep -qE 'ror a'; then
+        log_fail "$name: test_s16_shift_right_1 missing 'ror a' (arithmetic shift)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift1_body"
         fi
         ((TESTS_FAILED++))
         return 1

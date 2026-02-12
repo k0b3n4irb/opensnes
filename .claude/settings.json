@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-commit-check.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/mark-tests-passed.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(make clean:*)",
+      "Bash(time make:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(md5:*)",
+      "Bash(xxd:*)",
+      "Bash(chmod:*)",
+      "Bash(timeout:*)",
+      "Bash(tee:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git remote:*)",
+      "Bash(git submodule:*)",
+      "Bash(git mv:*)",
+      "Bash(git -C:*)",
+
+      "Bash(gh:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)",
+
+      "Bash(python3:*)",
+      "Bash(brew list:*)",
+
+      "Bash(./run_tests.sh:*)",
+      "Bash(./build_validation.sh:*)",
+      "Bash(./run_test.sh:*)",
+      "Bash(./build-all.sh:*)",
+
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:wiki.superfamicom.org)",
+      "WebFetch(domain:en.wikibooks.org)",
+      "WebFetch(domain:www.mesen.ca)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ],
+    "deny": []
+  },
+  "env": {
+    "OPENSNES_HOME": "/Users/k0b3/workspaces/github/opensnes",
+    "MESEN": "/Users/k0b3/workspaces/github/Mesen2/bin/osx-arm64/Release/Mesen"
+  },
+  "mcpServers": {
+    "context7": {
+      "description": "Documentation lookup for SNES/65816 programming",
+      "usage": [
+        "Use /websites/snes_nesdev_wiki for SNES hardware documentation (registers, OAM, VRAM, DMA)",
+        "Use /websites/cc65_github_io_doc for 6502/65816 assembly reference"
+      ]
+    }
+  }
+}

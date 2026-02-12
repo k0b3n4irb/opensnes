@@ -132,6 +132,8 @@ static const u8 font_tiles[] = {
  * Calculator State
  *============================================================================*/
 
+extern volatile u8 vblank_flag;  /* Defined in crt0.asm, set by NMI handler */
+
 static u8 cursor_x;        /* Cursor X (0-3) */
 static u8 cursor_y;        /* Cursor Y (0-3) */
 static u16 display_value;  /* Current display value */
@@ -251,35 +253,17 @@ static void draw_title(void) {
     write_tile(20, 4, TILE_R);
 }
 
-/*============================================================================
- * Software Multiply/Divide (avoid broken runtime)
- *============================================================================*/
-
-static u16 soft_multiply(u16 a, u16 b) {
-    u16 result = 0;
-    /* Simple repeated addition - slower but reliable */
-    while (b > 0) {
-        result = result + a;
-        b = b - 1;
-    }
-    return result;
-}
-
-static u16 soft_divide(u16 dividend, u16 divisor) {
-    u16 quotient = 0;
-    if (divisor == 0) return 0;
-    /* Simple repeated subtraction - slower but reliable */
-    while (dividend >= divisor) {
-        dividend = dividend - divisor;
-        quotient = quotient + 1;
-    }
-    return quotient;
-}
-
 static void update_display(void) {
     u16 val;
     u8 x;
     u8 d0, d1, d2, d3, d4;
+
+    /* Clear stale VBlank flag — if computation (multiply loops)
+       took longer than one frame, NMI already set vblank_flag=1.
+       Without clearing, WaitForVBlank returns immediately during
+       active display, and VRAM writes silently fail. */
+    vblank_flag = 0;
+    WaitForVBlank();
 
     /* Clear display area (5 digits) */
     for (x = 0; x < 5; x++) {
@@ -288,7 +272,7 @@ static void update_display(void) {
 
     val = display_value;
 
-    /* Extract digits using repeated subtraction (no multiply/divide) */
+    /* Extract digits using repeated subtraction */
     d4 = 0;
     while (val >= 10000) { val = val - 10000; d4++; }
     d3 = 0;
