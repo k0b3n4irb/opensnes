@@ -172,14 +172,11 @@ endif
 
 USE_HIROM      ?= 0
 
-# Override cartridge type for HiROM mode
-ifeq ($(USE_HIROM),1)
-ifeq ($(USE_SRAM),1)
-CARTRIDGETYPE := $$23    # HiROM + SRAM
-else
-CARTRIDGETYPE := $$21    # HiROM only
-endif
-endif
+# HiROM note: cartridge type ($FFD6) does NOT encode LoROM/HiROM.
+# That's in the map mode byte ($FFD5), set by HIROM/LOROM directives.
+# $FFD6 values: $00=ROM, $01=ROM+RAM, $02=ROM+RAM+Battery.
+# The previous $21/$23 values incorrectly claimed coprocessor presence,
+# causing emulators to misdetect the ROM type.
 
 # Select header template based on ROM mode
 ifeq ($(USE_HIROM),1)
@@ -248,20 +245,29 @@ ifneq ($(SOUNDBANK_SRC),)
 # Soundbank bank number (default: 1)
 SOUNDBANK_BANK ?= 1
 
-# HiROM flag for smconv (-i enables HiROM address mapping)
-ifeq ($(USE_HIROM),1)
-SMCONV_HIROM_FLAG := -i
-else
+# SNESMOD HiROM note:
+# Do NOT pass -i to smconv. The -i flag generates $0000-based internal addresses,
+# but the SNESMOD driver code (snesmod.asm) uses hardcoded $8000 offsets
+# (SB_SAMPCOUNT=$8000, SB_MODTABLE=$8004, etc.). Keep LoROM-style $8000 addresses.
+#
+# HiROM WLA-DX to CPU address mapping (bank $00-$3F mirror):
+#   WLA-DX bank N, .ORG $XXXX → file offset = N * $10000 + $XXXX
+#   CPU $NN:$8000 (mirror) → file offset = N * $10000 + $8000
+#   Therefore: .ORG $8000 in WLA-DX bank 1 → file $18000 = CPU $01:$8000 ✓
 SMCONV_HIROM_FLAG :=
-endif
 
 # Generate soundbank from IT files
-# smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix), -i (HiROM)
-# Note: We generate to a temp file first, then append SOUNDBANK_BANK and move atomically
-# to avoid incomplete files from interrupted builds
+# smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix)
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
-	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)$(if $(SMCONV_HIROM_FLAG), (HiROM mode),)"
-	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SMCONV_HIROM_FLAG) $(SOUNDBANK_SRC)
+	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
+	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+ifeq ($(USE_HIROM),1)
+	@# HiROM: force soundbank to .ORG $$8000 within its WLA-DX bank.
+	@# In HiROM, CPU $$01:$$8000 → file offset $$18000 = WLA-DX bank 1, .ORG $$8000.
+	@# SNESMOD reads via bank $$01 ($00-$3F mirror), so data MUST be at $$8000+ offset.
+	@sed -i -e 's/^\.BANK \([0-9]*\)$$/.BANK \1\n.ORG $$8000/' \
+	        -e 's/\.SECTION "SOUNDBANK"/.SECTION "SOUNDBANK" FORCE/' $(SOUNDBANK_OUT).asm
+endif
 	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
 	@mv $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).h.tmp
 	@{ cat $(SOUNDBANK_OUT).h.tmp; echo ""; echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)"; } > $(SOUNDBANK_OUT).h
