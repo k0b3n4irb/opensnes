@@ -6,6 +6,6 @@ ROM_NAME := SPRITE TESTS
 
 CSRC     := test_sprite.c
 USE_LIB  := 1
-LIB_MODULES := console sprite dma text
+LIB_MODULES := console sprite sprite_dynamic sprite_lut dma text
 
 include $(OPENSNES)/make/common.mk

@@ -95,6 +95,7 @@ for test_dir in "$SCRIPT_DIR"/*/; do
             cat "$BUILD_LOG"
         fi
     fi
+    rm -f "$BUILD_LOG"
 done
 
 echo ""

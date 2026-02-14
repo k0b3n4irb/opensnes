@@ -1,13 +1,18 @@
 // =============================================================================
 // Unit Test: Sprite Module
 // =============================================================================
-// Tests the sprite/OAM management functions.
+// Tests the sprite/OAM management functions by verifying oamMemory[] contents
+// after function calls.
 //
-// Critical functions tested:
-// - oamInit(): Initialize OAM memory, hide all sprites
-// - oamSet(): Set sprite position, tile, attributes
-// - oamSetVisible(): Show/hide individual sprites
-// - Constants: OBJ_SIZE, OBJ_HIDE_Y, MAX_SPRITES
+// OAM buffer layout (oamMemory[], 544 bytes):
+//   Bytes 0-511: 4 bytes per sprite (128 sprites)
+//     offset+0: X position (low 8 bits)
+//     offset+1: Y position
+//     offset+2: Tile number (low 8 bits)
+//     offset+3: Attributes (vhoopppc)
+//   Bytes 512-543: High table (2 bits per sprite)
+//     bit 0 of each pair: X high bit (bit 8)
+//     bit 1 of each pair: size select (0=small, 1=large)
 // =============================================================================
 
 #include <snes.h>
@@ -16,155 +21,301 @@
 #include <snes/dma.h>
 #include <snes/text.h>
 
-// Test sprite tile data (8x8, simple pattern)
+// Access the raw OAM hardware buffer from C
+extern u8 oamMemory[];
+
+// Test sprite tile data (8x8, 4bpp = 32 bytes)
 const u8 testSpriteTiles[] = {
-    // Plane 0 (8 bytes)
     0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF,
-    // Plane 1 (8 bytes)
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    // Padding to 32 bytes for 4bpp
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-// Test palette
 const u8 testPalette[] = {
-    0x00, 0x00,  // Color 0: Transparent
-    0xFF, 0x7F,  // Color 1: White
-    0x00, 0x7C,  // Color 2: Red
-    0xE0, 0x03,  // Color 3: Green
-    0x1F, 0x00,  // Color 4: Blue
-    0xFF, 0x03,  // Color 5: Yellow
-    0x1F, 0x7C,  // Color 6: Magenta
-    0xE0, 0x7F,  // Color 7: Cyan
-    // Remaining colors black
+    0x00, 0x00, 0xFF, 0x7F, 0x00, 0x7C, 0xE0, 0x03,
+    0x1F, 0x00, 0xFF, 0x03, 0x1F, 0x7C, 0xE0, 0x7F,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-// Test results
-static u8 test_passed;
-static u8 test_failed;
+// Test counters
+static u8 tests_passed;
+static u8 tests_failed;
+static u8 test_line;
 
-void log_result(const char* name, u8 passed) {
-    if (passed) {
-        test_passed++;
-    } else {
-        test_failed++;
-    }
-}
+#define TEST(name, condition) do { \
+    if (condition) { \
+        tests_passed++; \
+    } else { \
+        tests_failed++; \
+        textPrintAt(1, test_line, "FAIL:"); \
+        textPrintAt(7, test_line, name); \
+        test_line++; \
+    } \
+} while(0)
 
 // =============================================================================
 // Test: OAM Constants
 // =============================================================================
 void test_oam_constants(void) {
-    // Verify MAX_SPRITES
-    u8 pass = (MAX_SPRITES == 128);
-    log_result("MAX_SPRITES == 128", pass);
-
-    // Verify OBJ_HIDE_Y
-    pass = (OBJ_HIDE_Y == 240);
-    log_result("OBJ_HIDE_Y == 240", pass);
-
-    // Verify size constants exist and are unique
-    pass = (OBJ_SIZE8_L16 != OBJ_SIZE16_L32);
-    log_result("Size constants unique", pass);
+    TEST("MAX_SPRITES==128", MAX_SPRITES == 128);
+    TEST("OBJ_HIDE_Y==240", OBJ_HIDE_Y == 240);
+    TEST("SizeConst unique", OBJ_SIZE8_L16 != OBJ_SIZE16_L32);
+    TEST("OBJ_SHOW==1", OBJ_SHOW == 1);
+    TEST("OBJ_HIDE==0", OBJ_HIDE == 0);
 }
 
 // =============================================================================
-// Test: oamInit
+// Test: oamClear — all sprites hidden
 // =============================================================================
-void test_oam_init(void) {
-    // Initialize OAM
-    oamInit();
+void test_oam_clear(void) {
+    oamClear();
 
-    // After init, all sprites should be hidden (Y=240)
-    // We can't directly read oamMemory from C easily,
-    // but we can verify the function executes without crash
-    log_result("oamInit executes", 1);
+    // After clear, every sprite should have Y=240 (OBJ_HIDE_Y)
+    u8 all_hidden = 1;
+    u8 i;
+    for (i = 0; i < 128; i++) {
+        u16 off = (u16)i << 2;
+        if (oamMemory[off + 1] != OBJ_HIDE_Y) {
+            all_hidden = 0;
+            break;
+        }
+    }
+    TEST("clear: all Y=240", all_hidden);
+
+    // High table: all X high bits set (0x55 pattern = 01010101)
+    u8 hitable_ok = 1;
+    for (i = 0; i < 32; i++) {
+        if (oamMemory[512 + i] != 0x55) {
+            hitable_ok = 0;
+            break;
+        }
+    }
+    TEST("clear: hitbl=0x55", hitable_ok);
 }
 
 // =============================================================================
-// Test: oamSet basic positioning
-// oamSet(id, x, y, tile, palette, priority, flags)
+// Test: oamSet basic — verify position bytes
 // =============================================================================
-void test_oam_set_basic(void) {
-    oamInit();
+void test_oam_set_position(void) {
+    oamClear();
 
-    // Set sprite 0 at position (100, 80)
-    oamSet(0, 100, 80, 0, 0, 0, 0);
-    log_result("oamSet sprite 0", 1);
+    // Set sprite 0 at (100, 80), tile=5, pal=0, prio=0, no flip
+    oamSet(0, 100, 80, 5, 0, 0, 0);
 
-    // Set sprite at different positions
-    oamSet(1, 0, 0, 0, 0, 0, 0);      // Top-left
-    oamSet(2, 255, 0, 0, 0, 0, 0);    // Top-right edge
-    oamSet(3, 128, 112, 0, 0, 0, 0);  // Center-ish
-    log_result("oamSet multiple sprites", 1);
+    TEST("set: X lo=100", oamMemory[0] == 100);
+    TEST("set: Y=80", oamMemory[1] == 80);
+    TEST("set: tile=5", oamMemory[2] == 5);
+    // attr = vhoopppc: no flip, prio=0, pal=0, tile hi=0 → 0x00
+    TEST("set: attr=0x00", oamMemory[3] == 0x00);
+
+    // X high bit should be clear (x=100 < 256)
+    // High table byte 128 (512+0), sprite 0 = bit 0
+    u8 ht = oamMemory[512];
+    TEST("set: Xhi clear", (ht & 0x01) == 0);
 }
 
 // =============================================================================
-// Test: oamSet with attributes
+// Test: oamSet with X > 255 — high bit set
+// =============================================================================
+void test_oam_set_xhi(void) {
+    oamClear();
+
+    // Set sprite 0 at X=300 (0x12C), Y=50
+    oamSet(0, 300, 50, 0, 0, 0, 0);
+
+    // X low 8 bits = 300 & 0xFF = 0x2C = 44
+    TEST("xhi: X lo=44", oamMemory[0] == 44);
+    TEST("xhi: Y=50", oamMemory[1] == 50);
+
+    // X high bit should be set
+    u8 ht = oamMemory[512];
+    TEST("xhi: Xhi set", (ht & 0x01) == 1);
+}
+
+// =============================================================================
+// Test: oamSet attributes — priority, palette, flip, tile high bit
 // =============================================================================
 void test_oam_set_attributes(void) {
-    oamInit();
+    oamClear();
 
-    // Test priority (0-3) - priority is param 6
-    oamSet(0, 100, 80, 0, 0, 0, 0);  // Priority 0
-    oamSet(1, 100, 80, 0, 0, 1, 0);  // Priority 1
-    oamSet(2, 100, 80, 0, 0, 2, 0);  // Priority 2
-    oamSet(3, 100, 80, 0, 0, 3, 0);  // Priority 3
-    log_result("oamSet priorities", 1);
+    // Priority 2, palette 3, no flip, tile=0
+    // attr = vhoopppc = 00_10_011_0 = 0x26
+    oamSet(0, 50, 50, 0, 3, 2, 0);
+    TEST("attr: p2 pal3", oamMemory[3] == 0x26);
 
-    // Test flip flags (flags param includes OBJ_FLIPX and OBJ_FLIPY)
-    oamSet(4, 100, 80, 0, 0, 0, OBJ_FLIPX);           // H-flip
-    oamSet(5, 100, 80, 0, 0, 0, OBJ_FLIPY);           // V-flip
-    oamSet(6, 100, 80, 0, 0, 0, OBJ_FLIPX | OBJ_FLIPY); // Both flips
-    log_result("oamSet flip flags", 1);
+    // H-flip + V-flip, priority 1, palette 5, tile=256 (high bit=1)
+    // attr = 11_01_101_1 = 0xDB
+    oamSet(1, 50, 50, 256, 5, 1, OBJ_FLIPX | OBJ_FLIPY);
+    TEST("attr: flip+t256", oamMemory[7] == 0xDB);
 
-    // Test palette (0-7) - palette is param 5
-    oamSet(7, 100, 80, 0, 3, 0, 0);  // Palette 3
-    oamSet(8, 100, 80, 0, 7, 0, 0);  // Palette 7
-    log_result("oamSet palettes", 1);
+    // Just H-flip, prio 0, pal 0, tile 0
+    // attr = 01_00_000_0 = 0x40
+    oamSet(2, 50, 50, 0, 0, 0, OBJ_FLIPX);
+    TEST("attr: Hflip", oamMemory[11] == 0x40);
+
+    // Just V-flip
+    // attr = 10_00_000_0 = 0x80
+    oamSet(3, 50, 50, 0, 0, 0, OBJ_FLIPY);
+    TEST("attr: Vflip", oamMemory[15] == 0x80);
 }
 
 // =============================================================================
-// Test: oamSetVisible
+// Test: oamHide — sprite hidden at Y=240 with X high bit set
 // =============================================================================
-void test_oam_visibility(void) {
-    oamInit();
+void test_oam_hide(void) {
+    oamClear();
 
-    // Set a sprite
+    // First set sprite 5 at a visible position
+    oamSet(5, 100, 80, 0, 0, 0, 0);
+    TEST("hide: pre Y=80", oamMemory[5 * 4 + 1] == 80);
+
+    // Now hide it
+    oamHide(5);
+    TEST("hide: X lo=0", oamMemory[5 * 4 + 0] == 0);
+    TEST("hide: Y=240", oamMemory[5 * 4 + 1] == OBJ_HIDE_Y);
+
+    // X high bit should be set (sprite 5: byte 512+1, bit 2)
+    u8 ht = oamMemory[512 + 1]; // sprites 4-7
+    TEST("hide: Xhi set", (ht & 0x04) != 0); // sprite 5 = bit 2
+}
+
+// =============================================================================
+// Test: oamSetVisible(id, OBJ_HIDE) — same as oamHide
+// =============================================================================
+void test_oam_set_visible(void) {
+    oamClear();
+
     oamSet(0, 100, 80, 0, 0, 0, 0);
+    TEST("vis: pre Y=80", oamMemory[1] == 80);
 
-    // Hide it
     oamSetVisible(0, OBJ_HIDE);
-    log_result("oamSetVisible hide", 1);
+    TEST("vis: hide Y=240", oamMemory[1] == OBJ_HIDE_Y);
 
-    // Show it again
+    // OBJ_SHOW does NOT restore Y — documented behavior
     oamSetVisible(0, OBJ_SHOW);
-    log_result("oamSetVisible show", 1);
+    TEST("vis: show noop", oamMemory[1] == OBJ_HIDE_Y);
 }
 
 // =============================================================================
-// Test: Multiple sprite stress test
+// Test: oamSetX / oamSetY / oamSetXY
 // =============================================================================
-void test_many_sprites(void) {
-    oamInit();
+void test_oam_setxy(void) {
+    oamClear();
+    oamSet(0, 0, 0, 0, 0, 0, 0);
 
-    // Set all 128 sprites
-    for (u8 i = 0; i < 128; i++) {
-        u16 x = (i % 16) * 16;
-        u8 y = (i / 16) * 16;
-        oamSet(i, x, y, 0, i % 8, 0, 0);
+    oamSetX(0, 200);
+    TEST("setX: X=200", oamMemory[0] == 200);
+
+    oamSetY(0, 150);
+    TEST("setY: Y=150", oamMemory[1] == 150);
+
+    oamSetXY(0, 75, 120);
+    TEST("setXY: X=75", oamMemory[0] == 75);
+    TEST("setXY: Y=120", oamMemory[1] == 120);
+}
+
+// =============================================================================
+// Test: oamSetTile
+// =============================================================================
+void test_oam_set_tile(void) {
+    oamClear();
+    oamSet(0, 50, 50, 0, 0, 0, 0);
+
+    oamSetTile(0, 42);
+    TEST("tile: lo=42", oamMemory[2] == 42);
+}
+
+// =============================================================================
+// Test: oamSetSize — large/small bit in high table
+// =============================================================================
+void test_oam_set_size(void) {
+    oamClear();
+
+    // Set sprite 0 to large size
+    oamSetSize(0, 1);
+    // Size is bit 1 of the 2-bit pair for sprite 0 in high table
+    u8 ht = oamMemory[512];
+    TEST("size: large", (ht & 0x02) != 0);
+
+    // Set back to small
+    oamSetSize(0, 0);
+    ht = oamMemory[512];
+    TEST("size: small", (ht & 0x02) == 0);
+}
+
+// =============================================================================
+// Test: Multiple sprites — verify different slots don't interfere
+// =============================================================================
+void test_multi_sprite(void) {
+    oamClear();
+
+    oamSet(0, 10, 20, 1, 0, 0, 0);
+    oamSet(1, 30, 40, 2, 1, 0, 0);
+    oamSet(2, 50, 60, 3, 2, 0, 0);
+
+    // Verify sprite 0
+    TEST("multi: s0 X=10", oamMemory[0] == 10);
+    TEST("multi: s0 Y=20", oamMemory[1] == 20);
+    TEST("multi: s0 t=1", oamMemory[2] == 1);
+
+    // Verify sprite 1
+    TEST("multi: s1 X=30", oamMemory[4] == 30);
+    TEST("multi: s1 Y=40", oamMemory[5] == 40);
+    TEST("multi: s1 t=2", oamMemory[6] == 2);
+
+    // Verify sprite 2
+    TEST("multi: s2 X=50", oamMemory[8] == 50);
+    TEST("multi: s2 Y=60", oamMemory[9] == 60);
+    TEST("multi: s2 t=3", oamMemory[10] == 3);
+}
+
+// =============================================================================
+// Test: Stress test — set all 128 sprites, verify a sample
+// =============================================================================
+void test_all_sprites(void) {
+    oamClear();
+
+    u8 i;
+    for (i = 0; i < 128; i++) {
+        oamSet(i, i, i + 10, 0, i % 8, 0, 0);
     }
-    log_result("Set all 128 sprites", 1);
+
+    // Spot-check a few sprites
+    TEST("all: s0 X=0", oamMemory[0] == 0);
+    TEST("all: s0 Y=10", oamMemory[1] == 10);
+    TEST("all: s64 X=64", oamMemory[64 * 4] == 64);
+    TEST("all: s64 Y=74", oamMemory[64 * 4 + 1] == 74);
+    TEST("all: s127 X=127", oamMemory[127 * 4] == 127);
+    TEST("all: s127 Y=137", oamMemory[127 * 4 + 1] == 137);
+}
+
+// =============================================================================
+// Test: oambuffer[] (dynamic sprite engine) structure layout
+// =============================================================================
+void test_oambuffer_struct(void) {
+    // Verify structure size is 16 bytes (PVSnesLib compatible)
+    TEST("t_sprites=16B", sizeof(t_sprites) == 16);
+
+    // Verify field offsets via direct write + read
+    oambuffer[0].oamx = 123;
+    oambuffer[0].oamy = 45;
+    oambuffer[0].oamframeid = 7;
+    oambuffer[0].oamattribute = 0x2A;
+    oambuffer[0].oamrefresh = 1;
+
+    TEST("buf: oamx=123", oambuffer[0].oamx == 123);
+    TEST("buf: oamy=45", oambuffer[0].oamy == 45);
+    TEST("buf: frameid=7", oambuffer[0].oamframeid == 7);
+    TEST("buf: attr=0x2A", oambuffer[0].oamattribute == 0x2A);
+    TEST("buf: refresh=1", oambuffer[0].oamrefresh == 1);
 }
 
 // =============================================================================
 // Main
 // =============================================================================
 int main(void) {
-    // Initialize console for output
     consoleInit();
     setMode(BG_MODE0, 0);
     textInit();
@@ -174,32 +325,45 @@ int main(void) {
                   (u8*)testPalette, sizeof(testPalette),
                   OBJ_SIZE8_L16, 0x0000, 0x0000);
 
-    textPrintAt(2, 1, "SPRITE MODULE TESTS");
-    textPrintAt(2, 2, "-------------------");
+    textPrintAt(1, 1, "SPRITE MODULE TESTS");
+    textPrintAt(1, 2, "-------------------");
 
-    test_passed = 0;
-    test_failed = 0;
+    tests_passed = 0;
+    tests_failed = 0;
+    test_line = 4;  // first line for failure messages
 
-    // Run tests
+    // Run all tests
     test_oam_constants();
-    test_oam_init();
-    test_oam_set_basic();
+    test_oam_clear();
+    test_oam_set_position();
+    test_oam_set_xhi();
     test_oam_set_attributes();
-    test_oam_visibility();
-    test_many_sprites();
+    test_oam_hide();
+    test_oam_set_visible();
+    test_oam_setxy();
+    test_oam_set_tile();
+    test_oam_set_size();
+    test_multi_sprite();
+    test_all_sprites();
+    test_oambuffer_struct();
 
-    // Display results
-    textPrintAt(2, 4, "Tests completed");
+    // Show summary
+    test_line += 2;
+    textPrintAt(1, test_line, "Passed: ");
+    textPrintU16(tests_passed);
+    test_line++;
+    textPrintAt(1, test_line, "Failed: ");
+    textPrintU16(tests_failed);
+    test_line++;
+
+    if (tests_failed == 0) {
+        textPrintAt(1, test_line, "ALL TESTS PASSED");
+    }
 
     setScreenOn();
 
-    // Show some test sprites
-    oamSet(0, 100, 100, 0, 0, 3, 0);
-    oamSetVisible(0, OBJ_SHOW);
-
     while (1) {
         WaitForVBlank();
-        oamUpdate();
     }
 
     return 0;
