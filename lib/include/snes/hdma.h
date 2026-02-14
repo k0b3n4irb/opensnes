@@ -227,6 +227,21 @@
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
 
 /**
+ * @brief Set up an HDMA channel with explicit source bank byte.
+ *
+ * Same as hdmaSetup() but allows specifying the ROM bank for HDMA tables
+ * in banks other than $00. Use this when your HDMA table is in a SUPERFREE
+ * section that may be placed in bank $01+ by the linker.
+ *
+ * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or _7)
+ * @param mode     Transfer mode (HDMA_MODE_*)
+ * @param destReg  Destination B-bus register (low byte of $21xx address)
+ * @param table    Pointer to HDMA table in ROM or RAM
+ * @param bank     Source bank byte ($00-$3F for LoROM)
+ */
+void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank);
+
+/**
  * @brief Enable HDMA channel(s)
  *
  * Enables the specified HDMA channel(s). HDMA will start on the next frame.

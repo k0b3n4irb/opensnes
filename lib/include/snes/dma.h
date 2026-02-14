@@ -71,6 +71,40 @@
 void dmaCopyVram(u8 *source, u16 vramAddr, u16 size);
 
 /**
+ * @brief Copy data to VRAM with explicit source bank byte.
+ *
+ * Same as dmaCopyVram() but allows specifying the ROM bank for data
+ * in banks other than $00 (e.g., SUPERFREE sections placed by linker).
+ *
+ * @param source   Source address (16-bit offset within bank)
+ * @param bank     Source bank byte ($00-$3F for LoROM, $00-$7D for HiROM)
+ * @param vramAddr VRAM destination word address
+ * @param size     Number of bytes to transfer
+ *
+ * @warning Must be called during VBlank or force blank!
+ */
+void dmaCopyVramBank(u8 *source, u8 bank, u16 vramAddr, u16 size);
+
+/**
+ * @brief Load Mode 7 interleaved data to VRAM.
+ *
+ * Mode 7 stores tilemap in VRAM low bytes and tile pixels in VRAM high bytes.
+ * This function performs two DMA transfers with appropriate VMAIN settings:
+ *   1. Tilemap -> VMDATAL (VMAIN=$00, increment after low byte)
+ *   2. Tiles   -> VMDATAH (VMAIN=$80, increment after high byte)
+ *
+ * VRAM destination is always $0000 (Mode 7 uses the full 32K word space).
+ *
+ * @param tilemap      Tilemap data source (.mp7 file, 128x128 = 16384 bytes)
+ * @param tilemapSize  Tilemap data size in bytes
+ * @param tiles        Tile pixel data source (.pc7 file, 256 tiles x 64 bytes)
+ * @param tilesSize    Tile pixel data size in bytes
+ *
+ * @warning Must be called during forced blank (INIDISP=$80) or VBlank.
+ */
+void dmaCopyVramMode7(u8 *tilemap, u16 tilemapSize, u8 *tiles, u16 tilesSize);
+
+/**
  * @brief Copy data to VRAM (WRAM source only)
  *
  * @param src Source address in Work RAM (bank $7E)

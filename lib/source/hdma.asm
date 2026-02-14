@@ -123,6 +123,61 @@ hdmaSetup:
     rtl
 
 ;------------------------------------------------------------------------------
+; void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank)
+;
+; Same as hdmaSetup but with explicit bank byte for HDMA tables in banks > $00.
+;
+; Stack layout (after PHP):
+;   5-6,s = bank (rightmost, u8 in 16-bit slot)
+;   7-8,s = table (16-bit pointer)
+;   9-10,s = destReg (u8 in 16-bit slot)
+;   11-12,s = mode (u8 in 16-bit slot)
+;   13-14,s = channel (leftmost, u8 in 16-bit slot)
+;------------------------------------------------------------------------------
+hdmaSetupBank:
+    php
+    rep #$30                ; 16-bit A and X/Y
+
+    ; Calculate DMA register base address for this channel
+    sep #$20
+    lda 13,s                ; channel (8-bit)
+    cmp #8
+    bcs @hdmaSetupBank_done ; Invalid channel, bail out
+
+    rep #$20
+    and #$00FF              ; Mask to 8-bit
+    asl a
+    asl a
+    asl a
+    asl a                   ; channel * 16
+    clc
+    adc #$4300              ; Base address
+    tax                     ; X = register base ($43x0)
+
+    ; Set HDMA mode (DMAPx at $43x0)
+    sep #$20
+    lda 11,s                ; mode (8-bit)
+    sta.l $0000,x           ; $43x0 = DMAP
+
+    ; Set destination register (BBADx at $43x1)
+    lda 9,s                 ; destReg (8-bit)
+    sta.l $0001,x           ; $43x1 = BBAD
+
+    ; Set table address (A1Tx at $43x2-$43x3)
+    rep #$20
+    lda 7,s                 ; table address (16-bit)
+    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+
+    ; Set bank from explicit parameter
+    sep #$20
+    lda 5,s                 ; bank byte
+    sta.l $0004,x           ; $43x4 = A1B (bank)
+
+@hdmaSetupBank_done:
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
 ; void hdmaEnable(u8 channelMask)
 ;
 ; Enables specified HDMA channels.
