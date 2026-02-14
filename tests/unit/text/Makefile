@@ -1,10 +1,10 @@
-# Types Unit Test Makefile
+# Text Unit Test Makefile
 
 OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := test_types.sfc
-ROM_NAME := TYPE TESTS
+TARGET   := test_text.sfc
+ROM_NAME := TEXT TESTS
 
-CSRC     := test_types.c
+CSRC     := test_text.c
 USE_LIB  := 1
 LIB_MODULES := console text dma sprite
 
