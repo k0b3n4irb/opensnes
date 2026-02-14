@@ -14,8 +14,12 @@ After EVERY modification (code, library, compiler, example, build system):
 
 ### Step 1: Run ALL automated tests (Claude does this)
 
+**CRITICAL: NEVER use partial rebuilds** (`make lib`, `make -C examples/...`) before testing.
+Partial rebuilds can leave stale artifacts that produce non-reproducible test results.
+The ONLY allowed build command before manual testing is `make clean && make` from root.
+
 ```bash
-make clean && make                                                      # Full rebuild
+make clean && make                                                      # Full rebuild FROM ROOT
 ./tests/compiler/run_tests.sh                                           # Compiler tests
 OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Example validation
 ```

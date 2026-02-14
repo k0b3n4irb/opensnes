@@ -218,7 +218,9 @@ Record results. If baseline fails, FIX IT before proceeding.
 ### Step 3: Automated Tests
 
 ```bash
-# Rebuild
+# Rebuild — ALWAYS from root, ALWAYS clean first
+# NEVER use partial rebuilds (make lib, make -C examples/...) before testing.
+# Partial rebuilds can leave stale artifacts that produce non-reproducible results.
 make clean && make -k
 
 # Compiler regression tests
@@ -362,6 +364,7 @@ git stash pop       # Restore work if needed
 | Trap | Prevention |
 |------|------------|
 | Stale .asm files after compiler change | Always `make clean && make` |
+| Partial rebuild before manual test | **NEVER** use `make lib`, `make -C examples/...`, or any partial rebuild before asking user to test. The ONLY allowed command is `make clean && make` from root. Partial rebuilds create ambiguous state where ROMs may not reflect all source changes. |
 | cproc uncommitted changes appear "clean" | Check `cd compiler/cproc && git status` explicitly |
 | QBE submodule detached HEAD | `cd compiler/qbe && git checkout main` before committing |
 | Multiple changes mask each other | ONE change at a time, always |
