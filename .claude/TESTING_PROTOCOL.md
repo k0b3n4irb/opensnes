@@ -15,13 +15,13 @@ These 7 examples cover all critical subsystems. **ALL must work after every chan
 
 | # | Example | Path | Tests | Expected Behavior |
 |---|---------|------|-------|-------------------|
-| 1 | **Breakout** | `examples/games/2_breakout/` | Sprites, input, game logic | Ball bounces, paddle moves with D-PAD, blocks break |
-| 2 | **LikeMario** | `examples/games/1_likemario/` | Scrolling, sprites, input, tilemaps | Mario walks/jumps, camera scrolls, tiles display |
-| 3 | **HDMA Wave** | `examples/graphics/effects/2_hdma_wave/` | HDMA, PPU effects | Wavy distortion effect on background |
-| 4 | **Dynamic Sprite** | `examples/graphics/sprites/4_dynamic_sprite/` | Dynamic sprites, OAM buffer | 4 animated 16x16 sprites (red/green) at y=100 |
-| 5 | **Continuous Scroll** | `examples/graphics/backgrounds/2_continuous_scroll/` | BG scrolling, input | Background scrolls smoothly with D-PAD |
-| 6 | **SFX Demo** | `examples/audio/1_sfx_demo/` | Audio, input | Sound effects play on button press |
-| 7 | **HiROM Demo** | `examples/audio/4_snesmod_hirom/` | HiROM mode, audio | Music plays, HiROM mapping works |
+| 1 | **Breakout** | `examples/games/breakout/` | Sprites, input, game logic | Ball bounces, paddle moves with D-PAD, blocks break |
+| 2 | **LikeMario** | `examples/games/likemario/` | Scrolling, sprites, input, tilemaps | Mario walks/jumps, camera scrolls, tiles display |
+| 3 | **HDMA Wave** | `examples/graphics/effects/hdma_wave/` | HDMA, PPU effects | Wavy distortion effect on background |
+| 4 | **Dynamic Sprite** | `examples/graphics/sprites/dynamic_sprite/` | Dynamic sprites, OAM buffer | 4 animated 16x16 sprites (red/green) at y=100 |
+| 5 | **Continuous Scroll** | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolling, input | Background scrolls smoothly with D-PAD |
+| 6 | **SFX Demo** | `examples/audio/sfx_demo/` | Audio, input | Sound effects play on button press |
+| 7 | **HiROM Demo** | `examples/audio/snesmod_hirom/` | HiROM mode, audio | Music plays, HiROM mapping works |
 
 ### Failure Symptoms to Watch For
 
@@ -127,7 +127,7 @@ The commit `db8e977` moved `oambuffer` from `$7E:0520` to `$7E:2000`. This test 
 ```bash
 test_oambuffer_bank00_accessible() {
     local name="oambuffer_in_bank00_mirror"
-    local sym_file="examples/graphics/sprites/4_dynamic_sprite/dynamic_sprite.sym"
+    local sym_file="examples/graphics/sprites/dynamic_sprite/dynamic_sprite.sym"
     ((TESTS_RUN++))
 
     if [[ ! -f "$sym_file" ]]; then

@@ -50,7 +50,7 @@ make clean              # Clean all build artifacts
 make help               # Show all targets
 
 # Build a single example
-make -C examples/text/1_hello_world
+make -C examples/text/hello_world
 
 # Check for memory overlaps after building
 python3 tools/symmap/symmap.py --check-overlap game.sym

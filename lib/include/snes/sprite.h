@@ -273,7 +273,7 @@ void oamSetEx(u8 id, u8 size, u8 visible);
  * player_x += 1;  // Jerky movement!
  * @endcode
  *
- * See examples/graphics/12_continuous_scroll for details on this pattern.
+ * See examples/graphics/backgrounds/continuous_scroll for details on this pattern.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 

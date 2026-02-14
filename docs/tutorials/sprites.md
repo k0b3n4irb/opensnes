@@ -209,7 +209,7 @@ REG_OBJSEL = 0x60;  // 16x16/32x32, tiles at $0000
 
 ## Example: Two Players
 
-See `examples/input/2_two_players/` for a complete example with two independently controlled sprites.
+See `examples/input/two_players/` for a complete example with two independently controlled sprites.
 
 ## Performance Tips
 

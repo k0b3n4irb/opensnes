@@ -3,14 +3,16 @@
 
 PROJECT_NAME           = "OpenSNES SDK"
 PROJECT_NUMBER         = "1.0"
-PROJECT_BRIEF          = "Modern C SDK for Super Nintendo Development"
+PROJECT_BRIEF          = "Modern C SDK for SNES Development"
 OUTPUT_DIRECTORY       = doc
 
 # Input
-INPUT                  = lib/include README.md
+INPUT                  = lib/include README.md examples
 FILE_PATTERNS          = *.h *.md
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
+EXCLUDE_PATTERNS       = */README_TEMPLATE.md
+FILTER_PATTERNS        = *.md="python3 docs/doxygen_md_filter.py"
 
 # Output formats
 GENERATE_HTML          = YES

@@ -2,7 +2,7 @@
  * arithmetic - Ported from PVSnesLib to OpenSNES
  *
  * Integer calculator with on-screen button grid.
- * Extends examples/basics/2_calculator with power (^) operation.
+ * Extends examples/basics/calculator with power (^) operation.
  * D-pad moves cursor, A presses the selected button.
  * Supports +, -, *, /, ^ (power), C (clear), = (equals).
  *

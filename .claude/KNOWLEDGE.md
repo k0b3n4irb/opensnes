@@ -775,8 +775,8 @@ oamSet(0, player.x, player.y, tile, pal, prio, flags);
 4. Initialize struct at declaration (global initializer)
 
 **Affected Examples:**
-- `12_continuous_scroll` - Fixed February 2026
-- `21_animated_sprite` - Reference implementation (working pattern)
+- `continuous_scroll` - Fixed February 2026
+- `animated_sprite` - Reference implementation (working pattern)
 
 **How to Diagnose:**
 1. Check if UP/DOWN works but LEFT/RIGHT doesn't
@@ -791,8 +791,8 @@ This bug is subtle and time-consuming to debug because:
 - No error messages or warnings
 
 **See Also:**
-- `examples/graphics/21_animated_sprite/main.c` - Working reference
-- `examples/graphics/12_continuous_scroll/main.c` - Fixed example with documentation
+- `examples/graphics/animated_sprite/main.c` - Working reference
+- `examples/graphics/continuous_scroll/main.c` - Fixed example with documentation
 
 ---
 
@@ -1183,9 +1183,9 @@ void audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release);
 
 | Example | Mode | Purpose |
 |---------|------|---------|
-| `1_tone/` | Legacy | Low-level SPC700 programming |
-| `2_sfx/` | Legacy | Basic library usage |
-| `6_snesmod_music/` | SNESMOD | Tracker music playback |
+| `tone/` | Legacy | Low-level SPC700 programming |
+| `sfx/` | Legacy | Basic library usage |
+| `snesmod_music/` | SNESMOD | Tracker music playback |
 
 ### SNESMOD Usage
 
@@ -1685,25 +1685,25 @@ LIB_MODULES := console sprite dma background
 
 | Example | Architecture | Notes |
 |---------|--------------|-------|
-| `5_mode1` | C + Library DMA | Ideal pattern |
-| `6_simple_sprite` | C + Library DMA | Uses `oamInitGfxSet()` |
-| `7_fading` | C + Library DMA | Ideal pattern |
-| `11_mode5` | C + Library DMA | Hi-res mode |
-| `4_scrolling` | C + Library DMA | 2 backgrounds |
-| `12_continuous_scroll` | C + Library DMA | VBlank callback demo |
-| `6_snesmod_music` | C + Library DMA | SNESMOD example |
-| `7_snesmod_sfx` | C + Library DMA | SNESMOD example |
-| `3_mode7` | C + ASM DMA | Mode 7 interleaved VRAM (library doesn't support) |
-| `8_mode0` | C + ASM DMA | 4-BG parallax (educational for Mode 0) |
-| `9_parallax` | C + ASM DMA | Parallax scrolling demo |
-| `10_mode3` | C + ASM DMA | Split DMA for >32KB tiles |
-| `2_animation` | C + ASM DMA | Sprite animation |
-| `1_tone` | C + ASM | Low-level SPC700 demo |
-| `2_sfx` | C + Library | Legacy audio |
-| `2_custom_font` | Standalone | Font rendering demo |
-| `1_calculator` | Standalone | No graphics, logic demo |
-| `1_hello_world` | C + Library | Text console |
-| `2_two_players` | C + Library | Input demo |
+| `mode1` | C + Library DMA | Ideal pattern |
+| `simple_sprite` | C + Library DMA | Uses `oamInitGfxSet()` |
+| `fading` | C + Library DMA | Ideal pattern |
+| `mode5` | C + Library DMA | Hi-res mode |
+| `scrolling` | C + Library DMA | 2 backgrounds |
+| `continuous_scroll` | C + Library DMA | VBlank callback demo |
+| `snesmod_music` | C + Library DMA | SNESMOD example |
+| `snesmod_sfx` | C + Library DMA | SNESMOD example |
+| `mode7` | C + ASM DMA | Mode 7 interleaved VRAM (library doesn't support) |
+| `mode0` | C + ASM DMA | 4-BG parallax (educational for Mode 0) |
+| `parallax` | C + ASM DMA | Parallax scrolling demo |
+| `mode3` | C + ASM DMA | Split DMA for >32KB tiles |
+| `animation` | C + ASM DMA | Sprite animation |
+| `tone` | C + ASM | Low-level SPC700 demo |
+| `sfx` | C + Library | Legacy audio |
+| `custom_font` | Standalone | Font rendering demo |
+| `calculator` | Standalone | No graphics, logic demo |
+| `hello_world` | C + Library | Text console |
+| `two_players` | C + Library | Input demo |
 
 ### When to Keep ASM
 
