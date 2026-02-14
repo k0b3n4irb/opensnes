@@ -81,19 +81,13 @@ release/
 !examples/**/res/*.pic
 !examples/**/res/*.map
 !examples/**/res/*.pal
+!examples/**/res/*.inc
+!examples/**/res/*.as
+!examples/**/res/*.pc7
+!examples/**/res/*.mp7
 !examples/**/assets/*.inc
 !examples/**/assets/*.as
 !examples/**/assets/*.pc7
 !examples/**/assets/*.mp7
 !examples/**/assets/*.pal
-!pvsneslib_examples/**/data.asm
-!pvsneslib_examples/**/spc.asm
-!pvsneslib_examples/**/res/*.pic
-!pvsneslib_examples/**/res/*.map
-!pvsneslib_examples/**/res/*.pal
-!pvsneslib_examples/**/res/*.inc
-!pvsneslib_examples/**/res/*.as
-!pvsneslib_examples/**/res/*.pc7
-!pvsneslib_examples/**/res/*.mp7
-!pvsneslib_examples/**/res/*.pal
 

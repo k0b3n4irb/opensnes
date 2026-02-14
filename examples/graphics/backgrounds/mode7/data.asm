@@ -1,150 +1,94 @@
-;==============================================================================
-; Mode 7 Graphics Data and Loading Routines
-;==============================================================================
+; Mode 7 - Asset data and VRAM loader
+;
+; Mode 7 VRAM layout is interleaved:
+;   Low bytes  (VMDATAL) = tilemap (128x128 tile indices)
+;   High bytes (VMDATAH) = tile pixel data (8bpp, 256 tiles x 64 bytes)
+;
+; Requires two separate DMAs with different VMAIN settings.
 
-.SECTION ".mode7data" SUPERFREE
-
+; Mode 7 tile pixel data (8bpp)
+.section ".rodata1" superfree
 mode7_tiles:
-.INCBIN "assets/mode7bg.pc7"
+.incbin "res/mode7bg.pc7"
 mode7_tiles_end:
+.ends
 
+; Mode 7 tilemap (128x128 = 16384 bytes)
+.section ".rodata2" superfree
 mode7_map:
-.INCBIN "assets/mode7bg.mp7"
+.incbin "res/mode7bg.mp7"
 mode7_map_end:
 
 mode7_pal:
-.INCBIN "assets/mode7bg.pal"
+.incbin "res/mode7bg.pal"
+mode7_pal_end:
+.ends
 
-.ENDS
+; Assembly helper: load Mode 7 data to VRAM
+; Must be called during forced blank (INIDISP = $80)
+.section ".mode7loader" superfree
 
-;==============================================================================
-; Mode 7 VRAM Loading Function
-;==============================================================================
-; Mode 7 VRAM layout:
-;   - Tilemap in low bytes of VRAM words $0000-$3FFF
-;   - Character data in high bytes of VRAM words $0000-$3FFF
-;==============================================================================
-
-.SECTION ".mode7code" SUPERFREE
-
-;------------------------------------------------------------------------------
-; load_mode7_vram - Load Mode 7 tiles and map to VRAM
-;------------------------------------------------------------------------------
-; Called from C as: load_mode7_vram()
-;------------------------------------------------------------------------------
-load_mode7_vram:
+asm_loadMode7Data:
     php
-    phb
+    rep #$10            ; 16-bit index registers
+    sep #$20            ; 8-bit accumulator
 
-    sep #$20            ; 8-bit A
-    rep #$10            ; 16-bit X/Y
-
-    ; Set data bank to 0 for register access
+    ; Step 1: Load tilemap to VRAM low bytes
     lda #$00
-    pha
-    plb
+    sta $2115           ; VMAIN = 0 (increment after low byte write)
+    stz $2116           ; VMADDL = 0
+    stz $2117           ; VMADDH = 0
 
-    ; Set VRAM address to 0
-    stz $2116           ; VMADDL
-    stz $2117           ; VMADDH
-
-    ; VMAIN: increment after low byte write ($2118), step 1
-    stz $2115
-
-    ;--------------------------------------------------
-    ; DMA tilemap to VRAM low bytes
-    ;--------------------------------------------------
-    lda #$00            ; DMA mode: 1 byte, A->B, no increment mode
-    sta $4300           ; DMAP0
-
-    lda #$18            ; B-bus address: $2118 (VMDATAL)
-    sta $4301           ; BBAD0
-
-    ; A-bus address (source) - 24-bit pointer to mode7_map
-    lda #<mode7_map
-    sta $4302           ; A1T0L
-    lda #>mode7_map
-    sta $4303           ; A1T0H
-    lda #:mode7_map     ; Bank byte
-    sta $4304           ; A1B0
-
-    ; Transfer size: 16384 bytes (128x128 tilemap)
-    rep #$20
-    lda #$4000
-    sta $4305           ; DAS0L/H
-    sep #$20
-
-    ; Start DMA on channel 0
+    ; DMA channel 0: mode 0 (1 byte, A->B), destination VMDATAL ($2118)
+    stz $4300           ; DMA mode 0
+    lda #$18            ; B-bus = $2118 (VMDATAL)
+    sta $4301
+    ldx #mode7_map
+    stx $4302           ; Source address low word
+    lda #:mode7_map
+    sta $4304           ; Source bank
+    ldx #(mode7_map_end - mode7_map)
+    stx $4305           ; Transfer size
     lda #$01
-    sta $420B           ; MDMAEN
+    sta $420B           ; Start DMA channel 0
 
-    ;--------------------------------------------------
-    ; DMA tile data to VRAM high bytes
-    ;--------------------------------------------------
-    ; Reset VRAM address to 0
-    stz $2116
-    stz $2117
+    ; Step 2: Load tile pixels to VRAM high bytes
+    lda #$80
+    sta $2115           ; VMAIN = $80 (increment after high byte write)
+    stz $2116           ; VMADDL = 0
+    stz $2117           ; VMADDH = 0
 
-    ; VMAIN: increment after high byte write ($2119), step 1
+    stz $4300           ; DMA mode 0
+    lda #$19            ; B-bus = $2119 (VMDATAH)
+    sta $4301
+    ldx #mode7_tiles
+    stx $4302           ; Source address low word
+    lda #:mode7_tiles
+    sta $4304           ; Source bank
+    ldx #(mode7_tiles_end - mode7_tiles)
+    stx $4305           ; Transfer size
+    lda #$01
+    sta $420B           ; Start DMA channel 0
+
+    ; Step 3: Load palette to CGRAM
+    stz $2121           ; CGADD = 0 (start at color 0)
+
+    stz $4300           ; DMA mode 0
+    lda #$22            ; B-bus = $2122 (CGDATA)
+    sta $4301
+    ldx #mode7_pal
+    stx $4302           ; Source address low word
+    lda #:mode7_pal
+    sta $4304           ; Source bank
+    ldx #(mode7_pal_end - mode7_pal)
+    stx $4305           ; Transfer size
+    lda #$01
+    sta $420B           ; Start DMA channel 0
+
+    ; Restore VMAIN for normal word access
     lda #$80
     sta $2115
 
-    lda #$00            ; DMA mode
-    sta $4300
-
-    lda #$19            ; B-bus address: $2119 (VMDATAH)
-    sta $4301
-
-    ; A-bus address - mode7_tiles
-    lda #<mode7_tiles
-    sta $4302
-    lda #>mode7_tiles
-    sta $4303
-    lda #:mode7_tiles   ; Bank byte
-    sta $4304
-
-    ; Transfer size: 7168 bytes (112 tiles * 64 bytes)
-    ; Actually use the full size for safety
-    rep #$20
-    lda #(mode7_tiles_end - mode7_tiles)
-    sta $4305
-    sep #$20
-
-    ; Start DMA
-    lda #$01
-    sta $420B
-
-    ;--------------------------------------------------
-    ; DMA palette to CGRAM
-    ;--------------------------------------------------
-    stz $2121           ; CGADD = 0
-
-    lda #$00            ; DMA mode
-    sta $4300
-
-    lda #$22            ; B-bus address: $2122 (CGDATA)
-    sta $4301
-
-    ; A-bus address - mode7_pal
-    lda #<mode7_pal
-    sta $4302
-    lda #>mode7_pal
-    sta $4303
-    lda #:mode7_pal     ; Bank byte
-    sta $4304
-
-    ; Transfer size: 512 bytes (256 colors * 2)
-    rep #$20
-    lda #$0200
-    sta $4305
-    sep #$20
-
-    ; Start DMA
-    lda #$01
-    sta $420B
-
-    plb
     plp
     rtl
-
-.ENDS
+.ends

@@ -1,19 +1,14 @@
-#==============================================================================
-# Mode 7 Example Makefile
-#==============================================================================
+# Mode 7 - Demonstrates Mode 7 rotation and scaling with joypad input
 
 OPENSNES := $(shell cd ../../../.. && pwd)
 
-TARGET     := mode7.sfc
-ROM_NAME   := MODE7 DEMO OPENSNES
+TARGET   := mode7.sfc
+ROM_NAME := OPENSNES MODE7
 
-# Use the OpenSNES library
-USE_LIB    := 1
-LIB_MODULES := console input sprite dma mode7
+USE_LIB     := 1
+LIB_MODULES := console dma background sprite input mode7
 
-# Source files
-CSRC       := main.c
-ASMSRC     := data.asm
+CSRC   := main.c
+ASMSRC := data.asm
 
-# Include common build rules
 include $(OPENSNES)/make/common.mk

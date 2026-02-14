@@ -145,6 +145,12 @@ OAM_HELPERS :=
 endif
 
 #------------------------------------------------------------------------------
+# ROM Size Configuration
+#------------------------------------------------------------------------------
+# ROMSIZE = log2(ROM_bytes / 1024). For 8 banks (256KB): 1024 << 8 = 256KB → $08
+ROMSIZE ?= $$08
+
+#------------------------------------------------------------------------------
 # SRAM Configuration (set USE_SRAM=1 to enable battery-backed save)
 #------------------------------------------------------------------------------
 # USE_SRAM    - Set to 1 to enable SRAM for save games
@@ -325,6 +331,7 @@ project_hdr.asm: $(HDR_TEMPLATE)
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
 	@sed -e 's/__ROM_NAME__/$(ROM_NAME)/g' \
 	     -e 's/__CARTRIDGETYPE__/$(CARTRIDGETYPE)/g' \
+	     -e 's/__ROMSIZE__/$(ROMSIZE)/g' \
 	     -e 's/__SRAMSIZE__/$(SRAMSIZE)/g' \
 	     $(HDR_TEMPLATE) > $@
 
