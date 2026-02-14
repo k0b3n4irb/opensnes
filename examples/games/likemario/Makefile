@@ -16,9 +16,8 @@ ASMSRC      := data.asm
 USE_LIB     := 1
 LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background
 
-# SNESMOD audio (disabled for dichotomy test)
-#USE_SNESMOD    := 1
-#SOUNDBANK_SRC  := overworld.it
+USE_SNESMOD    := 1
+SOUNDBANK_SRC  := overworld.it
 
 include $(OPENSNES)/make/common.mk
 

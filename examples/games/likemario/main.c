@@ -11,6 +11,8 @@
  */
 
 #include <snes.h>
+#include <snes/snesmod.h>
+#include "soundbank.h"
 
 /*============================================================================
  * External Data (from data.asm)
@@ -185,18 +187,24 @@ static void map_prepare_column(u16 map_col, u16 vram_col) {
 }
 
 static void map_flush_column(void) {
-    u16 row;
-
     if (!col_pending) return;
 
+    /* Set VRAM address and vertical column mode (increment by 32 words) */
     REG_VMAIN = 0x81;
     REG_VMADDL = col_vram_base & 0xFF;
     REG_VMADDH = col_vram_base >> 8;
 
-    for (row = 0; row < 32; row++) {
-        REG_VMDATAL = col_buffer[row] & 0xFF;
-        REG_VMDATAH = col_buffer[row] >> 8;
-    }
+    /* DMA channel 1: transfer col_buffer (64 bytes) to VRAM
+     * Using DMA instead of C loop — the compiled register-write loop
+     * takes ~57,600 master cycles (exceeds VBlank), while DMA takes ~512. */
+    REG_DMAP(1) = 0x01;            /* 2-register word mode ($2118/$2119) */
+    REG_BBAD(1) = 0x18;            /* Destination: VMDATAL */
+    REG_A1TL(1) = (u16)col_buffer & 0xFF;
+    REG_A1TH(1) = ((u16)col_buffer >> 8) & 0xFF;
+    REG_A1B(1)  = 0x7E;            /* Source bank: WRAM */
+    REG_DASL(1) = 64;              /* 32 words = 64 bytes */
+    REG_DASH(1) = 0;
+    REG_MDMAEN  = 0x02;            /* Fire DMA channel 1 */
 
     REG_VMAIN = 0x80;
     col_pending = 0;
@@ -457,6 +465,11 @@ int main(void) {
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
     mario_init();
 
+    /* Initialize SNESMOD audio */
+    snesmodInit();
+    snesmodSetSoundbank(SOUNDBANK_BANK);
+    snesmodLoadModule(MOD_OVERWORLD);
+
     REG_TM = TM_BG1 | TM_OBJ;
 
     /* Initial sprite draw + upload (still in force blank from consoleInit) */
@@ -467,6 +480,9 @@ int main(void) {
     oamInitDynamicSpriteEndFrame();
 
     setScreenOn();      /* Release force blank — display begins */
+
+    snesmodPlay(0);
+    snesmodSetModuleVolume(100);
 
     WaitForVBlank();
 
@@ -483,9 +499,12 @@ int main(void) {
         oamInitDynamicSpriteEndFrame();
 
         WaitForVBlank();
+        /* VRAM operations first — must complete within VBlank */
         map_flush_column();
         bgSetScroll(0, camera_x, 0);
         oamVramQueueUpdate();
+        /* SPC700 communication last — no VBlank restriction */
+        snesmodProcess();
     }
 
     return 0;
