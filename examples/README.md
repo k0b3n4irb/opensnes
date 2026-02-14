@@ -13,8 +13,8 @@ Each example is a **lesson** designed to teach specific concepts. The number pre
 ```
 examples/
 ├── text/                    # Start here! Learn the basics
-│   ├── 1_hello_world/
-│   └── 2_custom_font/
+│   ├── hello_world/
+│   └── custom_font/
 │
 ├── graphics/
 │   ├── backgrounds/         # Background modes and scrolling
@@ -33,70 +33,70 @@ examples/
 ### 1. Start Here: Text
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [text/1_hello_world](text/1_hello_world/) | 1 | VRAM, tilemaps, Mode 0, your first ROM |
-| [text/2_custom_font](text/2_custom_font/) | 2 | Asset pipeline, 2bpp tiles, font2snes |
+| [text/hello_world](text/hello_world/) | 1 | VRAM, tilemaps, Mode 0, your first ROM |
+| [text/custom_font](text/custom_font/) | 2 | Asset pipeline, 2bpp tiles, font2snes |
 
 ### 2. Graphics: Backgrounds
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [graphics/backgrounds/1_mode0](graphics/backgrounds/1_mode0/) | 1 | Mode 0: 4 BG layers, 2bpp |
-| [graphics/backgrounds/1_mode1](graphics/backgrounds/1_mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp |
-| [graphics/backgrounds/2_scrolling](graphics/backgrounds/2_scrolling/) | 2 | Basic scrolling |
-| [graphics/backgrounds/3_mode3](graphics/backgrounds/3_mode3/) | 3 | 256-color mode |
-| [graphics/backgrounds/3_mode5](graphics/backgrounds/3_mode5/) | 3 | Hi-res mode |
-| [graphics/backgrounds/3_parallax](graphics/backgrounds/3_parallax/) | 3 | Multi-layer parallax |
-| [graphics/backgrounds/4_mode7](graphics/backgrounds/4_mode7/) | 4 | Rotation/scaling |
-| [graphics/backgrounds/4_continuous_scroll](graphics/backgrounds/4_continuous_scroll/) | 4 | Dynamic tile loading |
+| [graphics/backgrounds/mode0](graphics/backgrounds/mode0/) | 1 | Mode 0: 4 BG layers, 2bpp |
+| [graphics/backgrounds/mode1](graphics/backgrounds/mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp |
+| [graphics/backgrounds/scrolling](graphics/backgrounds/scrolling/) | 2 | Basic scrolling |
+| [graphics/backgrounds/mode3](graphics/backgrounds/mode3/) | 3 | 256-color mode |
+| [graphics/backgrounds/mode5](graphics/backgrounds/mode5/) | 3 | Hi-res mode |
+| [graphics/backgrounds/parallax](graphics/backgrounds/parallax/) | 3 | Multi-layer parallax |
+| [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | 4 | Rotation/scaling |
+| [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | 4 | Dynamic tile loading |
 
 ### 3. Graphics: Sprites
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [graphics/sprites/1_simple_sprite](graphics/sprites/1_simple_sprite/) | 1 | OAM, basic sprite display |
-| [graphics/sprites/2_animated_sprite](graphics/sprites/2_animated_sprite/) | 2 | Frame animation |
-| [graphics/sprites/3_animation_system](graphics/sprites/3_animation_system/) | 3 | State machine animation |
-| [graphics/sprites/3_metasprite](graphics/sprites/3_metasprite/) | 3 | Multi-tile sprites |
-| [graphics/sprites/4_dynamic_sprite](graphics/sprites/4_dynamic_sprite/) | 4 | VRAM management |
+| [graphics/sprites/simple_sprite](graphics/sprites/simple_sprite/) | 1 | OAM, basic sprite display |
+| [graphics/sprites/animated_sprite](graphics/sprites/animated_sprite/) | 2 | Frame animation |
+| [graphics/sprites/animation_system](graphics/sprites/animation_system/) | 3 | State machine animation |
+| [graphics/sprites/metasprite](graphics/sprites/metasprite/) | 3 | Multi-tile sprites |
+| [graphics/sprites/dynamic_sprite](graphics/sprites/dynamic_sprite/) | 4 | VRAM management |
 
 ### 4. Graphics: Effects
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [graphics/effects/1_fading](graphics/effects/1_fading/) | 1 | Screen brightness |
-| [graphics/effects/2_mosaic](graphics/effects/2_mosaic/) | 2 | Pixelation effect |
-| [graphics/effects/2_window](graphics/effects/2_window/) | 2 | Hardware windows |
-| [graphics/effects/3_transparency](graphics/effects/3_transparency/) | 3 | Color math |
-| [graphics/effects/3_hdma_gradient](graphics/effects/3_hdma_gradient/) | 3 | Per-scanline colors |
+| [graphics/effects/fading](graphics/effects/fading/) | 1 | Screen brightness |
+| [graphics/effects/mosaic](graphics/effects/mosaic/) | 2 | Pixelation effect |
+| [graphics/effects/window](graphics/effects/window/) | 2 | Hardware windows |
+| [graphics/effects/transparency](graphics/effects/transparency/) | 3 | Color math |
+| [graphics/effects/hdma_gradient](graphics/effects/hdma_gradient/) | 3 | Per-scanline colors |
 
 ### 5. Input
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [input/2_two_players](input/2_two_players/) | 2 | Auto-read, multiplayer input |
+| [input/two_players](input/two_players/) | 2 | Auto-read, multiplayer input |
 
 ### 6. Audio
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [audio/1_tone](audio/1_tone/) | 1 | Basic sound generation |
-| [audio/2_sfx](audio/2_sfx/) | 2 | Sound effects |
-| [audio/3_snesmod_music](audio/3_snesmod_music/) | 3 | Tracker music |
-| [audio/3_snesmod_sfx](audio/3_snesmod_sfx/) | 3 | SNESMOD SFX |
+| [audio/tone](audio/tone/) | 1 | Basic sound generation |
+| [audio/sfx](audio/sfx/) | 2 | Sound effects |
+| [audio/snesmod_music](audio/snesmod_music/) | 3 | Tracker music |
+| [audio/snesmod_sfx](audio/snesmod_sfx/) | 3 | SNESMOD SFX |
 
 ### 7. Memory
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [memory/2_save_game](memory/2_save_game/) | 2 | SRAM saves |
-| [memory/3_hirom_demo](memory/3_hirom_demo/) | 3 | HiROM mode |
+| [memory/save_game](memory/save_game/) | 2 | SRAM saves |
+| [memory/hirom_demo](memory/hirom_demo/) | 3 | HiROM mode |
 
 ### 8. Basics
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [basics/2_calculator](basics/2_calculator/) | 2 | Math operations |
-| [basics/3_collision_demo](basics/3_collision_demo/) | 3 | Collision detection |
-| [basics/3_smooth_movement](basics/3_smooth_movement/) | 3 | Interpolation |
+| [basics/calculator](basics/calculator/) | 2 | Math operations |
+| [basics/collision_demo](basics/collision_demo/) | 3 | Collision detection |
+| [basics/smooth_movement](basics/smooth_movement/) | 3 | Interpolation |
 
 ### 9. Complete Games
 | Example | Complexity | What You'll Learn |
 |---------|------------|-------------------|
-| [games/4_breakout](games/4_breakout/) | 4 | Complete game structure |
-| [games/4_entity_demo](games/4_entity_demo/) | 4 | Entity system |
+| [games/breakout](games/breakout/) | 4 | Complete game structure |
+| [games/entity_demo](games/entity_demo/) | 4 | Entity system |
 
 ---
 
@@ -108,7 +108,7 @@ cd opensnes
 make
 
 # Build a specific example
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 make
 
 # Clean and rebuild
@@ -120,7 +120,7 @@ make clean && make
 We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulation:
 
 ```bash
-/path/to/Mesen examples/text/1_hello_world/hello_world.sfc
+/path/to/Mesen examples/text/hello_world/hello_world.sfc
 ```
 
 ---
@@ -140,4 +140,4 @@ We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulatio
 
 ---
 
-**Ready?** Start with [text/1_hello_world](text/1_hello_world/) →
+**Ready?** Start with [text/hello_world](text/hello_world/) →

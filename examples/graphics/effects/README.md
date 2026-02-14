@@ -6,12 +6,12 @@ Learn SNES special effects: fading, windows, transparency, and HDMA.
 
 | Example | Complexity | Description |
 |---------|------------|-------------|
-| [1_fading](1_fading/) | 1 | Screen brightness fading |
-| [2_mosaic](2_mosaic/) | 2 | Pixelation mosaic effect |
-| [2_window](2_window/) | 2 | Hardware window masking |
-| [3_transparency](3_transparency/) | 3 | Color math (add/subtract) |
-| [3_hdma_gradient](3_hdma_gradient/) | 3 | HDMA color gradients |
-| [4_hdma_wave](4_hdma_wave/) | 4 | HDMA wave distortion |
+| [fading](fading/) | 1 | Screen brightness fading |
+| [mosaic](mosaic/) | 2 | Pixelation mosaic effect |
+| [window](window/) | 2 | Hardware window masking |
+| [transparency](transparency/) | 3 | Color math (add/subtract) |
+| [hdma_gradient](hdma_gradient/) | 3 | HDMA color gradients |
+| [hdma_wave](hdma_wave/) | 4 | HDMA wave distortion |
 
 ## Key Concepts
 

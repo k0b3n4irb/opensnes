@@ -2,7 +2,7 @@
   Input Test Script for Mesen2
 
   Tests that joypad input examples respond correctly.
-  Runs against examples/input/2_two_players/two_players.sfc
+  Runs against examples/input/two_players/two_players.sfc
 
   Usage:
     Mesen --testrunner --lua tests/mesen/input_test.lua two_players.sfc

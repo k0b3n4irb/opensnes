@@ -2,7 +2,7 @@
   Animation Test Script for Mesen2
 
   Verifies sprite animation changes over time.
-  Runs against examples/graphics/2_animation/animation.sfc
+  Runs against examples/graphics/animation/animation.sfc
 
   Usage:
     Mesen --testrunner --lua tests/mesen/animation_test.lua animation.sfc

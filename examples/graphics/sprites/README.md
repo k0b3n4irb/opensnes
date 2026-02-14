@@ -6,11 +6,11 @@ Learn SNES sprite (OBJ) handling from basic display to dynamic VRAM management.
 
 | Example | Complexity | Description |
 |---------|------------|-------------|
-| [1_simple_sprite](1_simple_sprite/) | 1 | Basic sprite display and movement |
-| [2_animated_sprite](2_animated_sprite/) | 2 | Frame-based sprite animation |
-| [3_animation_system](3_animation_system/) | 3 | State machine animation system |
-| [3_metasprite](3_metasprite/) | 3 | Multi-tile sprites (metasprites) |
-| [4_dynamic_sprite](4_dynamic_sprite/) | 4 | Dynamic VRAM loading for many sprites |
+| [simple_sprite](simple_sprite/) | 1 | Basic sprite display and movement |
+| [animated_sprite](animated_sprite/) | 2 | Frame-based sprite animation |
+| [animation_system](animation_system/) | 3 | State machine animation system |
+| [metasprite](metasprite/) | 3 | Multi-tile sprites (metasprites) |
+| [dynamic_sprite](dynamic_sprite/) | 4 | Dynamic VRAM loading for many sprites |
 
 ## Key Concepts
 

@@ -20,7 +20,7 @@ local test = require("test")
 test.describe("Custom Font Example", function()
 
     test.beforeAll(function()
-        test.loadSymbols(scriptDir .. "../../../examples/text/2_custom_font/custom_font.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/text/custom_font/custom_font.sym")
     end)
 
     test.beforeEach(function()
