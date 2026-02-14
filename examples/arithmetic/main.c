@@ -1,24 +1,21 @@
-/**
- * @file main.c
- * @brief Calculator Example using OpenSNES C Library
+/*
+ * arithmetic - Ported from PVSnesLib to OpenSNES
  *
- * A simple 4-function calculator demonstrating:
- * - Library initialization (consoleInit, setMode)
- * - Text rendering with embedded font
- * - Input handling (padUpdate, padPressed)
- * - 16-bit arithmetic in C
+ * Integer calculator with on-screen button grid.
+ * Extends examples/basics/calculator with power (^) operation.
+ * D-pad moves cursor, A presses the selected button.
+ * Supports +, -, *, /, ^ (power), C (clear), = (equals).
  *
- * Controls:
- * - D-pad: Move cursor between buttons
- * - A button: Press selected button
- * - Buttons: 0-9, +, -, *, /, C (clear), = (equals)
+ * Uses direct VRAM writes for reliable tile rendering.
+ *
+ * -- alekmaul (original PVSnesLib example)
  */
 
 #include <snes.h>
 
 /*============================================================================
  * Embedded Font (2bpp, 16 bytes per tile)
- * Characters: space, 0-9, +, -, *, /, =, C, [, ]
+ * Characters: space, 0-9, +, -, *, /, =, C, [, ], ^
  *============================================================================*/
 
 static const u8 font_tiles[] = {
@@ -79,54 +76,54 @@ static const u8 font_tiles[] = {
     /* 18: ] */
     0x78,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
     0x18,0x00, 0x18,0x00, 0x78,0x00, 0x00,0x00,
-    /* 19: A (for CALCULATOR title) */
+    /* 19: ^ (caret/power) */
+    0x18,0x00, 0x3C,0x00, 0x66,0x00, 0x42,0x00,
+    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    /* 20: A */
     0x18,0x00, 0x3C,0x00, 0x66,0x00, 0x7E,0x00,
     0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 20: L */
+    /* 21: L */
     0x60,0x00, 0x60,0x00, 0x60,0x00, 0x60,0x00,
     0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 21: U */
+    /* 22: U */
     0x66,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
     0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 22: T */
+    /* 23: T */
     0x7E,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
     0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    /* 23: O */
+    /* 24: O */
     0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
     0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 24: R */
+    /* 25: R */
     0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x7C,0x00,
     0x6C,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
+    /* 26: E */
+    0x7E,0x00, 0x60,0x00, 0x60,0x00, 0x7C,0x00,
+    0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
 };
 
-#define FONT_SIZE (25 * 16)
+#define FONT_TILE_COUNT 27
+#define FONT_SIZE (FONT_TILE_COUNT * 16)
 
 /* Tile indices */
-#define TILE_SPACE 0
-#define TILE_0     1
-#define TILE_1     2
-#define TILE_2     3
-#define TILE_3     4
-#define TILE_4     5
-#define TILE_5     6
-#define TILE_6     7
-#define TILE_7     8
-#define TILE_8     9
-#define TILE_9     10
-#define TILE_PLUS  11
-#define TILE_MINUS 12
-#define TILE_MUL   13
-#define TILE_DIV   14
-#define TILE_EQ    15
-#define TILE_C     16
+#define TILE_SPACE  0
+#define TILE_0      1
+#define TILE_PLUS   11
+#define TILE_MINUS  12
+#define TILE_MUL    13
+#define TILE_DIV    14
+#define TILE_EQ     15
+#define TILE_C      16
 #define TILE_LBRACK 17
 #define TILE_RBRACK 18
-#define TILE_A     19
-#define TILE_L     20
-#define TILE_U     21
-#define TILE_T     22
-#define TILE_O     23
-#define TILE_R     24
+#define TILE_CARET  19
+#define TILE_A      20
+#define TILE_L      21
+#define TILE_U      22
+#define TILE_T      23
+#define TILE_O      24
+#define TILE_R      25
+#define TILE_E      26
 
 /*============================================================================
  * Calculator State
@@ -134,12 +131,13 @@ static const u8 font_tiles[] = {
 
 extern volatile u8 vblank_flag;  /* Defined in crt0.asm, set by NMI handler */
 
-static u8 cursor_x;        /* Cursor X (0-3) */
-static u8 cursor_y;        /* Cursor Y (0-3) */
-static u16 display_value;  /* Current display value */
-static u16 accumulator;    /* Stored value for operations */
-static u8 pending_op;      /* Pending operation: 0=none, 1=+, 2=-, 3=*, 4=/ */
-static u8 new_number;      /* Flag: next digit starts new number */
+static u8 cur_x;          /* Cursor X (0-3) */
+static u8 cur_y;          /* Cursor Y (0-4) */
+static u16 display_val;   /* Current display value (unsigned, like 2_calculator) */
+static u16 accum;         /* Stored value for operations */
+static u8 pending_op;     /* 0=none, 1=+, 2=-, 3=*, 4=/, 5=^ */
+static u8 new_number;     /* Next digit starts new number */
+static u8 overflow;       /* Set when result exceeds u16 max */
 
 /*============================================================================
  * VRAM Configuration
@@ -154,7 +152,7 @@ static u8 new_number;      /* Flag: next digit starts new number */
 
 static void write_tile(u8 x, u8 y, u8 tile) {
     u16 addr;
-    addr = TILEMAP_ADDR + y * 32 + x;
+    addr = TILEMAP_ADDR + (u16)y * 32 + x;
     REG_VMAIN = 0x80;
     REG_VMADDL = addr & 0xFF;
     REG_VMADDH = addr >> 8;
@@ -185,41 +183,43 @@ static void load_font(void) {
 }
 
 /*============================================================================
- * Display Functions
- *============================================================================*/
-
-/* Button layout:
+ * Button Layout (5 rows x 4 cols)
+ *
  *   [7] [8] [9] [/]
  *   [4] [5] [6] [*]
  *   [1] [2] [3] [-]
  *   [0] [C] [=] [+]
- */
+ *   [^]
+ *============================================================================*/
 
-/* Tile for each button position */
-static const u8 button_tiles[16] = {
-    TILE_7, TILE_8, TILE_9, TILE_DIV,
-    TILE_4, TILE_5, TILE_6, TILE_MUL,
-    TILE_1, TILE_2, TILE_3, TILE_MINUS,
-    TILE_0, TILE_C, TILE_EQ, TILE_PLUS
+/* Tile for each button position (20 slots, row 4 only has 1) */
+static const u8 button_tiles[20] = {
+    TILE_0 + 7, TILE_0 + 8, TILE_0 + 9, TILE_DIV,
+    TILE_0 + 4, TILE_0 + 5, TILE_0 + 6, TILE_MUL,
+    TILE_0 + 1, TILE_0 + 2, TILE_0 + 3, TILE_MINUS,
+    TILE_0,     TILE_C,     TILE_EQ,    TILE_PLUS,
+    TILE_CARET, TILE_SPACE, TILE_SPACE, TILE_SPACE
 };
 
-/* Values: 0-9 for digits, 0xF0-F3 for ops, 0xFE=clear, 0xFF=equals */
-static const u8 button_values[16] = {
-    7, 8, 9, 0xF3,      /* 7, 8, 9, / */
-    4, 5, 6, 0xF2,      /* 4, 5, 6, * */
-    1, 2, 3, 0xF1,      /* 1, 2, 3, - */
-    0, 0xFE, 0xFF, 0xF0 /* 0, C, =, + */
+/* Values: 0-9 = digits, 0xF0-F4 = ops, 0xFE = clear, 0xFF = equals */
+static const u8 button_values[20] = {
+    7, 8, 9, 0xF3,       /* /, op 4 */
+    4, 5, 6, 0xF2,       /* *, op 3 */
+    1, 2, 3, 0xF1,       /* -, op 2 */
+    0, 0xFE, 0xFF, 0xF0, /* C, =, +, op 1 */
+    0xF4, 0, 0, 0        /* ^, op 5 */
 };
 
-#define BTN_START_X 10
-#define BTN_START_Y 10
-#define BTN_SPACE   4
-#define DISPLAY_X   14
-#define DISPLAY_Y   6
+#define BTN_START_X  10
+#define BTN_START_Y  10
+#define BTN_SPACE    4
+#define DISPLAY_X    12
+#define DISPLAY_Y    6
+#define DISPLAY_W    7
 
 static void draw_buttons(void) {
     u8 i, bx, by;
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < 17; i++) {
         bx = BTN_START_X + (i & 3) * BTN_SPACE;
         by = BTN_START_Y + (i >> 2) * 2;
         write_tile(bx, by, button_tiles[i]);
@@ -228,8 +228,8 @@ static void draw_buttons(void) {
 
 static void draw_cursor(u8 show) {
     u8 bx, by;
-    bx = BTN_START_X + cursor_x * BTN_SPACE;
-    by = BTN_START_Y + cursor_y * 2;
+    bx = BTN_START_X + cur_x * BTN_SPACE;
+    by = BTN_START_Y + cur_y * 2;
     if (show) {
         write_tile(bx - 1, by, TILE_LBRACK);
         write_tile(bx + 1, by, TILE_RBRACK);
@@ -240,25 +240,29 @@ static void draw_cursor(u8 show) {
 }
 
 static void draw_title(void) {
-    /* "CALCULATOR" at row 4 */
-    write_tile(11, 4, TILE_C);
-    write_tile(12, 4, TILE_A);
-    write_tile(13, 4, TILE_L);
-    write_tile(14, 4, TILE_C);
-    write_tile(15, 4, TILE_U);
-    write_tile(16, 4, TILE_L);
-    write_tile(17, 4, TILE_A);
-    write_tile(18, 4, TILE_T);
-    write_tile(19, 4, TILE_O);
-    write_tile(20, 4, TILE_R);
+    /* "CALCULATOR" at row 3 */
+    write_tile(11, 3, TILE_C);
+    write_tile(12, 3, TILE_A);
+    write_tile(13, 3, TILE_L);
+    write_tile(14, 3, TILE_C);
+    write_tile(15, 3, TILE_U);
+    write_tile(16, 3, TILE_L);
+    write_tile(17, 3, TILE_A);
+    write_tile(18, 3, TILE_T);
+    write_tile(19, 3, TILE_O);
+    write_tile(20, 3, TILE_R);
 }
+
+/*============================================================================
+ * Display (signed s16)
+ *============================================================================*/
 
 static void update_display(void) {
     u16 val;
     u8 x;
     u8 d0, d1, d2, d3, d4;
 
-    /* Clear stale VBlank flag — if computation (multiply loops)
+    /* Clear stale VBlank flag — if computation (multiply/power loops)
        took longer than one frame, NMI already set vblank_flag=1.
        Without clearing, WaitForVBlank returns immediately during
        active display, and VRAM writes silently fail. */
@@ -270,7 +274,16 @@ static void update_display(void) {
         write_tile(DISPLAY_X + x, DISPLAY_Y, TILE_SPACE);
     }
 
-    val = display_value;
+    if (overflow) {
+        write_tile(DISPLAY_X, DISPLAY_Y, TILE_E);
+        write_tile(DISPLAY_X + 1, DISPLAY_Y, TILE_R);
+        write_tile(DISPLAY_X + 2, DISPLAY_Y, TILE_R);
+        write_tile(DISPLAY_X + 3, DISPLAY_Y, TILE_O);
+        write_tile(DISPLAY_X + 4, DISPLAY_Y, TILE_R);
+        return;
+    }
+
+    val = display_val;
 
     /* Extract digits using repeated subtraction */
     d4 = 0;
@@ -281,7 +294,7 @@ static void update_display(void) {
     while (val >= 100) { val = val - 100; d2++; }
     d1 = 0;
     while (val >= 10) { val = val - 10; d1++; }
-    d0 = (u8)val;  /* Remainder is ones digit */
+    d0 = (u8)val;
 
     /* Display right-aligned, skip leading zeros */
     x = DISPLAY_X;
@@ -303,46 +316,78 @@ static void update_display(void) {
 static void do_operation(void) {
     u16 a, b, result;
 
-    a = accumulator;
-    b = display_value;
+    a = accum;
+    b = display_val;
     result = 0;
+    overflow = 0;
 
     if (pending_op == 1) {
-        /* Addition */
-        display_value = a + b;
+        /* Addition — detect overflow: if result < either operand, it wrapped */
+        result = a + b;
+        if (result < a) {
+            overflow = 1;
+        } else {
+            display_val = result;
+        }
     } else if (pending_op == 2) {
         /* Subtraction */
-        display_value = a - b;
+        display_val = a - b;
     } else if (pending_op == 3) {
-        /* Multiplication - inline repeated addition */
+        /* Multiplication — repeated addition with overflow check */
         while (b > 0) {
+            u16 prev = result;
             result = result + a;
+            if (result < prev) {
+                overflow = 1;
+                break;
+            }
             b = b - 1;
         }
-        display_value = result;
+        if (!overflow) display_val = result;
     } else if (pending_op == 4) {
-        /* Division - inline repeated subtraction */
+        /* Division */
         if (b != 0) {
             while (a >= b) {
                 a = a - b;
                 result = result + 1;
             }
-            display_value = result;
+            display_val = result;
         }
+    } else if (pending_op == 5) {
+        /* Power — repeated multiplication with overflow check */
+        result = 1;
+        while (b > 0) {
+            u16 tmp = 0;
+            u16 i = result;
+            while (i > 0) {
+                u16 prev = tmp;
+                tmp = tmp + a;
+                if (tmp < prev) {
+                    overflow = 1;
+                    break;
+                }
+                i = i - 1;
+            }
+            if (overflow) break;
+            result = tmp;
+            b = b - 1;
+        }
+        if (!overflow) display_val = result;
     }
     update_display();
 }
 
 static void handle_digit(u8 digit) {
     u16 val;
+    overflow = 0;
     if (new_number) {
-        display_value = 0;
+        display_val = 0;
         new_number = 0;
     }
-    if (display_value <= 6553) {
+    if (display_val <= 6553) {
         /* Multiply by 10 using shifts: x*10 = x*8 + x*2 = (x<<3) + (x<<1) */
-        val = display_value;
-        display_value = (val << 3) + (val << 1) + digit;
+        val = display_val;
+        display_val = (val << 3) + (val << 1) + digit;
     }
     update_display();
 }
@@ -351,7 +396,7 @@ static void handle_operator(u8 op) {
     if (pending_op != 0) {
         do_operation();
     }
-    accumulator = display_value;
+    accum = display_val;
     pending_op = op;
     new_number = 1;
 }
@@ -365,16 +410,18 @@ static void handle_equals(void) {
 }
 
 static void handle_clear(void) {
-    display_value = 0;
-    accumulator = 0;
+    display_val = 0;
+    accum = 0;
     pending_op = 0;
     new_number = 1;
+    overflow = 0;
     update_display();
 }
 
 static void press_button(void) {
     u8 pos, value;
-    pos = cursor_y * 4 + cursor_x;
+    pos = cur_y * 4 + cur_x;
+    if (pos >= 20) return;
     value = button_values[pos];
 
     if (value <= 9) {
@@ -411,9 +458,9 @@ int main(void) {
     /* Configure BG1 */
     REG_BG1SC = 0x04;    /* Tilemap at $0800, 32x32 */
     REG_BG12NBA = 0x00;  /* BG1 tiles at $0000 */
-    REG_TM = TM_BG1;     /* Enable BG1 */
+    REG_TM = TM_BG1;
 
-    /* Set palette */
+    /* Set palette: bg dark blue, text white */
     REG_CGADD = 0;
     REG_CGDATA = 0x00; REG_CGDATA = 0x28;  /* Dark blue */
     REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* White */
@@ -423,12 +470,13 @@ int main(void) {
     draw_buttons();
 
     /* Initialize state */
-    cursor_x = 0;
-    cursor_y = 0;
-    display_value = 0;
-    accumulator = 0;
+    cur_x = 0;
+    cur_y = 0;
+    display_val = 0;
+    accum = 0;
     pending_op = 0;
     new_number = 1;
+    overflow = 0;
 
     update_display();
     draw_cursor(1);
@@ -455,21 +503,27 @@ int main(void) {
         if (pad_pressed == 0) continue;
 
         /* Save old position */
-        old_x = cursor_x;
-        old_y = cursor_y;
+        old_x = cur_x;
+        old_y = cur_y;
 
         /* Process D-pad */
         if (pad_pressed & KEY_LEFT) {
-            if (cursor_x > 0) cursor_x--;
+            if (cur_x > 0) cur_x = cur_x - 1;
         }
         if (pad_pressed & KEY_RIGHT) {
-            if (cursor_x < 3) cursor_x++;
+            if (cur_y == 4) {
+                /* Row 4 only has ^ at col 0 */
+            } else {
+                if (cur_x < 3) cur_x = cur_x + 1;
+            }
         }
         if (pad_pressed & KEY_UP) {
-            if (cursor_y > 0) cursor_y--;
+            if (cur_y > 0) cur_y = cur_y - 1;
         }
         if (pad_pressed & KEY_DOWN) {
-            if (cursor_y < 3) cursor_y++;
+            if (cur_y < 4) cur_y = cur_y + 1;
+            /* Clamp col on row 4 */
+            if (cur_y == 4 && cur_x > 0) cur_x = 0;
         }
 
         /* Process A button */
@@ -478,16 +532,33 @@ int main(void) {
         }
 
         /* Update cursor if moved */
-        if (cursor_x != old_x || cursor_y != old_y) {
+        if (cur_x != old_x || cur_y != old_y) {
             /* Clear old cursor */
-            cursor_x = old_x;
-            cursor_y = old_y;
+            cur_x = old_x;
+            cur_y = old_y;
             draw_cursor(0);
-            /* Restore and draw new */
-            if (pad_pressed & KEY_LEFT) { if (old_x > 0) cursor_x = old_x - 1; }
-            if (pad_pressed & KEY_RIGHT) { if (old_x < 3) cursor_x = old_x + 1; }
-            if (pad_pressed & KEY_UP) { if (old_y > 0) cursor_y = old_y - 1; }
-            if (pad_pressed & KEY_DOWN) { if (old_y < 3) cursor_y = old_y + 1; }
+            /* Restore position from pad input */
+            if (pad_pressed & KEY_LEFT) {
+                if (old_x > 0) cur_x = old_x - 1;
+            }
+            if (pad_pressed & KEY_RIGHT) {
+                if (old_y == 4) {
+                    cur_x = old_x;
+                } else {
+                    if (old_x < 3) cur_x = old_x + 1;
+                    else cur_x = old_x;
+                }
+            }
+            if (pad_pressed & KEY_UP) {
+                if (old_y > 0) cur_y = old_y - 1;
+                else cur_y = old_y;
+            }
+            if (pad_pressed & KEY_DOWN) {
+                if (old_y < 4) cur_y = old_y + 1;
+                else cur_y = old_y;
+            }
+            /* Clamp col on row 4 */
+            if (cur_y == 4 && cur_x > 0) cur_x = 0;
             draw_cursor(1);
         }
     }
