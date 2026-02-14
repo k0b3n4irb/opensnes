@@ -14,8 +14,8 @@
 _Static_assert(sizeof(u8) == 1, "u8 must be 1 byte");
 _Static_assert(sizeof(u16) == 2, "u16 must be 2 bytes");
 _Static_assert(sizeof(s16) == 2, "s16 must be 2 bytes");
-// Note: s32 = signed long long = 8 bytes on cproc/65816
-// (types.h comment says "32-bit" but long long is actually 64-bit on cproc)
+_Static_assert(sizeof(s32) == 4, "s32 must be exactly 4 bytes");
+_Static_assert(sizeof(u32) == 4, "u32 must be exactly 4 bytes");
 _Static_assert(sizeof(bool) == 1, "bool must be 1 byte");
 
 static u8 tests_passed;
@@ -83,9 +83,9 @@ void test_s16_range(void) {
 // Test: s32 range
 // =============================================================================
 void test_s32_size(void) {
-    // s32 = signed long long on cproc/65816
-    // Verify it's at least 4 bytes (can hold 32-bit values)
-    TEST("s32: >=4B", sizeof(s32) >= 4);
+    // s32 must be exactly 4 bytes (signed int on cproc/65816)
+    TEST("s32: ==4B", sizeof(s32) == 4);
+    TEST("u32: ==4B", sizeof(u32) == 4);
 
     s32 val = 0;
     TEST("s32: zero", val == 0);
