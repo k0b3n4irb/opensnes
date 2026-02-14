@@ -53,13 +53,13 @@ CHANGE → auto tests → USER VALIDATES → commit checkpoint
 
 | # | Example | Path | What to check |
 |---|---------|------|---------------|
-| 1 | Breakout | `examples/games/2_breakout/` | Ball bounces, paddle moves, blocks break |
-| 2 | LikeMario | `examples/games/1_likemario/` | Mario walks/jumps, camera scrolls |
-| 3 | HDMA Wave | `examples/graphics/effects/2_hdma_wave/` | Wavy distortion visible |
-| 4 | Dynamic Sprite | `examples/graphics/sprites/4_dynamic_sprite/` | 4 animated sprites at y=100 |
-| 5 | Continuous Scroll | `examples/graphics/backgrounds/2_continuous_scroll/` | BG scrolls with D-PAD |
-| 6 | SFX Demo | `examples/audio/1_sfx_demo/` | Sound plays on button press |
-| 7 | HiROM Demo | `examples/audio/4_snesmod_hirom/` | Music plays, HiROM works |
+| 1 | Breakout | `examples/games/breakout/` | Ball bounces, paddle moves, blocks break |
+| 2 | LikeMario | `examples/games/likemario/` | Mario walks/jumps, camera scrolls |
+| 3 | HDMA Wave | `examples/graphics/effects/hdma_wave/` | Wavy distortion visible |
+| 4 | Dynamic Sprite | `examples/graphics/sprites/dynamic_sprite/` | 4 animated sprites at y=100 |
+| 5 | Continuous Scroll | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolls with D-PAD |
+| 6 | SFX Demo | `examples/audio/sfx_demo/` | Sound plays on button press |
+| 7 | HiROM Demo | `examples/audio/snesmod_hirom/` | Music plays, HiROM works |
 
 ## Atomic Changes Only
 
