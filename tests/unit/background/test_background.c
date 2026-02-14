@@ -4,7 +4,8 @@
 // Tests background layer configuration and scrolling functions.
 //
 // Critical functions tested:
-// - bgSetScroll(): Set background scroll position
+// - bgSetScroll() / bgSetScrollX() / bgSetScrollY(): Set scroll position
+// - bgGetScrollX() / bgGetScrollY(): Read scroll shadow
 // - bgSetMapPtr(): Set tilemap address
 // - bgSetGfxPtr(): Set tile graphics address
 // - bgInit(): Initialize background layer
@@ -38,133 +39,139 @@ _Static_assert(BG_16COLORS == 16, "BG_16COLORS must be 16");
 _Static_assert(BG_256COLORS == 256, "BG_256COLORS must be 256");
 
 // =============================================================================
-// Runtime tests
+// Test framework
 // =============================================================================
 
-static u8 test_passed;
-static u8 test_failed;
+static u8 tests_passed;
+static u8 tests_failed;
+static u8 test_line;
 
-void log_result(const char* name, u8 passed) {
-    if (passed) {
-        test_passed++;
-    } else {
-        test_failed++;
-    }
-}
-
-// =============================================================================
-// Test: bgInit
-// =============================================================================
-void test_bg_init(void) {
-    // Initialize each background layer
-    bgInit(0);
-    log_result("bgInit(0) executes", 1);
-
-    bgInit(1);
-    log_result("bgInit(1) executes", 1);
-
-    bgInit(2);
-    log_result("bgInit(2) executes", 1);
-
-    bgInit(3);
-    log_result("bgInit(3) executes", 1);
-}
+#define TEST(name, condition) do { \
+    if (condition) { \
+        tests_passed++; \
+    } else { \
+        tests_failed++; \
+        textPrintAt(1, test_line, "FAIL:"); \
+        textPrintAt(7, test_line, name); \
+        test_line++; \
+    } \
+} while(0)
 
 // =============================================================================
-// Test: bgSetScroll
+// Test: bgSetScroll + bgGetScrollX/Y
 // =============================================================================
 void test_bg_scroll(void) {
-    // Set scroll for BG1
+    // Origin
     bgSetScroll(0, 0, 0);
-    log_result("bgSetScroll origin", 1);
+    TEST("setScroll X=0", bgGetScrollX(0) == 0);
+    TEST("setScroll Y=0", bgGetScrollY(0) == 0);
 
+    // Typical offset
     bgSetScroll(0, 100, 50);
-    log_result("bgSetScroll offset", 1);
+    TEST("setScroll X=100", bgGetScrollX(0) == 100);
+    TEST("setScroll Y=50", bgGetScrollY(0) == 50);
 
+    // Max 8-bit values
     bgSetScroll(0, 255, 255);
-    log_result("bgSetScroll max 8-bit", 1);
+    TEST("setScroll X=255", bgGetScrollX(0) == 255);
+    TEST("setScroll Y=255", bgGetScrollY(0) == 255);
 
+    // Max 10-bit values
     bgSetScroll(0, 1023, 1023);
-    log_result("bgSetScroll max 10-bit", 1);
-
-    // Test individual axis functions
-    bgSetScrollX(0, 128);
-    log_result("bgSetScrollX executes", 1);
-
-    bgSetScrollY(0, 64);
-    log_result("bgSetScrollY executes", 1);
+    TEST("setScroll X=1023", bgGetScrollX(0) == 1023);
+    TEST("setScroll Y=1023", bgGetScrollY(0) == 1023);
 }
 
 // =============================================================================
-// Test: bgSetMapPtr
+// Test: bgSetScrollX / bgSetScrollY (individual axis)
 // =============================================================================
-void test_bg_map_ptr(void) {
-    // Set tilemap pointer for each BG with different sizes
-    bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
-    log_result("bgSetMapPtr BG1 32x32", 1);
+void test_bg_scroll_axis(void) {
+    // Set both first
+    bgSetScroll(0, 100, 200);
 
-    bgSetMapPtr(1, 0x0400, BG_MAP_64x32);
-    log_result("bgSetMapPtr BG2 64x32", 1);
+    // Change X only — Y must be preserved
+    bgSetScrollX(0, 300);
+    TEST("scrollX sets X", bgGetScrollX(0) == 300);
+    TEST("scrollX keeps Y", bgGetScrollY(0) == 200);
 
-    bgSetMapPtr(2, 0x0800, BG_MAP_32x64);
-    log_result("bgSetMapPtr BG3 32x64", 1);
-
-    bgSetMapPtr(3, 0x0C00, BG_MAP_64x64);
-    log_result("bgSetMapPtr BG4 64x64", 1);
+    // Change Y only — X must be preserved
+    bgSetScrollY(0, 400);
+    TEST("scrollY sets Y", bgGetScrollY(0) == 400);
+    TEST("scrollY keeps X", bgGetScrollX(0) == 300);
 }
 
 // =============================================================================
-// Test: bgSetGfxPtr
+// Test: Multiple BGs are independent
 // =============================================================================
-void test_bg_gfx_ptr(void) {
-    // Set graphics pointer for each BG
-    bgSetGfxPtr(0, 0x0000);
-    log_result("bgSetGfxPtr BG1", 1);
+void test_bg_scroll_independence(void) {
+    bgSetScroll(0, 10, 20);
+    bgSetScroll(1, 30, 40);
+    bgSetScroll(2, 50, 60);
+    bgSetScroll(3, 70, 80);
 
-    bgSetGfxPtr(1, 0x2000);
-    log_result("bgSetGfxPtr BG2", 1);
-
-    bgSetGfxPtr(2, 0x4000);
-    log_result("bgSetGfxPtr BG3", 1);
-
-    bgSetGfxPtr(3, 0x6000);
-    log_result("bgSetGfxPtr BG4", 1);
+    TEST("BG0 X indep", bgGetScrollX(0) == 10);
+    TEST("BG0 Y indep", bgGetScrollY(0) == 20);
+    TEST("BG1 X indep", bgGetScrollX(1) == 30);
+    TEST("BG1 Y indep", bgGetScrollY(1) == 40);
+    TEST("BG2 X indep", bgGetScrollX(2) == 50);
+    TEST("BG2 Y indep", bgGetScrollY(2) == 60);
+    TEST("BG3 X indep", bgGetScrollX(3) == 70);
+    TEST("BG3 Y indep", bgGetScrollY(3) == 80);
 }
 
 // =============================================================================
-// Test: Multiple BG configuration
+// Test: bgInit resets scroll shadows
 // =============================================================================
-void test_multi_bg(void) {
-    // Simulate typical Mode 1 setup
+void test_bg_init(void) {
+    // Set non-zero scroll
+    bgSetScroll(0, 999, 888);
+    TEST("pre-init X", bgGetScrollX(0) == 999);
+    TEST("pre-init Y", bgGetScrollY(0) == 888);
+
+    // bgInit should reset to (0, 0)
     bgInit(0);
-    bgInit(1);
-    bgInit(2);
+    TEST("init resets X", bgGetScrollX(0) == 0);
+    TEST("init resets Y", bgGetScrollY(0) == 0);
 
-    bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
-    bgSetMapPtr(1, 0x0400, BG_MAP_32x32);
-    bgSetMapPtr(2, 0x0800, BG_MAP_32x32);
-
-    bgSetGfxPtr(0, 0x2000);
-    bgSetGfxPtr(1, 0x2000);
-    bgSetGfxPtr(2, 0x4000);
-
-    bgSetScroll(0, 0, 0);
-    bgSetScroll(1, 0, 0);
-    bgSetScroll(2, 0, 0);
-
-    log_result("Multi-BG Mode 1 setup", 1);
+    // Other BGs should be unaffected
+    bgSetScroll(1, 123, 456);
+    bgInit(0);
+    TEST("init BG0 no BG1 X", bgGetScrollX(1) == 123);
+    TEST("init BG0 no BG1 Y", bgGetScrollY(1) == 456);
 }
 
 // =============================================================================
-// Test: Scroll animation pattern
+// Test: Scroll animation pattern (shadow tracks increments)
 // =============================================================================
 void test_scroll_animation(void) {
-    // Simulate scroll animation loop
     u16 i;
     for (i = 0; i < 64; i++) {
         bgSetScroll(0, i, 0);
     }
-    log_result("Scroll animation loop", 1);
+    TEST("anim final X=63", bgGetScrollX(0) == 63);
+    TEST("anim final Y=0", bgGetScrollY(0) == 0);
+}
+
+// =============================================================================
+// Test: bgSetMapPtr (smoke — registers are write-only)
+// =============================================================================
+void test_bg_map_ptr(void) {
+    bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
+    bgSetMapPtr(1, 0x0400, BG_MAP_64x32);
+    bgSetMapPtr(2, 0x0800, BG_MAP_32x64);
+    bgSetMapPtr(3, 0x0C00, BG_MAP_64x64);
+    TEST("mapPtr no crash", 1);
+}
+
+// =============================================================================
+// Test: bgSetGfxPtr (smoke — registers are write-only)
+// =============================================================================
+void test_bg_gfx_ptr(void) {
+    bgSetGfxPtr(0, 0x0000);
+    bgSetGfxPtr(1, 0x2000);
+    bgSetGfxPtr(2, 0x4000);
+    bgSetGfxPtr(3, 0x6000);
+    TEST("gfxPtr no crash", 1);
 }
 
 // =============================================================================
@@ -178,20 +185,21 @@ int main(void) {
     textPrintAt(2, 1, "BACKGROUND MODULE TESTS");
     textPrintAt(2, 2, "-----------------------");
 
-    test_passed = 0;
-    test_failed = 0;
+    tests_passed = 0;
+    tests_failed = 0;
+    test_line = 4;
 
     // Run tests
-    test_bg_init();
     test_bg_scroll();
+    test_bg_scroll_axis();
+    test_bg_scroll_independence();
+    test_bg_init();
+    test_scroll_animation();
     test_bg_map_ptr();
     test_bg_gfx_ptr();
-    test_multi_bg();
-    test_scroll_animation();
 
     // Display results
-    textPrintAt(2, 4, "Tests completed");
-    textPrintAt(2, 5, "Static asserts: PASSED");
+    textPrintAt(2, 26, "Static asserts: PASSED");
 
     setScreenOn();
 
