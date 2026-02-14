@@ -1,95 +1,77 @@
-/**
- * @file main.c
- * @brief Mode 7 Rotation/Scaling Demo
+/*
+ * Mode 7 - PVSnesLib example ported to OpenSNES
  *
- * Demonstrates SNES Mode 7 - the hardware rotation and scaling mode
- * made famous by F-Zero, Super Mario Kart, and Pilotwings.
+ * Demonstrates Mode 7 rotation and scaling:
+ *   A button:  Rotate clockwise
+ *   B button:  Rotate counter-clockwise
+ *   UP:        Zoom in (increase scale)
+ *   DOWN:      Zoom out (decrease scale)
  *
- * Controls:
- *   A/B      - Rotate left/right
- *   Up/Down  - Zoom in/out
+ * Mode 7 uses interleaved VRAM format with tilemap in low bytes
+ * and tile pixels in high bytes. Loading is handled by an assembly
+ * helper function in data.asm.
  */
 
 #include <snes.h>
 
-/* External function from data.asm */
-extern void load_mode7_vram(void);
+/* Assembly helper to load Mode 7 data with proper VRAM interleaving */
+extern void asm_loadMode7Data(void);
 
 int main(void) {
+    u16 pad0;
     u8 angle = 0;
-    u16 scale = 0x0100;  /* 1.0 scale */
-    u16 pad;
+    u16 zscale = 0x0200; /* 2.0 in 8.8 fixed point (matches PVSnesLib default) */
 
-    /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    consoleInit();
 
-    /* Load Mode 7 graphics */
-    load_mode7_vram();
+    /* Force blank for VRAM loading */
+    REG_INIDISP = 0x80;
 
-    /* Initialize Mode 7 (from library) */
+    /* Load Mode 7 tile data, tilemap, and palette via assembly helper */
+    asm_loadMode7Data();
+
+    /* Set Mode 7 and initialize transformation */
+    setMode(BG_MODE7, 0);
     mode7Init();
+    mode7SetScale(0x0200, 0x0200);
+    mode7SetAngle(0);
 
-    /* Set Mode 7 */
-    REG_BGMODE = BGMODE_MODE7;
-
-    /* Mode 7 settings: no flip, wrap around */
-    REG_M7SEL = 0x00;
-
-    /* Enable BG1 on main screen (Mode 7 only uses BG1) */
+    /* Turn on display with BG1 */
     REG_TM = TM_BG1;
+    setScreenOn();
 
-    /* Set initial scale and rotation */
-    mode7SetScale(scale, scale);
-    mode7SetAngle(angle);
-
-    /* Enable display at full brightness */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
-
-    /* Main loop */
     while (1) {
-        WaitForVBlank();
+        pad0 = padHeld(0);
 
-        /* Wait for auto-joypad read to complete */
-        while (REG_HVBJOY & 0x01) { }
-
-        /* Read controller - use 16-bit read directly */
-        pad = *((vu16*)0x4218);
-
-        /* Skip if disconnected (reads as $FFFF) or no buttons */
-        if (pad == 0xFFFF || pad == 0) {
-            continue;
-        }
-
-        /* A button: rotate clockwise */
-        if (pad & KEY_A) {
+        /* Rotate clockwise with A */
+        if (pad0 & KEY_A) {
             angle++;
             mode7SetAngle(angle);
         }
 
-        /* B button: rotate counter-clockwise */
-        if (pad & KEY_B) {
+        /* Rotate counter-clockwise with B */
+        if (pad0 & KEY_B) {
             angle--;
             mode7SetAngle(angle);
         }
 
-        /* Up: zoom in (smaller scale = closer view) */
-        if (pad & KEY_UP) {
-            if (scale > 0x40) {
-                scale -= 8;
-                mode7SetScale(scale, scale);
-                mode7SetAngle(angle);
-            }
+        /* Zoom out with UP (increase scale = shows more of the plane) */
+        if (pad0 & KEY_UP) {
+            if (zscale < 0x0F00)
+                zscale += 16;
+            mode7SetScale(zscale, zscale);
+            mode7SetAngle(angle);
         }
 
-        /* Down: zoom out (larger scale = farther view) */
-        if (pad & KEY_DOWN) {
-            if (scale < 0x400) {
-                scale += 8;
-                mode7SetScale(scale, scale);
-                mode7SetAngle(angle);
-            }
+        /* Zoom in with DOWN (decrease scale = magnifies) */
+        if (pad0 & KEY_DOWN) {
+            if (zscale > 0x0010)
+                zscale -= 16;
+            mode7SetScale(zscale, zscale);
+            mode7SetAngle(angle);
         }
+
+        WaitForVBlank();
     }
-
     return 0;
 }

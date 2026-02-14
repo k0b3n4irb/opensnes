@@ -59,7 +59,8 @@ sramSave:
     lda.b DP_SIZE               ; A = byte count - 1
 
     ; Block move: source bank $7E, dest bank $70
-    mvn $70, $7E
+    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
+    mvn $7E, $70
 
 @done:
     plb
@@ -94,7 +95,8 @@ sramLoad:
     lda.b DP_SIZE               ; A = byte count - 1
 
     ; Block move: source bank $70, dest bank $7E
-    mvn $7E, $70
+    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
+    mvn $70, $7E
 
 @done:
     plb
@@ -131,7 +133,8 @@ sramSaveOffset:
     lda.b DP_SIZE               ; A = byte count - 1
 
     ; Block move: source bank $7E, dest bank $70
-    mvn $70, $7E
+    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
+    mvn $7E, $70
 
 @done:
     plb
@@ -168,7 +171,8 @@ sramLoadOffset:
     lda.b DP_SIZE               ; A = byte count - 1
 
     ; Block move: source bank $70, dest bank $7E
-    mvn $7E, $70
+    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
+    mvn $70, $7E
 
 @done:
     plb

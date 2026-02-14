@@ -18,10 +18,10 @@ These 7 examples cover all critical subsystems. **ALL must work after every chan
 | 1 | **Breakout** | `examples/games/breakout/` | Sprites, input, game logic | Ball bounces, paddle moves with D-PAD, blocks break |
 | 2 | **LikeMario** | `examples/games/likemario/` | Scrolling, sprites, input, tilemaps | Mario walks/jumps, camera scrolls, tiles display |
 | 3 | **HDMA Wave** | `examples/graphics/effects/hdma_wave/` | HDMA, PPU effects | Wavy distortion effect on background |
-| 4 | **Dynamic Sprite** | `examples/graphics/sprites/dynamic_sprite/` | Dynamic sprites, OAM buffer | 4 animated 16x16 sprites (red/green) at y=100 |
+| 4 | **Dynamic Sprite** | `examples/graphics/sprites/dynamic_sprite/` | Dynamic sprites, OAM buffer | Animated 16x16 sprite at center |
 | 5 | **Continuous Scroll** | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolling, input | Background scrolls smoothly with D-PAD |
-| 6 | **SFX Demo** | `examples/audio/sfx_demo/` | Audio, input | Sound effects play on button press |
-| 7 | **HiROM Demo** | `examples/audio/snesmod_hirom/` | HiROM mode, audio | Music plays, HiROM mapping works |
+| 6 | **SNESMOD Music** | `examples/audio/snesmod_music/` | Audio playback | Music plays |
+| 7 | **Save Game** | `examples/memory/save_game/` | SRAM save/load | Save and load works |
 
 ### Failure Symptoms to Watch For
 
@@ -244,8 +244,8 @@ Test each example in Mesen2 emulator. Record results:
 | hdma_wave        | OK    | OK   | OK     | N/A   | N/A   | PASS   |
 | dynamic_sprite   | OK    | OK   | OK     | N/A   | N/A   | PASS   |
 | continuous_scroll| OK    | OK   | OK     | OK    | N/A   | PASS   |
-| sfx_demo         | OK    | OK   | OK     | OK    | OK    | PASS   |
-| hirom_demo       | OK    | OK   | OK     | N/A   | OK    | PASS   |
+| snesmod_music    | OK    | OK   | OK     | N/A   | OK    | PASS   |
+| save_game        | OK    | OK   | OK     | OK    | N/A   | PASS   |
 ```
 
 **ALL 7 must PASS. If any fails: STOP. Revert. Investigate.**
@@ -260,7 +260,7 @@ git commit -m "$(cat <<'EOF'
 type(scope): description
 
 Tested: 7/7 reference examples pass (breakout, likemario, hdma_wave,
-dynamic_sprite, continuous_scroll, sfx_demo, hirom_demo)
+dynamic_sprite, continuous_scroll, snesmod_music, save_game)
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF

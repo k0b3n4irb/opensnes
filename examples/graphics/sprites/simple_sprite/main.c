@@ -1,74 +1,45 @@
-/**
- * @file main.c
- * @brief Simple Sprite Example
+/*
+ * minimal_sprite32 - OpenSNES regression test
  *
- * Port of pvsneslib SimpleSprite example.
- * Demonstrates how to display a static 32x32 sprite.
+ * Minimal test: displays a single 32x32 sprite at center screen.
+ * No text, no input, no menu. Verifies 32x32 sprite rendering works.
  *
- * This example shows:
- * - Loading sprite tiles to VRAM using oamInitGfxSet()
- * - Loading sprite palette to CGRAM
- * - Setting up a sprite with oamSet
- * - Basic sprite display in Mode 1
+ * VRAM Layout:
+ *   $2000 = OBSEL name base (tileBase=1 means $2000 word addr)
+ *   $2100 = Sprite tile data loaded here
+ *
+ * Tile number: (0x2100 - 0x2000) / 16 = 0x10
  */
 
 #include <snes.h>
 
-/*============================================================================
- * External Graphics Data (defined in data.asm)
- *============================================================================*/
-
-extern u8 sprite_tiles[], sprite_tiles_end[];
-extern u8 sprite_pal[], sprite_pal_end[];
+extern u8 sprite32[], sprite32_end[], palsprite32[];
 
 int main(void) {
-    /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    consoleInit();
 
-    /* Initialize sprite system with graphics:
-     * - Load tiles to VRAM $0000
-     * - Load palette to CGRAM 128 (sprite palette 0)
-     * - Configure 32x32 small / 64x64 large sprites
+    /* Load sprite tiles to VRAM $2100 */
+    WaitForVBlank();
+    dmaCopyVram(sprite32, 0x2100, sprite32_end - sprite32);
+
+    /* Load palette to CGRAM 128 (sprite palette 0) */
+    dmaCopyCGram(palsprite32, 128, 32);
+
+    /* Set OBJ size: small=8, large=32, name base=1 ($2000) */
+    oamInitEx(OBJ_SIZE8_L32, 1);
+
+    /* Place one sprite at center screen
+     * tile = (0x2100 - 0x2000) / 16 = 0x10
+     * palette=0, priority=3 (front), no flip
      */
-    oamInitGfxSet(sprite_tiles, sprite_tiles_end - sprite_tiles,
-                  sprite_pal, sprite_pal_end - sprite_pal,
-                  0, 0x0000, OBJ_SIZE32_L64);
+    oamSet(0, 112, 96, 0x0010, 0, 3, 0);
+    oamSetEx(0, OBJ_LARGE, OBJ_SHOW);
 
-    /* Note: No explicit background color set to match PVSnesLib behavior.
-     * The background color will be whatever the library initializes CGRAM 0 to.
-     */
-
-    /* Set up sprite 0:
-     * Position: (100, 100)
-     * Tile: 0 (first tile)
-     * Palette: 0
-     * Priority: 3 (highest)
-     * Flags: 0 (no flip)
-     */
-    oamSet(0, 100, 100, 0, 0, 3, 0);
-
-    /* Set sprite 0 to use small size (32x32) and visible */
-    oamSetSize(0, 0);  /* 0 = small size */
-    oamSetVisible(0, 1);
-
-    /* Hide all other sprites */
-    for (u8 i = 1; i < 128; i++) {
-        oamHide(i);
-    }
-
-    /* Update OAM buffer to hardware */
-    oamUpdate();
-
-    /* Set Mode 1 (needed for sprites) */
-    REG_BGMODE = 0x01;
-
-    /* Enable sprites on main screen only (no backgrounds) */
+    /* Enable Mode 1 with sprites only */
+    setMode(BG_MODE1, 0);
     REG_TM = TM_OBJ;
+    setScreenOn();
 
-    /* Enable display at full brightness */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
-
-    /* Main loop */
     while (1) {
         WaitForVBlank();
     }

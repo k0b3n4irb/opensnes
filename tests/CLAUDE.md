@@ -9,7 +9,7 @@ Ce fichier documente **tous** les tests du projet OpenSNES : quoi, quand, commen
 | **N'importe quoi** (minimum) | `./tests/unit/run_unit_tests.sh` |
 | `compiler/qbe/` ou `compiler/cproc/` | `./tests/compiler/run_tests.sh` + rebuild all |
 | `lib/` ou `templates/common/` | `make clean && make` + `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
-| `examples/` ou `pvsneslib_examples/` | `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
+| `examples/` | `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
 | **Avant tout commit** | Les 3 commandes ci-dessous |
 
 ```bash
@@ -166,9 +166,8 @@ Valide **tous** les ROMs dans `examples/` ET `pvsneslib_examples/`.
 
 ### Couverture actuelle
 
-- `examples/` : ~36 ROMs (tous les exemples OpenSNES)
-- `pvsneslib_examples/` : ~31 ROMs (exemples PVSnesLib portés)
-- Total : **67 ROMs** validés
+- `examples/` : 22 ROMs (tous les exemples OpenSNES)
+- Total : **22 ROMs** validés
 
 ---
 
@@ -182,10 +181,10 @@ Le script automatique ne peut pas vérifier le rendu visuel ni l'interactivité.
 | 1 | `examples/games/breakout/` | Balle rebondit, raquette bouge, blocs cassent |
 | 2 | `examples/games/likemario/` | Mario marche/saute, caméra scrolle |
 | 3 | `examples/graphics/effects/hdma_wave/` | Distorsion ondulée visible |
-| 4 | `examples/graphics/sprites/dynamic_sprite/` | 4 sprites animés à y=100 |
+| 4 | `examples/graphics/sprites/dynamic_sprite/` | Sprite animé au centre |
 | 5 | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolle avec D-PAD |
-| 6 | `examples/audio/sfx_demo/` | Son joué sur pression A |
-| 7 | `examples/audio/snesmod_hirom/` | Musique joue, HiROM fonctionne |
+| 6 | `examples/audio/snesmod_music/` | Musique joue |
+| 7 | `examples/memory/save_game/` | Sauvegarde/chargement fonctionne |
 
 ---
 
@@ -243,7 +242,7 @@ tests/
 | Assertions smoke (runtime) | ~170 |
 | `_Static_assert` (compile-time) | 119 |
 | Tests compilateur | 41 |
-| ROMs validés (examples) | 67 |
+| ROMs validés (examples) | 22 |
 | Exemples de référence (manuel) | 7 |
 
 ---

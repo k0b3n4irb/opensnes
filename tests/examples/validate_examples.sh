@@ -31,7 +31,6 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES_HOME="${OPENSNES_HOME:-$(dirname "$(dirname "$SCRIPT_DIR")")}"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
-PVSNESLIB_EXAMPLES_DIR="$OPENSNES_HOME/pvsneslib_examples"
 SYMMAP="$OPENSNES_HOME/tools/symmap/symmap.py"
 VRAMCHECK="$OPENSNES_HOME/tools/vramcheck/vramcheck.py"
 
@@ -99,22 +98,9 @@ log_verbose() {
 
 # Find all example directories with Makefiles
 find_examples() {
-    # Main examples directory
     find "$EXAMPLES_DIR" -name "Makefile" -type f | while read makefile; do
         dirname "$makefile"
     done
-
-    # PVSnesLib ported examples (if they exist)
-    if [[ -d "$PVSNESLIB_EXAMPLES_DIR" ]]; then
-        find "$PVSNESLIB_EXAMPLES_DIR" -name "Makefile" -type f | while read makefile; do
-            # Skip the top-level Makefile (it's just a coordinator)
-            local dir
-            dir=$(dirname "$makefile")
-            if [[ "$dir" != "$PVSNESLIB_EXAMPLES_DIR" ]]; then
-                echo "$dir"
-            fi
-        done
-    fi
 }
 
 # Build a single example
@@ -276,11 +262,7 @@ validate_example() {
     local dir="$1"
     local name=$(basename "$dir")
     local parent=$(basename "$(dirname "$dir")")
-    # For pvsneslib_examples, prefix with "pvs/" to distinguish
     local full_name="$parent/$name"
-    if [[ "$dir" == *pvsneslib_examples* ]]; then
-        full_name="pvs/$parent/$name"
-    fi
 
     # In quick mode, skip examples that have no .sfc file (never built)
     if [[ $QUICK -eq 1 ]]; then
@@ -363,9 +345,6 @@ main() {
     echo "========================================"
     echo "OPENSNES_HOME: $OPENSNES_HOME"
     echo "Examples dir:  $EXAMPLES_DIR"
-    if [[ -d "$PVSNESLIB_EXAMPLES_DIR" ]]; then
-        echo "PVS examples:  $PVSNESLIB_EXAMPLES_DIR"
-    fi
     echo ""
 
     # Check prerequisites
