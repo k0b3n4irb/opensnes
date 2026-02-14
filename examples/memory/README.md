@@ -6,8 +6,8 @@ Learn SNES memory features: SRAM saves and HiROM mode.
 
 | Example | Complexity | Description |
 |---------|------------|-------------|
-| [2_save_game](2_save_game/) | 2 | Battery-backed SRAM for save games |
-| [3_hirom_demo](3_hirom_demo/) | 3 | HiROM mode (64KB banks) |
+| [save_game](save_game/) | 2 | Battery-backed SRAM for save games |
+| [hirom_demo](hirom_demo/) | 3 | HiROM mode (64KB banks) |
 
 ## Key Concepts
 

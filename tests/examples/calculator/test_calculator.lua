@@ -23,7 +23,7 @@ test.describe("Calculator Example", function()
 
     test.beforeAll(function()
         -- ROM should already be loaded by Mesen2
-        test.loadSymbols(scriptDir .. "../../../examples/basics/1_calculator/calculator.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/basics/calculator/calculator.sym")
     end)
 
     test.it("should reach main()", function()

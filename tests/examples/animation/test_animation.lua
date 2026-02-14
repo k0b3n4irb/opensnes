@@ -1,5 +1,5 @@
 --[[
-  test_animation.lua - Test the 2_animation example ROM
+  test_animation.lua - Test the animation example ROM
 
   This example was the subject of the WRAM mirroring bug fix.
   oamMemory is now correctly placed at $7E:0300 (above mirror range).
@@ -22,10 +22,10 @@ package.path = scriptDir .. "../../../tools/snesdbg/?.lua;" .. package.path
 local test = require("test")
 local dbg = require("snesdbg")
 
-test.describe("Animation Example (2_animation)", function()
+test.describe("Animation Example (animation)", function()
 
     test.beforeAll(function()
-        test.loadSymbols(scriptDir .. "../../../examples/graphics/2_animation/animation.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/graphics/animation/animation.sym")
         dbg.setOAMBuffer("oamMemory")
     end)
 

@@ -176,19 +176,19 @@ run_test() {
         # Look for ROM mapping for example tests
         case "$test_name" in
             hello_world)
-                rom="$OPENSNES_HOME/examples/text/1_hello_world/hello_world.sfc"
+                rom="$OPENSNES_HOME/examples/text/hello_world/hello_world.sfc"
                 ;;
             custom_font)
-                rom="$OPENSNES_HOME/examples/text/2_custom_font/custom_font.sfc"
+                rom="$OPENSNES_HOME/examples/text/custom_font/custom_font.sfc"
                 ;;
             animation)
-                rom="$OPENSNES_HOME/examples/graphics/2_animation/animation.sfc"
+                rom="$OPENSNES_HOME/examples/graphics/animation/animation.sfc"
                 ;;
             tone)
-                rom="$OPENSNES_HOME/examples/audio/1_tone/tone.sfc"
+                rom="$OPENSNES_HOME/examples/audio/tone/tone.sfc"
                 ;;
             calculator)
-                rom="$OPENSNES_HOME/examples/basics/1_calculator/calculator.sfc"
+                rom="$OPENSNES_HOME/examples/basics/calculator/calculator.sfc"
                 ;;
             *)
                 log_warn "Unknown example test: $test_name, skipping"

@@ -6,14 +6,14 @@ Learn SNES background modes and scrolling techniques.
 
 | Example | Complexity | Description |
 |---------|------------|-------------|
-| [1_mode0](1_mode0/) | 1 | Mode 0: 4 background layers, 2bpp (4 colors each) |
-| [1_mode1](1_mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp, most common mode |
-| [2_scrolling](2_scrolling/) | 2 | Basic background scrolling with D-pad |
-| [3_mode3](3_mode3/) | 3 | Mode 3: 256-color direct mode |
-| [3_mode5](3_mode5/) | 3 | Mode 5: Hi-res 512×224 mode |
-| [3_parallax](3_parallax/) | 3 | Multi-layer parallax scrolling |
-| [4_mode7](4_mode7/) | 4 | Mode 7: Rotation and scaling |
-| [4_continuous_scroll](4_continuous_scroll/) | 4 | Dynamic tile loading for large maps |
+| [mode0](mode0/) | 1 | Mode 0: 4 background layers, 2bpp (4 colors each) |
+| [mode1](mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp, most common mode |
+| [scrolling](scrolling/) | 2 | Basic background scrolling with D-pad |
+| [mode3](mode3/) | 3 | Mode 3: 256-color direct mode |
+| [mode5](mode5/) | 3 | Mode 5: Hi-res 512×224 mode |
+| [parallax](parallax/) | 3 | Multi-layer parallax scrolling |
+| [mode7](mode7/) | 4 | Mode 7: Rotation and scaling |
+| [continuous_scroll](continuous_scroll/) | 4 | Dynamic tile loading for large maps |
 
 ## Key Concepts
 
