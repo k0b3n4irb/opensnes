@@ -21,9 +21,13 @@
 #include <snes.h>
 
 /* Assembly helpers */
-extern void asm_loadGroundData(void);
 extern void asm_loadSkyData(void);
 extern void asm_setupHdmaPerspective(u16 sx, u16 sy);
+
+/* Ground data (defined in data.asm) */
+extern u8 ground_map[], ground_map_end[];
+extern u8 ground_tiles[], ground_tiles_end[];
+extern u8 ground_pal[], ground_pal_end[];
 
 u16 pad0;
 u16 sx, sy;
@@ -35,7 +39,9 @@ int main(void) {
     REG_INIDISP = 0x80;
 
     /* Load Mode 7 ground (1024x1024, 256 colors) to VRAM $0000 + palette */
-    asm_loadGroundData();
+    dmaCopyVramMode7(ground_map, ground_map_end - ground_map,
+                     ground_tiles, ground_tiles_end - ground_tiles);
+    dmaCopyCGram(ground_pal, 0, ground_pal_end - ground_pal);
 
     /* Load sky tiles+map to VRAM $4000/$5000 */
     asm_loadSkyData();
