@@ -1,0 +1,6 @@
+*.obj
+*.ps
+*.sfc
+*.sym
+linkfile
+combined.asm
