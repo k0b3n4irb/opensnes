@@ -321,6 +321,7 @@ mode7Rotate:
 
     ; Call mode7SetAngle with the converted angle
     jsl mode7SetAngle
+    sep #$20            ; C functions return in 16-bit A, restore 8-bit
 
     pla                 ; Clean up stack
 

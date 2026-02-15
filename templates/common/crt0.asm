@@ -709,6 +709,7 @@ NmiHandler:
     beq +
     stz oam_update_flag
     jsl oamUpdate
+    sep #$20            ; C functions return in 16-bit A, restore 8-bit
 +
 
     ; Transfer tilemap buffer to VRAM during VBlank
