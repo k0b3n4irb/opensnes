@@ -2333,6 +2333,70 @@ test_nonleaf_frameless() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Dead store elimination (Phase 7a)
+# global_increment: frameless + no intermediate sta to stack slots
+# phi_loop: frame preserved (phi args need slots)
+#------------------------------------------------------------------------------
+test_dead_store_elimination() {
+    local name="dead_store_elimination"
+    local src="$SCRIPT_DIR/test_dead_store_elimination.c"
+    local out="$BUILD/test_dead_store_elimination.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. global_increment: should be frameless (no tsa/sec/sbc frame setup)
+    func_body=$(sed -n '/^global_increment:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: global_increment has frame setup (sbc) — should be frameless"
+        ((fail_count++))
+    fi
+
+    # 2. global_increment: should have NO sta to stack slots (N,s pattern)
+    #    lda.w / sta.w (global access) is fine; only sta N,s is dead
+    if echo "$func_body" | grep -qP '\bsta\s+\d+,s\b'; then
+        log_fail "$name: global_increment has sta N,s — dead stores not eliminated"
+        ((fail_count++))
+    fi
+
+    # 3. global_increment: MUST still load and store to g_counter
+    if ! echo "$func_body" | grep -q 'lda.w g_counter'; then
+        log_fail "$name: global_increment missing lda.w g_counter"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'sta.w g_counter'; then
+        log_fail "$name: global_increment missing sta.w g_counter"
+        ((fail_count++))
+    fi
+
+    # 4. phi_loop: MUST have a frame (sbc in prologue) for phi args
+    func_body=$(sed -n '/^phi_loop:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: phi_loop missing frame setup (sbc) — phi args need stack slots!"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -2432,6 +2496,9 @@ main() {
 
     # === Phase 5b: Non-leaf optimization tests ===
     test_nonleaf_frameless           # Non-leaf wrapper functions should be frameless
+
+    # === Phase 7a: Dead store elimination tests ===
+    test_dead_store_elimination      # Dead store elimination + aggressive frame elimination
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
