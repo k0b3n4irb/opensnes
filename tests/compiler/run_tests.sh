@@ -2433,34 +2433,33 @@ test_plx_cleanup() {
     local fail_count=0
     local func_body
 
-    # 1. wrapper_one (1-arg call, non-void): should use plx, no tax/tsa sequence
+    # 1. wrapper_one (1-arg call, non-void): pass-through → tail call (jml)
     func_body=$(sed -n '/^wrapper_one:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -q 'plx'; then
-        log_fail "$name: wrapper_one missing plx for stack cleanup"
+    if ! echo "$func_body" | grep -qP '\tjml'; then
+        log_fail "$name: wrapper_one missing jml (tail call optimization)"
         ((fail_count++))
     fi
 
-    # Should NOT have the old tax/tsa/clc/adc/tas/txa sequence for cleanup
-    # (Note: tax may appear for other reasons, but tsa should not appear in a PLX cleanup)
-    if echo "$func_body" | grep -q 'tsa' && echo "$func_body" | grep -q 'tas'; then
-        log_fail "$name: wrapper_one still uses tsa/tas arithmetic cleanup"
+    # Should NOT have jsl+rtl (tail call eliminates both)
+    if echo "$func_body" | grep -q 'rtl'; then
+        log_fail "$name: wrapper_one still has rtl (should be tail call)"
         ((fail_count++))
     fi
 
-    # 2. wrapper_two (2-arg call, non-void): should use plx (cleanup=4, within threshold)
+    # 2. wrapper_two (2-arg call, non-void): pass-through → tail call (jml)
     func_body=$(sed -n '/^wrapper_two:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -q 'plx'; then
-        log_fail "$name: wrapper_two missing plx for stack cleanup"
+    if ! echo "$func_body" | grep -qP '\tjml'; then
+        log_fail "$name: wrapper_two missing jml (tail call optimization)"
         ((fail_count++))
     fi
 
-    # 3. void_wrapper (1-arg void call): should use plx
+    # 3. void_wrapper (1-arg void call): pass-through → tail call (jml)
     func_body=$(sed -n '/^void_wrapper:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -q 'plx'; then
-        log_fail "$name: void_wrapper missing plx for stack cleanup"
+    if ! echo "$func_body" | grep -qP '\tjml'; then
+        log_fail "$name: void_wrapper missing jml (tail call optimization)"
         ((fail_count++))
     fi
 
@@ -2919,6 +2918,81 @@ test_indirect_store_acache() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Tail call optimization (Phase 13)
+# - call_add: same args pass-through → jml (no stores, no jsl, no rtl)
+# - call_chain: second call is tail → sta + jml (no second jsl+plx+rtl)
+# - no_tail_call: arg count mismatch → normal jsl+cleanup+rtl
+#------------------------------------------------------------------------------
+test_tail_call() {
+    local name="tail_call"
+    local src="$SCRIPT_DIR/test_tail_call.c"
+    local out="$BUILD/test_tail_call.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_add must have jml (tail call)
+    local call_add_body
+    call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_add_body" | grep -qP '\tjml\s+add_u16'; then
+        log_fail "$name: call_add missing 'jml add_u16' (tail call not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_add must NOT have jsl (no normal call)
+    if echo "$call_add_body" | grep -qP '\tjsl'; then
+        log_fail "$name: call_add still has jsl (should be jml only)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_add must NOT have rtl (tail call replaces it)
+    if echo "$call_add_body" | grep -qP '\trtl'; then
+        log_fail "$name: call_add still has rtl (should be eliminated by tail call)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_chain must have jml for second call
+    local call_chain_body
+    call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_chain_body" | grep -qP '\tjml\s+add_one'; then
+        log_fail "$name: call_chain missing 'jml add_one' (tail call not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_chain must still have one jsl (first call is NOT tail call)
+    if ! echo "$call_chain_body" | grep -qP '\tjsl\s+add_one'; then
+        log_fail "$name: call_chain missing 'jsl add_one' (first call should remain)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_chain must NOT have rtl
+    if echo "$call_chain_body" | grep -qP '\trtl'; then
+        log_fail "$name: call_chain still has rtl (should be eliminated by tail call)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # no_tail_call must NOT have jml (arg count mismatch)
+    local no_tco_body
+    no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
+    if echo "$no_tco_body" | grep -qP '\tjml'; then
+        log_fail "$name: no_tail_call has jml (should NOT be tail-call optimized)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # no_tail_call must have rtl (normal return)
+    if ! echo "$no_tco_body" | grep -qP '\trtl'; then
+        log_fail "$name: no_tail_call missing rtl (normal return expected)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -3040,6 +3114,9 @@ main() {
 
     # === Phase 12: Direct page registers + div/mod return in A ===
     test_dp_registers                # .b addressing for tcc__r0/r1/r9 + no lda after div/mod
+
+    # === Phase 13: Tail call optimization ===
+    test_tail_call                   # jml for tail calls (call_add, call_chain)
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
