@@ -2992,6 +2992,45 @@ test_tail_call() {
     ((TESTS_PASSED++))
 }
 
+test_lazy_rep20() {
+    local name="lazy_rep20"
+    local src="$SCRIPT_DIR/test_tail_call.c"
+    local out="$BUILD/test_tail_call.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_add is a pure tail call (all args same-pos) → NO rep #$20
+    local call_add_body
+    call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
+    if echo "$call_add_body" | grep -qP '\trep\s+#\$20'; then
+        log_fail "$name: call_add has rep #\$20 (pure tail call should skip prologue)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_chain has lda/sta before jml → MUST have rep #$20
+    local call_chain_body
+    call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_chain_body" | grep -qP '\trep\s+#\$20'; then
+        log_fail "$name: call_chain missing rep #\$20 (non-pure tail call needs it)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # no_tail_call is a normal function → MUST have rep #$20
+    local no_tco_body
+    no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
+    if ! echo "$no_tco_body" | grep -qP '\trep\s+#\$20'; then
+        log_fail "$name: no_tail_call missing rep #\$20 (normal function needs it)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 #------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
@@ -3117,6 +3156,7 @@ main() {
 
     # === Phase 13: Tail call optimization ===
     test_tail_call                   # jml for tail calls (call_add, call_chain)
+    test_lazy_rep20                  # skip rep #$20 for pure tail calls (call_add)
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
