@@ -2659,6 +2659,119 @@ test_commutative_swap() {
 }
 
 #------------------------------------------------------------------------------
+# Test: INC/DEC for ±1 constants
+# Verifies that add/sub with 1 or 0xFFFF emits inc a / dec a.
+#------------------------------------------------------------------------------
+test_inc_dec() {
+    local name="inc_dec"
+    local src="$SCRIPT_DIR/test_inc_dec.c"
+    local out="$BUILD/test_inc_dec.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # increment(x) should use 'inc a', not 'clc' + 'adc'
+    local inc_fn
+    inc_fn=$(sed -n '/^increment:/,/^\.ENDS/p' "$out")
+    if ! echo "$inc_fn" | grep -q 'inc a'; then
+        log_fail "$name: increment() missing 'inc a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$inc_fn" | grep -q 'clc'; then
+        log_fail "$name: increment() still uses 'clc' (should use 'inc a')"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # decrement(x) should use 'dec a', not 'sec' + 'sbc'
+    local dec_fn
+    dec_fn=$(sed -n '/^decrement:/,/^\.ENDS/p' "$out")
+    if ! echo "$dec_fn" | grep -q 'dec a'; then
+        log_fail "$name: decrement() missing 'dec a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$dec_fn" | grep -q 'sec'; then
+        log_fail "$name: decrement() still uses 'sec' (should use 'dec a')"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # add_ffff(x) should use 'dec a' (x + 0xFFFF = x - 1 in u16)
+    local addff_fn
+    addff_fn=$(sed -n '/^add_ffff:/,/^\.ENDS/p' "$out")
+    if ! echo "$addff_fn" | grep -q 'dec a'; then
+        log_fail "$name: add_ffff() missing 'dec a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # add_five(x) should NOT use inc/dec (value is 5, not ±1)
+    local add5_fn
+    add5_fn=$(sed -n '/^add_five:/,/^\.ENDS/p' "$out")
+    if echo "$add5_fn" | grep -q 'inc a\|dec a'; then
+        log_fail "$name: add_five() incorrectly uses inc/dec for non-±1 constant"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: A-cache survives pha
+# Verifies that pushing the same value twice doesn't reload from stack.
+#------------------------------------------------------------------------------
+test_acache_pha() {
+    local name="acache_pha"
+    local src="$SCRIPT_DIR/test_acache_pha.c"
+    local out="$BUILD/test_acache_pha.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_same_twice(x): pushes x twice as args to add_two(x, x)
+    # First push loads x, second push should reuse A-cache (no second lda)
+    local fn_body
+    fn_body=$(sed -n '/^call_same_twice:/,/^\.ENDS/p' "$out")
+
+    # Count lda instructions (should be exactly 1, not 2)
+    local lda_count
+    lda_count=$(echo "$fn_body" | grep -c 'lda')
+    if [[ "$lda_count" -gt 1 ]]; then
+        log_fail "$name: call_same_twice has $lda_count lda instructions (expected 1, A-cache should skip second)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # Should have 2 pha instructions (one per arg)
+    local pha_count
+    pha_count=$(echo "$fn_body" | grep -c 'pha')
+    if [[ "$pha_count" -ne 2 ]]; then
+        log_fail "$name: call_same_twice has $pha_count pha (expected 2)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_with_computed(x): x+5 result should be pushed without storing to frame first
+    local fn2_body
+    fn2_body=$(sed -n '/^call_with_computed:/,/^\.ENDS/p' "$out")
+
+    # Should NOT have sta instruction (dead store: result used only as next arg)
+    # Use tab prefix to avoid matching @start label
+    if echo "$fn2_body" | grep -qP '\tsta'; then
+        log_fail "$name: call_with_computed has 'sta' (dead store should be eliminated)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -2766,6 +2879,10 @@ main() {
     test_plx_cleanup                 # PLX stack cleanup for small arg counts
     test_xba_shift                   # XBA byte-swap for constant shifts ≥ 8
     test_commutative_swap            # Commutative operand swap for A-cache reuse
+
+    # === Phase 9: INC/DEC + A-cache pha + dead store arg tests ===
+    test_inc_dec                     # INC/DEC for ±1 constants
+    test_acache_pha                  # A-cache survives pha (no redundant loads)
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
