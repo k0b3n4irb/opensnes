@@ -254,9 +254,9 @@ static void draw_screen(void) {
  *
  * This function handles level transitions:
  * 1. Reset ball/paddle positions
- * 2. Reset tilemaps from ROM (clean slate)
+ * 2. Reset background tilemap and brick array from ROM
  * 3. Cycle background color
- * 4. Rebuild brick wall
+ * 4. Rebuild brick wall in existing BG1 tilemap (preserves HUD)
  * 5. Upload everything to VRAM
  * 6. Wait for player to press START
  *
@@ -274,9 +274,6 @@ static void new_level(void) {
     pos_x = 94;
     pos_y = 109;
     px = 80;
-
-    /* Reset tilemaps from ROM to ensure clean state */
-    mycopy((u8 *)blockmap, bg1map, 0x800);
 
     /* Select background pattern for this level (cycles through 4) */
     switch (level & 3) {
@@ -326,14 +323,16 @@ static void new_level(void) {
         }
     }
 
-    /* ATOMIC VRAM UPDATE:
-     * All three DMAs (palette + both tilemaps) in single VBlank.
-     * Total: 512 + 2048 + 2048 = 4608 bytes
-     * This is at the edge of VBlank budget but works (PVSnesLib does same). */
+    /* FORCE BLANK for bulk VRAM update:
+     * Total: 512 + 2048 + 2048 = 4608 bytes — exceeds VBlank budget after
+     * NMI handler overhead (OAM DMA + joypad read ~13K cycles). Force blank
+     * disables rendering so VRAM writes are accepted at any time. */
     WaitForVBlank();
+    REG_INIDISP = 0x80;  /* Force blank — VRAM accessible */
     dmaCopyCGram((u8 *)pal, 0, 256 * 2);
     dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
     dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
+    REG_INIDISP = 0x0F;  /* Restore full brightness */
 
     draw_screen();
 
@@ -537,11 +536,14 @@ static void remove_brick(void) {
     /* Calculate tilemap offset */
     idx = (by << 5) + (bx << 1);
 
-    /* Clear brick tiles from BG1 */
+    /* Clear brick tiles from BG1
+     * Base 0x42 (not 0x62) because idx uses by which starts at 1,
+     * while placement uses j which starts at 0: 0x42 + by*32 = 0x62 + j*32 */
     blockmap[0x42 + idx] = 0;
     blockmap[0x43 + idx] = 0;
 
-    /* Remove shadow effect from BG3 */
+    /* Remove shadow effect from BG3
+     * Same row compensation: 0x63 + by*32 = 0x83 + j*32 */
     backmap[0x63 + idx] -= 0x400;
     backmap[0x64 + idx] -= 0x400;
 
