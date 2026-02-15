@@ -1314,20 +1314,36 @@ test_comparisons() {
         return 1
     fi
 
-    # Verify s16 signed shift-by-8 uses cmp+ror (arithmetic shift), NOT lsr
+    # Verify s16 signed shift-by-8 uses arithmetic shift (not unsigned lsr).
+    # Two valid patterns:
+    #   - XBA optimization: xba + and + cmp #$0080 + ora #$FF00 (shift ≥ 8)
+    #   - Loop pattern: cmp #$8000 + ror (shift < 8)
     local signed_shift_body
     signed_shift_body=$(sed -n '/^test_s16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
-    if ! echo "$signed_shift_body" | grep -qE 'cmp\.w #\$8000'; then
-        log_fail "$name: test_s16_shift_right missing 'cmp.w #\$8000' (sign bit extraction)"
-        if [[ $VERBOSE -eq 1 ]]; then
-            echo "Function body:"
-            echo "$signed_shift_body"
+    if echo "$signed_shift_body" | grep -q 'xba'; then
+        # XBA path: must have sign extension (ora #$FF00)
+        if ! echo "$signed_shift_body" | grep -qE 'ora'; then
+            log_fail "$name: test_s16_shift_right uses xba but missing sign extension (ora)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$signed_shift_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
         fi
-        ((TESTS_FAILED++))
-        return 1
-    fi
-    if ! echo "$signed_shift_body" | grep -qE 'ror a'; then
-        log_fail "$name: test_s16_shift_right missing 'ror a' (arithmetic shift)"
+    elif echo "$signed_shift_body" | grep -qE 'cmp\.w #\$8000'; then
+        # cmp/ror path: must have ror
+        if ! echo "$signed_shift_body" | grep -qE 'ror a'; then
+            log_fail "$name: test_s16_shift_right missing 'ror a' (arithmetic shift)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$signed_shift_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    else
+        log_fail "$name: test_s16_shift_right uses neither xba nor cmp+ror for arithmetic shift"
         if [[ $VERBOSE -eq 1 ]]; then
             echo "Function body:"
             echo "$signed_shift_body"
@@ -1337,7 +1353,7 @@ test_comparisons() {
     fi
     # Ensure signed shift-by-8 does NOT use lsr (that would be unsigned, wrong for signed)
     if echo "$signed_shift_body" | grep -qE 'lsr'; then
-        log_fail "$name: test_s16_shift_right uses lsr (should use cmp+ror for arithmetic shift)"
+        log_fail "$name: test_s16_shift_right uses lsr (should use arithmetic shift)"
         if [[ $VERBOSE -eq 1 ]]; then
             echo "Function body:"
             echo "$signed_shift_body"
@@ -2397,6 +2413,252 @@ test_dead_store_elimination() {
 }
 
 #------------------------------------------------------------------------------
+# Test: PLX stack cleanup optimization
+# Verifies that small stack cleanups use PLX instead of tax/tsa/clc/adc/tas/txa.
+#------------------------------------------------------------------------------
+test_plx_cleanup() {
+    local name="plx_cleanup"
+    local src="$SCRIPT_DIR/test_plx_cleanup.c"
+    local out="$BUILD/test_plx_cleanup.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. wrapper_one (1-arg call, non-void): should use plx, no tax/tsa sequence
+    func_body=$(sed -n '/^wrapper_one:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q 'plx'; then
+        log_fail "$name: wrapper_one missing plx for stack cleanup"
+        ((fail_count++))
+    fi
+
+    # Should NOT have the old tax/tsa/clc/adc/tas/txa sequence for cleanup
+    # (Note: tax may appear for other reasons, but tsa should not appear in a PLX cleanup)
+    if echo "$func_body" | grep -q 'tsa' && echo "$func_body" | grep -q 'tas'; then
+        log_fail "$name: wrapper_one still uses tsa/tas arithmetic cleanup"
+        ((fail_count++))
+    fi
+
+    # 2. wrapper_two (2-arg call, non-void): should use plx (cleanup=4, within threshold)
+    func_body=$(sed -n '/^wrapper_two:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q 'plx'; then
+        log_fail "$name: wrapper_two missing plx for stack cleanup"
+        ((fail_count++))
+    fi
+
+    # 3. void_wrapper (1-arg void call): should use plx
+    func_body=$(sed -n '/^void_wrapper:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q 'plx'; then
+        log_fail "$name: void_wrapper missing plx for stack cleanup"
+        ((fail_count++))
+    fi
+
+    # 4. __mul16 cleanup: test via a multiply function
+    # Create a small test file for mul cleanup
+    local mul_src="$BUILD/test_plx_mul.c"
+    local mul_out="$BUILD/test_plx_mul.c.asm"
+    cat > "$mul_src" << 'CEOF'
+unsigned short mul_general(unsigned short a, unsigned short b) {
+    return a * b;
+}
+CEOF
+
+    if compile_test "${name}_mul" "$mul_src" "$mul_out"; then
+        func_body=$(sed -n '/^mul_general:/,/^\.ENDS/p' "$mul_out")
+        if ! echo "$func_body" | grep -q 'plx'; then
+            log_fail "$name: mul_general missing plx for __mul16 cleanup"
+            ((fail_count++))
+        fi
+        if echo "$func_body" | grep -q 'tsa' && echo "$func_body" | grep -q 'tas'; then
+            log_fail "$name: mul_general still uses tsa/tas for __mul16 cleanup"
+            ((fail_count++))
+        fi
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: XBA byte-swap optimization for shifts ≥ 8
+# Verifies that constant shifts ≥ 8 use xba instead of repeated shift loops.
+#------------------------------------------------------------------------------
+test_xba_shift() {
+    local name="xba_shift"
+    local src="$SCRIPT_DIR/test_xba_shift.c"
+    local out="$BUILD/test_xba_shift.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+    local lsr_count asl_count
+
+    # 1. shr8: should use xba + and, no 8 consecutive lsr
+    func_body=$(sed -n '/^shr8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shr8 missing xba instruction"
+        ((fail_count++))
+    fi
+    lsr_count=$(echo "$func_body" | grep -c 'lsr a' || true)
+    if [[ $lsr_count -ge 8 ]]; then
+        log_fail "$name: shr8 has $lsr_count lsr instructions (should use xba)"
+        ((fail_count++))
+    fi
+
+    # 2. sar8: should use xba + sign extension pattern
+    func_body=$(sed -n '/^sar8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: sar8 missing xba instruction"
+        ((fail_count++))
+    fi
+    # Should NOT have 8 cmp/ror pairs
+    local ror_count
+    ror_count=$(echo "$func_body" | grep -c 'ror a' || true)
+    if [[ $ror_count -ge 8 ]]; then
+        log_fail "$name: sar8 has $ror_count ror instructions (should use xba)"
+        ((fail_count++))
+    fi
+    # Should have sign extension (ora #$FF00 or equivalent)
+    if ! echo "$func_body" | grep -q 'ora'; then
+        log_fail "$name: sar8 missing sign extension (ora)"
+        ((fail_count++))
+    fi
+
+    # 3. shl8: should use xba + and
+    func_body=$(sed -n '/^shl8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shl8 missing xba instruction"
+        ((fail_count++))
+    fi
+    asl_count=$(echo "$func_body" | grep -c 'asl a' || true)
+    if [[ $asl_count -ge 8 ]]; then
+        log_fail "$name: shl8 has $asl_count asl instructions (should use xba)"
+        ((fail_count++))
+    fi
+
+    # 4. shr12: should use xba + 4 remaining lsr
+    func_body=$(sed -n '/^shr12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shr12 missing xba instruction"
+        ((fail_count++))
+    fi
+    lsr_count=$(echo "$func_body" | grep -c 'lsr a' || true)
+    if [[ $lsr_count -ne 4 ]]; then
+        log_fail "$name: shr12 should have exactly 4 lsr (has $lsr_count)"
+        ((fail_count++))
+    fi
+
+    # 5. sar12: should use xba + sign extend + 4 remaining sar
+    func_body=$(sed -n '/^sar12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: sar12 missing xba instruction"
+        ((fail_count++))
+    fi
+
+    # 6. shl12: should use xba + 4 remaining asl
+    func_body=$(sed -n '/^shl12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shl12 missing xba instruction"
+        ((fail_count++))
+    fi
+    asl_count=$(echo "$func_body" | grep -c 'asl a' || true)
+    if [[ $asl_count -ne 4 ]]; then
+        log_fail "$name: shl12 should have exactly 4 asl (has $asl_count)"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Commutative operand swap optimization
+# Verifies that commutative ops swap operands when r1 is in A-cache.
+#------------------------------------------------------------------------------
+test_commutative_swap() {
+    local name="commutative_swap"
+    local src="$SCRIPT_DIR/test_commutative_swap.c"
+    local out="$BUILD/test_commutative_swap.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # shift_and_add: idx<<1 stays in A-cache, add swaps operands.
+    # The shl result is a Case 3 dead store (arg[1] of next commutative op).
+    # Should be frameless (no frame setup needed).
+    func_body=$(sed -n '/^shift_and_add:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: shift_and_add has frame setup — should be frameless"
+        ((fail_count++))
+    fi
+
+    # Should have asl (the shift) but no sta N,s (dead store eliminated)
+    if ! echo "$func_body" | grep -q 'asl a'; then
+        log_fail "$name: shift_and_add missing asl a"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -qP '\bsta\s+\d+,s\b'; then
+        log_fail "$name: shift_and_add has sta N,s — intermediates should be dead stores"
+        ((fail_count++))
+    fi
+
+    # or_shifted: same pattern with OR
+    func_body=$(sed -n '/^or_shifted:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: or_shifted has frame setup — should be frameless"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -2499,6 +2761,11 @@ main() {
 
     # === Phase 7a: Dead store elimination tests ===
     test_dead_store_elimination      # Dead store elimination + aggressive frame elimination
+
+    # === Phase 8: PLX + XBA + Commutative swap tests ===
+    test_plx_cleanup                 # PLX stack cleanup for small arg counts
+    test_xba_shift                   # XBA byte-swap for constant shifts ≥ 8
+    test_commutative_swap            # Commutative operand swap for A-cache reuse
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
