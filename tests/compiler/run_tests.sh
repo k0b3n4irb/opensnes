@@ -2839,6 +2839,52 @@ test_inline_mul_11_15() {
     ((TESTS_PASSED++))
 }
 
+test_dp_registers() {
+    local name="dp_registers"
+    local src="$SCRIPT_DIR/test_dp_registers.c"
+    local out="$BUILD/test_dp_registers.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # All tcc__ register accesses should use .b (direct page), not .w (absolute)
+    if grep -qP '\t(sta|lda|adc|sbc)\.w tcc__r[019]' "$out"; then
+        log_fail "$name: still using .w for tcc__ registers (should be .b)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # div_by_10 should NOT have lda.b tcc__r0 after jsl __div16
+    local div_body
+    div_body=$(sed -n '/^div_by_10:/,/^\.ENDS/p' "$out")
+    if echo "$div_body" | grep -qP 'jsl __div16' && echo "$div_body" | grep -qP '\tlda\.b tcc__r0'; then
+        log_fail "$name: div_by_10 still reloads tcc__r0 after __div16 (should return in A)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # mod_by_10 should NOT have lda.b tcc__r0 after jsl __mod16
+    local mod_body
+    mod_body=$(sed -n '/^mod_by_10:/,/^\.ENDS/p' "$out")
+    if echo "$mod_body" | grep -qP 'jsl __mod16' && echo "$mod_body" | grep -qP '\tlda\.b tcc__r0'; then
+        log_fail "$name: mod_by_10 still reloads tcc__r0 after __mod16 (should return in A)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # mul_by_7 should use .b for tcc__r9
+    local mul_body
+    mul_body=$(sed -n '/^mul_by_7:/,/^\.ENDS/p' "$out")
+    if ! echo "$mul_body" | grep -qP '\tsta\.b tcc__r9'; then
+        log_fail "$name: mul_by_7 not using .b for tcc__r9"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 test_indirect_store_acache() {
     local name="indirect_store_acache"
     local src="$SCRIPT_DIR/test_indirect_store.c"
@@ -2991,6 +3037,9 @@ main() {
     # === Phase 11: Inline multiply *11-*15 + indirect store optimization ===
     test_inline_mul_11_15            # Inline multiply patterns *11-*15
     test_indirect_store_acache       # Indirect store A-cache → frameless array_write
+
+    # === Phase 12: Direct page registers + div/mod return in A ===
+    test_dp_registers                # .b addressing for tcc__r0/r1/r9 + no lda after div/mod
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
