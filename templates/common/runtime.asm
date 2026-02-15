@@ -116,7 +116,7 @@ tcc_mul16:
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor (must be <= 255 for hardware, else software)
-; Output: tcc__r0 = quotient
+; Output: tcc__r0 = quotient, A = quotient (returned in A for caller)
 ;         tcc__r1 = remainder
 ;
 ; Uses hardware division ($4204-$4206, result at $4214-$4217)
@@ -150,10 +150,10 @@ tcc_div16:
     nop
 
     rep #$20
-    lda $4214           ; Quotient
-    sta tcc__r0
     lda $4216           ; Remainder
     sta tcc__r1
+    lda $4214           ; Quotient
+    sta tcc__r0         ; A = quotient (returned in A for caller)
 
     plp
     rtl
@@ -190,10 +190,10 @@ tcc_div16:
     bne @div_loop
 
     ; Move results
-    lda tcc__r2
-    sta tcc__r0         ; Quotient
     lda tcc__r3
     sta tcc__r1         ; Remainder
+    lda tcc__r2
+    sta tcc__r0         ; Quotient — A = quotient (returned in A for caller)
 
     plp
     rtl
@@ -203,12 +203,12 @@ tcc_div16:
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor
-; Output: tcc__r0 = remainder
+; Output: tcc__r0 = remainder, A = remainder (returned in A for caller)
 ;------------------------------------------------------------------------------
 tcc_mod16:
     jsl tcc_div16
     lda tcc__r1         ; Remainder is in tcc__r1
-    sta tcc__r0
+    sta tcc__r0         ; A = remainder (returned in A for caller)
     rtl
 
 .ENDS
