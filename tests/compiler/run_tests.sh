@@ -1793,12 +1793,17 @@ test_multiply() {
         return 1
     fi
 
-    # Check non-special constant (*13) also calls __mul16
+    # Check *13 uses inline shift+add pattern (not __mul16)
     local const_body
     const_body=$(sed -n '/^mul_by_13:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
 
-    if ! echo "$const_body" | grep -q '__mul16'; then
-        log_fail "$name: mul_by_13 missing __mul16 call"
+    if echo "$const_body" | grep -q '__mul16'; then
+        log_fail "$name: mul_by_13 still calls __mul16 (should be inlined)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    if ! echo "$const_body" | grep -q 'tcc__r9'; then
+        log_fail "$name: mul_by_13 missing inline pattern (no tcc__r9)"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -2805,6 +2810,68 @@ test_cmp_dead_store() {
     ((TESTS_PASSED++))
 }
 
+test_inline_mul_11_15() {
+    local name="inline_mul_11_15"
+    local src="$SCRIPT_DIR/test_inline_mul.c"
+    local out="$BUILD/test_inline_mul.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # All five functions should NOT call __mul16
+    for fn in mul_by_11 mul_by_12 mul_by_13 mul_by_14 mul_by_15; do
+        local fn_body
+        fn_body=$(sed -n "/^${fn}:/,/^\\.ENDS/p" "$out")
+        if echo "$fn_body" | grep -q '__mul16'; then
+            log_fail "$name: $fn still calls __mul16 (should use inline shift+add)"
+            ((TESTS_FAILED++))
+            return
+        fi
+        # Should use tcc__r9 as scratch register
+        if ! echo "$fn_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: $fn missing tcc__r9 (inline pattern not applied)"
+            ((TESTS_FAILED++))
+            return
+        fi
+    done
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_indirect_store_acache() {
+    local name="indirect_store_acache"
+    local src="$SCRIPT_DIR/test_indirect_store.c"
+    local out="$BUILD/test_indirect_store.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # array_write should be frameless (framesize=0)
+    if ! grep -q 'array_write (framesize=0' "$out"; then
+        log_fail "$name: array_write not frameless (indirect store dead store not working)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # Should use tax (address to X) without pha/pla
+    local fn_body
+    fn_body=$(sed -n '/^array_write:/,/^\.ENDS/p' "$out")
+    if ! echo "$fn_body" | grep -qP '\ttax'; then
+        log_fail "$name: array_write missing tax instruction"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$fn_body" | grep -qP '\tpha'; then
+        log_fail "$name: array_write still uses pha (A-cache optimization not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 #------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
@@ -2920,6 +2987,10 @@ main() {
 
     # === Phase 10: Comparison dead store for frameless conditionals ===
     test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
+
+    # === Phase 11: Inline multiply *11-*15 + indirect store optimization ===
+    test_inline_mul_11_15            # Inline multiply patterns *11-*15
+    test_indirect_store_acache       # Indirect store A-cache → frameless array_write
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
