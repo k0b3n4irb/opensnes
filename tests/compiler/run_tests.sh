@@ -2268,6 +2268,71 @@ test_sign_promotion() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Phase 5b — Non-leaf param aliasing + frame safety
+#
+# Phase 5b extends param alias propagation to non-leaf functions (fewer
+# redundant param copies). But frame elimination stays leaf-only: non-leaf
+# functions with intermediate values across calls MUST keep their frame.
+# Without this, sta N,s writes into the caller's frame → corruption.
+# Regression: oamSetXY, oamSetVisible, oamDrawMetasprite, bgInit all went
+# frameless incorrectly, causing black screens and garbled sprites.
+#------------------------------------------------------------------------------
+test_nonleaf_frameless() {
+    local name="nonleaf_frameless"
+    local src="$SCRIPT_DIR/test_nonleaf_frameless.c"
+    local out="$BUILD/test_nonleaf_frameless.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. compute_across_call: MUST have frame (sbc in prologue) because
+    #    intermediate 'sum' lives across the jsl call
+    func_body=$(sed -n '/^compute_across_call:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: compute_across_call missing frame setup (sbc) — intermediate across call needs frame!"
+        ((fail_count++))
+    fi
+
+    if ! echo "$func_body" | grep -q 'jsl'; then
+        log_fail "$name: compute_across_call missing jsl — should call external_func"
+        ((fail_count++))
+    fi
+
+    # 2. forward_with_work: MUST have frame (has intermediate 'c' across call)
+    func_body=$(sed -n '/^forward_with_work:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: forward_with_work missing frame setup (sbc) — intermediate across call needs frame!"
+        ((fail_count++))
+    fi
+
+    # 3. Both non-leaf functions should have leaf_opt=1 (param aliasing active)
+    #    This confirms Phase 5b is working: optimizations apply to non-leaf
+    if ! grep -q 'compute_across_call.*leaf_opt=1' "$out"; then
+        log_fail "$name: compute_across_call should have leaf_opt=1 (param aliasing active)"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -2364,6 +2429,9 @@ main() {
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
     test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
     test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
+
+    # === Phase 5b: Non-leaf optimization tests ===
+    test_nonleaf_frameless           # Non-leaf wrapper functions should be frameless
 
     # === Compiler Hardening Tests (Phase 1.5) ===
     test_struct_alignment            # Struct padding, field offsets, array stride
