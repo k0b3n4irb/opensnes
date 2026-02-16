@@ -7,19 +7,19 @@
 ;------------------------------------------------------------------------------
 ; Background tiles (4bpp, 16 colors)
 ;------------------------------------------------------------------------------
-tiles: .incbin "res/pvsneslib.pic"
+tiles: .incbin "res/opensnes.pic"
 tiles_end:
 
 ;------------------------------------------------------------------------------
 ; Background tilemap
 ;------------------------------------------------------------------------------
-tilemap: .incbin "res/pvsneslib.map"
+tilemap: .incbin "res/opensnes.map"
 tilemap_end:
 
 ;------------------------------------------------------------------------------
 ; Background palette (16 colors)
 ;------------------------------------------------------------------------------
-palette: .incbin "res/pvsneslib.pal"
+palette: .incbin "res/opensnes.pal"
 palette_end:
 
 .ends
