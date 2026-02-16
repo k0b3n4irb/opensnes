@@ -86,7 +86,7 @@ If that sounds exciting rather than terrifying, you're in the right place.
 | | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **31% faster code** than PVSnesLib+816-opt on our benchmark suite |
 | | **Hardware library** (18 modules) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
 | | **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
-| | **23 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
+| | **24 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
 | | **Cross-platform** | `make` on Linux, macOS, and Windows (MSYS2). CI-tested on all three. |
 
 ## Quick Start
@@ -126,14 +126,14 @@ You'll also want a SNES emulator — [Mesen2](https://www.mesen.ca/) is recommen
 ```bash
 git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
-make                  # builds compiler, tools, library, and all 23 examples
+make                  # builds compiler, tools, library, and all 24 examples
 
 # Open examples/text/hello_world/hello_world.sfc in Mesen2
 ```
 
 ## Examples
 
-23 examples with detailed READMEs that explain not just *what* the code does, but *why*.
+24 examples with detailed READMEs that explain not just *what* the code does, but *why*.
 Organized as a progressive learning path — from "Hello World" to a complete platformer.
 
 **[Browse all examples and the learning path](examples/README.md)**
