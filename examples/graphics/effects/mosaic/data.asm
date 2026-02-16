@@ -1,15 +1,15 @@
 .section ".rodata1" superfree
 tiles:
-.incbin "res/pvsneslib.pic"
+.incbin "res/opensnes.pic"
 tiles_end:
 .ends
 
 .section ".rodata2" superfree
 tilemap:
-.incbin "res/pvsneslib.map"
+.incbin "res/opensnes.map"
 tilemap_end:
 
 palette:
-.incbin "res/pvsneslib.pal"
+.incbin "res/opensnes.pal"
 palette_end:
 .ends
