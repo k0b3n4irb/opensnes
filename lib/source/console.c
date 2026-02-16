@@ -31,8 +31,9 @@ extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
  * Static Variables
  *============================================================================*/
 
-/** Current screen brightness (0-15) */
-static u8 current_brightness;
+/** Current screen brightness (0-15), defaults to full brightness.
+ *  Initialized here so setScreenOn() works without consoleInit(). */
+static u8 current_brightness = 15;
 
 /** PAL/NTSC flag */
 static u8 is_pal_system;

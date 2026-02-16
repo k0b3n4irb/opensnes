@@ -400,6 +400,22 @@ Start:
     ldx #$1FFF
     txs
 
+    ; Zero-initialize low WRAM ($0000-$1FFF) — BSS clear
+    ; Stack is empty (SP=$1FFF), so safe to zero the entire 8KB range.
+    ; InitHardware (next) will overwrite OAM ($0300-$051F) with proper values.
+    ; CopyInitData (later) will overwrite initialized statics from ROM.
+    pea $0000           ; Set DBR=$00 for bank $00 WRAM access
+    plb
+    plb
+    rep #$20            ; 16-bit A for 2-byte stores
+    lda #$0000
+    ldx #$2000          ; Clear 8KB: $0000-$1FFF
+-   dex
+    dex
+    sta.w $0000,x
+    bne -
+    sep #$20            ; Restore 8-bit A for InitHardware
+
     ; Initialize hardware
     jsr InitHardware
 
