@@ -1,7 +1,7 @@
 --[[
-  debug_animation.lua - Example: Debug the 2_animation Example
+  debug_animation.lua - Example: Debug the animation Example
 
-  This script is designed to debug the OpenSNES 2_animation example
+  This script is designed to debug the OpenSNES animation example
   that was fixed for WRAM mirroring issues.
 
   It verifies:
@@ -10,7 +10,7 @@
   3. OAM buffer is transferred correctly to hardware
 
   Usage in Mesen2:
-    1. Load examples/graphics/2_animation/animation.sfc
+    1. Load examples/graphics/animation/animation.sfc
     2. Run this script from Debug > Script Window
 ]]
 
@@ -21,7 +21,7 @@ local dbg = require("snesdbg")
 -- Configuration - adjust paths as needed
 local SYM_FILE = "animation.sym"
 
-print("=== 2_animation Debug Script ===")
+print("=== animation Debug Script ===")
 print("")
 
 -- Load symbols
@@ -32,7 +32,7 @@ end)
 
 if not ok then
     print("ERROR: Could not load symbols: " .. tostring(err))
-    print("Make sure you're running from the 2_animation directory")
+    print("Make sure you're running from the animation directory")
     print("or adjust the SYM_FILE path in this script.")
     return
 end

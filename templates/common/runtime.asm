@@ -42,18 +42,19 @@ tcc_mul16:
     php
     rep #$30            ; 16-bit A, X/Y
 
-    ; Save inputs to stack
-    lda tcc__r0
-    pha                 ; [SP] = multiplicand
-    lda tcc__r1
-    pha                 ; [SP+2] = multiplier
+    ; Compiler calling convention: args pushed on stack
+    ; Stack layout after jsl + php:
+    ;   SP+1: P register (1 byte)
+    ;   SP+2,3,4: return address (3 bytes)
+    ;   SP+5,6: arg1 = multiplicand (pushed second)
+    ;   SP+7,8: arg2 = multiplier (pushed first)
 
     sep #$20            ; 8-bit A
 
     ; --- a_lo * b_lo ---
-    lda 3,s             ; a_lo
+    lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
-    lda 1,s             ; b_lo
+    lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB - triggers multiply
 
     nop                 ; Wait 8 cycles for result
@@ -68,9 +69,9 @@ tcc_mul16:
     sep #$20
 
     ; --- a_hi * b_lo ---
-    lda 4,s             ; a_hi
+    lda 6,s             ; a_hi (multiplicand high byte)
     sta $4202           ; WRMPYA
-    lda 1,s             ; b_lo
+    lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB
 
     nop
@@ -90,9 +91,9 @@ tcc_mul16:
     sep #$20
 
     ; --- a_lo * b_hi ---
-    lda 3,s             ; a_lo
+    lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
-    lda 2,s             ; b_hi
+    lda 8,s             ; b_hi (multiplier high byte)
     sta $4203           ; WRMPYB
 
     nop
@@ -105,12 +106,7 @@ tcc_mul16:
     xba                 ; Multiply by 256
     and #$FF00
     clc
-    adc tcc__r2
-    sta tcc__r0         ; Final result in tcc__r0
-
-    ; Clean up stack
-    pla
-    pla
+    adc tcc__r2         ; Final result in A (returned to caller)
 
     plp
     rtl
@@ -120,7 +116,7 @@ tcc_mul16:
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor (must be <= 255 for hardware, else software)
-; Output: tcc__r0 = quotient
+; Output: tcc__r0 = quotient, A = quotient (returned in A for caller)
 ;         tcc__r1 = remainder
 ;
 ; Uses hardware division ($4204-$4206, result at $4214-$4217)
@@ -154,10 +150,10 @@ tcc_div16:
     nop
 
     rep #$20
-    lda $4214           ; Quotient
-    sta tcc__r0
     lda $4216           ; Remainder
     sta tcc__r1
+    lda $4214           ; Quotient
+    sta tcc__r0         ; A = quotient (returned in A for caller)
 
     plp
     rtl
@@ -194,10 +190,10 @@ tcc_div16:
     bne @div_loop
 
     ; Move results
-    lda tcc__r2
-    sta tcc__r0         ; Quotient
     lda tcc__r3
     sta tcc__r1         ; Remainder
+    lda tcc__r2
+    sta tcc__r0         ; Quotient — A = quotient (returned in A for caller)
 
     plp
     rtl
@@ -207,12 +203,12 @@ tcc_div16:
 ;------------------------------------------------------------------------------
 ; Input:  tcc__r0 = dividend
 ;         tcc__r1 = divisor
-; Output: tcc__r0 = remainder
+; Output: tcc__r0 = remainder, A = remainder (returned in A for caller)
 ;------------------------------------------------------------------------------
 tcc_mod16:
     jsl tcc_div16
     lda tcc__r1         ; Remainder is in tcc__r1
-    sta tcc__r0
+    sta tcc__r0         ; A = remainder (returned in A for caller)
     rtl
 
 .ENDS

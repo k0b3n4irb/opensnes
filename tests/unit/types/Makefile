@@ -1,10 +1,11 @@
-# Types Unit Test
-# NOTE: Currently disabled due to WLA-DX linker issues with underscore-prefixed
-# labels in RAMSECTION. The main examples build and work fine.
-# TODO: Fix test harness to work with WLA-DX label scoping
+# Types Unit Test Makefile
 
-.PHONY: all clean
-all:
-	@echo "[SKIP] test_types disabled (WLA-DX linker issue with BSS labels)"
-clean:
-	@echo "[SKIP] Nothing to clean"
+OPENSNES := $(shell cd ../../.. && pwd)
+TARGET   := test_types.sfc
+ROM_NAME := TYPE TESTS
+
+CSRC     := test_types.c
+USE_LIB  := 1
+LIB_MODULES := console text dma sprite
+
+include $(OPENSNES)/make/common.mk

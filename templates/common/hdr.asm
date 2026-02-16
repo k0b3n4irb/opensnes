@@ -43,7 +43,7 @@
     SLOWROM                 ; 2.68MHz ROM access
     LOROM                   ; LoROM memory mapping
     CARTRIDGETYPE __CARTRIDGETYPE__  ; $00=ROM, $02=ROM+SRAM
-    ROMSIZE $06             ; 512Kbit = 64KB
+    ROMSIZE __ROMSIZE__     ; ROM size (1024 << N bytes)
     SRAMSIZE __SRAMSIZE__   ; $00=None, $03=8KB
     COUNTRY $01             ; North America (NTSC)
     LICENSEECODE $00        ; Unlicensed

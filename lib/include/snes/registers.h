@@ -126,6 +126,24 @@
 /** @brief Mode 7 settings (W) */
 #define REG_M7SEL       (*(vu8*)0x211A)
 
+/** @brief Mode 7 matrix A (W, 2x write: low then high) */
+#define REG_M7A         (*(vu8*)0x211B)
+
+/** @brief Mode 7 matrix B (W, 2x write: low then high) */
+#define REG_M7B         (*(vu8*)0x211C)
+
+/** @brief Mode 7 matrix C (W, 2x write: low then high) */
+#define REG_M7C         (*(vu8*)0x211D)
+
+/** @brief Mode 7 matrix D (W, 2x write: low then high) */
+#define REG_M7D         (*(vu8*)0x211E)
+
+/** @brief Mode 7 center X (W, 2x write: low then high) */
+#define REG_M7X         (*(vu8*)0x211F)
+
+/** @brief Mode 7 center Y (W, 2x write: low then high) */
+#define REG_M7Y         (*(vu8*)0x2120)
+
 /** @brief CGRAM address (W) */
 #define REG_CGADD       (*(vu8*)0x2121)
 

@@ -21,7 +21,7 @@ test.describe("Hello World Example", function()
 
     test.beforeAll(function()
         -- ROM should already be loaded by Mesen2
-        test.loadSymbols(scriptDir .. "../../../examples/text/1_hello_world/hello_world.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/text/hello_world/hello_world.sym")
     end)
 
     test.it("should reach main()", function()

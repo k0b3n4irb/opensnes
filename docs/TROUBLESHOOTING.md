@@ -79,18 +79,16 @@ temp += c;
 result = temp / d;
 ```
 
-### "error: static variable 'X' initialized in ROM"
+### Static variables with initializers
 
-**Cause**: C static variables with initializers are placed in ROM (read-only).
-
-**Fix**:
+Initialized static variables now work correctly:
 ```c
-// BAD: Initialized static goes to ROM
-static u8 counter = 0;
-
-// GOOD: Uninitialized static goes to RAM (C guarantees zero-init)
-static u8 counter;
+// Both work correctly:
+static u8 counter = 0;   // Initial value copied from ROM to RAM at startup
+static u8 counter;       // Zero-initialized by C standard
 ```
+
+The `CopyInitData` routine in crt0.asm copies initial values from ROM to RAM before `main()` is called.
 
 ## Runtime Issues (Black Screen / Crash)
 

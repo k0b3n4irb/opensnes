@@ -171,4 +171,4 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 
 - [Registers](REGISTERS.md) - Full register reference
 - [PPU](PPU.md) - Graphics system overview
-- [Animation Example](/examples/graphics/2_animation/) - Working sprite animation code
+- [Animation Example](/examples/graphics/animation/) - Working sprite animation code

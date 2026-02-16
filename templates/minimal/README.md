@@ -38,7 +38,7 @@ The simplest starting point for an OpenSNES project.
 
 1. **Add graphics**: See `examples/graphics/` for sprite and background examples
 2. **Add sound**: See `examples/audio/` for sound playback
-3. **Add game logic**: Check out `examples/games/1_pong/` for a complete game
+3. **Add game logic**: Check out `examples/games/pong/` for a complete game
 
 ## Common Modifications
 

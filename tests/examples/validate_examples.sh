@@ -264,6 +264,16 @@ validate_example() {
     local parent=$(basename "$(dirname "$dir")")
     local full_name="$parent/$name"
 
+    # In quick mode, skip examples that have no .sfc file (never built)
+    if [[ $QUICK -eq 1 ]]; then
+        local rom_file_check
+        rom_file_check=$(find "$dir" -maxdepth 1 -name "*.sfc" -type f 2>/dev/null | head -1)
+        if [[ -z "$rom_file_check" ]]; then
+            log_verbose "Skipping unbuilt: $full_name"
+            return 0
+        fi
+    fi
+
     ((TOTAL++))
 
     echo ""

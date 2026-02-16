@@ -15,7 +15,7 @@ This guide provides detailed explanations of each example project, breaking down
 
 ## 1. Hello World
 
-**Location:** `examples/text/1_hello_world/`
+**Location:** `examples/text/hello_world/`
 
 This example displays "HELLO WORLD!" on screen using background tiles. It demonstrates the fundamental concepts of SNES graphics.
 
@@ -114,7 +114,7 @@ REG_INIDISP = 0x0F;  /* Full brightness, screen on */
 
 ## 2. Sprite Display
 
-**Location:** `examples/graphics/1_sprite/`
+**Location:** `examples/graphics/sprite/`
 
 This example shows a 16x16 pixel sprite on screen. It introduces OAM (Object Attribute Memory) and sprite graphics.
 
@@ -220,7 +220,7 @@ REG_OAMDATA = 0x02;  /* Bits: --ss --ss (sprite 3,2,1,0) */
 
 ## 3. Joypad Input
 
-**Location:** `examples/input/1_joypad/`
+**Location:** `examples/input/joypad/`
 
 Move a sprite around the screen using the D-pad. Hold A or B for faster movement.
 
@@ -306,7 +306,7 @@ Holding A or B triples the movement speed.
 
 ## 4. Audio Playback
 
-**Location:** `examples/audio/1_tone/`
+**Location:** `examples/audio/tone/`
 
 Press A to play a "tada" sound effect. Demonstrates SPC700 audio programming.
 
@@ -464,7 +464,7 @@ for (i = used_sprites; i < 128; i++) {
 Each example has a Makefile:
 
 ```bash
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 make
 # Creates hello_world.sfc
 

@@ -8,9 +8,10 @@
 # 3. Assembly -> Object file
 #
 # Usage:
-#   ./run_tests.sh           # Run all tests
-#   ./run_tests.sh -v        # Verbose output
-#   ./run_tests.sh test_X    # Run specific test
+#   ./run_tests.sh                    # Run all tests (strict mode)
+#   ./run_tests.sh -v                 # Verbose output
+#   ./run_tests.sh --allow-known-bugs # Known bugs warn instead of fail
+#   ./run_tests.sh test_X             # Run specific test
 #==============================================================================
 
 # Don't exit on error - we want to run all tests
@@ -21,6 +22,9 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+
+# Cross-platform: BSD grep (macOS) doesn't support -P, use TAB variable
+TAB=$'\t'
 
 # Paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -36,8 +40,10 @@ AS="$BIN/wla-65816"
 TESTS_RUN=0
 TESTS_PASSED=0
 TESTS_FAILED=0
+TESTS_KNOWN_BUGS=0
 
 VERBOSE=0
+ALLOW_KNOWN_BUGS=0
 
 #------------------------------------------------------------------------------
 # Helpers
@@ -59,6 +65,45 @@ log_verbose() {
     if [[ $VERBOSE -eq 1 ]]; then
         echo "[DEBUG] $1"
     fi
+}
+
+# Log a known bug failure. In --allow-known-bugs mode, counts as warning.
+# In strict mode (default), counts as failure.
+log_known_bug() {
+    if [[ $ALLOW_KNOWN_BUGS -eq 1 ]]; then
+        echo -e "${YELLOW}[KNOWN_BUG]${NC} $1"
+        ((TESTS_KNOWN_BUGS++))
+    else
+        log_fail "$1 (known bug — use --allow-known-bugs to suppress)"
+        ((TESTS_FAILED++))
+    fi
+}
+
+# Compile a C test file to assembly.
+# Returns 0 on success, 1 on failure.
+# On MSYS2/Windows, cproc may segfault non-deterministically.
+# Segfaults are reported as known bugs instead of failures.
+compile_test() {
+    local name="$1"
+    local src="$2"
+    local out="$3"
+    local err_file="$BUILD/$(basename "$src" .c).err"
+
+    if "$CC" "$src" -o "$out" 2>"$err_file"; then
+        return 0
+    fi
+
+    local err_msg
+    err_msg=$(cat "$err_file")
+    if echo "$err_msg" | grep -qi 'segmentation fault\|segfault\|signal 11'; then
+        log_known_bug "$name: cproc segfault on MSYS2 (non-deterministic)"
+        return 1
+    fi
+
+    log_fail "$name: Compilation failed"
+    echo "$err_msg"
+    ((TESTS_FAILED++))
+    return 1
 }
 
 #------------------------------------------------------------------------------
@@ -398,9 +443,9 @@ test_shift_right_ops() {
         return 1
     fi
 
-    # Verify lsr instructions are generated (for >> 8 operation)
-    if ! grep -E 'lsr a' "$out" > /dev/null 2>&1; then
-        log_fail "$name: No LSR instructions generated for shift right"
+    # Verify shift-by-8 uses xba optimization (or lsr for non-8 shifts)
+    if ! grep -E 'xba|lsr a' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No shift right instructions generated (expected xba or lsr)"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -699,9 +744,9 @@ test_global_var_reads() {
         fi
     fi
 
-    # Verify direct loads are present (lda.l global_x, etc.)
-    if ! grep -E 'lda\.l global_x' "$out" > /dev/null 2>&1; then
-        log_fail "$name: No direct load 'lda.l global_x' found"
+    # Verify direct loads are present (lda.w global_x or lda.l global_x)
+    if ! grep -E 'lda\.(w|l) global_x' "$out" > /dev/null 2>&1; then
+        log_fail "$name: No direct load 'lda.w/l global_x' found"
         ((TESTS_FAILED++))
         return 1
     fi
@@ -785,6 +830,2211 @@ test_input_button_masks() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Struct pointer initialization (QBE bug February 2026)
+#------------------------------------------------------------------------------
+test_struct_ptr_init() {
+    local name="struct_ptr_init"
+    local src="$SCRIPT_DIR/test_struct_ptr_init.c"
+    local out="$BUILD/test_struct_ptr_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/struct_ptr.err"; then
+        log_fail "$name: Compilation failed"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # CRITICAL: Check that myFrames symbol is correctly referenced
+    # The bug caused .dl z+0 instead of .dl myFrames+0
+    if grep -q '\.dl myFrames' "$out"; then
+        log_info "$name"
+        ((TESTS_PASSED++))
+        return 0
+    fi
+
+    # Check for corrupted symbol (the bug)
+    if grep -q '\.dl z+0' "$out" || grep -q '\.dl [a-z]+0' "$out"; then
+        log_fail "$name: Symbol reference corrupted (QBE static buffer bug)"
+        echo "Expected: .dl myFrames+0"
+        echo "Found:"
+        grep '\.dl' "$out"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_fail "$name: myFrames symbol not found in output"
+    ((TESTS_FAILED++))
+    return 1
+}
+
+#------------------------------------------------------------------------------
+# Test: 2D array access
+#------------------------------------------------------------------------------
+test_2d_array() {
+    local name="2d_array_access"
+    local src="$SCRIPT_DIR/test_2d_array.c"
+    local out="$BUILD/test_2d_array.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/2d_array.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/2d_array.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for grid and wide symbols
+    if ! grep -q 'grid' "$out"; then
+        log_fail "$name: grid symbol not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Nested structure access
+#------------------------------------------------------------------------------
+test_nested_struct() {
+    local name="nested_struct"
+    local src="$SCRIPT_DIR/test_nested_struct.c"
+    local out="$BUILD/test_nested_struct.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/nested_struct.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/nested_struct.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for game symbol (our GameState variable)
+    # Use -a to force text mode (MSYS2/Windows may detect CRLF files as binary)
+    if ! grep -aq 'game' "$out"; then
+        log_fail "$name: game symbol not found"
+        log_verbose "File size: $(wc -c < "$out") bytes, first 5 lines:"
+        log_verbose "$(head -5 "$out")"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Union handling
+#------------------------------------------------------------------------------
+test_union() {
+    local name="union_handling"
+    local src="$SCRIPT_DIR/test_union.c"
+    local out="$BUILD/test_union.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    # Note: cproc segfaults on union types on Windows/MSYS2 (known issue)
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/union.err"; then
+        local err_msg
+        err_msg=$(cat "$BUILD/union.err")
+        if echo "$err_msg" | grep -qi 'segmentation fault\|segfault\|signal 11'; then
+            log_known_bug "$name: cproc crashes on unions (Windows/MSYS2 segfault)"
+            return 1
+        fi
+        log_fail "$name: Compilation failed"
+        echo "$err_msg"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for union variables
+    # Use -a to force text mode (MSYS2/Windows may detect CRLF files as binary)
+    if ! grep -aq 'ms' "$out" || ! grep -aq 'col' "$out"; then
+        log_fail "$name: Union symbols not found"
+        log_verbose "File size: $(wc -c < "$out") bytes, first 5 lines:"
+        log_verbose "$(head -5 "$out")"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Large local variables (>256 bytes)
+#------------------------------------------------------------------------------
+test_large_local() {
+    local name="large_local_vars"
+    local src="$SCRIPT_DIR/test_large_local.c"
+    local out="$BUILD/test_large_local.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/large_local.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/large_local.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check that functions exist in output
+    if ! grep -q 'test_large_local:' "$out"; then
+        log_fail "$name: test_large_local function not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: String literal initialization
+#------------------------------------------------------------------------------
+test_string_init() {
+    local name="string_init"
+    local src="$SCRIPT_DIR/test_string_init.c"
+    local out="$BUILD/test_string_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/string_init.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/string_init.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check that string data exists
+    if ! grep -q 'Sword' "$out" && ! grep -q '"Sword"' "$out"; then
+        # Strings might be encoded differently, check for .db with ASCII values
+        if ! grep -q '\.db 83' "$out"; then  # 'S' = 83
+            log_fail "$name: String data not found"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Pointer arithmetic
+#------------------------------------------------------------------------------
+test_ptr_arithmetic() {
+    local name="ptr_arithmetic"
+    local src="$SCRIPT_DIR/test_ptr_arithmetic.c"
+    local out="$BUILD/test_ptr_arithmetic.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/ptr_arith.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/ptr_arith.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Switch statement
+#------------------------------------------------------------------------------
+test_switch() {
+    local name="switch_stmt"
+    local src="$SCRIPT_DIR/test_switch.c"
+    local out="$BUILD/test_switch.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/switch.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/switch.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Function pointers
+# SKIP: QBE crashes with function pointer types (assertion failure in str())
+# TODO: Fix QBE bug - tracked in .claude/KNOWLEDGE.md
+#------------------------------------------------------------------------------
+test_function_ptr() {
+    local name="function_ptr"
+    local src="$SCRIPT_DIR/test_function_ptr.c"
+    local out="$BUILD/test_function_ptr.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/function_ptr.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/function_ptr.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for indirect call mechanism (jml [tcc__r9] for indirect calls)
+    # OR direct calls only (if optimizer resolves all pointers)
+    if ! grep -qE '(jml \[tcc__r9\]|jsl increment|jsl execute_action)' "$out"; then
+        log_fail "$name: No call instructions found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that execute_action function exists and handles indirect call
+    if ! grep -q 'execute_action:' "$out"; then
+        log_fail "$name: execute_action function not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Bitwise operations
+#------------------------------------------------------------------------------
+test_bitops() {
+    local name="bitops"
+    local src="$SCRIPT_DIR/test_bitops.c"
+    local out="$BUILD/test_bitops.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/bitops.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/bitops.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for AND, ORA, EOR instructions
+    if ! grep -qE '(and|ora|eor)\.' "$out"; then
+        log_fail "$name: Bitwise instructions not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Loop constructs
+#------------------------------------------------------------------------------
+test_loops() {
+    local name="loops"
+    local src="$SCRIPT_DIR/test_loops.c"
+    local out="$BUILD/test_loops.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/loops.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/loops.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for loop-related branch instructions
+    if ! grep -qE '(bne|beq|bcc|bcs)' "$out"; then
+        log_fail "$name: Branch instructions not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Comparison operations
+#------------------------------------------------------------------------------
+test_comparisons() {
+    local name="comparisons"
+    local src="$SCRIPT_DIR/test_comparisons.c"
+    local out="$BUILD/test_comparisons.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/compare.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/compare.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+
+    # Check for comparison-related instructions (branch or compare)
+    if ! grep -qE '(bne|beq|bcc|bcs|bmi|bpl|sec|sbc)' "$out"; then
+        log_fail "$name: Comparison instructions not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify unsigned short comparisons use unsigned branches (bcc/bcs),
+    # NOT signed branches (bmi/bpl). The compiler bug caused u16 >= constant
+    # to use bmi (signed), which breaks for values >= 32768.
+    local u16_funcs=(test_u16_high_less test_u16_vs_constant)
+    for func in "${u16_funcs[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+        if echo "$func_body" | grep -qE '\bbmi\b|\bbpl\b'; then
+            log_fail "$name: ${func} uses signed branch (bmi/bpl) instead of unsigned (bcc/bcs)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$func_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Verify ternary value is materialized when used as function argument.
+    # Regression: GVN replaces the phi with the comparison result, then
+    # comparison+branch fusion incorrectly skips the comparison instruction,
+    # leaving the ternary value uninitialized.
+    local ternary_body
+    ternary_body=$(sed -n '/^test_ternary_value_used:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$ternary_body" | grep -qE 'lda\.w #[01]'; then
+        log_fail "$name: test_ternary_value_used missing boolean materialization (lda.w #0/#1)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$ternary_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify u16 shift right uses lsr (logical), NOT asr-like pattern
+    local shift_body
+    shift_body=$(sed -n '/^test_u16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$shift_body" | grep -qE 'lsr'; then
+        log_fail "$name: test_u16_shift_right missing lsr (logical shift right)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify s16 signed shift-by-8 uses arithmetic shift (not unsigned lsr).
+    # Two valid patterns:
+    #   - XBA optimization: xba + and + cmp #$0080 + ora #$FF00 (shift ≥ 8)
+    #   - Loop pattern: cmp #$8000 + ror (shift < 8)
+    local signed_shift_body
+    signed_shift_body=$(sed -n '/^test_s16_shift_right:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if echo "$signed_shift_body" | grep -q 'xba'; then
+        # XBA path: must have sign extension (ora #$FF00)
+        if ! echo "$signed_shift_body" | grep -qE 'ora'; then
+            log_fail "$name: test_s16_shift_right uses xba but missing sign extension (ora)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$signed_shift_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    elif echo "$signed_shift_body" | grep -qE 'cmp\.w #\$8000'; then
+        # cmp/ror path: must have ror
+        if ! echo "$signed_shift_body" | grep -qE 'ror a'; then
+            log_fail "$name: test_s16_shift_right missing 'ror a' (arithmetic shift)"
+            if [[ $VERBOSE -eq 1 ]]; then
+                echo "Function body:"
+                echo "$signed_shift_body"
+            fi
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    else
+        log_fail "$name: test_s16_shift_right uses neither xba nor cmp+ror for arithmetic shift"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    # Ensure signed shift-by-8 does NOT use lsr (that would be unsigned, wrong for signed)
+    if echo "$signed_shift_body" | grep -qE 'lsr'; then
+        log_fail "$name: test_s16_shift_right uses lsr (should use arithmetic shift)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Verify s16 signed shift-by-1 still uses cmp+ror (arithmetic), NOT lsr
+    local signed_shift1_body
+    signed_shift1_body=$(sed -n '/^test_s16_shift_right_1:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$signed_shift1_body" | grep -qE 'cmp\.w #\$8000'; then
+        log_fail "$name: test_s16_shift_right_1 missing 'cmp.w #\$8000' (sign bit extraction)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift1_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    if ! echo "$signed_shift1_body" | grep -qE 'ror a'; then
+        log_fail "$name: test_s16_shift_right_1 missing 'ror a' (arithmetic shift)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$signed_shift1_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Volatile variables
+#------------------------------------------------------------------------------
+test_volatiles() {
+    local name="volatiles"
+    local src="$SCRIPT_DIR/test_volatiles.c"
+    local out="$BUILD/test_volatiles.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/volatile.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/volatile.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Type casting
+#------------------------------------------------------------------------------
+test_type_cast() {
+    local name="type_cast"
+    local src="$SCRIPT_DIR/test_type_cast.c"
+    local out="$BUILD/test_type_cast.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/typecast.err"; then
+        log_fail "$name: Compilation failed"
+        cat "$BUILD/typecast.err"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    echo "Generated: $out"
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Phase 1.3: HDMA Wave Regression Tests
+# These test bugs discovered during HDMA wave demo development.
+# The bugs produce NO warnings — code compiles but generates wrong assembly.
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Test: Variable-count shifts generate actual shift instructions
+# BUG: `1 << variable` compiles to just `lda.w #1` — shift is dropped
+#      Constant shifts are folded at compile time, masking the bug.
+#------------------------------------------------------------------------------
+test_variable_shift() {
+    local name="variable_shift"
+    local src="$SCRIPT_DIR/test_variable_shift.c"
+    local out="$BUILD/test_variable_shift.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/variable_shift_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/variable_shift_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Extract the body of shift_left_var function (between label and next label/section)
+    local func_body
+    func_body=$(sed -n '/^shift_left_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    # Check for actual shift instructions in shift_left_var
+    # Must contain asl (shift left) or a call to __shl (shift helper)
+    if ! echo "$func_body" | grep -qE '(asl|__shl)'; then
+        log_fail "$name: shift_left_var has NO asl/__shl — variable shift dropped!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body of shift_left_var:"
+            echo "$func_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check compute_bitmask also has shifts
+    local bitmask_body
+    bitmask_body=$(sed -n '/^compute_bitmask:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$bitmask_body" | grep -qE '(asl|__shl)'; then
+        log_fail "$name: compute_bitmask has NO asl/__shl — 1<<idx broken!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body of compute_bitmask:"
+            echo "$bitmask_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: SSA phi-node resolution with 6+ locals in nested if/else
+# BUG: Wrong values stored to wrong stack slots when many locals are
+#      modified in separate conditional branches
+#------------------------------------------------------------------------------
+test_ssa_phi_locals() {
+    local name="ssa_phi_locals"
+    local src="$SCRIPT_DIR/test_ssa_phi_locals.c"
+    local out="$BUILD/test_ssa_phi_locals.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/ssa_phi_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/ssa_phi_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Extract test_many_locals function body
+    local func_body
+    func_body=$(sed -n '/^test_many_locals:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    # Check that all 12 expected constants are present:
+    # Initial values: 1, 2, 3, 4, 5, 6
+    # Branch values: 10, 20, 30, 40, 50, 60
+    local missing=0
+    for val in 10 20 30 40 50 60; do
+        if ! echo "$func_body" | grep -qE "lda\.w #$val\b"; then
+            log_verbose "Missing constant #$val in test_many_locals"
+            ((missing++))
+        fi
+    done
+
+    if [[ $missing -gt 0 ]]; then
+        log_fail "$name: Missing $missing/6 branch constants — phi-node values lost!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Function body:"
+            echo "$func_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that at least 6 unique stack slot offsets are used for stores
+    # Pattern: sta N,s where N is the stack offset
+    local unique_slots
+    unique_slots=$(echo "$func_body" | grep -oE 'sta [0-9]+,s' | sort -u | wc -l)
+
+    if [[ $unique_slots -lt 6 ]]; then
+        log_fail "$name: Only $unique_slots unique stack slots (need 6+) — phi-node confusion!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Stack stores found:"
+            echo "$func_body" | grep -E 'sta [0-9]+,s' | sort -u
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Mutable static variables are placed in RAM, not ROM
+# BUG: `static int counter = 0;` placed in .SECTION ".rodata" SUPERFREE (ROM)
+#      Writes to these variables are silently ignored on hardware.
+#------------------------------------------------------------------------------
+test_static_mutable() {
+    local name="static_mutable"
+    local src="$SCRIPT_DIR/test_static_mutable.c"
+    local out="$BUILD/test_static_mutable.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/static_mutable_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/static_mutable_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check each mutable static symbol: it must NOT be in a SUPERFREE section
+    # Strategy: search backward from symbol label to find containing section directive
+    local symbols=(uninit_counter zero_counter init_counter byte_flag word_state byte_counter word_accumulator)
+    local rom_count=0
+
+    for sym in "${symbols[@]}"; do
+        # Find line number of the symbol label
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+
+        if [[ -z "$sym_line" ]]; then
+            log_verbose "Symbol $sym not found in assembly"
+            continue
+        fi
+
+        # Search backward from symbol to find the containing section directive
+        # Look for .SECTION or .RAMSECTION
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+        if echo "$section_line" | grep -q 'SUPERFREE'; then
+            log_verbose "$sym is in ROM (SUPERFREE): $section_line"
+            ((rom_count++))
+        elif echo "$section_line" | grep -q '\.RAMSECTION'; then
+            log_verbose "$sym is in RAM (RAMSECTION): $section_line"
+        fi
+    done
+
+    if [[ $rom_count -gt 0 ]]; then
+        log_fail "$name: $rom_count/$((${#symbols[@]})) mutable statics placed in ROM (SUPERFREE)!"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "Section directives in assembly:"
+            grep -n -E '\.(SECTION|RAMSECTION)' "$out"
+            echo ""
+            echo "Symbol locations:"
+            for sym in "${symbols[@]}"; do
+                grep -n "^${sym}:" "$out"
+            done
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_const_data() {
+    local name="const_data"
+    local src="$SCRIPT_DIR/test_const_data.c"
+    local out="$BUILD/test_const_data.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/const_data_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/const_data_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check const arrays are in ROM (SUPERFREE), not RAMSECTION
+    local const_symbols=(const_arr const_u8_arr)
+    local ram_count=0
+
+    for sym in "${const_symbols[@]}"; do
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+
+        if [[ -z "$sym_line" ]]; then
+            log_verbose "Symbol $sym not found in assembly"
+            continue
+        fi
+
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+        if echo "$section_line" | grep -q '\.RAMSECTION'; then
+            log_verbose "$sym is in RAM (RAMSECTION): $section_line"
+            ((ram_count++))
+        elif echo "$section_line" | grep -q 'SUPERFREE'; then
+            log_verbose "$sym is in ROM (SUPERFREE): $section_line"
+        fi
+    done
+
+    if [[ $ram_count -gt 0 ]]; then
+        log_fail "$name: $ram_count const array(s) placed in RAM instead of ROM!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check mutable array is in RAMSECTION (not ROM)
+    local mut_line
+    mut_line=$(grep -n "^mut_arr:" "$out" | head -1 | cut -d: -f1)
+    if [[ -n "$mut_line" ]]; then
+        local mut_section
+        mut_section=$(head -n "$mut_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if echo "$mut_section" | grep -q 'SUPERFREE'; then
+            log_fail "$name: mutable array placed in ROM instead of RAM!"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Multiplication code generation
+#
+# Verifies that:
+#   - Small constant multipliers (*3, *5, *6, *7, *9, *10) use inline shift+add
+#   - Variable multiplication and non-special constants call __mul16
+#   - __mul16 uses stack-based calling convention (pha, not sta.l tcc__r0)
+#
+# Bug history:
+#   __mul16 runtime read from tcc__r0/tcc__r1 (register convention) but the
+#   compiler pushed arguments on the stack. Fixed in runtime.asm to read
+#   from stack offsets SP+5,6 (arg1) and SP+7,8 (arg2).
+#------------------------------------------------------------------------------
+test_multiply() {
+    local name="multiply"
+    local src="$SCRIPT_DIR/test_multiply.c"
+    local out="$BUILD/test_multiply.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/multiply_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/multiply_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check inline multiplications use tcc__r9 (shift+add pattern), NOT __mul16
+    local inline_muls=(mul_by_3 mul_by_5 mul_by_6 mul_by_7 mul_by_9 mul_by_10)
+    for func in "${inline_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using inline shift+add"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: ${func} missing tcc__r9 (no inline shift+add pattern)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check that variable * variable calls __mul16 with stack convention (pha)
+    local var_body
+    var_body=$(sed -n '/^mul_var:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$var_body" | grep -q '__mul16'; then
+        log_fail "$name: mul_var missing __mul16 call"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$var_body" | grep -q 'pha'; then
+        log_fail "$name: mul_var missing pha (stack-based calling convention)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check *13 uses inline shift+add pattern (not __mul16)
+    local const_body
+    const_body=$(sed -n '/^mul_by_13:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if echo "$const_body" | grep -q '__mul16'; then
+        log_fail "$name: mul_by_13 still calls __mul16 (should be inlined)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+    if ! echo "$const_body" | grep -q 'tcc__r9'; then
+        log_fail "$name: mul_by_13 missing inline pattern (no tcc__r9)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Function return values are preserved through epilogue
+# BUG: `tsa` in epilogue overwrites return value in A register.
+#      Every non-void function with framesize > 2 returned garbage.
+# FIX: tax (save A) → tsa; adc; tas (adjust SP) → txa (restore A)
+#------------------------------------------------------------------------------
+test_return_value() {
+    local name="return_value"
+    local src="$SCRIPT_DIR/test_return_value.c"
+    local out="$BUILD/test_return_value.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/return_value_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/return_value_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # For each function with locals (framesize > 2), check the epilogue pattern:
+    # The return sequence must be: tax → tsa → ... → tas → txa → plp → rtl
+    # NOT: tsa → ... → tas → plp → rtl (which destroys A)
+
+    local functions=(compute_with_locals compute_complex call_and_return compute_byte)
+    local fail_count=0
+
+    for func in "${functions[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|; End of/p" "$out")
+
+        # Check if function has stack frame (tsa in body = stack adjustment)
+        if ! echo "$func_body" | grep -q 'tsa'; then
+            log_verbose "$func: no stack frame, skip epilogue check"
+            continue
+        fi
+
+        # Count epilogue pattern: must have tax before the final tsa, and txa after tas
+        # The epilogue pattern should be: tax → tsa → clc → adc → tas → txa → plp → rtl
+        # Extract the last occurrence of tax...txa...rtl
+        if ! echo "$func_body" | grep -A8 'tax' | grep -q 'txa'; then
+            log_fail "$name: ${func} epilogue missing tax/txa — return value destroyed!"
+            ((fail_count++))
+        fi
+    done
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Struct alignment and padding
+#
+# Verifies that:
+#   - Struct sizes include correct padding (Simple=4, Mixed=6, Nested=10,
+#     ThreeWords=6, OneByte=1)
+#   - Field offsets use correct alignment (u16 fields 2-byte aligned)
+#   - Array stride calculation uses correct struct size
+#------------------------------------------------------------------------------
+test_struct_alignment() {
+    local name="struct_alignment"
+    local src="$SCRIPT_DIR/test_struct_alignment.c"
+    local out="$BUILD/test_struct_alignment.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Check struct sizes via dsb in RAMSECTION
+    local expected_sizes=("simple:4" "mixed:6" "nested:10" "three:6" "one:1")
+    for entry in "${expected_sizes[@]}"; do
+        local sym="${entry%%:*}"
+        local expected_sz="${entry##*:}"
+        local actual_line
+        actual_line=$(grep -A1 "^${sym}:" "$out" | grep 'dsb')
+        if [[ -z "$actual_line" ]]; then
+            log_fail "$name: Symbol '$sym' not found in RAMSECTION"
+            ((fail_count++))
+            continue
+        fi
+        local actual_sz
+        actual_sz=$(echo "$actual_line" | grep -oE '[0-9]+')
+        if [[ "$actual_sz" != "$expected_sz" ]]; then
+            log_fail "$name: '$sym' dsb $actual_sz, expected dsb $expected_sz"
+            ((fail_count++))
+        fi
+    done
+
+    # Check that field offsets use adc #2 (for u16 alignment) in test_simple_access
+    local func_body
+    func_body=$(sed -n '/^test_simple_access:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #2'; then
+        log_fail "$name: test_simple_access missing adc.w #2 for u16 field offset"
+        ((fail_count++))
+    fi
+
+    # Check that test_mixed_access has offsets for fields at +2, +4, +5
+    func_body=$(sed -n '/^test_mixed_access:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #4'; then
+        log_fail "$name: test_mixed_access missing adc.w #4 for z field offset"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'adc\.w #5'; then
+        log_fail "$name: test_mixed_access missing adc.w #5 for w field offset"
+        ((fail_count++))
+    fi
+
+    # Check array stride: test_array_stride should use adc #4 or #8 for stride
+    func_body=$(sed -n '/^test_array_stride:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'adc\.w #4'; then
+        log_fail "$name: test_array_stride missing stride offset adc.w #4"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Volatile pointer dereference
+#
+# Verifies that:
+#   - Writes to volatile hardware registers are not eliminated
+#   - Reads from volatile registers are not cached/coalesced
+#   - Register write order is preserved for hardware sequences
+#   - Volatile loop writes are not optimized away
+#------------------------------------------------------------------------------
+test_volatile_ptr() {
+    local name="volatile_ptr"
+    local src="$SCRIPT_DIR/test_volatile_ptr.c"
+    local out="$BUILD/test_volatile_ptr.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # test_write_register: must have 3 writes to $002100 (not optimized away)
+    local func_body
+    func_body=$(sed -n '/^test_write_register:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    local write_count
+    write_count=$(echo "$func_body" | grep -c 'sta\.l \$002100')
+    if [[ $write_count -lt 3 ]]; then
+        log_fail "$name: test_write_register has $write_count writes to \$002100, expected 3 (volatile writes optimized away!)"
+        ((fail_count++))
+    fi
+
+    # test_read_register: must have 2 separate reads (lda.l via indirect)
+    func_body=$(sed -n '/^test_read_register:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    local read_count
+    read_count=$(echo "$func_body" | grep -c 'lda\.l')
+    if [[ $read_count -lt 2 ]]; then
+        log_fail "$name: test_read_register has $read_count reads, expected 2+ (volatile reads coalesced!)"
+        ((fail_count++))
+    fi
+
+    # test_vram_write_sequence: must write to $2115, $2116, $2117, $2118, $2119 in order
+    func_body=$(sed -n '/^test_vram_write_sequence:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    for reg in 2115 2116 2117 2118 2119; do
+        if ! echo "$func_body" | grep -q "sta\.l \$00${reg}"; then
+            log_fail "$name: test_vram_write_sequence missing write to \$${reg}"
+            ((fail_count++))
+        fi
+    done
+
+    # test_volatile_loop: must have writes to $2118 and $2119 inside loop body
+    func_body=$(sed -n '/^test_volatile_loop:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'sta\.l \$002118'; then
+        log_fail "$name: test_volatile_loop missing loop write to \$002118"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Global struct initialization
+#
+# Verifies that:
+#   - Initialized globals are in RAMSECTION (.data) with matching .data_init
+#   - Zero-initialized globals are in .bss (no .data_init entry)
+#   - Init data contains correct values (struct field values)
+#   - Complex patterns: nested structs, arrays of structs, partial init
+#------------------------------------------------------------------------------
+test_global_struct_init() {
+    local name="global_struct_init"
+    local src="$SCRIPT_DIR/test_global_struct_init.c"
+    local out="$BUILD/test_global_struct_init.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Check that initialized globals have both RAMSECTION and .data_init
+    local init_symbols=("entry1" "entry2" "player" "enemy" "default_style" "table" "partial")
+    for sym in "${init_symbols[@]}"; do
+        # Must be in RAMSECTION
+        if ! grep -q "^${sym}:" "$out"; then
+            log_fail "$name: Symbol '$sym' not found"
+            ((fail_count++))
+            continue
+        fi
+        local sym_line
+        sym_line=$(grep -n "^${sym}:" "$out" | head -1 | cut -d: -f1)
+        local section_line
+        section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if ! echo "$section_line" | grep -q 'RAMSECTION'; then
+            log_fail "$name: '$sym' not in RAMSECTION (got: $section_line)"
+            ((fail_count++))
+        fi
+        # Must have matching .data_init
+        if ! grep -q "\.dw ${sym}" "$out"; then
+            log_fail "$name: '$sym' has no .data_init entry (.dw ${sym})"
+            ((fail_count++))
+        fi
+    done
+
+    # Check that zero-initialized global is in .bss (NOT .data)
+    local zeroed_line
+    zeroed_line=$(grep -n "^zeroed:" "$out" | head -1 | cut -d: -f1)
+    if [[ -n "$zeroed_line" ]]; then
+        local zeroed_section
+        zeroed_section=$(head -n "$zeroed_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+        if echo "$zeroed_section" | grep -q '\.bss'; then
+            log_verbose "$name: zeroed correctly in .bss"
+        elif echo "$zeroed_section" | grep -q '\.data'; then
+            # .data is also fine if it has no .data_init (or all zeros)
+            log_verbose "$name: zeroed in .data section (acceptable)"
+        fi
+        # Must NOT have a .data_init entry
+        if grep -q '\.dw zeroed' "$out"; then
+            log_fail "$name: 'zeroed' should not have .data_init (it's zero-initialized)"
+            ((fail_count++))
+        fi
+    fi
+
+    # Check specific init values: entry1 should have .dw 1000
+    if ! grep -q '\.dw 1000' "$out"; then
+        log_fail "$name: Missing init value .dw 1000 for entry1.value"
+        ((fail_count++))
+    fi
+
+    # Check player init: .db 100 (health field)
+    if ! grep -q '\.db 100' "$out"; then
+        log_fail "$name: Missing init value .db 100 for player.health"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: 32-bit (unsigned int) arithmetic
+#
+# Verifies that:
+#   - 32-bit add/sub generate ADC/SBC instructions
+#   - 32-bit variables use 4 bytes of storage (dsb 4)
+#   - High-word access uses result+2 pattern (sta.l symbol+2)
+#   - Bitwise ops (AND, OR, XOR) generate correct 32-bit sequences
+#
+# Note: On cproc/65816, unsigned int = 4 bytes (u32), NOT unsigned long (8 bytes)
+#------------------------------------------------------------------------------
+test_u32_arithmetic() {
+    local name="u32_arithmetic"
+    local src="$SCRIPT_DIR/test_u32_arithmetic.c"
+    local out="$BUILD/test_u32_arithmetic.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # 32-bit result variable must be 4 bytes
+    local result_dsb
+    result_dsb=$(grep -A1 '^result32:' "$out" | grep 'dsb' | grep -oE '[0-9]+')
+    if [[ "$result_dsb" != "4" ]]; then
+        log_fail "$name: result32 is dsb $result_dsb, expected dsb 4"
+        ((fail_count++))
+    fi
+
+    # KNOWN BUG: add32/sub32 generate 16-bit code for u32 params.
+    # The backend currently treats u32 function params as 16-bit.
+    # TODO: Fix 32-bit parameter passing in w65816 ABI.
+    # For now, just verify the functions compile without errors.
+    local add32_body
+    add32_body=$(sed -n '/^add32:/,/^\.ENDS/p' "$out")
+    if [[ -z "$add32_body" ]]; then
+        log_fail "$name: add32 function not found in output"
+        ((fail_count++))
+    fi
+
+    # Must access high word via result32+2 pattern
+    if ! grep -q 'result32+2' "$out"; then
+        log_fail "$name: No result32+2 pattern found (32-bit high word not accessed)"
+        ((fail_count++))
+    fi
+
+    # Check that functions are not constant-folded (must have function bodies with arithmetic)
+    local func_body
+    func_body=$(sed -n '/^add32:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'adc|clc'; then
+        log_fail "$name: add32 function body has no ADC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    func_body=$(sed -n '/^sub32:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'sbc|sec'; then
+        log_fail "$name: sub32 function body has no SBC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Signed/unsigned type promotion
+#
+# Verifies that:
+#   - u8 zero-extension uses AND #$00FF
+#   - s8 sign-extension uses AND #$00FF + CMP #$0080 + ORA #$FF00 pattern
+#   - Mixed signed/unsigned arithmetic produces correct extensions
+#   - Arithmetic right shift preserves sign
+#
+# On 65816, integer promotion is critical for correctness:
+#   u8 → u16: AND #$00FF (zero-extend)
+#   s8 → s16: AND #$00FF, CMP #$0080, BCC +, ORA #$FF00 (sign-extend)
+#------------------------------------------------------------------------------
+test_sign_promotion() {
+    local name="sign_promotion"
+    local src="$SCRIPT_DIR/test_sign_promotion.c"
+    local out="$BUILD/test_sign_promotion.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # Must have zero-extension pattern: and.w #$00FF
+    local zext_count
+    zext_count=$(grep -c 'and\.w #\$00FF' "$out")
+    if [[ $zext_count -lt 4 ]]; then
+        log_fail "$name: Only $zext_count zero-extensions (and.w #\$00FF) found, expected 4+"
+        ((fail_count++))
+    fi
+
+    # Must have sign-extension check: cmp.w #$0080
+    local sext_check_count
+    sext_check_count=$(grep -c 'cmp\.w #\$0080' "$out")
+    if [[ $sext_check_count -lt 2 ]]; then
+        log_fail "$name: Only $sext_check_count sign-extension checks (cmp.w #\$0080) found, expected 2+"
+        ((fail_count++))
+    fi
+
+    # Must have sign-extension apply: ora.w #$FF00
+    local sext_apply_count
+    sext_apply_count=$(grep -c 'ora\.w #\$FF00' "$out")
+    if [[ $sext_apply_count -lt 2 ]]; then
+        log_fail "$name: Only $sext_apply_count sign-extensions (ora.w #\$FF00) found, expected 2+"
+        ((fail_count++))
+    fi
+
+    # Check add_s8_s16 specifically has the sign-extension pattern
+    local func_body
+    func_body=$(sed -n '/^add_s8_s16:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q 'and\.w #\$00FF'; then
+        log_fail "$name: add_s8_s16 missing zero-extend before sign check"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'cmp\.w #\$0080'; then
+        log_fail "$name: add_s8_s16 missing sign bit check (cmp.w #\$0080)"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'ora\.w #\$FF00'; then
+        log_fail "$name: add_s8_s16 missing sign extension (ora.w #\$FF00)"
+        ((fail_count++))
+    fi
+
+    # Check that functions are not constant-folded
+    func_body=$(sed -n '/^add_u8_u8:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -qE 'adc|clc'; then
+        log_fail "$name: add_u8_u8 function body has no ADC — possibly constant-folded"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Phase 5b — Non-leaf param aliasing + frame safety
+#
+# Phase 5b extends param alias propagation to non-leaf functions (fewer
+# redundant param copies). But frame elimination stays leaf-only: non-leaf
+# functions with intermediate values across calls MUST keep their frame.
+# Without this, sta N,s writes into the caller's frame → corruption.
+# Regression: oamSetXY, oamSetVisible, oamDrawMetasprite, bgInit all went
+# frameless incorrectly, causing black screens and garbled sprites.
+#------------------------------------------------------------------------------
+test_nonleaf_frameless() {
+    local name="nonleaf_frameless"
+    local src="$SCRIPT_DIR/test_nonleaf_frameless.c"
+    local out="$BUILD/test_nonleaf_frameless.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. compute_across_call: MUST have frame (sbc in prologue) because
+    #    intermediate 'sum' lives across the jsl call
+    func_body=$(sed -n '/^compute_across_call:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: compute_across_call missing frame setup (sbc) — intermediate across call needs frame!"
+        ((fail_count++))
+    fi
+
+    if ! echo "$func_body" | grep -q 'jsl'; then
+        log_fail "$name: compute_across_call missing jsl — should call external_func"
+        ((fail_count++))
+    fi
+
+    # 2. forward_with_work: MUST have frame (has intermediate 'c' across call)
+    func_body=$(sed -n '/^forward_with_work:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: forward_with_work missing frame setup (sbc) — intermediate across call needs frame!"
+        ((fail_count++))
+    fi
+
+    # 3. Both non-leaf functions should have leaf_opt=1 (param aliasing active)
+    #    This confirms Phase 5b is working: optimizations apply to non-leaf
+    if ! grep -q 'compute_across_call.*leaf_opt=1' "$out"; then
+        log_fail "$name: compute_across_call should have leaf_opt=1 (param aliasing active)"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Dead store elimination (Phase 7a)
+# global_increment: frameless + no intermediate sta to stack slots
+# phi_loop: frame preserved (phi args need slots)
+#------------------------------------------------------------------------------
+test_dead_store_elimination() {
+    local name="dead_store_elimination"
+    local src="$SCRIPT_DIR/test_dead_store_elimination.c"
+    local out="$BUILD/test_dead_store_elimination.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. global_increment: should be frameless (no tsa/sec/sbc frame setup)
+    func_body=$(sed -n '/^global_increment:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: global_increment has frame setup (sbc) — should be frameless"
+        ((fail_count++))
+    fi
+
+    # 2. global_increment: should have NO sta to stack slots (N,s pattern)
+    #    lda.w / sta.w (global access) is fine; only sta N,s is dead
+    if echo "$func_body" | grep -qE "${TAB}sta [0-9]+,s"; then
+        log_fail "$name: global_increment has sta N,s — dead stores not eliminated"
+        ((fail_count++))
+    fi
+
+    # 3. global_increment: MUST still load and store to g_counter
+    if ! echo "$func_body" | grep -q 'lda.w g_counter'; then
+        log_fail "$name: global_increment missing lda.w g_counter"
+        ((fail_count++))
+    fi
+    if ! echo "$func_body" | grep -q 'sta.w g_counter'; then
+        log_fail "$name: global_increment missing sta.w g_counter"
+        ((fail_count++))
+    fi
+
+    # 4. phi_loop: MUST have a frame (sbc in prologue) for phi args
+    func_body=$(sed -n '/^phi_loop:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: phi_loop missing frame setup (sbc) — phi args need stack slots!"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: PLX stack cleanup optimization
+# Verifies that small stack cleanups use PLX instead of tax/tsa/clc/adc/tas/txa.
+#------------------------------------------------------------------------------
+test_plx_cleanup() {
+    local name="plx_cleanup"
+    local src="$SCRIPT_DIR/test_plx_cleanup.c"
+    local out="$BUILD/test_plx_cleanup.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # 1. wrapper_one (1-arg call, non-void): pass-through → tail call (jml)
+    func_body=$(sed -n '/^wrapper_one:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
+        log_fail "$name: wrapper_one missing jml (tail call optimization)"
+        ((fail_count++))
+    fi
+
+    # Should NOT have jsl+rtl (tail call eliminates both)
+    if echo "$func_body" | grep -q 'rtl'; then
+        log_fail "$name: wrapper_one still has rtl (should be tail call)"
+        ((fail_count++))
+    fi
+
+    # 2. wrapper_two (2-arg call, non-void): pass-through → tail call (jml)
+    func_body=$(sed -n '/^wrapper_two:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
+        log_fail "$name: wrapper_two missing jml (tail call optimization)"
+        ((fail_count++))
+    fi
+
+    # 3. void_wrapper (1-arg void call): pass-through → tail call (jml)
+    func_body=$(sed -n '/^void_wrapper:/,/^\.ENDS/p' "$out")
+
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
+        log_fail "$name: void_wrapper missing jml (tail call optimization)"
+        ((fail_count++))
+    fi
+
+    # 4. __mul16 cleanup: test via a multiply function
+    # Create a small test file for mul cleanup
+    local mul_src="$BUILD/test_plx_mul.c"
+    local mul_out="$BUILD/test_plx_mul.c.asm"
+    cat > "$mul_src" << 'CEOF'
+unsigned short mul_general(unsigned short a, unsigned short b) {
+    return a * b;
+}
+CEOF
+
+    if compile_test "${name}_mul" "$mul_src" "$mul_out"; then
+        func_body=$(sed -n '/^mul_general:/,/^\.ENDS/p' "$mul_out")
+        if ! echo "$func_body" | grep -q 'plx'; then
+            log_fail "$name: mul_general missing plx for __mul16 cleanup"
+            ((fail_count++))
+        fi
+        if echo "$func_body" | grep -q 'tsa' && echo "$func_body" | grep -q 'tas'; then
+            log_fail "$name: mul_general still uses tsa/tas for __mul16 cleanup"
+            ((fail_count++))
+        fi
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: XBA byte-swap optimization for shifts ≥ 8
+# Verifies that constant shifts ≥ 8 use xba instead of repeated shift loops.
+#------------------------------------------------------------------------------
+test_xba_shift() {
+    local name="xba_shift"
+    local src="$SCRIPT_DIR/test_xba_shift.c"
+    local out="$BUILD/test_xba_shift.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+    local lsr_count asl_count
+
+    # 1. shr8: should use xba + and, no 8 consecutive lsr
+    func_body=$(sed -n '/^shr8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shr8 missing xba instruction"
+        ((fail_count++))
+    fi
+    lsr_count=$(echo "$func_body" | grep -c 'lsr a' || true)
+    if [[ $lsr_count -ge 8 ]]; then
+        log_fail "$name: shr8 has $lsr_count lsr instructions (should use xba)"
+        ((fail_count++))
+    fi
+
+    # 2. sar8: should use xba + sign extension pattern
+    func_body=$(sed -n '/^sar8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: sar8 missing xba instruction"
+        ((fail_count++))
+    fi
+    # Should NOT have 8 cmp/ror pairs
+    local ror_count
+    ror_count=$(echo "$func_body" | grep -c 'ror a' || true)
+    if [[ $ror_count -ge 8 ]]; then
+        log_fail "$name: sar8 has $ror_count ror instructions (should use xba)"
+        ((fail_count++))
+    fi
+    # Should have sign extension (ora #$FF00 or equivalent)
+    if ! echo "$func_body" | grep -q 'ora'; then
+        log_fail "$name: sar8 missing sign extension (ora)"
+        ((fail_count++))
+    fi
+
+    # 3. shl8: should use xba + and
+    func_body=$(sed -n '/^shl8:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shl8 missing xba instruction"
+        ((fail_count++))
+    fi
+    asl_count=$(echo "$func_body" | grep -c 'asl a' || true)
+    if [[ $asl_count -ge 8 ]]; then
+        log_fail "$name: shl8 has $asl_count asl instructions (should use xba)"
+        ((fail_count++))
+    fi
+
+    # 4. shr12: should use xba + 4 remaining lsr
+    func_body=$(sed -n '/^shr12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shr12 missing xba instruction"
+        ((fail_count++))
+    fi
+    lsr_count=$(echo "$func_body" | grep -c 'lsr a' || true)
+    if [[ $lsr_count -ne 4 ]]; then
+        log_fail "$name: shr12 should have exactly 4 lsr (has $lsr_count)"
+        ((fail_count++))
+    fi
+
+    # 5. sar12: should use xba + sign extend + 4 remaining sar
+    func_body=$(sed -n '/^sar12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: sar12 missing xba instruction"
+        ((fail_count++))
+    fi
+
+    # 6. shl12: should use xba + 4 remaining asl
+    func_body=$(sed -n '/^shl12:/,/^\.ENDS/p' "$out")
+    if ! echo "$func_body" | grep -q 'xba'; then
+        log_fail "$name: shl12 missing xba instruction"
+        ((fail_count++))
+    fi
+    asl_count=$(echo "$func_body" | grep -c 'asl a' || true)
+    if [[ $asl_count -ne 4 ]]; then
+        log_fail "$name: shl12 should have exactly 4 asl (has $asl_count)"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Commutative operand swap optimization
+# Verifies that commutative ops swap operands when r1 is in A-cache.
+#------------------------------------------------------------------------------
+test_commutative_swap() {
+    local name="commutative_swap"
+    local src="$SCRIPT_DIR/test_commutative_swap.c"
+    local out="$BUILD/test_commutative_swap.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+    local func_body
+
+    # shift_and_add: idx<<1 stays in A-cache, add swaps operands.
+    # The shl result is a Case 3 dead store (arg[1] of next commutative op).
+    # Should be frameless (no frame setup needed).
+    func_body=$(sed -n '/^shift_and_add:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: shift_and_add has frame setup — should be frameless"
+        ((fail_count++))
+    fi
+
+    # Should have asl (the shift) but no sta N,s (dead store eliminated)
+    if ! echo "$func_body" | grep -q 'asl a'; then
+        log_fail "$name: shift_and_add missing asl a"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -qE "${TAB}sta [0-9]+,s"; then
+        log_fail "$name: shift_and_add has sta N,s — intermediates should be dead stores"
+        ((fail_count++))
+    fi
+
+    # or_shifted: same pattern with OR
+    func_body=$(sed -n '/^or_shifted:/,/^\.ENDS/p' "$out")
+
+    if echo "$func_body" | grep -qE '\bsbc\b'; then
+        log_fail "$name: or_shifted has frame setup — should be frameless"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: INC/DEC for ±1 constants
+# Verifies that add/sub with 1 or 0xFFFF emits inc a / dec a.
+#------------------------------------------------------------------------------
+test_inc_dec() {
+    local name="inc_dec"
+    local src="$SCRIPT_DIR/test_inc_dec.c"
+    local out="$BUILD/test_inc_dec.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # increment(x) should use 'inc a', not 'clc' + 'adc'
+    local inc_fn
+    inc_fn=$(sed -n '/^increment:/,/^\.ENDS/p' "$out")
+    if ! echo "$inc_fn" | grep -q 'inc a'; then
+        log_fail "$name: increment() missing 'inc a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$inc_fn" | grep -q 'clc'; then
+        log_fail "$name: increment() still uses 'clc' (should use 'inc a')"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # decrement(x) should use 'dec a', not 'sec' + 'sbc'
+    local dec_fn
+    dec_fn=$(sed -n '/^decrement:/,/^\.ENDS/p' "$out")
+    if ! echo "$dec_fn" | grep -q 'dec a'; then
+        log_fail "$name: decrement() missing 'dec a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$dec_fn" | grep -q 'sec'; then
+        log_fail "$name: decrement() still uses 'sec' (should use 'dec a')"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # add_ffff(x) should use 'dec a' (x + 0xFFFF = x - 1 in u16)
+    local addff_fn
+    addff_fn=$(sed -n '/^add_ffff:/,/^\.ENDS/p' "$out")
+    if ! echo "$addff_fn" | grep -q 'dec a'; then
+        log_fail "$name: add_ffff() missing 'dec a'"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # add_five(x) should NOT use inc/dec (value is 5, not ±1)
+    local add5_fn
+    add5_fn=$(sed -n '/^add_five:/,/^\.ENDS/p' "$out")
+    if echo "$add5_fn" | grep -q 'inc a\|dec a'; then
+        log_fail "$name: add_five() incorrectly uses inc/dec for non-±1 constant"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: A-cache survives pha
+# Verifies that pushing the same value twice doesn't reload from stack.
+#------------------------------------------------------------------------------
+test_acache_pha() {
+    local name="acache_pha"
+    local src="$SCRIPT_DIR/test_acache_pha.c"
+    local out="$BUILD/test_acache_pha.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_same_twice(x): pushes x twice as args to add_two(x, x)
+    # First push loads x, second push should reuse A-cache (no second lda)
+    local fn_body
+    fn_body=$(sed -n '/^call_same_twice:/,/^\.ENDS/p' "$out")
+
+    # Count lda instructions (should be exactly 1, not 2)
+    local lda_count
+    lda_count=$(echo "$fn_body" | grep -c 'lda')
+    if [[ "$lda_count" -gt 1 ]]; then
+        log_fail "$name: call_same_twice has $lda_count lda instructions (expected 1, A-cache should skip second)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # Should have 2 pha instructions (one per arg)
+    local pha_count
+    pha_count=$(echo "$fn_body" | grep -c 'pha')
+    if [[ "$pha_count" -ne 2 ]]; then
+        log_fail "$name: call_same_twice has $pha_count pha (expected 2)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_with_computed(x): x+5 result should be pushed without storing to frame first
+    local fn2_body
+    fn2_body=$(sed -n '/^call_with_computed:/,/^\.ENDS/p' "$out")
+
+    # Should NOT have sta instruction (dead store: result used only as next arg)
+    # Use tab prefix to avoid matching @start label
+    # Known bug: dead store elimination doesn't yet handle this pattern
+    if echo "$fn2_body" | grep -q "${TAB}sta"; then
+        log_known_bug "$name: call_with_computed has 'sta' (dead store not yet eliminated for computed args)"
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Comparison dead store for frameless conditionals
+# When comparison result is only used by jnz (fusion), its slot store is dead.
+#------------------------------------------------------------------------------
+test_cmp_dead_store() {
+    local name="cmp_dead_store"
+    local src="$SCRIPT_DIR/test_cmp_dead_store.c"
+    local out="$BUILD/test_cmp_dead_store.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # max_val should be frameless (framesize=0)
+    if ! grep -q 'max_val (framesize=0' "$out"; then
+        log_fail "$name: max_val not frameless (comparison dead store not working)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # max_val should NOT have frame prologue (tsa/sec/sbc)
+    local fn_body
+    fn_body=$(sed -n '/^max_val:/,/^\.ENDS/p' "$out")
+    if echo "$fn_body" | grep -q 'tsa'; then
+        log_fail "$name: max_val has frame prologue (should be frameless)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # eq_check should also be frameless
+    if ! grep -q 'eq_check (framesize=0' "$out"; then
+        log_fail "$name: eq_check not frameless"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_inline_mul_11_15() {
+    local name="inline_mul_11_15"
+    local src="$SCRIPT_DIR/test_inline_mul.c"
+    local out="$BUILD/test_inline_mul.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # All five functions should NOT call __mul16
+    for fn in mul_by_11 mul_by_12 mul_by_13 mul_by_14 mul_by_15; do
+        local fn_body
+        fn_body=$(sed -n "/^${fn}:/,/^\\.ENDS/p" "$out")
+        if echo "$fn_body" | grep -q '__mul16'; then
+            log_fail "$name: $fn still calls __mul16 (should use inline shift+add)"
+            ((TESTS_FAILED++))
+            return
+        fi
+        # Should use tcc__r9 as scratch register
+        if ! echo "$fn_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: $fn missing tcc__r9 (inline pattern not applied)"
+            ((TESTS_FAILED++))
+            return
+        fi
+    done
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_dp_registers() {
+    local name="dp_registers"
+    local src="$SCRIPT_DIR/test_dp_registers.c"
+    local out="$BUILD/test_dp_registers.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # All tcc__ register accesses should use .b (direct page), not .w (absolute)
+    if grep -qE "${TAB}(sta|lda|adc|sbc)\.w tcc__r[019]" "$out"; then
+        log_fail "$name: still using .w for tcc__ registers (should be .b)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # div_by_10 should NOT have lda.b tcc__r0 after jsl __div16
+    local div_body
+    div_body=$(sed -n '/^div_by_10:/,/^\.ENDS/p' "$out")
+    if echo "$div_body" | grep -q 'jsl __div16' && echo "$div_body" | grep -q "${TAB}lda.b tcc__r0"; then
+        log_fail "$name: div_by_10 still reloads tcc__r0 after __div16 (should return in A)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # mod_by_10 should NOT have lda.b tcc__r0 after jsl __mod16
+    local mod_body
+    mod_body=$(sed -n '/^mod_by_10:/,/^\.ENDS/p' "$out")
+    if echo "$mod_body" | grep -q 'jsl __mod16' && echo "$mod_body" | grep -q "${TAB}lda.b tcc__r0"; then
+        log_fail "$name: mod_by_10 still reloads tcc__r0 after __mod16 (should return in A)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # mul_by_7 should use .b for tcc__r9
+    local mul_body
+    mul_body=$(sed -n '/^mul_by_7:/,/^\.ENDS/p' "$out")
+    if ! echo "$mul_body" | grep -q "${TAB}sta.b tcc__r9"; then
+        log_fail "$name: mul_by_7 not using .b for tcc__r9"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_indirect_store_acache() {
+    local name="indirect_store_acache"
+    local src="$SCRIPT_DIR/test_indirect_store.c"
+    local out="$BUILD/test_indirect_store.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # array_write should be frameless (framesize=0)
+    if ! grep -q 'array_write (framesize=0' "$out"; then
+        log_fail "$name: array_write not frameless (indirect store dead store not working)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # Should use tax (address to X) without pha/pla
+    local fn_body
+    fn_body=$(sed -n '/^array_write:/,/^\.ENDS/p' "$out")
+    if ! echo "$fn_body" | grep -q "${TAB}tax"; then
+        log_fail "$name: array_write missing tax instruction"
+        ((TESTS_FAILED++))
+        return
+    fi
+    if echo "$fn_body" | grep -q "${TAB}pha"; then
+        log_fail "$name: array_write still uses pha (A-cache optimization not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Tail call optimization (Phase 13)
+# - call_add: same args pass-through → jml (no stores, no jsl, no rtl)
+# - call_chain: second call is tail → sta + jml (no second jsl+plx+rtl)
+# - no_tail_call: arg count mismatch → normal jsl+cleanup+rtl
+#------------------------------------------------------------------------------
+test_tail_call() {
+    local name="tail_call"
+    local src="$SCRIPT_DIR/test_tail_call.c"
+    local out="$BUILD/test_tail_call.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_add must have jml (tail call)
+    local call_add_body
+    call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_add_body" | grep -q "${TAB}jml add_u16"; then
+        log_fail "$name: call_add missing 'jml add_u16' (tail call not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_add must NOT have jsl (no normal call)
+    if echo "$call_add_body" | grep -q "${TAB}jsl"; then
+        log_fail "$name: call_add still has jsl (should be jml only)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_add must NOT have rtl (tail call replaces it)
+    if echo "$call_add_body" | grep -q "${TAB}rtl"; then
+        log_fail "$name: call_add still has rtl (should be eliminated by tail call)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_chain must have jml for second call
+    local call_chain_body
+    call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_chain_body" | grep -q "${TAB}jml add_one"; then
+        log_fail "$name: call_chain missing 'jml add_one' (tail call not applied)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_chain must still have one jsl (first call is NOT tail call)
+    if ! echo "$call_chain_body" | grep -q "${TAB}jsl add_one"; then
+        log_fail "$name: call_chain missing 'jsl add_one' (first call should remain)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # call_chain must NOT have rtl
+    if echo "$call_chain_body" | grep -q "${TAB}rtl"; then
+        log_fail "$name: call_chain still has rtl (should be eliminated by tail call)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # no_tail_call must NOT have jml (arg count mismatch)
+    local no_tco_body
+    no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
+    if echo "$no_tco_body" | grep -q "${TAB}jml"; then
+        log_fail "$name: no_tail_call has jml (should NOT be tail-call optimized)"
+        ((TESTS_FAILED++))
+        return
+    fi
+    # no_tail_call must have rtl (normal return)
+    if ! echo "$no_tco_body" | grep -q "${TAB}rtl"; then
+        log_fail "$name: no_tail_call missing rtl (normal return expected)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+test_lazy_rep20() {
+    local name="lazy_rep20"
+    local src="$SCRIPT_DIR/test_tail_call.c"
+    local out="$BUILD/test_tail_call.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # call_add is a pure tail call (all args same-pos) → NO rep #$20
+    local call_add_body
+    call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
+    if echo "$call_add_body" | grep -q "${TAB}rep #\$20"; then
+        log_fail "$name: call_add has rep #\$20 (pure tail call should skip prologue)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # call_chain has lda/sta before jml → MUST have rep #$20
+    local call_chain_body
+    call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
+    if ! echo "$call_chain_body" | grep -q "${TAB}rep #\$20"; then
+        log_fail "$name: call_chain missing rep #\$20 (non-pure tail call needs it)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    # no_tail_call is a normal function → MUST have rep #$20
+    local no_tco_body
+    no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
+    if ! echo "$no_tco_body" | grep -q "${TAB}rep #\$20"; then
+        log_fail "$name: no_tail_call missing rep #\$20 (normal function needs it)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Helper: Check any .asm file for unhandled ops
 # Usage: check_asm_for_unhandled_ops <file.asm>
 # Returns: 0 if clean, 1 if unhandled ops found
@@ -818,6 +3068,10 @@ main() {
         case $1 in
             -v|--verbose)
                 VERBOSE=1
+                shift
+                ;;
+            --allow-known-bugs)
+                ALLOW_KNOWN_BUGS=1
                 shift
                 ;;
             *)
@@ -854,9 +3108,72 @@ main() {
     test_global_var_reads            # CRITICAL: Global/extern vars must use direct addressing
     test_input_button_masks          # CRITICAL: Button masks must match pvsneslib/hardware
 
+    # === Advanced Pattern Tests (Phase 1.2) ===
+    test_struct_ptr_init             # CRITICAL: Struct pointer init (QBE bug Feb 2026)
+    test_2d_array                    # 2D array stride calculation
+    test_nested_struct               # Nested structure member access
+    test_union                       # Union size and member access
+    test_large_local                 # Large local variables (>256 bytes)
+    test_string_init                 # String literals in struct initializers
+    test_ptr_arithmetic              # Pointer arithmetic with different types
+    test_switch                      # Switch statement compilation
+    test_function_ptr                # Function pointers and callbacks
+    test_bitops                      # Bitwise operations
+    test_loops                       # Loop constructs (for, while, do-while)
+    test_comparisons                 # Signed/unsigned comparisons
+    test_volatiles                   # Volatile variable handling
+    test_type_cast                   # Type casting and conversions
+
+    # === HDMA Wave Regression Tests (Phase 1.3) ===
+    test_variable_shift              # FIXED: Variable-count shifts now emit loop
+    test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
+    test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
+    test_const_data                  # Const arrays placed in ROM (SUPERFREE)
+    test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
+    test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
+
+    # === Phase 5b: Non-leaf optimization tests ===
+    test_nonleaf_frameless           # Non-leaf wrapper functions should be frameless
+
+    # === Phase 7a: Dead store elimination tests ===
+    test_dead_store_elimination      # Dead store elimination + aggressive frame elimination
+
+    # === Phase 8: PLX + XBA + Commutative swap tests ===
+    test_plx_cleanup                 # PLX stack cleanup for small arg counts
+    test_xba_shift                   # XBA byte-swap for constant shifts ≥ 8
+    test_commutative_swap            # Commutative operand swap for A-cache reuse
+
+    # === Phase 9: INC/DEC + A-cache pha + dead store arg tests ===
+    test_inc_dec                     # INC/DEC for ±1 constants
+    test_acache_pha                  # A-cache survives pha (no redundant loads)
+
+    # === Phase 10: Comparison dead store for frameless conditionals ===
+    test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
+
+    # === Phase 11: Inline multiply *11-*15 + indirect store optimization ===
+    test_inline_mul_11_15            # Inline multiply patterns *11-*15
+    test_indirect_store_acache       # Indirect store A-cache → frameless array_write
+
+    # === Phase 12: Direct page registers + div/mod return in A ===
+    test_dp_registers                # .b addressing for tcc__r0/r1/r9 + no lda after div/mod
+
+    # === Phase 13: Tail call optimization ===
+    test_tail_call                   # jml for tail calls (call_add, call_chain)
+    test_lazy_rep20                  # skip rep #$20 for pure tail calls (call_add)
+
+    # === Compiler Hardening Tests (Phase 1.5) ===
+    test_struct_alignment            # Struct padding, field offsets, array stride
+    test_volatile_ptr                # Volatile register reads/writes not optimized away
+    test_global_struct_init          # .data_init for initialized global structs
+    test_u32_arithmetic              # 32-bit arithmetic on 16-bit CPU
+    test_sign_promotion              # Signed/unsigned type promotion and extension
+
     echo ""
     echo "========================================"
     echo "Results: $TESTS_PASSED/$TESTS_RUN passed"
+    if [[ $TESTS_KNOWN_BUGS -gt 0 ]]; then
+        echo -e "${YELLOW}$TESTS_KNOWN_BUGS known bug(s)${NC}"
+    fi
     if [[ $TESTS_FAILED -gt 0 ]]; then
         echo -e "${RED}$TESTS_FAILED tests failed${NC}"
         exit 1

@@ -85,6 +85,22 @@ void bgSetScrollX(u8 bg, u16 x);
  */
 void bgSetScrollY(u8 bg, u16 y);
 
+/**
+ * @brief Get current horizontal scroll position (from shadow)
+ *
+ * @param bg Background number (0-3)
+ * @return Horizontal scroll value last set by bgSetScroll/bgSetScrollX
+ */
+u16 bgGetScrollX(u8 bg);
+
+/**
+ * @brief Get current vertical scroll position (from shadow)
+ *
+ * @param bg Background number (0-3)
+ * @return Vertical scroll value last set by bgSetScroll/bgSetScrollY
+ */
+u16 bgGetScrollY(u8 bg);
+
 /*============================================================================
  * Memory Configuration
  *============================================================================*/

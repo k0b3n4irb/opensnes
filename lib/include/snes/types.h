@@ -29,12 +29,11 @@
  * @defgroup types Fixed-Width Types
  * @brief Integer types with guaranteed sizes
  *
- * On the 65816 CPU:
+ * On the 65816 CPU (cproc compiler):
  * - char = 8 bits
  * - short = 16 bits
- * - int = 16 bits (same as short!)
- * - long = 16 bits (same as short! - 816-tcc quirk)
- * - long long = 32 bits
+ * - int = 32 bits (4 bytes)
+ * - long = 64 bits (8 bytes — NOT 32-bit!)
  *
  * Always use these typedefs instead of C primitive types.
  * @{
@@ -55,16 +54,16 @@ typedef unsigned short u16;
 /**
  * @brief 32-bit signed integer (-2147483648 to 2147483647)
  *
- * @note Uses `long long` because 816-tcc treats `long` as 16-bit.
+ * @note Uses `int` because cproc treats `int` as 32-bit on 65816.
  */
-typedef signed long long s32;
+typedef signed int s32;
 
 /**
  * @brief 32-bit unsigned integer (0 to 4294967295)
  *
- * @note Uses `long long` because 816-tcc treats `long` as 16-bit.
+ * @note Uses `int` because cproc treats `int` as 32-bit on 65816.
  */
-typedef unsigned long long u32;
+typedef unsigned int u32;
 
 /** @} */ /* end of types group */
 

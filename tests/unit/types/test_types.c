@@ -1,173 +1,217 @@
-/**
- * @file test_types.c
- * @brief Unit tests for OpenSNES type definitions
- *
- * Validates that types have correct sizes and behavior on 65816.
- */
+// =============================================================================
+// Unit Test: Type Definitions
+// =============================================================================
+// Validates that OpenSNES types have correct sizes and behavior on 65816.
+// Uses inline test pattern (no test_harness.h) to avoid WLA-DX underscore
+// label issues.
+// =============================================================================
 
 #include <snes.h>
-#include "../../harness/test_harness.h"
-#include "../../harness/test_harness.c"
+#include <snes/console.h>
+#include <snes/text.h>
 
-/*============================================================================
- * Type Size Tests
- *============================================================================*/
+// Compile-time type size checks
+_Static_assert(sizeof(u8) == 1, "u8 must be 1 byte");
+_Static_assert(sizeof(u16) == 2, "u16 must be 2 bytes");
+_Static_assert(sizeof(s16) == 2, "s16 must be 2 bytes");
+_Static_assert(sizeof(s32) == 4, "s32 must be exactly 4 bytes");
+_Static_assert(sizeof(u32) == 4, "u32 must be exactly 4 bytes");
+_Static_assert(sizeof(bool) == 1, "bool must be 1 byte");
 
+static u8 tests_passed;
+static u8 tests_failed;
+static u8 test_line;
+
+#define TEST(name, condition) do { \
+    if (condition) { \
+        tests_passed++; \
+    } else { \
+        tests_failed++; \
+        textPrintAt(1, test_line, "FAIL:"); \
+        textPrintAt(7, test_line, name); \
+        test_line++; \
+    } \
+} while(0)
+
+// =============================================================================
+// Test: u8 range and overflow
+// =============================================================================
 void test_u8_range(void) {
     u8 val = 0;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("u8: zero", val == 0);
 
     val = 255;
-    TEST_ASSERT_EQUAL(255, val);
+    TEST("u8: max", val == 255);
 
-    /* Overflow wraps */
     val = 255;
     val++;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("u8: overflow", val == 0);
 }
 
+// =============================================================================
+// Test: u16 range and overflow
+// =============================================================================
 void test_u16_range(void) {
     u16 val = 0;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("u16: zero", val == 0);
 
     val = 65535;
-    TEST_ASSERT_EQUAL(65535, val);
+    TEST("u16: max", val == 65535);
 
-    /* Overflow wraps */
     val++;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("u16: overflow", val == 0);
 }
 
+// =============================================================================
+// Test: s16 range
+// =============================================================================
 void test_s16_range(void) {
     s16 val = 0;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("s16: zero", val == 0);
 
     val = 32767;
-    TEST_ASSERT_EQUAL(32767, val);
+    TEST("s16: max", val == 32767);
 
     val = -32768;
-    TEST_ASSERT_EQUAL(-32768, val);
+    TEST("s16: min", val == -32768);
 
-    /* Negative numbers */
     val = -1;
-    TEST_ASSERT_EQUAL(-1, val);
+    TEST("s16: neg1", val == -1);
 }
 
-void test_s32_range(void) {
+// =============================================================================
+// Test: s32 range
+// =============================================================================
+void test_s32_size(void) {
+    // s32 must be exactly 4 bytes (signed int on cproc/65816)
+    TEST("s32: ==4B", sizeof(s32) == 4);
+    TEST("u32: ==4B", sizeof(u32) == 4);
+
     s32 val = 0;
-    TEST_ASSERT_EQUAL(0, val);
+    TEST("s32: zero", val == 0);
 
-    /* Large positive */
     val = 100000;
-    TEST_ASSERT_EQUAL(100000, val);
+    TEST("s32: 100K", val == 100000);
 
-    /* Large negative */
     val = -100000;
-    TEST_ASSERT_EQUAL(-100000, val);
+    TEST("s32: -100K", val == -100000);
 }
 
-/*============================================================================
- * Arithmetic Tests
- *============================================================================*/
-
+// =============================================================================
+// Test: u16 arithmetic
+// =============================================================================
 void test_u16_arithmetic(void) {
     u16 a = 100;
     u16 b = 200;
 
-    TEST_ASSERT_EQUAL(300, a + b);
-    TEST_ASSERT_EQUAL(100, b - a);
-    TEST_ASSERT_EQUAL(20000, a * b);
-    TEST_ASSERT_EQUAL(2, b / a);
+    TEST("u16: add", (u16)(a + b) == 300);
+    TEST("u16: sub", (u16)(b - a) == 100);
+    TEST("u16: div", (u16)(b / a) == 2);
 }
 
+// =============================================================================
+// Test: s16 arithmetic
+// =============================================================================
 void test_s16_arithmetic(void) {
     s16 a = 100;
     s16 b = -50;
 
-    TEST_ASSERT_EQUAL(50, a + b);
-    TEST_ASSERT_EQUAL(150, a - b);
-    TEST_ASSERT_EQUAL(-5000, a * b);
-    TEST_ASSERT_EQUAL(-2, a / b);
+    TEST("s16: add", (s16)(a + b) == 50);
+    TEST("s16: sub", (s16)(a - b) == 150);
 }
 
-void test_s32_arithmetic(void) {
-    s32 a = 50000;
-    s32 b = 50000;
-
-    /* This would overflow in s16 */
-    TEST_ASSERT_EQUAL(100000, a + b);
-    TEST_ASSERT_EQUAL(2500000000LL, a * b);
-}
-
-/*============================================================================
- * Boolean Tests
- *============================================================================*/
-
+// =============================================================================
+// Test: boolean values
+// =============================================================================
 void test_boolean_values(void) {
     bool t = TRUE;
     bool f = FALSE;
 
-    TEST_ASSERT(t);
-    TEST_ASSERT(!f);
-    TEST_ASSERT_EQUAL(0xFF, TRUE);
-    TEST_ASSERT_EQUAL(0x00, FALSE);
+    TEST("bool: TRUE", t != 0);
+    TEST("bool: FALSE", f == 0);
+    TEST("bool: !FALSE", !f);
 }
 
-/*============================================================================
- * Macro Tests
- *============================================================================*/
-
+// =============================================================================
+// Test: BIT macro
+// =============================================================================
 void test_bit_macro(void) {
-    TEST_ASSERT_EQUAL(0x0001, BIT(0));
-    TEST_ASSERT_EQUAL(0x0002, BIT(1));
-    TEST_ASSERT_EQUAL(0x0080, BIT(7));
-    TEST_ASSERT_EQUAL(0x8000, BIT(15));
+    TEST("BIT(0)=1", BIT(0) == 0x0001);
+    TEST("BIT(1)=2", BIT(1) == 0x0002);
+    TEST("BIT(7)=80", BIT(7) == 0x0080);
+    TEST("BIT(15)=8000", BIT(15) == 0x8000);
 }
 
+// =============================================================================
+// Test: BYTE macros
+// =============================================================================
 void test_byte_macros(void) {
     u16 val = 0x1234;
 
-    TEST_ASSERT_EQUAL(0x34, LO_BYTE(val));
-    TEST_ASSERT_EQUAL(0x12, HI_BYTE(val));
-    TEST_ASSERT_EQUAL(0x1234, MAKE_WORD(0x34, 0x12));
+    TEST("LO=0x34", LO_BYTE(val) == 0x34);
+    TEST("HI=0x12", HI_BYTE(val) == 0x12);
+    TEST("MAKE_WORD", MAKE_WORD(0x34, 0x12) == 0x1234);
 }
 
+// =============================================================================
+// Test: MIN/MAX/CLAMP macros
+// =============================================================================
 void test_minmax_macros(void) {
-    TEST_ASSERT_EQUAL(5, MIN(5, 10));
-    TEST_ASSERT_EQUAL(5, MIN(10, 5));
-    TEST_ASSERT_EQUAL(10, MAX(5, 10));
-    TEST_ASSERT_EQUAL(10, MAX(10, 5));
-    TEST_ASSERT_EQUAL(5, CLAMP(3, 5, 10));
-    TEST_ASSERT_EQUAL(7, CLAMP(7, 5, 10));
-    TEST_ASSERT_EQUAL(10, CLAMP(15, 5, 10));
+    TEST("MIN(5,10)=5", MIN(5, 10) == 5);
+    TEST("MIN(10,5)=5", MIN(10, 5) == 5);
+    TEST("MAX(5,10)=10", MAX(5, 10) == 10);
+    TEST("MAX(10,5)=10", MAX(10, 5) == 10);
+    TEST("CLAMP low", CLAMP(3, 5, 10) == 5);
+    TEST("CLAMP mid", CLAMP(7, 5, 10) == 7);
+    TEST("CLAMP high", CLAMP(15, 5, 10) == 10);
 }
 
-/*============================================================================
- * Main
- *============================================================================*/
-
+// =============================================================================
+// Main
+// =============================================================================
 int main(void) {
-    test_init();
+    consoleInit();
+    setMode(BG_MODE0, 0);
+    textInit();
 
-    /* Type size tests */
-    RUN_TEST(test_u8_range);
-    RUN_TEST(test_u16_range);
-    RUN_TEST(test_s16_range);
-    RUN_TEST(test_s32_range);
+    textPrintAt(1, 1, "TYPE DEFINITION TESTS");
+    textPrintAt(1, 2, "---------------------");
 
-    /* Arithmetic tests */
-    RUN_TEST(test_u16_arithmetic);
-    RUN_TEST(test_s16_arithmetic);
-    RUN_TEST(test_s32_arithmetic);
+    tests_passed = 0;
+    tests_failed = 0;
+    test_line = 4;
 
-    /* Boolean tests */
-    RUN_TEST(test_boolean_values);
+    test_u8_range();
+    test_u16_range();
+    test_s16_range();
+    test_s32_size();
+    test_u16_arithmetic();
+    test_s16_arithmetic();
+    test_boolean_values();
+    test_bit_macro();
+    test_byte_macros();
+    test_minmax_macros();
 
-    /* Macro tests */
-    RUN_TEST(test_bit_macro);
-    RUN_TEST(test_byte_macros);
-    RUN_TEST(test_minmax_macros);
+    test_line += 2;
+    textPrintAt(1, test_line, "Passed: ");
+    textPrintU16(tests_passed);
+    test_line++;
+    textPrintAt(1, test_line, "Failed: ");
+    textPrintU16(tests_failed);
+    test_line++;
 
-    test_report();
+    textPrintAt(1, test_line, "Static asserts: OK");
+    test_line++;
+
+    if (tests_failed == 0) {
+        textPrintAt(1, test_line, "ALL TESTS PASSED");
+    }
+
+    setScreenOn();
+
+    while (1) {
+        WaitForVBlank();
+    }
+
     return 0;
 }

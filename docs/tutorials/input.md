@@ -263,7 +263,7 @@ For reference, the joypad registers:
 
 ## Example
 
-See `examples/input/2_two_players/` for a complete two-player demo.
+See `examples/input/two_players/` for a complete two-player demo.
 
 ## Next Steps
 

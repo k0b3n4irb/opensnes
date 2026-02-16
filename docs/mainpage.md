@@ -80,7 +80,7 @@ make
 ### Create Your First ROM
 
 ```bash
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 make
 # Open hello_world.sfc in your emulator
 ```

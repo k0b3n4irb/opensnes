@@ -44,9 +44,10 @@ void oamInit(void) {
     oamInitEx(OBJ_SIZE8_L16, 0);
 }
 
-void oamInitEx(u8 size, u8 tileBase) {
+void oamInitEx(u16 size, u16 tileBase) {
+    /* All parameters u16 to avoid calling convention issues */
     /* Set sprite size and tile base address */
-    REG_OBJSEL = (size << 5) | (tileBase & 0x07);
+    REG_OBJSEL = (u8)((size << 5) | (tileBase & 0x07));
 
     /* Clear OAM buffer - hide all sprites */
     oamClear();
@@ -78,14 +79,15 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
 static const u8 xhi_bit[4] = { 0x01, 0x04, 0x10, 0x40 };
 static const u8 xhi_mask[4] = { 0xFE, 0xFB, 0xEF, 0xBF };
 
-void oamSet(u8 id, u16 x, u8 y, u16 tile, u8 palette, u8 priority, u8 flags) {
+void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags) {
+    /* All parameters are u16 to avoid calling convention issues with mixed sizes */
     if (id >= MAX_SPRITES) return;
 
     u16 offset = id << 2;  /* id * 4 */
 
     /* Set position and tile */
     oam_buffer[offset + 0] = (u8)(x & 0xFF);
-    oam_buffer[offset + 1] = y;
+    oam_buffer[offset + 1] = (u8)(y & 0xFF);
     oam_buffer[offset + 2] = (u8)(tile & 0xFF);
 
     /* Set attributes: vhoopppc */
@@ -94,15 +96,15 @@ void oamSet(u8 id, u16 x, u8 y, u16 tile, u8 palette, u8 priority, u8 flags) {
     /* oo = priority (0-3) */
     /* ppp = palette (0-7) */
     /* c = tile high bit */
-    oam_buffer[offset + 3] = (flags & 0xC0) |
+    oam_buffer[offset + 3] = (u8)((flags & 0xC0) |
                               ((priority & 0x03) << 4) |
                               ((palette & 0x07) << 1) |
-                              ((tile >> 8) & 0x01);
+                              ((tile >> 8) & 0x01));
 
     /* Set high table X high bit (bit 0 of each 2-bit pair) */
     /* Don't touch size bit (bit 1) - that's set by oamSetSize/oamSetEx */
-    u8 ext_offset = 512 + (id >> 2);
-    u8 slot = id & 0x03;
+    u16 ext_offset = 512 + (id >> 2);
+    u16 slot = id & 0x03;
 
     if (x & 0x100) {
         oam_buffer[ext_offset] = (oam_buffer[ext_offset] & xhi_mask[slot]) | xhi_bit[slot];
@@ -166,12 +168,22 @@ void oamSetVisible(u8 id, u8 visible) {
 
 void oamHide(u8 id) {
     if (id >= MAX_SPRITES) return;
-    /* Y = 240 is off-screen (below visible area) */
-    oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y;
+    /* Y=240 + X=256 (high bit set) to hide off-screen.
+     * Y=240 alone wraps for sprites > 16px tall.
+     */
+    oam_buffer[(id << 2) + 0] = 0;          /* X low = 0 */
+    oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y; /* Y = 240 */
+
+    /* Set X high bit in extension table */
+    u16 ext_offset = 512 + (id >> 2);
+    u8 slot = id & 0x03;
+    oam_buffer[ext_offset] |= xhi_bit[slot];
+
     oam_update_flag = 1;
 }
 
-void oamSetSize(u8 id, u8 large) {
+void oamSetSize(u16 id, u16 large) {
+    /* All parameters u16 to avoid calling convention issues */
     if (id >= MAX_SPRITES) return;
 
     /* Lookup tables to avoid variable shifts (compiler bug workaround) */
@@ -179,8 +191,8 @@ void oamSetSize(u8 id, u8 large) {
     static const u8 size_bit[4] = { 0x02, 0x08, 0x20, 0x80 };
     static const u8 size_mask[4] = { 0xFD, 0xF7, 0xDF, 0x7F };
 
-    u8 ext_offset = 512 + (id >> 2);
-    u8 slot = id & 0x03;
+    u16 ext_offset = 512 + (id >> 2);
+    u16 slot = id & 0x03;
 
     if (large) {
         oam_buffer[ext_offset] |= size_bit[slot];
@@ -201,24 +213,6 @@ void oamSetEx(u8 id, u8 size, u8 visible) {
     if (!visible) {
         oamHide(id);
     }
-}
-
-/*============================================================================
- * Dynamic Sprite Graphics Pointer
- *============================================================================*/
-
-/* External reference to dynamic sprite buffer (defined in sprite_dynamic.asm) */
-extern t_sprites oambuffer[];
-
-void oamSetGfx(u16 id, u8 *gfx) {
-    if (id >= MAX_SPRITES) return;
-
-    /* Store the 24-bit address as separate 16-bit addr + 8-bit bank
-     * This ensures correct alignment with 16-byte structure
-     * Assembly reads: addr16 at offset 8-9, bank at offset 10
-     */
-    oambuffer[id].oamgfxaddr = (u16)(unsigned long)gfx;
-    oambuffer[id].oamgfxbank = (u8)((unsigned long)gfx >> 16);
 }
 
 /*============================================================================
@@ -255,7 +249,11 @@ void oamUpdate(void) {
 void oamClear(void) {
     u8 i;
 
-    /* Hide all sprites by setting Y = 240 */
+    /* Hide all sprites: Y=240 + X=256 (high bit set).
+     * Y=240 alone causes large sprites (32x32, 64x64) to wrap to
+     * the top of the screen. Setting X bit 8 = 1 pushes them
+     * off-screen to the right, safe for any sprite size.
+     */
     for (i = 0; i < 128; i++) {
         u16 offset = i << 2;
         oam_buffer[offset + 0] = 0;
@@ -264,9 +262,12 @@ void oamClear(void) {
         oam_buffer[offset + 3] = 0;
     }
 
-    /* Clear extension table */
+    /* Extension table: set X high bit (bit 0 of each 2-bit pair) for all sprites.
+     * Each byte covers 4 sprites: bits 0,2,4,6 = X high; bits 1,3,5,7 = size.
+     * Pattern 0x55 = 01010101 = all X high bits set, all size bits clear.
+     */
     for (i = 0; i < 32; i++) {
-        oam_buffer[512 + i] = 0;
+        oam_buffer[512 + i] = 0x55;
     }
 
     oam_update_flag = 1;

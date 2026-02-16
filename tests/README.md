@@ -53,10 +53,10 @@ The `examples/` category tests the working example ROMs using the `snesdbg` Lua 
 
 | Test | ROM | What it tests |
 |------|-----|---------------|
-| hello_world | text/1_hello_world | Basic boot, hardware init, VBlank |
-| custom_font | text/2_custom_font | Font loading, message display |
-| animation | graphics/2_animation | **WRAM mirroring fix**, sprite movement, OAM transfer |
-| tone | audio/1_tone | SPC700 init, audio playback |
+| hello_world | text/hello_world | Basic boot, hardware init, VBlank |
+| custom_font | text/custom_font | Font loading, message display |
+| animation | graphics/animation | **WRAM mirroring fix**, sprite movement, OAM transfer |
+| tone | audio/tone | SPC700 init, audio playback |
 
 Run example tests:
 ```bash
