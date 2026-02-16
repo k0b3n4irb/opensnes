@@ -1,5 +1,6 @@
-/*
- * Mode 7 Perspective - F-Zero style ground with sky
+/**
+ * @file main.c
+ * @brief Mode 7 Perspective — F-Zero Style Pseudo-3D Ground
  *
  * Ported from PVSnesLib Mode7Perspective by mills32 / alekmaul
  *
@@ -36,7 +37,7 @@ int main(void) {
     consoleInit();
 
     /* Force blank for VRAM loading */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Load Mode 7 ground (1024x1024, 256 colors) to VRAM $0000 + palette */
     dmaCopyVramMode7(ground_map, ground_map_end - ground_map,

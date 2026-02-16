@@ -1,23 +1,13 @@
-/*
- * gradientcolors - Ported from PVSnesLib to OpenSNES
- *
- * Simple gradient color effect in mode 1
- * -- alekmaul (original PVSnesLib example)
+/**
+ * @file main.c
+ * @brief Gradient Colors — HDMA Color Gradient Effect
  *
  * Demonstrates HDMA color gradient effect on a background.
  * Press A to remove the gradient, B to re-enable it.
  *
- * API differences from PVSnesLib:
- *  - setModeHdmaColor(table) -> hdmaSetup(ch, MODE_2REG_2X, CGADD, table)
- *  - setModeHdmaReset(0)     -> hdmaDisableAll()
- *  - padsCurrent(0)          -> padHeld(0)
- *  - bgInitMapSet()          -> dmaCopyVram()
- *  - bgSetDisable()          -> REG_TM
- *
  * The gradient works by changing CGRAM color 0 (backdrop) via HDMA.
  * HDMA mode 3 writes 4 bytes/entry: CGADD(x2) + CGDATA(x2) = set
- * a 15-bit SNES color per scanline group. This is the same technique
- * PVSnesLib uses in setModeHdmaColor (HDMA Channel 6).
+ * a 15-bit SNES color per scanline group.
  */
 
 #include <snes.h>

@@ -1,11 +1,12 @@
-/*
- * Mode 7 - PVSnesLib example ported to OpenSNES
+/**
+ * @file main.c
+ * @brief Mode 7 — Rotation and Scaling
  *
  * Demonstrates Mode 7 rotation and scaling:
  *   A button:  Rotate clockwise
  *   B button:  Rotate counter-clockwise
- *   UP:        Zoom in (increase scale)
- *   DOWN:      Zoom out (decrease scale)
+ *   UP:        Zoom out (increase scale)
+ *   DOWN:      Zoom in (decrease scale)
  *
  * Mode 7 uses interleaved VRAM format with tilemap in low bytes
  * and tile pixels in high bytes. Loading is handled by an assembly
@@ -25,7 +26,7 @@ int main(void) {
     consoleInit();
 
     /* Force blank for VRAM loading */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Load Mode 7 tile data, tilemap, and palette via assembly helper */
     asm_loadMode7Data();

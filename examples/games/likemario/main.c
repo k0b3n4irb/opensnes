@@ -1,5 +1,6 @@
 /**
- * LikeMario - Side-scrolling platformer
+ * @file main.c
+ * @brief LikeMario — Side-Scrolling Platformer
  *
  * Port of PVSnesLib's likemario example to OpenSNES.
  * Demonstrates: tile-based map scrolling, sprite animation,

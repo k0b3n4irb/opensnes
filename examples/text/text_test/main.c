@@ -1,7 +1,8 @@
-/* Text Module Test — Crash isolation STEP 4
+/**
+ * @file main.c
+ * @brief Text Module Test
  *
- * Steps 2-3 confirmed working (textInit, textLoadFont, bgSet* OK)
- * Now testing: textPrintAt + textFlush
+ * Tests the text module: textInit, textLoadFont, textPrintAt, textFlush.
  *
  * Expected: dark blue screen with "TEXT MODULE TEST" in white
  * If dark blue only (no text): textPrintAt or textFlush bug

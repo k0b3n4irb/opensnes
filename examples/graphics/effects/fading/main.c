@@ -74,7 +74,7 @@ static void fade_in(u8 speed) {
 
 int main(void) {
     /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     /*------------------------------------------------------------------------
      * Configure Background Tilemap
@@ -113,7 +113,7 @@ int main(void) {
     bgSetScroll(0, 0, 0);
 
     /* Start with screen on */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     /* Wait for first button press */
     wait_for_key();

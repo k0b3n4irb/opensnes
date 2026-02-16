@@ -1,3 +1,4 @@
+# Animated Sprite — Direction-based sprite animation with flip
 OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET     := animated_sprite.sfc

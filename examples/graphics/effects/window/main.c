@@ -79,7 +79,7 @@ int main(void) {
     pad_prev = 0;
 
     /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     /*------------------------------------------------------------------------
      * Configure Background
@@ -116,7 +116,7 @@ int main(void) {
      * Turn on screen
      *------------------------------------------------------------------------*/
 
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     /*------------------------------------------------------------------------
      * Main loop

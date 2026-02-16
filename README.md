@@ -1,9 +1,36 @@
+<div align="center">
+
 # OpenSNES
+
+**Modern, open-source SDK for Super Nintendo development**
+
+*Write SNES games in C. Build on Linux, macOS, and Windows.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
 [![Build Status](https://github.com/k0b3n4irb/opensnes/actions/workflows/opensnes_build.yml/badge.svg)](https://github.com/k0b3n4irb/opensnes/actions)
+[![Alpha](https://img.shields.io/badge/status-alpha-orange.svg)]()
+[![C11](https://img.shields.io/badge/language-C11-blue.svg)]()
+[![65816](https://img.shields.io/badge/target-65816-purple.svg)]()
 
-**OpenSNES** is a modern, open-source SDK for SNES development.
+</div>
+
+---
+
+### Supported Platforms
+
+The SDK builds and runs natively on all three major operating systems.
+CI tests every commit on all platforms.
+
+| Platform | Architecture | Toolchain | Status |
+|----------|-------------|-----------|--------|
+| **Linux** | x86_64, arm64 | GCC / Clang + GNU Make | [![Linux](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=linux)](https://github.com/k0b3n4irb/opensnes/actions) |
+| **macOS** | arm64 (Apple Silicon), x86_64 | Clang + GNU Make | [![macOS](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=macos)](https://github.com/k0b3n4irb/opensnes/actions) |
+| **Windows** | x86_64 | MSYS2 (UCRT64) + Clang | [![Windows](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=windows)](https://github.com/k0b3n4irb/opensnes/actions) |
+
+> **Note**: arm64 Linux is supported (the toolchain cross-compiles to 65816)
+> but not yet tested in CI.
+
+---
 
 This project would not exist without **[PVSnesLib](https://github.com/alekmaul/pvsneslib)**
 by [Alekmaul](https://github.com/alekmaul) and its community of contributors. OpenSNES is
@@ -54,59 +81,62 @@ If that sounds exciting rather than terrifying, you're in the right place.
 
 ## What OpenSNES Gives You
 
-- **A C compiler for the 65816** — write game logic in C11, compiled through cproc + QBE
-  with a custom backend that generates tight 65816 assembly
-- **A hardware library** — clean APIs for PPU, sprites, backgrounds, DMA, input, HDMA,
-  text, and audio (SNESMOD tracker playback)
-- **Asset tools** — convert PNG images to SNES tiles (`gfx4snes`), fonts (`font2snes`),
-  and Impulse Tracker music to SPC700 format (`smconv`)
-- **Working examples** — from "Hello World" to a playable Breakout clone, each with
-  a walkthrough that explains not just *what* the code does, but *why*
-- **Cross-platform builds** — `make` on Linux, macOS, and Windows (MSYS2)
+| | Feature | Details |
+|-|---------|---------|
+| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **31% faster code** than PVSnesLib+816-opt on our benchmark suite |
+| | **Hardware library** (18 modules) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
+| | **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
+| | **23 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
+| | **Cross-platform** | `make` on Linux, macOS, and Windows (MSYS2). CI-tested on all three. |
 
 ## Quick Start
 
+### Prerequisites
+
+<details>
+<summary><b>Linux</b> (Debian / Ubuntu)</summary>
+
 ```bash
-# Clone with submodules
+sudo apt install build-essential clang cmake make git
+```
+</details>
+
+<details>
+<summary><b>macOS</b></summary>
+
+```bash
+xcode-select --install        # Apple Clang
+brew install cmake             # if not already installed
+```
+</details>
+
+<details>
+<summary><b>Windows</b> (MSYS2 UCRT64)</summary>
+
+```bash
+pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake make git
+```
+</details>
+
+You'll also want a SNES emulator — [Mesen2](https://www.mesen.ca/) is recommended
+(debugger, trace logger, memory viewer).
+
+### Build & Run
+
+```bash
 git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
+make                  # builds compiler, tools, library, and all 23 examples
 
-# Build everything (compiler, tools, library, examples)
-make
-
-# Run an example
 # Open examples/text/hello_world/hello_world.sfc in Mesen2
 ```
 
-You'll need: Clang, GNU Make, and a SNES emulator
-([Mesen2](https://www.mesen.ca/) recommended).
-
 ## Examples
 
-Every example has a detailed README with a full walkthrough that explains not just
-*what* the code does, but *why*. Start with Hello World and work your way up.
+23 examples with detailed READMEs that explain not just *what* the code does, but *why*.
+Organized as a progressive learning path — from "Hello World" to a complete platformer.
 
-### Start Here
-
-| Example | What you'll learn |
-|---------|------------------|
-| [Hello World](examples/text/hello_world/) | Tiles, tilemaps, palettes — the PPU fundamentals |
-| [Custom Font](examples/text/custom_font/) | Building a complete character set, raw register access |
-| [Calculator](examples/basics/calculator/) | Joypad input with edge detection, UI with background tiles |
-
-### Browse All Examples
-
-| Category | What's inside |
-|----------|--------------|
-| [Text](examples/text/) | Fonts, tile-based text rendering |
-| [Basics](examples/basics/) | Input handling, collision, movement |
-| [Sprites](examples/graphics/sprites/) | Static, animated, dynamic, and metasprites |
-| [Backgrounds](examples/graphics/backgrounds/) | Modes 0/1/3/5/7, scrolling, parallax |
-| [Effects](examples/graphics/effects/) | HDMA, fading, transparency, mosaic, windows |
-| [Input](examples/input/) | Joypad reading, multiplayer |
-| [Audio](examples/audio/) | Sound effects, tracker music (SNESMOD) |
-| [Memory](examples/memory/) | HiROM, SRAM save games |
-| [Games](examples/games/) | Breakout, platformer, and more |
+**[Browse all examples and the learning path](examples/README.md)**
 
 ---
 
@@ -244,12 +274,14 @@ OpenSNES stands on the shoulders of the SNES homebrew community:
 
 ## Contributing
 
-Contributions are welcome! Check the [Issues](https://github.com/k0b3n4irb/opensnes/issues)
-for open tasks, or the [Roadmap](ROADMAP.md) for planned features.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+- [Open issues](https://github.com/k0b3n4irb/opensnes/issues) — bugs and tasks
+- [Roadmap](ROADMAP.md) — planned features
+- [Changelog](CHANGELOG.md) — what's changed since the PVSnesLib fork
 
 ## License
 
 MIT License — See [LICENSE](LICENSE)
 
 This project maintains the same open-source spirit as PVSnesLib.
-See [pvsneslib_license.txt](pvsneslib/pvsneslib_license.txt) for the original license.

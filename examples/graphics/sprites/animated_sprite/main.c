@@ -64,7 +64,7 @@ int main(void) {
     u16 pad0;
 
     /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     /* Initialize sprite graphics:
      * - Load tiles to VRAM $0000
@@ -89,11 +89,11 @@ int main(void) {
     oamUpdate();
 
     /* Set Mode 1, enable sprites only */
-    REG_BGMODE = 0x01;
+    setMode(BG_MODE1, 0);
     REG_TM = TM_OBJ;
 
     /* Enable display at full brightness */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     /* Main loop */
     while (1) {

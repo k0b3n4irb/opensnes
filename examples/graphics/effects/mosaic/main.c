@@ -1,5 +1,6 @@
-/*
- * Mosaic Shading - Ported from PVSnesLib MosaicShading example
+/**
+ * @file main.c
+ * @brief Mosaic — Pixelation and Fade Transitions
  *
  * Demonstrates fade and mosaic screen transition effects.
  * Press any button to advance to the next effect step:
@@ -8,9 +9,6 @@
  *   3. Mosaic out (pixels get bigger)
  *   4. Mosaic in (pixels return to normal)
  *   (loops)
- *
- * Uses direct register writes matching PVSnesLib's setMosaicEffect
- * and setFadeEffect assembly implementation.
  */
 
 #include <snes.h>

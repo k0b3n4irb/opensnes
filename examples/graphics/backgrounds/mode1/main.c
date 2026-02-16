@@ -27,7 +27,7 @@ extern u8 palette[], palette_end[];
 
 int main(void) {
     /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     /*------------------------------------------------------------------------
      * Configure Background Tilemap
@@ -66,7 +66,7 @@ int main(void) {
     bgSetScroll(0, 0, 0);
 
     /* Enable display at full brightness */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     /* Main loop - just wait for VBlank */
     while (1) {

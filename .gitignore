@@ -45,15 +45,10 @@ testlink
 .DS_Store
 **/.DS_Store
 
-# Claude (track essential workflow files, ignore the rest)
-.claude/*
-!.claude/instructions.md
-!.claude/KNOWLEDGE.md
-!.claude/TESTING_PROTOCOL.md
-!.claude/rules/
-!.claude/hooks/
-!.claude/settings.json
+# Claude Code (internal tooling — not part of the public project)
+.claude/
 CLAUDE.md
+tests/CLAUDE.md
 
 # Build directories
 build/
