@@ -32,26 +32,27 @@ building on what came before.
 | 11 | [effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
 | 12 | [effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
 | 13 | [effects/transparency](graphics/effects/transparency/) | Color math / blending |
-| 14 | [effects/window](graphics/effects/window/) | Hardware window masking |
+| 14 | [effects/window](graphics/effects/window/) | HDMA triangle window masking |
+| 15 | [effects/transparent_window](graphics/effects/transparent_window/) | Color math + HDMA transparent rectangle |
 
 ### Level 4 — Expert Topics
 
 | # | Example | What You'll Learn |
 |---|---------|-------------------|
-| 15 | [backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
-| 16 | [backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
-| 17 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
-| 18 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
-| 19 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback |
-| 20 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects |
+| 16 | [backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
+| 17 | [backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 18 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 19 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 20 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback |
+| 21 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects |
 
 ### Level 5 — Complete Projects
 
 | # | Example | What You'll Learn |
 |---|---------|-------------------|
-| 21 | [basics/collision_demo](basics/collision_demo/) | Collision detection mechanics |
-| 22 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
-| 23 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
+| 22 | [basics/collision_demo](basics/collision_demo/) | Collision detection mechanics |
+| 23 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 24 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
 
 ---
 
