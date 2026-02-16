@@ -1,5 +1,9 @@
 /**
- * Dynamic Sprite Demo - All sprites start at frame 0
+ * @file main.c
+ * @brief Dynamic Sprite — VRAM Streaming Animation
+ *
+ * Demonstrates the dynamic sprite engine: 4 animated 16x16 sprites
+ * with per-frame VRAM tile uploads.
  */
 
 #include <snes.h>
@@ -19,7 +23,7 @@ static u16 frame3;
 int main(void) {
     u8 i;
 
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
     dmaCopyCGram(spr16_properpal, 128, 32);
@@ -67,9 +71,9 @@ int main(void) {
     oamVramQueueUpdate();
     oamInitDynamicSpriteEndFrame();
 
-    REG_BGMODE = 0x01;
+    setMode(BG_MODE1, 0);
     REG_TM = TM_OBJ;
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     while (1) {
         WaitForVBlank();

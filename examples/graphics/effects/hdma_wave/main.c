@@ -1,5 +1,6 @@
 /**
- * HDMA Wave Demo
+ * @file main.c
+ * @brief HDMA Wave — Scanline Distortion Effect
  *
  * A: toggle wave on/off
  * D-pad LEFT/RIGHT: decrease/increase amplitude

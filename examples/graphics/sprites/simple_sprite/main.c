@@ -1,8 +1,8 @@
-/*
- * minimal_sprite32 - OpenSNES regression test
+/**
+ * @file main.c
+ * @brief Simple Sprite — Display a Single 32x32 Sprite
  *
- * Minimal test: displays a single 32x32 sprite at center screen.
- * No text, no input, no menu. Verifies 32x32 sprite rendering works.
+ * Displays a single 32x32 sprite at center screen.
  *
  * VRAM Layout:
  *   $2000 = OBSEL name base (tileBase=1 means $2000 word addr)

@@ -114,7 +114,7 @@ int main(void) {
     u16 pad;
 
     /* Force blank during setup */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
+    setScreenOff();
 
     /*------------------------------------------------------------------------
      * Configure Background Tilemaps (where tilemap data goes in VRAM)
@@ -191,7 +191,7 @@ int main(void) {
     oamUpdate();
 
     /* Enable display at full brightness */
-    REG_INIDISP = INIDISP_BRIGHTNESS(15);
+    setScreenOn();
 
     /*------------------------------------------------------------------------
      * Main Loop

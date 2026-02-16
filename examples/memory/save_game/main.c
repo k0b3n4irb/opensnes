@@ -1,9 +1,12 @@
-/* SRAM Test — Direct port of PVSnesLib sramoffset example
+/**
+ * @file main.c
+ * @brief Save Game — SRAM Multi-Slot Persistence
  *
- * A = Write Slot 1 (hardcoded values)
- * B = Read Slot 1
- * X = Write Slot 2 (hardcoded values)
- * Y = Read Slot 2
+ * Demonstrates SRAM save/load with multiple save slots.
+ *   A = Write Slot 1
+ *   B = Read Slot 1
+ *   X = Write Slot 2
+ *   Y = Read Slot 2
  */
 
 #include <snes.h>

@@ -49,7 +49,8 @@ git checkout -b feature/my-feature
 # Make changes...
 
 # Run tests
-./tests/run_tests.sh
+./tests/compiler/run_tests.sh
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
 
 # Commit with descriptive message
 git commit -m "feat(component): add new feature

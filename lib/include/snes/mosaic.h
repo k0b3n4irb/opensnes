@@ -18,8 +18,8 @@
  * @copyright MIT License
  */
 
-#ifndef SNES_MOSAIC_H
-#define SNES_MOSAIC_H
+#ifndef OPENSNES_MOSAIC_H
+#define OPENSNES_MOSAIC_H
 
 #include <snes/types.h>
 
@@ -122,4 +122,4 @@ void mosaicFadeIn(u8 speed);
  */
 void mosaicFadeOut(u8 speed);
 
-#endif /* SNES_MOSAIC_H */
+#endif /* OPENSNES_MOSAIC_H */

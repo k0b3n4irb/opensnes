@@ -1,5 +1,6 @@
 /**
- * SNESMOD Music Example
+ * @file main.c
+ * @brief SNESMOD Music — Tracker Music Playback
  *
  * Demonstrates tracker-based music playback using SNESMOD.
  *

@@ -1,143 +1,97 @@
-# OpenSNES Tutorial
+# OpenSNES Examples
 
-Welcome to the OpenSNES learning path! This tutorial will guide you from your first "Hello World" to building complete SNES games.
-
-## How to Use This Tutorial
-
-Each example is a **lesson** designed to teach specific concepts. The number prefix indicates complexity:
-- `1_` = Beginner (simplest concepts)
-- `2_` = Easy (basic usage)
-- `3_` = Intermediate (multiple concepts)
-- `4_` = Advanced (complex features)
-
-```
-examples/
-├── text/                    # Start here! Learn the basics
-│   ├── hello_world/
-│   └── custom_font/
-│
-├── graphics/
-│   ├── backgrounds/         # Background modes and scrolling
-│   ├── sprites/             # Sprite handling
-│   └── effects/             # Visual effects (HDMA, windows, etc.)
-│
-├── input/                   # Controller handling
-├── audio/                   # Sound effects and music
-├── memory/                  # SRAM saves, HiROM mode
-├── basics/                  # Utility examples
-└── games/                   # Complete game examples
-```
+Learn SNES development step by step. Each example teaches specific hardware concepts,
+building on what came before.
 
 ## Learning Path
 
-### 1. Start Here: Text
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [text/hello_world](text/hello_world/) | 1 | VRAM, tilemaps, Mode 0, your first ROM |
-| [text/custom_font](text/custom_font/) | 2 | Asset pipeline, 2bpp tiles, font2snes |
+### Level 1 — First Steps
 
-### 2. Graphics: Backgrounds
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [graphics/backgrounds/mode0](graphics/backgrounds/mode0/) | 1 | Mode 0: 4 BG layers, 2bpp |
-| [graphics/backgrounds/mode1](graphics/backgrounds/mode1/) | 1 | Mode 1: 2×4bpp + 1×2bpp |
-| [graphics/backgrounds/scrolling](graphics/backgrounds/scrolling/) | 2 | Basic scrolling |
-| [graphics/backgrounds/mode3](graphics/backgrounds/mode3/) | 3 | 256-color mode |
-| [graphics/backgrounds/mode5](graphics/backgrounds/mode5/) | 3 | Hi-res mode |
-| [graphics/backgrounds/parallax](graphics/backgrounds/parallax/) | 3 | Multi-layer parallax |
-| [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | 4 | Rotation/scaling |
-| [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | 4 | Dynamic tile loading |
+| # | Example | What You'll Learn |
+|---|---------|-------------------|
+| 1 | [text/hello_world](text/hello_world/) | PPU, backgrounds, tiles, palette — your first ROM |
+| 2 | [sprites/simple_sprite](graphics/sprites/simple_sprite/) | OAM, sprite display, CGRAM split |
+| 3 | [input/two_players](input/two_players/) | Joypad reading, multiplayer input |
 
-### 3. Graphics: Sprites
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [graphics/sprites/simple_sprite](graphics/sprites/simple_sprite/) | 1 | OAM, basic sprite display |
-| [graphics/sprites/animated_sprite](graphics/sprites/animated_sprite/) | 2 | Frame animation |
-| [graphics/sprites/animation_system](graphics/sprites/animation_system/) | 3 | State machine animation |
-| [graphics/sprites/metasprite](graphics/sprites/metasprite/) | 3 | Multi-tile sprites |
-| [graphics/sprites/dynamic_sprite](graphics/sprites/dynamic_sprite/) | 4 | VRAM management |
+### Level 2 — Graphics Fundamentals
 
-### 4. Graphics: Effects
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [graphics/effects/fading](graphics/effects/fading/) | 1 | Screen brightness |
-| [graphics/effects/mosaic](graphics/effects/mosaic/) | 2 | Pixelation effect |
-| [graphics/effects/window](graphics/effects/window/) | 2 | Hardware windows |
-| [graphics/effects/transparency](graphics/effects/transparency/) | 3 | Color math |
-| [graphics/effects/hdma_gradient](graphics/effects/hdma_gradient/) | 3 | Per-scanline colors |
+| # | Example | What You'll Learn |
+|---|---------|-------------------|
+| 4 | [backgrounds/mode1](graphics/backgrounds/mode1/) | Mode 1 multi-layer backgrounds |
+| 5 | [sprites/animated_sprite](graphics/sprites/animated_sprite/) | Frame animation, sprite sheets, H-flip |
+| 6 | [sprites/dynamic_sprite](graphics/sprites/dynamic_sprite/) | VRAM streaming, dynamic tile uploads |
+| 7 | [effects/fading](graphics/effects/fading/) | Brightness control, screen transitions |
+| 8 | [effects/mosaic](graphics/effects/mosaic/) | Mosaic pixelation effect |
 
-### 5. Input
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [input/two_players](input/two_players/) | 2 | Auto-read, multiplayer input |
+### Level 3 — Advanced Effects
 
-### 6. Audio
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [audio/tone](audio/tone/) | 1 | Basic sound generation |
-| [audio/sfx](audio/sfx/) | 2 | Sound effects |
-| [audio/snesmod_music](audio/snesmod_music/) | 3 | Tracker music |
-| [audio/snesmod_sfx](audio/snesmod_sfx/) | 3 | SNESMOD SFX |
+| # | Example | What You'll Learn |
+|---|---------|-------------------|
+| 9 | [backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | Streaming background scroll |
+| 10 | [effects/hdma_wave](graphics/effects/hdma_wave/) | HDMA scanline effects |
+| 11 | [effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
+| 12 | [effects/transparency](graphics/effects/transparency/) | Color math / blending |
+| 13 | [effects/window](graphics/effects/window/) | Hardware window masking |
 
-### 7. Memory
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [memory/save_game](memory/save_game/) | 2 | SRAM saves |
-| [memory/hirom_demo](memory/hirom_demo/) | 3 | HiROM mode |
+### Level 4 — Expert Topics
 
-### 8. Basics
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [basics/calculator](basics/calculator/) | 2 | Math operations |
-| [basics/collision_demo](basics/collision_demo/) | 3 | Collision detection |
-| [basics/smooth_movement](basics/smooth_movement/) | 3 | Interpolation |
+| # | Example | What You'll Learn |
+|---|---------|-------------------|
+| 14 | [backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
+| 15 | [backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 16 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 17 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 18 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback |
+| 19 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects |
 
-### 9. Complete Games
-| Example | Complexity | What You'll Learn |
-|---------|------------|-------------------|
-| [games/breakout](games/breakout/) | 4 | Complete game structure |
-| [games/entity_demo](games/entity_demo/) | 4 | Entity system |
+### Level 5 — Complete Projects
+
+| # | Example | What You'll Learn |
+|---|---------|-------------------|
+| 20 | [basics/collision_demo](basics/collision_demo/) | Collision detection mechanics |
+| 21 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 22 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
 
 ---
 
-## Building Examples
+## Building
 
 ```bash
-# Build everything
+# Build all examples
 cd opensnes
 make
 
-# Build a specific example
-cd examples/text/hello_world
-make
+# Build a single example
+make -C examples/text/hello_world
 
 # Clean and rebuild
 make clean && make
 ```
 
-## Running in Emulator
+## Running
 
-We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulation:
+We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate SNES emulation:
 
 ```bash
-/path/to/Mesen examples/text/hello_world/hello_world.sfc
+# Open a ROM in Mesen2
+mesen examples/text/hello_world/hello_world.sfc
 ```
 
+Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.
+
+## Tips
+
+1. **Follow the order** — each example builds on concepts from earlier ones
+2. **Read the source** — every `main.c` is commented to explain the "why"
+3. **Experiment** — change values, break things, see what happens
+4. **Use the debugger** — Mesen2's PPU viewer is invaluable for understanding what's in VRAM
+
+## Resources
+
+- [SNESdev Wiki](https://snes.nesdev.org/wiki/) — Hardware reference
+- [fullsnes](https://problemkaputt.de/fullsnes.htm) — Detailed technical documentation
+- [OpenSNES Issues](https://github.com/opensnes/opensnes/issues) — Report bugs or ask questions
+
 ---
 
-## Tips for Learning
-
-1. **Read the code comments** - They explain the "why"
-2. **Experiment** - Change values and see what happens
-3. **Use Mesen's debugger** - View VRAM, OAM, registers in real-time
-4. **Follow the complexity order** - Start with 1_, then 2_, etc.
-
-## Getting Help
-
-- [SNESdev Wiki](https://snes.nesdev.org/wiki/) - Hardware reference
-- [SNESdev Discord](https://discord.gg/snesdev) - Community help
-- [OpenSNES Issues](https://github.com/opensnes/opensnes/issues) - Report bugs
-
----
-
-**Ready?** Start with [text/hello_world](text/hello_world/) →
+**Ready?** Start with [text/hello_world](text/hello_world/) and build your first SNES ROM.
