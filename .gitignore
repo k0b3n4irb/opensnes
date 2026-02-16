@@ -45,9 +45,10 @@ testlink
 .DS_Store
 **/.DS_Store
 
-# Claude
+# Claude Code (internal tooling — not part of the public project)
 .claude/
 CLAUDE.md
+tests/CLAUDE.md
 
 # Build directories
 build/
@@ -57,6 +58,7 @@ release/
 # Temporary files
 *.log
 *.tmp
+*.bak
 
 # Build artifacts (generated files)
 *.asm
@@ -74,6 +76,10 @@ release/
 !examples/**/res/*.pic
 !examples/**/res/*.map
 !examples/**/res/*.pal
+!examples/**/res/*.inc
+!examples/**/res/*.as
+!examples/**/res/*.pc7
+!examples/**/res/*.mp7
 !examples/**/assets/*.inc
 !examples/**/assets/*.as
 !examples/**/assets/*.pc7

@@ -18,23 +18,27 @@
  *
  * ## Table Format
  *
- * Direct mode (bit 7 = 0): Write different data each scanline
+ * Non-repeat mode (bit 7 = 0): Write data ONCE, then skip N-1 scanlines
  * ```
- * .db 3        ; Apply next value for 3 lines
- * .db $1F, $00 ; Data (2 bytes for mode 1)
- * .db 5        ; Apply next value for 5 lines
+ * .db 32       ; Write data once, hold for 32 scanlines
+ * .db $1F, $00 ; Data (2 bytes for transfer mode 1)
+ * .db 16       ; Write data once, hold for 16 scanlines
  * .db $1F, $08 ; Data
  * .db 0        ; End of table
  * ```
+ * Use for registers that hold their value (COLDATA, CGADD).
+ * Efficient: 1 data set per group, regardless of line count.
  *
- * Repeat mode (bit 7 = 1): Write same data for N lines, then advance
+ * Repeat mode (bit 7 = 1): Write same data EVERY scanline for N lines
  * ```
- * .db $82      ; Repeat next value for 2 lines ($80 | 2)
- * .db $1F, $00 ; Data
- * .db $85      ; Repeat next value for 5 lines
+ * .db $82      ; Write data every scanline for 2 lines ($80 | 2)
+ * .db $1F, $00 ; Data written on each of the 2 scanlines
+ * .db $85      ; Write data every scanline for 5 lines
  * .db $1F, $08 ; Data
  * .db 0        ; End of table
  * ```
+ * REQUIRED for scroll registers (BG1HOFS, etc.) and other write-twice/
+ * latched registers that need re-writing every scanline.
  *
  * ## Usage Example
  *
@@ -56,6 +60,27 @@
  *
  * @note HDMA channels 6-7 are recommended to avoid conflicts with DMA.
  * @note HDMA tables must be in ROM or bank $7E RAM.
+ *
+ * ## IMPORTANT: Scroll Registers Require Repeat Mode
+ *
+ * BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that
+ * require being written EVERY scanline to maintain their value. Use REPEAT
+ * mode (bit 7 = 1) in the HDMA line count for these registers.
+ *
+ * Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the
+ * scroll value is lost on subsequent scanlines — causing visible glitches.
+ *
+ * ```
+ * // WRONG - Non-repeat writes once then skips, scroll value lost:
+ * .db 32, $20, $00    ; Writes on line 1 only, lines 2-32 get stale value
+ *
+ * // CORRECT - Repeat writes every scanline, scroll value maintained:
+ * .db $A0, $20, $00   ; $A0 = $80 | 32 = write every scanline for 32 lines
+ * ```
+ *
+ * Summary:
+ * - COLDATA ($2132), CGADD/CGDATA: non-repeat OK (registers hold value)
+ * - BG scroll, window, Mode 7 matrix: MUST use repeat mode
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -202,6 +227,21 @@
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
 
 /**
+ * @brief Set up an HDMA channel with explicit source bank byte.
+ *
+ * Same as hdmaSetup() but allows specifying the ROM bank for HDMA tables
+ * in banks other than $00. Use this when your HDMA table is in a SUPERFREE
+ * section that may be placed in bank $01+ by the linker.
+ *
+ * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or _7)
+ * @param mode     Transfer mode (HDMA_MODE_*)
+ * @param destReg  Destination B-bus register (low byte of $21xx address)
+ * @param table    Pointer to HDMA table in ROM or RAM
+ * @param bank     Source bank byte ($00-$3F for LoROM)
+ */
+void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank);
+
+/**
  * @brief Enable HDMA channel(s)
  *
  * Enables the specified HDMA channel(s). HDMA will start on the next frame.
@@ -294,5 +334,67 @@ void hdmaGradient(u8 channel, const void *colorTable);
  * @note Uses mode 2REG to write both WH0 and WH1
  */
 void hdmaWindowShape(u8 channel, const void *windowTable);
+
+/*============================================================================
+ * HDMA Wave Effect Functions
+ *============================================================================*/
+
+/**
+ * @brief Initialize HDMA wave effect system
+ *
+ * Must be called once before using wave effects. Allocates internal
+ * buffers and sets up the wave state.
+ */
+void hdmaWaveInit(void);
+
+/**
+ * @brief Set up horizontal wave effect (water reflection)
+ *
+ * Creates a wavy horizontal distortion, commonly used for:
+ * - Water reflections
+ * - Heat shimmer
+ * - Dream/flashback sequences
+ *
+ * @param channel HDMA channel to use (6 or 7 recommended)
+ * @param bg Background layer to affect (1-3)
+ * @param amplitude Wave amplitude in pixels (1-16)
+ * @param frequency Wave frequency (1=long waves, 8=short waves)
+ *
+ * @code
+ * hdmaWaveInit();
+ * hdmaWaveH(HDMA_CHANNEL_6, 1, 4, 2);  // Gentle water reflection on BG1
+ * hdmaEnable(1 << HDMA_CHANNEL_6);
+ *
+ * while (1) {
+ *     WaitForVBlank();
+ *     hdmaWaveUpdate();  // Animate the wave
+ * }
+ * @endcode
+ */
+void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency);
+
+/**
+ * @brief Update wave animation
+ *
+ * Call this once per frame (after WaitForVBlank) to animate
+ * the wave effect. Updates the HDMA table with new wave values.
+ *
+ * @note Only needed if wave effects are active
+ */
+void hdmaWaveUpdate(void);
+
+/**
+ * @brief Stop wave effect and disable HDMA channel
+ *
+ * Disables the wave effect and frees the HDMA channel.
+ */
+void hdmaWaveStop(void);
+
+/**
+ * @brief Set wave speed
+ *
+ * @param speed Animation speed (1=slow, 4=fast, default=2)
+ */
+void hdmaWaveSetSpeed(u8 speed);
 
 #endif /* OPENSNES_HDMA_H */

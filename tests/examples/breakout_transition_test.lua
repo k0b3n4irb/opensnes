@@ -16,7 +16,7 @@ Test approach:
 5. Check that specific pixels don't show "pink" corruption
 
 Usage:
-  ./Mesen --testrunner examples/game/1_breakout/breakout.sfc --lua tests/examples/breakout_transition_test.lua
+  ./Mesen --testrunner examples/game/breakout/breakout.sfc --lua tests/examples/breakout_transition_test.lua
 ]]
 
 print("==========================================")

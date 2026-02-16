@@ -79,7 +79,7 @@ Color index = (bitplane1[bit] << 1) | bitplane0[bit]
 
 ## Lessons
 
-### [1. Hello World](1_hello_world/)
+### [1. Hello World](hello_world/)
 **Difficulty:** ⭐ Beginner
 
 Your first SNES ROM! Display "HELLO WORLD" on screen.
@@ -96,7 +96,7 @@ Your first SNES ROM! Display "HELLO WORLD" on screen.
 
 ---
 
-### [2. Custom Font](2_custom_font/)
+### [2. Custom Font](custom_font/)
 **Difficulty:** ⭐⭐ Beginner+
 
 Create your own font and display multiple lines of text.

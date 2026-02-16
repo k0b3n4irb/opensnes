@@ -203,7 +203,7 @@ void oamInit(void);
  * @param size Sprite size configuration (OBJ_SIZE_*)
  * @param tileBase Base address for sprite tiles in VRAM (word address >> 13)
  */
-void oamInitEx(u8 size, u8 tileBase);
+void oamInitEx(u16 size, u16 tileBase);
 
 /**
  * @brief Initialize sprite graphics and palette (PVSnesLib compatible)
@@ -253,12 +253,29 @@ void oamSetEx(u8 id, u8 size, u8 visible);
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
+ * @warning **Coordinate Variable Pattern**: Due to a compiler quirk, sprite
+ * coordinates MUST be stored in a struct with s16 members for correct behavior.
+ * Using separate u16 variables causes jerky horizontal movement.
+ *
+ * **CORRECT** (use struct with s16):
  * @code
- * oamSet(0, 100, 80, 0, 0, 3, 0);  // Sprite 0, priority 3, no flip
- * oamSet(1, 50, 50, 4, 1, 2, 0x40);  // Sprite 1, palette 1, H-flip
+ * typedef struct { s16 x, y; } Position;
+ * Position player = {100, 100};
+ * oamSet(0, player.x, player.y, 0, 0, 3, 0);
+ * player.x += 1;  // Smooth movement
  * @endcode
+ *
+ * **WRONG** (separate u16 variables - causes bugs):
+ * @code
+ * u16 player_x = 100;  // DON'T do this!
+ * u16 player_y = 100;
+ * oamSet(0, player_x, player_y, 0, 0, 3, 0);
+ * player_x += 1;  // Jerky movement!
+ * @endcode
+ *
+ * See examples/graphics/backgrounds/continuous_scroll for details on this pattern.
  */
-void oamSet(u8 id, u16 x, u8 y, u16 tile, u8 palette, u8 priority, u8 flags);
+void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
 /**
  * @brief Set sprite X position
@@ -297,7 +314,19 @@ void oamSetTile(u8 id, u16 tile);
  * @brief Set sprite visibility
  *
  * @param id Sprite ID (0-127)
- * @param visible TRUE to show, FALSE to hide
+ * @param visible OBJ_SHOW (1) or OBJ_HIDE (0)
+ *
+ * @note **Important**: SNES sprite visibility is controlled by Y position.
+ * Setting Y to 240 (OBJ_HIDE_Y) hides the sprite below the visible screen.
+ * This function only handles HIDING (sets Y=240). Passing OBJ_SHOW does
+ * nothing - to show a sprite, set a valid Y coordinate using oamSetY() or
+ * oamSet(). For explicit hiding, use oamHide() which is clearer.
+ *
+ * @code
+ * oamSetVisible(0, OBJ_HIDE);  // Hides sprite 0 (sets Y=240)
+ * oamSetVisible(0, OBJ_SHOW);  // Does nothing! Sprite stays hidden.
+ * oamSetY(0, 100);             // This shows the sprite at Y=100
+ * @endcode
  */
 void oamSetVisible(u8 id, u8 visible);
 
@@ -314,7 +343,7 @@ void oamHide(u8 id);
  * @param id Sprite ID (0-127)
  * @param large TRUE for large size, FALSE for small
  */
-void oamSetSize(u8 id, u8 large);
+void oamSetSize(u16 id, u16 large);
 
 /*============================================================================
  * OAM Update

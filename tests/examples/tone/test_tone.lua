@@ -21,7 +21,7 @@ local dbg = require("snesdbg")
 test.describe("Tone (Audio) Example", function()
 
     test.beforeAll(function()
-        test.loadSymbols(scriptDir .. "../../../examples/audio/1_tone/tone.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/audio/tone/tone.sym")
     end)
 
     test.beforeEach(function()

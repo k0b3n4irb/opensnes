@@ -63,7 +63,7 @@ clean:
 	$(MAKE) -C $(TESTS_PATH) clean
 	-rm -rf bin/
 
-install: compiler tools
+install: compiler tools lib
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
 
@@ -92,17 +92,17 @@ tests: compiler tools
 	$(MAKE) -C $(TESTS_PATH)
 
 docs:
-	doxygen Doxyfile
+	cd docs && doxygen Doxyfile
 	@echo "========================================="
-	@echo "Documentation generated in doc/html/"
-	@echo "Open doc/html/index.html in a browser"
+	@echo "Documentation generated in docs/build/html/"
+	@echo "Open docs/build/html/index.html in a browser"
 	@echo "========================================="
 
 #------------------------------------------------------------------------------
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: all docs
+release: install docs
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."

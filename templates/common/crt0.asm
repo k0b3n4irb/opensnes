@@ -16,6 +16,40 @@
 ;
 ;==============================================================================
 
+;------------------------------------------------------------------------------
+; ASCII Table Definition
+;------------------------------------------------------------------------------
+; Define identity mapping for .ASC directives (character → same character).
+; This suppresses the WLA-DX warning "No .ASCIITABLE defined" and makes
+; the intended mapping explicit.
+;------------------------------------------------------------------------------
+.ASCIITABLE
+MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
+.ENDA
+
+;==============================================================================
+; WLA-DX Section Types Used in This File
+;==============================================================================
+;
+; FORCE    - Section placed at an exact address. The ORGA directive specifies
+;            the absolute address. Content MUST fit exactly. Used for hardware
+;            requirements like compiler registers at $0000 and OAM buffer at
+;            $7E:0300 (avoiding WRAM mirror overlap).
+;
+; SEMIFREE - Section placed after a specified ORG within the bank, but the
+;            linker can move it if needed. Good for startup code that needs
+;            to be in bank 0 but doesn't need a specific address.
+;
+; SUPERFREE - Section can be placed in ANY bank with available space. Used
+;             for library code and data that doesn't need specific placement.
+;             The linker optimizes placement automatically.
+;
+; RAMSECTION - Allocates RAM without generating ROM data. Combined with
+;              ORGA FORCE for precise placement or without for automatic.
+;
+; For more details, see .claude/WLA-DX.md
+;==============================================================================
+
 ; Include ROM header (memory map, vectors)
 .include "project_hdr.asm"
 
@@ -81,6 +115,9 @@
 .RAMSECTION ".system" BANK 0 SLOT 1
     vblank_flag     dsb 1   ; Set by NMI handler, cleared by WaitVBlank
     oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
+    tilemap_update_flag dsb 1 ; Set when tilemap buffer needs DMA to VRAM
+    tilemap_vram_addr dsb 2   ; VRAM word address for tilemap DMA target
+    tilemap_src_addr dsb 2    ; 16-bit RAM address of tilemap buffer (bank $00)
     frame_count     dsb 2   ; Frame counter (incremented by NMI handler)
     frame_count_svg dsb 2   ; Saved frame count
     lag_frame_counter dsb 2 ; Lag frame detection
@@ -88,6 +125,20 @@
     pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
+.ENDS
+
+;------------------------------------------------------------------------------
+; Reserved Bank $00 Region (WRAM Mirror Protection)
+;------------------------------------------------------------------------------
+; Bank $00 addresses $0000-$1FFF mirror Bank $7E's $0000-$1FFF.
+; We reserve $0300-$051F in Bank $00 to prevent the linker from placing
+; variables there, avoiding collision with Bank $7E's OAM buffer.
+; Note: Dynamic sprite buffers ($0520+) are only used by advanced projects
+; that typically manage their own memory layout.
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".reserved_7e_mirror" BANK 0 SLOT 1 ORGA $0300 FORCE
+    _reserved_7e_mirror dsb 544 ; Reserved: mirrors Bank $7E oamMemory
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -107,17 +158,22 @@
 ; oambuffer: Game-level sprite state (128 sprites × 16 bytes = 2048 bytes)
 ; oamQueueEntry: VRAM upload queue (128 entries × 6 bytes = 768 bytes)
 ; State variables for sprite management
+;
+; oambuffer MUST be in Bank $00 mirror range ($0000-$1FFF) because the C
+; compiler generates `sta.l $0000,x` which always writes to bank $00.
+; Address $0520 is right after oamMemory ($0300-$051F).
+; Assembly code with DB=$7E reads $7E:0520 = same physical RAM (mirror).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".dynamic_sprite_buffer" BANK $7E SLOT 1 ORGA $0520 FORCE
-    oambuffer       dsb 2048    ; 128 × 16 bytes ($7E:0520-$7E:0D1F)
+; oambuffer (2048 bytes) is defined in sprite_dynamic.asm (BANK 0 SLOT 1)
+; so C code can access it via sta.l $0000,x. Only projects using
+; LIB_MODULES := ... sprite_dynamic ... allocate it.
+
+.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 2 ORGA $2800 FORCE
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:2800-$7E:2AFF)
 .ENDS
 
-.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 1 ORGA $0D20 FORCE
-    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:0D20-$7E:101F)
-.ENDS
-
-.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 1 ORGA $1020 FORCE
+.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 2 ORGA $2B00 FORCE
     ; Temporary values for sprite calculations
     sprit_val0      dsb 1       ; Temporary value #0
     sprit_val1      dsb 1       ; Temporary value #1
@@ -145,9 +201,17 @@
 ;------------------------------------------------------------------------------
 ; ROM Setup
 ;------------------------------------------------------------------------------
+; LoROM: Slot 0 starts at $8000, so .ORG 0 = address $8000
+; HiROM: Slot 0 starts at $0000 (64KB banks), so .ORG $8000 = address $8000
+;        Code must be at $8000+ to be accessible via bank $00 mirror.
+;------------------------------------------------------------------------------
 
 .BANK 0
-.ORG 0
+.ifdef HIROM
+.ORG $8000              ; HiROM: 64KB bank, place code at $8000+
+.else
+.ORG 0                  ; LoROM: Slot starts at $8000, so .ORG 0 = $8000
+.endif
 .EMPTYFILL $00
 
 ;------------------------------------------------------------------------------
@@ -262,6 +326,48 @@ InitHardware:
     cpx #$420E
     bne -
 
+    ;--------------------------------------------------------------------------
+    ; Initialize OAM buffer to hide all sprites
+    ;--------------------------------------------------------------------------
+    ; The NMI handler DMAs oamMemory to hardware OAM every frame.
+    ; If not initialized, garbage sprites appear on screen.
+    ; Y position = 240 ($F0) hides sprites below visible screen.
+    ;--------------------------------------------------------------------------
+    ; Set data bank to $7E to access oamMemory with absolute addressing
+    pea $7E7E
+    plb
+    plb
+
+    rep #$20            ; 16-bit A
+    ldx #0
+    lda #$00F0          ; Little-endian: low byte=$F0 (Y=240), high byte=$00 (tile=0)
+@oam_clear_loop:
+    stz.w oamMemory,x   ; X position = 0
+    sta.w oamMemory+1,x ; Y = 240, tile = 0
+    stz.w oamMemory+3,x ; attributes = 0 (only low byte matters)
+    inx
+    inx
+    inx
+    inx
+    cpx #512            ; 128 sprites × 4 bytes
+    bne @oam_clear_loop
+
+    ; Clear OAM extension table (32 bytes)
+    ldx #0
+@oam_ext_clear:
+    stz.w oamMemory+512,x
+    inx
+    inx
+    cpx #32
+    bne @oam_ext_clear
+
+    sep #$20            ; Back to 8-bit A
+
+    ; Restore data bank to $00
+    pea $0000
+    plb
+    plb
+
     rts
 
 .ENDS
@@ -300,6 +406,7 @@ Start:
     ; Clear system flags
     stz vblank_flag
     stz oam_update_flag
+    stz tilemap_update_flag
 
     ; Initialize VBlank callback to default (does nothing)
     rep #$20
@@ -337,6 +444,9 @@ Start:
     plb
     plb
 
+    ; Initialize static variables (copy init data from ROM to RAM)
+    jsr CopyInitData
+
     ; Enable NMI (VBlank interrupt)
     sep #$20
     lda #$81            ; NMI + auto joypad
@@ -351,6 +461,76 @@ Start:
     sep #$20
     sta $FFFD           ; Store for test runners
     stp                 ; Stop CPU
+
+.ENDS
+
+;==============================================================================
+; Initialized Data Copy Routine
+;==============================================================================
+; Copies initialized static variable data from ROM to RAM at startup.
+;
+; Init data format (generated by compiler for each initialized static):
+;   [target_addr:2][size:2][data:N]
+;
+; End marker: target_addr = 0
+;
+; The DataInitStart symbol points to the base .data_init section.
+; A placeholder byte precedes the actual init records.
+; All .data_init.N sections are appended by WLA-DX using APPENDTO.
+;==============================================================================
+
+.SECTION ".copy_init" SEMIFREE
+
+CopyInitData:
+    rep #$30            ; 16-bit A and X/Y
+
+    ; Load address of init data start (skip 1-byte placeholder)
+    lda #DataInitStart + 1
+    sta tcc__r0         ; tcc__r0 = current ROM pointer (low word)
+
+@init_loop:
+    ; Read target RAM address
+    lda (tcc__r0)
+    beq @init_done      ; If target_addr == 0, we're done
+    sta tcc__r2         ; tcc__r2 = RAM target address
+
+    ; Read size
+    ldy #2
+    lda (tcc__r0),y
+    beq @next_record    ; If size == 0, skip to next (shouldn't happen)
+    sta tcc__r4         ; tcc__r4 = size
+
+    ; Source is at tcc__r0 + 4 (after addr and size fields)
+    lda tcc__r0
+    clc
+    adc #4
+    sta tcc__r1         ; tcc__r1 = ROM source address
+
+    ; Copy loop: copy tcc__r4 bytes from [tcc__r1] to [tcc__r2]
+    ; IMPORTANT: Use 8-bit A to copy exactly 1 byte per iteration.
+    ; 16-bit lda/sta would write 2 bytes per iteration, causing a
+    ; 1-byte overrun past the target on the final iteration.
+    sep #$20            ; 8-bit A (X/Y remain 16-bit)
+    ldy #0
+@copy_byte:
+    lda (tcc__r1),y
+    sta (tcc__r2),y
+    iny
+    cpy tcc__r4
+    bne @copy_byte
+    rep #$20            ; restore 16-bit A
+
+@next_record:
+    ; Move to next init record: tcc__r0 += 4 + size
+    lda tcc__r0
+    clc
+    adc #4              ; Skip addr and size fields
+    adc tcc__r4         ; Skip data bytes
+    sta tcc__r0
+    bra @init_loop
+
+@init_done:
+    rts
 
 .ENDS
 
@@ -529,6 +709,14 @@ NmiHandler:
     beq +
     stz oam_update_flag
     jsl oamUpdate
+    sep #$20            ; C functions return in 16-bit A, restore 8-bit
++
+
+    ; Transfer tilemap buffer to VRAM during VBlank
+    lda tilemap_update_flag
+    beq +
+    stz tilemap_update_flag
+    jsl tilemapFlush
 +
 
     ; Set VBlank flag
@@ -582,6 +770,67 @@ IrqHandler:
 ;
 ; The NMI handler calls oamUpdate if oam_update_flag is set.
 ; This function must be provided by either the library or oam_helpers.asm.
+;==============================================================================
+
+;==============================================================================
+; Tilemap Flush (DMA tilemap buffer to VRAM)
+;==============================================================================
+; Called during VBlank by NMI handler when tilemap_update_flag is set.
+; DMA transfers 2048 bytes from tilemapBuffer ($7E:3000) to VRAM.
+; Uses DMA channel 1 to avoid conflicting with OAM on channel 0/7.
+;==============================================================================
+
+.SECTION ".tilemap_flush" SEMIFREE
+
+tilemapFlush:
+    php
+    phb                 ; Save current data bank
+
+    ; Set DBR to $00 for hardware register access
+    pea $0000
+    plb
+    plb                 ; DBR = $00
+
+    sep #$20            ; 8-bit A
+    lda #$80
+    sta $2115           ; VMAIN: increment after high byte write
+
+    rep #$20            ; 16-bit A
+    lda tilemap_vram_addr
+    sta $2116           ; VMADDL/H: VRAM word address
+
+    ; DMA channel 1: word write mode (2 regs write once: VMDATAL+VMDATAH)
+    lda #$1801          ; Mode 01 (ab), target $18 (VMDATAL)
+    sta $4310
+
+    ; Transfer size = 2048 bytes
+    lda #2048
+    sta $4315
+
+    ; Source address from tilemap_src_addr (set by textInit in C)
+    lda tilemap_src_addr
+    sta $4312           ; DMA source address (low word)
+
+    sep #$20            ; 8-bit A
+    lda #$00            ; Bank $00 (WRAM mirror, buffer always < $2000)
+    sta $4314           ; DMA source bank
+
+    lda #$02            ; Enable DMA channel 1
+    sta $420B
+
+    plb                 ; Restore data bank
+    plp
+    rtl                 ; Return long (called with JSL)
+
+.ENDS
+
+;==============================================================================
+; Note on C Code Placement
+;==============================================================================
+; The compiler generates data accesses using `lda.l $0000,x` which reads from
+; bank $00. In both LoROM and HiROM modes, bank $00:$8000-$FFFF contains ROM.
+; C code sections use SUPERFREE and will be placed in available ROM space.
+; No special BASE directive is needed since code stays in bank $00.
 ;==============================================================================
 
 ;==============================================================================

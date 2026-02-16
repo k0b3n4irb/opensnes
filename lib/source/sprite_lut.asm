@@ -9,7 +9,11 @@
 ; - 32x32 sprites use 16 tiles in a 4x4 pattern
 ;-----------------------------------------------------------------------
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 ;-----------------------------------------------------------------------
 ; 16x16 Sprite Lookup Tables (64 sprites max)

@@ -75,7 +75,7 @@ Building examples... (30 ROMs)
 
 ```bash
 # Navigate to hello world example
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 
 # Open the ROM in your emulator
 # macOS:
@@ -94,7 +94,7 @@ The easiest way is to copy an existing example:
 
 ```bash
 # From the opensnes root directory
-cp -r examples/text/1_hello_world ~/my-snes-game
+cp -r examples/text/hello_world ~/my-snes-game
 cd ~/my-snes-game
 
 # Edit the Makefile to change the ROM name
@@ -166,10 +166,10 @@ Now that you have a working setup, explore by complexity:
 
 | Level | Examples | What You'll Learn |
 |-------|----------|-------------------|
-| **Beginner** | `text/1_hello_world`, `basics/1_calculator` | Console output, basic setup |
-| **Intermediate** | `graphics/2_animation`, `input/1_joypad` | Sprites, controller input |
-| **Advanced** | `graphics/10_mode7`, `audio/6_snesmod_music` | Mode 7, tracker music |
-| **Expert** | `game/1_breakout`, `game/2_entity_demo` | Complete game structure |
+| **Beginner** | `text/hello_world`, `basics/calculator` | Console output, basic setup |
+| **Intermediate** | `graphics/animation`, `input/joypad` | Sprites, controller input |
+| **Advanced** | `graphics/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
+| **Expert** | `game/breakout`, `game/entity_demo` | Complete game structure |
 
 Browse all examples:
 ```bash
@@ -211,7 +211,7 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
 This is usually a compiler limitation. Check:
 - Are you using `u32`/`s32`? Prefer `u16`/`s16` when possible
-- Static variables with initializers? Use `static u8 x;` not `static u8 x = 0;`
+- Both `static u8 x = 0;` and `static u8 x;` work correctly
 
 ## Getting Help
 

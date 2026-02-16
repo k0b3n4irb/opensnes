@@ -347,12 +347,21 @@ def print_overlap_check(table: SymbolTable) -> int:
 
     # Both banks have symbols - check for EXACT address collisions
     # We only flag an error if the SAME address is used in BOTH banks
-    bank0_max = max(s.address for s in bank0_mirror)
+
+    # Filter out reserved placeholder symbols (intentional space reservations)
+    # These symbols start with '_reserved' and exist to prevent linker placement
+    bank0_real = [s for s in bank0_mirror if not s.name.startswith('_reserved')]
+
+    if not bank0_real:
+        print(f"{Colors.GREEN}OK: Bank $00 only has reserved placeholder symbols{Colors.RESET}")
+        return 0
+
+    bank0_max = max(s.address for s in bank0_real)
     bank7e_min = min(s.address for s in bank7e_mirror)
     bank7e_max = max(s.address for s in bank7e_mirror)
 
     # Build address sets for precise collision detection
-    bank0_addresses = set(s.address for s in bank0_mirror)
+    bank0_addresses = set(s.address for s in bank0_real)
     bank7e_addresses = set(s.address for s in bank7e_mirror)
 
     # Check for oamMemory buffer range (544 bytes starting at its address)

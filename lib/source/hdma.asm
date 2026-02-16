@@ -3,9 +3,27 @@
 ;
 ; HDMA requires 24-bit source addresses for tables in ROM.
 ; The C version can't handle this correctly, so we need assembly.
+;
+;==============================================================================
+; BANK LIMITATION (same as DMA)
+;==============================================================================
+; HDMA table bank handling:
+;   - ROM addresses ($8000+): Bank is set to $00
+;   - RAM addresses (< $8000): Bank is set to $7E
+;
+; This means HDMA tables in ROM must be in bank 0 for correct operation.
+; For most projects this is not a limitation since HDMA tables are small
+; and typically placed via SUPERFREE which lands in bank 0.
+;
+; If you need HDMA tables in higher banks, you would need to modify
+; hdmaSetup() to accept an explicit bank parameter.
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 .SECTION ".hdma_asm" SUPERFREE
 
@@ -101,6 +119,61 @@ hdmaSetup:
     sta.l $0004,x           ; $43x4 = A1B (bank)
 
 @done:
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank)
+;
+; Same as hdmaSetup but with explicit bank byte for HDMA tables in banks > $00.
+;
+; Stack layout (after PHP):
+;   5-6,s = bank (rightmost, u8 in 16-bit slot)
+;   7-8,s = table (16-bit pointer)
+;   9-10,s = destReg (u8 in 16-bit slot)
+;   11-12,s = mode (u8 in 16-bit slot)
+;   13-14,s = channel (leftmost, u8 in 16-bit slot)
+;------------------------------------------------------------------------------
+hdmaSetupBank:
+    php
+    rep #$30                ; 16-bit A and X/Y
+
+    ; Calculate DMA register base address for this channel
+    sep #$20
+    lda 13,s                ; channel (8-bit)
+    cmp #8
+    bcs @hdmaSetupBank_done ; Invalid channel, bail out
+
+    rep #$20
+    and #$00FF              ; Mask to 8-bit
+    asl a
+    asl a
+    asl a
+    asl a                   ; channel * 16
+    clc
+    adc #$4300              ; Base address
+    tax                     ; X = register base ($43x0)
+
+    ; Set HDMA mode (DMAPx at $43x0)
+    sep #$20
+    lda 11,s                ; mode (8-bit)
+    sta.l $0000,x           ; $43x0 = DMAP
+
+    ; Set destination register (BBADx at $43x1)
+    lda 9,s                 ; destReg (8-bit)
+    sta.l $0001,x           ; $43x1 = BBAD
+
+    ; Set table address (A1Tx at $43x2-$43x3)
+    rep #$20
+    lda 7,s                 ; table address (16-bit)
+    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+
+    ; Set bank from explicit parameter
+    sep #$20
+    lda 5,s                 ; bank byte
+    sta.l $0004,x           ; $43x4 = A1B (bank)
+
+@hdmaSetupBank_done:
     plp
     rtl
 
@@ -230,4 +303,31 @@ hdmaSetTable:
 ;------------------------------------------------------------------------------
 .RAMSECTION ".hdma_state" BANK 0 SLOT 1
     hdma_enabled_state: dsb 1
+.ENDS
+
+;------------------------------------------------------------------------------
+; RAM for HDMA wave effect (double-buffered tables)
+;
+; Tables use 4-line chunks: 224 / 4 = 56 entries * 3 bytes + 1 = 169 bytes
+; Format per entry: [0x84 = repeat 4 lines] [scroll_lo] [scroll_hi]
+;
+; Tables are in bank $7E above the WRAM mirror ($2000+).
+; C code writes to them via the WRAM data port ($2180-$2183) since the
+; compiler's sta.l $0000,x only accesses bank $00 (I/O above $1FFF).
+; HDMA reads directly from bank $7E via the bank byte set in hdmaSetup.
+;------------------------------------------------------------------------------
+.RAMSECTION ".hdma_wave_tables" BANK $7E SLOT 2
+    hdma_table_a:         dsb 169    ; Buffer A
+    hdma_table_b:         dsb 169    ; Buffer B
+.ENDS
+
+.RAMSECTION ".hdma_wave_state" BANK 0 SLOT 1
+    hdma_active_buffer:   dsb 1      ; 0 = buffer A active, 1 = buffer B active
+    hdma_wave_frame:      dsb 1      ; Animation frame counter
+    hdma_wave_amplitude:  dsb 1      ; Wave amplitude (pixels)
+    hdma_wave_frequency:  dsb 1      ; Wave frequency multiplier
+    hdma_wave_channel:    dsb 1      ; HDMA channel being used
+    hdma_wave_enabled:    dsb 1      ; 1 = wave effect active
+    hdma_wave_speed:      dsb 1      ; Animation speed (frames per update)
+    hdma_wave_dest_reg:   dsb 1      ; Destination register (BG1HOFS, etc.)
 .ENDS

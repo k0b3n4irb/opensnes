@@ -194,7 +194,7 @@ sprite_pal_end:
 
 ## Example: Complete Background Setup
 
-See `examples/graphics/4_scrolling/` for a complete parallax scrolling example.
+See `examples/graphics/scrolling/` for a complete parallax scrolling example.
 
 ## Next Steps
 

@@ -1,5 +1,5 @@
 ; Library memory map for compiling library object files
-; Must EXACTLY match the ROM's LoROM configuration in templates/common/hdr.asm
+; LoROM configuration (32KB banks)
 
 .MEMORYMAP
     SLOTSIZE $8000          ; 32KB per slot (default)

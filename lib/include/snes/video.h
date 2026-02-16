@@ -51,6 +51,9 @@
  * - 1: 2 BG 16-color, 1 BG 4-color (most common)
  * - 7: Mode 7 rotation/scaling
  *
+ * @note consoleInit() sets BG1 tilemap at VRAM $0400 and tile data at $0000.
+ *       Use bgSetMapPtr() and bgSetGfxPtr() to customize after setMode().
+ *
  * @code
  * // Mode 1 with BG3 having high priority (for HUD overlay)
  * setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
