@@ -1,356 +1,91 @@
-# Window Masking Example
+# Window — HDMA Triangle Masking
 
-An interactive spotlight effect using SNES hardware window masking.
+A triangle-shaped window mask driven by HDMA, showing how per-scanline window
+boundary updates create non-rectangular shapes. Press **A**, **X**, or **B** to
+apply the window to different background layers.
 
-## Learning Objectives
+Ported from PVSnesLib "Window" example.
 
-After this lesson, you will understand:
-- What hardware windows are on the SNES
-- How to create and position windows
-- Masking layers with windows
-- Inverted vs normal window modes
-- Common window effects (spotlight, split-screen, wipes)
+## Controls
 
-## Prerequisites
+| Button | Action |
+|--------|--------|
+| **A** | Window on BG1 only |
+| **X** | Window on BG2 only |
+| **B** | Window on both BG1 and BG2 |
 
-- Understanding of backgrounds and layers
-- Completed basic graphics examples
+## How It Works
 
----
+### SNES Window System
 
-## What This Example Does
+The SNES PPU has two hardware windows — rectangular regions defined by left and
+right X coordinates. These windows can mask (hide) portions of any background
+layer or sprite layer. Window operations cost zero CPU time because they're
+handled entirely by the PPU.
 
-Creates a movable "spotlight" effect that reveals a portion of the background:
-- A rectangular window moves across the screen
-- Content inside the window is visible
-- Content outside is masked (hidden)
-- Can toggle inverted mode (show outside, hide inside)
+### Making Non-Rectangular Shapes with HDMA
 
-```
-+----------------------------------------+
-|████████████████████████████████████████|
-|█████████+----------+███████████████████|
-|█████████| VISIBLE  |███████████████████|
-|█████████| CONTENT  |███████████████████|
-|█████████+----------+███████████████████|
-|████████████████████████████████████████|
-+----------------------------------------+
-```
+A single window is always a horizontal band. But by changing the left/right
+boundaries **every scanline** using HDMA, you can create any shape — circles,
+triangles, or custom silhouettes.
 
-**Controls:**
-- D-Pad Left/Right: Move window horizontally
-- A button: Toggle window on/off
-- B button: Toggle inverted mode
-- L button: Decrease window width
-- R button: Increase window width
+This example uses two HDMA channels:
+- **Channel 6** writes to WH0 ($2126) — window 1 left boundary
+- **Channel 7** writes to WH1 ($2127) — window 1 right boundary
 
----
+### The Triangle Tables
 
-## Code Type
-
-**Pure C**
-
-| Component | Type |
-|-----------|------|
-| Main loop | C (`main.c`) |
-| Input handling | C (direct register reads) |
-| Window control | Library (`window.c`) |
-| Graphics loading | Library (`bgInitTileSet`, `dmaCopyVram`) |
-| Graphics data | Assembly (`data.asm`) |
-
----
-
-## Window Fundamentals
-
-### What Are Windows?
-
-The SNES has two hardware windows (Window 1 and Window 2) that create rectangular mask regions:
-- Each window has left and right boundaries
-- Windows span the full screen height
-- Windows can mask any layer (BG1-4, sprites)
-- Logic operations combine windows
-
-### Window Registers
-
-| Register | Address | Purpose |
-|----------|---------|---------|
-| WH0 | $2126 | Window 1 left position |
-| WH1 | $2127 | Window 1 right position |
-| WH2 | $2128 | Window 2 left position |
-| WH3 | $2129 | Window 2 right position |
-| W12SEL | $2123 | Window 1/2 enable for BG1/2 |
-| W34SEL | $2124 | Window 1/2 enable for BG3/4 |
-| WOBJSEL | $2125 | Window 1/2 enable for OBJ/Color |
-| TMW | $212E | Main screen window mask |
-| TSW | $212F | Subscreen window mask |
-
----
-
-## Setting Up a Window
-
-### Step 1: Set Position
-
-```c
-/* Window 1 from X=88 to X=168 (80 pixels wide) */
-windowSetPos(WINDOW_1, 88, 168);
-```
-
-### Step 2: Enable for Layers
-
-```c
-/* Enable Window 1 for BG1 */
-windowEnable(WINDOW_1, WINDOW_BG1);
-```
-
-### Step 3: Set Inversion
-
-```c
-/* Normal: mask outside, show inside */
-windowSetInvert(WINDOW_1, WINDOW_BG1, 0);
-
-/* Inverted: show outside, mask inside */
-windowSetInvert(WINDOW_1, WINDOW_BG1, 1);
-```
-
-### Step 4: Enable Masking on Main Screen
-
-```c
-/* Apply window mask to main screen for BG1 */
-windowSetMainMask(WINDOW_BG1);
-```
-
----
-
-## The Spotlight Effect
-
-This example creates a centered, movable window:
-
-```c
-static u8 window_x = 128;         /* Center of screen */
-static u8 window_half_width = 40; /* 80 pixels wide */
-
-static void update_window(void) {
-    u8 left, right;
-
-    /* Calculate boundaries with clamping */
-    if (window_x < window_half_width) {
-        left = 0;
-    } else {
-        left = window_x - window_half_width;
-    }
-
-    if (window_x + window_half_width > 255) {
-        right = 255;
-    } else {
-        right = window_x + window_half_width;
-    }
-
-    /* Apply window settings */
-    windowSetPos(WINDOW_1, left, right);
-    windowEnable(WINDOW_1, WINDOW_BG1);
-    windowSetInvert(WINDOW_1, WINDOW_BG1, window_inverted);
-    windowSetMainMask(WINDOW_BG1);
-}
-```
-
----
-
-## Window Inversion
-
-### Normal Mode (Invert = 0)
+The HDMA tables define a diamond/triangle shape centered on screen:
 
 ```
-Outside window: MASKED (invisible)
-Inside window:  VISIBLE
+Line  0-59:  WH0=255, WH1=0   -> left > right -> window disabled (no mask)
+Line 60-91:  WH0 shrinks 127->96, WH1 grows 129->160 -> triangle expands
+Line 92-123: WH0 grows 96->127, WH1 shrinks 160->129 -> triangle contracts
+Line 124+:   WH0=255, WH1=0   -> window disabled again
 ```
 
-Use for: Spotlights, reveals, fade-in effects
+The tables use **repeat mode** (bit 7 set in the line count) because each
+scanline needs a different value. Non-repeat mode would write once and hold,
+which doesn't work when the shape changes per line.
 
-### Inverted Mode (Invert = 1)
+### Inversion: Show Inside
 
-```
-Outside window: VISIBLE
-Inside window:  MASKED (invisible)
-```
+By default, TMW (main screen window) hides pixels **inside** the window.
+We set the **invert** flag so that pixels **outside** the window are hidden
+instead — revealing only the triangle-shaped area.
 
-Use for: Cutouts, hiding UI elements, special effects
+### Switching Layers
 
----
+When you press A/X/B, the code:
+1. Disables HDMA channels
+2. Resets all window registers (`windowInit()`)
+3. Enables window 1 on the new layer(s) with inversion
+4. Sets TMW for the new layer(s)
+5. Re-enables HDMA
 
-## Build and Run
+## VRAM Layout
 
-```bash
-cd examples/graphics/window
-make clean && make
+| Region | Content |
+|--------|---------|
+| $0000 | BG1 tilemap (32x32) |
+| $1000 | BG2 tilemap (32x32) |
+| $4000 | BG1 tiles (4bpp, 16 colors) |
+| $6000 | BG2 tiles (4bpp, 16 colors) |
 
-# Run in emulator
-/path/to/Mesen window.sfc
-```
+## Key Registers
 
----
+| Register | Value | Purpose |
+|----------|-------|---------|
+| $2123 (W12SEL) | varies | Enable + invert window 1 per BG |
+| $212E (TMW) | varies | Main screen window mask |
+| $2126 (WH0) | HDMA | Window 1 left boundary |
+| $2127 (WH1) | HDMA | Window 1 right boundary |
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Main loop, input handling, window state |
-| `data.asm` | Background graphics data |
-| `Makefile` | Build configuration |
-| `res/pvsneslib.bmp` | Source background image |
-
----
-
-## Window Layer Constants
-
-```c
-#define WINDOW_1    0
-#define WINDOW_2    1
-
-#define WINDOW_BG1  0x01
-#define WINDOW_BG2  0x02
-#define WINDOW_BG3  0x04
-#define WINDOW_BG4  0x08
-#define WINDOW_OBJ  0x10
-#define WINDOW_MATH 0x20
-#define WINDOW_ALL  0x3F
-```
-
----
-
-## Common Window Techniques
-
-### Split Screen
-
-```c
-/* Left half for player 1, right half for player 2 */
-windowSetPos(WINDOW_1, 0, 127);    /* Left half */
-windowSetPos(WINDOW_2, 128, 255);  /* Right half */
-/* Apply different BG scrolls in each region using HDMA */
-```
-
-### Horizontal Wipe Transition
-
-```c
-/* Wipe from left to right */
-for (u8 x = 0; x < 255; x++) {
-    windowSetPos(WINDOW_1, 0, x);
-    windowEnable(WINDOW_1, WINDOW_ALL);
-    windowSetMainMask(WINDOW_ALL);
-    WaitForVBlank();
-}
-```
-
-### UI Window
-
-```c
-/* Keep a portion always visible for HUD */
-windowSetPos(WINDOW_1, 0, 255);    /* Full width */
-windowEnable(WINDOW_1, WINDOW_BG3); /* BG3 for HUD */
-windowSetInvert(WINDOW_1, WINDOW_BG3, 1); /* Always show HUD */
-```
-
-### HDMA-Animated Windows
-
-Combine windows with HDMA to create:
-- Circular spotlights (vary left/right per scanline)
-- Wavy edges
-- Perspective effects
-
----
-
-## Exercises
-
-### Exercise 1: Expanding Spotlight
-
-Make the window slowly expand:
-```c
-static u8 expand_timer = 0;
-expand_timer++;
-if (expand_timer >= 4 && window_half_width < 100) {
-    expand_timer = 0;
-    window_half_width++;
-    update_window();
-}
-```
-
-### Exercise 2: Two Windows
-
-Use both windows for a double spotlight:
-```c
-windowSetPos(WINDOW_1, 40, 80);
-windowSetPos(WINDOW_2, 176, 216);
-windowEnable(WINDOW_1, WINDOW_BG1);
-windowEnable(WINDOW_2, WINDOW_BG1);
-windowSetLogic(WINDOW_BG1, WINDOW_LOGIC_OR);  /* Show either window */
-```
-
-### Exercise 3: Screen Wipe
-
-Create a left-to-right reveal:
-```c
-void wipeReveal(void) {
-    for (u8 x = 0; x < 255; x++) {
-        windowSetPos(WINDOW_1, x, 255);
-        update_window();
-        WaitForVBlank();
-    }
-}
-```
-
-### Exercise 4: Hide Sprites
-
-Mask sprites behind a window:
-```c
-windowEnable(WINDOW_1, WINDOW_OBJ);
-windowSetMainMask(WINDOW_OBJ);
-/* Sprites inside the window are hidden */
-```
-
----
-
-## Technical Notes
-
-### Window Logic Operations
-
-When using both windows on the same layer:
-
-```c
-#define WINDOW_LOGIC_OR   0x00  /* Show if inside either window */
-#define WINDOW_LOGIC_AND  0x01  /* Show if inside both windows */
-#define WINDOW_LOGIC_XOR  0x02  /* Show if inside one but not both */
-#define WINDOW_LOGIC_XNOR 0x03  /* Show if inside both or neither */
-
-windowSetLogic(WINDOW_BG1, WINDOW_LOGIC_OR);
-```
-
-### Vertical Windows with HDMA
-
-Standard windows only define horizontal boundaries. For vertical masking:
-1. Set up an HDMA channel targeting WH0/WH1
-2. Create a table that changes boundaries per scanline
-3. This creates shapes like circles or irregular regions
-
-### Performance
-
-Window operations are free - they're computed by the PPU hardware during rendering. No CPU cost during gameplay.
-
-### Main vs Subscreen
-
-- `windowSetMainMask()` - Affects main screen rendering
-- `windowSetSubMask()` - Affects subscreen (for transparency effects)
-
-Most games only use main screen masking.
-
----
-
-## What's Next?
-
-**Color Math:** [Transparency Example](../transparency/) - Shadow and tint effects
-
-**HDMA:** [HDMA Gradient Example](../hdma_gradient/) - Per-scanline effects
-
----
-
-## License
-
-Code: MIT
+| `main.c` | HDMA triangle tables, window setup, input loop |
+| `data.asm` | Two backgrounds (BG1 + BG2) graphics data |
+| `res/bg1.png` | Background 1 (palette slot 0) |
+| `res/bg2.png` | Background 2 (palette slot 1) |
