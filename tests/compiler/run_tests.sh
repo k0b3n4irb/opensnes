@@ -23,6 +23,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# Cross-platform: BSD grep (macOS) doesn't support -P, use TAB variable
+TAB=$'\t'
+
 # Paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -2380,7 +2383,7 @@ test_dead_store_elimination() {
 
     # 2. global_increment: should have NO sta to stack slots (N,s pattern)
     #    lda.w / sta.w (global access) is fine; only sta N,s is dead
-    if echo "$func_body" | grep -qP '\bsta\s+\d+,s\b'; then
+    if echo "$func_body" | grep -qE "${TAB}sta [0-9]+,s"; then
         log_fail "$name: global_increment has sta N,s — dead stores not eliminated"
         ((fail_count++))
     fi
@@ -2436,7 +2439,7 @@ test_plx_cleanup() {
     # 1. wrapper_one (1-arg call, non-void): pass-through → tail call (jml)
     func_body=$(sed -n '/^wrapper_one:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -qP '\tjml'; then
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
         log_fail "$name: wrapper_one missing jml (tail call optimization)"
         ((fail_count++))
     fi
@@ -2450,7 +2453,7 @@ test_plx_cleanup() {
     # 2. wrapper_two (2-arg call, non-void): pass-through → tail call (jml)
     func_body=$(sed -n '/^wrapper_two:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -qP '\tjml'; then
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
         log_fail "$name: wrapper_two missing jml (tail call optimization)"
         ((fail_count++))
     fi
@@ -2458,7 +2461,7 @@ test_plx_cleanup() {
     # 3. void_wrapper (1-arg void call): pass-through → tail call (jml)
     func_body=$(sed -n '/^void_wrapper:/,/^\.ENDS/p' "$out")
 
-    if ! echo "$func_body" | grep -qP '\tjml'; then
+    if ! echo "$func_body" | grep -q "${TAB}jml"; then
         log_fail "$name: void_wrapper missing jml (tail call optimization)"
         ((fail_count++))
     fi
@@ -2635,7 +2638,7 @@ test_commutative_swap() {
         log_fail "$name: shift_and_add missing asl a"
         ((fail_count++))
     fi
-    if echo "$func_body" | grep -qP '\bsta\s+\d+,s\b'; then
+    if echo "$func_body" | grep -qE "${TAB}sta [0-9]+,s"; then
         log_fail "$name: shift_and_add has sta N,s — intermediates should be dead stores"
         ((fail_count++))
     fi
@@ -2760,7 +2763,7 @@ test_acache_pha() {
 
     # Should NOT have sta instruction (dead store: result used only as next arg)
     # Use tab prefix to avoid matching @start label
-    if echo "$fn2_body" | grep -qP '\tsta'; then
+    if echo "$fn2_body" | grep -q "${TAB}sta"; then
         log_fail "$name: call_with_computed has 'sta' (dead store should be eliminated)"
         ((TESTS_FAILED++))
         return
@@ -2847,7 +2850,7 @@ test_dp_registers() {
     compile_test "$name" "$src" "$out" || return
 
     # All tcc__ register accesses should use .b (direct page), not .w (absolute)
-    if grep -qP '\t(sta|lda|adc|sbc)\.w tcc__r[019]' "$out"; then
+    if grep -qE "${TAB}(sta|lda|adc|sbc)\.w tcc__r[019]" "$out"; then
         log_fail "$name: still using .w for tcc__ registers (should be .b)"
         ((TESTS_FAILED++))
         return
@@ -2856,7 +2859,7 @@ test_dp_registers() {
     # div_by_10 should NOT have lda.b tcc__r0 after jsl __div16
     local div_body
     div_body=$(sed -n '/^div_by_10:/,/^\.ENDS/p' "$out")
-    if echo "$div_body" | grep -qP 'jsl __div16' && echo "$div_body" | grep -qP '\tlda\.b tcc__r0'; then
+    if echo "$div_body" | grep -q 'jsl __div16' && echo "$div_body" | grep -q "${TAB}lda.b tcc__r0"; then
         log_fail "$name: div_by_10 still reloads tcc__r0 after __div16 (should return in A)"
         ((TESTS_FAILED++))
         return
@@ -2865,7 +2868,7 @@ test_dp_registers() {
     # mod_by_10 should NOT have lda.b tcc__r0 after jsl __mod16
     local mod_body
     mod_body=$(sed -n '/^mod_by_10:/,/^\.ENDS/p' "$out")
-    if echo "$mod_body" | grep -qP 'jsl __mod16' && echo "$mod_body" | grep -qP '\tlda\.b tcc__r0'; then
+    if echo "$mod_body" | grep -q 'jsl __mod16' && echo "$mod_body" | grep -q "${TAB}lda.b tcc__r0"; then
         log_fail "$name: mod_by_10 still reloads tcc__r0 after __mod16 (should return in A)"
         ((TESTS_FAILED++))
         return
@@ -2874,7 +2877,7 @@ test_dp_registers() {
     # mul_by_7 should use .b for tcc__r9
     local mul_body
     mul_body=$(sed -n '/^mul_by_7:/,/^\.ENDS/p' "$out")
-    if ! echo "$mul_body" | grep -qP '\tsta\.b tcc__r9'; then
+    if ! echo "$mul_body" | grep -q "${TAB}sta.b tcc__r9"; then
         log_fail "$name: mul_by_7 not using .b for tcc__r9"
         ((TESTS_FAILED++))
         return
@@ -2902,12 +2905,12 @@ test_indirect_store_acache() {
     # Should use tax (address to X) without pha/pla
     local fn_body
     fn_body=$(sed -n '/^array_write:/,/^\.ENDS/p' "$out")
-    if ! echo "$fn_body" | grep -qP '\ttax'; then
+    if ! echo "$fn_body" | grep -q "${TAB}tax"; then
         log_fail "$name: array_write missing tax instruction"
         ((TESTS_FAILED++))
         return
     fi
-    if echo "$fn_body" | grep -qP '\tpha'; then
+    if echo "$fn_body" | grep -q "${TAB}pha"; then
         log_fail "$name: array_write still uses pha (A-cache optimization not applied)"
         ((TESTS_FAILED++))
         return
@@ -2934,19 +2937,19 @@ test_tail_call() {
     # call_add must have jml (tail call)
     local call_add_body
     call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
-    if ! echo "$call_add_body" | grep -qP '\tjml\s+add_u16'; then
+    if ! echo "$call_add_body" | grep -q "${TAB}jml add_u16"; then
         log_fail "$name: call_add missing 'jml add_u16' (tail call not applied)"
         ((TESTS_FAILED++))
         return
     fi
     # call_add must NOT have jsl (no normal call)
-    if echo "$call_add_body" | grep -qP '\tjsl'; then
+    if echo "$call_add_body" | grep -q "${TAB}jsl"; then
         log_fail "$name: call_add still has jsl (should be jml only)"
         ((TESTS_FAILED++))
         return
     fi
     # call_add must NOT have rtl (tail call replaces it)
-    if echo "$call_add_body" | grep -qP '\trtl'; then
+    if echo "$call_add_body" | grep -q "${TAB}rtl"; then
         log_fail "$name: call_add still has rtl (should be eliminated by tail call)"
         ((TESTS_FAILED++))
         return
@@ -2955,19 +2958,19 @@ test_tail_call() {
     # call_chain must have jml for second call
     local call_chain_body
     call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
-    if ! echo "$call_chain_body" | grep -qP '\tjml\s+add_one'; then
+    if ! echo "$call_chain_body" | grep -q "${TAB}jml add_one"; then
         log_fail "$name: call_chain missing 'jml add_one' (tail call not applied)"
         ((TESTS_FAILED++))
         return
     fi
     # call_chain must still have one jsl (first call is NOT tail call)
-    if ! echo "$call_chain_body" | grep -qP '\tjsl\s+add_one'; then
+    if ! echo "$call_chain_body" | grep -q "${TAB}jsl add_one"; then
         log_fail "$name: call_chain missing 'jsl add_one' (first call should remain)"
         ((TESTS_FAILED++))
         return
     fi
     # call_chain must NOT have rtl
-    if echo "$call_chain_body" | grep -qP '\trtl'; then
+    if echo "$call_chain_body" | grep -q "${TAB}rtl"; then
         log_fail "$name: call_chain still has rtl (should be eliminated by tail call)"
         ((TESTS_FAILED++))
         return
@@ -2976,13 +2979,13 @@ test_tail_call() {
     # no_tail_call must NOT have jml (arg count mismatch)
     local no_tco_body
     no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
-    if echo "$no_tco_body" | grep -qP '\tjml'; then
+    if echo "$no_tco_body" | grep -q "${TAB}jml"; then
         log_fail "$name: no_tail_call has jml (should NOT be tail-call optimized)"
         ((TESTS_FAILED++))
         return
     fi
     # no_tail_call must have rtl (normal return)
-    if ! echo "$no_tco_body" | grep -qP '\trtl'; then
+    if ! echo "$no_tco_body" | grep -q "${TAB}rtl"; then
         log_fail "$name: no_tail_call missing rtl (normal return expected)"
         ((TESTS_FAILED++))
         return
@@ -3003,7 +3006,7 @@ test_lazy_rep20() {
     # call_add is a pure tail call (all args same-pos) → NO rep #$20
     local call_add_body
     call_add_body=$(sed -n '/^call_add:/,/^\.ENDS/p' "$out")
-    if echo "$call_add_body" | grep -qP '\trep\s+#\$20'; then
+    if echo "$call_add_body" | grep -q "${TAB}rep #\$20"; then
         log_fail "$name: call_add has rep #\$20 (pure tail call should skip prologue)"
         ((TESTS_FAILED++))
         return
@@ -3012,7 +3015,7 @@ test_lazy_rep20() {
     # call_chain has lda/sta before jml → MUST have rep #$20
     local call_chain_body
     call_chain_body=$(sed -n '/^call_chain:/,/^\.ENDS/p' "$out")
-    if ! echo "$call_chain_body" | grep -qP '\trep\s+#\$20'; then
+    if ! echo "$call_chain_body" | grep -q "${TAB}rep #\$20"; then
         log_fail "$name: call_chain missing rep #\$20 (non-pure tail call needs it)"
         ((TESTS_FAILED++))
         return
@@ -3021,7 +3024,7 @@ test_lazy_rep20() {
     # no_tail_call is a normal function → MUST have rep #$20
     local no_tco_body
     no_tco_body=$(sed -n '/^no_tail_call:/,/^\.ENDS/p' "$out")
-    if ! echo "$no_tco_body" | grep -qP '\trep\s+#\$20'; then
+    if ! echo "$no_tco_body" | grep -q "${TAB}rep #\$20"; then
         log_fail "$name: no_tail_call missing rep #\$20 (normal function needs it)"
         ((TESTS_FAILED++))
         return
