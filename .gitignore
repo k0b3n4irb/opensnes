@@ -50,6 +50,9 @@ testlink
 CLAUDE.md
 tests/CLAUDE.md
 
+# Private game projects (never commit)
+projects/
+
 # Build directories
 build/
 bin/
