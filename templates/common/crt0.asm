@@ -125,6 +125,8 @@ MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
     pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
+    bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
+    bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -734,6 +736,42 @@ NmiHandler:
     stz tilemap_update_flag
     jsl tilemapFlush
 +
+
+    ; Sync BG scroll shadows to hardware ($210D-$2114)
+    ; 8-bit A, data bank $00 (WRAM + hardware registers accessible)
+    ; Cost: ~128 master cycles (~0.5% of VBlank)
+    lda bg_scroll_x      ; BG1 H low
+    sta $210D
+    lda bg_scroll_x+1    ; BG1 H high
+    sta $210D
+    lda bg_scroll_y      ; BG1 V low
+    sta $210E
+    lda bg_scroll_y+1    ; BG1 V high
+    sta $210E
+    lda bg_scroll_x+2    ; BG2 H low
+    sta $210F
+    lda bg_scroll_x+3    ; BG2 H high
+    sta $210F
+    lda bg_scroll_y+2    ; BG2 V low
+    sta $2110
+    lda bg_scroll_y+3    ; BG2 V high
+    sta $2110
+    lda bg_scroll_x+4    ; BG3 H low
+    sta $2111
+    lda bg_scroll_x+5    ; BG3 H high
+    sta $2111
+    lda bg_scroll_y+4    ; BG3 V low
+    sta $2112
+    lda bg_scroll_y+5    ; BG3 V high
+    sta $2112
+    lda bg_scroll_x+6    ; BG4 H low
+    sta $2113
+    lda bg_scroll_x+7    ; BG4 H high
+    sta $2113
+    lda bg_scroll_y+6    ; BG4 V low
+    sta $2114
+    lda bg_scroll_y+7    ; BG4 V high
+    sta $2114
 
     ; Set VBlank flag
     lda #$01
