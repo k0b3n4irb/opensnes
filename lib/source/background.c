@@ -23,8 +23,8 @@
 static u8 bg12nba_shadow;  /* Shadow for REG_BG12NBA ($210B) */
 static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
 
-static u16 bg_scroll_x[4]; /* Shadow for BG1-4 horizontal scroll */
-static u16 bg_scroll_y[4]; /* Shadow for BG1-4 vertical scroll */
+extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */
+extern u16 bg_scroll_y[4]; /* Synced to hardware by NMI handler */
 
 /*============================================================================
  * Scrolling Functions
@@ -33,76 +33,14 @@ static u16 bg_scroll_y[4]; /* Shadow for BG1-4 vertical scroll */
 void bgSetScroll(u8 bg, u16 x, u16 y) {
     bg_scroll_x[bg] = x;
     bg_scroll_y[bg] = y;
-    switch (bg) {
-        case 0:
-            REG_BG1HOFS = x & 0xFF;
-            REG_BG1HOFS = (x >> 8) & 0xFF;
-            REG_BG1VOFS = y & 0xFF;
-            REG_BG1VOFS = (y >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2HOFS = x & 0xFF;
-            REG_BG2HOFS = (x >> 8) & 0xFF;
-            REG_BG2VOFS = y & 0xFF;
-            REG_BG2VOFS = (y >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3HOFS = x & 0xFF;
-            REG_BG3HOFS = (x >> 8) & 0xFF;
-            REG_BG3VOFS = y & 0xFF;
-            REG_BG3VOFS = (y >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4HOFS = x & 0xFF;
-            REG_BG4HOFS = (x >> 8) & 0xFF;
-            REG_BG4VOFS = y & 0xFF;
-            REG_BG4VOFS = (y >> 8) & 0xFF;
-            break;
-    }
 }
 
 void bgSetScrollX(u8 bg, u16 x) {
     bg_scroll_x[bg] = x;
-    switch (bg) {
-        case 0:
-            REG_BG1HOFS = x & 0xFF;
-            REG_BG1HOFS = (x >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2HOFS = x & 0xFF;
-            REG_BG2HOFS = (x >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3HOFS = x & 0xFF;
-            REG_BG3HOFS = (x >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4HOFS = x & 0xFF;
-            REG_BG4HOFS = (x >> 8) & 0xFF;
-            break;
-    }
 }
 
 void bgSetScrollY(u8 bg, u16 y) {
     bg_scroll_y[bg] = y;
-    switch (bg) {
-        case 0:
-            REG_BG1VOFS = y & 0xFF;
-            REG_BG1VOFS = (y >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2VOFS = y & 0xFF;
-            REG_BG2VOFS = (y >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3VOFS = y & 0xFF;
-            REG_BG3VOFS = (y >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4VOFS = y & 0xFF;
-            REG_BG4VOFS = (y >> 8) & 0xFF;
-            break;
-    }
 }
 
 u16 bgGetScrollX(u8 bg) {
