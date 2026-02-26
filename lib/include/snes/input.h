@@ -96,13 +96,13 @@
  *============================================================================*/
 
 /**
- * @brief Update input state
+ * @brief (Deprecated) No-op, kept for API compatibility.
  *
- * Call once per frame, typically after WaitForVBlank().
- * This reads the hardware registers and updates internal state.
+ * Input is read automatically by the NMI handler in crt0.asm every VBlank.
+ * There is no need to call this function. Use padHeld(), padPressed(), and
+ * padReleased() directly after WaitForVBlank().
  *
- * @note If using consoleInit() with auto-joypad read enabled,
- *       this is called automatically during WaitForVBlank().
+ * @deprecated This function does nothing. Remove calls to it from your code.
  */
 void padUpdate(void);
 

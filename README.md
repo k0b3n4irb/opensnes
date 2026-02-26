@@ -181,6 +181,28 @@ make -C examples/games/breakout
 
 ---
 
+## Testing
+
+Two test suites validate the SDK after any change:
+
+```bash
+# Full rebuild (always start from clean to avoid stale artifacts)
+make clean && make
+
+# Compiler regression tests (54 tests)
+./tests/compiler/run_tests.sh --allow-known-bugs
+
+# Example validation (memory overlaps + ROM size checks)
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
+```
+
+> **`OPENSNES_HOME` vs `OPENSNES`**: `OPENSNES` is the Makefile variable that
+> points to the SDK root (set in each project's Makefile). `OPENSNES_HOME` is
+> the environment variable used by the test scripts — set it to the SDK root
+> directory before running tests.
+
+---
+
 ## Learning Path
 
 There's no shortcut, but there is a path.
