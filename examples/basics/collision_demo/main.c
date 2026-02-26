@@ -17,12 +17,20 @@
 #include <snes/collision.h>
 
 /*============================================================================
+ * Direct OAM buffer access (avoids oamSet() overhead)
+ *============================================================================*/
+
+extern u8 oamMemory[];
+extern volatile u8 oam_update_flag;
+
+/*============================================================================
  * Game Objects
  *============================================================================*/
 
 #define PLAYER_SIZE 8
 #define ENEMY_SIZE  8
 #define NUM_ENEMIES 4
+#define PLAYER_SPEED 2
 
 /* Player position */
 static s16 player_x, player_y;
@@ -223,19 +231,26 @@ static void draw_tilemap(void) {
 static void update_sprites(void) {
     u8 i;
     u8 palette;
+    u16 offset;
 
-    /* Update player sprite - green if colliding, blue if not */
-    palette = (collision_flags != 0) ? 1 : 0;  /* Palette 1 = red/green zone */
-    oamSet(0, player_x, player_y, 0, palette, 3, 0);
+    /* Player sprite (ID 0) - green if colliding, white if not */
+    palette = (collision_flags != 0) ? 1 : 0;
+    oamMemory[0] = (u8)player_x;
+    oamMemory[1] = (u8)player_y;
+    oamMemory[2] = 0;  /* tile 0 */
+    oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
 
-    /* Update enemy sprites */
+    /* Enemy sprites (IDs 1-4) */
     for (i = 0; i < NUM_ENEMIES; i++) {
+        offset = (i + 1) << 2;
         palette = (collision_flags & (1 << i)) ? 1 : 0;
-        oamSet(i + 1, enemy_x[i], enemy_y[i], 1, palette, 2, 0);
+        oamMemory[offset] = (u8)enemy_x[i];
+        oamMemory[offset + 1] = (u8)enemy_y[i];
+        oamMemory[offset + 2] = 1;  /* tile 1 */
+        oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
     }
 
-    /* Hide remaining sprites */
-    oamHide(5);
+    oam_update_flag = 1;
 }
 
 static void check_collisions(void) {
@@ -323,6 +338,10 @@ int main(void) {
     enemy_x[3] = MAP_OFFSET_X + 104;  /* tile (13,11) - bottom-right open area */
     enemy_y[3] = MAP_OFFSET_Y + 88;
 
+    /* Show sprites 0-4 (clear X high bits set by oamClear) */
+    oamMemory[512] = 0x00;  /* Sprites 0-3: X high=0, size=small */
+    oamMemory[513] = oamMemory[513] & 0xFC;  /* Sprite 4: clear X high bit */
+
     /* Initial update */
     check_collisions();
     update_sprites();
@@ -334,45 +353,32 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* Read input */
         pad = padHeld(0);
-
-        /* Calculate new position */
         new_x = player_x;
         new_y = player_y;
 
-        if (pad & KEY_LEFT) {
-            new_x = player_x - 2;
-        }
-        if (pad & KEY_RIGHT) {
-            new_x = player_x + 2;
-        }
-        if (pad & KEY_UP) {
-            new_y = player_y - 2;
-        }
-        if (pad & KEY_DOWN) {
-            new_y = player_y + 2;
-        }
+        if (pad & KEY_LEFT)  new_x = player_x - PLAYER_SPEED;
+        if (pad & KEY_RIGHT) new_x = player_x + PLAYER_SPEED;
+        if (pad & KEY_UP)    new_y = player_y - PLAYER_SPEED;
+        if (pad & KEY_DOWN)  new_y = player_y + PLAYER_SPEED;
 
-        /* Check wall collision before moving */
+        /* Wall collision */
         if (!check_wall_collision(new_x, new_y)) {
             player_x = new_x;
             player_y = new_y;
         } else {
-            /* Try moving just X */
             if (!check_wall_collision(new_x, player_y)) {
                 player_x = new_x;
             }
-            /* Try moving just Y */
             if (!check_wall_collision(player_x, new_y)) {
                 player_y = new_y;
             }
         }
 
-        /* Check sprite collisions */
+        /* Sprite collisions */
         check_collisions();
 
-        /* Update display */
+        /* Update all sprites via direct buffer writes */
         update_sprites();
     }
 

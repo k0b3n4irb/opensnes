@@ -158,7 +158,6 @@ int main(void) {
      *--------------------------------------------------------------------*/
     while (1) {
         WaitForVBlank();
-        padUpdate();
 
         /* A: window on BG1 only */
         if (padPressed(0) & KEY_A) {

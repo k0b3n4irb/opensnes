@@ -30,8 +30,9 @@ extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
  *============================================================================*/
 
 void padUpdate(void) {
-    /* Input is read in VBlank ISR - nothing to do here */
-    /* This function exists for API compatibility */
+    /* DEPRECATED: This function is a no-op. Input is read automatically
+     * by the NMI handler in crt0.asm. Use padHeld(), padPressed(), and
+     * padReleased() directly — no need to call padUpdate() first. */
 }
 
 u16 padPressed(u8 pad) {
