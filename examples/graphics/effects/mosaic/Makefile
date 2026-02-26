@@ -6,7 +6,7 @@ TARGET   := mosaic.sfc
 ROM_NAME := OPENSNES MOSAIC
 
 USE_LIB     := 1
-LIB_MODULES := console dma background sprite input
+LIB_MODULES := console dma background sprite input mosaic
 
 CSRC   := main.c
 ASMSRC := data.asm
