@@ -65,10 +65,16 @@ static const u8 message[] = {
     0xFF            /* end marker */
 };
 
+/* Background palette: dark blue bg, white text (2 colors × 2 bytes) */
+static const u8 bg_palette[] = {
+    0x00, 0x28,  /* Color 0: Dark blue */
+    0xFF, 0x7F,  /* Color 1: White */
+};
+
 int main(void) {
-    u16 i;
     u16 addr;
     u8 tile;
+    u16 i;
 
     /* Initialize console hardware using library */
     consoleInit();
@@ -77,25 +83,14 @@ int main(void) {
     setMode(BG_MODE0, 0);
 
     /* Configure BG1 for text display */
-    REG_BG1SC = 0x04;   /* Tilemap at $0400, 32x32 */
-    REG_BG12NBA = 0x00; /* BG1 tiles at $0000 */
+    bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
+    bgSetGfxPtr(0, 0x0000);
 
-    /* Load font tiles to VRAM $0000 */
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
+    /* Load font tiles to VRAM $0000 via DMA */
+    dmaCopyVram((u8 *)font_tiles, 0x0000, 144);
 
-    for (i = 0; i < 144; i += 2) {
-        REG_VMDATAL = font_tiles[i];
-        REG_VMDATAH = font_tiles[i + 1];
-    }
-
-    /* Set up palette */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00;  /* Color 0: Dark blue */
-    REG_CGDATA = 0x28;
-    REG_CGDATA = 0xFF;  /* Color 1: White */
-    REG_CGDATA = 0x7F;
+    /* Load palette via DMA */
+    dmaCopyCGram((u8 *)bg_palette, 0, 4);
 
     /* Fill tilemap with spaces */
     REG_VMADDL = 0x00;

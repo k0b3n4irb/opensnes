@@ -110,6 +110,12 @@ static const u8 empty_tile[] = {
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
+/* BG palette: black background, gray walls */
+static const u8 bg_palette[] = {
+    0x00, 0x00,  /* Color 0: Black (background) */
+    0x94, 0x52,  /* Color 1: Gray (walls) */
+};
+
 /*============================================================================
  * Sprite Palette
  *============================================================================*/
@@ -141,57 +147,20 @@ static const u8 collision_palette[] = {
  *============================================================================*/
 
 static void load_graphics(void) {
-    u16 i;
+    setScreenOff();
 
-    REG_INIDISP = 0x80;  /* Force blank */
+    /* Load BG tiles via DMA (tile 0 = empty, tile 1 = wall) */
+    dmaCopyVram((u8 *)empty_tile, 0x0000, 16);
+    dmaCopyVram((u8 *)wall_tile, 0x0008, 16);
 
-    /* Load BG tiles (tile 0 = empty, tile 1 = wall) */
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
+    /* Load sprite tiles via DMA at $4000 */
+    dmaCopyVram((u8 *)player_tile, 0x4000, 32);
+    dmaCopyVram((u8 *)enemy_tile, 0x4010, 32);
 
-    /* Tile 0: empty */
-    for (i = 0; i < 16; i += 2) {
-        REG_VMDATAL = empty_tile[i];
-        REG_VMDATAH = empty_tile[i + 1];
-    }
-    /* Tile 1: wall */
-    for (i = 0; i < 16; i += 2) {
-        REG_VMDATAL = wall_tile[i];
-        REG_VMDATAH = wall_tile[i + 1];
-    }
-
-    /* Load sprite tiles at $4000 */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x40;
-
-    /* Tile 0: player (blue) */
-    for (i = 0; i < 32; i += 2) {
-        REG_VMDATAL = player_tile[i];
-        REG_VMDATAH = player_tile[i + 1];
-    }
-    /* Tile 1: enemy (red) */
-    for (i = 0; i < 32; i += 2) {
-        REG_VMDATAL = enemy_tile[i];
-        REG_VMDATAH = enemy_tile[i + 1];
-    }
-
-    /* Load sprite palette 0 (CGRAM 128) */
-    REG_CGADD = 128;
-    for (i = 0; i < 32; i++) {
-        REG_CGDATA = sprite_palette[i];
-    }
-
-    /* Load sprite palette 1 (CGRAM 144) for collision indicator */
-    REG_CGADD = 144;
-    for (i = 0; i < 32; i++) {
-        REG_CGDATA = collision_palette[i];
-    }
-
-    /* Load BG palette */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 0: Black (background) */
-    REG_CGDATA = 0x94; REG_CGDATA = 0x52;  /* Color 1: Gray (walls) */
+    /* Load palettes via DMA */
+    dmaCopyCGram((u8 *)sprite_palette, 128, 32);
+    dmaCopyCGram((u8 *)collision_palette, 144, 32);
+    dmaCopyCGram((u8 *)bg_palette, 0, 4);
 }
 
 static void draw_tilemap(void) {
@@ -314,8 +283,8 @@ int main(void) {
     draw_tilemap();
 
     /* Configure BG1 */
-    REG_BG1SC = 0x04;  /* Tilemap at $0400, 32x32 */
-    REG_BG12NBA = 0x00;
+    bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
+    bgSetGfxPtr(0, 0x0000);
     REG_TM = TM_BG1 | TM_OBJ;
 
     /* Object settings */

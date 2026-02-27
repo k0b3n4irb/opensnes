@@ -12,12 +12,28 @@
 
 #include <snes.h>
 
-/* Simple 8x8 sprite tile (solid square) */
-const u8 sprite_tile[32] = {
+/* Simple 8x8 sprite tile (solid square, 4bpp) */
+static const u8 sprite_tile[32] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  /* Plane 0 */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  /* Plane 1 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  /* Plane 2 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   /* Plane 3 */
+};
+
+/* Palette 0 (Player 1): Blue */
+static const u8 pal_blue[] = {
+    0x00, 0x00,  /* Color 0: Transparent */
+    0x00, 0x00,  /* Color 1: Black */
+    0x00, 0x00,  /* Color 2: Black */
+    0xFF, 0x7C,  /* Color 3: Blue */
+};
+
+/* Palette 1 (Player 2): Red */
+static const u8 pal_red[] = {
+    0x00, 0x00,  /* Color 0: Transparent */
+    0x00, 0x00,  /* Color 1: Black */
+    0x00, 0x00,  /* Color 2: Black */
+    0x1F, 0x00,  /* Color 3: Red */
 };
 
 /*============================================================================
@@ -37,41 +53,19 @@ Player p2 = {192, 112};
 
 int main(void) {
     u16 pad1, pad2;
-    u16 i;
 
     /* Positions initialized in global struct declaration */
 
     /* Initialize console (sets up display, enables NMI) */
     consoleInit();
 
-    /* Set video mode 1 with 8x8 sprites */
-    REG_OBJSEL = 0x00;  /* 8x8 and 16x16 sprites, base at 0x0000 */
+    /* Initialize sprite graphics: tile + palette 0 (blue) + OBJSEL */
+    oamInitGfxSet((u8 *)sprite_tile, 32,
+                  (u8 *)pal_blue, 8,
+                  0, 0x0000, OBJ_SIZE8_L16);
 
-    /* Upload sprite tiles to VRAM at 0x0000 */
-    REG_VMAIN = 0x80;  /* Increment on high byte write */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
-
-    /* Copy tile data (32 bytes = 16 words) */
-    for (i = 0; i < 32; i += 2) {
-        REG_VMDATAL = sprite_tile[i];
-        REG_VMDATAH = sprite_tile[i + 1];
-    }
-
-    /* Set up sprite palettes */
-    /* Palette 0 (Player 1): Blue */
-    REG_CGADD = 128;  /* Sprite palettes start at 128 */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 0: Transparent */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 1: Black */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 2: Black */
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7C;  /* Color 3: Blue */
-
-    /* Palette 1 (Player 2): Red */
-    REG_CGADD = 128 + 16;  /* Next palette */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 0: Transparent */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 1: Black */
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 2: Black */
-    REG_CGDATA = 0x1F; REG_CGDATA = 0x00;  /* Color 3: Red */
+    /* Load palette 1 (Player 2: Red) */
+    dmaCopyCGram((u8 *)pal_red, 128 + 16, 8);
 
     /* Initialize OAM */
     oamInit();
@@ -92,29 +86,21 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* Wait for auto-joypad read to complete */
-        while (REG_HVBJOY & 0x01) {}
+        /* Read both controllers (NMI handler reads joypads automatically) */
+        pad1 = padHeld(0);
+        pad2 = padHeld(1);
 
-        /* Read both controllers directly */
-        pad1 = REG_JOY1L | (REG_JOY1H << 8);
-        pad2 = REG_JOY2L | (REG_JOY2H << 8);
+        /* Player 1 movement */
+        if (pad1 & KEY_UP)    { if (p1.y > 0) p1.y--; }
+        if (pad1 & KEY_DOWN)  { if (p1.y < 224) p1.y++; }
+        if (pad1 & KEY_LEFT)  { if (p1.x > 0) p1.x--; }
+        if (pad1 & KEY_RIGHT) { if (p1.x < 248) p1.x++; }
 
-        /* Skip if controller disconnected */
-        if (pad1 != 0xFFFF) {
-            /* Player 1 movement */
-            if (pad1 & KEY_UP)    { if (p1.y > 0) p1.y--; }
-            if (pad1 & KEY_DOWN)  { if (p1.y < 224) p1.y++; }
-            if (pad1 & KEY_LEFT)  { if (p1.x > 0) p1.x--; }
-            if (pad1 & KEY_RIGHT) { if (p1.x < 248) p1.x++; }
-        }
-
-        if (pad2 != 0xFFFF) {
-            /* Player 2 movement */
-            if (pad2 & KEY_UP)    { if (p2.y > 0) p2.y--; }
-            if (pad2 & KEY_DOWN)  { if (p2.y < 224) p2.y++; }
-            if (pad2 & KEY_LEFT)  { if (p2.x > 0) p2.x--; }
-            if (pad2 & KEY_RIGHT) { if (p2.x < 248) p2.x++; }
-        }
+        /* Player 2 movement */
+        if (pad2 & KEY_UP)    { if (p2.y > 0) p2.y--; }
+        if (pad2 & KEY_DOWN)  { if (p2.y < 224) p2.y++; }
+        if (pad2 & KEY_LEFT)  { if (p2.x > 0) p2.x--; }
+        if (pad2 & KEY_RIGHT) { if (p2.x < 248) p2.x++; }
 
         /* Update sprite positions */
         oamSet(0, p1.x, p1.y, 0, 0, 0, 0);

@@ -13,6 +13,6 @@ CSRC     := main.c
 
 # Enable OpenSNES library with collision support
 USE_LIB     := 1
-LIB_MODULES := console input sprite dma collision
+LIB_MODULES := console input sprite dma collision background
 
 include $(OPENSNES)/make/common.mk
