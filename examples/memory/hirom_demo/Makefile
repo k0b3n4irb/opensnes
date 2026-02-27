@@ -7,7 +7,7 @@ ROM_NAME := HIROM DEMO
 
 USE_LIB     := 1
 USE_HIROM   := 1
-LIB_MODULES := console dma input sprite
+LIB_MODULES := console dma input sprite background
 
 CSRC   := main.c
 

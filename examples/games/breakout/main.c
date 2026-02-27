@@ -389,11 +389,11 @@ static void new_level(void) {
      * NMI handler overhead (OAM DMA + joypad read ~13K cycles). Force blank
      * disables rendering so VRAM writes are accepted at any time. */
     WaitForVBlank();
-    REG_INIDISP = 0x80;  /* Force blank — VRAM accessible */
+    setScreenOff();
     dmaCopyCGram((u8 *)pal, 0, 256 * 2);
     dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
     dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
-    REG_INIDISP = 0x0F;  /* Restore full brightness */
+    setScreenOn();
 
     draw_screen();
 
@@ -703,7 +703,7 @@ static void run_frame(void) {
  */
 int main(void) {
     /* Force blank during setup - screen is black, VRAM accessible */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Initialize joypad buffer */
     pad_keys[0] = 0;
@@ -793,8 +793,8 @@ int main(void) {
     oamClear();
 
     /* MODE 1: BG1 4bpp, BG2 4bpp (unused), BG3 2bpp */
-    REG_BGMODE = 0x01;
-    REG_TM = 0x15;  /* Enable: OBJ + BG3 + BG1 */
+    setMode(BG_MODE1, 0);
+    REG_TM = TM_BG1 | TM_BG3 | TM_OBJ;
 
     /* Initialize scroll positions */
     bgSetScroll(0, 0, 0);
@@ -812,7 +812,7 @@ int main(void) {
     oamUpdate();
 
     /* Enable display at full brightness */
-    REG_INIDISP = 0x0F;
+    setScreenOn();
 
     /* Wait for START to begin game */
     do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
