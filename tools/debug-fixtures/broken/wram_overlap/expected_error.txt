@@ -1,1 +1,1 @@
-WRAM Mirror Overlap Detected
+WRAM Mirror Collision Detected!
