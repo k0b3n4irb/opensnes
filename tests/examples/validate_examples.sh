@@ -31,8 +31,8 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES_HOME="${OPENSNES_HOME:-$(dirname "$(dirname "$SCRIPT_DIR")")}"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
-SYMMAP="$OPENSNES_HOME/tools/symmap/symmap.py"
-VRAMCHECK="$OPENSNES_HOME/tools/vramcheck/vramcheck.py"
+SYMMAP="$OPENSNES_HOME/devtools/symmap.py"
+VRAMCHECK="$OPENSNES_HOME/devtools/vramcheck.py"
 
 # Counters
 TOTAL=0

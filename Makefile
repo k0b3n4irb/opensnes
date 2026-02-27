@@ -119,8 +119,7 @@ release: install docs
 	@cp -r lib/lib $(RELEASE_DIR)/opensnes/lib/ 2>/dev/null || true
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
-	@cp -r tools/symmap $(RELEASE_DIR)/opensnes/tools/
-	@cp -r tools/vramcheck $(RELEASE_DIR)/opensnes/tools/
+	@cp -r devtools $(RELEASE_DIR)/opensnes/devtools/ 2>/dev/null || true
 	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
