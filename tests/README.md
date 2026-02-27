@@ -131,101 +131,40 @@ Tests the my_feature functionality.
 
 ### 3. Write Test Code
 
+Unit tests use a simple inline pattern with `TEST()` macros (see `tests/unit/` for examples):
+
 ```c
 // test_my_feature.c
 #include <snes.h>
-#include "test_harness.h"
+#include <snes/console.h>
+#include <snes/text.h>
 
-void test_feature_basic(void) {
-    // Arrange
-    int input = 5;
+static u8 tests_passed;
+static u8 tests_failed;
+static u8 test_line;
 
-    // Act
-    int result = my_feature(input);
-
-    // Assert
-    TEST_ASSERT_EQUAL(10, result);
-}
+#define TEST(name, condition) do { \
+    if (condition) { tests_passed++; } \
+    else { tests_failed++; textPrintAt(1, test_line, "FAIL:"); \
+           textPrintAt(7, test_line, name); test_line++; } \
+} while(0)
 
 int main(void) {
-    test_init();
+    consoleInit();
+    setMode(BG_MODE0, 0);
+    textInit();
 
-    RUN_TEST(test_feature_basic);
+    TEST("basic", my_feature(5) == 10);
 
-    test_report();
-    return 0;
+    // Display results...
+    setScreenOn();
+    while (1) { WaitForVBlank(); }
 }
 ```
 
-### 4. Write Mesen2 Test Script
-
-```lua
--- test_my_feature.lua
-local test = require("test_harness")
-
-test.init()
-test.run_until_complete(5000)  -- 5 second timeout
-test.check_results()
-test.exit()
-```
-
-## Test Harness API
-
-### C API (test_harness.h)
-
-```c
-// Initialize test system
-void test_init(void);
-
-// Run a test function
-void RUN_TEST(void (*test_func)(void));
-
-// Assertions
-void TEST_ASSERT(int condition);
-void TEST_ASSERT_EQUAL(int expected, int actual);
-void TEST_ASSERT_EQUAL_U16(u16 expected, u16 actual);
-void TEST_ASSERT_EQUAL_PTR(void* expected, void* actual);
-void TEST_ASSERT_MEM_EQUAL(void* expected, void* actual, u16 size);
-
-// Mark test result
-void TEST_PASS(void);
-void TEST_FAIL(const char* message);
-
-// Report results (writes to known memory address for Mesen2)
-void test_report(void);
-```
-
-### Lua API (test_harness.lua)
-
-```lua
--- Initialize test runner
-test.init()
-
--- Run emulator until test completes or timeout
-test.run_until_complete(timeout_ms)
-
--- Check test results from memory
-test.check_results()
-
--- Read memory
-test.read_byte(address)
-test.read_word(address)
-
--- Exit emulator with result code
-test.exit()
-```
-
-## Memory Layout for Test Results
-
-Tests report results to fixed memory addresses:
-
-| Address | Size | Description |
-|---------|------|-------------|
-| $7F0000 | 1 | Test status: 0=running, 1=pass, 2=fail |
-| $7F0001 | 2 | Tests run count |
-| $7F0003 | 2 | Tests passed count |
-| $7F0005 | 2 | Tests failed count |
-| $7F0010 | 64 | Failure message (null-terminated) |
+> **Note:** `tests/harness/test_harness.h` exists but is **deprecated** — its labels
+> use a `_` prefix that breaks WLA-DX cross-object resolution. All unit tests use
+> the inline `TEST()` macro pattern shown above instead.
 
 ## Continuous Integration
 
@@ -238,11 +177,11 @@ The CI pipeline runs automatically on:
 | Check | Description |
 |-------|-------------|
 | Build toolchain | Compiles cc65816, WLA-DX, gfx4snes, smconv |
-| Build examples | Builds all 27 example ROMs |
+| Build examples | Builds all 25 example ROMs |
 | Build tests | Compiles test ROMs |
 | Validate examples | Checks for memory overlaps (symmap.py) |
 | Compiler tests | Runs compiler regression tests |
-| Example count | Verifies all 27 examples built successfully |
+| Example count | Verifies all 25 examples built successfully |
 
 ### CI Workflow
 

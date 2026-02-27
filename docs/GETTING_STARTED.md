@@ -54,21 +54,21 @@ Pick one (Mesen is recommended for debugging):
 
 ```bash
 # Clone with submodules (--recursive is required!)
-git clone --recursive https://github.com/OpenSNES/opensnes.git
+git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
 
 # Build everything
 make
 ```
 
-This builds the compiler, tools, library, and all 30 example ROMs.
+This builds the compiler, tools, library, and all 25 example ROMs.
 
 **Expected output:**
 ```
 Building cc65816 compiler...
 Building WLA-DX assembler...
 Building OpenSNES library...
-Building examples... (30 ROMs)
+Building examples... (25 ROMs)
 ```
 
 ## Step 4: Run Your First ROM
@@ -166,10 +166,10 @@ Now that you have a working setup, explore by complexity:
 
 | Level | Examples | What You'll Learn |
 |-------|----------|-------------------|
-| **Beginner** | `text/hello_world`, `basics/calculator` | Console output, basic setup |
-| **Intermediate** | `graphics/animation`, `input/joypad` | Sprites, controller input |
-| **Advanced** | `graphics/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
-| **Expert** | `game/breakout`, `game/entity_demo` | Complete game structure |
+| **Beginner** | `text/hello_world`, `text/text_test` | Console output, text formatting |
+| **Intermediate** | `graphics/sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
+| **Advanced** | `graphics/backgrounds/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
+| **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
 
 Browse all examples:
 ```bash
@@ -203,7 +203,7 @@ Add to your shell profile (`~/.bashrc` or `~/.zshrc`) to make it permanent.
 Your ROM built but doesn't display anything. Common causes:
 1. Missing `setScreenOn()` call
 2. VBlank loop issues
-3. Memory overlap (run `python3 tools/symmap/symmap.py --check-overlap game.sym`)
+3. Memory overlap (run `python3 devtools/symmap.py --check-overlap game.sym`)
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
@@ -215,6 +215,6 @@ This is usually a compiler limitation. Check:
 
 ## Getting Help
 
-- **Issues**: [github.com/OpenSNES/opensnes/issues](https://github.com/OpenSNES/opensnes/issues)
+- **Issues**: [github.com/k0b3n4irb/opensnes/issues](https://github.com/k0b3n4irb/opensnes/issues)
 - **SNES Dev Wiki**: [snes.nesdev.org](https://snes.nesdev.org/)
 - **Discord**: Search for "SNES Development" communities

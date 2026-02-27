@@ -6,11 +6,12 @@ Understanding SNES hardware is essential for effective game development.
 
 | Document | Description |
 |----------|-------------|
-| [CPU](CPU.md) | 65816 processor details |
-| [PPU](PPU.md) | Picture Processing Unit (graphics) |
-| [APU](APU.md) | Audio Processing Unit (sound) |
 | [Memory Map](MEMORY_MAP.md) | RAM, ROM, and register layout |
-| [DMA](DMA.md) | Direct Memory Access |
+| [Registers](REGISTERS.md) | Complete hardware register reference |
+| [OAM](OAM.md) | Sprite attribute memory documentation |
+
+For graphics (PPU, tiles, modes, palettes), see the [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md).
+For audio (SPC700, DSP, BRR, SNESMOD), see the [SNES Sound Guide](../SNES_SOUND_GUIDE.md).
 
 ## Quick Reference
 

@@ -33,7 +33,7 @@ covers changes made since the fork.
 
 ### Examples
 
-- 23 working examples covering all subsystems:
+- 25 working examples covering all subsystems:
   - **Games**: Breakout, LikeMario (platformer with scrolling)
   - **Graphics**: sprites (simple, dynamic, animated), backgrounds (Mode 1, Mode 7,
     Mode 7 perspective, continuous scroll), effects (fading, HDMA wave, gradient colors,
@@ -54,7 +54,7 @@ covers changes made since the fork.
 
 ### Testing
 
-- 50 compiler regression tests (`tests/compiler/run_tests.sh`)
+- 54 compiler regression tests (`tests/compiler/run_tests.sh`)
 - Example validation with memory overlap checking (`tests/examples/validate_examples.sh`)
 - CI pipeline on Linux, macOS, and Windows (MSYS2)
 
