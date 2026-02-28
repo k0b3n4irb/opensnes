@@ -2,139 +2,63 @@
 
 Automated testing infrastructure for OpenSNES SDK.
 
-## Philosophy
+## Quick Reference
 
-**Every feature must have tests.** We follow a test-first development approach:
-1. Write test specification
-2. Implement feature
-3. Verify tests pass
-4. Document the feature
+```bash
+# Before every commit — the 3 mandatory scripts
+./tests/compiler/run_tests.sh --allow-known-bugs        # 53/54 compiler tests
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick  # 25/25 ROM validation
+./tests/unit/run_unit_tests.sh                           # 19 unit test modules
+```
 
 ## Test Categories
 
-| Category | Description | Location |
-|----------|-------------|----------|
-| `black_screen` | Smoke test - detects broken ROMs | `tests/black_screen_test.lua` |
-| `examples/` | Example ROM tests (snesdbg-based) | `tests/examples/` |
-| `unit/` | Low-level function tests (math, memory) | `tests/unit/` |
-| `hardware/` | SNES hardware feature tests | `tests/hardware/` |
-| `integration/` | Full system tests | `tests/integration/` |
-| `compiler/` | Compiler regression tests | `tests/compiler/` |
+| Category | Script | What it does |
+|----------|--------|-------------|
+| **Compiler** | `tests/compiler/run_tests.sh` | 54 regression tests (C → ASM → grep patterns) |
+| **Examples** | `tests/examples/validate_examples.sh` | Memory overlap + ROM size for all 25 examples |
+| **Unit** | `tests/unit/run_unit_tests.sh` | 19 test modules (~385 runtime + 119 compile-time assertions) |
+| **CI** | `tests/ci/check_memory_overlaps.sh` | CI-specific overlap checking |
 
-## Quick Smoke Test: Black Screen Detection
-
-The fastest way to check if all ROMs are working is the **black screen test**. A black screen after initialization typically means the ROM is broken.
+## Compiler Tests (`tests/compiler/`)
 
 ```bash
-# Run black screen test on all examples
-./tests/run_black_screen_tests.sh /path/to/Mesen
-
-# With verbose output
-./tests/run_black_screen_tests.sh /path/to/Mesen --verbose
-
-# Save screenshots for inspection
-./tests/run_black_screen_tests.sh /path/to/Mesen --save-screenshots
+./tests/compiler/run_tests.sh [-v] [--allow-known-bugs]
 ```
 
-**How it works:**
-1. Loads each ROM in Mesen
-2. Waits 90 frames (1.5 seconds)
-3. Analyzes screen buffer for non-black pixels
-4. PASS if >0.5% of pixels are non-black
-5. FAIL if screen is black (likely broken ROM)
+54 tests that compile C files and verify the generated assembly (grep on .asm output).
+Covers: codegen, types, operators, control flow, variables, promotions, optimizations.
 
-**Output:**
-- Screenshots of failed ROMs saved to `tests/screenshots/FAIL_*.png`
-- Exit code 0 = all pass, 1 = failures detected
+**Status:** 53/54 pass. 1 known bug (`comparisons: test_s16_shift_right`).
 
-## Example Tests
-
-The `examples/` category tests the working example ROMs using the `snesdbg` Lua library:
-
-| Test | ROM | What it tests |
-|------|-----|---------------|
-| hello_world | text/hello_world | Basic boot, hardware init, VBlank |
-| custom_font | text/custom_font | Font loading, message display |
-| animation | graphics/animation | **WRAM mirroring fix**, sprite movement, OAM transfer |
-| tone | audio/tone | SPC700 init, audio playback |
-
-Run example tests:
-```bash
-./run_tests.sh examples
-```
-
-## Prerequisites
-
-- **Mesen2 Emulator**: Required for running ROM-based tests
-  - macOS: Build from source or use release
-  - Path: Set `MESEN_PATH` environment variable
+## Example Validation (`tests/examples/`)
 
 ```bash
-export MESEN_PATH=/path/to/Mesen
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh [--quick] [--verbose]
 ```
 
-## Running Tests
+Validates all 25 example ROMs:
+- `--quick`: skip rebuild, validate existing .sfc files only
+- Without flag: clean + rebuild each example before validation
+
+**Checks:** build success, memory overlaps (symmap.py), ROM size (32KB-4MB, power of 2).
+
+## Unit Tests (`tests/unit/`)
 
 ```bash
-# Run all tests
-./run_tests.sh
-
-# Run specific category
-./run_tests.sh unit
-./run_tests.sh hardware
-
-# Run single test
-./run_tests.sh unit/math
-
-# Verbose output
-./run_tests.sh -v
+./tests/unit/run_unit_tests.sh [-v]
 ```
 
-## Test Structure
+19 modules. Each is a standalone .sfc ROM that runs on SNES hardware.
+The runner builds each test and checks memory overlaps via `symmap.py`.
 
-Each test is a directory containing:
-
-```
-tests/unit/math/
-├── README.md           # Test documentation
-├── Makefile           # Build configuration
-├── test_math.c        # Test source code
-├── test_math.lua      # Mesen2 test runner script
-└── expected.txt       # Expected results (optional)
-```
+See `tests/CLAUDE.md` for the full module breakdown (assertions vs smoke tests).
 
 ## Writing Tests
 
-### 1. Create Test Directory
-
-```bash
-mkdir -p tests/unit/my_feature
-```
-
-### 2. Write Test Documentation (README.md)
-
-```markdown
-# my_feature Test
-
-## Purpose
-Tests the my_feature functionality.
-
-## What is Tested
-- Feature behavior A
-- Edge case B
-- Error condition C
-
-## Expected Results
-- All assertions pass
-- No crashes or hangs
-```
-
-### 3. Write Test Code
-
-Unit tests use a simple inline pattern with `TEST()` macros (see `tests/unit/` for examples):
+Unit tests use inline `TEST()` macros:
 
 ```c
-// test_my_feature.c
 #include <snes.h>
 #include <snes/console.h>
 #include <snes/text.h>
@@ -162,75 +86,34 @@ int main(void) {
 }
 ```
 
-> **Note:** `tests/harness/test_harness.h` exists but is **deprecated** — its labels
-> use a `_` prefix that breaks WLA-DX cross-object resolution. All unit tests use
-> the inline `TEST()` macro pattern shown above instead.
+## Debugging Tools
 
-## Continuous Integration
+`tools/snesdbg/` provides a Lua debugging library for Mesen2:
+- Symbol-aware memory reads (`dbg.read("player_x")`)
+- OAM inspection and comparison (shadow buffer vs hardware)
+- Breakpoints and variable watches by symbol name
+- BDD-style test DSL (`describe`/`it`/`beforeEach`)
 
-The CI pipeline runs automatically on:
-- Every push to `main` or `develop` branches
-- Every pull request to `main` or `develop`
+See `tools/snesdbg/README.md` for the full API.
 
-### What CI Checks
+## Manual Validation (7 Reference Examples)
 
-| Check | Description |
-|-------|-------------|
-| Build toolchain | Compiles cc65816, WLA-DX, gfx4snes, smconv |
-| Build examples | Builds all 25 example ROMs |
-| Build tests | Compiles test ROMs |
-| Validate examples | Checks for memory overlaps (symmap.py) |
-| Compiler tests | Runs compiler regression tests |
-| Example count | Verifies all 25 examples built successfully |
+After automated tests pass, these must be tested in Mesen2 before committing
+changes to compiler, library, or examples:
 
-### CI Workflow
+| # | Example | What to check |
+|---|---------|---------------|
+| 1 | `examples/games/breakout/` | Ball bounces, paddle moves, blocks break |
+| 2 | `examples/games/likemario/` | Mario walks/jumps, camera scrolls |
+| 3 | `examples/graphics/effects/hdma_wave/` | Wavy distortion visible |
+| 4 | `examples/graphics/sprites/dynamic_sprite/` | Animated sprite at center |
+| 5 | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolls with D-PAD |
+| 6 | `examples/audio/snesmod_music/` | Music plays |
+| 7 | `examples/memory/save_game/` | Save/load works |
 
-GitHub Actions workflow: `.github/workflows/opensnes_build.yml`
+## CI Pipeline
 
-Runs on 3 platforms:
-- **Linux** (ubuntu-latest)
-- **Windows** (windows-latest with MSYS2)
-- **macOS** (macos-latest)
-
-### Local CI Validation
-
-Before pushing, you can run the same checks locally:
-
-```bash
-# Full build
-make clean && make
-
-# Validate all examples (checks for memory overlaps, ROM sizes)
-./tests/examples/validate_examples.sh --quick
-
-# Run compiler tests
-./tests/compiler/run_tests.sh
-
-# Verify example count
-echo "Examples built: $(find examples -name '*.sfc' | wc -l)"
-```
-
-### Artifacts
-
-CI uploads the following artifacts for debugging:
-- **Build logs**: Full build output for each platform
-- **Example ROMs**: All compiled .sfc files
-- **Documentation**: Generated API docs (from Linux build)
-
-## Coverage Goals
-
-| Component | Target Coverage |
-|-----------|----------------|
-| Math functions | 100% |
-| Memory management | 100% |
-| Input handling | 90% |
-| Sprite system | 80% |
-| Background system | 80% |
-| Audio system | 70% |
-
-## Adding New Test Categories
-
-1. Create directory under `tests/`
-2. Add to `run_tests.sh` category list
-3. Document in this README
-4. Add to CI workflow
+GitHub Actions (`.github/workflows/opensnes_build.yml`) runs on push/PR to `main`/`develop`:
+- Builds toolchain, library, and all 25 examples on Linux, Windows, macOS
+- Runs compiler tests and example validation
+- Uploads build artifacts (ROMs, docs)
