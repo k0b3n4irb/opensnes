@@ -13,14 +13,17 @@
 #
 #==============================================================================
 
-# Parallel builds
+# Platform detection (parallel builds + release naming)
 UNAME := $(shell uname -s)
 ifeq ($(OS),Windows_NT)
     MAKEFLAGS += -j$(NUMBER_OF_PROCESSORS)
+    PLATFORM  := windows
 else ifeq ($(UNAME),Darwin)
     MAKEFLAGS += -j$(shell sysctl -n hw.ncpu)
-else ifeq ($(UNAME),Linux)
+    PLATFORM  := darwin
+else
     MAKEFLAGS += -j$(shell nproc)
+    PLATFORM  := linux
 endif
 
 # Paths
@@ -29,15 +32,6 @@ TOOLS_PATH    := tools
 LIB_PATH      := lib
 EXAMPLES_PATH := examples
 TESTS_PATH    := tests
-
-# Platform detection for release naming
-ifeq ($(OS),Windows_NT)
-    PLATFORM := windows
-else ifeq ($(UNAME),Darwin)
-    PLATFORM := darwin
-else
-    PLATFORM := linux
-endif
 
 RELEASE_DIR := release
 RELEASE_NAME := opensnes_$(PLATFORM)
