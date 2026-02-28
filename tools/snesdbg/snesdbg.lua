@@ -29,7 +29,7 @@
 
   Requires: Mesen2 emulator with Lua scripting support
 
-  Part of OpenSNES SDK - https://github.com/xxx/opensnes
+  Part of OpenSNES SDK - https://github.com/k0b3n4irb/opensnes
 ]]
 
 -- Get the directory of this script for relative requires
@@ -422,53 +422,80 @@ end
 -- Utilities
 -- ============================================================================
 
---- Wait for a number of frames
+--- Execute a callback after N frames (non-blocking, event-driven)
 -- @param frames Number of frames to wait
-function M.waitFrames(frames)
+-- @param callback Function to call when done
+-- @return event callback ID (can be used to cancel)
+function M.afterFrames(frames, callback)
     local count = 0
-    local waiting = true
-
-    local function onFrameWait()
+    local id
+    id = emu.addEventCallback(function()
         count = count + 1
         if count >= frames then
-            waiting = false
+            emu.removeEventCallback(id, emu.eventType.endFrame)
+            callback()
         end
-    end
-
-    emu.addEventCallback(onFrameWait, emu.eventType.startFrame)
-
-    while waiting do
-        emu.frameAdvance()
-    end
-
-    emu.removeEventCallback(onFrameWait, emu.eventType.startFrame)
+    end, emu.eventType.endFrame)
+    return id
 end
 
---- Wait until a symbol address is reached (execution)
+--- Execute a callback when a symbol address is reached (non-blocking, event-driven)
 -- @param name Symbol name
--- @param timeout Maximum frames to wait (default 600 = 10 seconds)
--- @return true if reached, false if timeout
-function M.waitUntilSymbol(name, timeout)
-    timeout = timeout or 600
-    local reached = false
-
-    local function onHit()
-        reached = true
+-- @param callback Function called when symbol is reached
+-- @param timeout Maximum frames to wait (default 600 = 10 seconds), nil = no timeout
+-- @return table with memCallbackId and optional timeoutId
+function M.onSymbolReached(name, callback, timeout)
+    if not currentSymbols then
+        error("Symbols not loaded. Call loadSymbols() first.")
     end
 
-    M.breakAtSymbol(name, onHit)
-
-    local frames = 0
-    while not reached and frames < timeout do
-        emu.frameAdvance()
-        frames = frames + 1
+    local addr = currentSymbols:resolve(name)
+    if not addr then
+        error("Unknown symbol: " .. name)
     end
 
-    if not reached then
-        print(string.format("[snesdbg] TIMEOUT waiting for '%s' after %d frames", name, timeout))
+    local ids = {}
+    local fired = false
+
+    -- Memory callback for when symbol is executed
+    emu.addMemoryCallback(function()
+        if fired then return end
+        fired = true
+        -- Cancel timeout if set
+        if ids.timeoutId then
+            emu.removeEventCallback(ids.timeoutId, emu.eventType.endFrame)
+        end
+        callback(true)
+    end, emu.callbackType.exec, addr)
+
+    -- Optional timeout
+    if timeout then
+        local count = 0
+        ids.timeoutId = emu.addEventCallback(function()
+            count = count + 1
+            if count >= timeout and not fired then
+                fired = true
+                emu.removeEventCallback(ids.timeoutId, emu.eventType.endFrame)
+                print(string.format("[snesdbg] TIMEOUT waiting for '%s' after %d frames", name, timeout))
+                callback(false)
+            end
+        end, emu.eventType.endFrame)
     end
 
-    return reached
+    print(string.format("[snesdbg] Waiting for '%s' ($%06X)", name, addr))
+    return ids
+end
+
+--- DEPRECATED: waitFrames() used blocking emu.frameAdvance() which does not exist in Mesen2.
+-- Use afterFrames(frames, callback) instead.
+function M.waitFrames()
+    error("waitFrames() is blocking and not supported in Mesen2. Use afterFrames(frames, callback) instead.")
+end
+
+--- DEPRECATED: waitUntilSymbol() used blocking emu.frameAdvance() which does not exist in Mesen2.
+-- Use onSymbolReached(name, callback, timeout) instead.
+function M.waitUntilSymbol()
+    error("waitUntilSymbol() is blocking and not supported in Mesen2. Use onSymbolReached(name, callback, timeout) instead.")
 end
 
 --- Print current state (useful for debugging)
