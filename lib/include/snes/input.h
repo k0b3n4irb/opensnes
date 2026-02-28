@@ -166,4 +166,122 @@ u16 padRaw(u8 pad);
  */
 u8 padIsConnected(u8 pad);
 
+/*============================================================================
+ * Mouse Constants
+ *============================================================================*/
+
+/** @defgroup mouse_input Mouse Input
+ * @brief SNES Mouse support (1-2 mice on ports 1/2)
+ *
+ * The SNES mouse provides 2 buttons and relative X/Y displacement.
+ * Displacement is read via bit-bang in the NMI handler after mouseInit().
+ *
+ * ## Usage
+ *
+ * @code
+ * // Detect and initialize mouse on port 1
+ * if (mouseInit(0)) {
+ *     // Mouse found!
+ * }
+ *
+ * // Main loop
+ * while (1) {
+ *     WaitForVBlank();
+ *     s16 dx = mouseGetX(0);
+ *     s16 dy = mouseGetY(0);
+ *     cursor_x += dx;
+ *     cursor_y += dy;
+ *     if (mouseButtonsPressed(0) & MOUSE_BUTTON_LEFT) {
+ *         // Left click!
+ *     }
+ * }
+ * @endcode
+ * @{
+ */
+
+#define MOUSE_BUTTON_LEFT   0x01  /**< Left mouse button */
+#define MOUSE_BUTTON_RIGHT  0x02  /**< Right mouse button */
+
+#define MOUSE_SENS_LOW      0     /**< Low sensitivity */
+#define MOUSE_SENS_MEDIUM   1     /**< Medium sensitivity */
+#define MOUSE_SENS_HIGH     2     /**< High sensitivity */
+
+/**
+ * @brief Initialize mouse on given port.
+ *
+ * Detects if a mouse is connected by checking the auto-joypad device
+ * signature. If found, cycles sensitivity to fix the Nintendo power-on bug
+ * and enables mouse reading in the NMI handler.
+ *
+ * @param port Controller port (0 = port 1, 1 = port 2)
+ * @return 1 if mouse detected, 0 if not
+ */
+u8 mouseInit(u8 port);
+
+/**
+ * @brief Check if mouse is connected on port.
+ *
+ * @param port Controller port (0 or 1)
+ * @return 1 if connected, 0 if not
+ */
+u8 mouseIsConnected(u8 port);
+
+/**
+ * @brief Get X displacement since last frame.
+ *
+ * Returns signed displacement: positive = right, negative = left.
+ * Raw hardware format is sign-magnitude; this function converts it.
+ *
+ * @param port Controller port (0 or 1)
+ * @return X displacement (-127 to +127)
+ */
+s16 mouseGetX(u8 port);
+
+/**
+ * @brief Get Y displacement since last frame.
+ *
+ * Returns signed displacement: positive = down, negative = up.
+ *
+ * @param port Controller port (0 or 1)
+ * @return Y displacement (-127 to +127)
+ */
+s16 mouseGetY(u8 port);
+
+/**
+ * @brief Get currently held mouse buttons.
+ *
+ * @param port Controller port (0 or 1)
+ * @return Button mask (MOUSE_BUTTON_LEFT / MOUSE_BUTTON_RIGHT)
+ */
+u8 mouseButtonsHeld(u8 port);
+
+/**
+ * @brief Get newly pressed mouse buttons this frame.
+ *
+ * @param port Controller port (0 or 1)
+ * @return Button mask of buttons pressed this frame (edge detection)
+ */
+u8 mouseButtonsPressed(u8 port);
+
+/**
+ * @brief Set mouse sensitivity.
+ *
+ * Cycles the mouse sensitivity by strobing the controller port.
+ * The sensitivity cycles: LOW -> MEDIUM -> HIGH -> LOW -> ...
+ *
+ * @param port Controller port (0 or 1)
+ * @param sensitivity Target sensitivity (MOUSE_SENS_LOW/MEDIUM/HIGH)
+ */
+void mouseSetSensitivity(u8 port, u8 sensitivity);
+
+/**
+ * @brief Get current mouse sensitivity.
+ *
+ * @param port Controller port (0 or 1)
+ * @return Current sensitivity (MOUSE_SENS_LOW/MEDIUM/HIGH)
+ */
+u8 mouseGetSensitivity(u8 port);
+
+/** @} */
+
 #endif /* OPENSNES_INPUT_H */
