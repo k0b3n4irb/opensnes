@@ -127,6 +127,20 @@ MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
+    ; Mouse state (read in VBlank ISR when mouse_con != 0)
+    mouse_con       dsb 1   ; bitmask: bit 0 = port 1 mouse, bit 1 = port 2 mouse
+    mouse_x         dsb 2   ; port 1 X displacement (sign-magnitude raw byte in low)
+    mouse_y         dsb 2   ; port 1 Y displacement (sign-magnitude raw byte in low)
+    mouse_x2        dsb 2   ; port 2 X displacement
+    mouse_y2        dsb 2   ; port 2 Y displacement
+    mouse_buttons   dsb 1   ; port 1 buttons (bit 0 = left, bit 1 = right)
+    mouse_buttons2  dsb 1   ; port 2 buttons
+    mouse_btnsold   dsb 1   ; port 1 previous frame buttons
+    mouse_btnsold2  dsb 1   ; port 2 previous frame buttons
+    mouse_btnsdown  dsb 1   ; port 1 newly pressed (edge detection)
+    mouse_btnsdown2 dsb 1   ; port 2 newly pressed
+    mouse_sens      dsb 1   ; port 1 sensitivity (0-2)
+    mouse_sens2     dsb 1   ; port 2 sensitivity
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -625,6 +639,133 @@ NmiHandler:
     eor pad_keysold+2
     and pad_keys+2
     sta pad_keysdown+2
+
+    ;--------------------------------------------------------------------------
+    ; Read Mouse (if connected)
+    ;--------------------------------------------------------------------------
+    ; Only runs when mouse_con != 0 (set by mouseInit in C code).
+    ; For each active port:
+    ;   1. Extract buttons + sensitivity from auto-joypad data
+    ;   2. Bit-bang 16 bits of displacement via $4016/$4017
+    ;   3. Edge-detect buttons
+    ;--------------------------------------------------------------------------
+    sep #$20                ; 8-bit A for mouse reading
+    lda mouse_con
+    bne @mouse_start
+    jmp @mouse_done         ; Skip if no mouse initialized (jmp for distance)
+@mouse_start:
+
+    ; --- Port 1 mouse ---
+    bit #$01
+    beq @mouse_port2
+
+    ; Save old buttons for edge detection
+    lda mouse_buttons
+    sta mouse_btnsold
+
+    ; Extract buttons and sensitivity from auto-joypad JOY1L ($4218)
+    ; JOY1L bit layout for mouse:
+    ;   Bit 7: Right button
+    ;   Bit 6: Left button
+    ;   Bits 5-4: Sensitivity (00=low, 01=med, 10=high)
+    ;   Bits 3-0: Signature (0001)
+    lda $4218               ; JOY1L (8-bit read)
+    pha                     ; Save for sensitivity extraction
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    sta mouse_buttons       ; bits 1-0 = right, left
+
+    pla                     ; Restore byte
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    and #$03
+    sta mouse_sens
+
+    ; Edge detection: newly pressed = (cur ^ old) & cur
+    lda mouse_buttons
+    eor mouse_btnsold
+    and mouse_buttons
+    sta mouse_btnsdown
+
+    ; Bit-bang 16 bits of displacement from port 1 ($4016)
+    ; Uses cascading ROL like PVSnesLib: reads 16 bits through mouse_x→mouse_y.
+    ; After 16 iterations: mouse_y = first 8 bits (Y), mouse_x = last 8 bits (X).
+    ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude)
+    rep #$20                ; 16-bit A for word operations
+    stz mouse_y             ; Clear displacement accumulators
+    stz mouse_x
+
+    sep #$20                ; 8-bit A for bit reading
+    ldy #16                 ; 16 bits total (8 Y + 8 X)
+@mouse1_disp_loop:
+    lda $4016               ; Read bit from port 1 (bit 0)
+    lsr a                   ; Shift bit 0 into carry
+    rol mouse_x             ; Carry → mouse_x bit 0, mouse_x bit 7 → carry
+    rol mouse_y             ; Carry → mouse_y bit 0
+    nop                     ; Hyperkin compatibility delay (170+ master cycles)
+    nop
+    dey
+    bne @mouse1_disp_loop
+
+@mouse_port2:
+    ; --- Port 2 mouse ---
+    lda mouse_con
+    bit #$02
+    beq @mouse_done
+
+    ; Save old buttons
+    lda mouse_buttons2
+    sta mouse_btnsold2
+
+    ; Extract from auto-joypad JOY2L ($421A)
+    lda $421A               ; JOY2L (8-bit read)
+    pha
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    sta mouse_buttons2
+
+    pla
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    and #$03
+    sta mouse_sens2
+
+    ; Edge detection
+    lda mouse_buttons2
+    eor mouse_btnsold2
+    and mouse_buttons2
+    sta mouse_btnsdown2
+
+    ; Bit-bang 16 bits of displacement from port 2 ($4017)
+    rep #$20
+    stz mouse_y2
+    stz mouse_x2
+
+    sep #$20
+    ldy #16
+@mouse2_disp_loop:
+    lda $4017
+    lsr a
+    rol mouse_x2
+    rol mouse_y2
+    nop
+    nop
+    dey
+    bne @mouse2_disp_loop
+
+@mouse_done:
 
     sep #$20
 

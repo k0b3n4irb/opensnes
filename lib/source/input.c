@@ -25,6 +25,21 @@ extern u16 pad_keys[5];      /* Current button state (5 pads × 16 bits) */
 extern u16 pad_keysold[5];   /* Previous frame button state */
 extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
 
+/* Mouse state (populated by VBlank ISR when mouse_con != 0) */
+extern u8  mouse_con;        /* Bitmask: bit 0 = port 1, bit 1 = port 2 */
+extern u16 mouse_x;          /* Port 1 X displacement (sign-magnitude in low byte) */
+extern u16 mouse_y;          /* Port 1 Y displacement (sign-magnitude in low byte) */
+extern u16 mouse_x2;         /* Port 2 X displacement */
+extern u16 mouse_y2;         /* Port 2 Y displacement */
+extern u8  mouse_buttons;    /* Port 1 buttons held */
+extern u8  mouse_buttons2;   /* Port 2 buttons held */
+extern u8  mouse_btnsold;    /* Port 1 previous buttons */
+extern u8  mouse_btnsold2;   /* Port 2 previous buttons */
+extern u8  mouse_btnsdown;   /* Port 1 newly pressed */
+extern u8  mouse_btnsdown2;  /* Port 2 newly pressed */
+extern u8  mouse_sens;       /* Port 1 sensitivity */
+extern u8  mouse_sens2;      /* Port 2 sensitivity */
+
 /*============================================================================
  * Input Functions
  *============================================================================*/
@@ -72,4 +87,182 @@ u8 padIsConnected(u8 pad) {
     /* A disconnected controller reads as $FFFF or $0000 depending on pull-ups */
     u16 state = pad_keys[pad];
     return (state != 0xFFFF && state != 0x0000) ? TRUE : FALSE;
+}
+
+/*============================================================================
+ * Mouse Functions
+ *============================================================================*/
+
+/**
+ * Convert sign-magnitude byte to signed value.
+ * Bit 7 = sign (1 = negative), bits 6-0 = magnitude.
+ */
+static s16 sign_magnitude_to_signed(u8 raw) {
+    s16 magnitude = (s16)(raw & 0x7F);
+    if (raw & 0x80) {
+        return -magnitude;
+    }
+    return magnitude;
+}
+
+u8 mouseInit(u8 port) {
+    u8 signature;
+
+    if (port > 1) return 0;
+
+    /* Wait for auto-joypad to complete */
+    while (REG_HVBJOY & 0x01) {}
+
+    /* Read device signature from auto-joypad result (low nibble) */
+    if (port == 0) {
+        signature = REG_JOY1L & 0x0F;
+    } else {
+        signature = REG_JOY2L & 0x0F;
+    }
+
+    /* Mouse signature is $01 (joypad is $00) */
+    if (signature != 0x01) return 0;
+
+    /* Enable mouse reading in NMI handler */
+    if (port == 0) {
+        mouse_con |= 0x01;
+    } else {
+        mouse_con |= 0x02;
+    }
+
+    /*
+     * Fix Nintendo mouse power-on bug:
+     * The internal sensitivity state may not match what the mouse reports.
+     * Cycling sensitivity 2 times via strobe resets it to a known state.
+     * Note: We must actually read the port register (not just cast to void)
+     * because some compilers may eliminate a (void) volatile read.
+     */
+    {
+        volatile u8 dummy;
+        u8 i;
+        for (i = 0; i < 2; i++) {
+            REG_JOYA = 0x01;   /* Strobe ON */
+            if (port == 0) {
+                dummy = REG_JOYA; /* Clock one bit (triggers sensitivity cycle) */
+            } else {
+                dummy = REG_JOYB;
+            }
+            REG_JOYA = 0x00;   /* Strobe OFF */
+        }
+        (void)dummy;           /* Suppress unused warning */
+    }
+
+    return 1;
+}
+
+u8 mouseIsConnected(u8 port) {
+    if (port > 1) return 0;
+    if (port == 0) {
+        return (mouse_con & 0x01) ? 1 : 0;
+    }
+    return (mouse_con & 0x02) ? 1 : 0;
+}
+
+s16 mouseGetX(u8 port) {
+    if (port == 0) {
+        return sign_magnitude_to_signed((u8)mouse_x);
+    } else if (port == 1) {
+        return sign_magnitude_to_signed((u8)mouse_x2);
+    }
+    return 0;
+}
+
+s16 mouseGetY(u8 port) {
+    if (port == 0) {
+        return sign_magnitude_to_signed((u8)mouse_y);
+    } else if (port == 1) {
+        return sign_magnitude_to_signed((u8)mouse_y2);
+    }
+    return 0;
+}
+
+u8 mouseButtonsHeld(u8 port) {
+    if (port == 0) return mouse_buttons;
+    if (port == 1) return mouse_buttons2;
+    return 0;
+}
+
+u8 mouseButtonsPressed(u8 port) {
+    if (port == 0) return mouse_btnsdown;
+    if (port == 1) return mouse_btnsdown2;
+    return 0;
+}
+
+void mouseSetSensitivity(u8 port, u8 sensitivity) {
+    volatile u8 dummy;
+    u8 read_sens;
+    u8 max_cycles;
+    u8 i;
+
+    if (port > 1) return;
+    sensitivity &= 0x03;
+    if (sensitivity > 2) sensitivity = 2;
+
+    /*
+     * PVSnesLib-compatible sensitivity cycling protocol:
+     * Each cycle: strobe ON, read response, strobe OFF, skip 10 bits,
+     * read 2 sensitivity bits, compare with target.
+     * Max 4 cycles to wrap around and find target.
+     */
+    max_cycles = 4;
+    while (max_cycles > 0) {
+        /* Strobe: latch data, clock one bit, release */
+        REG_JOYA = 0x01;   /* Strobe ON */
+        if (port == 0) {
+            dummy = REG_JOYA; /* Read response (clock) */
+        } else {
+            dummy = REG_JOYB;
+        }
+        REG_JOYA = 0x00;   /* Strobe OFF */
+
+        /* Skip 10 bits of serial data */
+        for (i = 0; i < 10; i++) {
+            if (port == 0) {
+                dummy = REG_JOYA;
+            } else {
+                dummy = REG_JOYB;
+            }
+        }
+
+        /* Read 2 sensitivity bits */
+        read_sens = 0;
+        if (port == 0) {
+            dummy = REG_JOYA;
+        } else {
+            dummy = REG_JOYB;
+        }
+        read_sens = (dummy & 0x01) << 1;
+
+        if (port == 0) {
+            dummy = REG_JOYA;
+        } else {
+            dummy = REG_JOYB;
+        }
+        read_sens |= (dummy & 0x01);
+
+        /* Check if we reached the target */
+        if (read_sens == sensitivity) break;
+
+        max_cycles--;
+    }
+
+    (void)dummy;  /* Suppress unused warning */
+
+    /* Update cached value */
+    if (port == 0) {
+        mouse_sens = sensitivity;
+    } else {
+        mouse_sens2 = sensitivity;
+    }
+}
+
+u8 mouseGetSensitivity(u8 port) {
+    if (port == 0) return mouse_sens;
+    if (port == 1) return mouse_sens2;
+    return 0;
 }
