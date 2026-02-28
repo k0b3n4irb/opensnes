@@ -86,13 +86,30 @@ int main(void) {
 }
 ```
 
-## Debugging Tools
+## Mesen2 Lua Tests
+
+Mesen2-based tests that validate ROM behavior at runtime.
+
+| Script | Purpose |
+|--------|---------|
+| `tests/black_screen_test.lua` | Black screen smoke test (PNG size proxy) |
+| `tests/run_black_screen_tests.sh` | Runner: tests all 25 ROMs for black screens |
+| `tests/test_snes_compliance.sh` | 8 static checks on headers and assembly |
+| `tests/examples/hello_world/test_hello_world.lua` | Mesen2 test for hello_world example |
+| `tests/examples/breakout_transition_test.lua` | Mesen2 test for breakout transitions |
+| `tests/examples/compare_screenshots.sh` + `.lua` | PVSnesLib vs OpenSNES visual comparison |
+
+All Mesen2 Lua scripts use the **event-driven** pattern (register callbacks, return
+control). See `tests/black_screen_test.lua` for the canonical example.
+
+## Debugging Tools (snesdbg)
 
 `tools/snesdbg/` provides a Lua debugging library for Mesen2:
 - Symbol-aware memory reads (`dbg.read("player_x")`)
 - OAM inspection and comparison (shadow buffer vs hardware)
 - Breakpoints and variable watches by symbol name
-- BDD-style test DSL (`describe`/`it`/`beforeEach`)
+- BDD-style test DSL (`describe`/`it` with event-driven `done()` callbacks)
+- Non-blocking frame waits (`afterFrames`) and symbol waits (`onSymbolReached`)
 
 See `tools/snesdbg/README.md` for the full API.
 
