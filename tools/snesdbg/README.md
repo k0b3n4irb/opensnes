@@ -10,7 +10,7 @@ A comprehensive Lua debugging library for OpenSNES development with Mesen2 emula
 - **Test assertions** - assertEqual, assertGreaterThan, assertInRange, etc.
 - **OAM comparison** - Compare shadow buffer to hardware OAM
 - **Struct support** - Define and read C struct layouts
-- **Test framework** - BDD-style test DSL (describe/it)
+- **Test framework** - BDD-style test DSL (describe/it) with event-driven execution
 
 ## Quick Start
 
@@ -34,6 +34,11 @@ end)
 -- Set breakpoints at functions
 dbg.breakAtSymbol("game_init", function()
     print("game_init() called!")
+end)
+
+-- Run code after N frames (non-blocking)
+dbg.afterFrames(60, function()
+    print(string.format("After 1 second: monster_x = %d", dbg.read("monster_x")))
 end)
 ```
 
@@ -169,17 +174,43 @@ local player = dbg.readStruct("player_data", "Player")
 print(player.x, player.y, player.health)
 ```
 
-### Utilities
+### Frame Callbacks & Timing (Event-Driven)
+
+Mesen2 is event-driven: you register callbacks, return control, and Mesen2
+calls your callbacks at the right time. **Never use blocking loops.**
 
 ```lua
-dbg.waitFrames(10)                     -- Wait 10 frames
-dbg.waitUntilSymbol("init_done")       -- Wait until execution reaches symbol
-dbg.printState()                       -- Print debug library state
+-- Run code after N frames
+dbg.afterFrames(60, function()
+    print("One second has passed!")
+end)
+
+-- Run code when execution reaches a symbol
+dbg.onSymbolReached("game_init", function(reached)
+    if reached then
+        print("game_init() was called!")
+    else
+        print("Timed out waiting for game_init()")
+    end
+end, 600)  -- 600 frame timeout (10 seconds)
+
+-- Run code every frame
+local id = dbg.everyFrame(function()
+    -- called each frame
+end)
+dbg.stopEveryFrame(id)
+
+-- Print debug state
+dbg.printState()
 ```
 
 ## Test Framework
 
 The test framework provides a BDD-style DSL for writing ROM tests.
+Tests are **declared** synchronously, then **executed** asynchronously
+via a state machine driven by Mesen2 callbacks.
+
+Each test function receives a `done` callback — call it when the test completes.
 
 ```lua
 local test = require("snesdbg.test")
@@ -187,39 +218,39 @@ local test = require("snesdbg.test")
 test.describe("My Game Tests", function()
 
     test.beforeAll(function()
-        test.loadROM("game.sfc")
         test.loadSymbols("game.sym")
     end)
 
-    test.beforeEach(function()
-        test.reset()  -- Reset emulator
+    test.it("should initialize player at (100, 100)", function(done)
+        test.afterFrames(10, function()
+            test.assertEqual("player_x", 100)
+            test.assertEqual("player_y", 100)
+            done()
+        end)
     end)
 
-    test.it("should initialize player at (100, 100)", function()
-        test.waitFrames(10)
-        test.assertEqual("player_x", 100)
-        test.assertEqual("player_y", 100)
+    test.it("should move right when RIGHT pressed", function(done)
+        test.afterFrames(10, function()
+            local initial = test.read("player_x")
+            test.holdButton("right")
+            test.afterFrames(10, function()
+                test.assertGreaterThan("player_x", initial)
+                test.releaseAllButtons()
+                done()
+            end)
+        end)
     end)
 
-    test.it("should move right when RIGHT pressed", function()
-        test.waitFrames(10)
-        local initial = test.read("player_x")
-
-        test.holdButton("right")
-        test.waitFrames(10)
-        test.releaseButton("right")
-
-        test.assertGreaterThan("player_x", initial)
-    end)
-
-    test.it("should have correct OAM data", function()
-        test.waitFrames(10)
-        test.assertOAM(0, {x = 100, y = 100, tile = 0})
+    test.it("should have correct OAM data", function(done)
+        test.afterFrames(10, function()
+            test.assertOAM(0, {x = 100, y = 100, tile = 0})
+            done()
+        end)
     end)
 
 end)
 
-test.run()
+test.run()  -- Returns immediately, Mesen2 drives execution
 ```
 
 ### Test Framework API
@@ -227,30 +258,26 @@ test.run()
 ```lua
 -- Suite definition
 test.describe("Suite Name", fn)
-test.it("test name", fn)
+test.it("test name", fn(done))   -- fn receives done() callback
 test.beforeAll(fn)
 test.beforeEach(fn)
 test.afterEach(fn)
 test.afterAll(fn)
 test.skip("test name", "reason")
-test.only("test name", fn)  -- Run only this test
+test.only("test name", fn)       -- Run only this test
 
--- ROM management
-test.loadROM("game.sfc")
+-- Symbol management
 test.loadSymbols("game.sym")
-test.reset()
-test.powerCycle()
 
--- Frame control
-test.waitFrames(10)
-test.waitForVBlank()
-test.waitUntilSymbol("label")
+-- Frame control (event-driven)
+test.afterFrames(10, callback)              -- Non-blocking frame wait
+test.onSymbolReached("label", callback)     -- Non-blocking symbol wait
 
 -- Input simulation
 test.holdButton("right")
 test.releaseButton("right")
 test.releaseAllButtons()
-test.pressButton("a", 2)  -- Press for 2 frames
+test.pressButton("a", 2, callback)  -- Press for 2 frames, then callback
 
 -- Memory access (same as dbg)
 test.read("symbol")
@@ -262,7 +289,7 @@ test.assertOAM(index, {x=, y=, tile=})
 test.assertOAMTransferred()
 
 -- Run tests
-test.run()  -- Returns true if all passed
+test.run()  -- Returns immediately, event-driven execution
 ```
 
 ## File Structure
@@ -274,13 +301,13 @@ snesdbg/
 ├── memory.lua         # Memory access helpers
 ├── assertions.lua     # Test assertions
 ├── oam.lua            # OAM helpers
-├── test.lua           # Test framework DSL
+├── test.lua           # Test framework DSL (event-driven)
 ├── README.md          # This file
 └── examples/
-    ├── watch_variable.lua
-    ├── trace_function.lua
-    ├── test_sprite.lua
-    └── debug_animation.lua
+    ├── watch_variable.lua   # Watch variables for changes
+    ├── trace_function.lua   # Trace function execution
+    ├── test_sprite.lua      # Test OAM/sprite functionality
+    └── debug_breakout.lua   # Debug breakout example
 ```
 
 ## Mesen2 Memory Types
@@ -289,11 +316,11 @@ When using raw Mesen2 API alongside snesdbg, remember:
 
 | Type | Use |
 |------|-----|
-| `snesSpriteRam` | OAM data (NOT `snesOam`!) |
-| `snesWorkRam` | WRAM ($7E-$7F) |
-| `snesVideoRam` | VRAM |
-| `snesCgRam` | CGRAM (palettes) |
-| `snesMemory` | Full address space |
+| `emu.memType.snesSpriteRam` | OAM data |
+| `emu.memType.snesWorkRam` | WRAM ($7E-$7F) |
+| `emu.memType.snesVideoRam` | VRAM |
+| `emu.memType.snesCgRam` | CGRAM (palettes) |
+| `emu.memType.snesMemory` | Full address space |
 
 ## Common Patterns
 
@@ -314,19 +341,18 @@ end)
 
 ```lua
 -- After game initialization
-test.waitFrames(10)
+dbg.afterFrames(10, function()
+    -- Check shadow buffer
+    local sprite = dbg.readSprite(0)
+    print(string.format("Buffer: (%d, %d)", sprite.x, sprite.y))
 
--- Check shadow buffer
-local sprite = dbg.readSprite(0)
-print(string.format("Buffer: (%d, %d)", sprite.x, sprite.y))
+    -- Check hardware
+    local hwSprite = dbg.readHardwareSprite(0)
+    print(string.format("Hardware: (%d, %d)", hwSprite.x, hwSprite.y))
 
--- Check hardware after VBlank
-test.waitForVBlank()
-local hwSprite = dbg.readHardwareSprite(0)
-print(string.format("Hardware: (%d, %d)", hwSprite.x, hwSprite.y))
-
--- They should match
-dbg.assertOAMTransferred()
+    -- They should match
+    dbg.assertOAMTransferred()
+end)
 ```
 
 ### Tracing Function Execution
@@ -347,14 +373,17 @@ end)
 
 ### OAM comparison shows mismatches
 - Make sure you're checking after VBlank (OAM is DMA'd during VBlank)
-- Use `test.waitForVBlank()` before comparing
+- Use `dbg.afterFrames(1, callback)` to wait a frame before comparing
 
 ### Execution callbacks not firing
 - Use 24-bit addresses for exec callbacks: `0x008100` not `0x8100`
 - Make sure the code path is actually executed
 
+### "waitFrames() is blocking and not supported" error
+- `waitFrames()` and `waitUntilSymbol()` have been removed
+- Use `afterFrames(n, callback)` and `onSymbolReached(name, callback)` instead
+- See the Quick Start section for examples
+
 ## See Also
 
 - [OpenSNES SDK Documentation](../../README.md)
-- [KNOWLEDGE.md](../../.claude/KNOWLEDGE.md) - SNES debugging knowledge base
-- [ROADMAP.md](../../.claude/ROADMAP.md) - Development roadmap
