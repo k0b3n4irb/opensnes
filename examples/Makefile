@@ -27,8 +27,9 @@ all: $(EXAMPLE_TARGETS)
 
 clean: $(CLEAN_TARGETS)
 
-# Build each example (can run in parallel)
+# Build each example (clean first to catch regressions early)
 $(EXAMPLE_TARGETS): build-%:
+	@$(MAKE) -C $* clean 2>/dev/null || true
 	@$(MAKE) -C $*
 
 # Clean each example (can run in parallel)
