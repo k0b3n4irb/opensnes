@@ -284,4 +284,149 @@ u8 mouseGetSensitivity(u8 port);
 
 /** @} */
 
+/*============================================================================
+ * Super Scope Constants
+ *============================================================================*/
+
+/** @defgroup scope_input Super Scope Input
+ * @brief SNES Super Scope support (port 2 only)
+ *
+ * The Super Scope is a light gun that uses the PPU H/V counter latch
+ * to determine aim position. It provides 4 buttons and 2 status flags.
+ *
+ * ## Usage
+ *
+ * @code
+ * // Detect and initialize Super Scope
+ * if (scopeInit()) {
+ *     // Super Scope found on port 2!
+ * }
+ *
+ * // Calibration: ask user to fire at screen center
+ * // Wait for fire...
+ * scopeCalibrate();
+ *
+ * // Main loop
+ * while (1) {
+ *     WaitForVBlank();
+ *     u16 x = scopeGetX();
+ *     u16 y = scopeGetY();
+ *     if (scopeButtonsPressed() & SSC_FIRE) {
+ *         // Shot fired!
+ *     }
+ * }
+ * @endcode
+ * @{
+ */
+
+#define SSC_FIRE        0x8000  /**< Fire button (trigger) */
+#define SSC_CURSOR      0x4000  /**< Cursor button */
+#define SSC_TURBO       0x2000  /**< Turbo switch */
+#define SSC_PAUSE       0x1000  /**< Pause button */
+#define SSC_OFFSCREEN   0x0200  /**< Off-screen flag */
+#define SSC_NOISE       0x0100  /**< Noise flag (no signal) */
+
+/**
+ * @brief Detect Super Scope on port 2.
+ *
+ * Checks the auto-joypad device signature on port 2. If a Super Scope
+ * is found, enables reading in the NMI handler and sets default
+ * hold/repeat delays (60/20 frames).
+ *
+ * @return 1 if Super Scope detected, 0 if not
+ */
+u8 scopeInit(void);
+
+/**
+ * @brief Check if Super Scope is connected.
+ *
+ * @return 1 if connected, 0 if not
+ */
+u8 scopeIsConnected(void);
+
+/**
+ * @brief Get calibration-adjusted H position.
+ *
+ * @return Adjusted X coordinate (0-255 visible range)
+ */
+u16 scopeGetX(void);
+
+/**
+ * @brief Get calibration-adjusted V position.
+ *
+ * @return Adjusted Y coordinate (0-223 visible range)
+ */
+u16 scopeGetY(void);
+
+/**
+ * @brief Get raw (uncalibrated) H position from PPU.
+ *
+ * @return Raw X coordinate from PPU H counter
+ */
+u16 scopeGetRawX(void);
+
+/**
+ * @brief Get raw (uncalibrated) V position from PPU.
+ *
+ * @return Raw Y coordinate from PPU V counter
+ */
+u16 scopeGetRawY(void);
+
+/**
+ * @brief Get currently held buttons.
+ *
+ * @return Button mask (SSC_FIRE, SSC_CURSOR, SSC_TURBO, SSC_PAUSE,
+ *         SSC_OFFSCREEN, SSC_NOISE)
+ */
+u16 scopeButtonsDown(void);
+
+/**
+ * @brief Get newly pressed buttons this frame.
+ *
+ * @return Button mask of buttons pressed this frame (edge detection)
+ */
+u16 scopeButtonsPressed(void);
+
+/**
+ * @brief Get buttons held past the hold delay threshold.
+ *
+ * After holding a button for holddelay frames, it triggers as "held".
+ * Then it re-triggers every repdelay frames.
+ *
+ * @return Button mask of held buttons
+ */
+u16 scopeButtonsHeld(void);
+
+/**
+ * @brief Calibrate aim from a center-screen shot.
+ *
+ * Call this after the user fires at the center of the screen (128, 112).
+ * Computes calibration offsets: centerh = 128 - rawX, centerv = 112 - rawY.
+ * The NMI handler applies these offsets to all subsequent readings.
+ */
+void scopeCalibrate(void);
+
+/**
+ * @brief Set hold delay (frames before hold triggers).
+ *
+ * @param frames Number of frames (default: 60 = 1 second at 60Hz)
+ */
+void scopeSetHoldDelay(u16 frames);
+
+/**
+ * @brief Set repeat delay (frames between repeat fires after hold).
+ *
+ * @param frames Number of frames (default: 20)
+ */
+void scopeSetRepeatDelay(u16 frames);
+
+/**
+ * @brief Get frames since last detected shot.
+ *
+ * @return Number of frames since last PPU latch (shot detection)
+ */
+u16 scopeSinceShot(void);
+
+/** @} */
+
 #endif /* OPENSNES_INPUT_H */

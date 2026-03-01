@@ -144,6 +144,35 @@ MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
 .ENDS
 
 ;------------------------------------------------------------------------------
+; Super Scope State Variables (port 2 only)
+;------------------------------------------------------------------------------
+; Separate RAMSECTION to avoid inflating ".system" (which must stay small
+; enough for the linker to place variables like tilemap_src_addr within
+; 8-bit direct page addressing range).
+;------------------------------------------------------------------------------
+
+.RAMSECTION ".scope" BANK 0 SLOT 1
+    scope_con       dsb 1   ; 1 = Super Scope connected and active
+    scope_sinceshot dsb 2   ; frames since last shot (u16)
+    scope_shoth     dsb 2   ; H position, calibration-adjusted (u16)
+    scope_shotv     dsb 2   ; V position, calibration-adjusted (u16)
+    scope_shothraw  dsb 2   ; H position, raw from PPU (u16)
+    scope_shotvraw  dsb 2   ; V position, raw from PPU (u16)
+    scope_centerh   dsb 2   ; H calibration offset (s16)
+    scope_centerv   dsb 2   ; V calibration offset (s16)
+    scope_down      dsb 2   ; buttons currently held (u16)
+    scope_now       dsb 2   ; buttons newly pressed this frame (u16)
+    scope_held      dsb 2   ; buttons held past holddelay (u16)
+    scope_last      dsb 2   ; previous frame button state (u16)
+    scope_port2down dsb 2   ; raw auto-joypad port 2 (u16)
+    scope_port2last dsb 2   ; previous frame raw port 2 (u16)
+    scope_port2now  dsb 2   ; newly pressed raw port 2 (u16)
+    scope_holddelay dsb 2   ; frames before hold triggers (u16, default 60)
+    scope_repdelay  dsb 2   ; frames between repeat fires (u16, default 20)
+    scope_tohold    dsb 2   ; countdown to hold (u16)
+.ENDS
+
+;------------------------------------------------------------------------------
 ; Reserved Bank $00 Region (WRAM Mirror Protection)
 ;------------------------------------------------------------------------------
 ; Bank $00 addresses $0000-$1FFF mirror Bank $7E's $0000-$1FFF.
@@ -766,6 +795,144 @@ NmiHandler:
     bne @mouse2_disp_loop
 
 @mouse_done:
+
+    ;--------------------------------------------------------------------------
+    ; Read Super Scope (if connected)
+    ;--------------------------------------------------------------------------
+    ; Only runs when scope_con != 0 (set by scopeInit in C code).
+    ; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
+    ; Reads PPU H/V latch for shot position, applies calibration offset,
+    ; and processes buttons with hold/repeat delay logic.
+    ;--------------------------------------------------------------------------
+    sep #$20                ; 8-bit A
+    lda scope_con
+    bne @scope_start
+    jmp @scope_done         ; Skip if no Super Scope initialized
+@scope_start:
+
+    ; Read port 2 raw data from auto-joypad and compute edge detection
+    rep #$20                ; 16-bit A
+    lda scope_port2down
+    sta scope_port2last     ; Save previous frame
+    lda $421A               ; REG_JOY2L/H (16-bit read)
+    sta scope_port2down
+    eor scope_port2last
+    and scope_port2down
+    sta scope_port2now      ; Newly pressed raw port 2
+
+    ; Validate Super Scope signature: bits 0-7 all 1, bits 10-11 both 0
+    lda scope_port2down
+    and #$0CFF
+    cmp #$00FF
+    beq @scope_valid
+    jmp @scope_disconnect
+@scope_valid:
+
+    ; Check PPU H/V counter latch (bit 6 of REG_STAT78)
+    sep #$20                ; 8-bit A
+    lda $213F               ; REG_STAT78
+    and #$40
+    beq @scope_no_shot
+
+    ; --- Shot detected: read H/V position ---
+    ; REG_OPHCT ($213C): 9-bit H position, read twice (low then high)
+    lda $213C               ; OPHCT low byte
+    sta scope_shothraw
+    lda $213C               ; OPHCT high bit (bit 0 only)
+    and #$01
+    sta scope_shothraw+1
+
+    ; REG_OPVCT ($213D): 9-bit V position, read twice (low then high)
+    lda $213D               ; OPVCT low byte
+    sta scope_shotvraw
+    lda $213D               ; OPVCT high bit (bit 0 only)
+    and #$01
+    sta scope_shotvraw+1
+
+    ; Apply calibration offset: adjusted = raw + center offset
+    rep #$20                ; 16-bit A
+    lda scope_shothraw
+    clc
+    adc scope_centerh
+    sta scope_shoth
+    lda scope_shotvraw
+    clc
+    adc scope_centerv
+    sta scope_shotv
+
+    ; Reset shot counter
+    stz scope_sinceshot
+    bra @scope_buttons      ; Common button processing
+
+@scope_no_shot:
+    ; --- No shot this frame ---
+    rep #$20                ; 16-bit A
+    inc scope_sinceshot
+
+@scope_buttons:
+    ; Full button processing: extract bits 15-12 (buttons) and 9-8 (flags)
+    ; All buttons (Fire, Cursor, Turbo, Pause) + flags (Offscreen, Noise)
+    ; are processed identically on both shot and non-shot frames.
+    lda scope_port2down
+    and #$F300              ; Keep buttons (15-12) + offscreen (9) + noise (8)
+    sta scope_down
+
+    ; Edge detection: newly pressed = (cur ^ last) & cur
+    lda scope_last
+    eor scope_down
+    and scope_down
+    sta scope_now
+
+    ; Hold/repeat delay logic
+    ; If buttons changed from last frame, reset hold countdown
+    lda scope_down
+    cmp scope_last
+    bne @scope_reset_hold
+
+    ; Same buttons held: decrement countdown
+    lda scope_tohold
+    beq @scope_held_fire     ; Already at 0 → fire held event
+    dec a
+    sta scope_tohold
+    stz scope_held
+    bra @scope_save_last
+
+@scope_held_fire:
+    ; Hold triggered: set held = down, reload with repeat delay
+    lda scope_down
+    sta scope_held
+    lda scope_repdelay
+    sta scope_tohold
+    bra @scope_save_last
+
+@scope_reset_hold:
+    ; Buttons changed: reload with hold delay
+    lda scope_holddelay
+    sta scope_tohold
+    stz scope_held
+    bra @scope_save_last
+
+@scope_disconnect:
+    ; Invalid signature: disconnect Super Scope
+    rep #$20
+    stz scope_down
+    stz scope_now
+    stz scope_held
+    stz scope_shoth
+    stz scope_shotv
+    stz scope_shothraw
+    stz scope_shotvraw
+    stz scope_sinceshot
+    sep #$20
+    stz scope_con
+    bra @scope_done
+
+@scope_save_last:
+    ; Save current button state for next frame
+    lda scope_down
+    sta scope_last
+
+@scope_done:
 
     sep #$20
 

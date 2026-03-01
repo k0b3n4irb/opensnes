@@ -266,3 +266,94 @@ u8 mouseGetSensitivity(u8 port) {
     if (port == 1) return mouse_sens2;
     return 0;
 }
+
+/*============================================================================
+ * Super Scope Functions
+ *============================================================================*/
+
+/* Super Scope state (populated by VBlank ISR when scope_con != 0) */
+extern u8  scope_con;
+extern u16 scope_sinceshot;
+extern u16 scope_shoth, scope_shotv;
+extern u16 scope_shothraw, scope_shotvraw;
+extern u16 scope_centerh, scope_centerv;
+extern u16 scope_down, scope_now, scope_held;
+extern u16 scope_last;
+extern u16 scope_holddelay, scope_repdelay;
+extern u16 scope_tohold;
+
+u8 scopeInit(void) {
+    u16 val;
+
+    /* Wait for auto-joypad to complete */
+    while (REG_HVBJOY & 0x01) {}
+
+    /* Read port 2 auto-joypad result (16-bit) */
+    val = (u16)REG_JOY2H << 8 | (u16)REG_JOY2L;
+
+    /* Super Scope signature: bits 0-7 all 1, bits 10-11 both 0 */
+    if ((val & 0x0CFF) != 0x00FF) return 0;
+
+    /* Enable Super Scope reading in NMI handler */
+    scope_con = 1;
+
+    /* Set default delays */
+    scope_holddelay = 60;
+    scope_repdelay = 20;
+    scope_tohold = 60;
+
+    /* Clear calibration */
+    scope_centerh = 0;
+    scope_centerv = 0;
+
+    return 1;
+}
+
+u8 scopeIsConnected(void) {
+    return scope_con;
+}
+
+u16 scopeGetX(void) {
+    return scope_shoth;
+}
+
+u16 scopeGetY(void) {
+    return scope_shotv;
+}
+
+u16 scopeGetRawX(void) {
+    return scope_shothraw;
+}
+
+u16 scopeGetRawY(void) {
+    return scope_shotvraw;
+}
+
+u16 scopeButtonsDown(void) {
+    return scope_down;
+}
+
+u16 scopeButtonsPressed(void) {
+    return scope_now;
+}
+
+u16 scopeButtonsHeld(void) {
+    return scope_held;
+}
+
+void scopeCalibrate(void) {
+    scope_centerh = 0x80 - scope_shothraw;
+    scope_centerv = 0x70 - scope_shotvraw;
+}
+
+void scopeSetHoldDelay(u16 frames) {
+    scope_holddelay = frames;
+}
+
+void scopeSetRepeatDelay(u16 frames) {
+    scope_repdelay = frames;
+}
+
+u16 scopeSinceShot(void) {
+    return scope_sinceshot;
+}
