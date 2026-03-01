@@ -232,16 +232,16 @@ check_bank0_overflow() {
     log_verbose "Checking bank \$00 ROM overflow for $name..."
 
     local output
-    output=$(python3 "$SYMMAP" --check-bank0-overflow "$sym_file" 2>&1)
+    output=$(python3 "$SYMMAP" --check-bank0-overflow --warn-threshold 2048 "$sym_file" 2>&1)
     local exit_code=$?
 
-    # symmap.py returns exit code 1 when string literals spilled (hard fail)
-    if [[ $exit_code -ne 0 ]] || echo "$output" | grep -q "^OVERFLOW:"; then
+    # symmap.py returns: 1=critical spill, 2=below threshold, 0=OK
+    if [[ $exit_code -eq 1 ]] || echo "$output" | grep -q "^OVERFLOW:"; then
         log_error "$name: Bank \$00 ROM overflow detected!"
         echo "$output" | grep -E "OVERFLOW|string\." | head -10
         return 1
-    elif echo "$output" | grep -q "^WARNING:"; then
-        log_warn "$name: $(echo "$output" | grep "^WARNING:" | head -1)"
+    elif [[ $exit_code -eq 2 ]] || echo "$output" | grep -q "^WARNING:"; then
+        log_warn "$name: $(echo "$output" | grep "WARNING:" | head -1)"
         return 0
     else
         log_verbose "$name: Bank \$00 ROM OK"

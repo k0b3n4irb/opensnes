@@ -494,11 +494,12 @@ def print_overlap_check(table: SymbolTable) -> int:
     return 1
 
 
-def print_bank0_overflow_check(table: SymbolTable) -> int:
+def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048) -> int:
     """Check and print bank $00 ROM overflow status. Returns exit code.
 
     Exit code 1 (hard fail): string literals spilled to bank $01+.
-    Exit code 0: no critical spills (warnings are informational only).
+    Exit code 2: bank $00 free space below warn_threshold.
+    Exit code 0: no critical spills and free space above threshold.
     """
     critical, warnings, free_bytes = table.check_bank0_rom_overflow()
 
@@ -529,14 +530,18 @@ def print_bank0_overflow_check(table: SymbolTable) -> int:
         for sym in warnings:
             print(f"  ${sym.bank:02X}:{sym.address:04X}  {sym.name}")
         print(f"  Bank $00 ROM free: {free_bytes} bytes")
+        if free_bytes < warn_threshold:
+            print(f"{Colors.YELLOW}WARNING: Bank $00 ROM nearly full "
+                  f"({free_bytes} bytes free, threshold: {warn_threshold}){Colors.RESET}")
+            return 2
         return 0
 
     # No spills — check for low free space warning
-    if free_bytes < 1024:
+    if free_bytes < warn_threshold:
         print(f"{Colors.YELLOW}WARNING: Bank $00 ROM nearly full "
-              f"({free_bytes} bytes free, < 1024){Colors.RESET}")
+              f"({free_bytes} bytes free, threshold: {warn_threshold}){Colors.RESET}")
         print("  Adding more const data or string literals may cause overflow.")
-        return 0
+        return 2
 
     print(f"{Colors.GREEN}OK: No C-generated data in bank $01+ "
           f"(bank $00 ROM free: {free_bytes} bytes){Colors.RESET}")
@@ -619,6 +624,7 @@ Examples:
   symmap -v game.sym                       Show detailed memory layout
   symmap --check-overlap game.sym          Check for WRAM mirror overlaps
   symmap --check-bank0-overflow game.sym   Check for bank $00 ROM overflow
+  symmap --check-bank0-overflow --warn-threshold 4096 game.sym
   symmap --find monster_x game.sym         Find symbol by name
   symmap --export-json game.sym            Export to JSON format
 """
@@ -631,6 +637,8 @@ Examples:
                         help='Check for WRAM mirror overlaps (main use case)')
     parser.add_argument('--check-bank0-overflow', action='store_true',
                         help='Check for C-generated data that spilled from bank $00')
+    parser.add_argument('--warn-threshold', type=int, default=2048, metavar='N',
+                        help='Free space threshold (bytes) for bank $00 warning (default: 2048)')
     parser.add_argument('--find', metavar='NAME',
                         help='Find symbol by name (fuzzy match)')
     parser.add_argument('--export-json', action='store_true',
@@ -670,7 +678,7 @@ Examples:
         return print_overlap_check(table)
 
     if args.check_bank0_overflow:
-        return print_bank0_overflow_check(table)
+        return print_bank0_overflow_check(table, warn_threshold=args.warn_threshold)
 
     if args.find:
         print_symbol_search(table, args.find)
