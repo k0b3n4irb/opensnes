@@ -93,7 +93,7 @@ int main(void) {
                  (u16)(cursor_pal_end - cursor_pal));
 
     /* OBJSEL: base address $4000 word addr = N*$2000, N=2 */
-    REG_OBJSEL = 0x02;
+    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
 
     /* Enable BG1 (text) and sprites on main screen */
     REG_TM = TM_BG1 | TM_OBJ;

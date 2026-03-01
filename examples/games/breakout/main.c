@@ -786,10 +786,10 @@ int main(void) {
     dmaCopyCGram((u8 *)pal, 0, 256 * 2);
 
     /* SPRITE CONFIGURATION:
-     * OBJSEL=0x00: 8x8/16x16 sprites, name base=0, name select=0
+     * 8x8/16x16 sprites, name base=0, name select=0
      * Secondary name table at (0+0+1)*8KB = 0x2000
      * Access secondary table with: tile_number | 256 */
-    REG_OBJSEL = 0x00;
+    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x0000);
     oamClear();
 
     /* MODE 1: BG1 4bpp, BG2 4bpp (unused), BG3 2bpp */
