@@ -41,6 +41,16 @@
 .EQU OAM_REFRESH            7           ; u8 refresh flag
 .EQU OAM_GRAPHICS           8           ; u24 graphics pointer (3 bytes + pad)
 
+;------------------------------------------------------------------------------
+; Compile-time offset assertions (must match t_sprites in sprite.h)
+;------------------------------------------------------------------------------
+.ASSERT OAM_OAMX == 0
+.ASSERT OAM_OAMY == 2
+.ASSERT OAM_FRAMEID == 4
+.ASSERT OAM_ATTRIBUTE == 6
+.ASSERT OAM_REFRESH == 7
+.ASSERT OAM_GRAPHICS == 8
+
 ;==============================================================================
 ; Dynamic Sprite RAM Buffer
 ;==============================================================================
