@@ -107,5 +107,6 @@
 /* Animation: #include <snes/animation.h> */
 /* Collision: #include <snes/collision.h> */
 /* Entity: #include <snes/entity.h> */
+/* LZSS: #include <snes/lzss.h> */
 
 #endif /* OPENSNES_H */
