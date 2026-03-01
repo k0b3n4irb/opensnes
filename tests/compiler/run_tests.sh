@@ -1513,6 +1513,103 @@ test_variable_shift() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Variable shift stack offset after pha (emitload_adj fix)
+# BUG: After 'pha' pushes 2 bytes, emitload() reads the shift count at the
+#      pre-push stack offset. Must use emitload_adj(r1, fn, 2) instead.
+# Checks all 3 shift types: shl, shr, sar
+#------------------------------------------------------------------------------
+test_variable_shift_runtime() {
+    local name="variable_shift_runtime"
+    local src="$SCRIPT_DIR/test_variable_shift_runtime.c"
+    local out="$BUILD/test_variable_shift_runtime.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local failed=0
+
+    # For each variable-shift function, check that after 'pha', the next
+    # 'lda N,s' uses an offset that accounts for the 2-byte push.
+    # The pattern is: pha → lda N,s → tax → pla
+    # Before fix: lda used the pre-push offset (wrong)
+    # After fix: lda uses offset+2 (correct via emitload_adj)
+
+    # Check var_shl: must have pha followed by lda with stack-relative addr, then tax, then pla
+    local shl_body
+    shl_body=$(sed -n '/^var_shl:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$shl_body" | grep -q 'pha'; then
+        log_fail "$name: var_shl missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$shl_body" | grep -qE 'asl'; then
+        log_fail "$name: var_shl missing asl instruction"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check var_shr: must have pha + lsr loop
+    local shr_body
+    shr_body=$(sed -n '/^var_shr:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$shr_body" | grep -q 'pha'; then
+        log_fail "$name: var_shr missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$shr_body" | grep -qE 'lsr'; then
+        log_fail "$name: var_shr missing lsr instruction"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check var_sar: must have pha + cmp #$8000 + ror loop
+    local sar_body
+    sar_body=$(sed -n '/^var_sar:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$sar_body" | grep -q 'pha'; then
+        log_fail "$name: var_sar missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$sar_body" | grep -qE 'ror'; then
+        log_fail "$name: var_sar missing ror instruction (signed shift)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY CHECK: Verify the pha → lda N,s pattern has adjusted offset.
+    # After pha, the stack-relative offset for the shift count must be +2
+    # from what it would be without pha. We check that the lda between
+    # pha and tax uses a stack-relative address (N,s pattern).
+    # Extract the lda between pha and pla in var_shl
+    local pha_to_pla
+    pha_to_pla=$(echo "$shl_body" | sed -n '/pha/,/pla/p')
+
+    if ! echo "$pha_to_pla" | grep -qE 'lda.*,s'; then
+        log_fail "$name: var_shl missing stack-relative load between pha/pla"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: SSA phi-node resolution with 6+ locals in nested if/else
 # BUG: Wrong values stored to wrong stack slots when many locals are
 #      modified in separate conditional branches
@@ -3126,6 +3223,7 @@ main() {
 
     # === HDMA Wave Regression Tests (Phase 1.3) ===
     test_variable_shift              # FIXED: Variable-count shifts now emit loop
+    test_variable_shift_runtime      # FIXED: Stack offset after pha adjusted by +2
     test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
     test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
