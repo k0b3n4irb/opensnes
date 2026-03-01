@@ -44,6 +44,7 @@ static cmdp_command_st gfx4snes_command = {
 			{'z', "til-lzpack", "add blank tile management (for multiple bgs)", CMDP_TYPE_BOOL, &gfx4snes_args.tilelzpacked},
 			{'W', "tile-width", "width of image block in pixels", CMDP_TYPE_INT4, &gfx4snes_args.tilewidth},
 			{'H', "tile-height", "height of image block in pixels", CMDP_TYPE_INT4, &gfx4snes_args.tileheight},
+			{'S', "sprite-map", "print sprite tile number map for sheet", CMDP_TYPE_BOOL, &gfx4snes_args.spritemap},
             {0, 0, "Metasprites options:\n", CMDP_TYPE_NONE, NULL,NULL},
 			{'T', "metasprite", "Include metasprite definition for output (-s is mandatory for this)", CMDP_TYPE_BOOL, &gfx4snes_args.metasprite},
 			{'X', "meta-width","Width of the metasprite {0..128}",CMDP_TYPE_INT4, &gfx4snes_args.metawidth},
@@ -226,6 +227,32 @@ int main(int argc, const char **argv)
 
 	// save header file
 	inc_save(gfx4snes_args.filebase,true, gfx4snes_args.mapoutput, gfx4snes_args.palettesave,gfx4snes_args.metasprite,(gfx4snes_args.tilepacked) || (gfx4snes_args.mapscreenmode==7), gfx4snes_args.quietmode);
+
+	// print sprite tile map if requested
+	if (gfx4snes_args.spritemap)
+	{
+		int sw = gfx4snes_args.tilewidth;
+		int sh = gfx4snes_args.tileheight;
+		int sub_w = sw / 8;     // tiles per sprite horizontally
+		int sub_h = sh / 8;     // tiles per sprite vertically
+		int cols = snesimage.header.width / sw;
+		int rows = snesimage.header.height / sh;
+
+		fprintf(stdout, "\nSprite tile map (%dx%d sheet, %dx%d sprites):\n",
+		        snesimage.header.width, snesimage.header.height, sw, sh);
+
+		for (int r = 0; r < rows; r++)
+		{
+			fprintf(stdout, "  ");
+			for (int c = 0; c < cols; c++)
+			{
+				int base_tile = r * sub_h * 16 + c * sub_w;
+				fprintf(stdout, "(%3d,%3d) = tile 0x%02X", c * sw, r * sh, base_tile);
+				if (c < cols - 1) fprintf(stdout, "  |  ");
+			}
+			fprintf(stdout, "\n");
+		}
+	}
 
 	// free memory used for image processing
 	if (map_snes != NULL) free(map_snes);
