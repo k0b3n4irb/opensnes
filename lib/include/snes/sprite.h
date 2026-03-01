@@ -177,6 +177,20 @@ typedef struct {
     u16 _reserved2;     /**< 14-15: Padding for 16-byte alignment */
 } t_sprites;
 
+/*============================================================================
+ * Compile-time struct layout assertions
+ * Must match the oambuffer layout in sprite_dynamic.asm exactly.
+ *============================================================================*/
+
+_Static_assert(sizeof(t_sprites) == 16, "t_sprites must be 16 bytes");
+_Static_assert(__builtin_offsetof(t_sprites, oamx) == 0, "oamx offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamy) == 2, "oamy offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamframeid) == 4, "oamframeid offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamattribute) == 6, "oamattribute offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamrefresh) == 7, "oamrefresh offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamgfxaddr) == 8, "oamgfxaddr offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offset mismatch");
+
 /**
  * @brief Macro to set sprite graphics address from a pointer
  *
@@ -191,12 +205,14 @@ typedef struct {
     oambuffer[id].oamgfxbank = (u8)((unsigned long)(gfx) >> 16); \
 } while(0)
 
+/* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
+
 /**
- * @brief Dynamic sprite buffer (128 entries)
+ * @brief Dynamic sprite buffer (128 entries, 2048 bytes)
  *
  * Game-level sprite state for the dynamic sprite engine.
  * Each entry tracks a sprite's position, animation frame, and graphics pointer.
- * Separate from oamMemory (hardware OAM buffer).
+ * Separate from oamMemory (hardware OAM buffer at $0300-$051F).
  */
 extern t_sprites oambuffer[128];
 

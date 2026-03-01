@@ -29,7 +29,7 @@ AS = ../bin/wla-65816
 
 # Flags
 CFLAGS = -I$(INCDIR)
-ASFLAGS = -I $(SRCDIR) -o
+ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -o
 
 # Source files
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
