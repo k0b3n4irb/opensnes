@@ -91,6 +91,8 @@ USE_LIB     ?= 0
 #
 #   sprite  -> dma      (OAM buffer is DMA'd to hardware in NMI handler)
 #   text    -> dma      (Font loading uses DMA transfers)
+#   object  -> map      (Object collision uses map tile lookups)
+#   map     -> dma      (Map VBlank updates use DMA transfers)
 #   snesmod -> console  (SNESMOD requires NMI handling from console)
 #   hdma    -> (none)   (Standalone, but often used with console for VBlank)
 #
@@ -104,6 +106,7 @@ USE_LIB     ?= 0
 #   Basic game:     console sprite dma input background
 #   With audio:     console sprite dma input snesmod
 #   With effects:   console sprite dma hdma
+#   Platformer:     console sprite dma input background map object
 #------------------------------------------------------------------------------
 
 # Library directory (select lorom or hirom based on USE_HIROM)

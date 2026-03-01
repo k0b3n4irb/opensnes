@@ -88,6 +88,15 @@
 /* Mosaic Effects */
 #include <snes/mosaic.h>
 
+/* Map Engine */
+#include <snes/map.h>
+
+/* Object Engine */
+#include <snes/object.h>
+
+/* Debug Utilities */
+#include <snes/debug.h>
+
 /*============================================================================
  * Optional Headers (include separately if needed)
  *============================================================================*/
