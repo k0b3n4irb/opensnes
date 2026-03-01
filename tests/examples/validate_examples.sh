@@ -395,6 +395,17 @@ main() {
         exit 1
     fi
 
+    # MVN/MVP lint (non-blocking, informational only)
+    local mvn_linter="$OPENSNES_HOME/devtools/check_mvn.py"
+    if [[ -f "$mvn_linter" ]]; then
+        local lib_asm_files=("$OPENSNES_HOME"/lib/source/*.asm)
+        if [[ ${#lib_asm_files[@]} -gt 0 ]]; then
+            echo -e "${CYAN}[MVN LINT]${NC} Checking library MVN/MVP usage..."
+            python3 "$mvn_linter" "${lib_asm_files[@]}" 2>/dev/null || true
+            echo ""
+        fi
+    fi
+
     # Find and validate all examples
     while IFS= read -r example_dir; do
         validate_example "$example_dir" || true
