@@ -210,7 +210,27 @@ LIB_MODULES += snesmod
 endif
 
 #------------------------------------------------------------------------------
-# Library Object Resolution (must come after SNESMOD module addition)
+# Module Dependency Auto-Resolution
+#------------------------------------------------------------------------------
+# Automatically adds transitive dependencies so users don't need to list them
+# manually. For example, LIB_MODULES = sprite auto-adds dma.
+# Three nested _resolve_one calls handle chains up to 3 deep.
+# $(sort) deduplicates — existing explicit deps are harmless.
+
+_DEP_sprite    := dma
+_DEP_text      := dma
+_DEP_text4bpp  := dma
+_DEP_object    := map
+_DEP_map       := dma
+_DEP_snesmod   := console
+
+_resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
+_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
+
+LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
+
+#------------------------------------------------------------------------------
+# Library Object Resolution (must come after dependency resolution)
 #------------------------------------------------------------------------------
 # Links both C objects (.o) and assembly objects (-asm.o) if they exist.
 
