@@ -68,9 +68,12 @@ lzss_m6     DW      ; bit counter
 ;         then LZ77 stream (flag bytes + literal/reference pairs).
 ;         12-bit distance, 4-bit length encoding.
 ;
-; Parameters (on stack, cc65816 calling convention):
-;   source  (10-12,s): 24-bit pointer to compressed data
-;   address (14-15,s): VRAM word address (will be doubled for byte addressing)
+; Parameters (on stack, cc65816 calling convention — 16-bit pointers):
+;   source  (10-11,s): 16-bit pointer to compressed data
+;   address (12-13,s): VRAM word address (will be doubled for byte addressing)
+;
+; BANK LIMITATION: Source data must be in bank $00 (same as dmaCopyVram).
+; For data in other banks, use an assembly wrapper with :label bank byte.
 ;
 ; IMPORTANT: Disables interrupts during decompression to prevent
 ;            NMI handler from corrupting VRAM writes.
@@ -88,14 +91,14 @@ LzssDecodeVram:
     plb
 
     rep #$20
-    lda 10,s                        ; Load source address (low 16 bits)
+    lda 10,s                        ; Load source address (16-bit pointer)
     sta tcc__r0                     ; tcc__r0 = source address
     sep #$20
-    lda 12,s                        ; Load source bank byte
+    lda #$00                        ; Bank $00 (cc65816 passes 16-bit pointers)
     sta tcc__r0h
 
     rep #$20
-    lda 14,s                        ; Load VRAM word address
+    lda 12,s                        ; Load VRAM word address
     asl a                           ; Convert to byte address (x2)
     sta lzss_m0                     ; lzss_m0 = VRAM target (byte address)
 
