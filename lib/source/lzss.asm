@@ -69,8 +69,11 @@ lzss_m6     DW      ; bit counter
 ;         12-bit distance, 4-bit length encoding.
 ;
 ; Parameters (on stack, cc65816 calling convention — 16-bit pointers):
-;   source  (10-11,s): 16-bit pointer to compressed data
-;   address (12-13,s): VRAM word address (will be doubled for byte addressing)
+;
+;   cc65816 pushes args left-to-right, so after php+phb+phx+phy (6B)
+;   and 3-byte JSL return address:
+;     10-11,s = address  (rightmost arg, pushed last = closest to return)
+;     12-13,s = source   (leftmost arg, pushed first = farthest from return)
 ;
 ; BANK LIMITATION: Source data must be in bank $00 (same as dmaCopyVram).
 ; For data in other banks, use an assembly wrapper with :label bank byte.
@@ -91,14 +94,14 @@ LzssDecodeVram:
     plb
 
     rep #$20
-    lda 10,s                        ; Load source address (16-bit pointer)
+    lda 12,s                        ; Source address (leftmost arg, higher stack offset)
     sta tcc__r0                     ; tcc__r0 = source address
     sep #$20
     lda #$00                        ; Bank $00 (cc65816 passes 16-bit pointers)
     sta tcc__r0h
 
     rep #$20
-    lda 12,s                        ; Load VRAM word address
+    lda 10,s                        ; VRAM word address (rightmost arg, lower stack offset)
     asl a                           ; Convert to byte address (x2)
     sta lzss_m0                     ; lzss_m0 = VRAM target (byte address)
 
