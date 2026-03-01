@@ -356,12 +356,22 @@ else
 SOUNDBANK_DEP :=
 endif
 
+# Extract .incbin file paths from ASMSRC and add as dependencies.
+# This ensures touching a .pic/.pal/.map file triggers a rebuild
+# without needing `make clean`.
+ifneq ($(ASMSRC),)
+INCBIN_DEPS := $(shell grep -hi '\.incbin' $(ASMSRC) 2>/dev/null | \
+    sed -n 's/.*\.incbin[[:space:]]*"\([^"]*\)".*/\1/p' | sort -u)
+else
+INCBIN_DEPS :=
+endif
+
 # Combine bootstrap assembly sources (C code is in separate .o files)
 # Order: crt0 -> runtime -> data_init_start -> [ASMSRC] -> [soundbank]
 # Note: data_init_end is compiled as a separate object and linked last,
 # ensuring all APPENDTO ".data_init" records (from C and lib objects)
 # precede the end marker.
-combined.asm: $(TEMPLATES)/crt0.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP)
+combined.asm: $(TEMPLATES)/crt0.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP) $(INCBIN_DEPS)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
 	@cat $(RUNTIME) >> $@
