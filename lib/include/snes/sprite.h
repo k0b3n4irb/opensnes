@@ -56,6 +56,21 @@
 /** @brief Macro to convert size index to OBJSEL register value */
 #define OBJ_SIZE_TO_REG(size) ((size) << 5)
 
+/** @brief Convert VRAM word address to OBJSEL name base bits (0-2) */
+#define OBJ_BASE(vram_addr) (((vram_addr) >> 13) & 0x07)
+
+/**
+ * @brief Build OBJSEL register value from size constant + VRAM base address
+ * @param size One of OBJ_SIZE8_L16 .. OBJ_SIZE32_L64
+ * @param vram_addr VRAM word address for sprite tiles (must be 8KB-aligned)
+ *
+ * @code
+ * REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);  // = 0x62
+ * REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16,  0x4000);  // = 0x02
+ * @endcode
+ */
+#define OBJSEL(size, vram_addr) ((u8)(OBJ_SIZE_TO_REG(size) | OBJ_BASE(vram_addr)))
+
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
 
