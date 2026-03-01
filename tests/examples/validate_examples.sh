@@ -5,8 +5,9 @@
 # Checks:
 #   1. All examples build successfully
 #   2. No WRAM memory overlaps (via symmap.py)
-#   3. ROM files exist and have reasonable sizes
-#   4. Required symbols are present
+#   3. No bank $00 ROM overflow (string literals in bank $01+)
+#   4. ROM files exist and have reasonable sizes
+#   5. Required symbols are present
 #
 # Usage:
 #   ./validate_examples.sh              # Validate all examples
@@ -217,6 +218,37 @@ check_required_symbols() {
     return 0
 }
 
+# Check for bank $00 ROM overflow (C-generated data in bank $01+)
+check_bank0_overflow() {
+    local dir="$1"
+    local name=$(basename "$dir")
+    local sym_file=$(find "$dir" -name "*.sym" -type f | head -1)
+
+    if [[ -z "$sym_file" || ! -f "$sym_file" ]]; then
+        log_verbose "$name: No .sym file found (skipping bank \$00 check)"
+        return 0
+    fi
+
+    log_verbose "Checking bank \$00 ROM overflow for $name..."
+
+    local output
+    output=$(python3 "$SYMMAP" --check-bank0-overflow "$sym_file" 2>&1)
+    local exit_code=$?
+
+    # symmap.py returns exit code 1 when string literals spilled (hard fail)
+    if [[ $exit_code -ne 0 ]] || echo "$output" | grep -q "^OVERFLOW:"; then
+        log_error "$name: Bank \$00 ROM overflow detected!"
+        echo "$output" | grep -E "OVERFLOW|string\." | head -10
+        return 1
+    elif echo "$output" | grep -q "^WARNING:"; then
+        log_warn "$name: $(echo "$output" | grep "^WARNING:" | head -1)"
+        return 0
+    else
+        log_verbose "$name: Bank \$00 ROM OK"
+        return 0
+    fi
+}
+
 # Check for VRAM layout issues (overlapping regions, split DMA patterns)
 check_vram_layout() {
     local dir="$1"
@@ -296,6 +328,11 @@ validate_example() {
 
     # Check memory overlaps
     if ! check_memory_overlaps "$dir"; then
+        failed=1
+    fi
+
+    # Check bank $00 ROM overflow (string literals in bank $01+)
+    if ! check_bank0_overflow "$dir"; then
         failed=1
     fi
 

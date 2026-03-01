@@ -158,6 +158,7 @@ Valide **tous** les ROMs dans `examples/` ET `pvsneslib_examples/`.
 |-------|-------------|-------|
 | **Build** | `make` réussit (skip si `--quick`) | make |
 | **Memory overlap** | Pas de collision WRAM Bank $00/$7E | `symmap.py --check-overlap` |
+| **Bank $00 overflow** | Pas de string literals C en bank $01+ | `symmap.py --check-bank0-overflow` |
 | **ROM size** | .sfc existe, 32KB-4MB, puissance de 2 | wc -c |
 | **VRAM layout** | Pas de chevauchement tilemap/tileset | `vramcheck.py` (si présent) |
 
