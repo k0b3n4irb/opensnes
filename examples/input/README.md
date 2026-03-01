@@ -11,3 +11,5 @@ just pressed this frame." Without it, a single tap of A fires 10+ times at 60fps
 |---------|------------------|
 | [Button Test](button_test/) | Reading all buttons, edge detection pattern |
 | [Two Players](two_players/) | Reading both controllers independently |
+| [Mouse](mouse/) | Mouse detection, cursor movement, button handling, sensitivity |
+| [Super Scope](superscope/) | Light gun detection, calibration, PPU H/V counters |
