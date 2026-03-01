@@ -74,10 +74,13 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
  * Sprite Properties
  *============================================================================*/
 
-/* Lookup tables to avoid variable shifts (compiler bug workaround) */
-/* X high bit is bit 0 of each 2-bit pair: bits 0, 2, 4, 6 for sprites 0-3 */
-static const u8 xhi_bit[4] = { 0x01, 0x04, 0x10, 0x40 };
-static const u8 xhi_mask[4] = { 0xFE, 0xFB, 0xEF, 0xBF };
+/* OAM high table bit helpers — inline to avoid static const bank spill.
+ * Each byte covers 4 sprites: 2 bits per sprite (bit 0 = X high, bit 1 = size).
+ * slot = id & 3 gives the sprite's position within the byte (0-3).
+ * Uses conditionals instead of variable shifts to avoid a codegen bug in the
+ * 65816 backend's pha/tax/pla shift loop (wrong stack offset after pha). */
+#define OAM_XHI_BIT(slot)  ((u8)((slot) == 0 ? 0x01 : (slot) == 1 ? 0x04 : (slot) == 2 ? 0x10 : 0x40))
+#define OAM_SIZE_BIT(slot) ((u8)((slot) == 0 ? 0x02 : (slot) == 1 ? 0x08 : (slot) == 2 ? 0x20 : 0x80))
 
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags) {
     /* All parameters are u16 to avoid calling convention issues with mixed sizes */
@@ -107,9 +110,9 @@ void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags
     u16 slot = id & 0x03;
 
     if (x & 0x100) {
-        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & xhi_mask[slot]) | xhi_bit[slot];
+        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
     } else {
-        oam_buffer[ext_offset] &= xhi_mask[slot];
+        oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
     }
 
     oam_update_flag = 1;
@@ -121,14 +124,14 @@ void oamSetX(u8 id, u16 x) {
     u16 offset = id << 2;
     oam_buffer[offset + 0] = (u8)(x & 0xFF);
 
-    /* Update high bit using lookup tables */
+    /* Update X high bit in extension table */
     u8 ext_offset = 512 + (id >> 2);
     u8 slot = id & 0x03;
 
     if (x & 0x100) {
-        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & xhi_mask[slot]) | xhi_bit[slot];
+        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
     } else {
-        oam_buffer[ext_offset] &= xhi_mask[slot];
+        oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
     }
 
     oam_update_flag = 1;
@@ -177,7 +180,7 @@ void oamHide(u8 id) {
     /* Set X high bit in extension table */
     u16 ext_offset = 512 + (id >> 2);
     u8 slot = id & 0x03;
-    oam_buffer[ext_offset] |= xhi_bit[slot];
+    oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
 
     oam_update_flag = 1;
 }
@@ -186,18 +189,13 @@ void oamSetSize(u16 id, u16 large) {
     /* All parameters u16 to avoid calling convention issues */
     if (id >= MAX_SPRITES) return;
 
-    /* Lookup tables to avoid variable shifts (compiler bug workaround) */
-    /* Size bit is bit 1 of each 2-bit pair: bits 1, 3, 5, 7 for sprites 0-3 */
-    static const u8 size_bit[4] = { 0x02, 0x08, 0x20, 0x80 };
-    static const u8 size_mask[4] = { 0xFD, 0xF7, 0xDF, 0x7F };
-
     u16 ext_offset = 512 + (id >> 2);
     u16 slot = id & 0x03;
 
     if (large) {
-        oam_buffer[ext_offset] |= size_bit[slot];
+        oam_buffer[ext_offset] |= OAM_SIZE_BIT(slot);
     } else {
-        oam_buffer[ext_offset] &= size_mask[slot];
+        oam_buffer[ext_offset] &= ~OAM_SIZE_BIT(slot);
     }
 
     oam_update_flag = 1;
