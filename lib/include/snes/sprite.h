@@ -627,4 +627,121 @@ void oamDynamic8Draw(u16 id);
  */
 void oamSetGfx(u16 id, u8 *gfx);
 
+/*============================================================================
+ * Fast Macro Sprite API
+ *
+ * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
+ * These write directly to oamMemory[] without function call overhead.
+ *
+ * oamSet() has framesize=158 per call due to SSA temporaries. With >2-3
+ * sprites/frame in the main loop, the stack manipulation causes visible
+ * jitter. These macros eliminate that overhead entirely.
+ *
+ * Note: cc65816 does not truly inline 'static inline' functions — they
+ * become separate SUPERFREE sections with global labels that conflict
+ * across translation units. Macros are the only zero-overhead option.
+ *
+ * Requires these declarations in your .c file (both defined in crt0.asm):
+ *   extern u8 oamMemory[];
+ *   extern volatile u8 oam_update_flag;
+ *
+ * Note: these are NOT declared in this header because cproc crashes on
+ * unused extern array declarations. Only add them in files that use
+ * the macros below.
+ *
+ * Usage:
+ *   // In your .c file:
+ *   extern u8 oamMemory[];
+ *   extern volatile u8 oam_update_flag;
+ *
+ *   // Pre-compute attribute byte once at init
+ *   u8 attr = OAM_ATTR(tile, palette, priority, flags);
+ *
+ *   // Per-frame: fast full update
+ *   oamSetFast(id, x, y, tile, palette, priority, flags);
+ *
+ *   // Per-frame: position-only update (most common)
+ *   oamSetXYFast(id, x, y);
+ *============================================================================*/
+
+/**
+ * @brief Pre-compute OAM attribute byte (vhoopppc)
+ *
+ * @param _tile Tile number (0-511, only bit 8 used)
+ * @param _pal Palette (0-7)
+ * @param _prio Priority (0-3)
+ * @param _fl Flip flags (bit 6 = H flip, bit 7 = V flip)
+ * @return Packed attribute byte
+ */
+#define OAM_ATTR(_tile, _pal, _prio, _fl) \
+    ((u8)(((_fl) & 0xC0) | \
+          (((_prio) & 0x03) << 4) | \
+          (((_pal) & 0x07) << 1) | \
+          (((_tile) >> 8) & 0x01)))
+
+/**
+ * @brief X-high-bit mask for a sprite slot (0-3 within a high-table byte)
+ *
+ * Each high-table byte covers 4 sprites. Bit 0 of each 2-bit pair is the
+ * X high bit. This macro returns the mask for the X-high bit of the given slot.
+ */
+#define OAM_XHI_MASK(_slot) \
+    ((u8)((_slot) == 0 ? 0x01 : (_slot) == 1 ? 0x04 : \
+          (_slot) == 2 ? 0x10 : 0x40))
+
+/**
+ * @brief Set sprite properties with zero function-call overhead
+ *
+ * Drop-in replacement for oamSet() that writes directly to oamMemory[].
+ * Same parameters, same behavior, but compiles to direct memory writes
+ * instead of a function call with framesize=158.
+ *
+ * @param _id Sprite ID (0-127)
+ * @param _x X position (0-511)
+ * @param _y Y position (0-255)
+ * @param _tile Tile number (0-511)
+ * @param _pal Palette (0-7)
+ * @param _prio Priority (0-3)
+ * @param _fl Flip flags (bit 6 = H flip, bit 7 = V flip)
+ */
+#define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
+    u16 _off = (u16)(_id) << 2; \
+    oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
+    oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
+    u16 _ext = 512 + ((u16)(_id) >> 2); \
+    u16 _sl = (u16)(_id) & 0x03; \
+    u8 _xhi = OAM_XHI_MASK(_sl); \
+    if ((_x) & 0x100) \
+        oamMemory[_ext] |= _xhi; \
+    else \
+        oamMemory[_ext] &= ~_xhi; \
+    oam_update_flag = 1; \
+} while(0)
+
+/**
+ * @brief Update sprite position only (most common per-frame operation)
+ *
+ * Fastest possible sprite update — only writes X, Y, and X high bit.
+ * Use when tile/palette/priority/flags don't change between frames.
+ *
+ * @param _id Sprite ID (0-127)
+ * @param _x X position (0-511)
+ * @param _y Y position (0-255)
+ */
+#define oamSetXYFast(_id, _x, _y) do { \
+    u16 _off = (u16)(_id) << 2; \
+    oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    u16 _ext = 512 + ((u16)(_id) >> 2); \
+    u16 _sl = (u16)(_id) & 0x03; \
+    u8 _xhi = OAM_XHI_MASK(_sl); \
+    if ((_x) & 0x100) \
+        oamMemory[_ext] |= _xhi; \
+    else \
+        oamMemory[_ext] &= ~_xhi; \
+    oam_update_flag = 1; \
+} while(0)
+
 #endif /* OPENSNES_SPRITE_H */
