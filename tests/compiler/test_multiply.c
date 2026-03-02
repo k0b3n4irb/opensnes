@@ -29,8 +29,25 @@ u16 mul_by_10(u16 x) { return x * 10; }
 /* Multiply by variable (must use __mul16) */
 u16 mul_var(u16 x, u16 y) { return x * y; }
 
-/* Multiply by non-special constant (must use __mul16) */
+/* Multiply by non-special constant (inline shift+add) */
 u16 mul_by_13(u16 x) { return x * 13; }
+
+/* Power-of-2 multiply (should be inline shifts, NOT __mul16) */
+u16 mul_by_64(u16 x) { return x * 64; }
+u16 mul_by_128(u16 x) { return x * 128; }
+u16 mul_by_256(u16 x) { return x * 256; }
+u16 mul_by_1024(u16 x) { return x * 1024; }
+u16 mul_by_2048(u16 x) { return x * 2048; }
+
+/* Power-of-2 divide (should be inline shifts, NOT __div16) */
+u16 div_by_32(u16 x) { return x / 32; }
+u16 div_by_64(u16 x) { return x / 64; }
+u16 div_by_1024(u16 x) { return x / 1024; }
+
+/* Power-of-2 modulo (should be inline AND, NOT __mod16) */
+u16 mod_by_32(u16 x) { return x % 32; }
+u16 mod_by_64(u16 x) { return x % 64; }
+u16 mod_by_1024(u16 x) { return x % 1024; }
 
 int main(void) {
     u16 a = 7;

@@ -33,11 +33,9 @@ int main(void) {
     bgSetGfxPtr(0, 0x0000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;
-    REG_TM = TM_BG1;
+    setColor(0, RGB(0, 0, 0));
+    setColor(1, RGB(31, 31, 31));
+    setMainScreen(LAYER_BG1);
 
     textPrintAt(12, 1, "SRAM TEST");
     textPrintAt(3, 5, "USE A TO WRITE Slot1");

@@ -73,6 +73,9 @@
 /* Interrupts */
 #include <snes/interrupt.h>
 
+/* System variables (crt0.asm exports) */
+#include <snes/system.h>
+
 /* Mode 7 */
 #include <snes/mode7.h>
 

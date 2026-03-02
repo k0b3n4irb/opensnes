@@ -30,11 +30,8 @@
  * Uses oamMemory defined in crt0.asm at $7E:0300 to ensure all code
  * (C library, assembly helpers, NMI handler) uses the same buffer.
  */
-extern u8 oamMemory[];
+/* oamMemory[] and oam_update_flag are declared in <snes/system.h> (via <snes.h>) */
 #define oam_buffer oamMemory
-
-/* Flag to trigger OAM DMA during VBlank (defined in crt0.asm) */
-extern volatile u8 oam_update_flag;
 
 /*============================================================================
  * Initialization

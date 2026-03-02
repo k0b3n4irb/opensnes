@@ -21,8 +21,7 @@
  * External Variables (defined in crt0.asm)
  *============================================================================*/
 
-extern volatile u8 vblank_flag;
-extern volatile u8 oam_update_flag;    /* Set to trigger OAM DMA during VBlank */
+/* vblank_flag and oam_update_flag are declared in <snes/system.h> (via <snes.h>) */
 extern volatile u16 frame_count;
 extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
 extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
