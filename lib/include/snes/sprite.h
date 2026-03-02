@@ -192,17 +192,32 @@ _Static_assert(__builtin_offsetof(t_sprites, oamgfxaddr) == 8, "oamgfxaddr offse
 _Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offset mismatch");
 
 /**
- * @brief Macro to set sprite graphics address from a pointer
+ * @brief Set sprite graphics address (bank $00 only)
  *
- * Properly stores the 24-bit address by splitting it into 16-bit address + bank byte.
- * This ensures correct structure layout matching the assembly expectations.
+ * Sets the 16-bit graphics address with bank byte = 0.
+ * cc65816 passes 16-bit pointers, so the bank byte is always lost
+ * before this macro runs. Use OAM_SET_GFX_BANK() for data in other banks.
  *
  * @param id Sprite index (0-127)
- * @param gfx Pointer to graphics data (will be split into addr16 + bank)
+ * @param gfx Pointer to graphics data in bank $00
  */
 #define OAM_SET_GFX(id, gfx) do { \
-    oambuffer[id].oamgfxaddr = (u16)(unsigned long)(gfx); \
-    oambuffer[id].oamgfxbank = (u8)((unsigned long)(gfx) >> 16); \
+    oambuffer[id].oamgfxaddr = (u16)(gfx); \
+    oambuffer[id].oamgfxbank = 0; \
+} while(0)
+
+/**
+ * @brief Set sprite graphics address with explicit bank byte
+ *
+ * Use this when sprite data is in a bank other than $00.
+ *
+ * @param id Sprite index (0-127)
+ * @param gfx Pointer to graphics data
+ * @param bank ROM bank where graphics data is located (0-255)
+ */
+#define OAM_SET_GFX_BANK(id, gfx, bank) do { \
+    oambuffer[id].oamgfxaddr = (u16)(gfx); \
+    oambuffer[id].oamgfxbank = (u8)(bank); \
 } while(0)
 
 /* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
@@ -584,7 +599,7 @@ void oamVramQueueUpdate(void);
  * oambuffer[0].oamframeid = 0;
  * oambuffer[0].oamattribute = OBJ_PRIO(2) | OBJ_PAL(0);
  * oambuffer[0].oamrefresh = 1;
- * oambuffer[0].oamgraphics = &sprite32_tiles;
+ * OAM_SET_GFX(0, sprite32_tiles);
  * oamDynamic32Draw(0);
  * @endcode
  */
@@ -610,22 +625,6 @@ void oamDynamic16Draw(u16 id);
  */
 void oamDynamic8Draw(u16 id);
 
-/**
- * @brief Set graphics pointer for dynamic sprite (handles 24-bit address)
- *
- * This function properly sets both the 16-bit address and bank byte
- * for sprite graphics data. Use this instead of directly setting
- * oamgraphics/oamgfxbank to ensure correct bank handling.
- *
- * @param id Index into oambuffer array (0-127)
- * @param gfx Pointer to sprite graphics data in ROM
- *
- * @code
- * extern u8 sprite_tiles[];
- * oamSetGfx(0, sprite_tiles);  // Sets oambuffer[0].oamgraphics and .oamgfxbank
- * @endcode
- */
-void oamSetGfx(u16 id, u8 *gfx);
 
 /*============================================================================
  * Fast Macro Sprite API
