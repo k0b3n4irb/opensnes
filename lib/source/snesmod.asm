@@ -254,13 +254,14 @@ snesmodInit:
     stz digi_active
     stz digi_copyrate
 
-    ; Clear FIFO
+    ; Clear FIFO (all 256 bytes)
+    sep #$10            ; 8-bit X so INX wraps 255->0
     ldx #$0
     lda #$0
 -:  sta.w spc_fifo,x
     inx
-    cpx #$ff
     bne -
+    rep #$10            ; Restore 16-bit index
 
     ; Re-enable NMI (VBlank interrupt) - critical for WaitForVBlank to work!
     lda #$81                    ; NMI enable + auto joypad read
