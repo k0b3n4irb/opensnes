@@ -60,7 +60,7 @@
  *   $4219 (JOY1H) → bits 15-8:  B, Y, Select, Start, Up, Down, Left, Right
  *   $4218 (JOY1L) → bits 7-0:   A, X, L, R, (signature bits)
  *
- * Bit layout (accent accent = accent accent accent accent accent):
+ * Bit layout (16-bit, active high):
  *   15   14   13   12   11   10   9    8    7    6    5    4    3-0
  *   B    Y    Sel  Sta  Up   Dn   Lt   Rt   A    X    L    R    ID
  *
