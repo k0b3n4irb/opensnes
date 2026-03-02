@@ -1908,6 +1908,63 @@ test_multiply() {
         return 1
     fi
 
+    # Check power-of-2 multiplies use asl (NOT __mul16)
+    local pow2_muls=(mul_by_64 mul_by_128 mul_by_256 mul_by_1024 mul_by_2048)
+    for func in "${pow2_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using inline shifts"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'asl a'; then
+            log_fail "$name: ${func} missing 'asl a' (should use shift for power-of-2)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check power-of-2 divides use lsr (NOT __div16)
+    local pow2_divs=(div_by_32 div_by_64 div_by_1024)
+    for func in "${pow2_divs[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__div16'; then
+            log_fail "$name: ${func} calls __div16 instead of using inline shifts"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'lsr a'; then
+            log_fail "$name: ${func} missing 'lsr a' (should use shift for power-of-2)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check power-of-2 modulos use and (NOT __mod16)
+    local pow2_mods=(mod_by_32 mod_by_64 mod_by_1024)
+    for func in "${pow2_mods[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mod16'; then
+            log_fail "$name: ${func} calls __mod16 instead of using inline AND"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'and\.w'; then
+            log_fail "$name: ${func} missing 'and.w' (should use AND for power-of-2 modulo)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
     log_info "$name"
     ((TESTS_PASSED++))
 }

@@ -37,7 +37,7 @@ int main(void) {
 
     /* Enable Mode 1 with sprites only */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_OBJ;
+    setMainScreen(LAYER_OBJ);
     setScreenOn();
 
     while (1) {

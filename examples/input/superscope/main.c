@@ -20,9 +20,7 @@ extern u8 aim_target_pal[], aim_target_pal_end[];
 extern u8 sprites_tiles[], sprites_tiles_end[];
 extern u8 sprites_pal[], sprites_pal_end[];
 
-/* Direct OAM buffer access */
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
 #define STATE_DETECT    0
 #define STATE_CALIBRATE 1

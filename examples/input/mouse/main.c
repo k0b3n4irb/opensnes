@@ -25,9 +25,7 @@
 extern u8 cursor_tiles[], cursor_tiles_end[];
 extern u8 cursor_pal[], cursor_pal_end[];
 
-/* Direct OAM buffer access for performance */
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
 /* Cursor position (accumulated from mouse deltas) */
 static s16 pos_x;

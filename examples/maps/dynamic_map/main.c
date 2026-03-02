@@ -42,8 +42,7 @@ extern u8 c64_sprite;
 extern void smapClear(u16 byte_count);
 extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
-/* VBlank flag from crt0.asm — set by NMI, cleared by WaitForVBlank */
-extern volatile u8 vblank_flag;
+/* vblank_flag declared in <snes/system.h> (via <snes.h>) */
 
 /* VRAM layout */
 #define VRAM_SPRITEMAP  0x1000  /* BG1 tilemap (SC_64x64) */

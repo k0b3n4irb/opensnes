@@ -90,7 +90,7 @@ int main(void) {
 
     /* Set Mode 1, enable sprites only */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_OBJ;
+    setMainScreen(LAYER_OBJ);
 
     /* Enable display at full brightness */
     setScreenOn();

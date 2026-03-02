@@ -48,9 +48,7 @@ extern u8 backpal[], backpal_end[]; /* 7 level color sets (7 x 16 bytes) */
 /* Input buffer - NMI handler reads joypads and stores here every frame */
 extern u16 pad_keys[];
 
-/* Direct OAM buffer access (avoids oamSet() overhead) */
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
 /*============================================================================
  * Constants

@@ -21,9 +21,7 @@
 #include <snes/dma.h>
 #include <snes/text.h>
 
-// Access the raw OAM hardware buffer and update flag from C (crt0.asm)
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
+// oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>)
 
 // Test sprite tile data (8x8, 4bpp = 32 bytes)
 const u8 testSpriteTiles[] = {

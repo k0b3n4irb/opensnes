@@ -187,9 +187,8 @@ int main(void) {
     }
 
     /* Set palette */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x28;  /* Dark blue */
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* White */
+    setColor(0, 0x2800);           /* Dark blue */
+    setColor(1, RGB(31, 31, 31));  /* White */
 
     /* Clear tilemap */
     REG_VMADDL = 0x00;
@@ -211,7 +210,7 @@ int main(void) {
     print_msg(0x0400 + 15*32 + 7, msg_pitch_norm);
 
     /* Enable BG1 on main screen */
-    REG_TM = TM_BG1;
+    setMainScreen(LAYER_BG1);
 
     /* Initialize SNESMOD */
     snesmodInit();

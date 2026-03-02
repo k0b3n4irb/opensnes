@@ -191,4 +191,29 @@ void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
  */
 void bgInitTileSetData(u8 bgNumber, u8 *tileSource, u16 tileSize, u16 vramAddr);
 
+/*============================================================================
+ * Tilemap Utilities
+ *============================================================================*/
+
+/**
+ * @brief Fill a tilemap region in VRAM with a single tile entry
+ *
+ * Clears or fills a background tilemap. Thin wrapper around dmaFillVRAM()
+ * with tilemap-focused naming.
+ *
+ * @param vramAddr VRAM word address of the tilemap
+ * @param fillTile Tile entry to fill with (includes palette/priority bits)
+ * @param sizeBytes Size of the tilemap in bytes (e.g., 2048 for 32x32)
+ *
+ * @code
+ * // Clear BG1 tilemap (32x32 = 2048 bytes) with tile 0
+ * bgClearTilemap(0x0400, 0x0000, 2048);
+ *
+ * // Fill with a specific tile entry (palette 2, tile 5)
+ * bgClearTilemap(0x0400, 0x1005, 2048);
+ * @endcode
+ */
+#define bgClearTilemap(vramAddr, fillTile, sizeBytes) \
+    dmaFillVRAM((u16)(fillTile), (u16)(vramAddr), (u16)(sizeBytes))
+
 #endif /* OPENSNES_BACKGROUND_H */

@@ -299,6 +299,12 @@ void oamSetEx(u8 id, u8 size, u8 visible);
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
+ * @warning **Performance**: oamSet() has framesize=158 per call (158 bytes of
+ * stack manipulation due to SSA temporaries). Calling it more than 2-3 times
+ * per frame in the main loop causes visible jitter on real hardware.
+ * Use oamSetFast() or oamSetXYFast() macros for performance-critical code
+ * (see "Fast Macro Sprite API" section below).
+ *
  * @warning **Coordinate Variable Pattern**: Due to a compiler quirk, sprite
  * coordinates MUST be stored in a struct with s16 members for correct behavior.
  * Using separate u16 variables causes jerky horizontal movement.
@@ -640,19 +646,10 @@ void oamDynamic8Draw(u16 id);
  * become separate SUPERFREE sections with global labels that conflict
  * across translation units. Macros are the only zero-overhead option.
  *
- * Requires these declarations in your .c file (both defined in crt0.asm):
- *   extern u8 oamMemory[];
- *   extern volatile u8 oam_update_flag;
- *
- * Note: these are NOT declared in this header because cproc crashes on
- * unused extern array declarations. Only add them in files that use
- * the macros below.
+ * oamMemory[] and oam_update_flag are declared in <snes/system.h>
+ * (included automatically via <snes.h>).
  *
  * Usage:
- *   // In your .c file:
- *   extern u8 oamMemory[];
- *   extern volatile u8 oam_update_flag;
- *
  *   // Pre-compute attribute byte once at init
  *   u8 attr = OAM_ATTR(tile, palette, priority, flags);
  *

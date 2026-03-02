@@ -117,7 +117,7 @@ int main(void) {
     }
 
     /* Enable BG1 on main screen */
-    REG_TM = TM_BG1;
+    setMainScreen(LAYER_BG1);
 
     /* Turn on screen using library */
     setScreenOn();

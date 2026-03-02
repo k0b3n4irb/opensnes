@@ -85,6 +85,78 @@ void setMode(u8 mode, u8 flags);
  */
 #define RGB24(r, g, b) RGB((r) >> 3, (g) >> 3, (b) >> 3)
 
-/* Placeholder - more functions to be implemented */
+/*============================================================================
+ * Layer Enable Constants (for REG_TM / REG_TS / setMainScreen / setSubScreen)
+ *============================================================================*/
+
+/** @defgroup layer_enable Layer Enable Bit Masks
+ * @brief OR these together for setMainScreen() / setSubScreen()
+ * @{
+ */
+#define LAYER_BG1   0x01  /**< Background layer 1 */
+#define LAYER_BG2   0x02  /**< Background layer 2 */
+#define LAYER_BG3   0x04  /**< Background layer 3 */
+#define LAYER_BG4   0x08  /**< Background layer 4 */
+#define LAYER_OBJ   0x10  /**< Sprite (OBJ) layer */
+/** @} */
+
+/*============================================================================
+ * Screen Layer Control
+ *============================================================================*/
+
+/**
+ * @brief Enable layers on the main screen
+ *
+ * Sets which layers are visible on the main screen (REG_TM $212C).
+ * Forgetting to call this (or set REG_TM directly) is the #1 cause
+ * of blank screens after consoleInit().
+ *
+ * @param layers OR'd combination of LAYER_BG1..LAYER_OBJ
+ *
+ * @code
+ * setMainScreen(LAYER_BG1 | LAYER_OBJ);   // Show BG1 + sprites
+ * setMainScreen(LAYER_BG1 | LAYER_BG2);   // Show BG1 + BG2
+ * @endcode
+ */
+#define setMainScreen(layers) (REG_TM = (u8)(layers))
+
+/**
+ * @brief Enable layers on the sub screen
+ *
+ * Sets which layers are visible on the sub screen (REG_TS $212D).
+ * The sub screen is used as the second operand for color math.
+ *
+ * @param layers OR'd combination of LAYER_BG1..LAYER_OBJ
+ *
+ * @code
+ * setSubScreen(LAYER_BG2);  // BG2 as color math source
+ * @endcode
+ */
+#define setSubScreen(layers) (REG_TS = (u8)(layers))
+
+/*============================================================================
+ * Palette Helpers
+ *============================================================================*/
+
+/**
+ * @brief Set a single CGRAM color
+ *
+ * Writes a 15-bit BGR color to the specified palette index.
+ * Works during VBlank or force blank only.
+ *
+ * @param index Color index (0-255)
+ * @param color 15-bit BGR color (use RGB() or RGB24() macros)
+ *
+ * @code
+ * setColor(0, RGB(0, 0, 0));        // Color 0 = black
+ * setColor(1, RGB(31, 31, 31));     // Color 1 = white
+ * setColor(128, RGB(31, 0, 0));     // Sprite palette 0, color 0 = red
+ * @endcode
+ */
+#define setColor(index, color) do { \
+    REG_CGADD = (u8)(index); \
+    REG_CGDATA = (u8)((color) & 0xFF); \
+    REG_CGDATA = (u8)(((color) >> 8) & 0xFF); \
+} while(0)
 
 #endif /* OPENSNES_VIDEO_H */

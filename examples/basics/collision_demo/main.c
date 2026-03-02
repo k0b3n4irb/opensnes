@@ -16,12 +16,7 @@
 #include <snes.h>
 #include <snes/collision.h>
 
-/*============================================================================
- * Direct OAM buffer access (avoids oamSet() overhead)
- *============================================================================*/
-
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
 /*============================================================================
  * Game Objects

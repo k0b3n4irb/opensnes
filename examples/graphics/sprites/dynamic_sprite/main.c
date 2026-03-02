@@ -72,7 +72,7 @@ int main(void) {
     oamInitDynamicSpriteEndFrame();
 
     setMode(BG_MODE1, 0);
-    REG_TM = TM_OBJ;
+    setMainScreen(LAYER_OBJ);
     setScreenOn();
 
     while (1) {
