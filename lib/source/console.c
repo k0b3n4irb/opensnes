@@ -132,18 +132,8 @@ u8 getBrightness(void) {
  * VBlank Synchronization
  *============================================================================*/
 
-void WaitForVBlank(void) {
-    /* Mark OAM buffer for transfer during VBlank */
-    oam_update_flag = 1;
-
-    /* Wait for VBlank flag to be set by NMI handler */
-    while (!vblank_flag) {
-        /* Idle - could use WAI instruction for power saving */
-    }
-
-    /* Clear flag for next frame */
-    vblank_flag = 0;
-}
+/* WaitForVBlank() is now implemented in assembly (crt0.asm) using WAI
+ * instruction for power savings and reduced bus contention (Opt 1). */
 
 u8 isInVBlank(void) {
     return (REG_HVBJOY & 0x80) ? TRUE : FALSE;

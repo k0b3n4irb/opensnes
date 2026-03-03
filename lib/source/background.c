@@ -25,22 +25,35 @@ static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
 
 extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */
 extern u16 bg_scroll_y[4]; /* Synced to hardware by NMI handler */
+extern volatile u8 bg_scroll_dirty; /* Bitmask: bit 0-3 = BG1-4 dirty */
 
 /*============================================================================
  * Scrolling Functions
  *============================================================================*/
 
+/* Lookup table to avoid variable shift codegen bug (1 << bg generates
+ * broken pha/tax/pla pattern). Using conditionals instead. */
+static u8 bg_dirty_bit(u8 bg) {
+    if (bg == 0) return 1;
+    if (bg == 1) return 2;
+    if (bg == 2) return 4;
+    return 8;
+}
+
 void bgSetScroll(u8 bg, u16 x, u16 y) {
     bg_scroll_x[bg] = x;
     bg_scroll_y[bg] = y;
+    bg_scroll_dirty |= bg_dirty_bit(bg);
 }
 
 void bgSetScrollX(u8 bg, u16 x) {
     bg_scroll_x[bg] = x;
+    bg_scroll_dirty |= bg_dirty_bit(bg);
 }
 
 void bgSetScrollY(u8 bg, u16 y) {
     bg_scroll_y[bg] = y;
+    bg_scroll_dirty |= bg_dirty_bit(bg);
 }
 
 u16 bgGetScrollX(u8 bg) {
