@@ -26,9 +26,9 @@ tiles.pic tiles.pal: tiles.png
 	@echo "[GFX] Converting tileset..."
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
-mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
+mario_sprite.pic mario_sprite.pal: mario_sprite.png
 	@echo "[GFX] Converting mario sprites..."
-	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -t bmp -i $<
+	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
 combined.asm: tiles.pic mario_sprite.pic
 

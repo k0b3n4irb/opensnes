@@ -17,9 +17,9 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion (8bpp Mode 3 image)
 #------------------------------------------------------------------------------
 
-pvsneslib.pic pvsneslib.pal pvsneslib.map: pvsneslib.bmp
+pvsneslib.pic pvsneslib.pal pvsneslib.map: pvsneslib.png
 	@echo "[GFX] Converting background..."
-	@$(GFX4SNES) -s 8 -o 256 -u 256 -p -m -t bmp -i $<
+	@$(GFX4SNES) -s 8 -o 256 -u 256 -p -m -i $<
 
 combined.asm: pvsneslib.pic
 

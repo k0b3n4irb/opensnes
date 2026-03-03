@@ -228,7 +228,7 @@ make clean && make
 | `main.c` | Main loop, input handling, effect state |
 | `data.asm` | Background graphics data |
 | `Makefile` | Build configuration |
-| `res/pvsneslib.bmp` | Source background image |
+| `res/pvsneslib.png` | Source background image |
 
 ---
 

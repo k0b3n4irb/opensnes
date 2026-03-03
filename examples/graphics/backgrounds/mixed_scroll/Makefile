@@ -22,14 +22,14 @@ include $(OPENSNES)/make/common.mk
 #------------------------------------------------------------------------------
 
 # Shader: 4bpp, palette entry 1 (tilemap references palette slot 1)
-res/shader.pic res/shader.pal res/shader.map: res/shader.bmp
+res/shader.pic res/shader.pal res/shader.map: res/shader.png
 	@echo "[GFX] $< (palette entry 1)"
-	@$(GFX4SNES) -s 8 -o 16 -e 1 -m -p -t bmp -i $<
+	@$(GFX4SNES) -s 8 -o 16 -e 1 -m -p -i $<
 
 # PVSnesLib logo: 4bpp, palette entry 0 (default palette slot)
-res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.bmp
+res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.png
 	@echo "[GFX] $< (palette entry 0)"
-	@$(GFX4SNES) -s 8 -o 16 -m -p -t bmp -i $<
+	@$(GFX4SNES) -s 8 -o 16 -m -p -i $<
 
 # Extended clean
 clean: clean-mixed_scroll
