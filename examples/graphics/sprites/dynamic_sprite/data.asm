@@ -12,9 +12,8 @@ spr16_tiles:
 spr16_tiles_end:
 
 ; 16x16 sprite palette (32 bytes, 16 colors)
-; Proper palette generated from the source PNG
 spr16_properpal:
-.incbin "res/sprite16_proper.pal"
+.incbin "res/sprite16_grid.pal"
 spr16_properpal_end:
 
 .ends
