@@ -1,12 +1,12 @@
 opensnes_til:
-.incbin "opensnes.pic"
+.incbin "res/opensnes.pic"
 opensnes_tilend:
 
 opensnes_map:
-.incbin "opensnes.map"
+.incbin "res/opensnes.map"
 opensnes_mapend:
 
 opensnes_pal:
-.incbin "opensnes.pal"
+.incbin "res/opensnes.pal"
 opensnes_palend:
 
