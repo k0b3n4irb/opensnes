@@ -8,19 +8,19 @@
 ;----------------------------------------------------------------------
 .section ".rodata1" superfree
 
-tiles_til:      .incbin "tiles.pic"
+tiles_til:      .incbin "res/tiles.pic"
 tiles_tilend:
 
-tiles_pal:      .incbin "tiles.pal"
+tiles_pal:      .incbin "res/tiles.pal"
 tiles_palend:
 
-mario_sprite_til: .incbin "mario_sprite.pic"
+mario_sprite_til: .incbin "res/mario_sprite.pic"
 mario_sprite_tilend:
 
-mario_sprite_pal: .incbin "mario_sprite.pal"
+mario_sprite_pal: .incbin "res/mario_sprite.pal"
 mario_sprite_palend:
 
-jumpsnd:        .incbin "mariojump.brr"
+jumpsnd:        .incbin "res/mariojump.brr"
 jumpsndend:
 
 .ends
@@ -30,8 +30,8 @@ jumpsndend:
 ;----------------------------------------------------------------------
 .section ".rodata2" semifree bank 0
 
-mapmario:       .incbin "BG1.m16"
+mapmario:       .incbin "res/BG1.m16"
 
-tilesetatt:     .incbin "map_1_1.b16"
+tilesetatt:     .incbin "res/map_1_1.b16"
 
 .ends

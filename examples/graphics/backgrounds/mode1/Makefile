@@ -19,3 +19,18 @@ ASMSRC     := data.asm
 
 # Include common build rules
 include $(OPENSNES)/make/common.mk
+
+#------------------------------------------------------------------------------
+# Graphics conversion (4bpp Mode 1 background)
+#------------------------------------------------------------------------------
+
+res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png
+	@echo "[GFX] Converting background..."
+	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
+
+combined.asm: res/opensnes.pic
+
+clean: clean-mode1
+.PHONY: clean-mode1
+clean-mode1:
+	@rm -f res/opensnes.pic res/opensnes.pal res/opensnes.map res/opensnes.inc res/opensnes_data.as

@@ -22,30 +22,30 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion
 #------------------------------------------------------------------------------
 
-tilesMario.pic tilesMario.pal: tilesMario.png
+res/tilesMario.pic res/tilesMario.pal: res/tilesMario.png
 	@echo "[GFX] Converting tileset..."
 	@$(GFX4SNES) -s 8 -o 48 -u 16 -p -m -i $<
 
-mario.pic mario.pal: mario.png
+res/mario.pic res/mario.pal: res/mario.png
 	@echo "[GFX] Converting mario sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-goomba.pic goomba.pal: goomba.png
+res/goomba.pic res/goomba.pal: res/goomba.png
 	@echo "[GFX] Converting goomba sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-koopatroopa.pic koopatroopa.pal: koopatroopa.png
+res/koopatroopa.pic res/koopatroopa.pal: res/koopatroopa.png
 	@echo "[GFX] Converting koopatroopa sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
 # Ensure graphics are converted before assembly
-combined.asm: tilesMario.pic mario.pic goomba.pic koopatroopa.pic
+combined.asm: res/tilesMario.pic res/mario.pic res/goomba.pic res/koopatroopa.pic
 
 # Extended clean
 clean: clean-mapandobjects
 .PHONY: clean-mapandobjects
 clean-mapandobjects:
-	@rm -f tilesMario.pic tilesMario.pal tilesMario.map tilesMario.inc tilesMario_data.as
-	@rm -f mario.pic mario.pal mario.inc mario_data.as
-	@rm -f goomba.pic goomba.pal goomba.inc goomba_data.as
-	@rm -f koopatroopa.pic koopatroopa.pal koopatroopa.inc koopatroopa_data.as
+	@rm -f res/tilesMario.pic res/tilesMario.pal res/tilesMario.map res/tilesMario.inc res/tilesMario_data.as
+	@rm -f res/mario.pic res/mario.pal res/mario.inc res/mario_data.as
+	@rm -f res/goomba.pic res/goomba.pal res/goomba.inc res/goomba_data.as
+	@rm -f res/koopatroopa.pic res/koopatroopa.pal res/koopatroopa.inc res/koopatroopa_data.as

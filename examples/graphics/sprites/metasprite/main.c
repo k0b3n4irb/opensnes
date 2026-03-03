@@ -19,9 +19,9 @@ extern u8 spritehero16_til[];
 extern u8 spritehero8_til[];
 
 /* Metasprite frame definitions */
-#include "hero8_meta.inc"
-#include "hero16_meta.inc"
-#include "hero32_meta.inc"
+#include "res/hero8_meta.inc"
+#include "res/hero16_meta.inc"
+#include "res/hero32_meta.inc"
 
 /*
  * VRAM Layout:
