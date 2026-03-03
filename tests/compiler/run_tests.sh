@@ -1965,6 +1965,31 @@ test_multiply() {
         fi
     done
 
+    # Check composite constant multiplies use inline shift+add (NOT __mul16)
+    local composite_muls=(mul_by_24 mul_by_48 mul_by_20 mul_by_40 mul_by_36 mul_by_60 mul_by_96)
+    for func in "${composite_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using composite inline"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: ${func} missing tcc__r9 (no inline shift+add pattern)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'asl a'; then
+            log_fail "$name: ${func} missing 'asl a' (should use shifts)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
     log_info "$name"
     ((TESTS_PASSED++))
 }
@@ -2966,6 +2991,57 @@ test_cmp_dead_store() {
     ((TESTS_PASSED++))
 }
 
+test_mul_dead_store() {
+    local name="mul_dead_store"
+    local src="$SCRIPT_DIR/test_mul_dead_store.c"
+    local out="$BUILD/test_mul_dead_store.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+
+    # chain_mul: intermediate (a*3+b) should NOT have a dead sta N,s
+    # before the *5 inline pattern. The function should be frameless if
+    # the dead store is eliminated.
+    local fn_body
+    fn_body=$(sed -n '/^chain_mul:/,/^\.ENDS/p' "$out")
+
+    # Should NOT have sta N,s followed by sta.b tcc__r9 (dead store pattern)
+    if echo "$fn_body" | grep -A1 'sta [0-9]\+,s' | grep -q 'sta\.b tcc__r9'; then
+        log_fail "$name: chain_mul has dead store before inline multiply"
+        ((fail_count++))
+    fi
+
+    # chain_shift: intermediate should be dead (used directly by asl)
+    fn_body=$(sed -n '/^chain_shift:/,/^\.ENDS/p' "$out")
+    if echo "$fn_body" | grep -qE "${TAB}sta [0-9]+,s"; then
+        log_fail "$name: chain_shift has sta N,s — intermediate should be dead"
+        ((fail_count++))
+    fi
+
+    # chain_composite: intermediate should be dead (used by composite *24)
+    fn_body=$(sed -n '/^chain_composite:/,/^\.ENDS/p' "$out")
+    if echo "$fn_body" | grep -A1 'sta [0-9]\+,s' | grep -q 'sta\.b tcc__r9'; then
+        log_fail "$name: chain_composite has dead store before composite multiply"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 test_inline_mul_11_15() {
     local name="inline_mul_11_15"
     local src="$SCRIPT_DIR/test_inline_mul.c"
@@ -3306,6 +3382,7 @@ main() {
     test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
 
     # === Phase 11: Inline multiply *11-*15 + indirect store optimization ===
+    test_mul_dead_store              # Dead store elim for inline constant multiplies
     test_inline_mul_11_15            # Inline multiply patterns *11-*15
     test_indirect_store_acache       # Indirect store A-cache → frameless array_write
 
