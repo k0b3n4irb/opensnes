@@ -1610,6 +1610,102 @@ test_variable_shift_runtime() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Variable shift with u8 params in compound expressions
+# BUG: (1 << bg) generates wrong code when bg is u8 and also used for array
+#      indexing. The shift count reads from the wrong stack slot because
+#      emitload_adj needs sp_adjust=+2 after pha. This test covers the exact
+#      bgSetScrollX pattern: u8 param + array store + variable shift + OR-assign.
+#------------------------------------------------------------------------------
+test_variable_shift_u8_compound() {
+    local name="variable_shift_u8_compound"
+    local src="$SCRIPT_DIR/test_variable_shift_bug.c"
+    local out="$BUILD/test_variable_shift_bug.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local failed=0
+
+    # Extract set_scroll_u8 function body
+    local u8_body
+    u8_body=$(sed -n '/^set_scroll_u8:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|^\.ENDS/p' "$out" | sed '$d')
+
+    # 1. Must have variable shift codegen (pha + asl loop)
+    if ! echo "$u8_body" | grep -q 'pha'; then
+        log_fail "$name: set_scroll_u8 missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$u8_body" | grep -qE 'asl'; then
+        log_fail "$name: set_scroll_u8 missing asl (shift dropped)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 2. Key check: after pha, the lda N,s must use offset+2 from the pre-pha
+    #    store of bg_ext. Find the sta (store bg_ext) and the lda between pha/pla.
+    #    The lda offset must be exactly sta_offset + 2.
+
+    # Find the extub store: the 'and.w #$00FF' followed by 'sta N,s'
+    local bg_store_offset
+    bg_store_offset=$(echo "$u8_body" | grep -oP '(?<=sta )\d+(?=,s)' | head -1)
+
+    # Find the lda between pha and pla (the shift count load)
+    local pha_to_pla
+    pha_to_pla=$(echo "$u8_body" | sed -n '/pha/,/pla/p')
+    local shift_load_offset
+    shift_load_offset=$(echo "$pha_to_pla" | grep -oP '(?<=lda )\d+(?=,s)' | head -1)
+
+    if [[ -z "$bg_store_offset" || -z "$shift_load_offset" ]]; then
+        log_fail "$name: Could not extract stack offsets (store=$bg_store_offset, load=$shift_load_offset)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local expected_offset=$((bg_store_offset + 2))
+    if [[ "$shift_load_offset" -ne "$expected_offset" ]]; then
+        log_fail "$name: Shift count loaded from ${shift_load_offset},s but expected ${expected_offset},s (store was ${bg_store_offset},s + 2 for pha)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "  set_scroll_u8 body:"
+            echo "$u8_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 3. Cross-check: u16 version must also have correct pha/lda pattern
+    local u16_body
+    u16_body=$(sed -n '/^set_scroll_u16:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|^\.ENDS/p' "$out" | sed '$d')
+
+    if ! echo "$u16_body" | grep -q 'pha'; then
+        log_fail "$name: set_scroll_u16 missing pha"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 4. CRITICAL: .INDEX 16 must appear before each function label.
+    #    Without it, WLA-DX assembles cpx #0 as 2 bytes (8-bit) instead
+    #    of 3 bytes (16-bit), misaligning all subsequent instructions.
+    if ! grep -q '\.INDEX 16' "$out"; then
+        log_fail "$name: Missing .INDEX 16 directive — cpx #0 will be misassembled!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: SSA phi-node resolution with 6+ locals in nested if/else
 # BUG: Wrong values stored to wrong stack slots when many locals are
 #      modified in separate conditional branches
@@ -3357,6 +3453,7 @@ main() {
     # === HDMA Wave Regression Tests (Phase 1.3) ===
     test_variable_shift              # FIXED: Variable-count shifts now emit loop
     test_variable_shift_runtime      # FIXED: Stack offset after pha adjusted by +2
+    test_variable_shift_u8_compound  # FIXED: u8 param + array + shift + OR-assign pattern
     test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
     test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
