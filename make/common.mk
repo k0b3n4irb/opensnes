@@ -217,7 +217,7 @@ endif
 # Three nested _resolve_one calls handle chains up to 3 deep.
 # $(sort) deduplicates — existing explicit deps are harmless.
 
-_DEP_sprite    := dma
+_DEP_sprite    := dma sprite_oamset
 _DEP_text      := dma
 _DEP_text4bpp  := dma
 _DEP_object    := map

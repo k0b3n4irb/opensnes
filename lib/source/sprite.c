@@ -31,7 +31,11 @@
  * (C library, assembly helpers, NMI handler) uses the same buffer.
  */
 /* oamMemory[] and oam_update_flag are declared in <snes/system.h> (via <snes.h>) */
+extern u8 oam_max_id; /* Defined in crt0.asm - highest sprite ID written */
 #define oam_buffer oamMemory
+
+/* Update oam_max_id tracking (inline to avoid function call overhead) */
+#define OAM_TRACK_MAX(id) do { if ((id) > oam_max_id) oam_max_id = (id); } while(0)
 
 /*============================================================================
  * Initialization
@@ -79,41 +83,9 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
 #define OAM_XHI_BIT(slot)  ((u8)((slot) == 0 ? 0x01 : (slot) == 1 ? 0x04 : (slot) == 2 ? 0x10 : 0x40))
 #define OAM_SIZE_BIT(slot) ((u8)((slot) == 0 ? 0x02 : (slot) == 1 ? 0x08 : (slot) == 2 ? 0x20 : 0x80))
 
-void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags) {
-    /* All parameters are u16 to avoid calling convention issues with mixed sizes */
-    if (id >= MAX_SPRITES) return;
-
-    u16 offset = id << 2;  /* id * 4 */
-
-    /* Set position and tile */
-    oam_buffer[offset + 0] = (u8)(x & 0xFF);
-    oam_buffer[offset + 1] = (u8)(y & 0xFF);
-    oam_buffer[offset + 2] = (u8)(tile & 0xFF);
-
-    /* Set attributes: vhoopppc */
-    /* v = vertical flip (bit 7 of flags) */
-    /* h = horizontal flip (bit 6 of flags) */
-    /* oo = priority (0-3) */
-    /* ppp = palette (0-7) */
-    /* c = tile high bit */
-    oam_buffer[offset + 3] = (u8)((flags & 0xC0) |
-                              ((priority & 0x03) << 4) |
-                              ((palette & 0x07) << 1) |
-                              ((tile >> 8) & 0x01));
-
-    /* Set high table X high bit (bit 0 of each 2-bit pair) */
-    /* Don't touch size bit (bit 1) - that's set by oamSetSize/oamSetEx */
-    u16 ext_offset = 512 + (id >> 2);
-    u16 slot = id & 0x03;
-
-    if (x & 0x100) {
-        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
-    } else {
-        oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
-    }
-
-    oam_update_flag = 1;
-}
+/* oamSet() is now implemented in assembly (sprite_oamset.asm) for performance.
+ * The C version had framesize=158 (~100+ cycles overhead per call).
+ * The assembly version eliminates all frame allocation. */
 
 void oamSetX(u8 id, u16 x) {
     if (id >= MAX_SPRITES) return;
@@ -131,12 +103,14 @@ void oamSetX(u8 id, u16 x) {
         oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
     }
 
+    OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
 
 void oamSetY(u8 id, u8 y) {
     if (id >= MAX_SPRITES) return;
     oam_buffer[(id << 2) + 1] = y;
+    OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
 
@@ -154,6 +128,7 @@ void oamSetTile(u8 id, u16 tile) {
     /* Update tile high bit in attributes */
     oam_buffer[offset + 3] = (oam_buffer[offset + 3] & 0xFE) | ((tile >> 8) & 0x01);
 
+    OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
 
@@ -179,6 +154,7 @@ void oamHide(u8 id) {
     u8 slot = id & 0x03;
     oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
 
+    OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
 
@@ -195,6 +171,7 @@ void oamSetSize(u16 id, u16 large) {
         oam_buffer[ext_offset] &= ~OAM_SIZE_BIT(slot);
     }
 
+    OAM_TRACK_MAX((u8)id);
     oam_update_flag = 1;
 }
 
@@ -265,6 +242,7 @@ void oamClear(void) {
         oam_buffer[512 + i] = 0x55;
     }
 
+    oam_max_id = 127;  /* Force full OAM DMA to clear all sprites */
     oam_update_flag = 1;
 }
 

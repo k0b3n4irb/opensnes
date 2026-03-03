@@ -127,6 +127,8 @@ MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
+    bg_scroll_dirty dsb 1   ; Bitmask: bit 0-3 = BG1-4 scroll dirty
+    oam_max_id      dsb 1   ; Highest sprite ID written (for partial OAM DMA)
     ; Mouse state (read in VBlank ISR when mouse_con != 0)
     mouse_con       dsb 1   ; bitmask: bit 0 = port 1 mouse, bit 1 = port 2 mouse
     mouse_x         dsb 2   ; port 1 X displacement (sign-magnitude raw byte in low)
@@ -937,13 +939,28 @@ NmiHandler:
     sep #$20
 
     ; Call user VBlank callback (BEFORE OAM update for max VBlank time)
-    ; Always called - default callback does nothing (just RTL)
+    ;
+    ; Opt 7: Skip register save/restore when default callback is active.
+    ; Compare nmi_callback (16-bit addr + 8-bit bank) against DefaultNmiCallback.
+    ; If match, skip the ~260-cycle save/restore + call block.
     ;
     ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
     ; because JML [dp] reads from address D+dp. We save the main loop's registers
     ; to the NMI register area, then restore them after the callback.
     rep #$30            ; 16-bit A/X/Y
 
+    ; Check if callback is the default no-op
+    lda nmi_callback        ; 16-bit address
+    cmp #DefaultNmiCallback
+    bne @do_callback
+    sep #$20
+    lda nmi_callback+2      ; bank byte
+    cmp #:DefaultNmiCallback
+    bne +                   ; Not match → do callback
+    jmp @skip_callback      ; Match → skip save/restore/call (long jump)
++   rep #$30
+
+@do_callback:
     ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
     ; The C callback may use any of these registers
     lda tcc__r0
@@ -1028,6 +1045,7 @@ NmiHandler:
     lda tcc__nmi_r10h
     sta tcc__r10h
 
+@skip_callback:
     sep #$20            ; Back to 8-bit A
 
     ; Transfer OAM buffer to hardware during VBlank
@@ -1046,8 +1064,13 @@ NmiHandler:
 +
 
     ; Sync BG scroll shadows to hardware ($210D-$2114)
-    ; 8-bit A, data bank $00 (WRAM + hardware registers accessible)
-    ; Cost: ~128 master cycles (~0.5% of VBlank)
+    ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
+    ; 8-bit A, data bank $00
+    lda bg_scroll_dirty
+    beq @scroll_done      ; Nothing dirty → skip all
+
+    bit #$01
+    beq @bg1_done
     lda bg_scroll_x      ; BG1 H low
     sta $210D
     lda bg_scroll_x+1    ; BG1 H high
@@ -1056,6 +1079,11 @@ NmiHandler:
     sta $210E
     lda bg_scroll_y+1    ; BG1 V high
     sta $210E
+    lda bg_scroll_dirty   ; Reload for next test
+@bg1_done:
+
+    bit #$02
+    beq @bg2_done
     lda bg_scroll_x+2    ; BG2 H low
     sta $210F
     lda bg_scroll_x+3    ; BG2 H high
@@ -1064,6 +1092,11 @@ NmiHandler:
     sta $2110
     lda bg_scroll_y+3    ; BG2 V high
     sta $2110
+    lda bg_scroll_dirty   ; Reload for next test
+@bg2_done:
+
+    bit #$04
+    beq @bg3_done
     lda bg_scroll_x+4    ; BG3 H low
     sta $2111
     lda bg_scroll_x+5    ; BG3 H high
@@ -1072,6 +1105,11 @@ NmiHandler:
     sta $2112
     lda bg_scroll_y+5    ; BG3 V high
     sta $2112
+    lda bg_scroll_dirty   ; Reload for next test
+@bg3_done:
+
+    bit #$08
+    beq @bg4_done
     lda bg_scroll_x+6    ; BG4 H low
     sta $2113
     lda bg_scroll_x+7    ; BG4 H high
@@ -1080,6 +1118,10 @@ NmiHandler:
     sta $2114
     lda bg_scroll_y+7    ; BG4 V high
     sta $2114
+@bg4_done:
+
+    stz bg_scroll_dirty   ; Clear all dirty bits
+@scroll_done:
 
     ; Set VBlank flag
     lda #$01
@@ -1101,6 +1143,29 @@ NmiHandler:
 ; Simply returns immediately.
 ;------------------------------------------------------------------------------
 DefaultNmiCallback:
+    rtl
+
+;------------------------------------------------------------------------------
+; WaitForVBlank - Wait for VBlank using WAI instruction (Opt 1)
+;------------------------------------------------------------------------------
+; Uses WAI to halt CPU until interrupt, saving power and bus bandwidth.
+; Checks vblank_flag BEFORE WAI so lag frames pass through immediately.
+; Sets oam_update_flag so NMI handler transfers OAM buffer.
+;------------------------------------------------------------------------------
+WaitForVBlank:
+    php
+    sep #$20
+    lda #$01
+    sta.l oam_update_flag
+    lda.l vblank_flag       ; Check if NMI already fired (lag frame)
+    bne @vblank_ready       ; Yes → skip WAI
+-   wai                     ; Halt CPU until NMI (or IRQ)
+    lda.l vblank_flag
+    beq -                   ; Not VBlank — spurious IRQ, wait again
+@vblank_ready:
+    lda #$00
+    sta.l vblank_flag       ; Clear flag
+    plp
     rtl
 
 .ENDS
