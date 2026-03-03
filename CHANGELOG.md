@@ -5,7 +5,59 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
-## [Unreleased]
+## [0.2.0] - 2026-03-03
+
+### Compiler
+
+- **Fixed variable shift codegen** — `(1 << variable)` generated broken code because WLA-DX
+  defaulted to 8-bit index registers per object file. Fixed by emitting `.ACCU 16` / `.INDEX 16`
+  before each function.
+- **Fixed variable shift stack offset** — `emitload_adj` now correctly adjusts +2 after `pha`
+  in the shift loop.
+- **-22% runtime cycles** vs PVSnesLib + 816-opt on benchmark suite (improved from -31% in v0.1.0)
+- Added composite constant multiply (*20, *24, *40, *48, *96)
+- Added inline multiply for *11 through *15
+- Dead store elimination for inline multiply A-cache compatibility
+
+### Library
+
+- New modules: `map`, `object`, `debug`, `lzss`, `video`
+- Mouse and Super Scope input drivers
+- Assembly `oamSet()` — C version had framesize=158, causing visible slowdown with >2 sprites
+- WAI-based `WaitForVBlank()` — saves CPU power
+- Conditional BG scroll writes via `bg_scroll_dirty` bitmask in NMI handler
+- NMI callback skip optimization (~260 cycles saved when using DefaultNmiCallback)
+- `oamSetFast` macro for zero-overhead OAM writes
+- Fixed `mode7Rotate` degree overflow
+- Fixed SNESMOD FIFO clear
+- Fixed `colorMathSetSource` CGWSEL bit 1 polarity
+- Fixed write-only register reads in library code
+
+### Examples
+
+- 36 working examples (up from 25), 11 new:
+  - **Games**: mapandobjects (object engine platformer), slopemario (slope collision)
+  - **Maps**: dynamic_map (tilemap sprite engine)
+  - **Graphics**: metasprite, object_size, mixed_scroll, mode1_bg3_priority, mode1_lz77, hdma_gradient
+  - **Input**: mouse, superscope
+  - **Basics**: collision_demo (AABB + tile collision)
+- Removed variable-shift workarounds (collision_demo, background.c)
+- Added GFX conversion rules to all example Makefiles (CI clean-build safe)
+
+### Build System
+
+- Multi-file C compilation support (`CSRC` variable)
+- Automatic module dependency resolution in `common.mk`
+- Bank $00 free space threshold warning in `symmap.py`
+
+### Testing
+
+- 57 compiler regression tests (up from 54)
+- 25 unit test modules
+- 36 example validations
+- POSIX-compatible test scripts (macOS `grep -oE` instead of `grep -oP`)
+
+## [0.1.0] - 2026-02-16
 
 ### Compiler (cc65816 — QBE w65816 backend)
 
@@ -42,7 +94,6 @@ covers changes made since the fork.
   - **Input**: two-player joypad
   - **Memory**: SRAM save/load, HiROM demo
   - **Text**: hello world, text formatting
-  - **Basics**: collision demo
 
 ### Build System
 
@@ -50,13 +101,14 @@ covers changes made since the fork.
 - HiROM support (`USE_HIROM=1`)
 - SRAM support (`USE_SRAM=1`)
 - Library module selection (`LIB_MODULES=console sprite dma`)
+- CI pipeline on Linux, macOS, and Windows (MSYS2)
 - `make release` for SDK packaging
 
 ### Testing
 
-- 54 compiler regression tests (`tests/compiler/run_tests.sh`)
-- Example validation with memory overlap checking (`tests/examples/validate_examples.sh`)
-- CI pipeline on Linux, macOS, and Windows (MSYS2)
+- 54 compiler regression tests
+- Example validation with memory overlap checking
+- Multi-platform CI (Linux, macOS, Windows)
 
 ### Documentation
 
