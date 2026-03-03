@@ -172,3 +172,28 @@ unsigned short call_chain(unsigned short x) {
 unsigned short pea_constant_args(void) {
     return add_u16(42, 100);
 }
+
+/* --- 29. Composite multiply *24 (base*2^k: 3*8) --- */
+unsigned short mul_const_24(unsigned short a) {
+    return a * 24;
+}
+
+/* --- 30. Composite multiply *48 (base*2^k: 3*16) --- */
+unsigned short mul_const_48(unsigned short a) {
+    return a * 48;
+}
+
+/* --- 31. Composite multiply *20 (base*2^k: 5*4) --- */
+unsigned short mul_const_20(unsigned short a) {
+    return a * 20;
+}
+
+/* --- 32. Composite multiply *40 (base*2^k: 5*8) --- */
+unsigned short mul_const_40(unsigned short a) {
+    return a * 40;
+}
+
+/* --- 33. Composite multiply *96 (base*2^k: 3*32) --- */
+unsigned short mul_const_96(unsigned short a) {
+    return a * 96;
+}
