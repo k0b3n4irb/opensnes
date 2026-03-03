@@ -2,8 +2,8 @@
  * Compiler benchmark functions — standalone C for cycle analysis.
  *
  * Compile:  ./bin/cc65816 bench_functions.c -o bench_functions.asm
- * Analyze:  python3 devtools/cyclecount.py bench_functions.asm
- * Compare:  python3 devtools/cyclecount.py --compare before.asm after.asm
+ * Analyze:  python3 devtools/cyclecount/cyclecount.py bench_functions.asm
+ * Compare:  python3 devtools/cyclecount/cyclecount.py --compare before.asm after.asm
  *
  * Each function isolates one compiler code generation pattern.
  * After a compiler change, recompile and compare cycle counts.

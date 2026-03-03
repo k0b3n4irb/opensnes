@@ -29,7 +29,7 @@ local function test(name, condition, msg)
 end
 
 -- Get .sym file from command line or use default
-local symFile = arg[1] or "../debug-fixtures/clean/hello_world/hello_world.sym"
+local symFile = arg[1] or "../../tests/examples/hello_world/hello_world.sym"
 
 print("===========================================")
 print("  snesdbg Symbol Parser Test")

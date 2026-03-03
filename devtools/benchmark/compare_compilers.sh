@@ -9,8 +9,8 @@
 #   PVSNESLIB_HOME — path to PVSnesLib root (default: ~/workspace/pvsneslib)
 #
 # Usage:
-#   tools/benchmark/compare_compilers.sh
-#   PVSNESLIB_HOME=/path/to/pvsneslib tools/benchmark/compare_compilers.sh
+#   devtools/benchmark/compare_compilers.sh
+#   PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
 
 set -euo pipefail
 
@@ -23,7 +23,7 @@ OPENSNES_HOME="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PVSNESLIB_HOME="${PVSNESLIB_HOME:-$HOME/workspace/pvsneslib}"
 
 BENCH_SRC="${OPENSNES_HOME}/tests/benchmark/bench_functions.c"
-CYCLECOUNT="${OPENSNES_HOME}/devtools/cyclecount.py"
+CYCLECOUNT="${OPENSNES_HOME}/devtools/cyclecount/cyclecount.py"
 
 CC65816="${OPENSNES_HOME}/bin/cc65816"
 TCC816="${PVSNESLIB_HOME}/devkitsnes/bin/816-tcc"

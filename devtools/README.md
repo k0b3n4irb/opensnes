@@ -32,26 +32,27 @@ an isolated virtual environment.
 
 ```bash
 # Using the managed environment
-uv run brr2it.py input.brr output.it "SampleName" 8363
+uv run brr2it/brr2it.py input.brr output.it "SampleName" 8363
 
-uv run gen_hud_bar.py
+uv run gen_hud_bar/gen_hud_bar.py
 ```
 
 Or activate the environment first:
 
 ```bash
 source .venv/bin/activate
-python3 brr2it.py input.brr output.it "SampleName" 8363
+python3 brr2it/brr2it.py input.brr output.it "SampleName" 8363
 ```
 
 ## Available Tools
 
 | Tool | Description | Doc |
 |------|-------------|-----|
-| `brr2it.py` | Convert SNES BRR samples to Impulse Tracker (.it) | [brr2it.md](brr2it.md) |
-| `cyclecount.py` | Estimate CPU cycle costs of 65816 assembly | — |
-| `font2snes.py` | Font conversion (Python reference implementation) | — |
-| `gen_hud_bar.py` | Generate HUD health bar sprite sheets | [gen_hud_bar.md](gen_hud_bar.md) |
-| `memprofiler.py` | Analyze WRAM memory usage from .sym files | — |
-| `symmap.py` | Check WRAM memory overlaps (used by test suite) | — |
-| `vramcheck.py` | Check VRAM layout overlaps (used by test suite) | — |
+| [`symmap/`](symmap/) | Check WRAM memory overlaps (used by test suite) | [README](symmap/README.md) |
+| [`cyclecount/`](cyclecount/) | Estimate CPU cycle costs of 65816 assembly | [README](cyclecount/README.md) |
+| [`check_mvn/`](check_mvn/) | Detect suspicious MVN/MVP bank operands in assembly | [README](check_mvn/README.md) |
+| [`brr2it/`](brr2it/) | Convert SNES BRR samples to Impulse Tracker (.it) | [README](brr2it/README.md) |
+| [`font2snes/`](font2snes/) | Font conversion (Python reference implementation) | [README](font2snes/README.md) |
+| [`gen_hud_bar/`](gen_hud_bar/) | Generate HUD health bar sprite sheets | [README](gen_hud_bar/README.md) |
+| [`benchmark/`](benchmark/) | Compiler benchmark (OpenSNES vs PVSnesLib) | [README](benchmark/README.md) |
+| [`snesdbg/`](snesdbg/) | Lua debugging library for Mesen2 | [README](snesdbg/README.md) |

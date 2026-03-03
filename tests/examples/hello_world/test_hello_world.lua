@@ -13,7 +13,7 @@
 
 -- Add snesdbg to path
 local scriptDir = debug.getinfo(1, "S").source:match("@?(.*/)") or "./"
-package.path = scriptDir .. "../../../tools/snesdbg/?.lua;" .. package.path
+package.path = scriptDir .. "../../../devtools/snesdbg/?.lua;" .. package.path
 
 local test = require("test")
 

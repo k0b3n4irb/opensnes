@@ -7,8 +7,8 @@ known safe macros. Flags suspicious patterns that may indicate swapped
 bank operands.
 
 Usage:
-    python3 devtools/check_mvn.py lib/source/*.asm
-    python3 devtools/check_mvn.py --strict lib/source/*.asm
+    python3 devtools/check_mvn/check_mvn.py lib/source/*.asm
+    python3 devtools/check_mvn/check_mvn.py --strict lib/source/*.asm
 
 Exit codes:
     0 = No issues (or only warnings in non-strict mode)

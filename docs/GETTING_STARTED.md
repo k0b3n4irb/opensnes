@@ -203,7 +203,7 @@ Add to your shell profile (`~/.bashrc` or `~/.zshrc`) to make it permanent.
 Your ROM built but doesn't display anything. Common causes:
 1. Missing `setScreenOn()` call
 2. VBlank loop issues
-3. Memory overlap (run `python3 devtools/symmap.py --check-overlap game.sym`)
+3. Memory overlap (run `python3 devtools/symmap/symmap.py --check-overlap game.sym`)
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 

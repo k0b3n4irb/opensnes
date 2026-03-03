@@ -23,10 +23,10 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Derive OPENSNES_HOME from script location if not set or if set to invalid path
 DERIVED_HOME="$(cd "$SCRIPT_DIR/../.." && pwd)"
-if [ -z "${OPENSNES_HOME:-}" ] || [ ! -f "${OPENSNES_HOME}/devtools/symmap.py" ]; then
+if [ -z "${OPENSNES_HOME:-}" ] || [ ! -f "${OPENSNES_HOME}/devtools/symmap/symmap.py" ]; then
     OPENSNES_HOME="$DERIVED_HOME"
 fi
-SYMMAP="$OPENSNES_HOME/devtools/symmap.py"
+SYMMAP="$OPENSNES_HOME/devtools/symmap/symmap.py"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
 
 echo "========================================"
@@ -106,7 +106,7 @@ if [ $FAILED -gt 0 ]; then
     echo -e "${RED}ERROR: Memory collisions detected in $FAILED example(s)${NC}"
     echo ""
     echo "To debug, run:"
-    echo "  python3 devtools/symmap.py --check-overlap <path/to/example.sym>"
+    echo "  python3 devtools/symmap/symmap.py --check-overlap <path/to/example.sym>"
     echo ""
     echo "Common fixes:"
     echo "  1. Move Bank \$7E buffers to address \$2000+ (above mirror range)"

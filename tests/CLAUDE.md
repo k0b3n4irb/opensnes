@@ -257,7 +257,7 @@ tests/
 | `examples/breakout_transition_test.lua` | Event-driven | Oui |
 | `examples/compare_screenshots.sh` + `.lua` | Shell + Mesen2 --testrunner | Oui |
 
-### snesdbg (`tools/snesdbg/`)
+### snesdbg (`devtools/snesdbg/`)
 
 Bibliothèque de debug Lua pour Mesen2 :
 - **API event-driven** : `afterFrames(n, callback)`, `onSymbolReached(name, callback)`
@@ -265,7 +265,7 @@ Bibliothèque de debug Lua pour Mesen2 :
 - Watches, breakpoints, assertions, OAM inspection
 - Test framework BDD (`describe`/`it` avec callbacks `done()`)
 
-Voir `tools/snesdbg/README.md` pour l'API complète.
+Voir `devtools/snesdbg/README.md` pour l'API complète.
 
 ---
 

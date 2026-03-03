@@ -30,3 +30,10 @@ res/bg2.pic res/bg2.map res/bg2.pal: res/bg2.png
 
 # Ensure assets are converted before assembly (data.asm .incbin references them)
 combined.asm: res/bg1.pic res/bg1.map res/bg1.pal res/bg2.pic res/bg2.map res/bg2.pal
+
+# Extended clean
+clean: clean-window
+.PHONY: clean-window
+clean-window:
+	@rm -f res/bg1.pic res/bg1.pal res/bg1.map res/bg1.inc res/bg1_data.as
+	@rm -f res/bg2.pic res/bg2.pal res/bg2.map res/bg2.inc res/bg2_data.as
