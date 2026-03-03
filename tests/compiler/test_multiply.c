@@ -39,6 +39,15 @@ u16 mul_by_256(u16 x) { return x * 256; }
 u16 mul_by_1024(u16 x) { return x * 1024; }
 u16 mul_by_2048(u16 x) { return x * 2048; }
 
+/* Composite constant multiply: base * 2^k, base in [3..15] */
+u16 mul_by_24(u16 x) { return x * 24; }    /* 3 * 8 */
+u16 mul_by_48(u16 x) { return x * 48; }    /* 3 * 16 */
+u16 mul_by_20(u16 x) { return x * 20; }    /* 5 * 4 */
+u16 mul_by_40(u16 x) { return x * 40; }    /* 5 * 8 */
+u16 mul_by_36(u16 x) { return x * 36; }    /* 9 * 4 */
+u16 mul_by_60(u16 x) { return x * 60; }    /* 15 * 4 */
+u16 mul_by_96(u16 x) { return x * 96; }    /* 3 * 32 */
+
 /* Power-of-2 divide (should be inline shifts, NOT __div16) */
 u16 div_by_32(u16 x) { return x / 32; }
 u16 div_by_64(u16 x) { return x / 64; }
