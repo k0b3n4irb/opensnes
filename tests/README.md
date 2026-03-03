@@ -104,14 +104,14 @@ control). See `tests/black_screen_test.lua` for the canonical example.
 
 ## Debugging Tools (snesdbg)
 
-`tools/snesdbg/` provides a Lua debugging library for Mesen2:
+`devtools/snesdbg/` provides a Lua debugging library for Mesen2:
 - Symbol-aware memory reads (`dbg.read("player_x")`)
 - OAM inspection and comparison (shadow buffer vs hardware)
 - Breakpoints and variable watches by symbol name
 - BDD-style test DSL (`describe`/`it` with event-driven `done()` callbacks)
 - Non-blocking frame waits (`afterFrames`) and symbol waits (`onSymbolReached`)
 
-See `tools/snesdbg/README.md` for the full API.
+See `devtools/snesdbg/README.md` for the full API.
 
 ## Manual Validation (7 Reference Examples)
 

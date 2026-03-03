@@ -30,3 +30,10 @@ res/shader.pic res/shader.pal res/shader.map: res/shader.bmp
 res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.bmp
 	@echo "[GFX] $< (palette entry 0)"
 	@$(GFX4SNES) -s 8 -o 16 -m -p -t bmp -i $<
+
+# Extended clean
+clean: clean-mixed_scroll
+.PHONY: clean-mixed_scroll
+clean-mixed_scroll:
+	@rm -f res/shader.pic res/shader.pal res/shader.map res/shader.inc res/shader_data.as
+	@rm -f res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map res/pvsneslib.inc res/pvsneslib_data.as

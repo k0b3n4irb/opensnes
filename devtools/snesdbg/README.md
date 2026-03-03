@@ -48,7 +48,7 @@ end)
 2. In your test scripts, add the snesdbg path to package.path:
 
 ```lua
-package.path = "/path/to/opensnes/tools/snesdbg/?.lua;" .. package.path
+package.path = "/path/to/opensnes/devtools/snesdbg/?.lua;" .. package.path
 local dbg = require("snesdbg")
 ```
 

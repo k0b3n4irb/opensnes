@@ -123,7 +123,7 @@ Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you 
 
 **Diagnose**:
 ```bash
-python3 devtools/symmap.py --check-overlap game.sym
+python3 devtools/symmap/symmap.py --check-overlap game.sym
 ```
 
 **Fix**: The library uses `ORGA $0300` to avoid the overlap zone.
@@ -278,7 +278,7 @@ If it's in ROM ($8000+), you can't write to it.
 
 ```bash
 # Check for memory overlaps
-python3 devtools/symmap.py --check-overlap game.sym
+python3 devtools/symmap/symmap.py --check-overlap game.sym
 
 # View symbol map
 cat game.sym | grep "variable_name"

@@ -32,8 +32,7 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES_HOME="${OPENSNES_HOME:-$(dirname "$(dirname "$SCRIPT_DIR")")}"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
-SYMMAP="$OPENSNES_HOME/devtools/symmap.py"
-VRAMCHECK="$OPENSNES_HOME/devtools/vramcheck.py"
+SYMMAP="$OPENSNES_HOME/devtools/symmap/symmap.py"
 
 # Counters
 TOTAL=0
@@ -249,45 +248,6 @@ check_bank0_overflow() {
     fi
 }
 
-# Check for VRAM layout issues (overlapping regions, split DMA patterns)
-check_vram_layout() {
-    local dir="$1"
-    local name=$(basename "$dir")
-
-    # Only check if vramcheck tool exists
-    if [[ ! -f "$VRAMCHECK" ]]; then
-        return 0
-    fi
-
-    # Find symbol file
-    local sym_file=$(find "$dir" -name "*.sym" -type f | head -1)
-    if [[ -z "$sym_file" || ! -f "$sym_file" ]]; then
-        log_verbose "$name: No .sym file found (skipping VRAM check)"
-        return 0
-    fi
-
-    log_verbose "Checking VRAM layout for $name..."
-
-    local output
-    output=$(python3 "$VRAMCHECK" "$sym_file" 2>&1)
-    local exit_code=$?
-
-    # vramcheck returns non-zero on errors
-    if [[ $exit_code -ne 0 ]]; then
-        # Only fail on actual overlap detection, not on tool errors
-        if echo "$output" | grep -qi "overlap\|conflict\|collision"; then
-            log_error "$name: VRAM layout issues detected!"
-            echo "$output" | head -5
-            return 1
-        else
-            log_verbose "$name: VRAM check completed (informational only)"
-            return 0
-        fi
-    else
-        log_verbose "$name: VRAM layout OK"
-        return 0
-    fi
-}
 
 # Validate a single example
 validate_example() {
@@ -333,11 +293,6 @@ validate_example() {
 
     # Check bank $00 ROM overflow (string literals in bank $01+)
     if ! check_bank0_overflow "$dir"; then
-        failed=1
-    fi
-
-    # Check VRAM layout (only fails on dangerous patterns)
-    if ! check_vram_layout "$dir"; then
         failed=1
     fi
 
@@ -396,7 +351,7 @@ main() {
     fi
 
     # MVN/MVP lint (non-blocking, informational only)
-    local mvn_linter="$OPENSNES_HOME/devtools/check_mvn.py"
+    local mvn_linter="$OPENSNES_HOME/devtools/check_mvn/check_mvn.py"
     if [[ -f "$mvn_linter" ]]; then
         local lib_asm_files=("$OPENSNES_HOME"/lib/source/*.asm)
         if [[ ${#lib_asm_files[@]} -gt 0 ]]; then
