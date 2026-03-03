@@ -268,8 +268,8 @@ tiles.pic tiles.pal: tiles.png
 	$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
 # Mario sprites: 16x16, 4bpp, 16 colors
-mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
-	$(GFX4SNES) -s 16 -o 16 -u 16 -p -t bmp -i $<
+mario_sprite.pic mario_sprite.pal: mario_sprite.png
+	$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 ```
 
 | Flag | Meaning |
@@ -279,8 +279,7 @@ mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
 | `-u 16` | Use up to 16 unique colors |
 | `-p` | Generate palette file (`.pal`) |
 | `-m` | Generate tilemap file (`.map`) — only for backgrounds |
-| `-t bmp` | Input format is BMP (default is PNG) |
-| `-i` | Input file |
+| `-i` | Input file (PNG format, the default) |
 
 ### Why So Many Modules?
 
@@ -337,7 +336,7 @@ every tile lookup would return garbage.
 | `main.c` | All game logic: physics, collision, streaming, camera (~493 lines) |
 | `data.asm` | ROM assets: tiles, sprites, palettes, map data, collision table |
 | `tiles.png` | Background tileset source (8x8 tiles) |
-| `mario_sprite.bmp` | Sprite sheet source (16x16 frames) |
+| `mario_sprite.png` | Sprite sheet source (16x16 frames) |
 | `BG1.m16` | World tilemap (tile indices + flip/palette bits) |
 | `map_1_1.b16` | Per-tile collision properties (solid/empty) |
 | `overworld.it` | Music file (Impulse Tracker, not yet wired up) |

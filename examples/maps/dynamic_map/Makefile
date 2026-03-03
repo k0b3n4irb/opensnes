@@ -20,4 +20,4 @@ include $(OPENSNES)/make/common.mk
 
 # NOTE: Sprite .pic/.pal files are pre-converted from PVSnesLib because
 # gfx4snes cannot force 8bpp encoding (PVSnesLib uses gfx2snes -u 256).
-# The BMP source files are kept in res/ for reference.
+# The PNG source files are kept in res/ for reference.
