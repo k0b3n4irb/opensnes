@@ -1657,13 +1657,13 @@ test_variable_shift_u8_compound() {
 
     # Find the extub store: the 'and.w #$00FF' followed by 'sta N,s'
     local bg_store_offset
-    bg_store_offset=$(echo "$u8_body" | grep -oP '(?<=sta )\d+(?=,s)' | head -1)
+    bg_store_offset=$(echo "$u8_body" | grep -oE 'sta [0-9]+,s' | head -1 | sed 's/sta \([0-9]*\),s/\1/')
 
     # Find the lda between pha and pla (the shift count load)
     local pha_to_pla
     pha_to_pla=$(echo "$u8_body" | sed -n '/pha/,/pla/p')
     local shift_load_offset
-    shift_load_offset=$(echo "$pha_to_pla" | grep -oP '(?<=lda )\d+(?=,s)' | head -1)
+    shift_load_offset=$(echo "$pha_to_pla" | grep -oE 'lda [0-9]+,s' | head -1 | sed 's/lda \([0-9]*\),s/\1/')
 
     if [[ -z "$bg_store_offset" || -z "$shift_load_offset" ]]; then
         log_fail "$name: Could not extract stack offsets (store=$bg_store_offset, load=$shift_load_offset)"
