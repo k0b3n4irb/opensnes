@@ -180,6 +180,47 @@ dmaCopyCGram:
     rtl
 
 ;------------------------------------------------------------------------------
+; void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size)
+;
+; DMA palette data with explicit bank byte for data in banks other than 0.
+;
+; Stack layout (after PHP):
+;   5-6,s = size
+;   7-8,s = startColor
+;   9,s = bank (8-bit, padded to 16-bit push)
+;   10-11,s = source
+;------------------------------------------------------------------------------
+dmaCopyCGramBank:
+    php
+
+    sep #$20
+    lda 7,s                 ; startColor (low byte = color index)
+    sta.l $2121             ; REG_CGADD
+
+    rep #$20
+    lda 5,s                 ; size
+    sta.l $4305             ; DMA size
+
+    lda 11,s                ; source address (16-bit)
+    sta.l $4302             ; DMA source address
+
+    sep #$20
+    lda 9,s                 ; bank byte
+    sta.l $4304             ; DMA source bank
+
+    lda #$00
+    sta.l $4300             ; DMA mode: 1-register write (byte)
+
+    lda #$22
+    sta.l $4301             ; Destination: CGDATA ($2122)
+
+    lda #$01
+    sta.l $420B             ; Start DMA channel 0
+
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
 ; void dmaCopyOam(u8 *source, u16 size)
 ;
 ; Stack layout (after PHP):

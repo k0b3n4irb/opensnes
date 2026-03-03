@@ -7,7 +7,7 @@ Current state of the project and planned work.
 ## Current Status: v0.1.0 (Alpha)
 
 The SDK is functional for SNES game development. The compiler produces code
-31% faster than PVSnesLib+816-opt on our benchmark suite. 23 working examples
+31% faster than PVSnesLib+816-opt on our benchmark suite. 25 working examples
 cover all major subsystems.
 
 ---
@@ -55,11 +55,11 @@ cover all major subsystems.
 | `mosaic` | Mosaic pixelation effect |
 | `interrupt` | NMI/IRQ handlers |
 
-### Examples (23)
+### Examples (25)
 - **Text**: hello_world, text_test
 - **Sprites**: simple_sprite, animated_sprite, dynamic_sprite
 - **Backgrounds**: mode1, mode7, mode7_perspective, continuous_scroll
-- **Effects**: fading, hdma_wave, gradient_colors, mosaic, transparency, window
+- **Effects**: fading, hdma_wave, gradient_colors, parallax_scrolling, mosaic, transparency, window, transparent_window
 - **Input**: two_players
 - **Audio**: snesmod_music, snesmod_sfx
 - **Memory**: save_game, hirom_demo
@@ -93,7 +93,7 @@ cover all major subsystems.
 ### Short Term
 - [ ] SNESMOD HiROM support (soundbank addressing)
 - [ ] More compiler peephole optimizations
-- [ ] Additional examples: Mode 3 (256-color), parallax scrolling
+- [ ] Additional examples: Mode 3 (256-color)
 
 ### Medium Term
 - [ ] Game templates (platformer, shmup, RPG starter)

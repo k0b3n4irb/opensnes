@@ -62,6 +62,19 @@ void textInitEx(u16 tilemap_addr, u16 font_tile, u8 palette);
 void textLoadFont(u16 vram_addr);
 
 /**
+ * @brief Load font as 4bpp tiles for Mode 1 BGs
+ *
+ * Bitplanes 2-3 are zero; font uses colors 0-3 of its palette slot.
+ * Use this instead of textLoadFont() when text is on a 4bpp BG layer
+ * (e.g., BG1 or BG2 in Mode 1).
+ *
+ * Requires 'text4bpp' in LIB_MODULES.
+ *
+ * @param vram_addr VRAM word address for tiles
+ */
+void textLoadFont4bpp(u16 vram_addr);
+
+/**
  * @brief Set cursor position
  *
  * @param x Column (0-31 or 0-63)

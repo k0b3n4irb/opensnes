@@ -49,7 +49,7 @@ typedef void (*VBlankCallback)(void);
  * }
  * @endcode
  *
- * @note Keep callbacks short! VBlank time is limited (~2200 scanlines on NTSC)
+ * @note Keep callbacks short! VBlank time is limited (~2200 CPU cycles on NTSC)
  * @note Callback runs with interrupts disabled
  * @note The callback function must be in the same ROM bank as the main code (bank 0).
  *       For larger projects, use nmiSetBank() to specify the bank explicitly.

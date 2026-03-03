@@ -90,7 +90,7 @@ int main(void) {
 
     /* Set Mode 1, enable sprites only */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_OBJ;
+    setMainScreen(LAYER_OBJ);
 
     /* Enable display at full brightness */
     setScreenOn();
@@ -99,14 +99,9 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* Wait for auto-joypad read to complete */
-        while (REG_HVBJOY & 0x01) {}
+        pad0 = padHeld(0);
 
-        /* Read controller directly from hardware registers */
-        pad0 = REG_JOY1L | (REG_JOY1H << 8);
-
-        /* Disconnected controller reads as $FFFF */
-        if (pad0 != 0xFFFF && pad0 != 0) {
+        if (pad0 != 0) {
             /* Handle movement */
             if (pad0 & KEY_UP) {
                 if (monster.y >= SCREEN_TOP) monster.y--;

@@ -14,6 +14,7 @@
 # Binary executables (rebuilt from source)
 tools/font2snes/font2snes
 tools/gfx4snes/gfx4snes
+tools/img2snes/img2snes
 tools/smconv/smconv
 
 # Generated documentation
@@ -30,6 +31,7 @@ doc/
 *.pc7
 *.mp7
 *.bnk
+*.srm
 
 # WLA-DX
 linkfile
@@ -49,6 +51,9 @@ testlink
 .claude/
 CLAUDE.md
 tests/CLAUDE.md
+
+# Private game projects (never commit)
+projects/
 
 # Build directories
 build/

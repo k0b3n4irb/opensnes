@@ -315,6 +315,12 @@
 /** @brief Multiplication result high (R) */
 #define REG_RDMPYH      (*(vu8*)0x4217)
 
+/** @brief Joypad Port A data/strobe (R/W: read serial data, write bit 0 to latch) */
+#define REG_JOYA        (*(vu8*)0x4016)
+
+/** @brief Joypad Port B data (R: read serial data for port 2) */
+#define REG_JOYB        (*(vu8*)0x4017)
+
 /** @brief Joypad 1 data low (R) */
 #define REG_JOY1L       (*(vu8*)0x4218)
 

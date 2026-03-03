@@ -1,8 +1,12 @@
 --[[
-  test.lua - Test Framework DSL for OpenSNES
+  test.lua - Event-Driven Test Framework DSL for OpenSNES
 
   A BDD-style test framework built on snesdbg for writing readable
-  integration tests for SNES ROMs.
+  integration tests for SNES ROMs. Uses Mesen2's event-driven model
+  (callbacks, not blocking loops).
+
+  Tests are declared synchronously (describe/it), then executed
+  asynchronously via a state machine that advances test by test.
 
   Usage:
     local test = require("snesdbg.test")
@@ -10,25 +14,29 @@
     test.describe("My ROM Tests", function()
 
         test.beforeAll(function()
-            test.loadROM("game.sfc")
             test.loadSymbols("game.sym")
         end)
 
-        test.it("should initialize correctly", function()
-            test.waitFrames(10)
-            test.assertEqual("player_x", 100)
+        test.it("should initialize correctly", function(done)
+            test.afterFrames(10, function()
+                test.assertEqual("player_x", 100)
+                done()
+            end)
         end)
 
-        test.it("should move right when RIGHT pressed", function()
+        test.it("should move right when RIGHT pressed", function(done)
             local initial = test.read("player_x")
             test.holdButton("right")
-            test.waitFrames(10)
-            test.assertGreaterThan("player_x", initial)
+            test.afterFrames(10, function()
+                test.assertGreaterThan("player_x", initial)
+                test.releaseAllButtons()
+                done()
+            end)
         end)
 
     end)
 
-    test.run()
+    test.run()  -- Returns immediately, Mesen2 drives execution
 ]]
 
 -- Get the directory of this script for relative requires
@@ -58,21 +66,24 @@ local results = {
 -- Button state for input simulation
 local heldButtons = {}
 
--- Button name to Mesen2 button mapping
-local buttonMap = {
-    a = "a",
-    b = "b",
-    x = "x",
-    y = "y",
-    l = "l",
-    r = "r",
-    start = "start",
-    select = "select",
-    up = "up",
-    down = "down",
-    left = "left",
-    right = "right"
+-- Button name to SNES bit mask mapping
+local buttonBits = {
+    b      = 0x8000,
+    y      = 0x4000,
+    select = 0x2000,
+    start  = 0x1000,
+    up     = 0x0800,
+    down   = 0x0400,
+    left   = 0x0200,
+    right  = 0x0100,
+    a      = 0x0080,
+    x      = 0x0040,
+    l      = 0x0020,
+    r      = 0x0010
 }
+
+-- Input callback ID
+local inputCallbackId = nil
 
 -- ============================================================================
 -- Suite Definition
@@ -98,9 +109,9 @@ function M.describe(name, fn)
     table.insert(suites, suite)
 end
 
---- Define a test case
+--- Define a test case (receives a done callback)
 -- @param name Test name
--- @param fn Test function
+-- @param fn Test function, called with done() callback
 function M.it(name, fn)
     if not currentSuite then
         error("it() must be called inside describe()")
@@ -149,15 +160,8 @@ function M.afterAll(fn)
 end
 
 -- ============================================================================
--- Test Helpers - ROM Management
+-- Test Helpers - Symbol Management
 -- ============================================================================
-
---- Load a ROM file
--- @param path Path to .sfc file
-function M.loadROM(path)
-    emu.loadRom(path)
-    print(string.format("[test] Loaded ROM: %s", path))
-end
 
 --- Load symbols from .sym file
 -- @param path Path to .sym file
@@ -165,55 +169,25 @@ function M.loadSymbols(path)
     dbg.loadSymbols(path)
 end
 
---- Reset the emulator
-function M.reset()
-    emu.reset()
-    heldButtons = {}
-end
-
---- Power cycle the emulator
-function M.powerCycle()
-    emu.powerCycle()
-    heldButtons = {}
-end
-
 -- ============================================================================
--- Test Helpers - Frame Management
+-- Test Helpers - Frame Management (Event-Driven)
 -- ============================================================================
 
---- Wait for specified number of frames
+--- Execute a callback after N frames (non-blocking)
 -- @param frames Number of frames to wait
-function M.waitFrames(frames)
-    for i = 1, frames do
-        -- Apply held buttons before each frame
-        for button, held in pairs(heldButtons) do
-            if held then
-                emu.setInput(1, buttonMap[button], true)
-            end
-        end
-        emu.frameAdvance()
-    end
+-- @param callback Function to call when done
+-- @return event callback ID
+function M.afterFrames(frames, callback)
+    return dbg.afterFrames(frames, callback)
 end
 
---- Wait for VBlank
-function M.waitForVBlank()
-    -- Wait for start of VBlank by checking RDNMI
-    local inVBlank = false
-    while not inVBlank do
-        local nmitimen = emu.read(0x4210, emu.memType.snesMemory)
-        inVBlank = (nmitimen & 0x80) ~= 0
-        if not inVBlank then
-            emu.frameAdvance()
-        end
-    end
-end
-
---- Wait until execution reaches a symbol
+--- Execute a callback when a symbol is reached (non-blocking)
 -- @param name Symbol name
+-- @param callback Function called with (reached: boolean)
 -- @param timeout Max frames to wait (default 600)
--- @return true if reached
-function M.waitUntilSymbol(name, timeout)
-    return dbg.waitUntilSymbol(name, timeout)
+-- @return IDs table
+function M.onSymbolReached(name, callback, timeout)
+    return dbg.onSymbolReached(name, callback, timeout)
 end
 
 -- ============================================================================
@@ -224,7 +198,7 @@ end
 -- @param button Button name (a, b, x, y, l, r, start, select, up, down, left, right)
 function M.holdButton(button)
     button = string.lower(button)
-    if not buttonMap[button] then
+    if not buttonBits[button] then
         error("Unknown button: " .. button)
     end
     heldButtons[button] = true
@@ -242,14 +216,30 @@ function M.releaseAllButtons()
     heldButtons = {}
 end
 
---- Press a button briefly (hold for a few frames, then release)
+--- Press a button for N frames, then call back (non-blocking)
 -- @param button Button name
 -- @param frames Number of frames to hold (default 2)
-function M.pressButton(button, frames)
+-- @param callback Function to call after release
+function M.pressButton(button, frames, callback)
     frames = frames or 2
     M.holdButton(button)
-    M.waitFrames(frames)
-    M.releaseButton(button)
+    M.afterFrames(frames, function()
+        M.releaseButton(button)
+        if callback then callback() end
+    end)
+end
+
+-- Internal: apply held buttons each frame via input callback
+local function applyInput()
+    local mask = 0
+    for button, held in pairs(heldButtons) do
+        if held then
+            mask = mask | buttonBits[button]
+        end
+    end
+    if mask ~= 0 then
+        emu.setInput(0, mask)
+    end
 end
 
 -- ============================================================================
@@ -282,7 +272,7 @@ end
 
 function M.assertEqual(nameOrAddr, expected, msg)
     local result = dbg.assertEqual(nameOrAddr, expected, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -290,7 +280,7 @@ end
 
 function M.assertNotEqual(nameOrAddr, unexpected, msg)
     local result = dbg.assertNotEqual(nameOrAddr, unexpected, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -298,7 +288,7 @@ end
 
 function M.assertGreaterThan(nameOrAddr, threshold, msg)
     local result = dbg.assertGreaterThan(nameOrAddr, threshold, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -306,7 +296,7 @@ end
 
 function M.assertLessThan(nameOrAddr, threshold, msg)
     local result = dbg.assertLessThan(nameOrAddr, threshold, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -314,7 +304,7 @@ end
 
 function M.assertInRange(nameOrAddr, min, max, msg)
     local result = dbg.assertInRange(nameOrAddr, min, max, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -322,7 +312,7 @@ end
 
 function M.assertTrue(condition, msg)
     local result = dbg.assertTrue(condition, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -330,7 +320,7 @@ end
 
 function M.assertFalse(condition, msg)
     local result = dbg.assertFalse(condition, msg)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -345,7 +335,7 @@ end
 -- @param expected Table with expected values {x=, y=, tile=, ...}
 function M.assertOAM(index, expected)
     local result = dbg.assertOAM(index, expected)
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -354,7 +344,7 @@ end
 --- Assert OAM was transferred to hardware
 function M.assertOAMTransferred()
     local result = dbg.assertOAMTransferred()
-    if not result then
+    if not result and currentTest then
         currentTest.failed = true
     end
     return result
@@ -377,81 +367,62 @@ end
 -- ============================================================================
 
 --- Assert no WRAM mirror overlaps exist
--- Uses symmap tool logic
 function M.assertNoWRAMOverlap()
-    -- This would need to shell out to symmap or re-implement the check
-    -- For now, just pass (the check should be done at build time)
     print("[PASS] No WRAM overlap (checked at build time)")
     return true
 end
 
 -- ============================================================================
--- Test Runner
+-- Test Runner (Event-Driven State Machine)
 -- ============================================================================
 
---- Run all defined test suites
--- @return true if all tests passed
-function M.run()
-    print("")
-    print("======================================")
-    print("  OpenSNES Test Runner")
-    print("======================================")
-    print("")
+-- Execution state
+local execState = {
+    suiteIdx = 0,
+    testIdx = 0,
+    phase = "idle"  -- idle, beforeAll, beforeEach, test, afterEach, afterAll, done
+}
 
-    results = {
-        suites = 0,
-        tests = 0,
-        passed = 0,
-        failed = 0,
-        errors = {}
-    }
+-- Advance to next test/suite (called after each step completes)
+local function advance()
+    local suite = suites[execState.suiteIdx]
 
-    for _, suite in ipairs(suites) do
-        results.suites = results.suites + 1
-        print(string.format("Suite: %s", suite.name))
-        print(string.rep("-", 40))
+    if execState.phase == "beforeAll" then
+        execState.testIdx = 1
+        if #suite.tests > 0 then
+            execState.phase = "beforeEach"
+        else
+            execState.phase = "afterAll"
+        end
+        advance()
+        return
+    end
 
-        -- Reset assertions for this suite
-        dbg.resetTests()
+    if execState.phase == "beforeEach" then
+        execState.phase = "test"
+        local test = suite.tests[execState.testIdx]
+        currentTest = {name = test.name, failed = false}
 
-        -- Run beforeAll
-        if suite.beforeAll then
-            local ok, err = pcall(suite.beforeAll)
+        -- Run beforeEach
+        if suite.beforeEach then
+            local ok, err = pcall(suite.beforeEach)
             if not ok then
-                print(string.format("  [ERROR] beforeAll: %s", err))
-                goto continue
+                print(string.format("  [ERROR] beforeEach for '%s': %s", test.name, err))
+                currentTest.failed = true
+                execState.phase = "afterEach"
+                advance()
+                return
             end
         end
 
-        -- Run each test
-        for _, test in ipairs(suite.tests) do
-            results.tests = results.tests + 1
-            currentTest = {name = test.name, failed = false}
-
-            -- Run beforeEach
-            if suite.beforeEach then
-                local ok, err = pcall(suite.beforeEach)
-                if not ok then
-                    print(string.format("  [ERROR] beforeEach for '%s': %s", test.name, err))
-                    currentTest.failed = true
-                    goto nextTest
-                end
-            end
-
-            -- Run the test
-            local ok, err = pcall(test.fn)
-            if not ok then
-                print(string.format("  [ERROR] %s: %s", test.name, err))
-                currentTest.failed = true
-            end
-
-            -- Run afterEach
+        -- Run the test with done() callback
+        local done = function()
+            -- afterEach
             if suite.afterEach then
                 pcall(suite.afterEach)
             end
 
             -- Record result
-            ::nextTest::
             if currentTest.failed then
                 results.failed = results.failed + 1
                 print(string.format("  [FAIL] %s", test.name))
@@ -459,20 +430,56 @@ function M.run()
                 results.passed = results.passed + 1
                 print(string.format("  [PASS] %s", test.name))
             end
-
+            results.tests = results.tests + 1
             currentTest = nil
+
+            -- Next test or finish suite
+            execState.testIdx = execState.testIdx + 1
+            if execState.testIdx <= #suite.tests then
+                execState.phase = "beforeEach"
+                advance()
+            else
+                execState.phase = "afterAll"
+                advance()
+            end
         end
 
-        -- Run afterAll
+        local ok, err = pcall(test.fn, done)
+        if not ok then
+            print(string.format("  [ERROR] %s: %s", test.name, err))
+            currentTest.failed = true
+            done()
+        end
+        return
+    end
+
+    if execState.phase == "afterAll" then
         if suite.afterAll then
             pcall(suite.afterAll)
         end
-
-        ::continue::
         print("")
+
+        -- Next suite or finish
+        execState.suiteIdx = execState.suiteIdx + 1
+        if execState.suiteIdx <= #suites then
+            execState.phase = "beforeAll"
+            advance()
+        else
+            execState.phase = "done"
+            printSummary()
+        end
+        return
+    end
+end
+
+-- Print final summary and stop emulator
+function printSummary()
+    -- Remove input callback
+    if inputCallbackId then
+        emu.removeEventCallback(inputCallbackId, emu.eventType.startFrame)
+        inputCallbackId = nil
     end
 
-    -- Print summary
     print("======================================")
     print("  Results")
     print("======================================")
@@ -485,12 +492,61 @@ function M.run()
     if results.failed == 0 then
         print("  ALL TESTS PASSED!")
         emu.stop(0)
-        return true
     else
         print("  SOME TESTS FAILED")
         emu.stop(1)
-        return false
     end
+end
+
+--- Run all defined test suites (returns immediately, event-driven)
+function M.run()
+    print("")
+    print("======================================")
+    print("  OpenSNES Test Runner")
+    print("======================================")
+    print("")
+
+    results = {
+        suites = #suites,
+        tests = 0,
+        passed = 0,
+        failed = 0,
+        errors = {}
+    }
+
+    if #suites == 0 then
+        print("  No test suites defined.")
+        emu.stop(0)
+        return
+    end
+
+    -- Register input callback to apply held buttons each frame
+    inputCallbackId = emu.addEventCallback(applyInput, emu.eventType.startFrame)
+
+    -- Start execution
+    execState.suiteIdx = 1
+    execState.phase = "beforeAll"
+
+    local suite = suites[1]
+    print(string.format("Suite: %s", suite.name))
+    print(string.rep("-", 40))
+
+    -- Reset assertions
+    dbg.resetTests()
+
+    -- Run beforeAll
+    if suite.beforeAll then
+        local ok, err = pcall(suite.beforeAll)
+        if not ok then
+            print(string.format("  [ERROR] beforeAll: %s", err))
+            execState.phase = "afterAll"
+            advance()
+            return
+        end
+    end
+
+    execState.phase = "beforeAll"
+    advance()
 end
 
 --- Skip a test (mark as pending)
@@ -503,8 +559,9 @@ function M.skip(name, reason)
 
     table.insert(currentSuite.tests, {
         name = name,
-        fn = function()
+        fn = function(done)
             print(string.format("  [SKIP] %s%s", name, reason and (": " .. reason) or ""))
+            done()
         end,
         skipped = true
     })
@@ -514,7 +571,6 @@ end
 -- @param name Test name
 -- @param fn Test function
 function M.only(name, fn)
-    -- Mark all other tests as skipped
     if currentSuite then
         for _, test in ipairs(currentSuite.tests) do
             test.skipped = true

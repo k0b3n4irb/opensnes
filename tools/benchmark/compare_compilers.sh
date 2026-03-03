@@ -23,7 +23,7 @@ OPENSNES_HOME="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PVSNESLIB_HOME="${PVSNESLIB_HOME:-$HOME/workspace/pvsneslib}"
 
 BENCH_SRC="${OPENSNES_HOME}/tests/benchmark/bench_functions.c"
-CYCLECOUNT="${OPENSNES_HOME}/tools/cyclecount/cyclecount.py"
+CYCLECOUNT="${OPENSNES_HOME}/devtools/cyclecount.py"
 
 CC65816="${OPENSNES_HOME}/bin/cc65816"
 TCC816="${PVSNESLIB_HOME}/devkitsnes/bin/816-tcc"

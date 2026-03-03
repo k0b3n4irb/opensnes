@@ -73,6 +73,9 @@
 /* Interrupts */
 #include <snes/interrupt.h>
 
+/* System variables (crt0.asm exports) */
+#include <snes/system.h>
+
 /* Mode 7 */
 #include <snes/mode7.h>
 
@@ -88,6 +91,15 @@
 /* Mosaic Effects */
 #include <snes/mosaic.h>
 
+/* Map Engine */
+#include <snes/map.h>
+
+/* Object Engine */
+#include <snes/object.h>
+
+/* Debug Utilities */
+#include <snes/debug.h>
+
 /*============================================================================
  * Optional Headers (include separately if needed)
  *============================================================================*/
@@ -98,5 +110,6 @@
 /* Animation: #include <snes/animation.h> */
 /* Collision: #include <snes/collision.h> */
 /* Entity: #include <snes/entity.h> */
+/* LZSS: #include <snes/lzss.h> */
 
 #endif /* OPENSNES_H */

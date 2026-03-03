@@ -91,6 +91,8 @@ USE_LIB     ?= 0
 #
 #   sprite  -> dma      (OAM buffer is DMA'd to hardware in NMI handler)
 #   text    -> dma      (Font loading uses DMA transfers)
+#   object  -> map      (Object collision uses map tile lookups)
+#   map     -> dma      (Map VBlank updates use DMA transfers)
 #   snesmod -> console  (SNESMOD requires NMI handling from console)
 #   hdma    -> (none)   (Standalone, but often used with console for VBlank)
 #
@@ -104,6 +106,7 @@ USE_LIB     ?= 0
 #   Basic game:     console sprite dma input background
 #   With audio:     console sprite dma input snesmod
 #   With effects:   console sprite dma hdma
+#   Platformer:     console sprite dma input background map object
 #------------------------------------------------------------------------------
 
 # Library directory (select lorom or hirom based on USE_HIROM)
@@ -184,11 +187,13 @@ USE_HIROM      ?= 0
 # The previous $21/$23 values incorrectly claimed coprocessor presence,
 # causing emulators to misdetect the ROM type.
 
-# Select header template based on ROM mode
+# Select header template and memmap include based on ROM mode
 ifeq ($(USE_HIROM),1)
 HDR_TEMPLATE := $(TEMPLATES)/hdr_hirom.asm
+MEMMAP_INC   := memmap_hirom.inc
 else
 HDR_TEMPLATE := $(TEMPLATES)/hdr.asm
+MEMMAP_INC   := memmap.inc
 endif
 
 #------------------------------------------------------------------------------
@@ -205,7 +210,27 @@ LIB_MODULES += snesmod
 endif
 
 #------------------------------------------------------------------------------
-# Library Object Resolution (must come after SNESMOD module addition)
+# Module Dependency Auto-Resolution
+#------------------------------------------------------------------------------
+# Automatically adds transitive dependencies so users don't need to list them
+# manually. For example, LIB_MODULES = sprite auto-adds dma.
+# Three nested _resolve_one calls handle chains up to 3 deep.
+# $(sort) deduplicates — existing explicit deps are harmless.
+
+_DEP_sprite    := dma sprite_oamset
+_DEP_text      := dma
+_DEP_text4bpp  := dma
+_DEP_object    := map
+_DEP_map       := dma
+_DEP_snesmod   := console
+
+_resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
+_resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
+
+LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
+
+#------------------------------------------------------------------------------
+# Library Object Resolution (must come after dependency resolution)
 #------------------------------------------------------------------------------
 # Links both C objects (.o) and assembly objects (-asm.o) if they exist.
 
@@ -226,8 +251,11 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 # Generate header filenames from graphics sources (output to current dir)
 GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
 
-# Object files
-OBJS := combined.obj
+# Object files from C sources (one .o per .c file)
+C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
+
+# All object files
+OBJS := combined.obj $(C_OBJS) data_init_end.o
 
 #------------------------------------------------------------------------------
 # Build Targets
@@ -300,25 +328,27 @@ endef
 $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 
 #------------------------------------------------------------------------------
-# C Compilation
+# C Compilation (multi-file support)
 #------------------------------------------------------------------------------
 
-# cc65816 (cproc+QBE): compile C to WLA-DX assembly
-# The QBE w65816 backend now emits WLA-DX compatible assembly directly
+# cc65816 (cproc+QBE): compile each C source to a standalone WLA-DX object.
+# Pipeline: file.c → file.c.asm (compiler) → file.c.wrap.asm (+ memmap) → file.c.o
 #
-# LIMITATION: Only a single C source file (main.c) is supported by this pipeline.
-# The build system compiles all files listed in CSRC together into a single
-# main.c.asm output. While CSRC can technically contain multiple files, only
-# main.c is used as the primary entry point.
+# Each .c file is compiled independently and linked as a separate object.
+# Cross-file references (function calls, extern variables) are resolved by
+# the WLA-DX linker — labels are globally visible by default.
 #
-# Workarounds for multi-file projects:
-#   1. Use additional assembly files via ASMSRC variable
-#   2. #include other C files directly into main.c
-#   3. Implement additional logic in assembly and link via ASMSRC
+# CSRC defaults to main.c for backward compatibility. Multi-file projects
+# simply list all C sources: CSRC := main.c engine/player.c ui/hud.c
 #
-main.c.asm: $(CSRC) $(GFX_HEADERS)
-	@echo "[CC] $(CSRC)"
-	@$(CC) $(ALL_CFLAGS) $(CSRC) -o $@
+# Order-only prerequisite on combined.asm ensures SMCONV/GFX conversion
+# completes before C compilation starts (prevents parallel build races with
+# multi-target rules like soundbank.asm + soundbank.h).
+%.c.o: %.c $(GFX_HEADERS) | combined.asm
+	@echo "[CC] $<"
+	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
+	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $*.c.asm; } > $*.c.wrap.asm
+	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $*.c.wrap.asm
 
 #------------------------------------------------------------------------------
 # Assembly Generation
@@ -349,9 +379,22 @@ else
 SOUNDBANK_DEP :=
 endif
 
-# Combine all assembly sources
-# Order: crt0 -> runtime -> data_init_start -> compiled C -> data_init_end
-combined.asm: $(TEMPLATES)/crt0.asm main.c.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP)
+# Extract .incbin file paths from ASMSRC and add as dependencies.
+# This ensures touching a .pic/.pal/.map file triggers a rebuild
+# without needing `make clean`.
+ifneq ($(ASMSRC),)
+INCBIN_DEPS := $(shell grep -hi '\.incbin' $(ASMSRC) 2>/dev/null | \
+    sed -n 's/.*\.incbin[[:space:]]*"\([^"]*\)".*/\1/p' | sort -u)
+else
+INCBIN_DEPS :=
+endif
+
+# Combine bootstrap assembly sources (C code is in separate .o files)
+# Order: crt0 -> runtime -> data_init_start -> [ASMSRC] -> [soundbank]
+# Note: data_init_end is compiled as a separate object and linked last,
+# ensuring all APPENDTO ".data_init" records (from C and lib objects)
+# precede the end marker.
+combined.asm: $(TEMPLATES)/crt0.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP) $(INCBIN_DEPS)
 	@echo "[ASM] Combining sources..."
 	@cat $(TEMPLATES)/crt0.asm > $@
 	@cat $(RUNTIME) >> $@
@@ -359,7 +402,6 @@ ifeq ($(USE_LIB),0)
 	@cat $(OAM_HELPERS) >> $@
 endif
 	@cat $(TEMPLATES)/data_init_start.asm >> $@
-	@cat main.c.asm >> $@
 ifneq ($(ASMSRC),)
 	@for f in $(ASMSRC); do cat $$f >> $@; done
 endif
@@ -368,7 +410,6 @@ ifneq ($(SOUNDBANK_SRC),)
 	@cat $(SOUNDBANK_OUT).asm >> $@
 endif
 endif
-	@cat $(TEMPLATES)/data_init_end.asm >> $@
 
 #------------------------------------------------------------------------------
 # Linking
@@ -386,11 +427,21 @@ combined.obj: combined.asm
 	@echo "[AS] $<"
 	@$(AS) $(ASFLAGS) -o $@ $<
 
+# End marker for initialized data — compiled as a separate object and linked
+# last so that all APPENDTO ".data_init" sections from C and lib objects are
+# placed before the sentinel (addr=0, size=0).
+data_init_end.o: $(TEMPLATES)/data_init_end.asm $(TEMPLATES)/$(MEMMAP_INC)
+	@echo "[AS] data_init_end"
+	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(TEMPLATES)/data_init_end.asm; } > data_init_end.wrap.asm
+	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ data_init_end.wrap.asm
+
 # Create linker file
+# Order: combined.obj -> C objects -> lib objects -> data_init_end.o (must be last)
 # Note: On MSYS2/Windows, wlalink needs Windows-style paths, so we use cygpath -m
-linkfile: combined.obj
+linkfile: combined.obj $(C_OBJS) data_init_end.o
 	@echo "[objects]" > $@
 	@echo "combined.obj" >> $@
+	@for obj in $(C_OBJS); do echo "$$obj" >> $@; done
 ifeq ($(USE_LIB),1)
 ifeq ($(OS),Windows_NT)
 	@for obj in $(LIB_OBJS); do echo "$$(cygpath -m $$obj)" >> $@; done
@@ -398,9 +449,10 @@ else
 	@for obj in $(LIB_OBJS); do echo "$$obj" >> $@; done
 endif
 endif
+	@echo "data_init_end.o" >> $@
 
 # Link to final ROM
-$(TARGET): combined.obj linkfile
+$(TARGET): combined.obj $(C_OBJS) data_init_end.o linkfile
 	@echo "[LD] $@"
 	@$(LD) -S linkfile $@
 
@@ -410,7 +462,9 @@ $(TARGET): combined.obj linkfile
 
 clean:
 	@echo "Cleaning $(TARGET)..."
-	@rm -f *.c.asm combined.asm project_hdr.asm *.obj linkfile *.sym $(TARGET)
+	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
+	@rm -f data_init_end.wrap.asm data_init_end.o
+	@rm -f combined.asm project_hdr.asm *.obj linkfile *.sym $(TARGET)
 ifneq ($(GFX_HEADERS),)
 	@rm -f $(GFX_HEADERS)
 endif

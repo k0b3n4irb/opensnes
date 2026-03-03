@@ -16,11 +16,9 @@ int main(void) {
     setMode(BG_MODE0, 0);
 
     /* Palette: color 0 = dark blue, color 1 = white */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x28;
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;
-    REG_TM = TM_BG1;
+    setColor(0, 0x2800);
+    setColor(1, RGB(31, 31, 31));
+    setMainScreen(LAYER_BG1);
 
     /* STEP 2: textInit (confirmed working) */
     textInit();

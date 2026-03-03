@@ -23,23 +23,10 @@ extern u8 tiles[], tiles_end[];
 extern u8 tilemap[], tilemap_end[];
 extern u8 palette[], palette_end[];
 
-/* Wait for a button press */
+/* Wait for a button press (release then press) */
 static void wait_for_key(void) {
-    u16 pad;
-
-    /* Wait for all buttons to be released first */
-    do {
-        WaitForVBlank();
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-    } while (pad != 0 && pad != 0xFFFF);
-
-    /* Now wait for a button press */
-    do {
-        WaitForVBlank();
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-    } while (pad == 0 || pad == 0xFFFF);
+    while (padHeld(0) != 0) WaitForVBlank();
+    while (padHeld(0) == 0) WaitForVBlank();
 }
 
 /* Fade out (light to black) */
@@ -48,9 +35,8 @@ static void fade_out(u8 speed) {
     u8 i;
 
     for (brightness = 15; brightness >= 0; brightness--) {
-        REG_INIDISP = (u8)brightness;
+        setBrightness((u8)brightness);
 
-        /* Wait multiple frames based on speed */
         for (i = 0; i < speed; i++) {
             WaitForVBlank();
         }
@@ -63,9 +49,8 @@ static void fade_in(u8 speed) {
     u8 i;
 
     for (brightness = 0; brightness <= 15; brightness++) {
-        REG_INIDISP = brightness;
+        setBrightness(brightness);
 
-        /* Wait multiple frames based on speed */
         for (i = 0; i < speed; i++) {
             WaitForVBlank();
         }

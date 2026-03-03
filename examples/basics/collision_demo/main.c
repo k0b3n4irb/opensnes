@@ -16,6 +16,8 @@
 #include <snes.h>
 #include <snes/collision.h>
 
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
+
 /*============================================================================
  * Game Objects
  *============================================================================*/
@@ -23,6 +25,7 @@
 #define PLAYER_SIZE 8
 #define ENEMY_SIZE  8
 #define NUM_ENEMIES 4
+#define PLAYER_SPEED 2
 
 /* Player position */
 static s16 player_x, player_y;
@@ -102,6 +105,12 @@ static const u8 empty_tile[] = {
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
+/* BG palette: black background, gray walls */
+static const u8 bg_palette[] = {
+    0x00, 0x00,  /* Color 0: Black (background) */
+    0x94, 0x52,  /* Color 1: Gray (walls) */
+};
+
 /*============================================================================
  * Sprite Palette
  *============================================================================*/
@@ -133,57 +142,20 @@ static const u8 collision_palette[] = {
  *============================================================================*/
 
 static void load_graphics(void) {
-    u16 i;
+    setScreenOff();
 
-    REG_INIDISP = 0x80;  /* Force blank */
+    /* Load BG tiles via DMA (tile 0 = empty, tile 1 = wall) */
+    dmaCopyVram((u8 *)empty_tile, 0x0000, 16);
+    dmaCopyVram((u8 *)wall_tile, 0x0008, 16);
 
-    /* Load BG tiles (tile 0 = empty, tile 1 = wall) */
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
+    /* Load sprite tiles via DMA at $4000 */
+    dmaCopyVram((u8 *)player_tile, 0x4000, 32);
+    dmaCopyVram((u8 *)enemy_tile, 0x4010, 32);
 
-    /* Tile 0: empty */
-    for (i = 0; i < 16; i += 2) {
-        REG_VMDATAL = empty_tile[i];
-        REG_VMDATAH = empty_tile[i + 1];
-    }
-    /* Tile 1: wall */
-    for (i = 0; i < 16; i += 2) {
-        REG_VMDATAL = wall_tile[i];
-        REG_VMDATAH = wall_tile[i + 1];
-    }
-
-    /* Load sprite tiles at $4000 */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x40;
-
-    /* Tile 0: player (blue) */
-    for (i = 0; i < 32; i += 2) {
-        REG_VMDATAL = player_tile[i];
-        REG_VMDATAH = player_tile[i + 1];
-    }
-    /* Tile 1: enemy (red) */
-    for (i = 0; i < 32; i += 2) {
-        REG_VMDATAL = enemy_tile[i];
-        REG_VMDATAH = enemy_tile[i + 1];
-    }
-
-    /* Load sprite palette 0 (CGRAM 128) */
-    REG_CGADD = 128;
-    for (i = 0; i < 32; i++) {
-        REG_CGDATA = sprite_palette[i];
-    }
-
-    /* Load sprite palette 1 (CGRAM 144) for collision indicator */
-    REG_CGADD = 144;
-    for (i = 0; i < 32; i++) {
-        REG_CGDATA = collision_palette[i];
-    }
-
-    /* Load BG palette */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* Color 0: Black (background) */
-    REG_CGDATA = 0x94; REG_CGDATA = 0x52;  /* Color 1: Gray (walls) */
+    /* Load palettes via DMA */
+    dmaCopyCGram((u8 *)sprite_palette, 128, 32);
+    dmaCopyCGram((u8 *)collision_palette, 144, 32);
+    dmaCopyCGram((u8 *)bg_palette, 0, 4);
 }
 
 static void draw_tilemap(void) {
@@ -223,19 +195,26 @@ static void draw_tilemap(void) {
 static void update_sprites(void) {
     u8 i;
     u8 palette;
+    u16 offset;
 
-    /* Update player sprite - green if colliding, blue if not */
-    palette = (collision_flags != 0) ? 1 : 0;  /* Palette 1 = red/green zone */
-    oamSet(0, player_x, player_y, 0, palette, 3, 0);
+    /* Player sprite (ID 0) - green if colliding, white if not */
+    palette = (collision_flags != 0) ? 1 : 0;
+    oamMemory[0] = (u8)player_x;
+    oamMemory[1] = (u8)player_y;
+    oamMemory[2] = 0;  /* tile 0 */
+    oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
 
-    /* Update enemy sprites */
+    /* Enemy sprites (IDs 1-4) */
     for (i = 0; i < NUM_ENEMIES; i++) {
+        offset = (i + 1) << 2;
         palette = (collision_flags & (1 << i)) ? 1 : 0;
-        oamSet(i + 1, enemy_x[i], enemy_y[i], 1, palette, 2, 0);
+        oamMemory[offset] = (u8)enemy_x[i];
+        oamMemory[offset + 1] = (u8)enemy_y[i];
+        oamMemory[offset + 2] = 1;  /* tile 1 */
+        oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
     }
 
-    /* Hide remaining sprites */
-    oamHide(5);
+    oam_update_flag = 1;
 }
 
 static void check_collisions(void) {
@@ -257,7 +236,7 @@ static void check_collisions(void) {
         enemy_box[i].height = ENEMY_SIZE;
 
         if (collideRect(&player_box, &enemy_box[i])) {
-            collision_flags = collision_flags | (1 << i);
+            collision_flags |= (1 << i);
         }
     }
 }
@@ -299,12 +278,12 @@ int main(void) {
     draw_tilemap();
 
     /* Configure BG1 */
-    REG_BG1SC = 0x04;  /* Tilemap at $0400, 32x32 */
-    REG_BG12NBA = 0x00;
+    bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
+    bgSetGfxPtr(0, 0x0000);
     REG_TM = TM_BG1 | TM_OBJ;
 
     /* Object settings */
-    REG_OBJSEL = 0x02;  /* 8x8/16x16, tiles at $4000 */
+    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
 
     /* Initialize player position - tile (7,7) = open area below center platform */
     player_x = MAP_OFFSET_X + 56;
@@ -323,6 +302,10 @@ int main(void) {
     enemy_x[3] = MAP_OFFSET_X + 104;  /* tile (13,11) - bottom-right open area */
     enemy_y[3] = MAP_OFFSET_Y + 88;
 
+    /* Show sprites 0-4 (clear X high bits set by oamClear) */
+    oamMemory[512] = 0x00;  /* Sprites 0-3: X high=0, size=small */
+    oamMemory[513] = oamMemory[513] & 0xFC;  /* Sprite 4: clear X high bit */
+
     /* Initial update */
     check_collisions();
     update_sprites();
@@ -334,45 +317,32 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* Read input */
         pad = padHeld(0);
-
-        /* Calculate new position */
         new_x = player_x;
         new_y = player_y;
 
-        if (pad & KEY_LEFT) {
-            new_x = player_x - 2;
-        }
-        if (pad & KEY_RIGHT) {
-            new_x = player_x + 2;
-        }
-        if (pad & KEY_UP) {
-            new_y = player_y - 2;
-        }
-        if (pad & KEY_DOWN) {
-            new_y = player_y + 2;
-        }
+        if (pad & KEY_LEFT)  new_x = player_x - PLAYER_SPEED;
+        if (pad & KEY_RIGHT) new_x = player_x + PLAYER_SPEED;
+        if (pad & KEY_UP)    new_y = player_y - PLAYER_SPEED;
+        if (pad & KEY_DOWN)  new_y = player_y + PLAYER_SPEED;
 
-        /* Check wall collision before moving */
+        /* Wall collision */
         if (!check_wall_collision(new_x, new_y)) {
             player_x = new_x;
             player_y = new_y;
         } else {
-            /* Try moving just X */
             if (!check_wall_collision(new_x, player_y)) {
                 player_x = new_x;
             }
-            /* Try moving just Y */
             if (!check_wall_collision(player_x, new_y)) {
                 player_y = new_y;
             }
         }
 
-        /* Check sprite collisions */
+        /* Sprite collisions */
         check_collisions();
 
-        /* Update display */
+        /* Update all sprites via direct buffer writes */
         update_sprites();
     }
 

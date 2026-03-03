@@ -29,8 +29,34 @@ u16 mul_by_10(u16 x) { return x * 10; }
 /* Multiply by variable (must use __mul16) */
 u16 mul_var(u16 x, u16 y) { return x * y; }
 
-/* Multiply by non-special constant (must use __mul16) */
+/* Multiply by non-special constant (inline shift+add) */
 u16 mul_by_13(u16 x) { return x * 13; }
+
+/* Power-of-2 multiply (should be inline shifts, NOT __mul16) */
+u16 mul_by_64(u16 x) { return x * 64; }
+u16 mul_by_128(u16 x) { return x * 128; }
+u16 mul_by_256(u16 x) { return x * 256; }
+u16 mul_by_1024(u16 x) { return x * 1024; }
+u16 mul_by_2048(u16 x) { return x * 2048; }
+
+/* Composite constant multiply: base * 2^k, base in [3..15] */
+u16 mul_by_24(u16 x) { return x * 24; }    /* 3 * 8 */
+u16 mul_by_48(u16 x) { return x * 48; }    /* 3 * 16 */
+u16 mul_by_20(u16 x) { return x * 20; }    /* 5 * 4 */
+u16 mul_by_40(u16 x) { return x * 40; }    /* 5 * 8 */
+u16 mul_by_36(u16 x) { return x * 36; }    /* 9 * 4 */
+u16 mul_by_60(u16 x) { return x * 60; }    /* 15 * 4 */
+u16 mul_by_96(u16 x) { return x * 96; }    /* 3 * 32 */
+
+/* Power-of-2 divide (should be inline shifts, NOT __div16) */
+u16 div_by_32(u16 x) { return x / 32; }
+u16 div_by_64(u16 x) { return x / 64; }
+u16 div_by_1024(u16 x) { return x / 1024; }
+
+/* Power-of-2 modulo (should be inline AND, NOT __mod16) */
+u16 mod_by_32(u16 x) { return x % 32; }
+u16 mod_by_64(u16 x) { return x % 64; }
+u16 mod_by_1024(u16 x) { return x % 1024; }
 
 int main(void) {
     u16 a = 7;

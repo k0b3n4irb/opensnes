@@ -21,8 +21,7 @@
 #include <snes/dma.h>
 #include <snes/text.h>
 
-// Access the raw OAM hardware buffer from C
-extern u8 oamMemory[];
+// oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>)
 
 // Test sprite tile data (8x8, 4bpp = 32 bytes)
 const u8 testSpriteTiles[] = {
@@ -313,6 +312,97 @@ void test_oambuffer_struct(void) {
 }
 
 // =============================================================================
+// Test: oamSetFast — verify identical output to oamSet
+// =============================================================================
+void test_oam_set_fast_basic(void) {
+    u8 ref_x, ref_y, ref_tile, ref_attr, ref_ht;
+
+    // Use oamSet to produce reference output
+    oamClear();
+    oamSet(0, 100, 80, 5, 2, 3, 0);
+    ref_x = oamMemory[0];
+    ref_y = oamMemory[1];
+    ref_tile = oamMemory[2];
+    ref_attr = oamMemory[3];
+    ref_ht = oamMemory[512];
+
+    // Use oamSetFast and compare
+    oamClear();
+    oamSetFast(0, 100, 80, 5, 2, 3, 0);
+
+    TEST("fast: X lo", oamMemory[0] == ref_x);
+    TEST("fast: Y", oamMemory[1] == ref_y);
+    TEST("fast: tile", oamMemory[2] == ref_tile);
+    TEST("fast: attr", oamMemory[3] == ref_attr);
+    TEST("fast: hitbl", oamMemory[512] == ref_ht);
+}
+
+// =============================================================================
+// Test: oamSetFast — X high bit, flips, tile 256+
+// =============================================================================
+void test_oam_set_fast_xhi_flip(void) {
+    u8 ref[4];
+
+    // Test X > 255 with flips
+    oamClear();
+    oamSet(1, 300, 50, 256, 5, 1, OBJ_FLIPX | OBJ_FLIPY);
+    ref[0] = oamMemory[4]; ref[1] = oamMemory[5];
+    ref[2] = oamMemory[6]; ref[3] = oamMemory[7];
+    u8 ref_ht = oamMemory[512];
+
+    oamClear();
+    oamSetFast(1, 300, 50, 256, 5, 1, OBJ_FLIPX | OBJ_FLIPY);
+
+    TEST("fastX: X lo", oamMemory[4] == ref[0]);
+    TEST("fastX: Y", oamMemory[5] == ref[1]);
+    TEST("fastX: tile", oamMemory[6] == ref[2]);
+    TEST("fastX: attr", oamMemory[7] == ref[3]);
+    TEST("fastX: hitbl", oamMemory[512] == ref_ht);
+}
+
+// =============================================================================
+// Test: oamSetXYFast — position-only update
+// =============================================================================
+void test_oam_setxy_fast(void) {
+    oamClear();
+    oamSetFast(0, 50, 60, 10, 3, 2, 0);  // initial full set
+
+    // Now only update position
+    oamSetXYFast(0, 200, 100);
+
+    TEST("xyfast: X=200", oamMemory[0] == 200);
+    TEST("xyfast: Y=100", oamMemory[1] == 100);
+    // tile and attr should be unchanged
+    TEST("xyfast: tile=10", oamMemory[2] == 10);
+
+    // Test with X > 255
+    oamSetXYFast(0, 300, 50);
+    TEST("xyfast: Xlo=44", oamMemory[0] == 44);
+    TEST("xyfast: Xhi set", (oamMemory[512] & 0x01) == 1);
+
+    // Clear X high bit
+    oamSetXYFast(0, 100, 50);
+    TEST("xyfast: Xhi clr", (oamMemory[512] & 0x01) == 0);
+}
+
+// =============================================================================
+// Test: OAM_ATTR — pre-computed attribute byte macro
+// =============================================================================
+void test_oam_attr(void) {
+    // prio=2, pal=3, no flip, tile hi=0 → 0x26
+    TEST("attr: p2 pal3", OAM_ATTR(0, 3, 2, 0) == 0x26);
+
+    // flip + tile 256: v=1,h=1,prio=1,pal=5,tile_hi=1 → 0xDB
+    TEST("attr: flip+t256", OAM_ATTR(256, 5, 1, OBJ_FLIPX | OBJ_FLIPY) == 0xDB);
+
+    // H-flip only, prio 0, pal 0 → 0x40
+    TEST("attr: Hflip", OAM_ATTR(0, 0, 0, OBJ_FLIPX) == 0x40);
+
+    // V-flip only → 0x80
+    TEST("attr: Vflip", OAM_ATTR(0, 0, 0, OBJ_FLIPY) == 0x80);
+}
+
+// =============================================================================
 // Main
 // =============================================================================
 int main(void) {
@@ -346,6 +436,10 @@ int main(void) {
     test_multi_sprite();
     test_all_sprites();
     test_oambuffer_struct();
+    test_oam_set_fast_basic();
+    test_oam_set_fast_xhi_flip();
+    test_oam_setxy_fast();
+    test_oam_attr();
 
     // Show summary
     test_line += 2;

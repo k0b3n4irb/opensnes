@@ -161,15 +161,24 @@ setMode:
     rtl
 
 ;------------------------------------------------------------------------------
-; WaitForVBlank - Wait for VBlank
+; WaitForVBlank - Wait for VBlank (WAI version)
+;------------------------------------------------------------------------------
+; Uses WAI to halt CPU until interrupt, saving power and bus bandwidth.
+; Checks vblank_flag BEFORE WAI so lag frames pass through immediately.
+; Sets oam_update_flag so NMI handler transfers OAM buffer.
 ;------------------------------------------------------------------------------
 WaitForVBlank:
     php
     sep #$20
-    ; Wait for vblank_flag (set by NMI handler in crt0.asm)
--   lda.l vblank_flag
-    beq -
-    lda #0
+    lda #$01
+    sta.l oam_update_flag
+    lda.l vblank_flag   ; Check if NMI already fired (lag frame)
+    bne @vblank_ready   ; Yes → skip WAI
+-   wai                 ; Halt CPU until NMI (or IRQ)
+    lda.l vblank_flag
+    beq -               ; Not VBlank — spurious IRQ, wait again
+@vblank_ready:
+    lda #$00
     sta.l vblank_flag   ; Clear flag
     ; Increment frame counter
     rep #$20

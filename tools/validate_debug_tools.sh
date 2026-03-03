@@ -11,7 +11,7 @@
 #
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SYMMAP="$SCRIPT_DIR/symmap/symmap.py"
+SYMMAP="$(cd "$SCRIPT_DIR/.." && pwd)/devtools/symmap.py"
 FIXTURES_DIR="$SCRIPT_DIR/debug-fixtures"
 
 # Colors

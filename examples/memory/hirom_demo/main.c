@@ -86,6 +86,12 @@ static const u8 font_tiles[] = {
 #define TILEMAP_ADDR  0x0400   /* Word address for tilemap */
 #define TILES_ADDR    0x0000   /* Word address for tiles */
 
+/* Initial palette: dark blue background, white text */
+static const u8 init_palette[] = {
+    0x00, 0x28,  /* Color 0: Dark blue */
+    0xFF, 0x7F,  /* Color 1: White */
+};
+
 /*============================================================================
  * Helper Functions
  *============================================================================*/
@@ -134,14 +140,12 @@ int main(void) {
     clear_tilemap();
 
     /* Configure BG1 */
-    REG_BG1SC = 0x04;    /* Tilemap at $0800, 32x32 */
-    REG_BG12NBA = 0x00;  /* BG1 tiles at $0000 */
-    REG_TM = 0x01;       /* Enable BG1 on main screen */
+    bgSetMapPtr(0, TILEMAP_ADDR, BG_MAP_32x32);
+    bgSetGfxPtr(0, TILES_ADDR);
+    REG_TM = TM_BG1;
 
-    /* Set palette - dark blue background, white text */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x28;  /* Dark blue (color 0) */
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* White (color 1) */
+    /* Load palette via DMA */
+    dmaCopyCGram((u8 *)init_palette, 0, 4);
 
     /* Display "HIROM MODE" centered on screen */
     /* Screen is 32 tiles wide, "HIROM MODE" is 10 chars */

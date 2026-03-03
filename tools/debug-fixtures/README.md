@@ -29,13 +29,13 @@ Each fixture directory contains:
 
 ### Clean Fixtures
 1. Copy a working `.sym` file from `examples/`
-2. Verify: `python3 tools/symmap/symmap.py --check-overlap your_fixture.sym`
+2. Verify: `python3 devtools/symmap.py --check-overlap your_fixture.sym`
 3. Should exit with code 0 (success)
 
 ### Broken Fixtures
 1. Create a `.sym` file that triggers the bug
 2. Create `expected_error.txt` with the error message substring
-3. Verify: `python3 tools/symmap/symmap.py --check-overlap your_fixture.sym`
+3. Verify: `python3 devtools/symmap.py --check-overlap your_fixture.sym`
 4. Should exit with code 1 and output should contain expected error
 
 ## Known Bug Types

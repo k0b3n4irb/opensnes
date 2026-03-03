@@ -1,0 +1,108 @@
+/**
+ * HDMA Gradient — Brightness gradient effect using HDMA
+ *
+ * Demonstrates HDMA writing to the INIDISP register ($2100) to create
+ * a vertical brightness gradient across the screen. Press A to cycle
+ * through 15 different gradient levels.
+ *
+ * Mode 3 (256 colors, 8bpp BG1) with a large tiled image.
+ *
+ * Based on PVSnesLib HDMAGradient example by Alekmaul.
+ */
+#include <snes.h>
+#include <snes/console.h>
+#include <snes/video.h>
+#include <snes/background.h>
+#include <snes/input.h>
+#include <snes/hdma.h>
+
+/* Assembly loader — handles DMA with correct bank bytes for SUPERFREE data.
+ * See data.asm: tile data (32KB) lands in bank $01, so dmaCopyVram()
+ * (which hardcodes bank $00) would read garbage. */
+extern void loadGraphics(void);
+
+/* HDMA table for brightness gradient (33 bytes max: 16 entries × 2 + terminator) */
+static u8 hdma_gradient_table[33];
+
+/**
+ * Build the HDMA brightness gradient table.
+ *
+ * Creates 16 groups of 14 scanlines each (16 × 14 = 224 scanlines).
+ * Each group has a brightness value from 'level' down to 0.
+ *
+ * HDMA mode 0 (1 register, no repeat): each entry is:
+ *   [count] [value]
+ * where count is the number of scanlines and value is written to INIDISP ($2100).
+ *
+ * @param level Maximum brightness level (1-15, where 15 = full brightness)
+ */
+static void buildGradientTable(u8 level) {
+    u16 i;
+    u16 idx = 0;
+
+    /* Clamp level to 1-15 */
+    if (level < 1) level = 1;
+    if (level > 15) level = 15;
+
+    /* 16 steps, 14 scanlines each = 224 total */
+    for (i = 0; i < 16; i++) {
+        u8 brightness;
+
+        /* Brightness decreases from 'level' based on step position */
+        /* Formula: level - (i / (32 / (level + 1))) */
+        u16 divisor = 32 / (level + 1);
+        if (divisor == 0) divisor = 1;
+        u16 step = i / divisor;
+        if (step > level) step = level;
+        brightness = level - (u8)step;
+
+        hdma_gradient_table[idx++] = 14;             /* 14 scanlines */
+        hdma_gradient_table[idx++] = brightness;     /* brightness value */
+    }
+
+    /* Terminator */
+    hdma_gradient_table[idx] = 0;
+}
+
+int main(void) {
+    u8 gradient = 15;
+
+    /* Initialize console (sets up NMI handler) */
+    consoleInit();
+
+    /* Force blank for VRAM writes */
+    REG_INIDISP = 0x80;
+
+    /* Load all graphics via assembly DMA (correct bank bytes) */
+    loadGraphics();
+
+    /* Configure BG1: tilemap at $0000, tiles at $1000 (word addresses) */
+    REG_BG1SC = (0x0000 >> 8) | 0x00;  /* SC_32x32 */
+    REG_BG12NBA = 0x01;                 /* BG1 tiles at $1000 */
+
+    /* Mode 3 (256 colors on BG1), enable BG1 only */
+    setMode(BG_MODE3, 0);
+
+    /* Build initial gradient and enable HDMA */
+    buildGradientTable(gradient);
+
+    /* HDMA channel 3: mode 0 (1 register), dest = INIDISP ($00) */
+    hdmaSetup(3, 0, 0x00, hdma_gradient_table);
+    hdmaEnable(3);
+
+    /* Screen on */
+    setScreenOn();
+
+    while (1) {
+        /* Press A to cycle gradient levels (15 → 2 → 15) */
+        if (padPressed(0) & KEY_A) {
+            gradient--;
+            if (gradient < 2) gradient = 15;
+            buildGradientTable(gradient);
+        }
+
+        WaitForVBlank();
+    }
+
+    return 0;
+}

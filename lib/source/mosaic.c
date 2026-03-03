@@ -66,7 +66,6 @@ u8 mosaicGetSize(void) {
 }
 
 void mosaicFadeIn(u8 speed) {
-    u8 i;
     u8 wait;
 
     /* Fade from current size down to 0 */

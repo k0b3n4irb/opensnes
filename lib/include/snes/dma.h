@@ -30,7 +30,7 @@
  *
  * @note The current implementation assumes source data is in bank $00 for
  * ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using
- * dmaCopyVramBank() with an explicit bank parameter.
+ * dmaCopyVramBank() or dmaCopyCGramBank() with an explicit bank parameter.
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -155,9 +155,24 @@ void dmaClearVRAM(void);
  * active display causes palette corruption.
  *
  * @note Source data must be in bank $00. For data in other banks,
- * manual DMA setup with explicit bank is required.
+ * use dmaCopyCGramBank() with an explicit bank parameter.
  */
 void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
+
+/**
+ * @brief Copy palette data to CGRAM with explicit source bank byte.
+ *
+ * Same as dmaCopyCGram() but allows specifying the ROM bank for data
+ * in banks other than $00 (e.g., SUPERFREE sections placed by linker).
+ *
+ * @param source     Source address (16-bit offset within bank)
+ * @param bank       Source bank byte ($00-$3F for LoROM, $00-$7D for HiROM)
+ * @param startColor Starting color index (0-255)
+ * @param size       Number of bytes to transfer (2 bytes per color)
+ *
+ * @warning Must be called during VBlank or force blank!
+ */
+void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size);
 
 /**
  * @brief Copy palette data to CGRAM (WRAM source only)

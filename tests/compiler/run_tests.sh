@@ -1513,6 +1513,199 @@ test_variable_shift() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Variable shift stack offset after pha (emitload_adj fix)
+# BUG: After 'pha' pushes 2 bytes, emitload() reads the shift count at the
+#      pre-push stack offset. Must use emitload_adj(r1, fn, 2) instead.
+# Checks all 3 shift types: shl, shr, sar
+#------------------------------------------------------------------------------
+test_variable_shift_runtime() {
+    local name="variable_shift_runtime"
+    local src="$SCRIPT_DIR/test_variable_shift_runtime.c"
+    local out="$BUILD/test_variable_shift_runtime.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local failed=0
+
+    # For each variable-shift function, check that after 'pha', the next
+    # 'lda N,s' uses an offset that accounts for the 2-byte push.
+    # The pattern is: pha → lda N,s → tax → pla
+    # Before fix: lda used the pre-push offset (wrong)
+    # After fix: lda uses offset+2 (correct via emitload_adj)
+
+    # Check var_shl: must have pha followed by lda with stack-relative addr, then tax, then pla
+    local shl_body
+    shl_body=$(sed -n '/^var_shl:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$shl_body" | grep -q 'pha'; then
+        log_fail "$name: var_shl missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$shl_body" | grep -qE 'asl'; then
+        log_fail "$name: var_shl missing asl instruction"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check var_shr: must have pha + lsr loop
+    local shr_body
+    shr_body=$(sed -n '/^var_shr:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$shr_body" | grep -q 'pha'; then
+        log_fail "$name: var_shr missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$shr_body" | grep -qE 'lsr'; then
+        log_fail "$name: var_shr missing lsr instruction"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check var_sar: must have pha + cmp #$8000 + ror loop
+    local sar_body
+    sar_body=$(sed -n '/^var_sar:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+
+    if ! echo "$sar_body" | grep -q 'pha'; then
+        log_fail "$name: var_sar missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$sar_body" | grep -qE 'ror'; then
+        log_fail "$name: var_sar missing ror instruction (signed shift)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # KEY CHECK: Verify the pha → lda N,s pattern has adjusted offset.
+    # After pha, the stack-relative offset for the shift count must be +2
+    # from what it would be without pha. We check that the lda between
+    # pha and tax uses a stack-relative address (N,s pattern).
+    # Extract the lda between pha and pla in var_shl
+    local pha_to_pla
+    pha_to_pla=$(echo "$shl_body" | sed -n '/pha/,/pla/p')
+
+    if ! echo "$pha_to_pla" | grep -qE 'lda.*,s'; then
+        log_fail "$name: var_shl missing stack-relative load between pha/pla"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Variable shift with u8 params in compound expressions
+# BUG: (1 << bg) generates wrong code when bg is u8 and also used for array
+#      indexing. The shift count reads from the wrong stack slot because
+#      emitload_adj needs sp_adjust=+2 after pha. This test covers the exact
+#      bgSetScrollX pattern: u8 param + array store + variable shift + OR-assign.
+#------------------------------------------------------------------------------
+test_variable_shift_u8_compound() {
+    local name="variable_shift_u8_compound"
+    local src="$SCRIPT_DIR/test_variable_shift_bug.c"
+    local out="$BUILD/test_variable_shift_bug.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local failed=0
+
+    # Extract set_scroll_u8 function body
+    local u8_body
+    u8_body=$(sed -n '/^set_scroll_u8:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|^\.ENDS/p' "$out" | sed '$d')
+
+    # 1. Must have variable shift codegen (pha + asl loop)
+    if ! echo "$u8_body" | grep -q 'pha'; then
+        log_fail "$name: set_scroll_u8 missing pha (no variable shift codegen)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$u8_body" | grep -qE 'asl'; then
+        log_fail "$name: set_scroll_u8 missing asl (shift dropped)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 2. Key check: after pha, the lda N,s must use offset+2 from the pre-pha
+    #    store of bg_ext. Find the sta (store bg_ext) and the lda between pha/pla.
+    #    The lda offset must be exactly sta_offset + 2.
+
+    # Find the extub store: the 'and.w #$00FF' followed by 'sta N,s'
+    local bg_store_offset
+    bg_store_offset=$(echo "$u8_body" | grep -oE 'sta [0-9]+,s' | head -1 | sed 's/sta \([0-9]*\),s/\1/')
+
+    # Find the lda between pha and pla (the shift count load)
+    local pha_to_pla
+    pha_to_pla=$(echo "$u8_body" | sed -n '/pha/,/pla/p')
+    local shift_load_offset
+    shift_load_offset=$(echo "$pha_to_pla" | grep -oE 'lda [0-9]+,s' | head -1 | sed 's/lda \([0-9]*\),s/\1/')
+
+    if [[ -z "$bg_store_offset" || -z "$shift_load_offset" ]]; then
+        log_fail "$name: Could not extract stack offsets (store=$bg_store_offset, load=$shift_load_offset)"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local expected_offset=$((bg_store_offset + 2))
+    if [[ "$shift_load_offset" -ne "$expected_offset" ]]; then
+        log_fail "$name: Shift count loaded from ${shift_load_offset},s but expected ${expected_offset},s (store was ${bg_store_offset},s + 2 for pha)"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "  set_scroll_u8 body:"
+            echo "$u8_body"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 3. Cross-check: u16 version must also have correct pha/lda pattern
+    local u16_body
+    u16_body=$(sed -n '/^set_scroll_u16:/,/^[a-zA-Z_][a-zA-Z0-9_]*:\|^\.ENDS/p' "$out" | sed '$d')
+
+    if ! echo "$u16_body" | grep -q 'pha'; then
+        log_fail "$name: set_scroll_u16 missing pha"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # 4. CRITICAL: .INDEX 16 must appear before each function label.
+    #    Without it, WLA-DX assembles cpx #0 as 2 bytes (8-bit) instead
+    #    of 3 bytes (16-bit), misaligning all subsequent instructions.
+    if ! grep -q '\.INDEX 16' "$out"; then
+        log_fail "$name: Missing .INDEX 16 directive — cpx #0 will be misassembled!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: SSA phi-node resolution with 6+ locals in nested if/else
 # BUG: Wrong values stored to wrong stack slots when many locals are
 #      modified in separate conditional branches
@@ -1810,6 +2003,88 @@ test_multiply() {
         ((TESTS_FAILED++))
         return 1
     fi
+
+    # Check power-of-2 multiplies use asl (NOT __mul16)
+    local pow2_muls=(mul_by_64 mul_by_128 mul_by_256 mul_by_1024 mul_by_2048)
+    for func in "${pow2_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using inline shifts"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'asl a'; then
+            log_fail "$name: ${func} missing 'asl a' (should use shift for power-of-2)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check power-of-2 divides use lsr (NOT __div16)
+    local pow2_divs=(div_by_32 div_by_64 div_by_1024)
+    for func in "${pow2_divs[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__div16'; then
+            log_fail "$name: ${func} calls __div16 instead of using inline shifts"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'lsr a'; then
+            log_fail "$name: ${func} missing 'lsr a' (should use shift for power-of-2)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check power-of-2 modulos use and (NOT __mod16)
+    local pow2_mods=(mod_by_32 mod_by_64 mod_by_1024)
+    for func in "${pow2_mods[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mod16'; then
+            log_fail "$name: ${func} calls __mod16 instead of using inline AND"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'and\.w'; then
+            log_fail "$name: ${func} missing 'and.w' (should use AND for power-of-2 modulo)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
+
+    # Check composite constant multiplies use inline shift+add (NOT __mul16)
+    local composite_muls=(mul_by_24 mul_by_48 mul_by_20 mul_by_40 mul_by_36 mul_by_60 mul_by_96)
+    for func in "${composite_muls[@]}"; do
+        local func_body
+        func_body=$(sed -n "/^${func}:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p" "$out" | sed '$d')
+
+        if echo "$func_body" | grep -q '__mul16'; then
+            log_fail "$name: ${func} calls __mul16 instead of using composite inline"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'tcc__r9'; then
+            log_fail "$name: ${func} missing tcc__r9 (no inline shift+add pattern)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+
+        if ! echo "$func_body" | grep -q 'asl a'; then
+            log_fail "$name: ${func} missing 'asl a' (should use shifts)"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    done
 
     log_info "$name"
     ((TESTS_PASSED++))
@@ -2812,6 +3087,57 @@ test_cmp_dead_store() {
     ((TESTS_PASSED++))
 }
 
+test_mul_dead_store() {
+    local name="mul_dead_store"
+    local src="$SCRIPT_DIR/test_mul_dead_store.c"
+    local out="$BUILD/test_mul_dead_store.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    compile_test "$name" "$src" "$out" || return
+
+    local fail_count=0
+
+    # chain_mul: intermediate (a*3+b) should NOT have a dead sta N,s
+    # before the *5 inline pattern. The function should be frameless if
+    # the dead store is eliminated.
+    local fn_body
+    fn_body=$(sed -n '/^chain_mul:/,/^\.ENDS/p' "$out")
+
+    # Should NOT have sta N,s followed by sta.b tcc__r9 (dead store pattern)
+    if echo "$fn_body" | grep -A1 'sta [0-9]\+,s' | grep -q 'sta\.b tcc__r9'; then
+        log_fail "$name: chain_mul has dead store before inline multiply"
+        ((fail_count++))
+    fi
+
+    # chain_shift: intermediate should be dead (used directly by asl)
+    fn_body=$(sed -n '/^chain_shift:/,/^\.ENDS/p' "$out")
+    if echo "$fn_body" | grep -qE "${TAB}sta [0-9]+,s"; then
+        log_fail "$name: chain_shift has sta N,s — intermediate should be dead"
+        ((fail_count++))
+    fi
+
+    # chain_composite: intermediate should be dead (used by composite *24)
+    fn_body=$(sed -n '/^chain_composite:/,/^\.ENDS/p' "$out")
+    if echo "$fn_body" | grep -A1 'sta [0-9]\+,s' | grep -q 'sta\.b tcc__r9'; then
+        log_fail "$name: chain_composite has dead store before composite multiply"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 test_inline_mul_11_15() {
     local name="inline_mul_11_15"
     local src="$SCRIPT_DIR/test_inline_mul.c"
@@ -3126,6 +3452,8 @@ main() {
 
     # === HDMA Wave Regression Tests (Phase 1.3) ===
     test_variable_shift              # FIXED: Variable-count shifts now emit loop
+    test_variable_shift_runtime      # FIXED: Stack offset after pha adjusted by +2
+    test_variable_shift_u8_compound  # FIXED: u8 param + array + shift + OR-assign pattern
     test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
     test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
@@ -3151,6 +3479,7 @@ main() {
     test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
 
     # === Phase 11: Inline multiply *11-*15 + indirect store optimization ===
+    test_mul_dead_store              # Dead store elim for inline constant multiplies
     test_inline_mul_11_15            # Inline multiply patterns *11-*15
     test_indirect_store_acache       # Indirect store A-cache → frameless array_write
 

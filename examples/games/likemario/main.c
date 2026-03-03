@@ -85,6 +85,9 @@ static u8  anim_tick;
 static s16 map_max_x;
 static s16 cam_max_x;
 
+/* Sound effect slot (returned by snesmodLoadEffect) */
+static u8 sfx_jump_slot;
+
 /* Column buffer for deferred VRAM write */
 static u16 col_buffer[32];
 static u16 col_vram_base;
@@ -292,8 +295,10 @@ static void mario_handle_input(void) {
                 mario_yvel = -MARIO_HIJUMPING;
             else
                 mario_yvel = -MARIO_JUMPING;
+            snesmodPlayEffect(sfx_jump_slot, 127, 128, 3);
         }
     }
+
 }
 
 /*
@@ -470,6 +475,7 @@ int main(void) {
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
     snesmodLoadModule(MOD_OVERWORLD);
+    sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
 
     REG_TM = TM_BG1 | TM_OBJ;
 
@@ -483,7 +489,7 @@ int main(void) {
     setScreenOn();      /* Release force blank — display begins */
 
     snesmodPlay(0);
-    snesmodSetModuleVolume(100);
+    snesmodSetModuleVolume(60);
 
     WaitForVBlank();
 

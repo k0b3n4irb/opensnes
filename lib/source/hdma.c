@@ -21,11 +21,11 @@
 void hdmaParallax(u8 channel, u8 bg, const void *scrollTable) {
     u8 destReg;
 
-    /* Map BG number to scroll register */
+    /* Map BG number (0-indexed) to scroll register */
     switch (bg) {
-        case 1: destReg = HDMA_DEST_BG1HOFS; break;
-        case 2: destReg = HDMA_DEST_BG2HOFS; break;
-        case 3: destReg = HDMA_DEST_BG3HOFS; break;
+        case 0: destReg = HDMA_DEST_BG1HOFS; break;
+        case 1: destReg = HDMA_DEST_BG2HOFS; break;
+        case 2: destReg = HDMA_DEST_BG3HOFS; break;
         default: return;
     }
 
@@ -143,11 +143,11 @@ void hdmaWaveInit(void) {
 void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     u8 destReg;
 
-    /* Map BG number to scroll register */
+    /* Map BG number (0-indexed) to scroll register */
     switch (bg) {
-        case 1: destReg = HDMA_DEST_BG1HOFS; break;
-        case 2: destReg = HDMA_DEST_BG2HOFS; break;
-        case 3: destReg = HDMA_DEST_BG3HOFS; break;
+        case 0: destReg = HDMA_DEST_BG1HOFS; break;
+        case 1: destReg = HDMA_DEST_BG2HOFS; break;
+        case 2: destReg = HDMA_DEST_BG3HOFS; break;
         default: return;
     }
 

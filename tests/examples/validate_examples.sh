@@ -5,8 +5,9 @@
 # Checks:
 #   1. All examples build successfully
 #   2. No WRAM memory overlaps (via symmap.py)
-#   3. ROM files exist and have reasonable sizes
-#   4. Required symbols are present
+#   3. No bank $00 ROM overflow (string literals in bank $01+)
+#   4. ROM files exist and have reasonable sizes
+#   5. Required symbols are present
 #
 # Usage:
 #   ./validate_examples.sh              # Validate all examples
@@ -31,8 +32,8 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPENSNES_HOME="${OPENSNES_HOME:-$(dirname "$(dirname "$SCRIPT_DIR")")}"
 EXAMPLES_DIR="$OPENSNES_HOME/examples"
-SYMMAP="$OPENSNES_HOME/tools/symmap/symmap.py"
-VRAMCHECK="$OPENSNES_HOME/tools/vramcheck/vramcheck.py"
+SYMMAP="$OPENSNES_HOME/devtools/symmap.py"
+VRAMCHECK="$OPENSNES_HOME/devtools/vramcheck.py"
 
 # Counters
 TOTAL=0
@@ -217,6 +218,37 @@ check_required_symbols() {
     return 0
 }
 
+# Check for bank $00 ROM overflow (C-generated data in bank $01+)
+check_bank0_overflow() {
+    local dir="$1"
+    local name=$(basename "$dir")
+    local sym_file=$(find "$dir" -name "*.sym" -type f | head -1)
+
+    if [[ -z "$sym_file" || ! -f "$sym_file" ]]; then
+        log_verbose "$name: No .sym file found (skipping bank \$00 check)"
+        return 0
+    fi
+
+    log_verbose "Checking bank \$00 ROM overflow for $name..."
+
+    local output
+    output=$(python3 "$SYMMAP" --check-bank0-overflow --warn-threshold 2048 "$sym_file" 2>&1)
+    local exit_code=$?
+
+    # symmap.py returns: 1=critical spill, 2=below threshold, 0=OK
+    if [[ $exit_code -eq 1 ]] || echo "$output" | grep -q "^OVERFLOW:"; then
+        log_error "$name: Bank \$00 ROM overflow detected!"
+        echo "$output" | grep -E "OVERFLOW|string\." | head -10
+        return 1
+    elif [[ $exit_code -eq 2 ]] || echo "$output" | grep -q "^WARNING:"; then
+        log_warn "$name: $(echo "$output" | grep "WARNING:" | head -1)"
+        return 0
+    else
+        log_verbose "$name: Bank \$00 ROM OK"
+        return 0
+    fi
+}
+
 # Check for VRAM layout issues (overlapping regions, split DMA patterns)
 check_vram_layout() {
     local dir="$1"
@@ -299,6 +331,11 @@ validate_example() {
         failed=1
     fi
 
+    # Check bank $00 ROM overflow (string literals in bank $01+)
+    if ! check_bank0_overflow "$dir"; then
+        failed=1
+    fi
+
     # Check VRAM layout (only fails on dangerous patterns)
     if ! check_vram_layout "$dir"; then
         failed=1
@@ -356,6 +393,17 @@ main() {
     if [[ ! -f "$SYMMAP" ]]; then
         log_error "symmap.py not found: $SYMMAP"
         exit 1
+    fi
+
+    # MVN/MVP lint (non-blocking, informational only)
+    local mvn_linter="$OPENSNES_HOME/devtools/check_mvn.py"
+    if [[ -f "$mvn_linter" ]]; then
+        local lib_asm_files=("$OPENSNES_HOME"/lib/source/*.asm)
+        if [[ ${#lib_asm_files[@]} -gt 0 ]]; then
+            echo -e "${CYAN}[MVN LINT]${NC} Checking library MVN/MVP usage..."
+            python3 "$mvn_linter" "${lib_asm_files[@]}" 2>/dev/null || true
+            echo ""
+        fi
     fi
 
     # Find and validate all examples

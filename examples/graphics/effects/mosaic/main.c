@@ -42,32 +42,13 @@ void doFadeIn(void) {
 }
 
 void doMosaicOut(void) {
-    u8 val;
-    u8 i;
-    /* Mosaic size 0→15 in high nibble, BG1 enable in low nibble */
-    val = 0x00;
-    for (i = 0; i < 16; i++) {
-        WaitForVBlank();
-        WaitForVBlank();
-        WaitForVBlank();
-        REG_MOSAIC = val | MOSAIC_BG1;
-        val += 0x10;
-    }
+    mosaicEnable(MOSAIC_BG1);
+    mosaicFadeOut(3);
 }
 
 void doMosaicIn(void) {
-    u8 val;
-    u8 i;
-    /* Mosaic size 15→0 in high nibble, BG1 enable in low nibble */
-    val = 0xF0;
-    for (i = 0; i < 16; i++) {
-        WaitForVBlank();
-        WaitForVBlank();
-        WaitForVBlank();
-        REG_MOSAIC = val | MOSAIC_BG1;
-        val -= 0x10;
-    }
-    REG_MOSAIC = 0x00;
+    mosaicFadeIn(3);
+    mosaicDisable();
 }
 
 int main(void) {

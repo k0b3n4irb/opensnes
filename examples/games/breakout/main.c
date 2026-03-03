@@ -48,6 +48,8 @@ extern u8 backpal[], backpal_end[]; /* 7 level color sets (7 x 16 bytes) */
 /* Input buffer - NMI handler reads joypads and stores here every frame */
 extern u16 pad_keys[];
 
+/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
+
 /*============================================================================
  * Constants
  *============================================================================*/
@@ -225,24 +227,81 @@ static void mycopy(u8 *dest, const u8 *src, u16 len) {
  * - Lower priority (1 vs 3) so they appear behind main sprites
  */
 static void draw_screen(void) {
-    /* Ball - sprite 1, tile 20 from secondary table */
-    oamSet(1, (u16)pos_x, (u8)pos_y, 20 | 256, 0, 3, 0);
+    /*
+     * Direct OAM buffer writes — replaces 10x oamSet() calls.
+     * oamSet() has framesize=158 per call; 10 calls = 1580 bytes stack overhead.
+     *
+     * OAM low table: 4 bytes per sprite at offset id*4
+     *   [0] X low, [1] Y, [2] tile low, [3] attributes (vhoopppc)
+     *
+     * Attribute byte precomputed constants:
+     *   0x31 = priority 3, palette 0, tile high bit 1 (secondary name table)
+     *   0x71 = H-flip + priority 3, palette 0, tile high bit 1
+     *   0x11 = priority 1, palette 0, tile high bit 1 (shadows)
+     *   0x51 = H-flip + priority 1, palette 0, tile high bit 1
+     */
 
-    /* Paddle - 4 sprites forming a 32-pixel wide paddle
-     * Uses tile 16 twice with H-flip for symmetry */
-    oamSet(2, px + 0,  200, 15 | 256, 0, 3, 0);       /* Left cap */
-    oamSet(3, px + 8,  200, 16 | 256, 0, 3, 0);       /* Middle left */
-    oamSet(4, px + 16, 200, 16 | 256, 0, 3, 0x40);    /* Middle right (H-flip) */
-    oamSet(5, px + 24, 200, 17 | 256, 0, 3, 0);       /* Right cap */
+    /* Sprite 1: Ball */
+    oamMemory[4]  = (u8)pos_x;
+    oamMemory[5]  = (u8)pos_y;
+    oamMemory[6]  = 20;    /* tile 20 */
+    oamMemory[7]  = 0x31;
 
-    /* Ball shadow - lower priority, offset position */
-    oamSet(6, (u16)(pos_x + 3), (u8)(pos_y + 3), 21 | 256, 0, 1, 0);
+    /* Sprite 2: Paddle left cap */
+    oamMemory[8]  = (u8)px;
+    oamMemory[9]  = 200;
+    oamMemory[10] = 15;    /* tile 15 */
+    oamMemory[11] = 0x31;
 
-    /* Paddle shadow - same structure as paddle but with shadow tiles */
-    oamSet(7, px + 4,  204, 18 | 256, 0, 1, 0);
-    oamSet(8, px + 12, 204, 19 | 256, 0, 1, 0);
-    oamSet(9, px + 20, 204, 19 | 256, 0, 1, 0x40);    /* H-flip */
-    oamSet(10, px + 28, 204, 18 | 256, 0, 1, 0);
+    /* Sprite 3: Paddle middle left */
+    oamMemory[12] = (u8)(px + 8);
+    oamMemory[13] = 200;
+    oamMemory[14] = 16;    /* tile 16 */
+    oamMemory[15] = 0x31;
+
+    /* Sprite 4: Paddle middle right (H-flip) */
+    oamMemory[16] = (u8)(px + 16);
+    oamMemory[17] = 200;
+    oamMemory[18] = 16;    /* tile 16 */
+    oamMemory[19] = 0x71;
+
+    /* Sprite 5: Paddle right cap */
+    oamMemory[20] = (u8)(px + 24);
+    oamMemory[21] = 200;
+    oamMemory[22] = 17;    /* tile 17 */
+    oamMemory[23] = 0x31;
+
+    /* Sprite 6: Ball shadow */
+    oamMemory[24] = (u8)(pos_x + 3);
+    oamMemory[25] = (u8)(pos_y + 3);
+    oamMemory[26] = 21;    /* tile 21 */
+    oamMemory[27] = 0x11;
+
+    /* Sprite 7: Paddle shadow left */
+    oamMemory[28] = (u8)(px + 4);
+    oamMemory[29] = 204;
+    oamMemory[30] = 18;    /* tile 18 */
+    oamMemory[31] = 0x11;
+
+    /* Sprite 8: Paddle shadow middle left */
+    oamMemory[32] = (u8)(px + 12);
+    oamMemory[33] = 204;
+    oamMemory[34] = 19;    /* tile 19 */
+    oamMemory[35] = 0x11;
+
+    /* Sprite 9: Paddle shadow middle right (H-flip) */
+    oamMemory[36] = (u8)(px + 20);
+    oamMemory[37] = 204;
+    oamMemory[38] = 19;    /* tile 19 */
+    oamMemory[39] = 0x51;
+
+    /* Sprite 10: Paddle shadow right */
+    oamMemory[40] = (u8)(px + 28);
+    oamMemory[41] = 204;
+    oamMemory[42] = 18;    /* tile 18 */
+    oamMemory[43] = 0x11;
+
+    oam_update_flag = 1;
 }
 
 /*============================================================================
@@ -328,11 +387,11 @@ static void new_level(void) {
      * NMI handler overhead (OAM DMA + joypad read ~13K cycles). Force blank
      * disables rendering so VRAM writes are accepted at any time. */
     WaitForVBlank();
-    REG_INIDISP = 0x80;  /* Force blank — VRAM accessible */
+    setScreenOff();
     dmaCopyCGram((u8 *)pal, 0, 256 * 2);
     dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
     dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
-    REG_INIDISP = 0x0F;  /* Restore full brightness */
+    setScreenOn();
 
     draw_screen();
 
@@ -642,7 +701,7 @@ static void run_frame(void) {
  */
 int main(void) {
     /* Force blank during setup - screen is black, VRAM accessible */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Initialize joypad buffer */
     pad_keys[0] = 0;
@@ -725,15 +784,15 @@ int main(void) {
     dmaCopyCGram((u8 *)pal, 0, 256 * 2);
 
     /* SPRITE CONFIGURATION:
-     * OBJSEL=0x00: 8x8/16x16 sprites, name base=0, name select=0
+     * 8x8/16x16 sprites, name base=0, name select=0
      * Secondary name table at (0+0+1)*8KB = 0x2000
      * Access secondary table with: tile_number | 256 */
-    REG_OBJSEL = 0x00;
+    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x0000);
     oamClear();
 
     /* MODE 1: BG1 4bpp, BG2 4bpp (unused), BG3 2bpp */
-    REG_BGMODE = 0x01;
-    REG_TM = 0x15;  /* Enable: OBJ + BG3 + BG1 */
+    setMode(BG_MODE1, 0);
+    REG_TM = TM_BG1 | TM_BG3 | TM_OBJ;
 
     /* Initialize scroll positions */
     bgSetScroll(0, 0, 0);
@@ -741,17 +800,17 @@ int main(void) {
 
     /* Setup sprites */
     draw_screen();
-    oamHide(0);  /* Hide sprite 0 (corruption workaround) */
-    for (i = 1; i <= 10; i++) {
-        oamSetEx(i, OBJ_SMALL, OBJ_SHOW);
-    }
+    /* High table: sprite 0 hidden (X high=1), sprites 1-10 visible (X high=0, size=small) */
+    oamMemory[512] = 0x01;  /* Sprite 0: X high=1 (hidden), sprites 1-3: X high=0 */
+    oamMemory[513] = 0x00;  /* Sprites 4-7: visible */
+    oamMemory[514] = 0x40;  /* Sprites 8-10: visible, sprite 11: hidden (X high=1) */
 
     /* Transfer OAM to hardware */
     WaitForVBlank();
     oamUpdate();
 
     /* Enable display at full brightness */
-    REG_INIDISP = 0x0F;
+    setScreenOn();
 
     /* Wait for START to begin game */
     do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
