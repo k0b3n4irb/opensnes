@@ -196,7 +196,6 @@ static void update_sprites(void) {
     u8 i;
     u8 palette;
     u16 offset;
-    u8 mask;
 
     /* Player sprite (ID 0) - green if colliding, white if not */
     palette = (collision_flags != 0) ? 1 : 0;
@@ -205,17 +204,14 @@ static void update_sprites(void) {
     oamMemory[2] = 0;  /* tile 0 */
     oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
 
-    /* Enemy sprites (IDs 1-4)
-     * Use running mask instead of (1 << i) to avoid compiler variable-shift bug */
-    mask = 1;
+    /* Enemy sprites (IDs 1-4) */
     for (i = 0; i < NUM_ENEMIES; i++) {
         offset = (i + 1) << 2;
-        palette = (collision_flags & mask) ? 1 : 0;
+        palette = (collision_flags & (1 << i)) ? 1 : 0;
         oamMemory[offset] = (u8)enemy_x[i];
         oamMemory[offset + 1] = (u8)enemy_y[i];
         oamMemory[offset + 2] = 1;  /* tile 1 */
         oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
-        mask = mask + mask;
     }
 
     oam_update_flag = 1;
@@ -223,7 +219,6 @@ static void update_sprites(void) {
 
 static void check_collisions(void) {
     u8 i;
-    u8 mask;
 
     collision_flags = 0;
 
@@ -233,9 +228,7 @@ static void check_collisions(void) {
     player_box.width = PLAYER_SIZE;
     player_box.height = PLAYER_SIZE;
 
-    /* Check player vs each enemy
-     * Use running mask instead of (1 << i) to avoid compiler variable-shift bug */
-    mask = 1;
+    /* Check player vs each enemy */
     for (i = 0; i < NUM_ENEMIES; i++) {
         enemy_box[i].x = enemy_x[i];
         enemy_box[i].y = enemy_y[i];
@@ -243,9 +236,8 @@ static void check_collisions(void) {
         enemy_box[i].height = ENEMY_SIZE;
 
         if (collideRect(&player_box, &enemy_box[i])) {
-            collision_flags = collision_flags | mask;
+            collision_flags |= (1 << i);
         }
-        mask = mask + mask;
     }
 }
 
