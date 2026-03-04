@@ -1,5 +1,7 @@
 # Two Players Example
 
+![Screenshot](screenshot.png)
+
 Simultaneous multi-controller input handling.
 
 ## Learning Objectives
@@ -168,17 +170,15 @@ The SNES supports various controllers:
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/input/two_players
-make clean && make
-
-# Run in emulator (enable 2nd controller)
-/path/to/Mesen two_players.sfc
+cd $OPENSNES_HOME
+make -C examples/input/two_players
 ```
 
-Note: Configure emulator for two controllers.
+Then open `two_players.sfc` in your emulator (Mesen2 recommended).
+Configure the emulator for two controllers.
 
 ---
 
@@ -186,8 +186,7 @@ Note: Configure emulator for two controllers.
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Two-player input handling |
-| `data.asm` | Sprite graphics |
+| `main.c` | Two-player input handling, sprite setup, palette |
 | `Makefile` | Build configuration |
 
 ---
@@ -274,10 +273,4 @@ Bit 8:  Right
 
 **Collision:** [Collision Demo](../../basics/collision_demo/) - Hit detection
 
-**Game:** [Breakout](../../game/breakout/) - Complete game
-
----
-
-## License
-
-Code: MIT
+**Game:** [Breakout](../../games/breakout/) - Complete game with collision and sprites

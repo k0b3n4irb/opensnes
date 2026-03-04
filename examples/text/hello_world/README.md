@@ -7,9 +7,15 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/text/hello_world
-# Open hello_world.sfc in Mesen2
 ```
+
+Then open `hello_world.sfc` in your emulator (Mesen2 recommended).
+
+## Controls
+
+No interactive controls. The text is displayed statically.
 
 ## What You'll Learn
 
@@ -202,8 +208,8 @@ and cause timing issues.
 - **Two lines of text:** Write a second message at a different tilemap row. Row N starts
   at base address + N×32.
 
-- **Next example:** [Custom Font](../custom_font/) — a complete A-Z, 0-9 font with
-  reusable text rendering.
+- **Next example:** [Simple Sprite](../../graphics/sprites/simple_sprite/) -- display a
+  32x32 sprite on screen using OAM.
 
 ---
 
@@ -233,9 +239,9 @@ LIB_MODULES := console sprite dma       # Which library pieces to pull in
 CSRC        := main.c                   # Your single C source file
 ```
 
-One key rule: **OpenSNES supports only one C source file per project.** That's `CSRC`.
-If your project grows, you either `#include` other `.c` files into main.c, or add
-additional logic as assembly files via `ASMSRC`.
+`CSRC` can list multiple C files (e.g., `CSRC := main.c engine/player.c`).
+For this simple example, a single file is sufficient. You can also add assembly
+source files via `ASMSRC`.
 
 ### Why These Modules?
 

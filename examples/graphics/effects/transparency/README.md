@@ -1,5 +1,7 @@
 # Color Math Transparency Example
 
+![Screenshot](screenshot.png)
+
 Interactive shadow and tint effects using the SNES color math hardware.
 
 ## Learning Objectives
@@ -209,15 +211,14 @@ while (1) {
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/graphics/transparency
-make clean && make
-
-# Run in emulator
-/path/to/Mesen transparency.sfc
+cd $OPENSNES_HOME
+make -C examples/graphics/effects/transparency
 ```
+
+Then open `transparency.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -228,7 +229,7 @@ make clean && make
 | `main.c` | Main loop, input handling, effect state |
 | `data.asm` | Background graphics data |
 | `Makefile` | Build configuration |
-| `res/pvsneslib.png` | Source background image |
+| `res/opensnes.png` | Source background image |
 
 ---
 
@@ -374,12 +375,6 @@ Color math respects layer priority:
 
 ## What's Next?
 
-**Window Masking:** [Window Example](../window/) - Spotlight effect
+**Window Masking:** [Window Example](../window/) - Triangle-shaped HDMA window
 
-**HDMA:** [HDMA Gradient Example](../hdma_gradient/) - Per-scanline effects
-
----
-
-## License
-
-Code: MIT
+**HDMA Gradient:** [Gradient Colors](../gradient_colors/) - Per-scanline color effects

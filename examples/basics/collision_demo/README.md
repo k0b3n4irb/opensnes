@@ -1,5 +1,7 @@
 # Collision Detection Example
 
+![Screenshot](screenshot.png)
+
 Multiple collision systems: AABB, point, and tile-based.
 
 ## Learning Objectives
@@ -178,15 +180,14 @@ void updateSprite(void) {
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/basics/collision_demo
-make clean && make
-
-# Run in emulator
-/path/to/Mesen collision_demo.sfc
+cd $OPENSNES_HOME
+make -C examples/basics/collision_demo
 ```
+
+Then open `collision_demo.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -195,7 +196,6 @@ make clean && make
 | File | Purpose |
 |------|---------|
 | `main.c` | Collision logic and game loop |
-| `data.asm` | Level and sprite graphics |
 | `Makefile` | Build configuration |
 
 ---
@@ -288,9 +288,7 @@ if (obj1.layer & obj2.mask) { /* Check collision */ }
 
 ## What's Next?
 
-**Smooth Movement:** [Smooth Movement](../smooth_movement/) - Fixed-point physics
-
-**Game:** [Breakout](../../game/breakout/) - Complete game
+**Game:** [Breakout](../../games/breakout/) - Complete game with collision, sprites, and levels
 
 ---
 
