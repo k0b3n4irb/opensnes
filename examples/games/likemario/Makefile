@@ -40,4 +40,5 @@ combined.asm: res/tiles.pic res/mario_sprite.pic
 clean: clean-likemario
 .PHONY: clean-likemario
 clean-likemario:
-	@rm -f res/tiles.pic res/tiles.pal res/tiles.map res/mario_sprite.pic res/mario_sprite.pal
+	@rm -f res/tiles.pic res/tiles.pal res/tiles.map res/tiles.inc res/tiles_data.as
+	@rm -f res/mario_sprite.pic res/mario_sprite.pal res/mario_sprite.inc res/mario_sprite_data.as
