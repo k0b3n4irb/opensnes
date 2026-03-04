@@ -24,6 +24,6 @@ res/spritehero8.pic res/spritehero8.pal: res/spritehero8.png
 clean: clean-metasprite
 .PHONY: clean-metasprite
 clean-metasprite:
-	@rm -f res/spritehero32.pic res/spritehero32.pal
-	@rm -f res/spritehero16.pic res/spritehero16.pal
-	@rm -f res/spritehero8.pic res/spritehero8.pal
+	@rm -f res/spritehero32.pic res/spritehero32.pal res/spritehero32.inc res/spritehero32_data.as res/spritehero32_meta.inc
+	@rm -f res/spritehero16.pic res/spritehero16.pal res/spritehero16.inc res/spritehero16_data.as res/spritehero16_meta.inc
+	@rm -f res/spritehero8.pic res/spritehero8.pal res/spritehero8.inc res/spritehero8_data.as res/spritehero8_meta.inc
