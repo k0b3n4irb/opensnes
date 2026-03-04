@@ -1,5 +1,7 @@
 # Fading Example
 
+![Screenshot](screenshot.png)
+
 Screen brightness transitions for fade in/out effects.
 
 ## Learning Objectives
@@ -153,15 +155,14 @@ void changeScene(void) {
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/graphics/fading
-make clean && make
-
-# Run in emulator
-/path/to/Mesen fading.sfc
+cd $OPENSNES_HOME
+make -C examples/graphics/effects/fading
 ```
+
+Then open `fading.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -248,12 +249,6 @@ This allows fading specific layers independently.
 
 ## What's Next?
 
-**Mode 0:** [Mode 0 Example](../mode0/) - Four background layers
+**Mosaic:** [Mosaic Example](../mosaic/) - Pixelation transitions
 
-**Parallax:** [Parallax Example](../parallax/) - Multi-speed scrolling
-
----
-
-## License
-
-Code: MIT
+**Parallax:** [Parallax Scrolling](../parallax_scrolling/) - Multi-speed scrolling with HDMA

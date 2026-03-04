@@ -1,11 +1,22 @@
 # Basics Examples
 
-Game mechanics that go beyond graphics and audio: collision detection, smooth movement,
-and interactive UI. These examples combine input, sprites, and math into patterns you'll
-reuse in every game.
+Core game mechanics that go beyond pure graphics or audio. These examples demonstrate
+fundamental patterns -- collision detection, movement, and interactive logic -- that
+you will reuse in every game project.
 
-| Example | What you'll learn |
-|---------|------------------|
-| [Calculator](calculator/) | Edge detection input, cursor UI, integer math on a CPU with no divide |
-| [Collision Demo](collision_demo/) | Bounding-box collision between sprites |
-| [Smooth Movement](smooth_movement/) | Sub-pixel positioning with fixed-point arithmetic |
+## Examples
+
+| Example | Difficulty | Description |
+|---------|------------|-------------|
+| [collision_demo](collision_demo/) | Intermediate | Bounding-box collision detection between multiple sprites |
+
+## Key Concepts
+
+- **Bounding-box collision**: compare rectangle edges to detect overlaps
+- The SNES has no hardware collision detection -- it must be done in software
+- Efficient collision checks matter because the 65816 CPU is slow at 32-bit math
+
+---
+
+After completing the graphics and input examples, study **collision_demo** to see
+how sprites, input, and math come together into interactive gameplay.

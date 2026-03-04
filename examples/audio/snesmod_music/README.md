@@ -1,5 +1,7 @@
 # SNESMOD Music Example
 
+![Screenshot](screenshot.png)
+
 Full music playback using SNESMOD, a tracker-based audio engine for the SNES.
 
 ## Learning Objectives
@@ -13,7 +15,7 @@ After this lesson, you will understand:
 
 ## Prerequisites
 
-- Completed [tone](../tone/) example (audio basics)
+- Basic understanding of SNES audio concepts
 - Understanding of BG text rendering
 - Basic tracker music concepts (optional)
 
@@ -178,15 +180,14 @@ soundbank:
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/audio/snesmod_music
-make clean && make
-
-# Run in emulator
-/path/to/Mesen music.sfc
+cd $OPENSNES_HOME
+make -C examples/audio/snesmod_music
 ```
+
+Then open `music.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -278,9 +279,9 @@ smconv -s -o soundbank music/song.it
 
 ## What's Next?
 
-**Return to basics:** [Calculator](../../basics/calculator/) - Input handling
+**Sound Effects:** [SNESMOD SFX](../snesmod_sfx/) - Sound effect playback with pitch control
 
-**Graphics:** [Animation](../../graphics/animation/) - Sprite animation
+**Graphics:** [Simple Sprite](../../graphics/sprites/simple_sprite/) - Display a sprite on screen
 
 ---
 

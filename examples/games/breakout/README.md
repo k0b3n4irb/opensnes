@@ -16,9 +16,11 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/games/breakout
-# Open breakout.sfc in Mesen2
 ```
+
+Then open `breakout.sfc` in your emulator (Mesen2 recommended).
 
 ## What You'll Learn
 
@@ -247,7 +249,7 @@ static void run_frame(void) {
   the paddle to activate bonuses (wide paddle, slow ball, multiball).
 
 - **Add sound:** Play a BRR sample on each bounce. Check out
-  [sfx_demo](../../audio/sfx_demo/) for the SPC700 pattern.
+  [SNESMOD SFX](../../audio/snesmod_sfx/) for the sound effect pattern.
 
 - **Design your own levels:** Edit `brick_map` in `data.asm`. Values 0-7 are colors,
   8 is empty. The grid is 10 columns x 10 rows — go wild.

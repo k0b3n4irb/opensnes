@@ -15,9 +15,11 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/games/likemario
-# Open likemario.sfc in Mesen2
 ```
+
+Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 
 ## What You'll Learn
 

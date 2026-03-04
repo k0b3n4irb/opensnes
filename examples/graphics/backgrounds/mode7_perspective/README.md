@@ -1,8 +1,10 @@
-# Mode 7 Perspective — Pseudo-3D Ground Effect
+# Mode 7 Perspective -- Pseudo-3D Ground Effect
+
+![Screenshot](screenshot.png)
 
 ## What This Example Shows
 
-How to combine Mode 7 with HDMA to create a **perspective ground plane** — the same
+How to combine Mode 7 with HDMA to create a **perspective ground plane** -- the same
 technique used in F-Zero, Mario Kart, and Pilotwings. The screen is split in two:
 a static sky on top and a scaled ground that recedes into the distance.
 
@@ -16,6 +18,15 @@ per-scanline programming).
 | Button | Action |
 |--------|--------|
 | D-PAD | Scroll the ground plane |
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/graphics/backgrounds/mode7_perspective
+```
+
+Then open `mode7_perspective.sfc` in your emulator (Mesen2 recommended).
 
 ## How It Works
 
@@ -39,7 +50,7 @@ The key to the 3D illusion: scanlines near the top of the ground area (the
 "horizon") use a large scale value (small objects = far away), while scanlines
 near the bottom use a small scale value (large objects = close up).
 
-This is a pre-computed table in the assembly data — each of the 128 ground
+This is a pre-computed table in the assembly data -- each of the 128 ground
 scanlines has its own M7A/M7D scale pair.
 
 ### 3. Scrolling
@@ -53,18 +64,51 @@ asm_setupHdmaPerspective(sx, sy);
 ```
 
 The scroll values are passed to the assembly helper, which writes them to the
-Mode 7 scroll registers (M7HOFS/M7VOFS) and re-enables the HDMA channels.
+Mode 7 scroll registers (M7HOFS/M7VOFS at $210D/$210E) and re-enables the HDMA
+channels each frame.
 
 ## SNES Concepts
 
-- **Mode switching mid-frame**: The SNES allows changing BGMODE via HDMA between
-  scanlines. This is how one screen shows two completely different video modes.
-- **Per-scanline scaling**: By writing M7A/M7D every scanline via HDMA repeat mode,
-  each horizontal line of the ground has a different scale — creating the depth illusion.
-- **HDMA budget**: 4 simultaneous HDMA channels is feasible but uses significant
-  bus time per scanline. Adding more channels risks running out of HBlank time.
+### Mode Switching Mid-Frame
 
-## Next Steps
+The SNES allows changing the BGMODE register ($2105) via HDMA between scanlines.
+This is how one screen shows two completely different video modes -- Mode 3 for
+the sky portion and Mode 7 for the ground portion. The switch happens during
+HBlank, so there is no visible glitch.
 
-- `effects/gradient_colors` — Another HDMA technique (color gradients)
-- `games/likemario` — Scrolling backgrounds with sprites (different approach)
+### Per-Scanline Scaling
+
+By writing M7A/M7D every scanline via HDMA repeat mode, each horizontal line of
+the ground has a different scale factor. Lines near the horizon are scaled way
+down (far away), lines at the bottom are close to 1:1 (nearby). This creates the
+depth illusion without any 3D math at runtime -- it is all pre-computed tables.
+
+### HDMA Budget
+
+4 simultaneous HDMA channels is feasible but uses significant bus time per scanline.
+Each HDMA transfer needs ~18 master cycles per byte during HBlank. Adding more
+channels risks running out of HBlank time (1364 master cycles per scanline).
+
+## Project Structure
+
+| File | Purpose |
+|------|---------|
+| `main.c` | Input handling, scroll updates, HDMA initialization |
+| `data.asm` | Mode 7 ground data, sky tiles, HDMA perspective tables, assembly helpers |
+| `res/ground.png` | Mode 7 ground texture source |
+| `res/sky.png` | Sky background source |
+| `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |
+
+## Going Further
+
+- **Add rotation**: Combine the perspective tables with angle rotation for a
+  full F-Zero-style driving effect. You would need to recompute the M7A-M7D
+  table entries based on the current heading angle.
+
+- **Add sprites**: Place car or character sprites on top of the ground plane.
+  Sprites render normally in Mode 7 and can be scaled/positioned to match the
+  perspective.
+
+- **Explore related examples**:
+  - `effects/gradient_colors` -- Another HDMA technique (color gradients)
+  - `games/likemario` -- Scrolling backgrounds with sprites (different approach)

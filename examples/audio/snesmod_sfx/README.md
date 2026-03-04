@@ -1,5 +1,7 @@
 # SNESMOD Sound Effects Example
 
+![Screenshot](screenshot.png)
+
 Sound effect playback with pitch control using SNESMOD.
 
 ## Learning Objectives
@@ -135,15 +137,14 @@ smconv -s soundbank.bnk sample1.wav sample2.wav ...
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/audio/snesmod_sfx
-make clean && make
-
-# Run in emulator
-/path/to/Mesen snesmod_sfx.sfc
+cd $OPENSNES_HOME
+make -C examples/audio/snesmod_sfx
 ```
+
+Then open `sfx.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -152,8 +153,7 @@ make clean && make
 | File | Purpose |
 |------|---------|
 | `main.c` | SFX triggering and pitch control |
-| `data.asm` | Font tiles for display |
-| `soundbank/` | SNESMOD soundbank data |
+| `sfx/` | Sound effect source samples |
 | `Makefile` | Build configuration |
 
 ---
@@ -222,7 +222,7 @@ SNESMOD samples play at their original rate. Pitch parameter shifts playback spe
 
 **SNESMOD Music:** [SNESMOD Music](../snesmod_music/) - Tracker music playback
 
-**Graphics:** Return to [graphics examples](../../graphics/)
+**Graphics:** [Simple Sprite](../../graphics/sprites/simple_sprite/) - Display a sprite on screen
 
 ---
 

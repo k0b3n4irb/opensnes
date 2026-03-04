@@ -1,23 +1,33 @@
 # Audio Examples
 
-The SNES has a dedicated audio processor — the SPC700 — with its own 64KB of RAM,
+The SNES has a dedicated audio processor -- the SPC700 -- with its own 64KB of RAM,
 its own DSP chip, and its own instruction set. It runs independently from the main CPU.
-The two communicate through just 4 shared bytes.
+The two communicate through just 4 shared I/O bytes.
 
-These examples cover two approaches:
+These examples use **SNESMOD**, a tracker-based audio engine. You write `.it` files
+in a tracker (OpenMPT, Schism Tracker, etc.), the `smconv` tool converts them to
+SPC700 format, and the library handles playback from C.
 
-**Bare-metal** — upload your own driver to the SPC700, trigger sounds manually.
-Maximum control, minimum abstraction.
+## Examples
 
-**SNESMOD** — a full tracker audio engine that handles music and sound effects from C.
-You write `.it` files in a tracker, `smconv` converts them, and the library plays them.
+| Example | Difficulty | Description |
+|---------|------------|-------------|
+| [snesmod_music](snesmod_music/) | Intermediate | Tracker music playback with smconv and the SNESMOD process loop |
+| [snesmod_sfx](snesmod_sfx/) | Intermediate | Playing sound effects alongside music |
 
-| Example | Approach | What you'll learn |
-|---------|----------|------------------|
-| [SFX Demo](sfx_demo/) | Bare-metal | SPC700 upload protocol, BRR format, port handshaking |
-| [SNESMOD Music](snesmod_music/) | SNESMOD | Tracker music playback, smconv tool, the process loop |
-| [SNESMOD SFX](snesmod_sfx/) | SNESMOD | Sound effects alongside music |
-| [SNESMOD HiROM](snesmod_hirom/) | SNESMOD | Audio in HiROM mode (64KB banks) |
+## Prerequisites
 
-Start with **SFX Demo** if you want to understand how audio works at the hardware level.
-Start with **SNESMOD Music** if you just want music in your game.
+- Build the `smconv` tool: `make tools`
+- A tracker module in `.it` format (Impulse Tracker)
+
+## Key Concepts
+
+- The SPC700 runs its own program independently of the 65816 CPU
+- SNESMOD uploads its driver + song data to SPC700 RAM at init
+- Call `spcProcess()` every frame to keep audio synchronized
+- Sound effects use separate channels and can play over music
+
+---
+
+Start with **snesmod_music** to get music playing, then move to **snesmod_sfx**
+to layer sound effects on top.

@@ -1,6 +1,8 @@
 # Super Scope
 
-> **One-line summary**: Light gun detection, calibration via PPU H/V counters, and fire tracking with a red dot sprite.
+![Screenshot](screenshot.png)
+
+Light gun detection, calibration via PPU H/V counters, and fire tracking with a red dot sprite.
 
 ## Controls
 
@@ -13,9 +15,12 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/input/superscope
-# Open superscope.sfc in Mesen2 (enable Super Scope in Input settings, port 2)
 ```
+
+Then open `superscope.sfc` in your emulator (Mesen2 recommended).
+Enable Super Scope in Mesen2 Input settings, port 2.
 
 ## What You'll Learn
 
