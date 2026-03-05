@@ -1,4 +1,4 @@
-# OpenSNES Code Style Guide
+# OpenSNES Code Style Guide {#code_style}
 
 Consistent code style makes the codebase easier to read and maintain.
 

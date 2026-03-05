@@ -1,4 +1,4 @@
-# Troubleshooting OpenSNES
+# Troubleshooting OpenSNES {#troubleshooting}
 
 Common issues and their solutions.
 

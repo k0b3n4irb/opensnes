@@ -1,4 +1,4 @@
-# SNES Hardware Overview
+# SNES Hardware Overview {#hardware_overview}
 
 Understanding SNES hardware is essential for effective game development.
 
