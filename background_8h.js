@@ -1,0 +1,26 @@
+var background_8h =
+[
+    [ "BG_16COLORS", "group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a", null ],
+    [ "BG_256COLORS", "group__bg__colors.html#gaab497f5051249668123af8a5363b8bf8", null ],
+    [ "BG_4COLORS", "group__bg__colors.html#ga774d2a0de276a94af89173eb592803c0", null ],
+    [ "BG_4COLORS0", "group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0", null ],
+    [ "BG_MAP_32x32", "group__bg__size.html#ga034f9e445b3659542009666f92520fd3", null ],
+    [ "BG_MAP_32x64", "group__bg__size.html#ga2d3be2477b25908777377bc78d00d07d", null ],
+    [ "BG_MAP_64x32", "group__bg__size.html#ga97363366540ca9c8f3063b9602b190d4", null ],
+    [ "BG_MAP_64x64", "group__bg__size.html#ga4fd01b0f07c15f48232902829af7db9a", null ],
+    [ "bgClearTilemap", "background_8h.html#a3e0cf515ae8b6a6f7ce1895c6d12b9f4", null ],
+    [ "SC_32x32", "group__bg__size.html#ga11724b6748ce0954e9b43819263537fc", null ],
+    [ "SC_32x64", "group__bg__size.html#gaeaa1585b5a34aea00df0224fdcc4a5ab", null ],
+    [ "SC_64x32", "group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7", null ],
+    [ "SC_64x64", "group__bg__size.html#gace76b0c992e2cba05f6da76f9825720a", null ],
+    [ "bgGetScrollX", "background_8h.html#ad4d4460f82883d16f9a5704d75b76aaf", null ],
+    [ "bgGetScrollY", "background_8h.html#a455adfa84072ba5e3c4b048eb4441846", null ],
+    [ "bgInit", "background_8h.html#ad7b7a6656164a31988d31feb574572a6", null ],
+    [ "bgInitTileSet", "background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207", null ],
+    [ "bgInitTileSetData", "background_8h.html#aac05d719a8f944d8a773abc6348cce41", null ],
+    [ "bgSetGfxPtr", "background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d", null ],
+    [ "bgSetMapPtr", "background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924", null ],
+    [ "bgSetScroll", "background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4", null ],
+    [ "bgSetScrollX", "background_8h.html#a255b7012c710513afe464505ec420d3c", null ],
+    [ "bgSetScrollY", "background_8h.html#a1fcd01a63d5efa74df2394d1374588b6", null ]
+];

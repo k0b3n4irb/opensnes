@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['map_5fopt_5f1way_0',['MAP_OPT_1WAY',['../map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30',1,'map.h']]],
+  ['map_5fopt_5fbg2_1',['MAP_OPT_BG2',['../map_8h.html#a1697378c813c532a862943726625bd5b',1,'map.h']]],
+  ['max_5fsprites_2',['MAX_SPRITES',['../sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4',1,'sprite.h']]],
+  ['maxsprtrf_3',['MAXSPRTRF',['../sprite_8h.html#ae1fcc1b52ee5a02b6fc316b8b143791c',1,'sprite.h']]],
+  ['metaspr_5fitem_4',['METASPR_ITEM',['../sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b',1,'sprite.h']]],
+  ['metaspr_5fterm_5',['METASPR_TERM',['../sprite_8h.html#aa1d425dcce3cd104751744535b6a389a',1,'sprite.h']]],
+  ['metasprite_5fend_6',['metasprite_end',['../sprite_8h.html#a9f9f390a57460914e27c7604b7d8379a',1,'sprite.h']]],
+  ['mode7_5fflip_5fh_7',['MODE7_FLIP_H',['../mode7_8h.html#a8194eb27466e989b799b3a97446093e5',1,'mode7.h']]],
+  ['mode7_5fflip_5fv_8',['MODE7_FLIP_V',['../mode7_8h.html#a965289e86f458530292acd97a69b540b',1,'mode7.h']]],
+  ['mode7_5ftile0_9',['MODE7_TILE0',['../mode7_8h.html#ad4c105a9c2165ccf56070e30b8943bae',1,'mode7.h']]],
+  ['mode7_5ftransparent_10',['MODE7_TRANSPARENT',['../mode7_8h.html#a0c468d883ece574391e63d990e082aa7',1,'mode7.h']]],
+  ['mode7_5fwrap_11',['MODE7_WRAP',['../mode7_8h.html#a42a1485d7600874477a6805a9567a32d',1,'mode7.h']]],
+  ['mosaic_5fbg1_12',['MOSAIC_BG1',['../mosaic_8h.html#aeae429c8e286da71bda14e930468367c',1,'mosaic.h']]],
+  ['mosaic_5fbg2_13',['MOSAIC_BG2',['../mosaic_8h.html#a3392bbb0a16063c6fa3c2a4d785602ab',1,'mosaic.h']]],
+  ['mosaic_5fbg3_14',['MOSAIC_BG3',['../mosaic_8h.html#a310a4d7b11cd15e26c8b0276f49714d6',1,'mosaic.h']]],
+  ['mosaic_5fbg4_15',['MOSAIC_BG4',['../mosaic_8h.html#acead97fc4126a191f810a5c424518a54',1,'mosaic.h']]],
+  ['mosaic_5fbg_5fall_16',['MOSAIC_BG_ALL',['../mosaic_8h.html#a087a0125524bbc2887b242600077b081',1,'mosaic.h']]],
+  ['mosaic_5fmax_17',['MOSAIC_MAX',['../mosaic_8h.html#adff19067a3ace55a83b54b343000e326',1,'mosaic.h']]],
+  ['mosaic_5fmin_18',['MOSAIC_MIN',['../mosaic_8h.html#a1a8d8268b9ee6a832931e47428d76d07',1,'mosaic.h']]]
+];
