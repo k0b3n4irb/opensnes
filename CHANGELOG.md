@@ -5,6 +5,37 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.3.0] - 2026-03-05
+
+### Examples
+
+- **Transparency rewrite**: Replaced placeholder color math demo with proper PVSnesLib-style
+  transparency example — landscape (BG1, 4bpp) blended with scrolling clouds (BG3, 2bpp) via
+  color addition, using assembly DMA loader for correct bank bytes.
+- **HDMA gradient fix**: Improved step formula for smoother fade and deferred HDMA activation
+  to button press.
+- **Asset pipeline modernization**: All 36 examples now use `res/` subdirectories with gfx4snes
+  Makefile rules for reproducible asset conversion from source PNGs. Removed tracked generated
+  files (`.inc`, `_data.as`, `.pic`, `.pal`, `.map`) — these are now built at compile time.
+- Converted all remaining BMP source assets to PNG.
+- Added missing `.inc`/`_data.as`/`_meta.inc` entries to clean rules.
+
+### Documentation
+
+- Comprehensive README rewrite for all 36 examples with consistent formatting, hardware
+  explanations, and build instructions.
+- Added Mesen2 screenshots for key examples (breakout, likemario, collision_demo, etc.).
+
+### Devtools
+
+- Reorganized `devtools/` into one directory per tool, each with its own README.
+
+### Housekeeping
+
+- Removed unused project templates.
+- Removed tracked gfx4snes-generated binary files from the repository.
+- Fixed sprite32.pal size and removed unused assets.
+
 ## [0.2.0] - 2026-03-03
 
 ### Compiler
