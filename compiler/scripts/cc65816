@@ -70,18 +70,24 @@ if [[ ! -f "$INPUT" ]]; then
     exit 1
 fi
 
-# Create unique temp file using mktemp
+# Create unique temp files using mktemp
 # -t template: portable across macOS, Linux, and Git Bash/MSYS on Windows
 TMPFILE=$(mktemp -t cc65816.XXXXXX) || TMPFILE=$(mktemp)
-trap 'rm -f "$TMPFILE"' EXIT
+IRFILE=$(mktemp -t cc65816_ir.XXXXXX) || IRFILE=$(mktemp)
+trap 'rm -f "$TMPFILE" "$IRFILE"' EXIT
 
-# Pipeline: cc -E (preprocess) -> cproc-qbe (C -> QBE IL) -> qbe (QBE IL -> 65816 asm)
-# We use the system preprocessor to work around cproc's limited preprocessor
+# Stage 1: Preprocess with system cc
 cc -E "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
 
+# Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
+# Using a pipe hides cproc crashes: QBE receives truncated IR and reports
+# misleading parse errors. With a temp file, cproc failures are caught cleanly.
+"$CPROC" "$TMPFILE" > "$IRFILE"
+
+# Stage 3: QBE IR -> 65816 assembly
 if [[ -z "$OUTPUT" ]]; then
-    "$CPROC" "$TMPFILE" | "$QBE" -t w65816
+    "$QBE" -t w65816 "$IRFILE"
 else
-    "$CPROC" "$TMPFILE" | "$QBE" -t w65816 > "$OUTPUT"
+    "$QBE" -t w65816 "$IRFILE" > "$OUTPUT"
     echo "Generated: $OUTPUT"
 fi
