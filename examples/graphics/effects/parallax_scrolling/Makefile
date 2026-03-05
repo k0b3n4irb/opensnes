@@ -21,3 +21,9 @@ res/back.pic res/back.map res/back.pal: res/back.png
 
 # Ensure assets are converted before assembly (data.asm .incbin references them)
 combined.asm: res/back.pic res/back.map res/back.pal
+
+# Extended clean
+clean: clean-parallax_scrolling
+.PHONY: clean-parallax_scrolling
+clean-parallax_scrolling:
+	@rm -f res/back.pic res/back.pal res/back.map res/back.inc res/back_data.as

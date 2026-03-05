@@ -1,163 +1,65 @@
 /**
- * @file main.c
- * @brief Color Math Transparency Example
+ * Transparency — Color addition between two background layers
  *
- * Demonstrates the color math module for transparency and tinting effects.
+ * Demonstrates SNES color math by blending clouds (BG3, subscreen)
+ * over a landscape (BG1, main screen). The clouds scroll automatically.
  *
- * Controls:
- *   D-Pad Up/Down: Increase/decrease shadow intensity
- *   A: Toggle shadow effect on/off
- *   B: Cycle through color tints (red, green, blue, none)
+ * Mode 1: BG1 = 4bpp (16 colors), BG3 = 2bpp (4 colors)
+ * Color addition: subscreen colors are added to BG1 + backdrop.
+ *
+ * Based on PVSnesLib Transparency example by Alekmaul.
  */
-
 #include <snes.h>
+#include <snes/console.h>
+#include <snes/video.h>
+#include <snes/background.h>
 #include <snes/colormath.h>
 
-/*============================================================================
- * External Graphics Data (defined in data.asm)
- *============================================================================*/
-
-extern u8 tiles[], tiles_end[];
-extern u8 tilemap[], tilemap_end[];
-extern u8 palette[], palette_end[];
-
-/*============================================================================
- * State Variables
- *============================================================================*/
-
-static u8 shadow_intensity;
-static u8 shadow_enabled;
-static u8 tint_mode;  /* 0=none, 1=red, 2=green, 3=blue */
-
-static void apply_effect(void) {
-    if (shadow_enabled) {
-        /* Apply shadow (darken) effect */
-        colorMathShadow(COLORMATH_ALL, shadow_intensity);
-    } else if (tint_mode > 0) {
-        /* Apply color tint */
-        colorMathEnable(COLORMATH_ALL);
-        colorMathSetOp(COLORMATH_ADD);
-        colorMathSetHalf(0);
-        colorMathSetSource(COLORMATH_SRC_FIXED);
-
-        switch (tint_mode) {
-            case 1: /* Red tint */
-                colorMathSetFixedColor(12, 0, 0);
-                break;
-            case 2: /* Green tint */
-                colorMathSetFixedColor(0, 12, 0);
-                break;
-            case 3: /* Blue tint */
-                colorMathSetFixedColor(0, 0, 12);
-                break;
-        }
-    } else {
-        /* No effect */
-        colorMathDisable();
-    }
-}
+/* Assembly loader — handles DMA with correct bank bytes for SUPERFREE data. */
+extern void loadGraphics(void);
 
 int main(void) {
-    u16 pad;
-    u16 pad_prev;
+    short scrX = 0;
 
-    /* Initialize state */
-    shadow_intensity = 8;
-    shadow_enabled = 0;
-    tint_mode = 0;
-    pad_prev = 0;
+    consoleInit();
 
-    /* Force blank during setup */
-    setScreenOff();
+    /* Force blank for VRAM/CGRAM writes */
+    REG_INIDISP = 0x80;
 
-    /*------------------------------------------------------------------------
-     * Configure Background
-     *------------------------------------------------------------------------*/
+    /* Load all graphics via assembly DMA (correct bank bytes) */
+    loadGraphics();
 
-    /* BG1 tilemap at VRAM $1000, 32x32 tiles */
-    bgSetMapPtr(0, 0x1000, SC_32x32);
+    /* BG1: tilemap at $2000, tiles at $0000 (4bpp landscape) */
+    REG_BG1SC = (0x2000 >> 8) | 0x00;   /* SC_32x32 */
+    REG_BG12NBA = 0x00;                  /* BG1 tiles at $0000 */
 
-    /* BG1: tiles at $4000, palette at slot 0 */
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
-                  palette_end - palette,
-                  BG_16COLORS, 0x4000);
+    /* BG3: tilemap at $2400, tiles at $1000 (2bpp clouds) */
+    REG_BG3SC = (0x2400 >> 8) | 0x00;   /* SC_32x32 */
+    REG_BG34NBA = 0x01;                  /* BG3 tiles at $1000 */
 
-    /* Load tilemap */
-    dmaCopyVram(tilemap, 0x1000, tilemap_end - tilemap);
+    /* Mode 1, BG3 priority high */
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
 
-    /*------------------------------------------------------------------------
-     * Configure Video Mode
-     *------------------------------------------------------------------------*/
+    /* Main screen: BG1 + BG3 only (disable BG2) */
+    setMainScreen(LAYER_BG1 | LAYER_BG3);
 
-    setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1;
-    bgSetScroll(0, 0, 0);
+    /* Subscreen: BG3 (clouds provide color data for blending) */
+    setSubScreen(LAYER_BG3);
 
-    /*------------------------------------------------------------------------
-     * Initialize Color Math
-     *------------------------------------------------------------------------*/
-
+    /* Color addition: blend subscreen (clouds) into BG1 + backdrop */
     colorMathInit();
-
-    /*------------------------------------------------------------------------
-     * Turn on screen
-     *------------------------------------------------------------------------*/
+    colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
+    colorMathSetOp(COLORMATH_ADD);
+    colorMathEnable(COLORMATH_BG1 | COLORMATH_BACKDROP);
 
     setScreenOn();
 
-    /*------------------------------------------------------------------------
-     * Main loop
-     *------------------------------------------------------------------------*/
-
     while (1) {
+        /* Scroll clouds horizontally */
+        scrX++;
+        bgSetScroll(2, scrX, 0);
+
         WaitForVBlank();
-
-        /* Read joypad */
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-
-        /* Detect new presses */
-        u16 pressed = pad & ~pad_prev;
-
-        /* A button: toggle shadow */
-        if (pressed & 0x0080) {  /* A button */
-            shadow_enabled = !shadow_enabled;
-            if (shadow_enabled) {
-                tint_mode = 0;  /* Disable tint when enabling shadow */
-            }
-            apply_effect();
-        }
-
-        /* B button: cycle tint */
-        if (pressed & 0x8000) {  /* B button */
-            if (!shadow_enabled) {
-                tint_mode = (tint_mode + 1) % 4;
-                apply_effect();
-            }
-        }
-
-        /* D-Pad Up: increase shadow */
-        if (pressed & 0x0800) {  /* Up */
-            if (shadow_intensity < 31) {
-                shadow_intensity++;
-                if (shadow_enabled) {
-                    apply_effect();
-                }
-            }
-        }
-
-        /* D-Pad Down: decrease shadow */
-        if (pressed & 0x0400) {  /* Down */
-            if (shadow_intensity > 0) {
-                shadow_intensity--;
-                if (shadow_enabled) {
-                    apply_effect();
-                }
-            }
-        }
-
-        pad_prev = pad;
     }
 
     return 0;

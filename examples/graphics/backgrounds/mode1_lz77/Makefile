@@ -17,13 +17,13 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion (4bpp Mode 1, LZ77 compressed)
 #------------------------------------------------------------------------------
 
-pvsneslib.pic pvsneslib.pal pvsneslib.map: pvsneslib.png
+res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.png
 	@echo "[GFX] Converting background (LZ77)..."
 	@$(GFX4SNES) -z -s 8 -o 16 -u 16 -e 0 -p -m -i $<
 
-combined.asm: pvsneslib.pic
+combined.asm: res/pvsneslib.pic
 
 clean: clean-mode1_lz77
 .PHONY: clean-mode1_lz77
 clean-mode1_lz77:
-	@rm -f pvsneslib.pic pvsneslib.pal pvsneslib.map pvsneslib.inc pvsneslib_data.as
+	@rm -f res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map res/pvsneslib.inc res/pvsneslib_data.as

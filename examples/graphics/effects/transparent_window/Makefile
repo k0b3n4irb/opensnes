@@ -26,3 +26,9 @@ res/background.pic res/background.map res/background.pal: res/background.png
 
 # Ensure assets are converted before assembly
 combined.asm: res/background.pic res/background.map res/background.pal
+
+# Extended clean
+clean: clean-transparent_window
+.PHONY: clean-transparent_window
+clean-transparent_window:
+	@rm -f res/background.pic res/background.pal res/background.map res/background.inc res/background_data.as

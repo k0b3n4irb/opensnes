@@ -82,7 +82,7 @@ lib: compiler
 examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
-tests: compiler tools
+tests: compiler tools lib
 	$(MAKE) -C $(TESTS_PATH)
 
 docs:

@@ -8,34 +8,34 @@
 .section ".rodata1" superfree
 
 tileset:
-.incbin "tiles.pic"
+.incbin "res/tiles.pic"
 tilesetend:
 
 tilepal:
-.incbin "tiles.pal"
+.incbin "res/tiles.pal"
 
 mariogfx:
-.incbin "mario_sprite.pic"
+.incbin "res/mario_sprite.pic"
 mariogfx_end:
 
 mariopal:
-.incbin "mario_sprite.pal"
+.incbin "res/mario_sprite.pal"
 
 .ends
 
 .section ".rodata2" superfree
 
 mapmario:
-.incbin "BG1.m16"
+.incbin "res/BG1.m16"
 
 objmario:
-.incbin "map_1_1.o16"
+.incbin "res/map_1_1.o16"
 
 tilesetatt:
-.incbin "map_1_1.b16"
+.incbin "res/map_1_1.b16"
 
 tilesetdef:
-.incbin "map_1_1.t16"
+.incbin "res/map_1_1.t16"
 
 .ends
 

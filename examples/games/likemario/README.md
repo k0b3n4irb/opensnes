@@ -15,9 +15,11 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/games/likemario
-# Open likemario.sfc in Mesen2
 ```
+
+Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 
 ## What You'll Learn
 
@@ -264,12 +266,12 @@ The Makefile includes custom rules for two different asset types:
 
 ```makefile
 # Background tiles: 8x8, 4bpp, 16 colors
-tiles.pic tiles.pal: tiles.png
+res/tiles.pic res/tiles.pal: res/tiles.png
 	$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
 # Mario sprites: 16x16, 4bpp, 16 colors
-mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
-	$(GFX4SNES) -s 16 -o 16 -u 16 -p -t bmp -i $<
+res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
+	$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 ```
 
 | Flag | Meaning |
@@ -279,8 +281,7 @@ mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
 | `-u 16` | Use up to 16 unique colors |
 | `-p` | Generate palette file (`.pal`) |
 | `-m` | Generate tilemap file (`.map`) — only for backgrounds |
-| `-t bmp` | Input format is BMP (default is PNG) |
-| `-i` | Input file |
+| `-i` | Input file (PNG format, the default) |
 
 ### Why So Many Modules?
 
@@ -301,14 +302,14 @@ mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
 ```asm
 ; Graphics — accessed only via DMA, can be in any ROM bank
 .SECTION ".rodata1" SUPERFREE
-tiles_til:        .INCBIN "tiles.pic"
-mario_sprite_til: .INCBIN "mario_sprite.pic"
+tiles_til:        .INCBIN "res/tiles.pic"
+mario_sprite_til: .INCBIN "res/mario_sprite.pic"
 .ENDS
 
 ; Map data — accessed directly by C code, must be in bank $00
 .SECTION ".rodata2" SEMIFREE BANK 0
-mapmario:    .INCBIN "BG1.m16"       ; Tilemap (u16 per tile)
-tilesetatt:  .INCBIN "map_1_1.b16"   ; Collision properties
+mapmario:    .INCBIN "res/BG1.m16"       ; Tilemap (u16 per tile)
+tilesetatt:  .INCBIN "res/map_1_1.b16"   ; Collision properties
 .ENDS
 ```
 
@@ -336,12 +337,12 @@ every tile lookup would return garbage.
 |------|-------------|
 | `main.c` | All game logic: physics, collision, streaming, camera (~493 lines) |
 | `data.asm` | ROM assets: tiles, sprites, palettes, map data, collision table |
-| `tiles.png` | Background tileset source (8x8 tiles) |
-| `mario_sprite.bmp` | Sprite sheet source (16x16 frames) |
-| `BG1.m16` | World tilemap (tile indices + flip/palette bits) |
-| `map_1_1.b16` | Per-tile collision properties (solid/empty) |
-| `overworld.it` | Music file (Impulse Tracker, not yet wired up) |
-| `mariojump.brr` | Jump sound effect (BRR, not yet wired up) |
+| `res/tiles.png` | Background tileset source (8x8 tiles) |
+| `res/mario_sprite.png` | Sprite sheet source (16x16 frames) |
+| `res/BG1.m16` | World tilemap (tile indices + flip/palette bits) |
+| `res/map_1_1.b16` | Per-tile collision properties (solid/empty) |
+| `res/overworld.it` | Music file (Impulse Tracker, not yet wired up) |
+| `res/mariojump.brr` | Jump sound effect (BRR, not yet wired up) |
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background` |
 
 ## Credits

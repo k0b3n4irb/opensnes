@@ -17,7 +17,7 @@ USE_LIB     := 1
 LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background
 
 USE_SNESMOD    := 1
-SOUNDBANK_SRC  := overworld.it jump_sfx.it
+SOUNDBANK_SRC  := res/overworld.it res/jump_sfx.it
 
 include $(OPENSNES)/make/common.mk
 
@@ -25,19 +25,20 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion (custom rules since tiles and sprites need different flags)
 #------------------------------------------------------------------------------
 
-tiles.pic tiles.pal: tiles.png
+res/tiles.pic res/tiles.pal: res/tiles.png
 	@echo "[GFX] Converting tileset..."
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
-mario_sprite.pic mario_sprite.pal: mario_sprite.bmp
+res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
 	@echo "[GFX] Converting mario sprites..."
-	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -t bmp -i $<
+	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
 # Ensure graphics are converted before assembly
-combined.asm: tiles.pic mario_sprite.pic
+combined.asm: res/tiles.pic res/mario_sprite.pic
 
 # Extended clean
 clean: clean-likemario
 .PHONY: clean-likemario
 clean-likemario:
-	@rm -f tiles.pic tiles.pal tiles.map mario_sprite.pic mario_sprite.pal
+	@rm -f res/tiles.pic res/tiles.pal res/tiles.map res/tiles.inc res/tiles_data.as
+	@rm -f res/mario_sprite.pic res/mario_sprite.pal res/mario_sprite.inc res/mario_sprite_data.as

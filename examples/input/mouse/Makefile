@@ -17,3 +17,18 @@ ASMSRC     := data.asm
 
 # Include common build rules
 include $(OPENSNES)/make/common.mk
+
+#------------------------------------------------------------------------------
+# Graphics conversion (4bpp cursor sprite)
+#------------------------------------------------------------------------------
+
+res/cursor.pic res/cursor.pal: res/cursor.png
+	@echo "[GFX] Converting cursor sprite..."
+	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -i $<
+
+combined.asm: res/cursor.pic
+
+clean: clean-mouse
+.PHONY: clean-mouse
+clean-mouse:
+	@rm -f res/cursor.pic res/cursor.pal res/cursor.inc res/cursor_data.as

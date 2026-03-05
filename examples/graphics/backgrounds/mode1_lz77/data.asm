@@ -11,7 +11,7 @@
 .section ".rodata_tiles" superfree
 
 patterns:
-.incbin "pvsneslib.pic"
+.incbin "res/pvsneslib.pic"
 patterns_end:
 
 .ends
@@ -20,11 +20,11 @@ patterns_end:
 .section ".rodata_map" superfree
 
 map:
-.incbin "pvsneslib.map"
+.incbin "res/pvsneslib.map"
 map_end:
 
 palette:
-.incbin "pvsneslib.pal"
+.incbin "res/pvsneslib.pal"
 palette_end:
 
 .ends

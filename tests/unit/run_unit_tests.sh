@@ -22,11 +22,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DERIVED_HOME="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Auto-detect OPENSNES_HOME if not set or invalid
-if [ -z "${OPENSNES_HOME:-}" ] || [ ! -f "${OPENSNES_HOME}/devtools/symmap.py" ]; then
+if [ -z "${OPENSNES_HOME:-}" ] || [ ! -f "${OPENSNES_HOME}/devtools/symmap/symmap.py" ]; then
     export OPENSNES_HOME="$DERIVED_HOME"
 fi
 
-SYMMAP="$OPENSNES_HOME/devtools/symmap.py"
+SYMMAP="$OPENSNES_HOME/devtools/symmap/symmap.py"
 
 VERBOSE=0
 if [ "${1:-}" = "-v" ] || [ "${1:-}" = "--verbose" ]; then

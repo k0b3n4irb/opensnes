@@ -14,7 +14,7 @@
 .section ".rodata_tiles1" superfree
 
 pvsneslib_tiles:
-.incbin "pvsneslib.pic" READ 32768
+.incbin "res/pvsneslib.pic" READ 32768
 
 .ends
 
@@ -22,7 +22,7 @@ pvsneslib_tiles:
 .section ".rodata_tiles2" superfree
 
 pvsneslib_tiles2:
-.incbin "pvsneslib.pic" SKIP 32768
+.incbin "res/pvsneslib.pic" SKIP 32768
 pvsneslib_tiles2_end:
 
 .ends
@@ -31,11 +31,11 @@ pvsneslib_tiles2_end:
 .section ".rodata_map" superfree
 
 pvsneslib_map:
-.incbin "pvsneslib.map"
+.incbin "res/pvsneslib.map"
 pvsneslib_map_end:
 
 pvsneslib_palette:
-.incbin "pvsneslib.pal"
+.incbin "res/pvsneslib.pal"
 pvsneslib_palette_end:
 
 .ends

@@ -18,9 +18,11 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/graphics/effects/hdma_wave
-# Open hdma_wave.sfc in Mesen2
 ```
+
+Then open `hdma_wave.sfc` in your emulator (Mesen2 recommended).
 
 ## What You'll Learn
 

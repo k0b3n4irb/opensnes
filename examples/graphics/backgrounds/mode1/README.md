@@ -1,5 +1,7 @@
 # Mode 1 Example
 
+![Screenshot](screenshot.png)
+
 The most common SNES video mode with two 16-color and one 4-color background.
 
 ## Learning Objectives
@@ -147,15 +149,14 @@ Row layout: BP0, BP1, BP0, BP1... (16 bytes)
 
 ---
 
-## Build and Run
+## Build & Run
 
 ```bash
-cd examples/graphics/mode1
-make clean && make
-
-# Run in emulator
-/path/to/Mesen mode1.sfc
+cd $OPENSNES_HOME
+make -C examples/graphics/backgrounds/mode1
 ```
+
+Then open `mode1.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
@@ -239,12 +240,8 @@ Mode 1 palette organization:
 
 ## What's Next?
 
-**Sprites:** [Simple Sprite](../simple_sprite/) - Display sprites
+**More BG layers:** [BG3 Priority](../mode1_bg3_priority/) - HUD overlay in Mode 1
 
-**Effects:** [Fading](../fading/) - Screen transitions
+**Sprites:** [Simple Sprite](../../sprites/simple_sprite/) - Display a sprite
 
----
-
-## License
-
-Code: MIT
+**Effects:** [Fading](../../effects/fading/) - Screen transitions

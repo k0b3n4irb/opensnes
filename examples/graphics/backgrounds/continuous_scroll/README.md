@@ -14,9 +14,11 @@
 ## Build & Run
 
 ```bash
+cd $OPENSNES_HOME
 make -C examples/graphics/backgrounds/continuous_scroll
-# Open continuous_scroll.sfc in Mesen2
 ```
+
+Then open `continuous_scroll.sfc` in your emulator (Mesen2 recommended).
 
 ## What You'll Learn
 
@@ -190,7 +192,7 @@ the OAM buffer to hardware — no manual `oamUpdate()` needed inside the loop.
 ## Go Further
 
 - **Add tile streaming:** Right now the tilemap is static. For larger worlds, you'd
-  upload new tile columns as the camera scrolls. See [LikeMario](../../games/likemario/)
+  upload new tile columns as the camera scrolls. See [LikeMario](../../../games/likemario/)
   for a working implementation.
 
 - **Add vertical scrolling:** Same pattern, but with Y thresholds and `bg_scroll_y`.
@@ -199,7 +201,7 @@ the OAM buffer to hardware — no manual `oamUpdate()` needed inside the loop.
 - **Add animation:** Use different sprite tiles based on direction. Tile 0 for right,
   tile 1 for left, advance every few frames for a walk cycle.
 
-- **Next example:** [LikeMario](../../games/likemario/) — full platformer with gravity,
+- **Next example:** [LikeMario](../../../games/likemario/) — full platformer with gravity,
   collision, and tile streaming.
 
 ---
