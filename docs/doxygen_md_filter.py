@@ -26,7 +26,7 @@ def main():
         sys.exit(1)
 
     filepath = sys.argv[1]
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
     rel = os.path.relpath(filepath)
