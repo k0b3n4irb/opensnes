@@ -79,18 +79,16 @@ temp += c;
 result = temp / d;
 ```
 
-### "error: static variable 'X' initialized in ROM"
+### Static variables with initializers
 
-**Cause**: C static variables with initializers are placed in ROM (read-only).
-
-**Fix**:
+Initialized static variables now work correctly:
 ```c
-// BAD: Initialized static goes to ROM
-static u8 counter = 0;
-
-// GOOD: Uninitialized static goes to RAM (C guarantees zero-init)
-static u8 counter;
+// Both work correctly:
+static u8 counter = 0;   // Initial value copied from ROM to RAM at startup
+static u8 counter;       // Zero-initialized by C standard
 ```
+
+The `CopyInitData` routine in crt0.asm copies initial values from ROM to RAM before `main()` is called.
 
 ## Runtime Issues (Black Screen / Crash)
 
@@ -125,7 +123,7 @@ Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you 
 
 **Diagnose**:
 ```bash
-python3 tools/symmap/symmap.py --check-overlap game.sym
+python3 devtools/symmap/symmap.py --check-overlap game.sym
 ```
 
 **Fix**: The library uses `ORGA $0300` to avoid the overlap zone.
@@ -280,7 +278,7 @@ If it's in ROM ($8000+), you can't write to it.
 
 ```bash
 # Check for memory overlaps
-python3 tools/symmap/symmap.py --check-overlap game.sym
+python3 devtools/symmap/symmap.py --check-overlap game.sym
 
 # View symbol map
 cat game.sym | grep "variable_name"

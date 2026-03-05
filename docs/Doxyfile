@@ -28,8 +28,8 @@ INPUT                  = mainpage.md \
                          tutorials/ \
                          GETTING_STARTED.md \
                          EXAMPLE_WALKTHROUGHS.md \
-                         CONTRIBUTING.md \
-                         CODE_STYLE.md
+                         CODE_STYLE.md \
+                         ../CONTRIBUTING.md
 
 # File patterns to process
 FILE_PATTERNS          = *.h *.md

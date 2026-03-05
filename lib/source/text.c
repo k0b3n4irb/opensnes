@@ -2,6 +2,10 @@
  * @file text.c
  * @brief Text rendering implementation for OpenSNES
  *
+ * Text is written to a RAM buffer (tilemapBuffer at $7E:3000), then
+ * DMA-transferred to VRAM during VBlank. This avoids VRAM write timing
+ * issues and removes the need for forced blank during text updates.
+ *
  * License: CC0 (Public Domain)
  */
 
@@ -9,8 +13,29 @@
 #include "snes/registers.h"
 #include "snes/dma.h"
 
-/* Include the font data */
-#include "opensnes_font_2bpp.h"
+/* Font data defined in text_data.asm */
+extern const unsigned char opensnes_font_2bpp[];
+
+/* Assembly helpers for performance-critical operations (text.asm) */
+extern void asm_textDMAFont(void);
+extern void asm_textFillBuffer(u16 value);
+
+/* Tilemap DMA function (defined in crt0.asm) */
+extern void tilemapFlush(void);
+
+/* Tilemap RAM buffer — placed by compiler in bank $00 WRAM mirror.
+ * The compiler generates `sta.l $0000,x` for array access, which always
+ * hits bank $00. Only addresses $0000-$1FFF in bank $00 are WRAM.
+ * 2048 bytes = 32×32 tilemap entries × 2 bytes each. */
+u8 tilemapBuffer[2048];
+
+/* DMA control variables (defined in crt0.asm .system RAMSECTION) */
+extern volatile u8 tilemap_update_flag;
+extern u16 tilemap_vram_addr;
+extern u16 tilemap_src_addr;
+
+/* Font size constants */
+#define FONT_SIZE 1536  /* 96 chars * 16 bytes per tile */
 
 /* Global text configuration */
 TextConfig text_config;
@@ -18,24 +43,6 @@ TextConfig text_config;
 /* Current cursor position */
 static u8 cursor_x = 0;
 static u8 cursor_y = 0;
-
-/**
- * @brief Write a word to VRAM at the specified address
- */
-static void vram_write_word(u16 addr, u16 data) {
-    REG_VMAIN = 0x80;       /* Increment after high byte write */
-    REG_VMADDL = addr & 0xFF;
-    REG_VMADDH = addr >> 8;
-    REG_VMDATAL = data & 0xFF;
-    REG_VMDATAH = data >> 8;
-}
-
-/**
- * @brief Calculate tilemap address for position
- */
-static u16 calc_tilemap_addr(u8 x, u8 y) {
-    return text_config.tilemap_addr + (y * text_config.map_width) + x;
-}
 
 /**
  * @brief Build tilemap entry for a character
@@ -57,6 +64,19 @@ static u16 build_tile_entry(char c) {
            ((u16)text_config.priority << 13);
 }
 
+/**
+ * @brief Write a tilemap entry to the RAM buffer
+ *
+ * @param x Column position (0-31)
+ * @param y Row position (0-31)
+ * @param entry 16-bit tilemap entry (tile + attributes)
+ */
+static void buffer_write_entry(u8 x, u8 y, u16 entry) {
+    u16 buf_offset = ((u16)y * text_config.map_width + x) * 2;
+    tilemapBuffer[buf_offset]     = entry & 0xFF;
+    tilemapBuffer[buf_offset + 1] = entry >> 8;
+}
+
 void textInit(void) {
     text_config.tilemap_addr = 0x3800;  /* $7000 in byte address / 2 */
     text_config.font_tile = 0;
@@ -64,8 +84,16 @@ void textInit(void) {
     text_config.priority = 0;
     text_config.map_width = 32;
 
+    /* Set DMA source and target for NMI handler */
+    tilemap_vram_addr = 0x3800;
+    tilemap_src_addr = (u16)tilemapBuffer;
+
     cursor_x = 0;
     cursor_y = 0;
+
+    /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles) */
+    textClear();
+    tilemapFlush();
 }
 
 void textInitEx(u16 tilemap_addr, u16 font_tile, u8 palette) {
@@ -75,26 +103,26 @@ void textInitEx(u16 tilemap_addr, u16 font_tile, u8 palette) {
     text_config.priority = 0;
     text_config.map_width = 32;
 
+    /* Set DMA source and target for NMI handler */
+    tilemap_vram_addr = tilemap_addr >> 1;
+    tilemap_src_addr = (u16)tilemapBuffer;
+
     cursor_x = 0;
     cursor_y = 0;
+
+    /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles) */
+    textClear();
+    tilemapFlush();
 }
 
 void textLoadFont(u16 vram_addr) {
-    u16 i;
-
     /* Set VRAM address (word address) */
     REG_VMAIN = 0x80;
     REG_VMADDL = vram_addr & 0xFF;
     REG_VMADDH = vram_addr >> 8;
 
-    /* Write font data
-     * 2bpp format: 16 bytes per tile
-     * 96 characters = 1536 bytes = 768 words
-     */
-    for (i = 0; i < sizeof(opensnes_font_2bpp); i += 2) {
-        REG_VMDATAL = opensnes_font_2bpp[i];
-        REG_VMDATAH = opensnes_font_2bpp[i + 1];
-    }
+    /* DMA font data from ROM to VRAM (assembly helper — ~1500 cycles vs ~180000) */
+    asm_textDMAFont();
 }
 
 void textSetPos(u8 x, u8 y) {
@@ -111,9 +139,6 @@ u8 textGetY(void) {
 }
 
 void textPutChar(char c) {
-    u16 addr;
-    u16 entry;
-
     /* Handle newline */
     if (c == '\n') {
         cursor_x = 0;
@@ -127,12 +152,8 @@ void textPutChar(char c) {
         return;
     }
 
-    /* Calculate tilemap address */
-    addr = calc_tilemap_addr(cursor_x, cursor_y);
-
-    /* Build and write tile entry */
-    entry = build_tile_entry(c);
-    vram_write_word(addr, entry);
+    /* Write tile entry to RAM buffer */
+    buffer_write_entry(cursor_x, cursor_y, build_tile_entry(c));
 
     /* Advance cursor */
     cursor_x++;
@@ -200,7 +221,9 @@ void textPrintHex(u16 value, u8 digits) {
 }
 
 void textClear(void) {
-    textClearRect(0, 0, text_config.map_width, 32);
+    u16 entry = build_tile_entry(' ');
+    /* Assembly fill loop — ~14000 cycles vs ~238000 from compiled C */
+    asm_textFillBuffer(entry);
 }
 
 void textClearRect(u8 x, u8 y, u8 w, u8 h) {
@@ -210,17 +233,17 @@ void textClearRect(u8 x, u8 y, u8 w, u8 h) {
 void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
     u8 row, col;
     u16 entry = build_tile_entry(c);
+    u8 lo = entry & 0xFF;
+    u8 hi = entry >> 8;
+    u16 row_offset;
 
+    /* Compute offset once per row, increment in inner loop */
     for (row = 0; row < h; row++) {
-        u16 addr = calc_tilemap_addr(x, y + row);
-
-        REG_VMAIN = 0x80;
-        REG_VMADDL = addr & 0xFF;
-        REG_VMADDH = addr >> 8;
-
+        row_offset = ((u16)(y + row) * text_config.map_width + x) * 2;
         for (col = 0; col < w; col++) {
-            REG_VMDATAL = entry & 0xFF;
-            REG_VMDATAH = entry >> 8;
+            tilemapBuffer[row_offset]     = lo;
+            tilemapBuffer[row_offset + 1] = hi;
+            row_offset += 2;
         }
     }
 }
@@ -254,4 +277,11 @@ void textDrawBox(u8 x, u8 y, u8 w, u8 h) {
         textPutChar('-');
     }
     textPutChar('+');
+}
+
+void textFlush(void) {
+    /* Set flag for NMI handler to DMA during next VBlank.
+     * This is safe to call anytime — the actual VRAM write
+     * happens during VBlank when VRAM access is allowed. */
+    tilemap_update_flag = 1;
 }

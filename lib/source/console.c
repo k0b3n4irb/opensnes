@@ -21,8 +21,7 @@
  * External Variables (defined in crt0.asm)
  *============================================================================*/
 
-extern volatile u8 vblank_flag;
-extern volatile u8 oam_update_flag;    /* Set to trigger OAM DMA during VBlank */
+/* vblank_flag and oam_update_flag are declared in <snes/system.h> (via <snes.h>) */
 extern volatile u16 frame_count;
 extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
 extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
@@ -31,8 +30,14 @@ extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
  * Static Variables
  *============================================================================*/
 
-/** Current screen brightness (0-15) */
-static u8 current_brightness;
+/** Current screen brightness (0-15), defaults to full brightness.
+ *  Initialized here so setScreenOn() works without consoleInit(). */
+static u8 current_brightness = 15;
+
+/** Force blank state shadow (REG_INIDISP is write-only, can't read back).
+ *  1 = force blanked (screen off), 0 = screen on.
+ *  Starts at 1 because consoleInit() sets force blank first. */
+static u8 force_blanked = 1;
 
 /** PAL/NTSC flag */
 static u8 is_pal_system;
@@ -61,6 +66,23 @@ void consoleInit(void) {
     /* Set up Mode 1 as default */
     REG_BGMODE = BGMODE_MODE1;
 
+    /* Set default BG memory layout.
+     * Without this, crt0 leaves $2107-$210C at zero, which puts both
+     * tilemap and tile data at VRAM $0000 (overlapping = garbage).
+     *
+     * Default layout:
+     *   BG1 tilemap at VRAM $0400 (BG1SC = $04, 32x32)
+     *   BG1 tile data at VRAM $0000 (BG12NBA low nibble = $0)
+     *
+     * Users can override with bgSetMapPtr() / bgSetGfxPtr() after init.
+     * We use direct register writes to avoid depending on the background module.
+     */
+    *(volatile u8*)0x2107 = 0x04;  /* BG1SC: tilemap at VRAM $0400, 32x32 */
+    *(volatile u8*)0x210B = 0x00;  /* BG12NBA: BG1 tiles at VRAM $0000 */
+
+    /* Disable mosaic effect (register can have garbage on power-up) */
+    REG_MOSAIC = 0;
+
     /* Clear palettes to black */
     REG_CGADD = 0;
     u16 i;
@@ -84,19 +106,20 @@ void consoleInitEx(u16 options) {
  *============================================================================*/
 
 void setScreenOn(void) {
-    /* Set brightness, disable force blank */
+    force_blanked = 0;
     REG_INIDISP = current_brightness & 0x0F;
 }
 
 void setScreenOff(void) {
-    /* Force blank */
+    force_blanked = 1;
     REG_INIDISP = INIDISP_FORCE_BLANK;
 }
 
 void setBrightness(u8 brightness) {
     current_brightness = brightness & 0x0F;
-    /* Only update if screen is on (not force blanked) */
-    if (!(REG_INIDISP & 0x80)) {
+    /* Only update hardware if screen is on (not force blanked).
+     * REG_INIDISP ($2100) is write-only — use shadow variable. */
+    if (!force_blanked) {
         REG_INIDISP = current_brightness;
     }
 }
@@ -109,18 +132,8 @@ u8 getBrightness(void) {
  * VBlank Synchronization
  *============================================================================*/
 
-void WaitForVBlank(void) {
-    /* Mark OAM buffer for transfer during VBlank */
-    oam_update_flag = 1;
-
-    /* Wait for VBlank flag to be set by NMI handler */
-    while (!vblank_flag) {
-        /* Idle - could use WAI instruction for power saving */
-    }
-
-    /* Clear flag for next frame */
-    vblank_flag = 0;
-}
+/* WaitForVBlank() is now implemented in assembly (crt0.asm) using WAI
+ * instruction for power savings and reduced bus contention (Opt 1). */
 
 u8 isInVBlank(void) {
     return (REG_HVBJOY & 0x80) ? TRUE : FALSE;
@@ -206,9 +219,9 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
 }
 
 void nmiSet(VBlankCallback callback) {
-    /* Extract bank byte from 24-bit function pointer */
-    u8 bank = (u8)((unsigned long)callback >> 16);
-    nmiSetBank(callback, bank);
+    /* cc65816 passes 16-bit pointers — bank byte is always 0.
+     * Use nmiSetBank() for callbacks in other banks. */
+    nmiSetBank(callback, 0);
 }
 
 void nmiClear(void) {

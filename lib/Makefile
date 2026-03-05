@@ -29,13 +29,36 @@ AS = ../bin/wla-65816
 
 # Flags
 CFLAGS = -I$(INCDIR)
-ASFLAGS = -I $(SRCDIR) -o
+ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -o
 
 # Source files
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
 # Note: sm_spc.asm is included by snesmod.asm, so we exclude it from direct compilation
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
 ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm, $(wildcard $(SRCDIR)/*.asm))
+
+# Sed transformations: convert cproc/QBE output to WLA-DX compatible assembly
+#   /^\.data/d         : Remove .data section markers (WLA-DX uses different syntax)
+#   /^\/\* end/d       : Remove "/* end function */" comments from QBE output
+#   /^\.balign/d       : Remove alignment directives (handled by WLA-DX sections)
+#   /^\.GLOBAL/d       : Remove global declarations (WLA-DX exports differently)
+#   .byte -> .db       : Convert byte directive to WLA-DX syntax
+#   .word -> .dw       : Convert word directive to WLA-DX syntax
+#   .long -> .dl       : Convert long directive to WLA-DX syntax
+#   .ascii -> .ASC     : Convert ASCII string directive to WLA-DX syntax
+#   \000 -> ", 0, "    : Convert null bytes in strings to explicit zeros
+#   .dsb N -> .dsb N,0 : Add fill value to DSB (Define Storage Bytes) directive
+SED_QBE_TO_WLA = \
+	-e '/^\.data/d' \
+	-e '/^\/\* end/d' \
+	-e '/^\.balign/d' \
+	-e '/^\.GLOBAL/d' \
+	-e 's/\.byte/.db/g' \
+	-e 's/\.word/.dw/g' \
+	-e 's/\.long/.dl/g' \
+	-e 's/\.ascii/.ASC/g' \
+	-e 's/\\000/", 0, "/g' \
+	-e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g'
 
 # Object files - LoROM
 C_OBJECTS_LOROM = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_LOROM)/%.o)
@@ -69,19 +92,12 @@ lorom: $(OBJECTS_LOROM)
 $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_LOROM)
 	@echo "[CC-LOROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_LOROM)/$*.c.asm
+	@if [ ! -f $(SRCDIR)/lib_memmap.inc ]; then \
+		echo "ERROR: $(SRCDIR)/lib_memmap.inc not found"; exit 1; \
+	fi
 	@echo '.include "lib_memmap.inc"' > $(BUILDDIR_LOROM)/$*.asm
 	@echo '' >> $(BUILDDIR_LOROM)/$*.asm
-	@sed -e '/^\.data/d' \
-	     -e '/^\/\* end/d' \
-	     -e '/^\.balign/d' \
-	     -e '/^\.GLOBAL/d' \
-	     -e 's/\.byte/.db/g' \
-	     -e 's/\.word/.dw/g' \
-	     -e 's/\.long/.dl/g' \
-	     -e 's/\.ascii/.ASC/g' \
-	     -e 's/\\000/", 0, "/g' \
-	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
-	     $(BUILDDIR_LOROM)/$*.c.asm >> $(BUILDDIR_LOROM)/$*.asm
+	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_LOROM)/$*.c.asm >> $(BUILDDIR_LOROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_LOROM)/$*.asm
 
 # ASM compilation for LoROM
@@ -103,19 +119,12 @@ hirom: $(OBJECTS_HIROM)
 $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_HIROM)
 	@echo "[CC-HIROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_HIROM)/$*.c.asm
+	@if [ ! -f $(SRCDIR)/lib_memmap_hirom.inc ]; then \
+		echo "ERROR: $(SRCDIR)/lib_memmap_hirom.inc not found"; exit 1; \
+	fi
 	@echo '.include "lib_memmap_hirom.inc"' > $(BUILDDIR_HIROM)/$*.asm
 	@echo '' >> $(BUILDDIR_HIROM)/$*.asm
-	@sed -e '/^\.data/d' \
-	     -e '/^\/\* end/d' \
-	     -e '/^\.balign/d' \
-	     -e '/^\.GLOBAL/d' \
-	     -e 's/\.byte/.db/g' \
-	     -e 's/\.word/.dw/g' \
-	     -e 's/\.long/.dl/g' \
-	     -e 's/\.ascii/.ASC/g' \
-	     -e 's/\\000/", 0, "/g' \
-	     -e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g' \
-	     $(BUILDDIR_HIROM)/$*.c.asm >> $(BUILDDIR_HIROM)/$*.asm
+	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_HIROM)/$*.c.asm >> $(BUILDDIR_HIROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_HIROM)/$*.asm
 
 # ASM compilation for HiROM

@@ -1,129 +1,48 @@
-# Topic: Text Display
+# Text Examples
 
-Learn how the SNES displays text and graphics using tiles and tilemaps.
+The SNES has no built-in text rendering. Text is displayed the same way as any
+other graphics: font characters are stored as tiles in VRAM, and a tilemap
+references those tiles to spell out words on screen.
 
-## What You'll Learn
+These examples teach the tile/tilemap fundamentals that underpin all SNES graphics.
 
-- How VRAM stores tile graphics
-- How tilemaps reference tiles to build screens
-- The 2bpp tile format (4 colors)
-- Using the font2snes tool
+## Examples
 
-## SNES Text Rendering Explained
+| Example | Difficulty | Description |
+|---------|------------|-------------|
+| [hello_world](hello_world/) | Beginner | Your first SNES ROM -- display text on a background layer |
+| [text_test](text_test/) | Beginner | Text positioning, formatting, and consoleDrawText usage |
 
-The SNES doesn't have a "print text" function. Instead, text is displayed like any other graphics:
+## Key Concepts
 
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Font Image  │ ──▶ │  Tile Data   │ ──▶ │   Tilemap    │
-│  (PNG file)  │     │   (VRAM)     │     │   (VRAM)     │
-└──────────────┘     └──────────────┘     └──────────────┘
-                            │                    │
-                            ▼                    ▼
-                     ┌──────────────────────────────┐
-                     │        PPU renders screen    │
-                     └──────────────────────────────┘
-```
-
-### Step 1: Font as Tiles
-
-Each character is an 8×8 pixel **tile**. A font is just a collection of tiles:
+### How Text Works on SNES
 
 ```
-┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
-│A│B│C│D│E│F│G│H│I│J│K│L│M│N│O│P│  Tile 0-15
-├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-│Q│R│S│T│U│V│W│X│Y│Z│0│1│2│3│4│5│  Tile 16-31
-└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+Font Image (PNG) --> gfx4snes/font2snes --> Tile Data (VRAM)
+                                        --> Tilemap (VRAM)
+                                                |
+                                        PPU renders screen
 ```
 
-### Step 2: Tilemap
+Each character is an 8x8 pixel tile. A font is a collection of tiles covering
+the ASCII range. The tilemap is a grid of tile numbers that defines which
+character appears at each screen position.
 
-A **tilemap** is a grid of tile numbers that defines what appears on screen:
+### 2BPP Tile Format
 
-```
-Tilemap (32×32 tiles = 256×256 pixels):
-┌────┬────┬────┬────┬────┬────┬────┬────┐
-│  0 │  7 │ 11 │ 11 │ 14 │  0 │ 22 │ 14 │ ← "HELLO WO"
-├────┼────┼────┼────┼────┼────┼────┼────┤    (tile numbers)
-│ 17 │ 11 │  3 │  0 │  0 │  0 │  0 │  0 │ ← "RLD"
-└────┴────┴────┴────┴────┴────┴────┴────┘
-
-Each entry = 2 bytes: tile number + attributes
-```
-
-## 2BPP Tile Format
-
-"2bpp" means **2 bits per pixel** = 4 possible colors (0-3).
-
-Each 8×8 tile = 16 bytes:
-- Bytes 0-7: Bitplane 0 (bit 0 of each pixel)
-- Bytes 8-15: Bitplane 1 (bit 1 of each pixel)
-
-```
-Example: Letter "H"
-Pixels:           Bitplane 0:    Bitplane 1:
-. # . . . . # .   01000010       00000000
-. # . . . . # .   01000010       00000000
-. # . . . . # .   01000010       00000000
-. # # # # # # .   01111110       00000000
-. # . . . . # .   01000010       00000000
-. # . . . . # .   01000010       00000000
-. # . . . . # .   01000010       00000000
-. . . . . . . .   00000000       00000000
-```
-
-Color index = (bitplane1[bit] << 1) | bitplane0[bit]
-
----
-
-## Lessons
-
-### [1. Hello World](1_hello_world/)
-**Difficulty:** ⭐ Beginner
-
-Your first SNES ROM! Display "HELLO WORLD" on screen.
-
-**Concepts:**
-- VRAM and tilemap basics
-- Background mode 0
-- Inline font data
-
-**Key Registers:**
-- `$2105` BGMODE - Set graphics mode
-- `$2115-2119` VRAM access
-- `$212C` TM - Enable layers
-
----
-
-### [2. Custom Font](2_custom_font/)
-**Difficulty:** ⭐⭐ Beginner+
-
-Create your own font and display multiple lines of text.
-
-**Concepts:**
-- Asset pipeline (PNG → SNES)
-- The `font2snes` tool
-- Full ASCII character set (32-127)
-
-**New Skills:**
-- Using conversion tools
-- Working with assets/
-
----
-
-## Quick Reference
+"2bpp" means 2 bits per pixel = 4 possible colors (indices 0-3).
+Each 8x8 tile is 16 bytes: 8 bytes for bitplane 0, 8 bytes for bitplane 1.
 
 ### VRAM Layout for Text
 
 ```
 $0000-$0FFF: Tile data (font graphics)
-$1000-$17FF: BG1 tilemap (32×32 = 2KB)
+$1000-$17FF: BG1 tilemap (32x32 = 2KB)
 ```
 
 ### Mode 0 Palette
 
-In Mode 0, each background uses 4 colors:
+In Mode 0, each background layer gets 4 colors:
 - BG1: Colors 0-3
 - BG2: Colors 4-7
 - BG3: Colors 8-11
@@ -131,4 +50,5 @@ In Mode 0, each background uses 4 colors:
 
 ---
 
-**Next Topic:** [Graphics](../graphics/) - Learn to display sprites →
+Start with **hello_world** to get your first ROM running, then use **text_test**
+to explore text positioning and formatting.

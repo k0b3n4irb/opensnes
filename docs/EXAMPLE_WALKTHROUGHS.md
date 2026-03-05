@@ -8,14 +8,14 @@ This guide provides detailed explanations of each example project, breaking down
 
 1. [Hello World](#1-hello-world) - Text display using background tiles
 2. [Sprite Display](#2-sprite-display) - Show a 16x16 sprite
-3. [Joypad Input](#3-joypad-input) - Move a sprite with the controller
-4. [Audio Playback](#4-audio-playback) - Play sounds with button press
+3. [Two-Player Input](#3-two-player-input) - Move sprites with controllers
+4. [SNESMOD Music](#4-snesmod-music) - Tracker music playback
 
 ---
 
 ## 1. Hello World
 
-**Location:** `examples/text/1_hello_world/`
+**Location:** `examples/text/hello_world/`
 
 This example displays "HELLO WORLD!" on screen using background tiles. It demonstrates the fundamental concepts of SNES graphics.
 
@@ -114,7 +114,7 @@ REG_INIDISP = 0x0F;  /* Full brightness, screen on */
 
 ## 2. Sprite Display
 
-**Location:** `examples/graphics/1_sprite/`
+**Location:** `examples/graphics/sprites/simple_sprite/`
 
 This example shows a 16x16 pixel sprite on screen. It introduces OAM (Object Attribute Memory) and sprite graphics.
 
@@ -218,189 +218,252 @@ REG_OAMDATA = 0x02;  /* Bits: --ss --ss (sprite 3,2,1,0) */
 
 ---
 
-## 3. Joypad Input
+## 3. Two-Player Input
 
-**Location:** `examples/input/1_joypad/`
+**Location:** `examples/input/two_players/`
 
-Move a sprite around the screen using the D-pad. Hold A or B for faster movement.
+Move sprites around the screen using the D-pad. Supports two players simultaneously.
 
 ### Key Concepts
 
 - Auto-joypad reading
-- Button state polling
+- Button state polling (both controllers)
 - Boundary checking
-- Real-time sprite movement
+- Real-time sprite movement for multiple players
 
 ### Controller Button Layout
 
 ```c
-#define JOY_B       0x8000
-#define JOY_Y       0x4000
-#define JOY_SELECT  0x2000
-#define JOY_START   0x1000
-#define JOY_UP      0x0800
-#define JOY_DOWN    0x0400
-#define JOY_LEFT    0x0200
-#define JOY_RIGHT   0x0100
-#define JOY_A       0x0080
-#define JOY_X       0x0040
-#define JOY_L       0x0020
-#define JOY_R       0x0010
+#define KEY_B       0x8000
+#define KEY_Y       0x4000
+#define KEY_SELECT  0x2000
+#define KEY_START   0x1000
+#define KEY_UP      0x0800
+#define KEY_DOWN    0x0400
+#define KEY_LEFT    0x0200
+#define KEY_RIGHT   0x0100
+#define KEY_A       0x0080
+#define KEY_X       0x0040
+#define KEY_L       0x0020
+#define KEY_R       0x0010
 ```
 
 ### Code Walkthrough
 
-#### Enabling Auto-Joypad
+#### Player State
+
+Each player has their own position stored in a struct:
 
 ```c
-REG_NMITIMEN = 0x81;  /* Enable NMI + auto-joypad */
+typedef struct {
+    s16 x, y;
+} Player;
+
+Player p1 = {64, 112};   /* Player 1 starts left */
+Player p2 = {192, 112};  /* Player 2 starts right */
 ```
 
-The SNES automatically reads all controllers during VBlank when bit 0 is set.
+#### Sprite Setup (Two Palettes)
 
-#### Reading Controller State
+Each player gets a different colored sprite via separate palettes:
 
 ```c
-static u16 read_joypad(void) {
-    /* Wait for auto-read to complete */
-    while (REG_HVBJOY & 0x01) {}
-    return REG_JOY1L | (REG_JOY1H << 8);
-}
+/* Load sprite tile + Player 1 palette (blue) */
+oamInitGfxSet((u8 *)sprite_tile, 32,
+              (u8 *)pal_blue, 8,
+              0, 0x0000, OBJ_SIZE8_L16);
+
+/* Load Player 2 palette (red) into palette slot 1 */
+dmaCopyCGram((u8 *)pal_red, 128 + 16, 8);
+
+/* Set up both sprites */
+oamSet(0, p1.x, p1.y, 0, 0, 0, 0);  /* Palette 0 (blue) */
+oamSet(1, p2.x, p2.y, 0, 0, 0, 1);  /* Palette 1 (red)  */
 ```
 
-**Important:** Always wait for auto-read to complete before reading JOY1L/H!
+#### Reading Both Controllers
 
-#### Movement with Boundary Checking
+The NMI handler reads both joypads automatically. Use `padHeld()` with the
+controller index (0 or 1) to get the current button state:
 
 ```c
-if (joy & JOY_UP) {
-    if (sprite_y > speed) {
-        sprite_y = sprite_y - speed;
-    } else {
-        sprite_y = 0;
-    }
-}
+pad1 = padHeld(0);  /* Controller 1 */
+pad2 = padHeld(1);  /* Controller 2 */
 ```
 
-This prevents the sprite from wrapping around when it reaches the screen edge.
+#### Independent Movement with Boundary Checking
 
-#### Variable Speed
+Each player's D-pad input moves only their sprite:
 
 ```c
-speed = 1;
-if (joy & (JOY_A | JOY_B)) {
-    speed = 3;
-}
+/* Player 1 movement */
+if (pad1 & KEY_UP)    { if (p1.y > 0) p1.y--; }
+if (pad1 & KEY_DOWN)  { if (p1.y < 224) p1.y++; }
+if (pad1 & KEY_LEFT)  { if (p1.x > 0) p1.x--; }
+if (pad1 & KEY_RIGHT) { if (p1.x < 248) p1.x++; }
+
+/* Player 2 movement */
+if (pad2 & KEY_UP)    { if (p2.y > 0) p2.y--; }
+if (pad2 & KEY_DOWN)  { if (p2.y < 224) p2.y++; }
+if (pad2 & KEY_LEFT)  { if (p2.x > 0) p2.x--; }
+if (pad2 & KEY_RIGHT) { if (p2.x < 248) p2.x++; }
+
+/* Update both sprites */
+oamSet(0, p1.x, p1.y, 0, 0, 0, 0);
+oamSet(1, p2.x, p2.y, 0, 0, 0, 1);
 ```
 
-Holding A or B triples the movement speed.
+The boundary checks prevent sprites from wrapping around screen edges.
 
 ### Try It Yourself
 
-1. Add acceleration (gradual speed increase)
-2. Implement edge wrapping instead of boundary clamping
-3. Add a second sprite controlled by buttons
-4. Implement 8-way diagonal movement
+1. Add a speed boost when holding A or B
+2. Implement collision detection between the two sprites
+3. Add a score display for a competitive mini-game
+4. Make each player's sprite a different size (8x8 vs 16x16)
 
 ---
 
-## 4. Audio Playback
+## 4. SNESMOD Music
 
-**Location:** `examples/audio/1_tone/`
+**Location:** `examples/audio/snesmod_music/`
 
-Press A to play a "tada" sound effect. Demonstrates SPC700 audio programming.
+Play tracker music with interactive controls: play, stop, pause/resume, volume, and fade out.
 
 ### Key Concepts
 
-- SPC700 IPL boot protocol
-- Uploading code/data to audio RAM
-- BRR sample format
-- DSP voice configuration
-- CPU-SPC communication
+- SNESMOD audio system setup
+- Soundbank conversion from Impulse Tracker (.it) files
+- Module loading and playback
+- Per-frame audio processing
+- Volume and transport controls
 
-### SPC700 Architecture
+### Makefile Configuration
 
-The SNES has a separate audio processor:
-- **SPC700**: 8-bit CPU running at 1.024 MHz
-- **DSP**: Digital Signal Processor with 8 voices
-- **64KB Audio RAM**: Holds driver code, samples, and echo buffer
+SNESMOD requires specific Makefile settings:
 
-### Communication Protocol
+```makefile
+# Enable SNESMOD audio system
+USE_SNESMOD    := 1
+USE_LIB        := 1
+LIB_MODULES    := console sprite dma input
 
-The CPU and SPC communicate via 4 I/O ports ($2140-$2143):
-
-```c
-#define REG_APUIO0 (*(volatile u8*)0x2140)
+# Soundbank source files (.it format)
+SOUNDBANK_SRC  := music/pollen8.it
 ```
 
-This example uses an "echo" protocol:
-1. SPC continuously echoes port0 values
-2. Write 0x55 to trigger sound
-3. Wait for echo confirmation
-4. Clear to 0x00
+The build system converts `.it` files into a soundbank binary and generates `soundbank.h`
+with constants like `SOUNDBANK_BANK` and `MOD_POLLEN8`.
 
 ### Code Walkthrough
 
-#### SPC Initialization
+#### Initialization
 
 ```c
-spc_wait_ready();  /* Wait for IPL to be ready */
+#include <snes/snesmod.h>
+#include "soundbank.h"
 
-/* Upload driver, directory, and sample */
-spc_upload(0x0200, spc_driver, sizeof(spc_driver));
-spc_upload(0x0300, sample_dir, sizeof(sample_dir));
-spc_upload(0x0400, &tada_brr_start, 8739);
+/* Initialize SNESMOD (uploads driver to SPC700) */
+snesmodInit();
 
-spc_execute(0x0200);  /* Start driver */
+/* Tell SNESMOD where the soundbank lives in ROM */
+snesmodSetSoundbank(SOUNDBANK_BANK);
+
+/* Load a module from the soundbank */
+snesmodLoadModule(MOD_POLLEN8);
+
+/* Start playback (0 = from beginning) */
+snesmodPlay(0);
 ```
 
-#### DSP Voice Setup (in driver)
+**What's happening:**
+- `snesmodInit()` uploads the SNESMOD driver to the SPC700's 64KB audio RAM
+- `snesmodSetSoundbank()` tells the driver which ROM bank holds the converted soundbank
+- `snesmodLoadModule()` transfers the module (patterns + samples) to audio RAM
+- `snesmodPlay(0)` starts playback from pattern 0
 
-The SPC driver configures DSP registers:
-
-```asm
-; Voice 0 volume
-mov $F2, #$00     ; V0VOLL register
-mov $F3, #$7F     ; Max volume
-
-; Pitch (sample playback rate)
-mov $F2, #$02     ; V0PITCHL
-mov $F3, #$40
-mov $F2, #$03     ; V0PITCHH
-mov $F3, #$04
-
-; ADSR envelope
-mov $F2, #$05     ; V0ADSR1
-mov $F3, #$FF     ; Attack/Decay
-mov $F2, #$06     ; V0ADSR2
-mov $F3, #$E0     ; Sustain/Release
-```
-
-#### Playing Sound
+#### Per-Frame Processing (Critical!)
 
 ```c
-/* Detect A button press */
-if ((joy & JOY_A) && !a_was_pressed) {
-    REG_APUIO0 = 0x55;              /* Send play command */
-    while (REG_APUIO0 != 0x55) {}   /* Wait for echo */
-    REG_APUIO0 = 0x00;              /* Clear command */
-    while (REG_APUIO0 != 0x00) {}
+while (1) {
+    WaitForVBlank();
+    snesmodProcess();  /* MUST be called every frame! */
+    /* ... game logic ... */
 }
 ```
 
-### BRR Sample Format
+**`snesmodProcess()` is mandatory every frame.** It handles CPU↔SPC communication:
+streaming pattern data, processing commands, and keeping playback in sync.
+Skipping it causes audio glitches or silence.
 
-BRR (Bit Rate Reduction) is the SNES's compressed audio format:
-- 9 bytes per block (1 header + 8 data bytes)
-- 16 samples per block
-- 4:1 compression ratio
+#### Transport Controls
+
+```c
+/* Play / Stop */
+snesmodPlay(0);     /* Start from beginning */
+snesmodStop();      /* Stop playback */
+
+/* Pause / Resume */
+snesmodPause();
+snesmodResume();
+```
+
+#### Volume Control
+
+```c
+/* Set module volume (0-127) */
+snesmodSetModuleVolume(volume);
+
+/* Fade volume over time (target, speed) */
+snesmodFadeVolume(0, 4);  /* Fade to silence, speed 4 */
+```
+
+### Creating Music
+
+1. Use [OpenMPT](https://openmpt.org/) (free) to compose in Impulse Tracker format
+2. SNES supports 8 channels, 32kHz max sample rate
+3. Keep total sample data under ~58KB (shares 64KB audio RAM with driver + echo buffer)
+4. Export as `.it` and place in your project's `music/` directory
 
 ### Try It Yourself
 
-1. Change the playback pitch
-2. Add a second sample
-3. Implement volume control
-4. Create a simple melody
+1. Replace `pollen8.it` with your own tracker module
+2. Add sound effects alongside music (see `snesmod_sfx` example)
+3. Implement music selection with multiple modules
+4. Trigger music changes based on game events
+
+### Deep Dive: What SNESMOD Does Under the Hood
+
+For the curious — here's what happens beneath the library calls.
+
+The SNES has a completely separate **SPC700** audio processor:
+- 8-bit CPU running at 1.024 MHz
+- Custom DSP with 8 voices, hardware ADSR, echo/reverb
+- 64KB dedicated audio RAM (not accessible by the main CPU)
+
+Communication happens via 4 shared I/O ports ($2140-$2143). When you call
+`snesmodInit()`, it uses the SPC700's built-in IPL boot ROM to upload the
+SNESMOD driver code into audio RAM:
+
+```
+CPU writes to $2140-$2143  →  SPC700 reads from $F4-$F7
+SPC700 writes to $F4-$F7   →  CPU reads from $2140-$2143
+```
+
+The driver then configures DSP registers for each voice:
+
+```
+$F2 = register address    $F3 = register value
+Voice registers: VOL_L, VOL_R, PITCH_L, PITCH_H, ADSR1, ADSR2, ...
+```
+
+Audio samples use **BRR** (Bit Rate Reduction) compression:
+- 9 bytes per block (1 header + 8 data bytes = 16 decoded samples)
+- ~4:1 compression ratio vs raw PCM
+- The DSP decompresses in real-time during playback
+
+`snesmodProcess()` streams pattern data from ROM to the SPC700 each frame,
+telling the driver which notes to play, at what pitch and volume.
 
 ---
 
@@ -464,7 +527,7 @@ for (i = used_sprites; i < 128; i++) {
 Each example has a Makefile:
 
 ```bash
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 make
 # Creates hello_world.sfc
 

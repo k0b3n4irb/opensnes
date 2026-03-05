@@ -17,7 +17,7 @@
  * $2130 - CGWSEL: Color math control register A
  *   Bits 7-6: Force main screen black (0=never, 1=outside window, 2=inside, 3=always)
  *   Bits 5-4: Color math enable (0=always, 1=inside window, 2=outside, 3=never)
- *   Bit 1: Sub screen color source (0=sub screen, 1=fixed color)
+ *   Bit 1: Sub screen BG/OBJ enable (0=fixed color, 1=sub screen)
  *   Bit 0: Direct color mode for 256-color BG
  *
  * $2131 - CGADSUB: Color math control register B
@@ -80,9 +80,9 @@ void colorMathSetHalf(u8 enable) {
 
 void colorMathSetSource(u8 source) {
     if (source == COLORMATH_SRC_FIXED) {
-        cgwsel |= 0x02;  /* Use fixed color */
+        cgwsel &= ~0x02; /* Fixed color: bit 1 = 0 */
     } else {
-        cgwsel &= ~0x02; /* Use sub screen */
+        cgwsel |= 0x02;  /* Sub screen: bit 1 = 1 */
     }
     REG_CGWSEL = cgwsel;
 }

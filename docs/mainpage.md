@@ -57,7 +57,7 @@ OpenSNES provides everything you need to create SNES games in C:
 - **Assembler** (WLA-DX) - Full 65816 and SPC700 support
 - **Library** - Hardware abstraction for graphics, audio, input
 - **Tools** - Asset converters for graphics and audio
-- **Examples** - 11 working example ROMs to learn from
+- **Examples** - 25 working example ROMs to learn from
 
 ## Quick Start
 
@@ -72,7 +72,7 @@ OpenSNES provides everything you need to create SNES games in C:
 ### Build the SDK
 
 ```bash
-git clone --recursive https://github.com/user/opensnes.git
+git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
 make
 ```
@@ -80,7 +80,7 @@ make
 ### Create Your First ROM
 
 ```bash
-cd examples/text/1_hello_world
+cd examples/text/hello_world
 make
 # Open hello_world.sfc in your emulator
 ```
@@ -109,24 +109,37 @@ make
 - @ref tutorial_audio "Audio & Music"
 
 ### Contributing
-- @ref contributing "Contributing Guide"
 - @ref code_style "Code Style Guide"
 
 ## Examples Overview
 
 | Category | Example | Description |
 |----------|---------|-------------|
-| Text | hello_world | Basic text output |
-| Text | custom_font | Custom font loading |
-| Basics | calculator | Arithmetic operations |
-| Graphics | animation | Sprite animation |
-| Graphics | mode7 | Rotation & scaling |
-| Graphics | scrolling | Parallax scrolling |
-| Audio | tone | Simple tone generation |
-| Audio | sfx | BRR sample playback |
-| Audio | snesmod_music | Tracker music |
-| Audio | snesmod_sfx | Sound effects |
-| Input | two_players | Two-player controls |
+| Text | [hello_world](../examples/text/hello_world/) | Basic text output |
+| Text | [text_test](../examples/text/text_test/) | Text positioning and formatting |
+| Basics | [collision_demo](../examples/basics/collision_demo/) | Collision detection |
+| Input | [two_players](../examples/input/two_players/) | Two-player controls |
+| Sprites | [simple_sprite](../examples/graphics/sprites/simple_sprite/) | OAM, sprite display |
+| Sprites | [animated_sprite](../examples/graphics/sprites/animated_sprite/) | Frame animation, H-flip |
+| Sprites | [dynamic_sprite](../examples/graphics/sprites/dynamic_sprite/) | VRAM streaming |
+| Backgrounds | [mode1](../examples/graphics/backgrounds/mode1/) | Mode 1 multi-layer |
+| Backgrounds | [continuous_scroll](../examples/graphics/backgrounds/continuous_scroll/) | Streaming scroll |
+| Backgrounds | [mode7](../examples/graphics/backgrounds/mode7/) | Rotation & scaling |
+| Backgrounds | [mode7_perspective](../examples/graphics/backgrounds/mode7_perspective/) | Pseudo-3D (F-Zero style) |
+| Effects | [fading](../examples/graphics/effects/fading/) | Brightness transitions |
+| Effects | [mosaic](../examples/graphics/effects/mosaic/) | Pixelation effect |
+| Effects | [gradient_colors](../examples/graphics/effects/gradient_colors/) | HDMA color gradients |
+| Effects | [hdma_wave](../examples/graphics/effects/hdma_wave/) | Scanline wave distortion |
+| Effects | [parallax_scrolling](../examples/graphics/effects/parallax_scrolling/) | Multi-layer parallax |
+| Effects | [transparency](../examples/graphics/effects/transparency/) | Color math blending |
+| Effects | [window](../examples/graphics/effects/window/) | Window masking |
+| Effects | [transparent_window](../examples/graphics/effects/transparent_window/) | Window + color math |
+| Audio | [snesmod_music](../examples/audio/snesmod_music/) | Tracker music playback |
+| Audio | [snesmod_sfx](../examples/audio/snesmod_sfx/) | Sound effects |
+| Memory | [hirom_demo](../examples/memory/hirom_demo/) | HiROM memory mapping |
+| Memory | [save_game](../examples/memory/save_game/) | Battery-backed saves |
+| Games | [breakout](../examples/games/breakout/) | Complete Breakout game |
+| Games | [likemario](../examples/games/likemario/) | Platformer with scrolling |
 
 ## Architecture
 
@@ -150,6 +163,6 @@ OpenSNES is released under the MIT License. See LICENSE file for details.
 
 ## Links
 
-- [GitHub Repository](https://github.com/user/opensnes)
-- [Issue Tracker](https://github.com/user/opensnes/issues)
+- [GitHub Repository](https://github.com/k0b3n4irb/opensnes)
+- [Issue Tracker](https://github.com/k0b3n4irb/opensnes/issues)
 - [SNES Development Wiki](https://snes.nesdev.org/)

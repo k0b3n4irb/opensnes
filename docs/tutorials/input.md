@@ -12,8 +12,8 @@ This tutorial covers reading SNES controllers including button detection and mul
     │ ┌───┼───┼───┐      (Y)   (A)├───┤     │
     │ │ ← │   │ → │ [SEL][STA] │ Y │ A │    │
     │ └───┼───┼───┘            ├───┼───┤    │
-    │     │ ↓ │                │ B │       │
-    │     └───┘                └───┘       │
+    │     │ ↓ │                │ B │        │
+    │     └───┘                └───┘        │
     └───────────────────────────────────────┘
 ```
 
@@ -263,7 +263,7 @@ For reference, the joypad registers:
 
 ## Example
 
-See `examples/input/2_two_players/` for a complete two-player demo.
+See `examples/input/two_players/` for a complete two-player demo.
 
 ## Next Steps
 

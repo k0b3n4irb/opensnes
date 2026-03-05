@@ -1,132 +1,115 @@
-# OpenSNES Tutorial
+# OpenSNES Examples
 
-Welcome to the OpenSNES learning path! This tutorial will guide you from your first "Hello World" to building complete SNES games.
+Learn SNES development step by step. 36 examples organized by topic, building
+from basic concepts to complete games.
 
-## How to Use This Tutorial
+## Categories
 
-Each example is a **lesson** designed to teach specific concepts. Work through them in order within each topic - they build on each other.
-
-```
-📁 examples/
-├── 📁 text/          ← Start here! Learn the basics
-├── 📁 graphics/      ← Sprites, backgrounds, tiles
-├── 📁 input/         ← Controller handling
-└── 📁 audio/         ← Sound effects and music
-```
+| Category | Examples | What It Covers |
+|----------|----------|----------------|
+| [text/](text/) | 2 | Text display, fonts, tilemaps |
+| [basics/](basics/) | 1 | Collision detection, game mechanics |
+| [graphics/](graphics/) | 21 | Backgrounds, sprites, visual effects |
+| [input/](input/) | 3 | Joypads, mouse, Super Scope |
+| [audio/](audio/) | 2 | Music and sound effects via SNESMOD |
+| [maps/](maps/) | 2 | Tile maps, dynamic streaming, slopes |
+| [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
+| [games/](games/) | 3 | Complete game projects |
 
 ## Learning Path
 
-### 🎯 Beginner: Text & Basics
-**Goal:** Understand SNES architecture and display text on screen.
+### Level 1 -- First Steps
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [text/1_hello_world](text/1_hello_world/) | VRAM, tilemaps, Mode 0, your first ROM |
-| 2 | [text/2_custom_font](text/2_custom_font/) | Asset pipeline, 2bpp tiles, font2snes tool |
+| # | Example | What You Will Learn |
+|---|---------|---------------------|
+| 1 | [text/hello_world](text/hello_world/) | PPU, backgrounds, tiles, palette -- your first ROM |
+| 2 | [text/text_test](text/text_test/) | Text positioning, formatting, consoleDrawText |
+| 3 | [graphics/sprites/simple_sprite](graphics/sprites/simple_sprite/) | OAM, sprite display, CGRAM split |
+| 4 | [input/two_players](input/two_players/) | Joypad reading, multiplayer input |
 
-### 🎮 Intermediate: Graphics
-**Goal:** Display and animate sprites, create backgrounds.
+### Level 2 -- Graphics Fundamentals
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | [graphics/1_sprite](graphics/1_sprite/) | OAM, sprites, 4bpp tiles, controller input |
-| 2 | graphics/2_animation | *(coming soon)* Frame animation, timing |
-| 3 | graphics/3_background | *(coming soon)* Tilemaps, scrolling |
+| # | Example | What You Will Learn |
+|---|---------|---------------------|
+| 5 | [graphics/backgrounds/mode1](graphics/backgrounds/mode1/) | Mode 1 multi-layer backgrounds |
+| 6 | [graphics/backgrounds/mode1_bg3_priority](graphics/backgrounds/mode1_bg3_priority/) | BG3 priority bit in Mode 1 |
+| 7 | [graphics/backgrounds/mode1_lz77](graphics/backgrounds/mode1_lz77/) | LZ77-compressed background data |
+| 8 | [graphics/sprites/animated_sprite](graphics/sprites/animated_sprite/) | Frame animation, sprite sheets, H-flip |
+| 9 | [graphics/sprites/dynamic_sprite](graphics/sprites/dynamic_sprite/) | VRAM streaming, dynamic tile uploads |
+| 10 | [graphics/sprites/object_size](graphics/sprites/object_size/) | OBJSEL sprite size configurations |
+| 11 | [graphics/effects/fading](graphics/effects/fading/) | Brightness control, screen transitions |
+| 12 | [graphics/effects/mosaic](graphics/effects/mosaic/) | Mosaic pixelation effect |
 
-### 🕹️ Intermediate: Input
-**Goal:** Handle player input from controllers.
+### Level 3 -- Scrolling and Effects
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | input/1_controller | *(coming soon)* Auto-read, button states |
+| # | Example | What You Will Learn |
+|---|---------|---------------------|
+| 13 | [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
+| 14 | [graphics/backgrounds/mixed_scroll](graphics/backgrounds/mixed_scroll/) | Multiple BG layers scrolling at different rates |
+| 15 | [graphics/effects/hdma_wave](graphics/effects/hdma_wave/) | HDMA scanline wave distortion |
+| 16 | [graphics/effects/hdma_gradient](graphics/effects/hdma_gradient/) | HDMA color gradient per scanline |
+| 17 | [graphics/effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
+| 18 | [graphics/effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
+| 19 | [graphics/effects/transparency](graphics/effects/transparency/) | Color math (add/subtract blending) |
+| 20 | [graphics/effects/window](graphics/effects/window/) | Hardware window masking |
+| 21 | [graphics/effects/transparent_window](graphics/effects/transparent_window/) | Color math + HDMA windowed transparency |
 
-### 🔊 Advanced: Audio
-**Goal:** Add sound effects and music.
+### Level 4 -- Advanced Topics
 
-| # | Example | What You'll Learn |
-|---|---------|-------------------|
-| 1 | audio/1_sound | *(coming soon)* SPC700, BRR samples |
+| # | Example | What You Will Learn |
+|---|---------|---------------------|
+| 22 | [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
+| 23 | [graphics/backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 24 | [graphics/sprites/metasprite](graphics/sprites/metasprite/) | Multi-tile composite sprites |
+| 25 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
+| 26 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
+| 27 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 28 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 29 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
+| 30 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
 
----
+### Level 5 -- Maps and Complete Projects
 
-## SNES Architecture Overview
+| # | Example | What You Will Learn |
+|---|---------|---------------------|
+| 31 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
+| 32 | [maps/slopemario](maps/slopemario/) | Slopes and tile-based collision |
+| 33 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
+| 34 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 35 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
+| 36 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
 
-Before diving in, here's what you need to know about the SNES:
-
-### The Two Processors
-
-```
-┌─────────────────┐     ┌─────────────────┐
-│   65816 CPU     │     │   SPC700 APU    │
-│  (Main CPU)     │────▶│  (Audio CPU)    │
-│   ~3.58 MHz     │     │   ~1.024 MHz    │
-└────────┬────────┘     └─────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│      PPU        │
-│ (Picture Proc.) │
-│  Video output   │
-└─────────────────┘
-```
-
-### Memory You'll Use
-
-| Memory | Size | Purpose |
-|--------|------|---------|
-| **VRAM** | 64 KB | Tile graphics, tilemaps |
-| **CGRAM** | 512 bytes | Color palettes (256 colors) |
-| **OAM** | 544 bytes | Sprite attributes (128 sprites) |
-| **WRAM** | 128 KB | Your variables, game state |
-
-### Display Basics
-
-- **Resolution:** 256×224 pixels (NTSC) or 256×239 (PAL)
-- **Colors:** 256 colors on screen (from 32,768 possible)
-- **Sprites:** Up to 128 sprites, 32 per scanline
-- **Backgrounds:** Up to 4 layers depending on mode
-
----
-
-## Building Examples
+## Building
 
 ```bash
-# Build everything
+# Build all examples
 cd opensnes
 make
 
-# Build a specific example
-cd examples/text/1_hello_world
-make
+# Build a single example
+make -C examples/text/hello_world
 
 # Clean and rebuild
 make clean && make
 ```
 
-## Running in Emulator
+## Running
 
-We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate emulation:
+We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate SNES emulation:
 
 ```bash
-# Open ROM in Mesen
-/path/to/Mesen examples/text/1_hello_world/hello_world.sfc
+mesen examples/text/hello_world/hello_world.sfc
 ```
 
----
+Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.
 
-## Tips for Learning
+## Tips
 
-1. **Read the code comments** - They explain the "why"
-2. **Experiment** - Change values and see what happens
-3. **Use Mesen's debugger** - View VRAM, OAM, registers in real-time
-4. **One concept at a time** - Don't skip ahead
-
-## Getting Help
-
-- 📖 [SNESdev Wiki](https://snes.nesdev.org/wiki/) - Hardware reference
-- 💬 [SNESdev Discord](https://discord.gg/snesdev) - Community help
-- 🐛 [OpenSNES Issues](https://github.com/opensnes/opensnes/issues) - Report bugs
+1. **Follow the order** -- each example builds on concepts from earlier ones
+2. **Read the source** -- every `main.c` is commented to explain the "why"
+3. **Experiment** -- change values, break things, see what happens
+4. **Use the debugger** -- Mesen2's PPU viewer is invaluable for understanding VRAM
 
 ---
 
-**Ready?** Start with [text/1_hello_world](text/1_hello_world/) →
+**Ready?** Start with [text/hello_world](text/hello_world/) and build your first SNES ROM.

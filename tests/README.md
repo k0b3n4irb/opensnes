@@ -2,296 +2,135 @@
 
 Automated testing infrastructure for OpenSNES SDK.
 
-## Philosophy
+## Quick Reference
 
-**Every feature must have tests.** We follow a test-first development approach:
-1. Write test specification
-2. Implement feature
-3. Verify tests pass
-4. Document the feature
+```bash
+# Before every commit — the 3 mandatory scripts
+./tests/compiler/run_tests.sh --allow-known-bugs        # 53/54 compiler tests
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick  # 25/25 ROM validation
+./tests/unit/run_unit_tests.sh                           # 19 unit test modules
+```
 
 ## Test Categories
 
-| Category | Description | Location |
-|----------|-------------|----------|
-| `black_screen` | Smoke test - detects broken ROMs | `tests/black_screen_test.lua` |
-| `examples/` | Example ROM tests (snesdbg-based) | `tests/examples/` |
-| `unit/` | Low-level function tests (math, memory) | `tests/unit/` |
-| `hardware/` | SNES hardware feature tests | `tests/hardware/` |
-| `integration/` | Full system tests | `tests/integration/` |
-| `compiler/` | Compiler regression tests | `tests/compiler/` |
+| Category | Script | What it does |
+|----------|--------|-------------|
+| **Compiler** | `tests/compiler/run_tests.sh` | 54 regression tests (C → ASM → grep patterns) |
+| **Examples** | `tests/examples/validate_examples.sh` | Memory overlap + ROM size for all 25 examples |
+| **Unit** | `tests/unit/run_unit_tests.sh` | 19 test modules (~385 runtime + 119 compile-time assertions) |
+| **CI** | `tests/ci/check_memory_overlaps.sh` | CI-specific overlap checking |
 
-## Quick Smoke Test: Black Screen Detection
-
-The fastest way to check if all ROMs are working is the **black screen test**. A black screen after initialization typically means the ROM is broken.
+## Compiler Tests (`tests/compiler/`)
 
 ```bash
-# Run black screen test on all examples
-./tests/run_black_screen_tests.sh /path/to/Mesen
-
-# With verbose output
-./tests/run_black_screen_tests.sh /path/to/Mesen --verbose
-
-# Save screenshots for inspection
-./tests/run_black_screen_tests.sh /path/to/Mesen --save-screenshots
+./tests/compiler/run_tests.sh [-v] [--allow-known-bugs]
 ```
 
-**How it works:**
-1. Loads each ROM in Mesen
-2. Waits 90 frames (1.5 seconds)
-3. Analyzes screen buffer for non-black pixels
-4. PASS if >0.5% of pixels are non-black
-5. FAIL if screen is black (likely broken ROM)
+54 tests that compile C files and verify the generated assembly (grep on .asm output).
+Covers: codegen, types, operators, control flow, variables, promotions, optimizations.
 
-**Output:**
-- Screenshots of failed ROMs saved to `tests/screenshots/FAIL_*.png`
-- Exit code 0 = all pass, 1 = failures detected
+**Status:** 53/54 pass. 1 known bug (`comparisons: test_s16_shift_right`).
 
-## Example Tests
-
-The `examples/` category tests the working example ROMs using the `snesdbg` Lua library:
-
-| Test | ROM | What it tests |
-|------|-----|---------------|
-| hello_world | text/1_hello_world | Basic boot, hardware init, VBlank |
-| custom_font | text/2_custom_font | Font loading, message display |
-| animation | graphics/2_animation | **WRAM mirroring fix**, sprite movement, OAM transfer |
-| tone | audio/1_tone | SPC700 init, audio playback |
-
-Run example tests:
-```bash
-./run_tests.sh examples
-```
-
-## Prerequisites
-
-- **Mesen2 Emulator**: Required for running ROM-based tests
-  - macOS: Build from source or use release
-  - Path: Set `MESEN_PATH` environment variable
+## Example Validation (`tests/examples/`)
 
 ```bash
-export MESEN_PATH=/path/to/Mesen
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh [--quick] [--verbose]
 ```
 
-## Running Tests
+Validates all 25 example ROMs:
+- `--quick`: skip rebuild, validate existing .sfc files only
+- Without flag: clean + rebuild each example before validation
+
+**Checks:** build success, memory overlaps (symmap.py), ROM size (32KB-4MB, power of 2).
+
+## Unit Tests (`tests/unit/`)
 
 ```bash
-# Run all tests
-./run_tests.sh
-
-# Run specific category
-./run_tests.sh unit
-./run_tests.sh hardware
-
-# Run single test
-./run_tests.sh unit/math
-
-# Verbose output
-./run_tests.sh -v
+./tests/unit/run_unit_tests.sh [-v]
 ```
 
-## Test Structure
+19 modules. Each is a standalone .sfc ROM that runs on SNES hardware.
+The runner builds each test and checks memory overlaps via `symmap.py`.
 
-Each test is a directory containing:
-
-```
-tests/unit/math/
-├── README.md           # Test documentation
-├── Makefile           # Build configuration
-├── test_math.c        # Test source code
-├── test_math.lua      # Mesen2 test runner script
-└── expected.txt       # Expected results (optional)
-```
+See `tests/CLAUDE.md` for the full module breakdown (assertions vs smoke tests).
 
 ## Writing Tests
 
-### 1. Create Test Directory
-
-```bash
-mkdir -p tests/unit/my_feature
-```
-
-### 2. Write Test Documentation (README.md)
-
-```markdown
-# my_feature Test
-
-## Purpose
-Tests the my_feature functionality.
-
-## What is Tested
-- Feature behavior A
-- Edge case B
-- Error condition C
-
-## Expected Results
-- All assertions pass
-- No crashes or hangs
-```
-
-### 3. Write Test Code
+Unit tests use inline `TEST()` macros:
 
 ```c
-// test_my_feature.c
 #include <snes.h>
-#include "test_harness.h"
+#include <snes/console.h>
+#include <snes/text.h>
 
-void test_feature_basic(void) {
-    // Arrange
-    int input = 5;
+static u8 tests_passed;
+static u8 tests_failed;
+static u8 test_line;
 
-    // Act
-    int result = my_feature(input);
-
-    // Assert
-    TEST_ASSERT_EQUAL(10, result);
-}
+#define TEST(name, condition) do { \
+    if (condition) { tests_passed++; } \
+    else { tests_failed++; textPrintAt(1, test_line, "FAIL:"); \
+           textPrintAt(7, test_line, name); test_line++; } \
+} while(0)
 
 int main(void) {
-    test_init();
+    consoleInit();
+    setMode(BG_MODE0, 0);
+    textInit();
 
-    RUN_TEST(test_feature_basic);
+    TEST("basic", my_feature(5) == 10);
 
-    test_report();
-    return 0;
+    // Display results...
+    setScreenOn();
+    while (1) { WaitForVBlank(); }
 }
 ```
 
-### 4. Write Mesen2 Test Script
+## Mesen2 Lua Tests
 
-```lua
--- test_my_feature.lua
-local test = require("test_harness")
+Mesen2-based tests that validate ROM behavior at runtime.
 
-test.init()
-test.run_until_complete(5000)  -- 5 second timeout
-test.check_results()
-test.exit()
-```
+| Script | Purpose |
+|--------|---------|
+| `tests/black_screen_test.lua` | Black screen smoke test (PNG size proxy) |
+| `tests/run_black_screen_tests.sh` | Runner: tests all 25 ROMs for black screens |
+| `tests/test_snes_compliance.sh` | 8 static checks on headers and assembly |
+| `tests/examples/hello_world/test_hello_world.lua` | Mesen2 test for hello_world example |
+| `tests/examples/breakout_transition_test.lua` | Mesen2 test for breakout transitions |
+| `tests/examples/compare_screenshots.sh` + `.lua` | PVSnesLib vs OpenSNES visual comparison |
 
-## Test Harness API
+All Mesen2 Lua scripts use the **event-driven** pattern (register callbacks, return
+control). See `tests/black_screen_test.lua` for the canonical example.
 
-### C API (test_harness.h)
+## Debugging Tools (snesdbg)
 
-```c
-// Initialize test system
-void test_init(void);
+`devtools/snesdbg/` provides a Lua debugging library for Mesen2:
+- Symbol-aware memory reads (`dbg.read("player_x")`)
+- OAM inspection and comparison (shadow buffer vs hardware)
+- Breakpoints and variable watches by symbol name
+- BDD-style test DSL (`describe`/`it` with event-driven `done()` callbacks)
+- Non-blocking frame waits (`afterFrames`) and symbol waits (`onSymbolReached`)
 
-// Run a test function
-void RUN_TEST(void (*test_func)(void));
+See `devtools/snesdbg/README.md` for the full API.
 
-// Assertions
-void TEST_ASSERT(int condition);
-void TEST_ASSERT_EQUAL(int expected, int actual);
-void TEST_ASSERT_EQUAL_U16(u16 expected, u16 actual);
-void TEST_ASSERT_EQUAL_PTR(void* expected, void* actual);
-void TEST_ASSERT_MEM_EQUAL(void* expected, void* actual, u16 size);
+## Manual Validation (7 Reference Examples)
 
-// Mark test result
-void TEST_PASS(void);
-void TEST_FAIL(const char* message);
+After automated tests pass, these must be tested in Mesen2 before committing
+changes to compiler, library, or examples:
 
-// Report results (writes to known memory address for Mesen2)
-void test_report(void);
-```
+| # | Example | What to check |
+|---|---------|---------------|
+| 1 | `examples/games/breakout/` | Ball bounces, paddle moves, blocks break |
+| 2 | `examples/games/likemario/` | Mario walks/jumps, camera scrolls |
+| 3 | `examples/graphics/effects/hdma_wave/` | Wavy distortion visible |
+| 4 | `examples/graphics/sprites/dynamic_sprite/` | Animated sprite at center |
+| 5 | `examples/graphics/backgrounds/continuous_scroll/` | BG scrolls with D-PAD |
+| 6 | `examples/audio/snesmod_music/` | Music plays |
+| 7 | `examples/memory/save_game/` | Save/load works |
 
-### Lua API (test_harness.lua)
+## CI Pipeline
 
-```lua
--- Initialize test runner
-test.init()
-
--- Run emulator until test completes or timeout
-test.run_until_complete(timeout_ms)
-
--- Check test results from memory
-test.check_results()
-
--- Read memory
-test.read_byte(address)
-test.read_word(address)
-
--- Exit emulator with result code
-test.exit()
-```
-
-## Memory Layout for Test Results
-
-Tests report results to fixed memory addresses:
-
-| Address | Size | Description |
-|---------|------|-------------|
-| $7F0000 | 1 | Test status: 0=running, 1=pass, 2=fail |
-| $7F0001 | 2 | Tests run count |
-| $7F0003 | 2 | Tests passed count |
-| $7F0005 | 2 | Tests failed count |
-| $7F0010 | 64 | Failure message (null-terminated) |
-
-## Continuous Integration
-
-The CI pipeline runs automatically on:
-- Every push to `main` or `develop` branches
-- Every pull request to `main` or `develop`
-
-### What CI Checks
-
-| Check | Description |
-|-------|-------------|
-| Build toolchain | Compiles cc65816, WLA-DX, gfx4snes, smconv |
-| Build examples | Builds all 27 example ROMs |
-| Build tests | Compiles test ROMs |
-| Validate examples | Checks for memory overlaps (symmap.py) |
-| Compiler tests | Runs compiler regression tests |
-| Example count | Verifies all 27 examples built successfully |
-
-### CI Workflow
-
-GitHub Actions workflow: `.github/workflows/opensnes_build.yml`
-
-Runs on 3 platforms:
-- **Linux** (ubuntu-latest)
-- **Windows** (windows-latest with MSYS2)
-- **macOS** (macos-latest)
-
-### Local CI Validation
-
-Before pushing, you can run the same checks locally:
-
-```bash
-# Full build
-make clean && make
-
-# Validate all examples (checks for memory overlaps, ROM sizes)
-./tests/examples/validate_examples.sh --quick
-
-# Run compiler tests
-./tests/compiler/run_tests.sh
-
-# Verify example count
-echo "Examples built: $(find examples -name '*.sfc' | wc -l)"
-```
-
-### Artifacts
-
-CI uploads the following artifacts for debugging:
-- **Build logs**: Full build output for each platform
-- **Example ROMs**: All compiled .sfc files
-- **Documentation**: Generated API docs (from Linux build)
-
-## Coverage Goals
-
-| Component | Target Coverage |
-|-----------|----------------|
-| Math functions | 100% |
-| Memory management | 100% |
-| Input handling | 90% |
-| Sprite system | 80% |
-| Background system | 80% |
-| Audio system | 70% |
-
-## Adding New Test Categories
-
-1. Create directory under `tests/`
-2. Add to `run_tests.sh` category list
-3. Document in this README
-4. Add to CI workflow
+GitHub Actions (`.github/workflows/opensnes_build.yml`) runs on push/PR to `main`/`develop`:
+- Builds toolchain, library, and all 25 examples on Linux, Windows, macOS
+- Runs compiler tests and example validation
+- Uploads build artifacts (ROMs, docs)
