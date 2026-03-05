@@ -166,11 +166,9 @@ oamSet(0, x, y, 3, 0, 0, 0, 0);
 
 **Checklist**:
 ```c
-// Must call every frame AFTER WaitForVBlank
+// Input is read automatically by the NMI handler every VBlank.
+// Just call the query functions after WaitForVBlank:
 WaitForVBlank();
-padUpdate();  // Read controllers
-
-// Use the right functions
 u16 pressed = padPressed(0);   // Just pressed this frame
 u16 held = padHeld(0);         // Currently held
 u16 released = padReleased(0); // Just released this frame

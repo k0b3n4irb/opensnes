@@ -44,12 +44,6 @@ extern u8  mouse_sens2;      /* Port 2 sensitivity */
  * Input Functions
  *============================================================================*/
 
-void padUpdate(void) {
-    /* DEPRECATED: This function is a no-op. Input is read automatically
-     * by the NMI handler in crt0.asm. Use padHeld(), padPressed(), and
-     * padReleased() directly — no need to call padUpdate() first. */
-}
-
 u16 padPressed(u8 pad) {
     if (pad >= 5) return 0;
     u16 state = pad_keysdown[pad];
