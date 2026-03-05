@@ -49,6 +49,7 @@ git checkout -b feature/my-feature
 # Make changes...
 
 # Run tests
+./tests/unit/run_unit_tests.sh
 ./tests/compiler/run_tests.sh
 OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
 

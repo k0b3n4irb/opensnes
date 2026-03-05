@@ -4,7 +4,7 @@ Current state of the project and planned work.
 
 ---
 
-## Current Status: v0.2.0
+## Current Status: v0.3.0
 
 The SDK is functional for SNES game development. The compiler produces code
 22% faster than PVSnesLib+816-opt on our benchmark suite. 36 working examples
