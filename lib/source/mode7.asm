@@ -23,6 +23,7 @@
     m7_mat_b:       dsw 1       ; Matrix B
     m7_mat_c:       dsw 1       ; Matrix C
     m7_mat_d:       dsw 1       ; Matrix D
+    m7_tmp:         dsw 1       ; Temp for 16-bit degree conversion
 .ENDS
 
 .SECTION ".mode7_data" SUPERFREE
@@ -291,36 +292,52 @@ mode7SetScroll:
 ;------------------------------------------------------------------------------
 ; mode7Rotate - Set rotation in degrees (0-359)
 ; Input: 5,s = degrees (16-bit)
-; Converts degrees to 0-255 range: angle = degrees * 256 / 360
+; Converts degrees to 0-255 range: angle = (degrees * 182) >> 8
+;
+; Uses split 16-bit multiply via two 8-bit hardware multiplies:
+;   result = degrees_lo * 182 + (degrees_hi * 182) << 8
+;   angle  = result >> 8
 ;------------------------------------------------------------------------------
 mode7Rotate:
     php
-    rep #$20
-
-    ; degrees * 256 / 360 ≈ degrees * 91 / 128
-    ; We use the hardware multiplier for this
-    lda 5,s             ; Get degrees
-    sta.l $4202         ; WRMPYA (8-bit, but we'll handle 16-bit separately)
-
-    ; For simplicity, we do: (degrees * 182) >> 8
-    ; 182 / 256 ≈ 0.711 ≈ 256/360
     sep #$20
+
+    ; Multiply low byte: degrees_lo * 182
     lda 5,s             ; degrees low byte
     sta.l $4202         ; WRMPYA
     lda #182            ; Conversion factor
     sta.l $4203         ; WRMPYB - triggers multiply
 
-    ; Wait 8 cycles for result
+    ; Wait 8 cycles for result (nop = 2 cycles each on 65816)
     nop
     nop
     nop
     nop
 
-    lda.l $4217         ; RDMPYH (high byte of result)
+    ; result_lo_hi = high byte of (degrees_lo * 182)
+    lda.l $4217         ; RDMPYH
+    sta.l m7_tmp        ; Save partial result
+
+    ; Multiply high byte: degrees_hi * 182
+    lda 6,s             ; degrees high byte
+    sta.l $4202         ; WRMPYA
+    lda #182
+    sta.l $4203         ; WRMPYB - triggers multiply
+
+    nop
+    nop
+    nop
+    nop
+
+    ; angle = result_lo_hi + low byte of (degrees_hi * 182)
+    lda.l $4216         ; RDMPYL (low byte of degrees_hi * 182)
+    clc
+    adc.l m7_tmp        ; Add partial result from low-byte multiply
     pha                 ; Save converted angle
 
     ; Call mode7SetAngle with the converted angle
     jsl mode7SetAngle
+    sep #$20
 
     pla                 ; Clean up stack
 

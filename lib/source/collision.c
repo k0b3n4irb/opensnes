@@ -107,14 +107,7 @@ u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth) {
     tileY = py >> 3;
 
     /* Calculate offset in tilemap */
-    /* offset = tileY * mapWidth + tileX */
-    /* Use repeated addition to avoid multiplication */
-    offset = 0;
-    while (tileY > 0) {
-        offset = offset + mapWidth;
-        tileY = tileY - 1;
-    }
-    offset = offset + tileX;
+    offset = tileY * mapWidth + tileX;
 
     /* Return tile value */
     return tilemap[offset];
@@ -143,12 +136,7 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
     tileY = py >> shift;
 
     /* Calculate offset */
-    offset = 0;
-    while (tileY > 0) {
-        offset = offset + mapWidth;
-        tileY = tileY - 1;
-    }
-    offset = offset + tileX;
+    offset = tileY * mapWidth + tileX;
 
     return tilemap[offset];
 }

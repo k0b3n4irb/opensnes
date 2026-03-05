@@ -17,86 +17,42 @@
  * to allow read-modify-write operations.
  *============================================================================*/
 
-/* NOTE: Do NOT initialize these with "= 0" - QBE puts initialized statics
- * in ROM (.rodata), but we need these in RAM to be writable.
- * C standard guarantees uninitialized statics are zero-initialized.
+/* Shadow registers for read-modify-write operations.
+ * Zero-initialized by C standard (uninitialized statics are zero).
  */
 static u8 bg12nba_shadow;  /* Shadow for REG_BG12NBA ($210B) */
 static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
+
+extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */
+extern u16 bg_scroll_y[4]; /* Synced to hardware by NMI handler */
+extern volatile u8 bg_scroll_dirty; /* Bitmask: bit 0-3 = BG1-4 dirty */
 
 /*============================================================================
  * Scrolling Functions
  *============================================================================*/
 
 void bgSetScroll(u8 bg, u16 x, u16 y) {
-    switch (bg) {
-        case 0:
-            REG_BG1HOFS = x & 0xFF;
-            REG_BG1HOFS = (x >> 8) & 0xFF;
-            REG_BG1VOFS = y & 0xFF;
-            REG_BG1VOFS = (y >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2HOFS = x & 0xFF;
-            REG_BG2HOFS = (x >> 8) & 0xFF;
-            REG_BG2VOFS = y & 0xFF;
-            REG_BG2VOFS = (y >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3HOFS = x & 0xFF;
-            REG_BG3HOFS = (x >> 8) & 0xFF;
-            REG_BG3VOFS = y & 0xFF;
-            REG_BG3VOFS = (y >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4HOFS = x & 0xFF;
-            REG_BG4HOFS = (x >> 8) & 0xFF;
-            REG_BG4VOFS = y & 0xFF;
-            REG_BG4VOFS = (y >> 8) & 0xFF;
-            break;
-    }
+    bg_scroll_x[bg] = x;
+    bg_scroll_y[bg] = y;
+    bg_scroll_dirty |= (u8)(1 << bg);
 }
 
 void bgSetScrollX(u8 bg, u16 x) {
-    switch (bg) {
-        case 0:
-            REG_BG1HOFS = x & 0xFF;
-            REG_BG1HOFS = (x >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2HOFS = x & 0xFF;
-            REG_BG2HOFS = (x >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3HOFS = x & 0xFF;
-            REG_BG3HOFS = (x >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4HOFS = x & 0xFF;
-            REG_BG4HOFS = (x >> 8) & 0xFF;
-            break;
-    }
+    bg_scroll_x[bg] = x;
+    bg_scroll_dirty |= (u8)(1 << bg);
 }
 
 void bgSetScrollY(u8 bg, u16 y) {
-    switch (bg) {
-        case 0:
-            REG_BG1VOFS = y & 0xFF;
-            REG_BG1VOFS = (y >> 8) & 0xFF;
-            break;
-        case 1:
-            REG_BG2VOFS = y & 0xFF;
-            REG_BG2VOFS = (y >> 8) & 0xFF;
-            break;
-        case 2:
-            REG_BG3VOFS = y & 0xFF;
-            REG_BG3VOFS = (y >> 8) & 0xFF;
-            break;
-        case 3:
-            REG_BG4VOFS = y & 0xFF;
-            REG_BG4VOFS = (y >> 8) & 0xFF;
-            break;
-    }
+    bg_scroll_y[bg] = y;
+    bg_scroll_dirty |= (u8)(1 << bg);
+}
+
+u16 bgGetScrollX(u8 bg) {
+    return bg_scroll_x[bg];
+}
+
+u16 bgGetScrollY(u8 bg) {
+    return bg_scroll_y[bg];
 }
 
 /*============================================================================

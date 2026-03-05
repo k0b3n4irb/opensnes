@@ -17,7 +17,7 @@
 #
 #==============================================================================
 
-set -e
+set -eo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -136,6 +136,56 @@ if [ "$TOTAL" -eq 0 ]; then
 fi
 
 #------------------------------------------------------------------------------
+# Pre-flight: verify Mesen can start
+#------------------------------------------------------------------------------
+echo "--- Mesen pre-flight check ---"
+echo "Binary: $MESEN_PATH"
+echo "File type: $(file "$MESEN_PATH" 2>/dev/null | head -1)"
+echo "Lua script: $LUA_SCRIPT"
+
+# Try running Mesen briefly to check for missing libraries or startup errors
+FIRST_ROM=$(echo "$ROMS" | head -1)
+echo "Testing with: $FIRST_ROM"
+# Check for missing shared libraries first
+echo "--- Dependency check ---"
+ldd "$MESEN_PATH" 2>&1 | grep -i "not found" || echo "All dependencies satisfied"
+echo "---"
+
+# Test 1: check if Mesen responds to --help or any flag
+echo "--- Test: Mesen version/help ---"
+HELP_EXIT=0
+timeout 5 "$MESEN_PATH" --help > /tmp/opensnes_help.txt 2>&1 || HELP_EXIT=$?
+echo "Help exit code: $HELP_EXIT"
+head -10 /tmp/opensnes_help.txt 2>/dev/null || echo "(no help output)"
+
+# Test 2: try testrunner with --enablestdout
+echo "--- Test: testrunner mode ---"
+PREFLIGHT_EXIT=0
+timeout 15 "$MESEN_PATH" --testrunner --enablestdout "$FIRST_ROM" "$LUA_SCRIPT" > /tmp/opensnes_preflight.txt 2>&1 || PREFLIGHT_EXIT=$?
+echo "Pre-flight exit code: $PREFLIGHT_EXIT (124=timeout, 0=PASS, 1=FAIL)"
+
+# Test 3: try without --testrunner to see if Mesen loads at all
+echo "--- Test: Mesen GUI mode (5s) ---"
+GUI_EXIT=0
+timeout 5 "$MESEN_PATH" "$FIRST_ROM" > /tmp/opensnes_gui.txt 2>&1 || GUI_EXIT=$?
+echo "GUI exit code: $GUI_EXIT"
+echo "GUI output size: $(wc -c < /tmp/opensnes_gui.txt 2>/dev/null || echo 0) bytes"
+head -5 /tmp/opensnes_gui.txt 2>/dev/null || echo "(no gui output)"
+echo "--- Pre-flight output (first 30 lines) ---"
+head -30 /tmp/opensnes_preflight.txt 2>/dev/null || echo "(no output)"
+echo "--- Pre-flight output size: $(wc -c < /tmp/opensnes_preflight.txt 2>/dev/null || echo 0) bytes ---"
+
+# Check if result was produced
+if grep -q "BLACKTEST_RESULT:" /tmp/opensnes_preflight.txt 2>/dev/null; then
+    echo "Pre-flight: Mesen testrunner is working!"
+else
+    echo "WARNING: Mesen did not produce expected output."
+    echo "Full output:"
+    cat /tmp/opensnes_preflight.txt 2>/dev/null || echo "(empty)"
+fi
+echo "-------------------------------"
+
+#------------------------------------------------------------------------------
 # Run tests
 #------------------------------------------------------------------------------
 echo "========================================"
@@ -152,6 +202,7 @@ PASSED=0
 FAILED=0
 ERRORS=0
 FAILED_ROMS=""
+FIRST_ERROR_DUMPED=0
 
 for ROM in $ROMS; do
     ROM_NAME=$(basename "$ROM" .sfc)
@@ -166,14 +217,21 @@ for ROM in $ROMS; do
     fi
 
     # Run Mesen in testrunner mode with timeout (output captured to file)
-    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" "$ROM" --testrunner --lua "$LUA_SCRIPT" || true
+    # Syntax: Mesen --testrunner --enablestdout <rom> <lua_script>
+    MESEN_EXIT=0
+    run_with_timeout_capture "$TIMEOUT_SECONDS" "$MESEN_PATH" --testrunner --enablestdout "$ROM" "$LUA_SCRIPT" || MESEN_EXIT=$?
     OUTPUT=$(cat "$OUTPUT_FILE" 2>/dev/null || true)
 
-    # Check result from stdout (BLACKTEST_RESULT:PASS/FAIL:details)
-    # Also check file as fallback
+    # Check result: prefer stdout output, fallback to exit code
     RESULT=""
     if echo "$OUTPUT" | grep -q "BLACKTEST_RESULT:"; then
         RESULT=$(echo "$OUTPUT" | grep "BLACKTEST_RESULT:" | tail -1 | sed 's/BLACKTEST_RESULT://')
+    elif [ "$MESEN_EXIT" -eq 0 ]; then
+        # emu.stop(0) = PASS (exit code 0, no stdout needed)
+        RESULT="PASS:exit code 0"
+    elif [ "$MESEN_EXIT" -eq 1 ]; then
+        # emu.stop(1) = FAIL (exit code 1)
+        RESULT="FAIL:exit code 1 (black screen)"
     elif [ -f "$RESULT_FILE" ]; then
         RESULT=$(cat "$RESULT_FILE")
     fi
@@ -216,6 +274,13 @@ for ROM in $ROMS; do
         # Timeout or crash - no result found
         ERRORS=$((ERRORS + 1))
         echo -e "${YELLOW}[ERROR]${NC} $ROM_DIR/$ROM_NAME - Timeout or crash (no result)"
+        # Dump first error output for debugging
+        if [ "$FIRST_ERROR_DUMPED" -eq 0 ]; then
+            FIRST_ERROR_DUMPED=1
+            echo "  --- Debug output for first error ---"
+            head -20 "$OUTPUT_FILE" 2>/dev/null || echo "  (no output file)"
+            echo "  --- End debug output ---"
+        fi
     fi
 done
 

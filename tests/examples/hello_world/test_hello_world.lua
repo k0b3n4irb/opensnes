@@ -13,7 +13,7 @@
 
 -- Add snesdbg to path
 local scriptDir = debug.getinfo(1, "S").source:match("@?(.*/)") or "./"
-package.path = scriptDir .. "../../../tools/snesdbg/?.lua;" .. package.path
+package.path = scriptDir .. "../../../devtools/snesdbg/?.lua;" .. package.path
 
 local test = require("test")
 
@@ -21,7 +21,7 @@ test.describe("Hello World Example", function()
 
     test.beforeAll(function()
         -- ROM should already be loaded by Mesen2
-        test.loadSymbols(scriptDir .. "../../../examples/text/1_hello_world/hello_world.sym")
+        test.loadSymbols(scriptDir .. "../../../examples/text/hello_world/hello_world.sym")
     end)
 
     test.it("should reach main()", function()

@@ -12,8 +12,10 @@ else ifeq ($(UNAME),Linux)
     MAKEFLAGS += -j$(shell nproc)
 endif
 
-# Find all example directories with Makefiles
-EXAMPLES := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+# Find all example directories with Makefiles (up to 3 levels deep)
+# Note: $(dir ...) produces trailing slashes; we strip them for cleaner target names
+EXAMPLES_RAW := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile) $(wildcard */*/*/Makefile))
+EXAMPLES := $(patsubst %/,%,$(EXAMPLES_RAW))
 
 # Create build targets for each example
 EXAMPLE_TARGETS := $(EXAMPLES:%=build-%)
@@ -25,8 +27,9 @@ all: $(EXAMPLE_TARGETS)
 
 clean: $(CLEAN_TARGETS)
 
-# Build each example (can run in parallel)
+# Build each example (clean first to catch regressions early)
 $(EXAMPLE_TARGETS): build-%:
+	@$(MAKE) -C $* clean 2>/dev/null || true
 	@$(MAKE) -C $*
 
 # Clean each example (can run in parallel)

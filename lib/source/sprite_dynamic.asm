@@ -41,6 +41,28 @@
 .EQU OAM_REFRESH            7           ; u8 refresh flag
 .EQU OAM_GRAPHICS           8           ; u24 graphics pointer (3 bytes + pad)
 
+;------------------------------------------------------------------------------
+; Compile-time offset assertions (must match t_sprites in sprite.h)
+;------------------------------------------------------------------------------
+.ASSERT OAM_OAMX == 0
+.ASSERT OAM_OAMY == 2
+.ASSERT OAM_FRAMEID == 4
+.ASSERT OAM_ATTRIBUTE == 6
+.ASSERT OAM_REFRESH == 7
+.ASSERT OAM_GRAPHICS == 8
+
+;==============================================================================
+; Dynamic Sprite RAM Buffer
+;==============================================================================
+; oambuffer MUST be in Bank $00 SLOT 1 ($0000-$1FFF) because the C compiler
+; generates `sta.l $0000,x` which always writes to bank $00.
+; Assembly code with DB=$7E reads the mirror ($7E:0000-$1FFF = $00:0000-$1FFF).
+;==============================================================================
+
+.RAMSECTION ".dynamic_sprite_buffer" BANK 0 SLOT 1
+    oambuffer       dsb 2048    ; 128 × 16 bytes
+.ENDS
+
 ;==============================================================================
 ; Lookup Tables for OAM High Table Manipulation
 ;==============================================================================

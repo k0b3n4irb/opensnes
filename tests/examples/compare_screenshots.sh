@@ -55,7 +55,7 @@ SPECIFIC_EXAMPLE=""
 
 # Example mappings (parallel arrays for bash 3.x compatibility)
 EXAMPLE_NAMES=("mode1" "simple_sprite" "fading")
-EXAMPLE_OPENSNES=("examples/graphics/5_mode1/mode1.sfc" "examples/graphics/6_simple_sprite/simple_sprite.sfc" "examples/graphics/7_fading/fading.sfc")
+EXAMPLE_OPENSNES=("examples/graphics/backgrounds/mode1/mode1.sfc" "examples/graphics/sprites/simple_sprite/simple_sprite.sfc" "examples/graphics/effects/fading/fading.sfc")
 EXAMPLE_PVSNESLIB=("snes-examples/graphics/Backgrounds/Mode1/Mode1.sfc" "snes-examples/graphics/Sprites/SimpleSprite/SimpleSprite.sfc" "snes-examples/graphics/Effects/Fading/Fading.sfc")
 
 # Get example index by name

@@ -1,0 +1,39 @@
+/* cproc configuration for w65816 (SNES) target */
+/* Auto-generated from config.h.in - do not edit directly */
+
+static const char target[] = "w65816";
+
+static const char *const defaultdefines[] = {
+    "-D", "__w65816__",
+    "-D", "__SNES__",
+    "-D", "__INT_MAX__=32767",
+    "-D", "__LONG_MAX__=2147483647",
+    "-D", "__SIZEOF_INT__=2",
+    "-D", "__SIZEOF_LONG__=4",
+    "-D", "__SIZEOF_POINTER__=2",
+    NULL,
+};
+
+static const char *const defaultlinkflags[] = {NULL};
+
+static const char *const preprocesscmd[] = {
+    "cpp",
+    "-U", "__GNUC__",
+    "-P",
+};
+
+static const char *const codegencmd[] = {
+    "../qbe/qbe",
+};
+
+static const char *const assemblecmd[] = {
+    "wla-65816",
+    "-o",
+};
+
+static const char *const linkcmd[] = {
+    "wlalink",
+};
+
+static const char *const startfiles[] = {NULL};
+static const char *const endfiles[] = {NULL};

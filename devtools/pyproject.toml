@@ -1,0 +1,8 @@
+[project]
+name = "opensnes-devtools"
+version = "0.1.0"
+description = "Internal developer tools for OpenSNES SDK"
+requires-python = ">=3.10"
+dependencies = [
+    "pillow>=10.0",  # Required by gen_hud_bar.py
+]

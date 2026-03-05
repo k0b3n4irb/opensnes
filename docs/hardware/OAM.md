@@ -170,5 +170,5 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 ## See Also
 
 - [Registers](REGISTERS.md) - Full register reference
-- [PPU](PPU.md) - Graphics system overview
-- [Animation Example](/examples/graphics/2_animation/) - Working sprite animation code
+- [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md) - Graphics system overview
+- [Animated Sprite Example](/examples/graphics/sprites/animated_sprite/) - Working sprite animation code

@@ -58,47 +58,11 @@ endif
 $(QBE_DIR)/qbe:
 	$(MAKE) -C $(QBE_DIR) CC=clang
 
-# Generate cproc config.h if missing (required for non-Linux platforms)
-$(CPROC_DIR)/config.h:
+# Generate cproc config.h from template (required for non-Linux platforms)
+# Using a template file is more maintainable than multi-line echo commands
+$(CPROC_DIR)/config.h: config.h.in
 	@echo "[CPROC] Generating config.h for w65816 target..."
-	@echo '/* cproc configuration for w65816 (SNES) target */' > $@
-	@echo '' >> $@
-	@echo 'static const char target[] = "w65816";' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const defaultdefines[] = {' >> $@
-	@echo '    "-D", "__w65816__",' >> $@
-	@echo '    "-D", "__SNES__",' >> $@
-	@echo '    "-D", "__INT_MAX__=32767",' >> $@
-	@echo '    "-D", "__LONG_MAX__=2147483647",' >> $@
-	@echo '    "-D", "__SIZEOF_INT__=2",' >> $@
-	@echo '    "-D", "__SIZEOF_LONG__=4",' >> $@
-	@echo '    "-D", "__SIZEOF_POINTER__=2",' >> $@
-	@echo '    NULL,' >> $@
-	@echo '};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const defaultlinkflags[] = {NULL};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const preprocesscmd[] = {' >> $@
-	@echo '    "cpp",' >> $@
-	@echo '    "-U", "__GNUC__",' >> $@
-	@echo '    "-P",' >> $@
-	@echo '};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const codegencmd[] = {' >> $@
-	@echo '    "../qbe/qbe",' >> $@
-	@echo '};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const assemblecmd[] = {' >> $@
-	@echo '    "wla-65816",' >> $@
-	@echo '    "-o",' >> $@
-	@echo '};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const linkcmd[] = {' >> $@
-	@echo '    "wlalink",' >> $@
-	@echo '};' >> $@
-	@echo '' >> $@
-	@echo 'static const char *const startfiles[] = {NULL};' >> $@
-	@echo 'static const char *const endfiles[] = {NULL};' >> $@
+	@cp $< $@
 
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
@@ -118,12 +82,21 @@ cc65816-install: cc65816
 # WLA-DX (assembler/linker)
 #------------------------------------------------------------------------------
 
-wla:
+# Marker file to track if WLA-DX has been built
+WLA_BUILT_MARKER := $(WLA_DIR)/.wla-built
+
+wla: $(WLA_BUILT_MARKER)
+
+# Only run CMake and build if binaries don't exist
+# The marker file prevents unnecessary CMake reconfiguration on incremental builds
+$(WLA_BUILT_MARKER):
 	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang . && $(MAKE) wla-65816 wla-spc700 wlalink
+	@touch $@
 
 wla-clean:
 	-cd $(WLA_DIR) && $(MAKE) clean 2>/dev/null || true
 	-rm -f $(WLA_DIR)/CMakeCache.txt
+	-rm -f $(WLA_BUILT_MARKER)
 
 wla-install:
 	@mkdir -p $(BIN_DIR)

@@ -5,6 +5,7 @@
 # Usage: cc65816 input.c [-o output.asm]
 
 set -e
+set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CPROC="$SCRIPT_DIR/cproc-qbe"

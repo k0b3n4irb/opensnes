@@ -13,14 +13,17 @@
 #
 #==============================================================================
 
-# Parallel builds
+# Platform detection (parallel builds + release naming)
 UNAME := $(shell uname -s)
 ifeq ($(OS),Windows_NT)
     MAKEFLAGS += -j$(NUMBER_OF_PROCESSORS)
+    PLATFORM  := windows
 else ifeq ($(UNAME),Darwin)
     MAKEFLAGS += -j$(shell sysctl -n hw.ncpu)
-else ifeq ($(UNAME),Linux)
+    PLATFORM  := darwin
+else
     MAKEFLAGS += -j$(shell nproc)
+    PLATFORM  := linux
 endif
 
 # Paths
@@ -29,15 +32,6 @@ TOOLS_PATH    := tools
 LIB_PATH      := lib
 EXAMPLES_PATH := examples
 TESTS_PATH    := tests
-
-# Platform detection for release naming
-ifeq ($(OS),Windows_NT)
-    PLATFORM := windows
-else ifeq ($(UNAME),Darwin)
-    PLATFORM := darwin
-else
-    PLATFORM := linux
-endif
 
 RELEASE_DIR := release
 RELEASE_NAME := opensnes_$(PLATFORM)
@@ -63,7 +57,7 @@ clean:
 	$(MAKE) -C $(TESTS_PATH) clean
 	-rm -rf bin/
 
-install: compiler tools
+install: compiler tools lib
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
 
@@ -88,21 +82,21 @@ lib: compiler
 examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
-tests: compiler tools
+tests: compiler tools lib
 	$(MAKE) -C $(TESTS_PATH)
 
 docs:
-	doxygen Doxyfile
+	cd docs && doxygen Doxyfile
 	@echo "========================================="
-	@echo "Documentation generated in doc/html/"
-	@echo "Open doc/html/index.html in a browser"
+	@echo "Documentation generated in docs/build/html/"
+	@echo "Open docs/build/html/index.html in a browser"
 	@echo "========================================="
 
 #------------------------------------------------------------------------------
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: all docs
+release: install docs
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."
@@ -119,8 +113,7 @@ release: all docs
 	@cp -r lib/lib $(RELEASE_DIR)/opensnes/lib/ 2>/dev/null || true
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
-	@cp -r tools/symmap $(RELEASE_DIR)/opensnes/tools/
-	@cp -r tools/vramcheck $(RELEASE_DIR)/opensnes/tools/
+	@cp -r devtools $(RELEASE_DIR)/opensnes/devtools/ 2>/dev/null || true
 	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true

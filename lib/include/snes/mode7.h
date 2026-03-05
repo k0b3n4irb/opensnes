@@ -184,8 +184,8 @@ void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d);
  * Controls flipping and out-of-bounds behavior.
  *
  * @param settings M7SEL value:
- *   Bit 7: Flip vertically
- *   Bit 6: Flip horizontally
+ *   Bit 1: Flip vertically
+ *   Bit 0: Flip horizontally
  *   Bits 7-6: Out of bounds behavior (0=wrap, 0x80=transparent, 0xC0=tile 0)
  */
 void mode7SetSettings(u8 settings);

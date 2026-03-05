@@ -4,7 +4,7 @@
  * These are called by generated code for operations the 65816 can't do natively.
  *
  * KNOWN ISSUE: The runtime functions may produce incorrect results.
- * The calculator example (examples/basics/1_calculator) uses a software
+ * The calculator example (examples/basics/calculator) uses a software
  * workaround with repeated addition/subtraction instead of * and /.
  *
  * This file documents the expected vs actual behavior to help trace and fix

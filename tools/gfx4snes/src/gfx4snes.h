@@ -58,6 +58,7 @@ typedef struct
     int palettesave;		           											// 1 = save the palette
     int paletteround;                  											// 1 = round palette up & down
     int paletterearrange;				    									// 1 = compute palette to fit with snes capabilities
+    int spritemap;                                                              // 1 = print sprite tile number map
 } t_gfx4snes_args;
 
 //-------------------------------------------------------------------------------------------------

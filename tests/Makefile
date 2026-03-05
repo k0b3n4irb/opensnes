@@ -13,7 +13,9 @@ else ifeq ($(UNAME),Linux)
 endif
 
 # Find all test directories with Makefiles
-TESTS := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+# Note: $(dir ...) produces trailing slashes; we strip them for cleaner target names
+TESTS_RAW := $(dir $(wildcard */Makefile) $(wildcard */*/Makefile))
+TESTS := $(patsubst %/,%,$(TESTS_RAW))
 
 # Create build targets for each test
 TEST_TARGETS := $(TESTS:%=build-%)

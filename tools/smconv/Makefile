@@ -54,6 +54,7 @@ $(BINDIR):
 	@mkdir -p $@
 
 install: $(TARGET)
+	@echo "[INSTALL] smconv -> $(BINDIR)/"
 
 clean:
 	@echo "[CLEAN] Removing smconv build files..."

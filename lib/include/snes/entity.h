@@ -7,7 +7,7 @@
  * ## Overview
  *
  * This module provides:
- * - Pool of reusable entity slots (up to 64 entities)
+ * - Pool of reusable entity slots (up to 16 entities)
  * - Position and velocity tracking
  * - Entity types for game logic
  * - Sprite and animation integration

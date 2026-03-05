@@ -45,6 +45,9 @@ enum
 namespace IT2SPC
 {
 
+    // Forward declarations
+    std::string Path2ID(const char *prefix, const std::string &source);
+
     /***********************************************************************************************
      *
      * Bank
@@ -109,6 +112,11 @@ namespace IT2SPC
             //			}
             //		}
             Source *s = new Source(mod.Samples[i]->Data); //, cisd );
+
+            // Set source ID from sample name (for SFX_* defines in soundbank.h)
+            if (mod.Samples[i]->Name[0] != '\0') {
+                s->id = Path2ID("SFX_", mod.Samples[i]->Name);
+            }
 
             int index = AddSource(s);
             bool exists = false;
@@ -270,7 +278,7 @@ namespace IT2SPC
                     sources[source_list[directory[i]]]->GetTuningFactor()));
         }
 
-        if (VERBOSE)
+        // Calculate totalsize unconditionally (needed for soundbank.h export)
         {
             int pattsize = 0;
             for (int i = 0; i < mod.PatternCount; i++)
@@ -292,54 +300,58 @@ namespace IT2SPC
             {
                 envsize += Instruments[i]->GetExportSize();
             }
-            // othersize += GetExportSize_Header();
 
             u32 echosize = EchoDelay * 2048;
             totalsize = pattsize + sampsize + instrsize + envsize + echosize;
             spc_ram_size = 65535 - module_base - header_size;
             u32 bytesfree = spc_ram_size - totalsize - header_size;
             totabanksize = totabanksize + totalsize;
-            if (ChkSfx && (totalsizem1 != 0))
+
+            if (VERBOSE)
             {
-                printf(
-                    "Conversion report:\n"
-                    "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
-                    "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
-                    " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
-                    "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
-                    "     Echo region: [%5i bytes]\n"
-                    "           Total: [%5i bytes]   *%i bytes free* *%i bytes free with 1st module*\n",
-                    pattsize, mod.Length, max_length,
-                    sampsize, mod.PatternCount, max_patterns,
-                    instrsize, mod.InstrumentCount, max_instruments,
-                    envsize, mod.SampleCount, max_samples,
-                    echosize,
-                    totalsize, bytesfree, bytesfree - totalsizem1);
+                if (ChkSfx && (totalsizem1 != 0))
+                {
+                    printf(
+                        "Conversion report:\n"
+                        "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
+                        "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
+                        " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
+                        "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
+                        "     Echo region: [%5i bytes]\n"
+                        "           Total: [%5i bytes]   *%i bytes free* *%i bytes free with 1st module*\n",
+                        pattsize, mod.Length, max_length,
+                        sampsize, mod.PatternCount, max_patterns,
+                        instrsize, mod.InstrumentCount, max_instruments,
+                        envsize, mod.SampleCount, max_samples,
+                        echosize,
+                        totalsize, bytesfree, bytesfree - totalsizem1);
+                }
+                else
+                {
+                    printf(
+                        "Conversion report:\n"
+                        "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
+                        "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
+                        " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
+                        "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
+                        "     Echo region: [%5i bytes]\n"
+                        "           Total: [%5i bytes]   *%i bytes free*\n",
+                        pattsize, mod.Length, max_length,
+                        sampsize, mod.PatternCount, max_patterns,
+                        instrsize, mod.InstrumentCount, max_instruments,
+                        envsize, mod.SampleCount, max_samples,
+                        echosize,
+                        totalsize, bytesfree);
+                }
+
+                if (totalsize > spc_ram_size)
+                {
+                    printf ("%s: " ERRORRED("error") ": Module is too big. Maximum is %i bytes\n", ERRORBRIGHT("smconv"),spc_ram_size);
+                }
             }
-            else
-            {
-                printf(
-                    "Conversion report:\n"
-                    "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
-                    "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
-                    " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
-                    "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
-                    "     Echo region: [%5i bytes]\n"
-                    "           Total: [%5i bytes]   *%i bytes free*\n",
-                    pattsize, mod.Length, max_length,
-                    sampsize, mod.PatternCount, max_patterns,
-                    instrsize, mod.InstrumentCount, max_instruments,
-                    envsize, mod.SampleCount, max_samples,
-                    echosize,
-                    totalsize, bytesfree);
-            }
+
             if (totalsizem1 == 0)
                 totalsizem1 = totalsize;
-
-            if (totalsize > spc_ram_size)
-            {
-                printf ("%s: " ERRORRED("error") ": Module is too big. Maximum is %i bytes\n", ERRORBRIGHT("smconv"),spc_ram_size);
-            }
         }
     }
 

@@ -70,11 +70,11 @@ audio_voice_sample  DSB 8       ; Sample ID per voice (moved from $7E)
 
 .ENDS
 
-.RAMSECTION ".audio_ram" BANK 0 SLOT 1 ORGA $0400 FORCE
+.RAMSECTION ".audio_ram" BANK 0 SLOT 1 ORGA $0700 FORCE
 
 ; Sample table: 8 bytes per sample, 64 samples = 512 bytes
 ; Format: spcAddr(2), size(2), loop(2), flags(1), reserved(1)
-; Placed at $0400-$05FF in bank 0 RAM (above stack)
+; Placed at $0700-$08FF in bank 0 RAM (above oamMemory $0300-$051F)
 audio_samples       DSB 512
 
 .ENDS

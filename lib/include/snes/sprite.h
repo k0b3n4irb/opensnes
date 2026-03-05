@@ -56,6 +56,21 @@
 /** @brief Macro to convert size index to OBJSEL register value */
 #define OBJ_SIZE_TO_REG(size) ((size) << 5)
 
+/** @brief Convert VRAM word address to OBJSEL name base bits (0-2) */
+#define OBJ_BASE(vram_addr) (((vram_addr) >> 13) & 0x07)
+
+/**
+ * @brief Build OBJSEL register value from size constant + VRAM base address
+ * @param size One of OBJ_SIZE8_L16 .. OBJ_SIZE32_L64
+ * @param vram_addr VRAM word address for sprite tiles (must be 8KB-aligned)
+ *
+ * @code
+ * REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);  // = 0x62
+ * REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16,  0x4000);  // = 0x02
+ * @endcode
+ */
+#define OBJSEL(size, vram_addr) ((u8)(OBJ_SIZE_TO_REG(size) | OBJ_BASE(vram_addr)))
+
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
 
@@ -162,26 +177,57 @@ typedef struct {
     u16 _reserved2;     /**< 14-15: Padding for 16-byte alignment */
 } t_sprites;
 
+/*============================================================================
+ * Compile-time struct layout assertions
+ * Must match the oambuffer layout in sprite_dynamic.asm exactly.
+ *============================================================================*/
+
+_Static_assert(sizeof(t_sprites) == 16, "t_sprites must be 16 bytes");
+_Static_assert(__builtin_offsetof(t_sprites, oamx) == 0, "oamx offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamy) == 2, "oamy offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamframeid) == 4, "oamframeid offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamattribute) == 6, "oamattribute offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamrefresh) == 7, "oamrefresh offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamgfxaddr) == 8, "oamgfxaddr offset mismatch");
+_Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offset mismatch");
+
 /**
- * @brief Macro to set sprite graphics address from a pointer
+ * @brief Set sprite graphics address (bank $00 only)
  *
- * Properly stores the 24-bit address by splitting it into 16-bit address + bank byte.
- * This ensures correct structure layout matching the assembly expectations.
+ * Sets the 16-bit graphics address with bank byte = 0.
+ * cc65816 passes 16-bit pointers, so the bank byte is always lost
+ * before this macro runs. Use OAM_SET_GFX_BANK() for data in other banks.
  *
  * @param id Sprite index (0-127)
- * @param gfx Pointer to graphics data (will be split into addr16 + bank)
+ * @param gfx Pointer to graphics data in bank $00
  */
 #define OAM_SET_GFX(id, gfx) do { \
-    oambuffer[id].oamgfxaddr = (u16)(unsigned long)(gfx); \
-    oambuffer[id].oamgfxbank = (u8)((unsigned long)(gfx) >> 16); \
+    oambuffer[id].oamgfxaddr = (u16)(gfx); \
+    oambuffer[id].oamgfxbank = 0; \
 } while(0)
 
 /**
- * @brief Dynamic sprite buffer (128 entries)
+ * @brief Set sprite graphics address with explicit bank byte
+ *
+ * Use this when sprite data is in a bank other than $00.
+ *
+ * @param id Sprite index (0-127)
+ * @param gfx Pointer to graphics data
+ * @param bank ROM bank where graphics data is located (0-255)
+ */
+#define OAM_SET_GFX_BANK(id, gfx, bank) do { \
+    oambuffer[id].oamgfxaddr = (u16)(gfx); \
+    oambuffer[id].oamgfxbank = (u8)(bank); \
+} while(0)
+
+/* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
+
+/**
+ * @brief Dynamic sprite buffer (128 entries, 2048 bytes)
  *
  * Game-level sprite state for the dynamic sprite engine.
  * Each entry tracks a sprite's position, animation frame, and graphics pointer.
- * Separate from oamMemory (hardware OAM buffer).
+ * Separate from oamMemory (hardware OAM buffer at $0300-$051F).
  */
 extern t_sprites oambuffer[128];
 
@@ -203,7 +249,7 @@ void oamInit(void);
  * @param size Sprite size configuration (OBJ_SIZE_*)
  * @param tileBase Base address for sprite tiles in VRAM (word address >> 13)
  */
-void oamInitEx(u8 size, u8 tileBase);
+void oamInitEx(u16 size, u16 tileBase);
 
 /**
  * @brief Initialize sprite graphics and palette (PVSnesLib compatible)
@@ -253,12 +299,35 @@ void oamSetEx(u8 id, u8 size, u8 visible);
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
+ * @warning **Performance**: oamSet() has framesize=158 per call (158 bytes of
+ * stack manipulation due to SSA temporaries). Calling it more than 2-3 times
+ * per frame in the main loop causes visible jitter on real hardware.
+ * Use oamSetFast() or oamSetXYFast() macros for performance-critical code
+ * (see "Fast Macro Sprite API" section below).
+ *
+ * @warning **Coordinate Variable Pattern**: Due to a compiler quirk, sprite
+ * coordinates MUST be stored in a struct with s16 members for correct behavior.
+ * Using separate u16 variables causes jerky horizontal movement.
+ *
+ * **CORRECT** (use struct with s16):
  * @code
- * oamSet(0, 100, 80, 0, 0, 3, 0);  // Sprite 0, priority 3, no flip
- * oamSet(1, 50, 50, 4, 1, 2, 0x40);  // Sprite 1, palette 1, H-flip
+ * typedef struct { s16 x, y; } Position;
+ * Position player = {100, 100};
+ * oamSet(0, player.x, player.y, 0, 0, 3, 0);
+ * player.x += 1;  // Smooth movement
  * @endcode
+ *
+ * **WRONG** (separate u16 variables - causes bugs):
+ * @code
+ * u16 player_x = 100;  // DON'T do this!
+ * u16 player_y = 100;
+ * oamSet(0, player_x, player_y, 0, 0, 3, 0);
+ * player_x += 1;  // Jerky movement!
+ * @endcode
+ *
+ * See examples/graphics/backgrounds/continuous_scroll for details on this pattern.
  */
-void oamSet(u8 id, u16 x, u8 y, u16 tile, u8 palette, u8 priority, u8 flags);
+void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
 /**
  * @brief Set sprite X position
@@ -297,7 +366,19 @@ void oamSetTile(u8 id, u16 tile);
  * @brief Set sprite visibility
  *
  * @param id Sprite ID (0-127)
- * @param visible TRUE to show, FALSE to hide
+ * @param visible OBJ_SHOW (1) or OBJ_HIDE (0)
+ *
+ * @note **Important**: SNES sprite visibility is controlled by Y position.
+ * Setting Y to 240 (OBJ_HIDE_Y) hides the sprite below the visible screen.
+ * This function only handles HIDING (sets Y=240). Passing OBJ_SHOW does
+ * nothing - to show a sprite, set a valid Y coordinate using oamSetY() or
+ * oamSet(). For explicit hiding, use oamHide() which is clearer.
+ *
+ * @code
+ * oamSetVisible(0, OBJ_HIDE);  // Hides sprite 0 (sets Y=240)
+ * oamSetVisible(0, OBJ_SHOW);  // Does nothing! Sprite stays hidden.
+ * oamSetY(0, 100);             // This shows the sprite at Y=100
+ * @endcode
  */
 void oamSetVisible(u8 id, u8 visible);
 
@@ -314,7 +395,7 @@ void oamHide(u8 id);
  * @param id Sprite ID (0-127)
  * @param large TRUE for large size, FALSE for small
  */
-void oamSetSize(u8 id, u8 large);
+void oamSetSize(u16 id, u16 large);
 
 /*============================================================================
  * OAM Update
@@ -524,7 +605,7 @@ void oamVramQueueUpdate(void);
  * oambuffer[0].oamframeid = 0;
  * oambuffer[0].oamattribute = OBJ_PRIO(2) | OBJ_PAL(0);
  * oambuffer[0].oamrefresh = 1;
- * oambuffer[0].oamgraphics = &sprite32_tiles;
+ * OAM_SET_GFX(0, sprite32_tiles);
  * oamDynamic32Draw(0);
  * @endcode
  */
@@ -550,21 +631,113 @@ void oamDynamic16Draw(u16 id);
  */
 void oamDynamic8Draw(u16 id);
 
+
+/*============================================================================
+ * Fast Macro Sprite API
+ *
+ * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
+ * These write directly to oamMemory[] without function call overhead.
+ *
+ * oamSet() has framesize=158 per call due to SSA temporaries. With >2-3
+ * sprites/frame in the main loop, the stack manipulation causes visible
+ * jitter. These macros eliminate that overhead entirely.
+ *
+ * Note: cc65816 does not truly inline 'static inline' functions — they
+ * become separate SUPERFREE sections with global labels that conflict
+ * across translation units. Macros are the only zero-overhead option.
+ *
+ * oamMemory[] and oam_update_flag are declared in <snes/system.h>
+ * (included automatically via <snes.h>).
+ *
+ * Usage:
+ *   // Pre-compute attribute byte once at init
+ *   u8 attr = OAM_ATTR(tile, palette, priority, flags);
+ *
+ *   // Per-frame: fast full update
+ *   oamSetFast(id, x, y, tile, palette, priority, flags);
+ *
+ *   // Per-frame: position-only update (most common)
+ *   oamSetXYFast(id, x, y);
+ *============================================================================*/
+
 /**
- * @brief Set graphics pointer for dynamic sprite (handles 24-bit address)
+ * @brief Pre-compute OAM attribute byte (vhoopppc)
  *
- * This function properly sets both the 16-bit address and bank byte
- * for sprite graphics data. Use this instead of directly setting
- * oamgraphics/oamgfxbank to ensure correct bank handling.
- *
- * @param id Index into oambuffer array (0-127)
- * @param gfx Pointer to sprite graphics data in ROM
- *
- * @code
- * extern u8 sprite_tiles[];
- * oamSetGfx(0, sprite_tiles);  // Sets oambuffer[0].oamgraphics and .oamgfxbank
- * @endcode
+ * @param _tile Tile number (0-511, only bit 8 used)
+ * @param _pal Palette (0-7)
+ * @param _prio Priority (0-3)
+ * @param _fl Flip flags (bit 6 = H flip, bit 7 = V flip)
+ * @return Packed attribute byte
  */
-void oamSetGfx(u16 id, u8 *gfx);
+#define OAM_ATTR(_tile, _pal, _prio, _fl) \
+    ((u8)(((_fl) & 0xC0) | \
+          (((_prio) & 0x03) << 4) | \
+          (((_pal) & 0x07) << 1) | \
+          (((_tile) >> 8) & 0x01)))
+
+/**
+ * @brief X-high-bit mask for a sprite slot (0-3 within a high-table byte)
+ *
+ * Each high-table byte covers 4 sprites. Bit 0 of each 2-bit pair is the
+ * X high bit. This macro returns the mask for the X-high bit of the given slot.
+ */
+#define OAM_XHI_MASK(_slot) \
+    ((u8)((_slot) == 0 ? 0x01 : (_slot) == 1 ? 0x04 : \
+          (_slot) == 2 ? 0x10 : 0x40))
+
+/**
+ * @brief Set sprite properties with zero function-call overhead
+ *
+ * Drop-in replacement for oamSet() that writes directly to oamMemory[].
+ * Same parameters, same behavior, but compiles to direct memory writes
+ * instead of a function call with framesize=158.
+ *
+ * @param _id Sprite ID (0-127)
+ * @param _x X position (0-511)
+ * @param _y Y position (0-255)
+ * @param _tile Tile number (0-511)
+ * @param _pal Palette (0-7)
+ * @param _prio Priority (0-3)
+ * @param _fl Flip flags (bit 6 = H flip, bit 7 = V flip)
+ */
+#define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
+    u16 _off = (u16)(_id) << 2; \
+    oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
+    oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
+    u16 _ext = 512 + ((u16)(_id) >> 2); \
+    u16 _sl = (u16)(_id) & 0x03; \
+    u8 _xhi = OAM_XHI_MASK(_sl); \
+    if ((_x) & 0x100) \
+        oamMemory[_ext] |= _xhi; \
+    else \
+        oamMemory[_ext] &= ~_xhi; \
+    oam_update_flag = 1; \
+} while(0)
+
+/**
+ * @brief Update sprite position only (most common per-frame operation)
+ *
+ * Fastest possible sprite update — only writes X, Y, and X high bit.
+ * Use when tile/palette/priority/flags don't change between frames.
+ *
+ * @param _id Sprite ID (0-127)
+ * @param _x X position (0-511)
+ * @param _y Y position (0-255)
+ */
+#define oamSetXYFast(_id, _x, _y) do { \
+    u16 _off = (u16)(_id) << 2; \
+    oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    u16 _ext = 512 + ((u16)(_id) >> 2); \
+    u16 _sl = (u16)(_id) & 0x03; \
+    u8 _xhi = OAM_XHI_MASK(_sl); \
+    if ((_x) & 0x100) \
+        oamMemory[_ext] |= _xhi; \
+    else \
+        oamMemory[_ext] &= ~_xhi; \
+    oam_update_flag = 1; \
+} while(0)
 
 #endif /* OPENSNES_SPRITE_H */

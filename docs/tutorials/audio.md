@@ -241,8 +241,8 @@ Total audio RAM: 64KB
 
 ## Examples
 
-- `examples/audio/6_snesmod_music/` - Music playback demo
-- `examples/audio/7_snesmod_sfx/` - Sound effects demo
+- `examples/audio/snesmod_music/` - Music playback demo
+- `examples/audio/snesmod_sfx/` - Sound effects demo
 
 ## Next Steps
 
