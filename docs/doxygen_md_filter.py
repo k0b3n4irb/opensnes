@@ -22,6 +22,9 @@ import sys
 
 
 def main():
+    # Force UTF-8 on stdout (Windows/MSYS2 defaults to cp1252)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 2:
         sys.exit(1)
 
