@@ -52,7 +52,7 @@ static void buildGradientTable(u8 level) {
         /* Formula: level - (i / (32 / (level + 1))) */
         u16 divisor = 32 / (level + 1);
         if (divisor == 0) divisor = 1;
-        u16 step = i / divisor;
+        u16 step = (i * 2) / divisor;
         if (step > level) step = level;
         brightness = level - (u8)step;
 
@@ -83,22 +83,20 @@ int main(void) {
     /* Mode 3 (256 colors on BG1), enable BG1 only */
     setMode(BG_MODE3, 0);
 
-    /* Build initial gradient and enable HDMA */
-    buildGradientTable(gradient);
-
-    /* HDMA channel 3: mode 0 (1 register), dest = INIDISP ($00) */
+    /* Pre-configure HDMA channel 3 but don't enable yet.
+     * The gradient effect only activates when the user presses A. */
     hdmaSetup(3, 0, 0x00, hdma_gradient_table);
-    hdmaEnable(3);
 
     /* Screen on */
     setScreenOn();
 
     while (1) {
-        /* Press A to cycle gradient levels (15 → 2 → 15) */
+        /* Press A to activate and cycle gradient levels (15 → 2 → 15) */
         if (padPressed(0) & KEY_A) {
+            buildGradientTable(gradient);
+            hdmaEnable(1 << 3);
             gradient--;
             if (gradient < 2) gradient = 15;
-            buildGradientTable(gradient);
         }
 
         WaitForVBlank();
