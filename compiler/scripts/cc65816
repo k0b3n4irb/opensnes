@@ -82,7 +82,33 @@ cc -E "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
 # Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
 # Using a pipe hides cproc crashes: QBE receives truncated IR and reports
 # misleading parse errors. With a temp file, cproc failures are caught cleanly.
-"$CPROC" "$TMPFILE" > "$IRFILE"
+#
+# cproc occasionally segfaults on MSYS2 (Windows). Retry up to 2 times on
+# signal 139 (SIGSEGV) before giving up. This does not mask real errors —
+# compilation failures with exit code != 139 are not retried.
+CPROC_RETRIES=3
+for _try in $(seq 1 $CPROC_RETRIES); do
+    set +e
+    "$CPROC" "$TMPFILE" > "$IRFILE" 2>/tmp/cc65816_cproc_err.$$
+    CPROC_EXIT=$?
+    set -e
+
+    if [[ $CPROC_EXIT -eq 0 ]]; then
+        break
+    fi
+
+    # Exit code 139 = killed by signal 11 (SIGSEGV)
+    if [[ $CPROC_EXIT -eq 139 ]] && [[ $_try -lt $CPROC_RETRIES ]]; then
+        echo "cc65816: cproc segfault (attempt $_try/$CPROC_RETRIES), retrying..." >&2
+        continue
+    fi
+
+    # Not a segfault or last retry — propagate the error
+    cat /tmp/cc65816_cproc_err.$$ >&2
+    rm -f /tmp/cc65816_cproc_err.$$
+    exit $CPROC_EXIT
+done
+rm -f /tmp/cc65816_cproc_err.$$
 
 # Stage 3: QBE IR -> 65816 assembly
 if [[ -z "$OUTPUT" ]]; then
