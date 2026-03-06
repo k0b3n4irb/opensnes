@@ -93,7 +93,18 @@ jobs:
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+          # cproc non-deterministically segfaults on MSYS2; retry make up to 3 times
+          for attempt in 1 2 3; do
+            if make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Build failed after 3 attempts"
+              exit 1
+            fi
+            echo "=== Build attempt $attempt failed (likely cproc segfault), retrying... ==="
+            make clean
+          done
 
       - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'
