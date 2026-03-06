@@ -1,4 +1,4 @@
-# SNES OAM (Object Attribute Memory)
+# SNES OAM (Object Attribute Memory) {#oam}
 
 OAM stores sprite attributes for the PPU. Understanding how OAM works is critical for sprite programming.
 

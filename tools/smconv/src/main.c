@@ -1,26 +1,24 @@
 /******************************************************************************
- * snesmod converter
+ * snesmod converter (pure C rewrite)
  * (C) 2009 Mukunda Johnson
  * Modifications by Alekmaul, 2012-2016
  ******************************************************************************/
 
-#include <string>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "inputdata.h"
 #include "itloader.h"
 #include "it2spc.h"
 
-// DEFINES
 #define ERRORRED(STRING) "\x1B[31m" STRING "\033[0m"
-#define ERRORPINK(STRING) "\x1B[35m" STRING "\033[0m"
 #define ERRORBRIGHT(STRING) "\x1B[97m" STRING "\033[0m"
-
 
 #define SMCONVVERSION __BUILD_VERSION
 #define SMCONVDATE __BUILD_DATE
 
-const char USAGE[] = {
+static const char USAGE[] =
     "\nUsage : smconv [options] [input]...\n"
     "\n\nSoundbank options:"
     "\n-s                Soundbank creation mode"
@@ -49,84 +47,67 @@ const char USAGE[] = {
     "\n  smconv -s -o soundbank -b 1 -n -p soundbank input.it"
     "\n\nAnd for IT->SPC:"
     "\n  smconv input.it"
-    "\n\nUse -V to view how much RAM the modules will use.\n"};
+    "\n\nUse -V to view how much RAM the modules will use.\n";
 
-const char VERSION[] = {
+static const char VERSION[] =
     "smconv (" SMCONVDATE ") version " SMCONVVERSION ""
     "\nCopyright (c) 2012-2024 Alekmaul "
-    "\nBased on SNESMOD (C) 2009 Mukunda Johnson (www.mukunda.com)\n"};
-
-std::string PATH;
-bool VERBOSE;
-int BANKNUM;
-bool NO_HEADER;
-std::string SYMBOL_PREFIX;
+    "\nBased on SNESMOD (C) 2009 Mukunda Johnson (www.mukunda.com)\n";
 
 int main(int argc, char *argv[])
 {
-    ConversionInput::OperationData od(argc, argv);
+    smconv_args_t od;
+    smconv_args_parse(&od, argc, argv);
 
-    VERBOSE = od.verbose_mode;
-    BANKNUM = od.banknumber;
-    NO_HEADER = od.no_header;
-    SYMBOL_PREFIX = od.symbol_prefix;
+    spc_bank_set_verbose(od.verbose_mode);
 
-    if (od.show_help)
-    {
-        printf(USAGE);
+    if (od.show_help) {
+        printf("%s", USAGE);
         exit(0);
     }
 
-    if (od.show_version)
-    {
-        printf(VERSION);
+    if (od.show_version) {
+        printf("%s", VERSION);
         exit(0);
     }
 
-    if (argc < 2)
-    {
-        printf(USAGE);
-        exit (EXIT_FAILURE); 
+    if (argc < 2) {
+        printf("%s", USAGE);
+        exit(EXIT_FAILURE);
     }
 
-    if (od.output.empty())
-    {
-        printf ("%s: " ERRORRED("fatal error") ": missing output file\n", ERRORBRIGHT("smconv"));
-        exit (EXIT_FAILURE);  
+    if (od.output[0] == '\0') {
+        printf("%s: " ERRORRED("fatal error") ": missing output file\n", ERRORBRIGHT("smconv"));
+        exit(EXIT_FAILURE);
     }
 
-    if (od.files.empty())
-    {
-        printf ("%s: " ERRORRED("fatal error") ": missing input file\n", ERRORBRIGHT("smconv"));
-        exit (EXIT_FAILURE); 
+    if (od.file_count == 0) {
+        printf("%s: " ERRORRED("fatal error") ": missing input file\n", ERRORBRIGHT("smconv"));
+        exit(EXIT_FAILURE);
     }
 
-    if (VERBOSE)
-    {
-        printf ("%s: Loading modules...\n", ERRORBRIGHT("smconv"));
+    if (od.verbose_mode) {
+        printf("%s: Loading modules...\n", ERRORBRIGHT("smconv"));
         fflush(stdout);
     }
 
-    ITLoader::Bank bank(od.files);
+    itl_bank_t *bank = itl_bank_create(od.files, od.file_count);
 
-    if (VERBOSE)
-    {
-        printf ("%s: Starting conversion...\n", ERRORBRIGHT("smconv"));
+    if (od.verbose_mode) {
+        printf("%s: Starting conversion...\n", ERRORBRIGHT("smconv"));
         fflush(stdout);
     }
 
-    IT2SPC::Bank result(bank, od.hirom, od.check_effect_size);
+    spc_bank_t *result = spc_bank_create(bank, od.hirom, od.check_effect_size);
 
+    if (od.spc_mode) {
+        spc_bank_make_spc(result, od.output);
+    } else {
+        spc_bank_export(result, od.output, od.no_header, od.symbol_prefix, od.banknumber);
+    }
 
-    // export products
-    if (od.spc_mode)
-    {
-        result.MakeSPC(od.output.c_str());
-    }
-    else
-    {
-        result.Export(od.output.c_str());
-    }
+    spc_bank_destroy(result);
+    itl_bank_destroy(bank);
 
     return 0;
 }

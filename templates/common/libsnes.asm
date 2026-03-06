@@ -271,38 +271,6 @@ consoleDisableNMI:
     rtl
 
 ;------------------------------------------------------------------------------
-; padUpdate - Read joypad state and update pressed flags
-; Call once per frame, typically after WaitForVBlank
-;------------------------------------------------------------------------------
-padUpdate:
-    php
-    rep #$30            ; 16-bit A/X/Y
-
-    ; Wait for auto-joypad read to complete
-    sep #$20
--   lda $4212           ; HVBJOY
-    and #$01            ; Check auto-read status
-    bne -
-    rep #$20
-
-    ; Read joypad 1
-    lda $4218           ; JOY1L/JOY1H
-
-    ; Calculate newly pressed buttons
-    ; pressed = current AND NOT held
-    sta.w pad0
-    eor.w pad0_held     ; XOR with held to get changes
-    and.w pad0          ; AND with current = newly pressed
-    sta.w pad0_pressed
-
-    ; Update held state
-    lda.w pad0
-    sta.w pad0_held
-
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
 ; padPressed - Return buttons pressed this frame (edge-triggered)
 ; Returns: A = button mask for pressed buttons
 ;------------------------------------------------------------------------------

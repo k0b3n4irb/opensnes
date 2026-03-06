@@ -1,4 +1,4 @@
-# SNES Sound Programming Guide
+# SNES Sound Programming Guide {#snes_sound_guide}
 
 This guide covers the SNES audio system for OpenSNES game development.
 

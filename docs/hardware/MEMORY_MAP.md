@@ -1,4 +1,4 @@
-# SNES Memory Map
+# SNES Memory Map {#memory_map}
 
 Complete memory layout reference for SNES development.
 

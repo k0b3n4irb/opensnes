@@ -89,12 +89,22 @@ jobs:
 
       - name: Build & Release OpenSNES for Windows
         if: matrix.name == 'windows'
-        continue-on-error: true  # cproc may intermittently crash on MSYS2 (text.c HiROM)
         shell: msys2 {0}
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+          # cproc non-deterministically segfaults on MSYS2; retry make up to 3 times
+          for attempt in 1 2 3; do
+            if make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Build failed after 3 attempts"
+              exit 1
+            fi
+            echo "=== Build attempt $attempt failed (likely cproc segfault), retrying... ==="
+            make clean
+          done
 
       - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'
@@ -113,7 +123,6 @@ jobs:
 
       - name: Build tests (Windows)
         if: matrix.name == 'windows'
-        continue-on-error: true  # cproc segfaults on some C constructs on MSYS2
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -131,7 +140,6 @@ jobs:
 
       - name: Run compiler tests (Windows)
         if: matrix.name == 'windows'
-        continue-on-error: true  # cproc segfaults non-deterministically on MSYS2
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -150,7 +158,6 @@ jobs:
 
       - name: Build examples (Windows)
         if: matrix.name == 'windows'
-        continue-on-error: true  # cproc may intermittently crash on MSYS2
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -166,7 +173,6 @@ jobs:
 
       - name: Validate examples (Windows)
         if: matrix.name == 'windows'
-        continue-on-error: true  # depends on examples building successfully
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -185,7 +191,6 @@ jobs:
 
       - name: Check memory overlaps (Windows)
         if: matrix.name == 'windows'
-        continue-on-error: true  # depends on examples building successfully
         shell: msys2 {0}
         run: |
           set -o pipefail

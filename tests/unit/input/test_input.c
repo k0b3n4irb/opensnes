@@ -106,21 +106,8 @@ void test_button_single_bits(void) {
     log_result("KEY_RIGHT single bit", is_single_bit(KEY_RIGHT));
 }
 
-// Test padUpdate doesn't crash
-void test_pad_update(void) {
-    padUpdate();
-    log_result("padUpdate executes", 1);
-
-    // Multiple updates
-    padUpdate();
-    padUpdate();
-    log_result("padUpdate multiple", 1);
-}
-
 // Test pad functions return values
 void test_pad_functions(void) {
-    padUpdate();
-
     // These should return 0 when no buttons pressed
     u16 pressed = padPressed(0);
     u16 held = padHeld(0);
@@ -176,7 +163,6 @@ int main(void) {
 
     // Run tests
     test_button_single_bits();
-    test_pad_update();
     test_pad_functions();
     test_button_combinations();
 
@@ -191,8 +177,6 @@ int main(void) {
 
     while (1) {
         WaitForVBlank();
-        padUpdate();
-
         u16 held = padHeld(0);
 
         // Clear button display area

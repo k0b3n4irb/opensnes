@@ -1,4 +1,4 @@
-# SNES Hardware Register Reference
+# SNES Hardware Register Reference {#registers}
 
 Complete reference for all SNES hardware registers commonly used in game development.
 

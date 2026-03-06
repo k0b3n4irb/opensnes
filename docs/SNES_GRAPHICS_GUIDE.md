@@ -1,4 +1,4 @@
-# SNES Graphics Programming Guide
+# SNES Graphics Programming Guide {#snes_graphics_guide}
 
 This guide covers everything needed to create graphics for SNES games using OpenSNES.
 

@@ -96,17 +96,6 @@
  *============================================================================*/
 
 /**
- * @brief (Deprecated) No-op, kept for API compatibility.
- *
- * Input is read automatically by the NMI handler in crt0.asm every VBlank.
- * There is no need to call this function. Use padHeld(), padPressed(), and
- * padReleased() directly after WaitForVBlank().
- *
- * @deprecated This function does nothing. Remove calls to it from your code.
- */
-void padUpdate(void);
-
-/**
  * @brief Get buttons pressed this frame
  *
  * Returns buttons that were just pressed (not held from previous frame).

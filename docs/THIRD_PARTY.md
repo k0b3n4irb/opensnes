@@ -1,4 +1,4 @@
-# Third-Party Components
+# Third-Party Components {#third_party}
 
 This document lists third-party tools and libraries included in OpenSNES, along with their original authors and licenses.
 

@@ -1,4 +1,4 @@
-# OpenSNES Example Walkthroughs
+# OpenSNES Example Walkthroughs {#example_walkthroughs}
 
 This guide provides detailed explanations of each example project, breaking down the code line by line to help you understand SNES programming concepts.
 
