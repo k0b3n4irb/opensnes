@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['walkthroughs_0',['OpenSNES Example Walkthroughs',['../md_EXAMPLE__WALKTHROUGHS.html',1,'']]],
-  ['with_20opensnes_1',['Getting Started with OpenSNES',['../md_GETTING__STARTED.html',1,'']]]
+  ['input_20examples_0',['Input Examples',['../examples_input.html',1,'']]],
+  ['input_20tutorial_1',['Controller Input Tutorial',['../tutorial_input.html',1,'index']]]
 ];

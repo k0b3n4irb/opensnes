@@ -1,15 +1,21 @@
 var searchData=
 [
-  ['waitforvblank_0',['WaitForVBlank',['../console_8h.html#abd33830487e4764e5ec22ec98b749f4b',1,'console.h']]],
-  ['windowcentered_1',['windowCentered',['../window_8h.html#a11a35f5ec93736ea033380fd399e6bdd',1,'window.h']]],
-  ['windowdisable_2',['windowDisable',['../window_8h.html#aade31a5a8942e5aed6e954ae4ac5508b',1,'window.h']]],
-  ['windowdisableall_3',['windowDisableAll',['../window_8h.html#abc5aaec4f8b14ffdaa8aa487492962cb',1,'window.h']]],
-  ['windowenable_4',['windowEnable',['../window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017',1,'window.h']]],
-  ['windowinit_5',['windowInit',['../window_8h.html#a950e61e7616f970db1d7dab2a851a8b7',1,'window.h']]],
-  ['windowsetinvert_6',['windowSetInvert',['../window_8h.html#ace412a79a04227a3b380fa54723a749a',1,'window.h']]],
-  ['windowsetlogic_7',['windowSetLogic',['../window_8h.html#a9e3b098fd3ae47368da1fa8129ba63ee',1,'window.h']]],
-  ['windowsetmainmask_8',['windowSetMainMask',['../window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c',1,'window.h']]],
-  ['windowsetpos_9',['windowSetPos',['../window_8h.html#a69900cfa7ecb5f94e7f6195024ac9e10',1,'window.h']]],
-  ['windowsetsubmask_10',['windowSetSubMask',['../window_8h.html#a6cdc44e1b2242ad4ee985c972dae0b00',1,'window.h']]],
-  ['windowsplit_11',['windowSplit',['../window_8h.html#a977a0f5193aa0688fef854dce181d2de',1,'window.h']]]
+  ['textclear_0',['textClear',['../text_8h.html#a3ee3aa74832395d0ee83d3bfcf456650',1,'text.h']]],
+  ['textclearrect_1',['textClearRect',['../text_8h.html#a5b0d49c65eb292f8d6ab738a5106482c',1,'text.h']]],
+  ['textdrawbox_2',['textDrawBox',['../text_8h.html#ad5364fa63c6171eab19184c104fa0d0d',1,'text.h']]],
+  ['textfillrect_3',['textFillRect',['../text_8h.html#a0ab17818609216a18abe2ba6ba8fd83c',1,'text.h']]],
+  ['textflush_4',['textFlush',['../text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404',1,'text.h']]],
+  ['textgetx_5',['textGetX',['../text_8h.html#afcf97ad814e172c8648c70fb9f696ad4',1,'text.h']]],
+  ['textgety_6',['textGetY',['../text_8h.html#afda1c2639e7e9271acc8760f0d657304',1,'text.h']]],
+  ['textinit_7',['textInit',['../text_8h.html#a055579e7b75458617363a27f1224bc99',1,'text.h']]],
+  ['textinitex_8',['textInitEx',['../text_8h.html#a1d32953264bb842516edeb3292359758',1,'text.h']]],
+  ['textloadfont_9',['textLoadFont',['../text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f',1,'text.h']]],
+  ['textloadfont4bpp_10',['textLoadFont4bpp',['../text_8h.html#a21a39509cc61fba3c98500627619baf0',1,'text.h']]],
+  ['textprint_11',['textPrint',['../text_8h.html#ae2b623eed527810c71528f6b898bff3e',1,'text.h']]],
+  ['textprintat_12',['textPrintAt',['../text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc',1,'text.h']]],
+  ['textprinthex_13',['textPrintHex',['../text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab',1,'text.h']]],
+  ['textprints16_14',['textPrintS16',['../text_8h.html#a23f9b3d2b505e3189c30cfaa976be1ee',1,'text.h']]],
+  ['textprintu16_15',['textPrintU16',['../text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4',1,'text.h']]],
+  ['textputchar_16',['textPutChar',['../text_8h.html#acd3f984c3d3308883e2729a50db16413',1,'text.h']]],
+  ['textsetpos_17',['textSetPos',['../text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0',1,'text.h']]]
 ];

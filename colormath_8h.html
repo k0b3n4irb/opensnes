@@ -211,21 +211,21 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Color Math (Blending/Transparency) </p>
 <p>Color math enables blending between the main screen and sub screen or a fixed color. This creates effects like transparency, shadows, fading, and underwater tints.</p>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md17"></a>
 How Color Math Works</h2>
 <p>The SNES can add or subtract colors:</p><ul>
 <li><b>Add</b>: Main screen + Sub screen (or fixed color) = brighter</li>
 <li><b>Subtract</b>: Main screen - Sub screen (or fixed color) = darker</li>
 </ul>
 <p>Half mode divides the result by 2, useful for 50% transparency.</p>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 Main Screen vs Sub Screen</h2>
 <ul>
 <li>Main screen: Primary display (what you normally see)</li>
 <li>Sub screen: Secondary layer used for blending</li>
 </ul>
 <p>For transparency, put the background on main screen and the transparent layer on sub screen.</p>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md19"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// 50% transparent BG2 over BG1</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;   <span class="comment">// Both on main screen</span></div>

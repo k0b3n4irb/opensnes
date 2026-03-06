@@ -146,7 +146,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>SNES Mouse support (1-2 mice on ports 1/2) </p>
 <p>The SNES mouse provides 2 buttons and relative X/Y displacement. Displacement is read via bit-bang in the NMI handler after <a class="el" href="group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e" title="Initialize mouse on given port.">mouseInit()</a>.</p>
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md35"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Detect and initialize mouse on port 1</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e">mouseInit</a>(0)) {</div>
@@ -166,7 +166,7 @@ Usage</h2>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga2cdb51c5e8b9145b02d9ae990cd1b2cf"><div class="ttname"><a href="group__mouse__input.html#ga2cdb51c5e8b9145b02d9ae990cd1b2cf">mouseGetY</a></div><div class="ttdeci">s16 mouseGetY(u8 port)</div><div class="ttdoc">Get Y displacement since last frame.</div></div>
-<div class="ttc" id="agroup__mouse__input_html_ga67d41b5dcdb6d241343bf97e15304079"><div class="ttname"><a href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a></div><div class="ttdeci">#define MOUSE_BUTTON_LEFT</div><div class="ttdef"><b>Definition</b> input.h:202</div></div>
+<div class="ttc" id="agroup__mouse__input_html_ga67d41b5dcdb6d241343bf97e15304079"><div class="ttname"><a href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a></div><div class="ttdeci">#define MOUSE_BUTTON_LEFT</div><div class="ttdef"><b>Definition</b> input.h:191</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga7452fe56733af8f085a8c7c7b814de0e"><div class="ttname"><a href="group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e">mouseInit</a></div><div class="ttdeci">u8 mouseInit(u8 port)</div><div class="ttdoc">Initialize mouse on given port.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga9f99c41040c01525f1aaa1fd229a31b5"><div class="ttname"><a href="group__mouse__input.html#ga9f99c41040c01525f1aaa1fd229a31b5">mouseGetX</a></div><div class="ttdeci">s16 mouseGetX(u8 port)</div><div class="ttdoc">Get X displacement since last frame.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_gafc97172b71c6aafca462a667f3eb2f8d"><div class="ttname"><a href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a></div><div class="ttdeci">u8 mouseButtonsPressed(u8 port)</div><div class="ttdoc">Get newly pressed mouse buttons this frame.</div></div>

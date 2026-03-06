@@ -202,9 +202,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a2ef786c923fe4841a3b4f1d2f7350dda" id="r_a2ef786c923fe4841a3b4f1d2f7350dda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda">padReleased</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a2ef786c923fe4841a3b4f1d2f7350dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons released this frame.  <br /></td></tr>
 <tr class="separator:a2ef786c923fe4841a3b4f1d2f7350dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c8c7da097c04492b16819557c828fd8" id="r_a1c8c7da097c04492b16819557c828fd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input_8h.html#a1c8c7da097c04492b16819557c828fd8">padUpdate</a> (void)</td></tr>
-<tr class="memdesc:a1c8c7da097c04492b16819557c828fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Deprecated) No-op, kept for API compatibility.  <br /></td></tr>
-<tr class="separator:a1c8c7da097c04492b16819557c828fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1e54dc68c7f0b0b70f98efbd0ce247c9" id="r_ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga1e54dc68c7f0b0b70f98efbd0ce247c9">scopeButtonsDown</a> (void)</td></tr>
 <tr class="memdesc:ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get currently held buttons.  <br /></td></tr>
 <tr class="separator:ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,7 +245,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Controller Input. </p>
 <p>Functions for reading controller input.</p>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md33"></a>
 Button Constants</h2>
 <p>Use these constants with <a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a>, <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a>, etc:</p>
 <table class="markdownTable">
@@ -279,7 +276,7 @@ Button Constants</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">KEY_RIGHT   </td><td class="markdownTableBodyNone">D-pad right   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Check for button press (just pressed this frame)</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
@@ -439,28 +436,6 @@ Usage</h2>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Button mask of released buttons </dd></dl>
-
-</div>
-</div>
-<a id="a1c8c7da097c04492b16819557c828fd8" name="a1c8c7da097c04492b16819557c828fd8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c8c7da097c04492b16819557c828fd8">&#9670;&#160;</a></span>padUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void padUpdate </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>(Deprecated) No-op, kept for API compatibility. </p>
-<p>Input is read automatically by the NMI handler in crt0.asm every VBlank. There is no need to call this function. Use <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a>, <a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a>, and <a class="el" href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda" title="Get buttons released this frame.">padReleased()</a> directly after <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>.</p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>This function does nothing. Remove calls to it from your code. </dd></dl>
 
 </div>
 </div>

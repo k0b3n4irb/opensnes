@@ -238,7 +238,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES HDMA (Horizontal-blanking DMA) </p>
 <p>HDMA transfers data to PPU registers once per scanline during HBlank, enabling effects like color gradients, parallax scrolling, and wave distortion that change across the screen.</p>
-<h2><a class="anchor" id="autotoc_md38"></a>
+<h2><a class="anchor" id="autotoc_md29"></a>
 How HDMA Works</h2>
 <p>HDMA uses a table in memory that specifies:</p><ul>
 <li>How many scanlines to apply a value</li>
@@ -248,7 +248,7 @@ How HDMA Works</h2>
 <li>1 byte: Line count (bit 7 = repeat mode, bits 0-6 = count)</li>
 <li>N bytes: Data to write (1-4 bytes depending on transfer mode)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md39"></a>
+<h2><a class="anchor" id="autotoc_md30"></a>
 Table Format</h2>
 <p>Non-repeat mode (bit 7 = 0): Write data ONCE, then skip N-1 scanlines </p><div class="fragment"><div class="line">.db 32       ; Write data once, hold <span class="keywordflow">for</span> 32 scanlines</div>
 <div class="line">.db $1F, $00 ; Data (2 bytes <span class="keywordflow">for</span> transfer mode 1)</div>
@@ -262,7 +262,7 @@ Table Format</h2>
 <div class="line">.db $1F, $08 ; Data</div>
 <div class="line">.db 0        ; End of table</div>
 </div><!-- fragment --><p> REQUIRED for scroll registers (BG1HOFS, etc.) and other write-twice/ latched registers that need re-writing every scanline.</p>
-<h2><a class="anchor" id="autotoc_md40"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define HDMA table in ROM</span></div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gradient_table[] = {</div>
@@ -285,7 +285,7 @@ Usage Example</h2>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>HDMA channels 6-7 are recommended to avoid conflicts with DMA. </dd>
 <dd>
 HDMA tables must be in ROM or bank $7E RAM.</dd></dl>
-<h2><a class="anchor" id="autotoc_md41"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 <p>BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that require being written EVERY scanline to maintain their value. Use REPEAT mode (bit 7 = 1) in the HDMA line count for these registers.</p>
 <p>Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the scroll value is lost on subsequent scanlines — causing visible glitches.</p>

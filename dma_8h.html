@@ -119,15 +119,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ae3be346bcc28bc733e25fd5fe46a8b9c" id="r_ae3be346bcc28bc733e25fd5fe46a8b9c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:ae3be346bcc28bc733e25fd5fe46a8b9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM data (PVSnesLib compatible)  <br /></td></tr>
 <tr class="separator:ae3be346bcc28bc733e25fd5fe46a8b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3e45dfba4bd5221bf5a31e1ded08cbc" id="r_ab3e45dfba4bd5221bf5a31e1ded08cbc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#ab3e45dfba4bd5221bf5a31e1ded08cbc">dmaCopyToCGRAM</a> (const void *src, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dest, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> count)</td></tr>
-<tr class="memdesc:ab3e45dfba4bd5221bf5a31e1ded08cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM (WRAM source only)  <br /></td></tr>
-<tr class="separator:ab3e45dfba4bd5221bf5a31e1ded08cbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17096aec74b0182f712144527aa65714" id="r_a17096aec74b0182f712144527aa65714"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#a17096aec74b0182f712144527aa65714">dmaCopyToOAM</a> (const void *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a17096aec74b0182f712144527aa65714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM data (WRAM source only)  <br /></td></tr>
-<tr class="separator:a17096aec74b0182f712144527aa65714"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64b37754c68db6386ea7e1dd6199ce1a" id="r_a64b37754c68db6386ea7e1dd6199ce1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#a64b37754c68db6386ea7e1dd6199ce1a">dmaCopyToVRAM</a> (const void *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dest, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a64b37754c68db6386ea7e1dd6199ce1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM (WRAM source only)  <br /></td></tr>
-<tr class="separator:a64b37754c68db6386ea7e1dd6199ce1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afea0f88cf525ded08d70e9e4e74a5a51" id="r_afea0f88cf525ded08d70e9e4e74a5a51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:afea0f88cf525ded08d70e9e4e74a5a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM (PVSnesLib compatible)  <br /></td></tr>
 <tr class="separator:afea0f88cf525ded08d70e9e4e74a5a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,7 +138,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES DMA (Direct Memory Access) </p>
 <p>Functions for fast memory transfers using DMA.</p>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md24"></a>
 DMA Overview</h2>
 <p>DMA allows fast transfers between:</p><ul>
 <li>Work RAM ↔ VRAM (video RAM)</li>
@@ -155,12 +146,12 @@ DMA Overview</h2>
 <li>Work RAM ↔ OAM (sprite RAM)</li>
 </ul>
 <p>DMA is much faster than CPU copying and should be used for all bulk transfers during VBlank.</p>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 VBlank Timing Requirement</h2>
 <dl class="section warning"><dt>Warning</dt><dd><b>CRITICAL</b>: VRAM, CGRAM, and OAM can only be safely accessed during VBlank (vertical blanking period) or when the screen is in force blank mode (INIDISP bit 7 set). Accessing these memories during active display causes visual corruption and undefined behavior.</dd>
 <dd>
 <b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 Bank Limitation</h2>
 <dl class="section note"><dt>Note</dt><dd>The current implementation assumes source data is in bank $00 for ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using <a class="el" href="dma_8h.html#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> or <a class="el" href="dma_8h.html#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
@@ -329,135 +320,6 @@ Bank Limitation</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a>(oamBuffer, 544);</div>
 <div class="ttc" id="adma_8h_html_ae3be346bcc28bc733e25fd5fe46a8b9c"><div class="ttname"><a href="dma_8h.html#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a></div><div class="ttdeci">void dmaCopyOam(u8 *source, u16 size)</div><div class="ttdoc">Copy OAM data (PVSnesLib compatible)</div></div>
 </div><!-- fragment --> 
-</div>
-</div>
-<a id="ab3e45dfba4bd5221bf5a31e1ded08cbc" name="ab3e45dfba4bd5221bf5a31e1ded08cbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3e45dfba4bd5221bf5a31e1ded08cbc">&#9670;&#160;</a></span>dmaCopyToCGRAM()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dmaCopyToCGRAM </td>
-          <td>(</td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
-          <td class="paramname"><em>dest</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
-          <td class="paramname"><em>count</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Copy palette data to CGRAM (WRAM source only) </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">src</td><td>Source address (array of 16-bit colors) </td></tr>
-    <tr><td class="paramname">dest</td><td>Starting color index (0-255) </td></tr>
-    <tr><td class="paramname">count</td><td>Number of colors to copy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Use <a class="el" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4" title="Copy palette data to CGRAM (PVSnesLib compatible)">dmaCopyCGram()</a> instead for ROM/RAM sources </dd></dl>
-
-</div>
-</div>
-<a id="a17096aec74b0182f712144527aa65714" name="a17096aec74b0182f712144527aa65714"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17096aec74b0182f712144527aa65714">&#9670;&#160;</a></span>dmaCopyToOAM()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dmaCopyToOAM </td>
-          <td>(</td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Copy OAM data (WRAM source only) </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">src</td><td>Source address (544 bytes) </td></tr>
-    <tr><td class="paramname">size</td><td>Number of bytes to copy (usually 544)</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="dma_8h.html#ae3be346bcc28bc733e25fd5fe46a8b9c" title="Copy OAM data (PVSnesLib compatible)">dmaCopyOam()</a> instead for ROM/RAM sources </dd></dl>
-
-</div>
-</div>
-<a id="a64b37754c68db6386ea7e1dd6199ce1a" name="a64b37754c68db6386ea7e1dd6199ce1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64b37754c68db6386ea7e1dd6199ce1a">&#9670;&#160;</a></span>dmaCopyToVRAM()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dmaCopyToVRAM </td>
-          <td>(</td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
-          <td class="paramname"><em>dest</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Copy data to VRAM (WRAM source only) </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">src</td><td>Source address in Work RAM (bank $7E) </td></tr>
-    <tr><td class="paramname">dest</td><td>Destination word address in VRAM </td></tr>
-    <tr><td class="paramname">size</td><td>Number of bytes to copy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Must be called during VBlank! </dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Use <a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible)">dmaCopyVram()</a> instead for ROM/RAM sources </dd></dl>
-
 </div>
 </div>
 <a id="afea0f88cf525ded08d70e9e4e74a5a51" name="afea0f88cf525ded08d70e9e4e74a5a51"></a>

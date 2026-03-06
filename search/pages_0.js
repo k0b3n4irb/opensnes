@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['animation_20tutorial_0',['Sprites &amp; Animation Tutorial',['../tutorial_sprites.html',1,'']]],
-  ['audio_20music_20tutorial_1',['Audio &amp; Music Tutorial',['../tutorial_audio.html',1,'']]]
+  ['1_20bg3_20high_20priority_20hud_20layer_20over_20backgrounds_0',['Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds',['../examples_graphics_backgrounds_mode1_bg3_priority.html',1,'learning_path']]],
+  ['1_20example_1',['Mode 1 Example',['../examples_graphics_backgrounds_mode1.html',1,'learning_path']]],
+  ['1_20lz77_2',['Mode 1 LZ77',['../examples_graphics_backgrounds_mode1_lz77.html',1,'learning_path']]]
 ];

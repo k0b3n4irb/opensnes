@@ -38,7 +38,6 @@ var input_8h =
     [ "padPressed", "input_8h.html#ac697a43420bb5e1a038e129d79e88de8", null ],
     [ "padRaw", "input_8h.html#abcf020412a5fcc70c31c207517f97a48", null ],
     [ "padReleased", "input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda", null ],
-    [ "padUpdate", "input_8h.html#a1c8c7da097c04492b16819557c828fd8", null ],
     [ "scopeButtonsDown", "group__scope__input.html#ga1e54dc68c7f0b0b70f98efbd0ce247c9", null ],
     [ "scopeButtonsHeld", "group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0", null ],
     [ "scopeButtonsPressed", "group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6", null ],

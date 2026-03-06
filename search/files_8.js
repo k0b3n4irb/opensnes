@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lzss_2eh_0',['lzss.h',['../lzss_8h.html',1,'']]]
+  ['koopatroopa_2eh_0',['koopatroopa.h',['../koopatroopa_8h.html',1,'']]]
 ];

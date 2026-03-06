@@ -97,8 +97,8 @@ $(document).ready(function(){initNavTree('tutorial_audio.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES audio including the SPC700 sound chip, BRR samples, and SNESMOD tracker playback.</p>
-<h1><a class="anchor" id="autotoc_md75"></a>
-SNES Audio Architecture</h1>
+<h2><a class="anchor" id="autotoc_md66"></a>
+SNES Audio Architecture</h2>
 <p>The SNES has a dedicated <b>SPC700</b> sound processor with:</p>
 <ul>
 <li>8 audio channels</li>
@@ -107,8 +107,8 @@ SNES Audio Architecture</h1>
 <li>Hardware ADSR envelopes</li>
 <li>Echo/reverb effects</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md76"></a>
-Audio Options in OpenSNES</h1>
+<h2><a class="anchor" id="autotoc_md67"></a>
+Audio Options in OpenSNES</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Method   </th><th class="markdownTableHeadNone">Best For   </th><th class="markdownTableHeadNone">Size   </th><th class="markdownTableHeadNone">Complexity    </th></tr>
@@ -117,19 +117,19 @@ Audio Options in OpenSNES</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>SNESMOD</b>   </td><td class="markdownTableBodyNone">Music + SFX   </td><td class="markdownTableBodyNone">~5.5KB   </td><td class="markdownTableBodyNone">Medium   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md77"></a>
-SNESMOD (Recommended)</h1>
+<h2><a class="anchor" id="autotoc_md68"></a>
+SNESMOD (Recommended)</h2>
 <p>SNESMOD is a tracker-based audio engine supporting Impulse Tracker (.it) modules.</p>
-<h2><a class="anchor" id="autotoc_md78"></a>
-Setup</h2>
+<h3><a class="anchor" id="autotoc_md69"></a>
+Setup</h3>
 <ol type="1">
 <li>Create music in a tracker (OpenMPT recommended)</li>
 <li>Export as Impulse Tracker (.it) format</li>
 <li>Convert with smconv tool</li>
 <li>Link soundbank with your ROM</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md79"></a>
-Makefile Configuration</h2>
+<h3><a class="anchor" id="autotoc_md70"></a>
+Makefile Configuration</h3>
 <div class="fragment"><div class="line"># Enable SNESMOD</div>
 <div class="line">USE_SNESMOD    := 1</div>
 <div class="line">USE_LIB        := 1</div>
@@ -137,8 +137,8 @@ Makefile Configuration</h2>
 <div class="line"> </div>
 <div class="line"># Soundbank source files</div>
 <div class="line">SOUNDBANK_SRC  := music/mymusic.it sfx/effects.it</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md80"></a>
-Basic Music Playback</h2>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md71"></a>
+Basic Music Playback</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
@@ -178,8 +178,8 @@ Basic Music Playback</h2>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="asnesmod_8h_html"><div class="ttname"><a href="snesmod_8h.html">snesmod.h</a></div><div class="ttdoc">SNESMOD - Tracker-based Audio Engine.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md81"></a>
-Sound Effects</h2>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md72"></a>
+Sound Effects</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
 <div class="line"> </div>
@@ -211,8 +211,8 @@ Sound Effects</h2>
 <div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:332</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md82"></a>
-Volume Control</h2>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md73"></a>
+Volume Control</h3>
 <div class="fragment"><div class="line"><span class="comment">// Set master volume (0-127)</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(127);</div>
 <div class="line"> </div>
@@ -230,8 +230,8 @@ Volume Control</h2>
 <div class="ttc" id="agroup__snesmod__module_html_gaf35e6e51f4a13c2183365eb814605bd2"><div class="ttname"><a href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a></div><div class="ttdeci">void snesmodResume(void)</div><div class="ttdoc">Resume module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga256f12e62b2fae20a93a5ab05a53db5f"><div class="ttname"><a href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a></div><div class="ttdeci">void snesmodSetModuleVolume(u8 volume)</div><div class="ttdoc">Set module volume.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga9681d3b7715b34884cd81e2caf51d477"><div class="ttname"><a href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a></div><div class="ttdeci">void snesmodFadeVolume(u8 targetVolume, u8 speed)</div><div class="ttdoc">Fade module volume.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md83"></a>
-Creating Music with OpenMPT</h2>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md74"></a>
+Creating Music with OpenMPT</h3>
 <ol type="1">
 <li>Download <a href="https://openmpt.org/">OpenMPT</a> (free)</li>
 <li>Create new Impulse Tracker module</li>
@@ -243,8 +243,8 @@ Creating Music with OpenMPT</h2>
 </li>
 <li>Export as .it file</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md84"></a>
-smconv Tool</h2>
+<h3><a class="anchor" id="autotoc_md75"></a>
+smconv Tool</h3>
 <div class="fragment"><div class="line"># Convert music for soundbank</div>
 <div class="line">smconv -s -o soundbank -b 1 music.it effects.it</div>
 <div class="line"> </div>
@@ -252,13 +252,13 @@ smconv Tool</h2>
 <div class="line"># - soundbank.asm  (link with ROM)</div>
 <div class="line"># - soundbank.h    (module/effect IDs)</div>
 <div class="line"># - soundbank.bnk  (binary data)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md85"></a>
-Pitch Constants</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md76"></a>
+Pitch Constants</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SNESMOD_PITCH_LOW    4   </span><span class="comment">// 16kHz - lower pitch</span></div>
 <div class="line"><span class="preprocessor">#define SNESMOD_PITCH_NORMAL 8   </span><span class="comment">// 32kHz - normal pitch</span></div>
 <div class="line"><span class="preprocessor">#define SNESMOD_PITCH_HIGH   12  </span><span class="comment">// 48kHz - higher pitch</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md86"></a>
-Important: Call snesmodProcess()!</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md77"></a>
+Important: Call snesmodProcess()!</h2>
 <p><b>You MUST call <code><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></code> every frame!</b> Failure to do so causes:</p><ul>
 <li>Audio glitches and stuttering</li>
 <li>Command buffer overflow</li>
@@ -270,8 +270,8 @@ Important: Call snesmodProcess()!</h1>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ... game logic</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md87"></a>
-Example: Music + SFX</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md78"></a>
+Example: Music + SFX</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
@@ -324,8 +324,8 @@ Example: Music + SFX</h1>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md88"></a>
-Memory Usage</h1>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md79"></a>
+Memory Usage</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Component   </th><th class="markdownTableHeadNone">Size    </th></tr>
@@ -337,22 +337,22 @@ Memory Usage</h1>
 <td class="markdownTableBodyNone">Echo Buffer   </td><td class="markdownTableBodyNone">~4KB (at $D000-$FFFF)   </td></tr>
 </table>
 <p>Total audio RAM: 64KB</p>
-<h1><a class="anchor" id="autotoc_md89"></a>
-Tips</h1>
+<h2><a class="anchor" id="autotoc_md80"></a>
+Tips</h2>
 <ol type="1">
 <li><b>Keep samples small</b> - Use lower sample rates for less important sounds</li>
 <li><b>Reuse samples</b> - Same sample at different pitches for variety</li>
 <li><b>Test on hardware</b> - Emulator timing may differ</li>
 <li><b>Use echo sparingly</b> - Takes 4KB+ of audio RAM</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md90"></a>
-Examples</h1>
+<h2><a class="anchor" id="autotoc_md81"></a>
+Examples</h2>
 <ul>
 <li><code>examples/audio/snesmod_music/</code> - Music playback demo</li>
 <li><code>examples/audio/snesmod_sfx/</code> - Sound effects demo</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md91"></a>
-Next Steps</h1>
+<h2><a class="anchor" id="autotoc_md82"></a>
+Next Steps</h2>
 <ul>
 <li><a class="el" href="snesmod_8h.html">SNESMOD API Reference</a></li>
 <li><a class="el" href="tutorial_graphics.html">Back to Graphics</a> </li>
@@ -363,6 +363,7 @@ Next Steps</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

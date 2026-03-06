@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['2_0',['Reading Controller 2',['../tutorial_input.html#autotoc_md107',1,'']]],
-  ['2_20sprite_20display_1',['2. Sprite Display',['../md_EXAMPLE__WALKTHROUGHS.html#autotoc_md169',1,'']]],
-  ['2_3a_20get_20an_20emulator_2',['Step 2: Get an Emulator',['../md_GETTING__STARTED.html#autotoc_md140',1,'']]]
+  ['0_0',['0',['../examples_graphics_effects_fading.html#autotoc_md812',1,'Force Blank vs Brightness 0'],['../examples_graphics_effects_hdma_gradient.html#autotoc_md834',1,'HDMA Table Format (Mode 0)']]],
+  ['0_207_1',['Per-Voice Registers (x = voice 0-7)',['../snes_sound_guide.html#autotoc_md273',1,'']]],
+  ['0_20palette_2',['Mode 0 Palette',['../examples_text.html#autotoc_md1246',1,'']]],
+  ['0f_207f_3',['FIR Filter Coefficients (COEF 0F-7F)',['../snes_sound_guide.html#autotoc_md290',1,'']]]
 ];

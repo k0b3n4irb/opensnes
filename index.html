@@ -96,200 +96,59 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">OpenSNES Documentation </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="mainpage"></a> Welcome to the <b>OpenSNES</b> documentation - a modern, open-source SDK for Super Nintendo (SNES) development.</p>
+<div class="textblock"><p><a class="anchor" id="mainpage"></a> A modern, open-source SDK for Super Nintendo development. Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.</p>
 <h1><a class="anchor" id="autotoc_md0"></a>
-Acknowledgments</h1>
-<p><b>OpenSNES would not exist without <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a>.</b></p>
-<p>This project is deeply built upon the incredible work of <b>Alekmaul</b> and all the PVSnesLib contributors who have spent years creating a comprehensive SNES development kit. We owe them an enormous debt of gratitude for:</p>
-<ul>
-<li>The complete hardware abstraction library</li>
-<li>SNESMOD audio engine integration</li>
-<li>Asset conversion tools (gfx4snes, smconv)</li>
-<li>Decades of SNES development knowledge</li>
-<li>80+ working examples that taught us how SNES development works</li>
-</ul>
-<p><b>Thank you to the entire PVSnesLib community.</b></p>
+Start Here</h1>
+<p><a class="el" href="getting_started.html">Getting Started with OpenSNES</a> &ndash; Install the SDK and build your first ROM</p>
+<p><a class="el" href="learning_path.html">Learn SNES Development</a> &ndash; 36 examples from "Hello World" to complete games</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
-How OpenSNES Differs from PVSnesLib</h1>
-<p>OpenSNES is a fork that focuses on <b>modernizing the compiler toolchain</b> while keeping the proven library and tools:</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Component   </th><th class="markdownTableHeadNone">PVSnesLib   </th><th class="markdownTableHeadNone">OpenSNES    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>C Compiler</b>   </td><td class="markdownTableBodyNone">816-tcc (based on TinyCC)   </td><td class="markdownTableBodyNone">cc65816 (cproc + QBE backend)    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Assembler</b>   </td><td class="markdownTableBodyNone">WLA-DX   </td><td class="markdownTableBodyNone">WLA-DX (same)    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Library</b>   </td><td class="markdownTableBodyNone">PVSnesLib   </td><td class="markdownTableBodyNone">Based on PVSnesLib    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Tools</b>   </td><td class="markdownTableBodyNone">gfx4snes, smconv, etc.   </td><td class="markdownTableBodyNone">Same tools (gfx4snes from PVSnesLib)   </td></tr>
-</table>
-<h2><a class="anchor" id="autotoc_md2"></a>
-Why a New Compiler?</h2>
-<p>The 816-tcc compiler in PVSnesLib, while functional, has limitations. OpenSNES uses <b>cc65816</b>, a new compiler built on:</p>
-<ul>
-<li><b>cproc</b> - A clean, modern C11 compiler frontend</li>
-<li><b>QBE</b> - An optimizing backend, with a custom 65816 target</li>
-</ul>
-<p>This provides:</p><ul>
-<li>Better C11 standard compliance</li>
-<li>Cleaner codebase for maintenance</li>
-<li>Foundation for future optimizations</li>
-<li>Direct WLA-DX assembly output (no post-processing)</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md3"></a>
-What Stays the Same?</h2>
-<ul>
-<li>The excellent PVSnesLib library API</li>
-<li>Proven asset tools</li>
-<li>SNESMOD audio system</li>
-<li>WLA-DX assembler</li>
-</ul>
-<p>OpenSNES aims to be a <b>companion project</b> that explores compiler improvements while respecting and building upon PVSnesLib's solid foundation.</p>
+Guides</h1>
+<p><a class="el" href="snes_graphics_guide.html">SNES Graphics Programming Guide</a> &ndash; Backgrounds, sprites, modes, VRAM</p>
+<p><a class="el" href="snes_sound_guide.html">SNES Sound Programming Guide</a> &ndash; SPC700, SNESMOD, music and SFX</p>
+<p><a class="el" href="troubleshooting.html">Troubleshooting OpenSNES</a> &ndash; Common problems and solutions</p>
+<p><a class="el" href="example_walkthroughs.html">OpenSNES Example Walkthroughs</a> &ndash; Line-by-line code explanations</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Tutorials</h1>
+<p><a class="el" href="tutorial_graphics.html">Graphics &amp; Backgrounds Tutorial</a> &ndash; Graphics &amp; Backgrounds</p>
+<p><a class="el" href="tutorial_sprites.html">Sprites &amp; Animation Tutorial</a> &ndash; Sprites &amp; <a class="el" href="structAnimation.html" title="Animation definition.">Animation</a></p>
+<p><a class="el" href="tutorial_input.html">Controller Input Tutorial</a> &ndash; Controller Input</p>
+<p><a class="el" href="tutorial_audio.html">Audio &amp; Music Tutorial</a> &ndash; Audio &amp; Music</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Hardware Reference</h1>
+<p><a class="el" href="hardware_overview.html">SNES Hardware Overview</a> &ndash; CPU, PPU, APU architecture</p>
+<p><a class="el" href="memory_map.html">SNES Memory Map</a> &ndash; Address space layout</p>
+<p><a class="el" href="registers.html">SNES Hardware Register Reference</a> &ndash; PPU, DMA, I/O registers</p>
+<p><a class="el" href="oam.html">SNES OAM (Object Attribute Memory)</a> &ndash; Sprite attribute memory</p>
 <h1><a class="anchor" id="autotoc_md4"></a>
-What is OpenSNES?</h1>
-<p>OpenSNES provides everything you need to create SNES games in C:</p>
-<ul>
-<li><b>C Compiler</b> (cc65816) - Write games in C, not just assembly</li>
-<li><b>Assembler</b> (WLA-DX) - Full 65816 and SPC700 support</li>
-<li><b>Library</b> - Hardware abstraction for graphics, audio, input</li>
-<li><b>Tools</b> - Asset converters for graphics and audio</li>
-<li><b>Examples</b> - 25 working example ROMs to learn from</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
-Quick Start</h1>
-<h2><a class="anchor" id="autotoc_md6"></a>
-Prerequisites</h2>
-<ul>
-<li><b>macOS</b>: Xcode Command Line Tools</li>
-<li><b>Linux</b>: GCC, Make, CMake</li>
-<li><b>Windows</b>: MSYS2 with MinGW-w64 toolchain (native, no WSL required)</li>
-<li>Git</li>
-<li>A SNES emulator (Mesen, bsnes, Snes9x)</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md7"></a>
-Build the SDK</h2>
-<div class="fragment"><div class="line">git clone --recursive https://github.com/k0b3n4irb/opensnes.git</div>
-<div class="line">cd opensnes</div>
-<div class="line">make</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md8"></a>
-Create Your First ROM</h2>
-<div class="fragment"><div class="line">cd examples/text/hello_world</div>
-<div class="line">make</div>
-<div class="line"># Open hello_world.sfc in your emulator</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
-Documentation Sections</h1>
-<h2><a class="anchor" id="autotoc_md10"></a>
-Getting Started</h2>
-<ul>
-<li>Installation &amp; Setup</li>
-<li>Example Walkthroughs</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md11"></a>
-API Reference</h2>
+API Reference</h1>
 <ul>
 <li><a class="el" href="snes_8h.html">Main Header (snes.h)</a></li>
 <li><a class="el" href="console_8h.html">Console Functions</a></li>
 <li><a class="el" href="sprite_8h.html">Sprite/OAM Functions</a></li>
 <li><a class="el" href="input_8h.html">Input Handling</a></li>
-<li><a class="el" href="audio_8h.html">Legacy Audio</a></li>
-<li><a class="el" href="snesmod_8h.html">SNESMOD Tracker Audio</a></li>
-<li><a class="el" href="mode7_8h.html">Mode 7 Graphics</a></li>
 <li><a class="el" href="dma_8h.html">DMA Transfers</a></li>
+<li><a class="el" href="mode7_8h.html">Mode 7 Graphics</a></li>
+<li><a class="el" href="snesmod_8h.html">SNESMOD Audio</a></li>
 <li><a class="el" href="registers_8h.html">Hardware Registers</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md12"></a>
-Tutorials</h2>
-<ul>
-<li><a class="el" href="tutorial_graphics.html">Graphics &amp; Backgrounds</a></li>
-<li><a class="el" href="tutorial_sprites.html">Sprites &amp; Animation</a></li>
-<li><a class="el" href="tutorial_input.html">Controller Input</a></li>
-<li><a class="el" href="tutorial_audio.html">Audio &amp; Music</a></li>
-</ul>
-<h2><a class="anchor" id="autotoc_md13"></a>
-Contributing</h2>
-<ul>
-<li>Code Style Guide</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md14"></a>
-Examples Overview</h1>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Category   </th><th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Text   </td><td class="markdownTableBodyNone"><a href="../examples/text/hello_world/">hello_world</a>   </td><td class="markdownTableBodyNone">Basic text output    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Text   </td><td class="markdownTableBodyNone"><a href="../examples/text/text_test/">text_test</a>   </td><td class="markdownTableBodyNone">Text positioning and formatting    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Basics   </td><td class="markdownTableBodyNone"><a href="../examples/basics/collision_demo/">collision_demo</a>   </td><td class="markdownTableBodyNone">Collision detection    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Input   </td><td class="markdownTableBodyNone"><a href="../examples/input/two_players/">two_players</a>   </td><td class="markdownTableBodyNone">Two-player controls    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Sprites   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/sprites/simple_sprite/">simple_sprite</a>   </td><td class="markdownTableBodyNone">OAM, sprite display    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Sprites   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/sprites/animated_sprite/">animated_sprite</a>   </td><td class="markdownTableBodyNone">Frame animation, H-flip    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Sprites   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/sprites/dynamic_sprite/">dynamic_sprite</a>   </td><td class="markdownTableBodyNone">VRAM streaming    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Backgrounds   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/backgrounds/mode1/">mode1</a>   </td><td class="markdownTableBodyNone">Mode 1 multi-layer    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Backgrounds   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/backgrounds/continuous_scroll/">continuous_scroll</a>   </td><td class="markdownTableBodyNone">Streaming scroll    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Backgrounds   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/backgrounds/mode7/">mode7</a>   </td><td class="markdownTableBodyNone">Rotation &amp; scaling    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Backgrounds   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/backgrounds/mode7_perspective/">mode7_perspective</a>   </td><td class="markdownTableBodyNone">Pseudo-3D (F-Zero style)    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/fading/">fading</a>   </td><td class="markdownTableBodyNone">Brightness transitions    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/mosaic/">mosaic</a>   </td><td class="markdownTableBodyNone">Pixelation effect    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/gradient_colors/">gradient_colors</a>   </td><td class="markdownTableBodyNone">HDMA color gradients    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/hdma_wave/">hdma_wave</a>   </td><td class="markdownTableBodyNone">Scanline wave distortion    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/parallax_scrolling/">parallax_scrolling</a>   </td><td class="markdownTableBodyNone">Multi-layer parallax    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/transparency/">transparency</a>   </td><td class="markdownTableBodyNone">Color math blending    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/window/">window</a>   </td><td class="markdownTableBodyNone">Window masking    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Effects   </td><td class="markdownTableBodyNone"><a href="../examples/graphics/effects/transparent_window/">transparent_window</a>   </td><td class="markdownTableBodyNone">Window + color math    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Audio   </td><td class="markdownTableBodyNone"><a href="../examples/audio/snesmod_music/">snesmod_music</a>   </td><td class="markdownTableBodyNone">Tracker music playback    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Audio   </td><td class="markdownTableBodyNone"><a href="../examples/audio/snesmod_sfx/">snesmod_sfx</a>   </td><td class="markdownTableBodyNone">Sound effects    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Memory   </td><td class="markdownTableBodyNone"><a href="../examples/memory/hirom_demo/">hirom_demo</a>   </td><td class="markdownTableBodyNone">HiROM memory mapping    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Memory   </td><td class="markdownTableBodyNone"><a href="../examples/memory/save_game/">save_game</a>   </td><td class="markdownTableBodyNone">Battery-backed saves    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Games   </td><td class="markdownTableBodyNone"><a href="../examples/games/breakout/">breakout</a>   </td><td class="markdownTableBodyNone">Complete Breakout game    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Games   </td><td class="markdownTableBodyNone"><a href="../examples/games/likemario/">likemario</a>   </td><td class="markdownTableBodyNone">Platformer with scrolling   </td></tr>
-</table>
-<h1><a class="anchor" id="autotoc_md15"></a>
-Architecture</h1>
-<div class="fragment"><div class="line">C Code (.c)</div>
-<div class="line">    ↓</div>
-<div class="line">cc65816 (cproc + QBE w65816)</div>
-<div class="line">    ↓</div>
-<div class="line">65816 Assembly (.asm)</div>
-<div class="line">    ↓</div>
-<div class="line">wla-65816 (assembler)</div>
-<div class="line">    ↓</div>
-<div class="line">wlalink (linker)</div>
-<div class="line">    ↓</div>
-<div class="line">SNES ROM (.sfc)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
-License</h1>
-<p>OpenSNES is released under the MIT License. See LICENSE file for details.</p>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md5"></a>
+Contributing</h1>
+<p><a class="el" href="code_style.html">OpenSNES Code Style Guide</a> &ndash; Code style conventions</p>
+<p><a class="el" href="contributing.html">Contributing to OpenSNES</a> &ndash; How to contribute</p>
+<p><a class="el" href="third_party.html">Third-Party Components</a> &ndash; Third-party components and licenses</p>
+<h1><a class="anchor" id="autotoc_md6"></a>
+Acknowledgments</h1>
+<p>OpenSNES is built upon <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> by <b>Alekmaul</b> and contributors. We owe them an enormous debt of gratitude for the hardware library, SNESMOD audio engine, asset tools, and decades of SNES development knowledge.</p>
+<h1><a class="anchor" id="autotoc_md7"></a>
 Links</h1>
 <ul>
 <li><a href="https://github.com/k0b3n4irb/opensnes">GitHub Repository</a></li>
 <li><a href="https://github.com/k0b3n4irb/opensnes/issues">Issue Tracker</a></li>
-<li><a href="https://snes.nesdev.org/">SNES Development Wiki</a> </li>
+<li><a href="https://snes.nesdev.org/">SNES Development Wiki</a></li>
 </ul>
+<h1><a class="anchor" id="autotoc_md8"></a>
+License</h1>
+<p>OpenSNES is released under the MIT License. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->

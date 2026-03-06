@@ -202,10 +202,10 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Window/Masking System. </p>
 <p>Windows are rectangular regions that can mask (hide or show) portions of background layers and sprites. The SNES has two windows that can be combined using logic operations.</p>
-<h2><a class="anchor" id="autotoc_md72"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 How Windows Work</h2>
 <p>Each window has left and right boundaries (0-255 pixel positions). Pixels inside the window are treated differently than pixels outside. Windows can be enabled independently for each layer (BG1-4, OBJ).</p>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md64"></a>
 Window Logic</h2>
 <p>When both windows affect a layer, they can be combined:</p><ul>
 <li>OR: Either window masks the pixel</li>
@@ -213,7 +213,7 @@ Window Logic</h2>
 <li>XOR: Exactly one window masks the pixel</li>
 <li>XNOR: Both or neither window masks the pixel</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md74"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Create a spotlight effect - show only inside window</span></div>
 <div class="line"><a class="code hl_function" href="window_8h.html#a69900cfa7ecb5f94e7f6195024ac9e10">windowSetPos</a>(<a class="code hl_define" href="window_8h.html#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, 80, 176);     <span class="comment">// Window from x=80 to x=176</span></div>
