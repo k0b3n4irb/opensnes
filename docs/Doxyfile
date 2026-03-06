@@ -21,14 +21,21 @@ CREATE_SUBDIRS         = NO
 # Input Sources
 #---------------------------------------------------------------------------
 
-# Library headers (API reference)
+# Library headers (API reference) + guides + examples
 INPUT                  = mainpage.md \
                          ../lib/include/snes \
                          ../lib/include/snes.h \
                          tutorials/ \
                          GETTING_STARTED.md \
+                         LEARNING_PATH.md \
                          EXAMPLE_WALKTHROUGHS.md \
                          CODE_STYLE.md \
+                         SNES_GRAPHICS_GUIDE.md \
+                         SNES_SOUND_GUIDE.md \
+                         TROUBLESHOOTING.md \
+                         THIRD_PARTY.md \
+                         hardware/ \
+                         ../examples/ \
                          ../CONTRIBUTING.md
 
 # File patterns to process
@@ -38,15 +45,25 @@ FILE_PATTERNS          = *.h *.md
 RECURSIVE              = YES
 
 # Exclude patterns
-EXCLUDE_PATTERNS       = */doxygen-awesome-css/*
+EXCLUDE_PATTERNS       = */doxygen-awesome-css/* \
+                         */tech/* \
+                         */res/*
 
 # Use markdown
 MARKDOWN_SUPPORT       = YES
 AUTOLINK_SUPPORT       = YES
 USE_MDFILE_AS_MAINPAGE = mainpage.md
 
-# Image path for documentation images (uncomment when images are added)
-# IMAGE_PATH             = images
+# Markdown filter: inject \page directives for unique page IDs
+FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
+
+# Image path for example screenshots
+IMAGE_PATH             = ../examples/audio/snesmod_music \
+                         ../examples/audio/snesmod_sfx \
+                         ../examples/basics/collision_demo \
+                         ../examples/games/breakout \
+                         ../examples/games/likemario \
+                         ../examples/games/mapandobjects
 
 #---------------------------------------------------------------------------
 # Build Configuration

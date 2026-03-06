@@ -1,4 +1,4 @@
-# Contributing to OpenSNES
+# Contributing to OpenSNES {#contributing}
 
 Thank you for your interest in contributing to OpenSNES!
 

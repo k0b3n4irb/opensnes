@@ -6,11 +6,13 @@ distinguish them. This filter injects a \\page directive at the top of each
 markdown file, using the parent directory path as a unique page identifier.
 
 Usage in Doxyfile:
-    FILTER_PATTERNS = *.md="python3 docs/doxygen_md_filter.py"
+    FILTER_PATTERNS = *.md="python3 doxygen_md_filter.py"
 
 Example:
     examples/text/hello_world/README.md  ->  \\page examples_text_hello_world Hello World
     examples/games/breakout/README.md    ->  \\page examples_games_breakout Breakout
+    docs/hardware/MEMORY_MAP.md          ->  \\page memory_map SNES Memory Map
+    CONTRIBUTING.md  (with {#contributing})  ->  \\page contributing Contributing to OpenSNES
     README.md (root)                     ->  (passed through unchanged)
 """
 
@@ -20,31 +22,52 @@ import sys
 
 
 def main():
+    # Force UTF-8 on stdout (Windows/MSYS2 defaults to cp1252)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 2:
         sys.exit(1)
 
     filepath = sys.argv[1]
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Don't filter the root README (it uses USE_MDFILE_AS_MAINPAGE)
     rel = os.path.relpath(filepath)
-    if rel == "README.md":
+    basename = os.path.basename(rel)
+
+    # Don't filter the root README or mainpage (handled by USE_MDFILE_AS_MAINPAGE)
+    if rel == "README.md" or basename == "mainpage.md":
         sys.stdout.write(content)
         return
 
-    # Extract the first # heading for the page title
-    match = re.match(r"^#\s+(.+?)(?:\s*\{#.*\})?\s*$", content, re.MULTILINE)
+    # Extract the first # heading and optional explicit {#page_id}
+    match = re.match(r"^#\s+(.+?)(?:\s*\{#([^}]+)\})?\s*$", content, re.MULTILINE)
     if not match:
         sys.stdout.write(content)
         return
 
     title = match.group(1).strip()
+    explicit_id = match.group(2)
 
-    # Build page ID from directory path
-    # examples/text/hello_world/README.md -> examples_text_hello_world
-    dirpath = os.path.dirname(rel)
-    page_id = dirpath.replace(os.sep, "_").replace("/", "_").replace("-", "_")
+    if explicit_id:
+        # Use the explicit {#page_id} from the heading
+        page_id = explicit_id.strip()
+    else:
+        # Auto-generate page ID from directory path
+        dirpath = os.path.dirname(rel)
+        # Normalize: strip ".." components (from ../examples/ paths)
+        parts = [
+            p
+            for p in dirpath.replace(os.sep, "/").split("/")
+            if p and p != ".."
+        ]
+
+        # For non-README files, append the filename stem
+        if basename != "README.md":
+            stem = os.path.splitext(basename)[0]
+            parts.append(stem)
+
+        page_id = "_".join(parts).replace("-", "_")
 
     if not page_id:
         sys.stdout.write(content)

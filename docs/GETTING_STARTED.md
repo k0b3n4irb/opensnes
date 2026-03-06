@@ -1,4 +1,4 @@
-# Getting Started with OpenSNES
+# Getting Started with OpenSNES {#getting_started}
 
 This guide will get you from zero to running your first SNES ROM in about 10 minutes.
 

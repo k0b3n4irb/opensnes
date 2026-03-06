@@ -70,18 +70,50 @@ if [[ ! -f "$INPUT" ]]; then
     exit 1
 fi
 
-# Create unique temp file using mktemp
+# Create unique temp files using mktemp
 # -t template: portable across macOS, Linux, and Git Bash/MSYS on Windows
 TMPFILE=$(mktemp -t cc65816.XXXXXX) || TMPFILE=$(mktemp)
-trap 'rm -f "$TMPFILE"' EXIT
+IRFILE=$(mktemp -t cc65816_ir.XXXXXX) || IRFILE=$(mktemp)
+trap 'rm -f "$TMPFILE" "$IRFILE"' EXIT
 
-# Pipeline: cc -E (preprocess) -> cproc-qbe (C -> QBE IL) -> qbe (QBE IL -> 65816 asm)
-# We use the system preprocessor to work around cproc's limited preprocessor
+# Stage 1: Preprocess with system cc
 cc -E "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
 
+# Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
+# Using a pipe hides cproc crashes: QBE receives truncated IR and reports
+# misleading parse errors. With a temp file, cproc failures are caught cleanly.
+#
+# cproc occasionally segfaults on MSYS2 (Windows). Retry up to 2 times on
+# signal 139 (SIGSEGV) before giving up. This does not mask real errors —
+# compilation failures with exit code != 139 are not retried.
+CPROC_RETRIES=3
+for _try in $(seq 1 $CPROC_RETRIES); do
+    set +e
+    "$CPROC" "$TMPFILE" > "$IRFILE" 2>/tmp/cc65816_cproc_err.$$
+    CPROC_EXIT=$?
+    set -e
+
+    if [[ $CPROC_EXIT -eq 0 ]]; then
+        break
+    fi
+
+    # Exit code 139 = killed by signal 11 (SIGSEGV)
+    if [[ $CPROC_EXIT -eq 139 ]] && [[ $_try -lt $CPROC_RETRIES ]]; then
+        echo "cc65816: cproc segfault (attempt $_try/$CPROC_RETRIES), retrying..." >&2
+        continue
+    fi
+
+    # Not a segfault or last retry — propagate the error
+    cat /tmp/cc65816_cproc_err.$$ >&2
+    rm -f /tmp/cc65816_cproc_err.$$
+    exit $CPROC_EXIT
+done
+rm -f /tmp/cc65816_cproc_err.$$
+
+# Stage 3: QBE IR -> 65816 assembly
 if [[ -z "$OUTPUT" ]]; then
-    "$CPROC" "$TMPFILE" | "$QBE" -t w65816
+    "$QBE" -t w65816 "$IRFILE"
 else
-    "$CPROC" "$TMPFILE" | "$QBE" -t w65816 > "$OUTPUT"
+    "$QBE" -t w65816 "$IRFILE" > "$OUTPUT"
     echo "Generated: $OUTPUT"
 fi

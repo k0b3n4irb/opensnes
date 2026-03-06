@@ -105,18 +105,6 @@ void dmaCopyVramBank(u8 *source, u8 bank, u16 vramAddr, u16 size);
 void dmaCopyVramMode7(u8 *tilemap, u16 tilemapSize, u8 *tiles, u16 tilesSize);
 
 /**
- * @brief Copy data to VRAM (WRAM source only)
- *
- * @param src Source address in Work RAM (bank $7E)
- * @param dest Destination word address in VRAM
- * @param size Number of bytes to copy
- *
- * @note Must be called during VBlank!
- * @deprecated Use dmaCopyVram() instead for ROM/RAM sources
- */
-void dmaCopyToVRAM(const void* src, u16 dest, u16 size);
-
-/**
  * @brief Set VRAM to a value
  *
  * @param value Value to fill (repeated as word)
@@ -174,17 +162,6 @@ void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
  */
 void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size);
 
-/**
- * @brief Copy palette data to CGRAM (WRAM source only)
- *
- * @param src Source address (array of 16-bit colors)
- * @param dest Starting color index (0-255)
- * @param count Number of colors to copy
- *
- * @deprecated Use dmaCopyCGram() instead for ROM/RAM sources
- */
-void dmaCopyToCGRAM(const void* src, u8 dest, u16 count);
-
 /*============================================================================
  * OAM Transfers
  *============================================================================*/
@@ -200,16 +177,6 @@ void dmaCopyToCGRAM(const void* src, u8 dest, u16 count);
  * @endcode
  */
 void dmaCopyOam(u8 *source, u16 size);
-
-/**
- * @brief Copy OAM data (WRAM source only)
- *
- * @param src Source address (544 bytes)
- * @param size Number of bytes to copy (usually 544)
- *
- * @deprecated Use dmaCopyOam() instead for ROM/RAM sources
- */
-void dmaCopyToOAM(const void* src, u16 size);
 
 /*============================================================================
  * Generic DMA

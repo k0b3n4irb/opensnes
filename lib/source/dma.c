@@ -14,34 +14,6 @@
  * VRAM Transfers
  *============================================================================*/
 
-void dmaCopyToVRAM(const void* src, u16 dest, u16 size) {
-    /* Set VRAM address (word address) */
-    REG_VMADDL = dest & 0xFF;
-    REG_VMADDH = (dest >> 8) & 0xFF;
-
-    /* Set VRAM increment mode: increment after high byte write */
-    REG_VMAIN = 0x80;
-
-    /* DMA channel 0 */
-    /* Mode: 1 = Write to 2 registers (VMDATAL/VMDATAH alternating) */
-    REG_DMAP(0) = 0x01;
-
-    /* Destination: VMDATAL ($2118) */
-    REG_BBAD(0) = 0x18;
-
-    /* Source address (16-bit, bank $7E for WRAM) */
-    REG_A1TL(0) = (u16)src & 0xFF;
-    REG_A1TH(0) = ((u16)src >> 8) & 0xFF;
-    REG_A1B(0) = 0x7E;
-
-    /* Transfer size */
-    REG_DASL(0) = size & 0xFF;
-    REG_DASH(0) = (size >> 8) & 0xFF;
-
-    /* Start DMA on channel 0 */
-    REG_MDMAEN = 0x01;
-}
-
 void dmaFillVRAM(u16 value, u16 dest, u16 size) {
     /* For fill, we use fixed source mode */
     /* Set VRAM address */
@@ -76,59 +48,6 @@ void dmaClearVRAM(void) {
 /*============================================================================
  * CGRAM (Palette) Transfers
  *============================================================================*/
-
-void dmaCopyToCGRAM(const void* src, u8 dest, u16 count) {
-    /* Set CGRAM address (color index, 0-255) */
-    REG_CGADD = dest;
-
-    /* DMA channel 0 */
-    /* Mode: 0 = Write to 1 register */
-    REG_DMAP(0) = 0x00;
-
-    /* Destination: CGDATA ($2122) */
-    REG_BBAD(0) = 0x22;
-
-    /* Source address */
-    REG_A1TL(0) = (u16)src & 0xFF;
-    REG_A1TH(0) = ((u16)src >> 8) & 0xFF;
-    REG_A1B(0) = 0x7E;
-
-    /* Transfer size (2 bytes per color) */
-    u16 size = count * 2;
-    REG_DASL(0) = size & 0xFF;
-    REG_DASH(0) = (size >> 8) & 0xFF;
-
-    /* Start DMA */
-    REG_MDMAEN = 0x01;
-}
-
-/*============================================================================
- * OAM Transfers
- *============================================================================*/
-
-void dmaCopyToOAM(const void* src, u16 size) {
-    /* Set OAM address to 0 */
-    REG_OAMADDL = 0;
-    REG_OAMADDH = 0;
-
-    /* DMA channel 0 */
-    REG_DMAP(0) = 0x00;
-
-    /* Destination: OAMDATA ($2104) */
-    REG_BBAD(0) = 0x04;
-
-    /* Source address */
-    REG_A1TL(0) = (u16)src & 0xFF;
-    REG_A1TH(0) = ((u16)src >> 8) & 0xFF;
-    REG_A1B(0) = 0x7E;
-
-    /* Transfer size */
-    REG_DASL(0) = size & 0xFF;
-    REG_DASH(0) = (size >> 8) & 0xFF;
-
-    /* Start DMA */
-    REG_MDMAEN = 0x01;
-}
 
 /*============================================================================
  * Generic DMA
