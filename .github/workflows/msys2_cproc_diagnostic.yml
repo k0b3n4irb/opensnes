@@ -55,9 +55,9 @@ jobs:
       # Step 2: Run known-failing tests 10x each (normal build)
       # --------------------------------------------------------
       - name: "Stress test: known-failing patterns (normal build)"
+        continue-on-error: true
         shell: msys2 {0}
         run: |
-          set -o pipefail
           CC="./bin/cc65816"
           TESTS=(
             tests/compiler/test_union.c
@@ -74,32 +74,30 @@ jobs:
             fail=0
             segfault=0
             for i in $(seq 1 $RUNS); do
-              set +e
-              "$CC" "$src" -o /dev/null 2>/tmp/diag_err_${name}_${i}.txt
-              rc=$?
-              set -e
+              "$CC" "$src" -o /dev/null 2>/tmp/diag_err_${name}_${i}.txt && rc=0 || rc=$?
               if [ $rc -eq 0 ]; then
-                ((pass++))
+                pass=$((pass + 1))
               elif [ $rc -eq 139 ] || grep -qi 'segmentation fault\|segfault' /tmp/diag_err_${name}_${i}.txt 2>/dev/null; then
-                ((segfault++))
+                segfault=$((segfault + 1))
                 echo "  SEGFAULT: $name run $i (exit=$rc)"
                 cat /tmp/diag_err_${name}_${i}.txt 2>/dev/null || true
               else
-                ((fail++))
+                fail=$((fail + 1))
                 echo "  FAIL: $name run $i (exit=$rc)"
                 cat /tmp/diag_err_${name}_${i}.txt 2>/dev/null || true
               fi
             done
             echo "$name: $pass/$RUNS pass, $segfault segfault, $fail other fail"
           done
+          echo "=== Stress test complete ==="
 
       # --------------------------------------------------------
       # Step 3: Run cproc directly (bypass cc65816) for details
       # --------------------------------------------------------
       - name: "Direct cproc invocation on failing files"
+        continue-on-error: true
         shell: msys2 {0}
         run: |
-          set -o pipefail
           CPROC="./bin/cproc-qbe"
           TESTS=(
             tests/compiler/test_union.c
@@ -121,10 +119,7 @@ jobs:
 
             # Stage 2: run cproc 5x directly, capture stdout+stderr
             for i in 1 2 3 4 5; do
-              set +e
-              "$CPROC" "$pp" > /tmp/diag_ir_${name}_${i}.qbe 2>/tmp/diag_cproc_${name}_${i}.err
-              rc=$?
-              set -e
+              "$CPROC" "$pp" > /tmp/diag_ir_${name}_${i}.qbe 2>/tmp/diag_cproc_${name}_${i}.err && rc=0 || rc=$?
               if [ $rc -ne 0 ]; then
                 echo "  Run $i: EXIT=$rc"
                 echo "  stderr:"
@@ -137,11 +132,13 @@ jobs:
               fi
             done
           done
+          echo "=== Direct invocation complete ==="
 
       # --------------------------------------------------------
       # Step 4: Build cproc with AddressSanitizer
       # --------------------------------------------------------
       - name: Build cproc with ASan
+        continue-on-error: true
         shell: msys2 {0}
         run: |
           set -euo pipefail
@@ -186,9 +183,9 @@ jobs:
       # Step 5: Run tests with ASan build
       # --------------------------------------------------------
       - name: "ASan: run known-failing patterns"
+        continue-on-error: true
         shell: msys2 {0}
         run: |
-          set -o pipefail
           ASAN_BIN="./bin/cproc-qbe-asan"
           if [ ! -f "$ASAN_BIN" ] && [ ! -f "${ASAN_BIN}.exe" ]; then
             echo "ASan binary not found, skipping"
@@ -215,10 +212,7 @@ jobs:
             [ -f "$pp" ] || cc -E "$src" > "$pp" 2>/dev/null
 
             for i in 1 2 3; do
-              set +e
-              "$ASAN_BIN" "$pp" > /dev/null 2>/tmp/diag_asan_${name}_${i}.log
-              rc=$?
-              set -e
+              "$ASAN_BIN" "$pp" > /dev/null 2>/tmp/diag_asan_${name}_${i}.log && rc=0 || rc=$?
               if [ $rc -ne 0 ]; then
                 echo "  Run $i: EXIT=$rc"
                 cat /tmp/diag_asan_${name}_${i}.log
@@ -227,11 +221,13 @@ jobs:
               fi
             done
           done
+          echo "=== ASan tests complete ==="
 
       # --------------------------------------------------------
       # Step 6: Run ALL compiler tests (for comparison)
       # --------------------------------------------------------
       - name: "Full compiler test suite"
+        continue-on-error: true
         shell: msys2 {0}
         run: |
           set -o pipefail
@@ -241,14 +237,22 @@ jobs:
       # --------------------------------------------------------
       # Upload all diagnostic artifacts
       # --------------------------------------------------------
+      - name: Collect diagnostics
+        if: always()
+        shell: msys2 {0}
+        run: |
+          mkdir -p diag_output
+          cp /tmp/diag_*.txt diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.err diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.log diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.qbe diag_output/ 2>/dev/null || true
+          cp /tmp/diag_preprocessed/*.pp.c diag_output/ 2>/dev/null || true
+          echo "=== Collected files ==="
+          ls -la diag_output/ 2>/dev/null || echo "(empty)"
+
       - name: Upload diagnostics
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: msys2-cproc-diagnostics
-          path: |
-            /tmp/diag_*.txt
-            /tmp/diag_*.err
-            /tmp/diag_*.log
-            /tmp/diag_*.qbe
-            /tmp/diag_preprocessed/
+          path: diag_output/
