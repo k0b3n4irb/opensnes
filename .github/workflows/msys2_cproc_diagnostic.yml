@@ -6,10 +6,6 @@ name: MSYS2 cproc Segfault Diagnostic
 
 on:
   workflow_dispatch:
-  push:
-    branches: [develop]
-    paths:
-      - '.github/workflows/msys2_cproc_diagnostic.yml'  # TODO: remove after ASan test
 
 jobs:
   diagnose:
