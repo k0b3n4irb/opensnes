@@ -143,17 +143,30 @@ jobs:
         shell: msys2 {0}
         run: |
           echo "=== Building cproc-qbe with ASan ==="
+
+          # Diagnostic: find ASan runtime libs
+          echo "=== Looking for ASan runtime ==="
+          find /ucrt64/lib -name '*asan*' 2>/dev/null || true
+          find /ucrt64/lib -name '*clang_rt*' 2>/dev/null || true
+          clang --version | head -2
+          clang -print-runtime-dir 2>/dev/null || true
+          clang -print-file-name=libclang_rt.asan_dynamic.dll.a 2>/dev/null || true
+
           cd compiler/cproc
           make clean
 
           # Build only cproc-qbe (not driver which needs spawn.h)
-          # The Makefile's cproc-qbe target links OBJ (no driver.o)
-          # Use clang for ASan — MSYS2 gcc doesn't ship libasan
-          ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1"
-          make CC="clang $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
-            echo "ASan build failed — skipping ASan tests"
-            cd ../..
-            exit 0
+          # Try static ASan linking (avoids missing dynamic runtime)
+          ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1 -static-libsan"
+          make CC="clang $ASAN" LDFLAGS="-fsanitize=address -static-libsan" cproc-qbe 2>&1 || {
+            echo "--- Static ASan failed, trying dynamic ---"
+            make clean
+            ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1"
+            make CC="clang $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
+              echo "ASan build failed — skipping ASan tests"
+              cd ../..
+              exit 0
+            }
           }
 
           echo "=== Checking ASan linkage ==="
