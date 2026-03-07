@@ -24,7 +24,6 @@ jobs:
           msystem: UCRT64
           install: >-
             mingw-w64-ucrt-x86_64-clang
-            mingw-w64-ucrt-x86_64-compiler-rt
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-python
             base-devel
@@ -138,62 +137,52 @@ jobs:
       # --------------------------------------------------------
       # Step 4: Build cproc with AddressSanitizer
       # --------------------------------------------------------
-      - name: Build cproc with ASan
+      - name: Build cproc with UBSan + debug
         continue-on-error: true
         shell: msys2 {0}
         run: |
-          echo "=== Building cproc-qbe with ASan ==="
-
-          # Diagnostic: find ASan runtime libs
-          echo "=== Looking for ASan runtime ==="
-          find /ucrt64/lib -name '*asan*' 2>/dev/null || true
-          find /ucrt64/lib -name '*clang_rt*' 2>/dev/null || true
-          clang --version | head -2
-          clang -print-runtime-dir 2>/dev/null || true
-          clang -print-file-name=libclang_rt.asan_dynamic.dll.a 2>/dev/null || true
-
+          echo "=== Building cproc-qbe with UBSan + debug ==="
           cd compiler/cproc
           make clean
 
-          # Build only cproc-qbe (not driver which needs spawn.h)
-          # Try static ASan linking (avoids missing dynamic runtime)
-          ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1 -static-libsan"
-          make CC="clang $ASAN" LDFLAGS="-fsanitize=address -static-libsan" cproc-qbe 2>&1 || {
-            echo "--- Static ASan failed, trying dynamic ---"
+          # ASan runtime not available on MSYS2 MinGW targets.
+          # Use UBSan (no runtime needed) + debug symbols for stack traces.
+          UBSAN="-fsanitize=undefined -fno-omit-frame-pointer -g -O1"
+          make CC="cc $UBSAN" LDFLAGS="-fsanitize=undefined" cproc-qbe 2>&1 || {
+            echo "UBSan build failed — trying plain debug build"
             make clean
-            ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1"
-            make CC="clang $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
-              echo "ASan build failed — skipping ASan tests"
+            make CC="cc -g -O1" cproc-qbe 2>&1 || {
+              echo "Debug build failed — skipping"
               cd ../..
               exit 0
             }
           }
 
-          echo "=== Checking ASan linkage ==="
+          echo "=== Checking binary ==="
           file cproc-qbe* || true
           ldd cproc-qbe* 2>/dev/null || true
 
-          # Copy ASan build
+          # Copy sanitized build
           cp cproc-qbe ../../bin/cproc-qbe-asan 2>/dev/null || \
           cp cproc-qbe.exe ../../bin/cproc-qbe-asan.exe 2>/dev/null || true
           cd ../..
 
       # --------------------------------------------------------
-      # Step 5: Run tests with ASan build
+      # Step 5: Run tests with UBSan/debug build
       # --------------------------------------------------------
-      - name: "ASan: run known-failing patterns"
+      - name: "UBSan: run known-failing patterns"
         continue-on-error: true
         shell: msys2 {0}
         run: |
           ASAN_BIN="./bin/cproc-qbe-asan"
           if [ ! -f "$ASAN_BIN" ] && [ ! -f "${ASAN_BIN}.exe" ]; then
-            echo "ASan binary not found, skipping"
+            echo "UBSan binary not found, skipping"
             exit 0
           fi
           # Use .exe if present
           [ -f "${ASAN_BIN}.exe" ] && ASAN_BIN="${ASAN_BIN}.exe"
 
-          export ASAN_OPTIONS="detect_leaks=0:halt_on_error=0:print_stacktrace=1:symbolize=1"
+          export UBSAN_OPTIONS="halt_on_error=0:print_stacktrace=1"
 
           TESTS=(
             tests/compiler/test_union.c
@@ -205,7 +194,7 @@ jobs:
 
           for src in "${TESTS[@]}"; do
             name=$(basename "$src" .c)
-            echo "=== ASan: $name ==="
+            echo "=== UBSan: $name ==="
 
             pp="/tmp/diag_preprocessed/${name}.pp.c"
             [ -f "$pp" ] || cc -E "$src" > "$pp" 2>/dev/null
@@ -220,7 +209,7 @@ jobs:
               fi
             done
           done
-          echo "=== ASan tests complete ==="
+          echo "=== UBSan tests complete ==="
 
       # --------------------------------------------------------
       # Step 6: Run ALL compiler tests (for comparison)
