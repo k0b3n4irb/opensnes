@@ -1870,6 +1870,62 @@ test_static_mutable() {
     ((TESTS_PASSED++))
 }
 
+test_struct_typedef_rodata() {
+    local name="struct_typedef_rodata"
+    local src="$SCRIPT_DIR/test_struct_typedef_rodata.c"
+    local out="$BUILD/test_struct_typedef_rodata.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/struct_typedef_rodata_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/struct_typedef_rodata_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that 'state' is in RAMSECTION (mutable RAM), not SUPERFREE (ROM)
+    local sym_line
+    sym_line=$(grep -n "^state:" "$out" | head -1 | cut -d: -f1)
+
+    if [[ -z "$sym_line" ]]; then
+        log_fail "$name: Symbol 'state' not found in assembly"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local section_line
+    section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+    if echo "$section_line" | grep -q 'SUPERFREE\|\.rodata'; then
+        log_fail "$name: Mutable struct 'state' placed in ROM! section: $section_line"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "This is a cproc mktype() uninitialized qual bug."
+            echo "A #line directive before typedef struct causes type->qual garbage."
+            grep -n -E '\.(SECTION|RAMSECTION)' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$section_line" | grep -q '\.RAMSECTION'; then
+        log_fail "$name: Symbol 'state' not in expected RAMSECTION: $section_line"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 test_const_data() {
     local name="const_data"
     local src="$SCRIPT_DIR/test_const_data.c"
@@ -3520,6 +3576,7 @@ main() {
     test_variable_shift_u8_compound  # FIXED: u8 param + array + shift + OR-assign pattern
     test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
     test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
+    test_struct_typedef_rodata       # FIXED: Uninitialized type->qual in mktype() caused false rodata
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
     test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
     test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
