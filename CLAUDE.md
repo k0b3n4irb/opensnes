@@ -56,7 +56,7 @@ If `CSRC` is not set, it defaults to `main.c`. Assembly files can also be added 
 ```bash
 make clean && make                                                      # Full rebuild
 ./tests/unit/run_unit_tests.sh                                          # Unit tests (25 modules)
-./tests/compiler/run_tests.sh                                           # Compiler tests (57/57)
+./tests/compiler/run_tests.sh                                           # Compiler tests (58/58)
 OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Example validation (36/36)
 ```
 

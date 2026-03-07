@@ -142,7 +142,7 @@ régénérer tous les .asm (les vieux .asm avec l'ancien codegen restent sinon).
 
 ### État actuel
 
-57/57 passent. Aucun known bug.
+58/58 passent. Aucun known bug.
 
 ---
 

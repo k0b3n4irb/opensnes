@@ -3078,6 +3078,41 @@ test_acache_pha() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Phi-move A-cache correctness
+# When multiple phi moves are emitted in sequence, the A-cache must track
+# which Ref is actually in A. A stale cache causes phi moves to skip loads,
+# writing the wrong value. Regression: writestring showed only "P" instead
+# of "PLAYER 1 READY" because pos got st's phi value.
+#------------------------------------------------------------------------------
+test_phi_acache() {
+    local name="phi_acache"
+    local src="$SCRIPT_DIR/test_phi_acache.c"
+    local out="$BUILD/test_phi_acache.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # In @if_join (the phi merge block), the phi moves for sp, pos, and st
+    # must each load from different slots. If A-cache is stale, the st phi
+    # move reuses A from the pos phi move (wrong value).
+    # Check: the phi merge block must have 3 separate lda instructions
+    # (one for each of sp_new, pos_new, st_new).
+    local join_body
+    join_body=$(sed -n '/@if_join/,/jmp @while_cond/p' "$out")
+
+    local lda_count
+    lda_count=$(echo "$join_body" | grep -c "${TAB}lda")
+    if [[ "$lda_count" -lt 3 ]]; then
+        log_fail "$name: if_join has only $lda_count lda (expected 3 — sp, pos, st need separate loads)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: Comparison dead store for frameless conditionals
 # When comparison result is only used by jnz (fusion), its slot store is dead.
 #------------------------------------------------------------------------------
@@ -3503,6 +3538,7 @@ main() {
     # === Phase 9: INC/DEC + A-cache pha + dead store arg tests ===
     test_inc_dec                     # INC/DEC for ±1 constants
     test_acache_pha                  # A-cache survives pha (no redundant loads)
+    test_phi_acache                  # Phi-move A-cache tracks actual Ref in A
 
     # === Phase 10: Comparison dead store for frameless conditionals ===
     test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
