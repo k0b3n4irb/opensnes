@@ -5,11 +5,7 @@ name: MSYS2 cproc Segfault Diagnostic
 # and captures crash details.
 
 on:
-  workflow_dispatch:  # Manual trigger once on main
-  push:
-    branches: [develop]
-    paths:
-      - '.github/workflows/msys2_cproc_diagnostic.yml'  # Self-trigger on first push
+  workflow_dispatch:  # Manual trigger only (must exist on main or use gh workflow run --ref)
 
 jobs:
   diagnose:
@@ -141,42 +137,26 @@ jobs:
         continue-on-error: true
         shell: msys2 {0}
         run: |
-          set -euo pipefail
-          echo "=== Building cproc with ASan ==="
+          echo "=== Building cproc-qbe with ASan ==="
           cd compiler/cproc
-
-          # Clean and rebuild with ASan flags
           make clean
 
-          # Configure with ASan
-          cat > config.h <<'CONF'
-          #define PREFIX ""
-          #define DYNAMIC_LINKER ""
-          CONF
-
-          # Build with ASan
-          CFLAGS="-fsanitize=address -fno-omit-frame-pointer -g -O1" \
-          LDFLAGS="-fsanitize=address" \
-          make EXTRA_CFLAGS="-fsanitize=address -fno-omit-frame-pointer -g -O1" \
-               EXTRA_LDFLAGS="-fsanitize=address" 2>&1 || {
-            echo "ASan build failed, trying without EXTRA_ vars..."
-            make clean
-            CC="cc -fsanitize=address -fno-omit-frame-pointer -g -O1" \
-            LDFLAGS="-fsanitize=address" \
-            make 2>&1 || {
-              echo "ASan build failed entirely — skipping ASan tests"
-              exit 0
-            }
+          # Build only cproc-qbe (not driver which needs spawn.h)
+          # The Makefile's cproc-qbe target links OBJ (no driver.o)
+          ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1"
+          make CC="cc $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
+            echo "ASan build failed — skipping ASan tests"
+            cd ../..
+            exit 0
           }
 
-          # Verify ASan is linked
           echo "=== Checking ASan linkage ==="
           file cproc-qbe* || true
           ldd cproc-qbe* 2>/dev/null || true
 
           # Copy ASan build
-          cp cproc-qbe ../../bin/cproc-qbe-asan || \
-          cp cproc-qbe.exe ../../bin/cproc-qbe-asan.exe || true
+          cp cproc-qbe ../../bin/cproc-qbe-asan 2>/dev/null || \
+          cp cproc-qbe.exe ../../bin/cproc-qbe-asan.exe 2>/dev/null || true
           cd ../..
 
       # --------------------------------------------------------
