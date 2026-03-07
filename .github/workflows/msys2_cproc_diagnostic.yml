@@ -5,7 +5,11 @@ name: MSYS2 cproc Segfault Diagnostic
 # and captures crash details.
 
 on:
-  workflow_dispatch:  # Manual trigger only (must exist on main or use gh workflow run --ref)
+  workflow_dispatch:
+  push:
+    branches: [develop]
+    paths:
+      - '.github/workflows/msys2_cproc_diagnostic.yml'  # TODO: remove after ASan test
 
 jobs:
   diagnose:
