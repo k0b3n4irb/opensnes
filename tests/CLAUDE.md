@@ -142,7 +142,7 @@ régénérer tous les .asm (les vieux .asm avec l'ancien codegen restent sinon).
 
 ### État actuel
 
-53/54 passent. 1 known bug : `comparisons: test_s16_shift_right` (signed right shift pattern manquant).
+57/57 passent. Aucun known bug.
 
 ---
 
