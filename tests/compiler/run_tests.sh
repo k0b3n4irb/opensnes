@@ -3060,15 +3060,16 @@ test_acache_pha() {
         return
     fi
 
-    # call_with_computed(x): x+5 result should be pushed without storing to frame first
+    # call_with_computed(x): x+5 result should be pushed via pha (A-cache),
+    # not stored to frame first. Non-tail-call version to avoid tail-call
+    # rewriting the arg in-place (which requires sta and is correct).
     local fn2_body
     fn2_body=$(sed -n '/^call_with_computed:/,/^\.ENDS/p' "$out")
 
-    # Should NOT have sta instruction (dead store: result used only as next arg)
-    # Use tab prefix to avoid matching @start label
-    # Known bug: dead store elimination doesn't yet handle this pattern
-    if echo "$fn2_body" | grep -q "${TAB}sta"; then
-        log_known_bug "$name: call_with_computed has 'sta' (dead store not yet eliminated for computed args)"
+    # Should have pha (computed value pushed as arg directly from A)
+    if ! echo "$fn2_body" | grep -q "${TAB}pha"; then
+        log_fail "$name: call_with_computed missing pha (computed arg should be pushed via A-cache)"
+        ((TESTS_FAILED++))
         return
     fi
 

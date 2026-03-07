@@ -13,9 +13,10 @@ unsigned short call_same_twice(unsigned short x) {
     return add_two(x, x);
 }
 
-/* Computation result pushed immediately as arg */
+/* Computation result pushed immediately as arg (non-tail-call) */
 extern unsigned short do_something(unsigned short a);
 
 unsigned short call_with_computed(unsigned short x) {
-    return do_something(x + 5);
+    unsigned short r = do_something(x + 5);
+    return r + 1;
 }

@@ -31,13 +31,15 @@ make                    # Build everything (compiler, tools, library, examples)
 make compiler           # Build cc65816 + WLA-DX
 make tools              # Build gfx4snes, font2snes, smconv
 make lib                # Build the library
-make examples           # Build all 25 example ROMs
+make examples           # Build all 36 example ROMs
 make docs               # Generate Doxygen docs (requires doxygen)
 make clean              # Clean all artifacts
 make -C examples/games/breakout   # Build a single example
 ```
 
 **Compiler rebuild gotcha**: `make compiler` may not recompile changed QBE .c files. Use `cd compiler/qbe && make clean && make` then copy the binary to `bin/`.
+
+**cc65816 script gotcha**: `make clean` deletes `bin/` and rebuilds from `compiler/scripts/cc65816`. Edit the source in `compiler/scripts/`, not `bin/cc65816`.
 
 ### Multiple C Source Files
 
@@ -53,9 +55,9 @@ If `CSRC` is not set, it defaults to `main.c`. Assembly files can also be added 
 
 ```bash
 make clean && make                                                      # Full rebuild
-./tests/unit/run_unit_tests.sh                                          # Unit tests (19 modules)
-./tests/compiler/run_tests.sh --allow-known-bugs                        # Compiler tests (53/54)
-OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Example validation (25/25)
+./tests/unit/run_unit_tests.sh                                          # Unit tests (25 modules)
+./tests/compiler/run_tests.sh                                           # Compiler tests (57/57)
+OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Example validation (36/36)
 ```
 
 **`validate_examples.sh` requires `OPENSNES_HOME=$(pwd)` to be set.**
@@ -64,8 +66,8 @@ OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Exampl
 
 | Script | Purpose |
 |--------|---------|
-| `./tests/unit/run_unit_tests.sh` | 19 unit test modules (~385 runtime + 119 compile-time assertions). Options: `-v` |
-| `./tests/compiler/run_tests.sh` | 54 compiler regression tests (use `--allow-known-bugs` to tolerate known failures). Options: `-v`, `--allow-known-bugs` |
+| `./tests/unit/run_unit_tests.sh` | 25 unit test modules (~385 runtime + 119 compile-time assertions). Options: `-v` |
+| `./tests/compiler/run_tests.sh` | 57 compiler regression tests (use `--allow-known-bugs` to tolerate known failures). Options: `-v`, `--allow-known-bugs` |
 | `./tests/examples/validate_examples.sh` | Memory overlaps + ROM size checks. Options: `--quick`, `--verbose` |
 | `./tests/ci/check_memory_overlaps.sh` | CI-specific overlap checking |
 
@@ -81,7 +83,7 @@ OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick      # Exampl
 ### Toolchain Pipeline
 
 ```
-C source → cproc (C11 frontend) → QBE IR → w65816 backend → 65816 Assembly (.asm)
+C source → cc -E (preprocess) → cproc (C11 → QBE IR) → qbe -t w65816 (IR → 65816 asm)
                                                                     ↓
                                                           wla-65816 (assembler)
                                                                     ↓
@@ -90,17 +92,20 @@ C source → cproc (C11 frontend) → QBE IR → w65816 backend → 65816 Assemb
                                                                 .sfc ROM
 ```
 
+The `cc65816` wrapper script (`compiler/scripts/cc65816`, installed to `bin/cc65816`) orchestrates the 3 stages using temp files (not pipes) to catch cproc crashes cleanly. On MSYS2, cproc occasionally segfaults — cc65816 retries up to 3 times on signal 139.
+
 ### Key Directories
 
 | Path | What it is |
 |------|-----------|
-| `compiler/qbe/w65816/emit.c` | **The big one** (95KB). 65816 code generator with 13 optimization phases |
+| `compiler/qbe/w65816/emit.c` | **The big one** (~102KB). 65816 code generator with 13 optimization phases |
 | `compiler/qbe/w65816/abi.c` | ABI / calling conventions |
 | `compiler/cproc/` | C11 frontend (emits QBE IR) |
-| `templates/common/crt0.asm` | Startup code, NMI handler, WRAM layout (26KB) |
+| `compiler/scripts/cc65816` | Compiler wrapper script (source — copied to `bin/` by `make`) |
+| `templates/common/crt0.asm` | Startup code, NMI handler, WRAM layout (~40KB) |
 | `templates/common/runtime.asm` | Math helpers (__mul16, __div16, __mod16) |
 | `make/common.mk` | Shared build rules — all example Makefiles include this |
-| `lib/include/snes/` | 23 public library headers |
+| `lib/include/snes/` | 28 public library headers |
 | `lib/source/` | Library implementation (mixed C and assembly) |
 | `devtools/symmap/symmap.py` | Symbol map analyzer (memory overlap checking) |
 
@@ -188,6 +193,8 @@ Bit: 15  14  13  12  11  10  9   8   7   6   5   4   3-0
 - `tokval.str` includes quote characters: `section ".rodata"` appears as `"\".rodata\""` in code
 - Static buffers get overwritten — copy strings you need to keep
 - `emit.c` has 13 optimization phases; understand the phase interactions before modifying
+- **cc65816 push order is LEFT-TO-RIGHT** (not right-to-left!): `f(a, b)` → `pea a; pea b; jsl f`. ASM functions ported from PVSnesLib (which uses tcc816 right-to-left) have **swapped stack offsets**
+- **cproc on MSYS2**: non-deterministic segfaults (exit code 139). cc65816 retries automatically, but compiler tests may report known bugs for `union`, `string_init`, `nested_struct`, `global_struct_init`
 
 ## Debugging
 
@@ -198,6 +205,17 @@ grep "my_var" game.sym                                      # Check symbol place
 xxd -s 0x0100 -l 64 game.sfc                                # Inspect ROM binary
 ./bin/cc65816 test.c -o test.asm                             # Inspect generated assembly
 ```
+
+## Testing Protocol (Auto-loaded)
+
+`.claude/rules/testing.md` and `.claude/rules/porting.md` are auto-loaded into every session with mandatory rules. Key points:
+
+- **Classify changes**: A (compiler), B (library/runtime), C (example), D (tools/build/docs)
+- **Category A/B/C**: `make clean && make` + all 3 test suites + user Mesen2 validation of 7 reference examples before commit
+- **Category D**: Run only affected scripts + user approval (no Mesen2 needed)
+- **NEVER commit without user approval**
+
+See `tests/CLAUDE.md` for comprehensive test documentation (module inventory, assertion counts, how to add tests).
 
 ## Reference Documentation
 
