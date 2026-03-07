@@ -147,8 +147,9 @@ jobs:
 
           # Build only cproc-qbe (not driver which needs spawn.h)
           # The Makefile's cproc-qbe target links OBJ (no driver.o)
+          # Use clang for ASan — MSYS2 gcc doesn't ship libasan
           ASAN="-fsanitize=address -fno-omit-frame-pointer -g -O1"
-          make CC="cc $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
+          make CC="clang $ASAN" LDFLAGS="-fsanitize=address" cproc-qbe 2>&1 || {
             echo "ASan build failed — skipping ASan tests"
             cd ../..
             exit 0
