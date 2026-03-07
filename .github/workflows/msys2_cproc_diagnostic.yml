@@ -5,7 +5,11 @@ name: MSYS2 cproc Segfault Diagnostic
 # and captures crash details.
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch:  # Manual trigger once on main
+  push:
+    branches: [develop]
+    paths:
+      - '.github/workflows/msys2_cproc_diagnostic.yml'  # Self-trigger on first push
 
 jobs:
   diagnose:
