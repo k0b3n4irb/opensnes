@@ -29,7 +29,9 @@ typedef struct {
     u8 ripple_amp;
 } EffectState;
 
-EffectState fx = {0, 80, 0, 8};
+EffectState fx = {0, 80, 0, 6};
+
+extern u8 hdma_table_a[];
 
 static void stopCurrentEffect(void) {
     /* Stop ALL HDMA channels unconditionally to avoid leftover HDMA from
@@ -39,6 +41,14 @@ static void stopCurrentEffect(void) {
     hdmaColorGradientStop(6);       /* Disables ch6 */
     hdmaIrisWipeStop(6);            /* Disables ch6, restores window regs */
     hdmaWaveStop();                 /* Disables wave ch, resets BG scroll */
+
+    /* Re-enable ch6 with a null (terminator) table. This keeps ch6 always
+     * enabled so HDMA init at each VBlank properly loads A1T → A2A.
+     * Without this, enabling ch6 AFTER init causes one frame of stale
+     * A2A reads (horizontal lines artifact). */
+    hdma_table_a[0] = 0x00;
+    hdmaSetupBank(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a, 0x00);
+    hdmaEnable(1 << 6);
 
     /* Restore original palette (color gradient modifies CGRAM per-scanline,
      * values persist after HDMA stops). Reload from ROM source.
@@ -67,6 +77,12 @@ int main(void) {
     setMode(BG_MODE1, 0);
     setMainScreen(LAYER_BG1);
     setScreenOn();
+
+    /* Pre-enable HDMA ch6 with a null table so it's initialized at
+     * every VBlank HDMA init. Prevents stale A2A on first effect use. */
+    hdma_table_a[0] = 0x00;
+    hdmaSetupBank(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a, 0x00);
+    hdmaEnable(1 << 6);
 
     while (1) {
         WaitForVBlank();
@@ -122,13 +138,13 @@ int main(void) {
             if (fx.active_effect != 4) {
                 stopCurrentEffect();
             }
-            fx.ripple_amp = 32;
+            fx.ripple_amp = 6;
             WaitForVBlank();
             hdmaWaterRipple(6, 0, fx.ripple_amp, 2);
             fx.active_effect = 4;
         }
 
-        /* D-pad adjustments — rebuild during VBlank */
+        /* D-pad adjustments */
         if (pressed & KEY_UP) {
             if (fx.active_effect == 1 && fx.brightness_bot < 14) {
                 fx.brightness_bot += 2;
@@ -140,8 +156,8 @@ int main(void) {
                 WaitForVBlank();
                 hdmaIrisWipe(6, TM_BG1, 128, 112, fx.iris_radius);
             }
-            if (fx.active_effect == 4 && fx.ripple_amp < 60) {
-                fx.ripple_amp += 4;
+            if (fx.active_effect == 4 && fx.ripple_amp < 24) {
+                fx.ripple_amp += 2;
                 hdma_wave_amplitude = fx.ripple_amp;
             }
         }
@@ -156,8 +172,8 @@ int main(void) {
                 WaitForVBlank();
                 hdmaIrisWipe(6, TM_BG1, 128, 112, fx.iris_radius);
             }
-            if (fx.active_effect == 4 && fx.ripple_amp > 4) {
-                fx.ripple_amp -= 4;
+            if (fx.active_effect == 4 && fx.ripple_amp > 2) {
+                fx.ripple_amp -= 2;
                 hdma_wave_amplitude = fx.ripple_amp;
             }
         }

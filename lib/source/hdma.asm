@@ -321,7 +321,6 @@ hdmaSetTable:
 
 .RAMSECTION ".hdma_brightness" BANK 0 SLOT 1
     hdma_brightness_table: dsb 113   ; Brightness gradient (56 entries x 2 + 1)
-    hdma_ripple_table:     dsb 673   ; Water ripple (224 entries x 3 + 1)
 .ENDS
 
 .RAMSECTION ".hdma_effect_tables" BANK $7E SLOT 2
