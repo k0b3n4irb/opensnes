@@ -103,8 +103,8 @@ qui cassent le linker WLA-DX (cross-object resolution failure avec préfixe `_`)
 
 ### Problèmes connus
 
-- **Audio** : RAMSECTION `.audio_ram` ($0400 FORCE, 512B) chevauche `oamMemory` ($0300-$051F). Impossible de linker le module audio avec les sprites. Test limité aux constantes/structs.
-- **SNESMOD** : même conflit RAMSECTION + nécessite un soundbank binaire. Pas de test unitaire.
+- **Audio** : `.audio_ram` est à $0700 (au-dessus de oamMemory $0300-$051F). Le module linke correctement avec sprites. Test limité aux constantes/structs car audioInit() attend un SPC driver (timeout en émulateur sans soundbank).
+- **SNESMOD** : nécessite un soundbank binaire. Pas de test unitaire.
 
 ---
 
