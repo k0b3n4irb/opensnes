@@ -2646,6 +2646,78 @@ test_sign_promotion() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Signed division/modulo use __sdiv16/__smod16
+#
+# Verifies that signed division (Odiv) calls __sdiv16, not __div16,
+# and signed modulo (Orem) calls __smod16, not __mod16.
+# Bug: both were calling unsigned routines, producing wrong results
+# for negative operands (e.g. -3330 / 223 = 278 instead of -14).
+#------------------------------------------------------------------------------
+test_signed_division() {
+    local name="signed_division"
+    local src="$SCRIPT_DIR/test_signed_division.c"
+    local out="$BUILD/test_signed_division.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # signed_div must call __sdiv16
+    local func_body
+    func_body=$(sed -n '/^signed_div:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__sdiv16'; then
+        log_fail "$name: signed_div does NOT call __sdiv16"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -q 'jsl __div16'; then
+        log_fail "$name: signed_div incorrectly calls unsigned __div16"
+        ((fail_count++))
+    fi
+
+    # signed_mod must call __smod16
+    func_body=$(sed -n '/^signed_mod:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__smod16'; then
+        log_fail "$name: signed_mod does NOT call __smod16"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -q 'jsl __mod16'; then
+        log_fail "$name: signed_mod incorrectly calls unsigned __mod16"
+        ((fail_count++))
+    fi
+
+    # unsigned_div must call __div16 (NOT __sdiv16)
+    func_body=$(sed -n '/^unsigned_div:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__div16'; then
+        log_fail "$name: unsigned_div does NOT call __div16"
+        ((fail_count++))
+    fi
+
+    # unsigned_mod must call __mod16 (NOT __smod16)
+    func_body=$(sed -n '/^unsigned_mod:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__mod16'; then
+        log_fail "$name: unsigned_mod does NOT call __mod16"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: Phase 5b — Non-leaf param aliasing + frame safety
 #
 # Phase 5b extends param alias propagation to non-leaf functions (fewer
@@ -3618,6 +3690,7 @@ main() {
     test_global_struct_init          # .data_init for initialized global structs
     test_u32_arithmetic              # 32-bit arithmetic on 16-bit CPU
     test_sign_promotion              # Signed/unsigned type promotion and extension
+    test_signed_division             # FIXED: Signed div/mod now call __sdiv16/__smod16
 
     echo ""
     echo "========================================"
