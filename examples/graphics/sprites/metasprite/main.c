@@ -52,6 +52,8 @@ extern u8 spritehero8_til[];
 
 u16 selectedItem;
 
+static void drawSprites(void);
+
 static void drawMenu(void) {
     textClearRect(3, 2, 28, 4);
     textPrintAt(3, 2, "Object size :");
@@ -73,14 +75,28 @@ static void drawMenu(void) {
 }
 
 static void changeObjSize(void) {
+    extern volatile u8 vblank_flag;
+
+    /* Prepare new OAM data BEFORE VBlank so the NMI DMA sends correct
+     * sprites in the same VBlank where OBJSEL changes. Without this,
+     * one frame renders old sprites with new size mode = garbled. */
+    oamClear();
+    drawSprites();
+
+    /* Force fresh VBlank sync: if NMI fired during oamClear/drawSprites,
+     * it may have DMA'd a partially-built buffer and set vblank_flag.
+     * Clear it so WaitForVBlank waits for a NEW NMI that DMAs the
+     * complete buffer. */
+    vblank_flag = 0;
+
     WaitForVBlank();
+    /* Write OBJSEL during VBlank, AFTER NMI has DMA'd the new OAM */
     if (selectedItem == 0)
         REG_OBJSEL = OBJ_SIZE_TO_REG(OBJ_SIZE8_L16);
     else if (selectedItem == 1)
         REG_OBJSEL = OBJ_SIZE_TO_REG(OBJ_SIZE8_L32);
     else
         REG_OBJSEL = OBJ_SIZE_TO_REG(OBJ_SIZE16_L32);
-    oamClear();
 }
 
 static void drawSprites(void) {
@@ -157,7 +173,6 @@ int main(void) {
                 selectedItem--;
                 drawMenu();
                 changeObjSize();
-                drawSprites();
             }
         }
         if (pressed & KEY_DOWN) {
@@ -165,7 +180,6 @@ int main(void) {
                 selectedItem++;
                 drawMenu();
                 changeObjSize();
-                drawSprites();
             }
         }
 
