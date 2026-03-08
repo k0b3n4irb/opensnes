@@ -41,7 +41,10 @@ static void stopCurrentEffect(void) {
     hdmaWaveStop();                 /* Disables wave ch, resets BG scroll */
 
     /* Restore original palette (color gradient modifies CGRAM per-scanline,
-     * values persist after HDMA stops). Reload from ROM source. */
+     * values persist after HDMA stops). Reload from ROM source.
+     * CGRAM DMA must happen during VBlank — doing it during active display
+     * causes brief visual artifacts (vertical bars). */
+    WaitForVBlank();
     dmaCopyCGram(palette, 0, palette_end - palette);
 
     fx.active_effect = 0;
@@ -82,7 +85,9 @@ int main(void) {
 
         /* A: Brightness gradient */
         if (pressed & KEY_A) {
-            stopCurrentEffect();
+            if (fx.active_effect != 1) {
+                stopCurrentEffect();
+            }
             fx.brightness_bot = 0;
             WaitForVBlank();
             hdmaBrightnessGradient(7, 15, fx.brightness_bot);
@@ -91,7 +96,9 @@ int main(void) {
 
         /* B: Color gradient on color 0 */
         if (pressed & KEY_B) {
-            stopCurrentEffect();
+            if (fx.active_effect != 2) {
+                stopCurrentEffect();
+            }
             WaitForVBlank();
             hdmaColorGradient(6, 0,
                               RGB(4, 8, 28),   /* Deep blue top */
@@ -101,7 +108,9 @@ int main(void) {
 
         /* X: Iris wipe */
         if (pressed & KEY_X) {
-            stopCurrentEffect();
+            if (fx.active_effect != 3) {
+                stopCurrentEffect();
+            }
             fx.iris_radius = 80;
             WaitForVBlank();
             hdmaIrisWipe(6, TM_BG1, 128, 112, fx.iris_radius);
@@ -110,7 +119,9 @@ int main(void) {
 
         /* Y: Water ripple */
         if (pressed & KEY_Y) {
-            stopCurrentEffect();
+            if (fx.active_effect != 4) {
+                stopCurrentEffect();
+            }
             fx.ripple_amp = 32;
             WaitForVBlank();
             hdmaWaterRipple(6, 0, fx.ripple_amp, 2);

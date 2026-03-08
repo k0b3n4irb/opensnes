@@ -14,6 +14,7 @@
 #include <snes.h>
 #include <snes/console.h>
 #include <snes/input.h>
+#include <snes/hdma.h>
 
 /* 4bpp tiles for Mode 1 BG1.
  * VRAM write: low byte = tiles[i], high byte = 0x00.
@@ -444,12 +445,6 @@ static const u8 hdma_tables[AMP_LEVELS * TABLE_SIZE] = {
 };
 
 /* Direct hardware registers */
-#define HW_HDMAEN  (*(vu8*)0x420C)
-#define HW_DMAP6   (*(vu8*)0x4360)
-#define HW_BBAD6   (*(vu8*)0x4361)
-#define HW_A1T6L   (*(vu8*)0x4362)
-#define HW_A1T6H   (*(vu8*)0x4363)
-#define HW_A1B6    (*(vu8*)0x4364)
 /* State variables (static = placed in RAM by compiler) */
 static u8 wave_on;
 static u8 amp_idx;
@@ -463,8 +458,6 @@ static const u16 amp_offsets[AMP_LEVELS] = {
 
 int main(void) {
     u16 i;
-    u16 tbl_addr;
-    u16 phase_off;
 
     /* Init state */
     wave_on = 0;
@@ -504,11 +497,9 @@ int main(void) {
         *(vu8*)0x2119 = 0x00;
     }
 
-    /* Configure HDMA channel 6 */
-    HW_DMAP6 = 0x02;    /* mode 2: write twice to same register */
-    HW_BBAD6 = 0x0D;    /* target: BG1HOFS ($210D) */
-    HW_A1B6  = 0x00;    /* bank 0 (ROM) */
-    HW_HDMAEN = 0x00;   /* start with HDMA off */
+    /* Configure HDMA channel 6: write-twice mode to BG1HOFS */
+    hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG_2X, HDMA_DEST_BG1HOFS,
+              &hdma_tables[amp_offsets[amp_idx]]);
 
     setScreenOn();
 
@@ -558,15 +549,13 @@ int main(void) {
             }
         }
 
-        /* Update HDMA table pointer every frame */
+        /* Update HDMA table pointer and enable/disable */
         if (wave_on) {
-            phase_off = (u16)phase * 3;
-            tbl_addr = (u16)hdma_tables + amp_offsets[amp_idx] + phase_off;
-            HW_A1T6L = (u8)(tbl_addr & 0xFF);
-            HW_A1T6H = (u8)((tbl_addr >> 8) & 0xFF);
-            HW_HDMAEN = 0x40;
+            hdmaSetTable(HDMA_CHANNEL_6,
+                         &hdma_tables[amp_offsets[amp_idx] + (u16)phase * 3]);
+            hdmaEnable(0x40);
         } else {
-            HW_HDMAEN = 0x00;
+            hdmaDisable(0x40);
         }
     }
     return 0;
