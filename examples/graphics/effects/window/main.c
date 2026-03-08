@@ -155,6 +155,10 @@ int main(void) {
 
     /*--------------------------------------------------------------------
      * Main loop
+     *
+     * PPU register writes in setup_window() happen immediately after
+     * WaitForVBlank returns, which is still during VBlank (~11K cycles
+     * remain after NMI handler). This satisfies Pattern 4.
      *--------------------------------------------------------------------*/
     while (1) {
         WaitForVBlank();
