@@ -317,8 +317,19 @@ hdmaSetTable:
 ; HDMA reads directly from bank $7E via the bank byte set in hdmaSetup.
 ;------------------------------------------------------------------------------
 .RAMSECTION ".hdma_wave_tables" BANK $7E SLOT 2
-    hdma_table_a:         dsb 169    ; Buffer A
-    hdma_table_b:         dsb 169    ; Buffer B
+    hdma_table_a:         dsb 169    ; Wave buffer A
+    hdma_table_b:         dsb 169    ; Wave buffer B
+.ENDS
+
+.RAMSECTION ".hdma_brightness" BANK 0 SLOT 1
+    hdma_brightness_table: dsb 113   ; Brightness gradient (56 entries x 2 + 1)
+    hdma_ripple_table:     dsb 169   ; Water ripple (56 entries x 3 + 1)
+.ENDS
+
+.RAMSECTION ".hdma_effect_tables" BANK $7E SLOT 2
+    hdma_color_table:      dsb 281   ; Color gradient (56 entries x 5 + 1)
+    hdma_iris_table_a:     dsb 673   ; Iris wipe buffer A (224 entries x 3 + 1)
+    hdma_iris_table_b:     dsb 673   ; Iris wipe buffer B (224 entries x 3 + 1)
 .ENDS
 
 .RAMSECTION ".hdma_wave_state" BANK 0 SLOT 1
@@ -330,4 +341,6 @@ hdmaSetTable:
     hdma_wave_enabled:    dsb 1      ; 1 = wave effect active
     hdma_wave_speed:      dsb 1      ; Animation speed (frames per update)
     hdma_wave_dest_reg:   dsb 1      ; Destination register (BG1HOFS, etc.)
+    hdma_wave_mode:       dsb 1      ; 0 = wave, 1 = ripple
+    hdma_iris_buffer:     dsb 1      ; 0 = iris buffer A active, 1 = buffer B
 .ENDS
