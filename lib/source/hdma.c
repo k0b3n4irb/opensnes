@@ -56,7 +56,8 @@ void hdmaWindowShape(u8 channel, const void *windowTable) {
  * registers, NOT RAM. So we use the WRAM data port ($2180-$2183) to write
  * to bank $7E directly.
  *
- * Table format: 56 entries of [0x84][scroll_lo][scroll_hi] + [0x00] = 169 bytes
+ * Wave tables: 224 entries of [0x81][scroll_lo][scroll_hi] + [0x00] = 673 bytes
+ * Wave/ripple tables in bank $00 RAM (C pointer writes, no WRAM port needed)
  *============================================================================*/
 
 /*
@@ -112,8 +113,11 @@ extern u8 hdma_wave_speed;
 extern u8 hdma_wave_dest_reg;
 extern u8 hdma_wave_mode;
 
-/* Number of 4-line chunks: 224 / 4 = 56 */
+/* Number of 4-line chunks for gradient effects: 224 / 4 = 56 */
 #define WAVE_CHUNKS 56
+
+/* Number of 1-scanline entries for wave/ripple effects (full resolution) */
+#define WAVE_LINES 224
 
 /* Forward declaration for ripple mode */
 static void fillRippleTableRAM(u8 frame, u8 maxAmplitude, u8 frequency);
@@ -137,31 +141,29 @@ static const u8 channel_mask[] = {
 #define WRAM_ADDRH  (*(vu8*)0x2183)
 
 /**
- * Fill a wave table in bank $7E via the WRAM data port.
- * Cannot use C pointers because they access bank $00 via sta.l $0000,x.
+ * Fill a wave table in bank $00 RAM via C pointer writes.
+ * Tables live in bank $00 RAMSECTION (address < $2000), accessible by C.
  */
-static void fillWaveTable(u16 tableAddr, u8 frame, u8 amplitude, u8 frequency) {
+static void fillWaveTable(u8 *table, u8 frame, u8 amplitude, u8 frequency) {
     u16 i;
+    u8 *p = table;
+    u8 angle = frame;
 
-    /* Set WRAM write address to bank $7E + tableAddr */
-    WRAM_ADDRL = (u8)(tableAddr & 0xFF);
-    WRAM_ADDRM = (u8)((tableAddr >> 8) & 0xFF);
-    WRAM_ADDRH = 0;  /* Bank $7E (bit 0 = 0) */
-
-    for (i = 0; i < WAVE_CHUNKS; i++) {
-        /* Calculate sine value for this chunk (use center of chunk) */
-        u8 line = (u8)((i << 2) + 2);  /* i * 4 + 2 = center of chunk */
-        u8 angle = (u8)(((u16)line * frequency) + frame);
+    for (i = 0; i < WAVE_LINES; i++) {
         s16 sine_val = hdmaSin(angle);  /* -256 to +256 (8.8 fixed) */
 
-        /* Scale by amplitude: offset = (sine_val * amplitude) >> 8 */
-        s16 offset = (s16)(((s32)sine_val * amplitude) >> 8);
+        /* Scale by amplitude with rounding: (product + 128) >> 8
+         * Without +128, truncation creates horizontal banding artifacts
+         * because many adjacent scanlines get the same integer offset. */
+        s16 offset = (s16)((sine_val * (s16)amplitude + 128) >> 8);
 
-        WRAM_DATA = 0x84;                 /* Repeat mode, 4 lines */
-        WRAM_DATA = (u8)(offset & 0xFF);  /* Scroll low byte */
-        WRAM_DATA = (u8)((offset >> 8) & 0xFF);  /* Scroll high byte */
+        *p++ = 0x81;                         /* Repeat mode, 1 line */
+        *p++ = (u8)(offset & 0xFF);          /* Scroll low byte */
+        *p++ = (u8)((offset >> 8) & 0xFF);   /* Scroll high byte */
+
+        angle += frequency;
     }
-    WRAM_DATA = 0x00;  /* End marker */
+    *p = 0x00;  /* End marker */
 }
 
 void hdmaWaveInit(void) {
@@ -179,8 +181,8 @@ void hdmaWaveInit(void) {
     hdma_wave_mode = 0;
 
     /* Initialize both buffers with flat scroll (no wave) */
-    fillWaveTable((u16)hdma_table_a, 0, 0, 0);
-    fillWaveTable((u16)hdma_table_b, 0, 0, 0);
+    fillWaveTable((u8 *)hdma_table_a, 0, 0, 0);
+    fillWaveTable((u8 *)hdma_table_b, 0, 0, 0);
 }
 
 void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
@@ -203,14 +205,14 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     hdma_wave_mode = 0;
 
     /* Fill both buffers with initial wave */
-    fillWaveTable((u16)hdma_table_a, hdma_wave_frame, amplitude, frequency);
-    fillWaveTable((u16)hdma_table_b, hdma_wave_frame, amplitude, frequency);
+    fillWaveTable((u8 *)hdma_table_a, hdma_wave_frame, amplitude, frequency);
+    fillWaveTable((u8 *)hdma_table_b, hdma_wave_frame, amplitude, frequency);
 
     /* Start with buffer A active */
     hdma_active_buffer = 0;
 
-    /* Setup and enable HDMA */
-    hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
+    /* Setup and enable HDMA — bank $00 for RAM tables */
+    hdmaSetupBank(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a, 0x00);
     hdmaEnable(channel_mask[channel]);
 }
 
@@ -221,22 +223,22 @@ void hdmaWaveUpdate(void) {
     hdma_wave_frame = (u8)(hdma_wave_frame + hdma_wave_speed);
 
     if (hdma_wave_mode == 1) {
-        /* Ripple mode: single bank $00 RAM buffer, no double-buffering.
-         * Fill the table directly with C pointers, same as brightness. */
+        /* Ripple mode: single bank $00 RAM buffer */
         fillRippleTableRAM(hdma_wave_frame,
                            hdma_wave_amplitude, hdma_wave_frequency);
     } else {
-        /* Wave mode: double-buffered WRAM tables */
-        u16 update_addr;
+        /* Wave mode: double-buffered bank $00 RAM tables */
+        u8 *update_buf;
         if (hdma_active_buffer == 0) {
-            update_addr = (u16)hdma_table_b;
+            update_buf = (u8 *)hdma_table_b;
         } else {
-            update_addr = (u16)hdma_table_a;
+            update_buf = (u8 *)hdma_table_a;
         }
 
-        fillWaveTable(update_addr, hdma_wave_frame,
+        fillWaveTable(update_buf, hdma_wave_frame,
                       hdma_wave_amplitude, hdma_wave_frequency);
 
+        /* Point HDMA to new buffer */
         if (hdma_active_buffer == 0) {
             hdmaSetTable(hdma_wave_channel, hdma_table_b);
         } else {
@@ -382,29 +384,13 @@ static u16 isqrt(u16 n) {
 }
 
 /**
- * Quick-fill an iris table with "fully masked" entries (WH0=0xFF, WH1=0x00).
- * Fast enough to run within VBlank (~20K cycles for 224 entries).
+ * Fill an iris table buffer using C pointer writes.
+ * Tables are in bank $00 RAM (< $2000), directly accessible from C.
+ * Writes 224 entries of [0x81][WH0][WH1] + terminator.
  */
-static void fillIrisMasked(u16 tableAddr) {
+static void fillIrisTable(u8 *table, u8 centerX, u8 centerY, u16 r2) {
     u16 y;
-
-    wramSetAddr(tableAddr);
-    for (y = 0; y < 224; y++) {
-        WRAM_DATA = 0x81;  /* Repeat 1 line */
-        WRAM_DATA = 0xFF;  /* WH0 > WH1 = empty window = fully masked */
-        WRAM_DATA = 0x00;
-    }
-    WRAM_DATA = 0x00;  /* End marker */
-}
-
-/**
- * Fill an iris table buffer at the given address.
- * Writes 224 entries of [0x81][WH0][WH1] + terminator via WRAM port.
- */
-static void fillIrisTable(u16 tableAddr, u8 centerX, u8 centerY, u16 r2) {
-    u16 y;
-
-    wramSetAddr(tableAddr);
+    u8 *p = table;
 
     for (y = 0; y < 224; y++) {
         s16 dy = (s16)y - (s16)centerY;
@@ -423,11 +409,11 @@ static void fillIrisTable(u16 tableAddr, u8 centerX, u8 centerY, u16 r2) {
             wh1 = (right > 255) ? 255 : (u8)right;
         }
 
-        WRAM_DATA = 0x81;  /* Repeat 1 line */
-        WRAM_DATA = wh0;   /* WH0 (left edge) */
-        WRAM_DATA = wh1;   /* WH1 (right edge) */
+        *p++ = 0x81;  /* Repeat 1 line */
+        *p++ = wh0;   /* WH0 (left edge) */
+        *p++ = wh1;   /* WH1 (right edge) */
     }
-    WRAM_DATA = 0x00;  /* End marker */
+    *p = 0x00;  /* End marker */
 }
 
 void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
@@ -446,31 +432,31 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
     if (layers & 0x08) w34sel  |= 0x30;  /* BG4: W1 enable + invert */
     if (layers & 0x10) wobjsel |= 0x03;  /* OBJ: W1 enable + invert */
 
+    /* Build into the inactive buffer while HDMA reads the active one.
+     * Window masking is NOT enabled yet — avoids artifacts from stale
+     * WH0/WH1 during the slow fillIrisTable computation. */
+    if (hdma_iris_buffer == 0) {
+        build_table = hdma_iris_table_b;
+    } else {
+        build_table = hdma_iris_table_a;
+    }
+
+    fillIrisTable(build_table, centerX, centerY, r2);
+
+    /* Setup and enable HDMA to drive WH0/WH1 per scanline.
+     * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
+    hdmaSetupBank(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table, 0x00);
+    hdmaEnable(channel_mask[channel]);
+
+    /* Wait for HDMA to initialize (happens at start of VBlank).
+     * Only THEN enable window masking — ensures WH0/WH1 are being
+     * driven by HDMA before the PPU uses them for clipping. */
+    WaitForVBlank();
+
     REG_W12SEL  = w12sel;
     REG_W34SEL  = w34sel;
     REG_WOBJSEL = wobjsel;
     REG_TMW     = layers;
-
-    if (hdma_iris_buffer == 0) {
-        /* First call or buffer A is active: quick-fill A as mask,
-         * start HDMA on A, then build circle into B and swap */
-        fillIrisMasked((u16)hdma_iris_table_a);
-        hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, hdma_iris_table_a);
-        hdmaEnable(channel_mask[channel]);
-
-        build_table = hdma_iris_table_b;
-    } else {
-        /* Buffer B is active: build into A while HDMA reads B */
-        build_table = hdma_iris_table_a;
-    }
-
-    /* Build the real circle table (slow — takes multiple frames).
-     * HDMA keeps reading the other buffer uninterrupted. */
-    fillIrisTable((u16)build_table, centerX, centerY, r2);
-
-    /* Swap: point HDMA to the newly built table */
-    hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
-    hdmaEnable(channel_mask[channel]);
 
     /* Toggle active buffer */
     hdma_iris_buffer = (u8)(hdma_iris_buffer ^ 1);
@@ -491,33 +477,30 @@ void hdmaIrisWipeStop(u8 channel) {
  *--------------------------------------------------------------------------*/
 
 /**
- * Fill a ripple table: amplitude scales from 0 at top to maxAmplitude at bottom.
- * Higher frequency than standard wave for water-like appearance.
- */
-extern u8 hdma_ripple_table[169];
-
-/**
  * Fill the ripple table in bank $00 RAM using C pointers.
  * Same pattern as hdmaBrightnessGradient — no WRAM port needed.
  */
+extern u8 hdma_ripple_table[673];
+
 static void fillRippleTableRAM(u8 frame, u8 maxAmplitude, u8 frequency) {
     u16 i;
     u8 *p = (u8 *)hdma_ripple_table;
+    u8 angle = frame;
 
-    for (i = 0; i < WAVE_CHUNKS; i++) {
-        u8 line = (u8)((i << 2) + 2);
-        u8 angle = (u8)(((u16)line * frequency) + frame);
+    for (i = 0; i < WAVE_LINES; i++) {
         s16 sine_val = hdmaSin(angle);
 
         /* Scale amplitude by Y position: 0 at top, maxAmplitude at bottom */
-        u16 scaled = (u16)(((u16)maxAmplitude * line) / 223);
+        u16 scaled = (u16)(((u16)maxAmplitude * (u8)i) / 223);
         u8 amp = (u8)scaled;
         s16 product = (s16)(sine_val * (s16)amp);
-        s16 offset = (s16)(product >> 8);
+        s16 offset = (s16)((product + 128) >> 8);
 
-        *p++ = 0x84;                     /* Repeat 4 lines */
+        *p++ = 0x81;                     /* Repeat 1 line */
         *p++ = (u8)(offset & 0xFF);      /* Scroll low */
         *p++ = (u8)((offset >> 8) & 0xFF); /* Scroll high */
+
+        angle += frequency;
     }
     *p = 0x00;  /* End marker */
 }
@@ -534,7 +517,7 @@ void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed) {
 
     hdma_wave_channel = channel;
     hdma_wave_amplitude = amplitude;
-    hdma_wave_frequency = 6;  /* Higher frequency for water look */
+    hdma_wave_frequency = 6;  /* Higher frequency for water-like appearance */
     hdma_wave_dest_reg = destReg;
     hdma_wave_speed = speed;
     hdma_wave_frame = 0;

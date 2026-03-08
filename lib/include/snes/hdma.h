@@ -361,11 +361,11 @@ void hdmaWaveInit(void);
  * @param channel HDMA channel to use (6 or 7 recommended)
  * @param bg Background layer to affect (0=BG1, 1=BG2, 2=BG3)
  * @param amplitude Wave amplitude in pixels (1-16)
- * @param frequency Wave frequency (1=long waves, 8=short waves)
+ * @param frequency Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.
  *
  * @code
  * hdmaWaveInit();
- * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 2);  // Gentle water reflection on BG1
+ * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 4);  // Gentle water reflection on BG1
  * hdmaEnable(1 << HDMA_CHANNEL_6);
  *
  * while (1) {
