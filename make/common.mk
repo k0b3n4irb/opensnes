@@ -69,7 +69,7 @@ endif
 endif
 
 # Shared templates
-TEMPLATES := $(OPENSNES)/templates/common
+TEMPLATES := $(OPENSNES)/templates
 
 #------------------------------------------------------------------------------
 # Default Configuration
