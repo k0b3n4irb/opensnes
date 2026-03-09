@@ -45,11 +45,11 @@ test_oam_size() {
     # Check that oamMemory is 544 bytes (512 + 32)
     if grep -q "oamMemory.*dsb 544" "$OPENSNES/lib/source/sprite.c" 2>/dev/null || \
        grep -q "OAM_SIZE.*544" "$OPENSNES/lib/include/snes/sprite.h" 2>/dev/null || \
-       grep -q "dsb 544" "$OPENSNES/templates/common/crt0.asm" 2>/dev/null; then
+       grep -q "dsb 544" "$OPENSNES/templates/crt0.asm" 2>/dev/null; then
         log_pass "$name: OAM buffer is 544 bytes"
     else
         # Check in the actual crt0.asm
-        if grep -E "oamMemory.*dsb.*544|\.buffer.*544" "$OPENSNES/templates/common/crt0.asm" > /dev/null 2>&1; then
+        if grep -E "oamMemory.*dsb.*544|\.buffer.*544" "$OPENSNES/templates/crt0.asm" > /dev/null 2>&1; then
             log_pass "$name: OAM buffer is 544 bytes"
         else
             log_fail "$name: OAM buffer size not found or incorrect"
@@ -146,11 +146,11 @@ test_wram_mirror() {
     ((TESTS_RUN++))
 
     # Check that oamMemory is placed above $0300 to avoid WRAM mirroring
-    if grep -E "ORGA.*\\\$0300.*FORCE|oamMemory.*\\\$7E:03" "$OPENSNES/templates/common/crt0.asm" > /dev/null 2>&1; then
+    if grep -E "ORGA.*\\\$0300.*FORCE|oamMemory.*\\\$7E:03" "$OPENSNES/templates/crt0.asm" > /dev/null 2>&1; then
         log_pass "$name: OAM buffer protected from WRAM mirror"
     else
         # Alternative check for any FORCE placement
-        if grep -q "FORCE" "$OPENSNES/templates/common/crt0.asm" 2>/dev/null; then
+        if grep -q "FORCE" "$OPENSNES/templates/crt0.asm" 2>/dev/null; then
             log_pass "$name: RAMSECTION uses FORCE directive"
         else
             log_fail "$name: WRAM mirroring protection not verified"
