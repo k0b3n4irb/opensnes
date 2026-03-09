@@ -129,8 +129,11 @@ tcc_div16:
     php
     rep #$30
 
-    ; Check if divisor fits in 8 bits
+    ; Division by zero guard: return quotient=0, remainder=0
     lda tcc__r1
+    beq @div_zero
+
+    ; Check if divisor fits in 8 bits
     and #$FF00
     bne @software_div
 
@@ -162,6 +165,13 @@ tcc_div16:
     plp
     rtl
 
+@div_zero:
+    ; Divisor is 0: return quotient=0, remainder=0 (deterministic)
+    stz tcc__r0
+    lda #0
+    plp
+    rtl
+
 @software_div:
     ; Software division for 16-bit divisor
     ; Simple shift-and-subtract algorithm
@@ -169,6 +179,7 @@ tcc_div16:
     sta tcc__r2         ; Quotient
     sta tcc__r3         ; Remainder
 
+    phx                 ; Save X (defensive: caller may rely on it)
     ldx #16             ; 16 bits
 
 @div_loop:
@@ -192,6 +203,8 @@ tcc_div16:
 @no_sub:
     dex
     bne @div_loop
+
+    plx                 ; Restore X
 
     ; Move results
     lda tcc__r3
