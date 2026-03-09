@@ -323,7 +323,7 @@ hdmaSetTable:
     hdma_brightness_table: dsb 113   ; Brightness gradient (56 entries x 2 + 1)
 .ENDS
 
-.RAMSECTION ".hdma_effect_tables" BANK $7E SLOT 2
+.RAMSECTION ".hdma_color" BANK 0 SLOT 1
     hdma_color_table:      dsb 281   ; Color gradient (56 entries x 5 + 1)
 .ENDS
 
