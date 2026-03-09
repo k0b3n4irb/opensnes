@@ -308,17 +308,28 @@ hdmaSetTable:
 ;------------------------------------------------------------------------------
 ; RAM for HDMA wave effect (double-buffered tables)
 ;
-; Tables use 4-line chunks: 224 / 4 = 56 entries * 3 bytes + 1 = 169 bytes
-; Format per entry: [0x84 = repeat 4 lines] [scroll_lo] [scroll_hi]
+; Tables use 1-scanline resolution: 224 entries * 3 bytes + 1 = 673 bytes
+; Format per entry: [0x81 = repeat 1 line] [scroll_lo] [scroll_hi]
 ;
-; Tables are in bank $7E above the WRAM mirror ($2000+).
-; C code writes to them via the WRAM data port ($2180-$2183) since the
-; compiler's sta.l $0000,x only accesses bank $00 (I/O above $1FFF).
-; HDMA reads directly from bank $7E via the bank byte set in hdmaSetup.
+; Tables in bank $00 RAM (< $2000) — C pointers can write directly.
+; Bank $00:$0000-$1FFF mirrors bank $7E:$0000-$1FFF (same WRAM).
 ;------------------------------------------------------------------------------
-.RAMSECTION ".hdma_wave_tables" BANK $7E SLOT 2
-    hdma_table_a:         dsb 169    ; Buffer A
-    hdma_table_b:         dsb 169    ; Buffer B
+.RAMSECTION ".hdma_wave_tables" BANK 0 SLOT 1
+    hdma_table_a:         dsb 673    ; Wave buffer A (224 * 3 + 1)
+    hdma_table_b:         dsb 673    ; Wave buffer B (224 * 3 + 1)
+.ENDS
+
+.RAMSECTION ".hdma_brightness" BANK 0 SLOT 1
+    hdma_brightness_table: dsb 113   ; Brightness gradient (56 entries x 2 + 1)
+.ENDS
+
+.RAMSECTION ".hdma_color" BANK 0 SLOT 1
+    hdma_color_table:      dsb 281   ; Color gradient (56 entries x 5 + 1)
+.ENDS
+
+.RAMSECTION ".hdma_iris_tables" BANK 0 SLOT 1
+    hdma_iris_table_a:     dsb 673   ; Iris wipe buffer A (224 entries x 3 + 1)
+    hdma_iris_table_b:     dsb 673   ; Iris wipe buffer B (224 entries x 3 + 1)
 .ENDS
 
 .RAMSECTION ".hdma_wave_state" BANK 0 SLOT 1
@@ -330,4 +341,6 @@ hdmaSetTable:
     hdma_wave_enabled:    dsb 1      ; 1 = wave effect active
     hdma_wave_speed:      dsb 1      ; Animation speed (frames per update)
     hdma_wave_dest_reg:   dsb 1      ; Destination register (BG1HOFS, etc.)
+    hdma_wave_mode:       dsb 1      ; 0 = wave, 1 = ripple
+    hdma_iris_buffer:     dsb 1      ; 0 = iris buffer A active, 1 = buffer B
 .ENDS

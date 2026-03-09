@@ -81,30 +81,10 @@ typedef struct {
     s16 bg1_scroll_y;   /**< BG1 vertical scroll offset */
     s16 bg2_scroll_x;   /**< BG2 horizontal scroll offset (parallax) */
     s16 bg2_scroll_y;   /**< BG2 vertical scroll offset */
-    u8 need_scroll_update; /**< Flag: set to trigger scroll register update in VBlank */
 } GameState;
 
 /** @brief Global game state instance with initial values */
-GameState game = {20, 100, 0, 32, 0, 32, 1};
-
-/*============================================================================
- * VBlank Callback
- *============================================================================*/
-
-/**
- * VBlank callback - updates scroll registers at the start of VBlank
- *
- * Scroll register updates should happen during VBlank to avoid
- * visual glitches. The VBlank callback is the perfect place for this.
- */
-void myVBlankHandler(void) {
-    if (game.need_scroll_update) {
-        /* Update scroll registers during VBlank for glitch-free scrolling */
-        bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
-        bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
-        game.need_scroll_update = 0;
-    }
-}
+GameState game = {20, 100, 0, 32, 0, 32};
 
 /*============================================================================
  * Main Program
@@ -179,11 +159,6 @@ int main(void) {
      * Initialize Game State (values already set in global initializer)
      *------------------------------------------------------------------------*/
 
-    /* Register VBlank callback for scroll updates */
-    /* Note: Use nmiSetBank with bank 1 because myVBlankHandler is placed in bank 1 */
-    /* by the linker. In LoROM, bank 1 = ROM $8000-$FFFF (second 32KB). */
-    nmiSetBank(myVBlankHandler, 1);
-
     /* Set initial sprite - tile 0, palette 0, priority 2 */
     oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
 
@@ -246,8 +221,9 @@ int main(void) {
          */
         oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
 
-        /* Signal scroll update - VBlank callback will apply it */
-        game.need_scroll_update = 1;
+        /* Update scroll — bgSetScroll defers to NMI via dirty flag */
+        bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
+        bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
     }
 
     return 0;

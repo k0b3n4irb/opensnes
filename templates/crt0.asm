@@ -608,6 +608,12 @@ CopyInitData:
 ;------------------------------------------------------------------------------
 ; Called at the start of each VBlank period (~60Hz).
 ; Transfers OAM buffer to hardware if needed, then sets vblank_flag.
+;
+; WARNING: Do NOT use the WRAM data port ($2180-$2183) in NMI code.
+; Main-thread code (HDMA table construction, map streaming, object updates)
+; writes multi-byte sequences to $2180 with an address set via $2181-$2183.
+; If NMI fires mid-sequence and touches $2180-$2183, the address/data will
+; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
 NmiHandler:
     rep #$30

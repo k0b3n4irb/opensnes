@@ -252,7 +252,6 @@ void oamClear(void) {
 
 u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size) {
-    u8 count = 0;
     u8 id = startId;
 
     while (meta->dx != metasprite_end && id < MAX_SPRITES) {
@@ -283,19 +282,17 @@ u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
             oamSetSize(id, size);
 
             id++;
-            count++;
         }
 
         meta++;
     }
 
-    return count;
+    return id;
 }
 
 u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,
                    u8 flipX, u8 flipY, u8 width, u8 height) {
-    u8 count = 0;
     u8 id = startId;
 
     /* Sprite size for offset calculations (depends on size mode) */
@@ -339,13 +336,12 @@ u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
             oamSetSize(id, size);
 
             id++;
-            count++;
         }
 
         meta++;
     }
 
-    return count;
+    return id;
 }
 
 u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette) {

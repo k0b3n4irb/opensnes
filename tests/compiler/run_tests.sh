@@ -1870,6 +1870,62 @@ test_static_mutable() {
     ((TESTS_PASSED++))
 }
 
+test_struct_typedef_rodata() {
+    local name="struct_typedef_rodata"
+    local src="$SCRIPT_DIR/test_struct_typedef_rodata.c"
+    local out="$BUILD/test_struct_typedef_rodata.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Compile C to assembly
+    if ! "$CC" "$src" -o "$out" 2>"$BUILD/struct_typedef_rodata_compile.err"; then
+        log_fail "$name: Compilation failed"
+        if [[ $VERBOSE -eq 1 ]]; then
+            cat "$BUILD/struct_typedef_rodata_compile.err"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check that 'state' is in RAMSECTION (mutable RAM), not SUPERFREE (ROM)
+    local sym_line
+    sym_line=$(grep -n "^state:" "$out" | head -1 | cut -d: -f1)
+
+    if [[ -z "$sym_line" ]]; then
+        log_fail "$name: Symbol 'state' not found in assembly"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local section_line
+    section_line=$(head -n "$sym_line" "$out" | grep -E '\.(SECTION|RAMSECTION)' | tail -1)
+
+    if echo "$section_line" | grep -q 'SUPERFREE\|\.rodata'; then
+        log_fail "$name: Mutable struct 'state' placed in ROM! section: $section_line"
+        if [[ $VERBOSE -eq 1 ]]; then
+            echo "This is a cproc mktype() uninitialized qual bug."
+            echo "A #line directive before typedef struct causes type->qual garbage."
+            grep -n -E '\.(SECTION|RAMSECTION)' "$out"
+        fi
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! echo "$section_line" | grep -q '\.RAMSECTION'; then
+        log_fail "$name: Symbol 'state' not in expected RAMSECTION: $section_line"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
 test_const_data() {
     local name="const_data"
     local src="$SCRIPT_DIR/test_const_data.c"
@@ -2590,6 +2646,78 @@ test_sign_promotion() {
 }
 
 #------------------------------------------------------------------------------
+# Test: Signed division/modulo use __sdiv16/__smod16
+#
+# Verifies that signed division (Odiv) calls __sdiv16, not __div16,
+# and signed modulo (Orem) calls __smod16, not __mod16.
+# Bug: both were calling unsigned routines, producing wrong results
+# for negative operands (e.g. -3330 / 223 = 278 instead of -14).
+#------------------------------------------------------------------------------
+test_signed_division() {
+    local name="signed_division"
+    local src="$SCRIPT_DIR/test_signed_division.c"
+    local out="$BUILD/test_signed_division.c.asm"
+    ((TESTS_RUN++))
+
+    if [[ ! -f "$src" ]]; then
+        log_fail "$name: Source file not found: $src"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    if ! compile_test "$name" "$src" "$out"; then
+        return 1
+    fi
+
+    local fail_count=0
+
+    # signed_div must call __sdiv16
+    local func_body
+    func_body=$(sed -n '/^signed_div:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__sdiv16'; then
+        log_fail "$name: signed_div does NOT call __sdiv16"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -q 'jsl __div16'; then
+        log_fail "$name: signed_div incorrectly calls unsigned __div16"
+        ((fail_count++))
+    fi
+
+    # signed_mod must call __smod16
+    func_body=$(sed -n '/^signed_mod:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__smod16'; then
+        log_fail "$name: signed_mod does NOT call __smod16"
+        ((fail_count++))
+    fi
+    if echo "$func_body" | grep -q 'jsl __mod16'; then
+        log_fail "$name: signed_mod incorrectly calls unsigned __mod16"
+        ((fail_count++))
+    fi
+
+    # unsigned_div must call __div16 (NOT __sdiv16)
+    func_body=$(sed -n '/^unsigned_div:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__div16'; then
+        log_fail "$name: unsigned_div does NOT call __div16"
+        ((fail_count++))
+    fi
+
+    # unsigned_mod must call __mod16 (NOT __smod16)
+    func_body=$(sed -n '/^unsigned_mod:/,/^[a-zA-Z_][a-zA-Z0-9_]*:/p' "$out" | sed '$d')
+    if ! echo "$func_body" | grep -q '__mod16'; then
+        log_fail "$name: unsigned_mod does NOT call __mod16"
+        ((fail_count++))
+    fi
+
+    if [[ $fail_count -gt 0 ]]; then
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
 # Test: Phase 5b — Non-leaf param aliasing + frame safety
 #
 # Phase 5b extends param alias propagation to non-leaf functions (fewer
@@ -3060,15 +3188,51 @@ test_acache_pha() {
         return
     fi
 
-    # call_with_computed(x): x+5 result should be pushed without storing to frame first
+    # call_with_computed(x): x+5 result should be pushed via pha (A-cache),
+    # not stored to frame first. Non-tail-call version to avoid tail-call
+    # rewriting the arg in-place (which requires sta and is correct).
     local fn2_body
     fn2_body=$(sed -n '/^call_with_computed:/,/^\.ENDS/p' "$out")
 
-    # Should NOT have sta instruction (dead store: result used only as next arg)
-    # Use tab prefix to avoid matching @start label
-    # Known bug: dead store elimination doesn't yet handle this pattern
-    if echo "$fn2_body" | grep -q "${TAB}sta"; then
-        log_known_bug "$name: call_with_computed has 'sta' (dead store not yet eliminated for computed args)"
+    # Should have pha (computed value pushed as arg directly from A)
+    if ! echo "$fn2_body" | grep -q "${TAB}pha"; then
+        log_fail "$name: call_with_computed missing pha (computed arg should be pushed via A-cache)"
+        ((TESTS_FAILED++))
+        return
+    fi
+
+    log_info "$name"
+    ((TESTS_PASSED++))
+}
+
+#------------------------------------------------------------------------------
+# Test: Phi-move A-cache correctness
+# When multiple phi moves are emitted in sequence, the A-cache must track
+# which Ref is actually in A. A stale cache causes phi moves to skip loads,
+# writing the wrong value. Regression: writestring showed only "P" instead
+# of "PLAYER 1 READY" because pos got st's phi value.
+#------------------------------------------------------------------------------
+test_phi_acache() {
+    local name="phi_acache"
+    local src="$SCRIPT_DIR/test_phi_acache.c"
+    local out="$BUILD/test_phi_acache.c.asm"
+    ((TESTS_RUN++))
+
+    compile_test "$name" "$src" "$out" || return
+
+    # In @if_join (the phi merge block), the phi moves for sp, pos, and st
+    # must each load from different slots. If A-cache is stale, the st phi
+    # move reuses A from the pos phi move (wrong value).
+    # Check: the phi merge block must have 3 separate lda instructions
+    # (one for each of sp_new, pos_new, st_new).
+    local join_body
+    join_body=$(sed -n '/@if_join/,/jmp @while_cond/p' "$out")
+
+    local lda_count
+    lda_count=$(echo "$join_body" | grep -c "${TAB}lda")
+    if [[ "$lda_count" -lt 3 ]]; then
+        log_fail "$name: if_join has only $lda_count lda (expected 3 — sp, pos, st need separate loads)"
+        ((TESTS_FAILED++))
         return
     fi
 
@@ -3484,6 +3648,7 @@ main() {
     test_variable_shift_u8_compound  # FIXED: u8 param + array + shift + OR-assign pattern
     test_ssa_phi_locals              # Regression: SSA phi-node confusion with many locals
     test_static_mutable              # FIXED: Mutable statics placed in RAMSECTION
+    test_struct_typedef_rodata       # FIXED: Uninitialized type->qual in mktype() caused false rodata
     test_const_data                  # Const arrays placed in ROM (SUPERFREE)
     test_multiply                    # FIXED: Inline *3,*5,*6,*7,*9,*10 + __mul16 stack convention
     test_return_value                # FIXED: Epilogue tax/txa preserves return value in A
@@ -3502,6 +3667,7 @@ main() {
     # === Phase 9: INC/DEC + A-cache pha + dead store arg tests ===
     test_inc_dec                     # INC/DEC for ±1 constants
     test_acache_pha                  # A-cache survives pha (no redundant loads)
+    test_phi_acache                  # Phi-move A-cache tracks actual Ref in A
 
     # === Phase 10: Comparison dead store for frameless conditionals ===
     test_cmp_dead_store              # Comparison jnz dead store → frameless conditional
@@ -3524,6 +3690,7 @@ main() {
     test_global_struct_init          # .data_init for initialized global structs
     test_u32_arithmetic              # 32-bit arithmetic on 16-bit CPU
     test_sign_promotion              # Signed/unsigned type promotion and extension
+    test_signed_division             # FIXED: Signed div/mod now call __sdiv16/__smod16
 
     echo ""
     echo "========================================"

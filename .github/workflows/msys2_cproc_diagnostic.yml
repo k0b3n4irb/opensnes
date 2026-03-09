@@ -1,0 +1,242 @@
+name: MSYS2 cproc Segfault Diagnostic
+
+# Focused diagnostic for non-deterministic cproc segfaults on MSYS2.
+# Builds cproc with ASan, runs known-failing patterns multiple times,
+# and captures crash details.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          msystem: UCRT64
+          install: >-
+            mingw-w64-ucrt-x86_64-clang
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-python
+            base-devel
+            git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # --------------------------------------------------------
+      # Step 1: Normal build (baseline)
+      # --------------------------------------------------------
+      - name: Build compiler (normal)
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          echo "=== System info ==="
+          uname -a
+          cc --version | head -2
+          echo "=== Building compiler ==="
+          make compiler 2>&1
+          echo "=== Binaries ==="
+          ls -la bin/
+          file bin/cproc-qbe.exe bin/qbe.exe 2>/dev/null || true
+          ldd bin/cproc-qbe.exe 2>/dev/null || true
+
+      # --------------------------------------------------------
+      # Step 2: Run known-failing tests 10x each (normal build)
+      # --------------------------------------------------------
+      - name: "Stress test: known-failing patterns (normal build)"
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          CC="./bin/cc65816"
+          TESTS=(
+            tests/compiler/test_union.c
+            tests/compiler/test_string_init.c
+            tests/compiler/test_nested_struct.c
+            tests/compiler/test_global_struct_init.c
+            tests/compiler/test_struct_ptr_init.c
+          )
+          RUNS=10
+          echo "=== Stress testing $RUNS runs per file ==="
+          for src in "${TESTS[@]}"; do
+            name=$(basename "$src" .c)
+            pass=0
+            fail=0
+            segfault=0
+            for i in $(seq 1 $RUNS); do
+              "$CC" "$src" -o /dev/null 2>/tmp/diag_err_${name}_${i}.txt && rc=0 || rc=$?
+              if [ $rc -eq 0 ]; then
+                pass=$((pass + 1))
+              elif [ $rc -eq 139 ] || grep -qi 'segmentation fault\|segfault' /tmp/diag_err_${name}_${i}.txt 2>/dev/null; then
+                segfault=$((segfault + 1))
+                echo "  SEGFAULT: $name run $i (exit=$rc)"
+                cat /tmp/diag_err_${name}_${i}.txt 2>/dev/null || true
+              else
+                fail=$((fail + 1))
+                echo "  FAIL: $name run $i (exit=$rc)"
+                cat /tmp/diag_err_${name}_${i}.txt 2>/dev/null || true
+              fi
+            done
+            echo "$name: $pass/$RUNS pass, $segfault segfault, $fail other fail"
+          done
+          echo "=== Stress test complete ==="
+
+      # --------------------------------------------------------
+      # Step 3: Run cproc directly (bypass cc65816) for details
+      # --------------------------------------------------------
+      - name: "Direct cproc invocation on failing files"
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          CPROC="./bin/cproc-qbe"
+          TESTS=(
+            tests/compiler/test_union.c
+            tests/compiler/test_string_init.c
+            tests/compiler/test_nested_struct.c
+            tests/compiler/test_global_struct_init.c
+            tests/compiler/test_struct_ptr_init.c
+          )
+          mkdir -p /tmp/diag_preprocessed
+
+          for src in "${TESTS[@]}"; do
+            name=$(basename "$src" .c)
+            echo "=== $name ==="
+
+            # Stage 1: preprocess and save
+            pp="/tmp/diag_preprocessed/${name}.pp.c"
+            cc -E "$src" > "$pp" 2>/dev/null || { echo "  preprocess FAILED"; continue; }
+            wc -c "$pp"
+
+            # Stage 2: run cproc 5x directly, capture stdout+stderr
+            for i in 1 2 3 4 5; do
+              "$CPROC" "$pp" > /tmp/diag_ir_${name}_${i}.qbe 2>/tmp/diag_cproc_${name}_${i}.err && rc=0 || rc=$?
+              if [ $rc -ne 0 ]; then
+                echo "  Run $i: EXIT=$rc"
+                echo "  stderr:"
+                cat /tmp/diag_cproc_${name}_${i}.err
+                echo "  IR size: $(wc -c < /tmp/diag_ir_${name}_${i}.qbe) bytes"
+                echo "  IR tail:"
+                tail -5 /tmp/diag_ir_${name}_${i}.qbe 2>/dev/null || true
+              else
+                echo "  Run $i: OK (IR=$(wc -c < /tmp/diag_ir_${name}_${i}.qbe) bytes)"
+              fi
+            done
+          done
+          echo "=== Direct invocation complete ==="
+
+      # --------------------------------------------------------
+      # Step 4: Build cproc with AddressSanitizer
+      # --------------------------------------------------------
+      - name: Build cproc with UBSan + debug
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          echo "=== Building cproc-qbe with UBSan + debug ==="
+          cd compiler/cproc
+          make clean
+
+          # ASan runtime not available on MSYS2 MinGW targets.
+          # Use UBSan (no runtime needed) + debug symbols for stack traces.
+          UBSAN="-fsanitize=undefined -fno-omit-frame-pointer -g -O1"
+          make CC="cc $UBSAN" LDFLAGS="-fsanitize=undefined" cproc-qbe 2>&1 || {
+            echo "UBSan build failed — trying plain debug build"
+            make clean
+            make CC="cc -g -O1" cproc-qbe 2>&1 || {
+              echo "Debug build failed — skipping"
+              cd ../..
+              exit 0
+            }
+          }
+
+          echo "=== Checking binary ==="
+          file cproc-qbe* || true
+          ldd cproc-qbe* 2>/dev/null || true
+
+          # Copy sanitized build
+          cp cproc-qbe ../../bin/cproc-qbe-asan 2>/dev/null || \
+          cp cproc-qbe.exe ../../bin/cproc-qbe-asan.exe 2>/dev/null || true
+          cd ../..
+
+      # --------------------------------------------------------
+      # Step 5: Run tests with UBSan/debug build
+      # --------------------------------------------------------
+      - name: "UBSan: run known-failing patterns"
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          ASAN_BIN="./bin/cproc-qbe-asan"
+          if [ ! -f "$ASAN_BIN" ] && [ ! -f "${ASAN_BIN}.exe" ]; then
+            echo "UBSan binary not found, skipping"
+            exit 0
+          fi
+          # Use .exe if present
+          [ -f "${ASAN_BIN}.exe" ] && ASAN_BIN="${ASAN_BIN}.exe"
+
+          export UBSAN_OPTIONS="halt_on_error=0:print_stacktrace=1"
+
+          TESTS=(
+            tests/compiler/test_union.c
+            tests/compiler/test_string_init.c
+            tests/compiler/test_nested_struct.c
+            tests/compiler/test_global_struct_init.c
+            tests/compiler/test_struct_ptr_init.c
+          )
+
+          for src in "${TESTS[@]}"; do
+            name=$(basename "$src" .c)
+            echo "=== UBSan: $name ==="
+
+            pp="/tmp/diag_preprocessed/${name}.pp.c"
+            [ -f "$pp" ] || cc -E "$src" > "$pp" 2>/dev/null
+
+            for i in 1 2 3; do
+              "$ASAN_BIN" "$pp" > /dev/null 2>/tmp/diag_asan_${name}_${i}.log && rc=0 || rc=$?
+              if [ $rc -ne 0 ]; then
+                echo "  Run $i: EXIT=$rc"
+                cat /tmp/diag_asan_${name}_${i}.log
+              else
+                echo "  Run $i: OK"
+              fi
+            done
+          done
+          echo "=== UBSan tests complete ==="
+
+      # --------------------------------------------------------
+      # Step 6: Run ALL compiler tests (for comparison)
+      # --------------------------------------------------------
+      - name: "Full compiler test suite"
+        continue-on-error: true
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          echo "=== Full compiler test suite ==="
+          ./tests/compiler/run_tests.sh -v --allow-known-bugs 2>&1
+
+      # --------------------------------------------------------
+      # Upload all diagnostic artifacts
+      # --------------------------------------------------------
+      - name: Collect diagnostics
+        if: always()
+        shell: msys2 {0}
+        run: |
+          mkdir -p diag_output
+          cp /tmp/diag_*.txt diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.err diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.log diag_output/ 2>/dev/null || true
+          cp /tmp/diag_*.qbe diag_output/ 2>/dev/null || true
+          cp /tmp/diag_preprocessed/*.pp.c diag_output/ 2>/dev/null || true
+          echo "=== Collected files ==="
+          ls -la diag_output/ 2>/dev/null || echo "(empty)"
+
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: msys2-cproc-diagnostics
+          path: diag_output/

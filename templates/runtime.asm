@@ -13,9 +13,13 @@
 .DEFINE __mul16 tcc_mul16
 .DEFINE __div16 tcc_div16
 .DEFINE __mod16 tcc_mod16
+.DEFINE __sdiv16 tcc_sdiv16
+.DEFINE __smod16 tcc_smod16
 .EXPORT __mul16
 .EXPORT __div16
 .EXPORT __mod16
+.EXPORT __sdiv16
+.EXPORT __smod16
 
 .SECTION ".runtime" SEMIFREE
 
@@ -125,8 +129,11 @@ tcc_div16:
     php
     rep #$30
 
-    ; Check if divisor fits in 8 bits
+    ; Division by zero guard: return quotient=0, remainder=0
     lda tcc__r1
+    beq @div_zero
+
+    ; Check if divisor fits in 8 bits
     and #$FF00
     bne @software_div
 
@@ -158,6 +165,13 @@ tcc_div16:
     plp
     rtl
 
+@div_zero:
+    ; Divisor is 0: return quotient=0, remainder=0 (deterministic)
+    stz tcc__r0
+    lda #0
+    plp
+    rtl
+
 @software_div:
     ; Software division for 16-bit divisor
     ; Simple shift-and-subtract algorithm
@@ -165,6 +179,7 @@ tcc_div16:
     sta tcc__r2         ; Quotient
     sta tcc__r3         ; Remainder
 
+    phx                 ; Save X (defensive: caller may rely on it)
     ldx #16             ; 16 bits
 
 @div_loop:
@@ -189,6 +204,8 @@ tcc_div16:
     dex
     bne @div_loop
 
+    plx                 ; Restore X
+
     ; Move results
     lda tcc__r3
     sta tcc__r1         ; Remainder
@@ -209,6 +226,99 @@ tcc_mod16:
     jsl tcc_div16
     lda tcc__r1         ; Remainder is in tcc__r1
     sta tcc__r0         ; A = remainder (returned in A for caller)
+    rtl
+
+;------------------------------------------------------------------------------
+; tcc_sdiv16 - Signed 16-bit division
+;------------------------------------------------------------------------------
+; Input:  tcc__r0 = dividend (signed)
+;         tcc__r1 = divisor (signed)
+; Output: tcc__r0 = quotient, A = quotient
+;         tcc__r1 = remainder
+;
+; Strategy: XOR signs to determine result sign, make both operands positive,
+; do unsigned division, negate result if signs differed.
+;------------------------------------------------------------------------------
+tcc_sdiv16:
+    php
+    rep #$30
+
+    ; XOR operand signs → bit 15 = result sign
+    lda tcc__r0
+    eor tcc__r1
+    pha                     ; save combined sign on stack
+
+    ; Make dividend positive
+    lda tcc__r0
+    bpl @sdiv_dpos
+    eor #$FFFF
+    inc a
+    sta tcc__r0
+@sdiv_dpos:
+    ; Make divisor positive
+    lda tcc__r1
+    bpl @sdiv_vpos
+    eor #$FFFF
+    inc a
+    sta tcc__r1
+@sdiv_vpos:
+    jsl tcc_div16           ; unsigned: r0=quotient, r1=remainder
+
+    ; Negate quotient if signs differed
+    pla                     ; combined sign
+    bpl @sdiv_done
+    lda tcc__r0
+    eor #$FFFF
+    inc a
+    sta tcc__r0
+@sdiv_done:
+    lda tcc__r0
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; tcc_smod16 - Signed 16-bit modulo
+;------------------------------------------------------------------------------
+; Input:  tcc__r0 = dividend (signed)
+;         tcc__r1 = divisor (signed)
+; Output: tcc__r0 = remainder, A = remainder
+;
+; Remainder sign follows the dividend sign (C99/C11 semantics).
+;------------------------------------------------------------------------------
+tcc_smod16:
+    php
+    rep #$30
+
+    ; Save dividend sign
+    lda tcc__r0
+    pha
+
+    ; Make dividend positive
+    bpl @smod_dpos
+    eor #$FFFF
+    inc a
+    sta tcc__r0
+@smod_dpos:
+    ; Make divisor positive
+    lda tcc__r1
+    bpl @smod_vpos
+    eor #$FFFF
+    inc a
+    sta tcc__r1
+@smod_vpos:
+    jsl tcc_div16           ; unsigned: r0=quotient, r1=remainder
+
+    ; Negate remainder if dividend was negative
+    pla                     ; original dividend
+    bpl @smod_done
+    lda tcc__r1
+    eor #$FFFF
+    inc a
+    sta tcc__r1
+@smod_done:
+    lda tcc__r1
+    sta tcc__r0
+    plp
     rtl
 
 .ENDS
