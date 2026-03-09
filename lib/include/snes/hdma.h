@@ -61,6 +61,13 @@
  * @note HDMA channels 6-7 are recommended to avoid conflicts with DMA.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
+ * ## Bank Byte Limitation
+ *
+ * hdmaSetup() hardcodes bank $00 for ROM addresses (>= $8000). If the
+ * linker places a SUPERFREE table in bank $01+, HDMA will read wrong data.
+ * Use hdmaSetupBank() with an explicit bank byte for ROM tables, or use
+ * RAM-based tables (always bank $00) for dynamic effects.
+ *
  * ## IMPORTANT: Scroll Registers Require Repeat Mode
  *
  * BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that
@@ -360,7 +367,7 @@ void hdmaWaveInit(void);
  *
  * @param channel HDMA channel to use (6 or 7 recommended)
  * @param bg Background layer to affect (0=BG1, 1=BG2, 2=BG3)
- * @param amplitude Wave amplitude in pixels (1-16)
+ * @param amplitude Wave amplitude in pixels (1-60, clamped internally)
  * @param frequency Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.
  *
  * @code
@@ -522,9 +529,10 @@ void hdmaIrisWipeStop(u8 channel);
  *
  * @param channel HDMA channel (6 or 7 recommended)
  * @param bg Background layer (0=BG1, 1=BG2, 2=BG3)
- * @param amplitude Maximum ripple amplitude at bottom of screen (1-16 pixels)
+ * @param amplitude Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped)
  * @param speed Animation speed (1=slow, 4=fast)
  *
+ * @note Amplitude is clamped to 60 to prevent s16 overflow in sine computation.
  * @note Cannot be used simultaneously with hdmaWaveH (shared buffers).
  * @note Call hdmaWaveUpdate() each frame to animate.
  * @note Call hdmaWaveStop() to stop the effect.
