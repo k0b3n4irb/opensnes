@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds_mode7.ht
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md747"></a>
+    <h2><a class="anchor" id="autotoc_md748"></a>
 What This Example Shows</h2>
 <p>How to use the SNES Mode 7 &ndash; a special background mode that applies an affine transformation (rotation + scaling) to a single 128x128 tile layer. This is the same technique behind F-Zero's ground, Mario Kart's tracks, and Pilotwings' maps.</p>
-<h2><a class="anchor" id="autotoc_md748"></a>
+<h2><a class="anchor" id="autotoc_md749"></a>
 Prerequisites</h2>
 <p>Read <code>backgrounds/mode1</code> first (basic background setup). Mode 7 is fundamentally different from tile-based modes but the initialization flow is similar.</p>
-<h2><a class="anchor" id="autotoc_md749"></a>
+<h2><a class="anchor" id="autotoc_md750"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -120,21 +120,21 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down   </td><td class="markdownTableBodyNone">Zoom in (magnify)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md750"></a>
+<h2><a class="anchor" id="autotoc_md751"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/backgrounds/mode7</div>
 </div><!-- fragment --><p>Then open <code>mode7.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md751"></a>
+<h2><a class="anchor" id="autotoc_md752"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md752"></a>
+<h3><a class="anchor" id="autotoc_md753"></a>
 1. Mode 7 VRAM format</h3>
 <p>Mode 7 uses a special interleaved VRAM format:</p><ul>
 <li><b>Even bytes</b>: tilemap entries (128x128 = 16,384 tiles)</li>
 <li><b>Odd bytes</b>: pixel data (256 tiles, 8x8, 256 colors each)</li>
 </ul>
 <p>This is completely different from Modes 0-3 where tilemap and tile data are in separate VRAM regions. The loading is handled by <code>asm_loadMode7Data()</code> in data.asm, which uses <code><a class="el" href="dma_8h.html#a6e380a37b7453d36c6dd881bb7a374f2" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a></code> to write both the tilemap and tile data into the interleaved format the PPU expects.</p>
-<h3><a class="anchor" id="autotoc_md753"></a>
+<h3><a class="anchor" id="autotoc_md754"></a>
 2. Initialize the transformation</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a>, 0);</div>
 <div class="line"><a class="code hl_function" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a>();</div>
@@ -146,7 +146,7 @@ How It Works</h2>
 <div class="ttc" id="amode7_8h_html_ab0ab87a9cdbf57823ba802fb068c5cbc"><div class="ttname"><a href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a></div><div class="ttdeci">void mode7Init(void)</div><div class="ttdoc">Initialize Mode 7.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p><code><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></code> sets the rotation center to the screen center (128, 128). Scale <code>0x0200</code> = 2.0 in 8.8 fixed-point &ndash; this shows the map at a comfortable zoom level. Scale <code>0x0100</code> would be 1.0 (one texel per pixel).</p>
-<h3><a class="anchor" id="autotoc_md754"></a>
+<h3><a class="anchor" id="autotoc_md755"></a>
 3. Update the matrix every frame</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    angle++;</div>
@@ -154,7 +154,7 @@ How It Works</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 </div><!-- fragment --><p><code><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></code> recalculates the 2x2 transformation matrix (registers M7A-M7D at $211B-$211E) using the current angle and scale. The angle is 0-255, mapping to 0-360 degrees.</p>
-<h3><a class="anchor" id="autotoc_md755"></a>
+<h3><a class="anchor" id="autotoc_md756"></a>
 4. Zoom control</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
 <div class="line">    <span class="keywordflow">if</span> (zscale &lt; 0x0F00) zscale += 16;</div>
@@ -163,9 +163,9 @@ How It Works</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 </div><!-- fragment --><p>After changing the scale, you must call <code><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></code> again because the matrix depends on both angle and scale. The scale range is clamped to <code>0x0010</code>-<code>0x0F00</code> &ndash; values outside this range produce extreme distortion.</p>
-<h2><a class="anchor" id="autotoc_md756"></a>
+<h2><a class="anchor" id="autotoc_md757"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md757"></a>
+<h3><a class="anchor" id="autotoc_md758"></a>
 Affine Transformation</h3>
 <p>Mode 7 applies a 2x2 matrix to BG1. The matrix encodes rotation, scaling, and skew. The hardware computes the transform per-scanline using four registers:</p>
 <table class="markdownTable">
@@ -180,16 +180,16 @@ Affine Transformation</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">M7D   </td><td class="markdownTableBodyNone">$211E   </td><td class="markdownTableBodyNone">Matrix element D (cosine * scale)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md758"></a>
+<h3><a class="anchor" id="autotoc_md759"></a>
 One Layer Only</h3>
 <p>Mode 7 supports exactly one background (BG1). No BG2/BG3/BG4. Sprites still work normally on top, which is how F-Zero renders its cars.</p>
-<h3><a class="anchor" id="autotoc_md759"></a>
+<h3><a class="anchor" id="autotoc_md760"></a>
 256-Color Palette</h3>
 <p>Each Mode 7 tile uses 256 colors (8bpp), unlike Modes 0-3 which use 2/4/8 colors per palette. This gives richer visuals but limits you to 256 unique tiles total.</p>
-<h3><a class="anchor" id="autotoc_md760"></a>
+<h3><a class="anchor" id="autotoc_md761"></a>
 8.8 Fixed-Point Scale</h3>
 <p><code>0x0100</code> = 1.0x (normal), <code>0x0200</code> = 2.0x (zoomed out, shows more area), <code>0x0080</code> = 0.5x (zoomed in, magnifies). The integer part is the high byte, the fractional part is the low byte.</p>
-<h2><a class="anchor" id="autotoc_md761"></a>
+<h2><a class="anchor" id="autotoc_md762"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -203,7 +203,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma background sprite input mode7</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md762"></a>
+<h2><a class="anchor" id="autotoc_md763"></a>
 Going Further</h2>
 <ul>
 <li><b>Add scrolling</b>: Use <code>mode7SetPos()</code> to pan across the Mode 7 plane with the D-pad while rotating. This is how F-Zero navigates its tracks.</li>

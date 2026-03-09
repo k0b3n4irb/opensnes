@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds_continuo
 <p>&zwj;Two-layer parallax scrolling with a player sprite that triggers camera movement. Move with the D-pad. Walk past the threshold and the world scrolls to follow. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md645"></a>
+<h2><a class="anchor" id="autotoc_md646"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -108,12 +108,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-Pad   </td><td class="markdownTableBodyNone">Move the character   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md646"></a>
+<h2><a class="anchor" id="autotoc_md647"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/backgrounds/continuous_scroll</div>
 </div><!-- fragment --><p>Then open <code>continuous_scroll.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md647"></a>
+<h2><a class="anchor" id="autotoc_md648"></a>
 What You'll Learn</h2>
 <ul>
 <li>How SNES background scrolling actually works (it's not moving tiles — it's moving the camera)</li>
@@ -122,9 +122,9 @@ What You'll Learn</h2>
 <li>Why scroll register updates must happen during VBlank (and how to guarantee it)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md649"></a>
+<h2><a class="anchor" id="autotoc_md650"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md650"></a>
+<h3><a class="anchor" id="autotoc_md651"></a>
 1. Two Layers, Two Speeds</h3>
 <p>This example uses Mode 1 with two background layers: BG1 is the main scene, BG2 is a distant backdrop. When the camera scrolls, BG1 moves at full speed while BG2 moves slower, creating the illusion of depth. Think of the background layers in Streets of Rage 2 — that's exactly this technique.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
@@ -147,7 +147,7 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why palette slot 2 and 4?</b> Each BG palette slot holds 16 colors. Slot 0 starts at CGRAM address 0, slot 2 at address 32, slot 4 at address 64. Using different slots means BG1 and BG2 get independent color palettes. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md651"></a>
+<h3><a class="anchor" id="autotoc_md652"></a>
 2. The Threshold Scroll Pattern</h3>
 <p>The player moves freely on screen. But when they reach a threshold (column 140 going right, column 80 going left), the background starts scrolling and the player gets pushed back:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SCROLL_THRESHOLD_RIGHT 140</span></div>
@@ -162,7 +162,7 @@ Walkthrough</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why push the player back?</b> Without <code>player_x -= 1</code>, the player would walk past the threshold and keep going off-screen. The push-back keeps them locked to the threshold while the world scrolls beneath them. This is the same pattern used in Super Mario World's camera system. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md652"></a>
+<h3><a class="anchor" id="autotoc_md653"></a>
 3. The VBlank Callback</h3>
 <p>Scroll registers are write-only and take effect immediately. If you write them during active display (while the PPU is drawing), you'll get a visible tear — the top half of the screen shows the old scroll position, the bottom half shows the new one.</p>
 <p>The fix: update scroll registers during VBlank, when the PPU isn't drawing. This example uses a VBlank callback:</p>
@@ -182,7 +182,7 @@ Walkthrough</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>What's the <code>1</code> in <code>nmiSetBank</code>?</b> It's the ROM bank number. In LoROM, your code lives in bank 1 ($8000-$FFFF of the second 32KB). The NMI handler needs the bank number to do a long call to your function. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md653"></a>
+<h3><a class="anchor" id="autotoc_md654"></a>
 4. The Game State Struct</h3>
 <p>All game variables live in one struct:</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
@@ -201,7 +201,7 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why a struct instead of separate variables?</b> The OpenSNES compiler has a known quirk: separate <code>static u16</code> variables can generate broken code for some access patterns, while struct members work correctly. Using a struct also keeps related state together, which makes the code easier to follow. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md654"></a>
+<h3><a class="anchor" id="autotoc_md655"></a>
 5. The Main Loop</h3>
 <p>One frame, one iteration. Read input, move player, check thresholds, update sprite:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -232,7 +232,7 @@ Walkthrough</h2>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 </div><!-- fragment --><p>The sprite position updates via <code><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></code>, and the NMI handler automatically DMAs the OAM buffer to hardware — no manual <code><a class="el" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260" title="Copy OAM buffer to hardware.">oamUpdate()</a></code> needed inside the loop.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md656"></a>
+<h2><a class="anchor" id="autotoc_md657"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Scrolling tears or flickers?</b> Your scroll registers are being written during active display. Make sure all <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> calls happen in the VBlank callback, not in the main loop.</li>
@@ -241,7 +241,7 @@ Tips &amp; Tricks</h2>
 <li><b>Sprite disappears at the left edge?</b> The SNES uses 9-bit X coordinates for sprites. Values below 0 wrap to 256+, which is off-screen. Clamp <code>player_x</code> to a minimum of 0.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md658"></a>
+<h2><a class="anchor" id="autotoc_md659"></a>
 Go Further</h2>
 <ul>
 <li><b>Add tile streaming:</b> Right now the tilemap is static. For larger worlds, you'd upload new tile columns as the camera scrolls. See <a href="../../../games/likemario/">LikeMario</a> for a working implementation.</li>
@@ -250,16 +250,16 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../../../games/likemario/">LikeMario</a> — full platformer with gravity, collision, and tile streaming.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md660"></a>
+<h2><a class="anchor" id="autotoc_md661"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md661"></a>
+<h3><a class="anchor" id="autotoc_md662"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := continuous_scroll.sfc</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console sprite input background dma</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">ASMSRC      := data.asm</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md662"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md663"></a>
 Why &lt;tt&gt;ASMSRC&lt;/tt&gt; for Background Data?</h3>
 <p><code>data.asm</code> is the asset container. It includes pre-converted tile data, tilemaps, palettes, and the player sprite — all as binary blobs via <code>.INCBIN</code>:</p>
 <div class="fragment"><div class="line">.SECTION &quot;.bg1_tiles&quot; SUPERFREE</div>
@@ -270,7 +270,7 @@ Why &lt;tt&gt;ASMSRC&lt;/tt&gt; for Background Data?</h3>
 <div class="line">bg1_map: .INCBIN &quot;res/bg1.map&quot;</div>
 <div class="line">.ENDS</div>
 </div><!-- fragment --><p>The <code>SUPERFREE</code> directive tells the linker "put this in any ROM bank with space." Background tile sets can be 4-8 KB each — far too large for bank $00 WRAM. In ROM, they cost nothing at runtime and get DMA'd to VRAM during initialization.</p>
-<h3><a class="anchor" id="autotoc_md663"></a>
+<h3><a class="anchor" id="autotoc_md664"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -289,7 +289,7 @@ Why These Modules?</h3>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why <code>background</code> here but not in Hello World?</b> Hello World writes scroll and tilemap registers directly. This example uses <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> in a VBlank callback — the background module provides that function and manages the double-write protocol that 16-bit scroll registers require (write low byte, then high byte, to the same address). </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md664"></a>
+<h3><a class="anchor" id="autotoc_md665"></a>
 The gfx4snes Tool</h3>
 <p>The background art in <code>res/</code> was converted from PNG source images:</p>
 <div class="fragment"><div class="line">gfx4snes -s 8 -p -i bg1.png    # 8x8 tiles, generate palette</div>
@@ -301,7 +301,7 @@ The gfx4snes Tool</h3>
 </ol>
 <p>The output files (<code>.pic</code> for tiles, <code>.pal</code> for palette, <code>.map</code> for tilemap) are raw binary — exactly the format the PPU expects. DMA them to VRAM and they just work.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md666"></a>
+<h2><a class="anchor" id="autotoc_md667"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -321,7 +321,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">INIDISP   </td><td class="markdownTableBodyNone">$2100   </td><td class="markdownTableBodyNone">Force blank / brightness control   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md667"></a>
+<h2><a class="anchor" id="autotoc_md668"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -333,7 +333,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite input background dma</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md668"></a>
+<h2><a class="anchor" id="autotoc_md669"></a>
 Credits</h2>
 <ul>
 <li>Original: odelot (PVSnesLib example)</li>

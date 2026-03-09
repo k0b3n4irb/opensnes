@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('examples_games_likemario.html',''); in
 <p>&zwj;A side-scrolling platformer with gravity, tile collision, and a camera that follows the player across a world bigger than the screen. This is the real deal. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md602"></a>
+<h2><a class="anchor" id="autotoc_md603"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -110,12 +110,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A   </td><td class="markdownTableBodyNone">Jump (hold Up + A for higher jump)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md603"></a>
+<h2><a class="anchor" id="autotoc_md604"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/games/likemario</div>
 </div><!-- fragment --><p>Then open <code>likemario.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md604"></a>
+<h2><a class="anchor" id="autotoc_md605"></a>
 What You'll Learn</h2>
 <ul>
 <li>How tile streaming works — loading new map columns into VRAM as the camera scrolls</li>
@@ -125,20 +125,20 @@ What You'll Learn</h2>
 <li>Why the camera position and the scroll register are two different things</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md606"></a>
+<h2><a class="anchor" id="autotoc_md607"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md607"></a>
+<h3><a class="anchor" id="autotoc_md608"></a>
 1. The World Is Bigger Than the Screen</h3>
 <p>The SNES screen is 256 pixels wide — 32 tiles. But the LikeMario map is hundreds of tiles wide. The PPU's tilemap is only 32x32 entries, so you can't load the entire world at once. Instead, the game streams new tile columns into VRAM as the camera scrolls.</p>
 <p>Think of the tilemap as a circular buffer. As the camera moves right, the leftmost column scrolls off-screen. That column's VRAM slot gets overwritten with the next column from the map. The player never sees the swap because it happens off-screen.</p>
-<h3><a class="anchor" id="autotoc_md608"></a>
+<h3><a class="anchor" id="autotoc_md609"></a>
 2. The VRAM Layout</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#define VRAM_SPR_LARGE  0x0000   </span><span class="comment">// Sprite graphics</span></div>
 <div class="line"><span class="preprocessor">#define VRAM_SPR_SMALL  0x1000   </span><span class="comment">// Sprite graphics (small)</span></div>
 <div class="line"><span class="preprocessor">#define VRAM_BG_TILES   0x2000   </span><span class="comment">// Background tileset</span></div>
 <div class="line"><span class="preprocessor">#define VRAM_BG_MAP     0x6800   </span><span class="comment">// Background tilemap (32x32)</span></div>
 </div><!-- fragment --><p>The tileset (the pixel art for every unique tile) lives at <code>$2000</code>. The tilemap (which tile goes where) lives at <code>$6800</code>. Sprites get <code>$0000</code>-<code>$1FFF</code>. This layout avoids overlaps and leaves room for the 32x32 tilemap to wrap around.</p>
-<h3><a class="anchor" id="autotoc_md609"></a>
+<h3><a class="anchor" id="autotoc_md610"></a>
 3. Streaming: The Column Pipeline</h3>
 <p>Streaming happens in three stages, split across the frame:</p>
 <p><b>During active display</b> (CPU is free, PPU is drawing): </p><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> map_prepare_column(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> map_col, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_col) {</div>
@@ -168,7 +168,7 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why +32, not +31?</b> The screen shows tiles 0-31, but tile 32 is partially visible at the right edge (the camera rarely sits on an exact tile boundary). Without that extra column, you'd see a blank strip flickering at the right side during scrolling. This was a bug in the original port that took a while to track down. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md610"></a>
+<h3><a class="anchor" id="autotoc_md611"></a>
 4. Fixed-Point Physics</h3>
 <p>The 65816 has no multiply instruction and runs at 3.58 MHz. You can't afford floating-point anything. Instead, positions and velocities use <b>8-bit fixed-point</b>: the high byte is the pixel position, the low byte is the fractional part (1/256th of a pixel).</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> mario_xvel;     <span class="comment">/* Velocity: units of 1/256 pixel per frame */</span></div>
@@ -184,7 +184,7 @@ Walkthrough</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>What's <code>asr8()</code>?</b> Arithmetic shift right by 8 — effectively dividing by 256 while preserving the sign. The compiler's <code>&gt;&gt;</code> operator uses logical shift (LSR), which fills the top bit with 0 instead of the sign bit. For negative velocities (moving left), this gives the wrong answer. <code>asr8()</code> is a workaround that inverts, shifts, and inverts back. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md611"></a>
+<h3><a class="anchor" id="autotoc_md612"></a>
 5. Gravity in Two Lines</h3>
 <div class="fragment"><div class="line">mario_yvel += GRAVITY;                <span class="comment">/* Accelerate downward every frame */</span></div>
 <div class="line"><span class="keywordflow">if</span> (mario_yvel &gt; 0x0400) mario_yvel = 0x0400;  <span class="comment">/* Terminal velocity */</span></div>
@@ -199,7 +199,7 @@ Walkthrough</h2>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md612"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md613"></a>
 6. Tile-Based Collision</h3>
 <p>No bounding boxes, no sprite lists. The world is made of tiles, and collision is a lookup:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> map_get_tile_prop(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> px, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> py) {</div>
@@ -222,7 +222,7 @@ Walkthrough</h2>
 <div class="line">}</div>
 <div class="ttc" id="amap_8h_html_a227eedee0994ff2eac6ed2b691d9bcb3"><div class="ttname"><a href="map_8h.html#a227eedee0994ff2eac6ed2b691d9bcb3">ACT_STAND</a></div><div class="ttdeci">#define ACT_STAND</div><div class="ttdef"><b>Definition</b> map.h:91</div></div>
 </div><!-- fragment --><p>Two points, not one, because Mario is 16 pixels wide. Testing only the center would let him hang off ledges with half his body in mid-air.</p>
-<h3><a class="anchor" id="autotoc_md613"></a>
+<h3><a class="anchor" id="autotoc_md614"></a>
 7. The Main Loop</h3>
 <p>One frame, one iteration. Game logic runs during active display, VRAM writes during VBlank:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -250,7 +250,7 @@ Walkthrough</h2>
 <div class="ttc" id="asprite_8h_html_ac9eb3b2751e5b744470cd16453ff3261"><div class="ttname"><a href="sprite_8h.html#ac9eb3b2751e5b744470cd16453ff3261">oamInitDynamicSpriteEndFrame</a></div><div class="ttdeci">void oamInitDynamicSpriteEndFrame(void)</div><div class="ttdoc">End frame processing for dynamic sprites.</div></div>
 </div><!-- fragment --><p>The split is strict: everything above <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> touches only RAM. Everything below it writes to hardware. Break this rule and you get visual corruption.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md615"></a>
+<h2><a class="anchor" id="autotoc_md616"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Mario falls through the floor?</b> Check your collision points. If <code>mario_y + 16</code> overshoots by even one pixel, the tile lookup returns the row below the floor — empty space — and Mario keeps falling.</li>
@@ -259,7 +259,7 @@ Tips &amp; Tricks</h2>
 <li><b>Scrolling tears or flickers?</b> <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> must happen during VBlank. If it's called during active display, the top and bottom halves of the screen scroll by different amounts for one frame.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md617"></a>
+<h2><a class="anchor" id="autotoc_md618"></a>
 Go Further</h2>
 <ul>
 <li><b>Add enemies:</b> Use a second sprite with its own collision box. Check overlap with Mario each frame. Start simple — a Goomba that walks left until it hits a wall.</li>
@@ -268,16 +268,16 @@ Go Further</h2>
 <li><b>Study the physics:</b> Change <code>GRAVITY</code>, <code>MARIO_ACCEL</code>, and <code>MARIO_JUMPING</code>. Small tweaks completely change how the game feels. This is how real platformers are tuned.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md619"></a>
+<h2><a class="anchor" id="autotoc_md620"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md620"></a>
+<h3><a class="anchor" id="autotoc_md621"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := likemario.sfc</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">ASMSRC      := data.asm</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md621"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md622"></a>
 Asset Conversion with gfx4snes</h3>
 <p>The Makefile includes custom rules for two different asset types:</p>
 <div class="fragment"><div class="line"># Background tiles: 8x8, 4bpp, 16 colors</div>
@@ -303,7 +303,7 @@ Asset Conversion with gfx4snes</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>-i</code>   </td><td class="markdownTableBodyNone">Input file (PNG format, the default)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md622"></a>
+<h3><a class="anchor" id="autotoc_md623"></a>
 Why So Many Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -323,7 +323,7 @@ Why So Many Modules?</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>background</code>   </td><td class="markdownTableBodyNone"><code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code>, <code><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a></code>, <code><a class="el" href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a></code>   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md623"></a>
+<h3><a class="anchor" id="autotoc_md624"></a>
 Data Placement</h3>
 <p><code>data.asm</code> uses two different section types for a reason:</p>
 <div class="fragment"><div class="line">; Graphics — accessed only via DMA, can be in any ROM bank</div>
@@ -339,7 +339,7 @@ Data Placement</h3>
 <div class="line">.ENDS</div>
 </div><!-- fragment --><p>The map data is in <code>SEMIFREE BANK 0</code> because the compiler generates <code>lda.l $0000,x</code> for array accesses — which always reads from bank $00. If the map were in bank $01, every tile lookup would return garbage.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md625"></a>
+<h2><a class="anchor" id="autotoc_md626"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -359,7 +359,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">INIDISP   </td><td class="markdownTableBodyNone">$2100   </td><td class="markdownTableBodyNone">Force blank during init   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md626"></a>
+<h2><a class="anchor" id="autotoc_md627"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -383,7 +383,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md627"></a>
+<h2><a class="anchor" id="autotoc_md628"></a>
 Credits</h2>
 <ul>
 <li>Original: alekmaul (PVSnesLib example)</li>

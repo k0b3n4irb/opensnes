@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_memory_save_game.html',''); i
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1176"></a>
+    <h2><a class="anchor" id="autotoc_md1177"></a>
 What This Example Shows</h2>
 <p>How to save and load game data using the SNES cartridge SRAM (Static RAM). The SRAM is battery-backed &ndash; data persists even when the console is powered off. This is how classic SNES games like Zelda and Final Fantasy save progress.</p>
-<h2><a class="anchor" id="autotoc_md1177"></a>
+<h2><a class="anchor" id="autotoc_md1178"></a>
 Prerequisites</h2>
 <p>Read <code>text/hello_world</code> first (console setup, text display).</p>
-<h2><a class="anchor" id="autotoc_md1178"></a>
+<h2><a class="anchor" id="autotoc_md1179"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -120,14 +120,14 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Y   </td><td class="markdownTableBodyNone">Read and display Slot 2   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1179"></a>
+<h2><a class="anchor" id="autotoc_md1180"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/save_game</div>
 </div><!-- fragment --><p>Then open <code>save_game.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md1180"></a>
+<h2><a class="anchor" id="autotoc_md1181"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1181"></a>
+<h3><a class="anchor" id="autotoc_md1182"></a>
 1. Define a save structure</h3>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> posX, posY;</div>
@@ -136,23 +136,23 @@ How It Works</h2>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --><p>The structure is 8 bytes. In a real game, this would hold player position, inventory, level progress, etc.</p>
-<h3><a class="anchor" id="autotoc_md1182"></a>
+<h3><a class="anchor" id="autotoc_md1183"></a>
 2. Save to SRAM</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#adc12b01aadf1604c033fbf838eeb4abc">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;vts, SAVE_SIZE, SAVE_SIZE * SLOT1);</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="asram_8h_html_adc12b01aadf1604c033fbf838eeb4abc"><div class="ttname"><a href="sram_8h.html#adc12b01aadf1604c033fbf838eeb4abc">sramSaveOffset</a></div><div class="ttdeci">void sramSaveOffset(u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
 </div><!-- fragment --><p><code><a class="el" href="sram_8h.html#adc12b01aadf1604c033fbf838eeb4abc" title="Save data to SRAM at offset.">sramSaveOffset()</a></code> copies <code>SAVE_SIZE</code> bytes from RAM to SRAM at the given offset. Multiple save slots use different offsets (Slot 0 at offset 0, Slot 1 at offset 8, etc.).</p>
-<h3><a class="anchor" id="autotoc_md1183"></a>
+<h3><a class="anchor" id="autotoc_md1184"></a>
 3. Load from SRAM</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;vtl, SAVE_SIZE, SAVE_SIZE * SLOT1);</div>
 <div class="ttc" id="asram_8h_html_ab68f968d67c1b0afcfef2aeb92c92002"><div class="ttname"><a href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --><p><code><a class="el" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002" title="Load data from SRAM at offset.">sramLoadOffset()</a></code> copies bytes back from SRAM into a RAM structure. The loaded values are then displayed as hex on screen using <code><a class="el" href="text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab" title="Print an unsigned integer in hexadecimal.">textPrintHex()</a></code>.</p>
-<h3><a class="anchor" id="autotoc_md1184"></a>
+<h3><a class="anchor" id="autotoc_md1185"></a>
 4. Enable SRAM in the Makefile</h3>
 <div class="fragment"><div class="line">USE_SRAM = 1</div>
 <div class="line">SRAM_SIZE = 3</div>
 </div><!-- fragment --><p><code>USE_SRAM</code> sets the ROM header flag telling the emulator (or real hardware) that the cartridge has battery-backed SRAM. <code>SRAM_SIZE = 3</code> means 8 KB (2^3 = 8 KB).</p>
-<h3><a class="anchor" id="autotoc_md1185"></a>
+<h3><a class="anchor" id="autotoc_md1186"></a>
 5. Text display</h3>
 <p>The example uses the text system on BG1 in Mode 0 (2bpp):</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a>();</div>
@@ -165,21 +165,21 @@ How It Works</h2>
 <div class="ttc" id="atext_8h_html_a055579e7b75458617363a27f1224bc99"><div class="ttname"><a href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a></div><div class="ttdeci">void textInit(void)</div><div class="ttdoc">Initialize text system with default configuration.</div></div>
 <div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
 </div><!-- fragment --><p>After each save/load operation, <code><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></code> updates the on-screen feedback and <code><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM.">textFlush()</a></code> sends the updated text buffer to VRAM.</p>
-<h2><a class="anchor" id="autotoc_md1186"></a>
+<h2><a class="anchor" id="autotoc_md1187"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1187"></a>
+<h3><a class="anchor" id="autotoc_md1188"></a>
 SRAM Address Space</h3>
 <p>In LoROM mode, SRAM is mapped at <code>$70:0000-$71:FFFF</code> (up to 64 KB, though most cartridges have 8 KB). In HiROM mode, it appears at <code>$20:6000-$3F:7FFF</code>. The <code><a class="el" href="sram_8h.html#adc12b01aadf1604c033fbf838eeb4abc" title="Save data to SRAM at offset.">sramSaveOffset()</a></code> and <code><a class="el" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002" title="Load data from SRAM at offset.">sramLoadOffset()</a></code> functions handle the addressing &ndash; you just provide a byte offset.</p>
-<h3><a class="anchor" id="autotoc_md1188"></a>
+<h3><a class="anchor" id="autotoc_md1189"></a>
 Save Slots</h3>
 <p>Save slots are simply offsets into SRAM. With 8 KB of SRAM and 8-byte saves, you could theoretically have 1024 slots. Real games use 3-4 slots with larger structures (100-500 bytes for RPG save states).</p>
-<h3><a class="anchor" id="autotoc_md1189"></a>
+<h3><a class="anchor" id="autotoc_md1190"></a>
 Checksum Validation</h3>
 <p>This example does not validate saves. A real game should store a checksum alongside the save data to detect corrupted SRAM (weak battery, first boot with uninitialized RAM, etc.). A simple XOR or CRC-8 of the save bytes suffices.</p>
-<h3><a class="anchor" id="autotoc_md1190"></a>
+<h3><a class="anchor" id="autotoc_md1191"></a>
 Battery Persistence</h3>
 <p>On real SNES hardware, a CR2032 lithium battery in the cartridge powers the SRAM when the console is off. Batteries last 15-25 years. In emulators, the SRAM is saved to a <code>.srm</code> file on disk.</p>
-<h2><a class="anchor" id="autotoc_md1191"></a>
+<h2><a class="anchor" id="autotoc_md1192"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -189,7 +189,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>USE_SRAM := 1</code>, <code>LIB_MODULES := console dma text background sprite input</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1192"></a>
+<h2><a class="anchor" id="autotoc_md1193"></a>
 Going Further</h2>
 <ul>
 <li><b>Add a checksum</b>: Before saving, compute a checksum of the data bytes and store it alongside the save. On load, verify the checksum and display "CORRUPT" if it does not match.</li>

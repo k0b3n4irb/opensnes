@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('md__2home_2runner_2work_2opensnes_2ope
 <p>&zwj;<b>One-line summary</b>: what this example does, visible on screen. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md1204"></a>
+<h2><a class="anchor" id="autotoc_md1205"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -110,11 +110,11 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A   </td><td class="markdownTableBodyNone">...   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1205"></a>
+<h2><a class="anchor" id="autotoc_md1206"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">make -C examples/category/example_name</div>
 <div class="line"># Open the .sfc in Mesen2</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1206"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1207"></a>
 What You'll Learn</h2>
 <p>List the <b>SNES hardware concepts</b> taught by this example, not C functions:</p>
 <ul>
@@ -122,10 +122,10 @@ What You'll Learn</h2>
 <li>The difference between video modes (Mode 0 vs Mode 1)</li>
 <li>Why VRAM writes must happen during VBlank</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1207"></a>
+<h2><a class="anchor" id="autotoc_md1208"></a>
 Walkthrough</h2>
 <p>The heart of the README. Explain the code <b>in execution order</b>, not file order. Each section corresponds to a logical step.</p>
-<h3><a class="anchor" id="autotoc_md1208"></a>
+<h3><a class="anchor" id="autotoc_md1209"></a>
 1. Initialization</h3>
 <p>Explain what <code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code> and <code><a class="el" href="video_8h.html#ad89d023577743a32d3407027e535b0ff" title="Set background mode.">setMode()</a></code> do in the context of this example. Don't repeat the API docs — explain <b>why</b> this choice is made here.</p>
 <div class="fragment"><div class="line"><span class="comment">// Direct excerpt from this example&#39;s main.c</span></div>
@@ -137,7 +137,7 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why Mode 1?</b> It's the most common mode on the SNES (Super Mario World, Street Fighter II). Good balance between colors per layer (16) and number of layers (3). </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md1209"></a>
+<h3><a class="anchor" id="autotoc_md1210"></a>
 2. Loading Graphics</h3>
 <p>Show real code, then explain the <b>data format</b> and the <b>hardware mechanism</b>.</p>
 <div class="fragment"><div class="line"><span class="comment">// 4bpp tiles: 32 bytes per tile (8 rows x 4 bitplanes)</span></div>
@@ -156,7 +156,7 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>How does it work?</b> VRAM is organized in 16-bit words. <code>VMAIN = 0x80</code> configures auto-increment on the high byte write (<code>VMDATAH</code>). Each pair of writes fills one VRAM word. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md1210"></a>
+<h3><a class="anchor" id="autotoc_md1211"></a>
 N. Main Loop</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -164,14 +164,14 @@ N. Main Loop</h3>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 </div><!-- fragment --><p>Explain what happens each frame and why.</p>
-<h2><a class="anchor" id="autotoc_md1211"></a>
+<h2><a class="anchor" id="autotoc_md1212"></a>
 Tips &amp; Tricks</h2>
 <p>Practical tips and common pitfalls <b>specific to this example</b>:</p>
 <ul>
 <li><b>VRAM and VBlank</b>: VRAM writes are silently ignored during active display. If your display is corrupted, make sure you write during <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code>.</li>
 <li><b>Palette color 0</b>: always the backdrop. If your screen is black but tiles are loaded, check that color 0 isn't set to black.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1212"></a>
+<h2><a class="anchor" id="autotoc_md1213"></a>
 Go Further</h2>
 <p>Concrete modifications to try on this example:</p>
 <ul>
@@ -179,7 +179,7 @@ Go Further</h2>
 <li><b>Add animation</b>: in the main loop, increment a variable each frame and use it to change the scroll offset or palette.</li>
 <li><b>Next example</b>: <a href="../next/">Next Example Name</a> to learn [concept].</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1213"></a>
+<h2><a class="anchor" id="autotoc_md1214"></a>
 Under the Hood: The Build</h2>
 <p>Explain the Makefile: what tools are used, what modules are needed and why.</p>
 <div class="fragment"><div class="line">TARGET      := example.sfc</div>
@@ -196,7 +196,7 @@ Under the Hood: The Build</h2>
 <td class="markdownTableBodyNone"><code>dma</code>   </td><td class="markdownTableBodyNone">...   </td></tr>
 </table>
 <p>If graphics tools are used (gfx4snes, font2snes, smconv), explain what they do and why the flags are set the way they are.</p>
-<h2><a class="anchor" id="autotoc_md1214"></a>
+<h2><a class="anchor" id="autotoc_md1215"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -212,7 +212,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">TM   </td><td class="markdownTableBodyNone">$212C   </td><td class="markdownTableBodyNone">Active layers   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1215"></a>
+<h2><a class="anchor" id="autotoc_md1216"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

@@ -249,5 +249,5 @@ var NAVTREEINDEX0 =
 "examples_memory_save_game.html":[0,10,27],
 "examples_text.html":[13],
 "examples_text_hello_world.html":[0,10,0],
-"examples_text_hello_world.html#autotoc_md1217":[4,0]
+"examples_text_hello_world.html#autotoc_md1218":[4,0]
 };

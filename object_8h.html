@@ -198,7 +198,7 @@ Variables</h2></td></tr>
 <li>Fixed-point position and velocity</li>
 <li>Object-to-object collision detection</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 Workspace Pattern</h2>
 <p>Because the object buffer resides in Bank $7E (not directly accessible from C), a workspace pattern is used. Before each C callback, the engine copies the current object's data to <code>objWorkspace</code> (Bank $00). After the callback returns, changes are copied back.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -225,7 +225,7 @@ Workspace Pattern</h2>
 <div class="ttc" id="astructt__objs_html_a3805bf290808a8490f0e866e58843e48"><div class="ttname"><a href="structt__objs.html#a3805bf290808a8490f0e866e58843e48">t_objs::xvel</a></div><div class="ttdeci">s16 xvel</div><div class="ttdef"><b>Definition</b> object.h:90</div></div>
 <div class="ttc" id="astructt__objs_html_a7d8d754f7264eebc304486e94750c5ce"><div class="ttname"><a href="structt__objs.html#a7d8d754f7264eebc304486e94750c5ce">t_objs::xpos</a></div><div class="ttdeci">u8 xpos[3]</div><div class="ttdef"><b>Definition</b> object.h:82</div></div>
 <div class="ttc" id="astructt__objs_html_af4bfdc0bbd947feb9ea45fd95f735a9d"><div class="ttname"><a href="structt__objs.html#af4bfdc0bbd947feb9ea45fd95f735a9d">t_objs::action</a></div><div class="ttdeci">u16 action</div><div class="ttdef"><b>Definition</b> object.h:96</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md47"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md48"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib object engine by Alekmaul Slope management: Nub1604 License: zlib (compatible with MIT) </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>

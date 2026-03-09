@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_input_mouse.html',''); initRe
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1051"></a>
+    <h2><a class="anchor" id="autotoc_md1052"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to detect whether a SNES Mouse is connected to a controller port</li>
@@ -110,18 +110,18 @@ What You'll Learn</h2>
 <li>How to cycle the mouse sensitivity setting (low, medium, high)</li>
 <li>How to display a hardware sprite as a cursor on top of a text background</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1052"></a>
+<h2><a class="anchor" id="autotoc_md1053"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1053"></a>
+<h3><a class="anchor" id="autotoc_md1054"></a>
 SNES Mouse Hardware</h3>
 <p>The SNES Mouse connects to a standard controller port and is identified by the auto-joypad read circuitry. The CPU reads it through the same I/O registers as controllers ($4218-$421F), but the data format differs: instead of button bits, it returns X and Y displacement values (deltas) and two button bits (left and right). The <code><a class="el" href="group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e" title="Initialize mouse on given port.">mouseInit()</a></code> function checks the device signature returned by auto-joypad and returns whether a mouse was found.</p>
-<h3><a class="anchor" id="autotoc_md1054"></a>
+<h3><a class="anchor" id="autotoc_md1055"></a>
 Mouse Sensitivity</h3>
 <p>The SNES Mouse has three sensitivity levels (low, medium, high) that control how many pixels of displacement are reported per physical movement unit. The setting is stored in the mouse hardware and cycled via <code><a class="el" href="group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d" title="Set mouse sensitivity.">mouseSetSensitivity()</a></code>.</p>
-<h3><a class="anchor" id="autotoc_md1055"></a>
+<h3><a class="anchor" id="autotoc_md1056"></a>
 Sprites as UI Elements</h3>
 <p>This example uses a hardware sprite (OAM entry 0) as the cursor rather than drawing into a background tilemap. Sprites can be positioned at arbitrary pixel coordinates without affecting backgrounds and are drawn on top of all BG layers. The cursor tile data is DMA'd to OBJ VRAM at $4000 and configured as 16x16 via <code>REG_OBJSEL</code> ($2101).</p>
-<h2><a class="anchor" id="autotoc_md1056"></a>
+<h2><a class="anchor" id="autotoc_md1057"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -134,9 +134,9 @@ Controls</h2>
 <td class="markdownTableBodyNone">Right click   </td><td class="markdownTableBodyNone">Cycle sensitivity (Low / Med / High)   </td></tr>
 </table>
 <p>Note: In Mesen2, enable SNES Mouse emulation under Input settings and assign it to controller port 1.</p>
-<h2><a class="anchor" id="autotoc_md1057"></a>
+<h2><a class="anchor" id="autotoc_md1058"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1058"></a>
+<h3><a class="anchor" id="autotoc_md1059"></a>
 1. Initialize Text and Detect Mouse</h3>
 <p>The text system provides on-screen labels. After one VBlank cycle (to ensure auto-joypad has run), <code>mouseInit(0)</code> checks port 1 for a mouse. If none is found, a message is displayed and the program halts.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -159,7 +159,7 @@ How It Works</h2>
 <div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
 <div class="ttc" id="atext_8h_html_a57d1c6fb6592214ea0fdd6e548dd7efc"><div class="ttname"><a href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc">textPrintAt</a></div><div class="ttdeci">void textPrintAt(u8 x, u8 y, const char *str)</div><div class="ttdoc">Print a string at specific position.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1059"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1060"></a>
 2. Load Cursor Sprite</h3>
 <p>The cursor is a 16x16 4bpp sprite. Because SNES OBJ tiles are arranged in a 16-tile-wide grid in VRAM, a 16x16 sprite uses tiles 0-1 (top row) and tiles 16-17 (bottom row). The tile data is split across two DMA transfers:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(cursor_tiles, 0x4000, 64);          <span class="comment">/* top half: tiles 0-1 */</span></div>
@@ -167,7 +167,7 @@ How It Works</h2>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(cursor_pal, 128, ...);              <span class="comment">/* sprite palette 0 */</span></div>
 <div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible)</div></div>
 <div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1060"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1061"></a>
 3. Set Up OAM Directly</h3>
 <p>Rather than calling <code><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></code> every frame (which has high overhead on the 65816), the cursor sprite is configured by writing directly to the <code>oamMemory[]</code> buffer. The NMI handler DMA's this buffer to OAM hardware each VBlank:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[0] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)pos_x;       <span class="comment">/* X position */</span></div>
@@ -179,7 +179,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300)</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1061"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1062"></a>
 4. Main Loop: Read Mouse, Update Cursor</h3>
 <p>Each frame, the mouse deltas are read and accumulated into the cursor position. The position is clamped to screen bounds (0-255 horizontal, 0-223 vertical):</p>
 <div class="fragment"><div class="line">pos_x += <a class="code hl_function" href="group__mouse__input.html#ga9f99c41040c01525f1aaa1fd229a31b5">mouseGetX</a>(0);</div>
@@ -188,7 +188,7 @@ How It Works</h2>
 <div class="line"><span class="keywordflow">if</span> (pos_x &gt; 255) pos_x = 255;</div>
 <div class="ttc" id="agroup__mouse__input_html_ga2cdb51c5e8b9145b02d9ae990cd1b2cf"><div class="ttname"><a href="group__mouse__input.html#ga2cdb51c5e8b9145b02d9ae990cd1b2cf">mouseGetY</a></div><div class="ttdeci">s16 mouseGetY(u8 port)</div><div class="ttdoc">Get Y displacement since last frame.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga9f99c41040c01525f1aaa1fd229a31b5"><div class="ttname"><a href="group__mouse__input.html#ga9f99c41040c01525f1aaa1fd229a31b5">mouseGetX</a></div><div class="ttdeci">s16 mouseGetX(u8 port)</div><div class="ttdoc">Get X displacement since last frame.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1062"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1063"></a>
 5. Button Handling</h3>
 <p><code><a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a></code> returns which buttons are currently down (for continuous display), while <code><a class="el" href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d" title="Get newly pressed mouse buttons this frame.">mouseButtonsPressed()</a></code> returns buttons that transitioned from released to pressed this frame (for single-shot actions like color change):</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a>(0) &amp; <a class="code hl_define" href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a>) {</div>
@@ -200,7 +200,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__mouse__input_html_gafc97172b71c6aafca462a667f3eb2f8d"><div class="ttname"><a href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a></div><div class="ttdeci">u8 mouseButtonsPressed(u8 port)</div><div class="ttdoc">Get newly pressed mouse buttons this frame.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1063"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1064"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">mouse/</div>
 <div class="line">├── main.c        — Mouse detection, cursor movement, button handling</div>
@@ -208,7 +208,7 @@ Project Structure</h2>
 <div class="line">├── Makefile      — Build configuration (6 library modules)</div>
 <div class="line">└── res/</div>
 <div class="line">    └── cursor.png — 16x16 cursor sprite source graphic (4bpp)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1064"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1065"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/mouse</div>

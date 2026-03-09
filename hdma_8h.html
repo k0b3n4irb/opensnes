@@ -159,6 +159,9 @@ Macros</h2></td></tr>
 <tr class="memitem:abd06fabf187b6275574809241b2aed81" id="r_abd06fabf187b6275574809241b2aed81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a>&#160;&#160;&#160;0x32</td></tr>
 <tr class="memdesc:abd06fabf187b6275574809241b2aed81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Fixed color ($2132)  <br /></td></tr>
 <tr class="separator:abd06fabf187b6275574809241b2aed81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12213bf95f16dc7f5c0bbb6d50eb9baf" id="r_a12213bf95f16dc7f5c0bbb6d50eb9baf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a12213bf95f16dc7f5c0bbb6d50eb9baf">HDMA_DEST_INIDISP</a>&#160;&#160;&#160;0x00</td></tr>
+<tr class="memdesc:a12213bf95f16dc7f5c0bbb6d50eb9baf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: INIDISP brightness ($2100)  <br /></td></tr>
+<tr class="separator:a12213bf95f16dc7f5c0bbb6d50eb9baf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa36d2b537ff8a8e55794746c8bca656a" id="r_aa36d2b537ff8a8e55794746c8bca656a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#aa36d2b537ff8a8e55794746c8bca656a">HDMA_DEST_M7A</a>&#160;&#160;&#160;0x1B</td></tr>
 <tr class="memdesc:aa36d2b537ff8a8e55794746c8bca656a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix A ($211B)  <br /></td></tr>
 <tr class="separator:aa36d2b537ff8a8e55794746c8bca656a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,6 +192,18 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a4473b558fc1715556b995a576644b4d8" id="r_a4473b558fc1715556b995a576644b4d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8">hdmaBrightnessGradient</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> topBrightness, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bottomBrightness)</td></tr>
+<tr class="memdesc:a4473b558fc1715556b995a576644b4d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a vertical brightness gradient.  <br /></td></tr>
+<tr class="separator:a4473b558fc1715556b995a576644b4d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad669b33978f84ff190f1bb6050483ccd" id="r_ad669b33978f84ff190f1bb6050483ccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#ad669b33978f84ff190f1bb6050483ccd">hdmaBrightnessGradientStop</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel)</td></tr>
+<tr class="memdesc:ad669b33978f84ff190f1bb6050483ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop brightness gradient and restore full brightness.  <br /></td></tr>
+<tr class="separator:ad669b33978f84ff190f1bb6050483ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72729443b1db1842e795d733563d5c90" id="r_a72729443b1db1842e795d733563d5c90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a72729443b1db1842e795d733563d5c90">hdmaColorGradient</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> colorIndex, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> topColor, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> bottomColor)</td></tr>
+<tr class="memdesc:a72729443b1db1842e795d733563d5c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a per-scanline CGRAM color gradient.  <br /></td></tr>
+<tr class="separator:a72729443b1db1842e795d733563d5c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4a0a92619e221e36d2650874c0fabd5" id="r_ab4a0a92619e221e36d2650874c0fabd5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#ab4a0a92619e221e36d2650874c0fabd5">hdmaColorGradientStop</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel)</td></tr>
+<tr class="memdesc:ab4a0a92619e221e36d2650874c0fabd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop color gradient effect.  <br /></td></tr>
+<tr class="separator:ab4a0a92619e221e36d2650874c0fabd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafb1226c87da6fe510dc0ea0ae121a6c" id="r_aafb1226c87da6fe510dc0ea0ae121a6c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#aafb1226c87da6fe510dc0ea0ae121a6c">hdmaDisable</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channelMask)</td></tr>
 <tr class="memdesc:aafb1226c87da6fe510dc0ea0ae121a6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable HDMA channel(s)  <br /></td></tr>
 <tr class="separator:aafb1226c87da6fe510dc0ea0ae121a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,6 +219,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a3ef990bb74e3837ca73837c0619f6043" id="r_a3ef990bb74e3837ca73837c0619f6043"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a3ef990bb74e3837ca73837c0619f6043">hdmaGradient</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, const void *colorTable)</td></tr>
 <tr class="memdesc:a3ef990bb74e3837ca73837c0619f6043"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a fixed color gradient effect.  <br /></td></tr>
 <tr class="separator:a3ef990bb74e3837ca73837c0619f6043"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad53b403f29a83339eb6d772bf3096379" id="r_ad53b403f29a83339eb6d772bf3096379"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379">hdmaIrisWipe</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> centerX, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> centerY, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> radius)</td></tr>
+<tr class="memdesc:ad53b403f29a83339eb6d772bf3096379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a circular window mask (iris/spotlight effect)  <br /></td></tr>
+<tr class="separator:ad53b403f29a83339eb6d772bf3096379"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa6761b1dc96c462e1d5bbc2176bb33" id="r_a4fa6761b1dc96c462e1d5bbc2176bb33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a4fa6761b1dc96c462e1d5bbc2176bb33">hdmaIrisWipeStop</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel)</td></tr>
+<tr class="memdesc:a4fa6761b1dc96c462e1d5bbc2176bb33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop iris wipe effect and restore window registers.  <br /></td></tr>
+<tr class="separator:a4fa6761b1dc96c462e1d5bbc2176bb33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf1c0451139948b3f1049b84580ce906" id="r_adf1c0451139948b3f1049b84580ce906"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, const void *scrollTable)</td></tr>
 <tr class="memdesc:adf1c0451139948b3f1049b84580ce906"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a background parallax scroll effect.  <br /></td></tr>
 <tr class="separator:adf1c0451139948b3f1049b84580ce906"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,6 +237,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a79da757d3be21ef94b3e9a78b9cdf2f0" id="r_a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0">hdmaSetupBank</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, const void *table, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank)</td></tr>
 <tr class="memdesc:a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up an HDMA channel with explicit source bank byte.  <br /></td></tr>
 <tr class="separator:a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4cd68c6a5535d13dd11fa4c487abbfe" id="r_af4cd68c6a5535d13dd11fa4c487abbfe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
+<tr class="memdesc:af4cd68c6a5535d13dd11fa4c487abbfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a water ripple distortion effect.  <br /></td></tr>
+<tr class="separator:af4cd68c6a5535d13dd11fa4c487abbfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ef7d5f50fba237731cac30b5a3af241" id="r_a2ef7d5f50fba237731cac30b5a3af241"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frequency)</td></tr>
 <tr class="memdesc:a2ef7d5f50fba237731cac30b5a3af241"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up horizontal wave effect (water reflection)  <br /></td></tr>
 <tr class="separator:a2ef7d5f50fba237731cac30b5a3af241"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -279,13 +303,16 @@ Usage Example</h2>
 <div class="line"><span class="comment">// In main loop, HDMA runs automatically each frame</span></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s)</div></div>
-<div class="ttc" id="ahdma_8h_html_a84c42564b2a8bb1f61d468e3df77e0c3"><div class="ttname"><a href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a></div><div class="ttdeci">#define HDMA_MODE_1REG</div><div class="ttdoc">HDMA mode: 1 register, 1 byte.</div><div class="ttdef"><b>Definition</b> hdma.h:125</div></div>
+<div class="ttc" id="ahdma_8h_html_a84c42564b2a8bb1f61d468e3df77e0c3"><div class="ttname"><a href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a></div><div class="ttdeci">#define HDMA_MODE_1REG</div><div class="ttdoc">HDMA mode: 1 register, 1 byte.</div><div class="ttdef"><b>Definition</b> hdma.h:132</div></div>
 <div class="ttc" id="ahdma_8h_html_accfc69511911e1c0fdc59823c43c7a23"><div class="ttname"><a href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a></div><div class="ttdeci">void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table)</div><div class="ttdoc">Set up an HDMA channel.</div></div>
-<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:111</div></div>
+<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:118</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>HDMA channels 6-7 are recommended to avoid conflicts with DMA. </dd>
 <dd>
 HDMA tables must be in ROM or bank $7E RAM.</dd></dl>
 <h2><a class="anchor" id="autotoc_md32"></a>
+Bank Byte Limitation</h2>
+<p><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> hardcodes bank $00 for ROM addresses (&gt;= $8000). If the linker places a SUPERFREE table in bank $01+, HDMA will read wrong data. Use <a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank()</a> with an explicit bank byte for ROM tables, or use RAM-based tables (always bank $00) for dynamic effects.</p>
+<h2><a class="anchor" id="autotoc_md33"></a>
 IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 <p>BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that require being written EVERY scanline to maintain their value. Use REPEAT mode (bit 7 = 1) in the HDMA line count for these registers.</p>
 <p>Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the scroll value is lost on subsequent scanlines — causing visible glitches.</p>
@@ -573,6 +600,22 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 
 </div>
 </div>
+<a id="a12213bf95f16dc7f5c0bbb6d50eb9baf" name="a12213bf95f16dc7f5c0bbb6d50eb9baf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12213bf95f16dc7f5c0bbb6d50eb9baf">&#9670;&#160;</a></span>HDMA_DEST_INIDISP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_INIDISP&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: INIDISP brightness ($2100) </p>
+
+</div>
+</div>
 <a id="aa36d2b537ff8a8e55794746c8bca656a" name="aa36d2b537ff8a8e55794746c8bca656a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa36d2b537ff8a8e55794746c8bca656a">&#9670;&#160;</a></span>HDMA_DEST_M7A</h2>
 
@@ -724,6 +767,172 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a4473b558fc1715556b995a576644b4d8" name="a4473b558fc1715556b995a576644b4d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4473b558fc1715556b995a576644b4d8">&#9670;&#160;</a></span>hdmaBrightnessGradient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaBrightnessGradient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>topBrightness</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>bottomBrightness</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a vertical brightness gradient. </p>
+<p>Smoothly fades screen brightness from top to bottom using HDMA on the INIDISP register ($2100). Useful for:</p><ul>
+<li>Fade-to-black at screen bottom</li>
+<li>Spotlight / vignette effects</li>
+<li>Underwater depth dimming</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>HDMA channel (6 or 7 recommended) </td></tr>
+    <tr><td class="paramname">topBrightness</td><td>Brightness at top of screen (0-15, 15=full) </td></tr>
+    <tr><td class="paramname">bottomBrightness</td><td>Brightness at bottom of screen (0-15)</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8">hdmaBrightnessGradient</a>(<a class="code hl_define" href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a>, 15, 0);  <span class="comment">// Fade to black</span></div>
+<div class="ttc" id="ahdma_8h_html_a4473b558fc1715556b995a576644b4d8"><div class="ttname"><a href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8">hdmaBrightnessGradient</a></div><div class="ttdeci">void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness)</div><div class="ttdoc">Create a vertical brightness gradient.</div></div>
+<div class="ttc" id="ahdma_8h_html_ad0501096ae607ca77cdd49cabce373b9"><div class="ttname"><a href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a></div><div class="ttdeci">#define HDMA_CHANNEL_7</div><div class="ttdoc">HDMA channel 7 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="ad669b33978f84ff190f1bb6050483ccd" name="ad669b33978f84ff190f1bb6050483ccd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad669b33978f84ff190f1bb6050483ccd">&#9670;&#160;</a></span>hdmaBrightnessGradientStop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaBrightnessGradientStop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop brightness gradient and restore full brightness. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>The channel used for the gradient </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a72729443b1db1842e795d733563d5c90" name="a72729443b1db1842e795d733563d5c90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72729443b1db1842e795d733563d5c90">&#9670;&#160;</a></span>hdmaColorGradient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaColorGradient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>colorIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
+          <td class="paramname"><em>topColor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
+          <td class="paramname"><em>bottomColor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a per-scanline CGRAM color gradient. </p>
+<p>Smoothly interpolates a palette color from one value to another across the screen. Uses HDMA to rewrite a CGRAM entry per scanline. Useful for:</p><ul>
+<li>Sky color gradients (blue to orange sunset)</li>
+<li>Water depth color shifts</li>
+<li>Background atmosphere effects</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>HDMA channel (6 or 7 recommended) </td></tr>
+    <tr><td class="paramname">colorIndex</td><td>CGRAM color index to modify (0-255) </td></tr>
+    <tr><td class="paramname">topColor</td><td>15-bit SNES color at top of screen (use <a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e" title="Create RGB color value.">RGB()</a> macro) </td></tr>
+    <tr><td class="paramname">bottomColor</td><td>15-bit SNES color at bottom of screen</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><span class="comment">// Blue sky fading to orange at horizon</span></div>
+<div class="line"><a class="code hl_function" href="hdma_8h.html#a72729443b1db1842e795d733563d5c90">hdmaColorGradient</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0,</div>
+<div class="line">                  <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(4, 8, 28),    <span class="comment">// Deep blue</span></div>
+<div class="line">                  <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(28, 16, 4));   <span class="comment">// Orange</span></div>
+<div class="ttc" id="ahdma_8h_html_a72729443b1db1842e795d733563d5c90"><div class="ttname"><a href="hdma_8h.html#a72729443b1db1842e795d733563d5c90">hdmaColorGradient</a></div><div class="ttdeci">void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)</div><div class="ttdoc">Create a per-scanline CGRAM color gradient.</div></div>
+<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:76</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="ab4a0a92619e221e36d2650874c0fabd5" name="ab4a0a92619e221e36d2650874c0fabd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4a0a92619e221e36d2650874c0fabd5">&#9670;&#160;</a></span>hdmaColorGradientStop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaColorGradientStop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop color gradient effect. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>The channel used for the gradient </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="aafb1226c87da6fe510dc0ea0ae121a6c" name="aafb1226c87da6fe510dc0ea0ae121a6c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aafb1226c87da6fe510dc0ea0ae121a6c">&#9670;&#160;</a></span>hdmaDisable()</h2>
 
@@ -798,7 +1007,6 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);              <span class="comment">// Enable channel 6</span></div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>((1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>) | (1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a>)); <span class="comment">// Enable 6 and 7</span></div>
-<div class="ttc" id="ahdma_8h_html_ad0501096ae607ca77cdd49cabce373b9"><div class="ttname"><a href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a></div><div class="ttdeci">#define HDMA_CHANNEL_7</div><div class="ttdoc">HDMA channel 7 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:113</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -861,6 +1069,108 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 <dl class="section note"><dt>Note</dt><dd>Table format: line count + 1 byte (COLDATA value) per entry </dd>
 <dd>
 COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
+
+</div>
+</div>
+<a id="ad53b403f29a83339eb6d772bf3096379" name="ad53b403f29a83339eb6d772bf3096379"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad53b403f29a83339eb6d772bf3096379">&#9670;&#160;</a></span>hdmaIrisWipe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaIrisWipe </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>layers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>centerX</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>centerY</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>radius</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a circular window mask (iris/spotlight effect) </p>
+<p>Uses HDMA to drive window registers (WH0/WH1) per scanline, approximating a circle. Configures all window registers automatically. Useful for:</p><ul>
+<li>Scene transitions (iris in/out)</li>
+<li>Spotlight effects</li>
+<li>Circular vignette</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>HDMA channel (6 or 7 recommended) </td></tr>
+    <tr><td class="paramname">layers</td><td>Layer bitmask to apply window masking (TM_BG1, TM_BG2, etc.) </td></tr>
+    <tr><td class="paramname">centerX</td><td>Horizontal center of circle (0-255) </td></tr>
+    <tr><td class="paramname">centerY</td><td>Vertical center of circle (0-223) </td></tr>
+    <tr><td class="paramname">radius</td><td>Circle radius in pixels (0-128)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Call again with a different radius to animate the wipe.</dd></dl>
+<div class="fragment"><div class="line"><span class="comment">// Iris wipe on BG1, centered on screen</span></div>
+<div class="line"><a class="code hl_function" href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379">hdmaIrisWipe</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>, 128, 112, 80);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Animate iris opening</span></div>
+<div class="line"><span class="keywordflow">for</span> (r = 0; r &lt; 128; r += 2) {</div>
+<div class="line">    <a class="code hl_function" href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379">hdmaIrisWipe</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>, 128, 112, r);</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
+<div class="line">}</div>
+<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:439</div></div>
+<div class="ttc" id="ahdma_8h_html_ad53b403f29a83339eb6d772bf3096379"><div class="ttname"><a href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379">hdmaIrisWipe</a></div><div class="ttdeci">void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius)</div><div class="ttdoc">Create a circular window mask (iris/spotlight effect)</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="a4fa6761b1dc96c462e1d5bbc2176bb33" name="a4fa6761b1dc96c462e1d5bbc2176bb33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fa6761b1dc96c462e1d5bbc2176bb33">&#9670;&#160;</a></span>hdmaIrisWipeStop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaIrisWipeStop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stop iris wipe effect and restore window registers. </p>
+<p>Disables the HDMA channel and clears all window masking registers (W12SEL, W34SEL, WOBJSEL, TMW) to restore normal display.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>The channel used for the iris wipe </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -999,7 +1309,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a>, <a class="code hl_define" href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a>, my_table);</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
-<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132)</div><div class="ttdef"><b>Definition</b> hdma.h:202</div></div>
+<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132)</div><div class="ttdef"><b>Definition</b> hdma.h:209</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1062,6 +1372,73 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 
 </div>
 </div>
+<a id="af4cd68c6a5535d13dd11fa4c487abbfe" name="af4cd68c6a5535d13dd11fa4c487abbfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4cd68c6a5535d13dd11fa4c487abbfe">&#9670;&#160;</a></span>hdmaWaterRipple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaWaterRipple </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>channel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>bg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>amplitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>speed</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a water ripple distortion effect. </p>
+<p>Similar to hdmaWaveH but with amplitude that increases from top to bottom, simulating underwater refraction or heat haze. Uses the wave system's double-buffered tables internally.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>HDMA channel (6 or 7 recommended) </td></tr>
+    <tr><td class="paramname">bg</td><td>Background layer (0=BG1, 1=BG2, 2=BG3) </td></tr>
+    <tr><td class="paramname">amplitude</td><td>Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped) </td></tr>
+    <tr><td class="paramname">speed</td><td><a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> speed (1=slow, 4=fast)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Amplitude is clamped to 60 to prevent s16 overflow in sine computation. </dd>
+<dd>
+Cannot be used simultaneously with hdmaWaveH (shared buffers). </dd>
+<dd>
+Call <a class="el" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216" title="Update wave animation.">hdmaWaveUpdate()</a> each frame to animate. </dd>
+<dd>
+Call <a class="el" href="hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1" title="Stop wave effect and disable HDMA channel.">hdmaWaveStop()</a> to stop the effect.</dd></dl>
+<div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, 8, 2);</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">while</span> (1) {</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
+<div class="line">    <a class="code hl_function" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216">hdmaWaveUpdate</a>();  <span class="comment">// Animate ripple</span></div>
+<div class="line">}</div>
+<div class="ttc" id="ahdma_8h_html_a415b729e4a24c33a2d71d7f6ed925216"><div class="ttname"><a href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216">hdmaWaveUpdate</a></div><div class="ttdeci">void hdmaWaveUpdate(void)</div><div class="ttdoc">Update wave animation.</div></div>
+<div class="ttc" id="ahdma_8h_html_af4cd68c6a5535d13dd11fa4c487abbfe"><div class="ttname"><a href="hdma_8h.html#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a></div><div class="ttdeci">void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed)</div><div class="ttdoc">Create a water ripple distortion effect.</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a id="a2ef7d5f50fba237731cac30b5a3af241" name="a2ef7d5f50fba237731cac30b5a3af241"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2ef7d5f50fba237731cac30b5a3af241">&#9670;&#160;</a></span>hdmaWaveH()</h2>
 
@@ -1110,23 +1487,21 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
   <table class="params">
     <tr><td class="paramname">channel</td><td>HDMA channel to use (6 or 7 recommended) </td></tr>
     <tr><td class="paramname">bg</td><td>Background layer to affect (0=BG1, 1=BG2, 2=BG3) </td></tr>
-    <tr><td class="paramname">amplitude</td><td>Wave amplitude in pixels (1-16) </td></tr>
-    <tr><td class="paramname">frequency</td><td>Wave frequency (1=long waves, 8=short waves)</td></tr>
+    <tr><td class="paramname">amplitude</td><td>Wave amplitude in pixels (1-60, clamped internally) </td></tr>
+    <tr><td class="paramname">frequency</td><td>Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a>();</div>
-<div class="line"><a class="code hl_function" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, 4, 2);  <span class="comment">// Gentle water reflection on BG1</span></div>
+<div class="line"><a class="code hl_function" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, 4, 4);  <span class="comment">// Gentle water reflection on BG1</span></div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <a class="code hl_function" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216">hdmaWaveUpdate</a>();  <span class="comment">// Animate the wave</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="ahdma_8h_html_a2658bf1d97761d3e7a940b29ac560438"><div class="ttname"><a href="hdma_8h.html#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a></div><div class="ttdeci">void hdmaWaveInit(void)</div><div class="ttdoc">Initialize HDMA wave effect system.</div></div>
 <div class="ttc" id="ahdma_8h_html_a2ef7d5f50fba237731cac30b5a3af241"><div class="ttname"><a href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a></div><div class="ttdeci">void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency)</div><div class="ttdoc">Set up horizontal wave effect (water reflection)</div></div>
-<div class="ttc" id="ahdma_8h_html_a415b729e4a24c33a2d71d7f6ed925216"><div class="ttname"><a href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216">hdmaWaveUpdate</a></div><div class="ttdeci">void hdmaWaveUpdate(void)</div><div class="ttdoc">Update wave animation.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

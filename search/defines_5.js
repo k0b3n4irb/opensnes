@@ -17,13 +17,14 @@ var searchData=
   ['hdma_5fdest_5fcgadd_14',['HDMA_DEST_CGADD',['../hdma_8h.html#af1addfa1b6fe98e5c4f1ff623f263ba0',1,'hdma.h']]],
   ['hdma_5fdest_5fcgdata_15',['HDMA_DEST_CGDATA',['../hdma_8h.html#aeb23fedb4e6cf7a9fcd14156d09f85e0',1,'hdma.h']]],
   ['hdma_5fdest_5fcoldata_16',['HDMA_DEST_COLDATA',['../hdma_8h.html#abd06fabf187b6275574809241b2aed81',1,'hdma.h']]],
-  ['hdma_5fdest_5fm7a_17',['HDMA_DEST_M7A',['../hdma_8h.html#aa36d2b537ff8a8e55794746c8bca656a',1,'hdma.h']]],
-  ['hdma_5fdest_5fwh0_18',['HDMA_DEST_WH0',['../hdma_8h.html#ad92f713a4e3a27aa73b0f162a6f2f40b',1,'hdma.h']]],
-  ['hdma_5fdest_5fwh1_19',['HDMA_DEST_WH1',['../hdma_8h.html#ad6ab1c05c8d7f89fde75617894d686e0',1,'hdma.h']]],
-  ['hdma_5findirect_20',['HDMA_INDIRECT',['../hdma_8h.html#a6f06e1a32a25d66fbd9943315c4660da',1,'hdma.h']]],
-  ['hdma_5fmode_5f1reg_21',['HDMA_MODE_1REG',['../hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3',1,'hdma.h']]],
-  ['hdma_5fmode_5f1reg_5f2x_22',['HDMA_MODE_1REG_2X',['../hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc',1,'hdma.h']]],
-  ['hdma_5fmode_5f2reg_23',['HDMA_MODE_2REG',['../hdma_8h.html#aae087a8a7ee45b79832198a29e022200',1,'hdma.h']]],
-  ['hdma_5fmode_5f2reg_5f2x_24',['HDMA_MODE_2REG_2X',['../hdma_8h.html#a21680673893284141c68b3fb38e775e4',1,'hdma.h']]],
-  ['hdma_5fmode_5f4reg_25',['HDMA_MODE_4REG',['../hdma_8h.html#ae1cd2638b518b8b92200d4d72d4aef7d',1,'hdma.h']]]
+  ['hdma_5fdest_5finidisp_17',['HDMA_DEST_INIDISP',['../hdma_8h.html#a12213bf95f16dc7f5c0bbb6d50eb9baf',1,'hdma.h']]],
+  ['hdma_5fdest_5fm7a_18',['HDMA_DEST_M7A',['../hdma_8h.html#aa36d2b537ff8a8e55794746c8bca656a',1,'hdma.h']]],
+  ['hdma_5fdest_5fwh0_19',['HDMA_DEST_WH0',['../hdma_8h.html#ad92f713a4e3a27aa73b0f162a6f2f40b',1,'hdma.h']]],
+  ['hdma_5fdest_5fwh1_20',['HDMA_DEST_WH1',['../hdma_8h.html#ad6ab1c05c8d7f89fde75617894d686e0',1,'hdma.h']]],
+  ['hdma_5findirect_21',['HDMA_INDIRECT',['../hdma_8h.html#a6f06e1a32a25d66fbd9943315c4660da',1,'hdma.h']]],
+  ['hdma_5fmode_5f1reg_22',['HDMA_MODE_1REG',['../hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3',1,'hdma.h']]],
+  ['hdma_5fmode_5f1reg_5f2x_23',['HDMA_MODE_1REG_2X',['../hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc',1,'hdma.h']]],
+  ['hdma_5fmode_5f2reg_24',['HDMA_MODE_2REG',['../hdma_8h.html#aae087a8a7ee45b79832198a29e022200',1,'hdma.h']]],
+  ['hdma_5fmode_5f2reg_5f2x_25',['HDMA_MODE_2REG_2X',['../hdma_8h.html#a21680673893284141c68b3fb38e775e4',1,'hdma.h']]],
+  ['hdma_5fmode_5f4reg_26',['HDMA_MODE_4REG',['../hdma_8h.html#ae1cd2638b518b8b92200d4d72d4aef7d',1,'hdma.h']]]
 ];

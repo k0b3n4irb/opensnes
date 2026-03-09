@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['0_0',['0',['../examples_graphics_effects_fading.html#autotoc_md812',1,'Force Blank vs Brightness 0'],['../examples_graphics_effects_hdma_gradient.html#autotoc_md834',1,'HDMA Table Format (Mode 0)']]],
-  ['0_207_1',['Per-Voice Registers (x = voice 0-7)',['../snes_sound_guide.html#autotoc_md273',1,'']]],
-  ['0_20palette_2',['Mode 0 Palette',['../examples_text.html#autotoc_md1246',1,'']]],
-  ['0f_207f_3',['FIR Filter Coefficients (COEF 0F-7F)',['../snes_sound_guide.html#autotoc_md290',1,'']]]
+  ['0_0',['0',['../examples_graphics_effects_fading.html#autotoc_md813',1,'Force Blank vs Brightness 0'],['../examples_graphics_effects_hdma_gradient.html#autotoc_md835',1,'HDMA Table Format (Mode 0)']]],
+  ['0_207_1',['Per-Voice Registers (x = voice 0-7)',['../snes_sound_guide.html#autotoc_md274',1,'']]],
+  ['0_20palette_2',['Mode 0 Palette',['../examples_text.html#autotoc_md1247',1,'']]],
+  ['0f_207f_3',['FIR Filter Coefficients (COEF 0F-7F)',['../snes_sound_guide.html#autotoc_md291',1,'']]]
 ];

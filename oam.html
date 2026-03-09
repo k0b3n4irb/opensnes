@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('oam.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>OAM stores sprite attributes for the PPU. Understanding how OAM works is critical for sprite programming.</p>
-<h2><a class="anchor" id="autotoc_md357"></a>
+<h2><a class="anchor" id="autotoc_md358"></a>
 OAM Structure</h2>
 <p>OAM is <b>544 bytes</b> total:</p>
 <table class="markdownTable">
@@ -108,7 +108,7 @@ OAM Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Extended Table   </td><td class="markdownTableBodyNone">512-543   </td><td class="markdownTableBodyNone">128 sprites × 2 bits each   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md358"></a>
+<h3><a class="anchor" id="autotoc_md359"></a>
 Main Table (4 bytes per sprite)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -122,7 +122,7 @@ Main Table (4 bytes per sprite)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">3   </td><td class="markdownTableBodyNone">Attributes (see below)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md359"></a>
+<h3><a class="anchor" id="autotoc_md360"></a>
 Attribute Byte (Byte 3)</h3>
 <div class="fragment"><div class="line">Bit 7: Vertical flip</div>
 <div class="line">Bit 6: Horizontal flip</div>
@@ -130,11 +130,11 @@ Attribute Byte (Byte 3)</h3>
 <div class="line">Bit 3: Palette (high bit, with bits 1-3 from palette select)</div>
 <div class="line">Bits 1-3: Palette select (0-7)</div>
 <div class="line">Bit 0: Tile number (bit 8, for second tile page)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md360"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md361"></a>
 Extended Table (2 bits per sprite)</h3>
 <div class="fragment"><div class="line">Bit 1: Size (0=small, 1=large)</div>
 <div class="line">Bit 0: X position (bit 8, for X &gt; 255)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md361"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md362"></a>
 Critical: OAM Write Buffer</h2>
 <p><b>This is the most important thing to understand about OAM writes.</b></p>
 <p>The SNES uses a <b>16-bit internal write buffer</b> for OAM:</p>
@@ -142,7 +142,7 @@ Critical: OAM Write Buffer</h2>
 <li>First write to <code>$2104</code> → goes to internal <b>low byte buffer only</b></li>
 <li>Second write to <code>$2104</code> → goes to <b>high byte buffer AND commits both bytes to OAM</b></li>
 </ol>
-<h3><a class="anchor" id="autotoc_md362"></a>
+<h3><a class="anchor" id="autotoc_md363"></a>
 The Problem</h3>
 <p>If you only write one byte (e.g., just the X position), <b>nothing happens</b>. The byte sits in the internal buffer but is never committed to actual OAM.</p>
 <div class="fragment"><div class="line"><span class="comment">// WRONG - Only writes X, never commits to OAM!</span></div>
@@ -152,7 +152,7 @@ The Problem</h3>
 <div class="ttc" id="agroup__ppu__regs_html_gac7a5db74119e971459fad469a4caa92c"><div class="ttname"><a href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a></div><div class="ttdeci">#define REG_OAMDATA</div><div class="ttdoc">OAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:61</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad8e30bb8ad62f2a58545ff770db95174"><div class="ttname"><a href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a></div><div class="ttdeci">#define REG_OAMADDH</div><div class="ttdoc">OAM address high (W)</div><div class="ttdef"><b>Definition</b> registers.h:58</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gae7e3753ff8b20eb03256385da37eaf38"><div class="ttname"><a href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a></div><div class="ttdeci">#define REG_OAMADDL</div><div class="ttdoc">OAM address low (W)</div><div class="ttdef"><b>Definition</b> registers.h:55</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md363"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md364"></a>
 The Solution</h3>
 <p><b>Always write bytes in pairs:</b></p>
 <div class="fragment"><div class="line"><span class="comment">// CORRECT - Writes X and Y, commits both to OAM</span></div>
@@ -162,7 +162,7 @@ The Solution</h3>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = y;    <span class="comment">// Y goes to high byte, COMMITS both X and Y!</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = tile; <span class="comment">// Tile goes to low byte buffer</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = attr; <span class="comment">// Attr goes to high byte, COMMITS both!</span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md364"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md365"></a>
 Why PVSnesLib "Just Works"</h3>
 <p>PVSnesLib uses a <b>shadow buffer</b> approach:</p><ol type="1">
 <li>All sprite functions write to a RAM buffer (<code>oamMemory</code>)</li>
@@ -170,7 +170,7 @@ Why PVSnesLib "Just Works"</h3>
 <li>DMA always transfers complete data, avoiding the pair-write issue</li>
 </ol>
 <p>For direct OAM writes without a shadow buffer, you must respect the pair-write requirement.</p>
-<h2><a class="anchor" id="autotoc_md365"></a>
+<h2><a class="anchor" id="autotoc_md366"></a>
 OAM Registers</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -182,7 +182,7 @@ OAM Registers</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">OAMDATA   </td><td class="markdownTableBodyNone">$2104   </td><td class="markdownTableBodyNone">OAM data write   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md366"></a>
+<h3><a class="anchor" id="autotoc_md367"></a>
 Setting OAM Address</h3>
 <div class="fragment"><div class="line"><span class="comment">// Set OAM address to sprite N (N = 0-127)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = N * 4;  <span class="comment">// Each sprite is 4 bytes</span></div>
@@ -190,7 +190,7 @@ Setting OAM Address</h3>
 </div><!-- fragment --><p>For the extended table: </p><div class="fragment"><div class="line"><span class="comment">// Set OAM address to extended table</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = 0;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a> = 1;  <span class="comment">// Bit 0 = 1 selects high table (bytes 512+)</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md367"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md368"></a>
 Sprite Sizes</h2>
 <p><code>$2101</code> (OBJSEL) configures sprite sizes:</p>
 <table class="markdownTable">
@@ -209,14 +209,14 @@ Sprite Sizes</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">0xA0   </td><td class="markdownTableBodyNone">32x32   </td><td class="markdownTableBodyNone">64x64   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md368"></a>
+<h2><a class="anchor" id="autotoc_md369"></a>
 Hiding Sprites</h2>
 <p>To hide a sprite, set its Y position to 240 (off-screen):</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = sprite_id * 4;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a> = 0;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 0;    <span class="comment">// X (don&#39;t care)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 240;  <span class="comment">// Y = 240 hides sprite</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md369"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md370"></a>
 Timing</h2>
 <p>OAM writes should be done during <b>VBlank</b> or <b>forced blank</b> (screen off). Writing during active display can cause visual glitches.</p>
 <div class="fragment"><div class="line"><span class="comment">// Wait for VBlank before OAM updates</span></div>
@@ -224,7 +224,7 @@ Timing</h2>
 <div class="line"><span class="keywordflow">while</span> (!(<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x80)) {} <span class="comment">// Wait for VBlank to start</span></div>
 <div class="line"><span class="comment">// Now safe to write OAM</span></div>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md370"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md371"></a>
 Complete Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Update sprite 0 position and animation frame</span></div>
 <div class="line"><span class="keywordtype">void</span> update_sprite(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tile, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> attr) {</div>
@@ -243,7 +243,7 @@ Complete Example</h2>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = attr; <span class="comment">//         Attr (commits tile,attr)</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md371"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md372"></a>
 Common Pitfalls</h2>
 <ol type="1">
 <li><b>Writing single bytes</b> - Always write in pairs</li>
@@ -251,7 +251,7 @@ Common Pitfalls</h2>
 <li><b>Forgetting extended table</b> - Large sprites need size bit set</li>
 <li><b>X position &gt; 255</b> - Need to set bit 0 in extended table</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md372"></a>
+<h2><a class="anchor" id="autotoc_md373"></a>
 See Also</h2>
 <ul>
 <li><a class="el" href="REGISTERS_8md.html">Registers</a> - Full register reference</li>

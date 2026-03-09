@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('tutorial_sprites.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES sprites (OBJ layer) including OAM management and animation.</p>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md109"></a>
 SNES Sprite Basics</h2>
 <ul>
 <li>Up to <b>128 sprites</b> on screen</li>
@@ -106,7 +106,7 @@ SNES Sprite Basics</h2>
 <li>8 palettes available (palettes 8-15 in CGRAM)</li>
 <li>Stored in <b>OAM</b> (Object Attribute Memory) - 544 bytes</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md109"></a>
+<h2><a class="anchor" id="autotoc_md110"></a>
 OAM Structure</h2>
 <p>Each sprite uses 4 bytes in main OAM + 2 bits in high table:</p>
 <p><b>Main OAM (4 bytes per sprite):</b> </p><table class="markdownTable">
@@ -128,9 +128,9 @@ OAM Structure</h2>
 <li>ppp = Palette (0-7, maps to CGRAM 128-255)</li>
 <li>N = Tile number bit 8</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md110"></a>
+<h2><a class="anchor" id="autotoc_md111"></a>
 Using OpenSNES Sprite Functions</h2>
-<h3><a class="anchor" id="autotoc_md111"></a>
+<h3><a class="anchor" id="autotoc_md112"></a>
 Initialize OAM</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -153,13 +153,13 @@ Initialize OAM</h3>
 <div class="ttc" id="agroup__reg__const_html_ga904faa4d363b90e91ea62d36dbbab949"><div class="ttname"><a href="group__reg__const.html#ga904faa4d363b90e91ea62d36dbbab949">TM_OBJ</a></div><div class="ttdeci">#define TM_OBJ</div><div class="ttdef"><b>Definition</b> registers.h:443</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="asprite_8h_html_a274b5d953c60f5455937be288f6652ee"><div class="ttname"><a href="sprite_8h.html#a274b5d953c60f5455937be288f6652ee">oamInit</a></div><div class="ttdeci">void oamInit(void)</div><div class="ttdoc">Initialize sprite system.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md112"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md113"></a>
 Setting a Sprite</h3>
 <div class="fragment"><div class="line"><span class="comment">// oamSet(id, x, y, priority, hflip, vflip, palette)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, 100, 80, 0, 0, 0, 0);  <span class="comment">// Sprite 0 at (100, 80)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, 120, 80, 0, 0, 0, 1);  <span class="comment">// Sprite 1 with palette 1</span></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md113"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md114"></a>
 Updating OAM</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -172,7 +172,7 @@ Updating OAM</h3>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md114"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md115"></a>
 Hiding Sprites</h3>
 <div class="fragment"><div class="line"><span class="comment">// Hide a specific sprite (moves Y off-screen)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a>(5);</div>
@@ -180,7 +180,7 @@ Hiding Sprites</h3>
 <div class="line"><span class="comment">// Hide all sprites</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a274b5d953c60f5455937be288f6652ee">oamInit</a>();</div>
 <div class="ttc" id="asprite_8h_html_a554b6c0dd569a866ecec6095ff058a7f"><div class="ttname"><a href="sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a></div><div class="ttdeci">void oamHide(u8 id)</div><div class="ttdoc">Hide sprite.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md115"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md116"></a>
 Loading Sprite Tiles</h2>
 <p>Sprite tiles go in VRAM (location set by REG_OBJSEL):</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_tile[32] = {</div>
@@ -216,7 +216,7 @@ Loading Sprite Tiles</h2>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W)</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md116"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md117"></a>
 Sprite Palettes</h2>
 <p>Sprite palettes use CGRAM addresses 128-255:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> load_sprite_palette(<span class="keywordtype">void</span>) {</div>
@@ -235,9 +235,9 @@ Sprite Palettes</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md117"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md118"></a>
 Animation</h2>
-<h3><a class="anchor" id="autotoc_md118"></a>
+<h3><a class="anchor" id="autotoc_md119"></a>
 Frame-based Animation</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = 0;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_timer = 0;</div>
@@ -259,7 +259,7 @@ Frame-based Animation</h3>
 <div class="line"><span class="comment">// Set tile based on frame (assuming tiles 0-3 are animation frames)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a>(0, anim_frame);</div>
 <div class="ttc" id="asprite_8h_html_a07b133e4cd2416bcb648b2ece69d34fe"><div class="ttname"><a href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a></div><div class="ttdeci">void oamSetTile(u8 id, u16 tile)</div><div class="ttdoc">Set sprite tile.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md119"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md120"></a>
 Movement with Animation</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_x = 128;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_y = 112;</div>
@@ -280,7 +280,7 @@ Movement with Animation</h3>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md120"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md121"></a>
 Sprite Sizes</h2>
 <p>Configure sprite sizes with REG_OBJSEL:</p>
 <div class="fragment"><div class="line"><span class="comment">// REG_OBJSEL: sssnnbbb</span></div>
@@ -299,10 +299,10 @@ Sprite Sizes</h2>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a> = 0x00;  <span class="comment">// 8x8/16x16, tiles at $0000</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a> = 0x20;  <span class="comment">// 8x8/32x32, tiles at $0000</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a> = 0x60;  <span class="comment">// 16x16/32x32, tiles at $0000</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md121"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md122"></a>
 Example: Two Players</h2>
 <p>See <code>examples/input/two_players/</code> for a complete example with two independently controlled sprites.</p>
-<h2><a class="anchor" id="autotoc_md122"></a>
+<h2><a class="anchor" id="autotoc_md123"></a>
 Performance Tips</h2>
 <ol type="1">
 <li><b>Minimize <a class="el" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260" title="Copy OAM buffer to hardware.">oamUpdate()</a> calls</b> - Only call once per frame</li>
@@ -310,7 +310,7 @@ Performance Tips</h2>
 <li><b>Check sprite limits</b> - Max 32 sprites per scanline, 128 total</li>
 <li><b>Batch similar sprites</b> - Group sprites using same tiles/palettes</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h2><a class="anchor" id="autotoc_md124"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_input.html">Controller Input</a></li>

@@ -65,10 +65,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_text_hello_world.html#autotoc_md1218",
+"examples_text_hello_world.html#autotoc_md1219",
 "group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10",
-"learning_path.html",
-"sram_8h.html#adc12b01aadf1604c033fbf838eeb4abc"
+"interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7",
+"sram_8h.html#a07095ff815cfb5f1ef99aab2e81a10ef"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_memory_hirom_demo.html',''); 
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1156"></a>
+    <h2><a class="anchor" id="autotoc_md1157"></a>
 What This Example Shows</h2>
 <p>The difference between <b>LoROM</b> and <b>HiROM</b> memory mapping on the SNES, and how to build a HiROM ROM with OpenSNES. The program displays "HIROM MODE" and changes the background color when A is pressed &ndash; proving the ROM, library, and input all work correctly in HiROM mode.</p>
-<h2><a class="anchor" id="autotoc_md1157"></a>
+<h2><a class="anchor" id="autotoc_md1158"></a>
 Prerequisites</h2>
 <p>Read <code>text/hello_world</code> first (basic PPU setup). Understanding of hexadecimal addressing is helpful but not required.</p>
-<h2><a class="anchor" id="autotoc_md1158"></a>
+<h2><a class="anchor" id="autotoc_md1159"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,14 +114,14 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A (hold)   </td><td class="markdownTableBodyNone">Changes background to light blue   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1159"></a>
+<h2><a class="anchor" id="autotoc_md1160"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/hirom_demo</div>
 </div><!-- fragment --><p>Then open <code>hirom_demo.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md1160"></a>
+<h2><a class="anchor" id="autotoc_md1161"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1161"></a>
+<h3><a class="anchor" id="autotoc_md1162"></a>
 1. Enable HiROM in the Makefile</h3>
 <div class="fragment"><div class="line">USE_HIROM = 1</div>
 </div><!-- fragment --><p>This tells the build system to:</p><ul>
@@ -129,16 +129,16 @@ How It Works</h2>
 <li>Set the mapping mode byte to HiROM</li>
 <li>Adjust the linker configuration for 64 KB banks</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1162"></a>
+<h3><a class="anchor" id="autotoc_md1163"></a>
 2. The code is identical to LoROM</h3>
 <p>The C code does not need to change between LoROM and HiROM &ndash; the compiler and linker handle the address mapping transparently. <code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code>, <code><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible)">dmaCopyVram()</a></code>, <code><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></code> &ndash; everything works the same way.</p>
-<h3><a class="anchor" id="autotoc_md1163"></a>
+<h3><a class="anchor" id="autotoc_md1164"></a>
 3. Embedded font (no external assets)</h3>
 <p>This demo uses a built-in 2bpp font defined as a <code>const</code> array in C:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> font_tiles[] = { ... };</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --><p>The <code>const</code> qualifier places the data in ROM (not RAM), so it works regardless of memory mapping mode. The tiles are loaded to VRAM via <code><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible)">dmaCopyVram()</a></code>.</p>
-<h3><a class="anchor" id="autotoc_md1164"></a>
+<h3><a class="anchor" id="autotoc_md1165"></a>
 4. Interactive feedback</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 0;</div>
@@ -151,9 +151,9 @@ How It Works</h2>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
 </div><!-- fragment --><p>The color change on A-press confirms that joypad reading works correctly in HiROM mode. CGRAM writes at $2121/$2122 work identically in both modes.</p>
-<h2><a class="anchor" id="autotoc_md1165"></a>
+<h2><a class="anchor" id="autotoc_md1166"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1166"></a>
+<h3><a class="anchor" id="autotoc_md1167"></a>
 LoROM vs HiROM</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -171,17 +171,17 @@ LoROM vs HiROM</h3>
 <li><b>LoROM</b>: Each bank only exposes the upper 32 KB of ROM. The lower half ($0000-$7FFF) maps to hardware registers, WRAM, etc. Most SNES games use LoROM.</li>
 <li><b>HiROM</b>: Each bank exposes the full 64 KB of ROM. This makes large data tables simpler to address (no bank-boundary splits). Used by games with large assets (Chrono Trigger, Star Ocean).</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1167"></a>
+<h3><a class="anchor" id="autotoc_md1168"></a>
 When to Use HiROM</h3>
 <ul>
 <li>Large contiguous data (&gt; 32 KB tilesets, music, maps)</li>
 <li>Simpler address math for streaming systems</li>
 <li>If you do not need it, stick with LoROM &ndash; it is the default and better tested</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1168"></a>
+<h3><a class="anchor" id="autotoc_md1169"></a>
 Address Translation</h3>
 <p>The key difference is where ROM data appears in the CPU address space. In LoROM, a 64 KB ROM file is split across two banks (bank 0 holds bytes 0-32767 at $8000-$FFFF, bank 1 holds bytes 32768-65535). In HiROM, the same data fills one bank completely ($0000-$FFFF). The linker and ROM header handle this mapping automatically.</p>
-<h2><a class="anchor" id="autotoc_md1169"></a>
+<h2><a class="anchor" id="autotoc_md1170"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -191,7 +191,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>USE_HIROM := 1</code>, <code>LIB_MODULES := console dma input sprite background</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1170"></a>
+<h2><a class="anchor" id="autotoc_md1171"></a>
 Going Further</h2>
 <ul>
 <li><b>Compare ROM sizes</b>: Build the same example in LoROM (remove <code>USE_HIROM=1</code>) and compare the <code>.sfc</code> file sizes and <code>.sym</code> file bank assignments.</li>
