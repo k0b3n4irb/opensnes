@@ -131,14 +131,6 @@ static const u8 channel_mask[] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 };
 
-/*
- * WRAM data port registers for writing to bank $7E above $2000.
- * $2181/$2182/$2183 = address, $2180 = data (auto-increment).
- */
-#define WRAM_DATA   (*(vu8*)0x2180)
-#define WRAM_ADDRL  (*(vu8*)0x2181)
-#define WRAM_ADDRM  (*(vu8*)0x2182)
-#define WRAM_ADDRH  (*(vu8*)0x2183)
 
 /**
  * Fill a wave table in bank $00 RAM via C pointer writes.
@@ -262,19 +254,10 @@ void hdmaWaveSetSpeed(u8 speed) {
 }
 
 /*============================================================================
- * HDMA Effect Helpers - Phase 1
+ * HDMA Effect Helpers
  *
- * All table writes use the WRAM data port ($2180-$2183) because tables
- * live in bank $7E above $2000, unreachable by C pointers (sta.l $0000,x
- * writes to bank $00 where $2000+ is I/O, not RAM).
+ * All tables live in bank $00 RAM (< $2000) and are written via C pointers.
  *============================================================================*/
-
-/** Set WRAM write address to bank $7E + addr */
-static void wramSetAddr(u16 addr) {
-    WRAM_ADDRL = (u8)(addr & 0xFF);
-    WRAM_ADDRM = (u8)((addr >> 8) & 0xFF);
-    WRAM_ADDRH = 0;  /* Bank $7E (bit 0 = 0) */
-}
 
 /*--------------------------------------------------------------------------
  * Brightness Gradient
@@ -328,7 +311,7 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
     botG = (s16)((bottomColor >> 5) & 0x1F);
     botB = (s16)((bottomColor >> 10) & 0x1F);
 
-    wramSetAddr((u16)hdma_color_table);
+    u8 *p = (u8 *)hdma_color_table;
 
     /* 56 chunks of 4 scanlines each = 224 scanlines.
      * Mode 2REG_2X to CGADD ($2121): writes CGADD, CGADD, CGDATA, CGDATA.
@@ -340,15 +323,15 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
         u8 b = (u8)(topB + ((botB - topB) * line) / 223);
         u16 color = (u16)(((u16)b << 10) | ((u16)g << 5) | (u16)r);
 
-        WRAM_DATA = 4;                          /* 4 scanlines, non-repeat */
-        WRAM_DATA = colorIndex;                  /* CGADD low */
-        WRAM_DATA = 0x00;                        /* CGADD high */
-        WRAM_DATA = (u8)(color & 0xFF);          /* CGDATA low */
-        WRAM_DATA = (u8)((color >> 8) & 0xFF);   /* CGDATA high */
+        *p++ = 4;                          /* 4 scanlines, non-repeat */
+        *p++ = colorIndex;                  /* CGADD low */
+        *p++ = 0x00;                        /* CGADD high */
+        *p++ = (u8)(color & 0xFF);          /* CGDATA low */
+        *p++ = (u8)((color >> 8) & 0xFF);   /* CGDATA high */
     }
-    WRAM_DATA = 0x00;  /* End marker */
+    *p = 0x00;  /* End marker */
 
-    hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
+    hdmaSetupBank(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table, 0x00);
     hdmaEnable(channel_mask[channel]);
 }
 
