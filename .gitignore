@@ -24,7 +24,7 @@ doc/
 *.ps
 *.asp
 
-# Tool outputs
+# Tool outputs (gfx4snes, smconv)
 *.pic
 *.pal
 *.brr
@@ -32,6 +32,8 @@ doc/
 *.mp7
 *.bnk
 *.srm
+*.inc
+*_data.as
 
 # WLA-DX
 linkfile
@@ -75,23 +77,16 @@ release/
 *.sfc
 *.h
 
-# But track source files
+# But track source files (not generated artifacts)
 !lib/source/*.asm
+!lib/source/*.inc
 !lib/include/**/*.h
+!lib/include/**/*.inc
 !templates/**/*.asm
+!templates/**/*.inc
 !examples/**/data.asm
 !examples/**/spc.asm
+!examples/**/hero*_meta.inc
 !tools/**/*.h
-!examples/**/res/*.pic
-!examples/**/res/*.map
-!examples/**/res/*.pal
-!examples/**/res/*.inc
-!examples/**/res/*.as
-!examples/**/res/*.pc7
-!examples/**/res/*.mp7
-!examples/**/assets/*.inc
-!examples/**/assets/*.as
-!examples/**/assets/*.pc7
-!examples/**/assets/*.mp7
-!examples/**/assets/*.pal
+!tests/**/*.inc
 
