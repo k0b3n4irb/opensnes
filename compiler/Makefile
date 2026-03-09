@@ -67,7 +67,7 @@ $(CPROC_DIR)/config.h: config.h.in
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
 # Use clang for consistent builds across all platforms
-	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" cproc-qbe
+	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="-g" cproc-qbe
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean

@@ -61,6 +61,13 @@
  * @note HDMA channels 6-7 are recommended to avoid conflicts with DMA.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
+ * ## Bank Byte Limitation
+ *
+ * hdmaSetup() hardcodes bank $00 for ROM addresses (>= $8000). If the
+ * linker places a SUPERFREE table in bank $01+, HDMA will read wrong data.
+ * Use hdmaSetupBank() with an explicit bank byte for ROM tables, or use
+ * RAM-based tables (always bank $00) for dynamic effects.
+ *
  * ## IMPORTANT: Scroll Registers Require Repeat Mode
  *
  * BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that
@@ -200,6 +207,9 @@
 
 /** @brief Destination: Fixed color ($2132) */
 #define HDMA_DEST_COLDATA   0x32
+
+/** @brief Destination: INIDISP brightness ($2100) */
+#define HDMA_DEST_INIDISP   0x00
 
 /** @brief Destination: Mode 7 matrix A ($211B) */
 #define HDMA_DEST_M7A       0x1B
@@ -357,12 +367,12 @@ void hdmaWaveInit(void);
  *
  * @param channel HDMA channel to use (6 or 7 recommended)
  * @param bg Background layer to affect (0=BG1, 1=BG2, 2=BG3)
- * @param amplitude Wave amplitude in pixels (1-16)
- * @param frequency Wave frequency (1=long waves, 8=short waves)
+ * @param amplitude Wave amplitude in pixels (1-60, clamped internally)
+ * @param frequency Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.
  *
  * @code
  * hdmaWaveInit();
- * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 2);  // Gentle water reflection on BG1
+ * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 4);  // Gentle water reflection on BG1
  * hdmaEnable(1 << HDMA_CHANNEL_6);
  *
  * while (1) {
@@ -396,5 +406,146 @@ void hdmaWaveStop(void);
  * @param speed Animation speed (1=slow, 4=fast, default=2)
  */
 void hdmaWaveSetSpeed(u8 speed);
+
+/*============================================================================
+ * HDMA Brightness Gradient
+ *============================================================================*/
+
+/**
+ * @brief Create a vertical brightness gradient
+ *
+ * Smoothly fades screen brightness from top to bottom using HDMA
+ * on the INIDISP register ($2100). Useful for:
+ * - Fade-to-black at screen bottom
+ * - Spotlight / vignette effects
+ * - Underwater depth dimming
+ *
+ * @param channel HDMA channel (6 or 7 recommended)
+ * @param topBrightness Brightness at top of screen (0-15, 15=full)
+ * @param bottomBrightness Brightness at bottom of screen (0-15)
+ *
+ * @code
+ * hdmaBrightnessGradient(HDMA_CHANNEL_7, 15, 0);  // Fade to black
+ * @endcode
+ */
+void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness);
+
+/**
+ * @brief Stop brightness gradient and restore full brightness
+ *
+ * @param channel The channel used for the gradient
+ */
+void hdmaBrightnessGradientStop(u8 channel);
+
+/*============================================================================
+ * HDMA Color Gradient
+ *============================================================================*/
+
+/**
+ * @brief Create a per-scanline CGRAM color gradient
+ *
+ * Smoothly interpolates a palette color from one value to another across
+ * the screen. Uses HDMA to rewrite a CGRAM entry per scanline. Useful for:
+ * - Sky color gradients (blue to orange sunset)
+ * - Water depth color shifts
+ * - Background atmosphere effects
+ *
+ * @param channel HDMA channel (6 or 7 recommended)
+ * @param colorIndex CGRAM color index to modify (0-255)
+ * @param topColor 15-bit SNES color at top of screen (use RGB() macro)
+ * @param bottomColor 15-bit SNES color at bottom of screen
+ *
+ * @code
+ * // Blue sky fading to orange at horizon
+ * hdmaColorGradient(HDMA_CHANNEL_6, 0,
+ *                   RGB(4, 8, 28),    // Deep blue
+ *                   RGB(28, 16, 4));   // Orange
+ * @endcode
+ */
+void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor);
+
+/**
+ * @brief Stop color gradient effect
+ *
+ * @param channel The channel used for the gradient
+ */
+void hdmaColorGradientStop(u8 channel);
+
+/*============================================================================
+ * HDMA Iris Wipe (Circular Window)
+ *============================================================================*/
+
+/**
+ * @brief Create a circular window mask (iris/spotlight effect)
+ *
+ * Uses HDMA to drive window registers (WH0/WH1) per scanline,
+ * approximating a circle. Configures all window registers automatically.
+ * Useful for:
+ * - Scene transitions (iris in/out)
+ * - Spotlight effects
+ * - Circular vignette
+ *
+ * @param channel HDMA channel (6 or 7 recommended)
+ * @param layers Layer bitmask to apply window masking (TM_BG1, TM_BG2, etc.)
+ * @param centerX Horizontal center of circle (0-255)
+ * @param centerY Vertical center of circle (0-223)
+ * @param radius Circle radius in pixels (0-128)
+ *
+ * @note Call again with a different radius to animate the wipe.
+ *
+ * @code
+ * // Iris wipe on BG1, centered on screen
+ * hdmaIrisWipe(HDMA_CHANNEL_6, TM_BG1, 128, 112, 80);
+ *
+ * // Animate iris opening
+ * for (r = 0; r < 128; r += 2) {
+ *     hdmaIrisWipe(HDMA_CHANNEL_6, TM_BG1, 128, 112, r);
+ *     WaitForVBlank();
+ * }
+ * @endcode
+ */
+void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius);
+
+/**
+ * @brief Stop iris wipe effect and restore window registers
+ *
+ * Disables the HDMA channel and clears all window masking registers
+ * (W12SEL, W34SEL, WOBJSEL, TMW) to restore normal display.
+ *
+ * @param channel The channel used for the iris wipe
+ */
+void hdmaIrisWipeStop(u8 channel);
+
+/*============================================================================
+ * HDMA Water Ripple
+ *============================================================================*/
+
+/**
+ * @brief Create a water ripple distortion effect
+ *
+ * Similar to hdmaWaveH but with amplitude that increases from top to bottom,
+ * simulating underwater refraction or heat haze. Uses the wave system's
+ * double-buffered tables internally.
+ *
+ * @param channel HDMA channel (6 or 7 recommended)
+ * @param bg Background layer (0=BG1, 1=BG2, 2=BG3)
+ * @param amplitude Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped)
+ * @param speed Animation speed (1=slow, 4=fast)
+ *
+ * @note Amplitude is clamped to 60 to prevent s16 overflow in sine computation.
+ * @note Cannot be used simultaneously with hdmaWaveH (shared buffers).
+ * @note Call hdmaWaveUpdate() each frame to animate.
+ * @note Call hdmaWaveStop() to stop the effect.
+ *
+ * @code
+ * hdmaWaterRipple(HDMA_CHANNEL_6, 0, 8, 2);
+ *
+ * while (1) {
+ *     WaitForVBlank();
+ *     hdmaWaveUpdate();  // Animate ripple
+ * }
+ * @endcode
+ */
+void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed);
 
 #endif /* OPENSNES_HDMA_H */

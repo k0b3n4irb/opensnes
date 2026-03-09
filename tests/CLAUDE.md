@@ -8,7 +8,7 @@ Ce fichier documente **tous** les tests du projet OpenSNES : quoi, quand, commen
 |---|---|
 | **N'importe quoi** (minimum) | `./tests/unit/run_unit_tests.sh` |
 | `compiler/qbe/` ou `compiler/cproc/` | `./tests/compiler/run_tests.sh` + rebuild all |
-| `lib/` ou `templates/common/` | `make clean && make` + `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
+| `lib/` ou `templates/` | `make clean && make` + `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
 | `examples/` | `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` |
 | **Avant tout commit** | Les 3 commandes ci-dessous |
 
@@ -103,8 +103,8 @@ qui cassent le linker WLA-DX (cross-object resolution failure avec préfixe `_`)
 
 ### Problèmes connus
 
-- **Audio** : RAMSECTION `.audio_ram` ($0400 FORCE, 512B) chevauche `oamMemory` ($0300-$051F). Impossible de linker le module audio avec les sprites. Test limité aux constantes/structs.
-- **SNESMOD** : même conflit RAMSECTION + nécessite un soundbank binaire. Pas de test unitaire.
+- **Audio** : `.audio_ram` est à $0700 (au-dessus de oamMemory $0300-$051F). Le module linke correctement avec sprites. Test limité aux constantes/structs car audioInit() attend un SPC driver (timeout en émulateur sans soundbank).
+- **SNESMOD** : nécessite un soundbank binaire. Pas de test unitaire.
 
 ---
 
@@ -112,7 +112,7 @@ qui cassent le linker WLA-DX (cross-object resolution failure avec préfixe `_`)
 
 **Script** : `./tests/compiler/run_tests.sh [-v] [--allow-known-bugs]`
 
-54 tests de régression pour le compilateur cc65816 (cproc + QBE w65816).
+60 tests de régression pour le compilateur cc65816 (cproc + QBE w65816).
 Chaque test compile un fichier C et vérifie le **contenu de l'assembleur généré** (grep sur le .asm).
 
 ### Ce que ça teste
@@ -122,7 +122,7 @@ Chaque test compile un fichier C et vérifie le **contenu de l'assembleur géné
 | Binaires existent | 2 | cc65816, wla-65816 présents dans bin/ |
 | Codegen basique | 5 | Compilation minimale, directives WLA-DX correctes |
 | Types & struct | 6 | Struct alignment, union, nested struct, 2D array, global struct init |
-| Opérateurs | 8 | Shift, division, multiplication, comparaisons, bitops, variable shift |
+| Opérateurs | 9 | Shift, division, signed division, multiplication, comparaisons, bitops, variable shift |
 | Contrôle de flux | 4 | Loops, switch, function pointers, SSA phi nodes |
 | Variables | 6 | Static mutable, const data en ROM, volatile, volatile ptr, globals |
 | Promotions | 3 | u32 arithmetic, sign promotion, large local |
@@ -142,7 +142,7 @@ régénérer tous les .asm (les vieux .asm avec l'ancien codegen restent sinon).
 
 ### État actuel
 
-53/54 passent. 1 known bug : `comparisons: test_s16_shift_right` (signed right shift pattern manquant).
+60/60 passent. Aucun known bug.
 
 ---
 
@@ -169,8 +169,8 @@ Valide **tous** les ROMs dans `examples/` ET `pvsneslib_examples/`.
 
 ### Couverture actuelle
 
-- `examples/` : 25 ROMs (tous les exemples OpenSNES)
-- Total : **25 ROMs** validés
+- `examples/` : 37 ROMs (tous les exemples OpenSNES)
+- Total : **37 ROMs** validés
 
 ---
 
@@ -203,7 +203,7 @@ tests/
 ├── test_snes_compliance.sh         ← 8 vérifications statiques (grep headers/asm)
 │
 ├── compiler/                       ← Tests de régression compilateur
-│   ├── run_tests.sh                   54 tests (C → ASM → grep patterns)
+│   ├── run_tests.sh                   60 tests (C → ASM → grep patterns)
 │   └── build/                         Fichiers temporaires de test
 │
 ├── examples/                       ← Validation automatique des ROMs
@@ -269,7 +269,7 @@ Voir `devtools/snesdbg/README.md` pour l'API complète.
 
 ---
 
-## 6. Chiffres clés
+## 7. Chiffres clés
 
 | Métrique | Valeur |
 |----------|--------|
@@ -277,13 +277,13 @@ Voir `devtools/snesdbg/README.md` pour l'API complète.
 | Assertions réelles (runtime) | ~385 |
 | Assertions smoke (runtime) | ~170 |
 | `_Static_assert` (compile-time) | 119 |
-| Tests compilateur | 54 |
-| ROMs validés (examples) | 25 |
+| Tests compilateur | 60 |
+| ROMs validés (examples) | 37 |
 | Exemples de référence (manuel) | 7 |
 
 ---
 
-## 7. Règles pour les contributions
+## 8. Règles pour les contributions
 
 1. **Tout changement doit passer les 3 scripts** avant commit
 2. **Tout nouveau module library** doit avoir un test dans `tests/unit/`

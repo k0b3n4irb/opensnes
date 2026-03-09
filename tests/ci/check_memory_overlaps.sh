@@ -111,7 +111,7 @@ if [ $FAILED -gt 0 ]; then
     echo "Common fixes:"
     echo "  1. Move Bank \$7E buffers to address \$2000+ (above mirror range)"
     echo "  2. Add reserved section in Bank \$00 to prevent linker collisions"
-    echo "  3. Check templates/common/crt0.asm for memory layout"
+    echo "  3. Check templates/crt0.asm for memory layout"
     exit 1
 fi
 
