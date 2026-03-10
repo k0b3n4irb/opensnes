@@ -153,7 +153,7 @@ OpenSNES is a fork of PVSnesLib with a different set of trade-offs:
 | **Library** | Modular (`LIB_MODULES=...`) | Monolithic |
 | **Docs** | 8 guides + 37 example READMEs | Wiki + 4 READMEs |
 | **Track record** | 3 months, no shipped games | 14 years, commercial games shipped |
-| **Pre-built binaries** | Not yet | Available |
+| **Pre-built binaries** | Available (GitHub Releases) | Available |
 
 PVSnesLib is the proven, battle-tested choice. OpenSNES is the modern, well-tested
 alternative with better tooling and documentation. See the full

@@ -9,6 +9,8 @@ on:
     branches:
       - "main"
       - "develop"
+    tags-ignore:
+      - "v*"  # Release tags are handled by release.yml
   pull_request:
     branches:
       - "main"

@@ -123,7 +123,7 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 
 | Item | Status | Why it matters |
 |------|--------|----------------|
-| Pre-built binary releases | Not started | Blocks adoption — users shouldn't need to compile the compiler |
+| Pre-built binary releases | Done (release.yml) | Blocks adoption — users shouldn't need to compile the compiler |
 | Hardware verification docs | Not started | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
 | Published performance benchmark | Tool exists | Marketing — show the 22% improvement with data |
@@ -139,7 +139,7 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 | More ported examples | In progress | Breadth of coverage |
 
 ### Short Term (v0.7.0)
-- [ ] Pre-built binary releases for Linux, macOS, Windows
+- [x] Pre-built binary releases for Linux, macOS, Windows
 - [ ] Published benchmark results (compiler output comparison)
 - [ ] More compiler peephole optimizations
 - [ ] Performance profiling tools (VBlank usage, cycle counter)
@@ -164,7 +164,7 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 2. **32-bit operations are slow** — prefer `u16`/`s16` when possible
 3. **~4 KB VBlank DMA budget** — don't exceed per-frame transfer limits
 4. **All C variables must be in bank $00, < $2000** — compiler generates `sta.l $0000,x`
-5. **No pre-built binaries** — must compile toolchain from source (~1 minute)
+5. **No floating-point emulation** — integer and fixed-point only
 
 ---
 
