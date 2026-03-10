@@ -14,3 +14,8 @@
 
 .ROMBANKSIZE $10000         ; 64KB per bank (HiROM standard)
 .ROMBANKS 4                 ; Match ROM configuration
+
+; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
+.ASCIITABLE
+MAP ' ' TO '~' = ' '
+.ENDA
