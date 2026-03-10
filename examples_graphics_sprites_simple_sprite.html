@@ -100,39 +100,39 @@ $(document).ready(function(){initNavTree('examples_graphics_sprites_simple_sprit
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1036"></a>
+    <h2><a class="anchor" id="autotoc_md1038"></a>
 What This Example Shows</h2>
 <p>How to display a single 32x32 pixel sprite on screen using the SNES Object Attribute Memory (OAM). This is the simplest possible sprite program &ndash; no animation, no input, just one sprite at the center of the screen.</p>
-<h2><a class="anchor" id="autotoc_md1037"></a>
+<h2><a class="anchor" id="autotoc_md1039"></a>
 Prerequisites</h2>
 <p>Read <code>text/hello_world</code> first &ndash; it covers <code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code>, VRAM, and the PPU basics.</p>
-<h2><a class="anchor" id="autotoc_md1038"></a>
+<h2><a class="anchor" id="autotoc_md1040"></a>
 Controls</h2>
 <p>No interactive controls. A static sprite is displayed at the center of the screen.</p>
-<h2><a class="anchor" id="autotoc_md1039"></a>
+<h2><a class="anchor" id="autotoc_md1041"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/sprites/simple_sprite</div>
 </div><!-- fragment --><p>Then open <code>simple_sprite.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md1040"></a>
+<h2><a class="anchor" id="autotoc_md1042"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1041"></a>
+<h3><a class="anchor" id="autotoc_md1043"></a>
 1. Load sprite graphics into VRAM</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(sprite32, 0x2100, sprite32_end - sprite32);</div>
 <div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
 </div><!-- fragment --><p>Sprite tiles go to a different VRAM region than background tiles. Here we load them at word address <code>$2100</code>. The SNES has a shared 64 KB VRAM &ndash; backgrounds and sprites coexist by using non-overlapping address ranges.</p>
-<h3><a class="anchor" id="autotoc_md1042"></a>
+<h3><a class="anchor" id="autotoc_md1044"></a>
 2. Load the sprite palette</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(palsprite32, 128, 32);</div>
 <div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible)</div></div>
 </div><!-- fragment --><p>CGRAM (Color Generator RAM) holds 256 entries. The first 128 are for backgrounds, the last 128 are for sprites. Offset 128 = first sprite palette (palette 0 in sprite terms). Each palette is 16 colors (32 bytes in 15-bit SNES format).</p>
-<h3><a class="anchor" id="autotoc_md1043"></a>
+<h3><a class="anchor" id="autotoc_md1045"></a>
 3. Configure OBJ size</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a22334065b3f4ab55b83686d7edbff98a">oamInitEx</a>(<a class="code hl_define" href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a>, 1);</div>
 <div class="ttc" id="asprite_8h_html_a22334065b3f4ab55b83686d7edbff98a"><div class="ttname"><a href="sprite_8h.html#a22334065b3f4ab55b83686d7edbff98a">oamInitEx</a></div><div class="ttdeci">void oamInitEx(u16 size, u16 tileBase)</div><div class="ttdoc">Initialize sprite system with configuration.</div></div>
 <div class="ttc" id="asprite_8h_html_a4e8556727bbae22ac2e0fa8392a13fc4"><div class="ttname"><a href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a></div><div class="ttdeci">#define OBJ_SIZE8_L32</div><div class="ttdef"><b>Definition</b> sprite.h:50</div></div>
 </div><!-- fragment --><p>The SNES supports two sprite sizes simultaneously: "small" and "large". Here we use 8x8 small / 32x32 large. The second parameter (<code>1</code>) sets the name base &ndash; the VRAM region where sprite tiles start (<code>$2000</code> in word addressing).</p>
-<h3><a class="anchor" id="autotoc_md1044"></a>
+<h3><a class="anchor" id="autotoc_md1046"></a>
 4. Place the sprite</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, 112, 96, 0x0010, 0, 3, 0);</div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6">oamSetEx</a>(0, <a class="code hl_define" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a>, <a class="code hl_define" href="sprite_8h.html#a0b9b0362f3cdfc1625ff5cfea7efcd0c">OBJ_SHOW</a>);</div>
@@ -147,7 +147,7 @@ How It Works</h2>
 <li>Priority: 3 (in front of all backgrounds)</li>
 </ul>
 <p><code><a class="el" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6" title="Set sprite extended attributes.">oamSetEx()</a></code> sets this sprite as "large" (32x32) and visible.</p>
-<h3><a class="anchor" id="autotoc_md1045"></a>
+<h3><a class="anchor" id="autotoc_md1047"></a>
 5. Enable display</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
 <div class="line"><a class="code hl_define" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a>);</div>
@@ -158,9 +158,9 @@ How It Works</h2>
 <div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:121</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>Mode 1 is used but we only enable sprites (<code>LAYER_OBJ</code>) on the main screen &ndash; no backgrounds needed for this demo.</p>
-<h2><a class="anchor" id="autotoc_md1046"></a>
+<h2><a class="anchor" id="autotoc_md1048"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1047"></a>
+<h3><a class="anchor" id="autotoc_md1049"></a>
 OAM (Object Attribute Memory)</h3>
 <p>The SNES has 128 sprite entries in OAM, each with:</p><ul>
 <li>X/Y position (9-bit X, 8-bit Y)</li>
@@ -170,13 +170,13 @@ OAM (Object Attribute Memory)</h3>
 <li>Horizontal/vertical flip flags</li>
 </ul>
 <p>Plus 32 bytes of "high table" storing the X position MSB and size-select bit for each sprite (2 bits per sprite, packed 4 per byte).</p>
-<h3><a class="anchor" id="autotoc_md1048"></a>
+<h3><a class="anchor" id="autotoc_md1050"></a>
 CGRAM Split</h3>
 <p>Colors 0-127 are for backgrounds, colors 128-255 are for sprites. Sprite palette 0 starts at CGRAM offset 128, palette 1 at 144, and so on. Each palette holds 16 colors (32 bytes).</p>
-<h3><a class="anchor" id="autotoc_md1049"></a>
+<h3><a class="anchor" id="autotoc_md1051"></a>
 Name Base</h3>
 <p>The VRAM word address where the PPU starts looking for sprite tiles. Set via <code><a class="el" href="sprite_8h.html#a22334065b3f4ab55b83686d7edbff98a" title="Initialize sprite system with configuration.">oamInitEx()</a></code> or register $2101 (OBJSEL). The tile number in each OAM entry is an offset from this base.</p>
-<h2><a class="anchor" id="autotoc_md1050"></a>
+<h2><a class="anchor" id="autotoc_md1052"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -190,7 +190,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma sprite</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1051"></a>
+<h2><a class="anchor" id="autotoc_md1053"></a>
 Going Further</h2>
 <ul>
 <li><b>Move the sprite</b>: Add <code><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></code> input reading and update the X/Y position in the main loop with <code><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></code>.</li>

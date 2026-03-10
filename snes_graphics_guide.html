@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('snes_graphics_guide.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This guide covers everything needed to create graphics for SNES games using OpenSNES.</p>
-<h2><a class="anchor" id="autotoc_md219"></a>
+<h2><a class="anchor" id="autotoc_md221"></a>
 Table of Contents</h2>
 <ol type="1">
 <li>PPU Architecture</li>
@@ -111,7 +111,7 @@ Table of Contents</h2>
 <li>Tools &amp; Resources</li>
 </ol>
 <hr  />
-<h2><a class="anchor" id="autotoc_md221"></a>
+<h2><a class="anchor" id="autotoc_md223"></a>
 PPU Architecture</h2>
 <p>The SNES uses <b>two PPU chips</b> working together:</p>
 <table class="markdownTable">
@@ -122,7 +122,7 @@ PPU Architecture</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">PPU2   </td><td class="markdownTableBodyNone">5C78   </td><td class="markdownTableBodyNone">"The Compositor" - generates video signal, accesses palettes   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md222"></a>
+<h3><a class="anchor" id="autotoc_md224"></a>
 Memory Systems</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -135,7 +135,7 @@ Memory Systems</h3>
 <td class="markdownTableBodyNone"><b>CGRAM</b>   </td><td class="markdownTableBodyNone">512 bytes   </td><td class="markdownTableBodyNone">Color palettes (256 colors × 15-bit)   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md224"></a>
+<h2><a class="anchor" id="autotoc_md226"></a>
 Video Modes</h2>
 <p>The SNES supports 8 background modes. <b>Mode 1</b> is most common for games:</p>
 <table class="markdownTable">
@@ -158,7 +158,7 @@ Video Modes</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">8bpp   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">Rotation/scaling (Mode 7)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md225"></a>
+<h3><a class="anchor" id="autotoc_md227"></a>
 Mode 1 Setup (Recommended)</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a> = 0x01;  <span class="comment">// Mode 1, 8x8 tiles</span></div>
 <div class="line"><span class="comment">// BG1: 16 colors (4bpp) - main playfield</span></div>
@@ -166,9 +166,9 @@ Mode 1 Setup (Recommended)</h3>
 <div class="line"><span class="comment">// BG3: 4 colors (2bpp)  - HUD/status bar</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga52a05d4fdd66feb5ae0d8bb0a8b291e0"><div class="ttname"><a href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a></div><div class="ttdeci">#define REG_BGMODE</div><div class="ttdoc">BG mode and tile size (W)</div><div class="ttdef"><b>Definition</b> registers.h:64</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md227"></a>
+<h2><a class="anchor" id="autotoc_md229"></a>
 Backgrounds</h2>
-<h3><a class="anchor" id="autotoc_md228"></a>
+<h3><a class="anchor" id="autotoc_md230"></a>
 Tilemap Structure</h3>
 <p>Each tilemap entry is <b>16 bits</b>: </p><div class="fragment"><div class="line">VHOP PPCC CCCC CCCC</div>
 <div class="line">│││  ││└─────────── Tile number (0-1023)</div>
@@ -176,7 +176,7 @@ Tilemap Structure</h3>
 <div class="line">││└─────────────────  Priority (0-1)</div>
 <div class="line">│└──────────────────  Horizontal flip</div>
 <div class="line">└───────────────────  Vertical flip</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md229"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md231"></a>
 Tilemap Sizes</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -190,7 +190,7 @@ Tilemap Sizes</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">64×64   </td><td class="markdownTableBodyNone">4096   </td><td class="markdownTableBodyNone">512×512   </td><td class="markdownTableBodyNone">8 KB   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md230"></a>
+<h3><a class="anchor" id="autotoc_md232"></a>
 Tile Formats</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -203,9 +203,9 @@ Tile Formats</h3>
 <td class="markdownTableBodyNone">8bpp   </td><td class="markdownTableBodyNone">256   </td><td class="markdownTableBodyNone">64 bytes   </td><td class="markdownTableBodyNone">Detailed art   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md232"></a>
+<h2><a class="anchor" id="autotoc_md234"></a>
 Sprites</h2>
-<h3><a class="anchor" id="autotoc_md233"></a>
+<h3><a class="anchor" id="autotoc_md235"></a>
 OAM Structure (544 bytes total)</h3>
 <p><b>Main Table</b> (512 bytes, 4 bytes × 128 sprites):</p>
 <table class="markdownTable">
@@ -232,7 +232,7 @@ OAM Structure (544 bytes total)</h3>
 <li>Bit 0: X position bit 8 (for X &gt; 255)</li>
 <li>Bit 1: Size select (0=small, 1=large)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md234"></a>
+<h3><a class="anchor" id="autotoc_md236"></a>
 Sprite Sizes</h3>
 <p>Register <code>$2101</code> selects two sizes (small/large):</p>
 <table class="markdownTable">
@@ -255,7 +255,7 @@ Sprite Sizes</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">16×32   </td><td class="markdownTableBodyNone">32×32   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md235"></a>
+<h3><a class="anchor" id="autotoc_md237"></a>
 Scanline Limits (Critical!)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -266,14 +266,14 @@ Scanline Limits (Critical!)</h3>
 <td class="markdownTableBodyNone">Slivers/line   </td><td class="markdownTableBodyNone">34 max   </td><td class="markdownTableBodyNone">Sprite parts clipped   </td></tr>
 </table>
 <p><b>Solution</b>: Rotate OAM priority each frame to distribute flicker.</p>
-<h3><a class="anchor" id="autotoc_md236"></a>
+<h3><a class="anchor" id="autotoc_md238"></a>
 Sprite Priority</h3>
 <p>Within OBJ layer: Lower OAM index = on top With backgrounds: Priority bits 0-3 interleave with BG layers</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md238"></a>
+<h2><a class="anchor" id="autotoc_md240"></a>
 Metasprites</h2>
 <p>Metasprites combine multiple hardware sprites into one logical entity.</p>
-<h3><a class="anchor" id="autotoc_md239"></a>
+<h3><a class="anchor" id="autotoc_md241"></a>
 Data Format Example</h3>
 <div class="fragment"><div class="line"><span class="comment">// Each entry: X offset, Y offset, tile, attributes</span></div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> player_idle[] = {</div>
@@ -288,7 +288,7 @@ Data Format Example</h3>
 <div class="line">    0xFF  <span class="comment">// End marker</span></div>
 <div class="line">};</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md240"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md242"></a>
 Animation State Machine</h3>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frame;           <span class="comment">// Current frame index</span></div>
@@ -310,9 +310,9 @@ Animation State Machine</h3>
 <div class="ttc" id="astructAnimation_html"><div class="ttname"><a href="structAnimation.html">Animation</a></div><div class="ttdoc">Animation definition.</div><div class="ttdef"><b>Definition</b> animation.h:73</div></div>
 <div class="ttc" id="astructAnimation_html_a8e9b8b3b61265b2b8e268a02dec709a1"><div class="ttname"><a href="structAnimation.html#a8e9b8b3b61265b2b8e268a02dec709a1">Animation::frames</a></div><div class="ttdeci">u8 * frames</div><div class="ttdef"><b>Definition</b> animation.h:74</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md242"></a>
+<h2><a class="anchor" id="autotoc_md244"></a>
 VRAM Layout</h2>
-<h3><a class="anchor" id="autotoc_md243"></a>
+<h3><a class="anchor" id="autotoc_md245"></a>
 Recommended Layout (Mode 1)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -328,7 +328,7 @@ Recommended Layout (Mode 1)</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$8000   </td><td class="markdownTableBodyNone">16 KB   </td><td class="markdownTableBodyNone">Sprite tiles (4bpp, 512 tiles)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md244"></a>
+<h3><a class="anchor" id="autotoc_md246"></a>
 VRAM Address Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -347,9 +347,9 @@ VRAM Address Registers</h3>
 <td class="markdownTableBodyNone">$2101   </td><td class="markdownTableBodyNone">Sprite tile address + size select   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md246"></a>
+<h2><a class="anchor" id="autotoc_md248"></a>
 Palettes</h2>
-<h3><a class="anchor" id="autotoc_md247"></a>
+<h3><a class="anchor" id="autotoc_md249"></a>
 CGRAM Layout (256 colors × 2 bytes)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -359,19 +359,19 @@ CGRAM Layout (256 colors × 2 bytes)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$80-$FF   </td><td class="markdownTableBodyNone">128   </td><td class="markdownTableBodyNone">Sprite palettes (8 × 16 colors)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md248"></a>
+<h3><a class="anchor" id="autotoc_md250"></a>
 Color Format (15-bit BGR)</h3>
 <div class="fragment"><div class="line">0BBB BBGG GGGR RRRR</div>
 <div class="line"> │││││││││││└────── Red (0-31)</div>
 <div class="line"> │││││└└└└└──────── Green (0-31)</div>
 <div class="line"> └└└└└───────────── Blue (0-31)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md249"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md251"></a>
 Palette Selection</h3>
 <p><b>Backgrounds</b>: Tilemap bits 10-12 select palette 0-7 <b>Sprites</b>: OAM byte 3 bits 1-3 select palette 0-7 (from upper CGRAM)</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md251"></a>
+<h2><a class="anchor" id="autotoc_md253"></a>
 Asset Requirements</h2>
-<h3><a class="anchor" id="autotoc_md252"></a>
+<h3><a class="anchor" id="autotoc_md254"></a>
 For SNES Compatibility</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -387,7 +387,7 @@ For SNES Compatibility</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Character   </td><td class="markdownTableBodyNone">16×16 to 32×32 typical   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md253"></a>
+<h3><a class="anchor" id="autotoc_md255"></a>
 Recommended Workflow</h3>
 <ol type="1">
 <li><b>Create art</b> in any tool (Aseprite, GIMP, Photoshop)</li>
@@ -397,9 +397,9 @@ Recommended Workflow</h3>
 <li><b>Load via DMA</b> during VBlank</li>
 </ol>
 <hr  />
-<h2><a class="anchor" id="autotoc_md255"></a>
+<h2><a class="anchor" id="autotoc_md257"></a>
 Tools &amp; Resources</h2>
-<h3><a class="anchor" id="autotoc_md256"></a>
+<h3><a class="anchor" id="autotoc_md258"></a>
 Graphics Conversion Tools</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -415,7 +415,7 @@ Graphics Conversion Tools</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>GIMP</b>   </td><td class="markdownTableBodyNone">Free image editor   </td><td class="markdownTableBodyNone">gimp.org   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md257"></a>
+<h3><a class="anchor" id="autotoc_md259"></a>
 Free Asset Sources (CC0/Public Domain)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -429,7 +429,7 @@ Free Asset Sources (CC0/Public Domain)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Kenney Assets</b>   </td><td class="markdownTableBodyNone"><a href="https://kenney.nl/assets">https://kenney.nl/assets</a> (CC0)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md258"></a>
+<h3><a class="anchor" id="autotoc_md260"></a>
 Documentation</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -444,9 +444,9 @@ Documentation</h3>
 <td class="markdownTableBodyNone"><a href="https://fabiensanglard.net/snes_ppus_how/">Fabien Sanglard PPU</a>   </td><td class="markdownTableBodyNone">Deep PPU internals   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md260"></a>
+<h2><a class="anchor" id="autotoc_md262"></a>
 Quick Reference</h2>
-<h3><a class="anchor" id="autotoc_md261"></a>
+<h3><a class="anchor" id="autotoc_md263"></a>
 Register Cheat Sheet</h3>
 <div class="fragment"><div class="line">$2100 INIDISP  - Screen on/off, brightness</div>
 <div class="line">$2101 OBJSEL   - Sprite VRAM address, sizes</div>
@@ -462,7 +462,7 @@ Register Cheat Sheet</h3>
 <div class="line">$2119 VMDATAH  - VRAM data write (high)</div>
 <div class="line">$2121 CGADD    - Palette address</div>
 <div class="line">$2122 CGDATA   - Palette data write</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md262"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md264"></a>
 DMA Registers (for fast transfers)</h3>
 <div class="fragment"><div class="line">$4300 DMAP0   - DMA parameters</div>
 <div class="line">$4301 BBAD0   - B-bus address ($18 for VRAM, $22 for CGRAM)</div>

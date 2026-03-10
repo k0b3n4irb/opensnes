@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_hdma_wave.ht
 <p>&zwj;A wavy distortion effect that bends the entire screen like a funhouse mirror. Press A to toggle, D-pad to control amplitude and animation. This is the same trick used for water reflections in Chrono Trigger. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md842"></a>
+<h2><a class="anchor" id="autotoc_md844"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,12 +114,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-Pad Down   </td><td class="markdownTableBodyNone">Stop animation (freeze)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md843"></a>
+<h2><a class="anchor" id="autotoc_md845"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/hdma_wave</div>
 </div><!-- fragment --><p>Then open <code>hdma_wave.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md844"></a>
+<h2><a class="anchor" id="autotoc_md846"></a>
 What You'll Learn</h2>
 <ul>
 <li>What HDMA is and why it's one of the SNES's most powerful features</li>
@@ -128,14 +128,14 @@ What You'll Learn</h2>
 <li>Pre-computing animation tables in ROM to avoid any runtime math</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md846"></a>
+<h2><a class="anchor" id="autotoc_md848"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md847"></a>
+<h3><a class="anchor" id="autotoc_md849"></a>
 1. What Is HDMA?</h3>
 <p>Normal DMA transfers a block of data from one place to another — useful for loading tiles during VBlank. <b>HDMA</b> (Horizontal DMA) is different: it feeds a small amount of data to a PPU register <em>every single scanline</em> while the screen is being drawn.</p>
 <p>Think about it: the PPU draws 224 horizontal lines per frame. If you change the BG1 horizontal scroll register between each line, every line on screen shifts by a different amount. Feed it a sine wave pattern and the whole screen undulates.</p>
 <p>That's exactly what this demo does.</p>
-<h3><a class="anchor" id="autotoc_md848"></a>
+<h3><a class="anchor" id="autotoc_md850"></a>
 2. The HDMA Table Format</h3>
 <p>An HDMA table is a sequence of entries in RAM or ROM. The hardware reads one entry per group of scanlines:</p>
 <div class="fragment"><div class="line">[0x81] [lo] [hi]   ← Repeat 1 scanline, write (lo, hi) to target register</div>
@@ -144,7 +144,7 @@ Walkthrough</h2>
 <div class="line">[0x00]              ← End of table</div>
 </div><!-- fragment --><p>The <code>0x81</code> byte means: repeat mode (bit 7 = 1), for 1 scanline (bits 6-0 = 1). Repeat mode writes the data on every scanline in the group. Without it, the data is written once and held — fine for registers that latch, but scroll registers need fresh writes every line.</p>
 <p>This demo has 335 entries per table (224 visible lines + 111 extra for animation phase wrapping) × 3 bytes each + 1 end marker = 1006 bytes per amplitude level.</p>
-<h3><a class="anchor" id="autotoc_md849"></a>
+<h3><a class="anchor" id="autotoc_md851"></a>
 3. Seven Amplitude Levels</h3>
 <p>The demo pre-computes tables for 7 wave amplitudes (0, 4, 8, 12, 16, 20, 24 pixels):</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define AMP_LEVELS    7</span></div>
@@ -162,7 +162,7 @@ Walkthrough</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why 335 entries instead of 224?</b> <a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> works by shifting the starting offset into the table. With only 224 entries, the phase offset would run off the end. The extra 111 entries (one full sine period = 112, minus 1) provide wrap-around space so animation can cycle smoothly without bounds checking. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md850"></a>
+<h3><a class="anchor" id="autotoc_md852"></a>
 4. Setting Up the HDMA Channel</h3>
 <p>The SNES has 8 DMA channels (0-7). This demo uses channel 6 for HDMA:</p>
 <div class="fragment"><div class="line">HW_DMAP6 = 0x02;    <span class="comment">/* Mode 2: write 2 bytes to same register, twice */</span></div>
@@ -172,7 +172,7 @@ Walkthrough</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why $210D specifically?</b> BG1HOFS (BG1 Horizontal Offset) controls how far BG1 is scrolled horizontally. By writing a different value to it on every scanline, each line of pixels shifts by a different amount. That's the wave. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md851"></a>
+<h3><a class="anchor" id="autotoc_md853"></a>
 5. Animation = Just Move the Pointer</h3>
 <p>Each frame, the main loop advances the phase and recalculates the table address:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (animating) {</div>
@@ -193,7 +193,7 @@ Walkthrough</h2>
 <div class="line">    0, 1006, 2012, 3018, 4024, 5030, 6036</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The animation "moves" by starting the HDMA read from a different point in the sine table. Phase 0 starts at the beginning, phase 56 starts halfway through the sine cycle. The wave appears to flow because each frame shifts the starting position by one entry.</p>
-<h3><a class="anchor" id="autotoc_md852"></a>
+<h3><a class="anchor" id="autotoc_md854"></a>
 6. The Checkerboard Background</h3>
 <p>To make the wave visible, the demo fills BG1 with alternating black and white tiles:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span> (i = 0; i &lt; 1024; i++) {</div>
@@ -207,7 +207,7 @@ Walkthrough</h2>
 <div class="ttc" id="agroup__volatile__types_html_ga1a2a3100a902c32a55d8b08915bce044"><div class="ttname"><a href="group__volatile__types.html#ga1a2a3100a902c32a55d8b08915bce044">vu8</a></div><div class="ttdeci">volatile u8 vu8</div><div class="ttdef"><b>Definition</b> types.h:83</div></div>
 </div><!-- fragment --><p>Without some visual pattern, the wave would be invisible — you'd just see a flat color shifting left and right. The checkerboard makes the distortion obvious.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md854"></a>
+<h2><a class="anchor" id="autotoc_md856"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Wave is invisible?</b> You need a visible pattern on the background. A solid color won't show horizontal displacement — there's nothing to distinguish shifted from non-shifted lines.</li>
@@ -216,7 +216,7 @@ Tips &amp; Tricks</h2>
 <li><b>Want to apply this to a real background?</b> Replace the checkerboard with actual tile art. The wave effect works on any background — it just shifts the scroll register. Water reflections in RPGs use this exact technique on a duplicated background layer.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md856"></a>
+<h2><a class="anchor" id="autotoc_md858"></a>
 Go Further</h2>
 <ul>
 <li><b>Vertical wave:</b> Instead of BG1HOFS, target BG1VOFS ($210E). Now the wave goes up and down instead of left and right. Combine both for a truly psychedelic effect.</li>
@@ -225,22 +225,22 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../hdma_gradient/">HDMA Gradient</a> — using HDMA to create smooth color gradients across the screen.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md858"></a>
+<h2><a class="anchor" id="autotoc_md860"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md859"></a>
+<h3><a class="anchor" id="autotoc_md861"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := hdma_wave.sfc</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console dma sprite input</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md860"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md862"></a>
 All Data Lives in C</h3>
 <p>Notice there's no <code>ASMSRC</code> and no graphics tools. The entire HDMA table — all 7042 bytes of pre-computed sine waves — is a <code>static const</code> array in <code>main.c</code>. The compiler places <code>const</code> data directly in ROM (in a <code>SUPERFREE</code> section), so it costs zero RAM.</p>
 <p>The checkerboard background tiles are also generated at runtime with a simple loop, not loaded from an asset file. This makes the example fully self-contained: one C file, no external dependencies.</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>When should data go in C vs. assembly?</b> Rule of thumb: if the data is generated by a tool (gfx4snes, smconv) or is a binary blob (<code>.pic</code>, <code>.pal</code>, <code>.brr</code>), put it in assembly with <code>.INCBIN</code>. If the data is hand-written or computed (lookup tables, HDMA tables, font tiles), a <code>const</code> array in C is simpler and keeps everything in one place. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md861"></a>
+<h3><a class="anchor" id="autotoc_md863"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -257,9 +257,9 @@ Why These Modules?</h3>
 <blockquote class="doxtable">
 <p>&zwj;**"Where's the HDMA module?"** The library has <code>hdma.c</code>/<code>hdma.asm</code>, but this example doesn't use them. HDMA setup is just 5 register writes — <code>DMAP6</code>, <code>BBAD6</code>, <code>A1T6L/H</code>, <code>A1B6</code>, <code>HDMAEN</code> — simple enough to do inline. The library's HDMA API is more useful when you need to manage multiple HDMA channels dynamically. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md862"></a>
+<h2><a class="anchor" id="autotoc_md864"></a>
 &lt;/blockquote&gt;</h2>
-<h2><a class="anchor" id="autotoc_md863"></a>
+<h2><a class="anchor" id="autotoc_md865"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -277,7 +277,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">HDMAEN   </td><td class="markdownTableBodyNone">$420C   </td><td class="markdownTableBodyNone">HDMA channel enable (bit 6 = channel 6)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md864"></a>
+<h2><a class="anchor" id="autotoc_md866"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_audio_snesmod_music.html','')
 <div class="caption">
 Screenshot</div></div>
     <p>Full music playback using SNESMOD, a tracker-based audio engine for the SNES.</p>
-<h2><a class="anchor" id="autotoc_md446"></a>
+<h2><a class="anchor" id="autotoc_md448"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>How SNESMOD works (module-based music)</li>
@@ -110,7 +110,7 @@ Learning Objectives</h2>
 <li>Volume control</li>
 <li>The smconv tool workflow</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md447"></a>
+<h2><a class="anchor" id="autotoc_md449"></a>
 Prerequisites</h2>
 <ul>
 <li>Basic understanding of SNES audio concepts</li>
@@ -118,7 +118,7 @@ Prerequisites</h2>
 <li>Basic tracker music concepts (optional)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md449"></a>
+<h2><a class="anchor" id="autotoc_md451"></a>
 What This Example Does</h2>
 <ul>
 <li>Displays a menu showing controls</li>
@@ -142,7 +142,7 @@ What This Example Does</h2>
 <td class="markdownTableBodyNone">START   </td><td class="markdownTableBodyNone">Fade out   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md451"></a>
+<h2><a class="anchor" id="autotoc_md453"></a>
 Code Type</h2>
 <p><b>Mixed C + Library + SNESMOD</b></p>
 <table class="markdownTable">
@@ -164,7 +164,7 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Text rendering   </td><td class="markdownTableBodyNone">Direct VRAM writes   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md453"></a>
+<h2><a class="anchor" id="autotoc_md455"></a>
 SNESMOD Overview</h2>
 <p>SNESMOD is a tracker-based music playback system:</p>
 <div class="fragment"><div class="line">Impulse Tracker file (.it)</div>
@@ -183,7 +183,7 @@ SNESMOD Overview</h2>
 <div class="line">         |</div>
 <div class="line">         v</div>
 <div class="line">    SPC700 playback</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md454"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md456"></a>
 Key Features</h3>
 <ul>
 <li>8 simultaneous channels</li>
@@ -194,9 +194,9 @@ Key Features</h3>
 <li>~5.5KB driver footprint</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md456"></a>
+<h2><a class="anchor" id="autotoc_md458"></a>
 SNESMOD API</h2>
-<h3><a class="anchor" id="autotoc_md457"></a>
+<h3><a class="anchor" id="autotoc_md459"></a>
 Initialization</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
@@ -210,7 +210,7 @@ Initialization</h3>
 <div class="ttc" id="agroup__snesmod__module_html_ga8299a9a929e131b1c7c145fae1a1e2f1"><div class="ttname"><a href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a></div><div class="ttdeci">void snesmodPlay(u8 startPosition)</div><div class="ttdoc">Start module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gae805748fae02839bafc3b2c2e3a82358"><div class="ttname"><a href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a></div><div class="ttdeci">void snesmodLoadModule(u16 moduleId)</div><div class="ttdoc">Load a module from the soundbank.</div></div>
 <div class="ttc" id="asnesmod_8h_html"><div class="ttname"><a href="snesmod_8h.html">snesmod.h</a></div><div class="ttdoc">SNESMOD - Tracker-based Audio Engine.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md458"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md460"></a>
 Main Loop (CRITICAL!)</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -220,7 +220,7 @@ Main Loop (CRITICAL!)</h3>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
 </div><!-- fragment --><p><b>Warning:</b> Failing to call <code><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></code> every frame causes audio glitches, buffer underruns, and potential crashes.</p>
-<h3><a class="anchor" id="autotoc_md459"></a>
+<h3><a class="anchor" id="autotoc_md461"></a>
 Playback Control</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);      <span class="comment">/* Play from start */</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038">snesmodStop</a>();       <span class="comment">/* Stop playback */</span></div>
@@ -229,16 +229,16 @@ Playback Control</h3>
 <div class="ttc" id="agroup__snesmod__module_html_ga1201b579aa2b8fbb3c62abe17c230038"><div class="ttname"><a href="group__snesmod__module.html#ga1201b579aa2b8fbb3c62abe17c230038">snesmodStop</a></div><div class="ttdeci">void snesmodStop(void)</div><div class="ttdoc">Stop module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gab75a9b81acb805e7cfe875b6e093425d"><div class="ttname"><a href="group__snesmod__module.html#gab75a9b81acb805e7cfe875b6e093425d">snesmodPause</a></div><div class="ttdeci">void snesmodPause(void)</div><div class="ttdoc">Pause module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gaf35e6e51f4a13c2183365eb814605bd2"><div class="ttname"><a href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a></div><div class="ttdeci">void snesmodResume(void)</div><div class="ttdoc">Resume module playback.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md460"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md462"></a>
 Volume Control</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(127);    <span class="comment">/* 0-127 */</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a>(0, 4);        <span class="comment">/* Target volume, speed */</span></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga256f12e62b2fae20a93a5ab05a53db5f"><div class="ttname"><a href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a></div><div class="ttdeci">void snesmodSetModuleVolume(u8 volume)</div><div class="ttdoc">Set module volume.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga9681d3b7715b34884cd81e2caf51d477"><div class="ttname"><a href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a></div><div class="ttdeci">void snesmodFadeVolume(u8 targetVolume, u8 speed)</div><div class="ttdoc">Fade module volume.</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md462"></a>
+<h2><a class="anchor" id="autotoc_md464"></a>
 Creating Music</h2>
-<h3><a class="anchor" id="autotoc_md463"></a>
+<h3><a class="anchor" id="autotoc_md465"></a>
 Using OpenMPT (Recommended)</h3>
 <ol type="1">
 <li>Download <a href="https://openmpt.org/">OpenMPT</a> (free for Windows/Wine)</li>
@@ -252,7 +252,7 @@ Using OpenMPT (Recommended)</h3>
 <li>Export as <code>.it</code> file</li>
 <li>Place in <code>music/</code> directory</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md464"></a>
+<h3><a class="anchor" id="autotoc_md466"></a>
 Build Process</h3>
 <p>The Makefile automatically:</p><ol type="1">
 <li>Runs <code>smconv</code> on your <code>.it</code> file</li>
@@ -261,7 +261,7 @@ Build Process</h3>
 </ol>
 <div class="fragment"><div class="line">SOUNDBANK_SRC := music/mymusic.it</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md466"></a>
+<h2><a class="anchor" id="autotoc_md468"></a>
 Generated Files</h2>
 <p>After building with smconv:</p>
 <p><b>soundbank.h:</b> </p><div class="fragment"><div class="line"><span class="preprocessor">#define MOD_POLLEN8     0</span></div>
@@ -271,13 +271,13 @@ Generated Files</h2>
 <div class="line">    .INCBIN &quot;soundbank.bnk&quot;</div>
 <div class="line">.ENDS</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md468"></a>
+<h2><a class="anchor" id="autotoc_md470"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_music</div>
 </div><!-- fragment --><p>Then open <code>music.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md470"></a>
+<h2><a class="anchor" id="autotoc_md472"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -296,62 +296,62 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>soundbank.bnk</code>   </td><td class="markdownTableBodyNone">Generated: compiled soundbank   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md472"></a>
+<h2><a class="anchor" id="autotoc_md474"></a>
 Memory Layout</h2>
-<h3><a class="anchor" id="autotoc_md473"></a>
+<h3><a class="anchor" id="autotoc_md475"></a>
 ROM</h3>
 <div class="fragment"><div class="line">Bank 0-1:  Code, tiles, tilemaps</div>
 <div class="line">Bank 2+:   Soundbank data (smconv output)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md474"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md476"></a>
 SPC RAM</h3>
 <div class="fragment"><div class="line">$0000-$00FF: Driver variables</div>
 <div class="line">$0200-$CFFF: Module data, samples</div>
 <div class="line">$D000-$FFFF: Echo buffer (if enabled)</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md476"></a>
+<h2><a class="anchor" id="autotoc_md478"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md477"></a>
+<h3><a class="anchor" id="autotoc_md479"></a>
 Exercise 1: Add Sound Effects</h3>
 <p>Use <code><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a></code> to trigger sounds on button presses.</p>
-<h3><a class="anchor" id="autotoc_md478"></a>
+<h3><a class="anchor" id="autotoc_md480"></a>
 Exercise 2: Multiple Modules</h3>
 <p>Add a second <code>.it</code> file and switch between them with SELECT button.</p>
-<h3><a class="anchor" id="autotoc_md479"></a>
+<h3><a class="anchor" id="autotoc_md481"></a>
 Exercise 3: Echo Effects</h3>
 <p>Enable echo in your tracker module and hear the reverb.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md481"></a>
+<h2><a class="anchor" id="autotoc_md483"></a>
 Common Issues</h2>
-<h3><a class="anchor" id="autotoc_md482"></a>
+<h3><a class="anchor" id="autotoc_md484"></a>
 No audio output</h3>
 <ul>
 <li>Check <code><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></code> is called every frame</li>
 <li>Verify <code><a class="el" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c" title="Initialize SNESMOD audio engine.">snesmodInit()</a></code> before <code><a class="el" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1" title="Start module playback.">snesmodPlay()</a></code></li>
 <li>Check emulator audio is enabled</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md483"></a>
+<h3><a class="anchor" id="autotoc_md485"></a>
 Music sounds wrong</h3>
 <ul>
 <li>Verify module exports correctly from OpenMPT</li>
 <li>Check channel count (8 max)</li>
 <li>Verify sample rate (32kHz max)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md484"></a>
+<h3><a class="anchor" id="autotoc_md486"></a>
 Build fails with smconv error</h3>
 <ul>
 <li>Check <code>.it</code> file is valid Impulse Tracker format</li>
 <li>Verify smconv is built: <code>make -C $OPENSNES/bin smconv</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md485"></a>
+<h3><a class="anchor" id="autotoc_md487"></a>
 Audio glitches</h3>
 <ul>
 <li>Ensure <code><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></code> is called EVERY frame</li>
 <li>Check for infinite loops blocking the main loop</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md487"></a>
+<h2><a class="anchor" id="autotoc_md489"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md488"></a>
+<h3><a class="anchor" id="autotoc_md490"></a>
 Why Tracker-Based Music?</h3>
 <p>Tracker modules are efficient for the SNES:</p><ul>
 <li>Compact pattern data (repeatable)</li>
@@ -359,7 +359,7 @@ Why Tracker-Based Music?</h3>
 <li>Volume, panning, effects per-channel</li>
 <li>No streaming required</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md489"></a>
+<h3><a class="anchor" id="autotoc_md491"></a>
 smconv Options</h3>
 <div class="fragment"><div class="line">smconv -s -o soundbank music/song.it</div>
 </div><!-- fragment --><ul>
@@ -368,17 +368,17 @@ smconv Options</h3>
 <li>Input: Impulse Tracker file(s)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md491"></a>
+<h2><a class="anchor" id="autotoc_md493"></a>
 What's Next?</h2>
 <p><b>Sound Effects:</b> <a href="../snesmod_sfx/">SNESMOD SFX</a> - Sound effect playback with pitch control</p>
 <p><b>Graphics:</b> <a href="../../graphics/sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md493"></a>
+<h2><a class="anchor" id="autotoc_md495"></a>
 Credits</h2>
 <p>SNESMOD driver by Mukunda Johnson.</p>
 <p>Sample music "pollen8" - Public domain.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md495"></a>
+<h2><a class="anchor" id="autotoc_md497"></a>
 License</h2>
 <p>Code: MIT SNESMOD: See snesmod.org license </p>
 </div></div><!-- contents -->

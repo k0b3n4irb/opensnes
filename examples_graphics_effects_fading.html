@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_fading.html'
 <div class="caption">
 Screenshot</div></div>
     <p>Screen brightness transitions for fade in/out effects.</p>
-<h2><a class="anchor" id="autotoc_md784"></a>
+<h2><a class="anchor" id="autotoc_md786"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>How SNES screen brightness control works</li>
@@ -109,14 +109,14 @@ Learning Objectives</h2>
 <li>Different fade speeds and styles</li>
 <li>Using fades for scene transitions</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md785"></a>
+<h2><a class="anchor" id="autotoc_md787"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed background examples</li>
 <li>Understanding of VBlank timing</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md787"></a>
+<h2><a class="anchor" id="autotoc_md789"></a>
 What This Example Does</h2>
 <p>Demonstrates multiple fade effects:</p><ul>
 <li>Fade from black to full brightness</li>
@@ -133,7 +133,7 @@ What This Example Does</h2>
 <li>Any button: Advance to next fade effect</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md789"></a>
+<h2><a class="anchor" id="autotoc_md791"></a>
 Code Type</h2>
 <p><b>C with Direct Register Access</b></p>
 <table class="markdownTable">
@@ -149,7 +149,7 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Input detection   </td><td class="markdownTableBodyNone">Direct register access   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md791"></a>
+<h2><a class="anchor" id="autotoc_md793"></a>
 INIDISP Register</h2>
 <p>The INIDISP register ($2100) controls screen brightness:</p>
 <div class="fragment"><div class="line">Bits 0-3: Brightness level (0-15)</div>
@@ -168,9 +168,9 @@ INIDISP Register</h2>
 <td class="markdownTableBodyNone">$8F   </td><td class="markdownTableBodyNone">Force blank at full brightness   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md793"></a>
+<h2><a class="anchor" id="autotoc_md795"></a>
 Basic Fade Implementation</h2>
-<h3><a class="anchor" id="autotoc_md794"></a>
+<h3><a class="anchor" id="autotoc_md796"></a>
 Fade In (Black to Full)</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> fadeIn(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed) {</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness;</div>
@@ -187,7 +187,7 @@ Fade In (Black to Full)</h3>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W)</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md795"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md797"></a>
 Fade Out (Full to Black)</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> fadeOut(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed) {</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness;</div>
@@ -202,7 +202,7 @@ Fade Out (Full to Black)</h3>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0;  <span class="comment">/* Ensure fully black */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md797"></a>
+<h2><a class="anchor" id="autotoc_md799"></a>
 Fade Speeds</h2>
 <p>Different speeds for different purposes:</p>
 <table class="markdownTable">
@@ -217,7 +217,7 @@ Fade Speeds</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">120   </td><td class="markdownTableBodyNone">2.0 sec   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md798"></a>
+<h3><a class="anchor" id="autotoc_md800"></a>
 Quick Flash</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> flash(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x0F;  <span class="comment">/* Full white */</span></div>
@@ -226,7 +226,7 @@ Quick Flash</h3>
 <div class="line">    fadeIn(1);           <span class="comment">/* Quick restore */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md800"></a>
+<h2><a class="anchor" id="autotoc_md802"></a>
 Scene Transition Pattern</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> changeScene(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="comment">/* Fade out current scene */</span></div>
@@ -244,13 +244,13 @@ Scene Transition Pattern</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__reg__const_html_gab18ce2bcee19d38256a74af702ebe4a3"><div class="ttname"><a href="group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3">INIDISP_FORCE_BLANK</a></div><div class="ttdeci">#define INIDISP_FORCE_BLANK</div><div class="ttdef"><b>Definition</b> registers.h:424</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md802"></a>
+<h2><a class="anchor" id="autotoc_md804"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/fading</div>
 </div><!-- fragment --><p>Then open <code>fading.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md804"></a>
+<h2><a class="anchor" id="autotoc_md806"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -263,23 +263,23 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md806"></a>
+<h2><a class="anchor" id="autotoc_md808"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md807"></a>
+<h3><a class="anchor" id="autotoc_md809"></a>
 Exercise 1: Smooth Fade</h3>
 <p>Create smoother fades using sub-frame timing (though limited by 16 brightness levels): </p><div class="fragment"><div class="line"><span class="comment">/* Use longer waits between steps */</span></div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> wait = 0; wait &lt; 8; wait++) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md808"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md810"></a>
 Exercise 2: Directional Wipe</h3>
 <p>Combine with window masking for a wipe effect instead of fade.</p>
-<h3><a class="anchor" id="autotoc_md809"></a>
+<h3><a class="anchor" id="autotoc_md811"></a>
 Exercise 3: Color Fade</h3>
 <p>Use color math to fade to a specific color instead of black: </p><div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(r, g, b);</div>
 <div class="line"><span class="comment">/* Increase color math intensity as brightness drops */</span></div>
 <div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md810"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md812"></a>
 Exercise 4: Pulse Effect</h3>
 <p>Create a pulsing brightness effect: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pulse_dir = 1;</div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness = 8;</div>
@@ -290,23 +290,23 @@ Exercise 4: Pulse Effect</h3>
 <div class="line">}</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = brightness;</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md812"></a>
+<h2><a class="anchor" id="autotoc_md814"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md813"></a>
+<h3><a class="anchor" id="autotoc_md815"></a>
 Force Blank vs Brightness 0</h3>
 <ul>
 <li><b>Brightness 0</b>: Screen shows black, but PPU still renders</li>
 <li><b>Force Blank</b>: PPU stops rendering, VRAM access is safe</li>
 </ul>
 <p>Use force blank when updating graphics, brightness 0 for visual fades.</p>
-<h3><a class="anchor" id="autotoc_md814"></a>
+<h3><a class="anchor" id="autotoc_md816"></a>
 Fade During Gameplay</h3>
 <p>For in-game fades without stopping action:</p><ol type="1">
 <li>Use force blank only briefly for VRAM updates</li>
 <li>Fade brightness while game continues</li>
 <li>Game logic runs normally during fade</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md815"></a>
+<h3><a class="anchor" id="autotoc_md817"></a>
 Alternative: Palette Fade</h3>
 <p>Instead of hardware brightness, modify palette colors: </p><div class="fragment"><div class="line"><span class="comment">/* Fade palette toward black */</span></div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> i = 0; i &lt; 256; i++) {</div>
@@ -316,7 +316,7 @@ Alternative: Palette Fade</h3>
 <div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible)</div></div>
 </div><!-- fragment --><p>This allows fading specific layers independently.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md817"></a>
+<h2><a class="anchor" id="autotoc_md819"></a>
 What's Next?</h2>
 <p><b>Mosaic:</b> <a href="../mosaic/">Mosaic Example</a> - Pixelation transitions</p>
 <p><b>Parallax:</b> <a href="../parallax_scrolling/">Parallax Scrolling</a> - Multi-speed scrolling with HDMA </p>

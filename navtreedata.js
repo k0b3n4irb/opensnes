@@ -65,7 +65,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_text_hello_world.html#autotoc_md1219",
+"examples_text_hello_world.html#autotoc_md1221",
 "group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10",
 "interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7",
 "sram_8h.html#a07095ff815cfb5f1ef99aab2e81a10ef"

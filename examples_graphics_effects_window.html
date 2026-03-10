@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_window.html'
 Screenshot</div></div>
     <p>A triangle-shaped window mask driven by HDMA, showing how per-scanline window boundary updates create non-rectangular shapes. Press <b>A</b>, <b>X</b>, or <b>B</b> to apply the window to different background layers.</p>
 <p>Ported from PVSnesLib "Window" example.</p>
-<h2><a class="anchor" id="autotoc_md957"></a>
+<h2><a class="anchor" id="autotoc_md959"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,24 +114,24 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>B</b>   </td><td class="markdownTableBodyNone">Window on both BG1 and BG2   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md958"></a>
+<h2><a class="anchor" id="autotoc_md960"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/window</div>
 </div><!-- fragment --><p>Then open <code>window.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md959"></a>
+<h2><a class="anchor" id="autotoc_md961"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md960"></a>
+<h3><a class="anchor" id="autotoc_md962"></a>
 SNES Window System</h3>
 <p>The SNES PPU has two hardware windows &ndash; rectangular regions defined by left and right X coordinates. These windows can mask (hide) portions of any background layer or sprite layer. Window operations cost zero CPU time because they are handled entirely by the PPU.</p>
-<h3><a class="anchor" id="autotoc_md961"></a>
+<h3><a class="anchor" id="autotoc_md963"></a>
 Making Non-Rectangular Shapes with HDMA</h3>
 <p>A single window is always a horizontal band. But by changing the left/right boundaries <b>every scanline</b> using HDMA, you can create any shape &ndash; circles, triangles, or custom silhouettes.</p>
 <p>This example uses two HDMA channels:</p><ul>
 <li><b>Channel 6</b> writes to WH0 ($2126) &ndash; window 1 left boundary</li>
 <li><b>Channel 7</b> writes to WH1 ($2127) &ndash; window 1 right boundary</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md962"></a>
+<h3><a class="anchor" id="autotoc_md964"></a>
 The Triangle Tables</h3>
 <p>The HDMA tables define a diamond/triangle shape centered on screen:</p>
 <div class="fragment"><div class="line">Line  0-59:  WH0=255, WH1=0   -&gt; left &gt; right -&gt; window disabled (no mask)</div>
@@ -139,10 +139,10 @@ The Triangle Tables</h3>
 <div class="line">Line 92-123: WH0 grows 96-&gt;127, WH1 shrinks 160-&gt;129 -&gt; triangle contracts</div>
 <div class="line">Line 124+:   WH0=255, WH1=0   -&gt; window disabled again</div>
 </div><!-- fragment --><p>The tables use <b>repeat mode</b> (bit 7 set in the line count) because each scanline needs a different value. Non-repeat mode would write once and hold, which does not work when the shape changes per line.</p>
-<h3><a class="anchor" id="autotoc_md963"></a>
+<h3><a class="anchor" id="autotoc_md965"></a>
 Inversion: Show Inside</h3>
 <p>By default, TMW (main screen window at $212E) hides pixels <b>inside</b> the window. The code sets the <b>invert</b> flag in W12SEL ($2123) so that pixels <b>outside</b> the window are hidden instead &ndash; revealing only the triangle-shaped area.</p>
-<h3><a class="anchor" id="autotoc_md964"></a>
+<h3><a class="anchor" id="autotoc_md966"></a>
 Switching Layers</h3>
 <p>When you press A/X/B, the code:</p><ol type="1">
 <li>Disables HDMA channels</li>
@@ -151,9 +151,9 @@ Switching Layers</h3>
 <li>Sets TMW for the new layer(s)</li>
 <li>Re-enables HDMA</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md965"></a>
+<h2><a class="anchor" id="autotoc_md967"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md966"></a>
+<h3><a class="anchor" id="autotoc_md968"></a>
 W12SEL Register ($2123)</h3>
 <p>This register controls Window 1 enable and inversion for BG1 and BG2:</p>
 <table class="markdownTable">
@@ -169,10 +169,10 @@ W12SEL Register ($2123)</h3>
 <td class="markdownTableBodyNone">5   </td><td class="markdownTableBodyNone">BG2 Window 1 Enable   </td></tr>
 </table>
 <p>Setting both the enable and invert bits for a BG makes pixels <b>outside</b> the window invisible, revealing only the windowed region.</p>
-<h3><a class="anchor" id="autotoc_md967"></a>
+<h3><a class="anchor" id="autotoc_md969"></a>
 Window Shapes in Commercial Games</h3>
 <p>This technique was used extensively: spotlight effects in Mega Man X, the title screen reveal in Donkey Kong Country, and dialog box cutouts in RPGs. Any shape that can be described as a left-right boundary pair per scanline can be rendered as a window.</p>
-<h2><a class="anchor" id="autotoc_md968"></a>
+<h2><a class="anchor" id="autotoc_md970"></a>
 VRAM Layout</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -186,7 +186,7 @@ VRAM Layout</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$6000   </td><td class="markdownTableBodyNone">BG2 tiles (4bpp, 16 colors)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md969"></a>
+<h2><a class="anchor" id="autotoc_md971"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -202,7 +202,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite dma input background window hdma math</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md970"></a>
+<h2><a class="anchor" id="autotoc_md972"></a>
 Going Further</h2>
 <ul>
 <li><b>Animated window</b>: Modify the triangle tables each frame to make the shape pulse or rotate. Copy the tables to RAM and adjust the boundary values.</li>

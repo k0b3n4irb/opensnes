@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_sprites_metasprite.h
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1006"></a>
+    <h2><a class="anchor" id="autotoc_md1008"></a>
 What You'll Learn</h2>
 <ul>
 <li>How metasprites combine multiple hardware sprites into one logical character</li>
@@ -110,9 +110,9 @@ What You'll Learn</h2>
 <li>How <code><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible)">oamDrawMeta()</a></code> places a list of hardware sprites from a single function call</li>
 <li>How VRAM tile layout relates to OAM tile numbering</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1007"></a>
+<h2><a class="anchor" id="autotoc_md1009"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1008"></a>
+<h3><a class="anchor" id="autotoc_md1010"></a>
 OBJ Size Modes (Register $2101)</h3>
 <p>The SNES PPU supports 128 hardware sprites (OAM entries), but only two sizes are available at any time, controlled by bits 5-7 of register $2101 (OBJSEL). Each OAM entry has a size bit selecting either "small" or "large." The three modes used in this example:</p>
 <table class="markdownTable">
@@ -126,7 +126,7 @@ OBJ Size Modes (Register $2101)</h3>
 <td class="markdownTableBodyNone">OBJ_SIZE16_L32   </td><td class="markdownTableBodyNone">16x16   </td><td class="markdownTableBodyNone">32x32   </td><td class="markdownTableBodyNone"><code>0x60</code> (bits 7-5)   </td></tr>
 </table>
 <p>You cannot mix three sizes (e.g. 8x8 + 16x16 + 32x32) in one frame. Choose the two sizes that best suit your game's needs.</p>
-<h3><a class="anchor" id="autotoc_md1009"></a>
+<h3><a class="anchor" id="autotoc_md1011"></a>
 MetaspriteItem Structure</h3>
 <p>A metasprite is defined as an array of <code><a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible)">MetaspriteItem</a></code> entries, terminated by <code>METASPR_TERM</code>. Each item specifies the X/Y offset from the metasprite origin, a tile number, and attribute flags (palette, priority, flip):</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> hero16_frame0[] = {</div>
@@ -143,7 +143,7 @@ MetaspriteItem Structure</h3>
 <div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128)</div><div class="ttdef"><b>Definition</b> sprite.h:448</div></div>
 <div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:454</div></div>
 <div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible)</div><div class="ttdef"><b>Definition</b> sprite.h:433</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1010"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1012"></a>
 VRAM Tile Layout and OAM Tile Numbers</h3>
 <p>OAM tile numbers reference 8x8 tiles in VRAM, regardless of the hardware sprite size. A 16x16 sprite uses 4 consecutive 8x8 tiles (2 across x 2 down in the VRAM character grid, which is 16 tiles wide). A 32x32 sprite uses 16 tiles. The <code>-T</code> flag in gfx4snes transposes the sprite sheet to match the SNES OBJ VRAM grid layout, so tile indices in the metasprite data correspond directly to positions in the converted <code>.pic</code> file.</p>
 <p>This example packs all three sprite sheets into contiguous VRAM starting at $0000:</p>
@@ -157,7 +157,7 @@ VRAM Tile Layout and OAM Tile Numbers</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">hero8   </td><td class="markdownTableBodyNone">$1200   </td><td class="markdownTableBodyNone">16   </td><td class="markdownTableBodyNone">288   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1011"></a>
+<h2><a class="anchor" id="autotoc_md1013"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -167,7 +167,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down   </td><td class="markdownTableBodyNone">Select next OBJ size mode   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1012"></a>
+<h2><a class="anchor" id="autotoc_md1014"></a>
 How It Works</h2>
 <p><b>1. Load all sprite tiles</b> &ndash; Three sprite sheets are DMA'd to contiguous VRAM regions while the screen is blanked:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(spritehero32_til, VRAM_HERO32, HERO32_TILES * TILE_BYTES);</div>
@@ -204,7 +204,7 @@ How It Works</h2>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:83</div></div>
 <div class="ttc" id="asprite_8h_html_a908b094470fa9632302b14321338ae7a"><div class="ttname"><a href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a></div><div class="ttdeci">#define OBJ_SMALL</div><div class="ttdoc">Sprite size selection.</div><div class="ttdef"><b>Definition</b> sprite.h:82</div></div>
 </div><!-- fragment --><p><b>4. Text menu</b> &ndash; A text overlay on BG1 (Mode 1, 4bpp font) shows the current selection and the two active sprite sizes, updated whenever the user presses Up or Down.</p>
-<h2><a class="anchor" id="autotoc_md1013"></a>
+<h2><a class="anchor" id="autotoc_md1015"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">metasprite/</div>
 <div class="line">├── main.c              — OBJ mode switching, metasprite drawing, text menu</div>
@@ -217,7 +217,7 @@ Project Structure</h2>
 <div class="line">    ├── hero32_meta.inc     — MetaspriteItem definitions for 32x32 frames</div>
 <div class="line">    ├── hero16_meta.inc     — MetaspriteItem definitions for 16x16 frames</div>
 <div class="line">    └── hero8_meta.inc      — MetaspriteItem definitions for 8x8 frames</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1014"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1016"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/sprites/metasprite</div>
