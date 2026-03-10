@@ -28,7 +28,7 @@ INPUT                  = mainpage.md \
                          tutorials/ \
                          GETTING_STARTED.md \
                          LEARNING_PATH.md \
-                         EXAMPLE_WALKTHROUGHS.md \
+                         EXAMPLES_BY_CATEGORY.md \
                          CODE_STYLE.md \
                          SNES_GRAPHICS_GUIDE.md \
                          SNES_SOUND_GUIDE.md \
