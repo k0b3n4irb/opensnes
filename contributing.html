@@ -201,9 +201,9 @@ Documentation Requirements</h3>
 <h3><a class="anchor" id="autotoc_md1277"></a>
 Test Requirements</h3>
 <ul>
-<li>Unit tests for all public functions</li>
+<li>Unit tests for public functions where feasible (PPU/DMA functions are write-only registers — smoke tests are acceptable)</li>
 <li>Integration tests for feature interactions</li>
-<li>Minimum 80% coverage for new code</li>
+<li>Compiler changes require a regression test in <code>tests/compiler/</code></li>
 </ul>
 <h3><a class="anchor" id="autotoc_md1278"></a>
 Attribution Requirements</h3>
