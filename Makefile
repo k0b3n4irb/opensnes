@@ -46,7 +46,12 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
-RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
+VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
+ifneq ($(VERSION),)
+    RELEASE_NAME := opensnes_$(VERSION)_$(PLATFORM)_$(ARCH)
+else
+    RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
+endif
 
 .DEFAULT_GOAL := all
 .PHONY: all clean install compiler tools lib examples tests submodules docs help release clean-release
@@ -118,17 +123,21 @@ release: install docs
 	@mkdir -p $(RELEASE_DIR)/opensnes/lib
 	@mkdir -p $(RELEASE_DIR)/opensnes/make
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
-	@mkdir -p $(RELEASE_DIR)/opensnes/tools
 	@mkdir -p $(RELEASE_DIR)/opensnes/docs
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@cp -r lib/lib $(RELEASE_DIR)/opensnes/lib/ 2>/dev/null || true
+	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@cp -r devtools $(RELEASE_DIR)/opensnes/devtools/ 2>/dev/null || true
+	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
+	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
+	@find $(RELEASE_DIR)/opensnes/examples -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
 	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
+	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
+	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cd $(RELEASE_DIR) && zip -q -r $(RELEASE_NAME).zip opensnes
 	@rm -rf $(RELEASE_DIR)/opensnes
 	@echo ""

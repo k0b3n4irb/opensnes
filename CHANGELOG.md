@@ -5,6 +5,35 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.7.1] - 2026-03-10
+
+### Build System
+
+- **WLA-DX submodule updated** to latest upstream (42 commits) — assembler/linker
+  improvements and bug fixes.
+- **Fixed ASCIITABLE warnings**: moved `.ASCIITABLE` definition from `crt0.asm` into
+  all memmap include files so every assembly unit gets the identity ASCII mapping.
+- **Added `.ACCU 16` / `.INDEX 16`** to `runtime.asm` for correct WLA-DX register
+  width tracking in math functions.
+- **Release asset filenames now include version tag**
+  (e.g. `opensnes_v0.7.1_linux_x86_64.zip`).
+
+### Tooling
+
+- **VS Code project configuration**: shared `settings.json` (file associations,
+  IntelliSense), `tasks.json` (12 build/test tasks), `extensions.json`
+  (WLA-DX syntax + C/C++ recommended).
+
+### Dependencies
+
+- **Updated vendored lodepng** from 20230410 to 20260119 in gfx4snes and img2snes.
+
+### Housekeeping
+
+- Added `.gitattributes` to fix GitHub language detection (all `.h` → C).
+- Removed accidentally tracked `CLAUDE.md` files from repository.
+- Updated `ATTRIBUTION.md` with complete dependency and contributor credits.
+
 ## [0.7.0] - 2026-03-10
 
 ### CI/CD
