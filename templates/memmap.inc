@@ -12,3 +12,8 @@
 
 .ROMBANKSIZE $8000          ; 32KB banks (LoROM)
 .ROMBANKS 8                 ; Match ROM configuration
+
+; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
+.ASCIITABLE
+MAP ' ' TO '~' = ' '
+.ENDA
