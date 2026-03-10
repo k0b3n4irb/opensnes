@@ -113,7 +113,7 @@ docs:
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: install docs
+release: all docs
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."
@@ -129,10 +129,9 @@ release: install docs
 	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
-	@cp -r devtools $(RELEASE_DIR)/opensnes/devtools/ 2>/dev/null || true
 	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
 	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
-	@find $(RELEASE_DIR)/opensnes/examples -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
+	@find $(RELEASE_DIR)/opensnes/examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
 	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
