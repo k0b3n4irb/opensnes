@@ -44,6 +44,7 @@ open docs/build/html/index.html
 
 | Document | Description |
 |----------|-------------|
+| [Maturity Review](MATURITY_REVIEW.md) | OpenSNES vs PVSnesLib comparison and v1.0 roadmap |
 | [Code Style](CODE_STYLE.md) | Coding standards |
 | [Third Party](THIRD_PARTY.md) | Attribution and licenses |
 
