@@ -5,6 +5,91 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.7.0] - 2026-03-10
+
+### CI/CD
+
+- **Pre-built binary releases**: new `release.yml` workflow triggered on version tags.
+  Builds SDK on Linux, macOS, and Windows, runs tests, creates GitHub Release with
+  platform zips attached automatically.
+- Release zip filenames now include architecture (`opensnes_linux_x86_64.zip`,
+  `opensnes_darwin_arm64.zip`, `opensnes_windows_x86_64.zip`).
+- Build workflow skips tag pushes (handled by release workflow).
+
+### Documentation
+
+- **Product maturity review** (`docs/MATURITY_REVIEW.md`): comprehensive comparison
+  of OpenSNES vs PVSnesLib across 8 dimensions.
+- **Published benchmark** (`docs/BENCHMARK.md`): 34-function comparison showing
+  -30.3% total cycles vs PVSnesLib + 816-opt (32/34 function wins).
+- Updated ROADMAP from v0.3.0 to v0.6.0 with structured v1.0 milestones.
+- Updated README: beta status badge, comparison table, accurate counts (37 examples,
+  28 headers, 60 compiler tests, 25 unit modules).
+- Getting started guide now offers pre-built SDK download as primary option.
+
+## [0.6.0] - 2026-03-09
+
+### Compiler
+
+- **Signed division and modulo**: emit `__sdiv16` / `__smod16` for signed `/` and `%`
+  operators.
+- **Fixed cproc `mktype()` uninitialized fields**: garbage in `type->qual` could cause
+  mutable structs to be emitted as `.rodata` (ROM). Fixed by initializing all fields.
+- Eliminated redundant loads in phi-move A-cache.
+
+### Library
+
+- **HDMA effect helpers**: new high-level library functions for wave, ripple, iris wipe,
+  brightness gradient (`hdmaWaveEffect`, `hdmaBrightnessGradient`, etc.).
+- Fixed `oamDrawMeta` return value and metasprite mode switching.
+- Migrated color gradient HDMA to bank $00 RAM.
+- Double-buffer ripple mode fix and edge wrapping.
+- Iris tables moved to bank $00 for correct HDMA bank byte.
+
+### Runtime
+
+- Signed 16-bit division and modulo (`sdiv16` / `smod16`) in `runtime.asm`.
+- Division-by-zero guard and X register preservation in software division.
+
+### Examples
+
+- HDMA helpers demo example.
+- Migrated hdma_wave and hdma_gradient to library helpers.
+- Fixed continuous_scroll: replaced fragile nmiSetBank callback with bgSetScroll.
+
+### Build System
+
+- Flattened `templates/common/` to `templates/`.
+- Removed dead startup code from crt0.asm and libsnes.asm.
+
+## [0.5.0] - 2026-03-08
+
+### Compiler
+
+- Fixed memory leaks in cproc (cleanup functions added).
+
+## [0.4.0] - 2026-03-07
+
+### Toolchain
+
+- **smconv rewritten in pure C** (was C++). Simpler build, no C++ dependency.
+
+### CI/CD
+
+- cproc segfault retry for Windows MSYS2 stability.
+- Replaced cproc|qbe pipe with temp file to catch cproc crashes.
+- GitHub Pages deployment workflow for Doxygen docs.
+
+### Documentation
+
+- Restructured documentation with learning path and navigation hub.
+- Removed Co-Authored-By requirement from commit messages.
+
+### API
+
+- **Removed 4 deprecated functions**: `padUpdate`, `dmaCopyToVRAM`, `dmaCopyToCGRAM`,
+  `dmaCopyToOAM`. Use `padHeld`/`padPressed` and `dmaCopyVram`/`dmaCopyCGram`/`dmaCopyOam`.
+
 ## [0.3.0] - 2026-03-05
 
 ### Examples
