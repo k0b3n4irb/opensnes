@@ -75,11 +75,16 @@ jobs:
       # ------------------------------------ #
       # Build & create release package       #
       # ------------------------------------ #
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+        shell: bash
+
       - name: Build release (Linux)
         if: matrix.name == 'linux'
         run: |
           export OPENSNES_HOME=$(pwd)
-          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+          make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       - name: Build release (Windows)
         if: matrix.name == 'windows'
@@ -88,7 +93,7 @@ jobs:
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
           for attempt in 1 2 3; do
-            if make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
+            if make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
               break
             fi
             if [ "$attempt" -eq 3 ]; then
@@ -103,7 +108,7 @@ jobs:
         if: matrix.name == 'darwin'
         run: |
           export OPENSNES_HOME=$(pwd)
-          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+          make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
       # Run tests                            #
@@ -140,8 +145,8 @@ jobs:
       - name: Upload release zip
         uses: actions/upload-artifact@v4
         with:
-          name: opensnes-${{ matrix.name }}-${{ matrix.arch }}
-          path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
+          name: opensnes-${{ steps.version.outputs.tag }}-${{ matrix.name }}-${{ matrix.arch }}
+          path: release/opensnes_${{ steps.version.outputs.tag }}_${{ matrix.name }}_${{ matrix.arch }}.zip
 
   # ------------------------------------ #
   # Create GitHub Release                #
@@ -187,9 +192,9 @@ jobs:
 
           | Platform | File | Architecture |
           |----------|------|--------------|
-          | **Linux** | \`opensnes_linux_x86_64.zip\` | x86_64 |
-          | **macOS** | \`opensnes_darwin_arm64.zip\` | arm64 (Apple Silicon) |
-          | **Windows** | \`opensnes_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
+          | **Linux** | \`opensnes_${TAG}_linux_x86_64.zip\` | x86_64 |
+          | **macOS** | \`opensnes_${TAG}_darwin_arm64.zip\` | arm64 (Apple Silicon) |
+          | **Windows** | \`opensnes_${TAG}_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
 
           ### Quick start
 
@@ -209,6 +214,6 @@ jobs:
           draft: false
           prerelease: ${{ contains(steps.tag.outputs.version, '-rc') || contains(steps.tag.outputs.version, '-beta') }}
           files: |
-            artifacts/opensnes-linux-x86_64/opensnes_linux_x86_64.zip
-            artifacts/opensnes-darwin-arm64/opensnes_darwin_arm64.zip
-            artifacts/opensnes-windows-x86_64/opensnes_windows_x86_64.zip
+            artifacts/opensnes-${{ steps.tag.outputs.version }}-linux-x86_64/opensnes_${{ steps.tag.outputs.version }}_linux_x86_64.zip
+            artifacts/opensnes-${{ steps.tag.outputs.version }}-darwin-arm64/opensnes_${{ steps.tag.outputs.version }}_darwin_arm64.zip
+            artifacts/opensnes-${{ steps.tag.outputs.version }}-windows-x86_64/opensnes_${{ steps.tag.outputs.version }}_windows_x86_64.zip
