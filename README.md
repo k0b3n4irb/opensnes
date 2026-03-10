@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
 [![Build Status](https://github.com/k0b3n4irb/opensnes/actions/workflows/opensnes_build.yml/badge.svg)](https://github.com/k0b3n4irb/opensnes/actions)
-[![Alpha](https://img.shields.io/badge/status-alpha-orange.svg)]()
+[![Beta](https://img.shields.io/badge/status-beta-yellow.svg)]()
 [![C11](https://img.shields.io/badge/language-C11-blue.svg)]()
 [![65816](https://img.shields.io/badge/target-65816-purple.svg)]()
 
@@ -38,8 +38,9 @@ a fork that builds on their years of work — the library, the toolchain, the ex
 a focus on documentation, compiler improvements, and developer experience. Credit where
 credit is due: PVSnesLib laid the foundation for everything here.
 
-> **Work in Progress**: This project is under active development. APIs may change
-> and some features are incomplete.
+> **Beta**: A modern, well-tested SNES SDK ready for serious hobby development and
+> game jams, building toward commercial-grade maturity. APIs are stabilizing but may
+> still change between minor versions.
 
 ---
 
@@ -83,10 +84,10 @@ If that sounds exciting rather than terrifying, you're in the right place.
 
 | | Feature | Details |
 |-|---------|---------|
-| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **22% faster code** than PVSnesLib+816-opt on our benchmark suite |
-| | **Hardware library** (18 modules) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
+| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **30% faster code** than PVSnesLib+816-opt on our benchmark suite ([details](docs/BENCHMARK.md)) |
+| | **Hardware library** (28 headers, modular linking) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
 | | **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
-| | **36 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
+| | **37 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
 | | **Cross-platform** | `make` on Linux, macOS, and Windows (MSYS2). CI-tested on all three. |
 
 ## Quick Start
@@ -126,17 +127,37 @@ You'll also want a SNES emulator — [Mesen2](https://www.mesen.ca/) is recommen
 ```bash
 git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
-make                  # builds compiler, tools, library, and all 25 examples
+make                  # builds compiler, tools, library, and all 37 examples
 
 # Open examples/text/hello_world/hello_world.sfc in Mesen2
 ```
 
 ## Examples
 
-25 examples with detailed READMEs that explain not just *what* the code does, but *why*.
+37 examples with detailed READMEs that explain not just *what* the code does, but *why*.
 Organized as a progressive learning path — from "Hello World" to a complete platformer.
 
 **[Browse all examples and the learning path](examples/README.md)**
+
+---
+
+## How We Compare to PVSnesLib
+
+OpenSNES is a fork of PVSnesLib with a different set of trade-offs:
+
+| | OpenSNES | PVSnesLib |
+|-|----------|-----------|
+| **Compiler** | C11 (cproc+QBE), 13 opt phases, **-30% cycles** | C89 (tcc816), 38 regex peepholes |
+| **Testing** | 60 compiler + 25 unit + 37 ROM validations | None |
+| **CI** | 3 platforms per push | Build-only |
+| **Library** | Modular (`LIB_MODULES=...`) | Monolithic |
+| **Docs** | 8 guides + 37 example READMEs | Wiki + 4 READMEs |
+| **Track record** | 3 months, no shipped games | 14 years, commercial games shipped |
+| **Pre-built binaries** | Available (GitHub Releases) | Available |
+
+PVSnesLib is the proven, battle-tested choice. OpenSNES is the modern, well-tested
+alternative with better tooling and documentation. See the full
+[maturity review](docs/MATURITY_REVIEW.md) for details.
 
 ---
 
@@ -183,16 +204,19 @@ make -C examples/games/breakout
 
 ## Testing
 
-Two test suites validate the SDK after any change:
+Three test suites validate the SDK after any change:
 
 ```bash
 # Full rebuild (always start from clean to avoid stale artifacts)
 make clean && make
 
-# Compiler regression tests (54 tests)
+# Unit tests (25 modules, ~385 runtime + 119 compile-time assertions)
+./tests/unit/run_unit_tests.sh
+
+# Compiler regression tests (60 tests)
 ./tests/compiler/run_tests.sh --allow-known-bugs
 
-# Example validation (memory overlaps + ROM size checks)
+# Example validation (memory overlaps + ROM size checks, 37 ROMs)
 OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
 ```
 
@@ -299,8 +323,9 @@ OpenSNES stands on the shoulders of the SNES homebrew community:
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues) — bugs and tasks
-- [Roadmap](ROADMAP.md) — planned features
+- [Roadmap](ROADMAP.md) — planned features and v1.0 requirements
 - [Changelog](CHANGELOG.md) — what's changed since the PVSnesLib fork
+- [Maturity Review](docs/MATURITY_REVIEW.md) — how we compare to PVSnesLib
 
 ## License
 
