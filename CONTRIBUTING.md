@@ -111,9 +111,10 @@ Every new feature must have:
 
 ### Test Requirements
 
-- Unit tests for all public functions
+- Unit tests for public functions where feasible (PPU/DMA functions are
+  write-only registers — smoke tests are acceptable)
 - Integration tests for feature interactions
-- Minimum 80% coverage for new code
+- Compiler changes require a regression test in `tests/compiler/`
 
 ### Attribution Requirements
 

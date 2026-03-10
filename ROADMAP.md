@@ -4,12 +4,13 @@ Current state of the project and planned work.
 
 ---
 
-## Current Status: v0.6.0
+## Current Status: v0.7.1
 
 A modern, well-tested SNES SDK ready for serious hobby development and game jams,
 building toward commercial-grade maturity. The compiler produces code 30% faster than
 PVSnesLib+816-opt on our benchmark suite. 37 working examples cover all major subsystems,
-with cross-platform CI on Linux, macOS, and Windows.
+with cross-platform CI on Linux, macOS, and Windows. Pre-built SDK binaries are available
+for Linux, macOS, and Windows.
 
 See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison with PVSnesLib.
 
@@ -134,13 +135,14 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 |------|--------|----------------|
 | Pixel mode (Mode 3 direct drawing) | Not started | Feature parity with PVSnesLib (niche) |
 | Tiled map editor integration | Not started | Workflow convenience for level designers |
-| VSCode extension / project template | Not started | Developer experience improvement |
+| ~~VSCode project configuration~~ | Done (v0.7.1) | Developer experience improvement |
 | Video tutorials | Not started | Wider audience reach |
 | More ported examples | In progress | Breadth of coverage |
 
-### Short Term (v0.7.0)
-- [x] Pre-built binary releases for Linux, macOS, Windows
-- [x] Published benchmark results (docs/BENCHMARK.md — -30.3% vs PVSnesLib)
+### Short Term (v0.8.0)
+- [x] Pre-built binary releases for Linux, macOS, Windows (done v0.7.0)
+- [x] Published benchmark results (done v0.7.0)
+- [x] VS Code project configuration (done v0.7.1)
 - [ ] More compiler peephole optimizations
 - [ ] Performance profiling tools (VBlank usage, cycle counter)
 
@@ -164,7 +166,6 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 2. **32-bit operations are slow** — prefer `u16`/`s16` when possible
 3. **~4 KB VBlank DMA budget** — don't exceed per-frame transfer limits
 4. **All C variables must be in bank $00, < $2000** — compiler generates `sta.l $0000,x`
-5. **No floating-point emulation** — integer and fixed-point only
 
 ---
 
@@ -172,4 +173,4 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [README.md](README.md) for build instructions.
 
-*Last updated: 2026-03-09*
+*Last updated: 2026-03-10*
