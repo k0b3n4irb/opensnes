@@ -19,10 +19,13 @@ jobs:
         include:
           - os: ubuntu-latest
             name: linux
+            arch: x86_64
           - os: windows-latest
             name: windows
+            arch: x86_64
           - os: macos-latest
             name: darwin
+            arch: arm64
 
     steps:
       # ------------------------------------ #
@@ -137,8 +140,8 @@ jobs:
       - name: Upload release zip
         uses: actions/upload-artifact@v4
         with:
-          name: opensnes-${{ matrix.name }}
-          path: release/opensnes_${{ matrix.name }}.zip
+          name: opensnes-${{ matrix.name }}-${{ matrix.arch }}
+          path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
 
   # ------------------------------------ #
   # Create GitHub Release                #
@@ -184,9 +187,9 @@ jobs:
 
           | Platform | File | Architecture |
           |----------|------|--------------|
-          | **Linux** | \`opensnes_linux.zip\` | x86_64 |
-          | **macOS** | \`opensnes_darwin.zip\` | arm64 (Apple Silicon) |
-          | **Windows** | \`opensnes_windows.zip\` | x86_64 (MSYS2 UCRT64) |
+          | **Linux** | \`opensnes_linux_x86_64.zip\` | x86_64 |
+          | **macOS** | \`opensnes_darwin_arm64.zip\` | arm64 (Apple Silicon) |
+          | **Windows** | \`opensnes_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
 
           ### Quick start
 
@@ -206,6 +209,6 @@ jobs:
           draft: false
           prerelease: ${{ contains(steps.tag.outputs.version, '-rc') || contains(steps.tag.outputs.version, '-beta') }}
           files: |
-            artifacts/opensnes-linux/opensnes_linux.zip
-            artifacts/opensnes-darwin/opensnes_darwin.zip
-            artifacts/opensnes-windows/opensnes_windows.zip
+            artifacts/opensnes-linux-x86_64/opensnes_linux_x86_64.zip
+            artifacts/opensnes-darwin-arm64/opensnes_darwin_arm64.zip
+            artifacts/opensnes-windows-x86_64/opensnes_windows_x86_64.zip

@@ -59,9 +59,9 @@ Download the latest release for your platform from the
 
 | Platform | File |
 |----------|------|
-| Linux x86_64 | `opensnes_linux.zip` |
-| macOS arm64 | `opensnes_darwin.zip` |
-| Windows x86_64 | `opensnes_windows.zip` |
+| Linux x86_64 | `opensnes_linux_x86_64.zip` |
+| macOS arm64 | `opensnes_darwin_arm64.zip` |
+| Windows x86_64 | `opensnes_windows_x86_64.zip` |
 
 Extract the zip and note the path — you'll need it for your project's Makefile.
 
