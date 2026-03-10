@@ -46,7 +46,12 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
-RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
+VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
+ifneq ($(VERSION),)
+    RELEASE_NAME := opensnes_$(VERSION)_$(PLATFORM)_$(ARCH)
+else
+    RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
+endif
 
 .DEFAULT_GOAL := all
 .PHONY: all clean install compiler tools lib examples tests submodules docs help release clean-release
