@@ -15,15 +15,27 @@
 
 # Platform detection (parallel builds + release naming)
 UNAME := $(shell uname -s)
+UNAME_M := $(shell uname -m)
 ifeq ($(OS),Windows_NT)
     MAKEFLAGS += -j$(NUMBER_OF_PROCESSORS)
     PLATFORM  := windows
+    ARCH      := x86_64
 else ifeq ($(UNAME),Darwin)
     MAKEFLAGS += -j$(shell sysctl -n hw.ncpu)
     PLATFORM  := darwin
+    ifeq ($(UNAME_M),arm64)
+        ARCH := arm64
+    else
+        ARCH := x86_64
+    endif
 else
     MAKEFLAGS += -j$(shell nproc)
     PLATFORM  := linux
+    ifeq ($(UNAME_M),aarch64)
+        ARCH := arm64
+    else
+        ARCH := $(UNAME_M)
+    endif
 endif
 
 # Paths
@@ -34,7 +46,7 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
-RELEASE_NAME := opensnes_$(PLATFORM)
+RELEASE_NAME := opensnes_$(PLATFORM)_$(ARCH)
 
 .DEFAULT_GOAL := all
 .PHONY: all clean install compiler tools lib examples tests submodules docs help release clean-release

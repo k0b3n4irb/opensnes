@@ -1,0 +1,214 @@
+name: Release
+
+# Triggered when a version tag is pushed (e.g. v0.7.0)
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+            arch: x86_64
+          - os: windows-latest
+            name: windows
+            arch: x86_64
+          - os: macos-latest
+            name: darwin
+            arch: arm64
+
+    steps:
+      # ------------------------------------ #
+      # Install dependencies                 #
+      # ------------------------------------ #
+      - name: Install dependencies for Linux
+        if: matrix.name == 'linux'
+        run: |
+          sudo apt update -y
+          sudo apt-get install -y build-essential \
+              clang \
+              cmake \
+              make \
+              git \
+              doxygen \
+              zip
+
+      - name: Install dependencies for Windows
+        if: matrix.name == 'windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          msystem: UCRT64
+          install: >-
+            mingw-w64-ucrt-x86_64-clang
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-doxygen
+            mingw-w64-ucrt-x86_64-python
+            base-devel
+            git
+            zip
+
+      - name: Install dependencies for macOS
+        if: matrix.name == 'darwin'
+        run: |
+          brew update || true
+          brew install doxygen zip || true
+
+      # ------------------------------------ #
+      # Checkout the project                 #
+      # ------------------------------------ #
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # ------------------------------------ #
+      # Build & create release package       #
+      # ------------------------------------ #
+      - name: Build release (Linux)
+        if: matrix.name == 'linux'
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+
+      - name: Build release (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          export OPENSNES_HOME=$(pwd)
+          for attempt in 1 2 3; do
+            if make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Build failed after 3 attempts"
+              exit 1
+            fi
+            echo "=== Build attempt $attempt failed (likely cproc segfault), retrying... ==="
+            make clean
+          done
+
+      - name: Build release (macOS)
+        if: matrix.name == 'darwin'
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Run tests                            #
+      # ------------------------------------ #
+      - name: Run compiler tests (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          set -o pipefail
+          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Run compiler tests (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Validate examples (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          set -o pipefail
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Validate examples (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          set -o pipefail
+          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      # ------------------------------------ #
+      # Upload zip as artifact for release   #
+      # ------------------------------------ #
+      - name: Upload release zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: opensnes-${{ matrix.name }}-${{ matrix.arch }}
+          path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
+
+  # ------------------------------------ #
+  # Create GitHub Release                #
+  # ------------------------------------ #
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Extract tag version
+        id: tag
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes from CHANGELOG
+        id: notes
+        run: |
+          TAG="${{ steps.tag.outputs.version }}"
+          VERSION="${TAG#v}"
+
+          # Extract the section for this version from CHANGELOG.md
+          NOTES=$(awk "/^## \[${VERSION}\]/{found=1; next} /^## \[/{if(found) exit} found{print}" CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release ${TAG}. See [CHANGELOG.md](CHANGELOG.md) for details."
+          fi
+
+          # Write to file (handles multiline)
+          cat > release_notes.md << NOTESEOF
+          ## What's in this release
+
+          ${NOTES}
+
+          ---
+
+          ## Download
+
+          | Platform | File | Architecture |
+          |----------|------|--------------|
+          | **Linux** | \`opensnes_linux_x86_64.zip\` | x86_64 |
+          | **macOS** | \`opensnes_darwin_arm64.zip\` | arm64 (Apple Silicon) |
+          | **Windows** | \`opensnes_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
+
+          ### Quick start
+
+          1. Download and extract the zip for your platform
+          2. Set \`OPENSNES=/path/to/opensnes\` in your project's Makefile
+          3. \`make\` — your first ROM is ready
+
+          See [GETTING_STARTED.md](docs/GETTING_STARTED.md) for full instructions.
+          NOTESEOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.version }}
+          name: OpenSNES ${{ steps.tag.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.version, '-rc') || contains(steps.tag.outputs.version, '-beta') }}
+          files: |
+            artifacts/opensnes-linux-x86_64/opensnes_linux_x86_64.zip
+            artifacts/opensnes-darwin-arm64/opensnes_darwin_arm64.zip
+            artifacts/opensnes-windows-x86_64/opensnes_windows_x86_64.zip

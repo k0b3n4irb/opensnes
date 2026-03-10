@@ -50,7 +50,22 @@ Pick one (Mesen is recommended for debugging):
 | [bsnes](https://github.com/bsnes-emu/bsnes) | Cycle accuracy | GitHub releases |
 | [Snes9x](https://www.snes9x.com/) | Performance | snes9x.com |
 
-## Step 3: Clone and Build OpenSNES
+## Step 3: Get OpenSNES
+
+### Option A: Download Pre-built SDK (recommended)
+
+Download the latest release for your platform from the
+[GitHub Releases page](https://github.com/k0b3n4irb/opensnes/releases):
+
+| Platform | File |
+|----------|------|
+| Linux x86_64 | `opensnes_linux_x86_64.zip` |
+| macOS arm64 | `opensnes_darwin_arm64.zip` |
+| Windows x86_64 | `opensnes_windows_x86_64.zip` |
+
+Extract the zip and note the path — you'll need it for your project's Makefile.
+
+### Option B: Build from source
 
 ```bash
 # Clone with submodules (--recursive is required!)
@@ -61,14 +76,14 @@ cd opensnes
 make
 ```
 
-This builds the compiler, tools, library, and all 25 example ROMs.
+This builds the compiler, tools, library, and all 37 example ROMs.
 
 **Expected output:**
 ```
 Building cc65816 compiler...
 Building WLA-DX assembler...
 Building OpenSNES library...
-Building examples... (25 ROMs)
+Building examples... (37 ROMs)
 ```
 
 ## Step 4: Run Your First ROM
