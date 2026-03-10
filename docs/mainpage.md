@@ -7,7 +7,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage getting_started -- Install the SDK and build your first ROM
 
-@subpage learning_path -- 36 examples from "Hello World" to complete games
+@subpage learning_path -- 37 examples from "Hello World" to complete games
+
+@subpage examples_by_category -- Browse examples by topic
 
 ## Guides
 
@@ -16,8 +18,6 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 @subpage snes_sound_guide -- SPC700, SNESMOD, music and SFX
 
 @subpage troubleshooting -- Common problems and solutions
-
-@subpage example_walkthroughs -- Line-by-line code explanations
 
 ## Tutorials
 
