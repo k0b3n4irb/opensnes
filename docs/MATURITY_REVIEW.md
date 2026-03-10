@@ -224,7 +224,7 @@ PVSnesLib's tmx2snes (Tiled integration) is useful and not replicated in OpenSNE
 7. **Tiled integration**: tmx2snes
 
 ### Where OpenSNES is Better
-1. **Modern compiler**: C11, 13 optimization phases, -22% cycles vs PVSnesLib+816-opt
+1. **Modern compiler**: C11, 13 optimization phases, -30% cycles vs PVSnesLib+816-opt
 2. **Testing**: 60+25+37 automated tests vs zero
 3. **Documentation**: multi-layered, in-repo, example READMEs
 4. **Modularity**: link only what you need, clear dependency graph
@@ -250,7 +250,7 @@ record, some missing features).
 | Pre-built binary releases (download & use) | Done | Blocks adoption |
 | Hardware verification (real SNES testing) | Not documented | Credibility |
 | At least 1 complete game demo (not port) | In progress (RPG) | Showcase |
-| Performance benchmark published | Tool exists, not published | Marketing |
+| Performance benchmark published | Done | Marketing |
 
 ### Nice-to-Have
 
