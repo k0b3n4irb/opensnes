@@ -84,7 +84,7 @@ If that sounds exciting rather than terrifying, you're in the right place.
 
 | | Feature | Details |
 |-|---------|---------|
-| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **22% faster code** than PVSnesLib+816-opt on our benchmark suite |
+| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **30% faster code** than PVSnesLib+816-opt on our benchmark suite ([details](docs/BENCHMARK.md)) |
 | | **Hardware library** (28 headers, modular linking) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
 | | **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
 | | **37 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
@@ -147,7 +147,7 @@ OpenSNES is a fork of PVSnesLib with a different set of trade-offs:
 
 | | OpenSNES | PVSnesLib |
 |-|----------|-----------|
-| **Compiler** | C11 (cproc+QBE), 13 opt phases, **-22% cycles** | C89 (tcc816), 38 regex peepholes |
+| **Compiler** | C11 (cproc+QBE), 13 opt phases, **-30% cycles** | C89 (tcc816), 38 regex peepholes |
 | **Testing** | 60 compiler + 25 unit + 37 ROM validations | None |
 | **CI** | 3 platforms per push | Build-only |
 | **Library** | Modular (`LIB_MODULES=...`) | Monolithic |

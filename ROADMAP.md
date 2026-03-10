@@ -7,7 +7,7 @@ Current state of the project and planned work.
 ## Current Status: v0.6.0
 
 A modern, well-tested SNES SDK ready for serious hobby development and game jams,
-building toward commercial-grade maturity. The compiler produces code 22% faster than
+building toward commercial-grade maturity. The compiler produces code 30% faster than
 PVSnesLib+816-opt on our benchmark suite. 37 working examples cover all major subsystems,
 with cross-platform CI on Linux, macOS, and Windows.
 
@@ -126,7 +126,7 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 | Pre-built binary releases | Done (release.yml) | Blocks adoption — users shouldn't need to compile the compiler |
 | Hardware verification docs | Not started | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
-| Published performance benchmark | Tool exists | Marketing — show the 22% improvement with data |
+| Published performance benchmark | Done (docs/BENCHMARK.md) | Marketing — show the 30% improvement with data |
 
 ### Nice-to-Have
 
@@ -140,7 +140,7 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 
 ### Short Term (v0.7.0)
 - [x] Pre-built binary releases for Linux, macOS, Windows
-- [ ] Published benchmark results (compiler output comparison)
+- [x] Published benchmark results (docs/BENCHMARK.md — -30.3% vs PVSnesLib)
 - [ ] More compiler peephole optimizations
 - [ ] Performance profiling tools (VBlank usage, cycle counter)
 
