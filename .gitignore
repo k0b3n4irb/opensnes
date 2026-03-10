@@ -39,8 +39,11 @@ doc/
 linkfile
 testlink
 
-# IDE
-.vscode/
+# IDE (track shared VS Code config, ignore personal settings)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

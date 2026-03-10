@@ -1,0 +1,91 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // ── Build ────────────────────────────────────────────────
+        {
+            "label": "Build All",
+            "type": "shell",
+            "command": "make",
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": "$gcc",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "Build Compiler",
+            "type": "shell",
+            "command": "make compiler",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Build Tools",
+            "type": "shell",
+            "command": "make tools",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Build Library",
+            "type": "shell",
+            "command": "make lib",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Build Examples",
+            "type": "shell",
+            "command": "make examples",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Build Current Example",
+            "type": "shell",
+            "command": "make",
+            "options": { "cwd": "${fileDirname}" },
+            "problemMatcher": "$gcc",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean & Build All",
+            "type": "shell",
+            "command": "make clean && make",
+            "group": "build",
+            "problemMatcher": "$gcc",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+
+        // ── Tests ────────────────────────────────────────────────
+        {
+            "label": "Run Unit Tests",
+            "type": "shell",
+            "command": "./tests/unit/run_unit_tests.sh",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Compiler Tests",
+            "type": "shell",
+            "command": "./tests/compiler/run_tests.sh",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Example Validation",
+            "type": "shell",
+            "command": "OPENSNES_HOME=${workspaceFolder} ./tests/examples/validate_examples.sh --quick",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run All Tests",
+            "type": "shell",
+            "command": "./tests/unit/run_unit_tests.sh && ./tests/compiler/run_tests.sh && OPENSNES_HOME=${workspaceFolder} ./tests/examples/validate_examples.sh --quick",
+            "group": { "kind": "test", "isDefault": true },
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "clear": true }
+        }
+    ]
+}

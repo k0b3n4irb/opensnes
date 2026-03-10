@@ -1,0 +1,52 @@
+{
+    // CMake (WLA-DX submodule uses CMake but we build via make)
+    "cmake.ignoreCMakeListsMissing": true,
+
+    // File associations
+    "files.associations": {
+        "*.asm": "asm",
+        "*.inc": "asm",
+        "*.as": "asm"
+    },
+
+    // Hide build artifacts from the explorer
+    "files.exclude": {
+        "**/*.o": true,
+        "**/*.obj": true,
+        "**/linkfile": true,
+        "**/combined.asm": true,
+        "**/project_hdr.asm": true,
+        "**/*.c.asm": true,
+        "**/*.c.wrap.asm": true,
+        "**/data_init_end.wrap.asm": true,
+        "bin/": true,
+        "build/": true,
+        "release/": true
+    },
+
+    // Search: skip build artifacts and submodule internals
+    "search.exclude": {
+        "**/compiler/wla-dx": true,
+        "**/compiler/qbe/minic": true,
+        "**/docs/doxygen-awesome-css": true,
+        "**/*.sfc": true,
+        "**/*.sym": true
+    },
+
+    // Indentation: tabs for assembly, 4 spaces for C
+    "[asm]": {
+        "editor.insertSpaces": false,
+        "editor.tabSize": 4
+    },
+    "[c]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+
+    // C/C++ IntelliSense (for library headers)
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/lib/include"
+    ],
+    "C_Cpp.default.defines": [],
+    "C_Cpp.errorSquiggles": "enabled"
+}
