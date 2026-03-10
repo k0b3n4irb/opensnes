@@ -16,17 +16,6 @@
 ;
 ;==============================================================================
 
-;------------------------------------------------------------------------------
-; ASCII Table Definition
-;------------------------------------------------------------------------------
-; Define identity mapping for .ASC directives (character → same character).
-; This suppresses the WLA-DX warning "No .ASCIITABLE defined" and makes
-; the intended mapping explicit.
-;------------------------------------------------------------------------------
-.ASCIITABLE
-MAP ' ' TO '~' = ' '    ; Printable ASCII: space (32) to tilde (126)
-.ENDA
-
 ;==============================================================================
 ; WLA-DX Section Types Used in This File
 ;==============================================================================

@@ -14,6 +14,11 @@
   BANKS 1
 .ENDRO
 
+; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
+.ASCIITABLE
+MAP ' ' TO '~' = ' '
+.ENDA
+
 .RAMSECTION "zeropage" BANK 0 SLOT 1
 .ENDS
 
