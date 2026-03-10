@@ -25,6 +25,17 @@ else ifeq ($(UNAME), Linux)
     MAKEFLAGS := -j$(shell nproc)
 endif
 
+# Static linking for release portability
+# macOS: Apple forbids static linking with libSystem — always dynamic
+# Linux/Windows: static to avoid glibc/DLL dependencies for end users
+ifeq ($(UNAME), Darwin)
+    STATIC_LDFLAGS :=
+    CMAKE_STATIC_FLAGS :=
+else
+    STATIC_LDFLAGS := -static
+    CMAKE_STATIC_FLAGS := -DCMAKE_EXE_LINKER_FLAGS="-static"
+endif
+
 .DEFAULT_GOAL := all
 .PHONY: all clean install cc65816 cc65816-clean cc65816-install wla wla-clean wla-install
 
@@ -56,7 +67,7 @@ endif
 	@chmod +x $(BIN_DIR)/cc65816
 
 $(QBE_DIR)/qbe:
-	$(MAKE) -C $(QBE_DIR) CC=clang
+	$(MAKE) -C $(QBE_DIR) CC=clang LDFLAGS="$(STATIC_LDFLAGS)"
 
 # Generate cproc config.h from template (required for non-Linux platforms)
 # Using a template file is more maintainable than multi-line echo commands
@@ -67,7 +78,7 @@ $(CPROC_DIR)/config.h: config.h.in
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
 # Use clang for consistent builds across all platforms
-	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="-g" cproc-qbe
+	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="-g" LDFLAGS="$(STATIC_LDFLAGS)" cproc-qbe
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
@@ -90,7 +101,7 @@ wla: $(WLA_BUILT_MARKER)
 # Only run CMake and build if binaries don't exist
 # The marker file prevents unnecessary CMake reconfiguration on incremental builds
 $(WLA_BUILT_MARKER):
-	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang . && $(MAKE) wla-65816 wla-spc700 wlalink
+	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang $(CMAKE_STATIC_FLAGS) . && $(MAKE) wla-65816 wla-spc700 wlalink
 	@touch $@
 
 wla-clean:
