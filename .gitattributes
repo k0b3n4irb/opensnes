@@ -1,6 +1,5 @@
-# Linguist overrides — tell GitHub these are C (not C++)
-tools/gfx4snes/src/lodepng.h linguist-language=C
-tools/img2snes/src/lodepng.h linguist-language=C
+# Linguist overrides — all .h files in this project are C (not C++)
+*.h linguist-language=C
 
 # Doxygen theme is vendored, not our code
 docs/doxygen-awesome-css/** linguist-vendored
