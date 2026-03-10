@@ -56,7 +56,7 @@ OpenSNES = higher risk (young), lower blind spots (well-tested).
 - **37 examples**, each with its own README.md
 - C11 support: `const`, `_Static_assert`, modern syntax
 - cc65816 wrapper retries on crashes, cleaner error output
-- **BUT**: requires building compiler from source (no pre-built binaries yet)
+- Pre-built binaries available on GitHub Releases for all 3 platforms
 
 ### Verdict
 
@@ -247,7 +247,7 @@ record, some missing features).
 
 | Item | Status | Impact |
 |------|--------|--------|
-| Pre-built binary releases (download & use) | Missing | Blocks adoption |
+| Pre-built binary releases (download & use) | Done | Blocks adoption |
 | Hardware verification (real SNES testing) | Not documented | Credibility |
 | At least 1 complete game demo (not port) | In progress (RPG) | Showcase |
 | Performance benchmark published | Tool exists, not published | Marketing |
