@@ -102,7 +102,7 @@
 ;------------------------------------------------------------------------------
 
 .RAMSECTION ".system" BANK 0 SLOT 1
-    vblank_flag     dsb 1   ; Set by NMI handler, cleared by WaitVBlank
+    vblank_flag     dsb 1   ; Handshake: set by WaitForVBlank, cleared by NMI
     oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
     tilemap_update_flag dsb 1 ; Set when tilemap buffer needs DMA to VRAM
     tilemap_vram_addr dsb 2   ; VRAM word address for tilemap DMA target
@@ -596,7 +596,20 @@ CopyInitData:
 ; NmiHandler - VBlank Interrupt
 ;------------------------------------------------------------------------------
 ; Called at the start of each VBlank period (~60Hz).
-; Transfers OAM buffer to hardware if needed, then sets vblank_flag.
+; Uses PVSnesLib handshake protocol:
+;   - Main thread sets vblank_flag=1 via WaitForVBlank ("I'm ready")
+;   - NMI handler checks flag: if 0 → lag frame (skip work), if 1 → do work
+;   - NMI handler clears flag=0 when done ("acknowledged")
+;   - Main thread wakes from WAI, sees flag=0, proceeds
+;
+; Execution order (PVSnesLib-aligned):
+;   1. OAM DMA        — VBlank-critical (VRAM write)
+;   2. Tilemap DMA    — VBlank-critical (VRAM write)
+;   3. BG scroll sync — VBlank-critical (PPU register write)
+;   4. User callback  — not VBlank-critical
+;   5. Joypad read    — not VBlank-critical ($4218/$421A readable anytime)
+;   6. Mouse read     — not VBlank-critical ($4016/$4017 serial)
+;   7. Super Scope    — not VBlank-critical (PPU latch + $421A)
 ;
 ; WARNING: Do NOT use the WRAM data port ($2180-$2183) in NMI code.
 ; Main-thread code (HDMA table construction, map streaming, object updates)
@@ -605,7 +618,7 @@ CopyInitData:
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
 NmiHandler:
-    rep #$30
+    rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
     pha
     phx
     phy
@@ -625,13 +638,246 @@ NmiHandler:
     sep #$20
     lda $4210
 
-    ; Increment frame counter
+    ; Increment frame counter (always, even on lag frames)
     rep #$20
     inc frame_count
 
     ;--------------------------------------------------------------------------
-    ; Read Joypads (like PVSnesLib - read in VBlank ISR for reliability)
+    ; Handshake check: is main thread ready?
     ;--------------------------------------------------------------------------
+    sep #$20
+    lda vblank_flag
+    bne @vblank_work        ; flag=1 → main thread called WaitForVBlank, do work
+
+    ; Lag frame — main thread still computing, skip all VBlank work
+    rep #$20
+    inc lag_frame_counter
+    jmp @nmi_restore
+
+@vblank_work:
+    rep #$20
+
+    ;==========================================================================
+    ; VRAM-CRITICAL SECTION — must complete during VBlank
+    ;==========================================================================
+    ; PVSnesLib order: OAM DMA → tilemap DMA → scroll sync FIRST,
+    ; then callback and input reading (which are NOT VBlank-critical).
+    ; This maximizes the time available for VRAM writes.
+    ;==========================================================================
+
+    sep #$20            ; 8-bit A for flag checks
+
+    ;--------------------------------------------------------------------------
+    ; 1. Transfer OAM buffer to hardware during VBlank
+    ;--------------------------------------------------------------------------
+    lda oam_update_flag
+    beq +
+    stz oam_update_flag
+    jsl oamUpdate
+    sep #$20            ; C functions return in 16-bit A, restore 8-bit
++
+
+    ;--------------------------------------------------------------------------
+    ; 2. Transfer tilemap buffer to VRAM during VBlank
+    ;--------------------------------------------------------------------------
+    lda tilemap_update_flag
+    beq +
+    stz tilemap_update_flag
+    jsl tilemapFlush
+    sep #$20            ; Restore 8-bit A after C function
++
+
+    ;--------------------------------------------------------------------------
+    ; 3. Sync BG scroll shadows to hardware ($210D-$2114)
+    ;--------------------------------------------------------------------------
+    ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
+    ; 8-bit A, data bank $00
+    lda bg_scroll_dirty
+    beq @scroll_done      ; Nothing dirty → skip all
+
+    bit #$01
+    beq @bg1_done
+    lda bg_scroll_x      ; BG1 H low
+    sta $210D
+    lda bg_scroll_x+1    ; BG1 H high
+    sta $210D
+    lda bg_scroll_y      ; BG1 V low
+    sta $210E
+    lda bg_scroll_y+1    ; BG1 V high
+    sta $210E
+    lda bg_scroll_dirty   ; Reload for next test
+@bg1_done:
+
+    bit #$02
+    beq @bg2_done
+    lda bg_scroll_x+2    ; BG2 H low
+    sta $210F
+    lda bg_scroll_x+3    ; BG2 H high
+    sta $210F
+    lda bg_scroll_y+2    ; BG2 V low
+    sta $2110
+    lda bg_scroll_y+3    ; BG2 V high
+    sta $2110
+    lda bg_scroll_dirty   ; Reload for next test
+@bg2_done:
+
+    bit #$04
+    beq @bg3_done
+    lda bg_scroll_x+4    ; BG3 H low
+    sta $2111
+    lda bg_scroll_x+5    ; BG3 H high
+    sta $2111
+    lda bg_scroll_y+4    ; BG3 V low
+    sta $2112
+    lda bg_scroll_y+5    ; BG3 V high
+    sta $2112
+    lda bg_scroll_dirty   ; Reload for next test
+@bg3_done:
+
+    bit #$08
+    beq @bg4_done
+    lda bg_scroll_x+6    ; BG4 H low
+    sta $2113
+    lda bg_scroll_x+7    ; BG4 H high
+    sta $2113
+    lda bg_scroll_y+6    ; BG4 V low
+    sta $2114
+    lda bg_scroll_y+7    ; BG4 V high
+    sta $2114
+@bg4_done:
+
+    stz bg_scroll_dirty   ; Clear all dirty bits
+@scroll_done:
+
+    ;==========================================================================
+    ; NON-CRITICAL SECTION — callback + input reading
+    ;==========================================================================
+    ; These do NOT require VBlank timing:
+    ;   - User callback: runs C code, accesses RAM (not VRAM)
+    ;   - Joypads: reads $4218/$421A (readable anytime after auto-read completes)
+    ;   - Mouse: reads $4016/$4017 (serial registers, no VBlank dependency)
+    ;   - Super Scope: reads PPU latch + $421A (no VBlank dependency)
+    ;==========================================================================
+
+    ;--------------------------------------------------------------------------
+    ; 4. Call user VBlank callback
+    ;--------------------------------------------------------------------------
+    ; Opt 7: Skip register save/restore when default callback is active.
+    ; Compare nmi_callback (16-bit addr + 8-bit bank) against DefaultNmiCallback.
+    ; If match, skip the ~260-cycle save/restore + call block.
+    ;
+    ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
+    ; because JML [dp] reads from address D+dp. We save the main loop's registers
+    ; to the NMI register area, then restore them after the callback.
+    rep #$30            ; 16-bit A/X/Y
+
+    ; Check if callback is the default no-op
+    lda nmi_callback        ; 16-bit address
+    cmp #DefaultNmiCallback
+    bne @do_callback
+    sep #$20
+    lda nmi_callback+2      ; bank byte
+    cmp #:DefaultNmiCallback
+    bne +                   ; Not match → do callback
+    jmp @skip_callback      ; Match → skip save/restore/call (long jump)
++   rep #$30
+
+@do_callback:
+    ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
+    ; The C callback may use any of these registers
+    lda tcc__r0
+    sta tcc__nmi_r0
+    lda tcc__r0h
+    sta tcc__nmi_r0h
+    lda tcc__r1
+    sta tcc__nmi_r1
+    lda tcc__r1h
+    sta tcc__nmi_r1h
+    lda tcc__r2
+    sta tcc__nmi_r2
+    lda tcc__r2h
+    sta tcc__nmi_r2h
+    lda tcc__r3
+    sta tcc__nmi_r3
+    lda tcc__r3h
+    sta tcc__nmi_r3h
+    lda tcc__r4
+    sta tcc__nmi_r4
+    lda tcc__r4h
+    sta tcc__nmi_r4h
+    lda tcc__r5
+    sta tcc__nmi_r5
+    lda tcc__r5h
+    sta tcc__nmi_r5h
+    lda tcc__r9
+    sta tcc__nmi_r9
+    lda tcc__r9h
+    sta tcc__nmi_r9h
+    lda tcc__r10
+    sta tcc__nmi_r10
+    lda tcc__r10h
+    sta tcc__nmi_r10h
+
+    ; Set data bank to $7E for C variable access
+    pea $7E7E
+    plb
+    plb
+    ; Push return address - 1 for RTL (bank:addr-1)
+    phk                 ; Push current program bank
+    pea @callback_done-1
+    jml [nmi_callback]  ; Indirect long jump (D=0, reads from address 0+nmi_callback)
+@callback_done:
+
+    ; Restore data bank to $00 for hardware register access
+    pea $0000
+    plb
+    plb
+
+    ; Restore ALL main loop's compiler registers from NMI area
+    lda tcc__nmi_r0
+    sta tcc__r0
+    lda tcc__nmi_r0h
+    sta tcc__r0h
+    lda tcc__nmi_r1
+    sta tcc__r1
+    lda tcc__nmi_r1h
+    sta tcc__r1h
+    lda tcc__nmi_r2
+    sta tcc__r2
+    lda tcc__nmi_r2h
+    sta tcc__r2h
+    lda tcc__nmi_r3
+    sta tcc__r3
+    lda tcc__nmi_r3h
+    sta tcc__r3h
+    lda tcc__nmi_r4
+    sta tcc__r4
+    lda tcc__nmi_r4h
+    sta tcc__r4h
+    lda tcc__nmi_r5
+    sta tcc__r5
+    lda tcc__nmi_r5h
+    sta tcc__r5h
+    lda tcc__nmi_r9
+    sta tcc__r9
+    lda tcc__nmi_r9h
+    sta tcc__r9h
+    lda tcc__nmi_r10
+    sta tcc__r10
+    lda tcc__nmi_r10h
+    sta tcc__r10h
+
+@skip_callback:
+    sep #$20            ; Back to 8-bit A
+
+    ;--------------------------------------------------------------------------
+    ; 5. Read Joypads
+    ;--------------------------------------------------------------------------
+    ; Auto-joypad completes ~4K master clocks into VBlank, well before NMI fires.
+    ; Readable anytime — not VBlank-critical.
+    ;--------------------------------------------------------------------------
+    rep #$20            ; 16-bit A for joypad reads
+
     ; Wait for auto-joypad read to complete
 -   lda $4212
     and #$0001
@@ -667,7 +913,7 @@ NmiHandler:
     sta pad_keysdown+2
 
     ;--------------------------------------------------------------------------
-    ; Read Mouse (if connected)
+    ; 6. Read Mouse (if connected)
     ;--------------------------------------------------------------------------
     ; Only runs when mouse_con != 0 (set by mouseInit in C code).
     ; For each active port:
@@ -794,7 +1040,7 @@ NmiHandler:
 @mouse_done:
 
     ;--------------------------------------------------------------------------
-    ; Read Super Scope (if connected)
+    ; 7. Read Super Scope (if connected)
     ;--------------------------------------------------------------------------
     ; Only runs when scope_con != 0 (set by scopeInit in C code).
     ; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
@@ -931,197 +1177,11 @@ NmiHandler:
 
 @scope_done:
 
+    ; Clear VBlank flag (handshake: signal main thread "done")
     sep #$20
+    stz vblank_flag
 
-    ; Call user VBlank callback (BEFORE OAM update for max VBlank time)
-    ;
-    ; Opt 7: Skip register save/restore when default callback is active.
-    ; Compare nmi_callback (16-bit addr + 8-bit bank) against DefaultNmiCallback.
-    ; If match, skip the ~260-cycle save/restore + call block.
-    ;
-    ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
-    ; because JML [dp] reads from address D+dp. We save the main loop's registers
-    ; to the NMI register area, then restore them after the callback.
-    rep #$30            ; 16-bit A/X/Y
-
-    ; Check if callback is the default no-op
-    lda nmi_callback        ; 16-bit address
-    cmp #DefaultNmiCallback
-    bne @do_callback
-    sep #$20
-    lda nmi_callback+2      ; bank byte
-    cmp #:DefaultNmiCallback
-    bne +                   ; Not match → do callback
-    jmp @skip_callback      ; Match → skip save/restore/call (long jump)
-+   rep #$30
-
-@do_callback:
-    ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
-    ; The C callback may use any of these registers
-    lda tcc__r0
-    sta tcc__nmi_r0
-    lda tcc__r0h
-    sta tcc__nmi_r0h
-    lda tcc__r1
-    sta tcc__nmi_r1
-    lda tcc__r1h
-    sta tcc__nmi_r1h
-    lda tcc__r2
-    sta tcc__nmi_r2
-    lda tcc__r2h
-    sta tcc__nmi_r2h
-    lda tcc__r3
-    sta tcc__nmi_r3
-    lda tcc__r3h
-    sta tcc__nmi_r3h
-    lda tcc__r4
-    sta tcc__nmi_r4
-    lda tcc__r4h
-    sta tcc__nmi_r4h
-    lda tcc__r5
-    sta tcc__nmi_r5
-    lda tcc__r5h
-    sta tcc__nmi_r5h
-    lda tcc__r9
-    sta tcc__nmi_r9
-    lda tcc__r9h
-    sta tcc__nmi_r9h
-    lda tcc__r10
-    sta tcc__nmi_r10
-    lda tcc__r10h
-    sta tcc__nmi_r10h
-
-    ; Set data bank to $7E for C variable access
-    pea $7E7E
-    plb
-    plb
-    ; Push return address - 1 for RTL (bank:addr-1)
-    phk                 ; Push current program bank
-    pea @callback_done-1
-    jml [nmi_callback]  ; Indirect long jump (D=0, reads from address 0+nmi_callback)
-@callback_done:
-
-    ; Restore data bank to $00 for hardware register access
-    pea $0000
-    plb
-    plb
-
-    ; Restore ALL main loop's compiler registers from NMI area
-    lda tcc__nmi_r0
-    sta tcc__r0
-    lda tcc__nmi_r0h
-    sta tcc__r0h
-    lda tcc__nmi_r1
-    sta tcc__r1
-    lda tcc__nmi_r1h
-    sta tcc__r1h
-    lda tcc__nmi_r2
-    sta tcc__r2
-    lda tcc__nmi_r2h
-    sta tcc__r2h
-    lda tcc__nmi_r3
-    sta tcc__r3
-    lda tcc__nmi_r3h
-    sta tcc__r3h
-    lda tcc__nmi_r4
-    sta tcc__r4
-    lda tcc__nmi_r4h
-    sta tcc__r4h
-    lda tcc__nmi_r5
-    sta tcc__r5
-    lda tcc__nmi_r5h
-    sta tcc__r5h
-    lda tcc__nmi_r9
-    sta tcc__r9
-    lda tcc__nmi_r9h
-    sta tcc__r9h
-    lda tcc__nmi_r10
-    sta tcc__r10
-    lda tcc__nmi_r10h
-    sta tcc__r10h
-
-@skip_callback:
-    sep #$20            ; Back to 8-bit A
-
-    ; Transfer OAM buffer to hardware during VBlank
-    lda oam_update_flag
-    beq +
-    stz oam_update_flag
-    jsl oamUpdate
-    sep #$20            ; C functions return in 16-bit A, restore 8-bit
-+
-
-    ; Transfer tilemap buffer to VRAM during VBlank
-    lda tilemap_update_flag
-    beq +
-    stz tilemap_update_flag
-    jsl tilemapFlush
-+
-
-    ; Sync BG scroll shadows to hardware ($210D-$2114)
-    ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
-    ; 8-bit A, data bank $00
-    lda bg_scroll_dirty
-    beq @scroll_done      ; Nothing dirty → skip all
-
-    bit #$01
-    beq @bg1_done
-    lda bg_scroll_x      ; BG1 H low
-    sta $210D
-    lda bg_scroll_x+1    ; BG1 H high
-    sta $210D
-    lda bg_scroll_y      ; BG1 V low
-    sta $210E
-    lda bg_scroll_y+1    ; BG1 V high
-    sta $210E
-    lda bg_scroll_dirty   ; Reload for next test
-@bg1_done:
-
-    bit #$02
-    beq @bg2_done
-    lda bg_scroll_x+2    ; BG2 H low
-    sta $210F
-    lda bg_scroll_x+3    ; BG2 H high
-    sta $210F
-    lda bg_scroll_y+2    ; BG2 V low
-    sta $2110
-    lda bg_scroll_y+3    ; BG2 V high
-    sta $2110
-    lda bg_scroll_dirty   ; Reload for next test
-@bg2_done:
-
-    bit #$04
-    beq @bg3_done
-    lda bg_scroll_x+4    ; BG3 H low
-    sta $2111
-    lda bg_scroll_x+5    ; BG3 H high
-    sta $2111
-    lda bg_scroll_y+4    ; BG3 V low
-    sta $2112
-    lda bg_scroll_y+5    ; BG3 V high
-    sta $2112
-    lda bg_scroll_dirty   ; Reload for next test
-@bg3_done:
-
-    bit #$08
-    beq @bg4_done
-    lda bg_scroll_x+6    ; BG4 H low
-    sta $2113
-    lda bg_scroll_x+7    ; BG4 H high
-    sta $2113
-    lda bg_scroll_y+6    ; BG4 V low
-    sta $2114
-    lda bg_scroll_y+7    ; BG4 V high
-    sta $2114
-@bg4_done:
-
-    stz bg_scroll_dirty   ; Clear all dirty bits
-@scroll_done:
-
-    ; Set VBlank flag
-    lda #$01
-    sta vblank_flag
-
+@nmi_restore:
     ; Restore and return
     rep #$30
     plb                 ; Restore data bank
@@ -1141,25 +1201,27 @@ DefaultNmiCallback:
     rtl
 
 ;------------------------------------------------------------------------------
-; WaitForVBlank - Wait for VBlank using WAI instruction (Opt 1)
+; WaitForVBlank - PVSnesLib handshake protocol
 ;------------------------------------------------------------------------------
-; Uses WAI to halt CPU until interrupt, saving power and bus bandwidth.
-; Checks vblank_flag BEFORE WAI so lag frames pass through immediately.
-; Sets oam_update_flag so NMI handler transfers OAM buffer.
+; Sets vblank_flag=1 ("main thread ready"), then halts with WAI.
+; NMI handler sees flag=1, does VBlank work (OAM, tilemap, scroll, joypads),
+; then clears flag=0. Main thread wakes, sees flag=0, proceeds.
+;
+; If game logic exceeds one frame (lag), flag stays 0 when NMI fires.
+; NMI skips all work and increments lag_frame_counter. No silent VRAM
+; corruption — lag is visible and debuggable.
+;
+; KEEP: X, Y (documented in interrupt.h, used by video.asm)
 ;------------------------------------------------------------------------------
 WaitForVBlank:
     php
     sep #$20
     lda #$01
-    sta.l oam_update_flag
-    lda.l vblank_flag       ; Check if NMI already fired (lag frame)
-    bne @vblank_ready       ; Yes → skip WAI
--   wai                     ; Halt CPU until NMI (or IRQ)
+    sta.l oam_update_flag   ; Request OAM transfer
+    sta.l vblank_flag       ; Signal: "main thread ready"
+-   wai                     ; Halt until NMI
     lda.l vblank_flag
-    beq -                   ; Not VBlank — spurious IRQ, wait again
-@vblank_ready:
-    lda #$00
-    sta.l vblank_flag       ; Clear flag
+    bne -                   ; Loop until NMI clears flag to 0
     plp
     rtl
 
