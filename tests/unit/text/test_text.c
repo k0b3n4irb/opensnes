@@ -129,7 +129,7 @@ void test_text_print_at(void) {
 void test_text_init_ex(void) {
     textInitEx(0x3800, 128, 2);
 
-    TEST("ex: tmap=$3800", text_config.tilemap_addr == 0x3800);
+    TEST("ex: tmap=$1C00", text_config.tilemap_addr == 0x1C00); /* word addr = $3800 >> 1 */
     TEST("ex: font_t=128", text_config.font_tile == 128);
     TEST("ex: palette=2", text_config.palette == 2);
 
