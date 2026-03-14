@@ -107,20 +107,17 @@
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
     bg_scroll_dirty dsb 1   ; Bitmask: bit 0-3 = BG1-4 scroll dirty
     oam_max_id      dsb 1   ; Highest sprite ID written (for partial OAM DMA)
-    ; Mouse state (read in VBlank ISR when mouse_con != 0)
+    ; Mouse state — PVSnesLib-compatible indexed layout
+    ; All 2-byte arrays: [0]=port 1, [1]=port 2. Accessed with X=0 or X=1.
     mouse_con       dsb 1   ; bitmask: bit 0 = port 1 mouse, bit 1 = port 2 mouse
-    mouse_x         dsb 2   ; port 1 X displacement (sign-magnitude raw byte in low)
-    mouse_y         dsb 2   ; port 1 Y displacement (sign-magnitude raw byte in low)
-    mouse_x2        dsb 2   ; port 2 X displacement
-    mouse_y2        dsb 2   ; port 2 Y displacement
-    mouse_buttons   dsb 1   ; port 1 buttons (bit 0 = left, bit 1 = right)
-    mouse_buttons2  dsb 1   ; port 2 buttons
-    mouse_btnsold   dsb 1   ; port 1 previous frame buttons
-    mouse_btnsold2  dsb 1   ; port 2 previous frame buttons
-    mouse_btnsdown  dsb 1   ; port 1 newly pressed (edge detection)
-    mouse_btnsdown2 dsb 1   ; port 2 newly pressed
-    mouse_sens      dsb 1   ; port 1 sensitivity (0-2)
-    mouse_sens2     dsb 1   ; port 2 sensitivity
+    mouse_x         dsb 2   ; X displacement per port (sign-magnitude)
+    mouse_y         dsb 2   ; Y displacement per port (sign-magnitude)
+    mouseConnect    dsb 2   ; Per-port connection flag (0=disconnected, 1=connected)
+    mousePressed    dsb 2   ; Currently held buttons per port
+    mousePreviousPressed dsb 2 ; Previous frame buttons per port
+    mouseButton     dsb 2   ; Newly pressed buttons per port (edge detection)
+    mouseSensitivity dsb 2  ; Current sensitivity per port (0-2)
+    mouseRequestChangeSensitivity dsb 2 ; Deferred sensitivity command per port
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -903,128 +900,220 @@ NmiHandler:
     ;--------------------------------------------------------------------------
     ; 6. Read Mouse (if connected)
     ;--------------------------------------------------------------------------
-    ; Only runs when mouse_con != 0 (set by mouseInit in C code).
-    ; For each active port:
-    ;   1. Extract buttons + sensitivity from auto-joypad data
-    ;   2. Bit-bang 16 bits of displacement via $4016/$4017
-    ;   3. Edge-detect buttons
+    ; PVSnesLib-compatible mouse reading with:
+    ;   - Per-frame connection detection via device signature
+    ;   - Automatic sensitivity sync on first connection (Nintendo mouse bug)
+    ;   - Deferred sensitivity change commands (mouseRequestChangeSensitivity)
+    ;   - Indexed variables: X=0 for port 1, X=1 for port 2
     ;--------------------------------------------------------------------------
-    sep #$20                ; 8-bit A for mouse reading
+    sep #$20                ; 8-bit A for mouse_con check
     lda.w mouse_con
     bne @mouse_start
     jmp @mouse_done         ; Skip if no mouse initialized (jmp for distance)
 @mouse_start:
+    sep #$10                ; 8-bit X/Y for indexed mouse access
 
-    ; --- Port 1 mouse ---
-    bit #$01
-    beq @mouse_port2
-
-    ; Save old buttons for edge detection
-    lda.w mouse_buttons
-    sta.w mouse_btnsold
-
-    ; Extract buttons and sensitivity from auto-joypad JOY1L ($4218)
-    ; JOY1L bit layout for mouse:
-    ;   Bit 7: Right button
-    ;   Bit 6: Left button
-    ;   Bits 5-4: Sensitivity (00=low, 01=med, 10=high)
-    ;   Bits 3-0: Signature (0001)
-    lda $4218               ; JOY1L (8-bit read)
-    pha                     ; Save for sensitivity extraction
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta.w mouse_buttons       ; bits 1-0 = right, left
-
-    pla                     ; Restore byte
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    and #$03
-    sta.w mouse_sens
-
-    ; Edge detection: newly pressed = (cur ^ old) & cur
-    lda.w mouse_buttons
-    eor.w mouse_btnsold
-    and.w mouse_buttons
-    sta.w mouse_btnsdown
-
-    ; Bit-bang 16 bits of displacement from port 1 ($4016)
-    ; Uses cascading ROL like PVSnesLib: reads 16 bits through mouse_x→mouse_y.
-    ; After 16 iterations: mouse_y = first 8 bits (Y), mouse_x = last 8 bits (X).
-    ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude)
-    rep #$20                ; 16-bit A for word operations
-    stz.w mouse_y             ; Clear displacement accumulators
-    stz.w mouse_x
-
-    sep #$20                ; 8-bit A for bit reading
-    ldy #16                 ; 16 bits total (8 Y + 8 X)
-@mouse1_disp_loop:
-    lda $4016               ; Read bit from port 1 (bit 0)
-    lsr a                   ; Shift bit 0 into carry
-    rol.w mouse_x             ; Carry → mouse_x bit 0, mouse_x bit 7 → carry
-    rol.w mouse_y             ; Carry → mouse_y bit 0
-    nop                     ; Hyperkin compatibility delay (170+ master cycles)
-    nop
-    dey
-    bne @mouse1_disp_loop
-
-@mouse_port2:
-    ; --- Port 2 mouse ---
+    ; Read port 2 first, then port 1 (PVSnesLib order)
     lda.w mouse_con
     bit #$02
-    beq @mouse_done
+    beq @skip_port2
+        ldx #1
+        lda.w $421A         ; REG_JOY2L (auto-joypad result)
+        jsr @MouseData
+@skip_port2:
+    lda.w mouse_con
+    bit #$01
+    beq @skip_port1
+        ldx #0
+        lda.w $4218         ; REG_JOY1L (auto-joypad result)
+        jsr @MouseData
+@skip_port1:
 
-    ; Save old buttons
-    lda.w mouse_buttons2
-    sta.w mouse_btnsold2
+    rep #$10                ; Restore 16-bit index for scope section
+    jmp @mouse_done         ; Jump past subroutine code
 
-    ; Extract from auto-joypad JOY2L ($421A)
-    lda $421A               ; JOY2L (8-bit read)
-    pha
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta.w mouse_buttons2
+;---------------------------------------------------------------------------
+; @MouseData — Read mouse data for one port
+;
+; IN: A = REG_JOY1L or REG_JOY2L (auto-joypad result byte)
+; IN: X = 0 (port 1) or 1 (port 2)
+; KEEP: X
+;
+; DB = 0, D = tcc__nmi_registers (NOT ZERO)
+;---------------------------------------------------------------------------
+.ACCU 8
+.INDEX 8
+@MouseData:
+    tay                     ; Save full JOY byte in Y
 
-    pla
+    ; Test if a mouse is connected (device signature in low nibble = $01)
+    and #$0F
+    cmp #$01
+    bne @NoMouseConnected
+
+    ; Test if mouse was connected on the previous frame
+    lda.w mouseConnect,x
+    beq @MouseConnectedThisFrame
+
+    ; --- Normal frame: update buttons and displacement ---
+
+    ; Save old buttons for edge detection
+    lda.w mousePressed,x
+    sta.w mousePreviousPressed,x
+
+    ; Extract sensitivity (bits 5-4) and buttons (bits 7-6) from JOY byte
+    tya                     ; Restore JOY byte
     lsr a
     lsr a
     lsr a
     lsr a
+    tay                     ; Y = upper nibble >> 4
     and #$03
-    sta.w mouse_sens2
+    sta.w mouseSensitivity,x
 
-    ; Edge detection
-    lda.w mouse_buttons2
-    eor.w mouse_btnsold2
-    and.w mouse_buttons2
-    sta.w mouse_btnsdown2
-
-    ; Bit-bang 16 bits of displacement from port 2 ($4017)
-    rep #$20
-    stz.w mouse_y2
-    stz.w mouse_x2
-
-    sep #$20
-    ldy #16
-@mouse2_disp_loop:
-    lda $4017
+    tya
     lsr a
-    rol.w mouse_x2
-    rol.w mouse_y2
-    nop
+    lsr a
+    sta.w mousePressed,x
+
+    ; Edge detection: newly pressed = (cur ^ old) & cur
+    eor.w mousePreviousPressed,x
+    and.w mousePressed,x
+    sta.w mouseButton,x
+
+    ; Bit-bang 16 bits of displacement from controller port.
+    ; $4016,x → $4016 (port 1) or $4017 (port 2).
+    ; After 16 iterations: mouse_y = first 8 bits (Y displacement),
+    ;                       mouse_x = last 8 bits (X displacement).
+    ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude).
+    ;
+    ; Hyperkin mouse timing: >=170 master cycles between bit reads.
+    ; SlowROM: this loop is ~190 m-cycles, no extra delay needed.
+    ldy #16
+@disp_loop:
+    lda.w $4016,x
+    lsr a                   ; Bit 0 → carry
+    rol.w mouse_x,x
+    rol.w mouse_y,x
+    nop                     ; Hyperkin compatibility delay
     nop
     dey
-    bne @mouse2_disp_loop
+    bne @disp_loop
 
+    ; Check for deferred sensitivity change request
+    lda.w mouseRequestChangeSensitivity,x
+    bne @ChangeSensitivityRequest
+
+    rts
+
+; Mouse was just connected this frame — sync sensitivity (Nintendo bug fix).
+; The Nintendo Mouse has a bug where internal sensitivity doesn't match
+; reported sensitivity on power-on. Cycling is required on first connection.
+@MouseConnectedThisFrame:
+    ; Restore sensitivity from last known value (survives disconnect/reconnect)
+    lda.w mouseSensitivity,x
+    and #$03
+    jsr @SetMouseSensitivity
+
+    ; Set mouse connected flag
+    lda #1
+    sta.w mouseConnect,x
+
+    ; Clear stale deferred request
+    stz.w mouseRequestChangeSensitivity,x
+
+    ; Clear mouse state (may not be valid on connection frame)
+    bra @ClearMouseState
+
+@NoMouseConnected:
+    stz.w mouseConnect,x
+
+@ClearMouseState:
+    ; Not clearing mouseSensitivity — it's used to restore on reconnect
+    stz.w mouseButton,x
+    stz.w mousePressed,x
+    stz.w mousePreviousPressed,x
+    stz.w mouse_x,x
+    stz.w mouse_y,x
+    rts
+
+; Process deferred sensitivity change request.
+; Protocol: $01 = cycle once, $02+ = cycle twice, $80+ = set to (value & 3).
+; A = mouseRequestChangeSensitivity value
+@ChangeSensitivityRequest:
+    stz.w mouseRequestChangeSensitivity,x
+
+    bmi @RequestSpecificSensitivity
+
+    ; Send one or two cycle-sensitivity commands to the mouse
+    ldy #$01
+    sty.w $4016             ; Strobe ON
+        dec a
+        beq +
+            ldy.w $4016,x   ; Extra clock read (cycle twice)
++
+        ldy.w $4016,x       ; Clock read (cycle once)
+    stz.w $4016             ; Strobe OFF
+
+    rts
+
+; A = mouseRequestChangeSensitivity (high bit set: specific target)
+@RequestSpecificSensitivity:
+    and #$03
+    cmp.w mouseSensitivity,x
+    beq @SensReturn
+
+; Cycle through mouse sensitivity until reported matches requested.
+; CAUTION: Always cycles at least once (required on first connection).
+; A = requested sensitivity (0-2)
+@SetMouseSensitivity:
+    tay                     ; Y = target sensitivity
+
+    ; Limit cycle-sensitivity commands to prevent infinite loop
+    ; (disconnected mouse or Hyperkin mouse always reports sensitivity 0)
+    lda #4
+    sta.b 1                 ; DP scratch: cycle counter
+
+@CycleLoop:
+    ; Send cycle-sensitivity command: strobe ON, read, strobe OFF
+    lda #$01
+    sta.w $4016             ; Strobe ON
+    lda.w $4016,x           ; Clock (triggers sensitivity cycle)
+    stz.w $4016             ; Strobe OFF
+
+    ; Read sensitivity bits from mouse.
+    ; No Hyperkin delay needed — Hyperkin doesn't support cycle-sensitivity.
+
+    ; Skip the first 10 bits (using A as loop counter to preserve Y)
+    lda #10
+@sens_skip_loop:
+    bit.w $4016,x
+    dec a
+    bne @sens_skip_loop
+
+    ; Read the 2 sensitivity bits
+    stz.b 0                 ; DP scratch: sensitivity accumulator
+
+    lda.w $4016,x
+    lsr a
+    rol.b 0
+
+    lda.w $4016,x
+    lsr a
+    rol.b 0
+
+    ; Compare read sensitivity with target (Y)
+    cpy.b 0
+    beq @SensReturn
+
+    dec.b 1
+    bne @CycleLoop
+
+@SensReturn:
+    rts
+
+.ACCU 8
+.INDEX 16
 @mouse_done:
 
     ;--------------------------------------------------------------------------
