@@ -25,20 +25,18 @@ extern u16 pad_keys[5];      /* Current button state (5 pads × 16 bits) */
 extern u16 pad_keysold[5];   /* Previous frame button state */
 extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
 
-/* Mouse state (populated by VBlank ISR when mouse_con != 0) */
-extern u8  mouse_con;        /* Bitmask: bit 0 = port 1, bit 1 = port 2 */
-extern u16 mouse_x;          /* Port 1 X displacement (sign-magnitude in low byte) */
-extern u16 mouse_y;          /* Port 1 Y displacement (sign-magnitude in low byte) */
-extern u16 mouse_x2;         /* Port 2 X displacement */
-extern u16 mouse_y2;         /* Port 2 Y displacement */
-extern u8  mouse_buttons;    /* Port 1 buttons held */
-extern u8  mouse_buttons2;   /* Port 2 buttons held */
-extern u8  mouse_btnsold;    /* Port 1 previous buttons */
-extern u8  mouse_btnsold2;   /* Port 2 previous buttons */
-extern u8  mouse_btnsdown;   /* Port 1 newly pressed */
-extern u8  mouse_btnsdown2;  /* Port 2 newly pressed */
-extern u8  mouse_sens;       /* Port 1 sensitivity */
-extern u8  mouse_sens2;      /* Port 2 sensitivity */
+/* Mouse state — PVSnesLib-compatible indexed layout.
+ * All 2-byte arrays: [0] = port 1, [1] = port 2.
+ * NMI handler detects connection per-frame and handles sensitivity sync. */
+extern u8  mouse_con;          /* Bitmask: bit 0 = port 1, bit 1 = port 2 */
+extern u8  mouse_x[2];        /* X displacement per port (sign-magnitude) */
+extern u8  mouse_y[2];        /* Y displacement per port (sign-magnitude) */
+extern u8  mouseConnect[2];   /* Per-port connection flag (set by NMI handler) */
+extern u8  mousePressed[2];   /* Currently held buttons per port */
+extern u8  mousePreviousPressed[2]; /* Previous frame buttons per port */
+extern u8  mouseButton[2];    /* Newly pressed buttons per port */
+extern u8  mouseSensitivity[2]; /* Current sensitivity per port (0-2) */
+extern u8  mouseRequestChangeSensitivity[2]; /* Deferred sensitivity command */
 
 /*============================================================================
  * Input Functions
@@ -117,33 +115,14 @@ u8 mouseInit(u8 port) {
     /* Mouse signature is $01 (joypad is $00) */
     if (signature != 0x01) return 0;
 
-    /* Enable mouse reading in NMI handler */
+    /* Enable mouse reading in NMI handler.
+     * The NMI handler will detect the connection per-frame, automatically
+     * sync sensitivity on first connection (fixing the Nintendo mouse
+     * power-on bug), and process deferred sensitivity change commands. */
     if (port == 0) {
         mouse_con |= 0x01;
     } else {
         mouse_con |= 0x02;
-    }
-
-    /*
-     * Fix Nintendo mouse power-on bug:
-     * The internal sensitivity state may not match what the mouse reports.
-     * Cycling sensitivity 2 times via strobe resets it to a known state.
-     * Note: We must actually read the port register (not just cast to void)
-     * because some compilers may eliminate a (void) volatile read.
-     */
-    {
-        volatile u8 dummy;
-        u8 i;
-        for (i = 0; i < 2; i++) {
-            REG_JOYA = 0x01;   /* Strobe ON */
-            if (port == 0) {
-                dummy = REG_JOYA; /* Clock one bit (triggers sensitivity cycle) */
-            } else {
-                dummy = REG_JOYB;
-            }
-            REG_JOYA = 0x00;   /* Strobe OFF */
-        }
-        (void)dummy;           /* Suppress unused warning */
     }
 
     return 1;
@@ -151,114 +130,43 @@ u8 mouseInit(u8 port) {
 
 u8 mouseIsConnected(u8 port) {
     if (port > 1) return 0;
-    if (port == 0) {
-        return (mouse_con & 0x01) ? 1 : 0;
-    }
-    return (mouse_con & 0x02) ? 1 : 0;
+    return mouseConnect[port] ? 1 : 0;
 }
 
 s16 mouseGetX(u8 port) {
-    if (port == 0) {
-        return sign_magnitude_to_signed((u8)mouse_x);
-    } else if (port == 1) {
-        return sign_magnitude_to_signed((u8)mouse_x2);
-    }
-    return 0;
+    if (port > 1) return 0;
+    return sign_magnitude_to_signed(mouse_x[port]);
 }
 
 s16 mouseGetY(u8 port) {
-    if (port == 0) {
-        return sign_magnitude_to_signed((u8)mouse_y);
-    } else if (port == 1) {
-        return sign_magnitude_to_signed((u8)mouse_y2);
-    }
-    return 0;
+    if (port > 1) return 0;
+    return sign_magnitude_to_signed(mouse_y[port]);
 }
 
 u8 mouseButtonsHeld(u8 port) {
-    if (port == 0) return mouse_buttons;
-    if (port == 1) return mouse_buttons2;
-    return 0;
+    if (port > 1) return 0;
+    return mousePressed[port];
 }
 
 u8 mouseButtonsPressed(u8 port) {
-    if (port == 0) return mouse_btnsdown;
-    if (port == 1) return mouse_btnsdown2;
-    return 0;
+    if (port > 1) return 0;
+    return mouseButton[port];
 }
 
 void mouseSetSensitivity(u8 port, u8 sensitivity) {
-    volatile u8 dummy;
-    u8 read_sens;
-    u8 max_cycles;
-    u8 i;
-
     if (port > 1) return;
     sensitivity &= 0x03;
     if (sensitivity > 2) sensitivity = 2;
 
-    /*
-     * PVSnesLib-compatible sensitivity cycling protocol:
-     * Each cycle: strobe ON, read response, strobe OFF, skip 10 bits,
-     * read 2 sensitivity bits, compare with target.
-     * Max 4 cycles to wrap around and find target.
-     */
-    max_cycles = 4;
-    while (max_cycles > 0) {
-        /* Strobe: latch data, clock one bit, release */
-        REG_JOYA = 0x01;   /* Strobe ON */
-        if (port == 0) {
-            dummy = REG_JOYA; /* Read response (clock) */
-        } else {
-            dummy = REG_JOYB;
-        }
-        REG_JOYA = 0x00;   /* Strobe OFF */
-
-        /* Skip 10 bits of serial data */
-        for (i = 0; i < 10; i++) {
-            if (port == 0) {
-                dummy = REG_JOYA;
-            } else {
-                dummy = REG_JOYB;
-            }
-        }
-
-        /* Read 2 sensitivity bits */
-        read_sens = 0;
-        if (port == 0) {
-            dummy = REG_JOYA;
-        } else {
-            dummy = REG_JOYB;
-        }
-        read_sens = (dummy & 0x01) << 1;
-
-        if (port == 0) {
-            dummy = REG_JOYA;
-        } else {
-            dummy = REG_JOYB;
-        }
-        read_sens |= (dummy & 0x01);
-
-        /* Check if we reached the target */
-        if (read_sens == sensitivity) break;
-
-        max_cycles--;
-    }
-
-    (void)dummy;  /* Suppress unused warning */
-
-    /* Update cached value */
-    if (port == 0) {
-        mouse_sens = sensitivity;
-    } else {
-        mouse_sens2 = sensitivity;
-    }
+    /* Deferred command: NMI handler will cycle hardware sensitivity.
+     * High bit set = "set to specific sensitivity (value & 3)".
+     * Protocol: $01=cycle once, $02+=cycle twice, $80+=set to (value & 3). */
+    mouseRequestChangeSensitivity[port] = 0x80 | sensitivity;
 }
 
 u8 mouseGetSensitivity(u8 port) {
-    if (port == 0) return mouse_sens;
-    if (port == 1) return mouse_sens2;
-    return 0;
+    if (port > 1) return 0;
+    return mouseSensitivity[port];
 }
 
 /*============================================================================
