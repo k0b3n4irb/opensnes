@@ -58,7 +58,9 @@
  * // In main loop, HDMA runs automatically each frame
  * @endcode
  *
- * @note HDMA channels 6-7 are recommended to avoid conflicts with DMA.
+ * @warning **Do NOT use HDMA_CHANNEL_7** — the NMI handler uses DMA channel 7
+ *          for OAM transfers every frame, which destroys any HDMA setup on that
+ *          channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram).
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
  * ## Bank Byte Limitation
