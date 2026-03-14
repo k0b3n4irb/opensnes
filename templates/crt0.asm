@@ -668,14 +668,41 @@ NmiHandler:
     sep #$20            ; 8-bit A for flag checks
 
     ;--------------------------------------------------------------------------
-    ; 1. Transfer OAM buffer to hardware during VBlank
+    ; 1. Transfer OAM buffer to hardware during VBlank (inline DMA)
+    ;--------------------------------------------------------------------------
+    ; Inline OAM DMA replaces the C oamUpdate() call (~200+ cycle savings).
+    ; Uses DMA channel 7 (channel 0 reserved for main-thread dmaCopyVram).
+    ; PVSnesLib reference: vblank.asm lines 670-687.
     ;--------------------------------------------------------------------------
     lda oam_update_flag
-    beq +
+    beq @oam_done
     stz oam_update_flag
-    jsl oamUpdate
-    sep #$20            ; C functions return in 16-bit A, restore 8-bit
-+
+
+    ; Set OAM address to 0 (word register — use 16-bit A)
+    rep #$20
+    stz.w $2102             ; OAMADDL/H = 0
+
+    ; DMA channel 7: CPU→PPU, auto-increment, dest $2104 (OAMDATA)
+    lda.w #$0400
+    sta.w $4370             ; $4370 = mode ($00), $4371 = dest ($04)
+
+    ; Source: oamMemory ($7E:0300)
+    lda.w #oamMemory
+    sta.w $4372             ; Source address low/high
+    sep #$20
+    lda.b #:oamMemory       ; Source bank ($7E)
+    sta.w $4374
+
+    ; Transfer size: 544 bytes ($0220)
+    rep #$20
+    lda.w #$0220
+    sta.w $4375             ; DMA size
+
+    ; Start DMA channel 7
+    sep #$20
+    lda.b #$80
+    sta.w $420B             ; MDMAEN: channel 7
+@oam_done:
 
     ;--------------------------------------------------------------------------
     ; 2. Transfer tilemap buffer to VRAM during VBlank
