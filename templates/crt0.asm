@@ -377,21 +377,51 @@ InitHardware:
     cpx #512            ; 128 sprites × 4 bytes
     bne @oam_clear_loop
 
-    ; Clear OAM extension table (32 bytes)
+    ; Initialize OAM extension table (32 bytes) to $55
+    ; Pattern 0x55 = 01010101: X high bit set for all sprites.
+    ; Combined with Y=240, this pushes sprites fully off-screen.
+    ; Without X high bit, large sprites (32x32+) at Y=240 wrap to top.
+    ; Must match oamClear() behavior to prevent startup sprite glitch.
+    sep #$20            ; 8-bit A for byte store
+    lda #$55
     ldx #0
 @oam_ext_clear:
-    stz.w oamMemory+512,x
-    inx
+    sta.w oamMemory+512,x
     inx
     cpx #32
     bne @oam_ext_clear
-
-    sep #$20            ; Back to 8-bit A
 
     ; Restore data bank to $00
     pea $0000
     plb
     plb
+
+    ;--------------------------------------------------------------------------
+    ; DMA initialized OAM buffer to hardware OAM (screen is off)
+    ;--------------------------------------------------------------------------
+    ; Without this, hardware OAM retains power-on garbage until the first
+    ; WaitForVBlank triggers an OAM DMA — causing 1-2 frames of corrupted
+    ; sprites when the screen turns on.
+    ;--------------------------------------------------------------------------
+    rep #$20
+    stz.w $2102             ; OAM address = 0
+
+    lda.w #$0400
+    sta.w $4370             ; DMA mode: CPU→PPU, auto-inc, dest $2104 (OAMDATA)
+
+    lda.w #oamMemory
+    sta.w $4372             ; Source address
+    sep #$20
+    lda.b #:oamMemory       ; Source bank ($7E)
+    sta.w $4374
+
+    rep #$20
+    lda.w #$0220            ; 544 bytes
+    sta.w $4375
+
+    sep #$20
+    lda.b #$80
+    sta.w $420B             ; Start DMA channel 7
 
     rts
 
