@@ -71,30 +71,19 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
-; NMI Handler Registers (separate from main code to prevent corruption)
+; NMI Handler Registers (separate direct page for VBlank callback)
 ;------------------------------------------------------------------------------
-; The VBlank callback runs C code which uses tcc__r0-r10 for calculations.
-; Using the same registers as the main loop would corrupt its state.
-; PVSnesLib solves this with a separate 48-byte register area for NMI.
+; PVSnesLib-style DP isolation: NMI sets D = tcc__nmi_registers (page-aligned).
+; The C callback's dp-relative instructions (lda.b tcc__r0, etc.) automatically
+; access this area instead of the main thread's registers. Zero-cost isolation —
+; no save/restore of compiler registers needed (~260 cycle savings).
+;
+; MUST be page-aligned ($XX00) to avoid 65816 DP cycle penalty.
+; MUST be at least 48 bytes (same layout as tcc__r0..tcc__r10h + nmi_callback).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ORGA $0080 FORCE
-    tcc__nmi_r0     dsb 2
-    tcc__nmi_r0h    dsb 2
-    tcc__nmi_r1     dsb 2
-    tcc__nmi_r1h    dsb 2
-    tcc__nmi_r2     dsb 2
-    tcc__nmi_r2h    dsb 2
-    tcc__nmi_r3     dsb 2
-    tcc__nmi_r3h    dsb 2
-    tcc__nmi_r4     dsb 2
-    tcc__nmi_r4h    dsb 2
-    tcc__nmi_r5     dsb 2
-    tcc__nmi_r5h    dsb 2
-    tcc__nmi_r9     dsb 2
-    tcc__nmi_r9h    dsb 2
-    tcc__nmi_r10    dsb 2
-    tcc__nmi_r10h   dsb 2
+.RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ALIGN $0100
+    tcc__nmi_registers dsb 48   ; Same layout as main registers: r0..r10h + callback area
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -625,8 +614,11 @@ NmiHandler:
     phd
     phb                 ; Save data bank
 
-    ; Set direct page
-    lda #tcc__r0
+    ; Set direct page to NMI register area (PVSnesLib-style DP isolation)
+    ; D = tcc__nmi_registers (page-aligned, != 0)
+    ; All dp-relative accesses in callback C code now hit NMI registers,
+    ; not main thread registers. No save/restore needed.
+    lda #tcc__nmi_registers
     tcd
 
     ; Set data bank to $00 for hardware registers
@@ -639,19 +631,20 @@ NmiHandler:
     lda $4210
 
     ; Increment frame counter (always, even on lag frames)
+    ; NOTE: With D != 0, all system variable accesses MUST use .w (absolute)
     rep #$20
-    inc frame_count
+    inc.w frame_count
 
     ;--------------------------------------------------------------------------
     ; Handshake check: is main thread ready?
     ;--------------------------------------------------------------------------
     sep #$20
-    lda vblank_flag
+    lda.w vblank_flag
     bne @vblank_work        ; flag=1 → main thread called WaitForVBlank, do work
 
     ; Lag frame — main thread still computing, skip all VBlank work
     rep #$20
-    inc lag_frame_counter
+    inc.w lag_frame_counter
     jmp @nmi_restore
 
 @vblank_work:
@@ -673,10 +666,14 @@ NmiHandler:
     ; Inline OAM DMA replaces the C oamUpdate() call (~200+ cycle savings).
     ; Uses DMA channel 7 (channel 0 reserved for main-thread dmaCopyVram).
     ; PVSnesLib reference: vblank.asm lines 670-687.
+    ;
+    ; NOTE: All system variable accesses use .w (absolute addressing) because
+    ; D = tcc__nmi_registers (!= 0). Without .w, WLA-DX may emit DP-relative
+    ; instructions that would read from the wrong address.
     ;--------------------------------------------------------------------------
-    lda oam_update_flag
+    lda.w oam_update_flag
     beq @oam_done
-    stz oam_update_flag
+    stz.w oam_update_flag
 
     ; Set OAM address to 0 (word register — use 16-bit A)
     rep #$20
@@ -707,9 +704,9 @@ NmiHandler:
     ;--------------------------------------------------------------------------
     ; 2. Transfer tilemap buffer to VRAM during VBlank
     ;--------------------------------------------------------------------------
-    lda tilemap_update_flag
+    lda.w tilemap_update_flag
     beq +
-    stz tilemap_update_flag
+    stz.w tilemap_update_flag
     jsl tilemapFlush
     sep #$20            ; Restore 8-bit A after C function
 +
@@ -719,61 +716,61 @@ NmiHandler:
     ;--------------------------------------------------------------------------
     ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
     ; 8-bit A, data bank $00
-    lda bg_scroll_dirty
+    lda.w bg_scroll_dirty
     beq @scroll_done      ; Nothing dirty → skip all
 
     bit #$01
     beq @bg1_done
-    lda bg_scroll_x      ; BG1 H low
+    lda.w bg_scroll_x      ; BG1 H low
     sta $210D
-    lda bg_scroll_x+1    ; BG1 H high
+    lda.w bg_scroll_x+1    ; BG1 H high
     sta $210D
-    lda bg_scroll_y      ; BG1 V low
+    lda.w bg_scroll_y      ; BG1 V low
     sta $210E
-    lda bg_scroll_y+1    ; BG1 V high
+    lda.w bg_scroll_y+1    ; BG1 V high
     sta $210E
-    lda bg_scroll_dirty   ; Reload for next test
+    lda.w bg_scroll_dirty   ; Reload for next test
 @bg1_done:
 
     bit #$02
     beq @bg2_done
-    lda bg_scroll_x+2    ; BG2 H low
+    lda.w bg_scroll_x+2    ; BG2 H low
     sta $210F
-    lda bg_scroll_x+3    ; BG2 H high
+    lda.w bg_scroll_x+3    ; BG2 H high
     sta $210F
-    lda bg_scroll_y+2    ; BG2 V low
+    lda.w bg_scroll_y+2    ; BG2 V low
     sta $2110
-    lda bg_scroll_y+3    ; BG2 V high
+    lda.w bg_scroll_y+3    ; BG2 V high
     sta $2110
-    lda bg_scroll_dirty   ; Reload for next test
+    lda.w bg_scroll_dirty   ; Reload for next test
 @bg2_done:
 
     bit #$04
     beq @bg3_done
-    lda bg_scroll_x+4    ; BG3 H low
+    lda.w bg_scroll_x+4    ; BG3 H low
     sta $2111
-    lda bg_scroll_x+5    ; BG3 H high
+    lda.w bg_scroll_x+5    ; BG3 H high
     sta $2111
-    lda bg_scroll_y+4    ; BG3 V low
+    lda.w bg_scroll_y+4    ; BG3 V low
     sta $2112
-    lda bg_scroll_y+5    ; BG3 V high
+    lda.w bg_scroll_y+5    ; BG3 V high
     sta $2112
-    lda bg_scroll_dirty   ; Reload for next test
+    lda.w bg_scroll_dirty   ; Reload for next test
 @bg3_done:
 
     bit #$08
     beq @bg4_done
-    lda bg_scroll_x+6    ; BG4 H low
+    lda.w bg_scroll_x+6    ; BG4 H low
     sta $2113
-    lda bg_scroll_x+7    ; BG4 H high
+    lda.w bg_scroll_x+7    ; BG4 H high
     sta $2113
-    lda bg_scroll_y+6    ; BG4 V low
+    lda.w bg_scroll_y+6    ; BG4 V low
     sta $2114
-    lda bg_scroll_y+7    ; BG4 V high
+    lda.w bg_scroll_y+7    ; BG4 V high
     sta $2114
 @bg4_done:
 
-    stz bg_scroll_dirty   ; Clear all dirty bits
+    stz.w bg_scroll_dirty   ; Clear all dirty bits
 @scroll_done:
 
     ;==========================================================================
@@ -789,110 +786,44 @@ NmiHandler:
     ;--------------------------------------------------------------------------
     ; 4. Call user VBlank callback
     ;--------------------------------------------------------------------------
-    ; Opt 7: Skip register save/restore when default callback is active.
-    ; Compare nmi_callback (16-bit addr + 8-bit bank) against DefaultNmiCallback.
-    ; If match, skip the ~260-cycle save/restore + call block.
+    ; PVSnesLib-style DP isolation: D = tcc__nmi_registers, so the callback's
+    ; dp-relative accesses (lda.b tcc__r0, etc.) automatically hit the NMI
+    ; register area — no save/restore needed (~260 cycle savings).
     ;
-    ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
-    ; because JML [dp] reads from address D+dp. We save the main loop's registers
-    ; to the NMI register area, then restore them after the callback.
+    ; Opt 7: Skip callback entirely when default no-op is active.
+    ;
+    ; JML [nmi_callback] reads from bank $00 absolute address nmi_callback
+    ; (65816 JML indirect always reads from bank 0, ignoring D).
+    ;--------------------------------------------------------------------------
     rep #$30            ; 16-bit A/X/Y
 
     ; Check if callback is the default no-op
-    lda nmi_callback        ; 16-bit address
+    lda.w nmi_callback        ; 16-bit address (absolute, D != 0)
     cmp #DefaultNmiCallback
     bne @do_callback
     sep #$20
-    lda nmi_callback+2      ; bank byte
+    lda.w nmi_callback+2      ; bank byte
     cmp #:DefaultNmiCallback
     bne +                   ; Not match → do callback
-    jmp @skip_callback      ; Match → skip save/restore/call (long jump)
+    jmp @skip_callback      ; Match → skip call entirely
 +   rep #$30
 
 @do_callback:
-    ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
-    ; The C callback may use any of these registers
-    lda tcc__r0
-    sta tcc__nmi_r0
-    lda tcc__r0h
-    sta tcc__nmi_r0h
-    lda tcc__r1
-    sta tcc__nmi_r1
-    lda tcc__r1h
-    sta tcc__nmi_r1h
-    lda tcc__r2
-    sta tcc__nmi_r2
-    lda tcc__r2h
-    sta tcc__nmi_r2h
-    lda tcc__r3
-    sta tcc__nmi_r3
-    lda tcc__r3h
-    sta tcc__nmi_r3h
-    lda tcc__r4
-    sta tcc__nmi_r4
-    lda tcc__r4h
-    sta tcc__nmi_r4h
-    lda tcc__r5
-    sta tcc__nmi_r5
-    lda tcc__r5h
-    sta tcc__nmi_r5h
-    lda tcc__r9
-    sta tcc__nmi_r9
-    lda tcc__r9h
-    sta tcc__nmi_r9h
-    lda tcc__r10
-    sta tcc__nmi_r10
-    lda tcc__r10h
-    sta tcc__nmi_r10h
-
     ; Set data bank to $7E for C variable access
+    ; D already = tcc__nmi_registers (callback uses NMI register space)
     pea $7E7E
     plb
     plb
     ; Push return address - 1 for RTL (bank:addr-1)
     phk                 ; Push current program bank
     pea @callback_done-1
-    jml [nmi_callback]  ; Indirect long jump (D=0, reads from address 0+nmi_callback)
+    jml [nmi_callback]  ; Indirect long jump (reads from bank $00 absolute)
 @callback_done:
 
     ; Restore data bank to $00 for hardware register access
     pea $0000
     plb
     plb
-
-    ; Restore ALL main loop's compiler registers from NMI area
-    lda tcc__nmi_r0
-    sta tcc__r0
-    lda tcc__nmi_r0h
-    sta tcc__r0h
-    lda tcc__nmi_r1
-    sta tcc__r1
-    lda tcc__nmi_r1h
-    sta tcc__r1h
-    lda tcc__nmi_r2
-    sta tcc__r2
-    lda tcc__nmi_r2h
-    sta tcc__r2h
-    lda tcc__nmi_r3
-    sta tcc__r3
-    lda tcc__nmi_r3h
-    sta tcc__r3h
-    lda tcc__nmi_r4
-    sta tcc__r4
-    lda tcc__nmi_r4h
-    sta tcc__r4h
-    lda tcc__nmi_r5
-    sta tcc__r5
-    lda tcc__nmi_r5h
-    sta tcc__r5h
-    lda tcc__nmi_r9
-    sta tcc__r9
-    lda tcc__nmi_r9h
-    sta tcc__r9h
-    lda tcc__nmi_r10
-    sta tcc__r10
-    lda tcc__nmi_r10h
-    sta tcc__r10h
 
 @skip_callback:
     sep #$20            ; Back to 8-bit A
@@ -911,33 +842,33 @@ NmiHandler:
     bne -
 
     ; Save previous state
-    lda pad_keys
-    sta pad_keysold
-    lda pad_keys+2
-    sta pad_keysold+2
+    lda.w pad_keys
+    sta.w pad_keysold
+    lda.w pad_keys+2
+    sta.w pad_keysold+2
 
     ; Read joypad 1 (16-bit load gets both JOY1L and JOY1H)
     lda $4218           ; 16-bit: A = JOY1H:JOY1L
     bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
     beq +
         lda #$0000      ; Invalid input - clear it
-+   sta pad_keys
++   sta.w pad_keys
 
     ; Compute edge detection: (current ^ old) & current = newly pressed
-    eor pad_keysold
-    and pad_keys
-    sta pad_keysdown
+    eor.w pad_keysold
+    and.w pad_keys
+    sta.w pad_keysdown
 
     ; Read joypad 2
     lda $421A           ; 16-bit: A = JOY2H:JOY2L
     bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
     beq ++
         lda #$0000      ; Invalid input - clear it
-++  sta pad_keys+2
+++  sta.w pad_keys+2
 
-    eor pad_keysold+2
-    and pad_keys+2
-    sta pad_keysdown+2
+    eor.w pad_keysold+2
+    and.w pad_keys+2
+    sta.w pad_keysdown+2
 
     ;--------------------------------------------------------------------------
     ; 6. Read Mouse (if connected)
@@ -949,7 +880,7 @@ NmiHandler:
     ;   3. Edge-detect buttons
     ;--------------------------------------------------------------------------
     sep #$20                ; 8-bit A for mouse reading
-    lda mouse_con
+    lda.w mouse_con
     bne @mouse_start
     jmp @mouse_done         ; Skip if no mouse initialized (jmp for distance)
 @mouse_start:
@@ -959,8 +890,8 @@ NmiHandler:
     beq @mouse_port2
 
     ; Save old buttons for edge detection
-    lda mouse_buttons
-    sta mouse_btnsold
+    lda.w mouse_buttons
+    sta.w mouse_btnsold
 
     ; Extract buttons and sensitivity from auto-joypad JOY1L ($4218)
     ; JOY1L bit layout for mouse:
@@ -976,7 +907,7 @@ NmiHandler:
     lsr a
     lsr a
     lsr a
-    sta mouse_buttons       ; bits 1-0 = right, left
+    sta.w mouse_buttons       ; bits 1-0 = right, left
 
     pla                     ; Restore byte
     lsr a
@@ -984,29 +915,29 @@ NmiHandler:
     lsr a
     lsr a
     and #$03
-    sta mouse_sens
+    sta.w mouse_sens
 
     ; Edge detection: newly pressed = (cur ^ old) & cur
-    lda mouse_buttons
-    eor mouse_btnsold
-    and mouse_buttons
-    sta mouse_btnsdown
+    lda.w mouse_buttons
+    eor.w mouse_btnsold
+    and.w mouse_buttons
+    sta.w mouse_btnsdown
 
     ; Bit-bang 16 bits of displacement from port 1 ($4016)
     ; Uses cascading ROL like PVSnesLib: reads 16 bits through mouse_x→mouse_y.
     ; After 16 iterations: mouse_y = first 8 bits (Y), mouse_x = last 8 bits (X).
     ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude)
     rep #$20                ; 16-bit A for word operations
-    stz mouse_y             ; Clear displacement accumulators
-    stz mouse_x
+    stz.w mouse_y             ; Clear displacement accumulators
+    stz.w mouse_x
 
     sep #$20                ; 8-bit A for bit reading
     ldy #16                 ; 16 bits total (8 Y + 8 X)
 @mouse1_disp_loop:
     lda $4016               ; Read bit from port 1 (bit 0)
     lsr a                   ; Shift bit 0 into carry
-    rol mouse_x             ; Carry → mouse_x bit 0, mouse_x bit 7 → carry
-    rol mouse_y             ; Carry → mouse_y bit 0
+    rol.w mouse_x             ; Carry → mouse_x bit 0, mouse_x bit 7 → carry
+    rol.w mouse_y             ; Carry → mouse_y bit 0
     nop                     ; Hyperkin compatibility delay (170+ master cycles)
     nop
     dey
@@ -1014,13 +945,13 @@ NmiHandler:
 
 @mouse_port2:
     ; --- Port 2 mouse ---
-    lda mouse_con
+    lda.w mouse_con
     bit #$02
     beq @mouse_done
 
     ; Save old buttons
-    lda mouse_buttons2
-    sta mouse_btnsold2
+    lda.w mouse_buttons2
+    sta.w mouse_btnsold2
 
     ; Extract from auto-joypad JOY2L ($421A)
     lda $421A               ; JOY2L (8-bit read)
@@ -1031,7 +962,7 @@ NmiHandler:
     lsr a
     lsr a
     lsr a
-    sta mouse_buttons2
+    sta.w mouse_buttons2
 
     pla
     lsr a
@@ -1039,26 +970,26 @@ NmiHandler:
     lsr a
     lsr a
     and #$03
-    sta mouse_sens2
+    sta.w mouse_sens2
 
     ; Edge detection
-    lda mouse_buttons2
-    eor mouse_btnsold2
-    and mouse_buttons2
-    sta mouse_btnsdown2
+    lda.w mouse_buttons2
+    eor.w mouse_btnsold2
+    and.w mouse_buttons2
+    sta.w mouse_btnsdown2
 
     ; Bit-bang 16 bits of displacement from port 2 ($4017)
     rep #$20
-    stz mouse_y2
-    stz mouse_x2
+    stz.w mouse_y2
+    stz.w mouse_x2
 
     sep #$20
     ldy #16
 @mouse2_disp_loop:
     lda $4017
     lsr a
-    rol mouse_x2
-    rol mouse_y2
+    rol.w mouse_x2
+    rol.w mouse_y2
     nop
     nop
     dey
@@ -1075,23 +1006,23 @@ NmiHandler:
     ; and processes buttons with hold/repeat delay logic.
     ;--------------------------------------------------------------------------
     sep #$20                ; 8-bit A
-    lda scope_con
+    lda.w scope_con
     bne @scope_start
     jmp @scope_done         ; Skip if no Super Scope initialized
 @scope_start:
 
     ; Read port 2 raw data from auto-joypad and compute edge detection
     rep #$20                ; 16-bit A
-    lda scope_port2down
-    sta scope_port2last     ; Save previous frame
+    lda.w scope_port2down
+    sta.w scope_port2last     ; Save previous frame
     lda $421A               ; REG_JOY2L/H (16-bit read)
-    sta scope_port2down
-    eor scope_port2last
-    and scope_port2down
-    sta scope_port2now      ; Newly pressed raw port 2
+    sta.w scope_port2down
+    eor.w scope_port2last
+    and.w scope_port2down
+    sta.w scope_port2now      ; Newly pressed raw port 2
 
     ; Validate Super Scope signature: bits 0-7 all 1, bits 10-11 both 0
-    lda scope_port2down
+    lda.w scope_port2down
     and #$0CFF
     cmp #$00FF
     beq @scope_valid
@@ -1107,106 +1038,106 @@ NmiHandler:
     ; --- Shot detected: read H/V position ---
     ; REG_OPHCT ($213C): 9-bit H position, read twice (low then high)
     lda $213C               ; OPHCT low byte
-    sta scope_shothraw
+    sta.w scope_shothraw
     lda $213C               ; OPHCT high bit (bit 0 only)
     and #$01
-    sta scope_shothraw+1
+    sta.w scope_shothraw+1
 
     ; REG_OPVCT ($213D): 9-bit V position, read twice (low then high)
     lda $213D               ; OPVCT low byte
-    sta scope_shotvraw
+    sta.w scope_shotvraw
     lda $213D               ; OPVCT high bit (bit 0 only)
     and #$01
-    sta scope_shotvraw+1
+    sta.w scope_shotvraw+1
 
     ; Apply calibration offset: adjusted = raw + center offset
     rep #$20                ; 16-bit A
-    lda scope_shothraw
+    lda.w scope_shothraw
     clc
-    adc scope_centerh
-    sta scope_shoth
-    lda scope_shotvraw
+    adc.w scope_centerh
+    sta.w scope_shoth
+    lda.w scope_shotvraw
     clc
-    adc scope_centerv
-    sta scope_shotv
+    adc.w scope_centerv
+    sta.w scope_shotv
 
     ; Reset shot counter
-    stz scope_sinceshot
+    stz.w scope_sinceshot
     bra @scope_buttons      ; Common button processing
 
 @scope_no_shot:
     ; --- No shot this frame ---
     rep #$20                ; 16-bit A
-    inc scope_sinceshot
+    inc.w scope_sinceshot
 
 @scope_buttons:
     ; Full button processing: extract bits 15-12 (buttons) and 9-8 (flags)
     ; All buttons (Fire, Cursor, Turbo, Pause) + flags (Offscreen, Noise)
     ; are processed identically on both shot and non-shot frames.
-    lda scope_port2down
+    lda.w scope_port2down
     and #$F300              ; Keep buttons (15-12) + offscreen (9) + noise (8)
-    sta scope_down
+    sta.w scope_down
 
     ; Edge detection: newly pressed = (cur ^ last) & cur
-    lda scope_last
-    eor scope_down
-    and scope_down
-    sta scope_now
+    lda.w scope_last
+    eor.w scope_down
+    and.w scope_down
+    sta.w scope_now
 
     ; Hold/repeat delay logic
     ; If buttons changed from last frame, reset hold countdown
-    lda scope_down
-    cmp scope_last
+    lda.w scope_down
+    cmp.w scope_last
     bne @scope_reset_hold
 
     ; Same buttons held: decrement countdown
-    lda scope_tohold
+    lda.w scope_tohold
     beq @scope_held_fire     ; Already at 0 → fire held event
     dec a
-    sta scope_tohold
-    stz scope_held
+    sta.w scope_tohold
+    stz.w scope_held
     bra @scope_save_last
 
 @scope_held_fire:
     ; Hold triggered: set held = down, reload with repeat delay
-    lda scope_down
-    sta scope_held
-    lda scope_repdelay
-    sta scope_tohold
+    lda.w scope_down
+    sta.w scope_held
+    lda.w scope_repdelay
+    sta.w scope_tohold
     bra @scope_save_last
 
 @scope_reset_hold:
     ; Buttons changed: reload with hold delay
-    lda scope_holddelay
-    sta scope_tohold
-    stz scope_held
+    lda.w scope_holddelay
+    sta.w scope_tohold
+    stz.w scope_held
     bra @scope_save_last
 
 @scope_disconnect:
     ; Invalid signature: disconnect Super Scope
     rep #$20
-    stz scope_down
-    stz scope_now
-    stz scope_held
-    stz scope_shoth
-    stz scope_shotv
-    stz scope_shothraw
-    stz scope_shotvraw
-    stz scope_sinceshot
+    stz.w scope_down
+    stz.w scope_now
+    stz.w scope_held
+    stz.w scope_shoth
+    stz.w scope_shotv
+    stz.w scope_shothraw
+    stz.w scope_shotvraw
+    stz.w scope_sinceshot
     sep #$20
-    stz scope_con
+    stz.w scope_con
     bra @scope_done
 
 @scope_save_last:
     ; Save current button state for next frame
-    lda scope_down
-    sta scope_last
+    lda.w scope_down
+    sta.w scope_last
 
 @scope_done:
 
     ; Clear VBlank flag (handshake: signal main thread "done")
     sep #$20
-    stz vblank_flag
+    stz.w vblank_flag
 
 @nmi_restore:
     ; Restore and return
@@ -1307,7 +1238,7 @@ tilemapFlush:
     sta $2115           ; VMAIN: increment after high byte write
 
     rep #$20            ; 16-bit A
-    lda tilemap_vram_addr
+    lda.w tilemap_vram_addr
     sta $2116           ; VMADDL/H: VRAM word address
 
     ; DMA channel 1: word write mode (2 regs write once: VMDATAL+VMDATAH)
@@ -1319,7 +1250,7 @@ tilemapFlush:
     sta $4315
 
     ; Source address from tilemap_src_addr (set by textInit in C)
-    lda tilemap_src_addr
+    lda.w tilemap_src_addr
     sta $4312           ; DMA source address (low word)
 
     sep #$20            ; 8-bit A

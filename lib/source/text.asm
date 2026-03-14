@@ -264,7 +264,7 @@ asm_textFillBuffer:
     php
     rep #$30            ; 16-bit A and X/Y
     lda 5,s             ; Get fill value (past P + 3-byte return addr)
-    ldx tilemap_src_addr ; Buffer base address (bank $00)
+    ldx.w tilemap_src_addr ; Buffer base address (bank $00)
     ldy #1024           ; Word count
 -   sta.l $0000,x       ; Store 16-bit value at bank $00:X
     inx
