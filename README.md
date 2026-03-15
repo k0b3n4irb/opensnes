@@ -127,14 +127,14 @@ You'll also want a SNES emulator — [Mesen2](https://www.mesen.ca/) is recommen
 ```bash
 git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
-make                  # builds compiler, tools, library, and all 37 examples
+make                  # builds compiler, tools, library, and all 41 examples
 
 # Open examples/text/hello_world/hello_world.sfc in Mesen2
 ```
 
 ## Examples
 
-37 examples with detailed READMEs that explain not just *what* the code does, but *why*.
+41 examples with detailed READMEs that explain not just *what* the code does, but *why*.
 Organized as a progressive learning path — from "Hello World" to a complete platformer.
 
 **[Browse all examples and the learning path](examples/README.md)**
@@ -148,10 +148,10 @@ OpenSNES is a fork of PVSnesLib with a different set of trade-offs:
 | | OpenSNES | PVSnesLib |
 |-|----------|-----------|
 | **Compiler** | C11 (cproc+QBE), 13 opt phases, **-30% cycles** | C89 (tcc816), 38 regex peepholes |
-| **Testing** | 60 compiler + 25 unit + 37 ROM validations | None |
+| **Testing** | 60 compiler + 25 unit + 41 ROM validations | None |
 | **CI** | 3 platforms per push | Build-only |
 | **Library** | Modular (`LIB_MODULES=...`) | Monolithic |
-| **Docs** | 8 guides + 37 example READMEs | Wiki + 4 READMEs |
+| **Docs** | 8 guides + 41 example READMEs | Wiki + 4 READMEs |
 | **Track record** | 3 months, no shipped games | 14 years, commercial games shipped |
 | **Pre-built binaries** | Available (GitHub Releases) | Available |
 
@@ -204,26 +204,19 @@ make -C examples/games/breakout
 
 ## Testing
 
-Three test suites validate the SDK after any change:
+All testing is handled by **opensnes-emu** — a SNES debug emulator (snes9x WASM) that serves as the single source of truth. 212 automated checks across 7 phases:
 
 ```bash
-# Full rebuild (always start from clean to avoid stale artifacts)
+# Full rebuild
 make clean && make
 
-# Unit tests (25 modules, ~385 runtime + 119 compile-time assertions)
-./tests/unit/run_unit_tests.sh
-
-# Compiler regression tests (60 tests)
-./tests/compiler/run_tests.sh --allow-known-bugs
-
-# Example validation (memory overlaps + ROM size checks, 37 ROMs)
-OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
+# Run all tests (requires Node.js 20+ and opensnes-emu WASM core built)
+cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
 ```
 
-> **`OPENSNES_HOME` vs `OPENSNES`**: `OPENSNES` is the Makefile variable that
-> points to the SDK root (set in each project's Makefile). `OPENSNES_HOME` is
-> the environment variable used by the test scripts — set it to the SDK root
-> directory before running tests.
+Phases: preconditions, compiler tests (60), static analysis (67), runtime execution (54), visual regression (42), lag frame detection (42).
+
+See [tools/opensnes-emu/README.md](tools/opensnes-emu/README.md) for setup instructions.
 
 ---
 

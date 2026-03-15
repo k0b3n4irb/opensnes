@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 37 examples organized by topic. For a progressive learning path, see
+All 41 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -22,11 +22,14 @@ Background layers, scrolling, and video modes.
 
 | Example | Description |
 |---------|-------------|
+| @subpage examples_graphics_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
 | @subpage examples_graphics_backgrounds_mode1 | Mode 1 multi-layer backgrounds (4bpp + 2bpp) |
 | @subpage examples_graphics_backgrounds_mode1_bg3_priority | BG3 priority bit for overlay effects |
 | @subpage examples_graphics_backgrounds_mode1_lz77 | LZ77-compressed background data |
 | @subpage examples_graphics_backgrounds_continuous_scroll | Streaming scroll with dynamic tile loading |
 | @subpage examples_graphics_backgrounds_mixed_scroll | Multiple BG layers at different scroll rates |
+| @subpage examples_graphics_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
+| @subpage examples_graphics_backgrounds_mode5 | Mode 5: hi-res 512×256 (16-color) |
 | @subpage examples_graphics_backgrounds_mode7 | Mode 7 rotation and scaling |
 | @subpage examples_graphics_backgrounds_mode7_perspective | Pseudo-3D perspective (F-Zero style) |
 
@@ -129,3 +132,4 @@ Complete game projects combining multiple subsystems.
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
 | @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
+| @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |

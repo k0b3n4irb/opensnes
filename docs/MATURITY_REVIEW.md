@@ -21,7 +21,7 @@ experience — not internal code quality, but practical readiness.
 - **3 months** of active development (Jan-Mar 2026), 6 releases (v0.1.0-v0.6.0)
 - **No shipped games** yet (only demo examples)
 - **API still evolving**: deprecated functions removed between versions
-- **Strong regression protection**: 60 compiler tests + 25 unit modules + 37 ROM validations
+- **Strong regression protection**: 60 compiler tests + 25 unit modules + 41 ROM validations
 - **3-platform CI**: Linux, macOS, Windows — every push validated
 
 ### Verdict
@@ -53,7 +53,7 @@ OpenSNES = higher risk (young), lower blind spots (well-tested).
 - `GETTING_STARTED.md` in repo with per-platform instructions
 - `LEARNING_PATH.md` with progressive curriculum
 - `EXAMPLE_WALKTHROUGHS.md` with detailed code explanations
-- **37 examples**, each with its own README.md
+- **41 examples**, each with its own README.md
 - C11 support: `const`, `_Static_assert`, modern syntax
 - cc65816 wrapper retries on crashes, cleaner error output
 - Pre-built binaries available on GitHub Releases for all 3 platforms
@@ -121,8 +121,8 @@ optimization phases with regression tests.
 - **In-repo documentation**: README, CONTRIBUTING, CHANGELOG, ROADMAP
 - **Developer guides**: GETTING_STARTED, LEARNING_PATH, EXAMPLE_WALKTHROUGHS,
   CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE
-- **Examples**: 37, each with its own README.md (hardware explanations, code walkthroughs)
-- **Test documentation**: tests/CLAUDE.md with module inventory, assertion counts
+- **Examples**: 41, each with its own README.md + screenshot.png
+- **Test infrastructure**: opensnes-emu (212 checks, 7 phases, single source of truth)
 - **Hardware reference**: docs/hardware/ with MEMORY_MAP, OAM, REGISTERS
 
 ### Verdict
