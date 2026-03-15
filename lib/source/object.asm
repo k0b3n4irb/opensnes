@@ -197,7 +197,7 @@ objtmp4         DW
     ldy #objWorkspace.w         ; Y = dest addr in Bank $00
 
     lda #OB_SIZE - 1            ; A = byte count - 1
-    mvn $7E, $00                ; BLOCK_COPY_7E_TO_00 (inline for computed X)
+    mvn $7E, $00                ; WLA-DX: src=$7E (buffers), dest=$00 (workspace)
 
     ply
     plx
@@ -220,7 +220,7 @@ objtmp4         DW
     ldx #objWorkspace.w         ; X = source addr in Bank $00
 
     lda #OB_SIZE - 1            ; A = byte count - 1
-    mvn $00, $7E                ; BLOCK_COPY_00_TO_7E (inline for computed Y)
+    mvn $00, $7E                ; WLA-DX: src=$00 (workspace), dest=$7E (buffers)
 
     ply
     plx
