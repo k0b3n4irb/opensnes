@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_hdma_gradien
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md803"></a>
+    <h2><a class="anchor" id="autotoc_md819"></a>
 What You'll Learn</h2>
 <ul>
 <li>How HDMA transfers work: automatic per-scanline register writes with no CPU involvement</li>
@@ -109,12 +109,12 @@ What You'll Learn</h2>
 <li>How to build and update HDMA tables at runtime</li>
 <li>How to handle large ROM assets that exceed bank $00 (32KB) using assembly DMA loaders</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md804"></a>
+<h2><a class="anchor" id="autotoc_md820"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md805"></a>
+<h3><a class="anchor" id="autotoc_md821"></a>
 HDMA and the INIDISP Register</h3>
 <p>HDMA is a special DMA mode that transfers a small amount of data to a PPU register at the start of every horizontal blanking period (between scanlines). Register $2100 (INIDISP) controls the master screen brightness: bits 0-3 set brightness from 0 (black) to 15 (full), and bit 7 enables forced blanking. By writing different brightness values per scanline group, you create a gradient fade effect entirely in hardware &ndash; the CPU only builds the table once.</p>
-<h3><a class="anchor" id="autotoc_md806"></a>
+<h3><a class="anchor" id="autotoc_md822"></a>
 HDMA Table Format (Mode 0)</h3>
 <p>HDMA mode 0 writes 1 byte per entry to a single register. Each table entry is 2 bytes: a scanline count followed by the data byte. A count of 0 terminates the table. This example creates 16 entries of 14 scanlines each (16 x 14 = 224, covering the full visible screen). The brightness value decreases as you go down the screen:</p>
 <div class="fragment"><div class="line">[14] [brightness_0]   — top 14 scanlines at maximum brightness</div>
@@ -122,13 +122,13 @@ HDMA Table Format (Mode 0)</h3>
 <div class="line">...</div>
 <div class="line">[14] [brightness_15]  — bottom 14 scanlines, darkest</div>
 <div class="line">[0]                   — terminator</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md807"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md823"></a>
 HDMA Channel Setup</h3>
 <p>The library function <code>hdmaSetup(channel, mode, dest_register, table_ptr)</code> configures an HDMA channel. In this example: channel 3, mode 0 (1-register/no-repeat), destination register offset $00 (which maps to $2100 = INIDISP), and a pointer to the gradient table in RAM. The channel is activated with <code>hdmaEnable(3)</code> and runs automatically every frame until disabled.</p>
-<h3><a class="anchor" id="autotoc_md808"></a>
+<h3><a class="anchor" id="autotoc_md824"></a>
 Large Asset DMA with Bank Bytes</h3>
 <p>The 8bpp background image requires about 39KB of tile data &ndash; more than the 32KB bank $00 limit. The data is split across two SUPERFREE ROM sections that the linker may place in bank $01+. Since the C library's <code><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible)">dmaCopyVram()</a></code> hardcodes bank $00, a custom assembly <code>loadGraphics</code> function uses WLA-DX's <code>:label</code> syntax to resolve the correct source bank byte at link time, performing 4 separate DMA transfers (two tile chunks, palette, and tilemap).</p>
-<h2><a class="anchor" id="autotoc_md809"></a>
+<h2><a class="anchor" id="autotoc_md825"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -136,7 +136,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A   </td><td class="markdownTableBodyNone">Cycle gradient intensity (15 down to 2, then back to 15)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md810"></a>
+<h2><a class="anchor" id="autotoc_md826"></a>
 How It Works</h2>
 <p><b>1. Graphics loading</b> &ndash; An assembly function handles all VRAM/CGRAM transfers during force blank, splitting the large tileset across two DMA operations with correct bank bytes:</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;   <span class="comment">/* Force blank */</span></div>
@@ -172,7 +172,7 @@ How It Works</h2>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s)</div></div>
 <div class="ttc" id="ahdma_8h_html_accfc69511911e1c0fdc59823c43c7a23"><div class="ttname"><a href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a></div><div class="ttdeci">void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table)</div><div class="ttdoc">Set up an HDMA channel.</div></div>
 </div><!-- fragment --><p><b>5. Interactive cycling</b> &ndash; Pressing A decreases the gradient level (fewer brightness steps = more uniform brightness), wrapping from 2 back to 15. The table is rebuilt in RAM and HDMA picks up the new values on the next frame automatically.</p>
-<h2><a class="anchor" id="autotoc_md811"></a>
+<h2><a class="anchor" id="autotoc_md827"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">hdma_gradient/</div>
 <div class="line">├── main.c          — Gradient table builder, HDMA setup, input handling</div>
@@ -180,7 +180,7 @@ Project Structure</h2>
 <div class="line">├── Makefile        — Build configuration</div>
 <div class="line">└── res/</div>
 <div class="line">    └── pvsneslib.png  — 256-color background image (converted to 8bpp tiles at build time)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md812"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md828"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/hdma_gradient</div>

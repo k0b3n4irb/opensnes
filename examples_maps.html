@@ -97,26 +97,26 @@ $(document).ready(function(){initNavTree('examples_maps.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This category contains examples that demonstrate tilemap-based engines and map collision systems on the SNES. On the SNES, "maps" refer to both the hardware tilemaps (the 32x32 or 64x64 grids of tile entries that the PPU renders as backgrounds) and the higher-level game maps built on top of them (scrolling worlds, collision grids, entity placement). These examples show two different approaches: a custom tilemap sprite engine that treats background tiles as movable objects, and a full platformer using the OpenSNES map and object engines with slope collision.</p>
-<h2><a class="anchor" id="autotoc_md1109"></a>
+<h2><a class="anchor" id="autotoc_md1128"></a>
 Examples</h2>
-<h3><a class="anchor" id="autotoc_md1110"></a>
+<h3><a class="anchor" id="autotoc_md1129"></a>
 &lt;a href="dynamic_map/" &gt;dynamic_map&lt;/a&gt;</h3>
 <p><b>Custom Tilemap Sprite Engine</b> &ndash; Demonstrates how to build a tile-based sprite system on BG1 using Mode 3 (8bpp, 256 colors). Supports both 32x32 and 64x64 map grids, with gargoyle sprites placed and scrolled interactively. Includes a C64-to-SNES sprite format converter. Teaches extended WRAM buffer management (bank $7E) and the 1-page-per-VBlank DMA pattern for safe tilemap transfers.</p>
-<h3><a class="anchor" id="autotoc_md1111"></a>
+<h3><a class="anchor" id="autotoc_md1130"></a>
 &lt;a href="slopemario/" &gt;slopemario&lt;/a&gt;</h3>
 <p><b>Platformer with Slope Collision</b> &ndash; A Mario-style platformer that uses <code><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></code> for diagonal terrain. Combines the map engine (scrolling tile world), the object engine (entity init/update callbacks), and the dynamic sprite engine (animated character rendering). Demonstrates player physics with acceleration, jumping, and slope-following, plus camera tracking via <code><a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a></code>.</p>
-<h2><a class="anchor" id="autotoc_md1112"></a>
+<h2><a class="anchor" id="autotoc_md1131"></a>
 Key SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1113"></a>
+<h3><a class="anchor" id="autotoc_md1132"></a>
 Hardware Tilemaps</h3>
 <p>The PPU reads tile indices from VRAM tilemap regions configured via registers $2107-$210A (BG1SC through BG4SC). Each tilemap entry is 2 bytes: a 10-bit tile number plus palette, priority, and horizontal/vertical flip bits. The PPU renders these tiles automatically every frame &ndash; the CPU only needs to update the tilemap data in VRAM.</p>
-<h3><a class="anchor" id="autotoc_md1114"></a>
+<h3><a class="anchor" id="autotoc_md1133"></a>
 Tilemap Sizes</h3>
 <p>Tilemaps can be 32x32 (SC_32x32, 2KB) up to 64x64 (SC_64x64, 8KB = four 32x32 pages). Larger tilemaps allow the hardware scroll registers ($210D-$2114) to pan across a bigger area without any CPU tile streaming. For worlds even larger than 64x64 tiles, software must stream new rows and columns into VRAM during VBlank.</p>
-<h3><a class="anchor" id="autotoc_md1115"></a>
+<h3><a class="anchor" id="autotoc_md1134"></a>
 Tile-Based Collision</h3>
 <p>Instead of checking sprite-to-sprite bounding boxes, the game reads tile type data from ROM arrays at the player's position. Tile types encode properties like solid, empty, platform, slope angle, and hazard. The <code><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></code> function extends basic collision with diagonal surface support.</p>
-<h3><a class="anchor" id="autotoc_md1116"></a>
+<h3><a class="anchor" id="autotoc_md1135"></a>
 VBlank DMA Budget</h3>
 <p>The SNES PPU ignores VRAM writes during active display. All tilemap and tile data updates must happen during VBlank (~41,000 master cycles available after NMI overhead). At 8 cycles per byte, a safe transfer limit is roughly 4-5KB per frame. Larger transfers require splitting across multiple VBlanks or using forced blank.</p>
 <hr  />

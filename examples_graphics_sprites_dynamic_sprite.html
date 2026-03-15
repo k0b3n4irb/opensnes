@@ -100,24 +100,24 @@ $(document).ready(function(){initNavTree('examples_graphics_sprites_dynamic_spri
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md962"></a>
+    <h2><a class="anchor" id="autotoc_md981"></a>
 What This Example Shows</h2>
 <p>How to use the <b>dynamic sprite system</b> to stream sprite tile data into VRAM every frame. Unlike static sprites (where all frames live in VRAM permanently), dynamic sprites upload only the current animation frame, saving VRAM space when sprites have many frames.</p>
 <p>This demo displays 4 animated 16x16 sprites, each cycling through 24 frames of animation.</p>
-<h2><a class="anchor" id="autotoc_md963"></a>
+<h2><a class="anchor" id="autotoc_md982"></a>
 Prerequisites</h2>
 <p>Read <code>sprites/simple_sprite</code> first (OAM basics), then <code>sprites/animated_sprite</code> (frame-based animation).</p>
-<h2><a class="anchor" id="autotoc_md964"></a>
+<h2><a class="anchor" id="autotoc_md983"></a>
 Controls</h2>
 <p>No interactive controls. Four sprites animate automatically.</p>
-<h2><a class="anchor" id="autotoc_md965"></a>
+<h2><a class="anchor" id="autotoc_md984"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/sprites/dynamic_sprite</div>
 </div><!-- fragment --><p>Then open <code>dynamic_sprite.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md966"></a>
+<h2><a class="anchor" id="autotoc_md985"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md967"></a>
+<h3><a class="anchor" id="autotoc_md986"></a>
 1. Initialize the dynamic sprite engine</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#adc3b431ee9b6bc613e5e4e6734dbfc08">oamInitDynamicSprite</a>(0x0000, 0x1000, 0, 0, <a class="code hl_define" href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a>);</div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInitGfxSet, oamInitEx)</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
@@ -127,7 +127,7 @@ How It Works</h2>
 <li>VRAM ceiling: <code>$1000</code> (max VRAM used &ndash; prevents overwriting background data)</li>
 <li>Sprite size: 8x8 small / 16x16 large</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md968"></a>
+<h3><a class="anchor" id="autotoc_md987"></a>
 2. Set up sprites via the oambuffer</h3>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].<a class="code hl_variable" href="structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004">oamx</a> = 64;</div>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].<a class="code hl_variable" href="structt__sprites.html#a6c499b96e640bbad488eb8874bf36281">oamy</a> = 100;</div>
@@ -148,7 +148,7 @@ How It Works</h2>
 <li><b>oamrefresh</b>: set to 1 when the frame changes &ndash; tells the engine to re-upload tiles</li>
 <li><b>OAM_SET_GFX</b>: points to the source tile data in ROM</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md969"></a>
+<h3><a class="anchor" id="autotoc_md988"></a>
 3. Draw and upload every frame</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a>(0);        <span class="comment">/* Queue sprite 0 for VRAM upload */</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a4f830004646995018000dae0f898d221">oamVramQueueUpdate</a>();       <span class="comment">/* DMA all queued tiles to VRAM */</span></div>
@@ -157,29 +157,29 @@ How It Works</h2>
 <div class="ttc" id="asprite_8h_html_ac9eb3b2751e5b744470cd16453ff3261"><div class="ttname"><a href="sprite_8h.html#ac9eb3b2751e5b744470cd16453ff3261">oamInitDynamicSpriteEndFrame</a></div><div class="ttdeci">void oamInitDynamicSpriteEndFrame(void)</div><div class="ttdoc">End frame processing for dynamic sprites.</div></div>
 <div class="ttc" id="asprite_8h_html_aebd07ed4460088c9f3b1aca4ddbbcda8"><div class="ttname"><a href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a></div><div class="ttdeci">void oamDynamic16Draw(u16 id)</div><div class="ttdoc">Draw a 16x16 dynamic sprite.</div></div>
 </div><!-- fragment --><p>The draw/upload cycle runs every frame in the main loop. Only sprites with <code>oamrefresh = 1</code> actually trigger a DMA transfer.</p>
-<h3><a class="anchor" id="autotoc_md970"></a>
+<h3><a class="anchor" id="autotoc_md989"></a>
 4. Animate by changing frame IDs</h3>
 <div class="fragment"><div class="line">frame0++;</div>
 <div class="line"><span class="keywordflow">if</span> (frame0 &gt;= 24) frame0 = 0;</div>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].<a class="code hl_variable" href="structt__sprites.html#a0928afd4ac9d8c3c5cceefa44c3a520a">oamframeid</a> = frame0;</div>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].<a class="code hl_variable" href="structt__sprites.html#ac4e74ac3a1b9ad5b2f756c512f608cb8">oamrefresh</a> = 1;</div>
 </div><!-- fragment --><p>Every 8 frames, the animation advances. Setting <code>oamrefresh = 1</code> tells the engine to upload the new frame's tiles to VRAM on the next <code><a class="el" href="sprite_8h.html#a4f830004646995018000dae0f898d221" title="Process VRAM upload queue.">oamVramQueueUpdate()</a></code> call.</p>
-<h2><a class="anchor" id="autotoc_md971"></a>
+<h2><a class="anchor" id="autotoc_md990"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md972"></a>
+<h3><a class="anchor" id="autotoc_md991"></a>
 VRAM Budget During VBlank</h3>
 <p>The SNES can only write to VRAM during VBlank. With DMA, you get roughly 4-5 KB per frame. Each 16x16 sprite frame is 128 bytes (4 tiles x 32 bytes). With 4 sprites updating simultaneously, that is 512 bytes &ndash; well within budget.</p>
-<h3><a class="anchor" id="autotoc_md973"></a>
+<h3><a class="anchor" id="autotoc_md992"></a>
 Static vs Dynamic Sprites</h3>
 <ul>
 <li><b>Static</b>: All frames pre-loaded in VRAM. Frame selection is instant (just change the tile number). Downside: a 24-frame sprite uses 3 KB of VRAM permanently.</li>
 <li><b>Dynamic</b>: Only the current frame lives in VRAM. Supports hundreds of frames with minimal VRAM usage. Downside: each frame change costs DMA time during VBlank.</li>
 </ul>
 <p>Dynamic sprites are the right choice when sprites have many animation frames (RPG characters with walk cycles, attack animations, etc.) or when multiple unique characters share limited VRAM space.</p>
-<h3><a class="anchor" id="autotoc_md974"></a>
+<h3><a class="anchor" id="autotoc_md993"></a>
 Force Blank for Initial Setup</h3>
 <p>This demo uses <code><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank)">setScreenOff()</a></code> (which sets <code>REG_INIDISP = 0x80</code>) during setup to allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank only.</p>
-<h2><a class="anchor" id="autotoc_md975"></a>
+<h2><a class="anchor" id="autotoc_md994"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -193,7 +193,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md976"></a>
+<h2><a class="anchor" id="autotoc_md995"></a>
 Going Further</h2>
 <ul>
 <li><b>Move sprites with input</b>: Add <code><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></code> and update <code>oambuffer[0].oamx/oamy</code> based on D-pad direction.</li>

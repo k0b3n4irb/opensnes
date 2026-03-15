@@ -65,11 +65,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_graphics_backgrounds_mode1_lz77.html",
-"group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a",
-"group__types.html#gaed742c436da53c1080638ce6ef7d13de",
-"object_8h.html#af27124be823e35daf579362d3820738d",
-"text_8h.html#a055579e7b75458617363a27f1224bc99"
+"examples_graphics_backgrounds_mixed_scroll.html",
+"group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85",
+"group__snesmod__stream.html#gac0658f7f553444a88821c4f6530df26a",
+"object_8h.html#a7000f80d8c2991bbb9cd69489ab8f774",
+"structt__sprites.html#a725c47bc8c0a00ad85b3f73b8c6f2a22"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

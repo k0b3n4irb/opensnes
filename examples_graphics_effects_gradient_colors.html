@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_gradient_col
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md789"></a>
+    <h2><a class="anchor" id="autotoc_md805"></a>
 What This Example Shows</h2>
 <p>How to create a smooth color gradient across the screen using <b>HDMA to rewrite CGRAM</b> (the palette) every few scanlines. This technique changes the backdrop color (color 0) as the PPU draws each line, creating sky gradients, underwater effects, or sunset transitions.</p>
-<h2><a class="anchor" id="autotoc_md790"></a>
+<h2><a class="anchor" id="autotoc_md806"></a>
 Prerequisites</h2>
 <p>Read <code>effects/hdma_wave</code> first (HDMA basics and table format).</p>
-<h2><a class="anchor" id="autotoc_md791"></a>
+<h2><a class="anchor" id="autotoc_md807"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -116,14 +116,14 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">B   </td><td class="markdownTableBodyNone">Re-enable the gradient   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md792"></a>
+<h2><a class="anchor" id="autotoc_md808"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/gradient_colors</div>
 </div><!-- fragment --><p>Then open <code>gradient_colors.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md793"></a>
+<h2><a class="anchor" id="autotoc_md809"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md794"></a>
+<h3><a class="anchor" id="autotoc_md810"></a>
 1. HDMA targets CGADD ($2121)</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4">HDMA_MODE_2REG_2X</a>, <a class="code hl_define" href="hdma_8h.html#af1addfa1b6fe98e5c4f1ff623f263ba0">HDMA_DEST_CGADD</a>, hdmaGradientList);</div>
 <div class="ttc" id="ahdma_8h_html_a21680673893284141c68b3fb38e775e4"><div class="ttname"><a href="hdma_8h.html#a21680673893284141c68b3fb38e775e4">HDMA_MODE_2REG_2X</a></div><div class="ttdeci">#define HDMA_MODE_2REG_2X</div><div class="ttdoc">HDMA mode: 2 registers, 4 bytes (2 to each)</div><div class="ttdef"><b>Definition</b> hdma.h:158</div></div>
@@ -143,13 +143,13 @@ How It Works</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">4   </td><td class="markdownTableBodyNone">$2122   </td><td class="markdownTableBodyNone">Write color data (high byte of 15-bit color)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md795"></a>
+<h3><a class="anchor" id="autotoc_md811"></a>
 2. The gradient table</h3>
 <p>Each entry in <code>hdmaGradientList</code> is:</p>
 <div class="fragment"><div class="line">[line_count] [cgadd_lo=0x00] [cgadd_hi=0x00] [color_lo] [color_hi]</div>
 </div><!-- fragment --><p>The table defines color 0 (backdrop) for groups of scanlines. By stepping through blues, purples, and oranges, it creates a smooth vertical gradient.</p>
 <p>The table ends with a <code>0x00</code> byte (zero line count = end of HDMA table).</p>
-<h3><a class="anchor" id="autotoc_md796"></a>
+<h3><a class="anchor" id="autotoc_md812"></a>
 3. Toggle at runtime</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) <a class="code hl_function" href="hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f">hdmaDisableAll</a>();</div>
 <div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) enableGradient();</div>
@@ -157,18 +157,18 @@ How It Works</h2>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
 <div class="ttc" id="ahdma_8h_html_ad5a8e7d96e85c1d7ec49a488d6f3838f"><div class="ttname"><a href="hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f">hdmaDisableAll</a></div><div class="ttdeci">void hdmaDisableAll(void)</div><div class="ttdoc">Disable all HDMA channels.</div></div>
 </div><!-- fragment --><p>HDMA can be enabled/disabled at any time. When disabled, color 0 reverts to whatever was last written to CGRAM.</p>
-<h2><a class="anchor" id="autotoc_md797"></a>
+<h2><a class="anchor" id="autotoc_md813"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md798"></a>
+<h3><a class="anchor" id="autotoc_md814"></a>
 CGRAM (Color Generator RAM)</h3>
 <p>The SNES palette holds 256 colors, each stored as a 15-bit value (5 bits per R/G/B channel). Color 0 is the "backdrop" &ndash; visible wherever no BG or sprite pixel is drawn. By rewriting color 0 per scanline group via HDMA, each band of the screen displays a different background color.</p>
-<h3><a class="anchor" id="autotoc_md799"></a>
+<h3><a class="anchor" id="autotoc_md815"></a>
 HDMA Mode 3 (2REG_2X)</h3>
 <p>This mode writes 4 bytes to 2 consecutive registers, 2 bytes each. It is perfect for CGADD+CGDATA pairs because you need to set the target color address first (CGADD at $2121), then write the color value (CGDATA at $2122).</p>
-<h3><a class="anchor" id="autotoc_md800"></a>
+<h3><a class="anchor" id="autotoc_md816"></a>
 Non-Repeat vs Repeat Mode</h3>
 <p>This gradient uses non-repeat entries (bit 7 = 0 in the count byte). The color is written once, then holds for N scanlines. This works because CGRAM latches its value &ndash; unlike scroll registers (BG1HOFS etc.) which need repeat mode with fresh writes every scanline.</p>
-<h2><a class="anchor" id="autotoc_md801"></a>
+<h2><a class="anchor" id="autotoc_md817"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -182,7 +182,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma background sprite hdma input math</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md802"></a>
+<h2><a class="anchor" id="autotoc_md818"></a>
 Going Further</h2>
 <ul>
 <li><b>Custom gradient</b>: Edit the <code>hdmaGradientList</code> table in data.asm. Each entry is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try creating a sunset (orange to purple to dark blue).</li>

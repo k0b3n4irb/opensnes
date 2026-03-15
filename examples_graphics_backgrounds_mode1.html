@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds_mode1.ht
 <div class="caption">
 Screenshot</div></div>
     <p>The most common SNES video mode with two 16-color and one 4-color background.</p>
-<h2><a class="anchor" id="autotoc_md655"></a>
+<h2><a class="anchor" id="autotoc_md663"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>Mode 1 layer configuration</li>
@@ -109,14 +109,14 @@ Learning Objectives</h2>
 <li>4bpp tile format basics</li>
 <li>Palette organization</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md656"></a>
+<h2><a class="anchor" id="autotoc_md664"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed text examples</li>
 <li>Basic understanding of tiles and tilemaps</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md658"></a>
+<h2><a class="anchor" id="autotoc_md666"></a>
 What This Example Does</h2>
 <p>Displays a static background image using Mode 1:</p><ul>
 <li>BG1 with 16 colors (4bpp)</li>
@@ -133,7 +133,7 @@ What This Example Does</h2>
 <div class="line">+----------------------------------------+</div>
 </div><!-- fragment --><p><b>Controls:</b> None (static display)</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md660"></a>
+<h2><a class="anchor" id="autotoc_md668"></a>
 Code Type</h2>
 <p><b>C with Library Functions</b></p>
 <table class="markdownTable">
@@ -149,7 +149,7 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Screen enable   </td><td class="markdownTableBodyNone">Library (<code>setScreenOn</code>)   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md662"></a>
+<h2><a class="anchor" id="autotoc_md670"></a>
 Mode 1 Overview</h2>
 <p>Mode 1 is the most popular SNES video mode:</p>
 <table class="markdownTable">
@@ -164,7 +164,7 @@ Mode 1 Overview</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Sprites   </td><td class="markdownTableBodyNone">4bpp   </td><td class="markdownTableBodyNone">16 per palette   </td><td class="markdownTableBodyNone">Characters, objects   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md663"></a>
+<h3><a class="anchor" id="autotoc_md671"></a>
 Games Using Mode 1</h3>
 <ul>
 <li>Super Mario World</li>
@@ -174,14 +174,14 @@ Games Using Mode 1</h3>
 <li>Chrono Trigger</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md665"></a>
+<h2><a class="anchor" id="autotoc_md673"></a>
 Basic Setup</h2>
-<h3><a class="anchor" id="autotoc_md666"></a>
+<h3><a class="anchor" id="autotoc_md674"></a>
 1. Configure Video Mode</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);  <span class="comment">/* Mode 1, no special options */</span></div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:28</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md667"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md675"></a>
 2. Set Up Background</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Tilemap at VRAM $1000, 32x32 tiles */</span></div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x1000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
@@ -198,7 +198,7 @@ Basic Setup</h2>
 <div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga11724b6748ce0954e9b43819263537fc"><div class="ttname"><a href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a></div><div class="ttdeci">#define SC_32x32</div><div class="ttdef"><b>Definition</b> background.h:36</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md668"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md676"></a>
 3. Enable Display</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;  <span class="comment">/* Show BG1 on main screen */</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
@@ -206,14 +206,14 @@ Basic Setup</h2>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W)</div><div class="ttdef"><b>Definition</b> registers.h:181</div></div>
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:439</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md670"></a>
+<h2><a class="anchor" id="autotoc_md678"></a>
 VRAM Layout</h2>
 <p>A typical Mode 1 VRAM layout:</p>
 <div class="fragment"><div class="line">$0000-$0FFF: BG1 tilemap (32x32 = 2KB)</div>
 <div class="line">$1000-$1FFF: BG2 tilemap (optional)</div>
 <div class="line">$2000-$3FFF: BG3 tilemap (optional)</div>
 <div class="line">$4000-$7FFF: Tile graphics (16KB available)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md671"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md679"></a>
 Tilemap Format</h3>
 <p>Each tilemap entry is 2 bytes:</p>
 <div class="fragment"><div class="line">Byte 0: Tile number (0-255)</div>
@@ -224,7 +224,7 @@ Tilemap Format</h3>
 <div class="line">         ppp = Palette (0-7)</div>
 <div class="line">         cc = Tile high bits (for &gt;256 tiles)</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md673"></a>
+<h2><a class="anchor" id="autotoc_md681"></a>
 4bpp Tile Format</h2>
 <p>Mode 1 uses 4 bits per pixel (16 colors):</p>
 <div class="fragment"><div class="line">Each 8x8 tile = 32 bytes</div>
@@ -234,13 +234,13 @@ Tilemap Format</h3>
 <div class="line">Row layout: BP0, BP1, BP0, BP1... (16 bytes)</div>
 <div class="line">            BP2, BP3, BP2, BP3... (16 bytes)</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md675"></a>
+<h2><a class="anchor" id="autotoc_md683"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/backgrounds/mode1</div>
 </div><!-- fragment --><p>Then open <code>mode1.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md677"></a>
+<h2><a class="anchor" id="autotoc_md685"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -255,33 +255,33 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>res/</code>   </td><td class="markdownTableBodyNone">Source graphics files   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md679"></a>
+<h2><a class="anchor" id="autotoc_md687"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md680"></a>
+<h3><a class="anchor" id="autotoc_md688"></a>
 Exercise 1: Add a Second Layer</h3>
 <p>Enable BG2 with a different tileset: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x1800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a>(1, tiles_bg2, palette, 1, ...);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;</div>
 <div class="ttc" id="agroup__reg__const_html_gaae76565c377b5604fdbfa058ca79b433"><div class="ttname"><a href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a></div><div class="ttdeci">#define TM_BG2</div><div class="ttdef"><b>Definition</b> registers.h:440</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md681"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md689"></a>
 Exercise 2: Change Palette</h3>
 <p>Modify colors by writing to CGRAM: </p><div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 0;  <span class="comment">/* Start at color 0 */</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00; <a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00;  <span class="comment">/* Black */</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0xFF; <a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x7F;  <span class="comment">/* White */</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md682"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md690"></a>
 Exercise 3: Tile Flip</h3>
 <p>Modify tilemap entries to flip tiles: </p><div class="fragment"><div class="line"><span class="comment">/* Horizontal flip: set bit 6 of attribute byte */</span></div>
 <div class="line">tilemap_entry = tile_num | (1 &lt;&lt; 14);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md683"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md691"></a>
 Exercise 4: Add Priority</h3>
 <p>Use BG3 for a status bar that appears over BG1: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(2, 0x2000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"><span class="comment">/* Set BG3 priority higher in tilemap entries */</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md685"></a>
+<h2><a class="anchor" id="autotoc_md693"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md686"></a>
+<h3><a class="anchor" id="autotoc_md694"></a>
 Mode 1 Priorities</h3>
 <p>Default priority (back to front):</p><ol type="1">
 <li>BG3 (lowest)</li>
@@ -290,14 +290,14 @@ Mode 1 Priorities</h3>
 <li>Sprites (can be interleaved)</li>
 </ol>
 <p>Priority bit in tilemap flips individual tiles to front.</p>
-<h3><a class="anchor" id="autotoc_md687"></a>
+<h3><a class="anchor" id="autotoc_md695"></a>
 BG3 Specifics</h3>
 <p>BG3 in Mode 1 is only 2bpp (4 colors) but has special priority behavior. It's commonly used for:</p><ul>
 <li>HUD overlays</li>
 <li>Text displays</li>
 <li>Status bars</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md688"></a>
+<h3><a class="anchor" id="autotoc_md696"></a>
 Color Palette</h3>
 <p>Mode 1 palette organization:</p><ul>
 <li>Colors 0-15: BG1 palette</li>
@@ -306,7 +306,7 @@ Color Palette</h3>
 <li>Colors 128-255: Sprite palettes</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md690"></a>
+<h2><a class="anchor" id="autotoc_md698"></a>
 What's Next?</h2>
 <p><b>More BG layers:</b> <a href="../mode1_bg3_priority/">BG3 Priority</a> - HUD overlay in Mode 1</p>
 <p><b>Sprites:</b> <a href="../../sprites/simple_sprite/">Simple Sprite</a> - Display a sprite</p>

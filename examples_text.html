@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('examples_text.html',''); initResizable
 <div class="contents">
 <div class="textblock"><p>The SNES has no built-in text rendering. Text is displayed the same way as any other graphics: font characters are stored as tiles in VRAM, and a tilemap references those tiles to spell out words on screen.</p>
 <p>These examples teach the tile/tilemap fundamentals that underpin all SNES graphics.</p>
-<h2><a class="anchor" id="autotoc_md1213"></a>
+<h2><a class="anchor" id="autotoc_md1232"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -108,23 +108,23 @@ Examples</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="text_test/">text_test</a>   </td><td class="markdownTableBodyNone">Beginner   </td><td class="markdownTableBodyNone">Text positioning, formatting, and consoleDrawText usage   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1214"></a>
+<h2><a class="anchor" id="autotoc_md1233"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1215"></a>
+<h3><a class="anchor" id="autotoc_md1234"></a>
 How Text Works on SNES</h3>
 <div class="fragment"><div class="line">Font Image (PNG) --&gt; gfx4snes/font2snes --&gt; Tile Data (VRAM)</div>
 <div class="line">                                        --&gt; Tilemap (VRAM)</div>
 <div class="line">                                                |</div>
 <div class="line">                                        PPU renders screen</div>
 </div><!-- fragment --><p>Each character is an 8x8 pixel tile. A font is a collection of tiles covering the ASCII range. The tilemap is a grid of tile numbers that defines which character appears at each screen position.</p>
-<h3><a class="anchor" id="autotoc_md1216"></a>
+<h3><a class="anchor" id="autotoc_md1235"></a>
 2BPP Tile Format</h3>
 <p>"2bpp" means 2 bits per pixel = 4 possible colors (indices 0-3). Each 8x8 tile is 16 bytes: 8 bytes for bitplane 0, 8 bytes for bitplane 1.</p>
-<h3><a class="anchor" id="autotoc_md1217"></a>
+<h3><a class="anchor" id="autotoc_md1236"></a>
 VRAM Layout for Text</h3>
 <div class="fragment"><div class="line">$0000-$0FFF: Tile data (font graphics)</div>
 <div class="line">$1000-$17FF: BG1 tilemap (32x32 = 2KB)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1218"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1237"></a>
 Mode 0 Palette</h3>
 <p>In Mode 0, each background layer gets 4 colors:</p><ul>
 <li>BG1: Colors 0-3</li>

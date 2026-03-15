@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_mosaic.html'
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md836"></a>
+    <h2><a class="anchor" id="autotoc_md855"></a>
 What This Example Shows</h2>
 <p>How to use the SNES mosaic register to create a pixelation effect, and how to combine it with brightness fading for screen transitions. Press any button to cycle through 4 transition steps: fade out, fade in, mosaic out, mosaic in.</p>
-<h2><a class="anchor" id="autotoc_md837"></a>
+<h2><a class="anchor" id="autotoc_md856"></a>
 Prerequisites</h2>
 <p>Read <code>effects/fading</code> first (brightness control basics).</p>
-<h2><a class="anchor" id="autotoc_md838"></a>
+<h2><a class="anchor" id="autotoc_md857"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -115,14 +115,14 @@ Controls</h2>
 <td class="markdownTableBodyNone">Any button   </td><td class="markdownTableBodyNone">Advance to next transition step   </td></tr>
 </table>
 <p>The cycle repeats: fade out -&gt; fade in -&gt; mosaic out -&gt; mosaic in -&gt; (loop)</p>
-<h2><a class="anchor" id="autotoc_md839"></a>
+<h2><a class="anchor" id="autotoc_md858"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/mosaic</div>
 </div><!-- fragment --><p>Then open <code>mosaic.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md840"></a>
+<h2><a class="anchor" id="autotoc_md859"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md841"></a>
+<h3><a class="anchor" id="autotoc_md860"></a>
 1. Fade effect (brightness)</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> doFadeOut(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="keywordflow">for</span> (i = 15; i &gt; 0; i--) {</div>
@@ -134,7 +134,7 @@ How It Works</h2>
 <div class="ttc" id="aconsole_8h_html_a5a1bfaf2babf4d8dac31cafc468c735f"><div class="ttname"><a href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a></div><div class="ttdeci">void setBrightness(u8 brightness)</div><div class="ttdoc">Set screen brightness.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 </div><!-- fragment --><p><code><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></code> writes to register $2100 (INIDISP). Values 0-15 control the master brightness &ndash; 15 is full, 0 is black. Two VBlank waits per step gives a smooth ~0.5 second transition.</p>
-<h3><a class="anchor" id="autotoc_md842"></a>
+<h3><a class="anchor" id="autotoc_md861"></a>
 2. Mosaic effect (pixelation)</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> doMosaicOut(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="mosaic_8h.html#a7409ed07840cb4960b91cc990c35deac">mosaicEnable</a>(<a class="code hl_define" href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a>);</div>
@@ -149,7 +149,7 @@ How It Works</h2>
 <li><b>Bits 3-0</b>: Which backgrounds are affected (bit 0 = BG1, bit 1 = BG2, etc.)</li>
 </ul>
 <p>Increasing the block size from 0 to 15 makes pixels progressively larger until the image is a grid of colored squares.</p>
-<h3><a class="anchor" id="autotoc_md843"></a>
+<h3><a class="anchor" id="autotoc_md862"></a>
 3. Combining both for transitions</h3>
 <p>Classic SNES transition pattern used in many RPGs:</p><ol type="1">
 <li>Mosaic out (image becomes blocky)</li>
@@ -159,18 +159,18 @@ How It Works</h2>
 <li>Mosaic in (blocks shrink to reveal the scene)</li>
 </ol>
 <p>This gives a polished "dissolve" effect.</p>
-<h2><a class="anchor" id="autotoc_md844"></a>
+<h2><a class="anchor" id="autotoc_md863"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md845"></a>
+<h3><a class="anchor" id="autotoc_md864"></a>
 Mosaic Register ($2106)</h3>
 <p>The SNES PPU provides per-background pixelation with 16 levels. The effect is applied entirely in hardware &ndash; zero CPU cost. Each BG layer can be independently mosaic'd by setting its corresponding bit in the low nibble.</p>
-<h3><a class="anchor" id="autotoc_md846"></a>
+<h3><a class="anchor" id="autotoc_md865"></a>
 Not a Blur</h3>
 <p>Mosaic replaces pixels with the top-left pixel of each NxN block. It is a decimation effect, not a filter. The result looks like a low-resolution version of the original image.</p>
-<h3><a class="anchor" id="autotoc_md847"></a>
+<h3><a class="anchor" id="autotoc_md866"></a>
 Sprites Are Unaffected</h3>
 <p>Mosaic only applies to background layers. Sprites always render at full resolution. Some games use this creatively &ndash; mosaic the BG while sprites remain sharp during a transition, making characters stand out against the dissolving background.</p>
-<h2><a class="anchor" id="autotoc_md848"></a>
+<h2><a class="anchor" id="autotoc_md867"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -184,7 +184,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma background sprite input mosaic</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md849"></a>
+<h2><a class="anchor" id="autotoc_md868"></a>
 Going Further</h2>
 <ul>
 <li><b>Scene transition</b>: Load two different backgrounds. Use the fade/mosaic combination to transition between them &ndash; mosaic out scene A, load scene B tiles during force blank, mosaic in scene B.</li>

@@ -1,10 +1,10 @@
 var searchData=
 [
   ['key_20capabilities_0',['Key Capabilities',['../snes_sound_guide.html#autotoc_md237',1,'']]],
-  ['key_20concepts_1',['key concepts',['../examples_text.html#autotoc_md1214',1,'Key Concepts'],['../examples_memory.html#autotoc_md1144',1,'Key Concepts'],['../examples_input.html#autotoc_md1038',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1002',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md865',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md750',1,'Key Concepts'],['../examples_basics.html#autotoc_md544',1,'Key Concepts'],['../examples_audio.html#autotoc_md415',1,'Key Concepts'],['../hardware_overview.html#autotoc_md350',1,'Key Concepts']]],
+  ['key_20concepts_1',['key concepts',['../examples_text.html#autotoc_md1233',1,'Key Concepts'],['../examples_memory.html#autotoc_md1163',1,'Key Concepts'],['../examples_input.html#autotoc_md1057',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1021',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md884',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md766',1,'Key Concepts'],['../examples_basics.html#autotoc_md544',1,'Key Concepts'],['../examples_audio.html#autotoc_md415',1,'Key Concepts'],['../hardware_overview.html#autotoc_md350',1,'Key Concepts']]],
   ['key_20features_2',['Key Features',['../examples_audio_snesmod_music.html#autotoc_md425',1,'']]],
   ['key_20memory_20regions_3',['Key Memory Regions',['../memory_map.html#autotoc_md319',1,'']]],
-  ['key_20snes_20concepts_4',['Key SNES Concepts',['../examples_maps.html#autotoc_md1112',1,'']]],
+  ['key_20snes_20concepts_4',['Key SNES Concepts',['../examples_maps.html#autotoc_md1131',1,'']]],
   ['key_5fa_5',['KEY_A',['../group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7',1,'input.h']]],
   ['key_5fb_6',['KEY_B',['../group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7',1,'input.h']]],
   ['key_5fdown_7',['KEY_DOWN',['../group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf',1,'input.h']]],
