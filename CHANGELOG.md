@@ -47,7 +47,7 @@ covers changes made since the fork.
 
 ### Documentation
 
-- **Product maturity review** (`docs/MATURITY_REVIEW.md`): comprehensive comparison
+- **opensnes-emu debug emulator (single source of truth for testing)
   of OpenSNES vs PVSnesLib across 8 dimensions.
 - **Published benchmark** (`docs/BENCHMARK.md`): 34-function comparison showing
   -30.3% total cycles vs PVSnesLib + 816-opt (32/34 function wins).

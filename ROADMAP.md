@@ -12,7 +12,6 @@ PVSnesLib+816-opt on our benchmark suite. 37 working examples cover all major su
 with cross-platform CI on Linux, macOS, and Windows. Pre-built SDK binaries are available
 for Linux, macOS, and Windows.
 
-See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison with PVSnesLib.
 
 ---
 
@@ -104,7 +103,6 @@ See [docs/MATURITY_REVIEW.md](docs/MATURITY_REVIEW.md) for a detailed comparison
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
 - [x] CHANGELOG, CONTRIBUTING, GitHub templates
-- [x] Product maturity review (docs/MATURITY_REVIEW.md)
 
 ### Developer Tooling (8 tools)
 - [x] **symmap.py** — Symbol map analysis, memory overlap detection, bank overflow checking
