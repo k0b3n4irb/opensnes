@@ -68,6 +68,7 @@
     tcc__r10h   dsb 2
     ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
     nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
+    nmi_has_callback dsb 1  ; 0 = default no-op, 1 = user callback active
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -824,18 +825,12 @@ NmiHandler:
     ; JML [nmi_callback] reads from bank $00 absolute address nmi_callback
     ; (65816 JML indirect always reads from bank 0, ignoring D).
     ;--------------------------------------------------------------------------
-    rep #$30            ; 16-bit A/X/Y
-
-    ; Check if callback is the default no-op
-    lda.w nmi_callback        ; 16-bit address (absolute, D != 0)
-    cmp #DefaultNmiCallback
-    bne @do_callback
+    ; Fast callback check: single byte flag (saves ~18 cycles vs 24-bit compare)
     sep #$20
-    lda.w nmi_callback+2      ; bank byte
-    cmp #:DefaultNmiCallback
-    bne +                   ; Not match → do callback
-    jmp @skip_callback      ; Match → skip call entirely
-+   rep #$30
+    lda.w nmi_has_callback
+    beq @skip_callback      ; 0 = no callback → skip
+
+    rep #$30                ; 16-bit A/X/Y for callback
 
 @do_callback:
     ; Set data bank to $7E for C variable access
