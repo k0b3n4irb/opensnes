@@ -24,6 +24,7 @@
 /* vblank_flag and oam_update_flag are declared in <snes/system.h> (via <snes.h>) */
 extern volatile u16 frame_count;
 extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
+extern volatile u8 nmi_has_callback;    /* 0 = default no-op, 1 = user callback */
 extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
 
 /*============================================================================
@@ -211,6 +212,9 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
     nmi_callback[2] = bank;
     nmi_callback[3] = 0x00;  /* Padding */
 
+    /* Fast flag for NMI: skip callback entirely when default no-op */
+    nmi_has_callback = 1;
+
     /* Clear NMI flag to prevent spurious interrupt */
     clearNmiFlag();
 
@@ -225,6 +229,7 @@ void nmiSet(VBlankCallback callback) {
 }
 
 void nmiClear(void) {
-    /* Restore default callback */
+    /* Restore default callback and clear fast flag */
     nmiSetBank((VBlankCallback)DefaultNmiCallback, 0);
+    nmi_has_callback = 0;
 }

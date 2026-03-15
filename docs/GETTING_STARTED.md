@@ -76,14 +76,14 @@ cd opensnes
 make
 ```
 
-This builds the compiler, tools, library, and all 37 example ROMs.
+This builds the compiler, tools, library, and all 41 example ROMs.
 
 **Expected output:**
 ```
 Building cc65816 compiler...
 Building WLA-DX assembler...
 Building OpenSNES library...
-Building examples... (37 ROMs)
+Building examples... (41 ROMs)
 ```
 
 ## Step 4: Run Your First ROM

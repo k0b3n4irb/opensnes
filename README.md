@@ -18,77 +18,28 @@
 
 ### Supported Platforms
 
-The SDK builds and runs natively on all three major operating systems.
-CI tests every commit on all platforms.
-
 | Platform | Architecture | Toolchain | Status |
 |----------|-------------|-----------|--------|
 | **Linux** | x86_64, arm64 | GCC / Clang + GNU Make | [![Linux](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=linux)](https://github.com/k0b3n4irb/opensnes/actions) |
 | **macOS** | arm64 (Apple Silicon), x86_64 | Clang + GNU Make | [![macOS](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=macos)](https://github.com/k0b3n4irb/opensnes/actions) |
 | **Windows** | x86_64 | MSYS2 (UCRT64) + Clang | [![Windows](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=windows)](https://github.com/k0b3n4irb/opensnes/actions) |
 
-> **Note**: arm64 Linux is supported (the toolchain cross-compiles to 65816)
-> but not yet tested in CI.
-
 ---
 
-This project would not exist without **[PVSnesLib](https://github.com/alekmaul/pvsneslib)**
-by [Alekmaul](https://github.com/alekmaul) and its community of contributors. OpenSNES is
-a fork that builds on their years of work — the library, the toolchain, the examples — with
-a focus on documentation, compiler improvements, and developer experience. Credit where
-credit is due: PVSnesLib laid the foundation for everything here.
-
-> **Beta**: A modern, well-tested SNES SDK ready for serious hobby development and
-> game jams, building toward commercial-grade maturity. APIs are stabilizing but may
-> still change between minor versions.
-
----
-
-## A Fair Warning
-
-SNES development is hard. Not "takes a weekend to figure out" hard —
-**fundamentally, structurally hard.**
-
-The SNES was designed in 1989 by hardware engineers, for assembly programmers,
-with no concessions to convenience. There is no operating system. There is no standard
-library. There is no debugger that pauses the world while you inspect variables.
-The CPU runs at 3.58 MHz, has 128 KB of RAM, and doesn't know what a `float` is.
-
-You will need to understand how a PPU renders tiles scanline by scanline. You will need
-to know why writing to VRAM outside of VBlank silently fails. You will need to care about
-individual clock cycles, because on this hardware, every single one matters.
-
-**OpenSNES lets you write game logic in C.** That's a real advantage — you get `if`/`else`,
-functions, structs, and all the abstraction C provides. The SDK handles initialization,
-DMA transfers, joypad reading, sprite management, and audio playback through a clean API.
-For many things, you'll never touch a register directly.
-
-**But C alone won't get you to a finished game.**
-
-The PPU has quirks that no C abstraction can fully hide. Performance-critical inner loops,
-custom HDMA effects, and advanced hardware tricks eventually require reading — and writing —
-65816 assembly. The SDK handles audio through SNESMOD (music and sound effects from C,
-no assembly needed), and it handles sprites, backgrounds, and DMA through its library.
-But the moment you push past what the library provides, you're on the hardware's terms.
-
-This is not a flaw in the SDK. It's the nature of the machine. OpenSNES will keep
-improving — better optimizations, more library functions, smoother workflows — but the
-gap between "my sprites move" and "my game ships" will always require understanding
-what happens beneath the C.
-
-If that sounds exciting rather than terrifying, you're in the right place.
+This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
 ---
 
 ## What OpenSNES Gives You
 
-| | Feature | Details |
-|-|---------|---------|
-| | **C11 compiler for the 65816** | cproc + QBE with a custom backend — **30% faster code** than PVSnesLib+816-opt on our benchmark suite ([details](docs/BENCHMARK.md)) |
-| | **Hardware library** (28 headers, modular linking) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
-| | **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
-| | **37 working examples** | From "Hello World" to a playable Breakout clone — each with a detailed walkthrough |
-| | **Cross-platform** | `make` on Linux, macOS, and Windows (MSYS2). CI-tested on all three. |
+| Feature | Details |
+|---------|---------|
+| **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
+| **Hardware library** (28 headers, modular linking) | PPU, sprites, backgrounds, DMA, HDMA, input, text, audio, Mode 7, collision, animation, SRAM... |
+| **Asset pipeline** | `gfx4snes` (PNG to tiles), `font2snes` (font converter), `smconv` (Impulse Tracker to SPC700) |
+| **41 examples** | From "Hello World" to Tetris with music — each with README + screenshot |
+| **Debug emulator** | [opensnes-emu](tools/opensnes-emu/README.md): snes9x WASM, MCP server, 212 automated checks |
+| **Cross-platform** | `make` on Linux, macOS, and Windows (MSYS2). CI-tested on all three. |
 
 ## Quick Start
 
@@ -106,8 +57,8 @@ sudo apt install build-essential clang cmake make git
 <summary><b>macOS</b></summary>
 
 ```bash
-xcode-select --install        # Apple Clang
-brew install cmake             # if not already installed
+xcode-select --install
+brew install cmake
 ```
 </details>
 
@@ -119,45 +70,23 @@ pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake make git
 ```
 </details>
 
-You'll also want a SNES emulator — [Mesen2](https://www.mesen.ca/) is recommended
-(debugger, trace logger, memory viewer).
+You'll also want [Mesen2](https://www.mesen.ca/) — the best SNES emulator for development (debugger, trace logger, memory viewer).
 
 ### Build & Run
 
 ```bash
 git clone --recursive https://github.com/k0b3n4irb/opensnes.git
 cd opensnes
-make                  # builds compiler, tools, library, and all 37 examples
+make                  # builds compiler, tools, library, and all 41 examples
 
 # Open examples/text/hello_world/hello_world.sfc in Mesen2
 ```
 
 ## Examples
 
-37 examples with detailed READMEs that explain not just *what* the code does, but *why*.
-Organized as a progressive learning path — from "Hello World" to a complete platformer.
+41 examples with README and screenshot, organized as a progressive learning path.
 
-**[Browse all examples and the learning path](examples/README.md)**
-
----
-
-## How We Compare to PVSnesLib
-
-OpenSNES is a fork of PVSnesLib with a different set of trade-offs:
-
-| | OpenSNES | PVSnesLib |
-|-|----------|-----------|
-| **Compiler** | C11 (cproc+QBE), 13 opt phases, **-30% cycles** | C89 (tcc816), 38 regex peepholes |
-| **Testing** | 60 compiler + 25 unit + 37 ROM validations | None |
-| **CI** | 3 platforms per push | Build-only |
-| **Library** | Modular (`LIB_MODULES=...`) | Monolithic |
-| **Docs** | 8 guides + 37 example READMEs | Wiki + 4 READMEs |
-| **Track record** | 3 months, no shipped games | 14 years, commercial games shipped |
-| **Pre-built binaries** | Available (GitHub Releases) | Available |
-
-PVSnesLib is the proven, battle-tested choice. OpenSNES is the modern, well-tested
-alternative with better tooling and documentation. See the full
-[maturity review](docs/MATURITY_REVIEW.md) for details.
+**[Browse all examples](examples/README.md)** · **[Learning path](docs/LEARNING_PATH.md)**
 
 ---
 
@@ -179,10 +108,8 @@ alternative with better tooling and documentation. See the full
 |------|-------------|
 | **cc65816** | C compiler (cproc + QBE with 65816 backend) |
 | **wla-65816** | WLA-DX assembler for 65816 code |
-| **wla-spc700** | WLA-DX assembler for SPC700 audio code |
 | **wlalink** | Linker — combines objects into a ROM |
-| **gfx4snes** | PNG → SNES tiles (.pic), palettes (.pal), tilemaps (.map) |
-| **font2snes** | PNG font grid → C header with tile data |
+| **gfx4snes** | PNG → SNES tiles, palettes, tilemaps |
 | **smconv** | Impulse Tracker (.it) → SNESMOD soundbank for SPC700 |
 
 ## Build Commands
@@ -195,140 +122,55 @@ make lib                # Build the OpenSNES library
 make examples           # Build all example ROMs
 make docs               # Generate API documentation (requires Doxygen)
 make clean              # Clean all build artifacts
-
-# Build a single example
-make -C examples/games/breakout
 ```
 
 ---
 
 ## Testing
 
-Three test suites validate the SDK after any change:
+All testing is handled by **[opensnes-emu](tools/opensnes-emu/README.md)** — a SNES debug emulator (snes9x WASM) that serves as the single source of truth.
 
 ```bash
-# Full rebuild (always start from clean to avoid stale artifacts)
-make clean && make
-
-# Unit tests (25 modules, ~385 runtime + 119 compile-time assertions)
-./tests/unit/run_unit_tests.sh
-
-# Compiler regression tests (60 tests)
-./tests/compiler/run_tests.sh --allow-known-bugs
-
-# Example validation (memory overlaps + ROM size checks, 37 ROMs)
-OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
+cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
 ```
 
-> **`OPENSNES_HOME` vs `OPENSNES`**: `OPENSNES` is the Makefile variable that
-> points to the SDK root (set in each project's Makefile). `OPENSNES_HOME` is
-> the environment variable used by the test scripts — set it to the SDK root
-> directory before running tests.
+7 phases, 212 checks: preconditions, compiler tests, build, static analysis, runtime execution, visual regression, lag detection.
 
 ---
 
 ## Learning Path
 
-There's no shortcut, but there is a path.
+**Week 1** — Build the SDK. Open Hello World in Mesen2. Modify it. Break it. Fix it.
 
-**Week 1 — Get your bearings.** Build the SDK. Open Hello World in Mesen2. Read the
-walkthrough. Modify the message. Change the colors. Break it on purpose, then fix it.
-Understand what every register write does.
+**Week 2-3** — Work through the examples in order. By Continuous Scroll, you'll understand tilemaps, sprites, DMA, input, and VBlank timing.
 
-**Week 2-3 — Work through the examples.** Go in order. Each one builds on the last.
-By the time you finish Continuous Scroll, you'll understand tilemaps, sprites, DMA,
-input handling, and VBlank timing. These are the fundamentals of every SNES game.
+**Week 4+** — Start your game. Copy an example as a template.
 
-**Week 4+ — Start your game.** Copy an example as a template. Add features one at a
-time. When something doesn't work, check the generated assembly (`main.c.asm`) — it
-will teach you more about the 65816 than any tutorial.
+**Eventually** — Learn assembly. Check `main.c.asm` — the generated code teaches you the 65816.
 
-**Eventually — Learn assembly.** You don't need it on day one. But the day you want
-to write a custom HDMA effect, optimize a tight loop, or push the hardware beyond what
-the library offers, you'll be glad you started reading it in `main.c.asm` weeks ago.
-The transition from "reading" to "writing" assembly is smaller than you think.
-
-Resources that will help:
-
-- [SFC Development Wiki](https://wiki.superfamicom.org/) — hardware reference
-- [SNESdev Wiki](https://snes.nesdev.org/wiki/SNESdev_Wiki) — community knowledge base
-- [65816 Instruction Set](https://undisbeliever.net/snesdev/65816-opcodes.html) — when you're ready
-- [Mesen2](https://www.mesen.ca/) — the best SNES emulator for development (debugger, trace logger, memory viewer)
-- [Super NES Programming](https://en.wikibooks.org/wiki/Super_NES_Programming/) — Wikibook tutorial
-
----
-
-## Emulator vs. Real Hardware
-
-**A ROM that works in an emulator can fail on a real console.** This is one of the
-most common — and most frustrating — surprises in SNES development.
-
-Emulators are forgiving. They tolerate DMA transfers that slightly overrun VBlank.
-They don't crash when HDMA and DMA collide on the bus. They handle IRQ timing edge
-cases gracefully. Real hardware does none of these things.
-
-Common issues that show up only on console:
-
-- **VBlank overrun** — you transfer 5 KB of tile data per frame, it works in Mesen2,
-  but on hardware the screen glitches because the transfer didn't finish before
-  rendering started
-- **DMA/HDMA collision** — on CPU revision 1 consoles, a DMA completing just as HDMA
-  starts can crash the system entirely. Emulators don't reproduce this.
-- **Bus timing** — the exact cycle when a register write takes effect can differ by
-  1-2 cycles between emulator and hardware. Usually invisible, until it isn't.
-- **Audio sync** — SPC700 communication timing is approximate in most emulators.
-  A handshake that works in software may fail on silicon.
-
-**Test on real hardware.** Even if you develop entirely in an emulator, verify on
-console before calling something "done."
-
-### Flash Cartridges
-
-Flash cartridges let you load ROMs from an SD card and run them on a real SNES.
-For development, they're essential:
-
-| Cartridge | Notes |
-|-----------|-------|
-| [**FXPak Pro**](https://krikzz.com/our-products/cartridges/fxpak-pro.html) | The reference. Formerly SD2SNES. FPGA-based, supports nearly all enhancement chips (Super FX, SA-1, Cx4). USB port for debugging. Made by [Krikzz](https://krikzz.com/). |
-
-> **Avoid cheap clones.** The SD2SNES design is open-source, so clones exist — but
-> quality varies wildly. Glitchy behavior, missing audio features, or outright failure.
-> For development work where you need to trust the hardware, buy from Krikzz or a
-> reputable reseller.
-
-[Mesen2](https://www.mesen.ca/) remains the best emulator for day-to-day development —
-its debugger, trace logger, and memory viewer are indispensable. But the final test is
-always the real machine.
+Resources:
+- [SFC Development Wiki](https://wiki.superfamicom.org/)
+- [SNESdev Wiki](https://snes.nesdev.org/wiki/SNESdev_Wiki)
+- [Mesen2](https://www.mesen.ca/)
 
 ---
 
 ## Lineage & Acknowledgements
 
-OpenSNES stands on the shoulders of the SNES homebrew community:
-
-### The Foundation
-- **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and contributors — the library, toolchain, and examples that made this project possible
-- **[SNES-SDK](http://code.google.com/p/snes-sdk/)** by Ulrich Hecht — the original SNES C SDK that started it all
-
-### Toolchain
+- **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by Alekmaul — the foundation
 - **[QBE](https://c9x.me/compile/)** by Quentin Carbonneaux — compiler backend
-- **[WLA-DX](https://github.com/vhelin/wla-dx)** by Ville Helin — assembler suite
-- **[cproc](https://sr.ht/~mcf/cproc/)** by Michael Forney — C compiler frontend
-
-### Audio
-- **[SNESMOD](https://github.com/mukunda-/snesmod)** by Mukunda Johnson — tracker audio driver
+- **[WLA-DX](https://github.com/vhelin/wla-dx)** by Ville Helin — assembler
+- **[cproc](https://sr.ht/~mcf/cproc/)** by Michael Forney — C frontend
+- **[SNESMOD](https://github.com/mukunda-/snesmod)** by Mukunda Johnson — audio driver
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- [Open issues](https://github.com/k0b3n4irb/opensnes/issues) — bugs and tasks
-- [Roadmap](ROADMAP.md) — planned features and v1.0 requirements
-- [Changelog](CHANGELOG.md) — what's changed since the PVSnesLib fork
-- [Maturity Review](docs/MATURITY_REVIEW.md) — how we compare to PVSnesLib
+- [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
+- [Roadmap](ROADMAP.md)
+- [Changelog](CHANGELOG.md)
 
 ## License
 
 MIT License — See [LICENSE](LICENSE)
-
-This project maintains the same open-source spirit as PVSnesLib.
