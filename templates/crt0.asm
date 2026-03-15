@@ -103,6 +103,9 @@
     pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
+    pad_count       dsb 1   ; Number of pads to read (1 or 2, default 1)
+    snes_mplay5     dsb 1   ; 1 if MultiPlayer5 adapter is connected
+    mp5read         dsb 1   ; Temporary for MultiPlayer5 plug detection
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
     bg_scroll_dirty dsb 1   ; Bitmask: bit 0-3 = BG1-4 scroll dirty
@@ -476,6 +479,10 @@ Start:
     stz oam_update_flag
     stz tilemap_update_flag
 
+    ; Default: read 1 pad only (saves ~35 cycles/frame)
+    lda #$01
+    sta pad_count
+
     ; Initialize VBlank callback to default (does nothing)
     rep #$20
     lda #DefaultNmiCallback
@@ -702,30 +709,16 @@ NmiHandler:
     beq @oam_done
     stz.w oam_update_flag
 
-    ; Set OAM address to 0 (word register — use 16-bit A)
+    ; OAM DMA — channel 7 is preconfigured at boot (InitHardware).
+    ; Only reset OAM address, DMA size, and trigger.
+    ; Mode ($4370), dest ($4371), source addr ($4372-$4374) persist.
     rep #$20
-    stz.w $2102             ; OAMADDL/H = 0
-
-    ; DMA channel 7: CPU→PPU, auto-increment, dest $2104 (OAMDATA)
-    lda.w #$0400
-    sta.w $4370             ; $4370 = mode ($00), $4371 = dest ($04)
-
-    ; Source: oamMemory ($7E:0300)
-    lda.w #oamMemory
-    sta.w $4372             ; Source address low/high
-    sep #$20
-    lda.b #:oamMemory       ; Source bank ($7E)
-    sta.w $4374
-
-    ; Transfer size: 544 bytes ($0220)
-    rep #$20
+    stz.w $2102             ; OAM address = 0
     lda.w #$0220
-    sta.w $4375             ; DMA size
-
-    ; Start DMA channel 7
+    sta.w $4375             ; DMA size (544 bytes)
     sep #$20
     lda.b #$80
-    sta.w $420B             ; MDMAEN: channel 7
+    sta.w $420B             ; Start DMA channel 7
 @oam_done:
 
     ;--------------------------------------------------------------------------
@@ -853,20 +846,35 @@ NmiHandler:
     plb
 
 @skip_callback:
-    sep #$20            ; Back to 8-bit A
+    sep #$20            ; 8-bit A
+    rep #$10            ; 16-bit X/Y (needed for ScanMPlay5)
 
     ;--------------------------------------------------------------------------
-    ; 5. Read Joypads
+    ; 5. Wait for Auto-Joypad + Read All Inputs
     ;--------------------------------------------------------------------------
-    ; Auto-joypad completes ~4K master clocks into VBlank, well before NMI fires.
-    ; Readable anytime — not VBlank-critical.
+    ; Auto-joypad completes ~4K master clocks into VBlank. Must wait before
+    ; ANY input reading (pads, MP5, mouse, or scope).
+    ;--------------------------------------------------------------------------
+    lda #$01
+-   bit.w $4212         ; REG_HVBJOY bit 0 = auto-joypad busy
+    bne -
+
+    ;--------------------------------------------------------------------------
+    ; 5a. Read MultiPlayer5 pads 2-4 (if connected)
+    ;--------------------------------------------------------------------------
+    ; MP5 is mutually exclusive with mouse/scope. If MP5 is active, we read
+    ; pads 2-4 here via bit-banging, then fall through to read pads 0-1.
+    ; Mouse and scope are skipped (PVSnesLib behavior).
+    ;--------------------------------------------------------------------------
+    lda.w snes_mplay5
+    beq @mp5_done
+        jsl ScanMPlay5
+@mp5_done:
+
+    ;--------------------------------------------------------------------------
+    ; 5b. Read Joypads 0 & 1
     ;--------------------------------------------------------------------------
     rep #$20            ; 16-bit A for joypad reads
-
-    ; Wait for auto-joypad read to complete
--   lda $4212
-    and #$0001
-    bne -
 
     ; Save previous state
     lda.w pad_keys
@@ -886,7 +894,13 @@ NmiHandler:
     and.w pad_keys
     sta.w pad_keysdown
 
-    ; Read joypad 2
+    ; Read joypad 2 (only if pad_count >= 2)
+    sep #$20
+    lda.w pad_count
+    cmp #$02
+    rep #$20
+    bcc @pad2_done
+
     lda $421A           ; 16-bit: A = JOY2H:JOY2L
     bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
     beq ++
@@ -896,22 +910,220 @@ NmiHandler:
     eor.w pad_keysold+2
     and.w pad_keys+2
     sta.w pad_keysdown+2
+@pad2_done:
 
     ;--------------------------------------------------------------------------
-    ; 6. Read Mouse (if connected)
+    ; 5c. Skip mouse/scope if MultiPlayer5 active (incompatible devices)
     ;--------------------------------------------------------------------------
-    ; PVSnesLib-compatible mouse reading with:
-    ;   - Per-frame connection detection via device signature
-    ;   - Automatic sensitivity sync on first connection (Nintendo mouse bug)
-    ;   - Deferred sensitivity change commands (mouseRequestChangeSensitivity)
-    ;   - Indexed variables: X=0 for port 1, X=1 for port 2
+    sep #$20
+    lda.w snes_mplay5
+    beq @no_mp5_skip
+        jmp @scope_done     ; Skip mouse and scope entirely
+@no_mp5_skip:
+
     ;--------------------------------------------------------------------------
-    sep #$20                ; 8-bit A for mouse_con check
+    ; 6. Read Mouse (if connected) — via SUPERFREE subroutine
+    ;--------------------------------------------------------------------------
+    ; A is already 8-bit (sep #$20 from MP5 skip check above)
     lda.w mouse_con
-    bne @mouse_start
-    jmp @mouse_done         ; Skip if no mouse initialized (jmp for distance)
-@mouse_start:
+    beq @mouse_done
+        jsl ReadMouse
+@mouse_done:
+
+    ;--------------------------------------------------------------------------
+    ; 7. Read Super Scope (if connected) — via SUPERFREE subroutine
+    ;--------------------------------------------------------------------------
+    sep #$20                ; 8-bit A
+    lda.w scope_con
+    beq @scope_done
+        jsl ReadScope
+@scope_done:
+
+    ; Clear VBlank flag (handshake: signal main thread "done")
+    sep #$20
+    stz.w vblank_flag
+
+@nmi_restore:
+    ; Restore and return
+    rep #$30
+    plb                 ; Restore data bank
+    pld
+    ply
+    plx
+    pla
+    rti
+
+;------------------------------------------------------------------------------
+; DefaultNmiCallback - Default VBlank callback (does nothing)
+;------------------------------------------------------------------------------
+; This is called by NmiHandler when no user callback is registered.
+; Simply returns immediately.
+;------------------------------------------------------------------------------
+DefaultNmiCallback:
+    rtl
+
+;------------------------------------------------------------------------------
+; WaitForVBlank - PVSnesLib handshake protocol
+;------------------------------------------------------------------------------
+; Sets vblank_flag=1 ("main thread ready"), then halts with WAI.
+; NMI handler sees flag=1, does VBlank work (OAM, tilemap, scroll, joypads),
+; then clears flag=0. Main thread wakes, sees flag=0, proceeds.
+;
+; If game logic exceeds one frame (lag), flag stays 0 when NMI fires.
+; NMI skips all work and increments lag_frame_counter. No silent VRAM
+; corruption — lag is visible and debuggable.
+;
+; KEEP: X, Y (documented in interrupt.h, used by video.asm)
+;------------------------------------------------------------------------------
+WaitForVBlank:
+    php
+    sep #$20
+    lda #$01
+    sta.l oam_update_flag   ; Request OAM transfer
+    sta.l vblank_flag       ; Signal: "main thread ready"
+-   wai                     ; Halt until NMI
+    lda.l vblank_flag
+    bne -                   ; Loop until NMI clears flag to 0
+    plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; MultiPlayer5 Pad Reading (SUPERFREE — can be placed in any bank)
+;==============================================================================
+
+.SECTION ".scan_mplay5" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ScanMPlay5 — Read MultiPlayer5 pads 2, 3, 4
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when snes_mplay5 != 0.
+; Based on PVSnesLib's _ScanMPlay5 macro and SNES Development Wiki multitap
+; protocol (https://snes.nesdev.org/wiki/Multitap).
+;
+; Reads pads 3 & 4 via bit-banging REG_JOYB ($4017) after switching the
+; multitap to its second controller pair (REG_WRIO bit 7 = 0).
+; Reads pad 2 from auto-joypad result (REG_JOY4L/H = $421E-$421F).
+;
+; REQUIRES: Auto-Joypad has finished reading.
+; REQUIRES: REG_WRIO bit 7 set BEFORE VBlank starts.
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: pad_keys/pad_keysold/pad_keysdown updated for pads 2, 3, 4
+;      REG_WRIO restored to $80
+;      A = 8-bit, X/Y = 16-bit
+;------------------------------------------------------------------------------
+ScanMPlay5:
+    rep #$10            ; 16-bit X/Y
+.INDEX 16
+
+    ; Save old pad state (pads 2, 3, 4)
+    ldy.w pad_keys+4    ; pad_keys[2]
+    sty.w pad_keysold+4
+    ldy.w pad_keys+6    ; pad_keys[3]
+    sty.w pad_keysold+6
+    ldy.w pad_keys+8    ; pad_keys[4]
+    sty.w pad_keysold+8
+
+    sep #$20
+.ACCU 8
+
+    ; Switch multitap to second pair of controllers
+    stz.w $4201         ; REG_WRIO = 0
+
+    ; Initialize pad_keys[4] bytes to 1.
+    ; After 8 rol operations, the initial 1 bit shifts out through carry,
+    ; setting carry and terminating the bcc loop.
+    lda #1
+    sta.w pad_keys+8    ; pad_keys[4] low byte
+    sta.w pad_keys+9    ; pad_keys[4] high byte
+
+    ; Read high byte of pads 3 & 4 (bit-bang from REG_JOYB)
+-       lda.w $4017     ; REG_JOYB
+        lsr             ; bit 0 → carry (pad 3 data)
+        rol.w pad_keys+7   ; pad_keys[3] high byte
+        lsr             ; bit 1 → carry (pad 4 data)
+        rol.w pad_keys+9   ; pad_keys[4] high byte
+        bcc -           ; Loop until carry set (8 bits read)
+
+    ; Read low byte of pads 3 & 4
+    ; pad_keys[4] low byte still has its initial value of 1 (untouched by
+    ; the high byte loop above), so it terminates after 8 iterations.
+-       lda.w $4017     ; REG_JOYB
+        lsr             ; bit 0 → carry (pad 3 data)
+        rol.w pad_keys+6   ; pad_keys[3] low byte
+        lsr             ; bit 1 → carry (pad 4 data)
+        rol.w pad_keys+8   ; pad_keys[4] low byte
+        bcc -           ; Loop until carry set (8 bits read)
+
+    rep #$20
+.ACCU 16
+
+    ; Read pad 2 from auto-joypad (REG_JOY4L/H = $421E-$421F)
+    lda.w $421E         ; 16-bit: JOY4H:JOY4L
+    bit.w #$000F        ; Validate signature bits
+    beq +
+        lda.w #$0000    ; Not a standard controller
++   sta.w pad_keys+4    ; pad_keys[2]
+    eor.w pad_keysold+4
+    and.w pad_keys+4
+    sta.w pad_keysdown+4
+
+    ; Process pad 3 edge detection
+    lda.w pad_keys+6    ; pad_keys[3]
+    bit.w #$000F
+    beq +
+        lda.w #$0000
+        sta.w pad_keys+6
++   eor.w pad_keysold+6
+    and.w pad_keys+6
+    sta.w pad_keysdown+6
+
+    ; Process pad 4 edge detection
+    lda.w pad_keys+8    ; pad_keys[4]
+    bit.w #$000F
+    beq +
+        lda.w #$0000
+        sta.w pad_keys+8
++   eor.w pad_keysold+8
+    and.w pad_keys+8
+    sta.w pad_keysdown+8
+
+    ; Switch multitap back to first pair of controllers
+    ; Ensures auto-joypad reads pads 0/1 on the next VBlank
+    sep #$20
+.ACCU 8
+    lda #$80
+    sta.w $4201         ; REG_WRIO = $80
+
+    rtl
+
+.ENDS
+
+;==============================================================================
+; Mouse Reading (SUPERFREE — extracted from NMI for bank $00 savings)
+;==============================================================================
+
+.SECTION ".read_mouse" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ReadMouse — PVSnesLib-compatible mouse reading
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when mouse_con != 0.
+;
+; Features:
+;   - Per-frame connection detection via device signature
+;   - Automatic sensitivity sync on first connection (Nintendo mouse bug)
+;   - Deferred sensitivity change commands (mouseRequestChangeSensitivity)
+;   - Indexed variables: X=0 for port 1, X=1 for port 2
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: Mouse state variables updated, A = 8-bit, X/Y = 16-bit
+;------------------------------------------------------------------------------
+ReadMouse:
     sep #$10                ; 8-bit X/Y for indexed mouse access
+.INDEX 8
 
     ; Read port 2 first, then port 1 (PVSnesLib order)
     lda.w mouse_con
@@ -929,8 +1141,9 @@ NmiHandler:
         jsr @MouseData
 @skip_port1:
 
-    rep #$10                ; Restore 16-bit index for scope section
-    jmp @mouse_done         ; Jump past subroutine code
+    rep #$10                ; Restore 16-bit index
+.INDEX 16
+    rtl
 
 ;---------------------------------------------------------------------------
 ; @MouseData — Read mouse data for one port
@@ -1112,26 +1325,30 @@ NmiHandler:
 @SensReturn:
     rts
 
-.ACCU 8
-.INDEX 16
-@mouse_done:
+.ENDS
 
-    ;--------------------------------------------------------------------------
-    ; 7. Read Super Scope (if connected)
-    ;--------------------------------------------------------------------------
-    ; Only runs when scope_con != 0 (set by scopeInit in C code).
-    ; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
-    ; Reads PPU H/V latch for shot position, applies calibration offset,
-    ; and processes buttons with hold/repeat delay logic.
-    ;--------------------------------------------------------------------------
-    sep #$20                ; 8-bit A
-    lda.w scope_con
-    bne @scope_start
-    jmp @scope_done         ; Skip if no Super Scope initialized
-@scope_start:
+;==============================================================================
+; Super Scope Reading (SUPERFREE — extracted from NMI for bank $00 savings)
+;==============================================================================
 
+.SECTION ".read_scope" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ReadScope — Nintendo SHVC Scope BIOS v1.00 compatible reading
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when scope_con != 0.
+;
+; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
+; Reads PPU H/V latch for shot position, applies calibration offset,
+; and processes buttons with hold/repeat delay logic.
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: Scope state variables updated, A = 8-bit
+;------------------------------------------------------------------------------
+ReadScope:
     ; Read port 2 raw data from auto-joypad and compute edge detection
     rep #$20                ; 16-bit A
+.ACCU 16
     lda.w scope_port2down
     sta.w scope_port2last     ; Save previous frame
     lda $421A               ; REG_JOY2L/H (16-bit read)
@@ -1150,6 +1367,7 @@ NmiHandler:
 
     ; Check PPU H/V counter latch (bit 6 of REG_STAT78)
     sep #$20                ; 8-bit A
+.ACCU 8
     lda $213F               ; REG_STAT78
     and #$40
     beq @scope_no_shot
@@ -1171,6 +1389,7 @@ NmiHandler:
 
     ; Apply calibration offset: adjusted = raw + center offset
     rep #$20                ; 16-bit A
+.ACCU 16
     lda.w scope_shothraw
     clc
     adc.w scope_centerh
@@ -1187,6 +1406,7 @@ NmiHandler:
 @scope_no_shot:
     ; --- No shot this frame ---
     rep #$20                ; 16-bit A
+.ACCU 16
     inc.w scope_sinceshot
 
 @scope_buttons:
@@ -1235,6 +1455,7 @@ NmiHandler:
 @scope_disconnect:
     ; Invalid signature: disconnect Super Scope
     rep #$20
+.ACCU 16
     stz.w scope_down
     stz.w scope_now
     stz.w scope_held
@@ -1244,62 +1465,17 @@ NmiHandler:
     stz.w scope_shotvraw
     stz.w scope_sinceshot
     sep #$20
+.ACCU 8
     stz.w scope_con
-    bra @scope_done
+    rtl
 
 @scope_save_last:
     ; Save current button state for next frame
     lda.w scope_down
     sta.w scope_last
 
-@scope_done:
-
-    ; Clear VBlank flag (handshake: signal main thread "done")
     sep #$20
-    stz.w vblank_flag
-
-@nmi_restore:
-    ; Restore and return
-    rep #$30
-    plb                 ; Restore data bank
-    pld
-    ply
-    plx
-    pla
-    rti
-
-;------------------------------------------------------------------------------
-; DefaultNmiCallback - Default VBlank callback (does nothing)
-;------------------------------------------------------------------------------
-; This is called by NmiHandler when no user callback is registered.
-; Simply returns immediately.
-;------------------------------------------------------------------------------
-DefaultNmiCallback:
-    rtl
-
-;------------------------------------------------------------------------------
-; WaitForVBlank - PVSnesLib handshake protocol
-;------------------------------------------------------------------------------
-; Sets vblank_flag=1 ("main thread ready"), then halts with WAI.
-; NMI handler sees flag=1, does VBlank work (OAM, tilemap, scroll, joypads),
-; then clears flag=0. Main thread wakes, sees flag=0, proceeds.
-;
-; If game logic exceeds one frame (lag), flag stays 0 when NMI fires.
-; NMI skips all work and increments lag_frame_counter. No silent VRAM
-; corruption — lag is visible and debuggable.
-;
-; KEEP: X, Y (documented in interrupt.h, used by video.asm)
-;------------------------------------------------------------------------------
-WaitForVBlank:
-    php
-    sep #$20
-    lda #$01
-    sta.l oam_update_flag   ; Request OAM transfer
-    sta.l vblank_flag       ; Signal: "main thread ready"
--   wai                     ; Halt until NMI
-    lda.l vblank_flag
-    bne -                   ; Loop until NMI clears flag to 0
-    plp
+.ACCU 8
     rtl
 
 .ENDS
