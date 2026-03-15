@@ -5,6 +5,63 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.8.0] - 2026-03-15
+
+### opensnes-emu — Debug Emulator (NEW)
+
+- **SNES debug emulator** powered by snes9x (WASM): load ROMs, run frames, capture
+  screenshots, inspect VRAM/CGRAM/OAM/CPU/PPU state programmatically.
+- **MCP server** with 14 tools for Claude Code integration (stdio transport).
+- **Single source of truth**: `tests/` directory removed. All testing handled by
+  `node tools/opensnes-emu/test/run-all-tests.mjs` — 212 checks across 7 phases.
+- **Visual regression**: pixel-exact screenshot baselines for all 41 examples.
+- **Lag frame detection**: measures steady-state lag over 300 frames per example.
+- **Compiler benchmark**: cycle count comparison via `run-benchmark.mjs`.
+
+### Compiler
+
+- **fixMul/fixLerp**: rewritten in assembly using SNES hardware multiplier ($4202/$4203).
+  C version overflowed because `(s32)a*(s32)b` compiled to 16-bit `__mul16`.
+- **Alloc TSA**: alloc instruction now computes absolute stack address via `TSA+offset`,
+  preventing aliasing with tcc compiler registers at $0000-$001F.
+- **Benchmark baseline**: 33 functions, 1318 total cycles.
+
+### Library
+
+- **BG_4COLORS0 palette banking**: `bgInitTileSet` now computes CGRAM offset as
+  `bgNumber*32 + paletteEntry*4` for Mode 0 (matches PVSnesLib).
+- **HDMA channel 7 warning**: NMI handler uses DMA channel 7 for OAM — documented
+  in hdma.h, window/transparent_window examples fixed to use channels 4+5.
+- **fixMul/fixLerp/fixDiv**: hardware multiplier assembly (lib/source/math.asm).
+- **objUpdateXY**: header corrected — parameter is raw index, not handle.
+- **MultiPlayer5**: new mp5 module for multitap adapter support.
+
+### Runtime
+
+- **NMI handler**: MP5/mouse/scope extracted to SUPERFREE sections. Auto-joypad wait
+  before all input reading. OAM DMA revert (preconfigured channel optimization caused
+  Mesen2 regression — snes9x didn't catch it).
+
+### Examples (41 total, +4 new)
+
+- **Mode 0**: 4-layer 2bpp Kirby parallax demo (ported from PVSnesLib).
+- **Mode 3**: 256-color 8bpp static display with split DMA loader.
+- **Mode 5**: Hi-res 512×256 16-color display.
+- **Tetris**: Korobeiniki music (SNESMOD), multi-line clear fix, RNG fix, gravity fix.
+- **All 41 examples** now have README.md + screenshot.png.
+
+### Documentation
+
+- Streamlined root README (328→150 lines).
+- Removed MATURITY_REVIEW.md (replaced by opensnes-emu real metrics).
+- Updated all docs for 41 examples and opensnes-emu workflow.
+
+### Removed
+
+- `tests/` directory (17,701 lines) — fully migrated to opensnes-emu.
+- `devtools/benchmark/` and `devtools/check_mvn/` — handled by opensnes-emu.
+- `examples/benchmark/` — opensnes-emu handles benchmarking.
+
 ## [0.7.1] - 2026-03-10
 
 ### Build System
