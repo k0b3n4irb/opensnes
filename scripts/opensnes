@@ -1,0 +1,438 @@
+#!/bin/bash
+# opensnes — CLI tool for the OpenSNES SNES development SDK
+#
+# Usage:
+#     opensnes init <name> [--template TEMPLATE]
+#     opensnes build [--clean]
+#     opensnes run [--emulator EMULATOR]
+#     opensnes clean
+#     opensnes doctor
+
+set -e
+set -o pipefail
+
+# ---------------------------------------------------------------------------
+# Colors (disabled if not a terminal)
+# ---------------------------------------------------------------------------
+
+if [ -t 1 ]; then
+    BOLD='\033[1m'
+    GREEN='\033[32m'
+    YELLOW='\033[33m'
+    RED='\033[31m'
+    RESET='\033[0m'
+else
+    BOLD='' GREEN='' YELLOW='' RED='' RESET=''
+fi
+
+ok()   { printf "  ${GREEN}OK${RESET}: %s\n" "$1"; }
+warn() { printf "  ${YELLOW}WARN${RESET}: %s\n" "$1"; }
+fail() { printf "  ${RED}FAIL${RESET}: %s\n" "$1"; }
+die()  { echo "opensnes: error: $1" >&2; exit 1; }
+info() { echo "$1"; }
+
+# ---------------------------------------------------------------------------
+# SDK discovery
+# ---------------------------------------------------------------------------
+
+find_sdk_root() {
+    # 1. OPENSNES_HOME environment variable
+    if [ -n "$OPENSNES_HOME" ] && [ -f "$OPENSNES_HOME/make/common.mk" ]; then
+        echo "$(cd "$OPENSNES_HOME" && pwd)"
+        return
+    fi
+
+    # 2. Script location (bin/opensnes -> SDK root)
+    local script_dir
+    script_dir="$(cd "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "$0")")" && pwd)"
+    local sdk_from_script
+    sdk_from_script="$(dirname "$script_dir")"
+    if [ -f "$sdk_from_script/make/common.mk" ]; then
+        echo "$sdk_from_script"
+        return
+    fi
+
+    # 3. Walk up from cwd
+    local d
+    d="$(pwd)"
+    while true; do
+        if [ -f "$d/make/common.mk" ]; then
+            echo "$d"
+            return
+        fi
+        local parent
+        parent="$(dirname "$d")"
+        [ "$parent" = "$d" ] && break
+        d="$parent"
+    done
+
+    return 1
+}
+
+require_sdk() {
+    local sdk
+    sdk="$(find_sdk_root)" || die "Cannot find OpenSNES SDK. Set OPENSNES_HOME or run from the SDK tree."
+    echo "$sdk"
+}
+
+# ---------------------------------------------------------------------------
+# Project detection
+# ---------------------------------------------------------------------------
+
+find_project_root() {
+    local d
+    d="$(pwd)"
+    while true; do
+        if [ -f "$d/Makefile" ] && grep -q "common.mk" "$d/Makefile" 2>/dev/null; then
+            echo "$d"
+            return
+        fi
+        local parent
+        parent="$(dirname "$d")"
+        [ "$parent" = "$d" ] && break
+        d="$parent"
+    done
+
+    return 1
+}
+
+require_project() {
+    local proj
+    proj="$(find_project_root)" || die "No OpenSNES project found. Run 'opensnes init <name>' first."
+    echo "$proj"
+}
+
+# ---------------------------------------------------------------------------
+# Emulator detection
+# ---------------------------------------------------------------------------
+
+find_emulator() {
+    local preferred="$1"
+
+    if [ -n "$preferred" ]; then
+        command -v "$preferred" >/dev/null 2>&1 && { echo "$preferred"; return; }
+        die "Emulator not found: $preferred"
+    fi
+
+    local cmd
+    for cmd in mesen Mesen Mesen2 bsnes bsnes-hd snes9x snes9x-gtk; do
+        if command -v "$cmd" >/dev/null 2>&1; then
+            echo "$cmd"
+            return
+        fi
+    done
+
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Templates
+# ---------------------------------------------------------------------------
+
+write_template_blank() {
+    local dir="$1"
+
+    cat > "$dir/main.c" << 'MAIN_C'
+#include <snes.h>
+
+int main(void) {
+    consoleInit();
+    setMode(BG_MODE0, 0);
+
+    setColor(0, RGB(0, 0, 10));
+    setColor(1, RGB(31, 31, 31));
+    setMainScreen(LAYER_BG1);
+
+    textInit();
+    textLoadFont(0x0000);
+    bgSetGfxPtr(0, 0x0000);
+    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+
+    textPrintAt(8, 14, "HELLO SNES!");
+    textFlush();
+
+    WaitForVBlank();
+    setScreenOn();
+
+    while (1) {
+        WaitForVBlank();
+    }
+
+    return 0;
+}
+MAIN_C
+}
+
+write_template_game() {
+    local dir="$1"
+
+    cat > "$dir/main.c" << 'MAIN_C'
+#include <snes.h>
+
+static u16 pad;
+static s16 sprite_x = 120;
+static s16 sprite_y = 100;
+
+int main(void) {
+    consoleInit();
+
+    oamClear();
+
+    setScreenOn();
+
+    while (1) {
+        WaitForVBlank();
+
+        pad = padHeld(0);
+
+        if (pad & KEY_UP)    sprite_y--;
+        if (pad & KEY_DOWN)  sprite_y++;
+        if (pad & KEY_LEFT)  sprite_x--;
+        if (pad & KEY_RIGHT) sprite_x++;
+
+        oamSet(0, sprite_x, sprite_y, 0, 0, 0, 0);
+    }
+
+    return 0;
+}
+MAIN_C
+}
+
+lib_modules_for_template() {
+    case "$1" in
+        blank) echo "console dma text background sprite" ;;
+        game)  echo "console sprite dma input" ;;
+        *)     die "Unknown template: $1" ;;
+    esac
+}
+
+write_makefile() {
+    local dir="$1" name="$2" rom_name="$3" sdk="$4" lib_modules="$5"
+
+    # Pad ROM_NAME to 21 characters
+    rom_name="$(echo "$rom_name" | tr '[:lower:]' '[:upper:]')"
+    rom_name="$(printf '%-21.21s' "$rom_name")"
+
+    cat > "$dir/Makefile" << MAKEFILE
+# OpenSNES project: ${name}
+# Generated by: opensnes init
+
+OPENSNES := ${sdk}
+
+TARGET   := ${name}.sfc
+ROM_NAME := ${rom_name}
+
+CSRC     := main.c
+
+USE_LIB     := 1
+LIB_MODULES := ${lib_modules}
+
+include \$(OPENSNES)/make/common.mk
+MAKEFILE
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+cmd_init() {
+    local name="" template="blank"
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --template|-t) template="$2"; shift 2 ;;
+            -*)            die "Unknown option: $1" ;;
+            *)             name="$1"; shift ;;
+        esac
+    done
+
+    [ -z "$name" ] && die "Usage: opensnes init <name> [--template blank|game]"
+
+    local sdk
+    sdk="$(require_sdk)"
+
+    [ -e "$name" ] && die "Directory already exists: $name"
+
+    local lib_modules
+    lib_modules="$(lib_modules_for_template "$template")"
+
+    # Create project
+    mkdir -p "$name/res"
+
+    case "$template" in
+        blank) write_template_blank "$name" ;;
+        game)  write_template_game "$name" ;;
+        *)     die "Unknown template: $template. Available: blank, game" ;;
+    esac
+
+    local rom_name
+    rom_name="$(echo "$name" | tr '_-' '  ')"
+
+    write_makefile "$name" "$name" "$rom_name" "$sdk" "$lib_modules"
+
+    info "Created project: $name/"
+    info "  Template:  $template"
+    info "  SDK:       $sdk"
+    info ""
+    info "Next steps:"
+    info "  cd $name"
+    info "  opensnes build"
+    info "  opensnes run"
+}
+
+cmd_build() {
+    local clean=0
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --clean|-c) clean=1; shift ;;
+            *)          die "Unknown option: $1" ;;
+        esac
+    done
+
+    local sdk proj
+    sdk="$(require_sdk)"
+    proj="$(require_project)"
+
+    if [ "$clean" -eq 1 ]; then
+        OPENSNES_HOME="$sdk" make -C "$proj" clean
+    fi
+
+    OPENSNES_HOME="$sdk" make -C "$proj"
+}
+
+cmd_clean() {
+    local sdk proj
+    sdk="$(require_sdk)"
+    proj="$(require_project)"
+
+    OPENSNES_HOME="$sdk" make -C "$proj" clean
+}
+
+cmd_run() {
+    local emulator=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --emulator|-e) emulator="$2"; shift 2 ;;
+            *)             die "Unknown option: $1" ;;
+        esac
+    done
+
+    local sdk proj
+    sdk="$(require_sdk)"
+    proj="$(require_project)"
+
+    # Build first
+    OPENSNES_HOME="$sdk" make -C "$proj"
+
+    # Find .sfc ROM
+    local rom
+    rom="$(find "$proj" -maxdepth 1 -name '*.sfc' -print -quit)"
+    [ -z "$rom" ] && die "No .sfc file found after build."
+
+    # Find emulator
+    local emu
+    emu="$(find_emulator "$emulator")" || {
+        info "Built: $(basename "$rom")"
+        info "No emulator found. Install Mesen, bsnes, or snes9x."
+        info "Open manually: $rom"
+        return
+    }
+
+    info "Launching: $(basename "$emu") $(basename "$rom")"
+    "$emu" "$rom" >/dev/null 2>&1 &
+}
+
+cmd_doctor() {
+    local sdk
+    sdk="$(find_sdk_root)" || true
+
+    info "OpenSNES Doctor"
+    info "========================================"
+
+    # SDK
+    if [ -n "$sdk" ]; then
+        ok "SDK found: $sdk"
+    else
+        fail "SDK not found. Set OPENSNES_HOME."
+        return
+    fi
+
+    # Toolchain binaries
+    local bin_dir="$sdk/bin"
+    local b
+    for b in cc65816 qbe cproc-qbe wla-65816 wlalink gfx4snes smconv; do
+        if [ -x "$bin_dir/$b" ]; then
+            ok "$b"
+        else
+            fail "$b — not found in $bin_dir"
+        fi
+    done
+
+    # Library
+    local lorom_dir="$sdk/lib/build/lorom"
+    if [ -d "$lorom_dir" ]; then
+        local count
+        count="$(find "$lorom_dir" -name '*.o' | wc -l)"
+        ok "Library: $count modules (lorom)"
+    else
+        fail "Library not built. Run 'make lib' in SDK root."
+    fi
+
+    # Emulator
+    local emu
+    emu="$(find_emulator)" || true
+    if [ -n "$emu" ]; then
+        ok "Emulator: $(basename "$emu")"
+    else
+        warn "No emulator found. Install Mesen, bsnes, or snes9x."
+    fi
+
+    # Project
+    local proj
+    proj="$(find_project_root)" || true
+    if [ -n "$proj" ]; then
+        ok "Project: $proj"
+    else
+        info "  (no project in current directory)"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+usage() {
+    cat << 'EOF'
+opensnes — Modern SNES Development SDK
+
+Usage:
+    opensnes <command> [options]
+
+Commands:
+    init <name>   Create a new project (--template blank|game)
+    build         Build the current project (--clean to rebuild)
+    clean         Clean build artifacts
+    run           Build and run in emulator (--emulator NAME)
+    doctor        Check SDK installation
+
+Examples:
+    opensnes init my-game --template game
+    cd my-game && opensnes build
+    opensnes run --emulator mesen
+EOF
+    exit 0
+}
+
+[ $# -eq 0 ] && usage
+
+case "$1" in
+    init)    shift; cmd_init "$@" ;;
+    build)   shift; cmd_build "$@" ;;
+    clean)   shift; cmd_clean "$@" ;;
+    run)     shift; cmd_run "$@" ;;
+    doctor)  shift; cmd_doctor "$@" ;;
+    -h|--help|help) usage ;;
+    *)       die "Unknown command: $1. Run 'opensnes help' for usage." ;;
+esac

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "opensnes-emu": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/home/kobenairb/workspace/opensnes/tools/opensnes-emu/dist/server/mcp-server.js"]
+    }
+  }
+}

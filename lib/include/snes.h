@@ -111,5 +111,6 @@
 /* Collision: #include <snes/collision.h> */
 /* Entity: #include <snes/entity.h> */
 /* LZSS: #include <snes/lzss.h> */
+/* MultiPlayer5: #include <snes/mp5.h> */
 
 #endif /* OPENSNES_H */

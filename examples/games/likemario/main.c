@@ -19,12 +19,15 @@
  * External Data (from data.asm)
  *============================================================================*/
 
-extern u8 tiles_til[], tiles_tilend[];
-extern u8 tiles_pal[];
 extern u8 mario_sprite_til[];
-extern u8 mario_sprite_pal[];
 extern u8 mapmario[];
 extern u8 tilesetatt[];
+
+/* Assembly DMA loader — uses :label bank bytes for SUPERFREE data */
+extern void loadGraphics(void);
+
+/* Returns bank byte of mario_sprite_til for dynamic sprite engine */
+extern u8 getSpriteTilBank(void);
 
 /*============================================================================
  * Constants
@@ -256,7 +259,7 @@ static void mario_init(void) {
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
-    OAM_SET_GFX(0, mario_sprite_til);
+    OAM_SET_GFX_BANK(0, mario_sprite_til, getSpriteTilBank());
 }
 
 static void mario_handle_input(void) {
@@ -461,12 +464,10 @@ int main(void) {
     bgSetGfxPtr(0, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_MAP, SC_64x32);
 
-    bgInitTileSet(0, tiles_til, tiles_pal, 0,
-                  (u16)(tiles_tilend - tiles_til),
-                  16 * 2, BG_16COLORS, VRAM_BG_TILES);
+    /* DMA all tile/palette data with correct bank bytes (SUPERFREE may be bank $01+) */
+    loadGraphics();
 
     oamInitDynamicSprite(VRAM_SPR_LARGE, VRAM_SPR_SMALL, 0, 0, OBJ_SIZE8_L16);
-    dmaCopyCGram(mario_sprite_pal, 128, 16 * 2);
 
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
     mario_init();

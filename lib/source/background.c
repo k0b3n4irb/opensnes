@@ -130,8 +130,14 @@ void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
      */
     u16 colorIndex;
 
-    if (colorMode == BG_4COLORS || colorMode == BG_4COLORS0) {
-        /* 4 colors per palette, color index = entry * 4 */
+    if (colorMode == BG_4COLORS0) {
+        /* Mode 0: each BG has its own 4-color palette bank.
+         * BG0=CGRAM 0-3, BG1=32-35, BG2=64-67, BG3=96-99.
+         * colorIndex = bgNumber * 32 + paletteEntry * 4
+         * (matches PVSnesLib bgInitTileSet Mode 0 behavior) */
+        colorIndex = (u16)bgNumber * 32 + (u16)paletteEntry * 4;
+    } else if (colorMode == BG_4COLORS) {
+        /* Generic 4 colors (non-Mode 0), color index = entry * 4 */
         colorIndex = paletteEntry * 4;
     } else if (colorMode == BG_16COLORS) {
         /* 16 colors per palette, color index = entry * 16 */

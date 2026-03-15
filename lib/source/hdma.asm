@@ -113,7 +113,7 @@ hdmaSetup:
     lda #$00
     bra @set_bank
 @use_ram_bank:
-    ; RAM address (< $8000) - use bank $7E
+    ; RAM address (< $8000) - use bank $7E (WRAM)
     lda #$7E
 @set_bank:
     sta.l $0004,x           ; $43x4 = A1B (bank)

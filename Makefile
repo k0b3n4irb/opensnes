@@ -99,8 +99,8 @@ lib: compiler
 examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
-tests: compiler tools lib
-	$(MAKE) -C $(TESTS_PATH)
+tests:
+	@echo "Tests moved to tools/opensnes-emu. Run: node tools/opensnes-emu/test/run-all-tests.mjs"
 
 docs:
 	cd docs && doxygen Doxyfile
