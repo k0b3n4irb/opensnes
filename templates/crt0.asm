@@ -103,7 +103,6 @@
     pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
-    pad_count       dsb 1   ; Number of pads to read (1 or 2, default 1)
     snes_mplay5     dsb 1   ; 1 if MultiPlayer5 adapter is connected
     mp5read         dsb 1   ; Temporary for MultiPlayer5 plug detection
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
@@ -479,10 +478,6 @@ Start:
     stz oam_update_flag
     stz tilemap_update_flag
 
-    ; Default: read 1 pad only (saves ~35 cycles/frame)
-    lda #$01
-    sta pad_count
-
     ; Initialize VBlank callback to default (does nothing)
     rep #$20
     lda #DefaultNmiCallback
@@ -709,16 +704,30 @@ NmiHandler:
     beq @oam_done
     stz.w oam_update_flag
 
-    ; OAM DMA — channel 7 is preconfigured at boot (InitHardware).
-    ; Only reset OAM address, DMA size, and trigger.
-    ; Mode ($4370), dest ($4371), source addr ($4372-$4374) persist.
+    ; Set OAM address to 0 (word register — use 16-bit A)
     rep #$20
-    stz.w $2102             ; OAM address = 0
+    stz.w $2102             ; OAMADDL/H = 0
+
+    ; DMA channel 7: CPU→PPU, auto-increment, dest $2104 (OAMDATA)
+    lda.w #$0400
+    sta.w $4370             ; $4370 = mode ($00), $4371 = dest ($04)
+
+    ; Source: oamMemory ($7E:0300)
+    lda.w #oamMemory
+    sta.w $4372             ; Source address low/high
+    sep #$20
+    lda.b #:oamMemory       ; Source bank ($7E)
+    sta.w $4374
+
+    ; Transfer size: 544 bytes ($0220)
+    rep #$20
     lda.w #$0220
-    sta.w $4375             ; DMA size (544 bytes)
+    sta.w $4375             ; DMA size
+
+    ; Start DMA channel 7
     sep #$20
     lda.b #$80
-    sta.w $420B             ; Start DMA channel 7
+    sta.w $420B             ; MDMAEN: channel 7
 @oam_done:
 
     ;--------------------------------------------------------------------------
@@ -894,13 +903,7 @@ NmiHandler:
     and.w pad_keys
     sta.w pad_keysdown
 
-    ; Read joypad 2 (only if pad_count >= 2)
-    sep #$20
-    lda.w pad_count
-    cmp #$02
-    rep #$20
-    bcc @pad2_done
-
+    ; Read joypad 2
     lda $421A           ; 16-bit: A = JOY2H:JOY2L
     bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
     beq ++
@@ -910,7 +913,6 @@ NmiHandler:
     eor.w pad_keysold+2
     and.w pad_keys+2
     sta.w pad_keysdown+2
-@pad2_done:
 
     ;--------------------------------------------------------------------------
     ; 5c. Skip mouse/scope if MultiPlayer5 active (incompatible devices)
