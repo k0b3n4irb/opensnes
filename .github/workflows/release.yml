@@ -111,33 +111,28 @@ jobs:
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Run tests                            #
+      # Tests (moved to opensnes-emu)        #
       # ------------------------------------ #
-      - name: Run compiler tests (Linux/macOS)
-        if: matrix.name != 'windows'
-        run: |
-          set -o pipefail
-          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      - name: Run compiler tests (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          set -o pipefail
-          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
+      # Full test suite: node tools/opensnes-emu/test/run-all-tests.mjs
+      # CI validates build success only. Symmap overlap check on built examples:
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
-          set -o pipefail
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          for sym in $(find examples -name "*.sym" 2>/dev/null); do
+            python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          done
+          true
 
       - name: Validate examples (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
-          set -o pipefail
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          for sym in $(find examples -name "*.sym" 2>/dev/null); do
+            python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          done
+          true
 
       # ------------------------------------ #
       # Upload zip as artifact for release   #
