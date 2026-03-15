@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_audio_snesmod_sfx.html',''); 
 <div class="caption">
 Screenshot</div></div>
     <p>Sound effect playback with pitch control using SNESMOD.</p>
-<h2><a class="anchor" id="autotoc_md498"></a>
+<h2><a class="anchor" id="autotoc_md467"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>SNESMOD sound effect playback</li>
@@ -109,14 +109,14 @@ Learning Objectives</h2>
 <li>Real-time pitch modification</li>
 <li>Using SNESMOD without background music</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md499"></a>
+<h2><a class="anchor" id="autotoc_md468"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed basic audio examples</li>
 <li>Understanding of SNESMOD initialization</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md501"></a>
+<h2><a class="anchor" id="autotoc_md470"></a>
 What This Example Does</h2>
 <p>Demonstrates SNESMOD sound effect system:</p><ul>
 <li>Multiple sound effects mapped to buttons</li>
@@ -145,7 +145,7 @@ What This Example Does</h2>
 <li>D-Pad Left/Right: Cycle pitch (Low/Normal/High)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md503"></a>
+<h2><a class="anchor" id="autotoc_md472"></a>
 Code Type</h2>
 <p><b>C with Library Functions</b></p>
 <table class="markdownTable">
@@ -163,16 +163,16 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Input   </td><td class="markdownTableBodyNone">Direct register access   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md505"></a>
+<h2><a class="anchor" id="autotoc_md474"></a>
 SNESMOD Sound Effects</h2>
-<h3><a class="anchor" id="autotoc_md506"></a>
+<h3><a class="anchor" id="autotoc_md475"></a>
 Initialization</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Initialize SNESMOD with soundbank */</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>(soundbank);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* No music needed - just SFX */</span></div>
 <div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md507"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md476"></a>
 Playing Effects</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Play sound effect with pitch parameter */</span></div>
 <div class="line">snesmodPlaySfx(SFX_TADA, pitch);</div>
@@ -183,9 +183,9 @@ Playing Effects</h3>
 <div class="line"><span class="comment">   - 2: High pitch</span></div>
 <div class="line"><span class="comment">*/</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md509"></a>
+<h2><a class="anchor" id="autotoc_md478"></a>
 Pitch Control</h2>
-<h3><a class="anchor" id="autotoc_md510"></a>
+<h3><a class="anchor" id="autotoc_md479"></a>
 Pitch Modes</h3>
 <div class="fragment"><div class="line"><span class="keyword">enum</span> PitchMode {</div>
 <div class="line">    PITCH_LOW = 0,</div>
@@ -195,7 +195,7 @@ Pitch Modes</h3>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> current_pitch = PITCH_NORMAL;</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md511"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md480"></a>
 Cycling Pitch</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
 <div class="line">    current_pitch++;</div>
@@ -206,7 +206,7 @@ Cycling Pitch</h3>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md513"></a>
+<h2><a class="anchor" id="autotoc_md482"></a>
 Soundbank Structure</h2>
 <p>SNESMOD soundbanks contain:</p><ul>
 <li>BRR sample data</li>
@@ -214,18 +214,18 @@ Soundbank Structure</h2>
 <li>Optional music patterns</li>
 <li>Sound effect triggers</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md514"></a>
+<h3><a class="anchor" id="autotoc_md483"></a>
 Creating a Soundbank</h3>
 <div class="fragment"><div class="line"># Convert samples and create soundbank</div>
 <div class="line">smconv -s soundbank.bnk sample1.wav sample2.wav ...</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md516"></a>
+<h2><a class="anchor" id="autotoc_md485"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_sfx</div>
 </div><!-- fragment --><p>Then open <code>sfx.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md518"></a>
+<h2><a class="anchor" id="autotoc_md487"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -238,17 +238,17 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md520"></a>
+<h2><a class="anchor" id="autotoc_md489"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md521"></a>
+<h3><a class="anchor" id="autotoc_md490"></a>
 Exercise 1: Volume Control</h3>
 <p>Add volume adjustment: </p><div class="fragment"><div class="line"><span class="comment">/* If SNESMOD supports volume parameter */</span></div>
 <div class="line">snesmodPlaySfxVol(SFX_TADA, pitch, volume);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md522"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md491"></a>
 Exercise 2: Random Pitch</h3>
 <p>Randomize pitch on each play: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> random_pitch = (frame_counter % 3);</div>
 <div class="line">snesmodPlaySfx(SFX_TADA, random_pitch);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md523"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md492"></a>
 Exercise 3: Rapid Fire</h3>
 <p>Allow holding button for repeated sounds: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="keywordflow">if</span> (sfx_cooldown == 0) {</div>
@@ -258,33 +258,33 @@ Exercise 3: Rapid Fire</h3>
 <div class="line">}</div>
 <div class="line"><span class="keywordflow">if</span> (sfx_cooldown &gt; 0) sfx_cooldown--;</div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md524"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md493"></a>
 Exercise 4: Sound Sequence</h3>
 <p>Play a sequence of sounds: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sequence[] = {SFX_TADA, SFX_PIANO, SFX_STRINGS};</div>
 <div class="line"><span class="comment">/* Play each with delay between */</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md526"></a>
+<h2><a class="anchor" id="autotoc_md495"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md527"></a>
+<h3><a class="anchor" id="autotoc_md496"></a>
 SFX Channels</h3>
 <p>SNESMOD reserves channels for SFX:</p><ul>
 <li>Music uses channels 0-5 (configurable)</li>
 <li>SFX typically use channels 6-7</li>
 <li>Check soundbank configuration</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md528"></a>
+<h3><a class="anchor" id="autotoc_md497"></a>
 Polyphony</h3>
 <p>Playing a new SFX may cut off a previous one depending on channel allocation. Plan your sound design accordingly.</p>
-<h3><a class="anchor" id="autotoc_md529"></a>
+<h3><a class="anchor" id="autotoc_md498"></a>
 Sample Rate</h3>
 <p>SNESMOD samples play at their original rate. Pitch parameter shifts playback speed, affecting both pitch and duration.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md531"></a>
+<h2><a class="anchor" id="autotoc_md500"></a>
 What's Next?</h2>
 <p><b>SNESMOD Music:</b> <a href="../snesmod_music/">SNESMOD Music</a> - Tracker music playback</p>
 <p><b>Graphics:</b> <a href="../../graphics/sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md533"></a>
+<h2><a class="anchor" id="autotoc_md502"></a>
 License</h2>
 <p>Code: MIT Samples: See soundbank source </p>
 </div></div><!-- contents -->
@@ -293,7 +293,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

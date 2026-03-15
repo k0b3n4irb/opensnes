@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_parallax_scr
 <div class="caption">
 Screenshot</div></div>
     <p>Multi-speed horizontal scrolling using HDMA &ndash; one background image, three scroll zones.</p>
-<h2><a class="anchor" id="autotoc_md881"></a>
+<h2><a class="anchor" id="autotoc_md850"></a>
 What This Example Shows</h2>
 <ul>
 <li>Splitting the screen into horizontal zones with different scroll speeds</li>
@@ -109,17 +109,17 @@ What This Example Shows</h2>
 <li>Creating a depth illusion with a single background layer</li>
 <li>Updating HDMA table values at runtime from C</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md882"></a>
+<h2><a class="anchor" id="autotoc_md851"></a>
 Controls</h2>
 <p>No interactive controls. The background scrolls automatically in three horizontal bands at different speeds.</p>
-<h2><a class="anchor" id="autotoc_md883"></a>
+<h2><a class="anchor" id="autotoc_md852"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/parallax_scrolling</div>
 </div><!-- fragment --><p>Then open <code>parallax_scrolling.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md884"></a>
+<h2><a class="anchor" id="autotoc_md853"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md885"></a>
+<h3><a class="anchor" id="autotoc_md854"></a>
 The Parallax Technique</h3>
 <p>Real parallax scrolling uses multiple BG layers at different speeds. This example achieves the same depth effect with a <b>single layer</b> by using HDMA to change the horizontal scroll register at different screen positions.</p>
 <p>The screen is divided into three zones:</p>
@@ -133,7 +133,7 @@ The Parallax Technique</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Bottom   </td><td class="markdownTableBodyNone">64 lines   </td><td class="markdownTableBodyNone">+4 px/frame   </td><td class="markdownTableBodyNone">Grass/ground (close, fast)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md886"></a>
+<h3><a class="anchor" id="autotoc_md855"></a>
 HDMA Scroll Table</h3>
 <p>The HDMA table lives in RAM so it can be updated each frame:</p>
 <div class="fragment"><div class="line">Byte 0: 72          Line count (top zone)</div>
@@ -143,15 +143,15 @@ HDMA Scroll Table</h3>
 <div class="line">Byte 6: 64          Line count (bottom zone)</div>
 <div class="line">Byte 7-8: scroll    16-bit horizontal offset</div>
 <div class="line">Byte 9: 0x00        End marker</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md887"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md856"></a>
 HDMA Setup</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, scroll_table);</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s)</div></div>
-<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:118</div></div>
+<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
 <div class="ttc" id="ahdma_8h_html_adf1c0451139948b3f1049b84580ce906"><div class="ttname"><a href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a></div><div class="ttdeci">void hdmaParallax(u8 channel, u8 bg, const void *scrollTable)</div><div class="ttdoc">Set up a background parallax scroll effect.</div></div>
 </div><!-- fragment --><p>The <code><a class="el" href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906" title="Set up a background parallax scroll effect.">hdmaParallax()</a></code> function configures HDMA mode <code>1REG_2X</code> on the specified channel, targeting the BG horizontal scroll register. Mode <code>1REG_2X</code> writes 2 bytes to the same register &ndash; the low byte and high byte of the scroll position.</p>
-<h3><a class="anchor" id="autotoc_md888"></a>
+<h3><a class="anchor" id="autotoc_md857"></a>
 Animation Loop</h3>
 <p>Each frame, the main loop increments the scroll offsets at different rates:</p>
 <div class="fragment"><div class="line">*(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;scroll_table[1] += 1;  <span class="comment">/* +1 px/frame (slow) */</span></div>
@@ -159,18 +159,18 @@ Animation Loop</h3>
 <div class="line">*(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;scroll_table[7] += 4;  <span class="comment">/* +4 px/frame (fast) */</span></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --><p>Because the table lives in RAM, the HDMA hardware reads the updated values on the next frame automatically.</p>
-<h2><a class="anchor" id="autotoc_md889"></a>
+<h2><a class="anchor" id="autotoc_md858"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md890"></a>
+<h3><a class="anchor" id="autotoc_md859"></a>
 BG1HOFS ($210D) – Write-Twice Register</h3>
 <p>BG scroll registers on the SNES are "write-twice" latched registers. You write the low byte first, then the high byte, both to the same address. HDMA mode <code>1REG_2X</code> handles this automatically by writing 2 bytes per entry to the target address.</p>
-<h3><a class="anchor" id="autotoc_md891"></a>
+<h3><a class="anchor" id="autotoc_md860"></a>
 64x32 Tilemap for Seamless Wrapping</h3>
 <p>The example uses a 64x32 tilemap (512 pixels wide). When the scroll offset exceeds 512, the tilemap wraps seamlessly because the PPU performs modular addressing on the tilemap. This is wider than the screen (256 pixels), so there is always enough off-screen content to scroll into.</p>
-<h3><a class="anchor" id="autotoc_md892"></a>
+<h3><a class="anchor" id="autotoc_md861"></a>
 Why This Works with One Layer</h3>
 <p>In a true multi-layer parallax, BG1 and BG2 have independent scroll registers. But HDMA can rewrite BG1HOFS at different points during the frame, effectively giving each screen zone its own scroll speed. The limitation is that you cannot overlap the zones &ndash; each zone is a strict horizontal band.</p>
-<h2><a class="anchor" id="autotoc_md893"></a>
+<h2><a class="anchor" id="autotoc_md862"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -184,7 +184,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma background sprite hdma input math</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md894"></a>
+<h2><a class="anchor" id="autotoc_md863"></a>
 Going Further</h2>
 <ul>
 <li><b>Player-controlled scroll</b>: Replace the automatic scroll with D-pad input. Only increment the offsets when a direction is held.</li>
@@ -201,7 +201,7 @@ Going Further</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

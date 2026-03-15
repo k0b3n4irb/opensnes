@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('hardware_overview.html',''); initResiz
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Understanding SNES hardware is essential for effective game development.</p>
-<h2><a class="anchor" id="autotoc_md376"></a>
+<h2><a class="anchor" id="autotoc_md345"></a>
 Contents</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -110,9 +110,9 @@ Contents</h2>
 <td class="markdownTableBodyNone"><a class="el" href="OAM_8md.html">OAM</a>   </td><td class="markdownTableBodyNone">Sprite attribute memory documentation   </td></tr>
 </table>
 <p>For graphics (PPU, tiles, modes, palettes), see the <a class="el" href="SNES__GRAPHICS__GUIDE_8md.html">SNES Graphics Guide</a>. For audio (SPC700, DSP, BRR, SNESMOD), see the <a class="el" href="SNES__SOUND__GUIDE_8md.html">SNES Sound Guide</a>.</p>
-<h2><a class="anchor" id="autotoc_md377"></a>
+<h2><a class="anchor" id="autotoc_md346"></a>
 Quick Reference</h2>
-<h3><a class="anchor" id="autotoc_md378"></a>
+<h3><a class="anchor" id="autotoc_md347"></a>
 Specifications</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -132,7 +132,7 @@ Specifications</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Audio RAM   </td><td class="markdownTableBodyNone">64 KB   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md379"></a>
+<h3><a class="anchor" id="autotoc_md348"></a>
 Resolution</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -144,23 +144,23 @@ Resolution</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Hi-res   </td><td class="markdownTableBodyNone">512x224 (limited use)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md380"></a>
+<h3><a class="anchor" id="autotoc_md349"></a>
 Colors</h3>
 <ul>
 <li>15-bit color (32768 colors)</li>
 <li>256 simultaneous colors (8 palettes x 16 colors for BG, same for sprites)</li>
 <li>Format: <code>0BBBBBGGGGGRRRRR</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md381"></a>
+<h2><a class="anchor" id="autotoc_md350"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md382"></a>
+<h3><a class="anchor" id="autotoc_md351"></a>
 Vertical Blank (VBlank)</h3>
 <p>The PPU draws the screen line by line. VBlank is the period when the PPU is not drawing (returning to top of screen). This is the <b>only safe time</b> to update VRAM, OAM, and CGRAM.</p>
 <div class="fragment"><div class="line"><span class="comment">// Wait for VBlank before updating graphics</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"><span class="comment">// Now safe to DMA to VRAM</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md383"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md352"></a>
 Tiles and Sprites</h3>
 <p><b>Tiles</b> are 8x8 pixel graphics used for both backgrounds and sprites.</p>
 <p><b>Sprites</b> (Objects/OBJ) are movable graphics composed of one or more tiles:</p><ul>
@@ -169,7 +169,7 @@ Tiles and Sprites</h3>
 <li>32 sprites per scanline limit</li>
 <li>Can be flipped horizontally/vertically</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md384"></a>
+<h3><a class="anchor" id="autotoc_md353"></a>
 Background Modes</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -192,14 +192,14 @@ Background Modes</h3>
 <td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">256   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">Mode 7 rotation   </td></tr>
 </table>
 <p>Most games use <b>Mode 1</b> (good balance of features).</p>
-<h3><a class="anchor" id="autotoc_md385"></a>
+<h3><a class="anchor" id="autotoc_md354"></a>
 Banks and Addressing</h3>
 <p>The 65816 has a 24-bit address space divided into 256 "banks" of 64KB each:</p>
 <div class="fragment"><div class="line">$00:0000 - $00:FFFF  Bank 0 (direct page, stack, I/O)</div>
 <div class="line">$7E:0000 - $7E:FFFF  Work RAM (low 64KB)</div>
 <div class="line">$7F:0000 - $7F:FFFF  Work RAM (high 64KB)</div>
 <div class="line">$80:0000 - $FF:FFFF  ROM and mirrors</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md386"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md355"></a>
 LoROM vs HiROM</h3>
 <p>ROM mapping modes affect how cartridge ROM appears in the address space:</p>
 <table class="markdownTable">
@@ -213,7 +213,7 @@ LoROM vs HiROM</h3>
 <td class="markdownTableBodyNone">ExHiROM   </td><td class="markdownTableBodyNone">Varies   </td><td class="markdownTableBodyNone">8 MB   </td><td class="markdownTableBodyNone">Very large games   </td></tr>
 </table>
 <p>OpenSNES uses <b>LoROM</b> by default.</p>
-<h2><a class="anchor" id="autotoc_md387"></a>
+<h2><a class="anchor" id="autotoc_md356"></a>
 Further Reading</h2>
 <ul>
 <li><a href="https://snes.nesdev.org/">SNESdev Wiki</a> - Comprehensive hardware docs</li>

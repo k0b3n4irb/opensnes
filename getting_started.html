@@ -97,26 +97,26 @@ $(document).ready(function(){initNavTree('getting_started.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This guide will get you from zero to running your first SNES ROM in about 10 minutes.</p>
-<h2><a class="anchor" id="autotoc_md125"></a>
+<h2><a class="anchor" id="autotoc_md126"></a>
 What You'll Need</h2>
 <ul>
 <li><b>C programming basics</b> - if you can write a for loop, you're ready</li>
 <li><b>Curiosity</b> - the SNES is a fascinating machine</li>
 <li><b>An emulator</b> - to test your ROMs</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md126"></a>
+<h2><a class="anchor" id="autotoc_md127"></a>
 Step 1: Install Prerequisites</h2>
-<h3><a class="anchor" id="autotoc_md127"></a>
+<h3><a class="anchor" id="autotoc_md128"></a>
 macOS</h3>
 <div class="fragment"><div class="line">xcode-select --install</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md128"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md129"></a>
 Linux (Ubuntu/Debian)</h3>
 <div class="fragment"><div class="line">sudo apt update</div>
 <div class="line">sudo apt install build-essential clang cmake make git python3</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md129"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md130"></a>
 Linux (Fedora)</h3>
 <div class="fragment"><div class="line">sudo dnf install clang cmake make git python3</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md130"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md131"></a>
 Windows</h3>
 <ol type="1">
 <li>Install <a href="https://www.msys2.org/">MSYS2</a></li>
@@ -125,7 +125,7 @@ Windows</h3>
 </ol>
 <div class="fragment"><div class="line">pacman -Syu</div>
 <div class="line">pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md131"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md132"></a>
 Step 2: Get an Emulator</h2>
 <p>Pick one (Mesen is recommended for debugging):</p>
 <table class="markdownTable">
@@ -138,9 +138,9 @@ Step 2: Get an Emulator</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="https://www.snes9x.com/">Snes9x</a>   </td><td class="markdownTableBodyNone">Performance   </td><td class="markdownTableBodyNone">snes9x.com   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md132"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Step 3: Get OpenSNES</h2>
-<h3><a class="anchor" id="autotoc_md133"></a>
+<h3><a class="anchor" id="autotoc_md134"></a>
 Option A: Download Pre-built SDK (recommended)</h3>
 <p>Download the latest release for your platform from the <a href="https://github.com/k0b3n4irb/opensnes/releases">GitHub Releases page</a>:</p>
 <table class="markdownTable">
@@ -154,7 +154,7 @@ Option A: Download Pre-built SDK (recommended)</h3>
 <td class="markdownTableBodyNone">Windows x86_64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_windows_x86_64.zip</code>   </td></tr>
 </table>
 <p>Extract the zip and note the path — you'll need it for your project's Makefile.</p>
-<h3><a class="anchor" id="autotoc_md134"></a>
+<h3><a class="anchor" id="autotoc_md135"></a>
 Option B: Build from source</h3>
 <div class="fragment"><div class="line"># Clone with submodules (--recursive is required!)</div>
 <div class="line">git clone --recursive https://github.com/k0b3n4irb/opensnes.git</div>
@@ -167,7 +167,7 @@ Option B: Build from source</h3>
 <div class="line">Building WLA-DX assembler...</div>
 <div class="line">Building OpenSNES library...</div>
 <div class="line">Building examples... (37 ROMs)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md135"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md136"></a>
 Step 4: Run Your First ROM</h2>
 <div class="fragment"><div class="line"># Navigate to hello world example</div>
 <div class="line">cd examples/text/hello_world</div>
@@ -180,7 +180,7 @@ Step 4: Run Your First ROM</h2>
 <div class="line"># Windows:</div>
 <div class="line">start Mesen.exe hello_world.sfc</div>
 </div><!-- fragment --><p>You should see "Hello World!" on screen.</p>
-<h2><a class="anchor" id="autotoc_md136"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Step 5: Create Your Own Project</h2>
 <p>The easiest way is to copy an existing example:</p>
 <div class="fragment"><div class="line"># From the opensnes root directory</div>
@@ -192,7 +192,7 @@ Step 5: Create Your Own Project</h2>
 <div class="line"># Build</div>
 <div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
 <div class="line">make</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md137"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md138"></a>
 Minimal Project Structure</h3>
 <div class="fragment"><div class="line">my-snes-game/</div>
 <div class="line">├── Makefile        # Build configuration</div>
@@ -200,7 +200,7 @@ Minimal Project Structure</h3>
 <div class="line">└── res/            # Assets (optional)</div>
 <div class="line">    ├── tiles.png</div>
 <div class="line">    └── music.it</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md138"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md139"></a>
 Minimal Makefile</h3>
 <div class="fragment"><div class="line"># Point to your OpenSNES installation</div>
 <div class="line">OPENSNES := /path/to/opensnes</div>
@@ -218,7 +218,7 @@ Minimal Makefile</h3>
 <div class="line"> </div>
 <div class="line"># Include the build system</div>
 <div class="line">include $(OPENSNES)/make/common.mk</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md139"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md140"></a>
 Minimal main.c</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -243,7 +243,7 @@ Minimal main.c</h3>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md140"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md141"></a>
 What's Next?</h2>
 <p>Now that you have a working setup, explore by complexity:</p>
 <table class="markdownTable">
@@ -259,19 +259,19 @@ What's Next?</h2>
 <td class="markdownTableBodyNone"><b>Expert</b>   </td><td class="markdownTableBodyNone"><code>games/breakout</code>, <code>games/likemario</code>   </td><td class="markdownTableBodyNone">Complete game structure   </td></tr>
 </table>
 <p>Browse all examples: </p><div class="fragment"><div class="line">ls -la examples/*/</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md141"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md142"></a>
 Troubleshooting</h2>
-<h3><a class="anchor" id="autotoc_md142"></a>
+<h3><a class="anchor" id="autotoc_md143"></a>
 "command not found: make"</h3>
 <p>Install build tools (see Step 1).</p>
-<h3><a class="anchor" id="autotoc_md143"></a>
+<h3><a class="anchor" id="autotoc_md144"></a>
 "fatal: repository not found" or empty compiler folder</h3>
 <p>You forgot <code>--recursive</code>. Fix it: </p><div class="fragment"><div class="line">git submodule update --init --recursive</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md144"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md145"></a>
 "OPENSNES_HOME not set" or "No rule to make target"</h3>
 <p>Set the environment variable: </p><div class="fragment"><div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
 </div><!-- fragment --><p>Add to your shell profile (<code>~/.bashrc</code> or <code>~/.zshrc</code>) to make it permanent.</p>
-<h3><a class="anchor" id="autotoc_md145"></a>
+<h3><a class="anchor" id="autotoc_md146"></a>
 Black screen when running ROM</h3>
 <p>Your ROM built but doesn't display anything. Common causes:</p><ol type="1">
 <li>Missing <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> call</li>
@@ -279,13 +279,13 @@ Black screen when running ROM</h3>
 <li>Memory overlap (run <code>python3 devtools/symmap/symmap.py --check-overlap game.sym</code>)</li>
 </ol>
 <p>See <a class="el" href="TROUBLESHOOTING_8md.html">TROUBLESHOOTING.md</a> for more solutions.</p>
-<h3><a class="anchor" id="autotoc_md146"></a>
+<h3><a class="anchor" id="autotoc_md147"></a>
 Build fails with "unhandled op" or assembly errors</h3>
 <p>This is usually a compiler limitation. Check:</p><ul>
 <li>Are you using <code>u32</code>/<code>s32</code>? Prefer <code>u16</code>/<code>s16</code> when possible</li>
 <li>Both <code>static u8 x = 0;</code> and <code>static u8 x;</code> work correctly</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md147"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 Getting Help</h2>
 <ul>
 <li><b>Issues</b>: <a href="https://github.com/k0b3n4irb/opensnes/issues">github.com/k0b3n4irb/opensnes/issues</a></li>

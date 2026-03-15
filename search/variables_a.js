@@ -1,9 +1,19 @@
 var searchData=
 [
-  ['palette_0',['palette',['../structEntity.html#a5efeef49b8855233c4c0f4ab51cc23d2',1,'Entity::palette'],['../structTextConfig.html#ac6b1c43751406d6f420330ea3a6702d7',1,'TextConfig::palette']]],
-  ['pan_1',['pan',['../structAudioVoiceState.html#a958df6d83cacade9da5a08873d156cc0',1,'AudioVoiceState']]],
-  ['parentid_2',['parentID',['../structt__objs.html#a126da553800ad52ce87634a199c222a2',1,'t_objs']]],
-  ['pitch_3',['pitch',['../structAudioVoiceState.html#a1632b1574afdfe799aacde4c2c491e1e',1,'AudioVoiceState']]],
-  ['prev_4',['prev',['../structt__objs.html#a75a67b882b8b551803155c2fa879900b',1,'t_objs']]],
-  ['priority_5',['priority',['../structEntity.html#a99ca400c412a842f986b1c4cccc53b59',1,'Entity::priority'],['../structTextConfig.html#abea1aa5c5f5f7fc8853914a157998d56',1,'TextConfig::priority']]]
+  ['oam_5fupdate_5fflag_0',['oam_update_flag',['../system_8h.html#aebb6082d6353b65122e8009f24a5e494',1,'system.h']]],
+  ['oamattribute_1',['oamattribute',['../structt__sprites.html#ac0fb1ea59809017c11430630430e864d',1,'t_sprites']]],
+  ['oambuffer_2',['oambuffer',['../sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f',1,'sprite.h']]],
+  ['oamframeid_3',['oamframeid',['../structt__sprites.html#a0928afd4ac9d8c3c5cceefa44c3a520a',1,'t_sprites']]],
+  ['oamgfxaddr_4',['oamgfxaddr',['../structt__sprites.html#a700775b8be7bf28d8df89ebe0aafa366',1,'t_sprites']]],
+  ['oamgfxbank_5',['oamgfxbank',['../structt__sprites.html#aa6d796f63ca5dfef7af5e62efea3aeb2',1,'t_sprites']]],
+  ['oammemory_6',['oamMemory',['../system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9',1,'system.h']]],
+  ['oamrefresh_7',['oamrefresh',['../structt__sprites.html#ac4e74ac3a1b9ad5b2f756c512f608cb8',1,'t_sprites']]],
+  ['oamx_8',['oamx',['../structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004',1,'t_sprites']]],
+  ['oamy_9',['oamy',['../structt__sprites.html#a6c499b96e640bbad488eb8874bf36281',1,'t_sprites']]],
+  ['objgetid_10',['objgetid',['../object_8h.html#ad4b2cf3a008d2011baf65b7ed74eaf65',1,'object.h']]],
+  ['objnotused_11',['objnotused',['../structt__objs.html#aed65e6435d869acf9aa711fa28e740de',1,'t_objs']]],
+  ['objptr_12',['objptr',['../object_8h.html#a9e81915d1e68d22798a93bb27eb74188',1,'object.h']]],
+  ['objtokill_13',['objtokill',['../object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3',1,'object.h']]],
+  ['objworkspace_14',['objWorkspace',['../object_8h.html#aff685114554f887d186a87bacbe786b9',1,'object.h']]],
+  ['onscreen_15',['onscreen',['../structt__objs.html#a158edcd064c0b2a21b8eea4cc5dcfa8a',1,'t_objs']]]
 ];

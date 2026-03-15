@@ -102,17 +102,17 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_transparent_
 Screenshot</div></div>
     <p>A semi-transparent darkened rectangle rendered over a background image using SNES color math and HDMA-driven window boundaries. No input &ndash; the effect is static.</p>
 <p>Ported from PVSnesLib "TransparentWindow" example by Digifox.</p>
-<h2><a class="anchor" id="autotoc_md947"></a>
+<h2><a class="anchor" id="autotoc_md916"></a>
 Controls</h2>
 <p>No interactive controls. The darkened rectangle is displayed statically.</p>
-<h2><a class="anchor" id="autotoc_md948"></a>
+<h2><a class="anchor" id="autotoc_md917"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/transparent_window</div>
 </div><!-- fragment --><p>Then open <code>transparent_window.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md949"></a>
+<h2><a class="anchor" id="autotoc_md918"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md950"></a>
+<h3><a class="anchor" id="autotoc_md919"></a>
 The Technique</h3>
 <p>This combines three SNES hardware features:</p>
 <ol type="1">
@@ -120,7 +120,7 @@ The Technique</h3>
 <li><b>Window masking</b> restricts color math to the rectangular region</li>
 <li><b>Color math</b> subtracts a fixed color inside the window, darkening pixels</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md951"></a>
+<h3><a class="anchor" id="autotoc_md920"></a>
 Window for Color Math (Not for BG Masking)</h3>
 <p>The key insight: windows can control <b>where color math applies</b> independently from where they mask background layers.</p>
 <ul>
@@ -129,14 +129,14 @@ Window for Color Math (Not for BG Masking)</h3>
 <li>The background is fully visible everywhere</li>
 <li>But inside the window rectangle, color math darkens the pixels</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md952"></a>
+<h3><a class="anchor" id="autotoc_md921"></a>
 HDMA Rectangle</h3>
 <p>Two HDMA channels define the rectangle shape by driving WH0 ($2126) and WH1 ($2127):</p>
 <div class="fragment"><div class="line">Lines  0-95:  WH0=255, WH1=0  -&gt; window disabled (left &gt; right = no region)</div>
 <div class="line">Lines 96-207: WH0=40,  WH1=216 -&gt; rectangle from x=40 to x=216</div>
 <div class="line">Lines 208+:   WH0=255, WH1=0  -&gt; window disabled again</div>
 </div><!-- fragment --><p>The tables use <b>repeat mode</b> (bit 7 set in the line count byte) for the rectangle segment. Even though the values are constant across those scanlines, repeat mode ensures WH0/WH1 are re-written every line. This is required because WH0/WH1 are write-only PPU registers.</p>
-<h3><a class="anchor" id="autotoc_md953"></a>
+<h3><a class="anchor" id="autotoc_md922"></a>
 Color Math Configuration</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -148,19 +148,19 @@ Color Math Configuration</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">COLDATA ($2132)   </td><td class="markdownTableBodyNone"><code>0xEC</code>   </td><td class="markdownTableBodyNone">Subtract intensity 12 from R+G+B (moderate darkening)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md954"></a>
+<h2><a class="anchor" id="autotoc_md923"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md955"></a>
+<h3><a class="anchor" id="autotoc_md924"></a>
 Color Math Window vs BG Window</h3>
 <p>The SNES window system serves two independent purposes:</p><ul>
 <li><b>BG/OBJ masking</b> (controlled by W12SEL/$2123 and TMW/$212E): hides pixels inside or outside the window</li>
 <li><b>Color math region</b> (controlled by WOBJSEL/$2125 and CGWSEL/$2130): restricts where add/subtract blending applies</li>
 </ul>
 <p>This example uses only the color math window, leaving BG masking untouched. The background is fully visible everywhere, but the rectangular region gets darkened.</p>
-<h3><a class="anchor" id="autotoc_md956"></a>
+<h3><a class="anchor" id="autotoc_md925"></a>
 Practical Use</h3>
 <p>This technique is used in RPGs for dialog boxes (darken the area behind text), menu overlays, and spotlight effects. It costs zero CPU time &ndash; all hardware.</p>
-<h2><a class="anchor" id="autotoc_md957"></a>
+<h2><a class="anchor" id="autotoc_md926"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -174,7 +174,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite dma background window colormath hdma math</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md958"></a>
+<h2><a class="anchor" id="autotoc_md927"></a>
 Going Further</h2>
 <ul>
 <li><b>Animated rectangle</b>: Move the rectangle by modifying the HDMA table values each frame. Change the <code>RECT_X</code> and <code>RECT_Y</code> offsets and rebuild the tables.</li>
@@ -191,7 +191,7 @@ Going Further</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_input_two_players.html',''); 
 <div class="caption">
 Screenshot</div></div>
     <p>Simultaneous multi-controller input handling.</p>
-<h2><a class="anchor" id="autotoc_md1088"></a>
+<h2><a class="anchor" id="autotoc_md1057"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>Reading from multiple controller ports</li>
@@ -109,14 +109,14 @@ Learning Objectives</h2>
 <li>Controller disconnection detection</li>
 <li>Separate palettes for player identification</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1089"></a>
+<h2><a class="anchor" id="autotoc_md1058"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed basic input examples</li>
 <li>Understanding of sprite basics</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1091"></a>
+<h2><a class="anchor" id="autotoc_md1060"></a>
 What This Example Does</h2>
 <p>Two-player simultaneous control:</p><ul>
 <li>Player 1 (blue sprite) controlled by Controller 1</li>
@@ -138,7 +138,7 @@ What This Example Does</h2>
 <li>Controller 2 D-Pad: Move red sprite (Player 2)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1093"></a>
+<h2><a class="anchor" id="autotoc_md1062"></a>
 Code Type</h2>
 <p><b>C with Direct Register Access</b></p>
 <table class="markdownTable">
@@ -154,9 +154,9 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Boundary check   </td><td class="markdownTableBodyNone">C code   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1095"></a>
+<h2><a class="anchor" id="autotoc_md1064"></a>
 Reading Two Controllers</h2>
-<h3><a class="anchor" id="autotoc_md1096"></a>
+<h3><a class="anchor" id="autotoc_md1065"></a>
 Controller Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -170,7 +170,7 @@ Controller Registers</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">JOY2H   </td><td class="markdownTableBodyNone">$421B   </td><td class="markdownTableBodyNone">Controller 2 high byte   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md1097"></a>
+<h3><a class="anchor" id="autotoc_md1066"></a>
 Reading Both Controllers</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Wait for auto-read completion */</span></div>
 <div class="line"><span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
@@ -187,9 +187,9 @@ Reading Both Controllers</h3>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1099"></a>
+<h2><a class="anchor" id="autotoc_md1068"></a>
 Player State</h2>
-<h3><a class="anchor" id="autotoc_md1100"></a>
+<h3><a class="anchor" id="autotoc_md1069"></a>
 Struct Pattern (Required)</h3>
 <p>Using a struct with <code>s16</code> coordinates is required for reliable movement. Separate <code>u16</code> variables cause horizontal movement issues due to a compiler quirk.</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
@@ -200,9 +200,9 @@ Struct Pattern (Required)</h3>
 <div class="line">Player p2 = {192, 112};</div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1102"></a>
+<h2><a class="anchor" id="autotoc_md1071"></a>
 Player Movement</h2>
-<h3><a class="anchor" id="autotoc_md1103"></a>
+<h3><a class="anchor" id="autotoc_md1072"></a>
 Independent Control</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Player 1 movement */</span></div>
 <div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p1.x &lt; 248) p1.x++; }</div>
@@ -220,9 +220,9 @@ Independent Control</h3>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1105"></a>
+<h2><a class="anchor" id="autotoc_md1074"></a>
 Player Differentiation</h2>
-<h3><a class="anchor" id="autotoc_md1106"></a>
+<h3><a class="anchor" id="autotoc_md1075"></a>
 Separate Palettes</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Palette 0: Blue (Player 1) */</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 128;</div>
@@ -233,7 +233,7 @@ Separate Palettes</h3>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x1F; <a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00;  <span class="comment">/* Red */</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1107"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1076"></a>
 Sprite Setup</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Player 1: Palette 0 (blue) */</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, p1.x, p1.y, 0, 0, 3, 0);</div>
@@ -242,16 +242,16 @@ Sprite Setup</h3>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, p2.x, p2.y, 0, 1, 3, 0);</div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1109"></a>
+<h2><a class="anchor" id="autotoc_md1078"></a>
 Controller Detection</h2>
-<h3><a class="anchor" id="autotoc_md1110"></a>
+<h3><a class="anchor" id="autotoc_md1079"></a>
 Disconnected Controller</h3>
 <div class="fragment"><div class="line"><span class="comment">/* 0xFFFF indicates no controller connected */</span></div>
 <div class="line"><span class="keywordflow">if</span> (pad2 == 0xFFFF) {</div>
 <div class="line">    <span class="comment">/* Controller 2 not connected */</span></div>
 <div class="line">    <span class="comment">/* Could display &quot;CONNECT CONTROLLER 2&quot; */</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1111"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1080"></a>
 Controller Types</h3>
 <p>The SNES supports various controllers:</p><ul>
 <li>Standard gamepad (most common)</li>
@@ -260,13 +260,13 @@ Controller Types</h3>
 <li>Multitap (4+ players)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1113"></a>
+<h2><a class="anchor" id="autotoc_md1082"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/two_players</div>
 </div><!-- fragment --><p>Then open <code>two_players.sfc</code> in your emulator (Mesen2 recommended). Configure the emulator for two controllers.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1115"></a>
+<h2><a class="anchor" id="autotoc_md1084"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -277,18 +277,18 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1117"></a>
+<h2><a class="anchor" id="autotoc_md1086"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md1118"></a>
+<h3><a class="anchor" id="autotoc_md1087"></a>
 Exercise 1: Player Collision</h3>
 <p>Detect when players touch: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (abs(p1.x - p2.x) &lt; 16 &amp;&amp; abs(p1.y - p2.y) &lt; 16) {</div>
 <div class="line">    <span class="comment">/* Players colliding! */</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1119"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1088"></a>
 Exercise 2: Different Speeds</h3>
 <p>Give players different speeds: </p><div class="fragment"><div class="line"><span class="preprocessor">#define P1_SPEED 2</span></div>
 <div class="line"><span class="preprocessor">#define P2_SPEED 3  </span><span class="comment">/* Faster */</span><span class="preprocessor"></span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1120"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1089"></a>
 Exercise 3: Button Actions</h3>
 <p>Add button-triggered actions: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="comment">/* Player 1 action */</span></div>
@@ -297,33 +297,33 @@ Exercise 3: Button Actions</h3>
 <div class="line">    <span class="comment">/* Player 2 action */</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1121"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1090"></a>
 Exercise 4: Split Screen</h3>
 <p>Implement split-screen view for versus games (advanced): </p><div class="fragment"><div class="line"><span class="comment">/* Use windows to divide screen */</span></div>
 <div class="line"><span class="comment">/* Each player has their own camera */</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1123"></a>
+<h2><a class="anchor" id="autotoc_md1092"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md1124"></a>
+<h3><a class="anchor" id="autotoc_md1093"></a>
 Auto-Joypad Read</h3>
 <p>The SNES automatically reads controllers during VBlank:</p><ul>
 <li>Enabled by NMITIMEN register</li>
 <li>Takes ~4 scanlines</li>
 <li>Check HVBJOY bit 0 for completion</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1125"></a>
+<h3><a class="anchor" id="autotoc_md1094"></a>
 Multitap Support</h3>
 <p>For more than 2 players, use the multitap:</p><ul>
 <li>Requires different register access</li>
 <li>Up to 4-5 players depending on adapter</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1126"></a>
+<h3><a class="anchor" id="autotoc_md1095"></a>
 Input Latency</h3>
 <p>Controller reads happen once per frame:</p><ul>
 <li>60Hz = ~16.7ms input latency</li>
 <li>Additional latency from game logic</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1127"></a>
+<h3><a class="anchor" id="autotoc_md1096"></a>
 Button Layout</h3>
 <p>Both controllers have identical mapping: </p><div class="fragment"><div class="line">Bit 15: B        Bit 7: A</div>
 <div class="line">Bit 14: Y        Bit 6: X</div>
@@ -334,7 +334,7 @@ Button Layout</h3>
 <div class="line">Bit 9:  Left</div>
 <div class="line">Bit 8:  Right</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md1129"></a>
+<h2><a class="anchor" id="autotoc_md1098"></a>
 What's Next?</h2>
 <p><b>Collision:</b> <a href="../../basics/collision_demo/">Collision Demo</a> - Hit detection</p>
 <p><b>Game:</b> <a href="../../games/breakout/">Breakout</a> - Complete game with collision and sprites </p>
@@ -344,7 +344,7 @@ What's Next?</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

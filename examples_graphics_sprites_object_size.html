@@ -100,10 +100,10 @@ $(document).ready(function(){initNavTree('examples_graphics_sprites_object_size.
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1017"></a>
+    <h2><a class="anchor" id="autotoc_md986"></a>
 What This Example Shows</h2>
 <p>An interactive menu to switch between all <b>6 SNES sprite size combinations</b>. The SNES OBJSEL register defines two sizes (small and large) that apply to all 128 sprites. Each sprite chooses small or large via its OAM high-table bit.</p>
-<h2><a class="anchor" id="autotoc_md1018"></a>
+<h2><a class="anchor" id="autotoc_md987"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -111,14 +111,14 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD UP/DOWN   </td><td class="markdownTableBodyNone">Select sprite size mode   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1019"></a>
+<h2><a class="anchor" id="autotoc_md988"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/sprites/object_size</div>
 </div><!-- fragment --><p>Then open <code>object_size.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md1020"></a>
+<h2><a class="anchor" id="autotoc_md989"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1021"></a>
+<h3><a class="anchor" id="autotoc_md990"></a>
 1. Set up text on BG1 (4bpp in Mode 1)</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a>();</div>
 <div class="line"><a class="code hl_function" href="text_8h.html#a21a39509cc61fba3c98500627619baf0">textLoadFont4bpp</a>(0x0000);</div>
@@ -130,7 +130,7 @@ How It Works</h2>
 <div class="ttc" id="atext_8h_html_a055579e7b75458617363a27f1224bc99"><div class="ttname"><a href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a></div><div class="ttdeci">void textInit(void)</div><div class="ttdoc">Initialize text system with default configuration.</div></div>
 <div class="ttc" id="atext_8h_html_a21a39509cc61fba3c98500627619baf0"><div class="ttname"><a href="text_8h.html#a21a39509cc61fba3c98500627619baf0">textLoadFont4bpp</a></div><div class="ttdeci">void textLoadFont4bpp(u16 vram_addr)</div><div class="ttdoc">Load font as 4bpp tiles for Mode 1 BGs.</div></div>
 </div><!-- fragment --><p>The built-in font is loaded as 4bpp tiles at VRAM <code>$0000</code>. The text system writes to a RAM buffer, then DMAs to the tilemap at <code>$3800</code> during VBlank.</p>
-<h3><a class="anchor" id="autotoc_md1022"></a>
+<h3><a class="anchor" id="autotoc_md991"></a>
 2. Load sprites with force blank</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;  <span class="comment">/* Force blank -- unlimited VRAM write time */</span></div>
 <div class="line"> </div>
@@ -143,7 +143,7 @@ How It Works</h2>
 <div class="ttc" id="asprite_8h_html_a429bb77c76f029e8ee367f6a1bd27dca"><div class="ttname"><a href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible)</div></div>
 <div class="ttc" id="asprite_8h_html_a4e8556727bbae22ac2e0fa8392a13fc4"><div class="ttname"><a href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a></div><div class="ttdeci">#define OBJ_SIZE8_L32</div><div class="ttdef"><b>Definition</b> sprite.h:50</div></div>
 </div><!-- fragment --><p><b>Force blank is required</b> because larger sprites (32x32, 64x64) exceed the ~4 KB VBlank DMA budget. Without it, VRAM writes are silently dropped by the PPU.</p>
-<h3><a class="anchor" id="autotoc_md1023"></a>
+<h3><a class="anchor" id="autotoc_md992"></a>
 3. Two sprites per mode</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, 70, 120, 0x0010, 0, 3, 0);   <span class="comment">/* Small sprite, left */</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6">oamSetEx</a>(0, <a class="code hl_define" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a>, <a class="code hl_define" href="sprite_8h.html#a0b9b0362f3cdfc1625ff5cfea7efcd0c">OBJ_SHOW</a>);</div>
@@ -159,7 +159,7 @@ How It Works</h2>
 <li>Small at VRAM <code>$4100</code>: tile = (<code>$4100</code> - <code>$4000</code>) / 16 = <code>$10</code></li>
 <li>Large at VRAM <code>$4500</code>: tile = (<code>$4500</code> - <code>$4000</code>) / 16 = <code>$50</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1024"></a>
+<h2><a class="anchor" id="autotoc_md993"></a>
 The 6 Size Modes</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -178,22 +178,22 @@ The 6 Size Modes</h2>
 <td class="markdownTableBodyNone">5   </td><td class="markdownTableBodyNone">32x32   </td><td class="markdownTableBodyNone">64x64   </td><td class="markdownTableBodyNone"><code>OBJ_SIZE32_L64</code>   </td></tr>
 </table>
 <p>Most SNES games use mode 3 (<code>OBJ_SIZE16_L32</code>) &ndash; 16x16 for characters and 32x32 for bosses/effects. Mode 0 (<code>OBJ_SIZE8_L16</code>) is common for simple games with small sprites.</p>
-<h2><a class="anchor" id="autotoc_md1025"></a>
+<h2><a class="anchor" id="autotoc_md994"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1026"></a>
+<h3><a class="anchor" id="autotoc_md995"></a>
 OBJSEL Register ($2101)</h3>
 <p>This register sets the global size pair and name base address. Changing it affects ALL 128 sprites simultaneously, so games typically pick one mode at startup and stick with it for the entire game. The size pair defines what "small" and "large" mean &ndash; individual sprites select between the two via <code><a class="el" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6" title="Set sprite extended attributes.">oamSetEx()</a></code>.</p>
-<h3><a class="anchor" id="autotoc_md1027"></a>
+<h3><a class="anchor" id="autotoc_md996"></a>
 OAM High Table</h3>
 <p>Each of the 128 sprites has 2 extra bits stored in 32 bytes of high table:</p><ul>
 <li>Bit 0: X position bit 8 (extends the 8-bit X to 9 bits, allowing off-screen positions)</li>
 <li>Bit 1: Size select (0 = small, 1 = large)</li>
 </ul>
 <p>These bits are packed 4 sprites per byte. The <code><a class="el" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6" title="Set sprite extended attributes.">oamSetEx()</a></code> function writes them.</p>
-<h3><a class="anchor" id="autotoc_md1028"></a>
+<h3><a class="anchor" id="autotoc_md997"></a>
 Force Blank for Large DMA</h3>
 <p>The SNES PPU silently ignores VRAM writes during active display (scanlines 0-223). A 64x64 sprite is 8 KB of tile data &ndash; far too much for VBlank DMA. Use <code>REG_INIDISP = 0x80</code> to disable rendering, transfer the data, then restore with <code>REG_INIDISP = 0x0F</code>.</p>
-<h2><a class="anchor" id="autotoc_md1029"></a>
+<h2><a class="anchor" id="autotoc_md998"></a>
 VRAM Layout</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -209,7 +209,7 @@ VRAM Layout</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>$4500</code>   </td><td class="markdownTableBodyNone">Large sprite tiles   </td><td class="markdownTableBodyNone">varies   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1030"></a>
+<h2><a class="anchor" id="autotoc_md999"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -223,7 +223,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite dma text text4bpp input background</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1031"></a>
+<h2><a class="anchor" id="autotoc_md1000"></a>
 Going Further</h2>
 <ul>
 <li><b>Size comparison</b>: Modify the code to display all 6 small/large pairs on screen simultaneously (using sprites 0-11). This gives a visual reference chart.</li>
@@ -241,7 +241,7 @@ Going Further</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

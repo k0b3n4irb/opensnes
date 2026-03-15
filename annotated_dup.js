@@ -4,6 +4,7 @@ var annotated_dup =
     [ "AudioSample", "structAudioSample.html", "structAudioSample" ],
     [ "AudioVoiceState", "structAudioVoiceState.html", "structAudioVoiceState" ],
     [ "Entity", "structEntity.html", "structEntity" ],
+    [ "LineClearResult", "structLineClearResult.html", "structLineClearResult" ],
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
     [ "Rect", "structRect.html", "structRect" ],
     [ "scoMemory", "structscoMemory.html", "structscoMemory" ],

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['dir_0',['dir',['../structt__objs.html#ae2bb79aa63d37e6f2a0a98762a12c60f',1,'t_objs']]],
-  ['dx_1',['dx',['../structMetaspriteItem.html#a5d07f89607940a1d70300bfec816b08f',1,'MetaspriteItem']]],
-  ['dy_2',['dy',['../structMetaspriteItem.html#a845726a319cfae2a703b5ed90b4094a4',1,'MetaspriteItem']]]
+  ['count_0',['count',['../structt__objs.html#a731b129eb56574ea1f24a5ee8a7d54aa',1,'t_objs::count'],['../structLineClearResult.html#a66c179e782dd803fd54af9e52ee98a25',1,'LineClearResult::count']]]
 ];

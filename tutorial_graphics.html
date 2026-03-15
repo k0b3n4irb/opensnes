@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('tutorial_graphics.html',''); initResiz
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES graphics fundamentals including video modes, backgrounds, and tilemaps.</p>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md85"></a>
 SNES Video Modes</h2>
 <p>The SNES has 8 video modes (0-7). OpenSNES primarily uses:</p>
 <table class="markdownTable">
@@ -110,9 +110,9 @@ SNES Video Modes</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>7</b>   </td><td class="markdownTableBodyNone">256 colors (rotatable)   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">-   </td><td class="markdownTableBodyNone">Racing, rotation effects   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md85"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 Setting Up Graphics</h2>
-<h3><a class="anchor" id="autotoc_md86"></a>
+<h3><a class="anchor" id="autotoc_md87"></a>
 Initialize Display</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -142,7 +142,7 @@ Initialize Display</h3>
 <div class="ttc" id="agroup__reg__const_html_gaa3235e8a5a53d51220c4d3582e1804e8"><div class="ttname"><a href="group__reg__const.html#gaa3235e8a5a53d51220c4d3582e1804e8">BGMODE_MODE1</a></div><div class="ttdeci">#define BGMODE_MODE1</div><div class="ttdef"><b>Definition</b> registers.h:429</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md87"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md88"></a>
 Loading Tiles to VRAM</h2>
 <p>Tiles are 8x8 pixel graphics stored in VRAM. For 4bpp (16 color) tiles:</p>
 <div class="fragment"><div class="line"><span class="comment">// Tile data (32 bytes per 8x8 tile for 4bpp)</span></div>
@@ -176,7 +176,7 @@ Loading Tiles to VRAM</h2>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W)</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md88"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md89"></a>
 Setting Up Tilemaps</h2>
 <p>Tilemaps define which tiles appear where on screen. Each entry is 2 bytes:</p>
 <div class="fragment"><div class="line">Bits: vhopppcc cccccccc</div>
@@ -200,7 +200,7 @@ Setting Up Tilemaps</h2>
 <div class="line">        }</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md89"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md90"></a>
 Setting Palettes</h2>
 <p>SNES uses 15-bit color (RGB555):</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> setup_palette(<span class="keywordtype">void</span>) {</div>
@@ -229,7 +229,7 @@ Setting Palettes</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md90"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md91"></a>
 Background Scrolling</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> scroll_x = 0;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> scroll_y = 0;</div>
@@ -244,7 +244,7 @@ Background Scrolling</h2>
 <div class="ttc" id="agroup__ppu__regs_html_ga466a20c79b0739bae02668b1b764d8f1"><div class="ttname"><a href="group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1">REG_BG1VOFS</a></div><div class="ttdeci">#define REG_BG1VOFS</div><div class="ttdoc">BG1 vertical scroll (W, 2x write)</div><div class="ttdef"><b>Definition</b> registers.h:91</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gab769d805a40fdce758d964d274bb8195"><div class="ttname"><a href="group__ppu__regs.html#gab769d805a40fdce758d964d274bb8195">REG_BG1HOFS</a></div><div class="ttdeci">#define REG_BG1HOFS</div><div class="ttdoc">BG1 horizontal scroll (W, 2x write)</div><div class="ttdef"><b>Definition</b> registers.h:88</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md91"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md92"></a>
 Parallax Scrolling</h2>
 <p>For depth effect, scroll backgrounds at different speeds:</p>
 <div class="fragment"><div class="line"><span class="comment">// In main loop:</span></div>
@@ -258,7 +258,7 @@ Parallax Scrolling</h2>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga79723f49e7557337b091835634430844">REG_BG2HOFS</a> = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(scroll_x &gt;&gt; 1);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga79723f49e7557337b091835634430844">REG_BG2HOFS</a> = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((scroll_x &gt;&gt; 1) &gt;&gt; 8);</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga79723f49e7557337b091835634430844"><div class="ttname"><a href="group__ppu__regs.html#ga79723f49e7557337b091835634430844">REG_BG2HOFS</a></div><div class="ttdeci">#define REG_BG2HOFS</div><div class="ttdoc">BG2 horizontal scroll (W, 2x write)</div><div class="ttdef"><b>Definition</b> registers.h:94</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md92"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md93"></a>
 Using gfx4snes</h2>
 <p>Convert PNG images to SNES format using gfx4snes (based on PVSnesLib):</p>
 <div class="fragment"><div class="line"># Convert 8x8 tiles with palette output</div>
@@ -278,10 +278,10 @@ Using gfx4snes</h2>
 <div class="line">sprite_pal:</div>
 <div class="line">.incbin &quot;res/sprites.pal&quot;</div>
 <div class="line">sprite_pal_end:</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md93"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md94"></a>
 Example: Complete Background Setup</h2>
 <p>See <code>examples/graphics/effects/parallax_scrolling/</code> for a complete parallax scrolling example.</p>
-<h2><a class="anchor" id="autotoc_md94"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_sprites.html">Sprites &amp; Animation</a></li>

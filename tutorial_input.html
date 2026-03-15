@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('tutorial_input.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers reading SNES controllers including button detection and multi-player support.</p>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md96"></a>
 SNES Controller Layout</h2>
 <div class="fragment"><div class="line">    L                              R</div>
 <div class="line">┌───────────────────────────────────────┐</div>
@@ -109,7 +109,7 @@ SNES Controller Layout</h2>
 <div class="line">│     │ ↓ │                │ B │        │</div>
 <div class="line">│     └───┘                └───┘        │</div>
 <div class="line">└───────────────────────────────────────┘</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md96"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md97"></a>
 Button Constants</h2>
 <p>OpenSNES defines these button masks in <code><a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a></code>:</p>
 <div class="fragment"><div class="line"><span class="comment">// D-Pad</span></div>
@@ -131,9 +131,9 @@ Button Constants</h2>
 <div class="line"><span class="comment">// Start/Select</span></div>
 <div class="line"><span class="preprocessor">#define KEY_START   0x1000</span></div>
 <div class="line"><span class="preprocessor">#define KEY_SELECT  0x2000</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md97"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
 Reading Controllers</h2>
-<h3><a class="anchor" id="autotoc_md98"></a>
+<h3><a class="anchor" id="autotoc_md99"></a>
 Direct Register Access (Recommended)</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -170,7 +170,7 @@ Direct Register Access (Recommended)</h3>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md100"></a>
 Reading Controller 2</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1, pad2;</div>
 <div class="line"> </div>
@@ -182,7 +182,7 @@ Reading Controller 2</h3>
 <div class="line">pad2 = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
 <div class="ttc" id="agroup__cpu__regs_html_ga02503a4acaf3d9cc9fa85ac9732fdb3a"><div class="ttname"><a href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a></div><div class="ttdeci">#define REG_JOY2H</div><div class="ttdoc">Joypad 2 data high (R)</div><div class="ttdef"><b>Definition</b> registers.h:334</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_ga2dd548a4753566d81adb12473d4673af"><div class="ttname"><a href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a></div><div class="ttdeci">#define REG_JOY2L</div><div class="ttdoc">Joypad 2 data low (R)</div><div class="ttdef"><b>Definition</b> registers.h:331</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md101"></a>
 Edge Detection</h2>
 <p>Detect button presses (not just held state):</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_current;</div>
@@ -220,7 +220,7 @@ Edge Detection</h2>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md101"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md102"></a>
 Movement Example</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_x = 128;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_y = 112;</div>
@@ -242,7 +242,7 @@ Movement Example</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md102"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
 Two-Player Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Player positions</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p1_x = 64, p1_y = 112;</div>
@@ -279,7 +279,7 @@ Two-Player Example</h2>
 <div class="line">}</div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md104"></a>
 Button Combinations</h2>
 <div class="fragment"><div class="line"><span class="comment">// Check for multiple buttons</span></div>
 <div class="line"><span class="keywordflow">if</span> ((pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) &amp;&amp; (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>)) {</div>
@@ -297,7 +297,7 @@ Button Combinations</h2>
 <div class="line">    <span class="comment">// All combo buttons pressed</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md104"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md105"></a>
 Menu Navigation</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> menu_selection = 0;</div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> MENU_ITEMS = 4;</div>
@@ -321,7 +321,7 @@ Menu Navigation</h2>
 <div class="line">    close_menu();</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md105"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md106"></a>
 Hardware Registers</h2>
 <p>For reference, the joypad registers:</p>
 <table class="markdownTable">
@@ -346,7 +346,7 @@ Hardware Registers</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">REG_HVBJOY   </td><td class="markdownTableBodyNone">$4212   </td><td class="markdownTableBodyNone">Status (bit 0 = auto-read busy)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md106"></a>
+<h2><a class="anchor" id="autotoc_md107"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Always wait for auto-joypad</b> - Check <code>REG_HVBJOY &amp; 0x01</code> before reading</li>
@@ -354,10 +354,10 @@ Tips</h2>
 <li><b>Use edge detection for menus</b> - Prevents rapid-fire selection</li>
 <li><b>Use held state for movement</b> - Smoother continuous motion</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md108"></a>
 Example</h2>
 <p>See <code>examples/input/two_players/</code> for a complete two-player demo.</p>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md109"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_audio.html">Audio &amp; Music</a></li>

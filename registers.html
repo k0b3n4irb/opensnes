@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('registers.html',''); initResizable(); 
 <div class="contents">
 <div class="textblock"><p>Complete reference for all SNES hardware registers commonly used in game development.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md389"></a>
+<h2><a class="anchor" id="autotoc_md358"></a>
 Table of Contents</h2>
 <ul>
 <li>PPU Registers ($2100-$213F)</li>
@@ -107,11 +107,11 @@ Table of Contents</h2>
 <li>Joypad Registers ($4016-$4017, $4218-$421F)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md391"></a>
+<h2><a class="anchor" id="autotoc_md360"></a>
 PPU Registers ($2100-$213F)</h2>
-<h3><a class="anchor" id="autotoc_md392"></a>
+<h3><a class="anchor" id="autotoc_md361"></a>
 Display Control</h3>
-<h4><a class="anchor" id="autotoc_md393"></a>
+<h4><a class="anchor" id="autotoc_md362"></a>
 $2100 - INIDISP (Display Control)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -129,7 +129,7 @@ $2100 - INIDISP (Display Control)</h4>
 <div class="line"><span class="comment">// Force blank (screen off)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;</div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W)</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md394"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md363"></a>
 $2101 - OBJSEL (Sprite Settings)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -168,9 +168,9 @@ $2101 - OBJSEL (Sprite Settings)</h4>
 <div class="line"><span class="comment">// 16x16 small, 32x32 large sprites</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a> = 0x60;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga82c4b53f10fe0de6176e3f96b49ae554"><div class="ttname"><a href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a></div><div class="ttdeci">#define REG_OBJSEL</div><div class="ttdoc">Object (sprite) size and base (W)</div><div class="ttdef"><b>Definition</b> registers.h:52</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md395"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md364"></a>
 OAM (Sprite Memory)</h3>
-<h4><a class="anchor" id="autotoc_md396"></a>
+<h4><a class="anchor" id="autotoc_md365"></a>
 $2102-$2103 - OAMADDL/H (OAM Address)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -182,7 +182,7 @@ $2102-$2103 - OAMADDL/H (OAM Address)</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$2103   </td><td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">OAM address bit 9   </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md397"></a>
+<h4><a class="anchor" id="autotoc_md366"></a>
 $2104 - OAMDATA (OAM Data Write)</h4>
 <p>Write sprite data to OAM. Address auto-increments.</p>
 <div class="fragment"><div class="line"><span class="comment">// Set sprite 0 position</span></div>
@@ -195,9 +195,9 @@ $2104 - OAMDATA (OAM Data Write)</h4>
 <div class="ttc" id="agroup__ppu__regs_html_gac7a5db74119e971459fad469a4caa92c"><div class="ttname"><a href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a></div><div class="ttdeci">#define REG_OAMDATA</div><div class="ttdoc">OAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:61</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad8e30bb8ad62f2a58545ff770db95174"><div class="ttname"><a href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a></div><div class="ttdeci">#define REG_OAMADDH</div><div class="ttdoc">OAM address high (W)</div><div class="ttdef"><b>Definition</b> registers.h:58</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gae7e3753ff8b20eb03256385da37eaf38"><div class="ttname"><a href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a></div><div class="ttdeci">#define REG_OAMADDL</div><div class="ttdoc">OAM address low (W)</div><div class="ttdef"><b>Definition</b> registers.h:55</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md398"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md367"></a>
 Background Mode</h3>
-<h4><a class="anchor" id="autotoc_md399"></a>
+<h4><a class="anchor" id="autotoc_md368"></a>
 $2105 - BGMODE (Background Mode)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -242,9 +242,9 @@ $2105 - BGMODE (Background Mode)</h4>
 <div class="line"><span class="comment">// Mode 1 with 16x16 BG1 tiles</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a> = 0x11;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga52a05d4fdd66feb5ae0d8bb0a8b291e0"><div class="ttname"><a href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a></div><div class="ttdeci">#define REG_BGMODE</div><div class="ttdoc">BG mode and tile size (W)</div><div class="ttdef"><b>Definition</b> registers.h:64</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md400"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md369"></a>
 Background Tilemap</h3>
-<h4><a class="anchor" id="autotoc_md401"></a>
+<h4><a class="anchor" id="autotoc_md370"></a>
 $2107-$210A - BG1SC-BG4SC (Tilemap Address/Size)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -260,7 +260,7 @@ $2107-$210A - BG1SC-BG4SC (Tilemap Address/Size)</h4>
 <div class="line"><span class="comment">// BG1 tilemap at $7000 (64x64 tiles)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga92fb484df47302e1f52a162e17546636">REG_BG1SC</a> = 0x73;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga92fb484df47302e1f52a162e17546636"><div class="ttname"><a href="group__ppu__regs.html#ga92fb484df47302e1f52a162e17546636">REG_BG1SC</a></div><div class="ttdeci">#define REG_BG1SC</div><div class="ttdoc">BG1 tilemap address (W)</div><div class="ttdef"><b>Definition</b> registers.h:70</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md402"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md371"></a>
 $210B-$210C - BG12NBA/BG34NBA (Tile Data Address)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -273,9 +273,9 @@ $210B-$210C - BG12NBA/BG34NBA (Tile Data Address)</h4>
 <div class="fragment"><div class="line"><span class="comment">// BG1 tiles at $0000, BG2 at $4000</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga44e47bf13266350ebb5120b7618d46d5">REG_BG12NBA</a> = 0x40;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga44e47bf13266350ebb5120b7618d46d5"><div class="ttname"><a href="group__ppu__regs.html#ga44e47bf13266350ebb5120b7618d46d5">REG_BG12NBA</a></div><div class="ttdeci">#define REG_BG12NBA</div><div class="ttdoc">BG1/2 tile data address (W)</div><div class="ttdef"><b>Definition</b> registers.h:82</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md403"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md372"></a>
 Background Scroll</h3>
-<h4><a class="anchor" id="autotoc_md404"></a>
+<h4><a class="anchor" id="autotoc_md373"></a>
 $210D-$2114 - BGnHOFS/BGnVOFS (Scroll Registers)</h4>
 <p>Write twice: first low byte, then high byte.</p>
 <div class="fragment"><div class="line"><span class="comment">// Scroll BG1 horizontally by 100 pixels</span></div>
@@ -287,9 +287,9 @@ $210D-$2114 - BGnHOFS/BGnVOFS (Scroll Registers)</h4>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1">REG_BG1VOFS</a> = 50 &gt;&gt; 8;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga466a20c79b0739bae02668b1b764d8f1"><div class="ttname"><a href="group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1">REG_BG1VOFS</a></div><div class="ttdeci">#define REG_BG1VOFS</div><div class="ttdoc">BG1 vertical scroll (W, 2x write)</div><div class="ttdef"><b>Definition</b> registers.h:91</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gab769d805a40fdce758d964d274bb8195"><div class="ttname"><a href="group__ppu__regs.html#gab769d805a40fdce758d964d274bb8195">REG_BG1HOFS</a></div><div class="ttdeci">#define REG_BG1HOFS</div><div class="ttdoc">BG1 horizontal scroll (W, 2x write)</div><div class="ttdef"><b>Definition</b> registers.h:88</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md405"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md374"></a>
 VRAM Access</h3>
-<h4><a class="anchor" id="autotoc_md406"></a>
+<h4><a class="anchor" id="autotoc_md375"></a>
 $2115 - VMAIN (VRAM Address Increment)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -304,7 +304,7 @@ $2115 - VMAIN (VRAM Address Increment)</h4>
 <div class="fragment"><div class="line"><span class="comment">// Increment after high byte write, step by 1</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a> = 0x80;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga09d7fb089889aaa434f7c88ebccb5190"><div class="ttname"><a href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a></div><div class="ttdeci">#define REG_VMAIN</div><div class="ttdoc">VRAM address increment mode (W)</div><div class="ttdef"><b>Definition</b> registers.h:112</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md407"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md376"></a>
 $2116-$2117 - VMADDL/H (VRAM Address)</h4>
 <p>Word address (not byte address).</p>
 <div class="fragment"><div class="line"><span class="comment">// Set VRAM address to $4000 (word address $2000)</span></div>
@@ -312,16 +312,16 @@ $2116-$2117 - VMADDL/H (VRAM Address)</h4>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a> = 0x20;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga0579806de7fa683e46ebe36fe5b89c64"><div class="ttname"><a href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a></div><div class="ttdeci">#define REG_VMADDH</div><div class="ttdoc">VRAM address high (W)</div><div class="ttdef"><b>Definition</b> registers.h:118</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga165959d614d718e17d008060049491bc"><div class="ttname"><a href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a></div><div class="ttdeci">#define REG_VMADDL</div><div class="ttdoc">VRAM address low (W)</div><div class="ttdef"><b>Definition</b> registers.h:115</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md408"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md377"></a>
 $2118-$2119 - VMDATAL/H (VRAM Data Write)</h4>
 <div class="fragment"><div class="line"><span class="comment">// Write word $1234 to VRAM</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a> = 0x34;  <span class="comment">// Low byte</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a> = 0x12;  <span class="comment">// High byte (triggers increment)</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga1c64488065746dab4b05ad917c276841"><div class="ttname"><a href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a></div><div class="ttdeci">#define REG_VMDATAL</div><div class="ttdoc">VRAM data write low (W)</div><div class="ttdef"><b>Definition</b> registers.h:121</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W)</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md409"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md378"></a>
 Color (CGRAM)</h3>
-<h4><a class="anchor" id="autotoc_md410"></a>
+<h4><a class="anchor" id="autotoc_md379"></a>
 $2121 - CGADD (CGRAM Address)</h4>
 <p>Color index (0-255).</p>
 <div class="fragment"><div class="line"><span class="comment">// Set palette address to color 0</span></div>
@@ -330,7 +330,7 @@ $2121 - CGADD (CGRAM Address)</h4>
 <div class="line"><span class="comment">// Set palette address to sprite palette 0 (color 128)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 128;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md411"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md380"></a>
 $2122 - CGDATA (CGRAM Data Write)</h4>
 <p>15-bit color: <code>0BBBBBGGGGGRRRRR</code></p>
 <div class="fragment"><div class="line"><span class="comment">// Set color to white ($7FFF)</span></div>
@@ -349,9 +349,9 @@ $2122 - CGDATA (CGRAM Data Write)</h4>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x7C;</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md412"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md381"></a>
 Screen Enable</h3>
-<h4><a class="anchor" id="autotoc_md413"></a>
+<h4><a class="anchor" id="autotoc_md382"></a>
 $212C - TM (Main Screen Enable)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -373,15 +373,15 @@ $212C - TM (Main Screen Enable)</h4>
 <div class="line"><span class="comment">// Enable BG1, BG2, and sprites</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = 0x13;</div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W)</div><div class="ttdef"><b>Definition</b> registers.h:181</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md414"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md383"></a>
 $212D - TS (Sub Screen Enable)</h4>
 <p>Same bit layout as TM, for sub screen (color math).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md416"></a>
+<h2><a class="anchor" id="autotoc_md385"></a>
 CPU Registers ($4200-$421F)</h2>
-<h3><a class="anchor" id="autotoc_md417"></a>
+<h3><a class="anchor" id="autotoc_md386"></a>
 Interrupt Control</h3>
-<h4><a class="anchor" id="autotoc_md418"></a>
+<h4><a class="anchor" id="autotoc_md387"></a>
 $4200 - NMITIMEN (Interrupt Enable)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -401,7 +401,7 @@ $4200 - NMITIMEN (Interrupt Enable)</h4>
 <div class="line"><span class="comment">// Enable NMI, V-IRQ, and auto-joypad</span></div>
 <div class="line"><a class="code hl_define" href="group__cpu__regs.html#ga8627bb48b8760c306190eb7ed050af73">REG_NMITIMEN</a> = 0xA1;</div>
 <div class="ttc" id="agroup__cpu__regs_html_ga8627bb48b8760c306190eb7ed050af73"><div class="ttname"><a href="group__cpu__regs.html#ga8627bb48b8760c306190eb7ed050af73">REG_NMITIMEN</a></div><div class="ttdeci">#define REG_NMITIMEN</div><div class="ttdoc">Interrupt enable (W)</div><div class="ttdef"><b>Definition</b> registers.h:253</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md419"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md388"></a>
 $4207-$420A - HTIMEx/VTIMEx (IRQ Timer)</h4>
 <p>H position (0-339) and V position (0-261/311) for IRQ trigger.</p>
 <div class="fragment"><div class="line"><span class="comment">// Trigger IRQ at scanline 128</span></div>
@@ -413,7 +413,7 @@ $4207-$420A - HTIMEx/VTIMEx (IRQ Timer)</h4>
 <div class="ttc" id="agroup__cpu__regs_html_ga4f50b6a5e4c8fc273448121b882ea45a"><div class="ttname"><a href="group__cpu__regs.html#ga4f50b6a5e4c8fc273448121b882ea45a">REG_HTIMEH</a></div><div class="ttdeci">#define REG_HTIMEH</div><div class="ttdoc">H-count timer high (W)</div><div class="ttdef"><b>Definition</b> registers.h:277</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_ga57b51b28ef797ddbb83b77f70083df89"><div class="ttname"><a href="group__cpu__regs.html#ga57b51b28ef797ddbb83b77f70083df89">REG_VTIMEH</a></div><div class="ttdeci">#define REG_VTIMEH</div><div class="ttdoc">V-count timer high (W)</div><div class="ttdef"><b>Definition</b> registers.h:283</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gacde8f217f21a065b117e7b48fd83b3b4"><div class="ttname"><a href="group__cpu__regs.html#gacde8f217f21a065b117e7b48fd83b3b4">REG_HTIMEL</a></div><div class="ttdeci">#define REG_HTIMEL</div><div class="ttdoc">H-count timer low (W)</div><div class="ttdef"><b>Definition</b> registers.h:274</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md420"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md389"></a>
 $4210 - RDNMI (NMI Status)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -428,7 +428,7 @@ $4210 - RDNMI (NMI Status)</h4>
 <div class="line"><span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dummy = <a class="code hl_define" href="group__cpu__regs.html#ga3a29932a3a9cf7dbbf25a3a30c9e25fa">REG_RDNMI</a>;  <span class="comment">// Acknowledge NMI</span></div>
 <div class="ttc" id="agroup__cpu__regs_html_ga3a29932a3a9cf7dbbf25a3a30c9e25fa"><div class="ttname"><a href="group__cpu__regs.html#ga3a29932a3a9cf7dbbf25a3a30c9e25fa">REG_RDNMI</a></div><div class="ttdeci">#define REG_RDNMI</div><div class="ttdoc">NMI flag and version (R)</div><div class="ttdef"><b>Definition</b> registers.h:295</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md421"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md390"></a>
 $4211 - TIMEUP (IRQ Status)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -437,7 +437,7 @@ $4211 - TIMEUP (IRQ Status)</h4>
 <td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">IRQ   </td><td class="markdownTableBodyNone">1 = IRQ occurred (cleared on read)   </td></tr>
 </table>
 <p><b>IMPORTANT:</b> Read this register in IRQ handler to acknowledge IRQ!</p>
-<h4><a class="anchor" id="autotoc_md422"></a>
+<h4><a class="anchor" id="autotoc_md391"></a>
 $4212 - HVBJOY (Blank/Joypad Status)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -452,9 +452,9 @@ $4212 - HVBJOY (Blank/Joypad Status)</h4>
 <div class="fragment"><div class="line"><span class="comment">// Wait for auto-joypad to complete</span></div>
 <div class="line"><span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md423"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md392"></a>
 Math Hardware</h3>
-<h4><a class="anchor" id="autotoc_md424"></a>
+<h4><a class="anchor" id="autotoc_md393"></a>
 $4202-$4203 - WRMPYA/B (Multiply)</h4>
 <p>8-bit x 8-bit = 16-bit multiplication.</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__cpu__regs.html#ga2168ef9fd6bee916e0634338f77d30f1">REG_WRMPYA</a> = 25;</div>
@@ -466,7 +466,7 @@ $4202-$4203 - WRMPYA/B (Multiply)</h4>
 <div class="ttc" id="agroup__cpu__regs_html_ga88b98a3f0a3052b54ad6bfdd5aeed5b7"><div class="ttname"><a href="group__cpu__regs.html#ga88b98a3f0a3052b54ad6bfdd5aeed5b7">REG_WRMPYB</a></div><div class="ttdeci">#define REG_WRMPYB</div><div class="ttdoc">Multiplicand B (W)</div><div class="ttdef"><b>Definition</b> registers.h:262</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gad1c21f1e957f0bfbc5225622485eac2b"><div class="ttname"><a href="group__cpu__regs.html#gad1c21f1e957f0bfbc5225622485eac2b">REG_RDMPYL</a></div><div class="ttdeci">#define REG_RDMPYL</div><div class="ttdoc">Multiplication result low (R)</div><div class="ttdef"><b>Definition</b> registers.h:313</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md425"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md394"></a>
 $4204-$4206 - WRDIV (Divide)</h4>
 <p>16-bit / 8-bit division with remainder.</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__cpu__regs.html#ga36c524042ae56ed697a091d9028c47d1">REG_WRDIVL</a> = 100 &amp; 0xFF;</div>
@@ -480,9 +480,9 @@ $4204-$4206 - WRDIV (Divide)</h4>
 <div class="ttc" id="agroup__cpu__regs_html_ga64d4c4a3f0e7db22b3772366547e2a20"><div class="ttname"><a href="group__cpu__regs.html#ga64d4c4a3f0e7db22b3772366547e2a20">REG_RDDIVH</a></div><div class="ttdeci">#define REG_RDDIVH</div><div class="ttdoc">Division result high (R)</div><div class="ttdef"><b>Definition</b> registers.h:310</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_ga86489687f4cd1f8e0722aee83506d138"><div class="ttname"><a href="group__cpu__regs.html#ga86489687f4cd1f8e0722aee83506d138">REG_WRDIVH</a></div><div class="ttdeci">#define REG_WRDIVH</div><div class="ttdoc">Dividend high (W)</div><div class="ttdef"><b>Definition</b> registers.h:268</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gad850a1019d379d9f61faa6c5213cadb9"><div class="ttname"><a href="group__cpu__regs.html#gad850a1019d379d9f61faa6c5213cadb9">REG_RDDIVL</a></div><div class="ttdeci">#define REG_RDDIVL</div><div class="ttdoc">Division result low (R)</div><div class="ttdef"><b>Definition</b> registers.h:307</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md426"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md395"></a>
 DMA Control</h3>
-<h4><a class="anchor" id="autotoc_md427"></a>
+<h4><a class="anchor" id="autotoc_md396"></a>
 $420B - MDMAEN (General DMA Enable)</h4>
 <p>Write a bit mask to start DMA on channels 0-7.</p>
 <div class="fragment"><div class="line"><span class="comment">// Start DMA on channel 0</span></div>
@@ -491,16 +491,16 @@ $420B - MDMAEN (General DMA Enable)</h4>
 <div class="line"><span class="comment">// Start DMA on channels 0 and 1</span></div>
 <div class="line"><a class="code hl_define" href="group__cpu__regs.html#gabccd357db38cf6e7528e807b8692ef0f">REG_MDMAEN</a> = 0x03;</div>
 <div class="ttc" id="agroup__cpu__regs_html_gabccd357db38cf6e7528e807b8692ef0f"><div class="ttname"><a href="group__cpu__regs.html#gabccd357db38cf6e7528e807b8692ef0f">REG_MDMAEN</a></div><div class="ttdeci">#define REG_MDMAEN</div><div class="ttdoc">DMA enable (W)</div><div class="ttdef"><b>Definition</b> registers.h:286</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md428"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md397"></a>
 $420C - HDMAEN (HDMA Enable)</h4>
 <p>Enable HDMA on channels 0-7. HDMA runs automatically each scanline.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md430"></a>
+<h2><a class="anchor" id="autotoc_md399"></a>
 DMA Registers ($4300-$437F)</h2>
 <p>Each channel has 16 bytes of registers at $43x0-$43xF where x = channel (0-7).</p>
-<h3><a class="anchor" id="autotoc_md431"></a>
+<h3><a class="anchor" id="autotoc_md400"></a>
 Channel Configuration</h3>
-<h4><a class="anchor" id="autotoc_md432"></a>
+<h4><a class="anchor" id="autotoc_md401"></a>
 $43x0 - DMAPx (DMA Parameters)</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -539,7 +539,7 @@ $43x0 - DMAPx (DMA Parameters)</h4>
 <div class="line"><span class="comment">// Mode 0 (for CGRAM): write to $2122</span></div>
 <div class="line"><a class="code hl_define" href="group__dma__regs.html#ga608d0640a578e25194c6d6c551f2fb55">REG_DMAP</a>(0) = 0x00;</div>
 <div class="ttc" id="agroup__dma__regs_html_ga608d0640a578e25194c6d6c551f2fb55"><div class="ttname"><a href="group__dma__regs.html#ga608d0640a578e25194c6d6c551f2fb55">REG_DMAP</a></div><div class="ttdeci">#define REG_DMAP(n)</div><div class="ttdoc">DMA parameters for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:361</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md433"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md402"></a>
 $43x1 - BBADx (B-Bus Address)</h4>
 <p>PPU register address (low byte only, $21xx).</p>
 <div class="fragment"><div class="line"><span class="comment">// DMA to VRAM data port ($2118)</span></div>
@@ -551,7 +551,7 @@ $43x1 - BBADx (B-Bus Address)</h4>
 <div class="line"><span class="comment">// DMA to OAM data port ($2104)</span></div>
 <div class="line"><a class="code hl_define" href="group__dma__regs.html#ga3ecdb99da389d0a44b8d73f55c65d735">REG_BBAD</a>(0) = 0x04;</div>
 <div class="ttc" id="agroup__dma__regs_html_ga3ecdb99da389d0a44b8d73f55c65d735"><div class="ttname"><a href="group__dma__regs.html#ga3ecdb99da389d0a44b8d73f55c65d735">REG_BBAD</a></div><div class="ttdeci">#define REG_BBAD(n)</div><div class="ttdoc">DMA B-bus address for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:364</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md434"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md403"></a>
 $43x2-$43x4 - A1TxL/H/B (Source Address)</h4>
 <p>24-bit source address (CPU side).</p>
 <div class="fragment"><div class="line"><span class="comment">// Source at $7E:2000</span></div>
@@ -561,7 +561,7 @@ $43x2-$43x4 - A1TxL/H/B (Source Address)</h4>
 <div class="ttc" id="agroup__dma__regs_html_ga0386461c8e822d53dc29ce8e59c86364"><div class="ttname"><a href="group__dma__regs.html#ga0386461c8e822d53dc29ce8e59c86364">REG_A1TL</a></div><div class="ttdeci">#define REG_A1TL(n)</div><div class="ttdoc">DMA A-bus address low for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:367</div></div>
 <div class="ttc" id="agroup__dma__regs_html_gaa0f744406f8252a776b0096f88bc58f8"><div class="ttname"><a href="group__dma__regs.html#gaa0f744406f8252a776b0096f88bc58f8">REG_A1TH</a></div><div class="ttdeci">#define REG_A1TH(n)</div><div class="ttdoc">DMA A-bus address high for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:370</div></div>
 <div class="ttc" id="agroup__dma__regs_html_gacdf938d5d490dcd1fdcf93e437df15fd"><div class="ttname"><a href="group__dma__regs.html#gacdf938d5d490dcd1fdcf93e437df15fd">REG_A1B</a></div><div class="ttdeci">#define REG_A1B(n)</div><div class="ttdoc">DMA A-bus bank for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:373</div></div>
-</div><!-- fragment --><h4><a class="anchor" id="autotoc_md435"></a>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md404"></a>
 $43x5-$43x6 - DASxL/H (Transfer Size)</h4>
 <p>Number of bytes to transfer (0 = 65536).</p>
 <div class="fragment"><div class="line"><span class="comment">// Transfer 1024 bytes</span></div>
@@ -569,7 +569,7 @@ $43x5-$43x6 - DASxL/H (Transfer Size)</h4>
 <div class="line"><a class="code hl_define" href="group__dma__regs.html#gae17f02ef534d311e2161fc61e50f179b">REG_DASH</a>(0) = 0x04;</div>
 <div class="ttc" id="agroup__dma__regs_html_gad907026dc98b667755e0ff392525e429"><div class="ttname"><a href="group__dma__regs.html#gad907026dc98b667755e0ff392525e429">REG_DASL</a></div><div class="ttdeci">#define REG_DASL(n)</div><div class="ttdoc">DMA size low for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:376</div></div>
 <div class="ttc" id="agroup__dma__regs_html_gae17f02ef534d311e2161fc61e50f179b"><div class="ttname"><a href="group__dma__regs.html#gae17f02ef534d311e2161fc61e50f179b">REG_DASH</a></div><div class="ttdeci">#define REG_DASH(n)</div><div class="ttdoc">DMA size high for channel n.</div><div class="ttdef"><b>Definition</b> registers.h:379</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md436"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md405"></a>
 DMA Example</h3>
 <div class="fragment"><div class="line"><span class="comment">// DMA 2048 bytes to VRAM at $0000</span></div>
 <div class="line"><span class="keywordtype">void</span> dmaToVRAM(<span class="keyword">const</span> <span class="keywordtype">void</span>* src, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size) {</div>
@@ -591,9 +591,9 @@ DMA Example</h3>
 <div class="line">    <a class="code hl_define" href="group__cpu__regs.html#gabccd357db38cf6e7528e807b8692ef0f">REG_MDMAEN</a> = 0x01;</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md438"></a>
+<h2><a class="anchor" id="autotoc_md407"></a>
 Joypad Registers</h2>
-<h3><a class="anchor" id="autotoc_md439"></a>
+<h3><a class="anchor" id="autotoc_md408"></a>
 $4218-$421F - JOY1-4 (Auto-Read Results)</h3>
 <p>After auto-joypad read completes (check $4212 bit 0):</p>
 <table class="markdownTable">
@@ -630,7 +630,7 @@ $4218-$421F - JOY1-4 (Auto-Read Results)</h3>
 <div class="ttc" id="agroup__cpu__regs_html_gaa7f10b9a2db0fb936560d2475717bf73"><div class="ttname"><a href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a></div><div class="ttdeci">#define REG_JOY1H</div><div class="ttdoc">Joypad 1 data high (R)</div><div class="ttdef"><b>Definition</b> registers.h:328</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gac0a6bd5981a6d53791eca06ea2bd5772"><div class="ttname"><a href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a></div><div class="ttdeci">#define REG_JOY1L</div><div class="ttdoc">Joypad 1 data low (R)</div><div class="ttdef"><b>Definition</b> registers.h:325</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md441"></a>
+<h2><a class="anchor" id="autotoc_md410"></a>
 OpenSNES Register Macros</h2>
 <p>The SDK provides convenient macros in <code>&lt;<a class="el" href="registers_8h.html" title="SNES Hardware Register Definitions.">snes/registers.h</a>&gt;</code>:</p>
 <div class="fragment"><div class="line"><span class="comment">// Direct register access</span></div>
@@ -646,7 +646,7 @@ OpenSNES Register Macros</h2>
 <div class="line"><span class="comment">// PPU status (read-only)</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x80) { <span class="comment">/* In VBlank */</span> }</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md443"></a>
+<h2><a class="anchor" id="autotoc_md412"></a>
 Further Reading</h2>
 <ul>
 <li><a class="el" href="MEMORY__MAP_8md.html">Memory Map</a> - Full address space layout</li>

@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['health_0',['health',['../structEntity.html#a05adfb0c4bf2b5965819d7437fd5cd2b',1,'Entity']]],
-  ['height_1',['height',['../structRect.html#a7e0d0a0cf7eb269f3d902a14f7995c5c',1,'Rect::height'],['../structEntity.html#a1784f0191f0a7853c740d64e7052c10f',1,'Entity::height'],['../structt__objs.html#a3bf3757f174f93270ff558d1351a7872',1,'t_objs::height']]],
-  ['hitpoints_2',['hitpoints',['../structt__objs.html#a66724708a48c464c7c9e1a00a6b81b6d',1,'t_objs']]]
+  ['flags_0',['flags',['../structAudioSample.html#a0b4a12b0741a71424ba4b51f09a9b65e',1,'AudioSample::flags'],['../structEntity.html#ad1d0a3f5055f29472e19a60d04d354b1',1,'Entity::flags']]],
+  ['font_5ftile_1',['font_tile',['../structTextConfig.html#a57476fe40cc993144b0cd3b07842bdf4',1,'TextConfig']]],
+  ['framecount_2',['frameCount',['../structAnimation.html#a44c9945a9433f2fc849c77bd3501b28c',1,'Animation']]],
+  ['framedelay_3',['frameDelay',['../structAnimation.html#a11968cac7a2898ce4796df14d4b41198',1,'Animation']]],
+  ['frames_4',['frames',['../structAnimation.html#a8e9b8b3b61265b2b8e268a02dec709a1',1,'Animation']]]
 ];

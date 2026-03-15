@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds_mode7_pe
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md766"></a>
+    <h2><a class="anchor" id="autotoc_md735"></a>
 What This Example Shows</h2>
 <p>How to combine Mode 7 with HDMA to create a <b>perspective ground plane</b> &ndash; the same technique used in F-Zero, Mario Kart, and Pilotwings. The screen is split in two: a static sky on top and a scaled ground that recedes into the distance.</p>
-<h2><a class="anchor" id="autotoc_md767"></a>
+<h2><a class="anchor" id="autotoc_md736"></a>
 Prerequisites</h2>
 <p>Read <code>backgrounds/mode7</code> first (Mode 7 basics), then <code>effects/hdma_wave</code> (HDMA per-scanline programming).</p>
-<h2><a class="anchor" id="autotoc_md768"></a>
+<h2><a class="anchor" id="autotoc_md737"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,14 +114,14 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD   </td><td class="markdownTableBodyNone">Scroll the ground plane   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md769"></a>
+<h2><a class="anchor" id="autotoc_md738"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/backgrounds/mode7_perspective</div>
 </div><!-- fragment --><p>Then open <code>mode7_perspective.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md770"></a>
+<h2><a class="anchor" id="autotoc_md739"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md771"></a>
+<h3><a class="anchor" id="autotoc_md740"></a>
 1. Split-screen with HDMA</h3>
 <p>The screen is divided by 4 HDMA channels running every frame:</p>
 <table class="markdownTable">
@@ -137,11 +137,11 @@ How It Works</h2>
 <td class="markdownTableBodyNone">Ch4   </td><td class="markdownTableBodyNone">M7D ($211E)   </td><td class="markdownTableBodyNone">Per-scanline vertical scale (perspective)   </td></tr>
 </table>
 <p>Top 96 scanlines: Mode 3 displays a static sky background on BG2. Bottom 128 scanlines: Mode 7 displays the ground with per-scanline scaling.</p>
-<h3><a class="anchor" id="autotoc_md772"></a>
+<h3><a class="anchor" id="autotoc_md741"></a>
 2. Perspective math</h3>
 <p>The key to the 3D illusion: scanlines near the top of the ground area (the "horizon") use a large scale value (small objects = far away), while scanlines near the bottom use a small scale value (large objects = close up).</p>
 <p>This is a pre-computed table in the assembly data &ndash; each of the 128 ground scanlines has its own M7A/M7D scale pair.</p>
-<h3><a class="anchor" id="autotoc_md773"></a>
+<h3><a class="anchor" id="autotoc_md742"></a>
 3. Scrolling</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  sx--;</div>
 <div class="line"><span class="keywordflow">if</span> (pad0 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) sx++;</div>
@@ -153,18 +153,18 @@ How It Works</h2>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 </div><!-- fragment --><p>The scroll values are passed to the assembly helper, which writes them to the Mode 7 scroll registers (M7HOFS/M7VOFS at $210D/$210E) and re-enables the HDMA channels each frame.</p>
-<h2><a class="anchor" id="autotoc_md774"></a>
+<h2><a class="anchor" id="autotoc_md743"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md775"></a>
+<h3><a class="anchor" id="autotoc_md744"></a>
 Mode Switching Mid-Frame</h3>
 <p>The SNES allows changing the BGMODE register ($2105) via HDMA between scanlines. This is how one screen shows two completely different video modes &ndash; Mode 3 for the sky portion and Mode 7 for the ground portion. The switch happens during HBlank, so there is no visible glitch.</p>
-<h3><a class="anchor" id="autotoc_md776"></a>
+<h3><a class="anchor" id="autotoc_md745"></a>
 Per-Scanline Scaling</h3>
 <p>By writing M7A/M7D every scanline via HDMA repeat mode, each horizontal line of the ground has a different scale factor. Lines near the horizon are scaled way down (far away), lines at the bottom are close to 1:1 (nearby). This creates the depth illusion without any 3D math at runtime &ndash; it is all pre-computed tables.</p>
-<h3><a class="anchor" id="autotoc_md777"></a>
+<h3><a class="anchor" id="autotoc_md746"></a>
 HDMA Budget</h3>
 <p>4 simultaneous HDMA channels is feasible but uses significant bus time per scanline. Each HDMA transfer needs ~18 master cycles per byte during HBlank. Adding more channels risks running out of HBlank time (1364 master cycles per scanline).</p>
-<h2><a class="anchor" id="autotoc_md778"></a>
+<h2><a class="anchor" id="autotoc_md747"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -180,7 +180,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console dma background sprite input mode7</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md779"></a>
+<h2><a class="anchor" id="autotoc_md748"></a>
 Going Further</h2>
 <ul>
 <li><b>Add rotation</b>: Combine the perspective tables with angle rotation for a full F-Zero-style driving effect. You would need to recompute the M7A-M7D table entries based on the current heading angle.</li>
@@ -197,7 +197,7 @@ Going Further</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

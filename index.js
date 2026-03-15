@@ -12,33 +12,33 @@ var index =
     [ "Getting Started with OpenSNES", "getting_started.html", null ],
     [ "Learn SNES Development", "learning_path.html", [
       [ "Hello World", "examples_text_hello_world.html", [
-        [ "Level 1: First Steps", "learning_path.html#autotoc_md148", null ],
-        [ "Level 2: Graphics Fundamentals", "learning_path.html#autotoc_md149", null ],
-        [ "Level 3: Scrolling and Effects", "learning_path.html#autotoc_md150", null ],
-        [ "Level 4: Advanced Topics", "learning_path.html#autotoc_md151", null ],
-        [ "Level 5: Maps and Complete Projects", "learning_path.html#autotoc_md152", [
-          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1220", null ],
-          [ "Controls", "examples_text_hello_world.html#autotoc_md1221", null ],
-          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1222", null ],
-          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1224", [
-            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1225", null ],
-            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1226", null ],
-            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1227", null ],
-            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1228", null ],
-            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1229", null ],
-            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1230", null ],
-            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1231", null ]
+        [ "Level 1: First Steps", "learning_path.html#autotoc_md149", null ],
+        [ "Level 2: Graphics Fundamentals", "learning_path.html#autotoc_md150", null ],
+        [ "Level 3: Scrolling and Effects", "learning_path.html#autotoc_md151", null ],
+        [ "Level 4: Advanced Topics", "learning_path.html#autotoc_md152", null ],
+        [ "Level 5: Maps and Complete Projects", "learning_path.html#autotoc_md153", [
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1189", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1190", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1191", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1193", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1194", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1195", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1196", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1197", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1198", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1199", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1200", null ]
           ] ],
-          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1233", null ],
-          [ "Go Further", "examples_text_hello_world.html#autotoc_md1235", null ],
-          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1237", [
-            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1238", null ],
-            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1239", null ],
-            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1240", null ]
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1202", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1204", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1206", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1207", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1208", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1209", null ]
           ] ],
-          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1241", null ],
-          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1242", null ],
-          [ "Files", "examples_text_hello_world.html#autotoc_md1243", null ]
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1210", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1211", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1212", null ]
         ] ]
       ] ],
       [ "Text Module Test", "examples_text_text_test.html", null ],
@@ -77,10 +77,81 @@ var index =
       [ "LikeMario", "examples_games_likemario.html", null ],
       [ "Map and Objects", "examples_games_mapandobjects.html", null ]
     ] ],
+    [ "Browse Examples by Category", "examples_by_category.html", [
+      [ "Hello World", "examples_text_hello_world.html", [
+        [ "Text", "examples_by_category.html#autotoc_md155", null ],
+        [ "Graphics: Backgrounds", "examples_by_category.html#autotoc_md157", null ],
+        [ "Graphics: Sprites", "examples_by_category.html#autotoc_md159", null ],
+        [ "Graphics: Effects", "examples_by_category.html#autotoc_md161", null ],
+        [ "Input", "examples_by_category.html#autotoc_md163", null ],
+        [ "Audio", "examples_by_category.html#autotoc_md165", null ],
+        [ "Maps", "examples_by_category.html#autotoc_md167", null ],
+        [ "Memory", "examples_by_category.html#autotoc_md169", null ],
+        [ "Basics", "examples_by_category.html#autotoc_md171", null ],
+        [ "Games", "examples_by_category.html#autotoc_md173", [
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1189", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1190", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1191", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1193", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1194", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1195", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1196", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1197", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1198", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1199", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1200", null ]
+          ] ],
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1202", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1204", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1206", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1207", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1208", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1209", null ]
+          ] ],
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1210", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1211", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1212", null ]
+        ] ]
+      ] ],
+      [ "Text Module Test", "examples_text_text_test.html", null ],
+      [ "Mode 1 Example", "examples_graphics_backgrounds_mode1.html", null ],
+      [ "Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds", "examples_graphics_backgrounds_mode1_bg3_priority.html", null ],
+      [ "Mode 1 LZ77", "examples_graphics_backgrounds_mode1_lz77.html", null ],
+      [ "Continuous Scroll", "examples_graphics_backgrounds_continuous_scroll.html", null ],
+      [ "Mixed Scroll", "examples_graphics_backgrounds_mixed_scroll.html", null ],
+      [ "Mode 7 -- Rotation and Scaling", "examples_graphics_backgrounds_mode7.html", null ],
+      [ "Mode 7 Perspective -- Pseudo-3D Ground Effect", "examples_graphics_backgrounds_mode7_perspective.html", null ],
+      [ "Simple Sprite -- Your First OAM Sprite", "examples_graphics_sprites_simple_sprite.html", null ],
+      [ "Animated Sprite -- Direction States and Sprite Sheets", "examples_graphics_sprites_animated_sprite.html", null ],
+      [ "Dynamic Sprite -- VRAM Streaming for Animated Sprites", "examples_graphics_sprites_dynamic_sprite.html", null ],
+      [ "Object Size -- All 6 SNES Sprite Size Modes", "examples_graphics_sprites_object_size.html", null ],
+      [ "Metasprite", "examples_graphics_sprites_metasprite.html", null ],
+      [ "Fading Example", "examples_graphics_effects_fading.html", null ],
+      [ "Mosaic -- PPU Pixel Block Effect", "examples_graphics_effects_mosaic.html", null ],
+      [ "HDMA Wave", "examples_graphics_effects_hdma_wave.html", null ],
+      [ "HDMA Gradient", "examples_graphics_effects_hdma_gradient.html", null ],
+      [ "Gradient Colors -- HDMA Color Gradients", "examples_graphics_effects_gradient_colors.html", null ],
+      [ "Parallax Scrolling", "examples_graphics_effects_parallax_scrolling.html", null ],
+      [ "Color Math Transparency Example", "examples_graphics_effects_transparency.html", null ],
+      [ "Window -- HDMA Triangle Masking", "examples_graphics_effects_window.html", null ],
+      [ "Transparent Window -- Color Math + HDMA", "examples_graphics_effects_transparent_window.html", null ],
+      [ "Two Players Example", "examples_input_two_players.html", null ],
+      [ "SNES Mouse", "examples_input_mouse.html", null ],
+      [ "Super Scope", "examples_input_superscope.html", null ],
+      [ "SNESMOD Music Example", "examples_audio_snesmod_music.html", null ],
+      [ "SNESMOD Sound Effects Example", "examples_audio_snesmod_sfx.html", null ],
+      [ "Dynamic Map", "examples_maps_dynamic_map.html", null ],
+      [ "Slope Mario", "examples_maps_slopemario.html", null ],
+      [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", null ],
+      [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ],
+      [ "Collision Detection Example", "examples_basics_collision_demo.html", null ],
+      [ "Breakout", "examples_games_breakout.html", null ],
+      [ "LikeMario", "examples_games_likemario.html", null ],
+      [ "Map and Objects", "examples_games_mapandobjects.html", null ]
+    ] ],
     [ "SNES Graphics Programming Guide", "snes_graphics_guide.html", null ],
     [ "SNES Sound Programming Guide", "snes_sound_guide.html", null ],
     [ "Troubleshooting OpenSNES", "troubleshooting.html", null ],
-    [ "OpenSNES Example Walkthroughs", "example_walkthroughs.html", null ],
     [ "Graphics & Backgrounds Tutorial", "tutorial_graphics.html", null ],
     [ "Sprites & Animation Tutorial", "tutorial_sprites.html", null ],
     [ "Controller Input Tutorial", "tutorial_input.html", null ],

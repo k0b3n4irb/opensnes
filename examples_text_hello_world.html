@@ -100,15 +100,15 @@ $(document).ready(function(){initNavTree('examples_text_hello_world.html',''); i
 <p>&zwj;Your first SNES ROM. Nine tiles, two colors, one message. Welcome to 1990. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md1220"></a>
+<h2><a class="anchor" id="autotoc_md1189"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/text/hello_world</div>
 </div><!-- fragment --><p>Then open <code>hello_world.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md1221"></a>
+<h2><a class="anchor" id="autotoc_md1190"></a>
 Controls</h2>
 <p>No interactive controls. The text is displayed statically.</p>
-<h2><a class="anchor" id="autotoc_md1222"></a>
+<h2><a class="anchor" id="autotoc_md1191"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES turns pixels into pictures (tiles, tilemaps, palettes — the holy trinity)</li>
@@ -117,15 +117,15 @@ What You'll Learn</h2>
 <li>The difference between VRAM (video memory) and regular RAM</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1224"></a>
+<h2><a class="anchor" id="autotoc_md1193"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md1225"></a>
+<h3><a class="anchor" id="autotoc_md1194"></a>
 1. There Is No printf</h3>
 <p>On a modern computer, printing text is one line of code. On the SNES, there is no text system. There's no font. There's no framebuffer. The PPU (Picture Processing Unit) only understands one thing: <b>tiles</b>.</p>
 <p>A tile is an 8x8 pixel image stored in VRAM. A tilemap is a grid that says "put tile #3
 here, tile #7 there." That's it — that's the entire display system. If you want letters on screen, you need to draw each letter as a tile, upload them to VRAM, and then write a tilemap that spells out your message.</p>
 <p>That's exactly what this example does.</p>
-<h3><a class="anchor" id="autotoc_md1226"></a>
+<h3><a class="anchor" id="autotoc_md1195"></a>
 2. Drawing Letters in Hex</h3>
 <p>Each letter is hand-encoded as a 16-byte tile in 2bpp format (2 bits per pixel = 4 possible colors). Every pair of bytes is one row of 8 pixels:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> font_tiles[] = {</div>
@@ -139,7 +139,7 @@ here, tile #7 there." That's it — that's the entire display system. If you wan
 <blockquote class="doxtable">
 <p>&zwj;<b>Why are all the second bytes <code>0x00</code>?</b> In 2bpp format, byte 1 is bitplane 0 and byte 2 is bitplane 1. We only use color 1 (bitplane 0 = 1, bitplane 1 = 0), so the second byte is always zero. If you set both to <code>0xFF</code>, you'd get color 3 instead. That's how the SNES packs multiple color choices into minimal memory. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md1227"></a>
+<h3><a class="anchor" id="autotoc_md1196"></a>
 3. Setting Up the PPU</h3>
 <p>Before writing anything to VRAM, you need to tell the PPU where to find things:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -158,7 +158,7 @@ graphics start at `$0000`."</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why two separate addresses?</b> Because tiles and tilemaps are different data. Tiles are the pixel art. The tilemap is the layout — which tile goes where on screen. They can live anywhere in VRAM, and you choose where by setting these registers. This separation is what makes the SNES so flexible: you can reuse the same tiles with different layouts, or swap layouts without reloading tiles. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md1228"></a>
+<h3><a class="anchor" id="autotoc_md1197"></a>
 4. Uploading Tiles to VRAM</h3>
 <p>VRAM isn't regular memory — you can't just write to it with a pointer. You talk to it through a pair of registers: set the address, then write data byte by byte:</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a> = 0x80;   <span class="comment">/* Auto-increment after writing high byte */</span></div>
@@ -176,7 +176,7 @@ graphics start at `$0000`."</p>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W)</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
 </div><!-- fragment --><p>VRAM is organized in 16-bit words. <code>VMAIN = 0x80</code> means "auto-increment the address
 after I write the high byte." So you write low, write high, and the address moves forward by one word. 144 bytes = 9 tiles × 16 bytes each = our complete font.</p>
-<h3><a class="anchor" id="autotoc_md1229"></a>
+<h3><a class="anchor" id="autotoc_md1198"></a>
 5. Two Colors, Four Bytes</h3>
 <p>The SNES palette uses 15-bit BGR color (5 bits per channel, little-endian):</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 0;       <span class="comment">/* Start at color 0 */</span></div>
@@ -187,7 +187,7 @@ after I write the high byte." So you write low, write high, and the address move
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W)</div><div class="ttdef"><b>Definition</b> registers.h:148</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W)</div><div class="ttdef"><b>Definition</b> registers.h:151</div></div>
 </div><!-- fragment --><p>Color 0 is the background, color 1 is the text. Four bytes, two colors. That's all we need for a monochrome font.</p>
-<h3><a class="anchor" id="autotoc_md1230"></a>
+<h3><a class="anchor" id="autotoc_md1199"></a>
 6. Spelling the Message</h3>
 <p>The message is encoded as an array of tile indices:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> message[] = {</div>
@@ -214,7 +214,7 @@ after I write the high byte." So you write low, write high, and the address move
 <blockquote class="doxtable">
 <p>&zwj;<b>What's <code>0x05CA</code>?</b> The tilemap base is <code>$0400</code>. Each row is 32 entries wide. Row 14 starts at <code>$0400 + 14×32 = $0400 + $01C0 = $05C0</code>. Column 10 adds 10 more: <code>$05CA</code>. That math becomes second nature after a few tilemaps. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md1231"></a>
+<h3><a class="anchor" id="autotoc_md1200"></a>
 7. Lights On</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;  <span class="comment">/* Show BG1 on the main screen */</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();     <span class="comment">/* Turn on the display */</span></div>
@@ -228,7 +228,7 @@ after I write the high byte." So you write low, write high, and the address move
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:439</div></div>
 </div><!-- fragment --><p><code>TM</code> (screen designation) controls which layers are visible. We enable BG1 only. <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> sets brightness to maximum. The infinite loop with <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> keeps the program alive and synced to 60fps — without it, the CPU would spin wildly and cause timing issues.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1233"></a>
+<h2><a class="anchor" id="autotoc_md1202"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Screen is black?</b> Check that <code>REG_TM</code> has the right layer enabled. If BG1 isn't in the TM register, the PPU won't draw it, no matter what's in VRAM.</li>
@@ -237,7 +237,7 @@ Tips &amp; Tricks</h2>
 <li><b>Why <code>setMode(BG_MODE0, 0)</code> and not Mode 1?</b> Mode 0 gives 4 layers of 2bpp (4 colors each). Mode 1 gives 2 layers of 4bpp + 1 layer of 2bpp. For monochrome text, Mode 0 is the natural fit — and you get 3 extra layers free if you want them later.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1235"></a>
+<h2><a class="anchor" id="autotoc_md1204"></a>
 Go Further</h2>
 <ul>
 <li><b>Change the message:</b> Add tiles for your own letters. Each tile is 16 bytes — sketch it on graph paper first, convert to hex, add it to <code>font_tiles[]</code>.</li>
@@ -246,15 +246,15 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../../graphics/sprites/simple_sprite/">Simple Sprite</a> &ndash; display a 32x32 sprite on screen using OAM.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md1237"></a>
+<h2><a class="anchor" id="autotoc_md1206"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md1238"></a>
+<h3><a class="anchor" id="autotoc_md1207"></a>
 The Pipeline</h3>
 <div class="fragment"><div class="line">main.c  →  cc65816  →  main.c.asm  →  wla-65816  →  main.c.obj  →  wlalink  →  hello_world.sfc</div>
 <div class="line">  C          cproc+       65816          WLA-DX         object        linker       final ROM</div>
 <div class="line">source       QBE         assembly       assembler        file</div>
 </div><!-- fragment --><p><code>cc65816</code> is the C compiler — it's actually two programs stitched together: <code>cproc</code> (a C11 frontend) parses your C code into intermediate representation, then <code>QBE</code> (with a custom 65816 backend) turns that IR into assembly. <code>wla-65816</code> assembles it into an object file. Finally, <code>wlalink</code> links everything — your compiled code, the startup code (crt0.asm), math helpers (runtime.asm), and library modules — into a playable <code>.sfc</code> ROM.</p>
-<h3><a class="anchor" id="autotoc_md1239"></a>
+<h3><a class="anchor" id="autotoc_md1208"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := hello_world.sfc          # Output ROM filename</div>
 <div class="line">ROM_NAME    := OPENSNES HELLO WORLD     # 21-char name burned into the ROM header</div>
@@ -262,7 +262,7 @@ The Makefile</h3>
 <div class="line">LIB_MODULES := console sprite dma       # Which library pieces to pull in</div>
 <div class="line">CSRC        := main.c                   # Your single C source file</div>
 </div><!-- fragment --><p><code>CSRC</code> can list multiple C files (e.g., <code>CSRC := main.c engine/player.c</code>). For this simple example, a single file is sufficient. You can also add assembly source files via <code>ASMSRC</code>.</p>
-<h3><a class="anchor" id="autotoc_md1240"></a>
+<h3><a class="anchor" id="autotoc_md1209"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -277,9 +277,9 @@ Why These Modules?</h3>
 <blockquote class="doxtable">
 <p>&zwj;**"But there are no sprites in Hello World!"** Correct. The dependency chain is: <code>console</code> → <code>sprite</code> → <code>dma</code>. The NMI handler (in console) always DMAs the OAM buffer (in sprite) to the PPU, and that DMA call lives in the dma module. The build system does NOT auto-resolve these dependencies — if you forget <code>dma</code>, you get a linker error about an undefined <code>dmaCopyOam</code> symbol and no hint about why. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md1241"></a>
+<h2><a class="anchor" id="autotoc_md1210"></a>
 &lt;/blockquote&gt;</h2>
-<h2><a class="anchor" id="autotoc_md1242"></a>
+<h2><a class="anchor" id="autotoc_md1211"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -303,7 +303,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">TM   </td><td class="markdownTableBodyNone">$212C   </td><td class="markdownTableBodyNone">Enable BG1 on main screen   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1243"></a>
+<h2><a class="anchor" id="autotoc_md1212"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -319,7 +319,7 @@ Files</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

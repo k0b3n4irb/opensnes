@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('examples_graphics_sprites.html',''); i
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Learn SNES sprite (OBJ) handling from basic display to dynamic VRAM management. The SNES supports 128 hardware sprites with configurable sizes, priorities, and palette assignments.</p>
-<h2><a class="anchor" id="autotoc_md1032"></a>
+<h2><a class="anchor" id="autotoc_md1001"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -113,9 +113,9 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="dynamic_sprite/">dynamic_sprite</a>   </td><td class="markdownTableBodyNone">Advanced   </td><td class="markdownTableBodyNone">Dynamic VRAM tile streaming for many unique sprites   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1033"></a>
+<h2><a class="anchor" id="autotoc_md1002"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1034"></a>
+<h3><a class="anchor" id="autotoc_md1003"></a>
 OAM Structure</h3>
 <p>128 sprites, 4 bytes each in the low table (512 bytes):</p><ul>
 <li>Byte 0: X position (low 8 bits)</li>
@@ -124,7 +124,7 @@ OAM Structure</h3>
 <li>Byte 3: Attributes (vhoopppc &ndash; flip, priority, palette, tile high bit)</li>
 </ul>
 <p>High table (32 bytes): 2 bits per sprite for X high bit and size select.</p>
-<h3><a class="anchor" id="autotoc_md1035"></a>
+<h3><a class="anchor" id="autotoc_md1004"></a>
 Sprite Sizes (OBJSEL $2101)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -142,7 +142,7 @@ Sprite Sizes (OBJSEL $2101)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">5   </td><td class="markdownTableBodyNone">32x32   </td><td class="markdownTableBodyNone">64x64   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md1036"></a>
+<h3><a class="anchor" id="autotoc_md1005"></a>
 Performance Tip</h3>
 <p>For many sprites per frame, write directly to the <code>oamMemory[]</code> buffer instead of calling <code><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></code> repeatedly. The NMI handler DMAs the buffer to OAM hardware when <code>oam_update_flag</code> is set.</p>
 <hr  />

@@ -21,5 +21,11 @@ var searchData=
   ['hdmawavesetspeed_18',['hdmaWaveSetSpeed',['../hdma_8h.html#a51e3697c2d4ec0f4a9f121822f5f584e',1,'hdma.h']]],
   ['hdmawavestop_19',['hdmaWaveStop',['../hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1',1,'hdma.h']]],
   ['hdmawaveupdate_20',['hdmaWaveUpdate',['../hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216',1,'hdma.h']]],
-  ['hdmawindowshape_21',['hdmaWindowShape',['../hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6',1,'hdma.h']]]
+  ['hdmawindowshape_21',['hdmaWindowShape',['../hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6',1,'hdma.h']]],
+  ['hudclearmessage_22',['hudClearMessage',['../hud_8h.html#a39e871ce996a37670216b9d07b624347',1,'hud.h']]],
+  ['hudinit_23',['hudInit',['../hud_8h.html#a4322f64e04a2bb7be09a2c11f3f6a0f1',1,'hud.h']]],
+  ['hudshowmessage_24',['hudShowMessage',['../hud_8h.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hud.h']]],
+  ['hudupdatelevel_25',['hudUpdateLevel',['../hud_8h.html#ab007827502c470f795bcbb00ba332eb2',1,'hud.h']]],
+  ['hudupdatelines_26',['hudUpdateLines',['../hud_8h.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hud.h']]],
+  ['hudupdatescore_27',['hudUpdateScore',['../hud_8h.html#a7259c10a755ca12584e1eb24b069ba86',1,'hud.h']]]
 ];

@@ -17,6 +17,7 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "math.h", "math_8h.html", "math_8h" ],
     [ "mode7.h", "mode7_8h.html", "mode7_8h" ],
     [ "mosaic.h", "mosaic_8h.html", "mosaic_8h" ],
+    [ "mp5.h", "mp5_8h.html", "mp5_8h" ],
     [ "object.h", "object_8h.html", "object_8h" ],
     [ "registers.h", "registers_8h.html", "registers_8h" ],
     [ "scoring.h", "scoring_8h.html", "scoring_8h" ],

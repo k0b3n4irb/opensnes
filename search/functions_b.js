@@ -35,5 +35,8 @@ var searchData=
   ['mouseinit_32',['mouseInit',['../group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e',1,'input.h']]],
   ['mouseisconnected_33',['mouseIsConnected',['../group__mouse__input.html#ga5068f6438c4c46d041f3cbf31a35421b',1,'input.h']]],
   ['mousesetsensitivity_34',['mouseSetSensitivity',['../group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d',1,'input.h']]],
-  ['mul16_35',['mul16',['../math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54',1,'math.h']]]
+  ['mp5disable_35',['mp5Disable',['../mp5_8h.html#a0fa48a4fbe7f8154e456e62dbd91f990',1,'mp5.h']]],
+  ['mp5enable_36',['mp5Enable',['../mp5_8h.html#a05d040026001e52db705d7f2214eee57',1,'mp5.h']]],
+  ['mp5isconnected_37',['mp5IsConnected',['../mp5_8h.html#a2b7f9575990a192ff32f34441b4e2081',1,'mp5.h']]],
+  ['mul16_38',['mul16',['../math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54',1,'math.h']]]
 ];

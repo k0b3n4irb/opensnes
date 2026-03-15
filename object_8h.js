@@ -18,7 +18,7 @@ var object_8h =
     [ "objNew", "object_8h.html#a5f3dd63b163cced3299b0d1d48d2b17a", null ],
     [ "objRefreshAll", "object_8h.html#aede8c571a7e8bdb8129b5df55b45225b", null ],
     [ "objUpdateAll", "object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83", null ],
-    [ "objUpdateXY", "object_8h.html#aaad5794fd209d2cc2c8e8cfc1f451923", null ],
+    [ "objUpdateXY", "object_8h.html#af27124be823e35daf579362d3820738d", null ],
     [ "objgetid", "object_8h.html#ad4b2cf3a008d2011baf65b7ed74eaf65", null ],
     [ "objptr", "object_8h.html#a9e81915d1e68d22798a93bb27eb74188", null ],
     [ "objtokill", "object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3", null ],

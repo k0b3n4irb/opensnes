@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_transparency
 <div class="caption">
 Screenshot</div></div>
     <p>Interactive shadow and tint effects using the SNES color math hardware.</p>
-<h2><a class="anchor" id="autotoc_md903"></a>
+<h2><a class="anchor" id="autotoc_md872"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>How SNES color math works</li>
@@ -110,14 +110,14 @@ Learning Objectives</h2>
 <li>Creating tint (color overlay) effects</li>
 <li>The three color math registers: CGWSEL, CGADSUB, COLDATA</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md904"></a>
+<h2><a class="anchor" id="autotoc_md873"></a>
 Prerequisites</h2>
 <ul>
 <li>Understanding of backgrounds and palettes</li>
 <li>Completed basic graphics examples</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md906"></a>
+<h2><a class="anchor" id="autotoc_md875"></a>
 What This Example Does</h2>
 <p>Displays a background with interactive color math effects:</p><ul>
 <li><b>Shadow mode</b>: Darkens the entire screen (adjustable intensity)</li>
@@ -139,7 +139,7 @@ What This Example Does</h2>
 <li>D-Pad Down: Decrease shadow intensity</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md908"></a>
+<h2><a class="anchor" id="autotoc_md877"></a>
 Code Type</h2>
 <p><b>Pure C</b></p>
 <table class="markdownTable">
@@ -157,9 +157,9 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Graphics data   </td><td class="markdownTableBodyNone">Assembly (<code>data.asm</code>)   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md910"></a>
+<h2><a class="anchor" id="autotoc_md879"></a>
 Color Math Fundamentals</h2>
-<h3><a class="anchor" id="autotoc_md911"></a>
+<h3><a class="anchor" id="autotoc_md880"></a>
 The Three Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -171,7 +171,7 @@ The Three Registers</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">COLDATA   </td><td class="markdownTableBodyNone">$2132   </td><td class="markdownTableBodyNone">Fixed color value (5-bit per channel)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md912"></a>
+<h3><a class="anchor" id="autotoc_md881"></a>
 CGWSEL - Color Math Control A</h3>
 <div class="fragment"><div class="line">Bit 1-0: Color math source</div>
 <div class="line">  00 = Always use subscreen</div>
@@ -179,7 +179,7 @@ CGWSEL - Color Math Control A</h3>
 <div class="line">  10 = Fixed color only</div>
 <div class="line">  11 = Disable color math</div>
 </div><!-- fragment --><p>For fixed color effects, use <code>REG_CGWSEL = 0x02</code>.</p>
-<h3><a class="anchor" id="autotoc_md913"></a>
+<h3><a class="anchor" id="autotoc_md882"></a>
 CGADSUB - Color Math Control B</h3>
 <div class="fragment"><div class="line">Bit 7: Add/Subtract (0=add, 1=subtract)</div>
 <div class="line">Bit 6: Half result (divide by 2)</div>
@@ -187,14 +187,14 @@ CGADSUB - Color Math Control B</h3>
 </div><!-- fragment --><p>Example: </p><div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga4de43c070a90869390fca11731a2692e">REG_CGADSUB</a> = 0x80 | 0x01;  <span class="comment">/* Subtract, BG1 enabled */</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga4de43c070a90869390fca11731a2692e">REG_CGADSUB</a> = 0x00 | 0x01;  <span class="comment">/* Add, BG1 enabled */</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga4de43c070a90869390fca11731a2692e"><div class="ttname"><a href="group__ppu__regs.html#ga4de43c070a90869390fca11731a2692e">REG_CGADSUB</a></div><div class="ttdeci">#define REG_CGADSUB</div><div class="ttdoc">Color math control B (W)</div><div class="ttdef"><b>Definition</b> registers.h:196</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md914"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md883"></a>
 COLDATA - Fixed Color</h3>
 <div class="fragment"><div class="line">Bit 7: Blue channel</div>
 <div class="line">Bit 6: Green channel</div>
 <div class="line">Bit 5: Red channel</div>
 <div class="line">Bits 4-0: Intensity (0-31)</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md916"></a>
+<h2><a class="anchor" id="autotoc_md885"></a>
 Shadow Effect</h2>
 <p>Shadows are created by <b>subtracting</b> from the screen colors:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5">colorMathShadow</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> intensity) {</div>
@@ -220,7 +220,7 @@ Shadow Effect</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --><p>Higher intensity = darker shadow (more color subtracted).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md918"></a>
+<h2><a class="anchor" id="autotoc_md887"></a>
 Tint Effect</h2>
 <p>Tints are created by <b>adding</b> a single color channel:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Red tint */</span></div>
@@ -235,7 +235,7 @@ Tint Effect</h2>
 <div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens)</div><div class="ttdef"><b>Definition</b> colormath.h:85</div></div>
 </div><!-- fragment --><p>This makes the screen appear tinted toward that color.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md920"></a>
+<h2><a class="anchor" id="autotoc_md889"></a>
 State Machine</h2>
 <p>The example uses a simple state machine:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> shadow_intensity = 8;</div>
@@ -263,7 +263,7 @@ State Machine</h2>
 <div class="ttc" id="acolormath_8h_html_a6c2c8c46d31bdc310520d1d11f3e68b8"><div class="ttname"><a href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a></div><div class="ttdeci">#define COLORMATH_ALL</div><div class="ttdoc">Apply color math to all layers.</div><div class="ttdef"><b>Definition</b> colormath.h:78</div></div>
 <div class="ttc" id="acolormath_8h_html_ae94260b8411da5bb9f06386b65e6d6cb"><div class="ttname"><a href="colormath_8h.html#ae94260b8411da5bb9f06386b65e6d6cb">colorMathDisable</a></div><div class="ttdeci">void colorMathDisable(void)</div><div class="ttdoc">Disable all color math.</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md922"></a>
+<h2><a class="anchor" id="autotoc_md891"></a>
 Input Handling</h2>
 <p>Edge detection for button presses:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_prev = 0;</div>
@@ -292,13 +292,13 @@ Input Handling</h2>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md924"></a>
+<h2><a class="anchor" id="autotoc_md893"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/transparency</div>
 </div><!-- fragment --><p>Then open <code>transparency.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md926"></a>
+<h2><a class="anchor" id="autotoc_md895"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -313,7 +313,7 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>res/opensnes.png</code>   </td><td class="markdownTableBodyNone">Source background image   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md928"></a>
+<h2><a class="anchor" id="autotoc_md897"></a>
 Color Math Layer Constants</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#define COLORMATH_BG1      0x01</span></div>
 <div class="line"><span class="preprocessor">#define COLORMATH_BG2      0x02</span></div>
@@ -332,9 +332,9 @@ Color Math Layer Constants</h2>
 <div class="ttc" id="acolormath_8h_html_a7f349afd40df9ce4d4ccafa0b03d9d6a"><div class="ttname"><a href="colormath_8h.html#a7f349afd40df9ce4d4ccafa0b03d9d6a">COLORMATH_OBJ</a></div><div class="ttdeci">#define COLORMATH_OBJ</div><div class="ttdoc">Apply color math to sprites (OBJ)</div><div class="ttdef"><b>Definition</b> colormath.h:72</div></div>
 <div class="ttc" id="acolormath_8h_html_ab6a733f0b0c44bd3b5df36d28bf8c482"><div class="ttname"><a href="colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482">COLORMATH_BG1</a></div><div class="ttdeci">#define COLORMATH_BG1</div><div class="ttdoc">Apply color math to BG1.</div><div class="ttdef"><b>Definition</b> colormath.h:60</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md930"></a>
+<h2><a class="anchor" id="autotoc_md899"></a>
 Common Effects</h2>
-<h3><a class="anchor" id="autotoc_md931"></a>
+<h3><a class="anchor" id="autotoc_md900"></a>
 50% Transparency</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482">COLORMATH_BG1</a>);</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);</div>
@@ -343,14 +343,14 @@ Common Effects</h2>
 <div class="line"><span class="comment">/* Subscreen must have content to blend with */</span></div>
 <div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:95</div></div>
 <div class="ttc" id="acolormath_8h_html_aa5667a2a54eb543bd71dbbd9cd41bd10"><div class="ttname"><a href="colormath_8h.html#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a></div><div class="ttdeci">void colorMathSetHalf(u8 enable)</div><div class="ttdoc">Enable or disable half mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md932"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md901"></a>
 Fade to Black</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Increase shadow intensity from 0 to 31 over time */</span></div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> i = 0; i &lt; 32; i++) {</div>
 <div class="line">    <a class="code hl_function" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5">colorMathShadow</a>(<a class="code hl_define" href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>, i);</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md933"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md902"></a>
 Flash Effect</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Quick white flash */</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>);</div>
@@ -360,9 +360,9 @@ Flash Effect</h3>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ae94260b8411da5bb9f06386b65e6d6cb">colorMathDisable</a>();</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md935"></a>
+<h2><a class="anchor" id="autotoc_md904"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md936"></a>
+<h3><a class="anchor" id="autotoc_md905"></a>
 Exercise 1: Fade Transition</h3>
 <p>Create a fade-to-black transition: </p><div class="fragment"><div class="line"><span class="comment">/* Call each frame */</span></div>
 <div class="line"><span class="keywordtype">void</span> fadeOut(<span class="keywordtype">void</span>) {</div>
@@ -372,7 +372,7 @@ Exercise 1: Fade Transition</h3>
 <div class="line">        <a class="code hl_function" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5">colorMathShadow</a>(<a class="code hl_define" href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>, fade_level);</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md937"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md906"></a>
 Exercise 2: Pulsing Tint</h3>
 <p>Make the tint pulse by varying intensity: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pulse_dir = 1;</div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pulse_val = 0;</div>
@@ -382,14 +382,14 @@ Exercise 2: Pulsing Tint</h3>
 <div class="line">    pulse_dir = -pulse_dir;</div>
 <div class="line">}</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(pulse_val, 0, 0);  <span class="comment">/* Pulsing red */</span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md938"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md907"></a>
 Exercise 3: Day/Night Cycle</h3>
 <p>Combine shadow with a blue tint for night: </p><div class="fragment"><div class="line"><span class="comment">/* Night time effect */</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(0, 0, 8);  <span class="comment">/* Slight blue */</span></div>
 <div class="line"><span class="comment">/* Then overlay shadow */</span></div>
 <div class="line"><span class="comment">/* Note: May need HDMA for complex multi-effect */</span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md939"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md908"></a>
 Exercise 4: Damage Flash</h3>
 <p>Flash red when taking damage: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> damageFlash(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>);</div>
@@ -401,26 +401,26 @@ Exercise 4: Damage Flash</h3>
 <div class="line">    <a class="code hl_function" href="colormath_8h.html#ae94260b8411da5bb9f06386b65e6d6cb">colorMathDisable</a>();</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md941"></a>
+<h2><a class="anchor" id="autotoc_md910"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md942"></a>
+<h3><a class="anchor" id="autotoc_md911"></a>
 Why Fixed Color?</h3>
 <p>The SNES has two color math sources:</p><ol type="1">
 <li><b>Subscreen</b> - For transparency between layers</li>
 <li><b>Fixed color</b> - For uniform tint/shadow effects</li>
 </ol>
 <p>Fixed color is simpler when you want a consistent effect across the entire screen.</p>
-<h3><a class="anchor" id="autotoc_md943"></a>
+<h3><a class="anchor" id="autotoc_md912"></a>
 Half Mode</h3>
 <p>Setting <code>colorMathSetHalf(1)</code> divides the result by 2. This is essential for true 50% transparency but optional for shadow/tint effects.</p>
-<h3><a class="anchor" id="autotoc_md944"></a>
+<h3><a class="anchor" id="autotoc_md913"></a>
 Layer Priority</h3>
 <p>Color math respects layer priority:</p><ul>
 <li>Higher priority layers can block color math</li>
 <li>Use layer masks to control which layers are affected</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md946"></a>
+<h2><a class="anchor" id="autotoc_md915"></a>
 What's Next?</h2>
 <p><b>Window Masking:</b> <a href="../window/">Window Example</a> - Triangle-shaped HDMA window</p>
 <p><b>HDMA Gradient:</b> <a href="../gradient_colors/">Gradient Colors</a> - Per-scanline color effects </p>
@@ -430,7 +430,7 @@ What's Next?</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="learning_path.html">Learn SNES Development</a></li>
+    <li class="navelem"><a class="el" href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a class="el" href="examples_by_category.html">Browse Examples by Category</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

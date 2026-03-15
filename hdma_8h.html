@@ -303,12 +303,11 @@ Usage Example</h2>
 <div class="line"><span class="comment">// In main loop, HDMA runs automatically each frame</span></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s)</div></div>
-<div class="ttc" id="ahdma_8h_html_a84c42564b2a8bb1f61d468e3df77e0c3"><div class="ttname"><a href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a></div><div class="ttdeci">#define HDMA_MODE_1REG</div><div class="ttdoc">HDMA mode: 1 register, 1 byte.</div><div class="ttdef"><b>Definition</b> hdma.h:132</div></div>
+<div class="ttc" id="ahdma_8h_html_a84c42564b2a8bb1f61d468e3df77e0c3"><div class="ttname"><a href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a></div><div class="ttdeci">#define HDMA_MODE_1REG</div><div class="ttdoc">HDMA mode: 1 register, 1 byte.</div><div class="ttdef"><b>Definition</b> hdma.h:134</div></div>
 <div class="ttc" id="ahdma_8h_html_accfc69511911e1c0fdc59823c43c7a23"><div class="ttname"><a href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a></div><div class="ttdeci">void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table)</div><div class="ttdoc">Set up an HDMA channel.</div></div>
-<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:118</div></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>HDMA channels 6-7 are recommended to avoid conflicts with DMA. </dd>
-<dd>
-HDMA tables must be in ROM or bank $7E RAM.</dd></dl>
+<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd><b>Do NOT use HDMA_CHANNEL_7</b> — the NMI handler uses DMA channel 7 for OAM transfers every frame, which destroys any HDMA setup on that channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram). </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>HDMA tables must be in ROM or bank $7E RAM.</dd></dl>
 <h2><a class="anchor" id="autotoc_md32"></a>
 Bank Byte Limitation</h2>
 <p><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> hardcodes bank $00 for ROM addresses (&gt;= $8000). If the linker places a SUPERFREE table in bank $01+, HDMA will read wrong data. Use <a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank()</a> with an explicit bank byte for ROM tables, or use RAM-based tables (always bank $00) for dynamic effects.</p>
@@ -815,7 +814,7 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8">hdmaBrightnessGradient</a>(<a class="code hl_define" href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a>, 15, 0);  <span class="comment">// Fade to black</span></div>
 <div class="ttc" id="ahdma_8h_html_a4473b558fc1715556b995a576644b4d8"><div class="ttname"><a href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8">hdmaBrightnessGradient</a></div><div class="ttdeci">void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness)</div><div class="ttdoc">Create a vertical brightness gradient.</div></div>
-<div class="ttc" id="ahdma_8h_html_ad0501096ae607ca77cdd49cabce373b9"><div class="ttname"><a href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a></div><div class="ttdeci">#define HDMA_CHANNEL_7</div><div class="ttdoc">HDMA channel 7 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
+<div class="ttc" id="ahdma_8h_html_ad0501096ae607ca77cdd49cabce373b9"><div class="ttname"><a href="hdma_8h.html#ad0501096ae607ca77cdd49cabce373b9">HDMA_CHANNEL_7</a></div><div class="ttdeci">#define HDMA_CHANNEL_7</div><div class="ttdoc">HDMA channel 7 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:122</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1309,7 +1308,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a>, <a class="code hl_define" href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a>, my_table);</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
-<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132)</div><div class="ttdef"><b>Definition</b> hdma.h:209</div></div>
+<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="hdma_8h.html#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132)</div><div class="ttdef"><b>Definition</b> hdma.h:211</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

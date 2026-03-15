@@ -97,9 +97,9 @@ $(document).ready(function(){initNavTree('troubleshooting.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Common issues and their solutions.</p>
-<h2><a class="anchor" id="autotoc_md314"></a>
+<h2><a class="anchor" id="autotoc_md283"></a>
 Build Issues</h2>
-<h3><a class="anchor" id="autotoc_md315"></a>
+<h3><a class="anchor" id="autotoc_md284"></a>
 "OPENSNES not defined" or "No rule to make target 'common.mk'"</h3>
 <p><b>Cause</b>: The Makefile can't find the OpenSNES installation.</p>
 <p><b>Fix</b>: Set <code>OPENSNES</code> in your Makefile or set the environment variable:</p>
@@ -108,18 +108,18 @@ Build Issues</h2>
 <div class="line"> </div>
 <div class="line"># Option 2: Set environment variable</div>
 <div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md316"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md285"></a>
 Empty &lt;tt&gt;compiler/&lt;/tt&gt; directories or "cc65816 not found"</h3>
 <p><b>Cause</b>: Submodules weren't cloned.</p>
 <p><b>Fix</b>: </p><div class="fragment"><div class="line">cd /path/to/opensnes</div>
 <div class="line">git submodule update --init --recursive</div>
 <div class="line">make compiler</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md317"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md286"></a>
 "wla-65816: command not found"</h3>
 <p><b>Cause</b>: Compiler toolchain not built.</p>
 <p><b>Fix</b>: </p><div class="fragment"><div class="line">cd /path/to/opensnes</div>
 <div class="line">make compiler</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md318"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md287"></a>
 "clang: command not found" or "cc: command not found"</h3>
 <p><b>Cause</b>: Missing host C compiler.</p>
 <p><b>Fix</b> (by platform): </p><div class="fragment"><div class="line"># macOS</div>
@@ -133,7 +133,7 @@ Empty &lt;tt&gt;compiler/&lt;/tt&gt; directories or "cc65816 not found"</h3>
 <div class="line"> </div>
 <div class="line"># Windows MSYS2 (UCRT64)</div>
 <div class="line">pacman -S mingw-w64-ucrt-x86_64-clang</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md319"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md288"></a>
 Build fails with "unhandled op: XXX"</h3>
 <p><b>Cause</b>: The QBE backend doesn't support a specific operation (usually 32-bit or complex expressions).</p>
 <p><b>Fix</b>: Simplify your code: </p><div class="fragment"><div class="line"><span class="comment">// BAD: 32-bit operations are slow and may not work</span></div>
@@ -151,16 +151,16 @@ Build fails with "unhandled op: XXX"</h3>
 <div class="line">result = temp / d;</div>
 <div class="ttc" id="agroup__types_html_ga10e94b422ef0c20dcdec20d31a1f5049"><div class="ttname"><a href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a></div><div class="ttdeci">unsigned int u32</div><div class="ttdoc">32-bit unsigned integer (0 to 4294967295)</div><div class="ttdef"><b>Definition</b> types.h:66</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md320"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md289"></a>
 Static variables with initializers</h3>
 <p>Initialized static variables now work correctly: </p><div class="fragment"><div class="line"><span class="comment">// Both work correctly:</span></div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> counter = 0;   <span class="comment">// Initial value copied from ROM to RAM at startup</span></div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> counter;       <span class="comment">// Zero-initialized by C standard</span></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --><p>The <code>CopyInitData</code> routine in crt0.asm copies initial values from ROM to RAM before <code>main()</code> is called.</p>
-<h2><a class="anchor" id="autotoc_md321"></a>
+<h2><a class="anchor" id="autotoc_md290"></a>
 Runtime Issues (Black Screen / Crash)</h2>
-<h3><a class="anchor" id="autotoc_md322"></a>
+<h3><a class="anchor" id="autotoc_md291"></a>
 ROM loads but screen is black</h3>
 <p>This is the most common issue. Causes and fixes:</p>
 <p><b>1. Missing <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code></b> </p><div class="fragment"><div class="line"><span class="comment">// The screen is OFF by default. You must turn it on:</span></div>
@@ -179,7 +179,7 @@ ROM loads but screen is black</h3>
 <p>Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you have variables in both ranges, they'll overwrite each other.</p>
 <p><b>Diagnose</b>: </p><div class="fragment"><div class="line">python3 devtools/symmap/symmap.py --check-overlap game.sym</div>
 </div><!-- fragment --><p><b>Fix</b>: The library uses <code>ORGA $0300</code> to avoid the overlap zone.</p>
-<h3><a class="anchor" id="autotoc_md323"></a>
+<h3><a class="anchor" id="autotoc_md292"></a>
 ROM runs but crashes after a few seconds</h3>
 <p><b>Causes</b>:</p><ol type="1">
 <li><b>Stack overflow</b> - Too many function calls or large local arrays</li>
@@ -191,7 +191,7 @@ ROM runs but crashes after a few seconds</h3>
 <li>Check the call stack depth</li>
 <li>Look for NULL pointer dereferences</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md324"></a>
+<h3><a class="anchor" id="autotoc_md293"></a>
 Sprites don't appear</h3>
 <p><b>Checklist</b>: </p><div class="fragment"><div class="line"><span class="comment">// 1. Initialize OAM</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a274b5d953c60f5455937be288f6652ee">oamInit</a>();</div>
@@ -213,7 +213,7 @@ Sprites don't appear</h3>
 <div class="ttc" id="asprite_8h_html_a429bb77c76f029e8ee367f6a1bd27dca"><div class="ttname"><a href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible)</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInitGfxSet, oamInitEx)</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md325"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md294"></a>
 Controller input not working</h3>
 <p><b>Checklist</b>: </p><div class="fragment"><div class="line"><span class="comment">// Input is read automatically by the NMI handler every VBlank.</span></div>
 <div class="line"><span class="comment">// Just call the query functions after WaitForVBlank:</span></div>
@@ -230,7 +230,7 @@ Controller input not working</h3>
 <div class="ttc" id="ainput_8h_html_a2ef786c923fe4841a3b4f1d2f7350dda"><div class="ttname"><a href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda">padReleased</a></div><div class="ttdeci">u16 padReleased(u8 pad)</div><div class="ttdoc">Get buttons released this frame.</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md326"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md295"></a>
 Audio not playing</h3>
 <p><b>For basic audio</b>: </p><div class="fragment"><div class="line"><a class="code hl_function" href="group__audio__init.html#gaca805f5c6782ded195a7d479cffb5e5f">audioInit</a>();</div>
 <div class="line"><a class="code hl_function" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a>(channel, sample_data, sample_size, pitch);</div>
@@ -251,13 +251,13 @@ Audio not playing</h3>
 <div class="ttc" id="agroup__snesmod__module_html_ga8299a9a929e131b1c7c145fae1a1e2f1"><div class="ttname"><a href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a></div><div class="ttdeci">void snesmodPlay(u8 startPosition)</div><div class="ttdoc">Start module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__module_html_gae805748fae02839bafc3b2c2e3a82358"><div class="ttname"><a href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a></div><div class="ttdeci">void snesmodLoadModule(u16 moduleId)</div><div class="ttdoc">Load a module from the soundbank.</div></div>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md327"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md296"></a>
 Graphics Issues</h2>
-<h3><a class="anchor" id="autotoc_md328"></a>
+<h3><a class="anchor" id="autotoc_md297"></a>
 Wrong colors / garbled palette</h3>
 <p><b>Cause</b>: BGR555 format mismatch.</p>
 <p>SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Use gfx4snes to convert PNGs correctly: </p><div class="fragment"><div class="line">gfx4snes -i sprite.png -o sprite</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md329"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md298"></a>
 Tiles appear corrupted</h3>
 <p><b>Causes</b>:</p><ol type="1">
 <li>Wrong tile format (2bpp vs 4bpp vs 8bpp)</li>
@@ -272,7 +272,7 @@ Tiles appear corrupted</h3>
 <div class="ttc" id="abackground_8h_html_a192a4ea97fde5c5c0a78ada7f54cf207"><div class="ttname"><a href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:28</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md330"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md299"></a>
 Scrolling is jerky</h3>
 <p><b>Cause</b>: Updating scroll registers outside VBlank.</p>
 <p><b>Fix</b>: </p><div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -283,9 +283,9 @@ Scrolling is jerky</h3>
 <div class="line">    <span class="comment">// Game logic</span></div>
 <div class="line">}</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md331"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md300"></a>
 Memory Issues</h2>
-<h3><a class="anchor" id="autotoc_md332"></a>
+<h3><a class="anchor" id="autotoc_md301"></a>
 "ROM too large" or linker errors about size</h3>
 <p><b>Cause</b>: Too much data in your ROM.</p>
 <p><b>Check ROM size</b>: </p><div class="fragment"><div class="line">ls -la game.sfc</div>
@@ -294,7 +294,7 @@ Memory Issues</h2>
 <li>Use smaller audio samples</li>
 <li>Split into multiple banks (advanced)</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md333"></a>
+<h3><a class="anchor" id="autotoc_md302"></a>
 Variables have wrong values</h3>
 <p><b>Check symbol placement</b>: </p><div class="fragment"><div class="line">grep &quot;my_variable&quot; game.sym</div>
 </div><!-- fragment --><ul>
@@ -302,9 +302,9 @@ Variables have wrong values</h3>
 <li>Bad (ROM): <code>00:8234 my_variable</code></li>
 </ul>
 <p>If it's in ROM ($8000+), you can't write to it.</p>
-<h2><a class="anchor" id="autotoc_md334"></a>
+<h2><a class="anchor" id="autotoc_md303"></a>
 Getting More Help</h2>
-<h3><a class="anchor" id="autotoc_md335"></a>
+<h3><a class="anchor" id="autotoc_md304"></a>
 Diagnostic Commands</h3>
 <div class="fragment"><div class="line"># Check for memory overlaps</div>
 <div class="line">python3 devtools/symmap/symmap.py --check-overlap game.sym</div>
@@ -317,7 +317,7 @@ Diagnostic Commands</h3>
 <div class="line"> </div>
 <div class="line"># Check ROM size</div>
 <div class="line">ls -la game.sfc</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md336"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md305"></a>
 Using Mesen Debugger</h3>
 <ol type="1">
 <li>Load ROM in Mesen</li>
@@ -325,7 +325,7 @@ Using Mesen Debugger</h3>
 <li>Set breakpoint at your code</li>
 <li>Step through and watch registers/memory</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md337"></a>
+<h3><a class="anchor" id="autotoc_md306"></a>
 Reporting Bugs</h3>
 <p>Include in your issue:</p><ol type="1">
 <li>OpenSNES version (<code>git rev-parse HEAD</code>)</li>
