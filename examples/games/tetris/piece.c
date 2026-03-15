@@ -9,7 +9,7 @@
  * Type IDs match tile color indices (1-7).
  * Nintendo Rotation System (NRS).
  */
-static const s8 all_shapes[] = {
+static s8 all_shapes[] = {
     /* === PIECE_I (type 1) === */
     /* rot 0: horizontal ████ */
      0, 0, 0, 0,   0, 1, 2, 3,
