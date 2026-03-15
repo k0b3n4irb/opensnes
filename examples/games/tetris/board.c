@@ -54,25 +54,27 @@ void boardLockPiece(u8 type, u8 rot, s8 row, s8 col) {
 
 u8 boardFindFullLines(LineClearResult *result) {
     u8 r, c, full;
+    u8 cnt;
 
-    result->count = 0;
+    cnt = 0;
 
     /* Only scan visible rows — hidden spawn rows (0-3) can never be full */
     for (r = VISIBLE_TOP; r < BOARD_ROWS; r++) {
         full = 1;
         for (c = 0; c < BOARD_W; c++) {
-            if (board[r][c] == 0) {
+            if (boardGetCell(r, c) == 0) {
                 full = 0;
                 break;
             }
         }
-        if (full && result->count < 4) {
-            result->rows[result->count] = r;
-            result->count++;
+        if (full && cnt < 4) {
+            result->rows[cnt] = r;
+            cnt++;
         }
     }
 
-    return result->count;
+    result->count = cnt;
+    return cnt;
 }
 
 void boardRemoveLines(LineClearResult *result) {

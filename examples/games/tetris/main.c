@@ -12,6 +12,8 @@
  */
 
 #include <snes.h>
+#include <snes/snesmod.h>
+#include "soundbank.h"
 #include "board.h"
 #include "piece.h"  /* pieceGetCellRow/Col, pieceSpawnRow/Col, etc. */
 #include "render.h"
@@ -19,6 +21,7 @@
 
 /* Input buffer from NMI handler */
 extern u16 pad_keys[];
+extern volatile u16 frame_count;
 
 /* String constants from data.asm */
 extern const char str_paused[];
@@ -38,7 +41,10 @@ extern const char str_start[];
  * NES Gravity Speed Table (frames per drop)
  *============================================================================*/
 
-static const u8 speed_table[] = {
+/* NOT const — const arrays go to SUPERFREE ROM which may land in bank $01+.
+ * The compiler generates lda.l $0000,x (always bank $00) for array access.
+ * Mutable arrays go to WRAM (bank $00) via CopyInitData. */
+static u8 speed_table[] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6,   /* L0-9: NES NTSC */
     5, 5, 5, 4, 4, 4, 3, 3, 3,              /* L10-18 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1         /* L19-29+ */
@@ -57,7 +63,7 @@ static const u8 speed_table[] = {
  * NES Scoring
  *============================================================================*/
 
-static const u16 line_scores[] = { 0, 40, 100, 300, 1200 };
+static u16 line_scores[] = { 0, 40, 100, 300, 1200 };
 
 /*============================================================================
  * Game State Variables
@@ -89,7 +95,7 @@ static u8 flash_timer;
 static u16 prev_pad;
 
 /* Rainbow color cycle for message text (BGR555, SNESS palette) */
-static const u16 msg_colors[] = {
+static u16 msg_colors[] = {
     0x7FFF,  /* white */
     0x307C,  /* magenta (#e71861) */
     0x0B5E,  /* yellow (#f6d714) */
@@ -272,8 +278,12 @@ static void startGame(void) {
     prev_pad = 0;
     flash_timer = 0;
 
-    srand(pad_keys[0]);  /* seed RNG from joypad timing */
+    srand(frame_count);  /* seed RNG from frame count — varies with player timing on title screen */
     next_type = pieceRandom();
+
+    /* Start music */
+    snesmodPlay(0);
+    snesmodSetModuleVolume(60);
 
     renderBoard();
     hudInit();
@@ -346,8 +356,8 @@ static void statePlaying(void) {
 }
 
 /* Screen shake offsets (alternating pattern) */
-static const s8 shake_dx[] = { 2, -2, 1, -1, 2, -1, 1, 0 };
-static const s8 shake_dy[] = { -1, 1, -2, 1, 0, -1, 1, 0 };
+static s8 shake_dx[] = { 2, -2, 1, -1, 2, -1, 1, 0 };
+static s8 shake_dy[] = { -1, 1, -2, 1, 0, -1, 1, 0 };
 
 static void stateLineClear(void) {
     flash_timer++;
@@ -495,6 +505,11 @@ int main(void) {
     WaitForVBlank();
     renderFlush();
 
+    /* Initialize SNESMOD audio */
+    snesmodInit();
+    snesmodSetSoundbank(SOUNDBANK_BANK);
+    snesmodLoadModule(MOD_TETRIS_THEME);
+
     /* Display comes on with everything visible at once */
     setScreenOn();
 
@@ -519,6 +534,7 @@ int main(void) {
                 break;
         }
 
+        snesmodProcess();
         WaitForVBlank();
         renderFlush();
     }
