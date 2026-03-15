@@ -118,38 +118,11 @@ jobs:
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Build and run tests                  #
+      # Tests (moved to opensnes-emu)        #
       # ------------------------------------ #
-      - name: Build tests (Linux/macOS)
-        if: matrix.name != 'windows'
-        run: |
-          set -o pipefail
-          make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      - name: Build tests (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          set -o pipefail
-          make tests 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      # ------------------------------------ #
-      # Run compiler tests                   #
-      # ------------------------------------ #
-      - name: Run compiler tests (Linux/macOS)
-        if: matrix.name != 'windows'
-        run: |
-          set -o pipefail
-          echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      - name: Run compiler tests (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          set -o pipefail
-          echo "=== Compiler Tests ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/compiler/run_tests.sh --allow-known-bugs 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+      # Unit tests, compiler tests, and example validation are now handled by
+      # tools/opensnes-emu/test/run-all-tests.mjs (requires Node.js + WASM).
+      # CI runs build + symmap validation only. Full test suite runs locally.
 
       # ------------------------------------ #
       # Build and validate examples          #
@@ -169,12 +142,15 @@ jobs:
           echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
+      # Validate examples: symmap overlap check (no bash scripts needed)
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'
         run: |
           set -o pipefail
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          for sym in examples/**/*.sym; do
+            [ -f "$sym" ] && python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          done
 
       - name: Validate examples (Windows)
         if: matrix.name == 'windows'
@@ -182,25 +158,9 @@ jobs:
         run: |
           set -o pipefail
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/examples/validate_examples.sh --quick 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      # ------------------------------------ #
-      # Check memory overlaps                #
-      # ------------------------------------ #
-      - name: Check memory overlaps (Linux/macOS)
-        if: matrix.name != 'windows'
-        run: |
-          set -o pipefail
-          echo "=== Memory Overlap Check ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/ci/check_memory_overlaps.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
-
-      - name: Check memory overlaps (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          set -o pipefail
-          echo "=== Memory Overlap Check ===" | tee -a opensnes_release_${{ matrix.name }}.log
-          ./tests/ci/check_memory_overlaps.sh 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          for sym in examples/**/*.sym; do
+            [ -f "$sym" ] && python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+          done
 
       # ------------------------------------ #
       # Check library linking                #
