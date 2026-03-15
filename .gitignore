@@ -64,6 +64,9 @@ tests/CLAUDE.md
 # Private game projects (never commit)
 projects/
 
+# Debug emulator (separate project with its own git repo)
+tools/opensnes-emu/
+
 # Build directories
 build/
 bin/

@@ -296,10 +296,12 @@ u16 objCollidObj(u16 objhandle1, u16 objhandle2);
  *
  * Adds xvel/yvel to xpos/ypos (24-bit fixed point).
  *
- * @param objhandle Object index
+ * @param objindex Raw object index (0-79), NOT the handle from objNew.
+ *                 Use the index passed to your update callback, or
+ *                 extract from handle with (handle & 0xFF).
  *
  * @note Syncs objWorkspace before and after.
  */
-void objUpdateXY(u16 objhandle);
+void objUpdateXY(u16 objindex);
 
 #endif /* OPENSNES_OBJECT_H */

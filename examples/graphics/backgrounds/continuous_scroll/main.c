@@ -165,6 +165,13 @@ int main(void) {
     /* Transfer OAM buffer to hardware before turning screen on */
     oamUpdate();
 
+    /* Set initial scroll BEFORE enabling display.
+     * Hardware scroll defaults to (0,0). Without this, the first visible
+     * frame shows the tilemap at Y=0 instead of Y=32, causing a visible
+     * "jump" when the correct scroll is applied on the next frame. */
+    bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
+    bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
+
     /* Enable display at full brightness */
     setScreenOn();
 

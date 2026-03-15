@@ -1,6 +1,6 @@
 # Learn SNES Development {#learning_path}
 
-A progressive learning path through 36 examples, from your first ROM to complete games.
+A progressive learning path through 37 examples, from your first ROM to complete games.
 Each example builds on concepts from earlier ones.
 
 ## Level 1: First Steps
@@ -46,6 +46,8 @@ HDMA, parallax, color math, hardware windows.
 @subpage examples_graphics_effects_hdma_wave
 
 @subpage examples_graphics_effects_hdma_gradient
+
+@subpage examples_graphics_effects_hdma_helpers
 
 @subpage examples_graphics_effects_gradient_colors
 

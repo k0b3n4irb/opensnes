@@ -71,30 +71,19 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
-; NMI Handler Registers (separate from main code to prevent corruption)
+; NMI Handler Registers (separate direct page for VBlank callback)
 ;------------------------------------------------------------------------------
-; The VBlank callback runs C code which uses tcc__r0-r10 for calculations.
-; Using the same registers as the main loop would corrupt its state.
-; PVSnesLib solves this with a separate 48-byte register area for NMI.
+; PVSnesLib-style DP isolation: NMI sets D = tcc__nmi_registers (page-aligned).
+; The C callback's dp-relative instructions (lda.b tcc__r0, etc.) automatically
+; access this area instead of the main thread's registers. Zero-cost isolation —
+; no save/restore of compiler registers needed (~260 cycle savings).
+;
+; MUST be page-aligned ($XX00) to avoid 65816 DP cycle penalty.
+; MUST be at least 48 bytes (same layout as tcc__r0..tcc__r10h + nmi_callback).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ORGA $0080 FORCE
-    tcc__nmi_r0     dsb 2
-    tcc__nmi_r0h    dsb 2
-    tcc__nmi_r1     dsb 2
-    tcc__nmi_r1h    dsb 2
-    tcc__nmi_r2     dsb 2
-    tcc__nmi_r2h    dsb 2
-    tcc__nmi_r3     dsb 2
-    tcc__nmi_r3h    dsb 2
-    tcc__nmi_r4     dsb 2
-    tcc__nmi_r4h    dsb 2
-    tcc__nmi_r5     dsb 2
-    tcc__nmi_r5h    dsb 2
-    tcc__nmi_r9     dsb 2
-    tcc__nmi_r9h    dsb 2
-    tcc__nmi_r10    dsb 2
-    tcc__nmi_r10h   dsb 2
+.RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ALIGN $0100
+    tcc__nmi_registers dsb 48   ; Same layout as main registers: r0..r10h + callback area
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -102,7 +91,7 @@
 ;------------------------------------------------------------------------------
 
 .RAMSECTION ".system" BANK 0 SLOT 1
-    vblank_flag     dsb 1   ; Set by NMI handler, cleared by WaitVBlank
+    vblank_flag     dsb 1   ; Handshake: set by WaitForVBlank, cleared by NMI
     oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
     tilemap_update_flag dsb 1 ; Set when tilemap buffer needs DMA to VRAM
     tilemap_vram_addr dsb 2   ; VRAM word address for tilemap DMA target
@@ -114,24 +103,23 @@
     pad_keys        dsb 10  ; Current button state (5 pads × 16 bits)
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
+    snes_mplay5     dsb 1   ; 1 if MultiPlayer5 adapter is connected
+    mp5read         dsb 1   ; Temporary for MultiPlayer5 plug detection
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
     bg_scroll_dirty dsb 1   ; Bitmask: bit 0-3 = BG1-4 scroll dirty
     oam_max_id      dsb 1   ; Highest sprite ID written (for partial OAM DMA)
-    ; Mouse state (read in VBlank ISR when mouse_con != 0)
+    ; Mouse state — PVSnesLib-compatible indexed layout
+    ; All 2-byte arrays: [0]=port 1, [1]=port 2. Accessed with X=0 or X=1.
     mouse_con       dsb 1   ; bitmask: bit 0 = port 1 mouse, bit 1 = port 2 mouse
-    mouse_x         dsb 2   ; port 1 X displacement (sign-magnitude raw byte in low)
-    mouse_y         dsb 2   ; port 1 Y displacement (sign-magnitude raw byte in low)
-    mouse_x2        dsb 2   ; port 2 X displacement
-    mouse_y2        dsb 2   ; port 2 Y displacement
-    mouse_buttons   dsb 1   ; port 1 buttons (bit 0 = left, bit 1 = right)
-    mouse_buttons2  dsb 1   ; port 2 buttons
-    mouse_btnsold   dsb 1   ; port 1 previous frame buttons
-    mouse_btnsold2  dsb 1   ; port 2 previous frame buttons
-    mouse_btnsdown  dsb 1   ; port 1 newly pressed (edge detection)
-    mouse_btnsdown2 dsb 1   ; port 2 newly pressed
-    mouse_sens      dsb 1   ; port 1 sensitivity (0-2)
-    mouse_sens2     dsb 1   ; port 2 sensitivity
+    mouse_x         dsb 2   ; X displacement per port (sign-magnitude)
+    mouse_y         dsb 2   ; Y displacement per port (sign-magnitude)
+    mouseConnect    dsb 2   ; Per-port connection flag (0=disconnected, 1=connected)
+    mousePressed    dsb 2   ; Currently held buttons per port
+    mousePreviousPressed dsb 2 ; Previous frame buttons per port
+    mouseButton     dsb 2   ; Newly pressed buttons per port (edge detection)
+    mouseSensitivity dsb 2  ; Current sensitivity per port (0-2)
+    mouseRequestChangeSensitivity dsb 2 ; Deferred sensitivity command per port
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -388,21 +376,51 @@ InitHardware:
     cpx #512            ; 128 sprites × 4 bytes
     bne @oam_clear_loop
 
-    ; Clear OAM extension table (32 bytes)
+    ; Initialize OAM extension table (32 bytes) to $55
+    ; Pattern 0x55 = 01010101: X high bit set for all sprites.
+    ; Combined with Y=240, this pushes sprites fully off-screen.
+    ; Without X high bit, large sprites (32x32+) at Y=240 wrap to top.
+    ; Must match oamClear() behavior to prevent startup sprite glitch.
+    sep #$20            ; 8-bit A for byte store
+    lda #$55
     ldx #0
 @oam_ext_clear:
-    stz.w oamMemory+512,x
-    inx
+    sta.w oamMemory+512,x
     inx
     cpx #32
     bne @oam_ext_clear
-
-    sep #$20            ; Back to 8-bit A
 
     ; Restore data bank to $00
     pea $0000
     plb
     plb
+
+    ;--------------------------------------------------------------------------
+    ; DMA initialized OAM buffer to hardware OAM (screen is off)
+    ;--------------------------------------------------------------------------
+    ; Without this, hardware OAM retains power-on garbage until the first
+    ; WaitForVBlank triggers an OAM DMA — causing 1-2 frames of corrupted
+    ; sprites when the screen turns on.
+    ;--------------------------------------------------------------------------
+    rep #$20
+    stz.w $2102             ; OAM address = 0
+
+    lda.w #$0400
+    sta.w $4370             ; DMA mode: CPU→PPU, auto-inc, dest $2104 (OAMDATA)
+
+    lda.w #oamMemory
+    sta.w $4372             ; Source address
+    sep #$20
+    lda.b #:oamMemory       ; Source bank ($7E)
+    sta.w $4374
+
+    rep #$20
+    lda.w #$0220            ; 544 bytes
+    sta.w $4375
+
+    sep #$20
+    lda.b #$80
+    sta.w $420B             ; Start DMA channel 7
 
     rts
 
@@ -596,7 +614,20 @@ CopyInitData:
 ; NmiHandler - VBlank Interrupt
 ;------------------------------------------------------------------------------
 ; Called at the start of each VBlank period (~60Hz).
-; Transfers OAM buffer to hardware if needed, then sets vblank_flag.
+; Uses PVSnesLib handshake protocol:
+;   - Main thread sets vblank_flag=1 via WaitForVBlank ("I'm ready")
+;   - NMI handler checks flag: if 0 → lag frame (skip work), if 1 → do work
+;   - NMI handler clears flag=0 when done ("acknowledged")
+;   - Main thread wakes from WAI, sees flag=0, proceeds
+;
+; Execution order (PVSnesLib-aligned):
+;   1. OAM DMA        — VBlank-critical (VRAM write)
+;   2. Tilemap DMA    — VBlank-critical (VRAM write)
+;   3. BG scroll sync — VBlank-critical (PPU register write)
+;   4. User callback  — not VBlank-critical
+;   5. Joypad read    — not VBlank-critical ($4218/$421A readable anytime)
+;   6. Mouse read     — not VBlank-critical ($4016/$4017 serial)
+;   7. Super Scope    — not VBlank-critical (PPU latch + $421A)
 ;
 ; WARNING: Do NOT use the WRAM data port ($2180-$2183) in NMI code.
 ; Main-thread code (HDMA table construction, map streaming, object updates)
@@ -605,15 +636,18 @@ CopyInitData:
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
 NmiHandler:
-    rep #$30
+    rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
     pha
     phx
     phy
     phd
     phb                 ; Save data bank
 
-    ; Set direct page
-    lda #tcc__r0
+    ; Set direct page to NMI register area (PVSnesLib-style DP isolation)
+    ; D = tcc__nmi_registers (page-aligned, != 0)
+    ; All dp-relative accesses in callback C code now hit NMI registers,
+    ; not main thread registers. No save/restore needed.
+    lda #tcc__nmi_registers
     tcd
 
     ; Set data bank to $00 for hardware registers
@@ -625,380 +659,194 @@ NmiHandler:
     sep #$20
     lda $4210
 
-    ; Increment frame counter
+    ; Increment frame counter (always, even on lag frames)
+    ; NOTE: With D != 0, all system variable accesses MUST use .w (absolute)
     rep #$20
-    inc frame_count
+    inc.w frame_count
 
     ;--------------------------------------------------------------------------
-    ; Read Joypads (like PVSnesLib - read in VBlank ISR for reliability)
+    ; Handshake check: is main thread ready?
     ;--------------------------------------------------------------------------
-    ; Wait for auto-joypad read to complete
--   lda $4212
-    and #$0001
-    bne -
+    sep #$20
+    lda.w vblank_flag
+    bne @vblank_work        ; flag=1 → main thread called WaitForVBlank, do work
 
-    ; Save previous state
-    lda pad_keys
-    sta pad_keysold
-    lda pad_keys+2
-    sta pad_keysold+2
+    ; Lag frame — main thread still computing, skip all VBlank work
+    rep #$20
+    inc.w lag_frame_counter
+    jmp @nmi_restore
 
-    ; Read joypad 1 (16-bit load gets both JOY1L and JOY1H)
-    lda $4218           ; 16-bit: A = JOY1H:JOY1L
-    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
+@vblank_work:
+    rep #$20
+
+    ;==========================================================================
+    ; VRAM-CRITICAL SECTION — must complete during VBlank
+    ;==========================================================================
+    ; PVSnesLib order: OAM DMA → tilemap DMA → scroll sync FIRST,
+    ; then callback and input reading (which are NOT VBlank-critical).
+    ; This maximizes the time available for VRAM writes.
+    ;==========================================================================
+
+    sep #$20            ; 8-bit A for flag checks
+
+    ;--------------------------------------------------------------------------
+    ; 1. Transfer OAM buffer to hardware during VBlank (inline DMA)
+    ;--------------------------------------------------------------------------
+    ; Inline OAM DMA replaces the C oamUpdate() call (~200+ cycle savings).
+    ; Uses DMA channel 7 (channel 0 reserved for main-thread dmaCopyVram).
+    ; PVSnesLib reference: vblank.asm lines 670-687.
+    ;
+    ; NOTE: All system variable accesses use .w (absolute addressing) because
+    ; D = tcc__nmi_registers (!= 0). Without .w, WLA-DX may emit DP-relative
+    ; instructions that would read from the wrong address.
+    ;--------------------------------------------------------------------------
+    lda.w oam_update_flag
+    beq @oam_done
+    stz.w oam_update_flag
+
+    ; Set OAM address to 0 (word register — use 16-bit A)
+    rep #$20
+    stz.w $2102             ; OAMADDL/H = 0
+
+    ; DMA channel 7: CPU→PPU, auto-increment, dest $2104 (OAMDATA)
+    lda.w #$0400
+    sta.w $4370             ; $4370 = mode ($00), $4371 = dest ($04)
+
+    ; Source: oamMemory ($7E:0300)
+    lda.w #oamMemory
+    sta.w $4372             ; Source address low/high
+    sep #$20
+    lda.b #:oamMemory       ; Source bank ($7E)
+    sta.w $4374
+
+    ; Transfer size: 544 bytes ($0220)
+    rep #$20
+    lda.w #$0220
+    sta.w $4375             ; DMA size
+
+    ; Start DMA channel 7
+    sep #$20
+    lda.b #$80
+    sta.w $420B             ; MDMAEN: channel 7
+@oam_done:
+
+    ;--------------------------------------------------------------------------
+    ; 2. Transfer tilemap buffer to VRAM during VBlank
+    ;--------------------------------------------------------------------------
+    lda.w tilemap_update_flag
     beq +
-        lda #$0000      ; Invalid input - clear it
-+   sta pad_keys
-
-    ; Compute edge detection: (current ^ old) & current = newly pressed
-    eor pad_keysold
-    and pad_keys
-    sta pad_keysdown
-
-    ; Read joypad 2
-    lda $421A           ; 16-bit: A = JOY2H:JOY2L
-    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
-    beq ++
-        lda #$0000      ; Invalid input - clear it
-++  sta pad_keys+2
-
-    eor pad_keysold+2
-    and pad_keys+2
-    sta pad_keysdown+2
+    stz.w tilemap_update_flag
+    jsl tilemapFlush
+    sep #$20            ; Restore 8-bit A after C function
++
 
     ;--------------------------------------------------------------------------
-    ; Read Mouse (if connected)
+    ; 3. Sync BG scroll shadows to hardware ($210D-$2114)
     ;--------------------------------------------------------------------------
-    ; Only runs when mouse_con != 0 (set by mouseInit in C code).
-    ; For each active port:
-    ;   1. Extract buttons + sensitivity from auto-joypad data
-    ;   2. Bit-bang 16 bits of displacement via $4016/$4017
-    ;   3. Edge-detect buttons
-    ;--------------------------------------------------------------------------
-    sep #$20                ; 8-bit A for mouse reading
-    lda mouse_con
-    bne @mouse_start
-    jmp @mouse_done         ; Skip if no mouse initialized (jmp for distance)
-@mouse_start:
+    ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
+    ; 8-bit A, data bank $00
+    lda.w bg_scroll_dirty
+    beq @scroll_done      ; Nothing dirty → skip all
 
-    ; --- Port 1 mouse ---
     bit #$01
-    beq @mouse_port2
+    beq @bg1_done
+    lda.w bg_scroll_x      ; BG1 H low
+    sta $210D
+    lda.w bg_scroll_x+1    ; BG1 H high
+    sta $210D
+    lda.w bg_scroll_y      ; BG1 V low
+    sta $210E
+    lda.w bg_scroll_y+1    ; BG1 V high
+    sta $210E
+    lda.w bg_scroll_dirty   ; Reload for next test
+@bg1_done:
 
-    ; Save old buttons for edge detection
-    lda mouse_buttons
-    sta mouse_btnsold
-
-    ; Extract buttons and sensitivity from auto-joypad JOY1L ($4218)
-    ; JOY1L bit layout for mouse:
-    ;   Bit 7: Right button
-    ;   Bit 6: Left button
-    ;   Bits 5-4: Sensitivity (00=low, 01=med, 10=high)
-    ;   Bits 3-0: Signature (0001)
-    lda $4218               ; JOY1L (8-bit read)
-    pha                     ; Save for sensitivity extraction
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta mouse_buttons       ; bits 1-0 = right, left
-
-    pla                     ; Restore byte
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    and #$03
-    sta mouse_sens
-
-    ; Edge detection: newly pressed = (cur ^ old) & cur
-    lda mouse_buttons
-    eor mouse_btnsold
-    and mouse_buttons
-    sta mouse_btnsdown
-
-    ; Bit-bang 16 bits of displacement from port 1 ($4016)
-    ; Uses cascading ROL like PVSnesLib: reads 16 bits through mouse_x→mouse_y.
-    ; After 16 iterations: mouse_y = first 8 bits (Y), mouse_x = last 8 bits (X).
-    ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude)
-    rep #$20                ; 16-bit A for word operations
-    stz mouse_y             ; Clear displacement accumulators
-    stz mouse_x
-
-    sep #$20                ; 8-bit A for bit reading
-    ldy #16                 ; 16 bits total (8 Y + 8 X)
-@mouse1_disp_loop:
-    lda $4016               ; Read bit from port 1 (bit 0)
-    lsr a                   ; Shift bit 0 into carry
-    rol mouse_x             ; Carry → mouse_x bit 0, mouse_x bit 7 → carry
-    rol mouse_y             ; Carry → mouse_y bit 0
-    nop                     ; Hyperkin compatibility delay (170+ master cycles)
-    nop
-    dey
-    bne @mouse1_disp_loop
-
-@mouse_port2:
-    ; --- Port 2 mouse ---
-    lda mouse_con
     bit #$02
-    beq @mouse_done
+    beq @bg2_done
+    lda.w bg_scroll_x+2    ; BG2 H low
+    sta $210F
+    lda.w bg_scroll_x+3    ; BG2 H high
+    sta $210F
+    lda.w bg_scroll_y+2    ; BG2 V low
+    sta $2110
+    lda.w bg_scroll_y+3    ; BG2 V high
+    sta $2110
+    lda.w bg_scroll_dirty   ; Reload for next test
+@bg2_done:
 
-    ; Save old buttons
-    lda mouse_buttons2
-    sta mouse_btnsold2
+    bit #$04
+    beq @bg3_done
+    lda.w bg_scroll_x+4    ; BG3 H low
+    sta $2111
+    lda.w bg_scroll_x+5    ; BG3 H high
+    sta $2111
+    lda.w bg_scroll_y+4    ; BG3 V low
+    sta $2112
+    lda.w bg_scroll_y+5    ; BG3 V high
+    sta $2112
+    lda.w bg_scroll_dirty   ; Reload for next test
+@bg3_done:
 
-    ; Extract from auto-joypad JOY2L ($421A)
-    lda $421A               ; JOY2L (8-bit read)
-    pha
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    sta mouse_buttons2
+    bit #$08
+    beq @bg4_done
+    lda.w bg_scroll_x+6    ; BG4 H low
+    sta $2113
+    lda.w bg_scroll_x+7    ; BG4 H high
+    sta $2113
+    lda.w bg_scroll_y+6    ; BG4 V low
+    sta $2114
+    lda.w bg_scroll_y+7    ; BG4 V high
+    sta $2114
+@bg4_done:
 
-    pla
-    lsr a
-    lsr a
-    lsr a
-    lsr a
-    and #$03
-    sta mouse_sens2
+    stz.w bg_scroll_dirty   ; Clear all dirty bits
+@scroll_done:
 
-    ; Edge detection
-    lda mouse_buttons2
-    eor mouse_btnsold2
-    and mouse_buttons2
-    sta mouse_btnsdown2
-
-    ; Bit-bang 16 bits of displacement from port 2 ($4017)
-    rep #$20
-    stz mouse_y2
-    stz mouse_x2
-
-    sep #$20
-    ldy #16
-@mouse2_disp_loop:
-    lda $4017
-    lsr a
-    rol mouse_x2
-    rol mouse_y2
-    nop
-    nop
-    dey
-    bne @mouse2_disp_loop
-
-@mouse_done:
+    ;==========================================================================
+    ; NON-CRITICAL SECTION — callback + input reading
+    ;==========================================================================
+    ; These do NOT require VBlank timing:
+    ;   - User callback: runs C code, accesses RAM (not VRAM)
+    ;   - Joypads: reads $4218/$421A (readable anytime after auto-read completes)
+    ;   - Mouse: reads $4016/$4017 (serial registers, no VBlank dependency)
+    ;   - Super Scope: reads PPU latch + $421A (no VBlank dependency)
+    ;==========================================================================
 
     ;--------------------------------------------------------------------------
-    ; Read Super Scope (if connected)
+    ; 4. Call user VBlank callback
     ;--------------------------------------------------------------------------
-    ; Only runs when scope_con != 0 (set by scopeInit in C code).
-    ; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
-    ; Reads PPU H/V latch for shot position, applies calibration offset,
-    ; and processes buttons with hold/repeat delay logic.
-    ;--------------------------------------------------------------------------
-    sep #$20                ; 8-bit A
-    lda scope_con
-    bne @scope_start
-    jmp @scope_done         ; Skip if no Super Scope initialized
-@scope_start:
-
-    ; Read port 2 raw data from auto-joypad and compute edge detection
-    rep #$20                ; 16-bit A
-    lda scope_port2down
-    sta scope_port2last     ; Save previous frame
-    lda $421A               ; REG_JOY2L/H (16-bit read)
-    sta scope_port2down
-    eor scope_port2last
-    and scope_port2down
-    sta scope_port2now      ; Newly pressed raw port 2
-
-    ; Validate Super Scope signature: bits 0-7 all 1, bits 10-11 both 0
-    lda scope_port2down
-    and #$0CFF
-    cmp #$00FF
-    beq @scope_valid
-    jmp @scope_disconnect
-@scope_valid:
-
-    ; Check PPU H/V counter latch (bit 6 of REG_STAT78)
-    sep #$20                ; 8-bit A
-    lda $213F               ; REG_STAT78
-    and #$40
-    beq @scope_no_shot
-
-    ; --- Shot detected: read H/V position ---
-    ; REG_OPHCT ($213C): 9-bit H position, read twice (low then high)
-    lda $213C               ; OPHCT low byte
-    sta scope_shothraw
-    lda $213C               ; OPHCT high bit (bit 0 only)
-    and #$01
-    sta scope_shothraw+1
-
-    ; REG_OPVCT ($213D): 9-bit V position, read twice (low then high)
-    lda $213D               ; OPVCT low byte
-    sta scope_shotvraw
-    lda $213D               ; OPVCT high bit (bit 0 only)
-    and #$01
-    sta scope_shotvraw+1
-
-    ; Apply calibration offset: adjusted = raw + center offset
-    rep #$20                ; 16-bit A
-    lda scope_shothraw
-    clc
-    adc scope_centerh
-    sta scope_shoth
-    lda scope_shotvraw
-    clc
-    adc scope_centerv
-    sta scope_shotv
-
-    ; Reset shot counter
-    stz scope_sinceshot
-    bra @scope_buttons      ; Common button processing
-
-@scope_no_shot:
-    ; --- No shot this frame ---
-    rep #$20                ; 16-bit A
-    inc scope_sinceshot
-
-@scope_buttons:
-    ; Full button processing: extract bits 15-12 (buttons) and 9-8 (flags)
-    ; All buttons (Fire, Cursor, Turbo, Pause) + flags (Offscreen, Noise)
-    ; are processed identically on both shot and non-shot frames.
-    lda scope_port2down
-    and #$F300              ; Keep buttons (15-12) + offscreen (9) + noise (8)
-    sta scope_down
-
-    ; Edge detection: newly pressed = (cur ^ last) & cur
-    lda scope_last
-    eor scope_down
-    and scope_down
-    sta scope_now
-
-    ; Hold/repeat delay logic
-    ; If buttons changed from last frame, reset hold countdown
-    lda scope_down
-    cmp scope_last
-    bne @scope_reset_hold
-
-    ; Same buttons held: decrement countdown
-    lda scope_tohold
-    beq @scope_held_fire     ; Already at 0 → fire held event
-    dec a
-    sta scope_tohold
-    stz scope_held
-    bra @scope_save_last
-
-@scope_held_fire:
-    ; Hold triggered: set held = down, reload with repeat delay
-    lda scope_down
-    sta scope_held
-    lda scope_repdelay
-    sta scope_tohold
-    bra @scope_save_last
-
-@scope_reset_hold:
-    ; Buttons changed: reload with hold delay
-    lda scope_holddelay
-    sta scope_tohold
-    stz scope_held
-    bra @scope_save_last
-
-@scope_disconnect:
-    ; Invalid signature: disconnect Super Scope
-    rep #$20
-    stz scope_down
-    stz scope_now
-    stz scope_held
-    stz scope_shoth
-    stz scope_shotv
-    stz scope_shothraw
-    stz scope_shotvraw
-    stz scope_sinceshot
-    sep #$20
-    stz scope_con
-    bra @scope_done
-
-@scope_save_last:
-    ; Save current button state for next frame
-    lda scope_down
-    sta scope_last
-
-@scope_done:
-
-    sep #$20
-
-    ; Call user VBlank callback (BEFORE OAM update for max VBlank time)
+    ; PVSnesLib-style DP isolation: D = tcc__nmi_registers, so the callback's
+    ; dp-relative accesses (lda.b tcc__r0, etc.) automatically hit the NMI
+    ; register area — no save/restore needed (~260 cycle savings).
     ;
-    ; Opt 7: Skip register save/restore when default callback is active.
-    ; Compare nmi_callback (16-bit addr + 8-bit bank) against DefaultNmiCallback.
-    ; If match, skip the ~260-cycle save/restore + call block.
+    ; Opt 7: Skip callback entirely when default no-op is active.
     ;
-    ; IMPORTANT: D must be 0 (tcc__r0) for JML [nmi_callback] to work correctly,
-    ; because JML [dp] reads from address D+dp. We save the main loop's registers
-    ; to the NMI register area, then restore them after the callback.
+    ; JML [nmi_callback] reads from bank $00 absolute address nmi_callback
+    ; (65816 JML indirect always reads from bank 0, ignoring D).
+    ;--------------------------------------------------------------------------
     rep #$30            ; 16-bit A/X/Y
 
     ; Check if callback is the default no-op
-    lda nmi_callback        ; 16-bit address
+    lda.w nmi_callback        ; 16-bit address (absolute, D != 0)
     cmp #DefaultNmiCallback
     bne @do_callback
     sep #$20
-    lda nmi_callback+2      ; bank byte
+    lda.w nmi_callback+2      ; bank byte
     cmp #:DefaultNmiCallback
     bne +                   ; Not match → do callback
-    jmp @skip_callback      ; Match → skip save/restore/call (long jump)
+    jmp @skip_callback      ; Match → skip call entirely
 +   rep #$30
 
 @do_callback:
-    ; Save ALL main loop's compiler registers to NMI area (prevent corruption)
-    ; The C callback may use any of these registers
-    lda tcc__r0
-    sta tcc__nmi_r0
-    lda tcc__r0h
-    sta tcc__nmi_r0h
-    lda tcc__r1
-    sta tcc__nmi_r1
-    lda tcc__r1h
-    sta tcc__nmi_r1h
-    lda tcc__r2
-    sta tcc__nmi_r2
-    lda tcc__r2h
-    sta tcc__nmi_r2h
-    lda tcc__r3
-    sta tcc__nmi_r3
-    lda tcc__r3h
-    sta tcc__nmi_r3h
-    lda tcc__r4
-    sta tcc__nmi_r4
-    lda tcc__r4h
-    sta tcc__nmi_r4h
-    lda tcc__r5
-    sta tcc__nmi_r5
-    lda tcc__r5h
-    sta tcc__nmi_r5h
-    lda tcc__r9
-    sta tcc__nmi_r9
-    lda tcc__r9h
-    sta tcc__nmi_r9h
-    lda tcc__r10
-    sta tcc__nmi_r10
-    lda tcc__r10h
-    sta tcc__nmi_r10h
-
     ; Set data bank to $7E for C variable access
+    ; D already = tcc__nmi_registers (callback uses NMI register space)
     pea $7E7E
     plb
     plb
     ; Push return address - 1 for RTL (bank:addr-1)
     phk                 ; Push current program bank
     pea @callback_done-1
-    jml [nmi_callback]  ; Indirect long jump (D=0, reads from address 0+nmi_callback)
+    jml [nmi_callback]  ; Indirect long jump (reads from bank $00 absolute)
 @callback_done:
 
     ; Restore data bank to $00 for hardware register access
@@ -1006,122 +854,98 @@ NmiHandler:
     plb
     plb
 
-    ; Restore ALL main loop's compiler registers from NMI area
-    lda tcc__nmi_r0
-    sta tcc__r0
-    lda tcc__nmi_r0h
-    sta tcc__r0h
-    lda tcc__nmi_r1
-    sta tcc__r1
-    lda tcc__nmi_r1h
-    sta tcc__r1h
-    lda tcc__nmi_r2
-    sta tcc__r2
-    lda tcc__nmi_r2h
-    sta tcc__r2h
-    lda tcc__nmi_r3
-    sta tcc__r3
-    lda tcc__nmi_r3h
-    sta tcc__r3h
-    lda tcc__nmi_r4
-    sta tcc__r4
-    lda tcc__nmi_r4h
-    sta tcc__r4h
-    lda tcc__nmi_r5
-    sta tcc__r5
-    lda tcc__nmi_r5h
-    sta tcc__r5h
-    lda tcc__nmi_r9
-    sta tcc__r9
-    lda tcc__nmi_r9h
-    sta tcc__r9h
-    lda tcc__nmi_r10
-    sta tcc__r10
-    lda tcc__nmi_r10h
-    sta tcc__r10h
-
 @skip_callback:
-    sep #$20            ; Back to 8-bit A
+    sep #$20            ; 8-bit A
+    rep #$10            ; 16-bit X/Y (needed for ScanMPlay5)
 
-    ; Transfer OAM buffer to hardware during VBlank
-    lda oam_update_flag
-    beq +
-    stz oam_update_flag
-    jsl oamUpdate
-    sep #$20            ; C functions return in 16-bit A, restore 8-bit
-+
-
-    ; Transfer tilemap buffer to VRAM during VBlank
-    lda tilemap_update_flag
-    beq +
-    stz tilemap_update_flag
-    jsl tilemapFlush
-+
-
-    ; Sync BG scroll shadows to hardware ($210D-$2114)
-    ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
-    ; 8-bit A, data bank $00
-    lda bg_scroll_dirty
-    beq @scroll_done      ; Nothing dirty → skip all
-
-    bit #$01
-    beq @bg1_done
-    lda bg_scroll_x      ; BG1 H low
-    sta $210D
-    lda bg_scroll_x+1    ; BG1 H high
-    sta $210D
-    lda bg_scroll_y      ; BG1 V low
-    sta $210E
-    lda bg_scroll_y+1    ; BG1 V high
-    sta $210E
-    lda bg_scroll_dirty   ; Reload for next test
-@bg1_done:
-
-    bit #$02
-    beq @bg2_done
-    lda bg_scroll_x+2    ; BG2 H low
-    sta $210F
-    lda bg_scroll_x+3    ; BG2 H high
-    sta $210F
-    lda bg_scroll_y+2    ; BG2 V low
-    sta $2110
-    lda bg_scroll_y+3    ; BG2 V high
-    sta $2110
-    lda bg_scroll_dirty   ; Reload for next test
-@bg2_done:
-
-    bit #$04
-    beq @bg3_done
-    lda bg_scroll_x+4    ; BG3 H low
-    sta $2111
-    lda bg_scroll_x+5    ; BG3 H high
-    sta $2111
-    lda bg_scroll_y+4    ; BG3 V low
-    sta $2112
-    lda bg_scroll_y+5    ; BG3 V high
-    sta $2112
-    lda bg_scroll_dirty   ; Reload for next test
-@bg3_done:
-
-    bit #$08
-    beq @bg4_done
-    lda bg_scroll_x+6    ; BG4 H low
-    sta $2113
-    lda bg_scroll_x+7    ; BG4 H high
-    sta $2113
-    lda bg_scroll_y+6    ; BG4 V low
-    sta $2114
-    lda bg_scroll_y+7    ; BG4 V high
-    sta $2114
-@bg4_done:
-
-    stz bg_scroll_dirty   ; Clear all dirty bits
-@scroll_done:
-
-    ; Set VBlank flag
+    ;--------------------------------------------------------------------------
+    ; 5. Wait for Auto-Joypad + Read All Inputs
+    ;--------------------------------------------------------------------------
+    ; Auto-joypad completes ~4K master clocks into VBlank. Must wait before
+    ; ANY input reading (pads, MP5, mouse, or scope).
+    ;--------------------------------------------------------------------------
     lda #$01
-    sta vblank_flag
+-   bit.w $4212         ; REG_HVBJOY bit 0 = auto-joypad busy
+    bne -
 
+    ;--------------------------------------------------------------------------
+    ; 5a. Read MultiPlayer5 pads 2-4 (if connected)
+    ;--------------------------------------------------------------------------
+    ; MP5 is mutually exclusive with mouse/scope. If MP5 is active, we read
+    ; pads 2-4 here via bit-banging, then fall through to read pads 0-1.
+    ; Mouse and scope are skipped (PVSnesLib behavior).
+    ;--------------------------------------------------------------------------
+    lda.w snes_mplay5
+    beq @mp5_done
+        jsl ScanMPlay5
+@mp5_done:
+
+    ;--------------------------------------------------------------------------
+    ; 5b. Read Joypads 0 & 1
+    ;--------------------------------------------------------------------------
+    rep #$20            ; 16-bit A for joypad reads
+
+    ; Save previous state
+    lda.w pad_keys
+    sta.w pad_keysold
+    lda.w pad_keys+2
+    sta.w pad_keysold+2
+
+    ; Read joypad 1 (16-bit load gets both JOY1L and JOY1H)
+    lda $4218           ; 16-bit: A = JOY1H:JOY1L
+    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
+    beq +
+        lda #$0000      ; Invalid input - clear it
++   sta.w pad_keys
+
+    ; Compute edge detection: (current ^ old) & current = newly pressed
+    eor.w pad_keysold
+    and.w pad_keys
+    sta.w pad_keysdown
+
+    ; Read joypad 2
+    lda $421A           ; 16-bit: A = JOY2H:JOY2L
+    bit #$000F          ; Validate: bits 0-3 must be zero for valid joypad
+    beq ++
+        lda #$0000      ; Invalid input - clear it
+++  sta.w pad_keys+2
+
+    eor.w pad_keysold+2
+    and.w pad_keys+2
+    sta.w pad_keysdown+2
+
+    ;--------------------------------------------------------------------------
+    ; 5c. Skip mouse/scope if MultiPlayer5 active (incompatible devices)
+    ;--------------------------------------------------------------------------
+    sep #$20
+    lda.w snes_mplay5
+    beq @no_mp5_skip
+        jmp @scope_done     ; Skip mouse and scope entirely
+@no_mp5_skip:
+
+    ;--------------------------------------------------------------------------
+    ; 6. Read Mouse (if connected) — via SUPERFREE subroutine
+    ;--------------------------------------------------------------------------
+    ; A is already 8-bit (sep #$20 from MP5 skip check above)
+    lda.w mouse_con
+    beq @mouse_done
+        jsl ReadMouse
+@mouse_done:
+
+    ;--------------------------------------------------------------------------
+    ; 7. Read Super Scope (if connected) — via SUPERFREE subroutine
+    ;--------------------------------------------------------------------------
+    sep #$20                ; 8-bit A
+    lda.w scope_con
+    beq @scope_done
+        jsl ReadScope
+@scope_done:
+
+    ; Clear VBlank flag (handshake: signal main thread "done")
+    sep #$20
+    stz.w vblank_flag
+
+@nmi_restore:
     ; Restore and return
     rep #$30
     plb                 ; Restore data bank
@@ -1141,26 +965,519 @@ DefaultNmiCallback:
     rtl
 
 ;------------------------------------------------------------------------------
-; WaitForVBlank - Wait for VBlank using WAI instruction (Opt 1)
+; WaitForVBlank - PVSnesLib handshake protocol
 ;------------------------------------------------------------------------------
-; Uses WAI to halt CPU until interrupt, saving power and bus bandwidth.
-; Checks vblank_flag BEFORE WAI so lag frames pass through immediately.
-; Sets oam_update_flag so NMI handler transfers OAM buffer.
+; Sets vblank_flag=1 ("main thread ready"), then halts with WAI.
+; NMI handler sees flag=1, does VBlank work (OAM, tilemap, scroll, joypads),
+; then clears flag=0. Main thread wakes, sees flag=0, proceeds.
+;
+; If game logic exceeds one frame (lag), flag stays 0 when NMI fires.
+; NMI skips all work and increments lag_frame_counter. No silent VRAM
+; corruption — lag is visible and debuggable.
+;
+; KEEP: X, Y (documented in interrupt.h, used by video.asm)
 ;------------------------------------------------------------------------------
 WaitForVBlank:
     php
     sep #$20
     lda #$01
-    sta.l oam_update_flag
-    lda.l vblank_flag       ; Check if NMI already fired (lag frame)
-    bne @vblank_ready       ; Yes → skip WAI
--   wai                     ; Halt CPU until NMI (or IRQ)
+    sta.l oam_update_flag   ; Request OAM transfer
+    sta.l vblank_flag       ; Signal: "main thread ready"
+-   wai                     ; Halt until NMI
     lda.l vblank_flag
-    beq -                   ; Not VBlank — spurious IRQ, wait again
-@vblank_ready:
-    lda #$00
-    sta.l vblank_flag       ; Clear flag
+    bne -                   ; Loop until NMI clears flag to 0
     plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; MultiPlayer5 Pad Reading (SUPERFREE — can be placed in any bank)
+;==============================================================================
+
+.SECTION ".scan_mplay5" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ScanMPlay5 — Read MultiPlayer5 pads 2, 3, 4
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when snes_mplay5 != 0.
+; Based on PVSnesLib's _ScanMPlay5 macro and SNES Development Wiki multitap
+; protocol (https://snes.nesdev.org/wiki/Multitap).
+;
+; Reads pads 3 & 4 via bit-banging REG_JOYB ($4017) after switching the
+; multitap to its second controller pair (REG_WRIO bit 7 = 0).
+; Reads pad 2 from auto-joypad result (REG_JOY4L/H = $421E-$421F).
+;
+; REQUIRES: Auto-Joypad has finished reading.
+; REQUIRES: REG_WRIO bit 7 set BEFORE VBlank starts.
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: pad_keys/pad_keysold/pad_keysdown updated for pads 2, 3, 4
+;      REG_WRIO restored to $80
+;      A = 8-bit, X/Y = 16-bit
+;------------------------------------------------------------------------------
+ScanMPlay5:
+    rep #$10            ; 16-bit X/Y
+.INDEX 16
+
+    ; Save old pad state (pads 2, 3, 4)
+    ldy.w pad_keys+4    ; pad_keys[2]
+    sty.w pad_keysold+4
+    ldy.w pad_keys+6    ; pad_keys[3]
+    sty.w pad_keysold+6
+    ldy.w pad_keys+8    ; pad_keys[4]
+    sty.w pad_keysold+8
+
+    sep #$20
+.ACCU 8
+
+    ; Switch multitap to second pair of controllers
+    stz.w $4201         ; REG_WRIO = 0
+
+    ; Initialize pad_keys[4] bytes to 1.
+    ; After 8 rol operations, the initial 1 bit shifts out through carry,
+    ; setting carry and terminating the bcc loop.
+    lda #1
+    sta.w pad_keys+8    ; pad_keys[4] low byte
+    sta.w pad_keys+9    ; pad_keys[4] high byte
+
+    ; Read high byte of pads 3 & 4 (bit-bang from REG_JOYB)
+-       lda.w $4017     ; REG_JOYB
+        lsr             ; bit 0 → carry (pad 3 data)
+        rol.w pad_keys+7   ; pad_keys[3] high byte
+        lsr             ; bit 1 → carry (pad 4 data)
+        rol.w pad_keys+9   ; pad_keys[4] high byte
+        bcc -           ; Loop until carry set (8 bits read)
+
+    ; Read low byte of pads 3 & 4
+    ; pad_keys[4] low byte still has its initial value of 1 (untouched by
+    ; the high byte loop above), so it terminates after 8 iterations.
+-       lda.w $4017     ; REG_JOYB
+        lsr             ; bit 0 → carry (pad 3 data)
+        rol.w pad_keys+6   ; pad_keys[3] low byte
+        lsr             ; bit 1 → carry (pad 4 data)
+        rol.w pad_keys+8   ; pad_keys[4] low byte
+        bcc -           ; Loop until carry set (8 bits read)
+
+    rep #$20
+.ACCU 16
+
+    ; Read pad 2 from auto-joypad (REG_JOY4L/H = $421E-$421F)
+    lda.w $421E         ; 16-bit: JOY4H:JOY4L
+    bit.w #$000F        ; Validate signature bits
+    beq +
+        lda.w #$0000    ; Not a standard controller
++   sta.w pad_keys+4    ; pad_keys[2]
+    eor.w pad_keysold+4
+    and.w pad_keys+4
+    sta.w pad_keysdown+4
+
+    ; Process pad 3 edge detection
+    lda.w pad_keys+6    ; pad_keys[3]
+    bit.w #$000F
+    beq +
+        lda.w #$0000
+        sta.w pad_keys+6
++   eor.w pad_keysold+6
+    and.w pad_keys+6
+    sta.w pad_keysdown+6
+
+    ; Process pad 4 edge detection
+    lda.w pad_keys+8    ; pad_keys[4]
+    bit.w #$000F
+    beq +
+        lda.w #$0000
+        sta.w pad_keys+8
++   eor.w pad_keysold+8
+    and.w pad_keys+8
+    sta.w pad_keysdown+8
+
+    ; Switch multitap back to first pair of controllers
+    ; Ensures auto-joypad reads pads 0/1 on the next VBlank
+    sep #$20
+.ACCU 8
+    lda #$80
+    sta.w $4201         ; REG_WRIO = $80
+
+    rtl
+
+.ENDS
+
+;==============================================================================
+; Mouse Reading (SUPERFREE — extracted from NMI for bank $00 savings)
+;==============================================================================
+
+.SECTION ".read_mouse" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ReadMouse — PVSnesLib-compatible mouse reading
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when mouse_con != 0.
+;
+; Features:
+;   - Per-frame connection detection via device signature
+;   - Automatic sensitivity sync on first connection (Nintendo mouse bug)
+;   - Deferred sensitivity change commands (mouseRequestChangeSensitivity)
+;   - Indexed variables: X=0 for port 1, X=1 for port 2
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: Mouse state variables updated, A = 8-bit, X/Y = 16-bit
+;------------------------------------------------------------------------------
+ReadMouse:
+    sep #$10                ; 8-bit X/Y for indexed mouse access
+.INDEX 8
+
+    ; Read port 2 first, then port 1 (PVSnesLib order)
+    lda.w mouse_con
+    bit #$02
+    beq @skip_port2
+        ldx #1
+        lda.w $421A         ; REG_JOY2L (auto-joypad result)
+        jsr @MouseData
+@skip_port2:
+    lda.w mouse_con
+    bit #$01
+    beq @skip_port1
+        ldx #0
+        lda.w $4218         ; REG_JOY1L (auto-joypad result)
+        jsr @MouseData
+@skip_port1:
+
+    rep #$10                ; Restore 16-bit index
+.INDEX 16
+    rtl
+
+;---------------------------------------------------------------------------
+; @MouseData — Read mouse data for one port
+;
+; IN: A = REG_JOY1L or REG_JOY2L (auto-joypad result byte)
+; IN: X = 0 (port 1) or 1 (port 2)
+; KEEP: X
+;
+; DB = 0, D = tcc__nmi_registers (NOT ZERO)
+;---------------------------------------------------------------------------
+.ACCU 8
+.INDEX 8
+@MouseData:
+    tay                     ; Save full JOY byte in Y
+
+    ; Test if a mouse is connected (device signature in low nibble = $01)
+    and #$0F
+    cmp #$01
+    bne @NoMouseConnected
+
+    ; Test if mouse was connected on the previous frame
+    lda.w mouseConnect,x
+    beq @MouseConnectedThisFrame
+
+    ; --- Normal frame: update buttons and displacement ---
+
+    ; Save old buttons for edge detection
+    lda.w mousePressed,x
+    sta.w mousePreviousPressed,x
+
+    ; Extract sensitivity (bits 5-4) and buttons (bits 7-6) from JOY byte
+    tya                     ; Restore JOY byte
+    lsr a
+    lsr a
+    lsr a
+    lsr a
+    tay                     ; Y = upper nibble >> 4
+    and #$03
+    sta.w mouseSensitivity,x
+
+    tya
+    lsr a
+    lsr a
+    sta.w mousePressed,x
+
+    ; Edge detection: newly pressed = (cur ^ old) & cur
+    eor.w mousePreviousPressed,x
+    and.w mousePressed,x
+    sta.w mouseButton,x
+
+    ; Bit-bang 16 bits of displacement from controller port.
+    ; $4016,x → $4016 (port 1) or $4017 (port 2).
+    ; After 16 iterations: mouse_y = first 8 bits (Y displacement),
+    ;                       mouse_x = last 8 bits (X displacement).
+    ; Format: sign-magnitude (bit 7 = direction, bits 6-0 = magnitude).
+    ;
+    ; Hyperkin mouse timing: >=170 master cycles between bit reads.
+    ; SlowROM: this loop is ~190 m-cycles, no extra delay needed.
+    ldy #16
+@disp_loop:
+    lda.w $4016,x
+    lsr a                   ; Bit 0 → carry
+    rol.w mouse_x,x
+    rol.w mouse_y,x
+    nop                     ; Hyperkin compatibility delay
+    nop
+    dey
+    bne @disp_loop
+
+    ; Check for deferred sensitivity change request
+    lda.w mouseRequestChangeSensitivity,x
+    bne @ChangeSensitivityRequest
+
+    rts
+
+; Mouse was just connected this frame — sync sensitivity (Nintendo bug fix).
+; The Nintendo Mouse has a bug where internal sensitivity doesn't match
+; reported sensitivity on power-on. Cycling is required on first connection.
+@MouseConnectedThisFrame:
+    ; Restore sensitivity from last known value (survives disconnect/reconnect)
+    lda.w mouseSensitivity,x
+    and #$03
+    jsr @SetMouseSensitivity
+
+    ; Set mouse connected flag
+    lda #1
+    sta.w mouseConnect,x
+
+    ; Clear stale deferred request
+    stz.w mouseRequestChangeSensitivity,x
+
+    ; Clear mouse state (may not be valid on connection frame)
+    bra @ClearMouseState
+
+@NoMouseConnected:
+    stz.w mouseConnect,x
+
+@ClearMouseState:
+    ; Not clearing mouseSensitivity — it's used to restore on reconnect
+    stz.w mouseButton,x
+    stz.w mousePressed,x
+    stz.w mousePreviousPressed,x
+    stz.w mouse_x,x
+    stz.w mouse_y,x
+    rts
+
+; Process deferred sensitivity change request.
+; Protocol: $01 = cycle once, $02+ = cycle twice, $80+ = set to (value & 3).
+; A = mouseRequestChangeSensitivity value
+@ChangeSensitivityRequest:
+    stz.w mouseRequestChangeSensitivity,x
+
+    bmi @RequestSpecificSensitivity
+
+    ; Send one or two cycle-sensitivity commands to the mouse
+    ldy #$01
+    sty.w $4016             ; Strobe ON
+        dec a
+        beq +
+            ldy.w $4016,x   ; Extra clock read (cycle twice)
++
+        ldy.w $4016,x       ; Clock read (cycle once)
+    stz.w $4016             ; Strobe OFF
+
+    rts
+
+; A = mouseRequestChangeSensitivity (high bit set: specific target)
+@RequestSpecificSensitivity:
+    and #$03
+    cmp.w mouseSensitivity,x
+    beq @SensReturn
+
+; Cycle through mouse sensitivity until reported matches requested.
+; CAUTION: Always cycles at least once (required on first connection).
+; A = requested sensitivity (0-2)
+@SetMouseSensitivity:
+    tay                     ; Y = target sensitivity
+
+    ; Limit cycle-sensitivity commands to prevent infinite loop
+    ; (disconnected mouse or Hyperkin mouse always reports sensitivity 0)
+    lda #4
+    sta.b 1                 ; DP scratch: cycle counter
+
+@CycleLoop:
+    ; Send cycle-sensitivity command: strobe ON, read, strobe OFF
+    lda #$01
+    sta.w $4016             ; Strobe ON
+    lda.w $4016,x           ; Clock (triggers sensitivity cycle)
+    stz.w $4016             ; Strobe OFF
+
+    ; Read sensitivity bits from mouse.
+    ; No Hyperkin delay needed — Hyperkin doesn't support cycle-sensitivity.
+
+    ; Skip the first 10 bits (using A as loop counter to preserve Y)
+    lda #10
+@sens_skip_loop:
+    bit.w $4016,x
+    dec a
+    bne @sens_skip_loop
+
+    ; Read the 2 sensitivity bits
+    stz.b 0                 ; DP scratch: sensitivity accumulator
+
+    lda.w $4016,x
+    lsr a
+    rol.b 0
+
+    lda.w $4016,x
+    lsr a
+    rol.b 0
+
+    ; Compare read sensitivity with target (Y)
+    cpy.b 0
+    beq @SensReturn
+
+    dec.b 1
+    bne @CycleLoop
+
+@SensReturn:
+    rts
+
+.ENDS
+
+;==============================================================================
+; Super Scope Reading (SUPERFREE — extracted from NMI for bank $00 savings)
+;==============================================================================
+
+.SECTION ".read_scope" SUPERFREE
+
+;------------------------------------------------------------------------------
+; ReadScope — Nintendo SHVC Scope BIOS v1.00 compatible reading
+;------------------------------------------------------------------------------
+; Called from NMI handler via JSL when scope_con != 0.
+;
+; Based on Nintendo SHVC Scope BIOS v1.00 (disassembled by Revenant).
+; Reads PPU H/V latch for shot position, applies calibration offset,
+; and processes buttons with hold/repeat delay logic.
+;
+; IN:  DB = 0, A = 8-bit
+; OUT: Scope state variables updated, A = 8-bit
+;------------------------------------------------------------------------------
+ReadScope:
+    ; Read port 2 raw data from auto-joypad and compute edge detection
+    rep #$20                ; 16-bit A
+.ACCU 16
+    lda.w scope_port2down
+    sta.w scope_port2last     ; Save previous frame
+    lda $421A               ; REG_JOY2L/H (16-bit read)
+    sta.w scope_port2down
+    eor.w scope_port2last
+    and.w scope_port2down
+    sta.w scope_port2now      ; Newly pressed raw port 2
+
+    ; Validate Super Scope signature: bits 0-7 all 1, bits 10-11 both 0
+    lda.w scope_port2down
+    and #$0CFF
+    cmp #$00FF
+    beq @scope_valid
+    jmp @scope_disconnect
+@scope_valid:
+
+    ; Check PPU H/V counter latch (bit 6 of REG_STAT78)
+    sep #$20                ; 8-bit A
+.ACCU 8
+    lda $213F               ; REG_STAT78
+    and #$40
+    beq @scope_no_shot
+
+    ; --- Shot detected: read H/V position ---
+    ; REG_OPHCT ($213C): 9-bit H position, read twice (low then high)
+    lda $213C               ; OPHCT low byte
+    sta.w scope_shothraw
+    lda $213C               ; OPHCT high bit (bit 0 only)
+    and #$01
+    sta.w scope_shothraw+1
+
+    ; REG_OPVCT ($213D): 9-bit V position, read twice (low then high)
+    lda $213D               ; OPVCT low byte
+    sta.w scope_shotvraw
+    lda $213D               ; OPVCT high bit (bit 0 only)
+    and #$01
+    sta.w scope_shotvraw+1
+
+    ; Apply calibration offset: adjusted = raw + center offset
+    rep #$20                ; 16-bit A
+.ACCU 16
+    lda.w scope_shothraw
+    clc
+    adc.w scope_centerh
+    sta.w scope_shoth
+    lda.w scope_shotvraw
+    clc
+    adc.w scope_centerv
+    sta.w scope_shotv
+
+    ; Reset shot counter
+    stz.w scope_sinceshot
+    bra @scope_buttons      ; Common button processing
+
+@scope_no_shot:
+    ; --- No shot this frame ---
+    rep #$20                ; 16-bit A
+.ACCU 16
+    inc.w scope_sinceshot
+
+@scope_buttons:
+    ; Full button processing: extract bits 15-12 (buttons) and 9-8 (flags)
+    ; All buttons (Fire, Cursor, Turbo, Pause) + flags (Offscreen, Noise)
+    ; are processed identically on both shot and non-shot frames.
+    lda.w scope_port2down
+    and #$F300              ; Keep buttons (15-12) + offscreen (9) + noise (8)
+    sta.w scope_down
+
+    ; Edge detection: newly pressed = (cur ^ last) & cur
+    lda.w scope_last
+    eor.w scope_down
+    and.w scope_down
+    sta.w scope_now
+
+    ; Hold/repeat delay logic
+    ; If buttons changed from last frame, reset hold countdown
+    lda.w scope_down
+    cmp.w scope_last
+    bne @scope_reset_hold
+
+    ; Same buttons held: decrement countdown
+    lda.w scope_tohold
+    beq @scope_held_fire     ; Already at 0 → fire held event
+    dec a
+    sta.w scope_tohold
+    stz.w scope_held
+    bra @scope_save_last
+
+@scope_held_fire:
+    ; Hold triggered: set held = down, reload with repeat delay
+    lda.w scope_down
+    sta.w scope_held
+    lda.w scope_repdelay
+    sta.w scope_tohold
+    bra @scope_save_last
+
+@scope_reset_hold:
+    ; Buttons changed: reload with hold delay
+    lda.w scope_holddelay
+    sta.w scope_tohold
+    stz.w scope_held
+    bra @scope_save_last
+
+@scope_disconnect:
+    ; Invalid signature: disconnect Super Scope
+    rep #$20
+.ACCU 16
+    stz.w scope_down
+    stz.w scope_now
+    stz.w scope_held
+    stz.w scope_shoth
+    stz.w scope_shotv
+    stz.w scope_shothraw
+    stz.w scope_shotvraw
+    stz.w scope_sinceshot
+    sep #$20
+.ACCU 8
+    stz.w scope_con
+    rtl
+
+@scope_save_last:
+    ; Save current button state for next frame
+    lda.w scope_down
+    sta.w scope_last
+
+    sep #$20
+.ACCU 8
     rtl
 
 .ENDS
@@ -1218,7 +1535,7 @@ tilemapFlush:
     sta $2115           ; VMAIN: increment after high byte write
 
     rep #$20            ; 16-bit A
-    lda tilemap_vram_addr
+    lda.w tilemap_vram_addr
     sta $2116           ; VMADDL/H: VRAM word address
 
     ; DMA channel 1: word write mode (2 regs write once: VMDATAL+VMDATAH)
@@ -1230,7 +1547,7 @@ tilemapFlush:
     sta $4315
 
     ; Source address from tilemap_src_addr (set by textInit in C)
-    lda tilemap_src_addr
+    lda.w tilemap_src_addr
     sta $4312           ; DMA source address (low word)
 
     sep #$20            ; 8-bit A

@@ -86,13 +86,8 @@ fixed fixCos(u8 angle) {
  * Fixed-Point Arithmetic
  *============================================================================*/
 
-fixed fixMul(fixed a, fixed b) {
-    s32 result;
-
-    /* 8.8 * 8.8 = 16.16, then shift down to 8.8 */
-    result = (s32)a * (s32)b;
-    return (fixed)(result >> 8);
-}
+/* fixMul is implemented in math_fixmul.asm using SNES hardware multiplier.
+ * The C version overflows because the compiler reduces (s32)a*(s32)b to __mul16. */
 
 fixed fixDiv(fixed a, fixed b) {
     s32 dividend;
@@ -165,12 +160,5 @@ fixed fixClamp(fixed x, fixed min, fixed max) {
     return x;
 }
 
-fixed fixLerp(fixed a, fixed b, u8 t) {
-    fixed diff;
-    s32 scaled;
-
-    diff = b - a;
-    /* Scale diff by t/256 */
-    scaled = (s32)diff * t;
-    return a + (fixed)(scaled >> 8);
-}
+/* fixLerp is implemented in math_fixmul.asm using SNES hardware multiplier.
+ * The C version overflows because the compiler reduces (s32)diff*t to __mul16. */

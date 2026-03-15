@@ -94,6 +94,7 @@ USE_LIB     ?= 0
 #   object  -> map      (Object collision uses map tile lookups)
 #   map     -> dma      (Map VBlank updates use DMA transfers)
 #   snesmod -> console  (SNESMOD requires NMI handling from console)
+#   mp5     -> input    (MultiPlayer5 uses input state variables)
 #   hdma    -> (none)   (Standalone, but often used with console for VBlank)
 #
 # The build system does NOT auto-resolve dependencies. If you use 'sprite',
@@ -223,6 +224,7 @@ _DEP_text4bpp  := dma
 _DEP_object    := map
 _DEP_map       := dma
 _DEP_snesmod   := console
+_DEP_mp5       := input
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))

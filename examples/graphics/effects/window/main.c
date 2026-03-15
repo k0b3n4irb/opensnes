@@ -98,19 +98,20 @@ u8 tablerighttriangle[] = {
 
 static void setup_window(u8 layers, u8 w12sel_val) {
     /* Disable HDMA first */
-    hdmaDisable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_7));
+    hdmaDisable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
     /* Set window registers — direct writes matching PVSnesLib */
     REG_TMW = layers | 0x10;      /* Main screen mask + OBJ */
     REG_W12SEL = w12sel_val;       /* Window 1 enable + invert */
     REG_WOBJSEL = w12sel_val;      /* PVSnesLib sets WOBJSEL = bgrndmask */
 
-    /* Set up HDMA: channel 6 → WH0, channel 7 → WH1 */
-    hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_WH0,
+    /* Set up HDMA: channel 4 → WH0, channel 5 → WH1
+     * NMI handler uses DMA channel 7 for OAM — avoid channel 7 for HDMA! */
+    hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0,
               tablelefttriangle);
-    hdmaSetup(HDMA_CHANNEL_7, HDMA_MODE_1REG, HDMA_DEST_WH1,
+    hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
               tablerighttriangle);
-    hdmaEnable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_7));
+    hdmaEnable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 }
 
 /*============================================================================
