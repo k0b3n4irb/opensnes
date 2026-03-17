@@ -344,12 +344,19 @@ InitHardware:
     lda #$FF
     sta $4201
 
-    ; Clear math/DMA registers ($4202-$420D)
+    ; Clear math/DMA registers ($4202-$420C, then set $420D for ROM speed)
     ldx #$4202
 -   stz.w $0000,x
     inx
+.ifdef FASTROM
+    cpx #$420D
+    bne -
+    lda #$01
+    sta.w $420D             ; Enable FastROM access speed
+.else
     cpx #$420E
     bne -
+.endif
 
     ;--------------------------------------------------------------------------
     ; Initialize OAM buffer to hide all sprites
@@ -446,6 +453,11 @@ Start:
     ; Switch to native mode
     clc
     xce
+
+.ifdef FASTROM
+    jml.l FastStart         ; Jump to bank $80 mirror for fast ROM access
+FastStart:
+.endif
 
     ; 16-bit X/Y, 8-bit A
     rep #$18
@@ -637,6 +649,10 @@ CopyInitData:
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
 NmiHandler:
+.ifdef FASTROM
+    jml.l FastNmi           ; Jump to bank $80 mirror for fast ROM access
+FastNmi:
+.endif
     rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
     pha
     phx
@@ -1207,6 +1223,10 @@ ReadMouse:
     rol.w mouse_y,x
     nop                     ; Hyperkin compatibility delay
     nop
+.ifdef FASTROM
+    nop                     ; FastROM: extra delay (loop is ~30 cyc faster)
+    nop
+.endif
     dey
     bne @disp_loop
 

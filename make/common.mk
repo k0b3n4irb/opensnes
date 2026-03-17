@@ -181,6 +181,7 @@ endif
 # Note: USE_SRAM + USE_HIROM is not yet fully supported (SRAM location differs).
 
 USE_HIROM      ?= 0
+USE_FASTROM    ?= 0
 
 # HiROM note: cartridge type ($FFD6) does NOT encode LoROM/HiROM.
 # That's in the map mode byte ($FFD5), set by HIROM/LOROM directives.
@@ -423,6 +424,10 @@ ifeq ($(USE_HIROM),1)
 ASFLAGS := -D HIROM
 else
 ASFLAGS :=
+endif
+
+ifeq ($(USE_FASTROM),1)
+ASFLAGS += -D FASTROM
 endif
 
 combined.obj: combined.asm
