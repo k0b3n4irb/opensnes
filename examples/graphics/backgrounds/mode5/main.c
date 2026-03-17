@@ -27,10 +27,10 @@ int main(void) {
     dmaCopyVram(tilemap, 0x6000, tilemap_end - tilemap);
     bgSetMapPtr(0, 0x6000, SC_32x32);
 
-    /* Mode 5: hi-res, BG1 only */
+    /* Mode 5: hi-res, BG1 on both main+sub (required for 512px) */
     setMode(BG_MODE5, 0);
     setMainScreen(LAYER_BG1);
-    setSubScreen(0);
+    setSubScreen(LAYER_BG1);
 
     setScreenOn();
 
