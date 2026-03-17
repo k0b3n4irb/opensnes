@@ -166,8 +166,9 @@ int main(int argc, const char **argv)
 		// convert map to a snes format if needed and /!\ optimize tiles in tiles_snes
 		map_snes = map_convertsnes(tiles_snes, &nbtiles, gfx4snes_args.tilewidth, gfx4snes_args.tileheight, blksx, blksy, gfx4snes_args.palettecolors, gfx4snes_args.paletteentry, gfx4snes_args.mapscreenmode, gfx4snes_args.notilereduction, gfx4snes_args.tileblank, gfx4snes_args.map32pages, gfx4snes_args.tileflip, gfx4snes_args.quietmode);
 
-		// save now the map 
-		map_save (gfx4snes_args.filebase, map_snes,gfx4snes_args.mapscreenmode, blksx, blksy, gfx4snes_args.tileoffset,gfx4snes_args.maphighpriority, gfx4snes_args.quietmode);
+		// save now the map (Mode 5/6 halves block count — match map_convertsnes allocation)
+		int map_blksx = ((gfx4snes_args.mapscreenmode == 5) || (gfx4snes_args.mapscreenmode == 6)) ? blksx >> 1 : blksx;
+		map_save (gfx4snes_args.filebase, map_snes,gfx4snes_args.mapscreenmode, map_blksx, blksy, gfx4snes_args.tileoffset,gfx4snes_args.maphighpriority, gfx4snes_args.quietmode);
 	}
 	// no map, only tiles (for sprites or meta sprites certainly)
 	else 
