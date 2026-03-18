@@ -181,9 +181,10 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
     // size of a tile block (64 bytes for a 8x8 block)
     sizetile = blksizex*blksizey;
 
-    // allocate map
-      // get memory for the new buffer
-    map = (unsigned short *) malloc(nbblockx * nbblocky * sizeof(unsigned short));
+    // allocate map (calloc to zero-initialize — Mode 5/6 first loop only writes
+    // even-x positions, so odd positions must start at zero before the second
+    // loop adds tile indices with +=)
+    map = (unsigned short *) calloc(nbblockx * nbblocky, sizeof(unsigned short));
     if (map == NULL)
     {
         fatal("can't allocate enough memory for the buffer in map_convertsnes");

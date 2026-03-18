@@ -94,7 +94,7 @@ void oamSetX(u8 id, u16 x) {
     oam_buffer[offset + 0] = (u8)(x & 0xFF);
 
     /* Update X high bit in extension table */
-    u8 ext_offset = 512 + (id >> 2);
+    u16 ext_offset = 512 + (id >> 2);
     u8 slot = id & 0x03;
 
     if (x & 0x100) {

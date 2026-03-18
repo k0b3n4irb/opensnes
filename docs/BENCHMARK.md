@@ -18,7 +18,7 @@ optimizer on our benchmark suite of 34 isolated functions.
 
 ## Methodology
 
-Each function in `tests/benchmark/bench_functions.c` isolates one code generation
+Each function in `tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c` isolates one code generation
 pattern (arithmetic, shifts, loops, struct access, function calls, etc.). Both
 compilers process the same source file:
 

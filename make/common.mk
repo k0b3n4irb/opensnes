@@ -16,6 +16,11 @@
 #   SPRITE_SIZE - Sprite/tile size for gfx4snes (default: 8)
 #   BPP       - Bits per pixel for graphics (default: 4)
 #
+# ROM configuration options:
+#   USE_HIROM     - Set to 1 for HiROM mode (64KB banks instead of 32KB)
+#   USE_FASTROM   - Set to 1 for FastROM (~33% faster ROM access)
+#   USE_SRAM      - Set to 1 to enable battery-backed save (8KB default)
+#
 # SNESMOD audio options:
 #   USE_SNESMOD   - Set to 1 to enable SNESMOD tracker audio
 #   SOUNDBANK_SRC - IT files to convert (e.g., music.it sfx.it)
@@ -196,6 +201,15 @@ else
 HDR_TEMPLATE := $(TEMPLATES)/hdr.asm
 MEMMAP_INC   := memmap.inc
 endif
+
+#------------------------------------------------------------------------------
+# FastROM Configuration (set USE_FASTROM=1 for faster ROM access)
+#------------------------------------------------------------------------------
+# FastROM reduces ROM read cycles from 8 to 6 master cycles (~33% faster).
+# At boot, the CPU jumps to the bank $80 mirror and sets $420D = $01.
+# Compatible with both LoROM and HiROM. All existing code works unchanged.
+
+USE_FASTROM    ?= 0
 
 #------------------------------------------------------------------------------
 # SNESMOD Configuration (set USE_SNESMOD=1 to enable tracker-based audio)
@@ -423,6 +437,10 @@ ifeq ($(USE_HIROM),1)
 ASFLAGS := -D HIROM
 else
 ASFLAGS :=
+endif
+
+ifeq ($(USE_FASTROM),1)
+ASFLAGS += -D FASTROM
 endif
 
 combined.obj: combined.asm

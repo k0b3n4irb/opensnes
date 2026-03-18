@@ -40,7 +40,11 @@
 .SNESHEADER
     ID "OPEN"               ; Developer ID (4 chars)
     NAME "__ROM_NAME__"     ; Game title (21 chars, pad with spaces)
+.ifdef FASTROM
+    FASTROM                 ; Fast ROM access (register $420D = $01)
+.else
     SLOWROM                 ; 2.68MHz ROM access
+.endif
     LOROM                   ; LoROM memory mapping
     CARTRIDGETYPE __CARTRIDGETYPE__  ; $00=ROM, $02=ROM+SRAM
     ROMSIZE __ROMSIZE__     ; ROM size (1024 << N bytes)
@@ -86,6 +90,9 @@
 ;------------------------------------------------------------------------------
 
 .BANK 0
+.ifdef FASTROM
+.BASE $80
+.endif
 .ORG 0
 
 .SECTION ".empty_handler" SEMIFREE

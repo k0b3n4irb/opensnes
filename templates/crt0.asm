@@ -68,6 +68,7 @@
     tcc__r10h   dsb 2
     ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
     nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
+    nmi_has_callback dsb 1  ; 0 = default no-op, 1 = user callback active
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -343,12 +344,19 @@ InitHardware:
     lda #$FF
     sta $4201
 
-    ; Clear math/DMA registers ($4202-$420D)
+    ; Clear math/DMA registers ($4202-$420C, then set $420D for ROM speed)
     ldx #$4202
 -   stz.w $0000,x
     inx
+.ifdef FASTROM
+    cpx #$420D
+    bne -
+    lda #$01
+    sta.w $420D             ; Enable FastROM access speed
+.else
     cpx #$420E
     bne -
+.endif
 
     ;--------------------------------------------------------------------------
     ; Initialize OAM buffer to hide all sprites
@@ -445,6 +453,11 @@ Start:
     ; Switch to native mode
     clc
     xce
+
+.ifdef FASTROM
+    jml.l FastStart         ; Jump to bank $80 mirror for fast ROM access
+FastStart:
+.endif
 
     ; 16-bit X/Y, 8-bit A
     rep #$18
@@ -636,6 +649,10 @@ CopyInitData:
 ; be corrupted silently when the main thread resumes.
 ;------------------------------------------------------------------------------
 NmiHandler:
+.ifdef FASTROM
+    jml.l FastNmi           ; Jump to bank $80 mirror for fast ROM access
+FastNmi:
+.endif
     rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
     pha
     phx
@@ -824,18 +841,12 @@ NmiHandler:
     ; JML [nmi_callback] reads from bank $00 absolute address nmi_callback
     ; (65816 JML indirect always reads from bank 0, ignoring D).
     ;--------------------------------------------------------------------------
-    rep #$30            ; 16-bit A/X/Y
-
-    ; Check if callback is the default no-op
-    lda.w nmi_callback        ; 16-bit address (absolute, D != 0)
-    cmp #DefaultNmiCallback
-    bne @do_callback
+    ; Fast callback check: single byte flag (saves ~18 cycles vs 24-bit compare)
     sep #$20
-    lda.w nmi_callback+2      ; bank byte
-    cmp #:DefaultNmiCallback
-    bne +                   ; Not match → do callback
-    jmp @skip_callback      ; Match → skip call entirely
-+   rep #$30
+    lda.w nmi_has_callback
+    beq @skip_callback      ; 0 = no callback → skip
+
+    rep #$30                ; 16-bit A/X/Y for callback
 
 @do_callback:
     ; Set data bank to $7E for C variable access
@@ -1212,6 +1223,10 @@ ReadMouse:
     rol.w mouse_y,x
     nop                     ; Hyperkin compatibility delay
     nop
+.ifdef FASTROM
+    nop                     ; FastROM: extra delay (loop is ~30 cyc faster)
+    nop
+.endif
     dey
     bne @disp_loop
 

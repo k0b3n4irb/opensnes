@@ -1,0 +1,21 @@
+# Valgrind suppression file for statically-linked binaries
+#
+# glibc's _dl_non_dynamic_init / _dl_get_origin allocates memory via
+# sbrk during the very first malloc (tcache_init). These pages are not
+# fully initialized, so free() reading internal malloc metadata from
+# those regions triggers false "Conditional jump depends on uninitialised
+# value" warnings. This is harmless — it's glibc bookkeeping, not
+# application data.
+#
+# Affects: all statically-linked C tools (smconv, cproc-qbe, etc.)
+# Does NOT suppress real application-level uninitialised-value bugs.
+#
+# Usage: valgrind --suppressions=tools/valgrind-static.supp ...
+
+{
+   glibc_static_dl_origin_malloc_metadata
+   Memcheck:Cond
+   fun:free
+   ...
+   fun:main
+}
