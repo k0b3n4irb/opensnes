@@ -334,13 +334,12 @@ static void new_level(void) {
     pos_y = 109;
     px = 80;
 
-    /* Select background pattern for this level (cycles through 4) */
-    switch (level & 3) {
-        case 0: mycopy((u8 *)backmap, bg2map0, 0x800); break;
-        case 1: mycopy((u8 *)backmap, bg2map1, 0x800); break;
-        case 2: mycopy((u8 *)backmap, bg2map2, 0x800); break;
-        case 3: mycopy((u8 *)backmap, bg2map3, 0x800); break;
-    }
+    /* Select background pattern for this level.
+     * Pattern 0 (tiles 1-12) is the smoothest — it includes flat fill tiles
+     * that hide tile boundaries. Patterns 1-3 use multi-shade tiles that
+     * create visible banding. Reuse pattern 0 for all levels; the palette
+     * cycling already provides visual variety per level. */
+    mycopy((u8 *)backmap, bg2map0, 0x800);
     mycopy((u8 *)blocks, brick_map, 100);
 
     /* Update level display in tilemap */
@@ -353,9 +352,9 @@ static void new_level(void) {
 
     /* PALETTE CYCLING:
      * backpal.dat contains 7 sets of 8 colors (7 x 16 bytes).
-     * Each set replaces CGRAM colors 8-15 (byte offset 16).
+     * Each set replaces CGRAM colors 16-23 (byte offset 32) = BG3 palettes 4-5.
      * This changes the background pattern color each level. */
-    mycopy((u8 *)pal + 16, backpal + color * 16, 0x10);
+    mycopy((u8 *)pal + 32, backpal + color * 16, 0x10);
 
     /* BRICK INITIALIZATION:
      * Each brick is 2 tiles wide. The brick array contains color values 0-7.
