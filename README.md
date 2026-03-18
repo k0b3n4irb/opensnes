@@ -12,6 +12,8 @@
 [![C11](https://img.shields.io/badge/language-C11-blue.svg)]()
 [![65816](https://img.shields.io/badge/target-65816-purple.svg)]()
 
+**[Documentation](https://k0b3n4irb.github.io/opensnes/)** · **[Getting Started](https://k0b3n4irb.github.io/opensnes/getting-started.html)** · **[API Reference](https://k0b3n4irb.github.io/opensnes/api/)** · **[Contributing](https://k0b3n4irb.github.io/opensnes/contributing.html)**
+
 </div>
 
 ---
@@ -165,8 +167,9 @@ Resources:
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome! See the [Contributing Guide](https://k0b3n4irb.github.io/opensnes/contributing.html) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
+- [Documentation](https://k0b3n4irb.github.io/opensnes/)
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
