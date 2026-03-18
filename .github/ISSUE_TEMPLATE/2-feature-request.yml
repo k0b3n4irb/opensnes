@@ -24,13 +24,15 @@ body:
     id: category
     attributes:
       label: Category
+      description: "Matches commit scopes used in the project"
       options:
-        - Library (new function / module)
-        - Compiler optimization
-        - Tools (gfx4snes, smconv, font2snes)
-        - New example
-        - Documentation
-        - Build system / CI
+        - "lib — new library function or module"
+        - "compiler — compiler optimization or fix"
+        - "runtime — crt0.asm, NMI handler, startup"
+        - "tools — gfx4snes, smconv, font2snes, img2snes"
+        - "examples — new or improved example"
+        - "build — Makefile, CI, linking"
+        - "docs — documentation, tutorials"
     validations:
       required: true
 

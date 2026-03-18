@@ -52,15 +52,15 @@ body:
     id: component
     attributes:
       label: Component
-      description: Which part of the SDK is affected?
+      description: "Which part of the SDK is affected? (matches commit scopes)"
       options:
-        - Compiler (cc65816, cproc, QBE)
-        - Library (lib/)
-        - Runtime (crt0.asm, runtime.asm)
-        - Tools (gfx4snes, smconv, font2snes)
-        - Examples
-        - Build system (Makefile, CI)
-        - Documentation
+        - "compiler — cc65816, cproc, QBE"
+        - "lib — hardware library (lib/source, lib/include)"
+        - "runtime — crt0.asm, runtime.asm, NMI handler"
+        - "tools — gfx4snes, smconv, font2snes, img2snes"
+        - "examples — example ROMs"
+        - "build — Makefile, CI, linking"
+        - "docs — documentation"
     validations:
       required: true
 
