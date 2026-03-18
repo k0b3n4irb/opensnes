@@ -87,6 +87,7 @@ For prerequisites and platform-specific setup, see the **[Getting Started guide]
 
 We stand on the shoulders of:
 
+- **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by Alekmaul — the foundation
 - **[QBE](https://c9x.me/compile/)** by Quentin Carbonneaux — compiler backend
 - **[cproc](https://sr.ht/~mcf/cproc/)** by Michael Forney — C frontend
 - **[WLA-DX](https://github.com/vhelin/wla-dx)** by Ville Helin — assembler
