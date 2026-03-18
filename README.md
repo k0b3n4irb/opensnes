@@ -18,6 +18,26 @@
 
 ---
 
+## A Fair Warning
+
+SNES development is hard. Not "takes a weekend to figure out" hard — fundamentally, structurally hard.
+
+The SNES was designed in 1989 by hardware engineers, for assembly programmers, with no concessions to convenience. There is no operating system. There is no standard library. There is no debugger that pauses the world while you inspect variables. The CPU runs at 3.58 MHz, has 128 KB of RAM, and doesn't know what a float is.
+
+You will need to understand how a PPU renders tiles scanline by scanline. You will need to know why writing to VRAM outside of VBlank silently fails. You will need to care about individual clock cycles, because on this hardware, every single one matters.
+
+OpenSNES lets you write game logic in C. That's a real advantage — you get if/else, functions, structs, and all the abstraction C provides. The SDK handles initialization, DMA transfers, joypad reading, sprite management, and audio playback through a clean API. For many things, you'll never touch a register directly.
+
+But C alone won't get you to a finished game.
+
+The PPU has quirks that no C abstraction can fully hide. Performance-critical inner loops, custom HDMA effects, and advanced hardware tricks eventually require reading — and writing — 65816 assembly. The SDK handles audio through SNESMOD (music and sound effects from C, no assembly needed), and it handles sprites, backgrounds, and DMA through its library. But the moment you push past what the library provides, you're on the hardware's terms.
+
+This is not a flaw in the SDK. It's the nature of the machine. OpenSNES will keep improving — better optimizations, more library functions, smoother workflows — but the gap between "my sprites move" and "my game ships" will always require understanding what happens beneath the C.
+
+If that sounds exciting rather than terrifying, you're in the right place.
+
+---
+
 ## Why OpenSNES?
 
 OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 41 example ROMs.
