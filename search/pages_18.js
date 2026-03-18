@@ -11,6 +11,6 @@ var searchData=
   ['transparent_20window_20color_20math_20hdma_8',['Transparent Window -- Color Math + HDMA',['../examples_graphics_effects_transparent_window.html',1,'examples_by_category']]],
   ['triangle_20masking_9',['Window -- HDMA Triangle Masking',['../examples_graphics_effects_window.html',1,'examples_by_category']]],
   ['troubleshooting_20opensnes_10',['Troubleshooting OpenSNES',['../troubleshooting.html',1,'index']]],
-  ['tutorial_11',['tutorial',['../tutorial_audio.html',1,'Audio &amp; Music Tutorial'],['../tutorial_input.html',1,'Controller Input Tutorial'],['../tutorial_graphics.html',1,'Graphics &amp; Backgrounds Tutorial'],['../tutorial_sprites.html',1,'Sprites &amp; Animation Tutorial']]],
+  ['tutorial_11',['tutorial',['../tutorial_animation.html',1,'Animation Tutorial'],['../tutorial_audio.html',1,'Audio &amp; Music Tutorial'],['../tutorial_collision.html',1,'Collision Detection Tutorial'],['../tutorial_input.html',1,'Controller Input Tutorial'],['../tutorial_game_states.html',1,'Game States Tutorial'],['../tutorial_graphics.html',1,'Graphics &amp; Backgrounds Tutorial'],['../tutorial_scrolling.html',1,'Scrolling &amp; Parallax Tutorial'],['../tutorial_sprites.html',1,'Sprites &amp; Animation Tutorial']]],
   ['two_20players_20example_12',['Two Players Example',['../examples_input_two_players.html',1,'examples_by_category']]]
 ];

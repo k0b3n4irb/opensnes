@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['vflip_0',['VFLIP',['../render_8c.html#acdc01ff1691a45c963a0e5d5bfa0f2cd',1,'render.c']]],
+  ['visible_5ftop_1',['VISIBLE_TOP',['../board_8h.html#a861da31e43731d4610bd150e9e8f77a2',1,'board.h']]],
+  ['vram_5fbg1_5fmap_2',['VRAM_BG1_MAP',['../render_8c.html#a062335e0c6d2c2294bf2782b300c7a60',1,'render.c']]],
+  ['vram_5fbg2_5fgfx_3',['VRAM_BG2_GFX',['../maps_2dynamic__map_2main_8c.html#aba14270cc3cca97712782e0ed46263be',1,'main.c']]],
+  ['vram_5fbg2_5fmap_4',['vram_bg2_map',['../render_8c.html#a887794f9b169e435e406eed5ff0a9c3b',1,'VRAM_BG2_MAP:&#160;render.c'],['../maps_2dynamic__map_2main_8c.html#a887794f9b169e435e406eed5ff0a9c3b',1,'VRAM_BG2_MAP:&#160;main.c']]],
+  ['vram_5fbg3_5fmap_5',['VRAM_BG3_MAP',['../render_8c.html#a5496de1e71cd26388ff2055d7804d1f5',1,'render.c']]],
+  ['vram_5fbg3_5fmsgrow_6',['VRAM_BG3_MSGROW',['../render_8c.html#ab308a72cc3f84f4ad16e67fd372e96db',1,'render.c']]],
+  ['vram_5fbg_5fmap_7',['VRAM_BG_MAP',['../games_2likemario_2main_8c.html#aac6bdb9f6545d1755dbfb4946bb1d842',1,'main.c']]],
+  ['vram_5fbg_5ftiles_8',['VRAM_BG_TILES',['../games_2likemario_2main_8c.html#aec9dcf2ea648f7c52b3593d354a663a3',1,'main.c']]],
+  ['vram_5ffont_9',['vram_font',['../maps_2dynamic__map_2main_8c.html#a42f9b2d893d66eedd0255d9b236dc2e4',1,'VRAM_FONT:&#160;main.c'],['../graphics_2sprites_2metasprite_2main_8c.html#a42f9b2d893d66eedd0255d9b236dc2e4',1,'VRAM_FONT:&#160;main.c']]],
+  ['vram_5fhero16_10',['VRAM_HERO16',['../graphics_2sprites_2metasprite_2main_8c.html#a1ecc54ba9c97d7721f0d6c440a30682c',1,'main.c']]],
+  ['vram_5fhero32_11',['VRAM_HERO32',['../graphics_2sprites_2metasprite_2main_8c.html#a0a79e7c1576f67a4ba27a5f569e1fdcc',1,'main.c']]],
+  ['vram_5fhero8_12',['VRAM_HERO8',['../graphics_2sprites_2metasprite_2main_8c.html#afe1890aa4ac8c4c3d2cb1ee5c5f08320',1,'main.c']]],
+  ['vram_5fspr_5flarge_13',['VRAM_SPR_LARGE',['../games_2likemario_2main_8c.html#a307f7a66d00de9b68d22f059e6490ee3',1,'main.c']]],
+  ['vram_5fspr_5fsmall_14',['VRAM_SPR_SMALL',['../games_2likemario_2main_8c.html#a7969a37ad80a90f7ec11c8eccd822291',1,'main.c']]],
+  ['vram_5fsprite_5fgfx_15',['VRAM_SPRITE_GFX',['../maps_2dynamic__map_2main_8c.html#ab0a4148f62efa1297831be21e77cd36b',1,'main.c']]],
+  ['vram_5fspritemap_16',['VRAM_SPRITEMAP',['../maps_2dynamic__map_2main_8c.html#ac8440e857ee5f4ef77ce8a7c4da6e92b',1,'main.c']]],
+  ['vram_5ftext_5fmap_17',['VRAM_TEXT_MAP',['../graphics_2sprites_2metasprite_2main_8c.html#a723a43d336256e6d28543c1f170d1171',1,'main.c']]],
+  ['vram_5ftiles2_18',['VRAM_TILES2',['../render_8c.html#acb3902fcc0a8dc9ce08adea51d7c3ec5',1,'render.c']]],
+  ['vram_5ftiles4_19',['VRAM_TILES4',['../render_8c.html#a92e50f10a988806932af445f1c9cd948',1,'render.c']]]
+];

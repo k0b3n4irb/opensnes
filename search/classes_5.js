@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['scomemory_0',['scoMemory',['../structscoMemory.html',1,'']]]
+  ['player_0',['Player',['../structPlayer.html',1,'']]]
 ];

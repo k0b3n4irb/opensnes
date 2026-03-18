@@ -36,6 +36,7 @@ var searchData=
   ['objloadobjects_33',['objLoadObjects',['../object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a',1,'object.h']]],
   ['objnew_34',['objNew',['../object_8h.html#a5f3dd63b163cced3299b0d1d48d2b17a',1,'object.h']]],
   ['objrefreshall_35',['objRefreshAll',['../object_8h.html#aede8c571a7e8bdb8129b5df55b45225b',1,'object.h']]],
-  ['objupdateall_36',['objUpdateAll',['../object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83',1,'object.h']]],
-  ['objupdatexy_37',['objUpdateXY',['../object_8h.html#af27124be823e35daf579362d3820738d',1,'object.h']]]
+  ['objregistertypes_36',['objregistertypes',['../games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c'],['../maps_2slopemario_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c']]],
+  ['objupdateall_37',['objUpdateAll',['../object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83',1,'object.h']]],
+  ['objupdatexy_38',['objUpdateXY',['../object_8h.html#af27124be823e35daf579362d3820738d',1,'object.h']]]
 ];

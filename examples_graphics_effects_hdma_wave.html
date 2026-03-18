@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_hdma_wave.ht
 <p>&zwj;A wavy distortion effect that bends the entire screen like a funhouse mirror. Press A to toggle, D-pad to control amplitude and animation. This is the same trick used for water reflections in Chrono Trigger. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md832"></a>
+<h2><a class="anchor" id="autotoc_md909"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,12 +114,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-Pad Down   </td><td class="markdownTableBodyNone">Stop animation (freeze)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md833"></a>
+<h2><a class="anchor" id="autotoc_md910"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/hdma_wave</div>
 </div><!-- fragment --><p>Then open <code>hdma_wave.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md834"></a>
+<h2><a class="anchor" id="autotoc_md911"></a>
 What You'll Learn</h2>
 <ul>
 <li>What HDMA is and why it's one of the SNES's most powerful features</li>
@@ -128,14 +128,14 @@ What You'll Learn</h2>
 <li>Pre-computing animation tables in ROM to avoid any runtime math</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md836"></a>
+<h2><a class="anchor" id="autotoc_md913"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md837"></a>
+<h3><a class="anchor" id="autotoc_md914"></a>
 1. What Is HDMA?</h3>
 <p>Normal DMA transfers a block of data from one place to another — useful for loading tiles during VBlank. <b>HDMA</b> (Horizontal DMA) is different: it feeds a small amount of data to a PPU register <em>every single scanline</em> while the screen is being drawn.</p>
 <p>Think about it: the PPU draws 224 horizontal lines per frame. If you change the BG1 horizontal scroll register between each line, every line on screen shifts by a different amount. Feed it a sine wave pattern and the whole screen undulates.</p>
 <p>That's exactly what this demo does.</p>
-<h3><a class="anchor" id="autotoc_md838"></a>
+<h3><a class="anchor" id="autotoc_md915"></a>
 2. The HDMA Table Format</h3>
 <p>An HDMA table is a sequence of entries in RAM or ROM. The hardware reads one entry per group of scanlines:</p>
 <div class="fragment"><div class="line">[0x81] [lo] [hi]   ← Repeat 1 scanline, write (lo, hi) to target register</div>
@@ -144,70 +144,80 @@ Walkthrough</h2>
 <div class="line">[0x00]              ← End of table</div>
 </div><!-- fragment --><p>The <code>0x81</code> byte means: repeat mode (bit 7 = 1), for 1 scanline (bits 6-0 = 1). Repeat mode writes the data on every scanline in the group. Without it, the data is written once and held — fine for registers that latch, but scroll registers need fresh writes every line.</p>
 <p>This demo has 335 entries per table (224 visible lines + 111 extra for animation phase wrapping) × 3 bytes each + 1 end marker = 1006 bytes per amplitude level.</p>
-<h3><a class="anchor" id="autotoc_md839"></a>
+<h3><a class="anchor" id="autotoc_md916"></a>
 3. Seven Amplitude Levels</h3>
 <p>The demo pre-computes tables for 7 wave amplitudes (0, 4, 8, 12, 16, 20, 24 pixels):</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define AMP_LEVELS    7</span></div>
 <div class="line"><span class="preprocessor">#define TABLE_ENTRIES 335</span></div>
 <div class="line"><span class="preprocessor">#define TABLE_SIZE    1006</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hdma_tables[AMP_LEVELS * TABLE_SIZE] = {</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072">hdma_tables</a>[<a class="code hl_define" href="graphics_2effects_2hdma__wave_2main_8c.html#ac247b6d2f61c4934c01ade8749276784">AMP_LEVELS</a> * <a class="code hl_define" href="graphics_2effects_2hdma__wave_2main_8c.html#a032503e76d6f69bc67e99e909c8125da">TABLE_SIZE</a>] = {</div>
 <div class="line">    <span class="comment">/* Amplitude 0: all entries are (0x81, 0x00, 0x00) — no displacement */</span></div>
 <div class="line">    <span class="comment">/* Amplitude 1: sine wave with peak ±4 pixels */</span></div>
 <div class="line">    <span class="comment">/* ... */</span></div>
 <div class="line">    <span class="comment">/* Amplitude 6: sine wave with peak ±24 pixels */</span></div>
 <div class="line">};</div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_a032503e76d6f69bc67e99e909c8125da"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#a032503e76d6f69bc67e99e909c8125da">TABLE_SIZE</a></div><div class="ttdeci">#define TABLE_SIZE</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_ac247b6d2f61c4934c01ade8749276784"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#ac247b6d2f61c4934c01ade8749276784">AMP_LEVELS</a></div><div class="ttdeci">#define AMP_LEVELS</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_ac773506df458c7fe6bcb8a67fe258072"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072">hdma_tables</a></div><div class="ttdeci">static const u8 hdma_tables[7 *1006]</div><div class="ttdoc">Pre-computed HDMA sine wave tables for 7 amplitude levels.</div><div class="ttdef"><b>Definition</b> main.c:86</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --><p>All 7 × 1006 = 7042 bytes live in ROM. Zero runtime math — the CPU just points the HDMA channel at the right offset and the hardware does the rest.</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why 335 entries instead of 224?</b> <a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> works by shifting the starting offset into the table. With only 224 entries, the phase offset would run off the end. The extra 111 entries (one full sine period = 112, minus 1) provide wrap-around space so animation can cycle smoothly without bounds checking. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md840"></a>
+<h3><a class="anchor" id="autotoc_md917"></a>
 4. Setting Up the HDMA Channel</h3>
 <p>The SNES has 8 DMA channels (0-7). This demo uses channel 6 for HDMA:</p>
-<div class="fragment"><div class="line">HW_DMAP6 = 0x02;    <span class="comment">/* Mode 2: write 2 bytes to same register, twice */</span></div>
-<div class="line">HW_BBAD6 = 0x0D;    <span class="comment">/* Target: BG1HOFS ($210D) */</span></div>
-<div class="line">HW_A1B6  = 0x00;    <span class="comment">/* Source bank 0 (ROM) */</span></div>
+<div class="fragment"><div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_DMAP6</a> = 0x02;    <span class="comment">/* Mode 2: write 2 bytes to same register, twice */</span></div>
+<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_BBAD6</a> = 0x0D;    <span class="comment">/* Target: BG1HOFS ($210D) */</span></div>
+<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_A1B6</a>  = 0x00;    <span class="comment">/* Source bank 0 (ROM) */</span></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 </div><!-- fragment --><p>Mode 2 writes two bytes to the target register, which is exactly what BG1HOFS needs — it's a 16-bit register written as two consecutive bytes to the same address.</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why $210D specifically?</b> BG1HOFS (BG1 Horizontal Offset) controls how far BG1 is scrolled horizontally. By writing a different value to it on every scanline, each line of pixels shifts by a different amount. That's the wave. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md841"></a>
+<h3><a class="anchor" id="autotoc_md918"></a>
 5. Animation = Just Move the Pointer</h3>
 <p>Each frame, the main loop advances the phase and recalculates the table address:</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (animating) {</div>
-<div class="line">    phase = phase + 1;</div>
-<div class="line">    <span class="keywordflow">if</span> (phase &gt;= 112) phase = 0;  <span class="comment">/* Sine period = 112 entries */</span></div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9">animating</a>) {</div>
+<div class="line">    <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> = <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> + 1;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> &gt;= 112) <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> = 0;  <span class="comment">/* Sine period = 112 entries */</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordflow">if</span> (wave_on) {</div>
-<div class="line">    phase_off = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)phase * 3;   <span class="comment">/* 3 bytes per entry */</span></div>
-<div class="line">    tbl_addr = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)hdma_tables + amp_offsets[amp_idx] + phase_off;</div>
-<div class="line">    HW_A1T6L = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(tbl_addr &amp; 0xFF);</div>
-<div class="line">    HW_A1T6H = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((tbl_addr &gt;&gt; 8) &amp; 0xFF);</div>
-<div class="line">    HW_HDMAEN = 0x40;  <span class="comment">/* Enable channel 6 */</span></div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a1217eca99ae6132b71291ce224f6faf8">wave_on</a>) {</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">phase_off</a> = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> * 3;   <span class="comment">/* 3 bytes per entry */</span></div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tbl_addr</a> = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072">hdma_tables</a> + <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08">amp_offsets</a>[<a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6">amp_idx</a>] + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">phase_off</a>;</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_A1T6L</a> = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tbl_addr</a> &amp; 0xFF);</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_A1T6H</a> = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tbl_addr</a> &gt;&gt; 8) &amp; 0xFF);</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">HW_HDMAEN</a> = 0x40;  <span class="comment">/* Enable channel 6 */</span></div>
 <div class="line">}</div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_a1217eca99ae6132b71291ce224f6faf8"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#a1217eca99ae6132b71291ce224f6faf8">wave_on</a></div><div class="ttdeci">static u8 wave_on</div><div class="ttdef"><b>Definition</b> main.c:503</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_a4f5bf0d24f1c1e07461c5631f84a2ee6"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6">amp_idx</a></div><div class="ttdeci">static u8 amp_idx</div><div class="ttdef"><b>Definition</b> main.c:504</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_a69a06c0873c234e1242abb73b84755e1"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a></div><div class="ttdeci">static u8 phase</div><div class="ttdef"><b>Definition</b> main.c:506</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_abdd3cff453194f6dbcc796e20b76dd08"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08">amp_offsets</a></div><div class="ttdeci">static const u16 amp_offsets[7]</div><div class="ttdoc">Pre-computed byte offsets into hdma_tables[] for each amplitude level.</div><div class="ttdef"><b>Definition</b> main.c:517</div></div>
+<div class="ttc" id="agraphics_2effects_2hdma__wave_2main_8c_html_aeafbd2df4bb2c4f71ecfb2bae657e2c9"><div class="ttname"><a href="graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9">animating</a></div><div class="ttdeci">static u8 animating</div><div class="ttdef"><b>Definition</b> main.c:505</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --><p><code>amp_offsets[]</code> is a pre-computed lookup table to avoid multiplying by 1006 at runtime:</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> amp_offsets[AMP_LEVELS] = {</div>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08">amp_offsets</a>[<a class="code hl_define" href="graphics_2effects_2hdma__wave_2main_8c.html#ac247b6d2f61c4934c01ade8749276784">AMP_LEVELS</a>] = {</div>
 <div class="line">    0, 1006, 2012, 3018, 4024, 5030, 6036</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The animation "moves" by starting the HDMA read from a different point in the sine table. Phase 0 starts at the beginning, phase 56 starts halfway through the sine cycle. The wave appears to flow because each frame shifts the starting position by one entry.</p>
-<h3><a class="anchor" id="autotoc_md842"></a>
+<h3><a class="anchor" id="autotoc_md919"></a>
 6. The Checkerboard Background</h3>
 <p>To make the wave visible, the demo fills BG1 with alternating black and white tiles:</p>
-<div class="fragment"><div class="line"><span class="keywordflow">for</span> (i = 0; i &lt; 1024; i++) {</div>
-<div class="line">    <span class="keywordflow">if</span> (i &amp; 1) {</div>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; 1024; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &amp; 1) {</div>
 <div class="line">        *(<a class="code hl_typedef" href="group__volatile__types.html#ga1a2a3100a902c32a55d8b08915bce044">vu8</a>*)0x2118 = 0x01;  <span class="comment">/* White tile */</span></div>
 <div class="line">    } <span class="keywordflow">else</span> {</div>
 <div class="line">        *(<a class="code hl_typedef" href="group__volatile__types.html#ga1a2a3100a902c32a55d8b08915bce044">vu8</a>*)0x2118 = 0x00;  <span class="comment">/* Black tile */</span></div>
 <div class="line">    }</div>
 <div class="line">    *(<a class="code hl_typedef" href="group__volatile__types.html#ga1a2a3100a902c32a55d8b08915bce044">vu8</a>*)0x2119 = 0x00;</div>
 <div class="line">}</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agroup__volatile__types_html_ga1a2a3100a902c32a55d8b08915bce044"><div class="ttname"><a href="group__volatile__types.html#ga1a2a3100a902c32a55d8b08915bce044">vu8</a></div><div class="ttdeci">volatile u8 vu8</div><div class="ttdef"><b>Definition</b> types.h:83</div></div>
 </div><!-- fragment --><p>Without some visual pattern, the wave would be invisible — you'd just see a flat color shifting left and right. The checkerboard makes the distortion obvious.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md844"></a>
+<h2><a class="anchor" id="autotoc_md921"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Wave is invisible?</b> You need a visible pattern on the background. A solid color won't show horizontal displacement — there's nothing to distinguish shifted from non-shifted lines.</li>
@@ -216,7 +226,7 @@ Tips &amp; Tricks</h2>
 <li><b>Want to apply this to a real background?</b> Replace the checkerboard with actual tile art. The wave effect works on any background — it just shifts the scroll register. Water reflections in RPGs use this exact technique on a duplicated background layer.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md846"></a>
+<h2><a class="anchor" id="autotoc_md923"></a>
 Go Further</h2>
 <ul>
 <li><b>Vertical wave:</b> Instead of BG1HOFS, target BG1VOFS ($210E). Now the wave goes up and down instead of left and right. Combine both for a truly psychedelic effect.</li>
@@ -225,22 +235,22 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../hdma_gradient/">HDMA Gradient</a> — using HDMA to create smooth color gradients across the screen.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md848"></a>
+<h2><a class="anchor" id="autotoc_md925"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md849"></a>
+<h3><a class="anchor" id="autotoc_md926"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := hdma_wave.sfc</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console dma sprite input</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md850"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md927"></a>
 All Data Lives in C</h3>
 <p>Notice there's no <code>ASMSRC</code> and no graphics tools. The entire HDMA table — all 7042 bytes of pre-computed sine waves — is a <code>static const</code> array in <code>main.c</code>. The compiler places <code>const</code> data directly in ROM (in a <code>SUPERFREE</code> section), so it costs zero RAM.</p>
 <p>The checkerboard background tiles are also generated at runtime with a simple loop, not loaded from an asset file. This makes the example fully self-contained: one C file, no external dependencies.</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>When should data go in C vs. assembly?</b> Rule of thumb: if the data is generated by a tool (gfx4snes, smconv) or is a binary blob (<code>.pic</code>, <code>.pal</code>, <code>.brr</code>), put it in assembly with <code>.INCBIN</code>. If the data is hand-written or computed (lookup tables, HDMA tables, font tiles), a <code>const</code> array in C is simpler and keeps everything in one place. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md851"></a>
+<h3><a class="anchor" id="autotoc_md928"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -257,9 +267,9 @@ Why These Modules?</h3>
 <blockquote class="doxtable">
 <p>&zwj;**"Where's the HDMA module?"** The library has <code>hdma.c</code>/<code>hdma.asm</code>, but this example doesn't use them. HDMA setup is just 5 register writes — <code>DMAP6</code>, <code>BBAD6</code>, <code>A1T6L/H</code>, <code>A1B6</code>, <code>HDMAEN</code> — simple enough to do inline. The library's HDMA API is more useful when you need to manage multiple HDMA channels dynamically. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md852"></a>
+<h2><a class="anchor" id="autotoc_md929"></a>
 &lt;/blockquote&gt;</h2>
-<h2><a class="anchor" id="autotoc_md853"></a>
+<h2><a class="anchor" id="autotoc_md930"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -277,7 +287,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">HDMAEN   </td><td class="markdownTableBodyNone">$420C   </td><td class="markdownTableBodyNone">HDMA channel enable (bit 6 = channel 6)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md854"></a>
+<h2><a class="anchor" id="autotoc_md931"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

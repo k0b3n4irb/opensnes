@@ -151,20 +151,20 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES SRAM (Save RAM) Functions. </p>
 <p>Functions for saving and loading game data to battery-backed SRAM.</p>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 SRAM Overview</h2>
 <p>SRAM (Static RAM) on SNES cartridges is battery-backed RAM that persists when the console is powered off. It's used for save games.</p>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md64"></a>
 Memory Layout (LoROM)</h2>
 <p>SRAM is mapped at bank $70, addresses $0000-$7FFF (32KB max). Most games use 2KB-8KB of SRAM.</p>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define your save data structure</span></div>
 <div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  magic[4];      <span class="comment">// &quot;SAVE&quot; to detect valid save</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> score;</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  level;</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  lives;</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a>;</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  <a class="code hl_variable" href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a>;</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  <a class="code hl_variable" href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a>;</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>  checksum;</div>
 <div class="line">} SaveData;</div>
 <div class="line"> </div>
@@ -183,11 +183,14 @@ Usage Example</h2>
 <div class="line">save.magic[0] = <span class="charliteral">&#39;S&#39;</span>; save.magic[1] = <span class="charliteral">&#39;A&#39;</span>;</div>
 <div class="line">save.magic[2] = <span class="charliteral">&#39;V&#39;</span>; save.magic[3] = <span class="charliteral">&#39;E&#39;</span>;</div>
 <div class="line"><a class="code hl_function" href="sram_8h.html#a69aa4b1a5889249f5387ee1118c4b0ce">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:165</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:164</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">static u16 score</div><div class="ttdef"><b>Definition</b> main.c:161</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="asram_8h_html_a63e125097d3ec2339e7d13e918077314"><div class="ttname"><a href="sram_8h.html#a63e125097d3ec2339e7d13e918077314">sramLoad</a></div><div class="ttdeci">void sramLoad(u8 *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
 <div class="ttc" id="asram_8h_html_a69aa4b1a5889249f5387ee1118c4b0ce"><div class="ttname"><a href="sram_8h.html#a69aa4b1a5889249f5387ee1118c4b0ce">sramSave</a></div><div class="ttdeci">void sramSave(u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md63"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md66"></a>
 ROM Header Requirement</h2>
 <p>To enable SRAM, your ROM header (hdr.asm) must set:</p><ul>
 <li>CARTRIDGETYPE $02 (ROM + SRAM)</li>

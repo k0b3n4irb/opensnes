@@ -114,13 +114,13 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0fdd07e8c768e0f844a694c27432c466" id="r_a0fdd07e8c768e0f844a694c27432c466"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#a0fdd07e8c768e0f844a694c27432c466">scoreAdd</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *score, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value)</td></tr>
+<tr class="memitem:a0fdd07e8c768e0f844a694c27432c466" id="r_a0fdd07e8c768e0f844a694c27432c466"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#a0fdd07e8c768e0f844a694c27432c466">scoreAdd</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *<a class="el" href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value)</td></tr>
 <tr class="memdesc:a0fdd07e8c768e0f844a694c27432c466"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a value to a score.  <br /></td></tr>
 <tr class="separator:a0fdd07e8c768e0f844a694c27432c466"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf59998f0ef22dd38f065f0727175670" id="r_abf59998f0ef22dd38f065f0727175670"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#abf59998f0ef22dd38f065f0727175670">scoreClear</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *score)</td></tr>
+<tr class="memitem:abf59998f0ef22dd38f065f0727175670" id="r_abf59998f0ef22dd38f065f0727175670"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#abf59998f0ef22dd38f065f0727175670">scoreClear</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *<a class="el" href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a>)</td></tr>
 <tr class="memdesc:abf59998f0ef22dd38f065f0727175670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear a score to zero.  <br /></td></tr>
 <tr class="separator:abf59998f0ef22dd38f065f0727175670"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abee0ce525fed4cec05cda9b01037b71d" id="r_abee0ce525fed4cec05cda9b01037b71d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#abee0ce525fed4cec05cda9b01037b71d">scoreCmp</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *a, <a class="el" href="structscoMemory.html">scoMemory</a> *b)</td></tr>
+<tr class="memitem:abee0ce525fed4cec05cda9b01037b71d" id="r_abee0ce525fed4cec05cda9b01037b71d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#abee0ce525fed4cec05cda9b01037b71d">scoreCmp</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *<a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="structscoMemory.html">scoMemory</a> *<a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
 <tr class="memdesc:abee0ce525fed4cec05cda9b01037b71d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two scores.  <br /></td></tr>
 <tr class="separator:abee0ce525fed4cec05cda9b01037b71d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e083b947b9a1c08b9c6b03a24c15418" id="r_a3e083b947b9a1c08b9c6b03a24c15418"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scoring_8h.html#a3e083b947b9a1c08b9c6b03a24c15418">scoreCpy</a> (<a class="el" href="structscoMemory.html">scoMemory</a> *src, <a class="el" href="structscoMemory.html">scoMemory</a> *dst)</td></tr>
@@ -130,7 +130,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Score management for OpenSNES. </p>
 <p>Provides a simple scoring system using a two-part representation (low/high u16 pairs) to handle scores beyond 16-bit range. Each part represents a value 0-9999, giving a total range of 0-99,999,999.</p>
-<h2><a class="anchor" id="autotoc_md53"></a>
+<h2><a class="anchor" id="autotoc_md56"></a>
 Attribution</h2>
 <p>Originally from: PVSnesLib (<a href="https://github.com/alekmaul/pvsneslib">https://github.com/alekmaul/pvsneslib</a>) Author: Alekmaul License: zlib (compatible with MIT) Modifications:</p><ul>
 <li>Pure C implementation (PVSnesLib used assembly)</li>

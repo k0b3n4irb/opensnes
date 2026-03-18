@@ -11,6 +11,7 @@ var topics =
     [ "Common Macros", "group__macros.html", "group__macros" ],
     [ "DMA Registers", "group__dma__regs.html", "group__dma__regs" ],
     [ "Echo Effects", "group__audio__echo.html", "group__audio__echo" ],
+    [ "Examples", "group__examples.html", "group__examples" ],
     [ "Fixed-Width Types", "group__types.html", "group__types" ],
     [ "Function Pointers", "group__func__ptr.html", "group__func__ptr" ],
     [ "Initialization", "group__audio__init.html", "group__audio__init" ],
@@ -31,6 +32,6 @@ var topics =
     [ "Streaming Audio", "group__snesmod__stream.html", "group__snesmod__stream" ],
     [ "Super Scope Input", "group__scope__input.html", "group__scope__input" ],
     [ "Volatile Types", "group__volatile__types.html", "group__volatile__types" ],
-    [ "Volume Control", "group__snesmod__volume.html", "group__snesmod__volume" ],
-    [ "Volume Control", "group__audio__volume.html", "group__audio__volume" ]
+    [ "Volume Control", "group__audio__volume.html", "group__audio__volume" ],
+    [ "Volume Control", "group__snesmod__volume.html", "group__snesmod__volume" ]
 ];

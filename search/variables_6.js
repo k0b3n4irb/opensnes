@@ -1,6 +1,21 @@
 var searchData=
 [
-  ['health_0',['health',['../structEntity.html#a05adfb0c4bf2b5965819d7437fd5cd2b',1,'Entity']]],
-  ['height_1',['height',['../structRect.html#a7e0d0a0cf7eb269f3d902a14f7995c5c',1,'Rect::height'],['../structEntity.html#a1784f0191f0a7853c740d64e7052c10f',1,'Entity::height'],['../structt__objs.html#a3bf3757f174f93270ff558d1351a7872',1,'t_objs::height']]],
-  ['hitpoints_2',['hitpoints',['../structt__objs.html#a66724708a48c464c7c9e1a00a6b81b6d',1,'t_objs']]]
+  ['flags_0',['flags',['../structEntity.html#ad1d0a3f5055f29472e19a60d04d354b1',1,'Entity::flags'],['../structAudioSample.html#a0b4a12b0741a71424ba4b51f09a9b65e',1,'AudioSample::flags']]],
+  ['flash_5ftimer_1',['flash_timer',['../games_2tetris_2main_8c.html#a7beb604a8de72684319bc5c99d9a64aa',1,'main.c']]],
+  ['flip_2',['flip',['../maps_2slopemario_2mario_8c.html#ac3ec10c7966221f17621e68908bfa9b4',1,'flip:&#160;mario.c'],['../graphics_2backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924',1,'flip:&#160;main.c'],['../games_2mapandobjects_2mario_8c.html#ac3ec10c7966221f17621e68908bfa9b4',1,'flip:&#160;mario.c']]],
+  ['flipx_3',['flipx',['../structMonster.html#af18fac6f28430cbeddf1873240e24ade',1,'Monster']]],
+  ['font2bpp_5fgfx_4',['font2bpp_gfx',['../render_8c.html#a0fcda55a4736fe96266c03fd074c675f',1,'render.c']]],
+  ['font2bpp_5fgfx_5fend_5',['font2bpp_gfx_end',['../render_8c.html#a6cbba83ba7fbea3765155c9608fdd85d',1,'render.c']]],
+  ['font_5ftile_6',['font_tile',['../structTextConfig.html#a57476fe40cc993144b0cd3b07842bdf4',1,'TextConfig']]],
+  ['font_5ftiles_7',['font_tiles',['../audio_2snesmod__music_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c'],['../audio_2snesmod__sfx_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c'],['../memory_2hirom__demo_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c'],['../text_2hello__world_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c']]],
+  ['frame0_8',['frame0',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e',1,'main.c']]],
+  ['frame1_9',['frame1',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a514500046679145273f113c61af16cd5',1,'main.c']]],
+  ['frame2_10',['frame2',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a8f122651a50ccf7482b22659b3217821',1,'main.c']]],
+  ['frame3_11',['frame3',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#aaf47a9315cba731325a26e9eacff5c2d',1,'main.c']]],
+  ['frame_5fcount_12',['frame_count',['../games_2tetris_2main_8c.html#a393cdd9777ac31290693d930c63d2a83',1,'main.c']]],
+  ['frame_5fcounter_13',['frame_counter',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47',1,'main.c']]],
+  ['framecount_14',['frameCount',['../structAnimation.html#a44c9945a9433f2fc849c77bd3501b28c',1,'Animation']]],
+  ['framedelay_15',['frameDelay',['../structAnimation.html#a11968cac7a2898ce4796df14d4b41198',1,'Animation']]],
+  ['frames_16',['frames',['../structAnimation.html#a8e9b8b3b61265b2b8e268a02dec709a1',1,'Animation']]],
+  ['fx_17',['fx',['../graphics_2effects_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0',1,'main.c']]]
 ];

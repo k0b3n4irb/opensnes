@@ -1,6 +1,21 @@
 var searchData=
 [
-  ['action_0',['action',['../structt__objs.html#af4bfdc0bbd947feb9ea45fd95f735a9d',1,'t_objs']]],
-  ['active_1',['active',['../structAudioVoiceState.html#ae623a907318e5108f0385f6474a4894b',1,'AudioVoiceState::active'],['../structEntity.html#a8e337523bd3e53b390fc1624a2aa1c46',1,'Entity::active']]],
-  ['attr_2',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
+  ['a_0',['a',['../games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a',1,'main.c']]],
+  ['action_1',['action',['../structt__objs.html#af4bfdc0bbd947feb9ea45fd95f735a9d',1,'t_objs']]],
+  ['active_2',['active',['../structAudioVoiceState.html#ae623a907318e5108f0385f6474a4894b',1,'AudioVoiceState::active'],['../structEntity.html#a8e337523bd3e53b390fc1624a2aa1c46',1,'Entity::active']]],
+  ['active_5feffect_3',['active_effect',['../structEffectState.html#a27d734cda7b83e2ce99d435c0ee582b4',1,'EffectState']]],
+  ['aim_5ftarget_5fmap_4',['aim_target_map',['../input_2superscope_2main_8c.html#a35859279ec6a363be2a0c91d75550e7f',1,'main.c']]],
+  ['aim_5ftarget_5fmap_5fend_5',['aim_target_map_end',['../input_2superscope_2main_8c.html#a4cdde5edfe65f3612c751be90e094935',1,'main.c']]],
+  ['aim_5ftarget_5fpal_6',['aim_target_pal',['../input_2superscope_2main_8c.html#ad519a816142e0ae816ee1fe86224511c',1,'main.c']]],
+  ['aim_5ftarget_5fpal_5fend_7',['aim_target_pal_end',['../input_2superscope_2main_8c.html#ab38c4bfbc2b43a9eb19d741e19b45d73',1,'main.c']]],
+  ['aim_5ftarget_5ftiles_8',['aim_target_tiles',['../input_2superscope_2main_8c.html#aebeabd9e4131b3a9e586a46f151cfc93',1,'main.c']]],
+  ['aim_5ftarget_5ftiles_5fend_9',['aim_target_tiles_end',['../input_2superscope_2main_8c.html#a1ad9275b167fd0034b2886e140037768',1,'main.c']]],
+  ['all_5fshapes_10',['all_shapes',['../piece_8c.html#a38b764f5e51ebf2b31492e409379edae',1,'piece.c']]],
+  ['amp_5fidx_11',['amp_idx',['../graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6',1,'main.c']]],
+  ['amp_5foffsets_12',['amp_offsets',['../graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08',1,'main.c']]],
+  ['anim_5fdelay_13',['anim_delay',['../structMonster.html#a9866806505fb8b256a2897ad1fb7e323',1,'Monster']]],
+  ['anim_5fframe_14',['anim_frame',['../structMonster.html#a46e4766a089bbdb88eaa7c06b5529a17',1,'Monster']]],
+  ['anim_5ftick_15',['anim_tick',['../games_2likemario_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570',1,'main.c']]],
+  ['animating_16',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
+  ['attr_17',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
 ];

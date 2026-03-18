@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_basics_collision_demo.html','
 <div class="caption">
 Screenshot</div></div>
     <p>Multiple collision systems: AABB, point, and tile-based.</p>
-<h2><a class="anchor" id="autotoc_md503"></a>
+<h2><a class="anchor" id="autotoc_md580"></a>
 Learning Objectives</h2>
 <p>After this lesson, you will understand:</p><ul>
 <li>Axis-aligned bounding box (AABB) collision</li>
@@ -109,17 +109,17 @@ Learning Objectives</h2>
 <li>Tile-based world collision</li>
 <li>Visual collision feedback</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md504"></a>
+<h2><a class="anchor" id="autotoc_md581"></a>
 Prerequisites</h2>
 <ul>
 <li>Completed sprite examples</li>
 <li>Understanding of coordinate systems</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md506"></a>
+<h2><a class="anchor" id="autotoc_md583"></a>
 What This Example Does</h2>
 <p>Demonstrates collision detection systems:</p><ul>
-<li>Player sprite navigating a tile-based level</li>
+<li><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> sprite navigating a tile-based level</li>
 <li>Walls and platforms block movement</li>
 <li>Visual feedback when colliding</li>
 <li>Multiple collision check methods</li>
@@ -140,7 +140,7 @@ What This Example Does</h2>
 <li>A button: Toggle collision display (if implemented)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md508"></a>
+<h2><a class="anchor" id="autotoc_md585"></a>
 Code Type</h2>
 <p><b>C with Library Functions</b></p>
 <table class="markdownTable">
@@ -156,45 +156,48 @@ Code Type</h2>
 <td class="markdownTableBodyNone">Input handling   </td><td class="markdownTableBodyNone">Direct register access   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md510"></a>
+<h2><a class="anchor" id="autotoc_md587"></a>
 Collision Types</h2>
-<h3><a class="anchor" id="autotoc_md511"></a>
+<h3><a class="anchor" id="autotoc_md588"></a>
 1. AABB Collision (Sprite vs Sprite)</h3>
-<p>Two rectangles overlap if all conditions are true: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x1, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y1, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> w1, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> h1,</div>
-<div class="line">               <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x2, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y2, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> w2, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> h2) {</div>
-<div class="line">    <span class="keywordflow">return</span> (x1 &lt; x2 + w2) &amp;&amp;</div>
-<div class="line">           (x1 + w1 &gt; x2) &amp;&amp;</div>
-<div class="line">           (y1 &lt; y2 + h2) &amp;&amp;</div>
-<div class="line">           (y1 + h1 &gt; y2);</div>
+<p>Two rectangles overlap if all conditions are true: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x1</a>, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y1</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w1</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h1</a>,</div>
+<div class="line">               <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x2</a>, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y2</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w2</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h2</a>) {</div>
+<div class="line">    <span class="keywordflow">return</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x1</a> &lt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x2</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w2</a>) &amp;&amp;</div>
+<div class="line">           (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x1</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w1</a> &gt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">x2</a>) &amp;&amp;</div>
+<div class="line">           (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y1</a> &lt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y2</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h2</a>) &amp;&amp;</div>
+<div class="line">           (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y1</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h1</a> &gt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">y2</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="acollision_8h_html_abb09495fb18f03c5f57e7d91afbbaba8"><div class="ttname"><a href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a></div><div class="ttdeci">u8 collideRect(Rect *a, Rect *b)</div><div class="ttdoc">Check rectangle vs rectangle collision (AABB)</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md512"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md589"></a>
 2. Point vs Tile (World Collision)</h3>
 <p>Check if a point is inside a solid tile: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y) {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tile_x = x &gt;&gt; 3;  <span class="comment">/* Divide by tile size (8) */</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tile_y = y &gt;&gt; 3;</div>
-<div class="line">    <span class="keywordflow">return</span> collision_map[tile_y * MAP_WIDTH + tile_x];</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tile_x</a> = x &gt;&gt; 3;  <span class="comment">/* Divide by tile size (8) */</span></div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tile_y</a> = y &gt;&gt; 3;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e">collision_map</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tile_y</a> * <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">tile_x</a>];</div>
 <div class="line">}</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a180c6e6fa533d22284477eea00f5e63e"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e">collision_map</a></div><div class="ttdeci">static u8 collision_map[16 *14]</div><div class="ttdoc">Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area)</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_aa037a6d6a4f04d51c7ec1c9ee9054e76"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a></div><div class="ttdeci">#define MAP_WIDTH</div><div class="ttdef"><b>Definition</b> main.c:80</div></div>
 <div class="ttc" id="acollision_8h_html_a653ce0d0c8ee01d02993035990f64a03"><div class="ttname"><a href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a></div><div class="ttdeci">u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth)</div><div class="ttdoc">Check collision with tile at pixel coordinates.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md513"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md590"></a>
 3. Four-Corner Check</h3>
-<p>For moving objects, check all corners: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> checkCollision(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> w, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> h) {</div>
+<p>For moving objects, check all corners: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h</a>) {</div>
 <div class="line">    <span class="keywordflow">return</span> <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x, y) ||           <span class="comment">/* Top-left */</span></div>
-<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x + w, y) ||       <span class="comment">/* Top-right */</span></div>
-<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x, y + h) ||       <span class="comment">/* Bottom-left */</span></div>
-<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x + w, y + h);     <span class="comment">/* Bottom-right */</span></div>
+<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w</a>, y) ||       <span class="comment">/* Top-right */</span></div>
+<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x, y + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h</a>) ||       <span class="comment">/* Bottom-left */</span></div>
+<div class="line">           <a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(x + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">w</a>, y + <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">h</a>);     <span class="comment">/* Bottom-right */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md515"></a>
+<h2><a class="anchor" id="autotoc_md592"></a>
 Collision Map</h2>
-<h3><a class="anchor" id="autotoc_md516"></a>
+<h3><a class="anchor" id="autotoc_md593"></a>
 Map Format</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#define MAP_WIDTH 16</span></div>
 <div class="line"><span class="preprocessor">#define MAP_HEIGHT 14</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> collision_map[MAP_WIDTH * MAP_HEIGHT] = {</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e">collision_map</a>[<a class="code hl_define" href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a> * <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#a529d5ebb449edf31d9835d13f4fb9f89">MAP_HEIGHT</a>] = {</div>
 <div class="line">    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  <span class="comment">/* Top wall */</span></div>
 <div class="line">    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,</div>
 <div class="line">    1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,1,  <span class="comment">/* Platforms */</span></div>
@@ -203,66 +206,70 @@ Map Format</h3>
 <div class="line">    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  <span class="comment">/* Bottom wall */</span></div>
 <div class="line">};</div>
 <div class="line"><span class="comment">/* 0 = passable, 1 = solid */</span></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_a529d5ebb449edf31d9835d13f4fb9f89"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a529d5ebb449edf31d9835d13f4fb9f89">MAP_HEIGHT</a></div><div class="ttdeci">#define MAP_HEIGHT</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md518"></a>
+<h2><a class="anchor" id="autotoc_md595"></a>
 Movement with Collision</h2>
-<h3><a class="anchor" id="autotoc_md519"></a>
+<h3><a class="anchor" id="autotoc_md596"></a>
 Basic Movement</h3>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> movePlayer(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> new_x = player_x;</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> new_y = player_y;</div>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">movePlayer</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a> = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a> = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>;</div>
 <div class="line"> </div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) new_x += 2;</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>) new_x -= 2;</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) new_y += 2;</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) new_y -= 2;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a> += 2;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a> -= 2;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a> += 2;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a> -= 2;</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Only move if no collision */</span></div>
-<div class="line">    <span class="keywordflow">if</span> (!checkCollision(new_x, player_y, 16, 16)) {</div>
-<div class="line">        player_x = new_x;</div>
+<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 16, 16)) {</div>
+<div class="line">        <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a>;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (!checkCollision(player_x, new_y, 16, 16)) {</div>
-<div class="line">        player_y = new_y;</div>
+<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a>, 16, 16)) {</div>
+<div class="line">        <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a>;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md520"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md597"></a>
 Slide Along Walls</h3>
 <p>Check axes separately for smooth movement: </p><div class="fragment"><div class="line"><span class="comment">/* Try X movement */</span></div>
-<div class="line"><span class="keywordflow">if</span> (!checkCollision(new_x, player_y, 16, 16)) {</div>
-<div class="line">    player_x = new_x;</div>
+<div class="line"><span class="keywordflow">if</span> (!<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 16, 16)) {</div>
+<div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_x</a>;</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Try Y movement independently */</span></div>
-<div class="line"><span class="keywordflow">if</span> (!checkCollision(player_x, new_y, 16, 16)) {</div>
-<div class="line">    player_y = new_y;</div>
+<div class="line"><span class="keywordflow">if</span> (!<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a>, 16, 16)) {</div>
+<div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">new_y</a>;</div>
 <div class="line">}</div>
 <div class="line"><span class="comment">/* Player slides along walls instead of stopping completely */</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md522"></a>
+<h2><a class="anchor" id="autotoc_md599"></a>
 Visual Feedback</h2>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> updateSprite(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette = 0;  <span class="comment">/* Normal color */</span></div>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">updateSprite</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> = 0;  <span class="comment">/* Normal color */</span></div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Check if currently colliding */</span></div>
-<div class="line">    <span class="keywordflow">if</span> (checkCollision(player_x, player_y, 16, 16)) {</div>
-<div class="line">        palette = 1;  <span class="comment">/* Red/highlighted color */</span></div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 16, 16)) {</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> = 1;  <span class="comment">/* Red/highlighted color */</span></div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, player_x, player_y, 0, palette, 3, 0);</div>
+<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 0, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 3, 0);</div>
 <div class="line">}</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes)</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md524"></a>
+<h2><a class="anchor" id="autotoc_md601"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/collision_demo</div>
 </div><!-- fragment --><p>Then open <code>collision_demo.sfc</code> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md526"></a>
+<h2><a class="anchor" id="autotoc_md603"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -273,66 +280,67 @@ Files</h2>
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md528"></a>
+<h2><a class="anchor" id="autotoc_md605"></a>
 Exercises</h2>
-<h3><a class="anchor" id="autotoc_md529"></a>
+<h3><a class="anchor" id="autotoc_md606"></a>
 Exercise 1: Collectibles</h3>
-<p>Add items that disappear on contact: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(player_x, player_y, 16, 16,</div>
-<div class="line">                item_x, item_y, 8, 8)) {</div>
-<div class="line">    item_collected = 1;</div>
-<div class="line">    score++;</div>
+<p>Add items that disappear on contact: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 16, 16,</div>
+<div class="line">                <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">item_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">item_y</a>, 8, 8)) {</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">item_collected</a> = 1;</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a>++;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md530"></a>
+<div class="ttc" id="agames_2breakout_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">static u16 score</div><div class="ttdef"><b>Definition</b> main.c:161</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md607"></a>
 Exercise 2: Pushable Objects</h3>
-<p>Implement a box that can be pushed: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(player, box)) {</div>
-<div class="line">    box_x += player_velocity_x;</div>
+<p>Implement a box that can be pushed: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">player</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">box</a>)) {</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">box_x</a> += <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">player_velocity_x</a>;</div>
 <div class="line">    <span class="comment">/* Check if box hits wall */</span></div>
-<div class="line">    <span class="keywordflow">if</span> (checkCollision(box_x, box_y, 16, 16)) {</div>
-<div class="line">        box_x -= player_velocity_x;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">checkCollision</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">box_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">box_y</a>, 16, 16)) {</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">box_x</a> -= <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">player_velocity_x</a>;</div>
 <div class="line">        <span class="comment">/* Push failed - block player too */</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md531"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md608"></a>
 Exercise 3: One-Way Platforms</h3>
-<p>Allow jumping through from below: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (velocity_y &gt; 0 &amp;&amp;  <span class="comment">/* Moving down */</span></div>
-<div class="line">    player_y + 16 &lt;= platform_y + 4) {  <span class="comment">/* Above platform */</span></div>
+<p>Allow jumping through from below: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">velocity_y</a> &gt; 0 &amp;&amp;  <span class="comment">/* Moving down */</span></div>
+<div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> + 16 &lt;= <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">platform_y</a> + 4) {  <span class="comment">/* Above platform */</span></div>
 <div class="line">    <span class="comment">/* Allow passing through */</span></div>
 <div class="line">} <span class="keywordflow">else</span> {</div>
 <div class="line">    <span class="comment">/* Block */</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md532"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md609"></a>
 Exercise 4: Slope Collision</h3>
 <p>Implement diagonal surfaces: </p><div class="fragment"><div class="line"><span class="comment">/* Calculate height at current X position */</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> slope_height = getSlopeHeight(player_x);</div>
-<div class="line"><span class="keywordflow">if</span> (player_y + 16 &gt; slope_height) {</div>
-<div class="line">    player_y = slope_height - 16;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">slope_height</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">getSlopeHeight</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>);</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> + 16 &gt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">slope_height</a>) {</div>
+<div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">slope_height</a> - 16;</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md534"></a>
+<h2><a class="anchor" id="autotoc_md611"></a>
 Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md535"></a>
+<h3><a class="anchor" id="autotoc_md612"></a>
 Performance</h3>
-<p>Tile collision is O(1) - just array lookup. AABB checks are also O(1) but comparing many sprites is O(n).</p>
-<h3><a class="anchor" id="autotoc_md536"></a>
+<p>Tile collision is <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">O(1)</a> - just array lookup. AABB checks are also <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">O(1)</a> but comparing many sprites is <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">O(n)</a>.</p>
+<h3><a class="anchor" id="autotoc_md613"></a>
 Hitbox vs Visual Size</h3>
 <p>Often hitboxes are smaller than sprites: </p><div class="fragment"><div class="line"><span class="preprocessor">#define HITBOX_X_OFFSET 2</span></div>
 <div class="line"><span class="preprocessor">#define HITBOX_WIDTH 12  </span><span class="comment">/* vs 16 pixel sprite */</span><span class="preprocessor"></span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md537"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md614"></a>
 Subpixel Collision</h3>
-<p>For fixed-point positions, round to pixels for collision: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> pixel_x = fixed_x &gt;&gt; 8;</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md538"></a>
+<p>For fixed-point positions, round to pixels for collision: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pixel_x</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">fixed_x</a> &gt;&gt; 8;</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md615"></a>
 Collision Layers</h3>
 <p>Different objects collide with different things: </p><div class="fragment"><div class="line"><span class="preprocessor">#define COL_PLAYER 0x01</span></div>
 <div class="line"><span class="preprocessor">#define COL_ENEMY  0x02</span></div>
 <div class="line"><span class="preprocessor">#define COL_BULLET 0x04</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordflow">if</span> (obj1.layer &amp; obj2.mask) { <span class="comment">/* Check collision */</span> }</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">obj1</a>.layer &amp; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">obj2</a>.mask) { <span class="comment">/* Check collision */</span> }</div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md540"></a>
+<h2><a class="anchor" id="autotoc_md617"></a>
 What's Next?</h2>
 <p><b>Game:</b> <a href="../../games/breakout/">Breakout</a> - Complete game with collision, sprites, and levels</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md542"></a>
+<h2><a class="anchor" id="autotoc_md619"></a>
 License</h2>
 <p>Code: MIT </p>
 </div></div><!-- contents -->

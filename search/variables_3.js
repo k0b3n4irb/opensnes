@@ -1,4 +1,30 @@
 var searchData=
 [
-  ['count_0',['count',['../structt__objs.html#a731b129eb56574ea1f24a5ee8a7d54aa',1,'t_objs::count'],['../structLineClearResult.html#a66c179e782dd803fd54af9e52ee98a25',1,'LineClearResult::count']]]
+  ['c_0',['c',['../games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d',1,'main.c']]],
+  ['c64_5fsprite_1',['c64_sprite',['../maps_2dynamic__map_2main_8c.html#a2554873de5fece55bf4392ccb2a130b2',1,'main.c']]],
+  ['cam_5fmax_5fx_2',['cam_max_x',['../games_2likemario_2main_8c.html#ab82521ff2e2f8a537bf4ea99692e5e53',1,'main.c']]],
+  ['camera_5fx_3',['camera_x',['../games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272',1,'main.c']]],
+  ['camx_4',['camX',['../structSaveState.html#a2ead7a38c9532779b1581b5522578ba1',1,'SaveState']]],
+  ['camy_5',['camY',['../structSaveState.html#ade6b43adf6309c5cebfec1eba392dc66',1,'SaveState']]],
+  ['char_5fpal_6',['char_pal',['../graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae9937fa2abcbf438fe567d413088ce5d',1,'main.c']]],
+  ['char_5fpal_5fend_7',['char_pal_end',['../graphics_2backgrounds_2continuous__scroll_2main_8c.html#a81cb55b8bc98fddba37b6eea8baf5498',1,'main.c']]],
+  ['char_5ftiles_8',['char_tiles',['../graphics_2backgrounds_2continuous__scroll_2main_8c.html#a15f53a46ee49da39b687cf058bcf8e6f',1,'main.c']]],
+  ['char_5ftiles_5fend_9',['char_tiles_end',['../graphics_2backgrounds_2continuous__scroll_2main_8c.html#a5d307451fde1e1d028ab980909a6376d',1,'main.c']]],
+  ['clear_5fresult_10',['clear_result',['../games_2tetris_2main_8c.html#ac771b3a28ecd7bc6ad27b48feee3e94c',1,'main.c']]],
+  ['col_5fbuffer_11',['col_buffer',['../games_2likemario_2main_8c.html#a00f92a2e1ceca5a59009973e4e9c85da',1,'main.c']]],
+  ['col_5fpending_12',['col_pending',['../games_2likemario_2main_8c.html#ada8c20d885ae7f2fca648d33d5ee7e06',1,'main.c']]],
+  ['col_5fvram_5fbase_13',['col_vram_base',['../games_2likemario_2main_8c.html#aeaf219553df60aec9bc94d606d2fc2b5',1,'main.c']]],
+  ['collision_5fflags_14',['collision_flags',['../basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444',1,'main.c']]],
+  ['collision_5fmap_15',['collision_map',['../basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e',1,'main.c']]],
+  ['collision_5fpalette_16',['collision_palette',['../basics_2collision__demo_2main_8c.html#a9bf113cc8c0a116a54e1ee9a645f9e4a',1,'main.c']]],
+  ['color_17',['color',['../games_2breakout_2main_8c.html#afbe561487f384d8fc8576b24bda1f8b6',1,'main.c']]],
+  ['count_18',['count',['../structLineClearResult.html#a66c179e782dd803fd54af9e52ee98a25',1,'LineClearResult::count'],['../structt__objs.html#a731b129eb56574ea1f24a5ee8a7d54aa',1,'t_objs::count']]],
+  ['cur_5fcol_19',['cur_col',['../games_2tetris_2main_8c.html#a27219e4522e6fe35bc96dde0fe94dd05',1,'main.c']]],
+  ['cur_5frot_20',['cur_rot',['../games_2tetris_2main_8c.html#a5025634d5d80636224a2ee7e7e10f32d',1,'main.c']]],
+  ['cur_5frow_21',['cur_row',['../games_2tetris_2main_8c.html#a334b30334c918a87be9dfcdf06436c3e',1,'main.c']]],
+  ['cur_5ftype_22',['cur_type',['../games_2tetris_2main_8c.html#a95580aa5d2c4d05cc7be62ac88b6b705',1,'main.c']]],
+  ['cursor_5fpal_23',['cursor_pal',['../input_2mouse_2main_8c.html#a08cc1a6eb08977efde23b65826f2775d',1,'main.c']]],
+  ['cursor_5fpal_5fend_24',['cursor_pal_end',['../input_2mouse_2main_8c.html#a0d41229783b27d39111f2702b3fafabd',1,'main.c']]],
+  ['cursor_5ftiles_25',['cursor_tiles',['../input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4',1,'main.c']]],
+  ['cursor_5ftiles_5fend_26',['cursor_tiles_end',['../input_2mouse_2main_8c.html#a65ba59e0cd3bb8053ff966e4595cbbbb',1,'main.c']]]
 ];

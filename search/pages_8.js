@@ -6,7 +6,7 @@ var searchData=
   ['and_20sprite_20sheets_3',['Animated Sprite -- Direction States and Sprite Sheets',['../examples_graphics_sprites_animated_sprite.html',1,'examples_by_category']]],
   ['animated_20sprite_20direction_20states_20and_20sprite_20sheets_4',['Animated Sprite -- Direction States and Sprite Sheets',['../examples_graphics_sprites_animated_sprite.html',1,'examples_by_category']]],
   ['animated_20sprites_5',['Dynamic Sprite -- VRAM Streaming for Animated Sprites',['../examples_graphics_sprites_dynamic_sprite.html',1,'examples_by_category']]],
-  ['animation_20tutorial_6',['Sprites &amp; Animation Tutorial',['../tutorial_sprites.html',1,'index']]],
+  ['animation_20tutorial_6',['animation tutorial',['../tutorial_animation.html',1,'Animation Tutorial'],['../tutorial_sprites.html',1,'Sprites &amp; Animation Tutorial']]],
   ['attribute_20memory_7',['SNES OAM (Object Attribute Memory)',['../oam.html',1,'index']]],
   ['audio_20examples_8',['Audio Examples',['../examples_audio.html',1,'']]],
   ['audio_20music_20tutorial_9',['Audio &amp; Music Tutorial',['../tutorial_audio.html',1,'index']]]

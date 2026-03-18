@@ -125,7 +125,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a9f8b37269fa2086f1e65090356bb1b23" id="r_a9f8b37269fa2086f1e65090356bb1b23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#a9f8b37269fa2086f1e65090356bb1b23">dmaCopyVramBank</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a9f8b37269fa2086f1e65090356bb1b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM with explicit source bank byte.  <br /></td></tr>
 <tr class="separator:a9f8b37269fa2086f1e65090356bb1b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e380a37b7453d36c6dd881bb7a374f2" id="r_a6e380a37b7453d36c6dd881bb7a374f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#a6e380a37b7453d36c6dd881bb7a374f2">dmaCopyVramMode7</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilemap, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilemapSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tiles, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilesSize)</td></tr>
+<tr class="memitem:a6e380a37b7453d36c6dd881bb7a374f2" id="r_a6e380a37b7453d36c6dd881bb7a374f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#a6e380a37b7453d36c6dd881bb7a374f2">dmaCopyVramMode7</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode1_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilemapSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode1_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilesSize)</td></tr>
 <tr class="memdesc:a6e380a37b7453d36c6dd881bb7a374f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load Mode 7 interleaved data to VRAM.  <br /></td></tr>
 <tr class="separator:a6e380a37b7453d36c6dd881bb7a374f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcc5b9f47bd12569f7d51adb0acdfa0e" id="r_afcc5b9f47bd12569f7d51adb0acdfa0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dma_8h.html#afcc5b9f47bd12569f7d51adb0acdfa0e">dmaFillVRAM</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dest, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
@@ -138,7 +138,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES DMA (Direct Memory Access) </p>
 <p>Functions for fast memory transfers using DMA.</p>
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 DMA Overview</h2>
 <p>DMA allows fast transfers between:</p><ul>
 <li>Work RAM ↔ VRAM (video RAM)</li>
@@ -146,12 +146,12 @@ DMA Overview</h2>
 <li>Work RAM ↔ OAM (sprite RAM)</li>
 </ul>
 <p>DMA is much faster than CPU copying and should be used for all bulk transfers during VBlank.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 VBlank Timing Requirement</h2>
 <dl class="section warning"><dt>Warning</dt><dd><b>CRITICAL</b>: VRAM, CGRAM, and OAM can only be safely accessed during VBlank (vertical blanking period) or when the screen is in force blank mode (INIDISP bit 7 set). Accessing these memories during active display causes visual corruption and undefined behavior.</dd>
 <dd>
 <b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 Bank Limitation</h2>
 <dl class="section note"><dt>Note</dt><dd>The current implementation assumes source data is in bank $00 for ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using <a class="el" href="dma_8h.html#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> or <a class="el" href="dma_8h.html#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
@@ -220,11 +220,12 @@ Bank Limitation</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> palette[];</div>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[];</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(palette, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible)</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes)</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank! Calling during active display causes palette corruption.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Source data must be in bank $00. For data in other banks, use <a class="el" href="dma_8h.html#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter. </dd></dl>
 
@@ -364,11 +365,12 @@ Bank Limitation</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> tileset[];</div>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>[];</div>
 <div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> tileset_end[];</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(tileset, 0x0000, tileset_end - tileset);</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>, 0x0000, tileset_end - <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>);</div>
 <div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
+<div class="ttc" id="agames_2mapandobjects_2main_8c_html_ad82028c95075b062fde3c871e9dabdbd"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a></div><div class="ttdeci">u8 tileset</div><div class="ttdoc">BG1 tileset tile data (4bpp) – start label.</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank! Calling during active display causes visual corruption.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Source data must be in bank $00 (LoROM $00:8000-$FFFF). For data in other banks, use <a class="el" href="dma_8h.html#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a>. </dd></dl>
 

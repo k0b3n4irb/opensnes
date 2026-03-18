@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('tutorial_input.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers reading SNES controllers including button detection and multi-player support.</p>
-<h2><a class="anchor" id="autotoc_md96"></a>
+<h2><a class="anchor" id="autotoc_md160"></a>
 SNES Controller Layout</h2>
 <div class="fragment"><div class="line">    L                              R</div>
 <div class="line">┌───────────────────────────────────────┐</div>
@@ -109,7 +109,7 @@ SNES Controller Layout</h2>
 <div class="line">│     │ ↓ │                │ B │        │</div>
 <div class="line">│     └───┘                └───┘        │</div>
 <div class="line">└───────────────────────────────────────┘</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md97"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md161"></a>
 Button Constants</h2>
 <p>OpenSNES defines these button masks in <code><a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a></code>:</p>
 <div class="fragment"><div class="line"><span class="comment">// D-Pad</span></div>
@@ -131,13 +131,13 @@ Button Constants</h2>
 <div class="line"><span class="comment">// Start/Select</span></div>
 <div class="line"><span class="preprocessor">#define KEY_START   0x1000</span></div>
 <div class="line"><span class="preprocessor">#define KEY_SELECT  0x2000</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md162"></a>
 Reading Controllers</h2>
-<h3><a class="anchor" id="autotoc_md99"></a>
+<h3><a class="anchor" id="autotoc_md163"></a>
 Direct Register Access (Recommended)</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -146,23 +146,24 @@ Direct Register Access (Recommended)</h3>
 <div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Read controller 1</span></div>
-<div class="line">    pad = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Check for disconnected controller</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad == 0xFFFF) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> == 0xFFFF) {</div>
 <div class="line">        <span class="comment">// No controller connected</span></div>
 <div class="line">        <span class="keywordflow">continue</span>;</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Check buttons</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">        <span class="comment">// A button pressed</span></div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
 <div class="line">        <span class="comment">// D-pad up pressed</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gaa7f10b9a2db0fb936560d2475717bf73"><div class="ttname"><a href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a></div><div class="ttdeci">#define REG_JOY1H</div><div class="ttdoc">Joypad 1 data high (R)</div><div class="ttdef"><b>Definition</b> registers.h:328</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gac0a6bd5981a6d53791eca06ea2bd5772"><div class="ttname"><a href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a></div><div class="ttdeci">#define REG_JOY1L</div><div class="ttdoc">Joypad 1 data low (R)</div><div class="ttdef"><b>Definition</b> registers.h:325</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
@@ -170,158 +171,160 @@ Direct Register Access (Recommended)</h3>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md164"></a>
 Reading Controller 2</h3>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1, pad2;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Wait for auto-joypad</span></div>
 <div class="line"><span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Read both controllers</span></div>
-<div class="line">pad1 = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line">pad2 = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
+<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
+<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
 <div class="ttc" id="agroup__cpu__regs_html_ga02503a4acaf3d9cc9fa85ac9732fdb3a"><div class="ttname"><a href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a></div><div class="ttdeci">#define REG_JOY2H</div><div class="ttdoc">Joypad 2 data high (R)</div><div class="ttdef"><b>Definition</b> registers.h:334</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_ga2dd548a4753566d81adb12473d4673af"><div class="ttname"><a href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a></div><div class="ttdeci">#define REG_JOY2L</div><div class="ttdoc">Joypad 2 data low (R)</div><div class="ttdef"><b>Definition</b> registers.h:331</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md101"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md165"></a>
 Edge Detection</h2>
 <p>Detect button presses (not just held state):</p>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_current;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_previous = 0;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_pressed;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a>;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_previous</a> = 0;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Read current state</span></div>
-<div class="line">    pad_current = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a> = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Detect new presses (down this frame, not last frame)</span></div>
-<div class="line">    pad_pressed = pad_current &amp; ~pad_previous;</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a> &amp; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">~pad_previous</a>;</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Save for next frame</span></div>
-<div class="line">    pad_previous = pad_current;</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_previous</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a>;</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Skip if disconnected</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_current == 0xFFFF) {</div>
-<div class="line">        pad_pressed = 0;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a> == 0xFFFF) {</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> = 0;</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Now use pad_pressed for one-shot actions</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">        <span class="comment">// A was just pressed (fires once)</span></div>
-<div class="line">        player_jump();</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">player_jump</a>();</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Use pad_current for continuous actions</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_current &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_current</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
 <div class="line">        <span class="comment">// Right is held (fires every frame)</span></div>
-<div class="line">        player_x++;</div>
+<div class="line">        <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md102"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md166"></a>
 Movement Example</h2>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_x = 128;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_y = 112;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = 128;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = 112;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">void</span> update_player(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad) {</div>
+<div class="line"><span class="keywordtype">void</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">update_player</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a>) {</div>
 <div class="line">    <span class="comment">// Movement with boundary checking</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
-<div class="line">        <span class="keywordflow">if</span> (player_y &gt; 0) player_y--;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> &gt; 0) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>--;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
-<div class="line">        <span class="keywordflow">if</span> (player_y &lt; 224) player_y++;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> &lt; 224) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>++;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>) {</div>
-<div class="line">        <span class="keywordflow">if</span> (player_x &gt; 0) player_x--;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> &gt; 0) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>--;</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
-<div class="line">        <span class="keywordflow">if</span> (player_x &lt; 248) player_x++;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> &lt; 248) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md167"></a>
 Two-Player Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Player positions</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p1_x = 64, p1_y = 112;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p2_x = 192, p2_y = 112;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a> = 64, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a> = 112;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a> = 192, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a> = 112;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Read both controllers</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1 = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad2 = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Player 1 movement</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad1 != 0xFFFF) {</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (p1_y &gt; 0) p1_y--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (p1_y &lt; 224) p1_y++; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p1_x &gt; 0) p1_x--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p1_x &lt; 248) p1_x++; }</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> != 0xFFFF) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a> &gt; 0) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a>--; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a> &lt; 224) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a>++; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a> &gt; 0) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a>--; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad1</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a> &lt; 248) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a>++; }</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Player 2 movement</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad2 != 0xFFFF) {</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (p2_y &gt; 0) p2_y--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (p2_y &lt; 224) p2_y++; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p2_x &gt; 0) p2_x--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p2_x &lt; 248) p2_x++; }</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> != 0xFFFF) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a> &gt; 0) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a>--; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a> &lt; 224) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a>++; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a> &gt; 0) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a>--; }</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad2</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a> &lt; 248) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a>++; }</div>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Update sprites</span></div>
-<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, p1_x, p1_y, 0, 0, 0, 0);  <span class="comment">// Player 1</span></div>
-<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, p2_x, p2_y, 0, 0, 0, 1);  <span class="comment">// Player 2</span></div>
+<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p1_y</a>, 0, 0, 0, 0);  <span class="comment">// Player 1</span></div>
+<div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">p2_y</a>, 0, 0, 0, 1);  <span class="comment">// Player 2</span></div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md104"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md168"></a>
 Button Combinations</h2>
 <div class="fragment"><div class="line"><span class="comment">// Check for multiple buttons</span></div>
-<div class="line"><span class="keywordflow">if</span> ((pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) &amp;&amp; (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>)) {</div>
+<div class="line"><span class="keywordflow">if</span> ((<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) &amp;&amp; (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>)) {</div>
 <div class="line">    <span class="comment">// A + B pressed together</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check for button + direction</span></div>
-<div class="line"><span class="keywordflow">if</span> ((pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) &amp;&amp; (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)) {</div>
+<div class="line"><span class="keywordflow">if</span> ((<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) &amp;&amp; (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)) {</div>
 <div class="line">    <span class="comment">// Down + A (e.g., slide attack)</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Create combo masks</span></div>
 <div class="line"><span class="preprocessor">#define COMBO_HADOUKEN (KEY_DOWN | KEY_RIGHT | KEY_A)</span></div>
-<div class="line"><span class="keywordflow">if</span> ((pad &amp; COMBO_HADOUKEN) == COMBO_HADOUKEN) {</div>
+<div class="line"><span class="keywordflow">if</span> ((<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">COMBO_HADOUKEN</a>) == <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">COMBO_HADOUKEN</a>) {</div>
 <div class="line">    <span class="comment">// All combo buttons pressed</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md105"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md169"></a>
 Menu Navigation</h2>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> menu_selection = 0;</div>
-<div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> MENU_ITEMS = 4;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a> = 0;</div>
+<div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">MENU_ITEMS</a> = 4;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
-<div class="line">    <span class="keywordflow">if</span> (menu_selection &gt; 0) {</div>
-<div class="line">        menu_selection--;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a> &gt; 0) {</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a>--;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
-<div class="line">    <span class="keywordflow">if</span> (menu_selection &lt; MENU_ITEMS - 1) {</div>
-<div class="line">        menu_selection++;</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a> &lt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">MENU_ITEMS</a> - 1) {</div>
+<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a>++;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="comment">// Confirm selection</span></div>
-<div class="line">    activate_menu_item(menu_selection);</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">activate_menu_item</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">menu_selection</a>);</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad_pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) {</div>
 <div class="line">    <span class="comment">// Cancel / go back</span></div>
-<div class="line">    close_menu();</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">close_menu</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md106"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md170"></a>
 Hardware Registers</h2>
 <p>For reference, the joypad registers:</p>
 <table class="markdownTable">
@@ -346,7 +349,7 @@ Hardware Registers</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">REG_HVBJOY   </td><td class="markdownTableBodyNone">$4212   </td><td class="markdownTableBodyNone">Status (bit 0 = auto-read busy)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md171"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Always wait for auto-joypad</b> - Check <code>REG_HVBJOY &amp; 0x01</code> before reading</li>
@@ -354,10 +357,10 @@ Tips</h2>
 <li><b>Use edge detection for menus</b> - Prevents rapid-fire selection</li>
 <li><b>Use held state for movement</b> - Smoother continuous motion</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md172"></a>
 Example</h2>
 <p>See <code>examples/input/two_players/</code> for a complete two-player demo.</p>
-<h2><a class="anchor" id="autotoc_md109"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_audio.html">Audio &amp; Music</a></li>

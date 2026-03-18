@@ -1,6 +1,19 @@
 var searchData=
 [
-  ['bgcleartilemap_0',['bgClearTilemap',['../background_8h.html#a3e0cf515ae8b6a6f7ce1895c6d12b9f4',1,'background.h']]],
-  ['board_5frows_1',['BOARD_ROWS',['../board_8h.html#afdeabcf1ceb950f88253cd775bacc441',1,'board.h']]],
-  ['board_5fw_2',['BOARD_W',['../board_8h.html#a7e466dc49e1e84524d505faab5d946bc',1,'board.h']]]
+  ['base_5ftile_5f16_0',['BASE_TILE_16',['../graphics_2sprites_2metasprite_2main_8c.html#acac94c2679c53549cb9dacfcfb08be1a',1,'main.c']]],
+  ['base_5ftile_5f32_1',['BASE_TILE_32',['../graphics_2sprites_2metasprite_2main_8c.html#a185b25d8300b5a4e465ed3f581b633d3',1,'main.c']]],
+  ['base_5ftile_5f8_2',['BASE_TILE_8',['../graphics_2sprites_2metasprite_2main_8c.html#a9071483b8a3b1fc7e806c58f5a4f08cb',1,'main.c']]],
+  ['bg3_5fattr_3',['BG3_ATTR',['../hud_8c.html#a61f2830da20d19053f5070e275543ee5',1,'hud.c']]],
+  ['bgcleartilemap_4',['bgClearTilemap',['../background_8h.html#a3e0cf515ae8b6a6f7ce1895c6d12b9f4',1,'background.h']]],
+  ['board_5frows_5',['BOARD_ROWS',['../board_8h.html#afdeabcf1ceb950f88253cd775bacc441',1,'board.h']]],
+  ['board_5fto_5fmap_6',['BOARD_TO_MAP',['../render_8c.html#ad97b7cdaeaca611c94b3075bb4b01eee',1,'render.c']]],
+  ['board_5fw_7',['BOARD_W',['../board_8h.html#a7e466dc49e1e84524d505faab5d946bc',1,'board.h']]],
+  ['border_5fbl_8',['BORDER_BL',['../render_8c.html#aa3d313a02965214a9d95cde5e74cf10a',1,'render.c']]],
+  ['border_5fbr_9',['BORDER_BR',['../render_8c.html#ac73e54c595727b5f104b99806e4e2dc5',1,'render.c']]],
+  ['border_5fh_5fb_10',['BORDER_H_B',['../render_8c.html#a1e559c3952c3512421a3379768e6df12',1,'render.c']]],
+  ['border_5fh_5ft_11',['BORDER_H_T',['../render_8c.html#a931e10e827f6a567d3ffaa4785de4805',1,'render.c']]],
+  ['border_5ftl_12',['BORDER_TL',['../render_8c.html#a229fbf543802a8cf0b43eb00cdfb2295',1,'render.c']]],
+  ['border_5ftr_13',['BORDER_TR',['../render_8c.html#a96a72fec2a6a9a8b7d2691b5eb22b137',1,'render.c']]],
+  ['border_5fvl_14',['BORDER_VL',['../render_8c.html#ad68e6e320c5d8a4875518fea9dad506c',1,'render.c']]],
+  ['border_5fvr_15',['BORDER_VR',['../render_8c.html#a86f6a64bb13bcfbb8a4c59b7ecdef74c',1,'render.c']]]
 ];

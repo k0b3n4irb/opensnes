@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['x_0',['x',['../structRect.html#a9e32b68a268c298487173d197726d6ab',1,'Rect::x'],['../structEntity.html#abb39fb6fdbad51636ea22e63fdc0fcd7',1,'Entity::x']]],
-  ['x_5fpos_1',['x_pos',['../map_8h.html#a52d9f95007fdae0115aa0d5b21317257',1,'map.h']]],
-  ['xmax_2',['xmax',['../structt__objs.html#acd8923cc8af679f29948a046cc75facf',1,'t_objs']]],
-  ['xmin_3',['xmin',['../structt__objs.html#afe1bb9b465b03a6ce06be3563a3a7b7a',1,'t_objs']]],
-  ['xofs_4',['xofs',['../structt__objs.html#ad5a67be825dd45b98f19bda952a856f5',1,'t_objs']]],
-  ['xpos_5',['xpos',['../structt__objs.html#a7d8d754f7264eebc304486e94750c5ce',1,'t_objs']]],
-  ['xvel_6',['xvel',['../structt__objs.html#a3805bf290808a8490f0e866e58843e48',1,'t_objs']]]
+  ['red_5fpal_0',['red_pal',['../render_8c.html#a72e7599f5246c03e063969192051a3ba',1,'render.c']]],
+  ['red_5fpal_5fend_1',['red_pal_end',['../render_8c.html#a5ca877bee4fd0a03f9cda26df2c16b48',1,'render.c']]],
+  ['reserved_2',['reserved',['../structAudioSample.html#a6d0275d2784175c8e5c239c6e356abe8',1,'AudioSample::reserved'],['../structMetaspriteItem.html#a397cd371d501cc3acacdf66c2842de19',1,'MetaspriteItem::reserved']]],
+  ['ripple_5famp_3',['ripple_amp',['../structEffectState.html#a651a317d0d26a99369822f895d670e3b',1,'EffectState']]],
+  ['rockford_5f8bpp_4',['rockford_8bpp',['../maps_2dynamic__map_2main_8c.html#a62e581f8c19ac69c131a30adf4744803',1,'main.c']]],
+  ['rows_5',['rows',['../structLineClearResult.html#a12e086c157c523a8f9b8d60012b2c4a7',1,'LineClearResult']]]
 ];

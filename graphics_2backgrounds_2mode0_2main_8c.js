@@ -1,0 +1,28 @@
+var graphics_2backgrounds_2mode0_2main_8c =
+[
+    [ "main", "graphics_2backgrounds_2mode0_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
+    [ "bgm0", "graphics_2backgrounds_2mode0_2main_8c.html#aac7b0559d91ebe44ff10793efa7351f8", null ],
+    [ "bgm0_end", "graphics_2backgrounds_2mode0_2main_8c.html#a0bec9e2adc9e4a005fdf5de93cc2903e", null ],
+    [ "bgm1", "graphics_2backgrounds_2mode0_2main_8c.html#adbba02169ffa4598bd86f19419185ccc", null ],
+    [ "bgm1_end", "graphics_2backgrounds_2mode0_2main_8c.html#a21430191d95c01ee95775a39031299fe", null ],
+    [ "bgm2", "graphics_2backgrounds_2mode0_2main_8c.html#a55deb16ef530ee90bf36f39dac2965bb", null ],
+    [ "bgm2_end", "graphics_2backgrounds_2mode0_2main_8c.html#a7d52dc79bf0202550c3981feb1b39dcc", null ],
+    [ "bgm3", "graphics_2backgrounds_2mode0_2main_8c.html#a3ed6dba48d794979cacc69787a82ec98", null ],
+    [ "bgm3_end", "graphics_2backgrounds_2mode0_2main_8c.html#a3233b59fce885b743da4139dc5d6b457", null ],
+    [ "flip", "graphics_2backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924", null ],
+    [ "p0", "graphics_2backgrounds_2mode0_2main_8c.html#af5b91772e3c9be05602487ecbe8b8a5e", null ],
+    [ "p1", "graphics_2backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d", null ],
+    [ "p2", "graphics_2backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41", null ],
+    [ "p3", "graphics_2backgrounds_2mode0_2main_8c.html#a985b6295fee151ac90a9f7faef0cf219", null ],
+    [ "sxbg1", "graphics_2backgrounds_2mode0_2main_8c.html#a4972a1805dca94e883d79336d79e62d4", null ],
+    [ "sxbg2", "graphics_2backgrounds_2mode0_2main_8c.html#ad5d23d1d0a267e43bedea4bac363ba30", null ],
+    [ "sxbg3", "graphics_2backgrounds_2mode0_2main_8c.html#a39cfcd83a7d139c408296ad1c85a7bca", null ],
+    [ "t0", "graphics_2backgrounds_2mode0_2main_8c.html#a9d574bf0887728d05437227eb689ce78", null ],
+    [ "t0_end", "graphics_2backgrounds_2mode0_2main_8c.html#ae1fe0219807709ddc3a9862b3375e6f4", null ],
+    [ "t1", "graphics_2backgrounds_2mode0_2main_8c.html#a51f04bf75d931e7dda1fb40a0bc4e5d3", null ],
+    [ "t1_end", "graphics_2backgrounds_2mode0_2main_8c.html#a7f81c2cb034425b5995c2a1785213e10", null ],
+    [ "t2", "graphics_2backgrounds_2mode0_2main_8c.html#a47bd310f3b7ba71e48d7644cbf3e72bf", null ],
+    [ "t2_end", "graphics_2backgrounds_2mode0_2main_8c.html#a8907bb021ff7597431731771e06634a1", null ],
+    [ "t3", "graphics_2backgrounds_2mode0_2main_8c.html#a106910bf960606f055cb8daedb1992a0", null ],
+    [ "t3_end", "graphics_2backgrounds_2mode0_2main_8c.html#a09c854166a5cc27ec2a4bcccf8da9718", null ]
+];

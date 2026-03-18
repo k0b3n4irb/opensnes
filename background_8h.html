@@ -172,7 +172,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Background Layer Management. </p>
 <p>Functions for configuring and scrolling background layers.</p>
-<h2><a class="anchor" id="autotoc_md14"></a>
+<h2><a class="anchor" id="autotoc_md15"></a>
 Overview</h2>
 <p>The SNES has up to 4 background layers (BG1-BG4), though not all modes support all layers. Use these functions to configure tilemap addresses, tile graphics addresses, and scroll positions.</p>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
@@ -388,10 +388,13 @@ Overview</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> tiles[], tiles_end[];</div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> palette[];</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a>(0, tiles, palette, 0, tiles_end - tiles, 32, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="graphics_2backgrounds_2mode1_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>[], <a class="code hl_variable" href="graphics_2backgrounds_2mode1_2main_8c.html#aedfcc0c9e922a49f431a9b605bd1ffe5">tiles_end</a>[];</div>
+<div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[];</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a>(0, <a class="code hl_variable" href="graphics_2backgrounds_2mode1_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, <a class="code hl_variable" href="graphics_2backgrounds_2mode1_2main_8c.html#aedfcc0c9e922a49f431a9b605bd1ffe5">tiles_end</a> - <a class="code hl_variable" href="graphics_2backgrounds_2mode1_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, 32, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
 <div class="ttc" id="abackground_8h_html_a192a4ea97fde5c5c0a78ada7f54cf207"><div class="ttname"><a href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes)</div></div>
+<div class="ttc" id="agraphics_2backgrounds_2mode1_2main_8c_html_adbf45f9654fccf61f3aa31645fd95120"><div class="ttname"><a href="graphics_2backgrounds_2mode1_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a></div><div class="ttdeci">u8 tiles[]</div></div>
+<div class="ttc" id="agraphics_2backgrounds_2mode1_2main_8c_html_aedfcc0c9e922a49f431a9b605bd1ffe5"><div class="ttname"><a href="graphics_2backgrounds_2mode1_2main_8c.html#aedfcc0c9e922a49f431a9b605bd1ffe5">tiles_end</a></div><div class="ttdeci">u8 tiles_end[]</div><div class="ttdef"><b>Definition</b> main.c:38</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 </div><!-- fragment --> 
 </div>

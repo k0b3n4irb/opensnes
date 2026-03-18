@@ -1,4 +1,14 @@
 var searchData=
 [
-  ['map_5fwidth_0',['map_width',['../structTextConfig.html#a4f647c1c7a2ee132a28ff051f5162c66',1,'TextConfig']]]
+  ['hdma_5fgrad_5ftbl_0',['hdma_grad_tbl',['../render_8c.html#aec7aea7099072fea2bf426ccc378f216',1,'render.c']]],
+  ['hdma_5fleft_1',['hdma_left',['../graphics_2effects_2transparent__window_2main_8c.html#a6c3b3bc4ab37496e61eb3f4c003a0047',1,'main.c']]],
+  ['hdma_5fright_2',['hdma_right',['../graphics_2effects_2transparent__window_2main_8c.html#a6a32fe16a7e8bf79412c563953db84c1',1,'main.c']]],
+  ['hdma_5ftable_5fa_3',['hdma_table_a',['../graphics_2effects_2hdma__helpers_2main_8c.html#a2be3b699303a4fde39181d3a53cd5253',1,'main.c']]],
+  ['hdma_5ftables_4',['hdma_tables',['../graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072',1,'main.c']]],
+  ['hdma_5fwave_5famplitude_5',['hdma_wave_amplitude',['../graphics_2effects_2hdma__helpers_2main_8c.html#ab741e13534482f7524b3922759714dfc',1,'main.c']]],
+  ['hdmagradientlist_6',['hdmaGradientList',['../graphics_2effects_2gradient__colors_2main_8c.html#ac02a749aefafdaf51906904af640e33a',1,'main.c']]],
+  ['health_7',['health',['../structEntity.html#a05adfb0c4bf2b5965819d7437fd5cd2b',1,'Entity']]],
+  ['height_8',['height',['../structRect.html#a7e0d0a0cf7eb269f3d902a14f7995c5c',1,'Rect::height'],['../structEntity.html#a1784f0191f0a7853c740d64e7052c10f',1,'Entity::height'],['../structt__objs.html#a3bf3757f174f93270ff558d1351a7872',1,'t_objs::height']]],
+  ['hiscore_9',['hiscore',['../games_2breakout_2main_8c.html#ada91ff5c946fe8702016a0b4fc0f9a54',1,'main.c']]],
+  ['hitpoints_10',['hitpoints',['../structt__objs.html#a66724708a48c464c7c9e1a00a6b81b6d',1,'t_objs']]]
 ];

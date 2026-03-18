@@ -10,10 +10,10 @@ var searchData=
   ['bgsetscroll_7',['bgSetScroll',['../background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4',1,'background.h']]],
   ['bgsetscrollx_8',['bgSetScrollX',['../background_8h.html#a255b7012c710513afe464505ec420d3c',1,'background.h']]],
   ['bgsetscrolly_9',['bgSetScrollY',['../background_8h.html#a1fcd01a63d5efa74df2394d1374588b6',1,'background.h']]],
-  ['boardcheckcollision_10',['boardCheckCollision',['../board_8h.html#a3589149365a89b8e8596a07d98367d17',1,'board.h']]],
-  ['boardclear_11',['boardClear',['../board_8h.html#a84091fc09ac0821c49b956016ab918a6',1,'board.h']]],
-  ['boardfindfulllines_12',['boardFindFullLines',['../board_8h.html#aeccb3323064b66dcc56a9b5238e630cd',1,'board.h']]],
-  ['boardgetcell_13',['boardGetCell',['../board_8h.html#afe889da34619e8bc9093bea63bb60eb4',1,'board.h']]],
-  ['boardlockpiece_14',['boardLockPiece',['../board_8h.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'board.h']]],
-  ['boardremovelines_15',['boardRemoveLines',['../board_8h.html#afd8482c028475d73af8bde2a897c0fdb',1,'board.h']]]
+  ['boardcheckcollision_10',['boardcheckcollision',['../board_8h.html#a3589149365a89b8e8596a07d98367d17',1,'boardCheckCollision(u8 type, u8 rot, s8 row, s8 col):&#160;board.c'],['../board_8c.html#a3589149365a89b8e8596a07d98367d17',1,'boardCheckCollision(u8 type, u8 rot, s8 row, s8 col):&#160;board.c']]],
+  ['boardclear_11',['boardclear',['../board_8c.html#a84091fc09ac0821c49b956016ab918a6',1,'boardClear(void):&#160;board.c'],['../board_8h.html#a84091fc09ac0821c49b956016ab918a6',1,'boardClear(void):&#160;board.c']]],
+  ['boardfindfulllines_12',['boardfindfulllines',['../board_8c.html#aeccb3323064b66dcc56a9b5238e630cd',1,'boardFindFullLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#aeccb3323064b66dcc56a9b5238e630cd',1,'boardFindFullLines(LineClearResult *result):&#160;board.c']]],
+  ['boardgetcell_13',['boardgetcell',['../board_8c.html#afe889da34619e8bc9093bea63bb60eb4',1,'boardGetCell(u8 row, u8 col):&#160;board.c'],['../board_8h.html#afe889da34619e8bc9093bea63bb60eb4',1,'boardGetCell(u8 row, u8 col):&#160;board.c']]],
+  ['boardlockpiece_14',['boardlockpiece',['../board_8c.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c'],['../board_8h.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c']]],
+  ['boardremovelines_15',['boardremovelines',['../board_8c.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c']]]
 ];

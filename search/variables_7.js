@@ -1,15 +1,19 @@
 var searchData=
 [
-  ['lkup16idb_0',['lkup16idB',['../sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e',1,'sprite.h']]],
-  ['lkup16idt_1',['lkup16idT',['../sprite_8h.html#a09e0cfe326fed5be272d928b64e609b4',1,'sprite.h']]],
-  ['lkup16idt0_2',['lkup16idT0',['../sprite_8h.html#a65d11cf31c7b509fc25b15af524d6d6d',1,'sprite.h']]],
-  ['lkup16oams_3',['lkup16oamS',['../sprite_8h.html#a334dff82dcd162697f7ab48e1722bd8f',1,'sprite.h']]],
-  ['lkup32idb_4',['lkup32idB',['../sprite_8h.html#af660f585ad1752b1004dba4df84324a3',1,'sprite.h']]],
-  ['lkup32idt_5',['lkup32idT',['../sprite_8h.html#ad3fab3f2677e9bc4bbdc5f9ffa735231',1,'sprite.h']]],
-  ['lkup32oams_6',['lkup32oamS',['../sprite_8h.html#a3340e166e6f1b9fe91af53b99581bb06',1,'sprite.h']]],
-  ['lkup8idb_7',['lkup8idB',['../sprite_8h.html#ad0557057357143581e9e6612d26ef575',1,'sprite.h']]],
-  ['lkup8idt_8',['lkup8idT',['../sprite_8h.html#ae95313a08b1257ec7327a71c76e8f1a0',1,'sprite.h']]],
-  ['lkup8oams_9',['lkup8oamS',['../sprite_8h.html#a512c524d16be34e3aa0fec1b2952e1bb',1,'sprite.h']]],
-  ['loop_10',['loop',['../structAnimation.html#ae3222e56f158f49bf183860c1590bc29',1,'Animation']]],
-  ['looppoint_11',['loopPoint',['../structAudioSample.html#a8f6bad09ca8631ebc2e4a18b51465d29',1,'AudioSample']]]
+  ['game_0',['game',['../graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44',1,'main.c']]],
+  ['game_5fstate_1',['game_state',['../games_2tetris_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6',1,'main.c']]],
+  ['gfx_5fframe_2',['gfx_frame',['../structMonster.html#af48434d537b961db46339532f773f5ef',1,'Monster']]],
+  ['goombanum_3',['goombanum',['../goomba_8c.html#a99b0830fc737786e314626ea562da36a',1,'goomba.c']]],
+  ['goombax_4',['goombax',['../goomba_8c.html#a5af8f39b4f7cd5a9ae448a28511dca97',1,'goomba.c']]],
+  ['goombay_5',['goombay',['../goomba_8c.html#abe23c045ef78a61e422680ba2b6ce4b4',1,'goomba.c']]],
+  ['gravity_5fspeed_6',['gravity_speed',['../games_2tetris_2main_8c.html#a6c0aa5033fa21e4a84e30b22d016d740',1,'main.c']]],
+  ['gravity_5ftimer_7',['gravity_timer',['../games_2tetris_2main_8c.html#a97393cc0efa4d9bad10918dec4748240',1,'main.c']]],
+  ['green_5fpal_8',['green_pal',['../render_8c.html#adbabd640184a5b6d3359dc1b584b8572',1,'render.c']]],
+  ['green_5fpal_5fend_9',['green_pal_end',['../render_8c.html#a7b050b62b123f9011f9658a19a56e648',1,'render.c']]],
+  ['ground_5fmap_10',['ground_map',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a7ef644f4cbca08b8c4830f66c08330d7',1,'main.c']]],
+  ['ground_5fmap_5fend_11',['ground_map_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#aef57732bc4709eaf757da302dc02293e',1,'main.c']]],
+  ['ground_5fpal_12',['ground_pal',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a534a970bd1fed69f5998c09e6e32abb9',1,'main.c']]],
+  ['ground_5fpal_5fend_13',['ground_pal_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a04a03c1fe8deb545e3e59430f79c6d58',1,'main.c']]],
+  ['ground_5ftiles_14',['ground_tiles',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a104cbd84dfd0889dd256703da2382a59',1,'main.c']]],
+  ['ground_5ftiles_5fend_15',['ground_tiles_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a91488c47affe2c43b79535f7663eea90',1,'main.c']]]
 ];

@@ -153,11 +153,11 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Console Initialization and Core Functions. </p>
 <p>Provides functions for initializing SNES hardware and core functionality like VBlank synchronization.</p>
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md21"></a>
 Basic Usage</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="comment">// Initialize hardware</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
@@ -173,10 +173,11 @@ Basic Usage</h2>
 <div class="line">        <span class="comment">// Update sprites/backgrounds</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point – initialize SNESMOD, display HUD, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:210</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md21"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md22"></a>
 Attribution</h2>
 <p>Originally from: PVSnesLib (<a href="https://github.com/alekmaul/pvsneslib">https://github.com/alekmaul/pvsneslib</a>) Author: Alekmaul License: zlib (compatible with MIT) Modifications:</p><ul>
 <li>Renamed functions for clarity</li>
@@ -210,7 +211,7 @@ Attribution</h2>
 <li>VBlank interrupt setup</li>
 </ul>
 <p>After calling, screen is blanked (black). Call <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> to enable display after you've set up your graphics.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Load graphics...</span></div>
@@ -387,7 +388,8 @@ Attribution</h2>
 <p>Get random 16-bit number. </p>
 <p>Returns a pseudo-random number using a linear feedback shift register.</p>
 <dl class="section return"><dt>Returns</dt><dd>Random value 0-65535</dd></dl>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> enemy_x = <a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 <div class="ttc" id="aconsole_8h_html_af907eeb70a7322d16123cbab3094c2a2"><div class="ttname"><a href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a></div><div class="ttdeci">u16 rand(void)</div><div class="ttdoc">Get random 16-bit number.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 </div><!-- fragment --> 
@@ -438,11 +440,12 @@ Attribution</h2>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="comment">// Fade in effect</span></div>
-<div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> i = 0; i &lt;= 15; i++) {</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a>(i);</div>
+<div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt;= 15; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_a5a1bfaf2babf4d8dac31cafc468c735f"><div class="ttname"><a href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a></div><div class="ttdeci">void setBrightness(u8 brightness)</div><div class="ttdoc">Set screen brightness.</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

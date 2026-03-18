@@ -1,7 +1,24 @@
 var searchData=
 [
-  ['vblank_5fflag_0',['vblank_flag',['../system_8h.html#aaaa70a72e192e5cc318437192516fe9c',1,'system.h']]],
-  ['volume_1',['volume',['../structAudioVoiceState.html#a2872432aa733029ad75c201f8d026e67',1,'AudioVoiceState']]],
-  ['vx_2',['vx',['../structEntity.html#ad72480a14837f5d295799646a7a9a89c',1,'Entity']]],
-  ['vy_3',['vy',['../structEntity.html#a60b6121daafc44d8b1542d70051ae05d',1,'Entity']]]
+  ['oam_5fupdate_5fflag_0',['oam_update_flag',['../system_8h.html#aebb6082d6353b65122e8009f24a5e494',1,'system.h']]],
+  ['oamattribute_1',['oamattribute',['../structt__sprites.html#ac0fb1ea59809017c11430630430e864d',1,'t_sprites']]],
+  ['oambuffer_2',['oambuffer',['../sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f',1,'sprite.h']]],
+  ['oamframeid_3',['oamframeid',['../structt__sprites.html#a0928afd4ac9d8c3c5cceefa44c3a520a',1,'t_sprites']]],
+  ['oamgfxaddr_4',['oamgfxaddr',['../structt__sprites.html#a700775b8be7bf28d8df89ebe0aafa366',1,'t_sprites']]],
+  ['oamgfxbank_5',['oamgfxbank',['../structt__sprites.html#aa6d796f63ca5dfef7af5e62efea3aeb2',1,'t_sprites']]],
+  ['oammemory_6',['oamMemory',['../system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9',1,'system.h']]],
+  ['oamrefresh_7',['oamrefresh',['../structt__sprites.html#ac4e74ac3a1b9ad5b2f756c512f608cb8',1,'t_sprites']]],
+  ['oamx_8',['oamx',['../structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004',1,'t_sprites']]],
+  ['oamy_9',['oamy',['../structt__sprites.html#a6c499b96e640bbad488eb8874bf36281',1,'t_sprites']]],
+  ['objgetid_10',['objgetid',['../object_8h.html#ad4b2cf3a008d2011baf65b7ed74eaf65',1,'object.h']]],
+  ['objmario_11',['objmario',['../games_2mapandobjects_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c'],['../maps_2slopemario_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c']]],
+  ['objnotused_12',['objnotused',['../structt__objs.html#aed65e6435d869acf9aa711fa28e740de',1,'t_objs']]],
+  ['objptr_13',['objptr',['../object_8h.html#a9e81915d1e68d22798a93bb27eb74188',1,'object.h']]],
+  ['objtokill_14',['objtokill',['../object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3',1,'object.h']]],
+  ['objworkspace_15',['objWorkspace',['../object_8h.html#aff685114554f887d186a87bacbe786b9',1,'object.h']]],
+  ['obx_16',['obx',['../games_2breakout_2main_8c.html#aaf6173e5c080f27dd1240193e946fd92',1,'main.c']]],
+  ['oby_17',['oby',['../games_2breakout_2main_8c.html#ab8301075e8707b76d42be10e10874bcc',1,'main.c']]],
+  ['onscreen_18',['onscreen',['../structt__objs.html#a158edcd064c0b2a21b8eea4cc5dcfa8a',1,'t_objs']]],
+  ['orange_5fpal_19',['orange_pal',['../render_8c.html#a94c4f8909d4b4082dba8c626f326134b',1,'render.c']]],
+  ['orange_5fpal_5fend_20',['orange_pal_end',['../render_8c.html#a758423799a10ec752d719b45d37fd944',1,'render.c']]]
 ];

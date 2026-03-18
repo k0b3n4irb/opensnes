@@ -1,0 +1,25 @@
+var graphics_2backgrounds_2continuous__scroll_2main_8c =
+[
+    [ "GameState", "structGameState.html", "structGameState" ],
+    [ "MAX_SCROLL_X", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974", null ],
+    [ "SCROLL_THRESHOLD_LEFT", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a8a90ba51fd761fd07b62073e648827a8", null ],
+    [ "SCROLL_THRESHOLD_RIGHT", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f", null ],
+    [ "main", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
+    [ "bg1_map", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a52542aeab5abef25d4f2b20c2df9e420", null ],
+    [ "bg1_map_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#af540a15b02df03b3549e693d1f04e440", null ],
+    [ "bg1_pal", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#af082268a77de6b87b9cc0c1f123d05a8", null ],
+    [ "bg1_pal_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#aa2f71080ef2ae286f98c27ad8eaf0713", null ],
+    [ "bg1_tiles", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#ad82e6af0bf2560f208dc9d80b8bb6213", null ],
+    [ "bg1_tiles_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#adc4bffa540c79399b5ee884572461e28", null ],
+    [ "bg2_map", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a9da5969c7acd2ffbfe8d3773c2d7c49b", null ],
+    [ "bg2_map_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a9b9b700c14fb33f10a6cd46293e2813c", null ],
+    [ "bg2_pal", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#ac9aedb0dda63f721c34d4774c1b9f948", null ],
+    [ "bg2_pal_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a332f0e810c82ec63eb143b84397487cd", null ],
+    [ "bg2_tiles", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a4daa24340e99ea06ca91f83bf4857544", null ],
+    [ "bg2_tiles_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#ac5d0b0fddd9cd40359b747d18588f996", null ],
+    [ "char_pal", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae9937fa2abcbf438fe567d413088ce5d", null ],
+    [ "char_pal_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a81cb55b8bc98fddba37b6eea8baf5498", null ],
+    [ "char_tiles", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a15f53a46ee49da39b687cf058bcf8e6f", null ],
+    [ "char_tiles_end", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a5d307451fde1e1d028ab980909a6376d", null ],
+    [ "game", "graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44", null ]
+];

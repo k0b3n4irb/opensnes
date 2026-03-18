@@ -4,5 +4,6 @@ var searchData=
   ['readme_5ftemplate_2emd_1',['README_TEMPLATE.md',['../README__TEMPLATE_8md.html',1,'']]],
   ['registers_2eh_2',['registers.h',['../registers_8h.html',1,'']]],
   ['registers_2emd_3',['REGISTERS.md',['../REGISTERS_8md.html',1,'']]],
-  ['render_2eh_4',['render.h',['../render_8h.html',1,'']]]
+  ['render_2ec_4',['render.c',['../render_8c.html',1,'']]],
+  ['render_2eh_5',['render.h',['../render_8h.html',1,'']]]
 ];

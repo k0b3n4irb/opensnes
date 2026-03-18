@@ -39,6 +39,7 @@ var NAVTREE =
     [ "OpenSNES Examples", "examples.html", null ],
     [ "[Example Name]", "md__2home_2runner_2work_2opensnes_2opensnes_2examples_2README__TEMPLATE.html", null ],
     [ "Text Examples", "examples_text.html", null ],
+    [ "Example Source Code", "example_sources.html", null ],
     [ "Todo List", "todo.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
@@ -54,8 +55,10 @@ var NAVTREE =
       [ "File Members", "globals.html", [
         [ "All", "globals.html", "globals_dup" ],
         [ "Functions", "globals_func.html", "globals_func" ],
-        [ "Variables", "globals_vars.html", null ],
+        [ "Variables", "globals_vars.html", "globals_vars" ],
         [ "Typedefs", "globals_type.html", null ],
+        [ "Enumerations", "globals_enum.html", null ],
+        [ "Enumerator", "globals_eval.html", null ],
         [ "Macros", "globals_defs.html", "globals_defs" ]
       ] ]
     ] ]
@@ -65,11 +68,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_graphics_backgrounds_mixed_scroll.html",
-"group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85",
-"group__snesmod__stream.html#gac0658f7f553444a88821c4f6530df26a",
-"object_8h.html#a7000f80d8c2991bbb9cd69489ab8f774",
-"structt__sprites.html#a725c47bc8c0a00ad85b3f73b8c6f2a22"
+"examples_games_breakout.html",
+"goomba_8c.html#a99b0830fc737786e314626ea562da36a",
+"group__ppu__regs.html#ga4d49034fd405fed8f5f42df44fa2b3a8",
+"koopatroopa_8c.html#abe4a226904b4532f5edb7a66a77aefce",
+"piece_8h.html#aee707398916fd4752f85e771787c023c",
+"structLineClearResult.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

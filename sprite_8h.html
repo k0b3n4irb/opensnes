@@ -169,7 +169,7 @@ Macros</h2></td></tr>
 <tr class="separator:aa4a3dec16e47237ca76dafdef88883b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a330d199fcaadc1fab59ca0b7f1ca3b0c" id="r_a330d199fcaadc1fab59ca0b7f1ca3b0c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:a330d199fcaadc1fab59ca0b7f1ca3b0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaa85a4b677edfc58a4b9e26df8890f7" id="r_afaa85a4b677edfc58a4b9e26df8890f7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(pal)&#160;&#160;&#160;((pal) &lt;&lt; 1)</td></tr>
+<tr class="memitem:afaa85a4b677edfc58a4b9e26df8890f7" id="r_afaa85a4b677edfc58a4b9e26df8890f7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(<a class="el" href="games_2breakout_2main_8c.html#a55e2dfee6cb6bff2bbfb31bb8fb1ded7">pal</a>)&#160;&#160;&#160;((<a class="el" href="games_2breakout_2main_8c.html#a55e2dfee6cb6bff2bbfb31bb8fb1ded7">pal</a>) &lt;&lt; 1)</td></tr>
 <tr class="memdesc:afaa85a4b677edfc58a4b9e26df8890f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metasprite palette attribute macro.  <br /></td></tr>
 <tr class="separator:afaa85a4b677edfc58a4b9e26df8890f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a719045957a857d18f56354a20313ae37" id="r_a719045957a857d18f56354a20313ae37"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(prio)&#160;&#160;&#160;((prio) &lt;&lt; 4)</td></tr>
@@ -228,7 +228,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aabedfca9210feb740c636184ed205501" id="r_aabedfca9210feb740c636184ed205501"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#aabedfca9210feb740c636184ed205501">oamDrawMetaFlip</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> baseTile, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> basePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipX, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipY, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> width, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> height)</td></tr>
 <tr class="memdesc:aabedfca9210feb740c636184ed205501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite with flip support.  <br /></td></tr>
 <tr class="separator:aabedfca9210feb740c636184ed205501"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f9ae4d3bdd5fcb1a9883fc72e5da788" id="r_a3f9ae4d3bdd5fcb1a9883fc72e5da788"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a3f9ae4d3bdd5fcb1a9883fc72e5da788">oamDrawMetasprite</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> startId, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette)</td></tr>
+<tr class="memitem:a3f9ae4d3bdd5fcb1a9883fc72e5da788" id="r_a3f9ae4d3bdd5fcb1a9883fc72e5da788"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a3f9ae4d3bdd5fcb1a9883fc72e5da788">oamDrawMetasprite</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> startId, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>)</td></tr>
 <tr class="memdesc:a3f9ae4d3bdd5fcb1a9883fc72e5da788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite (legacy simple interface)  <br /></td></tr>
 <tr class="separator:a3f9ae4d3bdd5fcb1a9883fc72e5da788"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd07ed4460088c9f3b1aca4ddbbcda8" id="r_aebd07ed4460088c9f3b1aca4ddbbcda8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id)</td></tr>
@@ -258,7 +258,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a429bb77c76f029e8ee367f6a1bd27dca" id="r_a429bb77c76f029e8ee367f6a1bd27dca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilePalette, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> paletteSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> paletteEntry, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oamSize)</td></tr>
 <tr class="memdesc:a429bb77c76f029e8ee367f6a1bd27dca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize sprite graphics and palette (PVSnesLib compatible)  <br /></td></tr>
 <tr class="separator:a429bb77c76f029e8ee367f6a1bd27dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a697c4b66632525f55f21fb6008582b3f" id="r_a697c4b66632525f55f21fb6008582b3f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> palette, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> priority, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> flags)</td></tr>
+<tr class="memitem:a697c4b66632525f55f21fb6008582b3f" id="r_a697c4b66632525f55f21fb6008582b3f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> priority, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> flags)</td></tr>
 <tr class="memdesc:a697c4b66632525f55f21fb6008582b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties.  <br /></td></tr>
 <tr class="separator:a697c4b66632525f55f21fb6008582b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad6b003019aab2756f00ebe97b5716c6" id="r_aad6b003019aab2756f00ebe97b5716c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6">oamSetEx</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> visible)</td></tr>
@@ -328,7 +328,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Sprite (Object) Management. </p>
 <p>Functions for managing hardware sprites (OBJ).</p>
-<h2><a class="anchor" id="autotoc_md57"></a>
+<h2><a class="anchor" id="autotoc_md60"></a>
 SNES Sprite Limits</h2>
 <ul>
 <li>128 sprites total</li>
@@ -336,7 +336,7 @@ SNES Sprite Limits</h2>
 <li>Sizes: 8x8, 16x16, 32x32, 64x64</li>
 <li>8 palettes (16 colors each, sharing color 0)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md58"></a>
+<h2><a class="anchor" id="autotoc_md61"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Initialize sprite system</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a274b5d953c60f5455937be288f6652ee">oamInit</a>();</div>
@@ -353,7 +353,7 @@ Usage</h2>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License</dd></dl>
-<h2><a class="anchor" id="autotoc_md59"></a>
+<h2><a class="anchor" id="autotoc_md62"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib sprite system by Alekmaul </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -896,8 +896,8 @@ Attribution</h2>
           <td class="memname">#define OBJ_PAL</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">pal</td><td>)</td>
-          <td>&#160;&#160;&#160;((pal) &lt;&lt; 1)</td>
+          <td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#a55e2dfee6cb6bff2bbfb31bb8fb1ded7">pal</a></td><td>)</td>
+          <td>&#160;&#160;&#160;((<a class="el" href="games_2breakout_2main_8c.html#a55e2dfee6cb6bff2bbfb31bb8fb1ded7">pal</a>) &lt;&lt; 1)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1696,13 +1696,14 @@ Attribution</h2>
 <p>Call after drawing all sprites each frame. Hides sprites that were visible last frame but not drawn this frame, and resets per-frame counters.</p>
 <div class="fragment"><div class="line"><span class="comment">// Game loop</span></div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
-<div class="line">    <span class="keywordflow">for</span> (i = 0; i &lt; numSprites; i++) {</div>
-<div class="line">        <a class="code hl_function" href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a>(i);</div>
+<div class="line">    <span class="keywordflow">for</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; numSprites; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
+<div class="line">        <a class="code hl_function" href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>
 <div class="line">    }</div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#ac9eb3b2751e5b744470cd16453ff3261">oamInitDynamicSpriteEndFrame</a>();  <span class="comment">// Hide unused sprites</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a4f830004646995018000dae0f898d221">oamVramQueueUpdate</a>();  <span class="comment">// Upload graphics to VRAM</span></div>
 <div class="line">}</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="asprite_8h_html_a4f830004646995018000dae0f898d221"><div class="ttname"><a href="sprite_8h.html#a4f830004646995018000dae0f898d221">oamVramQueueUpdate</a></div><div class="ttdeci">void oamVramQueueUpdate(void)</div><div class="ttdoc">Process VRAM upload queue.</div></div>
 <div class="ttc" id="asprite_8h_html_ac9eb3b2751e5b744470cd16453ff3261"><div class="ttname"><a href="sprite_8h.html#ac9eb3b2751e5b744470cd16453ff3261">oamInitDynamicSpriteEndFrame</a></div><div class="ttdeci">void oamInitDynamicSpriteEndFrame(void)</div><div class="ttdoc">End frame processing for dynamic sprites.</div></div>
 <div class="ttc" id="asprite_8h_html_aebd07ed4460088c9f3b1aca4ddbbcda8"><div class="ttname"><a href="sprite_8h.html#aebd07ed4460088c9f3b1aca4ddbbcda8">oamDynamic16Draw</a></div><div class="ttdeci">void oamDynamic16Draw(u16 id)</div><div class="ttdoc">Draw a 16x16 dynamic sprite.</div></div>
@@ -1816,10 +1817,13 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> sprite_tiles[], sprite_tiles_end[];</div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> sprite_pal[];</div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a>(sprite_tiles, sprite_tiles_end - sprite_tiles,</div>
-<div class="line">              sprite_pal, 32, 0, 0x6000, <a class="code hl_define" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>);</div>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a9f62f8ac72d6193b2b27e1c8949e2180">sprite_tiles</a>[], <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a>[];</div>
+<div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a20fcfc492e0b93bed7aab47c9177550f">sprite_pal</a>[];</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a>(<a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a9f62f8ac72d6193b2b27e1c8949e2180">sprite_tiles</a>, <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a> - <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a9f62f8ac72d6193b2b27e1c8949e2180">sprite_tiles</a>,</div>
+<div class="line">              <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a20fcfc492e0b93bed7aab47c9177550f">sprite_pal</a>, 32, 0, 0x6000, <a class="code hl_define" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>);</div>
+<div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_a20fcfc492e0b93bed7aab47c9177550f"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#a20fcfc492e0b93bed7aab47c9177550f">sprite_pal</a></div><div class="ttdeci">u8 sprite_pal[]</div><div class="ttdoc">Palette for the character sprite (16 colors, 4bpp)</div></div>
+<div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_a9f62f8ac72d6193b2b27e1c8949e2180"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#a9f62f8ac72d6193b2b27e1c8949e2180">sprite_tiles</a></div><div class="ttdeci">u8 sprite_tiles[]</div><div class="ttdoc">Sprite sheet tile data containing all animation frames (defined in data.asm)</div></div>
+<div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_ab70c48d98fc2ba28acebfe2acc51c291"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a></div><div class="ttdeci">u8 sprite_tiles_end[]</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
 <div class="ttc" id="asprite_8h_html_a429bb77c76f029e8ee367f6a1bd27dca"><div class="ttname"><a href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible)</div></div>
 </div><!-- fragment --> 
 </div>
@@ -1901,10 +1905,12 @@ Attribution</h2>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, player.x, player.y, 0, 0, 3, 0);</div>
 <div class="line">player.x += 1;  <span class="comment">// Smooth movement</span></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
-</div><!-- fragment --><p><b>WRONG</b> (separate u16 variables - causes bugs): </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_x = 100;  <span class="comment">// DON&#39;T do this!</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> player_y = 100;</div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, player_x, player_y, 0, 0, 3, 0);</div>
-<div class="line">player_x += 1;  <span class="comment">// Jerky movement!</span></div>
+</div><!-- fragment --><p><b>WRONG</b> (separate u16 variables - causes bugs): </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = 100;  <span class="comment">// DON&#39;T do this!</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = 100;</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 0, 0, 3, 0);</div>
+<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> += 1;  <span class="comment">// Jerky movement!</span></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 </div><!-- fragment --><p>See examples/graphics/backgrounds/continuous_scroll for details on this pattern. </p>
 
 </div>

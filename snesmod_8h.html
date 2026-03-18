@@ -175,7 +175,7 @@ Functions</h2></td></tr>
 <li>Echo/reverb effects</li>
 <li>Volume fading and position synchronization</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md54"></a>
+<h2><a class="anchor" id="autotoc_md57"></a>
 Quick Start</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
@@ -183,7 +183,7 @@ Quick Start</h2>
 <div class="line"> </div>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> soundbank[];</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="comment">// Initialize video...</span></div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();</div>
@@ -200,6 +200,7 @@ Quick Start</h2>
 <div class="line">        }</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point – initialize SNESMOD, display HUD, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:210</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__snesmod__init_html_ga4ee30188309d91d30e4d147b6292cae3"><div class="ttname"><a href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a></div><div class="ttdeci">void snesmodSetSoundbank(u8 bank)</div><div class="ttdoc">Set the soundbank bank number.</div></div>
@@ -212,14 +213,14 @@ Quick Start</h2>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="asnesmod_8h_html"><div class="ttname"><a href="snesmod_8h.html">snesmod.h</a></div><div class="ttdoc">SNESMOD - Tracker-based Audio Engine.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md55"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md58"></a>
 Soundbank Creation</h2>
 <p>Use smconv to create soundbanks from Impulse Tracker files: </p><div class="fragment"><div class="line">smconv -s -o soundbank music.it effects.it</div>
 </div><!-- fragment --><p>This generates:</p><ul>
 <li>soundbank.asm - Assembly data to link with ROM</li>
 <li>soundbank.h - Module/effect ID constants</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md56"></a>
+<h2><a class="anchor" id="autotoc_md59"></a>
 Memory Usage</h2>
 <ul>
 <li>SPC700 driver: ~5.5KB</li>

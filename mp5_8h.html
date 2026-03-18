@@ -124,12 +124,12 @@ Functions</h2></td></tr>
 <div class="textblock"><p>SNES MultiPlayer5 (Multitap) Support. </p>
 <p>Functions for detecting and using the MultiPlayer5 adapter, which allows up to 5 controllers on a single SNES.</p>
 <p>When enabled, the NMI handler automatically reads controllers 3-5 in addition to the standard controllers 1-2. All five controllers are accessible through the standard <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a>/padPressed() functions (pad indices 0-4).</p>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mp5_8h.html">snes/mp5.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Detect MultiPlayer5 adapter</span></div>
@@ -141,15 +141,19 @@ Usage</h2>
 <div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"> </div>
 <div class="line">        <span class="comment">// Read all 5 controllers</span></div>
-<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p1 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);</div>
-<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p2 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(1);</div>
-<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p3 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(2);</div>
+<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a> = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);</div>
+<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a> = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(1);</div>
+<div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2backgrounds_2mode0_2main_8c.html#a985b6295fee151ac90a9f7faef0cf219">p3</a> = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(2);</div>
 <div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p4 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(3);</div>
 <div class="line">        <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p5 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(4);</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point – initialize SNESMOD, display HUD, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:210</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="agraphics_2backgrounds_2mode0_2main_8c_html_a484a4880604b9d010eb04b38ec267f41"><div class="ttname"><a href="graphics_2backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a></div><div class="ttdeci">u8 p2[]</div><div class="ttdoc">Player 2 state, initialized at right-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
+<div class="ttc" id="agraphics_2backgrounds_2mode0_2main_8c_html_a985b6295fee151ac90a9f7faef0cf219"><div class="ttname"><a href="graphics_2backgrounds_2mode0_2main_8c.html#a985b6295fee151ac90a9f7faef0cf219">p3</a></div><div class="ttdeci">u8 p3[]</div></div>
+<div class="ttc" id="agraphics_2backgrounds_2mode0_2main_8c_html_adae424b8373ce417295e0072e3ccad6d"><div class="ttname"><a href="graphics_2backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a></div><div class="ttdeci">u8 p1[]</div><div class="ttdoc">Player 1 state, initialized at left-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:101</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="amp5_8h_html"><div class="ttname"><a href="mp5_8h.html">mp5.h</a></div><div class="ttdoc">SNES MultiPlayer5 (Multitap) Support.</div></div>

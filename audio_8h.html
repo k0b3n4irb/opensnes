@@ -286,14 +286,14 @@ Functions</h2></td></tr>
 <li>Echo/reverb effects with configurable FIR filter</li>
 <li>Per-voice ADSR envelope control</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md12"></a>
+<h2><a class="anchor" id="autotoc_md13"></a>
 Quick Start</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> beep_brr[];</div>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> beep_brr_end[];</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="group__audio__init.html#gaca805f5c6782ded195a7d479cffb5e5f">audioInit</a>();</div>
 <div class="line">    <a class="code hl_function" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a>(0, beep_brr, beep_brr_end - beep_brr, 0);</div>
 <div class="line"> </div>
@@ -305,6 +305,7 @@ Quick Start</h2>
 <div class="line">        }</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point – initialize SNESMOD, display HUD, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:210</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__audio__init_html_gac25577949f0b4226318e6fb714cc6ef9"><div class="ttname"><a href="group__audio__init.html#gac25577949f0b4226318e6fb714cc6ef9">audioUpdate</a></div><div class="ttdeci">void audioUpdate(void)</div><div class="ttdoc">Process audio updates.</div></div>
 <div class="ttc" id="agroup__audio__init_html_gaca805f5c6782ded195a7d479cffb5e5f"><div class="ttname"><a href="group__audio__init.html#gaca805f5c6782ded195a7d479cffb5e5f">audioInit</a></div><div class="ttdeci">void audioInit(void)</div><div class="ttdoc">Initialize the audio system.</div></div>
@@ -314,7 +315,7 @@ Quick Start</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md13"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md14"></a>
 Features</h2>
 <ul>
 <li>Up to 8 simultaneous sound effects (SPC700 voices)</li>

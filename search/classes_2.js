@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lineclearresult_0',['LineClearResult',['../structLineClearResult.html',1,'']]]
+  ['gamestate_0',['GameState',['../structGameState.html',1,'']]]
 ];
