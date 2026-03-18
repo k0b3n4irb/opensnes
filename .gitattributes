@@ -3,3 +3,5 @@
 
 # Doxygen theme is vendored, not our code
 docs/doxygen-awesome-css/** linguist-vendored
+*.hpp linguist-detectable=false
+*.cpp linguist-detectable=false
