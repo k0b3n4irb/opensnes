@@ -25,9 +25,17 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_sprites -- Sprites & Animation
 
+@subpage tutorial_animation -- Animation Techniques
+
+@subpage tutorial_scrolling -- Scrolling & Parallax
+
 @subpage tutorial_input -- Controller Input
 
+@subpage tutorial_collision -- Collision Detection
+
 @subpage tutorial_audio -- Audio & Music
+
+@subpage tutorial_game_states -- Game States & Transitions
 
 ## Hardware Reference
 
