@@ -18,6 +18,12 @@
 
 ---
 
+## Introduction
+
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 41 example ROMs.
+
+This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
+
 ## A Fair Warning
 
 SNES development is hard. Not "takes a weekend to figure out" hard — fundamentally, structurally hard.
@@ -26,9 +32,7 @@ The SNES was designed in 1989 by hardware engineers, for assembly programmers, w
 
 You will need to understand how a PPU renders tiles scanline by scanline. You will need to know why writing to VRAM outside of VBlank silently fails. You will need to care about individual clock cycles, because on this hardware, every single one matters.
 
-OpenSNES lets you write game logic in **standard C11** — no proprietary toolchain, no assembly required to get started. That's a real advantage — you get if/else, functions, structs, and all the abstraction C provides. The SDK handles initialization, DMA transfers, joypad reading, sprite management, and audio playback through a clean API. One `make` command builds the compiler, tools, library, and all 41 example ROMs. For many things, you'll never touch a register directly.
-
-This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
+OpenSNES lets you write game logic in C. That's a real advantage — you get if/else, functions, structs, and all the abstraction C provides. The SDK handles initialization, DMA transfers, joypad reading, sprite management, and audio playback through a clean API. For many things, you'll never touch a register directly.
 
 But C alone won't get you to a finished game.
 
