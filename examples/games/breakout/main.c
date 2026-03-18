@@ -1,31 +1,47 @@
 /**
  * @file main.c
- * @brief Breakout Game - A Complete SNES Game Example
+ * @brief Breakout game with brick collision, paddle physics, and level cycling
+ * @ingroup examples
  *
- * This game demonstrates core SNES development concepts:
+ * A complete Breakout game demonstrating how multiple SNES subsystems work
+ * together in a real game. The playfield uses background tiles (not sprites)
+ * for bricks, enabling 100 on-screen bricks without hitting the 128-sprite
+ * hardware limit. The paddle and ball are hardware sprites with shadow
+ * sprites for depth effect.
  *
- * VIDEO SYSTEM:
- * - Mode 1 (most common SNES mode): BG1 4bpp, BG3 2bpp, sprites
- * - VRAM tilemap overlap to save memory
- * - Palette cycling for level progression
+ * Key technical patterns: RAM tilemap buffers for runtime brick destruction,
+ * overlapping BG1/BG3 tilemaps in VRAM to save memory (requiring atomic
+ * dual-DMA updates), palette cycling for per-level color variation, and
+ * direct oamMemory[] writes instead of oamSet() for performance (10 sprites
+ * per frame would cause visible slowdown with oamSet's 158-byte stack frame).
  *
- * SPRITES:
- * - Multi-sprite paddle (4 tiles with shadows)
- * - Ball with shadow for depth effect
- * - Secondary name table access (tile | 256)
+ * Ball bounce angle varies by paddle hit zone (4 zones), creating the
+ * classic Breakout aiming mechanic. Scoring uses level multipliers.
  *
- * TILEMAPS:
- * - RAM buffer pattern for runtime modification
- * - Bricks as background tiles (not sprites)
- * - Text rendering via tilemap writes
+ * Based on SNES SDK game by Ulrich Hecht, PVSnesLib port by alekmaul.
  *
- * DMA:
- * - Atomic VRAM updates for overlapping tilemaps
- * - Palette DMA for color cycling
+ * @par SNES Concepts
+ * - Mode 1: BG1 (4bpp playfield), BG3 (2bpp background pattern), OBJ sprites
+ * - Overlapping VRAM tilemaps (BG1 at $0000, BG3 at $0400 share $0400-$07FF)
+ * - Atomic dual-DMA: both tilemaps uploaded in same VBlank to prevent flicker
+ * - RAM tilemap buffers for runtime modification (brick destruction, HUD)
+ * - Palette cycling: 7 color sets rotated per level via CGRAM DMA
+ * - Direct oamMemory[] writes for 10 sprites (ball + paddle + shadows)
+ * - Secondary sprite name table access (tile | 256 for VRAM $2000+)
+ * - Force blank for bulk VRAM uploads exceeding VBlank DMA budget
  *
- * Based on SNES SDK game by Ulrich Hecht
- * PVSnesLib port by alekmaul
- * OpenSNES port
+ * @par What to Observe
+ * - Press START to begin; paddle moves with D-pad (hold A for speed boost)
+ * - Ball bounces off walls, paddle, and bricks with angled deflection
+ * - Bricks disappear on hit; score and high score update in the HUD
+ * - Background color changes each level (palette cycling)
+ * - Shadow sprites create a subtle depth effect under ball and paddle
+ * - START pauses/unpauses the game
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, input
+ *
+ * @see sprite.h, dma.h, background.h, input.h
  */
 
 #include <snes.h>
@@ -37,15 +53,28 @@
  * The _end labels allow calculating sizes: (tiles1_end - tiles1) = byte count
  *============================================================================*/
 
-extern u8 tiles1[], tiles1_end[];   /* BG tiles: border, bricks, font (4bpp) */
-extern u8 tiles2[], tiles2_end[];   /* Sprite tiles: ball, paddle (4bpp) */
-extern u8 bg1map[], bg1map_end[];   /* BG1 tilemap: playfield border */
-extern u8 bg2map[], bg2map_end[];   /* BG3 tilemap: all 4 background patterns */
-extern u8 bg2map0[], bg2map1[], bg2map2[], bg2map3[];  /* Individual patterns */
-extern u8 palette[], palette_end[]; /* Full 256-color palette */
-extern u8 backpal[], backpal_end[]; /* 7 level color sets (7 x 16 bytes) */
+/** @brief BG tiles: border, bricks, and font glyphs (4bpp, ~3840 bytes) */
+extern u8 tiles1[], tiles1_end[];
+/** @brief Sprite tiles: ball, paddle, and shadow shapes (4bpp, ~592 bytes) */
+extern u8 tiles2[], tiles2_end[];
+/** @brief BG1 tilemap: playfield border frame and HUD layout (2KB) */
+extern u8 bg1map[], bg1map_end[];
+/** @brief BG3 tilemap: all 4 background fill patterns concatenated (2KB) */
+extern u8 bg2map[], bg2map_end[];
+/** @brief Individual BG3 patterns (pointers into bg2map for per-level selection) */
+extern u8 bg2map0[], bg2map1[], bg2map2[], bg2map3[];
+/** @brief Full 256-color palette for BG and sprite layers (512 bytes) */
+extern u8 palette[], palette_end[];
+/** @brief 7 level color sets for palette cycling (7 x 16 bytes = 112 bytes) */
+extern u8 backpal[], backpal_end[];
 
-/* Input buffer - NMI handler reads joypads and stores here every frame */
+/**
+ * @brief Raw joypad state buffer written by the NMI handler every frame.
+ *
+ * pad_keys[0] = port 1 buttons, pad_keys[1] = port 2 buttons.
+ * Used directly (instead of padHeld()) for the game loop because Breakout
+ * was ported from PVSnesLib which reads pad_keys[] directly.
+ */
 extern u16 pad_keys[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
@@ -54,20 +83,29 @@ extern u16 pad_keys[];
  * Constants
  *============================================================================*/
 
-/* Default brick layout (10x10 grid, 100 bytes) - defined in data.asm
- * Values 0-7 = brick color/type, 8 = no brick */
+/**
+ * @brief Default brick layout (10x10 grid, 100 bytes).
+ *
+ * Each byte encodes the brick type at that grid position:
+ * values 0-7 select a colored brick (palette index), value 8 = empty cell.
+ * Copied to the mutable `blocks[]` array at level start so bricks can
+ * be destroyed at runtime without modifying the ROM template.
+ */
 extern const u8 brick_map[];
 
-/* Status message strings - defined in data.asm to ensure bank 0 placement */
+/** @brief "READY" message string (in data.asm for guaranteed bank $00 placement) */
 extern const char str_ready[];
+/** @brief "GAME OVER" message string */
 extern const char str_gameover[];
+/** @brief "PAUSED" message string */
 extern const char str_paused[];
+/** @brief Blank string (spaces) for clearing message areas */
 extern const char str_blank[];
 
-#define ST_READY    str_ready
-#define ST_GAMEOVER str_gameover
-#define ST_PAUSED   str_paused
-#define ST_BLANK    str_blank
+#define ST_READY    str_ready    /**< Alias for the READY message */
+#define ST_GAMEOVER str_gameover /**< Alias for the GAME OVER message */
+#define ST_PAUSED   str_paused  /**< Alias for the PAUSED message */
+#define ST_BLANK    str_blank   /**< Alias for the blank clearing string */
 
 /*============================================================================
  * RAM Buffers (defined in data.asm)
@@ -82,10 +120,30 @@ extern const char str_blank[];
  * - ROM is read-only, so we copy to RAM and modify there
  *============================================================================*/
 
-extern u16 blockmap[];  /* BG1 tilemap copy - 0x400 entries (2KB) at $0800 */
-extern u16 backmap[];   /* BG3 tilemap copy - 0x400 entries (2KB) at $1000 */
-extern u16 pal[];       /* Palette copy - 0x100 entries (512 bytes) at $1800 */
-extern u8  blocks[];    /* Brick state array - 100 bytes */
+/**
+ * @brief BG1 tilemap RAM copy (0x400 entries = 2KB) at WRAM $0800.
+ *
+ * Modified at runtime when bricks are destroyed and HUD text updates.
+ * DMAs to VRAM $0000-$07FF each time visuals change.
+ */
+extern u16 blockmap[];
+/**
+ * @brief BG3 tilemap RAM copy (0x400 entries = 2KB) at WRAM $1000.
+ *
+ * Modified for shadow effects under bricks (palette bit toggling).
+ * DMAs to VRAM $0400-$0BFF. Overlaps BG1 at VRAM $0400-$07FF, so
+ * both must be uploaded atomically in the same VBlank.
+ */
+extern u16 backmap[];
+/** @brief Palette RAM copy (0x100 entries = 512 bytes) at WRAM $1800 */
+extern u16 pal[];
+/**
+ * @brief Mutable brick state array (100 entries, one per grid cell).
+ *
+ * Values 0-7 = active brick with that color, 8 = destroyed/empty.
+ * Initialized from the ROM brick_map[] template at each level start.
+ */
+extern u8  blocks[];
 
 /*============================================================================
  * Game State Variables
@@ -95,23 +153,29 @@ extern u8  blocks[];    /* Brick state array - 100 bytes */
  * their values are copied from ROM to RAM at startup.
  *============================================================================*/
 
-static u8  i, j, k;          /* Loop variables (global to reduce stack usage) */
-static u16 a, c, b;          /* Brick init temporaries */
-static u16 blockcount;       /* Bricks remaining (0 = level complete) */
-static u16 bx, by;           /* Ball position in brick grid coords */
-static u16 obx, oby;         /* Previous grid position (for bounce direction) */
-static u16 score, hiscore;   /* Current and high score */
-static u16 level2;           /* Display level number (starts at 1) */
-static u16 color;            /* Background color index (0-6, cycles each level) */
-static u16 level;            /* Internal level counter (for scoring multiplier) */
-static u16 lives;            /* Lives remaining */
-static u16 px;               /* Paddle X position (16-144 range) */
-static u16 pad0;             /* Current frame's joypad state */
+static u8  i, j, k;          /**< Loop counters (global to reduce 65816 stack overhead) */
+static u16 a, c, b;          /**< Brick init temporaries (reused in new_level/main) */
+static u16 blockcount;       /**< Number of bricks remaining (0 triggers next level) */
+static u16 bx, by;           /**< Ball position in brick grid coordinates (0-9 each) */
+static u16 obx, oby;         /**< Previous frame's grid position (determines bounce axis) */
+static u16 score, hiscore;   /**< Current score and all-time high score */
+static u16 level2;           /**< Display level number (1-based, shown in HUD) */
+static u16 color;            /**< Background palette set index (0-6, cycles per level) */
+static u16 level;            /**< Internal level counter (0-based, used as score multiplier) */
+static u16 lives;            /**< Lives remaining (0 = game over on next death) */
+static u16 px;               /**< Paddle X position in pixels (clamped to 16-144) */
+static u16 pad0;             /**< Current frame's joypad button bitmask */
 
-/* Ball velocity and position as separate vars (not struct) to avoid
- * compiler issues with struct member operations */
-static s16 vel_x, vel_y;     /* Ball velocity (-2 to +2 each axis) */
-static s16 pos_x, pos_y;     /* Ball pixel position */
+/**
+ * @brief Ball X velocity (-2 to +2 pixels/frame).
+ *
+ * Separate from a struct because the cc65816 compiler has quirks with
+ * compound operations on struct members (e.g., negation, += assignment).
+ */
+static s16 vel_x;
+static s16 vel_y;             /**< Ball Y velocity (-2 to +2 pixels/frame) */
+static s16 pos_x;             /**< Ball X pixel position */
+static s16 pos_y;             /**< Ball Y pixel position */
 
 /*============================================================================
  * Utility Functions

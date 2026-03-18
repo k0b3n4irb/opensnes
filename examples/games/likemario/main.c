@@ -1,14 +1,46 @@
 /**
  * @file main.c
- * @brief LikeMario — Side-Scrolling Platformer
+ * @brief Side-scrolling platformer with scroll streaming and SNESMOD audio
+ * @ingroup examples
  *
- * Port of PVSnesLib's likemario example to OpenSNES.
- * Demonstrates: tile-based map scrolling, sprite animation,
- * physics with gravity, tile collision, camera tracking.
+ * A Mario-style platformer demonstrating the core techniques of a scrolling
+ * SNES game: tile-based map streaming, subpixel physics, tile collision,
+ * camera tracking, animated sprites, and SPC700 music/sound effects via
+ * the SNESMOD audio driver.
  *
- * Controls:
- *   Left/Right - Move Mario
- *   A          - Jump (hold UP for high jump)
+ * The map engine streams one tile column per frame using a prepare/flush
+ * pattern: during active display, the next column is read from ROM into
+ * a RAM buffer (map_prepare_column); during VBlank, a 64-byte DMA writes
+ * it to VRAM (map_flush_column). This keeps VRAM writes within the VBlank
+ * budget. The column at +32 tiles ahead is streamed to cover the 33rd
+ * partial tile at the screen edge.
+ *
+ * Physics use 8.8 fixed-point velocities with arithmetic right shift for
+ * signed values. Collision checks test two probe points per axis against
+ * the tile property table (T_SOLID / T_EMPTY).
+ *
+ * Port of the PVSnesLib likemario example.
+ *
+ * @par SNES Concepts
+ * - Scroll streaming: 1 column/frame prepare-during-display, DMA-in-VBlank
+ * - SC_64x32 tilemap with 64-column wraparound for seamless scrolling
+ * - Subpixel 8.8 fixed-point physics (acceleration, gravity, max velocity)
+ * - Tile collision via property lookup table (tilesetatt)
+ * - Dynamic sprite engine with frame-based animation
+ * - SNESMOD: SPC700 module playback and sound effects
+ * - Assembly DMA loader with bank bytes for SUPERFREE ROM data
+ *
+ * @par What to Observe
+ * - Mario walks left/right with acceleration and deceleration
+ * - Press A to jump (hold UP for a higher jump)
+ * - Camera follows Mario; background scrolls smoothly
+ * - Music plays continuously; a jump sound effect triggers on A press
+ * - Falling off the bottom respawns Mario at the top
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background
+ *
+ * @see background.h, sprite.h, input.h, dma.h, snesmod.h
  */
 
 #include <snes.h>
@@ -19,87 +51,151 @@
  * External Data (from data.asm)
  *============================================================================*/
 
+/** @brief Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine */
 extern u8 mario_sprite_til[];
+/** @brief Map data (tile indices + header with width/height) */
 extern u8 mapmario[];
+/** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
 extern u8 tilesetatt[];
 
-/* Assembly DMA loader — uses :label bank bytes for SUPERFREE data */
+/**
+ * @brief DMA all tile and palette data from ROM to VRAM/CGRAM.
+ *
+ * Implemented in assembly because SUPERFREE sections may land in ROM
+ * banks $01+. The assembly uses `:label` to get the correct bank byte
+ * for each DMA source, which C cannot express.
+ */
 extern void loadGraphics(void);
 
-/* Returns bank byte of mario_sprite_til for dynamic sprite engine */
+/**
+ * @brief Get the ROM bank byte of mario_sprite_til.
+ *
+ * The dynamic sprite engine needs the bank byte to set up DMA source
+ * addresses for sprite tile uploads. Since the tiles are in a SUPERFREE
+ * section, their bank is determined at link time and only available
+ * via the `:label` assembly operator.
+ *
+ * @return Bank byte (e.g., 0x00, 0x01) of the mario_sprite_til data
+ */
 extern u8 getSpriteTilBank(void);
 
 /*============================================================================
  * Constants
  *============================================================================*/
 
-/* VRAM Layout */
+/** @brief VRAM word address for large (16x16) sprite tiles */
 #define VRAM_SPR_LARGE  0x0000
+/** @brief VRAM word address for small (8x8) sprite tiles */
 #define VRAM_SPR_SMALL  0x1000
+/** @brief VRAM word address for BG1 tile character data */
 #define VRAM_BG_TILES   0x2000
+/** @brief VRAM word address for BG1 tilemap (SC_64x32) */
 #define VRAM_BG_MAP     0x6800
 
-/* Physics (from PVSnesLib) */
+/**
+ * @brief Gravity acceleration in 8.8 fixed-point units per frame.
+ *
+ * Applied to mario_yvel every frame when airborne (jumping or falling).
+ * 48/256 = 0.1875 pixels/frame^2 -- gives a natural parabolic arc.
+ */
 #define GRAVITY         48
+/** @brief Maximum horizontal velocity in 8.8 fixed-point (1.25 pixels/frame) */
 #define MARIO_MAXACCEL  0x0140
+/** @brief Horizontal acceleration per frame in 8.8 fixed-point (0.22 pixels/frame) */
 #define MARIO_ACCEL     0x0038
+/** @brief Normal jump initial upward velocity in 8.8 fixed-point */
 #define MARIO_JUMPING   0x0394
+/** @brief High jump initial upward velocity (when holding UP during jump) */
 #define MARIO_HIJUMPING 0x0594
 
-/* Tile properties (b16 format: u16 per tile) */
+/** @brief Tile property: passable (air, background decoration) */
 #define T_EMPTY  0x0000
+/** @brief Tile property: solid (ground, walls, platforms) */
 #define T_SOLID  0xFF00
 
-/* Mario states */
+/** @brief Mario is standing on solid ground, idle */
 #define ACT_STAND  0
+/** @brief Mario is walking (horizontal velocity nonzero, on ground) */
 #define ACT_WALK   1
+/** @brief Mario is jumping (upward velocity, ascending phase) */
 #define ACT_JUMP   2
+/** @brief Mario is falling (downward velocity or walked off an edge) */
 #define ACT_FALL   3
 
-/* Sprite frame indices */
+/** @brief Dynamic sprite frame index: jump pose */
 #define FRAME_JUMP   1
+/** @brief Dynamic sprite frame index: walk animation frame 0 */
 #define FRAME_WALK0  2
+/** @brief Dynamic sprite frame index: walk animation frame 1 */
 #define FRAME_WALK1  3
+/** @brief Dynamic sprite frame index: standing idle pose */
 #define FRAME_STAND  6
 
 /*============================================================================
  * Global State
  *============================================================================*/
 
-static u16 map_width;
-static u16 map_height;
-static u16 *map_data;
-static u16 *tile_props;
+static u16 map_width;          /**< Map width in tiles (parsed from map header) */
+static u16 map_height;         /**< Map height in tiles (parsed from map header) */
+static u16 *map_data;          /**< Pointer to the tile index array within mapmario */
+static u16 *tile_props;        /**< Pointer to the tile property table (T_SOLID/T_EMPTY) */
 
-/* Precomputed row pointers for fast tile lookup (avoids multiply) */
+/**
+ * @brief Precomputed row pointers into map_data for fast tile lookup.
+ *
+ * Avoids an expensive multiply (row * map_width) on every tile access.
+ * map_row_ptrs[row] points directly to the start of that row's tile data.
+ * Maximum 32 rows for SC_64x32 tilemap height.
+ */
 static u16 *map_row_ptrs[32];
 
-static s16 camera_x;
-static s16 last_tile_x;
+static s16 camera_x;          /**< Current camera X scroll offset in pixels */
+static s16 last_tile_x;       /**< Last tile column for which streaming was performed */
 
-static s16 mario_x, mario_y;
-static u8  mario_xfrac, mario_yfrac;
-static s16 mario_xvel, mario_yvel;
-static u8  mario_action;
-static u8  mario_anim_idx;
-static u8  anim_tick;
+static s16 mario_x;           /**< Mario world X position in pixels */
+static s16 mario_y;           /**< Mario world Y position in pixels */
+static u8  mario_xfrac;       /**< Mario X sub-pixel fraction (8.8 fixed-point low byte) */
+static u8  mario_yfrac;       /**< Mario Y sub-pixel fraction (8.8 fixed-point low byte) */
+static s16 mario_xvel;        /**< Mario X velocity in 8.8 fixed-point */
+static s16 mario_yvel;        /**< Mario Y velocity in 8.8 fixed-point (negative = upward) */
+static u8  mario_action;      /**< Current action state (ACT_STAND/WALK/JUMP/FALL) */
+static u8  mario_anim_idx;    /**< Walk animation toggle (0 or 1, selects WALK0/WALK1) */
+static u8  anim_tick;         /**< Frame counter for animation timing */
 
-/* Cached max X for boundary checks */
-static s16 map_max_x;
-static s16 cam_max_x;
+static s16 map_max_x;         /**< Rightmost valid Mario X position (map_width*8 - 16) */
+static s16 cam_max_x;         /**< Maximum camera X offset (map_width*8 - 256) */
 
-/* Sound effect slot (returned by snesmodLoadEffect) */
+/** @brief SPC700 sound effect slot index for the jump sound */
 static u8 sfx_jump_slot;
 
-/* Column buffer for deferred VRAM write */
+/**
+ * @brief Column tile buffer for deferred VRAM streaming.
+ *
+ * During active display, map_prepare_column() fills this 32-entry
+ * buffer from ROM map data (RAM-only writes). During VBlank,
+ * map_flush_column() DMAs these 64 bytes to VRAM in one transfer.
+ */
 static u16 col_buffer[32];
-static u16 col_vram_base;
-static u8  col_pending;
+static u16 col_vram_base;     /**< VRAM word address for the pending column DMA */
+static u8  col_pending;       /**< Nonzero when col_buffer contains data awaiting flush */
 
 /*============================================================================
  * Map Engine
  *============================================================================*/
 
+/**
+ * @brief Look up the collision property of the tile at pixel coordinates.
+ *
+ * Converts pixel coordinates to tile coordinates, reads the tile index
+ * from the map via precomputed row pointers, then looks up the tile's
+ * property (T_SOLID or T_EMPTY) in the attribute table. Out-of-bounds
+ * coordinates above or left return T_SOLID (wall); below or right return
+ * T_EMPTY (open air, allowing fall-off-screen respawn).
+ *
+ * @param px World X position in pixels
+ * @param py World Y position in pixels
+ * @return T_SOLID (0xFF00) or T_EMPTY (0x0000)
+ */
 static u16 map_get_tile_prop(s16 px, s16 py) {
     u16 tx, ty;
 
@@ -113,6 +209,17 @@ static u16 map_get_tile_prop(s16 px, s16 py) {
     return tile_props[map_row_ptrs[ty][tx] & 0x03FF];
 }
 
+/**
+ * @brief Write a full tile column to VRAM via direct register writes.
+ *
+ * Used during force blank (initial map load) when DMA is not needed
+ * because there is no time constraint. Sets VMAIN to vertical increment
+ * mode (bit 0 set = increment address by 32 after each write), which
+ * writes one tile per row down a column.
+ *
+ * @param map_col  Source column index in the map data
+ * @param vram_col Destination column in the SC_64x32 tilemap (0-63)
+ */
 static void write_vram_column(u16 map_col, u16 vram_col) {
     u16 base, row, tile;
 
@@ -141,6 +248,13 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
     REG_VMAIN = 0x80;
 }
 
+/**
+ * @brief Load the map from ROM and populate the initial VRAM tilemap.
+ *
+ * Parses the map header (width, height in pixels), builds the row pointer
+ * table for O(1) tile lookups, and writes all 64 columns to VRAM. Must
+ * be called during force blank since it performs direct VRAM writes.
+ */
 static void map_load(void) {
     u16 col, row;
     u16 *hdr, *ptr;
@@ -174,6 +288,17 @@ static void map_load(void) {
     last_tile_x = 0;
 }
 
+/**
+ * @brief Buffer a map column for deferred VRAM write (prepare phase).
+ *
+ * Called during active display (not VBlank). Reads tile indices from
+ * ROM map data into the col_buffer[] RAM array and records the target
+ * VRAM address. No VRAM writes occur here -- those happen in
+ * map_flush_column() during the next VBlank.
+ *
+ * @param map_col  Source column index in the map data
+ * @param vram_col Target column in the SC_64x32 tilemap (0-63)
+ */
 static void map_prepare_column(u16 map_col, u16 vram_col) {
     u16 row;
 
@@ -193,6 +318,15 @@ static void map_prepare_column(u16 map_col, u16 vram_col) {
     col_pending = 1;
 }
 
+/**
+ * @brief Flush the buffered column to VRAM via DMA (flush phase).
+ *
+ * Must be called during VBlank. Uses DMA channel 1 in word mode to
+ * transfer 64 bytes (32 tilemap entries) to VRAM with vertical
+ * increment addressing. DMA takes ~512 master cycles vs ~57,600 for
+ * a compiled C register-write loop -- a 100x speedup that fits easily
+ * within the VBlank budget.
+ */
 static void map_flush_column(void) {
     if (!col_pending) return;
 
@@ -217,6 +351,14 @@ static void map_flush_column(void) {
     col_pending = 0;
 }
 
+/**
+ * @brief Check if the camera has scrolled to a new tile column and prepare it.
+ *
+ * Compares the current camera tile position to last_tile_x. If the camera
+ * moved right, prepares the column at +32 (one tile ahead of the visible
+ * right edge, covering the 33rd partial tile). If moved left, prepares
+ * the newly revealed left column. At most one column is prepared per frame.
+ */
 static void map_update(void) {
     s16 tile_x;
     u16 new_col, vram_col;
@@ -245,6 +387,15 @@ static void map_update(void) {
  * Mario - Split into small functions to keep stack frames manageable
  *============================================================================*/
 
+/**
+ * @brief Initialize Mario's position, velocity, animation, and sprite configuration.
+ *
+ * Places Mario at a safe spawn point, sets the dynamic sprite engine's
+ * frame to the standing pose, and configures the sprite attribute byte
+ * (priority 3, H-flip for facing right). The bank byte for sprite tile
+ * data is retrieved via getSpriteTilBank() because the tile data may
+ * reside in any ROM bank due to SUPERFREE section placement.
+ */
 static void mario_init(void) {
     mario_x = 48;
     mario_y = 96;       /* Ground level (row 14 = tile 40 SOLID at y=112, so feet at 112 → y=96) */
@@ -262,6 +413,14 @@ static void mario_init(void) {
     OAM_SET_GFX_BANK(0, mario_sprite_til, getSpriteTilBank());
 }
 
+/**
+ * @brief Process D-pad and button input for Mario's movement.
+ *
+ * LEFT/RIGHT apply acceleration (with max velocity clamping and
+ * deceleration when released). A triggers a jump if grounded; holding
+ * UP during jump gives a higher arc. The sprite's H-flip attribute is
+ * set to match the facing direction.
+ */
 static void mario_handle_input(void) {
     u16 pad;
 
@@ -304,11 +463,18 @@ static void mario_handle_input(void) {
 
 }
 
-/*
- * Arithmetic right shift by 8 — workaround for compiler using LSR (logical)
- * instead of ASR (arithmetic) for signed shifts.
- * For positive: normal unsigned shift.
- * For negative: invert, shift, invert back (preserves sign correctly).
+/**
+ * @brief Arithmetic right shift by 8 bits (extract integer part of 8.8 fixed-point).
+ *
+ * The 65816 has no native arithmetic shift right instruction, and the
+ * compiler's LSR (logical shift) would zero-fill the sign bit, turning
+ * negative values positive. This function works around it:
+ * - Positive values: simple unsigned shift (LSR is correct)
+ * - Negative values: bitwise NOT, unsigned shift, NOT back -- preserves
+ *   the sign bit through the inversion trick.
+ *
+ * @param val 8.8 fixed-point signed value
+ * @return Integer part (effectively val / 256 with sign preservation)
  */
 static s16 asr8(s16 val) {
     if (val >= 0)
@@ -316,6 +482,14 @@ static s16 asr8(s16 val) {
     return ~(((u16)~val) >> 8);
 }
 
+/**
+ * @brief Apply gravity and integrate velocity into position.
+ *
+ * Adds GRAVITY to Y velocity when airborne (capped at terminal velocity).
+ * Then integrates both axes: adds velocity to the fractional accumulator,
+ * extracts the integer pixel displacement via asr8(), and stores the
+ * remaining fraction for sub-pixel precision next frame.
+ */
 static void mario_apply_physics(void) {
     s16 new_frac;
 
@@ -334,6 +508,14 @@ static void mario_apply_physics(void) {
     mario_yfrac = new_frac & 0xFF;
 }
 
+/**
+ * @brief Check vertical tile collisions (ground landing and ceiling bonk).
+ *
+ * Ground check: probes two points at Mario's feet (left+2, right+13).
+ * If either hits a solid tile, snaps Y to the tile boundary and resets
+ * vertical velocity. Ceiling check: probes one point above Mario's head.
+ * Collision detection uses the tile property table, not per-pixel checks.
+ */
 static void mario_collide_vertical(void) {
     u16 prop;
 
@@ -367,6 +549,14 @@ static void mario_collide_vertical(void) {
     }
 }
 
+/**
+ * @brief Check horizontal tile collisions (wall sliding).
+ *
+ * Probes one point at Mario's vertical midpoint in the direction of
+ * movement. If a solid tile is hit, snaps X to the tile boundary and
+ * zeroes horizontal velocity. Only checks the direction Mario is
+ * actually moving to avoid false positives.
+ */
 static void mario_collide_horizontal(void) {
     u16 prop;
     s16 mid_y;
@@ -392,6 +582,14 @@ static void mario_collide_horizontal(void) {
     }
 }
 
+/**
+ * @brief Clamp Mario to world boundaries and handle action state transitions.
+ *
+ * Prevents Mario from leaving the map horizontally or going above the
+ * top. If Mario falls below Y=240 (off the bottom of the screen),
+ * respawns at the top-left. Also handles state machine transitions:
+ * WALK->STAND when velocity reaches zero, JUMP->FALL at the apex.
+ */
 static void mario_clamp_and_transition(void) {
     if (mario_x < 0) {
         mario_x = 0;
@@ -419,6 +617,14 @@ static void mario_clamp_and_transition(void) {
         mario_action = ACT_FALL;
 }
 
+/**
+ * @brief Update Mario's sprite animation frame based on current action.
+ *
+ * Walking alternates between WALK0 and WALK1 every 4 frames. Jumping
+ * and falling use the JUMP frame. Standing uses the STAND frame.
+ * The oamrefresh flag tells the dynamic sprite engine to re-upload
+ * the new frame's tile data to VRAM on the next flush.
+ */
 static void mario_animate(void) {
     anim_tick++;
 
@@ -441,6 +647,14 @@ static void mario_animate(void) {
     }
 }
 
+/**
+ * @brief Update camera to follow Mario and position the sprite on screen.
+ *
+ * Centers the camera on Mario (offset by half-screen width = 128 pixels),
+ * clamped to the map boundaries. Then converts Mario's world position
+ * to screen-relative coordinates for the sprite engine and triggers
+ * the dynamic sprite draw for OAM buffer update.
+ */
 static void mario_update_camera(void) {
     camera_x = mario_x - 128;
     if (camera_x < 0) camera_x = 0;
@@ -456,6 +670,31 @@ static void mario_update_camera(void) {
  * Main
  *============================================================================*/
 
+/**
+ * @brief Main entry point -- platformer initialization and game loop.
+ *
+ * Initializes all subsystems during force blank: Mode 1 video, tile/palette
+ * DMA via assembly loader, dynamic sprite engine, map loading, Mario state,
+ * and SNESMOD audio (music + jump sound effect). Then enters the main loop
+ * with a strict pipeline:
+ *
+ * Active display (CPU-only, no VRAM):
+ *   1. mario_handle_input() - read pad, apply acceleration
+ *   2. mario_apply_physics() - gravity, velocity integration
+ *   3. mario_collide_vertical/horizontal() - tile collision response
+ *   4. mario_clamp_and_transition() - boundary checks, state transitions
+ *   5. mario_animate() - frame selection
+ *   6. mario_update_camera() - camera + sprite positioning
+ *   7. map_update() - prepare next column in RAM buffer
+ *
+ * VBlank (VRAM writes allowed):
+ *   1. map_flush_column() - DMA one column (64 bytes)
+ *   2. bgSetScroll() - update hardware scroll registers
+ *   3. oamVramQueueUpdate() - upload sprite tiles
+ *   4. snesmodProcess() - SPC700 communication (no VBlank restriction)
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     consoleInit();      /* Sets force blank ON — stays until setScreenOn */
 

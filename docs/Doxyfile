@@ -36,10 +36,11 @@ INPUT                  = mainpage.md \
                          THIRD_PARTY.md \
                          hardware/ \
                          ../examples/ \
+                         examples_group.md \
                          ../CONTRIBUTING.md
 
 # File patterns to process
-FILE_PATTERNS          = *.h *.md
+FILE_PATTERNS          = *.h *.md *.c
 
 # Recursive search
 RECURSIVE              = YES

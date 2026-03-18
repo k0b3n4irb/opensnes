@@ -1,16 +1,33 @@
 /**
  * @file main.c
- * @brief Fading Effect Example
+ * @brief Screen fade in/out using INIDISP brightness control
+ * @ingroup examples
  *
- * Port of pvsneslib Fading example.
- * Demonstrates screen brightness control for fade in/out effects.
+ * Demonstrates smooth screen fading by stepping through the 16 brightness
+ * levels of the SNES INIDISP register ($2100). Bits 0-3 of INIDISP control
+ * master brightness from 0 (black) to 15 (full), while bit 7 is the force
+ * blank flag. By writing successive brightness values with timed delays
+ * between frames, the display fades smoothly to or from black. Three fade
+ * speeds are showcased: fast (1 frame/step), medium (3 frames/step), and
+ * slow (6 frames/step). This technique is used in virtually every SNES game
+ * for scene transitions, title screens, and game-over sequences.
  *
- * The SNES INIDISP register ($2100) controls screen brightness:
- * - Bits 0-3: Brightness level (0-15)
- * - Bit 7: Force blank (1 = screen off)
+ * @par SNES Concepts
+ * - INIDISP register ($2100) brightness levels 0-15
+ * - Frame-counted delay loops for animation timing
+ * - setBrightness() library wrapper for safe INIDISP writes
+ * - Force blank (bit 7) vs brightness dimming (bits 0-3)
  *
- * Controls:
- *   Any button: Advance to next fade effect
+ * @par What to Observe
+ * - Press any button to advance through fade effects
+ * - Fast fade out (instant-feeling), then fast fade in
+ * - Medium fade (noticeable transition), then slow fade (cinematic pace)
+ * - The cycle repeats: fast, medium, slow, fast, ...
+ *
+ * @par Modules Used
+ * console, sprite, dma, input, background
+ *
+ * @see video.h, input.h, background.h
  */
 
 #include <snes.h>
@@ -19,17 +36,42 @@
  * External Graphics Data (defined in data.asm)
  *============================================================================*/
 
+/** @brief 4bpp tile data for the background image. */
 extern u8 tiles[], tiles_end[];
+/** @brief Tilemap data (32x32 tile grid) for the background image. */
 extern u8 tilemap[], tilemap_end[];
+/** @brief 15-bit BGR palette (up to 16 colors) for the background image. */
 extern u8 palette[], palette_end[];
 
-/* Wait for a button press (release then press) */
+/**
+ * @brief Block until the user presses a button (with debounce).
+ *
+ * First waits for all buttons to be released (if any are held), then waits
+ * for a new button press. This two-phase approach prevents the same press
+ * from being detected twice and ensures clean transition between fade steps.
+ * Each iteration calls WaitForVBlank() to yield CPU time and synchronize
+ * with the display refresh.
+ */
 static void wait_for_key(void) {
     while (padHeld(0) != 0) WaitForVBlank();
     while (padHeld(0) == 0) WaitForVBlank();
 }
 
-/* Fade out (light to black) */
+/**
+ * @brief Fade the screen from full brightness to black.
+ *
+ * Steps the INIDISP register ($2100) brightness field from 15 (full) down
+ * to 0 (black). The @p speed parameter controls how many VBlank frames to
+ * wait between each brightness step -- higher values produce slower fades.
+ *
+ * At 60 fps (NTSC):
+ * - speed=1: 16 frames = ~0.27 seconds (fast/snappy)
+ * - speed=3: 48 frames = ~0.80 seconds (cinematic)
+ * - speed=6: 96 frames = ~1.60 seconds (dramatic)
+ *
+ * @param speed Number of VBlank frames to wait between each brightness step.
+ *              1 = fastest (1 frame/step), 6 = slowest (6 frames/step).
+ */
 static void fade_out(u8 speed) {
     s8 brightness;
     u8 i;
@@ -43,7 +85,17 @@ static void fade_out(u8 speed) {
     }
 }
 
-/* Fade in (black to light) */
+/**
+ * @brief Fade the screen from black to full brightness.
+ *
+ * Steps the INIDISP register ($2100) brightness field from 0 (black) up
+ * to 15 (full). Symmetric counterpart to fade_out().
+ *
+ * @param speed Number of VBlank frames to wait between each brightness step.
+ *              1 = fastest, 6 = slowest.
+ *
+ * @see fade_out() for timing details.
+ */
 static void fade_in(u8 speed) {
     u8 brightness;
     u8 i;
@@ -57,8 +109,19 @@ static void fade_in(u8 speed) {
     }
 }
 
+/**
+ * @brief Entry point -- cycles through fade-out/fade-in at three speeds.
+ *
+ * Loads a background image, then enters an interactive loop where each
+ * button press triggers the next fade effect: fast (1 frame/step),
+ * medium (3 frames/step), and slow (6 frames/step). The cycle repeats
+ * indefinitely. This demonstrates how INIDISP brightness control provides
+ * smooth scene transitions without any per-pixel computation.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
-    /* Force blank during setup */
+    /* Force blank during setup -- required for safe VRAM writes */
     setScreenOff();
 
     /*------------------------------------------------------------------------

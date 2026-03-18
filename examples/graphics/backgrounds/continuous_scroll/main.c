@@ -1,18 +1,34 @@
 /**
  * @file main.c
- * @brief Continuous Scroll Example (Pure C Version)
+ * @brief Two-layer parallax scrolling with player sprite
+ * @ingroup examples
  *
- * Port of PVSnesLib Mode1ContinuousScroll example.
- * Demonstrates:
- * - Two-layer parallax scrolling (BG1 + BG2)
- * - Player-controlled sprite movement
- * - D-pad controlled scrolling
- * - VBlank callback (nmiSet) for timing-critical scroll updates
- * - Pure C graphics loading using library functions
+ * Demonstrates continuous horizontal scrolling with two independent background
+ * layers moving at different speeds (parallax) and a player-controlled sprite.
+ * BG1 and BG2 are loaded with separate tile sets and palettes in different
+ * VRAM/CGRAM slots to avoid conflicts. The scroll position is updated each
+ * frame based on player movement: when the sprite crosses a screen threshold,
+ * the background auto-scrolls and the player is pushed back, creating a
+ * camera-follow effect common in side-scrolling games. Scroll registers are
+ * written via bgSetScroll(), which defers the actual PPU register write to the
+ * NMI handler via a dirty-flag mechanism.
  *
- * Original by odelot
- * Sprite from Calciumtrice (CC-BY 3.0)
- * Backgrounds inspired by Streets of Rage 2
+ * @par SNES Concepts
+ * - Multi-layer parallax scrolling (BG1 + BG2 at independent speeds)
+ * - Deferred scroll register writes via NMI dirty flags
+ * - Multiple tile sets and palette slots in VRAM/CGRAM
+ * - Sprite overlay on scrolling backgrounds
+ * - Auto-scroll camera with player threshold tracking
+ *
+ * @par What to Observe
+ * - Move the character with D-pad; background scrolls when near screen edges
+ * - BG1 and BG2 scroll together (parallax could use different speeds)
+ * - The sprite animates and moves freely within the scroll boundaries
+ *
+ * @par Modules Used
+ * console, sprite, input, background, dma
+ *
+ * @see background.h, sprite.h, input.h, dma.h
  */
 
 #include <snes.h>
@@ -90,8 +106,20 @@ GameState game = {20, 100, 0, 32, 0, 32};
  * Main Program
  *============================================================================*/
 
+/**
+ * @brief Entry point -- two-layer parallax scrolling with player sprite.
+ *
+ * Loads two independent background layers (BG1 and BG2) with separate tile
+ * sets and palette slots, plus a character sprite. Each frame, the D-pad
+ * moves the player sprite; when the sprite crosses the scroll threshold,
+ * the backgrounds auto-scroll and the sprite is pushed back, creating a
+ * camera-follow effect. Scroll registers are deferred to the NMI handler
+ * via bgSetScroll()'s dirty-flag mechanism for safe VBlank-only writes.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
-    u16 pad;
+    u16 pad;              /**< Current joypad button state (read from hardware) */
 
     /* Force blank during setup */
     setScreenOff();

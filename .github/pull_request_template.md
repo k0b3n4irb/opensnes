@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- Describe your changes in 1-3 bullet points -->
+<!-- Describe your changes in 1-3 bullet points. Explain WHY, not just WHAT. -->
 
 -
 
@@ -8,30 +8,34 @@
 
 - [ ] Bug fix
 - [ ] New feature
+- [ ] New example
 - [ ] Compiler optimization
-- [ ] Documentation / examples
+- [ ] Documentation
 - [ ] Build system / CI
 - [ ] Refactoring (no functional change)
 
-## Testing Checklist
+## Self-Review Checklist
 
-- [ ] `make clean && make` passes
-- [ ] `./tests/compiler/run_tests.sh` passes (if compiler change)
-- [ ] `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick` passes
-- [ ] Tested in Mesen2 emulator (if runtime change)
+- [ ] `make clean && make` passes without warnings
+- [ ] `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` passes
+- [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
+- [ ] No unrelated changes mixed in (one topic per PR)
+- [ ] New code has Doxygen documentation
+- [ ] Tested in Mesen2 (if runtime change — describe what you tested below)
 
-## Reference Examples Validated
+## Testing
 
-<!-- For compiler/library/runtime changes, check all that apply -->
+<!-- How did you verify this works? Which examples did you test? -->
 
-- [ ] Breakout
-- [ ] LikeMario
-- [ ] HDMA Wave
-- [ ] Dynamic Sprite
-- [ ] Continuous Scroll
-- [ ] SNESMOD Music
-- [ ] Save Game
+## AI Disclosure
+
+<!-- If you used AI tools (Copilot, Claude, etc.), briefly state what for. -->
+<!-- Leave blank if no AI tools were used. -->
+
+## Screenshots
+
+<!-- For visual changes, attach before/after screenshots or a short video. -->
 
 ## Additional Notes
 
-<!-- Anything reviewers should know -->
+<!-- Anything reviewers should know. -->

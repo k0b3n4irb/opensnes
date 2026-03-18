@@ -1,18 +1,32 @@
 /**
  * @file main.c
- * @brief Mode 1 Background Example
+ * @brief Static 16-color background display in Mode 1 (4bpp)
+ * @ingroup examples
  *
- * Port of pvsneslib Mode1 example.
- * Demonstrates how to display a simple 16-color tiled background in Mode 1.
+ * Displays a single full-screen tiled background using Mode 1, the most
+ * commonly used SNES video mode. Mode 1 provides two 4bpp layers (BG1 and
+ * BG2, each up to 16 colors) plus one 2bpp layer (BG3, 4 colors). This
+ * example uses only BG1 with a 16-color tileset and tilemap converted from
+ * a PNG by gfx4snes.
  *
- * Mode 1 is the most commonly used background mode:
- * - BG1 and BG2: 16 colors (4bpp)
- * - BG3: 4 colors (2bpp) - often used for text overlays
+ * This is a direct port of the PVSnesLib "Mode1" example.
  *
- * This example shows:
- * - Loading tiles to VRAM using bgInitTileSet()
- * - Loading tilemap to VRAM using dmaCopyVram()
- * - Setting up Mode 1 with library functions
+ * @par SNES Concepts
+ * - Mode 1: BG1/BG2 are 4bpp (16 colors each), BG3 is 2bpp (4 colors)
+ * - bgInitTileSet() for combined tile + palette loading with VRAM address configuration
+ * - dmaCopyVram() for tilemap data transfer to a separate VRAM region
+ * - VRAM layout: tilemap at $0000, tiles at $4000 (non-overlapping regions)
+ * - Force blank (setScreenOff) during VRAM setup to avoid mid-frame writes
+ *
+ * @par What to Observe
+ * - A static full-screen image rendered as 8x8 tiles on BG1
+ * - Only BG1 is enabled; BG2 and BG3 are unused
+ * - The image remains stationary (no scrolling)
+ *
+ * @par Modules Used
+ * console, sprite, dma, background
+ *
+ * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>
@@ -21,10 +35,24 @@
  * External Graphics Data (defined in data.asm)
  *============================================================================*/
 
-extern u8 tiles[], tiles_end[];
-extern u8 tilemap[], tilemap_end[];
-extern u8 palette[], palette_end[];
+extern u8 tiles[], tiles_end[];      /**< 4bpp tile graphics data (defined in data.asm via .incbin) */
+extern u8 tilemap[], tilemap_end[];  /**< 32x32 tilemap entries (defined in data.asm via .incbin) */
+extern u8 palette[], palette_end[];  /**< 16-color BGR555 palette (defined in data.asm via .incbin) */
 
+/**
+ * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
+ *
+ * Demonstrates the most common SNES video mode setup: force blank the
+ * screen, configure BG1's tilemap and tile base addresses, load tile
+ * graphics and palette via bgInitTileSet(), DMA the tilemap to VRAM,
+ * select Mode 1, enable BG1, and turn on the screen. The result is a
+ * static full-screen tiled image using up to 16 colors.
+ *
+ * The VRAM layout places the tilemap at $0000 and tile graphics at $4000
+ * to avoid overlap (each tilemap is up to 2KB, tile data can be many KB).
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     /* Force blank during setup */
     setScreenOff();

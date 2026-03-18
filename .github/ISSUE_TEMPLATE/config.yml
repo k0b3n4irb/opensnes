@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Discussion
+    url: https://github.com/k0b3n4irb/opensnes/discussions
+    about: Ask questions in Discussions, not Issues. Issues are for bugs and feature requests.
+  - name: Documentation
+    url: https://k0b3n4irb.github.io/opensnes/
+    about: Check the documentation first — your answer might already be there.

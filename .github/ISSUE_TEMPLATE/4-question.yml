@@ -1,0 +1,60 @@
+name: Question
+description: Ask a question about OpenSNES (after checking the documentation)
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before asking, please check these resources — your answer might already be there:
+        - [Documentation](https://k0b3n4irb.github.io/opensnes/)
+        - [Getting Started](https://k0b3n4irb.github.io/opensnes/getting_started.html)
+        - [Tutorials](https://k0b3n4irb.github.io/opensnes/) (Graphics, Sprites, Input, Audio, Scrolling, Collision, Animation, Game States)
+        - [Troubleshooting](https://k0b3n4irb.github.io/opensnes/troubleshooting.html)
+        - [Examples](https://github.com/k0b3n4irb/opensnes/tree/develop/examples) (41 annotated examples)
+
+  - type: checkboxes
+    id: docs-checked
+    attributes:
+      label: I checked the documentation first
+      options:
+        - label: I searched the [documentation site](https://k0b3n4irb.github.io/opensnes/) and didn't find an answer
+          required: true
+        - label: I looked at the relevant [example source code](https://github.com/k0b3n4irb/opensnes/tree/develop/examples)
+          required: true
+        - label: I checked the [troubleshooting page](https://k0b3n4irb.github.io/opensnes/troubleshooting.html)
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What do you need help with?
+      placeholder: "How do I load a 256-color background in Mode 3? I tried bgInitTileSet but the colors are wrong."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What I've Tried
+      description: What did you try? What did the documentation say? Where are you stuck?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      options:
+        - Graphics / Backgrounds
+        - Sprites / Animation
+        - Input (controller, mouse, super scope)
+        - Audio / Music
+        - Scrolling / Maps
+        - Compiler / Build
+        - Tools (gfx4snes, smconv, font2snes)
+        - Memory / Save
+        - Other
+    validations:
+      required: true

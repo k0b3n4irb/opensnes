@@ -1,11 +1,39 @@
 /**
  * @file main.c
- * @brief SNES Super Scope Demo
+ * @brief SNES Super Scope light gun detection, calibration, and firing
+ * @ingroup examples
  *
- * Blue calibration background with crosshair target, white text overlay,
- * and red dot sprite marking fire position.
+ * Demonstrates the SNES Super Scope (light gun) peripheral connected to
+ * controller port 2. The Super Scope works by detecting the CRT beam
+ * position when the trigger is pulled, returning X/Y screen coordinates
+ * via the auto-joypad registers. Because the sensor relies on CRT timing,
+ * a calibration step is needed to correct for aiming offset.
  *
- * States: DETECT -> CALIBRATE -> READY
+ * The example uses a three-state machine: DETECT waits for the Super Scope
+ * to be connected, CALIBRATE asks the player to shoot the screen center
+ * so the library can compute the aim offset, and READY tracks fire events
+ * and marks the hit position with a red dot sprite.
+ *
+ * Video setup: Mode 0 with BG1 (text overlay) and BG2 (crosshair target
+ * background for calibration), plus OBJ sprites for the red dot marker.
+ *
+ * @par SNES Concepts
+ * - Super Scope peripheral detection and calibration flow
+ * - Light gun coordinate reading (scopeGetX / scopeGetY)
+ * - Button polling for FIRE, PAUSE, and CURSOR buttons
+ * - Multi-layer Mode 0 with text on BG1 and graphics on BG2
+ * - Sprite positioning from light gun coordinates
+ *
+ * @par What to Observe
+ * - "Connect SuperScope to Port 2" message on startup
+ * - After connection, a crosshair target for calibration
+ * - Shooting places a red dot at the hit position
+ * - PAUSE button returns to calibration; CURSOR transitions to play
+ *
+ * @par Modules Used
+ * console, input, sprite, dma, text, background
+ *
+ * @see input.h, sprite.h, dma.h, text.h
  */
 
 #include <snes.h>
@@ -13,34 +41,81 @@
 #include <snes/text.h>
 #include <snes/dma.h>
 
-/* Graphics data from data.asm */
+/** @brief Aim target background tile data (2bpp, crosshair pattern) from data.asm */
 extern u8 aim_target_tiles[], aim_target_tiles_end[];
+/** @brief Aim target tilemap (32x32 BG2 layout) from data.asm */
 extern u8 aim_target_map[], aim_target_map_end[];
+/** @brief Aim target palette (BGR555) from data.asm */
 extern u8 aim_target_pal[], aim_target_pal_end[];
+/** @brief Sprite tile data (red dot marker, 4bpp) from data.asm */
 extern u8 sprites_tiles[], sprites_tiles_end[];
+/** @brief Sprite palette (BGR555) from data.asm */
 extern u8 sprites_pal[], sprites_pal_end[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
+/** @brief Waiting for Super Scope to be connected to port 2 */
 #define STATE_DETECT    0
+/** @brief Asking player to shoot screen center for aim offset calibration */
 #define STATE_CALIBRATE 1
+/** @brief Calibrated and tracking fire events; placing red dot markers */
 #define STATE_READY     2
 
+/**
+ * @brief Hide the red dot marker sprite by moving it off-screen.
+ *
+ * Y coordinate 0xE0 (224) is below the NTSC visible area, so the
+ * SNES PPU will not render this sprite. This is cheaper than disabling
+ * the sprite via the OAM high table.
+ */
 static void hideDot(void) {
     oamMemory[1] = 0xE0;
     oam_update_flag = 1;
 }
 
+/**
+ * @brief Show the red dot marker at the given screen coordinates.
+ *
+ * Updates sprite 0's X/Y in the OAM low table and signals the NMI
+ * handler to DMA the OAM buffer to the PPU next VBlank.
+ *
+ * @param x Screen X coordinate (0-255)
+ * @param y Screen Y coordinate (0-223 for visible area)
+ */
 static void showDot(u16 x, u16 y) {
     oamMemory[0] = (u8)x;
     oamMemory[1] = (u8)y;
     oam_update_flag = 1;
 }
 
+/**
+ * @brief Clear the bottom 4 rows of the text overlay (rows 24-27).
+ *
+ * Used to erase status messages when transitioning between states
+ * (detect, calibrate, ready).
+ */
 static void clearBottom(void) {
     textClearRect(0, 24, 32, 4);
 }
 
+/**
+ * @brief Main entry point -- Super Scope detection, calibration, and fire tracking.
+ *
+ * Implements a three-state machine:
+ * - STATE_DETECT: polls scopeInit() / scopeIsConnected() each frame until
+ *   the Super Scope is detected on controller port 2.
+ * - STATE_CALIBRATE: displays a crosshair target on BG2 and waits for the
+ *   player to shoot the center. scopeCalibrate() records the aim offset
+ *   so subsequent coordinate readings are accurate.
+ * - STATE_READY: tracks FIRE events, reads calibrated X/Y via scopeGetX()
+ *   / scopeGetY(), and places a red dot sprite at the hit position. The
+ *   PAUSE button returns to calibration for re-aiming.
+ *
+ * The fire_armed flag prevents stale FIRE events from the previous state
+ * from triggering immediately on state entry.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     u8 state;
     u8 fire_armed;

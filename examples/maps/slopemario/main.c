@@ -1,11 +1,39 @@
 /**
- * Slope Mario — Platformer with slope collision
+ * @file main.c
+ * @brief Platformer with diagonal slope collision detection
+ * @ingroup examples
  *
- * Demonstrates objCollidMapWithSlopes() for diagonal terrain.
- * Mario walks, jumps, and slides on slopes with proper physics.
- * No audio — focuses on slope collision stress testing.
+ * Demonstrates the object engine's objCollidMapWithSlopes() function
+ * for handling diagonal terrain in a tile-based platformer. The SNES
+ * has no hardware support for collision, so slope detection is done in
+ * software by reading tile attribute tables that encode slope angles
+ * per tile (flat, 45-degree, half-slopes).
  *
- * Based on PVSnesLib slopemario example by Nub1604.
+ * Uses the full OpenSNES game stack: map engine for scrolling, object
+ * engine for entity management, and dynamic sprite engine for animated
+ * character rendering. Mario walks, jumps, and slides on slopes with
+ * gravity-based physics.
+ *
+ * Port of the PVSnesLib slopemario example by Nub1604.
+ *
+ * @par SNES Concepts
+ * - Mode 1 with BG1 (tileset) and OBJ (sprites)
+ * - Map engine with tile attribute tables (collision properties per tile)
+ * - Slope collision: objCollidMapWithSlopes() for diagonal terrain
+ * - Object engine: entity lifecycle, update callbacks, physics
+ * - Dynamic sprite engine: animated 16x16 sprite with frame management
+ * - SC_64x32 tilemap for horizontally-scrolling levels
+ *
+ * @par What to Observe
+ * - Mario walks and jumps across terrain with diagonal slopes
+ * - Character follows slope surfaces smoothly (no stair-stepping)
+ * - Camera tracks Mario's position with map scrolling
+ * - Gravity pulls Mario down when airborne
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, map, object
+ *
+ * @see map.h, object.h, sprite.h, background.h
  */
 #include <snes.h>
 #include <snes/map.h>
@@ -13,12 +41,46 @@
 
 #include "mario.h"
 
-extern u8 tileset, tilesetend, tilepal, tilesetdef, tilesetatt;
-extern u8 mapmario, objmario;
+/** @brief BG1 tileset tile data (4bpp) -- start label */
+extern u8 tileset;
+/** @brief BG1 tileset tile data -- end label (for size calculation) */
+extern u8 tilesetend;
+/** @brief BG1 tileset palette (BGR555, 16 colors) */
+extern u8 tilepal;
+/** @brief Tile definition table (maps tile index to visual properties) */
+extern u8 tilesetdef;
+/** @brief Tile attribute table (encodes slope angles and collision flags per tile) */
+extern u8 tilesetatt;
+/** @brief Map data (tile indices for the level layout) */
+extern u8 mapmario;
+/** @brief Object layer data (entity spawn positions and types within the map) */
+extern u8 objmario;
 
-/* ASM function that registers Mario callback with correct bank byte */
+/**
+ * @brief Register Mario's object type callback with correct bank byte.
+ *
+ * Implemented in assembly because the object engine stores function
+ * pointers with bank bytes for cross-bank calls. C cannot express
+ * the `:label` bank-byte operator, so an ASM wrapper is required.
+ */
 extern void objRegisterTypes(void);
 
+/**
+ * @brief Main entry point -- slope collision platformer demo.
+ *
+ * Initializes the map engine with slope-aware collision data, registers
+ * the Mario object type, loads map and object layers, and enters the
+ * game loop. The main loop pipeline is:
+ * 1. mapUpdate()  -- prepare new tile columns during active display
+ * 2. objUpdateAll() -- run physics and collision for all entities
+ * 3. oamInitDynamicSpriteEndFrame() -- finalize sprite tile queue
+ * 4. WaitForVBlank + mapVblank + oamVramQueueUpdate -- flush to VRAM
+ *
+ * objCollidMapWithSlopes() is called internally by Mario's update
+ * callback to handle diagonal terrain traversal.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, &tileset, &tilepal, 0,
