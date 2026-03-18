@@ -12,7 +12,7 @@
 [![C11](https://img.shields.io/badge/language-C11-blue.svg)]()
 [![65816](https://img.shields.io/badge/target-65816-purple.svg)]()
 
-**[Documentation](https://k0b3n4irb.github.io/opensnes/)** · **[Getting Started](https://k0b3n4irb.github.io/opensnes/getting-started.html)** · **[API Reference](https://k0b3n4irb.github.io/opensnes/api/)** · **[Contributing](https://k0b3n4irb.github.io/opensnes/contributing.html)**
+**[Documentation](https://k0b3n4irb.github.io/opensnes/)** · **[Getting Started](https://k0b3n4irb.github.io/opensnes/getting_started.html)** · **[Contributing](https://k0b3n4irb.github.io/opensnes/contributing.html)**
 
 </div>
 
@@ -41,13 +41,13 @@ make
 
 Open `examples/text/hello_world/hello_world.sfc` in [Mesen2](https://www.mesen.ca/) and you're running on a Super Nintendo.
 
-For prerequisites and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting-started.html)**.
+For prerequisites and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting_started.html)**.
 
 ## Examples
 
 41 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
 
-**[Browse all examples](examples/README.md)** · **[Learning path](docs/LEARNING_PATH.md)**
+**[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
 
 ### Supported Platforms
 
