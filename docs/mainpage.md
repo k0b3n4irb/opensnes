@@ -47,9 +47,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage oam -- Sprite attribute memory
 
-## Examples (Source Code)
+## Examples (Annotated Source Code)
 
-See the @ref examples "Examples" group for all 41 annotated example source files.
+See the @ref example_sources "Example Source Code" page for all 41 examples organized by topic, with links to fully documented source files.
 
 ## API Reference
 
