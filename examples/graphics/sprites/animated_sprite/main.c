@@ -1,9 +1,37 @@
 /**
  * @file main.c
- * @brief Animated Sprite Example
+ * @brief Direction-based sprite animation with horizontal flip
+ * @ingroup examples
  *
- * Port of PVSnesLib AnimatedSprite demo.
- * Demonstrates sprite animation with direction states and horizontal flip.
+ * Demonstrates a classic sprite animation pattern: a character sprite with
+ * multiple directional walk cycles (down, up, left, right). Each direction
+ * uses a different row of frames in the sprite sheet, and the left-facing
+ * animation reuses the right-facing frames with the OAM horizontal flip
+ * bit (bit 6 of attribute byte).
+ *
+ * Animation is frame-paced with a configurable delay between tile changes.
+ * The sprite's OAM tile number is updated each frame via oamSet() to point
+ * at the correct frame in the pre-loaded sprite sheet. Movement is
+ * controlled with the D-PAD and clamped to screen boundaries.
+ *
+ * Ported from PVSnesLib AnimatedSprite example.
+ *
+ * @par SNES Concepts
+ * - Sprite animation via OAM tile number updates
+ * - Horizontal flip (OBJ_FLIPX) to mirror sprite frames
+ * - D-PAD input for 4-directional movement
+ * - Frame-paced animation with delay counters
+ *
+ * @par What to Observe
+ * - A 16x16 character sprite that walks in 4 directions with D-PAD
+ * - Walking left mirrors the right-facing animation
+ * - The animation cycles through 3 frames per direction
+ * - The sprite stops animating when no button is pressed
+ *
+ * @par Modules Used
+ * console, sprite, dma, input
+ *
+ * @see sprite.h, input.h, dma.h
  */
 
 #include <snes.h>

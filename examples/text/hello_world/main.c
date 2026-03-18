@@ -1,15 +1,31 @@
 /**
  * @file main.c
- * @brief Hello World - OpenSNES Library Example
+ * @brief Minimal "Hello World" text display using hand-coded 2bpp font tiles
+ * @ingroup examples
  *
- * Demonstrates using the OpenSNES library for basic console functions.
- * Uses:
- * - consoleInit() for hardware initialization
- * - setMode() for video mode
- * - setScreenOn() to enable display
- * - WaitForVBlank() for frame synchronization
+ * The simplest possible SNES program: writes a hand-coded 2bpp bitmap font
+ * into VRAM, builds a tilemap row to spell "HELLO WORLD!", and displays it
+ * on BG1 in Mode 0. No external assets or font library are used -- every
+ * tile is defined as raw bitplane data in a C array, making this example a
+ * good starting point for understanding how the SNES PPU interprets tile
+ * graphics and tilemaps.
  *
- * License: CC0 (Public Domain)
+ * @par SNES Concepts
+ * - 2bpp tile format: each 8x8 tile is 16 bytes (two bitplanes interleaved)
+ * - VRAM tilemap structure: 32x32 entries, each a 16-bit word (tile index + attributes)
+ * - CGRAM palette: two BGR555 colors loaded at palette index 0
+ * - Mode 0: four BG layers, each limited to 4 colors (2bpp)
+ * - DMA transfers for tile data and palette via dmaCopyVram / dmaCopyCGram
+ *
+ * @par What to Observe
+ * - "HELLO WORLD!" rendered in white text on a dark blue background
+ * - The text appears centered at row 14, column 10 of the 32x32 tilemap
+ * - The screen is otherwise blank (tilemap filled with tile 0, the space glyph)
+ *
+ * @par Modules Used
+ * console, sprite, dma, background
+ *
+ * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>

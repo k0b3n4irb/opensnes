@@ -1,14 +1,46 @@
 /**
  * @file main.c
- * @brief LikeMario — Side-Scrolling Platformer
+ * @brief Side-scrolling platformer with scroll streaming and SNESMOD audio
+ * @ingroup examples
  *
- * Port of PVSnesLib's likemario example to OpenSNES.
- * Demonstrates: tile-based map scrolling, sprite animation,
- * physics with gravity, tile collision, camera tracking.
+ * A Mario-style platformer demonstrating the core techniques of a scrolling
+ * SNES game: tile-based map streaming, subpixel physics, tile collision,
+ * camera tracking, animated sprites, and SPC700 music/sound effects via
+ * the SNESMOD audio driver.
  *
- * Controls:
- *   Left/Right - Move Mario
- *   A          - Jump (hold UP for high jump)
+ * The map engine streams one tile column per frame using a prepare/flush
+ * pattern: during active display, the next column is read from ROM into
+ * a RAM buffer (map_prepare_column); during VBlank, a 64-byte DMA writes
+ * it to VRAM (map_flush_column). This keeps VRAM writes within the VBlank
+ * budget. The column at +32 tiles ahead is streamed to cover the 33rd
+ * partial tile at the screen edge.
+ *
+ * Physics use 8.8 fixed-point velocities with arithmetic right shift for
+ * signed values. Collision checks test two probe points per axis against
+ * the tile property table (T_SOLID / T_EMPTY).
+ *
+ * Port of the PVSnesLib likemario example.
+ *
+ * @par SNES Concepts
+ * - Scroll streaming: 1 column/frame prepare-during-display, DMA-in-VBlank
+ * - SC_64x32 tilemap with 64-column wraparound for seamless scrolling
+ * - Subpixel 8.8 fixed-point physics (acceleration, gravity, max velocity)
+ * - Tile collision via property lookup table (tilesetatt)
+ * - Dynamic sprite engine with frame-based animation
+ * - SNESMOD: SPC700 module playback and sound effects
+ * - Assembly DMA loader with bank bytes for SUPERFREE ROM data
+ *
+ * @par What to Observe
+ * - Mario walks left/right with acceleration and deceleration
+ * - Press A to jump (hold UP for a higher jump)
+ * - Camera follows Mario; background scrolls smoothly
+ * - Music plays continuously; a jump sound effect triggers on A press
+ * - Falling off the bottom respawns Mario at the top
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background
+ *
+ * @see background.h, sprite.h, input.h, dma.h, snesmod.h
  */
 
 #include <snes.h>

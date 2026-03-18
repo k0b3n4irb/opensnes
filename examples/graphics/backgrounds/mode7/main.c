@@ -1,16 +1,33 @@
 /**
  * @file main.c
- * @brief Mode 7 — Rotation and Scaling
+ * @brief Mode 7 rotation and scaling demo
+ * @ingroup examples
  *
- * Demonstrates Mode 7 rotation and scaling:
- *   A button:  Rotate clockwise
- *   B button:  Rotate counter-clockwise
- *   UP:        Zoom out (increase scale)
- *   DOWN:      Zoom in (decrease scale)
+ * Demonstrates SNES Mode 7, the hardware affine transformation mode that
+ * applies a 2x2 matrix (rotation + scaling) to a single 128x128 tile
+ * background layer. Mode 7 uses a unique interleaved VRAM format where
+ * tilemap bytes occupy the low bytes and 8bpp tile pixel data occupies
+ * the high bytes of each VRAM word. The transformation matrix is
+ * controlled via registers M7A-M7D, with the library's mode7SetAngle()
+ * and mode7SetScale() computing the sin/cos matrix entries from an
+ * 8-bit angle and 8.8 fixed-point scale factors.
  *
- * Mode 7 uses interleaved VRAM format with tilemap in low bytes
- * and tile pixels in high bytes. Loading is handled by an assembly
- * helper function in data.asm.
+ * @par SNES Concepts
+ * - Mode 7 affine transformation (rotation + scaling via M7A-M7D)
+ * - Interleaved VRAM format (tilemap in low bytes, pixels in high bytes)
+ * - 8.8 fixed-point scale representation
+ * - 8-bit angle for hardware sin/cos lookup
+ *
+ * @par What to Observe
+ * - Press A to rotate the background clockwise
+ * - Press B to rotate counter-clockwise
+ * - Press UP to zoom out (background shrinks, more visible)
+ * - Press DOWN to zoom in (background magnifies)
+ *
+ * @par Modules Used
+ * console, dma, background, sprite, input, mode7
+ *
+ * @see mode7.h, background.h, input.h
  */
 
 #include <snes.h>

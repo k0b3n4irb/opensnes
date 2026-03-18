@@ -1,11 +1,39 @@
 /**
- * Slope Mario — Platformer with slope collision
+ * @file main.c
+ * @brief Platformer with diagonal slope collision detection
+ * @ingroup examples
  *
- * Demonstrates objCollidMapWithSlopes() for diagonal terrain.
- * Mario walks, jumps, and slides on slopes with proper physics.
- * No audio — focuses on slope collision stress testing.
+ * Demonstrates the object engine's objCollidMapWithSlopes() function
+ * for handling diagonal terrain in a tile-based platformer. The SNES
+ * has no hardware support for collision, so slope detection is done in
+ * software by reading tile attribute tables that encode slope angles
+ * per tile (flat, 45-degree, half-slopes).
  *
- * Based on PVSnesLib slopemario example by Nub1604.
+ * Uses the full OpenSNES game stack: map engine for scrolling, object
+ * engine for entity management, and dynamic sprite engine for animated
+ * character rendering. Mario walks, jumps, and slides on slopes with
+ * gravity-based physics.
+ *
+ * Port of the PVSnesLib slopemario example by Nub1604.
+ *
+ * @par SNES Concepts
+ * - Mode 1 with BG1 (tileset) and OBJ (sprites)
+ * - Map engine with tile attribute tables (collision properties per tile)
+ * - Slope collision: objCollidMapWithSlopes() for diagonal terrain
+ * - Object engine: entity lifecycle, update callbacks, physics
+ * - Dynamic sprite engine: animated 16x16 sprite with frame management
+ * - SC_64x32 tilemap for horizontally-scrolling levels
+ *
+ * @par What to Observe
+ * - Mario walks and jumps across terrain with diagonal slopes
+ * - Character follows slope surfaces smoothly (no stair-stepping)
+ * - Camera tracks Mario's position with map scrolling
+ * - Gravity pulls Mario down when airborne
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, map, object
+ *
+ * @see map.h, object.h, sprite.h, background.h
  */
 #include <snes.h>
 #include <snes/map.h>

@@ -1,19 +1,35 @@
 /**
  * @file main.c
- * @brief SNES Mouse Demo
+ * @brief SNES mouse input with cursor sprite, buttons, and sensitivity
+ * @ingroup examples
  *
- * Demonstrates SNES mouse input: cursor movement, button detection,
- * and sensitivity control.
+ * Demonstrates the SNES Mouse peripheral connected to controller port 1.
+ * The SNES mouse is a standard serial device that reports relative X/Y
+ * deltas and two buttons each frame via the auto-joypad read registers.
+ * This example accumulates the deltas into absolute screen coordinates
+ * and drives a 16x16 hardware sprite as a cursor.
  *
- * Controls (mouse on port 1):
- *   - Move mouse: cursor position displayed as text
- *   - Left click: cycle background color
- *   - Right click: cycle sensitivity
+ * The mouse supports three sensitivity levels (low, medium, high) that
+ * scale the delta values. Sensitivity is toggled by right-clicking.
+ * If no mouse is detected at startup, a diagnostic message is shown.
  *
- * If no mouse is detected, a message is displayed.
+ * @par SNES Concepts
+ * - Mouse peripheral detection and initialization via auto-joypad
+ * - Relative-to-absolute coordinate accumulation from mouse deltas
+ * - Sensitivity control (hardware-level scaling of mouse movement)
+ * - Sprite used as a cursor overlay on a text background
  *
- * @author OpenSNES Team
- * @copyright MIT License
+ * @par What to Observe
+ * - A 16x16 cursor sprite follows mouse movement on screen
+ * - Left click changes the background color to blue
+ * - Right click cycles sensitivity (LOW / MED / HIGH)
+ * - Button states ("PRESSED") appear next to L-click / R-click labels
+ * - Without a mouse connected, a "No mouse detected" message appears
+ *
+ * @par Modules Used
+ * console, input, sprite, dma, text, background
+ *
+ * @see input.h, sprite.h, dma.h, text.h
  */
 
 #include <snes.h>

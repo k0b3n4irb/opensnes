@@ -1,15 +1,37 @@
 /**
  * @file main.c
- * @brief HDMA Wave — Scanline Distortion Effect
+ * @brief HDMA-driven sinusoidal wave distortion on background
+ * @ingroup examples
  *
- * A: toggle wave on/off
- * D-pad LEFT/RIGHT: decrease/increase amplitude
- * D-pad UP: start wave animation
- * D-pad DOWN: stop wave animation
+ * Creates a wavy horizontal distortion effect by using HDMA to write
+ * per-scanline BG1 horizontal scroll offsets (BG1HOFS, $210D). A set of
+ * 7 pre-computed sine tables at increasing amplitudes (0 to 24 pixels) are
+ * stored in ROM, each containing 335 entries (224 visible scanlines + 111
+ * wrap entries for smooth phase animation). HDMA channel 6 is configured
+ * in write-twice mode (1REG_2X) to write both the low and high bytes of
+ * BG1HOFS each scanline. When animation is enabled, the table pointer
+ * advances by 3 bytes per frame (one HDMA entry), cycling through the
+ * wrap portion to create continuous wave motion. The background consists
+ * of simple alternating solid/empty tiles to make the distortion clearly
+ * visible.
  *
- * 7 amplitude levels (0, 4, 8, 12, 16, 20, 24 pixels).
- * 335-entry tables (224 visible + 111 wrap) for smooth animation.
- * All tables pre-computed in ROM using repeat-mode HDMA entries.
+ * @par SNES Concepts
+ * - HDMA write-twice mode (1REG_2X) targeting BG1HOFS ($210D)
+ * - Per-scanline horizontal scroll offset for wave distortion
+ * - Repeat-mode HDMA entries (bit 7 set = write every scanline)
+ * - Pre-computed sine tables with wrap region for seamless animation
+ * - Bare-metal VRAM and CGRAM writes (no library DMA helpers)
+ *
+ * @par What to Observe
+ * - Press A to toggle the wave effect on/off
+ * - Press LEFT/RIGHT to decrease/increase wave amplitude (7 levels)
+ * - Press UP to start wave animation (the wave scrolls vertically)
+ * - Press DOWN to stop animation (wave freezes in place)
+ *
+ * @par Modules Used
+ * console, dma, sprite, input, hdma
+ *
+ * @see hdma.h, input.h, video.h
  */
 #include <snes.h>
 #include <snes/console.h>

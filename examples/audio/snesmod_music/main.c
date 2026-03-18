@@ -1,15 +1,35 @@
 /**
  * @file main.c
- * @brief SNESMOD Music — Tracker Music Playback
+ * @brief Tracker music playback with transport controls via SNESMOD
+ * @ingroup examples
  *
- * Demonstrates tracker-based music playback using SNESMOD.
+ * Plays an Impulse Tracker (.it) module through the SPC700 sound processor
+ * using the SNESMOD library. The module is converted at build time by
+ * smconv into a soundbank that gets uploaded to the SPC700's 64 KB audio
+ * RAM. Once loaded, snesmodPlay() starts playback and snesmodProcess()
+ * must be called every frame to feed new pattern data to the sound driver.
  *
- * Controls:
- *   A      - Play music
- *   B      - Stop music
- *   X      - Pause/Resume
- *   L/R    - Volume down/up
- *   START  - Fade out
+ * The example provides a full set of transport controls (play, stop,
+ * pause/resume, volume, fade out) and displays them on-screen using a
+ * hand-coded 2bpp bitmap font.
+ *
+ * @par SNES Concepts
+ * - SPC700 audio subsystem: separate 65C816 coprocessor with its own 64 KB RAM
+ * - SNESMOD workflow: snesmodInit() -> snesmodSetSoundbank() -> snesmodLoadModule() -> snesmodPlay()
+ * - Per-frame snesmodProcess() call to stream pattern data to the SPC700
+ * - Module volume control and fade effects via snesmodSetModuleVolume / snesmodFadeVolume
+ * - Build pipeline: .it file -> smconv -> soundbank.asm + soundbank.h
+ *
+ * @par What to Observe
+ * - Music begins playing immediately on boot (the "pollen8" module)
+ * - Press A to restart, B to stop, X to pause/resume
+ * - L/R adjusts volume in steps of 10; START triggers a gradual fade-out
+ * - Text HUD on dark blue background shows available controls
+ *
+ * @par Modules Used
+ * console, sprite, dma, input
+ *
+ * @see snesmod.h, dma.h, video.h
  */
 
 #include <snes.h>

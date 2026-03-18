@@ -1,21 +1,36 @@
 /**
  * @file main.c
- * @brief Transparent Window Example
+ * @brief Semi-transparent darkened rectangle via HDMA windows and color math
+ * @ingroup examples
  *
- * Demonstrates a semi-transparent rectangle using SNES color math combined
- * with HDMA-driven window boundaries. A darkened rectangle is rendered over
- * a background image — no input, static effect.
+ * Combines two SNES hardware features to render a darkened rectangle over a
+ * background image. HDMA drives the window position registers WH0 ($2126)
+ * and WH1 ($2127) every scanline to define the rectangle boundaries. The
+ * color math unit is configured to subtract a fixed color intensity inside
+ * the window region only (CGWSEL bit 5-4 = 01), producing a tinted overlay.
+ *
+ * The HDMA tables use repeat mode (bit 7 set in the line count byte) because
+ * WH0/WH1 are write-only registers that must be refreshed every scanline,
+ * even when the window position is constant across the rectangle height.
  *
  * Ported from PVSnesLib "TransparentWindow" example by Digifox.
+ * Uses bare-metal register writes to match PVSnesLib behavior exactly.
  *
- * Technique:
- *   - HDMA drives WH0/WH1 to define a rectangle per scanline
- *   - Window is enabled for color math only (not for BG masking)
- *   - Color math subtracts a fixed color inside the window region
- *   - Result: the rectangle area appears darkened/tinted
+ * @par SNES Concepts
+ * - HDMA repeat mode for per-scanline window boundary updates
+ * - Window registers WH0/WH1 ($2126/$2127) defining a rectangular region
+ * - Color math subtraction inside the window region (CGWSEL/CGADSUB)
+ * - Fixed color source (COLDATA, $2132) for darkening intensity
  *
- * BARE-METAL register writes to match PVSnesLib exactly.
- * HDMA tables use REPEAT MODE (per-scanline data) as required by WH0/WH1.
+ * @par What to Observe
+ * - A background image with a darkened rectangle overlaid in the center
+ * - The effect is static; no input is required
+ * - The rectangle edges are pixel-sharp (HDMA-defined per scanline)
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, window, colormath, hdma, math
+ *
+ * @see hdma.h, colormath.h, video.h
  */
 
 #include <snes.h>

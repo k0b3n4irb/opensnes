@@ -1,17 +1,37 @@
-/*
- * Object Size Demo
+/**
+ * @file main.c
+ * @brief Interactive demo of all six SNES OBJ size modes
+ * @ingroup examples
  *
- * Interactive menu to switch between all 6 SNES sprite size modes.
- * UP/DOWN selects the mode, each mode shows a small and large sprite.
+ * The SNES PPU supports six sprite size combinations, configured globally
+ * via the OBJSEL register ($2101, bits 7-5). Each mode defines a "small"
+ * and "large" size that all 128 OAM entries share. Individual sprites
+ * select small or large via bit 1 of their OAM high-table entry.
  *
- * VRAM layout:
- *   $0000  Font tiles (4bpp, loaded by textLoadFont4bpp)
- *   $3800  BG1 tilemap (text, 32x32)
- *   $4000  Sprite name base (OBJ_BASE = 2)
- *   $4100  Small sprite tiles (tile $10 from name base)
- *   $4500  Large sprite tiles (tile $50 from name base)
+ * This example provides a text menu (UP/DOWN to navigate) that cycles
+ * through all six modes: 8/16, 8/32, 8/64, 16/32, 16/64, 32/64. Each
+ * selection reloads the appropriate sprite tiles via DMA under force blank
+ * (large sprites like 64x64 exceed the ~4KB VBlank DMA budget) and
+ * displays one small and one large sprite side by side.
  *
- * Based on PVSnesLib example.
+ * Based on PVSnesLib ObjectSize example.
+ *
+ * @par SNES Concepts
+ * - OBJSEL register ($2101): 6 size modes (bits 7-5) and name base (bits 1-0)
+ * - OAM high table size bit: selects small or large per sprite
+ * - Force blank for large VRAM transfers that exceed VBlank DMA budget
+ * - Sprite tile numbering relative to the OBJSEL name base address
+ *
+ * @par What to Observe
+ * - A text menu listing all 6 size combinations with a cursor
+ * - Press UP/DOWN to select a mode
+ * - One small sprite (left) and one large sprite (right) are shown
+ * - Notice how the same tile data renders at different pixel sizes
+ *
+ * @par Modules Used
+ * console, sprite, dma, text, text4bpp, input, background
+ *
+ * @see sprite.h, dma.h, input.h, video.h
  */
 
 #include <snes.h>

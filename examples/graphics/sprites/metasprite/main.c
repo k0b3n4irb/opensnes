@@ -1,13 +1,38 @@
 /**
  * @file main.c
- * @brief Metasprite Demo — Multi-Size Sprite Composition
+ * @brief Metasprite composition with switchable OBJ size modes
+ * @ingroup examples
  *
- * Demonstrates metasprites: large characters composed of multiple
- * hardware sprites. Three OBJ size modes selectable via D-PAD.
+ * Demonstrates metasprites: large characters built from multiple hardware
+ * OAM entries using oamDrawMeta(). The SNES OBJSEL register ($2101)
+ * provides two sprite sizes (small and large) that all 128 OAM entries
+ * share. This example lets the user switch between three size combinations
+ * to see how the same character is composed from differently-sized pieces.
  *
- * Mode 0: Small=8x8,  Large=16x16 — hero16 + hero8
- * Mode 1: Small=8x8,  Large=32x32 — hero32 + hero8
- * Mode 2: Small=16x16, Large=32x32 — hero32 + hero16
+ * Three sprite sheets (8x8, 16x16, 32x32) are pre-loaded to contiguous
+ * VRAM. The gfx4snes -T flag transposes the sprite sheet tiles into SNES
+ * OBJ VRAM layout, and the -P flag generates metasprite frame definitions
+ * (tile offsets + positions) included as C arrays.
+ *
+ * When the OBJ size mode changes, OBJSEL and OAM must be updated atomically
+ * within the same VBlank to avoid one frame of garbled sprites.
+ *
+ * @par SNES Concepts
+ * - OBJSEL ($2101) size modes: 6 combinations of small/large sprite sizes
+ * - Metasprite rendering: composing large characters from multiple OAM entries
+ * - Atomic OBJSEL + OAM update within a single VBlank
+ * - Transposed sprite sheet layout for SNES OBJ VRAM (gfx4snes -T)
+ *
+ * @par What to Observe
+ * - Two characters displayed: one large, one small
+ * - Press UP/DOWN to switch between 3 OBJ size modes
+ * - The on-screen text menu shows the current small/large sizes
+ * - Observe how the same character is recomposed with different tile sizes
+ *
+ * @par Modules Used
+ * console, sprite, dma, text, text4bpp, background, input
+ *
+ * @see sprite.h, dma.h, input.h
  */
 
 #include <snes.h>

@@ -1,25 +1,44 @@
-/*
- * DynamicMap
+/**
+ * @file main.c
+ * @brief Tilemap-based sprite engine with 32x32 and 64x64 map modes
+ * @ingroup examples
  *
- * Create and update 16x16 sprites in RAM on a 32x32 or 64x64 map.
- * Sprites are drawn as tilemap entries on BG1 (Mode 3, 256 colors).
- * Text overlay on BG2 shows controls.
+ * Demonstrates a custom tilemap sprite engine where 16x16 "sprites" are
+ * drawn as background tile entries on BG1 in Mode 3 (8bpp, 256 colors).
+ * This technique allows hundreds of on-screen objects without hitting the
+ * 128-hardware-sprite limit, at the cost of tile-aligned positioning.
  *
- * Includes a C64-to-SNES sprite format converter.
+ * The tilemap buffer lives in bank $7E extended WRAM (above the 8KB
+ * low-WRAM limit) and is accessed via assembly helpers (smapWrite,
+ * smapRead, smapDma) because the compiler generates `sta.l $0000,x`
+ * which always reads bank $00. Tilemap DMA to VRAM uses the 1-page-per-
+ * VBlank pattern (2KB per frame) to avoid flicker.
  *
- * Port of PVSnesLib DynamicMap example.
+ * Also includes a C64-to-SNES 8bpp sprite format converter that
+ * demonstrates bitplane interleaving for the SNES graphics format.
  *
- * Key adaptation: The tilemap buffer lives in bank $7E extended WRAM,
- * accessed via assembly helpers (smapWrite/smapRead/smapDma) because
- * the compiler generates sta.l $0000,x (bank $00 only, 8KB limit).
- * Sprite graphics are DMA'd directly from ROM to VRAM.
+ * Port of the PVSnesLib DynamicMap example.
  *
- * Controls:
- *   A     = Toggle 32x32 / 64x64 map mode
- *   B     = Toggle scroll lock
- *   X     = Place random sprite
- *   Y     = Convert C64 sprite (Boulder Dash Rockford)
- *   D-PAD = Scroll map
+ * @par SNES Concepts
+ * - Mode 3: 8bpp BG1 (256 colors) + 4bpp BG2 (text overlay)
+ * - Extended WRAM ($7E:2000+) for large tilemap buffers
+ * - SC_64x64 tilemap layout (4 nametable pages, 8KB total)
+ * - 1-page-per-VBlank DMA pattern for flicker-free tilemap updates
+ * - 8bpp bitplane format and C64-to-SNES pixel conversion
+ * - 16x16 tile mode (BG1_TSIZE16x16) for 64x64 map variant
+ *
+ * @par What to Observe
+ * - A gargoyle sprite border frames the map area
+ * - A = toggle between 32x32 and 64x64 map modes
+ * - B = toggle scroll lock on/off
+ * - X = place gargoyle sprites at random positions
+ * - Y = display a converted C64 Boulder Dash Rockford sprite
+ * - D-pad = scroll the map (respects scroll lock bounds)
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, text, text4bpp, input
+ *
+ * @see background.h, dma.h, input.h, text.h
  */
 
 #include <snes.h>

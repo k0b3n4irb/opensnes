@@ -1,14 +1,29 @@
 /**
  * @file main.c
- * @brief Mosaic — Pixelation and Fade Transitions
+ * @brief Mosaic and fade screen transition effects
+ * @ingroup examples
  *
- * Demonstrates fade and mosaic screen transition effects.
- * Press any button to advance to the next effect step:
- *   1. Fade out (screen goes black)
- *   2. Fade in (screen returns)
- *   3. Mosaic out (pixels get bigger)
- *   4. Mosaic in (pixels return to normal)
- *   (loops)
+ * Demonstrates two SNES screen transition techniques: brightness fading and
+ * the hardware mosaic filter. Brightness fading uses register $2100 (INIDISP)
+ * to ramp the master brightness from 0 (black) to 15 (full) over multiple
+ * frames. The mosaic effect uses register $2106 (MOSAIC) to progressively
+ * enlarge the pixel blocks on selected BG layers, creating a pixelation
+ * effect commonly used in RPG battle transitions.
+ *
+ * @par SNES Concepts
+ * - Master brightness fading via setBrightness() (register $2100)
+ * - Hardware mosaic filter via mosaicEnable() / mosaicFadeIn/Out() (register $2106)
+ * - Frame-paced transitions using WaitForVBlank() timing
+ *
+ * @par What to Observe
+ * - Press any button to cycle through 4 effects: fade out, fade in,
+ *   mosaic out (pixels enlarge), mosaic in (pixels shrink back)
+ * - The cycle repeats indefinitely
+ *
+ * @par Modules Used
+ * console, dma, background, sprite, input, mosaic
+ *
+ * @see video.h, mosaic.h, background.h
  */
 
 #include <snes.h>

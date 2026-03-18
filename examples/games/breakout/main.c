@@ -1,31 +1,47 @@
 /**
  * @file main.c
- * @brief Breakout Game - A Complete SNES Game Example
+ * @brief Breakout game with brick collision, paddle physics, and level cycling
+ * @ingroup examples
  *
- * This game demonstrates core SNES development concepts:
+ * A complete Breakout game demonstrating how multiple SNES subsystems work
+ * together in a real game. The playfield uses background tiles (not sprites)
+ * for bricks, enabling 100 on-screen bricks without hitting the 128-sprite
+ * hardware limit. The paddle and ball are hardware sprites with shadow
+ * sprites for depth effect.
  *
- * VIDEO SYSTEM:
- * - Mode 1 (most common SNES mode): BG1 4bpp, BG3 2bpp, sprites
- * - VRAM tilemap overlap to save memory
- * - Palette cycling for level progression
+ * Key technical patterns: RAM tilemap buffers for runtime brick destruction,
+ * overlapping BG1/BG3 tilemaps in VRAM to save memory (requiring atomic
+ * dual-DMA updates), palette cycling for per-level color variation, and
+ * direct oamMemory[] writes instead of oamSet() for performance (10 sprites
+ * per frame would cause visible slowdown with oamSet's 158-byte stack frame).
  *
- * SPRITES:
- * - Multi-sprite paddle (4 tiles with shadows)
- * - Ball with shadow for depth effect
- * - Secondary name table access (tile | 256)
+ * Ball bounce angle varies by paddle hit zone (4 zones), creating the
+ * classic Breakout aiming mechanic. Scoring uses level multipliers.
  *
- * TILEMAPS:
- * - RAM buffer pattern for runtime modification
- * - Bricks as background tiles (not sprites)
- * - Text rendering via tilemap writes
+ * Based on SNES SDK game by Ulrich Hecht, PVSnesLib port by alekmaul.
  *
- * DMA:
- * - Atomic VRAM updates for overlapping tilemaps
- * - Palette DMA for color cycling
+ * @par SNES Concepts
+ * - Mode 1: BG1 (4bpp playfield), BG3 (2bpp background pattern), OBJ sprites
+ * - Overlapping VRAM tilemaps (BG1 at $0000, BG3 at $0400 share $0400-$07FF)
+ * - Atomic dual-DMA: both tilemaps uploaded in same VBlank to prevent flicker
+ * - RAM tilemap buffers for runtime modification (brick destruction, HUD)
+ * - Palette cycling: 7 color sets rotated per level via CGRAM DMA
+ * - Direct oamMemory[] writes for 10 sprites (ball + paddle + shadows)
+ * - Secondary sprite name table access (tile | 256 for VRAM $2000+)
+ * - Force blank for bulk VRAM uploads exceeding VBlank DMA budget
  *
- * Based on SNES SDK game by Ulrich Hecht
- * PVSnesLib port by alekmaul
- * OpenSNES port
+ * @par What to Observe
+ * - Press START to begin; paddle moves with D-pad (hold A for speed boost)
+ * - Ball bounces off walls, paddle, and bricks with angled deflection
+ * - Bricks disappear on hit; score and high score update in the HUD
+ * - Background color changes each level (palette cycling)
+ * - Shadow sprites create a subtle depth effect under ball and paddle
+ * - START pauses/unpauses the game
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, input
+ *
+ * @see sprite.h, dma.h, background.h, input.h
  */
 
 #include <snes.h>

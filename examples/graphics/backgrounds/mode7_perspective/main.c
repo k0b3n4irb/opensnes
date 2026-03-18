@@ -1,22 +1,34 @@
 /**
  * @file main.c
- * @brief Mode 7 Perspective — F-Zero Style Pseudo-3D Ground
+ * @brief Mode 7 perspective with HDMA split-screen (F-Zero style)
+ * @ingroup examples
  *
- * Ported from PVSnesLib Mode7Perspective by mills32 / alekmaul
+ * Creates an F-Zero-style pseudo-3D ground plane by combining two BG modes
+ * on a single screen using HDMA mid-frame register switching. The top portion
+ * (96 scanlines) displays a Mode 3 sky background, while the bottom portion
+ * (128 scanlines) renders a Mode 7 ground plane with per-scanline perspective
+ * scaling. Four HDMA channels cooperate each frame: one switches BGMODE from
+ * Mode 3 to Mode 7 at the split line, another toggles the main screen layer
+ * enable (BG2 for sky, BG1 for ground), and two more write per-scanline M7A
+ * and M7D values to create the perspective foreshortening effect where distant
+ * rows appear more compressed.
  *
- * Uses HDMA to create a split-screen effect:
- *   - Top: Mode 3 sky background (96 scanlines)
- *   - Bottom: Mode 7 ground with per-scanline perspective scaling (128 scanlines)
+ * @par SNES Concepts
+ * - Mid-frame BG mode switching via HDMA (Mode 3 sky + Mode 7 ground)
+ * - Per-scanline M7A/M7D writes for perspective projection
+ * - HDMA-driven main screen layer enable toggling
+ * - Mode 7 ground plane scrolling with D-pad input
+ * - Multi-channel HDMA coordination (4 channels synchronized)
  *
- * Controls:
- *   D-PAD: Scroll the ground plane
+ * @par What to Observe
+ * - The screen is split: a flat sky image on top and a perspective ground below
+ * - Press D-pad to scroll the ground plane in any direction
+ * - Distant ground rows appear more compressed (perspective foreshortening)
  *
- * Technique:
- *   4 HDMA channels run every frame:
- *     Ch1: Switches BGMODE from Mode 3 (sky) to Mode 7 (ground)
- *     Ch2: Switches main screen enable (BG2 for sky, BG1 for ground)
- *     Ch3: Per-scanline M7A (horizontal scale) for perspective
- *     Ch4: Per-scanline M7D (vertical scale) for perspective
+ * @par Modules Used
+ * console, dma, background, sprite, input, mode7
+ *
+ * @see mode7.h, hdma.h, background.h, input.h
  */
 
 #include <snes.h>

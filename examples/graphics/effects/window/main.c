@@ -1,19 +1,38 @@
 /**
  * @file main.c
- * @brief HDMA Triangle Window Example
+ * @brief HDMA-driven triangle window masking on selectable BG layers
+ * @ingroup examples
  *
- * Demonstrates HDMA-driven window masking to create a triangle shape
- * that reveals portions of the background. Two backgrounds are loaded;
- * press A/X/B to apply the window to BG1, BG2, or both.
+ * Demonstrates the SNES window masking hardware combined with HDMA to create
+ * a triangle-shaped cutout that clips background layers. Two backgrounds
+ * are loaded (BG1 and BG2), and the user can apply the window mask to either
+ * or both layers via button presses.
+ *
+ * HDMA channels 4 and 5 drive WH0 ($2126) and WH1 ($2127) in repeat mode,
+ * updating the left and right window boundaries every scanline to form a
+ * diamond/triangle shape. The W12SEL register ($2123) controls which BG
+ * layers are affected by Window 1, with the invert bit set so pixels
+ * outside the triangle are masked (clipped to black).
  *
  * Ported from PVSnesLib "Window" example.
+ * Uses bare-metal register writes to match PVSnesLib behavior exactly.
  *
- * BARE-METAL register writes to match PVSnesLib exactly.
+ * @par SNES Concepts
+ * - Window masking via W12SEL ($2123) and TMW ($212E) registers
+ * - HDMA repeat mode for per-scanline WH0/WH1 updates
+ * - Window inversion (mask outside vs inside the region)
+ * - Runtime window reconfiguration via register writes
  *
- * Controls:
- *   A: Window on BG1 only
- *   X: Window on BG2 only
- *   B: Window on both BG1 and BG2
+ * @par What to Observe
+ * - A triangle/diamond shape masks portions of the background layers
+ * - Press A to apply window to BG1 only
+ * - Press X to apply window to BG2 only
+ * - Press B to apply window to both BG1 and BG2
+ *
+ * @par Modules Used
+ * console, sprite, dma, input, background, window, hdma, math
+ *
+ * @see hdma.h, video.h, background.h
  */
 
 #include <snes.h>

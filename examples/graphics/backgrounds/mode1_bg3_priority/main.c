@@ -1,19 +1,36 @@
-/*
- * Mode 1 BG3 High Priority
+/**
+ * @file main.c
+ * @brief Mode 1 BG3 high-priority overlay for HUD-style layering
+ * @ingroup examples
  *
- * Demonstrates using BG3 as a high-priority HUD layer in Mode 1.
- * BG3 overlays BG1 and BG2, making it ideal for status bars and HUDs.
+ * Demonstrates the Mode 1 BG3 priority bit, which promotes the normally
+ * lowest-priority 2bpp layer to render above BG1 and BG2. This hardware
+ * feature is how most SNES games implement status bars and HUDs that
+ * overlay the gameplay scene without using sprites. Three separate
+ * backgrounds are loaded: BG1 and BG2 provide the scene (4bpp, 16 colors
+ * each with separate palette banks), while BG3 (2bpp, 4 colors) draws on
+ * top of everything when BG3_MODE1_PRIORITY_HIGH is set in setMode().
  *
- * VRAM layout:
- *   $0000  BG1 tilemap (2048 bytes)
- *   $0400  BG2 tilemap (2048 bytes)
- *   $0800  BG3 tilemap (2048 bytes)
- *   $2000  BG1 tiles (4bpp)
- *   $3000  BG2 tiles (4bpp)
- *   $4000  BG3 tiles (2bpp)
+ * Based on the PVSnesLib example by odelot. Backgrounds inspired by
+ * Streets of Rage 2.
  *
- * Based on PVSnesLib example by odelot.
- * Backgrounds inspired by Streets of Rage 2.
+ * @par SNES Concepts
+ * - BG3 priority bit (BG3_MODE1_PRIORITY_HIGH): promotes BG3 above BG1+BG2
+ * - Mode 1 layer depths: normally BG1 > BG2 > BG3, but priority bit inverts BG3
+ * - Multi-layer VRAM layout with separate tilemap and tile regions per BG
+ * - Palette banking via bgInitTileSet() palette offset parameter (e.g., 2, 4 for 32/64-byte CGRAM offsets)
+ * - VRAM layout: tilemaps at $0000/$0400/$0800, tiles at $2000/$3000/$4000
+ *
+ * @par What to Observe
+ * - Three background layers visible simultaneously
+ * - BG3 (the HUD/overlay layer) renders on top of BG1 and BG2
+ * - Each layer uses a different palette bank (no color sharing between layers)
+ * - The scene is static (no scrolling or animation)
+ *
+ * @par Modules Used
+ * console, sprite, dma, background
+ *
+ * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>

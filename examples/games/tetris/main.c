@@ -1,14 +1,50 @@
 /**
  * @file main.c
- * @brief Tetris — Game loop, state machine, input (DAS), gravity
+ * @brief Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio
+ * @ingroup examples
  *
- * Mode 1, 3-layer architecture:
- *   BG1 (4bpp): Playfield — border + locked blocks + falling piece
- *   BG2 (4bpp): HUD — labels, score/level/lines, next piece preview
- *   BG3 (2bpp): Message overlay — PRESS START, PAUSED, GAME OVER
+ * A full Tetris implementation demonstrating a 3-layer Mode 1 architecture
+ * where each BG layer serves a distinct purpose: BG1 (4bpp) renders the
+ * playfield with border, locked blocks, and falling piece; BG2 (4bpp)
+ * displays the HUD with score, level, lines, and next piece preview;
+ * BG3 (2bpp) provides a message overlay (PRESS START, PAUSED, GAME OVER)
+ * that floats above the playfield using MODE1_PRIORITY_HIGH.
  *
- * BG3 with MODE1_PRIORITY_HIGH makes messages float above the playfield.
- * Dirty flags minimize DMA: only changed layers are flushed per VBlank.
+ * Input uses NES-authentic Delayed Auto Shift (DAS): an initial delay of
+ * 16 frames before auto-repeat kicks in at 6-frame intervals. Gravity
+ * follows the NES NTSC speed table (48 frames/drop at level 0 down to
+ * 1 frame/drop at level 29+). Scoring uses NES multipliers.
+ *
+ * The renderer uses dirty flags to minimize VBlank DMA -- only changed
+ * layers are flushed each frame. Heavy DMA frames (line clear completion,
+ * game over) use force blank to guarantee all VRAM writes succeed.
+ * An HDMA gradient provides a color wash effect on the background.
+ *
+ * @par SNES Concepts
+ * - Mode 1 three-layer architecture (playfield / HUD / message overlay)
+ * - BG3 priority bit for floating overlay above 4bpp layers
+ * - Dirty-flag DMA: selective per-layer VRAM updates each VBlank
+ * - Force blank for heavy multi-layer DMA (BG1+BG2+BG3 > 4KB)
+ * - HDMA gradient effect on background palette
+ * - Delayed Auto Shift (DAS) for responsive piece movement
+ * - NES gravity speed table and scoring system
+ * - SNESMOD: SPC700 music playback (Tetris theme)
+ * - State machine: TITLE, PLAYING, LINE_CLEAR, GAME_OVER
+ * - Screen shake effect during line clear animation
+ *
+ * @par What to Observe
+ * - Rainbow-cycling "PRESS START" on the title screen
+ * - Pieces fall with increasing speed as level rises
+ * - D-pad moves pieces (DAS auto-repeat after holding); A/B rotates
+ * - Completed lines flash and shake the screen before clearing
+ * - Score, level, and line count update in the right-side HUD
+ * - Next piece preview shows the upcoming tetromino
+ * - START pauses with a "PAUSED" overlay; GAME OVER cycles rainbow text
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, input
+ *
+ * @see background.h, dma.h, input.h, snesmod.h
  */
 
 #include <snes.h>

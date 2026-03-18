@@ -1,11 +1,34 @@
 /**
  * @file main.c
- * @brief Mode 0 — 4-Layer 2bpp Background Demo
+ * @brief Mode 0 parallax scrolling with four independent 2bpp backgrounds
+ * @ingroup examples
  *
- * Demonstrates BG Mode 0 (four 4-color backgrounds, 2bpp each).
- * Each BG uses a separate 4-color palette and has independent scrolling.
+ * Showcases BG Mode 0, the only SNES video mode that provides four
+ * simultaneous background layers. Each layer is limited to 4 colors (2bpp),
+ * giving a total of 16 on-screen palette entries across four independent
+ * palette banks. The four layers are loaded from separate BMP assets and
+ * scroll horizontally at different speeds every 3 frames, creating a
+ * parallax depth effect.
  *
- * Ported from PVSnesLib "Mode0" example.
+ * This is a direct port of the PVSnesLib "Mode0" example.
+ *
+ * @par SNES Concepts
+ * - Mode 0: four BG layers, each 2bpp (4 colors), each with its own palette bank
+ * - Palette banking: BG0 uses palette 0-3, BG1 uses 4-7, BG2 uses 8-11, BG3 uses 12-15
+ * - bgInitTileSet() loads tiles, palette, and configures the tile base address in one call
+ * - Independent per-layer scrolling via bgSetScroll() for parallax effects
+ * - VRAM layout: four separate tilemap regions ($0000/$0400/$0800/$0C00) and tile regions
+ *
+ * @par What to Observe
+ * - Four layered backgrounds visible simultaneously
+ * - BG1-BG3 scroll horizontally at different speeds (3x, 2x, 1x) for parallax
+ * - BG0 (frontmost) remains stationary
+ * - Each layer uses a distinct 4-color palette
+ *
+ * @par Modules Used
+ * console, dma, background
+ *
+ * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>

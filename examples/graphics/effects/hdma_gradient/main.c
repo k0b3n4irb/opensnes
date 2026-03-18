@@ -1,14 +1,33 @@
 /**
- * HDMA Gradient — Brightness gradient effect using HDMA
+ * @file main.c
+ * @brief HDMA brightness gradient on an 8bpp Mode 3 background
+ * @ingroup examples
  *
- * Demonstrates HDMA writing to the INIDISP register ($2100) to create
- * a vertical brightness gradient across the screen. Press A to cycle
- * through 15 different gradient levels. Press B to reset.
+ * Demonstrates a vertical brightness gradient using HDMA writes to the
+ * INIDISP register ($2100). Each scanline group receives a different
+ * brightness level (0-15), creating a smooth fade from full brightness
+ * at the top to darkness at the bottom. The hdmaBrightnessGradient()
+ * library helper builds the HDMA table at runtime, interpolating between
+ * a top brightness and a bottom brightness across 224 scanlines. The
+ * background is an 8bpp Mode 3 image loaded via an assembly DMA helper
+ * (required because the 32KB tile data spans multiple ROM banks, and
+ * the C-level dmaCopyVram() hardcodes bank $00).
  *
- * Mode 3 (256 colors, 8bpp BG1) with a large tiled image.
+ * @par SNES Concepts
+ * - HDMA writing to INIDISP ($2100) for per-scanline brightness control
+ * - hdmaBrightnessGradient() library helper for runtime table generation
+ * - Mode 3 (8bpp, 256-color) background rendering
+ * - Assembly DMA loader for multi-bank ROM data (SUPERFREE sections)
  *
- * Based on PVSnesLib HDMAGradient example by Alekmaul.
- * Uses hdmaBrightnessGradient() library helper.
+ * @par What to Observe
+ * - Press A repeatedly to cycle through gradient levels (top stays bright, bottom darkens)
+ * - Press B to stop the gradient and restore full uniform brightness
+ * - The 8bpp background image displays in full 256-color detail
+ *
+ * @par Modules Used
+ * console, dma, background, sprite, hdma, input, math
+ *
+ * @see hdma.h, video.h, background.h, input.h
  */
 #include <snes.h>
 #include <snes/console.h>

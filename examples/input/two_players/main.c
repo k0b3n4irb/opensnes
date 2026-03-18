@@ -1,13 +1,32 @@
 /**
  * @file main.c
- * @brief Two Players Demo
+ * @brief Two-player simultaneous input with independent sprites
+ * @ingroup examples
  *
- * Demonstrates reading two controllers simultaneously.
- * Each player controls their own sprite with the D-pad.
+ * Demonstrates reading two SNES controllers simultaneously via the
+ * auto-joypad registers. The NMI handler reads both ports every frame,
+ * and padHeld(0) / padHeld(1) return the held-button bitmasks for each
+ * player. Each player controls an independent 8x8 sprite with the D-pad.
  *
- * Controls:
- *   Player 1 (Controller 1): D-pad moves blue sprite
- *   Player 2 (Controller 2): D-pad moves red sprite
+ * Sprite tiles are defined inline as constant data (a solid 4bpp square),
+ * and two palettes (blue for Player 1, red for Player 2) are loaded to
+ * separate CGRAM sprite palette slots so each player has a distinct color.
+ *
+ * @par SNES Concepts
+ * - Simultaneous two-controller reading via auto-joypad
+ * - Per-player sprite palettes using CGRAM palette indexing
+ * - Inline tile data (no external assets needed)
+ * - oamSet() for simple sprite positioning
+ *
+ * @par What to Observe
+ * - A blue square (Player 1) and a red square (Player 2) on a black screen
+ * - Each sprite moves independently with its controller's D-pad
+ * - Both sprites can move at the same time without interference
+ *
+ * @par Modules Used
+ * console, input, sprite, dma, text
+ *
+ * @see input.h, sprite.h, dma.h
  */
 
 #include <snes.h>

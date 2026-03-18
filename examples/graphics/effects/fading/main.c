@@ -1,16 +1,33 @@
 /**
  * @file main.c
- * @brief Fading Effect Example
+ * @brief Screen fade in/out using INIDISP brightness control
+ * @ingroup examples
  *
- * Port of pvsneslib Fading example.
- * Demonstrates screen brightness control for fade in/out effects.
+ * Demonstrates smooth screen fading by stepping through the 16 brightness
+ * levels of the SNES INIDISP register ($2100). Bits 0-3 of INIDISP control
+ * master brightness from 0 (black) to 15 (full), while bit 7 is the force
+ * blank flag. By writing successive brightness values with timed delays
+ * between frames, the display fades smoothly to or from black. Three fade
+ * speeds are showcased: fast (1 frame/step), medium (3 frames/step), and
+ * slow (6 frames/step). This technique is used in virtually every SNES game
+ * for scene transitions, title screens, and game-over sequences.
  *
- * The SNES INIDISP register ($2100) controls screen brightness:
- * - Bits 0-3: Brightness level (0-15)
- * - Bit 7: Force blank (1 = screen off)
+ * @par SNES Concepts
+ * - INIDISP register ($2100) brightness levels 0-15
+ * - Frame-counted delay loops for animation timing
+ * - setBrightness() library wrapper for safe INIDISP writes
+ * - Force blank (bit 7) vs brightness dimming (bits 0-3)
  *
- * Controls:
- *   Any button: Advance to next fade effect
+ * @par What to Observe
+ * - Press any button to advance through fade effects
+ * - Fast fade out (instant-feeling), then fast fade in
+ * - Medium fade (noticeable transition), then slow fade (cinematic pace)
+ * - The cycle repeats: fast, medium, slow, fast, ...
+ *
+ * @par Modules Used
+ * console, sprite, dma, input, background
+ *
+ * @see video.h, input.h, background.h
  */
 
 #include <snes.h>

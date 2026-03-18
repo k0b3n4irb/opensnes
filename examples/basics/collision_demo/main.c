@@ -1,16 +1,40 @@
 /**
  * @file main.c
- * @brief Collision Detection Demo
+ * @brief AABB and tile-based collision detection with visual feedback
+ * @ingroup examples
  *
- * Demonstrates the collision detection library:
- * - Rectangle vs rectangle (AABB) collision
- * - Point vs rectangle collision
- * - Tile-based collision
- * - Visual feedback on collision
+ * Demonstrates the OpenSNES collision module with two complementary
+ * techniques: axis-aligned bounding box (AABB) tests between sprites, and
+ * tile-based collision against a static map. A white player sprite moves
+ * through a walled arena while four red enemy sprites sit at fixed
+ * positions. Collisions are detected every frame and indicated by color
+ * changes (white -> green). Wall collisions use corner-point checks against
+ * a 16x14 collision map, with per-axis rejection so the player can slide
+ * along walls.
  *
- * Controls:
- * - D-pad: Move player sprite
- * - A button: Toggle tile collision display
+ * The example also illustrates the direct oamMemory[] write pattern instead
+ * of calling oamSet() per sprite, which avoids the 158-byte stack frame
+ * overhead of oamSet() and keeps the main loop fast enough for 5 sprites
+ * at 60 fps.
+ *
+ * @par SNES Concepts
+ * - AABB collision via collideRect() for sprite-vs-sprite overlap testing
+ * - Tile collision via collideTile() for sprite-vs-map wall rejection
+ * - Direct OAM buffer writes (oamMemory[]) with oam_update_flag for NMI DMA
+ * - OAM high table management (bytes 512+) for X high bit and sprite size
+ * - Separate sprite palette banks for normal and collision-highlight colors
+ * - Mode 0 BG with hand-coded wall/empty tiles for the collision arena
+ *
+ * @par What to Observe
+ * - Move the white square with D-pad through the gray-walled arena
+ * - The player cannot pass through walls; it slides along them
+ * - When the player overlaps a red enemy, both turn green
+ * - Multiple simultaneous collisions are tracked independently
+ *
+ * @par Modules Used
+ * console, input, sprite, dma, collision, background
+ *
+ * @see collision.h, sprite.h, dma.h, input.h
  */
 
 #include <snes.h>

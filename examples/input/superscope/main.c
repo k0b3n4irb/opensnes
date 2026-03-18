@@ -1,11 +1,39 @@
 /**
  * @file main.c
- * @brief SNES Super Scope Demo
+ * @brief SNES Super Scope light gun detection, calibration, and firing
+ * @ingroup examples
  *
- * Blue calibration background with crosshair target, white text overlay,
- * and red dot sprite marking fire position.
+ * Demonstrates the SNES Super Scope (light gun) peripheral connected to
+ * controller port 2. The Super Scope works by detecting the CRT beam
+ * position when the trigger is pulled, returning X/Y screen coordinates
+ * via the auto-joypad registers. Because the sensor relies on CRT timing,
+ * a calibration step is needed to correct for aiming offset.
  *
- * States: DETECT -> CALIBRATE -> READY
+ * The example uses a three-state machine: DETECT waits for the Super Scope
+ * to be connected, CALIBRATE asks the player to shoot the screen center
+ * so the library can compute the aim offset, and READY tracks fire events
+ * and marks the hit position with a red dot sprite.
+ *
+ * Video setup: Mode 0 with BG1 (text overlay) and BG2 (crosshair target
+ * background for calibration), plus OBJ sprites for the red dot marker.
+ *
+ * @par SNES Concepts
+ * - Super Scope peripheral detection and calibration flow
+ * - Light gun coordinate reading (scopeGetX / scopeGetY)
+ * - Button polling for FIRE, PAUSE, and CURSOR buttons
+ * - Multi-layer Mode 0 with text on BG1 and graphics on BG2
+ * - Sprite positioning from light gun coordinates
+ *
+ * @par What to Observe
+ * - "Connect SuperScope to Port 2" message on startup
+ * - After connection, a crosshair target for calibration
+ * - Shooting places a red dot at the hit position
+ * - PAUSE button returns to calibration; CURSOR transitions to play
+ *
+ * @par Modules Used
+ * console, input, sprite, dma, text, background
+ *
+ * @see input.h, sprite.h, dma.h, text.h
  */
 
 #include <snes.h>

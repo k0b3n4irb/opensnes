@@ -1,6 +1,43 @@
-/*
- * Map scrolling with object engine demo
- * Based on PVSnesLib mapandobjects example by Alekmaul
+/**
+ * @file main.c
+ * @brief Scrolling platformer with object engine and enemy AI
+ * @ingroup examples
+ *
+ * Demonstrates the OpenSNES map engine and object engine working together
+ * to create a scrolling platformer with multiple entity types. The map
+ * engine handles tile-based scrolling and VRAM streaming, while the
+ * object engine manages entity lifecycle, physics, collision callbacks,
+ * and per-frame update dispatch.
+ *
+ * Three object types are registered via assembly callbacks (for correct
+ * bank byte resolution): Mario (player-controlled), Goomba (walks and
+ * reverses at walls), and Koopa Troopa (patrols with shell behavior).
+ * Object spawn positions are loaded from the map's object layer.
+ *
+ * The dynamic sprite engine handles animated 16x16 sprites with automatic
+ * VRAM tile management, freeing the game logic from manual tile uploads.
+ *
+ * Port of the PVSnesLib mapandobjects example by Alekmaul.
+ *
+ * @par SNES Concepts
+ * - Map engine: tile scrolling with mapLoad/mapUpdate/mapVblank pipeline
+ * - Object engine: entity registration, spawn from map data, update callbacks
+ * - Dynamic sprite engine: automatic VRAM tile allocation for animated sprites
+ * - Multiple sprite palettes via CGRAM bank indexing
+ * - SC_64x32 tilemap for horizontal scrolling levels
+ * - Assembly bank byte resolution for cross-bank function pointers
+ *
+ * @par What to Observe
+ * - Mario walks and jumps through a scrolling level
+ * - Goombas walk back and forth, reversing at obstacles
+ * - Koopa Troopas patrol with distinct movement patterns
+ * - Camera scrolls to follow Mario's position
+ * - All entities animate independently with the dynamic sprite engine
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, map, object
+ *
+ * @see map.h, object.h, sprite.h, background.h, input.h
  */
 #include <snes.h>
 #include <snes/map.h>

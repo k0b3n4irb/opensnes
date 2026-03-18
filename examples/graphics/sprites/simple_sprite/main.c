@@ -1,14 +1,32 @@
 /**
  * @file main.c
- * @brief Simple Sprite — Display a Single 32x32 Sprite
+ * @brief Display a single static 32x32 sprite
+ * @ingroup examples
  *
- * Displays a single 32x32 sprite at center screen.
+ * Minimal example showing how to load and display one hardware sprite on
+ * the SNES. Sprite tile data is DMA'd to VRAM, a 16-color palette is loaded
+ * to CGRAM at address 128 (sprite palette 0), and the OBJ size register
+ * (OBJSEL, $2101) is configured for small=8x8 / large=32x32 mode.
  *
- * VRAM Layout:
- *   $2000 = OBSEL name base (tileBase=1 means $2000 word addr)
- *   $2100 = Sprite tile data loaded here
+ * The sprite is placed at screen center using oamSet(), which writes to the
+ * 544-byte OAM buffer that the NMI handler DMAs to the PPU each VBlank.
+ * The tile number is calculated from the offset between the OBJSEL name
+ * base and the VRAM address where the tile data was loaded.
  *
- * Tile number: (0x2100 - 0x2000) / 16 = 0x10
+ * @par SNES Concepts
+ * - OAM (Object Attribute Memory): 128 sprite entries, 544 bytes total
+ * - OBJSEL register ($2101): sprite size mode and name base address
+ * - Sprite tile numbering relative to the OBJSEL name base
+ * - DMA transfer of tile data to VRAM and palette data to CGRAM
+ *
+ * @par What to Observe
+ * - A single 32x32 sprite displayed at the center of the screen
+ * - No input required; the sprite is static
+ *
+ * @par Modules Used
+ * console, dma, sprite
+ *
+ * @see sprite.h, dma.h, video.h
  */
 
 #include <snes.h>

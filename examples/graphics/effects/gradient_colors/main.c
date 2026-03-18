@@ -1,13 +1,33 @@
 /**
  * @file main.c
- * @brief Gradient Colors — HDMA Color Gradient Effect
+ * @brief HDMA-driven per-scanline backdrop color gradient
+ * @ingroup examples
  *
- * Demonstrates HDMA color gradient effect on a background.
- * Press A to remove the gradient, B to re-enable it.
+ * Uses HDMA to rewrite CGRAM color 0 (the backdrop color) on every scanline
+ * group, creating a smooth vertical color gradient behind the background
+ * layer. HDMA channel 6 is configured in mode 3 (2REG_2X), which writes
+ * 4 bytes per entry to consecutive register pairs: two bytes to CGADD
+ * ($2121) to select color index 0, then two bytes to CGDATA ($2122) to
+ * write the 15-bit BGR color value. A pre-built HDMA table in ROM defines
+ * the gradient colors for each scanline group. This technique was widely
+ * used in SNES games for sky gradients, underwater tinting, and lava glow
+ * effects without consuming any CPU time.
  *
- * The gradient works by changing CGRAM color 0 (backdrop) via HDMA.
- * HDMA mode 3 writes 4 bytes/entry: CGADD(x2) + CGDATA(x2) = set
- * a 15-bit SNES color per scanline group.
+ * @par SNES Concepts
+ * - HDMA mode 3 (2REG_2X) targeting CGADD + CGDATA
+ * - Per-scanline CGRAM color modification (color 0 = backdrop)
+ * - HDMA table format: [count] [CGADD_lo] [CGADD_hi] [color_lo] [color_hi]
+ * - Runtime HDMA enable/disable toggling
+ *
+ * @par What to Observe
+ * - A vertical color gradient covers the screen behind the background tiles
+ * - Press A to disable the gradient (flat backdrop color returns)
+ * - Press B to re-enable the gradient effect
+ *
+ * @par Modules Used
+ * console, dma, background, sprite, hdma, input, math
+ *
+ * @see hdma.h, background.h, input.h, video.h
  */
 
 #include <snes.h>

@@ -1,12 +1,29 @@
 /**
  * @file main.c
- * @brief Mode 5 Hi-Res Background Demo
+ * @brief Mode 5 hi-resolution background display
+ * @ingroup examples
  *
- * Demonstrates BG Mode 5 (512×256, 16-color, 4bpp).
- * Mode 5 is the SNES high-resolution mode, doubling horizontal
- * resolution to 512 pixels using interlaced tile data.
+ * Demonstrates SNES BG Mode 5 (512x256, 4bpp, 16 colors). Mode 5 doubles
+ * the horizontal resolution from 256 to 512 pixels by using interlaced
+ * tile data and requiring BG1 on both the main and sub screens. The PPU
+ * alternates even/odd pixel columns between the two screens each frame,
+ * producing a true 512-pixel-wide output on compatible displays. Tile data
+ * must be converted with the special `-M 5` interleaving flag.
  *
- * Ported from PVSnesLib "Mode5" example.
+ * @par SNES Concepts
+ * - BG Mode 5 hi-res rendering (512px horizontal)
+ * - Main screen + sub screen cooperation for interlaced output
+ * - Mode 5 tile data interleaving (`gfx4snes -M 5`)
+ * - DMA tilemap transfer to VRAM
+ *
+ * @par What to Observe
+ * - A single full-screen image rendered at 512-pixel horizontal resolution
+ * - Text and fine detail should appear sharper than standard 256px modes
+ *
+ * @par Modules Used
+ * console, dma, background
+ *
+ * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>

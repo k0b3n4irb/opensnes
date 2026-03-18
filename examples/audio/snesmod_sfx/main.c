@@ -1,17 +1,37 @@
 /**
  * @file main.c
- * @brief SNESMOD Sound Effects Demo
+ * @brief Sound effect playback with pitch control via SNESMOD
+ * @ingroup examples
  *
- * Demonstrates sound effect playback using SNESMOD without music.
- * Each button plays a different sound effect.
+ * Demonstrates standalone sound effect playback through the SPC700 using
+ * SNESMOD, without any background music. Five instrument samples (tada,
+ * strings, piano, marimba, cowbell) are loaded from a soundbank at startup.
+ * Each button triggers a different effect, and the D-pad left/right cycles
+ * between three pitch settings (low, normal, high) that apply to all
+ * subsequent effect triggers.
  *
- * Controls:
- *   A      - Play "Tada" effect
- *   B      - Play "Strings" effect
- *   X      - Play "Piano" effect
- *   Y      - Play "Marimba" effect
- *   L/R    - Play "Cowbell" effect
- *   Left/Right - Change pitch
+ * Unlike the music example, this one uses snesmodLoadEffect() to load
+ * individual samples rather than a full tracker module, and
+ * snesmodPlayEffect() to trigger one-shot playback with explicit volume,
+ * panning, and pitch parameters.
+ *
+ * @par SNES Concepts
+ * - SPC700 effect playback: samples uploaded individually via snesmodLoadEffect()
+ * - One-shot effect triggering with snesmodPlayEffect(id, volume, pan, pitch)
+ * - Pitch control constants: SNESMOD_PITCH_LOW, SNESMOD_PITCH_NORMAL, SNESMOD_PITCH_HIGH
+ * - Effects-only soundbank: .it file with instrument samples but no pattern data
+ * - Per-frame snesmodProcess() still required to service the sound driver
+ *
+ * @par What to Observe
+ * - Press A/B/X/Y to hear different instrument samples
+ * - Press L or R to hear the cowbell
+ * - Press Left/Right to change pitch (status shown on screen)
+ * - All effects play at the currently selected pitch
+ *
+ * @par Modules Used
+ * console, sprite, dma, input
+ *
+ * @see snesmod.h, dma.h, video.h
  */
 
 #include <snes.h>

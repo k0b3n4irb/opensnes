@@ -1,20 +1,42 @@
 /**
  * @file main.c
- * @brief HiROM Mode Demo with Library Support
+ * @brief HiROM memory mapping mode with 64KB bank access
+ * @ingroup examples
  *
- * Demonstrates HiROM memory mapping on the SNES using the OpenSNES library.
+ * Demonstrates building an OpenSNES ROM in HiROM mode, where each ROM
+ * bank provides 64KB of contiguous address space ($0000-$FFFF) instead
+ * of LoROM's 32KB ($8000-$FFFF). HiROM is selected by setting
+ * USE_HIROM := 1 in the Makefile, which switches the ROM header, memory
+ * map, and linker configuration.
  *
- * HiROM vs LoROM:
- * - LoROM: 32KB banks ($8000-$FFFF per bank)
- * - HiROM: 64KB banks ($0000-$FFFF per bank)
+ * HiROM is preferred for games with large contiguous data (streaming
+ * tilesets, large lookup tables) because it avoids the 32KB bank
+ * boundary that LoROM imposes. The tradeoff is that mirror-region
+ * access patterns differ, and some addressing modes behave differently.
  *
- * HiROM advantages:
- * - Larger contiguous ROM access without bank switching
- * - Better for games with large data tables or streaming
- * - Simpler address calculation for large assets
+ * This example uses inline 2bpp font tiles (no external assets) and
+ * direct VRAM register writes to display text, confirming that the
+ * library, ROM header, and memory map are all correctly configured
+ * for HiROM operation. Pressing A changes the background color as
+ * a simple input validation.
  *
- * This example displays "HIROM MODE" and responds to joypad input
- * to confirm the ROM and library are correctly configured.
+ * @par SNES Concepts
+ * - HiROM vs LoROM memory mapping (64KB vs 32KB banks)
+ * - ROM header configuration for HiROM (USE_HIROM flag)
+ * - Mode 0 with 2bpp inline font tiles
+ * - Direct VRAM register writes for tilemap text rendering
+ * - CGRAM palette writes for runtime color changes
+ *
+ * @par What to Observe
+ * - "HIROM MODE" and "+ LIB" text displayed on a dark blue background
+ * - Hold A to change the background color to light blue
+ * - Release A to restore the dark blue background
+ * - If the text appears garbled, the HiROM configuration has an issue
+ *
+ * @par Modules Used
+ * console, dma, input, sprite, background
+ *
+ * @see console.h, dma.h, input.h
  */
 
 #include <snes.h>

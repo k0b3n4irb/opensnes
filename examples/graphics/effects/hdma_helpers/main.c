@@ -1,15 +1,37 @@
 /**
  * @file main.c
- * @brief HDMA Helpers Demo
+ * @brief Interactive showcase of all four HDMA library helper effects
+ * @ingroup examples
  *
- * Demonstrates the 4 HDMA library helper effects:
- *   A: Brightness gradient (fade to black at bottom)
- *   B: Color gradient (sky color shift on BG color 0)
- *   X: Iris wipe (circular window)
- *   Y: Water ripple (increasing distortion top-to-bottom)
+ * Demonstrates the four high-level HDMA helper functions provided by the
+ * OpenSNES library: brightness gradient, color gradient, iris wipe, and
+ * water ripple. Each effect uses one or two HDMA channels to modify PPU
+ * registers per-scanline without CPU intervention. The brightness gradient
+ * writes INIDISP ($2100), the color gradient rewrites CGRAM color 0 via
+ * CGADD/CGDATA, the iris wipe programs window registers (WH0/WH1) with
+ * TMW masking, and the water ripple offsets BG1HOFS per scanline using
+ * a sine-based displacement table. Effects can be toggled and their
+ * parameters adjusted in real time using the controller.
  *
- * D-pad: adjust parameters per effect
- * START: stop current effect
+ * @par SNES Concepts
+ * - HDMA brightness gradient (INIDISP per-scanline dimming)
+ * - HDMA color gradient (CGRAM color 0 rewrite per scanline group)
+ * - HDMA iris wipe (window registers WH0/WH1 + TMW masking)
+ * - HDMA water ripple (BG1HOFS sine displacement per scanline)
+ * - Safe HDMA channel management (stop previous before starting new)
+ *
+ * @par What to Observe
+ * - Press A: brightness gradient (screen fades to black at bottom)
+ * - Press B: color gradient (backdrop shifts from deep blue to orange)
+ * - Press X: iris wipe (circular window reveals the background)
+ * - Press Y: water ripple (sinusoidal horizontal distortion animates)
+ * - D-pad UP/DOWN: adjust the active effect's parameter (radius, amplitude, etc.)
+ * - START: stop the current effect and restore normal display
+ *
+ * @par Modules Used
+ * console, sprite, dma, input, background, hdma
+ *
+ * @see hdma.h, input.h, background.h, video.h
  */
 #include <snes.h>
 #include <snes/console.h>

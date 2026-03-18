@@ -1,19 +1,34 @@
 /**
  * @file main.c
- * @brief Parallax Scrolling — HDMA Multi-Speed Horizontal Scroll
+ * @brief HDMA-driven parallax scrolling with three speed zones
+ * @ingroup examples
  *
- * Demonstrates parallax scrolling using HDMA to split the screen into
- * three horizontal zones, each scrolling at a different speed:
+ * Demonstrates parallax scrolling using HDMA (H-Blank DMA) to override
+ * the BG1 horizontal scroll register (BG1HOFS, $210D) at different
+ * scanline boundaries. The screen is divided into three horizontal zones,
+ * each scrolling at a different speed to create the illusion of depth.
  *
- *   - Top 72 lines:    +1 pixel/frame (distant sky, slow)
- *   - Middle 88 lines: +2 pixels/frame (midground)
- *   - Bottom 64 lines: +4 pixels/frame (foreground, fast)
- *
- * HDMA writes to BG1HOFS every scanline group, changing the horizontal
- * scroll offset per zone. The scroll table lives in RAM so the main loop
- * can update the offsets each frame.
+ * HDMA channel 6 writes a 2-byte scroll value (mode: 2-register) to
+ * BG1HOFS at each zone boundary. The scroll table lives in RAM so the
+ * main loop can increment each zone's offset at different rates every frame.
  *
  * Ported from PVSnesLib ParallaxScrolling example.
+ *
+ * @par SNES Concepts
+ * - HDMA (H-Blank DMA) for per-scanline register writes
+ * - BG horizontal scroll register (BG1HOFS, $210D)
+ * - RAM-based HDMA tables for dynamic per-frame updates
+ * - Parallax depth illusion via differential scroll speeds
+ *
+ * @par What to Observe
+ * - Three horizontal bands scroll at different speeds automatically
+ * - Top (sky): slow, middle: medium, bottom (foreground): fast
+ * - No input required; the effect runs continuously
+ *
+ * @par Modules Used
+ * console, dma, background, sprite, hdma, input, math
+ *
+ * @see hdma.h, background.h, dma.h
  */
 
 #include <snes.h>

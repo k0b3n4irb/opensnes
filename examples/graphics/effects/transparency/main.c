@@ -1,13 +1,35 @@
 /**
- * Transparency — Color addition between two background layers
+ * @file main.c
+ * @brief Color addition transparency between two background layers
+ * @ingroup examples
  *
- * Demonstrates SNES color math by blending clouds (BG3, subscreen)
- * over a landscape (BG1, main screen). The clouds scroll automatically.
+ * Demonstrates the SNES color math unit by blending two background layers.
+ * BG1 (main screen) shows a 4bpp landscape, while BG3 (sub screen) holds
+ * 2bpp semi-transparent clouds that scroll horizontally. The PPU adds the
+ * sub screen pixel colors to the main screen via registers CGWSEL ($2130)
+ * and CGADSUB ($2131), producing a translucent overlay effect.
  *
- * Mode 1: BG1 = 4bpp (16 colors), BG3 = 2bpp (4 colors)
- * Color addition: subscreen colors are added to BG1 + backdrop.
+ * Mode 1 is used with BG3 priority high so the 2bpp cloud layer renders
+ * above BG1. Color addition is applied to BG1 and the backdrop, meaning
+ * the cloud colors are numerically added to whatever is underneath.
  *
  * Based on PVSnesLib Transparency example by Alekmaul.
+ *
+ * @par SNES Concepts
+ * - Color math: addition mode via CGWSEL/CGADSUB registers
+ * - Main screen vs sub screen layer assignment
+ * - Mode 1 with BG3 priority high for overlay effects
+ * - 4bpp (BG1) and 2bpp (BG3) tile formats in the same mode
+ *
+ * @par What to Observe
+ * - A landscape background with semi-transparent clouds scrolling over it
+ * - The clouds blend additively, brightening the landscape beneath them
+ * - No input required; clouds scroll automatically
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, colormath
+ *
+ * @see colormath.h, background.h, video.h
  */
 #include <snes.h>
 #include <snes/console.h>

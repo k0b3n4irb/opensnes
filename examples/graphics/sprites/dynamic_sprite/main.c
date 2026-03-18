@@ -1,9 +1,34 @@
 /**
  * @file main.c
- * @brief Dynamic Sprite — VRAM Streaming Animation
+ * @brief Dynamic sprite engine with per-frame VRAM tile streaming
+ * @ingroup examples
  *
- * Demonstrates the dynamic sprite engine: 4 animated 16x16 sprites
- * with per-frame VRAM tile uploads.
+ * Demonstrates the OpenSNES dynamic sprite engine, which uploads only the
+ * currently-needed sprite tiles to VRAM each frame instead of pre-loading
+ * the entire sprite sheet. This trades VBlank DMA bandwidth for VRAM space,
+ * allowing many unique animation frames without exhausting the 32KB OBJ
+ * VRAM region.
+ *
+ * Four 16x16 sprites are animated simultaneously. Each sprite's tile data
+ * is streamed from ROM to VRAM via the oamDynamic16Draw() / oamVramQueueUpdate()
+ * pipeline. The engine maintains a queue of dirty tiles and batches DMA
+ * transfers to fit within the VBlank budget.
+ *
+ * @par SNES Concepts
+ * - Dynamic VRAM tile streaming to conserve OBJ VRAM space
+ * - Batched VBlank DMA for sprite tile uploads
+ * - Multiple independently-animated sprites sharing a tile pool
+ * - oambuffer[] structure for sprite state management
+ *
+ * @par What to Observe
+ * - Four 16x16 sprites displayed in a row, each animating through a
+ *   24-frame cycle with an 8-frame delay between advances
+ * - No input required; the animation runs continuously
+ *
+ * @par Modules Used
+ * console, sprite, sprite_dynamic, sprite_lut, dma, background, input
+ *
+ * @see sprite.h, dma.h, video.h
  */
 
 #include <snes.h>
