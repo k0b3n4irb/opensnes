@@ -5,63 +5,60 @@ Thank you for your interest in contributing to OpenSNES!
 ## Code of Conduct
 
 Be respectful, constructive, and welcoming to newcomers.
+SNES development is niche — every contributor matters.
 
-## How to Contribute
+## Reporting Bugs
 
-### Reporting Bugs
+1. Search [existing issues](https://github.com/k0b3n4irb/opensnes/issues) first
+2. Use the **Bug Report** template — it asks the right questions
+3. Include a **minimal reproduction** (a small `main.c` that triggers the bug)
+4. Attach screenshots or a short video if it's a visual issue
+5. Specify the emulator used (Mesen2, snes9x, bsnes)
 
-1. Search existing issues first
-2. Use the bug report template
-3. Include:
-   - OpenSNES version
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - ROM/example that demonstrates the bug
+## Suggesting Features
 
-### Suggesting Features
+1. Check the [Roadmap](ROADMAP.md) first
+2. Use the **Feature Request** template
+3. Explain the **use case**, not just the feature
 
-1. Check the roadmap first
-2. Open a feature request issue
-3. Explain the use case
+## Submitting Code
 
-### Submitting Code
-
-#### Setup
+### Setup
 
 ```bash
-# Fork the repository
 gh repo fork k0b3n4irb/opensnes
-
-# Clone your fork
 git clone https://github.com/YOUR_NAME/opensnes
 cd opensnes
-
-# Add upstream remote
 git remote add upstream https://github.com/k0b3n4irb/opensnes
-```
-
-#### Development Workflow
-
-```bash
-# Create feature branch
 git checkout -b feature/my-feature
-
-# Make changes...
-
-# Run tests
-./tests/unit/run_unit_tests.sh
-./tests/compiler/run_tests.sh
-OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick
-
-# Commit with descriptive message
-git commit -m "feat(component): add new feature
-
-Detailed description of changes.
-
-Closes #123"
 ```
 
-#### Commit Message Format
+### Pull Request Rules
+
+#### One topic per PR
+
+Each PR must address **exactly one logical change**. Never mix:
+- A bug fix with a refactor
+- A new feature with a style cleanup
+- A library change with an example change
+
+If you need to do both, submit two PRs where the second depends on the first.
+
+#### Keep PRs small
+
+| Lines changed | Verdict |
+|---------------|---------|
+| **< 200** | Ideal. Gets reviewed fast. |
+| **200–400** | Acceptable. Add a clear description. |
+| **> 400** | Too large. Split it or explain why it can't be split. |
+
+Asset files (`.pic`, `.pal`, `.map`) and generated assembly don't count
+toward these limits — only human-written code.
+
+**A 1000-line PR with no explanation will not be reviewed.** It's not
+that we don't want your contribution — it's that we can't verify it's correct.
+
+#### Commit messages
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -73,59 +70,74 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 [optional footer]
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation only
-- `test`: Adding tests
-- `refactor`: Code change that neither fixes nor adds
-- `perf`: Performance improvement
-- `chore`: Maintenance task
+**Types**: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `chore`, `build`
 
-#### Pull Request Checklist
+**Scopes**: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
+
+#### Testing
 
 Before submitting:
 
-- [ ] Tests pass locally
-- [ ] New code has tests
-- [ ] New features have documentation
-- [ ] Code follows style guide
-- [ ] Commit messages follow format
-- [ ] Attribution added (if using external code)
+1. `make clean && make` — full rebuild must succeed
+2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — 212 checks must pass
+3. Test affected examples in [Mesen2](https://www.mesen.ca/)
+4. New examples must include a working Makefile following the standard pattern
 
-#### Code Review
+#### Self-review checklist
+
+- [ ] `make clean && make` passes without warnings
+- [ ] Commits follow Conventional Commits format
+- [ ] No unrelated changes mixed in
+- [ ] New code has Doxygen documentation (`/** @brief */`)
+- [ ] Binary assets are from PVSnesLib or are original work
+
+### Code Review
 
 - All PRs require review before merge
-- Address feedback constructively
-- Squash commits if requested
+- Expect 1–3 rounds of feedback — this is normal, not a rejection
+- Maintainers aim to respond within 7 days
+- **What reviewers check**: correctness, VBlank safety (VRAM writes only
+  during blank), DMA budget, bank overflow risk, naming conventions
 
-## Development Guidelines
+## AI-Assisted Contributions
 
-### Documentation Requirements
+We accept contributions that used AI tools (Copilot, Claude, ChatGPT, etc.)
+under these conditions:
 
-Every new feature must have:
+1. **You must understand every line you submit.** If asked during review
+   to explain a design choice, "the AI suggested it" is not acceptable.
+   AI is a tool — you are the author.
 
-1. **Header documentation** - Doxygen comments in headers
-2. **Usage example** - In docs or as example code
-3. **Test coverage** - Unit and/or integration tests
+2. **Disclose AI usage in the PR description.** A simple note is enough:
+   "Used Claude for initial boilerplate, manually reviewed and edited."
 
-### Test Requirements
+3. **Same quality bar.** AI-assisted code must pass all tests, follow code
+   style, and handle SNES hardware constraints correctly (VBlank timing,
+   DMA budgets, bank boundaries). No exceptions.
 
-- Unit tests for public functions where feasible (PPU/DMA functions are
-  write-only registers — smoke tests are acceptable)
-- Integration tests for feature interactions
-- Compiler changes require a regression test in `tests/compiler/`
+4. **Do NOT add `Co-Authored-By` trailers** for AI tools in commit messages.
 
-### Attribution Requirements
+## Documentation
 
-When using external code:
+Every new feature or example must have:
 
-1. Add to `ATTRIBUTION.md`
-2. Include header comment in source file
-3. Ensure license compatibility
+1. **Doxygen comments** in source files (`/** @brief */` on functions,
+   defines, and important variables)
+2. **README** for new examples (with screenshot)
+3. **Tutorial reference** if it covers a new SNES concept
+   (see [docs/tutorials/](https://k0b3n4irb.github.io/opensnes/))
 
-## Questions?
+For code style conventions, see [Code Style Guide](https://k0b3n4irb.github.io/opensnes/code_style.html).
 
-- Open a discussion issue
-- Check existing documentation
-- Ask in SNESdev community channels
+## Good First Issues
+
+Look for issues labeled [`good first issue`](https://github.com/k0b3n4irb/opensnes/labels/good%20first%20issue).
+These are small, self-contained tasks with clear instructions — designed
+for your first contribution to the project.
+
+## Links
+
+- [Documentation](https://k0b3n4irb.github.io/opensnes/)
+- [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
+- [Roadmap](ROADMAP.md)
+- [Changelog](CHANGELOG.md)

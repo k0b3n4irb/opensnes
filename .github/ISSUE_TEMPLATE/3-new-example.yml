@@ -1,0 +1,80 @@
+name: New Example
+description: Propose or submit a new example ROM
+title: "[Example]: "
+labels: ["enhancement", "examples"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What does this example demonstrate?
+      description: Which SNES concept(s) does it teach?
+      placeholder: "Demonstrates HDMA-based water reflection effect using BG2 as a mirror of BG1."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Which directory should it go in?
+      options:
+        - text/
+        - graphics/backgrounds/
+        - graphics/sprites/
+        - graphics/effects/
+        - input/
+        - audio/
+        - maps/
+        - memory/
+        - games/
+        - basics/
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Video Mode
+      options:
+        - Mode 0 (4 BGs, 2bpp each)
+        - Mode 1 (2 BGs 4bpp + 1 BG 2bpp)
+        - Mode 3 (1 BG 8bpp + 1 BG 4bpp)
+        - Mode 5 (hi-res 512px)
+        - Mode 7 (rotation/scaling)
+        - Not applicable
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: modules
+    attributes:
+      label: Library Modules Used
+      options:
+        - label: console
+        - label: dma
+        - label: background
+        - label: sprite
+        - label: input
+        - label: text
+        - label: hdma
+        - label: collision
+        - label: mode7
+        - label: snesmod (audio)
+        - label: sram (save)
+
+  - type: input
+    id: pvsneslib
+    attributes:
+      label: PVSnesLib Source (if porting)
+      description: Path or URL to the original PVSnesLib example
+      placeholder: "pvsneslib/snes-examples/graphics/Effects/HDMAWater/"
+    validations:
+      required: false
+
+  - type: textarea
+    id: assets
+    attributes:
+      label: Assets Needed
+      description: Graphics, music, fonts — describe what's needed and where it comes from.
+    validations:
+      required: false
