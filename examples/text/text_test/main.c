@@ -29,6 +29,18 @@
 
 #include <snes.h>
 
+/**
+ * @brief Entry point -- initialize text module and display a test string
+ *
+ * Demonstrates the OpenSNES text module workflow: consoleInit() sets up
+ * hardware, textInit() allocates the off-screen text buffer, textLoadFont()
+ * DMA-transfers the built-in ASCII font tiles into VRAM, textPrintAt()
+ * writes characters into the buffer, and textFlush() copies the buffer to
+ * VRAM as a tilemap. A WaitForVBlank() before setScreenOn() ensures all
+ * VRAM writes complete during blanking, preventing PPU corruption.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     consoleInit();
     setMode(BG_MODE0, 0);

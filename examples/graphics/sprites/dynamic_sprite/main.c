@@ -33,39 +33,96 @@
 
 #include <snes.h>
 
+/**
+ * @brief ROM source for the 16x16 sprite sheet tile data.
+ *
+ * Contains all 24 animation frames laid out sequentially. The dynamic sprite
+ * engine reads individual frames from this ROM data and DMAs only the
+ * currently-needed tiles to VRAM each frame, conserving OBJ VRAM space.
+ */
 extern u8 spr16_tiles[];
+
+/** @brief 16-color palette for the 16x16 sprites */
 extern u8 spr16_properpal[];
 
+/**
+ * @brief X positions for the four sprites displayed in a horizontal row.
+ *
+ * Static const arrays are placed in ROM (SUPERFREE section) by the compiler.
+ * The sprites are evenly spaced across the 256-pixel screen width.
+ */
 static const s16 xpos[4] = {64, 112, 160, 208};
+
+/**
+ * @brief Global frame counter for animation timing.
+ *
+ * Counts from 0 to 7, advancing sprite animation every 8th frame (8/60 = 133ms).
+ * Using a shared counter keeps all four sprites synchronized.
+ */
 static u8 frame_counter;
 
-/* Individual frame counters - all start at 0 now */
+/** @brief Animation frame index for sprite 0 (0-23, wraps at 24) */
 static u16 frame0;
+/** @brief Animation frame index for sprite 1 (0-23, wraps at 24) */
 static u16 frame1;
+/** @brief Animation frame index for sprite 2 (0-23, wraps at 24) */
 static u16 frame2;
+/** @brief Animation frame index for sprite 3 (0-23, wraps at 24) */
 static u16 frame3;
 
+/**
+ * @brief Entry point: dynamic sprite engine demo with four animated sprites.
+ *
+ * Initializes the dynamic sprite system, which streams sprite tiles from ROM
+ * to VRAM on demand each frame. Four 16x16 sprites are placed in a row,
+ * each cycling through 24 animation frames with an 8-frame delay.
+ *
+ * The dynamic sprite pipeline works in three stages per frame:
+ * 1. oamDynamic16Draw() — marks which tiles each sprite needs
+ * 2. oamVramQueueUpdate() — batches and DMAs only changed tiles to VRAM
+ * 3. oamInitDynamicSpriteEndFrame() — resets the tile allocator for next frame
+ *
+ * This approach trades VBlank DMA time for VRAM conservation: instead of
+ * pre-loading all 24 frames (24 x 4 tiles x 32 bytes = 3KB per sprite),
+ * only the 4 active tiles per sprite are in VRAM at any time.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     u8 i;
 
     setScreenOff();
 
+    /* Initialize the dynamic sprite engine:
+     * - OBJ VRAM tile pool starts at word address $0000
+     * - OBJ VRAM name table at $1000 (for second name page if needed)
+     * - Sprite palette 0, name base 0
+     * - OBJSEL size mode: small=8x8, large=16x16 */
     oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+
+    /* Load sprite palette to CGRAM 128 (first sprite palette slot).
+     * 32 bytes = 16 colors x 2 bytes per color (15-bit BGR). */
     dmaCopyCGram(spr16_properpal, 128, 32);
 
-    /* Initialize frame counters - all start at same frame */
+    /* Initialize all frame counters to 0 (same starting frame) */
     frame0 = 0;
     frame1 = 0;
     frame2 = 0;
     frame3 = 0;
 
-    /* Initialize sprites - explicit to avoid for-loop compiler bugs */
+    /* Initialize each sprite's state in the oambuffer[] array.
+     * The oambuffer is the dynamic sprite engine's internal state, separate
+     * from the hardware OAM. Each entry tracks position, current frame,
+     * attributes, and a refresh flag that triggers VRAM re-upload.
+     *
+     * Sprites are initialized explicitly (not in a loop) to avoid potential
+     * compiler issues with for-loop index variables on the 65816. */
     oambuffer[0].oamx = xpos[0];
     oambuffer[0].oamy = 100;
     oambuffer[0].oamframeid = frame0;
-    oambuffer[0].oamattribute = OBJ_PRIO(3);
-    oambuffer[0].oamrefresh = 1;
-    OAM_SET_GFX(0, spr16_tiles);
+    oambuffer[0].oamattribute = OBJ_PRIO(3);   /**< Priority 3 = in front of all BGs */
+    oambuffer[0].oamrefresh = 1;                /**< Force initial tile upload */
+    OAM_SET_GFX(0, spr16_tiles);                /**< Point to ROM tile source */
 
     oambuffer[1].oamx = xpos[1];
     oambuffer[1].oamy = 100;
@@ -88,7 +145,9 @@ int main(void) {
     oambuffer[3].oamrefresh = 1;
     OAM_SET_GFX(3, spr16_tiles);
 
-    /* Draw in normal order now that init is explicit */
+    /* Initial draw pass: upload starting tiles to VRAM.
+     * This must happen before the screen turns on, otherwise the first
+     * frame would show uninitialized VRAM garbage in the sprite area. */
     oamDynamic16Draw(0);
     oamDynamic16Draw(1);
     oamDynamic16Draw(2);
@@ -96,6 +155,7 @@ int main(void) {
     oamVramQueueUpdate();
     oamInitDynamicSpriteEndFrame();
 
+    /* Mode 1 with only OBJ layer visible (no backgrounds) */
     setMode(BG_MODE1, 0);
     setMainScreen(LAYER_OBJ);
     setScreenOn();
@@ -103,36 +163,42 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
+        /* Advance animation every 8 frames (8/60 Hz = ~133ms per frame) */
         frame_counter++;
         if (frame_counter >= 8) {
             frame_counter = 0;
 
-            /* Animate sprite 0 */
+            /* Advance each sprite's animation frame (0-23 cycle).
+             * Setting oamrefresh = 1 tells oamDynamic16Draw() that this
+             * sprite's tile data has changed and needs re-uploading to VRAM. */
+
             frame0++;
             if (frame0 >= 24) frame0 = 0;
             oambuffer[0].oamframeid = frame0;
             oambuffer[0].oamrefresh = 1;
 
-            /* Animate sprite 1 */
             frame1++;
             if (frame1 >= 24) frame1 = 0;
             oambuffer[1].oamframeid = frame1;
             oambuffer[1].oamrefresh = 1;
 
-            /* Animate sprite 2 */
             frame2++;
             if (frame2 >= 24) frame2 = 0;
             oambuffer[2].oamframeid = frame2;
             oambuffer[2].oamrefresh = 1;
 
-            /* Animate sprite 3 */
             frame3++;
             if (frame3 >= 24) frame3 = 0;
             oambuffer[3].oamframeid = frame3;
             oambuffer[3].oamrefresh = 1;
         }
 
-        /* Draw all sprites */
+        /* Per-frame draw pipeline:
+         * 1. oamDynamic16Draw() — for each sprite, allocate a VRAM tile slot
+         *    and queue a DMA transfer if oamrefresh is set
+         * 2. oamVramQueueUpdate() — execute all queued DMA transfers to VRAM
+         * 3. oamInitDynamicSpriteEndFrame() — reset the tile pool allocator
+         *    so next frame starts fresh (tiles are re-allocated every frame) */
         oamDynamic16Draw(0);
         oamDynamic16Draw(1);
         oamDynamic16Draw(2);

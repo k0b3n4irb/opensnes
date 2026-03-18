@@ -46,31 +46,51 @@
  * Game Objects
  *============================================================================*/
 
-#define PLAYER_SIZE 8
-#define ENEMY_SIZE  8
-#define NUM_ENEMIES 4
-#define PLAYER_SPEED 2
+#define PLAYER_SIZE  8  /**< Player sprite width/height in pixels (8x8) */
+#define ENEMY_SIZE   8  /**< Enemy sprite width/height in pixels (8x8) */
+#define NUM_ENEMIES  4  /**< Number of static enemy sprites in the arena */
+#define PLAYER_SPEED 2  /**< Player movement speed in pixels per frame */
 
-/* Player position */
-static s16 player_x, player_y;
+/** @brief Player X position in screen coordinates */
+static s16 player_x;
+/** @brief Player Y position in screen coordinates */
+static s16 player_y;
+/** @brief Player bounding box for AABB collision tests via collideRect() */
 static Rect player_box;
 
-/* Enemy positions */
+/** @brief X positions of the four static enemy sprites */
 static s16 enemy_x[NUM_ENEMIES];
+/** @brief Y positions of the four static enemy sprites */
 static s16 enemy_y[NUM_ENEMIES];
+/** @brief Bounding boxes for each enemy, rebuilt every frame for collideRect() */
 static Rect enemy_box[NUM_ENEMIES];
 
-/* Collision state */
+/**
+ * @brief Bitmask tracking which enemies the player is currently overlapping
+ *
+ * Bit N is set when the player's AABB overlaps enemy N. Used to switch
+ * both the player and the colliding enemy to the green "collision" palette.
+ */
 static u8 collision_flags;
 
 /*============================================================================
  * Tile Collision Map (16x14 tiles, 8x8 pixels each = 128x112 area)
  *============================================================================*/
 
-#define MAP_WIDTH  16
-#define MAP_HEIGHT 14
+#define MAP_WIDTH  16  /**< Collision map width in 8x8 tiles */
+#define MAP_HEIGHT 14  /**< Collision map height in 8x8 tiles */
 
-/* Simple collision map: 1 = solid wall, 0 = empty */
+/**
+ * @brief Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area)
+ *
+ * A flat 2D array where 1 = solid wall and 0 = passable. The map is stored
+ * in row-major order. collideTile() converts a pixel coordinate to a tile
+ * index (px/8) and looks up this array to determine if the tile is solid.
+ * The border is all walls with internal platforms at symmetric positions.
+ *
+ * @note This is mutable (not const) because collideTile() takes a non-const
+ *       pointer. It lives in WRAM, not ROM.
+ */
 static u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  /* Top wall */
     1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -88,15 +108,23 @@ static u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  /* Bottom wall */
 };
 
-/* Map offset on screen */
+/** @brief Screen X offset where the collision map starts (centers the 128px map on 256px screen) */
 #define MAP_OFFSET_X 64
+/** @brief Screen Y offset where the collision map starts (centers the 112px map on 224px screen) */
 #define MAP_OFFSET_Y 56
 
 /*============================================================================
  * Sprite Graphics
  *============================================================================*/
 
-/* Player sprite (8x8, 4bpp) - color 1 filled square */
+/**
+ * @brief Player sprite tile (8x8, 4bpp = 32 bytes)
+ *
+ * A solid filled square using palette color 1 (white). In 4bpp format,
+ * each tile is 32 bytes: bitplanes 0-1 interleaved (16 bytes), then
+ * bitplanes 2-3 interleaved (16 bytes). Only bitplane 0 is set (0xFF),
+ * so every pixel maps to color index 1.
+ */
 static const u8 player_tile[] = {
     /* Bitplanes 0,1: bp0=1,bp1=0 → color 1 */
     0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
@@ -106,7 +134,12 @@ static const u8 player_tile[] = {
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
-/* Enemy sprite (8x8, 4bpp) - color 2 filled square */
+/**
+ * @brief Enemy sprite tile (8x8, 4bpp = 32 bytes)
+ *
+ * A solid filled square using palette color 2 (red). Only bitplane 1 is
+ * set (0xFF per row), so every pixel maps to color index 2.
+ */
 static const u8 enemy_tile[] = {
     /* Bitplanes 0,1: bp0=0,bp1=1 → color 2 */
     0x00,0xFF, 0x00,0xFF, 0x00,0xFF, 0x00,0xFF,
@@ -116,20 +149,27 @@ static const u8 enemy_tile[] = {
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
-/* Wall tile for BG (8x8, 2bpp) - color 1 outlined square */
+/**
+ * @brief Wall background tile (8x8, 2bpp = 16 bytes)
+ *
+ * An outlined square: border pixels use color 1 (gray), interior is
+ * color 0 (black/transparent). This provides visual feedback for the
+ * collision map walls while the collision logic uses the separate
+ * collision_map[] array.
+ */
 static const u8 wall_tile[] = {
     /* bp0=1,bp1=0 → color 1 for border, color 0 for interior */
     0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
     0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
 };
 
-/* Empty tile (8x8, 2bpp) */
+/** @brief Empty background tile (8x8, 2bpp = 16 bytes, all zeros = transparent) */
 static const u8 empty_tile[] = {
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
-/* BG palette: black background, gray walls */
+/** @brief BG palette (2 BGR555 colors): black background + gray walls */
 static const u8 bg_palette[] = {
     0x00, 0x00,  /* Color 0: Black (background) */
     0x94, 0x52,  /* Color 1: Gray (walls) */
@@ -139,7 +179,13 @@ static const u8 bg_palette[] = {
  * Sprite Palette
  *============================================================================*/
 
-/* Sprite palette 0 (CGRAM 128-143): normal colors */
+/**
+ * @brief Sprite palette 0 -- normal state (CGRAM offset 128, 16 colors)
+ *
+ * Loaded at CGRAM byte offset 128 (sprite palette bank 0). Color 0 is
+ * transparent (ignored by PPU for sprites), color 1 = white (player),
+ * color 2 = red (enemy), color 3 = green (unused in normal state).
+ */
 static const u8 sprite_palette[] = {
     0x00, 0x00,  /* Color 0: Transparent */
     0xFF, 0x7F,  /* Color 1: White (player) - BGR555: max all channels */
@@ -150,7 +196,14 @@ static const u8 sprite_palette[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-/* Sprite palette 1 (CGRAM 144-159): collision indicator colors */
+/**
+ * @brief Sprite palette 1 -- collision highlight (CGRAM offset 144)
+ *
+ * When a collision is detected, the sprite's OAM attribute byte is
+ * switched to palette bank 1, turning both the player and enemy green
+ * as visual feedback. Colors 1 and 2 are both green so both the player
+ * tile (color 1) and enemy tile (color 2) appear highlighted.
+ */
 static const u8 collision_palette[] = {
     0x00, 0x00,  /* Color 0: Transparent */
     0xE0, 0x03,  /* Color 1: Green (player colliding) */
@@ -165,6 +218,14 @@ static const u8 collision_palette[] = {
  * Helper Functions
  *============================================================================*/
 
+/**
+ * @brief Load all tile and palette data into VRAM/CGRAM via DMA
+ *
+ * Called once during initialization with screen off (force blank).
+ * Loads BG tiles (empty + wall) at VRAM $0000, sprite tiles (player +
+ * enemy) at VRAM $4000, and sets up both BG and sprite color palettes.
+ * Sprite palettes are loaded at CGRAM offsets 128 and 144 (banks 0 and 1).
+ */
 static void load_graphics(void) {
     setScreenOff();
 
@@ -182,6 +243,17 @@ static void load_graphics(void) {
     dmaCopyCGram((u8 *)bg_palette, 0, 4);
 }
 
+/**
+ * @brief Render the collision map as BG tiles in VRAM
+ *
+ * First clears the entire 32x32 BG1 tilemap at VRAM $0400 with tile 0
+ * (empty), then writes the 16x14 collision map into the tilemap at an
+ * offset that centers it on screen. Each collision_map[] entry of 1
+ * becomes BG tile 1 (wall outline), and 0 stays as tile 0 (empty).
+ *
+ * VRAM writes are done via direct PPU register access (REG_VMDATAL/H),
+ * which only works during forced blank or VBlank.
+ */
 static void draw_tilemap(void) {
     u8 tx, ty;
     u16 addr;
@@ -216,6 +288,17 @@ static void draw_tilemap(void) {
     }
 }
 
+/**
+ * @brief Write all sprite positions and attributes into the OAM buffer
+ *
+ * Uses direct oamMemory[] writes instead of oamSet() to avoid the
+ * 158-byte stack frame overhead per call. Each sprite occupies 4 bytes:
+ * [X_low, Y, tile_number, attribute]. The attribute byte encodes
+ * priority (bits 5-4) and palette bank (bits 3-1). When a collision is
+ * active, the palette bank switches from 0 (normal colors) to 1 (green
+ * highlight). Setting oam_update_flag = 1 tells the NMI handler to DMA
+ * the buffer to OAM during the next VBlank.
+ */
 static void update_sprites(void) {
     u8 i;
     u8 palette;
@@ -241,6 +324,14 @@ static void update_sprites(void) {
     oam_update_flag = 1;
 }
 
+/**
+ * @brief Test player-vs-enemy AABB overlap and update collision_flags
+ *
+ * Rebuilds the player and all enemy bounding boxes from their current
+ * positions, then calls collideRect() for each player-enemy pair. The
+ * result is stored in collision_flags as a bitmask (bit N = enemy N is
+ * overlapping). This bitmask drives the palette swap in update_sprites().
+ */
 static void check_collisions(void) {
     u8 i;
 
@@ -265,6 +356,23 @@ static void check_collisions(void) {
     }
 }
 
+/**
+ * @brief Test whether a position would overlap a solid wall tile
+ *
+ * Converts screen coordinates to collision map coordinates (subtracting
+ * the map offset), then probes all four corners of the player's 8x8
+ * bounding box against the collision_map[] via collideTile(). If any
+ * corner lands on a solid tile (value 1), the function returns 1 to
+ * reject the movement.
+ *
+ * The caller uses per-axis rejection: if the combined (new_x, new_y)
+ * collides, it tries each axis independently so the player can slide
+ * along walls instead of stopping dead.
+ *
+ * @param new_x Proposed player X position in screen coordinates
+ * @param new_y Proposed player Y position in screen coordinates
+ * @return 1 if the position overlaps a wall, 0 if clear
+ */
 static u8 check_wall_collision(s16 new_x, s16 new_y) {
     s16 map_x, map_y;
 
@@ -286,9 +394,21 @@ static u8 check_wall_collision(s16 new_x, s16 new_y) {
  * Main
  *============================================================================*/
 
+/**
+ * @brief Entry point -- initialize arena, run game loop with collision tests
+ *
+ * Sets up Mode 0 with BG1 for the wall tilemap and sprites for the player
+ * and enemies. The main loop reads the D-pad every frame, proposes a new
+ * position, validates it against the wall collision map (with per-axis
+ * sliding), checks AABB overlaps with enemies, and updates all sprite
+ * positions in the OAM buffer. The NMI handler handles the actual OAM
+ * DMA transfer during VBlank.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
-    u16 pad;
-    s16 new_x, new_y;
+    u16 pad;            /**< Current joypad button state (bitmask) */
+    s16 new_x, new_y;  /**< Proposed player position before wall check */
 
     /* Initialize */
     consoleInit();

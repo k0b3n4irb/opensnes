@@ -38,27 +38,53 @@
 #include <snes/input.h>
 #include <snes/hdma.h>
 
-/* 4bpp tiles for Mode 1 BG1.
- * VRAM write: low byte = tiles[i], high byte = 0x00.
- * For color 1 (only plane 0): bp0 rows = 0xFF, bp2 rows = 0x00.
+/**
+ * @brief Minimal 4bpp tile data: one empty tile and one solid tile.
+ *
+ * SNES 4bpp tiles are 32 bytes each (8x8 pixels, 4 bitplanes). The first 16
+ * bytes contain interleaved bitplanes 0 and 1, the next 16 contain bitplanes
+ * 2 and 3. For a "solid color 1" tile, only bitplane 0 needs to be set (all
+ * 0xFF), with all other bitplanes zero. The alternating empty/solid pattern
+ * in the tilemap creates vertical stripes that make the wave distortion
+ * clearly visible.
  */
 static const u8 tiles[] = {
-    /* Tile 0: empty */
+    /* Tile 0: empty (all pixels = color 0 = transparent/black) */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    /* Tile 1: solid color 1 */
+    /* Tile 1: solid color 1 (bitplane 0 = all 1s, bitplane 1 = all 0s) */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-#define AMP_LEVELS    7
-#define TABLE_ENTRIES 335
-#define TABLE_SIZE    1006  /* 335*3 + 1 end marker */
-#define SINE_PERIOD   112
-#define AMP_DEFAULT   3    /* amplitude 12 */
+#define AMP_LEVELS    7     /**< Number of amplitude levels (0, 4, 8, 12, 16, 20, 24 pixels) */
+#define TABLE_ENTRIES 335   /**< Entries per table: 224 visible scanlines + 111 wrap entries for smooth animation */
+#define TABLE_SIZE    1006  /**< Bytes per amplitude table: 335 entries x 3 bytes + 1 end marker (0x00) */
+#define SINE_PERIOD   112   /**< Sine wave period in scanlines (half the visible screen height) */
+#define AMP_DEFAULT   3     /**< Default amplitude index (amplitude level 12 pixels) */
 
+/**
+ * @brief Pre-computed HDMA sine wave tables for 7 amplitude levels.
+ *
+ * Each amplitude level has TABLE_SIZE (1006) bytes containing 335 HDMA entries
+ * plus a 0x00 terminator. Each entry is 3 bytes:
+ * - Byte 0: 0x81 = repeat flag (bit 7) + 1 scanline count (bits 6-0).
+ *   The repeat flag tells HDMA to re-read data bytes for every scanline in
+ *   the group (here, just 1 scanline), which is required for smooth per-line
+ *   distortion.
+ * - Bytes 1-2: BG1HOFS low byte and high byte (16-bit scroll offset).
+ *   Positive values shift the BG right, negative (two's complement, e.g.
+ *   0xFF,0xFF = -1) shift left.
+ *
+ * The 335 entries cover 224 visible scanlines plus 111 extra entries. By
+ * advancing the HDMA start pointer by 3 bytes (one entry) per frame, the wave
+ * pattern appears to scroll vertically. After 112 entries (one full sine
+ * period), the pattern repeats seamlessly due to the wrap region.
+ *
+ * Amplitude levels: 0, 4, 8, 12, 16, 20, 24 pixels peak displacement.
+ */
 static const u8 hdma_tables[AMP_LEVELS * TABLE_SIZE] = {
-    /* --- Amplitude 0 (index 0) --- */
+    /* --- Amplitude 0 (index 0): no displacement (flat, all zeroes) --- */
     0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00,
     0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00,
     0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00, 0x81,0x00,0x00,
@@ -466,22 +492,52 @@ static const u8 hdma_tables[AMP_LEVELS * TABLE_SIZE] = {
     0x00
 };
 
-/* Direct hardware registers */
-/* State variables (static = placed in RAM by compiler) */
-static u8 wave_on;
-static u8 amp_idx;
-static u8 animating;
-static u8 phase;
+/** @name Wave Effect State
+ *  @brief Runtime state variables for the wave distortion effect.
+ *
+ *  These are `static` (file-scope) variables, which the compiler places in
+ *  WRAM via RAMSECTION + .data_init. They persist across frames and are
+ *  initialized explicitly in main() rather than relying on C static init.
+ *  @{
+ */
+static u8 wave_on;      /**< Wave effect enabled flag (0=off, 1=on) */
+static u8 amp_idx;       /**< Current amplitude index (0-6, selects which table to use) */
+static u8 animating;     /**< Animation enabled flag (0=frozen, 1=scrolling) */
+static u8 phase;         /**< Current animation phase (0-111, index into sine period) */
+/** @} */
 
-/* Pre-computed offsets to avoid runtime multiplication */
+/**
+ * @brief Pre-computed byte offsets into hdma_tables[] for each amplitude level.
+ *
+ * Since each amplitude table is TABLE_SIZE (1006) bytes, the offset for level
+ * N is N * 1006. These are pre-computed to avoid runtime multiplication (the
+ * 65816 has no hardware multiply for 16-bit values, so `amp_idx * 1006` would
+ * require an expensive software multiply routine).
+ */
 static const u16 amp_offsets[AMP_LEVELS] = {
     0, 1006, 2012, 3018, 4024, 5030, 6036
 };
 
+/**
+ * @brief Entry point -- HDMA-driven sinusoidal wave distortion on background.
+ *
+ * Sets up a simple striped background using bare-metal VRAM and CGRAM writes
+ * (no library DMA helpers), then configures HDMA channel 6 to apply
+ * per-scanline horizontal scroll offsets from pre-computed sine tables.
+ *
+ * Controls:
+ * - A: toggle wave on/off
+ * - LEFT/RIGHT: decrease/increase amplitude
+ * - UP: start animation (wave scrolls vertically)
+ * - DOWN: stop animation (wave freezes)
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
     u16 i;
 
-    /* Init state */
+    /* Initialize state explicitly (not relying on C static init because
+     * the compiler's .data_init section handling can be fragile) */
     wave_on = 0;
     amp_idx = AMP_DEFAULT;
     animating = 0;
@@ -490,7 +546,12 @@ int main(void) {
     consoleInit();
     setMode(1, 0);
 
-    /* Upload 2 tiles (4bpp) to VRAM at word address 0x0000 */
+    /* Upload 2 tiles (4bpp, 32 bytes total) to VRAM at word address 0x0000.
+     * Bare-metal approach: write directly to PPU registers instead of using
+     * dmaCopyVram(). This avoids library overhead for tiny transfers.
+     * $2115 (VMAIN): 0x80 = auto-increment VRAM address after high-byte write.
+     * $2116/$2117 (VMADDL/H): set VRAM word address to 0x0000.
+     * $2118/$2119 (VMDATAL/H): write low/high bytes of each VRAM word. */
     *(vu8*)0x2115 = 0x80;
     *(vu8*)0x2116 = 0x00;
     *(vu8*)0x2117 = 0x00;
@@ -499,27 +560,35 @@ int main(void) {
         *(vu8*)0x2119 = 0x00;
     }
 
-    /* Palette: color 0 = black, color 1 = white */
+    /* Set palette: color 0 = black (0x0000), color 1 = white (0x7FFF).
+     * $2121 (CGADD): palette index to write. CGRAM auto-increments after
+     * each color (2 writes = 1 color, 15-bit BGR format). */
     *(vu8*)0x2121 = 0;
-    *(vu8*)0x2122 = 0x00;
-    *(vu8*)0x2122 = 0x00;
-    *(vu8*)0x2122 = 0xFF;
-    *(vu8*)0x2122 = 0x7F;
+    *(vu8*)0x2122 = 0x00;    /* color 0 low byte  (black) */
+    *(vu8*)0x2122 = 0x00;    /* color 0 high byte (black) */
+    *(vu8*)0x2122 = 0xFF;    /* color 1 low byte  (white) */
+    *(vu8*)0x2122 = 0x7F;    /* color 1 high byte (white) */
 
-    /* Fill BG1 tilemap at VRAM word address 0x0400 */
+    /* Fill BG1 tilemap at VRAM word address 0x0400 with alternating
+     * tile 0 (empty) and tile 1 (solid) to create vertical stripes.
+     * The stripes make the wave distortion visually obvious.
+     * 1024 entries = 32x32 tilemap (SC_32x32). */
     *(vu8*)0x2115 = 0x80;
     *(vu8*)0x2116 = 0x00;
     *(vu8*)0x2117 = 0x04;
     for (i = 0; i < 1024; i++) {
         if (i & 1) {
-            *(vu8*)0x2118 = 0x01;
+            *(vu8*)0x2118 = 0x01;   /* Tile 1 (solid) */
         } else {
-            *(vu8*)0x2118 = 0x00;
+            *(vu8*)0x2118 = 0x00;   /* Tile 0 (empty) */
         }
-        *(vu8*)0x2119 = 0x00;
+        *(vu8*)0x2119 = 0x00;       /* High byte: no flip, palette 0, priority 0 */
     }
 
-    /* Configure HDMA channel 6: write-twice mode to BG1HOFS */
+    /* Configure HDMA channel 6 in write-twice mode (1REG_2X) targeting
+     * BG1HOFS ($210D). In this mode, each HDMA entry writes 2 bytes to the
+     * same register: the low byte then the high byte of BG1's horizontal
+     * scroll offset. This produces per-scanline horizontal displacement. */
     hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG_2X, HDMA_DEST_BG1HOFS,
               &hdma_tables[amp_offsets[amp_idx]]);
 
@@ -563,7 +632,11 @@ int main(void) {
             animating = 0;
         }
 
-        /* Advance animation phase */
+        /* Advance animation phase.
+         * Each frame, the phase advances by 1 entry (3 bytes) in the HDMA table.
+         * After 112 steps (one full sine period), it wraps to 0. Because the
+         * table has 335 entries (224 + 111 wrap), the 224 visible scanlines
+         * always stay within bounds regardless of the starting phase. */
         if (animating) {
             phase = phase + 1;
             if (phase >= 112) {
@@ -571,7 +644,11 @@ int main(void) {
             }
         }
 
-        /* Update HDMA table pointer and enable/disable */
+        /* Update HDMA table pointer and enable/disable.
+         * hdmaSetTable() changes the DMA source address for channel 6 to point
+         * into the current amplitude's table, offset by (phase * 3) bytes.
+         * The `* 3` is because each HDMA entry is 3 bytes (1 control + 2 data).
+         * 0x40 = bit 6 = HDMA channel 6 bitmask. */
         if (wave_on) {
             hdmaSetTable(HDMA_CHANNEL_6,
                          &hdma_tables[amp_offsets[amp_idx] + (u16)phase * 3]);

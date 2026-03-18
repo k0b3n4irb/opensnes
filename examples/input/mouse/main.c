@@ -37,21 +37,48 @@
 #include <snes/text.h>
 #include <snes/dma.h>
 
-/* Graphics data defined in data.asm */
+/** @brief Cursor sprite tile data (16x16, 4bpp) defined in data.asm */
 extern u8 cursor_tiles[], cursor_tiles_end[];
+/** @brief Cursor sprite palette (SNES BGR555 format) defined in data.asm */
 extern u8 cursor_pal[], cursor_pal_end[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
-/* Cursor position (accumulated from mouse deltas) */
+/**
+ * @brief Absolute cursor X position on screen.
+ *
+ * Accumulated from relative mouse X deltas each frame. The SNES mouse
+ * reports displacement, not position, so we must integrate the deltas
+ * ourselves and clamp to the visible screen range (0-255).
+ */
 static s16 pos_x;
+
+/**
+ * @brief Absolute cursor Y position on screen.
+ *
+ * Same accumulation strategy as pos_x, clamped to 0-223 (NTSC visible).
+ */
 static s16 pos_y;
 
-/* Sensitivity names as individual strings (avoid pointer array stride issue) */
+/** @brief Sensitivity label: low speed (smallest deltas per physical movement) */
 static const char sens_low[] = "LOW ";
+/** @brief Sensitivity label: medium speed */
 static const char sens_med[] = "MED ";
+/** @brief Sensitivity label: high speed (largest deltas per physical movement) */
 static const char sens_hi[] = "HIGH";
 
+/**
+ * @brief Main entry point -- mouse detection, initialization, and input loop.
+ *
+ * Sets up Mode 0 with a text background for status display and a 16x16
+ * hardware sprite as a mouse cursor. The mouse is detected via mouseInit()
+ * on port 1. If absent, the program halts with a diagnostic message.
+ * Otherwise, the main loop reads relative mouse deltas each frame,
+ * accumulates them into absolute screen coordinates, and updates the
+ * cursor sprite position and button/sensitivity status on screen.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     u8 detected;
 

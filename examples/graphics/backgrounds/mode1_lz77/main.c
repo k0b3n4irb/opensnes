@@ -39,11 +39,28 @@
 #include <snes/background.h>
 #include <snes/lzss.h>
 
-/* Graphics data */
-extern u8 patterns[];           /* LZ77-compressed tile data */
-extern u8 palette[], palette_end[];
-extern u8 map[], map_end[];
+/** @name Graphics data pointers (defined in data.asm via .incbin)
+ * @{ */
+extern u8 patterns[];           /**< LZ77-compressed 4bpp tile data (decompressed to VRAM by LzssDecodeVram) */
+extern u8 palette[], palette_end[]; /**< Uncompressed 16-color BGR555 palette */
+extern u8 map[], map_end[];     /**< Uncompressed 32x32 tilemap entries */
+/** @} */
 
+/**
+ * @brief Entry point -- decompress LZ77 tiles to VRAM and display Mode 1 image
+ *
+ * Initializes the console, forces blank, then uses LzssDecodeVram() to
+ * stream LZ77-compressed tile data directly into VRAM at $4000. Unlike
+ * DMA (which copies raw data at ~1 byte per CPU cycle), LZSS decompression
+ * is CPU-driven and slower, so the screen must remain in forced blank for
+ * the entire decode. Palette and tilemap are loaded uncompressed via
+ * standard DMA calls.
+ *
+ * The benefit is ROM space savings: compressed tiles occupy ~30% less ROM
+ * than raw tile data, which matters when ROM banks are limited to 32KB.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     /* Initialize console (sets up NMI handler) */
     consoleInit();

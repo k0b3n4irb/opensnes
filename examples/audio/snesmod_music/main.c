@@ -36,8 +36,15 @@
 #include <snes/snesmod.h>
 #include "soundbank.h"
 
-/* Font tiles (2bpp, 16 bytes per tile)
- * Tile indices: 0=space, 1-26=A-Z, 27-36=0-9, 37=!, 38=., 39=:, 40=-, 41=/, 42=( 43=)
+/**
+ * @brief Hand-coded 2bpp bitmap font (40 glyphs, 16 bytes each = 640 bytes)
+ *
+ * A minimal bitmap font covering uppercase A-Z, digits 0-9, and punctuation
+ * symbols (-, /, :). Each 8x8 glyph is stored in SNES 2bpp format with
+ * interleaved bitplanes. Only bitplane 0 is used, so all text renders as
+ * palette color 1.
+ *
+ * Tile index map: 0=space, 1-26=A-Z, 27-36=0-9, 37=-, 38=/, 39=:
  */
 static const u8 font_tiles[] = {
     /* 0: Space */
@@ -143,26 +150,38 @@ static const u8 font_tiles[] = {
     0x18,0x00, 0x18,0x00, 0x00,0x00, 0x00,0x00,
 };
 
+/** @brief Total size of font tile data in bytes (40 glyphs * 16 bytes each) */
 #define FONT_SIZE (40 * 16)
 
-/* Pre-encoded messages (tile indices) */
-/* "SNESMOD MUSIC EXAMPLE" */
+/** @brief HUD title: "SNESMOD MUSIC EXAMPLE" (tile indices, 0xFF-terminated) */
 static const u8 msg_title[] = { 19,14,5,19,13,15,4, 0, 13,21,19,9,3, 0, 5,24,1,13,16,12,5, 0xFF };
-/* "CONTROLS:" */
+/** @brief HUD label: "CONTROLS:" */
 static const u8 msg_controls[] = { 3,15,14,20,18,15,12,19,39, 0xFF };
-/* "A - PLAY MUSIC" */
+/** @brief HUD line: "A - PLAY MUSIC" */
 static const u8 msg_a[] = { 1, 0,37,0, 16,12,1,25, 0, 13,21,19,9,3, 0xFF };
-/* "B - STOP MUSIC" */
+/** @brief HUD line: "B - STOP MUSIC" */
 static const u8 msg_b[] = { 2, 0,37,0, 19,20,15,16, 0, 13,21,19,9,3, 0xFF };
-/* "X - PAUSE/RESUME" */
+/** @brief HUD line: "X - PAUSE/RESUME" */
 static const u8 msg_x[] = { 24, 0,37,0, 16,1,21,19,5,38,18,5,19,21,13,5, 0xFF };
-/* "L/R - VOLUME DOWN/UP" */
+/** @brief HUD line: "L/R - VOLUME DOWN/UP" */
 static const u8 msg_lr[] = { 12,38,18, 0,37,0, 22,15,12,21,13,5, 0, 4,15,23,14,38,21,16, 0xFF };
-/* "START - FADE OUT" */
+/** @brief HUD line: "START - FADE OUT" */
 static const u8 msg_start[] = { 19,20,1,18,20, 0,37,0, 6,1,4,5, 0, 15,21,20, 0xFF };
-/* "NOW PLAYING: POLLEN8" */
+/** @brief HUD status: "NOW PLAYING: POLLEN8" */
 static const u8 msg_playing[] = { 14,15,23, 0, 16,12,1,25,9,14,7,39, 0, 16,15,12,12,5,14,35, 0xFF };
 
+/**
+ * @brief Write a 0xFF-terminated tile-index string to VRAM at a tilemap address
+ *
+ * Writes tile indices sequentially to the BG1 tilemap in VRAM, starting at
+ * the given word address. Each entry is written as a 16-bit tilemap word
+ * with the tile index in the low byte and zero attributes in the high byte.
+ * Must be called during forced blank or VBlank since it writes to VRAM
+ * via direct PPU register access.
+ *
+ * @param addr VRAM word address within the tilemap (e.g., 0x0400 + row*32 + col)
+ * @param msg  Pointer to a 0xFF-terminated array of tile indices
+ */
 static void print_msg(u16 addr, const u8 *msg) {
     u16 i;
     REG_VMADDL = addr & 0xFF;
@@ -175,13 +194,26 @@ static void print_msg(u16 addr, const u8 *msg) {
     }
 }
 
+/**
+ * @brief Entry point -- initialize SNESMOD, display HUD, run transport loop
+ *
+ * Sets up a Mode 0 text display with hand-coded font tiles, initializes the
+ * SNESMOD audio system, uploads the soundbank to SPC700 RAM, loads the
+ * "pollen8" tracker module, and starts playback. The main loop polls the
+ * joypad each frame and provides full transport controls: play (A), stop (B),
+ * pause/resume (X), volume up/down (R/L), and fade out (START).
+ * snesmodProcess() must be called every frame to stream pattern data to the
+ * SPC700 sound driver.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
-    u16 pad;
-    u16 pad_pressed;
-    u16 pad_prev;
-    u8 volume;
-    u8 paused;
-    u16 i;
+    u16 pad;           /**< Raw joypad state this frame */
+    u16 pad_pressed;   /**< Newly pressed buttons (rising edge) */
+    u16 pad_prev;      /**< Previous frame's joypad state for edge detection */
+    u8 volume;         /**< Current module volume (0-127) */
+    u8 paused;         /**< Pause toggle state: 0=playing, 1=paused */
+    u16 i;             /**< General-purpose loop counter */
 
     /* Initialize console hardware */
     consoleInit();

@@ -47,15 +47,55 @@
 #include "goomba.h"
 #include "koopatroopa.h"
 
-extern u8 tileset, tilesetend, tilesetpal, tilesetdef, tilesetatt;
-extern u8 mapmario, objmario;
+/** @brief BG1 tileset tile data (4bpp) -- start label */
+extern u8 tileset;
+/** @brief BG1 tileset tile data -- end label (for size calculation) */
+extern u8 tilesetend;
+/** @brief BG1 tileset palette (BGR555, 16 colors) */
+extern u8 tilesetpal;
+/** @brief Tile definition table (visual properties per tile index) */
+extern u8 tilesetdef;
+/** @brief Tile attribute table (collision flags per tile index) */
+extern u8 tilesetatt;
+/** @brief Map data (tile indices for the scrolling level layout) */
+extern u8 mapmario;
+/** @brief Object layer data (spawn positions and type IDs for entities) */
+extern u8 objmario;
+/** @brief Shared sprite palette for all entity types (BGR555) */
 extern u8 palsprite;
 
-/* ASM function that registers object callbacks with correct bank bytes */
+/**
+ * @brief Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.
+ *
+ * Each object type has an update callback function pointer stored with its
+ * ROM bank byte. Since C cannot express the `:label` bank-byte operator,
+ * this assembly function handles registration for all three entity types.
+ */
 extern void objRegisterTypes(void);
 
+/**
+ * @brief Running count of active objects in the level.
+ *
+ * Initialized to 1 (Mario is always object 0) and incremented as enemies
+ * are loaded from the map's object layer by objLoadObjects().
+ */
 u16 nbobjects;
 
+/**
+ * @brief Main entry point -- scrolling platformer with map and object engines.
+ *
+ * Initializes the map engine (BG1 tileset + tilemap), object engine (entity
+ * registration and spawning), and dynamic sprite engine (animated 16x16
+ * sprites). The main loop follows the standard OpenSNES game pipeline:
+ *
+ * Active display: mapUpdate() + objUpdateAll() + sprite end-frame
+ * VBlank: mapVblank() + oamVramQueueUpdate()
+ *
+ * Object callbacks (Mario, Goomba, Koopa Troopa) handle their own physics,
+ * collision, animation, and sprite drawing within objUpdateAll().
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, &tileset, &tilesetpal, 0,

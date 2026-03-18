@@ -32,29 +32,56 @@
 
 #include <snes.h>
 
-/* Assembly helper to load Mode 7 data with proper VRAM interleaving */
+/**
+ * @brief Assembly helper to load Mode 7 tile data, tilemap, and palette.
+ *
+ * Mode 7 uses a unique interleaved VRAM format: each VRAM word has the tilemap
+ * byte in the low byte and the 8bpp pixel data in the high byte. This requires
+ * special DMA sequencing that cannot be done with the standard dmaCopyVram()
+ * function. The assembly routine handles the interleaved write and also loads
+ * the 256-color palette to CGRAM.
+ *
+ * Must be called during forced blank (screen off) since it writes to VRAM.
+ */
 extern void asm_loadMode7Data(void);
 
+/**
+ * @brief Entry point -- interactive Mode 7 rotation and scaling demo.
+ *
+ * Initializes the Mode 7 plane with an image, then allows the user to rotate
+ * (A/B buttons) and zoom (D-pad UP/DOWN) in real time. The transformation
+ * matrix is updated each frame via mode7SetAngle() and mode7SetScale(), which
+ * compute sin/cos values and write to the M7A-M7D hardware registers.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
-    u16 pad0;
-    u8 angle = 0;
-    u16 zscale = 0x0200; /* 2.0 in 8.8 fixed point (matches PVSnesLib default) */
+    u16 pad0;                          /**< Current joypad button state */
+    u8 angle = 0;                      /**< Rotation angle (0-255 maps to 0-360 degrees) */
+    u16 zscale = 0x0200;               /**< Zoom level in 8.8 fixed-point (2.0 = default, higher = more zoomed out) */
 
     consoleInit();
 
-    /* Force blank for VRAM loading */
+    /* Force blank for VRAM loading -- VRAM writes are silently ignored
+     * during active display on the SNES PPU. */
     setScreenOff();
 
-    /* Load Mode 7 tile data, tilemap, and palette via assembly helper */
+    /* Load Mode 7 tile data, tilemap, and palette via assembly helper.
+     * This must happen during forced blank because it performs bulk VRAM DMA. */
     asm_loadMode7Data();
 
-    /* Set Mode 7 and initialize transformation */
+    /* Set Mode 7 and initialize the affine transformation matrix.
+     * mode7Init() zeros the scroll center and offset registers (M7HOFS/M7VOFS,
+     * M7X/M7Y). mode7SetScale() sets the initial zoom to 2.0x (showing the
+     * 128x128 tile plane at half magnification), and mode7SetAngle() writes
+     * the identity rotation (angle 0 = no rotation). */
     setMode(BG_MODE7, 0);
     mode7Init();
     mode7SetScale(0x0200, 0x0200);
     mode7SetAngle(0);
 
-    /* Turn on display with BG1 */
+    /* Turn on display with BG1 -- Mode 7 only supports a single BG layer
+     * (BG1), so we enable just that on the main screen via REG_TM. */
     REG_TM = TM_BG1;
     setScreenOn();
 
@@ -73,7 +100,12 @@ int main(void) {
             mode7SetAngle(angle);
         }
 
-        /* Zoom out with UP (increase scale = shows more of the plane) */
+        /* Zoom out with UP (increase scale = shows more of the plane).
+         * Scale is 8.8 fixed-point: 0x0100 = 1.0x, 0x0200 = 2.0x.
+         * Higher values shrink the image (show more area). Clamped
+         * to 0x0F00 (15x) to prevent extreme distortion.
+         * mode7SetAngle() must be called after mode7SetScale() because
+         * the scale factors are incorporated into the rotation matrix. */
         if (pad0 & KEY_UP) {
             if (zscale < 0x0F00)
                 zscale += 16;
@@ -81,7 +113,9 @@ int main(void) {
             mode7SetAngle(angle);
         }
 
-        /* Zoom in with DOWN (decrease scale = magnifies) */
+        /* Zoom in with DOWN (decrease scale = magnifies).
+         * Lower scale values enlarge the image. Clamped to 0x0010 to
+         * prevent division-by-zero-like artifacts in the matrix. */
         if (pad0 & KEY_DOWN) {
             if (zscale > 0x0010)
                 zscale -= 16;

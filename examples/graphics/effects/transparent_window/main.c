@@ -39,23 +39,35 @@
  * External Graphics Data (defined in data.asm)
  *============================================================================*/
 
+/** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
 extern u8 tiles[], tiles_end[];
+/** @brief Background tilemap data for the 32x32 tile grid */
 extern u8 tilemap[], tilemap_end[];
+/** @brief 16-color palette for the background */
 extern u8 palette[];
 
 /*============================================================================
  * Rectangle parameters
  *============================================================================*/
 
+/** @brief X coordinate of the darkened rectangle's left edge (pixels) */
 #define RECT_X      40
+/** @brief Y coordinate of the darkened rectangle's top edge (scanlines from top) */
 #define RECT_Y      96
+/** @brief Width of the darkened rectangle in pixels */
 #define RECT_WIDTH  176
+/** @brief Height of the darkened rectangle in scanlines */
 #define RECT_HEIGHT 112
 
 /*============================================================================
  * HDMA Tables (in RAM — built dynamically at startup)
  *
- * Format (repeat mode for the rectangle segment):
+ * These tables drive WH0 ($2126) and WH1 ($2127) to define the left and
+ * right window boundaries per scanline. The tables use HDMA repeat mode
+ * (bit 7 set in the line count) because WH0/WH1 are write-only registers
+ * that must be refreshed every scanline — even when the position is constant.
+ *
+ * Table structure:
  *   [y] [0xFF/0x00]              non-repeat: y lines, window disabled
  *   [0x80|height] [val]...[val]  repeat: height lines, per-scanline data
  *   [0x01] [0xFF/0x00]           non-repeat: 1 line, window disabled
@@ -64,13 +76,38 @@ extern u8 palette[];
  * Max size: 2 + 1 + 112 + 2 + 1 = 118 bytes
  *============================================================================*/
 
+/**
+ * @brief HDMA table for the left window boundary (WH0, $2126).
+ *
+ * Built at startup to define where the darkened rectangle starts horizontally
+ * on each scanline. Before and after the rectangle, WH0 is set to 0xFF
+ * (disabling the window by placing the left edge beyond the right edge).
+ */
 u8 hdma_left[128];
+
+/**
+ * @brief HDMA table for the right window boundary (WH1, $2127).
+ *
+ * Built at startup to define where the darkened rectangle ends horizontally
+ * on each scanline. Before the rectangle, WH1 is set to 0x00 (disabling the
+ * window by placing the right edge before the left edge).
+ */
 u8 hdma_right[128];
 
 /*============================================================================
  * Main
  *============================================================================*/
 
+/**
+ * @brief Entry point: darkened rectangle overlay using HDMA windows and color math.
+ *
+ * Builds HDMA tables to define a rectangle region, loads a background image,
+ * then uses the PPU's color math unit to subtract a fixed color intensity
+ * inside the window — creating a semi-transparent darkened overlay. This
+ * technique is used in RPGs for dialogue boxes, inventory screens, etc.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     u8 i;
 

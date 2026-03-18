@@ -34,9 +34,31 @@
 
 #include <snes.h>
 
-/* ASM DMA loader — handles bank bytes for SUPERFREE data */
+/**
+ * @brief Assembly DMA loader for large 8bpp tile data (defined in data.asm)
+ *
+ * Because Mode 3 tile data (64 bytes per 8x8 tile) typically exceeds 32KB,
+ * it cannot fit in a single ROM bank. The linker places SUPERFREE sections
+ * in whatever bank has space, potentially bank $01 or higher. C code cannot
+ * access these banks directly (lda.l $0000,x always reads bank $00), so an
+ * assembly routine uses the linker-provided bank byte (:label) to set the
+ * DMA source bank register ($4304) correctly for each transfer.
+ */
 extern void loadGraphics(void);
 
+/**
+ * @brief Entry point -- load 256-color tileset via ASM and display Mode 3 image
+ *
+ * Forces blank, calls the assembly DMA loader to transfer 8bpp tile data,
+ * tilemap, and 256-color palette into VRAM/CGRAM with correct bank bytes,
+ * then configures Mode 3 and turns on the screen. Mode 3 supports a single
+ * BG layer with 256 colors per tile (8 bitplanes), providing the richest
+ * color depth available in any tiled SNES mode. The tradeoff is that only
+ * one BG layer is available (plus a second 4-color direct-color BG that
+ * is unused here).
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     setScreenOff();
 

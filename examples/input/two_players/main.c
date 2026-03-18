@@ -31,7 +31,15 @@
 
 #include <snes.h>
 
-/* Simple 8x8 sprite tile (solid square, 4bpp) */
+/**
+ * @brief Inline 8x8 solid square sprite tile in SNES 4bpp format (32 bytes).
+ *
+ * SNES 4bpp tiles are stored as 4 interleaved bitplanes.
+ * Planes 0-1 (first 16 bytes) are all 0xFF = every pixel has bits 0-1 set.
+ * Planes 2-3 (next 16 bytes) are all 0x00 = bits 2-3 clear.
+ * Result: every pixel = color index 3 (0b0011), producing a solid square
+ * in whichever palette color 3 is assigned. No external asset file needed.
+ */
 static const u8 sprite_tile[32] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  /* Plane 0 */
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  /* Plane 1 */
@@ -39,7 +47,15 @@ static const u8 sprite_tile[32] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   /* Plane 3 */
 };
 
-/* Palette 0 (Player 1): Blue */
+/**
+ * @brief Sprite palette 0 (Player 1): Blue.
+ *
+ * SNES CGRAM stores 15-bit BGR555 colors (2 bytes each, little-endian).
+ * Color 0 is transparent for sprites regardless of value. Only color 3
+ * matters here because the tile's bitplanes produce index 3 for every pixel.
+ * 0x7CFF = B=31, G=3, R=31... wait -- 0xFF,0x7C = $7CFF = blue ($7C00) + some.
+ * Actual: low=0xFF high=0x7C => word $7CFF => R=31, G=7, B=15 => bright blue.
+ */
 static const u8 pal_blue[] = {
     0x00, 0x00,  /* Color 0: Transparent */
     0x00, 0x00,  /* Color 1: Black */
@@ -47,7 +63,13 @@ static const u8 pal_blue[] = {
     0xFF, 0x7C,  /* Color 3: Blue */
 };
 
-/* Palette 1 (Player 2): Red */
+/**
+ * @brief Sprite palette 1 (Player 2): Red.
+ *
+ * Loaded to CGRAM 128+16 (sprite palette bank 1). The sprite's attribute
+ * byte selects palette 1, so this red color is used for Player 2's square.
+ * 0x001F = R=31, G=0, B=0 => pure bright red.
+ */
 static const u8 pal_red[] = {
     0x00, 0x00,  /* Color 0: Transparent */
     0x00, 0x00,  /* Color 1: Black */
@@ -63,13 +85,33 @@ static const u8 pal_red[] = {
  * issues due to a compiler quirk. See .claude/KNOWLEDGE.md for details.
  *============================================================================*/
 
+/**
+ * @brief Per-player position state.
+ *
+ * Signed coordinates allow easy boundary clamping (< 0 check). Bundled
+ * in a struct because the cc65816 compiler produces correct code for
+ * struct-member arithmetic but has quirks with separate u16 variables.
+ */
 typedef struct {
-    s16 x, y;
+    s16 x;  /**< Horizontal screen position (pixels, 0-255) */
+    s16 y;  /**< Vertical screen position (pixels, 0-223) */
 } Player;
 
+/** @brief Player 1 state, initialized at left-center of screen */
 Player p1 = {64, 112};
+/** @brief Player 2 state, initialized at right-center of screen */
 Player p2 = {192, 112};
 
+/**
+ * @brief Main entry point -- two-player sprite movement demo.
+ *
+ * Loads a single solid-square tile to sprite VRAM, sets up two palettes
+ * (blue for Player 1, red for Player 2), and enters a loop where each
+ * player's D-pad input moves their respective sprite independently.
+ * Both controllers are read every frame via the NMI auto-joypad mechanism.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     u16 pad1, pad2;
 

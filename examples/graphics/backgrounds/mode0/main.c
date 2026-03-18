@@ -33,14 +33,55 @@
 
 #include <snes.h>
 
-extern u8 t0[], t0_end[], p0[], bgm0[], bgm0_end[];
-extern u8 t1[], t1_end[], p1[], bgm1[], bgm1_end[];
-extern u8 t2[], t2_end[], p2[], bgm2[], bgm2_end[];
-extern u8 t3[], t3_end[], p3[], bgm3[], bgm3_end[];
+/** @name BG0 asset pointers (defined in data.asm via .incbin)
+ * @{ */
+extern u8 t0[], t0_end[];    /**< BG0 tile data (2bpp) */
+extern u8 p0[];              /**< BG0 palette (4 colors, 8 bytes) */
+extern u8 bgm0[], bgm0_end[];/**< BG0 tilemap */
+/** @} */
 
-s16 sxbg1 = 0, sxbg2 = 0, sxbg3 = 0;
+/** @name BG1 asset pointers (defined in data.asm via .incbin)
+ * @{ */
+extern u8 t1[], t1_end[];    /**< BG1 tile data (2bpp) */
+extern u8 p1[];              /**< BG1 palette */
+extern u8 bgm1[], bgm1_end[];/**< BG1 tilemap */
+/** @} */
+
+/** @name BG2 asset pointers (defined in data.asm via .incbin)
+ * @{ */
+extern u8 t2[], t2_end[];    /**< BG2 tile data (2bpp) */
+extern u8 p2[];              /**< BG2 palette */
+extern u8 bgm2[], bgm2_end[];/**< BG2 tilemap */
+/** @} */
+
+/** @name BG3 asset pointers (defined in data.asm via .incbin)
+ * @{ */
+extern u8 t3[], t3_end[];    /**< BG3 tile data (2bpp) */
+extern u8 p3[];              /**< BG3 palette */
+extern u8 bgm3[], bgm3_end[];/**< BG3 tilemap */
+/** @} */
+
+/** @brief Horizontal scroll position for BG1 (fastest layer, 3px per tick) */
+s16 sxbg1 = 0;
+/** @brief Horizontal scroll position for BG2 (medium layer, 2px per tick) */
+s16 sxbg2 = 0;
+/** @brief Horizontal scroll position for BG3 (slowest layer, 1px per tick) */
+s16 sxbg3 = 0;
+/** @brief Frame counter for scroll speed throttle (scrolls every 3 frames) */
 u16 flip = 0;
 
+/**
+ * @brief Entry point -- load 4 BG layers and animate parallax scrolling
+ *
+ * Loads four independent 2bpp tilesets and tilemaps into separate VRAM
+ * regions, one per Mode 0 background layer. Each layer gets its own
+ * palette bank (Mode 0 provides 4 banks of 4 colors). After setup, the
+ * main loop increments scroll positions at different speeds every 3
+ * frames to create a parallax depth illusion: BG1 (foreground) moves
+ * fastest, BG3 (farthest) moves slowest, and BG0 stays stationary.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     /* Load 4 tilesets to VRAM at separate addresses.
      * Mode 0 palette banking: each BG has its own 4-color palette bank.

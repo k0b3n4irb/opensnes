@@ -47,6 +47,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage oam -- Sprite attribute memory
 
+## Examples (Source Code)
+
+See the @ref examples "Examples" group for all 41 annotated example source files.
+
 ## API Reference
 
 - @ref snes.h "Main Header (snes.h)"

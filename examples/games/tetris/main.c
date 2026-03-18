@@ -55,82 +55,127 @@
 #include "render.h"
 #include "hud.h"
 
-/* Input buffer from NMI handler */
+/**
+ * @brief Raw joypad state buffer written by the NMI handler every frame.
+ *
+ * Used directly (instead of padHeld()) for precise edge detection:
+ * pressed = pad_keys[0] & ~prev_pad gives newly-pressed buttons this frame.
+ */
 extern u16 pad_keys[];
+
+/**
+ * @brief Global frame counter incremented by the NMI handler.
+ *
+ * Used to seed srand() at game start -- the player's variable-length
+ * wait on the title screen produces a different seed each game, ensuring
+ * different piece sequences.
+ */
 extern volatile u16 frame_count;
 
-/* String constants from data.asm */
+/** @brief "PAUSED" overlay message string (in data.asm for bank $00 placement) */
 extern const char str_paused[];
+/** @brief "GAME OVER" overlay message string */
 extern const char str_gameover[];
+/** @brief "PRESS START" title screen message string */
 extern const char str_start[];
 
 /*============================================================================
  * Game States
  *============================================================================*/
 
+/** @brief Title screen: displaying "PRESS START" with rainbow cycle */
 #define STATE_TITLE      0
+/** @brief Active gameplay: piece falling, player input, gravity */
 #define STATE_PLAYING    1
+/** @brief Line clear animation: flashing rows + screen shake */
 #define STATE_LINE_CLEAR 2
+/** @brief Game over: board frozen, "GAME OVER" rainbow cycle, await restart */
 #define STATE_GAME_OVER  3
 
 /*============================================================================
  * NES Gravity Speed Table (frames per drop)
  *============================================================================*/
 
-/* NOT const — const arrays go to SUPERFREE ROM which may land in bank $01+.
- * The compiler generates lda.l $0000,x (always bank $00) for array access.
- * Mutable arrays go to WRAM (bank $00) via CopyInitData. */
+/**
+ * @brief NES NTSC gravity speed table (frames per automatic drop).
+ *
+ * Index = level number. Level 0 = 48 frames/drop (slowest), level 29+ = 1
+ * frame/drop (fastest). Values match the original NES Tetris for authentic feel.
+ *
+ * NOT const -- const arrays go to SUPERFREE ROM which may land in bank $01+.
+ * The compiler generates `lda.l $0000,x` (always bank $00) for array access,
+ * so const data in bank $01 would read garbage. Mutable arrays go to WRAM
+ * (bank $00) via CopyInitData at startup.
+ */
 static u8 speed_table[] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6,   /* L0-9: NES NTSC */
     5, 5, 5, 4, 4, 4, 3, 3, 3,              /* L10-18 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1         /* L19-29+ */
 };
 
+/** @brief Number of entries in speed_table (levels 0-29) */
 #define SPEED_TABLE_LEN 30
 
 /*============================================================================
  * DAS (Delayed Auto Shift) Constants
  *============================================================================*/
 
-#define DAS_INITIAL_DELAY  16  /* ~267ms at 60fps */
-#define DAS_REPEAT_DELAY    6  /* ~100ms at 60fps */
+/** @brief DAS initial delay before auto-repeat starts (~267ms at 60fps) */
+#define DAS_INITIAL_DELAY  16
+/** @brief DAS repeat interval once auto-repeat is active (~100ms at 60fps) */
+#define DAS_REPEAT_DELAY    6
 
 /*============================================================================
  * NES Scoring
  *============================================================================*/
 
+/**
+ * @brief NES scoring table: base points per number of simultaneous line clears.
+ *
+ * Index 0 = 0 lines (unused), 1 = single (40), 2 = double (100),
+ * 3 = triple (300), 4 = Tetris (1200). Multiplied by (level + 1).
+ * Not const -- see speed_table comment about bank $00 requirement.
+ */
 static u16 line_scores[] = { 0, 40, 100, 300, 1200 };
 
 /*============================================================================
  * Game State Variables
  *============================================================================*/
 
-static u8  game_state;
-static u8  cur_type, cur_rot;
-static s8  cur_row, cur_col;
-static u8  next_type;
-static u16 score;
-static u16 level;
-static u16 total_lines;
-static u8  lines_until_levelup;  /* counts down from 10; avoids __div16 */
-static u8  gravity_timer;
-static u8  gravity_speed;
-static u8  paused;
+static u8  game_state;           /**< Current game state (STATE_TITLE/PLAYING/etc.) */
+static u8  cur_type;             /**< Current falling piece type (0-6, one per tetromino shape) */
+static u8  cur_rot;              /**< Current piece rotation (0-3, quarter turns) */
+static s8  cur_row;              /**< Current piece row on the board (signed: can be negative during spawn) */
+static s8  cur_col;              /**< Current piece column on the board */
+static u8  next_type;            /**< Next piece type (shown in the preview box) */
+static u16 score;                /**< Player's current score (capped at 65000 to avoid u16 overflow) */
+static u16 level;                /**< Current level (0-based, increases every 10 lines) */
+static u16 total_lines;          /**< Total lines cleared this game */
+static u8  lines_until_levelup;  /**< Countdown from 10; avoids expensive __div16 for modulo */
+static u8  gravity_timer;        /**< Frames since last automatic drop */
+static u8  gravity_speed;        /**< Frames per drop at current level (from speed_table) */
+static u8  paused;               /**< Nonzero when game is paused */
 
-/* DAS state */
-static u8  das_left_timer;
-static u8  das_right_timer;
-static u8  das_down_timer;
+static u8  das_left_timer;       /**< DAS timer for LEFT button (0=idle, >=DAS_INITIAL_DELAY=repeating) */
+static u8  das_right_timer;      /**< DAS timer for RIGHT button */
+static u8  das_down_timer;       /**< DAS timer for DOWN button (soft drop) */
 
-/* Line clear animation */
+/** @brief Result of the last boardFindFullLines() call (which rows are full) */
 static LineClearResult clear_result;
-static u8 flash_timer;
+static u8 flash_timer;          /**< Frame counter during line clear flash animation */
+/** @brief Duration of the line clear flash animation in frames */
 #define FLASH_FRAMES 10
 
-/* Previous frame's pad state for edge detection */
+/** @brief Previous frame's joypad state (for edge-triggered button detection) */
 static u16 prev_pad;
 
-/* Rainbow color cycle for message text (BGR555, SNESS palette) */
+/**
+ * @brief Rainbow color cycle palette for animated message text (BGR555).
+ *
+ * Cycled through at MSG_COLOR_SPEED frames per color to create a
+ * rainbow shimmer on "PRESS START" and "GAME OVER" overlay text.
+ * Not const -- see speed_table comment about bank $00 requirement.
+ */
 static u16 msg_colors[] = {
     0x7FFF,  /* white */
     0x307C,  /* magenta (#e71861) */
@@ -141,19 +186,38 @@ static u16 msg_colors[] = {
     0x01BC,  /* orange (#dc6f0f) */
     0x3E22,  /* teal (#138e7d) */
 };
+/** @brief Number of colors in the rainbow cycle array */
 #define MSG_COLOR_COUNT  8
-#define MSG_COLOR_SPEED  8  /* frames per color */
+/** @brief Frames to display each color before advancing to the next */
+#define MSG_COLOR_SPEED  8
 
 /*============================================================================
  * Utility
  *============================================================================*/
 
+/**
+ * @brief Look up the gravity speed (frames per drop) for the current level.
+ *
+ * Clamps the level index to SPEED_TABLE_LEN-1 so levels beyond 29 all
+ * run at maximum speed (1 frame/drop).
+ *
+ * @return Frames per automatic piece drop
+ */
 static u8 getGravitySpeed(void) {
     u16 idx = level;
     if (idx >= SPEED_TABLE_LEN) idx = SPEED_TABLE_LEN - 1;
     return speed_table[idx];
 }
 
+/**
+ * @brief Add points for cleared lines using NES scoring formula.
+ *
+ * Points = line_scores[n] * (level + 1). Uses repeated addition instead
+ * of multiplication to avoid the expensive __mul16 runtime call on the
+ * 65816. Caps score at 65000 to prevent u16 overflow.
+ *
+ * @param lines_cleared Number of lines cleared simultaneously (1-4)
+ */
 static void addScore(u8 lines_cleared) {
     u16 pts;
     u16 lv;
@@ -177,6 +241,15 @@ static void addScore(u8 lines_cleared) {
  * Piece Spawning
  *============================================================================*/
 
+/**
+ * @brief Spawn the next piece at the top of the board.
+ *
+ * Promotes next_type to the current piece, generates a new random
+ * next piece, renders it in the preview box, and checks whether the
+ * spawn position is blocked (which means game over).
+ *
+ * @return 1 if spawn position is blocked (game over), 0 if successful
+ */
 static u8 spawnPiece(void) {
     cur_type = next_type;
     cur_rot  = 0;
@@ -198,6 +271,18 @@ static u8 spawnPiece(void) {
  * Input Handling
  *============================================================================*/
 
+/**
+ * @brief Process player input with DAS (Delayed Auto Shift) for piece movement.
+ *
+ * Implements NES-authentic input handling:
+ * - A/B: edge-triggered rotation (clockwise / counterclockwise)
+ * - LEFT/RIGHT: DAS with 16-frame initial delay, then 6-frame repeat
+ * - DOWN: soft drop (3-frame initial delay, then every-frame repeat)
+ * - START: toggle pause (blocks input until unpaused)
+ *
+ * DAS prevents accidental double-moves on button press while allowing
+ * fast continuous movement when held. Each direction has its own timer.
+ */
 static void handleInput(void) {
     u16 pad;
     u16 pressed;
@@ -299,6 +384,14 @@ static void handleInput(void) {
  * Game Logic
  *============================================================================*/
 
+/**
+ * @brief Initialize a new game: clear board, reset state, start music.
+ *
+ * Resets all game variables to initial state, seeds the RNG from
+ * frame_count (which varies based on how long the player waited on
+ * the title screen), spawns the first piece, and performs a force-blank
+ * flush to upload all three BG layers to VRAM simultaneously.
+ */
 static void startGame(void) {
     boardClear();
     score = 0;
@@ -339,6 +432,16 @@ static void startGame(void) {
     game_state = STATE_PLAYING;
 }
 
+/**
+ * @brief Main gameplay state: handle input, apply gravity, lock pieces.
+ *
+ * Uses delta rendering: erases the piece from the tilemap buffer, processes
+ * input and gravity, then redraws the piece at its new position. This way
+ * only the changed cells need updating rather than the entire board.
+ *
+ * When a piece locks, checks for completed lines. If found, transitions
+ * to STATE_LINE_CLEAR. Otherwise, re-renders the board and spawns next piece.
+ */
 static void statePlaying(void) {
     s8 new_row;
 
@@ -391,10 +494,25 @@ static void statePlaying(void) {
     renderPiece(cur_type, cur_rot, cur_row, cur_col);
 }
 
-/* Screen shake offsets (alternating pattern) */
+/**
+ * @brief Screen shake X offsets during line clear animation.
+ *
+ * Indexed by (flash_timer & 7). Alternating positive/negative values
+ * create a jarring shake effect. Not const -- bank $00 requirement.
+ */
 static s8 shake_dx[] = { 2, -2, 1, -1, 2, -1, 1, 0 };
+/** @brief Screen shake Y offsets during line clear animation */
 static s8 shake_dy[] = { -1, 1, -2, 1, 0, -1, 1, 0 };
 
+/**
+ * @brief Line clear animation state: flash rows, shake screen, then collapse.
+ *
+ * Runs for FLASH_FRAMES (10) frames. Each frame applies screen shake
+ * via BG scroll offsets and toggles the clearing rows' visual appearance.
+ * After the animation completes: removes lines from the board, updates
+ * scoring/level, performs a force-blank flush (heavy DMA of BG1+BG2),
+ * and spawns the next piece.
+ */
 static void stateLineClear(void) {
     flash_timer++;
 
@@ -457,6 +575,13 @@ static void stateLineClear(void) {
     }
 }
 
+/**
+ * @brief Game over state: display frozen board with rainbow "GAME OVER" text.
+ *
+ * Renders the final board state with the piece that caused the block-out,
+ * shows the GAME OVER message on the BG3 overlay, and cycles through
+ * rainbow colors until the player presses START to restart.
+ */
 static void stateGameOver(void) {
     u8 timer = 0;
     u8 cidx = 0;
@@ -491,6 +616,14 @@ static void stateGameOver(void) {
     startGame();
 }
 
+/**
+ * @brief Title screen state: rainbow "PRESS START" text until player begins.
+ *
+ * Cycles through msg_colors[] at MSG_COLOR_SPEED frames per color,
+ * creating a rainbow shimmer on the BG3 overlay text. The frame_count
+ * accumulates during this wait, providing RNG seed entropy proportional
+ * to how long the player watches the title screen.
+ */
 static void stateTitle(void) {
     u8 timer = 0;
     u8 cidx = 0;
@@ -519,6 +652,23 @@ static void stateTitle(void) {
  * Main
  *============================================================================*/
 
+/**
+ * @brief Main entry point -- Tetris initialization and state machine loop.
+ *
+ * Initialization sequence (all during force blank):
+ * 1. Wait 5 frames for NMI joypad reads to stabilize
+ * 2. renderInit() sets up Mode 1, loads tiles/palettes, configures all 3 BG layers
+ * 3. hudInit() + hudShowMessage() prepare the title screen content
+ * 4. renderFlush() DMAs everything to VRAM (guaranteed during force blank)
+ * 5. SNESMOD audio initialization (SPC700 module + soundbank)
+ * 6. setScreenOn() + renderEnableGradient() begin display with HDMA gradient
+ *
+ * The main loop dispatches to the current state handler (title, playing,
+ * line_clear, game_over) each frame, then calls snesmodProcess() for
+ * SPC700 communication and renderFlush() for selective VRAM DMA.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     u8 i;
 

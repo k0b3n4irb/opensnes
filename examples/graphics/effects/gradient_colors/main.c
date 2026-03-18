@@ -33,27 +33,73 @@
 #include <snes.h>
 #include <snes/hdma.h>
 
+/** @brief 4bpp tile data for the background layer. */
 extern u8 tiles[], tiles_end[];
+/** @brief Tilemap data (32x32 tile grid) for the background layer. */
 extern u8 tilemap[], tilemap_end[];
+/** @brief 15-bit BGR palette for the background (up to 16 colors). */
 extern u8 palette[], palette_end[];
+
+/**
+ * @brief Pre-built HDMA table for the backdrop color gradient (defined in data.asm).
+ *
+ * This table is consumed by HDMA channel 6 in mode 3 (2REG_2X), targeting
+ * CGADD ($2121). Each entry is 5 bytes:
+ * - Byte 0: scanline count (with bit 7 = repeat flag)
+ * - Bytes 1-2: written to CGADD (always 0x0000 to select color index 0)
+ * - Bytes 3-4: written to CGDATA (15-bit BGR color for this scanline group)
+ *
+ * The table ends with a 0x00 terminator byte. HDMA processes this table
+ * automatically every frame without CPU intervention, rewriting the backdrop
+ * color at each scanline group boundary to produce a smooth vertical gradient.
+ */
 extern u8 hdmaGradientList[];
 
-u8 pada, padb;
-u16 pad0;
+u8 pada;    /**< Edge-detection flag for A button (prevents repeat triggers while held) */
+u8 padb;    /**< Edge-detection flag for B button */
+u16 pad0;   /**< Current joypad button state */
 
+/**
+ * @brief Enable the HDMA backdrop color gradient effect.
+ *
+ * Configures HDMA channel 6 in mode 3 (2REG_2X) targeting CGADD ($2121).
+ * In this mode, HDMA writes 4 bytes per scanline to two consecutive register
+ * pairs: the first two bytes go to $2121 (CGADD, selecting palette index 0),
+ * and the next two bytes go to $2122 (CGDATA, writing the 15-bit BGR color).
+ *
+ * The net effect: on every scanline group boundary, CGRAM color 0 (the
+ * backdrop/transparent color) is overwritten with a new gradient color.
+ * Since CGRAM persists until the next write, each color covers its group
+ * of scanlines, producing a vertical gradient behind all BG layers.
+ *
+ * This technique costs zero CPU time -- HDMA runs entirely via DMA hardware.
+ */
 void enableGradient(void) {
-    /* Set up HDMA to write CGRAM color 0 (backdrop) directly per scanline.
-     * Uses mode 3 (2REG_2X): 4 bytes → $2121, $2121, $2122, $2122
-     * Each entry: [count] [0x00] [0x00] [color_lo] [color_hi]
-     * This sets CGADD=0 then writes a 15-bit SNES color to CGDATA. */
     hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdmaGradientList);
     hdmaEnable(1 << HDMA_CHANNEL_6);
 }
 
+/**
+ * @brief Disable the HDMA gradient and restore a flat backdrop color.
+ *
+ * Stops all HDMA channels. After stopping, CGRAM color 0 retains the last
+ * value written by HDMA (typically the color at the bottom of the gradient).
+ * The next VBlank's palette reload (if any) would restore the original color.
+ */
 void disableGradient(void) {
     hdmaDisableAll();
 }
 
+/**
+ * @brief Entry point -- HDMA-driven per-scanline backdrop color gradient.
+ *
+ * Loads a background and enables an HDMA-driven vertical color gradient on
+ * CGRAM color 0 (the backdrop). The A button disables the gradient (returning
+ * to a flat backdrop), and the B button re-enables it. Edge-detection flags
+ * (pada/padb) prevent repeated toggles while a button is held down.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
     consoleInit();
 

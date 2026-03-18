@@ -41,12 +41,46 @@
 
 #include "mario.h"
 
-extern u8 tileset, tilesetend, tilepal, tilesetdef, tilesetatt;
-extern u8 mapmario, objmario;
+/** @brief BG1 tileset tile data (4bpp) -- start label */
+extern u8 tileset;
+/** @brief BG1 tileset tile data -- end label (for size calculation) */
+extern u8 tilesetend;
+/** @brief BG1 tileset palette (BGR555, 16 colors) */
+extern u8 tilepal;
+/** @brief Tile definition table (maps tile index to visual properties) */
+extern u8 tilesetdef;
+/** @brief Tile attribute table (encodes slope angles and collision flags per tile) */
+extern u8 tilesetatt;
+/** @brief Map data (tile indices for the level layout) */
+extern u8 mapmario;
+/** @brief Object layer data (entity spawn positions and types within the map) */
+extern u8 objmario;
 
-/* ASM function that registers Mario callback with correct bank byte */
+/**
+ * @brief Register Mario's object type callback with correct bank byte.
+ *
+ * Implemented in assembly because the object engine stores function
+ * pointers with bank bytes for cross-bank calls. C cannot express
+ * the `:label` bank-byte operator, so an ASM wrapper is required.
+ */
 extern void objRegisterTypes(void);
 
+/**
+ * @brief Main entry point -- slope collision platformer demo.
+ *
+ * Initializes the map engine with slope-aware collision data, registers
+ * the Mario object type, loads map and object layers, and enters the
+ * game loop. The main loop pipeline is:
+ * 1. mapUpdate()  -- prepare new tile columns during active display
+ * 2. objUpdateAll() -- run physics and collision for all entities
+ * 3. oamInitDynamicSpriteEndFrame() -- finalize sprite tile queue
+ * 4. WaitForVBlank + mapVblank + oamVramQueueUpdate -- flush to VRAM
+ *
+ * objCollidMapWithSlopes() is called internally by Mario's update
+ * callback to handle diagonal terrain traversal.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, &tileset, &tilepal, 0,

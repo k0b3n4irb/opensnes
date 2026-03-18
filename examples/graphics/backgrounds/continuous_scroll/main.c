@@ -106,8 +106,20 @@ GameState game = {20, 100, 0, 32, 0, 32};
  * Main Program
  *============================================================================*/
 
+/**
+ * @brief Entry point -- two-layer parallax scrolling with player sprite.
+ *
+ * Loads two independent background layers (BG1 and BG2) with separate tile
+ * sets and palette slots, plus a character sprite. Each frame, the D-pad
+ * moves the player sprite; when the sprite crosses the scroll threshold,
+ * the backgrounds auto-scroll and the sprite is pushed back, creating a
+ * camera-follow effect. Scroll registers are deferred to the NMI handler
+ * via bgSetScroll()'s dirty-flag mechanism for safe VBlank-only writes.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
-    u16 pad;
+    u16 pad;              /**< Current joypad button state (read from hardware) */
 
     /* Force blank during setup */
     setScreenOff();

@@ -50,6 +50,15 @@
  * Characters: space, H, I, R, O, M, D, E, L, B, +
  *============================================================================*/
 
+/**
+ * @brief Inline 2bpp font tile data (11 characters, 16 bytes per tile).
+ *
+ * Each 2bpp tile is 8x8 pixels stored as 16 bytes: 8 rows of 2 bytes
+ * each (one byte per bitplane). Only 2 colors are used: color 0
+ * (transparent/background) and color 1 (text). This avoids needing
+ * an external font asset file -- the entire character set is embedded
+ * in the C source.
+ */
 static const u8 font_tiles[] = {
     /* 0: Space */
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
@@ -86,29 +95,37 @@ static const u8 font_tiles[] = {
     0x18,0x00, 0x18,0x00, 0x00,0x00, 0x00,0x00,
 };
 
+/** @brief Total font data size in bytes (11 characters x 16 bytes per 2bpp tile) */
 #define FONT_SIZE (11 * 16)
 
-/* Tile indices */
+/** @brief Tile index for space (blank tile) */
 #define TILE_SPACE 0
-#define TILE_H     1
-#define TILE_I     2
-#define TILE_R     3
-#define TILE_O     4
-#define TILE_M     5
-#define TILE_D     6
-#define TILE_E     7
-#define TILE_L     8
-#define TILE_B     9
-#define TILE_PLUS  10
+#define TILE_H     1  /**< Tile index for letter H */
+#define TILE_I     2  /**< Tile index for letter I */
+#define TILE_R     3  /**< Tile index for letter R */
+#define TILE_O     4  /**< Tile index for letter O */
+#define TILE_M     5  /**< Tile index for letter M */
+#define TILE_D     6  /**< Tile index for letter D */
+#define TILE_E     7  /**< Tile index for letter E */
+#define TILE_L     8  /**< Tile index for letter L */
+#define TILE_B     9  /**< Tile index for letter B */
+#define TILE_PLUS  10 /**< Tile index for plus sign (+) */
 
 /*============================================================================
  * VRAM Configuration
  *============================================================================*/
 
-#define TILEMAP_ADDR  0x0400   /* Word address for tilemap */
-#define TILES_ADDR    0x0000   /* Word address for tiles */
+/** @brief VRAM word address for the BG1 tilemap (32x32 = 2KB) */
+#define TILEMAP_ADDR  0x0400
+/** @brief VRAM word address for the tile character data */
+#define TILES_ADDR    0x0000
 
-/* Initial palette: dark blue background, white text */
+/**
+ * @brief Initial 2-color palette (dark blue background, white text).
+ *
+ * SNES CGRAM stores BGR555 colors as 2 bytes each (little-endian).
+ * Color 0 = backdrop (dark blue), Color 1 = text foreground (white).
+ */
 static const u8 init_palette[] = {
     0x00, 0x28,  /* Color 0: Dark blue */
     0xFF, 0x7F,  /* Color 1: White */
@@ -118,6 +135,18 @@ static const u8 init_palette[] = {
  * Helper Functions
  *============================================================================*/
 
+/**
+ * @brief Write a single tile entry to the BG1 tilemap via direct VRAM registers.
+ *
+ * Sets the VRAM address to the tilemap position (row * 32 + column) and
+ * writes the tile index as a 16-bit tilemap entry (low = tile number,
+ * high = attributes). VRAM writes only succeed during VBlank or forced
+ * blank -- calling this during active display will silently fail.
+ *
+ * @param x    Column position in the 32-wide tilemap (0-31)
+ * @param y    Row position in the 32-tall tilemap (0-31)
+ * @param tile Tile character index to write
+ */
 static void write_tile(u8 x, u8 y, u8 tile) {
     u16 addr;
     addr = TILEMAP_ADDR + y * 32 + x;
@@ -128,6 +157,12 @@ static void write_tile(u8 x, u8 y, u8 tile) {
     REG_VMDATAH = 0;
 }
 
+/**
+ * @brief Clear the entire BG1 tilemap to blank (space) tiles.
+ *
+ * Writes 1024 tilemap entries (32x32) with tile index 0 (space) and
+ * zero attributes. Must be called during force blank or VBlank.
+ */
 static void clear_tilemap(void) {
     u16 i;
     REG_VMAIN = 0x80;
@@ -143,6 +178,20 @@ static void clear_tilemap(void) {
  * Main
  *============================================================================*/
 
+/**
+ * @brief Main entry point -- HiROM mode validation demo.
+ *
+ * Verifies that the HiROM memory map, ROM header, and library all
+ * work correctly by displaying text and responding to input. The
+ * display is set up with inline 2bpp font tiles written directly
+ * to VRAM registers, proving that code and data addresses resolve
+ * properly in HiROM's 64KB-per-bank layout.
+ *
+ * Holding the A button changes the backdrop color as a simple
+ * demonstration that the library's input system works in HiROM mode.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     u16 pressed;
 

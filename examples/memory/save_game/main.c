@@ -39,18 +39,50 @@
 #include <snes.h>
 #include <snes/sram.h>
 
+/**
+ * @brief Data structure representing one save slot's persistent state.
+ *
+ * This struct is serialized directly to/from SRAM as a raw byte block.
+ * The SNES has no filesystem -- SRAM is a flat byte array, so structs
+ * are written at calculated byte offsets. Total size must match SAVE_SIZE.
+ */
 typedef struct {
-    s16 posX, posY;
-    u16 camX, camY;
+    s16 posX;   /**< Player X position (signed for negative coordinates) */
+    s16 posY;   /**< Player Y position */
+    u16 camX;   /**< Camera X scroll offset */
+    u16 camY;   /**< Camera Y scroll offset */
 } SaveState;
 
-SaveState vts, vtl;
+/** @brief Write buffer: filled with test data before saving to SRAM */
+SaveState vts;
+/** @brief Read buffer: populated by sramLoadOffset() when loading from SRAM */
+SaveState vtl;
+/** @brief Current joypad state (read each frame in the main loop) */
 u16 pad0;
 
+/** @brief SRAM byte offset for save slot 1 (starts at byte 0) */
 #define SLOT1 0
+/** @brief SRAM byte offset multiplier for save slot 2 (starts at byte 8) */
 #define SLOT2 1
+/** @brief Size in bytes of one save slot (must equal sizeof(SaveState)) */
 #define SAVE_SIZE 8
 
+/**
+ * @brief Main entry point -- SRAM save/load demo with two slots.
+ *
+ * Sets up a text display with instructions and enters a loop where
+ * each button performs a different SRAM operation:
+ * - A: write test values to Slot 1
+ * - B: read Slot 1 and display values as hex
+ * - X: write different test values to Slot 2
+ * - Y: read Slot 2 and display values as hex
+ *
+ * The SRAM region is battery-backed, so saved data persists across
+ * power cycles on real hardware and across emulator sessions (if SRAM
+ * saving is enabled in the emulator settings).
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     consoleInit();
     setMode(BG_MODE0, 0);

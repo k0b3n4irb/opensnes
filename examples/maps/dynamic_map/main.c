@@ -46,46 +46,99 @@
 #include "map32x32.h"
 #include "map64x64.h"
 
+/** @brief Tile index for an empty (cleared) cell in the sprite map */
 #define SPRITE_EMPTY    0
+/** @brief Tile index for the gargoyle character sprite */
 #define SPRITE_GARGOYLE 1
+/** @brief Tile index for the C64-converted Rockford character sprite */
 #define SPRITE_ROCKFORD 2
 
-/* ROM data (data.asm) */
+/** @brief 8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) */
 extern u8 sprite16, sprite16_end;
+/** @brief Palette for gargoyle sprite in 32x32 mode */
 extern u8 palsprite16, palsprite16_end;
+/** @brief 8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm) */
 extern u8 sprite16_64x64, sprite16_64x64_end;
+/** @brief Palette for gargoyle sprite in 64x64 mode */
 extern u8 palsprite16_64x64, palsprite16_64x64_end;
+/** @brief Raw C64 sprite data (Boulder Dash Rockford character) for conversion demo */
 extern u8 c64_sprite;
 
-/* Assembly helpers (ram.asm) — bank $7E tilemap buffer */
+/**
+ * @brief Clear the extended WRAM tilemap buffer ($7E:2000+).
+ * @param byte_count Number of bytes to zero in the tilemap buffer
+ */
 extern void smapClear(u16 byte_count);
+
+/**
+ * @brief DMA a portion of the WRAM tilemap buffer to VRAM.
+ *
+ * Because the tilemap lives in extended WRAM (bank $7E, above $2000),
+ * C code cannot access it directly -- the compiler generates `sta.l $0000,x`
+ * which always reads bank $00. This assembly helper sets the DMA source
+ * bank to $7E and performs the transfer.
+ *
+ * @param byte_offset Byte offset into the WRAM tilemap buffer
+ * @param vram_addr   VRAM word address destination
+ * @param byte_count  Number of bytes to transfer
+ */
 extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
 /* vblank_flag declared in <snes/system.h> (via <snes.h>) */
 
-/* VRAM layout */
-#define VRAM_SPRITEMAP  0x1000  /* BG1 tilemap (SC_64x64) */
-#define VRAM_BG2_MAP    0x6800  /* BG2 tilemap (text) */
-#define VRAM_BG2_GFX    0x2000  /* BG2 tile base */
-#define VRAM_FONT       0x3000  /* Font tiles within BG2 */
-#define VRAM_SPRITE_GFX 0x4000  /* BG1 sprite tiles (256-color) */
+/** @brief VRAM word address for BG1 tilemap (SC_64x64 = 4 nametable pages) */
+#define VRAM_SPRITEMAP  0x1000
+/** @brief VRAM word address for BG2 tilemap (text overlay, SC_32x32) */
+#define VRAM_BG2_MAP    0x6800
+/** @brief VRAM word address for BG2 tile character base */
+#define VRAM_BG2_GFX    0x2000
+/** @brief VRAM word address for 4bpp font tiles (within BG2 gfx region) */
+#define VRAM_FONT       0x3000
+/** @brief VRAM word address for BG1 8bpp sprite tile characters */
+#define VRAM_SPRITE_GFX 0x4000
 
-/* Font tile offset = (VRAM_FONT - VRAM_BG2_GFX) / 16 words per 4bpp tile */
+/**
+ * @brief Font tile number offset.
+ *
+ * Tilemap entries reference tiles relative to the BG's character base.
+ * The font is loaded at VRAM_FONT but the base is VRAM_BG2_GFX, so
+ * the first font tile has index (VRAM_FONT - VRAM_BG2_GFX) / 16 = 0x100.
+ * Each 4bpp tile is 32 bytes = 16 VRAM words.
+ */
 #define FONT_TILE_OFFSET 0x100
 
-u16 spritemap_len = 0x2000; /* bytes */
+/** @brief Total size of the SC_64x64 tilemap in bytes (4 pages x 2KB) */
+u16 spritemap_len = 0x2000;
+/** @brief Maximum number of unique sprite-tile entries in the map */
 u16 number_of_sprites = 0x40;
 
+/** @brief When true, scrolling is clamped to map boundaries; when false, wraps freely */
 u8 scroll_lock = 1;
+/** @brief When true, 32x32 map mode is active; when false, 64x64 mode */
 u8 is_map32x32 = 1;
 
+/** @brief Maximum horizontal scroll offset in pixels for the current map mode */
 u16 max_scroll_width;
+/** @brief Maximum vertical scroll offset in pixels for the current map mode */
 u16 max_scroll_height;
 
-/* Temp buffer for C64 sprite conversion (bank $00 WRAM) */
+/**
+ * @brief Temporary buffer for C64-to-SNES sprite format conversion.
+ *
+ * Must reside in bank $00 WRAM (not const / not ROM) because the
+ * conversion function writes to it and dmaCopyVram reads from bank $00.
+ * 256 bytes = one 16x16 sprite in 8bpp format (4 tiles x 64 bytes).
+ */
 static u8 sprite_temp[256];
 
-/* Pre-computed C64 Rockford sprite in SNES 8bpp format (for verification) */
+/**
+ * @brief Pre-computed C64 Rockford sprite already in SNES 8bpp format.
+ *
+ * This 256-byte array encodes a 16x16 sprite as 4 tiles in 8bpp planar
+ * format (8 interleaved bitplanes per tile row). Used for direct VRAM
+ * upload without runtime conversion. The data matches what convertC64Sprite()
+ * would produce, serving as both a display asset and a verification reference.
+ */
 static const u8 rockford_8bpp[256] = {
     0x00, 0x00, 0x0C, 0x00, 0x0F, 0x00, 0x33, 0x00,
     0x33, 0x00, 0x0F, 0x00, 0x03, 0x00, 0x0F, 0x00,
@@ -125,14 +178,29 @@ static const u8 rockford_8bpp[256] = {
  * C64 Sprite Converter
  *------------------------------------------------------------------------*/
 
+/**
+ * @brief Test whether bit 'idx' is set in byte 'b'.
+ * @param b   The byte to test
+ * @param idx Bit position (0 = LSB, 7 = MSB)
+ * @return 1 if bit is set, 0 otherwise
+ */
 static u8 isBitSet(u8 b, u8 idx) {
     return ((b >> idx) & 1);
 }
 
-/*
- * Get pixel from a C64 sprite.
- * C64 sprite: 8x16 pixels (stretched to 16x16), 4 quarter tiles.
- * 2-bit color: 00=black, 01=orange, 10=grey, 11=white.
+/**
+ * @brief Read a 2-bit pixel from a C64 sprite (multicolor mode).
+ *
+ * C64 multicolor sprites store 2 bits per pixel in a packed row format.
+ * The sprite is 8 double-wide pixels per row (16 effective pixels when
+ * stretched). This function decodes the pixel at (x, y) within a given
+ * tile quadrant of the 16x16 sprite.
+ *
+ * @param chr_no Base character number in the C64 sprite data
+ * @param tile   Tile quadrant (0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right)
+ * @param x      X pixel within the 8-pixel tile (0-7)
+ * @param y      Y pixel row within the tile (0-7)
+ * @return 2-bit color index (0=black, 1=orange, 2=grey, 3=white)
  */
 static u8 getPixel(u8 chr_no, u8 tile, u8 x, u8 y) {
     u16 offset;
@@ -154,10 +222,16 @@ static u8 getPixel(u8 chr_no, u8 tile, u8 x, u8 y) {
     }
 }
 
-/*
- * Convert a C64 sprite to SNES 8bpp format into sprite_temp[].
- * Writes 256 bytes sequentially (4 tiles x 64 bytes each).
- * SNES 8bpp: 8 bitplanes per row, 4 tiles per 16x16 sprite.
+/**
+ * @brief Convert a C64 multicolor sprite to SNES 8bpp planar format.
+ *
+ * The SNES 8bpp tile format stores 8 bitplanes per pixel row, grouped
+ * in pairs: planes 0-1 for the first 16 bytes, planes 2-3 for the next
+ * 16, and so on up to planes 6-7. This function reads pixels from the
+ * C64 source (2-bit color) and distributes them across the 8 bitplanes,
+ * producing a 256-byte result in sprite_temp[] (4 tiles x 64 bytes each).
+ *
+ * @param chr_no Base character number in the C64 sprite data to convert
  */
 static void convertC64Sprite(u8 chr_no) {
     u8 num_tiles = 4;
@@ -197,10 +271,24 @@ static void convertC64Sprite(u8 chr_no) {
  * Demo Initialization
  *------------------------------------------------------------------------*/
 
+/**
+ * @brief Flush the entire WRAM tilemap buffer to VRAM using the 1-page-per-VBlank pattern.
+ *
+ * Wrapper around screenRefresh() which internally DMAs the tilemap in
+ * 2KB pages across multiple VBlanks to stay within the DMA budget.
+ */
 static void refresh(void) {
     screenRefresh(VRAM_SPRITEMAP);
 }
 
+/**
+ * @brief Initialize the 32x32 tilemap demo mode.
+ *
+ * Configures Mode 3 with 8x8 BG1 tiles, loads gargoyle sprite tiles
+ * and palette to VRAM/CGRAM, clears the extended WRAM tilemap buffer,
+ * and DMAs the empty tilemap to VRAM. Must be called during force blank
+ * because it writes to VRAM directly.
+ */
 static void initDemoMap32x32(void) {
     u16 i;
 
@@ -237,6 +325,14 @@ static void initDemoMap32x32(void) {
     smapDma(0, VRAM_SPRITEMAP, spritemap_len);
 }
 
+/**
+ * @brief Initialize the 64x64 tilemap demo mode with 16x16 BG tiles.
+ *
+ * Similar to initDemoMap32x32() but uses BG1_TSIZE16x16 (bit 4 of mode
+ * register). In 16x16 tile mode, the SNES fetches the top and bottom
+ * halves of each tile from VRAM addresses 512 words apart, so tile data
+ * must be split between two VRAM regions per slot.
+ */
 static void initDemoMap64x64(void) {
     u16 i;
 
@@ -283,6 +379,16 @@ static void initDemoMap64x64(void) {
  * Draw sprite frame (border pattern)
  *------------------------------------------------------------------------*/
 
+/**
+ * @brief Draw a border frame of sprites around the 32x32 map perimeter.
+ *
+ * Fills the top, bottom, left, and right edges of the 32x32 tilemap
+ * with the given sprite tile index, creating a rectangular frame.
+ * Writes go to the WRAM tilemap buffer (not VRAM) -- the caller must
+ * DMA the buffer to VRAM afterward.
+ *
+ * @param sprite Sprite element index to place at each border cell
+ */
 static void drawSpriteFrame32x32(u16 sprite) {
     u8 x, y;
     for (x = 0; x < 32; x++)
@@ -291,6 +397,14 @@ static void drawSpriteFrame32x32(u16 sprite) {
                 drawSprite32x32(x, y, element2sprite32x32(sprite));
 }
 
+/**
+ * @brief Draw a border frame of sprites around the 64x64 map perimeter.
+ *
+ * Same as drawSpriteFrame32x32() but for the larger 64x64 map mode.
+ * Uses the 64x64 coordinate system and tile mapping functions.
+ *
+ * @param sprite Sprite element index to place at each border cell
+ */
 static void drawSpriteFrame64x64(u16 sprite) {
     u8 x, y;
     for (x = 0; x < 64; x++)
@@ -303,6 +417,17 @@ static void drawSpriteFrame64x64(u16 sprite) {
  * Main
  *------------------------------------------------------------------------*/
 
+/**
+ * @brief Main entry point -- dynamic tilemap sprite engine demo.
+ *
+ * Initializes Mode 3 (8bpp BG1) with a text overlay on BG2, sets up the
+ * extended WRAM tilemap buffer via assembly helpers, and enters a loop
+ * handling scrolling, map mode toggling (32x32 / 64x64), random sprite
+ * placement, and C64 sprite conversion display. Tilemap updates to VRAM
+ * use the 1-page-per-VBlank pattern (2KB per frame) for flicker-free DMA.
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     short sxbg0 = 0;
     short sybg0 = 0;

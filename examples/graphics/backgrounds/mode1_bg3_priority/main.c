@@ -35,18 +35,45 @@
 
 #include <snes.h>
 
-extern u8 bg1_tiles, bg1_tiles_end;
-extern u8 bg1_pal, bg1_pal_end;
-extern u8 bg1_map, bg1_map_end;
+/** @name BG1 asset labels (4bpp layer, defined in data.asm via .incbin)
+ * @{ */
+extern u8 bg1_tiles, bg1_tiles_end;  /**< BG1 tile graphics */
+extern u8 bg1_pal, bg1_pal_end;      /**< BG1 16-color palette (CGRAM bank 2) */
+extern u8 bg1_map, bg1_map_end;      /**< BG1 tilemap */
+/** @} */
 
-extern u8 bg2_tiles, bg2_tiles_end;
-extern u8 bg2_pal, bg2_pal_end;
-extern u8 bg2_map, bg2_map_end;
+/** @name BG2 asset labels (4bpp layer, defined in data.asm via .incbin)
+ * @{ */
+extern u8 bg2_tiles, bg2_tiles_end;  /**< BG2 tile graphics */
+extern u8 bg2_pal, bg2_pal_end;      /**< BG2 16-color palette (CGRAM bank 4) */
+extern u8 bg2_map, bg2_map_end;      /**< BG2 tilemap */
+/** @} */
 
-extern u8 bg3_tiles, bg3_tiles_end;
-extern u8 bg3_pal, bg3_pal_end;
-extern u8 bg3_map, bg3_map_end;
+/** @name BG3 asset labels (2bpp overlay layer, defined in data.asm via .incbin)
+ * @{ */
+extern u8 bg3_tiles, bg3_tiles_end;  /**< BG3 tile graphics */
+extern u8 bg3_pal, bg3_pal_end;      /**< BG3 palette (CGRAM bank 0) */
+extern u8 bg3_map, bg3_map_end;      /**< BG3 tilemap (HUD/overlay) */
+/** @} */
 
+/**
+ * @brief Entry point -- load 3 BG layers and display with BG3 high priority
+ *
+ * Sets up a Mode 1 scene with three background layers. BG1 and BG2 are
+ * 4bpp (16 colors each) providing the main scene, while BG3 is 2bpp
+ * (4 colors) used as an overlay/HUD layer. The key feature is
+ * BG3_MODE1_PRIORITY_HIGH passed to setMode(), which promotes BG3 above
+ * BG1 and BG2 in the rendering order. Without this flag, BG3 would render
+ * behind the other layers (lowest priority by default in Mode 1).
+ *
+ * Each layer loads into its own VRAM region and uses a separate CGRAM
+ * palette bank (controlled by the palette offset parameter in
+ * bgInitTileSet()). The palette offset is in units of 16 colors: offset 2
+ * means CGRAM colors 32-47 (BG1), offset 4 means colors 64-79 (BG2),
+ * and offset 0 means colors 0-15 (BG3).
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     consoleInit();
 

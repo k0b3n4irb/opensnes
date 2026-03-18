@@ -41,30 +41,44 @@
  * External Graphics Data (defined in data.asm)
  *============================================================================*/
 
+/** @brief 4bpp tile data for background layer 1 (defined in data.asm) */
 extern u8 tiles_bg1[], tiles_bg1_end[];
+/** @brief Tilemap data for BG1 (32x32 grid) */
 extern u8 tilemap_bg1[], tilemap_bg1_end[];
+/** @brief 16-color palette for BG1 */
 extern u8 palette_bg1[];
 
+/** @brief 4bpp tile data for background layer 2 (defined in data.asm) */
 extern u8 tiles_bg2[], tiles_bg2_end[];
+/** @brief Tilemap data for BG2 (32x32 grid) */
 extern u8 tilemap_bg2[], tilemap_bg2_end[];
+/** @brief 16-color palette for BG2 (loaded to CGRAM palette slot 1) */
 extern u8 palette_bg2[];
 
 /*============================================================================
  * HDMA Triangle Tables (in RAM — NOT const)
  *
- * NOT const: hdmaSetup uses bank $00 for all ROM addresses, but the linker
- * may place SUPERFREE const data in bank $01+. RAM tables always stay in
- * bank $00 WRAM, which hdmaSetup handles correctly via bank $7E mirror.
+ * These tables must be mutable (not const) because hdmaSetup() assumes
+ * bank $00 for ROM addresses, but the linker may place SUPERFREE const data
+ * in bank $01+. Mutable data always resides in bank $00 WRAM ($7E:0000),
+ * which hdmaSetup handles correctly.
  *
  * Format: [count | 0x80] [data per scanline...]
- *   - 0x80 bit = repeat mode (new data each scanline)
+ *   - 0x80 bit = repeat mode (HDMA reads one new byte per scanline)
  *   - Without 0x80 = non-repeat (same data held for count scanlines)
  *============================================================================*/
 
-/* Left boundary: converges from 0x7F to 0x60 then back to 0x7F */
+/**
+ * @brief HDMA table for the left window boundary (WH0, $2126).
+ *
+ * Defines a diamond/triangle shape: the left edge starts at x=0x7F (pixel 127,
+ * center of screen), narrows toward x=0x60 (pixel 96) over 32 scanlines, then
+ * widens back to 0x7F over 32 more scanlines. The 60-line header disables the
+ * window above the triangle by setting WH0=0xFF (left > right = no window).
+ */
 u8 tablelefttriangle[] = {
-    60, 0xFF,           /* 60 lines: WH0=255 (left > right -> window disabled) */
-    0x80 | 64,          /* 64 lines of per-scanline entries (repeat mode) */
+    60, 0xFF,           /**< 60 lines: WH0=255 (left > right -> window disabled) */
+    0x80 | 64,          /**< 64 lines of per-scanline entries (repeat mode) */
     0x7F, 0x7E, 0x7D, 0x7C, 0x7B, 0x7A, 0x79, 0x78,
     0x77, 0x76, 0x75, 0x74, 0x73, 0x72, 0x71, 0x70,
     0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x69, 0x68,
@@ -73,13 +87,19 @@ u8 tablelefttriangle[] = {
     0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
     0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
     0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F,
-    0xFF, 0             /* tail: WH0=255 (disabled) + end */
+    0xFF, 0             /**< Tail: WH0=255 (disabled) + end-of-table marker */
 };
 
-/* Right boundary: diverges from 0x81 to 0xA0 then back to 0x81 */
+/**
+ * @brief HDMA table for the right window boundary (WH1, $2127).
+ *
+ * Mirrors the left table: starts at x=0x81 (pixel 129), expands outward to
+ * x=0xA0 (pixel 160) then converges back. Together with tablelefttriangle,
+ * this creates a diamond shape centered at pixel 128 that is 64 scanlines tall.
+ */
 u8 tablerighttriangle[] = {
-    60, 0x00,           /* 60 lines: WH1=0 (left > right -> window disabled) */
-    0x80 | 64,          /* 64 lines of per-scanline entries (repeat mode) */
+    60, 0x00,           /**< 60 lines: WH1=0 (left > right -> window disabled) */
+    0x80 | 64,          /**< 64 lines of per-scanline entries (repeat mode) */
     0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88,
     0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90,
     0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98,
@@ -88,7 +108,7 @@ u8 tablerighttriangle[] = {
     0x97, 0x96, 0x95, 0x94, 0x93, 0x92, 0x91, 0x90,
     0x8F, 0x8E, 0x8D, 0x8C, 0x8B, 0x8A, 0x89, 0x88,
     0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81,
-    0x00, 0             /* tail: WH1=0 (disabled) + end */
+    0x00, 0             /**< Tail: WH1=0 (disabled) + end-of-table marker */
 };
 
 /*============================================================================
@@ -101,31 +121,47 @@ u8 tablerighttriangle[] = {
  * Precomputed masks: Enable + Invert (MSKOUT) for each BG combo
  *============================================================================*/
 
+/** @brief W12SEL value to enable Window 1 on BG1 with inversion (mask outside) */
 #define W12SEL_BG1  0x03   /* BG1: enable(0x02) + invert(0x01) */
+/** @brief W12SEL value to enable Window 1 on BG2 with inversion */
 #define W12SEL_BG2  0x30   /* BG2: enable(0x20) + invert(0x10) */
+/** @brief W12SEL value to enable Window 1 on both BG1 and BG2 with inversion */
 #define W12SEL_BOTH 0x33   /* Both BGs */
 
-/*============================================================================
- * Window setup helper — bare-metal register writes
+/**
+ * @brief Configure HDMA-driven window masking on the specified BG layers.
  *
- * Matches PVSnesLib setModeHdmaWindow() exactly:
- *   TMW = layers | 0x10    (OBJ also included)
- *   W12SEL = w12sel_val
- *   WOBJSEL = w12sel_val   (PVSnesLib sets this too)
- *   HDMA ch6/7 → WH0/WH1
- *============================================================================*/
-
+ * Sets up the SNES window hardware and HDMA channels to clip the specified
+ * background layers using the triangle-shaped boundary tables. Uses bare-metal
+ * PPU register writes to match PVSnesLib's setModeHdmaWindow() behavior exactly.
+ *
+ * The window "inverts" masking (via the invert bits in W12SEL), so pixels
+ * OUTSIDE the triangle shape are clipped to black, while pixels inside remain
+ * visible. This is the opposite of the default behavior (which masks inside).
+ *
+ * HDMA channels 4 and 5 are used (not 7, which the NMI handler reserves for
+ * OAM DMA). HDMA is disabled before reconfiguration and re-enabled after to
+ * avoid partial-table reads during the transition.
+ *
+ * @param layers  Bitmask of BG layers for TMW (e.g., TM_BG1 | TM_BG2)
+ * @param w12sel_val  W12SEL register value specifying which BGs use Window 1
+ */
 static void setup_window(u8 layers, u8 w12sel_val) {
-    /* Disable HDMA first */
+    /* Disable HDMA first to prevent partial table reads during reconfiguration */
     hdmaDisable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
-    /* Set window registers — direct writes matching PVSnesLib */
-    REG_TMW = layers | 0x10;      /* Main screen mask + OBJ */
-    REG_W12SEL = w12sel_val;       /* Window 1 enable + invert */
-    REG_WOBJSEL = w12sel_val;      /* PVSnesLib sets WOBJSEL = bgrndmask */
+    /* TMW ($212E): main screen window mask. Bits enable window clipping per
+     * layer. 0x10 includes OBJ in the mask (PVSnesLib convention). */
+    REG_TMW = layers | 0x10;
+    /* W12SEL ($2123): enable Window 1 for the target BGs with inversion. */
+    REG_W12SEL = w12sel_val;
+    /* WOBJSEL ($2125): PVSnesLib also writes the same value here to control
+     * color math window and OBJ window behavior. */
+    REG_WOBJSEL = w12sel_val;
 
-    /* Set up HDMA: channel 4 → WH0, channel 5 → WH1
-     * NMI handler uses DMA channel 7 for OAM — avoid channel 7 for HDMA! */
+    /* Configure HDMA: channel 4 drives WH0 (left boundary),
+     * channel 5 drives WH1 (right boundary). Mode 1REG = one byte per
+     * scanline written to the target register. */
     hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0,
               tablelefttriangle);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
@@ -137,8 +173,16 @@ static void setup_window(u8 layers, u8 w12sel_val) {
  * Main
  *============================================================================*/
 
+/**
+ * @brief Entry point: HDMA triangle window masking with selectable BG layers.
+ *
+ * Loads two BG layers, applies a diamond-shaped window mask via HDMA, and
+ * enters a loop where button presses reconfigure which layers are clipped.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
-    /* Force blank during setup */
+    /* Force blank during setup — screen off prevents visible VRAM corruption */
     setScreenOff();
 
     /*--------------------------------------------------------------------

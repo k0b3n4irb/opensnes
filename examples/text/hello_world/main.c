@@ -30,9 +30,15 @@
 
 #include <snes.h>
 
-/*
- * Font tiles (2bpp format, 16 bytes per tile)
- * Each row is 2 bytes: bitplane0, bitplane1
+/**
+ * @brief Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each)
+ *
+ * Each 8x8 tile occupies 16 bytes in SNES 2bpp format: two interleaved
+ * bitplanes per pixel row. Bitplane 0 selects palette color 1, bitplane 1
+ * selects color 2, and both together select color 3. All bitplane-1 bytes
+ * are zero here, so every lit pixel maps to palette color 1 (white).
+ *
+ * Tile index map: 0=Space, 1=H, 2=E, 3=L, 4=O, 5=W, 6=R, 7=D, 8=!
  */
 static const u8 font_tiles[] = {
     /* Tile 0: Space (blank) */
@@ -72,7 +78,12 @@ static const u8 font_tiles[] = {
     0x18, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00,
 };
 
-/* Message: HELLO WORLD! as tile indices */
+/**
+ * @brief "HELLO WORLD!" encoded as tile indices into font_tiles[]
+ *
+ * Each byte is an index into the font tile array. The string is terminated
+ * by 0xFF, which acts as an end-of-message sentinel (not a valid tile index).
+ */
 static const u8 message[] = {
     1, 2, 3, 3, 4,  /* HELLO */
     0,              /* space */
@@ -81,16 +92,33 @@ static const u8 message[] = {
     0xFF            /* end marker */
 };
 
-/* Background palette: dark blue bg, white text (2 colors × 2 bytes) */
+/**
+ * @brief Background palette in BGR555 format (2 colors, 4 bytes total)
+ *
+ * SNES CGRAM stores colors as 15-bit BGR555: bbbbbgggggrrrrr in two bytes
+ * (little-endian). Color 0 is the background fill, color 1 is the text.
+ * Only 2 of the 4 available Mode 0 palette entries are used.
+ */
 static const u8 bg_palette[] = {
     0x00, 0x28,  /* Color 0: Dark blue */
     0xFF, 0x7F,  /* Color 1: White */
 };
 
+/**
+ * @brief Entry point -- set up PPU, load font, build tilemap, display text
+ *
+ * Initializes the SNES hardware via consoleInit(), loads a hand-coded 2bpp
+ * font into VRAM, fills the 32x32 tilemap with blank tiles, writes the
+ * "HELLO WORLD!" message at a specific tilemap row/column, and enters an
+ * infinite VBlank loop. All VRAM writes happen during forced blank (screen
+ * off) to satisfy the PPU timing constraint.
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
-    u16 addr;
-    u8 tile;
-    u16 i;
+    u16 addr;   /**< VRAM word address for tilemap cursor position */
+    u8 tile;    /**< Current tile index read from message[] */
+    u16 i;      /**< Loop counter for tilemap fill and message write */
 
     /* Initialize console hardware using library */
     consoleInit();

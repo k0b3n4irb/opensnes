@@ -35,10 +35,24 @@
  * External Graphics Data (defined in data.asm)
  *============================================================================*/
 
-extern u8 tiles[], tiles_end[];
-extern u8 tilemap[], tilemap_end[];
-extern u8 palette[], palette_end[];
+extern u8 tiles[], tiles_end[];      /**< 4bpp tile graphics data (defined in data.asm via .incbin) */
+extern u8 tilemap[], tilemap_end[];  /**< 32x32 tilemap entries (defined in data.asm via .incbin) */
+extern u8 palette[], palette_end[];  /**< 16-color BGR555 palette (defined in data.asm via .incbin) */
 
+/**
+ * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
+ *
+ * Demonstrates the most common SNES video mode setup: force blank the
+ * screen, configure BG1's tilemap and tile base addresses, load tile
+ * graphics and palette via bgInitTileSet(), DMA the tilemap to VRAM,
+ * select Mode 1, enable BG1, and turn on the screen. The result is a
+ * static full-screen tiled image using up to 16 colors.
+ *
+ * The VRAM layout places the tilemap at $0000 and tile graphics at $4000
+ * to avoid overlap (each tilemap is up to 2KB, tile data can be many KB).
+ *
+ * @return Never returns (infinite loop).
+ */
 int main(void) {
     /* Force blank during setup */
     setScreenOff();

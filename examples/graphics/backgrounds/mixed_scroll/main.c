@@ -31,47 +31,85 @@
 
 #include <snes.h>
 
+/** @brief BG1 tile data -- repeating shader pattern (4bpp, tiles at VRAM $4000). */
 extern u8 bg1_tiles, bg1_tiles_end;
+/** @brief BG1 palette (16 colors loaded to CGRAM slot 1, offset 16). */
 extern u8 bg1_pal, bg1_pal_end;
+/** @brief BG1 tilemap (32x32 tile grid loaded to VRAM $1800). */
 extern u8 bg1_map, bg1_map_end;
 
+/** @brief BG2 tile data -- static logo (4bpp, tiles at VRAM $5000). */
 extern u8 bg2_tiles, bg2_tiles_end;
+/** @brief BG2 palette (16 colors loaded to CGRAM slot 0, offset 0). */
 extern u8 bg2_pal, bg2_pal_end;
+/** @brief BG2 tilemap (32x32 tile grid loaded to VRAM $1400). */
 extern u8 bg2_map, bg2_map_end;
 
-short scrX = 0, scrY = 0;
+/** @brief BG1 horizontal scroll offset (auto-incremented each frame). */
+short scrX = 0;
+/** @brief BG1 vertical scroll offset (auto-incremented each frame). */
+short scrY = 0;
 
+/**
+ * @brief Entry point -- mixed scrolling with auto-scrolling BG1 and fixed BG2.
+ *
+ * Loads two Mode 1 background layers into non-overlapping VRAM regions:
+ * - BG1: shader pattern (tiles at $4000, tilemap at $1800, palette slot 1)
+ * - BG2: static logo (tiles at $5000, tilemap at $1400, palette slot 0)
+ *
+ * Each frame, BG1's scroll position is incremented diagonally by 1 pixel in
+ * both X and Y, causing the shader pattern to scroll continuously. BG2 has
+ * no scroll updates, so it remains fixed on screen. The SNES PPU composites
+ * both layers together, with BG2 (the logo) appearing on top of BG1 due to
+ * default priority ordering.
+ *
+ * @note The extern declarations use scalar syntax (not array) because the
+ *       data symbols are defined in assembly as labels. Address-of (`&`)
+ *       is used to obtain their pointers for DMA operations.
+ *
+ * @return Does not return (infinite loop).
+ */
 int main(void) {
     consoleInit();
 
-    /* Load BG2 tiles + palette (pvsneslib logo, palette slot 0, tiles at $5000) */
+    /* Load BG2 tiles + palette (static logo).
+     * Palette slot 0 = CGRAM offset 0 (colors 0-15).
+     * Tiles at VRAM $5000 to avoid overlapping BG1 tiles at $4000. */
     bgInitTileSet(1, &bg2_tiles, &bg2_pal, 0,
                   &bg2_tiles_end - &bg2_tiles,
                   &bg2_pal_end - &bg2_pal,
                   BG_16COLORS, 0x5000);
 
-    /* Load BG1 tiles + palette (shader, palette slot 1, tiles at $4000) */
+    /* Load BG1 tiles + palette (shader pattern).
+     * Palette slot 1 = CGRAM offset 16 (colors 16-31).
+     * Each layer needs its own palette slot to avoid color conflicts. */
     bgInitTileSet(0, &bg1_tiles, &bg1_pal, 1,
                   &bg1_tiles_end - &bg1_tiles,
                   &bg1_pal_end - &bg1_pal,
                   BG_16COLORS, 0x4000);
 
-    /* Set tilemap locations */
+    /* Set tilemap locations -- tilemaps must not overlap each other
+     * or the tile data regions. Each SC_32x32 tilemap is 2KB (0x400 words). */
     bgSetMapPtr(1, 0x1400, SC_32x32);
     bgSetMapPtr(0, 0x1800, SC_32x32);
 
-    /* Copy tilemaps to VRAM */
+    /* Copy tilemaps to VRAM -- must happen during VBlank or forced blank
+     * because the PPU silently ignores VRAM writes during active display. */
     WaitForVBlank();
     dmaCopyVram(&bg2_map, 0x1400, &bg2_map_end - &bg2_map);
     dmaCopyVram(&bg1_map, 0x1800, &bg1_map_end - &bg1_map);
 
-    /* Mode 1, enable only BG1 + BG2 (BG3 disabled) */
+    /* Mode 1, enable only BG1 + BG2 (BG3 disabled).
+     * TM_BG1 | TM_BG2 enables both layers on the main screen. */
     setMode(BG_MODE1, 0);
     REG_TM = TM_BG1 | TM_BG2;
 
     setScreenOn();
 
     while (1) {
+        /* Increment both scroll axes by 1 pixel per frame, creating
+         * diagonal motion. The tilemap wraps naturally at 256 pixels
+         * (32 tiles x 8 pixels), producing a seamless repeating effect. */
         scrX++;
         scrY++;
         bgSetScroll(0, scrX, scrY);
