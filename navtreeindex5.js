@@ -1,5 +1,15 @@
 var NAVTREEINDEX5 =
 {
+"structt__sprites.html#a725c47bc8c0a00ad85b3f73b8c6f2a22":[16,0,9,1],
+"structt__sprites.html#aa6d796f63ca5dfef7af5e62efea3aeb2":[16,0,9,6],
+"structt__sprites.html#ac0fb1ea59809017c11430630430e864d":[16,0,9,3],
+"structt__sprites.html#ac4e74ac3a1b9ad5b2f756c512f608cb8":[16,0,9,7],
+"system_8h.html":[17,0,2,0,0,24],
+"system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9":[17,0,2,0,0,24,1],
+"system_8h.html#aaaa70a72e192e5cc318437192516fe9c":[17,0,2,0,0,24,2],
+"system_8h.html#aebb6082d6353b65122e8009f24a5e494":[17,0,2,0,0,24,0],
+"system_8h_source.html":[17,0,2,0,0,24],
+"text_8h.html":[17,0,2,0,0,25],
 "text_8h.html#a055579e7b75458617363a27f1224bc99":[17,0,2,0,0,25,8],
 "text_8h.html#a0ab17818609216a18abe2ba6ba8fd83c":[17,0,2,0,0,25,4],
 "text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f":[17,0,2,0,0,25,10],

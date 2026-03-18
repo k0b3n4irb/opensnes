@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects.html',''); i
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Learn SNES special effects: brightness fading, mosaic pixelation, hardware windows, color math transparency, and HDMA-driven per-scanline effects. These techniques give SNES games their distinctive visual style.</p>
-<h2><a class="anchor" id="autotoc_md864"></a>
+<h2><a class="anchor" id="autotoc_md883"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -121,35 +121,35 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="hdma_wave/">hdma_wave</a>   </td><td class="markdownTableBodyNone">Advanced   </td><td class="markdownTableBodyNone">HDMA wave distortion (wavy scanline offsets)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md865"></a>
+<h2><a class="anchor" id="autotoc_md884"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md866"></a>
+<h3><a class="anchor" id="autotoc_md885"></a>
 Screen Brightness (INIDISP $2100)</h3>
 <ul>
 <li>Bits 0-3: Brightness level (0 = black, 15 = full)</li>
 <li>Bit 7: Force blank (allows VRAM access outside VBlank)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md867"></a>
+<h3><a class="anchor" id="autotoc_md886"></a>
 Mosaic ($2106)</h3>
 <ul>
 <li>Bits 0-3: Enable per BG layer</li>
 <li>Bits 4-7: Mosaic block size (0 = 1x1, 15 = 16x16)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md868"></a>
+<h3><a class="anchor" id="autotoc_md887"></a>
 Hardware Windows ($2123-$212B)</h3>
 <ul>
 <li>Window 1 left/right: <code>$2126</code> / <code>$2127</code></li>
 <li>Window 2 left/right: <code>$2128</code> / <code>$2129</code></li>
 <li>Logic operations: AND, OR, XOR, XNOR per layer</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md869"></a>
+<h3><a class="anchor" id="autotoc_md888"></a>
 HDMA (Horizontal Blank DMA)</h3>
 <p>HDMA transfers data to PPU registers once per scanline during HBlank:</p><ul>
 <li>Use channels 6-7 to avoid conflicts with general DMA</li>
 <li>Table format: count byte + data bytes per entry</li>
 <li>Repeat mode (bit 7 of count = 1) writes every scanline in the group</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md870"></a>
+<h3><a class="anchor" id="autotoc_md889"></a>
 Color Math ($2130-$2132)</h3>
 <ul>
 <li>Add or subtract colors between main screen and sub screen (or fixed color)</li>

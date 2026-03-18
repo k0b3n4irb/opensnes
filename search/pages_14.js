@@ -1,15 +1,14 @@
 var searchData=
 [
-  ['test_0',['Text Module Test',['../examples_text_text_test.html',1,'examples_by_category']]],
-  ['text_20examples_1',['Text Examples',['../examples_text.html',1,'']]],
-  ['text_20module_20test_2',['Text Module Test',['../examples_text_text_test.html',1,'examples_by_category']]],
-  ['third_20party_20components_3',['Third-Party Components',['../third_party.html',1,'index']]],
-  ['to_20opensnes_4',['Contributing to OpenSNES',['../contributing.html',1,'index']]],
-  ['todo_20list_5',['Todo List',['../todo.html',1,'']]],
-  ['transparency_20example_6',['Color Math Transparency Example',['../examples_graphics_effects_transparency.html',1,'examples_by_category']]],
-  ['transparent_20window_20color_20math_20hdma_7',['Transparent Window -- Color Math + HDMA',['../examples_graphics_effects_transparent_window.html',1,'examples_by_category']]],
-  ['triangle_20masking_8',['Window -- HDMA Triangle Masking',['../examples_graphics_effects_window.html',1,'examples_by_category']]],
-  ['troubleshooting_20opensnes_9',['Troubleshooting OpenSNES',['../troubleshooting.html',1,'index']]],
-  ['tutorial_10',['tutorial',['../tutorial_audio.html',1,'Audio &amp; Music Tutorial'],['../tutorial_input.html',1,'Controller Input Tutorial'],['../tutorial_graphics.html',1,'Graphics &amp; Backgrounds Tutorial'],['../tutorial_sprites.html',1,'Sprites &amp; Animation Tutorial']]],
-  ['two_20players_20example_11',['Two Players Example',['../examples_input_two_players.html',1,'examples_by_category']]]
+  ['oam_20object_20attribute_20memory_0',['SNES OAM (Object Attribute Memory)',['../oam.html',1,'index']]],
+  ['oam_20sprite_1',['Simple Sprite -- Your First OAM Sprite',['../examples_graphics_sprites_simple_sprite.html',1,'examples_by_category']]],
+  ['object_20attribute_20memory_2',['SNES OAM (Object Attribute Memory)',['../oam.html',1,'index']]],
+  ['object_20size_20all_206_20snes_20sprite_20size_20modes_3',['Object Size -- All 6 SNES Sprite Size Modes',['../examples_graphics_sprites_object_size.html',1,'examples_by_category']]],
+  ['objects_4',['Map and Objects',['../examples_games_mapandobjects.html',1,'examples_by_category']]],
+  ['opensnes_5',['opensnes',['../contributing.html',1,'Contributing to OpenSNES'],['../getting_started.html',1,'Getting Started with OpenSNES'],['../troubleshooting.html',1,'Troubleshooting OpenSNES']]],
+  ['opensnes_20code_20style_20guide_6',['OpenSNES Code Style Guide',['../code_style.html',1,'index']]],
+  ['opensnes_20documentation_7',['OpenSNES Documentation',['../index.html',1,'']]],
+  ['opensnes_20examples_8',['OpenSNES Examples',['../examples.html',1,'']]],
+  ['over_20backgrounds_9',['Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds',['../examples_graphics_backgrounds_mode1_bg3_priority.html',1,'examples_by_category']]],
+  ['overview_10',['SNES Hardware Overview',['../hardware_overview.html',1,'index']]]
 ];

@@ -1,5 +1,15 @@
 var NAVTREEINDEX2 =
 {
+"group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85":[15,26,0],
+"group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d":[15,26,2],
+"group__audio__samples.html#gadf524c7893ef6324ceb2e343bc541444":[15,26,1],
+"group__audio__volume.html":[15,32],
+"group__audio__volume.html#ga369cd526622e459d207ce9cf59a4b2cb":[15,32,1],
+"group__audio__volume.html#ga3d91be5561ca544b40a7bb4f0ff96a7c":[15,32,2],
+"group__audio__volume.html#ga3f2f5cb90a6dd96e196e3964e9063904":[15,32,3],
+"group__audio__volume.html#ga5e1b2cf17fdac7871870929b97e10cf6":[15,32,4],
+"group__audio__volume.html#gab4c6d490fc3f1e7048c99b7fe357ec11":[15,32,0],
+"group__bg__colors.html":[15,7],
 "group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a":[15,7,0],
 "group__bg__colors.html#ga774d2a0de276a94af89173eb592803c0":[15,7,2],
 "group__bg__colors.html#gaab497f5051249668123af8a5363b8bf8":[15,7,1],
@@ -239,15 +249,5 @@ var NAVTREEINDEX2 =
 "group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97":[15,27,0],
 "group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2":[15,27,1],
 "group__snesmod__stream.html":[15,28],
-"group__snesmod__stream.html#ga1404de31f8d0d90140aa190c3ffea268":[15,28,0],
-"group__snesmod__stream.html#gac0658f7f553444a88821c4f6530df26a":[15,28,1],
-"group__snesmod__volume.html":[15,31],
-"group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f":[15,31,1],
-"group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477":[15,31,0],
-"group__types.html":[15,11],
-"group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6":[15,11,1],
-"group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049":[15,11,4],
-"group__types.html#ga151f780fb455885061d3b77ec1c90c03":[15,11,2],
-"group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1":[15,11,0],
-"group__types.html#ga9e6c91d77e24643b888dbd1a1a590054":[15,11,3]
+"group__snesmod__stream.html#ga1404de31f8d0d90140aa190c3ffea268":[15,28,0]
 };

@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_text_text_test.html',''); ini
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1220"></a>
+    <h2><a class="anchor" id="autotoc_md1239"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to initialize the text rendering system (<code>textInit</code>, <code>textLoadFont</code>)</li>
@@ -109,23 +109,23 @@ What You'll Learn</h2>
 <li>How to set CGRAM colors for background and text</li>
 <li>The correct call sequence: init, load font, set pointers, print, flush</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1221"></a>
+<h2><a class="anchor" id="autotoc_md1240"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1222"></a>
+<h3><a class="anchor" id="autotoc_md1241"></a>
 Text Rendering on the SNES</h3>
 <p>The SNES has no text hardware. To display text, you need a font stored as background tiles in VRAM and a tilemap that maps ASCII characters to tile indices. The text module handles this: <code><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont()</a></code> uploads a built-in 8x8 font to a specified VRAM address, and <code><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></code> writes character tile indices into a RAM buffer. <code><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM.">textFlush()</a></code> then DMA's that buffer into the BG1 tilemap in VRAM.</p>
-<h3><a class="anchor" id="autotoc_md1223"></a>
+<h3><a class="anchor" id="autotoc_md1242"></a>
 CGRAM and Color Setup</h3>
 <p>The SNES PPU reads colors from CGRAM (Color Generator RAM), a 512-byte palette holding 256 15-bit colors. Color 0 is the universal backdrop color. For text, you need at minimum two colors: color 0 for the background and color 1 for the font pixels. <code><a class="el" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c" title="Set a single CGRAM color.">setColor()</a></code> writes a 15-bit BGR value to a specific CGRAM index. The <code><a class="el" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e" title="Create RGB color value.">RGB(r, g, b)</a></code> macro converts 5-bit red, green, blue components into the SNES 15-bit format ($0BBBBBGGGGGRRRRR).</p>
-<h3><a class="anchor" id="autotoc_md1224"></a>
+<h3><a class="anchor" id="autotoc_md1243"></a>
 BG Pointer Configuration</h3>
 <p>The PPU needs to know where in VRAM to find the tilemap and tile graphics for each background layer. <code>bgSetMapPtr(0, 0x3800, BG_MAP_32x32)</code> tells the PPU that BG1's tilemap starts at VRAM word address $3800 and uses a 32x32 tile layout (256x256 pixels). <code>bgSetGfxPtr(0, 0x0000)</code> sets the tile character data address. These must match where <code><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont()</a></code> placed the font tiles.</p>
-<h2><a class="anchor" id="autotoc_md1225"></a>
+<h2><a class="anchor" id="autotoc_md1244"></a>
 Controls</h2>
 <p>This example has no interactive controls. It displays a static text string.</p>
-<h2><a class="anchor" id="autotoc_md1226"></a>
+<h2><a class="anchor" id="autotoc_md1245"></a>
 How It Works</h2>
-<h3><a class="anchor" id="autotoc_md1227"></a>
+<h3><a class="anchor" id="autotoc_md1246"></a>
 1. Console and Video Mode</h3>
 <p>Initialize the system and set Mode 0 (4 background layers, 2bpp each). Mode 0 is ideal for text because 2bpp tiles use less VRAM and 4 colors per palette slot is sufficient for monochrome text.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -133,7 +133,7 @@ How It Works</h2>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga82bccfa80c8aa4ff5aa4e1416e0ade25"><div class="ttname"><a href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a></div><div class="ttdeci">#define BG_MODE0</div><div class="ttdef"><b>Definition</b> video.h:27</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1228"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1247"></a>
 2. Set Colors</h3>
 <p>Color 0 (backdrop) is set to dark blue ($2800) and color 1 (font) to white. <code><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_BG1)</a></code> enables BG1 on the main screen so the tilemap is visible.</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(0, 0x2800);</div>
@@ -143,7 +143,7 @@ How It Works</h2>
 <div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:121</div></div>
 <div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:76</div></div>
 <div class="ttc" id="avideo_8h_html_aac65457ee33ca72f75a6ae3cc8af2f7c"><div class="ttname"><a href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a></div><div class="ttdeci">#define setColor(index, color)</div><div class="ttdoc">Set a single CGRAM color.</div><div class="ttdef"><b>Definition</b> video.h:156</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1229"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1248"></a>
 3. Initialize Text and Load Font</h3>
 <p><code><a class="el" href="text_8h.html#a055579e7b75458617363a27f1224bc99" title="Initialize text system with default configuration.">textInit()</a></code> sets up internal buffers. <code><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont()</a></code> uploads the built-in font tiles to VRAM $0000. The BG pointers are then configured to match:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a>();</div>
@@ -155,7 +155,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
 <div class="ttc" id="atext_8h_html_a055579e7b75458617363a27f1224bc99"><div class="ttname"><a href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a></div><div class="ttdeci">void textInit(void)</div><div class="ttdoc">Initialize text system with default configuration.</div></div>
 <div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1230"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1249"></a>
 4. Print and Flush</h3>
 <p><code>textPrintAt(8, 14, "TEXT MODULE TEST")</code> writes tile indices to a RAM buffer at column 8, row 14. <code><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM.">textFlush()</a></code> DMA's this buffer to the tilemap in VRAM. The screen is then enabled:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc">textPrintAt</a>(8, 14, <span class="stringliteral">&quot;TEXT MODULE TEST&quot;</span>);</div>
@@ -166,15 +166,15 @@ How It Works</h2>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="atext_8h_html_a57d1c6fb6592214ea0fdd6e548dd7efc"><div class="ttname"><a href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc">textPrintAt</a></div><div class="ttdeci">void textPrintAt(u8 x, u8 y, const char *str)</div><div class="ttdoc">Print a string at specific position.</div></div>
 <div class="ttc" id="atext_8h_html_a9cdc7b56636a72b2aa26c75d43dcf404"><div class="ttname"><a href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404">textFlush</a></div><div class="ttdeci">void textFlush(void)</div><div class="ttdoc">Request tilemap DMA transfer to VRAM.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1231"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1250"></a>
 5. Idle Loop</h3>
 <p>The program enters an infinite loop calling <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code>. The text remains on screen because the tilemap in VRAM is static.</p>
-<h2><a class="anchor" id="autotoc_md1232"></a>
+<h2><a class="anchor" id="autotoc_md1251"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">text_test/</div>
 <div class="line">├── main.c      — Text module initialization, print, and flush</div>
 <div class="line">└── Makefile    — Build configuration (4 library modules: console, dma, text, background)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1233"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1252"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/text/text_test</div>

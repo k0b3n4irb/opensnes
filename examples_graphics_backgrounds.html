@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds.html',''
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Learn SNES background modes and scrolling techniques. The PPU supports multiple background layers with different color depths, and hardware scrolling registers allow smooth movement without redrawing the screen.</p>
-<h2><a class="anchor" id="autotoc_md749"></a>
+<h2><a class="anchor" id="autotoc_md765"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -117,9 +117,9 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="mode7_perspective/">mode7_perspective</a>   </td><td class="markdownTableBodyNone">Advanced   </td><td class="markdownTableBodyNone">Pseudo-3D perspective effect (F-Zero style)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md750"></a>
+<h2><a class="anchor" id="autotoc_md766"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md751"></a>
+<h3><a class="anchor" id="autotoc_md767"></a>
 BG Scroll Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -133,14 +133,14 @@ BG Scroll Registers</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>$2113-$2114</code>   </td><td class="markdownTableBodyNone">BG4 H/V scroll   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md752"></a>
+<h3><a class="anchor" id="autotoc_md768"></a>
 Tilemap Entry (2 bytes)</h3>
 <div class="fragment"><div class="line">Bit 15-10: Palette</div>
 <div class="line">Bit 9:     Priority</div>
 <div class="line">Bit 8:     Y flip</div>
 <div class="line">Bit 7:     X flip</div>
 <div class="line">Bit 0-9:   Tile number</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md753"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md769"></a>
 Continuous Scroll Strategy</h3>
 <p>For maps larger than one screen, stream new tile columns/rows into VRAM as the camera moves. Only one column or row needs updating per frame, staying well within the VBlank DMA budget.</p>
 <hr  />
