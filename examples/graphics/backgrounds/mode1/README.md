@@ -166,7 +166,7 @@ Then open `mode1.sfc` in your emulator (Mesen2 recommended).
 |------|---------|
 | `main.c` | Background setup code |
 | `data.asm` | Tiles, tilemap, and palette data |
-| `Makefile` | Build configuration |
+| `Makefile` | Build configuration (`LIB_MODULES := console sprite dma background`) |
 | `res/` | Source graphics files |
 
 ---

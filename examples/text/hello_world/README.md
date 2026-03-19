@@ -235,7 +235,7 @@ math helpers (runtime.asm), and library modules — into a playable `.sfc` ROM.
 TARGET      := hello_world.sfc          # Output ROM filename
 ROM_NAME    := OPENSNES HELLO WORLD     # 21-char name burned into the ROM header
 USE_LIB     := 1                        # Link against the OpenSNES library
-LIB_MODULES := console sprite dma       # Which library pieces to pull in
+LIB_MODULES := console sprite dma background  # Which library pieces to pull in
 CSRC        := main.c                   # Your single C source file
 ```
 
@@ -278,4 +278,4 @@ source files via `ASMSRC`.
 | File | What's in it |
 |------|-------------|
 | `main.c` | Everything — tiles, palette, tilemap, main loop (~136 lines) |
-| `Makefile` | `LIB_MODULES := console sprite dma` |
+| `Makefile` | `LIB_MODULES := console sprite dma background` |

@@ -127,3 +127,7 @@ Then open `mode1_lz77.sfc` in your emulator (Mesen2 recommended). You should
 see a static full-screen image. The key takeaway is not what is displayed, but
 that the tile data was loaded from a compressed source, saving approximately
 4 KB of ROM space.
+
+## Modules
+
+`console lzss background sprite`

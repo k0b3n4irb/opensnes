@@ -27,6 +27,10 @@ The SNES PPU triggers an NMI interrupt at the end of every visible frame (scanli
 
 `WaitForVBlank()` blocks the main loop until the next NMI fires. This guarantees the game runs at a fixed frame rate. Without it, the main loop would spin freely and produce inconsistent timing.
 
+## Modules
+
+`console sprite dma background text input`
+
 ## Build & Run
 
 ```bash

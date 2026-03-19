@@ -23,4 +23,4 @@ Demonstrates the four HDMA library helper effects available in the OpenSNES SDK.
 
 ## Modules
 
-`console sprite dma background hdma`
+`console sprite dma input background hdma`
