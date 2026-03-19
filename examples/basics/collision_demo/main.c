@@ -263,12 +263,7 @@ static void draw_tilemap(void) {
     REG_VMAIN = 0x80;
 
     /* Clear entire 32x32 tilemap at $0400 with tile 0 (empty) */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x04;
-    for (i = 0; i < 1024; i++) {
-        REG_VMDATAL = 0;
-        REG_VMDATAH = 0;
-    }
+    dmaFillVRAM(0, 0x0400, 1024 * 2);
 
     /* Draw collision map tiles */
     for (ty = 0; ty < MAP_HEIGHT; ty++) {

@@ -259,12 +259,7 @@ int main(void) {
     setColor(1, RGB(31, 31, 31));  /* White */
 
     /* Clear tilemap */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x04;
-    for (i = 0; i < 1024; i++) {
-        REG_VMDATAL = 0;
-        REG_VMDATAH = 0;
-    }
+    dmaFillVRAM(0, 0x0400, 1024 * 2);
 
     /* Print messages */
     print_msg(0x0400 + 2*32 + 6, msg_title);

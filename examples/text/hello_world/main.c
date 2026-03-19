@@ -136,13 +136,8 @@ int main(void) {
     /* Load palette via DMA */
     dmaCopyCGram((u8 *)bg_palette, 0, 4);
 
-    /* Fill tilemap with spaces */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x04;
-    for (i = 0; i < 1024; i++) {
-        REG_VMDATAL = 0;
-        REG_VMDATAH = 0;
-    }
+    /* Fill tilemap with spaces (tile 0) */
+    dmaFillVRAM(0, 0x0400, 1024 * 2);
 
     /* Write message at row 14, column 10 */
     addr = 0x05CA;
