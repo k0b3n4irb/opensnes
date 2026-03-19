@@ -1,16 +1,6 @@
 ;==============================================================================
 ; OpenSNES Performance Profiling
 ;==============================================================================
-;
-; Provides:
-;   - Visual color-bar profiling (COLDATA $2132)
-;   - Scanline-based timing (OPVCT $213D)
-;   - Frame/lag counters (from crt0.asm system vars)
-;
-; Author: OpenSNES Team
-; License: MIT
-;
-;==============================================================================
 
 .ifdef HIROM
 .include "lib_memmap_hirom.inc"
@@ -18,25 +8,14 @@
 .include "lib_memmap.inc"
 .endif
 
-;------------------------------------------------------------------------------
-; Constants
-;------------------------------------------------------------------------------
-
-.EQU REG_COLDATA   $2132       ; Fixed color data (backdrop for color math)
-.EQU REG_SLHV      $2137       ; Latch H/V position counters
-.EQU REG_OPVCT     $213D       ; Vertical position counter (read twice)
-
-;------------------------------------------------------------------------------
-; Local storage for scanline timing
-;------------------------------------------------------------------------------
+.EQU REG_CGADSUB   $2131       ; Color math designation
+.EQU REG_COLDATA   $2132       ; Fixed color data
+.EQU REG_SLHV      $2137       ; Latch H/V counters
+.EQU REG_OPVCT     $213D       ; Vertical position counter
 
 .RAMSECTION ".profile_vars" BANK 0 SLOT 1
-    profile_scanline_start  dsb 2   ; Saved scanline for timing
+    profile_scanline_start  dsb 2
 .ENDS
-
-;==============================================================================
-; CODE
-;==============================================================================
 
 .SECTION ".profile_text" SUPERFREE
 
@@ -45,106 +24,103 @@
 .16bit
 
 ;------------------------------------------------------------------------------
+; Color table: 3 COLDATA writes per color (red, green, blue channels)
+;
+; COLDATA format: ccciiiii
+;   bit 7 = blue channel select
+;   bit 6 = green channel select
+;   bit 5 = red channel select
+;   bits 4-0 = intensity (0-31)
+;
+; To set red to 31:   write $3F ($20 | $1F)
+; To set green to 31: write $5F ($40 | $1F)
+; To set blue to 31:  write $9F ($80 | $1F)
+; To clear a channel:  write $20/$40/$80 (intensity 0)
+;------------------------------------------------------------------------------
+color_table:
+;           R     G     B
+.db $3F, $40, $80       ; 0 = RED:     R=31, G=0,  B=0
+.db $20, $5F, $80       ; 1 = GREEN:   R=0,  G=31, B=0
+.db $20, $40, $9F       ; 2 = BLUE:    R=0,  G=0,  B=31
+.db $3F, $5F, $80       ; 3 = YELLOW:  R=31, G=31, B=0
+.db $20, $5F, $9F       ; 4 = CYAN:    R=0,  G=31, B=31
+.db $3F, $40, $9F       ; 5 = MAGENTA: R=31, G=0,  B=31
+.db $3F, $5F, $9F       ; 6 = WHITE:   R=31, G=31, B=31
+
+;------------------------------------------------------------------------------
+; void profileInit(void)
+;
+; Enable color math: add fixed color to backdrop.
+; CGADSUB = $20: addition mode, backdrop enabled.
+;------------------------------------------------------------------------------
+profileInit:
+    php
+    sep #$20
+    lda #$20                    ; add to backdrop
+    sta.l REG_CGADSUB
+    ; Clear fixed color to black
+    lda #$20
+    sta.l REG_COLDATA           ; red = 0
+    lda #$40
+    sta.l REG_COLDATA           ; green = 0
+    lda #$80
+    sta.l REG_COLDATA           ; blue = 0
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
 ; void profileColorStart(u16 color)
 ;
-; Set fixed color (COLDATA) for visual profiling.
-; The color constant encodes R+G+B channel select + intensity.
-;
-; Stack: 5,s = color (16-bit, only low byte used)
+; Set fixed color from the color table.
+; Stack: 5,s = color index (0-6)
 ;------------------------------------------------------------------------------
 profileColorStart:
     php
-    sep #$20                    ; 8-bit A
-    lda 5,s                     ; color (low byte)
-    ora #$20                    ; ensure red channel select
-    sta.l REG_COLDATA           ; set red component
-    lda 5,s
-    ora #$40                    ; green channel select
-    sta.l REG_COLDATA           ; set green component
-    lda 5,s
-    ora #$80                    ; blue channel select
-    sta.l REG_COLDATA           ; set blue component
+    phb
+    rep #$30                    ; 16-bit A, X
+    lda 6,s                     ; color index (php+phb = +2, JSL ret = +3, arg at +6)
+    and #$0007                  ; clamp to 0-7
+    ; Multiply by 3 (table entry size)
+    sta.l tcc__r9               ; temp
+    asl a                       ; *2
+    clc
+    adc.l tcc__r9               ; *3
+    tax                         ; X = table offset
+
+    sep #$20                    ; 8-bit A for register writes
+    lda.l color_table,x         ; red channel COLDATA byte
+    sta.l REG_COLDATA
+    lda.l color_table+1,x       ; green channel
+    sta.l REG_COLDATA
+    lda.l color_table+2,x       ; blue channel
+    sta.l REG_COLDATA
+
+    plb
     plp
     rtl
 
 ;------------------------------------------------------------------------------
 ; void profileColorEnd(void)
 ;
-; Clear fixed color back to black (all channels = 0).
+; Clear fixed color to black (all channels intensity 0).
 ;------------------------------------------------------------------------------
 profileColorEnd:
     php
-    sep #$20                    ; 8-bit A
-    lda #$20                    ; red channel, intensity 0
+    sep #$20
+    lda #$20                    ; red = 0
     sta.l REG_COLDATA
-    lda #$40                    ; green channel, intensity 0
+    lda #$40                    ; green = 0
     sta.l REG_COLDATA
-    lda #$80                    ; blue channel, intensity 0
+    lda #$80                    ; blue = 0
     sta.l REG_COLDATA
     plp
     rtl
 
 ;------------------------------------------------------------------------------
 ; u16 profileGetScanline(void)
-;
-; Latch and read the PPU vertical position counter.
-; Returns 9-bit value (0-261 NTSC, 0-311 PAL) in A.
 ;------------------------------------------------------------------------------
 profileGetScanline:
     php
-    sep #$20                    ; 8-bit A for register reads
-    lda.l REG_SLHV              ; latch H/V counters
-    lda.l REG_OPVCT             ; read low byte
-    rep #$20                    ; 16-bit A
-    and #$00FF                  ; mask to 8 bits
-    pha                         ; save low byte
-    sep #$20
-    lda.l REG_OPVCT             ; read high bit
-    rep #$20
-    and #$0001                  ; bit 0 only
-    .repeat 8
-    asl a
-    .endr                       ; shift to bit 8
-    ora 1,s                     ; combine with low byte
-    sta 1,s
-    pla                         ; result in A
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
-; void profileScanlineStart(void)
-;
-; Save current scanline for later measurement.
-;------------------------------------------------------------------------------
-profileScanlineStart:
-    php
-    sep #$20
-    lda.l REG_SLHV              ; latch
-    lda.l REG_OPVCT             ; low byte
-    rep #$20
-    and #$00FF
-    sta.w profile_scanline_start
-    sep #$20
-    lda.l REG_OPVCT             ; high bit
-    rep #$20
-    and #$0001
-    .repeat 8
-    asl a
-    .endr
-    ora.w profile_scanline_start
-    sta.w profile_scanline_start
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
-; u16 profileScanlineEnd(void)
-;
-; Returns elapsed scanlines since profileScanlineStart().
-; Result in A (16-bit).
-;------------------------------------------------------------------------------
-profileScanlineEnd:
-    php
-    ; Read current scanline
     sep #$20
     lda.l REG_SLHV              ; latch
     lda.l REG_OPVCT             ; low byte
@@ -159,25 +135,66 @@ profileScanlineEnd:
     asl a
     .endr
     ora 1,s
-    sta 1,s                     ; current scanline on stack
+    sta 1,s
+    pla
+    plp
+    rtl
 
-    ; Subtract start scanline
+;------------------------------------------------------------------------------
+; void profileScanlineStart(void)
+;------------------------------------------------------------------------------
+profileScanlineStart:
+    php
+    sep #$20
+    lda.l REG_SLHV
+    lda.l REG_OPVCT
+    rep #$20
+    and #$00FF
+    sta.w profile_scanline_start
+    sep #$20
+    lda.l REG_OPVCT
+    rep #$20
+    and #$0001
+    .repeat 8
+    asl a
+    .endr
+    ora.w profile_scanline_start
+    sta.w profile_scanline_start
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; u16 profileScanlineEnd(void)
+;------------------------------------------------------------------------------
+profileScanlineEnd:
+    php
+    sep #$20
+    lda.l REG_SLHV
+    lda.l REG_OPVCT
+    rep #$20
+    and #$00FF
+    pha
+    sep #$20
+    lda.l REG_OPVCT
+    rep #$20
+    and #$0001
+    .repeat 8
+    asl a
+    .endr
+    ora 1,s
+    sta 1,s
     pla
     sec
     sbc.w profile_scanline_start
-
-    ; Handle wrap (current < start means we crossed frame boundary)
     bpl @no_wrap
     clc
-    adc #262                    ; NTSC frame = 262 scanlines
+    adc #262
 @no_wrap:
     plp
     rtl
 
 ;------------------------------------------------------------------------------
 ; u16 profileGetFrameCount(void)
-;
-; Returns frame_count from crt0.asm system variables.
 ;------------------------------------------------------------------------------
 profileGetFrameCount:
     rep #$20
@@ -186,8 +203,6 @@ profileGetFrameCount:
 
 ;------------------------------------------------------------------------------
 ; u16 profileGetLagFrames(void)
-;
-; Returns lag_frame_counter from crt0.asm system variables.
 ;------------------------------------------------------------------------------
 profileGetLagFrames:
     rep #$20
