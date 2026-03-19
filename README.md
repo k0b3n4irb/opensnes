@@ -93,6 +93,8 @@ We stand on the shoulders of:
 - **[WLA-DX](https://github.com/vhelin/wla-dx)** by Ville Helin — assembler
 - **[SNESMOD](https://github.com/mukunda-/snesmod)** by Mukunda Johnson — audio driver
 
+See [ATTRIBUTION.md](ATTRIBUTION.md) for the full list of dependencies, licenses, and contributors.
+
 ## Contributing
 
 Contributions welcome! See the **[Contributing Guide](https://k0b3n4irb.github.io/opensnes/contributing.html)**.

@@ -129,6 +129,10 @@ Every new feature or example must have:
 
 For code style conventions, see [Code Style Guide](https://k0b3n4irb.github.io/opensnes/code_style.html).
 
+When using external code, add an entry to [ATTRIBUTION.md](ATTRIBUTION.md) with the
+source, author, license, and description of modifications. Include a header
+comment in the source file.
+
 ## Good First Issues
 
 Look for issues labeled [`good first issue`](https://github.com/k0b3n4irb/opensnes/labels/good%20first%20issue).
