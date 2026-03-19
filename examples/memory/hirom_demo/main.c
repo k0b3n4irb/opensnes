@@ -164,14 +164,7 @@ static void write_tile(u8 x, u8 y, u8 tile) {
  * zero attributes. Must be called during force blank or VBlank.
  */
 static void clear_tilemap(void) {
-    u16 i;
-    REG_VMAIN = 0x80;
-    REG_VMADDL = TILEMAP_ADDR & 0xFF;
-    REG_VMADDH = TILEMAP_ADDR >> 8;
-    for (i = 0; i < 1024; i++) {
-        REG_VMDATAL = TILE_SPACE;
-        REG_VMDATAH = 0;
-    }
+    dmaFillVRAM(TILE_SPACE, TILEMAP_ADDR, 1024 * 2);
 }
 
 /*============================================================================

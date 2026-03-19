@@ -162,14 +162,22 @@ at the same angle every time and the game plays itself.
 ### 7. Drop Shadows (Free Depth)
 
 Every visible sprite has a shadow twin: same shape, darker palette, offset a few pixels
-down-right, drawn at a lower priority:
+down-right, drawn at a lower priority. Sprites are positioned via direct `oamMemory[]`
+writes instead of `oamSet()` to avoid the 158-byte stack frame overhead per call (10
+sprites per frame would cause visible slowdown):
 
 ```c
-// Ball — priority 3 (front)
-oamSet(1, pos_x, pos_y, 20 | 256, 0, 3, 0);
+// Ball — priority 3 (front), tile 20, attr 0x31
+oamMemory[4]  = (u8)pos_x;
+oamMemory[5]  = (u8)pos_y;
+oamMemory[6]  = 20;
+oamMemory[7]  = 0x31;
 
-// Ball shadow — priority 1 (behind), offset +3/+3
-oamSet(6, pos_x + 3, pos_y + 3, 21 | 256, 0, 1, 0);
+// Ball shadow — priority 1 (behind), tile 21, attr 0x11, offset +3/+3
+oamMemory[24] = (u8)(pos_x + 3);
+oamMemory[25] = (u8)(pos_y + 3);
+oamMemory[26] = 21;
+oamMemory[27] = 0x11;
 ```
 
 It costs 5 extra sprites (one per visible piece), but the result looks surprisingly polished

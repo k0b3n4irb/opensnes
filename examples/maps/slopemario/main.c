@@ -106,8 +106,7 @@ int main(void) {
     /* Load map and do initial full-screen refresh */
     mapLoad((u8 *)&mapmario, (u8 *)&tilesetdef, (u8 *)&tilesetatt);
 
-    /* Flush tilemap to VRAM while screen is off */
-    mapVblank();
+    /* mapLoad flushes VRAM internally */
 
     /* Flush initial sprite frame to VRAM before screen on */
     oamDynamic16Draw(0);

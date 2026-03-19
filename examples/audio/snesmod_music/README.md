@@ -51,8 +51,8 @@ After this lesson, you will understand:
 | Screen enable | Library (`setScreenOn()`) |
 | VBlank sync | Library (`WaitForVBlank()`) |
 | Audio | SNESMOD library |
-| Font tiles | Embedded C array |
-| Text rendering | Direct VRAM writes |
+| Font tiles | text module (`textLoadFont`) |
+| Text rendering | text module (`textPrintAt`, `textFlush`) |
 
 ---
 

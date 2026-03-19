@@ -346,10 +346,74 @@ _mini2:
     plx
     plb
 
+    ; mapLoad calls mapRefreshAll, then flushes VRAM directly (screen is off)
+    jsl mapRefreshAll
+
+    ; --- Direct VRAM flush (screen MUST be off during mapLoad) ---
+    ; DMA the entire bg_L1 buffer to VRAM immediately, so callers don't
+    ; need the mapUpdate+WaitForVBlank+mapVblank workaround.
+    sep #$20
+    lda #$80
+    sta.l $2115                     ; VMAIN: word increment
+
+    rep #$20
+    ldx #MAP_BG1_ADR
+    stx $2116                      ; VRAM destination
+
+    ldx #bg_L1.w
+    stx $4302                      ; Source address
+    sep #$20
+    lda #:bg_L1
+    sta.l $4304                    ; Source bank ($7E)
+
+    ldx #$1801
+    stx $4300                      ; DMA mode: word write to $2118
+
+    rep #$20
+    ldy #32 * 32 * 2               ; 2048 bytes (left page)
+    sty $4305
+
+    sep #$20
+    lda #$01
+    sta.l $420B                    ; Start DMA
+
+    ; Also flush the vertical buffer (right page edge column)
+    lda #$81                        ; VMAIN: increment by 32 (vertical)
+    sta.l $2115
+
+    rep #$20
+    ldx.w bgvvramloc_L1
+    stx $2116
+
+    ldx #bgvertleftbuf_L1.w
+    stx $4302
+    sep #$20
+    lda #:bgvertleftbuf_L1
+    sta.l $4304
+
+    ldx #$1801
+    stx $4300
+
+    rep #$20
+    ldy #32 * 2                    ; 64 bytes (one column)
+    sty $4305
+
+    sep #$20
+    lda #$01
+    sta.l $420B
+
+    ; Clear update flag — VRAM is already current
+    lda #$0
+    sta.l mapupdbuf
+
+    plp
+    rtl
+
 ;------------------------------------------------------------------------------
-; mapRefreshAll - internal: rebuild entire visible tilemap
+; mapRefreshAll - internal: rebuild entire visible tilemap in bg_L1
 ;------------------------------------------------------------------------------
 mapRefreshAll:
+    php
     phb
 
     sep #$20
@@ -750,7 +814,12 @@ mapUpdate:
     sep #$20
     lda.l mapdirty
     beq _maupd1
-    jmp mapRefreshAll
+    ; Runtime full refresh: push B, set bank $7E, then enter refresh
+    phb
+    lda #$7e
+    pha
+    plb
+    jmp _mapRefreshAll1
 
 _maupd1:
     phb

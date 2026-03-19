@@ -172,7 +172,7 @@ Then open `fading.sfc` in your emulator (Mesen2 recommended).
 |------|---------|
 | `main.c` | Fade logic and demo sequence |
 | `data.asm` | Background graphics |
-| `Makefile` | Build configuration |
+| `Makefile` | Build configuration (`LIB_MODULES := console sprite dma input background`) |
 
 ---
 

@@ -203,7 +203,7 @@ color shifting left and right. The checkerboard makes the distortion obvious.
 TARGET      := hdma_wave.sfc
 CSRC        := main.c
 USE_LIB     := 1
-LIB_MODULES := console dma sprite input
+LIB_MODULES := console dma sprite input hdma
 ```
 
 ### All Data Lives in C
@@ -253,4 +253,4 @@ no external dependencies.
 | File | What's in it |
 |------|-------------|
 | `main.c` | Everything — sine tables, HDMA setup, input loop (~573 lines, mostly data) |
-| `Makefile` | `LIB_MODULES := console dma sprite input` |
+| `Makefile` | `LIB_MODULES := console dma sprite input hdma` |

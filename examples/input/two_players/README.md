@@ -53,7 +53,7 @@ Two-player simultaneous control:
 |-----------|------|
 | Console init | Library (`consoleInit`, `setScreenOn`) |
 | Sprite display | Library (`oamInit`, `oamSet`, `oamUpdate`) |
-| Input reading | Direct register access |
+| Input reading | Library (`padHeld(0)`, `padHeld(1)`) |
 | Boundary check | C code |
 
 ---
@@ -72,14 +72,9 @@ Two-player simultaneous control:
 ### Reading Both Controllers
 
 ```c
-/* Wait for auto-read completion */
-while (REG_HVBJOY & 0x01) {}
-
-/* Read controller 1 */
-u16 pad1 = REG_JOY1L | (REG_JOY1H << 8);
-
-/* Read controller 2 */
-u16 pad2 = REG_JOY2L | (REG_JOY2H << 8);
+/* Read both controllers (NMI handler reads joypads automatically) */
+pad1 = padHeld(0);
+pad2 = padHeld(1);
 ```
 
 ---
@@ -187,7 +182,7 @@ Configure the emulator for two controllers.
 | File | Purpose |
 |------|---------|
 | `main.c` | Two-player input handling, sprite setup, palette |
-| `Makefile` | Build configuration |
+| `Makefile` | Build configuration (`LIB_MODULES := console input sprite dma text`) |
 
 ---
 

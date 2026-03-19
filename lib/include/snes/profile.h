@@ -2,8 +2,8 @@
  * @file profile.h
  * @brief Performance profiling tools for SNES development
  *
- * Provides scanline-based timing, VBlank usage measurement, lag frame
- * counting, and visual color-bar profiling for the SNES.
+ * Provides scanline-based timing, visual color-bar profiling,
+ * and frame/lag counters.
  *
  * ## Quick Start
  *
@@ -11,21 +11,21 @@
  * #include <snes.h>
  * #include <snes/profile.h>
  *
- * while (1) {
- *     WaitForVBlank();
+ * int main(void) {
+ *     consoleInit();
+ *     profileInit();  // enable color math for visual bars
+ *     // ... setup ...
+ *     setScreenOn();
  *
- *     profileColorStart(PROFILE_RED);
- *     // ... game logic ...
- *     profileColorEnd();
+ *     while (1) {
+ *         WaitForVBlank();
  *
- *     profileColorStart(PROFILE_GREEN);
- *     // ... rendering ...
- *     profileColorEnd();
+ *         profileColorStart(PROFILE_RED);
+ *         // ... game logic ...
+ *         profileColorEnd();
+ *     }
  * }
  * @endcode
- *
- * The colored bars visible at the bottom of the screen show how much
- * CPU time each section uses. If the bars reach VBlank, you're lagging.
  *
  * ## Build
  *
@@ -46,47 +46,44 @@
 /*============================================================================
  * Color Constants for Visual Profiling
  *
- * COLDATA format: gggrrrrr (green high 3 bits, red 5 bits)
- * These write to $2132 with intensity + channel select bits.
+ * Each constant is an index into the internal color table.
  *============================================================================*/
 
-/** Red color bar */
-#define PROFILE_RED     0x21
-/** Green color bar */
-#define PROFILE_GREEN   0x42
-/** Blue color bar */
-#define PROFILE_BLUE    0x80
-/** Yellow color bar */
-#define PROFILE_YELLOW  0x63
-/** Cyan color bar */
-#define PROFILE_CYAN    0xC2
-/** Magenta color bar */
-#define PROFILE_MAGENTA 0xA1
-/** White color bar */
-#define PROFILE_WHITE   0xE3
+#define PROFILE_RED       0
+#define PROFILE_GREEN     1
+#define PROFILE_BLUE      2
+#define PROFILE_YELLOW    3
+#define PROFILE_CYAN      4
+#define PROFILE_MAGENTA   5
+#define PROFILE_WHITE     6
+
+/*============================================================================
+ * Initialization
+ *============================================================================*/
+
+/**
+ * @brief Initialize the profiler
+ *
+ * Enables color math so that profileColorStart/End produce visible
+ * color bars on the backdrop. Call once after consoleInit(), before
+ * setScreenOn().
+ *
+ * Sets CGADSUB ($2131) to add fixed color to backdrop.
+ */
+void profileInit(void);
 
 /*============================================================================
  * Visual Color-Bar Profiling
  *
- * Sets the fixed color (backdrop) to a bright color before a code section,
- * then clears it after. The resulting color band on screen shows execution
- * time visually — the classic SNES developer technique.
- *
- * Multiple sections can use different colors to identify bottlenecks:
- *   profileColorStart(PROFILE_RED);    // AI update
- *   profileColorEnd();
- *   profileColorStart(PROFILE_GREEN);  // physics
- *   profileColorEnd();
+ * Sets the fixed color (COLDATA $2132) to show colored bands on screen.
+ * The band width shows how much CPU time the section uses.
+ * Multiple sections can use different colors to identify bottlenecks.
  *============================================================================*/
 
 /**
  * @brief Start a color-bar profiling section
  *
- * Sets the SNES fixed color (COLDATA $2132) to the given color.
- * The colored band is visible in the overscan/border area and during
- * active display if color math is enabled with fixed color source.
- *
- * @param color One of the PROFILE_* color constants
+ * @param color One of the PROFILE_* color constants (0-6)
  */
 void profileColorStart(u16 color);
 
@@ -99,29 +96,15 @@ void profileColorEnd(void);
 
 /*============================================================================
  * Scanline-Based Timing
- *
- * Reads the PPU vertical counter (OPVCT $213D) to measure elapsed
- * scanlines. Each scanline ≈ 1364 master cycles (NTSC).
- *
- * Accuracy: ±1 scanline. For sub-scanline precision, use Mesen2's
- * built-in profiler instead.
  *============================================================================*/
 
 /**
- * @brief Get the current scanline number
- *
- * Latches and reads the PPU vertical position counter (OPVCT).
- * Returns 0-261 (NTSC) or 0-311 (PAL).
- *
- * @return Current scanline (0 = top of frame)
+ * @brief Get the current scanline number (0-261 NTSC, 0-311 PAL)
  */
 u16 profileGetScanline(void);
 
 /**
  * @brief Start a scanline-based timing measurement
- *
- * Records the current scanline. Call profileScanlineEnd() after the
- * code section to get the elapsed scanline count.
  */
 void profileScanlineStart(void);
 
@@ -135,27 +118,17 @@ u16 profileScanlineEnd(void);
 
 /*============================================================================
  * Frame Counters
- *
- * These read system variables maintained by the NMI handler in crt0.asm.
  *============================================================================*/
 
 /**
- * @brief Get the total frame count
- *
- * Incremented by the NMI handler every VBlank. Wraps at 65535.
- *
- * @return Frame count since boot
+ * @brief Get total frame count since boot (wraps at 65535)
  */
 u16 profileGetFrameCount(void);
 
 /**
- * @brief Get the lag frame count
+ * @brief Get lag frame count since boot
  *
- * A lag frame occurs when main-thread code doesn't call WaitForVBlank()
- * before the next NMI fires. The NMI handler skips DMA work on lag
- * frames and increments this counter.
- *
- * @return Number of lag frames since boot
+ * A lag frame occurs when main code doesn't finish before the next NMI.
  */
 u16 profileGetLagFrames(void);
 

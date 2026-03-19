@@ -4,260 +4,69 @@
  * @ingroup examples
  *
  * Plays an Impulse Tracker (.it) module through the SPC700 sound processor
- * using the SNESMOD library. The module is converted at build time by
- * smconv into a soundbank that gets uploaded to the SPC700's 64 KB audio
- * RAM. Once loaded, snesmodPlay() starts playback and snesmodProcess()
- * must be called every frame to feed new pattern data to the sound driver.
+ * using the SNESMOD library. Provides transport controls: play, stop,
+ * pause/resume, volume up/down, and fade out.
  *
- * The example provides a full set of transport controls (play, stop,
- * pause/resume, volume, fade out) and displays them on-screen using a
- * hand-coded 2bpp bitmap font.
+ * Ported from PVSnesLib "music" example by alekmaul.
  *
  * @par SNES Concepts
- * - SPC700 audio subsystem: separate 65C816 coprocessor with its own 64 KB RAM
- * - SNESMOD workflow: snesmodInit() -> snesmodSetSoundbank() -> snesmodLoadModule() -> snesmodPlay()
- * - Per-frame snesmodProcess() call to stream pattern data to the SPC700
- * - Module volume control and fade effects via snesmodSetModuleVolume / snesmodFadeVolume
- * - Build pipeline: .it file -> smconv -> soundbank.asm + soundbank.h
+ * - SPC700 audio: separate coprocessor with 64 KB audio RAM
+ * - SNESMOD workflow: init → setSoundbank → loadModule → play
+ * - Per-frame snesmodProcess() to stream pattern data to SPC700
+ * - Module volume and fade control
  *
  * @par What to Observe
- * - Music begins playing immediately on boot (the "pollen8" module)
- * - Press A to restart, B to stop, X to pause/resume
- * - L/R adjusts volume in steps of 10; START triggers a gradual fade-out
- * - Text HUD on dark blue background shows available controls
+ * - Music plays immediately on boot
+ * - A=play, B=stop, X=pause/resume, L/R=volume, START=fade out
  *
  * @par Modules Used
- * console, sprite, dma, input
+ * console, sprite, dma, input, background, text
  *
- * @see snesmod.h, dma.h, video.h
+ * @see snesmod.h
  */
 
 #include <snes.h>
 #include <snes/snesmod.h>
+#include <snes/text.h>
 #include "soundbank.h"
 
 /**
- * @brief Hand-coded 2bpp bitmap font (40 glyphs, 16 bytes each = 640 bytes)
- *
- * A minimal bitmap font covering uppercase A-Z, digits 0-9, and punctuation
- * symbols (-, /, :). Each 8x8 glyph is stored in SNES 2bpp format with
- * interleaved bitplanes. Only bitplane 0 is used, so all text renders as
- * palette color 1.
- *
- * Tile index map: 0=space, 1-26=A-Z, 27-36=0-9, 37=-, 38=/, 39=:
- */
-static const u8 font_tiles[] = {
-    /* 0: Space */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    /* 1: A */
-    0x18,0x00, 0x3C,0x00, 0x66,0x00, 0x7E,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 2: B */
-    0x7C,0x00, 0x66,0x00, 0x7C,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x7C,0x00, 0x00,0x00,
-    /* 3: C */
-    0x3C,0x00, 0x66,0x00, 0x60,0x00, 0x60,0x00,
-    0x60,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 4: D */
-    0x78,0x00, 0x6C,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x6C,0x00, 0x78,0x00, 0x00,0x00,
-    /* 5: E */
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 6: F */
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x00,0x00,
-    /* 7: G */
-    0x3C,0x00, 0x66,0x00, 0x60,0x00, 0x6E,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 8: H */
-    0x66,0x00, 0x66,0x00, 0x7E,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 9: I */
-    0x3C,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 10: J */
-    0x1E,0x00, 0x0C,0x00, 0x0C,0x00, 0x0C,0x00,
-    0x6C,0x00, 0x6C,0x00, 0x38,0x00, 0x00,0x00,
-    /* 11: K */
-    0x66,0x00, 0x6C,0x00, 0x78,0x00, 0x70,0x00,
-    0x78,0x00, 0x6C,0x00, 0x66,0x00, 0x00,0x00,
-    /* 12: L */
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 13: M */
-    0xC6,0x00, 0xEE,0x00, 0xFE,0x00, 0xD6,0x00,
-    0xC6,0x00, 0xC6,0x00, 0xC6,0x00, 0x00,0x00,
-    /* 14: N */
-    0x66,0x00, 0x76,0x00, 0x7E,0x00, 0x6E,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 15: O */
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 16: P */
-    0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x7C,0x00,
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x00,0x00,
-    /* 17: Q */
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x6A,0x00, 0x6C,0x00, 0x36,0x00, 0x00,0x00,
-    /* 18: R */
-    0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x7C,0x00,
-    0x6C,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 19: S */
-    0x3C,0x00, 0x66,0x00, 0x70,0x00, 0x3C,0x00,
-    0x0E,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 20: T */
-    0x7E,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    /* 21: U */
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 22: V */
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x3C,0x00, 0x3C,0x00, 0x18,0x00, 0x00,0x00,
-    /* 23: W */
-    0xC6,0x00, 0xC6,0x00, 0xD6,0x00, 0xFE,0x00,
-    0xEE,0x00, 0xC6,0x00, 0xC6,0x00, 0x00,0x00,
-    /* 24: X */
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x18,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 25: Y */
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    /* 26: Z */
-    0x7E,0x00, 0x06,0x00, 0x0C,0x00, 0x18,0x00,
-    0x30,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 27-36: 0-9 */
-    0x3C,0x00, 0x66,0x00, 0x6E,0x00, 0x76,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x18,0x00, 0x38,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x7E,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x06,0x00, 0x1C,0x00, 0x30,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x06,0x00, 0x1C,0x00, 0x06,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x0C,0x00, 0x1C,0x00, 0x3C,0x00, 0x6C,0x00, 0x7E,0x00, 0x0C,0x00, 0x0C,0x00, 0x00,0x00,
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x06,0x00, 0x06,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x1C,0x00, 0x30,0x00, 0x60,0x00, 0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x7E,0x00, 0x06,0x00, 0x0C,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3E,0x00, 0x06,0x00, 0x0C,0x00, 0x38,0x00, 0x00,0x00,
-    /* 37: - */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x7E,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    /* 38: / */
-    0x06,0x00, 0x0C,0x00, 0x18,0x00, 0x30,0x00,
-    0x60,0x00, 0xC0,0x00, 0x80,0x00, 0x00,0x00,
-    /* 39: : */
-    0x00,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    0x18,0x00, 0x18,0x00, 0x00,0x00, 0x00,0x00,
-};
-
-/** @brief Total size of font tile data in bytes (40 glyphs * 16 bytes each) */
-#define FONT_SIZE (40 * 16)
-
-/** @brief HUD title: "SNESMOD MUSIC EXAMPLE" (tile indices, 0xFF-terminated) */
-static const u8 msg_title[] = { 19,14,5,19,13,15,4, 0, 13,21,19,9,3, 0, 5,24,1,13,16,12,5, 0xFF };
-/** @brief HUD label: "CONTROLS:" */
-static const u8 msg_controls[] = { 3,15,14,20,18,15,12,19,39, 0xFF };
-/** @brief HUD line: "A - PLAY MUSIC" */
-static const u8 msg_a[] = { 1, 0,37,0, 16,12,1,25, 0, 13,21,19,9,3, 0xFF };
-/** @brief HUD line: "B - STOP MUSIC" */
-static const u8 msg_b[] = { 2, 0,37,0, 19,20,15,16, 0, 13,21,19,9,3, 0xFF };
-/** @brief HUD line: "X - PAUSE/RESUME" */
-static const u8 msg_x[] = { 24, 0,37,0, 16,1,21,19,5,38,18,5,19,21,13,5, 0xFF };
-/** @brief HUD line: "L/R - VOLUME DOWN/UP" */
-static const u8 msg_lr[] = { 12,38,18, 0,37,0, 22,15,12,21,13,5, 0, 4,15,23,14,38,21,16, 0xFF };
-/** @brief HUD line: "START - FADE OUT" */
-static const u8 msg_start[] = { 19,20,1,18,20, 0,37,0, 6,1,4,5, 0, 15,21,20, 0xFF };
-/** @brief HUD status: "NOW PLAYING: POLLEN8" */
-static const u8 msg_playing[] = { 14,15,23, 0, 16,12,1,25,9,14,7,39, 0, 16,15,12,12,5,14,35, 0xFF };
-
-/**
- * @brief Write a 0xFF-terminated tile-index string to VRAM at a tilemap address
- *
- * Writes tile indices sequentially to the BG1 tilemap in VRAM, starting at
- * the given word address. Each entry is written as a 16-bit tilemap word
- * with the tile index in the low byte and zero attributes in the high byte.
- * Must be called during forced blank or VBlank since it writes to VRAM
- * via direct PPU register access.
- *
- * @param addr VRAM word address within the tilemap (e.g., 0x0400 + row*32 + col)
- * @param msg  Pointer to a 0xFF-terminated array of tile indices
- */
-static void print_msg(u16 addr, const u8 *msg) {
-    u16 i;
-    REG_VMADDL = addr & 0xFF;
-    REG_VMADDH = addr >> 8;
-    i = 0;
-    while (msg[i] != 0xFF) {
-        REG_VMDATAL = msg[i];
-        REG_VMDATAH = 0;
-        i++;
-    }
-}
-
-/**
- * @brief Entry point -- initialize SNESMOD, display HUD, run transport loop
- *
- * Sets up a Mode 0 text display with hand-coded font tiles, initializes the
- * SNESMOD audio system, uploads the soundbank to SPC700 RAM, loads the
- * "pollen8" tracker module, and starts playback. The main loop polls the
- * joypad each frame and provides full transport controls: play (A), stop (B),
- * pause/resume (X), volume up/down (R/L), and fade out (START).
- * snesmodProcess() must be called every frame to stream pattern data to the
- * SPC700 sound driver.
- *
- * @return Never returns (infinite loop).
+ * @brief Entry point — initialize audio, display controls, run transport loop
+ * @return Never returns
  */
 int main(void) {
-    u16 pad;           /**< Raw joypad state this frame */
-    u16 pad_pressed;   /**< Newly pressed buttons (rising edge) */
-    u16 pad_prev;      /**< Previous frame's joypad state for edge detection */
-    u8 volume;         /**< Current module volume (0-127) */
-    u8 paused;         /**< Pause toggle state: 0=playing, 1=paused */
-    u16 i;             /**< General-purpose loop counter */
+    u16 pad;
+    u8 volume;
+    u8 paused;
 
-    /* Initialize console hardware */
+    /* Init hardware */
     consoleInit();
-
-    /* Set Mode 0 (4 BG layers, all 2bpp) */
     setMode(BG_MODE0, 0);
 
-    /* Configure BG1 for text display */
-    REG_BG1SC = 0x04;   /* Tilemap at $0400, 32x32 */
-    REG_BG12NBA = 0x00; /* BG1 tiles at $0000 */
+    /* Palette */
+    setColor(0, 0x2800);
+    setColor(1, RGB(31, 31, 31));
 
-    /* Load font tiles to VRAM $0000 */
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
-    for (i = 0; i < FONT_SIZE; i += 2) {
-        REG_VMDATAL = font_tiles[i];
-        REG_VMDATAH = font_tiles[i + 1];
-    }
+    /* Text setup */
+    textInit();
+    textLoadFont(0x0000);
+    bgSetGfxPtr(0, 0x0000);
+    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
-    /* Set palette */
-    setColor(0, 0x2800);           /* Dark blue */
-    setColor(1, RGB(31, 31, 31));  /* White */
+    /* HUD */
+    textPrintAt(5, 2, "SNESMOD MUSIC EXAMPLE");
+    textPrintAt(5, 5, "CONTROLS:");
+    textPrintAt(7, 7, "A - PLAY MUSIC");
+    textPrintAt(7, 8, "B - STOP MUSIC");
+    textPrintAt(7, 9, "X - PAUSE/RESUME");
+    textPrintAt(7, 10, "L/R - VOLUME DOWN/UP");
+    textPrintAt(7, 11, "START - FADE OUT");
+    textPrintAt(5, 14, "NOW PLAYING: POLLEN8");
 
-    /* Clear tilemap */
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x04;
-    for (i = 0; i < 1024; i++) {
-        REG_VMDATAL = 0;
-        REG_VMDATAH = 0;
-    }
-
-    /* Print messages */
-    print_msg(0x0400 + 2*32 + 5, msg_title);
-    print_msg(0x0400 + 5*32 + 5, msg_controls);
-    print_msg(0x0400 + 7*32 + 7, msg_a);
-    print_msg(0x0400 + 8*32 + 7, msg_b);
-    print_msg(0x0400 + 9*32 + 7, msg_x);
-    print_msg(0x0400 + 10*32 + 7, msg_lr);
-    print_msg(0x0400 + 11*32 + 7, msg_start);
-    print_msg(0x0400 + 14*32 + 5, msg_playing);
-
-    /* Enable BG1 on main screen */
+    /* Screen enable */
     setMainScreen(LAYER_BG1);
+    textFlush();
+    WaitForVBlank();
 
     /* Initialize SNESMOD */
     snesmodInit();
@@ -265,50 +74,37 @@ int main(void) {
     snesmodLoadModule(MOD_POLLEN8);
     snesmodPlay(0);
 
-    /* Turn on screen */
     setScreenOn();
 
-    /* Initialize variables */
+    /* State */
     volume = 127;
     paused = 0;
-
-    /* Initialize pad_prev */
-    WaitForVBlank();
-    while (REG_HVBJOY & 0x01) {}
-    pad_prev = REG_JOY1L | (REG_JOY1H << 8);
 
     /* Main loop */
     while (1) {
         WaitForVBlank();
         snesmodProcess();
 
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-        pad_pressed = pad & ~pad_prev;
-        pad_prev = pad;
+        pad = padPressed(0);
 
-        if (pad == 0xFFFF) pad_pressed = 0;
-
-        if (pad_pressed & KEY_A) {
+        if (pad & KEY_A) {
             snesmodPlay(0);
             paused = 0;
-        } else if (pad_pressed & KEY_B) {
+        }
+        if (pad & KEY_B) {
             snesmodStop();
         }
-
-        if (pad_pressed & KEY_X) {
+        if (pad & KEY_X) {
             if (paused) { snesmodResume(); paused = 0; }
             else { snesmodPause(); paused = 1; }
         }
-
-        if (pad_pressed & KEY_L) {
+        if (pad & KEY_L) {
             if (volume > 10) { volume -= 10; snesmodSetModuleVolume(volume); }
         }
-        if (pad_pressed & KEY_R) {
+        if (pad & KEY_R) {
             if (volume < 117) { volume += 10; snesmodSetModuleVolume(volume); }
         }
-
-        if (pad_pressed & KEY_START) {
+        if (pad & KEY_START) {
             snesmodFadeVolume(0, 4);
         }
     }

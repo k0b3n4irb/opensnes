@@ -11,10 +11,10 @@ Mode 0 provides four background layers, each with its own 4-color palette bank. 
 ## Architecture
 
 - **Mode 0**: Four BGs, each 2bpp (4 colors per tile)
-- **BG0**: Foreground terrain (static)
-- **BG1**: Mid-ground elements (scroll speed ×3)
-- **BG2**: Far buildings (scroll speed ×2)
-- **BG3**: HUD bar (scroll speed ×1)
+- **BG1**: Foreground terrain (static)
+- **BG2**: Mid-ground elements (scroll speed ×3)
+- **BG3**: Far buildings (scroll speed ×2)
+- **BG4**: HUD bar (scroll speed ×1)
 - Each BG uses a separate palette bank (0-3)
 
 ## Ported from
