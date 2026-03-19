@@ -2,7 +2,7 @@
 # OpenSNES Tools - Makefile
 #==============================================================================
 
-SUBDIRS := font2snes gfx4snes img2snes smconv
+SUBDIRS := font2snes gfx4snes img2snes smconv tmx2snes
 
 .PHONY: all clean install $(SUBDIRS)
 
