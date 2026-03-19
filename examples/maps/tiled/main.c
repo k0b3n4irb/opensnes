@@ -109,7 +109,17 @@ int main(void) {
      */
     mapLoad(mapdata, tilesetdef, tilesetatt);
 
-    /* Step 4: Screen on — all VRAM is ready */
+    /* Step 4: Flush the initial tilemap to VRAM before screen on.
+     * The map engine updates one column per mapUpdate() cycle, so two
+     * full update+flush cycles ensure every visible tile is in VRAM. */
+    mapUpdate();
+    WaitForVBlank();
+    mapVblank();
+    mapUpdate();
+    WaitForVBlank();
+    mapVblank();
+
+    /* Step 5: Screen on — all VRAM is ready */
     setScreenOn();
 
     /*

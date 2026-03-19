@@ -114,15 +114,23 @@ int main(void) {
     /* Load map (screen still off — no garbage) */
     mapLoad(mapdata, tilesetdef, tilesetatt);
 
-    /* Initial position: center of map, ground level */
+    /* Initial position: near left edge, standing on ground (row 26 = y 208) */
     xloc = 16 * 8;
-    yloc = 14 * 8;
+    yloc = 208 - 16;
     frameidx = 0;
     frame = 0;
     flipx = 0;
     flip = 0;
 
     mapUpdateCamera(xloc, yloc);
+
+    /* Sync: prepare + flush the full tilemap before screen on */
+    mapUpdate();
+    WaitForVBlank();
+    mapVblank();
+    mapUpdate();
+    WaitForVBlank();
+    mapVblank();
 
     /* Screen on — all VRAM ready */
     setScreenOn();

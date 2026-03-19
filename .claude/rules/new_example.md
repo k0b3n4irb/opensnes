@@ -49,6 +49,7 @@ consoleInit() → setMode() → palettes → tiles → tilemap → BG pointers
 | Text without `textFlush()` | Text invisible | `textFlush()` triggers DMA |
 | `textLoadFont4bpp` without module | Link error | Add `text4bpp` to LIB_MODULES |
 | Sprite palette at CGRAM 0 | Wrong colors | Sprite palettes start at CGRAM 128 |
+| Map engine: single flush before screen on | 1-2 columns of garbage tiles | Two cycles: `mapUpdate+WaitForVBlank+mapVblank` × 2 |
 | Missing LIB_MODULES | Link error | Match `#include` with module |
 | `volatile` in loops | QBE SSA crash | Use globals instead |
 | ASM stack offset 7,s | Works for arg=0 only | First arg is at **6,s** after PHP+PHB |
