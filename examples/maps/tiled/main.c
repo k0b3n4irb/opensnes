@@ -97,17 +97,20 @@ int main(void) {
     setMode(BG_MODE1, 0);
     setMainScreen(LAYER_BG1);
 
-    /* Step 3: Turn on display */
-    setScreenOn();
-
     /*
-     * Step 4: Load the full map into the map engine
+     * Step 3: Load the full map into the map engine (screen still off)
      *
      * mapLoad copies the 224x30 tilemap, metatile definitions, and collision
      * attributes into extended WRAM (bank $7E). It also performs the initial
      * full-screen tilemap refresh to VRAM.
+     *
+     * This MUST happen before setScreenOn() — otherwise the tilemap write
+     * is visible as garbage for 1-2 frames.
      */
     mapLoad(mapdata, tilesetdef, tilesetatt);
+
+    /* Step 4: Screen on — all VRAM is ready */
+    setScreenOn();
 
     /*
      * Step 5: Main loop — scroll the camera with D-pad

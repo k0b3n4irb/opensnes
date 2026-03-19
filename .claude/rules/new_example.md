@@ -1,10 +1,15 @@
 # New Example Checklist (Auto-loaded)
 
-## MANDATORY: Before writing ANY new example
+## MANDATORY: Before writing OR PORTING any example
 
 1. **Read a working example** that uses the same features. Copy its init sequence.
    Do NOT write from memory — the init order matters and getting it wrong
    produces black screens or VRAM garbage.
+
+   **When porting from PVSnesLib: do NOT blindly copy the PVSnesLib init order.**
+   PVSnesLib code may violate our rules (e.g., `setScreenOn()` before all VRAM
+   is ready). Always reorder the ported code to match OUR init sequence below.
+   The rules apply to ALL code — new or ported.
 
 2. **Consult docs/** — it is the source of truth for all SNES concepts:
    - Graphics & backgrounds: `docs/tutorials/graphics.md`, `docs/SNES_GRAPHICS_GUIDE.md`
