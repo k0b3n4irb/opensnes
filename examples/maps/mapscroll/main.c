@@ -124,15 +124,7 @@ int main(void) {
 
     mapUpdateCamera(xloc, yloc);
 
-    /* Sync: prepare + flush the full tilemap before screen on */
-    mapUpdate();
-    WaitForVBlank();
-    mapVblank();
-    mapUpdate();
-    WaitForVBlank();
-    mapVblank();
-
-    /* Screen on — all VRAM ready */
+    /* Screen on — mapLoad flushes VRAM internally */
     setScreenOn();
 
     /* Main loop */

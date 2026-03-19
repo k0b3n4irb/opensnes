@@ -125,11 +125,7 @@ int main(void) {
     /* Load map and do initial full-screen refresh */
     mapLoad((u8 *)&mapmario, (u8 *)&tilesetdef, (u8 *)&tilesetatt);
 
-    /* Flush tilemap to VRAM while screen is off (force blank).
-     * mapLoad sets MAP_UPD_WHOLE but doesn't write to VRAM — that happens
-     * in mapVblank. Without this call, the first frame shows garbage VRAM. */
-    mapVblank();
-
+    /* mapLoad flushes VRAM internally — screen on */
     setScreenOn();
 
     while (1) {
