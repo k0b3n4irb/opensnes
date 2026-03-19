@@ -18,8 +18,10 @@
  * bgInitTileSet(0, &tileset, &tilesetpal, 0, size, 16*2, BG_16COLORS, 0x2000);
  * bgSetMapPtr(0, 0x6800, SC_64x32);
  *
- * // Load map data
+ * // Load map data (flushes VRAM internally — screen must be off)
  * mapLoad(&mapmario, &tilesetdef, &tilesetatt);
+ *
+ * setScreenOn();  // VRAM is ready
  *
  * // In main loop:
  * while (1) {
@@ -133,16 +135,19 @@ extern u16 y_pos;
  *============================================================================*/
 
 /**
- * @brief Load map data into the engine
+ * @brief Load map data into the engine and flush to VRAM
  *
  * Initializes metatile definitions, tile properties, and the row lookup table.
- * Also performs initial full-screen refresh.
+ * Performs a full-screen tilemap refresh and DMAs it directly to VRAM.
+ * After this call, the tilemap is ready — no separate mapVblank() needed
+ * before setScreenOn().
  *
  * @param layer1map  Address of map data (format: u16 width, u16 height, u16 pad, then tile indices)
  * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles)
  * @param tilesprop  Address of tile property data (collision types)
  *
- * @note Must be called during forced blank or before screen is enabled.
+ * @note Must be called during forced blank (screen off). The function
+ *       writes directly to VRAM via DMA.
  */
 void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop);
 
