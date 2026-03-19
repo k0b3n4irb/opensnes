@@ -75,6 +75,8 @@ See the @ref example_sources "Example Source Code" page for all 41 examples orga
 OpenSNES is built upon [PVSnesLib](https://github.com/alekmaul/pvsneslib) by **Alekmaul** and contributors.
 We owe them an enormous debt of gratitude for the hardware library, SNESMOD audio engine, asset tools, and decades of SNES development knowledge.
 
+For the full list of dependencies, licenses, and contributors, see [ATTRIBUTION.md](https://github.com/k0b3n4irb/opensnes/blob/develop/ATTRIBUTION.md).
+
 ## Links
 
 - [GitHub Repository](https://github.com/k0b3n4irb/opensnes)
