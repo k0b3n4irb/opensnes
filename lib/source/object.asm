@@ -485,6 +485,11 @@ _oiN3:
     ; Copy new object to workspace for init callback access
     SYNC_TO_WORKSPACE
 
+    ; Restore return value in A (SYNC_TO_WORKSPACE clobbers A via MVN).
+    ; cc65816 calling convention: return value in A register.
+    rep #$20
+    lda.l tcc__r0
+
 _oiNEnd:
     ply
     plx
