@@ -102,97 +102,97 @@ $(document).ready(function(){initNavTree('map_8h_source.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 <a href="map_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#ifndef OPENSNES_MAP_H</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#define OPENSNES_MAP_H</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#ifndef OPENSNES_MAP_H</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#define OPENSNES_MAP_H</span></div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment"> * Tile Property Constants</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="map_8h.html#a64b628522c7aaec4fd687d8cd3c15797">   52</a></span><span class="preprocessor">#define T_EMPTY     0x0000</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno"><a class="line" href="map_8h.html#af873aaa17834669d0f263af08c2912c3">   55</a></span><span class="preprocessor">#define T_SOLID     0xFF00</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno"><a class="line" href="map_8h.html#a7b834046275ade27bcb100e684cdbf2a">   58</a></span><span class="preprocessor">#define T_LADDER    0x0001</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="map_8h.html#a6cc6b73b3328f0e2a7553a4e1db3a5e9">   61</a></span><span class="preprocessor">#define T_FIRES     0x0002</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="map_8h.html#a87a89f657f33f4eab646bb7f6ad21fa3">   64</a></span><span class="preprocessor">#define T_SPIKE     0x0004</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="map_8h.html#ad36b80734e14117314d2ec683f552969">   67</a></span><span class="preprocessor">#define T_PLATE     0x0008</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="map_8h.html#a008d4ae062a79ec7335e08db7760cbe9">   70</a></span><span class="preprocessor">#define T_SLOPEU1   0x0020</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="map_8h.html#a5704d7b185a18668f4aea3c71a0415b1">   73</a></span><span class="preprocessor">#define T_SLOPED1   0x0021</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="map_8h.html#a9079bd5db5c4cbacb3e5f9092a0e9cbe">   76</a></span><span class="preprocessor">#define T_SLOPELU2  0x0022</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="map_8h.html#ac81f5707084136f68205fdadcfda52a7">   79</a></span><span class="preprocessor">#define T_SLOPELD2  0x0023</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="map_8h.html#a6c3b4ebcd473f6900208f5ee9eb3f465">   82</a></span><span class="preprocessor">#define T_SLOPEUU2  0x0024</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="map_8h.html#ac0824c3b9bd01205245b0c57e256e852">   85</a></span><span class="preprocessor">#define T_SLOPEUD2  0x0025</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment"> * Action Constants (used by both map and object engines)</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno"><a class="line" href="map_8h.html#a227eedee0994ff2eac6ed2b691d9bcb3">   91</a></span><span class="preprocessor">#define ACT_STAND   0x0000  </span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">   92</a></span><span class="preprocessor">#define ACT_WALK    0x0001  </span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="map_8h.html#a4617d14626ea66580d7996705d0a5bce">   93</a></span><span class="preprocessor">#define ACT_JUMP    0x0002  </span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444">   94</a></span><span class="preprocessor">#define ACT_FALL    0x0004  </span></div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="map_8h.html#ab9c13fbe07aac09e69bc677fe3f0fcaa">   95</a></span><span class="preprocessor">#define ACT_CLIMB   0x0008  </span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="map_8h.html#a7843ff58f7ae21834eee28a3cefbbd3a">   96</a></span><span class="preprocessor">#define ACT_DIE     0x0010  </span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="map_8h.html#aab4c8cebd89d6e8b2a68e709784829d5">   97</a></span><span class="preprocessor">#define ACT_BURN    0x0020  </span></div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * Map Options</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30">  104</a></span><span class="preprocessor">#define MAP_OPT_1WAY   0x01</span></div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="map_8h.html#a1697378c813c532a862943726625bd5b">  107</a></span><span class="preprocessor">#define MAP_OPT_BG2    0x02</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment"> * Exported Variables</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment">/* --- Bank $00 SLOT 1 (C-accessible, &lt; $2000) --- */</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment"> * Tile Property Constants</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="map_8h.html#a64b628522c7aaec4fd687d8cd3c15797">   54</a></span><span class="preprocessor">#define T_EMPTY     0x0000</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="map_8h.html#af873aaa17834669d0f263af08c2912c3">   57</a></span><span class="preprocessor">#define T_SOLID     0xFF00</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="map_8h.html#a7b834046275ade27bcb100e684cdbf2a">   60</a></span><span class="preprocessor">#define T_LADDER    0x0001</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="map_8h.html#a6cc6b73b3328f0e2a7553a4e1db3a5e9">   63</a></span><span class="preprocessor">#define T_FIRES     0x0002</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="map_8h.html#a87a89f657f33f4eab646bb7f6ad21fa3">   66</a></span><span class="preprocessor">#define T_SPIKE     0x0004</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="map_8h.html#ad36b80734e14117314d2ec683f552969">   69</a></span><span class="preprocessor">#define T_PLATE     0x0008</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="map_8h.html#a008d4ae062a79ec7335e08db7760cbe9">   72</a></span><span class="preprocessor">#define T_SLOPEU1   0x0020</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="map_8h.html#a5704d7b185a18668f4aea3c71a0415b1">   75</a></span><span class="preprocessor">#define T_SLOPED1   0x0021</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="map_8h.html#a9079bd5db5c4cbacb3e5f9092a0e9cbe">   78</a></span><span class="preprocessor">#define T_SLOPELU2  0x0022</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="map_8h.html#ac81f5707084136f68205fdadcfda52a7">   81</a></span><span class="preprocessor">#define T_SLOPELD2  0x0023</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="map_8h.html#a6c3b4ebcd473f6900208f5ee9eb3f465">   84</a></span><span class="preprocessor">#define T_SLOPEUU2  0x0024</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="map_8h.html#ac0824c3b9bd01205245b0c57e256e852">   87</a></span><span class="preprocessor">#define T_SLOPEUD2  0x0025</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="comment"> * Action Constants (used by both map and object engines)</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="map_8h.html#a227eedee0994ff2eac6ed2b691d9bcb3">   93</a></span><span class="preprocessor">#define ACT_STAND   0x0000  </span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno"><a class="line" href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">   94</a></span><span class="preprocessor">#define ACT_WALK    0x0001  </span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="map_8h.html#a4617d14626ea66580d7996705d0a5bce">   95</a></span><span class="preprocessor">#define ACT_JUMP    0x0002  </span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444">   96</a></span><span class="preprocessor">#define ACT_FALL    0x0004  </span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="map_8h.html#ab9c13fbe07aac09e69bc677fe3f0fcaa">   97</a></span><span class="preprocessor">#define ACT_CLIMB   0x0008  </span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="map_8h.html#a7843ff58f7ae21834eee28a3cefbbd3a">   98</a></span><span class="preprocessor">#define ACT_DIE     0x0010  </span></div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="map_8h.html#aab4c8cebd89d6e8b2a68e709784829d5">   99</a></span><span class="preprocessor">#define ACT_BURN    0x0020  </span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="comment"> * Map Options</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30">  106</a></span><span class="preprocessor">#define MAP_OPT_1WAY   0x01</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="map_8h.html#a1697378c813c532a862943726625bd5b">  109</a></span><span class="preprocessor">#define MAP_OPT_BG2    0x02</span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> * Exported Variables</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="comment"> *============================================================================*/</span></div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>;</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a>;</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="comment">/* --- Bank $7E SLOT 2 (NOT C-accessible, ASM-only) --- */</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment">/* The map engine&#39;s bulk data lives in Bank $7E:</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment"> *   metatiles[4096]     — metatile definitions (4 tile entries per metatile)</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment"> *   metatilesprop[2048] — tile collision properties</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> *   bg_L1[2048]         — BG1 tilemap buffer</span></div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *   mapadrrowlut[1024]  — row address lookup table</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> * These are managed internally by mapLoad/mapUpdate/mapVblank.</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> * C code accesses map data through mapGetMetaTile/mapGetMetaTilesProp.</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span><span class="comment"> * Functions</span></div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno"><a class="line" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">  147</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layer1map, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layertiles, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilesprop);</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno"><a class="line" href="map_8h.html#ac833e2572ce808bac75d10df2817df03">  155</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno"><a class="line" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">  165</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno"><a class="line" href="map_8h.html#a310e106b68443357988f941a95a27266">  176</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span> </div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno"><a class="line" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">  185</a></span><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno"><a class="line" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">  194</a></span><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span> </div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno"><a class="line" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">  201</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> optmap);</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_MAP_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment">/* --- Bank $00 SLOT 1 (C-accessible, &lt; $2000) --- */</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a>;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="comment">/* --- Bank $7E SLOT 2 (NOT C-accessible, ASM-only) --- */</span></div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment">/* The map engine&#39;s bulk data lives in Bank $7E:</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="comment"> *   metatiles[4096]     — metatile definitions (4 tile entries per metatile)</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="comment"> *   metatilesprop[2048] — tile collision properties</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="comment"> *   bg_L1[2048]         — BG1 tilemap buffer</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="comment"> *   mapadrrowlut[1024]  — row address lookup table</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span><span class="comment"> * These are managed internally by mapLoad/mapUpdate/mapVblank.</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="comment"> * C code accesses map data through mapGetMetaTile/mapGetMetaTilesProp.</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span><span class="comment"> * Functions</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno"><a class="line" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">  152</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layer1map, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layertiles, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilesprop);</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno"><a class="line" href="map_8h.html#ac833e2572ce808bac75d10df2817df03">  160</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno"><a class="line" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">  170</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno"><a class="line" href="map_8h.html#a310e106b68443357988f941a95a27266">  181</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno"><a class="line" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">  190</a></span><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno"><a class="line" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">  199</a></span><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_function" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ypos);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno"><a class="line" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">  206</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> optmap);</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_MAP_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_ace36248f57cf8494fae6acbe77b274f0"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0">xpos</a></div><div class="ttdeci">static const s16 xpos[4]</div><div class="ttdoc">X positions for the four sprites displayed in a horizontal row.</div><div class="ttdef"><b>Definition</b> main.c:54</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
@@ -203,7 +203,7 @@ $(document).ready(function(){initNavTree('map_8h_source.html',''); initResizable
 <div class="ttc" id="amap_8h_html_a79f8bb14ed9f0ee9d7031db7f02733be"><div class="ttname"><a href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a></div><div class="ttdeci">u16 y_pos</div><div class="ttdoc">Current camera Y position in pixels.</div></div>
 <div class="ttc" id="amap_8h_html_aa36598a0b40be791f4845574e0c5db1f"><div class="ttname"><a href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a></div><div class="ttdeci">void mapVblank(void)</div><div class="ttdoc">Transfer map updates to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
-<div class="ttc" id="amap_8h_html_acbc2c1bd8e111d2f1bf776cc15f1f104"><div class="ttname"><a href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a></div><div class="ttdeci">void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)</div><div class="ttdoc">Load map data into the engine.</div></div>
+<div class="ttc" id="amap_8h_html_acbc2c1bd8e111d2f1bf776cc15f1f104"><div class="ttname"><a href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a></div><div class="ttdeci">void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)</div><div class="ttdoc">Load map data into the engine and flush to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ad95ef475b3953c77cd646919e1cf1ce3"><div class="ttname"><a href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a></div><div class="ttdeci">u16 mapGetMetaTile(u16 xpos, u16 ypos)</div><div class="ttdoc">Get metatile index at map coordinates.</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">OpenSNES Standard Types.</div></div>
 </div><!-- fragment --></div><!-- contents -->

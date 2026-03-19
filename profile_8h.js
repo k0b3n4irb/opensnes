@@ -12,6 +12,7 @@ var profile_8h =
     [ "profileGetFrameCount", "profile_8h.html#a3f567bb59e4729e6cec85b827b3f97e0", null ],
     [ "profileGetLagFrames", "profile_8h.html#a071021ac9abd338ac63cf48b2d10f8c7", null ],
     [ "profileGetScanline", "profile_8h.html#a30c81ab840017529f70ad63238c8a79f", null ],
+    [ "profileInit", "profile_8h.html#acc2a7d890f2e61d20dc72d9964d92c9d", null ],
     [ "profileScanlineEnd", "profile_8h.html#ac059c33b80ae59cf02b491ddb89b014a", null ],
     [ "profileScanlineStart", "profile_8h.html#a2028d9104ba1295ca45717dae0dcc05a", null ]
 ];

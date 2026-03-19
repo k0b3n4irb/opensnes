@@ -175,7 +175,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a49fd2a70bfc38c5c4ba5ea883b863dc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get tile collision property at map coordinates.  <br /></td></tr>
 <tr class="separator:a49fd2a70bfc38c5c4ba5ea883b863dc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbc2c1bd8e111d2f1bf776cc15f1f104" id="r_acbc2c1bd8e111d2f1bf776cc15f1f104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layer1map, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *layertiles, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilesprop)</td></tr>
-<tr class="memdesc:acbc2c1bd8e111d2f1bf776cc15f1f104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load map data into the engine.  <br /></td></tr>
+<tr class="memdesc:acbc2c1bd8e111d2f1bf776cc15f1f104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load map data into the engine and flush to VRAM.  <br /></td></tr>
 <tr class="separator:acbc2c1bd8e111d2f1bf776cc15f1f104"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58e5d28fd6d1ce78aaba19e7bb697e13" id="r_a58e5d28fd6d1ce78aaba19e7bb697e13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> optmap)</td></tr>
 <tr class="memdesc:a58e5d28fd6d1ce78aaba19e7bb697e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set map engine options.  <br /></td></tr>
@@ -213,8 +213,10 @@ Usage</h2>
 <div class="line"><a class="code hl_function" href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a>(0, &amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>, &amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#a9df981b10fb8046ea0732f34f6cd1533">tilesetpal</a>, 0, size, 16*2, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x6800, <a class="code hl_define" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a>);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Load map data</span></div>
+<div class="line"><span class="comment">// Load map data (flushes VRAM internally — screen must be off)</span></div>
 <div class="line"><a class="code hl_function" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a>(&amp;<a class="code hl_variable" href="games_2likemario_2main_8c.html#ac1309b0fbf0de7ed50dcd666c4f6995f">mapmario</a>, &amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#a4965470887c9118da7d82fd0cba95f23">tilesetdef</a>, &amp;<a class="code hl_variable" href="games_2likemario_2main_8c.html#a7c2cc3f600a848059ca53a4f836c1a40">tilesetatt</a>);</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();  <span class="comment">// VRAM is ready</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// In main loop:</span></div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -226,6 +228,7 @@ Usage</h2>
 <div class="ttc" id="abackground_8h_html_a192a4ea97fde5c5c0a78ada7f54cf207"><div class="ttname"><a href="background_8h.html#a192a4ea97fde5c5c0a78ada7f54cf207">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_a7c2cc3f600a848059ca53a4f836c1a40"><div class="ttname"><a href="games_2likemario_2main_8c.html#a7c2cc3f600a848059ca53a4f836c1a40">tilesetatt</a></div><div class="ttdeci">u8 tilesetatt[]</div><div class="ttdoc">Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format)</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_ac1309b0fbf0de7ed50dcd666c4f6995f"><div class="ttname"><a href="games_2likemario_2main_8c.html#ac1309b0fbf0de7ed50dcd666c4f6995f">mapmario</a></div><div class="ttdeci">u8 mapmario[]</div><div class="ttdoc">Map data (tile indices + header with width/height)</div></div>
 <div class="ttc" id="agames_2mapandobjects_2main_8c_html_a4965470887c9118da7d82fd0cba95f23"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#a4965470887c9118da7d82fd0cba95f23">tilesetdef</a></div><div class="ttdeci">u8 tilesetdef</div><div class="ttdoc">Tile definition table (visual properties per tile index)</div></div>
@@ -238,7 +241,7 @@ Usage</h2>
 <div class="ttc" id="amap_8h_html_a310e106b68443357988f941a95a27266"><div class="ttname"><a href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a></div><div class="ttdeci">void mapUpdateCamera(u16 xpos, u16 ypos)</div><div class="ttdoc">Update camera position to follow an object.</div></div>
 <div class="ttc" id="amap_8h_html_aa36598a0b40be791f4845574e0c5db1f"><div class="ttname"><a href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a></div><div class="ttdeci">void mapVblank(void)</div><div class="ttdoc">Transfer map updates to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
-<div class="ttc" id="amap_8h_html_acbc2c1bd8e111d2f1bf776cc15f1f104"><div class="ttname"><a href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a></div><div class="ttdeci">void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)</div><div class="ttdoc">Load map data into the engine.</div></div>
+<div class="ttc" id="amap_8h_html_acbc2c1bd8e111d2f1bf776cc15f1f104"><div class="ttname"><a href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a></div><div class="ttdeci">void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)</div><div class="ttdoc">Load map data into the engine and flush to VRAM.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Map engine uses VRAM address $6800 for the tilemap by default.</dd></dl>
 <h2><a class="anchor" id="autotoc_md42"></a>
@@ -683,8 +686,8 @@ Attribution</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Load map data into the engine. </p>
-<p>Initializes metatile definitions, tile properties, and the row lookup table. Also performs initial full-screen refresh.</p>
+<p>Load map data into the engine and flush to VRAM. </p>
+<p>Initializes metatile definitions, tile properties, and the row lookup table. Performs a full-screen tilemap refresh and DMAs it directly to VRAM. After this call, the tilemap is ready — no separate <a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a> needed before <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">layer1map</td><td>Address of map data (format: u16 width, u16 height, u16 pad, then tile indices) </td></tr>
@@ -693,7 +696,7 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Must be called during forced blank or before screen is enabled. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA. </dd></dl>
 
 </div>
 </div>

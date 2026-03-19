@@ -6,7 +6,7 @@ var searchData=
   ['fix_5ffrac_3',['FIX_FRAC',['../math_8h.html#a32c8bd6cf38e896ab297e907c5cafdad',1,'math.h']]],
   ['fix_5fmake_4',['FIX_MAKE',['../math_8h.html#a09aaa6debbf920f664f5024c4828645d',1,'math.h']]],
   ['flash_5fframes_5',['FLASH_FRAMES',['../games_2tetris_2main_8c.html#a9c6ed757d0fb0d6c3a5f69ed4952ab8b',1,'main.c']]],
-  ['font_5fsize_6',['font_size',['../audio_2snesmod__music_2main_8c.html#aa968a61524f9ed159c4c5464cb26dd41',1,'FONT_SIZE:&#160;main.c'],['../audio_2snesmod__sfx_2main_8c.html#aa968a61524f9ed159c4c5464cb26dd41',1,'FONT_SIZE:&#160;main.c'],['../memory_2hirom__demo_2main_8c.html#aa968a61524f9ed159c4c5464cb26dd41',1,'FONT_SIZE:&#160;main.c']]],
+  ['font_5fsize_6',['FONT_SIZE',['../memory_2hirom__demo_2main_8c.html#aa968a61524f9ed159c4c5464cb26dd41',1,'main.c']]],
   ['font_5ftile_5foffset_7',['FONT_TILE_OFFSET',['../maps_2dynamic__map_2main_8c.html#a0b47bfbb9b7441e6917d8b5fbaca6dc0',1,'main.c']]],
   ['frame_5fjump_8',['FRAME_JUMP',['../games_2likemario_2main_8c.html#aeef02da41fe024e74efcfcb5fe7c9e68',1,'main.c']]],
   ['frame_5fstand_9',['FRAME_STAND',['../games_2likemario_2main_8c.html#a166c5c3f56b25f8980f4b6709d8492a0',1,'main.c']]],

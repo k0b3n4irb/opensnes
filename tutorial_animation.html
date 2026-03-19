@@ -145,9 +145,10 @@ Manual Counter (Recommended)</h3>
 Using getFrameCount()</h3>
 <p>The system <code>frame_count</code> (incremented by the NMI handler) is available via <code><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a></code>. Useful for simple periodic animations where you do not need to pause or reset the timer independently:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Cycle through 4 frames, changing every 8 VBlanks */</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frame = (<a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a>(0, frame * 2);</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> = (<a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a>(0, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> * 2);</div>
 <div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div></div>
+<div class="ttc" id="amaps_2mapscroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 </div><!-- fragment --><p>The manual counter is preferred for gameplay animations because you can pause it (stop incrementing when the character is idle) or reset it on state changes.</p>
 <h2><a class="anchor" id="autotoc_md75"></a>
 Sprite Sheet Layout</h2>
@@ -211,7 +212,7 @@ Direction-Based Animation</h2>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> anim_frame;</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> anim_delay;</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> state;</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipx;</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d">flipx</a>;</div>
 <div class="line">} <a class="code hl_struct" href="structMonster.html">Monster</a>;</div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_struct" href="structMonster.html">Monster</a> <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a> = {100, 100, 0, 0, 0, <a class="code hl_enumvalue" href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d">W_DOWN</a>, 0};</div>
@@ -223,6 +224,7 @@ Direction-Based Animation</h2>
 <div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa">W_LEFT</a></div><div class="ttdeci">@ W_LEFT</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
+<div class="ttc" id="amaps_2mapscroll_2main_8c_html_a8819ae0e38a6565e016c379e527b426d"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d">flipx</a></div><div class="ttdeci">u16 flipx</div><div class="ttdoc">Horizontal flip flag (1 = facing left)</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
 <div class="ttc" id="astructMonster_html"><div class="ttname"><a href="structMonster.html">Monster</a></div><div class="ttdoc">Sprite state structure holding position, animation, and direction.</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md80"></a>
 Input and State Changes</h3>
@@ -420,9 +422,9 @@ Action-Based Animation (LikeMario)</h3>
 <div class="ttc" id="agames_2likemario_2main_8c_html_acfc065e24c9bd4da82cdfe2d6e60844c"><div class="ttname"><a href="games_2likemario_2main_8c.html#acfc065e24c9bd4da82cdfe2d6e60844c">mario_anim_idx</a></div><div class="ttdeci">static u8 mario_anim_idx</div><div class="ttdef"><b>Definition</b> main.c:162</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_ad43823ee9b7b60480d1b5e24572ff6a7"><div class="ttname"><a href="games_2likemario_2main_8c.html#ad43823ee9b7b60480d1b5e24572ff6a7">FRAME_WALK0</a></div><div class="ttdeci">#define FRAME_WALK0</div><div class="ttdoc">Dynamic sprite frame index: walk animation frame 0.</div><div class="ttdef"><b>Definition</b> main.c:128</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_aeef02da41fe024e74efcfcb5fe7c9e68"><div class="ttname"><a href="games_2likemario_2main_8c.html#aeef02da41fe024e74efcfcb5fe7c9e68">FRAME_JUMP</a></div><div class="ttdeci">#define FRAME_JUMP</div><div class="ttdoc">Dynamic sprite frame index: jump pose.</div><div class="ttdef"><b>Definition</b> main.c:126</div></div>
-<div class="ttc" id="amap_8h_html_a4617d14626ea66580d7996705d0a5bce"><div class="ttname"><a href="map_8h.html#a4617d14626ea66580d7996705d0a5bce">ACT_JUMP</a></div><div class="ttdeci">#define ACT_JUMP</div><div class="ttdef"><b>Definition</b> map.h:93</div></div>
-<div class="ttc" id="amap_8h_html_a8c450076e1da6d4f8aa6e1f7e6737444"><div class="ttname"><a href="map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444">ACT_FALL</a></div><div class="ttdeci">#define ACT_FALL</div><div class="ttdef"><b>Definition</b> map.h:94</div></div>
-<div class="ttc" id="amap_8h_html_a912cfae6ccf6375f3c2831d65646c76b"><div class="ttname"><a href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a></div><div class="ttdeci">#define ACT_WALK</div><div class="ttdef"><b>Definition</b> map.h:92</div></div>
+<div class="ttc" id="amap_8h_html_a4617d14626ea66580d7996705d0a5bce"><div class="ttname"><a href="map_8h.html#a4617d14626ea66580d7996705d0a5bce">ACT_JUMP</a></div><div class="ttdeci">#define ACT_JUMP</div><div class="ttdef"><b>Definition</b> map.h:95</div></div>
+<div class="ttc" id="amap_8h_html_a8c450076e1da6d4f8aa6e1f7e6737444"><div class="ttname"><a href="map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444">ACT_FALL</a></div><div class="ttdeci">#define ACT_FALL</div><div class="ttdef"><b>Definition</b> map.h:96</div></div>
+<div class="ttc" id="amap_8h_html_a912cfae6ccf6375f3c2831d65646c76b"><div class="ttname"><a href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a></div><div class="ttdeci">#define ACT_WALK</div><div class="ttdef"><b>Definition</b> map.h:94</div></div>
 </div><!-- fragment --><p>Key details:</p><ul>
 <li><code>oamrefresh</code> is only set to 1 when the frame actually changes, avoiding redundant VRAM uploads</li>
 <li>Direction is handled separately via <code>oamattribute</code> (setting or clearing the H-flip bit <code>0x40</code>)</li>

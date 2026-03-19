@@ -23,8 +23,9 @@ var searchData=
   ['cur_5frot_20',['cur_rot',['../games_2tetris_2main_8c.html#a5025634d5d80636224a2ee7e7e10f32d',1,'main.c']]],
   ['cur_5frow_21',['cur_row',['../games_2tetris_2main_8c.html#a334b30334c918a87be9dfcdf06436c3e',1,'main.c']]],
   ['cur_5ftype_22',['cur_type',['../games_2tetris_2main_8c.html#a95580aa5d2c4d05cc7be62ac88b6b705',1,'main.c']]],
-  ['cursor_5fpal_23',['cursor_pal',['../input_2mouse_2main_8c.html#a08cc1a6eb08977efde23b65826f2775d',1,'main.c']]],
-  ['cursor_5fpal_5fend_24',['cursor_pal_end',['../input_2mouse_2main_8c.html#a0d41229783b27d39111f2702b3fafabd',1,'main.c']]],
-  ['cursor_5ftiles_25',['cursor_tiles',['../input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4',1,'main.c']]],
-  ['cursor_5ftiles_5fend_26',['cursor_tiles_end',['../input_2mouse_2main_8c.html#a65ba59e0cd3bb8053ff966e4595cbbbb',1,'main.c']]]
+  ['current_5fvalue_23',['current_value',['../basics_2random_2main_8c.html#a2c45a0d0a573653847a29cf921fb980f',1,'main.c']]],
+  ['cursor_5fpal_24',['cursor_pal',['../input_2mouse_2main_8c.html#a08cc1a6eb08977efde23b65826f2775d',1,'main.c']]],
+  ['cursor_5fpal_5fend_25',['cursor_pal_end',['../input_2mouse_2main_8c.html#a0d41229783b27d39111f2702b3fafabd',1,'main.c']]],
+  ['cursor_5ftiles_26',['cursor_tiles',['../input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4',1,'main.c']]],
+  ['cursor_5ftiles_5fend_27',['cursor_tiles_end',['../input_2mouse_2main_8c.html#a65ba59e0cd3bb8053ff966e4595cbbbb',1,'main.c']]]
 ];

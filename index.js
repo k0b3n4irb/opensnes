@@ -18,28 +18,28 @@ var index =
         [ "Level 3: Scrolling and Effects", "learning_path.html#autotoc_md228", null ],
         [ "Level 4: Advanced Topics", "learning_path.html#autotoc_md229", null ],
         [ "Level 5: Maps and Complete Projects", "learning_path.html#autotoc_md230", [
-          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1285", null ],
-          [ "Controls", "examples_text_hello_world.html#autotoc_md1286", null ],
-          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1287", null ],
-          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1289", [
-            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1290", null ],
-            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1291", null ],
-            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1292", null ],
-            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1293", null ],
-            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1294", null ],
-            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1295", null ],
-            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1296", null ]
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1241", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1242", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1243", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1245", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1246", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1247", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1248", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1249", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1250", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1251", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1252", null ]
           ] ],
-          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1298", null ],
-          [ "Go Further", "examples_text_hello_world.html#autotoc_md1300", null ],
-          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1302", [
-            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1303", null ],
-            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1304", null ],
-            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1305", null ]
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1254", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1256", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1258", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1259", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1260", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1261", null ]
           ] ],
-          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1306", null ],
-          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1307", null ],
-          [ "Files", "examples_text_hello_world.html#autotoc_md1308", null ]
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1262", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1263", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1264", null ]
         ] ]
       ] ],
       [ "Text Module Test", "examples_text_text_test.html", null ],
@@ -60,7 +60,7 @@ var index =
       [ "HDMA Helpers Demo", "examples_graphics_effects_hdma_helpers.html", null ],
       [ "Gradient Colors -- HDMA Color Gradients", "examples_graphics_effects_gradient_colors.html", null ],
       [ "Parallax Scrolling", "examples_graphics_effects_parallax_scrolling.html", null ],
-      [ "Color Math Transparency Example", "examples_graphics_effects_transparency.html", null ],
+      [ "Color Addition Transparency", "examples_graphics_effects_transparency.html", null ],
       [ "Window -- HDMA Triangle Masking", "examples_graphics_effects_window.html", null ],
       [ "Transparent Window -- Color Math + HDMA", "examples_graphics_effects_transparent_window.html", null ],
       [ "Mode 7 -- Rotation and Scaling", "examples_graphics_backgrounds_mode7.html", null ],
@@ -71,10 +71,10 @@ var index =
       [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", null ],
       [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ],
       [ "SNESMOD Music Example", "examples_audio_snesmod_music.html", null ],
-      [ "SNESMOD Sound Effects Example", "examples_audio_snesmod_sfx.html", null ],
+      [ "SNESMOD Sound Effects", "examples_audio_snesmod_sfx.html", null ],
       [ "Dynamic Map", "examples_maps_dynamic_map.html", null ],
       [ "Slope Mario", "examples_maps_slopemario.html", null ],
-      [ "Collision Detection Example", "examples_basics_collision_demo.html", null ],
+      [ "Collision Detection Demo", "examples_basics_collision_demo.html", null ],
       [ "Breakout", "examples_games_breakout.html", null ],
       [ "LikeMario", "examples_games_likemario.html", null ],
       [ "Map and Objects", "examples_games_mapandobjects.html", null ]
@@ -91,28 +91,28 @@ var index =
         [ "Memory", "examples_by_category.html#autotoc_md246", null ],
         [ "Basics", "examples_by_category.html#autotoc_md248", null ],
         [ "Games", "examples_by_category.html#autotoc_md250", [
-          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1285", null ],
-          [ "Controls", "examples_text_hello_world.html#autotoc_md1286", null ],
-          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1287", null ],
-          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1289", [
-            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1290", null ],
-            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1291", null ],
-            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1292", null ],
-            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1293", null ],
-            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1294", null ],
-            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1295", null ],
-            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1296", null ]
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1241", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1242", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1243", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1245", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1246", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1247", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1248", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1249", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1250", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1251", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1252", null ]
           ] ],
-          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1298", null ],
-          [ "Go Further", "examples_text_hello_world.html#autotoc_md1300", null ],
-          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1302", [
-            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1303", null ],
-            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1304", null ],
-            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1305", null ]
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1254", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1256", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1258", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1259", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1260", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1261", null ]
           ] ],
-          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1306", null ],
-          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1307", null ],
-          [ "Files", "examples_text_hello_world.html#autotoc_md1308", null ]
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1262", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1263", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1264", null ]
         ] ]
       ] ],
       [ "Text Module Test", "examples_text_text_test.html", null ],
@@ -138,19 +138,19 @@ var index =
       [ "HDMA Helpers Demo", "examples_graphics_effects_hdma_helpers.html", null ],
       [ "Gradient Colors -- HDMA Color Gradients", "examples_graphics_effects_gradient_colors.html", null ],
       [ "Parallax Scrolling", "examples_graphics_effects_parallax_scrolling.html", null ],
-      [ "Color Math Transparency Example", "examples_graphics_effects_transparency.html", null ],
+      [ "Color Addition Transparency", "examples_graphics_effects_transparency.html", null ],
       [ "Window -- HDMA Triangle Masking", "examples_graphics_effects_window.html", null ],
       [ "Transparent Window -- Color Math + HDMA", "examples_graphics_effects_transparent_window.html", null ],
       [ "Two Players Example", "examples_input_two_players.html", null ],
       [ "SNES Mouse", "examples_input_mouse.html", null ],
       [ "Super Scope", "examples_input_superscope.html", null ],
       [ "SNESMOD Music Example", "examples_audio_snesmod_music.html", null ],
-      [ "SNESMOD Sound Effects Example", "examples_audio_snesmod_sfx.html", null ],
+      [ "SNESMOD Sound Effects", "examples_audio_snesmod_sfx.html", null ],
       [ "Dynamic Map", "examples_maps_dynamic_map.html", null ],
       [ "Slope Mario", "examples_maps_slopemario.html", null ],
       [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", null ],
       [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ],
-      [ "Collision Detection Example", "examples_basics_collision_demo.html", null ],
+      [ "Collision Detection Demo", "examples_basics_collision_demo.html", null ],
       [ "Breakout", "examples_games_breakout.html", null ],
       [ "LikeMario", "examples_games_likemario.html", null ],
       [ "Map and Objects", "examples_games_mapandobjects.html", null ],

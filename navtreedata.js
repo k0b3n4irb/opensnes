@@ -27,14 +27,19 @@ var NAVTREE =
   [ "OpenSNES", "index.html", [
     [ "OpenSNES Documentation", "index.html", "index" ],
     [ "Audio Examples", "examples_audio.html", null ],
+    [ "Random Numbers", "examples_basics_random.html", null ],
     [ "Basics Examples", "examples_basics.html", null ],
+    [ "VBlank Timer", "examples_basics_timer.html", null ],
     [ "Complete Game Examples", "examples_games.html", null ],
     [ "Background Examples", "examples_graphics_backgrounds.html", null ],
     [ "Visual Effects Examples", "examples_graphics_effects.html", null ],
     [ "Graphics Examples", "examples_graphics.html", null ],
     [ "Sprite Examples", "examples_graphics_sprites.html", null ],
+    [ "Controller Input", "examples_input_controller.html", null ],
     [ "Input Examples", "examples_input.html", null ],
+    [ "Map Scroll", "examples_maps_mapscroll.html", null ],
     [ "Maps", "examples_maps.html", null ],
+    [ "Tiled Map Editor Integration", "examples_maps_tiled.html", null ],
     [ "Memory Examples", "examples_memory.html", null ],
     [ "OpenSNES Examples", "examples.html", null ],
     [ "[Example Name]", "md__2home_2runner_2work_2opensnes_2opensnes_2examples_2README__TEMPLATE.html", null ],
@@ -68,12 +73,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_games_breakout.html",
-"goomba_8c.html#a99b0830fc737786e314626ea562da36a",
-"group__ppu__regs.html#ga4d49034fd405fed8f5f42df44fa2b3a8",
-"koopatroopa_8c.html#abe4a226904b4532f5edb7a66a77aefce",
-"piece_8h.html#aee707398916fd4752f85e771787c023c",
-"structLineClearResult.html"
+"examples_by_category.html#autotoc_md236",
+"globals_vars_t.html",
+"group__ppu__regs.html#ga26261c1f9b345599d87efd852037081d",
+"interrupt_8h.html#af408cb8d09dc9ab56ae7245c18792c2d",
+"piece_8h.html",
+"structEntity.html#a752e31b7ff5897bd771a8611137ff88f"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

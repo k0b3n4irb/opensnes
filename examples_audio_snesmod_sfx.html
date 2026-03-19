@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OpenSNES: SNESMOD Sound Effects Example</title>
+<title>OpenSNES: SNESMOD Sound Effects</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -93,205 +93,108 @@ $(document).ready(function(){initNavTree('examples_audio_snesmod_sfx.html',''); 
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">SNESMOD Sound Effects Example</div></div>
+  <div class="headertitle"><div class="title">SNESMOD Sound Effects</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="image">
-<img src="screenshot.png" alt=""/>
-<div class="caption">
-Screenshot</div></div>
-    <p>Sound effect playback with pitch control using SNESMOD.</p>
+<div class="textblock"><blockquote class="doxtable">
+<p>&zwj;Sound effect playback with pitch control. Five instrument samples on the buttons, three pitch settings on the D-pad. No background music &ndash; effects only. </p>
+</blockquote>
+<p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
 <h2><a class="anchor" id="autotoc_md544"></a>
-Learning Objectives</h2>
-<p>After this lesson, you will understand:</p><ul>
-<li>SNESMOD sound effect playback</li>
-<li>Triggering different SFX on button presses</li>
-<li>Real-time pitch modification</li>
-<li>Using SNESMOD without background music</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md545"></a>
-Prerequisites</h2>
-<ul>
-<li>Completed basic audio examples</li>
-<li>Understanding of SNESMOD initialization</li>
-</ul>
-<hr  />
-<h2><a class="anchor" id="autotoc_md547"></a>
-What This Example Does</h2>
-<p>Demonstrates SNESMOD sound effect system:</p><ul>
-<li>Multiple sound effects mapped to buttons</li>
-<li>Three pitch modes (Low, Normal, High)</li>
-<li>Visual feedback showing current pitch</li>
-<li>No background music (SFX only)</li>
-</ul>
-<div class="fragment"><div class="line">+----------------------------------------+</div>
-<div class="line">|                                        |</div>
-<div class="line">|         SNESMOD SFX DEMO               |</div>
-<div class="line">|                                        |</div>
-<div class="line">|         Pitch: NORMAL                  |</div>
-<div class="line">|                                        |</div>
-<div class="line">|   A: Tada     B: Strings               |</div>
-<div class="line">|   X: Piano    Y: Marimba               |</div>
-<div class="line">|   L/R: Cowbell                         |</div>
-<div class="line">|   Left/Right: Change Pitch             |</div>
-<div class="line">|                                        |</div>
-<div class="line">+----------------------------------------+</div>
-</div><!-- fragment --><p><b>Controls:</b></p><ul>
-<li>A button: Play "Tada" sound</li>
-<li>B button: Play "Strings" sound</li>
-<li>X button: Play "Piano" sound</li>
-<li>Y button: Play "Marimba" sound</li>
-<li>L/R buttons: Play "Cowbell" sound</li>
-<li>D-Pad Left/Right: Cycle pitch (Low/Normal/High)</li>
-</ul>
-<hr  />
-<h2><a class="anchor" id="autotoc_md549"></a>
-Code Type</h2>
-<p><b>C with Library Functions</b></p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Component   </th><th class="markdownTableHeadNone">Type    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">SNESMOD init   </td><td class="markdownTableBodyNone">Library (<code>snesmodInit</code>)    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">SFX playback   </td><td class="markdownTableBodyNone">Library (<code>snesmodPlaySfx</code>)    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Soundbank   </td><td class="markdownTableBodyNone">Binary data from SNESMOD tools    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Display   </td><td class="markdownTableBodyNone">Direct VRAM writes    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Input   </td><td class="markdownTableBodyNone">Direct register access   </td></tr>
-</table>
-<hr  />
-<h2><a class="anchor" id="autotoc_md551"></a>
-SNESMOD Sound Effects</h2>
-<h3><a class="anchor" id="autotoc_md552"></a>
-Initialization</h3>
-<div class="fragment"><div class="line"><span class="comment">/* Initialize SNESMOD with soundbank */</span></div>
-<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">soundbank</a>);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">/* No music needed - just SFX */</span></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
-<div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md553"></a>
-Playing Effects</h3>
-<div class="fragment"><div class="line"><span class="comment">/* Play sound effect with pitch parameter */</span></div>
-<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">snesmodPlaySfx</a>(<a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a>, pitch);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">/* Pitch values:</span></div>
-<div class="line"><span class="comment">   - 0: Low pitch</span></div>
-<div class="line"><span class="comment">   - 1: Normal pitch</span></div>
-<div class="line"><span class="comment">   - 2: High pitch</span></div>
-<div class="line"><span class="comment">*/</span></div>
-<div class="ttc" id="aaudio_2snesmod__sfx_2main_8c_html_a1bf40f2a29f3ce18ded90aa7126c1b69"><div class="ttname"><a href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a></div><div class="ttdeci">#define SFX_TADA</div><div class="ttdef"><b>Definition</b> main.c:205</div></div>
-</div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md555"></a>
-Pitch Control</h2>
-<h3><a class="anchor" id="autotoc_md556"></a>
-Pitch Modes</h3>
-<div class="fragment"><div class="line"><span class="keyword">enum</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PitchMode</a> {</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_LOW</a> = 0,</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_NORMAL</a> = 1,</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_HIGH</a> = 2</div>
-<div class="line">};</div>
-<div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">current_pitch</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_NORMAL</a>;</div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md557"></a>
-Cycling Pitch</h3>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pressed</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">current_pitch</a>++;</div>
-<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">current_pitch</a> &gt; <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_HIGH</a>) {</div>
-<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">current_pitch</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">PITCH_LOW</a>;</div>
-<div class="line">    }</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">updatePitchDisplay</a>();</div>
-<div class="line">}</div>
-<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-</div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md559"></a>
-Soundbank Structure</h2>
-<p>SNESMOD soundbanks contain:</p><ul>
-<li>BRR sample data</li>
-<li>Instrument definitions</li>
-<li>Optional music patterns</li>
-<li>Sound effect triggers</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md560"></a>
-Creating a Soundbank</h3>
-<div class="fragment"><div class="line"># Convert samples and create soundbank</div>
-<div class="line">smconv -s soundbank.bnk sample1.wav sample2.wav ...</div>
-</div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md562"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_sfx</div>
 </div><!-- fragment --><p>Then open <code>sfx.sfc</code> in your emulator (Mesen2 recommended).</p>
+<h2><a class="anchor" id="autotoc_md545"></a>
+Controls</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Button   </th><th class="markdownTableHeadNone">Action    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">A   </td><td class="markdownTableBodyNone">Play "Tada"    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">B   </td><td class="markdownTableBodyNone">Play "Hall Strings"    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">X   </td><td class="markdownTableBodyNone">Play "Honky Tonk Piano"    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Y   </td><td class="markdownTableBodyNone">Play "Marimba"    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">L / R   </td><td class="markdownTableBodyNone">Play "Cowbell"    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">D-Pad Left / Right   </td><td class="markdownTableBodyNone">Cycle pitch (Low / Normal / High)   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md546"></a>
+What You'll Learn</h2>
+<ul>
+<li>How to initialize SNESMOD for effects-only playback (no music)</li>
+<li>Loading individual sound effects from a soundbank with <code><a class="el" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97" title="Load a sound effect from the soundbank.">snesmodLoadEffect()</a></code></li>
+<li>Playing effects with volume, pan, and pitch via <code><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a></code></li>
+<li>Using three built-in pitch constants: <code>SNESMOD_PITCH_LOW</code>, <code>SNESMOD_PITCH_NORMAL</code>, <code>SNESMOD_PITCH_HIGH</code></li>
+<li>Why <code><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></code> must be called every frame, even without music</li>
+</ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md564"></a>
+<h2><a class="anchor" id="autotoc_md548"></a>
+SNES Concepts</h2>
+<h3><a class="anchor" id="autotoc_md549"></a>
+SNESMOD Initialization</h3>
+<p>SNESMOD is initialized in two steps: <code><a class="el" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c" title="Initialize SNESMOD audio engine.">snesmodInit()</a></code> sets up the SPC700 driver, then <code><a class="el" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3" title="Set the soundbank bank number.">snesmodSetSoundbank()</a></code> tells it which ROM bank contains the soundbank data:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">SOUNDBANK_BANK</a>);</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga4ee30188309d91d30e4d147b6292cae3"><div class="ttname"><a href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a></div><div class="ttdeci">void snesmodSetSoundbank(u8 bank)</div><div class="ttdoc">Set the soundbank bank number.</div></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
+</div><!-- fragment --><p><code>SOUNDBANK_BANK</code> is a constant generated by the build system from the soundbank source files listed in the Makefile's <code>SOUNDBANK_SRC</code> variable.</p>
+<h3><a class="anchor" id="autotoc_md550"></a>
+Loading and Playing Effects</h3>
+<p>Each effect must be loaded before it can be played. This transfers the BRR sample data to the SPC700's 64KB audio RAM:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; <a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#adae8021d63052c74619497c15c70595e">NUM_EFFECTS</a>; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
+<div class="line">    <a class="code hl_function" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>
+<div class="line">}</div>
+<div class="ttc" id="aaudio_2snesmod__sfx_2main_8c_html_adae8021d63052c74619497c15c70595e"><div class="ttname"><a href="audio_2snesmod__sfx_2main_8c.html#adae8021d63052c74619497c15c70595e">NUM_EFFECTS</a></div><div class="ttdeci">#define NUM_EFFECTS</div><div class="ttdoc">Number of sound effects in the soundbank.</div><div class="ttdef"><b>Definition</b> main.c:36</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
+</div><!-- fragment --><p>To play an effect, call <code><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a></code> with four parameters &ndash; the effect ID, volume (0-127), pan (0=left, 128=center, 255=right), and pitch:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">SFX_TADA</a>, 127, 128, pitch);</div>
+<div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md551"></a>
+The Soundbank</h3>
+<p>The soundbank is built from an Impulse Tracker <code>.it</code> file (<code>sfx/effectssfx.it</code>) that contains five instrument samples. The <code>smconv</code> tool converts it into a binary soundbank at build time. The <code>.it</code> file holds the raw instrument definitions but no music patterns &ndash; this is an effects-only soundbank.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Index   </th><th class="markdownTableHeadNone">Effect   </th><th class="markdownTableHeadNone">Constant    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">Tada   </td><td class="markdownTableBodyNone"><code>SFX_TADA</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">1   </td><td class="markdownTableBodyNone">Hall Strings   </td><td class="markdownTableBodyNone"><code>SFX_HALL_STRINGS</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">2   </td><td class="markdownTableBodyNone">Honky Tonk Piano   </td><td class="markdownTableBodyNone"><code>SFX_HONKY_TONK_PIANO</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3   </td><td class="markdownTableBodyNone">Marimba   </td><td class="markdownTableBodyNone"><code>SFX_MARIMBA_1</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">4   </td><td class="markdownTableBodyNone">Cowbell   </td><td class="markdownTableBodyNone"><code>SFX_COWBELL</code>   </td></tr>
+</table>
+<h3><a class="anchor" id="autotoc_md552"></a>
+Text Display</h3>
+<p>The on-screen HUD uses the <code>text</code> library module (<code>textInit</code>, <code>textLoadFont</code>, <code>textPrintAt</code>, <code>textFlush</code>) for rendering control labels and the current pitch setting. <code><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM.">textFlush()</a></code> is called after updating the pitch display to transfer the text buffer to VRAM.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md554"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>main.c</code>   </td><td class="markdownTableBodyNone">SFX triggering and pitch control    </td></tr>
+<td class="markdownTableBodyNone"><code>main.c</code>   </td><td class="markdownTableBodyNone">SFX triggering, pitch control, text display    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>sfx/</code>   </td><td class="markdownTableBodyNone">Sound effect source samples    </td></tr>
+<td class="markdownTableBodyNone"><code>sfx/effectssfx.it</code>   </td><td class="markdownTableBodyNone">Impulse Tracker file with 5 instrument samples    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration   </td></tr>
+<td class="markdownTableBodyNone"><code>soundbank.h</code>   </td><td class="markdownTableBodyNone">Generated header with effect constants and bank info    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone">Build configuration (<code>USE_SNESMOD := 1</code>, <code>SOUNDBANK_SRC</code>)   </td></tr>
 </table>
-<hr  />
-<h2><a class="anchor" id="autotoc_md566"></a>
-Exercises</h2>
-<h3><a class="anchor" id="autotoc_md567"></a>
-Exercise 1: Volume Control</h3>
-<p>Add volume adjustment: </p><div class="fragment"><div class="line"><span class="comment">/* If SNESMOD supports volume parameter */</span></div>
-<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">snesmodPlaySfxVol</a>(<a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a>, pitch, volume);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md568"></a>
-Exercise 2: Random Pitch</h3>
-<p>Randomize pitch on each play: </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">random_pitch</a> = (<a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a> % 3);</div>
-<div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">snesmodPlaySfx</a>(<a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">random_pitch</a>);</div>
-<div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_af743d5de011168f86bbdb716e0afbc47"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></div><div class="ttdeci">static u8 frame_counter</div><div class="ttdoc">Global frame counter for animation timing.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md569"></a>
-Exercise 3: Rapid Fire</h3>
-<p>Allow holding button for repeated sounds: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pad</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
-<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sfx_cooldown</a> == 0) {</div>
-<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">snesmodPlaySfx</a>(<a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a>, pitch);</div>
-<div class="line">        <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sfx_cooldown</a> = 10;  <span class="comment">/* Frames between plays */</span></div>
-<div class="line">    }</div>
-<div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sfx_cooldown</a> &gt; 0) <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sfx_cooldown</a>--;</div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md570"></a>
-Exercise 4: Sound Sequence</h3>
-<p>Play a sequence of sounds: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sequence</a>[] = {<a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#a1bf40f2a29f3ce18ded90aa7126c1b69">SFX_TADA</a>, <a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#aff60174f120ff0abb9fa6afad08db11c">SFX_PIANO</a>, <a class="code hl_define" href="audio_2snesmod__sfx_2main_8c.html#afd67ac7495a542f8fd9e16b0357586c1">SFX_STRINGS</a>};</div>
-<div class="line"><span class="comment">/* Play each with delay between */</span></div>
-<div class="ttc" id="aaudio_2snesmod__sfx_2main_8c_html_afd67ac7495a542f8fd9e16b0357586c1"><div class="ttname"><a href="audio_2snesmod__sfx_2main_8c.html#afd67ac7495a542f8fd9e16b0357586c1">SFX_STRINGS</a></div><div class="ttdeci">#define SFX_STRINGS</div><div class="ttdef"><b>Definition</b> main.c:206</div></div>
-<div class="ttc" id="aaudio_2snesmod__sfx_2main_8c_html_aff60174f120ff0abb9fa6afad08db11c"><div class="ttname"><a href="audio_2snesmod__sfx_2main_8c.html#aff60174f120ff0abb9fa6afad08db11c">SFX_PIANO</a></div><div class="ttdeci">#define SFX_PIANO</div><div class="ttdef"><b>Definition</b> main.c:207</div></div>
-</div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md572"></a>
-Technical Notes</h2>
-<h3><a class="anchor" id="autotoc_md573"></a>
-SFX Channels</h3>
-<p>SNESMOD reserves channels for SFX:</p><ul>
-<li>Music uses channels 0-5 (configurable)</li>
-<li>SFX typically use channels 6-7</li>
-<li>Check soundbank configuration</li>
-</ul>
-<h3><a class="anchor" id="autotoc_md574"></a>
-Polyphony</h3>
-<p>Playing a new SFX may cut off a previous one depending on channel allocation. Plan your sound design accordingly.</p>
-<h3><a class="anchor" id="autotoc_md575"></a>
-Sample Rate</h3>
-<p>SNESMOD samples play at their original rate. Pitch parameter shifts playback speed, affecting both pitch and duration.</p>
-<hr  />
-<h2><a class="anchor" id="autotoc_md577"></a>
+<h2><a class="anchor" id="autotoc_md555"></a>
 What's Next?</h2>
 <p><b>SNESMOD Music:</b> <a href="../snesmod_music/">SNESMOD Music</a> - Tracker music playback</p>
-<p><b>Graphics:</b> <a href="../../graphics/sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen</p>
-<hr  />
-<h2><a class="anchor" id="autotoc_md579"></a>
-License</h2>
-<p>Code: MIT Samples: See soundbank source </p>
+<p><b>Graphics:</b> <a href="../../graphics/sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
