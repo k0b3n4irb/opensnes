@@ -4,276 +4,76 @@
  * @ingroup examples
  *
  * Demonstrates standalone sound effect playback through the SPC700 using
- * SNESMOD, without any background music. Five instrument samples (tada,
- * strings, piano, marimba, cowbell) are loaded from a soundbank at startup.
- * Each button triggers a different effect, and the D-pad left/right cycles
- * between three pitch settings (low, normal, high) that apply to all
- * subsequent effect triggers.
+ * SNESMOD, without any background music. Five instrument samples are loaded
+ * from a soundbank at startup. Each button triggers a different effect, and
+ * the D-pad left/right cycles between three pitch settings.
  *
- * Unlike the music example, this one uses snesmodLoadEffect() to load
- * individual samples rather than a full tracker module, and
- * snesmodPlayEffect() to trigger one-shot playback with explicit volume,
- * panning, and pitch parameters.
+ * Ported from PVSnesLib "effects" example by alekmaul.
  *
  * @par SNES Concepts
- * - SPC700 effect playback: samples uploaded individually via snesmodLoadEffect()
- * - One-shot effect triggering with snesmodPlayEffect(id, volume, pan, pitch)
- * - Pitch control constants: SNESMOD_PITCH_LOW, SNESMOD_PITCH_NORMAL, SNESMOD_PITCH_HIGH
- * - Effects-only soundbank: .it file with instrument samples but no pattern data
- * - Per-frame snesmodProcess() still required to service the sound driver
+ * - SPC700 effect playback: snesmodLoadEffect() + snesmodPlayEffect()
+ * - Pitch control: SNESMOD_PITCH_LOW / NORMAL / HIGH
+ * - Effects-only soundbank: .it file with instrument samples, no patterns
+ * - Per-frame snesmodProcess() required even without music
  *
  * @par What to Observe
- * - Press A/B/X/Y to hear different instrument samples
- * - Press L or R to hear the cowbell
- * - Press Left/Right to change pitch (status shown on screen)
- * - All effects play at the currently selected pitch
+ * - A/B/X/Y play different instrument samples
+ * - L/R play cowbell
+ * - LEFT/RIGHT change pitch (shown on screen)
  *
  * @par Modules Used
- * console, sprite, dma, input
+ * console, sprite, dma, input, background, text
  *
- * @see snesmod.h, dma.h, video.h
+ * @see snesmod.h
  */
 
 #include <snes.h>
 #include <snes/snesmod.h>
+#include <snes/text.h>
 #include "soundbank.h"
 
-/**
- * @brief Hand-coded 2bpp bitmap font (40 glyphs, 16 bytes each = 640 bytes)
- *
- * Same minimal font used across the audio examples. Each 8x8 glyph is in
- * SNES 2bpp interleaved bitplane format. Only bitplane 0 carries data, so
- * all text renders as palette color 1 (white on dark blue).
- *
- * Tile index map: 0=space, 1-26=A-Z, 27-36=0-9, 37=-, 38=/, 39=:
- */
-static const u8 font_tiles[] = {
-    /* 0: Space */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    /* 1: A */
-    0x18,0x00, 0x3C,0x00, 0x66,0x00, 0x7E,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 2: B */
-    0x7C,0x00, 0x66,0x00, 0x7C,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x7C,0x00, 0x00,0x00,
-    /* 3: C */
-    0x3C,0x00, 0x66,0x00, 0x60,0x00, 0x60,0x00,
-    0x60,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 4: D */
-    0x78,0x00, 0x6C,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x6C,0x00, 0x78,0x00, 0x00,0x00,
-    /* 5: E */
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 6: F */
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x00,0x00,
-    /* 7: G */
-    0x3C,0x00, 0x66,0x00, 0x60,0x00, 0x6E,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 8: H */
-    0x66,0x00, 0x66,0x00, 0x7E,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 9: I */
-    0x3C,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 10: J */
-    0x1E,0x00, 0x0C,0x00, 0x0C,0x00, 0x0C,0x00,
-    0x6C,0x00, 0x6C,0x00, 0x38,0x00, 0x00,0x00,
-    /* 11: K */
-    0x66,0x00, 0x6C,0x00, 0x78,0x00, 0x70,0x00,
-    0x78,0x00, 0x6C,0x00, 0x66,0x00, 0x00,0x00,
-    /* 12: L */
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x60,0x00,
-    0x60,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 13: M */
-    0xC6,0x00, 0xEE,0x00, 0xFE,0x00, 0xD6,0x00,
-    0xC6,0x00, 0xC6,0x00, 0xC6,0x00, 0x00,0x00,
-    /* 14: N */
-    0x66,0x00, 0x76,0x00, 0x7E,0x00, 0x6E,0x00,
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 15: O */
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 16: P */
-    0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x7C,0x00,
-    0x60,0x00, 0x60,0x00, 0x60,0x00, 0x00,0x00,
-    /* 17: Q */
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x6A,0x00, 0x6C,0x00, 0x36,0x00, 0x00,0x00,
-    /* 18: R */
-    0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x7C,0x00,
-    0x6C,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 19: S */
-    0x3C,0x00, 0x66,0x00, 0x70,0x00, 0x3C,0x00,
-    0x0E,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 20: T */
-    0x7E,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    /* 21: U */
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    /* 22: V */
-    0x66,0x00, 0x66,0x00, 0x66,0x00, 0x66,0x00,
-    0x3C,0x00, 0x3C,0x00, 0x18,0x00, 0x00,0x00,
-    /* 23: W */
-    0xC6,0x00, 0xC6,0x00, 0xD6,0x00, 0xFE,0x00,
-    0xEE,0x00, 0xC6,0x00, 0xC6,0x00, 0x00,0x00,
-    /* 24: X */
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x18,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x00,0x00,
-    /* 25: Y */
-    0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x18,0x00,
-    0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    /* 26: Z */
-    0x7E,0x00, 0x06,0x00, 0x0C,0x00, 0x18,0x00,
-    0x30,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    /* 27-36: 0-9 */
-    0x3C,0x00, 0x66,0x00, 0x6E,0x00, 0x76,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x18,0x00, 0x38,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x7E,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x06,0x00, 0x1C,0x00, 0x30,0x00, 0x60,0x00, 0x7E,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x06,0x00, 0x1C,0x00, 0x06,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x0C,0x00, 0x1C,0x00, 0x3C,0x00, 0x6C,0x00, 0x7E,0x00, 0x0C,0x00, 0x0C,0x00, 0x00,0x00,
-    0x7E,0x00, 0x60,0x00, 0x7C,0x00, 0x06,0x00, 0x06,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x1C,0x00, 0x30,0x00, 0x60,0x00, 0x7C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x7E,0x00, 0x06,0x00, 0x0C,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3C,0x00, 0x00,0x00,
-    0x3C,0x00, 0x66,0x00, 0x66,0x00, 0x3E,0x00, 0x06,0x00, 0x0C,0x00, 0x38,0x00, 0x00,0x00,
-    /* 37: - */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x7E,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    /* 38: / */
-    0x06,0x00, 0x0C,0x00, 0x18,0x00, 0x30,0x00,
-    0x60,0x00, 0xC0,0x00, 0x80,0x00, 0x00,0x00,
-    /* 39: : */
-    0x00,0x00, 0x18,0x00, 0x18,0x00, 0x00,0x00,
-    0x18,0x00, 0x18,0x00, 0x00,0x00, 0x00,0x00,
-};
-
-/** @brief Total size of font tile data in bytes (40 glyphs * 16 bytes each) */
-#define FONT_SIZE (40 * 16)
-
-/** @brief HUD title: "SNESMOD SFX EXAMPLE" (tile indices, 0xFF-terminated) */
-static const u8 msg_title[] = { 19,14,5,19,13,15,4, 0, 19,6,24, 0, 5,24,1,13,16,12,5, 0xFF };
-/** @brief HUD label: "CONTROLS:" */
-static const u8 msg_controls[] = { 3,15,14,20,18,15,12,19,39, 0xFF };
-/** @brief HUD line: "A - TADA" */
-static const u8 msg_a[] = { 1, 0,37,0, 20,1,4,1, 0xFF };
-/** @brief HUD line: "B - STRINGS" */
-static const u8 msg_b[] = { 2, 0,37,0, 19,20,18,9,14,7,19, 0xFF };
-/** @brief HUD line: "X - PIANO" */
-static const u8 msg_x[] = { 24, 0,37,0, 16,9,1,14,15, 0xFF };
-/** @brief HUD line: "Y - MARIMBA" */
-static const u8 msg_y[] = { 25, 0,37,0, 13,1,18,9,13,2,1, 0xFF };
-/** @brief HUD line: "L/R - COWBELL" */
-static const u8 msg_lr[] = { 12,38,18, 0,37,0, 3,15,23,2,5,12,12, 0xFF };
-/** @brief HUD line: "LEFT/RIGHT - PITCH" */
-static const u8 msg_dpad[] = { 12,5,6,20,38,18,9,7,8,20, 0,37,0, 16,9,20,3,8, 0xFF };
-/** @brief Pitch status: "PITCH: LOW" (padded with spaces to overwrite longer text) */
-static const u8 msg_pitch_low[] = { 16,9,20,3,8,39, 0, 12,15,23, 0, 0, 0, 0, 0xFF };
-/** @brief Pitch status: "PITCH: NORMAL" */
-static const u8 msg_pitch_norm[] = { 16,9,20,3,8,39, 0, 14,15,18,13,1,12, 0xFF };
-/** @brief Pitch status: "PITCH: HIGH" (padded with spaces to overwrite longer text) */
-static const u8 msg_pitch_high[] = { 16,9,20,3,8,39, 0, 8,9,7,8, 0, 0, 0xFF };
+/** @brief Number of sound effects in the soundbank */
+#define NUM_EFFECTS 5
 
 /**
- * @brief Write a 0xFF-terminated tile-index string to VRAM at a tilemap address
- *
- * Writes tile indices sequentially to the BG1 tilemap in VRAM. Each entry
- * becomes a 16-bit tilemap word with the tile index in the low byte and
- * zero attributes in the high byte. Must be called during forced blank or
- * VBlank since it writes to VRAM via direct PPU register access.
- *
- * @param addr VRAM word address within the tilemap (e.g., 0x0400 + row*32 + col)
- * @param msg  Pointer to a 0xFF-terminated array of tile indices
- */
-static void print_msg(u16 addr, const u8 *msg) {
-    u16 i;
-    REG_VMADDL = addr & 0xFF;
-    REG_VMADDH = addr >> 8;
-    i = 0;
-    while (msg[i] != 0xFF) {
-        REG_VMDATAL = msg[i];
-        REG_VMDATAH = 0;
-        i++;
-    }
-}
-
-/** @name Sound effect IDs (must match indices generated by smconv in soundbank.h)
- * @{ */
-#define SFX_TADA      0  /**< Tada fanfare sample */
-#define SFX_STRINGS   1  /**< Orchestral strings sample */
-#define SFX_PIANO     2  /**< Piano note sample */
-#define SFX_MARIMBA   3  /**< Marimba percussion sample */
-#define SFX_COWBELL   4  /**< Cowbell percussion sample */
-/** @} */
-
-/** @brief Total number of sound effects loaded from the soundbank */
-#define NUM_EFFECTS   5
-
-/**
- * @brief Entry point -- load sound effects, display HUD, run SFX trigger loop
- *
- * Sets up a Mode 0 text display, initializes SNESMOD, and loads all five
- * instrument samples into SPC700 RAM via snesmodLoadEffect(). The main
- * loop polls the joypad each frame: face buttons trigger different samples
- * via snesmodPlayEffect(), and Left/Right cycles through three pitch
- * settings (low, normal, high). The current pitch mode is shown on screen
- * by overwriting the tilemap status line.
- *
- * Unlike the music example, no tracker module is loaded -- only individual
- * samples are uploaded and played as one-shot effects.
- *
- * @return Never returns (infinite loop).
+ * @brief Entry point — load effects, display controls, play on button press
+ * @return Never returns
  */
 int main(void) {
-    u16 pad;           /**< Raw joypad state this frame */
-    u16 pad_pressed;   /**< Newly pressed buttons (rising edge) */
-    u16 pad_prev;      /**< Previous frame's joypad state for edge detection */
-    u16 pitch;         /**< Current pitch value passed to snesmodPlayEffect() */
-    u8 pitch_mode;     /**< Pitch selector: 0=low, 1=normal, 2=high */
-    u16 i;             /**< General-purpose loop counter */
+    u16 pad;
+    u8 pitch_mode;
+    u16 pitch;
+    u16 i;
 
-    /* Initialize console hardware */
+    /* Init hardware */
     consoleInit();
-
-    /* Set Mode 0 */
     setMode(BG_MODE0, 0);
 
-    /* Configure BG1 for text display */
-    REG_BG1SC = 0x04;
-    REG_BG12NBA = 0x00;
+    /* Palette */
+    setColor(0, 0x2800);
+    setColor(1, RGB(31, 31, 31));
 
-    /* Load font tiles to VRAM $0000 */
-    REG_VMAIN = 0x80;
-    REG_VMADDL = 0x00;
-    REG_VMADDH = 0x00;
-    for (i = 0; i < FONT_SIZE; i += 2) {
-        REG_VMDATAL = font_tiles[i];
-        REG_VMDATAH = font_tiles[i + 1];
-    }
+    /* Text setup */
+    textInit();
+    textLoadFont(0x0000);
+    bgSetGfxPtr(0, 0x0000);
+    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
-    /* Set palette */
-    setColor(0, 0x2800);           /* Dark blue */
-    setColor(1, RGB(31, 31, 31));  /* White */
+    /* HUD */
+    textPrintAt(6, 2, "SNESMOD SFX EXAMPLE");
+    textPrintAt(5, 5, "CONTROLS:");
+    textPrintAt(7, 7, "A - TADA");
+    textPrintAt(7, 8, "B - STRINGS");
+    textPrintAt(7, 9, "X - PIANO");
+    textPrintAt(7, 10, "Y - MARIMBA");
+    textPrintAt(7, 11, "L/R - COWBELL");
+    textPrintAt(7, 12, "LEFT/RIGHT - PITCH");
+    textPrintAt(7, 15, "PITCH: NORMAL   ");
 
-    /* Clear tilemap */
-    dmaFillVRAM(0, 0x0400, 1024 * 2);
-
-    /* Print messages */
-    print_msg(0x0400 + 2*32 + 6, msg_title);
-    print_msg(0x0400 + 5*32 + 5, msg_controls);
-    print_msg(0x0400 + 7*32 + 7, msg_a);
-    print_msg(0x0400 + 8*32 + 7, msg_b);
-    print_msg(0x0400 + 9*32 + 7, msg_x);
-    print_msg(0x0400 + 10*32 + 7, msg_y);
-    print_msg(0x0400 + 11*32 + 7, msg_lr);
-    print_msg(0x0400 + 12*32 + 7, msg_dpad);
-    print_msg(0x0400 + 15*32 + 7, msg_pitch_norm);
-
-    /* Enable BG1 on main screen */
+    /* Screen enable */
     setMainScreen(LAYER_BG1);
+    textFlush();
+    WaitForVBlank();
 
     /* Initialize SNESMOD */
     snesmodInit();
@@ -284,70 +84,61 @@ int main(void) {
         snesmodLoadEffect(i);
     }
 
-    /* Turn on screen */
     setScreenOn();
 
-    /* Initialize variables */
-    pitch_mode = 1;  /* Normal */
+    /* State */
+    pitch_mode = 1;
     pitch = SNESMOD_PITCH_NORMAL;
-
-    /* Initialize pad_prev */
-    WaitForVBlank();
-    while (REG_HVBJOY & 0x01) {}
-    pad_prev = REG_JOY1L | (REG_JOY1H << 8);
 
     /* Main loop */
     while (1) {
         WaitForVBlank();
         snesmodProcess();
 
-        while (REG_HVBJOY & 0x01) {}
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-        pad_pressed = pad & ~pad_prev;
-        pad_prev = pad;
-
-        if (pad == 0xFFFF) pad_pressed = 0;
+        pad = padPressed(0);
 
         /* Change pitch with Left/Right */
-        if (pad_pressed & KEY_LEFT) {
+        if (pad & KEY_LEFT) {
             if (pitch_mode > 0) {
                 pitch_mode--;
                 if (pitch_mode == 0) {
                     pitch = SNESMOD_PITCH_LOW;
-                    print_msg(0x0400 + 15*32 + 7, msg_pitch_low);
+                    textPrintAt(7, 15, "PITCH: LOW      ");
                 } else {
                     pitch = SNESMOD_PITCH_NORMAL;
-                    print_msg(0x0400 + 15*32 + 7, msg_pitch_norm);
+                    textPrintAt(7, 15, "PITCH: NORMAL   ");
                 }
+                textFlush();
             }
         }
-        if (pad_pressed & KEY_RIGHT) {
+        if (pad & KEY_RIGHT) {
             if (pitch_mode < 2) {
                 pitch_mode++;
                 if (pitch_mode == 1) {
                     pitch = SNESMOD_PITCH_NORMAL;
-                    print_msg(0x0400 + 15*32 + 7, msg_pitch_norm);
+                    textPrintAt(7, 15, "PITCH: NORMAL   ");
                 } else {
                     pitch = SNESMOD_PITCH_HIGH;
-                    print_msg(0x0400 + 15*32 + 7, msg_pitch_high);
+                    textPrintAt(7, 15, "PITCH: HIGH     ");
                 }
+                textFlush();
             }
         }
 
         /* Play effects on button press */
-        if (pad_pressed & KEY_A) {
+        if (pad & KEY_A) {
             snesmodPlayEffect(SFX_TADA, 127, 128, pitch);
         }
-        if (pad_pressed & KEY_B) {
-            snesmodPlayEffect(SFX_STRINGS, 127, 128, pitch);
+        if (pad & KEY_B) {
+            snesmodPlayEffect(SFX_HALL_STRINGS, 127, 128, pitch);
         }
-        if (pad_pressed & KEY_X) {
-            snesmodPlayEffect(SFX_PIANO, 127, 128, pitch);
+        if (pad & KEY_X) {
+            snesmodPlayEffect(SFX_HONKY_TONK_PIANO, 127, 128, pitch);
         }
-        if (pad_pressed & KEY_Y) {
-            snesmodPlayEffect(SFX_MARIMBA, 127, 128, pitch);
+        if (pad & KEY_Y) {
+            snesmodPlayEffect(SFX_MARIMBA_1, 127, 128, pitch);
         }
-        if ((pad_pressed & KEY_L) || (pad_pressed & KEY_R)) {
+        if ((pad & KEY_L) || (pad & KEY_R)) {
             snesmodPlayEffect(SFX_COWBELL, 127, 128, pitch);
         }
     }
