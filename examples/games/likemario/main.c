@@ -114,13 +114,13 @@ extern u8 getSpriteTilBank(void);
 #define T_SOLID  0xFF00
 
 /** @brief Mario is standing on solid ground, idle */
-#define ACT_STAND  0
+#define MARIO_ACT_STAND  0
 /** @brief Mario is walking (horizontal velocity nonzero, on ground) */
-#define ACT_WALK   1
+#define MARIO_ACT_WALK   1
 /** @brief Mario is jumping (upward velocity, ascending phase) */
-#define ACT_JUMP   2
+#define MARIO_ACT_JUMP   2
 /** @brief Mario is falling (downward velocity or walked off an edge) */
-#define ACT_FALL   3
+#define MARIO_ACT_FALL   3
 
 /** @brief Dynamic sprite frame index: jump pose */
 #define FRAME_JUMP   1
@@ -158,7 +158,7 @@ static u8  mario_xfrac;       /**< Mario X sub-pixel fraction (8.8 fixed-point l
 static u8  mario_yfrac;       /**< Mario Y sub-pixel fraction (8.8 fixed-point low byte) */
 static s16 mario_xvel;        /**< Mario X velocity in 8.8 fixed-point */
 static s16 mario_yvel;        /**< Mario Y velocity in 8.8 fixed-point (negative = upward) */
-static u8  mario_action;      /**< Current action state (ACT_STAND/WALK/JUMP/FALL) */
+static u8  mario_action;      /**< Current action state (MARIO_ACT_STAND/WALK/JUMP/FALL) */
 static u8  mario_anim_idx;    /**< Walk animation toggle (0 or 1, selects WALK0/WALK1) */
 static u8  anim_tick;         /**< Frame counter for animation timing */
 
@@ -403,7 +403,7 @@ static void mario_init(void) {
     mario_yfrac = 0;
     mario_xvel = 0;
     mario_yvel = 0;
-    mario_action = ACT_STAND;
+    mario_action = MARIO_ACT_STAND;
     mario_anim_idx = 0;
     anim_tick = 0;
 
@@ -428,15 +428,15 @@ static void mario_handle_input(void) {
 
     if (pad & KEY_LEFT) {
         oambuffer[0].oamattribute = OBJ_PRIO(3);
-        if (mario_action == ACT_STAND)
-            mario_action = ACT_WALK;
+        if (mario_action == MARIO_ACT_STAND)
+            mario_action = MARIO_ACT_WALK;
         mario_xvel -= MARIO_ACCEL;
         if (mario_xvel < -MARIO_MAXACCEL)
             mario_xvel = -MARIO_MAXACCEL;
     } else if (pad & KEY_RIGHT) {
         oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
-        if (mario_action == ACT_STAND)
-            mario_action = ACT_WALK;
+        if (mario_action == MARIO_ACT_STAND)
+            mario_action = MARIO_ACT_WALK;
         mario_xvel += MARIO_ACCEL;
         if (mario_xvel > MARIO_MAXACCEL)
             mario_xvel = MARIO_MAXACCEL;
@@ -451,8 +451,8 @@ static void mario_handle_input(void) {
     }
 
     if (padPressed(0) & KEY_A) {
-        if (mario_action == ACT_STAND || mario_action == ACT_WALK) {
-            mario_action = ACT_JUMP;
+        if (mario_action == MARIO_ACT_STAND || mario_action == MARIO_ACT_WALK) {
+            mario_action = MARIO_ACT_JUMP;
             if (pad & KEY_UP)
                 mario_yvel = -MARIO_HIJUMPING;
             else
@@ -493,7 +493,7 @@ static s16 asr8(s16 val) {
 static void mario_apply_physics(void) {
     s16 new_frac;
 
-    if (mario_action == ACT_JUMP || mario_action == ACT_FALL) {
+    if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL) {
         mario_yvel += GRAVITY;
         if (mario_yvel > 0x0400)
             mario_yvel = 0x0400;
@@ -529,11 +529,11 @@ static void mario_collide_vertical(void) {
             mario_y = ((mario_y + 16) & 0xFFF8) - 16;
             mario_yfrac = 0;
             mario_yvel = 0;
-            if (mario_action == ACT_FALL || mario_action == ACT_JUMP)
-                mario_action = ACT_STAND;
+            if (mario_action == MARIO_ACT_FALL || mario_action == MARIO_ACT_JUMP)
+                mario_action = MARIO_ACT_STAND;
         } else {
-            if (mario_action == ACT_STAND || mario_action == ACT_WALK)
-                mario_action = ACT_FALL;
+            if (mario_action == MARIO_ACT_STAND || mario_action == MARIO_ACT_WALK)
+                mario_action = MARIO_ACT_FALL;
         }
     }
 
@@ -544,7 +544,7 @@ static void mario_collide_vertical(void) {
             mario_y = (mario_y & 0xFFF8) + 8;
             mario_yfrac = 0;
             mario_yvel = 0;
-            mario_action = ACT_FALL;
+            mario_action = MARIO_ACT_FALL;
         }
     }
 }
@@ -608,13 +608,13 @@ static void mario_clamp_and_transition(void) {
         mario_y = 32;
         mario_xvel = 0;
         mario_yvel = 0;
-        mario_action = ACT_FALL;
+        mario_action = MARIO_ACT_FALL;
     }
 
-    if (mario_action == ACT_WALK && mario_xvel == 0)
-        mario_action = ACT_STAND;
-    if (mario_action == ACT_JUMP && mario_yvel >= 0)
-        mario_action = ACT_FALL;
+    if (mario_action == MARIO_ACT_WALK && mario_xvel == 0)
+        mario_action = MARIO_ACT_STAND;
+    if (mario_action == MARIO_ACT_JUMP && mario_yvel >= 0)
+        mario_action = MARIO_ACT_FALL;
 }
 
 /**
@@ -628,13 +628,13 @@ static void mario_clamp_and_transition(void) {
 static void mario_animate(void) {
     anim_tick++;
 
-    if (mario_action == ACT_WALK) {
+    if (mario_action == MARIO_ACT_WALK) {
         if ((anim_tick & 3) == 3) {
             mario_anim_idx ^= 1;
             oambuffer[0].oamframeid = FRAME_WALK0 + mario_anim_idx;
             oambuffer[0].oamrefresh = 1;
         }
-    } else if (mario_action == ACT_JUMP || mario_action == ACT_FALL) {
+    } else if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL) {
         if (oambuffer[0].oamframeid != FRAME_JUMP) {
             oambuffer[0].oamframeid = FRAME_JUMP;
             oambuffer[0].oamrefresh = 1;
