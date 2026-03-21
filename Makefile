@@ -71,7 +71,6 @@ clean:
 	$(MAKE) -C $(TOOLS_PATH) clean
 	$(MAKE) -C $(LIB_PATH) clean
 	$(MAKE) -C $(EXAMPLES_PATH) clean
-	$(MAKE) -C $(TESTS_PATH) clean
 	-rm -rf bin/
 
 install: compiler tools lib

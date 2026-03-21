@@ -51,7 +51,8 @@
 // isquiet = 0 if we want some messages in console
 void inc_save (const char *filename, bool istile, bool ismap, bool ispal,bool ismetasprite, bool mode7, bool isquiet)
 {
-	char *outputname, *incname;
+	char *outputname;
+	const char *incname;
    	FILE *fp;
 
 	// remove extension and put the ".inc" to filename

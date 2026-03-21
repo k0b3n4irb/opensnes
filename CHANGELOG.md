@@ -5,6 +5,63 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.10.0] - 2026-03-21
+
+### Library
+
+- **Dynamic metasprite engine**: `oamMetaDrawDyn32()`, `oamMetaDrawDyn16()`,
+  `oamMetaDrawDyn8()` — multi-tile sprite characters with per-frame VRAM streaming.
+  Iterates MetaspriteItem arrays and calls the proven oamDynamic*Draw functions
+  per sub-sprite. oamMetaDrawDyn16 includes `sprsize` parameter for correct
+  name table bit handling in SMALL mode.
+
+### Build System
+
+- **Eliminated `combined.asm`**: each ASM source (crt0, runtime, data_init_start,
+  user ASMSRC) is now compiled as a separate object file. Fixes HiROM ROMBANKMAP
+  linker errors and removes all `cat >>` file concatenation.
+- **common.mk refactoring**: 529 → 303 lines (-43%), 32 → 15 conditionals (-53%).
+  New `wrap_asm` macro factors the duplicated memmap-include-and-assemble pattern.
+  `_HAS_SOUNDBANK` computed once replaces 6 nested conditional blocks. `$(if)`
+  one-liners replace multi-line ifeq/else/endif blocks.
+- **smconv patched**: generates FORCE sections with `.ORG 0` and `SOUNDBANK_BANK`
+  in header directly — eliminates 3 sed post-processing calls.
+- **Soundbank multi-bank support**: soundbanks >32KB correctly split across
+  multiple ROM banks with FORCE placement. Tested with 56KB (LoROM, 2 banks)
+  and 59KB (HiROM, 2 banks) soundbanks.
+- **HiROM soundbank support**: soundbank assembled as separate object to avoid
+  ROMBANKMAP conflicts. HiROM `.ORG $8000` override for bank mirror access.
+- **HiROM text module fix**: `text.asm` and `text4bpp.asm` now include the correct
+  HiROM memmap conditionally (was hardcoded to LoROM, blocking all HiROM+text builds).
+- **HiROM ROMBANKS**: increased from 4 to 8 (512KB) to accommodate large soundbanks.
+- **macOS compatibility**: `sed -i.bak` instead of `sed -i` for BSD sed portability.
+- **Header template**: ROM_NAME via single sed, numeric values (CARTRIDGETYPE,
+  ROMSIZE, SRAMSIZE) via `.DEFINE` in project_config.inc.
+- **Fixed `make clean`**: removed stale `tests/` directory reference.
+
+### Compiler
+
+- **Zero warnings**: 72 Clang warnings fixed across cproc (67) and QBE (5).
+  Strict prototypes, switch default cases, operator precedence parentheses,
+  assignment-as-condition, sign comparison, unused variables.
+
+### Tools
+
+- **Zero warnings**: gfx4snes, smconv, img2snes, tmx2snes — strict prototypes,
+  uninitialized variables, const qualifiers, missing newlines, duplicate
+  instrument name handling in smconv (appends `_N` suffix).
+
+### Examples (49 total, +3 new)
+
+- **dynamic_metasprite**: port of PVSnesLib DynamicEngineMetaSprite — 3 OBJSEL
+  configurations (8/16, 8/32, 16/32) selectable via D-PAD, glitch-free transitions.
+- **snesmod_music_large**: "What Is Love" 108KB IT module — validates multi-bank
+  LoROM soundbank (56KB across 2 banks).
+- **snesmod_music_hirom**: "What Is Love" 210KB IT module — validates HiROM
+  soundbank support with 64KB banks.
+- **likemario**: renamed ACT_STAND/WALK/JUMP/FALL to MARIO_ACT_* to avoid
+  conflict with map.h bitmask definitions.
+
 ## [0.8.0] - 2026-03-15
 
 ### opensnes-emu — Debug Emulator (NEW)

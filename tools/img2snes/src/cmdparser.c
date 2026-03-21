@@ -470,6 +470,7 @@ static int cmdp_parse_args(int argc, char **argv, cmdp_command_st *cmdp, cmdp_ct
         ctx->fn_error_parse(&error_params);                                                                            \
     } while (0)
     int parsed_options = 0;
+    (void)parsed_options;
     int arg_index      = 0;
     for (; arg_index < argc; arg_index++)
     {
@@ -773,7 +774,7 @@ static void cmdp_setup(cmdp_command_st *cmdp, cmdp_command_st *parent)
 // expose
 // ============================================================================
 
-cmdp_flag_t cmdp_flag_always_hide()
+cmdp_flag_t cmdp_flag_always_hide(void)
 {
     return CMDP_FLAG_HIDE;
 }

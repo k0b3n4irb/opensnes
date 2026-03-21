@@ -202,7 +202,8 @@ spc_instrument_t *spc_instrument_create(const itl_instrument_t *src)
                 } else {
                     ed->delta = 64;
                     ed->duration = 255;
-                    printf("\nsmconv: warning 'Volume envelope for instrument %i must have more\n               than one node to play properly'\n\n", g_current_instrument);
+                    if (g_verbose)
+                        fprintf(stderr, "smconv: note: Volume envelope for instrument %i has only one node\n", g_current_instrument);
                 }
             } else {
                 ed->delta = 0;
@@ -270,6 +271,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
         int row_buf_cap = 0;
 
         u8 spc_hints = 0;
+        (void)spc_hints;
         u8 data_bits = 0;
         u8 p_maskvar[8] = {0};
 
@@ -967,7 +969,8 @@ static void export_asm(const spc_bank_t *b, const char *inputfile, const char *o
     if (size <= banksize) {
         fprintf(fp,
                 ".BANK %i\n"
-                ".SECTION \"SOUNDBANK\" ; need dedicated bank(s)\n\n"
+                ".ORG 0\n"
+                ".SECTION \"SOUNDBANK\" FORCE ; need dedicated bank(s)\n\n"
                 "%s:\n",
                 g_banknum, g_symbol_prefix);
 
@@ -985,7 +988,8 @@ static void export_asm(const spc_bank_t *b, const char *inputfile, const char *o
         for (u32 j = 0; j <= lastbank; j++) {
             fprintf(fp,
                     ".BANK %i\n"
-                    ".SECTION \"SOUNDBANK%i\" ; need dedicated bank(s)\n\n"
+                    ".ORG 0\n"
+                    ".SECTION \"SOUNDBANK%i\" FORCE ; need dedicated bank(s)\n\n"
                     "%s%i:\n",
                     g_banknum + (int)j, (int)j, g_symbol_prefix, (int)j);
 
@@ -1037,11 +1041,28 @@ static void export_inc(const spc_bank_t *b, const char *output)
     }
     fprintf(fp, "\n");
 
+    /* Track emitted SFX names to avoid duplicate #define warnings.
+     * Append _N suffix for duplicates (e.g., SFX_KICK, SFX_KICK_2, SFX_KICK_3). */
     for (int i = 0; i < b->source_count; i++) {
-        if (b->sources[i]->id[0] != '\0')
+        if (b->sources[i]->id[0] == '\0') continue;
+
+        /* Count how many times this name appeared before */
+        int dup_count = 0;
+        for (int j = 0; j < i; j++) {
+            if (strcmp(b->sources[j]->id, b->sources[i]->id) == 0)
+                dup_count++;
+        }
+
+        if (dup_count == 0) {
             fprintf(fp, "#define %-32s\t%i\n", b->sources[i]->id, i);
+        } else {
+            char unique_id[512];
+            snprintf(unique_id, sizeof(unique_id), "%s_%i", b->sources[i]->id, dup_count + 1);
+            fprintf(fp, "#define %-32s\t%i\n", unique_id, i);
+        }
     }
 
+    fprintf(fp, "\n#define SOUNDBANK_BANK %i\n", g_banknum);
     fprintf(fp, "\n#endif // __SOUNDBANK_DEFINITIONS__\n");
     fclose(fp);
 }

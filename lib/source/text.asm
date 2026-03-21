@@ -7,7 +7,11 @@
 ; License: CC0 (Public Domain)
 ;==============================================================================
 
+.ifdef HIROM
+.include "lib_memmap_hirom.inc"
+.else
 .include "lib_memmap.inc"
+.endif
 
 .SECTION ".text_font_rodata" SUPERFREE
 
