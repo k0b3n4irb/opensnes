@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_basics_random.html',''); init
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md569"></a>
+    <h2><a class="anchor" id="autotoc_md599"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to generate random numbers with <code><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></code> (returns 0-65535)</li>
@@ -109,7 +109,7 @@ What You'll Learn</h2>
 <li>Why seeding from <code><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a></code> at a player-triggered moment gives good randomness</li>
 <li>How to display numbers in both hex and decimal with the text module</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md570"></a>
+<h2><a class="anchor" id="autotoc_md600"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -119,12 +119,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">B   </td><td class="markdownTableBodyNone">Re-seed the PRNG from the frame counter   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md571"></a>
+<h2><a class="anchor" id="autotoc_md601"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md572"></a>
+<h3><a class="anchor" id="autotoc_md602"></a>
 Why Seed Matters</h3>
 <p><code><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></code> produces a deterministic sequence — the same seed always gives the same numbers. For a game, you want unpredictability. The trick: call <code>srand(getFrameCount())</code> when the player presses START on the title screen. Since the player presses at an unpredictable frame, the seed varies each playthrough.</p>
-<h3><a class="anchor" id="autotoc_md573"></a>
+<h3><a class="anchor" id="autotoc_md603"></a>
 Using rand() in Games</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;        <span class="comment">// Random X position (0-255)</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">damage</a> = 10 + (<a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 6);    <span class="comment">// Damage 10-15</span></div>
@@ -134,7 +134,7 @@ Using rand() in Games</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md574"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md604"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/random</div>

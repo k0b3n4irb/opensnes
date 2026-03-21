@@ -97,36 +97,37 @@ $(document).ready(function(){initNavTree('getting_started.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This guide will get you from zero to running your first SNES ROM in about 10 minutes.</p>
-<h2><a class="anchor" id="autotoc_md203"></a>
-What You'll Need</h2>
-<ul>
-<li><b>C programming basics</b> - if you can write a for loop, you're ready</li>
-<li><b>Curiosity</b> - the SNES is a fascinating machine</li>
-<li><b>An emulator</b> - to test your ROMs</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md204"></a>
-Step 1: Install Prerequisites</h2>
-<h3><a class="anchor" id="autotoc_md205"></a>
-macOS</h3>
-<div class="fragment"><div class="line">xcode-select --install</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md206"></a>
-Linux (Ubuntu/Debian)</h3>
-<div class="fragment"><div class="line">sudo apt update</div>
-<div class="line">sudo apt install build-essential clang cmake make git python3</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md207"></a>
-Linux (Fedora)</h3>
-<div class="fragment"><div class="line">sudo dnf install clang cmake make git python3</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md208"></a>
-Windows</h3>
-<ol type="1">
+<h2><a class="anchor" id="autotoc_md223"></a>
+Choose Your Path</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone"></th><th class="markdownTableHeadNone"><b>I want to make SNES games</b>   </th><th class="markdownTableHeadNone"><b>I want to contribute to the SDK</b>    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b>What</b>   </td><td class="markdownTableBodyNone">Download the pre-built SDK, write C code, build ROMs   </td><td class="markdownTableBodyNone">Clone the repo, modify compiler/library/tools    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>Prerequisites</b>   </td><td class="markdownTableBodyNone"><code>make</code> + text editor   </td><td class="markdownTableBodyNone">clang, cmake, git, python3    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b>Time to start</b>   </td><td class="markdownTableBodyNone">~5 minutes   </td><td class="markdownTableBodyNone">~15 minutes    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>Go to</b>   </td><td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">Path A: Game Developer</a>   </td><td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">Path B: SDK Developer</a>   </td></tr>
+</table>
+<hr  />
+<h2><a class="anchor" id="autotoc_md225"></a>
+Path A: Game Developer</h2>
+<p>You want to write SNES games in C. The SDK is already compiled — you just need to download it, write code, and run <code>make</code>.</p>
+<h3><a class="anchor" id="autotoc_md226"></a>
+A1. Install Prerequisites</h3>
+<p>You only need <code>make</code> (the build tool) and an emulator. No compiler installation required — the SDK ships with its own cross-compiler.</p>
+<p><b>macOS:</b> </p><div class="fragment"><div class="line">xcode-select --install</div>
+</div><!-- fragment --><p><b>Linux (Ubuntu/Debian):</b> </p><div class="fragment"><div class="line">sudo apt install make</div>
+</div><!-- fragment --><p><b>Linux (Fedora):</b> </p><div class="fragment"><div class="line">sudo dnf install make</div>
+</div><!-- fragment --><p><b>Windows:</b></p><ol type="1">
 <li>Install <a href="https://www.msys2.org/">MSYS2</a></li>
-<li>Open <b>MSYS2 UCRT64</b> terminal (not the regular MSYS2 terminal)</li>
-<li>Run:</li>
+<li>Open <b>MSYS2 UCRT64</b> terminal</li>
+<li>Run: <code>pacman -S make</code></li>
 </ol>
-<div class="fragment"><div class="line">pacman -Syu</div>
-<div class="line">pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md209"></a>
-Step 2: Get an Emulator</h2>
+<h3><a class="anchor" id="autotoc_md227"></a>
+A2. Get an Emulator</h3>
 <p>Pick one (Mesen is recommended for debugging):</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -138,10 +139,8 @@ Step 2: Get an Emulator</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="https://www.snes9x.com/">Snes9x</a>   </td><td class="markdownTableBodyNone">Performance   </td><td class="markdownTableBodyNone">snes9x.com   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md210"></a>
-Step 3: Get OpenSNES</h2>
-<h3><a class="anchor" id="autotoc_md211"></a>
-Option A: Download Pre-built SDK (recommended)</h3>
+<h3><a class="anchor" id="autotoc_md228"></a>
+A3. Download OpenSNES SDK</h3>
 <p>Download the latest release for your platform from the <a href="https://github.com/k0b3n4irb/opensnes/releases">GitHub Releases page</a>:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -149,94 +148,55 @@ Option A: Download Pre-built SDK (recommended)</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Linux x86_64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_linux_x86_64.zip</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">macOS arm64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_darwin_arm64.zip</code>    </td></tr>
+<td class="markdownTableBodyNone">Linux aarch64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_linux_aarch64.zip</code>    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">macOS arm64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_darwin_arm64.zip</code>    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Windows x86_64   </td><td class="markdownTableBodyNone"><code>opensnes_&lt;version&gt;_windows_x86_64.zip</code>   </td></tr>
 </table>
-<p>Extract the zip and note the path — you'll need it for your project's Makefile.</p>
-<h3><a class="anchor" id="autotoc_md212"></a>
-Option B: Build from source</h3>
-<div class="fragment"><div class="line"># Clone with submodules (--recursive is required!)</div>
-<div class="line">git clone --recursive https://github.com/k0b3n4irb/opensnes.git</div>
-<div class="line">cd opensnes</div>
+<p>Extract the archive somewhere permanent (e.g., <code>~/opensnes</code> or <code>C:\opensnes</code>).</p>
+<h3><a class="anchor" id="autotoc_md229"></a>
+A4. Run Your First ROM</h3>
+<p>The SDK comes with pre-built example ROMs:</p>
+<div class="fragment"><div class="line">cd opensnes/examples/text/hello_world</div>
 <div class="line"> </div>
-<div class="line"># Build everything</div>
-<div class="line">make</div>
-</div><!-- fragment --><p>This builds the compiler, tools, library, and all 41 example ROMs.</p>
-<p><b>Expected output:</b> </p><div class="fragment"><div class="line">Building cc65816 compiler...</div>
-<div class="line">Building WLA-DX assembler...</div>
-<div class="line">Building OpenSNES library...</div>
-<div class="line">Building examples... (41 ROMs)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md213"></a>
-Step 4: Run Your First ROM</h2>
-<div class="fragment"><div class="line"># Navigate to hello world example</div>
-<div class="line">cd examples/text/hello_world</div>
-<div class="line"> </div>
-<div class="line"># Open the ROM in your emulator</div>
-<div class="line"># macOS:</div>
-<div class="line">open -a Mesen hello_world.sfc</div>
-<div class="line"># Linux:</div>
-<div class="line">mesen hello_world.sfc</div>
-<div class="line"># Windows:</div>
-<div class="line">start Mesen.exe hello_world.sfc</div>
+<div class="line"># Open in your emulator</div>
+<div class="line">mesen hello_world.sfc        # Linux</div>
+<div class="line">open -a Mesen hello_world.sfc  # macOS</div>
+<div class="line">start Mesen.exe hello_world.sfc  # Windows</div>
 </div><!-- fragment --><p>You should see "Hello World!" on screen.</p>
-<h2><a class="anchor" id="autotoc_md214"></a>
-Step 5: Create Your Own Project</h2>
-<p>The easiest way is to copy an existing example:</p>
-<div class="fragment"><div class="line"># From the opensnes root directory</div>
-<div class="line">cp -r examples/text/hello_world ~/my-snes-game</div>
+<h3><a class="anchor" id="autotoc_md230"></a>
+A5. Create Your Own Project</h3>
+<p>Create a new directory anywhere on your machine:</p>
+<div class="fragment"><div class="line">mkdir ~/my-snes-game</div>
 <div class="line">cd ~/my-snes-game</div>
-<div class="line"> </div>
-<div class="line"># Edit the Makefile to change the ROM name</div>
-<div class="line"># Edit main.c to change the code</div>
-<div class="line"># Build</div>
-<div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
-<div class="line">make</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md215"></a>
-Minimal Project Structure</h3>
-<div class="fragment"><div class="line">my-snes-game/</div>
-<div class="line">├── Makefile        # Build configuration</div>
-<div class="line">├── main.c          # Your game code</div>
-<div class="line">└── res/            # Assets (optional)</div>
-<div class="line">    ├── tiles.png</div>
-<div class="line">    └── music.it</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md216"></a>
-Minimal Makefile</h3>
-<div class="fragment"><div class="line"># Point to your OpenSNES installation</div>
+</div><!-- fragment --><p>Create two files:</p>
+<p><b>Makefile:</b> </p><div class="fragment"><div class="line"># Point to your OpenSNES installation</div>
 <div class="line">OPENSNES := /path/to/opensnes</div>
 <div class="line"> </div>
 <div class="line"># ROM settings</div>
 <div class="line">TARGET   := my_game.sfc</div>
-<div class="line">ROM_NAME := &quot;MY GAME              &quot;   # Exactly 21 characters!</div>
+<div class="line">ROM_NAME := MY GAME</div>
 <div class="line"> </div>
 <div class="line"># Source files</div>
 <div class="line">CSRC     := main.c</div>
 <div class="line"> </div>
 <div class="line"># Use OpenSNES library</div>
 <div class="line">USE_LIB  := 1</div>
-<div class="line">LIB_MODULES := console</div>
+<div class="line">LIB_MODULES := console sprite dma background input</div>
 <div class="line"> </div>
 <div class="line"># Include the build system</div>
 <div class="line">include $(OPENSNES)/make/common.mk</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md217"></a>
-Minimal main.c</h3>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
+</div><!-- fragment --><p><b>main.c:</b> </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <span class="comment">// Initialize the console (sets up PPU, clears screen)</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Print text at position (8, 10)</span></div>
 <div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">consoleDrawText</a>(8, 10, <span class="stringliteral">&quot;Hello SNES!&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Turn on the screen (it starts off by default)</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// Main game loop</span></div>
 <div class="line">    <span class="keywordflow">while</span> (1) {</div>
-<div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();  <span class="comment">// Wait for vertical blank (60fps on NTSC)</span></div>
+<div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    }</div>
-<div class="line"> </div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point — initialize audio, display controls, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:37</div></div>
@@ -245,9 +205,62 @@ Minimal main.c</h3>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md218"></a>
+</div><!-- fragment --><p>Build and run: </p><div class="fragment"><div class="line">make</div>
+<div class="line">mesen my_game.sfc</div>
+</div><!-- fragment --><p>That's it — you're making SNES games.</p>
+<h3><a class="anchor" id="autotoc_md231"></a>
+Project Structure</h3>
+<div class="fragment"><div class="line">my-snes-game/</div>
+<div class="line">├── Makefile        # Build configuration</div>
+<div class="line">├── main.c          # Your game code</div>
+<div class="line">└── res/            # Assets (optional)</div>
+<div class="line">    ├── tiles.png</div>
+<div class="line">    └── music.it</div>
+</div><!-- fragment --><hr  />
+<h2><a class="anchor" id="autotoc_md233"></a>
+Path B: SDK Developer</h2>
+<p>You want to modify the compiler, library, tools, or build system itself. This requires building the entire SDK from source.</p>
+<h3><a class="anchor" id="autotoc_md234"></a>
+B1. Install Prerequisites</h3>
+<p>You need a full C/C++ development environment.</p>
+<p><b>macOS:</b> </p><div class="fragment"><div class="line">xcode-select --install</div>
+</div><!-- fragment --><p><b>Linux (Ubuntu/Debian):</b> </p><div class="fragment"><div class="line">sudo apt update</div>
+<div class="line">sudo apt install build-essential clang cmake make git python3</div>
+</div><!-- fragment --><p><b>Linux (Fedora):</b> </p><div class="fragment"><div class="line">sudo dnf install clang cmake make git python3</div>
+</div><!-- fragment --><p><b>Windows:</b></p><ol type="1">
+<li>Install <a href="https://www.msys2.org/">MSYS2</a></li>
+<li>Open <b>MSYS2 UCRT64</b> terminal</li>
+<li>Run: <div class="fragment"><div class="line">pacman -Syu</div>
+<div class="line">pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python</div>
+</div><!-- fragment --></li>
+</ol>
+<h3><a class="anchor" id="autotoc_md235"></a>
+B2. Clone and Build</h3>
+<div class="fragment"><div class="line"># Clone with submodules (--recursive is required!)</div>
+<div class="line">git clone --recursive https://github.com/k0b3n4irb/opensnes.git</div>
+<div class="line">cd opensnes</div>
+<div class="line"> </div>
+<div class="line"># Build everything: compiler → tools → library → examples</div>
+<div class="line">make</div>
+</div><!-- fragment --><p>This takes a few minutes. Expected output: </p><div class="fragment"><div class="line">Building cc65816 compiler...</div>
+<div class="line">Building WLA-DX assembler...</div>
+<div class="line">Building OpenSNES library...</div>
+<div class="line">Building examples... (52 ROMs)</div>
+<div class="line">OpenSNES SDK build complete!</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md236"></a>
+B3. Run Tests</h3>
+<div class="fragment"><div class="line">cd tools/opensnes-emu &amp;&amp; node test/run-all-tests.mjs --quick</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md237"></a>
+B4. Development Workflow</h3>
+<div class="fragment"><div class="line">make clean &amp;&amp; make     # Full rebuild (required after compiler changes)</div>
+<div class="line">make lib               # Rebuild library only</div>
+<div class="line">make examples          # Rebuild examples only</div>
+<div class="line">make -C examples/text/hello_world  # Rebuild one example</div>
+</div><!-- fragment --><p>See CLAUDE.md for architecture details and coding conventions.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md239"></a>
 What's Next?</h2>
-<p>Now that you have a working setup, explore by complexity:</p>
+<p>Explore by complexity:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Level   </th><th class="markdownTableHeadNone">Examples   </th><th class="markdownTableHeadNone">What You'll Learn    </th></tr>
@@ -258,41 +271,63 @@ What's Next?</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>Advanced</b>   </td><td class="markdownTableBodyNone"><code>graphics/backgrounds/mode7</code>, <code>audio/snesmod_music</code>   </td><td class="markdownTableBodyNone">Mode 7, tracker music    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Expert</b>   </td><td class="markdownTableBodyNone"><code>games/breakout</code>, <code>games/likemario</code>   </td><td class="markdownTableBodyNone">Complete game structure   </td></tr>
+<td class="markdownTableBodyNone"><b>Expert</b>   </td><td class="markdownTableBodyNone"><code>games/breakout</code>, <code>games/likemario</code>   </td><td class="markdownTableBodyNone">Complete game structure    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b>SA-1 Coprocessor</b>   </td><td class="markdownTableBodyNone"><code>memory/sa1_hello</code>, <code>memory/sa1_starfield</code>   </td><td class="markdownTableBodyNone">10.74 MHz second CPU (<a class="el" href="sa1_8md.html">tutorial</a>)   </td></tr>
 </table>
-<p>Browse all examples: </p><div class="fragment"><div class="line">ls -la examples/*/</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md219"></a>
+<p>Browse all examples: </p><div class="fragment"><div class="line">ls examples/*/</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md240"></a>
+Tutorials</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Topic   </th><th class="markdownTableHeadNone">Guide    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Graphics &amp; Backgrounds   </td><td class="markdownTableBodyNone"><a class="el" href="graphics_8md.html">tutorials/graphics.md</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Sprites &amp; <a class="el" href="structAnimation.html" title="Animation definition.">Animation</a>   </td><td class="markdownTableBodyNone"><a class="el" href="sprites_8md.html">tutorials/sprites.md</a>, <a class="el" href="animation_8md.html">tutorials/animation.md</a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Scrolling &amp; Parallax   </td><td class="markdownTableBodyNone"><a class="el" href="scrolling_8md.html">tutorials/scrolling.md</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Collision Detection   </td><td class="markdownTableBodyNone"><a class="el" href="collision_8md.html">tutorials/collision.md</a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Input Handling   </td><td class="markdownTableBodyNone"><a class="el" href="input_8md.html">tutorials/input.md</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Audio &amp; Music   </td><td class="markdownTableBodyNone"><a class="el" href="audio_8md.html">tutorials/audio.md</a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Game States   </td><td class="markdownTableBodyNone"><a class="el" href="game__states_8md.html">tutorials/game_states.md</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">SA-1 Coprocessor   </td><td class="markdownTableBodyNone"><a class="el" href="sa1_8md.html">tutorials/sa1.md</a>   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md241"></a>
 Troubleshooting</h2>
-<h3><a class="anchor" id="autotoc_md220"></a>
+<h3><a class="anchor" id="autotoc_md242"></a>
 "command not found: make"</h3>
-<p>Install build tools (see Step 1).</p>
-<h3><a class="anchor" id="autotoc_md221"></a>
+<p>Install build tools (see prerequisites for your path above).</p>
+<h3><a class="anchor" id="autotoc_md243"></a>
 "fatal: repository not found" or empty compiler folder</h3>
-<p>You forgot <code>--recursive</code>. Fix it: </p><div class="fragment"><div class="line">git submodule update --init --recursive</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md222"></a>
-"OPENSNES_HOME not set" or "No rule to make target"</h3>
-<p>Set the environment variable: </p><div class="fragment"><div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
-</div><!-- fragment --><p>Add to your shell profile (<code>~/.bashrc</code> or <code>~/.zshrc</code>) to make it permanent.</p>
-<h3><a class="anchor" id="autotoc_md223"></a>
+<p>You forgot <code>--recursive</code> when cloning. Fix it: </p><div class="fragment"><div class="line">git submodule update --init --recursive</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md244"></a>
+Build fails with "Library not built"</h3>
+<p>Run <code>make</code> from the SDK root first — the library must be compiled before examples: </p><div class="fragment"><div class="line">cd /path/to/opensnes &amp;&amp; make lib</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md245"></a>
 Black screen when running ROM</h3>
 <p>Your ROM built but doesn't display anything. Common causes:</p><ol type="1">
 <li>Missing <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> call</li>
-<li>VBlank loop issues</li>
-<li>Memory overlap (run <code>python3 devtools/symmap/symmap.py --check-overlap game.sym</code>)</li>
+<li>Missing <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> in main loop</li>
+<li>Wrong <code>LIB_MODULES</code> — check that you include all needed modules</li>
 </ol>
 <p>See <a class="el" href="TROUBLESHOOTING_8md.html">TROUBLESHOOTING.md</a> for more solutions.</p>
-<h3><a class="anchor" id="autotoc_md224"></a>
+<h3><a class="anchor" id="autotoc_md246"></a>
 Build fails with "unhandled op" or assembly errors</h3>
 <p>This is usually a compiler limitation. Check:</p><ul>
 <li>Are you using <code>u32</code>/<code>s32</code>? Prefer <code>u16</code>/<code>s16</code> when possible</li>
-<li>Both <code>static u8 x = 0;</code> and <code>static u8 x;</code> work correctly</li>
+<li>Use <code>u8</code>, <code>u16</code>, <code>s16</code>, <code>u32</code> types from <code><a class="el" href="snes_8h.html" title="OpenSNES Master Header.">snes.h</a></code> (not <code>int</code> or <code>long</code>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md225"></a>
+<h2><a class="anchor" id="autotoc_md247"></a>
 Getting Help</h2>
 <ul>
 <li><b>Issues</b>: <a href="https://github.com/k0b3n4irb/opensnes/issues">github.com/k0b3n4irb/opensnes/issues</a></li>
-<li><b>SNES Dev Wiki</b>: <a href="https://snes.nesdev.org/">snes.nesdev.org</a></li>
-<li><b>Discord</b>: Search for "SNES Development" communities </li>
+<li><b>SNES Dev Wiki</b>: <a href="https://snes.nesdev.org/">snes.nesdev.org</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

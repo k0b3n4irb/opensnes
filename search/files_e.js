@@ -1,13 +1,15 @@
 var searchData=
 [
-  ['scoring_2eh_0',['scoring.h',['../scoring_8h.html',1,'']]],
-  ['scrolling_2emd_1',['scrolling.md',['../scrolling_8md.html',1,'']]],
-  ['snes_2eh_2',['snes.h',['../snes_8h.html',1,'']]],
-  ['snes_5fgraphics_5fguide_2emd_3',['SNES_GRAPHICS_GUIDE.md',['../SNES__GRAPHICS__GUIDE_8md.html',1,'']]],
-  ['snes_5fsound_5fguide_2emd_4',['SNES_SOUND_GUIDE.md',['../SNES__SOUND__GUIDE_8md.html',1,'']]],
-  ['snesmod_2eh_5',['snesmod.h',['../snesmod_8h.html',1,'']]],
-  ['sprite_2eh_6',['sprite.h',['../sprite_8h.html',1,'']]],
-  ['sprites_2emd_7',['sprites.md',['../sprites_8md.html',1,'']]],
-  ['sram_2eh_8',['sram.h',['../sram_8h.html',1,'']]],
-  ['system_2eh_9',['system.h',['../system_8h.html',1,'']]]
+  ['sa1_2eh_0',['sa1.h',['../sa1_8h.html',1,'']]],
+  ['sa1_2emd_1',['sa1.md',['../sa1_8md.html',1,'']]],
+  ['scoring_2eh_2',['scoring.h',['../scoring_8h.html',1,'']]],
+  ['scrolling_2emd_3',['scrolling.md',['../scrolling_8md.html',1,'']]],
+  ['snes_2eh_4',['snes.h',['../snes_8h.html',1,'']]],
+  ['snes_5fgraphics_5fguide_2emd_5',['SNES_GRAPHICS_GUIDE.md',['../SNES__GRAPHICS__GUIDE_8md.html',1,'']]],
+  ['snes_5fsound_5fguide_2emd_6',['SNES_SOUND_GUIDE.md',['../SNES__SOUND__GUIDE_8md.html',1,'']]],
+  ['snesmod_2eh_7',['snesmod.h',['../snesmod_8h.html',1,'']]],
+  ['sprite_2eh_8',['sprite.h',['../sprite_8h.html',1,'']]],
+  ['sprites_2emd_9',['sprites.md',['../sprites_8md.html',1,'']]],
+  ['sram_2eh_10',['sram.h',['../sram_8h.html',1,'']]],
+  ['system_2eh_11',['system.h',['../system_8h.html',1,'']]]
 ];

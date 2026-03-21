@@ -46,6 +46,9 @@ var group__examples =
     [ "main.c", "maps_2slopemario_2main_8c.html", null ],
     [ "main.c", "maps_2tiled_2main_8c.html", null ],
     [ "main.c", "memory_2hirom__demo_2main_8c.html", null ],
+    [ "main.c", "memory_2sa1__hello_2main_8c.html", null ],
+    [ "main.c", "memory_2sa1__speed_2main_8c.html", null ],
+    [ "main.c", "memory_2sa1__starfield_2main_8c.html", null ],
     [ "main.c", "memory_2save__game_2main_8c.html", null ],
     [ "main.c", "text_2hello__world_2main_8c.html", null ],
     [ "main.c", "text_2text__test_2main_8c.html", null ]
