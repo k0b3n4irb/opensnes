@@ -193,12 +193,17 @@
 ; oambuffer (2048 bytes) is defined in sprite_dynamic.asm (BANK 0 SLOT 1)
 ; so C code can access it via sta.l $0000,x. Only projects using
 ; LIB_MODULES := ... sprite_dynamic ... allocate it.
+;
+; Dynamic sprite queue and state are also in BANK 0 SLOT 1 ($0000-$1FFF)
+; so both C (bank $00 absolute) and ASM (DB=$7E via WRAM mirror) can access
+; them. Previously at BANK $7E SLOT 2 ($2800+) which was above the WRAM
+; mirror, making them inaccessible from C code.
 
-.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 2 ORGA $2800 FORCE
-    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:2800-$7E:2AFF)
+.RAMSECTION ".dynamic_sprite_queue" BANK 0 SLOT 1
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes (VRAM upload queue)
 .ENDS
 
-.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 2 ORGA $2B00 FORCE
+.RAMSECTION ".dynamic_sprite_state" BANK 0 SLOT 1
     ; Temporary values for sprite calculations
     sprit_val0      dsb 1       ; Temporary value #0
     sprit_val1      dsb 1       ; Temporary value #1
