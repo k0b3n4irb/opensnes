@@ -68,6 +68,8 @@ See the @ref example_sources "Example Source Code" page for all 52 examples orga
 
 @subpage code_style -- Code style conventions
 
+@subpage contributing -- How to contribute
+
 @subpage third_party -- Third-party components and licenses
 
 ## Acknowledgments
