@@ -631,6 +631,86 @@ void oamDynamic16Draw(u16 id);
  */
 void oamDynamic8Draw(u16 id);
 
+/*============================================================================
+ * Dynamic Metasprite Engine
+ *============================================================================*/
+
+/**
+ * @brief Draw a 32x32 dynamic metasprite
+ *
+ * Iterates through a metasprite data array, setting up oambuffer entries
+ * and queuing VRAM uploads for each 32x32 sub-sprite. Each sub-sprite
+ * consumes one oambuffer entry (starting from id) and one OAM slot.
+ *
+ * The metasprite data array is terminated by METASPR_TERM (dx == -128).
+ * The frameid field in each MetaspriteItem selects the animation frame
+ * for that sub-sprite's VRAM upload.
+ *
+ * Improvements over PVSnesLib:
+ * - Bounds checking: stops drawing when OAM slots are exhausted (128 max)
+ * - Queue overflow check: skips VRAM queueing when queue is full
+ *
+ * @param id Starting index into oambuffer array (each sub-sprite uses id, id+1, ...)
+ * @param x X position of metasprite origin
+ * @param y Y position of metasprite origin
+ * @param meta Pointer to metasprite data array (MetaspriteItem[])
+ * @param gfxptr Pointer to sprite graphics data (bank $00 only)
+ *
+ * @note All sub-sprites share the same graphics base (gfxptr). The frameid
+ *       in each MetaspriteItem selects different tiles from that base.
+ *
+ * @note Bank $00 limitation: cc65816 passes 16-bit pointers only. Both
+ *       meta and gfxptr must be in bank $00. Use SEMIFREE BANK 0 for
+ *       large const arrays to prevent bank overflow.
+ *
+ * @code
+ * const MetaspriteItem hero[] = {
+ *     METASPR_ITEM(0,  0,  0, OBJ_PRIO(2)),   // Top-left 32x32
+ *     METASPR_ITEM(32, 0,  1, OBJ_PRIO(2)),   // Top-right 32x32
+ *     METASPR_ITEM(0,  32, 2, OBJ_PRIO(2)),   // Bottom-left 32x32
+ *     METASPR_ITEM(32, 32, 3, OBJ_PRIO(2)),   // Bottom-right 32x32
+ *     METASPR_TERM
+ * };
+ *
+ * // Set refresh flag on first sub-sprite
+ * oambuffer[0].oamrefresh = 1;
+ *
+ * // Draw all 4 sub-sprites (uses oambuffer[0..3])
+ * oamMetaDrawDyn32(0, 100, 80, hero, hero_tiles);
+ * @endcode
+ */
+void oamMetaDrawDyn32(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr);
+
+/**
+ * @brief Draw a 16x16 dynamic metasprite
+ *
+ * Like oamMetaDrawDyn32 but for 16x16 sub-sprites. Uses the 16x16 sprite
+ * VRAM region and LUT tables. Size (large/small) is determined by the
+ * oamInitDynamicSprite configuration (spr16addrgfx).
+ *
+ * @param id Starting oambuffer index
+ * @param x X position of metasprite origin
+ * @param y Y position of metasprite origin
+ * @param meta Pointer to metasprite data array
+ * @param gfxptr Pointer to sprite graphics data (bank $00 only)
+ * @param sprsize OBJ_SMALL (0) or OBJ_LARGE (1). When SMALL, tile bit 8
+ *        is set automatically so sprites read from the second name table.
+ */
+void oamMetaDrawDyn16(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr, u16 sprsize);
+
+/**
+ * @brief Draw an 8x8 dynamic metasprite
+ *
+ * Like oamMetaDrawDyn32 but for 8x8 sub-sprites. Uses the small sprite
+ * VRAM region (spr1addrgfx) and always sets size to SMALL.
+ *
+ * @param id Starting oambuffer index
+ * @param x X position of metasprite origin
+ * @param y Y position of metasprite origin
+ * @param meta Pointer to metasprite data array
+ * @param gfxptr Pointer to sprite graphics data (bank $00 only)
+ */
+void oamMetaDrawDyn8(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr);
 
 /*============================================================================
  * Fast Macro Sprite API

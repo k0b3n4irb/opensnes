@@ -221,6 +221,10 @@
     spr0addrgfx             dsb 2   ; VRAM address for large sprites ($0000)
     spr1addrgfx             dsb 2   ; VRAM address for small sprites ($1000)
     spr16addrgfx            dsb 2   ; VRAM address for 16x16 sprites (context-dependent)
+
+    ; Metasprite temporary storage
+    sprit_mxsvg             dsb 2   ; Saved metasprite X origin
+    sprit_mysvg             dsb 2   ; Saved metasprite Y origin
 .ENDS
 
 ;------------------------------------------------------------------------------
