@@ -1,6 +1,8 @@
 var group__examples =
 [
     [ "main.c", "audio_2snesmod__music_2main_8c.html", null ],
+    [ "main.c", "audio_2snesmod__music__hirom_2main_8c.html", null ],
+    [ "main.c", "audio_2snesmod__music__large_2main_8c.html", null ],
     [ "main.c", "audio_2snesmod__sfx_2main_8c.html", null ],
     [ "main.c", "basics_2collision__demo_2main_8c.html", null ],
     [ "main.c", "basics_2random_2main_8c.html", null ],
@@ -30,6 +32,7 @@ var group__examples =
     [ "main.c", "graphics_2effects_2transparent__window_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2window_2main_8c.html", null ],
     [ "main.c", "graphics_2sprites_2animated__sprite_2main_8c.html", null ],
+    [ "main.c", "graphics_2sprites_2dynamic__metasprite_2main_8c.html", null ],
     [ "main.c", "graphics_2sprites_2dynamic__sprite_2main_8c.html", null ],
     [ "main.c", "graphics_2sprites_2metasprite_2main_8c.html", null ],
     [ "main.c", "graphics_2sprites_2object__size_2main_8c.html", null ],

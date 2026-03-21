@@ -314,84 +314,93 @@ $(document).ready(function(){initNavTree('sprite_8h_source.html',''); initResiza
 <div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span> </div>
 <div class="line"><a id="l00632" name="l00632"></a><span class="lineno"><a class="line" href="sprite_8h.html#a6c55adeb05799a6f58555806db5a1755">  632</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="sprite_8h.html#a6c55adeb05799a6f58555806db5a1755">oamDynamic8Draw</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <span class="keywordtype">id</span>);</div>
 <div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span> </div>
-<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span> </div>
-<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span><span class="comment"> * Fast Macro Sprite API</span></div>
-<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span><span class="comment"> * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.</span></div>
-<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span><span class="comment"> * These write directly to oamMemory[] without function call overhead.</span></div>
-<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span><span class="comment"> * oamSet() has framesize=158 per call due to SSA temporaries. With &gt;2-3</span></div>
-<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span><span class="comment"> * sprites/frame in the main loop, the stack manipulation causes visible</span></div>
-<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span><span class="comment"> * jitter. These macros eliminate that overhead entirely.</span></div>
-<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span><span class="comment"> * Note: cc65816 does not truly inline &#39;static inline&#39; functions — they</span></div>
-<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span><span class="comment"> * become separate SUPERFREE sections with global labels that conflict</span></div>
-<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span><span class="comment"> * across translation units. Macros are the only zero-overhead option.</span></div>
-<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span><span class="comment"> * oamMemory[] and oam_update_flag are declared in &lt;snes/system.h&gt;</span></div>
-<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span><span class="comment"> * (included automatically via &lt;snes.h&gt;).</span></div>
-<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span><span class="comment"> * Usage:</span></div>
-<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span><span class="comment"> *   // Pre-compute attribute byte once at init</span></div>
-<div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span><span class="comment"> *   u8 attr = OAM_ATTR(tile, palette, priority, flags);</span></div>
-<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span><span class="comment"> *   // Per-frame: fast full update</span></div>
-<div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span><span class="comment"> *   oamSetFast(id, x, y, tile, palette, priority, flags);</span></div>
-<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span><span class="comment"> *</span></div>
-<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span><span class="comment"> *   // Per-frame: position-only update (most common)</span></div>
-<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span><span class="comment"> *   oamSetXYFast(id, x, y);</span></div>
-<div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span> </div>
-<div class="foldopen" id="foldopen00672" data-start="" data-end="">
-<div class="line"><a id="l00672" name="l00672"></a><span class="lineno"><a class="line" href="sprite_8h.html#a5fa5799545b94ba8e1ca643a9425ba71">  672</a></span><span class="preprocessor">#define OAM_ATTR(_tile, _pal, _prio, _fl) \</span></div>
-<div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span><span class="preprocessor">    ((u8)(((_fl) &amp; 0xC0) | \</span></div>
-<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span><span class="preprocessor">          (((_prio) &amp; 0x03) &lt;&lt; 4) | \</span></div>
-<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span><span class="preprocessor">          (((_pal) &amp; 0x07) &lt;&lt; 1) | \</span></div>
-<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span><span class="preprocessor">          (((_tile) &gt;&gt; 8) &amp; 0x01)))</span></div>
-</div>
-<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span> </div>
-<div class="foldopen" id="foldopen00684" data-start="" data-end="">
-<div class="line"><a id="l00684" name="l00684"></a><span class="lineno"><a class="line" href="sprite_8h.html#acff706d06b2ad507e4c73dc0afb3055d">  684</a></span><span class="preprocessor">#define OAM_XHI_MASK(_slot) \</span></div>
-<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span><span class="preprocessor">    ((u8)((_slot) == 0 ? 0x01 : (_slot) == 1 ? 0x04 : \</span></div>
-<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span><span class="preprocessor">          (_slot) == 2 ? 0x10 : 0x40))</span></div>
-</div>
-<div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span> </div>
-<div class="foldopen" id="foldopen00703" data-start="" data-end="">
-<div class="line"><a id="l00703" name="l00703"></a><span class="lineno"><a class="line" href="sprite_8h.html#ad6fdb30b5354a8869da17ca73a1e51f3">  703</a></span><span class="preprocessor">#define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \</span></div>
-<div class="line"><a id="l00704" name="l00704"></a><span class="lineno">  704</span><span class="preprocessor">    u16 _off = (u16)(_id) &lt;&lt; 2; \</span></div>
-<div class="line"><a id="l00705" name="l00705"></a><span class="lineno">  705</span><span class="preprocessor">    oamMemory[_off + 0] = (u8)((_x) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00706" name="l00706"></a><span class="lineno">  706</span><span class="preprocessor">    oamMemory[_off + 1] = (u8)((_y) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00707" name="l00707"></a><span class="lineno">  707</span><span class="preprocessor">    oamMemory[_off + 2] = (u8)((_tile) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00708" name="l00708"></a><span class="lineno">  708</span><span class="preprocessor">    oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \</span></div>
-<div class="line"><a id="l00709" name="l00709"></a><span class="lineno">  709</span><span class="preprocessor">    u16 _ext = 512 + ((u16)(_id) &gt;&gt; 2); \</span></div>
-<div class="line"><a id="l00710" name="l00710"></a><span class="lineno">  710</span><span class="preprocessor">    u16 _sl = (u16)(_id) &amp; 0x03; \</span></div>
-<div class="line"><a id="l00711" name="l00711"></a><span class="lineno">  711</span><span class="preprocessor">    u8 _xhi = OAM_XHI_MASK(_sl); \</span></div>
-<div class="line"><a id="l00712" name="l00712"></a><span class="lineno">  712</span><span class="preprocessor">    if ((_x) &amp; 0x100) \</span></div>
-<div class="line"><a id="l00713" name="l00713"></a><span class="lineno">  713</span><span class="preprocessor">        oamMemory[_ext] |= _xhi; \</span></div>
-<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span><span class="preprocessor">    else \</span></div>
-<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span><span class="preprocessor">        oamMemory[_ext] &amp;= ~_xhi; \</span></div>
-<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span><span class="preprocessor">    oam_update_flag = 1; \</span></div>
-<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span><span class="preprocessor">} while(0)</span></div>
-</div>
-<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span> </div>
-<div class="foldopen" id="foldopen00729" data-start="" data-end="">
-<div class="line"><a id="l00729" name="l00729"></a><span class="lineno"><a class="line" href="sprite_8h.html#ac83845cbc50f6c9f19844a317b59b66f">  729</a></span><span class="preprocessor">#define oamSetXYFast(_id, _x, _y) do { \</span></div>
-<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span><span class="preprocessor">    u16 _off = (u16)(_id) &lt;&lt; 2; \</span></div>
-<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span><span class="preprocessor">    oamMemory[_off + 0] = (u8)((_x) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span><span class="preprocessor">    oamMemory[_off + 1] = (u8)((_y) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span><span class="preprocessor">    u16 _ext = 512 + ((u16)(_id) &gt;&gt; 2); \</span></div>
-<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span><span class="preprocessor">    u16 _sl = (u16)(_id) &amp; 0x03; \</span></div>
-<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span><span class="preprocessor">    u8 _xhi = OAM_XHI_MASK(_sl); \</span></div>
-<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span><span class="preprocessor">    if ((_x) &amp; 0x100) \</span></div>
-<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span><span class="preprocessor">        oamMemory[_ext] |= _xhi; \</span></div>
-<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span><span class="preprocessor">    else \</span></div>
-<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span><span class="preprocessor">        oamMemory[_ext] &amp;= ~_xhi; \</span></div>
-<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span><span class="preprocessor">    oam_update_flag = 1; \</span></div>
-<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span><span class="preprocessor">} while(0)</span></div>
-</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span><span class="comment"> * Dynamic Metasprite Engine</span></div>
+<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span> </div>
+<div class="line"><a id="l00682" name="l00682"></a><span class="lineno"><a class="line" href="sprite_8h.html#a828d404dc023e92bd63981042f270003">  682</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="sprite_8h.html#a828d404dc023e92bd63981042f270003">oamMetaDrawDyn32</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *gfxptr);</div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span> </div>
+<div class="line"><a id="l00699" name="l00699"></a><span class="lineno"><a class="line" href="sprite_8h.html#a70df28a2879544f1cd20338c5bd0b9e4">  699</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="sprite_8h.html#a70df28a2879544f1cd20338c5bd0b9e4">oamMetaDrawDyn16</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *gfxptr, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> sprsize);</div>
+<div class="line"><a id="l00700" name="l00700"></a><span class="lineno">  700</span> </div>
+<div class="line"><a id="l00713" name="l00713"></a><span class="lineno"><a class="line" href="sprite_8h.html#a618f201dbc1a1c445890f304fd4c0b9c">  713</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="sprite_8h.html#a618f201dbc1a1c445890f304fd4c0b9c">oamMetaDrawDyn8</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *gfxptr);</div>
+<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span> </div>
+<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span><span class="comment"> * Fast Macro Sprite API</span></div>
+<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span><span class="comment"> * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.</span></div>
+<div class="line"><a id="l00719" name="l00719"></a><span class="lineno">  719</span><span class="comment"> * These write directly to oamMemory[] without function call overhead.</span></div>
+<div class="line"><a id="l00720" name="l00720"></a><span class="lineno">  720</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00721" name="l00721"></a><span class="lineno">  721</span><span class="comment"> * oamSet() has framesize=158 per call due to SSA temporaries. With &gt;2-3</span></div>
+<div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span><span class="comment"> * sprites/frame in the main loop, the stack manipulation causes visible</span></div>
+<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span><span class="comment"> * jitter. These macros eliminate that overhead entirely.</span></div>
+<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span><span class="comment"> * Note: cc65816 does not truly inline &#39;static inline&#39; functions — they</span></div>
+<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span><span class="comment"> * become separate SUPERFREE sections with global labels that conflict</span></div>
+<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span><span class="comment"> * across translation units. Macros are the only zero-overhead option.</span></div>
+<div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span><span class="comment"> * oamMemory[] and oam_update_flag are declared in &lt;snes/system.h&gt;</span></div>
+<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span><span class="comment"> * (included automatically via &lt;snes.h&gt;).</span></div>
+<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span><span class="comment"> * Usage:</span></div>
+<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span><span class="comment"> *   // Pre-compute attribute byte once at init</span></div>
+<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span><span class="comment"> *   u8 attr = OAM_ATTR(tile, palette, priority, flags);</span></div>
+<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span><span class="comment"> *   // Per-frame: fast full update</span></div>
+<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span><span class="comment"> *   oamSetFast(id, x, y, tile, palette, priority, flags);</span></div>
+<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span><span class="comment"> *   // Per-frame: position-only update (most common)</span></div>
+<div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span><span class="comment"> *   oamSetXYFast(id, x, y);</span></div>
+<div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span><span class="comment"> *============================================================================*/</span></div>
 <div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span> </div>
-<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_SPRITE_H */</span><span class="preprocessor"></span></div>
+<div class="foldopen" id="foldopen00752" data-start="" data-end="">
+<div class="line"><a id="l00752" name="l00752"></a><span class="lineno"><a class="line" href="sprite_8h.html#a5fa5799545b94ba8e1ca643a9425ba71">  752</a></span><span class="preprocessor">#define OAM_ATTR(_tile, _pal, _prio, _fl) \</span></div>
+<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span><span class="preprocessor">    ((u8)(((_fl) &amp; 0xC0) | \</span></div>
+<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span><span class="preprocessor">          (((_prio) &amp; 0x03) &lt;&lt; 4) | \</span></div>
+<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span><span class="preprocessor">          (((_pal) &amp; 0x07) &lt;&lt; 1) | \</span></div>
+<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span><span class="preprocessor">          (((_tile) &gt;&gt; 8) &amp; 0x01)))</span></div>
+</div>
+<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span> </div>
+<div class="foldopen" id="foldopen00764" data-start="" data-end="">
+<div class="line"><a id="l00764" name="l00764"></a><span class="lineno"><a class="line" href="sprite_8h.html#acff706d06b2ad507e4c73dc0afb3055d">  764</a></span><span class="preprocessor">#define OAM_XHI_MASK(_slot) \</span></div>
+<div class="line"><a id="l00765" name="l00765"></a><span class="lineno">  765</span><span class="preprocessor">    ((u8)((_slot) == 0 ? 0x01 : (_slot) == 1 ? 0x04 : \</span></div>
+<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span><span class="preprocessor">          (_slot) == 2 ? 0x10 : 0x40))</span></div>
+</div>
+<div class="line"><a id="l00767" name="l00767"></a><span class="lineno">  767</span> </div>
+<div class="foldopen" id="foldopen00783" data-start="" data-end="">
+<div class="line"><a id="l00783" name="l00783"></a><span class="lineno"><a class="line" href="sprite_8h.html#ad6fdb30b5354a8869da17ca73a1e51f3">  783</a></span><span class="preprocessor">#define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \</span></div>
+<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span><span class="preprocessor">    u16 _off = (u16)(_id) &lt;&lt; 2; \</span></div>
+<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span><span class="preprocessor">    oamMemory[_off + 0] = (u8)((_x) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span><span class="preprocessor">    oamMemory[_off + 1] = (u8)((_y) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span><span class="preprocessor">    oamMemory[_off + 2] = (u8)((_tile) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span><span class="preprocessor">    oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \</span></div>
+<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span><span class="preprocessor">    u16 _ext = 512 + ((u16)(_id) &gt;&gt; 2); \</span></div>
+<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span><span class="preprocessor">    u16 _sl = (u16)(_id) &amp; 0x03; \</span></div>
+<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span><span class="preprocessor">    u8 _xhi = OAM_XHI_MASK(_sl); \</span></div>
+<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span><span class="preprocessor">    if ((_x) &amp; 0x100) \</span></div>
+<div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span><span class="preprocessor">        oamMemory[_ext] |= _xhi; \</span></div>
+<div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span><span class="preprocessor">    else \</span></div>
+<div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span><span class="preprocessor">        oamMemory[_ext] &amp;= ~_xhi; \</span></div>
+<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span><span class="preprocessor">    oam_update_flag = 1; \</span></div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span><span class="preprocessor">} while(0)</span></div>
+</div>
+<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span> </div>
+<div class="foldopen" id="foldopen00809" data-start="" data-end="">
+<div class="line"><a id="l00809" name="l00809"></a><span class="lineno"><a class="line" href="sprite_8h.html#ac83845cbc50f6c9f19844a317b59b66f">  809</a></span><span class="preprocessor">#define oamSetXYFast(_id, _x, _y) do { \</span></div>
+<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span><span class="preprocessor">    u16 _off = (u16)(_id) &lt;&lt; 2; \</span></div>
+<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span><span class="preprocessor">    oamMemory[_off + 0] = (u8)((_x) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span><span class="preprocessor">    oamMemory[_off + 1] = (u8)((_y) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span><span class="preprocessor">    u16 _ext = 512 + ((u16)(_id) &gt;&gt; 2); \</span></div>
+<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span><span class="preprocessor">    u16 _sl = (u16)(_id) &amp; 0x03; \</span></div>
+<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span><span class="preprocessor">    u8 _xhi = OAM_XHI_MASK(_sl); \</span></div>
+<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span><span class="preprocessor">    if ((_x) &amp; 0x100) \</span></div>
+<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span><span class="preprocessor">        oamMemory[_ext] |= _xhi; \</span></div>
+<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span><span class="preprocessor">    else \</span></div>
+<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span><span class="preprocessor">        oamMemory[_ext] &amp;= ~_xhi; \</span></div>
+<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span><span class="preprocessor">    oam_update_flag = 1; \</span></div>
+<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span><span class="preprocessor">} while(0)</span></div>
+</div>
+<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span> </div>
+<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_SPRITE_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes)</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
@@ -412,11 +421,14 @@ $(document).ready(function(){initNavTree('sprite_8h_source.html',''); initResiza
 <div class="ttc" id="asprite_8h_html_a512c524d16be34e3aa0fec1b2952e1bb"><div class="ttname"><a href="sprite_8h.html#a512c524d16be34e3aa0fec1b2952e1bb">lkup8oamS</a></div><div class="ttdeci">u16 lkup8oamS[]</div><div class="ttdoc">VRAM source offsets for 8x8 sprites (128 entries)</div></div>
 <div class="ttc" id="asprite_8h_html_a554b6c0dd569a866ecec6095ff058a7f"><div class="ttname"><a href="sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a></div><div class="ttdeci">void oamHide(u8 id)</div><div class="ttdoc">Hide sprite.</div></div>
 <div class="ttc" id="asprite_8h_html_a5f6e7cb46f76cc6b03e2309b08e2092a"><div class="ttname"><a href="sprite_8h.html#a5f6e7cb46f76cc6b03e2309b08e2092a">oamSetXY</a></div><div class="ttdeci">void oamSetXY(u8 id, u16 x, u8 y)</div><div class="ttdoc">Set sprite position.</div></div>
+<div class="ttc" id="asprite_8h_html_a618f201dbc1a1c445890f304fd4c0b9c"><div class="ttname"><a href="sprite_8h.html#a618f201dbc1a1c445890f304fd4c0b9c">oamMetaDrawDyn8</a></div><div class="ttdeci">void oamMetaDrawDyn8(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr)</div><div class="ttdoc">Draw an 8x8 dynamic metasprite.</div></div>
 <div class="ttc" id="asprite_8h_html_a65d11cf31c7b509fc25b15af524d6d6d"><div class="ttname"><a href="sprite_8h.html#a65d11cf31c7b509fc25b15af524d6d6d">lkup16idT0</a></div><div class="ttdeci">u16 lkup16idT0[]</div><div class="ttdoc">OAM tile IDs for 16x16 sprites - large size mode (64 entries)</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_a6c55adeb05799a6f58555806db5a1755"><div class="ttname"><a href="sprite_8h.html#a6c55adeb05799a6f58555806db5a1755">oamDynamic8Draw</a></div><div class="ttdeci">void oamDynamic8Draw(u16 id)</div><div class="ttdoc">Draw an 8x8 dynamic sprite.</div></div>
+<div class="ttc" id="asprite_8h_html_a70df28a2879544f1cd20338c5bd0b9e4"><div class="ttname"><a href="sprite_8h.html#a70df28a2879544f1cd20338c5bd0b9e4">oamMetaDrawDyn16</a></div><div class="ttdeci">void oamMetaDrawDyn16(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr, u16 sprsize)</div><div class="ttdoc">Draw a 16x16 dynamic metasprite.</div></div>
 <div class="ttc" id="asprite_8h_html_a79aecfbe70f47d2e9f3f72e62139bc0e"><div class="ttname"><a href="sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e">lkup16idB</a></div><div class="ttdeci">u16 lkup16idB[]</div><div class="ttdoc">VRAM destination addresses for 16x16 sprites (64 entries)</div></div>
 <div class="ttc" id="asprite_8h_html_a7ffabc8e75e6d2ca0ae455c38c9ebfe8"><div class="ttname"><a href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8">oamClear</a></div><div class="ttdeci">void oamClear(void)</div><div class="ttdoc">Clear all sprites.</div></div>
+<div class="ttc" id="asprite_8h_html_a828d404dc023e92bd63981042f270003"><div class="ttname"><a href="sprite_8h.html#a828d404dc023e92bd63981042f270003">oamMetaDrawDyn32</a></div><div class="ttdeci">void oamMetaDrawDyn32(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr)</div><div class="ttdoc">Draw a 32x32 dynamic metasprite.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 <div class="ttc" id="asprite_8h_html_aabedfca9210feb740c636184ed205501"><div class="ttname"><a href="sprite_8h.html#aabedfca9210feb740c636184ed205501">oamDrawMetaFlip</a></div><div class="ttdeci">u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size, u8 flipX, u8 flipY, u8 width, u8 height)</div><div class="ttdoc">Draw a metasprite with flip support.</div></div>
 <div class="ttc" id="asprite_8h_html_aad6b003019aab2756f00ebe97b5716c6"><div class="ttname"><a href="sprite_8h.html#aad6b003019aab2756f00ebe97b5716c6">oamSetEx</a></div><div class="ttdeci">void oamSetEx(u8 id, u8 size, u8 visible)</div><div class="ttdoc">Set sprite extended attributes.</div></div>

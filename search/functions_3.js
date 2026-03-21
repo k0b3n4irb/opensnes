@@ -28,5 +28,6 @@ var searchData=
   ['drawspriteframe64x64_25',['drawSpriteFrame64x64',['../maps_2dynamic__map_2main_8c.html#a78c0c057f07815196421a2de2e51c7dd',1,'main.c']]],
   ['drawspriteraw32x32_26',['drawSpriteRaw32x32',['../map32x32_8c.html#aab61b44f0d9b89575e635964bf1ab3ed',1,'map32x32.c']]],
   ['drawspriteraw64x64_27',['drawSpriteRaw64x64',['../map64x64_8c.html#a61124d39bf69d92930c4ec2f5425256f',1,'map64x64.c']]],
-  ['drawsprites_28',['drawSprites',['../graphics_2sprites_2metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'main.c']]]
+  ['drawsprites_28',['drawsprites',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c'],['../graphics_2sprites_2metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c']]],
+  ['drawtext_29',['drawText',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#a10ff78cf96efa1288ccd4155d97161a4',1,'main.c']]]
 ];

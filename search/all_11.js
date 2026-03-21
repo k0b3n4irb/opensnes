@@ -14,7 +14,7 @@ var searchData=
   ['fails_20with_20smconv_20error_11',['Build fails with smconv error',['../examples_audio_snesmod_music.html#autotoc_md532',1,'']]],
   ['fails_20with_20unhandled_20op_20or_20assembly_20errors_12',['Build fails with &quot;unhandled op&quot; or assembly errors',['../getting_started.html#autotoc_md224',1,'']]],
   ['fails_20with_20unhandled_20op_3a_20xxx_13',['Build fails with &quot;unhandled op: XXX&quot;',['../troubleshooting.html#autotoc_md365',1,'']]],
-  ['false_14',['false',['../group__bool__type.html#ga65e9886d74aaee76545e83dd09011727',1,'false:&#160;types.h'],['../group__bool__type.html#gaa93f0eb578d23995850d61f7d61c55c1',1,'FALSE:&#160;types.h']]],
+  ['false_14',['false',['../group__bool__type.html#gaa93f0eb578d23995850d61f7d61c55c1',1,'FALSE:&#160;types.h'],['../group__bool__type.html#ga65e9886d74aaee76545e83dd09011727',1,'false:&#160;types.h']]],
   ['fast_20transfers_15',['DMA Registers (for fast transfers)',['../snes_graphics_guide.html#autotoc_md310',1,'']]],
   ['fatal_3a_20repository_20not_20found_20or_20empty_20compiler_20folder_16',['&quot;fatal: repository not found&quot; or empty compiler folder',['../getting_started.html#autotoc_md221',1,'']]],
   ['features_17',['features',['../audio_8h.html#autotoc_md14',1,'Features'],['../examples_games_tetris.html#autotoc_md656',1,'Features'],['../examples_audio_snesmod_music.html#autotoc_md502',1,'Key Features'],['../contributing.html#autotoc_md1299',1,'Suggesting Features']]],
