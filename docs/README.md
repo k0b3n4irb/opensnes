@@ -7,7 +7,6 @@ Welcome to the OpenSNES documentation.
 | Document | Description |
 |----------|-------------|
 | [Getting Started](GETTING_STARTED.md) | Quick start guide — zero to first ROM |
-| [Example Walkthroughs](EXAMPLE_WALKTHROUGHS.md) | Line-by-line code explanations |
 | [SNES Graphics Guide](SNES_GRAPHICS_GUIDE.md) | PPU, tiles, palettes, modes |
 | [SNES Sound Guide](SNES_SOUND_GUIDE.md) | SPC700, BRR samples, SNESMOD |
 | [Troubleshooting](TROUBLESHOOTING.md) | Common problems and solutions |
@@ -18,8 +17,12 @@ Welcome to the OpenSNES documentation.
 |----------|-------|
 | [Graphics & Backgrounds](tutorials/graphics.md) | Tilemaps, BG modes, scrolling |
 | [Sprites & Animation](tutorials/sprites.md) | OAM, sprite sheets, animation |
+| [Scrolling & Parallax](tutorials/scrolling.md) | Map scrolling, parallax layers |
+| [Collision Detection](tutorials/collision.md) | Tile and sprite collision |
 | [Controller Input](tutorials/input.md) | Joypad reading, button states |
 | [Audio & Music](tutorials/audio.md) | SNESMOD tracker playback |
+| [Game States](tutorials/game_states.md) | State machines, transitions |
+| [SA-1 Coprocessor](tutorials/sa1.md) | 10.74 MHz second CPU, shared I-RAM |
 
 ### Hardware Reference
 

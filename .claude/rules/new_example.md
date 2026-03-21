@@ -78,6 +78,38 @@ Every new example main.c MUST have:
 
 See existing examples in `docs/examples_group.md` for the format.
 
+## README.md — MANDATORY for every example
+
+Every example directory MUST have a `README.md` with:
+
+1. **Title** — example name as H1
+2. **Screenshot** — embedded screenshot from opensnes-emu (`![Screenshot](screenshot.png)`)
+3. **Description** — what the example demonstrates (2-3 sentences)
+4. **SNES Concepts** — bullet list of hardware/software concepts shown
+5. **How to Build** — standard build command
+6. **Modules Used** — list matching `LIB_MODULES` in Makefile
+
+### Screenshot Generation
+
+Use opensnes-emu to generate screenshots autonomously:
+```bash
+cd tools/opensnes-emu && node -e "
+const { createHeadlessEmulator } = require('./dist/server/headless.js');
+const { writeFileSync } = require('fs');
+(async () => {
+  const emu = await createHeadlessEmulator();
+  await emu.loadROM('../../examples/<path>/<rom>.sfc');
+  emu.runFrames(120);
+  const png = emu.screenshot.captureFrame(1);
+  writeFileSync('../../examples/<path>/screenshot.png', png);
+  emu.destroy();
+})();
+"
+```
+
+Save the screenshot as `screenshot.png` in the example directory.
+Reference it in README.md as `![Screenshot](screenshot.png)`.
+
 ## Before Committing
 
 1. `make clean && make` — full rebuild must pass

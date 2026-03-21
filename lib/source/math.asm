@@ -15,10 +15,14 @@
 ;     7-8,s = a (leftmost arg, pushed last)
 ;==============================================================================
 
-.ifdef HIROM
-.include "lib_memmap_hirom.inc"
+.ifdef SA1
+.include "memmap_sa1.inc"
 .else
-.include "lib_memmap.inc"
+.ifdef HIROM
+.include "memmap_hirom.inc"
+.else
+.include "memmap.inc"
+.endif
 .endif
 
 .SECTION ".math_fixmul" SUPERFREE

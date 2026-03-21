@@ -72,6 +72,7 @@ USE_LIB     ?= 0
 USE_HIROM   ?= 0
 USE_FASTROM ?= 0
 USE_SRAM    ?= 0
+USE_SA1     ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
 SOUNDBANK_SRC ?=
@@ -80,11 +81,13 @@ SOUNDBANK_BANK ?= 1
 ROMSIZE     ?= $$08
 
 # Derived configuration (one-liners using $(if))
-LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_HIROM)),hirom,lorom)
-HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm)
-MEMMAP_INC   := $(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc)
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SRAM)),$$02,$$00)
-SRAMSIZE     := $(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)
+# SA-1 uses LoROM bank layout but different header and cartridge type
+LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_HIROM)),hirom,lorom))
+RUNTIME_OBJ  := $(LIBDIR)/runtime-asm.o
+HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm))
+MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SRAM)),$$02,$$00))
+SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD auto-add modules
@@ -97,17 +100,16 @@ LIB_MODULES += snesmod
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 # OAM helpers (standalone projects without library)
 OAM_HELPERS_OBJ := $(if $(filter 0,$(USE_LIB)),oam_helpers.o)
 
 # Check library is built (skip for 'clean')
+# Runtime is always required (provides __mul16, __div16, etc.)
 ifneq ($(MAKECMDGOALS),clean)
-ifeq ($(USE_LIB),1)
-ifeq ($(wildcard $(LIBDIR)/console.o),)
+ifeq ($(wildcard $(RUNTIME_OBJ)),)
 $(error Library not built. Run: cd $(OPENSNES) && make lib)
-endif
 endif
 endif
 
@@ -221,15 +223,15 @@ project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
 	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(HDR_TEMPLATE) > $@
 
+# SA-1 boot stub: use example-local sa1_boot.asm if present, otherwise template
+SA1_BOOT_SRC := $(if $(wildcard sa1_boot.asm),sa1_boot.asm,$(TEMPLATES)/sa1_boot.asm)
+project_sa1_boot.asm: $(SA1_BOOT_SRC)
+	@cp $< $@
+
 # crt0: has its own MEMORYMAP via project_hdr.asm
-crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc
+crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boot.asm
 	@echo "[AS] crt0"
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
-
-# Runtime math library
-runtime.o: $(TEMPLATES)/runtime.asm
-	@echo "[AS] runtime"
-	$(call wrap_asm,$<,$@)
 
 # Initialized data start marker
 data_init_start.o: $(TEMPLATES)/data_init_start.asm
@@ -268,7 +270,7 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm
 #------------------------------------------------------------------------------
 
 # All objects in link order
-LINK_OBJS := crt0.o runtime.o data_init_start.o $(OAM_HELPERS_OBJ) $(ASM_OBJS) $(C_OBJS)
+LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(OAM_HELPERS_OBJ) $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
@@ -285,6 +287,11 @@ endif
 $(TARGET): linkfile
 	@echo "[LD] $@"
 	@$(LD) -S linkfile $@
+ifeq ($(USE_SA1),1)
+	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
+	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
+	@python3 -c "f=open('$@','r+b');f.seek(0x7FD5);b=f.read(1)[0];f.seek(0x7FD5);f.write(bytes([b|0x03]));f.close()" && echo "[SA1] Patched $$FFD5 map mode to SA-1"
+endif
 
 #------------------------------------------------------------------------------
 # Cleanup
@@ -292,12 +299,12 @@ $(TARGET): linkfile
 
 clean:
 	@echo "Cleaning $(TARGET)..."
-	@rm -f crt0.o runtime.o runtime.wrap.asm
+	@rm -f crt0.o
 	@rm -f data_init_start.o data_init_start.wrap.asm
 	@rm -f oam_helpers.o oam_helpers.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm
-	@rm -f project_hdr.asm project_config.inc linkfile *.sym $(TARGET)
+	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET)
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk

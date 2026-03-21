@@ -2,45 +2,48 @@
 
 This guide will get you from zero to running your first SNES ROM in about 10 minutes.
 
-## What You'll Need
+## Choose Your Path
 
-- **C programming basics** - if you can write a for loop, you're ready
-- **Curiosity** - the SNES is a fascinating machine
-- **An emulator** - to test your ROMs
+| | **I want to make SNES games** | **I want to contribute to the SDK** |
+|---|---|---|
+| **What** | Download the pre-built SDK, write C code, build ROMs | Clone the repo, modify compiler/library/tools |
+| **Prerequisites** | `make` + text editor | clang, cmake, git, python3 |
+| **Time to start** | ~5 minutes | ~15 minutes |
+| **Go to** | [Path A: Game Developer](#path-a-game-developer) | [Path B: SDK Developer](#path-b-sdk-developer) |
 
-## Step 1: Install Prerequisites
+---
 
-### macOS
+## Path A: Game Developer
 
+You want to write SNES games in C. The SDK is already compiled — you just need
+to download it, write code, and run `make`.
+
+### A1. Install Prerequisites
+
+You only need `make` (the build tool) and an emulator. No compiler installation
+required — the SDK ships with its own cross-compiler.
+
+**macOS:**
 ```bash
 xcode-select --install
 ```
 
-### Linux (Ubuntu/Debian)
-
+**Linux (Ubuntu/Debian):**
 ```bash
-sudo apt update
-sudo apt install build-essential clang cmake make git python3
+sudo apt install make
 ```
 
-### Linux (Fedora)
-
+**Linux (Fedora):**
 ```bash
-sudo dnf install clang cmake make git python3
+sudo dnf install make
 ```
 
-### Windows
-
+**Windows:**
 1. Install [MSYS2](https://www.msys2.org/)
-2. Open **MSYS2 UCRT64** terminal (not the regular MSYS2 terminal)
-3. Run:
+2. Open **MSYS2 UCRT64** terminal
+3. Run: `pacman -S make`
 
-```bash
-pacman -Syu
-pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python
-```
-
-## Step 2: Get an Emulator
+### A2. Get an Emulator
 
 Pick one (Mesen is recommended for debugging):
 
@@ -50,9 +53,7 @@ Pick one (Mesen is recommended for debugging):
 | [bsnes](https://github.com/bsnes-emu/bsnes) | Cycle accuracy | GitHub releases |
 | [Snes9x](https://www.snes9x.com/) | Performance | snes9x.com |
 
-## Step 3: Get OpenSNES
-
-### Option A: Download Pre-built SDK (recommended)
+### A3. Download OpenSNES SDK
 
 Download the latest release for your platform from the
 [GitHub Releases page](https://github.com/k0b3n4irb/opensnes/releases):
@@ -60,66 +61,83 @@ Download the latest release for your platform from the
 | Platform | File |
 |----------|------|
 | Linux x86_64 | `opensnes_<version>_linux_x86_64.zip` |
+| Linux aarch64 | `opensnes_<version>_linux_aarch64.zip` |
 | macOS arm64 | `opensnes_<version>_darwin_arm64.zip` |
 | Windows x86_64 | `opensnes_<version>_windows_x86_64.zip` |
 
-Extract the zip and note the path — you'll need it for your project's Makefile.
+Extract the archive somewhere permanent (e.g., `~/opensnes` or `C:\opensnes`).
 
-### Option B: Build from source
+### A4. Run Your First ROM
 
-```bash
-# Clone with submodules (--recursive is required!)
-git clone --recursive https://github.com/k0b3n4irb/opensnes.git
-cd opensnes
-
-# Build everything
-make
-```
-
-This builds the compiler, tools, library, and all 41 example ROMs.
-
-**Expected output:**
-```
-Building cc65816 compiler...
-Building WLA-DX assembler...
-Building OpenSNES library...
-Building examples... (41 ROMs)
-```
-
-## Step 4: Run Your First ROM
+The SDK comes with pre-built example ROMs:
 
 ```bash
-# Navigate to hello world example
-cd examples/text/hello_world
+cd opensnes/examples/text/hello_world
 
-# Open the ROM in your emulator
-# macOS:
-open -a Mesen hello_world.sfc
-# Linux:
-mesen hello_world.sfc
-# Windows:
-start Mesen.exe hello_world.sfc
+# Open in your emulator
+mesen hello_world.sfc        # Linux
+open -a Mesen hello_world.sfc  # macOS
+start Mesen.exe hello_world.sfc  # Windows
 ```
 
 You should see "Hello World!" on screen.
 
-## Step 5: Create Your Own Project
+### A5. Create Your Own Project
 
-The easiest way is to copy an existing example:
+Create a new directory anywhere on your machine:
 
 ```bash
-# From the opensnes root directory
-cp -r examples/text/hello_world ~/my-snes-game
+mkdir ~/my-snes-game
 cd ~/my-snes-game
-
-# Edit the Makefile to change the ROM name
-# Edit main.c to change the code
-# Build
-export OPENSNES_HOME=/path/to/opensnes
-make
 ```
 
-### Minimal Project Structure
+Create two files:
+
+**Makefile:**
+```makefile
+# Point to your OpenSNES installation
+OPENSNES := /path/to/opensnes
+
+# ROM settings
+TARGET   := my_game.sfc
+ROM_NAME := MY GAME
+
+# Source files
+CSRC     := main.c
+
+# Use OpenSNES library
+USE_LIB  := 1
+LIB_MODULES := console sprite dma background input
+
+# Include the build system
+include $(OPENSNES)/make/common.mk
+```
+
+**main.c:**
+```c
+#include <snes.h>
+
+int main(void) {
+    consoleInit();
+    consoleDrawText(8, 10, "Hello SNES!");
+    setScreenOn();
+
+    while (1) {
+        WaitForVBlank();
+    }
+    return 0;
+}
+```
+
+Build and run:
+```bash
+make
+mesen my_game.sfc
+```
+
+That's it — you're making SNES games.
+
+### Project Structure
 
 ```
 my-snes-game/
@@ -130,54 +148,84 @@ my-snes-game/
     └── music.it
 ```
 
-### Minimal Makefile
+---
 
-```makefile
-# Point to your OpenSNES installation
-OPENSNES := /path/to/opensnes
+## Path B: SDK Developer
 
-# ROM settings
-TARGET   := my_game.sfc
-ROM_NAME := "MY GAME              "   # Exactly 21 characters!
+You want to modify the compiler, library, tools, or build system itself.
+This requires building the entire SDK from source.
 
-# Source files
-CSRC     := main.c
+### B1. Install Prerequisites
 
-# Use OpenSNES library
-USE_LIB  := 1
-LIB_MODULES := console
+You need a full C/C++ development environment.
 
-# Include the build system
-include $(OPENSNES)/make/common.mk
+**macOS:**
+```bash
+xcode-select --install
 ```
 
-### Minimal main.c
-
-```c
-#include <snes.h>
-
-int main(void) {
-    // Initialize the console (sets up PPU, clears screen)
-    consoleInit();
-
-    // Print text at position (8, 10)
-    consoleDrawText(8, 10, "Hello SNES!");
-
-    // Turn on the screen (it starts off by default)
-    setScreenOn();
-
-    // Main game loop
-    while (1) {
-        WaitForVBlank();  // Wait for vertical blank (60fps on NTSC)
-    }
-
-    return 0;
-}
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install build-essential clang cmake make git python3
 ```
+
+**Linux (Fedora):**
+```bash
+sudo dnf install clang cmake make git python3
+```
+
+**Windows:**
+1. Install [MSYS2](https://www.msys2.org/)
+2. Open **MSYS2 UCRT64** terminal
+3. Run:
+```bash
+pacman -Syu
+pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python
+```
+
+### B2. Clone and Build
+
+```bash
+# Clone with submodules (--recursive is required!)
+git clone --recursive https://github.com/k0b3n4irb/opensnes.git
+cd opensnes
+
+# Build everything: compiler → tools → library → examples
+make
+```
+
+This takes a few minutes. Expected output:
+```
+Building cc65816 compiler...
+Building WLA-DX assembler...
+Building OpenSNES library...
+Building examples... (52 ROMs)
+OpenSNES SDK build complete!
+```
+
+### B3. Run Tests
+
+```bash
+cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
+```
+
+### B4. Development Workflow
+
+```bash
+make clean && make     # Full rebuild (required after compiler changes)
+make lib               # Rebuild library only
+make examples          # Rebuild examples only
+make -C examples/text/hello_world  # Rebuild one example
+```
+
+See [CLAUDE.md](../CLAUDE.md) for architecture details and coding conventions.
+
+---
 
 ## What's Next?
 
-Now that you have a working setup, explore by complexity:
+Explore by complexity:
 
 | Level | Examples | What You'll Learn |
 |-------|----------|-------------------|
@@ -185,40 +233,52 @@ Now that you have a working setup, explore by complexity:
 | **Intermediate** | `graphics/sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
 | **Advanced** | `graphics/backgrounds/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
 | **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
+| **SA-1 Coprocessor** | `memory/sa1_hello`, `memory/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
 
 Browse all examples:
 ```bash
-ls -la examples/*/
+ls examples/*/
 ```
+
+## Tutorials
+
+| Topic | Guide |
+|-------|-------|
+| Graphics & Backgrounds | [tutorials/graphics.md](tutorials/graphics.md) |
+| Sprites & Animation | [tutorials/sprites.md](tutorials/sprites.md), [tutorials/animation.md](tutorials/animation.md) |
+| Scrolling & Parallax | [tutorials/scrolling.md](tutorials/scrolling.md) |
+| Collision Detection | [tutorials/collision.md](tutorials/collision.md) |
+| Input Handling | [tutorials/input.md](tutorials/input.md) |
+| Audio & Music | [tutorials/audio.md](tutorials/audio.md) |
+| Game States | [tutorials/game_states.md](tutorials/game_states.md) |
+| SA-1 Coprocessor | [tutorials/sa1.md](tutorials/sa1.md) |
 
 ## Troubleshooting
 
 ### "command not found: make"
 
-Install build tools (see Step 1).
+Install build tools (see prerequisites for your path above).
 
 ### "fatal: repository not found" or empty compiler folder
 
-You forgot `--recursive`. Fix it:
+You forgot `--recursive` when cloning. Fix it:
 ```bash
 git submodule update --init --recursive
 ```
 
-### "OPENSNES_HOME not set" or "No rule to make target"
+### Build fails with "Library not built"
 
-Set the environment variable:
+Run `make` from the SDK root first — the library must be compiled before examples:
 ```bash
-export OPENSNES_HOME=/path/to/opensnes
+cd /path/to/opensnes && make lib
 ```
-
-Add to your shell profile (`~/.bashrc` or `~/.zshrc`) to make it permanent.
 
 ### Black screen when running ROM
 
 Your ROM built but doesn't display anything. Common causes:
 1. Missing `setScreenOn()` call
-2. VBlank loop issues
-3. Memory overlap (run `python3 devtools/symmap/symmap.py --check-overlap game.sym`)
+2. Missing `WaitForVBlank()` in main loop
+3. Wrong `LIB_MODULES` — check that you include all needed modules
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
@@ -226,10 +286,9 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
 This is usually a compiler limitation. Check:
 - Are you using `u32`/`s32`? Prefer `u16`/`s16` when possible
-- Both `static u8 x = 0;` and `static u8 x;` work correctly
+- Use `u8`, `u16`, `s16`, `u32` types from `snes.h` (not `int` or `long`)
 
 ## Getting Help
 
 - **Issues**: [github.com/k0b3n4irb/opensnes/issues](https://github.com/k0b3n4irb/opensnes/issues)
 - **SNES Dev Wiki**: [snes.nesdev.org](https://snes.nesdev.org/)
-- **Discord**: Search for "SNES Development" communities

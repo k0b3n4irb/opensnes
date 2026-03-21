@@ -18,10 +18,14 @@
 ;      4,s = flags     (last pushed, lowest above return addr)
 ;==============================================================================
 
-.ifdef HIROM
-.include "lib_memmap_hirom.inc"
+.ifdef SA1
+.include "memmap_sa1.inc"
 .else
-.include "lib_memmap.inc"
+.ifdef HIROM
+.include "memmap_hirom.inc"
+.else
+.include "memmap.inc"
+.endif
 .endif
 
 .SECTION ".text.oamSet" SUPERFREE

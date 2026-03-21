@@ -9,10 +9,14 @@
 ; - 32x32 sprites use 16 tiles in a 4x4 pattern
 ;-----------------------------------------------------------------------
 
-.ifdef HIROM
-.include "lib_memmap_hirom.inc"
+.ifdef SA1
+.include "memmap_sa1.inc"
 .else
-.include "lib_memmap.inc"
+.ifdef HIROM
+.include "memmap_hirom.inc"
+.else
+.include "memmap.inc"
+.endif
 .endif
 
 ;-----------------------------------------------------------------------

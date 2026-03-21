@@ -5,6 +5,63 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.11.0] - 2026-03-21
+
+### SA-1 Enhancement Chip Support (NEW)
+
+- **SA-1 coprocessor**: full build system support for SA-1 cartridges
+  (`USE_SA1 := 1`). Includes ROM header (cart type $35), memory maps,
+  post-link $FFD5 patching, and per-example boot stub override.
+- **SA-1 boot infrastructure**: crt0.asm initializes SA-1 (reset vector,
+  I-RAM write protection SIWP=$FF, release from reset, magic byte handshake).
+- **Per-example SA-1 boot**: each SA-1 example provides its own `sa1_boot.asm`.
+  crt0.asm includes `project_sa1_boot.asm` (local override or template default).
+- **sa1.h / sa1.c**: register definitions ($2200-$230E), `sa1Init()` function.
+- **Key discovery**: SIWP/CIWP bit=1 means WRITABLE (not protected despite
+  the register name). Documented in `.claude/SA-1.md`.
+
+### Build System
+
+- **Unified memmap files**: deleted 3 duplicate `lib/source/lib_memmap*.inc`,
+  all 18 library ASM files now reference `templates/memmap*.inc` via
+  `-I ../templates`. Single source of truth for memory maps.
+- **runtime.asm moved to lib/**: compiled once per config (lorom/hirom/sa1)
+  instead of 46 times per example. `RUNTIME_OBJ` always linked from library.
+
+### Compiler
+
+- **WLA-DX .ACCU/.INDEX override warning**: detects when `rep`/`sep` tracking
+  diverges from explicit `.ACCU`/`.INDEX` directives after branch merges.
+  Flags reset at `.ENDS` boundaries to avoid false positives.
+- **Leaf optimization fix**: `leaf_opt = fn->leaf && !fn->dynalloc` (was
+  `!fn->dynalloc`). Prevents non-leaf functions from corrupting JSL return
+  addresses with SSA temporaries.
+
+### Runtime
+
+- **Dynamic sprite state moved to bank $00**: RAMSECTION relocated from
+  bank $7E slot 2 to bank 0 slot 1 — C code can now access variables
+  via `lda.l $xxxx` (WRAM mirror, below $2000).
+
+### Examples (52 total, +3 new)
+
+- **sa1_hello**: SA-1 boot diagnostic — displays coprocessor status codes.
+- **sa1_speed**: SA-1 32-bit counter at 10.74 MHz — shows 69K increments/frame.
+- **sa1_starfield**: 128-dot murmuration with Lissajous sine patterns.
+  4 sine lookups per bird using `lda.l sine_table,x` (DB-independent ROM reads),
+  4 brightness palettes for depth illusion on dark blue background.
+
+### Documentation
+
+- **SA-1 tutorial**: `docs/tutorials/sa1.md` — architecture, setup, I-RAM
+  communication patterns, assembly tips, Mesen2 debugging guide.
+- **GETTING_STARTED.md rewritten**: two clear paths — "Game Developer" (download
+  release, just needs `make`) vs "SDK Developer" (clone, build from source).
+- **6 missing READMEs added**: all 52 examples now have README.md + screenshots
+  (generated via opensnes-emu headless API).
+- **Documentation audit**: fixed 4 broken links, updated example count 41→52,
+  added SA-1 to all doc indexes, added tutorials table to docs/README.md.
+
 ## [0.10.0] - 2026-03-21
 
 ### Library

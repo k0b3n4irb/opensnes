@@ -7,7 +7,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage getting_started -- Install the SDK and build your first ROM
 
-@subpage learning_path -- 41 examples from "Hello World" to complete games
+@subpage learning_path -- 52 examples from "Hello World" to complete games
 
 @subpage examples_by_category -- Browse examples by topic
 
@@ -37,6 +37,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_game_states -- Game States & Transitions
 
+@subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
+
 ## Hardware Reference
 
 @subpage hardware_overview -- CPU, PPU, APU architecture
@@ -49,7 +51,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 ## Examples (Annotated Source Code)
 
-See the @ref example_sources "Example Source Code" page for all 41 examples organized by topic, with links to fully documented source files.
+See the @ref example_sources "Example Source Code" page for all 52 examples organized by topic, with links to fully documented source files.
 
 ## API Reference
 

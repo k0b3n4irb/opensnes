@@ -1,7 +1,7 @@
 # Giuseppe RPG Engine — Documentation technique
 
 > **Ce document décrit le moteur tel qu'il fonctionne aujourd'hui.**
-> Pour la vision long terme (ring menu, inventaire, quêtes, sauvegardes), voir `engine.md`.
+> Pour la vision long terme (ring menu, inventaire, quêtes, sauvegardes), voir les issues du projet.
 
 ---
 

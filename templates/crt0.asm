@@ -121,6 +121,7 @@
     mouseButton     dsb 2   ; Newly pressed buttons per port (edge detection)
     mouseSensitivity dsb 2  ; Current sensitivity per port (0-2)
     mouseRequestChangeSensitivity dsb 2 ; Deferred sensitivity command per port
+    sa1_status      dsb 1   ; SA-1 boot status ($A5=OK, $00=not started/failed)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -193,12 +194,17 @@
 ; oambuffer (2048 bytes) is defined in sprite_dynamic.asm (BANK 0 SLOT 1)
 ; so C code can access it via sta.l $0000,x. Only projects using
 ; LIB_MODULES := ... sprite_dynamic ... allocate it.
+;
+; Dynamic sprite queue and state are also in BANK 0 SLOT 1 ($0000-$1FFF)
+; so both C (bank $00 absolute) and ASM (DB=$7E via WRAM mirror) can access
+; them. Previously at BANK $7E SLOT 2 ($2800+) which was above the WRAM
+; mirror, making them inaccessible from C code.
 
-.RAMSECTION ".dynamic_sprite_queue" BANK $7E SLOT 2 ORGA $2800 FORCE
-    oamQueueEntry   dsb 768     ; 128 × 6 bytes ($7E:2800-$7E:2AFF)
+.RAMSECTION ".dynamic_sprite_queue" BANK 0 SLOT 1
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes (VRAM upload queue)
 .ENDS
 
-.RAMSECTION ".dynamic_sprite_state" BANK $7E SLOT 2 ORGA $2B00 FORCE
+.RAMSECTION ".dynamic_sprite_state" BANK 0 SLOT 1
     ; Temporary values for sprite calculations
     sprit_val0      dsb 1       ; Temporary value #0
     sprit_val1      dsb 1       ; Temporary value #1
@@ -467,6 +473,13 @@ FastStart:
     rep #$18
     sep #$20
 
+.ifdef SA1
+    ; SA-1: Enable I-RAM writes for SNES CPU
+    ; Try $FF — maybe bit=1 means WRITABLE (not PROTECTED)
+    lda #$FF
+    sta.l $002229           ; SIWP = $FF
+.endif
+
     ; Set up stack at $1FFF
     ldx #$1FFF
     txs
@@ -539,6 +552,64 @@ FastStart:
     lda #$81            ; NMI + auto joypad
     sta $4200
     rep #$20
+
+.ifdef SA1
+    ;--------------------------------------------------------------------------
+    ; SA-1 Coprocessor Initialization
+    ;--------------------------------------------------------------------------
+    ; 1. Enable I-RAM write access for both CPUs
+    ; 2. Set SA-1 reset vector to SA1Start label
+    ; 3. Release SA-1 from reset
+    ;--------------------------------------------------------------------------
+    sep #$20
+
+    ; === SA-1 INIT ===
+
+    ; 1. Disable I-RAM write protection (redundant with early init, but safe)
+    lda #$FF
+    sta.l $002229           ; SIWP: try $FF = all bits set = writable?
+
+    ; 2. SELF-TEST: verify SNES CPU can write/read I-RAM
+    ;    Use STA.L/LDA.L to force bank $00 (bypass DB)
+    lda #$42
+    sta.l $003000           ; Write $42 to I-RAM (bank $00 explicit)
+    lda.l $003000           ; Read it back (bank $00 explicit)
+    cmp #$42
+    bne _sa1_iram_fail      ; I-RAM access broken!
+
+    ; 3. Clear I-RAM flag
+    lda #$00
+    sta.l $003000
+
+    ; 4. Set SA-1 reset vector
+    lda #<SA1Start
+    sta $2203               ; CRVL: reset vector low byte
+    lda #>SA1Start
+    sta $2204               ; CRVH: reset vector high byte
+
+    ; 5. Release SA-1 from reset
+    lda #$00
+    sta $2200               ; CCNT: release
+
+    ; 6. Wait for SA-1 to write $A5 to I-RAM
+    ldy #$FFFF
+-   lda.l $003000
+    cmp #$A5
+    beq +
+    dey
+    bne -
++
+    sta.l sa1_status
+    bra _sa1_init_done
+
+_sa1_iram_fail:
+    ; Store $FF to indicate I-RAM access failure (different from $A5 or timeout)
+    lda #$FF
+    sta.l sa1_status
+
+_sa1_init_done:
+    rep #$20
+.endif
 
     ; Call main() - use JSL since generated code returns with RTL
     jsl main
@@ -1590,6 +1661,12 @@ tilemapFlush:
 ; C code sections use SUPERFREE and will be placed in available ROM space.
 ; No special BASE directive is needed since code stays in bank $00.
 ;==============================================================================
+
+;==============================================================================
+; SA-1 Boot Stub (included only for SA-1 builds)
+;==============================================================================
+
+.include "project_sa1_boot.asm"
 
 ;==============================================================================
 ; External References
