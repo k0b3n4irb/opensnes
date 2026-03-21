@@ -185,6 +185,7 @@ Now that you have a working setup, explore by complexity:
 | **Intermediate** | `graphics/sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
 | **Advanced** | `graphics/backgrounds/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
 | **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
+| **SA-1 Coprocessor** | `memory/sa1_hello`, `memory/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
 
 Browse all examples:
 ```bash
