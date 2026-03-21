@@ -11,10 +11,14 @@
 ;   - Leftmost argument is furthest from SP
 ;==============================================================================
 
+.ifdef SA1
+.include "lib_memmap_sa1.inc"
+.else
 .ifdef HIROM
 .include "lib_memmap_hirom.inc"
 .else
 .include "lib_memmap.inc"
+.endif
 .endif
 
 ; SRAM bank for LoROM

@@ -2,26 +2,29 @@
 # OpenSNES Library - Makefile
 #==============================================================================
 #
-# Builds the OpenSNES library for both LoROM and HiROM modes.
+# Builds the OpenSNES library for LoROM, HiROM, and SA-1 modes.
 # Output:
 #   build/lorom/*.o  - Object files for LoROM projects
 #   build/hirom/*.o  - Object files for HiROM projects
+#   build/sa1/*.o    - Object files for SA-1 projects
 #
 # Usage:
-#   make            # Build library (both modes)
+#   make            # Build library (all modes)
 #   make lorom      # Build LoROM library only
 #   make hirom      # Build HiROM library only
+#   make sa1        # Build SA-1 library only
 #   make clean      # Clean all build artifacts
 #
 #==============================================================================
 
-.PHONY: all lorom hirom clean
+.PHONY: all lorom hirom sa1 clean
 
 # Directories
 SRCDIR = source
 INCDIR = include
 BUILDDIR_LOROM = build/lorom
 BUILDDIR_HIROM = build/hirom
+BUILDDIR_SA1   = build/sa1
 
 # Tools (using QBE-based compiler)
 CC = ../bin/cc65816
@@ -70,15 +73,21 @@ C_OBJECTS_HIROM = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_HIROM)/%.o)
 ASM_OBJECTS_HIROM = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_HIROM)/%-asm.o)
 OBJECTS_HIROM = $(C_OBJECTS_HIROM) $(ASM_OBJECTS_HIROM)
 
+# Object files - SA-1 (same bank layout as LoROM, different header)
+C_OBJECTS_SA1 = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SA1)/%.o)
+ASM_OBJECTS_SA1 = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SA1)/%-asm.o)
+OBJECTS_SA1 = $(C_OBJECTS_SA1) $(ASM_OBJECTS_SA1)
+
 #------------------------------------------------------------------------------
 # Main Target - Build Both
 #------------------------------------------------------------------------------
 
-all: lorom hirom
+all: lorom hirom sa1
 	@echo "========================================"
 	@echo "  Library built:"
 	@echo "    LoROM: $(BUILDDIR_LOROM)/"
 	@echo "    HiROM: $(BUILDDIR_HIROM)/"
+	@echo "    SA-1:  $(BUILDDIR_SA1)/"
 	@echo "========================================"
 
 #------------------------------------------------------------------------------
@@ -134,6 +143,30 @@ $(BUILDDIR_HIROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_HIROM)
 
 $(BUILDDIR_HIROM):
 	@mkdir -p $(BUILDDIR_HIROM)
+
+#------------------------------------------------------------------------------
+# SA-1 Build (same bank layout as LoROM, uses lib_memmap_sa1.inc)
+#------------------------------------------------------------------------------
+
+sa1: $(OBJECTS_SA1)
+	@echo "[DONE] SA-1 library: $(BUILDDIR_SA1)/"
+
+# C compilation for SA-1
+$(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_SA1)
+	@echo "[CC-SA1] $<"
+	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SA1)/$*.c.asm
+	@echo '.include "lib_memmap_sa1.inc"' > $(BUILDDIR_SA1)/$*.asm
+	@echo '' >> $(BUILDDIR_SA1)/$*.asm
+	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_SA1)/$*.c.asm >> $(BUILDDIR_SA1)/$*.asm
+	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SA1)/$*.asm
+
+# ASM compilation for SA-1
+$(BUILDDIR_SA1)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SA1)
+	@echo "[AS-SA1] $<"
+	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+
+$(BUILDDIR_SA1):
+	@mkdir -p $(BUILDDIR_SA1)
 
 #------------------------------------------------------------------------------
 # Clean

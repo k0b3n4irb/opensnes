@@ -29,10 +29,14 @@
 ; ROM addresses and bank $7E for RAM addresses.
 ;==============================================================================
 
+.ifdef SA1
+.include "lib_memmap_sa1.inc"
+.else
 .ifdef HIROM
 .include "lib_memmap_hirom.inc"
 .else
 .include "lib_memmap.inc"
+.endif
 .endif
 
 .SECTION ".dma_asm" SUPERFREE

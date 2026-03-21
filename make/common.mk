@@ -72,6 +72,7 @@ USE_LIB     ?= 0
 USE_HIROM   ?= 0
 USE_FASTROM ?= 0
 USE_SRAM    ?= 0
+USE_SA1     ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
 SOUNDBANK_SRC ?=
@@ -80,11 +81,12 @@ SOUNDBANK_BANK ?= 1
 ROMSIZE     ?= $$08
 
 # Derived configuration (one-liners using $(if))
-LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_HIROM)),hirom,lorom)
-HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm)
-MEMMAP_INC   := $(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc)
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SRAM)),$$02,$$00)
-SRAMSIZE     := $(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)
+# SA-1 uses LoROM bank layout but different header and cartridge type
+LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_HIROM)),hirom,lorom))
+HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm))
+MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SRAM)),$$02,$$00))
+SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD auto-add modules
@@ -97,7 +99,7 @@ LIB_MODULES += snesmod
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 # OAM helpers (standalone projects without library)
 OAM_HELPERS_OBJ := $(if $(filter 0,$(USE_LIB)),oam_helpers.o)
@@ -285,6 +287,11 @@ endif
 $(TARGET): linkfile
 	@echo "[LD] $@"
 	@$(LD) -S linkfile $@
+ifeq ($(USE_SA1),1)
+	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
+	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
+	@python3 -c "f=open('$@','r+b');f.seek(0x7FD5);b=f.read(1)[0];f.seek(0x7FD5);f.write(bytes([b|0x03]));f.close()" && echo "[SA1] Patched $$FFD5 map mode to SA-1"
+endif
 
 #------------------------------------------------------------------------------
 # Cleanup

@@ -11,10 +11,14 @@
 ; cc65816 calling convention: arguments pushed LEFT-TO-RIGHT.
 ;==============================================================================
 
+.ifdef SA1
+.include "lib_memmap_sa1.inc"
+.else
 .ifdef HIROM
 .include "lib_memmap_hirom.inc"
 .else
 .include "lib_memmap.inc"
+.endif
 .endif
 
 .SECTION ".mp5_text" SUPERFREE

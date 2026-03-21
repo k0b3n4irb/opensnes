@@ -2,10 +2,14 @@
 ; OpenSNES Performance Profiling
 ;==============================================================================
 
+.ifdef SA1
+.include "lib_memmap_sa1.inc"
+.else
 .ifdef HIROM
 .include "lib_memmap_hirom.inc"
 .else
 .include "lib_memmap.inc"
+.endif
 .endif
 
 .EQU REG_CGADSUB   $2131       ; Color math designation
