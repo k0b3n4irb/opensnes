@@ -1693,6 +1693,8 @@ cute_tiled_err:
 
 static int cute_tiled_read_bool_internal(cute_tiled_map_internal_t* m, int* out)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbitwise-instead-of-logical"
 	if ((cute_tiled_peak(m) == 't') | (cute_tiled_peak(m) == 'T'))
 	{
 		m->in += 4;
@@ -1706,6 +1708,7 @@ static int cute_tiled_read_bool_internal(cute_tiled_map_internal_t* m, int* out)
 	}
 
 	else goto cute_tiled_err;
+#pragma GCC diagnostic pop
 
 	CUTE_TILED_CHECK(m->in <= m->end, "Attempted to read passed input buffer (is this a valid JSON file?).");
 	return 1;

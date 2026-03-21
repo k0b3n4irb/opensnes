@@ -271,6 +271,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
         int row_buf_cap = 0;
 
         u8 spc_hints = 0;
+        (void)spc_hints;
         u8 data_bits = 0;
         u8 p_maskvar[8] = {0};
 

@@ -41,7 +41,7 @@ void image_load_png(const char *filename, t_image *img, bool isquiet)
 	unsigned char *pngbuff = NULL;											// png image buffer
 	unsigned char *pngimage = NULL;											// png decoded image buffer
 	size_t pngsize;															// png image buffer size
-	unsigned int pngwidth, pngheight;										// png image width & height
+	unsigned int pngwidth = 0, pngheight;									// png image width & height
 	LodePNGState pngstate;													// png settings
 	unsigned int pngerror;													// error management
 	int i,j;

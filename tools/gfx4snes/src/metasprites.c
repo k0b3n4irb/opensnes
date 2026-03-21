@@ -39,7 +39,8 @@
 // nbtilex,nbtiley = number of tiles to save (width and height)
 // isquiet = 0 if we want some messages in console
 void metasprite_save (const char *filename, unsigned short *sprites, int nbtilex, int nbtiley, int blocksize, int metasizex, int metasizey, int metaprio, int imgwidth, int imgheight, bool isquiet) {
-	char *outputname, *incname;
+	char *outputname;
+	const char *incname;
 	FILE *fp;
     int i,x,y, nbmetasprites;
 
