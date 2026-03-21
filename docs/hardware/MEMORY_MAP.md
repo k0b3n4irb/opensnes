@@ -168,6 +168,6 @@ u16 frame_counter;
 
 ## Further Reading
 
-- [PPU Registers](PPU.md)
-- [DMA Details](DMA.md)
+- [Hardware Registers](REGISTERS.md) - PPU, DMA, I/O registers
+- [OAM](OAM.md) - Sprite attribute memory
 - [SNESdev Wiki Memory Map](https://snes.nesdev.org/wiki/Memory_map)

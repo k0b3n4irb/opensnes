@@ -529,6 +529,5 @@ if (REG_HVBJOY & 0x80) { /* In VBlank */ }
 ## Further Reading
 
 - [Memory Map](MEMORY_MAP.md) - Full address space layout
-- [PPU Details](PPU.md) - Graphics subsystem
-- [DMA Details](DMA.md) - DMA transfer modes
+- [OAM](OAM.md) - Sprite attribute memory
 - [Fullsnes](https://problemkaputt.de/fullsnes.htm) - Complete technical reference
