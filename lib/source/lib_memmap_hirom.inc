@@ -11,7 +11,7 @@
 .ENDME
 
 .ROMBANKSIZE $10000         ; 64KB banks (HiROM)
-.ROMBANKS 4                 ; Match ROM configuration (256KB)
+.ROMBANKS 8                 ; Match ROM configuration (512KB, room for soundbanks)
 
 ; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
 .ASCIITABLE

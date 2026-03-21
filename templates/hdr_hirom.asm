@@ -39,7 +39,7 @@
 .ENDME
 
 .ROMBANKSIZE $10000         ; 64KB per bank (HiROM standard)
-.ROMBANKS 4                 ; 256KB ROM (4 x 64KB banks)
+.ROMBANKS 8                 ; 512KB ROM (8 x 64KB banks, room for large soundbanks)
 
 ;------------------------------------------------------------------------------
 ; SNES Header (located at $00:FFB0-FFDF in HiROM)

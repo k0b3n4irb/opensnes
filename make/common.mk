@@ -310,13 +310,20 @@ SMCONV_HIROM_FLAG :=
 # smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix)
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
+	@# Note: do NOT pass -i for HiROM. The -i flag prevents bank splitting,
+	@# but our SNESMOD library reads via LoROM-style mirror ($XX:$8000-$FFFF,
+	@# 32KB per bank). Splitting into 32KB chunks works for both ROM types.
 	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+	@# Force soundbank sections to start at offset 0 within their banks.
+	@# Without FORCE, SUPERFREE library code could shift the soundbank data,
+	@# and SNESMOD would read from the wrong offset. The regex handles both
+	@# single-bank ("SOUNDBANK") and multi-bank ("SOUNDBANK0", "SOUNDBANK1").
+	@sed -i -e 's/^\.BANK \([0-9]*\)$$/.BANK \1\n.ORG 0/' \
+	        -e 's/\.SECTION "SOUNDBANK\([0-9]*\)"/\.SECTION "SOUNDBANK\1" FORCE/' $(SOUNDBANK_OUT).asm
 ifeq ($(USE_HIROM),1)
-	@# HiROM: force soundbank to .ORG $$8000 within its WLA-DX bank.
-	@# In HiROM, CPU $$01:$$8000 → file offset $$18000 = WLA-DX bank 1, .ORG $$8000.
-	@# SNESMOD reads via bank $$01 ($00-$3F mirror), so data MUST be at $$8000+ offset.
-	@sed -i -e 's/^\.BANK \([0-9]*\)$$/.BANK \1\n.ORG $$8000/' \
-	        -e 's/\.SECTION "SOUNDBANK"/.SECTION "SOUNDBANK" FORCE/' $(SOUNDBANK_OUT).asm
+	@# HiROM: override ORG to $$8000 (CPU $$01:$$8000 → file $$18000).
+	@# SNESMOD reads via bank mirrors ($$00-$$3F), so data MUST be at $$8000+.
+	@sed -i -e 's/^\.ORG 0$$/.ORG $$8000/' $(SOUNDBANK_OUT).asm
 endif
 	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
 	@mv $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).h.tmp
@@ -421,11 +428,10 @@ endif
 ifneq ($(ASMSRC),)
 	@for f in $(ASMSRC); do cat $$f >> $@; done
 endif
-ifeq ($(USE_SNESMOD),1)
-ifneq ($(SOUNDBANK_SRC),)
-	@cat $(SOUNDBANK_OUT).asm >> $@
-endif
-endif
+## Soundbank is now assembled as a separate object (soundbank.o) to avoid
+## ROMBANKMAP conflicts in HiROM mode when .BANK directives from the
+## soundbank are mixed with the header's MEMORYMAP in the same source file.
+
 
 #------------------------------------------------------------------------------
 # Linking
@@ -446,6 +452,18 @@ endif
 combined.obj: combined.asm
 	@echo "[AS] $<"
 	@$(AS) $(ASFLAGS) -o $@ $<
+
+# Soundbank: assembled as a SEPARATE object to avoid ROMBANKMAP conflicts.
+# The soundbank ASM uses .BANK directives that conflict with the project
+# header's MEMORYMAP when combined in the same source file (HiROM bug).
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(TEMPLATES)/$(MEMMAP_INC)
+	@echo "[AS] $(SOUNDBANK_OUT)"
+	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(SOUNDBANK_OUT).asm; } > $(SOUNDBANK_OUT).wrap.asm
+	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $(SOUNDBANK_OUT).wrap.asm
+endif
+endif
 
 # End marker for initialized data — compiled as a separate object and linked
 # last so that all APPENDTO ".data_init" sections from C and lib objects are
@@ -469,10 +487,26 @@ else
 	@for obj in $(LIB_OBJS); do echo "$$obj" >> $@; done
 endif
 endif
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+	@echo "$(SOUNDBANK_OUT).o" >> $@
+endif
+endif
 	@echo "data_init_end.o" >> $@
 
 # Link to final ROM
-$(TARGET): combined.obj $(C_OBJS) data_init_end.o linkfile
+# Soundbank object dependency
+ifeq ($(USE_SNESMOD),1)
+ifneq ($(SOUNDBANK_SRC),)
+SOUNDBANK_OBJ := $(SOUNDBANK_OUT).o
+else
+SOUNDBANK_OBJ :=
+endif
+else
+SOUNDBANK_OBJ :=
+endif
+
+$(TARGET): combined.obj $(C_OBJS) $(SOUNDBANK_OBJ) data_init_end.o linkfile
 	@echo "[LD] $@"
 	@$(LD) -S linkfile $@
 
@@ -490,6 +524,6 @@ ifneq ($(GFX_HEADERS),)
 endif
 ifeq ($(USE_SNESMOD),1)
 ifneq ($(SOUNDBANK_SRC),)
-	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h
+	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm
 endif
 endif
