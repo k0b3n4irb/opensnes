@@ -270,8 +270,6 @@ GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
 # Object files from C sources (one .o per .c file)
 C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 
-# All object files
-OBJS := combined.obj $(C_OBJS) data_init_end.o
 
 #------------------------------------------------------------------------------
 # Build Targets
@@ -361,10 +359,9 @@ endef
 # CSRC defaults to main.c for backward compatibility. Multi-file projects
 # simply list all C sources: CSRC := main.c engine/player.c ui/hud.c
 #
-# Order-only prerequisite on combined.asm ensures SMCONV/GFX conversion
-# completes before C compilation starts (prevents parallel build races with
-# multi-target rules like soundbank.asm + soundbank.h).
-%.c.o: %.c $(GFX_HEADERS) | combined.asm
+# GFX_HEADERS dependency ensures graphics/soundbank conversion completes
+# before C compilation starts (soundbank.h must exist for #include).
+%.c.o: %.c $(GFX_HEADERS)
 	@echo "[CC] $<"
 	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
 	$(call wrap_asm,$*.c.asm,$@)
@@ -408,91 +405,63 @@ else
 INCBIN_DEPS :=
 endif
 
-# Combine bootstrap assembly sources (C code is in separate .o files)
-# Order: crt0 -> runtime -> data_init_start -> [ASMSRC] -> [soundbank]
-# Note: data_init_end is compiled as a separate object and linked last,
-# ensuring all APPENDTO ".data_init" records (from C and lib objects)
-# precede the end marker.
-combined.asm: $(TEMPLATES)/crt0.asm project_hdr.asm $(ASMSRC) $(OAM_HELPERS) $(RUNTIME) $(SOUNDBANK_DEP) $(INCBIN_DEPS)
-	@echo "[ASM] Combining sources..."
-	@cat $(TEMPLATES)/crt0.asm > $@
-	@cat $(RUNTIME) >> $@
-ifeq ($(USE_LIB),0)
-	@cat $(OAM_HELPERS) >> $@
-endif
-	@cat $(TEMPLATES)/data_init_start.asm >> $@
-ifneq ($(ASMSRC),)
-	@for f in $(ASMSRC); do cat $$f >> $@; done
-endif
-## Soundbank is now assembled as a separate object (soundbank.o) to avoid
-## ROMBANKMAP conflicts in HiROM mode when .BANK directives from the
-## soundbank are mixed with the header's MEMORYMAP in the same source file.
-
-
 #------------------------------------------------------------------------------
-# Linking
+# Assembly Objects (each source compiled separately — no more combined.asm)
 #------------------------------------------------------------------------------
 
-# Assemble to object file
-# Pass -D HIROM for HiROM builds so crt0.asm can use ORGA $8000
+# Assembler flags
 ifeq ($(USE_HIROM),1)
 ASFLAGS := -D HIROM
 else
 ASFLAGS :=
 endif
-
 ifeq ($(USE_FASTROM),1)
 ASFLAGS += -D FASTROM
 endif
 
-combined.obj: combined.asm
-	@echo "[AS] $<"
+# crt0: has its own MEMORYMAP via project_hdr.asm — no wrap needed
+crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc
+	@echo "[AS] crt0"
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
-# Soundbank: assembled as a SEPARATE object to avoid ROMBANKMAP conflicts.
-# The soundbank ASM uses .BANK directives that conflict with the project
-# header's MEMORYMAP when combined in the same source file (HiROM bug).
-ifeq ($(USE_SNESMOD),1)
-ifneq ($(SOUNDBANK_SRC),)
-$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(TEMPLATES)/$(MEMMAP_INC)
-	@echo "[AS] $(SOUNDBANK_OUT)"
-	$(call wrap_asm,$(SOUNDBANK_OUT).asm,$@)
-endif
-endif
+# Runtime math library
+runtime.o: $(TEMPLATES)/runtime.asm
+	@echo "[AS] runtime"
+	$(call wrap_asm,$<,$@)
 
-# End marker for initialized data — compiled as a separate object and linked
-# last so that all APPENDTO ".data_init" sections from C and lib objects are
-# placed before the sentinel (addr=0, size=0).
-data_init_end.o: $(TEMPLATES)/data_init_end.asm $(TEMPLATES)/$(MEMMAP_INC)
-	@echo "[AS] data_init_end"
-	$(call wrap_asm,$(TEMPLATES)/data_init_end.asm,$@)
+# Initialized data start marker (APPENDTO base section)
+data_init_start.o: $(TEMPLATES)/data_init_start.asm
+	@echo "[AS] data_init_start"
+	$(call wrap_asm,$<,$@)
 
-# Create linker file
-# Order: combined.obj -> C objects -> lib objects -> data_init_end.o (must be last)
-# Note: On MSYS2/Windows, wlalink needs Windows-style paths, so we use cygpath -m
-linkfile: combined.obj $(C_OBJS) data_init_end.o
-	@echo "[objects]" > $@
-	@echo "combined.obj" >> $@
-	@for obj in $(C_OBJS); do echo "$$obj" >> $@; done
-ifeq ($(USE_LIB),1)
-ifeq ($(OS),Windows_NT)
-	@for obj in $(LIB_OBJS); do echo "$$(cygpath -m $$obj)" >> $@; done
+# OAM helpers (only when USE_LIB=0)
+ifeq ($(USE_LIB),0)
+oam_helpers.o: $(OAM_HELPERS)
+	@echo "[AS] oam_helpers"
+	$(call wrap_asm,$<,$@)
+OAM_HELPERS_OBJ := oam_helpers.o
 else
-	@for obj in $(LIB_OBJS); do echo "$$obj" >> $@; done
+OAM_HELPERS_OBJ :=
 endif
-endif
-ifeq ($(USE_SNESMOD),1)
-ifneq ($(SOUNDBANK_SRC),)
-	@echo "$(SOUNDBANK_OUT).o" >> $@
-endif
-endif
-	@echo "data_init_end.o" >> $@
 
-# Link to final ROM
-# Soundbank object dependency
+# User ASM sources — each becomes its own object
+ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
+
+# Generate explicit rules for each ASMSRC file (avoids matching library objects)
+define ASM_OBJ_RULE
+$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS)
+	@echo "[AS] $(1)"
+	$$(call wrap_asm,$(1),$$@)
+endef
+$(foreach src,$(ASMSRC),$(eval $(call ASM_OBJ_RULE,$(src))))
+
+# Soundbank object
 ifeq ($(USE_SNESMOD),1)
 ifneq ($(SOUNDBANK_SRC),)
 SOUNDBANK_OBJ := $(SOUNDBANK_OUT).o
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm
+	@echo "[AS] $(SOUNDBANK_OUT)"
+	$(call wrap_asm,$<,$@)
 else
 SOUNDBANK_OBJ :=
 endif
@@ -500,7 +469,33 @@ else
 SOUNDBANK_OBJ :=
 endif
 
-$(TARGET): combined.obj $(C_OBJS) $(SOUNDBANK_OBJ) data_init_end.o linkfile
+# End marker for initialized data (must be linked LAST)
+data_init_end.o: $(TEMPLATES)/data_init_end.asm
+	@echo "[AS] data_init_end"
+	$(call wrap_asm,$<,$@)
+
+#------------------------------------------------------------------------------
+# Linking
+#------------------------------------------------------------------------------
+
+# All objects in link order
+LINK_OBJS := crt0.o runtime.o data_init_start.o $(OAM_HELPERS_OBJ) $(ASM_OBJS) $(C_OBJS)
+ifeq ($(USE_LIB),1)
+LINK_OBJS += $(LIB_OBJS)
+endif
+LINK_OBJS += $(SOUNDBANK_OBJ) data_init_end.o
+
+# Create linker file
+linkfile: $(LINK_OBJS)
+	@echo "[objects]" > $@
+ifeq ($(OS),Windows_NT)
+	@$(foreach obj,$(LINK_OBJS),echo "$$(cygpath -m $(obj))" >> $@;)
+else
+	@$(foreach obj,$(LINK_OBJS),echo "$(obj)" >> $@;)
+endif
+
+# Link to final ROM
+$(TARGET): linkfile
 	@echo "[LD] $@"
 	@$(LD) -S linkfile $@
 
@@ -510,14 +505,12 @@ $(TARGET): combined.obj $(C_OBJS) $(SOUNDBANK_OBJ) data_init_end.o linkfile
 
 clean:
 	@echo "Cleaning $(TARGET)..."
+	@rm -f crt0.o runtime.o runtime.wrap.asm
+	@rm -f data_init_start.o data_init_start.wrap.asm
+	@rm -f oam_helpers.o oam_helpers.wrap.asm
+	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
-	@rm -f data_init_end.wrap.asm data_init_end.o
-	@rm -f combined.asm project_hdr.asm project_config.inc *.obj linkfile *.sym $(TARGET)
-ifneq ($(GFX_HEADERS),)
+	@rm -f data_init_end.o data_init_end.wrap.asm
+	@rm -f project_hdr.asm project_config.inc linkfile *.sym $(TARGET)
 	@rm -f $(GFX_HEADERS)
-endif
-ifeq ($(USE_SNESMOD),1)
-ifneq ($(SOUNDBANK_SRC),)
-	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm
-endif
-endif
+	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
