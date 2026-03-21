@@ -4,8 +4,7 @@
 ;
 ; This file defines the SNES ROM header and interrupt vectors for HiROM mode.
 ;
-; The ROM name placeholder __ROM_NAME__ is replaced by the build system.
-; ROM name must be EXACTLY 21 characters (pad with spaces).
+; __ROM_NAME__ is replaced by sed. Other values come from project_config.inc.
 ;
 ; Memory Map (HiROM):
 ;   - ROM banks are 64KB ($0000-$FFFF)
@@ -45,6 +44,8 @@
 ; SNES Header (located at $00:FFB0-FFDF in HiROM)
 ;------------------------------------------------------------------------------
 
+.include "project_config.inc"
+
 .SNESHEADER
     ID "OPEN"               ; Developer ID (4 chars)
     NAME "__ROM_NAME__"     ; Game title (21 chars, pad with spaces)
@@ -54,9 +55,9 @@
     SLOWROM                 ; 2.68MHz ROM access
 .endif
     HIROM                   ; HiROM memory mapping
-    CARTRIDGETYPE __CARTRIDGETYPE__  ; $21=ROM, $23=ROM+SRAM
-    ROMSIZE __ROMSIZE__     ; ROM size (1024 << N bytes)
-    SRAMSIZE __SRAMSIZE__   ; $00=None, $03=8KB
+    CARTRIDGETYPE CARTRIDGETYPE  ; $21=ROM, $23=ROM+SRAM
+    ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
+    SRAMSIZE SRAMSIZE_VAL   ; $00=None, $03=8KB
     COUNTRY $01             ; North America (NTSC)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0

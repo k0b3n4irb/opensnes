@@ -310,25 +310,15 @@ SMCONV_HIROM_FLAG :=
 # smconv options: -s (soundbank mode), -b (bank), -n (no header), -p (symbol prefix)
 $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
-	@# Note: do NOT pass -i for HiROM. The -i flag prevents bank splitting,
-	@# but our SNESMOD library reads via LoROM-style mirror ($XX:$8000-$FFFF,
-	@# 32KB per bank). Splitting into 32KB chunks works for both ROM types.
+	@# smconv generates FORCE sections with .ORG 0 and SOUNDBANK_BANK in header.
+	@# Do NOT pass -i for HiROM — our SNESMOD reads via LoROM-style mirror
+	@# ($XX:$8000-$FFFF, 32KB per bank). Splitting works for both ROM types.
 	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
-	@# Force soundbank sections to start at offset 0 within their banks.
-	@# Without FORCE, SUPERFREE library code could shift the soundbank data,
-	@# and SNESMOD would read from the wrong offset. The regex handles both
-	@# single-bank ("SOUNDBANK") and multi-bank ("SOUNDBANK0", "SOUNDBANK1").
-	@sed -i -e 's/^\.BANK \([0-9]*\)$$/.BANK \1\n.ORG 0/' \
-	        -e 's/\.SECTION "SOUNDBANK\([0-9]*\)"/\.SECTION "SOUNDBANK\1" FORCE/' $(SOUNDBANK_OUT).asm
 ifeq ($(USE_HIROM),1)
-	@# HiROM: override ORG to $$8000 (CPU $$01:$$8000 → file $$18000).
-	@# SNESMOD reads via bank mirrors ($$00-$$3F), so data MUST be at $$8000+.
-	@sed -i -e 's/^\.ORG 0$$/.ORG $$8000/' $(SOUNDBANK_OUT).asm
+	@# HiROM: override .ORG 0 to .ORG $$8000. SNESMOD reads via bank mirrors
+	@# ($$00-$$3F:$$8000-$$FFFF), so data MUST be at $$8000+ within each bank.
+	@sed -i 's/^\.ORG 0$$/.ORG $$8000/' $(SOUNDBANK_OUT).asm
 endif
-	@# Add SOUNDBANK_BANK constant to header for snesmodSetSoundbank()
-	@mv $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).h.tmp
-	@{ cat $(SOUNDBANK_OUT).h.tmp; echo ""; echo "#define SOUNDBANK_BANK $(SOUNDBANK_BANK)"; } > $(SOUNDBANK_OUT).h
-	@rm -f $(SOUNDBANK_OUT).h.tmp
 
 # Add soundbank header to graphics headers (for dependency tracking)
 GFX_HEADERS += $(SOUNDBANK_OUT).h
@@ -354,6 +344,13 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 # C Compilation (multi-file support)
 #------------------------------------------------------------------------------
 
+# Wrap an ASM source with memmap include and assemble to object.
+# Usage: $(call wrap_asm,source.asm,output.o)
+define wrap_asm
+	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(1); } > $(basename $(2)).wrap.asm
+	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $(2) $(basename $(2)).wrap.asm
+endef
+
 # cc65816 (cproc+QBE): compile each C source to a standalone WLA-DX object.
 # Pipeline: file.c → file.c.asm (compiler) → file.c.wrap.asm (+ memmap) → file.c.o
 #
@@ -370,23 +367,22 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 %.c.o: %.c $(GFX_HEADERS) | combined.asm
 	@echo "[CC] $<"
 	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
-	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $*.c.asm; } > $*.c.wrap.asm
-	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $*.c.wrap.asm
+	$(call wrap_asm,$*.c.asm,$@)
 
 #------------------------------------------------------------------------------
 # Assembly Generation
 #------------------------------------------------------------------------------
 
-# Generate project-specific header with ROM name and SRAM settings
-# Uses sed for reliable multi-pattern substitution
-# HDR_TEMPLATE is set based on USE_HIROM (hdr.asm or hdr_hirom.asm)
-project_hdr.asm: $(HDR_TEMPLATE)
+# Generate project header: sed for ROM_NAME (WLA-DX .SNESHEADER NAME requires
+# literal string), .DEFINE for numeric values via project_config.inc.
+project_config.inc:
+	@echo '.DEFINE CARTRIDGETYPE $(CARTRIDGETYPE)' > $@
+	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
+	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
+
+project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
-	@sed -e 's/__ROM_NAME__/$(ROM_NAME)/g' \
-	     -e 's/__CARTRIDGETYPE__/$(CARTRIDGETYPE)/g' \
-	     -e 's/__ROMSIZE__/$(ROMSIZE)/g' \
-	     -e 's/__SRAMSIZE__/$(SRAMSIZE)/g' \
-	     $(HDR_TEMPLATE) > $@
+	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(HDR_TEMPLATE) > $@
 
 # Runtime library (math functions, etc.)
 RUNTIME := $(TEMPLATES)/runtime.asm
@@ -451,7 +447,7 @@ endif
 
 combined.obj: combined.asm
 	@echo "[AS] $<"
-	@$(AS) $(ASFLAGS) -o $@ $<
+	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
 # Soundbank: assembled as a SEPARATE object to avoid ROMBANKMAP conflicts.
 # The soundbank ASM uses .BANK directives that conflict with the project
@@ -460,8 +456,7 @@ ifeq ($(USE_SNESMOD),1)
 ifneq ($(SOUNDBANK_SRC),)
 $(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(TEMPLATES)/$(MEMMAP_INC)
 	@echo "[AS] $(SOUNDBANK_OUT)"
-	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(SOUNDBANK_OUT).asm; } > $(SOUNDBANK_OUT).wrap.asm
-	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $(SOUNDBANK_OUT).wrap.asm
+	$(call wrap_asm,$(SOUNDBANK_OUT).asm,$@)
 endif
 endif
 
@@ -470,8 +465,7 @@ endif
 # placed before the sentinel (addr=0, size=0).
 data_init_end.o: $(TEMPLATES)/data_init_end.asm $(TEMPLATES)/$(MEMMAP_INC)
 	@echo "[AS] data_init_end"
-	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(TEMPLATES)/data_init_end.asm; } > data_init_end.wrap.asm
-	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ data_init_end.wrap.asm
+	$(call wrap_asm,$(TEMPLATES)/data_init_end.asm,$@)
 
 # Create linker file
 # Order: combined.obj -> C objects -> lib objects -> data_init_end.o (must be last)
@@ -518,7 +512,7 @@ clean:
 	@echo "Cleaning $(TARGET)..."
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.wrap.asm data_init_end.o
-	@rm -f combined.asm project_hdr.asm *.obj linkfile *.sym $(TARGET)
+	@rm -f combined.asm project_hdr.asm project_config.inc *.obj linkfile *.sym $(TARGET)
 ifneq ($(GFX_HEADERS),)
 	@rm -f $(GFX_HEADERS)
 endif

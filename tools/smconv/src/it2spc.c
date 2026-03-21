@@ -967,7 +967,8 @@ static void export_asm(const spc_bank_t *b, const char *inputfile, const char *o
     if (size <= banksize) {
         fprintf(fp,
                 ".BANK %i\n"
-                ".SECTION \"SOUNDBANK\" ; need dedicated bank(s)\n\n"
+                ".ORG 0\n"
+                ".SECTION \"SOUNDBANK\" FORCE ; need dedicated bank(s)\n\n"
                 "%s:\n",
                 g_banknum, g_symbol_prefix);
 
@@ -985,7 +986,8 @@ static void export_asm(const spc_bank_t *b, const char *inputfile, const char *o
         for (u32 j = 0; j <= lastbank; j++) {
             fprintf(fp,
                     ".BANK %i\n"
-                    ".SECTION \"SOUNDBANK%i\" ; need dedicated bank(s)\n\n"
+                    ".ORG 0\n"
+                    ".SECTION \"SOUNDBANK%i\" FORCE ; need dedicated bank(s)\n\n"
                     "%s%i:\n",
                     g_banknum + (int)j, (int)j, g_symbol_prefix, (int)j);
 
@@ -1042,6 +1044,7 @@ static void export_inc(const spc_bank_t *b, const char *output)
             fprintf(fp, "#define %-32s\t%i\n", b->sources[i]->id, i);
     }
 
+    fprintf(fp, "\n#define SOUNDBANK_BANK %i\n", g_banknum);
     fprintf(fp, "\n#endif // __SOUNDBANK_DEFINITIONS__\n");
     fclose(fp);
 }
