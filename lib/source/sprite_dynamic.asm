@@ -14,12 +14,12 @@
 ;==============================================================================
 
 .ifdef SA1
-.include "lib_memmap_sa1.inc"
+.include "memmap_sa1.inc"
 .else
 .ifdef HIROM
-.include "lib_memmap_hirom.inc"
+.include "memmap_hirom.inc"
 .else
-.include "lib_memmap.inc"
+.include "memmap.inc"
 .endif
 .endif
 

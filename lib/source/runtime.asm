@@ -1,3 +1,13 @@
+.ifdef SA1
+.include "memmap_sa1.inc"
+.else
+.ifdef HIROM
+.include "memmap_hirom.inc"
+.else
+.include "memmap.inc"
+.endif
+.endif
+
 ;==============================================================================
 ; OpenSNES C Runtime Library
 ;==============================================================================

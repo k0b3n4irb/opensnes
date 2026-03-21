@@ -1666,7 +1666,7 @@ tilemapFlush:
 ; SA-1 Boot Stub (included only for SA-1 builds)
 ;==============================================================================
 
-.include "sa1_boot.asm"
+.include "project_sa1_boot.asm"
 
 ;==============================================================================
 ; External References

@@ -32,7 +32,7 @@ AS = ../bin/wla-65816
 
 # Flags
 CFLAGS = -I$(INCDIR)
-ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -o
+ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 
 # Source files
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
@@ -101,10 +101,7 @@ lorom: $(OBJECTS_LOROM)
 $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_LOROM)
 	@echo "[CC-LOROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_LOROM)/$*.c.asm
-	@if [ ! -f $(SRCDIR)/lib_memmap.inc ]; then \
-		echo "ERROR: $(SRCDIR)/lib_memmap.inc not found"; exit 1; \
-	fi
-	@echo '.include "lib_memmap.inc"' > $(BUILDDIR_LOROM)/$*.asm
+	@echo '.include "memmap.inc"' > $(BUILDDIR_LOROM)/$*.asm
 	@echo '' >> $(BUILDDIR_LOROM)/$*.asm
 	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_LOROM)/$*.c.asm >> $(BUILDDIR_LOROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_LOROM)/$*.asm
@@ -128,10 +125,7 @@ hirom: $(OBJECTS_HIROM)
 $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_HIROM)
 	@echo "[CC-HIROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_HIROM)/$*.c.asm
-	@if [ ! -f $(SRCDIR)/lib_memmap_hirom.inc ]; then \
-		echo "ERROR: $(SRCDIR)/lib_memmap_hirom.inc not found"; exit 1; \
-	fi
-	@echo '.include "lib_memmap_hirom.inc"' > $(BUILDDIR_HIROM)/$*.asm
+	@echo '.include "memmap_hirom.inc"' > $(BUILDDIR_HIROM)/$*.asm
 	@echo '' >> $(BUILDDIR_HIROM)/$*.asm
 	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_HIROM)/$*.c.asm >> $(BUILDDIR_HIROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_HIROM)/$*.asm
@@ -145,7 +139,7 @@ $(BUILDDIR_HIROM):
 	@mkdir -p $(BUILDDIR_HIROM)
 
 #------------------------------------------------------------------------------
-# SA-1 Build (same bank layout as LoROM, uses lib_memmap_sa1.inc)
+# SA-1 Build (same bank layout as LoROM, uses memmap_sa1.inc)
 #------------------------------------------------------------------------------
 
 sa1: $(OBJECTS_SA1)
@@ -155,7 +149,7 @@ sa1: $(OBJECTS_SA1)
 $(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_SA1)
 	@echo "[CC-SA1] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SA1)/$*.c.asm
-	@echo '.include "lib_memmap_sa1.inc"' > $(BUILDDIR_SA1)/$*.asm
+	@echo '.include "memmap_sa1.inc"' > $(BUILDDIR_SA1)/$*.asm
 	@echo '' >> $(BUILDDIR_SA1)/$*.asm
 	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_SA1)/$*.c.asm >> $(BUILDDIR_SA1)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SA1)/$*.asm
