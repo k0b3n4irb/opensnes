@@ -138,11 +138,20 @@ setupBitmapTilemap:
     .ACCU 16
     lda #$4000
     sta.l $2116
+    ; Identity tiles 0-511 (top 128 pixels)
     ldx #$0000
 -   stx $2118
     inx
     cpx #$0200
     bne -
+
+    ; Fill remaining 512 entries with tile 0 (black, bottom of screen)
+    ldx #$0000
+-   stx $2118
+    inx
+    cpx #$0200
+    bne -
+
     plp
     rtl
 .ENDS
