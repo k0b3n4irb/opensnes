@@ -88,9 +88,14 @@ _wram_stub:
     lda #$A0
     sta.l $3037              ; CFGR: IRQ mask + fast multiply
 
-    ; Give buses to GSU
-    lda #$18
-    sta.l $303A              ; SCMR: RAN+RON
+    ; Set screen base for PLOT
+    lda #$00
+    sta.l $3038              ; SCBR = $00 (SRAM base $0000)
+
+    ; Give buses to GSU + set PLOT mode
+    ; SCMR: 4bpp (bits 0-1=01) + height 128 (HT=00) + RAN + RON = $19
+    lda #$19
+    sta.l $303A              ; SCMR: 4bpp + RAN + RON
 
     ; Set program bank
     lda #:gsu_program
