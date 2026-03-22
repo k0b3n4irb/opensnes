@@ -1,7 +1,8 @@
-; SuperFX (GSU) Hello World Program
+; SuperFX (GSU) Hello World + SRAM test
 ;
-; Sets R0 = $CAFE as proof-of-life, then STOP.
-; The SNES CPU reads R0 back after the GSU halts.
+; 1. Sets R0 = $CAFE (register test)
+; 2. Writes $42 to SRAM[0] via STB (SRAM write test)
+; 3. STOP
 
 .include "memmap_gsu.inc"
 
@@ -9,6 +10,22 @@
 .ORG 0
 
 gsu_start:
-    IWT R0, #$CAFE         ; R0 = $CAFE (16-bit immediate)
-    STOP                   ; Halt GSU, trigger IRQ to SNES CPU
-    NOP                    ; Safety
+    ; Set SRAM bank (following DOOM-FX pattern)
+    IBT R0, #$70
+    RAMB                    ; RAMBR = 0 (first SRAM bank)
+
+    ; Write $42 to SRAM offset 0
+    IBT R0, #$42            ; value
+    IBT R1, #$00            ; SRAM address = 0
+    STB (R1)                ; SRAM[0] = $42 (byte write)
+
+    ; Write $55 to SRAM offset 1
+    IBT R0, #$55
+    IBT R1, #$01
+    STB (R1)
+
+    ; Set R0 = $CAFE for register test
+    IWT R0, #$CAFE
+
+    STOP
+    NOP

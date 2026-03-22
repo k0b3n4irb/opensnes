@@ -1,11 +1,15 @@
 ;==============================================================================
-; GSU Code Loader — embeds GSU binary and provides launch/wait functions
+; GSU Code Loader — WRAM-safe launch + SRAM readback
+;==============================================================================
+; ALL GSU launches MUST use the WRAM stub. The SNES CPU cannot read ROM
+; while the GSU is running (RON=1). Even a 3-instruction GSU program can
+; race the CPU's instruction prefetch.
 ;==============================================================================
 
 .ifdef SUPERFX
 
 ;------------------------------------------------------------------------------
-; GSU program binary (assembled by wla-superfx, linked to flat binary)
+; GSU program binary
 ;------------------------------------------------------------------------------
 .SECTION ".gsu_code" SUPERFREE
 gsu_program:
@@ -14,17 +18,17 @@ gsu_program_end:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; RAM for GSU result
+; WRAM area + result variables
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_vars" BANK 0 SLOT 1
+gsu_wram_area: dsb 64
 gsu_result: dsb 2
+gsu_sram_byte0: dsb 1
+gsu_sram_byte1: dsb 1
 .ENDS
 
 ;------------------------------------------------------------------------------
-; launchGSU — Configure buses, start GSU, wait for completion, read result
-;------------------------------------------------------------------------------
-; After return: gsu_result contains the 16-bit value from GSU R0.
-; No parameters. Called from C via: extern void launchGSU(void);
+; launchGSU + WRAM stub (same section for label arithmetic)
 ;------------------------------------------------------------------------------
 .SECTION ".gsu_launcher" SEMIFREE
 
@@ -33,42 +37,83 @@ gsu_result: dsb 2
 
 launchGSU:
     php
+
+    ; Copy WRAM stub from ROM to WRAM
     sep #$20
     .ACCU 8
-
-    ; Give ROM + RAM buses to GSU
-    lda #$18                     ; SCMR: RAN=1 + RON=1 (GSU owns both)
-    sta.l $303A                  ; SCMR
-
-    ; Set program bank (linker resolves :gsu_program to the ROM bank)
-    lda #:gsu_program
-    sta.l $3034                  ; PBR
-
-    ; Start GSU: write R15 (high byte write triggers execution)
-    rep #$20
-    .ACCU 16
-    lda #gsu_program             ; 16-bit ROM offset (LoROM: $8000+)
-    sta.l $301E                  ; R15 → GSU starts!
-
-    ; Poll SFR until GO flag clears (GSU finished)
-    sep #$20
-    .ACCU 8
--   lda.l $3030                  ; SFR low byte
-    and #$20                     ; GO flag (bit 5)
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l _wram_stub,x
+    sta.l gsu_wram_area,x
+    inx
+    cpx #(_wram_stub_end - _wram_stub)
     bne -
 
-    ; Reclaim buses for SNES CPU
-    lda #$00
-    sta.l $303A                  ; SCMR: SNES CPU owns everything
+    ; Execute from WRAM
+    jsl gsu_wram_area
 
-    ; Read GSU R0 result and store for C code
+    ; GSU finished — read results
     rep #$20
     .ACCU 16
-    lda.l $3000                  ; GSU R0
+    lda.l $3000              ; GSU R0
     sta.l gsu_result
+
+    ; Read SRAM bytes written by GSU
+    sep #$20
+    .ACCU 8
+    lda.l $700000            ; SRAM[0]
+    sta.l gsu_sram_byte0
+    lda.l $700001            ; SRAM[1]
+    sta.l gsu_sram_byte1
 
     plp
     rtl
+
+;--- WRAM stub (copied and executed from WRAM) ---
+_wram_stub:
+    sep #$20
+    .ACCU 8
+
+    ; Disable NMI (vector is in ROM)
+    lda #$00
+    sta.l $4200
+
+    ; Configure GSU
+    lda #$A0
+    sta.l $3037              ; CFGR: IRQ mask + fast multiply
+
+    ; Give buses to GSU
+    lda #$18
+    sta.l $303A              ; SCMR: RAN+RON
+
+    ; Set program bank
+    lda #:gsu_program
+    sta.l $3034              ; PBR
+
+    ; Start GSU
+    rep #$20
+    .ACCU 16
+    lda #gsu_program
+    sta.l $301E              ; R15 → GO!
+
+    ; Poll SFR
+    sep #$20
+    .ACCU 8
+-   lda.l $3030
+    and #$20
+    bne -
+
+    ; Reclaim buses
+    lda #$00
+    sta.l $303A
+
+    ; Re-enable NMI
+    lda #$81
+    sta.l $4200
+
+    rtl
+_wram_stub_end:
 
 .ENDS
 

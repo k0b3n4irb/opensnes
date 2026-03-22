@@ -24,6 +24,8 @@ extern void launchGSU(void);
 
 /** @brief GSU R0 result after launchGSU() (set by gsu_loader.asm) */
 extern u16 gsu_result;
+extern u8 gsu_sram_byte0;
+extern u8 gsu_sram_byte1;
 
 /** @brief Convert a nibble to hex ASCII */
 static u8 hexchar(u8 n) {
@@ -76,10 +78,25 @@ int main(void) {
         textPrintAt(3, 10, "GSU R0 RESULT:");
         textPrintAt(18, 10, (char*)buf);
 
-        if (result == 0xCAFE) {
-            textPrintAt(3, 13, "GSU: BOOTED OK");
+        /* Display SRAM readback */
+        buf[0] = '$';
+        buf[1] = hexchar(gsu_sram_byte0 >> 4);
+        buf[2] = hexchar(gsu_sram_byte0 & 0x0F);
+        buf[3] = ' ';
+        buf[4] = '$';
+        buf[5] = hexchar(gsu_sram_byte1 >> 4);
+        buf[6] = hexchar(gsu_sram_byte1 & 0x0F);
+        buf[7] = 0;
+        textPrintAt(3, 12, "SRAM[0,1]:");
+        textPrintAt(14, 12, (char*)buf);
+
+        if (result == 0xCAFE && gsu_sram_byte0 == 0x42 && gsu_sram_byte1 == 0x55) {
+            textPrintAt(3, 15, "ALL TESTS PASSED!");
+        } else if (result == 0xCAFE) {
+            textPrintAt(3, 15, "R0 OK, SRAM FAIL!");
+            textPrintAt(3, 16, "EXPECT: $42 $55");
         } else {
-            textPrintAt(3, 13, "GSU: WRONG VALUE!");
+            textPrintAt(3, 15, "GSU: WRONG VALUE!");
         }
     } else {
         textPrintAt(3, 6, "GSU: NOT DETECTED");
