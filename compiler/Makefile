@@ -101,7 +101,7 @@ wla: $(WLA_BUILT_MARKER)
 # Only run CMake and build if binaries don't exist
 # The marker file prevents unnecessary CMake reconfiguration on incremental builds
 $(WLA_BUILT_MARKER):
-	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang $(CMAKE_STATIC_FLAGS) . && $(MAKE) wla-65816 wla-spc700 wlalink
+	cd $(WLA_DIR) && cmake -G "$(CMAKE_TYPE)" -DCMAKE_C_COMPILER=clang $(CMAKE_STATIC_FLAGS) . && $(MAKE) wla-65816 wla-spc700 wla-superfx wlalink
 	@touch $@
 
 wla-clean:
@@ -112,7 +112,7 @@ wla-clean:
 wla-install:
 	@mkdir -p $(BIN_DIR)
 ifeq ($(OS),Windows_NT)
-	@cp $(WLA_DIR)/binaries/wla-65816.exe $(WLA_DIR)/binaries/wla-spc700.exe $(WLA_DIR)/binaries/wlalink.exe $(BIN_DIR)/
+	@cp $(WLA_DIR)/binaries/wla-65816.exe $(WLA_DIR)/binaries/wla-spc700.exe $(WLA_DIR)/binaries/wla-superfx.exe $(WLA_DIR)/binaries/wlalink.exe $(BIN_DIR)/
 else
-	@cp $(WLA_DIR)/binaries/wla-65816 $(WLA_DIR)/binaries/wla-spc700 $(WLA_DIR)/binaries/wlalink $(BIN_DIR)/
+	@cp $(WLA_DIR)/binaries/wla-65816 $(WLA_DIR)/binaries/wla-spc700 $(WLA_DIR)/binaries/wla-superfx $(WLA_DIR)/binaries/wlalink $(BIN_DIR)/
 endif

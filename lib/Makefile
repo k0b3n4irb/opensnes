@@ -17,7 +17,7 @@
 #
 #==============================================================================
 
-.PHONY: all lorom hirom sa1 clean
+.PHONY: all lorom hirom sa1 superfx clean
 
 # Directories
 SRCDIR = source
@@ -25,6 +25,7 @@ INCDIR = include
 BUILDDIR_LOROM = build/lorom
 BUILDDIR_HIROM = build/hirom
 BUILDDIR_SA1   = build/sa1
+BUILDDIR_SUPERFX = build/superfx
 
 # Tools (using QBE-based compiler)
 CC = ../bin/cc65816
@@ -78,16 +79,22 @@ C_OBJECTS_SA1 = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SA1)/%.o)
 ASM_OBJECTS_SA1 = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SA1)/%-asm.o)
 OBJECTS_SA1 = $(C_OBJECTS_SA1) $(ASM_OBJECTS_SA1)
 
+# Object files - SuperFX (LoROM-based, same bank layout as standard LoROM)
+C_OBJECTS_SUPERFX = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SUPERFX)/%.o)
+ASM_OBJECTS_SUPERFX = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o)
+OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
+
 #------------------------------------------------------------------------------
-# Main Target - Build Both
+# Main Target - Build All
 #------------------------------------------------------------------------------
 
-all: lorom hirom sa1
+all: lorom hirom sa1 superfx
 	@echo "========================================"
 	@echo "  Library built:"
-	@echo "    LoROM: $(BUILDDIR_LOROM)/"
-	@echo "    HiROM: $(BUILDDIR_HIROM)/"
-	@echo "    SA-1:  $(BUILDDIR_SA1)/"
+	@echo "    LoROM:    $(BUILDDIR_LOROM)/"
+	@echo "    HiROM:    $(BUILDDIR_HIROM)/"
+	@echo "    SA-1:     $(BUILDDIR_SA1)/"
+	@echo "    SuperFX:  $(BUILDDIR_SUPERFX)/"
 	@echo "========================================"
 
 #------------------------------------------------------------------------------
@@ -161,6 +168,30 @@ $(BUILDDIR_SA1)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SA1)
 
 $(BUILDDIR_SA1):
 	@mkdir -p $(BUILDDIR_SA1)
+
+#------------------------------------------------------------------------------
+# SuperFX Build (LoROM-based, uses memmap.inc — same as standard LoROM)
+#------------------------------------------------------------------------------
+
+superfx: $(OBJECTS_SUPERFX)
+	@echo "[DONE] SuperFX library: $(BUILDDIR_SUPERFX)/"
+
+# C compilation for SuperFX
+$(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_SUPERFX)
+	@echo "[CC-SUPERFX] $<"
+	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SUPERFX)/$*.c.asm
+	@echo '.include "memmap.inc"' > $(BUILDDIR_SUPERFX)/$*.asm
+	@echo '' >> $(BUILDDIR_SUPERFX)/$*.asm
+	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_SUPERFX)/$*.c.asm >> $(BUILDDIR_SUPERFX)/$*.asm
+	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SUPERFX)/$*.asm
+
+# ASM compilation for SuperFX
+$(BUILDDIR_SUPERFX)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SUPERFX)
+	@echo "[AS-SUPERFX] $<"
+	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+
+$(BUILDDIR_SUPERFX):
+	@mkdir -p $(BUILDDIR_SUPERFX)
 
 #------------------------------------------------------------------------------
 # Clean

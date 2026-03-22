@@ -1,0 +1,25 @@
+; SuperFX (GSU) Default Boot Stub
+;
+; Minimal GSU program: writes $A5 to SRAM and stops.
+; Override by placing your own gsu_boot.sfx in your example directory.
+;
+; The GSU accesses SRAM via RAMB (bank) + STW/STB instructions.
+; SRAM is at bank $70 from the SNES CPU side, but the GSU sees it
+; via its own RAM address space (set by RAMB instruction).
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+; GSU entry point — this address is written to R15 by the SNES CPU
+gsu_start:
+    ; Write magic byte $A5 to SRAM offset $0000
+    IBT R0, #$A5           ; R0 = $A5 (immediate byte, sign-extended)
+    IBT R1, #$00           ; R1 = $0000 (SRAM offset low)
+    RAMB                   ; Set RAM bank (R0 low byte, but bank is just 0 or 1)
+    IBT R0, #$A5           ; Reload R0 = $A5
+    STB (R1)               ; Store byte R0 -> SRAM[R1]
+
+    STOP                   ; Halt GSU, trigger IRQ to SNES CPU
+    NOP                    ; Safety after STOP
