@@ -1,163 +1,184 @@
-# SuperFX (GSU) — État d'avancement et connaissances
+# SuperFX (GSU) -- Status and Knowledge Base
 
-## Résumé
+## Summary
 
-Support SuperFX en cours d'implémentation. Phase 0 (build system) et Phase 1 (boot + registres) fonctionnent.
-Phase 2 (rendu bitmap PLOT) bloquée sur un problème de communication SRAM entre le GSU et le SNES CPU.
+SuperFX support in active development. Phase 0 (build system) and Phase 1 (boot + registers) work.
+Phase 2 (bitmap rendering) partially working: STW pipeline validated on bsnes, PLOT has position/color issues.
 
-## Ce qui fonctionne (validé dans Mesen2)
+## Emulator Compatibility
 
-### Phase 0 — Build system ✅ (commit `28b42ff`)
-- `wla-superfx` compilé et installé dans `bin/`
-- Pipeline 2 étapes : `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`
-- `USE_SUPERFX=1` dans Makefile, `GSUSRC` pour les sources GSU
+| Emulator | SuperFX Support | Notes |
+|----------|----------------|-------|
+| **bsnes** | Reference emulator | Cycle-accurate SuperFX emulation. Use for validation. |
+| **Mesen2** | Partial | Works for boot/registers. **Backward branch bug CONFIRMED on 2026-03-22 via bsnes comparison** -- GSU programs with backward branches (loops) may not execute correctly. |
+| **snes9x** | Not supported | Does not detect SuperFX in our ROM header. opensnes-emu screenshots show "GSU: NOT DETECTED" or black screen. |
+
+## What Works
+
+### Phase 0 -- Build system (commit `28b42ff`)
+- `wla-superfx` compiled and installed in `bin/`
+- 2-step pipeline: `.sfx` -> `wla-superfx` -> `wlalink -b` -> `.sfx.bin` -> `.incbin`
+- `USE_SUPERFX=1` in Makefile, `GSUSRC` for GSU sources
 - `hdr_superfx.asm` (cart type $14, LoROM, SRAM 32K)
 - `memmap_gsu.inc` (GSU address space)
 - `lib/Makefile` build variant `superfx`
 
-### Phase 1 — Boot + registres GSU ✅ (commit `4af0f3b`)
-- `superfx_hello` : GSU exécute `IWT R0, #$CAFE; STOP`
-- SNES CPU lit R0 = $CAFE après STOP → **communication bidirectionnelle via registres $3000-$303F confirmée**
-- VCR ($303B) = $04 (version du chip GSU)
-- `superfx.h` : définitions complètes des registres
-- `crt0.asm` : init SUPERFX (SCMR=$00, BRAMR=$01, lecture VCR)
-- `gsuInit()` retourne 1 si GSU détecté
+### Phase 1 -- Boot + GSU registers (commit `4af0f3b`)
+- `superfx_hello`: GSU executes `IWT R0, #$CAFE; STOP`
+- SNES CPU reads R0 = $CAFE after STOP -> **bidirectional communication via registers $3000-$303F confirmed**
+- VCR ($303B) = $04 (GSU chip version)
+- `superfx.h`: complete register definitions
+- `crt0.asm`: SUPERFX init (SCMR=$00, BRAMR=$01, VCR read)
+- `gsuInit()` returns 1 if GSU detected
 
-## Ce qui NE fonctionne PAS encore
+### Phase 2 -- Bitmap rendering (partial, commits `dfa25cf`, `cef71c7`)
 
-### Phase 2 — Rendu bitmap ❌ (en cours)
+**STW pipeline**: Works on bsnes. GSU writes to SRAM via STW, SNES CPU DMAs to VRAM.
+- `superfx_hello` STW test: writes $BEEF to SRAM[2,3], readback confirmed
+- `superfx_bitmap` clear loop: fills 16KB SRAM with STW, DMA to VRAM displays correctly
+- Identity tilemap at VRAM $4000, tiles 0-511
+- Remaining tilemap entries filled to avoid garbage on bottom half (commit `cef71c7`)
 
-**Problème** : Le GSU écrit dans la SRAM via STW/PLOT, mais les données n'apparaissent pas
-correctement quand le SNES CPU DMA depuis $70:0000 vers VRAM.
+**PLOT rendering**: Partially working, position and color issues remain.
 
-**Tests réalisés et résultats** :
+## PLOT Debugging Findings (2026-03-22)
 
-| Test | Résultat | Conclusion |
-|------|----------|------------|
-| SNES CPU écrit directement en VRAM ($2118) | ✅ Vert uni | Tilemap + palette + mode corrects |
-| SNES CPU écrit en SRAM ($70:0000) puis DMA → VRAM | ✅ Vert uni | SRAM accessible + DMA bank $70 OK |
-| GSU écrit via PLOT + DMA → VRAM | ❌ Bruit coloré | PLOT ou config SCMR incorrecte |
-| GSU écrit via STW (pas PLOT) + DMA → VRAM | ❌ Bruit coloré | Le GSU n'écrit pas au bon endroit |
-| GSU avec RAMB explicite + STW + DMA → VRAM | ❌ Bruit coloré | RAMB ne suffit pas |
+### Observed behavior on bsnes
+- PLOT writes pixels, but they appear at wrong position
+- Pink/magenta line visible at approximately Y~127 instead of expected Y=0
+- Color mismatch: COLOR #$01 (should be red from palette index 1) renders as pink/magenta
+- STW-based clear (writing $0000) works correctly -- black background confirmed
 
-**Hypothèses à investiguer** :
-1. La SRAM du GSU n'est peut-être pas mappée à $70:0000 côté SNES CPU
-2. Le bus arbitration (SCMR RAN/RON) affecte peut-être l'adressage
-3. La séquence de lancement depuis WRAM pourrait corrompre l'état du GSU
-4. Les registres SCMR/SCBR sont peut-être écrits au mauvais moment
+### Possible causes
+1. SCBR (Screen Base Register) offset calculation: PLOT may use a different SRAM base than expected
+2. PLOT pixel coordinate mapping: Y coordinate may wrap or offset due to screen height config
+3. Color register (COLR) vs palette: PLOT uses the COLR register, which maps to bitplane bits differently than direct palette index
+4. Screen height (HT bits in SCMR): 128px height mode may affect coordinate mapping
 
-**Prochaine étape OBLIGATOIRE** : chercher des implémentations SuperFX homebrew existantes
-et comparer notre séquence d'init/launch avec du code qui fonctionne. Ne plus deviner.
+### Next steps
+1. Study casfx PLOT examples for correct SCBR/SCMR configuration
+2. Verify PLOT coordinate system with single-pixel tests at known positions
+3. Compare COLR-to-bitplane mapping with SNES 4bpp format documentation
 
-## Architecture technique
+## Technical Architecture
 
 ### GSU (Graphics Support Unit)
-- CPU RISC 16-bit, 10.74 / 21.47 MHz
-- 16 registres 16-bit (R0-R15), R15 = PC
-- ISA unique (~55 mnémoniques), pas compatible 65816
-- Pas de pile hardware (LINK/RET via R11)
-- Instruction PLOT : écriture de pixels en format bitplane SNES
-- **Pas de compilateur C** — code GSU = assembleur uniquement
+- 16-bit RISC CPU, 10.74 / 21.47 MHz
+- 16 registers 16-bit (R0-R15), R15 = PC
+- Unique ISA (~55 mnemonics), NOT compatible with 65816
+- No hardware stack (LINK/RET via R11)
+- PLOT instruction: writes pixels in SNES bitplane format
+- **No C compiler** -- GSU code = assembly only
 
-### Mémoire
+### Memory
 ```
-┌─────────────────────────────────┐
-│         ROM (partagé)           │
-│  Bus EXCLUSIF : un seul CPU    │
-│  à la fois (SCMR RON bit)      │
-└──────────┬──────────────────────┘
-           │
-    ┌──────┼──────┐
-    │      │      │
-┌───┴───┐ ┌┴────┐ ┌┴──────┐
-│SNES   │ │SRAM │ │GSU    │
-│3.58MHz│ │32-  │ │10.74  │
-│       │ │128KB│ │MHz    │
-│WRAM   │ │$70: │ │       │
-│PPU    │ │0000 │ │NO WRAM│
-│APU    │ │     │ │NO PPU │
-└───────┘ └─────┘ └───────┘
++---------------------------------+
+|         ROM (shared)            |
+|  EXCLUSIVE bus: only one CPU    |
+|  at a time (SCMR RON bit)      |
++----------+---------------------+
+           |
+    +------+------+
+    |      |      |
++---+---+ ++----+ ++------+
+|SNES   | |SRAM | |GSU    |
+|3.58MHz| |32-  | |10.74  |
+|       | |128KB| |MHz    |
+|WRAM   | |$70: | |       |
+|PPU    | |0000 | |NO WRAM|
+|APU    | |     | |NO PPU |
++-------+ +-----+ +-------+
 ```
 
-### Registres GSU (SNES CPU side, $3000-$303F)
+### GSU Registers (SNES CPU side, $3000-$303F)
 
-| Registre | Adresse | Rôle |
+| Register | Address | Role |
 |----------|---------|------|
-| R0-R15 | $3000-$301F | Registres généraux 16-bit. **Écrire R15H ($301F) démarre le GSU** |
+| R0-R15 | $3000-$301F | General 16-bit registers. **Writing R15H ($301F) starts the GSU** |
 | SFR | $3030-$3031 | Status/Flags. Bit 5 = GO (1=running). Bit 15 = IRQ |
-| BRAMR | $3033 | Backup RAM register (bit 0: 1=SRAM writable par SNES CPU) |
-| PBR | $3034 | Program Bank Register (banque ROM du code GSU) |
-| SCBR | $3038 | Screen Base Register (base du framebuffer PLOT en SRAM) |
+| BRAMR | $3033 | Backup RAM register (bit 0: 1=SRAM writable by SNES CPU) |
+| PBR | $3034 | Program Bank Register (ROM bank for GSU code) |
+| SCBR | $3038 | Screen Base Register (PLOT framebuffer base in SRAM) |
 | CLSR | $3039 | Clock Select (0=10.74MHz, 1=21.47MHz) |
-| SCMR | $303A | Screen Mode: couleur + hauteur + **bus ownership (RAN/RON)** |
-| VCR | $303B | Version Code Register (read-only, $04 sur notre hardware) |
-| RAMBR | $303C | RAM Bank Register (read-only côté SNES) |
+| SCMR | $303A | Screen Mode: color + height + **bus ownership (RAN/RON)** |
+| VCR | $303B | Version Code Register (read-only, $04 on our hardware) |
+| RAMBR | $303C | RAM Bank Register (read-only on SNES CPU side) |
 
-### SCMR ($303A) — registre critique
+### SCMR ($303A) -- Critical Register
 
 ```
-Bit 7-6: inutilisés
-Bit 5:   HT1 (hauteur bit 1)
-Bit 4:   RON (1 = GSU owns ROM, SNES CPU NE PEUT PLUS lire ROM!)
-Bit 3:   RAN (1 = GSU owns RAM, SNES CPU NE PEUT PLUS lire SRAM!)
-Bit 2:   HT0 (hauteur bit 0)
+Bit 7-6: unused
+Bit 5:   HT1 (height bit 1)
+Bit 4:   RON (1 = GSU owns ROM, SNES CPU CANNOT read ROM!)
+Bit 3:   RAN (1 = GSU owns RAM, SNES CPU CANNOT read SRAM!)
+Bit 2:   HT0 (height bit 0)
 Bit 1-0: MD (00=2bpp, 01=4bpp, 11=8bpp)
 
-Hauteur : HT1:HT0 = 00→128px, 01→160px, 10→192px, 11→OBJ
+Height: HT1:HT0 = 00->128px, 01->160px, 10->192px, 11->OBJ
 ```
 
-### Bus exclusif — CONTRAINTE MAJEURE
+### Exclusive Bus -- MAJOR CONSTRAINT
 
-Quand SCMR a RON=1, le SNES CPU ne peut PAS lire la ROM — même son propre code !
-Le polling SFR doit s'exécuter depuis la **WRAM** (copie du stub dans $00:0xxx).
+When SCMR has RON=1, the SNES CPU CANNOT read ROM -- not even its own code!
+SFR polling must execute from **WRAM** (stub copied to $00:0xxx).
 
-Séquence actuelle (dans gsu_loader.asm) :
-1. SNES CPU écrit R0 (paramètre) dans $3000
-2. Copie le stub de lancement en WRAM
-3. JSL vers WRAM
-4. [WRAM] Configure SCBR, SCMR (RAN+RON), PBR, R15 → GSU démarre
-5. [WRAM] Poll SFR bit 5 (GO) jusqu'à 0
-6. [WRAM] SCMR = $00 (bus revient au SNES CPU)
-7. RTL vers ROM
+Current sequence (in gsu_loader.asm):
+1. SNES CPU writes R0 (parameter) to $3000
+2. Copies launch stub to WRAM
+3. JSL to WRAM
+4. [WRAM] Configure SCBR, SCMR (RAN+RON), PBR, R15 -> GSU starts
+5. [WRAM] Poll SFR bit 5 (GO) until 0
+6. [WRAM] SCMR = $00 (bus returns to SNES CPU)
+7. RTL back to ROM
 
-### Pipeline d'affichage (validé)
+### Display Pipeline (validated)
 
 ```
-GSU PLOT/STW → SRAM $70:0000 → DMA ch0 → VRAM $0000 → Tilemap identité → Écran
-                                  ↑                        ↑
-                          Source bank $70           VRAM $4000 (32×16 tiles)
-                          Mode $01 (2-reg)         Identity: tile[i] = i
-                          Dest $18 (VMDATAL)
+GSU PLOT/STW -> SRAM $70:0000 -> DMA ch0 -> VRAM $0000 -> Identity tilemap -> Screen
+                                   |                          |
+                           Source bank $70            VRAM $4000 (32x16 tiles)
+                           Mode $01 (2-reg)           tile[i] = i
+                           Dest $18 (VMDATAL)
 ```
 
-## Fichiers créés
+## Files Created
 
-| Fichier | Statut |
-|---------|--------|
-| `compiler/Makefile` | ✅ Ajout `wla-superfx` |
-| `templates/hdr_superfx.asm` | ✅ Header ROM (cart $14) |
-| `templates/memmap_gsu.inc` | ✅ Memory map GSU |
-| `templates/gsu_boot.sfx` | ✅ Boot stub par défaut |
-| `make/common.mk` | ✅ USE_SUPERFX, GSUSRC, pipeline |
-| `lib/Makefile` | ✅ Build variant superfx |
-| `lib/include/snes/superfx.h` | ✅ Registres + API |
-| `lib/source/superfx.c` | ✅ gsuInit() |
-| `templates/crt0.asm` | ✅ .ifdef SUPERFX init |
-| `examples/memory/superfx_hello/` | ✅ Boot diagnostic |
-| `examples/graphics/effects/superfx_bitmap/` | ❌ En cours (SRAM issue) |
+| File | Status |
+|------|--------|
+| `compiler/Makefile` | Ajout `wla-superfx` |
+| `templates/hdr_superfx.asm` | Header ROM (cart $14) |
+| `templates/memmap_gsu.inc` | Memory map GSU |
+| `templates/gsu_boot.sfx` | Boot stub par defaut |
+| `make/common.mk` | USE_SUPERFX, GSUSRC, pipeline |
+| `lib/Makefile` | Build variant superfx |
+| `lib/include/snes/superfx.h` | Registers + API |
+| `lib/source/superfx.c` | gsuInit() |
+| `templates/crt0.asm` | .ifdef SUPERFX init |
+| `examples/memory/superfx_hello/` | Boot diagnostic -- working |
+| `examples/graphics/effects/superfx_bitmap/` | STW pipeline works, PLOT WIP |
 
-## Ressources à consulter
+## Resources
 
-- [ ] SuperFX homebrew existants (GitHub, SMW Central)
-- [ ] Code source Mesen2 pour le SuperFX (comportement exact des registres)
-- [ ] SnesLab wiki SuperFX : https://sneslab.net/wiki/Super_FX
-- [ ] jsgroth blog SuperFX : https://jsgroth.dev/blog/posts/snes-coprocessors-part-7/
-- [ ] Super FX Development Kit (SMW Central) : https://www.smwcentral.net/?p=viewthread&t=81692
-- [ ] sfxasm (assembleur alternatif) : https://github.com/MrGlockenspiel/sfxasm — peut contenir des exemples
-- [ ] DiscoC (compilateur C expérimental pour GSU) : https://github.com/DiscoManOfficial/DiscoC
+- [x] casfx (GitHub) -- consulted for PLOT/CMODE/COLOR sequence, SCBR config
+- [x] DOOM-FX (GitHub) -- consulted for GSU init sequence and bus arbitration
+- [x] snes-sfx-demo (GitHub) -- consulted for minimal SuperFX homebrew example
+- [ ] Mesen2 source code for SuperFX (exact register behavior)
+- [ ] SnesLab wiki SuperFX: https://sneslab.net/wiki/Super_FX
+- [ ] jsgroth blog SuperFX: https://jsgroth.dev/blog/posts/snes-coprocessors-part-7/
+- [ ] Super FX Development Kit (SMW Central): https://www.smwcentral.net/?p=viewthread&t=81692
+- [ ] sfxasm (alternative assembler): https://github.com/MrGlockenspiel/sfxasm
+- [ ] DiscoC (experimental C compiler for GSU): https://github.com/DiscoManOfficial/DiscoC
 
-## Leçon apprise
+## Lessons Learned
 
-**Ne pas deviner.** Chercher du code qui fonctionne, comparer pas à pas, valider chaque étape.
-L'approche SA-1 (même ISA, vérification Mesen2 debugger) ne s'applique pas au SuperFX
-car c'est un CPU RISC avec un bus exclusif et un modèle mémoire différent.
+**Do not guess.** Find working code, compare step by step, validate each stage.
+The SA-1 approach (same ISA, Mesen2 debugger verification) does not apply to SuperFX
+because it is a RISC CPU with an exclusive bus and a different memory model.
+
+**Use bsnes as reference emulator.** Mesen2 has a confirmed backward branch bug
+for GSU code. Always validate SuperFX behavior on bsnes first, then cross-check
+with Mesen2 for register-level debugging.
+
+**snes9x does not support SuperFX** in our ROM configuration. opensnes-emu
+(snes9x-based) cannot be used for SuperFX testing -- screenshots will show
+"GSU: NOT DETECTED" or a black screen.

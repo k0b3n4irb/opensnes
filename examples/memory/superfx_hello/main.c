@@ -12,8 +12,15 @@
  * - GSU R0 result: $CAFE confirms the GSU executed code correctly
  * - If no SuperFX hardware: "NOT DETECTED" message
  *
+ * @par SNES Concepts
+ * - SuperFX (GSU) coprocessor detection and communication
+ * - WRAM stub execution (CPU cannot read ROM while GSU owns the bus)
+ * - SRAM shared memory between SNES CPU and GSU
+ *
  * @par Modules Used
  * console, sprite, dma, background, text, superfx
+ *
+ * @see examples/graphics/effects/superfx_bitmap for GSU framebuffer rendering
  */
 
 #include <snes.h>

@@ -6,9 +6,20 @@
  * The GSU fills 16KB of SRAM with a tile pattern (unrolled, no branches).
  * The SNES CPU then DMAs the result to VRAM for display.
  *
+ * @par SNES Concepts
+ * - SuperFX (GSU) PLOT instruction for pixel rendering in bitplane format
+ * - GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline
+ * - Identity tilemap for framebuffer-style display
+ * - SCMR configuration (color depth, screen height, bus ownership)
+ *
  * @par What to Observe
  * - Top 128 pixels should be solid green (color 5 from palette)
- * - Proves the full GSU→SRAM→DMA→VRAM pipeline works
+ * - Proves the full GSU-SRAM-DMA-VRAM pipeline works
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, text, superfx
+ *
+ * @see examples/memory/superfx_hello for GSU boot diagnostic
  */
 
 #include <snes.h>
