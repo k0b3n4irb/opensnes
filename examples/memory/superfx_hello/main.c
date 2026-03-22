@@ -26,6 +26,7 @@ extern void launchGSU(void);
 extern u16 gsu_result;
 extern u8 gsu_sram_byte0;
 extern u8 gsu_sram_byte1;
+extern u16 gsu_sram_word;
 
 /** @brief Convert a nibble to hex ASCII */
 static u8 hexchar(u8 n) {
@@ -90,13 +91,23 @@ int main(void) {
         textPrintAt(3, 12, "SRAM[0,1]:");
         textPrintAt(14, 12, (char*)buf);
 
-        if (result == 0xCAFE && gsu_sram_byte0 == 0x42 && gsu_sram_byte1 == 0x55) {
-            textPrintAt(3, 15, "ALL TESTS PASSED!");
+        /* Display STW result */
+        buf[0] = '$';
+        buf[1] = hexchar((gsu_sram_word >> 12) & 0x0F);
+        buf[2] = hexchar((gsu_sram_word >> 8) & 0x0F);
+        buf[3] = hexchar((gsu_sram_word >> 4) & 0x0F);
+        buf[4] = hexchar(gsu_sram_word & 0x0F);
+        buf[5] = 0;
+        textPrintAt(3, 14, "STW[2,3]:");
+        textPrintAt(13, 14, (char*)buf);
+
+        if (result == 0xCAFE && gsu_sram_byte0 == 0x42
+            && gsu_sram_byte1 == 0x55 && gsu_sram_word == 0xBEEF) {
+            textPrintAt(3, 17, "ALL TESTS PASSED!");
         } else if (result == 0xCAFE) {
-            textPrintAt(3, 15, "R0 OK, SRAM FAIL!");
-            textPrintAt(3, 16, "EXPECT: $42 $55");
+            textPrintAt(3, 17, "R0 OK, SRAM PARTIAL");
         } else {
-            textPrintAt(3, 15, "GSU: WRONG VALUE!");
+            textPrintAt(3, 17, "TESTS FAILED!");
         }
     } else {
         textPrintAt(3, 6, "GSU: NOT DETECTED");

@@ -1,0 +1,26 @@
+; SuperFX (GSU) — Fully unrolled fill using .REPT
+; Backward branches on the GSU don't work reliably (Mesen2 emulation issue?).
+; Workaround: .REPT generates 8192 sequential STW+INC+INC instructions.
+; 8192 words × 2 bytes = 16384 bytes = 16KB framebuffer fill.
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_render:
+    IBT R0, #$70
+    RAMB
+
+    ; Fill entire 16KB framebuffer with $00FF (color 5 = green)
+    IWT R0, #$00FF
+    IWT R1, #$0000
+
+    .REPT 8192
+    STW (R1)
+    INC R1
+    INC R1
+    .ENDR
+
+    STOP
+    NOP

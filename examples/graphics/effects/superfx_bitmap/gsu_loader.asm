@@ -13,7 +13,7 @@
 ;------------------------------------------------------------------------------
 .SECTION ".gsu_code" SUPERFREE
 gsu_program:
-    .incbin "gsu_hello.sfx.bin"
+    .incbin "gsu_render.sfx.bin"
 gsu_program_end:
 .ENDS
 
@@ -120,6 +120,65 @@ _wram_stub:
     rtl
 _wram_stub_end:
 
+.ENDS
+
+;------------------------------------------------------------------------------
+; setupBitmapTilemap — Identity tilemap (tiles 0-511) at VRAM $4000
+;------------------------------------------------------------------------------
+.SECTION ".gsu_tilemap" SEMIFREE
+.ACCU 16
+.INDEX 16
+setupBitmapTilemap:
+    php
+    sep #$20
+    .ACCU 8
+    lda #$80
+    sta.l $2115
+    rep #$20
+    .ACCU 16
+    lda #$4000
+    sta.l $2116
+    ldx #$0000
+-   stx $2118
+    inx
+    cpx #$0200
+    bne -
+    plp
+    rtl
+.ENDS
+
+;------------------------------------------------------------------------------
+; dmaBitmapToVRAM — DMA 16KB from SRAM $70:0000 to VRAM $0000
+;------------------------------------------------------------------------------
+.SECTION ".gsu_dma" SEMIFREE
+.ACCU 16
+.INDEX 16
+dmaBitmapToVRAM:
+    php
+    sep #$20
+    .ACCU 8
+    lda #$80
+    sta.l $2115
+    rep #$20
+    .ACCU 16
+    lda #$0000
+    sta.l $2116
+    lda #16384
+    sta.l $4305
+    lda #$0000
+    sta.l $4302
+    sep #$20
+    .ACCU 8
+    lda #$70
+    sta.l $4304
+    lda #$01
+    sta.l $4300
+    lda #$18
+    sta.l $4301
+    lda #$01
+    sta.l $420B
+    plp
+    rtl
 .ENDS
 
 .endif
