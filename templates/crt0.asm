@@ -122,6 +122,7 @@
     mouseSensitivity dsb 2  ; Current sensitivity per port (0-2)
     mouseRequestChangeSensitivity dsb 2 ; Deferred sensitivity command per port
     sa1_status      dsb 1   ; SA-1 boot status ($A5=OK, $00=not started/failed)
+    superfx_status  dsb 1   ; SuperFX GSU version (0=not detected, non-zero=chip version)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -609,6 +610,32 @@ _sa1_iram_fail:
 
 _sa1_init_done:
     rep #$20
+.endif
+
+.ifdef SUPERFX
+    ;--------------------------------------------------------------------------
+    ; SuperFX (GSU) Initialization
+    ;--------------------------------------------------------------------------
+    ; Put GSU in known state: SNES CPU owns all buses, SRAM writable.
+    ; The GSU is NOT started here — user code calls gsuRun() when ready.
+    ;--------------------------------------------------------------------------
+    sep #$20
+    .ACCU 8
+
+    ; SCMR: SNES CPU owns ROM and RAM (GSU dormant)
+    lda #$00
+    sta.l $303A
+
+    ; BRAMR: enable SRAM writes from SNES CPU side
+    lda #$01
+    sta.l $3033
+
+    ; Read GSU version register to confirm hardware present
+    lda.l $303B             ; VCR (Version Code Register)
+    sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
+
+    rep #$20
+    .ACCU 16
 .endif
 
     ; Call main() - use JSL since generated code returns with RTL

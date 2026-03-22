@@ -1,0 +1,14 @@
+; SuperFX (GSU) Hello World Program
+;
+; Sets R0 = $CAFE as proof-of-life, then STOP.
+; The SNES CPU reads R0 back after the GSU halts.
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_start:
+    IWT R0, #$CAFE         ; R0 = $CAFE (16-bit immediate)
+    STOP                   ; Halt GSU, trigger IRQ to SNES CPU
+    NOP                    ; Safety
