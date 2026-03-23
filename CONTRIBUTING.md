@@ -4,7 +4,7 @@ Thank you for your interest in contributing to OpenSNES!
 
 ## Code of Conduct
 
-Be respectful, constructive, and welcoming to newcomers.
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 SNES development is niche — every contributor matters.
 
 ## Reporting Bugs
@@ -30,10 +30,16 @@ gh repo fork k0b3n4irb/opensnes
 git clone https://github.com/YOUR_NAME/opensnes
 cd opensnes
 git remote add upstream https://github.com/k0b3n4irb/opensnes
-git checkout -b feature/my-feature
+git fetch upstream develop
+git checkout -b feature/my-feature upstream/develop
 ```
 
 ### Pull Request Rules
+
+#### Target branch
+
+All PRs must be submitted against the **`develop`** branch.
+PRs targeting `main` will be closed without review — `main` is updated only through releases.
 
 #### One topic per PR
 

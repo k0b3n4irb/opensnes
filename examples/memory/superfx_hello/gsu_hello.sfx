@@ -1,0 +1,35 @@
+; SuperFX (GSU) Hello World + SRAM test
+;
+; 1. Sets R0 = $CAFE (register test)
+; 2. Writes $42 to SRAM[0] via STB (SRAM write test)
+; 3. STOP
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_start:
+    ; Set SRAM bank (following DOOM-FX pattern)
+    IBT R0, #$70
+    RAMB                    ; RAMBR = 0 (first SRAM bank)
+
+    ; Test 1: STB — write single bytes
+    IBT R0, #$42            ; value
+    IBT R1, #$00            ; SRAM address = 0
+    STB (R1)                ; SRAM[0] = $42 (byte write)
+
+    IBT R0, #$55
+    IBT R1, #$01
+    STB (R1)                ; SRAM[1] = $55
+
+    ; Test 2: STW — write 16-bit word
+    IWT R0, #$BEEF          ; value (little-endian: $EF at [2], $BE at [3])
+    IBT R1, #$02            ; SRAM address = 2
+    STW (R1)                ; SRAM[2..3] = $BEEF
+
+    ; Set R0 = $CAFE for register test
+    IWT R0, #$CAFE
+
+    STOP
+    NOP

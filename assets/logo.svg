@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="512" height="512">
+  <!-- OpenSNES Logo — Variant 2: Retro Moderne -->
+  <!-- Clean pixel art with soft shadows and rounded feel -->
+  <!-- SNES-inspired palette, NO Nintendo references -->
+
+  <defs>
+    <linearGradient id="cartGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7161de"/>
+      <stop offset="100%" stop-color="#4a4a6a"/>
+    </linearGradient>
+    <linearGradient id="labelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b4555"/>
+      <stop offset="100%" stop-color="#1a2a3a"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#0a0a1e" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" fill="#12121e" rx="16"/>
+
+  <!-- Cartridge body with rounded corners -->
+  <rect x="40" y="20" width="176" height="172" rx="8" fill="url(#cartGrad)" filter="url(#shadow)"/>
+
+  <!-- Cart top ridge -->
+  <rect x="56" y="20" width="144" height="14" rx="4" fill="#8a7aee"/>
+
+  <!-- Connector pins -->
+  <rect x="64" y="192" width="128" height="28" rx="4" fill="#2a2a4a"/>
+  <g fill="#6a6a8a" opacity="0.7">
+    <rect x="72" y="198" width="6" height="14" rx="1"/>
+    <rect x="86" y="198" width="6" height="14" rx="1"/>
+    <rect x="100" y="198" width="6" height="14" rx="1"/>
+    <rect x="114" y="198" width="6" height="14" rx="1"/>
+    <rect x="128" y="198" width="6" height="14" rx="1"/>
+    <rect x="142" y="198" width="6" height="14" rx="1"/>
+    <rect x="156" y="198" width="6" height="14" rx="1"/>
+    <rect x="170" y="198" width="6" height="14" rx="1"/>
+  </g>
+
+  <!-- Label area -->
+  <rect x="52" y="48" width="152" height="112" rx="6" fill="url(#labelGrad)"/>
+  <!-- Label border glow -->
+  <rect x="52" y="48" width="152" height="3" rx="1" fill="#0bdb52" opacity="0.6"/>
+  <rect x="52" y="157" width="152" height="3" rx="1" fill="#0bdb52" opacity="0.6"/>
+
+  <!-- "OS" Large pixel letters - centered -->
+  <!-- O: 7 columns x 9 rows, pixel size = 8px -->
+  <g shape-rendering="crispEdges">
+    <!-- O letter -->
+    <rect x="64" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="72" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="80" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="88" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="56" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="64" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="88" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="96" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="56" y="80" width="8" height="8" fill="#0bdb52"/>
+    <rect x="96" y="80" width="8" height="8" fill="#0bdb52"/>
+    <rect x="56" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="96" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="56" y="96" width="8" height="8" fill="#0bdb52"/>
+    <rect x="96" y="96" width="8" height="8" fill="#0bdb52"/>
+    <rect x="56" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="64" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="88" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="96" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="64" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="72" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="80" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="88" y="112" width="8" height="8" fill="#0bdb52"/>
+
+    <!-- S letter -->
+    <rect x="120" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="128" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="136" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="144" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="152" y="64" width="8" height="8" fill="#0bdb52"/>
+    <rect x="112" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="120" y="72" width="8" height="8" fill="#0bdb52"/>
+    <rect x="112" y="80" width="8" height="8" fill="#0bdb52"/>
+    <rect x="120" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="128" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="136" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="144" y="88" width="8" height="8" fill="#0bdb52"/>
+    <rect x="152" y="96" width="8" height="8" fill="#0bdb52"/>
+    <rect x="160" y="96" width="8" height="8" fill="#0bdb52"/>
+    <rect x="152" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="160" y="104" width="8" height="8" fill="#0bdb52"/>
+    <rect x="112" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="120" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="128" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="136" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="144" y="112" width="8" height="8" fill="#0bdb52"/>
+    <rect x="152" y="112" width="8" height="8" fill="#0bdb52"/>
+
+    <!-- Code brackets < > in accent color -->
+    <rect x="176" y="80" width="8" height="8" fill="#e71861"/>
+    <rect x="184" y="88" width="8" height="8" fill="#e71861"/>
+    <rect x="176" y="96" width="8" height="8" fill="#e71861"/>
+  </g>
+
+  <!-- "OPENSNES" text -->
+  <text x="128" y="144" text-anchor="middle" font-family="'Courier New', monospace" font-size="14" fill="#a9b399" letter-spacing="3" font-weight="bold">OPENSNES</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="52" y="168" width="60" height="4" rx="2" fill="#e71861" opacity="0.8"/>
+  <rect x="118" y="168" width="40" height="4" rx="2" fill="#f6d714" opacity="0.8"/>
+  <rect x="164" y="168" width="40" height="4" rx="2" fill="#0bdb52" opacity="0.8"/>
+
+  <!-- "SDK" badge -->
+  <rect x="164" y="174" width="36" height="14" rx="3" fill="#e71861"/>
+  <text x="182" y="185" text-anchor="middle" font-family="'Courier New', monospace" font-size="10" fill="#f5f5f5" font-weight="bold">SDK</text>
+
+  <!-- Subtle corner decorations -->
+  <rect x="44" y="228" width="4" height="4" fill="#7161de" opacity="0.3"/>
+  <rect x="208" y="228" width="4" height="4" fill="#7161de" opacity="0.3"/>
+</svg>

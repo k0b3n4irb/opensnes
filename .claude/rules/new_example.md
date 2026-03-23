@@ -1,4 +1,9 @@
-# New Example Checklist (Auto-loaded)
+---
+paths:
+  - "examples/**/*"
+---
+
+# New Example Checklist
 
 ## MANDATORY: Before writing OR PORTING any example
 
@@ -112,7 +117,4 @@ Reference it in README.md as `![Screenshot](screenshot.png)`.
 
 ## Before Committing
 
-1. `make clean && make` — full rebuild must pass
-2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick`
-3. Ask user for Mesen2 validation
-4. No `Co-Authored-By` in commit message
+See `.claude/rules/testing.md` for the full workflow (Class C change for examples).

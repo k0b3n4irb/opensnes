@@ -47,6 +47,7 @@ endif
 
 CC       := $(OPENSNES)/bin/cc65816
 AS       := $(OPENSNES)/bin/wla-65816
+GSU_AS   := $(OPENSNES)/bin/wla-superfx
 LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
@@ -73,21 +74,22 @@ USE_HIROM   ?= 0
 USE_FASTROM ?= 0
 USE_SRAM    ?= 0
 USE_SA1     ?= 0
+USE_SUPERFX ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
 SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
+GSUSRC      ?=
 ROMSIZE     ?= $$08
 
 # Derived configuration (one-liners using $(if))
-# SA-1 uses LoROM bank layout but different header and cartridge type
-LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_HIROM)),hirom,lorom))
+LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
 RUNTIME_OBJ  := $(LIBDIR)/runtime-asm.o
-HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm))
+HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_SUPERFX)),hdr_superfx.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm)))
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SRAM)),$$02,$$00))
-SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00))
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_SRAM)),$$02,$$00)))
+SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD auto-add modules
@@ -100,7 +102,7 @@ LIB_MODULES += snesmod
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 # OAM helpers (standalone projects without library)
 OAM_HELPERS_OBJ := $(if $(filter 0,$(USE_LIB)),oam_helpers.o)
@@ -144,6 +146,7 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
 C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
+GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
 
 # Add soundbank header for C compilation dependency
@@ -154,6 +157,8 @@ endif
 # Extract .incbin dependencies from ASMSRC
 INCBIN_DEPS := $(if $(ASMSRC),$(shell grep -hi '\.incbin' $(ASMSRC) 2>/dev/null | \
     sed -n 's/.*\.incbin[[:space:]]*"\([^"]*\)".*/\1/p' | sort -u))
+# GSU binaries must be built before ASM objects that .incbin them
+INCBIN_DEPS += $(GSU_BINS)
 
 #------------------------------------------------------------------------------
 # Build Targets
@@ -191,6 +196,20 @@ $(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1)
 	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
 endef
 $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
+
+#------------------------------------------------------------------------------
+# SuperFX (GSU) Assembly — two-stage build: .sfx → .sfx.o → .sfx.bin
+#------------------------------------------------------------------------------
+
+ifneq ($(GSUSRC),)
+%.sfx.bin: %.sfx
+	@echo "[GSU] $< -> $@"
+	@$(GSU_AS) -I $(TEMPLATES) -o $*.sfx.o $<
+	@echo "[objects]" > $*.sfx.link
+	@echo "$*.sfx.o" >> $*.sfx.link
+	@$(LD) -b $*.sfx.link $@
+	@rm -f $*.sfx.o $*.sfx.link
+endif
 
 #------------------------------------------------------------------------------
 # Compilation
@@ -308,3 +327,4 @@ clean:
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET)
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
+	@rm -f $(GSU_BINS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link)

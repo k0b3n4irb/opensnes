@@ -39,6 +39,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
+@subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
+
 ## Hardware Reference
 
 @subpage hardware_overview -- CPU, PPU, APU architecture
