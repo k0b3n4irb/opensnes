@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo_128x128.png" alt="OpenSNES" width="128" height="128"/>
+
 # OpenSNES
 
 **Modern, open-source SDK for Super Nintendo development**
@@ -20,7 +22,7 @@
 
 ## Introduction
 
-OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 41 example ROMs.
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 52 example ROMs.
 
 This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
@@ -51,7 +53,7 @@ If that sounds exciting rather than terrifying, you're in the right place.
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
 | **28-module hardware library** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **41 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **52 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Debug emulator** | snes9x WASM with 212 automated checks |
 | **Cross-platform** | Linux, macOS, Windows — CI-tested on all three |
 
@@ -69,7 +71,7 @@ For prerequisites and platform-specific setup, see the **[Getting Started guide]
 
 ## Examples
 
-41 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+52 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
 
 **[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
 

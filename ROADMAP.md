@@ -4,14 +4,13 @@ Current state of the project and planned work.
 
 ---
 
-## Current Status: v0.7.1
+## Current Status: v0.11.0
 
-A modern, well-tested SNES SDK ready for serious hobby development and game jams,
+A modern, well-tested SNES SDK ready for serious hobby development, game jams, and educational use,
 building toward commercial-grade maturity. The compiler produces code 30% faster than
-PVSnesLib+816-opt on our benchmark suite. 37 working examples cover all major subsystems,
+PVSnesLib+816-opt on our benchmark suite. 52 working examples cover all major subsystems,
 with cross-platform CI on Linux, macOS, and Windows. Pre-built SDK binaries are available
-for Linux, macOS, and Windows.
-
+for all three platforms.
 
 ---
 
@@ -23,7 +22,7 @@ for Linux, macOS, and Windows.
 - [x] **wla-spc700** — SPC700 audio assembler
 - [x] **gfx4snes** — PNG/BMP to SNES tiles, palettes, tilemaps
 - [x] **font2snes** — Font converter
-- [x] **smconv** — Impulse Tracker (.it) to SNESMOD soundbank
+- [x] **smconv** — Impulse Tracker (.it) to SNESMOD soundbank (rewritten in pure C)
 
 ### Compiler Optimizations (13 phases)
 - [x] Dead jump elimination + A-register cache
@@ -44,20 +43,20 @@ for Linux, macOS, and Windows.
 | Module | Description |
 |--------|-------------|
 | `console` | Init, screen control, VBlank |
-| `sprite` | OAM management, dynamic sprites, LUT-based |
+| `sprite` | OAM management, dynamic sprites, metasprites, LUT-based |
 | `background` | BG layers, tilemaps, scrolling with dirty bitmask |
 | `dma` | DMA transfers (VRAM, CGRAM, OAM) |
 | `hdma` | HDMA effects (gradients, wave, ripple, iris, parallax) |
-| `input` | Joypad, mouse, Super Scope |
+| `input` | Joypad, mouse, Super Scope, MultiPlayer5 |
 | `text` | Text rendering (2bpp and 4bpp) |
-| `snesmod` | Tracker music and SFX (IT format) |
+| `snesmod` | Tracker music and SFX (IT format, multi-bank support) |
 | `mode7` | Mode 7 rotation/scaling |
 | `window` | Window masking |
 | `colormath` | Transparency, color blending |
 | `collision` | Bounding box collision |
 | `animation` | Sprite animation system |
 | `entity` | Game entity management |
-| `math` | Fixed-point math, lookup tables |
+| `math` | Fixed-point math, lookup tables, hardware multiplier |
 | `sram` | Save RAM (battery-backed persistence) |
 | `mosaic` | Mosaic pixelation effect |
 | `interrupt` | NMI/IRQ handlers |
@@ -67,42 +66,50 @@ for Linux, macOS, and Windows.
 | `scoring` | Score tracking |
 | `debug` | Nocash messages, Mesen breakpoints, assertions |
 | `video` | Video mode and display control |
+| `sa1` | SA-1 enhancement chip (10.74 MHz coprocessor) |
 
-### Examples (37)
+### Examples (52)
 - **Text**: hello_world, text_test
-- **Sprites**: simple_sprite, animated_sprite, dynamic_sprite, metasprite, object_size
-- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode7, mode7_perspective, continuous_scroll, mixed_scroll
+- **Sprites**: simple_sprite, animated_sprite, dynamic_sprite, dynamic_metasprite, metasprite, object_size
+- **Backgrounds**: mode0, mode1, mode1_bg3_priority, mode1_lz77, mode3, mode5, mode7, mode7_perspective, continuous_scroll, mixed_scroll
 - **Effects**: fading, hdma_wave, hdma_gradient, hdma_helpers, gradient_colors, parallax_scrolling, mosaic, transparency, window, transparent_window
 - **Input**: two_players, mouse, superscope
-- **Audio**: snesmod_music, snesmod_sfx
-- **Memory**: save_game, hirom_demo
-- **Maps**: dynamic_map, slopemario
-- **Basics**: collision_demo
-- **Games**: breakout, likemario, mapandobjects
+- **Audio**: snesmod_music, snesmod_sfx, snesmod_music_large, snesmod_music_hirom
+- **Memory**: save_game, hirom_demo, sa1_hello, sa1_speed, sa1_starfield
+- **Maps**: dynamic_map, mapscroll, slopemario, tiled
+- **Basics**: collision_demo, random, timer
+- **Games**: breakout, likemario, mapandobjects, tetris
 
 ### Build System
 - [x] Cross-platform (Linux, macOS, Windows/MSYS2)
-- [x] LoROM (default) and HiROM support
+- [x] LoROM (default), HiROM, and SA-1 support
 - [x] SRAM support
 - [x] Library module selection (`LIB_MODULES=...`)
 - [x] Automatic module dependency resolution
 - [x] Multi-file C compilation (`CSRC` variable)
-- [x] CI/CD pipeline (GitHub Actions)
-- [x] SDK release packaging (`make release`)
+- [x] CI/CD pipeline (GitHub Actions) — build, test, docs, release
+- [x] SDK release packaging (`make release`) with pre-built binaries
+- [x] Unified memmap files (single source of truth)
+- [x] VS Code project configuration
 
-### Testing
-- [x] 60 compiler regression tests
-- [x] 25 unit test modules (~385 runtime + 119 compile-time assertions)
-- [x] 37 example validations with memory overlap checking
+### Testing & Quality
+- [x] opensnes-emu debug emulator (snes9x WASM) — single source of truth
+- [x] 212 automated checks across 7 phases
+- [x] 60 compiler regression tests (C → ASM pattern checks)
+- [x] Visual regression (pixel-exact screenshot baselines)
+- [x] Lag frame detection
 - [x] Multi-platform CI (Linux, macOS, Windows)
+- [x] Zero compiler warnings (72 Clang warnings fixed)
 
 ### Documentation
 - [x] Doxygen API reference with doxygen-awesome-css theme
-- [x] Example READMEs with hardware explanations (37/37)
-- [x] Progressive learning path (GETTING_STARTED, LEARNING_PATH, EXAMPLE_WALKTHROUGHS)
+- [x] Example READMEs with hardware explanations (52/52)
+- [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
+- [x] 9 tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] CHANGELOG, CONTRIBUTING, GitHub templates
+- [x] Published benchmark: 30% faster than PVSnesLib+816-opt
+- [x] CHANGELOG, CONTRIBUTING, GitHub templates (issues + PR)
 
 ### Developer Tooling (8 tools)
 - [x] **symmap.py** — Symbol map analysis, memory overlap detection, bank overflow checking
@@ -126,6 +133,8 @@ for Linux, macOS, and Windows.
 | Hardware verification docs | Not started | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
 | Published performance benchmark | Done (docs/BENCHMARK.md) | Marketing — show the 30% improvement with data |
+| Migration guide PVSnesLib → OpenSNES | Not started | Smoothest adoption path for existing PVSnesLib users |
+| FAQ | Not started | Reduces support load, answers common questions upfront |
 
 ### Nice-to-Have
 
@@ -135,25 +144,16 @@ for Linux, macOS, and Windows.
 | Tiled map editor integration | Not started | Workflow convenience for level designers |
 | ~~VSCode project configuration~~ | Done (v0.7.1) | Developer experience improvement |
 | Video tutorials | Not started | Wider audience reach |
-| More ported examples | In progress | Breadth of coverage |
+| Project scaffolding (`opensnes init`) | Not started | Reduce friction for new users creating their own game |
 
-### Short Term (v0.8.0)
-- [x] Pre-built binary releases for Linux, macOS, Windows (done v0.7.0)
-- [x] Published benchmark results (done v0.7.0)
-- [x] VS Code project configuration (done v0.7.1)
+### Next Steps
+
 - [ ] More compiler peephole optimizations
 - [ ] Performance profiling tools (VBlank usage, cycle counter)
-
-### Medium Term (v0.8.0-v0.9.0)
-- [ ] Tutorial series for beginners
 - [ ] Mode 7 game example (racing or flying)
 - [ ] Streaming audio support
 - [ ] Hardware verification documentation
-
-### Long Term (v1.0)
 - [ ] At least 1 complete original game shipped
-- [ ] Comprehensive test suite with hardware verification
-- [ ] Complete API documentation coverage
 - [ ] Video tutorial series
 
 ---
@@ -171,4 +171,4 @@ for Linux, macOS, and Windows.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [README.md](README.md) for build instructions.
 
-*Last updated: 2026-03-10*
+*Last updated: 2026-03-22*

@@ -81,6 +81,7 @@ release/
 *.asm
 *.obj
 *.sfc
+*.bin
 *.h
 
 # But track source files (not generated artifacts)
