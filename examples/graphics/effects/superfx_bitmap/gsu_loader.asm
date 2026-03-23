@@ -90,10 +90,9 @@ _wram_stub:
 
     ; Set screen base for PLOT
     lda #$00
-    sta.l $3038              ; SCBR = $00 (SRAM base $0000)
+    sta.l $3038              ; SCBR = $00
 
-    ; Give buses to GSU + set PLOT mode
-    ; SCMR: 4bpp (bits 0-1=01) + height 128 (HT=00) + RAN + RON = $19
+    ; Give buses to GSU + set PLOT mode (4bpp + RAN + RON)
     lda #$19
     sta.l $303A              ; SCMR: 4bpp + RAN + RON
 
@@ -128,7 +127,11 @@ _wram_stub_end:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; setupBitmapTilemap — Identity tilemap (tiles 0-511) at VRAM $4000
+; setupBitmapTilemap — Column-major tilemap for SuperFX PLOT at VRAM $4000
+;------------------------------------------------------------------------------
+; PLOT stores tiles COLUMN-MAJOR: SRAM tile = col * 16 + row (height=128)
+; PPU tilemap is ROW-MAJOR: entry = row * 32 + col
+; So: tilemap[row*32 + col] = col * 16 + row
 ;------------------------------------------------------------------------------
 .SECTION ".gsu_tilemap" SEMIFREE
 .ACCU 16
@@ -143,16 +146,27 @@ setupBitmapTilemap:
     .ACCU 16
     lda #$4000
     sta.l $2116
-    ; Identity tiles 0-511 (top 128 pixels)
-    ldx #$0000
--   stx $2118
-    inx
-    cpx #$0200
-    bne -
 
-    ; Fill remaining 512 entries with tile 0 (black, bottom of screen)
+    ; Column-major tilemap: 32 cols x 16 rows
+    ldy #$0000               ; row (0-15)
+_tm_row:
+    ldx #$0000               ; col (0-31)
+    tya                      ; A = row
+_tm_col:
+    sta $2118                ; tile = col*16 + row
+    clc
+    adc #16                  ; next column
+    inx
+    cpx #32
+    bne _tm_col
+    iny
+    cpy #16
+    bne _tm_row
+
+    ; Fill remaining 512 entries with tile 0
     ldx #$0000
--   stx $2118
+    lda #$0000
+-   sta $2118
     inx
     cpx #$0200
     bne -

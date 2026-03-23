@@ -1,6 +1,10 @@
-; SuperFX (GSU) — Minimal PLOT test
-; Clear to $0000 (black), then PLOT one full row of red pixels (color 1)
-; If the top 8px band is red: PLOT works!
+; SuperFX (GSU) Gradient Renderer
+;
+; Draws 16 horizontal color bars across a 256x128 pixel framebuffer
+; using the PLOT hardware instruction.
+;
+; CRITICAL: Always add NOP padding between the last BNE and STOP.
+; The SuperFX pipeline pre-fetches STOP and halts before BNE can branch.
 
 .include "memmap_gsu.inc"
 
@@ -11,7 +15,7 @@ gsu_render:
     IBT R0, #$70
     RAMB
 
-    ; Clear 16KB to $0000 (black)
+    ; Clear 16KB framebuffer to $0000 (PLOT does read-modify-write)
     IWT R0, #$0000
     IWT R1, #$0000
     IWT R4, #8192
@@ -22,22 +26,47 @@ _clear:
     DEC R4
     BNE _clear
 
-    ; Set POR via CMODE (ref: casfx does this explicitly)
+    ; Set POR via CMODE (no transparency, no dither)
     IBT R0, #$00
-    CMODE                   ; POR = $00 (no transparency, no dither)
+    CMODE
 
-    ; Set color = 1 (red in our palette)
-    IBT R0, #$01
+    ; Render 16 color bars: 256 x 128 pixels
+    IBT R6, #$0F            ; AND mask
+    IBT R2, #$00            ; Y = 0
+    IWT R5, #128            ; 128 rows
+
+_row:
+    ; color = (Y / 8) & 15
+    MOVE R3, R2
+    WITH R3
+    LSR
+    WITH R3
+    LSR
+    WITH R3
+    LSR
+    WITH R3
+    AND R6
+    FROM R3
     COLOR
 
-    ; PLOT 256 pixels at Y=0 (first row)
-    IBT R1, #$00            ; X = 0
-    IBT R2, #$00            ; Y = 0
+    ; Plot 256 pixels across this row
+    IBT R1, #$00
     IWT R4, #256
-_plot:
-    PLOT                    ; plot (R1, R2), R1++
-    DEC R4
-    BNE _plot
 
+_col:
+    PLOT
+    DEC R4
+    BNE _col
+
+    ; Next row
+    INC R2
+    DEC R5
+    BNE _row
+
+    ; CRITICAL: NOP padding before STOP (pipeline pre-fetch fix)
+    NOP
+    NOP
+    NOP
+    NOP
     STOP
     NOP

@@ -1,23 +1,25 @@
 /**
  * @file main.c
- * @brief SuperFX Bitmap — GSU fills framebuffer, DMA to VRAM
+ * @brief SuperFX Bitmap — GSU renders rainbow gradient via PLOT
  * @ingroup examples
  *
- * The GSU fills 16KB of SRAM with a tile pattern (unrolled, no branches).
- * The SNES CPU then DMAs the result to VRAM for display.
+ * The GSU renders 16 horizontal color bars across a 256x128 pixel
+ * framebuffer using the hardware PLOT instruction. The SNES CPU
+ * DMAs the result from SRAM to VRAM for display.
  *
  * @par SNES Concepts
- * - SuperFX (GSU) PLOT instruction for pixel rendering in bitplane format
+ * - SuperFX PLOT instruction for pixel rendering in bitplane format
+ * - Column-major tile layout (PLOT stores tiles column-by-column)
  * - GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline
- * - Identity tilemap for framebuffer-style display
- * - SCMR configuration (color depth, screen height, bus ownership)
+ * - SCMR configuration (4bpp, height 128, bus ownership)
  *
  * @par What to Observe
- * - Top 128 pixels should be solid green (color 5 from palette)
- * - Proves the full GSU-SRAM-DMA-VRAM pipeline works
+ * - 16 horizontal rainbow color bars (black, red, orange, ... white)
+ * - Each bar is 8 pixels tall, spanning the full 256-pixel width
+ * - Rendered entirely by the SuperFX GSU at 10.74 MHz
  *
  * @par Modules Used
- * console, sprite, dma, background, text, superfx
+ * console, sprite, dma, background, superfx
  *
  * @see examples/memory/superfx_hello for GSU boot diagnostic
  */
@@ -30,10 +32,10 @@ extern void dmaBitmapToVRAM(void);
 extern void setupBitmapTilemap(void);
 
 static const u16 rainbow_pal[] = {
-    RGB( 0, 0, 0),   RGB(31, 0, 0),   RGB(31,16, 0),   RGB(31,31, 0),
-    RGB(16,31, 0),   RGB( 0,31, 0),   RGB( 0,31,16),   RGB( 0,31,31),
-    RGB( 0,16,31),   RGB( 0, 0,31),   RGB(16, 0,31),   RGB(31, 0,31),
-    RGB(31, 0,16),   RGB(20,20,20),   RGB(10,10,10),   RGB(31,31,31),
+    RGB( 0, 0, 0), RGB(31, 0, 0), RGB(31,16, 0), RGB(31,31, 0),
+    RGB(16,31, 0), RGB( 0,31, 0), RGB( 0,31,16), RGB( 0,31,31),
+    RGB( 0,16,31), RGB( 0, 0,31), RGB(16, 0,31), RGB(31, 0,31),
+    RGB(31, 0,16), RGB(20,20,20), RGB(10,10,10), RGB(31,31,31),
 };
 
 int main(void) {
@@ -50,10 +52,10 @@ int main(void) {
         while (1) { WaitForVBlank(); }
     }
 
-    /* GSU fills 16KB of SRAM with $00FF (green tiles) */
+    /* GSU renders gradient to SRAM */
     launchGSU();
 
-    /* DMA from SRAM $70:0000 to VRAM $0000 */
+    /* DMA from SRAM to VRAM */
     WaitForVBlank();
     setScreenOff();
     dmaBitmapToVRAM();
