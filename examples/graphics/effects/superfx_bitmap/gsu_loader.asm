@@ -84,9 +84,13 @@ _wram_stub:
     lda #$00
     sta.l $4200
 
-    ; Configure GSU
-    lda #$A0
-    sta.l $3037              ; CFGR: IRQ mask + fast multiply
+    ; Configure GSU (ref: casfx, DOOM-FX, PeterLemon)
+    lda #$80
+    sta.l $3037              ; CFGR: IRQ mask (PeterLemon uses $80)
+
+    ; 21.47 MHz clock (GSU-1/GSU-2 only, no effect on MC1)
+    lda #$01
+    sta.l $3039              ; CLSR = 21.47 MHz
 
     ; Set screen base for PLOT
     lda #$00

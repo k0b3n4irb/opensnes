@@ -1,8 +1,10 @@
 ; SuperFX (GSU) Gradient Renderer — 16 horizontal color bars
 ;
-; RULE: The SuperFX has a 1-instruction BRANCH DELAY SLOT.
-; The instruction after BNE/BRA ALWAYS executes (taken or not).
-; Put NOP after every branch to prevent side effects.
+; RULES:
+; 1. NOP after every BNE/BRA (branch delay slot)
+; 2. NOP×2 before STOP (STOP pre-fetch + MC1 safety)
+; 3. RPIX after PLOT loops (flush pixel cache)
+; 4. CACHE before hot loops (~3x speedup: 1 cycle vs 3-5 from ROM)
 
 .include "memmap_gsu.inc"
 
@@ -13,17 +15,19 @@ gsu_render:
     IBT R0, #$70
     RAMB
 
-    ; Clear 16KB framebuffer
+    ; Clear 16KB framebuffer (STW — not affected by CACHE/PLOT config)
     IWT R0, #$0000
     IWT R1, #$0000
     IWT R4, #8192
+
+    CACHE                   ; cache the clear loop (~3x faster)
 _clear:
     STW (R1)
     INC R1
     INC R1
     DEC R4
     BNE _clear
-    NOP                     ; delay slot (fallthrough: IBT is benign, but be safe)
+    NOP                     ; delay slot
 
     ; Set POR (no transparency, no dither)
     IBT R0, #$00
@@ -33,6 +37,8 @@ _clear:
     IBT R6, #$0F
     IBT R2, #$00            ; Y = 0
     IWT R5, #128
+
+    CACHE                   ; cache the PLOT loop (critical for performance)
 
 _row:
     ; color = (Y / 8) & 15
@@ -58,11 +64,9 @@ _col:
     BNE _col
     NOP                     ; delay slot
 
-    ; Flush pixel cache (last 8 pixels stay in GSU internal cache)
-    ; RPIX reads pixel at (R1,R2) and flushes the write cache as side effect
-    ; (ref: PeterLemon/SNES uses RPIX after PLOT for this purpose)
-    IBT R1, #$00            ; valid X for RPIX
-    RPIX                    ; flush pixel cache → SRAM
+    ; Flush pixel cache
+    IBT R1, #$00
+    RPIX
 
     ; Next row
     INC R2
@@ -70,8 +74,6 @@ _col:
     BNE _row
     NOP                     ; delay slot
 
-    NOP
-    NOP
     NOP
     NOP
     STOP
