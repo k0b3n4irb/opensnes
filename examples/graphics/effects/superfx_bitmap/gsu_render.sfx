@@ -1,10 +1,8 @@
-; SuperFX (GSU) Gradient Renderer
+; SuperFX (GSU) Gradient Renderer — 16 horizontal color bars
 ;
-; Draws 16 horizontal color bars across a 256x128 pixel framebuffer
-; using the PLOT hardware instruction.
-;
-; CRITICAL: Always add NOP padding between the last BNE and STOP.
-; The SuperFX pipeline pre-fetches STOP and halts before BNE can branch.
+; RULE: The SuperFX has a 1-instruction BRANCH DELAY SLOT.
+; The instruction after BNE/BRA ALWAYS executes (taken or not).
+; Put NOP after every branch to prevent side effects.
 
 .include "memmap_gsu.inc"
 
@@ -15,7 +13,7 @@ gsu_render:
     IBT R0, #$70
     RAMB
 
-    ; Clear 16KB framebuffer to $0000 (PLOT does read-modify-write)
+    ; Clear 16KB framebuffer
     IWT R0, #$0000
     IWT R1, #$0000
     IWT R4, #8192
@@ -25,15 +23,16 @@ _clear:
     INC R1
     DEC R4
     BNE _clear
+    NOP                     ; delay slot (fallthrough: IBT is benign, but be safe)
 
-    ; Set POR via CMODE (no transparency, no dither)
+    ; Set POR (no transparency, no dither)
     IBT R0, #$00
     CMODE
 
-    ; Render 16 color bars: 256 x 128 pixels
-    IBT R6, #$0F            ; AND mask
+    ; Render gradient: color = (Y / 8) & 15
+    IBT R6, #$0F
     IBT R2, #$00            ; Y = 0
-    IWT R5, #128            ; 128 rows
+    IWT R5, #128
 
 _row:
     ; color = (Y / 8) & 15
@@ -57,13 +56,14 @@ _col:
     PLOT
     DEC R4
     BNE _col
+    NOP                     ; delay slot
 
     ; Next row
     INC R2
     DEC R5
     BNE _row
+    NOP                     ; delay slot
 
-    ; CRITICAL: NOP padding before STOP (pipeline pre-fetch fix)
     NOP
     NOP
     NOP
