@@ -58,6 +58,12 @@ _col:
     BNE _col
     NOP                     ; delay slot
 
+    ; Flush pixel cache (last 8 pixels stay in GSU internal cache)
+    ; RPIX reads pixel at (R1,R2) and flushes the write cache as side effect
+    ; (ref: PeterLemon/SNES uses RPIX after PLOT for this purpose)
+    IBT R1, #$00            ; valid X for RPIX
+    RPIX                    ; flush pixel cache → SRAM
+
     ; Next row
     INC R2
     DEC R5
