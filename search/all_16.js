@@ -1,12 +1,12 @@
 var searchData=
 [
   ['k_0',['k',['../games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6',1,'main.c']]],
-  ['keep_20prs_20small_1',['Keep PRs small',['../contributing.html#autotoc_md1350',1,'']]],
-  ['key_20capabilities_2',['Key Capabilities',['../snes_sound_guide.html#autotoc_md336',1,'']]],
-  ['key_20concepts_3',['key concepts',['../examples_audio.html#autotoc_md514',1,'Key Concepts'],['../examples_basics.html#autotoc_md606',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md834',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md952',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1065',1,'Key Concepts'],['../examples_input.html#autotoc_md1108',1,'Key Concepts'],['../examples_memory.html#autotoc_md1230',1,'Key Concepts'],['../examples_text.html#autotoc_md1312',1,'Key Concepts'],['../hardware_overview.html#autotoc_md449',1,'Key Concepts']]],
-  ['key_20features_4',['Key Features',['../examples_audio_snesmod_music.html#autotoc_md524',1,'']]],
-  ['key_20memory_20regions_5',['Key Memory Regions',['../memory_map.html#autotoc_md418',1,'']]],
-  ['key_20snes_20concepts_6',['Key SNES Concepts',['../examples_maps.html#autotoc_md1189',1,'']]],
+  ['keep_20prs_20small_1',['Keep PRs small',['../contributing.html#autotoc_md1385',1,'']]],
+  ['key_20capabilities_2',['Key Capabilities',['../snes_sound_guide.html#autotoc_md355',1,'']]],
+  ['key_20concepts_3',['key concepts',['../examples_audio.html#autotoc_md533',1,'Key Concepts'],['../examples_basics.html#autotoc_md625',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md853',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md971',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1092',1,'Key Concepts'],['../examples_input.html#autotoc_md1135',1,'Key Concepts'],['../examples_memory.html#autotoc_md1257',1,'Key Concepts'],['../examples_text.html#autotoc_md1346',1,'Key Concepts'],['../hardware_overview.html#autotoc_md468',1,'Key Concepts']]],
+  ['key_20features_4',['Key Features',['../examples_audio_snesmod_music.html#autotoc_md543',1,'']]],
+  ['key_20memory_20regions_5',['Key Memory Regions',['../memory_map.html#autotoc_md437',1,'']]],
+  ['key_20snes_20concepts_6',['Key SNES Concepts',['../examples_maps.html#autotoc_md1216',1,'']]],
   ['key_5fa_7',['KEY_A',['../group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7',1,'input.h']]],
   ['key_5fb_8',['KEY_B',['../group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7',1,'input.h']]],
   ['key_5fdown_9',['KEY_DOWN',['../group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf',1,'input.h']]],

@@ -11,5 +11,7 @@ var searchData=
   ['sprite_2eh_8',['sprite.h',['../sprite_8h.html',1,'']]],
   ['sprites_2emd_9',['sprites.md',['../sprites_8md.html',1,'']]],
   ['sram_2eh_10',['sram.h',['../sram_8h.html',1,'']]],
-  ['system_2eh_11',['system.h',['../system_8h.html',1,'']]]
+  ['superfx_2eh_11',['superfx.h',['../superfx_8h.html',1,'']]],
+  ['superfx_2emd_12',['superfx.md',['../superfx_8md.html',1,'']]],
+  ['system_2eh_13',['system.h',['../system_8h.html',1,'']]]
 ];

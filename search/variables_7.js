@@ -17,5 +17,9 @@ var searchData=
   ['ground_5fpal_14',['ground_pal',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a534a970bd1fed69f5998c09e6e32abb9',1,'main.c']]],
   ['ground_5fpal_5fend_15',['ground_pal_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a04a03c1fe8deb545e3e59430f79c6d58',1,'main.c']]],
   ['ground_5ftiles_16',['ground_tiles',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a104cbd84dfd0889dd256703da2382a59',1,'main.c']]],
-  ['ground_5ftiles_5fend_17',['ground_tiles_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a91488c47affe2c43b79535f7663eea90',1,'main.c']]]
+  ['ground_5ftiles_5fend_17',['ground_tiles_end',['../graphics_2backgrounds_2mode7__perspective_2main_8c.html#a91488c47affe2c43b79535f7663eea90',1,'main.c']]],
+  ['gsu_5fresult_18',['gsu_result',['../memory_2superfx__hello_2main_8c.html#a6c8473de37b20dc95d9bc4cec1e11544',1,'main.c']]],
+  ['gsu_5fsram_5fbyte0_19',['gsu_sram_byte0',['../memory_2superfx__hello_2main_8c.html#aa882c498f78689f39c3987fcfba0fcda',1,'main.c']]],
+  ['gsu_5fsram_5fbyte1_20',['gsu_sram_byte1',['../memory_2superfx__hello_2main_8c.html#ad633a57bce552d45930a77ce98334e5b',1,'main.c']]],
+  ['gsu_5fsram_5fword_21',['gsu_sram_word',['../memory_2superfx__hello_2main_8c.html#ae17450f5f60c61ed81c1b9006b36db0f',1,'main.c']]]
 ];

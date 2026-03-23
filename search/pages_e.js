@@ -11,5 +11,6 @@ var searchData=
   ['graphics_20examples_8',['Graphics Examples',['../examples_graphics.html',1,'']]],
   ['graphics_20programming_20guide_9',['SNES Graphics Programming Guide',['../snes_graphics_guide.html',1,'index']]],
   ['ground_20effect_10',['Mode 7 Perspective -- Pseudo-3D Ground Effect',['../examples_graphics_backgrounds_mode7_perspective.html',1,'examples_by_category']]],
-  ['guide_11',['guide',['../code_style.html',1,'OpenSNES Code Style Guide'],['../snes_graphics_guide.html',1,'SNES Graphics Programming Guide'],['../snes_sound_guide.html',1,'SNES Sound Programming Guide']]]
+  ['gsu_20tutorial_11',['SuperFX (GSU) Tutorial',['../tutorial_superfx.html',1,'index']]],
+  ['guide_12',['guide',['../code_style.html',1,'OpenSNES Code Style Guide'],['../snes_graphics_guide.html',1,'SNES Graphics Programming Guide'],['../snes_sound_guide.html',1,'SNES Sound Programming Guide']]]
 ];

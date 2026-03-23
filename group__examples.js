@@ -28,6 +28,7 @@ var group__examples =
     [ "main.c", "graphics_2effects_2hdma__wave_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2mosaic_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2parallax__scrolling_2main_8c.html", null ],
+    [ "main.c", "graphics_2effects_2superfx__bitmap_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2transparency_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2transparent__window_2main_8c.html", null ],
     [ "main.c", "graphics_2effects_2window_2main_8c.html", null ],
@@ -50,6 +51,7 @@ var group__examples =
     [ "main.c", "memory_2sa1__speed_2main_8c.html", null ],
     [ "main.c", "memory_2sa1__starfield_2main_8c.html", null ],
     [ "main.c", "memory_2save__game_2main_8c.html", null ],
+    [ "main.c", "memory_2superfx__hello_2main_8c.html", null ],
     [ "main.c", "text_2hello__world_2main_8c.html", null ],
     [ "main.c", "text_2text__test_2main_8c.html", null ]
 ];

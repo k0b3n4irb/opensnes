@@ -100,15 +100,15 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_transparency
 <p>&zwj;Additive blending between two background layers: a static landscape with semi-transparent clouds scrolling over it. No input required. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md959"></a>
+<h2><a class="anchor" id="autotoc_md986"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/transparency</div>
 </div><!-- fragment --><p>Then open <code>transparency.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md960"></a>
+<h2><a class="anchor" id="autotoc_md987"></a>
 Controls</h2>
 <p>No interactive controls. The clouds scroll automatically.</p>
-<h2><a class="anchor" id="autotoc_md961"></a>
+<h2><a class="anchor" id="autotoc_md988"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES color math unit blends layers using CGWSEL and CGADSUB registers</li>
@@ -118,9 +118,9 @@ What You'll Learn</h2>
 <li>Using an assembly DMA loader for SUPERFREE graphics data with correct bank bytes</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md963"></a>
+<h2><a class="anchor" id="autotoc_md990"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md964"></a>
+<h3><a class="anchor" id="autotoc_md991"></a>
 Color Math: Main Screen + Sub Screen</h3>
 <p>The SNES PPU can blend two images together using its color math unit. The "main screen" is the final displayed image. The "sub screen" is a second, hidden rendering of selected layers whose pixel colors are used as the blend source.</p>
 <p>In this example:</p><ul>
@@ -128,14 +128,14 @@ Color Math: Main Screen + Sub Screen</h3>
 <li><b>Sub screen</b>: BG3 (clouds) &ndash; provides the color values for blending</li>
 </ul>
 <p>The color math unit takes each main screen pixel and <b>adds</b> the corresponding sub screen pixel color to it. Where clouds overlap the landscape, the cloud colors brighten the landscape beneath them. Where there are no cloud pixels, no addition occurs.</p>
-<h3><a class="anchor" id="autotoc_md965"></a>
+<h3><a class="anchor" id="autotoc_md992"></a>
 Mode 1 with BG3 Priority High</h3>
 <p>Mode 1 normally draws BG3 (2bpp) behind BG1 (4bpp). Setting <code>BG3_MODE1_PRIORITY_HIGH</code> promotes BG3's high-priority tiles above all other BG layers, which is essential for the cloud overlay to render on top of the landscape.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, <a class="code hl_define" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a>);</div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:28</div></div>
 <div class="ttc" id="agroup__bg__priority_html_gaae7e8057f1919684b5f32fd7b7b3f24f"><div class="ttname"><a href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></div><div class="ttdeci">#define BG3_MODE1_PRIORITY_HIGH</div><div class="ttdef"><b>Definition</b> video.h:41</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md966"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md993"></a>
 Color Math Configuration</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a>();</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a>);  <span class="comment">/* Blend source = sub screen */</span></div>
@@ -150,13 +150,13 @@ Color Math Configuration</h3>
 <div class="ttc" id="acolormath_8h_html_aeb012e74893e9b0761ee5dd2f18bd1ef"><div class="ttname"><a href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a></div><div class="ttdeci">void colorMathInit(void)</div><div class="ttdoc">Initialize color math to defaults.</div></div>
 <div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
 </div><!-- fragment --><p>The <code>COLORMATH_BACKDROP</code> flag ensures clouds also blend over empty areas (CGRAM entry 0).</p>
-<h3><a class="anchor" id="autotoc_md967"></a>
+<h3><a class="anchor" id="autotoc_md994"></a>
 Assembly DMA Loader</h3>
 <p>The tile data, tilemaps, and palettes live in SUPERFREE ROM sections that may land in any bank. C code cannot reliably specify bank bytes for cross-bank data, so <code>data.asm</code> provides a <code><a class="el" href="games_2likemario_2main_8c.html#ab112b2561151944d1c248b0f35b86eb0" title="DMA all tile and palette data from ROM to VRAM/CGRAM.">loadGraphics()</a></code> routine that uses the <code>:label</code> syntax to get linker-resolved bank bytes at link time. All graphics are loaded during forced blank (screen off) since the total data exceeds the ~4KB VBlank DMA budget.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md969"></a>
+<h2><a class="anchor" id="autotoc_md996"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md970"></a>
+<h3><a class="anchor" id="autotoc_md997"></a>
 Setup</h3>
 <ol type="1">
 <li><code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code> initializes the PPU and NMI handler</li>
@@ -167,7 +167,7 @@ Setup</h3>
 <li>Main screen, sub screen, and color math are configured</li>
 <li>Screen is turned on</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md971"></a>
+<h3><a class="anchor" id="autotoc_md998"></a>
 Main Loop</h3>
 <p>Each frame, BG3's horizontal scroll is incremented by one pixel. The tilemap wraps naturally, creating seamless looping clouds:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -180,7 +180,7 @@ Main Loop</h3>
 <div class="ttc" id="agraphics_2backgrounds_2mixed__scroll_2main_8c_html_a6609fd988804dfecee72a76d6e34fef9"><div class="ttname"><a href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a6609fd988804dfecee72a76d6e34fef9">scrX</a></div><div class="ttdeci">short scrX</div><div class="ttdoc">BG1 horizontal scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:49</div></div>
 </div><!-- fragment --><p><code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> defers the actual PPU register write to the NMI handler via a dirty-flag mechanism, ensuring scroll updates happen safely during VBlank.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md973"></a>
+<h2><a class="anchor" id="autotoc_md1000"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -196,7 +196,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>res/clouds.bmp</code>   </td><td class="markdownTableBodyNone">2bpp cloud overlay source image   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md974"></a>
+<h2><a class="anchor" id="autotoc_md1001"></a>
 What's Next?</h2>
 <p><b>Window Masking:</b> <a href="../window/">Window Example</a> - Triangle-shaped HDMA window</p>
 <p><b>HDMA Gradient:</b> <a href="../gradient_colors/">Gradient Colors</a> - Per-scanline color effects </p>

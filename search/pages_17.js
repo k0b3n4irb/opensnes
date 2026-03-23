@@ -47,5 +47,8 @@ var searchData=
   ['states_20tutorial_44',['Game States Tutorial',['../tutorial_game_states.html',1,'index']]],
   ['streaming_20for_20animated_20sprites_45',['Dynamic Sprite -- VRAM Streaming for Animated Sprites',['../examples_graphics_sprites_dynamic_sprite.html',1,'examples_by_category']]],
   ['style_20guide_46',['OpenSNES Code Style Guide',['../code_style.html',1,'index']]],
-  ['super_20scope_47',['Super Scope',['../examples_input_superscope.html',1,'examples_by_category']]]
+  ['super_20scope_47',['Super Scope',['../examples_input_superscope.html',1,'examples_by_category']]],
+  ['superfx_20bitmap_48',['SuperFX Bitmap',['../examples_graphics_effects_superfx_bitmap.html',1,'']]],
+  ['superfx_20gsu_20tutorial_49',['SuperFX (GSU) Tutorial',['../tutorial_superfx.html',1,'index']]],
+  ['superfx_20hello_50',['SuperFX Hello',['../examples_memory_superfx_hello.html',1,'']]]
 ];

@@ -97,10 +97,10 @@ $(document).ready(function(){initNavTree('memory_map.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Complete memory layout reference for SNES development.</p>
-<h2><a class="anchor" id="autotoc_md416"></a>
+<h2><a class="anchor" id="autotoc_md435"></a>
 Address Space Overview</h2>
 <p>The 65816 CPU has a 24-bit address bus, allowing access to 16 MB of memory. The address format is <code>$BB:AAAA</code> where BB is the bank (0-255) and AAAA is the offset within that bank (0-65535).</p>
-<h2><a class="anchor" id="autotoc_md417"></a>
+<h2><a class="anchor" id="autotoc_md436"></a>
 LoROM Memory Map (Default)</h2>
 <div class="fragment"><div class="line">Bank    Address         Size    Description</div>
 <div class="line">────────────────────────────────────────────────────────────────</div>
@@ -128,9 +128,9 @@ LoROM Memory Map (Default)</h2>
 <div class="line"> </div>
 <div class="line">$80-$BF                         Mirror of $00-$3F</div>
 <div class="line">$C0-$FF                         Mirror of $40-$7F (ROM only)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md418"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md437"></a>
 Key Memory Regions</h2>
-<h3><a class="anchor" id="autotoc_md419"></a>
+<h3><a class="anchor" id="autotoc_md438"></a>
 Work RAM ($7E:0000 - $7F:FFFF)</h3>
 <p>128 KB of general-purpose RAM.</p>
 <table class="markdownTable">
@@ -147,7 +147,7 @@ Work RAM ($7E:0000 - $7F:FFFF)</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$7F:0000-$7F:FFFF   </td><td class="markdownTableBodyNone">64 KB   </td><td class="markdownTableBodyNone">General use / buffers   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md420"></a>
+<h3><a class="anchor" id="autotoc_md439"></a>
 Video RAM ($2116-$2119)</h3>
 <p>64 KB accessed through registers, not directly mapped.</p>
 <table class="markdownTable">
@@ -161,7 +161,7 @@ Video RAM ($2116-$2119)</h3>
 <td class="markdownTableBodyNone">$8000-$FFFF   </td><td class="markdownTableBodyNone">Tilemaps   </td></tr>
 </table>
 <p>Actual layout depends on your configuration.</p>
-<h3><a class="anchor" id="autotoc_md421"></a>
+<h3><a class="anchor" id="autotoc_md440"></a>
 OAM (Object Attribute Memory)</h3>
 <p>544 bytes accessed through registers $2102-$2104.</p>
 <div class="fragment"><div class="line"><span class="comment">// Structure per sprite (bytes 0-511, 4 bytes each)</span></div>
@@ -176,7 +176,7 @@ OAM (Object Attribute Memory)</h3>
 <div class="line"><span class="comment">// 2 bits per sprite: X high bit, size select</span></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md422"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md441"></a>
 CGRAM (Color RAM)</h3>
 <p>512 bytes (256 colors x 2 bytes each).</p>
 <table class="markdownTable">
@@ -188,7 +188,7 @@ CGRAM (Color RAM)</h3>
 <td class="markdownTableBodyNone">256-511   </td><td class="markdownTableBodyNone">Sprite palettes (8 palettes x 16 colors)   </td></tr>
 </table>
 <p>Color format: <code>0BBBBBGGGGGRRRRR</code> (15-bit)</p>
-<h2><a class="anchor" id="autotoc_md423"></a>
+<h2><a class="anchor" id="autotoc_md442"></a>
 PPU Registers ($2100-$213F)</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -234,7 +234,7 @@ PPU Registers ($2100-$213F)</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$2133   </td><td class="markdownTableBodyNone">SETINI   </td><td class="markdownTableBodyNone">Screen settings   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md424"></a>
+<h2><a class="anchor" id="autotoc_md443"></a>
 CPU Registers ($4200-$44FF)</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -266,7 +266,7 @@ CPU Registers ($4200-$44FF)</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$4218-1F   </td><td class="markdownTableBodyNone">JOY1L-4H   </td><td class="markdownTableBodyNone">Joypad data   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md425"></a>
+<h2><a class="anchor" id="autotoc_md444"></a>
 DMA Registers ($43x0-$43xF)</h2>
 <p>8 DMA channels (x = 0-7):</p>
 <table class="markdownTable">
@@ -287,7 +287,7 @@ DMA Registers ($43x0-$43xF)</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$43xA   </td><td class="markdownTableBodyNone">NTRLx   </td><td class="markdownTableBodyNone">HDMA line counter   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md426"></a>
+<h2><a class="anchor" id="autotoc_md445"></a>
 Example: Setting Up Memory</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define variables in different memory regions</span></div>
 <div class="line"><span class="preprocessor">#pragma bss-name(push, &quot;BSS&quot;)    </span><span class="comment">// Goes to $7E:0200+</span></div>
@@ -302,7 +302,7 @@ Example: Setting Up Memory</h2>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a>;</div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_af743d5de011168f86bbdb716e0afbc47"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></div><div class="ttdeci">static u8 frame_counter</div><div class="ttdoc">Global frame counter for animation timing.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md427"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md446"></a>
 Further Reading</h2>
 <ul>
 <li><a class="el" href="REGISTERS_8md.html">Hardware Registers</a> - PPU, DMA, I/O registers</li>
