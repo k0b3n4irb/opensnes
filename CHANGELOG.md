@@ -5,6 +5,49 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.12.0] - 2026-03-23
+
+### SuperFX (GSU) Enhancement Chip Support (NEW)
+
+- **SuperFX coprocessor**: full build system support (`USE_SUPERFX=1`).
+  Two-stage GSU assembly pipeline: `.sfx` -> `wla-superfx` -> `.sfx.bin` -> `.incbin`.
+- **PLOT bitmap rendering**: GSU renders 16-color gradient via hardware PLOT
+  instruction at 21.47 MHz with CACHE optimization. Column-major tile layout,
+  pixel cache flush via RPIX.
+- **Three critical GSU rules discovered**:
+  1. Branch delay slot -- NOP after every BNE/BRA (instruction always executes)
+  2. STOP pre-fetch -- NOP padding before STOP (pipeline halts prematurely)
+  3. RPIX pixel cache flush -- last 8 pixels per row stay in internal cache
+- **superfx_hello**: boot diagnostic with STB/STW SRAM write tests
+- **superfx_bitmap**: 16-color rainbow gradient rendered by GSU PLOT hardware
+- **superfx.h**: complete GSU register definitions ($3000-$303F)
+- **WRAM execution**: mandatory for all GSU launches (ROM bus exclusive)
+- **21.47 MHz + CACHE**: ~6x speedup over uncached 10.74 MHz baseline
+
+### SA-1 Enhancement Chip
+
+- **SA-1 murmuration demo**: 128 dots in Lissajous sine patterns at 10.74 MHz.
+  Uses `lda.l sine_table,x` (opcode $BF) for DB-independent ROM reads.
+  4 brightness palettes for depth illusion on dark blue background.
+
+### Build System
+
+- **Unified memmap files**: deleted 3 duplicate `lib/source/lib_memmap*.inc`,
+  single source of truth in `templates/memmap*.inc`.
+- **runtime.asm moved to lib/**: compiled once per config instead of per-example.
+- **Per-example SA-1/SuperFX boot**: `project_sa1_boot.asm` generated from
+  local override or template default.
+
+### Documentation
+
+- **SuperFX tutorial**: `docs/tutorials/superfx.md` covering architecture,
+  PLOT rendering, assembly rules, WRAM execution, emulator compatibility.
+- **SA-1 tutorial**: `docs/tutorials/sa1.md` with I-RAM patterns and debugging.
+- **GETTING_STARTED.md rewritten**: Game Developer vs SDK Developer paths.
+- **All examples documented**: 54 READMEs + screenshots (opensnes-emu).
+- **Documentation audit**: fixed broken links, updated example count, added
+  tutorials index.
+
 ## [0.11.0] - 2026-03-21
 
 ### SA-1 Enhancement Chip Support (NEW)

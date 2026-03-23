@@ -23,6 +23,7 @@ Welcome to the OpenSNES documentation.
 | [Audio & Music](tutorials/audio.md) | SNESMOD tracker playback |
 | [Game States](tutorials/game_states.md) | State machines, transitions |
 | [SA-1 Coprocessor](tutorials/sa1.md) | 10.74 MHz second CPU, shared I-RAM |
+| [SuperFX (GSU)](tutorials/superfx.md) | RISC coprocessor, hardware PLOT rendering |
 
 ### Hardware Reference
 
