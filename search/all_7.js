@@ -1,10 +1,10 @@
 var searchData=
 [
   ['6_20paddle_20bounce_20physics_0',['6. Paddle Bounce Physics',['../examples_games_breakout.html#autotoc_md644',1,'']]],
-  ['6_20size_20modes_1',['The 6 Size Modes',['../examples_graphics_sprites_object_size.html#autotoc_md1083',1,'']]],
+  ['6_20size_20modes_1',['The 6 Size Modes',['../examples_graphics_sprites_object_size.html#autotoc_md1087',1,'']]],
   ['6_20snes_20sprite_20size_20modes_2',['Object Size -- All 6 SNES Sprite Size Modes',['../examples_graphics_sprites_object_size.html',1,'examples_by_category']]],
-  ['6_20spelling_20the_20message_3',['6. Spelling the Message',['../examples_text_hello_world.html#autotoc_md1331',1,'']]],
-  ['6_20state_20machine_4',['6. State Machine',['../examples_input_superscope.html#autotoc_md1149',1,'']]],
+  ['6_20spelling_20the_20message_3',['6. Spelling the Message',['../examples_text_hello_world.html#autotoc_md1332',1,'']]],
+  ['6_20state_20machine_4',['6. State Machine',['../examples_input_superscope.html#autotoc_md1153',1,'']]],
   ['6_20the_20checkerboard_20background_5',['6. The Checkerboard Background',['../examples_graphics_effects_hdma_wave.html#autotoc_md929',1,'']]],
   ['6_20tile_20based_20collision_6',['6. Tile-Based Collision',['../examples_games_likemario.html#autotoc_md672',1,'']]],
   ['64kb_20total_7',['Memory Budget (64KB total)',['../snes_sound_guide.html#autotoc_md388',1,'']]],

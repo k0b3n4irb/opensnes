@@ -249,7 +249,7 @@ Getting Started</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="superfx_8h.html">snes/superfx.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="graphics_2effects_2superfx__bitmap_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="graphics_2effects_2superfx__3d_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -259,7 +259,7 @@ Getting Started</h2>
 <div class="line">        <span class="keywordflow">while</span> (1) { <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>(); }</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="graphics_2effects_2superfx__bitmap_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>();</div>
+<div class="line">    <a class="code hl_function" href="graphics_2effects_2superfx__3d_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Read result from GSU R0 */</span></div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">result</a> = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3000;</div>
@@ -273,7 +273,7 @@ Getting Started</h2>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
-<div class="ttc" id="agraphics_2effects_2superfx__bitmap_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="graphics_2effects_2superfx__bitmap_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div></div>
+<div class="ttc" id="agraphics_2effects_2superfx__3d_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="graphics_2effects_2superfx__3d_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="asuperfx_8h_html"><div class="ttname"><a href="superfx_8h.html">superfx.h</a></div><div class="ttdoc">SuperFX (GSU) coprocessor register definitions and API.</div></div>

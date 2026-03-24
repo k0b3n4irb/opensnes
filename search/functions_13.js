@@ -16,9 +16,10 @@ var searchData=
   ['windowsplit_13',['windowSplit',['../window_8h.html#a977a0f5193aa0688fef854dce181d2de',1,'window.h']]],
   ['write_5ftile_14',['write_tile',['../memory_2hirom__demo_2main_8c.html#a7e612617242d479ac289ab6632a5116e',1,'main.c']]],
   ['write_5fvram_5fcolumn_15',['write_vram_column',['../games_2likemario_2main_8c.html#a08f0ca6d6bd43a513eb762fdbfb5f64d',1,'main.c']]],
-  ['writenum_16',['writenum',['../games_2breakout_2main_8c.html#a42f75a3892f52c5edcfbdd129fdec6a9',1,'main.c']]],
-  ['writenum_5fbg2_17',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
-  ['writestring_18',['writestring',['../games_2breakout_2main_8c.html#ad1545da3f0a593a3aad9c35e8dfdfd9c',1,'main.c']]],
-  ['writestring_5fbg2_19',['writestring_bg2',['../hud_8c.html#a29620f02e27c663e24607415b5cfb2f6',1,'hud.c']]],
-  ['writestring_5fbg2_5fattr_20',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
+  ['writeedgestosram_16',['writeEdgesToSRAM',['../graphics_2effects_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
+  ['writenum_17',['writenum',['../games_2breakout_2main_8c.html#a42f75a3892f52c5edcfbdd129fdec6a9',1,'main.c']]],
+  ['writenum_5fbg2_18',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
+  ['writestring_19',['writestring',['../games_2breakout_2main_8c.html#ad1545da3f0a593a3aad9c35e8dfdfd9c',1,'main.c']]],
+  ['writestring_5fbg2_20',['writestring_bg2',['../hud_8c.html#a29620f02e27c663e24607415b5cfb2f6',1,'hud.c']]],
+  ['writestring_5fbg2_5fattr_21',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
 ];

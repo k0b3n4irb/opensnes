@@ -97,96 +97,55 @@ $(document).ready(function(){initNavTree('examples_memory_superfx_hello.html',''
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>&zwj;GSU coprocessor boot diagnostic &ndash; detects SuperFX, launches a minimal GSU program, and verifies bidirectional CPU/GSU communication. </p>
+<p>&zwj;GSU coprocessor boot diagnostic with SRAM tests and FMULT validation </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md1290"></a>
+<h2><a class="anchor" id="autotoc_md1294"></a>
 Emulator Compatibility</h2>
-<blockquote class="doxtable">
-<p>&zwj;<b>Important</b>: SuperFX (GSU) examples require a SuperFX-capable emulator. </p>
-</blockquote>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator   </th><th class="markdownTableHeadNone">Status    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">Recommended &ndash; cycle-accurate SuperFX emulation    </td></tr>
+<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">Recommended &ndash; cycle-accurate SuperFX    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">Works for boot/registers, but has a bug with GSU backward branches    </td></tr>
+<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">Works (minor DMA timing differences)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Does not detect SuperFX in our ROM header   </td></tr>
+<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Detected with cart type $13   </td></tr>
 </table>
-<p>The screenshot above was captured with opensnes-emu (snes9x-based), which shows "GSU: NOT DETECTED". This is expected &ndash; the diagnostic messages and test results are only visible on a SuperFX-capable emulator.</p>
-<h2><a class="anchor" id="autotoc_md1291"></a>
+<blockquote class="doxtable">
+<p>&zwj;<b>Note:</b> opensnes-emu (snes9x-based) shows "GSU: NOT DETECTED" because snes9x WASM does not emulate the SuperFX coprocessor. </p>
+</blockquote>
+<h2><a class="anchor" id="autotoc_md1295"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/superfx_hello</div>
-</div><!-- fragment --><p>Then open <code>superfx_hello.sfc</code> in bsnes or Mesen2.</p>
-<h2><a class="anchor" id="autotoc_md1292"></a>
+</div><!-- fragment --><p>Then open <code>superfx_hello.sfc</code> in bsnes (recommended).</p>
+<h2><a class="anchor" id="autotoc_md1296"></a>
 What You'll Learn</h2>
 <ul>
-<li>How to detect the SuperFX (GSU) coprocessor at runtime via <code><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Initialize SuperFX — checks if GSU hardware is present.">gsuInit()</a></code></li>
-<li>Reading the GSU version register (VCR at $303B)</li>
-<li>Launching a GSU program and polling for completion</li>
-<li>Bidirectional communication: SNES CPU writes R0, GSU writes R0 back</li>
-<li>SRAM readback: GSU writes to SRAM, SNES CPU reads back to verify</li>
-<li>WRAM stub pattern: polling GSU status from WRAM while ROM bus is owned by GSU</li>
+<li>Detecting the SuperFX (GSU) coprocessor via the VCR register</li>
+<li>Launching a GSU program and reading back R0 ($CAFE)</li>
+<li>SRAM shared memory: byte writes ($42, $55) and word write via STW ($BEEF)</li>
+<li>FMULT instruction validation (2*2 = $4000, 1.5*3 = $4800)</li>
+<li>WRAM stub execution (CPU cannot read ROM while GSU owns the bus)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1293"></a>
-How It Works</h2>
-<ol type="1">
-<li><code><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Initialize SuperFX — checks if GSU hardware is present.">gsuInit()</a></code> checks VCR ($303B) for a valid SuperFX chip version</li>
-<li>The GSU program (<code>gsu_hello.sfx</code>) sets R0 = <code>$CAFE</code>, writes <code>$42</code> and <code>$55</code> to SRAM bytes 0-1, and writes <code>$BEEF</code> to SRAM bytes 2-3 via STW</li>
-<li><code><a class="el" href="graphics_2effects_2superfx__bitmap_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU()</a></code> copies a stub to WRAM, configures SCMR (bus ownership), sets PBR/R15 to start the GSU, polls SFR until done, then reclaims the buses</li>
-<li>The SNES CPU reads back R0 and SRAM values, displaying them on screen</li>
-<li>"ALL TESTS PASSED!" confirms full bidirectional communication</li>
-</ol>
-<h2><a class="anchor" id="autotoc_md1294"></a>
-Status Codes</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Value   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">R0 = <code>$CAFE</code>   </td><td class="markdownTableBodyNone">GSU executed the program correctly    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">SRAM[0] = <code>$42</code>   </td><td class="markdownTableBodyNone">GSU byte write to SRAM confirmed    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">SRAM[1] = <code>$55</code>   </td><td class="markdownTableBodyNone">Second GSU byte write confirmed    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">STW[2,3] = <code>$BEEF</code>   </td><td class="markdownTableBodyNone">GSU word write (STW instruction) confirmed    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">"NOT DETECTED"   </td><td class="markdownTableBodyNone">No SuperFX hardware found &ndash; use a capable emulator   </td></tr>
-</table>
-<h2><a class="anchor" id="autotoc_md1295"></a>
-Project Structure</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">File   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>main.c</code>   </td><td class="markdownTableBodyNone">Detection logic, result display, hex formatting    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>gsu_loader.asm</code>   </td><td class="markdownTableBodyNone">WRAM stub, GSU launch sequence, SRAM readback    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>gsu_hello.sfx</code>   </td><td class="markdownTableBodyNone">Minimal GSU program (R0 = $CAFE, SRAM writes)    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>USE_SUPERFX := 1</code>, <code>GSUSRC := gsu_hello.sfx</code>   </td></tr>
-</table>
-<h2><a class="anchor" id="autotoc_md1296"></a>
+<h2><a class="anchor" id="autotoc_md1297"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Module   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">console   </td><td class="markdownTableBodyNone">System initialization    </td></tr>
+<td class="markdownTableBodyNone"><code>console</code>   </td><td class="markdownTableBodyNone">System initialization    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">sprite   </td><td class="markdownTableBodyNone">OAM management    </td></tr>
+<td class="markdownTableBodyNone"><code>sprite</code>   </td><td class="markdownTableBodyNone">OAM setup (required by consoleInit)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">dma   </td><td class="markdownTableBodyNone">DMA transfers    </td></tr>
+<td class="markdownTableBodyNone"><code>dma</code>   </td><td class="markdownTableBodyNone">DMA transfers    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">background   </td><td class="markdownTableBodyNone">BG configuration    </td></tr>
+<td class="markdownTableBodyNone"><code>background</code>   </td><td class="markdownTableBodyNone">BG configuration    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">text   </td><td class="markdownTableBodyNone">Diagnostic text display    </td></tr>
+<td class="markdownTableBodyNone"><code>text</code>   </td><td class="markdownTableBodyNone">Diagnostic text display    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">superfx   </td><td class="markdownTableBodyNone">GSU coprocessor driver (<code><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Initialize SuperFX — checks if GSU hardware is present.">gsuInit()</a></code>)   </td></tr>
+<td class="markdownTableBodyNone"><code>superfx</code>   </td><td class="markdownTableBodyNone">GSU detection and communication   </td></tr>
 </table>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

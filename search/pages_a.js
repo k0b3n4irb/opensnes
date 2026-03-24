@@ -16,5 +16,6 @@ var searchData=
   ['continuous_20scroll_13',['Continuous Scroll',['../examples_graphics_backgrounds_continuous_scroll.html',1,'examples_by_category']]],
   ['contributing_20to_20opensnes_14',['Contributing to OpenSNES',['../contributing.html',1,'index']]],
   ['controller_20input_15',['Controller Input',['../examples_input_controller.html',1,'']]],
-  ['controller_20input_20tutorial_16',['Controller Input Tutorial',['../tutorial_input.html',1,'index']]]
+  ['controller_20input_20tutorial_16',['Controller Input Tutorial',['../tutorial_input.html',1,'index']]],
+  ['cube_17',['SuperFX 3D Cube',['../examples_graphics_effects_superfx_3d.html',1,'']]]
 ];

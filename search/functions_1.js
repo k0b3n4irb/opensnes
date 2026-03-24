@@ -15,5 +15,6 @@ var searchData=
   ['boardfindfulllines_12',['boardfindfulllines',['../board_8c.html#aeccb3323064b66dcc56a9b5238e630cd',1,'boardFindFullLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#aeccb3323064b66dcc56a9b5238e630cd',1,'boardFindFullLines(LineClearResult *result):&#160;board.c']]],
   ['boardgetcell_13',['boardgetcell',['../board_8c.html#afe889da34619e8bc9093bea63bb60eb4',1,'boardGetCell(u8 row, u8 col):&#160;board.c'],['../board_8h.html#afe889da34619e8bc9093bea63bb60eb4',1,'boardGetCell(u8 row, u8 col):&#160;board.c']]],
   ['boardlockpiece_14',['boardlockpiece',['../board_8c.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c'],['../board_8h.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c']]],
-  ['boardremovelines_15',['boardremovelines',['../board_8c.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c']]]
+  ['boardremovelines_15',['boardremovelines',['../board_8c.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c']]],
+  ['buildedges_16',['buildEdges',['../graphics_2effects_2superfx__3d_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00',1,'main.c']]]
 ];

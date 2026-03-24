@@ -35,7 +35,9 @@ var NAVTREE =
     [ "Complete Game Examples", "examples_games.html", null ],
     [ "Background Examples", "examples_graphics_backgrounds.html", null ],
     [ "Visual Effects Examples", "examples_graphics_effects.html", null ],
+    [ "SuperFX 3D Cube", "examples_graphics_effects_superfx_3d.html", null ],
     [ "SuperFX Bitmap", "examples_graphics_effects_superfx_bitmap.html", null ],
+    [ "SuperFX Mandelbrot", "examples_graphics_effects_superfx_mandelbrot.html", null ],
     [ "Graphics Examples", "examples_graphics.html", null ],
     [ "Dynamic Metasprite Engine", "examples_graphics_sprites_dynamic_metasprite.html", null ],
     [ "Sprite Examples", "examples_graphics_sprites.html", null ],
@@ -81,13 +83,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_audio_snesmod_music_hirom.html",
-"globals_vars.html",
-"group__mouse__input.html#ga5068f6438c4c46d041f3cbf31a35421b",
-"index.html#autotoc_md5",
-"object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a",
-"sprite_8h.html#a6c55adeb05799a6f58555806db5a1755",
-"text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc"
+"examples_audio_snesmod_music.html",
+"globals_type.html",
+"group__macros.html#gadba21e94be99de18d4a4eb0857a8f11d",
+"index.html",
+"object_8h.html#a4ad7c03653fa3b7fdc7c36b3e82a9565",
+"sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f",
+"text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -97,95 +97,55 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_superfx_bitm
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>&zwj;GSU framebuffer rendering &ndash; the GSU fills SRAM with tile data, then the SNES CPU DMAs it to VRAM for display. </p>
+<p>&zwj;GSU renders a 16-color rainbow gradient using the hardware PLOT instruction </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md978"></a>
+<h2><a class="anchor" id="autotoc_md982"></a>
 Emulator Compatibility</h2>
-<blockquote class="doxtable">
-<p>&zwj;<b>Important</b>: SuperFX (GSU) examples require a SuperFX-capable emulator. </p>
-</blockquote>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator   </th><th class="markdownTableHeadNone">Status    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">Recommended &ndash; cycle-accurate SuperFX emulation    </td></tr>
+<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">Recommended &ndash; cycle-accurate SuperFX    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">Works for boot/registers, but has a bug with GSU backward branches    </td></tr>
+<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">Works (minor DMA timing differences)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Does not detect SuperFX in our ROM header   </td></tr>
+<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Detected with cart type $13   </td></tr>
 </table>
-<p>The screenshot above was captured with opensnes-emu (snes9x-based), which shows a black screen because snes9x does not emulate SuperFX. On a capable emulator, the top half of the screen should display colored content rendered by the GSU.</p>
-<h2><a class="anchor" id="autotoc_md979"></a>
+<blockquote class="doxtable">
+<p>&zwj;<b>Note:</b> opensnes-emu (snes9x-based) shows a blank screen because snes9x WASM does not emulate the SuperFX coprocessor. </p>
+</blockquote>
+<h2><a class="anchor" id="autotoc_md983"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/effects/superfx_bitmap</div>
-</div><!-- fragment --><p>Then open <code>superfx_bitmap.sfc</code> in bsnes or Mesen2.</p>
-<h2><a class="anchor" id="autotoc_md980"></a>
+</div><!-- fragment --><p>Then open <code>superfx_bitmap.sfc</code> in bsnes (recommended).</p>
+<h2><a class="anchor" id="autotoc_md984"></a>
 What You'll Learn</h2>
 <ul>
-<li>The full GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline</li>
-<li>How the GSU uses PLOT to write pixels in SNES bitplane format</li>
-<li>Setting up an identity tilemap for framebuffer-style display</li>
-<li>Configuring SCMR for PLOT mode (color depth, screen height, bus ownership)</li>
-<li>DMA from SRAM bank $70 to VRAM</li>
+<li>SuperFX PLOT instruction for pixel rendering in bitplane format</li>
+<li>Column-major tile layout (PLOT stores tiles column-by-column)</li>
+<li>GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline</li>
+<li>SCMR configuration (4bpp mode, 128-pixel height, bus ownership)</li>
+<li>Force blank for bulk DMA transfers exceeding VBlank budget</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md981"></a>
-How It Works</h2>
-<ol type="1">
-<li>The SNES CPU sets up Mode 1 with a rainbow palette and an identity tilemap at VRAM $4000 (tile N maps to tile index N)</li>
-<li><code><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Initialize SuperFX — checks if GSU hardware is present.">gsuInit()</a></code> detects the SuperFX coprocessor</li>
-<li><code><a class="el" href="graphics_2effects_2superfx__bitmap_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU()</a></code> runs the GSU program via the WRAM stub pattern</li>
-<li>The GSU program (<code>gsu_render.sfx</code>) clears 16KB of SRAM to black, then uses PLOT to draw a row of red pixels at Y=0</li>
-<li>After the GSU finishes, the SNES CPU DMAs 16KB from SRAM $70:0000 to VRAM $0000</li>
-<li>The identity tilemap displays the framebuffer on screen</li>
-</ol>
-<h2><a class="anchor" id="autotoc_md982"></a>
-Pipeline Architecture</h2>
-<div class="fragment"><div class="line">GSU PLOT/STW --&gt; SRAM $70:0000 --&gt; DMA ch0 --&gt; VRAM $0000 --&gt; Identity tilemap --&gt; Screen</div>
-<div class="line">                                    |                            |</div>
-<div class="line">                            Source bank $70               VRAM $4000 (32x16 tiles)</div>
-<div class="line">                            Mode $01 (2-reg)              tile[i] = i</div>
-<div class="line">                            Dest $18 (VMDATAL)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md983"></a>
-Work in Progress</h2>
-<p>The PLOT rendering is partially working. The STW-based pipeline (clearing SRAM, bulk writes) is validated on bsnes. PLOT pixel rendering has known issues:</p>
-<ul>
-<li>Pixel position may not match expectations (pink line appears at Y~127 instead of Y=0)</li>
-<li>Color index mapping between PLOT and the palette needs investigation</li>
-<li>This is an active area of development &ndash; contributions and debugging help welcome</li>
-</ul>
-<h2><a class="anchor" id="autotoc_md984"></a>
-Project Structure</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">File   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>main.c</code>   </td><td class="markdownTableBodyNone">Mode/palette setup, GSU launch, DMA to VRAM    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>gsu_loader.asm</code>   </td><td class="markdownTableBodyNone">WRAM stub, GSU launch, identity tilemap setup, SRAM-to-VRAM DMA    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>gsu_render.sfx</code>   </td><td class="markdownTableBodyNone">GSU program: clear SRAM + PLOT pixel row    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>USE_SUPERFX := 1</code>, <code>GSUSRC := gsu_render.sfx</code>   </td></tr>
-</table>
 <h2><a class="anchor" id="autotoc_md985"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Module   </th><th class="markdownTableHeadNone">Purpose    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">console   </td><td class="markdownTableBodyNone">System initialization    </td></tr>
+<td class="markdownTableBodyNone"><code>console</code>   </td><td class="markdownTableBodyNone">System initialization    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">sprite   </td><td class="markdownTableBodyNone">OAM management    </td></tr>
+<td class="markdownTableBodyNone"><code>sprite</code>   </td><td class="markdownTableBodyNone">OAM setup (required by consoleInit)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">dma   </td><td class="markdownTableBodyNone">DMA transfers    </td></tr>
+<td class="markdownTableBodyNone"><code>dma</code>   </td><td class="markdownTableBodyNone">SRAM-to-VRAM bitmap transfer    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">background   </td><td class="markdownTableBodyNone">BG configuration    </td></tr>
+<td class="markdownTableBodyNone"><code>background</code>   </td><td class="markdownTableBodyNone">BG mode and tilemap configuration    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">text   </td><td class="markdownTableBodyNone">Text display (fallback if GSU not detected)    </td></tr>
+<td class="markdownTableBodyNone"><code>text</code>   </td><td class="markdownTableBodyNone">Text display (fallback if GSU not detected)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">superfx   </td><td class="markdownTableBodyNone">GSU coprocessor driver (<code><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Initialize SuperFX — checks if GSU hardware is present.">gsuInit()</a></code>)   </td></tr>
+<td class="markdownTableBodyNone"><code>superfx</code>   </td><td class="markdownTableBodyNone">GSU detection and initialization   </td></tr>
 </table>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
