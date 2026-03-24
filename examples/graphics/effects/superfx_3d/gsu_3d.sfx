@@ -1,0 +1,151 @@
+; SuperFX (GSU) Wireframe Cube — static square first (validates Bresenham)
+;
+; Draws 4 lines forming a square at the center of the screen.
+; Uses a Bresenham line drawing algorithm via PLOT.
+;
+; Register allocation:
+;   R0  scratch/COLOR/PLOT    R8  buffer base (from SNES CPU)
+;   R1  X pixel (PLOT)        R9  dx (line draw)
+;   R2  Y pixel (PLOT)        R10 dy (line draw)
+;   R3  line X0               R11 sx (step x: +1 or -1)
+;   R4  line Y0               R12 LOOP counter / sy
+;   R5  line X1               R13 LOOP target / err
+;   R6  FMULT / scratch       R14 e2 (error*2)
+;   R7  line Y1
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_start:
+    IBT R0, #$70
+    RAMB
+
+    ; Clear framebuffer (R8 = buffer base from SNES CPU)
+    IWT R0, #$0000
+    MOVE R1, R8
+    IWT R4, #8192
+    CACHE
+_clear:
+    STW (R1)
+    INC R1
+    INC R1
+    DEC R4
+    BNE _clear
+    NOP
+
+    ; Set CMODE
+    IBT R0, #$00
+    CMODE
+
+    ; Set color = 15 (white)
+    IBT R0, #$0F
+    COLOR
+
+    CACHE
+
+    ; Draw a square: (80,30) → (176,30) → (176,98) → (80,98) → (80,30)
+    ; Line 1: (80,30) → (176,30) — horizontal
+    IWT R3, #80
+    IWT R4, #30
+    IWT R5, #176
+    IWT R7, #30
+    IBT R0, #$0F
+    COLOR
+    ; Call line drawing (inline, not subroutine — no LINK on GSU easily)
+
+    ; === LINE DRAW: (R3,R4) → (R5,R7) ===
+    ; Bresenham's line algorithm
+    ; dx = abs(x1-x0), dy = -abs(y1-y0)
+    ; sx = x0<x1 ? 1 : -1, sy = y0<y1 ? 1 : -1
+    ; err = dx + dy
+
+    ; For this first test: just draw horizontal line (Y constant)
+    ; Simple loop: PLOT at each X from X0 to X1
+    MOVE R1, R3             ; R1 = X = X0
+    MOVE R2, R4             ; R2 = Y = Y0
+_line1:
+    PLOT
+    MOVE R0, R1             ; R0 = current X (after PLOT auto-increment)
+    MOVE R6, R5             ; R6 = X1
+    SUB R6                  ; R0 = X - X1 (signed comparison is tricky)
+    NOP
+    BMI _line1              ; if X < X1, continue
+    NOP
+
+    IBT R1, #$00
+    RPIX                    ; flush pixel cache
+
+    ; Line 2: (176,30) → (176,98) — vertical
+    IWT R3, #176
+    IWT R4, #30
+    IWT R7, #98
+    IBT R0, #$0F
+    COLOR
+    MOVE R1, R3
+    MOVE R2, R4
+_line2:
+    PLOT
+    INC R2                  ; Y++ (vertical line)
+    ; Reset R1 to X (PLOT auto-incremented it)
+    MOVE R1, R3
+    MOVE R0, R2
+    MOVE R6, R7
+    SUB R6
+    NOP
+    BMI _line2
+    NOP
+    IBT R1, #$00
+    RPIX
+
+    ; Line 3: (176,98) → (80,98) — horizontal (right to left)
+    IWT R3, #176
+    IWT R4, #98
+    IWT R5, #80
+    IBT R0, #$0F
+    COLOR
+    MOVE R1, R3
+    MOVE R2, R4
+_line3:
+    PLOT
+    ; PLOT increments R1. For right-to-left, we need to decrement.
+    ; Reset R1 and manually decrement
+    DEC R3                  ; X0--
+    NOP
+    MOVE R1, R3
+    MOVE R0, R3
+    MOVE R6, R5
+    SUB R6
+    NOP
+    BPL _line3              ; while X0 >= X1
+    NOP
+    IBT R1, #$00
+    RPIX
+
+    ; Line 4: (80,98) → (80,30) — vertical (bottom to top)
+    IWT R3, #80
+    IWT R4, #98
+    IWT R7, #30
+    IBT R0, #$0F
+    COLOR
+    MOVE R1, R3
+    MOVE R2, R4
+_line4:
+    PLOT
+    MOVE R1, R3             ; reset X after PLOT auto-increment
+    DEC R2                  ; Y-- (upward)
+    NOP
+    MOVE R0, R2
+    MOVE R6, R7
+    SUB R6
+    NOP
+    BPL _line4
+    NOP
+    IBT R1, #$00
+    RPIX
+
+    NOP
+    NOP
+    STOP
+    NOP
