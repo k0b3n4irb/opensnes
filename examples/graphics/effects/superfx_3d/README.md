@@ -1,6 +1,6 @@
-# SuperFX Bitmap
+# SuperFX 3D Cube
 
-> GSU renders a 16-color rainbow gradient using the hardware PLOT instruction
+> Auto-rotating wireframe cube with Y+X axis rotation and Bresenham line drawing
 
 ![Screenshot](screenshot.png)
 
@@ -18,18 +18,18 @@
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/graphics/effects/superfx_bitmap
+make -C examples/graphics/effects/superfx_3d
 ```
 
-Then open `superfx_bitmap.sfc` in bsnes (recommended).
+Then open `superfx_3d.sfc` in bsnes (recommended).
 
 ## What You'll Learn
 
-- SuperFX PLOT instruction for pixel rendering in bitplane format
-- Column-major tile layout (PLOT stores tiles column-by-column)
-- GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline
-- SCMR configuration (4bpp mode, 128-pixel height, bus ownership)
-- Force blank for bulk DMA transfers exceeding VBlank budget
+- 3D vertex rotation using a 256-entry sine lookup table
+- Two-axis rotation (Y then X) with 8-bit fixed-point math
+- CPU-side projection and edge buffer construction
+- GSU Bresenham line drawing via PLOT into a bitmap framebuffer
+- Chunked VBlank DMA: 16KB framebuffer split into 4x4KB transfers (one per VBlank) to avoid flicker
 
 ## Modules Used
 
@@ -37,7 +37,7 @@ Then open `superfx_bitmap.sfc` in bsnes (recommended).
 |--------|---------|
 | `console` | System initialization |
 | `sprite` | OAM setup (required by consoleInit) |
-| `dma` | SRAM-to-VRAM bitmap transfer |
+| `dma` | Chunked SRAM-to-VRAM framebuffer transfer |
 | `background` | BG mode and tilemap configuration |
-| `text` | Text display (fallback if GSU not detected) |
+| `input` | Joypad reading |
 | `superfx` | GSU detection and initialization |

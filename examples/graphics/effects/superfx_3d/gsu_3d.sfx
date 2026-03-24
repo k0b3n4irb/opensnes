@@ -1,0 +1,219 @@
+; SuperFX (GSU) Wireframe — 12 lines from SRAM via Bresenham + PLOT
+;
+; Edge data at SRAM $4000: 12 × 4 bytes (x0, y0, x1, y1)
+; SRAM pointer saved at $4100 (R12/R13 used by LOOP)
+;
+; Bresenham: PLOT with DEC R1 to compensate auto-increment.
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+.EQU EDGE_DATA  $4000
+.EQU PTR_SAVE   $4100
+.EQU NUM_EDGES  12
+
+gsu_start:
+    IBT R0, #$70
+    RAMB
+
+    ; Clear
+    IWT R0, #$0000
+    MOVE R1, R8
+    IWT R4, #8192
+    CACHE
+_clear:
+    STW (R1)
+    INC R1
+    INC R1
+    DEC R4
+    BNE _clear
+    NOP
+
+    IBT R0, #$00
+    CMODE
+
+    ; Init SRAM pointer
+    IWT R0, #EDGE_DATA
+    IWT R6, #PTR_SAVE
+    STW (R6)
+
+    ; Edge loop via LOOP (R12/R13)
+    IWT R12, #NUM_EDGES
+    MOVE R13, R15
+
+    CACHE
+
+_next_edge:
+    ; Load pointer
+    IWT R6, #PTR_SAVE
+    LDW (R6)
+    NOP
+    MOVE R6, R0
+
+    ; Read x0, y0, x1, y1
+    LDB (R6)
+    NOP
+    MOVE R1, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R2, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R3, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R4, R0
+    INC R6
+    NOP
+
+    ; Save updated pointer
+    MOVE R0, R6
+    IWT R6, #PTR_SAVE
+    STW (R6)
+
+    ; === Bresenham setup ===
+    ; dx = abs(x1-x0), sx = sign(x1-x0)
+    MOVE R0, R3
+    SUB R1
+    NOP
+    BPL _dx_pos
+    NOP
+    NOT
+    NOP
+    INC R0
+    NOP
+    IWT R9, #$FFFF
+    BRA _dx_done
+    NOP
+_dx_pos:
+    IWT R9, #$0001
+_dx_done:
+    MOVE R7, R0             ; R7 = dx (positive)
+
+    ; dy = -abs(y1-y0), sy = sign(y1-y0)
+    MOVE R0, R4
+    SUB R2
+    NOP
+    BPL _dy_pos
+    NOP
+    ; y1 < y0: negate to get abs, then negate again for dy
+    ; abs(y1-y0) = -(y1-y0) = y0-y1
+    NOT
+    NOP
+    INC R0
+    NOP
+    ; dy = -abs = -(y0-y1) = y1-y0 (which is already negative)
+    ; Oops, this double-negates. Let me rethink:
+    ; R0 = y1-y0 (negative). abs = NOT+INC = -(y1-y0).
+    ; dy = -abs = y1-y0 = R0 original. So for negative: dy = original R0.
+    ; But we already NOT+INC'd it. We need to NOT+INC again... or just
+    ; reload and negate:
+    ; SIMPLER: reload, compute abs separately
+    IWT R10, #$FFFF         ; sy = -1
+    ; abs(y1-y0) = R0 (we just negated the negative value)
+    ; dy = -abs = negate again
+    NOT
+    NOP
+    INC R0
+    NOP
+    BRA _dy_done
+    NOP
+
+_dy_pos:
+    IWT R10, #$0001         ; sy = +1
+    ; R0 = y1-y0 (positive). dy = -abs = negate
+    NOT
+    NOP
+    INC R0
+    NOP
+
+_dy_done:
+    MOVE R8, R0             ; R8 = dy (negative)
+
+    ; err = dx + dy
+    MOVE R0, R7
+    ADD R8
+    NOP
+    MOVE R5, R0
+
+    ; === Bresenham pixel loop ===
+    IBT R0, #$0F
+    COLOR
+
+_bres:
+    PLOT
+    DEC R1                  ; undo PLOT auto-increment
+    NOP
+
+    ; Done? x0==x1 && y0==y1
+    MOVE R0, R1
+    SUB R3
+    NOP
+    BNE _bres_cont
+    NOP
+    MOVE R0, R2
+    SUB R4
+    NOP
+    BEQ _bres_done
+    NOP
+
+_bres_cont:
+    ; e2 = 2 * err
+    MOVE R0, R5
+    ADD R5
+    NOP
+    MOVE R6, R0             ; R6 = e2
+
+    ; if e2 >= dy: err += dy, x0 += sx
+    SUB R8                  ; e2 - dy (subtracting negative = adding positive)
+    NOP
+    BMI _skip_x
+    NOP
+    MOVE R0, R5
+    ADD R8
+    NOP
+    MOVE R5, R0
+    MOVE R0, R1
+    ADD R9
+    NOP
+    MOVE R1, R0
+_skip_x:
+
+    ; if e2 <= dx: err += dx, y0 += sy
+    MOVE R0, R7
+    SUB R6                  ; dx - e2
+    NOP
+    BMI _skip_y
+    NOP
+    MOVE R0, R5
+    ADD R7
+    NOP
+    MOVE R5, R0
+    MOVE R0, R2
+    ADD R10
+    NOP
+    MOVE R2, R0
+_skip_y:
+
+    BRA _bres
+    NOP
+
+_bres_done:
+    IBT R1, #$00
+    RPIX
+
+    LOOP
+    NOP
+
+    NOP
+    NOP
+    STOP
+    NOP

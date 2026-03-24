@@ -1,8 +1,10 @@
-; SuperFX (GSU) Hello World + SRAM test
+; SuperFX (GSU) Hello World + SRAM + FMULT tests
 ;
-; 1. Sets R0 = $CAFE (register test)
-; 2. Writes $42 to SRAM[0] via STB (SRAM write test)
-; 3. STOP
+; FMULT: DREG = (SREG * R6) >> 16 (signed 16x16, upper 16 bits)
+; For 4.12 fixed-point: result = FMULT_output << 4
+;
+; Test 3: 2.0 * 2.0 = 4.0 → $2000 * $2000 → FMULT=$0400 → <<4 = $4000
+; Test 4: 1.5 * 3.0 = 4.5 → $1800 * $3000 → FMULT=$0480 → <<4 = $4800
 
 .include "memmap_gsu.inc"
 
@@ -10,26 +12,48 @@
 .ORG 0
 
 gsu_start:
-    ; Set SRAM bank (following DOOM-FX pattern)
     IBT R0, #$70
-    RAMB                    ; RAMBR = 0 (first SRAM bank)
+    RAMB
 
-    ; Test 1: STB — write single bytes
-    IBT R0, #$42            ; value
-    IBT R1, #$00            ; SRAM address = 0
-    STB (R1)                ; SRAM[0] = $42 (byte write)
+    ; Test 1: STB
+    IBT R0, #$42
+    IBT R1, #$00
+    STB (R1)                ; SRAM[0] = $42
 
     IBT R0, #$55
     IBT R1, #$01
     STB (R1)                ; SRAM[1] = $55
 
-    ; Test 2: STW — write 16-bit word
-    IWT R0, #$BEEF          ; value (little-endian: $EF at [2], $BE at [3])
-    IBT R1, #$02            ; SRAM address = 2
+    ; Test 2: STW
+    IWT R0, #$BEEF
+    IBT R1, #$02
     STW (R1)                ; SRAM[2..3] = $BEEF
 
-    ; Set R0 = $CAFE for register test
-    IWT R0, #$CAFE
+    ; Test 3: FMULT — 2.0 * 2.0 in 4.12
+    IWT R6, #$2000          ; R6 = 2.0
+    IWT R0, #$2000          ; R0 = 2.0 (SREG default)
+    FMULT                   ; R0 = ($2000 * $2000) >> 16 = $0400
+    ; Shift left 4: ADD R0 doubles R0 (R0 = SREG + R0 = 2*R0)
+    ADD R0                  ; $0800
+    ADD R0                  ; $1000
+    ADD R0                  ; $2000
+    ADD R0                  ; $4000 = 4.0 ✓
+    IBT R1, #$04
+    STW (R1)                ; SRAM[4..5] = FMULT result
 
+    ; Test 4: FMULT — 1.5 * 3.0 in 4.12
+    IWT R6, #$3000          ; R6 = 3.0
+    IWT R0, #$1800          ; R0 = 1.5
+    FMULT                   ; R0 = ($1800 * $3000) >> 16 = $0480
+    ADD R0                  ; $0900
+    ADD R0                  ; $1200
+    ADD R0                  ; $2400
+    ADD R0                  ; $4800 = 4.5 ✓
+    IBT R1, #$06
+    STW (R1)                ; SRAM[6..7] = FMULT result
+
+    IWT R0, #$CAFE
+    NOP
+    NOP
     STOP
     NOP

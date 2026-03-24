@@ -26,6 +26,8 @@ gsu_result: dsb 2
 gsu_sram_byte0: dsb 1
 gsu_sram_byte1: dsb 1
 gsu_sram_word: dsb 2
+gsu_fmult_test1: dsb 2     ; FMULT 2.0*2.0 result (expected $4000)
+gsu_fmult_test2: dsb 2     ; FMULT 1.5*3.0 result (expected $4800)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -71,6 +73,10 @@ launchGSU:
     .ACCU 16
     lda.l $700002            ; SRAM[2..3] (STW test)
     sta.l gsu_sram_word
+    lda.l $700004            ; SRAM[4..5] (FMULT test 1)
+    sta.l gsu_fmult_test1
+    lda.l $700006            ; SRAM[6..7] (FMULT test 2)
+    sta.l gsu_fmult_test2
 
     plp
     rtl
