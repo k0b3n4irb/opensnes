@@ -1,25 +1,24 @@
 /**
  * @file main.c
- * @brief SuperFX Mandelbrot Set — GSU computes fractal via FMULT + PLOT
+ * @brief SuperFX Mandelbrot Set — fractal computed by GSU via FMULT + PLOT
  * @ingroup examples
  *
  * The GSU computes the Mandelbrot set using 4.12 fixed-point arithmetic
- * and the FMULT instruction (signed 16x16 multiply). Each pixel is colored
- * by its escape iteration count, producing a classic fractal image.
+ * and renders it via PLOT. Static render (no animation).
+ * Renders in ~1-2 seconds at 21.47 MHz.
  *
  * @par SNES Concepts
- * - SuperFX FMULT for fixed-point multiplication
+ * - SuperFX FMULT for 16x16 signed fixed-point multiply
  * - PLOT hardware for pixel rendering
- * - Fractal computation on a RISC coprocessor
+ * - LOOP instruction for long-range loops (>128 byte body)
+ * - CACHE for ~6x instruction speedup
  *
  * @par What to Observe
- * - Classic Mandelbrot set shape with 16-color palette
- * - Renders in ~1-2 seconds on the GSU at 21.47 MHz
+ * - Classic Mandelbrot set shape with 16-color fractal palette
+ * - Computed entirely by the GSU RISC coprocessor
  *
  * @par Modules Used
  * console, sprite, dma, background, superfx
- *
- * @see examples/memory/superfx_hello for FMULT validation
  */
 
 #include <snes.h>
@@ -28,25 +27,14 @@
 extern void launchGSU(void);
 extern void dmaBitmapToVRAM(void);
 extern void setupBitmapTilemap(void);
+extern u8 gsu_scbr;
+extern u8 gsu_dma_src_hi;
 
-/** @brief 16-color fractal palette (black → blue → cyan → white → yellow → red) */
 static const u16 fractal_pal[] = {
-    RGB( 0, 0, 0),   /* 0: black (inside set) */
-    RGB( 0, 0,10),   /* 1: dark blue */
-    RGB( 0, 0,20),   /* 2: blue */
-    RGB( 0, 0,31),   /* 3: bright blue */
-    RGB( 0,16,31),   /* 4: azure */
-    RGB( 0,31,31),   /* 5: cyan */
-    RGB( 0,31,16),   /* 6: spring */
-    RGB( 0,31, 0),   /* 7: green */
-    RGB(16,31, 0),   /* 8: chartreuse */
-    RGB(31,31, 0),   /* 9: yellow */
-    RGB(31,16, 0),   /* 10: orange */
-    RGB(31, 0, 0),   /* 11: red */
-    RGB(31, 0,16),   /* 12: rose */
-    RGB(31, 0,31),   /* 13: magenta */
-    RGB(20,20,20),   /* 14: light gray */
-    RGB(31,31,31),   /* 15: white */
+    RGB( 0, 0, 0),   RGB( 0, 0,10),   RGB( 0, 0,20),   RGB( 0, 0,31),
+    RGB( 0,16,31),   RGB( 0,31,31),   RGB( 0,31,16),   RGB( 0,31, 0),
+    RGB(16,31, 0),   RGB(31,31, 0),   RGB(31,16, 0),   RGB(31, 0, 0),
+    RGB(31, 0,16),   RGB(31, 0,31),   RGB(20,20,20),   RGB(31,31,31),
 };
 
 int main(void) {
@@ -63,7 +51,9 @@ int main(void) {
         while (1) { WaitForVBlank(); }
     }
 
-    /* GSU computes Mandelbrot (takes ~1-2 seconds) */
+    /* Render Mandelbrot (takes ~1-2 seconds) */
+    gsu_scbr = 0x00;
+    gsu_dma_src_hi = 0x00;
     launchGSU();
 
     /* DMA result to VRAM */

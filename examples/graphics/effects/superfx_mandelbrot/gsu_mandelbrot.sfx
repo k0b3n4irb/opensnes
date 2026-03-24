@@ -27,9 +27,9 @@ gsu_start:
     IBT R0, #$70
     RAMB
 
-    ; Clear framebuffer
+    ; Clear framebuffer (R8 = buffer base, set by SNES CPU)
     IWT R0, #$0000
-    IWT R1, #$0000
+    MOVE R1, R8             ; R1 = buffer base ($0000 or $4000)
     IWT R4, #8192
     CACHE
 _clear:

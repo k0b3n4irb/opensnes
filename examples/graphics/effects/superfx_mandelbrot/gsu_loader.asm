@@ -21,11 +21,13 @@ gsu_program_end:
 ; WRAM area + result variables
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_vars" BANK 0 SLOT 1
-gsu_wram_area: dsb 64
+gsu_wram_area: dsb 96       ; must be >= stub size ($5A = 90 bytes)
 gsu_result: dsb 2
 gsu_sram_byte0: dsb 1
 gsu_sram_byte1: dsb 1
 gsu_sram_word: dsb 2
+gsu_scbr: dsb 1            ; SCBR for PLOT target ($00=bufA, $10=bufB)
+gsu_dma_src_hi: dsb 1      ; DMA source high byte ($00=bufA, $40=bufB)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -92,9 +94,22 @@ _wram_stub:
     lda #$01
     sta.l $3039              ; CLSR = 21.47 MHz
 
-    ; Set screen base for PLOT
-    lda #$00
-    sta.l $3038              ; SCBR = $00
+    ; Set screen base for PLOT (from WRAM variable: $00=bufA, $10=bufB)
+    lda.l gsu_scbr
+    sta.l $3038              ; SCBR = parameterized
+
+    ; Write buffer base to GSU R8 (for STW clear loop)
+    ; R8 = gsu_scbr * 1024 (SCBR=$00→$0000, SCBR=$10→$4000)
+    rep #$20
+    .ACCU 16
+    lda.l gsu_scbr
+    and #$00FF               ; zero-extend SCBR
+    xba                      ; * 256
+    asl a                    ; * 512
+    asl a                    ; * 1024
+    sta.l $3010              ; R8 = buffer base
+    sep #$20
+    .ACCU 8
 
     ; Give buses to GSU + set PLOT mode (4bpp + RAN + RON)
     lda #$19
@@ -197,8 +212,11 @@ dmaBitmapToVRAM:
     sta.l $2116
     lda #16384
     sta.l $4305
-    lda #$0000
-    sta.l $4302
+    ; Source offset: $0000 (bufA) or $4000 (bufB)
+    lda.l gsu_dma_src_hi
+    and #$00FF               ; zero-extend to 16-bit
+    xba                      ; swap: high byte = src_hi, low = $00
+    sta.l $4302              ; source = $xx00
     sep #$20
     .ACCU 8
     lda #$70
