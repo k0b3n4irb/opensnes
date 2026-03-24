@@ -1,0 +1,844 @@
+; this file was created with wlalink by ville helin <ville.helin@iki.fi>.
+; wla symbolic information for "superfx_mandelbrot.sfc".
+
+[information]
+version 3
+wlasymbol true
+
+[labels]
+00:81ac EmptyHandler
+00:0000 tcc__r0
+00:0002 tcc__r0h
+00:0004 tcc__r1
+00:0006 tcc__r1h
+00:0008 tcc__r2
+00:000a tcc__r2h
+00:000c tcc__r3
+00:000e tcc__r3h
+00:0010 tcc__r4
+00:0012 tcc__r4h
+00:0014 tcc__r5
+00:0016 tcc__r5h
+00:0018 tcc__r9
+00:001a tcc__r9h
+00:001c tcc__r10
+00:001e tcc__r10h
+00:0020 nmi_callback
+00:0024 nmi_has_callback
+00:0100 tcc__nmi_registers
+00:0025 vblank_flag
+00:0026 oam_update_flag
+00:0027 tilemap_update_flag
+00:0028 tilemap_vram_addr
+00:002a tilemap_src_addr
+00:002c frame_count
+00:002e frame_count_svg
+00:0030 lag_frame_counter
+00:0032 pad_keys
+00:003c pad_keysold
+00:0046 pad_keysdown
+00:0050 snes_mplay5
+00:0051 mp5read
+00:0052 bg_scroll_x
+00:005a bg_scroll_y
+00:0062 bg_scroll_dirty
+00:0063 oam_max_id
+00:0064 mouse_con
+00:0065 mouse_x
+00:0067 mouse_y
+00:0069 mouseConnect
+00:006b mousePressed
+00:006d mousePreviousPressed
+00:006f mouseButton
+00:0071 mouseSensitivity
+00:0073 mouseRequestChangeSensitivity
+00:0075 sa1_status
+00:0076 superfx_status
+00:00bd scope_con
+00:00be scope_sinceshot
+00:00c0 scope_shoth
+00:00c2 scope_shotv
+00:00c4 scope_shothraw
+00:00c6 scope_shotvraw
+00:00c8 scope_centerh
+00:00ca scope_centerv
+00:00cc scope_down
+00:00ce scope_now
+00:00d0 scope_held
+00:00d2 scope_last
+00:00d4 scope_port2down
+00:00d6 scope_port2last
+00:00d8 scope_port2now
+00:00da scope_holddelay
+00:00dc scope_repdelay
+00:00de scope_tohold
+00:0300 _reserved_7e_mirror
+7e:0300 oamMemory
+00:0520 oamQueueEntry
+00:00e0 sprit_val0
+00:00e1 sprit_val1
+00:00e2 sprit_val2
+00:00e4 oamqueuenumber
+00:00e6 oamnumberperframe
+00:00e8 oamnumberperframeold
+00:00ea oamnumberspr0
+00:00ec oamnumberspr0Init
+00:00ee oamnumberspr1
+00:00f0 oamnumberspr1Init
+00:00f2 spr0addrgfx
+00:00f4 spr1addrgfx
+00:00f6 spr16addrgfx
+00:00f8 sprit_mxsvg
+00:00fa sprit_mysvg
+00:836a InitHardware
+00:841d InitHardware@oam_clear_loop
+00:8436 InitHardware@oam_ext_clear
+00:811f Start
+00:84f4 CopyInitData
+00:84fc CopyInitData@init_loop
+00:851c CopyInitData@copy_byte
+00:8528 CopyInitData@next_record
+00:8537 CopyInitData@init_done
+00:81d3 NmiHandler
+00:81fc NmiHandler@vblank_work
+00:822f NmiHandler@oam_done
+00:8261 NmiHandler@bg1_done
+00:8280 NmiHandler@bg2_done
+00:829f NmiHandler@bg3_done
+00:82bb NmiHandler@bg4_done
+00:82be NmiHandler@scroll_done
+00:82c7 NmiHandler@do_callback
+00:82d3 NmiHandler@callback_done
+00:82d8 NmiHandler@skip_callback
+00:82ec NmiHandler@mp5_done
+00:8332 NmiHandler@no_mp5_skip
+00:833b NmiHandler@mouse_done
+00:8346 NmiHandler@scope_done
+00:834b NmiHandler@nmi_restore
+00:8353 DefaultNmiCallback
+00:8354 WaitForVBlank
+00:9b5a ScanMPlay5
+00:941c ReadMouse
+00:942d ReadMouse@skip_port2
+00:943c ReadMouse@skip_port1
+00:943f ReadMouse@MouseData
+00:946d ReadMouse@disp_loop
+00:9482 ReadMouse@MouseConnectedThisFrame
+00:9494 ReadMouse@NoMouseConnected
+00:9497 ReadMouse@ClearMouseState
+00:94a7 ReadMouse@ChangeSensitivityRequest
+00:94be ReadMouse@RequestSpecificSensitivity
+00:94c5 ReadMouse@SetMouseSensitivity
+00:94ca ReadMouse@CycleLoop
+00:94d7 ReadMouse@sens_skip_loop
+00:94f3 ReadMouse@SensReturn
+00:95cc ReadScope
+00:95f1 ReadScope@scope_valid
+00:9631 ReadScope@scope_no_shot
+00:9636 ReadScope@scope_buttons
+00:9661 ReadScope@scope_held_fire
+00:966f ReadScope@scope_reset_hold
+00:967a ReadScope@scope_disconnect
+00:969a ReadScope@scope_save_last
+00:85e8 IrqHandler
+00:85b1 tilemapFlush
+00:8000 tcc_mul16
+00:8056 tcc_div16
+00:8089 tcc_div16@div_zero
+00:8090 tcc_div16@software_div
+00:809b tcc_div16@div_loop
+00:80ac tcc_div16@no_sub
+00:80ba tcc_mod16
+00:80c3 tcc_sdiv16
+00:80d5 tcc_sdiv16@sdiv_dpos
+00:80df tcc_sdiv16@sdiv_vpos
+00:80ee tcc_sdiv16@sdiv_done
+00:80f2 tcc_smod16
+00:8100 tcc_smod16@smod_dpos
+00:810a tcc_smod16@smod_vpos
+00:8119 tcc_smod16@smod_done
+00:81b2 DataInitStart
+00:98f4 gsu_program
+00:9999 gsu_program_end
+00:0077 gsu_wram_area
+00:00b7 gsu_result
+00:00b9 gsu_sram_byte0
+00:00ba gsu_sram_byte1
+00:00bb gsu_sram_word
+00:846c launchGSU
+00:84ae _wram_stub
+00:84f4 _wram_stub_end
+00:8538 setupBitmapTilemap
+00:854d _tm_row
+00:8551 _tm_col
+00:8575 dmaBitmapToVRAM
+00:a1bd fractal_pal
+00:9a33 main
+00:9a3b main@start.1
+00:9a3b main@body.2
+00:9a98 main@if_false.4
+00:9ab6 main@while_cond.8
+00:9ab6 main@while_body.9
+00:9abd main@if_true.3
+00:9ac1 main@while_cond.5
+00:9ac1 main@while_body.6
+00:9d9e bgSetScroll
+00:9da6 bgSetScroll@start.1
+00:9da6 bgSetScroll@body.2
+00:9f06 bgSetScrollX
+00:9f0e bgSetScrollX@start.3
+00:9f0e bgSetScrollX@body.4
+00:9f54 bgSetScrollY
+00:9f5c bgSetScrollY@start.5
+00:9f5c bgSetScrollY@body.6
+00:a25a bgGetScrollX
+00:a25c bgGetScrollX@start.7
+00:a25c bgGetScrollX@body.8
+00:a26f bgGetScrollY
+00:a271 bgGetScrollY@start.9
+00:a271 bgGetScrollY@body.10
+00:977a bgSetMapPtr
+00:9782 bgSetMapPtr@start.11
+00:9782 bgSetMapPtr@body.12
+00:9782 bgSetMapPtr@switch_cond.13
+00:97b6 bgSetMapPtr@switch_ne.19
+00:97c0 bgSetMapPtr@switch_gt.21
+00:97ca bgSetMapPtr@switch_ne.25
+00:97d4 bgSetMapPtr@switch_gt.27
+00:97de bgSetMapPtr@switch_ne.28
+00:97e8 bgSetMapPtr@switch_gt.30
+00:97eb bgSetMapPtr@switch_lt.29
+00:97ee bgSetMapPtr@switch_case.18
+00:97fb bgSetMapPtr@switch_lt.26
+00:97fe bgSetMapPtr@switch_case.17
+00:980b bgSetMapPtr@switch_lt.20
+00:9815 bgSetMapPtr@switch_ne.22
+00:981f bgSetMapPtr@switch_gt.24
+00:9822 bgSetMapPtr@switch_lt.23
+00:9825 bgSetMapPtr@switch_case.15
+00:9832 bgSetMapPtr@switch_case.16
+00:983c bgSetMapPtr@switch_join.14
+00:90f9 bgSetGfxPtr
+00:9101 bgSetGfxPtr@start.31
+00:9101 bgSetGfxPtr@body.32
+00:9101 bgSetGfxPtr@switch_cond.33
+00:9130 bgSetGfxPtr@switch_ne.39
+00:913a bgSetGfxPtr@switch_gt.41
+00:9144 bgSetGfxPtr@switch_ne.45
+00:914e bgSetGfxPtr@switch_gt.47
+00:9158 bgSetGfxPtr@switch_ne.48
+00:9162 bgSetGfxPtr@switch_gt.50
+00:9165 bgSetGfxPtr@switch_lt.49
+00:9168 bgSetGfxPtr@switch_case.38
+00:9190 bgSetGfxPtr@switch_lt.46
+00:9193 bgSetGfxPtr@switch_case.37
+00:91b4 bgSetGfxPtr@switch_lt.40
+00:91be bgSetGfxPtr@switch_ne.42
+00:91c8 bgSetGfxPtr@switch_gt.44
+00:91cb bgSetGfxPtr@switch_lt.43
+00:91ce bgSetGfxPtr@switch_case.35
+00:91ef bgSetGfxPtr@switch_case.36
+00:9214 bgSetGfxPtr@switch_join.34
+00:a171 bgInit
+00:a179 bgInit@start.51
+00:a17d bgInit@body.52
+00:96a3 bgInitTileSet
+00:96ab bgInitTileSet@start.53
+00:96cb bgInitTileSet@body.54
+00:96f7 bgInitTileSet@if_false.56
+00:9701 bgInitTileSet@if_false.59
+00:970b bgInitTileSet@if_false.62
+00:9713 bgInitTileSet@if_true.61
+00:971d bgInitTileSet@if_join.63
+00:9724 bgInitTileSet@if_true.58
+00:9728 bgInitTileSet@if_join.60
+00:972f bgInitTileSet@if_true.55
+00:973d bgInitTileSet@if_join.57
+00:9eb5 bgInitTileSetData
+00:9ebd bgInitTileSetData@start.64
+00:9ecd bgInitTileSetData@body.65
+00:9eef bgInitTileSetData@if_true.66
+00:9eff bgInitTileSetData@if_false.67
+00:0130 bg12nba_shadow
+00:0131 bg34nba_shadow
+00:0132 current_brightness
+00:0133 force_blanked
+00:94f4 consoleInit
+00:94fc consoleInit@start.1
+00:94fc consoleInit@body.2
+00:951e consoleInit@cond_false.4
+00:9526 consoleInit@cond_true.3
+00:952b consoleInit@cond_join.5
+00:956a consoleInit@if_true.6
+00:9570 consoleInit@if_false.7
+00:9597 consoleInit@for_cond.8
+00:95a1 consoleInit@for_body.9
+00:95b1 consoleInit@for_cont.10
+00:95bb consoleInit@for_join.11
+00:a284 consoleInitEx
+00:a28c consoleInitEx@start.12
+00:a28e consoleInitEx@body.13
+00:a1dd setScreenOn
+00:a1df setScreenOn@start.14
+00:a1df setScreenOn@body.15
+00:81c1 setScreenOff
+00:81c3 setScreenOff@start.16
+00:81c3 setScreenOff@body.17
+00:a073 setBrightness
+00:a07b setBrightness@start.18
+00:a07b setBrightness@body.19
+00:a09a setBrightness@if_true.20
+00:a0a4 setBrightness@if_false.21
+00:a2ac getBrightness
+00:a2ae getBrightness@start.22
+00:a2ae getBrightness@body.23
+00:a037 isInVBlank
+00:a03f isInVBlank@start.24
+00:a03f isInVBlank@body.25
+00:a05b isInVBlank@cond_false.27
+00:a063 isInVBlank@cond_true.26
+00:a068 isInVBlank@cond_join.28
+00:a2c6 getFrameCount
+00:a2c8 getFrameCount@start.29
+00:a2c8 getFrameCount@body.30
+00:a2cc resetFrameCount
+00:a2ce resetFrameCount@start.31
+00:a2ce resetFrameCount@body.32
+00:a2b9 isPAL
+00:a2bb isPAL@start.33
+00:a2bb isPAL@body.34
+00:a0ab getRegion
+00:a0b3 getRegion@start.35
+00:a0b3 getRegion@body.36
+00:a0c7 getRegion@cond_false.38
+00:a0cf getRegion@cond_true.37
+00:a0d4 getRegion@cond_join.39
+00:9fa2 rand
+00:9faa rand@start.40
+00:9faa rand@body.41
+00:a22c srand
+00:a22e srand@start.42
+00:a22e srand@body.43
+00:a23d srand@if_true.44
+00:a243 srand@if_false.45
+00:a146 setMode
+00:a14e setMode@start.46
+00:a14e setMode@body.47
+00:9d38 nmiSetBank
+00:9d40 nmiSetBank@start.48
+00:9d48 nmiSetBank@body.49
+00:a19a nmiSet
+00:a1a2 nmiSet@start.50
+00:a1a6 nmiSet@body.51
+00:a1f8 nmiClear
+00:a1fa nmiClear@start.52
+00:a1fa nmiClear@body.53
+00:0134 is_pal_system
+00:00fc rand_seed
+00:00fe fill_value.2
+00:9ac8 dmaFillVRAM
+00:9ad0 dmaFillVRAM@start.1
+00:9aea dmaFillVRAM@body.2
+00:a244 dmaClearVRAM
+00:a246 dmaClearVRAM@start.3
+00:a246 dmaClearVRAM@body.4
+00:8fc3 dmaTransfer
+00:8fcb dmaTransfer@start.5
+00:8fcb dmaTransfer@body.6
+00:8fdc dmaTransfer@if_false.8
+00:90f2 dmaTransfer@if_true.7
+00:8e23 dmaCopyVram
+00:8e64 dmaCopyVramBank
+00:8e9b dmaCopyCGram
+00:8ece dmaCopyCGramBank
+00:8f01 dmaCopyOam
+00:8f33 dmaCopyVramMode7
+00:8f69 dmaCopyVramMode7@tilemap_ram_bank
+00:8f6b dmaCopyVramMode7@tilemap_set_bank
+00:8fac dmaCopyVramMode7@tiles_ram_bank
+00:8fae dmaCopyVramMode7@tiles_set_bank
+00:8fba clearNmiFlag
+00:a299 oamInit
+00:a29b oamInit@start.1
+00:a29b oamInit@body.2
+00:a113 oamInitEx
+00:a11b oamInitEx@start.3
+00:a123 oamInitEx@body.4
+00:9be4 oamInitGfxSet
+00:9bec oamInitGfxSet@start.5
+00:9c08 oamInitGfxSet@body.6
+00:886b oamSetX
+00:8873 oamSetX@start.7
+00:8873 oamSetX@body.8
+00:8882 oamSetX@if_false.10
+00:8900 oamSetX@if_false.12
+00:8923 oamSetX@cond_false.33
+00:8932 oamSetX@cond_false.36
+00:8941 oamSetX@cond_false.39
+00:8949 oamSetX@cond_true.38
+00:894e oamSetX@cond_join.40
+00:8955 oamSetX@cond_true.35
+00:895a oamSetX@cond_join.37
+00:8961 oamSetX@cond_true.32
+00:8966 oamSetX@cond_join.34
+00:898d oamSetX@if_true.11
+00:89b0 oamSetX@cond_false.14
+00:89bf oamSetX@cond_false.17
+00:89ce oamSetX@cond_false.20
+00:89d6 oamSetX@cond_true.19
+00:89db oamSetX@cond_join.21
+00:89e2 oamSetX@cond_true.16
+00:89e7 oamSetX@cond_join.18
+00:89ee oamSetX@cond_true.13
+00:89f3 oamSetX@cond_join.15
+00:8a02 oamSetX@cond_false.23
+00:8a11 oamSetX@cond_false.26
+00:8a20 oamSetX@cond_false.29
+00:8a28 oamSetX@cond_true.28
+00:8a2d oamSetX@cond_join.30
+00:8a34 oamSetX@cond_true.25
+00:8a39 oamSetX@cond_join.27
+00:8a40 oamSetX@cond_true.22
+00:8a45 oamSetX@cond_join.24
+00:8a6b oamSetX@if_join.31
+00:8a6b oamSetX@do_body.41
+00:8a7e oamSetX@if_true.44
+00:8a87 oamSetX@if_false.45
+00:8a87 oamSetX@do_cond.42
+00:8a87 oamSetX@do_join.43
+00:8a97 oamSetX@if_true.9
+00:9c64 oamSetY
+00:9c6c oamSetY@start.46
+00:9c6c oamSetY@body.47
+00:9c7b oamSetY@if_false.49
+00:9c9c oamSetY@do_body.50
+00:9caf oamSetY@if_true.53
+00:9cb8 oamSetY@if_false.54
+00:9cb8 oamSetY@do_cond.51
+00:9cb8 oamSetY@do_join.52
+00:9cc8 oamSetY@if_true.48
+00:9ff0 oamSetXY
+00:9ff8 oamSetXY@start.55
+00:a004 oamSetXY@body.56
+00:9843 oamSetTile
+00:984b oamSetTile@start.57
+00:984b oamSetTile@body.58
+00:985a oamSetTile@if_false.60
+00:98c1 oamSetTile@do_body.61
+00:98d4 oamSetTile@if_true.64
+00:98dd oamSetTile@if_false.65
+00:98dd oamSetTile@do_cond.62
+00:98dd oamSetTile@do_join.63
+00:98ed oamSetTile@if_true.59
+00:a0df oamSetVisible
+00:a0e7 oamSetVisible@start.66
+00:a0ef oamSetVisible@body.67
+00:a0fe oamSetVisible@if_false.69
+00:a10c oamSetVisible@if_true.68
+00:a10c oamSetVisible@if_join.70
+00:921b oamHide
+00:9223 oamHide@start.71
+00:9223 oamHide@body.72
+00:9232 oamHide@if_false.74
+00:929e oamHide@cond_false.76
+00:92a8 oamHide@cond_false.79
+00:92b2 oamHide@cond_false.82
+00:92ba oamHide@cond_true.81
+00:92bf oamHide@cond_join.83
+00:92c6 oamHide@cond_true.78
+00:92cb oamHide@cond_join.80
+00:92d2 oamHide@cond_true.75
+00:92d7 oamHide@cond_join.77
+00:92f8 oamHide@do_body.84
+00:930b oamHide@if_true.87
+00:9314 oamHide@if_false.88
+00:9314 oamHide@do_cond.85
+00:9314 oamHide@do_join.86
+00:9324 oamHide@if_true.73
+00:8c74 oamSetSize
+00:8c7c oamSetSize@start.89
+00:8c7c oamSetSize@body.90
+00:8c86 oamSetSize@if_false.92
+00:8cd5 oamSetSize@if_false.94
+00:8cf8 oamSetSize@cond_false.106
+00:8d07 oamSetSize@cond_false.109
+00:8d16 oamSetSize@cond_false.112
+00:8d1e oamSetSize@cond_true.111
+00:8d23 oamSetSize@cond_join.113
+00:8d2a oamSetSize@cond_true.108
+00:8d2f oamSetSize@cond_join.110
+00:8d36 oamSetSize@cond_true.105
+00:8d3b oamSetSize@cond_join.107
+00:8d62 oamSetSize@if_true.93
+00:8d85 oamSetSize@cond_false.96
+00:8d94 oamSetSize@cond_false.99
+00:8da3 oamSetSize@cond_false.102
+00:8dab oamSetSize@cond_true.101
+00:8db0 oamSetSize@cond_join.103
+00:8db7 oamSetSize@cond_true.98
+00:8dbc oamSetSize@cond_join.100
+00:8dc3 oamSetSize@cond_true.95
+00:8dc8 oamSetSize@cond_join.97
+00:8de9 oamSetSize@if_join.104
+00:8de9 oamSetSize@do_body.114
+00:8e03 oamSetSize@if_true.117
+00:8e0c oamSetSize@if_false.118
+00:8e0c oamSetSize@do_cond.115
+00:8e0c oamSetSize@do_join.116
+00:8e1c oamSetSize@if_true.91
+00:9dfb oamSetEx
+00:9e03 oamSetEx@start.119
+00:9e0f oamSetEx@body.120
+00:9e1e oamSetEx@if_false.122
+00:9e42 oamSetEx@if_true.123
+00:9e4a oamSetEx@if_false.124
+00:9e51 oamSetEx@if_true.121
+00:9ccf oamUpdate
+00:9cd7 oamUpdate@start.125
+00:9cf1 oamUpdate@body.126
+00:932b oamClear
+00:9333 oamClear@start.127
+00:9333 oamClear@body.128
+00:9338 oamClear@for_cond.129
+00:9347 oamClear@for_body.130
+00:93c0 oamClear@for_cont.131
+00:93ca oamClear@for_join.132
+00:93cf oamClear@for_cond.133
+00:93de oamClear@for_body.134
+00:93fd oamClear@for_cont.135
+00:9407 oamClear@for_join.136
+00:8a9e oamDrawMeta
+00:8aa6 oamDrawMeta@start.137
+00:8ac2 oamDrawMeta@body.138
+00:8af3 oamDrawMeta@while_cond.139
+00:8b1e oamDrawMeta@logic_right.142
+00:8b31 oamDrawMeta@logic_join.143
+00:8b38 oamDrawMeta@while_body.140
+00:8b64 oamDrawMeta@logic_right.144
+00:8b77 oamDrawMeta@logic_join.145
+00:8b8c oamDrawMeta@logic_right.146
+00:8b9f oamDrawMeta@logic_join.147
+00:8bab oamDrawMeta@logic_right.148
+00:8bbe oamDrawMeta@logic_join.149
+00:8bc9 oamDrawMeta@if_true.150
+00:8bfc oamDrawMeta@if_true.152
+00:8c00 oamDrawMeta@if_false.153
+00:8c56 oamDrawMeta@if_false.151
+00:8c69 oamDrawMeta@while_join.141
+00:85ee oamDrawMetaFlip
+00:85f6 oamDrawMetaFlip@start.154
+00:8622 oamDrawMetaFlip@body.155
+00:8631 oamDrawMetaFlip@cond_false.157
+00:8639 oamDrawMetaFlip@cond_true.156
+00:863e oamDrawMetaFlip@cond_join.158
+00:8684 oamDrawMetaFlip@while_cond.159
+00:86af oamDrawMetaFlip@logic_right.162
+00:86c2 oamDrawMetaFlip@logic_join.163
+00:86c9 oamDrawMetaFlip@while_body.160
+00:8705 oamDrawMetaFlip@if_true.164
+00:8720 oamDrawMetaFlip@if_false.165
+00:872f oamDrawMetaFlip@if_true.166
+00:874a oamDrawMetaFlip@if_false.167
+00:8762 oamDrawMetaFlip@logic_right.168
+00:8775 oamDrawMetaFlip@logic_join.169
+00:878a oamDrawMetaFlip@logic_right.170
+00:879d oamDrawMetaFlip@logic_join.171
+00:87a9 oamDrawMetaFlip@logic_right.172
+00:87bc oamDrawMetaFlip@logic_join.173
+00:87c7 oamDrawMetaFlip@if_true.174
+00:87fa oamDrawMetaFlip@if_true.176
+00:87fe oamDrawMetaFlip@if_false.177
+00:884d oamDrawMetaFlip@if_false.175
+00:8860 oamDrawMetaFlip@while_join.161
+00:9e58 oamDrawMetasprite
+00:9e60 oamDrawMetasprite@start.178
+00:9e74 oamDrawMetasprite@body.179
+00:9999 oamSet
+00:99a3 oamSet@in_range
+00:99f1 oamSet@shift_mask
+00:99f5 oamSet@mask_ready
+00:9a12 oamSet@clear_xhi
+00:9a1e oamSet@xhi_done
+00:9a30 oamSet@skip_max
+00:a212 gsuInit
+00:a214 gsuInit@start.1
+00:a214 gsuInit@body.2
+00:81c1 DataInitEnd
+00:0000 RAM_USAGE_SLOT_1_BANK_0_START
+00:081f RAM_USAGE_SLOT_1_BANK_0_END
+00:0300 RAM_USAGE_SLOT_1_BANK_126_START
+00:051f RAM_USAGE_SLOT_1_BANK_126_END
+
+[definitions]
+00008000 __mul16
+00008056 __div16
+000080ba __mod16
+000080c3 __sdiv16
+000080f2 __smod16
+00000006 _sizeof_EmptyHandler
+00000002 _sizeof_tcc__r0
+00000002 _sizeof_tcc__r0h
+00000002 _sizeof_tcc__r1
+00000002 _sizeof_tcc__r1h
+00000002 _sizeof_tcc__r2
+00000002 _sizeof_tcc__r2h
+00000002 _sizeof_tcc__r3
+00000002 _sizeof_tcc__r3h
+00000002 _sizeof_tcc__r4
+00000002 _sizeof_tcc__r4h
+00000002 _sizeof_tcc__r5
+00000002 _sizeof_tcc__r5h
+00000002 _sizeof_tcc__r9
+00000002 _sizeof_tcc__r9h
+00000002 _sizeof_tcc__r10
+00000002 _sizeof_tcc__r10h
+00000004 _sizeof_nmi_callback
+00000001 _sizeof_nmi_has_callback
+00000030 _sizeof_tcc__nmi_registers
+00000001 _sizeof_vblank_flag
+00000001 _sizeof_oam_update_flag
+00000001 _sizeof_tilemap_update_flag
+00000002 _sizeof_tilemap_vram_addr
+00000002 _sizeof_tilemap_src_addr
+00000002 _sizeof_frame_count
+00000002 _sizeof_frame_count_svg
+00000002 _sizeof_lag_frame_counter
+0000000a _sizeof_pad_keys
+0000000a _sizeof_pad_keysold
+0000000a _sizeof_pad_keysdown
+00000001 _sizeof_snes_mplay5
+00000001 _sizeof_mp5read
+00000008 _sizeof_bg_scroll_x
+00000008 _sizeof_bg_scroll_y
+00000001 _sizeof_bg_scroll_dirty
+00000001 _sizeof_oam_max_id
+00000001 _sizeof_mouse_con
+00000002 _sizeof_mouse_x
+00000002 _sizeof_mouse_y
+00000002 _sizeof_mouseConnect
+00000002 _sizeof_mousePressed
+00000002 _sizeof_mousePreviousPressed
+00000002 _sizeof_mouseButton
+00000002 _sizeof_mouseSensitivity
+00000002 _sizeof_mouseRequestChangeSensitivity
+00000001 _sizeof_sa1_status
+00000001 _sizeof_superfx_status
+00000001 _sizeof_scope_con
+00000002 _sizeof_scope_sinceshot
+00000002 _sizeof_scope_shoth
+00000002 _sizeof_scope_shotv
+00000002 _sizeof_scope_shothraw
+00000002 _sizeof_scope_shotvraw
+00000002 _sizeof_scope_centerh
+00000002 _sizeof_scope_centerv
+00000002 _sizeof_scope_down
+00000002 _sizeof_scope_now
+00000002 _sizeof_scope_held
+00000002 _sizeof_scope_last
+00000002 _sizeof_scope_port2down
+00000002 _sizeof_scope_port2last
+00000002 _sizeof_scope_port2now
+00000002 _sizeof_scope_holddelay
+00000002 _sizeof_scope_repdelay
+00000002 _sizeof_scope_tohold
+00000220 _sizeof__reserved_7e_mirror
+00000220 _sizeof_oamMemory
+00000300 _sizeof_oamQueueEntry
+00000001 _sizeof_sprit_val0
+00000001 _sizeof_sprit_val1
+00000002 _sizeof_sprit_val2
+00000002 _sizeof_oamqueuenumber
+00000002 _sizeof_oamnumberperframe
+00000002 _sizeof_oamnumberperframeold
+00000002 _sizeof_oamnumberspr0
+00000002 _sizeof_oamnumberspr0Init
+00000002 _sizeof_oamnumberspr1
+00000002 _sizeof_oamnumberspr1Init
+00000002 _sizeof_spr0addrgfx
+00000002 _sizeof_spr1addrgfx
+00000002 _sizeof_spr16addrgfx
+00000002 _sizeof_sprit_mxsvg
+00000002 _sizeof_sprit_mysvg
+00000102 _sizeof_InitHardware
+0000008d _sizeof_Start
+00000044 _sizeof_CopyInitData
+00000180 _sizeof_NmiHandler
+00000001 _sizeof_DefaultNmiCallback
+00000016 _sizeof_WaitForVBlank
+0000008a _sizeof_ScanMPlay5
+000000d8 _sizeof_ReadMouse
+000000d7 _sizeof_ReadScope
+00000006 _sizeof_IrqHandler
+00000037 _sizeof_tilemapFlush
+00000056 _sizeof_tcc_mul16
+00000064 _sizeof_tcc_div16
+00000009 _sizeof_tcc_mod16
+0000002f _sizeof_tcc_sdiv16
+0000002d _sizeof_tcc_smod16
+0000000f _sizeof_DataInitStart
+00000000 _sizeof_DataInitEnd
+000000a5 _sizeof_gsu_program
+00000000 _sizeof_gsu_program_end
+00000040 _sizeof_gsu_wram_area
+00000002 _sizeof_gsu_result
+00000001 _sizeof_gsu_sram_byte0
+00000001 _sizeof_gsu_sram_byte1
+00000002 _sizeof_gsu_sram_word
+00000042 _sizeof_launchGSU
+00000046 _sizeof__wram_stub
+00000000 _sizeof__wram_stub_end
+00000015 _sizeof_setupBitmapTilemap
+00000004 _sizeof__tm_row
+00000024 _sizeof__tm_col
+0000003c _sizeof_dmaBitmapToVRAM
+00000020 _sizeof_fractal_pal
+00000095 _sizeof_main
+0000005d _sizeof_bgSetScroll
+0000004e _sizeof_bgSetScrollX
+0000004e _sizeof_bgSetScrollY
+00000015 _sizeof_bgGetScrollX
+00000015 _sizeof_bgGetScrollY
+000000c9 _sizeof_bgSetMapPtr
+00000122 _sizeof_bgSetGfxPtr
+00000029 _sizeof_bgInit
+000000d7 _sizeof_bgInitTileSet
+00000051 _sizeof_bgInitTileSetData
+00000001 _sizeof_bg12nba_shadow
+00000001 _sizeof_bg34nba_shadow
+00000001 _sizeof_current_brightness
+00000001 _sizeof_force_blanked
+000000d8 _sizeof_consoleInit
+00000015 _sizeof_consoleInitEx
+0000001b _sizeof_setScreenOn
+00000012 _sizeof_setScreenOff
+00000038 _sizeof_setBrightness
+0000000d _sizeof_getBrightness
+0000003c _sizeof_isInVBlank
+00000006 _sizeof_getFrameCount
+00000006 _sizeof_resetFrameCount
+0000000d _sizeof_isPAL
+00000034 _sizeof_getRegion
+0000004e _sizeof_rand
+00000018 _sizeof_srand
+0000002b _sizeof_setMode
+00000066 _sizeof_nmiSetBank
+00000023 _sizeof_nmiSet
+0000001a _sizeof_nmiClear
+00000001 _sizeof_is_pal_system
+00000002 _sizeof_rand_seed
+00000002 _sizeof_fill_value.2
+00000092 _sizeof_dmaFillVRAM
+00000016 _sizeof_dmaClearVRAM
+00000136 _sizeof_dmaTransfer
+00000041 _sizeof_dmaCopyVram
+00000037 _sizeof_dmaCopyVramBank
+00000033 _sizeof_dmaCopyCGram
+00000033 _sizeof_dmaCopyCGramBank
+00000032 _sizeof_dmaCopyOam
+00000087 _sizeof_dmaCopyVramMode7
+00000009 _sizeof_clearNmiFlag
+00000013 _sizeof_oamInit
+00000033 _sizeof_oamInitEx
+00000080 _sizeof_oamInitGfxSet
+00000233 _sizeof_oamSetX
+0000006b _sizeof_oamSetY
+00000047 _sizeof_oamSetXY
+000000b1 _sizeof_oamSetTile
+00000034 _sizeof_oamSetVisible
+00000110 _sizeof_oamHide
+000001af _sizeof_oamSetSize
+0000005d _sizeof_oamSetEx
+00000069 _sizeof_oamUpdate
+000000f1 _sizeof_oamClear
+000001d6 _sizeof_oamDrawMeta
+0000027d _sizeof_oamDrawMetaFlip
+0000005d _sizeof_oamDrawMetasprite
+0000009a _sizeof_oamSet
+0000001a _sizeof_gsuInit
+
+[sections]
+000005ee 00:05ee 85ee 0000027d .text.oamDrawMetaFlip
+0000086b 00:086b 886b 00000233 .text.oamSetX
+00000a9e 00:0a9e 8a9e 000001d6 .text.oamDrawMeta
+00000c74 00:0c74 8c74 000001af .text.oamSetSize
+00000e23 00:0e23 8e23 000001a0 .dma_asm
+000001d3 00:01d3 81d3 00000197 .nmi
+00000fc3 00:0fc3 8fc3 00000136 .text.dmaTransfer
+000010f9 00:10f9 90f9 00000122 .text.bgSetGfxPtr
+00000000 00:0000 8000 0000011f .runtime
+0000121b 00:121b 921b 00000110 .text.oamHide
+0000036a 00:036a 836a 00000102 .init
+0000132b 00:132b 932b 000000f1 .text.oamClear
+0000141c 00:141c 941c 000000d8 .read_mouse
+000014f4 00:14f4 94f4 000000d8 .text.consoleInit
+000015cc 00:15cc 95cc 000000d7 .read_scope
+000016a3 00:16a3 96a3 000000d7 .text.bgInitTileSet
+0000177a 00:177a 977a 000000c9 .text.bgSetMapPtr
+00001843 00:1843 9843 000000b1 .text.oamSetTile
+000018f4 00:18f4 98f4 000000a5 .gsu_code
+00001999 00:1999 9999 0000009a .text.oamSet
+00001a33 00:1a33 9a33 00000095 .text.main
+00001ac8 00:1ac8 9ac8 00000092 .text.dmaFillVRAM
+0000011f 00:011f 811f 0000008d .start
+00001b5a 00:1b5a 9b5a 0000008a .scan_mplay5
+0000046c 00:046c 846c 00000088 .gsu_launcher
+00001be4 00:1be4 9be4 00000080 .text.oamInitGfxSet
+00001c64 00:1c64 9c64 0000006b .text.oamSetY
+00001ccf 00:1ccf 9ccf 00000069 .text.oamUpdate
+00001d38 00:1d38 9d38 00000066 .text.nmiSetBank
+00001d9e 00:1d9e 9d9e 0000005d .text.bgSetScroll
+00001dfb 00:1dfb 9dfb 0000005d .text.oamSetEx
+00001e58 00:1e58 9e58 0000005d .text.oamDrawMetasprite
+00001eb5 00:1eb5 9eb5 00000051 .text.bgInitTileSetData
+00001f06 00:1f06 9f06 0000004e .text.bgSetScrollX
+00001f54 00:1f54 9f54 0000004e .text.bgSetScrollY
+00001fa2 00:1fa2 9fa2 0000004e .text.rand
+00001ff0 00:1ff0 9ff0 00000047 .text.oamSetXY
+000004f4 00:04f4 84f4 00000044 .copy_init
+00000538 00:0538 8538 0000003d .gsu_tilemap
+00000575 00:0575 8575 0000003c .gsu_dma
+00002037 00:2037 a037 0000003c .text.isInVBlank
+00002073 00:2073 a073 00000038 .text.setBrightness
+000005b1 00:05b1 85b1 00000037 .tilemap_flush
+000020ab 00:20ab a0ab 00000034 .text.getRegion
+000020df 00:20df a0df 00000034 .text.oamSetVisible
+00002113 00:2113 a113 00000033 .text.oamInitEx
+00002146 00:2146 a146 0000002b .text.setMode
+00002171 00:2171 a171 00000029 .text.bgInit
+0000219a 00:219a a19a 00000023 .text.nmiSet
+000021bd 00:21bd a1bd 00000020 .rodata.1
+000021dd 00:21dd a1dd 0000001b .text.setScreenOn
+000021f8 00:21f8 a1f8 0000001a .text.nmiClear
+00002212 00:2212 a212 0000001a .text.gsuInit
+0000222c 00:222c a22c 00000018 .text.srand
+00002244 00:2244 a244 00000016 .text.dmaClearVRAM
+0000225a 00:225a a25a 00000015 .text.bgGetScrollX
+0000226f 00:226f a26f 00000015 .text.bgGetScrollY
+00002284 00:2284 a284 00000015 .text.consoleInitEx
+00002299 00:2299 a299 00000013 .text.oamInit
+000001c1 00:01c1 81c1 00000012 .text.setScreenOff
+000022ac 00:22ac a2ac 0000000d .text.getBrightness
+000022b9 00:22b9 a2b9 0000000d .text.isPAL
+000001ac 00:01ac 81ac 00000006 .empty_handler
+000005e8 00:05e8 85e8 00000006 .irq
+000022c6 00:22c6 a2c6 00000006 .text.getFrameCount
+000022cc 00:22cc a2cc 00000006 .text.resetFrameCount
+000001b2 00:01b2 81b2 0000000f .data_init
+
+[ramsections]
+00:0520 0520 00000300 .dynamic_sprite_queue
+00:0300 0300 00000220 .reserved_7e_mirror
+7e:0300 0300 00000220 .oam_buffer
+00:0025 0025 00000052 .system
+00:0077 0077 00000046 .gsu_vars
+00:0100 0100 00000030 .nmi_registers
+00:0000 0000 00000025 .registers
+00:00bd 00bd 00000023 .scope
+00:00e0 00e0 0000001c .dynamic_sprite_state
+00:00fc 00fc 00000002 .bss.4
+00:00fe 00fe 00000002 .bss.1
+00:0130 0130 00000001 .bss.1
+00:0131 0131 00000001 .bss.2
+00:0132 0132 00000001 .data.1
+00:0133 0133 00000001 .data.2
+00:0134 0134 00000001 .bss.3

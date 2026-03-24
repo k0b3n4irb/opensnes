@@ -1,0 +1,168 @@
+; SuperFX (GSU) Mandelbrot Set Renderer
+;
+; 4.12 fixed-point: 1.0=$1000, 4.0=$4000
+; FMULT: R0 = (SREG * R6) >> 16 → <<4 for 4.12
+;
+; Registers:
+;   R0  scratch/FMULT/COLOR    R8  re²
+;   R1  X pixel (PLOT)         R9  im²
+;   R2  Y pixel (PLOT)         R10 X pixel counter
+;   R3  re                     R11 step
+;   R4  im                     R12 LOOP Y counter
+;   R5  cr                     R13 LOOP Y target
+;   R6  FMULT operand          R14 ci
+;   R7  iteration counter
+
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+.EQU MAX_ITER    15
+.EQU DEFAULT_CX  $F800      ; -0.5 in 4.12
+.EQU DEFAULT_CY  $0000      ; 0.0
+.EQU DEFAULT_STEP $0060     ; ~0.023 in 4.12
+
+gsu_start:
+    IBT R0, #$70
+    RAMB
+
+    ; Clear framebuffer
+    IWT R0, #$0000
+    IWT R1, #$0000
+    IWT R4, #8192
+    CACHE
+_clear:
+    STW (R1)
+    INC R1
+    INC R1
+    DEC R4
+    BNE _clear
+    NOP
+
+    IBT R0, #$00
+    CMODE
+    IWT R11, #DEFAULT_STEP
+
+    ; Y loop via LOOP (R12=count, R13=target)
+    IBT R2, #$00
+    IWT R12, #128
+    MOVE R13, R15           ; R13 = next instruction = _y_loop
+
+    CACHE
+
+_y_loop:
+    ; ci = DEFAULT_CY + (Y - 64) * step
+    MOVE R0, R2
+    IBT R6, #$40
+    SUB R6                  ; R0 = Y - 64
+    NOP
+    MOVE R6, R11
+    MULT R6                 ; R0 = (Y-64)*step in 4.12
+    NOP
+    IWT R6, #DEFAULT_CY
+    ADD R6
+    NOP
+    MOVE R14, R0            ; R14 = ci
+
+    IBT R1, #$00
+    IWT R10, #256
+
+_x_loop:
+    ; cr = DEFAULT_CX + (X - 128) * step
+    MOVE R0, R1
+    IWT R6, #$0080
+    SUB R6                  ; R0 = X - 128
+    NOP
+    MOVE R6, R11
+    MULT R6                 ; R0 = (X-128)*step in 4.12
+    NOP
+    IWT R6, #DEFAULT_CX
+    ADD R6
+    NOP
+    MOVE R5, R0             ; R5 = cr
+
+    IWT R3, #$0000          ; re = 0
+    IWT R4, #$0000          ; im = 0
+    IBT R7, #MAX_ITER
+
+_iter:
+    ; re² = re * re
+    MOVE R0, R3
+    MOVE R6, R3
+    FMULT
+    ADD R0
+    ADD R0
+    ADD R0
+    ADD R0                  ; re² in 4.12
+    MOVE R8, R0
+
+    ; im² = im * im
+    MOVE R0, R4
+    MOVE R6, R4
+    FMULT
+    ADD R0
+    ADD R0
+    ADD R0
+    ADD R0                  ; im² in 4.12
+    MOVE R9, R0
+
+    ; Escape: re² + im² >= 4.0?
+    MOVE R0, R8
+    ADD R9
+    NOP
+    IWT R6, #$4000
+    SUB R6
+    NOP
+    BPL _escaped
+    NOP
+
+    ; new_im = 2 * re * im + ci (BEFORE re/im overwrite!)
+    MOVE R0, R3
+    MOVE R6, R4
+    FMULT
+    ADD R0
+    ADD R0
+    ADD R0
+    ADD R0                  ; re*im in 4.12
+    ADD R0                  ; 2*re*im
+    ADD R14                 ; + ci (R14 = ci)
+    NOP
+    MOVE R4, R0             ; im = new_im
+
+    ; new_re = re² - im² + cr
+    MOVE R0, R8
+    SUB R9
+    NOP
+    ADD R5                  ; + cr
+    NOP
+    MOVE R3, R0             ; re = new_re
+
+    DEC R7
+    BNE _iter
+    NOP
+
+_escaped:
+    ; color = iterations done = MAX_ITER - R7
+    IBT R0, #MAX_ITER
+    SUB R7
+    NOP
+    COLOR
+
+    PLOT                    ; auto-increments R1
+
+    DEC R10
+    BNE _x_loop
+    NOP
+
+    IBT R1, #$00
+    RPIX                    ; flush pixel cache
+
+    INC R2                  ; Y++
+    LOOP                    ; R12--, if !=0 goto R13
+    NOP                     ; delay slot
+
+    NOP
+    NOP
+    STOP
+    NOP
