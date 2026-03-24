@@ -34,6 +34,8 @@ extern u16 gsu_result;
 extern u8 gsu_sram_byte0;
 extern u8 gsu_sram_byte1;
 extern u16 gsu_sram_word;
+extern u16 gsu_fmult_test1;
+extern u16 gsu_fmult_test2;
 
 /** @brief Convert a nibble to hex ASCII */
 static u8 hexchar(u8 n) {
@@ -108,13 +110,33 @@ int main(void) {
         textPrintAt(3, 14, "STW[2,3]:");
         textPrintAt(13, 14, (char*)buf);
 
+        /* Display FMULT results */
+        buf[0] = '$';
+        buf[1] = hexchar((gsu_fmult_test1 >> 12) & 0xF);
+        buf[2] = hexchar((gsu_fmult_test1 >> 8) & 0xF);
+        buf[3] = hexchar((gsu_fmult_test1 >> 4) & 0xF);
+        buf[4] = hexchar(gsu_fmult_test1 & 0xF);
+        buf[5] = 0;
+        textPrintAt(3, 16, "2*2=");
+        textPrintAt(7, 16, (char*)buf);
+
+        buf[0] = '$';
+        buf[1] = hexchar((gsu_fmult_test2 >> 12) & 0xF);
+        buf[2] = hexchar((gsu_fmult_test2 >> 8) & 0xF);
+        buf[3] = hexchar((gsu_fmult_test2 >> 4) & 0xF);
+        buf[4] = hexchar(gsu_fmult_test2 & 0xF);
+        buf[5] = 0;
+        textPrintAt(13, 16, "1.5*3=");
+        textPrintAt(19, 16, (char*)buf);
+
         if (result == 0xCAFE && gsu_sram_byte0 == 0x42
-            && gsu_sram_byte1 == 0x55 && gsu_sram_word == 0xBEEF) {
-            textPrintAt(3, 17, "ALL TESTS PASSED!");
+            && gsu_sram_byte1 == 0x55 && gsu_sram_word == 0xBEEF
+            && gsu_fmult_test1 == 0x4000 && gsu_fmult_test2 == 0x4800) {
+            textPrintAt(3, 19, "ALL TESTS PASSED!");
         } else if (result == 0xCAFE) {
-            textPrintAt(3, 17, "R0 OK, SRAM PARTIAL");
+            textPrintAt(3, 19, "R0 OK, FMULT/SRAM?");
         } else {
-            textPrintAt(3, 17, "TESTS FAILED!");
+            textPrintAt(3, 19, "TESTS FAILED!");
         }
     } else {
         textPrintAt(3, 6, "GSU: NOT DETECTED");
