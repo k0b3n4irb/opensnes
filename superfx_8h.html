@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('superfx_8h.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 
-<p>SuperFX (GSU) coprocessor register definitions and API.  
+<p>SuperFX (GSU) coprocessor library — registers, config, and API.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">snes/types.h</a>&gt;</code><br />
 </div>
@@ -165,8 +165,6 @@ Macros</h2></td></tr>
 <tr class="separator:ad49cfcd5809d7d410a438b19b51db933"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28ae4008efe5558e3325340962059a07" id="r_a28ae4008efe5558e3325340962059a07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a28ae4008efe5558e3325340962059a07">REG_SFR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3030)</td></tr>
 <tr class="separator:a28ae4008efe5558e3325340962059a07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f1b86518872b7eb782e76674dc002fa" id="r_a4f1b86518872b7eb782e76674dc002fa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a4f1b86518872b7eb782e76674dc002fa">REG_SFR_H</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3031)</td></tr>
-<tr class="separator:a4f1b86518872b7eb782e76674dc002fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada011548944b13eb92dd71f1b7f480c3" id="r_ada011548944b13eb92dd71f1b7f480c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#ada011548944b13eb92dd71f1b7f480c3">REG_SFR_L</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3030)</td></tr>
 <tr class="separator:ada011548944b13eb92dd71f1b7f480c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91683548098fd503db2acca934effa7c" id="r_a91683548098fd503db2acca934effa7c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a91683548098fd503db2acca934effa7c">REG_VCR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x303B)</td></tr>
@@ -183,37 +181,65 @@ Macros</h2></td></tr>
 <tr class="separator:afc4e70c53ee457aae4c2fb0f8238be44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e959d072f954d2323777219fd46c856" id="r_a5e959d072f954d2323777219fd46c856"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a5e959d072f954d2323777219fd46c856">SCMR_H192</a>&#160;&#160;&#160;0x20</td></tr>
 <tr class="separator:a5e959d072f954d2323777219fd46c856"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae9c8c0037818dd3374e84aa11f484b7" id="r_aae9c8c0037818dd3374e84aa11f484b7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#aae9c8c0037818dd3374e84aa11f484b7">SCMR_HT0</a>&#160;&#160;&#160;0x04</td></tr>
-<tr class="separator:aae9c8c0037818dd3374e84aa11f484b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5651fdac694a55aca194f165510fd40" id="r_af5651fdac694a55aca194f165510fd40"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#af5651fdac694a55aca194f165510fd40">SCMR_HT1</a>&#160;&#160;&#160;0x20</td></tr>
-<tr class="separator:af5651fdac694a55aca194f165510fd40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4252288a83e12d228846a3c288b75226" id="r_a4252288a83e12d228846a3c288b75226"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a4252288a83e12d228846a3c288b75226">SCMR_OBJ</a>&#160;&#160;&#160;0x24</td></tr>
-<tr class="separator:a4252288a83e12d228846a3c288b75226"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46d40506dd634f0bb87d8c2cbefa1847" id="r_a46d40506dd634f0bb87d8c2cbefa1847"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a46d40506dd634f0bb87d8c2cbefa1847">SCMR_RAN</a>&#160;&#160;&#160;0x08</td></tr>
 <tr class="separator:a46d40506dd634f0bb87d8c2cbefa1847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ecf17cccfa7f001006bef43d63042e1" id="r_a0ecf17cccfa7f001006bef43d63042e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a0ecf17cccfa7f001006bef43d63042e1">SCMR_RON</a>&#160;&#160;&#160;0x10</td></tr>
 <tr class="separator:a0ecf17cccfa7f001006bef43d63042e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9778529684984e851c13865f09eb9b29" id="r_a9778529684984e851c13865f09eb9b29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a9778529684984e851c13865f09eb9b29">SFR_GO</a>&#160;&#160;&#160;0x20</td></tr>
 <tr class="separator:a9778529684984e851c13865f09eb9b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bdd8a7c3a94b3a00ad1af1ce63c3f6b" id="r_a8bdd8a7c3a94b3a00ad1af1ce63c3f6b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a8bdd8a7c3a94b3a00ad1af1ce63c3f6b">SFR_IRQ</a>&#160;&#160;&#160;0x80</td></tr>
-<tr class="separator:a8bdd8a7c3a94b3a00ad1af1ce63c3f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ae76c8e0f8bfa078d0bc18b4be1f4f6a8" id="r_ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">gsuDmaFullFrame</a> (void)</td></tr>
+<tr class="memdesc:ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS)  <br /></td></tr>
+<tr class="separator:ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addfe64b4f0c5ffe4847f2e0d56c5ef10" id="r_addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a> (void)</td></tr>
-<tr class="memdesc:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize SuperFX — checks if GSU hardware is present.  <br /></td></tr>
+<tr class="memdesc:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize SuperFX — detect hardware, set default config.  <br /></td></tr>
 <tr class="separator:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa2477b5e4a9d17cf5cf4103cc5ca5a8" id="r_afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a> (void)</td></tr>
+<tr class="memdesc:afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Launch GSU program and wait for completion (WRAM-safe)  <br /></td></tr>
+<tr class="separator:afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fd575a6b7ae455fdf3ca7205b221f50" id="r_a1fd575a6b7ae455fdf3ca7205b221f50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
+<tr class="memdesc:a1fd575a6b7ae455fdf3ca7205b221f50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup column-major tilemap for SuperFX PLOT framebuffer.  <br /></td></tr>
+<tr class="separator:a1fd575a6b7ae455fdf3ca7205b221f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7a88cd0ea3830d8a308cf5c0ca8b00a" id="r_ae7a88cd0ea3830d8a308cf5c0ca8b00a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a">gsuSetupHdmaBlanking</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> topBlank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> bottomBlank)</td></tr>
+<tr class="memdesc:ae7a88cd0ea3830d8a308cf5c0ca8b00a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup HDMA screen blanking for DMA bandwidth.  <br /></td></tr>
+<tr class="separator:ae7a88cd0ea3830d8a308cf5c0ca8b00a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a276ddb2df70ac449323c825df9d7f89d" id="r_a276ddb2df70ac449323c825df9d7f89d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d">gsu_cfgr</a></td></tr>
+<tr class="memdesc:a276ddb2df70ac449323c825df9d7f89d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply)  <br /></td></tr>
+<tr class="separator:a276ddb2df70ac449323c825df9d7f89d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06b7d31abfaac2dacbfe49f26e89c1a9" id="r_a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a06b7d31abfaac2dacbfe49f26e89c1a9">gsu_dma_src_hi</a></td></tr>
+<tr class="memdesc:a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000)  <br /></td></tr>
+<tr class="separator:a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa96dbf2933de566840e56b543630e5d6" id="r_aa96dbf2933de566840e56b543630e5d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#aa96dbf2933de566840e56b543630e5d6">gsu_prog_addr</a></td></tr>
+<tr class="memdesc:aa96dbf2933de566840e56b543630e5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">GSU program 16-bit address (set by gsuSetProgram)  <br /></td></tr>
+<tr class="separator:aa96dbf2933de566840e56b543630e5d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37f6cfe16760b75f19f649ecaaef14da" id="r_a37f6cfe16760b75f19f649ecaaef14da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#a37f6cfe16760b75f19f649ecaaef14da">gsu_prog_bank</a></td></tr>
+<tr class="memdesc:a37f6cfe16760b75f19f649ecaaef14da"><td class="mdescLeft">&#160;</td><td class="mdescRight">GSU program bank byte (set by gsuSetProgram)  <br /></td></tr>
+<tr class="separator:a37f6cfe16760b75f19f649ecaaef14da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad840ff367d45008c2505fc2e93c5bf06" id="r_ad840ff367d45008c2505fc2e93c5bf06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06">gsu_scbr</a></td></tr>
+<tr class="memdesc:ad840ff367d45008c2505fc2e93c5bf06"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCBR screen base ($00=buffer A, $10=buffer B)  <br /></td></tr>
+<tr class="separator:ad840ff367d45008c2505fc2e93c5bf06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af40ac5ed1d6c297cb066a57c4d52c995" id="r_af40ac5ed1d6c297cb066a57c4d52c995"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995">gsu_scmr</a></td></tr>
+<tr class="memdesc:af40ac5ed1d6c297cb066a57c4d52c995"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON)  <br /></td></tr>
+<tr class="separator:af40ac5ed1d6c297cb066a57c4d52c995"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd2eb7f0a4b968b7861b4e8654fb1ee" id="r_aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="superfx_8h.html#aebd2eb7f0a4b968b7861b4e8654fb1ee">superfx_status</a></td></tr>
-<tr class="memdesc:aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detect SuperFX hardware.  <br /></td></tr>
+<tr class="memdesc:aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">SuperFX status from crt0 init (VCR chip version, 0=not detected)  <br /></td></tr>
 <tr class="separator:aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>SuperFX (GSU) coprocessor register definitions and API. </p>
-<p>The SuperFX/GSU is a 16-bit RISC coprocessor running at 10.74 or 21.47 MHz. It has its own instruction set (not 65816) and communicates with the main CPU through shared cartridge SRAM and GSU registers at $3000-$303F.</p>
-<p>CRITICAL: When the GSU is running, it owns the ROM and RAM buses. The SNES CPU cannot read ROM or SRAM until the GSU stops (STOP instruction).</p>
+<div class="textblock"><p>SuperFX (GSU) coprocessor library — registers, config, and API. </p>
+<p>Provides a complete C API for SuperFX cartridges:</p><ul>
+<li>GSU detection and configuration</li>
+<li>WRAM-safe GSU launch (mandatory — CPU can't read ROM during GSU execution)</li>
+<li>DMA helpers for SRAM-to-VRAM framebuffer transfer</li>
+<li>HDMA screen blanking for 60 FPS DMA bandwidth</li>
+<li>Column-major tilemap setup for PLOT rendering</li>
+</ul>
+<p>The GSU code itself is written in SuperFX assembly (.sfx files). The C API handles all SNES-side boilerplate.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="superfx_8md.html">docs/tutorials/superfx.md</a> </dd></dl>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a6ec6a4d69c0619929aadf651082b0ae2" name="a6ec6a4d69c0619929aadf651082b0ae2"></a>
@@ -227,7 +253,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>10.74 MHz (default) </p>
 
 </div>
 </div>
@@ -242,7 +267,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>21.47 MHz (GSU-1/GSU-2 only, not Mario Chip 1) </p>
 
 </div>
 </div>
@@ -257,7 +281,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Cartridge SRAM, bank $70 </p>
 
 </div>
 </div>
@@ -272,7 +295,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Backup RAM Register (1-bit, write) </p>
 
 </div>
 </div>
@@ -287,7 +309,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Cache Base Register (16-bit, read-only) </p>
 
 </div>
 </div>
@@ -302,7 +323,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Clock Select Register (8-bit, write) </p>
 
 </div>
 </div>
@@ -359,7 +379,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>LINK return address </p>
 
 </div>
 </div>
@@ -374,7 +393,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>LOOP counter </p>
 
 </div>
 </div>
@@ -389,7 +407,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>LOOP target address </p>
 
 </div>
 </div>
@@ -404,7 +421,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>ROM data pointer </p>
 
 </div>
 </div>
@@ -419,7 +435,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Program Counter (write high byte = GO!) </p>
 
 </div>
 </div>
@@ -546,7 +561,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Program Bank Register (8-bit, read/write) </p>
 
 </div>
 </div>
@@ -561,7 +575,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>RAM Bank Register (8-bit, read-only from SNES CPU) </p>
 
 </div>
 </div>
@@ -576,7 +589,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>ROM Bank Register (8-bit, read-only from SNES CPU) </p>
 
 </div>
 </div>
@@ -591,7 +603,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Screen Base Register (8-bit, write) — PLOT pixel buffer base in SRAM </p>
 
 </div>
 </div>
@@ -606,7 +617,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Screen Mode Register (8-bit, write) — bus arbitration + PLOT config </p>
 
 </div>
 </div>
@@ -618,21 +628,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define REG_SFR&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3030)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Status/Flag Register (16-bit, read/write) </p>
-
-</div>
-</div>
-<a id="a4f1b86518872b7eb782e76674dc002fa" name="a4f1b86518872b7eb782e76674dc002fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f1b86518872b7eb782e76674dc002fa">&#9670;&#160;</a></span>REG_SFR_H</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define REG_SFR_H&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3031)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -664,7 +659,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Version Code Register (8-bit, read-only) </p>
 
 </div>
 </div>
@@ -679,7 +673,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>2 bits per pixel </p>
 
 </div>
 </div>
@@ -694,7 +687,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>4 bits per pixel </p>
 
 </div>
 </div>
@@ -709,7 +701,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>8 bits per pixel </p>
 
 </div>
 </div>
@@ -724,7 +715,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>128 pixels high </p>
 
 </div>
 </div>
@@ -739,7 +729,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>160 pixels high </p>
 
 </div>
 </div>
@@ -754,52 +743,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>192 pixels high </p>
-
-</div>
-</div>
-<a id="aae9c8c0037818dd3374e84aa11f484b7" name="aae9c8c0037818dd3374e84aa11f484b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae9c8c0037818dd3374e84aa11f484b7">&#9670;&#160;</a></span>SCMR_HT0</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCMR_HT0&#160;&#160;&#160;0x04</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Height bit 0 </p>
-
-</div>
-</div>
-<a id="af5651fdac694a55aca194f165510fd40" name="af5651fdac694a55aca194f165510fd40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5651fdac694a55aca194f165510fd40">&#9670;&#160;</a></span>SCMR_HT1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCMR_HT1&#160;&#160;&#160;0x20</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Height bit 1 </p>
-
-</div>
-</div>
-<a id="a4252288a83e12d228846a3c288b75226" name="a4252288a83e12d228846a3c288b75226"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4252288a83e12d228846a3c288b75226">&#9670;&#160;</a></span>SCMR_OBJ</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCMR_OBJ&#160;&#160;&#160;0x24</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>OBJ mode </p>
 
 </div>
 </div>
@@ -814,7 +757,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Bit 3: GSU owns RAM (1=GSU, 0=SNES CPU) </p>
 
 </div>
 </div>
@@ -829,7 +771,6 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Bit 4: GSU owns ROM (1=GSU, 0=SNES CPU) </p>
 
 </div>
 </div>
@@ -844,26 +785,39 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Bit 5: GSU is running (1=running, 0=stopped) </p>
-
-</div>
-</div>
-<a id="a8bdd8a7c3a94b3a00ad1af1ce63c3f6b" name="a8bdd8a7c3a94b3a00ad1af1ce63c3f6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bdd8a7c3a94b3a00ad1af1ce63c3f6b">&#9670;&#160;</a></span>SFR_IRQ</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SFR_IRQ&#160;&#160;&#160;0x80</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Bit 7 of high byte: IRQ flag (set on STOP) </p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ae76c8e0f8bfa078d0bc18b4be1f4f6a8" name="ae76c8e0f8bfa078d0bc18b4be1f4f6a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">&#9670;&#160;</a></span>gsuDmaFullFrame()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuDmaFullFrame </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS) </p>
+<p>Polls V-counter until scanline 184, then DMAs full framebuffer. Requires <a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a> for sufficient DMA bandwidth. </p>
+
+</div>
+</div>
 <a id="addfe64b4f0c5ffe4847f2e0d56c5ef10" name="addfe64b4f0c5ffe4847f2e0d56c5ef10"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#addfe64b4f0c5ffe4847f2e0d56c5ef10">&#9670;&#160;</a></span>gsuInit()</h2>
 
@@ -880,13 +834,266 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize SuperFX — checks if GSU hardware is present. </p>
+<p>Initialize SuperFX — detect hardware, set default config. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if GSU detected, 0 if not</dd></dl>
-<p>The crt0.asm startup code reads VCR and stores the result in superfx_status. This function returns whether the GSU was detected. </p>
+<p>Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00 </p>
+
+</div>
+</div>
+<a id="afa2477b5e4a9d17cf5cf4103cc5ca5a8" name="afa2477b5e4a9d17cf5cf4103cc5ca5a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8">&#9670;&#160;</a></span>gsuLaunch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuLaunch </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Launch GSU program and wait for completion (WRAM-safe) </p>
+<p>Call <a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e">gsuSetProgram()</a> first to set the GSU binary address. Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration. Disables NMI during execution (ROM inaccessible). </p>
+
+</div>
+</div>
+<a id="a1fd575a6b7ae455fdf3ca7205b221f50" name="a1fd575a6b7ae455fdf3ca7205b221f50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fd575a6b7ae455fdf3ca7205b221f50">&#9670;&#160;</a></span>gsuSetupBitmapTilemap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuSetupBitmapTilemap </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
+          <td class="paramname"><em>vramAddr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Setup column-major tilemap for SuperFX PLOT framebuffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vramAddr</td><td>VRAM word address for tilemap (typically 0x4000) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae7a88cd0ea3830d8a308cf5c0ca8b00a" name="ae7a88cd0ea3830d8a308cf5c0ca8b00a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7a88cd0ea3830d8a308cf5c0ca8b00a">&#9670;&#160;</a></span>gsuSetupHdmaBlanking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuSetupHdmaBlanking </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
+          <td class="paramname"><em>topBlank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
+          <td class="paramname"><em>bottomBlank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Setup HDMA screen blanking for DMA bandwidth. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">topBlank</td><td>Scanlines of forced blank at top (e.g., 40) </td></tr>
+    <tr><td class="paramname">bottomBlank</td><td>Scanlines of forced blank at bottom (e.g., 40)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Creates black bars like Star Fox. Total blank + VBlank must provide enough bandwidth for the 16KB framebuffer DMA (~6.2ms needed). </p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a276ddb2df70ac449323c825df9d7f89d" name="a276ddb2df70ac449323c825df9d7f89d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a276ddb2df70ac449323c825df9d7f89d">&#9670;&#160;</a></span>gsu_cfgr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_cfgr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply) </p>
+
+</div>
+</div>
+<a id="a06b7d31abfaac2dacbfe49f26e89c1a9" name="a06b7d31abfaac2dacbfe49f26e89c1a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06b7d31abfaac2dacbfe49f26e89c1a9">&#9670;&#160;</a></span>gsu_dma_src_hi</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_dma_src_hi</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000) </p>
+
+</div>
+</div>
+<a id="aa96dbf2933de566840e56b543630e5d6" name="aa96dbf2933de566840e56b543630e5d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa96dbf2933de566840e56b543630e5d6">&#9670;&#160;</a></span>gsu_prog_addr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsu_prog_addr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>GSU program 16-bit address (set by gsuSetProgram) </p>
+
+</div>
+</div>
+<a id="a37f6cfe16760b75f19f649ecaaef14da" name="a37f6cfe16760b75f19f649ecaaef14da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f6cfe16760b75f19f649ecaaef14da">&#9670;&#160;</a></span>gsu_prog_bank</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_prog_bank</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>GSU program bank byte (set by gsuSetProgram) </p>
+
+</div>
+</div>
+<a id="ad840ff367d45008c2505fc2e93c5bf06" name="ad840ff367d45008c2505fc2e93c5bf06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad840ff367d45008c2505fc2e93c5bf06">&#9670;&#160;</a></span>gsu_scbr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_scbr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SCBR screen base ($00=buffer A, $10=buffer B) </p>
+
+</div>
+</div>
+<a id="af40ac5ed1d6c297cb066a57c4d52c995" name="af40ac5ed1d6c297cb066a57c4d52c995"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af40ac5ed1d6c297cb066a57c4d52c995">&#9670;&#160;</a></span>gsu_scmr</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_scmr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON) </p>
+
+</div>
+</div>
 <a id="aebd2eb7f0a4b968b7861b4e8654fb1ee" name="aebd2eb7f0a4b968b7861b4e8654fb1ee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aebd2eb7f0a4b968b7861b4e8654fb1ee">&#9670;&#160;</a></span>superfx_status</h2>
 
@@ -907,9 +1114,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Detect SuperFX hardware. </p>
-<dl class="section return"><dt>Returns</dt><dd>Non-zero if GSU detected (VCR chip version), 0 if not present</dd></dl>
-<p>Reads VCR register ($303B). Returns the chip version code. On non-SuperFX cartridges, reads open bus (typically $00 or $FF). </p>
+<p>SuperFX status from crt0 init (VCR chip version, 0=not detected) </p>
 
 </div>
 </div>

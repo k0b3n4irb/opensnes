@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('snes_sound_guide.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This guide covers the SNES audio system for OpenSNES game development.</p>
-<h2><a class="anchor" id="autotoc_md352"></a>
+<h2><a class="anchor" id="autotoc_md359"></a>
 Table of Contents</h2>
 <ol type="1">
 <li><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">Architecture Overview</a></li>
@@ -111,7 +111,7 @@ Table of Contents</h2>
 <li><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">Tools &amp; Resources</a></li>
 </ol>
 <hr  />
-<h2><a class="anchor" id="autotoc_md354"></a>
+<h2><a class="anchor" id="autotoc_md361"></a>
 Architecture Overview</h2>
 <p>The SNES audio system is completely <b>separate</b> from the main CPU:</p>
 <table class="markdownTable">
@@ -128,7 +128,7 @@ Architecture Overview</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>Sample Rate</b>   </td><td class="markdownTableBodyNone">32 kHz output   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md355"></a>
+<h3><a class="anchor" id="autotoc_md362"></a>
 Key Capabilities</h3>
 <ul>
 <li>8 simultaneous channels</li>
@@ -140,9 +140,9 @@ Key Capabilities</h3>
 <li>Noise generator</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md357"></a>
+<h2><a class="anchor" id="autotoc_md364"></a>
 SPC700 CPU</h2>
-<h3><a class="anchor" id="autotoc_md358"></a>
+<h3><a class="anchor" id="autotoc_md365"></a>
 Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -160,7 +160,7 @@ Registers</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">PSW   </td><td class="markdownTableBodyNone">8-bit   </td><td class="markdownTableBodyNone">Status flags   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md359"></a>
+<h3><a class="anchor" id="autotoc_md366"></a>
 Memory Map</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -176,7 +176,7 @@ Memory Map</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$FFC0-$FFFF   </td><td class="markdownTableBodyNone">IPL ROM (boot code)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md360"></a>
+<h3><a class="anchor" id="autotoc_md367"></a>
 Communication Ports</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -192,10 +192,10 @@ Communication Ports</h3>
 </table>
 <p><b>Important</b>: Use 8-bit writes only! 16-bit writes can corrupt port 3.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md362"></a>
+<h2><a class="anchor" id="autotoc_md369"></a>
 DSP Registers</h2>
 <p>Access via indirect addressing: write address to <code>$F2</code>, read/write data at <code>$F3</code>.</p>
-<h3><a class="anchor" id="autotoc_md363"></a>
+<h3><a class="anchor" id="autotoc_md370"></a>
 Per-Voice Registers (x = voice 0-7)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -221,7 +221,7 @@ Per-Voice Registers (x = voice 0-7)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">x9   </td><td class="markdownTableBodyNone">OUTX   </td><td class="markdownTableBodyNone">8   </td><td class="markdownTableBodyNone">Current output (read-only)   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md364"></a>
+<h3><a class="anchor" id="autotoc_md371"></a>
 Global Registers</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -260,10 +260,10 @@ Global Registers</h3>
 <td class="markdownTableBodyNone">xF   </td><td class="markdownTableBodyNone">COEF   </td><td class="markdownTableBodyNone">FIR filter coefficients   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md366"></a>
+<h2><a class="anchor" id="autotoc_md373"></a>
 BRR Sample Format</h2>
 <p>BRR (Bit Rate Reduction) is ADPCM compression with ~3.5:1 ratio.</p>
-<h3><a class="anchor" id="autotoc_md367"></a>
+<h3><a class="anchor" id="autotoc_md374"></a>
 Block Structure (9 bytes)</h3>
 <div class="fragment"><div class="line">Byte 0: Header</div>
 <div class="line">  Bits 7-4: Range (shift amount)</div>
@@ -272,7 +272,7 @@ Block Structure (9 bytes)</h3>
 <div class="line">  Bit 0:    End flag</div>
 <div class="line"> </div>
 <div class="line">Bytes 1-8: Data (16 × 4-bit samples)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md368"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md375"></a>
 Filters</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -286,7 +286,7 @@ Filters</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">3   </td><td class="markdownTableBodyNone">1.796875   </td><td class="markdownTableBodyNone">-0.8125   </td><td class="markdownTableBodyNone">Moderate prediction   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md369"></a>
+<h3><a class="anchor" id="autotoc_md376"></a>
 Sample Directory</h3>
 <p>Location set by <code>DIR</code> register (×$100). Each entry is 4 bytes:</p>
 <table class="markdownTable">
@@ -298,21 +298,21 @@ Sample Directory</h3>
 <td class="markdownTableBodyNone">+2   </td><td class="markdownTableBodyNone">Loop address (16-bit)   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md371"></a>
+<h2><a class="anchor" id="autotoc_md378"></a>
 ADSR Envelopes</h2>
 <p>When ADSR enabled (bit 7 of x5 = 1):</p>
-<h3><a class="anchor" id="autotoc_md372"></a>
+<h3><a class="anchor" id="autotoc_md379"></a>
 ADSR1 Register (x5)</h3>
 <div class="fragment"><div class="line">EDDD AAAA</div>
 <div class="line">│└┴┴ └┴┴┴─ Attack rate (0-15)</div>
 <div class="line">│    └───── Decay rate (0-7)</div>
 <div class="line">└────────── ADSR enable</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md373"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md380"></a>
 ADSR2 Register (x6)</h3>
 <div class="fragment"><div class="line">SSSR RRRR</div>
 <div class="line">│││  └┴┴┴┴─ Sustain release rate (0-31)</div>
 <div class="line">└┴┴──────── Sustain level (0-7)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md374"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md381"></a>
 Timing Values</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -322,7 +322,7 @@ Timing Values</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">15   </td><td class="markdownTableBodyNone">0ms   </td><td class="markdownTableBodyNone">7   </td><td class="markdownTableBodyNone">37ms   </td><td class="markdownTableBodyNone">31   </td><td class="markdownTableBodyNone">18ms   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md375"></a>
+<h3><a class="anchor" id="autotoc_md382"></a>
 GAIN Modes (when ADSR disabled)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -339,9 +339,9 @@ GAIN Modes (when ADSR disabled)</h3>
 <td class="markdownTableBodyNone">Dec Exp   </td><td class="markdownTableBodyNone">101x xxxx   </td><td class="markdownTableBodyNone">Fall × 255/256   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md377"></a>
+<h2><a class="anchor" id="autotoc_md384"></a>
 Echo System</h2>
-<h3><a class="anchor" id="autotoc_md378"></a>
+<h3><a class="anchor" id="autotoc_md385"></a>
 Configuration</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -355,19 +355,19 @@ Configuration</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">EVOL   </td><td class="markdownTableBodyNone">$40   </td><td class="markdownTableBodyNone">50% echo volume   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md379"></a>
+<h3><a class="anchor" id="autotoc_md386"></a>
 Memory Usage</h3>
 <div class="fragment"><div class="line">Echo memory = EDL × 2KB</div>
 <div class="line">Delay time = EDL × 16ms</div>
 </div><!-- fragment --><p><b>Warning</b>: Echo buffer overwrites memory! Plan ARAM layout carefully.</p>
-<h3><a class="anchor" id="autotoc_md380"></a>
+<h3><a class="anchor" id="autotoc_md387"></a>
 FIR Filter Coefficients (COEF 0F-7F)</h3>
 <p>Default (no filtering): <code>127, 0, 0, 0, 0, 0, 0, 0</code></p>
 <p>Example low-pass: <code>32, 32, 32, 32, 0, 0, 0, 0</code></p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md382"></a>
+<h2><a class="anchor" id="autotoc_md389"></a>
 Communication Protocol</h2>
-<h3><a class="anchor" id="autotoc_md383"></a>
+<h3><a class="anchor" id="autotoc_md390"></a>
 Upload Protocol (Boot)</h3>
 <ol type="1">
 <li>SNES waits for <code>$AA</code> at $2140, <code>$BB</code> at $2141</li>
@@ -377,7 +377,7 @@ Upload Protocol (Boot)</h3>
 <li>Repeat for additional blocks</li>
 <li>Send entry point and <code>$00</code> to execute</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md384"></a>
+<h3><a class="anchor" id="autotoc_md391"></a>
 Runtime Communication</h3>
 <div class="fragment"><div class="line"><span class="comment">// Send command to SPC</span></div>
 <div class="line"><span class="keywordtype">void</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">spc_send_command</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cmd</a>, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">data</a>) {</div>
@@ -391,9 +391,9 @@ Runtime Communication</h3>
 <div class="ttc" id="agroup__apu__regs_html_ga89c7789cdab43863801289c60632880b"><div class="ttname"><a href="group__apu__regs.html#ga89c7789cdab43863801289c60632880b">REG_APUIO1</a></div><div class="ttdeci">#define REG_APUIO1</div><div class="ttdoc">APU I/O port 1 (R/W)</div><div class="ttdef"><b>Definition</b> registers.h:403</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md386"></a>
+<h2><a class="anchor" id="autotoc_md393"></a>
 Asset Requirements</h2>
-<h3><a class="anchor" id="autotoc_md387"></a>
+<h3><a class="anchor" id="autotoc_md394"></a>
 Sample Preparation</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -407,7 +407,7 @@ Sample Preparation</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Loop point   </td><td class="markdownTableBodyNone">Multiple of 16 samples   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md388"></a>
+<h3><a class="anchor" id="autotoc_md395"></a>
 Memory Budget (64KB total)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -421,7 +421,7 @@ Memory Budget (64KB total)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Samples</b>   </td><td class="markdownTableBodyNone">**~30-50 KB**   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md389"></a>
+<h3><a class="anchor" id="autotoc_md396"></a>
 Typical Sample Sizes</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -436,9 +436,9 @@ Typical Sample Sizes</h3>
 <td class="markdownTableBodyNone">SFX   </td><td class="markdownTableBodyNone">2 KB   </td><td class="markdownTableBodyNone">~0.6 KB   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md391"></a>
+<h2><a class="anchor" id="autotoc_md398"></a>
 Tools &amp; Resources</h2>
-<h3><a class="anchor" id="autotoc_md392"></a>
+<h3><a class="anchor" id="autotoc_md399"></a>
 Sound Creation Tools</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -452,7 +452,7 @@ Sound Creation Tools</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Audacity</b>   </td><td class="markdownTableBodyNone">Sample editing   </td><td class="markdownTableBodyNone">Free   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md393"></a>
+<h3><a class="anchor" id="autotoc_md400"></a>
 Conversion Tools</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -466,7 +466,7 @@ Conversion Tools</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Split700</b>   </td><td class="markdownTableBodyNone">Extract samples from SPC   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md394"></a>
+<h3><a class="anchor" id="autotoc_md401"></a>
 Sample Sources</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -478,7 +478,7 @@ Sample Sources</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="https://kenney.nl">Kenney.nl</a>   </td><td class="markdownTableBodyNone">CC0   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md395"></a>
+<h3><a class="anchor" id="autotoc_md402"></a>
 Documentation</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -491,9 +491,9 @@ Documentation</h3>
 <td class="markdownTableBodyNone">Wikibooks SPC700   </td><td class="markdownTableBodyNone"><a href="https://en.wikibooks.org/wiki/Super_NES_Programming/SPC700_reference">https://en.wikibooks.org/wiki/Super_NES_Programming/SPC700_reference</a>   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md397"></a>
+<h2><a class="anchor" id="autotoc_md404"></a>
 Quick Reference</h2>
-<h3><a class="anchor" id="autotoc_md398"></a>
+<h3><a class="anchor" id="autotoc_md405"></a>
 Pitch Calculation</h3>
 <div class="fragment"><div class="line">Pitch register = Hz × 128 / 1000</div>
 <div class="line">Hz = Pitch register × 1000 / 128</div>
@@ -505,7 +505,7 @@ Pitch Calculation</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A4   </td><td class="markdownTableBodyNone">440   </td><td class="markdownTableBodyNone">$1B00   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md399"></a>
+<h3><a class="anchor" id="autotoc_md406"></a>
 Common Operations</h3>
 <div class="fragment"><div class="line">// Start voice 0</div>
 <div class="line">DSP[$4C] = 0x01;  // KON</div>
@@ -520,7 +520,7 @@ Common Operations</h3>
 <div class="line">// Set voice 0 volume</div>
 <div class="line">DSP[$00] = left_vol;</div>
 <div class="line">DSP[$01] = right_vol;</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md400"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md407"></a>
 Noise Frequencies</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">

@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_basics_timer.html',''); initR
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md627"></a>
+    <h2><a class="anchor" id="autotoc_md641"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the NMI handler increments <code>frame_count</code> every VBlank — the heartbeat of every SNES game</li>
@@ -109,7 +109,7 @@ What You'll Learn</h2>
 <li>How <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> synchronizes the main loop to exactly 60/50 fps</li>
 <li>How to read input with <code><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></code> for single-press detection</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md628"></a>
+<h2><a class="anchor" id="autotoc_md642"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -117,18 +117,18 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A   </td><td class="markdownTableBodyNone">Reset counter to 0   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md629"></a>
+<h2><a class="anchor" id="autotoc_md643"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md630"></a>
+<h3><a class="anchor" id="autotoc_md644"></a>
 VBlank and frame_count</h3>
 <p>The SNES PPU triggers an NMI interrupt at the end of every visible frame (scanline 225). The NMI handler in <code>crt0.asm</code> increments <code>frame_count</code> — a 16-bit counter that wraps at 65535 (~18 minutes at 60 fps). This counter is the basis for all game timing: animation delays, physics steps, input polling, and audio updates all synchronize to it.</p>
-<h3><a class="anchor" id="autotoc_md631"></a>
+<h3><a class="anchor" id="autotoc_md645"></a>
 WaitForVBlank</h3>
 <p><code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> blocks the main loop until the next NMI fires. This guarantees the game runs at a fixed frame rate. Without it, the main loop would spin freely and produce inconsistent timing.</p>
-<h2><a class="anchor" id="autotoc_md632"></a>
+<h2><a class="anchor" id="autotoc_md646"></a>
 Modules</h2>
 <p><code>console sprite dma background text input</code></p>
-<h2><a class="anchor" id="autotoc_md633"></a>
+<h2><a class="anchor" id="autotoc_md647"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/timer</div>

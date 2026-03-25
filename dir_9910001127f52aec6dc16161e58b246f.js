@@ -8,8 +8,6 @@ var dir_9910001127f52aec6dc16161e58b246f =
     [ "mosaic", "dir_166bdc4315508af9f747ee42f178da15.html", "dir_166bdc4315508af9f747ee42f178da15" ],
     [ "parallax_scrolling", "dir_b2c41252b704b8db457a9a40c5cb358a.html", "dir_b2c41252b704b8db457a9a40c5cb358a" ],
     [ "superfx_3d", "dir_487940e5f874184d7f3f78bc1b2cd698.html", "dir_487940e5f874184d7f3f78bc1b2cd698" ],
-    [ "superfx_bitmap", "dir_a11fcdf9f378f1cd942b4c961ec9800f.html", "dir_a11fcdf9f378f1cd942b4c961ec9800f" ],
-    [ "superfx_mandelbrot", "dir_fda237168ca1952d47c3f436f3185ce6.html", "dir_fda237168ca1952d47c3f436f3185ce6" ],
     [ "transparency", "dir_7e61d567d6a36fd6ff35a56f7163f974.html", "dir_7e61d567d6a36fd6ff35a56f7163f974" ],
     [ "transparent_window", "dir_64d894911213963f880485919df5ef58.html", "dir_64d894911213963f880485919df5ef58" ],
     [ "window", "dir_06f8c0f6f1808f02f4837fce52b78990.html", "dir_06f8c0f6f1808f02f4837fce52b78990" ]

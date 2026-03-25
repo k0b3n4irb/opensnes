@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['demo_0',['demo',['../examples_basics_collision_demo.html',1,'Collision Detection Demo'],['../examples_graphics_effects_hdma_helpers.html',1,'HDMA Helpers Demo'],['../examples_memory_sa1_speed.html',1,'SA-1 Speed Demo']]],
+  ['demo_0',['demo',['../examples_basics_collision_demo.html',1,'Collision Detection Demo'],['../examples_graphics_effects_hdma_helpers.html',1,'HDMA Helpers Demo']]],
   ['demo_20understanding_20snes_20memory_20mapping_1',['HiROM Demo -- Understanding SNES Memory Mapping',['../examples_memory_hirom_demo.html',1,'examples_by_category']]],
   ['detection_20demo_2',['Collision Detection Demo',['../examples_basics_collision_demo.html',1,'examples_by_category']]],
   ['detection_20tutorial_3',['Collision Detection Tutorial',['../tutorial_collision.html',1,'index']]],

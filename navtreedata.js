@@ -36,8 +36,6 @@ var NAVTREE =
     [ "Background Examples", "examples_graphics_backgrounds.html", null ],
     [ "Visual Effects Examples", "examples_graphics_effects.html", null ],
     [ "SuperFX 3D Cube", "examples_graphics_effects_superfx_3d.html", null ],
-    [ "SuperFX Bitmap", "examples_graphics_effects_superfx_bitmap.html", null ],
-    [ "SuperFX Mandelbrot", "examples_graphics_effects_superfx_mandelbrot.html", null ],
     [ "Graphics Examples", "examples_graphics.html", null ],
     [ "Dynamic Metasprite Engine", "examples_graphics_sprites_dynamic_metasprite.html", null ],
     [ "Sprite Examples", "examples_graphics_sprites.html", null ],
@@ -48,7 +46,6 @@ var NAVTREE =
     [ "Tiled Map Editor Integration", "examples_maps_tiled.html", null ],
     [ "Memory Examples", "examples_memory.html", null ],
     [ "SA-1 Hello World", "examples_memory_sa1_hello.html", null ],
-    [ "SA-1 Speed Demo", "examples_memory_sa1_speed.html", null ],
     [ "SA-1 Starfield (Murmuration)", "examples_memory_sa1_starfield.html", null ],
     [ "SuperFX Hello", "examples_memory_superfx_hello.html", null ],
     [ "OpenSNES Examples", "examples.html", null ],
@@ -83,13 +80,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "animation_8h.html",
-"examples_audio_snesmod_music.html",
-"globals_type.html",
-"group__macros.html#gadba21e94be99de18d4a4eb0857a8f11d",
-"index.html",
-"object_8h.html#a4ad7c03653fa3b7fdc7c36b3e82a9565",
-"sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f",
-"text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f"
+"examples_audio_snesmod_music_large.html",
+"globals_vars.html",
+"group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060",
+"index.html#autotoc_md4",
+"object_8h.html#a5f727bc253e37de8d471c292e51112bc",
+"sprite_8h.html#a618f201dbc1a1c445890f304fd4c0b9c",
+"text_8h.html#a055579e7b75458617363a27f1224bc99"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

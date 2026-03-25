@@ -110,17 +110,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a9ab89667514f31b155bfd2bd2ada0b00" id="r_a9ab89667514f31b155bfd2bd2ada0b00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00">buildEdges</a> (void)</td></tr>
 <tr class="memdesc:a9ab89667514f31b155bfd2bd2ada0b00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build edge buffer from projected vertices.  <br /></td></tr>
 <tr class="separator:a9ab89667514f31b155bfd2bd2ada0b00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4dd9c388fa1bc37e3febef212247f9a" id="r_ad4dd9c388fa1bc37e3febef212247f9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#ad4dd9c388fa1bc37e3febef212247f9a">dmaChunkToVRAM</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> chunk)</td></tr>
-<tr class="separator:ad4dd9c388fa1bc37e3febef212247f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8141a91b5386629cef8fbfb1d8e546eb" id="r_a8141a91b5386629cef8fbfb1d8e546eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a> (void)</td></tr>
-<tr class="separator:a8141a91b5386629cef8fbfb1d8e546eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a3a6360cd7628baa3d69f4b7d50c35e" id="r_a8a3a6360cd7628baa3d69f4b7d50c35e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e">gsuSetProgram</a> (void)</td></tr>
+<tr class="separator:a8a3a6360cd7628baa3d69f4b7d50c35e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="separator:a840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefc8f0e95be47bb6ec917f4ed4169dfc" id="r_aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#aefc8f0e95be47bb6ec917f4ed4169dfc">rotateVertex</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td></tr>
-<tr class="memdesc:aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate one vertex, store projected screen coords.  <br /></td></tr>
+<tr class="memdesc:aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate one vertex, store projected screen coords (clamped)  <br /></td></tr>
 <tr class="separator:aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadf57a0ae23082f3e0af61a088a37711" id="r_aadf57a0ae23082f3e0af61a088a37711"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#aadf57a0ae23082f3e0af61a088a37711">setupBitmapTilemap</a> (void)</td></tr>
-<tr class="separator:aadf57a0ae23082f3e0af61a088a37711"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17000e52c641974ad31ef2386e695fe1" id="r_a17000e52c641974ad31ef2386e695fe1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1">writeEdgesToSRAM</a> (void)</td></tr>
 <tr class="separator:a17000e52c641974ad31ef2386e695fe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -150,10 +146,6 @@ Variables</h2></td></tr>
 <tr class="separator:aac1f89a29701ca7a1c6d291d4b251722"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ebe2671b17e48d52f625e0878feccef" id="r_a6ebe2671b17e48d52f625e0878feccef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a6ebe2671b17e48d52f625e0878feccef">g_say</a></td></tr>
 <tr class="separator:a6ebe2671b17e48d52f625e0878feccef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06b7d31abfaac2dacbfe49f26e89c1a9" id="r_a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a06b7d31abfaac2dacbfe49f26e89c1a9">gsu_dma_src_hi</a></td></tr>
-<tr class="separator:a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad840ff367d45008c2505fc2e93c5bf06" id="r_ad840ff367d45008c2505fc2e93c5bf06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#ad840ff367d45008c2505fc2e93c5bf06">gsu_scbr</a></td></tr>
-<tr class="separator:ad840ff367d45008c2505fc2e93c5bf06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74ca0597b23b1a8087c84123159f022f" id="r_a74ca0597b23b1a8087c84123159f022f"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2superfx__3d_2main_8c.html#a74ca0597b23b1a8087c84123159f022f">sin_tab</a> [256]</td></tr>
 <tr class="separator:a74ca0597b23b1a8087c84123159f022f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -180,8 +172,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad4dd9c388fa1bc37e3febef212247f9a" name="ad4dd9c388fa1bc37e3febef212247f9a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4dd9c388fa1bc37e3febef212247f9a">&#9670;&#160;</a></span>dmaChunkToVRAM()</h2>
+<a id="a8a3a6360cd7628baa3d69f4b7d50c35e" name="a8a3a6360cd7628baa3d69f4b7d50c35e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a3a6360cd7628baa3d69f4b7d50c35e">&#9670;&#160;</a></span>gsuSetProgram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -190,33 +182,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void dmaChunkToVRAM </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td>
-          <td class="paramname"><em>chunk</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8141a91b5386629cef8fbfb1d8e546eb" name="a8141a91b5386629cef8fbfb1d8e546eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8141a91b5386629cef8fbfb1d8e546eb">&#9670;&#160;</a></span>launchGSU()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void launchGSU </td>
+          <td class="memname">void gsuSetProgram </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -266,33 +232,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Rotate one vertex, store projected screen coords. </p>
-
-</div>
-</div>
-<a id="aadf57a0ae23082f3e0af61a088a37711" name="aadf57a0ae23082f3e0af61a088a37711"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadf57a0ae23082f3e0af61a088a37711">&#9670;&#160;</a></span>setupBitmapTilemap()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setupBitmapTilemap </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Rotate one vertex, store projected screen coords (clamped) </p>
 
 </div>
 </div>
@@ -545,50 +485,6 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> g_say</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a06b7d31abfaac2dacbfe49f26e89c1a9" name="a06b7d31abfaac2dacbfe49f26e89c1a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06b7d31abfaac2dacbfe49f26e89c1a9">&#9670;&#160;</a></span>gsu_dma_src_hi</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_dma_src_hi</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad840ff367d45008c2505fc2e93c5bf06" name="ad840ff367d45008c2505fc2e93c5bf06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad840ff367d45008c2505fc2e93c5bf06">&#9670;&#160;</a></span>gsu_scbr</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_scbr</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

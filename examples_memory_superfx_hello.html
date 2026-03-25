@@ -100,36 +100,49 @@ $(document).ready(function(){initNavTree('examples_memory_superfx_hello.html',''
 <p>&zwj;GSU coprocessor boot diagnostic with SRAM tests and FMULT validation </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md1294"></a>
+<h2><a class="anchor" id="autotoc_md1298"></a>
 Emulator Compatibility</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator   </th><th class="markdownTableHeadNone">Status    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">Recommended &ndash; cycle-accurate SuperFX    </td></tr>
+<td class="markdownTableBodyNone"><b>bsnes</b>   </td><td class="markdownTableBodyNone">✅ Recommended — cycle-accurate SuperFX emulation    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">Works (minor DMA timing differences)    </td></tr>
+<td class="markdownTableBodyNone"><b>Mesen2</b>   </td><td class="markdownTableBodyNone">✅ Works (known backward branch bug, does not affect this example)    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Detected with cart type $13   </td></tr>
+<td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">❌ Does not detect GSU despite correct header   </td></tr>
 </table>
-<blockquote class="doxtable">
-<p>&zwj;<b>Note:</b> opensnes-emu (snes9x-based) shows "GSU: NOT DETECTED" because snes9x WASM does not emulate the SuperFX coprocessor. </p>
-</blockquote>
-<h2><a class="anchor" id="autotoc_md1295"></a>
+<h2><a class="anchor" id="autotoc_md1299"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/superfx_hello</div>
-</div><!-- fragment --><p>Then open <code>superfx_hello.sfc</code> in bsnes (recommended).</p>
-<h2><a class="anchor" id="autotoc_md1296"></a>
+</div><!-- fragment --><p>Then open <code>superfx_hello.sfc</code> in bsnes (recommended) or Mesen2.</p>
+<h2><a class="anchor" id="autotoc_md1300"></a>
 What You'll Learn</h2>
 <ul>
-<li>Detecting the SuperFX (GSU) coprocessor via the VCR register</li>
-<li>Launching a GSU program and reading back R0 ($CAFE)</li>
-<li>SRAM shared memory: byte writes ($42, $55) and word write via STW ($BEEF)</li>
-<li>FMULT instruction validation (2*2 = $4000, 1.5*3 = $4800)</li>
-<li>WRAM stub execution (CPU cannot read ROM while GSU owns the bus)</li>
+<li>Detecting the SuperFX (GSU) coprocessor via the VCR register ($303B)</li>
+<li>Launching a GSU program with the WRAM stub (CPU cannot read ROM while GSU runs)</li>
+<li>SRAM shared memory: byte writes (STB: $42, $55) and word write (STW: $BEEF)</li>
+<li>FMULT fixed-point multiplication validation (2.0×2.0=$4000, 1.5×3.0=$4800)</li>
+<li>Reading GSU registers (R0=$CAFE) after STOP</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1297"></a>
+<h2><a class="anchor" id="autotoc_md1301"></a>
+Status Codes</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Value   </th><th class="markdownTableHeadNone">Meaning    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>GSU VERSION: $04</code>   </td><td class="markdownTableBodyNone">GSU-2 detected (GSU-1=$03, MC1=$01)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>R0 RESULT: $CAFE</code>   </td><td class="markdownTableBodyNone">GSU executed code correctly    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>SRAM[0,1]: $42 $55</code>   </td><td class="markdownTableBodyNone">STB byte writes to SRAM work    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>STW[2,3]: $BEEF</code>   </td><td class="markdownTableBodyNone">STW word write to SRAM works    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>2*2=$4000 1.5*3=$4800</code>   </td><td class="markdownTableBodyNone">FMULT 4.12 fixed-point validated   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md1302"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

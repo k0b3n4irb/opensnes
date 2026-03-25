@@ -75,9 +75,8 @@ var searchData=
   ['reg_5fscbr_72',['REG_SCBR',['../superfx_8h.html#a4c3b117840aa08b1cbbf74a40813dbaf',1,'superfx.h']]],
   ['reg_5fscmr_73',['REG_SCMR',['../superfx_8h.html#ad49cfcd5809d7d410a438b19b51db933',1,'superfx.h']]],
   ['reg_5fsfr_74',['REG_SFR',['../superfx_8h.html#a28ae4008efe5558e3325340962059a07',1,'superfx.h']]],
-  ['reg_5fsfr_5fh_75',['REG_SFR_H',['../superfx_8h.html#a4f1b86518872b7eb782e76674dc002fa',1,'superfx.h']]],
-  ['reg_5fsfr_5fl_76',['REG_SFR_L',['../superfx_8h.html#ada011548944b13eb92dd71f1b7f480c3',1,'superfx.h']]],
-  ['reg_5fvcr_77',['REG_VCR',['../superfx_8h.html#a91683548098fd503db2acca934effa7c',1,'superfx.h']]],
-  ['rgb_78',['RGB',['../video_8h.html#a4a118ad3ee36468a3fa616977a64864e',1,'video.h']]],
-  ['rgb24_79',['RGB24',['../video_8h.html#ad8da1514f9cd03e3cda94953525627f2',1,'video.h']]]
+  ['reg_5fsfr_5fl_75',['REG_SFR_L',['../superfx_8h.html#ada011548944b13eb92dd71f1b7f480c3',1,'superfx.h']]],
+  ['reg_5fvcr_76',['REG_VCR',['../superfx_8h.html#a91683548098fd503db2acca934effa7c',1,'superfx.h']]],
+  ['rgb_77',['RGB',['../video_8h.html#a4a118ad3ee36468a3fa616977a64864e',1,'video.h']]],
+  ['rgb24_78',['RGB24',['../video_8h.html#ad8da1514f9cd03e3cda94953525627f2',1,'video.h']]]
 ];

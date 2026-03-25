@@ -280,7 +280,7 @@ Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <div class="ttc" id="amemory_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="memory_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:27</div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md183"></a>
 Pattern 2: Free-Running Counter</h3>
-<p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. Used by <b>sa1_speed</b>.</p>
+<p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. See sa1_hello for register readback examples.</p>
 <div class="fragment"><div class="line">; SA-1 side: increment 32-bit counter forever</div>
 <div class="line">_sa1_count_loop:</div>
 <div class="line">    lda.l $003002       ; Load low word</div>
@@ -376,8 +376,6 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_hello/">sa1_hello</a>   </td><td class="markdownTableBodyNone">Boot diagnostic — verifies SA-1 initialization    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_speed/">sa1_speed</a>   </td><td class="markdownTableBodyNone">Free-running 32-bit counter at 10.74 MHz    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_starfield/">sa1_starfield</a>   </td><td class="markdownTableBodyNone">128 sprites with sine-wave Lissajous patterns   </td></tr>
 </table>
 <h2><a class="anchor" id="autotoc_md192"></a>
