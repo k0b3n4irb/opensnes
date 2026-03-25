@@ -39,7 +39,9 @@ ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
 # Note: sm_spc.asm is included by snesmod.asm, so we exclude it from direct compilation
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
-ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm, $(wildcard $(SRCDIR)/*.asm))
+# Exclude crt0 (per-ROM), sm_spc (included by snesmod), superfx (SuperFX-only)
+ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm, $(wildcard $(SRCDIR)/*.asm))
+ASM_SOURCES_SUPERFX_ONLY = $(SRCDIR)/superfx.asm
 
 # Sed transformations: convert cproc/QBE output to WLA-DX compatible assembly
 #   /^\.data/d         : Remove .data section markers (WLA-DX uses different syntax)
@@ -79,9 +81,9 @@ C_OBJECTS_SA1 = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SA1)/%.o)
 ASM_OBJECTS_SA1 = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SA1)/%-asm.o)
 OBJECTS_SA1 = $(C_OBJECTS_SA1) $(ASM_OBJECTS_SA1)
 
-# Object files - SuperFX (LoROM-based, same bank layout as standard LoROM)
+# Object files - SuperFX (LoROM-based + SuperFX-only ASM modules)
 C_OBJECTS_SUPERFX = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SUPERFX)/%.o)
-ASM_OBJECTS_SUPERFX = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o)
+ASM_OBJECTS_SUPERFX = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o) $(ASM_SOURCES_SUPERFX_ONLY:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o)
 OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
 
 #------------------------------------------------------------------------------

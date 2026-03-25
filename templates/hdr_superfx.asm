@@ -45,8 +45,19 @@
 
 .include "project_config.inc"
 
+;------------------------------------------------------------------------------
+; Extended Header ($FFB0-$FFBF) — fill with $FF like Star Fox
+;------------------------------------------------------------------------------
+; Star Fox has all $FF in the extended header area (= no extended header).
+; snes9x may misdetect if this area contains non-$FF values.
+;------------------------------------------------------------------------------
+.BANK 0 SLOT 0
+.ORG $7FB0
+.SECTION ".extended_header" FORCE
+.db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+.ENDS
+
 .SNESHEADER
-    ID "OPEN"               ; Developer ID (4 chars)
     NAME "__ROM_NAME__"     ; Game title (21 chars, pad with spaces)
 .ifdef FASTROM
     FASTROM
@@ -54,13 +65,14 @@
     SLOWROM
 .endif
     LOROM                   ; LoROM addressing
-    CARTRIDGETYPE CARTRIDGETYPE  ; $14=ROM+SuperFX+SRAM
+    CARTRIDGETYPE CARTRIDGETYPE  ; $13=ROM+GSU (Star Fox compatible)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
-    SRAMSIZE SRAMSIZE_VAL   ; Cartridge SRAM ($05=32KB)
+    SRAMSIZE $00            ; $00 in standard field (SuperFX quirk)
     COUNTRY $01             ; North America (NTSC)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0
 .ENDSNES
+
 
 ;------------------------------------------------------------------------------
 ; Native Mode Interrupt Vectors ($00:FFE0-FFEF)

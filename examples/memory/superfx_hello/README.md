@@ -8,11 +8,9 @@
 
 | Emulator | Status |
 |----------|--------|
-| **bsnes** | Recommended -- cycle-accurate SuperFX |
-| **Mesen2** | Works (minor DMA timing differences) |
-| **snes9x** | Detected with cart type $13 |
-
-> **Note:** opensnes-emu (snes9x-based) shows "GSU: NOT DETECTED" because snes9x WASM does not emulate the SuperFX coprocessor.
+| **bsnes** | ✅ Recommended — cycle-accurate SuperFX emulation |
+| **Mesen2** | ✅ Works (known backward branch bug, does not affect this example) |
+| **snes9x** | ❌ Does not detect GSU despite correct header |
 
 ## Build & Run
 
@@ -21,15 +19,25 @@ cd $OPENSNES_HOME
 make -C examples/memory/superfx_hello
 ```
 
-Then open `superfx_hello.sfc` in bsnes (recommended).
+Then open `superfx_hello.sfc` in bsnes (recommended) or Mesen2.
 
 ## What You'll Learn
 
-- Detecting the SuperFX (GSU) coprocessor via the VCR register
-- Launching a GSU program and reading back R0 ($CAFE)
-- SRAM shared memory: byte writes ($42, $55) and word write via STW ($BEEF)
-- FMULT instruction validation (2*2 = $4000, 1.5*3 = $4800)
-- WRAM stub execution (CPU cannot read ROM while GSU owns the bus)
+- Detecting the SuperFX (GSU) coprocessor via the VCR register ($303B)
+- Launching a GSU program with the WRAM stub (CPU cannot read ROM while GSU runs)
+- SRAM shared memory: byte writes (STB: $42, $55) and word write (STW: $BEEF)
+- FMULT fixed-point multiplication validation (2.0×2.0=$4000, 1.5×3.0=$4800)
+- Reading GSU registers (R0=$CAFE) after STOP
+
+## Status Codes
+
+| Value | Meaning |
+|-------|---------|
+| `GSU VERSION: $04` | GSU-2 detected (GSU-1=$03, MC1=$01) |
+| `R0 RESULT: $CAFE` | GSU executed code correctly |
+| `SRAM[0,1]: $42 $55` | STB byte writes to SRAM work |
+| `STW[2,3]: $BEEF` | STW word write to SRAM works |
+| `2*2=$4000 1.5*3=$4800` | FMULT 4.12 fixed-point validated |
 
 ## Modules Used
 

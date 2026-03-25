@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 52 examples organized by topic. For a progressive learning path, see
+All 54 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -133,3 +133,29 @@ Complete game projects combining multiple subsystems.
 | @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
 | @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |
+
+---
+
+## Enhancement Chips
+
+Cartridge coprocessors that extend the SNES beyond its base hardware.
+
+### SA-1 Coprocessor
+
+The SA-1 is a second 65816 CPU running at 10.74 MHz (3x main CPU speed),
+sharing I-RAM with the main CPU for inter-processor communication.
+
+| Example | Description |
+|---------|-------------|
+| @subpage examples_enhancement_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
+| @subpage examples_enhancement_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
+
+### SuperFX (GSU)
+
+The SuperFX is a custom RISC processor (GSU) with built-in pixel PLOT,
+hardware multiply, and direct framebuffer access for 3D and bitmap effects.
+
+| Example | Description |
+|---------|-------------|
+| @subpage examples_enhancement_superfx_hello | Boot + SRAM + FMULT hardware tests |
+| @subpage examples_enhancement_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |

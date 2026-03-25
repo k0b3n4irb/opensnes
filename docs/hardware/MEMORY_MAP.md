@@ -166,6 +166,53 @@ u8 temp;
 u16 frame_counter;
 ```
 
+## Enhancement Chip Memory
+
+### SA-1 Cartridge
+
+The SA-1 adds a second 65816 CPU and extra RAM to the cartridge.
+
+```
+Address         Size      Description
+────────────────────────────────────────────────────────────────
+$2200-$23FF     512 B     SA-1 registers (CPU control, DMA, math, IRQ)
+$3000-$37FF     2 KB      I-RAM (shared between SNES CPU and SA-1)
+$6000-$7FFF     8 KB      BW-RAM window (8 KB view into BW-RAM)
+$40-$5F:0000    up to     BW-RAM (up to 256 KB of fast static RAM)
+                256 KB
+```
+
+**I-RAM ($3000-$37FF)** is the primary communication channel between the
+SNES main CPU and the SA-1. Both processors can read and write it, gated
+by the SIWP ($2229) and CIWP ($222A) write-protection registers.
+
+**BW-RAM** is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB
+window visible at $6000-$7FFF for convenient access from bank $00 code.
+
+### SuperFX Cartridge
+
+The SuperFX (GSU) has its own register space and uses cartridge SRAM as
+a shared framebuffer.
+
+```
+Address         Size      Description
+────────────────────────────────────────────────────────────────
+$3000-$303F     64 B      GSU registers (R0-R15, SFR, SCMR, PBR, etc.)
+$3100-$32FF     512 B     GSU code cache (read-only from SNES side)
+$70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)
+```
+
+**GSU registers ($3000-$303F)** control the SuperFX processor. The SNES
+CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).
+
+**Code cache ($3100-$32FF)** holds the currently cached GSU instructions.
+The SNES can read but not write this region.
+
+**Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The SuperFX
+PLOT instruction writes pixels here, and the SNES reads it back for
+display. Bus ownership is controlled by the SCMR register ($303A) —
+the SNES and GSU cannot access SRAM simultaneously.
+
 ## Further Reading
 
 - [Hardware Registers](REGISTERS.md) - PPU, DMA, I/O registers

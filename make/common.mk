@@ -126,6 +126,7 @@ _DEP_object    := map
 _DEP_map       := dma
 _DEP_snesmod   := console
 _DEP_mp5       := input
+_DEP_superfx   := dma
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))

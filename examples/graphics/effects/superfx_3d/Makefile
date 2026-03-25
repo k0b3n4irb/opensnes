@@ -1,7 +1,7 @@
 OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET      := superfx_3d.sfc
-ROM_NAME    := SUPERFX 3D CUBE
+ROM_NAME    := SUPERFX 3D CUBE      
 
 CSRC        := main.c
 ASMSRC      := gsu_loader.asm

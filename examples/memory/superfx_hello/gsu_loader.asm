@@ -21,7 +21,7 @@ gsu_program_end:
 ; WRAM area + result variables
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_vars" BANK 0 SLOT 1
-gsu_wram_area: dsb 64
+gsu_hello_wram: dsb 64
 gsu_result: dsb 2
 gsu_sram_byte0: dsb 1
 gsu_sram_byte1: dsb 1
@@ -48,13 +48,13 @@ launchGSU:
     .INDEX 16
     ldx #$0000
 -   lda.l _wram_stub,x
-    sta.l gsu_wram_area,x
+    sta.l gsu_hello_wram,x
     inx
     cpx #(_wram_stub_end - _wram_stub)
     bne -
 
     ; Execute from WRAM
-    jsl gsu_wram_area
+    jsl gsu_hello_wram
 
     ; GSU finished — read results
     rep #$20
