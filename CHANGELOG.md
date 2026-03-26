@@ -5,6 +5,40 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.13.0] - 2026-03-26
+
+### SuperFX Phase 3-4 — Mandelbrot + Wireframe Cube
+
+- **FMULT validated**: 4.12 fixed-point multiply confirmed (2.0×2.0=4.0, 1.5×3.0=4.5).
+  Formula: `result_4_12 = FMULT_output << 4` (4× ADD R0).
+- **Mandelbrot fractal**: 256×128 computed by GSU via FMULT+PLOT, 16-color palette,
+  4.12 fixed-point iteration (z=z²+c, 15 max iterations). LOOP instruction for
+  Y iteration (body exceeds BNE 8-bit range). CACHE for ~3× speedup.
+- **Wireframe cube**: 12-edge Bresenham line drawing via PLOT, Y+X axis rotation
+  computed in C (sin/cos table), orthographic projection. Chunked 4×4KB VBlank DMA
+  (no flicker, ~15 FPS). Function splitting to avoid framesize>255.
+- **WRAM stub overflow fix**: stub grew to 90 bytes with parameterized SCBR/R8,
+  gsu_wram_area increased from 64 to 96 bytes.
+- **Mesen2 backward branch bug**: confirmed via bsnes comparison. BNE/BRA+STW
+  works on bsnes (cycle-accurate) but corrupts on Mesen2. bsnes is the reference
+  emulator for SuperFX testing.
+
+### Documentation
+
+- **READMEs + screenshots**: all 4 SuperFX examples fully documented with
+  emulator compatibility table (bsnes/Mesen2/snes9x).
+- **EXAMPLES_BY_CATEGORY.md**: added Enhancement Chips section (SA-1 + SuperFX).
+- **LEARNING_PATH.md**: added Level 6 (Enhancement Chips).
+- **REGISTERS.md**: added SA-1 ($2200-$230E) and GSU ($3000-$303F) register tables.
+- **MEMORY_MAP.md**: added SA-1 I-RAM/BW-RAM and SuperFX SRAM/cache layouts.
+
+### Examples (56 total, +4 new SuperFX)
+
+- **superfx_hello**: boot diagnostic + SRAM byte/word + FMULT 4.12 validation
+- **superfx_bitmap**: 16-color gradient via PLOT hardware
+- **superfx_mandelbrot**: fractal set via FMULT + PLOT (4.12 fixed-point)
+- **superfx_3d**: rotating wireframe cube (Bresenham + PLOT, 2-axis rotation)
+
 ## [0.12.0] - 2026-03-23
 
 ### SuperFX (GSU) Enhancement Chip Support (NEW)

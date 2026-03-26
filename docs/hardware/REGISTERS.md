@@ -531,3 +531,74 @@ if (REG_HVBJOY & 0x80) { /* In VBlank */ }
 - [Memory Map](MEMORY_MAP.md) - Full address space layout
 - [OAM](OAM.md) - Sprite attribute memory
 - [Fullsnes](https://problemkaputt.de/fullsnes.htm) - Complete technical reference
+
+---
+
+## SA-1 Registers ($2200-$230E)
+
+The SA-1 is a second 65816 CPU at 10.74 MHz. These registers control
+inter-processor communication and memory protection. For the full register
+set and programming details, see `.claude/SA-1.md`.
+
+| Register | Address | R/W | Description |
+|----------|---------|-----|-------------|
+| CCNT | $2200 | W | SA-1 CPU control: reset, IRQ, NMI, 4-bit message to SA-1 |
+| CRV | $2203-$2204 | W | SA-1 Reset Vector (address SA-1 jumps to on release from reset) |
+| SIWP | $2229 | W | SNES I-RAM Write Protection (bit=1 means page is **writable**) |
+| CIWP | $222A | W | SA-1 I-RAM Write Protection (bit=1 means page is **writable**) |
+| SFR | $2300 | R | Status Flags: SA-1 IRQ/NMI pending, 4-bit message from SA-1 |
+
+**Typical boot sequence:**
+
+```asm
+; Set SA-1 reset vector to our coprocessor entry point
+lda.w #sa1_entry
+sta.l $2203          ; CRV low
+lda.w #sa1_entry>>8
+sta.l $2204          ; CRV high (bank handled by mapping)
+
+; Enable I-RAM writes for both CPUs
+lda #$FF
+sta.l $2229          ; SIWP — all pages writable by SNES
+sta.l $222A          ; CIWP — all pages writable by SA-1
+
+; Release SA-1 from reset
+lda #$00
+sta.l $2200          ; CCNT — clear reset bit, SA-1 starts running
+```
+
+---
+
+## SuperFX / GSU Registers ($3000-$303F)
+
+The SuperFX (Graphics Support Unit) is a custom RISC processor with
+16 general-purpose registers, hardware multiply, and a built-in pixel
+PLOT engine. GSU code runs from cartridge ROM/cache and renders into
+a shared SRAM framebuffer.
+
+| Register | Address | R/W | Description |
+|----------|---------|-----|-------------|
+| R0-R15 | $3000-$301F | R/W | General-purpose registers (16-bit each). **Writing R15 starts the GSU!** |
+| SFR | $3030-$3031 | R | Status/Flag Register: GO bit (bit 5) = GSU is running |
+| PBR | $3034 | R/W | Program Bank Register (GSU code bank) |
+| SCBR | $3038 | W | Screen Base Register (framebuffer base address in SRAM) |
+| SCMR | $303A | W | Screen Mode: pixel depth + bus ownership (RAN=SRAM, RON=ROM access) |
+| VCR | $303B | R | Version Code Register (read-only, identifies GSU revision) |
+
+**Key concepts:**
+
+- **R15 is the program counter** — writing to it triggers GSU execution
+- **SFR GO bit** — poll `$3030` bit 5 to wait for GSU to finish (STOP instruction clears it)
+- **SCMR bus ownership** — SNES and GSU cannot access ROM/SRAM simultaneously; set RAN/RON bits to hand off bus access between frames
+- **PLOT** — GSU instruction that writes a pixel to the framebuffer at coordinates set by R1 (X) and R2 (Y), using the color in the COLOR register
+
+```asm
+; Wait for GSU to finish (poll SFR GO bit)
+-   lda.l $3030
+    and #$20             ; bit 5 = GO
+    bne -                ; loop while GSU is running
+
+; Start GSU: write entry address to R15
+    lda.w #gsu_entry
+    sta.l $301E          ; R15 low/high — GSU begins execution
+```

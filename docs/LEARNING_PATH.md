@@ -96,3 +96,26 @@ Tile maps, collision, and complete games.
 @subpage examples_games_likemario
 
 @subpage examples_games_mapandobjects
+
+## Level 6: Enhancement Chips
+
+Cartridge coprocessors that push the SNES beyond its base hardware.
+SA-1 uses the same 65816 ISA at 3x speed; SuperFX is a custom RISC processor.
+
+### SA-1 Coprocessor (same ISA, 10.74 MHz)
+
+@subpage examples_enhancement_sa1_hello
+
+@subpage examples_enhancement_sa1_speed
+
+@subpage examples_enhancement_sa1_starfield
+
+### SuperFX / GSU (custom RISC, bitmap + 3D)
+
+@subpage examples_enhancement_superfx_hello
+
+@subpage examples_enhancement_superfx_bitmap
+
+@subpage examples_enhancement_superfx_mandelbrot
+
+@subpage examples_enhancement_superfx_3d
