@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 52 examples organized by topic. For a progressive learning path, see
+All 55 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -159,6 +159,4 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_enhancement_superfx_hello | Boot + SRAM + FMULT hardware tests |
-| @subpage examples_enhancement_superfx_bitmap | Rainbow gradient rendered via PLOT |
-| @subpage examples_enhancement_superfx_mandelbrot | Mandelbrot fractal via FMULT + PLOT |
 | @subpage examples_enhancement_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
