@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('examples_input.html',''); initResizabl
 <div class="textblock"><p>The SNES supports standard controllers (12 buttons + D-pad), the SNES Mouse, and the Super Scope light gun. The console reads controller state automatically every frame via auto-joypad read and stores the result in hardware registers.</p>
 <p>The key skill is <b>edge detection</b> &ndash; distinguishing "button is held" from "button was
 just pressed this frame." Without it, a single tap registers dozens of times at 60fps.</p>
-<h2><a class="anchor" id="autotoc_md1146"></a>
+<h2><a class="anchor" id="autotoc_md1139"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -111,19 +111,19 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="superscope/">superscope</a>   </td><td class="markdownTableBodyNone">Advanced   </td><td class="markdownTableBodyNone">Light gun detection, calibration, PPU H/V counter targeting   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1147"></a>
+<h2><a class="anchor" id="autotoc_md1140"></a>
 Key Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1148"></a>
+<h3><a class="anchor" id="autotoc_md1141"></a>
 Joypad Bit Layout</h3>
 <div class="fragment"><div class="line">Bit: 15  14  13  12  11  10  9   8   7   6   5   4   3-0</div>
 <div class="line">     B   Y   Sel Sta Up  Dn  Lt  Rt  A   X   L   R   (ID)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1149"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1142"></a>
 Edge Detection Pattern</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">held</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">padsCurrent</a>(0);</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pressed</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">padsDown</a>(0);   <span class="comment">// newly pressed this frame only</span></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1150"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1143"></a>
 Input Devices</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">

@@ -148,6 +148,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a21a39509cc61fba3c98500627619baf0" id="r_a21a39509cc61fba3c98500627619baf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="text_8h.html#a21a39509cc61fba3c98500627619baf0">textLoadFont4bpp</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_addr)</td></tr>
 <tr class="memdesc:a21a39509cc61fba3c98500627619baf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load font as 4bpp tiles for Mode 1 BGs.  <br /></td></tr>
 <tr class="separator:a21a39509cc61fba3c98500627619baf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e1f9117d2dceb9fbc3f44875d92b259" id="r_a3e1f9117d2dceb9fbc3f44875d92b259"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259">textModeInit</a> (void)</td></tr>
+<tr class="memdesc:a3e1f9117d2dceb9fbc3f44875d92b259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize text display mode — one-call setup for text-based examples.  <br /></td></tr>
+<tr class="separator:a3e1f9117d2dceb9fbc3f44875d92b259"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2b623eed527810c71528f6b898bff3e" id="r_ae2b623eed527810c71528f6b898bff3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="text_8h.html#ae2b623eed527810c71528f6b898bff3e">textPrint</a> (const char *str)</td></tr>
 <tr class="memdesc:ae2b623eed527810c71528f6b898bff3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a string at cursor position.  <br /></td></tr>
 <tr class="separator:ae2b623eed527810c71528f6b898bff3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -548,6 +551,49 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
+</div>
+</div>
+<a id="a3e1f9117d2dceb9fbc3f44875d92b259" name="a3e1f9117d2dceb9fbc3f44875d92b259"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e1f9117d2dceb9fbc3f44875d92b259">&#9670;&#160;</a></span>textModeInit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void textModeInit </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize text display mode — one-call setup for text-based examples. </p>
+<p>Sets up Mode 0, BG1, white-on-black palette, font at VRAM $0000, tilemap at $3800 (32x32). Replaces the 8-line init sequence found in most text-based examples.</p>
+<p>Call <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> after this to display.</p>
+<p>Equivalent to: </p><div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
+<div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a>, 0);</div>
+<div class="line"><a class="code hl_define" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(0, 0x0000);</div>
+<div class="line"><a class="code hl_define" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(1, <a class="code hl_define" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 31, 31));</div>
+<div class="line"><a class="code hl_function" href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a>();</div>
+<div class="line"><a class="code hl_function" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a>(0x0000);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a>(0, 0x0000);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x3800, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
+<div class="line"><a class="code hl_define" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a>);</div>
+<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
+<div class="ttc" id="abackground_8h_html_a80e3887b5a1a50ba4985e4270ed6673d"><div class="ttname"><a href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a></div><div class="ttdeci">void bgSetGfxPtr(u8 bg, u16 vramAddr)</div><div class="ttdoc">Set background tile graphics address.</div></div>
+<div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
+<div class="ttc" id="agroup__bg__modes_html_ga82bccfa80c8aa4ff5aa4e1416e0ade25"><div class="ttname"><a href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a></div><div class="ttdeci">#define BG_MODE0</div><div class="ttdef"><b>Definition</b> video.h:27</div></div>
+<div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:96</div></div>
+<div class="ttc" id="atext_8h_html_a055579e7b75458617363a27f1224bc99"><div class="ttname"><a href="text_8h.html#a055579e7b75458617363a27f1224bc99">textInit</a></div><div class="ttdeci">void textInit(void)</div><div class="ttdoc">Initialize text system with default configuration.</div></div>
+<div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
+<div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:121</div></div>
+<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:76</div></div>
+<div class="ttc" id="avideo_8h_html_aac65457ee33ca72f75a6ae3cc8af2f7c"><div class="ttname"><a href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a></div><div class="ttdeci">#define setColor(index, color)</div><div class="ttdoc">Set a single CGRAM color.</div><div class="ttdef"><b>Definition</b> video.h:156</div></div>
+<div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="ae2b623eed527810c71528f6b898bff3e" name="ae2b623eed527810c71528f6b898bff3e"></a>

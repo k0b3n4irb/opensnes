@@ -11,10 +11,5 @@ var searchData=
   ['adrspritlarge_8',['ADRSPRITLARGE',['../graphics_2sprites_2object__size_2main_8c.html#af5abf90329e34db698a7774c40402b56',1,'main.c']]],
   ['amp_5fdefault_9',['AMP_DEFAULT',['../graphics_2effects_2hdma__wave_2main_8c.html#aaecfdabcd93ab543a6f69765773602b5',1,'main.c']]],
   ['amp_5flevels_10',['AMP_LEVELS',['../graphics_2effects_2hdma__wave_2main_8c.html#ac247b6d2f61c4934c01ade8749276784',1,'main.c']]],
-  ['anim_5fdelay_11',['ANIM_DELAY',['../graphics_2sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8',1,'main.c']]],
-  ['anim_5fmax_5fslots_12',['ANIM_MAX_SLOTS',['../animation_8h.html#af141bb1b1fe7e826dd9beb7d794862ab',1,'animation.h']]],
-  ['anim_5fstate_5ffinished_13',['ANIM_STATE_FINISHED',['../animation_8h.html#a852c33e527195162696eb58c7e130a4f',1,'animation.h']]],
-  ['anim_5fstate_5fpaused_14',['ANIM_STATE_PAUSED',['../animation_8h.html#a1352b77745686738433e3fc33435e69d',1,'animation.h']]],
-  ['anim_5fstate_5fplaying_15',['ANIM_STATE_PLAYING',['../animation_8h.html#a8797247696ac497456c4b2f233addb72',1,'animation.h']]],
-  ['anim_5fstate_5fstopped_16',['ANIM_STATE_STOPPED',['../animation_8h.html#a32b11a61ad98fa96e32319cafa518202',1,'animation.h']]]
+  ['anim_5fdelay_11',['ANIM_DELAY',['../graphics_2sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8',1,'main.c']]]
 ];

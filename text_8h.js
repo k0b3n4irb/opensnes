@@ -12,6 +12,7 @@ var text_8h =
     [ "textInitEx", "text_8h.html#a1d32953264bb842516edeb3292359758", null ],
     [ "textLoadFont", "text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f", null ],
     [ "textLoadFont4bpp", "text_8h.html#a21a39509cc61fba3c98500627619baf0", null ],
+    [ "textModeInit", "text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259", null ],
     [ "textPrint", "text_8h.html#ae2b623eed527810c71528f6b898bff3e", null ],
     [ "textPrintAt", "text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc", null ],
     [ "textPrintHex", "text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab", null ],

@@ -136,7 +136,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a> = 2
 , <a class="el" href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa">W_LEFT</a> = 2
  }</td></tr>
-<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> direction states.  <a href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
+<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation direction states.  <a href="graphics_2sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
 <tr class="separator:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -164,7 +164,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Direction-based sprite animation with horizontal flip. </p>
 <p>Demonstrates a classic sprite animation pattern: a character sprite with multiple directional walk cycles (down, up, left, right). Each direction uses a different row of frames in the sprite sheet, and the left-facing animation reuses the right-facing frames with the OAM horizontal flip bit (bit 6 of attribute byte).</p>
-<p><a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> is frame-paced with a configurable delay between tile changes. The sprite's OAM tile number is updated each frame via <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> to point at the correct frame in the pre-loaded sprite sheet. Movement is controlled with the D-PAD and clamped to screen boundaries.</p>
+<p>Animation is frame-paced with a configurable delay between tile changes. The sprite's OAM tile number is updated each frame via <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> to point at the correct frame in the pre-loaded sprite sheet. Movement is controlled with the D-PAD and clamped to screen boundaries.</p>
 <p>Ported from PVSnesLib AnimatedSprite example.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Sprite animation via OAM tile number updates</li>
@@ -256,7 +256,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> direction states. </p>
+<p>Animation direction states. </p>
 <p>Each state maps to a row in the sprite sheet. W_LEFT reuses the W_RIGHT row and sets the OAM horizontal flip bit to mirror the frames, which is a common SNES technique to halve the sprite sheet size for left/right symmetric characters. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d" name="af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d"></a>W_DOWN&#160;</td><td class="fielddoc"><p>Walking downward (facing camera) </p>

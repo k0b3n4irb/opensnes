@@ -16,6 +16,5 @@ var searchData=
   ['lkup8idb_13',['lkup8idB',['../sprite_8h.html#ad0557057357143581e9e6612d26ef575',1,'sprite.h']]],
   ['lkup8idt_14',['lkup8idT',['../sprite_8h.html#ae95313a08b1257ec7327a71c76e8f1a0',1,'sprite.h']]],
   ['lkup8oams_15',['lkup8oamS',['../sprite_8h.html#a512c524d16be34e3aa0fec1b2952e1bb',1,'sprite.h']]],
-  ['loop_16',['loop',['../structAnimation.html#ae3222e56f158f49bf183860c1590bc29',1,'Animation']]],
-  ['looppoint_17',['loopPoint',['../structAudioSample.html#a8f6bad09ca8631ebc2e4a18b51465d29',1,'AudioSample']]]
+  ['looppoint_16',['loopPoint',['../structAudioSample.html#a8f6bad09ca8631ebc2e4a18b51465d29',1,'AudioSample']]]
 ];

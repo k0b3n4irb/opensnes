@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('examples_maps_mapscroll.html',''); ini
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1218"></a>
+    <h2><a class="anchor" id="autotoc_md1211"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the map engine streams a large level through a small VRAM window</li>
@@ -110,7 +110,7 @@ What You'll Learn</h2>
 <li>The two-phase update pattern: <code><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></code> (CPU) → <code><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></code> (DMA)</li>
 <li>Sprite screen positioning relative to camera (<code>xloc - x_pos</code>)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1219"></a>
+<h2><a class="anchor" id="autotoc_md1212"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -120,16 +120,16 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RIGHT   </td><td class="markdownTableBodyNone">Move Mario right   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1220"></a>
+<h2><a class="anchor" id="autotoc_md1213"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md1221"></a>
+<h3><a class="anchor" id="autotoc_md1214"></a>
 Map Engine Two-Phase Update</h3>
 <p>The map is too large to fit in VRAM. The map engine solves this:</p>
 <ol type="1">
 <li>**<code><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></code>** — runs during active display. Checks if the camera crossed a tile boundary. If so, prepares a column of new tiles in a RAM buffer.</li>
 <li>**<code><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></code>** — runs during VBlank. DMAs the prepared tile column to VRAM. This is the only safe time to write VRAM.</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md1222"></a>
+<h3><a class="anchor" id="autotoc_md1215"></a>
 Camera-Relative Sprite Positioning</h3>
 <p>The sprite's position in the map (<code>xloc</code>) is not its screen position. The screen position is <code>xloc - x_pos</code>, where <code>x_pos</code> is the camera's current offset exported by the map engine.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a> - <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a> - <a class="code hl_variable" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a>, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, 0, 3, flags);</div>
@@ -139,10 +139,10 @@ Camera-Relative Sprite Positioning</h3>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a4bf69d14b43306f29f9a67bbb2d70ca8"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a></div><div class="ttdeci">u16 xloc</div><div class="ttdoc">Mario X position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:72</div></div>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a65f23786744bb3a1567af452246db6d1"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a></div><div class="ttdeci">u16 yloc</div><div class="ttdoc">Mario Y position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:75</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1223"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1216"></a>
 Walk Animation</h3>
-<p>The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. <a class="el" href="structAnimation.html" title="Animation definition.">Animation</a> advances every other input frame for natural pacing.</p>
-<h2><a class="anchor" id="autotoc_md1224"></a>
+<p>The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. Animation advances every other input frame for natural pacing.</p>
+<h2><a class="anchor" id="autotoc_md1217"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/mapscroll</div>

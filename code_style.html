@@ -97,9 +97,9 @@ $(document).ready(function(){initNavTree('code_style.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Consistent code style makes the codebase easier to read and maintain.</p>
-<h2><a class="anchor" id="autotoc_md299"></a>
+<h2><a class="anchor" id="autotoc_md292"></a>
 C Code</h2>
-<h3><a class="anchor" id="autotoc_md300"></a>
+<h3><a class="anchor" id="autotoc_md293"></a>
 General</h3>
 <ul>
 <li><b>Indentation</b>: 4 spaces (no tabs)</li>
@@ -119,7 +119,7 @@ General</h3>
 <div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">do_something</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md301"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md294"></a>
 Naming Conventions</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -137,7 +137,7 @@ Naming Conventions</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Enums   </td><td class="markdownTableBodyNone">UPPER_CASE   </td><td class="markdownTableBodyNone"><code>SPRITE_SIZE_8X8</code>   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md302"></a>
+<h3><a class="anchor" id="autotoc_md295"></a>
 Types</h3>
 <p>Use fixed-width types from <code><a class="el" href="snes_8h.html" title="OpenSNES Master Header.">snes.h</a></code>:</p>
 <div class="fragment"><div class="line"><span class="comment">// Good</span></div>
@@ -153,12 +153,12 @@ Types</h3>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md303"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md296"></a>
 Function Documentation</h3>
 <p>Use Doxygen-style comments:</p>
 <div class="fragment"><div class="line"> </div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sprite_init</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md304"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md297"></a>
 Error Handling</h3>
 <div class="fragment"><div class="line"><span class="comment">// Return FALSE/NULL on error</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sprite_init</a>(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y) {</div>
@@ -176,7 +176,7 @@ Error Handling</h3>
 <div class="ttc" id="agroup__bool__type_html_gaa8cecfc5c5c054d2875c03e77b7be15d"><div class="ttname"><a href="group__bool__type.html#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a></div><div class="ttdeci">#define TRUE</div><div class="ttdef"><b>Definition</b> types.h:126</div></div>
 <div class="ttc" id="agroup__bool__type_html_gaa93f0eb578d23995850d61f7d61c55c1"><div class="ttname"><a href="group__bool__type.html#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a></div><div class="ttdeci">#define FALSE</div><div class="ttdef"><b>Definition</b> types.h:125</div></div>
 <div class="ttc" id="asprite_8h_html_aeb21c7ac080eea985b7701df626d9cf4"><div class="ttname"><a href="sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4">MAX_SPRITES</a></div><div class="ttdeci">#define MAX_SPRITES</div><div class="ttdoc">Maximum number of hardware sprites.</div><div class="ttdef"><b>Definition</b> sprite.h:46</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md305"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md298"></a>
 Memory</h3>
 <div class="fragment"><div class="line"><span class="comment">// Always check allocations</span></div>
 <div class="line"><span class="keywordtype">void</span>* <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">ptr</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">malloc</a>(size);</div>
@@ -188,16 +188,16 @@ Memory</h3>
 <div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">SpriteData</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sprite</a>;</div>
 <div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">memset</a>(&amp;<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sprite</a>, 0, <span class="keyword">sizeof</span>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sprite</a>));</div>
 <div class="ttc" id="agroup__macros_html_ga070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div><div class="ttdoc">Null pointer constant.</div><div class="ttdef"><b>Definition</b> types.h:142</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md306"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md299"></a>
 Assembly (65816 - WLA-DX)</h2>
-<h3><a class="anchor" id="autotoc_md307"></a>
+<h3><a class="anchor" id="autotoc_md300"></a>
 General</h3>
 <ul>
 <li><b>Indentation</b>: Labels at column 0, instructions indented with tab</li>
 <li><b>Comments</b>: Explain non-obvious operations</li>
 <li><b>Sections</b>: Use <code>.section</code> for code organization</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md308"></a>
+<h3><a class="anchor" id="autotoc_md301"></a>
 Format</h3>
 <div class="fragment"><div class="line">;============================================================================</div>
 <div class="line">; Function: sprite_update</div>
@@ -227,7 +227,7 @@ Format</h3>
 <div class="line">    rtl</div>
 <div class="line"> </div>
 <div class="line">.ends</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md309"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md302"></a>
 Register Documentation</h3>
 <div class="fragment"><div class="line">; Document register state changes</div>
 <div class="line">    rep #$20                ; A = 16-bit</div>
@@ -236,7 +236,7 @@ Register Documentation</h3>
 <div class="line">; Document expected register values</div>
 <div class="line">; Input: A = sprite ID (0-127)</div>
 <div class="line">; Output: X = OAM offset</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md310"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md303"></a>
 Labels</h3>
 <div class="fragment"><div class="line">; Public labels: _function_name</div>
 <div class="line">_sprite_init:</div>
@@ -247,9 +247,9 @@ Labels</h3>
 <div class="line"> </div>
 <div class="line">; Named local: .local_name</div>
 <div class="line">.calculate_offset:</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md311"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md304"></a>
 File Organization</h2>
-<h3><a class="anchor" id="autotoc_md312"></a>
+<h3><a class="anchor" id="autotoc_md305"></a>
 Headers (.h)</h3>
 <div class="fragment"><div class="line"> </div>
 <div class="line"><span class="preprocessor">#ifndef OPENSNES_SPRITE_H</span></div>
@@ -273,7 +273,7 @@ Headers (.h)</h3>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_SPRITE_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md313"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md306"></a>
 Source (.c)</h3>
 <div class="fragment"><div class="line"> </div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="sprite_8h.html">sprite.h</a>&quot;</span></div>
@@ -286,7 +286,7 @@ Source (.c)</h3>
 <div class="line">    <span class="comment">// Implementation</span></div>
 <div class="line">}</div>
 <div class="ttc" id="asprite_8h_html"><div class="ttname"><a href="sprite_8h.html">sprite.h</a></div><div class="ttdoc">SNES Sprite (Object) Management.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md314"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md307"></a>
 Formatting Tools</h2>
 <p>Consider using:</p><ul>
 <li><code>clang-format</code> for C code (config in <code>.clang-format</code>)</li>

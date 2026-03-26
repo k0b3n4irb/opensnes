@@ -1,25 +1,6 @@
 var searchData=
 [
-  ['element2sprite32x32_0',['element2sprite32x32',['../map32x32_8h.html#ae672de960d84e9e82707e6e2fe664ffd',1,'element2sprite32x32(u8 elem):&#160;map32x32.c'],['../map32x32_8c.html#ae672de960d84e9e82707e6e2fe664ffd',1,'element2sprite32x32(u8 elem):&#160;map32x32.c']]],
+  ['element2sprite32x32_0',['element2sprite32x32',['../map32x32_8c.html#ae672de960d84e9e82707e6e2fe664ffd',1,'element2sprite32x32(u8 elem):&#160;map32x32.c'],['../map32x32_8h.html#ae672de960d84e9e82707e6e2fe664ffd',1,'element2sprite32x32(u8 elem):&#160;map32x32.c']]],
   ['element2sprite64x64_1',['element2sprite64x64',['../map64x64_8c.html#ae6f7b12632afd5a34fd892392d927d5d',1,'element2sprite64x64(u8 elem):&#160;map64x64.c'],['../map64x64_8h.html#ae6f7b12632afd5a34fd892392d927d5d',1,'element2sprite64x64(u8 elem):&#160;map64x64.c']]],
-  ['enablegradient_2',['enableGradient',['../graphics_2effects_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1',1,'main.c']]],
-  ['entitycollide_3',['entityCollide',['../entity_8h.html#a6098039e13f7d5bb25efc9b00d37a39c',1,'entity.h']]],
-  ['entitycollidetype_4',['entityCollideType',['../entity_8h.html#ae4b41081b18545028bcee0b353c27aa8',1,'entity.h']]],
-  ['entitycontainspoint_5',['entityContainsPoint',['../entity_8h.html#a59f6830a4cac02c3816177396041ad61',1,'entity.h']]],
-  ['entitycount_6',['entityCount',['../entity_8h.html#ad90d90f6fd90d04156ee1785441d567e',1,'entity.h']]],
-  ['entitycounttype_7',['entityCountType',['../entity_8h.html#abf5ea35bb1907a69fe99aaa8b9484c07',1,'entity.h']]],
-  ['entitydestroy_8',['entityDestroy',['../entity_8h.html#a7a4c3dfdf784b36d8d8f7e96e46d8d24',1,'entity.h']]],
-  ['entitydrawall_9',['entityDrawAll',['../entity_8h.html#ae8e0430af07b7fde26bf6126cdb41a61',1,'entity.h']]],
-  ['entityfindtype_10',['entityFindType',['../entity_8h.html#a1c8e5d66538b2024410e120752cc3b43',1,'entity.h']]],
-  ['entityget_11',['entityGet',['../entity_8h.html#a32d085b9a41e88d5b09dfa5782455879',1,'entity.h']]],
-  ['entityhideall_12',['entityHideAll',['../entity_8h.html#a9e45f19754bf329c3a4bc7638891c5e3',1,'entity.h']]],
-  ['entityinit_13',['entityInit',['../entity_8h.html#ad424ec23728cfe4412463962c4b3d320',1,'entity.h']]],
-  ['entitymoveall_14',['entityMoveAll',['../entity_8h.html#a3498953efc85cd5d6d8c130827d561ad',1,'entity.h']]],
-  ['entityscreenx_15',['entityScreenX',['../entity_8h.html#a90d4ef70eebdb4e6998f9356e219073d',1,'entity.h']]],
-  ['entityscreeny_16',['entityScreenY',['../entity_8h.html#ab83c1b821b6f796e6a3b7d2e92d191b3',1,'entity.h']]],
-  ['entitysetpos_17',['entitySetPos',['../entity_8h.html#a74e0847fa80f7d4316b2c0f481b54284',1,'entity.h']]],
-  ['entitysetsprite_18',['entitySetSprite',['../entity_8h.html#a9ec9ddb2fa8df6f361327e9745146591',1,'entity.h']]],
-  ['entitysetvel_19',['entitySetVel',['../entity_8h.html#afbe70fddac275268cf915f842cbd3830',1,'entity.h']]],
-  ['entityspawn_20',['entitySpawn',['../entity_8h.html#a3a4cc7dcdfc22725890241d4c7153bcc',1,'entity.h']]],
-  ['entityupdateall_21',['entityUpdateAll',['../entity_8h.html#a6ccb992e3aec3236a697d864870d529b',1,'entity.h']]]
+  ['enablegradient_2',['enableGradient',['../graphics_2effects_2gradient__colors_2main_8c.html#a3bb2cc2d1414873f04b4bfb504a9b3f1',1,'main.c']]]
 ];

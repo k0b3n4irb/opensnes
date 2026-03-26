@@ -79,14 +79,13 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"animation_8h.html",
-"examples_audio_snesmod_music_large.html",
-"globals_vars.html",
-"group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060",
-"index.html#autotoc_md4",
-"object_8h.html#a5f727bc253e37de8d471c292e51112bc",
-"sprite_8h.html#a618f201dbc1a1c445890f304fd4c0b9c",
-"text_8h.html#a055579e7b75458617363a27f1224bc99"
+"annotated.html",
+"examples_graphics_effects.html",
+"graphics_2backgrounds_2mode5_2main_8c.html",
+"group__ppu__regs.html#ga8aa8f353fd99ab0fc06c5204172e4ef0",
+"learning_path.html#autotoc_md267",
+"profile_8h.html#aaa7eb1066375f80ba625e6b6f52efa00",
+"structAudioSample.html#a63b54dd64735b12287d21087574b9f93"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

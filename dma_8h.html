@@ -138,7 +138,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES DMA (Direct Memory Access) </p>
 <p>Functions for fast memory transfers using DMA.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md22"></a>
 DMA Overview</h2>
 <p>DMA allows fast transfers between:</p><ul>
 <li>Work RAM ↔ VRAM (video RAM)</li>
@@ -146,12 +146,12 @@ DMA Overview</h2>
 <li>Work RAM ↔ OAM (sprite RAM)</li>
 </ul>
 <p>DMA is much faster than CPU copying and should be used for all bulk transfers during VBlank.</p>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 VBlank Timing Requirement</h2>
 <dl class="section warning"><dt>Warning</dt><dd><b>CRITICAL</b>: VRAM, CGRAM, and OAM can only be safely accessed during VBlank (vertical blanking period) or when the screen is in force blank mode (INIDISP bit 7 set). Accessing these memories during active display causes visual corruption and undefined behavior.</dd>
 <dd>
 <b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md24"></a>
 Bank Limitation</h2>
 <dl class="section note"><dt>Note</dt><dd>The current implementation assumes source data is in bank $00 for ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using <a class="el" href="dma_8h.html#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> or <a class="el" href="dma_8h.html#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
