@@ -1,7 +1,7 @@
 OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET      := superfx_bitmap.sfc
-ROM_NAME    := SUPERFX BITMAP
+ROM_NAME    := SUPERFX BITMAP       
 
 CSRC        := main.c
 ASMSRC      := gsu_loader.asm

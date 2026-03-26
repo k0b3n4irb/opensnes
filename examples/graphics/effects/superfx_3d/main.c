@@ -8,7 +8,9 @@
 #include <snes/superfx.h>
 
 extern void launchGSU(void);
+extern void dmaFullFrameToVRAM(void);
 extern void dmaChunkToVRAM(u16 chunk);
+extern void setupHDMABlanking(void);
 extern void setupBitmapTilemap(void);
 extern void writeEdgesToSRAM(void);
 extern u8 gsu_scbr;
@@ -54,22 +56,31 @@ u8 g_px[8];
 u8 g_py[8];
 s16 g_say, g_cay, g_sax, g_cax;
 
-/** @brief Rotate one vertex, store projected screen coords */
+/** @brief Rotate one vertex, store projected screen coords (clamped) */
 void rotateVertex(u16 idx) {
-    s16 x, y, z, rx, rz, ry2;
+    s16 x, y, z, rx, rz, ry2, px_val, py_val;
     x = cvx[idx];
     y = cvy[idx];
     z = cvz[idx];
 
-    /* Y-axis: rx = (x*cos - z*sin) / 128 */
+    /* Y-axis rotation */
     rx = (x * g_cay - z * g_say) / 128;
     rz = (x * g_say + z * g_cay) / 128;
 
-    /* X-axis: ry2 = (y*cos - rz*sin) / 128 */
+    /* X-axis rotation — ry2 can reach ±64 due to rz amplification */
     ry2 = (y * g_cax - rz * g_sax) / 128;
 
-    g_px[idx] = (u8)(128 + rx);
-    g_py[idx] = (u8)(64 + ry2);
+    /* Project + clamp to framebuffer bounds (0-255 X, 0-127 Y) */
+    px_val = 128 + rx;
+    if (px_val < 1) px_val = 1;
+    if (px_val > 254) px_val = 254;
+    g_px[idx] = (u8)px_val;
+
+    /* Y=64: center of framebuffer. BG scroll handles screen centering. */
+    py_val = 64 + ry2;
+    if (py_val < 1) py_val = 1;
+    if (py_val > 126) py_val = 126;
+    g_py[idx] = (u8)py_val;
 }
 
 /** @brief Build edge buffer from projected vertices */
@@ -102,11 +113,40 @@ int main(void) {
         while (1) { WaitForVBlank(); }
     }
 
-    setMainScreen(LAYER_BG1);
+    /* Hide all sprites (OAM Y=240 = offscreen) */
+    oamClear();
+    for (i = 0; i < 128; i++) {
+        oamMemory[i * 4 + 1] = 240;
+    }
+    oam_update_flag = 1;
+
+    setMainScreen(LAYER_BG1);  /* BG1 only, no OBJ layer */
     gsu_scbr = 0x00;
     gsu_dma_src_hi = 0x00;
     angle_y = 0;
     angle_x = 0;
+
+    /* Scroll BG1 down to center the 128px framebuffer in the 144px visible area.
+     * VOFS=208: top of screen shows BG Y=208 (fill tiles). Framebuffer (Y=0-127)
+     * appears at scanlines 48-175. With 40-line HDMA blank: visible = 40-183.
+     * Framebuffer centered: 8px dark above + 128px content + 8px dark below. */
+    bgSetScroll(0, 0, 208);
+
+    /* Render + DMA first frame BEFORE enabling HDMA (clean first display) */
+    g_say = sin_tab[0];
+    g_cay = sin_tab[64];
+    g_sax = sin_tab[0];
+    g_cax = sin_tab[64];
+    for (i = 0; i < 8; i++) { rotateVertex(i); }
+    buildEdges();
+    writeEdgesToSRAM();
+    launchGSU();
+    WaitForVBlank();
+    setScreenOff();
+    dmaFullFrameToVRAM();
+
+    /* Now enable HDMA + screen */
+    setupHDMABlanking();
     setScreenOn();
 
     while (1) {
@@ -123,15 +163,8 @@ int main(void) {
         writeEdgesToSRAM();
         launchGSU();
 
-        /* DMA 16KB in 4 chunks of 4KB (each fits in VBlank, no flicker) */
-        WaitForVBlank();
-        dmaChunkToVRAM(0);
-        WaitForVBlank();
-        dmaChunkToVRAM(1);
-        WaitForVBlank();
-        dmaChunkToVRAM(2);
-        WaitForVBlank();
-        dmaChunkToVRAM(3);
+        /* DMA 16KB — scanline-polled with HDMA blanking (40+40 margin) */
+        dmaFullFrameToVRAM();
 
         angle_y += 2;
         angle_x += 1;

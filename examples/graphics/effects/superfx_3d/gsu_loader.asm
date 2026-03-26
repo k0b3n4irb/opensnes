@@ -25,6 +25,7 @@ gsu_wram_area: dsb 96       ; must be >= stub size
 gsu_scbr: dsb 1
 gsu_dma_src_hi: dsb 1
 edge_buffer: dsb 48         ; 12 edges × 4 bytes (x0,y0,x1,y1)
+hdma_table: dsb 20          ; HDMA table: 8 entries × 2 + terminator = 17 bytes
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -270,6 +271,154 @@ writeEdgesToSRAM:
     inx
     cpx #48
     bne -
+    plp
+    rtl
+.ENDS
+
+;------------------------------------------------------------------------------
+; setupHDMABlanking — HDMA on channel 1 controls INIDISP per scanline
+;------------------------------------------------------------------------------
+; PeterLemon pattern: blank top 19 scanlines + last scanline for DMA bandwidth.
+; The visible area is scanlines 19-204 (186 lines of display).
+; HDMA table written to WRAM (hdma_table), channel 1 → REG_INIDISP ($2100).
+;------------------------------------------------------------------------------
+.SECTION ".gsu_hdma" SEMIFREE
+.ACCU 16
+.INDEX 16
+setupHDMABlanking:
+    php
+    sep #$20
+    .ACCU 8
+
+    ; Build HDMA table in WRAM
+    ; Format: [count, value] pairs. count bit 7=0 → direct mode.
+    ; $80 = forced blank (bit 7 of INIDISP), $0F = full brightness
+    ldx #$0000
+
+    ; Budget: 40 (top) + 40 (bottom) + 38 (VBlank) = 118 lines = 7.5ms
+    ; DMA 16KB needs ~6.1ms + ~97 bytes HDMA overhead → ~6.2ms. Margin: ~1.3ms
+
+    lda #40                  ; 40 scanlines: forced blank (top)
+    sta.l hdma_table,x
+    inx
+    lda #$80
+    sta.l hdma_table,x
+    inx
+
+    lda #32                  ; 144 visible scanlines (32×4 + 16)
+    sta.l hdma_table,x
+    inx
+    lda #$0F
+    sta.l hdma_table,x
+    inx
+
+    lda #32
+    sta.l hdma_table,x
+    inx
+    lda #$0F
+    sta.l hdma_table,x
+    inx
+
+    lda #32
+    sta.l hdma_table,x
+    inx
+    lda #$0F
+    sta.l hdma_table,x
+    inx
+
+    lda #32
+    sta.l hdma_table,x
+    inx
+    lda #$0F
+    sta.l hdma_table,x
+    inx
+
+    lda #16                  ; remaining 16 visible scanlines
+    sta.l hdma_table,x
+    inx
+    lda #$0F
+    sta.l hdma_table,x
+    inx
+
+    lda #40                  ; 40 scanlines: forced blank (bottom)
+    sta.l hdma_table,x
+    inx
+    lda #$80
+    sta.l hdma_table,x
+    inx
+
+    lda #$00                 ; end HDMA table
+    sta.l hdma_table,x
+
+    ; Configure HDMA channel 1 → REG_INIDISP ($2100)
+    lda #$00
+    sta.l $4310              ; transfer mode: 1 byte, direct
+    lda #$00
+    sta.l $4311              ; dest: $2100 (INIDISP)
+    rep #$20
+    .ACCU 16
+    lda #hdma_table
+    sta.l $4312              ; source: HDMA table address
+    sep #$20
+    .ACCU 8
+    lda #$00                 ; source bank (bank 0 = WRAM)
+    sta.l $4314
+
+    ; Enable HDMA channel 1
+    lda #$02                 ; bit 1 = channel 1
+    sta.l $420C
+
+    plp
+    rtl
+.ENDS
+
+;------------------------------------------------------------------------------
+; dmaFullFrameToVRAM — Wait for scanline 194, then DMA 16KB
+;------------------------------------------------------------------------------
+; PeterLemon technique: poll V-counter until scanline >= 194 (start of
+; bottom forced blank). DMA runs through: bottom blank (30 lines) +
+; VBlank (38 lines) + top blank (30 lines) = 98 lines = ~6.2ms.
+; 16KB DMA needs ~6.1ms → fits perfectly.
+;------------------------------------------------------------------------------
+.SECTION ".gsu_dma_full" SEMIFREE
+.ACCU 16
+.INDEX 16
+dmaFullFrameToVRAM:
+    php
+    sep #$20
+    .ACCU 8
+
+    ; Pre-configure DMA channel 0 (everything except start)
+    lda #$80
+    sta.l $2115              ; VMAIN: word increment
+    rep #$20
+    .ACCU 16
+    lda #$0000
+    sta.l $2116              ; VRAM dest = $0000
+    lda #16384              ; full 16KB framebuffer
+    sta.l $4305              ; 16KB
+    lda #$0000
+    sta.l $4302              ; source offset
+    sep #$20
+    .ACCU 8
+    lda #$70
+    sta.l $4304              ; source bank = SRAM
+    lda #$01
+    sta.l $4300              ; mode: 2-reg write
+    lda #$18
+    sta.l $4301              ; dest: VMDATAL
+
+    ; Poll V-counter until scanline >= 184 (start of bottom blank zone)
+    ; 40 top + 144 visible = 184. DMA runs through: 40 blank + 38 VBlank + 40 blank = 7.5ms
+-   lda.l $2137              ; latch H/V counters
+    lda.l $213D              ; V-counter low byte
+    cmp #184
+    bcc -                    ; loop while scanline < 184
+
+    ; Start DMA — we're in forced blank zone
+    lda #$01
+    sta.l $420B              ; GO!
+
     plp
     rtl
 .ENDS

@@ -1,7 +1,7 @@
 OPENSNES := $(shell cd ../../.. && pwd)
 
 TARGET      := superfx_hello.sfc
-ROM_NAME    := SUPERFX HELLO
+ROM_NAME    := SUPERFX HELLO        
 
 CSRC        := main.c
 ASMSRC      := gsu_loader.asm

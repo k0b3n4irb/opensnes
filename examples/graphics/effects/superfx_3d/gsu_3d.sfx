@@ -18,7 +18,7 @@ gsu_start:
     IBT R0, #$70
     RAMB
 
-    ; Clear
+    ; Clear framebuffer
     IWT R0, #$0000
     MOVE R1, R8
     IWT R4, #8192

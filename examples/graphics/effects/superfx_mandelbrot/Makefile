@@ -1,7 +1,7 @@
 OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET      := superfx_mandelbrot.sfc
-ROM_NAME    := SUPERFX MANDELBROT
+ROM_NAME    := SUPERFX MANDELBROT   
 
 CSRC        := main.c
 ASMSRC      := gsu_loader.asm
