@@ -1,28 +1,24 @@
-; SuperFX (GSU) Wireframe Cube — static square first (validates Bresenham)
+; SuperFX (GSU) Wireframe — 12 lines from SRAM via Bresenham + PLOT
 ;
-; Draws 4 lines forming a square at the center of the screen.
-; Uses a Bresenham line drawing algorithm via PLOT.
+; Edge data at SRAM $4000: 12 × 4 bytes (x0, y0, x1, y1)
+; SRAM pointer saved at $4100 (R12/R13 used by LOOP)
 ;
-; Register allocation:
-;   R0  scratch/COLOR/PLOT    R8  buffer base (from SNES CPU)
-;   R1  X pixel (PLOT)        R9  dx (line draw)
-;   R2  Y pixel (PLOT)        R10 dy (line draw)
-;   R3  line X0               R11 sx (step x: +1 or -1)
-;   R4  line Y0               R12 LOOP counter / sy
-;   R5  line X1               R13 LOOP target / err
-;   R6  FMULT / scratch       R14 e2 (error*2)
-;   R7  line Y1
+; Bresenham: PLOT with DEC R1 to compensate auto-increment.
 
 .include "memmap_gsu.inc"
 
 .BANK 0 SLOT 0
 .ORG 0
 
+.EQU EDGE_DATA  $4000
+.EQU PTR_SAVE   $4100
+.EQU NUM_EDGES  12
+
 gsu_start:
     IBT R0, #$70
     RAMB
 
-    ; Clear framebuffer (R8 = buffer base from SNES CPU)
+    ; Clear
     IWT R0, #$0000
     MOVE R1, R8
     IWT R4, #8192
@@ -35,115 +31,187 @@ _clear:
     BNE _clear
     NOP
 
-    ; Set CMODE
     IBT R0, #$00
     CMODE
 
-    ; Set color = 15 (white)
-    IBT R0, #$0F
-    COLOR
+    ; Init SRAM pointer
+    IWT R0, #EDGE_DATA
+    IWT R6, #PTR_SAVE
+    STW (R6)
+
+    ; Edge loop via LOOP (R12/R13)
+    IWT R12, #NUM_EDGES
+    MOVE R13, R15
 
     CACHE
 
-    ; Draw a square: (80,30) → (176,30) → (176,98) → (80,98) → (80,30)
-    ; Line 1: (80,30) → (176,30) — horizontal
-    IWT R3, #80
-    IWT R4, #30
-    IWT R5, #176
-    IWT R7, #30
-    IBT R0, #$0F
-    COLOR
-    ; Call line drawing (inline, not subroutine — no LINK on GSU easily)
-
-    ; === LINE DRAW: (R3,R4) → (R5,R7) ===
-    ; Bresenham's line algorithm
-    ; dx = abs(x1-x0), dy = -abs(y1-y0)
-    ; sx = x0<x1 ? 1 : -1, sy = y0<y1 ? 1 : -1
-    ; err = dx + dy
-
-    ; For this first test: just draw horizontal line (Y constant)
-    ; Simple loop: PLOT at each X from X0 to X1
-    MOVE R1, R3             ; R1 = X = X0
-    MOVE R2, R4             ; R2 = Y = Y0
-_line1:
-    PLOT
-    MOVE R0, R1             ; R0 = current X (after PLOT auto-increment)
-    MOVE R6, R5             ; R6 = X1
-    SUB R6                  ; R0 = X - X1 (signed comparison is tricky)
+_next_edge:
+    ; Load pointer
+    IWT R6, #PTR_SAVE
+    LDW (R6)
     NOP
-    BMI _line1              ; if X < X1, continue
+    MOVE R6, R0
+
+    ; Read x0, y0, x1, y1
+    LDB (R6)
+    NOP
+    MOVE R1, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R2, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R3, R0
+    INC R6
+    NOP
+    LDB (R6)
+    NOP
+    MOVE R4, R0
+    INC R6
     NOP
 
-    IBT R1, #$00
-    RPIX                    ; flush pixel cache
+    ; Save updated pointer
+    MOVE R0, R6
+    IWT R6, #PTR_SAVE
+    STW (R6)
 
-    ; Line 2: (176,30) → (176,98) — vertical
-    IWT R3, #176
-    IWT R4, #30
-    IWT R7, #98
-    IBT R0, #$0F
-    COLOR
-    MOVE R1, R3
-    MOVE R2, R4
-_line2:
-    PLOT
-    INC R2                  ; Y++ (vertical line)
-    ; Reset R1 to X (PLOT auto-incremented it)
-    MOVE R1, R3
-    MOVE R0, R2
-    MOVE R6, R7
-    SUB R6
-    NOP
-    BMI _line2
-    NOP
-    IBT R1, #$00
-    RPIX
-
-    ; Line 3: (176,98) → (80,98) — horizontal (right to left)
-    IWT R3, #176
-    IWT R4, #98
-    IWT R5, #80
-    IBT R0, #$0F
-    COLOR
-    MOVE R1, R3
-    MOVE R2, R4
-_line3:
-    PLOT
-    ; PLOT increments R1. For right-to-left, we need to decrement.
-    ; Reset R1 and manually decrement
-    DEC R3                  ; X0--
-    NOP
-    MOVE R1, R3
+    ; === Bresenham setup ===
+    ; dx = abs(x1-x0), sx = sign(x1-x0)
     MOVE R0, R3
-    MOVE R6, R5
-    SUB R6
+    SUB R1
     NOP
-    BPL _line3              ; while X0 >= X1
+    BPL _dx_pos
     NOP
+    NOT
+    NOP
+    INC R0
+    NOP
+    IWT R9, #$FFFF
+    BRA _dx_done
+    NOP
+_dx_pos:
+    IWT R9, #$0001
+_dx_done:
+    MOVE R7, R0             ; R7 = dx (positive)
+
+    ; dy = -abs(y1-y0), sy = sign(y1-y0)
+    MOVE R0, R4
+    SUB R2
+    NOP
+    BPL _dy_pos
+    NOP
+    ; y1 < y0: negate to get abs, then negate again for dy
+    ; abs(y1-y0) = -(y1-y0) = y0-y1
+    NOT
+    NOP
+    INC R0
+    NOP
+    ; dy = -abs = -(y0-y1) = y1-y0 (which is already negative)
+    ; Oops, this double-negates. Let me rethink:
+    ; R0 = y1-y0 (negative). abs = NOT+INC = -(y1-y0).
+    ; dy = -abs = y1-y0 = R0 original. So for negative: dy = original R0.
+    ; But we already NOT+INC'd it. We need to NOT+INC again... or just
+    ; reload and negate:
+    ; SIMPLER: reload, compute abs separately
+    IWT R10, #$FFFF         ; sy = -1
+    ; abs(y1-y0) = R0 (we just negated the negative value)
+    ; dy = -abs = negate again
+    NOT
+    NOP
+    INC R0
+    NOP
+    BRA _dy_done
+    NOP
+
+_dy_pos:
+    IWT R10, #$0001         ; sy = +1
+    ; R0 = y1-y0 (positive). dy = -abs = negate
+    NOT
+    NOP
+    INC R0
+    NOP
+
+_dy_done:
+    MOVE R8, R0             ; R8 = dy (negative)
+
+    ; err = dx + dy
+    MOVE R0, R7
+    ADD R8
+    NOP
+    MOVE R5, R0
+
+    ; === Bresenham pixel loop ===
+    IBT R0, #$0F
+    COLOR
+
+_bres:
+    PLOT
+    DEC R1                  ; undo PLOT auto-increment
+    NOP
+
+    ; Done? x0==x1 && y0==y1
+    MOVE R0, R1
+    SUB R3
+    NOP
+    BNE _bres_cont
+    NOP
+    MOVE R0, R2
+    SUB R4
+    NOP
+    BEQ _bres_done
+    NOP
+
+_bres_cont:
+    ; e2 = 2 * err
+    MOVE R0, R5
+    ADD R5
+    NOP
+    MOVE R6, R0             ; R6 = e2
+
+    ; if e2 >= dy: err += dy, x0 += sx
+    SUB R8                  ; e2 - dy (subtracting negative = adding positive)
+    NOP
+    BMI _skip_x
+    NOP
+    MOVE R0, R5
+    ADD R8
+    NOP
+    MOVE R5, R0
+    MOVE R0, R1
+    ADD R9
+    NOP
+    MOVE R1, R0
+_skip_x:
+
+    ; if e2 <= dx: err += dx, y0 += sy
+    MOVE R0, R7
+    SUB R6                  ; dx - e2
+    NOP
+    BMI _skip_y
+    NOP
+    MOVE R0, R5
+    ADD R7
+    NOP
+    MOVE R5, R0
+    MOVE R0, R2
+    ADD R10
+    NOP
+    MOVE R2, R0
+_skip_y:
+
+    BRA _bres
+    NOP
+
+_bres_done:
     IBT R1, #$00
     RPIX
 
-    ; Line 4: (80,98) → (80,30) — vertical (bottom to top)
-    IWT R3, #80
-    IWT R4, #98
-    IWT R7, #30
-    IBT R0, #$0F
-    COLOR
-    MOVE R1, R3
-    MOVE R2, R4
-_line4:
-    PLOT
-    MOVE R1, R3             ; reset X after PLOT auto-increment
-    DEC R2                  ; Y-- (upward)
+    LOOP
     NOP
-    MOVE R0, R2
-    MOVE R6, R7
-    SUB R6
-    NOP
-    BPL _line4
-    NOP
-    IBT R1, #$00
-    RPIX
 
     NOP
     NOP

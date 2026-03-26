@@ -21,13 +21,10 @@ gsu_program_end:
 ; WRAM area + result variables
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_vars" BANK 0 SLOT 1
-gsu_wram_area: dsb 96       ; must be >= stub size ($5A = 90 bytes)
-gsu_result: dsb 2
-gsu_sram_byte0: dsb 1
-gsu_sram_byte1: dsb 1
-gsu_sram_word: dsb 2
-gsu_scbr: dsb 1            ; SCBR for PLOT target ($00=bufA, $10=bufB)
-gsu_dma_src_hi: dsb 1      ; DMA source high byte ($00=bufA, $40=bufB)
+gsu_wram_area: dsb 96       ; must be >= stub size
+gsu_scbr: dsb 1
+gsu_dma_src_hi: dsb 1
+edge_buffer: dsb 48         ; 12 edges × 4 bytes (x0,y0,x1,y1)
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -56,24 +53,7 @@ launchGSU:
     ; Execute from WRAM
     jsl gsu_wram_area
 
-    ; GSU finished — read results
-    rep #$20
-    .ACCU 16
-    lda.l $3000              ; GSU R0
-    sta.l gsu_result
-
-    ; Read SRAM bytes written by GSU
-    sep #$20
-    .ACCU 8
-    lda.l $700000            ; SRAM[0]
-    sta.l gsu_sram_byte0
-    lda.l $700001            ; SRAM[1]
-    sta.l gsu_sram_byte1
-    rep #$20
-    .ACCU 16
-    lda.l $700002            ; SRAM[2..3] (STW test)
-    sta.l gsu_sram_word
-
+    ; GSU finished
     plp
     rtl
 
@@ -227,6 +207,28 @@ dmaBitmapToVRAM:
     sta.l $4301
     lda #$01
     sta.l $420B
+    plp
+    rtl
+.ENDS
+
+;------------------------------------------------------------------------------
+; writeEdgesToSRAM — Copy edge_buffer (48 bytes WRAM) to SRAM $70:4000
+;------------------------------------------------------------------------------
+.SECTION ".gsu_edges" SEMIFREE
+.ACCU 16
+.INDEX 16
+writeEdgesToSRAM:
+    php
+    sep #$20
+    .ACCU 8
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l edge_buffer,x
+    sta.l $704000,x
+    inx
+    cpx #48
+    bne -
     plp
     rtl
 .ENDS
