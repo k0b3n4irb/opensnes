@@ -7,15 +7,13 @@
 #include <snes.h>
 #include <snes/superfx.h>
 
-extern void launchGSU(void);
-extern void dmaFullFrameToVRAM(void);
-extern void dmaChunkToVRAM(u16 chunk);
-extern void setupHDMABlanking(void);
-extern void setupBitmapTilemap(void);
+/* Per-example functions (gsu_loader.asm) */
+extern void gsuSetProgram(void);
 extern void writeEdgesToSRAM(void);
-extern u8 gsu_scbr;
-extern u8 gsu_dma_src_hi;
 extern u8 edge_buffer[48];
+
+/* Library functions are in superfx.h: gsuLaunch, gsuSetupBitmapTilemap,
+ * gsuDmaFullFrame, gsuSetupHdmaBlanking, gsu_scbr, gsu_dma_src_hi */
 
 static const s8 sin_tab[256] = {
       0,   3,   6,   9,  12,  16,  19,  22,  25,  28,  31,  34,  37,  40,  43,  46,
@@ -106,7 +104,7 @@ int main(void) {
     dmaCopyCGram((u8*)cube_pal, 0, 32);
     bgSetGfxPtr(0, 0x0000);
     bgSetMapPtr(0, 0x4000, BG_MAP_32x32);
-    setupBitmapTilemap();
+    gsuSetupBitmapTilemap(0x4000);
 
     if (!gsuInit()) {
         setScreenOn();
@@ -140,13 +138,14 @@ int main(void) {
     for (i = 0; i < 8; i++) { rotateVertex(i); }
     buildEdges();
     writeEdgesToSRAM();
-    launchGSU();
+    gsuSetProgram();          /* tell library where GSU binary is (once) */
+    gsuLaunch();
     WaitForVBlank();
     setScreenOff();
-    dmaFullFrameToVRAM();
+    gsuDmaFullFrame();
 
     /* Now enable HDMA + screen */
-    setupHDMABlanking();
+    gsuSetupHdmaBlanking(40, 40);
     setScreenOn();
 
     while (1) {
@@ -161,10 +160,10 @@ int main(void) {
 
         buildEdges();
         writeEdgesToSRAM();
-        launchGSU();
+        gsuLaunch();
 
         /* DMA 16KB — scanline-polled with HDMA blanking (40+40 margin) */
-        dmaFullFrameToVRAM();
+        gsuDmaFullFrame();
 
         angle_y += 2;
         angle_x += 1;
