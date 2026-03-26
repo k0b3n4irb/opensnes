@@ -45,19 +45,9 @@ int main(void) {
     u16 pitch;
     u16 i;
 
-    /* Init hardware */
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    /* Palette */
-    setColor(0, 0x2800);
-    setColor(1, RGB(31, 31, 31));
-
-    /* Text setup */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    /* Init hardware + text */
+    textModeInit();
+    setColor(0, 0x2800);  /* custom dark blue background */
 
     /* HUD */
     textPrintAt(6, 2, "SNESMOD SFX EXAMPLE");
@@ -69,9 +59,6 @@ int main(void) {
     textPrintAt(7, 11, "L/R - COWBELL");
     textPrintAt(7, 12, "LEFT/RIGHT - PITCH");
     textPrintAt(7, 15, "PITCH: NORMAL   ");
-
-    /* Screen enable */
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
 

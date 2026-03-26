@@ -12,16 +12,7 @@ extern u8 sa1_status;
 int main(void) {
     u8 status;
 
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    setColor(0, 0x0000);
-    setColor(1, RGB(31, 31, 31));
-
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     textPrintAt(3, 3, "SA-1 BOOT DIAGNOSTIC");
 
@@ -43,8 +34,6 @@ int main(void) {
     } else {
         textPrintAt(3, 7, "UNKNOWN STATUS VALUE");
     }
-
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
     setScreenOn();

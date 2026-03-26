@@ -82,19 +82,7 @@ static const char sens_hi[] = "HIGH";
 int main(void) {
     u8 detected;
 
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    /* Text system: load font, set BG pointers, set palette */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
-
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;  /* BG color = black */
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* Text color = white */
+    textModeInit();
 
     textPrintAt(2, 1, "SNES MOUSE DEMO");
     textPrintAt(2, 2, "---------------");

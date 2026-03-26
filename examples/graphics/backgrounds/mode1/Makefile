@@ -1,7 +1,7 @@
 #==============================================================================
 # Mode 1 Background Example
 # Simple tile mode 1 demo - displays static 16-color background
-# Port of pvsneslib Mode1 example
+# Port of PVSnesLib Mode1 example
 #==============================================================================
 
 OPENSNES := $(shell cd ../../../.. && pwd)

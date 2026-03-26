@@ -104,8 +104,6 @@ endif
 # Assembler flags
 ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
-# OAM helpers (standalone projects without library)
-OAM_HELPERS_OBJ := $(if $(filter 0,$(USE_LIB)),oam_helpers.o)
 
 # Check library is built (skip for 'clean')
 # Runtime is always required (provides __mul16, __div16, etc.)
@@ -120,12 +118,11 @@ endif
 #------------------------------------------------------------------------------
 
 _DEP_sprite    := dma sprite_oamset
-_DEP_text      := dma
+_DEP_text      := dma background
 _DEP_text4bpp  := dma
 _DEP_object    := map
 _DEP_map       := dma
 _DEP_snesmod   := console
-_DEP_mp5       := input
 _DEP_superfx   := dma
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
@@ -238,10 +235,10 @@ project_config.inc:
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
 
-# Project header (ROM_NAME via sed, rest via project_config.inc)
+# Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
 project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
-	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(HDR_TEMPLATE) > $@
+	@padded=$$(printf "%-21.21s" "$(ROM_NAME)") && sed "s/__ROM_NAME__/$$padded/" $(HDR_TEMPLATE) > $@
 
 # SA-1 boot stub: use example-local sa1_boot.asm if present, otherwise template
 SA1_BOOT_SRC := $(if $(wildcard sa1_boot.asm),sa1_boot.asm,$(TEMPLATES)/sa1_boot.asm)
@@ -257,13 +254,6 @@ crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boo
 data_init_start.o: $(TEMPLATES)/data_init_start.asm
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
-
-# OAM helpers (USE_LIB=0 only)
-ifeq ($(USE_LIB),0)
-oam_helpers.o: $(TEMPLATES)/oam_helpers.asm
-	@echo "[AS] oam_helpers"
-	$(call wrap_asm,$<,$@)
-endif
 
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
@@ -290,7 +280,7 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm
 #------------------------------------------------------------------------------
 
 # All objects in link order
-LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(OAM_HELPERS_OBJ) $(ASM_OBJS) $(C_OBJS)
+LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
@@ -321,7 +311,6 @@ clean:
 	@echo "Cleaning $(TARGET)..."
 	@rm -f crt0.o
 	@rm -f data_init_start.o data_init_start.wrap.asm
-	@rm -f oam_helpers.o oam_helpers.wrap.asm
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm

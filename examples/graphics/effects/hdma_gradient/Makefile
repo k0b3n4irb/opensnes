@@ -17,13 +17,13 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion (8bpp Mode 3 image)
 #------------------------------------------------------------------------------
 
-res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.png
+res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png
 	@echo "[GFX] Converting background..."
 	@$(GFX4SNES) -s 8 -o 256 -u 256 -p -m -i $<
 
-combined.asm: res/pvsneslib.pic
+combined.asm: res/opensnes.pic
 
 clean: clean-hdma_gradient
 .PHONY: clean-hdma_gradient
 clean-hdma_gradient:
-	@rm -f res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map res/pvsneslib.inc res/pvsneslib_data.as
+	@rm -f res/opensnes.pic res/opensnes.pal res/opensnes.map res/opensnes.inc res/opensnes_data.as

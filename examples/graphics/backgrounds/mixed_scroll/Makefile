@@ -1,6 +1,6 @@
 #==============================================================================
 # Mode 1 Mixed Scroll Example
-# Two Mode 1 backgrounds: BG1 (shader) auto-scrolls, BG2 (pvsneslib logo) fixed
+# Two Mode 1 backgrounds: BG1 (shader) auto-scrolls, BG2 (opensnes logo) fixed
 # Port of PVSnesLib Mode1MixedScroll example
 #==============================================================================
 
@@ -27,7 +27,7 @@ res/shader.pic res/shader.pal res/shader.map: res/shader.png
 	@$(GFX4SNES) -s 8 -o 16 -e 1 -m -p -i $<
 
 # PVSnesLib logo: 4bpp, palette entry 0 (default palette slot)
-res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map: res/pvsneslib.png
+res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png
 	@echo "[GFX] $< (palette entry 0)"
 	@$(GFX4SNES) -s 8 -o 16 -m -p -i $<
 
@@ -36,4 +36,4 @@ clean: clean-mixed_scroll
 .PHONY: clean-mixed_scroll
 clean-mixed_scroll:
 	@rm -f res/shader.pic res/shader.pal res/shader.map res/shader.inc res/shader_data.as
-	@rm -f res/pvsneslib.pic res/pvsneslib.pal res/pvsneslib.map res/pvsneslib.inc res/pvsneslib_data.as
+	@rm -f res/opensnes.pic res/opensnes.pal res/opensnes.map res/opensnes.inc res/opensnes_data.as

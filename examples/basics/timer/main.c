@@ -42,26 +42,12 @@ extern volatile u16 frame_count;
  */
 int main(void) {
     /* Step 1: Hardware init */
-    consoleInit();
-
-    /* Step 2: Video mode */
-    setMode(BG_MODE0, 0);
-
-    /* Step 3: Palette */
-    setColor(0, 0x0000);
-    setColor(1, RGB(31, 31, 31));
-
-    /* Step 4: Text setup (follows text_test pattern) */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     /* Step 5: Static labels */
     textPrintAt(9, 8, "VBLANK COUNTER");
 
     /* Step 6: Screen enable */
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
     setScreenOn();

@@ -1,7 +1,7 @@
 #==============================================================================
 # Fading Effect Example
 # Screen fade in/out demonstration
-# Port of pvsneslib Fading example
+# Port of PVSnesLib Fading example
 #==============================================================================
 
 OPENSNES := $(shell cd ../../../.. && pwd)
