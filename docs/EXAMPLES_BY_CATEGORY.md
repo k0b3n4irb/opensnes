@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 55 examples organized by topic. For a progressive learning path, see
+All 54 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -148,7 +148,6 @@ sharing I-RAM with the main CPU for inter-processor communication.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_enhancement_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
-| @subpage examples_enhancement_sa1_speed | 32-bit counter at 10.74 MHz demonstrating SA-1 clock advantage |
 | @subpage examples_enhancement_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
 
 ### SuperFX (GSU)

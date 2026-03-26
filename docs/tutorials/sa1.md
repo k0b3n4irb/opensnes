@@ -210,7 +210,7 @@ while (1) {
 ### Pattern 2: Free-Running Counter
 
 The SA-1 increments a value continuously. The main CPU reads it whenever needed.
-No synchronization required — just atomic reads. Used by **sa1_speed**.
+No synchronization required — just atomic reads. See sa1_hello for register readback examples.
 
 ```asm
 ; SA-1 side: increment 32-bit counter forever
@@ -329,7 +329,6 @@ Common issues:
 | Example | What it demonstrates |
 |---------|---------------------|
 | [sa1_hello](../../../examples/memory/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
-| [sa1_speed](../../../examples/memory/sa1_speed/) | Free-running 32-bit counter at 10.74 MHz |
 | [sa1_starfield](../../../examples/memory/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
 
 ## What SA-1 Can't Do

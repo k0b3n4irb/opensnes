@@ -1,6 +1,6 @@
 # Learn SNES Development {#learning_path}
 
-A progressive learning path through 55 examples, from your first ROM to complete games.
+A progressive learning path through 54 examples, from your first ROM to complete games.
 Each example builds on concepts from earlier ones.
 
 ## Level 1: First Steps
@@ -105,8 +105,6 @@ SA-1 uses the same 65816 ISA at 3x speed; SuperFX is a custom RISC processor.
 ### SA-1 Coprocessor (same ISA, 10.74 MHz)
 
 @subpage examples_enhancement_sa1_hello
-
-@subpage examples_enhancement_sa1_speed
 
 @subpage examples_enhancement_sa1_starfield
 
