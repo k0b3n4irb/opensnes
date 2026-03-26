@@ -177,36 +177,77 @@ _tm_col:
 ;------------------------------------------------------------------------------
 ; dmaBitmapToVRAM — DMA 16KB from SRAM $70:0000 to VRAM $0000
 ;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------
+; dmaChunkToVRAM — DMA 4KB chunk from SRAM to VRAM (fits in VBlank)
+;------------------------------------------------------------------------------
+; Input: tcc__r0 = chunk index (0-3)
+; Chunk 0: SRAM $70:0000 → VRAM $0000, 4096 bytes
+; Chunk 1: SRAM $70:1000 → VRAM $0800, 4096 bytes
+; Chunk 2: SRAM $70:2000 → VRAM $1000, 4096 bytes
+; Chunk 3: SRAM $70:3000 → VRAM $1800, 4096 bytes
+;------------------------------------------------------------------------------
 .SECTION ".gsu_dma" SEMIFREE
 .ACCU 16
 .INDEX 16
-dmaBitmapToVRAM:
+dmaChunkToVRAM:
     php
+    rep #$20
+    .ACCU 16
+
+    ; Compute SRAM source = chunk * $1000
+    lda 5,s                  ; chunk index from stack (cc65816 left-to-right)
+    asl a
+    asl a
+    asl a
+    asl a                    ; chunk * 16
+    xba                      ; chunk * 4096 = $x000
+    sta.l $4302              ; source offset
+
+    ; Compute VRAM dest = chunk * $0800 (word address)
+    lda 5,s
+    xba                      ; chunk * 256
+    lsr a
+    lsr a                    ; chunk * 256 / 4... hmm
+
+    ; Simpler: chunk * $0800
+    lda 5,s
+    asl a
+    asl a
+    asl a                    ; chunk * 8
+    xba                      ; chunk * 2048 = $x800... no, xba swaps bytes
+
+    ; Even simpler approach: multiply by shifting
+    ; chunk=0: VRAM=$0000, chunk=1: $0800, chunk=2: $1000, chunk=3: $1800
+    ; $0800 = 2048. chunk * 2048.
+    ; In 16-bit: chunk << 11
+    lda 5,s
+    and #$0003               ; mask to 0-3
+    ; shift left 11: asl ×11 is too many. Use: (chunk << 8) << 3
+    xba                      ; << 8 (chunk in high byte)
+    asl a                    ; << 9
+    asl a                    ; << 10
+    asl a                    ; << 11
+    sta.l $2116              ; VRAM word dest
+
     sep #$20
     .ACCU 8
     lda #$80
-    sta.l $2115
+    sta.l $2115              ; word increment
+    lda #$70
+    sta.l $4304              ; source bank
     rep #$20
     .ACCU 16
-    lda #$0000
-    sta.l $2116
-    lda #16384
-    sta.l $4305
-    ; Source offset: $0000 (bufA) or $4000 (bufB)
-    lda.l gsu_dma_src_hi
-    and #$00FF               ; zero-extend to 16-bit
-    xba                      ; swap: high byte = src_hi, low = $00
-    sta.l $4302              ; source = $xx00
+    lda #4096
+    sta.l $4305              ; 4KB
     sep #$20
     .ACCU 8
-    lda #$70
-    sta.l $4304
     lda #$01
-    sta.l $4300
+    sta.l $4300              ; mode: 2-reg write
     lda #$18
-    sta.l $4301
+    sta.l $4301              ; dest: VMDATAL
     lda #$01
-    sta.l $420B
+    sta.l $420B              ; start DMA
+
     plp
     rtl
 .ENDS

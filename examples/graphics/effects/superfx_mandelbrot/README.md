@@ -1,6 +1,6 @@
-# SuperFX Bitmap
+# SuperFX Mandelbrot
 
-> GSU renders a 16-color rainbow gradient using the hardware PLOT instruction
+> Mandelbrot set fractal computed by the GSU using FMULT and 4.12 fixed-point math
 
 ![Screenshot](screenshot.png)
 
@@ -18,18 +18,18 @@
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/graphics/effects/superfx_bitmap
+make -C examples/graphics/effects/superfx_mandelbrot
 ```
 
-Then open `superfx_bitmap.sfc` in bsnes (recommended).
+Then open `superfx_mandelbrot.sfc` in bsnes (recommended).
 
 ## What You'll Learn
 
-- SuperFX PLOT instruction for pixel rendering in bitplane format
-- Column-major tile layout (PLOT stores tiles column-by-column)
-- GSU-to-SRAM-to-DMA-to-VRAM rendering pipeline
-- SCMR configuration (4bpp mode, 128-pixel height, bus ownership)
-- Force blank for bulk DMA transfers exceeding VBlank budget
+- SuperFX FMULT for 16x16 signed fixed-point multiplication (4.12 format)
+- PLOT hardware for per-pixel rendering into a bitplane framebuffer
+- LOOP instruction for long-range loops (body > 128 bytes)
+- CACHE instruction for ~6x GSU instruction fetch speedup
+- Static fractal rendering (~1-2 seconds at 21.47 MHz)
 
 ## Modules Used
 
@@ -39,5 +39,5 @@ Then open `superfx_bitmap.sfc` in bsnes (recommended).
 | `sprite` | OAM setup (required by consoleInit) |
 | `dma` | SRAM-to-VRAM bitmap transfer |
 | `background` | BG mode and tilemap configuration |
-| `text` | Text display (fallback if GSU not detected) |
+| `input` | Joypad reading |
 | `superfx` | GSU detection and initialization |

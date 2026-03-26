@@ -8,7 +8,7 @@
 #include <snes/superfx.h>
 
 extern void launchGSU(void);
-extern void dmaBitmapToVRAM(void);
+extern void dmaChunkToVRAM(u16 chunk);
 extern void setupBitmapTilemap(void);
 extern void writeEdgesToSRAM(void);
 extern u8 gsu_scbr;
@@ -123,10 +123,15 @@ int main(void) {
         writeEdgesToSRAM();
         launchGSU();
 
+        /* DMA 16KB in 4 chunks of 4KB (each fits in VBlank, no flicker) */
         WaitForVBlank();
-        setScreenOff();
-        dmaBitmapToVRAM();
-        setScreenOn();
+        dmaChunkToVRAM(0);
+        WaitForVBlank();
+        dmaChunkToVRAM(1);
+        WaitForVBlank();
+        dmaChunkToVRAM(2);
+        WaitForVBlank();
+        dmaChunkToVRAM(3);
 
         angle_y += 2;
         angle_x += 1;
