@@ -34,16 +34,8 @@ int main(void) {
     u16 pad;
     u8 paused;
 
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    setColor(0, 0x2800);
-    setColor(1, RGB(31, 31, 31));
-
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
+    setColor(0, 0x2800);  /* custom dark blue background */
 
     textPrintAt(4, 2, "SNESMOD HIROM MUSIC TEST");
     textPrintAt(5, 4, "64KB BANKS (HIROM MODE)");
@@ -52,8 +44,6 @@ int main(void) {
     textPrintAt(5, 9, "X - PAUSE/RESUME");
     textPrintAt(5, 12, "NOW PLAYING:");
     textPrintAt(5, 13, "WHAT IS LOVE (210KB IT)");
-
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
 

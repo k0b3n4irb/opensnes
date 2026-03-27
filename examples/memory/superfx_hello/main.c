@@ -47,16 +47,7 @@ int main(void) {
     u16 result;
     u8 buf[8];
 
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    setColor(0, 0x0000);
-    setColor(1, RGB(31, 31, 31));
-
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     textPrintAt(3, 2, "SUPERFX HELLO");
     textPrintAt(3, 3, "GSU COPROCESSOR");
@@ -145,8 +136,6 @@ int main(void) {
     }
 
     textFlush();
-
-    setMainScreen(LAYER_BG1);
     setScreenOn();
 
     while (1) {

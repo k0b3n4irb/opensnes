@@ -45,25 +45,13 @@ int main(void) {
     u16 pad;
 
     /* Init hardware */
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    /* Palette */
-    setColor(0, 0x0000);
-    setColor(1, RGB(31, 31, 31));
-
-    /* Text setup */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     /* Static labels */
     textPrintAt(12, 1, "PAD TEST");
     textPrintAt(6, 5, "USE PAD TO SEE VALUE");
 
     /* Screen on (all VRAM ready) */
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
     setScreenOn();

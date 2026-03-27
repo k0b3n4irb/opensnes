@@ -121,14 +121,7 @@ int main(void) {
     u8 fire_armed;
     u16 pressed, sx, sy;
 
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    /* --- Text system (BG1) --- */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     /* --- BG2: aim calibration target --- */
     dmaCopyVram(aim_target_tiles, 0x1000,

@@ -42,23 +42,9 @@
  * @return Never returns (infinite loop).
  */
 int main(void) {
-    consoleInit();
-    setMode(BG_MODE0, 0);
+    textModeInit();
+    setColor(0, 0x2800);  /* custom dark blue background */
 
-    /* Palette: color 0 = dark blue, color 1 = white */
-    setColor(0, 0x2800);
-    setColor(1, RGB(31, 31, 31));
-    setMainScreen(LAYER_BG1);
-
-    /* STEP 2: textInit (confirmed working) */
-    textInit();
-
-    /* STEP 3: font + BG pointers */
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
-
-    /* STEP 4: textPrintAt + textFlush */
     textPrintAt(8, 14, "TEXT MODULE TEST");
     textFlush();
 

@@ -84,17 +84,7 @@ u16 pad0;
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
-
-    setColor(0, RGB(0, 0, 0));
-    setColor(1, RGB(31, 31, 31));
-    setMainScreen(LAYER_BG1);
+    textModeInit();
 
     textPrintAt(12, 1, "SRAM TEST");
     textPrintAt(3, 5, "USE A TO WRITE Slot1");

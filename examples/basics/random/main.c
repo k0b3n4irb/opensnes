@@ -45,18 +45,7 @@ int main(void) {
     u16 pad;
 
     /* Step 1: Hardware init */
-    consoleInit();
-    setMode(BG_MODE0, 0);
-
-    /* Step 2: Palette */
-    setColor(0, 0x0000);
-    setColor(1, RGB(31, 31, 31));
-
-    /* Step 3: Text setup */
-    textInit();
-    textLoadFont(0x0000);
-    bgSetGfxPtr(0, 0x0000);
-    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    textModeInit();
 
     /* Step 4: Static labels */
     textPrintAt(5, 4, "RANDOM NUMBER GENERATOR");
@@ -67,7 +56,6 @@ int main(void) {
     current_value = rand();
 
     /* Step 6: Screen on (all VRAM ready) */
-    setMainScreen(LAYER_BG1);
     textFlush();
     WaitForVBlank();
     setScreenOn();

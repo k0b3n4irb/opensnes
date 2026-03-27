@@ -9,6 +9,7 @@
  * License: CC0 (Public Domain)
  */
 
+#include "snes.h"
 #include "snes/text.h"
 #include "snes/registers.h"
 #include "snes/dma.h"
@@ -284,4 +285,16 @@ void textFlush(void) {
      * This is safe to call anytime — the actual VRAM write
      * happens during VBlank when VRAM access is allowed. */
     tilemap_update_flag = 1;
+}
+
+void textModeInit(void) {
+    consoleInit();
+    setMode(BG_MODE0, 0);
+    setColor(0, 0x0000);
+    setColor(1, RGB(31, 31, 31));
+    textInit();
+    textLoadFont(0x0000);
+    bgSetGfxPtr(0, 0x0000);
+    bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+    setMainScreen(LAYER_BG1);
 }

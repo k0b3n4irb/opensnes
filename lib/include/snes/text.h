@@ -188,4 +188,28 @@ void textFlush(void);
  */
 void textDrawBox(u8 x, u8 y, u8 w, u8 h);
 
+/**
+ * @brief Initialize text display mode — one-call setup for text-based examples
+ *
+ * Sets up Mode 0, BG1, white-on-black palette, font at VRAM $0000,
+ * tilemap at $3800 (32x32). Replaces the 8-line init sequence found
+ * in most text-based examples.
+ *
+ * Call setScreenOn() after this to display.
+ *
+ * Equivalent to:
+ * @code
+ * consoleInit();
+ * setMode(BG_MODE0, 0);
+ * setColor(0, 0x0000);
+ * setColor(1, RGB(31, 31, 31));
+ * textInit();
+ * textLoadFont(0x0000);
+ * bgSetGfxPtr(0, 0x0000);
+ * bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+ * setMainScreen(LAYER_BG1);
+ * @endcode
+ */
+void textModeInit(void);
+
 #endif /* OPENSNES_TEXT_H */
