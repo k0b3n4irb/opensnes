@@ -71,6 +71,18 @@
  */
 #define OBJSEL(size, vram_addr) ((u8)(OBJ_SIZE_TO_REG(size) | OBJ_BASE(vram_addr)))
 
+/** @brief CGRAM base offset for sprite palettes (sprites use colors 128-255) */
+#define OBJ_CGRAM_BASE  128
+
+/** @brief OAM extension table offset in bytes (starts after 128*4 main entries) */
+#define OAM_EXT_OFFSET  512
+
+/** @brief OAM extension table size in bytes (2 bits per sprite, 128 sprites) */
+#define OAM_EXT_SIZE    32
+
+/** @brief Total OAM buffer size in bytes (512 main + 32 extension) */
+#define OAM_BUFFER_SIZE 544
+
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
 

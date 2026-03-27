@@ -47,6 +47,17 @@ if (pad & KEY_A) { /* A is held */ }
 if ((pad & KEY_L) && (pad & KEY_R)) { /* both shoulders held */ }
 ```
 
+## Modules Used
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler setup |
+| `sprite` | OAM buffer (required by NMI handler even with no visible sprites) |
+| `dma` | DMA transfers used internally by console init |
+| `background` | BG layer configuration |
+| `text` | `textInit()`, `textPrintAt()`, `textFlush()` for button name display |
+| `input` | `padHeld()`, `padPressed()` for reading controller state |
+
 ## Build & Run
 
 ```bash

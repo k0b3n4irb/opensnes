@@ -11,6 +11,18 @@
 #include <snes.h>
 #include <snes/collision.h>
 
+/* Default tile size for tile-based collision (8x8 pixels) */
+#define TILE_SIZE_DEFAULT   8
+
+/* Bit-shift for 8x8 tile size (log2(8) = 3) */
+#define TILE_SHIFT_8        3
+
+/* Bit-shift for 16x16 tile size (log2(16) = 4) */
+#define TILE_SHIFT_16       4
+
+/* Bit-shift for 32x32 tile size (log2(32) = 5) */
+#define TILE_SHIFT_32       5
+
 /*============================================================================
  * Rectangle Collision Functions
  *============================================================================*/
@@ -103,8 +115,8 @@ u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth) {
     if (px < 0 || py < 0) return 0;
 
     /* Convert pixel coords to tile coords (8x8 tiles) */
-    tileX = px >> 3;  /* Divide by 8 */
-    tileY = py >> 3;
+    tileX = px >> TILE_SHIFT_8;
+    tileY = py >> TILE_SHIFT_8;
 
     /* Calculate offset in tilemap */
     offset = tileY * mapWidth + tileX;
@@ -121,15 +133,14 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
     if (px < 0 || py < 0) return 0;
 
     /* Determine shift amount based on tile size */
-    /* 8=3, 16=4, 32=5 */
-    if (tileSize == 8) {
-        shift = 3;
+    if (tileSize == TILE_SIZE_DEFAULT) {
+        shift = TILE_SHIFT_8;
     } else if (tileSize == 16) {
-        shift = 4;
+        shift = TILE_SHIFT_16;
     } else if (tileSize == 32) {
-        shift = 5;
+        shift = TILE_SHIFT_32;
     } else {
-        shift = 3;  /* Default to 8x8 */
+        shift = TILE_SHIFT_8;  /* Default to 8x8 */
     }
 
     tileX = px >> shift;
