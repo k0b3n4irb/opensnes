@@ -235,10 +235,10 @@ project_config.inc:
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
 
-# Project header (ROM_NAME via sed, rest via project_config.inc)
+# Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
 project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
-	@sed 's/__ROM_NAME__/$(ROM_NAME)/' $(HDR_TEMPLATE) > $@
+	@padded=$$(printf "%-21.21s" "$(ROM_NAME)") && sed "s/__ROM_NAME__/$$padded/" $(HDR_TEMPLATE) > $@
 
 # SA-1 boot stub: use example-local sa1_boot.asm if present, otherwise template
 SA1_BOOT_SRC := $(if $(wildcard sa1_boot.asm),sa1_boot.asm,$(TEMPLATES)/sa1_boot.asm)
