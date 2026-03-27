@@ -601,19 +601,31 @@ void map_save (const char *filename, unsigned short *map,int snesmode, int nbtil
 	}
 
 
-	// write data ...
+	// write tile data ...
 	for(i=0;i<nbtilex*nbtiley;i++)
 	{
 		if(snesmode==7)
 		{
 			WRITEFILEBYTE(map[i]+tileoffset,fp);
 		}
-		else 
+		else
 		{
 			WRITEFILEWORD(map[i]+tileoffset+(priority<<PRIORITY_OFS),fp);
 		}
 	}
 
+	// Pad to SNES tilemap boundary (32x32 = 1024 entries for non-Mode7).
+	// The SNES PPU reads 32x32 entries for SC_32x32 regardless of image height.
+	// Without padding, unused rows show VRAM garbage.
+	if (snesmode != 7)
+	{
+		int total_written = nbtilex * nbtiley;
+		int target_entries = 32 * 32;  // SC_32x32
+		for (i = total_written; i < target_entries; i++)
+		{
+			WRITEFILEWORD(0, fp);  // tile 0, no flip, palette 0
+		}
+	}
 
 	// close file and leave
 	fclose(fp);
