@@ -79,8 +79,6 @@ release/
 
 # Build artifacts (generated files)
 *.asm
-*.obj
-*.sfc
 *.bin
 *.h
 

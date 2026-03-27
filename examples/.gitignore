@@ -4,10 +4,19 @@
 *.sym
 *.ps
 *.c.asm
+*.c.o
+*.wrap.asm
 combined.asm
 combined.obj
 linkfile
 project_hdr.asm
+project_config.inc
+project_sa1_boot.asm
+
+# SuperFX build artifacts
+*.sfx.bin
+*.sfx.o
+*.sfx.link
 
 # Generated files
 myfont.h
