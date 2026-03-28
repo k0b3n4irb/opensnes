@@ -78,11 +78,11 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[0].oamy = yp;
     oambuffer[0].oamframeid = 6;
     oambuffer[0].oamrefresh = 1;
-    oambuffer[0].oamattribute = 0x60 | (0 << 1);  /* priority 3, palette 0 */
+    oambuffer[0].oamattribute = OBJ_PRIO(2);
     OAM_SET_GFX(0, &mariogfx);
 
     /* Sprite palette at CGRAM 128 (sprite palette 0) */
-    dmaCopyCGram(&mariopal, 128, 16 * 2);
+    dmaCopyCGram(&mariopal, OBJ_CGRAM_BASE, 32);
 }
 
 void marioupdate(u16 idx) {

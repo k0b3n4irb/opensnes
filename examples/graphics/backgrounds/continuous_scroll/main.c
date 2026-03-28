@@ -181,7 +181,7 @@ int main(void) {
     setMode(BG_MODE1, 0);
 
     /* Enable BG1, BG2, and sprites on main screen */
-    REG_TM = 0x13;  /* TM = 00010011 = OBJ + BG2 + BG1 */
+    setMainScreen(LAYER_BG1 | LAYER_BG2 | LAYER_OBJ);
 
     /*------------------------------------------------------------------------
      * Initialize Game State (values already set in global initializer)
@@ -208,17 +208,8 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     while (1) {
-        /* Wait for VBlank first - auto-joypad runs during VBlank */
         WaitForVBlank();
-
-        /* Wait for auto-joypad read to complete */
-        while (REG_HVBJOY & 0x01) { }
-
-        /* Read joypad directly from hardware */
-        pad = REG_JOY1L | (REG_JOY1H << 8);
-
-        /* Skip if controller disconnected */
-        if (pad == 0xFFFF) continue;
+        pad = padHeld(0);
 
         /* Handle vertical movement - player moves freely */
         if (pad & KEY_UP) {
