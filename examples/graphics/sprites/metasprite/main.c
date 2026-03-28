@@ -147,8 +147,6 @@ static void drawMenu(void) {
  * that may have fired mid-preparation and DMA'd a partial buffer).
  */
 static void changeObjSize(void) {
-    extern volatile u8 vblank_flag;
-
     /* Prepare new OAM data BEFORE VBlank so the NMI DMA sends correct
      * sprites in the same VBlank where OBJSEL changes. */
     oamClear();
@@ -240,7 +238,7 @@ int main(void) {
     dmaCopyVram(spritehero8_til,  VRAM_HERO8,  HERO8_TILES * TILE_BYTES);
 
     /* Load sprite palette (sprite palette 0 = CGRAM $80) */
-    dmaCopyCGram(spritehero32_pal, 128, 32);
+    dmaCopyCGram(spritehero32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Initialize OBJ settings */
     selectedItem = 0;

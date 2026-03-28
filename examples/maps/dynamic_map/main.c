@@ -301,7 +301,7 @@ static void initDemoMap32x32(void) {
     initSpriteMap32x32(spritemap_len);
 
     /* Force blank for VRAM writes */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Clear sprite 0 (empty tile) VRAM area — 4 tiles × 64 bytes = 256 bytes.
      * Without this, uninitialized VRAM shows garbage in the map interior. */
@@ -345,7 +345,7 @@ static void initDemoMap64x64(void) {
     initSpriteMap64x64(spritemap_len);
 
     /* Force blank for VRAM writes */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Clear sprite 0 (empty tile) VRAM area.
      * In 16x16 mode: top half at VRAM_SPRITE_GFX (128 bytes),
@@ -462,7 +462,7 @@ int main(void) {
     drawSpriteFrame32x32(SPRITE_GARGOYLE);
 
     /* DMA the updated tilemap to VRAM during force blank */
-    REG_INIDISP = 0x80;
+    setScreenOff();
     smapDma(0, VRAM_SPRITEMAP, spritemap_len);
 
     /* Restore text palette AFTER sprite palette (which overwrites CGRAM) */

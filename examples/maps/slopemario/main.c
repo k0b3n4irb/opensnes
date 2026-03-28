@@ -84,7 +84,7 @@ extern void objRegisterTypes(void);
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, &tileset, &tilepal, 0,
-                  (&tilesetend - &tileset), 16 * 2, BG_16COLORS, 0x2000);
+                  (&tilesetend - &tileset), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_64x32);
 
     /* Mode 1, enable BG1 + sprites */

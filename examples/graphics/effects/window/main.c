@@ -191,7 +191,7 @@ int main(void) {
     bgSetMapPtr(0, 0x0000, SC_32x32);
     bgInitTileSet(0, tiles_bg1, palette_bg1, 0,
                   tiles_bg1_end - tiles_bg1,
-                  16 * 2, BG_16COLORS, 0x4000);
+                  PALETTE_16_SIZE, BG_16COLORS, 0x4000);
     dmaCopyVram(tilemap_bg1, 0x0000, tilemap_bg1_end - tilemap_bg1);
 
     /*--------------------------------------------------------------------
@@ -200,7 +200,7 @@ int main(void) {
     bgSetMapPtr(1, 0x1000, SC_32x32);
     bgInitTileSet(1, tiles_bg2, palette_bg2, 1,
                   tiles_bg2_end - tiles_bg2,
-                  16 * 2, BG_16COLORS, 0x6000);
+                  PALETTE_16_SIZE, BG_16COLORS, 0x6000);
     dmaCopyVram(tilemap_bg2, 0x1000, tilemap_bg2_end - tilemap_bg2);
 
     /*--------------------------------------------------------------------

@@ -118,7 +118,7 @@ int main(void) {
     dmaCopyVram(cursor_tiles + 64, 0x4100, 64);     /* tiles 16-17 (bottom) */
 
     /* Load cursor palette to CGRAM (sprite palette 0 = color 128) */
-    dmaCopyCGram(cursor_pal, 128,
+    dmaCopyCGram(cursor_pal, OBJ_CGRAM_BASE,
                  (u16)(cursor_pal_end - cursor_pal));
 
     /* OBJSEL: base address $4000 word addr = N*$2000, N=2 */

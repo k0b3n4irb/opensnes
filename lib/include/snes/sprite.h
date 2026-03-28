@@ -74,6 +74,15 @@
 /** @brief CGRAM base offset for sprite palettes (sprites use colors 128-255) */
 #define OBJ_CGRAM_BASE  128
 
+/** @brief CGRAM color index for sprite palette n (0-7) */
+#define OBJ_CGRAM_PAL(n)  (OBJ_CGRAM_BASE + (n) * 16)
+
+/** @brief Size of one 16-color palette in bytes (16 colors x 2 bytes per BGR555) */
+#define PALETTE_16_SIZE  32
+
+/** @brief Y coordinate that hides a sprite below the NTSC visible area */
+#define OAM_Y_OFFSCREEN  0xE0
+
 /** @brief OAM extension table offset in bytes (starts after 128*4 main entries) */
 #define OAM_EXT_OFFSET  512
 

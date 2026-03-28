@@ -72,7 +72,7 @@ int main(void) {
     /* Force blank (bit 7 of INIDISP) disables rendering, allowing unlimited
      * VRAM/CGRAM write time. Required because the graphics data is too large
      * for a single VBlank DMA transfer (~4KB budget). */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Load all tile data, tilemaps, and palettes via assembly DMA.
      * This handles bank bytes correctly for SUPERFREE ROM data. */

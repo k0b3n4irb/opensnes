@@ -102,7 +102,7 @@ int main(void) {
 
     /* Load sprite palette to CGRAM 128 (first sprite palette slot).
      * 32 bytes = 16 colors x 2 bytes per color (15-bit BGR). */
-    dmaCopyCGram(spr16_properpal, 128, 32);
+    dmaCopyCGram(spr16_properpal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Initialize all frame counters to 0 (same starting frame) */
     frame0 = 0;

@@ -126,7 +126,7 @@ int main(void) {
                   0, 0x0000, OBJ_SIZE8_L16);
 
     /* Load palette 1 (Player 2: Red) */
-    dmaCopyCGram((u8 *)pal_red, 128 + 16, 8);
+    dmaCopyCGram((u8 *)pal_red, OBJ_CGRAM_PAL(1), 8);
 
     /* Initialize OAM */
     oamInit();

@@ -145,7 +145,7 @@ int main(void) {
     bgSetMapPtr(1, 0x0000, SC_32x32);
     bgInitTileSet(1, tiles, palette, 0,
                   tiles_end - tiles,
-                  16 * 2, BG_16COLORS, 0x4000);
+                  PALETTE_16_SIZE, BG_16COLORS, 0x4000);
     dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
 
     /*--------------------------------------------------------------------

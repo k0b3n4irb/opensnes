@@ -70,8 +70,6 @@ extern u16 pad_keys[];
  * wait on the title screen produces a different seed each game, ensuring
  * different piece sequences.
  */
-extern volatile u16 frame_count;
-
 /** @brief "PAUSED" overlay message string (in data.asm for bank $00 placement) */
 extern const char str_paused[];
 /** @brief "GAME OVER" overlay message string */

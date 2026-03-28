@@ -33,9 +33,6 @@
 #include <snes.h>
 #include <snes/text.h>
 
-/** @brief NMI frame counter from crt0.asm — incremented every VBlank */
-extern volatile u16 frame_count;
-
 /**
  * @brief Entry point — display a live VBlank frame counter
  * @return Never returns (infinite game loop)

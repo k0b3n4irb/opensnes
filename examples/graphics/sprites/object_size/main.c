@@ -71,7 +71,7 @@ extern u8 palsprite64[], palsprite64_end[];
 #define ADRSPRITLARGE   0x4500
 
 /** @brief Size of one 16-color sprite palette in bytes (16 colors x 2 bytes) */
-#define PALETTESPRSIZE  (16 * 2)
+#define PALETTESPRSIZE  PALETTE_16_SIZE
 
 /**
  * @brief OAM tile number for the small sprite, relative to OBJSEL name base $4000.
@@ -128,44 +128,44 @@ static void changeObjSize(void) {
     /* Enter force blank — unlimited VRAM write time.
      * We wait for VBlank first to ensure any pending NMI DMA completes. */
     WaitForVBlank();
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     if (selectedItem == 0) {
         /* 8x8 small / 16x16 large */
         oamInitGfxSet(sprite8, sprite8_end - sprite8,
                       palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L16);
         dmaCopyVram(sprite16, ADRSPRITLARGE, sprite16_end - sprite16);
-        dmaCopyCGram(palsprite16, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite16, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 1) {
         /* 8x8 small / 32x32 large */
         oamInitGfxSet(sprite8, sprite8_end - sprite8,
                       palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L32);
         dmaCopyVram(sprite32, ADRSPRITLARGE, sprite32_end - sprite32);
-        dmaCopyCGram(palsprite32, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite32, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 2) {
         /* 8x8 small / 64x64 large */
         oamInitGfxSet(sprite8, sprite8_end - sprite8,
                       palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L64);
         dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 3) {
         /* 16x16 small / 32x32 large */
         oamInitGfxSet(sprite16, sprite16_end - sprite16,
                       palsprite16, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L32);
         dmaCopyVram(sprite32, ADRSPRITLARGE, sprite32_end - sprite32);
-        dmaCopyCGram(palsprite32, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite32, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 4) {
         /* 16x16 small / 64x64 large */
         oamInitGfxSet(sprite16, sprite16_end - sprite16,
                       palsprite16, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L64);
         dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 5) {
         /* 32x32 small / 64x64 large */
         oamInitGfxSet(sprite32, sprite32_end - sprite32,
                       palsprite32, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE32_L64);
         dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, 128 + 16, PALETTESPRSIZE);
+        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     }
 
     /* Display small sprite (left side): palette 0, priority 3, no flip.
@@ -179,8 +179,7 @@ static void changeObjSize(void) {
     oamSet(1, 170, 120, TILE_LARGE, 1, 3, 0);
     oamSetEx(1, OBJ_LARGE, OBJ_SHOW);
 
-    /* Exit force blank — restore full brightness (0x0F = brightness 15) */
-    REG_INIDISP = 0x0F;
+    setScreenOn();
 }
 
 /**

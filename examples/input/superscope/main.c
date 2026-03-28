@@ -64,12 +64,12 @@ extern u8 sprites_pal[], sprites_pal_end[];
 /**
  * @brief Hide the red dot marker sprite by moving it off-screen.
  *
- * Y coordinate 0xE0 (224) is below the NTSC visible area, so the
- * SNES PPU will not render this sprite. This is cheaper than disabling
- * the sprite via the OAM high table.
+ * Y coordinate OAM_Y_OFFSCREEN (224) is below the NTSC visible area,
+ * so the SNES PPU will not render this sprite. This is cheaper than
+ * disabling the sprite via the OAM high table.
  */
 static void hideDot(void) {
-    oamMemory[1] = 0xE0;
+    oamMemory[1] = OAM_Y_OFFSCREEN;
     oam_update_flag = 1;
 }
 
@@ -149,7 +149,7 @@ int main(void) {
     dmaCopyCGram(aim_target_pal, 44, 8);
 
     /* Sprite palette (CGRAM 128+) */
-    dmaCopyCGram(sprites_pal, 128,
+    dmaCopyCGram(sprites_pal, OBJ_CGRAM_BASE,
                  (u16)(sprites_pal_end - sprites_pal));
 
     /* --- Scroll --- */
@@ -159,7 +159,7 @@ int main(void) {
     /* --- OAM: sprite 0 = red dot, hidden --- */
     oamClear();
     oamMemory[0] = 0;
-    oamMemory[1] = 0xE0;     /* Off-screen */
+    oamMemory[1] = OAM_Y_OFFSCREEN;
     oamMemory[2] = 0x80;     /* Tile 0x80 (red dot) */
     oamMemory[3] = 0x34;     /* Priority 3, palette 2 */
     oamMemory[512] = 0x00;   /* Small (16x16), X high = 0 */

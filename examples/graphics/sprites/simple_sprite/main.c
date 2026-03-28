@@ -62,7 +62,7 @@ int main(void) {
     /* Load the 16-color sprite palette to CGRAM address 128.
      * CGRAM 0-127 = BG palettes, 128-255 = OBJ (sprite) palettes.
      * 32 bytes = 16 colors x 2 bytes/color (15-bit BGR format). */
-    dmaCopyCGram(palsprite32, 128, 32);
+    dmaCopyCGram(palsprite32, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Configure OBJSEL ($2101):
      * - Size mode OBJ_SIZE8_L32: small=8x8, large=32x32

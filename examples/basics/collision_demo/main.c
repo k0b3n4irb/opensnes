@@ -238,8 +238,8 @@ static void load_graphics(void) {
     dmaCopyVram((u8 *)enemy_tile, 0x4010, 32);
 
     /* Load palettes via DMA */
-    dmaCopyCGram((u8 *)sprite_palette, 128, 32);
-    dmaCopyCGram((u8 *)collision_palette, 144, 32);
+    dmaCopyCGram((u8 *)sprite_palette, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram((u8 *)collision_palette, OBJ_CGRAM_PAL(1), PALETTE_16_SIZE);
     dmaCopyCGram((u8 *)bg_palette, 0, 4);
 }
 
