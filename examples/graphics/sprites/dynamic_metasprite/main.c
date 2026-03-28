@@ -43,6 +43,7 @@ extern u8 spritehero32_pal[];
 extern u8 spritehero16_til[];
 extern u8 spritehero8_til[];
 
+
 /*========================================================================
  * Metasprite Definitions
  *========================================================================*/
@@ -120,34 +121,32 @@ void drawText(void) {
 }
 
 /**
- * @brief Reinitialize sprite engine and pre-draw sprites
+ * @brief Reinitialize sprite engine and upload all tiles during force blank
  *
- * Uses force blank to ensure no glitch frame: OBJSEL change + OAM clear +
- * sprite draw + VRAM upload all happen while screen is off.
+ * Uses force blank for glitch-free OBJSEL switch. Calls oamVramQueueUpdate
+ * twice because config 2 queues 10 entries but the engine processes max 7
+ * per call (MAXSPRTRF = 42 bytes = 7 entries).
  */
 void changeObjSize(void) {
     WaitForVBlank();
     setScreenOff();
 
     if (selectedItem == 0) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE8_L16, 0x0000));
+        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
     } else if (selectedItem == 1) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE8_L32, 0x0000));
+        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L32);
     } else {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE16_L32, 0x0000));
+        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE16_L32);
     }
 
-    /* Set refresh flags + pre-draw + upload VRAM while screen is off */
     oambuffer[1].oamrefresh = 1;
     oambuffer[10].oamrefresh = 1;
     drawSprites();
     oamVramQueueUpdate();
+    oamVramQueueUpdate();
     oamInitDynamicSpriteEndFrame();
 
-    /* OAM DMA via WaitForVBlank, then screen on with correct sprites */
+
     WaitForVBlank();
     setScreenOn();
 }
@@ -160,9 +159,14 @@ int main(void) {
     setColor(0, 0x0000);
     setColor(1, RGB(31, 31, 31));
 
+    /* VRAM layout (Mode 0, all word addresses):
+     * $0000-$0FFF: Large sprite tiles (dynamic engine, name table 0)
+     * $1000-$1FFF: Small sprite tiles (dynamic engine, name table 1)
+     * $3000-$32FF: Font tiles (2bpp, 96 chars × 8 words)
+     * $3800-$3BFF: BG1 tilemap (32×32 entries) */
     textInit();
-    textLoadFont(0x2000);
-    bgSetGfxPtr(0, 0x2000);
+    textLoadFont(0x3000);
+    bgSetGfxPtr(0, 0x3000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
     dmaCopyCGram(spritehero32_pal, 128, 32);
@@ -171,6 +175,7 @@ int main(void) {
     selectedItem = 0;
     drawText();
     changeObjSize();
+    setScreenOn();
 
     while (1) {
         pad0 = padPressed(0);

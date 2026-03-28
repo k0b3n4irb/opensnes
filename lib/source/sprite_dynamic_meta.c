@@ -56,7 +56,7 @@ void oamMetaDrawDyn8(u16 id, s16 x, s16 y,
         oambuffer[id].oamx = x + meta->dx;
         oambuffer[id].oamy = y + meta->dy;
         oambuffer[id].oamframeid = meta->tile;
-        oambuffer[id].oamattribute = meta->attr;
+        oambuffer[id].oamattribute = meta->attr | 0x01;
         oambuffer[id].oamrefresh = refresh;
         OAM_SET_GFX(id, gfxptr);
         oamDynamic8Draw(id);
