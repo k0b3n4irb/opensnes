@@ -33,7 +33,7 @@ void oamMetaDrawDyn16(u16 id, s16 x, s16 y,
     u8 refresh = oambuffer[id].oamrefresh;
     /* When 16x16 is SMALL (sprsize == OBJ_SMALL), tile bit 8 must be set
      * to address the second name table in VRAM ($1000+) */
-    u8 attr_or = (sprsize == OBJ_SMALL) ? 0x01 : 0x00;
+    u8 attr_or = (sprsize == OBJ_SMALL) ? OBJ_NAMETABLE_HIGH : 0x00;
 
     while (meta->dx != metasprite_end) {
         oambuffer[id].oamx = x + meta->dx;
@@ -56,7 +56,8 @@ void oamMetaDrawDyn8(u16 id, s16 x, s16 y,
         oambuffer[id].oamx = x + meta->dx;
         oambuffer[id].oamy = y + meta->dy;
         oambuffer[id].oamframeid = meta->tile;
-        oambuffer[id].oamattribute = meta->attr | 0x01;
+        /* 8x8 sprites always use second name table ($1000+) */
+        oambuffer[id].oamattribute = meta->attr | OBJ_NAMETABLE_HIGH;
         oambuffer[id].oamrefresh = refresh;
         OAM_SET_GFX(id, gfxptr);
         oamDynamic8Draw(id);

@@ -192,7 +192,6 @@ oamInitDynamicSprite:
 
     ; Initialize OAM (clear all sprites) - must do BEFORE setting OBJSEL
     ; because OpenSNES's oamInit resets OBJSEL
-    rep #$20
     jsl oamInit
 
     ; Set 16x16 sprite VRAM address based on size configuration
@@ -216,7 +215,7 @@ oamInitDynamicSprite:
     sep #$20
     .ACCU 8
     lda 10,s                        ; oamsize index (0-5)
-    asl a                           ; index << 5 → OBJSEL size bits
+    asl a                           ; index << 5 → OBJSEL size bits (= OBJ_SIZE_TO_REG)
     asl a
     asl a
     asl a

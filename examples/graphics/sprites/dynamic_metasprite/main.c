@@ -131,21 +131,19 @@ void changeObjSize(void) {
     WaitForVBlank();
     setScreenOff();
 
-    if (selectedItem == 0) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
-    } else if (selectedItem == 1) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L32);
-    } else {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE16_L32);
+    {
+        static const u8 obj_sizes[] = {
+            OBJ_SIZE8_L16, OBJ_SIZE8_L32, OBJ_SIZE16_L32
+        };
+        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, obj_sizes[selectedItem]);
     }
 
     oambuffer[1].oamrefresh = 1;
     oambuffer[10].oamrefresh = 1;
     drawSprites();
     oamVramQueueUpdate();
-    oamVramQueueUpdate();
+    oamVramQueueUpdate();  /* flush remaining queue entries (>7 sprites) */
     oamInitDynamicSpriteEndFrame();
-
 
     WaitForVBlank();
     setScreenOn();
@@ -156,7 +154,7 @@ int main(void) {
     consoleInit();
     setMode(BG_MODE0, 0);
 
-    setColor(0, 0x0000);
+    setColor(0, RGB(0, 0, 0));
     setColor(1, RGB(31, 31, 31));
 
     /* VRAM layout (Mode 0, all word addresses):
@@ -169,7 +167,7 @@ int main(void) {
     bgSetGfxPtr(0, 0x3000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
-    dmaCopyCGram(spritehero32_pal, 128, 32);
+    dmaCopyCGram(spritehero32_pal, OBJ_CGRAM_BASE, 32);
     setMainScreen(LAYER_BG1 | LAYER_OBJ);
 
     selectedItem = 0;

@@ -474,6 +474,9 @@ typedef MetaspriteItem t_metasprite;
 /** @brief Metasprite vertical flip flag */
 #define OBJ_FLIPY       0x80
 
+/** @brief OAM attribute bit 0: second name table select (tile numbers 256+) */
+#define OBJ_NAMETABLE_HIGH  0x01
+
 /**
  * @brief Draw a metasprite (PVSnesLib compatible)
  *
