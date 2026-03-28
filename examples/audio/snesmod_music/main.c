@@ -41,7 +41,7 @@ int main(void) {
 
     /* Init hardware + text */
     textModeInit();
-    setColor(0, 0x2800);  /* custom dark blue background */
+    setColor(0, RGB(0, 0, 10));
 
     /* HUD */
     textPrintAt(5, 2, "SNESMOD MUSIC EXAMPLE");

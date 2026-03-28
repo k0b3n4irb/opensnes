@@ -176,9 +176,7 @@ int main(void) {
 
         /* Left click: change BG color to blue */
         if (mouseButtonsPressed(0) & MOUSE_BUTTON_LEFT) {
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00;  /* Blue low (RRRRR GGG) */
-            REG_CGDATA = 0x7C;  /* Blue high (0BBBBB GG) = B=31 */
+            setColor(0, RGB(0, 0, 31));  /* Blue */
         }
 
         /* Right click: cycle sensitivity */

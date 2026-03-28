@@ -43,7 +43,7 @@
  */
 int main(void) {
     textModeInit();
-    setColor(0, 0x2800);  /* custom dark blue background */
+    setColor(0, RGB(0, 0, 10));
 
     textPrintAt(8, 14, "TEXT MODULE TEST");
     textFlush();

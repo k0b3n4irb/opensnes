@@ -208,10 +208,8 @@ int main(void) {
 
     /* Set font palette: color 0 = black (background), color 1 = white (text).
      * CGRAM colors are written as 15-bit BGR: $7FFF = white, $0000 = black. */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;   /* Color 0: black */
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;   /* Color 1: white ($7FFF) */
+    setColor(0, RGB(0, 0, 0));
+    setColor(1, RGB(31, 31, 31));
 
     /* Draw the static menu labels (these never change, only the cursor moves) */
     textPrintAt(3, 2, "Object size :");

@@ -243,13 +243,9 @@ int main(void) {
 
         /* Change background color on A button */
         if (pressed & KEY_A) {
-            /* Light blue when A is held */
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00; REG_CGDATA = 0x7C;
+            setColor(0, RGB(0, 0, 31));   /* Light blue */
         } else {
-            /* Dark blue normally */
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00; REG_CGDATA = 0x28;
+            setColor(0, RGB(0, 0, 10));   /* Dark blue */
         }
     }
 

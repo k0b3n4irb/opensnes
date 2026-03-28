@@ -227,10 +227,8 @@ int main(void) {
     textInitEx(VRAM_TEXT_MAP * 2, 0, 0);
 
     /* Font palette: BG palette 0, color 0=black, color 1=white */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;
+    setColor(0, RGB(0, 0, 0));
+    setColor(1, RGB(31, 31, 31));
 
     /* Load all sprite tile data to OBJ VRAM (screen still blanked) */
     dmaCopyVram(spritehero32_til, VRAM_HERO32, HERO32_TILES * TILE_BYTES);

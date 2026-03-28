@@ -137,10 +137,8 @@ int main(void) {
     REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);
 
     /* --- Palettes --- */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x66; REG_CGDATA = 0x7D;  /* Backdrop = blue $7D66 */
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* Text = white $7FFF */
+    setColor(0, RGB(6, 11, 31));   /* Backdrop: blue */
+    setColor(1, RGB(31, 31, 31)); /* Text: white */
 
     /* BG2: all 4 sub-palettes (CGRAM 32-47) */
     dmaCopyCGram(aim_target_pal, 32, 8);
@@ -153,8 +151,8 @@ int main(void) {
                  (u16)(sprites_pal_end - sprites_pal));
 
     /* --- Scroll --- */
-    bgSetScroll(0, 0, 0xFFFF);
-    bgSetScroll(1, 0, 0xFFFF);
+    bgSetScroll(0, 0, (u16)-1);
+    bgSetScroll(1, 0, (u16)-1);
 
     /* --- OAM: sprite 0 = red dot, hidden --- */
     oamClear();

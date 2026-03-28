@@ -35,7 +35,7 @@ int main(void) {
     u8 paused;
 
     textModeInit();
-    setColor(0, 0x2800);  /* custom dark blue background */
+    setColor(0, RGB(0, 0, 10));
 
     textPrintAt(4, 2, "SNESMOD HIROM MUSIC TEST");
     textPrintAt(5, 4, "64KB BANKS (HIROM MODE)");

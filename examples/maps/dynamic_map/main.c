@@ -443,9 +443,7 @@ int main(void) {
     textInitEx(VRAM_BG2_MAP * 2, FONT_TILE_OFFSET, 1);
 
     /* Set text palette (palette 1, color 1 = white) */
-    REG_CGADD = 17;    /* color index 17 = palette 1, color 1 */
-    REG_CGDATA = 0xFF;  /* white (low byte: gggrrrrr) */
-    REG_CGDATA = 0x7F;  /* white (high byte: 0bbbbbgg) */
+    setColor(17, RGB(31, 31, 31));  /* palette 1, color 1 = white */
 
     textPrintAt(6, 10, "DynamicMap");
     textPrintAt(6, 12, "A = Map size 32x32");
@@ -466,9 +464,7 @@ int main(void) {
     smapDma(0, VRAM_SPRITEMAP, spritemap_len);
 
     /* Restore text palette AFTER sprite palette (which overwrites CGRAM) */
-    REG_CGADD = 17;
-    REG_CGDATA = 0xFF;
-    REG_CGDATA = 0x7F;
+    setColor(17, RGB(31, 31, 31));
 
     /* Enable BG1 + BG2 */
     REG_TM = TM_BG1 | TM_BG2;
@@ -513,9 +509,7 @@ int main(void) {
                 textFlush();
                 setScreenOff();
                 initDemoMap32x32();
-                REG_CGADD = 17;
-                REG_CGDATA = 0xFF;
-                REG_CGDATA = 0x7F;
+                setColor(17, RGB(31, 31, 31));
                 REG_TM = TM_BG1 | TM_BG2;
                 setScreenOn();
                 drawSpriteFrame32x32(SPRITE_GARGOYLE);
@@ -524,9 +518,7 @@ int main(void) {
                 textFlush();
                 setScreenOff();
                 initDemoMap64x64();
-                REG_CGADD = 17;
-                REG_CGDATA = 0xFF;
-                REG_CGDATA = 0x7F;
+                setColor(17, RGB(31, 31, 31));
                 REG_TM = TM_BG1 | TM_BG2;
                 setScreenOn();
                 drawSpriteFrame64x64(SPRITE_GARGOYLE);
