@@ -220,8 +220,32 @@ define wrap_asm
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $(2) $(basename $(2)).wrap.asm
 endef
 
+# Lint flags for the optional clang syntax check (cproc ignores -W flags).
+# Disable host-vs-target false positives: SNES has 16-bit pointers, so casting
+# &fill_value (a u16*) to u16 and (vu8*)0x4300 from int are LEGITIMATE here
+# even though clang's host model would flag them. -Wno-unused-parameter
+# silences callback signatures (e.g. object engine init takes minx/maxx that
+# specific objects ignore — the ABI requires them).
+CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
+	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
+	-Wno-unused-parameter
+
 # C sources → objects
+# Step 1: clang syntax check (cproc has no built-in -W flags so a sibling
+#         compiler runs the warnings cc65816 silently swallows). -Werror
+#         makes any warning fail the build — the SDK is currently warning-
+#         clean and stays that way.
+# Step 2: cc65816 (cproc + QBE) → 65816 assembly.
+# Step 3: wrap with memmap and assemble via wla-65816.
+# SKIP_LINT=1 disables the syntax check (escape hatch for environments
+# without clang; CI always runs with the check enabled).
 %.c.o: %.c $(GFX_HEADERS)
+ifneq ($(SKIP_LINT),1)
+	@if command -v clang >/dev/null 2>&1; then \
+		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
+			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
+	fi
+endif
 	@echo "[CC] $<"
 	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
 	$(call wrap_asm,$*.c.asm,$@)

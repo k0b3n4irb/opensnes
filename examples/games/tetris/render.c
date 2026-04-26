@@ -343,7 +343,7 @@ void renderClearNextPiece(void) {
 
 void renderLineClearFlash(LineClearResult *result, u8 frame) {
     u8 i, c, r;
-    u8 tile;
+    u16 tile;
 
     tile = (frame & 1) ? (TILE_BORDER_H | PAL1) : TILE_EMPTY;
 

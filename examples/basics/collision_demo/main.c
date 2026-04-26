@@ -258,7 +258,6 @@ static void draw_tilemap(void) {
     u8 tx, ty;
     u16 addr;
     u8 tile;
-    u16 i;
 
     REG_VMAIN = 0x80;
 

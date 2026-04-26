@@ -89,8 +89,6 @@ static u16 frame3;
  * @return Never returns (infinite loop).
  */
 int main(void) {
-    u8 i;
-
     setScreenOff();
 
     /* Initialize the dynamic sprite engine:

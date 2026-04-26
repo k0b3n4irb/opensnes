@@ -233,6 +233,7 @@ static u8 getPixel(u8 chr_no, u8 tile, u8 x, u8 y) {
  *
  * @param chr_no Base character number in the C64 sprite data to convert
  */
+static void convertC64Sprite(u8 chr_no) __attribute__((unused));
 static void convertC64Sprite(u8 chr_no) {
     u8 num_tiles = 4;
     u8 bitplanes = 8;
@@ -270,16 +271,6 @@ static void convertC64Sprite(u8 chr_no) {
 /*------------------------------------------------------------------------
  * Demo Initialization
  *------------------------------------------------------------------------*/
-
-/**
- * @brief Flush the entire WRAM tilemap buffer to VRAM using the 1-page-per-VBlank pattern.
- *
- * Wrapper around screenRefresh() which internally DMAs the tilemap in
- * 2KB pages across multiple VBlanks to stay within the DMA budget.
- */
-static void refresh(void) {
-    screenRefresh(VRAM_SPRITEMAP);
-}
 
 /**
  * @brief Initialize the 32x32 tilemap demo mode.
