@@ -85,7 +85,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 Before submitting:
 
 1. `make clean && make` — full rebuild must succeed
-2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — 212 checks must pass
+2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all checks must pass (run with `--list` to see the current count)
 3. Test affected examples in [Mesen2](https://www.mesen.ca/)
 4. New examples must include a working Makefile following the standard pattern
 
