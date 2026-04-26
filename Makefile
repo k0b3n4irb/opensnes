@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -84,7 +84,10 @@ install: compiler tools lib
 submodules:
 	@git submodule update --init --recursive
 
-compiler: submodules
+verify-toolchain:
+	@python3 devtools/verify_toolchain.py
+
+compiler: submodules verify-toolchain
 	$(MAKE) -C $(COMPILER_PATH)
 	$(MAKE) -C $(COMPILER_PATH) install
 
@@ -164,4 +167,5 @@ help:
 	@echo "  release   - Create SDK release package (zip)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
+	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
 	@echo "  help      - Show this help"
