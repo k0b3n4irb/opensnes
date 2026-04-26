@@ -59,6 +59,6 @@ include $(OPENSNES)/make/common.mk
 
 This is a Class A change:
 1. `make clean && make` — REQUIRED (stale crt0 objects cause phantom failures)
-2. Full test suite — all 212 checks
+2. Full test suite — all 390+ checks
 3. Mesen2 validation on ALL affected examples
 4. If modifying NMI handler: consult `.claude/rules/nmi_audit.md` first

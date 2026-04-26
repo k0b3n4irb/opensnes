@@ -8,10 +8,10 @@ IMPORTANT: Every change must pass this workflow before commit.
 cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
 ```
 
-This runs 7 phases (212 checks total):
+This runs 8 phases (~390 checks total):
 1. **Preconditions** — toolchain and dependencies present
 2. **Compiler tests** — 60 C→ASM pattern checks
-3. **Build** — all 52 examples compile cleanly
+3. **Build** — all 53 examples compile cleanly
 4. **Static analysis** — ROM headers, memory maps, symbol overlaps
 5. **Runtime execution** — emulated run of each ROM
 6. **Visual regression** — screenshot comparison against baselines

@@ -54,4 +54,4 @@ All dp-relative accesses in NMI callback C code hit NMI registers, NOT main thre
 - [ ] Handshake protocol (vblank_flag) unchanged
 - [ ] DP isolation preserved (tcc__nmi_registers)
 - [ ] FASTROM variant (jml.l FastNmi) updated if applicable
-- [ ] All 52 examples still pass visual regression
+- [ ] All 53 examples still pass visual regression

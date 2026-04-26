@@ -3,7 +3,7 @@
 ## Pre-Release Checklist
 
 1. **Full rebuild**: `make clean && make` — zero warnings
-2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — 212 checks pass
+2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all checks pass (run with --list to see the current count)
 3. **Mesen2 validation**: test key examples manually (at minimum: hello_world, one sprite example, one audio example)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release
 

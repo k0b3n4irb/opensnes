@@ -39,6 +39,6 @@ This is a Class A change — requires `make clean && make` + full test suite + M
 ## After Any Compiler Change
 
 1. `make clean && make` — full rebuild (stale objects cause phantom bugs)
-2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all 212 checks
+2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all 390+ checks
 3. Ask user for Mesen2 validation on representative examples
 4. Check for regressions in code generation with compiler test patterns
