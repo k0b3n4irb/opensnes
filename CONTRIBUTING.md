@@ -34,12 +34,33 @@ git fetch upstream develop
 git checkout -b feature/my-feature upstream/develop
 ```
 
+### Branching and release policy
+
+The repository uses two long-lived branches with strict invariants. Knowing
+which branch you are on tells you what guarantees apply.
+
+| Branch | Invariant | When it advances |
+|--------|-----------|------------------|
+| **`main`** | Full test suite is green. Every commit is reachable from a tagged release or about to become one. The default branch — what `git clone` lands on. | Only via PR from `develop` (the "release PR"), or fast-forward when bumping for a new tag. |
+| **`develop`** | CI build job is green on the latest commit. May contain in-progress optimisations not yet stabilised. | All feature/fix PRs land here. |
+
+What this means in practice:
+
+- A user who wants the most recent **stable** SDK clones `main` (or a `vX.Y.Z` tag).
+- A user who wants the latest **work in progress** uses `develop`.
+- Tags `vX.Y.Z` are cut **only from `main`** — `release.yml` rejects a tag whose
+  commit is not on `main`.
+- `main` is **never** force-pushed. If a release ships a regression, fix it
+  forward (a `vX.Y.Z+1` tag) rather than rewriting history.
+
 ### Pull Request Rules
 
 #### Target branch
 
 All PRs must be submitted against the **`develop`** branch.
-PRs targeting `main` will be closed without review — `main` is updated only through releases.
+PRs targeting `main` are reserved for the release process (a single PR that
+brings `develop`'s green tip into `main` when the maintainers cut a release).
+Random PRs to `main` will be closed without review.
 
 #### One topic per PR
 

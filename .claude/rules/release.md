@@ -1,11 +1,40 @@
 # Release Workflow (Auto-loaded)
 
+## Branch model (see CONTRIBUTING.md for the full policy)
+
+- `develop` = active development. PRs land here. CI build must pass.
+- `main` = stable. Only updated via a release PR from `develop`. Full test
+  suite must be green at every commit.
+- Tags `vX.Y.Z` are cut **only from `main`**. `release.yml` rejects any tag
+  whose commit is not on `main`.
+
+## Release flow
+
+```
+develop  ─●─●─●─●─●─●  (active work, all PRs land here)
+                    │
+                    ●  release PR — bring develop's green tip into main
+                    │
+main     ──────────●─●  (fast-forward; tag is the second ●)
+                      │
+                      v0.X.Y  (tag pushed → release.yml runs)
+```
+
+1. Open a release PR `develop → main` titled `release: vX.Y.Z`. Body lists
+   the CHANGELOG entries.
+2. CI must be green on `develop`'s tip (build + functional-tests).
+3. After merge, tag the new `main` head: `git tag -a vX.Y.Z -m "..."` then
+   `git push origin vX.Y.Z`.
+4. `release.yml` runs the tag-on-main guard, then builds the per-OS
+   release zips and creates a GitHub Release with the assets.
+
 ## Pre-Release Checklist
 
 1. **Full rebuild**: `make clean && make` — zero warnings
-2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all checks pass (run with --list to see the current count)
+2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs --allow-known-bugs` — all checks pass
 3. **Mesen2 validation**: test key examples manually (at minimum: hello_world, one sprite example, one audio example)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release
+5. **`compiler/PINS.md` matches `compiler/{cproc,qbe,wla-dx}` HEADs**: `make verify-toolchain` exits 0
 
 ## CHANGELOG Format
 
