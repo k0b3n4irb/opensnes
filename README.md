@@ -105,6 +105,7 @@ Contributions welcome! See the **[Contributing Guide](https://k0b3n4irb.github.i
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
+- [Known limitations](KNOWN_LIMITATIONS.md) — silent failures and trade-offs to read before starting
 
 ## License
 

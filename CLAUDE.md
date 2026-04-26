@@ -78,6 +78,8 @@ include $(OPENSNES)/make/common.mk
 ## Critical Constraints
 
 IMPORTANT: These are **silent failures** — no error messages, just wrong behavior.
+The canonical, public-facing list with severity tags and mitigation notes lives
+in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 - **VRAM writes only work during VBlank or forced blank** — the PPU silently ignores writes during active display
 - **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
