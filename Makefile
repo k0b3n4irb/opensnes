@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain lint-commits docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -86,6 +86,11 @@ submodules:
 
 verify-toolchain:
 	@python3 devtools/verify_toolchain.py
+
+# Lint commit messages from origin/develop..HEAD (override RANGE=... for other ranges).
+RANGE ?= origin/develop..HEAD
+lint-commits:
+	@python3 devtools/lint_commits.py $(RANGE)
 
 compiler: submodules verify-toolchain
 	$(MAKE) -C $(COMPILER_PATH)
@@ -168,4 +173,5 @@ help:
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
+	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
 	@echo "  help      - Show this help"

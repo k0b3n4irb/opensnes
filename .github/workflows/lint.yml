@@ -1,0 +1,49 @@
+name: Lint
+
+# Mechanical enforcement of policies in .claude/rules/.
+# Currently: commit-message format (Conventional Commits) and the no-AI-attribution
+# rule. Add new lints to this workflow rather than to opensnes_build.yml so quick
+# checks stay fast and don't get muddied with toolchain build time.
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
+  push:
+    branches:
+      - "main"
+      - "develop"
+
+jobs:
+  commit-messages:
+    name: Commit messages (lint_commits.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need full history for the range walk
+
+      - name: Determine commit range
+        id: range
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            echo "range=${BASE}..${HEAD}" >> "$GITHUB_OUTPUT"
+          else
+            # On push, check commits in this push (before..after).
+            # github.event.before may be all-zeros on a new branch — fall back to
+            # comparing against origin/main, which catches everything that's
+            # newly landing.
+            BEFORE="${{ github.event.before }}"
+            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
+              echo "range=origin/main..HEAD" >> "$GITHUB_OUTPUT"
+            else
+              echo "range=${BEFORE}..HEAD" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Run lint_commits.py
+        run: python3 devtools/lint_commits.py "${{ steps.range.outputs.range }}"
