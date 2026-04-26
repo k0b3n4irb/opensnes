@@ -303,6 +303,23 @@ ifeq ($(USE_SA1),1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
 	@python3 -c "f=open('$@','r+b');f.seek(0x7FD5);b=f.read(1)[0];f.seek(0x7FD5);f.write(bytes([b|0x03]));f.close()" && echo "[SA1] Patched $$FFD5 map mode to SA-1"
 endif
+	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
+	@# bank $$01+. The compiler emits 16-bit addresses that always read bank $$00,
+	@# so spilled string.N symbols return GARBAGE silently in production. exit 1
+	@# from symmap = critical spill (hard fail). exit 2 = soft warning (low free
+	@# space) — printed but build continues. Set SKIP_BANK0_CHECK=1 to disable.
+ifneq ($(SKIP_BANK0_CHECK),1)
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow "$$SYM"; \
+		rc=$$?; \
+		if [ "$$rc" -eq 1 ]; then \
+			echo "ERROR: bank \$$00 ROM overflow — see symmap output above"; \
+			echo "       reduce const data or split arrays. SKIP_BANK0_CHECK=1 to bypass."; \
+			exit 1; \
+		fi; \
+	fi
+endif
 
 #------------------------------------------------------------------------------
 # Cleanup
