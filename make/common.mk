@@ -214,7 +214,13 @@ endif
 # Compilation
 #------------------------------------------------------------------------------
 
-# Wrap ASM source with memmap include and assemble to object
+# Wrap ASM source with memmap include and assemble to object.
+# Every rule using `wrap_asm` MUST include $(MEMMAP_DEP) in its prerequisites
+# so that a change to the memory-map template re-triggers the build — the
+# .wrap.asm file is regenerated each invocation, but `make` only knows to
+# invoke the rule when its declared deps change.
+MEMMAP_DEP := $(TEMPLATES)/$(MEMMAP_INC)
+
 define wrap_asm
 	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(1); } > $(basename $(2)).wrap.asm
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $(2) $(basename $(2)).wrap.asm
@@ -239,7 +245,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # Step 3: wrap with memmap and assemble via wla-65816.
 # SKIP_LINT=1 disables the syntax check (escape hatch for environments
 # without clang; CI always runs with the check enabled).
-%.c.o: %.c $(GFX_HEADERS)
+%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -276,13 +282,13 @@ crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boo
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
 # Initialized data start marker
-data_init_start.o: $(TEMPLATES)/data_init_start.asm
+data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
-$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS)
+$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP)
 	@echo "[AS] $(1)"
 	$$(call wrap_asm,$(1),$$@)
 endef
@@ -290,13 +296,13 @@ $(foreach src,$(ASMSRC),$(eval $(call ASM_OBJ_RULE,$(src))))
 
 # Soundbank object
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP)
 	@echo "[AS] $(SOUNDBANK_OUT)"
 	$(call wrap_asm,$<,$@)
 endif
 
 # End marker (must be linked LAST)
-data_init_end.o: $(TEMPLATES)/data_init_end.asm
+data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_end"
 	$(call wrap_asm,$<,$@)
 
