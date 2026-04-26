@@ -17,7 +17,6 @@ INPUT=$(cat 2>/dev/null) || INPUT=""
 case "$INPUT" in
     *git\ commit*|*git\ \ commit*) ;;
     *)
-        echo '{"decision": "allow"}'
         exit 0
         ;;
 esac
@@ -26,7 +25,6 @@ TODAY=$(date +%Y-%m-%d)
 MARKER="/tmp/opensnes_tests_passed_${TODAY}"
 
 if [[ -f "$MARKER" ]]; then
-    echo '{"decision": "allow"}'
     exit 0
 fi
 

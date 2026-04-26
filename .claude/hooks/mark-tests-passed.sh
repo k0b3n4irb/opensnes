@@ -17,7 +17,6 @@ INPUT=$(cat 2>/dev/null) || INPUT=""
 case "$INPUT" in
     *run-all-tests.mjs*|*run_tests.sh*|*validate_examples.sh*) ;;
     *)
-        echo '{"decision": "allow"}'
         exit 0
         ;;
 esac
@@ -40,5 +39,4 @@ if echo "$OUTPUT" | grep -qE 'ALL CHECKS PASSED|All tests passed|ALL VALIDATIONS
     echo "$(date '+%H:%M:%S') tests passed" >> "$MARKER" 2>/dev/null
 fi
 
-echo '{"decision": "allow"}'
 exit 0
