@@ -129,7 +129,7 @@ int main(void) {
 
     /* Mode 1 with only BG1 visible on the main screen */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
     setScreenOn();
 
     /* Wait for initial button press before starting the demo cycle */

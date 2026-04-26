@@ -108,7 +108,7 @@ int main(void) {
     setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
 
     /* Enable all three background layers */
-    REG_TM = TM_BG1 | TM_BG2 | TM_BG3;
+    setMainScreen(TM_BG1 | TM_BG2 | TM_BG3);
     setScreenOn();
 
     while (1) {

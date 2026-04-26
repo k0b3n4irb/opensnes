@@ -138,7 +138,7 @@ int main(void) {
     oamSet(1, p2.x, p2.y, 0, 0, 0, 1);  /* Palette 1 */
 
     /* Enable sprites on main screen */
-    REG_TM = TM_OBJ;
+    setMainScreen(TM_OBJ);
 
     /* Turn on screen */
     setScreenOn();

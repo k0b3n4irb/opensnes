@@ -125,7 +125,7 @@ int main(void) {
     REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
 
     /* Enable BG1 (text) and sprites on main screen */
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Clear all sprites (hide garbage) then set up sprite 0 as cursor */
     oamClear();

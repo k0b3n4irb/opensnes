@@ -85,7 +85,7 @@ int main(void) {
     dmaCopyVram(tilemap, 0x0000, 64 * 32 * 2);
 
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1;  /**< Enable only BG1 on the main screen */
+    setMainScreen(TM_BG1);  /**< Enable only BG1 on the main screen */
     setScreenOn();
 
     /* Build the initial HDMA scroll table with three zones.

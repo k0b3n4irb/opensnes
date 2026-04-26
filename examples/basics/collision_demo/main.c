@@ -419,7 +419,7 @@ int main(void) {
     /* Configure BG1 */
     bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
     bgSetGfxPtr(0, 0x0000);
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Object settings */
     REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);

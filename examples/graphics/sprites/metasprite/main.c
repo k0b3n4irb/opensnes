@@ -244,7 +244,7 @@ int main(void) {
     oamClear();
 
     /* Enable BG1 (text) and OBJ (sprites) */
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     drawMenu();
     drawSprites();

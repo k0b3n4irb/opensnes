@@ -65,7 +65,7 @@ extern void loadGraphics(void);
  */
 int main(void) {
     /** @brief Horizontal scroll offset for the cloud layer (BG3), incremented each frame */
-    short scrX = 0;
+    s16 scrX = 0;
 
     consoleInit();
 

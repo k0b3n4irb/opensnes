@@ -717,7 +717,7 @@ int main(void) {
     snesmodLoadModule(MOD_OVERWORLD);
     sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
 
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Initial sprite draw + upload (still in force blank from consoleInit) */
     oambuffer[0].oamx = mario_x;

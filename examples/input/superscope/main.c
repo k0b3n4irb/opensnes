@@ -164,7 +164,7 @@ int main(void) {
     oam_update_flag = 1;
 
     /* --- Enable layers --- */
-    REG_TM = TM_BG1 | TM_BG2 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_BG2 | TM_OBJ);
 
     /* Title (persistent across states) */
     textPrintAt(8, 1, "SUPERSCOPE Test");

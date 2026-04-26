@@ -207,7 +207,7 @@ int main(void) {
      * Video mode: Mode 1, enable BG1 + BG2
      *--------------------------------------------------------------------*/
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1 | TM_BG2;
+    setMainScreen(TM_BG1 | TM_BG2);
 
     /*--------------------------------------------------------------------
      * Initialize triangle window on both BGs

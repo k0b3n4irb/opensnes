@@ -226,7 +226,7 @@ int main(void) {
     changeObjSize();
 
     /* Enable BG1 (text menu) and OBJ (sprites) on the main screen */
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
     setScreenOn();
 
     while (1) {

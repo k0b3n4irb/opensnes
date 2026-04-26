@@ -89,7 +89,7 @@ int main(void) {
 
     /* Mode 1, enable BG1 + sprites */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Init dynamic sprite engine (large at $0000, small at $1000) */
     oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);

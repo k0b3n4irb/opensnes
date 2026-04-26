@@ -104,7 +104,7 @@ int main(void) {
 
     /* Mode 1, enable only BG1 + sprites */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Sprite palette at CGRAM 128 (sprite palette 0) */
     dmaCopyCGram(&palsprite, OBJ_CGRAM_BASE, PALETTE_16_SIZE);

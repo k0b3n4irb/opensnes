@@ -114,7 +114,7 @@ int main(void) {
     dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
 
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
 
     setScreenOn();
 

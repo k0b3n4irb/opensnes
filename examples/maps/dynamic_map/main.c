@@ -429,8 +429,8 @@ static void drawSpriteFrame64x64(u16 sprite) {
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
-    short sxbg0 = 0;
-    short sybg0 = 0;
+    s16 sxbg0 = 0;
+    s16 sybg0 = 0;
     u16 pad0;
     u16 pad0_released;
 
@@ -478,7 +478,7 @@ int main(void) {
         if (pad0 & KEY_RIGHT) {
             if (!scroll_lock)
                 sxbg0 += 4;
-            else if (sxbg0 < (short)max_scroll_width)
+            else if (sxbg0 < (s16)max_scroll_width)
                 sxbg0 += 4;
         } else if (pad0 & KEY_LEFT) {
             if (!scroll_lock)
@@ -494,7 +494,7 @@ int main(void) {
         } else if (pad0 & KEY_DOWN) {
             if (!scroll_lock)
                 sybg0 += 4;
-            else if (sybg0 < (short)max_scroll_height)
+            else if (sybg0 < (s16)max_scroll_height)
                 sybg0 += 4;
         }
 

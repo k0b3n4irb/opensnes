@@ -206,7 +206,7 @@ int main(void) {
     /* Configure BG1 */
     bgSetMapPtr(0, TILEMAP_ADDR, BG_MAP_32x32);
     bgSetGfxPtr(0, TILES_ADDR);
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
 
     /* Load palette via DMA */
     dmaCopyCGram((u8 *)init_palette, 0, 4);

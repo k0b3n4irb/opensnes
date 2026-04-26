@@ -152,7 +152,7 @@ int main(void) {
      * Video mode: Mode 1, display BG2 only
      *--------------------------------------------------------------------*/
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG2;
+    setMainScreen(TM_BG2);
 
     /*--------------------------------------------------------------------
      * Color math: direct register writes matching PVSnesLib exactly
