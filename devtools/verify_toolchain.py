@@ -133,7 +133,8 @@ def main() -> int:
         )
         return 1
 
-    print(f"✓ toolchain pins match: {len(pins)} submodule(s) verified")
+    # ASCII only — Windows cp1252 stdout breaks on non-Latin1 characters.
+    print(f"OK: toolchain pins match ({len(pins)} submodule(s) verified)")
     return 0
 
 
