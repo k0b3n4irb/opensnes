@@ -99,9 +99,10 @@ PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
 offsets read the wrong arguments — the first arg might be at offset 8,s instead
 of 6,s. The function compiles, links, and corrupts the stack at runtime.
 
-**Mitigation:** documented in `compiler/ABI.md` (see P2.5). When porting an ASM
-function from PVSnesLib, walk through the offsets explicitly. Function pointers
-called from C also follow this convention.
+**Mitigation:** the full calling convention is documented in
+[`compiler/ABI.md`](compiler/ABI.md), with worked examples and a port checklist.
+When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
+Function pointers called from C follow the same convention.
 
 ### 🟠 `volatile` in loops crashes QBE
 QBE's SSA pass can't always handle `volatile`. Loops with `volatile` reads/writes

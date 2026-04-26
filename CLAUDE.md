@@ -85,7 +85,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
 - **Bank $00 overflow**: `static const` arrays get SUPERFREE sections. If bank $00 fills (32KB), data silently spills to bank $01+ but C code reads from bank $00 → garbage. Combine related const arrays.
 - **`sta.l $0000,x` always reads bank $00** — all C RAM must be below $2000
-- **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets
+- **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
 - **`volatile` in loops crashes QBE** — use globals instead of `volatile` keyword

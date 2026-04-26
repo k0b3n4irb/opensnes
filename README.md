@@ -76,6 +76,9 @@ It is **not** the right SDK if any of these apply:
 **Read [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) before you start.** It
 catalogs every silent failure we know about, with severity tags and
 mitigations. Skim it once; refer back when something mysterious happens.
+For ASM-writing contributors, [`compiler/ABI.md`](compiler/ABI.md) documents
+the calling convention with worked examples (push order, frame layout, return
+values) — required reading before porting any function from PVSnesLib.
 
 ### Enhancement-chip maturity
 
