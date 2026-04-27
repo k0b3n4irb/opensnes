@@ -134,7 +134,7 @@ int main(void) {
     pos_x = 128;
     pos_y = 112;
     oamMemory[0] = (u8)pos_x;
-    oamMemory[1] = (u8)pos_y;
+    oamMemory[1] = (u8)(pos_y - 1);  /* PPU +1 scanline quirk: write Y-1 */
     oamMemory[2] = 0x00;         /* Tile number low */
     oamMemory[3] = 0x30;         /* priority 3, palette 0, no flip */
     oamMemory[512] = 0x02;       /* Large sprite (16x16), X high = 0 */
@@ -155,9 +155,9 @@ int main(void) {
         if (pos_y < 0) pos_y = 0;
         if (pos_y > 223) pos_y = 223;
 
-        /* Update cursor sprite position */
+        /* Update cursor sprite position (PPU +1 quirk: write Y-1) */
         oamMemory[0] = (u8)pos_x;
-        oamMemory[1] = (u8)pos_y;
+        oamMemory[1] = (u8)(pos_y - 1);
         oam_update_flag = 1;
 
         /* Show button state: HELD or blank */

@@ -55,7 +55,10 @@ oamSet:
     sta.l oamMemory,x
 
     ; Byte 1: Y position
+    ; SNES PPU quirk: a sprite with OAM_Y = N renders on scanlines N+1..N+8.
+    ; Subtract 1 so the caller's y matches the sprite's rendered top scanline.
     lda 12,s            ; y low byte
+    dec a               ; compensate +1 scanline PPU pipeline delay
     sta.l oamMemory+1,x
 
     ; Byte 2: tile number (low 8 bits)

@@ -105,7 +105,9 @@ void oamSetX(u8 id, u16 x) {
 
 void oamSetY(u8 id, u8 y) {
     if (id >= MAX_SPRITES) return;
-    oam_buffer[(id << 2) + 1] = y;
+    /* SNES PPU quirk: OAM_Y = N renders sprite on scanlines N+1..N+8.
+     * Subtract 1 so caller's y matches the sprite's rendered top scanline. */
+    oam_buffer[(id << 2) + 1] = (u8)(y - 1);
     OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }

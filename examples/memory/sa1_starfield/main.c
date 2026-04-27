@@ -107,7 +107,7 @@ int main(void) {
             pal_bits = (i >> 5) & 0x03;
 
             oamMemory[i * 4 + 0] = sx;
-            oamMemory[i * 4 + 1] = sy;
+            oamMemory[i * 4 + 1] = sy - 1;  /* PPU +1 scanline quirk: write Y-1 */
             oamMemory[i * 4 + 2] = 0;                      /* tile 0 */
             oamMemory[i * 4 + 3] = 0x30 | (pal_bits << 1); /* prio 3 */
         }

@@ -84,7 +84,7 @@ static void hideDot(void) {
  */
 static void showDot(u16 x, u16 y) {
     oamMemory[0] = (u8)x;
-    oamMemory[1] = (u8)y;
+    oamMemory[1] = (u8)(y - 1);  /* PPU +1 scanline quirk: write Y-1 */
     oam_update_flag = 1;
 }
 

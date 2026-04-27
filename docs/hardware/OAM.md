@@ -128,6 +128,43 @@ REG_OAMDATA = 0;    // X (don't care)
 REG_OAMDATA = 240;  // Y = 240 hides sprite
 ```
 
+## Sprite Y +1 Scanline Quirk
+
+The SNES PPU renders sprites with a 1-scanline vertical delay: a sprite whose
+`OAM_Y = N` is drawn on scanlines **N+1 through N+8**, not N through N+7. The
+OAM is scanned and tile-fetched on the previous scanline, so by the time the
+sprite is composited it has already advanced by one.
+
+This is documented hardware behavior, confirmed in two places on the SNESdev
+community wiki:
+
+- *Sprites* — "Like the NES, sprites appear 1 line lower than their Y value,
+  however because the first line of rendering is always hidden on SNES, a
+  sprite with Y=0 will appear to begin on the first visible line."
+  <https://snes.nesdev.org/wiki/Sprites>
+- *SNES PPU for NES developers* — "Sprites are delayed vertically by 1
+  scanline, just as on NES, so scroll and sprite positions will work
+  unmodified on SNES (...)."
+  <https://snes.nesdev.org/wiki/SNES_PPU_for_NES_developers>
+
+The X axis has no equivalent quirk.
+
+### OpenSNES SDK convention
+
+The public sprite APIs hide this quirk by subtracting 1 internally before
+writing OAM. **The Y argument you pass is the rendered top scanline.**
+
+| API | Compensates? |
+|-----|-------------|
+| `oamSet(id, x, y, ...)` | yes (auto Y-1) |
+| `oamSetY(id, y)` / `oamSetXY(...)` | yes |
+| `oamDrawMeta*` / `oamDynamic*Draw` | yes (call `oamSet` / engine compensates) |
+| Direct `oamMemory[id*4 + 1] = y` | **no** — caller must write `y - 1` |
+
+Sentinel values used to hide a sprite (`OBJ_HIDE_Y = 240`,
+`OAM_Y_OFFSCREEN = 224`) are **not** compensated — they are not logical
+positions, just markers that push the sprite off the visible area.
+
 ## Timing
 
 OAM writes should be done during **VBlank** or **forced blank** (screen off). Writing during active display can cause visual glitches.
