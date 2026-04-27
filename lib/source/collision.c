@@ -111,17 +111,29 @@ u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth) {
     u16 tileX, tileY;
     u16 offset;
 
-    /* Negative coordinates = out of bounds */
-    if (px < 0 || py < 0) return 0;
+    /* Out-of-bounds coordinates are treated as SOLID (impassable). The v1
+     * behaviour was to return 0 (no collision), which let player sprites
+     * escape the playable area to the left/top — observed in
+     * examples/basics/collision_demo where the white square could slip
+     * past the left wall once all four corner-checks went negative.
+     * Returning 1 here means "off the map = wall". Callers that want
+     * negative coords to mean "nothing here" should clamp before calling. */
+    if (px < 0 || py < 0) return 1;
 
     /* Convert pixel coords to tile coords (8x8 tiles) */
     tileX = px >> TILE_SHIFT_8;
     tileY = py >> TILE_SHIFT_8;
 
-    /* Calculate offset in tilemap */
-    offset = tileY * mapWidth + tileX;
+    /* Right-edge bound: pixel beyond mapWidth tiles is also off-map. */
+    if (tileX >= mapWidth) return 1;
 
-    /* Return tile value */
+    /* Note: bottom-edge (py) cannot be bounded here — the function does not
+     * know the map's height. Callers must guarantee py is within the map
+     * vertically, or use collideRectTile/collideRectMap which include
+     * their own bounds. */
+
+    /* Calculate offset in tilemap and return tile value */
+    offset = tileY * mapWidth + tileX;
     return tilemap[offset];
 }
 
@@ -130,7 +142,8 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
     u16 offset;
     u8 shift;
 
-    if (px < 0 || py < 0) return 0;
+    /* Out-of-bounds = SOLID. See collideTile for the rationale. */
+    if (px < 0 || py < 0) return 1;
 
     /* Determine shift amount based on tile size */
     if (tileSize == TILE_SIZE_DEFAULT) {
@@ -145,6 +158,8 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
 
     tileX = px >> shift;
     tileY = py >> shift;
+
+    if (tileX >= mapWidth) return 1;
 
     /* Calculate offset */
     offset = tileY * mapWidth + tileX;
