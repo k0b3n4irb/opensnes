@@ -162,7 +162,7 @@ int main(void) {
      * $1000-$1FFF: Small sprite tiles (dynamic engine, name table 1)
      * $3000-$32FF: Font tiles (2bpp, 96 chars × 8 words)
      * $3800-$3BFF: BG1 tilemap (32×32 entries) */
-    textInit();
+    textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
     textLoadFont(0x3000);
     bgSetGfxPtr(0, 0x3000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);

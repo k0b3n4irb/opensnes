@@ -28,7 +28,7 @@ Then open `object_size.sfc` in your emulator (Mesen2 recommended).
 ### 1. Set up text on BG1 (4bpp in Mode 1)
 
 ```c
-textInit();
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
 textLoadFont4bpp(0x0000);
 bgSetGfxPtr(0, 0x0000);
 bgSetMapPtr(0, 0x3800, SC_32x32);

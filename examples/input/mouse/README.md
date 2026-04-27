@@ -63,7 +63,7 @@ found, a message is displayed and the program halts.
 ```c
 consoleInit();
 setMode(BG_MODE0, 0);
-textInit();
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
 textLoadFont(0x0000);
 
 WaitForVBlank();

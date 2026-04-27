@@ -78,40 +78,26 @@ static void buffer_write_entry(u8 x, u8 y, u16 entry) {
     tilemapBuffer[buf_offset + 1] = entry >> 8;
 }
 
-void textInit(void) {
-    text_config.tilemap_addr = 0x3800;  /* $7000 in byte address / 2 */
-    text_config.font_tile = 0;
-    text_config.palette = 0;
-    text_config.priority = 0;
-    text_config.map_width = 32;
+void textInit(u16 tilemap_addr, u16 font_tile, u8 palette) {
+    /* tilemap_addr is a VRAM byte address. The PPU tilemap pointer
+     * registers (BG1SC..BG4SC) expect a word address — divide by 2 for
+     * the storage. This matches v1 textInitEx convention; the v1
+     * textInit(void) used a hard-coded word address (0x3800) which is
+     * the same as byte $7000 / 2. */
+    text_config.tilemap_addr = tilemap_addr >> 1;
+    text_config.font_tile    = font_tile;
+    text_config.palette      = palette & 0x07;
+    text_config.priority     = 0;
+    text_config.map_width    = 32;
 
-    /* Set DMA source and target for NMI handler */
-    tilemap_vram_addr = 0x3800;
-    tilemap_src_addr = (u16)tilemapBuffer;
-
-    cursor_x = 0;
-    cursor_y = 0;
-
-    /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles) */
-    textClear();
-    tilemapFlush();
-}
-
-void textInitEx(u16 tilemap_addr, u16 font_tile, u8 palette) {
-    text_config.tilemap_addr = tilemap_addr >> 1;  /* Convert to word address */
-    text_config.font_tile = font_tile;
-    text_config.palette = palette & 0x07;
-    text_config.priority = 0;
-    text_config.map_width = 32;
-
-    /* Set DMA source and target for NMI handler */
+    /* DMA target for NMI handler is the same word address. */
     tilemap_vram_addr = tilemap_addr >> 1;
-    tilemap_src_addr = (u16)tilemapBuffer;
+    tilemap_src_addr  = (u16)tilemapBuffer;
 
     cursor_x = 0;
     cursor_y = 0;
 
-    /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles) */
+    /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles). */
     textClear();
     tilemapFlush();
 }
@@ -292,7 +278,7 @@ void textModeInit(void) {
     setMode(BG_MODE0, 0);
     setColor(0, 0x0000);
     setColor(1, RGB(31, 31, 31));
-    textInit();
+    textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
     textLoadFont(0x0000);
     bgSetGfxPtr(0, 0x0000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
