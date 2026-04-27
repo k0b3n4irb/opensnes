@@ -129,7 +129,7 @@ int main(void) {
     dmaCopyCGram((u8 *)pal_red, OBJ_CGRAM_PAL(1), 8);
 
     /* Initialize OAM */
-    oamInit();
+    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
     /* Set up Player 1 sprite (OAM entry 0) */
     oamSet(0, p1.x, p1.y, 0, 0, 0, 0);

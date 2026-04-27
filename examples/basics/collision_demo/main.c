@@ -407,7 +407,7 @@ int main(void) {
     /* Initialize */
     consoleInit();
     setMode(BG_MODE0, 0);
-    oamInit();
+    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
     /* Load graphics */
     load_graphics();

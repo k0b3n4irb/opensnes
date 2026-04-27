@@ -77,7 +77,7 @@ int main(void) {
     /* Sprite setup: 4 palettes for depth, tile at VRAM $4000 */
     dmaCopyCGram((u8*)pal, OBJ_CGRAM_BASE, 4 * PALETTE_16_SIZE);
     dmaCopyVram((u8*)dot_tile, 0x4000, 32);
-    oamInitEx(OBJ_SIZE8_L16, 0x4000 >> 13);
+    oamInit(OBJ_SIZE8_L16, 0x4000 >> 13);
 
     oamClear();
 

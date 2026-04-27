@@ -14,8 +14,8 @@
  * ## Usage
  *
  * @code
- * // Initialize sprite system
- * oamInit();
+ * // Initialize sprite system (defaults: 8x8/16x16 sprites, tile base 0)
+ * oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
  *
  * // Set up a sprite
  * oamSet(0, 100, 80, 0, 0, 0, 0);  // Sprite 0 at (100, 80)
@@ -45,7 +45,7 @@
 /** @brief Maximum number of hardware sprites */
 #define MAX_SPRITES 128
 
-/** @brief Sprite size indices (for oamInitGfxSet, oamInitEx) */
+/** @brief Sprite size indices (for oamInit, oamInitGfxSet) */
 #define OBJ_SIZE8_L16   0   /**< Small=8x8, Large=16x16 */
 #define OBJ_SIZE8_L32   1   /**< Small=8x8, Large=32x32 */
 #define OBJ_SIZE8_L64   2   /**< Small=8x8, Large=64x64 */
@@ -257,20 +257,30 @@ extern t_sprites oambuffer[128];
  *============================================================================*/
 
 /**
- * @brief Initialize sprite system
+ * @brief Default sprite size mode — small=8×8 / large=16×16.
  *
- * Clears OAM buffer and sets up default configuration.
- * Must be called before using any sprite functions.
+ * Same value as OBJ_SIZE8_L16 (the most common configuration: 8×8 tiles
+ * for HUD elements and 16×16 for characters/projectiles).
  */
-void oamInit(void);
+#define OAM_DEFAULT_SIZE        OBJ_SIZE8_L16
+/** @brief Default sprite tile base — 0 = tiles at VRAM word $0000. */
+#define OAM_DEFAULT_TILE_BASE   0
 
 /**
- * @brief Initialize sprite system with configuration
+ * @brief Initialize the sprite (OAM) system.
  *
- * @param size Sprite size configuration (OBJ_SIZE_*)
- * @param tileBase Base address for sprite tiles in VRAM (word address >> 13)
+ * Sets the OBJSEL register (sprite size mode + tile base) and clears the
+ * OAM shadow buffer so all sprites start hidden. Must be called before
+ * any other oam* function. Replaces the v1 oamInit/oamInitEx pair —
+ * pass OAM_DEFAULT_* constants for the previous oamInit(void) defaults.
+ *
+ * @param size       Sprite size mode (OBJ_SIZE_*; use OAM_DEFAULT_SIZE for
+ *                   the standard 8×8/16×16 layout)
+ * @param tile_base  VRAM tile-base index 0-7 (each step = $1000 word
+ *                   addresses; use OAM_DEFAULT_TILE_BASE for tiles at
+ *                   VRAM $0000)
  */
-void oamInitEx(u16 size, u16 tileBase);
+void oamInit(u16 size, u16 tile_base);
 
 /**
  * @brief Initialize sprite graphics and palette (PVSnesLib compatible)

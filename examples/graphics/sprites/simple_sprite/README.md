@@ -50,7 +50,7 @@ sprite terms). Each palette is 16 colors (32 bytes in 15-bit SNES format).
 ### 3. Configure OBJ size
 
 ```c
-oamInitEx(OBJ_SIZE8_L32, 1);
+oamInit(OBJ_SIZE8_L32, 1);
 ```
 
 The SNES supports two sprite sizes simultaneously: "small" and "large". Here we use
@@ -106,7 +106,7 @@ colors (32 bytes).
 ### Name Base
 
 The VRAM word address where the PPU starts looking for sprite tiles. Set via
-`oamInitEx()` or register $2101 (OBJSEL). The tile number in each OAM entry is
+`oamInit()` or register $2101 (OBJSEL). The tile number in each OAM entry is
 an offset from this base.
 
 ## Project Structure

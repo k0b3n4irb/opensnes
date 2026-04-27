@@ -68,7 +68,7 @@ int main(void) {
      * - Size mode OBJ_SIZE8_L32: small=8x8, large=32x32
      * - Name base 1: tile data base at VRAM $2000 (base = slot * $2000)
      * Individual sprites choose small or large via the OAM high-table size bit. */
-    oamInitEx(OBJ_SIZE8_L32, 1);
+    oamInit(OBJ_SIZE8_L32, 1);
 
     /* Set OAM entry 0 to display the sprite:
      * - Position: (112, 96) = roughly center of 256x224 screen
