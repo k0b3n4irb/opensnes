@@ -5,6 +5,162 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [Unreleased]
+
+Audit-driven maintenance cycle (see `~/opensnes_audit_2026-04-26.md` and
+`~/opensnes_remediation_plan_2026-04-26.md`). 19 of 23 plan items completed
+across P0-P4. The SDK is now end-to-end CI-enforced: build green no longer
+just means "it compiles" — it means visual regression, lag detection, runtime,
+compiler patterns, bank $00 layout and submodule pins all hold.
+
+### Added
+
+- **`KNOWN_LIMITATIONS.md`** — public catalog of silent failures with
+  severity tags (🔴 silent corruption / 🟠 silent build / 🟡 toolchain quirk /
+  🟢 mitigated). 14 entries covering VBlank, DMA budget, WRAM port, bank $00,
+  push order, `volatile` + QBE, `.ACCU` tracking, SA-1 SIWP, SuperFX/Mesen2,
+  compiler optimisation gaps, type sizes, sprite-palette CGRAM offset.
+- **`compiler/ABI.md`** — empirically verified calling-convention reference:
+  LEFT-TO-RIGHT push, frame layout, return values, direct-page layout
+  (`tcc__r*`), type sizes, calling C↔ASM templates, port-from-PVSnesLib
+  checklist.
+- **`compiler/PINS.md`** — pinned SHAs for `compiler/{cproc,qbe,wla-dx}` with
+  a per-submodule list of carried-forward local patches.
+- **`tools/opensnes-emu/test/BASELINES.md`** — visual-regression baseline
+  schema and regen protocol.
+- **`lib/contrib/` directory** — non-core engine modules. Currently houses
+  `object.asm` (3 124 LOC game-entity engine) relocated from `lib/source/`
+  so `lib/source/` only contains hardware-wrapping code.
+- **Section "Who is OpenSNES for?"** in README — explicit prerequisites
+  (65816 ASM, NMI/VBlank model, hex addresses) and non-targets, plus an
+  enhancement-chip maturity table.
+- **Branching policy** in `CONTRIBUTING.md` — invariants for `main` vs
+  `develop`.
+- **2 compiler regression guards** — `test_arg_push_order` (LEFT-TO-RIGHT
+  ABI) and `test_section_directives` (`.ACCU 16` / `.INDEX 16` markers).
+  Compiler test suite: 60 → 62.
+
+### Changed
+
+- **`tools/opensnes-emu/` is now a public submodule** at
+  `github.com/k0b3n4irb/opensnes-emu` (was a local-only directory in the
+  user's tree). History was rewritten with `git filter-repo` to strip 275
+  generated build artifacts (.sfc, .sym, .o, .obj, etc.) — repo size went
+  from 218 MB to 11 MB tracked source.
+- **CI runs the full ~390-check test suite** (was build-only). Drop of
+  `--quick` adds the 60-test compiler-pattern phase. Added
+  `--allow-known-bugs` so the 5 documented compiler-optimisation gaps
+  (TCO + A-cache-through-pha + stale `leaf_opt` marker) report as
+  `[KNOWN_BUG]` rather than failing the build.
+- **`ROADMAP.md` resync** — corrects 52 → 53 examples, 212 → ~390 checks,
+  60 → 62 compiler tests, 7 → 8 phases. Drops removed modules
+  (animation, entity). Adds the contrib status for `object`. Pivots to
+  the "post-v0.13.0 toward v0.14.0" snapshot.
+- **`.claude/` is now tracked** (was entirely gitignored except one file).
+  Hooks, rules, skills and shared settings ship with the repo so any
+  Claude Code user gets the same gates. Personal `settings.local.json`
+  remains gitignored.
+- **`setMainScreen()` instead of `REG_TM = ...`** in 22 examples (style
+  consistency; identical bytes generated). `short` → `s16` in three more.
+
+### Fixed
+
+- **`lib/source/hdma.c:89`** — `sine_quarter[63] = 256` truncated to 0 in
+  `u8`, leaving a 1-pixel notch at sin(90°) on every HDMA sine effect.
+  Cap the table at 255.
+- **`examples/games/tetris/render.c:346`** — `u8 tile` couldn't hold
+  `TILE_BORDER_H | PAL1 = 0x409`, dropping the palette bits silently and
+  rendering the line-clear flash with the wrong palette. Promote to `u16`.
+- **`examples/memory/sa1_starfield/`** — `USE_FASTROM := 1` eliminates
+  the 50 % VBlank lag (150/300 frames → 0/300). The 128-bird OAM-update
+  loop was running into the next NMI on SlowROM.
+- **Hooks `pre-commit-check.sh` / `mark-tests-passed.sh`** — outputted
+  `{"decision": "allow"}` (invalid for the Claude Code schema) and
+  pointed contributors to non-existent test scripts. Now run silently
+  on the pass path and reference the real
+  `node test/run-all-tests.mjs --quick` runner.
+- **`.gitignore` cleanup** — `.claude/` entry was a blanket gitignore that
+  hid project-wide policies. Replaced with the precise
+  `.claude/settings.local.json` exclusion.
+- **3 hardcoded `/home/kobenairb/...` paths** in `.claude/rules/` and
+  skills replaced with `$PVSNESLIB_HOME`.
+- **Two dead unit fixtures** (`unit/animation`, `unit/entity`) referenced
+  modules removed from `lib/`. Build phase passed from 76/78 to 76/76.
+- **2 stale visual baselines** (`graphics/sprites/dynamic_metasprite`,
+  `maps/slopemario`) regenerated after recent ASM/c-bit fixes; baseline
+  for `memory/sa1_starfield` captured for the first time after the
+  FastROM bump.
+- **12 latent C warnings** surfaced by the new clang lint pipeline —
+  unused locals, dead helper functions (`writestring_bg2`, `refresh`),
+  unused parameters in callback ABI signatures.
+
+### Build
+
+- **Bank $00 ROM overflow check** runs on every link
+  (`devtools/symmap/symmap.py --check-bank0-overflow` invoked from
+  `make/common.mk`). String-literal spills now fail the build instead of
+  producing garbage at runtime. `SKIP_BANK0_CHECK=1` escapes if needed.
+- **`make verify-toolchain`** compares each compiler-submodule HEAD
+  against `compiler/PINS.md`. CI calls it before every build — drift
+  fails fast with a fix-it message naming the right remediation.
+- **clang `-fsyntax-only -Wall -Wextra -Werror`** runs in parallel with
+  cc65816 in the `%.c.o` rule (cproc ignores `-W*`). The SDK is
+  warning-clean and stays that way. `SKIP_LINT=1` for environments
+  without clang.
+- **Sed QBE→WLA-DX transform removed.** Empirical audit showed 9 of 10
+  patterns matched nothing in current QBE output (QBE emits `.db`/`.dw`/
+  `.dl` natively). The 10th pattern only deleted `/* end */` comments
+  that WLA-DX accepts. `lib/Makefile` lost 12 lines of fragile sed.
+- **Memmap dependency tracking** — `wrap_asm` consumers now list
+  `$(MEMMAP_INC)` as a real prerequisite. `touch templates/memmap.inc`
+  triggers a rebuild instead of producing stale objects.
+- **FastROM Makefile flag** documented; SA-1 Starfield uses it.
+
+### CI
+
+- **Functional-tests job** — opensnes-emu test suite gates PR merges
+  on Linux. Caches WASM core build by `bridge.cpp` hash; cache hit
+  brings full-suite runtime to ~3 minutes.
+- **Tag-on-main guard** — `release.yml` rejects a tag whose commit is
+  not reachable from `origin/main`. Tags can only be cut from the
+  release-PR merge.
+- **Lint workflow** (`lint.yml`) — runs `lint_commits.py` on every PR
+  and direct push to `main`/`develop`.
+
+### Testing
+
+- **Visual-regression baselines** carry provenance metadata
+  (`rom_sha256`, `snes9x_commit`, `captured_at`). The runner emits
+  `[WARN]` on drift instead of silently producing a misleading diff.
+- All 53 baselines re-captured against the current `make`-built ROMs.
+- **Compiler test runner** marks 5 unimplemented optimisations as
+  `knownBug()` instead of `fail()` — TCO (3 tests), A-cache through
+  pha (1), and the stale `leaf_opt=1` marker for non-leaf functions
+  (1). Without `--allow-known-bugs` they still fail; with the flag
+  they report `[KNOWN_BUG]` so a contributor implementing one sees
+  green immediately.
+
+### Tooling
+
+- **`devtools/verify_toolchain.py`** — parses `compiler/PINS.md` and
+  enforces submodule-pin invariants.
+- **`devtools/lint_commits.py`** — Conventional-Commits subject
+  validation + `Co-Authored-By:` rejection.
+
+### Documentation
+
+- **`compiler/ABI.md`**, **`KNOWN_LIMITATIONS.md`**,
+  **`tools/opensnes-emu/test/BASELINES.md`**, **`lib/contrib/README.md`**
+  added as canonical references.
+- **`README.md`** gains the audience-explicit section, chip maturity
+  table, and a prominent link to `KNOWN_LIMITATIONS.md`.
+- **`ROADMAP.md`** resynchronised against current state.
+- **`CONTRIBUTING.md`** documents the branching policy.
+- **`.claude/rules/release.md`** has the full release flow with ASCII
+  diagram and `make verify-toolchain` in the pre-release checklist.
+- **5 stale "212 checks" / "52 examples"** references corrected across
+  `.claude/rules/*.md` and the README.
+
 ## [0.13.0] - 2026-03-26
 
 ### SuperFX Phase 3-4 — Mandelbrot + Wireframe Cube
