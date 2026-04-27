@@ -47,7 +47,7 @@ ALLOWED_SCOPES = {
     "lib", "compiler", "runtime", "tools", "examples", "build",
     # Practical extensions used in this repo's history:
     "ci", "devtools", "docs", "claude", "contributing", "release",
-    "submodule", "deps", "readme",
+    "submodule", "deps", "readme", "changelog", "test", "tests",
 }
 
 SUBJECT_RE = re.compile(
