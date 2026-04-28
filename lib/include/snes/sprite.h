@@ -617,10 +617,31 @@ void oamInitDynamicSpriteEndFrame(void);
 void oamVramQueueUpdate(void);
 
 /**
+ * @brief Draw a dynamic sprite (size auto-resolved from OAM ext bit + init mode)
+ *
+ * Preferred entry point — replaces the manual choice between
+ * `oamDynamic8Draw` / `oamDynamic16Draw` / `oamDynamic32Draw`. The engine
+ * looks up the sprite's pixel size by combining the per-sprite size bit
+ * (bit 1 of its slot in the OAM extended table at offset 512+) with the
+ * size pair set at init by `oamInitDynamicSprite` (or `oamDynamicInit`),
+ * and dispatches to the matching size-specific routine.
+ *
+ * 64x64 dynamic streaming is not currently supported; calls that would
+ * resolve to 64x64 are silently skipped.
+ *
+ * @param id Index into oambuffer array (0-127)
+ */
+void oamDynamicDraw(u16 id);
+
+/**
  * @brief Draw a 32x32 dynamic sprite
  *
  * Updates OAM buffer with sprite position and attributes from oambuffer[id].
  * If oamrefresh is set, queues graphics for VRAM upload.
+ *
+ * @note Prefer `oamDynamicDraw` — it auto-dispatches based on the sprite's
+ *       resolved pixel size, removing the need for callers to know whether
+ *       they need the 8/16/32 variant.
  *
  * @param id Index into oambuffer array (0-127)
  *

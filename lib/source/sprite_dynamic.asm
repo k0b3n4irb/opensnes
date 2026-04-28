@@ -215,6 +215,7 @@ oamInitDynamicSprite:
     sep #$20
     .ACCU 8
     lda 10,s                        ; oamsize index (0-5)
+    sta.l oam_dynamic_size_mode     ; remember mode for oamDynamicDraw dispatch
     asl a                           ; index << 5 → OBJSEL size bits (= OBJ_SIZE_TO_REG)
     asl a
     asl a
