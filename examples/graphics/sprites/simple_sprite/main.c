@@ -77,9 +77,9 @@ int main(void) {
      * - Palette 0 (first sprite palette), priority 3 (in front of all BGs)
      * - No flip flags */
     oamSet(0, 112, 96, 0x0010, 0, 3, 0);
-    /* Set this sprite to use the LARGE size (32x32 in this OBJSEL mode) and
-     * make it visible. OBJ_SHOW clears the X high bit 8 (X >= 256 hides sprites). */
-    oamSetEx(0, OBJ_LARGE, OBJ_SHOW);
+    /* Set this sprite to use the LARGE size (32x32 in this OBJSEL mode).
+     * Visibility is controlled by Y position; oamSet above placed it on-screen. */
+    oamSetSize(0, OBJ_LARGE);
 
     /* Enable Mode 1 with only the OBJ (sprite) layer visible.
      * No background layers are enabled, so the backdrop color (CGRAM 0) fills

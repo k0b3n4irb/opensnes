@@ -306,15 +306,6 @@ void oamInit(u16 size, u16 tile_base);
 void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
                    u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize);
 
-/**
- * @brief Set sprite extended attributes
- *
- * @param id Sprite ID (0-127)
- * @param size Size selection (OBJ_SMALL or OBJ_LARGE)
- * @param visible Visibility (OBJ_SHOW or OBJ_HIDE)
- */
-void oamSetEx(u8 id, u8 size, u8 visible);
-
 /*============================================================================
  * Sprite Properties
  *============================================================================*/

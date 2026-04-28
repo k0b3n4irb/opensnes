@@ -55,10 +55,10 @@ REG_INIDISP = 0x0F;  /* Restore display */
 
 ```c
 oamSet(0, 70, 120, 0x0010, 0, 3, 0);   /* Small sprite, left */
-oamSetEx(0, OBJ_SMALL, OBJ_SHOW);
+oamSetSize(0, OBJ_SMALL);
 
 oamSet(1, 170, 120, 0x0050, 1, 3, 0);  /* Large sprite, right */
-oamSetEx(1, OBJ_LARGE, OBJ_SHOW);
+oamSetSize(1, OBJ_LARGE);
 ```
 
 Tile numbers are offsets from the OBJSEL name base (`$4000`):
@@ -87,7 +87,7 @@ games with small sprites.
 This register sets the global size pair and name base address. Changing it affects
 ALL 128 sprites simultaneously, so games typically pick one mode at startup and
 stick with it for the entire game. The size pair defines what "small" and "large"
-mean -- individual sprites select between the two via `oamSetEx()`.
+mean -- individual sprites select between the two via `oamSetSize()`.
 
 ### OAM High Table
 
@@ -95,7 +95,9 @@ Each of the 128 sprites has 2 extra bits stored in 32 bytes of high table:
 - Bit 0: X position bit 8 (extends the 8-bit X to 9 bits, allowing off-screen positions)
 - Bit 1: Size select (0 = small, 1 = large)
 
-These bits are packed 4 sprites per byte. The `oamSetEx()` function writes them.
+These bits are packed 4 sprites per byte. The `oamSetSize()` function writes the
+size bit; the X high bit is set automatically by `oamSet()` / `oamSetX()` when
+needed.
 
 ### Force Blank for Large DMA
 

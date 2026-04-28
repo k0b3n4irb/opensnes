@@ -173,18 +173,6 @@ void oamSetSize(u16 id, u16 large) {
     oam_update_flag = 1;
 }
 
-void oamSetEx(u8 id, u8 size, u8 visible) {
-    if (id >= MAX_SPRITES) return;
-
-    /* Set size */
-    oamSetSize(id, size);
-
-    /* Set visibility */
-    if (!visible) {
-        oamHide(id);
-    }
-}
-
 /*============================================================================
  * OAM Update
  *============================================================================*/

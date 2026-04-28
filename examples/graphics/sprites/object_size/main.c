@@ -171,13 +171,13 @@ static void changeObjSize(void) {
     /* Display small sprite (left side): palette 0, priority 3, no flip.
      * OBJ_SMALL selects the smaller of the two sizes in the current OBJSEL mode. */
     oamSet(0, 70, 120, TILE_SMALL, 0, 3, 0);
-    oamSetEx(0, OBJ_SMALL, OBJ_SHOW);
+    oamSetSize(0, OBJ_SMALL);
 
     /* Display large sprite (right side): palette 1, priority 3, no flip.
      * OBJ_LARGE selects the larger size. Using palette 1 (128+16 = CGRAM 144)
      * allows a different color scheme for the large sprite. */
     oamSet(1, 170, 120, TILE_LARGE, 1, 3, 0);
-    oamSetEx(1, OBJ_LARGE, OBJ_SHOW);
+    oamSetSize(1, OBJ_LARGE);
 
     setScreenOn();
 }

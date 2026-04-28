@@ -61,7 +61,7 @@ region where sprite tiles start (`$2000` in word addressing).
 
 ```c
 oamSet(0, 112, 96, 0x0010, 0, 3, 0);
-oamSetEx(0, OBJ_LARGE, OBJ_SHOW);
+oamSetSize(0, OBJ_LARGE);
 ```
 
 `oamSet()` configures OAM entry 0:
@@ -70,7 +70,8 @@ oamSetEx(0, OBJ_LARGE, OBJ_SHOW);
 - Palette: 0 (first sprite palette)
 - Priority: 3 (in front of all backgrounds)
 
-`oamSetEx()` sets this sprite as "large" (32x32) and visible.
+`oamSetSize()` selects the "large" size (32x32) for this sprite. Visibility is
+controlled by Y position; `oamSet` placed it on-screen.
 
 ### 5. Enable display
 
