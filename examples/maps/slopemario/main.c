@@ -117,9 +117,10 @@ int main(void) {
 
     /* mapLoad flushes VRAM internally */
 
-    /* Flush initial sprite frame to VRAM before screen on */
+    /* Queue initial sprite tile + let NMI auto-flush before screen on.
+     * NMI fires even under force blank, so this VBlank drains the queue. */
     oamDynamicDraw(0);
-    oamVramQueueUpdate();
+    WaitForVBlank();
 
     setScreenOn();
 

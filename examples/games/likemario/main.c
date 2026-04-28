@@ -728,12 +728,14 @@ int main(void) {
 
     setMainScreen(TM_BG1 | TM_OBJ);
 
-    /* Initial sprite draw + upload (still in force blank from consoleInit) */
+    /* Initial sprite draw — queue Mario's tile upload. The NMI handler
+     * runs even under force blank, so the WaitForVBlank below lets the
+     * auto-flush hook drain the VRAM queue + sync OAM before we release
+     * force blank. Mario is in VRAM by the time the first frame renders. */
     oambuffer[0].oamx = mario_x;
     oambuffer[0].oamy = mario_y;
     oamDynamicDraw(0);
-    oamVramQueueUpdate();
-    oamInitDynamicSpriteEndFrame();
+    WaitForVBlank();
 
     setScreenOn();      /* Release force blank — display begins */
 

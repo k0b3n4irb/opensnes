@@ -150,15 +150,15 @@ int main(void) {
     oambuffer[3].oamrefresh = 1;
     OAM_SET_GFX(3, spr16_tiles);
 
-    /* Initial draw pass: upload starting tiles to VRAM.
-     * This must happen before the screen turns on, otherwise the first
-     * frame would show uninitialized VRAM garbage in the sprite area. */
+    /* Initial draw pass: queue starting tiles, then let NMI auto-flush
+     * during force blank so all 4 tile uploads land in VRAM before
+     * setScreenOn — otherwise the first frame shows uninitialized VRAM
+     * in the sprite area. The 4 queue entries fit in one VBlank. */
     oamDynamicDraw(0);
     oamDynamicDraw(1);
     oamDynamicDraw(2);
     oamDynamicDraw(3);
-    oamVramQueueUpdate();
-    oamInitDynamicSpriteEndFrame();
+    WaitForVBlank();
 
     /* Mode 1 with only OBJ layer visible (no backgrounds) */
     setMode(BG_MODE1, 0);
