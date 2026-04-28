@@ -586,6 +586,43 @@ void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
                           u16 oamsp0init, u16 oamsp1init, u8 oamsize);
 
 /**
+ * @brief Configuration for the dynamic sprite engine.
+ *
+ * Pass this to `oamDynamicInit` instead of the 5 positional arguments of
+ * `oamInitDynamicSprite`. Equivalent at runtime; clearer at the call site
+ * and easier to evolve without breaking existing callers.
+ */
+typedef struct {
+    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr) */
+    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr) */
+    u16 slotLargeInit;  /**< Initial OAM slot for large sprites (was oamsp0init) */
+    u16 slotSmallInit;  /**< Initial OAM slot for small sprites (was oamsp1init) */
+    u8  sizeMode;       /**< OBJ_SIZE_* — defines the small/large pixel sizes */
+} OamDynamicConfig;
+
+/**
+ * @brief Initialize the dynamic sprite engine from a config struct.
+ *
+ * Preferred over `oamInitDynamicSprite` — the struct-based form makes the
+ * intent of each parameter visible at the call site and survives future
+ * additions without a signature break.
+ *
+ * @param cfg Configuration (caller-owned; the engine reads it once).
+ *
+ * @code
+ * static const OamDynamicConfig dyn = {
+ *     .vramLarge      = 0x0000,
+ *     .vramSmall      = 0x1000,
+ *     .slotLargeInit  = 0,
+ *     .slotSmallInit  = 0,
+ *     .sizeMode       = OBJ_SIZE16_L32,
+ * };
+ * oamDynamicInit(&dyn);
+ * @endcode
+ */
+void oamDynamicInit(const OamDynamicConfig *cfg);
+
+/**
  * @brief End frame processing for dynamic sprites
  *
  * Call after drawing all sprites each frame. Hides sprites that were

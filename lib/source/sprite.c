@@ -347,6 +347,18 @@ u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette) {
 }
 
 /*============================================================================
+ * Dynamic Sprite Engine — modern entry points
+ *============================================================================*/
+
+void oamDynamicInit(const OamDynamicConfig *cfg) {
+    oamInitDynamicSprite(cfg->vramLarge,
+                         cfg->vramSmall,
+                         cfg->slotLargeInit,
+                         cfg->slotSmallInit,
+                         cfg->sizeMode);
+}
+
+/*============================================================================
  * Dynamic Sprite Dispatch
  *============================================================================*/
 
