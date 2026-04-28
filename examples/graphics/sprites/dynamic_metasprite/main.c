@@ -3,8 +3,10 @@
  * @brief Dynamic metasprite engine demo — multi-tile characters with VRAM streaming
  * @ingroup examples
  *
- * Demonstrates oamMetaDrawDyn32/16/8: multi-tile sprite characters where each
- * sub-sprite's tiles are streamed to VRAM on demand (dynamic sprite engine).
+ * Demonstrates `oamMetaDrawDyn(..., size_class)`: multi-tile sprite
+ * characters where each sub-sprite's tiles are streamed to VRAM on demand
+ * (dynamic sprite engine). The `size_class` parameter selects whether the
+ * metasprite uses the small or large half of the configured size pair.
  * Three OBJSEL configurations are selectable via D-PAD:
  *
  * - Config 0: 8/16 — 16x16 metasprite (LARGE) + 8x8 metasprite (SMALL)

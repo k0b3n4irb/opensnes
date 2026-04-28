@@ -18,7 +18,7 @@ Then open `dynamic_metasprite.sfc` in your emulator (Mesen2 recommended).
 - Dynamic VRAM tile streaming for multi-tile sprite characters
 - Defining metasprites with `MetaspriteItem` arrays
 - Three OBJSEL size configurations: 8/16, 8/32, 16/32
-- Using `oamMetaDrawDyn32`, `oamMetaDrawDyn16`, `oamMetaDrawDyn8`
+- Using `oamMetaDrawDyn(id, x, y, meta, gfx, OBJ_SMALL/OBJ_LARGE)`
 - Force blank for glitch-free OBJSEL changes at runtime
 
 ## Controls

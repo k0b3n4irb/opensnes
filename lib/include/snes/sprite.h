@@ -182,7 +182,7 @@ extern u16 lkup8idB[];
  * OAM_SET_GFX(0, sprite_tiles);  // Set 24-bit graphics address
  *
  * // In game loop
- * oamDynamic16Draw(0);  // Draw and queue VRAM upload if needed
+ * oamDynamicDraw(0);  // Draw + queue VRAM upload (NMI auto-flushes)
  * @endcode
  */
 typedef struct {

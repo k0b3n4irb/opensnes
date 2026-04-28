@@ -24,7 +24,7 @@ Each object type has an init callback and an update callback, registered via `ob
 
 ### Dynamic Sprite Engine
 
-The dynamic sprite engine (`oamInitDynamicSprite`, `oamDynamic16Draw`) manages OAM entries and VRAM tile uploads automatically. Each `oambuffer[]` entry tracks position, current frame ID, and a refresh flag. When `oamrefresh` is set to 1, the engine re-uploads that sprite's tile data to VRAM on the next `oamVramQueueUpdate()` call. This is configured at startup with `oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16)`, placing large sprites at VRAM $0000 and small sprites at $1000.
+The dynamic sprite engine (`oamDynamicInit`, `oamDynamicDraw`) manages OAM entries and VRAM tile uploads automatically. Each `oambuffer[]` entry tracks position, current frame ID, and a refresh flag. When `oamrefresh` is set to 1, the engine re-uploads that sprite's tile data to VRAM during the next VBlank — the NMI handler auto-flushes the queue, so the application code never calls `oamVramQueueUpdate` or `oamInitDynamicSpriteEndFrame` from the main loop. The engine is configured at startup with an `OamDynamicConfig` struct (`vramLarge=0x0000`, `vramSmall=0x1000`, `sizeMode=OBJ_SIZE8_L16`).
 
 ### Assembly Bank Byte Registration
 
@@ -42,10 +42,18 @@ The compiler produces 16-bit function pointers without bank bytes, but C functio
 **1. Setup** -- The tileset is loaded to VRAM, the map engine is initialized with slope attribute data, and Mario's object type is registered:
 
 ```c
+static const OamDynamicConfig dyn = {
+    .vramLarge      = 0x0000,
+    .vramSmall      = 0x1000,
+    .slotLargeInit  = 0,
+    .slotSmallInit  = 0,
+    .sizeMode       = OBJ_SIZE8_L16,
+};
+
 bgInitTileSet(0, &tileset, &tilepal, 0,
               (&tilesetend - &tileset), 16 * 2, BG_16COLORS, 0x2000);
 bgSetMapPtr(0, 0x6800, SC_64x32);
-oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+oamDynamicInit(&dyn);
 objInitEngine();
 objRegisterTypes();
 objLoadObjects((u8 *)&objmario);
@@ -77,21 +85,19 @@ void marioupdate(u16 idx) {
     objUpdateXY(idx);
     oambuffer[0].oamx = mariox - x_pos;
     oambuffer[0].oamy = marioy - y_pos;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
     mapUpdateCamera(mariox, marioy);
 }
 ```
 
-**4. Main loop** -- Updates the map, all objects, and flushes sprite/tilemap data to VRAM during VBlank:
+**4. Main loop** -- Updates the map and all objects; the NMI handler auto-flushes the dynamic sprite engine each VBlank, and `mapVblank()` handles tilemap DMA:
 
 ```c
 while (1) {
     mapUpdate();
     objUpdateAll();
-    oamInitDynamicSpriteEndFrame();
     WaitForVBlank();
     mapVblank();
-    oamVramQueueUpdate();
 }
 ```
 

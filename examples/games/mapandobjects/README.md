@@ -41,10 +41,11 @@ into `objWorkspace`, and calls their update function.
 ### Dynamic Sprites
 
 Unlike static sprite allocation where tiles live at fixed VRAM addresses, the
-dynamic sprite engine (`oamInitDynamicSprite`, `oamDynamic16Draw`) uploads only the
+dynamic sprite engine (`oamDynamicInit`, `oamDynamicDraw`) uploads only the
 tiles that are visible each frame. This is essential when you have multiple animated
 characters, since SNES OBJ VRAM is limited to 32 KB. Sprite graphics are stored in
-ROM and streamed to VRAM as needed during VBlank via `oamVramQueueUpdate()`.
+ROM and streamed to VRAM as needed during VBlank — the NMI handler auto-flushes
+the VRAM tile queue, so the main loop just calls `oamDynamicDraw(id)` per sprite.
 
 ## Controls
 
@@ -63,10 +64,18 @@ with a 64x32 tile layout. The dynamic sprite engine is initialized with large
 sprites at VRAM $0000 and small sprites at $1000.
 
 ```c
+static const OamDynamicConfig dyn = {
+    .vramLarge      = 0x0000,
+    .vramSmall      = 0x1000,
+    .slotLargeInit  = 0,
+    .slotSmallInit  = 0,
+    .sizeMode       = OBJ_SIZE8_L16,
+};
+
 bgInitTileSet(0, &tileset, &tilesetpal, 0,
               (&tilesetend - &tileset), 16 * 2, BG_16COLORS, 0x2000);
 bgSetMapPtr(0, 0x6800, SC_64x32);
-oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+oamDynamicInit(&dyn);
 ```
 
 ### 2. Register Object Types in Assembly
@@ -94,17 +103,16 @@ mapLoad((u8 *)&mapmario, (u8 *)&tilesetdef, (u8 *)&tilesetatt);
 ### 4. Main Loop: Update, Draw, Sync
 
 Every frame: update the map scroll state, update all objects (physics + AI),
-finalize sprite allocation, wait for VBlank, then flush tilemap and sprite
-changes to VRAM:
+wait for VBlank, then let `mapVblank()` flush tilemap changes. The NMI
+handler auto-flushes the dynamic sprite engine — no `oamInitDynamicSpriteEndFrame`
+or `oamVramQueueUpdate` calls needed in the main loop.
 
 ```c
 while (1) {
     mapUpdate();
     objUpdateAll();
-    oamInitDynamicSpriteEndFrame();
     WaitForVBlank();
     mapVblank();
-    oamVramQueueUpdate();
 }
 ```
 
@@ -117,7 +125,7 @@ computed by subtracting the camera scroll (`x_pos`, `y_pos`):
 ```c
 goombax = goombax - x_pos;
 oambuffer[goombanum].oamx = goombax;
-oamDynamic16Draw(goombanum);
+oamDynamicDraw(goombanum);
 ```
 
 ## Project Structure

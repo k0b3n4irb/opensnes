@@ -10,9 +10,9 @@
  * VRAM region.
  *
  * Four 16x16 sprites are animated simultaneously. Each sprite's tile data
- * is streamed from ROM to VRAM via the oamDynamic16Draw() / oamVramQueueUpdate()
- * pipeline. The engine maintains a queue of dirty tiles and batches DMA
- * transfers to fit within the VBlank budget.
+ * is streamed from ROM to VRAM via oamDynamicDraw() — the engine queues
+ * dirty tiles and the NMI handler auto-flushes the queue every VBlank
+ * within the DMA budget.
  *
  * @par SNES Concepts
  * - Dynamic VRAM tile streaming to conserve OBJ VRAM space
@@ -77,10 +77,10 @@ static u16 frame3;
  * to VRAM on demand each frame. Four 16x16 sprites are placed in a row,
  * each cycling through 24 animation frames with an 8-frame delay.
  *
- * The dynamic sprite pipeline works in three stages per frame:
- * 1. oamDynamic16Draw() — marks which tiles each sprite needs
- * 2. oamVramQueueUpdate() — batches and DMAs only changed tiles to VRAM
- * 3. oamInitDynamicSpriteEndFrame() — resets the tile allocator for next frame
+ * The dynamic sprite pipeline per frame:
+ * 1. oamDynamicDraw() — main thread marks which tiles each sprite needs
+ * 2. NMI VBlank handler auto-flushes: DMAs queued tiles to VRAM and
+ *    resets the per-frame tile allocator for next frame
  *
  * This approach trades VBlank DMA time for VRAM conservation: instead of
  * pre-loading all 24 frames (24 x 4 tiles x 32 bytes = 3KB per sprite),
@@ -174,7 +174,7 @@ int main(void) {
             frame_counter = 0;
 
             /* Advance each sprite's animation frame (0-23 cycle).
-             * Setting oamrefresh = 1 tells oamDynamic16Draw() that this
+             * Setting oamrefresh = 1 tells oamDynamicDraw() that this
              * sprite's tile data has changed and needs re-uploading to VRAM. */
 
             frame0++;
@@ -198,17 +198,14 @@ int main(void) {
             oambuffer[3].oamrefresh = 1;
         }
 
-        /* Per-frame draw pipeline:
-         * 1. oamDynamic16Draw() — for each sprite, allocate a VRAM tile slot
-         *    and queue a DMA transfer if oamrefresh is set
-         * 2. oamVramQueueUpdate() — execute all queued DMA transfers to VRAM
-         * 3. oamInitDynamicSpriteEndFrame() — reset the tile pool allocator
-         *    so next frame starts fresh (tiles are re-allocated every frame) */
+        /* Per-frame draw: oamDynamicDraw() updates oambuffer + OAM and
+         * queues a tile DMA when oamrefresh is set. The NMI handler
+         * auto-flushes the queue and resets the tile allocator each
+         * VBlank — no manual orchestration needed in user code. */
         oamDynamicDraw(0);
         oamDynamicDraw(1);
         oamDynamicDraw(2);
         oamDynamicDraw(3);
-        /* NMI auto-flushes end-frame + VRAM tile queue. */
     }
 
     return 0;

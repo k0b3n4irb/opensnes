@@ -62,6 +62,35 @@ compiler patterns, bank $00 layout and submodule pins all hold.
   remains gitignored.
 - **`setMainScreen()` instead of `REG_TM = ...`** in 22 examples (style
   consistency; identical bytes generated). `short` → `s16` in three more.
+- **Sprite API simplification (P3.2 chantier B)** — public sprite surface
+  collapses from 28 to 20 functions over six dichotomy steps:
+  - `oamSet`/`oamSetEx`/`oamInit*` consolidations (B.A);
+  - `oamDynamicDraw(id)` size-aware dispatcher replaces
+    `oamDynamic{8,16,32}Draw` (B.1+B.2);
+  - `OamDynamicConfig` struct + `oamDynamicInit(&cfg)` replace the
+    5-arg positional `oamInitDynamicSprite` (B.3);
+  - migrated 9 call sites across 5 example games + reverted a
+    Y-1 over-compensation in the dynamic engine that was lifting
+    Mario 1–2 px off the ground on flat terrain (B.4);
+  - the NMI handler auto-flushes the dynamic engine via a new
+    `dynamic_flush_hook` indirect call — main loops drop the
+    explicit `oamInitDynamicSpriteEndFrame` / `oamVramQueueUpdate`
+    pair (B.5);
+  - legacy `oamInitDynamicSprite` and `oamDynamic{8,16,32}Draw`
+    retire from the public header; their ASM symbols stay as the
+    internal mechanism (B.6 modest);
+  - `oamMetaDrawDyn(id, x, y, meta, gfx, OBJ_SMALL/OBJ_LARGE)`
+    replaces `oamMetaDrawDyn{8,16,32}` — engine resolves pixel size
+    from the size pair set at init (B.6 aggressive part 1);
+  - simple init flushes (likemario, slopemario, dynamic_sprite)
+    migrate to a single `WaitForVBlank()` that fires the auto-flush
+    hook under force blank (B.6 aggressive part 2 partial).
+- **NMI handler gains a `dynamic_flush_hook` 24-bit function pointer**
+  in the bank-$00 register area. Defaults to a single-`rtl` no-op
+  stub; `oamInitDynamicSprite` repoints it at `oamDynamicNmiFlush`
+  which calls `oamInitDynamicSpriteEndFrame` + `oamVramQueueUpdate`
+  every VBlank. Cost for ROMs that don't use the dynamic engine: one
+  PEA + JML indirect + RTL ≈ 25 cycles per frame.
 
 ### Fixed
 
