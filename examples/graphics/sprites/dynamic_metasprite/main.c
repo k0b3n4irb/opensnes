@@ -87,14 +87,17 @@ u16 pad0;
 /** @brief Draw metasprites for the current OBJSEL configuration */
 void drawSprites(void) {
     if (selectedItem == 0) {
-        oamMetaDrawDyn16(1, 64, 140, hero16_frame0, spritehero16_til, OBJ_LARGE);
-        oamMetaDrawDyn8(10, 128, 140, hero8_frame0, spritehero8_til);
+        /* mode 0 (8/16): 16 large + 8 small */
+        oamMetaDrawDyn(1, 64, 140, hero16_frame0, spritehero16_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 128, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
     } else if (selectedItem == 1) {
-        oamMetaDrawDyn32(1, 64, 140, hero32_frame0, spritehero32_til);
-        oamMetaDrawDyn8(10, 192, 140, hero8_frame0, spritehero8_til);
+        /* mode 1 (8/32): 32 large + 8 small */
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
     } else {
-        oamMetaDrawDyn32(1, 64, 140, hero32_frame0, spritehero32_til);
-        oamMetaDrawDyn16(10, 192, 140, hero16_frame0, spritehero16_til, OBJ_SMALL);
+        /* mode 3 (16/32): 32 large + 16 small */
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero16_frame0, spritehero16_til, OBJ_SMALL);
     }
 }
 
