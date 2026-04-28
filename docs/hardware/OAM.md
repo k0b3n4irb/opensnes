@@ -151,19 +151,52 @@ The X axis has no equivalent quirk.
 
 ### OpenSNES SDK convention
 
-The public sprite APIs hide this quirk by subtracting 1 internally before
-writing OAM. **The Y argument you pass is the rendered top scanline.**
+The Y semantics depend on which API you use. Two camps:
 
-| API | Compensates? |
-|-----|-------------|
-| `oamSet(id, x, y, ...)` | yes (auto Y-1) |
-| `oamSetY(id, y)` / `oamSetXY(...)` | yes |
-| `oamDrawMeta*` / `oamDynamic*Draw` | yes (call `oamSet` / engine compensates) |
-| Direct `oamMemory[id*4 + 1] = y` | **no** — caller must write `y - 1` |
+**Camp 1 — Y is the rendered top scanline (`visual_top`)**
+
+The API auto-subtracts 1 before writing OAM, so the value you pass is what
+you see on screen.
+
+| API | Notes |
+|-----|-------|
+| `oamSet(id, x, y, ...)` | auto Y-1 in `sprite_oamset.asm` |
+| `oamSetY(id, y)` / `oamSetXY(...)` | auto Y-1 in `sprite.c` |
+| `oamDrawMeta` / `oamDrawMetaFlip` / `oamDrawMetasprite` | call `oamSet` |
+
+**Camp 2 — Y is the legacy PVSnesLib `y_logical` (= `visual_top - 1`)**
+
+The dynamic sprite engine inherits PVSnesLib's collision-and-render contract:
+collision math sets `oambuffer[id].oamy = visual_top - 1`, the engine writes
+that raw to OAM, and the PPU's +1 quirk lifts it back to `visual_top` on
+screen. **Do not pre-subtract** when feeding these APIs.
+
+| API | Notes |
+|-----|-------|
+| `oamDynamicDraw(id)` / `oamDynamic{8,16,32}Draw(id)` | use `oambuffer[id].oamy` raw |
+| `oamMetaDrawDyn{8,16,32}` | dynamic engine path, same convention |
+
+**Camp 3 — direct OAM writes**
+
+When bypassing both APIs and writing `oamMemory[id*4 + 1]` yourself, no one
+compensates for you. Subtract 1 manually so the rendered top matches the
+caller's intent.
+
+```c
+oamMemory[id*4 + 1] = (u8)(player_y - 1);   /* visual_top semantics */
+```
 
 Sentinel values used to hide a sprite (`OBJ_HIDE_Y = 240`,
 `OAM_Y_OFFSCREEN = 224`) are **not** compensated — they are not logical
 positions, just markers that push the sprite off the visible area.
+
+### Why two camps?
+
+Most of OpenSNES treats Y as `visual_top`, which is what programmers expect.
+The dynamic engine is the exception because its collision-driven `oamy`
+field is set by ported PVSnesLib code that already accounts for the quirk.
+Adding our own compensation on top would double the offset and lift sprites
+2 px off the ground — easily visible on slopemario / likemario.
 
 ## Timing
 

@@ -654,14 +654,28 @@ void oamInitDynamicSpriteEndFrame(void);
 void oamVramQueueUpdate(void);
 
 /**
- * @brief Draw a dynamic sprite (size auto-resolved from OAM ext bit + init mode)
+ * @brief Override the dispatched pixel size for a dynamic sprite slot.
+ *
+ * Optional companion to `oamDynamicDraw`. By default each slot dispatches
+ * to the "large" half of the size pair set at init. Call this to make a
+ * specific slot use a different pixel size (8, 16, or 32) — typical when
+ * mixing small and large dynamic sprites under the same mode pair.
+ *
+ * Pass 0 to clear the override and revert to the mode default.
+ *
+ * @param id   Sprite slot id (0-127)
+ * @param size Pixel size: 8, 16, or 32 (or 0 to clear)
+ */
+void oamDynamicSetSize(u16 id, u8 size);
+
+/**
+ * @brief Draw a dynamic sprite — engine picks the size routine.
  *
  * Preferred entry point — replaces the manual choice between
  * `oamDynamic8Draw` / `oamDynamic16Draw` / `oamDynamic32Draw`. The engine
- * looks up the sprite's pixel size by combining the per-sprite size bit
- * (bit 1 of its slot in the OAM extended table at offset 512+) with the
- * size pair set at init by `oamInitDynamicSprite` (or `oamDynamicInit`),
- * and dispatches to the matching size-specific routine.
+ * uses the per-sprite size set via `oamDynamicSetSize` if any; otherwise
+ * it falls back to the "large" pixel size of the size pair selected at
+ * init by `oamInitDynamicSprite` (or `oamDynamicInit`).
  *
  * 64x64 dynamic streaming is not currently supported; calls that would
  * resolve to 64x64 are silently skipped.

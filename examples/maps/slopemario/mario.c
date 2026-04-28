@@ -149,7 +149,7 @@ void marioupdate(u16 idx) {
     /* Update screen position relative to camera */
     oambuffer[0].oamx = mariox - x_pos;
     oambuffer[0].oamy = marioy - y_pos;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
 
     mapUpdateCamera(mariox, marioy);
 }

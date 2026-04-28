@@ -665,7 +665,6 @@ _o32d_no_refresh:
     ror a                           ; X bit 8 into carry
 
     lda.w oambuffer+OAM_OAMY,y        ; Y position
-    dec a                             ; PPU +1 scanline quirk compensation
     xba                             ; Swap: now A = Y:X_high_bit_in_carry
     rep #$20
     sta.w oamMemory,x               ; Store X(lo) and Y
@@ -852,7 +851,6 @@ _o16d_store_tile:
     sep #$20
     ror a
     lda.w oambuffer+OAM_OAMY,y
-    dec a                             ; PPU +1 scanline quirk compensation
     xba
     rep #$20
     sta.w oamMemory,x
@@ -1034,7 +1032,6 @@ _o8d_no_refresh:
     sep #$20
     ror a
     lda.w oambuffer+OAM_OAMY,y
-    dec a                             ; PPU +1 scanline quirk compensation
     xba
     rep #$20
     sta.w oamMemory,x

@@ -663,7 +663,7 @@ static void mario_update_camera(void) {
 
     oambuffer[0].oamx = mario_x - camera_x;
     oambuffer[0].oamy = mario_y;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
 }
 
 /*============================================================================
@@ -706,7 +706,16 @@ int main(void) {
     /* DMA all tile/palette data with correct bank bytes (SUPERFREE may be bank $01+) */
     loadGraphics();
 
-    oamInitDynamicSprite(VRAM_SPR_LARGE, VRAM_SPR_SMALL, 0, 0, OBJ_SIZE8_L16);
+    {
+        static const OamDynamicConfig dyn_cfg = {
+            .vramLarge     = VRAM_SPR_LARGE,
+            .vramSmall     = VRAM_SPR_SMALL,
+            .slotLargeInit = 0,
+            .slotSmallInit = 0,
+            .sizeMode      = OBJ_SIZE8_L16,
+        };
+        oamDynamicInit(&dyn_cfg);
+    }
 
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
     mario_init();
@@ -722,7 +731,7 @@ int main(void) {
     /* Initial sprite draw + upload (still in force blank from consoleInit) */
     oambuffer[0].oamx = mario_x;
     oambuffer[0].oamy = mario_y;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
     oamVramQueueUpdate();
     oamInitDynamicSpriteEndFrame();
 

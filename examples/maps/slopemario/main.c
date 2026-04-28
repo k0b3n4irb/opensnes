@@ -92,7 +92,16 @@ int main(void) {
     setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Init dynamic sprite engine (large at $0000, small at $1000) */
-    oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+    {
+        static const OamDynamicConfig dyn_cfg = {
+            .vramLarge     = 0x0000,
+            .vramSmall     = 0x1000,
+            .slotLargeInit = 0,
+            .slotSmallInit = 0,
+            .sizeMode      = OBJ_SIZE8_L16,
+        };
+        oamDynamicInit(&dyn_cfg);
+    }
 
     /* Object engine */
     objInitEngine();
@@ -109,7 +118,7 @@ int main(void) {
     /* mapLoad flushes VRAM internally */
 
     /* Flush initial sprite frame to VRAM before screen on */
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
     oamVramQueueUpdate();
 
     setScreenOn();

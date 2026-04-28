@@ -92,11 +92,18 @@ int main(void) {
     setScreenOff();
 
     /* Initialize the dynamic sprite engine:
-     * - OBJ VRAM tile pool starts at word address $0000
-     * - OBJ VRAM name table at $1000 (for second name page if needed)
-     * - Sprite palette 0, name base 0
+     * - Large-tile pool at VRAM word address $0000
+     * - Small-tile pool at $1000
+     * - Allocator starts at OAM slot 0 for both pools
      * - OBJSEL size mode: small=8x8, large=16x16 */
-    oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+    static const OamDynamicConfig dyn_cfg = {
+        .vramLarge     = 0x0000,
+        .vramSmall     = 0x1000,
+        .slotLargeInit = 0,
+        .slotSmallInit = 0,
+        .sizeMode      = OBJ_SIZE8_L16,
+    };
+    oamDynamicInit(&dyn_cfg);
 
     /* Load sprite palette to CGRAM 128 (first sprite palette slot).
      * 32 bytes = 16 colors x 2 bytes per color (15-bit BGR). */
@@ -146,10 +153,10 @@ int main(void) {
     /* Initial draw pass: upload starting tiles to VRAM.
      * This must happen before the screen turns on, otherwise the first
      * frame would show uninitialized VRAM garbage in the sprite area. */
-    oamDynamic16Draw(0);
-    oamDynamic16Draw(1);
-    oamDynamic16Draw(2);
-    oamDynamic16Draw(3);
+    oamDynamicDraw(0);
+    oamDynamicDraw(1);
+    oamDynamicDraw(2);
+    oamDynamicDraw(3);
     oamVramQueueUpdate();
     oamInitDynamicSpriteEndFrame();
 
@@ -197,10 +204,10 @@ int main(void) {
          * 2. oamVramQueueUpdate() — execute all queued DMA transfers to VRAM
          * 3. oamInitDynamicSpriteEndFrame() — reset the tile pool allocator
          *    so next frame starts fresh (tiles are re-allocated every frame) */
-        oamDynamic16Draw(0);
-        oamDynamic16Draw(1);
-        oamDynamic16Draw(2);
-        oamDynamic16Draw(3);
+        oamDynamicDraw(0);
+        oamDynamicDraw(1);
+        oamDynamicDraw(2);
+        oamDynamicDraw(3);
         oamVramQueueUpdate();
         oamInitDynamicSpriteEndFrame();
     }

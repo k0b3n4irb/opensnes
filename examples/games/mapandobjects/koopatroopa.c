@@ -106,12 +106,12 @@ static void koopatroopa_draw(void) {
 
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay - 16;
-    oamDynamic16Draw(n);
+    oamDynamicDraw(n);
 
     n++;
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay;
-    oamDynamic16Draw(n);
+    oamDynamicDraw(n);
 }
 
 void koopatroopaupdate(u16 idx) {

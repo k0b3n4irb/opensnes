@@ -127,6 +127,6 @@ void marioupdate(u16 idx) {
 
     oambuffer[0].oamx = mariox - x_pos;
     oambuffer[0].oamy = marioy - y_pos;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
     mapUpdateCamera(mariox, marioy);
 }

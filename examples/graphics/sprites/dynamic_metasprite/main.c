@@ -135,7 +135,14 @@ void changeObjSize(void) {
         static const u8 obj_sizes[] = {
             OBJ_SIZE8_L16, OBJ_SIZE8_L32, OBJ_SIZE16_L32
         };
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0, obj_sizes[selectedItem]);
+        OamDynamicConfig dyn_cfg = {
+            .vramLarge     = 0x0000,
+            .vramSmall     = 0x1000,
+            .slotLargeInit = 0,
+            .slotSmallInit = 0,
+            .sizeMode      = obj_sizes[selectedItem],
+        };
+        oamDynamicInit(&dyn_cfg);
     }
 
     oambuffer[1].oamrefresh = 1;

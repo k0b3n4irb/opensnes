@@ -82,5 +82,5 @@ void goombaupdate(u16 idx) {
     goombax = goombax - x_pos;
     oambuffer[goombanum].oamx = goombax;
     oambuffer[goombanum].oamy = goombay;
-    oamDynamic16Draw(goombanum);
+    oamDynamicDraw(goombanum);
 }

@@ -34,15 +34,6 @@
 extern u8 oam_max_id; /* Defined in crt0.asm - highest sprite ID written */
 #define oam_buffer oamMemory
 
-/**
- * Dynamic-sprite engine: global size pair set by oamInitDynamicSprite (arg5).
- * Stored at init time so oamDynamicDraw can dispatch to the right size-specific
- * routine without requiring the caller to repeat the size at every call.
- * Written by sprite_dynamic.asm (oamInitDynamicSprite); read by C helpers.
- * Holds one of OBJ_SIZE8_L16..OBJ_SIZE32_L64 (0..5). Defaults to 0 = 8/16 pair.
- */
-u8 oam_dynamic_size_mode;
-
 /* Update oam_max_id tracking (inline to avoid function call overhead) */
 #define OAM_TRACK_MAX(id) do { if ((id) > oam_max_id) oam_max_id = (id); } while(0)
 
@@ -346,61 +337,3 @@ u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette) {
                        0, palette, OBJ_LARGE);
 }
 
-/*============================================================================
- * Dynamic Sprite Engine — modern entry points
- *============================================================================*/
-
-void oamDynamicInit(const OamDynamicConfig *cfg) {
-    oamInitDynamicSprite(cfg->vramLarge,
-                         cfg->vramSmall,
-                         cfg->slotLargeInit,
-                         cfg->slotSmallInit,
-                         cfg->sizeMode);
-}
-
-/*============================================================================
- * Dynamic Sprite Dispatch
- *============================================================================*/
-
-/* Pixel size for each (mode << 1 | size_bit). Indexed by 12 entries:
- *   mode 0 (small=8,  large=16): 8, 16
- *   mode 1 (small=8,  large=32): 8, 32
- *   mode 2 (small=8,  large=64): 8, 64
- *   mode 3 (small=16, large=32): 16, 32
- *   mode 4 (small=16, large=64): 16, 64
- *   mode 5 (small=32, large=64): 32, 64
- */
-static const u8 oam_dynamic_pixel_size_lut[12] = {
-    8,  16,
-    8,  32,
-    8,  64,
-    16, 32,
-    16, 64,
-    32, 64,
-};
-
-void oamDynamicDraw(u16 id) {
-    u8 ext_byte;
-    u8 slot;
-    u8 size_bit;
-    u8 px;
-
-    if (id >= MAX_SPRITES) return;
-
-    /* Read per-sprite size bit from OAM extended table.
-     * Each byte covers 4 sprites; size bit is at position (slot*2 + 1). */
-    ext_byte = oam_buffer[OAM_EXT_OFFSET + (id >> 2)];
-    slot = (u8)(id & 0x03);
-    size_bit = (u8)((ext_byte >> (slot * 2 + 1)) & 0x01);
-
-    px = oam_dynamic_pixel_size_lut[(oam_dynamic_size_mode << 1) | size_bit];
-
-    if (px == 8) {
-        oamDynamic8Draw(id);
-    } else if (px == 16) {
-        oamDynamic16Draw(id);
-    } else if (px == 32) {
-        oamDynamic32Draw(id);
-    }
-    /* px == 64: 64x64 dynamic streaming is unsupported, silently skip. */
-}

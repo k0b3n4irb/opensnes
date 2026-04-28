@@ -117,14 +117,15 @@ endif
 # Module Dependency Auto-Resolution
 #------------------------------------------------------------------------------
 
-_DEP_sprite    := dma sprite_oamset
-_DEP_text      := dma background
-_DEP_text4bpp  := dma
-_DEP_object    := map
-_DEP_map       := dma
-_DEP_snesmod   := console
-_DEP_superfx   := dma
-_DEP_hdma      := dma
+_DEP_sprite          := dma sprite_oamset
+_DEP_sprite_dynamic  := sprite_dynamic_dispatch
+_DEP_text            := dma background
+_DEP_text4bpp        := dma
+_DEP_object          := map
+_DEP_map             := dma
+_DEP_snesmod         := console
+_DEP_superfx         := dma
+_DEP_hdma            := dma
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
