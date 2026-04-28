@@ -173,7 +173,7 @@ screen. **Do not pre-subtract** when feeding these APIs.
 
 | API | Notes |
 |-----|-------|
-| `oamDynamicDraw(id)` / `oamDynamic{8,16,32}Draw(id)` | use `oambuffer[id].oamy` raw |
+| `oamDynamicDraw(id)` | use `oambuffer[id].oamy` raw |
 | `oamMetaDrawDyn{8,16,32}` | dynamic engine path, same convention |
 
 **Camp 3 — direct OAM writes**

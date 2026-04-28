@@ -18,6 +18,16 @@
 
 #include <snes.h>
 
+/* Forward declarations for the legacy ASM entry points retained as the
+ * internal mechanism behind `oamDynamicInit` and `oamDynamicDraw`. They
+ * are no longer in the public header (B.6); user code must use the new
+ * struct-based init and the size-aware dispatcher. */
+extern void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
+                                 u16 oamsp0init, u16 oamsp1init, u8 oamsize);
+extern void oamDynamic8Draw(u16 id);
+extern void oamDynamic16Draw(u16 id);
+extern void oamDynamic32Draw(u16 id);
+
 /**
  * Global dynamic-sprite size pair (0..5, OBJ_SIZE_*).
  *

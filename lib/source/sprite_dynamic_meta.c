@@ -11,6 +11,12 @@
 
 #include <snes.h>
 
+/* Internal entry points: removed from the public header in B.6 but kept
+ * as the underlying ASM mechanism for the metasprite-dynamic loops below. */
+extern void oamDynamic8Draw(u16 id);
+extern void oamDynamic16Draw(u16 id);
+extern void oamDynamic32Draw(u16 id);
+
 void oamMetaDrawDyn32(u16 id, s16 x, s16 y,
                       const MetaspriteItem *meta, u8 *gfxptr) {
     u8 refresh = oambuffer[id].oamrefresh;

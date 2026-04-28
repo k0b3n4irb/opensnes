@@ -565,27 +565,6 @@ u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette);
  *============================================================================*/
 
 /**
- * @brief Initialize the dynamic sprite engine
- *
- * Sets up VRAM regions for sprite graphics and initializes the VRAM upload
- * queue. Must be called before using oamDynamic*Draw functions.
- *
- * @param gfxsp0adr VRAM address for large sprites (e.g., 0x0000)
- * @param gfxsp1adr VRAM address for small sprites (e.g., 0x1000)
- * @param oamsp0init Starting OAM slot for large sprites (0-127, multiple of 4)
- * @param oamsp1init Starting OAM slot for small sprites (0-127, multiple of 4)
- * @param oamsize Sprite size configuration (OBJ_SIZE_*)
- *
- * @code
- * // Initialize for 16x16 small, 32x32 large sprites
- * // Large sprites at VRAM $0000, small at $1000
- * oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE16_L32);
- * @endcode
- */
-void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
-                          u16 oamsp0init, u16 oamsp1init, u8 oamsize);
-
-/**
  * @brief Configuration for the dynamic sprite engine.
  *
  * Pass this to `oamDynamicInit` instead of the 5 positional arguments of
@@ -683,50 +662,6 @@ void oamDynamicSetSize(u16 id, u8 size);
  * @param id Index into oambuffer array (0-127)
  */
 void oamDynamicDraw(u16 id);
-
-/**
- * @brief Draw a 32x32 dynamic sprite
- *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
- *
- * @note Prefer `oamDynamicDraw` — it auto-dispatches based on the sprite's
- *       resolved pixel size, removing the need for callers to know whether
- *       they need the 8/16/32 variant.
- *
- * @param id Index into oambuffer array (0-127)
- *
- * @code
- * oambuffer[0].oamx = 100;
- * oambuffer[0].oamy = 80;
- * oambuffer[0].oamframeid = 0;
- * oambuffer[0].oamattribute = OBJ_PRIO(2) | OBJ_PAL(0);
- * oambuffer[0].oamrefresh = 1;
- * OAM_SET_GFX(0, sprite32_tiles);
- * oamDynamic32Draw(0);
- * @endcode
- */
-void oamDynamic32Draw(u16 id);
-
-/**
- * @brief Draw a 16x16 dynamic sprite
- *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
- *
- * @param id Index into oambuffer array (0-127)
- */
-void oamDynamic16Draw(u16 id);
-
-/**
- * @brief Draw an 8x8 dynamic sprite
- *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
- *
- * @param id Index into oambuffer array (0-127)
- */
-void oamDynamic8Draw(u16 id);
 
 /*============================================================================
  * Dynamic Metasprite Engine
