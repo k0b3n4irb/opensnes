@@ -752,13 +752,13 @@ int main(void) {
         mario_update_camera();
         map_update();
 
-        oamInitDynamicSpriteEndFrame();
-
         WaitForVBlank();
-        /* VRAM operations first — must complete within VBlank */
+        /* VRAM operations first — must complete within VBlank.
+         * NMI auto-flushes the dynamic sprite engine (end-frame +
+         * VRAM tile queue), so no manual oamInit*EndFrame /
+         * oamVramQueueUpdate calls are needed here. */
         map_flush_column();
         bgSetScroll(0, camera_x, 0);
-        oamVramQueueUpdate();
         /* SPC700 communication last — no VBlank restriction */
         snesmodProcess();
     }

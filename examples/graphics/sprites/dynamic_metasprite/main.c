@@ -201,9 +201,8 @@ int main(void) {
         }
 
         drawSprites();
-        oamInitDynamicSpriteEndFrame();
         WaitForVBlank();
-        oamVramQueueUpdate();
+        /* NMI auto-flushes end-frame + VRAM tile queue. */
     }
     return 0;
 }

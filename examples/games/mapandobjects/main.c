@@ -141,10 +141,9 @@ int main(void) {
         mapUpdate();
         objUpdateAll();
 
-        oamInitDynamicSpriteEndFrame();
         WaitForVBlank();
         mapVblank();
-        oamVramQueueUpdate();
+        /* NMI handler auto-flushes the dynamic sprite engine. */
     }
     return 0;
 }

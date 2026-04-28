@@ -223,10 +223,48 @@ oamInitDynamicSprite:
     asl a
     sta.l $2101                     ; REG_OBJSEL
 
+    ; Register oamDynamicNmiFlush with the NMI handler. From this point on,
+    ; the VBlank ISR will call our flush automatically and the application
+    ; never needs to invoke oamInitDynamicSpriteEndFrame / oamVramQueueUpdate
+    ; by hand. Idempotent: re-init just rewrites the same address.
+    rep #$20
+    .ACCU 16
+    lda #oamDynamicNmiFlush
+    sta.l dynamic_flush_hook
+    sep #$20
+    .ACCU 8
+    lda #:oamDynamicNmiFlush
+    sta.l dynamic_flush_hook+2
+
     ply
     plx
     plb
     plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; oamDynamicNmiFlush
+;==============================================================================
+; void oamDynamicNmiFlush(void)
+;
+; Indirect-long-callable target for the NMI handler's dynamic_flush_hook.
+; Called once per VBlank (after the engine is initialized) to:
+;   1. End-of-frame housekeeping: hide sprites from last frame that were
+;      not drawn this frame, reset slot counters, set oam_update_flag.
+;   2. Flush any queued sprite tile DMAs to VRAM.
+;
+; The two underlying routines are idempotent — if the application also
+; calls them by hand from the main loop (legacy pattern), the second run
+; is a cheap no-op.
+;==============================================================================
+
+.SECTION ".sprite_dynamic_nmi_flush" SUPERFREE
+
+oamDynamicNmiFlush:
+    jsl oamInitDynamicSpriteEndFrame
+    jsl oamVramQueueUpdate
     rtl
 
 .ENDS

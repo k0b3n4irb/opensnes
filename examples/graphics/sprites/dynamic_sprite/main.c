@@ -208,8 +208,7 @@ int main(void) {
         oamDynamicDraw(1);
         oamDynamicDraw(2);
         oamDynamicDraw(3);
-        oamVramQueueUpdate();
-        oamInitDynamicSpriteEndFrame();
+        /* NMI auto-flushes end-frame + VRAM tile queue. */
     }
 
     return 0;

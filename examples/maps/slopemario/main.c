@@ -127,10 +127,12 @@ int main(void) {
         mapUpdate();
         objUpdateAll();
 
-        oamInitDynamicSpriteEndFrame();
         WaitForVBlank();
         mapVblank();
-        oamVramQueueUpdate();
+        /* NMI handler auto-flushes the dynamic sprite engine
+         * (end-frame + VRAM tile queue), so the user code does not
+         * need to call oamInitDynamicSpriteEndFrame / oamVramQueueUpdate
+         * by hand from the main loop. */
     }
     return 0;
 }
