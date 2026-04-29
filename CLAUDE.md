@@ -52,7 +52,7 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE emits 65816 
 ### Enhancement Chip Support
 
 - **SA-1** (`USE_SA1=1`): Same 65816 ISA at 10.74 MHz. Shares I-RAM ($3000-$37FF) with main CPU. Per-example `sa1_boot.asm` for custom coprocessor code. See `docs/tutorials/sa1.md`.
-- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **bsnes is the reference emulator** (Mesen2 has a confirmed backward branch bug). See `.claude/SUPERFX.md`.
+- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **Validate with Mesen2** — it is the most accurate emulator currently available for GSU. **Do not use snes9x** for SuperFX validation: snes9x does not detect the GSU chip in our ROM headers (the example shows "GSU: NOT DETECTED"), so the snes9x-based CI test suite can only confirm boot, not GSU execution. P3.4 in `ROADMAP.md` tracks adding a Mesen2-headless CI path for real coverage.
 
 ### Example Makefile Pattern
 

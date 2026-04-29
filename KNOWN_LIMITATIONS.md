@@ -138,15 +138,21 @@ behaves differently, the init silently fails and the chip is half-configured.
 way, exercise it on real hardware before shipping. We track this in
 `memory/enhancement_chips_research.md`.
 
-### 🟡 SuperFX: Mesen2 has a confirmed backward-branch bug
-Mesen2 is the de-facto SNES dev emulator, but its SuperFX core mis-emulates
-backward branches in some cases — a ROM that runs correctly on real hardware
-or in bsnes can hang or render incorrectly in Mesen2.
+### 🟠 SuperFX: snes9x does not detect the GSU chip in our ROM headers
+The opensnes-emu CI test harness runs ROMs through snes9x's libretro core.
+For SuperFX examples, snes9x's chip-detection logic does not pick up the
+GSU from our ROM header configuration — the example boot path renders
+"GSU: NOT DETECTED" and the actual GSU code never runs. Visual baselines
+of those screenshots happily compare equal frame-to-frame, but the CI
+proves only "boots in snes9x", not "runs SuperFX correctly".
 
-**Mitigation:** for SuperFX work, **bsnes is the reference emulator**. The
-opensnes-emu test harness uses snes9x's libretro core which is also fine for
-SuperFX. Mesen2 is still useful for debugging — just don't trust it as the
-source of truth for SuperFX behaviour.
+**Mitigation:** validate SuperFX examples in **Mesen2**, which detects
+the GSU correctly and runs all current SuperFX examples without issue.
+P3.4 in `ROADMAP.md` tracks adding a Mesen2-headless CI path so SuperFX
+ROMs get the same end-to-end coverage as vanilla LoROM examples. (An
+earlier version of this entry blamed Mesen2 for a "backward-branch bug";
+re-validation showed the original observation conflated a snes9x mis-run
+with a Mesen2 bug. Reference behaviour was Mesen2's all along.)
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be

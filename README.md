@@ -88,7 +88,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
 | **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP register init is an assumption, not a published spec. |
-| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **bsnes is the reference emulator** — Mesen2 has a confirmed backward-branch bug. |
+| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validate with Mesen2** — most accurate GSU emulator we have currently. **snes9x does not detect the GSU chip** in our ROM headers, so the snes9x-based CI test suite cannot validate SuperFX execution end-to-end (P3.4 tracks adding a Mesen2-headless CI path). |
 
 ---
 

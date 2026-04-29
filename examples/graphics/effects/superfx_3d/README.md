@@ -8,9 +8,9 @@
 
 | Emulator | Status |
 |----------|--------|
-| **bsnes** | ✅ Recommended — cycle-accurate SuperFX emulation |
-| **Mesen2** | ✅ Works at 60 FPS with HDMA blanking |
-| **snes9x** | ❌ Does not detect GSU despite correct header |
+| **Mesen2** | ✅ Recommended — runs at 60 FPS with HDMA blanking |
+| **bsnes** | ✅ Cycle-accurate; useful as a second reference |
+| **snes9x** | ❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED" |
 
 ## Build & Run
 
@@ -19,7 +19,7 @@ cd $OPENSNES_HOME
 make -C examples/graphics/effects/superfx_3d
 ```
 
-Then open `superfx_3d.sfc` in bsnes (recommended) or Mesen2.
+Then open `superfx_3d.sfc` in Mesen2 (recommended) or bsnes.
 
 ## What You'll Learn
 
