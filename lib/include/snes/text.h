@@ -136,13 +136,6 @@ void textPrintAt(u8 x, u8 y, const char *str);
 void textPrintU16(u16 value);
 
 /**
- * @brief Print a signed integer
- *
- * @param value Number to print
- */
-void textPrintS16(s16 value);
-
-/**
  * @brief Print an unsigned integer in hexadecimal
  *
  * @param value Number to print
@@ -156,7 +149,7 @@ void textPrintHex(u16 value, u8 digits);
 void textClear(void);
 
 /**
- * @brief Clear a rectangular region
+ * @brief Clear a rectangular region (fills with spaces)
  *
  * @param x Start column
  * @param y Start row
@@ -166,17 +159,6 @@ void textClear(void);
 void textClearRect(u8 x, u8 y, u8 w, u8 h);
 
 /**
- * @brief Fill a rectangular region with a character
- *
- * @param x Start column
- * @param y Start row
- * @param w Width in tiles
- * @param h Height in tiles
- * @param c Character to fill with
- */
-void textFillRect(u8 x, u8 y, u8 w, u8 h, char c);
-
-/**
  * @brief Request tilemap DMA transfer to VRAM
  *
  * Marks the tilemap buffer as dirty. The actual transfer happens
@@ -184,18 +166,6 @@ void textFillRect(u8 x, u8 y, u8 w, u8 h, char c);
  * Call after modifying text to make changes visible.
  */
 void textFlush(void);
-
-/**
- * @brief Draw a box using box-drawing characters
- *
- * Uses ASCII characters for simple box borders.
- *
- * @param x Start column
- * @param y Start row
- * @param w Width (including border)
- * @param h Height (including border)
- */
-void textDrawBox(u8 x, u8 y, u8 w, u8 h);
 
 /**
  * @brief Initialize text display mode — one-call setup for text-based examples

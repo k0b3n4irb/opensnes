@@ -183,14 +183,6 @@ void textPrintU16(u16 value) {
     textPrint(p);
 }
 
-void textPrintS16(s16 value) {
-    if (value < 0) {
-        textPutChar('-');
-        value = -value;
-    }
-    textPrintU16((u16)value);
-}
-
 void textPrintHex(u16 value, u8 digits) {
     static const char hex_chars[] = "0123456789ABCDEF";
     char buf[5];
@@ -213,11 +205,12 @@ void textClear(void) {
     asm_textFillBuffer(entry);
 }
 
-void textClearRect(u8 x, u8 y, u8 w, u8 h) {
-    textFillRect(x, y, w, h, ' ');
-}
-
-void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
+/* Fill a rectangle with character c. Internal — only `textClearRect`
+ * uses it. Removed from the public header in chantier T.1: applications
+ * with non-trivial rectangle painting needs are better served by
+ * iterating textPrintAt themselves than by a one-purpose helper that
+ * was unused outside the lib. */
+static void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
     u8 row, col;
     u16 entry = build_tile_entry(c);
     u8 lo = entry & 0xFF;
@@ -235,35 +228,8 @@ void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
     }
 }
 
-void textDrawBox(u8 x, u8 y, u8 w, u8 h) {
-    u8 i;
-
-    /* Corners and edges using ASCII */
-    /* Using + for corners, - for horizontal, | for vertical */
-
-    /* Top edge */
-    textSetPos(x, y);
-    textPutChar('+');
-    for (i = 0; i < w - 2; i++) {
-        textPutChar('-');
-    }
-    textPutChar('+');
-
-    /* Side edges */
-    for (i = 1; i < h - 1; i++) {
-        textSetPos(x, y + i);
-        textPutChar('|');
-        textSetPos(x + w - 1, y + i);
-        textPutChar('|');
-    }
-
-    /* Bottom edge */
-    textSetPos(x, y + h - 1);
-    textPutChar('+');
-    for (i = 0; i < w - 2; i++) {
-        textPutChar('-');
-    }
-    textPutChar('+');
+void textClearRect(u8 x, u8 y, u8 w, u8 h) {
+    textFillRect(x, y, w, h, ' ');
 }
 
 void textFlush(void) {
