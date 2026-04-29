@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Design philosophy — read first
+
+Before proposing or accepting a refactor, consult **`PHILOSOPHY.md`**
+at the repo root. OpenSNES is a 2D game engine, not a thin C-over-asm
+wrapper, and five principles guide every API decision (sane defaults
+with escape hatches, hidden quirks with documented escape, opt-in
+modules, type-safe boundaries, predictable performance). Use them as
+acceptance criteria when evaluating a change. The "Non-goals" section
+of that doc is also load-bearing — it lists patterns the project
+deliberately refuses (no GC equivalent, no monolithic engine class,
+no `printf` in core lib, no mandatory framework lifecycle).
+
 ## Build Commands
 
 ```bash

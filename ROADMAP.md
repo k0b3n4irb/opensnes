@@ -2,7 +2,9 @@
 
 Current state of the project and planned work. The single source of truth for
 known traps and trade-offs is [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md);
-this file tracks **what is shipped** and **what is next**.
+the design principles every roadmap item must respect live in
+[`PHILOSOPHY.md`](PHILOSOPHY.md). This file tracks **what is shipped**
+and **what is next**.
 
 ---
 

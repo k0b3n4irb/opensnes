@@ -15,6 +15,14 @@ compiler patterns, bank $00 layout and submodule pins all hold.
 
 ### Added
 
+- **`PHILOSOPHY.md`** — design-principles document making the project's
+  positioning explicit. OpenSNES is a 2D game engine for C developers
+  who don't want to learn 65816 assembly to ship a SNES game; PVSnesLib
+  is a thin C wrapper for hardware enthusiasts. The two sit at
+  different altitudes of the same stack. Five principles guide every
+  API decision (sane defaults with escape hatches, hidden quirks with
+  documented escape, opt-in modules, type-safe boundaries, predictable
+  performance). Linked from `README.md`, `CLAUDE.md`, `ROADMAP.md`.
 - **`KNOWN_LIMITATIONS.md`** — public catalog of silent failures with
   severity tags (🔴 silent corruption / 🟠 silent build / 🟡 toolchain quirk /
   🟢 mitigated). 14 entries covering VBlank, DMA budget, WRAM port, bank $00,

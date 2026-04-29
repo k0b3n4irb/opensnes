@@ -103,6 +103,26 @@ values) — required reading before porting any function from PVSnesLib.
 | **Debug emulator** | snes9x WASM with ~390 automated checks (compiler tests + visual regression + lag detection + runtime + input sequences) |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
 
+## Design Philosophy
+
+OpenSNES is a **2D game engine** for SNES, not a thin C-over-asm wrapper.
+Five principles guide every design decision:
+
+1. **Sane defaults, escape hatches** — the 90% case is a one-liner; the
+   10% case stays possible.
+2. **Hide quirks, document the escape** — hardware traps don't reach
+   the user, but the explanation is one click away.
+3. **Modules are opt-in, never all-or-nothing** — `LIB_MODULES` selects
+   what links into your ROM.
+4. **Type-safe at the boundary** — structs and enums beat positional
+   `u16` arguments.
+5. **Predictable performance** — no hidden allocations, no lazy
+   patterns, every frame-time cost is documented.
+
+See **[PHILOSOPHY.md](PHILOSOPHY.md)** for the full statement and the
+explicit positioning vs. PVSnesLib (the two projects sit at different
+altitudes of the same stack and are complementary).
+
 ## Quick Start
 
 ```bash
