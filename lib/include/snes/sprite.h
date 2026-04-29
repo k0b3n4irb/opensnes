@@ -780,7 +780,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
     oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
     oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
@@ -806,7 +806,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetXYFast(_id, _x, _y) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
     u16 _sl = (u16)(_id) & 0x03; \
     u8 _xhi = OAM_XHI_MASK(_sl); \
