@@ -147,11 +147,18 @@ void textClear(void);
 void textClearRect(u8 x, u8 y, u8 w, u8 h);
 
 /**
- * @brief Request tilemap DMA transfer to VRAM
+ * @brief Request tilemap DMA transfer to VRAM (rarely needed).
  *
- * Marks the tilemap buffer as dirty. The actual transfer happens
- * during the next VBlank via DMA, ensuring safe VRAM access.
- * Call after modifying text to make changes visible.
+ * As of chantier T.4 every text writer (`textPutChar`, `textPrint`,
+ * `textPrintAt`, `textPrintU16`, `textPrintHex`, `textClear`,
+ * `textClearRect`) sets the dirty flag itself, so the NMI handler
+ * always flushes the tilemap on the next VBlank without an explicit
+ * call.
+ *
+ * Keep using this only when you wrote to `tilemapBuffer` directly,
+ * outside of the `text*` API — for example, if you patched a tile
+ * by hand for a custom UI element. Calling it redundantly after a
+ * regular `textPrint*` is a no-op.
  */
 void textFlush(void);
 

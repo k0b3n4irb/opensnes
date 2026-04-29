@@ -442,7 +442,6 @@ int main(void) {
     textPrintAt(6, 16, "X = Random sprite");
     textPrintAt(6, 18, "Y = Convert C64 sprite");
     textPrintAt(6, 20, "DPAD = Scroll map");
-    textFlush();
 
     /* Init 32x32 map demo */
     initDemoMap32x32();
@@ -497,7 +496,6 @@ int main(void) {
             is_map32x32 = !is_map32x32;
             if (is_map32x32) {
                 textPrintAt(6, 12, "A = Map size 32x32");
-                textFlush();
                 setScreenOff();
                 initDemoMap32x32();
                 setColor(17, RGB(31, 31, 31));
@@ -506,7 +504,6 @@ int main(void) {
                 drawSpriteFrame32x32(SPRITE_GARGOYLE);
             } else {
                 textPrintAt(6, 12, "A = Map size 64x64");
-                textFlush();
                 setScreenOff();
                 initDemoMap64x64();
                 setColor(17, RGB(31, 31, 31));
@@ -534,7 +531,6 @@ int main(void) {
                 textPrintAt(6, 14, "B = Scroll lock ON ");
             else
                 textPrintAt(6, 14, "B = Scroll lock OFF");
-            textFlush();
         }
 
         /* Random sprite placement */

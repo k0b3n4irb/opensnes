@@ -112,7 +112,7 @@ static void drawSprites(void);
  *
  * Prints the three available size combinations with a ">" cursor next to
  * the currently selected mode. The text is rendered to a BG1 tilemap buffer
- * and flushed to VRAM during the next VBlank via textFlush().
+ * and DMAed to VRAM by the NMI handler during the next VBlank.
  */
 static void drawMenu(void) {
     textClearRect(3, 2, 28, 4);
@@ -248,7 +248,6 @@ int main(void) {
 
     drawMenu();
     drawSprites();
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 
@@ -273,7 +272,6 @@ int main(void) {
 
         drawSprites();
         WaitForVBlank();
-        textFlush();
     }
 
     return 0;

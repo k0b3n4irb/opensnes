@@ -59,7 +59,6 @@ int main(void) {
     textPrintAt(7, 11, "L/R - COWBELL");
     textPrintAt(7, 12, "LEFT/RIGHT - PITCH");
     textPrintAt(7, 15, "PITCH: NORMAL   ");
-    textFlush();
     WaitForVBlank();
 
     /* Initialize SNESMOD */
@@ -95,7 +94,6 @@ int main(void) {
                     pitch = SNESMOD_PITCH_NORMAL;
                     textPrintAt(7, 15, "PITCH: NORMAL   ");
                 }
-                textFlush();
             }
         }
         if (pad & KEY_RIGHT) {
@@ -108,7 +106,6 @@ int main(void) {
                     pitch = SNESMOD_PITCH_HIGH;
                     textPrintAt(7, 15, "PITCH: HIGH     ");
                 }
-                textFlush();
             }
         }
 

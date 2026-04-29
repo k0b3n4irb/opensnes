@@ -52,7 +52,6 @@ int main(void) {
     textPrintAt(6, 5, "USE PAD TO SEE VALUE");
 
     /* Screen on (all VRAM ready) */
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 
@@ -90,7 +89,6 @@ int main(void) {
         else
             textPrintAt(9, 10, "               ");
 
-        textFlush();
     }
 
     return 0;

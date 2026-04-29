@@ -52,7 +52,6 @@ int main(void) {
     textPrintAt(7, 10, "L/R - VOLUME DOWN/UP");
     textPrintAt(7, 11, "START - FADE OUT");
     textPrintAt(5, 14, "NOW PLAYING: POLLEN8");
-    textFlush();
     WaitForVBlank();
 
     /* Initialize SNESMOD */

@@ -122,7 +122,6 @@ void drawText(void) {
     else
         textPrintAt(3, 5, "  Small: 16 - Large: 32");
 
-    textFlush();
 }
 
 /**

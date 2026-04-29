@@ -174,7 +174,6 @@ int main(void) {
     fire_armed = 0;
     textPrintAt(7, 25, "Connect SuperScope");
     textPrintAt(11, 26, "to Port 2");
-    textFlush();
 
     WaitForVBlank();
     setScreenOn();
@@ -233,7 +232,6 @@ int main(void) {
             break;
         }
 
-        textFlush();
     }
 
     return 0;

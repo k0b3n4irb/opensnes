@@ -97,7 +97,6 @@ int main(void) {
         textPrintAt(2, 5, "No mouse detected.");
         textPrintAt(2, 7, "Connect SNES mouse");
         textPrintAt(2, 8, "to port 1 and reset.");
-        textFlush();
         setScreenOn();
         while (1) {
             WaitForVBlank();
@@ -108,7 +107,6 @@ int main(void) {
     textPrintAt(2, 6, "L-click:");
     textPrintAt(2, 7, "R-click:");
     textPrintAt(2, 9, "Sens:");
-    textFlush();
 
     /* Load cursor sprite tiles to VRAM.
      * A 16x16 sprite uses tiles 0,1 (top) and 16,17 (bottom) in the
@@ -194,7 +192,6 @@ int main(void) {
             else if (s == 1) textPrintAt(8, 9, sens_med);
             else textPrintAt(8, 9, sens_hi);
         }
-        textFlush();
     }
 
     return 0;

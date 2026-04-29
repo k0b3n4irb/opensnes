@@ -95,7 +95,7 @@ u16 selectedItem;
  * @brief Draw the selection cursor next to the currently selected menu item.
  *
  * Places a ">" character at the selected row and a space at all others.
- * textFlush() queues the tilemap update for DMA during the next VBlank.
+ * The tilemap is auto-flushed by the NMI handler during the next VBlank.
  */
 static void drawCursor(void) {
     u8 i;
@@ -106,7 +106,6 @@ static void drawCursor(void) {
             textPrintAt(3, 3 + i, " ");
         }
     }
-    textFlush();
 }
 
 /**

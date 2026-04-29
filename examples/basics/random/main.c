@@ -56,7 +56,6 @@ int main(void) {
     current_value = rand();
 
     /* Step 6: Screen on (all VRAM ready) */
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 
@@ -89,7 +88,6 @@ int main(void) {
         textPrintU16(current_value);
         textPrint("      ");
 
-        textFlush();
     }
 
     return 0;

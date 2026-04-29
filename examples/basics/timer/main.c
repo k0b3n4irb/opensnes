@@ -15,7 +15,7 @@
  *
  * @par SNES Concepts
  * - VBlank frame counter (frame_count from crt0.asm, incremented by NMI)
- * - Text module for real-time number display (textPrintU16 + textFlush)
+ * - Text module for real-time number display (textPrintU16; NMI auto-flushes)
  * - WaitForVBlank synchronization (main loop runs at exactly 60/50 fps)
  * - Mode 0 with 2bpp font for text output
  *
@@ -45,7 +45,6 @@ int main(void) {
     textPrintAt(9, 8, "VBLANK COUNTER");
 
     /* Step 6: Screen enable */
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 
@@ -63,7 +62,6 @@ int main(void) {
         textPrintU16(frame_count);
         textPrint("   ");
         textPrintAt(7, 14, "PRESS A TO RESET");
-        textFlush();
     }
 
     return 0;

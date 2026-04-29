@@ -140,6 +140,13 @@ void textPutChar(char c) {
         cursor_x = 0;
         cursor_y++;
     }
+
+    /* Auto-flush: NMI handler will DMA the tilemap during the next
+     * VBlank. Removes the "you must call textFlush" footgun. The flag
+     * is a single byte; setting it on every glyph is essentially free
+     * (NMI does at most one tilemap DMA per frame regardless of how
+     * many text writes piled the flag back to 1). */
+    tilemap_update_flag = 1;
 }
 
 void textPrint(const char *str) {
@@ -195,6 +202,7 @@ void textClear(void) {
     u16 entry = build_tile_entry(' ');
     /* Assembly fill loop — ~14000 cycles vs ~238000 from compiled C */
     asm_textFillBuffer(entry);
+    tilemap_update_flag = 1;   /* auto-flush */
 }
 
 /* Fill a rectangle with character c. Internal — only `textClearRect`
@@ -218,6 +226,8 @@ static void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
             row_offset += 2;
         }
     }
+
+    tilemap_update_flag = 1;   /* auto-flush */
 }
 
 void textClearRect(u8 x, u8 y, u8 w, u8 h) {

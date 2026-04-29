@@ -44,7 +44,6 @@ int main(void) {
     textPrintAt(5, 9, "X - PAUSE/RESUME");
     textPrintAt(5, 12, "NOW PLAYING:");
     textPrintAt(5, 13, "WHAT IS LOVE (210KB IT)");
-    textFlush();
     WaitForVBlank();
 
     snesmodInit();
