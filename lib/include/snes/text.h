@@ -92,18 +92,6 @@ void textLoadFont4bpp(u16 vram_addr);
 void textSetPos(u8 x, u8 y);
 
 /**
- * @brief Get current cursor X position
- * @return Current column
- */
-u8 textGetX(void);
-
-/**
- * @brief Get current cursor Y position
- * @return Current row
- */
-u8 textGetY(void);
-
-/**
  * @brief Print a single character at cursor position
  *
  * Advances cursor. Handles newlines.

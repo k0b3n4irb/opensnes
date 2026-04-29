@@ -117,14 +117,6 @@ void textSetPos(u8 x, u8 y) {
     cursor_y = y;
 }
 
-u8 textGetX(void) {
-    return cursor_x;
-}
-
-u8 textGetY(void) {
-    return cursor_y;
-}
-
 void textPutChar(char c) {
     /* Handle newline */
     if (c == '\n') {
