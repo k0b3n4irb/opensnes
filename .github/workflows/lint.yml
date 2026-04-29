@@ -34,11 +34,16 @@ jobs:
             echo "range=${BASE}..${HEAD}" >> "$GITHUB_OUTPUT"
           else
             # On push, check commits in this push (before..after).
-            # github.event.before may be all-zeros on a new branch — fall back to
-            # comparing against origin/main, which catches everything that's
-            # newly landing.
+            # github.event.before may be all-zeros on a new branch, OR it may
+            # point to a now-dangling commit after a force-push (the old tip
+            # is no longer reachable from the new tip and was not fetched by
+            # actions/checkout). In both cases, fall back to comparing against
+            # origin/main, which catches everything that's newly landing on
+            # this branch.
             BEFORE="${{ github.event.before }}"
-            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
+            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+                 || [ -z "$BEFORE" ] \
+                 || ! git rev-parse --verify --quiet "${BEFORE}^{commit}" >/dev/null; then
               echo "range=origin/main..HEAD" >> "$GITHUB_OUTPUT"
             else
               echo "range=${BEFORE}..HEAD" >> "$GITHUB_OUTPUT"
