@@ -236,7 +236,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y build-essential clang cmake make git python3 zip
+          # xvfb provides a virtual X server so the Avalonia-based Mesen2
+          # binary can run on this headless ubuntu-latest runner. Without
+          # it Mesen2 SIGABRTs during GUI subsystem init, even with
+          # --testrunner. The test/phases/visual-mesen2.mjs phase auto-
+          # wraps Mesen2 in `xvfb-run -a` when $DISPLAY is missing.
+          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb
 
       - name: Check out OpenSNES (with submodules)
         uses: actions/checkout@v4
@@ -289,6 +294,16 @@ jobs:
         # version.
         working-directory: tools/opensnes-emu
         run: ./scripts/install-mesen2.sh
+
+      - name: Bootstrap Mesen2 config (skip first-run wizard)
+        # Mesen2's Program.Main shows an Avalonia setup wizard when no
+        # settings.json exists, BEFORE checking the --testrunner flag.
+        # On a headless CI runner that wizard hangs forever waiting for
+        # input. Pre-creating a minimal valid config triggers Mesen's
+        # CreateConfig() fallback and skips the wizard entirely.
+        run: |
+          mkdir -p ~/.config/Mesen2
+          printf '%s\n' '{"Version":"2.1.1","ConfigUpgrade":5}' > ~/.config/Mesen2/settings.json
 
       - name: Run test suite
         working-directory: tools/opensnes-emu
