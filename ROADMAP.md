@@ -226,14 +226,18 @@ This stretch focused on closing process gaps surfaced by an internal audit
       C and ASM implementations of `sprite` and `text`. Benchmark each,
       decide migration vs documentation, eliminate duplications. Largest
       remaining cleanup item (2–3 weeks, perf-critical so risk is real).
-- [ ] **SuperFX / SA-1 functional tests** (P3.4) — opensnes-emu uses
-      snes9x, which does not detect the GSU chip in our SuperFX ROM
-      headers (the example boot path lands on "GSU: NOT DETECTED"), so
-      the CI never actually runs SuperFX code. Mesen2 is the most
-      accurate emulator we have today — current SuperFX/SA-1 examples
-      run correctly there. Integrate a **Mesen2-headless** test path so
-      chip-using examples get CI coverage equivalent to vanilla LoROM.
-      (~2 weeks.)
+- [x] **SuperFX / SA-1 functional tests** (P3.4) — added a Mesen2-headless
+      visual regression phase
+      (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) running the
+      vendored Mesen2 binary in `--testrunner` mode against the four
+      chip-using examples. snes9x's libretro core does not detect the
+      GSU chip in OpenSNES' SuperFX ROM headers, so the snes9x-based
+      visual phase only validates "boots without crashing" for chip
+      ROMs; Mesen2 actually executes the chip code and gives a
+      meaningful baseline. The phase auto-skips when the binary is
+      absent (`scripts/install-mesen2.sh` fetches it once per CI run,
+      cached locally). 4 new checks, total 257 → 261. Done in
+      ~1 day rather than the originally estimated 2 weeks.
 - [ ] **Tail call optimisation in QBE w65816** — backend hooks exist
       upstream but the emit pass isn't wired. Would close 3 of the 5
       known-bug compiler tests. Effort uncertain; tracked.

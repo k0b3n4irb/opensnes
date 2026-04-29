@@ -280,6 +280,16 @@ jobs:
         working-directory: tools/opensnes-emu
         run: npm ci
 
+      - name: Install Mesen2 binary (chip-ROM coverage)
+        # snes9x doesn't detect the GSU chip in OpenSNES SuperFX ROM
+        # headers, so the snes9x-based visual phase only validates "boots
+        # without crashing" for chip ROMs. The Mesen2 phase fills the gap.
+        # The install script downloads ~15 MB once per CI run (no cache);
+        # short-circuits if vendor/Mesen already matches the requested
+        # version.
+        working-directory: tools/opensnes-emu
+        run: ./scripts/install-mesen2.sh
+
       - name: Run test suite
         working-directory: tools/opensnes-emu
         # Full suite (drops --quick so compiler tests run too).
