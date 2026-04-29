@@ -74,6 +74,13 @@
     ; pay nothing. oamInitDynamicSprite repoints it at oamDynamicNmiFlush
     ; which calls oamInitDynamicSpriteEndFrame + oamVramQueueUpdate.
     dynamic_flush_hook dsb 4
+    ; Init-time queue drain flag. When non-zero, oamDynamicNmiFlush skips the
+    ; end-frame "hide stale sprites" step and only flushes the VRAM tile
+    ; queue — used by oamDynamicDrainQueue to drain a >7-entry init queue
+    ; across multiple VBlanks without the end-frame logic concluding that
+    ; just-drawn sprites need hiding (see memory note on the 0/old-counter
+    ; race that broke B.5 the first time around).
+    oam_dynamic_draining dsb 1
 .ENDS
 
 ;------------------------------------------------------------------------------

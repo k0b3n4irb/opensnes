@@ -73,8 +73,9 @@ oamDynamicDraw(0);   /* Queue sprite 0; NMI auto-flushes the VRAM tile
 
 The draw call runs every frame in the main loop. Only sprites with
 `oamrefresh = 1` actually trigger a DMA transfer. The NMI handler
-finalises the frame (`oamInitDynamicSpriteEndFrame` + `oamVramQueueUpdate`
-equivalent) automatically — no manual flush needed.
+finalises the frame automatically — it hides leftover sprites, resets
+the slot allocator, and DMAs the queued tiles to VRAM — so user code
+never needs to issue a manual flush.
 
 ### 4. Animate by changing frame IDs
 
@@ -86,7 +87,7 @@ oambuffer[0].oamrefresh = 1;
 ```
 
 Every 8 frames, the animation advances. Setting `oamrefresh = 1` tells the engine
-to upload the new frame's tiles to VRAM on the next `oamVramQueueUpdate()` call.
+to upload the new frame's tiles to VRAM on the next VBlank.
 
 ## SNES Concepts
 

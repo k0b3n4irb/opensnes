@@ -24,9 +24,21 @@
  * struct-based init and the size-aware dispatcher. */
 extern void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
                                  u16 oamsp0init, u16 oamsp1init, u8 oamsize);
+extern void oamInitDynamicSpriteEndFrame(void);
 extern void oamDynamic8Draw(u16 id);
 extern void oamDynamic16Draw(u16 id);
 extern void oamDynamic32Draw(u16 id);
+
+/* Counter of bytes currently in the VRAM tile upload queue (declared in
+ * templates/crt0.asm). Each queued entry is 6 bytes. The NMI auto-flush
+ * hook drains up to MAXSPRTRF=42 (= 7 entries) per VBlank. */
+extern volatile u16 oamqueuenumber;
+
+/* Init-time queue drain flag (declared in templates/crt0.asm). When
+ * non-zero, oamDynamicNmiFlush skips end-of-frame "hide stale sprites"
+ * to let oamDynamicDrainQueue wait for queue empty without erasing the
+ * very sprites the application just queued. */
+extern u8 oam_dynamic_draining;
 
 /**
  * Global dynamic-sprite size pair (0..5, OBJ_SIZE_*).
@@ -85,6 +97,28 @@ void oamDynamicInit(const OamDynamicConfig *cfg) {
 void oamDynamicSetSize(u16 id, u8 size) {
     if (id >= MAX_SPRITES) return;
     oam_dyn_sprite_size[id] = size;
+}
+
+void oamDynamicDrainQueue(void) {
+    /* Tell the NMI auto-flush hook to skip the end-of-frame hide step
+     * for the duration of the wait — see oamDynamicNmiFlush in
+     * sprite_dynamic.asm and the comment block on oam_dynamic_draining
+     * in templates/crt0.asm for why this is needed. */
+    oam_dynamic_draining = 1;
+    while (oamqueuenumber != 0) {
+        WaitForVBlank();
+    }
+    oam_dynamic_draining = 0;
+
+    /* Run end-frame once now that the queue is fully flushed. This
+     * resets the per-frame slot allocators (oamnumberspr0/1) and
+     * snapshots oamnumberperframe into oamnumberperframeold so the
+     * NEXT main-loop draw allocates from the start of the slot pool
+     * — without it, the slot counters keep growing and subsequent
+     * sub-sprites are placed in VRAM regions that were never
+     * uploaded, producing visible garbage tiles ("window of noise"
+     * around metasprites after a configuration change). */
+    oamInitDynamicSpriteEndFrame();
 }
 
 void oamDynamicDraw(u16 id) {

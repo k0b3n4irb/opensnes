@@ -63,7 +63,7 @@ compiler patterns, bank $00 layout and submodule pins all hold.
 - **`setMainScreen()` instead of `REG_TM = ...`** in 22 examples (style
   consistency; identical bytes generated). `short` → `s16` in three more.
 - **Sprite API simplification (P3.2 chantier B)** — public sprite surface
-  collapses from 28 to 20 functions over six dichotomy steps:
+  collapses from 28 to 18 functions:
   - `oamSet`/`oamSetEx`/`oamInit*` consolidations (B.A);
   - `oamDynamicDraw(id)` size-aware dispatcher replaces
     `oamDynamic{8,16,32}Draw` (B.1+B.2);
@@ -84,7 +84,13 @@ compiler patterns, bank $00 layout and submodule pins all hold.
     from the size pair set at init (B.6 aggressive part 1);
   - simple init flushes (likemario, slopemario, dynamic_sprite)
     migrate to a single `WaitForVBlank()` that fires the auto-flush
-    hook under force blank (B.6 aggressive part 2 partial).
+    hook under force blank (B.6 aggressive part 2 partial);
+  - `oamDynamicDrainQueue()` lets the multi-VBlank init-time drain
+    happen via the same NMI auto-flush, with a draining flag that
+    inhibits the end-frame hide step during the drain — which lets
+    the legacy `oamInitDynamicSpriteEndFrame` / `oamVramQueueUpdate`
+    retire from the public header for good (B.6 aggressive part 2
+    complete).
 - **NMI handler gains a `dynamic_flush_hook` 24-bit function pointer**
   in the bank-$00 register area. Defaults to a single-`rtl` no-op
   stub; `oamInitDynamicSprite` repoints it at `oamDynamicNmiFlush`

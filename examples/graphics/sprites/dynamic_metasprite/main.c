@@ -126,11 +126,14 @@ void drawText(void) {
 }
 
 /**
- * @brief Reinitialize sprite engine and upload all tiles during force blank
+ * @brief Reinitialize sprite engine and upload all tiles during force blank.
  *
- * Uses force blank for glitch-free OBJSEL switch. Calls oamVramQueueUpdate
- * twice because config 2 queues 10 entries but the engine processes max 7
- * per call (MAXSPRTRF = 42 bytes = 7 entries).
+ * Uses force blank for a glitch-free OBJSEL switch. The current
+ * configuration can enqueue >7 entries (config 2 hits 10), and the NMI
+ * auto-flush hook drains 7 per VBlank, so `oamDynamicDrainQueue` loops
+ * `WaitForVBlank()` until the queue is empty before we release force
+ * blank. NMI suppresses the end-frame "hide stale sprites" path during
+ * the drain so the just-queued sprites are not pushed off-screen.
  */
 void changeObjSize(void) {
     WaitForVBlank();
@@ -153,11 +156,8 @@ void changeObjSize(void) {
     oambuffer[1].oamrefresh = 1;
     oambuffer[10].oamrefresh = 1;
     drawSprites();
-    oamVramQueueUpdate();
-    oamVramQueueUpdate();  /* flush remaining queue entries (>7 sprites) */
-    oamInitDynamicSpriteEndFrame();
+    oamDynamicDrainQueue();
 
-    WaitForVBlank();
     setScreenOn();
 }
 

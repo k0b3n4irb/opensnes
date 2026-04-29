@@ -602,37 +602,6 @@ typedef struct {
 void oamDynamicInit(const OamDynamicConfig *cfg);
 
 /**
- * @brief End frame processing for dynamic sprites
- *
- * Call after drawing all sprites each frame. Hides sprites that were
- * visible last frame but not drawn this frame, and resets per-frame counters.
- *
- * @code
- * // Game loop
- * while (1) {
- *     for (i = 0; i < numSprites; i++) {
- *         oamDynamic16Draw(i);
- *     }
- *     oamInitDynamicSpriteEndFrame();  // Hide unused sprites
- *     WaitForVBlank();
- *     oamVramQueueUpdate();  // Upload graphics to VRAM
- * }
- * @endcode
- */
-void oamInitDynamicSpriteEndFrame(void);
-
-/**
- * @brief Process VRAM upload queue
- *
- * Call during VBlank to upload queued sprite graphics to VRAM.
- * Transfers up to 7 sprites per frame to stay within VBlank budget.
- * If more sprites are queued, they will be transferred on subsequent frames.
- *
- * @note Must be called after WaitForVBlank() for proper timing.
- */
-void oamVramQueueUpdate(void);
-
-/**
  * @brief Override the dispatched pixel size for a dynamic sprite slot.
  *
  * Optional companion to `oamDynamicDraw`. By default each slot dispatches
@@ -662,6 +631,31 @@ void oamDynamicSetSize(u16 id, u8 size);
  * @param id Index into oambuffer array (0-127)
  */
 void oamDynamicDraw(u16 id);
+
+/**
+ * @brief Block until the dynamic-sprite VRAM tile queue is empty.
+ *
+ * Called once during init, after queueing the starting frame via
+ * `oamDynamicDraw` / `oamMetaDrawDyn`, and **before** `setScreenOn`. The
+ * NMI auto-flush hook drains up to 7 queue entries per VBlank, so init
+ * sequences that enqueue more than that (typical for metasprites with
+ * many sub-sprites) need several VBlanks to complete. This helper loops
+ * `WaitForVBlank()` until the queue is empty and tells the NMI hook to
+ * skip the end-of-frame "hide stale sprites" step during the drain so
+ * the just-drawn sprites are not pushed off-screen between waits.
+ *
+ * Safe to call only while the screen is in force blank — VRAM writes
+ * during active display are silently dropped by the PPU.
+ *
+ * @code
+ * setScreenOff();                  // force blank
+ * oamDynamicInit(&dyn);
+ * drawAllSprites();                // queues many tile uploads
+ * oamDynamicDrainQueue();          // wait until VRAM matches OAM
+ * setScreenOn();                   // first frame renders correctly
+ * @endcode
+ */
+void oamDynamicDrainQueue(void);
 
 /*============================================================================
  * Dynamic Metasprite Engine

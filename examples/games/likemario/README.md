@@ -197,13 +197,12 @@ while (1) {
     mario_update_camera();
     map_update();                        /* Stage column in RAM */
 
-    oamInitDynamicSpriteEndFrame();
-
     /* VBlank — hardware updates */
     WaitForVBlank();
     map_flush_column();                  /* Write staged column to VRAM */
     bgSetScroll(0, camera_x, 0);        /* Update scroll register */
-    oamVramQueueUpdate();               /* Upload sprite tiles */
+    /* NMI handler auto-flushes the dynamic sprite engine
+     * (end-frame + VRAM tile queue) — no manual calls needed. */
 }
 ```
 

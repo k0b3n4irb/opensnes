@@ -255,15 +255,31 @@ oamInitDynamicSprite:
 ;      not drawn this frame, reset slot counters, set oam_update_flag.
 ;   2. Flush any queued sprite tile DMAs to VRAM.
 ;
-; The two underlying routines are idempotent — if the application also
-; calls them by hand from the main loop (legacy pattern), the second run
-; is a cheap no-op.
+; The two underlying routines are idempotent for runtime use, but the
+; end-frame step compares this frame's sprite count to last frame's and
+; hides the difference. While the application is just waiting for the
+; queue to drain (oamDynamicDrainQueue), the count drops to 0 and the
+; hide path would erase the very sprites we are trying to upload — so
+; we skip it whenever oam_dynamic_draining is non-zero.
 ;==============================================================================
 
 .SECTION ".sprite_dynamic_nmi_flush" SUPERFREE
 
 oamDynamicNmiFlush:
+    php                                 ; preserve caller's P (NMI in rep #$20)
+    sep #$20
+    .ACCU 8
+    lda.l oam_dynamic_draining
+    bne _drain_only                     ; flag != 0 → skip end-frame
+    plp
+    .ACCU 16                            ; restore tracking for WLA-DX
     jsl oamInitDynamicSpriteEndFrame
+    jsl oamVramQueueUpdate
+    rtl
+
+_drain_only:
+    plp
+    .ACCU 16
     jsl oamVramQueueUpdate
     rtl
 

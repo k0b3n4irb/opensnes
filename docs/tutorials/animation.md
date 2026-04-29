@@ -224,8 +224,10 @@ For sprites with many animation frames, pre-loading all frames into VRAM wastes 
 1. All sprite frames live in ROM (the `.pic` file)
 2. The engine maintains a VRAM upload queue
 3. When `oamrefresh = 1`, the current frame's tiles are queued for DMA
-4. `oamVramQueueUpdate()` performs the actual VRAM transfer during VBlank
-5. Up to 7 sprite uploads per frame to stay within VBlank budget
+4. The NMI handler auto-flushes the queue during VBlank (no user call)
+5. Up to 7 sprite uploads per VBlank to stay within DMA budget; larger
+   one-shot batches at init use `oamDynamicDrainQueue()` to wait for
+   the queue to fully drain before `setScreenOn()`
 
 ### Initialization
 
@@ -292,8 +294,7 @@ while (1) {
 
     /* Draw sprite (updates oambuffer + OAM, queues tile DMA).
      * The NMI handler auto-flushes the queue and hides last
-     * frame's leftovers — no manual oamVramQueueUpdate /
-     * oamInitDynamicSpriteEndFrame needed in the main loop. */
+     * frame's leftovers — no manual flush calls needed. */
     oamDynamicDraw(0);
 }
 ```
