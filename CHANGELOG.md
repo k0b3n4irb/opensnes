@@ -7,6 +7,8 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-04-30
+
 Audit-driven maintenance cycle (see `~/opensnes_audit_2026-04-26.md` and
 `~/opensnes_remediation_plan_2026-04-26.md`). 19 of 23 plan items completed
 across P0-P4. The SDK is now end-to-end CI-enforced: build green no longer
@@ -14,8 +16,10 @@ just means "it compiles" — it means visual regression, lag detection, runtime,
 compiler patterns, bank $00 layout and submodule pins all hold. Adds the
 `PHILOSOPHY.md` design-principles document, completes chantiers B (sprite)
 and T (text) of P3.2 (public API surface 28 → 18 functions for sprite,
-18 → 15 for text), and lands the Mesen2-headless visual phase (P3.4) for
-real GSU/SA-1 emulation coverage on CI.
+18 → 15 for text), lands the Mesen2-headless visual phase (P3.4) for real
+GSU/SA-1 emulation coverage on CI, and ships the chantier C trilogy
+(C.1 + C.2.1 + C.2.2) of tail-call optimisations in qbe/w65816 — 18 TCO
+sites across the SDK, 4 of the 5 documented known compiler bugs cleared.
 
 ### Added
 
