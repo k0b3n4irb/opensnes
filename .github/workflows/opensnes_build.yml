@@ -241,7 +241,11 @@ jobs:
           # it Mesen2 SIGABRTs during GUI subsystem init, even with
           # --testrunner. The test/phases/visual-mesen2.mjs phase auto-
           # wraps Mesen2 in `xvfb-run -a` when $DISPLAY is missing.
-          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb
+          # libsdl2-2.0-0 is the runtime SDL2 library that Mesen2's native
+          # core (MesenCore.so) loads via dlopen at startup; without it
+          # the .NET host throws DllNotFoundException → exit 134 before
+          # any ROM is loaded.
+          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb libsdl2-2.0-0
 
       - name: Check out OpenSNES (with submodules)
         uses: actions/checkout@v4
