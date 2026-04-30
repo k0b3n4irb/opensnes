@@ -131,6 +131,20 @@ real GSU/SA-1 emulation coverage on CI.
   its visual phase only validates "boots without crashing" for those
   ROMs; Mesen2 fills the gap. Vendored `vendor/Mesen` binary +
   `scripts/install-mesen2.sh` for fresh contributor setup.
+- **TCO for trivial wrappers (chantier C.1)** — qbe/w65816 backend
+  now emits `jml callee` instead of the full `jsl + frame teardown
+  + rtl` for non-leaf functions whose every Ocall is in tail
+  position (e.g. `unsigned short call_add(a, b) { return add_u16(a, b); }`).
+  The TCO emission path was already in place; the remaining gate
+  was the conservative "non-leaf needs a frame" rule, relaxed to
+  recognise that a function with only tail Ocalls never executes
+  past a call and so cannot have temps that need across-call
+  storage. Result: 3 of the 5 known compiler-bug tests cleared
+  (plx_cleanup wrapper variants, acache_pha through pha, lazy_rep20
+  for pure tail calls); −5 cycles + −2 ROM bytes per tail call site.
+  Includes an env-gated diagnostic (`CC_TRACE_TCO=1`) that logs each
+  TCO eligibility decision — zero-cost when the env var is unset.
+  Chained tail calls (`return f(g(x))`) still need chantier C.2.
 
 ### Fixed
 
