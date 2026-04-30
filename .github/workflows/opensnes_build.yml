@@ -303,11 +303,19 @@ jobs:
         # Mesen2's Program.Main shows an Avalonia setup wizard when no
         # settings.json exists, BEFORE checking the --testrunner flag.
         # On a headless CI runner that wizard hangs forever waiting for
-        # input. Pre-creating a minimal valid config triggers Mesen's
-        # CreateConfig() fallback and skips the wizard entirely.
+        # input.
+        #
+        # A minimal `{"Version":"2.1.1","ConfigUpgrade":5}` config bypasses
+        # the wizard but the C++ MesenCore.so then crashes in InitDll
+        # with `std::bad_cast` because the per-system subsystem objects
+        # (Snes, Nes, Gameboy, ...) it expects to dynamic_cast<> are
+        # missing. Copy a fully-populated, sanitised settings.json
+        # (paths and recents wiped) from the test fixtures so all
+        # subsystem types are present and InitDll succeeds.
         run: |
           mkdir -p ~/.config/Mesen2
-          printf '%s\n' '{"Version":"2.1.1","ConfigUpgrade":5}' > ~/.config/Mesen2/settings.json
+          cp tools/opensnes-emu/test/fixtures/mesen2-config/settings.json \
+             ~/.config/Mesen2/settings.json
 
       - name: Run test suite
         working-directory: tools/opensnes-emu
