@@ -202,8 +202,8 @@ var NAVTREEINDEX0 =
 "examples_audio_snesmod_music.html":[0,11,29],
 "examples_audio_snesmod_music_hirom.html":[2],
 "examples_audio_snesmod_music_large.html":[3],
-"examples_audio_snesmod_sfx.html":[0,11,30],
 "examples_audio_snesmod_sfx.html":[0,12,31],
+"examples_audio_snesmod_sfx.html":[0,11,30],
 "examples_basics.html":[5],
 "examples_basics_collision_demo.html":[0,12,36],
 "examples_basics_collision_demo.html":[0,11,33],
@@ -224,12 +224,12 @@ var NAVTREEINDEX0 =
 "examples_by_category.html#autotoc_md290":[10,0],
 "examples_by_category.html#autotoc_md291":[10,1],
 "examples_games.html":[7],
-"examples_games_breakout.html":[0,11,34],
 "examples_games_breakout.html":[0,12,37],
+"examples_games_breakout.html":[0,11,34],
 "examples_games_likemario.html":[0,12,38],
 "examples_games_likemario.html":[0,11,35],
-"examples_games_mapandobjects.html":[0,11,36],
 "examples_games_mapandobjects.html":[0,12,39],
+"examples_games_mapandobjects.html":[0,11,36],
 "examples_games_tetris.html":[0,12,40],
 "examples_graphics.html":[11],
 "examples_graphics_backgrounds.html":[8],
@@ -248,6 +248,6 @@ var NAVTREEINDEX0 =
 "examples_graphics_backgrounds_mode5.html":[0,12,9],
 "examples_graphics_backgrounds_mode7.html":[0,11,22],
 "examples_graphics_backgrounds_mode7.html":[0,12,10],
-"examples_graphics_backgrounds_mode7_perspective.html":[0,12,11],
-"examples_graphics_backgrounds_mode7_perspective.html":[0,11,23]
+"examples_graphics_backgrounds_mode7_perspective.html":[0,11,23],
+"examples_graphics_backgrounds_mode7_perspective.html":[0,12,11]
 };

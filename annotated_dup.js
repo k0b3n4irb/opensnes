@@ -7,6 +7,7 @@ var annotated_dup =
     [ "LineClearResult", "structLineClearResult.html", "structLineClearResult" ],
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
     [ "Monster", "structMonster.html", "structMonster" ],
+    [ "OamDynamicConfig", "structOamDynamicConfig.html", "structOamDynamicConfig" ],
     [ "Player", "structPlayer.html", "structPlayer" ],
     [ "Rect", "structRect.html", "structRect" ],
     [ "SaveState", "structSaveState.html", "structSaveState" ],

@@ -17,7 +17,6 @@ var maps_2dynamic__map_2main_8c =
     [ "initDemoMap64x64", "maps_2dynamic__map_2main_8c.html#a9f6bc00b38bcfe94d921eed5e1c10c76", null ],
     [ "isBitSet", "maps_2dynamic__map_2main_8c.html#aedb12d995a2500e5959aa9174dce453a", null ],
     [ "main", "maps_2dynamic__map_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "refresh", "maps_2dynamic__map_2main_8c.html#afa81ebdd3d98a8abbca52f00f650be6b", null ],
     [ "smapClear", "maps_2dynamic__map_2main_8c.html#a3c13d72fbe5aca196252d3046d42c7fd", null ],
     [ "smapDma", "maps_2dynamic__map_2main_8c.html#a917e20f94898d50947290c35e5612d6e", null ],
     [ "c64_sprite", "maps_2dynamic__map_2main_8c.html#a2554873de5fece55bf4392ccb2a130b2", null ],

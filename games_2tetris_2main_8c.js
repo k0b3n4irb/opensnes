@@ -29,7 +29,6 @@ var games_2tetris_2main_8c =
     [ "das_left_timer", "games_2tetris_2main_8c.html#a29d8befead011f532316733640ef73a5", null ],
     [ "das_right_timer", "games_2tetris_2main_8c.html#a1a00968618829279097d7e44b8ed5edf", null ],
     [ "flash_timer", "games_2tetris_2main_8c.html#a7beb604a8de72684319bc5c99d9a64aa", null ],
-    [ "frame_count", "games_2tetris_2main_8c.html#a393cdd9777ac31290693d930c63d2a83", null ],
     [ "game_state", "games_2tetris_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6", null ],
     [ "gravity_speed", "games_2tetris_2main_8c.html#a6c0aa5033fa21e4a84e30b22d016d740", null ],
     [ "gravity_timer", "games_2tetris_2main_8c.html#a97393cc0efa4d9bad10918dec4748240", null ],

@@ -1,6 +1,5 @@
 var NAVTREEINDEX4 =
 {
-"learning_path.html#autotoc_md267":[5,1],
 "lzss_8h.html":[30,0,2,0,0,10],
 "lzss_8h.html#ae01a97bc31a2c32d3cdae197a9fbe9dc":[30,0,2,0,0,10,0],
 "lzss_8h_source.html":[30,0,2,0,0,10],
@@ -249,5 +248,6 @@ var NAVTREEINDEX4 =
 "profile_8h.html#a3f567bb59e4729e6cec85b827b3f97e0":[30,0,2,0,0,16,9],
 "profile_8h.html#a5e46903fa24e1c3b20d101e9d4bddde6":[30,0,2,0,0,16,8],
 "profile_8h.html#a7ee7d566af8cf6b15c9e1edeb53ec39c":[30,0,2,0,0,16,5],
-"profile_8h.html#a81dd9cd846c42acd27d205745856b85f":[30,0,2,0,0,16,2]
+"profile_8h.html#a81dd9cd846c42acd27d205745856b85f":[30,0,2,0,0,16,2],
+"profile_8h.html#aaa7eb1066375f80ba625e6b6f52efa00":[30,0,2,0,0,16,1]
 };

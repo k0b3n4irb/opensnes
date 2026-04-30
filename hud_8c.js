@@ -24,7 +24,6 @@ var hud_8c =
     [ "hudUpdateLines", "hud_8c.html#a3f3dd139b992cd9b6193cb0dfa4c3351", null ],
     [ "hudUpdateScore", "hud_8c.html#a7259c10a755ca12584e1eb24b069ba86", null ],
     [ "writenum_bg2", "hud_8c.html#af56014df16479f3e62ea17d3f35bfed5", null ],
-    [ "writestring_bg2", "hud_8c.html#a29620f02e27c663e24607415b5cfb2f6", null ],
     [ "writestring_bg2_attr", "hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8", null ],
     [ "bg3_msgrow", "hud_8c.html#a8d6aaaeef9536d537538355ca5ea05bf", null ],
     [ "str_level", "hud_8c.html#a8a8bb7ae741cfb4678eb60b9d9346b6c", null ],

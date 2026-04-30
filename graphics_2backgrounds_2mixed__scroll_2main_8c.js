@@ -13,6 +13,6 @@ var graphics_2backgrounds_2mixed__scroll_2main_8c =
     [ "bg2_pal_end", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#aa8d6f3ca7b338f6bcbaa3592d46b63de", null ],
     [ "bg2_tiles", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#a24f8d60414c675df5cd53cf8c97c3ca1", null ],
     [ "bg2_tiles_end", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#af5287437871d2120c617374243fe87c0", null ],
-    [ "scrX", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#a6609fd988804dfecee72a76d6e34fef9", null ],
-    [ "scrY", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#a794b43912906ed647cd45abe00f183b7", null ]
+    [ "scrX", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b", null ],
+    [ "scrY", "graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73", null ]
 ];

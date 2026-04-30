@@ -20,6 +20,5 @@ var searchData=
   ['writenum_17',['writenum',['../games_2breakout_2main_8c.html#a42f75a3892f52c5edcfbdd129fdec6a9',1,'main.c']]],
   ['writenum_5fbg2_18',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
   ['writestring_19',['writestring',['../games_2breakout_2main_8c.html#ad1545da3f0a593a3aad9c35e8dfdfd9c',1,'main.c']]],
-  ['writestring_5fbg2_20',['writestring_bg2',['../hud_8c.html#a29620f02e27c663e24607415b5cfb2f6',1,'hud.c']]],
-  ['writestring_5fbg2_5fattr_21',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
+  ['writestring_5fbg2_5fattr_20',['writestring_bg2_attr',['../hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8',1,'hud.c']]]
 ];

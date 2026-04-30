@@ -13,7 +13,7 @@ var searchData=
   ['frame1_10',['frame1',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a514500046679145273f113c61af16cd5',1,'main.c']]],
   ['frame2_11',['frame2',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a8f122651a50ccf7482b22659b3217821',1,'main.c']]],
   ['frame3_12',['frame3',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#aaf47a9315cba731325a26e9eacff5c2d',1,'main.c']]],
-  ['frame_5fcount_13',['frame_count',['../basics_2timer_2main_8c.html#a393cdd9777ac31290693d930c63d2a83',1,'frame_count:&#160;main.c'],['../games_2tetris_2main_8c.html#a393cdd9777ac31290693d930c63d2a83',1,'frame_count:&#160;main.c']]],
+  ['frame_5fcount_13',['frame_count',['../system_8h.html#a393cdd9777ac31290693d930c63d2a83',1,'system.h']]],
   ['frame_5fcounter_14',['frame_counter',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47',1,'main.c']]],
   ['frameidx_15',['frameidx',['../maps_2mapscroll_2main_8c.html#affac57a4c6f56d54fc5e576becd0a387',1,'main.c']]],
   ['fx_16',['fx',['../graphics_2effects_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0',1,'main.c']]]
