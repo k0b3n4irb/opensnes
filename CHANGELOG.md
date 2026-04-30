@@ -154,9 +154,27 @@ real GSU/SA-1 emulation coverage on CI.
   including `oamDynamicDrainQueue`, `textInit`, `run_frame` (breakout
   main loop), `stateGameOver`/`stateTitle` (tetris), `changeObjSize`
   (object_size example) and `koopatroopaupdate` (likemario AI).
-  Chained tail calls (`return f(g(x))` with non-zero outgoing args
-  on a framed function) still need chantier C.2.2 — five remaining
-  c2-candidate sites are catalogued by the same diagnostic.
+- **TCO for chained tail calls (chantier C.2.2)** — closes the
+  `return f(g(x))` pattern, where the inner call is a regular jsl
+  (its result feeds the outer arg) and the outer is a tail call.
+  The Oarg handler stores each outgoing arg to its caller-slot
+  position (offset `4 + framesize + ...` while the frame is still
+  up); the existing Ocall teardown then lifts SP back to the
+  function-entry point so the callee sees the args at canonical
+  `4`, `6`, ... offsets. Required two supporting changes:
+  count_fn_param_bytes() now falls through to a slot-walking helper
+  for non-leaf functions where Opar* has been lowered to slot
+  reads, and an alloc-safety guard declines C.2.2 on functions
+  containing any local Oalloc* (the frame teardown would invalidate
+  any pointer-to-local that escaped via the tail call — caught
+  the hard way: textPrintU16's `char buf[6]` + `textPrint(p)`
+  pattern produced a 101-pixel diff in basics/random's DEC line
+  before the guard landed). Cleared the last TCO known-bug
+  (`tail_call`'s call_chain check) and unlocked 3 more sites in
+  the lib (mouseGetX/Y, colorMathTransparency50). Test suite
+  without `--allow-known-bugs`: 397/399 → 398/399; the only
+  remaining known-bug is nonleaf_frameless's stale ASM-comment
+  marker, orthogonal to TCO.
 
 ### Fixed
 
