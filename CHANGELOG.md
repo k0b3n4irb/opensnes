@@ -7,7 +7,7 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
-## [0.14.0] - 2026-04-30
+## [0.15.0] - 2026-04-30
 
 Audit-driven maintenance cycle (see `~/opensnes_audit_2026-04-26.md` and
 `~/opensnes_remediation_plan_2026-04-26.md`). 19 of 23 plan items completed
