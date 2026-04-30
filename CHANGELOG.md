@@ -144,7 +144,19 @@ real GSU/SA-1 emulation coverage on CI.
   for pure tail calls); −5 cycles + −2 ROM bytes per tail call site.
   Includes an env-gated diagnostic (`CC_TRACE_TCO=1`) that logs each
   TCO eligibility decision — zero-cost when the env var is unset.
-  Chained tail calls (`return f(g(x))`) still need chantier C.2.
+- **TCO for framed void-tail-call wrappers (chantier C.2.1)** —
+  extends C.1 to functions that have a real frame because of an
+  earlier non-tail call, but whose final tail call takes zero
+  arguments. The Ocall handler now emits a `tsa; clc; adc.w
+  #framesize; tas` teardown immediately before the `jml` (gated on
+  `framesize > 2` to mirror the prologue's elision of phantom
+  alignment-only frames). 10 new TCO sites unlocked across the SDK,
+  including `oamDynamicDrainQueue`, `textInit`, `run_frame` (breakout
+  main loop), `stateGameOver`/`stateTitle` (tetris), `changeObjSize`
+  (object_size example) and `koopatroopaupdate` (likemario AI).
+  Chained tail calls (`return f(g(x))` with non-zero outgoing args
+  on a framed function) still need chantier C.2.2 — five remaining
+  c2-candidate sites are catalogued by the same diagnostic.
 
 ### Fixed
 
