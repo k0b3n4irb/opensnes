@@ -11,7 +11,11 @@ Audit-driven maintenance cycle (see `~/opensnes_audit_2026-04-26.md` and
 `~/opensnes_remediation_plan_2026-04-26.md`). 19 of 23 plan items completed
 across P0-P4. The SDK is now end-to-end CI-enforced: build green no longer
 just means "it compiles" — it means visual regression, lag detection, runtime,
-compiler patterns, bank $00 layout and submodule pins all hold.
+compiler patterns, bank $00 layout and submodule pins all hold. Adds the
+`PHILOSOPHY.md` design-principles document, completes chantiers B (sprite)
+and T (text) of P3.2 (public API surface 28 → 18 functions for sprite,
+18 → 15 for text), and lands the Mesen2-headless visual phase (P3.4) for
+real GSU/SA-1 emulation coverage on CI.
 
 ### Added
 
@@ -99,15 +103,45 @@ compiler patterns, bank $00 layout and submodule pins all hold.
     the legacy `oamInitDynamicSpriteEndFrame` / `oamVramQueueUpdate`
     retire from the public header for good (B.6 aggressive part 2
     complete).
+- **Text API simplification (P3.2 chantier T)** — public text surface
+  collapses from 18 to 15 functions:
+  - `textPrintS16`, `textDrawBox` retired; internal `textFillRect`
+    made `static` (T.1) — none had callers across the 53 examples
+    or the library;
+  - text writers (`textPutChar`, `textClear`, `textFillRect`)
+    auto-flush via the NMI tilemap_update_flag (T.4) — 17 examples
+    drop the manual `textFlush()` call. `textFlush()` stays public
+    as the explicit primitive for hand-rolled tilemap writers.
+- **`textGetX()` / `textGetY()` restored** — initially dropped in
+  T.2 on a "zero callers" sweep, then reintroduced after the unit
+  test fixture in opensnes-emu surfaced as a legitimate caller
+  reading cursor advancement. Two 1-line accessors are the right
+  shape for testable internal state.
 - **NMI handler gains a `dynamic_flush_hook` 24-bit function pointer**
   in the bank-$00 register area. Defaults to a single-`rtl` no-op
   stub; `oamInitDynamicSprite` repoints it at `oamDynamicNmiFlush`
   which calls `oamInitDynamicSpriteEndFrame` + `oamVramQueueUpdate`
   every VBlank. Cost for ROMs that don't use the dynamic engine: one
   PEA + JML indirect + RTL ≈ 25 cycles per frame.
+- **Mesen2-headless visual regression phase (P3.4)** — second visual
+  phase that runs the four chip-using ROMs (SuperFX 3D, SuperFX
+  Hello, SA-1 Hello, SA-1 Starfield) through Mesen2 in `--testrunner`
+  mode for real GSU/SA-1 emulation. snes9x's libretro core in
+  opensnes-emu does not detect the GSU chip in our ROM headers, so
+  its visual phase only validates "boots without crashing" for those
+  ROMs; Mesen2 fills the gap. Vendored `vendor/Mesen` binary +
+  `scripts/install-mesen2.sh` for fresh contributor setup.
 
 ### Fixed
 
+- **SNES PPU sprite Y +1 scanline quirk** — caller-passed Y was off
+  by one row from the rendered top because OAM_Y=N renders on
+  scanlines N+1..N+8. The `oamSet` ASM and `oamSetY` C path applied
+  the `-1` compensation in 87a0ae2; the macros `oamSetFast` /
+  `oamSetXYFast` were missed and silently rendered one scanline
+  lower than the equivalent `oamSet` call. Now uniform across all
+  five entry points so callers can mix the fast and slow APIs without
+  drift. `oamHide` is exempt (writes 240 directly).
 - **`lib/source/hdma.c:89`** — `sine_quarter[63] = 256` truncated to 0 in
   `u8`, leaving a 1-pixel notch at sin(90°) on every HDMA sine effect.
   Cap the table at 255.
@@ -169,6 +203,30 @@ compiler patterns, bank $00 layout and submodule pins all hold.
   release-PR merge.
 - **Lint workflow** (`lint.yml`) — runs `lint_commits.py` on every PR
   and direct push to `main`/`develop`.
+- **Lint workflow handles force-push** — after a force-push,
+  `github.event.before` points to a now-dangling commit that
+  `actions/checkout` does not fetch, so `git log ${BEFORE}..HEAD`
+  used to fail with exit code 2 (indistinguishable from a real lint
+  violation in the workflow output). Now `git rev-parse --verify`
+  the SHA first and fall back to `origin/main..HEAD` if it does
+  not resolve. The lint policy itself is unchanged.
+- **Mesen2-headless phase wired up on CI** — runs on `ubuntu-22.04`
+  (matches Mesen2's published x64-AOT build environment, avoids the
+  libstdc++ ABI mismatch that surfaces on 24.04 as `std::bad_cast`
+  in `MesenCore.so::InitDll`). Installs `xvfb` for a virtual display
+  and `libsdl2-dev` for the runtime SDL2 the native core dlopens at
+  startup. A 128 KB sanitised settings.json fixture in
+  `tools/opensnes-emu/test/fixtures/mesen2-config/` is copied to
+  `~/.config/Mesen2/` before launch — bypasses the first-run wizard
+  and provides the per-system config subtrees `MesenCore.so`
+  dynamic_cast<>s during init.
+- **`visual-mesen2.mjs` auto-wraps Mesen2 in `xvfb-run -a`** when
+  `$DISPLAY` is unset, so the same phase runs on a developer's
+  desktop and on a headless CI runner without conditional logic.
+  Failure messages now include the trailing 2 KB of Mesen2 stdout
+  / stderr, surfacing the actual failure signature (DllNotFound,
+  std::bad_cast, etc.) inline in the CI log instead of as an opaque
+  exit code.
 
 ### Testing
 
@@ -182,6 +240,20 @@ compiler patterns, bank $00 layout and submodule pins all hold.
   (1). Without `--allow-known-bugs` they still fail; with the flag
   they report `[KNOWN_BUG]` so a contributor implementing one sees
   green immediately.
+- **Mesen2 visual baselines** added for the four chip-using ROMs
+  (`graphics/effects/superfx_3d`, `memory/superfx_hello`,
+  `memory/sa1_hello`, `memory/sa1_starfield`) under
+  `tools/opensnes-emu/test/baselines/*.mesen2.bin`. Per-ROM diff
+  overrides for the two animated ones (cube rotation 2000 px,
+  starfield scroll 1500 px) absorb 1-frame timing drift between
+  machines without losing the "chip ran vs chip-NOT-DETECTED black
+  screen" signal that is the actual point of the phase.
+- **Unit fixture sync after sprite Y quirk** — 13 Y assertions in
+  the opensnes-emu `unit/sprite` fixture updated to expect the
+  `(input - 1)` convention now applied uniformly across the OAM
+  setters. Header note documents the convention so future test
+  authors see it. Phase result: `73/73 passed` (was 14 fail / 59
+  pass before the sync).
 
 ### Tooling
 
