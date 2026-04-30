@@ -62,13 +62,13 @@ int main(void) {
     /* Load the 16-color sprite palette to CGRAM address 128.
      * CGRAM 0-127 = BG palettes, 128-255 = OBJ (sprite) palettes.
      * 32 bytes = 16 colors x 2 bytes/color (15-bit BGR format). */
-    dmaCopyCGram(palsprite32, 128, 32);
+    dmaCopyCGram(palsprite32, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Configure OBJSEL ($2101):
      * - Size mode OBJ_SIZE8_L32: small=8x8, large=32x32
      * - Name base 1: tile data base at VRAM $2000 (base = slot * $2000)
      * Individual sprites choose small or large via the OAM high-table size bit. */
-    oamInitEx(OBJ_SIZE8_L32, 1);
+    oamInit(OBJ_SIZE8_L32, 1);
 
     /* Set OAM entry 0 to display the sprite:
      * - Position: (112, 96) = roughly center of 256x224 screen
@@ -77,9 +77,9 @@ int main(void) {
      * - Palette 0 (first sprite palette), priority 3 (in front of all BGs)
      * - No flip flags */
     oamSet(0, 112, 96, 0x0010, 0, 3, 0);
-    /* Set this sprite to use the LARGE size (32x32 in this OBJSEL mode) and
-     * make it visible. OBJ_SHOW clears the X high bit 8 (X >= 256 hides sprites). */
-    oamSetEx(0, OBJ_LARGE, OBJ_SHOW);
+    /* Set this sprite to use the LARGE size (32x32 in this OBJSEL mode).
+     * Visibility is controlled by Y position; oamSet above placed it on-screen. */
+    oamSetSize(0, OBJ_LARGE);
 
     /* Enable Mode 1 with only the OBJ (sprite) layer visible.
      * No background layers are enabled, so the backdrop color (CGRAM 0) fills

@@ -59,10 +59,6 @@ static void writestring_bg2_attr(const char *st, u16 pos, u16 attr) {
     bg2_dirty = 1;
 }
 
-static void writestring_bg2(const char *st, u16 pos) {
-    writestring_bg2_attr(st, pos, HUD_ATTR);
-}
-
 static void writenum_bg2(u16 num, u8 len, u16 pos) {
     u8 figure;
     pos += len - 1;

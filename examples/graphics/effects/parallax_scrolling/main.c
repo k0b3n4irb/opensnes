@@ -72,10 +72,10 @@ int main(void) {
     consoleInit();
 
     /* Load 4bpp tiles to VRAM word address $1000, palette to CGRAM slot 0.
-     * 16 * 2 * 2 = 64 bytes = 2 palettes worth (32 bytes each). */
+     * 2 * PALETTE_16_SIZE = 64 bytes = 2 palettes. */
     bgInitTileSet(0, tiles, palette, 0,
                   tiles_end - tiles,
-                  16 * 2 * 2,
+                  2 * PALETTE_16_SIZE,
                   BG_16COLORS, 0x1000);
 
     /* Load 64x32 tilemap to VRAM $0000.
@@ -85,7 +85,7 @@ int main(void) {
     dmaCopyVram(tilemap, 0x0000, 64 * 32 * 2);
 
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1;  /**< Enable only BG1 on the main screen */
+    setMainScreen(TM_BG1);  /**< Enable only BG1 on the main screen */
     setScreenOn();
 
     /* Build the initial HDMA scroll table with three zones.

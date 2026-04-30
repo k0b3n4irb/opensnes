@@ -91,7 +91,6 @@ int main(void) {
     textPrintAt(3, 7, "USE B TO READ Slot1");
     textPrintAt(3, 9, "USE X TO WRITE Slot2");
     textPrintAt(3, 11, "USE Y TO READ Slot2");
-    textFlush();
 
     WaitForVBlank();
     setScreenOn();
@@ -147,7 +146,6 @@ int main(void) {
             textPrintHex(vtl.posY, 4);
         }
 
-        textFlush();
         WaitForVBlank();
     }
 

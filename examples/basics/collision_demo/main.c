@@ -118,32 +118,31 @@ static u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
  *============================================================================*/
 
 /**
- * @brief Player sprite tile (8x8, 4bpp = 32 bytes)
+ * @brief Player sprite tile (8x8, 4bpp = 32 bytes) — TRON-style wireframe
  *
- * A solid filled square using palette color 1 (white). In 4bpp format,
- * each tile is 32 bytes: bitplanes 0-1 interleaved (16 bytes), then
- * bitplanes 2-3 interleaved (16 bytes). Only bitplane 0 is set (0xFF),
- * so every pixel maps to color index 1.
+ * A 1-pixel outlined square in palette color 1 (white). Top/bottom rows
+ * fully lit (0xFF), middle rows light only the left/right edges (0x81 =
+ * b10000001). 4bpp format: 8 rows of [bp0 bp1], then 8 rows of [bp2 bp3].
  */
 static const u8 player_tile[] = {
-    /* Bitplanes 0,1: bp0=1,bp1=0 → color 1 */
-    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
-    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
+    /* Bitplanes 0,1: outlined square in color 1 */
+    0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
+    0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
     /* Bitplanes 2,3: all zero */
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 };
 
 /**
- * @brief Enemy sprite tile (8x8, 4bpp = 32 bytes)
+ * @brief Enemy sprite tile (8x8, 4bpp = 32 bytes) — TRON-style wireframe
  *
- * A solid filled square using palette color 2 (red). Only bitplane 1 is
- * set (0xFF per row), so every pixel maps to color index 2.
+ * A 1-pixel outlined square in palette color 2 (red). Same outline pattern
+ * as the player tile but on bitplane 1 instead of bitplane 0.
  */
 static const u8 enemy_tile[] = {
-    /* Bitplanes 0,1: bp0=0,bp1=1 → color 2 */
-    0x00,0xFF, 0x00,0xFF, 0x00,0xFF, 0x00,0xFF,
-    0x00,0xFF, 0x00,0xFF, 0x00,0xFF, 0x00,0xFF,
+    /* Bitplanes 0,1: outlined square in color 2 */
+    0x00,0xFF, 0x00,0x81, 0x00,0x81, 0x00,0x81,
+    0x00,0x81, 0x00,0x81, 0x00,0x81, 0x00,0xFF,
     /* Bitplanes 2,3: all zero */
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
     0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
@@ -158,7 +157,7 @@ static const u8 enemy_tile[] = {
  * collision_map[] array.
  */
 static const u8 wall_tile[] = {
-    /* bp0=1,bp1=0 → color 1 for border, color 0 for interior */
+    /* TRON-style 1-pixel outline: top/bottom rows full, middle rows edges only */
     0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
     0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
 };
@@ -238,8 +237,8 @@ static void load_graphics(void) {
     dmaCopyVram((u8 *)enemy_tile, 0x4010, 32);
 
     /* Load palettes via DMA */
-    dmaCopyCGram((u8 *)sprite_palette, 128, 32);
-    dmaCopyCGram((u8 *)collision_palette, 144, 32);
+    dmaCopyCGram((u8 *)sprite_palette, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram((u8 *)collision_palette, OBJ_CGRAM_PAL(1), PALETTE_16_SIZE);
     dmaCopyCGram((u8 *)bg_palette, 0, 4);
 }
 
@@ -258,7 +257,6 @@ static void draw_tilemap(void) {
     u8 tx, ty;
     u16 addr;
     u8 tile;
-    u16 i;
 
     REG_VMAIN = 0x80;
 
@@ -299,19 +297,21 @@ static void update_sprites(void) {
     u8 palette;
     u16 offset;
 
-    /* Player sprite (ID 0) - green if colliding, white if not */
+    /* SNES PPU +1 scanline sprite quirk: write Y-1 so caller's Y matches
+     * the rendered top scanline. Required when bypassing oamSet (which
+     * compensates internally). See docs/hardware/OAM.md. */
     palette = (collision_flags != 0) ? 1 : 0;
     oamMemory[0] = (u8)player_x;
-    oamMemory[1] = (u8)player_y;
+    oamMemory[1] = (u8)(player_y - 1);
     oamMemory[2] = 0;  /* tile 0 */
     oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
 
-    /* Enemy sprites (IDs 1-4) */
+    /* Enemy sprites (IDs 1-4) - same -1 compensation */
     for (i = 0; i < NUM_ENEMIES; i++) {
         offset = (i + 1) << 2;
         palette = (collision_flags & (1 << i)) ? 1 : 0;
         oamMemory[offset] = (u8)enemy_x[i];
-        oamMemory[offset + 1] = (u8)enemy_y[i];
+        oamMemory[offset + 1] = (u8)(enemy_y[i] - 1);
         oamMemory[offset + 2] = 1;  /* tile 1 */
         oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
     }
@@ -408,7 +408,7 @@ int main(void) {
     /* Initialize */
     consoleInit();
     setMode(BG_MODE0, 0);
-    oamInit();
+    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
     /* Load graphics */
     load_graphics();
@@ -419,7 +419,7 @@ int main(void) {
     /* Configure BG1 */
     bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
     bgSetGfxPtr(0, 0x0000);
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Object settings */
     REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);

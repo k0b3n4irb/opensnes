@@ -32,24 +32,33 @@ typedef struct {
 extern TextConfig text_config;
 
 /**
- * @brief Initialize text system with default configuration
+ * @brief Default tilemap byte address — 32×32 tilemap at VRAM byte $7000.
  *
- * Sets up text_config with reasonable defaults:
- * - Tilemap at $7000 (BG3 default)
- * - Font starting at tile 0
- * - Palette 0, no priority
- * - 32-tile wide tilemap
+ * Convenience constant for the most common text setup (BG3 in Mode 0/1
+ * with text drawn at the standard tile-map slot). Pass to textInit() if
+ * you don't have a project-specific layout. textInit() expects a *byte*
+ * VRAM address — the value $7000 is what you'd read off a VRAM map.
  */
-void textInit(void);
+#define TEXT_DEFAULT_TILEMAP_ADDR  0x7000
+/** @brief Default first font tile (zero — font occupies tiles 0-95). */
+#define TEXT_DEFAULT_FONT_TILE     0
+/** @brief Default palette slot (palette 0). */
+#define TEXT_DEFAULT_PALETTE       0
 
 /**
- * @brief Initialize text system with custom configuration
+ * @brief Initialize the text rendering system.
  *
- * @param tilemap_addr VRAM word address for tilemap
- * @param font_tile First tile number of font
- * @param palette Palette number (0-7)
+ * Configures the tilemap address, the first font tile, and the palette
+ * slot used for text glyphs. Replaces the v1 textInit/textInitEx pair —
+ * pass TEXT_DEFAULT_* constants for the previous textInit(void) defaults.
+ *
+ * @param tilemap_addr VRAM **byte** address for the tilemap
+ *                     (use TEXT_DEFAULT_TILEMAP_ADDR for the standard $7000)
+ * @param font_tile    Tile number of the first font glyph in VRAM
+ *                     (use TEXT_DEFAULT_FONT_TILE for tile 0)
+ * @param palette      Palette slot 0-7 (use TEXT_DEFAULT_PALETTE for 0)
  */
-void textInitEx(u16 tilemap_addr, u16 font_tile, u8 palette);
+void textInit(u16 tilemap_addr, u16 font_tile, u8 palette);
 
 /**
  * @brief Load font tiles to VRAM
@@ -127,13 +136,6 @@ void textPrintAt(u8 x, u8 y, const char *str);
 void textPrintU16(u16 value);
 
 /**
- * @brief Print a signed integer
- *
- * @param value Number to print
- */
-void textPrintS16(s16 value);
-
-/**
  * @brief Print an unsigned integer in hexadecimal
  *
  * @param value Number to print
@@ -147,7 +149,7 @@ void textPrintHex(u16 value, u8 digits);
 void textClear(void);
 
 /**
- * @brief Clear a rectangular region
+ * @brief Clear a rectangular region (fills with spaces)
  *
  * @param x Start column
  * @param y Start row
@@ -157,36 +159,20 @@ void textClear(void);
 void textClearRect(u8 x, u8 y, u8 w, u8 h);
 
 /**
- * @brief Fill a rectangular region with a character
+ * @brief Request tilemap DMA transfer to VRAM (rarely needed).
  *
- * @param x Start column
- * @param y Start row
- * @param w Width in tiles
- * @param h Height in tiles
- * @param c Character to fill with
- */
-void textFillRect(u8 x, u8 y, u8 w, u8 h, char c);
-
-/**
- * @brief Request tilemap DMA transfer to VRAM
+ * As of chantier T.4 every text writer (`textPutChar`, `textPrint`,
+ * `textPrintAt`, `textPrintU16`, `textPrintHex`, `textClear`,
+ * `textClearRect`) sets the dirty flag itself, so the NMI handler
+ * always flushes the tilemap on the next VBlank without an explicit
+ * call.
  *
- * Marks the tilemap buffer as dirty. The actual transfer happens
- * during the next VBlank via DMA, ensuring safe VRAM access.
- * Call after modifying text to make changes visible.
+ * Keep using this only when you wrote to `tilemapBuffer` directly,
+ * outside of the `text*` API — for example, if you patched a tile
+ * by hand for a custom UI element. Calling it redundantly after a
+ * regular `textPrint*` is a no-op.
  */
 void textFlush(void);
-
-/**
- * @brief Draw a box using box-drawing characters
- *
- * Uses ASCII characters for simple box borders.
- *
- * @param x Start column
- * @param y Start row
- * @param w Width (including border)
- * @param h Height (including border)
- */
-void textDrawBox(u8 x, u8 y, u8 w, u8 h);
 
 /**
  * @brief Initialize text display mode — one-call setup for text-based examples
@@ -203,7 +189,7 @@ void textDrawBox(u8 x, u8 y, u8 w, u8 h);
  * setMode(BG_MODE0, 0);
  * setColor(0, 0x0000);
  * setColor(1, RGB(31, 31, 31));
- * textInit();
+ * textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
  * textLoadFont(0x0000);
  * bgSetGfxPtr(0, 0x0000);
  * bgSetMapPtr(0, 0x3800, BG_MAP_32x32);

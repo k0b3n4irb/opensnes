@@ -31,7 +31,7 @@
 .EQU OBJ_SPRITE16           2           ; 16x16 sprite identifier
 .EQU OBJ_SPRITE8            4           ; 8x8 sprite identifier
 
-.EQU OBJ_SIZE16_L32         $60         ; (3<<5) 16x16 small, 32x32 large
+.EQU OBJ_SIZE16_L32         3           ; Size index (matches C header), NOT register value
 .EQU OBJ_QUEUELIST_SIZE     128         ; Max queue entries
 .EQU MAXSPRTRF              42          ; 7 sprites * 6 bytes per entry
 
@@ -190,31 +190,97 @@ oamInitDynamicSprite:
     sta.w oamnumberspr1
     sta.w oamnumberspr1Init
 
+    ; Initialize OAM (clear all sprites) - must do BEFORE setting OBJSEL
+    ; because OpenSNES's oamInit resets OBJSEL
+    jsl oamInit
+
     ; Set 16x16 sprite VRAM address based on size configuration
+    ; MUST be AFTER oamInit — oamInit's C code may clobber spr16addrgfx
+    rep #$20
     lda.w spr1addrgfx                 ; Default: small sprites use spr1 address
     sta.w spr16addrgfx
     sep #$20
+    .ACCU 8
     lda 10,s                        ; oamsize (arg5)
     cmp #OBJ_SIZE16_L32
     beq +
     rep #$20
+    .ACCU 16
     lda.w spr0addrgfx                 ; If not 16/32 mode, use spr0 address
     sta.w spr16addrgfx
-
-+:  ; Initialize OAM (clear all sprites) - must do BEFORE setting OBJSEL
-    ; because OpenSNES's oamInit resets OBJSEL
-    rep #$20
-    jsl oamInit
++:
 
     ; Configure OBJSEL register AFTER oamInit (OpenSNES's oamInit overwrites it)
+    ; Callers pass size index (0-5), convert to register bits 7-5
     sep #$20
-    lda 10,s                        ; oamsize (arg5)
+    .ACCU 8
+    lda 10,s                        ; oamsize index (0-5)
+    sta.l oam_dynamic_size_mode     ; remember mode for oamDynamicDraw dispatch
+    asl a                           ; index << 5 → OBJSEL size bits (= OBJ_SIZE_TO_REG)
+    asl a
+    asl a
+    asl a
+    asl a
     sta.l $2101                     ; REG_OBJSEL
+
+    ; Register oamDynamicNmiFlush with the NMI handler. From this point on,
+    ; the VBlank ISR will call our flush automatically and the application
+    ; never needs to invoke oamInitDynamicSpriteEndFrame / oamVramQueueUpdate
+    ; by hand. Idempotent: re-init just rewrites the same address.
+    rep #$20
+    .ACCU 16
+    lda #oamDynamicNmiFlush
+    sta.l dynamic_flush_hook
+    sep #$20
+    .ACCU 8
+    lda #:oamDynamicNmiFlush
+    sta.l dynamic_flush_hook+2
 
     ply
     plx
     plb
     plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; oamDynamicNmiFlush
+;==============================================================================
+; void oamDynamicNmiFlush(void)
+;
+; Indirect-long-callable target for the NMI handler's dynamic_flush_hook.
+; Called once per VBlank (after the engine is initialized) to:
+;   1. End-of-frame housekeeping: hide sprites from last frame that were
+;      not drawn this frame, reset slot counters, set oam_update_flag.
+;   2. Flush any queued sprite tile DMAs to VRAM.
+;
+; The two underlying routines are idempotent for runtime use, but the
+; end-frame step compares this frame's sprite count to last frame's and
+; hides the difference. While the application is just waiting for the
+; queue to drain (oamDynamicDrainQueue), the count drops to 0 and the
+; hide path would erase the very sprites we are trying to upload — so
+; we skip it whenever oam_dynamic_draining is non-zero.
+;==============================================================================
+
+.SECTION ".sprite_dynamic_nmi_flush" SUPERFREE
+
+oamDynamicNmiFlush:
+    php                                 ; preserve caller's P (NMI in rep #$20)
+    sep #$20
+    .ACCU 8
+    lda.l oam_dynamic_draining
+    bne _drain_only                     ; flag != 0 → skip end-frame
+    plp
+    .ACCU 16                            ; restore tracking for WLA-DX
+    jsl oamInitDynamicSpriteEndFrame
+    jsl oamVramQueueUpdate
+    rtl
+
+_drain_only:
+    plp
+    .ACCU 16
+    jsl oamVramQueueUpdate
     rtl
 
 .ENDS

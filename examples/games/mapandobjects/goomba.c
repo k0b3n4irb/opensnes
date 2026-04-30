@@ -39,7 +39,7 @@ void goombainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[nbobjects].oamy = yp;
     oambuffer[nbobjects].oamframeid = 0;
     oambuffer[nbobjects].oamrefresh = 1;
-    oambuffer[nbobjects].oamattribute = 0x20 | (0 << 1);
+    oambuffer[nbobjects].oamattribute = OBJ_PRIO(2);
     OAM_SET_GFX(nbobjects, &sprgoomba);
     nbobjects++;
 }
@@ -82,5 +82,5 @@ void goombaupdate(u16 idx) {
     goombax = goombax - x_pos;
     oambuffer[goombanum].oamx = goombax;
     oambuffer[goombanum].oamy = goombay;
-    oamDynamic16Draw(goombanum);
+    oamDynamicDraw(goombanum);
 }

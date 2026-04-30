@@ -33,13 +33,20 @@ Then open `dynamic_sprite.sfc` in your emulator (Mesen2 recommended).
 ### 1. Initialize the dynamic sprite engine
 
 ```c
-oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+static const OamDynamicConfig dyn = {
+    .vramLarge      = 0x0000,
+    .vramSmall      = 0x1000,
+    .slotLargeInit  = 0,
+    .slotSmallInit  = 0,
+    .sizeMode       = OBJ_SIZE8_L16,
+};
+oamDynamicInit(&dyn);
 ```
 
 This configures the engine:
-- VRAM base: `$0000` (where streaming sprites start)
-- VRAM ceiling: `$1000` (max VRAM used -- prevents overwriting background data)
-- Sprite size: 8x8 small / 16x16 large
+- VRAM base for large tiles: `$0000`
+- VRAM base for small tiles: `$1000`
+- Sprite size pair: 8x8 small / 16x16 large
 
 ### 2. Set up sprites via the oambuffer
 
@@ -60,13 +67,15 @@ Each dynamic sprite has:
 ### 3. Draw and upload every frame
 
 ```c
-oamDynamic16Draw(0);        /* Queue sprite 0 for VRAM upload */
-oamVramQueueUpdate();       /* DMA all queued tiles to VRAM */
-oamInitDynamicSpriteEndFrame();  /* Reset for next frame */
+oamDynamicDraw(0);   /* Queue sprite 0; NMI auto-flushes the VRAM tile
+                      * queue and hides last frame's leftovers. */
 ```
 
-The draw/upload cycle runs every frame in the main loop. Only sprites with
-`oamrefresh = 1` actually trigger a DMA transfer.
+The draw call runs every frame in the main loop. Only sprites with
+`oamrefresh = 1` actually trigger a DMA transfer. The NMI handler
+finalises the frame automatically — it hides leftover sprites, resets
+the slot allocator, and DMAs the queued tiles to VRAM — so user code
+never needs to issue a manual flush.
 
 ### 4. Animate by changing frame IDs
 
@@ -78,7 +87,7 @@ oambuffer[0].oamrefresh = 1;
 ```
 
 Every 8 frames, the animation advances. Setting `oamrefresh = 1` tells the engine
-to upload the new frame's tiles to VRAM on the next `oamVramQueueUpdate()` call.
+to upload the new frame's tiles to VRAM on the next VBlank.
 
 ## SNES Concepts
 

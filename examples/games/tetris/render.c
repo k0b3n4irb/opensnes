@@ -217,7 +217,7 @@ void renderInit(void) {
 
     /* Mode 1 with BG3 high priority */
     setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
-    REG_TM = TM_BG1 | TM_BG2 | TM_BG3;
+    setMainScreen(TM_BG1 | TM_BG2 | TM_BG3);
 
     bgSetScroll(0, 0, 0);  /* BG1: playfield centered (3-tile padding top+bottom) */
     bgSetScroll(1, 0, 0);  /* BG2: HUD */
@@ -343,7 +343,7 @@ void renderClearNextPiece(void) {
 
 void renderLineClearFlash(LineClearResult *result, u8 frame) {
     u8 i, c, r;
-    u8 tile;
+    u16 tile;
 
     tile = (frame & 1) ? (TILE_BORDER_H | PAL1) : TILE_EMPTY;
 

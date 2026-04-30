@@ -88,7 +88,7 @@ int main(void) {
     setMode(BG_MODE1, 0);
 
     /* Enable only BG1 on main screen */
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
 
     /* Set scroll to (0,0) */
     bgSetScroll(0, 0, 0);

@@ -69,6 +69,18 @@
     ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
     nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
     nmi_has_callback dsb 1  ; 0 = default no-op, 1 = user callback active
+    ; Dynamic sprite engine NMI flush hook (24-bit fn ptr + 1-byte padding).
+    ; Defaults to DefaultDynamicFlush (no-op rtl) so non-dynamic-engine ROMs
+    ; pay nothing. oamInitDynamicSprite repoints it at oamDynamicNmiFlush
+    ; which calls oamInitDynamicSpriteEndFrame + oamVramQueueUpdate.
+    dynamic_flush_hook dsb 4
+    ; Init-time queue drain flag. When non-zero, oamDynamicNmiFlush skips the
+    ; end-frame "hide stale sprites" step and only flushes the VRAM tile
+    ; queue — used by oamDynamicDrainQueue to drain a >7-entry init queue
+    ; across multiple VBlanks without the end-frame logic concluding that
+    ; just-drawn sprites need hiding (see memory note on the 0/old-counter
+    ; race that broke B.5 the first time around).
+    oam_dynamic_draining dsb 1
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -517,6 +529,16 @@ FastStart:
     lda #:DefaultNmiCallback
     sta nmi_callback+2
 
+    ; Initialize dynamic sprite NMI flush hook to default no-op.
+    ; oamInitDynamicSprite repoints it at oamDynamicNmiFlush when the
+    ; dynamic sprite engine is brought up.
+    rep #$20
+    lda #DefaultDynamicFlush
+    sta dynamic_flush_hook
+    sep #$20
+    lda #:DefaultDynamicFlush
+    sta dynamic_flush_hook+2
+
     ; Clear frame counters (16-bit)
     rep #$20
     stz frame_count
@@ -799,6 +821,24 @@ FastNmi:
     rep #$20
 
     ;==========================================================================
+    ; Dynamic sprite engine: end-of-frame + VRAM tile queue flush (via hook)
+    ;==========================================================================
+    ; The hook defaults to a no-op stub (~25 cycles). When the dynamic sprite
+    ; engine is initialized, oamInitDynamicSprite repoints it at the real
+    ; flush function (oamDynamicNmiFlush) which calls
+    ; oamInitDynamicSpriteEndFrame (hides unused sprites + sets oam_update_flag)
+    ; followed by oamVramQueueUpdate (DMAs queued sprite tiles to VRAM).
+    ;
+    ; Runs BEFORE OAM DMA so the just-set oam_update_flag is honoured this
+    ; frame, and so sprite tiles arrive in VRAM before the OAM entries that
+    ; reference them.
+    ;==========================================================================
+    phk                             ; Push current program bank
+    pea @dynamic_flush_done-1       ; Push return offset (for RTL)
+    jml [dynamic_flush_hook]        ; Long indirect call
+@dynamic_flush_done:
+
+    ;==========================================================================
     ; VRAM-CRITICAL SECTION — must complete during VBlank
     ;==========================================================================
     ; PVSnesLib order: OAM DMA → tilemap DMA → scroll sync FIRST,
@@ -1075,6 +1115,17 @@ FastNmi:
 ; Simply returns immediately.
 ;------------------------------------------------------------------------------
 DefaultNmiCallback:
+    rtl
+
+;------------------------------------------------------------------------------
+; DefaultDynamicFlush - No-op stub for the dynamic sprite NMI flush hook.
+;------------------------------------------------------------------------------
+; The hook is JML-indirected from the VBlank handler. Until the dynamic
+; sprite engine is initialized, it points here so the indirect call is a
+; cheap no-op (PEA + JML + RTL ≈ 25 cycles per frame). Initializing the
+; engine via oamInitDynamicSprite repoints the hook at oamDynamicNmiFlush.
+;------------------------------------------------------------------------------
+DefaultDynamicFlush:
     rtl
 
 ;------------------------------------------------------------------------------

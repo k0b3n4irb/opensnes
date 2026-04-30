@@ -92,6 +92,17 @@ tiled/
     └── maplevel01.b16      — Generated: tile collision attributes
 ```
 
+## Modules Used
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler setup |
+| `sprite` | OAM buffer (required by NMI handler) |
+| `dma` | DMA transfers for tiles, palette, and map column streaming |
+| `input` | `padHeld()` for continuous D-pad reading |
+| `background` | BG layer configuration and scroll registers |
+| `map` | `mapLoad()`, `mapUpdate()`, `mapVblank()` — the streaming map engine |
+
 ## Build & Run
 
 ```bash

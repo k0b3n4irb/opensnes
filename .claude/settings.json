@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-commit-check.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/class-a-warning.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mark-tests-passed.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'CRITICAL REMINDERS AFTER COMPACTION:\\n- Co-Authored-By trailers FORBIDDEN in commits\\n- volatile crashes QBE — use globals instead\\n- VBlank DMA budget: ~4KB max per frame\\n- LEFT-TO-RIGHT arg push (not like PVSnesLib)\\n- VRAM writes only during VBlank or forced blank\\n- Always: make clean && make + full test suite before commit\\n- data_init_end.o MUST be linked last'"
+          }
+        ]
+      }
+    ]
+  }
+}

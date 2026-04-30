@@ -233,6 +233,7 @@ static u8 getPixel(u8 chr_no, u8 tile, u8 x, u8 y) {
  *
  * @param chr_no Base character number in the C64 sprite data to convert
  */
+static void convertC64Sprite(u8 chr_no) __attribute__((unused));
 static void convertC64Sprite(u8 chr_no) {
     u8 num_tiles = 4;
     u8 bitplanes = 8;
@@ -272,16 +273,6 @@ static void convertC64Sprite(u8 chr_no) {
  *------------------------------------------------------------------------*/
 
 /**
- * @brief Flush the entire WRAM tilemap buffer to VRAM using the 1-page-per-VBlank pattern.
- *
- * Wrapper around screenRefresh() which internally DMAs the tilemap in
- * 2KB pages across multiple VBlanks to stay within the DMA budget.
- */
-static void refresh(void) {
-    screenRefresh(VRAM_SPRITEMAP);
-}
-
-/**
  * @brief Initialize the 32x32 tilemap demo mode.
  *
  * Configures Mode 3 with 8x8 BG1 tiles, loads gargoyle sprite tiles
@@ -301,7 +292,7 @@ static void initDemoMap32x32(void) {
     initSpriteMap32x32(spritemap_len);
 
     /* Force blank for VRAM writes */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Clear sprite 0 (empty tile) VRAM area — 4 tiles × 64 bytes = 256 bytes.
      * Without this, uninitialized VRAM shows garbage in the map interior. */
@@ -345,7 +336,7 @@ static void initDemoMap64x64(void) {
     initSpriteMap64x64(spritemap_len);
 
     /* Force blank for VRAM writes */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Clear sprite 0 (empty tile) VRAM area.
      * In 16x16 mode: top half at VRAM_SPRITE_GFX (128 bytes),
@@ -429,8 +420,8 @@ static void drawSpriteFrame64x64(u16 sprite) {
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
-    short sxbg0 = 0;
-    short sybg0 = 0;
+    s16 sxbg0 = 0;
+    s16 sybg0 = 0;
     u16 pad0;
     u16 pad0_released;
 
@@ -440,12 +431,10 @@ int main(void) {
     bgSetGfxPtr(1, VRAM_BG2_GFX);
     bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
     textLoadFont4bpp(VRAM_FONT);
-    textInitEx(VRAM_BG2_MAP * 2, FONT_TILE_OFFSET, 1);
+    textInit(VRAM_BG2_MAP * 2, FONT_TILE_OFFSET, 1);
 
     /* Set text palette (palette 1, color 1 = white) */
-    REG_CGADD = 17;    /* color index 17 = palette 1, color 1 */
-    REG_CGDATA = 0xFF;  /* white (low byte: gggrrrrr) */
-    REG_CGDATA = 0x7F;  /* white (high byte: 0bbbbbgg) */
+    setColor(17, RGB(31, 31, 31));  /* palette 1, color 1 = white */
 
     textPrintAt(6, 10, "DynamicMap");
     textPrintAt(6, 12, "A = Map size 32x32");
@@ -453,7 +442,6 @@ int main(void) {
     textPrintAt(6, 16, "X = Random sprite");
     textPrintAt(6, 18, "Y = Convert C64 sprite");
     textPrintAt(6, 20, "DPAD = Scroll map");
-    textFlush();
 
     /* Init 32x32 map demo */
     initDemoMap32x32();
@@ -462,13 +450,11 @@ int main(void) {
     drawSpriteFrame32x32(SPRITE_GARGOYLE);
 
     /* DMA the updated tilemap to VRAM during force blank */
-    REG_INIDISP = 0x80;
+    setScreenOff();
     smapDma(0, VRAM_SPRITEMAP, spritemap_len);
 
     /* Restore text palette AFTER sprite palette (which overwrites CGRAM) */
-    REG_CGADD = 17;
-    REG_CGDATA = 0xFF;
-    REG_CGDATA = 0x7F;
+    setColor(17, RGB(31, 31, 31));
 
     /* Enable BG1 + BG2 */
     REG_TM = TM_BG1 | TM_BG2;
@@ -482,7 +468,7 @@ int main(void) {
         if (pad0 & KEY_RIGHT) {
             if (!scroll_lock)
                 sxbg0 += 4;
-            else if (sxbg0 < (short)max_scroll_width)
+            else if (sxbg0 < (s16)max_scroll_width)
                 sxbg0 += 4;
         } else if (pad0 & KEY_LEFT) {
             if (!scroll_lock)
@@ -498,7 +484,7 @@ int main(void) {
         } else if (pad0 & KEY_DOWN) {
             if (!scroll_lock)
                 sybg0 += 4;
-            else if (sybg0 < (short)max_scroll_height)
+            else if (sybg0 < (s16)max_scroll_height)
                 sybg0 += 4;
         }
 
@@ -510,23 +496,17 @@ int main(void) {
             is_map32x32 = !is_map32x32;
             if (is_map32x32) {
                 textPrintAt(6, 12, "A = Map size 32x32");
-                textFlush();
                 setScreenOff();
                 initDemoMap32x32();
-                REG_CGADD = 17;
-                REG_CGDATA = 0xFF;
-                REG_CGDATA = 0x7F;
+                setColor(17, RGB(31, 31, 31));
                 REG_TM = TM_BG1 | TM_BG2;
                 setScreenOn();
                 drawSpriteFrame32x32(SPRITE_GARGOYLE);
             } else {
                 textPrintAt(6, 12, "A = Map size 64x64");
-                textFlush();
                 setScreenOff();
                 initDemoMap64x64();
-                REG_CGADD = 17;
-                REG_CGDATA = 0xFF;
-                REG_CGDATA = 0x7F;
+                setColor(17, RGB(31, 31, 31));
                 REG_TM = TM_BG1 | TM_BG2;
                 setScreenOn();
                 drawSpriteFrame64x64(SPRITE_GARGOYLE);
@@ -551,7 +531,6 @@ int main(void) {
                 textPrintAt(6, 14, "B = Scroll lock ON ");
             else
                 textPrintAt(6, 14, "B = Scroll lock OFF");
-            textFlush();
         }
 
         /* Random sprite placement */

@@ -66,7 +66,7 @@ int main(void) {
     consoleInit();
 
     /* Force blank for VRAM writes */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Decompress tiles directly to VRAM at $4000 (LZ77 → VRAM) */
     LzssDecodeVram(patterns, 0x4000);

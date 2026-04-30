@@ -22,7 +22,7 @@
 
 ## Introduction
 
-OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 52 example ROMs.
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 53 example ROMs.
 
 This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
@@ -44,6 +44,52 @@ This is not a flaw in the SDK. It's the nature of the machine. OpenSNES will kee
 
 If that sounds exciting rather than terrifying, you're in the right place.
 
+## Who is OpenSNES for?
+
+OpenSNES is built for developers who already know the SNES — or who are willing
+to invest the time to learn it. Concretely, you'll be productive here if:
+
+- You're comfortable reading and writing **65816 assembly** when needed (most
+  game code is C, but you will hit assembly: HDMA tables, the NMI handler,
+  perf-critical inner loops).
+- You understand the **NMI / VBlank model** — when you can write to VRAM, why
+  DMA outside of VBlank silently fails, what a 4 KB VBlank budget means.
+- You can read a hex address. OAM, CGRAM, VRAM, BG tilemap addresses, palette
+  base offsets — these are part of the daily vocabulary.
+- You're porting from PVSnesLib, or coming from another SNES SDK, or you've
+  already shipped something for a comparable retro target.
+
+It is **not** the right SDK if any of these apply:
+
+- You're new to SNES development and just want to "make a game in C". The
+  language is the easy part; the hardware is the hard part. Start with a
+  beginner-friendly engine (Godot, GameMaker, etc.), then come back when the
+  retro itch is specific.
+- You want a fully managed runtime that hides the hardware. There isn't one
+  to hide it behind — the silent-failure list is real and inherited from the
+  machine.
+- You need a stable production toolchain for a deadline-driven project. The
+  SDK is **late beta** — the test suite is green and CI is enforced, but
+  several optimisations and chip APIs are still planned (see the
+  [roadmap](ROADMAP.md)).
+
+**Read [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) before you start.** It
+catalogs every silent failure we know about, with severity tags and
+mitigations. Skim it once; refer back when something mysterious happens.
+For ASM-writing contributors, [`compiler/ABI.md`](compiler/ABI.md) documents
+the calling convention with worked examples (push order, frame layout, return
+values) — required reading before porting any function from PVSnesLib.
+
+### Enhancement-chip maturity
+
+| Mode / Chip | Status | Notes |
+|-------------|:------:|-------|
+| **LoROM** | Stable | Default. Production-ready. |
+| **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
+| **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
+| **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP register init is an assumption, not a published spec. |
+| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validate with Mesen2** — most accurate GSU emulator we have currently. **snes9x does not detect the GSU chip** in our ROM headers, so the snes9x-based CI test suite cannot validate SuperFX execution end-to-end (P3.4 tracks adding a Mesen2-headless CI path). |
+
 ---
 
 ## What OpenSNES Gives You
@@ -51,11 +97,31 @@ If that sounds exciting rather than terrifying, you're in the right place.
 | | |
 |---|---|
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
-| **28-module hardware library** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
+| **30 hardware modules** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **52 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
-| **Debug emulator** | snes9x WASM with 212 automated checks |
-| **Cross-platform** | Linux, macOS, Windows — CI-tested on all three |
+| **53 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **Debug emulator** | snes9x WASM with ~390 automated checks (compiler tests + visual regression + lag detection + runtime + input sequences) |
+| **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
+
+## Design Philosophy
+
+OpenSNES is a **2D game engine** for SNES, not a thin C-over-asm wrapper.
+Five principles guide every design decision:
+
+1. **Sane defaults, escape hatches** — the 90% case is a one-liner; the
+   10% case stays possible.
+2. **Hide quirks, document the escape** — hardware traps don't reach
+   the user, but the explanation is one click away.
+3. **Modules are opt-in, never all-or-nothing** — `LIB_MODULES` selects
+   what links into your ROM.
+4. **Type-safe at the boundary** — structs and enums beat positional
+   `u16` arguments.
+5. **Predictable performance** — no hidden allocations, no lazy
+   patterns, every frame-time cost is documented.
+
+See **[PHILOSOPHY.md](PHILOSOPHY.md)** for the full statement and the
+explicit positioning vs. PVSnesLib (the two projects sit at different
+altitudes of the same stack and are complementary).
 
 ## Quick Start
 
@@ -71,7 +137,7 @@ For prerequisites and platform-specific setup, see the **[Getting Started guide]
 
 ## Examples
 
-52 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+53 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
 
 **[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
 
@@ -105,6 +171,7 @@ Contributions welcome! See the **[Contributing Guide](https://k0b3n4irb.github.i
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
+- [Known limitations](KNOWN_LIMITATIONS.md) — silent failures and trade-offs to read before starting
 
 ## License
 

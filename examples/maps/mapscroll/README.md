@@ -40,6 +40,17 @@ oamSet(0, xloc - x_pos, yloc - y_pos, frame, 0, 3, flags);
 
 The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. Animation advances every other input frame for natural pacing.
 
+## Modules Used
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler setup |
+| `sprite` | OAM buffer for the Mario sprite |
+| `dma` | DMA transfers for tiles, palette, and map column streaming |
+| `input` | `padHeld()` for continuous D-pad reading |
+| `background` | BG layer and scroll register configuration |
+| `map` | `mapLoad()`, `mapUpdate()`, `mapVblank()` — the streaming map engine |
+
 ## Build & Run
 
 ```bash

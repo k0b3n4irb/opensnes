@@ -94,9 +94,9 @@
 #define ACT_WALK    0x0001  /**< Walking */
 #define ACT_JUMP    0x0002  /**< Jumping */
 #define ACT_FALL    0x0004  /**< Falling */
-#define ACT_CLIMB   0x0008  /**< Climbing ladder */
-#define ACT_DIE     0x0010  /**< Dying */
-#define ACT_BURN    0x0020  /**< Burning */
+#define ACT_CLIMB   0x2000  /**< Climbing ladder (bit 13 — flag, combinable with state) */
+#define ACT_DIE     0x4000  /**< Dying (bit 14 — flag, combinable with state) */
+#define ACT_BURN    0x8000  /**< Burning (bit 15 — flag, combinable with state) */
 
 /*============================================================================
  * Map Options

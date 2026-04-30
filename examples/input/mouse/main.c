@@ -97,7 +97,6 @@ int main(void) {
         textPrintAt(2, 5, "No mouse detected.");
         textPrintAt(2, 7, "Connect SNES mouse");
         textPrintAt(2, 8, "to port 1 and reset.");
-        textFlush();
         setScreenOn();
         while (1) {
             WaitForVBlank();
@@ -108,7 +107,6 @@ int main(void) {
     textPrintAt(2, 6, "L-click:");
     textPrintAt(2, 7, "R-click:");
     textPrintAt(2, 9, "Sens:");
-    textFlush();
 
     /* Load cursor sprite tiles to VRAM.
      * A 16x16 sprite uses tiles 0,1 (top) and 16,17 (bottom) in the
@@ -118,14 +116,14 @@ int main(void) {
     dmaCopyVram(cursor_tiles + 64, 0x4100, 64);     /* tiles 16-17 (bottom) */
 
     /* Load cursor palette to CGRAM (sprite palette 0 = color 128) */
-    dmaCopyCGram(cursor_pal, 128,
+    dmaCopyCGram(cursor_pal, OBJ_CGRAM_BASE,
                  (u16)(cursor_pal_end - cursor_pal));
 
     /* OBJSEL: base address $4000 word addr = N*$2000, N=2 */
     REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
 
     /* Enable BG1 (text) and sprites on main screen */
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Clear all sprites (hide garbage) then set up sprite 0 as cursor */
     oamClear();
@@ -134,7 +132,7 @@ int main(void) {
     pos_x = 128;
     pos_y = 112;
     oamMemory[0] = (u8)pos_x;
-    oamMemory[1] = (u8)pos_y;
+    oamMemory[1] = (u8)(pos_y - 1);  /* PPU +1 scanline quirk: write Y-1 */
     oamMemory[2] = 0x00;         /* Tile number low */
     oamMemory[3] = 0x30;         /* priority 3, palette 0, no flip */
     oamMemory[512] = 0x02;       /* Large sprite (16x16), X high = 0 */
@@ -155,9 +153,9 @@ int main(void) {
         if (pos_y < 0) pos_y = 0;
         if (pos_y > 223) pos_y = 223;
 
-        /* Update cursor sprite position */
+        /* Update cursor sprite position (PPU +1 quirk: write Y-1) */
         oamMemory[0] = (u8)pos_x;
-        oamMemory[1] = (u8)pos_y;
+        oamMemory[1] = (u8)(pos_y - 1);
         oam_update_flag = 1;
 
         /* Show button state: HELD or blank */
@@ -176,9 +174,7 @@ int main(void) {
 
         /* Left click: change BG color to blue */
         if (mouseButtonsPressed(0) & MOUSE_BUTTON_LEFT) {
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00;  /* Blue low (RRRRR GGG) */
-            REG_CGDATA = 0x7C;  /* Blue high (0BBBBB GG) = B=31 */
+            setColor(0, RGB(0, 0, 31));  /* Blue */
         }
 
         /* Right click: cycle sensitivity */
@@ -196,7 +192,6 @@ int main(void) {
             else if (s == 1) textPrintAt(8, 9, sens_med);
             else textPrintAt(8, 9, sens_hi);
         }
-        textFlush();
     }
 
     return 0;

@@ -206,7 +206,7 @@ int main(void) {
     /* Configure BG1 */
     bgSetMapPtr(0, TILEMAP_ADDR, BG_MAP_32x32);
     bgSetGfxPtr(0, TILES_ADDR);
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
 
     /* Load palette via DMA */
     dmaCopyCGram((u8 *)init_palette, 0, 4);
@@ -243,13 +243,9 @@ int main(void) {
 
         /* Change background color on A button */
         if (pressed & KEY_A) {
-            /* Light blue when A is held */
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00; REG_CGDATA = 0x7C;
+            setColor(0, RGB(0, 0, 31));   /* Light blue */
         } else {
-            /* Dark blue normally */
-            REG_CGADD = 0;
-            REG_CGDATA = 0x00; REG_CGDATA = 0x28;
+            setColor(0, RGB(0, 0, 10));   /* Dark blue */
         }
     }
 

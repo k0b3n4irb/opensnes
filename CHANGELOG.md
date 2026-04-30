@@ -5,6 +5,325 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [Unreleased]
+
+## [0.14.0] - 2026-04-30
+
+Audit-driven maintenance cycle (see `~/opensnes_audit_2026-04-26.md` and
+`~/opensnes_remediation_plan_2026-04-26.md`). 19 of 23 plan items completed
+across P0-P4. The SDK is now end-to-end CI-enforced: build green no longer
+just means "it compiles" — it means visual regression, lag detection, runtime,
+compiler patterns, bank $00 layout and submodule pins all hold. Adds the
+`PHILOSOPHY.md` design-principles document, completes chantiers B (sprite)
+and T (text) of P3.2 (public API surface 28 → 18 functions for sprite,
+18 → 15 for text), lands the Mesen2-headless visual phase (P3.4) for real
+GSU/SA-1 emulation coverage on CI, and ships the chantier C trilogy
+(C.1 + C.2.1 + C.2.2) of tail-call optimisations in qbe/w65816 — 18 TCO
+sites across the SDK, 4 of the 5 documented known compiler bugs cleared.
+
+### Added
+
+- **`PHILOSOPHY.md`** — design-principles document making the project's
+  positioning explicit. OpenSNES is a 2D game engine for C developers
+  who don't want to learn 65816 assembly to ship a SNES game; PVSnesLib
+  is a thin C wrapper for hardware enthusiasts. The two sit at
+  different altitudes of the same stack. Five principles guide every
+  API decision (sane defaults with escape hatches, hidden quirks with
+  documented escape, opt-in modules, type-safe boundaries, predictable
+  performance). Linked from `README.md`, `CLAUDE.md`, `ROADMAP.md`.
+- **`KNOWN_LIMITATIONS.md`** — public catalog of silent failures with
+  severity tags (🔴 silent corruption / 🟠 silent build / 🟡 toolchain quirk /
+  🟢 mitigated). 14 entries covering VBlank, DMA budget, WRAM port, bank $00,
+  push order, `volatile` + QBE, `.ACCU` tracking, SA-1 SIWP, SuperFX/Mesen2,
+  compiler optimisation gaps, type sizes, sprite-palette CGRAM offset.
+- **`compiler/ABI.md`** — empirically verified calling-convention reference:
+  LEFT-TO-RIGHT push, frame layout, return values, direct-page layout
+  (`tcc__r*`), type sizes, calling C↔ASM templates, port-from-PVSnesLib
+  checklist.
+- **`compiler/PINS.md`** — pinned SHAs for `compiler/{cproc,qbe,wla-dx}` with
+  a per-submodule list of carried-forward local patches.
+- **`tools/opensnes-emu/test/BASELINES.md`** — visual-regression baseline
+  schema and regen protocol.
+- **`lib/contrib/` directory** — non-core engine modules. Currently houses
+  `object.asm` (3 124 LOC game-entity engine) relocated from `lib/source/`
+  so `lib/source/` only contains hardware-wrapping code.
+- **Section "Who is OpenSNES for?"** in README — explicit prerequisites
+  (65816 ASM, NMI/VBlank model, hex addresses) and non-targets, plus an
+  enhancement-chip maturity table.
+- **Branching policy** in `CONTRIBUTING.md` — invariants for `main` vs
+  `develop`.
+- **2 compiler regression guards** — `test_arg_push_order` (LEFT-TO-RIGHT
+  ABI) and `test_section_directives` (`.ACCU 16` / `.INDEX 16` markers).
+  Compiler test suite: 60 → 62.
+
+### Changed
+
+- **`tools/opensnes-emu/` is now a public submodule** at
+  `github.com/k0b3n4irb/opensnes-emu` (was a local-only directory in the
+  user's tree). History was rewritten with `git filter-repo` to strip 275
+  generated build artifacts (.sfc, .sym, .o, .obj, etc.) — repo size went
+  from 218 MB to 11 MB tracked source.
+- **CI runs the full ~390-check test suite** (was build-only). Drop of
+  `--quick` adds the 60-test compiler-pattern phase. Added
+  `--allow-known-bugs` so the 5 documented compiler-optimisation gaps
+  (TCO + A-cache-through-pha + stale `leaf_opt` marker) report as
+  `[KNOWN_BUG]` rather than failing the build.
+- **`ROADMAP.md` resync** — corrects 52 → 53 examples, 212 → ~390 checks,
+  60 → 62 compiler tests, 7 → 8 phases. Drops removed modules
+  (animation, entity). Adds the contrib status for `object`. Pivots to
+  the "post-v0.13.0 toward v0.14.0" snapshot.
+- **`.claude/` is now tracked** (was entirely gitignored except one file).
+  Hooks, rules, skills and shared settings ship with the repo so any
+  Claude Code user gets the same gates. Personal `settings.local.json`
+  remains gitignored.
+- **`setMainScreen()` instead of `REG_TM = ...`** in 22 examples (style
+  consistency; identical bytes generated). `short` → `s16` in three more.
+- **Sprite API simplification (P3.2 chantier B)** — public sprite surface
+  collapses from 28 to 18 functions:
+  - `oamSet`/`oamSetEx`/`oamInit*` consolidations (B.A);
+  - `oamDynamicDraw(id)` size-aware dispatcher replaces
+    `oamDynamic{8,16,32}Draw` (B.1+B.2);
+  - `OamDynamicConfig` struct + `oamDynamicInit(&cfg)` replace the
+    5-arg positional `oamInitDynamicSprite` (B.3);
+  - migrated 9 call sites across 5 example games + reverted a
+    Y-1 over-compensation in the dynamic engine that was lifting
+    Mario 1–2 px off the ground on flat terrain (B.4);
+  - the NMI handler auto-flushes the dynamic engine via a new
+    `dynamic_flush_hook` indirect call — main loops drop the
+    explicit `oamInitDynamicSpriteEndFrame` / `oamVramQueueUpdate`
+    pair (B.5);
+  - legacy `oamInitDynamicSprite` and `oamDynamic{8,16,32}Draw`
+    retire from the public header; their ASM symbols stay as the
+    internal mechanism (B.6 modest);
+  - `oamMetaDrawDyn(id, x, y, meta, gfx, OBJ_SMALL/OBJ_LARGE)`
+    replaces `oamMetaDrawDyn{8,16,32}` — engine resolves pixel size
+    from the size pair set at init (B.6 aggressive part 1);
+  - simple init flushes (likemario, slopemario, dynamic_sprite)
+    migrate to a single `WaitForVBlank()` that fires the auto-flush
+    hook under force blank (B.6 aggressive part 2 partial);
+  - `oamDynamicDrainQueue()` lets the multi-VBlank init-time drain
+    happen via the same NMI auto-flush, with a draining flag that
+    inhibits the end-frame hide step during the drain — which lets
+    the legacy `oamInitDynamicSpriteEndFrame` / `oamVramQueueUpdate`
+    retire from the public header for good (B.6 aggressive part 2
+    complete).
+- **Text API simplification (P3.2 chantier T)** — public text surface
+  collapses from 18 to 15 functions:
+  - `textPrintS16`, `textDrawBox` retired; internal `textFillRect`
+    made `static` (T.1) — none had callers across the 53 examples
+    or the library;
+  - text writers (`textPutChar`, `textClear`, `textFillRect`)
+    auto-flush via the NMI tilemap_update_flag (T.4) — 17 examples
+    drop the manual `textFlush()` call. `textFlush()` stays public
+    as the explicit primitive for hand-rolled tilemap writers.
+- **`textGetX()` / `textGetY()` restored** — initially dropped in
+  T.2 on a "zero callers" sweep, then reintroduced after the unit
+  test fixture in opensnes-emu surfaced as a legitimate caller
+  reading cursor advancement. Two 1-line accessors are the right
+  shape for testable internal state.
+- **NMI handler gains a `dynamic_flush_hook` 24-bit function pointer**
+  in the bank-$00 register area. Defaults to a single-`rtl` no-op
+  stub; `oamInitDynamicSprite` repoints it at `oamDynamicNmiFlush`
+  which calls `oamInitDynamicSpriteEndFrame` + `oamVramQueueUpdate`
+  every VBlank. Cost for ROMs that don't use the dynamic engine: one
+  PEA + JML indirect + RTL ≈ 25 cycles per frame.
+- **Mesen2-headless visual regression phase (P3.4)** — second visual
+  phase that runs the four chip-using ROMs (SuperFX 3D, SuperFX
+  Hello, SA-1 Hello, SA-1 Starfield) through Mesen2 in `--testrunner`
+  mode for real GSU/SA-1 emulation. snes9x's libretro core in
+  opensnes-emu does not detect the GSU chip in our ROM headers, so
+  its visual phase only validates "boots without crashing" for those
+  ROMs; Mesen2 fills the gap. Vendored `vendor/Mesen` binary +
+  `scripts/install-mesen2.sh` for fresh contributor setup.
+- **TCO for trivial wrappers (chantier C.1)** — qbe/w65816 backend
+  now emits `jml callee` instead of the full `jsl + frame teardown
+  + rtl` for non-leaf functions whose every Ocall is in tail
+  position (e.g. `unsigned short call_add(a, b) { return add_u16(a, b); }`).
+  The TCO emission path was already in place; the remaining gate
+  was the conservative "non-leaf needs a frame" rule, relaxed to
+  recognise that a function with only tail Ocalls never executes
+  past a call and so cannot have temps that need across-call
+  storage. Result: 3 of the 5 known compiler-bug tests cleared
+  (plx_cleanup wrapper variants, acache_pha through pha, lazy_rep20
+  for pure tail calls); −5 cycles + −2 ROM bytes per tail call site.
+  Includes an env-gated diagnostic (`CC_TRACE_TCO=1`) that logs each
+  TCO eligibility decision — zero-cost when the env var is unset.
+- **TCO for framed void-tail-call wrappers (chantier C.2.1)** —
+  extends C.1 to functions that have a real frame because of an
+  earlier non-tail call, but whose final tail call takes zero
+  arguments. The Ocall handler now emits a `tsa; clc; adc.w
+  #framesize; tas` teardown immediately before the `jml` (gated on
+  `framesize > 2` to mirror the prologue's elision of phantom
+  alignment-only frames). 10 new TCO sites unlocked across the SDK,
+  including `oamDynamicDrainQueue`, `textInit`, `run_frame` (breakout
+  main loop), `stateGameOver`/`stateTitle` (tetris), `changeObjSize`
+  (object_size example) and `koopatroopaupdate` (likemario AI).
+- **TCO for chained tail calls (chantier C.2.2)** — closes the
+  `return f(g(x))` pattern, where the inner call is a regular jsl
+  (its result feeds the outer arg) and the outer is a tail call.
+  The Oarg handler stores each outgoing arg to its caller-slot
+  position (offset `4 + framesize + ...` while the frame is still
+  up); the existing Ocall teardown then lifts SP back to the
+  function-entry point so the callee sees the args at canonical
+  `4`, `6`, ... offsets. Required two supporting changes:
+  count_fn_param_bytes() now falls through to a slot-walking helper
+  for non-leaf functions where Opar* has been lowered to slot
+  reads, and an alloc-safety guard declines C.2.2 on functions
+  containing any local Oalloc* (the frame teardown would invalidate
+  any pointer-to-local that escaped via the tail call — caught
+  the hard way: textPrintU16's `char buf[6]` + `textPrint(p)`
+  pattern produced a 101-pixel diff in basics/random's DEC line
+  before the guard landed). Cleared the last TCO known-bug
+  (`tail_call`'s call_chain check) and unlocked 3 more sites in
+  the lib (mouseGetX/Y, colorMathTransparency50). Test suite
+  without `--allow-known-bugs`: 397/399 → 398/399; the only
+  remaining known-bug is nonleaf_frameless's stale ASM-comment
+  marker, orthogonal to TCO.
+
+### Fixed
+
+- **SNES PPU sprite Y +1 scanline quirk** — caller-passed Y was off
+  by one row from the rendered top because OAM_Y=N renders on
+  scanlines N+1..N+8. The `oamSet` ASM and `oamSetY` C path applied
+  the `-1` compensation in 87a0ae2; the macros `oamSetFast` /
+  `oamSetXYFast` were missed and silently rendered one scanline
+  lower than the equivalent `oamSet` call. Now uniform across all
+  five entry points so callers can mix the fast and slow APIs without
+  drift. `oamHide` is exempt (writes 240 directly).
+- **`lib/source/hdma.c:89`** — `sine_quarter[63] = 256` truncated to 0 in
+  `u8`, leaving a 1-pixel notch at sin(90°) on every HDMA sine effect.
+  Cap the table at 255.
+- **`examples/games/tetris/render.c:346`** — `u8 tile` couldn't hold
+  `TILE_BORDER_H | PAL1 = 0x409`, dropping the palette bits silently and
+  rendering the line-clear flash with the wrong palette. Promote to `u16`.
+- **`examples/memory/sa1_starfield/`** — `USE_FASTROM := 1` eliminates
+  the 50 % VBlank lag (150/300 frames → 0/300). The 128-bird OAM-update
+  loop was running into the next NMI on SlowROM.
+- **Hooks `pre-commit-check.sh` / `mark-tests-passed.sh`** — outputted
+  `{"decision": "allow"}` (invalid for the Claude Code schema) and
+  pointed contributors to non-existent test scripts. Now run silently
+  on the pass path and reference the real
+  `node test/run-all-tests.mjs --quick` runner.
+- **`.gitignore` cleanup** — `.claude/` entry was a blanket gitignore that
+  hid project-wide policies. Replaced with the precise
+  `.claude/settings.local.json` exclusion.
+- **3 hardcoded `/home/kobenairb/...` paths** in `.claude/rules/` and
+  skills replaced with `$PVSNESLIB_HOME`.
+- **Two dead unit fixtures** (`unit/animation`, `unit/entity`) referenced
+  modules removed from `lib/`. Build phase passed from 76/78 to 76/76.
+- **2 stale visual baselines** (`graphics/sprites/dynamic_metasprite`,
+  `maps/slopemario`) regenerated after recent ASM/c-bit fixes; baseline
+  for `memory/sa1_starfield` captured for the first time after the
+  FastROM bump.
+- **12 latent C warnings** surfaced by the new clang lint pipeline —
+  unused locals, dead helper functions (`writestring_bg2`, `refresh`),
+  unused parameters in callback ABI signatures.
+
+### Build
+
+- **Bank $00 ROM overflow check** runs on every link
+  (`devtools/symmap/symmap.py --check-bank0-overflow` invoked from
+  `make/common.mk`). String-literal spills now fail the build instead of
+  producing garbage at runtime. `SKIP_BANK0_CHECK=1` escapes if needed.
+- **`make verify-toolchain`** compares each compiler-submodule HEAD
+  against `compiler/PINS.md`. CI calls it before every build — drift
+  fails fast with a fix-it message naming the right remediation.
+- **clang `-fsyntax-only -Wall -Wextra -Werror`** runs in parallel with
+  cc65816 in the `%.c.o` rule (cproc ignores `-W*`). The SDK is
+  warning-clean and stays that way. `SKIP_LINT=1` for environments
+  without clang.
+- **Sed QBE→WLA-DX transform removed.** Empirical audit showed 9 of 10
+  patterns matched nothing in current QBE output (QBE emits `.db`/`.dw`/
+  `.dl` natively). The 10th pattern only deleted `/* end */` comments
+  that WLA-DX accepts. `lib/Makefile` lost 12 lines of fragile sed.
+- **Memmap dependency tracking** — `wrap_asm` consumers now list
+  `$(MEMMAP_INC)` as a real prerequisite. `touch templates/memmap.inc`
+  triggers a rebuild instead of producing stale objects.
+- **FastROM Makefile flag** documented; SA-1 Starfield uses it.
+
+### CI
+
+- **Functional-tests job** — opensnes-emu test suite gates PR merges
+  on Linux. Caches WASM core build by `bridge.cpp` hash; cache hit
+  brings full-suite runtime to ~3 minutes.
+- **Tag-on-main guard** — `release.yml` rejects a tag whose commit is
+  not reachable from `origin/main`. Tags can only be cut from the
+  release-PR merge.
+- **Lint workflow** (`lint.yml`) — runs `lint_commits.py` on every PR
+  and direct push to `main`/`develop`.
+- **Lint workflow handles force-push** — after a force-push,
+  `github.event.before` points to a now-dangling commit that
+  `actions/checkout` does not fetch, so `git log ${BEFORE}..HEAD`
+  used to fail with exit code 2 (indistinguishable from a real lint
+  violation in the workflow output). Now `git rev-parse --verify`
+  the SHA first and fall back to `origin/main..HEAD` if it does
+  not resolve. The lint policy itself is unchanged.
+- **Mesen2-headless phase wired up on CI** — runs on `ubuntu-22.04`
+  (matches Mesen2's published x64-AOT build environment, avoids the
+  libstdc++ ABI mismatch that surfaces on 24.04 as `std::bad_cast`
+  in `MesenCore.so::InitDll`). Installs `xvfb` for a virtual display
+  and `libsdl2-dev` for the runtime SDL2 the native core dlopens at
+  startup. A 128 KB sanitised settings.json fixture in
+  `tools/opensnes-emu/test/fixtures/mesen2-config/` is copied to
+  `~/.config/Mesen2/` before launch — bypasses the first-run wizard
+  and provides the per-system config subtrees `MesenCore.so`
+  dynamic_cast<>s during init.
+- **`visual-mesen2.mjs` auto-wraps Mesen2 in `xvfb-run -a`** when
+  `$DISPLAY` is unset, so the same phase runs on a developer's
+  desktop and on a headless CI runner without conditional logic.
+  Failure messages now include the trailing 2 KB of Mesen2 stdout
+  / stderr, surfacing the actual failure signature (DllNotFound,
+  std::bad_cast, etc.) inline in the CI log instead of as an opaque
+  exit code.
+
+### Testing
+
+- **Visual-regression baselines** carry provenance metadata
+  (`rom_sha256`, `snes9x_commit`, `captured_at`). The runner emits
+  `[WARN]` on drift instead of silently producing a misleading diff.
+- All 53 baselines re-captured against the current `make`-built ROMs.
+- **Compiler test runner** marks 5 unimplemented optimisations as
+  `knownBug()` instead of `fail()` — TCO (3 tests), A-cache through
+  pha (1), and the stale `leaf_opt=1` marker for non-leaf functions
+  (1). Without `--allow-known-bugs` they still fail; with the flag
+  they report `[KNOWN_BUG]` so a contributor implementing one sees
+  green immediately.
+- **Mesen2 visual baselines** added for the four chip-using ROMs
+  (`graphics/effects/superfx_3d`, `memory/superfx_hello`,
+  `memory/sa1_hello`, `memory/sa1_starfield`) under
+  `tools/opensnes-emu/test/baselines/*.mesen2.bin`. Per-ROM diff
+  overrides for the two animated ones (cube rotation 2000 px,
+  starfield scroll 1500 px) absorb 1-frame timing drift between
+  machines without losing the "chip ran vs chip-NOT-DETECTED black
+  screen" signal that is the actual point of the phase.
+- **Unit fixture sync after sprite Y quirk** — 13 Y assertions in
+  the opensnes-emu `unit/sprite` fixture updated to expect the
+  `(input - 1)` convention now applied uniformly across the OAM
+  setters. Header note documents the convention so future test
+  authors see it. Phase result: `73/73 passed` (was 14 fail / 59
+  pass before the sync).
+
+### Tooling
+
+- **`devtools/verify_toolchain.py`** — parses `compiler/PINS.md` and
+  enforces submodule-pin invariants.
+- **`devtools/lint_commits.py`** — Conventional-Commits subject
+  validation + `Co-Authored-By:` rejection.
+
+### Documentation
+
+- **`compiler/ABI.md`**, **`KNOWN_LIMITATIONS.md`**,
+  **`tools/opensnes-emu/test/BASELINES.md`**, **`lib/contrib/README.md`**
+  added as canonical references.
+- **`README.md`** gains the audience-explicit section, chip maturity
+  table, and a prominent link to `KNOWN_LIMITATIONS.md`.
+- **`ROADMAP.md`** resynchronised against current state.
+- **`CONTRIBUTING.md`** documents the branching policy.
+- **`.claude/rules/release.md`** has the full release flow with ASCII
+  diagram and `make verify-toolchain` in the pre-release checklist.
+- **5 stale "212 checks" / "52 examples"** references corrected across
+  `.claude/rules/*.md` and the README.
+
 ## [0.13.0] - 2026-03-26
 
 ### SuperFX Phase 3-4 — Mandelbrot + Wireframe Cube

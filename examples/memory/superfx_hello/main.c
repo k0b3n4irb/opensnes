@@ -63,7 +63,6 @@ int main(void) {
         textPrintAt(16, 6, (char*)buf);
 
         textPrintAt(3, 8, "LAUNCHING GSU...");
-        textFlush();
         WaitForVBlank();
 
         launchGSU();
@@ -135,7 +134,6 @@ int main(void) {
         textPrintAt(3, 9, "EMULATOR (MESEN2)");
     }
 
-    textFlush();
     setScreenOn();
 
     while (1) {

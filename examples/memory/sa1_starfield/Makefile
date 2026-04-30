@@ -7,8 +7,9 @@ ROM_NAME := SA1 STARFIELD 3D
 
 CSRC     := main.c
 
-USE_LIB  := 1
-USE_SA1  := 1
+USE_LIB     := 1
+USE_SA1     := 1
+USE_FASTROM := 1
 LIB_MODULES := console sprite dma background input sa1
 
 include $(OPENSNES)/make/common.mk

@@ -77,7 +77,7 @@ int main(void) {
      * forced blank, which halts PPU rendering and allows unrestricted
      * VRAM/CGRAM/OAM access. Unlike VBlank (which only gives ~4KB DMA
      * budget), forced blank has no time limit. */
-    REG_INIDISP = 0x80;
+    setScreenOff();
 
     /* Load all graphics via assembly DMA (correct bank bytes).
      * The assembly routine handles the :label bank byte for SUPERFREE

@@ -10,3 +10,6 @@
 [submodule "compiler/qbe"]
 	path = compiler/qbe
 	url = https://github.com/k0b3n4irb/qbe.git
+[submodule "tools/opensnes-emu"]
+	path = tools/opensnes-emu
+	url = git@github.com:k0b3n4irb/opensnes-emu.git

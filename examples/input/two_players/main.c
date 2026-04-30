@@ -126,10 +126,10 @@ int main(void) {
                   0, 0x0000, OBJ_SIZE8_L16);
 
     /* Load palette 1 (Player 2: Red) */
-    dmaCopyCGram((u8 *)pal_red, 128 + 16, 8);
+    dmaCopyCGram((u8 *)pal_red, OBJ_CGRAM_PAL(1), 8);
 
     /* Initialize OAM */
-    oamInit();
+    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
     /* Set up Player 1 sprite (OAM entry 0) */
     oamSet(0, p1.x, p1.y, 0, 0, 0, 0);
@@ -138,7 +138,7 @@ int main(void) {
     oamSet(1, p2.x, p2.y, 0, 0, 0, 1);  /* Palette 1 */
 
     /* Enable sprites on main screen */
-    REG_TM = TM_OBJ;
+    setMainScreen(TM_OBJ);
 
     /* Turn on screen */
     setScreenOn();

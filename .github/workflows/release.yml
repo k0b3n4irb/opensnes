@@ -10,7 +10,30 @@ permissions:
   contents: write
 
 jobs:
+  # P4.2: tags are only valid from `main`. This guard blocks a tag pushed
+  # against develop or a feature branch — see CONTRIBUTING.md for the
+  # branching policy.
+  verify-tag-on-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need full history to walk merge-base
+
+      - name: Reject tag if not on main
+        run: |
+          TAG_SHA=$(git rev-parse HEAD)
+          if ! git merge-base --is-ancestor "$TAG_SHA" origin/main; then
+            echo "ERROR: tag commit $TAG_SHA is not reachable from origin/main."
+            echo "       Tags may only be cut from main. Merge develop into main"
+            echo "       via a release PR first, then re-tag the merge commit."
+            exit 1
+          fi
+          echo "OK: tag commit is on main."
+
   build:
+    needs: verify-tag-on-main
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:

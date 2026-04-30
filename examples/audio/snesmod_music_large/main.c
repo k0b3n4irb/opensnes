@@ -35,7 +35,7 @@ int main(void) {
     u8 paused;
 
     textModeInit();
-    setColor(0, 0x2800);  /* custom dark blue background */
+    setColor(0, RGB(0, 0, 10));
 
     textPrintAt(3, 2, "SNESMOD LARGE MUSIC TEST");
     textPrintAt(3, 4, "SOUNDBANK > 32KB (2 BANKS)");
@@ -44,7 +44,6 @@ int main(void) {
     textPrintAt(5, 9, "X - PAUSE/RESUME");
     textPrintAt(5, 12, "NOW PLAYING:");
     textPrintAt(5, 13, "WHAT IS LOVE (108KB IT)");
-    textFlush();
     WaitForVBlank();
 
     snesmodInit();

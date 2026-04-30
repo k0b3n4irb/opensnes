@@ -663,7 +663,7 @@ static void mario_update_camera(void) {
 
     oambuffer[0].oamx = mario_x - camera_x;
     oambuffer[0].oamy = mario_y;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
 }
 
 /*============================================================================
@@ -706,7 +706,16 @@ int main(void) {
     /* DMA all tile/palette data with correct bank bytes (SUPERFREE may be bank $01+) */
     loadGraphics();
 
-    oamInitDynamicSprite(VRAM_SPR_LARGE, VRAM_SPR_SMALL, 0, 0, OBJ_SIZE8_L16);
+    {
+        static const OamDynamicConfig dyn_cfg = {
+            .vramLarge     = VRAM_SPR_LARGE,
+            .vramSmall     = VRAM_SPR_SMALL,
+            .slotLargeInit = 0,
+            .slotSmallInit = 0,
+            .sizeMode      = OBJ_SIZE8_L16,
+        };
+        oamDynamicInit(&dyn_cfg);
+    }
 
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
     mario_init();
@@ -717,14 +726,16 @@ int main(void) {
     snesmodLoadModule(MOD_OVERWORLD);
     sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
 
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
-    /* Initial sprite draw + upload (still in force blank from consoleInit) */
+    /* Initial sprite draw — queue Mario's tile upload. The NMI handler
+     * runs even under force blank, so the WaitForVBlank below lets the
+     * auto-flush hook drain the VRAM queue + sync OAM before we release
+     * force blank. Mario is in VRAM by the time the first frame renders. */
     oambuffer[0].oamx = mario_x;
     oambuffer[0].oamy = mario_y;
-    oamDynamic16Draw(0);
-    oamVramQueueUpdate();
-    oamInitDynamicSpriteEndFrame();
+    oamDynamicDraw(0);
+    WaitForVBlank();
 
     setScreenOn();      /* Release force blank — display begins */
 
@@ -743,13 +754,13 @@ int main(void) {
         mario_update_camera();
         map_update();
 
-        oamInitDynamicSpriteEndFrame();
-
         WaitForVBlank();
-        /* VRAM operations first — must complete within VBlank */
+        /* VRAM operations first — must complete within VBlank.
+         * NMI auto-flushes the dynamic sprite engine (end-frame +
+         * VRAM tile queue), so no manual oamInit*EndFrame /
+         * oamVramQueueUpdate calls are needed here. */
         map_flush_column();
         bgSetScroll(0, camera_x, 0);
-        oamVramQueueUpdate();
         /* SPC700 communication last — no VBlank restriction */
         snesmodProcess();
     }

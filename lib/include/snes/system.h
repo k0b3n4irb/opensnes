@@ -67,4 +67,14 @@ extern volatile u8 oam_update_flag;
  */
 extern volatile u8 vblank_flag;
 
+/**
+ * @brief Frame counter incremented every VBlank by the NMI handler
+ *
+ * Counts total frames since boot (including lag frames).
+ * Useful for timing, animation, and elapsed-time calculations.
+ *
+ * @note Defined in crt0.asm.
+ */
+extern volatile u16 frame_count;
+
 #endif /* OPENSNES_SYSTEM_H */

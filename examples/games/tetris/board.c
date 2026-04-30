@@ -78,7 +78,7 @@ u8 boardFindFullLines(LineClearResult *result) {
 }
 
 void boardRemoveLines(LineClearResult *result) {
-    u8 i, r, c, line_row;
+    u8 i, c, line_row;
     s8 dst;
 
     for (i = 0; i < result->count; i++) {

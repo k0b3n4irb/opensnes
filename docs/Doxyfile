@@ -10,9 +10,9 @@
 #---------------------------------------------------------------------------
 
 PROJECT_NAME           = "OpenSNES"
-PROJECT_NUMBER         = "1.0"
+PROJECT_NUMBER         = "0.11.0"
 PROJECT_BRIEF          = "Modern Open-Source SNES Development SDK"
-PROJECT_LOGO           =
+PROJECT_LOGO           = ../assets/logo_64x64.png
 
 OUTPUT_DIRECTORY       = build
 CREATE_SUBDIRS         = NO
@@ -121,10 +121,12 @@ HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css \
 # JavaScript for dark mode toggle
 HTML_EXTRA_FILES       = doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js \
                          doxygen-awesome-css/doxygen-awesome-fragment-copy-button.js \
-                         doxygen-awesome-css/doxygen-awesome-paragraph-link.js
+                         doxygen-awesome-css/doxygen-awesome-paragraph-link.js \
+                         ../assets/favicon.ico \
+                         ../assets/logo_32x32.png \
+                         ../assets/logo_16x16.png
 
-# Use default header (doxygen-awesome works without custom header)
-# HTML_HEADER            = header.html
+HTML_HEADER            = header.html
 
 # Theme settings
 HTML_COLORSTYLE        = LIGHT

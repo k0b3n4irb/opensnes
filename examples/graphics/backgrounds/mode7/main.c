@@ -82,7 +82,7 @@ int main(void) {
 
     /* Turn on display with BG1 -- Mode 7 only supports a single BG layer
      * (BG1), so we enable just that on the main screen via REG_TM. */
-    REG_TM = TM_BG1;
+    setMainScreen(TM_BG1);
     setScreenOn();
 
     while (1) {

@@ -3,8 +3,10 @@
  * @brief Dynamic metasprite engine demo — multi-tile characters with VRAM streaming
  * @ingroup examples
  *
- * Demonstrates oamMetaDrawDyn32/16/8: multi-tile sprite characters where each
- * sub-sprite's tiles are streamed to VRAM on demand (dynamic sprite engine).
+ * Demonstrates `oamMetaDrawDyn(..., size_class)`: multi-tile sprite
+ * characters where each sub-sprite's tiles are streamed to VRAM on demand
+ * (dynamic sprite engine). The `size_class` parameter selects whether the
+ * metasprite uses the small or large half of the configured size pair.
  * Three OBJSEL configurations are selectable via D-PAD:
  *
  * - Config 0: 8/16 — 16x16 metasprite (LARGE) + 8x8 metasprite (SMALL)
@@ -42,6 +44,7 @@ extern u8 spritehero32_til[];
 extern u8 spritehero32_pal[];
 extern u8 spritehero16_til[];
 extern u8 spritehero8_til[];
+
 
 /*========================================================================
  * Metasprite Definitions
@@ -86,14 +89,17 @@ u16 pad0;
 /** @brief Draw metasprites for the current OBJSEL configuration */
 void drawSprites(void) {
     if (selectedItem == 0) {
-        oamMetaDrawDyn16(1, 64, 140, hero16_frame0, spritehero16_til, OBJ_LARGE);
-        oamMetaDrawDyn8(10, 128, 140, hero8_frame0, spritehero8_til);
+        /* mode 0 (8/16): 16 large + 8 small */
+        oamMetaDrawDyn(1, 64, 140, hero16_frame0, spritehero16_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 128, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
     } else if (selectedItem == 1) {
-        oamMetaDrawDyn32(1, 64, 140, hero32_frame0, spritehero32_til);
-        oamMetaDrawDyn8(10, 192, 140, hero8_frame0, spritehero8_til);
+        /* mode 1 (8/32): 32 large + 8 small */
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
     } else {
-        oamMetaDrawDyn32(1, 64, 140, hero32_frame0, spritehero32_til);
-        oamMetaDrawDyn16(10, 192, 140, hero16_frame0, spritehero16_til, OBJ_SMALL);
+        /* mode 3 (16/32): 32 large + 16 small */
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero16_frame0, spritehero16_til, OBJ_SMALL);
     }
 }
 
@@ -116,39 +122,41 @@ void drawText(void) {
     else
         textPrintAt(3, 5, "  Small: 16 - Large: 32");
 
-    textFlush();
 }
 
 /**
- * @brief Reinitialize sprite engine and pre-draw sprites
+ * @brief Reinitialize sprite engine and upload all tiles during force blank.
  *
- * Uses force blank to ensure no glitch frame: OBJSEL change + OAM clear +
- * sprite draw + VRAM upload all happen while screen is off.
+ * Uses force blank for a glitch-free OBJSEL switch. The current
+ * configuration can enqueue >7 entries (config 2 hits 10), and the NMI
+ * auto-flush hook drains 7 per VBlank, so `oamDynamicDrainQueue` loops
+ * `WaitForVBlank()` until the queue is empty before we release force
+ * blank. NMI suppresses the end-frame "hide stale sprites" path during
+ * the drain so the just-queued sprites are not pushed off-screen.
  */
 void changeObjSize(void) {
     WaitForVBlank();
     setScreenOff();
 
-    if (selectedItem == 0) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE8_L16, 0x0000));
-    } else if (selectedItem == 1) {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE8_L32, 0x0000));
-    } else {
-        oamInitDynamicSprite(0x0000, 0x1000, 0, 0,
-                             OBJSEL(OBJ_SIZE16_L32, 0x0000));
+    {
+        static const u8 obj_sizes[] = {
+            OBJ_SIZE8_L16, OBJ_SIZE8_L32, OBJ_SIZE16_L32
+        };
+        OamDynamicConfig dyn_cfg = {
+            .vramLarge     = 0x0000,
+            .vramSmall     = 0x1000,
+            .slotLargeInit = 0,
+            .slotSmallInit = 0,
+            .sizeMode      = obj_sizes[selectedItem],
+        };
+        oamDynamicInit(&dyn_cfg);
     }
 
-    /* Set refresh flags + pre-draw + upload VRAM while screen is off */
     oambuffer[1].oamrefresh = 1;
     oambuffer[10].oamrefresh = 1;
     drawSprites();
-    oamVramQueueUpdate();
-    oamInitDynamicSpriteEndFrame();
+    oamDynamicDrainQueue();
 
-    /* OAM DMA via WaitForVBlank, then screen on with correct sprites */
-    WaitForVBlank();
     setScreenOn();
 }
 
@@ -157,20 +165,26 @@ int main(void) {
     consoleInit();
     setMode(BG_MODE0, 0);
 
-    setColor(0, 0x0000);
+    setColor(0, RGB(0, 0, 0));
     setColor(1, RGB(31, 31, 31));
 
-    textInit();
-    textLoadFont(0x2000);
-    bgSetGfxPtr(0, 0x2000);
+    /* VRAM layout (Mode 0, all word addresses):
+     * $0000-$0FFF: Large sprite tiles (dynamic engine, name table 0)
+     * $1000-$1FFF: Small sprite tiles (dynamic engine, name table 1)
+     * $3000-$32FF: Font tiles (2bpp, 96 chars × 8 words)
+     * $3800-$3BFF: BG1 tilemap (32×32 entries) */
+    textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
+    textLoadFont(0x3000);
+    bgSetGfxPtr(0, 0x3000);
     bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
 
-    dmaCopyCGram(spritehero32_pal, 128, 32);
+    dmaCopyCGram(spritehero32_pal, OBJ_CGRAM_BASE, 32);
     setMainScreen(LAYER_BG1 | LAYER_OBJ);
 
     selectedItem = 0;
     drawText();
     changeObjSize();
+    setScreenOn();
 
     while (1) {
         pad0 = padPressed(0);
@@ -191,9 +205,8 @@ int main(void) {
         }
 
         drawSprites();
-        oamInitDynamicSpriteEndFrame();
         WaitForVBlank();
-        oamVramQueueUpdate();
+        /* NMI auto-flushes end-frame + VRAM tile queue. */
     }
     return 0;
 }

@@ -1,6 +1,6 @@
 # Compiler Benchmark — OpenSNES vs PVSnesLib
 
-*Generated on 2026-03-10 using `devtools/benchmark/compare_compilers.sh`*
+*Last updated: 2026-03-27. Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
 
 ## Summary
 

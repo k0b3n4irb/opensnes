@@ -77,7 +77,7 @@ cartridge has battery-backed SRAM. `SRAM_SIZE = 3` means 8 KB (2^3 = 8 KB).
 The example uses the text system on BG1 in Mode 0 (2bpp):
 
 ```c
-textInit();
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
 textLoadFont(0x0000);
 bgSetGfxPtr(0, 0x0000);
 bgSetMapPtr(0, 0x3800, BG_MAP_32x32);

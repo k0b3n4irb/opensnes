@@ -224,8 +224,10 @@ For sprites with many animation frames, pre-loading all frames into VRAM wastes 
 1. All sprite frames live in ROM (the `.pic` file)
 2. The engine maintains a VRAM upload queue
 3. When `oamrefresh = 1`, the current frame's tiles are queued for DMA
-4. `oamVramQueueUpdate()` performs the actual VRAM transfer during VBlank
-5. Up to 7 sprite uploads per frame to stay within VBlank budget
+4. The NMI handler auto-flushes the queue during VBlank (no user call)
+5. Up to 7 sprite uploads per VBlank to stay within DMA budget; larger
+   one-shot batches at init use `oamDynamicDrainQueue()` to wait for
+   the queue to fully drain before `setScreenOn()`
 
 ### Initialization
 
@@ -235,13 +237,21 @@ For sprites with many animation frames, pre-loading all frames into VRAM wastes 
 extern u8 spr16_tiles[];
 extern u8 spr16_pal[];
 
-/* Initialize dynamic sprite engine:
- *   VRAM $0000 = large sprite region
- *   VRAM $1000 = small sprite region
- *   OAM slot 0 = first large sprite
- *   OAM slot 0 = first small sprite
- *   OBJ_SIZE8_L16 = 8x8 small, 16x16 large */
-oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE8_L16);
+/* Initialize dynamic sprite engine via the struct-based API.
+ *   vramLarge      = VRAM $0000 (large-tile pool)
+ *   vramSmall      = VRAM $1000 (small-tile pool)
+ *   slotLargeInit  = first OAM slot for the large pool
+ *   slotSmallInit  = first OAM slot for the small pool
+ *   sizeMode       = OBJ_SIZE8_L16 (8x8 small, 16x16 large)
+ */
+static const OamDynamicConfig dyn = {
+    .vramLarge      = 0x0000,
+    .vramSmall      = 0x1000,
+    .slotLargeInit  = 0,
+    .slotSmallInit  = 0,
+    .sizeMode       = OBJ_SIZE8_L16,
+};
+oamDynamicInit(&dyn);
 
 /* Load palette (sprite palettes start at CGRAM 128) */
 dmaCopyCGram(spr16_pal, 128, 32);
@@ -282,14 +292,10 @@ while (1) {
         oambuffer[0].oamrefresh = 1;  /* Trigger VRAM upload */
     }
 
-    /* Draw sprite (updates OAM from oambuffer) */
-    oamDynamic16Draw(0);
-
-    /* Upload queued tile data to VRAM (must be in VBlank) */
-    oamVramQueueUpdate();
-
-    /* Hide sprites not drawn this frame */
-    oamInitDynamicSpriteEndFrame();
+    /* Draw sprite (updates oambuffer + OAM, queues tile DMA).
+     * The NMI handler auto-flushes the queue and hides last
+     * frame's leftovers — no manual flush calls needed. */
+    oamDynamicDraw(0);
 }
 ```
 
@@ -334,15 +340,19 @@ void mario_animate(void) {
 Key details:
 - `oamrefresh` is only set to 1 when the frame actually changes, avoiding redundant VRAM uploads
 - Direction is handled separately via `oamattribute` (setting or clearing the H-flip bit `0x40`)
-- `oamDynamic16Draw()` reads `oambuffer[].oamx` and `oambuffer[].oamy` for positioning
+- `oamDynamicDraw()` reads `oambuffer[].oamx` and `oambuffer[].oamy` for positioning
 
-### Available Draw Functions
+### One Draw Function, Engine-Resolved Size
 
-| Function | Sprite Size | Use Case |
-|----------|-------------|----------|
-| `oamDynamic8Draw(id)` | 8x8 | Small projectiles, particles |
-| `oamDynamic16Draw(id)` | 16x16 | Characters, items |
-| `oamDynamic32Draw(id)` | 32x32 | Bosses, large objects |
+`oamDynamicDraw(id)` looks up the sprite's pixel size from the size pair
+set at init plus an optional per-sprite override (`oamDynamicSetSize`),
+then dispatches to the matching internal routine. Callers no longer
+pick a function by sprite size — the engine knows.
+
+For metasprite groups, `oamMetaDrawDyn(id, x, y, meta, gfx, size_class)`
+walks a `MetaspriteItem` array and dispatches each sub-sprite the same
+way; pass `OBJ_LARGE` or `OBJ_SMALL` to select which half of the
+configured size pair to use.
 
 ## Background Tile Animation
 

@@ -78,7 +78,7 @@ setMainScreen(LAYER_BG1);
 font tiles to VRAM $0000. The BG pointers are then configured to match:
 
 ```c
-textInit();
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
 textLoadFont(0x0000);
 bgSetGfxPtr(0, 0x0000);
 bgSetMapPtr(0, 0x3800, BG_MAP_32x32);

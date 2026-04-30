@@ -46,9 +46,9 @@ extern u8 bg2_pal, bg2_pal_end;
 extern u8 bg2_map, bg2_map_end;
 
 /** @brief BG1 horizontal scroll offset (auto-incremented each frame). */
-short scrX = 0;
+s16 scrX = 0;
 /** @brief BG1 vertical scroll offset (auto-incremented each frame). */
-short scrY = 0;
+s16 scrY = 0;
 
 /**
  * @brief Entry point -- mixed scrolling with auto-scrolling BG1 and fixed BG2.
@@ -102,7 +102,7 @@ int main(void) {
     /* Mode 1, enable only BG1 + BG2 (BG3 disabled).
      * TM_BG1 | TM_BG2 enables both layers on the main screen. */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1 | TM_BG2;
+    setMainScreen(TM_BG1 | TM_BG2);
 
     setScreenOn();
 

@@ -41,7 +41,7 @@ int main(void) {
 
     /* Init hardware + text */
     textModeInit();
-    setColor(0, 0x2800);  /* custom dark blue background */
+    setColor(0, RGB(0, 0, 10));
 
     /* HUD */
     textPrintAt(5, 2, "SNESMOD MUSIC EXAMPLE");
@@ -52,7 +52,6 @@ int main(void) {
     textPrintAt(7, 10, "L/R - VOLUME DOWN/UP");
     textPrintAt(7, 11, "START - FADE OUT");
     textPrintAt(5, 14, "NOW PLAYING: POLLEN8");
-    textFlush();
     WaitForVBlank();
 
     /* Initialize SNESMOD */

@@ -60,10 +60,25 @@ void hdmaWindowShape(u8 channel, const void *windowTable) {
  * Wave/ripple tables in bank $00 RAM (C pointer writes, no WRAM port needed)
  *============================================================================*/
 
+/* Sine quarter-wave table size (quarter of full 256-entry period) */
+#define SINE_QUARTER_SIZE   64
+
+/* Sine period boundaries for quarter-wave reconstruction */
+#define SINE_HALF_PERIOD    128
+#define SINE_3Q_PERIOD      192
+
+/* PPU register base address ($2100) — dest registers are offsets from this */
+#define PPU_BASE_ADDR       0x2100
+
+/* Rounding bias for 8.8 fixed-point >> 8 division (half of 256) */
+#define FIXED8_ROUND        128
+
 /*
- * Local 64-entry quarter-wave sine table (8.8 fixed-point, 0-256).
+ * Local 64-entry quarter-wave sine table (8.8 fixed-point, 0-255).
  * Avoids dependency on the math module. Full period = 256 entries.
- * sine_quarter[i] = round(256 * sin(i * pi / 128)) for i in [0..63].
+ * sine_quarter[i] = round(255 * sin(i * pi / 128)) for i in [0..63].
+ * The peak is 255 (not 256) so the table fits in u8 without truncation;
+ * the 1/256 precision loss at sin(90°) is imperceptible for HDMA effects.
  */
 static const u8 sine_quarter[64] = {
       0,   6,  13,  19,  25,  31,  37,  44,
@@ -73,20 +88,20 @@ static const u8 sine_quarter[64] = {
     181, 185, 189, 193, 197, 201, 205, 209,
     212, 216, 219, 222, 225, 228, 231, 234,
     236, 238, 241, 243, 244, 246, 248, 249,
-    251, 252, 253, 254, 254, 255, 255, 256
+    251, 252, 253, 254, 254, 255, 255, 255
 };
 
 /** Local sine function: angle 0-255, returns -256..+256 (8.8 fixed) */
 static s16 hdmaSin(u8 angle) {
     u8 idx;
     s16 val;
-    if (angle < 64) {
+    if (angle < SINE_QUARTER_SIZE) {
         val = (s16)sine_quarter[angle];
-    } else if (angle < 128) {
-        idx = (u8)(127 - angle);
+    } else if (angle < SINE_HALF_PERIOD) {
+        idx = (u8)(SINE_HALF_PERIOD - 1 - angle);
         val = (s16)sine_quarter[idx];
-    } else if (angle < 192) {
-        idx = (u8)(angle - 128);
+    } else if (angle < SINE_3Q_PERIOD) {
+        idx = (u8)(angle - SINE_HALF_PERIOD);
         val = (s16)(-(s16)sine_quarter[idx]);
     } else {
         idx = (u8)(255 - angle);
@@ -144,10 +159,10 @@ static void fillWaveTable(u8 *table, u8 frame, u8 amplitude, u8 frequency) {
     for (i = 0; i < WAVE_LINES; i++) {
         s16 sine_val = hdmaSin(angle);  /* -256 to +256 (8.8 fixed) */
 
-        /* Scale by amplitude with rounding: (product + 128) >> 8
-         * Without +128, truncation creates horizontal banding artifacts
+        /* Scale by amplitude with rounding: (product + FIXED8_ROUND) >> 8
+         * Without rounding, truncation creates horizontal banding artifacts
          * because many adjacent scanlines get the same integer offset. */
-        s16 offset = (s16)((sine_val * (s16)amplitude + 128) >> 8);
+        s16 offset = (s16)((sine_val * (s16)amplitude + FIXED8_ROUND) >> 8);
 
         *p++ = 0x81;                         /* Repeat mode, 1 line */
         *p++ = (u8)(offset & 0xFF);          /* Scroll low byte */
@@ -245,8 +260,8 @@ void hdmaWaveStop(void) {
 
     /* Reset BG scroll offset to 0 so the wave doesn't leave the
      * background shifted after stopping. Write both low and high bytes. */
-    *(vu8*)(0x2100 + hdma_wave_dest_reg) = 0x00;
-    *(vu8*)(0x2100 + hdma_wave_dest_reg) = 0x00;
+    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
 }
 
 void hdmaWaveSetSpeed(u8 speed) {
@@ -292,7 +307,7 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
 void hdmaBrightnessGradientStop(u8 channel) {
     hdmaDisable(channel_mask[channel]);
     /* Restore full brightness */
-    *(vu8*)0x2100 = 0x0F;
+    REG_INIDISP = 0x0F;
 }
 
 /*--------------------------------------------------------------------------
@@ -470,7 +485,7 @@ static void fillRippleTableRAM(u8 *table, u8 frame, u8 maxAmplitude, u8 frequenc
     for (i = 0; i < WAVE_LINES; i++) {
         s16 sine_val = hdmaSin(angle);
         u8 amp = (u8)(amp_accum >> 8);
-        s16 offset = (s16)((sine_val * (s16)amp + 128) >> 8);
+        s16 offset = (s16)((sine_val * (s16)amp + FIXED8_ROUND) >> 8);
 
         *p++ = 0x81;
         *p++ = (u8)(offset & 0xFF);

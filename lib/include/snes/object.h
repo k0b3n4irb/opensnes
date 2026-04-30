@@ -1,6 +1,12 @@
 /**
  * @file object.h
- * @brief Game object engine with physics and collision
+ * @brief Game object engine with physics and collision (CONTRIB module)
+ *
+ * @note This is a contrib module, not core SDK. The implementation lives in
+ *       `lib/contrib/object.asm` and is not transitively included by `<snes.h>`.
+ *       Examples that use it must `#include <snes/object.h>` explicitly and
+ *       list `object` in their Makefile's `LIB_MODULES`. See
+ *       `lib/contrib/README.md` for the policy.
  *
  * Provides managed game objects with:
  * - Linked-list management (up to 80 objects, 64 types)

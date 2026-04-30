@@ -145,14 +145,14 @@ int main(void) {
     bgSetMapPtr(1, 0x0000, SC_32x32);
     bgInitTileSet(1, tiles, palette, 0,
                   tiles_end - tiles,
-                  16 * 2, BG_16COLORS, 0x4000);
+                  PALETTE_16_SIZE, BG_16COLORS, 0x4000);
     dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
 
     /*--------------------------------------------------------------------
      * Video mode: Mode 1, display BG2 only
      *--------------------------------------------------------------------*/
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG2;
+    setMainScreen(TM_BG2);
 
     /*--------------------------------------------------------------------
      * Color math: direct register writes matching PVSnesLib exactly

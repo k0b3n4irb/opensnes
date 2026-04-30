@@ -21,11 +21,20 @@
 
 # Directories
 SRCDIR = source
+CONTRIBDIR = contrib
 INCDIR = include
 BUILDDIR_LOROM = build/lorom
 BUILDDIR_HIROM = build/hirom
 BUILDDIR_SA1   = build/sa1
 BUILDDIR_SUPERFX = build/superfx
+
+# Memory-map templates included by every C-derived .asm (see wrap step below).
+# Listed as deps on every C compile rule so a memmap edit triggers a rebuild
+# instead of producing stale objects that link silently against the new map.
+MEMMAP_LOROM   = ../templates/memmap.inc
+MEMMAP_HIROM   = ../templates/memmap_hirom.inc
+MEMMAP_SA1     = ../templates/memmap_sa1.inc
+MEMMAP_SUPERFX = ../templates/memmap.inc
 
 # Tools (using QBE-based compiler)
 CC = ../bin/cc65816
@@ -38,52 +47,41 @@ ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 # Source files
 # Note: crt0.asm is startup code that requires hdr.asm - each ROM provides its own
 # Note: sm_spc.asm is included by snesmod.asm, so we exclude it from direct compilation
+# Note: contrib/ holds non-core engine modules (object.asm = 3124 LOC game-entity
+#       engine, treated as a contrib because it sits outside the hardware-library
+#       scope). They build with the same pipeline, but lib/contrib/README.md flags
+#       them as non-essential — examples that don't need them won't link them.
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
 # Exclude crt0 (per-ROM), sm_spc (included by snesmod), superfx (SuperFX-only)
-ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm, $(wildcard $(SRCDIR)/*.asm))
+ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm, $(wildcard $(SRCDIR)/*.asm)) \
+              $(wildcard $(CONTRIBDIR)/*.asm)
 ASM_SOURCES_SUPERFX_ONLY = $(SRCDIR)/superfx.asm
 
-# Sed transformations: convert cproc/QBE output to WLA-DX compatible assembly
-#   /^\.data/d         : Remove .data section markers (WLA-DX uses different syntax)
-#   /^\/\* end/d       : Remove "/* end function */" comments from QBE output
-#   /^\.balign/d       : Remove alignment directives (handled by WLA-DX sections)
-#   /^\.GLOBAL/d       : Remove global declarations (WLA-DX exports differently)
-#   .byte -> .db       : Convert byte directive to WLA-DX syntax
-#   .word -> .dw       : Convert word directive to WLA-DX syntax
-#   .long -> .dl       : Convert long directive to WLA-DX syntax
-#   .ascii -> .ASC     : Convert ASCII string directive to WLA-DX syntax
-#   \000 -> ", 0, "    : Convert null bytes in strings to explicit zeros
-#   .dsb N -> .dsb N,0 : Add fill value to DSB (Define Storage Bytes) directive
-SED_QBE_TO_WLA = \
-	-e '/^\.data/d' \
-	-e '/^\/\* end/d' \
-	-e '/^\.balign/d' \
-	-e '/^\.GLOBAL/d' \
-	-e 's/\.byte/.db/g' \
-	-e 's/\.word/.dw/g' \
-	-e 's/\.long/.dl/g' \
-	-e 's/\.ascii/.ASC/g' \
-	-e 's/\\000/", 0, "/g' \
-	-e 's/\.dsb \([0-9]*\)$$/.dsb \1, 0/g'
+# Helper: convert each ASM source path (in either source/ or contrib/) to the
+# matching $(BUILDDIR)/<basename>-asm.o object path. The double `notdir+patsubst`
+# strips the source-tree prefix so contrib/object.asm and source/foo.asm produce
+# build/<mode>/object-asm.o and build/<mode>/foo-asm.o respectively.
+asm_objects = $(addprefix $(1)/,$(addsuffix -asm.o,$(basename $(notdir $(ASM_SOURCES)))))
+asm_objects_superfx_only = $(addprefix $(1)/,$(addsuffix -asm.o,$(basename $(notdir $(ASM_SOURCES_SUPERFX_ONLY)))))
 
 # Object files - LoROM
 C_OBJECTS_LOROM = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_LOROM)/%.o)
-ASM_OBJECTS_LOROM = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_LOROM)/%-asm.o)
+ASM_OBJECTS_LOROM = $(call asm_objects,$(BUILDDIR_LOROM))
 OBJECTS_LOROM = $(C_OBJECTS_LOROM) $(ASM_OBJECTS_LOROM)
 
 # Object files - HiROM
 C_OBJECTS_HIROM = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_HIROM)/%.o)
-ASM_OBJECTS_HIROM = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_HIROM)/%-asm.o)
+ASM_OBJECTS_HIROM = $(call asm_objects,$(BUILDDIR_HIROM))
 OBJECTS_HIROM = $(C_OBJECTS_HIROM) $(ASM_OBJECTS_HIROM)
 
 # Object files - SA-1 (same bank layout as LoROM, different header)
 C_OBJECTS_SA1 = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SA1)/%.o)
-ASM_OBJECTS_SA1 = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SA1)/%-asm.o)
+ASM_OBJECTS_SA1 = $(call asm_objects,$(BUILDDIR_SA1))
 OBJECTS_SA1 = $(C_OBJECTS_SA1) $(ASM_OBJECTS_SA1)
 
 # Object files - SuperFX (LoROM-based + SuperFX-only ASM modules)
 C_OBJECTS_SUPERFX = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SUPERFX)/%.o)
-ASM_OBJECTS_SUPERFX = $(ASM_SOURCES:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o) $(ASM_SOURCES_SUPERFX_ONLY:$(SRCDIR)/%.asm=$(BUILDDIR_SUPERFX)/%-asm.o)
+ASM_OBJECTS_SUPERFX = $(call asm_objects,$(BUILDDIR_SUPERFX)) $(call asm_objects_superfx_only,$(BUILDDIR_SUPERFX))
 OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
 
 #------------------------------------------------------------------------------
@@ -107,17 +105,20 @@ lorom: $(OBJECTS_LOROM)
 	@echo "[DONE] LoROM library: $(BUILDDIR_LOROM)/"
 
 # C compilation for LoROM
-$(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_LOROM)
+$(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
 	@echo "[CC-LOROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_LOROM)/$*.c.asm
 	@echo '.include "memmap.inc"' > $(BUILDDIR_LOROM)/$*.asm
 	@echo '' >> $(BUILDDIR_LOROM)/$*.asm
-	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_LOROM)/$*.c.asm >> $(BUILDDIR_LOROM)/$*.asm
+	@cat $(BUILDDIR_LOROM)/$*.c.asm >> $(BUILDDIR_LOROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_LOROM)/$*.asm
 
-# ASM compilation for LoROM
+# ASM compilation for LoROM (core source/ + non-core contrib/)
 $(BUILDDIR_LOROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_LOROM)
 	@echo "[AS-LOROM] $<"
+	@$(AS) $(ASFLAGS) $@ $<
+$(BUILDDIR_LOROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_LOROM)
+	@echo "[AS-LOROM-CONTRIB] $<"
 	@$(AS) $(ASFLAGS) $@ $<
 
 $(BUILDDIR_LOROM):
@@ -131,17 +132,20 @@ hirom: $(OBJECTS_HIROM)
 	@echo "[DONE] HiROM library: $(BUILDDIR_HIROM)/"
 
 # C compilation for HiROM
-$(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_HIROM)
+$(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
 	@echo "[CC-HIROM] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_HIROM)/$*.c.asm
 	@echo '.include "memmap_hirom.inc"' > $(BUILDDIR_HIROM)/$*.asm
 	@echo '' >> $(BUILDDIR_HIROM)/$*.asm
-	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_HIROM)/$*.c.asm >> $(BUILDDIR_HIROM)/$*.asm
+	@cat $(BUILDDIR_HIROM)/$*.c.asm >> $(BUILDDIR_HIROM)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_HIROM)/$*.asm
 
-# ASM compilation for HiROM
+# ASM compilation for HiROM (core source/ + non-core contrib/)
 $(BUILDDIR_HIROM)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_HIROM)
 	@echo "[AS-HIROM] $<"
+	@$(AS) -D HIROM $(ASFLAGS) $@ $<
+$(BUILDDIR_HIROM)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_HIROM)
+	@echo "[AS-HIROM-CONTRIB] $<"
 	@$(AS) -D HIROM $(ASFLAGS) $@ $<
 
 $(BUILDDIR_HIROM):
@@ -155,17 +159,20 @@ sa1: $(OBJECTS_SA1)
 	@echo "[DONE] SA-1 library: $(BUILDDIR_SA1)/"
 
 # C compilation for SA-1
-$(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_SA1)
+$(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
 	@echo "[CC-SA1] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SA1)/$*.c.asm
 	@echo '.include "memmap_sa1.inc"' > $(BUILDDIR_SA1)/$*.asm
 	@echo '' >> $(BUILDDIR_SA1)/$*.asm
-	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_SA1)/$*.c.asm >> $(BUILDDIR_SA1)/$*.asm
+	@cat $(BUILDDIR_SA1)/$*.c.asm >> $(BUILDDIR_SA1)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SA1)/$*.asm
 
-# ASM compilation for SA-1
+# ASM compilation for SA-1 (core source/ + non-core contrib/)
 $(BUILDDIR_SA1)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SA1)
 	@echo "[AS-SA1] $<"
+	@$(AS) -D SA1 $(ASFLAGS) $@ $<
+$(BUILDDIR_SA1)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SA1)
+	@echo "[AS-SA1-CONTRIB] $<"
 	@$(AS) -D SA1 $(ASFLAGS) $@ $<
 
 $(BUILDDIR_SA1):
@@ -179,17 +186,20 @@ superfx: $(OBJECTS_SUPERFX)
 	@echo "[DONE] SuperFX library: $(BUILDDIR_SUPERFX)/"
 
 # C compilation for SuperFX
-$(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c | $(BUILDDIR_SUPERFX)
+$(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 	@echo "[CC-SUPERFX] $<"
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SUPERFX)/$*.c.asm
 	@echo '.include "memmap.inc"' > $(BUILDDIR_SUPERFX)/$*.asm
 	@echo '' >> $(BUILDDIR_SUPERFX)/$*.asm
-	@sed $(SED_QBE_TO_WLA) $(BUILDDIR_SUPERFX)/$*.c.asm >> $(BUILDDIR_SUPERFX)/$*.asm
+	@cat $(BUILDDIR_SUPERFX)/$*.c.asm >> $(BUILDDIR_SUPERFX)/$*.asm
 	@$(AS) $(ASFLAGS) $@ $(BUILDDIR_SUPERFX)/$*.asm
 
-# ASM compilation for SuperFX
+# ASM compilation for SuperFX (core source/ + non-core contrib/)
 $(BUILDDIR_SUPERFX)/%-asm.o: $(SRCDIR)/%.asm | $(BUILDDIR_SUPERFX)
 	@echo "[AS-SUPERFX] $<"
+	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
+$(BUILDDIR_SUPERFX)/%-asm.o: $(CONTRIBDIR)/%.asm | $(BUILDDIR_SUPERFX)
+	@echo "[AS-SUPERFX-CONTRIB] $<"
 	@$(AS) -D SUPERFX $(ASFLAGS) $@ $<
 
 $(BUILDDIR_SUPERFX):

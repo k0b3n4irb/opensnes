@@ -117,13 +117,15 @@ endif
 # Module Dependency Auto-Resolution
 #------------------------------------------------------------------------------
 
-_DEP_sprite    := dma sprite_oamset
-_DEP_text      := dma background
-_DEP_text4bpp  := dma
-_DEP_object    := map
-_DEP_map       := dma
-_DEP_snesmod   := console
-_DEP_superfx   := dma
+_DEP_sprite          := dma sprite_oamset
+_DEP_sprite_dynamic  := sprite_dynamic_dispatch
+_DEP_text            := dma background
+_DEP_text4bpp        := dma
+_DEP_object          := map
+_DEP_map             := dma
+_DEP_snesmod         := console
+_DEP_superfx         := dma
+_DEP_hdma            := dma
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
@@ -213,14 +215,44 @@ endif
 # Compilation
 #------------------------------------------------------------------------------
 
-# Wrap ASM source with memmap include and assemble to object
+# Wrap ASM source with memmap include and assemble to object.
+# Every rule using `wrap_asm` MUST include $(MEMMAP_DEP) in its prerequisites
+# so that a change to the memory-map template re-triggers the build — the
+# .wrap.asm file is regenerated each invocation, but `make` only knows to
+# invoke the rule when its declared deps change.
+MEMMAP_DEP := $(TEMPLATES)/$(MEMMAP_INC)
+
 define wrap_asm
 	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(1); } > $(basename $(2)).wrap.asm
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $(2) $(basename $(2)).wrap.asm
 endef
 
+# Lint flags for the optional clang syntax check (cproc ignores -W flags).
+# Disable host-vs-target false positives: SNES has 16-bit pointers, so casting
+# &fill_value (a u16*) to u16 and (vu8*)0x4300 from int are LEGITIMATE here
+# even though clang's host model would flag them. -Wno-unused-parameter
+# silences callback signatures (e.g. object engine init takes minx/maxx that
+# specific objects ignore — the ABI requires them).
+CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
+	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
+	-Wno-unused-parameter
+
 # C sources → objects
-%.c.o: %.c $(GFX_HEADERS)
+# Step 1: clang syntax check (cproc has no built-in -W flags so a sibling
+#         compiler runs the warnings cc65816 silently swallows). -Werror
+#         makes any warning fail the build — the SDK is currently warning-
+#         clean and stays that way.
+# Step 2: cc65816 (cproc + QBE) → 65816 assembly.
+# Step 3: wrap with memmap and assemble via wla-65816.
+# SKIP_LINT=1 disables the syntax check (escape hatch for environments
+# without clang; CI always runs with the check enabled).
+%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP)
+ifneq ($(SKIP_LINT),1)
+	@if command -v clang >/dev/null 2>&1; then \
+		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
+			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
+	fi
+endif
 	@echo "[CC] $<"
 	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
 	$(call wrap_asm,$*.c.asm,$@)
@@ -251,13 +283,13 @@ crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boo
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
 # Initialized data start marker
-data_init_start.o: $(TEMPLATES)/data_init_start.asm
+data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
-$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS)
+$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP)
 	@echo "[AS] $(1)"
 	$$(call wrap_asm,$(1),$$@)
 endef
@@ -265,13 +297,13 @@ $(foreach src,$(ASMSRC),$(eval $(call ASM_OBJ_RULE,$(src))))
 
 # Soundbank object
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP)
 	@echo "[AS] $(SOUNDBANK_OUT)"
 	$(call wrap_asm,$<,$@)
 endif
 
 # End marker (must be linked LAST)
-data_init_end.o: $(TEMPLATES)/data_init_end.asm
+data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_end"
 	$(call wrap_asm,$<,$@)
 
@@ -301,6 +333,23 @@ ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
 	@python3 -c "f=open('$@','r+b');f.seek(0x7FD5);b=f.read(1)[0];f.seek(0x7FD5);f.write(bytes([b|0x03]));f.close()" && echo "[SA1] Patched $$FFD5 map mode to SA-1"
+endif
+	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
+	@# bank $$01+. The compiler emits 16-bit addresses that always read bank $$00,
+	@# so spilled string.N symbols return GARBAGE silently in production. exit 1
+	@# from symmap = critical spill (hard fail). exit 2 = soft warning (low free
+	@# space) — printed but build continues. Set SKIP_BANK0_CHECK=1 to disable.
+ifneq ($(SKIP_BANK0_CHECK),1)
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow "$$SYM"; \
+		rc=$$?; \
+		if [ "$$rc" -eq 1 ]; then \
+			echo "ERROR: bank \$$00 ROM overflow — see symmap output above"; \
+			echo "       reduce const data or split arrays. SKIP_BANK0_CHECK=1 to bypass."; \
+			exit 1; \
+		fi; \
+	fi
 endif
 
 #------------------------------------------------------------------------------

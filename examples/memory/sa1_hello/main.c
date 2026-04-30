@@ -34,7 +34,6 @@ int main(void) {
     } else {
         textPrintAt(3, 7, "UNKNOWN STATUS VALUE");
     }
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 

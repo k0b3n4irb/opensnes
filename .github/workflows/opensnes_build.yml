@@ -84,6 +84,16 @@ jobs:
           submodules: recursive
 
       # ------------------------------------ #
+      # Verify compiler toolchain pins        #
+      # ------------------------------------ #
+      # Drift between submodule pointer and compiler/PINS.md fails fast before
+      # any build cost. Skipped on Windows because the MSYS2 shell wraps make
+      # itself, but the Linux/macOS legs cover the same submodule SHAs.
+      - name: Verify compiler toolchain pins
+        if: matrix.name != 'windows'
+        run: python3 devtools/verify_toolchain.py
+
+      # ------------------------------------ #
       # Build & create release               #
       # ------------------------------------ #
       - name: Build & Release OpenSNES for Linux
@@ -118,11 +128,12 @@ jobs:
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Tests (moved to opensnes-emu)        #
+      # Functional tests run in a separate   #
+      # job (see `functional-tests` below):  #
+      # opensnes-emu is Linux-only (WASM     #
+      # build via emsdk), so we don't try    #
+      # to run it on Windows/macOS legs.     #
       # ------------------------------------ #
-      # Unit tests, compiler tests, and example validation are now handled by
-      # tools/opensnes-emu/test/run-all-tests.mjs (requires Node.js + WASM).
-      # CI runs build + symmap validation only. Full test suite runs locally.
 
       # ------------------------------------ #
       # Build and validate examples          #
@@ -208,4 +219,126 @@ jobs:
         with:
           name: OpenSNES Logs (${{ matrix.name }})
           path: "*.log"
+
+  # ====================================================================== #
+  # Functional tests via opensnes-emu (snes9x WASM)                        #
+  #                                                                        #
+  # Runs the full test suite — visual regression, lag detection, runtime,  #
+  # static analysis, input sequences. Linux-only because the WASM core     #
+  # requires emsdk, and MSYS2 cproc segfaults make Windows test runs       #
+  # unreliable. Failures here block PR merges.                             #
+  # ====================================================================== #
+  functional-tests:
+    name: Functional Tests (opensnes-emu)
+    # Mesen2's published Linux_x64 zip is the NativeAOT build, compiled
+    # against the libstdc++ shipped with ubuntu-22.04 (gcc 11). Running
+    # that AOT binary on ubuntu-latest (24.04, gcc 13) hits a libstdc++
+    # ABI mismatch in the C++ MesenCore.so → std::bad_cast in InitDll.
+    # Pin the Functional Tests job to 22.04 to match Mesen2's build env.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          # xvfb provides a virtual X server so the Avalonia-based Mesen2
+          # binary can run on this headless ubuntu-latest runner. Without
+          # it Mesen2 SIGABRTs during GUI subsystem init, even with
+          # --testrunner. The test/phases/visual-mesen2.mjs phase auto-
+          # wraps Mesen2 in `xvfb-run -a` when $DISPLAY is missing.
+          # libsdl2-dev matches the package Mesen2's own CI installs
+          # (https://github.com/SourMesen/Mesen2 .github/workflows/build.yml)
+          # and pulls in libsdl2-2.0-0 plus the transitive deps the
+          # MesenCore.so dlopens at startup. Using libsdl2-2.0-0 alone
+          # was getting us past the DllNotFoundException but not all the
+          # way to a working init.
+          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb libsdl2-dev
+
+      - name: Check out OpenSNES (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: tools/opensnes-emu/package-lock.json
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.50
+          actions-cache-folder: emsdk-cache
+
+      - name: Verify compiler toolchain pins
+        run: python3 devtools/verify_toolchain.py
+
+      - name: Build SDK (toolchain + lib + examples)
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make
+
+      - name: Cache opensnes-emu WASM core
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: tools/opensnes-emu/core/build
+          key: wasm-core-${{ hashFiles('tools/opensnes-emu/core/bridge.cpp', 'tools/opensnes-emu/core/Makefile') }}
+
+      - name: Build WASM core (snes9x libretro)
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        working-directory: tools/opensnes-emu/core
+        run: make
+
+      - name: Install opensnes-emu dependencies
+        working-directory: tools/opensnes-emu
+        run: npm ci
+
+      - name: Install Mesen2 binary (chip-ROM coverage)
+        # snes9x doesn't detect the GSU chip in OpenSNES SuperFX ROM
+        # headers, so the snes9x-based visual phase only validates "boots
+        # without crashing" for chip ROMs. The Mesen2 phase fills the gap.
+        # The install script downloads ~15 MB once per CI run (no cache);
+        # short-circuits if vendor/Mesen already matches the requested
+        # version.
+        working-directory: tools/opensnes-emu
+        run: ./scripts/install-mesen2.sh
+
+      - name: Bootstrap Mesen2 config (skip first-run wizard)
+        # Mesen2's Program.Main shows an Avalonia setup wizard when no
+        # settings.json exists, BEFORE checking the --testrunner flag.
+        # On a headless CI runner that wizard hangs forever waiting for
+        # input.
+        #
+        # A minimal `{"Version":"2.1.1","ConfigUpgrade":5}` config bypasses
+        # the wizard but the C++ MesenCore.so then crashes in InitDll
+        # with `std::bad_cast` because the per-system subsystem objects
+        # (Snes, Nes, Gameboy, ...) it expects to dynamic_cast<> are
+        # missing. Copy a fully-populated, sanitised settings.json
+        # (paths and recents wiped) from the test fixtures so all
+        # subsystem types are present and InitDll succeeds.
+        run: |
+          mkdir -p ~/.config/Mesen2
+          cp tools/opensnes-emu/test/fixtures/mesen2-config/settings.json \
+             ~/.config/Mesen2/settings.json
+
+      - name: Run test suite
+        working-directory: tools/opensnes-emu
+        # Full suite (drops --quick so compiler tests run too).
+        # --allow-known-bugs lets the 5 documented gaps (tail call optimisation,
+        # A-cache through pha, stale leaf_opt marker) report as [KNOWN_BUG]
+        # instead of failing — they are tracked as future compiler work, not
+        # regressions. Real regressions still fail.
+        run: node test/run-all-tests.mjs --allow-known-bugs
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opensnes-emu test artifacts
+          path: |
+            tools/opensnes-emu/test/baselines/
+            tools/opensnes-emu/roms/
 

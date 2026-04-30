@@ -41,16 +41,12 @@ extern u8 oam_max_id; /* Defined in crt0.asm - highest sprite ID written */
  * Initialization
  *============================================================================*/
 
-void oamInit(void) {
-    oamInitEx(OBJ_SIZE8_L16, 0);
-}
+void oamInit(u16 size, u16 tile_base) {
+    /* All parameters u16 to avoid calling convention issues. */
+    /* OBJSEL packs sprite size (bits 5-7) and tile base (bits 0-2). */
+    REG_OBJSEL = (u8)((size << 5) | (tile_base & 0x07));
 
-void oamInitEx(u16 size, u16 tileBase) {
-    /* All parameters u16 to avoid calling convention issues */
-    /* Set sprite size and tile base address */
-    REG_OBJSEL = (u8)((size << 5) | (tileBase & 0x07));
-
-    /* Clear OAM buffer - hide all sprites */
+    /* Clear OAM buffer — hide all sprites. */
     oamClear();
 }
 
@@ -61,14 +57,14 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
 
     /* Load sprite palette to CGRAM (sprites use colors 128-255) */
     /* Each sprite palette is 16 colors = 32 bytes, starting at color 128 */
-    u16 palOffset = 128 + (paletteEntry * 16);
+    u16 palOffset = OBJ_CGRAM_BASE + (paletteEntry * 16);
     dmaCopyCGram(tilePalette, palOffset, paletteSize);
 
     /* Calculate tile base from VRAM address (divide by 0x2000) */
     u8 tileBase = (vramAddr >> 13) & 0x07;
 
     /* Initialize OAM with size and tile base */
-    oamInitEx(oamSize, tileBase);
+    oamInit(oamSize, tileBase);
 }
 
 /*============================================================================
@@ -94,7 +90,7 @@ void oamSetX(u8 id, u16 x) {
     oam_buffer[offset + 0] = (u8)(x & 0xFF);
 
     /* Update X high bit in extension table */
-    u16 ext_offset = 512 + (id >> 2);
+    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
     u8 slot = id & 0x03;
 
     if (x & 0x100) {
@@ -109,7 +105,9 @@ void oamSetX(u8 id, u16 x) {
 
 void oamSetY(u8 id, u8 y) {
     if (id >= MAX_SPRITES) return;
-    oam_buffer[(id << 2) + 1] = y;
+    /* SNES PPU quirk: OAM_Y = N renders sprite on scanlines N+1..N+8.
+     * Subtract 1 so caller's y matches the sprite's rendered top scanline. */
+    oam_buffer[(id << 2) + 1] = (u8)(y - 1);
     OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
@@ -150,7 +148,7 @@ void oamHide(u8 id) {
     oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y; /* Y = 240 */
 
     /* Set X high bit in extension table */
-    u16 ext_offset = 512 + (id >> 2);
+    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
     u8 slot = id & 0x03;
     oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
 
@@ -162,7 +160,7 @@ void oamSetSize(u16 id, u16 large) {
     /* All parameters u16 to avoid calling convention issues */
     if (id >= MAX_SPRITES) return;
 
-    u16 ext_offset = 512 + (id >> 2);
+    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
     u16 slot = id & 0x03;
 
     if (large) {
@@ -173,18 +171,6 @@ void oamSetSize(u16 id, u16 large) {
 
     OAM_TRACK_MAX((u8)id);
     oam_update_flag = 1;
-}
-
-void oamSetEx(u8 id, u8 size, u8 visible) {
-    if (id >= MAX_SPRITES) return;
-
-    /* Set size */
-    oamSetSize(id, size);
-
-    /* Set visibility */
-    if (!visible) {
-        oamHide(id);
-    }
 }
 
 /*============================================================================
@@ -210,9 +196,9 @@ void oamUpdate(void) {
     REG_A1TH(0) = ((u16)oam_buffer >> 8) & 0xFF;
     REG_A1B(0) = 0x7E;  /* Bank $7E (Work RAM) */
 
-    /* Transfer size: 544 bytes */
-    REG_DASL(0) = 544 & 0xFF;
-    REG_DASH(0) = (544 >> 8) & 0xFF;
+    /* Transfer size: 544 bytes (512 main + 32 extension) */
+    REG_DASL(0) = OAM_BUFFER_SIZE & 0xFF;
+    REG_DASH(0) = (OAM_BUFFER_SIZE >> 8) & 0xFF;
 
     /* Start DMA */
     REG_MDMAEN = 0x01;
@@ -226,7 +212,7 @@ void oamClear(void) {
      * the top of the screen. Setting X bit 8 = 1 pushes them
      * off-screen to the right, safe for any sprite size.
      */
-    for (i = 0; i < 128; i++) {
+    for (i = 0; i < MAX_SPRITES; i++) {
         u16 offset = i << 2;
         oam_buffer[offset + 0] = 0;
         oam_buffer[offset + 1] = OBJ_HIDE_Y;
@@ -238,8 +224,8 @@ void oamClear(void) {
      * Each byte covers 4 sprites: bits 0,2,4,6 = X high; bits 1,3,5,7 = size.
      * Pattern 0x55 = 01010101 = all X high bits set, all size bits clear.
      */
-    for (i = 0; i < 32; i++) {
-        oam_buffer[512 + i] = 0x55;
+    for (i = 0; i < OAM_EXT_SIZE; i++) {
+        oam_buffer[OAM_EXT_OFFSET + i] = 0x55;
     }
 
     oam_max_id = 127;  /* Force full OAM DMA to clear all sprites */
@@ -350,3 +336,4 @@ u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette) {
                        (const MetaspriteItem *)data,
                        0, palette, OBJ_LARGE);
 }
+

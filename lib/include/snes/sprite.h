@@ -14,8 +14,8 @@
  * ## Usage
  *
  * @code
- * // Initialize sprite system
- * oamInit();
+ * // Initialize sprite system (defaults: 8x8/16x16 sprites, tile base 0)
+ * oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
  *
  * // Set up a sprite
  * oamSet(0, 100, 80, 0, 0, 0, 0);  // Sprite 0 at (100, 80)
@@ -45,7 +45,7 @@
 /** @brief Maximum number of hardware sprites */
 #define MAX_SPRITES 128
 
-/** @brief Sprite size indices (for oamInitGfxSet, oamInitEx) */
+/** @brief Sprite size indices (for oamInit, oamInitGfxSet) */
 #define OBJ_SIZE8_L16   0   /**< Small=8x8, Large=16x16 */
 #define OBJ_SIZE8_L32   1   /**< Small=8x8, Large=32x32 */
 #define OBJ_SIZE8_L64   2   /**< Small=8x8, Large=64x64 */
@@ -70,6 +70,27 @@
  * @endcode
  */
 #define OBJSEL(size, vram_addr) ((u8)(OBJ_SIZE_TO_REG(size) | OBJ_BASE(vram_addr)))
+
+/** @brief CGRAM base offset for sprite palettes (sprites use colors 128-255) */
+#define OBJ_CGRAM_BASE  128
+
+/** @brief CGRAM color index for sprite palette n (0-7) */
+#define OBJ_CGRAM_PAL(n)  (OBJ_CGRAM_BASE + (n) * 16)
+
+/** @brief Size of one 16-color palette in bytes (16 colors x 2 bytes per BGR555) */
+#define PALETTE_16_SIZE  32
+
+/** @brief Y coordinate that hides a sprite below the NTSC visible area */
+#define OAM_Y_OFFSCREEN  0xE0
+
+/** @brief OAM extension table offset in bytes (starts after 128*4 main entries) */
+#define OAM_EXT_OFFSET  512
+
+/** @brief OAM extension table size in bytes (2 bits per sprite, 128 sprites) */
+#define OAM_EXT_SIZE    32
+
+/** @brief Total OAM buffer size in bytes (512 main + 32 extension) */
+#define OAM_BUFFER_SIZE 544
 
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
@@ -161,7 +182,7 @@ extern u16 lkup8idB[];
  * OAM_SET_GFX(0, sprite_tiles);  // Set 24-bit graphics address
  *
  * // In game loop
- * oamDynamic16Draw(0);  // Draw and queue VRAM upload if needed
+ * oamDynamicDraw(0);  // Draw + queue VRAM upload (NMI auto-flushes)
  * @endcode
  */
 typedef struct {
@@ -236,20 +257,30 @@ extern t_sprites oambuffer[128];
  *============================================================================*/
 
 /**
- * @brief Initialize sprite system
+ * @brief Default sprite size mode — small=8×8 / large=16×16.
  *
- * Clears OAM buffer and sets up default configuration.
- * Must be called before using any sprite functions.
+ * Same value as OBJ_SIZE8_L16 (the most common configuration: 8×8 tiles
+ * for HUD elements and 16×16 for characters/projectiles).
  */
-void oamInit(void);
+#define OAM_DEFAULT_SIZE        OBJ_SIZE8_L16
+/** @brief Default sprite tile base — 0 = tiles at VRAM word $0000. */
+#define OAM_DEFAULT_TILE_BASE   0
 
 /**
- * @brief Initialize sprite system with configuration
+ * @brief Initialize the sprite (OAM) system.
  *
- * @param size Sprite size configuration (OBJ_SIZE_*)
- * @param tileBase Base address for sprite tiles in VRAM (word address >> 13)
+ * Sets the OBJSEL register (sprite size mode + tile base) and clears the
+ * OAM shadow buffer so all sprites start hidden. Must be called before
+ * any other oam* function. Replaces the v1 oamInit/oamInitEx pair —
+ * pass OAM_DEFAULT_* constants for the previous oamInit(void) defaults.
+ *
+ * @param size       Sprite size mode (OBJ_SIZE_*; use OAM_DEFAULT_SIZE for
+ *                   the standard 8×8/16×16 layout)
+ * @param tile_base  VRAM tile-base index 0-7 (each step = $1000 word
+ *                   addresses; use OAM_DEFAULT_TILE_BASE for tiles at
+ *                   VRAM $0000)
  */
-void oamInitEx(u16 size, u16 tileBase);
+void oamInit(u16 size, u16 tile_base);
 
 /**
  * @brief Initialize sprite graphics and palette (PVSnesLib compatible)
@@ -274,15 +305,6 @@ void oamInitEx(u16 size, u16 tileBase);
  */
 void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
                    u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize);
-
-/**
- * @brief Set sprite extended attributes
- *
- * @param id Sprite ID (0-127)
- * @param size Size selection (OBJ_SMALL or OBJ_LARGE)
- * @param visible Visibility (OBJ_SHOW or OBJ_HIDE)
- */
-void oamSetEx(u8 id, u8 size, u8 visible);
 
 /*============================================================================
  * Sprite Properties
@@ -462,6 +484,9 @@ typedef MetaspriteItem t_metasprite;
 /** @brief Metasprite vertical flip flag */
 #define OBJ_FLIPY       0x80
 
+/** @brief OAM attribute bit 0: second name table select (tile numbers 256+) */
+#define OBJ_NAMETABLE_HIGH  0x01
+
 /**
  * @brief Draw a metasprite (PVSnesLib compatible)
  *
@@ -540,177 +565,149 @@ u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette);
  *============================================================================*/
 
 /**
- * @brief Initialize the dynamic sprite engine
+ * @brief Configuration for the dynamic sprite engine.
  *
- * Sets up VRAM regions for sprite graphics and initializes the VRAM upload
- * queue. Must be called before using oamDynamic*Draw functions.
+ * Pass this to `oamDynamicInit` instead of the 5 positional arguments of
+ * `oamInitDynamicSprite`. Equivalent at runtime; clearer at the call site
+ * and easier to evolve without breaking existing callers.
+ */
+typedef struct {
+    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr) */
+    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr) */
+    u16 slotLargeInit;  /**< Initial OAM slot for large sprites (was oamsp0init) */
+    u16 slotSmallInit;  /**< Initial OAM slot for small sprites (was oamsp1init) */
+    u8  sizeMode;       /**< OBJ_SIZE_* — defines the small/large pixel sizes */
+} OamDynamicConfig;
+
+/**
+ * @brief Initialize the dynamic sprite engine from a config struct.
  *
- * @param gfxsp0adr VRAM address for large sprites (e.g., 0x0000)
- * @param gfxsp1adr VRAM address for small sprites (e.g., 0x1000)
- * @param oamsp0init Starting OAM slot for large sprites (0-127, multiple of 4)
- * @param oamsp1init Starting OAM slot for small sprites (0-127, multiple of 4)
- * @param oamsize Sprite size configuration (OBJ_SIZE_*)
+ * Preferred over `oamInitDynamicSprite` — the struct-based form makes the
+ * intent of each parameter visible at the call site and survives future
+ * additions without a signature break.
+ *
+ * @param cfg Configuration (caller-owned; the engine reads it once).
  *
  * @code
- * // Initialize for 16x16 small, 32x32 large sprites
- * // Large sprites at VRAM $0000, small at $1000
- * oamInitDynamicSprite(0x0000, 0x1000, 0, 0, OBJ_SIZE16_L32);
+ * static const OamDynamicConfig dyn = {
+ *     .vramLarge      = 0x0000,
+ *     .vramSmall      = 0x1000,
+ *     .slotLargeInit  = 0,
+ *     .slotSmallInit  = 0,
+ *     .sizeMode       = OBJ_SIZE16_L32,
+ * };
+ * oamDynamicInit(&dyn);
  * @endcode
  */
-void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
-                          u16 oamsp0init, u16 oamsp1init, u8 oamsize);
+void oamDynamicInit(const OamDynamicConfig *cfg);
 
 /**
- * @brief End frame processing for dynamic sprites
+ * @brief Override the dispatched pixel size for a dynamic sprite slot.
  *
- * Call after drawing all sprites each frame. Hides sprites that were
- * visible last frame but not drawn this frame, and resets per-frame counters.
+ * Optional companion to `oamDynamicDraw`. By default each slot dispatches
+ * to the "large" half of the size pair set at init. Call this to make a
+ * specific slot use a different pixel size (8, 16, or 32) — typical when
+ * mixing small and large dynamic sprites under the same mode pair.
  *
- * @code
- * // Game loop
- * while (1) {
- *     for (i = 0; i < numSprites; i++) {
- *         oamDynamic16Draw(i);
- *     }
- *     oamInitDynamicSpriteEndFrame();  // Hide unused sprites
- *     WaitForVBlank();
- *     oamVramQueueUpdate();  // Upload graphics to VRAM
- * }
- * @endcode
+ * Pass 0 to clear the override and revert to the mode default.
+ *
+ * @param id   Sprite slot id (0-127)
+ * @param size Pixel size: 8, 16, or 32 (or 0 to clear)
  */
-void oamInitDynamicSpriteEndFrame(void);
+void oamDynamicSetSize(u16 id, u8 size);
 
 /**
- * @brief Process VRAM upload queue
+ * @brief Draw a dynamic sprite — engine picks the size routine.
  *
- * Call during VBlank to upload queued sprite graphics to VRAM.
- * Transfers up to 7 sprites per frame to stay within VBlank budget.
- * If more sprites are queued, they will be transferred on subsequent frames.
+ * Preferred entry point — replaces the manual choice between
+ * `oamDynamic8Draw` / `oamDynamic16Draw` / `oamDynamic32Draw`. The engine
+ * uses the per-sprite size set via `oamDynamicSetSize` if any; otherwise
+ * it falls back to the "large" pixel size of the size pair selected at
+ * init by `oamInitDynamicSprite` (or `oamDynamicInit`).
  *
- * @note Must be called after WaitForVBlank() for proper timing.
- */
-void oamVramQueueUpdate(void);
-
-/**
- * @brief Draw a 32x32 dynamic sprite
- *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
- *
- * @param id Index into oambuffer array (0-127)
- *
- * @code
- * oambuffer[0].oamx = 100;
- * oambuffer[0].oamy = 80;
- * oambuffer[0].oamframeid = 0;
- * oambuffer[0].oamattribute = OBJ_PRIO(2) | OBJ_PAL(0);
- * oambuffer[0].oamrefresh = 1;
- * OAM_SET_GFX(0, sprite32_tiles);
- * oamDynamic32Draw(0);
- * @endcode
- */
-void oamDynamic32Draw(u16 id);
-
-/**
- * @brief Draw a 16x16 dynamic sprite
- *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
+ * 64x64 dynamic streaming is not currently supported; calls that would
+ * resolve to 64x64 are silently skipped.
  *
  * @param id Index into oambuffer array (0-127)
  */
-void oamDynamic16Draw(u16 id);
+void oamDynamicDraw(u16 id);
 
 /**
- * @brief Draw an 8x8 dynamic sprite
+ * @brief Block until the dynamic-sprite VRAM tile queue is empty.
  *
- * Updates OAM buffer with sprite position and attributes from oambuffer[id].
- * If oamrefresh is set, queues graphics for VRAM upload.
+ * Called once during init, after queueing the starting frame via
+ * `oamDynamicDraw` / `oamMetaDrawDyn`, and **before** `setScreenOn`. The
+ * NMI auto-flush hook drains up to 7 queue entries per VBlank, so init
+ * sequences that enqueue more than that (typical for metasprites with
+ * many sub-sprites) need several VBlanks to complete. This helper loops
+ * `WaitForVBlank()` until the queue is empty and tells the NMI hook to
+ * skip the end-of-frame "hide stale sprites" step during the drain so
+ * the just-drawn sprites are not pushed off-screen between waits.
  *
- * @param id Index into oambuffer array (0-127)
+ * Safe to call only while the screen is in force blank — VRAM writes
+ * during active display are silently dropped by the PPU.
+ *
+ * @code
+ * setScreenOff();                  // force blank
+ * oamDynamicInit(&dyn);
+ * drawAllSprites();                // queues many tile uploads
+ * oamDynamicDrainQueue();          // wait until VRAM matches OAM
+ * setScreenOn();                   // first frame renders correctly
+ * @endcode
  */
-void oamDynamic8Draw(u16 id);
+void oamDynamicDrainQueue(void);
 
 /*============================================================================
  * Dynamic Metasprite Engine
  *============================================================================*/
 
 /**
- * @brief Draw a 32x32 dynamic metasprite
+ * @brief Draw a dynamic metasprite — engine picks the size routine.
  *
- * Iterates through a metasprite data array, setting up oambuffer entries
- * and queuing VRAM uploads for each 32x32 sub-sprite. Each sub-sprite
- * consumes one oambuffer entry (starting from id) and one OAM slot.
+ * Iterates `meta` (a MetaspriteItem array terminated by METASPR_TERM),
+ * sets up `oambuffer[id..]` for each sub-sprite, and dispatches to the
+ * matching `oamDynamic{8,16,32}Draw` based on the engine's current size
+ * pair (set at init via `oamDynamicInit`) and the caller-supplied
+ * `size_class`:
  *
- * The metasprite data array is terminated by METASPR_TERM (dx == -128).
- * The frameid field in each MetaspriteItem selects the animation frame
- * for that sub-sprite's VRAM upload.
+ *   - `OBJ_SMALL` → small half of the size pair, with `OBJ_NAMETABLE_HIGH`
+ *     ORed into the attribute byte so the tile id reaches the second name
+ *     table (where small dynamic tiles live in modes 0/1/3).
+ *   - `OBJ_LARGE` → large half of the size pair.
  *
- * Improvements over PVSnesLib:
- * - Bounds checking: stops drawing when OAM slots are exhausted (128 max)
- * - Queue overflow check: skips VRAM queueing when queue is full
+ * Replaces the legacy trio `oamMetaDrawDyn{8,16,32}`. The pixel size is
+ * resolved from the engine state, so callers no longer pick a function
+ * by sprite size — they just say which half of the pair to use.
  *
- * @param id Starting index into oambuffer array (each sub-sprite uses id, id+1, ...)
- * @param x X position of metasprite origin
- * @param y Y position of metasprite origin
- * @param meta Pointer to metasprite data array (MetaspriteItem[])
- * @param gfxptr Pointer to sprite graphics data (bank $00 only)
- *
- * @note All sub-sprites share the same graphics base (gfxptr). The frameid
- *       in each MetaspriteItem selects different tiles from that base.
- *
- * @note Bank $00 limitation: cc65816 passes 16-bit pointers only. Both
- *       meta and gfxptr must be in bank $00. Use SEMIFREE BANK 0 for
- *       large const arrays to prevent bank overflow.
+ * @param id          Starting oambuffer index (each sub-sprite uses
+ *                    `id`, `id+1`, ...).
+ * @param x,y         Metasprite origin in screen coordinates.
+ * @param meta        MetaspriteItem array, terminated by METASPR_TERM.
+ * @param gfxptr      ROM source for the dynamic tile data
+ *                    (bank $00 — cc65816 passes 16-bit pointers only).
+ * @param size_class  `OBJ_SMALL` (0) or `OBJ_LARGE` (1).
  *
  * @code
+ * static const OamDynamicConfig dyn = {
+ *     .vramLarge = 0x0000, .vramSmall = 0x1000,
+ *     .slotLargeInit = 0,  .slotSmallInit = 0,
+ *     .sizeMode = OBJ_SIZE16_L32,
+ * };
+ * oamDynamicInit(&dyn);
+ *
  * const MetaspriteItem hero[] = {
- *     METASPR_ITEM(0,  0,  0, OBJ_PRIO(2)),   // Top-left 32x32
- *     METASPR_ITEM(32, 0,  1, OBJ_PRIO(2)),   // Top-right 32x32
- *     METASPR_ITEM(0,  32, 2, OBJ_PRIO(2)),   // Bottom-left 32x32
- *     METASPR_ITEM(32, 32, 3, OBJ_PRIO(2)),   // Bottom-right 32x32
+ *     METASPR_ITEM(0,  0,  0, OBJ_PRIO(2)),
+ *     METASPR_ITEM(16, 0,  1, OBJ_PRIO(2)),
+ *     METASPR_ITEM(0,  16, 2, OBJ_PRIO(2)),
+ *     METASPR_ITEM(16, 16, 3, OBJ_PRIO(2)),
  *     METASPR_TERM
  * };
- *
- * // Set refresh flag on first sub-sprite
  * oambuffer[0].oamrefresh = 1;
- *
- * // Draw all 4 sub-sprites (uses oambuffer[0..3])
- * oamMetaDrawDyn32(0, 100, 80, hero, hero_tiles);
+ * oamMetaDrawDyn(0, 100, 80, hero, hero_tiles, OBJ_LARGE);
  * @endcode
  */
-void oamMetaDrawDyn32(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr);
-
-/**
- * @brief Draw a 16x16 dynamic metasprite
- *
- * Like oamMetaDrawDyn32 but for 16x16 sub-sprites. Uses the 16x16 sprite
- * VRAM region and LUT tables. Size (large/small) is determined by the
- * oamInitDynamicSprite configuration (spr16addrgfx).
- *
- * @param id Starting oambuffer index
- * @param x X position of metasprite origin
- * @param y Y position of metasprite origin
- * @param meta Pointer to metasprite data array
- * @param gfxptr Pointer to sprite graphics data (bank $00 only)
- * @param sprsize OBJ_SMALL (0) or OBJ_LARGE (1). When SMALL, tile bit 8
- *        is set automatically so sprites read from the second name table.
- */
-void oamMetaDrawDyn16(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr, u16 sprsize);
-
-/**
- * @brief Draw an 8x8 dynamic metasprite
- *
- * Like oamMetaDrawDyn32 but for 8x8 sub-sprites. Uses the small sprite
- * VRAM region (spr1addrgfx) and always sets size to SMALL.
- *
- * @param id Starting oambuffer index
- * @param x X position of metasprite origin
- * @param y Y position of metasprite origin
- * @param meta Pointer to metasprite data array
- * @param gfxptr Pointer to sprite graphics data (bank $00 only)
- */
-void oamMetaDrawDyn8(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxptr);
+void oamMetaDrawDyn(u16 id, s16 x, s16 y,
+                    const MetaspriteItem *meta, u8 *gfxptr, u8 size_class);
 
 /*============================================================================
  * Fast Macro Sprite API
@@ -783,7 +780,7 @@ void oamMetaDrawDyn8(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxpt
 #define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
     oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
     oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
@@ -809,7 +806,7 @@ void oamMetaDrawDyn8(u16 id, s16 x, s16 y, const MetaspriteItem *meta, u8 *gfxpt
 #define oamSetXYFast(_id, _x, _y) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
+    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
     u16 _sl = (u16)(_id) & 0x03; \
     u8 _xhi = OAM_XHI_MASK(_sl); \

@@ -72,7 +72,7 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[0].oamy = yp;
     oambuffer[0].oamframeid = 0;
     oambuffer[0].oamrefresh = 1;
-    oambuffer[0].oamattribute = 0x20 | (0 << 1);
+    oambuffer[0].oamattribute = OBJ_PRIO(2);
     OAM_SET_GFX(0, &sprmario);
 }
 
@@ -127,6 +127,6 @@ void marioupdate(u16 idx) {
 
     oambuffer[0].oamx = mariox - x_pos;
     oambuffer[0].oamy = marioy - y_pos;
-    oamDynamic16Draw(0);
+    oamDynamicDraw(0);
     mapUpdateCamera(mariox, marioy);
 }

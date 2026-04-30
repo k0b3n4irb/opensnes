@@ -8,9 +8,9 @@
 
 | Emulator | Status |
 |----------|--------|
-| **bsnes** | ✅ Recommended — cycle-accurate SuperFX emulation |
-| **Mesen2** | ✅ Works (known backward branch bug, does not affect this example) |
-| **snes9x** | ❌ Does not detect GSU despite correct header |
+| **Mesen2** | ✅ Recommended — detects the GSU correctly and runs SuperFX cleanly |
+| **bsnes** | ✅ Cycle-accurate; useful as a second reference |
+| **snes9x** | ❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED" |
 
 ## Build & Run
 
@@ -19,7 +19,7 @@ cd $OPENSNES_HOME
 make -C examples/memory/superfx_hello
 ```
 
-Then open `superfx_hello.sfc` in bsnes (recommended) or Mesen2.
+Then open `superfx_hello.sfc` in Mesen2 (recommended) or bsnes.
 
 ## What You'll Learn
 

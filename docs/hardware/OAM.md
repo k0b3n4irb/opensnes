@@ -128,6 +128,76 @@ REG_OAMDATA = 0;    // X (don't care)
 REG_OAMDATA = 240;  // Y = 240 hides sprite
 ```
 
+## Sprite Y +1 Scanline Quirk
+
+The SNES PPU renders sprites with a 1-scanline vertical delay: a sprite whose
+`OAM_Y = N` is drawn on scanlines **N+1 through N+8**, not N through N+7. The
+OAM is scanned and tile-fetched on the previous scanline, so by the time the
+sprite is composited it has already advanced by one.
+
+This is documented hardware behavior, confirmed in two places on the SNESdev
+community wiki:
+
+- *Sprites* — "Like the NES, sprites appear 1 line lower than their Y value,
+  however because the first line of rendering is always hidden on SNES, a
+  sprite with Y=0 will appear to begin on the first visible line."
+  <https://snes.nesdev.org/wiki/Sprites>
+- *SNES PPU for NES developers* — "Sprites are delayed vertically by 1
+  scanline, just as on NES, so scroll and sprite positions will work
+  unmodified on SNES (...)."
+  <https://snes.nesdev.org/wiki/SNES_PPU_for_NES_developers>
+
+The X axis has no equivalent quirk.
+
+### OpenSNES SDK convention
+
+The Y semantics depend on which API you use. Two camps:
+
+**Camp 1 — Y is the rendered top scanline (`visual_top`)**
+
+The API auto-subtracts 1 before writing OAM, so the value you pass is what
+you see on screen.
+
+| API | Notes |
+|-----|-------|
+| `oamSet(id, x, y, ...)` | auto Y-1 in `sprite_oamset.asm` |
+| `oamSetY(id, y)` / `oamSetXY(...)` | auto Y-1 in `sprite.c` |
+| `oamDrawMeta` / `oamDrawMetaFlip` / `oamDrawMetasprite` | call `oamSet` |
+
+**Camp 2 — Y is the legacy PVSnesLib `y_logical` (= `visual_top - 1`)**
+
+The dynamic sprite engine inherits PVSnesLib's collision-and-render contract:
+collision math sets `oambuffer[id].oamy = visual_top - 1`, the engine writes
+that raw to OAM, and the PPU's +1 quirk lifts it back to `visual_top` on
+screen. **Do not pre-subtract** when feeding these APIs.
+
+| API | Notes |
+|-----|-------|
+| `oamDynamicDraw(id)` | use `oambuffer[id].oamy` raw |
+| `oamMetaDrawDyn{8,16,32}` | dynamic engine path, same convention |
+
+**Camp 3 — direct OAM writes**
+
+When bypassing both APIs and writing `oamMemory[id*4 + 1]` yourself, no one
+compensates for you. Subtract 1 manually so the rendered top matches the
+caller's intent.
+
+```c
+oamMemory[id*4 + 1] = (u8)(player_y - 1);   /* visual_top semantics */
+```
+
+Sentinel values used to hide a sprite (`OBJ_HIDE_Y = 240`,
+`OAM_Y_OFFSCREEN = 224`) are **not** compensated — they are not logical
+positions, just markers that push the sprite off the visible area.
+
+### Why two camps?
+
+Most of OpenSNES treats Y as `visual_top`, which is what programmers expect.
+The dynamic engine is the exception because its collision-driven `oamy`
+field is set by ported PVSnesLib code that already accounts for the quirk.
+Adding our own compensation on top would double the offset and lift sprites
+2 px off the ground — easily visible on slopemario / likemario.
+
 ## Timing
 
 OAM writes should be done during **VBlank** or **forced blank** (screen off). Writing during active display can cause visual glitches.

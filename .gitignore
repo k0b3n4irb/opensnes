@@ -56,16 +56,11 @@ __pycache__/
 .DS_Store
 **/.DS_Store
 
-# Claude Code (internal tooling — not part of the public project)
-.claude/
-CLAUDE.md
-tests/CLAUDE.md
+# Claude Code project config — tracked, except for personal local overrides
+.claude/settings.local.json
 
 # Private game projects (never commit)
 projects/
-
-# Debug emulator (separate project with its own git repo)
-tools/opensnes-emu/
 
 # Build directories
 build/
@@ -79,8 +74,6 @@ release/
 
 # Build artifacts (generated files)
 *.asm
-*.obj
-*.sfc
 *.bin
 *.h
 

@@ -11,6 +11,9 @@
 #include <snes.h>
 #include <snes/window.h>
 
+/* Screen center X coordinate (256 pixels wide / 2) */
+#define SCREEN_CENTER_X 128
+
 /*============================================================================
  * Window Registers
  *
@@ -252,8 +255,8 @@ void windowCentered(u8 window, u8 width) {
     u8 right;
 
     half = width >> 1;
-    left = 128 - half;
-    right = 128 + half - 1;
+    left = SCREEN_CENTER_X - half;
+    right = SCREEN_CENTER_X + half - 1;
 
     windowSetPos(window, left, right);
 }

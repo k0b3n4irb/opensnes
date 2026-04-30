@@ -112,7 +112,7 @@ static void drawSprites(void);
  *
  * Prints the three available size combinations with a ">" cursor next to
  * the currently selected mode. The text is rendered to a BG1 tilemap buffer
- * and flushed to VRAM during the next VBlank via textFlush().
+ * and DMAed to VRAM by the NMI handler during the next VBlank.
  */
 static void drawMenu(void) {
     textClearRect(3, 2, 28, 4);
@@ -147,8 +147,6 @@ static void drawMenu(void) {
  * that may have fired mid-preparation and DMA'd a partial buffer).
  */
 static void changeObjSize(void) {
-    extern volatile u8 vblank_flag;
-
     /* Prepare new OAM data BEFORE VBlank so the NMI DMA sends correct
      * sprites in the same VBlank where OBJSEL changes. */
     oamClear();
@@ -226,13 +224,11 @@ int main(void) {
     /* Load font for text on BG1 (4bpp in Mode 1) */
     textLoadFont4bpp(VRAM_FONT);
     /* textInitEx takes byte address (word addr * 2), font_tile=0 (font at BG base) */
-    textInitEx(VRAM_TEXT_MAP * 2, 0, 0);
+    textInit(VRAM_TEXT_MAP * 2, 0, 0);
 
     /* Font palette: BG palette 0, color 0=black, color 1=white */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x00; REG_CGDATA = 0x00;
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;
+    setColor(0, RGB(0, 0, 0));
+    setColor(1, RGB(31, 31, 31));
 
     /* Load all sprite tile data to OBJ VRAM (screen still blanked) */
     dmaCopyVram(spritehero32_til, VRAM_HERO32, HERO32_TILES * TILE_BYTES);
@@ -240,7 +236,7 @@ int main(void) {
     dmaCopyVram(spritehero8_til,  VRAM_HERO8,  HERO8_TILES * TILE_BYTES);
 
     /* Load sprite palette (sprite palette 0 = CGRAM $80) */
-    dmaCopyCGram(spritehero32_pal, 128, 32);
+    dmaCopyCGram(spritehero32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Initialize OBJ settings */
     selectedItem = 0;
@@ -248,11 +244,10 @@ int main(void) {
     oamClear();
 
     /* Enable BG1 (text) and OBJ (sprites) */
-    REG_TM = TM_BG1 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     drawMenu();
     drawSprites();
-    textFlush();
     WaitForVBlank();
     setScreenOn();
 
@@ -277,7 +272,6 @@ int main(void) {
 
         drawSprites();
         WaitForVBlank();
-        textFlush();
     }
 
     return 0;

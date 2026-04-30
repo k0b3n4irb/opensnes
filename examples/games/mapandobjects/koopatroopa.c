@@ -26,7 +26,7 @@ static void koopatroopa_setup_sprites(u16 xp, u16 yp) {
     oambuffer[n].oamy = yp - 16;
     oambuffer[n].oamframeid = 0;
     oambuffer[n].oamrefresh = 1;
-    oambuffer[n].oamattribute = 0x20 | (0 << 1);
+    oambuffer[n].oamattribute = OBJ_PRIO(2);
     OAM_SET_GFX(n, &sprkoopatroopa);
     nbobjects++;
     n++;
@@ -35,7 +35,7 @@ static void koopatroopa_setup_sprites(u16 xp, u16 yp) {
     oambuffer[n].oamy = yp;
     oambuffer[n].oamframeid = 1;
     oambuffer[n].oamrefresh = 1;
-    oambuffer[n].oamattribute = 0x20 | (0 << 1);
+    oambuffer[n].oamattribute = OBJ_PRIO(2);
     OAM_SET_GFX(n, &sprkoopatroopa);
     nbobjects++;
 }
@@ -106,12 +106,12 @@ static void koopatroopa_draw(void) {
 
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay - 16;
-    oamDynamic16Draw(n);
+    oamDynamicDraw(n);
 
     n++;
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay;
-    oamDynamic16Draw(n);
+    oamDynamicDraw(n);
 }
 
 void koopatroopaupdate(u16 idx) {

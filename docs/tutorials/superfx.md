@@ -28,9 +28,9 @@ registers, hardware PLOT for pixel rendering, and an instruction cache.
 
 | Emulator | Status |
 |----------|--------|
-| **bsnes** | Recommended -- cycle-accurate SuperFX emulation |
-| **Mesen2** | Partial -- boot and registers work, PLOT rendering functional |
-| **snes9x** | Does not detect SuperFX in our ROM header |
+| **Mesen2** | Recommended -- detects the GSU correctly and runs all current SuperFX examples |
+| **bsnes** | Cycle-accurate -- useful as a second reference |
+| **snes9x** | Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED") |
 
 ## Getting Started
 

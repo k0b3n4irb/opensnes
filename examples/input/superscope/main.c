@@ -64,12 +64,12 @@ extern u8 sprites_pal[], sprites_pal_end[];
 /**
  * @brief Hide the red dot marker sprite by moving it off-screen.
  *
- * Y coordinate 0xE0 (224) is below the NTSC visible area, so the
- * SNES PPU will not render this sprite. This is cheaper than disabling
- * the sprite via the OAM high table.
+ * Y coordinate OAM_Y_OFFSCREEN (224) is below the NTSC visible area,
+ * so the SNES PPU will not render this sprite. This is cheaper than
+ * disabling the sprite via the OAM high table.
  */
 static void hideDot(void) {
-    oamMemory[1] = 0xE0;
+    oamMemory[1] = OAM_Y_OFFSCREEN;
     oam_update_flag = 1;
 }
 
@@ -84,7 +84,7 @@ static void hideDot(void) {
  */
 static void showDot(u16 x, u16 y) {
     oamMemory[0] = (u8)x;
-    oamMemory[1] = (u8)y;
+    oamMemory[1] = (u8)(y - 1);  /* PPU +1 scanline quirk: write Y-1 */
     oam_update_flag = 1;
 }
 
@@ -137,10 +137,8 @@ int main(void) {
     REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);
 
     /* --- Palettes --- */
-    REG_CGADD = 0;
-    REG_CGDATA = 0x66; REG_CGDATA = 0x7D;  /* Backdrop = blue $7D66 */
-    REG_CGADD = 1;
-    REG_CGDATA = 0xFF; REG_CGDATA = 0x7F;  /* Text = white $7FFF */
+    setColor(0, RGB(6, 11, 31));   /* Backdrop: blue */
+    setColor(1, RGB(31, 31, 31)); /* Text: white */
 
     /* BG2: all 4 sub-palettes (CGRAM 32-47) */
     dmaCopyCGram(aim_target_pal, 32, 8);
@@ -149,24 +147,24 @@ int main(void) {
     dmaCopyCGram(aim_target_pal, 44, 8);
 
     /* Sprite palette (CGRAM 128+) */
-    dmaCopyCGram(sprites_pal, 128,
+    dmaCopyCGram(sprites_pal, OBJ_CGRAM_BASE,
                  (u16)(sprites_pal_end - sprites_pal));
 
     /* --- Scroll --- */
-    bgSetScroll(0, 0, 0xFFFF);
-    bgSetScroll(1, 0, 0xFFFF);
+    bgSetScroll(0, 0, (u16)-1);
+    bgSetScroll(1, 0, (u16)-1);
 
     /* --- OAM: sprite 0 = red dot, hidden --- */
     oamClear();
     oamMemory[0] = 0;
-    oamMemory[1] = 0xE0;     /* Off-screen */
+    oamMemory[1] = OAM_Y_OFFSCREEN;
     oamMemory[2] = 0x80;     /* Tile 0x80 (red dot) */
     oamMemory[3] = 0x34;     /* Priority 3, palette 2 */
     oamMemory[512] = 0x00;   /* Small (16x16), X high = 0 */
     oam_update_flag = 1;
 
     /* --- Enable layers --- */
-    REG_TM = TM_BG1 | TM_BG2 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_BG2 | TM_OBJ);
 
     /* Title (persistent across states) */
     textPrintAt(8, 1, "SUPERSCOPE Test");
@@ -176,7 +174,6 @@ int main(void) {
     fire_armed = 0;
     textPrintAt(7, 25, "Connect SuperScope");
     textPrintAt(11, 26, "to Port 2");
-    textFlush();
 
     WaitForVBlank();
     setScreenOn();
@@ -235,7 +232,6 @@ int main(void) {
             break;
         }
 
-        textFlush();
     }
 
     return 0;

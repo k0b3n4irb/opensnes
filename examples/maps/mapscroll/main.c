@@ -157,7 +157,7 @@ int main(void) {
          * oamSet(id, x, y, tile, palette, priority, flags)
          * flags bit 6 = horizontal flip */
         oamSet(0, xloc - x_pos, yloc - y_pos, frame, 0, 3,
-               flipx ? 0x40 : 0x00);
+               flipx ? OBJ_FLIPX : 0);
 
         /* Update map engine */
         mapUpdate();

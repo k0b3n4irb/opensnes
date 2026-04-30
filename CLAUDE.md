@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Design philosophy — read first
+
+Before proposing or accepting a refactor, consult **`PHILOSOPHY.md`**
+at the repo root. OpenSNES is a 2D game engine, not a thin C-over-asm
+wrapper, and five principles guide every API decision (sane defaults
+with escape hatches, hidden quirks with documented escape, opt-in
+modules, type-safe boundaries, predictable performance). Use them as
+acceptance criteria when evaluating a change. The "Non-goals" section
+of that doc is also load-bearing — it lists patterns the project
+deliberately refuses (no GC equivalent, no monolithic engine class,
+no `printf` in core lib, no mandatory framework lifecycle).
+
 ## Build Commands
 
 ```bash
@@ -52,7 +64,7 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE emits 65816 
 ### Enhancement Chip Support
 
 - **SA-1** (`USE_SA1=1`): Same 65816 ISA at 10.74 MHz. Shares I-RAM ($3000-$37FF) with main CPU. Per-example `sa1_boot.asm` for custom coprocessor code. See `docs/tutorials/sa1.md`.
-- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **bsnes is the reference emulator** (Mesen2 has a confirmed backward branch bug). See `.claude/SUPERFX.md`.
+- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **Validate with Mesen2** — it is the most accurate emulator currently available for GSU. **Do not use snes9x** for SuperFX validation: snes9x does not detect the GSU chip in our ROM headers (the example shows "GSU: NOT DETECTED"), so the snes9x-based CI test suite can only confirm boot, not GSU execution. P3.4 in `ROADMAP.md` tracks adding a Mesen2-headless CI path for real coverage.
 
 ### Example Makefile Pattern
 
@@ -78,12 +90,14 @@ include $(OPENSNES)/make/common.mk
 ## Critical Constraints
 
 IMPORTANT: These are **silent failures** — no error messages, just wrong behavior.
+The canonical, public-facing list with severity tags and mitigation notes lives
+in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 - **VRAM writes only work during VBlank or forced blank** — the PPU silently ignores writes during active display
 - **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
 - **Bank $00 overflow**: `static const` arrays get SUPERFREE sections. If bank $00 fills (32KB), data silently spills to bank $01+ but C code reads from bank $00 → garbage. Combine related const arrays.
 - **`sta.l $0000,x` always reads bank $00** — all C RAM must be below $2000
-- **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets
+- **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
 - **`volatile` in loops crashes QBE** — use globals instead of `volatile` keyword

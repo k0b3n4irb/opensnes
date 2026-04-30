@@ -855,7 +855,7 @@ int main(void) {
 
     /* MODE 1: BG1 4bpp, BG2 4bpp (unused), BG3 2bpp */
     setMode(BG_MODE1, 0);
-    REG_TM = TM_BG1 | TM_BG3 | TM_OBJ;
+    setMainScreen(TM_BG1 | TM_BG3 | TM_OBJ);
 
     /* Initialize scroll positions */
     bgSetScroll(0, 0, 0);

@@ -75,9 +75,9 @@ int main(void) {
     setColor(0, RGB(0, 0, 4));  /* dark blue background */
 
     /* Sprite setup: 4 palettes for depth, tile at VRAM $4000 */
-    dmaCopyCGram((u8*)pal, 128, 128);   /* 4 palettes * 32 bytes */
+    dmaCopyCGram((u8*)pal, OBJ_CGRAM_BASE, 4 * PALETTE_16_SIZE);
     dmaCopyVram((u8*)dot_tile, 0x4000, 32);
-    oamInitEx(OBJ_SIZE8_L16, 0x4000 >> 13);
+    oamInit(OBJ_SIZE8_L16, 0x4000 >> 13);
 
     oamClear();
 
@@ -107,7 +107,7 @@ int main(void) {
             pal_bits = (i >> 5) & 0x03;
 
             oamMemory[i * 4 + 0] = sx;
-            oamMemory[i * 4 + 1] = sy;
+            oamMemory[i * 4 + 1] = sy - 1;  /* PPU +1 scanline quirk: write Y-1 */
             oamMemory[i * 4 + 2] = 0;                      /* tile 0 */
             oamMemory[i * 4 + 3] = 0x30 | (pal_bits << 1); /* prio 3 */
         }

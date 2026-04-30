@@ -32,6 +32,17 @@ u16 damage = 10 + (rand() % 6);    // Damage 10-15
 u8 drop = (rand() % 100) < 20;     // 20% chance of item drop
 ```
 
+## Modules Used
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler setup |
+| `sprite` | OAM buffer (required by NMI handler) |
+| `dma` | DMA transfers used internally by console init |
+| `background` | BG layer configuration |
+| `text` | `textInit()`, `textPrintAt()`, `textFlush()` for number display |
+| `input` | `padPressed()` for single-press button detection |
+
 ## Build & Run
 
 ```bash
