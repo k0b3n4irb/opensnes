@@ -230,7 +230,12 @@ jobs:
   # ====================================================================== #
   functional-tests:
     name: Functional Tests (opensnes-emu)
-    runs-on: ubuntu-latest
+    # Mesen2's published Linux_x64 zip is the NativeAOT build, compiled
+    # against the libstdc++ shipped with ubuntu-22.04 (gcc 11). Running
+    # that AOT binary on ubuntu-latest (24.04, gcc 13) hits a libstdc++
+    # ABI mismatch in the C++ MesenCore.so → std::bad_cast in InitDll.
+    # Pin the Functional Tests job to 22.04 to match Mesen2's build env.
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
       - name: Install dependencies
@@ -241,11 +246,13 @@ jobs:
           # it Mesen2 SIGABRTs during GUI subsystem init, even with
           # --testrunner. The test/phases/visual-mesen2.mjs phase auto-
           # wraps Mesen2 in `xvfb-run -a` when $DISPLAY is missing.
-          # libsdl2-2.0-0 is the runtime SDL2 library that Mesen2's native
-          # core (MesenCore.so) loads via dlopen at startup; without it
-          # the .NET host throws DllNotFoundException → exit 134 before
-          # any ROM is loaded.
-          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb libsdl2-2.0-0
+          # libsdl2-dev matches the package Mesen2's own CI installs
+          # (https://github.com/SourMesen/Mesen2 .github/workflows/build.yml)
+          # and pulls in libsdl2-2.0-0 plus the transitive deps the
+          # MesenCore.so dlopens at startup. Using libsdl2-2.0-0 alone
+          # was getting us past the DllNotFoundException but not all the
+          # way to a working init.
+          sudo apt-get install -y build-essential clang cmake make git python3 zip xvfb libsdl2-dev
 
       - name: Check out OpenSNES (with submodules)
         uses: actions/checkout@v4
