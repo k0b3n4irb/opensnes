@@ -7,6 +7,64 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+## [0.15.2] - 2026-05-01
+
+First of the three "framework opt-ins" promised by `PHILOSOPHY.md`
+(alongside the planned scene/state stack and the asset bundle
+convention). Ships an opt-in `gameloop` module that owns the
+`while (1) WaitForVBlank(); update();` cadence so user code can stay
+focused on its own logic.
+
+### Added
+
+- **`<snes/gameloop.h>` + `gameloop` library module (chantier D.1)** —
+  opt-in via `LIB_MODULES`, not auto-included by `<snes.h>`. Public
+  surface is one struct and one function:
+  ```c
+  typedef struct {
+      void (*init)(void);     // optional, NULL to skip
+      void (*update)(void);   // required, MUST NOT be NULL
+  } GameLoopConfig;
+
+  void gameLoopRun(const GameLoopConfig *cfg);  // never returns
+  ```
+  Implementation is three lines of actual logic. The framework owns
+  the WaitForVBlank → update cadence and nothing else: no
+  `consoleInit()`, no `setMode()`, no screen on/off — all of that
+  remains caller-driven so an existing example can opt in by
+  extracting init and update into static functions and having
+  `main()` hand off to `gameLoopRun`. Documented in the header,
+  including the explicit "When NOT to use this" section listing
+  state-machine and custom-rhythm patterns that don't fit.
+
+### Changed
+
+- **`examples/basics/timer`, `examples/basics/random`,
+  `examples/input/controller`** migrated to the gameloop framework
+  as canonical demos of the common pattern (single VBlank sync, an
+  `update` that reads input and writes to the tilemap, no custom
+  rhythm). ROM bytes change (one indirect call per frame for the
+  update dispatch); visual regression at frame 120 is identical for
+  controller and timer, shifts ~62 pixels for random's DEC line —
+  a one-pixel-column timing offset from the indirect-call overhead
+  that's visually indistinguishable. basics/random's baseline was
+  refreshed to absorb the shift.
+
+- **`examples/games/breakout` and `examples/games/tetris` deliberately
+  NOT migrated.** Both have custom synchronisation rhythms — breakout
+  ends each frame with `WaitForVBlank(); oamUpdate();` (work-then-
+  sync, with the OAM DMA piggybacking on the same VBlank), tetris
+  drives WaitForVBlank from inside per-state functions. The framework
+  imposes sync-then-work; migrating either would either drop them to
+  30 fps or require restructuring that obscures more than it teaches.
+  The "When NOT to use this" section in `gameloop.h` is calibrated
+  against exactly these patterns.
+
+### Documentation
+
+- **PHILOSOPHY.md → `gameloop`** — first of the three opt-in framework
+  pieces is no longer a placeholder.
+
 ## [0.15.1] - 2026-05-01
 
 Audit closure pass. No SDK-consumer-visible changes; the work
