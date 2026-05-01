@@ -1,22 +1,30 @@
 /**
  * @file main.c
- * @brief VBlank frame counter display
+ * @brief VBlank frame counter display, written against the gameloop framework
  * @ingroup examples
  *
  * Displays a live frame counter that increments every VBlank (60 fps NTSC,
- * 50 fps PAL). Demonstrates the simplest possible real-time display: read
- * a hardware counter, render it as text, repeat.
+ * 50 fps PAL). The simplest possible real-time display: read a hardware
+ * counter, render it as text, repeat. Doubles as the canonical demo of
+ * the opt-in `gameloop` framework — `init()` runs the standard SNES
+ * boot sequence, `update()` runs once per VBlank, and main() never sees
+ * a `while(1)` itself.
  *
- * The SNES NMI handler increments `frame_count` every VBlank. This is the
- * heartbeat of every SNES game — animation timing, input polling, physics
- * steps, and audio processing are all synchronized to this counter.
- *
- * Ported from PVSnesLib "timer" example by alekmaul.
+ * Equivalent hand-rolled main loop:
+ * @code{.c}
+ *     while (1) {
+ *         WaitForVBlank();
+ *         update();
+ *     }
+ * @endcode
+ * Both ship the same observable behaviour; the framework exists so the
+ * loop boilerplate isn't repeated 53 times across the SDK and so future
+ * scene/state machinery has one place to plug into.
  *
  * @par SNES Concepts
  * - VBlank frame counter (frame_count from crt0.asm, incremented by NMI)
  * - Text module for real-time number display (textPrintU16; NMI auto-flushes)
- * - WaitForVBlank synchronization (main loop runs at exactly 60/50 fps)
+ * - gameloop framework — init/update callbacks, hidden VBlank sync
  * - Mode 0 with 2bpp font for text output
  *
  * @par What to Observe
@@ -25,44 +33,61 @@
  * - The display never stutters because each frame does minimal work
  *
  * @par Modules Used
- * console, sprite, dma, background, text
+ * console, sprite, dma, background, text, input, gameloop
  *
- * @see console.h (getFrameCount), text.h
+ * @see gameloop.h, console.h (getFrameCount), text.h
  */
 
 #include <snes.h>
 #include <snes/text.h>
+#include <snes/gameloop.h>
 
 /**
- * @brief Entry point — display a live VBlank frame counter
- * @return Never returns (infinite game loop)
+ * @brief One-time hardware setup. Runs before the first VBlank sync.
+ *
+ * Standard text-mode boot: textModeInit() sets BG mode + text engine,
+ * the PrintAt writes our static label into the off-screen tilemap
+ * buffer, the explicit WaitForVBlank ensures the very first NMI has
+ * fired (so the buffer has been DMA'd to VRAM) before we turn the
+ * screen on.
  */
-int main(void) {
-    /* Step 1: Hardware init */
+static void on_init(void) {
     textModeInit();
-
-    /* Step 5: Static labels */
     textPrintAt(9, 8, "VBLANK COUNTER");
-
-    /* Step 6: Screen enable */
     WaitForVBlank();
     setScreenOn();
+}
 
-    /* Step 7: Main loop — update counter display every frame */
-    while (1) {
-        WaitForVBlank();
-
-        /* Reset counter on A press */
-        if (padPressed(0) & KEY_A) {
-            frame_count = 0;
-        }
-
-        textSetPos(10, 10);
-        textPrint("COUNT=");
-        textPrintU16(frame_count);
-        textPrint("   ");
-        textPrintAt(7, 14, "PRESS A TO RESET");
+/**
+ * @brief Per-frame work. Called once per VBlank by the gameloop.
+ *
+ * The framework has already done WaitForVBlank() before calling us,
+ * so we are inside the VBlank window — VRAM/CGRAM/OAM writes are
+ * safe at this point. Nothing here exceeds the budget so we never
+ * drop a frame.
+ */
+static void on_update(void) {
+    if (padPressed(0) & KEY_A) {
+        frame_count = 0;
     }
+    textSetPos(10, 10);
+    textPrint("COUNT=");
+    textPrintU16(frame_count);
+    textPrint("   ");
+    textPrintAt(7, 14, "PRESS A TO RESET");
+}
 
+/**
+ * @brief Entry point — hand off to gameLoopRun().
+ *
+ * gameLoopRun never returns; the `return 0` exists only to satisfy
+ * `int main(void)`'s control-flow contract.
+ */
+int main(void) {
+    GameLoopConfig cfg = {
+        .init = on_init,
+        .update = on_update,
+    };
+    gameLoopRun(&cfg);
     return 0;
 }

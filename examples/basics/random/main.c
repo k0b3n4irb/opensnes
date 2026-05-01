@@ -33,62 +33,64 @@
 
 #include <snes.h>
 #include <snes/text.h>
+#include <snes/gameloop.h>
 
 /** @brief Current random value to display */
 u16 current_value;
 
 /**
- * @brief Entry point — display random numbers on button press
- * @return Never returns (infinite game loop)
+ * @brief One-time setup. Static labels + first random + screen on.
  */
-int main(void) {
-    u16 pad;
-
-    /* Step 1: Hardware init */
+static void on_init(void) {
     textModeInit();
-
-    /* Step 4: Static labels */
     textPrintAt(5, 4, "RANDOM NUMBER GENERATOR");
     textPrintAt(3, 8, "PRESS A FOR NEW NUMBER");
     textPrintAt(3, 9, "PRESS B TO RE-SEED");
-
-    /* Step 5: Generate first value */
     current_value = rand();
-
-    /* Step 6: Screen on (all VRAM ready) */
     WaitForVBlank();
     setScreenOn();
+}
 
-    /* Step 7: Main loop */
-    while (1) {
-        WaitForVBlank();
+/**
+ * @brief Per-frame: read input, regenerate on A, re-seed on B, print value.
+ *
+ * The framework calls this once per VBlank — `padPressed()` reads the
+ * NMI-updated joypad buffer and returns only the bits that just
+ * transitioned (single-press detection), so holding the button down
+ * keeps producing the same number until release.
+ */
+static void on_update(void) {
+    u16 pad = padPressed(0);
 
-        pad = padPressed(0);
-
-        /* Generate new random number */
-        if (pad & KEY_A) {
-            current_value = rand();
-        }
-
-        /* Re-seed from frame counter (makes sequence unpredictable) */
-        if (pad & KEY_B) {
-            srand(getFrameCount());
-            current_value = rand();
-            textPrintAt(6, 18, "** RE-SEEDED **");
-        }
-
-        /* Display current value in hex and decimal */
-        textSetPos(8, 12);
-        textPrint("HEX: 0x");
-        textPrintHex(current_value, 4);
-        textPrint("  ");
-
-        textSetPos(8, 14);
-        textPrint("DEC: ");
-        textPrintU16(current_value);
-        textPrint("      ");
-
+    if (pad & KEY_A) {
+        current_value = rand();
     }
 
+    if (pad & KEY_B) {
+        srand(getFrameCount());
+        current_value = rand();
+        textPrintAt(6, 18, "** RE-SEEDED **");
+    }
+
+    textSetPos(8, 12);
+    textPrint("HEX: 0x");
+    textPrintHex(current_value, 4);
+    textPrint("  ");
+
+    textSetPos(8, 14);
+    textPrint("DEC: ");
+    textPrintU16(current_value);
+    textPrint("      ");
+}
+
+/**
+ * @brief Entry point — gameLoopRun never returns.
+ */
+int main(void) {
+    GameLoopConfig cfg = {
+        .init = on_init,
+        .update = on_update,
+    };
+    gameLoopRun(&cfg);
     return 0;
 }

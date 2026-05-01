@@ -36,60 +36,65 @@
 
 #include <snes.h>
 #include <snes/text.h>
+#include <snes/gameloop.h>
 
 /**
- * @brief Entry point — display held button name in real time
- * @return Never returns (infinite game loop)
+ * @brief One-time setup. Static labels then screen on.
  */
-int main(void) {
-    u16 pad;
-
-    /* Init hardware */
+static void on_init(void) {
     textModeInit();
-
-    /* Static labels */
     textPrintAt(12, 1, "PAD TEST");
     textPrintAt(6, 5, "USE PAD TO SEE VALUE");
-
-    /* Screen on (all VRAM ready) */
     WaitForVBlank();
     setScreenOn();
+}
 
-    /* Main loop */
-    while (1) {
-        WaitForVBlank();
+/**
+ * @brief Per-frame: read joypad, paint the held button name.
+ *
+ * `padHeld()` returns the bitmask of currently-pressed buttons (latched
+ * by the NMI handler this frame). The if/else cascade prints the first
+ * match — multiple-button combinations only show one.
+ */
+static void on_update(void) {
+    u16 pad = padHeld(0);
 
-        pad = padHeld(0);
+    if (pad & KEY_A)
+        textPrintAt(9, 10, "A PRESSED      ");
+    else if (pad & KEY_B)
+        textPrintAt(9, 10, "B PRESSED      ");
+    else if (pad & KEY_X)
+        textPrintAt(9, 10, "X PRESSED      ");
+    else if (pad & KEY_Y)
+        textPrintAt(9, 10, "Y PRESSED      ");
+    else if (pad & KEY_L)
+        textPrintAt(9, 10, "L PRESSED      ");
+    else if (pad & KEY_R)
+        textPrintAt(9, 10, "R PRESSED      ");
+    else if (pad & KEY_UP)
+        textPrintAt(9, 10, "UP PRESSED     ");
+    else if (pad & KEY_DOWN)
+        textPrintAt(9, 10, "DOWN PRESSED   ");
+    else if (pad & KEY_LEFT)
+        textPrintAt(9, 10, "LEFT PRESSED   ");
+    else if (pad & KEY_RIGHT)
+        textPrintAt(9, 10, "RIGHT PRESSED  ");
+    else if (pad & KEY_START)
+        textPrintAt(9, 10, "START PRESSED  ");
+    else if (pad & KEY_SELECT)
+        textPrintAt(9, 10, "SELECT PRESSED ");
+    else
+        textPrintAt(9, 10, "               ");
+}
 
-        /* Display which button is held */
-        if (pad & KEY_A)
-            textPrintAt(9, 10, "A PRESSED      ");
-        else if (pad & KEY_B)
-            textPrintAt(9, 10, "B PRESSED      ");
-        else if (pad & KEY_X)
-            textPrintAt(9, 10, "X PRESSED      ");
-        else if (pad & KEY_Y)
-            textPrintAt(9, 10, "Y PRESSED      ");
-        else if (pad & KEY_L)
-            textPrintAt(9, 10, "L PRESSED      ");
-        else if (pad & KEY_R)
-            textPrintAt(9, 10, "R PRESSED      ");
-        else if (pad & KEY_UP)
-            textPrintAt(9, 10, "UP PRESSED     ");
-        else if (pad & KEY_DOWN)
-            textPrintAt(9, 10, "DOWN PRESSED   ");
-        else if (pad & KEY_LEFT)
-            textPrintAt(9, 10, "LEFT PRESSED   ");
-        else if (pad & KEY_RIGHT)
-            textPrintAt(9, 10, "RIGHT PRESSED  ");
-        else if (pad & KEY_START)
-            textPrintAt(9, 10, "START PRESSED  ");
-        else if (pad & KEY_SELECT)
-            textPrintAt(9, 10, "SELECT PRESSED ");
-        else
-            textPrintAt(9, 10, "               ");
-
-    }
-
+/**
+ * @brief Entry point — gameLoopRun never returns.
+ */
+int main(void) {
+    GameLoopConfig cfg = {
+        .init = on_init,
+        .update = on_update,
+    };
+    gameLoopRun(&cfg);
     return 0;
 }
