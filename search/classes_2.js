@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['gamestate_0',['GameState',['../structGameState.html',1,'']]]
+  ['gameloopconfig_0',['GameLoopConfig',['../structGameLoopConfig.html',1,'']]],
+  ['gamestate_1',['GameState',['../structGameState.html',1,'']]]
 ];

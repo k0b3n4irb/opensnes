@@ -7,6 +7,7 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "console.h", "console_8h.html", "console_8h" ],
     [ "debug.h", "debug_8h.html", "debug_8h" ],
     [ "dma.h", "dma_8h.html", "dma_8h" ],
+    [ "gameloop.h", "gameloop_8h.html", "gameloop_8h" ],
     [ "hdma.h", "hdma_8h.html", "hdma_8h" ],
     [ "input.h", "input_8h.html", "input_8h" ],
     [ "interrupt.h", "interrupt_8h.html", "interrupt_8h" ],

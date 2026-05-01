@@ -61,7 +61,7 @@ var searchData=
   ['map_5fprepare_5fcolumn_58',['map_prepare_column',['../games_2likemario_2main_8c.html#a067264ada1c6c457ab1ba1fecb7221b7',1,'main.c']]],
   ['map_5frow_5fptrs_59',['map_row_ptrs',['../games_2likemario_2main_8c.html#aba8b5dd072efe75ff5257e58318d7648',1,'main.c']]],
   ['map_5fupdate_60',['map_update',['../games_2likemario_2main_8c.html#ad3a5b03471bc92a1d4453b3326eaeeb3',1,'main.c']]],
-  ['map_5fwidth_61',['map_width',['../basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76',1,'MAP_WIDTH:&#160;main.c'],['../games_2likemario_2main_8c.html#a569ad8f9a5117f4c707337b7d0141497',1,'map_width:&#160;main.c'],['../structTextConfig.html#a4f647c1c7a2ee132a28ff051f5162c66',1,'TextConfig::map_width']]],
+  ['map_5fwidth_61',['map_width',['../games_2likemario_2main_8c.html#a569ad8f9a5117f4c707337b7d0141497',1,'map_width:&#160;main.c'],['../basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76',1,'MAP_WIDTH:&#160;main.c'],['../structTextConfig.html#a4f647c1c7a2ee132a28ff051f5162c66',1,'TextConfig::map_width']]],
   ['mapdata_62',['mapdata',['../maps_2mapscroll_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72',1,'mapdata:&#160;main.c'],['../maps_2tiled_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72',1,'mapdata:&#160;main.c']]],
   ['mapgetmetatile_63',['mapGetMetaTile',['../map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3',1,'map.h']]],
   ['mapgetmetatilesprop_64',['mapGetMetaTilesProp',['../map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7',1,'map.h']]],

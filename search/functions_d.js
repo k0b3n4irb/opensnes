@@ -35,5 +35,7 @@ var searchData=
   ['objrefreshall_32',['objRefreshAll',['../object_8h.html#aede8c571a7e8bdb8129b5df55b45225b',1,'object.h']]],
   ['objregistertypes_33',['objregistertypes',['../games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c'],['../maps_2slopemario_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c']]],
   ['objupdateall_34',['objUpdateAll',['../object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83',1,'object.h']]],
-  ['objupdatexy_35',['objUpdateXY',['../object_8h.html#af27124be823e35daf579362d3820738d',1,'object.h']]]
+  ['objupdatexy_35',['objUpdateXY',['../object_8h.html#af27124be823e35daf579362d3820738d',1,'object.h']]],
+  ['on_5finit_36',['on_init',['../basics_2random_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c'],['../basics_2timer_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c'],['../input_2controller_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c']]],
+  ['on_5fupdate_37',['on_update',['../basics_2random_2main_8c.html#ae658753de50085894acfe2b69fbd62e5',1,'on_update(void):&#160;main.c'],['../basics_2timer_2main_8c.html#ae658753de50085894acfe2b69fbd62e5',1,'on_update(void):&#160;main.c'],['../input_2controller_2main_8c.html#ae658753de50085894acfe2b69fbd62e5',1,'on_update(void):&#160;main.c']]]
 ];

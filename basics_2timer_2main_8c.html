@@ -96,26 +96,37 @@ $(document).ready(function(){initNavTree('basics_2timer_2main_8c.html',''); init
 </div><!--header-->
 <div class="contents">
 
-<p>VBlank frame counter display.  
+<p>VBlank frame counter display, written against the gameloop framework.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="gameloop_8h_source.html">snes/gameloop.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basics_2timer_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — display a live VBlank frame counter.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — hand off to <a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun()</a>.  <br /></td></tr>
 <tr class="separator:a840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a0d3bc95bdfda1fef8948aa09b48dd4" id="r_a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basics_2timer_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4">on_init</a> (void)</td></tr>
+<tr class="memdesc:a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">One-time hardware setup. Runs before the first VBlank sync.  <br /></td></tr>
+<tr class="separator:a8a0d3bc95bdfda1fef8948aa09b48dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae658753de50085894acfe2b69fbd62e5" id="r_ae658753de50085894acfe2b69fbd62e5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basics_2timer_2main_8c.html#ae658753de50085894acfe2b69fbd62e5">on_update</a> (void)</td></tr>
+<tr class="memdesc:ae658753de50085894acfe2b69fbd62e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-frame work. Called once per VBlank by the gameloop.  <br /></td></tr>
+<tr class="separator:ae658753de50085894acfe2b69fbd62e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>VBlank frame counter display. </p>
-<p>Displays a live frame counter that increments every VBlank (60 fps NTSC, 50 fps PAL). Demonstrates the simplest possible real-time display: read a hardware counter, render it as text, repeat.</p>
-<p>The SNES NMI handler increments <code>frame_count</code> every VBlank. This is the heartbeat of every SNES game — animation timing, input polling, physics steps, and audio processing are all synchronized to this counter.</p>
-<p>Ported from PVSnesLib "timer" example by alekmaul.</p>
+<div class="textblock"><p>VBlank frame counter display, written against the gameloop framework. </p>
+<p>Displays a live frame counter that increments every VBlank (60 fps NTSC, 50 fps PAL). The simplest possible real-time display: read a hardware counter, render it as text, repeat. Doubles as the canonical demo of the opt-in <code>gameloop</code> framework — <code>init()</code> runs the standard SNES boot sequence, <code>update()</code> runs once per VBlank, and <a class="el" href="basics_2timer_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title="Entry point — hand off to gameLoopRun().">main()</a> never sees a <code>while(1)</code> itself.</p>
+<p>Equivalent hand-rolled main loop: </p><div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
+<div class="line">    update();</div>
+<div class="line">}</div>
+<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+</div><!-- fragment --><p> Both ship the same observable behaviour; the framework exists so the loop boilerplate isn't repeated 53 times across the SDK and so future scene/state machinery has one place to plug into.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>VBlank frame counter (frame_count from crt0.asm, incremented by NMI)</li>
 <li>Text module for real-time number display (textPrintU16; NMI auto-flushes)</li>
-<li>WaitForVBlank synchronization (main loop runs at exactly 60/50 fps)</li>
+<li>gameloop framework — init/update callbacks, hidden VBlank sync</li>
 <li>Mode 0 with 2bpp font for text output</li>
 </ul>
 </dd></dl>
@@ -125,8 +136,8 @@ Functions</h2></td></tr>
 <li>The display never stutters because each frame does minimal work</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a> (<a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount</a>), <a class="el" href="text_8h.html" title="Text rendering functions for OpenSNES.">text.h</a> </dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, gameloop</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gameloop_8h.html" title="Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation.">gameloop.h</a>, <a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a> (<a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount</a>), <a class="el" href="text_8h.html" title="Text rendering functions for OpenSNES.">text.h</a> </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
@@ -144,8 +155,66 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point — display a live VBlank frame counter. </p>
-<dl class="section return"><dt>Returns</dt><dd>Never returns (infinite game loop) </dd></dl>
+<p>Entry point — hand off to <a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun()</a>. </p>
+<p>gameLoopRun never returns; the <code>return 0</code> exists only to satisfy <code>int <a class="el" href="basics_2timer_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title="Entry point — hand off to gameLoopRun().">main(void)</a></code>'s control-flow contract. </p>
+
+</div>
+</div>
+<a id="a8a0d3bc95bdfda1fef8948aa09b48dd4" name="a8a0d3bc95bdfda1fef8948aa09b48dd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a0d3bc95bdfda1fef8948aa09b48dd4">&#9670;&#160;</a></span>on_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void on_init </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>One-time hardware setup. Runs before the first VBlank sync. </p>
+<p>Standard text-mode boot: <a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a> sets BG mode + text engine, the PrintAt writes our static label into the off-screen tilemap buffer, the explicit WaitForVBlank ensures the very first NMI has fired (so the buffer has been DMA'd to VRAM) before we turn the screen on. </p>
+
+</div>
+</div>
+<a id="ae658753de50085894acfe2b69fbd62e5" name="ae658753de50085894acfe2b69fbd62e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae658753de50085894acfe2b69fbd62e5">&#9670;&#160;</a></span>on_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void on_update </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Per-frame work. Called once per VBlank by the gameloop. </p>
+<p>The framework has already done <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> before calling us, so we are inside the VBlank window — VRAM/CGRAM/OAM writes are safe at this point. Nothing here exceeds the budget so we never drop a frame. </p>
 
 </div>
 </div>
