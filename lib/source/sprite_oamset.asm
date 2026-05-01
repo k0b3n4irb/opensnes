@@ -32,6 +32,8 @@
 
 oamSet:
     rep #$30            ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
 
     ; Bounds check: id >= 128 → return
     lda 16,s            ; id
@@ -49,6 +51,7 @@ oamSet:
     ; Write 4 bytes to OAM low table
     ;------------------------------------------------------------------
     sep #$20            ; 8-bit A for byte stores
+    .ACCU 8
 
     ; Byte 0: X position (low byte)
     lda 14,s            ; x low byte
@@ -103,6 +106,7 @@ oamSet:
     ; Slot = id & 3, XHI mask = 1 << (slot * 2)
 
     rep #$20            ; 16-bit A (X/Y still 16-bit)
+    .ACCU 16
 
     ; Compute XHI bit mask from slot
     lda 16,s            ; id
@@ -111,6 +115,7 @@ oamSet:
     tay                 ; Y = shift count
 
     sep #$20            ; 8-bit A
+    .ACCU 8
     lda #$01
     cpy.w #0
     beq @mask_ready
@@ -123,6 +128,7 @@ oamSet:
 
     ; Compute ext byte index = id >> 2
     rep #$20            ; 16-bit A
+    .ACCU 16
     lda 16,s            ; id
     lsr a
     lsr a               ; id >> 2
@@ -130,6 +136,7 @@ oamSet:
 
     ; Check x bit 8 (high byte of x parameter)
     sep #$20            ; 8-bit A
+    .ACCU 8
     lda 15,s            ; x high byte
     and #$01
     beq @clear_xhi
@@ -160,6 +167,7 @@ oamSet:
 @skip_max:
 
     rep #$20            ; Restore 16-bit A (C calling convention)
+    .ACCU 16
     rtl
 
 .ENDS

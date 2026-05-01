@@ -332,7 +332,9 @@ $(TARGET): linkfile
 ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
-	@python3 -c "f=open('$@','r+b');f.seek(0x7FD5);b=f.read(1)[0];f.seek(0x7FD5);f.write(bytes([b|0x03]));f.close()" && echo "[SA1] Patched $$FFD5 map mode to SA-1"
+	@# Implementation lives in tools/sa1-patch/ (audit P2.4 #3 — replaces the
+	@# inline Python one-liner that used to live here).
+	@$(OPENSNES)/bin/sa1_patch $@ && echo "[SA1] Patched $$FFD5 map mode to SA-1"
 endif
 	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
 	@# bank $$01+. The compiler emits 16-bit addresses that always read bank $$00,

@@ -54,6 +54,8 @@ sramSave:
     phb
 
     rep #$30                    ; 16-bit A, X, Y
+    .ACCU 16
+    .INDEX 16
 
     lda 6,s                     ; size
     beq @done                   ; if size == 0, skip
@@ -90,6 +92,8 @@ sramLoad:
     phb
 
     rep #$30                    ; 16-bit A, X, Y
+    .ACCU 16
+    .INDEX 16
 
     lda 6,s                     ; size
     beq @done                   ; if size == 0, skip
@@ -127,6 +131,8 @@ sramSaveOffset:
     phb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     lda 8,s                     ; size
     beq @done
@@ -165,6 +171,8 @@ sramLoadOffset:
     phb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     lda 8,s                     ; size
     beq @done
@@ -201,27 +209,33 @@ sramClear:
     phb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     lda 6,s                     ; size
     beq @done
     sta.b DP_SIZE
 
     sep #$20                    ; 8-bit A
+    .ACCU 8
     lda #SRAM_BANK
     pha
     plb                         ; Set data bank to SRAM
 
     lda #$00                    ; Fill value
     rep #$10                    ; 16-bit X, Y
+    .INDEX 16
     ldy #$0000                  ; Start at offset 0
 
 @clear_loop:
     sta $0000,y                 ; Store 0 to SRAM (bank register = $70)
     iny
     rep #$20
+    .ACCU 16
     tya
     cmp.b DP_SIZE
     sep #$20
+    .ACCU 8
     bcc @clear_loop
 
 @done:
@@ -243,6 +257,8 @@ sramChecksum:
     php
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     lda 5,s                     ; size
     beq @zero
@@ -252,10 +268,13 @@ sramChecksum:
     sta.b DP_SRC
 
     sep #$20
+    .ACCU 8
     lda #$00                    ; Initialize checksum
     sta.b DP_TEMP
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
     ldx #$0000                  ; X = counter
 
 @checksum_loop:
@@ -266,20 +285,24 @@ sramChecksum:
     tay                         ; Y = address (in bank $7E)
 
     sep #$20
+    .ACCU 8
     lda.l $7E0000,x             ; Load byte - use X index
     ; We need to recalculate with proper address
     rep #$20
+    .ACCU 16
     txa
     clc
     adc.b DP_SRC
     tax                         ; X = actual address
 
     sep #$20
+    .ACCU 8
     lda.l $7E0000,x             ; Load byte from WRAM
     eor.b DP_TEMP               ; XOR with running checksum
     sta.b DP_TEMP
 
     rep #$20
+    .ACCU 16
     txa
     sec
     sbc.b DP_SRC                ; Get back to offset
@@ -290,14 +313,17 @@ sramChecksum:
     bcc @checksum_loop
 
     sep #$20
+    .ACCU 8
     lda.b DP_TEMP               ; Load final checksum
     rep #$20
+    .ACCU 16
     and #$00FF                  ; Ensure high byte is 0
     plp
     rtl
 
 @zero:
     rep #$20
+    .ACCU 16
     lda #$0000
     plp
     rtl

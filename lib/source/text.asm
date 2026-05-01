@@ -241,17 +241,21 @@ opensnes_font_2bpp_end:
 asm_textDMAFont:
     php
     rep #$20            ; 16-bit A
+    .ACCU 16
     lda #$1801          ; Mode $01 (word write ab), target $18 (VMDATAL)
     sta $4300
     lda #opensnes_font_2bpp
     sta $4302           ; Source address (low word)
     sep #$20
+    .ACCU 8
     lda #:opensnes_font_2bpp
     sta $4304           ; Source bank
     rep #$20
+    .ACCU 16
     lda #1536           ; Transfer size (96 chars x 16 bytes)
     sta $4305
     sep #$20
+    .ACCU 8
     lda #$01            ; Enable DMA channel 0
     sta $420B
     plp
@@ -271,6 +275,8 @@ asm_textDMAFont:
 asm_textFillBuffer:
     php
     rep #$30            ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
     lda 5,s             ; Get fill value (past P + 3-byte return addr)
     ldx.w tilemap_src_addr ; Buffer base address (bank $00)
     ldy #1024           ; Word count

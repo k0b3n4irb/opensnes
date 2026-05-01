@@ -156,14 +156,17 @@ oamInitDynamicSprite:
 
     ; Set data bank to $7E for RAM access
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
 
     ; Clear VRAM upload queue (768 bytes)
     rep #$10                        ; 16-bit X/Y for larger loop count
+    .INDEX 16
     ldx #$0000
     sep #$20                        ; 8-bit A for byte stores
+    .ACCU 8
     lda #$00
 -   sta.w oamQueueEntry,x
     inx
@@ -171,6 +174,7 @@ oamInitDynamicSprite:
     bne -
 
     rep #$20
+    .ACCU 16
     stz.w oamqueuenumber            ; Reset queue position
 
     stz.w oamnumberperframeold      ; Reset per-frame counters
@@ -197,6 +201,7 @@ oamInitDynamicSprite:
     ; Set 16x16 sprite VRAM address based on size configuration
     ; MUST be AFTER oamInit — oamInit's C code may clobber spr16addrgfx
     rep #$20
+    .ACCU 16
     lda.w spr1addrgfx                 ; Default: small sprites use spr1 address
     sta.w spr16addrgfx
     sep #$20
@@ -302,11 +307,13 @@ oamInitDynamicSpriteEndFrame:
     phx
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
 
     rep #$20
+    .ACCU 16
     ldx.w oamnumberperframe           ; Current frame sprite count (×4)
     txa
     cmp.w oamnumberperframeold        ; Compare to last frame
@@ -334,16 +341,19 @@ _endframe_loop:
 
     ; Set X high bit to push sprite off-screen
     sep #$20
+    .ACCU 8
     lda.l oamHideshift,x
     ora.w oamMemory,y
     sta.w oamMemory,y
 
     ; Set X position to 1 (with high bit = off-screen)
     rep #$20
+    .ACCU 16
     plx
     txa
     tay
     sep #$20
+    .ACCU 8
     lda #$01
     sta.w oamMemory,y
     iny
@@ -351,6 +361,7 @@ _endframe_loop:
     sta.w oamMemory,y
 
     rep #$20
+    .ACCU 16
     ; Next sprite (id += 4)
     inx
     inx
@@ -376,9 +387,11 @@ _endframe_done:
 
     ; Signal NMI handler to DMA OAM buffer to hardware
     sep #$20
+    .ACCU 8
     lda #$01
     sta.l oam_update_flag
     rep #$20
+    .ACCU 16
 
     plx
     plb
@@ -405,6 +418,7 @@ oamVramQueueUpdate:
     phy
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
@@ -418,6 +432,7 @@ _vqu_start:
     sta.l $2115                     ; VRAM increment mode
 
     rep #$20
+    .ACCU 16
     stz.w oamqueuenumber            ; Assume we'll process everything
     txa                             ; A = bytes queued
     cmp #MAXSPRTRF
@@ -446,6 +461,7 @@ _vqu_loop:
 
     ; Check sprite size type
     sep #$20
+    .ACCU 8
     lda.l oamQueueEntry+5,x         ; Get sprite type
     cmp #OBJ_SPRITE8
     bne +
@@ -459,6 +475,7 @@ _vqu_loop:
 ;------------------------------------------------------------------------------
 _vqu_32x32:
     rep #$20
+    .ACCU 16
     lda.l oamQueueEntry+3,x         ; VRAM destination address
     sta.l $2116
 
@@ -484,6 +501,7 @@ _vqu_32x32:
 
     ; Set source bank for all channels
     sep #$20
+    .ACCU 8
     lda.l oamQueueEntry+2,x         ; Source bank
     sta.l $4314
     sta.l $4324
@@ -496,31 +514,37 @@ _vqu_32x32:
 
     ; Transfer row 2 (VRAM offset += $100)
     rep #$20
+    .ACCU 16
     lda #$100
     clc
     adc.l oamQueueEntry+3,x
     sta.l $2116
     sep #$20
+    .ACCU 8
     lda #$04
     sta.l $420b
 
     ; Transfer row 3 (VRAM offset += $200)
     rep #$20
+    .ACCU 16
     lda #$200
     clc
     adc.l oamQueueEntry+3,x
     sta.l $2116
     sep #$20
+    .ACCU 8
     lda #$08
     sta.l $420b
 
     ; Transfer row 4 (VRAM offset += $300)
     rep #$20
+    .ACCU 16
     lda #$300
     clc
     adc.l oamQueueEntry+3,x
     sta.l $2116
     sep #$20
+    .ACCU 8
     lda #$10
     sta.l $420b
 
@@ -531,6 +555,7 @@ _vqu_32x32:
 ;------------------------------------------------------------------------------
 _vqu_16x16:
     rep #$20
+    .ACCU 16
     lda.l oamQueueEntry+3,x         ; VRAM destination address
     sta.l $2116
 
@@ -548,6 +573,7 @@ _vqu_16x16:
 
     ; Set source bank
     sep #$20
+    .ACCU 8
     lda.l oamQueueEntry+2,x
     sta.l $4324
     sta.l $4334
@@ -558,10 +584,12 @@ _vqu_16x16:
 
     ; Transfer row 2 (VRAM offset += $100)
     rep #$20
+    .ACCU 16
     lda.l oamQueueEntry+3,x
     ora #$100
     sta.l $2116
     sep #$20
+    .ACCU 8
     lda #$08
     sta.l $420b
 
@@ -572,6 +600,7 @@ _vqu_16x16:
 ;------------------------------------------------------------------------------
 _vqu_8x8:
     rep #$20
+    .ACCU 16
     lda.l oamQueueEntry+3,x         ; VRAM destination
     sta.l $2116
 
@@ -582,6 +611,7 @@ _vqu_8x8:
     sta.l $4325
 
     sep #$20
+    .ACCU 8
     lda.l oamQueueEntry+2,x
     sta.l $4324
 
@@ -597,6 +627,7 @@ _vqu_next:
 _vqu_check_overflow:
     ; If we hit the max, move remaining entries to front of queue
     rep #$20
+    .ACCU 16
     lda.w oamqueuenumber
     beq _vqu_done
     ldy #$0000
@@ -642,6 +673,7 @@ oamDynamic32Draw:
     phy
 
     rep #$20
+    .ACCU 16
     lda 10,s                        ; id
     asl a                           ; id * 16 (oambuffer entry size)
     asl a
@@ -650,12 +682,14 @@ oamDynamic32Draw:
     tay                             ; Y = oambuffer offset
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
 
     ; Check if graphics need refresh
     sep #$20
+    .ACCU 8
     lda.w oambuffer+OAM_REFRESH,y
     beq _o32d_no_refresh
     lda #$00
@@ -663,6 +697,7 @@ oamDynamic32Draw:
 
     ; Queue graphics for VRAM upload
     rep #$20
+    .ACCU 16
     lda.w oambuffer+OAM_FRAMEID,y     ; Frame index
     asl a                           ; * 2 for word lookup
     tax
@@ -693,6 +728,7 @@ oamDynamic32Draw:
     sta.l oamQueueEntry,x
 
     sep #$20
+    .ACCU 8
     lda.w oambuffer+OAM_GRAPHICS+2,y  ; Source bank
     sta.l oamQueueEntry+2,x
     lda #OBJ_SPRITE32
@@ -701,6 +737,7 @@ oamDynamic32Draw:
 _o32d_no_refresh:
     ; Update OAM buffer with sprite position/attributes
     rep #$20
+    .ACCU 16
     ldx.w oamnumberperframe           ; Current OAM slot (×4)
 
     ; Get tile ID from lookup table
@@ -716,11 +753,13 @@ _o32d_no_refresh:
     lda.w oambuffer+OAM_OAMX,y        ; X position
     xba                             ; Save X high byte
     sep #$20
+    .ACCU 8
     ror a                           ; X bit 8 into carry
 
     lda.w oambuffer+OAM_OAMY,y        ; Y position
     xba                             ; Swap: now A = Y:X_high_bit_in_carry
     rep #$20
+    .ACCU 16
     sta.w oamMemory,x               ; Store X(lo) and Y
 
     ; Handle X high bit in high table
@@ -728,6 +767,7 @@ _o32d_no_refresh:
     phy                             ; Save oambuffer offset
     php                             ; Save processor status including carry
     rep #$20
+    .ACCU 16
     txa                             ; A = oamnumberperframe (oam index × 4)
     lsr a                           ; /2
     lsr a                           ; /4
@@ -738,6 +778,7 @@ _o32d_no_refresh:
     tay                             ; Y = high table address (512+)
     plp                             ; Restore carry flag from ror
     sep #$20                        ; Ensure 8-bit A for mask operations
+    .ACCU 8
 
     bcs _o32d_xhigh                 ; If carry set, X >= 256
     lda.l oammask+1,x               ; Clear X high bit
@@ -757,6 +798,7 @@ _o32d_attr:
 
     ; Set sprite size to LARGE in high table
     rep #$20
+    .ACCU 16
     lda.w oamnumberperframe
     lsr a
     lsr a
@@ -773,6 +815,7 @@ _o32d_attr:
     tax
 
     sep #$20
+    .ACCU 8
     lda.w oamMemory,y
     and.l oamSetExand,x             ; Clear size bit
     sta.w oamMemory,y
@@ -782,6 +825,7 @@ _o32d_attr:
 
     ; Update counters
     rep #$20
+    .ACCU 16
     inc.w oamnumberspr0             ; Next 32x32 slot
     lda.w oamnumberperframe
     clc
@@ -813,6 +857,7 @@ oamDynamic16Draw:
     phy
 
     rep #$20
+    .ACCU 16
     lda 10,s                        ; id
     asl a
     asl a
@@ -821,6 +866,7 @@ oamDynamic16Draw:
     tay                             ; Y = oambuffer offset
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
@@ -833,6 +879,7 @@ oamDynamic16Draw:
 
     ; Queue graphics for VRAM upload
     rep #$20
+    .ACCU 16
     lda.w oambuffer+OAM_FRAMEID,y
     asl a
     tax
@@ -869,6 +916,7 @@ _o16d_get_block:
     lda.w sprit_val2
     sta.l oamQueueEntry,x
     sep #$20
+    .ACCU 8
     lda.w oambuffer+OAM_GRAPHICS+2,y
     sta.l oamQueueEntry+2,x
     lda #OBJ_SPRITE16
@@ -876,6 +924,7 @@ _o16d_get_block:
 
 _o16d_no_refresh:
     rep #$20
+    .ACCU 16
     ldx.w oamnumberperframe
 
     ; Get tile ID based on size configuration
@@ -903,10 +952,12 @@ _o16d_store_tile:
     lda.w oambuffer+OAM_OAMX,y
     xba
     sep #$20
+    .ACCU 8
     ror a
     lda.w oambuffer+OAM_OAMY,y
     xba
     rep #$20
+    .ACCU 16
     sta.w oamMemory,x
 
     ; Handle X high bit in high table
@@ -914,6 +965,7 @@ _o16d_store_tile:
     phy                             ; Save oambuffer offset
     php                             ; Save processor status including carry
     rep #$20
+    .ACCU 16
     txa                             ; A = oamnumberperframe (oam index × 4)
     lsr a                           ; /2
     lsr a                           ; /4
@@ -924,6 +976,7 @@ _o16d_store_tile:
     tay                             ; Y = high table address (512+)
     plp                             ; Restore carry flag from ror
     sep #$20                        ; Ensure 8-bit A for mask operations
+    .ACCU 8
 
     bcs _o16d_xhigh
     lda.l oammask+1,x               ; Clear mask
@@ -943,6 +996,7 @@ _o16d_attr:
 
     ; Set sprite size in high table
     rep #$20
+    .ACCU 16
     lda.w oamnumberperframe
     lsr a
     lsr a
@@ -959,17 +1013,20 @@ _o16d_attr:
     tax
 
     sep #$20
+    .ACCU 8
     lda.w oamMemory,y
     and.l oamSetExand,x
     sta.w oamMemory,y
 
     ; Set size based on configuration (large if using spr0, small if spr1)
     rep #$20
+    .ACCU 16
     lda.w spr16addrgfx
     cmp.w spr1addrgfx
     beq _o16d_small_size
     ; Large size
     sep #$20
+    .ACCU 8
     lda.l oamSizeshift,x
     ora.w oamMemory,y
     sta.w oamMemory,y
@@ -977,6 +1034,7 @@ _o16d_attr:
 _o16d_small_size:
     ; Update counters
     rep #$20
+    .ACCU 16
     lda.w spr16addrgfx
     cmp.w spr0addrgfx
     beq _o16d_inc_large
@@ -1016,6 +1074,7 @@ oamDynamic8Draw:
     phy
 
     rep #$20
+    .ACCU 16
     lda 10,s
     asl a
     asl a
@@ -1024,6 +1083,7 @@ oamDynamic8Draw:
     tay
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
@@ -1035,6 +1095,7 @@ oamDynamic8Draw:
     sta.w oambuffer+OAM_REFRESH,y
 
     rep #$20
+    .ACCU 16
     lda.w oambuffer+OAM_FRAMEID,y
     asl a
     tax
@@ -1062,6 +1123,7 @@ oamDynamic8Draw:
     lda.w sprit_val2
     sta.l oamQueueEntry,x
     sep #$20
+    .ACCU 8
     lda.w oambuffer+OAM_GRAPHICS+2,y
     sta.l oamQueueEntry+2,x
     lda #OBJ_SPRITE8
@@ -1069,6 +1131,7 @@ oamDynamic8Draw:
 
 _o8d_no_refresh:
     rep #$20
+    .ACCU 16
     ldx.w oamnumberperframe
 
     ; Get tile ID
@@ -1084,10 +1147,12 @@ _o8d_no_refresh:
     lda.w oambuffer+OAM_OAMX,y
     xba
     sep #$20
+    .ACCU 8
     ror a
     lda.w oambuffer+OAM_OAMY,y
     xba
     rep #$20
+    .ACCU 16
     sta.w oamMemory,x
 
     ; Handle X high bit in high table
@@ -1095,6 +1160,7 @@ _o8d_no_refresh:
     phy                             ; Save oambuffer offset
     php                             ; Save processor status including carry
     rep #$20
+    .ACCU 16
     txa                             ; A = oamnumberperframe (oam index × 4)
     lsr a                           ; /2
     lsr a                           ; /4
@@ -1105,6 +1171,7 @@ _o8d_no_refresh:
     tay                             ; Y = high table address (512+)
     plp                             ; Restore carry flag from ror
     sep #$20                        ; Ensure 8-bit A for mask operations
+    .ACCU 8
 
     bcs _o8d_xhigh
     lda.l oammask+1,x               ; Clear X high bit
@@ -1124,6 +1191,7 @@ _o8d_attr:
 
     ; Set sprite size = small in high table
     rep #$20
+    .ACCU 16
     lda.w oamnumberperframe
     lsr a
     lsr a
@@ -1140,12 +1208,14 @@ _o8d_attr:
     tax
 
     sep #$20
+    .ACCU 8
     lda.w oamMemory,y
     and.l oamSetExand,x             ; Clear size bit (small)
     sta.w oamMemory,y
 
     ; Update counters
     rep #$20
+    .ACCU 16
     inc.w oamnumberspr1
     lda.w oamnumberperframe
     clc

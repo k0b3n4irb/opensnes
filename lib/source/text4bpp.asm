@@ -337,17 +337,21 @@ opensnes_font_4bpp_end:
 asm_textDMAFont4bpp:
     php
     rep #$20            ; 16-bit A
+    .ACCU 16
     lda #$1801          ; Mode $01 (word write ab), target $18 (VMDATAL)
     sta $4300
     lda #opensnes_font_4bpp
     sta $4302           ; Source address (low word)
     sep #$20
+    .ACCU 8
     lda #:opensnes_font_4bpp
     sta $4304           ; Source bank
     rep #$20
+    .ACCU 16
     lda #3072           ; Transfer size (96 chars x 32 bytes)
     sta $4305
     sep #$20
+    .ACCU 8
     lda #$01            ; Enable DMA channel 0
     sta $420B
     plp

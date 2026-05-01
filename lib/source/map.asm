@@ -142,12 +142,14 @@ mapUpdateCamera:
     phb
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
 
     ; cproc L-to-R: ypos(p2) SP+6, xpos(p1) SP+8
     rep #$20
+    .ACCU 16
     lda 8,s                                 ; xpos (param 1)
     sec
     sbc.l x_pos
@@ -166,9 +168,11 @@ _muc1:
 
 _muc2:
     sep #$20
+    .ACCU 8
     lda mapoptions
     and #MAP_OPT_1WAY
     rep #$20
+    .ACCU 16
     bne _muc4
 
     cmp #MAP_SCRLR_SCRL
@@ -230,12 +234,14 @@ mapLoad:
     ; cproc L-to-R: tilesprop(p3) SP+10, layertiles(p2) SP+12, layer1map(p1) SP+14
     ; cproc passes 16-bit pointers only (no bank byte), use bank $00
     sep #$20
+    .ACCU 8
     lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
     pha
     plb
     sta.l maptile_L1b
 
     rep #$20
+    .ACCU 16
     lda 14,s                                ; layer1map addr (param 1)
     tax
     lda 0,x                                 ; get mapwidth
@@ -262,6 +268,7 @@ mapLoad:
     sta.l $2181
 
     sep #$20
+    .ACCU 8
     lda #$7e
     sta.l $2183
 
@@ -279,6 +286,7 @@ mapLoad:
     sta $420B                               ; do dma for transfer
 
     rep	#$20
+    .ACCU 16
     lda	10,s	                            ; tilesprop addr (param 3)
 	sta.l	$4302
 
@@ -289,6 +297,7 @@ mapLoad:
     sty $2181
 
     sep	#$20
+    .ACCU 8
     lda #$7e
     sta.l $2183
 
@@ -310,6 +319,8 @@ mapLoad:
     sta.l mapoptions
 
     rep #$31
+    .ACCU 16
+    .INDEX 16
     lda.l mapwidth
     adc #MAP_MTSIZE - 1                     ; carry clear from REP
     lsr
@@ -357,16 +368,19 @@ _mini2:
     ; DMA the entire bg_L1 buffer to VRAM immediately, so callers don't
     ; need the mapUpdate+WaitForVBlank+mapVblank workaround.
     sep #$20
+    .ACCU 8
     lda #$80
     sta.l $2115                     ; VMAIN: word increment
 
     rep #$20
+    .ACCU 16
     ldx #MAP_BG1_ADR
     stx $2116                      ; VRAM destination
 
     ldx #bg_L1.w
     stx $4302                      ; Source address
     sep #$20
+    .ACCU 8
     lda #:bg_L1
     sta.l $4304                    ; Source bank ($7E)
 
@@ -374,10 +388,12 @@ _mini2:
     stx $4300                      ; DMA mode: word write to $2118
 
     rep #$20
+    .ACCU 16
     ldy #32 * 32 * 2               ; 2048 bytes (left page)
     sty $4305
 
     sep #$20
+    .ACCU 8
     lda #$01
     sta.l $420B                    ; Start DMA
 
@@ -386,12 +402,14 @@ _mini2:
     sta.l $2115
 
     rep #$20
+    .ACCU 16
     ldx.w bgvvramloc_L1
     stx $2116
 
     ldx #bgvertleftbuf_L1.w
     stx $4302
     sep #$20
+    .ACCU 8
     lda #:bgvertleftbuf_L1
     sta.l $4304
 
@@ -399,10 +417,12 @@ _mini2:
     stx $4300
 
     rep #$20
+    .ACCU 16
     ldy #32 * 2                    ; 64 bytes (one column)
     sty $4305
 
     sep #$20
+    .ACCU 8
     lda #$01
     sta.l $420B
 
@@ -421,6 +441,7 @@ mapRefreshAll:
     phb
 
     sep #$20
+    .ACCU 8
     lda #$7e
     pha
     plb
@@ -430,6 +451,8 @@ _mapRefreshAll1:
     phy
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda.l y_pos
     lsr
     lsr
@@ -466,10 +489,12 @@ _mapDAS1:
 
     phb
     sep #$20
+    .ACCU 8
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda 0,x
     plb
 
@@ -538,6 +563,7 @@ _mapDAS2:
     sta.l bgvvramloc_L1
 
     sep    #$20
+    .ACCU 8
     lda #MAP_UPD_WHOLE
     sta.l mapupdbuf
 
@@ -578,10 +604,12 @@ _phb1:
     tax
     phb
     sep #$20
+    .ACCU 8
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda 0,x
     plb
 
@@ -642,10 +670,12 @@ _pvb1:
     tax
     phb
     sep #$20
+    .ACCU 8
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda 0,x
     plb
 
@@ -688,6 +718,7 @@ mapVblank:
     phy
 
     sep #$20
+    .ACCU 8
     lda.b #$0
     pha
     plb
@@ -774,6 +805,7 @@ _mapvb4:
 
 _mapvbend:
     sep #$20
+    .ACCU 8
     lda.l mapoptions
     and #MAP_OPT_BG2
     bne _mapvbbg2
@@ -816,6 +848,7 @@ mapUpdate:
     php
 
     sep #$20
+    .ACCU 8
     lda.l mapdirty
     beq _maupd1
     ; Runtime full refresh: push B, set bank $7E, then enter refresh
@@ -833,6 +866,8 @@ _maupd1:
     plb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda.l x_pos
     sec
     sbc.w mapvisibletopleftxpos
@@ -878,10 +913,12 @@ _maupd42:
     sta.l bgvvramloc_L1
 
     sep #$20
+    .ACCU 8
     lda #MAP_UPD_VERT
     tsb mapupdbuf
 
     rep    #$20
+    .ACCU 16
 _maupd41:
     bra _mapupd3
 
@@ -923,10 +960,12 @@ _mapupd51:
     sta.l bgvvramloc_L1
 
     sep #$20
+    .ACCU 8
     lda #MAP_UPD_VERT
     tsb mapupdbuf
 
     rep #$20
+    .ACCU 16
 _mapupd3:
     lda.l x_pos
     sec
@@ -978,10 +1017,13 @@ _mapupd8:
     sta.l bgrightvramlocr_L1
 
     sep    #$20
+    .ACCU 8
     lda #MAP_UPD_HORIZ
     tsb    mapupdbuf
 
     rep    #$30
+    .ACCU 16
+    .INDEX 16
 _mapUpd81:
     bra _mapupd9
 _mapupd6:
@@ -1020,9 +1062,11 @@ _mapupda:
     sta.l bgrightvramlocr_L1
 
     sep #$20
+    .ACCU 8
     lda #MAP_UPD_HORIZ
     tsb mapupdbuf
     rep #$20
+    .ACCU 16
 
 _mapupd9:
 	lda.l y_pos
@@ -1031,6 +1075,7 @@ _mapupd9:
 	sta.l dispyofs_L1
 
     sep #$20
+    .ACCU 8
     lda #MAP_UPD_POSIT
     tsb mapupdbuf
 
@@ -1057,6 +1102,8 @@ mapGetMetaTile:
 
     ; cproc L-to-R: ypos(p2) SP+9, xpos(p1) SP+11
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda  9,s                                ; ypos (param 2, closest)
     lsr
     lsr
@@ -1079,10 +1126,12 @@ mapGetMetaTile:
 
     phb
     sep #$20
+    .ACCU 8
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda 0,x
     plb
     and #$03FF
@@ -1114,6 +1163,8 @@ mapGetMetaTilesProp:
 
     ; cproc L-to-R: ypos(p2) SP+9, xpos(p1) SP+11
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda  9,s                                ; ypos (param 2, closest)
     lsr
     lsr
@@ -1136,10 +1187,12 @@ mapGetMetaTilesProp:
 
     phb
     sep #$20
+    .ACCU 8
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda 0,x
     plb
     and #$03FF
@@ -1172,6 +1225,7 @@ mapSetMapOptions:
     phb
 
     sep #$20
+    .ACCU 8
     lda.b #$7E
     pha
     plb

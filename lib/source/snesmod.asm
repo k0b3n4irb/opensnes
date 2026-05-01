@@ -153,6 +153,7 @@ snesmodInit:
     sei
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     sta REG_NMI_TIMEN
     pha
@@ -192,8 +193,10 @@ snesmodInit:
 
 @sb_start:
     rep #$20                    ; Write port0+port1 data
+    .ACCU 16
     sta REG_APUIO0
     sep #$20
+    .ACCU 8
 
     cpx #SM_SPC_end-SM_SPC      ; Loop until all bytes transferred
     bcc @sb_send
@@ -260,12 +263,14 @@ snesmodInit:
 
     ; Clear FIFO (all 256 bytes)
     sep #$10            ; 8-bit X so INX wraps 255->0
+    .INDEX 8
     ldx #$0
     lda #$0
 -:  sta.w spc_fifo,x
     inx
     bne -
     rep #$10            ; Restore 16-bit index
+    .INDEX 16
 
     ; Re-enable NMI (VBlank interrupt) - critical for WaitForVBlank to work!
     lda #$81                    ; NMI enable + auto joypad read
@@ -289,6 +294,7 @@ snesmodSetSoundbank:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -321,14 +327,18 @@ snesmodLoadModule:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda 6,s                     ; module_id
     tax
     sep #$20
+    .ACCU 8
 
     phx                         ; Flush FIFO first
     jsr xspcFlush
@@ -340,6 +350,7 @@ snesmodLoadModule:
     jsr get_address
 
     rep #$20
+    .ACCU 16
     lda [spc_ptr], y            ; X = MODULE SIZE
     tax
 
@@ -358,6 +369,7 @@ snesmodLoadModule:
 +:  tay
 
     sep #$20
+    .ACCU 8
     lda spc_v                   ; Wait for SPC
     pha
 -:  cmp REG_APUIO1
@@ -384,6 +396,7 @@ snesmodLoadModule:
     incptr
 
     rep #$20
+    .ACCU 16
     lda [spc_ptr], y            ; x = number of sources
     tax
 
@@ -397,6 +410,7 @@ snesmodLoadModule:
 
     phy                         ; Push memory pointer and counter
     sep #$20
+    .ACCU 8
     lda spc_ptr+2
     pha
     phx
@@ -439,6 +453,7 @@ transfer_source:
     lda #$01                    ; Port0=$01
     sta REG_APUIO0
     rep #$20
+    .ACCU 16
     lda [spc_ptr], y            ; x = length (bytes->words)
     incptr
     ina
@@ -448,6 +463,7 @@ transfer_source:
     sta REG_APUIO2
     incptr
     sep #$20
+    .ACCU 8
 
     lda spc_v                   ; Send message
     eor #$80
@@ -476,9 +492,11 @@ transfer_again:
 
 do_transfer:
     rep #$20                    ; Transfer 1 word
+    .ACCU 16
     lda [spc_ptr], y
     sta REG_APUIO2
     sep #$20
+    .ACCU 8
     lda spc_v
     dex
     bne transfer_again
@@ -506,6 +524,7 @@ get_address:
     lda spc_bank
     sta spc_ptr+2
     rep #$20
+    .ACCU 16
     stx spc1
     txa
     asl
@@ -516,6 +535,7 @@ get_address:
     lda [spc_ptr]               ; Read address
     pha
     sep #$20
+    .ACCU 8
     ldy #2
     lda [spc_ptr],y             ; Read bank#
 
@@ -536,14 +556,18 @@ snesmodLoadEffect:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
 
     rep #$30
+    .ACCU 16
+    .INDEX 16
     lda 6,s                     ; id
     tax
     sep #$20
+    .ACCU 8
 
     ldy #SB_SRCTABLE
     sty spc2
@@ -565,6 +589,7 @@ snesmodLoadEffect:
     bne -
 
     rep #$20
+    .ACCU 16
     lda [spc_ptr], y            ; x = length (bytes->words)
     ina
     lsr
@@ -572,6 +597,7 @@ snesmodLoadEffect:
     tax
     incptr                      ; Skip loop
     sep #$20
+    .ACCU 8
 
     jsr do_transfer
 
@@ -594,6 +620,7 @@ QueueMessage:
     sei                         ; Disable IRQ
 
     sep #$10
+    .INDEX 8
     ldx spc_fwrite
     sta.w spc_fifo, x
     inx
@@ -605,6 +632,7 @@ QueueMessage:
     inx
     stx spc_fwrite
     rep #$10
+    .INDEX 16
 
     cli
 
@@ -621,6 +649,7 @@ snesmodFlush:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -654,6 +683,7 @@ xspcFlush:
 ;------------------------------------------------------------------------------
 xspcProcessMessages:
     sep #$10
+    .INDEX 8
     lda spc_fwrite
     cmp spc_fread
     beq @exit2
@@ -701,6 +731,7 @@ xspcProcessMessages:
 
 @exit2:
     rep #$10
+    .INDEX 16
     rts
 
 ;------------------------------------------------------------------------------
@@ -712,6 +743,7 @@ snesmodProcess:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -722,6 +754,7 @@ snesmodProcess:
 
 spcProcessMessages:
     sep #$10
+    .INDEX 8
     lda spc_fwrite
     cmp spc_fread
     beq @exit2
@@ -769,6 +802,7 @@ spcProcessMessages:
 
 @exit2:
     rep #$10
+    .INDEX 16
     plb
     plp
     rtl
@@ -782,6 +816,7 @@ snesmodPlay:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -800,6 +835,7 @@ snesmodStop:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -816,6 +852,7 @@ snesmodPause:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -832,6 +869,7 @@ snesmodResume:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -848,6 +886,7 @@ snesmodSetModuleVolume:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -866,6 +905,7 @@ snesmodFadeVolume:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
@@ -892,17 +932,20 @@ snesmodPlayEffect:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
 
     ; Get parameters from stack
     rep #$20
+    .ACCU 16
     lda 6,s                     ; pitch (u16)
     sta spc2                    ; Save pitch
     lda 12,s                    ; effectId (u16)
     tax                         ; X = effectId
     sep #$20
+    .ACCU 8
 
     ; Pack volume and pan into volpan byte
     ; Format: high nibble = volume/8, low nibble = pan/16
@@ -944,10 +987,12 @@ snesmodPlayEffect:
 snesmodGetPosition:
     php
     sep #$20
+    .ACCU 8
     stz tcc__r0
     lda.l REG_APUIO3
     sta tcc__r0
     rep #$20
+    .ACCU 16
     plp
     rtl
 
@@ -956,9 +1001,11 @@ snesmodGetPosition:
 ;------------------------------------------------------------------------------
 spcProcessStream:
     rep #$20
+    .ACCU 16
     lda digi_remain
     bne +
     sep #$20
+    .ACCU 8
     stz digi_active
     rts
 
@@ -991,6 +1038,7 @@ spcProcessStream:
 
 @newnote:
     rep #$20
+    .ACCU 16
     and #$00FF
     cmp digi_remain
     bcc @nsatcopy
@@ -1009,9 +1057,11 @@ spcProcessStream:
 
 @copysat:
     sep #$20
+    .ACCU 8
     sta REG_APUIO0
 
     sep #$10
+    .INDEX 8
     tax
     sta spc1
     asl
@@ -1024,6 +1074,7 @@ spcProcessStream:
     lda [digi_src2], y
     sta spc2
     rep #$20
+    .ACCU 16
     lda [digi_src], y
 
 -:  cpx REG_APUIO0
@@ -1032,6 +1083,7 @@ spcProcessStream:
     inx
     sta REG_APUIO2
     sep #$20
+    .ACCU 8
     lda spc2
     sta REG_APUIO1
     stx REG_APUIO0
@@ -1055,6 +1107,8 @@ spcProcessStream:
 
     tya
     rep #$31
+    .ACCU 16
+    .INDEX 16
     and #$FF
     adc digi_src
     sta digi_src
@@ -1062,6 +1116,7 @@ spcProcessStream:
     ina
     sta digi_src2
     sep #$20
+    .ACCU 8
 
     rts
 
@@ -1074,14 +1129,17 @@ snesmodSetSoundTable:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb
 
     rep #$20
+    .ACCU 16
     lda 6,s
     sta SoundTable
     sep #$20
+    .ACCU 8
     lda 8,s
     sta SoundTable+2
 
@@ -1098,6 +1156,7 @@ snesmodAllocateSoundRegion:
     php
     phb
     sep #$20
+    .ACCU 8
     lda #$0
     pha
     plb

@@ -67,6 +67,8 @@
 hdmaSetup:
     php
     rep #$30                ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
 
     ; Stack layout after PHP (1 byte) + JSL return (3 bytes):
     ;   1,s = P
@@ -79,11 +81,13 @@ hdmaSetup:
     ; Calculate DMA register base address for this channel
     ; Channel registers are at $4300 + (channel * $10)
     sep #$20
+    .ACCU 8
     lda 11,s                ; channel (8-bit)
     cmp #8
     bcs @done               ; Invalid channel, bail out
 
     rep #$20
+    .ACCU 16
     and #$00FF              ; Mask to 8-bit
     asl a
     asl a
@@ -95,6 +99,7 @@ hdmaSetup:
 
     ; Set HDMA mode (DMAPx at $43x0)
     sep #$20
+    .ACCU 8
     lda 9,s                 ; mode (8-bit)
     sta.l $0000,x           ; $43x0 = DMAP
 
@@ -104,12 +109,14 @@ hdmaSetup:
 
     ; Set table address (A1Tx at $43x2-$43x4)
     rep #$20
+    .ACCU 16
     lda 5,s                 ; table address (16-bit)
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
 
     ; For bank: if address >= $8000, it's ROM in bank 0 (LoROM)
     ; For addresses < $8000, assume bank $7E (RAM)
     sep #$20
+    .ACCU 8
     lda 6,s                 ; High byte of table address
     cmp #$80
     bcc @use_ram_bank
@@ -141,14 +148,18 @@ hdmaSetup:
 hdmaSetupBank:
     php
     rep #$30                ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
 
     ; Calculate DMA register base address for this channel
     sep #$20
+    .ACCU 8
     lda 13,s                ; channel (8-bit)
     cmp #8
     bcs @hdmaSetupBank_done ; Invalid channel, bail out
 
     rep #$20
+    .ACCU 16
     and #$00FF              ; Mask to 8-bit
     asl a
     asl a
@@ -160,6 +171,7 @@ hdmaSetupBank:
 
     ; Set HDMA mode (DMAPx at $43x0)
     sep #$20
+    .ACCU 8
     lda 11,s                ; mode (8-bit)
     sta.l $0000,x           ; $43x0 = DMAP
 
@@ -169,11 +181,13 @@ hdmaSetupBank:
 
     ; Set table address (A1Tx at $43x2-$43x3)
     rep #$20
+    .ACCU 16
     lda 7,s                 ; table address (16-bit)
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
 
     ; Set bank from explicit parameter
     sep #$20
+    .ACCU 8
     lda 5,s                 ; bank byte
     sta.l $0004,x           ; $43x4 = A1B (bank)
 
@@ -192,6 +206,7 @@ hdmaSetupBank:
 hdmaEnable:
     php
     sep #$20
+    .ACCU 8
 
     ; Read current HDMAEN, OR with mask, write back
     ; Note: HDMAEN at $420C is write-only, so we track state in RAM
@@ -211,6 +226,7 @@ hdmaEnable:
 hdmaDisable:
     php
     sep #$20
+    .ACCU 8
 
     lda 5,s                 ; channelMask
     eor #$FF                ; Invert to create AND mask
@@ -229,6 +245,7 @@ hdmaDisable:
 hdmaDisableAll:
     php
     sep #$20
+    .ACCU 8
 
     lda #$00
     sta.l hdma_enabled_state
@@ -245,6 +262,7 @@ hdmaDisableAll:
 hdmaGetEnabled:
     php
     sep #$20
+    .ACCU 8
 
     lda.l hdma_enabled_state
 
@@ -263,14 +281,18 @@ hdmaGetEnabled:
 hdmaSetTable:
     php
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; Calculate register base
     sep #$20
+    .ACCU 8
     lda 7,s                 ; channel
     cmp #8
     bcs @done
 
     rep #$20
+    .ACCU 16
     and #$00FF
     asl a
     asl a
@@ -286,6 +308,7 @@ hdmaSetTable:
 
     ; Set bank (same logic as hdmaSetup)
     sep #$20
+    .ACCU 8
     lda 6,s                 ; High byte of address
     cmp #$80
     bcc @use_ram

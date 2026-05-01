@@ -15,6 +15,7 @@
 tools/font2snes/font2snes
 tools/gfx4snes/gfx4snes
 tools/img2snes/img2snes
+tools/sa1-patch/sa1_patch
 tools/smconv/smconv
 
 # Generated documentation

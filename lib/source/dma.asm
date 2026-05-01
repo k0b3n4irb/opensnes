@@ -59,6 +59,7 @@ dmaCopyVram:
     php
 
     rep #$20
+    .ACCU 16
     lda 7,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
@@ -69,6 +70,7 @@ dmaCopyVram:
     sta.l $4302             ; DMA source address
 
     sep #$20
+    .ACCU 8
     lda #$80
     sta.l $2115             ; REG_VMAIN: increment after high byte write
 
@@ -117,6 +119,7 @@ dmaCopyVramBank:
     php
 
     rep #$20
+    .ACCU 16
     lda 7,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
@@ -127,6 +130,7 @@ dmaCopyVramBank:
     sta.l $4302             ; DMA source address
 
     sep #$20
+    .ACCU 8
     lda #$80
     sta.l $2115             ; REG_VMAIN
 
@@ -157,10 +161,12 @@ dmaCopyCGram:
     php
 
     sep #$20
+    .ACCU 8
     lda 7,s                 ; startColor (low byte = color index)
     sta.l $2121             ; REG_CGADD
 
     rep #$20
+    .ACCU 16
     lda 5,s                 ; size
     sta.l $4305             ; DMA size
 
@@ -168,6 +174,7 @@ dmaCopyCGram:
     sta.l $4302             ; DMA source address
 
     sep #$20
+    .ACCU 8
     lda #$00                ; Source bank = 0 (same limitation as dmaCopyVram)
     sta.l $4304             ; DMA source bank
 
@@ -198,10 +205,12 @@ dmaCopyCGramBank:
     php
 
     sep #$20
+    .ACCU 8
     lda 7,s                 ; startColor (low byte = color index)
     sta.l $2121             ; REG_CGADD
 
     rep #$20
+    .ACCU 16
     lda 5,s                 ; size
     sta.l $4305             ; DMA size
 
@@ -209,6 +218,7 @@ dmaCopyCGramBank:
     sta.l $4302             ; DMA source address
 
     sep #$20
+    .ACCU 8
     lda 9,s                 ; bank byte
     sta.l $4304             ; DMA source bank
 
@@ -235,6 +245,7 @@ dmaCopyOam:
     php
 
     rep #$20
+    .ACCU 16
     lda #$0000
     sta.l $2102             ; REG_OAMADDL/H: OAM address = 0
 
@@ -245,6 +256,7 @@ dmaCopyOam:
     sta.l $4302             ; DMA source address
 
     sep #$20
+    .ACCU 8
     lda #$7E                ; Source bank = $7E (Work RAM)
     sta.l $4304             ; DMA source bank
 
@@ -282,12 +294,14 @@ dmaCopyOam:
 dmaCopyVramMode7:
     php
     rep #$20                ; 16-bit accumulator
+    .ACCU 16
 
     ; Step 1: Load tilemap to VRAM low bytes (VMDATAL)
     lda #$0000
     sta.l $2116             ; VMADDR = $0000
 
     sep #$20                ; 8-bit accumulator
+    .ACCU 8
     lda #$00
     sta.l $2115             ; VMAIN = 0 (increment after low byte write)
     sta.l $4300             ; DMA mode 0 (1 byte, A→B) — A is still $00
@@ -295,12 +309,14 @@ dmaCopyVramMode7:
     sta.l $4301
 
     rep #$20
+    .ACCU 16
     lda 11,s                ; tilemap address (16-bit)
     sta.l $4302             ; DMA source address
     lda 9,s                 ; tilemapSize
     sta.l $4305             ; DMA transfer size
 
     sep #$20
+    .ACCU 8
     lda 12,s                ; high byte of tilemap address
     cmp #$80
     bcc @tilemap_ram_bank
@@ -316,10 +332,12 @@ dmaCopyVramMode7:
 
     ; Step 2: Load tile pixels to VRAM high bytes (VMDATAH)
     rep #$20
+    .ACCU 16
     lda #$0000
     sta.l $2116             ; VMADDR = $0000
 
     sep #$20
+    .ACCU 8
     lda #$80
     sta.l $2115             ; VMAIN = $80 (increment after high byte write)
     lda #$00
@@ -328,12 +346,14 @@ dmaCopyVramMode7:
     sta.l $4301
 
     rep #$20
+    .ACCU 16
     lda 7,s                 ; tiles address (16-bit)
     sta.l $4302             ; DMA source address
     lda 5,s                 ; tilesSize
     sta.l $4305             ; DMA transfer size
 
     sep #$20
+    .ACCU 8
     lda 8,s                 ; high byte of tiles address
     cmp #$80
     bcc @tiles_ram_bank
@@ -362,6 +382,7 @@ dmaCopyVramMode7:
 clearNmiFlag:
     php
     sep #$20
+    .ACCU 8
     lda.l $4210             ; Read REG_RDNMI to clear flag
     plp
     rtl

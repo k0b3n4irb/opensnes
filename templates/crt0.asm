@@ -280,7 +280,9 @@
 ;------------------------------------------------------------------------------
 InitHardware:
     rep #$10            ; 16-bit X/Y
+    .INDEX 16
     sep #$20            ; 8-bit A
+    .ACCU 8
 
     ; Screen off (force blank)
     lda #$8F
@@ -394,6 +396,7 @@ InitHardware:
     plb
 
     rep #$20            ; 16-bit A
+    .ACCU 16
     ldx #0
     lda #$00F0          ; Little-endian: low byte=$F0 (Y=240), high byte=$00 (tile=0)
 @oam_clear_loop:
@@ -413,6 +416,7 @@ InitHardware:
     ; Without X high bit, large sprites (32x32+) at Y=240 wrap to top.
     ; Must match oamClear() behavior to prevent startup sprite glitch.
     sep #$20            ; 8-bit A for byte store
+    .ACCU 8
     lda #$55
     ldx #0
 @oam_ext_clear:
@@ -434,6 +438,7 @@ InitHardware:
     ; sprites when the screen turns on.
     ;--------------------------------------------------------------------------
     rep #$20
+    .ACCU 16
     stz.w $2102             ; OAM address = 0
 
     lda.w #$0400
@@ -442,14 +447,17 @@ InitHardware:
     lda.w #oamMemory
     sta.w $4372             ; Source address
     sep #$20
+    .ACCU 8
     lda.b #:oamMemory       ; Source bank ($7E)
     sta.w $4374
 
     rep #$20
+    .ACCU 16
     lda.w #$0220            ; 544 bytes
     sta.w $4375
 
     sep #$20
+    .ACCU 8
     lda.b #$80
     sta.w $420B             ; Start DMA channel 7
 
@@ -484,7 +492,9 @@ FastStart:
 
     ; 16-bit X/Y, 8-bit A
     rep #$18
+    .INDEX 16
     sep #$20
+    .ACCU 8
 
 .ifdef SA1
     ; SA-1: Enable I-RAM writes for SNES CPU
@@ -505,6 +515,7 @@ FastStart:
     plb
     plb
     rep #$20            ; 16-bit A for 2-byte stores
+    .ACCU 16
     lda #$0000
     ldx #$2000          ; Clear 8KB: $0000-$1FFF
 -   dex
@@ -512,6 +523,7 @@ FastStart:
     sta.w $0000,x
     bne -
     sep #$20            ; Restore 8-bit A for InitHardware
+    .ACCU 8
 
     ; Initialize hardware
     jsr InitHardware
@@ -523,9 +535,11 @@ FastStart:
 
     ; Initialize VBlank callback to default (does nothing)
     rep #$20
+    .ACCU 16
     lda #DefaultNmiCallback
     sta nmi_callback
     sep #$20
+    .ACCU 8
     lda #:DefaultNmiCallback
     sta nmi_callback+2
 
@@ -533,21 +547,27 @@ FastStart:
     ; oamInitDynamicSprite repoints it at oamDynamicNmiFlush when the
     ; dynamic sprite engine is brought up.
     rep #$20
+    .ACCU 16
     lda #DefaultDynamicFlush
     sta dynamic_flush_hook
     sep #$20
+    .ACCU 8
     lda #:DefaultDynamicFlush
     sta dynamic_flush_hook+2
 
     ; Clear frame counters (16-bit)
     rep #$20
+    .ACCU 16
     stz frame_count
     stz frame_count_svg
     stz lag_frame_counter
     sep #$20
+    .ACCU 8
 
     ; Switch to 16-bit mode
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; Set Direct Page to compiler registers
     lda #tcc__r0
@@ -572,9 +592,11 @@ FastStart:
 
     ; Enable NMI (VBlank interrupt)
     sep #$20
+    .ACCU 8
     lda #$81            ; NMI + auto joypad
     sta $4200
     rep #$20
+    .ACCU 16
 
 .ifdef SA1
     ;--------------------------------------------------------------------------
@@ -585,6 +607,7 @@ FastStart:
     ; 3. Release SA-1 from reset
     ;--------------------------------------------------------------------------
     sep #$20
+    .ACCU 8
 
     ; === SA-1 INIT ===
 
@@ -632,6 +655,7 @@ _sa1_iram_fail:
 
 _sa1_init_done:
     rep #$20
+    .ACCU 16
 .endif
 
 .ifdef SUPERFX
@@ -666,6 +690,7 @@ _sa1_init_done:
     ; main() returned - halt
     ; QBE returns value in A register (already there after jsl main returns)
     sep #$20
+    .ACCU 8
     sta $FFFD           ; Store for test runners
     stp                 ; Stop CPU
 
@@ -690,6 +715,8 @@ _sa1_init_done:
 
 CopyInitData:
     rep #$30            ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
 
     ; Load address of init data start (skip 1-byte placeholder)
     lda #DataInitStart + 1
@@ -718,6 +745,7 @@ CopyInitData:
     ; 16-bit lda/sta would write 2 bytes per iteration, causing a
     ; 1-byte overrun past the target on the final iteration.
     sep #$20            ; 8-bit A (X/Y remain 16-bit)
+    .ACCU 8
     ldy #0
 @copy_byte:
     lda (tcc__r1),y
@@ -726,6 +754,7 @@ CopyInitData:
     cpy tcc__r4
     bne @copy_byte
     rep #$20            ; restore 16-bit A
+    .ACCU 16
 
 @next_record:
     ; Move to next init record: tcc__r0 += 4 + size
@@ -778,6 +807,8 @@ NmiHandler:
 FastNmi:
 .endif
     rep #$38            ; Clear M, X, and D flags (16-bit A/X/Y, binary mode)
+    .ACCU 16
+    .INDEX 16
     pha
     phx
     phy
@@ -798,27 +829,32 @@ FastNmi:
 
     ; Acknowledge NMI
     sep #$20
+    .ACCU 8
     lda $4210
 
     ; Increment frame counter (always, even on lag frames)
     ; NOTE: With D != 0, all system variable accesses MUST use .w (absolute)
     rep #$20
+    .ACCU 16
     inc.w frame_count
 
     ;--------------------------------------------------------------------------
     ; Handshake check: is main thread ready?
     ;--------------------------------------------------------------------------
     sep #$20
+    .ACCU 8
     lda.w vblank_flag
     bne @vblank_work        ; flag=1 → main thread called WaitForVBlank, do work
 
     ; Lag frame — main thread still computing, skip all VBlank work
     rep #$20
+    .ACCU 16
     inc.w lag_frame_counter
     jmp @nmi_restore
 
 @vblank_work:
     rep #$20
+    .ACCU 16
 
     ;==========================================================================
     ; Dynamic sprite engine: end-of-frame + VRAM tile queue flush (via hook)
@@ -847,6 +883,7 @@ FastNmi:
     ;==========================================================================
 
     sep #$20            ; 8-bit A for flag checks
+    .ACCU 8
 
     ;--------------------------------------------------------------------------
     ; 1. Transfer OAM buffer to hardware during VBlank (inline DMA)
@@ -865,6 +902,7 @@ FastNmi:
 
     ; Set OAM address to 0 (word register — use 16-bit A)
     rep #$20
+    .ACCU 16
     stz.w $2102             ; OAMADDL/H = 0
 
     ; DMA channel 7: CPU→PPU, auto-increment, dest $2104 (OAMDATA)
@@ -875,16 +913,19 @@ FastNmi:
     lda.w #oamMemory
     sta.w $4372             ; Source address low/high
     sep #$20
+    .ACCU 8
     lda.b #:oamMemory       ; Source bank ($7E)
     sta.w $4374
 
     ; Transfer size: 544 bytes ($0220)
     rep #$20
+    .ACCU 16
     lda.w #$0220
     sta.w $4375             ; DMA size
 
     ; Start DMA channel 7
     sep #$20
+    .ACCU 8
     lda.b #$80
     sta.w $420B             ; MDMAEN: channel 7
 @oam_done:
@@ -897,6 +938,7 @@ FastNmi:
     stz.w tilemap_update_flag
     jsl tilemapFlush
     sep #$20            ; Restore 8-bit A after C function
+    .ACCU 8
 +
 
     ;--------------------------------------------------------------------------
@@ -985,10 +1027,13 @@ FastNmi:
     ;--------------------------------------------------------------------------
     ; Fast callback check: single byte flag (saves ~18 cycles vs 24-bit compare)
     sep #$20
+    .ACCU 8
     lda.w nmi_has_callback
     beq @skip_callback      ; 0 = no callback → skip
 
     rep #$30                ; 16-bit A/X/Y for callback
+    .ACCU 16
+    .INDEX 16
 
 @do_callback:
     ; Set data bank to $7E for C variable access
@@ -1009,7 +1054,9 @@ FastNmi:
 
 @skip_callback:
     sep #$20            ; 8-bit A
+    .ACCU 8
     rep #$10            ; 16-bit X/Y (needed for ScanMPlay5)
+    .INDEX 16
 
     ;--------------------------------------------------------------------------
     ; 5. Wait for Auto-Joypad + Read All Inputs
@@ -1037,6 +1084,7 @@ FastNmi:
     ; 5b. Read Joypads 0 & 1
     ;--------------------------------------------------------------------------
     rep #$20            ; 16-bit A for joypad reads
+    .ACCU 16
 
     ; Save previous state
     lda.w pad_keys
@@ -1071,6 +1119,7 @@ FastNmi:
     ; 5c. Skip mouse/scope if MultiPlayer5 active (incompatible devices)
     ;--------------------------------------------------------------------------
     sep #$20
+    .ACCU 8
     lda.w snes_mplay5
     beq @no_mp5_skip
         jmp @scope_done     ; Skip mouse and scope entirely
@@ -1089,6 +1138,7 @@ FastNmi:
     ; 7. Read Super Scope (if connected) — via SUPERFREE subroutine
     ;--------------------------------------------------------------------------
     sep #$20                ; 8-bit A
+    .ACCU 8
     lda.w scope_con
     beq @scope_done
         jsl ReadScope
@@ -1096,11 +1146,14 @@ FastNmi:
 
     ; Clear VBlank flag (handshake: signal main thread "done")
     sep #$20
+    .ACCU 8
     stz.w vblank_flag
 
 @nmi_restore:
     ; Restore and return
     rep #$30
+    .ACCU 16
+    .INDEX 16
     plb                 ; Restore data bank
     pld
     ply
@@ -1144,6 +1197,7 @@ DefaultDynamicFlush:
 WaitForVBlank:
     php
     sep #$20
+    .ACCU 8
     lda #$01
     sta.l oam_update_flag   ; Request OAM transfer
     sta.l vblank_flag       ; Signal: "main thread ready"
@@ -1664,6 +1718,7 @@ ReadScope:
 ;------------------------------------------------------------------------------
 IrqHandler:
     sep #$20            ; 8-bit A
+    .ACCU 8
     lda $4211           ; Read TIMEUP to acknowledge IRQ
     rti
 
@@ -1699,10 +1754,12 @@ tilemapFlush:
     plb                 ; DBR = $00
 
     sep #$20            ; 8-bit A
+    .ACCU 8
     lda #$80
     sta $2115           ; VMAIN: increment after high byte write
 
     rep #$20            ; 16-bit A
+    .ACCU 16
     lda.w tilemap_vram_addr
     sta $2116           ; VMADDL/H: VRAM word address
 
@@ -1719,6 +1776,7 @@ tilemapFlush:
     sta $4312           ; DMA source address (low word)
 
     sep #$20            ; 8-bit A
+    .ACCU 8
     lda #$00            ; Bank $00 (WRAM mirror, buffer always < $2000)
     sta $4314           ; DMA source bank
 

@@ -52,3 +52,19 @@ jobs:
 
       - name: Run lint_commits.py
         run: python3 devtools/lint_commits.py "${{ steps.range.outputs.range }}"
+
+  asm-markers:
+    name: ASM .ACCU/.INDEX markers (lint_asm.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Run lint_asm.py
+        # Hand-written ASM in lib/source and templates must declare the
+        # post-rep/sep mode explicitly. WLA-DX's per-object-file mode
+        # tracking loses precision at branch merges and silently emits
+        # the wrong instruction width — caught historically as
+        # `cpx #0` shipping as 2 bytes instead of 3, cascading
+        # misalignment through the rest of the section.
+        run: python3 devtools/lint_asm.py
