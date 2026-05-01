@@ -106,5 +106,6 @@
 /* SRAM: #include <snes/sram.h> */
 /* Collision: #include <snes/collision.h> */
 /* LZSS: #include <snes/lzss.h> */
+/* Game loop framework: #include <snes/gameloop.h> */
 
 #endif /* OPENSNES_H */
