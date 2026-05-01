@@ -60,6 +60,7 @@ color_table:
 profileInit:
     php
     sep #$20
+    .ACCU 8
     lda #$20                    ; add to backdrop
     sta.l REG_CGADSUB
     ; Clear fixed color to black
@@ -82,6 +83,8 @@ profileColorStart:
     php
     phb
     rep #$30                    ; 16-bit A, X
+    .ACCU 16
+    .INDEX 16
     lda 6,s                     ; color index (php+phb = +2, JSL ret = +3, arg at +6)
     and #$0007                  ; clamp to 0-7
     ; Multiply by 3 (table entry size)
@@ -92,6 +95,7 @@ profileColorStart:
     tax                         ; X = table offset
 
     sep #$20                    ; 8-bit A for register writes
+    .ACCU 8
     lda.l color_table,x         ; red channel COLDATA byte
     sta.l REG_COLDATA
     lda.l color_table+1,x       ; green channel
@@ -111,6 +115,7 @@ profileColorStart:
 profileColorEnd:
     php
     sep #$20
+    .ACCU 8
     lda #$20                    ; red = 0
     sta.l REG_COLDATA
     lda #$40                    ; green = 0
@@ -126,14 +131,18 @@ profileColorEnd:
 profileGetScanline:
     php
     sep #$20
+    .ACCU 8
     lda.l REG_SLHV              ; latch
     lda.l REG_OPVCT             ; low byte
     rep #$20
+    .ACCU 16
     and #$00FF
     pha
     sep #$20
+    .ACCU 8
     lda.l REG_OPVCT             ; high bit
     rep #$20
+    .ACCU 16
     and #$0001
     .repeat 8
     asl a
@@ -150,14 +159,18 @@ profileGetScanline:
 profileScanlineStart:
     php
     sep #$20
+    .ACCU 8
     lda.l REG_SLHV
     lda.l REG_OPVCT
     rep #$20
+    .ACCU 16
     and #$00FF
     sta.w profile_scanline_start
     sep #$20
+    .ACCU 8
     lda.l REG_OPVCT
     rep #$20
+    .ACCU 16
     and #$0001
     .repeat 8
     asl a
@@ -173,14 +186,18 @@ profileScanlineStart:
 profileScanlineEnd:
     php
     sep #$20
+    .ACCU 8
     lda.l REG_SLHV
     lda.l REG_OPVCT
     rep #$20
+    .ACCU 16
     and #$00FF
     pha
     sep #$20
+    .ACCU 8
     lda.l REG_OPVCT
     rep #$20
+    .ACCU 16
     and #$0001
     .repeat 8
     asl a
@@ -202,6 +219,7 @@ profileScanlineEnd:
 ;------------------------------------------------------------------------------
 profileGetFrameCount:
     rep #$20
+    .ACCU 16
     lda.w frame_count
     rtl
 
@@ -210,6 +228,7 @@ profileGetFrameCount:
 ;------------------------------------------------------------------------------
 profileGetLagFrames:
     rep #$20
+    .ACCU 16
     lda.w lag_frame_counter
     rtl
 

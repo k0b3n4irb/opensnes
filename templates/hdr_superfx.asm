@@ -105,6 +105,7 @@
 .SECTION ".empty_handler" SEMIFREE
 EmptyHandler:
     sep #$20
+    .ACCU 8
     lda $4210           ; Read RDNMI to acknowledge NMI
     rti
 .ENDS

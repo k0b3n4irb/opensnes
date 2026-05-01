@@ -70,11 +70,14 @@ consoleNocashMessage:
     phb
 
     rep #$30                    ; 16-bit A, X, Y
+    .ACCU 16
+    .INDEX 16
 
     lda 6,s                     ; msg pointer (16-bit address in Bank $00)
     tax                         ; X = current character pointer
 
     sep #$20                    ; 8-bit A for character reads
+    .ACCU 8
 
 @loop:
     lda.l $000000,x             ; read byte from Bank $00 + X

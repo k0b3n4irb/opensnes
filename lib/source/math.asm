@@ -47,6 +47,8 @@
 fixMul:
     php
     rep #$30                    ; 16-bit A, X, Y
+    .ACCU 16
+    .INDEX 16
 
     ; Load arguments
     lda 7,s                     ; a
@@ -74,6 +76,7 @@ fixMul:
 @b_pos:
 
     sep #$20                    ; 8-bit A for hardware multiplier
+    .ACCU 8
 
     ;-- P0 = a_lo * b_lo --
     lda.w fmul_a               ; a low byte
@@ -84,11 +87,13 @@ fixMul:
     nop                         ;  | fill 8 cycles
     nop                         ; /
     rep #$20
+    .ACCU 16
     lda.l $4216                 ; P0 result
     sta.w fmul_p0
 
     ;-- P1 = a_hi * b_lo --
     sep #$20
+    .ACCU 8
     lda.w fmul_a + 1           ; a high byte
     sta.l $4202
     lda.w fmul_b               ; b low byte
@@ -97,11 +102,13 @@ fixMul:
     nop
     nop
     rep #$20
+    .ACCU 16
     lda.l $4216                 ; P1 result
     sta.w fmul_p1
 
     ;-- P2 = a_lo * b_hi --
     sep #$20
+    .ACCU 8
     lda.w fmul_a               ; a low byte
     sta.l $4202
     lda.w fmul_b + 1           ; b high byte
@@ -110,11 +117,13 @@ fixMul:
     nop
     nop
     rep #$20
+    .ACCU 16
     lda.l $4216                 ; P2 result
     sta.w fmul_p2
 
     ;-- P3 = a_hi * b_hi --
     sep #$20
+    .ACCU 8
     lda.w fmul_a + 1           ; a high byte
     sta.l $4202
     lda.w fmul_b + 1           ; b high byte
@@ -123,6 +132,7 @@ fixMul:
     nop
     nop
     rep #$20
+    .ACCU 16
     lda.l $4216                 ; P3 result
     sta.w fmul_p3
 
@@ -179,6 +189,8 @@ fixMul:
 fixLerp:
     php
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; diff = b - a
     lda 7,s                     ; b
@@ -196,6 +208,7 @@ fixLerp:
 
     ; t is in 5,s (8-bit value)
     sep #$20
+    .ACCU 8
 
     ;-- P0 = |diff_lo| * t --
     lda.w fmul_a               ; diff low byte
@@ -206,11 +219,13 @@ fixLerp:
     nop
     nop
     rep #$20
+    .ACCU 16
     lda.l $4216
     sta.w fmul_p0
 
     ;-- P1 = |diff_hi| * t --
     sep #$20
+    .ACCU 8
     lda.w fmul_a + 1           ; diff high byte
     sta.l $4202
     lda 5,s                     ; t
@@ -219,6 +234,7 @@ fixLerp:
     nop
     nop
     rep #$20
+    .ACCU 16
     lda.l $4216
     sta.w fmul_p1
 

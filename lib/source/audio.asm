@@ -97,16 +97,20 @@ audioInit:
     phb
     phd
     sep #$20
+    .ACCU 8
     rep #$10
+    .INDEX 16
 
     ; Set direct page and data bank to 0
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda #$0000
     tcd
     sep #$20
+    .ACCU 8
 
     ; Initialize state
     stz audio_sync
@@ -116,12 +120,15 @@ audioInit:
     stz audio_sample_count
 
     rep #$20
+    .ACCU 16
     lda #SPC_SAMPLE_START
     sta audio_next_addr
     sep #$20
+    .ACCU 8
 
     ; Clear sample table
     rep #$20
+    .ACCU 16
     ldx #$0000
     lda #$0000
 @clear_samples:
@@ -131,6 +138,7 @@ audioInit:
     cpx #512
     bcc @clear_samples
     sep #$20
+    .ACCU 8
 
     ; Clear voice sample IDs
     ldx #$0000
@@ -173,8 +181,10 @@ audioInit:
 
 @start:
     rep #$20
+    .ACCU 16
     sta $2140
     sep #$20
+    .ACCU 8
     cpx #spc_driver_end - spc_driver
     bcc @loop
 
@@ -215,8 +225,10 @@ audioUpdate:
 audioIsReady:
     php
     sep #$20
+    .ACCU 8
     lda #$01
     rep #$20
+    .ACCU 16
     and #$00FF
     plp
     rtl
@@ -230,18 +242,22 @@ audioLoadSample:
     phb
     phd
     sep #$20
+    .ACCU 8
     rep #$10
+    .INDEX 16
 
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda #$0000
     tcd
 
     ; Get parameters: id(1), pad(1), brrData(3), size(2), loopPoint(2)
     ; Stack after php/phb/phd: +6 bytes
     sep #$20
+    .ACCU 8
     lda 10,s                ; id
     cmp #64
     bcc +                   ; if valid, continue
@@ -250,13 +266,16 @@ audioLoadSample:
     sta audio_temp          ; Store id
 
     rep #$20
+    .ACCU 16
     lda 12,s                ; brrData low
     sta audio_ptr
     sep #$20
+    .ACCU 8
     lda 14,s                ; brrData bank
     sta audio_ptr+2
 
     rep #$20
+    .ACCU 16
     lda 15,s                ; size
     sta audio_temp+1
 
@@ -273,31 +292,38 @@ audioLoadSample:
 +
     ; Send UPLOAD_START command
     sep #$20
+    .ACCU 8
     jsr _waitSpcReady
 
     lda #SPC_CMD_UPLOAD_START
     sta $2140
     rep #$20
+    .ACCU 16
     lda audio_next_addr
     sta $2142               ; Target address
     sep #$20
+    .ACCU 8
 
     jsr _toggleSync
     jsr _waitSpcReady
 
     ; Upload sample data
     rep #$20
+    .ACCU 16
     lda audio_temp+1        ; Size
     sta audio_temp+5        ; Remaining
     sep #$20
+    .ACCU 8
 
     ldy #$0000
 
 @upload_loop:
     rep #$20
+    .ACCU 16
     lda audio_temp+5
     beq @upload_done
     sep #$20
+    .ACCU 8
 
     ; Send two bytes at a time
     lda [audio_ptr],y
@@ -314,6 +340,7 @@ audioLoadSample:
     jsr _waitSpcReady
 
     rep #$20
+    .ACCU 16
     lda audio_temp+5
     sec
     sbc #2
@@ -323,6 +350,7 @@ audioLoadSample:
 @upload_done:
     ; Send UPLOAD_END
     sep #$20
+    .ACCU 8
     lda #SPC_CMD_UPLOAD_END
     sta $2140
     lda audio_temp          ; Sample ID
@@ -336,6 +364,7 @@ audioLoadSample:
     ; Update sample table
     lda audio_temp          ; Sample ID
     rep #$20
+    .ACCU 16
     and #$00FF
     asl a
     asl a
@@ -350,17 +379,20 @@ audioLoadSample:
     sta.w audio_samples+4,x   ; Loop point
 
     sep #$20
+    .ACCU 8
     lda #$80                ; Loaded flag
     sta.w audio_samples+6,x
 
     ; Update next free address
     rep #$20
+    .ACCU 16
     lda audio_next_addr
     clc
     adc audio_temp+1
     sta audio_next_addr
 
     sep #$20
+    .ACCU 8
     inc audio_sample_count
 
     ; Return AUDIO_OK
@@ -376,12 +408,14 @@ audioLoadSample:
 
 @err_no_memory:
     sep #$20
+    .ACCU 8
     lda #1                  ; AUDIO_ERR_NO_MEMORY
     sta tcc__r0
     stz tcc__r0+1
 
 @done:
     rep #$20
+    .ACCU 16
     pld
     plb
     plp
@@ -394,6 +428,7 @@ audioUnloadSample:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -404,6 +439,7 @@ audioUnloadSample:
     bcs @done
 
     rep #$20
+    .ACCU 16
     and #$00FF
     asl a
     asl a
@@ -417,6 +453,7 @@ audioUnloadSample:
     sta.w audio_samples+6,x
 
     sep #$20
+    .ACCU 8
     dec audio_sample_count
 
 @done:
@@ -432,6 +469,7 @@ audioPlaySample:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -513,6 +551,7 @@ audioPlaySampleEx:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -526,9 +565,11 @@ audioPlaySampleEx:
     lda 8,s                 ; pan
     sta audio_temp+2
     rep #$20
+    .ACCU 16
     lda 9,s                 ; pitch
     sta audio_temp+3
     sep #$20
+    .ACCU 8
 
     ; Find free voice
     ldx #$0000
@@ -611,6 +652,7 @@ audioStopVoice:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -659,6 +701,7 @@ audioStopAll:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -685,6 +728,7 @@ audioSetVolume:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -712,6 +756,7 @@ audioSetVolume:
 audioGetVolume:
     php
     sep #$20
+    .ACCU 8
     lda audio_master_vol
     sta tcc__r0
     stz tcc__r0+1
@@ -725,6 +770,7 @@ audioSetVoiceVolume:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -758,6 +804,7 @@ audioSetVoicePitch:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -790,6 +837,7 @@ audioSetADSR:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -844,6 +892,7 @@ audioSetGain:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -870,6 +919,7 @@ audioSetEcho:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -908,12 +958,15 @@ audioSetEchoFilter:
     phb
     phd
     sep #$20
+    .ACCU 8
     rep #$10
+    .INDEX 16
 
     lda #$00
     pha
     plb
     rep #$20
+    .ACCU 16
     lda #$0000
     tcd
 
@@ -921,6 +974,7 @@ audioSetEchoFilter:
     lda 10,s
     sta audio_ptr
     sep #$20
+    .ACCU 8
     lda 12,s
     sta audio_ptr+2
 
@@ -952,6 +1006,7 @@ audioEnableEcho:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -976,6 +1031,7 @@ audioDisableEcho:
     php
     phb
     sep #$20
+    .ACCU 8
 
     lda #$00
     pha
@@ -997,6 +1053,7 @@ audioDisableEcho:
 audioGetFreeMemory:
     php
     rep #$20
+    .ACCU 16
     lda #SPC_ECHO_BUFFER
     sec
     sbc audio_next_addr
@@ -1010,6 +1067,7 @@ audioGetFreeMemory:
 audioGetSampleInfo:
     php
     sep #$20
+    .ACCU 8
     lda #3                  ; AUDIO_ERR_NOT_LOADED (stub)
     sta tcc__r0
     stz tcc__r0+1

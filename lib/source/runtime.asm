@@ -58,6 +58,8 @@
 tcc_mul16:
     php
     rep #$30            ; 16-bit A, X/Y
+    .ACCU 16
+    .INDEX 16
 
     ; Compiler calling convention: args pushed on stack
     ; Stack layout after jsl + php:
@@ -67,6 +69,7 @@ tcc_mul16:
     ;   SP+7,8: arg2 = multiplier (pushed first)
 
     sep #$20            ; 8-bit A
+    .ACCU 8
 
     ; --- a_lo * b_lo ---
     lda 5,s             ; a_lo (multiplicand low byte)
@@ -80,10 +83,12 @@ tcc_mul16:
     nop
 
     rep #$20
+    .ACCU 16
     lda $4216           ; Result low 16 bits
     sta tcc__r2         ; Save partial result
 
     sep #$20
+    .ACCU 8
 
     ; --- a_hi * b_lo ---
     lda 6,s             ; a_hi (multiplicand high byte)
@@ -98,6 +103,7 @@ tcc_mul16:
 
     ; Add to result (shifted left 8 = high byte goes to result)
     rep #$20
+    .ACCU 16
     lda $4216
     xba                 ; Swap bytes (multiply by 256)
     and #$FF00          ; Keep only high byte contribution
@@ -106,6 +112,7 @@ tcc_mul16:
     sta tcc__r2
 
     sep #$20
+    .ACCU 8
 
     ; --- a_lo * b_hi ---
     lda 5,s             ; a_lo (multiplicand low byte)
@@ -119,6 +126,7 @@ tcc_mul16:
     nop
 
     rep #$20
+    .ACCU 16
     lda $4216
     xba                 ; Multiply by 256
     and #$FF00
@@ -141,6 +149,8 @@ tcc_mul16:
 tcc_div16:
     php
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; Division by zero guard: return quotient=0, remainder=0
     lda tcc__r1
@@ -152,6 +162,7 @@ tcc_div16:
 
     ; Hardware division (8-bit divisor only)
     sep #$20
+    .ACCU 8
     lda tcc__r0
     sta $4204           ; WRDIVL
     lda tcc__r0+1
@@ -170,6 +181,7 @@ tcc_div16:
     nop
 
     rep #$20
+    .ACCU 16
     lda $4216           ; Remainder
     sta tcc__r1
     lda $4214           ; Quotient
@@ -255,6 +267,8 @@ tcc_mod16:
 tcc_sdiv16:
     php
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; XOR operand signs → bit 15 = result sign
     lda tcc__r0
@@ -301,6 +315,8 @@ tcc_sdiv16:
 tcc_smod16:
     php
     rep #$30
+    .ACCU 16
+    .INDEX 16
 
     ; Save dividend sign
     lda tcc__r0

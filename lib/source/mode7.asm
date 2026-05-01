@@ -64,6 +64,7 @@ m7_sincos_table:
 mode7Init:
     php
     rep #$20
+    .ACCU 16
 
     ; Default scale = 1.0
     lda #$0100
@@ -72,6 +73,7 @@ mode7Init:
 
     ; Initialize matrix to identity (no rotation, 1x scale)
     sep #$20
+    .ACCU 8
     lda #$00
     sta.l $211B         ; M7A low
     lda #$01
@@ -114,6 +116,7 @@ mode7Init:
 mode7SetScale:
     php
     rep #$20
+    .ACCU 16
 
     lda 5,s
     sta.l m7_scale_x
@@ -132,7 +135,9 @@ mode7SetAngle:
     phb
 
     rep #$10
+    .INDEX 16
     sep #$20            ; 8-bit A, 16-bit X/Y
+    .ACCU 8
 
     ; Set data bank to sin table bank
     lda #:m7_sincos_table
@@ -146,10 +151,12 @@ mode7SetAngle:
     ; Get angle parameter (5,s + 1 for phb = 6,s)
     lda 6,s
     rep #$20
+    .ACCU 16
     tax                 ; X = angle for indexing
 
     ; Get sin value
     sep #$20
+    .ACCU 8
     lda m7_sincos_table.w,x
     sta.l m7_sin
 
@@ -160,8 +167,10 @@ mode7SetAngle:
     clc
     adc #64
     rep #$20
+    .ACCU 16
     tax
     sep #$20
+    .ACCU 8
     lda m7_sincos_table.w,x
     sta.l m7_cos
 
@@ -174,8 +183,10 @@ mode7SetAngle:
 
     ; M7B = -sin * scale_x
     rep #$20
+    .ACCU 16
     lda.l m7_scale_x
     sep #$20
+    .ACCU 8
     sta.l $211B         ; M7A low (multiplicand low)
     xba
     sta.l $211B         ; M7A high (multiplicand high)
@@ -184,42 +195,49 @@ mode7SetAngle:
     inc a               ; Negate sin
     sta.l $211C         ; M7B (multiplier) - triggers multiply
     rep #$20
+    .ACCU 16
     lda.l $2135         ; Read MPYM+MPYH (high 16 bits of result)
     sta.l m7_mat_b
 
     ; M7C = sin * scale_y
     lda.l m7_scale_y
     sep #$20
+    .ACCU 8
     sta.l $211B
     xba
     sta.l $211B
     lda.l m7_sin
     sta.l $211C
     rep #$20
+    .ACCU 16
     lda.l $2135
     sta.l m7_mat_c
 
     ; M7A = cos * scale_x
     lda.l m7_scale_x
     sep #$20
+    .ACCU 8
     sta.l $211B
     xba
     sta.l $211B
     lda.l m7_cos
     sta.l $211C
     rep #$20
+    .ACCU 16
     lda.l $2135
     sta.l m7_mat_a
 
     ; M7D = cos * scale_y
     lda.l m7_scale_y
     sep #$20
+    .ACCU 8
     sta.l $211B
     xba
     sta.l $211B
     lda.l m7_cos
     sta.l $211C
     rep #$20
+    .ACCU 16
     lda.l $2135
     sta.l m7_mat_d
 
@@ -227,6 +245,7 @@ mode7SetAngle:
     ; Write matrix to PPU
     ;--------------------------------------------------
     sep #$20
+    .ACCU 8
 
     lda.l m7_mat_a
     sta.l $211B
@@ -258,6 +277,7 @@ mode7SetAngle:
 mode7SetCenter:
     php
     sep #$20
+    .ACCU 8
 
     lda 5,s             ; X low
     sta.l $211F
@@ -279,6 +299,7 @@ mode7SetCenter:
 mode7SetScroll:
     php
     sep #$20
+    .ACCU 8
 
     lda 5,s             ; X low
     sta.l $210D
@@ -305,6 +326,7 @@ mode7SetScroll:
 mode7Rotate:
     php
     sep #$20
+    .ACCU 8
 
     ; Multiply low byte: degrees_lo * 182
     lda 5,s             ; degrees low byte
@@ -342,6 +364,7 @@ mode7Rotate:
     ; Call mode7SetAngle with the converted angle
     jsl mode7SetAngle
     sep #$20
+    .ACCU 8
 
     pla                 ; Clean up stack
 
@@ -355,6 +378,7 @@ mode7Rotate:
 mode7Transform:
     php
     rep #$20
+    .ACCU 16
 
     ; Convert percentage to 8.8 fixed point
     ; scalePercent * 256 / 100 = scalePercent * 2.56 ≈ scalePercent * 656 / 256
@@ -387,6 +411,7 @@ mode7Transform:
 mode7SetPivot:
     php
     sep #$20
+    .ACCU 8
 
     ; Set center point
     lda 5,s             ; X
@@ -409,6 +434,7 @@ mode7SetPivot:
 mode7SetMatrix:
     php
     sep #$20
+    .ACCU 8
 
     ; Write M7A
     lda 5,s
@@ -444,6 +470,7 @@ mode7SetMatrix:
 mode7SetSettings:
     php
     sep #$20
+    .ACCU 8
 
     lda 5,s
     sta.l $211A         ; M7SEL

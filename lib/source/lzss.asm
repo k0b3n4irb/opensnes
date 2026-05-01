@@ -93,23 +93,28 @@ LzssDecodeVram:
     sei                             ; Disable interrupts (VRAM writes must not be interrupted)
 
     sep #$20
+    .ACCU 8
     lda #$7e                        ; Set data bank to $7E for work RAM access
     pha
     plb
 
     rep #$20
+    .ACCU 16
     lda 12,s                        ; Source address (leftmost arg, higher stack offset)
     sta tcc__r0                     ; tcc__r0 = source address
     sep #$20
+    .ACCU 8
     lda #$00                        ; Bank $00 (cc65816 passes 16-bit pointers)
     sta tcc__r0h
 
     rep #$20
+    .ACCU 16
     lda 10,s                        ; VRAM word address (rightmost arg, lower stack offset)
     asl a                           ; Convert to byte address (x2)
     sta lzss_m0                     ; lzss_m0 = VRAM target (byte address)
 
     sep #$20
+    .ACCU 8
     lda #$00                        ; Setup VRAM access (increment on read low)
     sta.l REG_VMAIN
 
@@ -129,9 +134,11 @@ LzssDecodeVram:
 @LZ77source:
     iny                             ; Skip tag byte, read 3-byte data length
     rep #$20
+    .ACCU 16
     lda [tcc__r0], y                ; x = uncompressed data length
     tax
     sep #$20
+    .ACCU 8
     iny
     iny
     iny
@@ -149,11 +156,13 @@ LzssDecodeVram:
 
 @raw_byte:
     rep #$20                        ; Setup VRAM address for write
+    .ACCU 16
     lda lzss_m0
     inc lzss_m0
     lsr                             ; Convert byte addr to word addr
     sta.l REG_VMADDL
     sep #$20
+    .ACCU 8
     lda [tcc__r0], y                ; Copy one literal byte
     iny
     bcs +                           ; carry = H/L byte select from lsr
@@ -172,21 +181,25 @@ LzssDecodeVram:
 
 @lz_byte:
     rep #$20                        ; Read 2-byte reference (disp + count)
+    .ACCU 16
     lda [tcc__r0], y
     iny
     iny
 
     phy                             ; Preserve source index
     sep #$20
+    .ACCU 8
     pha                             ; y = target - displacement - 1
     and #$0F
     xba
     rep #$20
+    .ACCU 16
     sec
     sbc lzss_m0
     eor #$FFFF
     tay                             ; y = source position in VRAM (byte addr)
     sep #$20
+    .ACCU 8
     pla                             ; a = count (top 4 bits + 3)
     lsr
     lsr
@@ -198,6 +211,7 @@ LzssDecodeVram:
     sta lzss_m4                     ; lzss_m4 = copy count (16-bit)
     stz lzss_m4+1
     rep #$20                        ; Clamp count to remaining data length
+    .ACCU 16
     cpx lzss_m4
     bcs +
     stx lzss_m4
@@ -208,9 +222,11 @@ LzssDecodeVram:
     sbc lzss_m4
     pha
     sep #$20
+    .ACCU 8
 
 @copyloop:
     rep #$21                        ; Copy one byte from VRAM back-reference
+    .ACCU 16
     tya
     iny
     lsr                             ; Convert source byte addr to word addr
@@ -223,6 +239,7 @@ LzssDecodeVram:
     lsr                             ; Convert dest byte addr to word addr
     tax
     sep #$20
+    .ACCU 8
     phb
     lda.b #0                        ; Switch to bank $00 for register access
     pha
@@ -242,6 +259,7 @@ LzssDecodeVram:
     lsr
     tax
     sep #$20
+    .ACCU 8
     phb
     lda.b #0
     pha
