@@ -39,21 +39,14 @@
  * convention can keep calling `bgInitTileSet` + `dmaCopyVram`
  * directly — the macros do not replace the underlying functions.
  *
- * @par Why macros, not a typed `BgAsset` struct
+ * @par Two flavours, same convention
  *
- * The natural design here would be a `static const BgAsset bg = {...}`
- * holding pointer fields, with a `bgLoad(&bg, ...)` runtime function.
- * That design is currently broken by a cproc/QBE/WLA-DX integration
- * bug: cproc lays out struct pointer fields with an 8-byte stride,
- * but WLA-DX's `.dl <symbol>` directive (used by QBE for static
- * pointer initialisers) emits only 3 bytes for a 24-bit address. The
- * resulting ROM layout shifts every field after the first pointer,
- * and every read at runtime returns garbage.
- *
- * Until that toolchain bug is fixed (separate compiler chantier), the
- * asset bundle ships as a header-only macro. The call-site ergonomics
- * are unchanged; only the "asset as a first-class value you can pass
- * to functions or store in a level table" use case is deferred.
+ * The header exposes both a macro form (`BG_LOAD`, `GFX_LOAD`) that
+ * inlines into the call site, and a typed-value form (`BgAsset`,
+ * `GfxAsset` + `bgLoad()`, `gfxLoad()`) that lets you store an asset
+ * in a `static const`, pass it to a function, or build a level table
+ * indexed at runtime. Both forms expand to the same hardware calls;
+ * pick whichever fits the use site.
  *
  * @par What this module does NOT do
  * - It does not configure the background mode (`setMode`), the main
@@ -84,6 +77,142 @@
 #include <snes/types.h>
 #include <snes/background.h>
 #include <snes/dma.h>
+
+/**
+ * @brief A tileset bundle: graphics + palette + color depth.
+ *
+ * Use cases: runtime-built tilemaps, BGs that only ship a tileset
+ * without a static map, or any "load tiles + palette" call where you
+ * want the asset to be a first-class value (passed to a function,
+ * stored in a level table, etc.).
+ *
+ * The struct stores begin/end pointer pairs rather than precomputed
+ * sizes because pointer subtraction between two extern symbols is
+ * not a compile-time constant in C — sizes are computed at load time
+ * by `gfxLoad()`. This keeps the struct usable in `static const`
+ * storage.
+ *
+ * Field stability: this struct is part of the public API. New fields
+ * may be added at the END only — keep the first five fields where
+ * they are. Callers SHOULD use designated initialisers.
+ */
+typedef struct {
+    /** @brief Pointer to tile graphics data. */
+    u8 *tiles;
+    /** @brief One past the end of tile graphics. Size is computed at
+     *         load time as `tiles_end - tiles`. */
+    u8 *tiles_end;
+    /** @brief Pointer to BGR555 palette data. */
+    u8 *palette;
+    /** @brief One past the end of the palette data. */
+    u8 *palette_end;
+    /**
+     * @brief Color depth selector. Use one of:
+     *        `BG_4COLORS`, `BG_4COLORS0` (Mode 0), `BG_16COLORS`,
+     *        `BG_256COLORS`. Determines how the runtime computes the
+     *        CGRAM destination from `palette_slot`.
+     */
+    u16 color_mode;
+} GfxAsset;
+
+/**
+ * @brief A full background bundle: tileset + tilemap + map size.
+ *
+ * Wraps a `GfxAsset` with a tilemap blob and the BG layout constant
+ * (`SC_32x32`, `SC_64x32`, `SC_32x64`, `SC_64x64`).
+ */
+typedef struct {
+    /** @brief Tileset (tiles + palette + color mode). */
+    GfxAsset gfx;
+    /** @brief Pointer to tilemap data (gfx4snes `.map`). */
+    u8 *tilemap;
+    /** @brief One past the end of the tilemap data. */
+    u8 *tilemap_end;
+    /**
+     * @brief Tilemap layout. Use one of `SC_32x32`, `SC_64x32`,
+     *        `SC_32x64`, `SC_64x64`.
+     */
+    u8 map_size;
+} BgAsset;
+
+/**
+ * @brief Load a tileset (tiles + palette) and configure a BG's tile
+ *        graphics pointer — typed-value variant of `GFX_LOAD`.
+ *
+ * @param bg            Background number 0-3.
+ * @param asset         Bundle to load. Must be non-NULL.
+ * @param palette_slot  Palette slot index (0-7 for 16-color, etc.).
+ * @param tiles_vram    VRAM word address for the tile graphics
+ *                      (4 KB aligned).
+ */
+void gfxLoad(u8 bg, const GfxAsset *asset, u8 palette_slot, u16 tiles_vram);
+
+/**
+ * @brief Load a full background bundle — typed-value variant of `BG_LOAD`.
+ *
+ * Composes `gfxLoad()` with `bgSetMapPtr()` and a `dmaCopyVram()` of
+ * the tilemap. After the call the BG is fully addressable; the caller
+ * still controls when to enable it on the screen.
+ *
+ * @param bg            Background number 0-3.
+ * @param asset         Bundle to load. Must be non-NULL.
+ * @param palette_slot  Palette slot index (see `gfxLoad`).
+ * @param tiles_vram    VRAM word address for the tile graphics.
+ * @param map_vram      VRAM word address for the tilemap.
+ */
+void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
+            u16 tiles_vram, u16 map_vram);
+
+/**
+ * @brief Declare a `static const GfxAsset` from gfx4snes-style symbol pairs.
+ *
+ * Expands to extern declarations for `<name>_tiles`/`<name>_tiles_end`
+ * and `<name>_pal`/`<name>_pal_end`, plus a `static const GfxAsset`
+ * populated with the right pointers and color mode.
+ *
+ * @code{.c}
+ *     DECLARE_GFX_ASSET(player, BG_16COLORS);
+ *     gfxLoad(0, &player, 0, 0x4000);
+ * @endcode
+ */
+#define DECLARE_GFX_ASSET(name, color_mode_)                                  \
+    extern u8 name##_tiles[], name##_tiles_end[];                             \
+    extern u8 name##_pal[],   name##_pal_end[];                               \
+    static const GfxAsset name = {                                            \
+        .tiles       = name##_tiles,                                          \
+        .tiles_end   = name##_tiles_end,                                      \
+        .palette     = name##_pal,                                            \
+        .palette_end = name##_pal_end,                                        \
+        .color_mode  = (color_mode_),                                         \
+    }
+
+/**
+ * @brief Declare a `static const BgAsset` from gfx4snes-style symbol pairs.
+ *
+ * Same convention as `DECLARE_GFX_ASSET`, plus `<name>_map` /
+ * `<name>_map_end` for the tilemap blob.
+ *
+ * @code{.c}
+ *     DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x32);
+ *     bgLoad(0, &scene, 0, 0x4000, 0x0000);
+ * @endcode
+ */
+#define DECLARE_BG_ASSET(name, color_mode_, map_size_)                        \
+    extern u8 name##_tiles[], name##_tiles_end[];                             \
+    extern u8 name##_pal[],   name##_pal_end[];                               \
+    extern u8 name##_map[],   name##_map_end[];                               \
+    static const BgAsset name = {                                             \
+        .gfx = {                                                              \
+            .tiles       = name##_tiles,                                      \
+            .tiles_end   = name##_tiles_end,                                  \
+            .palette     = name##_pal,                                        \
+            .palette_end = name##_pal_end,                                    \
+            .color_mode  = (color_mode_),                                     \
+        },                                                                    \
+        .tilemap     = name##_map,                                            \
+        .tilemap_end = name##_map_end,                                        \
+        .map_size    = (map_size_),                                           \
+    }
 
 /**
  * @brief Load a tileset (tiles + palette) and configure a BG's tile
