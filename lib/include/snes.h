@@ -107,5 +107,6 @@
 /* Collision: #include <snes/collision.h> */
 /* LZSS: #include <snes/lzss.h> */
 /* Game loop framework: #include <snes/gameloop.h> */
+/* Asset bundle convention: #include <snes/asset.h> */
 
 #endif /* OPENSNES_H */
