@@ -1,10 +1,11 @@
 /**
  * @file sprite_dynamic_dispatch.c
- * @brief Modern entry points for the dynamic sprite engine
+ * @brief Public entry points for the dynamic sprite engine
  *
  * Hosts the size-aware dispatch glue (`oamDynamicDraw`,
  * `oamDynamicSetSize`) and the struct-based init wrapper
- * (`oamDynamicInit` over the legacy `oamInitDynamicSprite`).
+ * (`oamDynamicInit`, which forwards to the internal ASM entry point
+ * `oamInitDynamicSprite` defined in sprite_dynamic.asm).
  *
  * Lives in its own translation unit so `sprite.o` stays free of
  * dependencies on the dynamic engine — examples that don't use
