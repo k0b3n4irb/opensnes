@@ -147,9 +147,15 @@ typedef struct {
     /**
      * @brief Called every VBlank while the scene is on top of the stack.
      *
-     * MUST NOT be NULL. The caller may invoke `scenePush` or
-     * `scenePop` from inside `update`; the change takes effect on the
-     * next VBlank dispatch.
+     * MUST NOT be NULL. The framework does NOT defend against this:
+     * if `update` is NULL, the dispatcher will `JSL` to whatever
+     * lives at address $00:0000 (SNES register hardware page) and
+     * crash immediately. The check is omitted on purpose — a fast
+     * crash is more diagnosable than a silent skip would be, and
+     * the per-frame cost of the check is non-zero on a 1.79 MHz CPU.
+     *
+     * The caller may invoke `scenePush` or `scenePop` from inside
+     * `update`; the change takes effect on the next VBlank dispatch.
      */
     void (*update)(void);
 } Scene;

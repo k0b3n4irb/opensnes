@@ -48,9 +48,11 @@
  * @par When NOT to use this
  *
  * - You need a state machine that swaps the per-frame logic between
- *   distinct screens (title, gameplay, pause, game-over). For now,
- *   either dispatch from inside `update` or wait for the
- *   `scene_2d` / scene-stack module that's planned next.
+ *   distinct screens (title, gameplay, pause, game-over). Either
+ *   dispatch from inside `update`, or use the `scene` module (D.3) —
+ *   see `<snes/scene.h>`. `GameLoopConfig` is an alias for `Scene`,
+ *   so promoting a single-loop game to a scene stack is a one-line
+ *   change at the call site (`gameLoopRun(&cfg)` → `sceneRun(&cfg)`).
  * - You need a custom synchronisation rhythm (e.g. half-rate updates,
  *   double-buffered audio polling). Keep your hand-rolled loop —
  *   gameLoopRun is meant for the common case, not every case.
@@ -60,8 +62,7 @@
  * Each frame, gameLoopRun adds one indirect call (`update` via the
  * `cfg` pointer) and one direct call (`WaitForVBlank`). On the order
  * of 30 cycles per frame, dwarfed by anything `update` itself does.
- * The compiler does not currently TCO the indirect call (chantier C
- * accepted only direct tail calls); a future C.3 may close that gap.
+ * The compiler does not currently TCO the indirect call.
  *
  * @par Modules required
  *
