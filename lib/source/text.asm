@@ -1,7 +1,6 @@
 ;==============================================================================
 ; OpenSNES Font Data - SNES 2bpp format
 ;
-; Auto-generated from opensnes_font_2bpp.h
 ; 96 characters, 16 bytes per tile = 1536 bytes total
 ;
 ; License: CC0 (Public Domain)
