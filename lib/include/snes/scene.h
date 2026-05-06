@@ -86,6 +86,14 @@
  *   work.
  * - No serialization, save-state, or scope substacks. A scene is just
  *   a pair of function pointers; you keep the data.
+ * - No inter-scene argument passing. Use a file-scope global for
+ *   shared state — `examples/basics/scene_stack` does this with
+ *   `static u16 counter_value`, which survives the counter→pause→
+ *   counter cycle because counter's `init` runs once on first push.
+ * - No `sceneSwap()` primitive. To replace the top scene without
+ *   keeping it on the stack, call `scenePop(); scenePush(&next);`.
+ *   The combo is intentional — the framework keeps the API surface
+ *   minimal and lets the user spell the intent explicitly.
  * - No NMI integration. Pushing/popping from inside an NMI callback
  *   is undefined; do it from `update` only.
  *
