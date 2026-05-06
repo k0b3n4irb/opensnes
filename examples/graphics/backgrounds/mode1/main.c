@@ -30,23 +30,25 @@
  */
 
 #include <snes.h>
+#include <snes/asset.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * External Graphics Data
+ *
+ * Symbols are referenced through the BG_LOAD() macro, which expands to
+ * `extern u8 bg_tiles[], bg_tiles_end[]` (and the `bg_pal*`, `bg_map*`
+ * pairs) plus the three hardware calls. The data labels themselves
+ * live in data.asm.
  *============================================================================*/
-
-extern u8 tiles[], tiles_end[];      /**< 4bpp tile graphics data (defined in data.asm via .incbin) */
-extern u8 tilemap[], tilemap_end[];  /**< 32x32 tilemap entries (defined in data.asm via .incbin) */
-extern u8 palette[], palette_end[];  /**< 16-color BGR555 palette (defined in data.asm via .incbin) */
 
 /**
  * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
  *
- * Demonstrates the most common SNES video mode setup: force blank the
- * screen, configure BG1's tilemap and tile base addresses, load tile
- * graphics and palette via bgInitTileSet(), DMA the tilemap to VRAM,
- * select Mode 1, enable BG1, and turn on the screen. The result is a
- * static full-screen tiled image using up to 16 colors.
+ * Demonstrates the asset bundle convention: a single BG_LOAD() macro
+ * does the same work as a manual `bgSetMapPtr` + `bgInitTileSet` +
+ * `dmaCopyVram` triple, with the symbol naming convention as the
+ * single source of truth (data.asm exports `bg_tiles`, `bg_pal`,
+ * `bg_map` and the macro derives the externs and sizes).
  *
  * The VRAM layout places the tilemap at $0000 and tile graphics at $4000
  * to avoid overlap (each tilemap is up to 2KB, tile data can be many KB).
@@ -58,27 +60,11 @@ int main(void) {
     setScreenOff();
 
     /*------------------------------------------------------------------------
-     * Configure Background Tilemap
+     * Load Background Bundle (tiles + palette + tilemap)
      *------------------------------------------------------------------------*/
 
-    /* BG1 tilemap at VRAM $0000, 32x32 tiles */
-    bgSetMapPtr(0, 0x0000, SC_32x32);
-
-    /*------------------------------------------------------------------------
-     * Load Background Tiles and Palette
-     *------------------------------------------------------------------------*/
-
-    /* BG1: tiles at $4000, palette at slot 0 (offset 0) */
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
-                  palette_end - palette,
-                  BG_16COLORS, 0x4000);
-
-    /*------------------------------------------------------------------------
-     * Load Tilemap Data
-     *------------------------------------------------------------------------*/
-
-    dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
+    /* BG1: 16-color 4bpp, 32x32 map, tiles at $4000, tilemap at $0000 */
+    BG_LOAD(bg, 0, 0, BG_16COLORS, SC_32x32, 0x4000, 0x0000);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
