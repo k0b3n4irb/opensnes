@@ -1,15 +1,16 @@
 /**
  * @file asset.h
- * @brief Opt-in asset bundle convention — load a (tiles + palette +
- *        optional tilemap) bundle in one statement.
+ * @brief Opt-in asset bundle convention — package tiles + palette
+ *        (+ optional tilemap) into a typed value, load it with one
+ *        function call.
  * @ingroup framework
  *
  * One of the three "framework opt-ins" promised by `PHILOSOPHY.md`
- * (alongside `gameloop` and the planned scene/state stack). This module
- * removes a recurring piece of SNES boilerplate: declaring six `extern`
- * symbols (begin/end pairs for tiles, palette, tilemap), computing
- * three sizes by subtraction at every call site, and threading them
- * through an 8-parameter `bgInitTileSet()` followed by a separate
+ * (alongside `gameloop` and `scene`). This module removes a recurring
+ * piece of SNES boilerplate: declaring six `extern` symbols
+ * (begin/end pairs for tiles, palette, tilemap), computing three
+ * sizes by subtraction at every call site, and threading them through
+ * an 8-parameter `bgInitTileSet()` followed by a separate
  * `dmaCopyVram()` for the map.
  *
  * @par Before
@@ -29,44 +30,45 @@
  * @par After
  * @code{.c}
  *     // data.asm exports bg_tiles, bg_pal, bg_map (each with _end labels).
- *     BG_LOAD(bg, 0, 0, BG_16COLORS, SC_32x32, 0x4000, 0x0000);
+ *     DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32);
+ *     bgLoad(0, &bg, 0, 0x4000, 0x0000);
  * @endcode
+ *
+ * `DECLARE_BG_ASSET` is constructor sugar — it expands to the six
+ * `extern` declarations and a `static const BgAsset` initialised
+ * from those symbols. Users who want to instantiate the struct
+ * manually can do so; the macro is a convenience, the struct is the
+ * contract.
  *
  * The macros expect the symbol naming convention `<name>_tiles`,
  * `<name>_pal`, `<name>_map` plus their `_end` siblings. The user
- * chooses the prefix once in their `data.asm` (one rename, applies
- * across the whole example). Users who do not want to follow the
- * convention can keep calling `bgInitTileSet` + `dmaCopyVram`
- * directly — the macros do not replace the underlying functions.
+ * chooses the prefix once in their `data.asm`.
  *
- * @par Two flavours, same convention
+ * @par Why a typed value
  *
- * The header exposes both a macro form (`BG_LOAD`, `GFX_LOAD`) that
- * inlines into the call site, and a typed-value form (`BgAsset`,
- * `GfxAsset` + `bgLoad()`, `gfxLoad()`) that lets you store an asset
- * in a `static const`, pass it to a function, or build a level table
- * indexed at runtime. Both forms expand to the same hardware calls;
- * pick whichever fits the use site.
+ * The asset is a first-class value: pass it to a function, store an
+ * array of them as a level table indexed at runtime, swap assets at
+ * scene boundaries. Each callsite is one `bgLoad`/`gfxLoad` call,
+ * no positional-parameter shuffle.
  *
  * @par What this module does NOT do
  * - It does not configure the background mode (`setMode`), the main
  *   screen mask (`setMainScreen`), or the screen brightness
  *   (`setScreenOn`). The caller still owns the high-level init order.
  * - It does not handle sprite asset bundles. Sprites have their own
- *   CGRAM offset (128) and OAM conventions; a future macro family
- *   may be added once the patterns settle.
+ *   CGRAM offset (128) and OAM conventions; out of scope here.
  * - It does not handle the Tiled mapdata pipeline (tilesetdef,
  *   tilesetatt, large levels). Those still go through `mapLoad()`.
  *
  * @par Performance
- * Both macros expand inline to existing library calls
- * (`bgSetMapPtr`, `bgInitTileSet`, `dmaCopyVram`). Zero runtime cost
- * over the long-form code.
+ * `gfxLoad` and `bgLoad` are thin C wrappers over `bgInitTileSet`,
+ * `dmaCopyVram`, and `bgSetMapPtr`. The compiler emits one indirect
+ * load per struct field; on the order of 30 cycles of overhead per
+ * call. All real work is done by the underlying DMA, which is
+ * unchanged.
  *
  * @par Modules required
- * `dma` and `background` (transitively pulled in by `bgInitTileSet`
- * and `dmaCopyVram`). No new lib module — this header is pure
- * preprocessor.
+ * `asset` (transitively pulls `dma` and `background`).
  *
  * @see background.h, dma.h
  */
@@ -213,81 +215,5 @@ void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
         .tilemap_end = name##_map_end,                                        \
         .map_size    = (map_size_),                                           \
     }
-
-/**
- * @brief Load a tileset (tiles + palette) and configure a BG's tile
- *        graphics pointer.
- *
- * Expands to two `extern u8` declarations for the symbol pair
- * `<name>_tiles` / `<name>_tiles_end`, `<name>_pal` / `<name>_pal_end`,
- * and a single call to `bgInitTileSet`. Use this when the BG's
- * tilemap is built at runtime (dynamic streaming, programmatically
- * generated maps) and only the tileset is shipped as data.
- *
- * Caller still owns: force-blank around the call (or being inside
- * VBlank), `setMode()`, `setMainScreen()`, `setScreenOn()`, the
- * BG's tilemap configuration if any.
- *
- * @code{.c}
- *     // data.asm exports player_tiles / player_tiles_end /
- *     //                  player_pal   / player_pal_end
- *     GFX_LOAD(player, 0, 0, BG_16COLORS, 0x4000);
- * @endcode
- *
- * @param name           Symbol-prefix root (must be a valid C identifier).
- * @param bg_            Background number 0-3.
- * @param palette_slot_  Palette slot index (0-7 for 16-color, etc.).
- * @param color_mode_    `BG_4COLORS` / `BG_16COLORS` / `BG_256COLORS`
- *                       / `BG_4COLORS0` (Mode 0).
- * @param tiles_vram_    VRAM word address for the tile graphics
- *                       (4 KB aligned).
- */
-#define GFX_LOAD(name, bg_, palette_slot_, color_mode_, tiles_vram_)         \
-    do {                                                                      \
-        extern u8 name##_tiles[], name##_tiles_end[];                         \
-        extern u8 name##_pal[],   name##_pal_end[];                           \
-        bgInitTileSet((bg_), name##_tiles, name##_pal, (palette_slot_),       \
-                      (u16)(name##_tiles_end - name##_tiles),                 \
-                      (u16)(name##_pal_end   - name##_pal),                   \
-                      (color_mode_), (tiles_vram_));                          \
-    } while (0)
-
-/**
- * @brief Load a full background bundle (tiles + palette + tilemap)
- *        and configure all BG pointers.
- *
- * Expands to six `extern u8` declarations for the symbol pairs
- * `<name>_tiles`, `<name>_pal`, `<name>_map` (each with an `_end`
- * sibling), then `bgSetMapPtr` + `bgInitTileSet` + `dmaCopyVram` —
- * the canonical "show this static background" sequence in one line.
- *
- * @code{.c}
- *     // data.asm exports bg_tiles / bg_pal / bg_map (with _end labels)
- *     BG_LOAD(bg, 0, 0, BG_16COLORS, SC_32x32, 0x4000, 0x0000);
- * @endcode
- *
- * @param name           Symbol-prefix root (must be a valid C identifier).
- * @param bg_            Background number 0-3.
- * @param palette_slot_  Palette slot index.
- * @param color_mode_    Color depth (`BG_*COLORS*`).
- * @param map_size_      `SC_32x32` / `SC_64x32` / `SC_32x64` / `SC_64x64`.
- * @param tiles_vram_    VRAM word address for the tile graphics
- *                       (4 KB aligned).
- * @param map_vram_      VRAM word address for the tilemap (1 KB aligned).
- */
-#define BG_LOAD(name, bg_, palette_slot_, color_mode_, map_size_,            \
-                tiles_vram_, map_vram_)                                       \
-    do {                                                                      \
-        extern u8 name##_tiles[], name##_tiles_end[];                         \
-        extern u8 name##_pal[],   name##_pal_end[];                           \
-        extern u8 name##_map[],   name##_map_end[];                           \
-        bgSetMapPtr((bg_), (map_vram_), (map_size_));                         \
-        bgInitTileSet((bg_), name##_tiles, name##_pal, (palette_slot_),       \
-                      (u16)(name##_tiles_end - name##_tiles),                 \
-                      (u16)(name##_pal_end   - name##_pal),                   \
-                      (color_mode_), (tiles_vram_));                          \
-        dmaCopyVram(name##_map, (map_vram_),                                  \
-                    (u16)(name##_map_end - name##_map));                      \
-    } while (0)
 
 #endif /* SNES_ASSET_H */
