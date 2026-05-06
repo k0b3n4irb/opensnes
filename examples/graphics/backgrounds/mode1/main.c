@@ -33,22 +33,24 @@
 #include <snes/asset.h>
 
 /*============================================================================
- * External Graphics Data
+ * Asset bundle declaration — typed-value form
  *
- * Symbols are referenced through the BG_LOAD() macro, which expands to
- * `extern u8 bg_tiles[], bg_tiles_end[]` (and the `bg_pal*`, `bg_map*`
- * pairs) plus the three hardware calls. The data labels themselves
- * live in data.asm.
+ * DECLARE_BG_ASSET expands to extern declarations for `bg_tiles`,
+ * `bg_pal`, `bg_map` (each with a matching `_end` label) and a
+ * `static const BgAsset bg = {...}`. The data labels themselves live
+ * in data.asm.
  *============================================================================*/
+
+DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32);
 
 /**
  * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
  *
- * Demonstrates the asset bundle convention: a single BG_LOAD() macro
- * does the same work as a manual `bgSetMapPtr` + `bgInitTileSet` +
- * `dmaCopyVram` triple, with the symbol naming convention as the
- * single source of truth (data.asm exports `bg_tiles`, `bg_pal`,
- * `bg_map` and the macro derives the externs and sizes).
+ * Demonstrates the typed asset bundle: tileset, palette, tilemap,
+ * color depth and map size all travel together in a single
+ * `BgAsset`. A single `bgLoad()` does the same work as a manual
+ * `bgSetMapPtr` + `bgInitTileSet` + `dmaCopyVram` triple, with the
+ * color-mode / size pairing locked at declaration time.
  *
  * The VRAM layout places the tilemap at $0000 and tile graphics at $4000
  * to avoid overlap (each tilemap is up to 2KB, tile data can be many KB).
@@ -63,8 +65,8 @@ int main(void) {
      * Load Background Bundle (tiles + palette + tilemap)
      *------------------------------------------------------------------------*/
 
-    /* BG1: 16-color 4bpp, 32x32 map, tiles at $4000, tilemap at $0000 */
-    BG_LOAD(bg, 0, 0, BG_16COLORS, SC_32x32, 0x4000, 0x0000);
+    /* BG1: tiles at $4000, tilemap at $0000, palette at slot 0 */
+    bgLoad(0, &bg, 0, 0x4000, 0x0000);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
