@@ -83,6 +83,7 @@ release/
 !lib/source/*.inc
 !lib/include/**/*.h
 !lib/include/**/*.inc
+!lib/source/**/*.h
 !templates/**/*.asm
 !templates/**/*.inc
 !examples/**/data.asm

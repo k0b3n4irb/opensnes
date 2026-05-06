@@ -11,6 +11,7 @@
  */
 
 #include <snes.h>
+#include "sprite_dynamic_internal.h"
 
 /* Internal entry points: removed from the public header in B.6 but kept
  * as the underlying ASM mechanism behind the unified iterator below. */
@@ -21,19 +22,7 @@ extern void oamDynamic32Draw(u16 id);
 /* Owned by sprite_dynamic_dispatch.c — current size pair (OBJ_SIZE_*). */
 extern u8 oam_dynamic_size_mode;
 
-/* Inlined macros (not functions) to avoid the cc65816 "JSL inside an
- * `if` branch followed by `cmp` dispatch" codegen issue documented at
- * memory/cc65816_conditional_jsl_codegen_bug.md. */
-#define MODE_LARGE_SIZE(mode) \
-    ((u8)((mode) == 0 ? 16 : \
-          (mode) == 1 ? 32 : \
-          (mode) == 2 ? 64 : \
-          (mode) == 3 ? 32 : \
-          (mode) == 4 ? 64 : 64))
-
-#define MODE_SMALL_SIZE(mode) \
-    ((u8)((mode) <= 2 ? 8 : \
-          (mode) <= 4 ? 16 : 32))
+/* MODE_LARGE_SIZE / MODE_SMALL_SIZE come from sprite_dynamic_internal.h. */
 
 /**
  * @brief Walk a metasprite, set up oambuffer entries, dispatch dynamic draws.
