@@ -330,10 +330,3 @@ u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
     return id;
 }
 
-u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette) {
-    /* Legacy interface - cast data to MetaspriteItem and call oamDrawMeta */
-    return oamDrawMeta(startId, (s16)x, (s16)y,
-                       (const MetaspriteItem *)data,
-                       0, palette, OBJ_LARGE);
-}
-
