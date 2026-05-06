@@ -56,6 +56,29 @@
  *   The currently-executing `update` finishes its frame; the next
  *   VBlank dispatches to the new top.
  *
+ * @par init timing — eager for the initial scene, deferred for pushes
+ * - The scene passed to `sceneRun` has its `init` called **eagerly**,
+ *   before the first `WaitForVBlank`. This matches `gameLoopRun`'s
+ *   pattern and is required because the canonical init body
+ *   (`consoleInit → setMode → palettes → setScreenOn`) must finish
+ *   before the first NMI runs its DMAs.
+ * - Scenes pushed via `scenePush` have their `init` **deferred** to
+ *   the next VBlank dispatch — `scenePush` only records the new top,
+ *   the dispatcher calls init right after `WaitForVBlank()` returns.
+ *   This guarantees a fresh ~33 K-cycle VBlank budget for init's
+ *   DMAs (palette load, tile upload, tilemap copy) instead of
+ *   sharing whatever the caller's `update` already consumed.
+ * - Edge cases:
+ *     - Calling `scenePop` from inside `init` pops the scene before
+ *       its `update` ever runs; the scene below resumes on the same
+ *       frame. The popped scene effectively "ran init then bailed".
+ *     - Calling `scenePush` from inside `init` cascades: the newly
+ *       pushed scene's `init` also runs in the same VBlank window,
+ *       chained right after the current init returns. If both inits
+ *       do heavy DMAs and the combined cost exceeds the VBlank
+ *       budget, move part of the work into `update` (which has a
+ *       full new VBlank window of its own).
+ *
  * @par What this module does NOT do
  * - No transitions (fade-in/out, slide). The caller renders those.
  * - No `resume`/`cleanup` callbacks. Most scenes don't need them; if
