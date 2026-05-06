@@ -118,7 +118,7 @@ endif
 #------------------------------------------------------------------------------
 
 _DEP_sprite          := dma sprite_oamset
-_DEP_sprite_dynamic  := sprite_dynamic_dispatch
+_DEP_sprite_dynamic  := sprite_dynamic_dispatch sprite_dynamic_helpers
 _DEP_text            := dma background
 _DEP_text4bpp        := dma
 _DEP_object          := map

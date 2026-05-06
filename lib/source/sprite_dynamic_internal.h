@@ -6,7 +6,7 @@
  * NOT a public header — do not install, do not include from
  * lib/include/snes/. This file lives next to the .c files that
  * implement the dynamic-sprite dispatcher and metasprite walker so
- * the helpers they share stay in one place.
+ * the helpers they share have one declaration site.
  */
 
 #ifndef SNES_SPRITE_DYNAMIC_INTERNAL_H
@@ -16,28 +16,14 @@
 
 /**
  * @brief Pixel size of the "large" half of an OBJ_SIZE_* size pair.
- *
- * Implemented as a macro (not a function) to dodge a cc65816 codegen
- * issue where a JSL inside a conditional fallback path followed by a
- * `cmp` dispatch produced a stale A-register read on the comparison,
- * silently skipping the dispatch. Inlining keeps everything in
- * registers / locals. See `memory/cc65816_conditional_jsl_codegen_bug.md`
- * for the full write-up of the underlying bug.
+ *        Implemented in sprite_dynamic_helpers.c.
  */
-#define MODE_LARGE_SIZE(mode) \
-    ((u8)((mode) == 0 ? 16 : \
-          (mode) == 1 ? 32 : \
-          (mode) == 2 ? 64 : \
-          (mode) == 3 ? 32 : \
-          (mode) == 4 ? 64 : 64))
+u8 mode_large_size(u8 mode);
 
 /**
  * @brief Pixel size of the "small" half of an OBJ_SIZE_* size pair.
- *
- * Same macro-not-function rationale as `MODE_LARGE_SIZE`.
+ *        Implemented in sprite_dynamic_helpers.c.
  */
-#define MODE_SMALL_SIZE(mode) \
-    ((u8)((mode) <= 2 ? 8 : \
-          (mode) <= 4 ? 16 : 32))
+u8 mode_small_size(u8 mode);
 
 #endif /* SNES_SPRITE_DYNAMIC_INTERNAL_H */

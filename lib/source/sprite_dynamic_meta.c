@@ -22,7 +22,8 @@ extern void oamDynamic32Draw(u16 id);
 /* Owned by sprite_dynamic_dispatch.c — current size pair (OBJ_SIZE_*). */
 extern u8 oam_dynamic_size_mode;
 
-/* MODE_LARGE_SIZE / MODE_SMALL_SIZE come from sprite_dynamic_internal.h. */
+/* mode_large_size / mode_small_size come from sprite_dynamic_internal.h
+ * (defined in sprite_dynamic_helpers.c). */
 
 /**
  * @brief Walk a metasprite, set up oambuffer entries, dispatch dynamic draws.
@@ -48,10 +49,10 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
     u8 attr_or;
 
     if (size_class == OBJ_SMALL) {
-        pixel_size = MODE_SMALL_SIZE(oam_dynamic_size_mode);
+        pixel_size = mode_small_size(oam_dynamic_size_mode);
         attr_or = OBJ_NAMETABLE_HIGH;
     } else {
-        pixel_size = MODE_LARGE_SIZE(oam_dynamic_size_mode);
+        pixel_size = mode_large_size(oam_dynamic_size_mode);
         attr_or = 0;
     }
 

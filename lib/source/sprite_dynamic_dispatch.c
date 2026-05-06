@@ -51,7 +51,8 @@ extern u8 oam_dynamic_draining;
  */
 u8 oam_dynamic_size_mode;
 
-/* MODE_LARGE_SIZE / MODE_SMALL_SIZE come from sprite_dynamic_internal.h. */
+/* mode_large_size / mode_small_size come from sprite_dynamic_internal.h
+ * (defined in sprite_dynamic_helpers.c). */
 
 /**
  * Per-sprite explicit pixel size override for the dynamic engine.
@@ -119,7 +120,7 @@ void oamDynamicDraw(u16 id) {
     sz = oam_dyn_sprite_size[id];
     if (sz == 0) {
         /* Fallback: large pixel size of the size pair set at init. */
-        sz = MODE_LARGE_SIZE(oam_dynamic_size_mode);
+        sz = mode_large_size(oam_dynamic_size_mode);
     }
 
     if (sz == 8) {
