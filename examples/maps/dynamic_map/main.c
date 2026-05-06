@@ -61,8 +61,6 @@ extern u8 palsprite16, palsprite16_end;
 extern u8 sprite16_64x64, sprite16_64x64_end;
 /** @brief Palette for gargoyle sprite in 64x64 mode */
 extern u8 palsprite16_64x64, palsprite16_64x64_end;
-/** @brief Raw C64 sprite data (Boulder Dash Rockford character) for conversion demo */
-extern u8 c64_sprite;
 
 /**
  * @brief Clear the extended WRAM tilemap buffer ($7E:2000+).
@@ -123,21 +121,11 @@ u16 max_scroll_width;
 u16 max_scroll_height;
 
 /**
- * @brief Temporary buffer for C64-to-SNES sprite format conversion.
- *
- * Must reside in bank $00 WRAM (not const / not ROM) because the
- * conversion function writes to it and dmaCopyVram reads from bank $00.
- * 256 bytes = one 16x16 sprite in 8bpp format (4 tiles x 64 bytes).
- */
-static u8 sprite_temp[256];
-
-/**
- * @brief Pre-computed C64 Rockford sprite already in SNES 8bpp format.
+ * @brief Pre-computed Rockford sprite in SNES 8bpp planar format.
  *
  * This 256-byte array encodes a 16x16 sprite as 4 tiles in 8bpp planar
- * format (8 interleaved bitplanes per tile row). Used for direct VRAM
- * upload without runtime conversion. The data matches what convertC64Sprite()
- * would produce, serving as both a display asset and a verification reference.
+ * format (8 interleaved bitplanes per tile row), ready for direct
+ * VRAM upload — no runtime conversion needed.
  */
 static const u8 rockford_8bpp[256] = {
     0x00, 0x00, 0x0C, 0x00, 0x0F, 0x00, 0x33, 0x00,
@@ -173,100 +161,6 @@ static const u8 rockford_8bpp[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-
-/*------------------------------------------------------------------------
- * C64 Sprite Converter
- *------------------------------------------------------------------------*/
-
-/**
- * @brief Test whether bit 'idx' is set in byte 'b'.
- * @param b   The byte to test
- * @param idx Bit position (0 = LSB, 7 = MSB)
- * @return 1 if bit is set, 0 otherwise
- */
-static u8 isBitSet(u8 b, u8 idx) {
-    return ((b >> idx) & 1);
-}
-
-/**
- * @brief Read a 2-bit pixel from a C64 sprite (multicolor mode).
- *
- * C64 multicolor sprites store 2 bits per pixel in a packed row format.
- * The sprite is 8 double-wide pixels per row (16 effective pixels when
- * stretched). This function decodes the pixel at (x, y) within a given
- * tile quadrant of the 16x16 sprite.
- *
- * @param chr_no Base character number in the C64 sprite data
- * @param tile   Tile quadrant (0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right)
- * @param x      X pixel within the 8-pixel tile (0-7)
- * @param y      Y pixel row within the tile (0-7)
- * @return 2-bit color index (0=black, 1=orange, 2=grey, 3=white)
- */
-static u8 getPixel(u8 chr_no, u8 tile, u8 x, u8 y) {
-    u16 offset;
-    u8 x_even = x & 0xFE; /* stretch by rounding to even */
-    u8 row;
-
-    if (tile >= 2) {
-        tile -= 2;
-        chr_no += 0x10; /* bottom half offset in C64 sprite data */
-    }
-
-    offset = (u16)chr_no * 8 + (u16)8 * tile + y;
-    row = *(&c64_sprite + offset);
-
-    {
-        u8 bit0 = isBitSet(row, 7 - x_even);
-        u8 bit1 = isBitSet(row, 7 - x_even - 1);
-        return (bit1 << 1) | bit0;
-    }
-}
-
-/**
- * @brief Convert a C64 multicolor sprite to SNES 8bpp planar format.
- *
- * The SNES 8bpp tile format stores 8 bitplanes per pixel row, grouped
- * in pairs: planes 0-1 for the first 16 bytes, planes 2-3 for the next
- * 16, and so on up to planes 6-7. This function reads pixels from the
- * C64 source (2-bit color) and distributes them across the 8 bitplanes,
- * producing a 256-byte result in sprite_temp[] (4 tiles x 64 bytes each).
- *
- * @param chr_no Base character number in the C64 sprite data to convert
- */
-static void convertC64Sprite(u8 chr_no) __attribute__((unused));
-static void convertC64Sprite(u8 chr_no) {
-    u8 num_tiles = 4;
-    u8 bitplanes = 8;
-    u8 t, b, mask;
-    u16 x, y;
-    u16 idx = 0;
-
-    for (t = 0; t < num_tiles; t++) {
-        for (b = 0; b < bitplanes; b += 2) {
-            for (y = 0; y < 8; y++) {
-                u8 data;
-
-                mask = 1 << b;
-                data = 0;
-                for (x = 0; x < 8; x++) {
-                    data = data << 1;
-                    if (getPixel(chr_no, t, x, y) & mask)
-                        data = data + 1;
-                }
-                sprite_temp[idx++] = data;
-
-                mask = mask << 1;
-                data = 0;
-                for (x = 0; x < 8; x++) {
-                    data = data << 1;
-                    if (getPixel(chr_no, t, x, y) & mask)
-                        data = data + 1;
-                }
-                sprite_temp[idx++] = data;
-            }
-        }
-    }
-}
 
 /*------------------------------------------------------------------------
  * Demo Initialization
