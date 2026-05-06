@@ -76,50 +76,26 @@
 #define SNES_GAMELOOP_H
 
 #include <snes/types.h>
+#include <snes/scene.h>
 
 /**
- * @brief Game loop callbacks.
+ * @brief Game loop callbacks. Alias for `Scene` from `<snes/scene.h>`.
  *
- * Pass to gameLoopRun() to opt into the framework. `init` is optional
- * (set to NULL to skip); `update` is required and must not be NULL.
+ * `GameLoopConfig` and `Scene` (D.3) are the same type — both expose
+ * an `init` and `update` callback pair, both follow the same
+ * lifecycle contract (init once, update every VBlank). `gameLoopRun`
+ * accepts a 1-deep "single scene"; `sceneRun` adds the push/pop
+ * stack semantics on top.
  *
- * Field stability: this struct is part of the public API. New fields
- * may be added in future releases at the END of the struct only —
- * existing code that initialises by name (designated initialisers)
- * will keep compiling. Position-based initialisation is therefore
- * discouraged.
+ * The alias keeps the historical D.1 name available so existing
+ * examples and downstream code keep compiling unchanged. New code is
+ * encouraged to use `Scene` directly for vocabulary consistency
+ * across the framework trilogy.
+ *
+ * Field documentation lives on the canonical `Scene` struct in
+ * `<snes/scene.h>`.
  */
-typedef struct {
-    /**
-     * @brief Called once before the loop starts. May be NULL.
-     *
-     * Run the standard init sequence here:
-     * `consoleInit() → setMode() → palettes → tiles → tilemap → BG
-     * pointers → sprites/text setup → setMainScreen() → setScreenOn()`.
-     * The framework does not enforce the order — it just calls your
-     * function with the SNES already booted by `crt0.asm` (NMI on,
-     * registers cleared, BSS zeroed). You own everything else.
-     */
-    void (*init)(void);
-
-    /**
-     * @brief Called once per VBlank, after the framework's
-     *        WaitForVBlank() returns. MUST NOT be NULL.
-     *
-     * The PPU is in VBlank when this runs (first ~33K cycles of the
-     * call). VRAM, OAM, CGRAM writes are safe at the start. As soon
-     * as you exceed the VBlank budget, further VRAM writes silently
-     * fail — the standard SNES rule, the framework does not change
-     * it.
-     *
-     * If this function takes longer than one frame's cycle budget,
-     * the next WaitForVBlank() simply waits one more frame, dropping
-     * the effective frame rate to 30 Hz / 25 Hz. The framework does
-     * not detect or report the overrun; if you need that, time
-     * yourself with `frame_count` snapshots.
-     */
-    void (*update)(void);
-} GameLoopConfig;
+typedef Scene GameLoopConfig;
 
 /**
  * @brief Run the OpenSNES game loop. Never returns.

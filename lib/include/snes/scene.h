@@ -78,6 +78,14 @@
  * `scene` (and `gameloop`'s transitive `WaitForVBlank` from the
  * runtime). No other lib module is pulled in by sceneRun itself.
  *
+ * @par Relationship with `gameloop` (D.1)
+ * `GameLoopConfig` from `<snes/gameloop.h>` is an alias for `Scene`.
+ * The two types are interchangeable; `gameLoopRun(&cfg)` is
+ * semantically equivalent to running a single-scene stack with
+ * `sceneRun(&cfg)`. Pick whichever name fits the use site:
+ * `GameLoopConfig` for "this is just a main loop", `Scene` for "this
+ * is one of several swappable screens".
+ *
  * @see gameloop.h, system.h (WaitForVBlank, frame_count)
  */
 
