@@ -6,6 +6,7 @@ var group__examples =
     [ "main.c", "audio_2snesmod__sfx_2main_8c.html", null ],
     [ "main.c", "basics_2collision__demo_2main_8c.html", null ],
     [ "main.c", "basics_2random_2main_8c.html", null ],
+    [ "main.c", "basics_2scene__stack_2main_8c.html", null ],
     [ "main.c", "basics_2timer_2main_8c.html", null ],
     [ "main.c", "games_2breakout_2main_8c.html", null ],
     [ "main.c", "games_2likemario_2main_8c.html", null ],

@@ -1,5 +1,6 @@
 var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
 [
+    [ "asset.h", "asset_8h.html", "asset_8h" ],
     [ "audio.h", "audio_8h.html", "audio_8h" ],
     [ "background.h", "background_8h.html", "background_8h" ],
     [ "collision.h", "collision_8h.html", "collision_8h" ],
@@ -20,6 +21,7 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "profile.h", "profile_8h.html", "profile_8h" ],
     [ "registers.h", "registers_8h.html", "registers_8h" ],
     [ "sa1.h", "sa1_8h.html", "sa1_8h" ],
+    [ "scene.h", "scene_8h.html", "scene_8h" ],
     [ "snesmod.h", "snesmod_8h.html", "snesmod_8h" ],
     [ "sprite.h", "sprite_8h.html", "sprite_8h" ],
     [ "sram.h", "sram_8h.html", "sram_8h" ],

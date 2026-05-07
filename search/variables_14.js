@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['update_0',['update',['../structGameLoopConfig.html#a4c758c4ca3650ad27a73913304083318',1,'GameLoopConfig']]]
+  ['update_0',['update',['../structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2',1,'Scene']]]
 ];

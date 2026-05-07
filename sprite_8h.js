@@ -50,7 +50,6 @@ var sprite_8h =
     [ "oamClear", "sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8", null ],
     [ "oamDrawMeta", "sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4", null ],
     [ "oamDrawMetaFlip", "sprite_8h.html#aabedfca9210feb740c636184ed205501", null ],
-    [ "oamDrawMetasprite", "sprite_8h.html#a3f9ae4d3bdd5fcb1a9883fc72e5da788", null ],
     [ "oamDynamicDrainQueue", "sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410", null ],
     [ "oamDynamicDraw", "sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c", null ],
     [ "oamDynamicInit", "sprite_8h.html#a333ce995f2762b9da596948ab43c5d54", null ],

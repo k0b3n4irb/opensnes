@@ -31,6 +31,7 @@ var NAVTREE =
     [ "SNESMOD Large Soundbank Music", "examples_audio_snesmod_music_large.html", null ],
     [ "Random Numbers", "examples_basics_random.html", null ],
     [ "Basics Examples", "examples_basics.html", null ],
+    [ "Scene Stack", "examples_basics_scene_stack.html", null ],
     [ "VBlank Timer", "examples_basics_timer.html", null ],
     [ "Complete Game Examples", "examples_games.html", null ],
     [ "Background Examples", "examples_graphics_backgrounds.html", null ],
@@ -80,13 +81,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"examples_graphics_effects.html",
-"graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html",
-"group__ppu__regs.html#ga79723f49e7557337b091835634430844",
-"learning_path.html#autotoc_md265",
-"profile_8h.html#a7ee7d566af8cf6b15c9e1edeb53ec39c",
-"sram_8h.html#ae73e427251033a0a2e6bb68a768a76c6",
-"window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017"
+"examples_graphics_backgrounds_mode1_bg3_priority.html",
+"goomba_8c.html#adb9325cd6ec6251c1c589c8fc1fed7f7",
+"group__ppu__regs.html#ga4f287a5385050275961326652a04c3f3",
+"koopatroopa_8c.html#ae3d6d007cf2553f4f13f79656418d114",
+"piece_8h.html#aee707398916fd4752f85e771787c023c",
+"sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4",
+"video_8h_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

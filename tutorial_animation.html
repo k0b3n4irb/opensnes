@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('tutorial_animation.html',''); initResi
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers sprite and background animation techniques on the SNES, from simple frame cycling to the dynamic sprite engine.</p>
-<h2><a class="anchor" id="autotoc_md64"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 Frame-Based Animation</h2>
 <p>The simplest animation technique: cycle through tile numbers at a fixed interval. Each animation frame corresponds to a different tile (or group of tiles) in VRAM.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -123,10 +123,10 @@ Frame-Based Animation</h2>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
 <div class="ttc" id="asprite_8h_html_a07b133e4cd2416bcb648b2ece69d34fe"><div class="ttname"><a href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a></div><div class="ttdeci">void oamSetTile(u8 id, u16 tile)</div><div class="ttdoc">Set sprite tile.</div></div>
 </div><!-- fragment --><p>The key insight: <b>animation only advances when the timer expires</b>, not every frame. This decouples visual speed from the 60 Hz game loop.</p>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<h2><a class="anchor" id="autotoc_md66"></a>
 Frame Timing</h2>
 <p>Two approaches for controlling animation speed:</p>
-<h3><a class="anchor" id="autotoc_md66"></a>
+<h3><a class="anchor" id="autotoc_md67"></a>
 Manual Counter (Recommended)</h3>
 <p>A dedicated <code>u8</code> counter gives full control and costs almost nothing:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_timer = 0;</div>
@@ -138,7 +138,7 @@ Manual Counter (Recommended)</h3>
 <div class="line">    <span class="comment">/* Advance to next animation frame */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This is the pattern used in <code>examples/graphics/sprites/dynamic_sprite/</code>. The counter increments once per VBlank, and every 8th frame the animation advances.</p>
-<h3><a class="anchor" id="autotoc_md67"></a>
+<h3><a class="anchor" id="autotoc_md68"></a>
 Using getFrameCount()</h3>
 <p>The system <code>frame_count</code> (incremented by the NMI handler) is available via <code><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a></code>. Useful for simple periodic animations where you do not need to pause or reset the timer independently:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Cycle through 4 frames, changing every 8 VBlanks */</span></div>
@@ -147,9 +147,9 @@ Using getFrameCount()</h3>
 <div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div></div>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 </div><!-- fragment --><p>The manual counter is preferred for gameplay animations because you can pause it (stop incrementing when the character is idle) or reset it on state changes.</p>
-<h2><a class="anchor" id="autotoc_md68"></a>
+<h2><a class="anchor" id="autotoc_md69"></a>
 Sprite Sheet Layout</h2>
-<h3><a class="anchor" id="autotoc_md69"></a>
+<h3><a class="anchor" id="autotoc_md70"></a>
 VRAM Tile Numbering</h3>
 <p>For 16x16 sprites in 4bpp mode, each sprite is a 2x2 group of 8x8 tiles (32 bytes per 8x8 tile, 128 bytes per 16x16 frame). Tile numbers follow the SNES OBJ character layout:</p>
 <div class="fragment"><div class="line">VRAM row 0:  tile 0   tile 1   tile 2   tile 3  ...  tile 15</div>
@@ -166,7 +166,7 @@ VRAM Tile Numbering</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Frame 2   </td><td class="markdownTableBodyNone">4   </td><td class="markdownTableBodyNone">4, 5, 20, 21   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md70"></a>
+<h3><a class="anchor" id="autotoc_md71"></a>
 Sprite Sheet Organization</h3>
 <p>A typical character sprite sheet is organized as rows of animation directions. For the animated sprite example (<code>examples/graphics/sprites/animated_sprite/</code>):</p>
 <div class="fragment"><div class="line">Row 0 (tiles 0-15):   Walk Down frames    | Walk Up frames    | Walk Right frames</div>
@@ -178,7 +178,7 @@ Sprite Sheet Organization</h3>
 <li><b>Right</b>: 12, 14, 32 (frame 3 wraps to next VRAM row)</li>
 <li><b>Left</b>: same tiles as Right, drawn with H-flip</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md71"></a>
+<h3><a class="anchor" id="autotoc_md72"></a>
 Converting Sprite Sheets with gfx4snes</h3>
 <div class="fragment"><div class="line"># 16x16 sprites, 4bpp, with palette output</div>
 <div class="line">gfx4snes -s 16 -o 16 -u 16 -p -i sprites.png</div>
@@ -189,7 +189,7 @@ Converting Sprite Sheets with gfx4snes</h3>
 <div class="line">sprite_pal:   .incbin &quot;res/sprites.pal&quot;</div>
 <div class="line">sprite_pal_end:</div>
 <div class="line">.ends</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md72"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md73"></a>
 Direction-Based Animation</h2>
 <p>Most game characters have different frames for each movement direction. The common pattern uses an <b>enum for states</b> and <b>H-flip for left/right mirroring</b>.</p>
 <p>From <code>examples/graphics/sprites/animated_sprite/</code>:</p>
@@ -223,7 +223,7 @@ Direction-Based Animation</h2>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a8819ae0e38a6565e016c379e527b426d"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d">flipx</a></div><div class="ttdeci">u16 flipx</div><div class="ttdoc">Horizontal flip flag (1 = facing left)</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
 <div class="ttc" id="astructMonster_html"><div class="ttname"><a href="structMonster.html">Monster</a></div><div class="ttdoc">Sprite state structure holding position, animation, and direction.</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md73"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md74"></a>
 Input and State Changes</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);</div>
 <div class="line"> </div>
@@ -257,7 +257,7 @@ Input and State Changes</h3>
 <div class="ttc" id="astructMonster_html_a8fe078bb2419edd3161269feb476e91b"><div class="ttname"><a href="structMonster.html#a8fe078bb2419edd3161269feb476e91b">Monster::x</a></div><div class="ttdeci">s16 x</div><div class="ttdef"><b>Definition</b> main.c:95</div></div>
 <div class="ttc" id="astructMonster_html_ad680b6e495c04540b0535d6a2a942edb"><div class="ttname"><a href="structMonster.html#ad680b6e495c04540b0535d6a2a942edb">Monster::y</a></div><div class="ttdeci">s16 y</div><div class="ttdef"><b>Definition</b> main.c:95</div></div>
 <div class="ttc" id="astructMonster_html_af18fac6f28430cbeddf1873240e24ade"><div class="ttname"><a href="structMonster.html#af18fac6f28430cbeddf1873240e24ade">Monster::flipx</a></div><div class="ttdeci">u8 flipx</div><div class="ttdef"><b>Definition</b> main.c:100</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md74"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md75"></a>
 Calculating the Tile Number</h3>
 <p>Map the current state and animation frame to a tile number, then apply the flip flag:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Compute tile from state + frame */</span></div>
@@ -279,7 +279,7 @@ Calculating the Tile Number</h3>
 <div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:482</div></div>
 <div class="ttc" id="astructMonster_html_a46e4766a089bbdb88eaa7c06b5529a17"><div class="ttname"><a href="structMonster.html#a46e4766a089bbdb88eaa7c06b5529a17">Monster::anim_frame</a></div><div class="ttdeci">u16 anim_frame</div><div class="ttdef"><b>Definition</b> main.c:97</div></div>
 <div class="ttc" id="astructMonster_html_af48434d537b961db46339532f773f5ef"><div class="ttname"><a href="structMonster.html#af48434d537b961db46339532f773f5ef">Monster::gfx_frame</a></div><div class="ttdeci">u16 gfx_frame</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md75"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md76"></a>
 Animation Timing with Idle Check</h3>
 <p>Only advance the animation counter while the character is moving:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> != 0) {</div>
@@ -294,10 +294,10 @@ Animation Timing with Idle Check</h3>
 <div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_aacb988fff541a047d8ce1b3a98553a6f"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#aacb988fff541a047d8ce1b3a98553a6f">FRAMES_PER_ANIMATION</a></div><div class="ttdeci">#define FRAMES_PER_ANIMATION</div><div class="ttdoc">Number of distinct frames in each directional walk cycle.</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
 <div class="ttc" id="astructMonster_html_a9866806505fb8b256a2897ad1fb7e323"><div class="ttname"><a href="structMonster.html#a9866806505fb8b256a2897ad1fb7e323">Monster::anim_delay</a></div><div class="ttdeci">u16 anim_delay</div><div class="ttdef"><b>Definition</b> main.c:98</div></div>
 </div><!-- fragment --><p>When no buttons are held, <code>anim_delay</code> stops incrementing and the sprite freezes on its current frame.</p>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md77"></a>
 The Dynamic Sprite Engine</h2>
 <p>For sprites with many animation frames, pre-loading all frames into VRAM wastes space. The <b>dynamic sprite engine</b> streams tile data from ROM to VRAM on demand, uploading only the current frame each time it changes.</p>
-<h3><a class="anchor" id="autotoc_md77"></a>
+<h3><a class="anchor" id="autotoc_md78"></a>
 How It Works</h3>
 <ol type="1">
 <li>All sprite frames live in ROM (the <code>.pic</code> file)</li>
@@ -306,7 +306,7 @@ How It Works</h3>
 <li>The NMI handler auto-flushes the queue during VBlank (no user call)</li>
 <li>Up to 7 sprite uploads per VBlank to stay within DMA budget; larger one-shot batches at init use <code><a class="el" href="sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410" title="Block until the dynamic-sprite VRAM tile queue is empty.">oamDynamicDrainQueue()</a></code> to wait for the queue to fully drain before <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code></li>
 </ol>
-<h3><a class="anchor" id="autotoc_md78"></a>
+<h3><a class="anchor" id="autotoc_md79"></a>
 Initialization</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -335,9 +335,9 @@ Initialization</h3>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_ac917b076df172412b9f00526ac9ecc7c"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ac917b076df172412b9f00526ac9ecc7c">spr16_tiles</a></div><div class="ttdeci">u8 spr16_tiles[]</div><div class="ttdoc">ROM source for the 16x16 sprite sheet tile data.</div></div>
 <div class="ttc" id="asprite_8h_html_a333ce995f2762b9da596948ab43c5d54"><div class="ttname"><a href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a></div><div class="ttdeci">void oamDynamicInit(const OamDynamicConfig *cfg)</div><div class="ttdoc">Initialize the dynamic sprite engine from a config struct.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet)</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:574</div></div>
-<div class="ttc" id="astructOamDynamicConfig_html_a35d9be87b911f19ad2755521f5e38e0c"><div class="ttname"><a href="structOamDynamicConfig.html#a35d9be87b911f19ad2755521f5e38e0c">OamDynamicConfig::vramLarge</a></div><div class="ttdeci">u16 vramLarge</div><div class="ttdef"><b>Definition</b> sprite.h:575</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md79"></a>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:559</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html_a35d9be87b911f19ad2755521f5e38e0c"><div class="ttname"><a href="structOamDynamicConfig.html#a35d9be87b911f19ad2755521f5e38e0c">OamDynamicConfig::vramLarge</a></div><div class="ttdeci">u16 vramLarge</div><div class="ttdef"><b>Definition</b> sprite.h:560</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md80"></a>
 Setting Up a Dynamic Sprite</h3>
 <p>Use the <code>oambuffer[]</code> array (type <code><a class="el" href="structt__sprites.html" title="Dynamic sprite state structure (16 bytes, PVSnesLib compatible)">t_sprites</a></code>) instead of <code><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></code>:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].<a class="code hl_variable" href="structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004">oamx</a> = 100;</div>
@@ -354,7 +354,7 @@ Setting Up a Dynamic Sprite</h3>
 <div class="ttc" id="astructt__sprites_html_a6c499b96e640bbad488eb8874bf36281"><div class="ttname"><a href="structt__sprites.html#a6c499b96e640bbad488eb8874bf36281">t_sprites::oamy</a></div><div class="ttdeci">s16 oamy</div><div class="ttdef"><b>Definition</b> sprite.h:190</div></div>
 <div class="ttc" id="astructt__sprites_html_ac0fb1ea59809017c11430630430e864d"><div class="ttname"><a href="structt__sprites.html#ac0fb1ea59809017c11430630430e864d">t_sprites::oamattribute</a></div><div class="ttdeci">u8 oamattribute</div><div class="ttdef"><b>Definition</b> sprite.h:192</div></div>
 <div class="ttc" id="astructt__sprites_html_ac4e74ac3a1b9ad5b2f756c512f608cb8"><div class="ttname"><a href="structt__sprites.html#ac4e74ac3a1b9ad5b2f756c512f608cb8">t_sprites::oamrefresh</a></div><div class="ttdeci">u8 oamrefresh</div><div class="ttdef"><b>Definition</b> sprite.h:193</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md80"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md81"></a>
 The Game Loop</h3>
 <p>From <code>examples/graphics/sprites/dynamic_sprite/</code>:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a> = 0;</div>
@@ -382,7 +382,7 @@ The Game Loop</h3>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_af743d5de011168f86bbdb716e0afbc47"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></div><div class="ttdeci">static u8 frame_counter</div><div class="ttdoc">Global frame counter for animation timing.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 <div class="ttc" id="asprite_8h_html_a6160a02efb71cd4b2bac8c1553f9f57c"><div class="ttname"><a href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a></div><div class="ttdeci">void oamDynamicDraw(u16 id)</div><div class="ttdoc">Draw a dynamic sprite — engine picks the size routine.</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md81"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md82"></a>
 Action-Based Animation (LikeMario)</h3>
 <p>The <code>examples/games/likemario/</code> example shows how to combine the dynamic sprite engine with action states. Each action maps to specific frame indices:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define FRAME_STAND  6</span></div>
@@ -431,14 +431,14 @@ Action-Based Animation (LikeMario)</h3>
 <li>Direction is handled separately via <code>oamattribute</code> (setting or clearing the H-flip bit <code>0x40</code>)</li>
 <li><code><a class="el" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c" title="Draw a dynamic sprite — engine picks the size routine.">oamDynamicDraw()</a></code> reads <code>oambuffer[].oamx</code> and <code>oambuffer[].oamy</code> for positioning</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md82"></a>
+<h3><a class="anchor" id="autotoc_md83"></a>
 One Draw Function, Engine-Resolved Size</h3>
 <p><code>oamDynamicDraw(id)</code> looks up the sprite's pixel size from the size pair set at init plus an optional per-sprite override (<code>oamDynamicSetSize</code>), then dispatches to the matching internal routine. Callers no longer pick a function by sprite size — the engine knows.</p>
 <p>For metasprite groups, <code>oamMetaDrawDyn(id, x, y, meta, gfx, size_class)</code> walks a <code><a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible)">MetaspriteItem</a></code> array and dispatches each sub-sprite the same way; pass <code>OBJ_LARGE</code> or <code>OBJ_SMALL</code> to select which half of the configured size pair to use.</p>
-<h2><a class="anchor" id="autotoc_md83"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Background Tile Animation</h2>
 <p>Backgrounds can be animated by cycling tilemap entries. This is useful for water, lava, torches, and other environmental effects.</p>
-<h3><a class="anchor" id="autotoc_md84"></a>
+<h3><a class="anchor" id="autotoc_md85"></a>
 Approach 1: Swap Tilemap Entries</h3>
 <p>Write new tile numbers into the tilemap at fixed intervals. This changes which tiles appear without modifying tile graphics:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define WATER_TILE_A  20</span></div>
@@ -472,7 +472,7 @@ Approach 1: Swap Tilemap Entries</h3>
 <div class="ttc" id="agroup__ppu__regs_html_ga165959d614d718e17d008060049491bc"><div class="ttname"><a href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a></div><div class="ttdeci">#define REG_VMADDL</div><div class="ttdoc">VRAM address low (W)</div><div class="ttdef"><b>Definition</b> registers.h:115</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga1c64488065746dab4b05ad917c276841"><div class="ttname"><a href="group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841">REG_VMDATAL</a></div><div class="ttdeci">#define REG_VMDATAL</div><div class="ttdoc">VRAM data write low (W)</div><div class="ttdef"><b>Definition</b> registers.h:121</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W)</div><div class="ttdef"><b>Definition</b> registers.h:124</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md85"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md86"></a>
 Approach 2: Overwrite Tile Graphics</h3>
 <p>Instead of changing the tilemap, DMA new pixel data into the same tile slot. Every tile referencing that slot updates simultaneously:</p>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> water_frame0[];  <span class="comment">/* 32 bytes (one 4bpp 8x8 tile) */</span></div>
@@ -496,10 +496,10 @@ Approach 2: Overwrite Tile Graphics</h3>
 <div class="line">}</div>
 <div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
 </div><!-- fragment --><p>This approach is more efficient when many tilemap positions use the same animated tile, since you update the graphics once rather than rewriting every tilemap entry.</p>
-<h3><a class="anchor" id="autotoc_md86"></a>
+<h3><a class="anchor" id="autotoc_md87"></a>
 VBlank Budget</h3>
 <p>Background tile animation involves VRAM writes, which <b>must happen during VBlank or forced blank</b>. Keep animated tile DMA small (under 1 KB per frame) to stay within the VBlank budget alongside sprite updates and scroll register writes.</p>
-<h2><a class="anchor" id="autotoc_md87"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Performance Considerations</h2>
 <ol type="1">
 <li><b><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> is expensive</b> (framesize=158). For more than 2-3 sprites per frame, use <code><a class="el" href="sprite_8h.html#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></code> or write directly to <code>oamMemory[]</code></li>
@@ -507,14 +507,14 @@ Performance Considerations</h2>
 <li><b>The dynamic engine uploads up to 7 sprites per frame</b>. If you need more animated sprites, spread their refresh across multiple frames</li>
 <li><b>BG tile animation competes with sprite DMA for VBlank time</b>. Budget carefully: ~4 KB total per VBlank</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md88"></a>
+<h2><a class="anchor" id="autotoc_md89"></a>
 Example References</h2>
 <ul>
 <li><code>examples/graphics/sprites/animated_sprite/</code> &ndash; basic 4-direction sprite animation with H-flip</li>
 <li><code>examples/graphics/sprites/dynamic_sprite/</code> &ndash; dynamic sprite engine with VRAM streaming</li>
 <li><code>examples/games/likemario/</code> &ndash; action-state animation (walk, jump, stand) with camera and physics</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md89"></a>
+<h2><a class="anchor" id="autotoc_md90"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_sprites.html">Sprite Basics</a></li>

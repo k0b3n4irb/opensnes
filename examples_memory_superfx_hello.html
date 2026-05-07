@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('examples_memory_superfx_hello.html',''
 <p>&zwj;GSU coprocessor boot diagnostic with SRAM tests and FMULT validation </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md1298"></a>
+<h2><a class="anchor" id="autotoc_md1307"></a>
 Emulator Compatibility</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -109,12 +109,12 @@ Emulator Compatibility</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED"   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1299"></a>
+<h2><a class="anchor" id="autotoc_md1308"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/memory/superfx_hello</div>
 </div><!-- fragment --><p>Then open <code>superfx_hello.sfc</code> in Mesen2 (recommended) or bsnes.</p>
-<h2><a class="anchor" id="autotoc_md1300"></a>
+<h2><a class="anchor" id="autotoc_md1309"></a>
 What You'll Learn</h2>
 <ul>
 <li>Detecting the SuperFX (GSU) coprocessor via the VCR register ($303B)</li>
@@ -123,7 +123,7 @@ What You'll Learn</h2>
 <li>FMULT fixed-point multiplication validation (2.0×2.0=$4000, 1.5×3.0=$4800)</li>
 <li>Reading GSU registers (R0=$CAFE) after STOP</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1301"></a>
+<h2><a class="anchor" id="autotoc_md1310"></a>
 Status Codes</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -139,7 +139,7 @@ Status Codes</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>2*2=$4000 1.5*3=$4800</code>   </td><td class="markdownTableBodyNone">FMULT 4.12 fixed-point validated   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1302"></a>
+<h2><a class="anchor" id="autotoc_md1311"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

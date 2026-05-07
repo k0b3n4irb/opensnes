@@ -37,5 +37,6 @@ var searchData=
   ['consoleinitex_34',['consoleInitEx',['../console_8h.html#a61f5e51d0173ceaad88679ed162359d1',1,'console.h']]],
   ['consolemesenbreakpoint_35',['consoleMesenBreakpoint',['../debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd',1,'debug.h']]],
   ['consolenocashmessage_36',['consoleNocashMessage',['../debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79',1,'debug.h']]],
-  ['convertc64sprite_37',['convertC64Sprite',['../maps_2dynamic__map_2main_8c.html#a98692d500326e50264c28de9591315ff',1,'main.c']]]
+  ['counter_5finit_37',['counter_init',['../basics_2scene__stack_2main_8c.html#a7e844f40aac8d1061abf89325fbcd7d8',1,'main.c']]],
+  ['counter_5fupdate_38',['counter_update',['../basics_2scene__stack_2main_8c.html#ab55aeb54c54ffc06b611f98f5d5816dd',1,'main.c']]]
 ];

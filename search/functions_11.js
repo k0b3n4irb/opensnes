@@ -14,5 +14,7 @@ var searchData=
   ['textprinthex_11',['textPrintHex',['../text_8h.html#ad7921b5cc9592bdfeaf917c52d0c95ab',1,'text.h']]],
   ['textprintu16_12',['textPrintU16',['../text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4',1,'text.h']]],
   ['textputchar_13',['textPutChar',['../text_8h.html#acd3f984c3d3308883e2729a50db16413',1,'text.h']]],
-  ['textsetpos_14',['textSetPos',['../text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0',1,'text.h']]]
+  ['textsetpos_14',['textSetPos',['../text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0',1,'text.h']]],
+  ['title_5finit_15',['title_init',['../basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845',1,'main.c']]],
+  ['title_5fupdate_16',['title_update',['../basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2',1,'main.c']]]
 ];

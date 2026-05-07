@@ -259,7 +259,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES HDMA (Horizontal-blanking DMA) </p>
 <p>HDMA transfers data to PPU registers once per scanline during HBlank, enabling effects like color gradients, parallax scrolling, and wave distortion that change across the screen.</p>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 How HDMA Works</h2>
 <p>HDMA uses a table in memory that specifies:</p><ul>
 <li>How many scanlines to apply a value</li>
@@ -269,7 +269,7 @@ How HDMA Works</h2>
 <li>1 byte: Line count (bit 7 = repeat mode, bits 0-6 = count)</li>
 <li>N bytes: Data to write (1-4 bytes depending on transfer mode)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 Table Format</h2>
 <p>Non-repeat mode (bit 7 = 0): Write data ONCE, then skip N-1 scanlines </p><div class="fragment"><div class="line">.db 32       ; Write data once, hold <span class="keywordflow">for</span> 32 scanlines</div>
 <div class="line">.db $1F, $00 ; Data (2 bytes <span class="keywordflow">for</span> transfer mode 1)</div>
@@ -283,7 +283,7 @@ Table Format</h2>
 <div class="line">.db $1F, $08 ; Data</div>
 <div class="line">.db 0        ; End of table</div>
 </div><!-- fragment --><p> REQUIRED for scroll registers (BG1HOFS, etc.) and other write-twice/ latched registers that need re-writing every scanline.</p>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md28"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define HDMA table in ROM</span></div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gradient_table[] = {</div>
@@ -305,10 +305,10 @@ Usage Example</h2>
 <div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd><b>Do NOT use HDMA_CHANNEL_7</b> — the NMI handler uses DMA channel 7 for OAM transfers every frame, which destroys any HDMA setup on that channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram). </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>HDMA tables must be in ROM or bank $7E RAM.</dd></dl>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md29"></a>
 Bank Byte Limitation</h2>
 <p><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> hardcodes bank $00 for ROM addresses (&gt;= $8000). If the linker places a SUPERFREE table in bank $01+, HDMA will read wrong data. Use <a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank()</a> with an explicit bank byte for ROM tables, or use RAM-based tables (always bank $00) for dynamic effects.</p>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md30"></a>
 IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 <p>BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that require being written EVERY scanline to maintain their value. Use REPEAT mode (bit 7 = 1) in the HDMA line count for these registers.</p>
 <p>Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the scroll value is lost on subsequent scanlines — causing visible glitches.</p>
@@ -1114,7 +1114,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 
 <p>Create a circular window mask (iris/spotlight effect) </p>
 <p>Uses HDMA to drive window registers (WH0/WH1) per scanline, approximating a circle. Configures all window registers automatically. Useful for:</p><ul>
-<li>Scene transitions (iris in/out)</li>
+<li><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> transitions (iris in/out)</li>
 <li>Spotlight effects</li>
 <li>Circular vignette</li>
 </ul>

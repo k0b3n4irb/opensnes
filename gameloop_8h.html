@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('gameloop_8h.html',''); initResizable()
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">gameloop.h File Reference</div></div>
 </div><!--header-->
@@ -100,18 +100,19 @@ $(document).ready(function(){initNavTree('gameloop_8h.html',''); initResizable()
 <p>Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">snes/types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="scene_8h_source.html">snes/scene.h</a>&gt;</code><br />
 </div>
 <p><a href="gameloop_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGameLoopConfig.html">GameLoopConfig</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Game loop callbacks.  <a href="structGameLoopConfig.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:abd4907749765c5550a229850c698c856" id="r_abd4907749765c5550a229850c698c856"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="structScene.html">Scene</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a></td></tr>
+<tr class="memdesc:abd4907749765c5550a229850c698c856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Game loop callbacks. Alias for <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> from <code>&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</code>.  <br /></td></tr>
+<tr class="separator:abd4907749765c5550a229850c698c856"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5d1a6a94538a167bfa984b00cf166af6" id="r_a5d1a6a94538a167bfa984b00cf166af6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6">gameLoopRun</a> (const <a class="el" href="structGameLoopConfig.html">GameLoopConfig</a> *cfg)</td></tr>
+<tr class="memitem:a5d1a6a94538a167bfa984b00cf166af6" id="r_a5d1a6a94538a167bfa984b00cf166af6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6">gameLoopRun</a> (const <a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a> *cfg)</td></tr>
 <tr class="memdesc:a5d1a6a94538a167bfa984b00cf166af6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the OpenSNES game loop. Never returns.  <br /></td></tr>
 <tr class="separator:a5d1a6a94538a167bfa984b00cf166af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -137,7 +138,7 @@ Functions</h2></td></tr>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_struct" href="structGameLoopConfig.html">GameLoopConfig</a> cfg = { .<a class="code hl_variable" href="structGameLoopConfig.html#a7e65876362c9c33a2f35d6f906ab2cb1">init</a> = onInit, .update = onUpdate };</div>
+<div class="line">    <a class="code hl_struct" href="structScene.html">GameLoopConfig</a> cfg = { .<a class="code hl_variable" href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">init</a> = onInit, .update = onUpdate };</div>
 <div class="line">    <a class="code hl_function" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6">gameLoopRun</a>(&amp;cfg);</div>
 <div class="line">    <span class="keywordflow">return</span> 0;   <span class="comment">// never reached — gameLoopRun never returns</span></div>
 <div class="line">}</div>
@@ -148,21 +149,41 @@ Functions</h2></td></tr>
 <div class="ttc" id="agroup__bg__modes_html_ga82bccfa80c8aa4ff5aa4e1416e0ade25"><div class="ttname"><a href="group__bg__modes.html#ga82bccfa80c8aa4ff5aa4e1416e0ade25">BG_MODE0</a></div><div class="ttdeci">#define BG_MODE0</div><div class="ttdef"><b>Definition</b> video.h:27</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
-<div class="ttc" id="astructGameLoopConfig_html"><div class="ttname"><a href="structGameLoopConfig.html">GameLoopConfig</a></div><div class="ttdoc">Game loop callbacks.</div><div class="ttdef"><b>Definition</b> gameloop.h:92</div></div>
-<div class="ttc" id="astructGameLoopConfig_html_a7e65876362c9c33a2f35d6f906ab2cb1"><div class="ttname"><a href="structGameLoopConfig.html#a7e65876362c9c33a2f35d6f906ab2cb1">GameLoopConfig::init</a></div><div class="ttdeci">void(* init)(void)</div><div class="ttdoc">Called once before the loop starts. May be NULL.</div><div class="ttdef"><b>Definition</b> gameloop.h:103</div></div>
+<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene's callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
+<div class="ttc" id="astructScene_html_a792c89d6cc91c1e09330819a3f15fe10"><div class="ttname"><a href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">Scene::init</a></div><div class="ttdeci">void(* init)(void)</div><div class="ttdoc">Called once when the scene is first pushed onto the stack.</div><div class="ttdef"><b>Definition</b> scene.h:153</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>The framework deliberately does very little. It does NOT call <code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code> or <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> for you, NOT touch palettes, NOT configure the NMI handler. All of those remain caller-driven so the ABI stays the same as a hand-rolled main loop and any example you already have keeps compiling. What the framework owns is exactly: the <code>while (1) <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>; update();</code> cadence.</p>
 <dl class="section user"><dt>When NOT to use this</dt><dd></dd></dl>
 <ul>
-<li>You need a state machine that swaps the per-frame logic between distinct screens (title, gameplay, pause, game-over). For now, either dispatch from inside <code>update</code> or wait for the <code>scene_2d</code> / scene-stack module that's planned next.</li>
+<li>You need a state machine that swaps the per-frame logic between distinct screens (title, gameplay, pause, game-over). Either dispatch from inside <code>update</code>, or use the <code>scene</code> module (D.3) — see <code>&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</code>. <code>GameLoopConfig</code> is an alias for <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code>, so promoting a single-loop game to a scene stack is a one-line change at the call site (<code>gameLoopRun(&amp;cfg)</code> → <code>sceneRun(&amp;cfg)</code>).</li>
 <li>You need a custom synchronisation rhythm (e.g. half-rate updates, double-buffered audio polling). Keep your hand-rolled loop — gameLoopRun is meant for the common case, not every case.</li>
 </ul>
 <dl class="section user"><dt>Performance</dt><dd></dd></dl>
-<p>Each frame, gameLoopRun adds one indirect call (<code>update</code> via the <code>cfg</code> pointer) and one direct call (<code>WaitForVBlank</code>). On the order of 30 cycles per frame, dwarfed by anything <code>update</code> itself does. The compiler does not currently TCO the indirect call (chantier C accepted only direct tail calls); a future C.3 may close that gap.</p>
+<p>Each frame, gameLoopRun adds one indirect call (<code>update</code> via the <code>cfg</code> pointer) and one direct call (<code>WaitForVBlank</code>). On the order of 30 cycles per frame, dwarfed by anything <code>update</code> itself does. The compiler does not currently TCO the indirect call.</p>
 <dl class="section user"><dt>Modules required</dt><dd></dd></dl>
 <p><code>gameloop</code> (and its transitive dependency on the runtime). No other lib module is pulled in by gameLoopRun itself — what your <code>init</code> and <code>update</code> callbacks use is on you.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html" title="SNES System Variables (crt0.asm exports)">system.h</a> (<a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a>, <a class="el" href="system_8h.html#a393cdd9777ac31290693d930c63d2a83" title="Frame counter incremented every VBlank by the NMI handler.">frame_count</a>) </dd></dl>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="abd4907749765c5550a229850c698c856" name="abd4907749765c5550a229850c698c856"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd4907749765c5550a229850c698c856">&#9670;&#160;</a></span>GameLoopConfig</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="structScene.html">Scene</a> <a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Game loop callbacks. Alias for <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> from <code>&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</code>. </p>
+<p><code>GameLoopConfig</code> and <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> (D.3) are the same type — both expose an <code>init</code> and <code>update</code> callback pair, both follow the same lifecycle contract (init once, update every VBlank). <code>gameLoopRun</code> accepts a 1-deep "single scene"; <code>sceneRun</code> adds the push/pop stack semantics on top.</p>
+<p>The alias keeps the historical D.1 name available so existing examples and downstream code keep compiling unchanged. New code is encouraged to use <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> directly for vocabulary consistency across the framework trilogy.</p>
+<p>Field documentation lives on the canonical <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> struct in <code>&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</code>. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="a5d1a6a94538a167bfa984b00cf166af6" name="a5d1a6a94538a167bfa984b00cf166af6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5d1a6a94538a167bfa984b00cf166af6">&#9670;&#160;</a></span>gameLoopRun()</h2>
 
@@ -172,7 +193,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void gameLoopRun </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structGameLoopConfig.html">GameLoopConfig</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a> *&#160;</td>
           <td class="paramname"><em>cfg</em></td><td>)</td>
           <td></td>
         </tr>
@@ -187,7 +208,7 @@ Functions</h2></td></tr>
 <div class="line">}</div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cfg</td><td>Pointer to a <a class="el" href="structGameLoopConfig.html" title="Game loop callbacks.">GameLoopConfig</a>. Must be non-NULL and must have a non-NULL <code>update</code>. <code>init</code> may be NULL to skip the init phase. The pointer is only consulted at the start of the loop and on each iteration's update; you may allocate <code>cfg</code> on the stack of <code><a class="el" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title="Entry point — initialize audio, display controls, run transport loop.">main()</a></code> since <code>main</code> does not return for as long as gameLoopRun runs. </td></tr>
+    <tr><td class="paramname">cfg</td><td>Pointer to a GameLoopConfig. Must be non-NULL and must have a non-NULL <code>update</code>. <code>init</code> may be NULL to skip the init phase. The pointer is only consulted at the start of the loop and on each iteration's update; you may allocate <code>cfg</code> on the stack of <code><a class="el" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title="Entry point — initialize audio, display controls, run transport loop.">main()</a></code> since <code>main</code> does not return for as long as gameLoopRun runs. </td></tr>
   </table>
   </dd>
 </dl>

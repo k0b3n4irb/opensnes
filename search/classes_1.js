@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['effectstate_0',['EffectState',['../structEffectState.html',1,'']]]
+  ['bgasset_0',['BgAsset',['../structBgAsset.html',1,'']]]
 ];

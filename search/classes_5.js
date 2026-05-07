@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['oamdynamicconfig_0',['OamDynamicConfig',['../structOamDynamicConfig.html',1,'']]]
+  ['metaspriteitem_0',['MetaspriteItem',['../structMetaspriteItem.html',1,'']]],
+  ['monster_1',['Monster',['../structMonster.html',1,'']]]
 ];
