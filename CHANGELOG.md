@@ -158,6 +158,15 @@ closed four residuals from the sprite/text duplication audit
 - **README.md and `examples/README.md` example counts refreshed**
   from 53 / 36 to the actual 54.
 
+- **`KNOWN_LIMITATIONS.md` refreshed** — two entries promoted
+  🟠 → 🟢 (WLA-DX `.ACCU`/`.INDEX` tracking, now lint-enforced;
+  SuperFX/snes9x detection, now covered by the Mesen2-headless
+  CI phase). Two stale entries removed (TCO and A-cache through
+  `pha` — both fixed in earlier chantiers but still listed as
+  open). The "five [KNOWN_BUG] entries" intro line corrected to
+  "one" — the only remaining compiler known-bug is the cosmetic
+  `leaf_opt=1` comment marker on non-leaf frameless functions.
+
 ### Internal cleanup
 
 - **`MODE_LARGE_SIZE` / `MODE_SMALL_SIZE` extracted to a shared
