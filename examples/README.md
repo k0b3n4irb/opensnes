@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 36 examples organized by topic, building
+Learn SNES development step by step. 54 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -8,13 +8,13 @@ from basic concepts to complete games.
 | Category | Examples | What It Covers |
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
-| [basics/](basics/) | 1 | Collision detection, game mechanics |
-| [graphics/](graphics/) | 21 | Backgrounds, sprites, visual effects |
-| [input/](input/) | 3 | Joypads, mouse, Super Scope |
-| [audio/](audio/) | 2 | Music and sound effects via SNESMOD |
-| [maps/](maps/) | 2 | Tile maps, dynamic streaming, slopes |
-| [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [games/](games/) | 3 | Complete game projects |
+| [basics/](basics/) | 4 | Collision, timing, scene stack, randomness |
+| [graphics/](graphics/) | 27 | Backgrounds, sprites, visual effects, Mode 7 |
+| [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
+| [audio/](audio/) | 4 | Music and sound effects via SNESMOD |
+| [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
+| [memory/](memory/) | 5 | HiROM mode, battery-backed saves, SA-1, SuperFX |
+| [games/](games/) | 4 | Complete game projects (Tetris, Breakout, Mario-like, map+objects) |
 
 ## Learning Path
 

@@ -162,7 +162,7 @@ you see on screen.
 |-----|-------|
 | `oamSet(id, x, y, ...)` | auto Y-1 in `sprite_oamset.asm` |
 | `oamSetY(id, y)` / `oamSetXY(...)` | auto Y-1 in `sprite.c` |
-| `oamDrawMeta` / `oamDrawMetaFlip` / `oamDrawMetasprite` | call `oamSet` |
+| `oamDrawMeta` / `oamDrawMetaFlip` | call `oamSet` |
 
 **Camp 2 — Y is the legacy PVSnesLib `y_logical` (= `visual_top - 1`)**
 

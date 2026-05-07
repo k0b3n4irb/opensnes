@@ -7,6 +7,187 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-05-07
+
+Framework trilogy completed. The two remaining "framework opt-ins"
+promised by `PHILOSOPHY.md` (alongside D.1 `gameloop` in v0.15.2)
+ship in this release: `<snes/asset.h>` for typed background and
+tileset bundles (D.2), `<snes/scene.h>` for a push/pop scene stack
+(D.3). An audit-driven cohesion pass aliases the gameloop config
+type to the new `Scene` type, defers scene init to the next VBlank
+dispatch (closing a silent VRAM-overrun footgun), and drops a
+parallel macro API that did not justify its surface.
+
+Two compiler fixes shipped along the way: chantier C.5 padded DL/DW
+static init data emissions to match `dtype_size` (which unblocked
+typed struct values with pointer fields), and the C.7
+JSL-in-conditional codegen bug was confirmed silently fixed by an
+earlier QBE chantier — the workaround macro is gone. Chantier P3.2
+closed four residuals from the sprite/text duplication audit
+(orphan font header, duplicated size-table macros, unused
+`oamDrawMetasprite` API, "legacy" → "internal" naming).
+
+### Added
+
+- **`<snes/asset.h>` + `asset` library module (chantier D.2)** —
+  typed `BgAsset` / `GfxAsset` value form for full background and
+  tileset bundles, plus `bgLoad()` / `gfxLoad()` runtime functions.
+  Constructor sugar via `DECLARE_BG_ASSET(name, color_mode, map_size)`
+  / `DECLARE_GFX_ASSET(name, color_mode)` that expand to the six
+  `extern` declarations and a populated `static const`. Symbol-naming
+  convention: `<name>_tiles` / `<name>_pal` / `<name>_map` (each with
+  matching `_end` siblings). Replaces the previous "declare six
+  externs, compute three sizes, thread eight positional parameters
+  through `bgInitTileSet`" boilerplate with a single typed value.
+
+- **`<snes/scene.h>` + `scene` library module (chantier D.3)** —
+  push/pop scene stack with `sceneRun(initial)`, `scenePush(next)`,
+  `scenePop()`. `Scene` is two function pointers (`init`, `update`).
+  Init for the initial scene runs eagerly (matches `gameLoopRun`);
+  init for pushed scenes runs at the next VBlank dispatch (full
+  budget for DMAs). Static stack of 8 deep, silent no-ops on
+  overflow / pop-from-bottom. Closes the framework opt-in trilogy.
+
+- **`examples/basics/scene_stack`** — title → counter → pause overlay
+  demo of the scene framework. ~120 LOC, exercises push/pop, eager
+  vs deferred init, and shared state via a file-scope global.
+
+### Changed
+
+- **`GameLoopConfig` is now `typedef Scene` (audit H1)** —
+  field-for-field identical structs unified. Source-compatible: every
+  existing `GameLoopConfig cfg = { .init = ..., .update = ... }`
+  keeps working via the typedef; new code is encouraged to use
+  `Scene` directly for vocabulary consistency across the trilogy.
+
+- **`scenePush()` no longer calls `init` synchronously (audit H2)** —
+  the dispatcher in `sceneRun` now runs init right after
+  `WaitForVBlank()` instead of inside the caller's `update` frame.
+  This gives init's DMAs (palette, tiles, tilemap) a fresh ~33 K
+  cycle VBlank budget. The initial scene's init keeps its eager
+  pre-VBlank semantics so `consoleInit` / `setMode` / `setScreenOn`
+  ordering still works as in `gameLoopRun`.
+
+- **`examples/graphics/backgrounds/mode1` and
+  `examples/graphics/backgrounds/mode1_bg3_priority` migrated to
+  the typed `BgAsset` form (audit H3)** — the `BG_LOAD` /
+  `GFX_LOAD` statement-form macros are dropped (one flavour, no
+  fuzzy choice between two parallel APIs).
+
+### Removed
+
+- **`oamDrawMetasprite` from `<snes/sprite.h>` (chantier P3.2)** —
+  was declared as a "legacy simple interface" with zero callers
+  in the entire repository. Drops the symbol and the
+  `docs/hardware/OAM.md` table mention.
+
+- **`BG_LOAD` / `GFX_LOAD` statement macros from `<snes/asset.h>`
+  (audit H3)** — parallel API to the typed `bgLoad` / `gfxLoad`
+  functions. Both did the same thing; the macros are gone, the
+  typed form is the only form.
+
+- **`lib/source/opensnes_font_2bpp.h` (chantier P3.2)** — orphan
+  font header with 1536 bytes of inlined data and unused `FONT_*`
+  macros, referenced by nothing. Drops 219 lines of dead code.
+
+- **`examples/maps/dynamic_map` C64 sprite converter dead code** —
+  `convertC64Sprite()`, `getPixel()`, `isBitSet()`,
+  `sprite_temp[256]`, the `c64_sprite` extern, and the 144-byte
+  data block. Unused since the example was ported. Drops 161 LOC.
+
+### Fixed
+
+- **QBE w65816 emit pads DL/DW init data (chantier C.5)** —
+  `compiler/qbe/emit.c` `emit_init_data()` now adds `.dsb N, 0`
+  after each emitted directive whose written size is smaller than
+  `dtype_size[type]`. Without this, `static const Struct { ptr }`
+  values had every field after the first pointer at the wrong ROM
+  offset (cproc lays out 8-byte stride for `u8 *`, but WLA-DX
+  writes 3 bytes for `.dl <symbol>`). The bug had never manifested
+  in shipping code because no example carried such a struct; the
+  fix unblocks the typed `BgAsset` value shipped in D.2.
+
+- **`scenePush` from `update` no longer overruns the VBlank
+  budget (audit H2)** — the pushed scene's init used to share the
+  caller's already-consumed window; if init did heavy DMAs it
+  could exceed the budget and the PPU would silently drop the
+  writes. See "Changed" above for the dispatcher refactor.
+
+### Compiler
+
+- **JSL-in-conditional codegen bug confirmed silently fixed
+  (chantier C.7)** — the `MODE_LARGE_SIZE` / `MODE_SMALL_SIZE`
+  workaround macros (which existed solely to keep helper calls
+  from inlining as JSLs inside an `if (sz == 0) { sz = helper(); }
+  if (sz == 8) ...` chain) are converted back to plain functions
+  in their own translation unit (`lib/source/sprite_dynamic_helpers.c`).
+  `slopemario` (the historical repro) and four other examples
+  that link the dynamic sprite engine still render correctly with
+  real `jsl` calls in the codepath. Memory note
+  `cc65816_conditional_jsl_codegen_bug.md` updated to mark FIXED.
+
+- **`compiler/PINS.md` qbe SHA bumped** to pull in the C.5 fix.
+
+### Documentation
+
+- **Framework trilogy headers cross-reference each other** —
+  `<snes/scene.h>` carries an explicit "`Scene` ≡ `GameLoopConfig`"
+  paragraph, `<snes/gameloop.h>`'s "When NOT to use this" points
+  at `<snes/scene.h>` for state-machine needs, and `asset.h` drops
+  the "two flavours" section in favour of "typed value is the
+  contract".
+
+- **Stale doc references purged**: `gameloop.h`'s "future C.3 may
+  close [the indirect-call TCO] gap" speculative promise dropped,
+  the "scene_2d / scene-stack module that's planned next" forward
+  reference updated to point at the now-shipped scene module,
+  `asset.h`'s "may be added once the patterns settle" sprite-asset
+  hint replaced with "out of scope here".
+
+- **`scene.h` documents the contract edge cases** — null `update`
+  is documented as undefined (no runtime check by design), the
+  `scenePop`-from-`init` pattern pops the scene before its first
+  update, push-cascade from `init` runs all chained inits in the
+  same VBlank window, scene-swap idiom is `scenePop(); scenePush(next);`,
+  inter-scene argument passing uses globals (out of scope by
+  design).
+
+- **`docs/mainpage.md` API Reference** lists the three framework
+  headers under a new "Framework opt-ins" subsection.
+
+- **README.md and `examples/README.md` example counts refreshed**
+  from 53 / 36 to the actual 54.
+
+- **`KNOWN_LIMITATIONS.md` refreshed** — two entries promoted
+  🟠 → 🟢 (WLA-DX `.ACCU`/`.INDEX` tracking, now lint-enforced;
+  SuperFX/snes9x detection, now covered by the Mesen2-headless
+  CI phase). Two stale entries removed (TCO and A-cache through
+  `pha` — both fixed in earlier chantiers but still listed as
+  open). The "five [KNOWN_BUG] entries" intro line corrected to
+  "one" — the only remaining compiler known-bug is the cosmetic
+  `leaf_opt=1` comment marker on non-leaf frameless functions.
+
+### Internal cleanup
+
+- **`MODE_LARGE_SIZE` / `MODE_SMALL_SIZE` extracted to a shared
+  internal header (chantier P3.2)** — were duplicated identically
+  in `sprite_dynamic_dispatch.c` and `sprite_dynamic_meta.c`. Now
+  live in `lib/source/sprite_dynamic_internal.h` (and after C.7
+  was confirmed fixed, the macros became plain functions in
+  `sprite_dynamic_helpers.c`).
+
+- **`sprite_dynamic_dispatch.c` "legacy" comments → "internal"
+  (chantier P3.2)** — the ASM entry points behind `oamDynamicInit`
+  / `oamDynamicDraw` are not deprecated, they are the
+  implementation layer.
+
+### Process / build
+
+- **`.gitignore`: track `lib/source/**/*.h`** — required because
+  internal-only headers (`sprite_dynamic_internal.h`) live next to
+  their `.c` files, but the previous rule treated all `.h` outside
+  `lib/include/` as build artefacts.
+
 ## [0.15.2] - 2026-05-01
 
 First of the three "framework opt-ins" promised by `PHILOSOPHY.md`

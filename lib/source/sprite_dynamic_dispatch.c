@@ -1,10 +1,11 @@
 /**
  * @file sprite_dynamic_dispatch.c
- * @brief Modern entry points for the dynamic sprite engine
+ * @brief Public entry points for the dynamic sprite engine
  *
  * Hosts the size-aware dispatch glue (`oamDynamicDraw`,
  * `oamDynamicSetSize`) and the struct-based init wrapper
- * (`oamDynamicInit` over the legacy `oamInitDynamicSprite`).
+ * (`oamDynamicInit`, which forwards to the internal ASM entry point
+ * `oamInitDynamicSprite` defined in sprite_dynamic.asm).
  *
  * Lives in its own translation unit so `sprite.o` stays free of
  * dependencies on the dynamic engine — examples that don't use
@@ -17,11 +18,12 @@
  */
 
 #include <snes.h>
+#include "sprite_dynamic_internal.h"
 
-/* Forward declarations for the legacy ASM entry points retained as the
- * internal mechanism behind `oamDynamicInit` and `oamDynamicDraw`. They
- * are no longer in the public header (B.6); user code must use the new
- * struct-based init and the size-aware dispatcher. */
+/* Forward declarations for the internal ASM entry points behind
+ * `oamDynamicInit` and `oamDynamicDraw`. Removed from the public header
+ * in B.6; user code goes through the struct-based init and the
+ * size-aware dispatcher exposed below. */
 extern void oamInitDynamicSprite(u16 gfxsp0adr, u16 gfxsp1adr,
                                  u16 oamsp0init, u16 oamsp1init, u8 oamsize);
 extern void oamInitDynamicSpriteEndFrame(void);
@@ -49,19 +51,8 @@ extern u8 oam_dynamic_draining;
  */
 u8 oam_dynamic_size_mode;
 
-/* Macro: pixel size of the "large" half of an OBJ_SIZE_* pair.
- *
- * Implemented as a macro (not a function) to dodge a cc65816 codegen issue
- * where a JSL inside the conditional fallback path of `oamDynamicDraw`
- * produced a stale A-register read on the subsequent `cmp #16`, silently
- * skipping the dispatch. Inlining keeps everything in registers / locals.
- */
-#define MODE_LARGE_SIZE(mode) \
-    ((u8)((mode) == 0 ? 16 : \
-          (mode) == 1 ? 32 : \
-          (mode) == 2 ? 64 : \
-          (mode) == 3 ? 32 : \
-          (mode) == 4 ? 64 : 64))
+/* mode_large_size / mode_small_size come from sprite_dynamic_internal.h
+ * (defined in sprite_dynamic_helpers.c). */
 
 /**
  * Per-sprite explicit pixel size override for the dynamic engine.
@@ -128,10 +119,8 @@ void oamDynamicDraw(u16 id) {
 
     sz = oam_dyn_sprite_size[id];
     if (sz == 0) {
-        /* Fallback: large pixel size of the size pair set at init.
-         * MODE_LARGE_SIZE is a macro, not a function — see its definition for
-         * the cc65816 codegen reason. */
-        sz = MODE_LARGE_SIZE(oam_dynamic_size_mode);
+        /* Fallback: large pixel size of the size pair set at init. */
+        sz = mode_large_size(oam_dynamic_size_mode);
     }
 
     if (sz == 8) {

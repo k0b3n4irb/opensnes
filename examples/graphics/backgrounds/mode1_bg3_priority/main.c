@@ -34,27 +34,15 @@
  */
 
 #include <snes.h>
+#include <snes/asset.h>
 
-/** @name BG1 asset labels (4bpp layer, defined in data.asm via .incbin)
- * @{ */
-extern u8 bg1_tiles, bg1_tiles_end;  /**< BG1 tile graphics */
-extern u8 bg1_pal, bg1_pal_end;      /**< BG1 16-color palette (CGRAM bank 2) */
-extern u8 bg1_map, bg1_map_end;      /**< BG1 tilemap */
-/** @} */
-
-/** @name BG2 asset labels (4bpp layer, defined in data.asm via .incbin)
- * @{ */
-extern u8 bg2_tiles, bg2_tiles_end;  /**< BG2 tile graphics */
-extern u8 bg2_pal, bg2_pal_end;      /**< BG2 16-color palette (CGRAM bank 4) */
-extern u8 bg2_map, bg2_map_end;      /**< BG2 tilemap */
-/** @} */
-
-/** @name BG3 asset labels (2bpp overlay layer, defined in data.asm via .incbin)
- * @{ */
-extern u8 bg3_tiles, bg3_tiles_end;  /**< BG3 tile graphics */
-extern u8 bg3_pal, bg3_pal_end;      /**< BG3 palette (CGRAM bank 0) */
-extern u8 bg3_map, bg3_map_end;      /**< BG3 tilemap (HUD/overlay) */
-/** @} */
+/* Three full background bundles, declared via DECLARE_BG_ASSET. Each
+ * expands to extern decls for <name>_tiles / <name>_pal / <name>_map
+ * (with their _end siblings) plus a static const BgAsset value. The
+ * data symbols themselves live in data.asm. */
+DECLARE_BG_ASSET(bg1, BG_16COLORS, SC_32x32);
+DECLARE_BG_ASSET(bg2, BG_16COLORS, SC_32x32);
+DECLARE_BG_ASSET(bg3, BG_16COLORS, SC_32x32);
 
 /**
  * @brief Entry point -- load 3 BG layers and display with BG3 high priority
@@ -67,42 +55,24 @@ extern u8 bg3_map, bg3_map_end;      /**< BG3 tilemap (HUD/overlay) */
  * behind the other layers (lowest priority by default in Mode 1).
  *
  * Each layer loads into its own VRAM region and uses a separate CGRAM
- * palette bank (controlled by the palette offset parameter in
- * bgInitTileSet()). The palette offset is in units of 16 colors: offset 2
- * means CGRAM colors 32-47 (BG1), offset 4 means colors 64-79 (BG2),
- * and offset 0 means colors 0-15 (BG3).
+ * palette bank. The palette_slot argument to bgLoad is in units of 16
+ * colors: slot 2 means CGRAM colors 32-47 (BG1), slot 4 means colors
+ * 64-79 (BG2), and slot 0 means colors 0-15 (BG3).
  *
  * @return Never returns (infinite loop).
  */
 int main(void) {
     consoleInit();
-
-    /* Set tilemap locations */
-    bgSetMapPtr(0, 0x0000, SC_32x32);
-    bgSetMapPtr(1, 0x0400, SC_32x32);
-    bgSetMapPtr(2, 0x0800, SC_32x32);
-
-    /* Load tile data and palettes */
-    bgInitTileSet(0, &bg1_tiles, &bg1_pal, 2,
-                  &bg1_tiles_end - &bg1_tiles,
-                  &bg1_pal_end - &bg1_pal,
-                  BG_16COLORS, 0x2000);
-
-    bgInitTileSet(1, &bg2_tiles, &bg2_pal, 4,
-                  &bg2_tiles_end - &bg2_tiles,
-                  &bg2_pal_end - &bg2_pal,
-                  BG_16COLORS, 0x3000);
-
-    bgInitTileSet(2, &bg3_tiles, &bg3_pal, 0,
-                  &bg3_tiles_end - &bg3_tiles,
-                  &bg3_pal_end - &bg3_pal,
-                  BG_16COLORS, 0x4000);
-
-    /* Copy tilemaps to VRAM during VBlank */
     WaitForVBlank();
-    dmaCopyVram(&bg1_map, 0x0000, &bg1_map_end - &bg1_map);
-    dmaCopyVram(&bg2_map, 0x0400, &bg2_map_end - &bg2_map);
-    dmaCopyVram(&bg3_map, 0x0800, &bg3_map_end - &bg3_map);
+
+    /* BG1: tiles at $2000, map at $0000, palette slot 2 */
+    bgLoad(0, &bg1, 2, 0x2000, 0x0000);
+
+    /* BG2: tiles at $3000, map at $0400, palette slot 4 */
+    bgLoad(1, &bg2, 4, 0x3000, 0x0400);
+
+    /* BG3: tiles at $4000, map at $0800, palette slot 0 (HUD overlay) */
+    bgLoad(2, &bg3, 0, 0x4000, 0x0800);
 
     /* Mode 1 with BG3 high priority — BG3 renders on top of BG1+BG2 */
     setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);

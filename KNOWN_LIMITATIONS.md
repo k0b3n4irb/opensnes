@@ -113,16 +113,21 @@ typically crash with a backend assertion or generate broken code.
 `oam_update_flag`). If you absolutely need MMIO semantics, use a small ASM
 helper.
 
-### 🟠 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges
+### 🟢 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges (lint-enforced)
 WLA-DX tracks the current accumulator/index register width across `rep`/`sep`
 instructions, but merging branches resets that tracking. The next instruction
 gets assembled at the wrong width — for example a `cpx #imm` becomes 2 bytes
 instead of 3, and every subsequent address is off by one.
 
-**Mitigation:** add an explicit `.ACCU 8`/`.ACCU 16` and `.INDEX 8`/`.INDEX 16`
-after every `rep`/`sep` and at every block boundary in hand-written ASM. The
-SDK's templates and library `.asm` files follow this rule. If you write your
-own ASM, audit for missing markers when you see misaligned-instruction bugs.
+**Mitigation (active since v0.15.1):** `devtools/lint_asm.py` enforces an
+explicit `.ACCU 8`/`.ACCU 16` and `.INDEX 8`/`.INDEX 16` after every
+`rep`/`sep` and at every block boundary in hand-written ASM. The lint runs
+in CI (`asm-markers` job in `.github/workflows/lint.yml`) and as part of the
+Makefile pipeline. The SDK's templates and library `.asm` files all carry the
+required markers (490 of them, added by the lint's `--fix` mode). If you
+write your own ASM and CI starts flagging your file, run
+`python devtools/lint_asm.py --fix path/to/your.asm` and inspect the diff
+before committing.
 
 ---
 
@@ -138,21 +143,29 @@ behaves differently, the init silently fails and the chip is half-configured.
 way, exercise it on real hardware before shipping. We track this in
 `memory/enhancement_chips_research.md`.
 
-### 🟠 SuperFX: snes9x does not detect the GSU chip in our ROM headers
-The opensnes-emu CI test harness runs ROMs through snes9x's libretro core.
-For SuperFX examples, snes9x's chip-detection logic does not pick up the
-GSU from our ROM header configuration — the example boot path renders
-"GSU: NOT DETECTED" and the actual GSU code never runs. Visual baselines
-of those screenshots happily compare equal frame-to-frame, but the CI
-proves only "boots in snes9x", not "runs SuperFX correctly".
+### 🟢 SuperFX: snes9x does not detect the GSU chip — Mesen2-headless covers it in CI
+The opensnes-emu CI test harness runs ROMs through snes9x's libretro core
+in the main `Visual Regression` phase. For SuperFX examples, snes9x's
+chip-detection logic does not pick up the GSU from our ROM header
+configuration — the example boot path renders "GSU: NOT DETECTED" and
+the actual GSU code never runs. Visual baselines of those screenshots
+happily compare equal frame-to-frame, but the snes9x phase proves only
+"boots in snes9x", not "runs SuperFX correctly".
 
-**Mitigation:** validate SuperFX examples in **Mesen2**, which detects
-the GSU correctly and runs all current SuperFX examples without issue.
-P3.4 in `ROADMAP.md` tracks adding a Mesen2-headless CI path so SuperFX
-ROMs get the same end-to-end coverage as vanilla LoROM examples. (An
-earlier version of this entry blamed Mesen2 for a "backward-branch bug";
-re-validation showed the original observation conflated a snes9x mis-run
-with a Mesen2 bug. Reference behaviour was Mesen2's all along.)
+**Mitigation (active since P3.4):** the test suite ships a separate
+`Mesen2 Visual Regression` phase
+(`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) that runs the
+vendored Mesen2 binary in `--testrunner` mode against the chip-using
+examples (currently 4 SuperFX/SA-1 ROMs). Mesen2 detects the GSU
+correctly and is the reference emulator for SuperFX. The phase is
+gated by the presence of the Mesen2 binary
+(`scripts/install-mesen2.sh` fetches it once per CI run, cached
+locally), so it is a no-op on contributor machines that haven't
+installed Mesen2 yet but mandatory in CI. Both phases together give
+SuperFX ROMs end-to-end coverage. (An earlier version of this entry
+blamed Mesen2 for a "backward-branch bug"; re-validation showed the
+original observation conflated a snes9x mis-run with a Mesen2 bug.
+Reference behaviour was Mesen2's all along.)
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be
@@ -178,26 +191,23 @@ against the file and fail on drift.
 
 ## Compiler optimisation gaps
 
-These are **planned but not yet implemented** in cc65816. The five `[KNOWN_BUG]`
-entries in the test suite (`--allow-known-bugs`) correspond to these:
-
-### 🟡 Tail call optimisation (TCO) not wired
-QBE upstream supports `jml` instead of `jsl + plx + plx + rtl` for pure
-pass-through wrappers, but the OpenSNES backend doesn't emit it. Wrapper
-functions pay the full call+return overhead. Fixes 3 compiler tests when
-implemented (`tail_call`, `lazy_rep20`, `plx_cleanup`).
-
-### 🟡 A-cache through `pha` not implemented
-The A-register cache (Phase 1) invalidates on every call. Pushing the same
-local through `pha` for two consecutive calls reloads it from the stack each
-time. A single A-cache extension across pure pushes would skip the second
-load. Fixes 1 compiler test.
+One known gap remains in cc65816 today (the lone `[KNOWN_BUG]` entry surfaced
+by `--allow-known-bugs` in the test suite). Earlier entries that lived here —
+tail call optimisation and A-cache-through-`pha` — have shipped (chantiers
+C.1 / C.2.1 / C.2.2 wired TCO; C.6's audit confirmed A-cache through `pha`
+already worked, the test had been stale).
 
 ### 🟡 Stale `leaf_opt=1` marker for non-leaf functions
 Phase 5b removed the `leaf_opt` gate so the optimisations apply to non-leaf
 functions too, but the comment marker in the generated ASM still says
 `leaf_opt=0` even when the optimisation is active. Cosmetic — the optimisation
-fires, just the diagnostic comment is wrong. Fixes 1 compiler test.
+fires, only the diagnostic comment is wrong. Surfaces as a single `[KNOWN_BUG]`
+in the compiler test phase (`nonleaf_frameless`).
+
+**Mitigation:** none needed for codegen correctness. If you read the comment
+markers to verify optimisation state, fall back to inspecting the actual ASM
+shape (a non-leaf frameless function has no `sec`/`sbc.w` prologue and no
+`adc.w`/`tas` epilogue, with arguments accessed via `4,s`/`6,s` directly).
 
 ---
 

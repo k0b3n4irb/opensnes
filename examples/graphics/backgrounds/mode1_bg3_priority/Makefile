@@ -7,7 +7,7 @@ TARGET     := mode1_bg3_priority.sfc
 ROM_NAME   := MODE1 BG3 PRIORITY
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background
+LIB_MODULES := console sprite dma background asset
 
 CSRC       := main.c
 ASMSRC     := data.asm

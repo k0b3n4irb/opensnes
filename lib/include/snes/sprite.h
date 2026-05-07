@@ -545,21 +545,6 @@ u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,
                    u8 flipX, u8 flipY, u8 width, u8 height);
 
-/**
- * @brief Draw a metasprite (legacy simple interface)
- *
- * Simplified interface for basic metasprite drawing.
- *
- * @param startId First sprite ID to use
- * @param x X position
- * @param y Y position
- * @param data Metasprite data (cast to const u8*)
- * @param palette Palette to use
- *
- * @return Number of hardware sprites used
- */
-u8 oamDrawMetasprite(u8 startId, u16 x, u8 y, const u8 *data, u8 palette);
-
 /*============================================================================
  * Dynamic Sprite Engine
  *============================================================================*/

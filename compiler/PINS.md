@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 3618c72d6eb209fe2342054c61fafa38933314f8 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 744bcdf31de7c0de9ae9fd4d1ec5b92a3f34abba | github.com/k0b3n4irb/qbe:main |
+| compiler/qbe | 5fe27f06dab529f702c418366b1f0a8b9227de1b | github.com/k0b3n4irb/qbe:main |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
