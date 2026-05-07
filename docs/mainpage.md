@@ -66,6 +66,12 @@ See the @ref example_sources "Example Source Code" page for all 54 examples orga
 - @ref snesmod.h "SNESMOD Audio"
 - @ref registers.h "Hardware Registers"
 
+### Framework opt-ins
+
+- @ref gameloop.h "Game loop framework (gameloop.h)"
+- @ref scene.h "Scene stack (scene.h)"
+- @ref asset.h "Asset bundle convention (asset.h)"
+
 ## Contributing
 
 @subpage code_style -- Code style conventions
