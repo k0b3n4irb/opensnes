@@ -115,3 +115,5 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `nmi_audit.md` — NMI handler rules, must consult before crt0.asm changes
 - `regression_method.md` — Mandatory bisection-based debugging, never guess
 - `release.md` — Release workflow, CHANGELOG format, version tagging
+- `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
+- `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.

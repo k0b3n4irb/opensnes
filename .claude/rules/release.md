@@ -30,11 +30,22 @@ main     ──────────●─●  (fast-forward; tag is the seco
 
 ## Pre-Release Checklist
 
-1. **Full rebuild**: `make clean && make` — zero warnings
+1. **Full rebuild**: `make clean && make` — zero C-side warnings; bank $00
+   nearly-full warnings tolerated only above `BANK0_FAIL_THRESHOLD` (see
+   `.claude/rules/bank0_budget.md`).
 2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs --allow-known-bugs` — all checks pass
 3. **Mesen2 validation**: test key examples manually (at minimum: hello_world, one sprite example, one audio example)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release
-5. **`compiler/PINS.md` matches `compiler/{cproc,qbe,wla-dx}` HEADs**: `make verify-toolchain` exits 0
+5. **Version macros bumped**: `lib/include/snes.h:30-40`
+   (`OPENSNES_VERSION_{MAJOR,MINOR,PATCH,STRING}`) updated to match the
+   new `## [X.Y.Z]` heading. **In the same commit as the CHANGELOG bump.**
+6. **`ROADMAP.md` "Current Status: post-vX.Y.Z" line bumped** to match
+   the new release.
+7. **`make lint-docs` exits 0** — version macros + ROADMAP status line +
+   examples count consistency. See `.claude/rules/doc_consistency.md`
+   for the full policy.
+8. **`compiler/PINS.md` matches `compiler/{cproc,qbe,wla-dx}` HEADs**: `make verify-toolchain` exits 0
+9. **`make lint` exits 0** — runs the aggregate lint (docs + ASM markers + commits).
 
 ## CHANGELOG Format
 

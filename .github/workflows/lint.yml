@@ -68,3 +68,20 @@ jobs:
         # `cpx #0` shipping as 2 bytes instead of 3, cascading
         # misalignment through the rest of the section.
         run: python3 devtools/lint_asm.py
+
+  doc-drift:
+    name: Doc drift (check_doc_drift.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Run check_doc_drift.py
+        # Anchored claims that drift behind code: version macros in
+        # lib/include/snes.h, ROADMAP "Current Status: post-vX.Y.Z" line,
+        # and "<N> examples" counts in active rule files. Caught
+        # historically as v0.1.0-dev macro stuck while the project shipped
+        # v0.16.0; "post-v0.13.0" ROADMAP three minors behind; and "53
+        # examples" sticking after v0.16.0 added the 54th. Fix policy lives
+        # in .claude/rules/doc_consistency.md.
+        run: python3 devtools/check_doc_drift.py
