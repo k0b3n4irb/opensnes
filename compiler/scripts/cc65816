@@ -76,8 +76,13 @@ TMPFILE=$(mktemp -t cc65816.XXXXXX) || TMPFILE=$(mktemp)
 IRFILE=$(mktemp -t cc65816_ir.XXXXXX) || IRFILE=$(mktemp)
 trap 'rm -f "$TMPFILE" "$IRFILE"' EXIT
 
-# Stage 1: Preprocess with system cc
-cc -E "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
+# Stage 1: Preprocess with system cc.
+# `-D__OPENSNES__=1` lets headers detect that they're being preprocessed
+# for the cc65816 target (vs the `clang -fsyntax-only` host lint pass
+# in make/common.mk, which compiles the same source with host int/long
+# sizes). lib/include/snes/types.h uses this to keep `sizeof(s32) == 4`
+# on both code paths despite cc65816 having long=4 and host having long=8.
+cc -E -D__OPENSNES__=1 "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
 
 # Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
 # Using a pipe hides cproc crashes: QBE receives truncated IR and reports

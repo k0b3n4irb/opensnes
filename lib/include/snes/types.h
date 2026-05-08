@@ -54,19 +54,40 @@ typedef unsigned short u16;
 /**
  * @brief 32-bit signed integer (-2147483648 to 2147483647)
  *
- * Uses `long` (4 bytes on cc65816 since chantier A1, 2026-05-08). Pre-A1
- * this was `int` because cproc treated `int` as 32-bit; with A1 aligning
- * `int` to 2 bytes (the native w65816 word size), the canonical 32-bit
- * type moves to `long`.
+ * Conditionally typedef'd to maintain `sizeof(s32) == 4` on the two
+ * compilers that touch this header:
+ * - **cc65816** (cproc + QBE w65816 — the actual SDK compiler): `long`
+ *   is 4 bytes since chantier A1 (2026-05-08). Pre-A1 used `int` for
+ *   the 32-bit type because cproc treated `int` as 32-bit; A1 made
+ *   `int` 2 bytes, so the canonical 32-bit type moves to `long`. The
+ *   `bin/cc65816` wrapper passes `-D__OPENSNES__=1` to its preprocessor
+ *   so this branch fires.
+ * - **Host clang** (the `-fsyntax-only` parallel lint pass in
+ *   `make/common.mk`): on x86_64 / arm64, `int` is 4 bytes and
+ *   `long` is 8. To keep `sizeof(s32) == 4` on the lint side, we
+ *   fall back to `int` here (the `#else` branch). The lint does
+ *   NOT receive `-D__OPENSNES__`.
+ *
+ * The underlying typedef differs per compiler, but `sizeof(s32) == 4`
+ * holds in both — which is the property the SDK's static asserts and
+ * data layout rely on.
  */
+#ifdef __OPENSNES__
 typedef signed long s32;
+#else
+typedef signed int s32;
+#endif
 
 /**
  * @brief 32-bit unsigned integer (0 to 4294967295)
  *
- * Uses `long` (4 bytes on cc65816 since chantier A1, 2026-05-08).
+ * See @ref s32 for the cc65816-vs-host-lint conditional rationale.
  */
+#ifdef __OPENSNES__
 typedef unsigned long u32;
+#else
+typedef unsigned int u32;
+#endif
 
 /** @} */ /* end of types group */
 
@@ -154,8 +175,13 @@ typedef unsigned char bool;
  * @code
  * u16 flags = BIT(0) | BIT(3);  // 0x0009
  * @endcode
+ *
+ * Uses `1u` (unsigned) so that `BIT(15) == 0x8000` holds under
+ * cc65816's 16-bit `int` (since chantier A1, 2026-05-08). With
+ * signed `1`, `1 << 15` overflows to -32768 on a 16-bit int and
+ * compares unequal to the (long-promoted) `0x8000` literal.
  */
-#define BIT(n) (1 << (n))
+#define BIT(n) (1u << (n))
 
 /**
  * @brief Get low byte of 16-bit value
