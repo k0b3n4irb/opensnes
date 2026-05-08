@@ -116,9 +116,10 @@
 #define HDMA_CHANNEL_4  4
 /** @brief HDMA channel 5 */
 #define HDMA_CHANNEL_5  5
-/** @brief HDMA channel 6 (recommended for HDMA) */
+/** @brief HDMA channel 6 (recommended for HDMA — never used by the runtime) */
 #define HDMA_CHANNEL_6  6
-/** @brief HDMA channel 7 (recommended for HDMA) */
+/** @brief HDMA channel 7 — **reserved for the OAM DMA**, do not use for HDMA
+ *  (see the @warning at the top of this header) */
 #define HDMA_CHANNEL_7  7
 
 /*============================================================================
