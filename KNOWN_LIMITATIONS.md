@@ -236,6 +236,36 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+## Performance traps
+
+### 🟡 `oamSet()` has framesize=158 — visible jitter past ~3 calls per frame
+The QBE backend allocates 158 bytes of SSA temporary storage for every
+`oamSet(id, x, y, attr, size, tile)` invocation, manipulated on the stack at
+each call site. On a 3.58 MHz CPU that overhead is visible: more than ~3
+`oamSet()` calls per frame in the main loop produces jerky movement on real
+hardware (and shows up as lag-frame spikes in the test suite). The function
+itself is correct — the cost lives in the calling convention, not in the OAM
+write.
+
+**Mitigation:** for any sprite that updates every frame, write directly to
+the `oamMemory[]` shadow buffer and let the NMI handler DMA it to OAM. The
+SDK ships two ergonomic helpers:
+
+- `oamSetFast(id, x, y, attr, size, tile)` — drop-in macro replacement for
+  `oamSet()` that compiles to direct memory writes (see
+  `lib/include/snes/sprite.h`'s "Fast Macro Sprite API" section).
+- `oamSetXYFast(id, x, y)` — position-only update, the most common
+  per-frame case.
+
+Both are documented in `sprite.h` next to the function form. Use the
+function `oamSet()` for one-shot setup at scene init (where the 158-byte
+frame is paid once and clarity wins); use the macros for the per-frame
+update path. The breakout, collision_demo, animated_sprite, mouse, and
+superscope examples all switched to direct `oamMemory[]` writes for this
+reason — see their READMEs for worked examples.
+
+---
+
 ## Where to add new entries
 
 When you discover a new silent failure or hard-to-debug constraint:
