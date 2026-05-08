@@ -250,11 +250,17 @@ void renderInit(void) {
         }
         *p = 0;  /* HDMA terminator */
 
-        /* Set up HDMA channel 7 registers (enable deferred to after setScreenOn) */
-        *(u8 *)0x4370 = 0x03;                          /* Mode 3: AABB → reg,reg,reg+1,reg+1 */
-        *(u8 *)0x4371 = 0x21;                          /* B-bus: $2121 (CGADD) */
-        *(u16 *)0x4372 = (u16)(u32)hdma_grad_tbl;      /* Table addr low+high */
-        *(u8 *)0x4374 = 0x00;                          /* Bank 0 (RAM) */
+        /* Set up HDMA channel 6 registers (enable deferred to after setScreenOn).
+         *
+         * Channel 7 is reserved by the OpenSNES NMI handler for the OAM DMA
+         * (see lib/include/snes/hdma.h:61 "Do NOT use HDMA_CHANNEL_7"). Using
+         * it here was a latent bug masked by the runtime's per-frame channel-7
+         * re-programming — exposed when WaitForVBlank stopped setting
+         * oam_update_flag unconditionally. */
+        *(u8 *)0x4360 = 0x03;                          /* Mode 3: AABB → reg,reg,reg+1,reg+1 */
+        *(u8 *)0x4361 = 0x21;                          /* B-bus: $2121 (CGADD) */
+        *(u16 *)0x4362 = (u16)(u32)hdma_grad_tbl;      /* Table addr low+high */
+        *(u8 *)0x4364 = 0x00;                          /* Bank 0 (RAM) */
     }
 
     /* Mark all visible rows dirty for initial force-blank flush */
@@ -361,7 +367,7 @@ static u16 msg_color;
 static u8 msg_color_dirty;
 
 void renderEnableGradient(void) {
-    *(u8 *)0x420C = 0x80;  /* Enable HDMA channel 7 */
+    *(u8 *)0x420C = 0x40;  /* Enable HDMA channel 6 (channel 7 reserved for OAM DMA) */
 }
 
 void renderSetMsgColor(u16 color) {
