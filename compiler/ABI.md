@@ -305,13 +305,16 @@ For the assembly source, see `lib/source/sprite_oamset.asm`.
 | C type | Size (bytes) | Notes |
 |--------|:------------:|-------|
 | `u8` / `s8` / `bool` / `_Bool` | 1 (storage), 2 (stack slot) | Always zero/sign-extended when passed as argument. |
-| `u16` / `s16` / pointer | 2 | Native word size. |
-| `int` / `unsigned int` | **4** | Surprising on a 16-bit target. Use `s16`/`u16` instead. |
-| `long` / `unsigned long` | **8** | Almost certainly not what you want. Avoid. |
-| `u32` / `s32` | 4 | Stack-passed and stack-returned. |
+| `u16` / `s16` / `int` / `unsigned int` | 2 | Native word size on the w65816 target. (Aligned with SNES expectations since chantier A1, 2026-05-08.) |
+| `u32` / `s32` / `long` / `unsigned long` | 4 | Stack-passed and stack-returned. |
+| `long long` / `unsigned long long` | 8 | C99 requires ≥ 64-bit. |
+| pointer | 8 in IR, 2 on stack | Pointer storage in `static const` structs is 8 bytes (cproc IR holdover; chantier A6 will reduce to 4). On the runtime stack, parameters take 2 bytes per slot per the w65816 ABI. Function pointers preserve the bank byte via the 8-byte storage layout — reducing it requires a coordinated emit-pass change (A6). |
 | `float` / `double` | 4 / 8 | Software floats — extremely slow, used only by `printf`-style helpers. Avoid in game code. |
 
-For all SDK code, use `u8`, `u16`, `s16`, `u32` from `lib/include/snes/types.h`.
+For SDK code, prefer the explicit fixed-width types `u8`, `u16`, `s16`,
+`u32` from `lib/include/snes/types.h` for **portability** (cross-compiler
+clarity). Bare `int` is now correct on this target since chantier A1
+shipped (2026-05-08).
 
 ---
 

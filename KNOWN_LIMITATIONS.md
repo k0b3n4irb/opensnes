@@ -213,15 +213,38 @@ shape (a non-leaf frameless function has no `sec`/`sbc.w` prologue and no
 
 ## Type & ABI gotchas
 
-### 🟡 `int` is 32 bits, `long` is 64 bits on cc65816
-Counter-intuitive on a 16-bit CPU. cproc was originally a host-target compiler
-and `sizeof(int)` in the IR is 4. Code that expects 16-bit `int` (e.g. ports
-from PVSnesLib's tcc816 which uses 16-bit `int`) will silently produce 32-bit
-arithmetic and double the work.
+### 🟢 `int` and `long` type sizes match the w65816 target (since chantier A1)
+`sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
+`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
+canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 
-**Mitigation:** always use the SDK's fixed-width types: `u8`, `u16`, `s16`,
-`u32`. Never use bare `int`/`long`/`short` in performance-sensitive code.
-The SDK's `lib/include/snes/types.h` provides the canonical typedefs.
+Historical note: pre-A1, `int` was 4 bytes and `long` was 8 (cproc was inherited
+as a host-target compiler with `sizeof(int) = 4` hardcoded). Code that expected
+16-bit `int` would silently produce 32-bit arithmetic and double the work.
+That trap is gone — bare `int` is now correct on this target.
+
+`u8` / `u16` / `s16` / `u32` from `lib/include/snes/types.h` remain the
+preferred types for **portability** (they make the code intent explicit and
+work identically across compilers), but using bare `int` no longer doubles
+your cycle cost.
+
+### 🟡 Pointer IR size is still 8 bytes (chantier A6 — pending)
+The companion fix for pointer types was deliberately deferred into its own
+chantier (A6) because reducing pointer storage cascades through QBE w65816's
+indirect-call emit pass: the bank byte for `jml [tcc__r9]` is hardcoded as
+`lda #$00` instead of read from the pointer's actual storage. Until A6 lands,
+function pointers are stored as 8 bytes (low + high + 4 bytes padding) and
+indirect calls assume bank `$00` — which works because the SDK's framework
+opt-ins (`scene`, `gameloop`) happen to dispatch to functions in bank `$00`
+via the lib's SUPERFREE'd code that lands there.
+
+**Mitigation (today):** function pointers continue to work as before. No user
+code change needed.
+
+**A6 plan:** pointer IR size 8 → 4 (24-bit address + 1 byte alignment),
+indirect-call emit reads bank byte from pointer storage, lib API can drop
+the `*Bank` variant pattern entirely. Tracked in the structural-defects
+catalogue.
 
 ### 🟡 Sprite palettes start at CGRAM offset 128, not 0
 Standard SNES quirk that surprises everyone once. The first 128 colours of

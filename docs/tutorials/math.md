@@ -266,23 +266,20 @@ table byte.
 
 ## Gotchas
 
-### 🔴 `int` is 32 bits, `long` is 64 bits on cc65816
+### 🟢 `int` and `long` sizes are correct on this target (since chantier A1)
 
-The biggest landmine in the lib's type story. Per
-`KNOWN_LIMITATIONS.md`:
+`sizeof(int) == 2`, `sizeof(long) == 4`. Bare `int` is the native 16-bit
+word; `long` is 32 bits. C convention says `int` is the natural word size
+of the machine, and on the w65816 that's now true.
 
-> Counter-intuitive on a 16-bit CPU. cproc was originally a host-target
-> compiler and `sizeof(int)` in the IR is 4. Code that expects 16-bit
-> `int` (e.g., ports from PVSnesLib's tcc816) will silently produce
-> 32-bit arithmetic and double the work.
+For **portability** across compilers (cross-platform tooling, code shared
+with PC-side helpers), keep using `s16`, `u16`, `s32`, `u32`, `fixed` from
+`lib/include/snes/types.h` — they make intent explicit and work
+identically everywhere. Bare `int speed = 5;` no longer doubles your
+cycle cost on cc65816, but a build of the same code with a different
+compiler may behave differently.
 
-Translation for math code: **always use `s16`, `u16`, `s32`, `u32`,
-`fixed`** — never bare `int` or `long`. A `int speed = 5;` works but
-the compiler emits 32-bit arithmetic for every operation involving
-`speed`, doubling the cycle cost.
-
-The `fixed` type is `s16` so it gets the right behaviour
-automatically.
+The `fixed` type is still `s16`. No change for fixed-point users.
 
 ### 🔴 `FIX(x)` overflows for `|x| ≥ 128`
 
@@ -397,4 +394,4 @@ binding.
   module uses integer math, but advanced collision (circle, swept,
   ray-cast) goes through fixed-point.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — covers the
-  `int = 32 bits` trap that bites every newcomer to cc65816.
+  historical `int = 32 bits` trap (closed by chantier A1 on 2026-05-08).

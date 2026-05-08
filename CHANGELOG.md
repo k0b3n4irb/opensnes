@@ -7,6 +7,36 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+### Compiler
+
+- **`int` is now 16 bits, `long` is now 32 bits on cc65816 (chantier A1).**
+  cproc's IR was inherited as a host-target compiler with
+  `sizeof(int) = 4` and `sizeof(long) = 8` hardcoded — wrong for a
+  16-bit CPU. The QBE w65816 backend already treated these classes
+  as 16/32-bit at emit time (per the `d929b94` patch's class `'l'`
+  reinterpretation), so cproc's IR sizes were inconsistent with
+  reality. Aligned in `compiler/cproc/type.c` (4 lines, 7 cproc patches
+  total now). Bare `int counter` no longer silently produces 32-bit
+  arithmetic — a documented `KNOWN_LIMITATIONS` 🟡 closes to 🟢. The
+  benchmark suite shows `loop_sum` improved by 5 cycles per iteration
+  (the only function in the suite using bare `int`); other functions
+  are unchanged because the SDK convention is `u16` everywhere.
+  Pointer size deliberately stays at 8 — its companion fix is the
+  separate chantier A6 (pointer ABI + bank-byte preservation) tracked
+  in the structural-defects catalogue. `compiler/PINS.md` now lists 7
+  cproc patches; submodule bumped to `7f26c16`.
+
+### Tests
+
+- **Visual baselines for `basics/random` and `superfx_3d` regenerated** —
+  both already documented as timing-fragile in `BASELINES.md`. The
+  cproc compiler change shifts emitted instructions slightly, which
+  cascades to a different RNG seed at frame 120 (random) and a
+  slightly different rotation angle (superfx_3d). Pixel comparison
+  catches any rendering-pipeline regression as before; the new
+  baselines pass byte-by-byte under the rebuilt parent. Submodule
+  `tools/opensnes-emu` bumped to `c440825`.
+
 ### Performance
 
 - **`WaitForVBlank` no longer sets `oam_update_flag` unconditionally** —
