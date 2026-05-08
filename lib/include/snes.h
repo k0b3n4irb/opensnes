@@ -1,8 +1,24 @@
 /**
  * @file snes.h
- * @brief OpenSNES Master Header
+ * @brief OpenSNES common-case master header
  *
- * Include this file to access all OpenSNES functionality.
+ * Pulls every module a typical project needs (console, video, sprite,
+ * background, input, dma, text, interrupt, system, mode7, hdma, window,
+ * colormath, mosaic, map, debug). **Specialty modules are opt-in** —
+ * include them separately when your project actually uses them, to keep
+ * compile times down and the dependency graph honest:
+ *
+ * - `<snes/audio.h>` — SPC700 audio driver
+ * - `<snes/math.h>` — fixed-point math, LUTs
+ * - `<snes/sram.h>` — battery-backed save RAM
+ * - `<snes/collision.h>` — bounding-box collision
+ * - `<snes/lzss.h>` — LZSS decompression to VRAM
+ * - `<snes/gameloop.h>` — gameloop framework opt-in
+ * - `<snes/asset.h>` — typed background / tileset bundles
+ * - `<snes/scene.h>` — push/pop scene stack
+ *
+ * The Doxygen list at the bottom of this header repeats the same split
+ * for IDE / cross-reference tooling.
  *
  * @code
  * #include <snes.h>
@@ -104,16 +120,22 @@
 #include <snes/debug.h>
 
 /*============================================================================
- * Optional Headers (include separately if needed)
- *============================================================================*/
-
-/* Audio: #include <snes/audio.h> */
-/* Math: #include <snes/math.h> */
-/* SRAM: #include <snes/sram.h> */
-/* Collision: #include <snes/collision.h> */
-/* LZSS: #include <snes/lzss.h> */
-/* Game loop framework: #include <snes/gameloop.h> */
-/* Asset bundle convention: #include <snes/asset.h> */
-/* Scene stack framework: #include <snes/scene.h> */
+ * Specialty modules — include separately, opt-in only
+ *============================================================================
+ *
+ * These modules carry real linker / dependency cost when included, so the
+ * master header keeps them out by default. Include the ones your project
+ * actually uses, and add the matching name to LIB_MODULES in your example
+ * Makefile (the transitive resolver in make/common.mk pulls deps for you).
+ *
+ *   #include <snes/audio.h>     // SPC700 audio driver
+ *   #include <snes/math.h>      // fixed-point math, LUTs, hardware multiplier
+ *   #include <snes/sram.h>      // battery-backed save RAM
+ *   #include <snes/collision.h> // bounding-box collision
+ *   #include <snes/lzss.h>      // LZSS decompression to VRAM
+ *   #include <snes/gameloop.h>  // gameloop framework opt-in
+ *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
+ *   #include <snes/scene.h>     // push/pop scene stack
+ */
 
 #endif /* OPENSNES_H */
