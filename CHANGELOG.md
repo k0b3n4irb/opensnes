@@ -7,6 +7,44 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+### Performance
+
+- **`WaitForVBlank` no longer sets `oam_update_flag` unconditionally** —
+  the runtime's NMI handler already conditionally skips the OAM DMA
+  when the flag is clear, but `WaitForVBlank` was setting the flag on
+  every call, defeating the optimisation. Sprite-idle ROMs (text-only
+  games, paused screens, splash frames) now save ~4.3 K cycles per
+  frame (the cost of the unnecessary 544-byte OAM DMA). The contract
+  is now: **callers that mutate `oamMemory[]` directly must set
+  `oam_update_flag = 1` themselves.** Every OAM-mutating function in
+  `lib/source/sprite.c` and the `oamSetFast` / `oamSetXYFast` macros
+  in `lib/include/snes/sprite.h` already set it; the documented
+  user pattern (per `KNOWN_LIMITATIONS.md` "Performance traps") is
+  unchanged. See `templates/crt0.asm:1184+` for the updated function
+  comment naming the new contract explicitly.
+
+### Fixed
+
+- **`examples/games/tetris` HDMA gradient migrated from channel 7 to
+  channel 6** — the example was writing directly to `$4370`-`$4374`,
+  reusing the channel reserved by the NMI's OAM DMA path. The conflict
+  was masked at runtime by `WaitForVBlank`'s unconditional flag set
+  re-programming channel 7 every frame; with the perf change above
+  removing that unconditional set, the latent contract violation is
+  exposed. Migrated to channel 6, which the lib does not reserve.
+
+### Tests
+
+- **Visual baselines for `basics/random`, `games/tetris`, and
+  `graphics/effects/superfx_3d` regenerated** — all three are
+  documented timing-fragile examples (RNG seeded by `frame_count`,
+  gameplay-driven state, continuously-animated rotating cube), and
+  the one-cycle shift in `WaitForVBlank` produces small frame-120
+  visual deltas that exceed the 50-px tolerance. Pixel comparison
+  catches any rendering-pipeline regression as before; the new
+  baselines pass the rebuilt suite cleanly. Submodule
+  `tools/opensnes-emu` bumped to `13415ec`.
+
 ## [0.16.0] - 2026-05-07
 
 Framework trilogy completed. The two remaining "framework opt-ins"

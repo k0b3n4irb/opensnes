@@ -1192,6 +1192,15 @@ DefaultDynamicFlush:
 ; NMI skips all work and increments lag_frame_counter. No silent VRAM
 ; corruption — lag is visible and debuggable.
 ;
+; OAM contract — does NOT set oam_update_flag. The flag is the gate for the
+; NMI handler's OAM DMA: only callers that mutated oamMemory[] this frame
+; should set it (saves ~4.3 K cycles per frame on sprite-idle ROMs and
+; eliminates a cold-boot garbage-DMA flicker on real hardware). Every
+; OAM-mutating function in `lib/source/sprite.c` and the
+; `oamSetFast` / `oamSetXYFast` macros set it themselves;
+; user code writing oamMemory[] directly must do the same. See
+; `KNOWN_LIMITATIONS.md` (Performance traps) for the canonical pattern.
+;
 ; KEEP: X, Y (documented in interrupt.h, used by video.asm)
 ;------------------------------------------------------------------------------
 WaitForVBlank:
@@ -1199,7 +1208,6 @@ WaitForVBlank:
     sep #$20
     .ACCU 8
     lda #$01
-    sta.l oam_update_flag   ; Request OAM transfer
     sta.l vblank_flag       ; Signal: "main thread ready"
 -   wai                     ; Halt until NMI
     lda.l vblank_flag
