@@ -126,3 +126,30 @@ PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
   because the overhead reduction is multiplied by iteration count
 - PVSnesLib's 816-opt is designed for tcc816's output patterns; a different C compiler
   might benefit differently from its peephole rules
+
+## CI gate (soft, comment-only)
+
+Every pull request to `main` or `develop` runs `.github/workflows/benchmark.yml`,
+which:
+
+1. Builds `cc65816` at the PR HEAD and runs `bench_functions.c` through it.
+2. Builds `cc65816` at the PR base ref and runs the same benchmark.
+3. Compares the two assembly outputs via
+   `devtools/cyclecount/cyclecount.py --compare`.
+4. Posts (or updates, idempotently) a comment on the PR with the per-function
+   delta and total.
+
+**Soft means soft.** The job never fails — a regression on the benchmark
+surface is a *signal* for review, not a *gate* on merge. The comment is
+the deliverable. The reviewer decides whether the regression is justified
+(a correctness fix that costs cycles, a refactor that simplifies code, …)
+or unintended (a missed optimisation pass, a stale assumption).
+
+The benchmark surface is narrow: 34 isolated functions in
+`tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c`. A PR can
+regress on the benchmark without regressing on real-world code, and vice
+versa. Treat the comment as one input among several when evaluating
+compiler-touching changes.
+
+Workflow runs on `pull_request` events only — direct pushes to `develop`
+or `main` do not trigger it (no obvious base ref to compare against).

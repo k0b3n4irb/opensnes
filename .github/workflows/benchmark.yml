@@ -1,0 +1,173 @@
+name: Benchmark
+
+# Soft cycle-count regression gate. Compiles cc65816 at both PR HEAD and the
+# PR base ref, runs `tools/opensnes-emu/test/run-benchmark.mjs` against each,
+# and posts the per-function cycle delta as a PR comment. Does NOT fail the
+# job on regression — this is a soft signal for review, not a merge gate.
+#
+# Wired in 2026-05-08 as the audit response to §14 of the external review
+# (cycle-count regression is otherwise invisible to the existing test
+# infrastructure: visual regression catches rendering breakage but not "this
+# inner loop now costs 100 more cycles").
+#
+# Why soft: the benchmark surface (34 isolated functions in
+# bench_functions.c) is narrow. A regression on it is a hint, not a proof.
+# A hard gate would block legitimate compiler refactors that trade benchmark
+# perf for correctness or maintainability. The PR comment surfaces the
+# delta; the reviewer makes the call.
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
+
+permissions:
+  contents: read
+  pull-requests: write   # required to post / update the PR comment
+
+jobs:
+  benchmark:
+    name: Compiler cycle-count benchmark (soft, comment-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out PR HEAD with submodules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # full history so we can checkout the base ref
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt update -y
+          sudo apt-get install -y build-essential clang cmake make git python3 nodejs
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Capture refs
+        id: refs
+        run: |
+          PR_HEAD=$(git rev-parse HEAD)
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          echo "pr_head=${PR_HEAD}" >> "$GITHUB_OUTPUT"
+          echo "base_ref=${BASE_REF}" >> "$GITHUB_OUTPUT"
+          echo "PR HEAD: ${PR_HEAD}"
+          echo "Base ref: ${BASE_REF}"
+
+      # ─── PR HEAD build + benchmark ────────────────────────────────────────
+      - name: Build compiler at PR HEAD
+        run: make compiler
+
+      - name: Run benchmark at PR HEAD
+        id: bench-pr
+        continue-on-error: true
+        run: |
+          node tools/opensnes-emu/test/run-benchmark.mjs > /tmp/bench_pr.log 2>&1 || true
+          if [ -f /tmp/opensnes_bench_current.asm ]; then
+            cp /tmp/opensnes_bench_current.asm /tmp/bench_pr.asm
+            echo "captured=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "captured=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ─── Base ref build + benchmark ───────────────────────────────────────
+      - name: Check out base branch
+        run: |
+          git fetch origin "${{ steps.refs.outputs.base_ref }}"
+          git checkout "origin/${{ steps.refs.outputs.base_ref }}"
+          git submodule update --init --recursive
+
+      - name: Rebuild compiler at base
+        run: |
+          make -C compiler clean
+          make compiler
+
+      - name: Run benchmark at base
+        id: bench-base
+        continue-on-error: true
+        run: |
+          node tools/opensnes-emu/test/run-benchmark.mjs > /tmp/bench_base.log 2>&1 || true
+          if [ -f /tmp/opensnes_bench_current.asm ]; then
+            cp /tmp/opensnes_bench_current.asm /tmp/bench_base.asm
+            echo "captured=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "captured=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore PR HEAD
+        run: |
+          git checkout "${{ steps.refs.outputs.pr_head }}"
+          git submodule update --init --recursive
+
+      # ─── Compare + comment ────────────────────────────────────────────────
+      - name: Compare cycle counts
+        id: compare
+        continue-on-error: true
+        run: |
+          if [ "${{ steps.bench-pr.outputs.captured }}" != "1" ] \
+              || [ "${{ steps.bench-base.outputs.captured }}" != "1" ]; then
+            echo "One or both benchmarks failed to produce output." \
+                 > /tmp/bench_compare.txt
+            echo "failed=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 devtools/cyclecount/cyclecount.py \
+              --compare /tmp/bench_base.asm /tmp/bench_pr.asm \
+              > /tmp/bench_compare.txt 2>&1
+          echo "failed=0" >> "$GITHUB_OUTPUT"
+          cat /tmp/bench_compare.txt
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const MARKER = '<!-- opensnes-benchmark-comment -->';
+
+            let body = MARKER + '\n## Compiler benchmark (soft, comment-only)\n\n';
+
+            try {
+              const compare = fs.readFileSync('/tmp/bench_compare.txt', 'utf-8').trim();
+              body += '```\n' + compare + '\n```\n\n';
+            } catch (e) {
+              body += `_Benchmark output unavailable: ${e.message}_\n\n`;
+            }
+
+            body += '_Compares cc65816 cycle output for ' +
+                    '`tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c` ' +
+                    'between PR HEAD and `${{ steps.refs.outputs.base_ref }}`. ' +
+                    'Soft gate — does not block merge. Wired by ' +
+                    '`.github/workflows/benchmark.yml`._';
+
+            // Find existing benchmark comment for idempotency
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.data.find(
+              c => c.body && c.body.includes(MARKER)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated comment ${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+              core.info('Created new comment');
+            }
