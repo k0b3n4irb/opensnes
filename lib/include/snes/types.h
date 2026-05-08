@@ -54,16 +54,19 @@ typedef unsigned short u16;
 /**
  * @brief 32-bit signed integer (-2147483648 to 2147483647)
  *
- * @note Uses `int` because cproc treats `int` as 32-bit on 65816.
+ * Uses `long` (4 bytes on cc65816 since chantier A1, 2026-05-08). Pre-A1
+ * this was `int` because cproc treated `int` as 32-bit; with A1 aligning
+ * `int` to 2 bytes (the native w65816 word size), the canonical 32-bit
+ * type moves to `long`.
  */
-typedef signed int s32;
+typedef signed long s32;
 
 /**
  * @brief 32-bit unsigned integer (0 to 4294967295)
  *
- * @note Uses `int` because cproc treats `int` as 32-bit on 65816.
+ * Uses `long` (4 bytes on cc65816 since chantier A1, 2026-05-08).
  */
-typedef unsigned int u32;
+typedef unsigned long u32;
 
 /** @} */ /* end of types group */
 
