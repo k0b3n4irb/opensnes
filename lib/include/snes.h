@@ -27,17 +27,23 @@
  * Version Information
  *============================================================================*/
 
+/* The values below are kept in sync with `CHANGELOG.md` head and verified by
+ * `devtools/check_doc_drift.py` at lint time (CI gate `lint.yml::doc-drift`).
+ * When bumping the CHANGELOG for a release, bump these three macros in the
+ * same commit — `.claude/rules/release.md` documents the step, and `make
+ * lint-docs` fails fast on mismatch. */
+
 /** @brief OpenSNES major version */
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 1
+#define OPENSNES_VERSION_MINOR 16
 
 /** @brief OpenSNES patch version */
 #define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.1.0-dev"
+#define OPENSNES_VERSION_STRING "0.16.0"
 
 /*============================================================================
  * Core Headers
