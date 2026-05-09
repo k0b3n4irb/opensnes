@@ -7,7 +7,48 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-05-09
+
+Compiler & runtime hardening release. Five structural defects from
+the post-audit catalogue (`.claude/STRUCTURAL_DEFECTS.md`) close in
+this version (A1, A2, A3, E1, E2), one new lib API ships (B6 — sqrt
+and atan2), and the build infrastructure gains two permanent guard
+rails (NMI/WRAM port race lint, hard cycle-count CI gate). Three
+🔴 silent failures from the catalogue downgrade to 🟢 (caught at
+build time). Public API is unchanged across the upgrade.
+
 ### Compiler
+
+- **`volatile` is preserved through the cproc → QBE pipeline
+  (chantier A2).** Pre-A2 cproc literally discarded the
+  `QUALVOLATILE` qualifier with `(void)(tq & QUALVOLATILE);` and a
+  `TODO` comment. As a result every C `volatile` load/store entered
+  QBE IR as a plain operation, and the load-forwarding pass coalesced
+  redundant volatile reads through value-numbering — a silent
+  miscompile that violated the C standard's "each access is a side
+  effect" volatile semantics. Concrete pre-fix symptom:
+
+      volatile unsigned short timer;
+      unsigned short read_twice(void) { return timer + timer; }
+                                              /* MUST emit 2 loads */
+
+  Pre-A2 emitted `lda timer; sta cache; clc; adc cache` (1 load +
+  1 cached read). Post-A2 emits two distinct `lda timer` loads as
+  the standard requires.
+
+  Fix touches three submodules: cproc threads `QUALVOLATILE` through
+  `funcload`/`funcstore` and emits a `volat` IR keyword via a new
+  `funcinst_volat` helper; QBE's `Ins` struct gains a `volat` field,
+  the parser recognises a `Tvolat` token, and `loadopt` /
+  `promote` / `gcm` skip volatile-tagged instructions; the
+  opensnes-emu test fixture's `volatiles` phase now asserts load /
+  store counts on `test_volatiles.c` rather than just compilation
+  success. PINS.md lists 8 cproc patches and 29 qbe patches now.
+  KNOWN_LIMITATIONS, CLAUDE.md, the compiler/new_example rules, and
+  compiler/ABI.md updated to remove the historical "use globals
+  instead of `volatile`" warnings — the lib still favours globals
+  for NMI handshakes for cycle-cost equivalence, not because
+  `volatile` is broken.
 
 - **`int` is now 16 bits, `long` is now 32 bits on cc65816 (chantier A1).**
   cproc's IR was inherited as a host-target compiler with
@@ -53,6 +94,138 @@ covers changes made since the fork.
   unchanged. See `templates/crt0.asm:1184+` for the updated function
   comment naming the new contract explicitly.
 
+### Library
+
+- **`<snes/math.h>` ships `sqrt16`, `fixSqrt`, and `atan2_8`
+  (chantier B6).** The "where is the target relative to me, and how
+  far?" surface every 2D action game leans on now lives in one
+  module:
+    - `sqrt16(n)` — bit-by-bit integer square root, ~80 cycles, no
+      LUT, result bounded to 255 (fits in `u8`).
+    - `fixSqrt(x)` — 8.8 fixed-point sqrt; delegates to `sqrt16`,
+      4 fractional bits of precision (capped intentionally —
+      raising it requires 32-bit shift currently broken under the
+      QBE 32-bit codegen gap, catalogue chantier A7).
+    - `atan2_8(dy, dx)` — 8-bit angle of the `(dx, dy)` vector in
+      the same convention as `fixSin` / `fixCos` (0=+X, 64=+Y, …).
+      65-byte LUT covers the first octant, symmetry handles the
+      other seven, scale-invariant reduction prevents the internal
+      16-bit divide from overflowing on any 16-bit input.
+
+  The `atan2_8 → fixCos / fixSin` chain is the canonical pattern
+  for projectile aiming, pursuit AI, and "rotate sprite to face X".
+
+  `lib/source/hdma.c` was using a private static `isqrt()` for the
+  iris-wipe radius — promoted to `sqrt16` (same algorithm,
+  identical results). `make/common.mk` adds the transitive dep
+  `_DEP_hdma := dma math_sqrt`, which means hdma-using examples
+  pull only the small sqrt module rather than the full math runtime.
+
+- **`math.c` split into `math.c` + `math_sqrt.c`** (post-B6
+  hygiene). The hdma → math transitive dep would otherwise have
+  dragged the full sine LUT (512 B), atan LUT (65 B), and
+  arithmetic helpers into every hdma-using example, even when the
+  caller only needed `sqrt16` through hdma. Six examples reclaimed
+  ≈ 1721 bytes of bank-$00 free space each (e.g. `parallax_scrolling`
+  5628 → 7349, `gradient_colors` 12324 → 14045). Five examples that
+  listed `math` in `LIB_MODULES` without using it had the dead
+  listing removed (`window`, `parallax_scrolling`, `hdma_gradient`,
+  `transparent_window`, `gradient_colors`). Public `<snes/math.h>`
+  surface unchanged — the resolver flattens
+  `_DEP_math := math_sqrt` so `LIB_MODULES := math` still pulls
+  sqrt as a transitive dep.
+
+### Examples
+
+- **`examples/basics/aim_target` — interactive showcase for
+  `sqrt16`, `atan2_8`, and trig chaining.** Player diamond at
+  screen centre, X target follows the D-pad. Each frame the
+  example recomputes `dx`/`dy`, calls `sqrt16(dx² + dy²)` for
+  pixel distance, calls `atan2_8(dy, dx)` for the 8-bit angle,
+  then calls `fixCos`/`fixSin` on that angle to read back the
+  unit direction vector. Live readout panel above the play area
+  shows DX, DY, DIST, ANGLE, COS(ANGLE), SIN(ANGLE) — all the
+  numbers update as the user moves the target. First example in
+  the suite that exercises fixed-point math at all.
+
+### CI / build infrastructure
+
+- **NMI / WRAM data port race lint shipped (chantier E1).** The
+  SNES WRAM data port (`$2180`-`$2183`) shares state between the
+  main thread and the NMI handler; if main-thread code is
+  mid-sequence on those ports and an NMI fires whose callback also
+  touches them, the address pointer is silently corrupted and the
+  main thread resumes writing to the wrong location with no error.
+  KNOWN_LIMITATIONS flagged the trap with a 🔴 severity tag and
+  documentation-only mitigation. Now caught at build time:
+  `devtools/check_nmi_wram_race.py` parses each example's
+  `combined.asm` + `*.c.asm` intermediates, walks the call graph
+  from every NMI callback root (NmiHandler + DefaultNmiCallback +
+  every symbol passed to `nmiSet`/`nmiSetBank`), takes the
+  closure, and fails the build if any reachable function writes
+  to `$2180-$2183`. Wired post-link in `make/common.mk` next to
+  the BANK0 ratchet. Bypass per-build with `SKIP_NMI_RACE_CHECK=1`.
+  Severity downgraded 🔴 → 🟢. Regression suite
+  `devtools/test_check_nmi_wram_race.py` (6 cases) wired into
+  `.github/workflows/lint.yml` as the new `nmi-race-tests` job.
+
+- **Cycle-count CI gate promoted from soft to hard (chantier E2).**
+  The gate shipped 2026-05-08 in soft / comment-only form
+  (commit `98d5014`); after 24 h of operation the threshold design
+  held up and is now hard. Two-armed thresholds:
+    - **Total cycles** > 5 % regression → fail (broad-drift catch)
+    - **Per-function** > 25 % AND > 50 cycles absolute → fail
+      (pathological catch — the combined percent + absolute floor
+      avoids small-routine noise)
+
+  Override path: include `Cycle-Regression-OK: <reason>` as a
+  trailer in any commit in the PR range. The workflow scans
+  `git log <base>..<head> --format=%B`; if the trailer is present
+  the gate exits 0 even on a breached threshold (the comparison
+  is still posted as a comment with a "regression overridden"
+  header so the trade-off is visible to reviewers). Trailer
+  preferred over PR labels (audit trail in git history forever),
+  over comment markers (no audit trail), over self-service
+  bypasses (anyone with push access can write the trailer).
+  `devtools/cyclecount/cyclecount.py` gains `--fail-on-regression`
+  (with tunable `--total-pct-limit` / `--fn-pct-limit` /
+  `--fn-abs-limit`).
+
+### Tests
+
+- **`[KNOWN_BUG]` markers retired and `--allow-known-bugs` dropped
+  from CI (chantier A3).** The compiler-test phase carried 7
+  stale `knownBug()` calls escaping assertions for "TCO not
+  implemented yet" and "A-cache through pha not implemented yet".
+  Investigation compiled each fixture and inspected the generated
+  ASM: every optimisation the markers gated had already shipped
+  (TCO via C.1 / C.2.1 / C.2.2; A-cache through pha audited
+  working in C.6; lazy `rep #$20` emission active). The
+  assertions were drifting behind the codegen, not anticipating
+  future work.
+
+  The `compute_across_call.*leaf_opt=1` assertion in
+  `nonleaf_frameless` was actively wrong — that function MUST
+  get `leaf_opt=0` because `sum` is live across the call (the
+  `all_calls_are_tail()` gate at `compiler/qbe/w65816/emit.c:2882`
+  correctly returns 0 for it). Rewritten to check
+  `forward_with_work.*leaf_opt=1` instead.
+
+  7 `knownBug()` calls converted to `fail()`. CI workflow's
+  `--allow-known-bugs` flag dropped. Real regressions on TCO /
+  A-cache / lazy rep now hard-fail. The MSYS2-segfault paths
+  remain — they only fire on Windows / MSYS2 builds and are
+  orthogonal to the optimisation gaps.
+
+- **`test_volatiles` phase strengthened from a smoke check to
+  semantic assertions** (companion to chantier A2). Three reads
+  of `hw_status` must produce ≥3 `lda hw_status` instructions;
+  four writes of `hw_data` must produce 4 stores; the
+  read-modify-write helper must produce 2 reads + 2 writes
+  balanced. Pre-A2 the QBE loadopt pass coalesced the reads
+  silently, and the test never noticed because it only checked
+  compilation succeeded.
+
 ### Fixed
 
 - **`examples/games/tetris` HDMA gradient migrated from channel 7 to
@@ -63,7 +236,52 @@ covers changes made since the fork.
   removing that unconditional set, the latent contract violation is
   exposed. Migrated to channel 6, which the lib does not reserve.
 
-### Tests
+### Maintainer / docs
+
+- **Strategic-defects catalogue promoted to
+  `.claude/STRUCTURAL_DEFECTS.md`** (was previously scratch in
+  `/tmp` between sessions). The file tracks effort estimates, risk
+  profiles, an interaction matrix, sequencing paths, and
+  investigation logs for every defect that requires a deliberate
+  multi-day chantier. Lives under `.claude/` because it's
+  maintainer-internal operational planning, not user-facing
+  documentation — contributors looking at the project's headline
+  state still read `KNOWN_LIMITATIONS.md` and `ROADMAP.md` at the
+  repo root for the public severity tags. CLAUDE.md gets a
+  "Strategic Planning" section pointing at the catalogue.
+
+- **`A6` (pointer ABI + indirect-call bank-byte preservation)
+  partial implementation reverted with full investigation log.**
+  Attempted `A6.1` (Ostorel CAddr → memory bank byte) +
+  `A6.3` (indirect call read bank byte from slot+2). The fix
+  passed 404/404 tests by coincidence: `A6.1` writes the bank
+  byte to a memory location, but `A6.3`'s read targets a stack
+  slot — the two are disconnected at the QBE Oload boundary
+  (Oload is 16-bit only on the w65816 target). Tests passed
+  because all framework callbacks land in bank `$00` thanks to
+  SUPERFREE placement, so `lda #$00` and `lda slot+2,s` happened
+  to emit identical-effect code. Reverted; root cause documented;
+  the full A6 chantier requires a coupled A6.4 / A6.5 / A6.6
+  bundle (cproc pointer 8→4 + QBE Kl class 24-bit load/store +
+  ASM site audit) before any of it can ship safely.
+
+- **New defect `A7` logged in the catalogue.** Surfaced during
+  B5 (`fixed32` 16.16) investigation: the QBE w65816 backend
+  truncates *every* 32-bit arithmetic operation to 16 bits
+  silently. `Oadd`, `Osub`, `Oshl`, `Oshr`, `Oneg`, and the
+  `loaduw → __mul16` lowering all emit a single 16-bit
+  instruction with no carry / borrow into the high half. A1
+  shipped `sizeof(long) == 4` in cproc IR but did not extend
+  the QBE backend to actually do 32-bit arithmetic — storage
+  is right, operations are wrong. The lib's own `fixDiv`
+  (`lib/source/math.c`) is broken for any dividend > 127
+  because of this; no shipped example exercises that path so
+  the bug is currently latent. Validated runtime with a
+  reproduction ROM displaying five `BUG` rows for the four
+  synthetic cases plus the lib `fixDiv` direct hit. Catalogue
+  entry has the full investigation, the reproduction ROM
+  spec, and the proposed A6.4-style fix surface (slot widening,
+  `__mul32` runtime, carry-aware Oadd/Osub).
 
 - **Visual baselines for `basics/random`, `games/tetris`, and
   `graphics/effects/superfx_3d` regenerated** — all three are
@@ -73,7 +291,7 @@ covers changes made since the fork.
   visual deltas that exceed the 50-px tolerance. Pixel comparison
   catches any rendering-pipeline regression as before; the new
   baselines pass the rebuilt suite cleanly. Submodule
-  `tools/opensnes-emu` bumped to `13415ec`.
+  `tools/opensnes-emu` bumped to `0931e1a`.
 
 ## [0.16.0] - 2026-05-07
 
