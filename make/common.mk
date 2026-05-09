@@ -368,6 +368,29 @@ ifneq ($(SKIP_BANK0_CHECK),1)
 		fi; \
 	fi
 endif
+	@# NMI / WRAM data port race lint — silent-failure 🔴 in
+	@# KNOWN_LIMITATIONS.md (chantier E1, 2026-05-09). Walks the
+	@# call graph from every NMI callback root (NmiHandler +
+	@# functions registered via nmiSet/nmiSetBank) and fails the
+	@# build if any reachable function writes to $$2180-$$2183.
+	@# Lib + crt0 are NOT followed (audited via
+	@# .claude/rules/nmi_audit.md); the lint only walks user code
+	@# in this example's .c.asm intermediates and combined.asm.
+	@# Set SKIP_NMI_RACE_CHECK=1 to disable for a build.
+ifneq ($(SKIP_NMI_RACE_CHECK),1)
+	@if [ -f combined.asm ]; then \
+		python3 $(OPENSNES)/devtools/check_nmi_wram_race.py \
+			--rom-dir . --quiet; \
+		rc=$$?; \
+		if [ "$$rc" -ne 0 ]; then \
+			echo "ERROR: NMI / WRAM port race — see report above."; \
+			echo "       Functions reachable from an NMI callback must"; \
+			echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
+			echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
+			exit 1; \
+		fi; \
+	fi
+endif
 
 #------------------------------------------------------------------------------
 # Cleanup

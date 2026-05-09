@@ -85,3 +85,20 @@ jobs:
         # examples" sticking after v0.16.0 added the 54th. Fix policy lives
         # in .claude/rules/doc_consistency.md.
         run: python3 devtools/check_doc_drift.py
+
+  nmi-race-tests:
+    name: NMI/WRAM race lint regression tests (test_check_nmi_wram_race.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Run test_check_nmi_wram_race.py
+        # Regression suite for devtools/check_nmi_wram_race.py — the
+        # static lint that fails the build if any function reachable
+        # from an NMI callback writes to $2180-$2183. The full lint
+        # runs per-example via make/common.mk; its parser logic
+        # (call-graph + callback-detection + closure) is exercised
+        # here against synthetic fixtures so the rules can't silently
+        # rot. Wired in chantier E1 (2026-05-09).
+        run: python3 devtools/test_check_nmi_wram_race.py

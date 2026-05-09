@@ -43,15 +43,21 @@ mid-DMA → garbage tiles for one or more rows.
 **Mitigation:** count your DMAs. If a frame needs > 4 KB, split across multiple
 VBlanks (1-page pattern) or move the heavy load into a forced-blank window.
 
-### 🔴 WRAM data port `$2180–$2183` is NOT safe in NMI
+### 🟢 WRAM data port `$2180–$2183` race in NMI (caught at build time)
 Main-thread code writes multi-byte sequences via `$2180` after setting an
 address with `$2181-$2183`. If NMI fires mid-sequence and any code in the NMI
 path touches those ports, the address pointer is silently corrupted and the
 main thread resumes writing garbage to a wrong location.
 
-**Mitigation:** the SDK's NMI handler in `templates/crt0.asm` never touches
-`$2180-$2183`. If you write a custom `nmiSet()` callback, do not use any
-function that goes through these ports.
+**Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
+runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
+the call graph from every NMI callback root (NmiHandler + functions
+registered via `nmiSet`/`nmiSetBank`) and **fails the build** if any
+reachable function writes to `$2180-$2183`. Lib + crt0 are audited and
+treated as a black box; the lint targets user code in NMI callbacks,
+where the actual risk lives. Bypass for a single build with
+`SKIP_NMI_RACE_CHECK=1`. Regression suite:
+`python3 devtools/test_check_nmi_wram_race.py` (6 cases).
 
 ### 🟢 Bank $00 ROM overflow → garbage const reads (caught at link time)
 `static const` arrays each get a SUPERFREE section. The compiler emits 16-bit
