@@ -345,17 +345,56 @@ early and you get partial results.
 This is the right shape for game code, but if you're translating
 from a different engine, watch the signedness boundary.
 
-### 🟡 No `atan2`, `sqrt`, `pow` in the SDK
+### `atan2` and `sqrt` ship in the lib (chantier B6, 2026-05-09)
 
-The lib ships sin/cos and the basic arithmetic operations. For:
+The full inverse-trig and square-root surface arrived together so
+the canonical "where is the target relative to me, and how far?"
+question is one call away. Three entry points cover almost every
+game-side use:
 
-- **`atan2`** (angle from a vector): roll your own LUT or use
-  Newton's method, both are off the SDK's beaten path.
-- **`sqrt`** (distance / hypot): canonical SNES approach is a
-  per-game LUT for "distances we care about" (e.g., pre-computed
-  table of common pixel distances).
-- **`pow`**: integer exponentiation via repeated multiply for small
-  exponents; otherwise build a per-game LUT.
+| Function | Returns | Cost |
+|---|---|---|
+| `u16 sqrt16(u16 n)` | floor of `sqrt(n)` (always 0–255) | ~80 cycles, no LUT |
+| `fixed fixSqrt(fixed x)` | `sqrt(x)` in 8.8 fixed | ~80 cycles, 4 fractional bits |
+| `u8 atan2_8(s16 dy, s16 dx)` | 8-bit angle (0–255 = 0°–360°) | ~120 cycles, 65-byte LUT |
+
+`atan2_8` uses the same 8-bit angle convention as `fixSin`/`fixCos`,
+so the natural pattern works:
+
+```c
+s16 dy = enemy_y - player_y;
+s16 dx = enemy_x - player_x;
+u8 aim = atan2_8(dy, dx);
+
+/* Now use aim with the trig LUTs to project a velocity vector */
+fixed vx = fixMul(speed, fixCos(aim));
+fixed vy = fixMul(speed, fixSin(aim));
+```
+
+`atan2_8` is scale-invariant — pass any 16-bit signed dy/dx and
+the function reduces magnitudes by power-of-two right shifts
+internally to keep its single 16-bit divide overflow-free.
+Precision degrades by ≤ 1 angle unit (≈ 1.4°) when reduction
+fires, which is below the perceptual floor for projectile aiming
+or sprite rotation in any 256-pixel-wide playfield.
+
+`sqrt16` is the canonical "how far is that thing" helper. The
+result is bounded to 255 (since `sqrt(65535) ≈ 255.99`), so it
+fits in `u8` for tile-grid distances. For the 8.8 fractional
+variant use `fixSqrt`. Note that `fixSqrt`'s precision is
+intentionally capped at 4 fractional bits — the 32-bit shift
+needed for full 8 bits of fraction would currently truncate
+under the QBE 32-bit codegen gap (catalogue chantier A7); we
+chose deterministic 4-bit precision over deceptive 8-bit
+output that's only correct for small inputs.
+
+### What's still missing: `pow`, `exp`, `log`
+
+These remain off the SDK's beaten path because no shipped example
+needs them. Integer exponentiation for small exponents is two
+lines of repeated `fixMul`; everything else (logarithm, general
+power) is per-game territory — bake a LUT for the specific
+range your game cares about.
 
 The PHILOSOPHY non-goal "no `printf` in core lib" extends here in
 spirit: the lib provides what most games need, and skips the heavy
@@ -373,6 +412,9 @@ weight that most games don't.
 | `fixLerp(a, b, t)` | ~40 |
 | `mul16(a, b)` (hardware multiply) | ~10 |
 | `div16(a, b)` (hardware divide) | ~20 |
+| `sqrt16(n)` | ~80 (bit-by-bit) |
+| `fixSqrt(x)` | ~80 (delegates to sqrt16) |
+| `atan2_8(dy, dx)` | ~120 (LUT + one 16-bit divide) |
 
 A typical sprite-physics frame (position update + sin/cos rotation +
 two `fixMul` calls per sprite × 64 sprites) is ~6 K cycles, well

@@ -131,7 +131,7 @@ _DEP_object          := map
 _DEP_map             := dma
 _DEP_snesmod         := console
 _DEP_superfx         := dma
-_DEP_hdma            := dma
+_DEP_hdma            := dma math
 _DEP_asset           := dma background
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
