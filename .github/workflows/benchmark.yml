@@ -1,20 +1,31 @@
 name: Benchmark
 
-# Soft cycle-count regression gate. Compiles cc65816 at both PR HEAD and the
-# PR base ref, runs `tools/opensnes-emu/test/run-benchmark.mjs` against each,
-# and posts the per-function cycle delta as a PR comment. Does NOT fail the
-# job on regression — this is a soft signal for review, not a merge gate.
+# Hard cycle-count regression gate (chantier E2, 2026-05-09).
+# Compiles cc65816 at both PR HEAD and the PR base ref, runs
+# `tools/opensnes-emu/test/run-benchmark.mjs` against each, posts the
+# per-function delta as a PR comment, and FAILS the job when the delta
+# breaches either threshold below.
 #
-# Wired in 2026-05-08 as the audit response to §14 of the external review
-# (cycle-count regression is otherwise invisible to the existing test
-# infrastructure: visual regression catches rendering breakage but not "this
-# inner loop now costs 100 more cycles").
+# Thresholds (defined in devtools/cyclecount/cyclecount.py):
+#   - Total cycles regression > 5%             → fail (broad-drift catch)
+#   - Per-function: > 25% AND > 50 abs cycles  → fail (pathological catch)
 #
-# Why soft: the benchmark surface (34 isolated functions in
-# bench_functions.c) is narrow. A regression on it is a hint, not a proof.
-# A hard gate would block legitimate compiler refactors that trade benchmark
-# perf for correctness or maintainability. The PR comment surfaces the
-# delta; the reviewer makes the call.
+# Override: include `Cycle-Regression-OK: <reason>` as a trailer in any
+# commit message in the PR range. The job still posts the comparison
+# comment but exits 0 instead of 1. The trailer lives in git history
+# forever as the audit trail for the deliberate trade-off (typical
+# uses: trading benchmark cycles for correctness, for code clarity,
+# for compiler-stack maintainability).
+#
+# Originally shipped 2026-05-08 (commit 98d5014) in soft / comment-only
+# form. Promoted to a hard gate 2026-05-09 once the gate had run on
+# enough PRs to confirm its signal-to-noise ratio is workable.
+#
+# Why this is workable as a hard gate: the benchmark surface (34
+# isolated functions in bench_functions.c) is narrow but the
+# combined-threshold design above is tuned for that narrowness — the
+# +50-cycle-absolute floor on per-function rules out small-routine
+# noise, and the 5% total threshold smooths over individual swings.
 
 on:
   pull_request:
@@ -28,7 +39,7 @@ permissions:
 
 jobs:
   benchmark:
-    name: Compiler cycle-count benchmark (soft, comment-only)
+    name: Compiler cycle-count benchmark (hard gate)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -104,6 +115,16 @@ jobs:
           git submodule update --init --recursive
 
       # ─── Compare + comment ────────────────────────────────────────────────
+      #
+      # Two-step gate:
+      #   1. Run the comparison and capture its exit code (1 on
+      #      threshold breach, 0 on clean).
+      #   2. Check the PR commit range for the override trailer
+      #      `Cycle-Regression-OK:`. If present, the job passes
+      #      regardless of the comparison's exit code.
+      #
+      # Both steps continue-on-error so the comment-posting step always
+      # runs; the final "Enforce gate" step is what fails the job.
       - name: Compare cycle counts
         id: compare
         continue-on-error: true
@@ -112,14 +133,38 @@ jobs:
               || [ "${{ steps.bench-base.outputs.captured }}" != "1" ]; then
             echo "One or both benchmarks failed to produce output." \
                  > /tmp/bench_compare.txt
-            echo "failed=1" >> "$GITHUB_OUTPUT"
+            echo "captured=0" >> "$GITHUB_OUTPUT"
+            echo "regression=0" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          python3 devtools/cyclecount/cyclecount.py \
+          echo "captured=1" >> "$GITHUB_OUTPUT"
+          if python3 devtools/cyclecount/cyclecount.py \
               --compare /tmp/bench_base.asm /tmp/bench_pr.asm \
-              > /tmp/bench_compare.txt 2>&1
-          echo "failed=0" >> "$GITHUB_OUTPUT"
+              --fail-on-regression \
+              > /tmp/bench_compare.txt 2>&1; then
+            echo "regression=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "regression=1" >> "$GITHUB_OUTPUT"
+          fi
           cat /tmp/bench_compare.txt
+
+      - name: Check for override trailer
+        id: override
+        continue-on-error: true
+        run: |
+          BASE="origin/${{ steps.refs.outputs.base_ref }}"
+          HEAD="${{ steps.refs.outputs.pr_head }}"
+          # Make sure the base ref is local (we already checked it out earlier
+          # but the restore-PR-HEAD step put us back; the base ref should still
+          # be in the local repo as origin/<branch>).
+          if git log "${BASE}..${HEAD}" --format=%B 2>/dev/null \
+               | grep -qE '^Cycle-Regression-OK:'; then
+            echo "present=1" >> "$GITHUB_OUTPUT"
+            echo "Override trailer found — gate will pass regardless of regression."
+          else
+            echo "present=0" >> "$GITHUB_OUTPUT"
+            echo "No override trailer in commit messages."
+          fi
 
       - name: Post or update PR comment
         uses: actions/github-script@v7
@@ -127,8 +172,19 @@ jobs:
           script: |
             const fs = require('fs');
             const MARKER = '<!-- opensnes-benchmark-comment -->';
+            const regression = '${{ steps.compare.outputs.regression }}' === '1';
+            const override   = '${{ steps.override.outputs.present }}'  === '1';
 
-            let body = MARKER + '\n## Compiler benchmark (soft, comment-only)\n\n';
+            let header;
+            if (!regression) {
+              header = '## Compiler benchmark (hard gate — clean)';
+            } else if (override) {
+              header = '## Compiler benchmark (hard gate — regression overridden)';
+            } else {
+              header = '## Compiler benchmark (hard gate — REGRESSION, blocking)';
+            }
+
+            let body = MARKER + '\n' + header + '\n\n';
 
             try {
               const compare = fs.readFileSync('/tmp/bench_compare.txt', 'utf-8').trim();
@@ -137,11 +193,22 @@ jobs:
               body += `_Benchmark output unavailable: ${e.message}_\n\n`;
             }
 
+            if (regression && override) {
+              body += '✅ The override trailer `Cycle-Regression-OK: <reason>` ' +
+                      'is present in this PR\'s commits, so the gate passes. ' +
+                      'The regression is recorded above for reviewer awareness.\n\n';
+            } else if (regression) {
+              body += '❌ Regression detected and **no override trailer** found in ' +
+                      'this PR\'s commit messages. The job fails. To merge a ' +
+                      'deliberate regression, add a `Cycle-Regression-OK: <reason>` ' +
+                      'trailer to one of the PR\'s commit messages and push again.\n\n';
+            }
+
             body += '_Compares cc65816 cycle output for ' +
                     '`tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c` ' +
                     'between PR HEAD and `${{ steps.refs.outputs.base_ref }}`. ' +
-                    'Soft gate — does not block merge. Wired by ' +
-                    '`.github/workflows/benchmark.yml`._';
+                    'Hard gate — see `.github/workflows/benchmark.yml` and ' +
+                    '`docs/BENCHMARK.md` for thresholds and override mechanism._';
 
             // Find existing benchmark comment for idempotency
             const comments = await github.rest.issues.listComments({
@@ -171,3 +238,14 @@ jobs:
               });
               core.info('Created new comment');
             }
+
+      - name: Enforce gate
+        run: |
+          REGRESSION="${{ steps.compare.outputs.regression }}"
+          OVERRIDE="${{ steps.override.outputs.present }}"
+          if [ "$REGRESSION" = "1" ] && [ "$OVERRIDE" != "1" ]; then
+            echo "::error::Cycle-count regression detected and no override trailer present."
+            echo "Add a 'Cycle-Regression-OK: <reason>' trailer to a commit in this PR's range to override."
+            exit 1
+          fi
+          echo "Gate passes (regression=$REGRESSION, override=$OVERRIDE)."

@@ -1687,7 +1687,52 @@ options:
 
 ---
 
-#### E2. Cycle-count CI gate is soft only (just shipped) 🟡
+#### E2. Cycle-count CI gate — SHIPPED hard 2026-05-09 🟢
+
+> **Status**: shipped 2026-05-09. The gate is now hard (fails the
+> CI job on threshold breach) with a `Cycle-Regression-OK:` commit
+> trailer as the deliberate-regression override. The original soft
+> gate was 24 hours old when promoted — long enough to confirm its
+> signal-to-noise was workable, short enough that the design didn't
+> calcify around the soft mode.
+>
+> **Thresholds picked**: total > 5 % regression OR per-function
+> > 25 % AND > 50 cycles absolute. The combined percent + absolute
+> floor on the per-function arm rules out small-routine noise
+> (a 4-instruction function going from 10 → 13 cycles is +30 % but
+> only +3 cycles absolute — not a real regression in practice). Both
+> knobs are tunable via cyclecount.py CLI flags but defaults are
+> baked into the workflow.
+>
+> **Override mechanism**: trailer in any commit in the PR range,
+> `Cycle-Regression-OK: <reason>`. Picked over PR labels (need
+> write access) and over comment markers (no audit trail in git).
+> Reasons live in git history forever; `git log --grep` enumerates
+> every accepted trade-off with its rationale.
+>
+> **Files touched**:
+> - `devtools/cyclecount/cyclecount.py` — added
+>   `--fail-on-regression`, `--total-pct-limit`, `--fn-pct-limit`,
+>   `--fn-abs-limit` flags. New `check_regression()` function
+>   returns breach descriptions; main returns 1 if any breach.
+> - `.github/workflows/benchmark.yml` — `continue-on-error` on
+>   the comparison step retained (for comment posting), new
+>   "Check for override trailer" step parses `git log --format`,
+>   final "Enforce gate" step fails the job if regression and no
+>   override.
+> - `docs/BENCHMARK.md` — "CI gate (hard, with override trailer)"
+>   section replaces the old "soft, comment-only" section. Threshold
+>   table, override rationale, and short history block.
+>
+> **Validation**: ran cyclecount.py locally with synthetic injection
+> (30 extra `rep #$30` instructions in `loop_sum`) — gate fires:
+> total +6.71 % AND per-function +75.63 % / +90 cycles, both arms
+> trip. With the source unchanged: gate clean, exit 0. Workflow YAML
+> validates with `python3 -c 'import yaml; yaml.safe_load(...)'`.
+> Runtime test suite (--quick) still 269/269 PASS — the cyclecount
+> changes don't regress non-CI usage.
+
+
 
 **Symptom**: the cycle-count CI gate shipped 2026-05-08 (commit
 `98d5014`) posts a PR comment with the per-function cycle delta but

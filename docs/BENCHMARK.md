@@ -127,7 +127,7 @@ PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
 - PVSnesLib's 816-opt is designed for tcc816's output patterns; a different C compiler
   might benefit differently from its peephole rules
 
-## CI gate (soft, comment-only)
+## CI gate (hard, with override trailer)
 
 Every pull request to `main` or `develop` runs `.github/workflows/benchmark.yml`,
 which:
@@ -135,21 +135,72 @@ which:
 1. Builds `cc65816` at the PR HEAD and runs `bench_functions.c` through it.
 2. Builds `cc65816` at the PR base ref and runs the same benchmark.
 3. Compares the two assembly outputs via
-   `devtools/cyclecount/cyclecount.py --compare`.
+   `devtools/cyclecount/cyclecount.py --compare --fail-on-regression`.
 4. Posts (or updates, idempotently) a comment on the PR with the per-function
-   delta and total.
+   delta, total, and the gate verdict (clean / overridden / blocking).
+5. **Fails the job** if the comparison breaches a threshold AND no override
+   trailer is present in the PR's commit messages.
 
-**Soft means soft.** The job never fails — a regression on the benchmark
-surface is a *signal* for review, not a *gate* on merge. The comment is
-the deliverable. The reviewer decides whether the regression is justified
-(a correctness fix that costs cycles, a refactor that simplifies code, …)
-or unintended (a missed optimisation pass, a stale assumption).
+### Thresholds
+
+The gate is **two-armed** so each arm catches a class of regression the
+other misses. A breach on either arm fails the gate.
+
+| Arm | Trips when | Reason |
+|---|---|---|
+| **Total** | Total cycles regress > **5 %** | Catches "many small regressions add up" — broad-drift detection across the whole bench surface. |
+| **Per-function** | A single function regresses > **25 %** AND > **50 cycles** absolute | Catches pathological per-function regressions. The combined percent + absolute floor avoids false positives on small routines (a 4-instruction function going +3 cycles is +30 % but doesn't matter in practice; both knobs must trip together). |
+
+Thresholds are tunable via flags on `cyclecount.py --fail-on-regression`
+(`--total-pct-limit`, `--fn-pct-limit`, `--fn-abs-limit`); the workflow
+uses the script defaults.
+
+### Override mechanism
+
+When a regression is **deliberate** (a correctness fix that costs cycles,
+a refactor for code clarity, a trade-off for compiler-stack
+maintainability), include this trailer in any commit in the PR's range:
+
+```
+Cycle-Regression-OK: <one-line reason for the regression>
+```
+
+The workflow scans `git log <base>..<head> --format=%B` for the trailer.
+If present, the gate exits 0 even on a breached threshold; the
+comparison is still posted as a comment (with the `regression
+overridden` header) so the regression is recorded for reviewer
+awareness.
+
+Why a trailer rather than a PR label or special comment marker:
+
+- **Audit trail in git history.** The reason for the trade-off lives in
+  the commit message forever. `git log --grep='Cycle-Regression-OK:'`
+  enumerates every deliberate regression the project has accepted, with
+  its rationale.
+- **Self-service.** Anyone with push access to the PR's branch can add
+  the trailer. PR labels would require the override step to depend on
+  who has the right to set labels.
+- **Survives rebase / squash-merge.** The trailer is in the commit
+  message, not metadata around the PR.
+
+### What the gate does NOT cover
 
 The benchmark surface is narrow: 34 isolated functions in
 `tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c`. A PR can
-regress on the benchmark without regressing on real-world code, and vice
-versa. Treat the comment as one input among several when evaluating
-compiler-touching changes.
+regress on real-world code without regressing on the benchmark, and vice
+versa. The gate is one input among several when evaluating
+compiler-touching changes — the visual-regression suite, runtime tests,
+and ASM-pattern checks in `compiler-tests.mjs` are the other arms.
 
-Workflow runs on `pull_request` events only — direct pushes to `develop`
-or `main` do not trigger it (no obvious base ref to compare against).
+Direct pushes to `develop` or `main` don't trigger the workflow (no
+obvious base ref to compare against). The gate runs on
+`pull_request` events only.
+
+### History
+
+- 2026-05-08: shipped soft / comment-only (commit `98d5014`) as the
+  audit response to §14 of the external review.
+- 2026-05-09: promoted to hard gate (chantier E2). Catalogue entry in
+  `.claude/STRUCTURAL_DEFECTS.md`. Decision rationale: the soft gate
+  had operated long enough to confirm the threshold design is workable;
+  the override mechanism gives a clean path for deliberate trade-offs.
