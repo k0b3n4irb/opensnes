@@ -197,23 +197,24 @@ against the file and fail on drift.
 
 ## Compiler optimisation gaps
 
-One known gap remains in cc65816 today (the lone `[KNOWN_BUG]` entry surfaced
-by `--allow-known-bugs` in the test suite). Earlier entries that lived here —
-tail call optimisation and A-cache-through-`pha` — have shipped (chantiers
-C.1 / C.2.1 / C.2.2 wired TCO; C.6's audit confirmed A-cache through `pha`
-already worked, the test had been stale).
+**None as of chantier A3 (2026-05-09).** The compiler-test phase runs
+clean without the `--allow-known-bugs` escape that used to gate tail
+call optimisation on wrappers, A-cache-through-`pha`, lazy `rep #$20`
+emission, and the `leaf_opt=1` marker on non-leaf functions.
+Investigation found every optimisation had already shipped (chantiers
+C.1 / C.2.1 / C.2.2 / C.6); the test markers were stale, not the
+codegen. The CI workflow no longer passes `--allow-known-bugs`; any
+regression on these surfaces immediately as a hard failure. The
+`leaf_opt=N` comment marker in generated ASM is also accurate — it
+reports the actual optimisation state per function (not always 1
+or always 0), so reading it is reliable.
 
-### 🟡 Stale `leaf_opt=1` marker for non-leaf functions
-Phase 5b removed the `leaf_opt` gate so the optimisations apply to non-leaf
-functions too, but the comment marker in the generated ASM still says
-`leaf_opt=0` even when the optimisation is active. Cosmetic — the optimisation
-fires, only the diagnostic comment is wrong. Surfaces as a single `[KNOWN_BUG]`
-in the compiler test phase (`nonleaf_frameless`).
-
-**Mitigation:** none needed for codegen correctness. If you read the comment
-markers to verify optimisation state, fall back to inspecting the actual ASM
-shape (a non-leaf frameless function has no `sec`/`sbc.w` prologue and no
-`adc.w`/`tas` epilogue, with arguments accessed via `4,s`/`6,s` directly).
+MSYS2-specific cproc segfaults (struct pointer init, nested structs,
+unions, string initializers, `.rodata`-vs-`RAMSECTION` flake) remain
+behind `knownBug()` calls in `compiler-tests.mjs`, gated on the
+`r.segfault` signal — they only fire on Windows / MSYS2 builds and
+are tracked in `.github/workflows/msys2_cproc_diagnostic.yml`. Linux
+and macOS CI never trigger them.
 
 ---
 

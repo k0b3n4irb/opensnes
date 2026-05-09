@@ -100,13 +100,15 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] `.ACCU 16` / `.INDEX 16` for WLA-DX register-size tracking
 - [x] Variable shift codegen fix (`(1 << variable)`)
 - [x] Signed division and modulo (`__sdiv16` / `__smod16`)
-- [x] **Tail call optimisation** — frameless TCO shipped (chantiers C.1 / C.2.1
-      / C.2.2; QBE patches `ed840fb` and `bab0164` per `compiler/PINS.md`).
-      Residual non-frameless cases still surface as `[KNOWN_BUG]` in the test
-      suite (`tail_call`, `lazy_rep20`, `plx_cleanup`); CI runs the full suite
-      with `--allow-known-bugs` so they don't fail PRs.
-- [x] **A-cache through `pha`** — confirmed working by chantier C.6's audit;
-      the `acache_pha` test was stale, not the optimisation.
+- [x] **Tail call optimisation** — shipped (chantiers C.1 / C.2.1 / C.2.2;
+      QBE patches `ed840fb` and `bab0164` per `compiler/PINS.md`). The
+      `tail_call`, `lazy_rep20`, `plx_cleanup` test cases that previously
+      ran under `--allow-known-bugs` were investigated in chantier A3 and
+      found to be testing optimisations that had already shipped; the
+      markers were stale. CI no longer passes `--allow-known-bugs`.
+- [x] **A-cache through `pha`** — shipped; chantier C.6's audit confirmed
+      the optimisation already worked, the `acache_pha` test was stale.
+      Hard-fails any regression as of chantier A3 (2026-05-09).
 
 ### Library modules
 | Module | Description | Status |
@@ -243,12 +245,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
       absent (`scripts/install-mesen2.sh` fetches it once per CI run,
       cached locally). 4 new checks, total 257 → 261. Done in
       ~1 day rather than the originally estimated 2 weeks.
-- [ ] **Retire residual TCO `[KNOWN_BUG]` test cases** — the underlying
-      optimisation works for frameless functions; the suite still flags
-      `tail_call`, `lazy_rep20`, `plx_cleanup` and the cosmetic
-      `nonleaf_frameless` marker so CI runs with `--allow-known-bugs`.
-      Either tighten those tests or finish the non-frameless path so the
-      flag becomes unnecessary.
+- [x] **Retire residual TCO `[KNOWN_BUG]` test cases** — done in
+      chantier A3 (2026-05-09). Investigation showed every optimisation
+      the markers gated had already shipped; the test assertions had
+      drifted away from current emit-pass behaviour rather than
+      anticipating future work. Markers removed, assertions converted
+      to hard-fail, `--allow-known-bugs` dropped from CI.
 - [ ] **Mode 7 game example** (racing or flying)
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
@@ -263,19 +265,14 @@ The full catalog with severity tags lives in
 [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md). Headlines:
 
 - **No floating-point** — use fixed-point math (`<snes/math.h>`)
-- **`int` is 4 bytes, `long` is 8 bytes** on this target — prefer `u16` /
-  `s16` from `<snes/types.h>` for performance-sensitive code
+- **`int` is 2 bytes, `long` is 4 bytes** on this target (since chantier
+  A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
+  `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
 - **All C variables must be in bank $00, < $2000** — compiler emits
   `sta.l $0000,x`
 - **Push order is LEFT-TO-RIGHT** (vs PVSnesLib's right-to-left) — see
   [`compiler/ABI.md`](compiler/ABI.md) before porting an ASM helper
-- **Residual `[KNOWN_BUG]` compiler-test entries** — frameless TCO and
-  A-cache-through-`pha` already ship; what remains is the cosmetic
-  `nonleaf_frameless` marker and three TCO test cases that still flag
-  (`tail_call`, `lazy_rep20`, `plx_cleanup`). CI runs with
-  `--allow-known-bugs` so they don't fail PRs. Tracked under "Next steps"
-  for retirement.
 
 ---
 
