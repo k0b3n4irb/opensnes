@@ -26,9 +26,18 @@ var NAVTREE =
 [
   [ "OpenSNES", "index.html", [
     [ "OpenSNES Documentation", "index.html", "index" ],
+    [ "Colour Math Tutorial", "tutorial_colormath.html", null ],
+    [ "DMA Tutorial", "tutorial_dma.html", null ],
+    [ "HDMA Tutorial", "tutorial_hdma.html", null ],
+    [ "Fixed-Point Math Tutorial", "tutorial_math.html", null ],
+    [ "Mode 7 Tutorial", "tutorial_mode7.html", null ],
+    [ "Mosaic Tutorial", "tutorial_mosaic.html", null ],
+    [ "SRAM Save Tutorial", "tutorial_sram.html", null ],
+    [ "Window Masking Tutorial", "tutorial_window.html", null ],
     [ "Audio Examples", "examples_audio.html", null ],
     [ "SNESMOD HiROM Music", "examples_audio_snesmod_music_hirom.html", null ],
     [ "SNESMOD Large Soundbank Music", "examples_audio_snesmod_music_large.html", null ],
+    [ "aim_target", "examples_basics_aim_target.html", null ],
     [ "Random Numbers", "examples_basics_random.html", null ],
     [ "Basics Examples", "examples_basics.html", null ],
     [ "Scene Stack", "examples_basics_scene_stack.html", null ],
@@ -81,13 +90,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"examples_graphics_backgrounds_mode1_bg3_priority.html",
-"goomba_8c.html#adb9325cd6ec6251c1c589c8fc1fed7f7",
-"group__ppu__regs.html#ga4f287a5385050275961326652a04c3f3",
-"koopatroopa_8c.html#ae3d6d007cf2553f4f13f79656418d114",
-"piece_8h.html#aee707398916fd4752f85e771787c023c",
-"sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4",
-"video_8h_source.html"
+"examples_graphics_backgrounds_mode1.html",
+"goomba_8c.html#ac62bb43c675907218c9a136966349273",
+"group__ppu__regs.html#ga4d49034fd405fed8f5f42df44fa2b3a8",
+"koopatroopa_8c.html#aac412c48e71c5060dbd8812c70a05889",
+"piece_8h.html#a91553c0e2fac0272cc71951d9787bf7e",
+"sprite_8h.html#adc29d672dac67a96fe49e055dce78bff",
+"tutorial_scrolling.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -15,36 +15,36 @@ var index =
     [ "Getting Started with OpenSNES", "getting_started.html", null ],
     [ "Learn SNES Development", "learning_path.html", [
       [ "Hello World", "examples_text_hello_world.html", [
-        [ "Level 1: First Steps", "learning_path.html#autotoc_md261", null ],
-        [ "Level 2: Graphics Fundamentals", "learning_path.html#autotoc_md262", null ],
-        [ "Level 3: Scrolling and Effects", "learning_path.html#autotoc_md263", null ],
-        [ "Level 4: Advanced Topics", "learning_path.html#autotoc_md264", null ],
-        [ "Level 5: Maps and Complete Projects", "learning_path.html#autotoc_md265", null ],
-        [ "Level 6: Enhancement Chips", "learning_path.html#autotoc_md266", [
-          [ "SA-1 Coprocessor (same ISA, 10.74 MHz)", "learning_path.html#autotoc_md267", null ],
-          [ "SuperFX / GSU (custom RISC, bitmap + 3D)", "learning_path.html#autotoc_md268", null ],
-          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1336", null ],
-          [ "Controls", "examples_text_hello_world.html#autotoc_md1337", null ],
-          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1338", null ],
-          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1340", [
-            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1341", null ],
-            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1342", null ],
-            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1343", null ],
-            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1344", null ],
-            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1345", null ],
-            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1346", null ],
-            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1347", null ]
+        [ "Level 1: First Steps", "learning_path.html#autotoc_md415", null ],
+        [ "Level 2: Graphics Fundamentals", "learning_path.html#autotoc_md416", null ],
+        [ "Level 3: Scrolling and Effects", "learning_path.html#autotoc_md417", null ],
+        [ "Level 4: Advanced Topics", "learning_path.html#autotoc_md418", null ],
+        [ "Level 5: Maps and Complete Projects", "learning_path.html#autotoc_md419", null ],
+        [ "Level 6: Enhancement Chips", "learning_path.html#autotoc_md420", [
+          [ "SA-1 Coprocessor (same ISA, 10.74 MHz)", "learning_path.html#autotoc_md421", null ],
+          [ "SuperFX / GSU (custom RISC, bitmap + 3D)", "learning_path.html#autotoc_md422", null ],
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1495", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1496", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1497", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1499", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1500", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1501", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1502", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1503", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1504", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1505", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1506", null ]
           ] ],
-          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1349", null ],
-          [ "Go Further", "examples_text_hello_world.html#autotoc_md1351", null ],
-          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1353", [
-            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1354", null ],
-            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1355", null ],
-            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1356", null ]
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1508", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1510", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1512", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1513", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1514", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1515", null ]
           ] ],
-          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1357", null ],
-          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1358", null ],
-          [ "Files", "examples_text_hello_world.html#autotoc_md1359", null ]
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1516", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1517", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1518", null ]
         ] ]
       ] ],
       [ "Text Module Test", "examples_text_text_test.html", null ],
@@ -86,41 +86,41 @@ var index =
     ] ],
     [ "Browse Examples by Category", "examples_by_category.html", [
       [ "Hello World", "examples_text_hello_world.html", [
-        [ "Text", "examples_by_category.html#autotoc_md270", null ],
-        [ "Graphics: Backgrounds", "examples_by_category.html#autotoc_md272", null ],
-        [ "Graphics: Sprites", "examples_by_category.html#autotoc_md274", null ],
-        [ "Graphics: Effects", "examples_by_category.html#autotoc_md276", null ],
-        [ "Input", "examples_by_category.html#autotoc_md278", null ],
-        [ "Audio", "examples_by_category.html#autotoc_md280", null ],
-        [ "Maps", "examples_by_category.html#autotoc_md282", null ],
-        [ "Memory", "examples_by_category.html#autotoc_md284", null ],
-        [ "Basics", "examples_by_category.html#autotoc_md286", null ],
-        [ "Games", "examples_by_category.html#autotoc_md288", null ],
-        [ "Enhancement Chips", "examples_by_category.html#autotoc_md290", [
-          [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md291", null ],
-          [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md292", null ],
-          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1336", null ],
-          [ "Controls", "examples_text_hello_world.html#autotoc_md1337", null ],
-          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1338", null ],
-          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1340", [
-            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1341", null ],
-            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1342", null ],
-            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1343", null ],
-            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1344", null ],
-            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1345", null ],
-            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1346", null ],
-            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1347", null ]
+        [ "Text", "examples_by_category.html#autotoc_md424", null ],
+        [ "Graphics: Backgrounds", "examples_by_category.html#autotoc_md426", null ],
+        [ "Graphics: Sprites", "examples_by_category.html#autotoc_md428", null ],
+        [ "Graphics: Effects", "examples_by_category.html#autotoc_md430", null ],
+        [ "Input", "examples_by_category.html#autotoc_md432", null ],
+        [ "Audio", "examples_by_category.html#autotoc_md434", null ],
+        [ "Maps", "examples_by_category.html#autotoc_md436", null ],
+        [ "Memory", "examples_by_category.html#autotoc_md438", null ],
+        [ "Basics", "examples_by_category.html#autotoc_md440", null ],
+        [ "Games", "examples_by_category.html#autotoc_md442", null ],
+        [ "Enhancement Chips", "examples_by_category.html#autotoc_md444", [
+          [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md445", null ],
+          [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md446", null ],
+          [ "Build & Run", "examples_text_hello_world.html#autotoc_md1495", null ],
+          [ "Controls", "examples_text_hello_world.html#autotoc_md1496", null ],
+          [ "What You'll Learn", "examples_text_hello_world.html#autotoc_md1497", null ],
+          [ "Walkthrough", "examples_text_hello_world.html#autotoc_md1499", [
+            [ "1. There Is No printf", "examples_text_hello_world.html#autotoc_md1500", null ],
+            [ "2. Drawing Letters in Hex", "examples_text_hello_world.html#autotoc_md1501", null ],
+            [ "3. Setting Up the PPU", "examples_text_hello_world.html#autotoc_md1502", null ],
+            [ "4. Uploading Tiles to VRAM", "examples_text_hello_world.html#autotoc_md1503", null ],
+            [ "5. Two Colors, Four Bytes", "examples_text_hello_world.html#autotoc_md1504", null ],
+            [ "6. Spelling the Message", "examples_text_hello_world.html#autotoc_md1505", null ],
+            [ "7. Lights On", "examples_text_hello_world.html#autotoc_md1506", null ]
           ] ],
-          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1349", null ],
-          [ "Go Further", "examples_text_hello_world.html#autotoc_md1351", null ],
-          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1353", [
-            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1354", null ],
-            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1355", null ],
-            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1356", null ]
+          [ "Tips & Tricks", "examples_text_hello_world.html#autotoc_md1508", null ],
+          [ "Go Further", "examples_text_hello_world.html#autotoc_md1510", null ],
+          [ "Under the Hood: The Build", "examples_text_hello_world.html#autotoc_md1512", [
+            [ "The Pipeline", "examples_text_hello_world.html#autotoc_md1513", null ],
+            [ "The Makefile", "examples_text_hello_world.html#autotoc_md1514", null ],
+            [ "Why These Modules?", "examples_text_hello_world.html#autotoc_md1515", null ]
           ] ],
-          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1357", null ],
-          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1358", null ],
-          [ "Files", "examples_text_hello_world.html#autotoc_md1359", null ]
+          [ "</blockquote>", "examples_text_hello_world.html#autotoc_md1516", null ],
+          [ "Technical Reference", "examples_text_hello_world.html#autotoc_md1517", null ],
+          [ "Files", "examples_text_hello_world.html#autotoc_md1518", null ]
         ] ]
       ] ],
       [ "Text Module Test", "examples_text_text_test.html", null ],

@@ -120,7 +120,7 @@ Frame-Based Animation</h2>
 <div class="line">}</div>
 <div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_aca96d6bd10d9a1eca2363540f9d3f5a8"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8">ANIM_DELAY</a></div><div class="ttdeci">#define ANIM_DELAY</div><div class="ttdoc">Number of frames to hold each animation frame before advancing.</div><div class="ttdef"><b>Definition</b> main.c:110</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
+<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asprite_8h_html_a07b133e4cd2416bcb648b2ece69d34fe"><div class="ttname"><a href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a></div><div class="ttdeci">void oamSetTile(u8 id, u16 tile)</div><div class="ttdoc">Set sprite tile.</div></div>
 </div><!-- fragment --><p>The key insight: <b>animation only advances when the timer expires</b>, not every frame. This decouples visual speed from the 60 Hz game loop.</p>
 <h2><a class="anchor" id="autotoc_md66"></a>

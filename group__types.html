@@ -159,7 +159,11 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 
 <p>32-bit signed integer (-2147483648 to 2147483647) </p>
-<dl class="section note"><dt>Note</dt><dd>Uses <code>int</code> because cproc treats <code>int</code> as 32-bit on 65816. </dd></dl>
+<p>Conditionally typedef'd to maintain <code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sizeof(s32)</a> == 4</code> on the two compilers that touch this header:</p><ul>
+<li><b>cc65816</b> (cproc + QBE w65816 — the actual SDK compiler): <code>long</code> is 4 bytes since chantier A1 (2026-05-08). Pre-A1 used <code>int</code> for the 32-bit type because cproc treated <code>int</code> as 32-bit; A1 made <code>int</code> 2 bytes, so the canonical 32-bit type moves to <code>long</code>. The <code>bin/cc65816</code> wrapper passes <code>-D__OPENSNES__=1</code> to its preprocessor so this branch fires.</li>
+<li><b>Host clang</b> (the <code>-fsyntax-only</code> parallel lint pass in <code>make/common.mk</code>): on x86_64 / arm64, <code>int</code> is 4 bytes and <code>long</code> is 8. To keep <code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sizeof(s32)</a> == 4</code> on the lint side, we fall back to <code>int</code> here (the <code>#else</code> branch). The lint does NOT receive <code>-D__OPENSNES__</code>.</li>
+</ul>
+<p>The underlying typedef differs per compiler, but <code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sizeof(s32)</a> == 4</code> holds in both — which is the property the SDK's static asserts and data layout rely on. </p>
 
 </div>
 </div>
@@ -208,7 +212,7 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 
 <p>32-bit unsigned integer (0 to 4294967295) </p>
-<dl class="section note"><dt>Note</dt><dd>Uses <code>int</code> because cproc treats <code>int</code> as 32-bit on 65816. </dd></dl>
+<p>See <a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6">s32</a> for the cc65816-vs-host-lint conditional rationale. </p>
 
 </div>
 </div>

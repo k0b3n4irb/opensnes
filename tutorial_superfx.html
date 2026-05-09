@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('tutorial_superfx.html',''); initResiza
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers the SuperFX coprocessor &ndash; a 16-bit RISC CPU running at up to 21.47 MHz inside the cartridge, with hardware pixel rendering.</p>
-<h2><a class="anchor" id="autotoc_md217"></a>
+<h2><a class="anchor" id="autotoc_md352"></a>
 What Is SuperFX?</h2>
 <p>The SuperFX (Graphics Support Unit) is a custom RISC processor found in games like <em>Star Fox</em>, <em>Yoshi's Island</em>, and <em>DOOM</em>. Unlike the SA-1 (which uses the same 65816 instruction set), the SuperFX has its own unique ISA with 16-bit registers, hardware PLOT for pixel rendering, and an instruction cache.</p>
 <table class="markdownTable">
@@ -119,7 +119,7 @@ What Is SuperFX?</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Special   </td><td class="markdownTableBodyNone">&ndash;   </td><td class="markdownTableBodyNone">PLOT (hardware pixel rendering)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md218"></a>
+<h2><a class="anchor" id="autotoc_md353"></a>
 Emulator Compatibility</h2>
 <blockquote class="doxtable">
 <p>&zwj;<b>Important</b>: SuperFX examples require specific emulators. </p>
@@ -134,9 +134,9 @@ Emulator Compatibility</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>snes9x</b>   </td><td class="markdownTableBodyNone">Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED")   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md219"></a>
+<h2><a class="anchor" id="autotoc_md354"></a>
 Getting Started</h2>
-<h3><a class="anchor" id="autotoc_md220"></a>
+<h3><a class="anchor" id="autotoc_md355"></a>
 1. Enable SuperFX in Your Makefile</h3>
 <div class="fragment"><div class="line">OPENSNES := $(shell cd ../../../.. &amp;&amp; pwd)</div>
 <div class="line">TARGET   := mygame.sfc</div>
@@ -152,7 +152,7 @@ Getting Started</h2>
 <div class="line"> </div>
 <div class="line">include $(OPENSNES)/make/common.mk</div>
 </div><!-- fragment --><p><code>GSUSRC</code> lists your SuperFX assembly files (<code>.sfx</code>). The build system assembles them with <code>wla-superfx</code> and produces flat binaries (<code>.sfx.bin</code>).</p>
-<h3><a class="anchor" id="autotoc_md221"></a>
+<h3><a class="anchor" id="autotoc_md356"></a>
 2. Write GSU Assembly Code</h3>
 <p>Create <code>gsu_code.sfx</code> &ndash; this runs on the SuperFX at up to 21.47 MHz:</p>
 <div class="fragment"><div class="line">.include &quot;memmap_gsu.inc&quot;</div>
@@ -173,7 +173,7 @@ Getting Started</h2>
 <div class="line">    NOP</div>
 <div class="line">    STOP</div>
 <div class="line">    NOP                  ; dummy after STOP (required)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md222"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md357"></a>
 3. Create the GSU Loader (65816 ASM)</h3>
 <p>Create <code>gsu_loader.asm</code> &ndash; this embeds the GSU binary and provides the WRAM-based launch function:</p>
 <div class="fragment"><div class="line">.ifdef SUPERFX</div>
@@ -241,7 +241,7 @@ Getting Started</h2>
 <div class="line"> </div>
 <div class="line">.ENDS</div>
 <div class="line">.endif</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md223"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md358"></a>
 4. Launch from C</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="superfx_8h.html">snes/superfx.h</a>&gt;</span></div>
@@ -272,10 +272,10 @@ Getting Started</h2>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
 <div class="ttc" id="amemory_2superfx__hello_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="memory_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div><div class="ttdoc">Launch GSU program, wait for completion (defined in gsu_loader.asm)</div></div>
-<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
+<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asuperfx_8h_html"><div class="ttname"><a href="superfx_8h.html">superfx.h</a></div><div class="ttdoc">SuperFX (GSU) coprocessor library — registers, config, and API.</div></div>
 <div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Initialize SuperFX — detect hardware, set default config.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md224"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md359"></a>
 The Exclusive Bus</h2>
 <p>When SCMR has RON=1, the GSU owns the ROM bus. <b>The SNES CPU cannot read ROM &ndash; not even its own code.</b> This is why:</p>
 <ol type="1">
@@ -283,23 +283,23 @@ The Exclusive Bus</h2>
 <li><b>NMI must be disabled</b> (the NMI vector is in ROM)</li>
 <li>All reference projects (casfx, DOOM-FX, PeterLemon) use WRAM execution</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md225"></a>
+<h2><a class="anchor" id="autotoc_md360"></a>
 SuperFX Assembly Rules</h2>
 <p>Four mandatory rules for all GSU programs:</p>
-<h3><a class="anchor" id="autotoc_md226"></a>
+<h3><a class="anchor" id="autotoc_md361"></a>
 1. NOP After Every Branch (Delay Slot)</h3>
 <p>The SuperFX pipeline pre-fetches the instruction after a branch. It <b>always executes</b>, whether the branch is taken or not.</p>
 <div class="fragment"><div class="line">DEC R4</div>
 <div class="line">BNE _loop</div>
 <div class="line">NOP              ; MANDATORY -- delay slot</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md227"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md362"></a>
 2. NOP Padding Before STOP</h3>
 <p>STOP in the pipeline halts the GSU before the branch can take effect.</p>
 <div class="fragment"><div class="line">NOP              ; delay slot safety</div>
 <div class="line">NOP              ; MC1 store-STOP bug safety</div>
 <div class="line">STOP</div>
 <div class="line">NOP              ; dummy opcode (pipeline clear)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md228"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md363"></a>
 3. RPIX After PLOT Loops</h3>
 <p>PLOT writes to an 8-pixel cache. The last pixels stay in cache unless flushed.</p>
 <div class="fragment"><div class="line">_col:</div>
@@ -309,7 +309,7 @@ SuperFX Assembly Rules</h2>
 <div class="line">    NOP              ; delay slot</div>
 <div class="line">    IBT R1, #$00</div>
 <div class="line">    RPIX             ; flush pixel cache to SRAM</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md229"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md364"></a>
 4. CACHE Before Hot Loops</h3>
 <p>CACHE loads 512 bytes of code. Instructions execute in 1 cycle (vs 3-5 from ROM).</p>
 <div class="fragment"><div class="line">    CACHE            ; ~6x speedup with 21 MHz clock</div>
@@ -318,10 +318,10 @@ SuperFX Assembly Rules</h2>
 <div class="line">    DEC R4</div>
 <div class="line">    BNE _loop</div>
 <div class="line">    NOP</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md230"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md365"></a>
 PLOT Bitmap Rendering</h2>
 <p>The PLOT instruction writes pixels in SNES bitplane format to SRAM.</p>
-<h3><a class="anchor" id="autotoc_md231"></a>
+<h3><a class="anchor" id="autotoc_md366"></a>
 Setup</h3>
 <p>From the SNES CPU (in the WRAM stub): </p><div class="fragment"><div class="line">stz.l $3038          ; SCBR = $00 (screen base at SRAM $0000)</div>
 <div class="line">lda #$19</div>
@@ -335,7 +335,7 @@ Setup</h3>
 <div class="line">IBT R1, #$00         ; X = 0</div>
 <div class="line">IBT R2, #$00         ; Y = 0</div>
 <div class="line">PLOT                 ; writes pixel at (R1, R2), R1 auto-increments</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md232"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md367"></a>
 Column-Major Tile Layout</h3>
 <p>PLOT stores tiles <b>column by column</b>, not row by row:</p>
 <div class="fragment"><div class="line">SRAM tile 0  = screen position (col=0, row=0)</div>
@@ -343,7 +343,7 @@ Column-Major Tile Layout</h3>
 <div class="line">SRAM tile 16 = screen position (col=1, row=0)</div>
 </div><!-- fragment --><p>The SNES PPU tilemap must compensate: </p><div class="fragment"><div class="line">tilemap[row * 32 + col] = col * tiles_per_column + row</div>
 </div><!-- fragment --><p>For 4bpp height=128: <code>tilemap[row*32 + col] = col*16 + row</code></p>
-<h3><a class="anchor" id="autotoc_md233"></a>
+<h3><a class="anchor" id="autotoc_md368"></a>
 SRAM to VRAM Transfer</h3>
 <p>After the GSU finishes, DMA the framebuffer during forced blank:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
@@ -351,7 +351,7 @@ SRAM to VRAM Transfer</h3>
 <div class="line"><span class="comment">/* (see gsu_loader.asm dmaBitmapToVRAM function) */</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdoc">Disable screen display (blank)</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md234"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md369"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -361,7 +361,7 @@ Examples</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="../../../examples/memory/superfx_3d/">superfx_3d</a>   </td><td class="markdownTableBodyNone">Rotating wireframe cube, Bresenham line drawing, 3D projection   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md235"></a>
+<h2><a class="anchor" id="autotoc_md370"></a>
 Further Reading</h2>
 <ul>
 <li>SuperFX register reference &ndash; complete register documentation</li>

@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('snes_8h.html',''); initResizable(); })
 </div><!--header-->
 <div class="contents">
 
-<p>OpenSNES Master Header.  
+<p>OpenSNES common-case master header.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">snes/types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="registers_8h_source.html">snes/registers.h</a>&gt;</code><br />
@@ -124,19 +124,30 @@ Macros</h2></td></tr>
 <tr class="memitem:a52dcd00f96e302db0233afedf45d42d3" id="r_a52dcd00f96e302db0233afedf45d42d3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#a52dcd00f96e302db0233afedf45d42d3">OPENSNES_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:a52dcd00f96e302db0233afedf45d42d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES major version.  <br /></td></tr>
 <tr class="separator:a52dcd00f96e302db0233afedf45d42d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7010da4aff784c937f4eb21b9aff806" id="r_ac7010da4aff784c937f4eb21b9aff806"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#ac7010da4aff784c937f4eb21b9aff806">OPENSNES_VERSION_MINOR</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memitem:ac7010da4aff784c937f4eb21b9aff806" id="r_ac7010da4aff784c937f4eb21b9aff806"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#ac7010da4aff784c937f4eb21b9aff806">OPENSNES_VERSION_MINOR</a>&#160;&#160;&#160;17</td></tr>
 <tr class="memdesc:ac7010da4aff784c937f4eb21b9aff806"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES minor version.  <br /></td></tr>
 <tr class="separator:ac7010da4aff784c937f4eb21b9aff806"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2660331ece9bb304cf9068ce6f4972a" id="r_af2660331ece9bb304cf9068ce6f4972a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#af2660331ece9bb304cf9068ce6f4972a">OPENSNES_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:af2660331ece9bb304cf9068ce6f4972a"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES patch version.  <br /></td></tr>
 <tr class="separator:af2660331ece9bb304cf9068ce6f4972a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a409c167562806a982baffc275742c677" id="r_a409c167562806a982baffc275742c677"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#a409c167562806a982baffc275742c677">OPENSNES_VERSION_STRING</a>&#160;&#160;&#160;&quot;0.1.0-dev&quot;</td></tr>
+<tr class="memitem:a409c167562806a982baffc275742c677" id="r_a409c167562806a982baffc275742c677"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="snes_8h.html#a409c167562806a982baffc275742c677">OPENSNES_VERSION_STRING</a>&#160;&#160;&#160;&quot;0.17.0&quot;</td></tr>
 <tr class="memdesc:a409c167562806a982baffc275742c677"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES version string.  <br /></td></tr>
 <tr class="separator:a409c167562806a982baffc275742c677"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>OpenSNES Master Header. </p>
-<p>Include this file to access all OpenSNES functionality.</p>
+<div class="textblock"><p>OpenSNES common-case master header. </p>
+<p>Pulls every module a typical project needs (console, video, sprite, background, input, dma, text, interrupt, system, mode7, hdma, window, colormath, mosaic, map, debug). <b>Specialty modules are opt-in</b> — include them separately when your project actually uses them, to keep compile times down and the dependency graph honest:</p>
+<ul>
+<li><code>&lt;<a class="el" href="audio_8h.html" title="OpenSNES Audio System.">snes/audio.h</a>&gt;</code> — SPC700 audio driver</li>
+<li><code>&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</code> — fixed-point math, LUTs</li>
+<li><code>&lt;<a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">snes/sram.h</a>&gt;</code> — battery-backed save RAM</li>
+<li><code>&lt;<a class="el" href="collision_8h.html" title="SNES Collision Detection.">snes/collision.h</a>&gt;</code> — bounding-box collision</li>
+<li><code>&lt;<a class="el" href="lzss_8h.html" title="LZSS (LZ77) Decompression for SNES.">snes/lzss.h</a>&gt;</code> — LZSS decompression to VRAM</li>
+<li><code>&lt;<a class="el" href="gameloop_8h.html" title="Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation.">snes/gameloop.h</a>&gt;</code> — gameloop framework opt-in</li>
+<li><code>&lt;<a class="el" href="asset_8h.html" title="Opt-in asset bundle convention — package tiles + palette (+ optional tilemap) into a typed value,...">snes/asset.h</a>&gt;</code> — typed background / tileset bundles</li>
+<li><code>&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</code> — push/pop scene stack</li>
+</ul>
+<p>The Doxygen list at the bottom of this header repeats the same split for IDE / cross-reference tooling.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
@@ -149,7 +160,7 @@ Macros</h2></td></tr>
 <div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point — initialize audio, display controls, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:37</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
+<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -176,7 +187,7 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPENSNES_VERSION_MINOR&#160;&#160;&#160;1</td>
+          <td class="memname">#define OPENSNES_VERSION_MINOR&#160;&#160;&#160;17</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -208,7 +219,7 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPENSNES_VERSION_STRING&#160;&#160;&#160;&quot;0.1.0-dev&quot;</td>
+          <td class="memname">#define OPENSNES_VERSION_STRING&#160;&#160;&#160;&quot;0.17.0&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">

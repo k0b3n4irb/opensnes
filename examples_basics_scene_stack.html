@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('examples_basics_scene_stack.html','');
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md639"></a>
+    <h2><a class="anchor" id="autotoc_md798"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to split a game into <code><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></code> callbacks (<code>init</code> + <code>update</code>)</li>
@@ -106,7 +106,7 @@ What You'll Learn</h2>
 <li>How <code>scenePop</code> resumes a suspended scene <b>without</b> re-running its <code>init</code></li>
 <li>How <code>sceneRun</code> replaces the standard <code>while (1) { <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>; update(); }</code> loop</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md640"></a>
+<h2><a class="anchor" id="autotoc_md799"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -120,9 +120,9 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Pause   </td><td class="markdownTableBodyNone">Select   </td><td class="markdownTableBodyNone">Pop back to counter (counter resumes from where it was)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md641"></a>
+<h2><a class="anchor" id="autotoc_md800"></a>
 SNES Concepts</h2>
-<h3><a class="anchor" id="autotoc_md642"></a>
+<h3><a class="anchor" id="autotoc_md801"></a>
 The Scene struct</h3>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a> (*init)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>);    <span class="comment">// optional, NULL skip; runs once on first push</span></div>
@@ -131,21 +131,21 @@ The Scene struct</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene's callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
 </div><!-- fragment --><p>Three callbacks live in this example: <code>title_init/update</code>, <code>counter_init/update</code>, <code>pause_init/update</code>. Each is a small function (8-15 lines) that does one thing.</p>
-<h3><a class="anchor" id="autotoc_md643"></a>
+<h3><a class="anchor" id="autotoc_md802"></a>
 Push/pop semantics</h3>
 <ul>
 <li><b>Push</b> suspends the currently-executing scene's <code>update</code> finishes its frame, then the next VBlank dispatches to the new top scene. <code>init</code> runs exactly once on push.</li>
 <li><b>Pop</b> removes the top scene; the resumed scene's <code>update</code> runs on the next VBlank — no <code>init</code> re-run, so its state survives. The counter's <code>counter_value</code> global persists across pause/resume because of this.</li>
 <li>The bottom of the stack is immortal. <code>scenePop</code> on a stack of size 1 is a silent no-op (the title screen can't accidentally exit).</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md644"></a>
+<h3><a class="anchor" id="autotoc_md803"></a>
 Why a framework instead of a switch</h3>
 <p>The hand-rolled equivalent is a <code>enum State current; switch (current) { ... }</code> plus an array for the suspend stack. ~15 lines of state-machine boilerplate per game. The framework brings it to 5: declare the <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs, call <code>sceneRun</code>. The runtime cost is one indirect call per frame (~20 cycles on top of <code>WaitForVBlank</code>'s overhead) — negligible against a 357K-cycle frame budget.</p>
-<h2><a class="anchor" id="autotoc_md645"></a>
+<h2><a class="anchor" id="autotoc_md804"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>Then load <code>scene_stack.sfc</code> in your favourite SNES emulator.</p>
-<h2><a class="anchor" id="autotoc_md646"></a>
+<h2><a class="anchor" id="autotoc_md805"></a>
 Modules Used</h2>
 <p><code>console</code>, <code>sprite</code>, <code>dma</code>, <code>background</code>, <code>text</code>, <code>input</code>, <code>scene</code> </p>
 </div></div><!-- contents -->

@@ -94,11 +94,11 @@ $(document).ready(function(){initNavTree('tutorial_scrolling.html',''); initResi
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES background scrolling techniques, from basic offset control to continuous tile streaming.</p>
-<h2><a class="anchor" id="autotoc_md188"></a>
+<h2><a class="anchor" id="autotoc_md302"></a>
 How BG Scrolling Works</h2>
 <p>The SNES PPU has two scroll registers per background layer: one horizontal (BGnHOFS) and one vertical (BGnVOFS). These registers define which pixel of the tilemap appears at the top-left corner of the screen. The PPU reads these registers once per frame during rendering.</p>
 <p>OpenSNES provides <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> to set these values. The function writes to shadow variables and marks the background as dirty; the NMI handler then commits the values to hardware during VBlank.</p>
-<h3><a class="anchor" id="autotoc_md189"></a>
+<h3><a class="anchor" id="autotoc_md303"></a>
 Wrap Behavior</h3>
 <p>Scroll offsets are 10 bits wide (0-1023). The tilemap wraps seamlessly:</p>
 <table class="markdownTable">
@@ -114,7 +114,7 @@ Wrap Behavior</h3>
 <td class="markdownTableBodyNone">SC_64x64   </td><td class="markdownTableBodyNone">512 x 512   </td><td class="markdownTableBodyNone">Wraps at 512   </td></tr>
 </table>
 <p>When the scroll offset exceeds the tilemap dimensions, the PPU wraps back to the beginning. This means a 32x32 tilemap scrolled to X=260 displays the same content as X=4.</p>
-<h2><a class="anchor" id="autotoc_md190"></a>
+<h2><a class="anchor" id="autotoc_md304"></a>
 Basic BG Scrolling</h2>
 <p>Use <code>bgSetScroll(bg, x, y)</code> to set the scroll offset for a background layer. The <code>bg</code> parameter is 0-indexed (0 = BG1, 1 = BG2, etc.).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -153,7 +153,7 @@ Basic BG Scrolling</h2>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W)</div><div class="ttdef"><b>Definition</b> registers.h:181</div></div>
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:439</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES Master Header.</div></div>
+<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>You can also set horizontal and vertical scroll independently:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a255b7012c710513afe464505ec420d3c">bgSetScrollX</a>(0, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">scroll_x</a>);   <span class="comment">/* Horizontal only */</span></div>
@@ -165,7 +165,7 @@ Basic BG Scrolling</h2>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cur_y</a> = <a class="code hl_function" href="background_8h.html#a455adfa84072ba5e3c4b048eb4441846">bgGetScrollY</a>(0);</div>
 <div class="ttc" id="abackground_8h_html_a455adfa84072ba5e3c4b048eb4441846"><div class="ttname"><a href="background_8h.html#a455adfa84072ba5e3c4b048eb4441846">bgGetScrollY</a></div><div class="ttdeci">u16 bgGetScrollY(u8 bg)</div><div class="ttdoc">Get current vertical scroll position (from shadow)</div></div>
 <div class="ttc" id="abackground_8h_html_ad4d4460f82883d16f9a5704d75b76aaf"><div class="ttname"><a href="background_8h.html#ad4d4460f82883d16f9a5704d75b76aaf">bgGetScrollX</a></div><div class="ttdeci">u16 bgGetScrollX(u8 bg)</div><div class="ttdoc">Get current horizontal scroll position (from shadow)</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md191"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md305"></a>
 D-PAD Controlled Scrolling</h2>
 <p>Read the joypad state with <code><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></code> and update the scroll position based on which directions are held. Use <code>s16</code> for scroll variables so negative values wrap correctly.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -204,7 +204,7 @@ D-PAD Controlled Scrolling</h2>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 </div><!-- fragment --><p>The tilemap wraps automatically, so the player can scroll in any direction indefinitely on a SC_64x64 map (512x512 pixels). For a larger world, see Continuous Scrolling below.</p>
-<h2><a class="anchor" id="autotoc_md192"></a>
+<h2><a class="anchor" id="autotoc_md306"></a>
 Mixed Scroll (Static + Moving Layers)</h2>
 <p>A common technique is scrolling one background while keeping another fixed. This works well for a moving pattern behind a static logo or HUD.</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a> = 0, <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a> = 0;</div>
@@ -222,10 +222,10 @@ Mixed Scroll (Static + Moving Layers)</h2>
 <div class="ttc" id="agraphics_2backgrounds_2mixed__scroll_2main_8c_html_a2349c3f40df58d5ea4c0d99fe5a2ca73"><div class="ttname"><a href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a></div><div class="ttdeci">s16 scrY</div><div class="ttdoc">BG1 vertical scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:51</div></div>
 <div class="ttc" id="agraphics_2backgrounds_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 horizontal scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:49</div></div>
 </div><!-- fragment --><p>See <code>examples/graphics/backgrounds/mixed_scroll/</code> for a complete example where a shader pattern auto-scrolls behind a static logo.</p>
-<h2><a class="anchor" id="autotoc_md193"></a>
+<h2><a class="anchor" id="autotoc_md307"></a>
 Parallax Scrolling</h2>
 <p>Parallax creates a depth illusion by scrolling background layers at different speeds. Distant layers move slowly; near layers move quickly.</p>
-<h3><a class="anchor" id="autotoc_md194"></a>
+<h3><a class="anchor" id="autotoc_md308"></a>
 Simple Parallax (Multiple BGs)</h3>
 <p>The easiest approach uses separate BG layers, each scrolled at a different rate:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">scroll_x</a> = 0;</div>
@@ -242,7 +242,7 @@ Simple Parallax (Multiple BGs)</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This is limited to the number of available BG layers (Mode 1 has 3 layers).</p>
-<h3><a class="anchor" id="autotoc_md195"></a>
+<h3><a class="anchor" id="autotoc_md309"></a>
 HDMA Parallax (Per-Scanline Scroll)</h3>
 <p>For more zones than available BG layers, use HDMA to rewrite the scroll register at different scanline positions. This splits a single BG into multiple horizontal bands, each scrolling at its own speed.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -287,14 +287,14 @@ HDMA Parallax (Per-Scanline Scroll)</h3>
 <div class="ttc" id="agroup__bg__size_html_ga6129b86a7c2913a31f1bca293fa7c1e7"><div class="ttname"><a href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></div><div class="ttdeci">#define SC_64x32</div><div class="ttdef"><b>Definition</b> background.h:37</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s)</div></div>
-<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
+<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA — never used by the runtime)</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
 <div class="ttc" id="ahdma_8h_html_adf1c0451139948b3f1049b84580ce906"><div class="ttname"><a href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a></div><div class="ttdeci">void hdmaParallax(u8 channel, u8 bg, const void *scrollTable)</div><div class="ttdoc">Set up a background parallax scroll effect.</div></div>
 </div><!-- fragment --><p>See <code>examples/graphics/effects/parallax_scrolling/</code> for the complete implementation.</p>
 <p><b>Important:</b> The scroll table must live in RAM (not <code>const</code>) because the main loop updates it every frame. HDMA reads from the table during rendering, so always update the values <em>before</em> <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code>.</p>
-<h2><a class="anchor" id="autotoc_md196"></a>
+<h2><a class="anchor" id="autotoc_md310"></a>
 Continuous / Infinite Scrolling</h2>
 <p>For worlds larger than the tilemap (e.g., a side-scroller level), you must stream new tile columns or rows into VRAM as the player scrolls. The tilemap wraps in hardware, so you overwrite the column that just scrolled off-screen with the next column from your map data.</p>
-<h3><a class="anchor" id="autotoc_md197"></a>
+<h3><a class="anchor" id="autotoc_md311"></a>
 The Streaming Pattern</h3>
 <ol type="1">
 <li>Scroll the BG offset as normal</li>
@@ -335,14 +335,14 @@ The Streaming Pattern</h3>
 <div class="ttc" id="astructGameState_html_acad6079a04372bf6b88f5cddf28bbb3e"><div class="ttname"><a href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">GameState::player_x</a></div><div class="ttdeci">s16 player_x</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
 <div class="ttc" id="astructGameState_html_afd37cb72cd408fd9a6cc894c645e1ac8"><div class="ttname"><a href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">GameState::bg2_scroll_x</a></div><div class="ttdeci">s16 bg2_scroll_x</div><div class="ttdef"><b>Definition</b> main.c:98</div></div>
 </div><!-- fragment --><p>See <code>examples/graphics/backgrounds/continuous_scroll/</code> for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.</p>
-<h3><a class="anchor" id="autotoc_md198"></a>
+<h3><a class="anchor" id="autotoc_md312"></a>
 Streaming Tips</h3>
 <ul>
 <li><b>DMA budget</b>: VBlank allows roughly 4KB of DMA. A single column of a 32-tile-high tilemap is 64 bytes (32 entries x 2 bytes), well within budget.</li>
 <li><b>Stream +32 columns, not +31</b>: the 33rd partial tile at the right edge is visible, so always stream one column ahead.</li>
 <li><b>Use SC_64x32 or SC_64x64</b>: wider tilemaps give you a 64-column circular buffer, reducing the streaming frequency.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md199"></a>
+<h2><a class="anchor" id="autotoc_md313"></a>
 VBlank Timing</h2>
 <p>Scroll registers (<code>BG1HOFS</code>, <code>BG1VOFS</code>, etc.) are latched by the PPU at the start of each frame. Writing them during active display produces tearing or no visible effect.</p>
 <p>OpenSNES handles this automatically: <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> writes to shadow variables and sets a dirty flag. The NMI handler checks the dirty flag during VBlank and commits only the changed values to hardware. You do not need to manually time your scroll writes.</p>
@@ -359,7 +359,7 @@ VBlank Timing</h2>
 <p>Also set initial scroll values <em>before</em> <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> to avoid a single-frame glitch where the tilemap appears at (0, 0) before your intended position takes effect:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">initial_x</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">initial_y</a>);</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();   <span class="comment">/* First visible frame already has correct scroll */</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md200"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md314"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_graphics.html">Graphics &amp; Backgrounds</a></li>

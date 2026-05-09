@@ -6,6 +6,7 @@ var math_8h =
     [ "UNFIX", "math_8h.html#a05738893be2affe52229eb12b99f4fba", null ],
     [ "UNFIX_ROUND", "math_8h.html#a78f48b221690b41e9f1b59cc6b056ceb", null ],
     [ "fixed", "math_8h.html#ac1976de9516b58f7a0352917f8d8bedd", null ],
+    [ "atan2_8", "math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5", null ],
     [ "div16", "math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab", null ],
     [ "fixAbs", "math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a", null ],
     [ "fixClamp", "math_8h.html#a5b18775a4f5e401550270ef08ab62a1e", null ],
@@ -14,6 +15,8 @@ var math_8h =
     [ "fixLerp", "math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd", null ],
     [ "fixMul", "math_8h.html#aaa8ca4460928f28892217658eca661bf", null ],
     [ "fixSin", "math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c", null ],
+    [ "fixSqrt", "math_8h.html#a5da2bf6880e934a85f84e9f070d612f5", null ],
     [ "mod16", "math_8h.html#ae2d0745b4830f0f51732ebccb6bb7d1d", null ],
-    [ "mul16", "math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54", null ]
+    [ "mul16", "math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54", null ],
+    [ "sqrt16", "math_8h.html#a8cc43b9aa47696123ad5d893daee75ea", null ]
 ];

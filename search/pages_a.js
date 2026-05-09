@@ -11,11 +11,12 @@ var searchData=
   ['color_20gradients_8',['Gradient Colors -- HDMA Color Gradients',['../examples_graphics_effects_gradient_colors.html',1,'examples_by_category']]],
   ['color_20math_20hdma_9',['Transparent Window -- Color Math + HDMA',['../examples_graphics_effects_transparent_window.html',1,'examples_by_category']]],
   ['colors_20hdma_20color_20gradients_10',['Gradient Colors -- HDMA Color Gradients',['../examples_graphics_effects_gradient_colors.html',1,'examples_by_category']]],
-  ['complete_20game_20examples_11',['Complete Game Examples',['../examples_games.html',1,'']]],
-  ['components_12',['Third-Party Components',['../third_party.html',1,'index']]],
-  ['continuous_20scroll_13',['Continuous Scroll',['../examples_graphics_backgrounds_continuous_scroll.html',1,'examples_by_category']]],
-  ['contributing_20to_20opensnes_14',['Contributing to OpenSNES',['../contributing.html',1,'index']]],
-  ['controller_20input_15',['Controller Input',['../examples_input_controller.html',1,'']]],
-  ['controller_20input_20tutorial_16',['Controller Input Tutorial',['../tutorial_input.html',1,'index']]],
-  ['cube_17',['SuperFX 3D Cube',['../examples_graphics_effects_superfx_3d.html',1,'']]]
+  ['colour_20math_20tutorial_11',['Colour Math Tutorial',['../tutorial_colormath.html',1,'']]],
+  ['complete_20game_20examples_12',['Complete Game Examples',['../examples_games.html',1,'']]],
+  ['components_13',['Third-Party Components',['../third_party.html',1,'index']]],
+  ['continuous_20scroll_14',['Continuous Scroll',['../examples_graphics_backgrounds_continuous_scroll.html',1,'examples_by_category']]],
+  ['contributing_20to_20opensnes_15',['Contributing to OpenSNES',['../contributing.html',1,'index']]],
+  ['controller_20input_16',['Controller Input',['../examples_input_controller.html',1,'']]],
+  ['controller_20input_20tutorial_17',['Controller Input Tutorial',['../tutorial_input.html',1,'index']]],
+  ['cube_18',['SuperFX 3D Cube',['../examples_graphics_effects_superfx_3d.html',1,'']]]
 ];
