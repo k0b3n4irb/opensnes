@@ -117,3 +117,14 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `release.md` — Release workflow, CHANGELOG format, version tagging
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
 - `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
+
+## Strategic Planning
+
+`.claude/STRUCTURAL_DEFECTS.md` is the maintainer-internal catalogue of
+defects that require deliberate chantiers (multi-day to multi-month).
+Carries effort estimates, risk profiles, an interaction matrix, and
+investigation logs that the public `KNOWN_LIMITATIONS.md` and
+`ROADMAP.md` deliberately omit. Consult before starting a non-trivial
+chantier; update the catalogue (status, investigation log, references)
+when shipping or deferring an entry. The public docs absorb only the
+high-level outcome (severity, headline, mitigation reference).
