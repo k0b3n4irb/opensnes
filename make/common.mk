@@ -53,6 +53,12 @@ GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
 TEMPLATES := $(OPENSNES)/templates
 
+# Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
+# 16 sits below the current example minimum (28 bytes free in mapscroll.sfc as
+# of v0.16.0) so the build still passes today; bumping it tighter is a
+# deliberate audit step. See .claude/rules/bank0_budget.md for the policy.
+BANK0_FAIL_THRESHOLD ?= 16
+
 # Check toolchain exists (skip for 'clean' target)
 ifneq ($(MAKECMDGOALS),clean)
 ifeq ($(wildcard $(CC)),)
@@ -125,7 +131,15 @@ _DEP_object          := map
 _DEP_map             := dma
 _DEP_snesmod         := console
 _DEP_superfx         := dma
-_DEP_hdma            := dma
+_DEP_hdma            := dma math_sqrt
+# math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
+# only) and the larger trig + arithmetic module (math = sine LUT +
+# atan_lut + fixSin/fixCos/fixDiv/fixMul/fixAbs/fixClamp/fixLerp +
+# atan2_8 + mul16/div16/mod16). hdma needs only sqrt16 (for iris-wipe
+# radius), so we depend on math_sqrt to keep hdma users light. Anyone
+# listing `math` in LIB_MODULES still gets sqrt because math depends
+# on math_sqrt — the resolver flattens this transitively.
+_DEP_math            := math_sqrt
 _DEP_asset           := dma background
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
@@ -338,18 +352,49 @@ ifeq ($(USE_SA1),1)
 	@$(OPENSNES)/bin/sa1_patch $@ && echo "[SA1] Patched $$FFD5 map mode to SA-1"
 endif
 	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
-	@# bank $$01+. The compiler emits 16-bit addresses that always read bank $$00,
-	@# so spilled string.N symbols return GARBAGE silently in production. exit 1
-	@# from symmap = critical spill (hard fail). exit 2 = soft warning (low free
-	@# space) — printed but build continues. Set SKIP_BANK0_CHECK=1 to disable.
+	@# bank $$01+, OR if bank $$00 free space drops below BANK0_FAIL_THRESHOLD.
+	@# The compiler emits 16-bit addresses that always read bank $$00, so spilled
+	@# string.N symbols return GARBAGE silently in production. The fail-threshold
+	@# is a ratchet: catches "one-const-literal-away-from-spill" regressions
+	@# before they ship. Default 16 sits below the current example minimum
+	@# (28 bytes free in mapscroll.sfc as of v0.16.0) so the build still passes;
+	@# bumping it tighter is a deliberate audit step — see
+	@# .claude/rules/bank0_budget.md for the policy.
+	@# exit 1 from symmap = critical spill OR imminent overflow (hard fail).
+	@# exit 2 = soft warning (low free space) — printed but build continues.
+	@# Set SKIP_BANK0_CHECK=1 to disable; BANK0_FAIL_THRESHOLD=N to retune.
 ifneq ($(SKIP_BANK0_CHECK),1)
 	@SYM=$(TARGET:.sfc=.sym); \
 	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow "$$SYM"; \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow \
+			--fail-threshold $(BANK0_FAIL_THRESHOLD) "$$SYM"; \
 		rc=$$?; \
 		if [ "$$rc" -eq 1 ]; then \
-			echo "ERROR: bank \$$00 ROM overflow — see symmap output above"; \
-			echo "       reduce const data or split arrays. SKIP_BANK0_CHECK=1 to bypass."; \
+			echo "ERROR: bank \$$00 ROM overflow / imminent overflow — see symmap output above"; \
+			echo "       reduce const data, split arrays, or set SKIP_BANK0_CHECK=1 to bypass."; \
+			exit 1; \
+		fi; \
+	fi
+endif
+	@# NMI / WRAM data port race lint — silent-failure 🔴 in
+	@# KNOWN_LIMITATIONS.md (chantier E1, 2026-05-09). Walks the
+	@# call graph from every NMI callback root (NmiHandler +
+	@# functions registered via nmiSet/nmiSetBank) and fails the
+	@# build if any reachable function writes to $$2180-$$2183.
+	@# Lib + crt0 are NOT followed (audited via
+	@# .claude/rules/nmi_audit.md); the lint only walks user code
+	@# in this example's .c.asm intermediates and combined.asm.
+	@# Set SKIP_NMI_RACE_CHECK=1 to disable for a build.
+ifneq ($(SKIP_NMI_RACE_CHECK),1)
+	@if [ -f combined.asm ]; then \
+		python3 $(OPENSNES)/devtools/check_nmi_wram_race.py \
+			--rom-dir . --quiet; \
+		rc=$$?; \
+		if [ "$$rc" -ne 0 ]; then \
+			echo "ERROR: NMI / WRAM port race — see report above."; \
+			echo "       Functions reachable from an NMI callback must"; \
+			echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
+			echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
 			exit 1; \
 		fi; \
 	fi

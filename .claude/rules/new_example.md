@@ -56,7 +56,7 @@ consoleInit() → setMode() → palettes → tiles → tilemap → BG pointers
 | Sprite palette at CGRAM 0 | Wrong colors | Sprite palettes start at CGRAM 128 |
 | `mapLoad()` called after `setScreenOn()` | Garbage tiles on first frame | `mapLoad()` before `setScreenOn()` — it flushes VRAM internally |
 | Missing LIB_MODULES | Link error | Match `#include` with module |
-| `volatile` in loops | QBE SSA crash | Use globals instead |
+| `volatile` semantics in loops | (resolved chantier A2, 2026-05-09 — `volat` IR keyword tags volatile accesses so loadopt/promote/gcm leave them intact) | Use `volatile` freely now; SDK still favours globals for NMI handshakes for cycle-cost equivalence |
 | ASM stack offset 7,s | Works for arg=0 only | First arg is at **6,s** after PHP+PHB |
 
 ## Makefile

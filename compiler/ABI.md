@@ -247,9 +247,13 @@ Constraints to respect:
   tracking after branch merges. Add explicit markers after every
   `rep`/`sep` and at the top of every label that may be branched to.
   See `KNOWN_LIMITATIONS.md` (toolchain section).
-- **No `volatile` in C declaration** of the helper: cproc accepts it but
-  QBE's SSA pass crashes on volatile in loops. Use a plain global to
-  signal hardware-poll completion.
+- **`volatile` is honoured** (since chantier A2, 2026-05-09): the cproc
+  → QBE pipeline tags volatile loads/stores with a `volat` IR keyword
+  so the load-forwarding, promotion, and dead-code passes leave each
+  access intact. Use `volatile` freely for MMIO and hardware polling.
+  Plain globals remain the SDK convention for NMI flag handshakes
+  (`vblank_flag`, `oam_update_flag`) only for cycle-cost equivalence —
+  not because `volatile` is broken.
 
 ---
 
@@ -305,13 +309,16 @@ For the assembly source, see `lib/source/sprite_oamset.asm`.
 | C type | Size (bytes) | Notes |
 |--------|:------------:|-------|
 | `u8` / `s8` / `bool` / `_Bool` | 1 (storage), 2 (stack slot) | Always zero/sign-extended when passed as argument. |
-| `u16` / `s16` / pointer | 2 | Native word size. |
-| `int` / `unsigned int` | **4** | Surprising on a 16-bit target. Use `s16`/`u16` instead. |
-| `long` / `unsigned long` | **8** | Almost certainly not what you want. Avoid. |
-| `u32` / `s32` | 4 | Stack-passed and stack-returned. |
+| `u16` / `s16` / `int` / `unsigned int` | 2 | Native word size on the w65816 target. (Aligned with SNES expectations since chantier A1, 2026-05-08.) |
+| `u32` / `s32` / `long` / `unsigned long` | 4 | Stack-passed and stack-returned. |
+| `long long` / `unsigned long long` | 8 | C99 requires ≥ 64-bit. |
+| pointer | 8 in IR, 2 on stack | Pointer storage in `static const` structs is 8 bytes (cproc IR holdover; chantier A6 will reduce to 4). On the runtime stack, parameters take 2 bytes per slot per the w65816 ABI. Function pointers preserve the bank byte via the 8-byte storage layout — reducing it requires a coordinated emit-pass change (A6). |
 | `float` / `double` | 4 / 8 | Software floats — extremely slow, used only by `printf`-style helpers. Avoid in game code. |
 
-For all SDK code, use `u8`, `u16`, `s16`, `u32` from `lib/include/snes/types.h`.
+For SDK code, prefer the explicit fixed-width types `u8`, `u16`, `s16`,
+`u32` from `lib/include/snes/types.h` for **portability** (cross-compiler
+clarity). Bare `int` is now correct on this target since chantier A1
+shipped (2026-05-08).
 
 ---
 
@@ -358,8 +365,7 @@ it unless you know A doesn't carry the return.
 - **Variadic functions** (`...`): no support. Wrappers like `printf` use
   fixed-prototype variants.
 - **Nested function definitions** (GCC extension): not supported.
-- **`alloca`** (variable-length stack allocation): not supported. Loops
-  with `volatile` crash the SSA pass; use globals instead.
+- **`alloca`** (variable-length stack allocation): not supported.
 - **`__attribute__((interrupt))`**: not recognised. The NMI handler is
   hand-written assembly in `templates/crt0.asm` and dispatches to a C
   callback registered via `nmiSet()`.

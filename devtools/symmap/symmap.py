@@ -494,12 +494,20 @@ def print_overlap_check(table: SymbolTable) -> int:
     return 1
 
 
-def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048) -> int:
+def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048,
+                                fail_threshold: int = 0) -> int:
     """Check and print bank $00 ROM overflow status. Returns exit code.
 
-    Exit code 1 (hard fail): string literals spilled to bank $01+.
-    Exit code 2: bank $00 free space below warn_threshold.
-    Exit code 0: no critical spills and free space above threshold.
+    Exit code 1 (hard fail): string literals spilled to bank $01+, OR free
+        space below ``fail_threshold`` (when fail_threshold > 0). The latter
+        catches "imminent overflow" — one new const literal away from a 🔴
+        silent corruption — before it ships.
+    Exit code 2: bank $00 free space below warn_threshold (soft warning).
+    Exit code 0: no critical spills and free space above thresholds.
+
+    fail_threshold of 0 (default) preserves the historical behaviour of
+    failing only on actual spill. CI-tightening is a deliberate ratchet —
+    see ``.claude/rules/bank0_budget.md`` for the policy.
     """
     critical, warnings, free_bytes = table.check_bank0_rom_overflow()
 
@@ -535,6 +543,17 @@ def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048) -
                   f"({free_bytes} bytes free, threshold: {warn_threshold}){Colors.RESET}")
             return 2
         return 0
+
+    # Hard-fail ratchet: free space below fail_threshold is treated as imminent
+    # overflow. Default 0 (disabled) preserves historical behaviour; the build
+    # system can opt in via BANK0_FAIL_THRESHOLD.
+    if fail_threshold > 0 and free_bytes < fail_threshold:
+        print(f"{Colors.RED}{Colors.BOLD}FAIL: Bank $00 ROM imminent overflow "
+              f"({free_bytes} bytes free, fail-threshold: {fail_threshold}){Colors.RESET}")
+        print("  One more const literal here will spill to bank $01+ and read")
+        print("  as garbage at runtime (see KNOWN_LIMITATIONS.md, severity 🔴).")
+        print(f"  See .claude/rules/bank0_budget.md for the refactor playbook.")
+        return 1
 
     # No spills — check for low free space warning
     if free_bytes < warn_threshold:
@@ -639,6 +658,9 @@ Examples:
                         help='Check for C-generated data that spilled from bank $00')
     parser.add_argument('--warn-threshold', type=int, default=2048, metavar='N',
                         help='Free space threshold (bytes) for bank $00 warning (default: 2048)')
+    parser.add_argument('--fail-threshold', type=int, default=0, metavar='N',
+                        help='Free space threshold (bytes) for bank $00 imminent-overflow '
+                             'hard-fail (default: 0 = disabled). Catches one-const-away-from-spill.')
     parser.add_argument('--find', metavar='NAME',
                         help='Find symbol by name (fuzzy match)')
     parser.add_argument('--export-json', action='store_true',
@@ -678,7 +700,9 @@ Examples:
         return print_overlap_check(table)
 
     if args.check_bank0_overflow:
-        return print_bank0_overflow_check(table, warn_threshold=args.warn_threshold)
+        return print_bank0_overflow_check(table,
+                                          warn_threshold=args.warn_threshold,
+                                          fail_threshold=args.fail_threshold)
 
     if args.find:
         print_symbol_search(table, args.find)

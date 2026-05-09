@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain lint-commits docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -91,6 +91,17 @@ verify-toolchain:
 RANGE ?= origin/develop..HEAD
 lint-commits:
 	@python3 devtools/lint_commits.py $(RANGE)
+
+# Doc-drift sentinel — version macros, ROADMAP status line, examples count
+# across active rules. See devtools/check_doc_drift.py and
+# .claude/rules/doc_consistency.md. Wired in CI under .github/workflows/lint.yml.
+lint-docs:
+	@python3 devtools/check_doc_drift.py
+
+# Aggregate lint target — runs every lint we have. Run before opening a PR.
+lint: lint-docs
+	@python3 devtools/lint_asm.py
+	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain
 	$(MAKE) -C $(COMPILER_PATH)
@@ -174,4 +185,6 @@ help:
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
+	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
+	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
 	@echo "  help      - Show this help"

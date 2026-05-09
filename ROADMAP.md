@@ -8,15 +8,17 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.13.0 (developing toward v0.14.0)
+## Current Status: post-v0.17.0 (developing toward v0.18.0)
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 53
+produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 54
 working examples cover every major subsystem, with cross-platform CI on Linux,
-macOS, and Windows enforcing not just "it compiles" but the full
-~390-check functional test suite (`opensnes-emu` snes9x WASM + visual
-regression + lag detection + 62 compiler tests + input sequences).
+macOS, and Windows enforcing not just "it compiles" but the full functional
+test suite (`opensnes-emu` snes9x WASM + visual regression + lag detection +
+compiler tests + input sequences). Run `cd tools/opensnes-emu && node
+test/run-all-tests.mjs --list` for the current check count — the suite grows
+with new chantiers and a single hard-coded number rots fast.
 
 ### Audience
 
@@ -98,12 +100,15 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] `.ACCU 16` / `.INDEX 16` for WLA-DX register-size tracking
 - [x] Variable shift codegen fix (`(1 << variable)`)
 - [x] Signed division and modulo (`__sdiv16` / `__smod16`)
-- [ ] **Tail call optimisation** — backend support exists in QBE upstream but
-      not wired in our 65816 emit. Tracked as known-bug in the test suite
-      (`tail_call`, `lazy_rep20`, `plx_cleanup`).
-- [ ] **A-cache through `pha`** — invalidates on every call today; extending
-      across pure pushes would skip a redundant `lda`. Tracked as known-bug
-      (`acache_pha`).
+- [x] **Tail call optimisation** — shipped (chantiers C.1 / C.2.1 / C.2.2;
+      QBE patches `ed840fb` and `bab0164` per `compiler/PINS.md`). The
+      `tail_call`, `lazy_rep20`, `plx_cleanup` test cases that previously
+      ran under `--allow-known-bugs` were investigated in chantier A3 and
+      found to be testing optimisations that had already shipped; the
+      markers were stale. CI no longer passes `--allow-known-bugs`.
+- [x] **A-cache through `pha`** — shipped; chantier C.6's audit confirmed
+      the optimisation already worked, the `acache_pha` test was stale.
+      Hard-fails any regression as of chantier A3 (2026-05-09).
 
 ### Library modules
 | Module | Description | Status |
@@ -240,10 +245,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
       absent (`scripts/install-mesen2.sh` fetches it once per CI run,
       cached locally). 4 new checks, total 257 → 261. Done in
       ~1 day rather than the originally estimated 2 weeks.
-- [ ] **Tail call optimisation in QBE w65816** — backend hooks exist
-      upstream but the emit pass isn't wired. Would close 3 of the 5
-      known-bug compiler tests. Effort uncertain; tracked.
-- [ ] **A-cache through `pha`** — closes the 4th known-bug.
+- [x] **Retire residual TCO `[KNOWN_BUG]` test cases** — done in
+      chantier A3 (2026-05-09). Investigation showed every optimisation
+      the markers gated had already shipped; the test assertions had
+      drifted away from current emit-pass behaviour rather than
+      anticipating future work. Markers removed, assertions converted
+      to hard-fail, `--allow-known-bugs` dropped from CI.
 - [ ] **Mode 7 game example** (racing or flying)
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
@@ -258,16 +265,14 @@ The full catalog with severity tags lives in
 [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md). Headlines:
 
 - **No floating-point** — use fixed-point math (`<snes/math.h>`)
-- **`int` is 4 bytes, `long` is 8 bytes** on this target — prefer `u16` /
-  `s16` from `<snes/types.h>` for performance-sensitive code
+- **`int` is 2 bytes, `long` is 4 bytes** on this target (since chantier
+  A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
+  `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
 - **All C variables must be in bank $00, < $2000** — compiler emits
   `sta.l $0000,x`
 - **Push order is LEFT-TO-RIGHT** (vs PVSnesLib's right-to-left) — see
   [`compiler/ABI.md`](compiler/ABI.md) before porting an ASM helper
-- **5 compiler optimisations are pending** — TCO, A-cache through pha,
-  and a stale `leaf_opt=1` marker. Tracked as known-bug entries in the
-  test suite, surface as `[KNOWN_BUG]` with `--allow-known-bugs`.
 
 ---
 
@@ -277,4 +282,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-04-27.*
+*Last updated: 2026-05-07. Anchored claims (version, examples count, framework
+opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
+and `.claude/rules/doc_consistency.md`.*

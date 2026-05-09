@@ -10,7 +10,7 @@ ROM_NAME   := WINDOW HDMA DEMO
 
 # Use the OpenSNES library
 USE_LIB    := 1
-LIB_MODULES := console sprite dma input background window hdma math
+LIB_MODULES := console sprite dma input background window hdma
 
 # Source files
 CSRC       := main.c

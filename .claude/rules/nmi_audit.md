@@ -41,6 +41,22 @@ Lag frames increment `frame_count` but skip VRAM work. This is intentional.
 Main-thread code writes multi-byte sequences to $2180 with address set via $2181-$2183.
 If NMI fires mid-sequence and touches $2180-$2183, the address/data will be **corrupted silently** when the main thread resumes.
 
+### Static lint (chantier E1, 2026-05-09)
+
+`devtools/check_nmi_wram_race.py` builds the call graph from each
+example's `combined.asm` + `*.c.asm` intermediates, identifies the
+NMI closure (NmiHandler + DefaultNmiCallback + every function passed
+to `nmiSet`/`nmiSetBank`), and **fails the build** if any reachable
+function writes to `$2180-$2183`.
+
+Wired into `make/common.mk` post-link, runs after every example
+build. Bypass per-build with `SKIP_NMI_RACE_CHECK=1` (debug-only —
+document in the commit). Lib + crt0 are *not* followed; they are
+audited under this checklist. The lint targets user code in NMI
+callbacks, where the actual risk lives.
+
+Regression tests: `python3 devtools/test_check_nmi_wram_race.py`.
+
 ## DP Isolation
 
 NMI uses `tcc__nmi_registers` (page-aligned, != 0) as its direct page.
@@ -54,4 +70,4 @@ All dp-relative accesses in NMI callback C code hit NMI registers, NOT main thre
 - [ ] Handshake protocol (vblank_flag) unchanged
 - [ ] DP isolation preserved (tcc__nmi_registers)
 - [ ] FASTROM variant (jml.l FastNmi) updated if applicable
-- [ ] All 53 examples still pass visual regression
+- [ ] Every example still passes visual regression (run the full `--quick` suite — counts drift; the gate is "all green", not a hard-coded number)

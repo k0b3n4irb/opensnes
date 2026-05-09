@@ -43,15 +43,21 @@ mid-DMA → garbage tiles for one or more rows.
 **Mitigation:** count your DMAs. If a frame needs > 4 KB, split across multiple
 VBlanks (1-page pattern) or move the heavy load into a forced-blank window.
 
-### 🔴 WRAM data port `$2180–$2183` is NOT safe in NMI
+### 🟢 WRAM data port `$2180–$2183` race in NMI (caught at build time)
 Main-thread code writes multi-byte sequences via `$2180` after setting an
 address with `$2181-$2183`. If NMI fires mid-sequence and any code in the NMI
 path touches those ports, the address pointer is silently corrupted and the
 main thread resumes writing garbage to a wrong location.
 
-**Mitigation:** the SDK's NMI handler in `templates/crt0.asm` never touches
-`$2180-$2183`. If you write a custom `nmiSet()` callback, do not use any
-function that goes through these ports.
+**Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
+runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
+the call graph from every NMI callback root (NmiHandler + functions
+registered via `nmiSet`/`nmiSetBank`) and **fails the build** if any
+reachable function writes to `$2180-$2183`. Lib + crt0 are audited and
+treated as a black box; the lint targets user code in NMI callbacks,
+where the actual risk lives. Bypass for a single build with
+`SKIP_NMI_RACE_CHECK=1`. Regression suite:
+`python3 devtools/test_check_nmi_wram_race.py` (6 cases).
 
 ### 🟢 Bank $00 ROM overflow → garbage const reads (caught at link time)
 `static const` arrays each get a SUPERFREE section. The compiler emits 16-bit
@@ -104,14 +110,26 @@ of 6,s. The function compiles, links, and corrupts the stack at runtime.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 
-### 🟠 `volatile` in loops crashes QBE
-QBE's SSA pass can't always handle `volatile`. Loops with `volatile` reads/writes
-typically crash with a backend assertion or generate broken code.
+### 🟢 `volatile` is preserved through QBE (since chantier A2, 2026-05-09)
+The C `volatile` qualifier on a load or store now survives the cproc → QBE
+pipeline. cproc tags the instruction with a `volat` keyword in the
+intermediate IR; QBE's `loadopt` (load forwarding), `promote` (alloca-to-
+register promotion), and `gcm` (dead-code elimination of unused loads) all
+honour the marker and leave volatile accesses intact, so each access to a
+`volatile` object produces its own load/store as the C standard requires.
 
-**Mitigation:** for hardware-poll loops, use a regular global instead of
-`volatile` — the SDK explicitly avoids `volatile` in flag handshakes (`vblank_flag`,
-`oam_update_flag`). If you absolutely need MMIO semantics, use a small ASM
-helper.
+Pre-A2 the SDK avoided `volatile` entirely (a comment in
+`compiler/cproc/qbe.c` literally said *"For now, treat volatile stores like
+normal stores for SNES hw access"* — the qualifier was discarded). The
+runtime still favours plain globals for handshake patterns (`vblank_flag`,
+`oam_update_flag`) because the cycle cost is the same and the contract is
+clearer for NMI-vs-main races, but user code is now free to use `volatile`
+for MMIO polling, hardware-register reads, and any pattern where the C
+standard's "each access is a side effect" semantics matter.
+
+The compiler-test phase enforces this with assertion counts on
+`test_volatiles.c` — three sequential reads of `hw_status` must produce at
+least three `lda.w hw_status` instructions, and so on.
 
 ### 🟢 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges (lint-enforced)
 WLA-DX tracks the current accumulator/index register width across `rep`/`sep`
@@ -191,37 +209,61 @@ against the file and fail on drift.
 
 ## Compiler optimisation gaps
 
-One known gap remains in cc65816 today (the lone `[KNOWN_BUG]` entry surfaced
-by `--allow-known-bugs` in the test suite). Earlier entries that lived here —
-tail call optimisation and A-cache-through-`pha` — have shipped (chantiers
-C.1 / C.2.1 / C.2.2 wired TCO; C.6's audit confirmed A-cache through `pha`
-already worked, the test had been stale).
+**None as of chantier A3 (2026-05-09).** The compiler-test phase runs
+clean without the `--allow-known-bugs` escape that used to gate tail
+call optimisation on wrappers, A-cache-through-`pha`, lazy `rep #$20`
+emission, and the `leaf_opt=1` marker on non-leaf functions.
+Investigation found every optimisation had already shipped (chantiers
+C.1 / C.2.1 / C.2.2 / C.6); the test markers were stale, not the
+codegen. The CI workflow no longer passes `--allow-known-bugs`; any
+regression on these surfaces immediately as a hard failure. The
+`leaf_opt=N` comment marker in generated ASM is also accurate — it
+reports the actual optimisation state per function (not always 1
+or always 0), so reading it is reliable.
 
-### 🟡 Stale `leaf_opt=1` marker for non-leaf functions
-Phase 5b removed the `leaf_opt` gate so the optimisations apply to non-leaf
-functions too, but the comment marker in the generated ASM still says
-`leaf_opt=0` even when the optimisation is active. Cosmetic — the optimisation
-fires, only the diagnostic comment is wrong. Surfaces as a single `[KNOWN_BUG]`
-in the compiler test phase (`nonleaf_frameless`).
-
-**Mitigation:** none needed for codegen correctness. If you read the comment
-markers to verify optimisation state, fall back to inspecting the actual ASM
-shape (a non-leaf frameless function has no `sec`/`sbc.w` prologue and no
-`adc.w`/`tas` epilogue, with arguments accessed via `4,s`/`6,s` directly).
+MSYS2-specific cproc segfaults (struct pointer init, nested structs,
+unions, string initializers, `.rodata`-vs-`RAMSECTION` flake) remain
+behind `knownBug()` calls in `compiler-tests.mjs`, gated on the
+`r.segfault` signal — they only fire on Windows / MSYS2 builds and
+are tracked in `.github/workflows/msys2_cproc_diagnostic.yml`. Linux
+and macOS CI never trigger them.
 
 ---
 
 ## Type & ABI gotchas
 
-### 🟡 `int` is 32 bits, `long` is 64 bits on cc65816
-Counter-intuitive on a 16-bit CPU. cproc was originally a host-target compiler
-and `sizeof(int)` in the IR is 4. Code that expects 16-bit `int` (e.g. ports
-from PVSnesLib's tcc816 which uses 16-bit `int`) will silently produce 32-bit
-arithmetic and double the work.
+### 🟢 `int` and `long` type sizes match the w65816 target (since chantier A1)
+`sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
+`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
+canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 
-**Mitigation:** always use the SDK's fixed-width types: `u8`, `u16`, `s16`,
-`u32`. Never use bare `int`/`long`/`short` in performance-sensitive code.
-The SDK's `lib/include/snes/types.h` provides the canonical typedefs.
+Historical note: pre-A1, `int` was 4 bytes and `long` was 8 (cproc was inherited
+as a host-target compiler with `sizeof(int) = 4` hardcoded). Code that expected
+16-bit `int` would silently produce 32-bit arithmetic and double the work.
+That trap is gone — bare `int` is now correct on this target.
+
+`u8` / `u16` / `s16` / `u32` from `lib/include/snes/types.h` remain the
+preferred types for **portability** (they make the code intent explicit and
+work identically across compilers), but using bare `int` no longer doubles
+your cycle cost.
+
+### 🟡 Pointer IR size is still 8 bytes (chantier A6 — pending)
+The companion fix for pointer types was deliberately deferred into its own
+chantier (A6) because reducing pointer storage cascades through QBE w65816's
+indirect-call emit pass: the bank byte for `jml [tcc__r9]` is hardcoded as
+`lda #$00` instead of read from the pointer's actual storage. Until A6 lands,
+function pointers are stored as 8 bytes (low + high + 4 bytes padding) and
+indirect calls assume bank `$00` — which works because the SDK's framework
+opt-ins (`scene`, `gameloop`) happen to dispatch to functions in bank `$00`
+via the lib's SUPERFREE'd code that lands there.
+
+**Mitigation (today):** function pointers continue to work as before. No user
+code change needed.
+
+**A6 plan:** pointer IR size 8 → 4 (24-bit address + 1 byte alignment),
+indirect-call emit reads bank byte from pointer storage, lib API can drop
+the `*Bank` variant pattern entirely. Tracked in the structural-defects
+catalogue.
 
 ### 🟡 Sprite palettes start at CGRAM offset 128, not 0
 Standard SNES quirk that surprises everyone once. The first 128 colours of
@@ -233,6 +275,36 @@ for sprites.
 **Mitigation:** use `OBJ_CGRAM_BASE` (= 128) and the `OBJ_CGRAM_PAL(n)` helper
 defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 (`PAL_n`) from OBJ (`OBJ_PAL_n`) palettes.
+
+---
+
+## Performance traps
+
+### 🟡 `oamSet()` has framesize=158 — visible jitter past ~3 calls per frame
+The QBE backend allocates 158 bytes of SSA temporary storage for every
+`oamSet(id, x, y, attr, size, tile)` invocation, manipulated on the stack at
+each call site. On a 3.58 MHz CPU that overhead is visible: more than ~3
+`oamSet()` calls per frame in the main loop produces jerky movement on real
+hardware (and shows up as lag-frame spikes in the test suite). The function
+itself is correct — the cost lives in the calling convention, not in the OAM
+write.
+
+**Mitigation:** for any sprite that updates every frame, write directly to
+the `oamMemory[]` shadow buffer and let the NMI handler DMA it to OAM. The
+SDK ships two ergonomic helpers:
+
+- `oamSetFast(id, x, y, attr, size, tile)` — drop-in macro replacement for
+  `oamSet()` that compiles to direct memory writes (see
+  `lib/include/snes/sprite.h`'s "Fast Macro Sprite API" section).
+- `oamSetXYFast(id, x, y)` — position-only update, the most common
+  per-frame case.
+
+Both are documented in `sprite.h` next to the function form. Use the
+function `oamSet()` for one-shot setup at scene init (where the 158-byte
+frame is paid once and clarity wins); use the macros for the per-frame
+update path. The breakout, collision_demo, animated_sprite, mouse, and
+superscope examples all switched to direct `oamMemory[]` writes for this
+reason — see their READMEs for worked examples.
 
 ---
 

@@ -327,11 +327,19 @@ jobs:
       - name: Run test suite
         working-directory: tools/opensnes-emu
         # Full suite (drops --quick so compiler tests run too).
-        # --allow-known-bugs lets the 5 documented gaps (tail call optimisation,
-        # A-cache through pha, stale leaf_opt marker) report as [KNOWN_BUG]
-        # instead of failing — they are tracked as future compiler work, not
-        # regressions. Real regressions still fail.
-        run: node test/run-all-tests.mjs --allow-known-bugs
+        #
+        # Pre-A3: this command passed `--allow-known-bugs` to escape
+        # 5 stale [KNOWN_BUG] markers (TCO non-frameless wrappers,
+        # A-cache through pha, stale leaf_opt=1 marker on
+        # compute_across_call). Investigation in chantier A3
+        # (2026-05-09) confirmed every one of those optimisations
+        # had already shipped — the markers were stale, not the code.
+        # The assertions are now hard-fail and the escape is gone.
+        # Linux-side MSYS2-segfault knownBug() sites in
+        # compiler-tests.mjs remain (they only fire on Windows builds
+        # of cproc); they're orthogonal to the optimisation gaps and
+        # never trigger here.
+        run: node test/run-all-tests.mjs
 
       - name: Upload test artifacts on failure
         if: failure()

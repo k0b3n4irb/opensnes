@@ -263,4 +263,96 @@ fixed fixClamp(fixed x, fixed min, fixed max);
  */
 fixed fixLerp(fixed a, fixed b, u8 t);
 
+/*============================================================================
+ * Square Root and Inverse Trigonometry
+ *============================================================================*/
+
+/**
+ * @brief Integer square root
+ *
+ * Computes `floor(sqrt(n))` for any 16-bit unsigned input. Uses the
+ * canonical bit-by-bit (digit-by-digit) algorithm — no LUT, no
+ * floating point, fully deterministic in cycle count (~80 cycles
+ * worst case on the 65816).
+ *
+ * @param n Input value (0 to 65535)
+ * @return Largest integer whose square is ≤ n. Range: 0 to 255.
+ *
+ * @code
+ * u16 dx = enemy_x - player_x;
+ * u16 dy = enemy_y - player_y;
+ * u16 dist = sqrt16(dx * dx + dy * dy);  // pixel distance
+ * @endcode
+ *
+ * @note Range guarantee: `sqrt16(n)` is always ≤ 255, so the result
+ *       fits in `u8`. Useful when distance is bounded by screen size.
+ *
+ * @see fixSqrt for the 8.8 fixed-point variant.
+ */
+u16 sqrt16(u16 n);
+
+/**
+ * @brief Square root in 8.8 fixed-point
+ *
+ * Computes the square root of an 8.8 fixed-point value. Internally
+ * delegates to `sqrt16(x)` and shifts the result by 4 bits to
+ * recover 5 bits of fractional precision in the answer (the
+ * remaining 3 bits are zero — this is a lib-side limit, not a
+ * mathematical one; precision can be raised once the QBE 32-bit
+ * codegen lands — see chantier A7 in the structural-defects
+ * catalogue).
+ *
+ * @param x Input value in 8.8 fixed-point. Must be ≥ 0; negative
+ *          inputs return 0.
+ * @return `sqrt(x)` in 8.8 fixed-point.
+ *
+ * @code
+ * fixed area = FIX(64);     // 64.0
+ * fixed side = fixSqrt(area);  // 8.0 (FIX(8))
+ * @endcode
+ *
+ * @note For `x < 0`, returns 0 (no error signalling — sqrt of
+ *       negative is undefined; the lib chooses defined-but-zero
+ *       over throwing through the simple API).
+ */
+fixed fixSqrt(fixed x);
+
+/**
+ * @brief 8-bit two-argument arctangent
+ *
+ * Returns the angle of the vector (dx, dy) measured from the
+ * positive X axis, in the SDK's 8-bit angle convention (0–255 =
+ * 0°–360°, same scale as `fixSin` / `fixCos`).
+ *
+ * - 0 → +X (east, dy=0, dx>0)
+ * - 64 → +Y (south on a screen, dy>0, dx=0)
+ * - 128 → −X (west)
+ * - 192 → −Y (north)
+ *
+ * Implementation: 65-entry LUT covering the first octant
+ * (`atan(t)` for `t ∈ [0, 1]` mapped to angle `[0, 32]`), with
+ * symmetry handling for the other 7 octants. Inputs are reduced
+ * by power-of-two right shifts when their magnitudes exceed 255,
+ * so the function works for any 16-bit signed input without
+ * overflowing the internal 16-bit divide.
+ *
+ * @param dy Y component of the vector
+ * @param dx X component of the vector
+ * @return 8-bit angle of `(dx, dy)`. Returns 0 if both inputs
+ *         are zero (the angle is mathematically undefined; the lib
+ *         chooses defined-but-zero).
+ *
+ * @code
+ * s16 dy = enemy_y - player_y;
+ * s16 dx = enemy_x - player_x;
+ * u8 aim_angle = atan2_8(dy, dx);
+ * fire_projectile(aim_angle);
+ * @endcode
+ *
+ * @note Precision is ≤ 1 angle unit (≈ 1.4°) for inputs whose
+ *       magnitudes fit in 8 bits; coarser for larger inputs after
+ *       reduction (still useful for game-side aiming logic).
+ */
+u8 atan2_8(s16 dy, s16 dx);
+
 #endif /* OPENSNES_MATH_H */

@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 3618c72d6eb209fe2342054c61fafa38933314f8 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 5fe27f06dab529f702c418366b1f0a8b9227de1b | github.com/k0b3n4irb/qbe:main |
+| compiler/cproc | cceac4bc784cc5be5523bbff7c94af36dbd66cd4 | github.com/k0b3n4irb/cproc:master |
+| compiler/qbe | 9878b9f60b422408d7d131abecbba4dc9a71d570 | github.com/k0b3n4irb/qbe:main |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -39,9 +39,11 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 6 patches (upstream merge-base: 7051114)
+### compiler/cproc — 8 patches (upstream merge-base: 7051114)
 
 ```
+cceac4b  fix(65816): preserve volatile through QBE IR  (chantier A2)
+7f26c16  fix(65816): align int/long type sizes with the w65816 target  (chantier A1)
 3618c72  fix: eliminate all Clang warnings
 ea95cac  fix: initialize all struct type fields in mktype() to prevent UB
 801c3e6  fix: add cleanup functions to free maps, arrays, and paramtemps at exit
@@ -54,11 +56,19 @@ d929b94  fix(w65816): fix pointer and type handling for QBE IL generation
 in ROM instead of WRAM — that's the kind of regression a careless submodule
 bump would re-introduce.
 
-### compiler/qbe — 28 patches (the bulk of the SDK's compiler magic)
+The chantier-A1 patch (7f26c16) reduces `sizeof(int)` from 4 to 2 and
+`sizeof(long)` from 8 to 4. The pointer size deliberately stays at 8 (its
+own structural defect is tracked as A6 in the structural-defects catalogue;
+reducing pointer storage cascades through QBE w65816's indirect-call emit
+pass). Empirically validated against the full quick test suite.
+
+### compiler/qbe — 30 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+9878b9f  fix(build): apply chantier A2 hygiene fixes to clean compile
+90b81e1  fix(w65816): respect volatile loads/stores via `volat` IR keyword  (chantier A2)
 d9483ee  fix(w65816): restrict leaf optimization to actual leaf functions
 b064fbd  fix: eliminate all Clang warnings in QBE w65816 backend
 ed0c7ee  fix(w65816): alloc computes absolute stack address via TSA

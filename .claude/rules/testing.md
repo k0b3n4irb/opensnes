@@ -11,7 +11,7 @@ cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
 This runs 8 phases (~390 checks total):
 1. **Preconditions** — toolchain and dependencies present
 2. **Compiler tests** — 60 C→ASM pattern checks
-3. **Build** — all 53 examples compile cleanly
+3. **Build** — every example compiles cleanly (`find examples -name main.c | wc -l` for the count; `--list` for the per-phase breakdown)
 4. **Static analysis** — ROM headers, memory maps, symbol overlaps
 5. **Runtime execution** — emulated run of each ROM
 6. **Visual regression** — screenshot comparison against baselines
@@ -53,7 +53,7 @@ Every non-trivial change requires all 3 pillars:
 For every change, run this three-step pipeline before asking the user to validate:
 
 1. **Identify** — enumerate every example whose compiled bytes could change,
-   not just every file edited. Class A compiler changes touch all 53 examples
+   not just every file edited. Class A compiler changes touch every example
    in principle; Class B library changes touch the subset that links the
    changed module; Class C example changes touch only one. Use the diagnostic
    tools available (e.g. `CC_TRACE_TCO` for compiler optimisations, `grep

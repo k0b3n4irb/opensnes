@@ -100,7 +100,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
-- **`volatile` in loops crashes QBE** — use globals instead of `volatile` keyword
+- **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
 - **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM
 
 ## Auto-Loaded Rules
@@ -115,3 +115,16 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `nmi_audit.md` — NMI handler rules, must consult before crt0.asm changes
 - `regression_method.md` — Mandatory bisection-based debugging, never guess
 - `release.md` — Release workflow, CHANGELOG format, version tagging
+- `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
+- `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
+
+## Strategic Planning
+
+`.claude/STRUCTURAL_DEFECTS.md` is the maintainer-internal catalogue of
+defects that require deliberate chantiers (multi-day to multi-month).
+Carries effort estimates, risk profiles, an interaction matrix, and
+investigation logs that the public `KNOWN_LIMITATIONS.md` and
+`ROADMAP.md` deliberately omit. Consult before starting a non-trivial
+chantier; update the catalogue (status, investigation log, references)
+when shipping or deferring an entry. The public docs absorb only the
+high-level outcome (severity, headline, mitigation reference).

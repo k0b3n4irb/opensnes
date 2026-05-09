@@ -11,6 +11,7 @@
 
 #include <snes.h>
 #include <snes/hdma.h>
+#include <snes/math.h>  /* sqrt16 — used by fillIrisTable */
 
 /*============================================================================
  * HDMA Effect Helpers
@@ -359,23 +360,12 @@ void hdmaColorGradientStop(u8 channel) {
 
 /*--------------------------------------------------------------------------
  * Iris Wipe (circular window)
+ *
+ * Uses the public sqrt16() from <snes/math.h> (chantier B6, 2026-05-09 —
+ * the previously-private isqrt() lived here from before the math API was
+ * filled out; promoted to lib API since it's the canonical 16-bit integer
+ * sqrt and other modules want it too).
  *--------------------------------------------------------------------------*/
-
-static u16 isqrt(u16 n) {
-    u16 result = 0;
-    u16 bit = 0x4000;
-    while (bit > n) bit >>= 2;
-    while (bit != 0) {
-        if (n >= result + bit) {
-            n = (u16)(n - result - bit);
-            result = (u16)((result >> 1) + bit);
-        } else {
-            result >>= 1;
-        }
-        bit >>= 2;
-    }
-    return result;
-}
 
 /**
  * Fill an iris table buffer using C pointer writes.
@@ -396,7 +386,7 @@ static void fillIrisTable(u8 *table, u8 centerX, u8 centerY, u16 r2) {
             wh0 = 0xFF;
             wh1 = 0x00;
         } else {
-            u16 dx = isqrt(r2 - dy2);
+            u16 dx = sqrt16(r2 - dy2);
             s16 left = (s16)centerX - (s16)dx;
             s16 right = (s16)centerX + (s16)dx;
             wh0 = (left < 0) ? 0 : (u8)left;

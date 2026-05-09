@@ -618,7 +618,8 @@ def print_report(functions, filename, verbose=False):
 
 
 def print_comparison(funcs_before, funcs_after, file_before, file_after):
-    """Print comparison between two analyses."""
+    """Print comparison between two analyses. Returns the totals so the
+    caller can apply optional regression thresholds."""
     all_names = list(dict.fromkeys(
         list(funcs_before.keys()) + list(funcs_after.keys())
     ))
@@ -633,6 +634,7 @@ def print_comparison(funcs_before, funcs_after, file_before, file_after):
 
     total_before = 0
     total_after = 0
+    per_fn = []
 
     for name in all_names:
         cyc_b = funcs_before.get(name, {}).get('cycles', 0)
@@ -640,6 +642,7 @@ def print_comparison(funcs_before, funcs_after, file_before, file_after):
         delta = cyc_a - cyc_b
         total_before += cyc_b
         total_after += cyc_a
+        per_fn.append((name, cyc_b, cyc_a, delta))
 
         if cyc_b > 0:
             pct = f"{delta / cyc_b * 100:+.1f}%"
@@ -663,6 +666,64 @@ def print_comparison(funcs_before, funcs_after, file_before, file_after):
     print(f"  {'-' * max_name}  {'-------':>7}  {'-------':>7}  {'-------':>7}  {'-------':>7}")
     print(f"  {'TOTAL':<{max_name}}  {total_before:>7}  {total_after:>7}  {total_delta_str:>7}  {total_pct:>7}")
     print()
+
+    return {
+        'total_before': total_before,
+        'total_after': total_after,
+        'per_fn': per_fn,
+    }
+
+
+def check_regression(comparison, total_pct_limit, fn_pct_limit, fn_abs_limit):
+    """Apply hard-gate thresholds to a comparison result.
+
+    Returns a list of breach descriptions. Empty list means no breach.
+
+    Two thresholds are applied:
+
+    1. **Total cycles**: if the post total is above the pre total by more
+       than `total_pct_limit` percent, that's a broad-drift breach.
+       This catches "many small regressions add up" patterns that
+       per-function checks miss.
+
+    2. **Per-function**: if any single function's after-cycles exceed
+       its before-cycles by both `fn_pct_limit` percent AND
+       `fn_abs_limit` cycles, that's a pathological-regression breach.
+       The combined percent + absolute floor avoids false positives on
+       trivially small functions (a 4-instruction routine going from
+       10 to 13 cycles is +30 % but only +3 cycles — not a real
+       regression in practice). Both knobs must trip together.
+
+    New functions (no `before` cycles) don't trigger per-function
+    breaches — they just contribute to the total.
+    """
+    breaches = []
+
+    tb = comparison['total_before']
+    ta = comparison['total_after']
+    if tb > 0:
+        total_pct = (ta - tb) / tb * 100
+        if total_pct > total_pct_limit:
+            breaches.append(
+                f"TOTAL regressed {total_pct:+.2f}% "
+                f"({tb} → {ta} cycles, +{ta - tb}); "
+                f"limit is +{total_pct_limit:.2f}%"
+            )
+
+    for name, cyc_b, cyc_a, delta in comparison['per_fn']:
+        if cyc_b == 0:
+            continue  # new function, no per-function regression possible
+        if delta <= 0:
+            continue
+        pct = delta / cyc_b * 100
+        if pct > fn_pct_limit and delta > fn_abs_limit:
+            breaches.append(
+                f"FUNCTION '{name}' regressed {pct:+.2f}% "
+                f"(+{delta} cycles: {cyc_b} → {cyc_a}); "
+                f"limit is +{fn_pct_limit:.2f}% AND +{fn_abs_limit} abs"
+            )
+
+    return breaches
 
 
 def output_json(functions, filename):
@@ -706,6 +767,20 @@ def main():
                         help='analyze only this function')
     parser.add_argument('--pvsneslib', action='store_true',
                         help='force PVSnesLib format (auto-detected by default)')
+    parser.add_argument('--fail-on-regression', action='store_true',
+                        help='exit 1 if --compare detects a regression past '
+                             'the configured thresholds (only with --compare)')
+    parser.add_argument('--total-pct-limit', type=float, default=5.0,
+                        help='--fail-on-regression: total cycles regression '
+                             'percent at which the gate fails (default 5.0)')
+    parser.add_argument('--fn-pct-limit', type=float, default=25.0,
+                        help='--fail-on-regression: per-function regression '
+                             'percent at which the gate fails (default 25.0). '
+                             'Must be tripped together with --fn-abs-limit.')
+    parser.add_argument('--fn-abs-limit', type=int, default=50,
+                        help='--fail-on-regression: per-function regression '
+                             'absolute cycles at which the gate fails '
+                             '(default 50). Combined with --fn-pct-limit.')
 
     args = parser.parse_args()
 
@@ -721,7 +796,27 @@ def main():
                                   if k == args.function)
             funcs_b = OrderedDict((k, v) for k, v in funcs_b.items()
                                   if k == args.function)
-        print_comparison(funcs_a, funcs_b, args.files[0], args.files[1])
+        comparison = print_comparison(funcs_a, funcs_b,
+                                      args.files[0], args.files[1])
+        if args.fail_on_regression:
+            breaches = check_regression(
+                comparison,
+                total_pct_limit=args.total_pct_limit,
+                fn_pct_limit=args.fn_pct_limit,
+                fn_abs_limit=args.fn_abs_limit,
+            )
+            if breaches:
+                print("REGRESSION GATE FAILED:")
+                for b in breaches:
+                    print(f"  - {b}")
+                print()
+                print("Override path: include a `Cycle-Regression-OK: <reason>` "
+                      "trailer in any commit in the PR range. The CI workflow "
+                      "honours that trailer and lets the gate pass; the "
+                      "comparison output is still posted as a comment.")
+                return 1
+            else:
+                print("Regression gate: OK (no breach detected).")
     else:
         for filename in args.files:
             functions = analyze_file(filename, args.branches_taken,
@@ -735,6 +830,8 @@ def main():
             else:
                 print_report(functions, filename, args.verbose)
 
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main() or 0)
