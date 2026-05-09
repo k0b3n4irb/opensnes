@@ -131,7 +131,15 @@ _DEP_object          := map
 _DEP_map             := dma
 _DEP_snesmod         := console
 _DEP_superfx         := dma
-_DEP_hdma            := dma math
+_DEP_hdma            := dma math_sqrt
+# math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
+# only) and the larger trig + arithmetic module (math = sine LUT +
+# atan_lut + fixSin/fixCos/fixDiv/fixMul/fixAbs/fixClamp/fixLerp +
+# atan2_8 + mul16/div16/mod16). hdma needs only sqrt16 (for iris-wipe
+# radius), so we depend on math_sqrt to keep hdma users light. Anyone
+# listing `math` in LIB_MODULES still gets sqrt because math depends
+# on math_sqrt — the resolver flattens this transitively.
+_DEP_math            := math_sqrt
 _DEP_asset           := dma background
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))

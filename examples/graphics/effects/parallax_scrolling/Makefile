@@ -6,7 +6,7 @@ TARGET   := parallax_scrolling.sfc
 ROM_NAME := OPENSNES PARALLAX
 
 USE_LIB     := 1
-LIB_MODULES := console dma background sprite hdma input math
+LIB_MODULES := console dma background sprite hdma input
 
 CSRC   := main.c
 ASMSRC := data.asm

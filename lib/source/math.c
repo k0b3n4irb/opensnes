@@ -165,47 +165,12 @@ fixed fixClamp(fixed x, fixed min, fixed max) {
 
 /*============================================================================
  * Square Root and Inverse Trigonometry (chantier B6, 2026-05-09)
+ *
+ * sqrt16 / fixSqrt live in their own translation unit (math_sqrt.c) so
+ * the hdma module can link just the sqrt family without dragging the
+ * sine LUT and arithmetic helpers below into hdma-using examples.
+ * See math_sqrt.c for the rationale.
  *============================================================================*/
-
-u16 sqrt16(u16 n) {
-    /* Canonical bit-by-bit integer square root.
-     *
-     * Invariant: at each iteration, `result` is the partial answer
-     * built so far, and `bit` is the next power-of-four bit to test.
-     * If (result + bit)^2 ≤ n, that bit goes into the answer; the
-     * remaining n shrinks by `result + bit`, then result shifts in
-     * the new bit. Otherwise just shift result (the bit was zero).
-     *
-     * Lifted from the previously-private isqrt() in lib/source/hdma.c
-     * (chantier B6 made it public — same algorithm, identical
-     * result for every input).
-     */
-    u16 result = 0;
-    u16 bit = 0x4000;
-    while (bit > n) bit >>= 2;
-    while (bit != 0) {
-        if (n >= result + bit) {
-            n = (u16)(n - result - bit);
-            result = (u16)((result >> 1) + bit);
-        } else {
-            result >>= 1;
-        }
-        bit >>= 2;
-    }
-    return result;
-}
-
-fixed fixSqrt(fixed x) {
-    if (x < 0) return 0;
-    /* sqrt(x/256) = sqrt(x) / 16, so the 8.8 representation of
-     * sqrt(x) is sqrt(raw) * 16 (because 8.8 = real * 256 and
-     * sqrt(real) = sqrt(raw) / 16, so sqrt(real) * 256 = sqrt(raw) * 16).
-     * The shift-by-4 caps fractional precision at 4 bits — adequate
-     * for distance / hypot calculations, will be raised once the
-     * QBE 32-bit codegen (catalogue A7) lands and we can do
-     * `sqrt16(x << 8) >> 4` without truncation. */
-    return (fixed)((s16)(sqrt16((u16)x) << 4));
-}
 
 /* atan(i / 64) for i = 0..64, scaled to the 8-bit angle convention
  * (full circle = 256). Computed once at design time (the SNES has no
