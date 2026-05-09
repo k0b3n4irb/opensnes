@@ -100,7 +100,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
-- **`volatile` in loops crashes QBE** — use globals instead of `volatile` keyword
+- **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
 - **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM
 
 ## Auto-Loaded Rules

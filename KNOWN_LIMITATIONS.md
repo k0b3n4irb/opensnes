@@ -110,14 +110,26 @@ of 6,s. The function compiles, links, and corrupts the stack at runtime.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 
-### 🟠 `volatile` in loops crashes QBE
-QBE's SSA pass can't always handle `volatile`. Loops with `volatile` reads/writes
-typically crash with a backend assertion or generate broken code.
+### 🟢 `volatile` is preserved through QBE (since chantier A2, 2026-05-09)
+The C `volatile` qualifier on a load or store now survives the cproc → QBE
+pipeline. cproc tags the instruction with a `volat` keyword in the
+intermediate IR; QBE's `loadopt` (load forwarding), `promote` (alloca-to-
+register promotion), and `gcm` (dead-code elimination of unused loads) all
+honour the marker and leave volatile accesses intact, so each access to a
+`volatile` object produces its own load/store as the C standard requires.
 
-**Mitigation:** for hardware-poll loops, use a regular global instead of
-`volatile` — the SDK explicitly avoids `volatile` in flag handshakes (`vblank_flag`,
-`oam_update_flag`). If you absolutely need MMIO semantics, use a small ASM
-helper.
+Pre-A2 the SDK avoided `volatile` entirely (a comment in
+`compiler/cproc/qbe.c` literally said *"For now, treat volatile stores like
+normal stores for SNES hw access"* — the qualifier was discarded). The
+runtime still favours plain globals for handshake patterns (`vblank_flag`,
+`oam_update_flag`) because the cycle cost is the same and the contract is
+clearer for NMI-vs-main races, but user code is now free to use `volatile`
+for MMIO polling, hardware-register reads, and any pattern where the C
+standard's "each access is a side effect" semantics matter.
+
+The compiler-test phase enforces this with assertion counts on
+`test_volatiles.c` — three sequential reads of `hw_status` must produce at
+least three `lda.w hw_status` instructions, and so on.
 
 ### 🟢 WLA-DX loses `.ACCU` / `.INDEX` tracking after branch merges (lint-enforced)
 WLA-DX tracks the current accumulator/index register width across `rep`/`sep`

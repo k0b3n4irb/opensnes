@@ -247,9 +247,13 @@ Constraints to respect:
   tracking after branch merges. Add explicit markers after every
   `rep`/`sep` and at the top of every label that may be branched to.
   See `KNOWN_LIMITATIONS.md` (toolchain section).
-- **No `volatile` in C declaration** of the helper: cproc accepts it but
-  QBE's SSA pass crashes on volatile in loops. Use a plain global to
-  signal hardware-poll completion.
+- **`volatile` is honoured** (since chantier A2, 2026-05-09): the cproc
+  → QBE pipeline tags volatile loads/stores with a `volat` IR keyword
+  so the load-forwarding, promotion, and dead-code passes leave each
+  access intact. Use `volatile` freely for MMIO and hardware polling.
+  Plain globals remain the SDK convention for NMI flag handshakes
+  (`vblank_flag`, `oam_update_flag`) only for cycle-cost equivalence —
+  not because `volatile` is broken.
 
 ---
 
@@ -361,8 +365,7 @@ it unless you know A doesn't carry the return.
 - **Variadic functions** (`...`): no support. Wrappers like `printf` use
   fixed-prototype variants.
 - **Nested function definitions** (GCC extension): not supported.
-- **`alloca`** (variable-length stack allocation): not supported. Loops
-  with `volatile` crash the SSA pass; use globals instead.
+- **`alloca`** (variable-length stack allocation): not supported.
 - **`__attribute__((interrupt))`**: not recognised. The NMI handler is
   hand-written assembly in `templates/crt0.asm` and dispatches to a C
   callback registered via `nmiSet()`.

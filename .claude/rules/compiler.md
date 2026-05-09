@@ -33,8 +33,8 @@ This is a Class A change — requires `make clean && make` + full test suite + M
 - **Bank $00 is 32KB max**: `static const` arrays get SUPERFREE sections. If bank $00 fills, data spills to bank $01+ but C code reads from bank $00 → garbage.
 - **`sta.l $0000,x` always reads bank $00**: all C RAM must be below $2000.
 - **LEFT-TO-RIGHT argument push**: cc65816 pushes function args left-to-right, NOT right-to-left like tcc816/PVSnesLib.
-- **`volatile` crashes QBE**: the SSA pass can't handle volatile. Use globals instead.
-- **`unsigned int` = 4 bytes, `unsigned long` = 8 bytes** on this target.
+- **`volatile` is honoured** (since chantier A2, 2026-05-09): cproc tags volatile loads/stores with a `volat` IR keyword that QBE's loadopt/promote/gcm passes respect. The SDK still favours plain globals for NMI handshake patterns for cycle-cost equivalence, but user code can use `volatile` for MMIO without silent coalescing.
+- **`unsigned int` = 2 bytes, `unsigned long` = 4 bytes** on this target (since chantier A1, 2026-05-08).
 
 ## After Any Compiler Change
 

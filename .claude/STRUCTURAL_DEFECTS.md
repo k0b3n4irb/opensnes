@@ -275,7 +275,83 @@ with pointers separated into A6, A1 is much smaller.
 
 ---
 
-#### A2. `volatile` in loops crashes QBE 🔴
+#### A2. `volatile` is preserved through QBE — SHIPPED 2026-05-09 🟢
+
+> **Status**: shipped 2026-05-09. The original symptom in this entry —
+> "QBE backend assertion failure or silently broken assembly output" —
+> turned out to be the second mode (silent miscompile, not assertion):
+> cproc was discarding the `QUALVOLATILE` qualifier with a literal
+> `(void)(tq & QUALVOLATILE);` and a `TODO` comment, so QBE's loadopt
+> pass coalesced redundant loads of the same volatile through value-
+> numbering, violating the C standard's "each access is a side effect"
+> volatile semantics.
+>
+> **Root cause discovered**: not an SSA-pass bug at all — cproc never
+> emitted volatile information into the QBE IR in the first place,
+> so QBE was free to optimise away duplicate loads as redundant.
+>
+> **Fix**:
+>
+> - **cproc** (`compiler/cproc/qbe.c`): replaced the `(void)(tq & ...)`
+>   discard with a real `is_volat` branch in `funcload` and `funcstore`.
+>   New `funcinst_volat()` wrapper around `funcinst()` flags the just-
+>   emitted instruction. The IR printer (`emitinst()`) prepends `volat`
+>   between the result class and the op for loads (`%t =w volat
+>   loaduh ...`) and at the line start for stores (`volat storeh ...`).
+>
+> - **QBE parser** (`compiler/qbe/parse.c`): new `Tvolat` token recognised
+>   either at line start or after `=cls` in `parseline`. Sets
+>   `is_volat=1` for the next emitted Ins.
+>
+> - **QBE Ins struct** (`compiler/qbe/all.h`): added `uchar volat`
+>   AFTER `arg[2]` (not packed into the bitfield) so the existing
+>   positional initialisers `(Ins){Op, Cls, To, {Args}}` continue to
+>   compile and default the new field to 0.
+>
+> - **QBE loadopt** (`compiler/qbe/load.c`): the load-forwarding loop
+>   now skips loads with `i->volat` set — they aren't candidates for
+>   `def()` substitution. The redundant load stays as a real load.
+>
+> - **QBE promote** (`compiler/qbe/mem.c`): the SSA promotion pass
+>   bails out of any alloca whose uses include a volatile load or
+>   store. Promoting would convert the memory access into a register
+>   copy and lose volatility.
+>
+> - **QBE gcm** (`compiler/qbe/gcm.c`): `canelim()` returns 0 for
+>   volatile loads even when the result temp has no users, so a
+>   volatile read is never elided as dead.
+>
+> - **QBE printfn** (`compiler/qbe/parse.c`): IR text round-trip
+>   preserves the `volat` keyword for debugging.
+>
+> **Validation**: 5 reproducers compiled before the fix
+> (`/tmp/a2_repro{1..5}.c` — kept ephemerally for the investigation):
+>
+> - Case 1 (read polling): `while (*reg & 0x80) { }` — already OK
+>   pre-fix (no dedup pattern).
+> - Case 2 (global flag): `while (flag) { }` — already OK.
+> - Case 3 (write loop): `for (...) *port = 0;` — already OK.
+> - Case 4 (read should not hoist): `while (!ready) {...}` — already OK.
+> - **Case 5 (read twice, the actual bug)**: `return timer + timer;`
+>   was `lda timer; sta cache; clc; adc cache` (1 load, 1 cached);
+>   post-fix `lda timer; sta cache; lda timer; clc; adc cache`
+>   (2 loads as required by C).
+>
+> Test fixture `tools/opensnes-emu/test/fixtures/compiler/test_volatiles.c`
+> already existed but only checked compilation succeeded; strengthened
+> in `tools/opensnes-emu/test/phases/compiler-tests.mjs` to assert
+> `lda hw_status` count ≥ 3 in `test_volatile_read`, `sta hw_data`
+> count ≥ 4 in `test_volatile_write`, and the read/write counts in
+> `test_read_modify_write`. Full suite 409/409 PASS post-fix.
+>
+> **Doc updates** (KNOWN_LIMITATIONS.md, CLAUDE.md, .claude/rules/
+> compiler.md, .claude/rules/new_example.md, compiler/ABI.md): the
+> historical "volatile crashes QBE / use globals" warnings replaced
+> with "volatile is honoured; SDK still favours globals for NMI
+> handshakes for cycle-cost equivalence, not because volatile is
+> broken".
+
+
 
 **Symptom**: a C loop body that reads or writes a `volatile`-qualified
 variable (typical pattern for hardware register polling) produces either
