@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | cceac4bc784cc5be5523bbff7c94af36dbd66cd4 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 9878b9f60b422408d7d131abecbba4dc9a71d570 | github.com/k0b3n4irb/qbe:main |
+| compiler/qbe | 2d3af4de3945e60246590a8fc47d677dc3c59f82 | github.com/k0b3n4irb/qbe:main |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -62,11 +62,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 30 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 31 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+2d3af4d  feat(w65816): chantier A6.8 — large-frame indirect addressing + Kl slot widening
 9878b9f  fix(build): apply chantier A2 hygiene fixes to clean compile
 90b81e1  fix(w65816): respect volatile loads/stores via `volat` IR keyword  (chantier A2)
 d9483ee  fix(w65816): restrict leaf optimization to actual leaf functions
