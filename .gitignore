@@ -60,8 +60,9 @@ __pycache__/
 # Claude Code project config — tracked, except for personal local overrides
 .claude/settings.local.json
 
-# Private game projects (never commit)
-projects/
+# Private game projects (never commit) — anchored to repo root so it
+# doesn't accidentally match `.claude/notes/projects/` etc.
+/projects/
 
 # Build directories
 build/
