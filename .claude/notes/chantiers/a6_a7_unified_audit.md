@@ -393,3 +393,150 @@ edges of the change set.
    in the backend? Decision affects how invasive the patch is.
 3. **9-fail reproduction**: reproduce immediately when A6 implementation
    starts — failure modes will dictate fix order within A6.
+
+---
+
+## 2026-05-10 A6-1 implementation attempt — findings (rolled back clean)
+
+The first A6-1 implementation session (2026-05-10) tried the change set
+above with the structure proposed in the audit. Net result: **rolled
+back, baseline restored, 269/269 tests pass**. The session uncovered
+**two coupled blockers** that need their own sub-chantier before
+A6-1 can ship cleanly.
+
+### What was attempted
+
+Changes applied (in this order, building on each other):
+
+1. **A6.1 + A6.2** — `mkpointertype()` and `typenullptr` size 8→4,
+   align 8→2 in `compiler/cproc/type.c`.
+2. **A6.4** — `dtype_size[DL]` 8→4 in `compiler/qbe/emit.c`. Result:
+   ALL DL items shrink to 4 bytes, including `long long` (broken if
+   any code uses it; today no example does).
+3. **A6.6** — indirect-call bank byte read from pointer storage
+   `+2` instead of hardcoded `lda #$00` in
+   `compiler/qbe/w65816/emit.c`.
+4. **Slot widening** — `maybeassign()` and `coalescephi()` reserve 2
+   slots for Kl temps (correct codegen for runtime pointer temps).
+5. **Pointer→DW** — refined cproc `qbetype()` so pointers emit data
+   type 'w' (DW=4 bytes) instead of 'l' (DL=8). Reverted A6.4 in
+   favour of this since DL stays 8 for `long long`.
+
+### Blocker A — 9 failures on A6 alone (root cause not yet diagnosed)
+
+With A6.1 + A6.2 + A6.4 applied (no slot widening, no pointer→DW
+yet), the quick test suite reports **9 failures** in the same shape
+the A1 catalogue investigation predicted:
+
+| Phase | Examples failing | Severity |
+|---|---|---|
+| Visual regression | `basics/aim_target` (774 px), `basics/random` (355 px), `basics/timer` (521 px), `graphics/backgrounds/mode1` (57344 px), `graphics/backgrounds/mode1_bg3_priority` (57344 px) | mixed; mode1 = whole screen wrong |
+| Lag detection | `basics/random`, `basics/scene_stack`, `basics/timer`, `input/controller` — all 100% lag frames | severe (examples hung) |
+
+Adding A6.6 (indirect-call fix) did NOT change the failure count.
+Reverting `dtype_size[DL]=4` and switching pointers to DW data type
+ALSO did not change. Same 9 failures persist.
+
+**Root cause hypothesis**: pointer Kl temps in runtime stack slots
+have only 2 bytes of slot space (1 slot index × 2 bytes/slot), but
+the IR claims they're 4 bytes. The high half (bank byte) is
+**uninitialised** in the slot. Pre-A6 the indirect-call hardcoded
+bank=0, masking the issue for bank-zero functions. Post-A6 the
+indirect-call reads a garbage bank byte.
+
+But that doesn't explain `mode1` (57344 pixels different = whole
+screen wrong, no indirect call involved). There's likely a SECOND
+mechanism — possibly cproc emitting different IR shapes for some
+pointer arithmetic patterns. Needs deeper investigation in the next
+session.
+
+### Blocker B — Slot widening triggers 8-bit stack offset overflow
+
+Adding slot widening (correct codegen for pointer temps):
+
+```
+goombainit framesize: 168 → 260 bytes
+                      → wlalink rejects `lda 272,s`
+                      → INPUT_NUMBER: Out of 8-bit range
+```
+
+`examples/games/mapandobjects/goomba.c::goombainit` has ~46 Kl temps
+post-widening, totaling 129 slots × 2 = 258 bytes + alignment = 260.
+The 65816's `lda <off>,s` addressing mode caps offsets at 8 bits
+(0–255), so wlalink rejects the assembly outright.
+
+This is **not specific to goombainit** — any future C code with
+> ~30 simultaneous pointer locals hits the same wall.
+
+### NEW sub-chantier — A6.8 (large-frame addressing)
+
+Without solving Blocker B, A6 cannot ship even after the 9-failure
+investigation completes. The 65816 hardware has no native > 8-bit
+stack-relative addressing; we need a **fallback addressing mode** for
+oversized frames.
+
+**Approach**: when `framesize > 256`, the function prologue copies SP
+into a DP scratch register (e.g., `tcc__r10`). All stack-relative
+accesses become `lda (tcc__r10),y` with the 8-bit offset moved into
+Y (or use `(tcc__r10),y` indirect with Y = offset). Slow but correct.
+
+**Cost**: ~3 extra cycles per stack access for affected functions.
+Acceptable since these are by definition complex / pointer-heavy
+functions.
+
+**Effort estimate**: 5-7 days. Touches `framesize` calc, prologue
+emission, AND every site that emits `lda/sta/cmp/adc <N>,s`. Has to
+keep the 8-bit-offset fast path for normal-sized frames.
+
+**Status**: not yet started. A6-1 BLOCKED on A6.8.
+
+### Updated implementation order
+
+| Step | Scope | Dependency |
+|---|---|---|
+| **A6-pre-1** | Investigate the 9 failures: which mechanism causes the visual diffs on `mode1` etc. (independent of slot widening / indirect-call) | none |
+| **A6.8** | Large-frame addressing mode (TSC + DP indirect for frames > 256) | none — independent backend chantier |
+| **A6-1** | Apply A6.1 + A6.2 + indirect-call fix + slot widening + pointer→DW | A6.8 (so widening doesn't overflow) AND A6-pre-1 (root-cause the 9 failures) |
+| A7-1 | u32 → Kl class + slot widening already done by A6-1 | A6-1 |
+| A7-2…A7-5 | (unchanged from earlier in this doc) | A7-1 |
+
+A6-1 is no longer 3-5 days. With A6-pre-1 + A6.8 + A6-1 itself,
+**A6-pre-1+A6.8+A6-1 sequence is ~2 weeks** (A6.8 alone is 5-7 days).
+
+### Files touched and reverted (2026-05-10)
+
+```
+compiler/cproc/type.c        — mkpointertype + typenullptr size/align (REVERTED)
+compiler/cproc/qbe.c         — qbetype pointer→DW (REVERTED)
+compiler/qbe/emit.c          — dtype_size[DL] (REVERTED)
+compiler/qbe/w65816/emit.c   — indirect-call bank byte (REVERTED)
+compiler/qbe/w65816/emit.c   — slot widening for Kl (REVERTED)
+```
+
+All five reverts confirmed clean: `git status` shows no diff on the
+submodules; `make examples` builds; `node test/run-all-tests.mjs
+--quick` reports 269/269. Submodule SHAs match `compiler/PINS.md`
+(verify-toolchain green).
+
+### Lessons captured
+
+The audit doc's original framing assumed A6 would need ~3-5 days
+of focused implementation. The reality after one session of
+implementation is:
+
+- The 9 failures predicted by the A1 investigation reproduce reliably
+  but their root cause is NOT a single mechanism — `mode1` whole-
+  screen failure cannot be explained by indirect-call bank byte.
+- The slot widening (which the original Phase 1.a discovered as
+  needed) requires solving the 8-bit stack offset overflow first. This
+  is **a hardware constraint** of the 65816's addressing modes, not
+  a compiler design flaw — but it must be addressed before the
+  backend can faithfully store 4-byte pointers in stack slots.
+- The audit-phase doc captured the 15 sites correctly but missed two
+  systemic issues (the multi-mechanism 9-failure case and the 256-byte
+  stack offset wall). Both surfaced only by attempting the
+  implementation. **The audit was necessary but not sufficient.**
+
+The right next move is **A6-pre-1 (diagnose the 9 failures) + A6.8
+(large-frame addressing)** as parallel sub-chantiers, before
+re-attempting A6-1.
