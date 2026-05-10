@@ -61,7 +61,92 @@ add/sub):
 | K | `Osub` handler | `emit.c:1440-1456` | Single 16-bit `sec; sbc` | **1.c** (switch on cls; Kl: pair) |
 | L | Phi moves | `emit.c:2670, 2691` | Single 16-bit copy | **1.c** (defer to Phase 2 if no Kl phi in repro; verify) |
 
-## Patch 1.a — Slot allocator widening
+## ⚠️ Phase 1.a — REDESIGN REQUIRED (2026-05-10 attempt failed)
+
+The first attempt at Phase 1.a (slot widening for ALL Kl temps) **broke
+`make examples`** on 2026-05-10. Root cause: pointers in QBE IR are
+currently class **Kl** (chantier A6 deferred — pointer IR is 8 bytes
+today, the backend reads only the low 2 from the slot). Widening every
+Kl temp to 2 slots over-allocates for pointer-heavy functions.
+
+Concrete failure: `examples/games/mapandobjects/goomba.c::goombainit`
+went from frame ~130 bytes to **260 bytes** after slot widening. The
+65816 `lda <offset>,s` addressing mode has an **8-bit stack offset**
+(0-255). The assembler rejected `lda 272,s` with "INPUT_NUMBER: Out of
+8-bit range".
+
+The widening worked correctly for pure-u32 arithmetic (acceptance
+gate would have passed for `add32` etc. once Phase 1.b/c land), but
+the side-effect on pointer-Kl temps cascades through any function with
+many local pointers — and that's most of the lib + several examples.
+
+**The naive "widen all Kl temps" plan is invalidated.** Phase 1.a needs
+to disambiguate pointer-Kl from u32-Kl in the slot allocator, OR ship
+A6 first (4-byte pointer ABI uniform with u32), OR accept that Phase
+1.a alone cannot land cleanly.
+
+### Redesign options (next-session decision)
+
+| Option | Mechanism | Effort | Risk |
+|---|---|---|---|
+| **A. Pre-pass infers temp role from def + uses** | Walk instructions: tag temps that DEFINE via `Oadd/Osub/Omul/Oshl/Oshr/Osar Kl` or are `Opar Kl`; widen only tagged. Pointers (defined by `Oalloc4/8/16`, RCon CAddr) stay 1 slot. | Medium (~1 day) | Medium — edge cases on Phi nodes, copies, casts may mis-classify |
+| **B. Ship A6 first, then Phase 1.a uniform** | A6 reduces pointer IR to 4 bytes (24-bit + alignment). Then both pointer and u32 are 4 bytes Kl, both need 2 slots, slot widening trivially correct. | Large (2-4 weeks for A6 alone, per catalogue) | High — A6 was deferred BECAUSE indirect-call cascade is hard |
+| **C. New IR class for u32** | Add e.g. `Klong` (32-bit) distinct from `Kl` (pointer). cproc emits the right class per C type. Backend treats them differently. | Large (2-3 weeks) | High — touches QBE core IR design, all targets |
+| **D. Lower u32 to PAIRED Kw temps in cproc** | cproc emits two Kw temps per u32, with explicit Hi/Lo handling. Bypass Kl entirely for u32. | Medium-Large | Medium — diverges from QBE's class system but locally contained |
+
+### Recommendation pending audit
+
+**Option A** is the most surgical and bounded. Mechanism:
+
+1. In `assignslots()` or before, run a single pass:
+   ```c
+   for each Ins i in fn:
+       if i->cls == Kl and i->op in {Oadd, Osub, Omul, Oshl, Oshr, Osar,
+                                     Oneg, Oxor, Oand, Oor, …}:
+           mark i->to as "arith Kl"
+           mark i->arg[0], i->arg[1] (if RTmp) as "arith Kl"
+   for each Phi p in fn:
+       if p->cls == Kl and any of p->arg is "arith Kl":
+           mark p->to and all p->arg as "arith Kl"
+   for each Opar i in fn:
+       if i->cls == Kl:
+           mark i->to as "arith Kl" /* params arrive as full Kl */
+   ```
+2. In `maybeassign()`: only widen if temp is "arith Kl".
+
+Edge cases to watch:
+- **Function pointers** (RCon CAddr to a function symbol): Kl class but
+  defined by RCon, not Oadd. Stay 1 slot — current behaviour, correct
+  for bank-zero functions (chantier A6 caveat).
+- **Pointer arithmetic** (`p + offset`): currently emitted as `Oadd Kl`.
+  Marking would widen pointer-arith temps, breaking those cases. Need
+  to also detect "one arg is RCon CAddr" → treat as pointer arith,
+  don't widen.
+- **Copy through phi**: a Kl temp that's just a phi merge between two
+  pointer paths shouldn't be widened. The marking propagation must be
+  conservative (only widen if EVIDENCE of arithmetic on plain integers).
+
+**Cleaner alternative inside option A**: tag temps during cproc IR
+emission (add a flag in Tmp or use the `width` field). cproc knows the
+C type at definition. Drawback: requires cproc-side patch in the same
+commit.
+
+### Lessons
+
+The cascade-risk audit in this design doc (lines 198-211 below) listed
+6 QBE patches as risk areas but **did NOT list "pointer Kl temps share
+the slot allocator with u32 Kl temps"** as a risk. That gap caused the
+2026-05-10 failure. Action: when designing Kl-related changes, always
+ask "what happens to pointer Kl temps?" first — it's the dominant
+existing use of Kl on this target.
+
+The failure was caught fast (first build of examples) and rolled back
+cleanly without a commit. No regression shipped. Next-session reopen
+starts with the redesign decision above, NOT with implementation.
+
+---
+
+## ORIGINAL Patch 1.a — Slot allocator widening (INVALIDATED — see above)
 
 **Goal**: Kl temps reserve 4 bytes (2 slot indices) instead of 2 bytes
 (1 slot). After this patch, slot offsets are correct but no codegen
