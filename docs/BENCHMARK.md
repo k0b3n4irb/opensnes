@@ -1,19 +1,20 @@
 # Compiler Benchmark — OpenSNES vs PVSnesLib
 
-*Last updated: 2026-03-27. Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
+*Last updated: 2026-05-10 (re-baselined post-v0.17.0; toolchain pins qbe `9878b9f`, cproc `cceac4b`).
+Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| **Total cycle reduction** | **-30.3%** vs PVSnesLib + 816-opt |
+| **Total cycle reduction** | **-29.1%** vs PVSnesLib + 816-opt |
 | Functions tested | 34 |
-| OpenSNES wins | 32 |
-| PVSnesLib+opt wins | 2 |
+| OpenSNES wins | 31 |
+| PVSnesLib+opt wins | 3 |
 | Ties | 0 |
 
 OpenSNES's cc65816 compiler (cproc + QBE w65816 backend with 13 optimization phases)
-produces code that is **30% faster** than PVSnesLib's tcc816 + 816-opt peephole
+produces code that is **29% faster** than PVSnesLib's tcc816 + 816-opt peephole
 optimizer on our benchmark suite of 34 isolated functions.
 
 ## Methodology
@@ -46,7 +47,7 @@ no page-crossing penalties).
   bitwise_and                 39        32        19    -40.6%
   bitwise_or                  39        32        19    -40.6%
   conditional                 81        65        40    -38.5%
-  loop_sum                   208       185       124    -33.0%
+  loop_sum                   208       185       119    -35.7%
   array_write                 74        65        36    -44.6%
   array_read                  68        60        31    -48.3%
   struct_sum                 111        86        74    -14.0%
@@ -61,7 +62,7 @@ no page-crossing penalties).
   zero_store_global           23        19        14    -26.3%
   compare_and_branch         136       129        60    -53.5%
   helper                      25        22        16    -27.3%
-  call_chain                  56        47        34    -27.7%
+  call_chain                  56        47        62    +31.9%
   pea_constant_args           36        33        37    +12.1%
   mul_const_24                45        42        32    -23.8%
   mul_const_48                45        42        34    -19.0%
@@ -69,7 +70,7 @@ no page-crossing penalties).
   mul_const_40                45        42        34    -19.0%
   mul_const_96                45        42        36    -14.3%
   ────────────────────  ────────  ────────  ────────  ────────
-  TOTAL                     2178      1891      1318    -30.3%
+  TOTAL                     2178      1891      1341    -29.1%
 ```
 
 ## Analysis
@@ -92,10 +93,23 @@ no page-crossing penalties).
 |----------|-------|-----|
 | `mod_const_10` | +3.1% | Both use runtime `__mod16`; slight overhead difference |
 | `pea_constant_args` | +12.1% | `pea.w` constant push vs PVSnesLib's direct load |
+| `call_chain` | +31.9% | Tail-call optimisation trade-off — see note below |
 
 The `pea_constant_args` regression is a trade-off: `pea.w` is smaller in code size
 (2 bytes vs 3) but costs 1 extra cycle. PVSnesLib's `lda #imm; pha` is faster but
 larger. Both approaches are valid.
+
+The `call_chain` (`helper(helper(x))`) regression is a tail-call-optimisation
+trade-off. Pre-TCO codegen for this shape was a frameless `lda 4,s; pha; jsl;
+plx; pha; jsl; plx; rtl` at 48 cycles. When TCO landed (qbe `ed840fb`), the
+chained-call path acquired a small frame to handle the general case (intermediate
+value preserved across the inner call, tail-jump to the outer helper after frame
+deallocation). For this specific shape the new codegen is +14 cycles vs the old
+frameless form, but **TOTAL benchmark cycles dropped from 1420 (pre-TCO) to 1341
+(post-TCO)** — a net **-5.6 % improvement** earned by TCO's wins on the rest of
+the suite. A future "smart-path" optimisation could detect when the chained-call
+intermediate doesn't survive the inner call and re-emit the frameless pattern,
+reclaiming the 14 cycles; not yet scheduled.
 
 ### Key Optimization Phases Contributing
 
