@@ -518,6 +518,137 @@ submodules; `make examples` builds; `node test/run-all-tests.mjs
 --quick` reports 269/269. Submodule SHAs match `compiler/PINS.md`
 (verify-toolchain green).
 
+### A6-pre-1 root-cause diagnosis (2026-05-10, second session)
+
+The 9 failures predicted by the A1 catalogue investigation have a
+**single root cause** — not a multi-mechanism puzzle as originally
+suspected. The `mode1` whole-screen failure that seemed to defy the
+"bank byte" hypothesis is actually the same mechanism as the lag
+failures, just with a different visible symptom.
+
+**Root cause (NEW SITE)**: `compiler/qbe/w65816/emit.c:2452-2515`
+(`Oarg` handler) **always pushes 2 bytes** regardless of the
+argument's class:
+
+```c
+case Oarg:
+case Oargsb: ...:
+    /* ... single pea.w or single pha ... */
+    argbytes += 2;  /* All args pushed as 16-bit */
+```
+
+This is correct for Kw args (16-bit values) but **wrong for Kl args**
+(32-bit values, including post-A6 pointers). With pointer ABI 4 bytes
+(post-A6.1), the caller pushes only 2 bytes for a pointer arg, but
+the callee reads 4 bytes from the stack — the upper 2 bytes contain
+whatever the next pushed arg landed on, or stale frame data.
+
+Evidence captured during investigation: `mode1`'s `main()` emits
+`bgLoad(0, &bg, 0, 0x4000, 0x0000)` as:
+
+```asm
+pea.w 0          ; arg 0: bg (u8) — correct
+pea.w bg         ; arg 1: &bg (POINTER, should push 4 bytes, only pushed 2)
+pea.w 0          ; arg 2
+pea.w 16384      ; arg 3
+pea.w 0          ; arg 4
+jsl bgLoad
+adc.w #10        ; cleanup: 5 args × 2 bytes = 10  ← assumes ALL Kw
+```
+
+If the pointer arg were correctly pushed as 4 bytes, the cleanup
+should be `adc.w #12` (5 Kw args × 2 + 1 ptr arg × 4 — but actually
+all the OTHER args ARE Kw so cleanup of Kw-only would be 4 args × 2
++ 1 Kl × 4 = 12 bytes). Today's cleanup of 10 confirms the all-Kw
+assumption.
+
+Inside `bgLoad`, `asset->tiles_end` and other field accesses use the
+asset pointer's high half (bank byte) for `lda` indirect operations.
+With high half corrupted, every dereference of `asset->field` reads
+random memory. The DMAs to VRAM emit garbage data → mode1 whole
+screen wrong (57344 px diff).
+
+Same mechanism explains:
+- `lag/scene_stack` (calls indirect through Scene struct fn ptrs —
+  scene struct lookup goes through asset ptr arg)
+- `lag/timer`, `lag/random`, `lag/controller` (call lib functions
+  passing pointer args — corrupted on the way in)
+- `visual/aim_target` (smaller diff — only some sprites/UI affected)
+- `visual/random`, `visual/timer` (rendering relies on ptr-arg
+  passing, partially survives on luck)
+
+**This is the SINGLE bug behind all 9 failures.** Fix specification:
+
+#### NEW Site A6.9 — Class-aware Oarg push
+
+`compiler/qbe/w65816/emit.c:2452-2515` (Oarg + Oargsb/ub/sh/uh
+fall-through) needs to push 2 bytes for Kw and 4 bytes for Kl:
+
+```c
+case Oarg:
+    if (i->cls == Kl) {
+        /* push high half first, then low half (so callee reads
+         * low half at lowest offset, matching little-endian C order
+         * where ptr->byte[0] is the LSB) */
+        emitload_adj(r0, fn, argbytes + 2);  /* high half */
+        fprintf(outf, "\tpha\n");
+        emitload_adj(r0, fn, argbytes);      /* low half */
+        fprintf(outf, "\tpha\n");
+        argbytes += 4;
+    } else {
+        /* existing Kw single-push path */
+        ...
+        argbytes += 2;
+    }
+    break;
+```
+
+For RCon CAddr (the `pea.w bg` case): need WLA-DX syntax for the
+bank byte of a symbol. Likely:
+
+```asm
+pea.w :bank(bg)        ; push bank in low 8 of high 16
+pea.w bg               ; push low 16 of address
+```
+
+WLA-DX `:bank(sym)` operator is the canonical way (verify in
+`.claude/WLA-DX.md` before implementing). Alternative: add a runtime
+"address-of" helper that constructs the 4-byte pointer value.
+
+#### Cascade: cleanup math + indirect-call
+
+`compiler/qbe/w65816/emit.c:2581-2611` Ocall cleanup uses `argbytes`
+already — it just needs the corrected accumulator. No code change
+beyond Oarg.
+
+`compiler/qbe/w65816/emit.c:2570-2575` indirect-call (A6.6 site):
+loads function pointer from caller's stack via `emitload_adj(r0, fn,
+argbytes)`. Today reads 2 bytes; needs 4 for proper bank byte
+(already documented in A6.6).
+
+### Updated A6 fix sequence
+
+A6 (post-pre-1 diagnosis) requires THREE coordinated changes that
+all must ship together:
+
+1. **A6.1** — pointer 8→4 bytes in cproc (already designed)
+2. **A6.4** — `dtype_size[DL]` 8→4 in QBE (already designed)
+3. **A6.6** — indirect-call bank byte from pointer storage (already designed)
+4. **A6.9 [NEW]** — Oarg pushes 4 bytes for Kl args (this session)
+5. **Slot widening** — Kl temps reserve 2 slots (to receive the 4-byte arg correctly)
+6. **A6.8** — large-frame addressing mode (so slot widening doesn't overflow goombainit)
+
+A6.9 is the missing piece. With it, the slot widening attempt would
+succeed because pointer temps get 4 bytes pushed by callers AND
+4 bytes of slot to receive them in.
+
+A6.8 (large frames) is still independent and still required — even
+post-A6.9, slot widening for goombainit's 30+ pointer temps inflates
+the frame past 256 bytes.
+
+**Revised effort**: A6.9 is small (~half day, mostly WLA-DX bank
+operator research). A6.8 is the dominant cost (5-7 days).
+
 ### Lessons captured
 
 The audit doc's original framing assumed A6 would need ~3-5 days
