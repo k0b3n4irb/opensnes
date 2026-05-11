@@ -758,3 +758,129 @@ implementation is:
 The right next move is **A6-pre-1 (diagnose the 9 failures) + A6.8
 (large-frame addressing)** as parallel sub-chantiers, before
 re-attempting A6-1.
+
+## 2026-05-11 9-site atomic patch attempt — rolled back, scope expanded
+
+### What was attempted
+
+After A6.8 shipped (commit 4aa4989) and the prior session's audit
+update (commit e2ba69c), this session attempted the full 8-site
+atomic patch in a single integrated compiler edit:
+
+- A6.1 cproc/type.c mkpointertype 8/8 → 4/2 + typenullptr
+- A6.4 qbe/emit.c dtype_size[DL] 8 → 4
+- A6.6 qbe/w65816/emit.c indirect-call bank byte from `:sym`
+- A6.9 qbe/w65816/emit.c Oarg push 4B for Kl args (with WLA-DX `:sym`)
+- A6.10 qbe/w65816/abi.c byte accumulator + class-aware Oload emit
+- A7.3 qbe/w65816/emit.c Oload Kl pair (low + high at addr/addr+2)
+- A7.4 qbe/w65816/emit.c Ostorel reads r0's actual high half
+- A7.5 qbe/w65816/emit.c Oadd/Osub Kl with carry propagation
+
+Plus three helper functions `emit_load_high`, `emit_store_high`,
+`emitop2_high` for Kl-pair semantics across slot/RSlot/RCon paths.
+
+### Two prerequisites surfaced during testing
+
+1. **A6.11 — `Oext*` for Kl destination (NEW)**.
+   `Oextsb/Oextub/Oextsh/Oextuh/Oextsw/Oextuw` with Kl destination
+   class need to initialise the high half:
+   - Zero-extending variants (Ouw/Oub/Ouh): high = 0
+   - Sign-extending variants (Osw/Osb/Osh): high = -1 if low<0 else 0
+
+   Without this, every C `array[i]` pattern (where `i` is u16/s16 and
+   `array` is a Kl pointer) constructs a pointer with garbage high
+   half. Detected by inspecting `examples/text/hello_world` asm —
+   the loop `tile = message[i]` emitted `lda i_low,s; lda.w #message;
+   adc.w #:message` reading uninitialised slot bytes for the bank
+   contribution.
+
+2. **Dead-store optimisation + leaf-opt aliasing incompatibility
+   with Kl temps**. Three optimisation paths in `emitstore`
+   (`temp_is_dead_store`, `temp_alias`, `skip_dead_retstore_temp`)
+   skip the slot write when "A still has the value for the next
+   consumer". This assumption holds for Kw single-store/single-read
+   patterns but BREAKS for Kl pair handling — between the low-half
+   store and the next instruction's first load, the high-half write
+   necessarily clobbers A. The Kw-optimised path leaves the LOW slot
+   uninitialised; the Oadd Kl that follows reads garbage.
+
+   Fix: add `fn->tmp[r.val].cls != Kl` guard to all three skip paths
+   in `emitstore` and to the `temp_alias` skip path in
+   `emitload_adj`. Trades a few cycles of optimisation for correctness
+   on Kl arithmetic.
+
+### Test result: 221/267, 46 failures (down from 267→269 baseline)
+
+Despite shipping all 9 sites plus the 4 Kl optimisation guards, the
+test suite regressed:
+
+- `boot/basics/scene_stack` reported "DMA channel 7 clobbered" —
+  something in the running game writes to $4370+. Specific cause
+  not identified.
+- 13 visual regressions in `audio/snesmod_*`, `basics/*`, `games/*`
+  with pixel diffs ranging from 494 to 57344 (= full-screen).
+- 7 lag-frame failures (game stuck in init/loop) including
+  `text/hello_world` (100% lag frames).
+
+The hello_world generated asm for `message[i]` reads correctly after
+A6.11 + Kl-guards. The lib's `dmaCopyVram` heuristic
+(`lda 10,s; cmp #$80; bcc...`) survives the 4-byte push order because
+byte 10,s still contains the high byte of the 16-bit low half — the
+LoROM bank-0 case continues to work.
+
+The remaining 46 failures could not be diagnosed without an emulator
+debugger session. The pattern is too broad to bisect from build
+artifacts alone.
+
+### Scope analysis: chantier is larger than audit predicted
+
+This is the **3rd cycle** of the audit-implement-discover-prerequisite
+loop for A6+A7:
+
+| Cycle | Audit predicted | Implementation surfaced |
+|---|---|---|
+| 1 (2026-05-10) | A6.1+A6.4+A6.6 atomic | A6.8 large-frame prereq |
+| 2 (2026-05-10) | A6.1+A6.4+A6.6+A6.9 | A6.10 + A7.3 + A7.4 + A7.5 prereqs |
+| 3 (2026-05-11, this session) | A6.1+4+6+9+10 + A7.3+4+5 | A6.11 + Kl-opt guards + ~46 unexplained failures |
+
+The remaining unexplained failures most plausibly involve:
+- Lib ASM functions that take pointer args may have edge cases beyond
+  the LoROM bank-0 heuristic (e.g., `dmaCopyVramBank` reads `lda 9,s`
+  for bank byte — under 4-byte push this is now the LOW BYTE of low
+  half, not the bank).
+- Other Kl IR ops not handled in this session: `Ocopy Kl`, `Ostore`
+  variants other than Ostorel, comparisons of Kl, `Omul`/`Odiv` of
+  pointers (unusual but possible).
+- The DMA channel 7 clobber suggests an out-of-bounds write through
+  a wrong-bank pointer landing on hardware registers — diagnostic
+  requires stepping the failing example.
+
+### Rolled back cleanly to e2ba69c + A6.8 baseline
+
+User decision (2026-05-11): rollback rather than commit WIP. Reasoning:
+the structural fix discipline is more valuable than partial progress
+on develop. Future re-attempt requires a longer focused session with
+emulator-debugger access for diagnosis of the residual failures.
+
+### Files reverted this session
+
+- `compiler/cproc/type.c` (A6.1)
+- `compiler/qbe/emit.c` (A6.4)
+- `compiler/qbe/w65816/emit.c` (A6.6, A6.9, A6.11, A7.3, A7.4, A7.5,
+  helpers, Kl optimisation guards)
+- `compiler/qbe/w65816/abi.c` (A6.10)
+
+`bin/qbe` and `bin/cproc-qbe` rebuilt to A6.8 baseline. 269/269 green
+restored. develop unchanged at e2ba69c after this rollback (this audit
+doc update is a separate commit).
+
+### Next session entry point
+
+A future session should plan for **8-12 hours focused work** with
+emulator-debugger access (Mesen2 step-through). The 8 audit sites +
+A6.11 + 4 Kl-opt guards are well-understood; the residual 46
+failures need empirical diagnosis. A working hypothesis to test
+first: **disable A6.4 (keep dtype_size[DL] = 8)** while keeping
+A6.1 (C-side ptr size = 4). This decouples ROM data layout from
+the IR layout change and lets us isolate whether the failures come
+from compiler emission or from data section width.
