@@ -649,6 +649,93 @@ the frame past 256 bytes.
 **Revised effort**: A6.9 is small (~half day, mostly WLA-DX bank
 operator research). A6.8 is the dominant cost (5-7 days).
 
+### A6.1+A6.4+A6.6+A6.9 attempt (2026-05-11, rolled back) — A6.10 + A7.3 discovered
+
+After A6.8 shipped (commit `4aa4989`, large-frame addressing + Kl slot
+widening, 269/269 green), the next session attempted to layer the
+remaining A6 sub-chantiers in one commit:
+
+- A6.1: cproc `mkpointertype` size/align 8/8 → 4/2
+- A6.4: qbe `dtype_size[DL]` 8 → 4
+- A6.6: indirect-call emit reads bank byte from pointer storage
+- A6.9: Oarg pushes 4 bytes for Kl args (with WLA-DX `:sym` operator
+  for bank byte of RCon CAddr symbol args)
+
+Result: **49 failures** (up from the 9 pre-fix baseline). Rolled back
+cleanly to A6.8-only state, 269/269 restored.
+
+### Root cause: A6.10 + A7.3 are prerequisites
+
+The 49 failures trace to **two new bugs uncovered by the partial fix**:
+
+1. **A6.10 — `compiler/qbe/w65816/abi.c` parameter loading**.
+   Today emits `emit(Oloadsw, Kw, i->to, SLOT(-paroff), R)` for every
+   `Opar*` regardless of the parameter's actual class. For a Kl param
+   (post-A6 pointer), the caller now correctly pushes 4 bytes, but the
+   callee's abi.c only loads the low 16 into the Kl temp's slot. The
+   high half (bank byte) stays uninitialised in the (newly-widened)
+   slot — every dereference of the param-loaded pointer reads garbage
+   bank byte.
+
+   Plus: `paroff = (parn + 1) * 2` assumes 2 bytes per param. For a Kl
+   param, subsequent param offsets are off by 2 bytes (read shifted
+   data).
+
+   Fix: byte accumulator + emit `Oload` (not `Oloadsw`) with `i->cls`.
+   But `Oload Kl` lowering itself is broken — see A7.3.
+
+2. **A7.3 — `Oload` handler in emit pass does not pair-load Kl.**
+   `compiler/qbe/w65816/emit.c:2280-2328` falls through `Oload`,
+   `Oloadsw`, `Oloaduw` to a single `emitload + emitstore` path. Both
+   helpers are class-agnostic (always 16-bit). A `Oload Kl` thus
+   produces a single 16-bit load into the Kl temp's slot, leaving
+   the high half uninitialised — same bank-byte loss as A6.10.
+
+   Fix: switch on `i->cls`, emit pair load (low at addr, high at
+   addr+2) and pair store (to i->to slot offset 0 and +2).
+
+Without BOTH A6.10 and A7.3, post-A6 pointer ABI is non-functional
+end-to-end — even if A6.1/A6.4/A6.6/A6.9 are perfectly correct in
+isolation, the missing A6.10 + A7.3 break the param-loading reception
+path. Caller and callee disagree on Kl param size.
+
+### Cascade: A7.5 (Oadd Kl) also surfaces
+
+For pointer arithmetic like `&asset->gfx` or `asset->tilemap` (where
+`tilemap` is a Kl field at non-zero offset), cproc emits `Oadd Kl`
+(pointer + scaled offset, both extended to Kl class). The current
+`Oadd` handler at `emit.c:1409-1438` is also class-agnostic — emits
+a single 16-bit add. For Kl, the high half of the result is
+unchanged (no carry from low add propagates to high half).
+
+This means lib functions like `bgLoad` that compute field addresses
+via pointer arithmetic on the param-loaded asset pointer get a
+double bug: garbage high half from A7.3 + lost carry from A7.5.
+
+### Revised A6 + A7 minimum atomic set
+
+The four sub-chantiers (A6.1+A6.4+A6.6+A6.9) need three more to ship
+together as one functional unit:
+
+- **A6.10** abi.c parameter loading: byte accumulator + class-aware
+  emit (~30 min)
+- **A7.3** Oload handler: pair load for Kl class (~1 hour)
+- **A7.4** Ostorel handler: read r0's high half instead of hardcoded
+  zero (~30 min)
+- **A7.5** Oadd / Osub handlers: pair add/sub with carry for Kl class
+  (~1 hour)
+
+Total atomic patch: ~3-4 hours focused work. Each sub-site is small;
+the coupling is what makes them an atomic unit.
+
+The cascade is now well-bounded. After this set ships:
+- The 9 catalogue failures should close (root cause was pointer arg
+  passing + reception — A6.9 + A6.10 + A7.3 + A6.6 cover the whole
+  path)
+- A7.6+ (shifts, bitwise, mul/div) remain for u32 arithmetic but
+  pointer ABI itself is closed
+- B5 fixed32 unblocks
+
 ### Lessons captured
 
 The audit doc's original framing assumed A6 would need ~3-5 days
