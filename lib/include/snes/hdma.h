@@ -407,8 +407,12 @@ void hdmaWaveStop(void);
  * @brief Set wave speed
  *
  * @param speed Animation speed (1=slow, 4=fast, default=2)
+ * Inlined for zero-call-overhead access.
  */
-void hdmaWaveSetSpeed(u8 speed);
+extern u8 hdma_wave_speed;
+inline void hdmaWaveSetSpeed(u8 speed) {
+    hdma_wave_speed = speed;
+}
 
 /*============================================================================
  * HDMA Brightness Gradient

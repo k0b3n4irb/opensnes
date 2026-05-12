@@ -32,8 +32,10 @@ extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
  *============================================================================*/
 
 /** Current screen brightness (0-15), defaults to full brightness.
- *  Initialized here so setScreenOn() works without consoleInit(). */
-static u8 current_brightness = 15;
+ *  Initialized here so setScreenOn() works without consoleInit().
+ *  External linkage so the `inline getBrightness()` in console.h
+ *  can access it from any TU. */
+u8 current_brightness = 15;
 
 /** Force blank state shadow (REG_INIDISP is write-only, can't read back).
  *  1 = force blanked (screen off), 0 = screen on.
@@ -129,9 +131,9 @@ void setBrightness(u8 brightness) {
     }
 }
 
-u8 getBrightness(void) {
-    return current_brightness;
-}
+/* getBrightness() is `inline` in console.h. Force-emit the standalone
+ * in this TU via address-taking, mirror of setScreenOff's pattern. */
+u8 (*const __opensnes_force_emit_getBrightness)(void) = getBrightness;
 
 /*============================================================================
  * VBlank Synchronization

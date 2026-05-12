@@ -150,9 +150,15 @@ void setBrightness(u8 brightness);
 /**
  * @brief Get current brightness
  *
+ * Inlined for zero-call-overhead access. The standalone definition is
+ * still available (force-emitted in console.c) for fn-pointer callers.
+ *
  * @return Current brightness level (0-15)
  */
-u8 getBrightness(void);
+extern u8 current_brightness;
+inline u8 getBrightness(void) {
+    return current_brightness;
+}
 
 /*============================================================================
  * VBlank Synchronization

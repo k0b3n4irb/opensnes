@@ -392,8 +392,15 @@ u16 scopeButtonsHeld(void);
  * Call this after the user fires at the center of the screen (128, 112).
  * Computes calibration offsets: centerh = 128 - rawX, centerv = 112 - rawY.
  * The NMI handler applies these offsets to all subsequent readings.
+ *
+ * Inlined for zero-call-overhead access.
  */
-void scopeCalibrate(void);
+extern u16 scope_shothraw, scope_shotvraw;
+extern u16 scope_centerh, scope_centerv;
+inline void scopeCalibrate(void) {
+    scope_centerh = 0x80 - scope_shothraw;
+    scope_centerv = 0x70 - scope_shotvraw;
+}
 
 /**
  * @brief Set hold delay (frames before hold triggers).
