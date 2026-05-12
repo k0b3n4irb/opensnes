@@ -121,6 +121,43 @@ chantier addresses the cproc/WLA-DX static-inline interaction.
 - `docs/BENCHMARK.md` — measured cycle gains
 - Develop commit `d825295` — function inlining chantier ship
 
+## 2026-05-12 empirical validation — C99 strict pattern (option 3)
+
+Reproduced the C99 inline/extern-inline pattern in `/tmp/c99_test/`:
+- `header.h`: `inline u8 read_state(void) { return shared_state; }`
+  (no static, no extern — pure C99 inline definition)
+- `foo.c`, `bar.c`: include header, call `read_state` / `write_state`
+- `console.c`: includes header, has `extern inline u8 read_state(void);`
+  declaration to force external definition emission
+
+**Result**: rejected.
+
+cproc compiles each TU. In every TU including the header:
+- inlinedefn=true (LINKEXTERN, FUNCINLINE, no SCEXTERN, no prior)
+- cproc/decl.c:1108 SKIPS emit (per C99 spec — inline definition is NOT
+  an external definition)
+- QBE never sees the body in the IR stream
+- Inline pass has nothing in its table → `not in table (forward ref?)`
+- `read_state` / `write_state` never inlined, never emitted as standalone
+- foo.asm / bar.asm have `jsl write_state` / `jml read_state` → unresolved
+
+For console.c with `extern inline ...;` declarations: cproc just records
+the forward decl; the body's emission decision was already made (skip)
+during header parsing. The `extern inline` does not retroactively force
+standalone emission. console.asm contains zero inline-function bodies.
+
+This means **all three resolutions require cproc changes**:
+- Option 1 (suppress standalone when fully inlined) — needs cproc/QBE
+  coordination to know inline outcome before deciding emit
+- Option 2 (symbol mangling) — needs cproc IR-level renaming + QBE asm
+  generator hook
+- Option 3 (C99 pattern) — needs cproc to NOT skip emit for inline
+  definitions when QBE's inline-hint feature is active, OR to
+  reconsider emission upon `extern inline` declaration
+
+All require ~1-2 days of compiler work. None is a "retrofit lib" task
+in isolation; each is a compiler chantier in its own right.
+
 ## When to revisit
 
 - If a future chantier addresses cproc symbol mangling or selective
