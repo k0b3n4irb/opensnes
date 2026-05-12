@@ -38,7 +38,9 @@ static u8 current_brightness = 15;
 /** Force blank state shadow (REG_INIDISP is write-only, can't read back).
  *  1 = force blanked (screen off), 0 = screen on.
  *  Starts at 1 because consoleInit() sets force blank first. */
-static u8 force_blanked = 1;
+/* External linkage so the `inline setScreenOff()` in console.h can
+ * access it from any TU. */
+u8 force_blanked = 1;
 
 /** PAL/NTSC flag */
 static u8 is_pal_system;
@@ -111,10 +113,12 @@ void setScreenOn(void) {
     REG_INIDISP = current_brightness & 0x0F;
 }
 
-void setScreenOff(void) {
-    force_blanked = 1;
-    REG_INIDISP = INIDISP_FORCE_BLANK;
-}
+/* Force standalone emission of the inline setScreenOff in this TU.
+ * Taking the function's address creates a data-section indirect
+ * reference; the QBE inline pass counts it and suppresses the
+ * "header-only inclusion" suppress rule, ensuring this TU emits the
+ * canonical fallback body for non-inlining callers and fn-ptr users. */
+void (*const __opensnes_force_emit_setScreenOff)(void) = setScreenOff;
 
 void setBrightness(u8 brightness) {
     current_brightness = brightness & 0x0F;
