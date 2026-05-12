@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | cceac4bc784cc5be5523bbff7c94af36dbd66cd4 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 2d3af4de3945e60246590a8fc47d677dc3c59f82 | github.com/k0b3n4irb/qbe:main |
+| compiler/cproc | 0237a00c60a2cbc189e4f346ff6df6781d71d29c | github.com/k0b3n4irb/cproc:master |
+| compiler/qbe | 77d07a017733a384eced10c22bf9530efe49b824 | github.com/k0b3n4irb/qbe:main |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -39,7 +39,7 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 8 patches (upstream merge-base: 7051114)
+### compiler/cproc — 9 patches (upstream merge-base: 7051114)
 
 ```
 cceac4b  fix(65816): preserve volatile through QBE IR  (chantier A2)
@@ -62,7 +62,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 31 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 34 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
