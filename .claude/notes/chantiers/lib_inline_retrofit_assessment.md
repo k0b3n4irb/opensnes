@@ -1,4 +1,16 @@
-# Lib inline retrofit — feasibility assessment (rejected)
+# Lib inline retrofit — feasibility assessment (UNBLOCKED 2026-05-12)
+
+> **Status update 2026-05-12 (commit 2b4e2f8)**: the limitations
+> documented below have been resolved by adding deferred function emit
+> + consumption tracking to QBE (compiler chantier "function inlining
+> — phase 2"). `setScreenOff` is now the first lib symbol retrofitted
+> via C99 inline pattern with a data-section force-emit anchor. The
+> doc below is preserved as the rationale for that compiler work; the
+> "rejected" status is historical.
+
+---
+
+# Lib inline retrofit — feasibility assessment (rejected, historical)
 
 **Date**: 2026-05-12
 **Status**: REJECTED — current SDK state makes the retrofit cost-prohibitive
