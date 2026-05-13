@@ -110,10 +110,8 @@ void consoleInitEx(u16 options) {
  * Screen Control
  *============================================================================*/
 
-void setScreenOn(void) {
-    force_blanked = 0;
-    REG_INIDISP = current_brightness & 0x0F;
-}
+/* setScreenOn() is `inline` in console.h. Force-emit canonical here. */
+void (*const __opensnes_force_emit_setScreenOn)(void) = setScreenOn;
 
 /* Force standalone emission of the inline setScreenOff in this TU.
  * Taking the function's address creates a data-section indirect
@@ -150,9 +148,8 @@ u8 isInVBlank(void) {
  * Frame Counter
  *============================================================================*/
 
-u16 getFrameCount(void) {
-    return frame_count;
-}
+/* getFrameCount() is `inline` in console.h. Force-emit canonical here. */
+u16 (*const __opensnes_force_emit_getFrameCount)(void) = getFrameCount;
 
 void resetFrameCount(void) {
     frame_count = 0;

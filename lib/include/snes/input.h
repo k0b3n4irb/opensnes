@@ -406,8 +406,12 @@ inline void scopeCalibrate(void) {
  * @brief Set hold delay (frames before hold triggers).
  *
  * @param frames Number of frames (default: 60 = 1 second at 60Hz)
+ * Inlined for zero-call-overhead access.
  */
-void scopeSetHoldDelay(u16 frames);
+extern u16 scope_holddelay;
+inline void scopeSetHoldDelay(u16 frames) {
+    scope_holddelay = frames;
+}
 
 /**
  * @brief Set repeat delay (frames between repeat fires after hold).

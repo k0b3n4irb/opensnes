@@ -5,11 +5,5 @@
 
 #include <snes/superfx.h>
 
-u8 gsuInit(void) {
-    /* Set safe defaults */
-    gsu_cfgr = 0x80;        /* IRQ mask, no fast multiply */
-    gsu_scmr = 0x19;        /* 4bpp + RAN + RON (most common for PLOT) */
-    gsu_scbr = 0x00;        /* Buffer A */
-    gsu_dma_src_hi = 0x00;  /* DMA from buffer A */
-    return superfx_status != 0;
-}
+/* gsuInit() is `inline` in superfx.h. Force-emit canonical here. */
+u8 (*const __opensnes_force_emit_gsuInit)(void) = gsuInit;

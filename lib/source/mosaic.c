@@ -30,7 +30,10 @@ u8 mosaic_bg_mask;
  * Internal Helper
  *============================================================================*/
 
-static void mosaic_update_register(void) {
+/* Marked `static inline` so the 5 intra-TU callers (mosaicEnable etc.)
+ * splice the 1-line body directly instead of jsl'ing a wrapper. The
+ * deferred-emit pass then drops the unused standalone in the .asm. */
+static inline void mosaic_update_register(void) {
     REG_MOSAIC = (mosaic_size << 4) | mosaic_bg_mask;
 }
 

@@ -103,9 +103,16 @@ extern u8 superfx_status;
  * @brief Initialize SuperFX — detect hardware, set default config
  * @return 1 if GSU detected, 0 if not
  *
- * Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00
+ * Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00.
+ * Inlined for zero-call-overhead access.
  */
-u8 gsuInit(void);
+inline u8 gsuInit(void) {
+    gsu_cfgr = 0x80;        /* IRQ mask, no fast multiply */
+    gsu_scmr = 0x19;        /* 4bpp + RAN + RON (most common for PLOT) */
+    gsu_scbr = 0x00;        /* Buffer A */
+    gsu_dma_src_hi = 0x00;  /* DMA from buffer A */
+    return superfx_status != 0;
+}
 
 /**
  * @brief Launch GSU program and wait for completion (WRAM-safe)
