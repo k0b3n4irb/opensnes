@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 42a5c4641f1d60bbc33c4b7794f3413973591399 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 988073d7c60dd8b69aea932d6902b232bc1d3b1f | github.com/k0b3n4irb/qbe:main |
+| compiler/qbe | 2eb9f53b83c21702ca712ff725677542cf57e981 | github.com/k0b3n4irb/qbe:main |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -62,7 +62,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 35 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 36 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 

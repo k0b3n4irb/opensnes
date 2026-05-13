@@ -158,10 +158,15 @@ inline void colorMathInit(void) {
  * @brief Enable color math for specified layers
  *
  * Enables color math blending for the given layers.
+ * Inlined for zero-call-overhead access (wave 4 retrofit).
  *
  * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, etc.)
  */
-void colorMathEnable(u8 layers);
+inline void colorMathEnable(u8 layers) {
+    /* Set layer enable bits (bits 0-5 of CGADSUB) */
+    cgadsub = (cgadsub & 0xC0) | (layers & 0x3F);
+    REG_CGADSUB = cgadsub;
+}
 
 /**
  * @brief Disable all color math
