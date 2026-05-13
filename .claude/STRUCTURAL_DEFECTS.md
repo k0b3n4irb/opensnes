@@ -1275,7 +1275,25 @@ pass — same root cause, same review reviewer.
 
 ---
 
-#### B4. `hdmaSetup` hardcodes bank `$00` 🟠
+#### B4. `hdmaSetup` hardcodes bank `$00` — PARTIAL 🟡 (API shipped; example migration pending)
+
+**Status update 2026-05-13**: `hdmaSetupBank()` is shipped and
+documented. `examples/graphics/effects/hdma_helpers` uses the
+bank-aware variant. Four other HDMA examples (`hdma_wave`,
+`window`, `gradient_colors`, `transparent_window`) still use the
+unsafe `hdmaSetup()` form — they happen to keep their tables in
+bank `$00`, so they currently work, but they'd break the moment
+their tables spill. Severity demoted from 🟠 to 🟡: API gap is
+closed, the residual risk is examples drifting toward unsafe use.
+
+Full acceptance ("hdmaSetup deprecated for ROM tables") would
+require migrating those four examples and either renaming
+`hdmaSetup` to `hdmaSetupBank0` or emitting a deprecation warning.
+Worth doing as a follow-up but no longer blocking.
+
+---
+
+**Original entry (preserved for context)**:
 
 **Symptom**: `hdmaSetup(channel, mode, destReg, table)` accepts a
 2-byte pointer and assumes the table lives in bank `$00`. If the linker
@@ -1362,7 +1380,23 @@ multiplier in multi-step form or a software multiply).
 
 ---
 
-#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` 🟡
+#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` — PARTIAL 🟡 (2 of 3 shipped, algorithmic not LUT)
+
+**Status update 2026-05-13**: The audit reveals three helpers
+already exist in `<snes/math.h>`: `u16 sqrt16(u16)`, `u8
+atan2_8(s16, s16)`, and `fixed fixSqrt(fixed)`. The implementations
+are algorithmic (bit-by-bit isqrt; quadrant-folded LUT for atan2),
+not pure LUTs as the acceptance criterion specified, but they meet
+the user need. `pow_lut` is the remaining gap.
+
+Severity stays 🟡 — the helpers are present and used by `atan2`
+example callers (1 caller for `atan2_8` per 2026-05-13 audit).
+Acceptance criterion partially met; adding `pow_lut` if a future
+chantier needs it is a small follow-up.
+
+---
+
+**Original entry (preserved for context)**:
 
 **Symptom**: each game that needs these rolls its own LUT. Common
 operations like "angle from a vector" (`atan2`), "distance between two
@@ -1526,7 +1560,30 @@ in ROADMAP as 2–3 weeks.
 
 ### Category D — Toolchain & emulator coverage
 
-#### D1. snes9x doesn't detect GSU in OpenSNES SuperFX ROM headers 🔴
+#### D1. snes9x doesn't detect GSU in OpenSNES SuperFX ROM headers — PARTIAL 🟡 (Mesen2 phase shipped + CI-installed)
+
+**Status update 2026-05-13**: Path D1.a is largely shipped. The
+Mesen2 visual-regression phase exists
+(`tools/opensnes-emu/test/phases/visual-mesen2.mjs`), runs 4
+SuperFX/SA-1 examples through Mesen2's `--testrunner`, and
+`.github/workflows/opensnes_build.yml` installs Mesen2 (and xvfb
+for headless) as part of the functional-tests job. CI runs are
+effectively validated against Mesen2.
+
+The "mandatory" gap is local dev only: if Mesen2 isn't installed,
+the phase reports `skipped` rather than failing. CI cannot skip
+because the workflow installs Mesen2 unconditionally. Severity
+demoted 🔴 → 🟡: silent-vacuous-pass risk is essentially gone for
+CI, present only for contributors running tests locally without
+Mesen2.
+
+Full acceptance ("CI fails if Mesen2 binary unavailable") would
+require failing the phase on absence rather than skipping. Worth
+doing but no longer urgent.
+
+---
+
+**Original entry (preserved for context)**:
 
 **Symptom**: snes9x's libretro core, used by `tools/opensnes-emu` for
 visual regression, does **not** detect the GSU chip in OpenSNES's
