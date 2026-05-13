@@ -491,13 +491,33 @@ sequencing, which has overlap with the function epilogue's existing
 
 ---
 
-#### A4. `oamSet` framesize=158 perf cliff 🟠
+#### A4. `oamSet` framesize=158 perf cliff — RESOLVED 🟢 (2026-03-03)
 
-**Symptom**: the `oamSet(id, x, y, attr, size, tile)` library function
-allocates **158 bytes of SSA temporaries on the stack per call**. The
-function itself is correct; the cost lives in stack manipulation. Calling
-`oamSet` more than ~3 times per frame in the main loop produces visible
-jitter on real hardware.
+**Status update**: shipped via tactical ASM rewrite (commit `39dbff8`,
+2026-03-03) — NOT the QBE-coalescer chantier originally proposed below.
+The ASM `oamSet` in `lib/source/sprite_oamset.asm` has framesize=0
+(direct stack-relative addressing, no SSA temps), saving ~100 cycles
+per call vs the C version. The acceptance criterion "framesize drops
+from 158 to ≤ 32 bytes" is met (framesize is 0).
+
+The broader perf-cliff observation surfaces in other multi-arg C
+helpers (`oamSetX` 148, `oamDrawMeta` 142, `oamDrawMetaFlip` 200,
+`collideRectEx` 176, `hdmaColorGradient` 162). A 2026-05-13 audit
+found that only `oamSetSize` (106) has multiple example callers (3);
+the rest are 0-1 callers, mostly demo/utility paths. The cliff
+persists but no longer affects per-frame hot paths in shipping
+examples — the priority dropped from 🟠 to 🟢. Future tightening
+(QBE coalescer chantier OR per-function ASM rewrites) is opportunistic,
+not blocking.
+
+The historical description of the original symptom and proposed fix
+is preserved below for context.
+
+**Symptom (historical, pre-2026-03-03)**: the `oamSet(id, x, y, attr,
+size, tile)` library function allocates **158 bytes of SSA temporaries
+on the stack per call**. The function itself is correct; the cost
+lives in stack manipulation. Calling `oamSet` more than ~3 times per
+frame in the main loop produces visible jitter on real hardware.
 
 **Root cause**: QBE's register allocator and SSA-temp lifetime analysis
 assign large numbers of stack slots for `oamSet`'s 6-argument body. The
