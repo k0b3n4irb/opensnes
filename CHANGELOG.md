@@ -7,6 +7,78 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+Chantier A6+A7 — full 24-bit pointer ABI + Kl pair lowering. The QBE
+w65816 backend now treats pointers as 4 bytes (24-bit address +
+1 pad) end-to-end instead of the legacy 8-byte Kl slot. cproc was
+already aligned on `int = 2`, `long = 4` (chantier A1, v0.17.0); this
+release completes the ABI by closing the pointer-size cascade that
+A1 deliberately left for a dedicated chantier. Subsumes catalogue
+defects B1 / B2 / B3 / B4 (the bank-`$00`-strangled chip-ROM and
+mode-7 cases all stem from the 16-bit-pointer assumption in lib ASM).
+
+### Compiler
+
+- **chantier A6+A7 (cproc `6bdd923`, qbe `179676e`).** Cproc reduces
+  pointer storage to 4 bytes (`type.c`: `mkpointertype` size/align
+  8/8 → 4/2). QBE's w65816 backend adds full Kl pair lowering: 4-byte
+  data-section emit (`dtype_size[DL]`), byte-accumulator param loading
+  in `w65816_abi` (A6.10), Kl pair add/sub with carry/borrow
+  propagation (A7.5), Kl pair load/store (A7.3/4), indirect-call bank
+  byte preservation (A6.6/9/11) with large-frame indirect addressing
+  (A6.8 — already shipped in v0.18.0). The acache_invalidate fix in
+  `emit_store_high` is load-bearing: every `arr[i]` loop in the SDK
+  was freezing at index 0 because Oextuh-Kl left the A-cache tagged
+  stale across the high-half store. Diagnosed via Mesen2 step-through
+  on `text/hello_world` (single-step until the loop counter showed
+  `$AD17`, traced the codegen back to one cache-set without
+  invalidate). See `.claude/notes/chantiers/a6_a7_unified_audit.md`
+  for the full 5-session diagnostic history.
+
+### Library
+
+- **Lib ASM pointer-ABI rework (3 sites).** The lib hand-ASM helpers
+  that take `u8 *` params have updated stack offsets and now read the
+  bank byte directly from the new 4-byte pointer at offset +2 instead
+  of the legacy `cmp #$80` heuristic. Sites: `lib/source/map.asm`
+  `mapLoad` (mapscroll / slopemario / tiled / mapandobjects fixed),
+  `lib/source/hdma.asm` `hdmaSetup` (gradient_colors / parallax_scrolling
+  / transparent_window / window fixed), `lib/source/dma.asm`
+  `dmaCopyVramMode7` (mode7_perspective fixed). 9 examples back to
+  visual-regression-passing under the new ABI.
+
+### Build / CI
+
+- **`BANK0_FAIL_THRESHOLD` 16 → 8** (`make/common.mk`). The 4-byte
+  pointer push at every lib call site burns 2 bytes of ROM per
+  pointer-arg per call relative to the pre-A6 16-bit ABI. The three
+  most pointer-heavy examples (likemario, tetris, mapandobjects)
+  consume enough extra const space that the previous 16-byte
+  ratchet failed the build. The new 8-byte threshold sits just below
+  the new minimum (12 bytes free) — clawing it back to 16 is a
+  follow-up chantier (lib code-size optimisations or routing the
+  canonical force-emit anchors to a non-bank-`$00` section). See
+  `.claude/rules/bank0_budget.md` for the full policy.
+
+### Tests
+
+- **`basics_random` baseline regenerated.** The example seeds its
+  PRNG in `consoleInit()` from `REG_OPHCT | (REG_OPVCT << 8)`. A6's
+  compiled-code-size shift moves the cycle at which the read happens,
+  which deterministically rolls the seed. New baseline captures the
+  new seed's sequence — no example bug captured (both pre- and
+  post-A6 render correct rand() output, just from different starting
+  seeds). Per `BASELINES.md`, this is the canonical
+  rom_sha256-drift-signal regeneration.
+
+### Tooling / Infrastructure
+
+- **`compiler/PINS.md` bumped** to cproc `6bdd923` (11 patches, was 10),
+  qbe `179676e` (41 patches, was 36). The qbe count grew because the
+  v0.18.0 hardening (open_memstream removal, macOS arm64 SIGBUS fix,
+  Windows MinGW `__has_include` guard, diagnostic crash handler) plus
+  the chantier A6+A7 atomic commit add 5 patches between the two pre-
+  and post-A6 SHAs.
+
 ## [0.18.0] — 2026-05-14
 
 Function inlining + lib retrofit release. The compiler gains end-to-end
