@@ -45,6 +45,7 @@
 #define OPENSNES_CONSOLE_H
 
 #include <snes/types.h>
+#include <snes/registers.h>  /* REG_INIDISP for inline setScreenOn/Off bodies */
 
 /*============================================================================
  * Initialization
@@ -101,13 +102,22 @@ void consoleInitEx(u16 options);
  * Turns on the display after initialization or a screen blank.
  * Sets full brightness (15).
  *
+ * Inlined for zero-call-overhead access (saves ~28 cycles per call).
+ * Shares the same `force_blanked` and `current_brightness` shadows as
+ * setScreenOff(); both are declared extern below.
+ *
  * @code
  * consoleInit();
  * // ... load graphics ...
  * setScreenOn();  // Display is now visible
  * @endcode
  */
-void setScreenOn(void);
+inline void setScreenOn(void) {
+    extern u8 force_blanked;
+    extern u8 current_brightness;
+    force_blanked = 0;
+    REG_INIDISP = current_brightness & 0x0F;
+}
 
 /**
  * @brief Disable screen display (blank)
@@ -115,13 +125,22 @@ void setScreenOn(void);
  * Turns off the display. Use during major VRAM updates that
  * can't complete during VBlank.
  *
+ * Inlined for zero-call-overhead access (saves ~28 cycles per call).
+ * The standalone definition in console.c is still emitted (via the
+ * `extern inline` declaration there) for ABI compatibility — direct
+ * call sites collapse to two stores.
+ *
  * @code
  * setScreenOff();
  * // ... massive VRAM update ...
  * setScreenOn();
  * @endcode
  */
-void setScreenOff(void);
+extern u8 force_blanked;
+inline void setScreenOff(void) {
+    force_blanked = 1;
+    REG_INIDISP = INIDISP_FORCE_BLANK;
+}
 
 /**
  * @brief Set screen brightness
@@ -141,9 +160,15 @@ void setBrightness(u8 brightness);
 /**
  * @brief Get current brightness
  *
+ * Inlined for zero-call-overhead access. The standalone definition is
+ * still available (force-emitted in console.c) for fn-pointer callers.
+ *
  * @return Current brightness level (0-15)
  */
-u8 getBrightness(void);
+extern u8 current_brightness;
+inline u8 getBrightness(void) {
+    return current_brightness;
+}
 
 /*============================================================================
  * VBlank Synchronization
@@ -195,6 +220,8 @@ u8 isInVBlank(void);
  * Returns the number of VBlanks since initialization.
  * Wraps at 65535.
  *
+ * Inlined for zero-call-overhead access (just a 16-bit load).
+ *
  * @return Frame count
  *
  * @code
@@ -202,7 +229,10 @@ u8 isInVBlank(void);
  * u8 anim_frame = (getFrameCount() / 8) % 4;
  * @endcode
  */
-u16 getFrameCount(void);
+inline u16 getFrameCount(void) {
+    extern volatile u16 frame_count;
+    return frame_count;
+}
 
 /**
  * @brief Reset frame counter

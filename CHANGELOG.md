@@ -7,6 +7,211 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
+## [0.18.0] — 2026-05-14
+
+Function inlining + lib retrofit release. The compiler gains end-to-end
+`inline` keyword support (chantier "function inlining"), plus deferred
+asm emission with consumption-aware standalone suppression that makes
+C99 cross-TU inline patterns work end-to-end. Sixteen lib helpers are
+retrofitted to use the new inline path — 55 examples now inline
+`setScreenOn()`, 22 inline `setScreenOff()`, plus scattered wins on
+`fixCos`, `textSetPos`, `colorMathInit/Enable`, etc.
+
+Total cycle reduction vs PVSnesLib+816-opt improves from **−29.1 %**
+(v0.17.0) to **−32.2 %**. The previously-regressing `call_chain` bench
+recovers from +31.9 % to −59.6 % vs PVSnesLib+opt. The catalogue's A4
+(oamSet perf cliff) is acknowledged RESOLVED — fix actually shipped
+2026-03-03 via tactical ASM rewrite (commit `39dbff8`) but the doc
+hadn't been updated. B4/B6/D1 also receive partial-shipped status
+updates after a full catalogue audit. No public API breakage.
+
+### Compiler
+
+- **Function inlining end-to-end (chantier "function inlining").** The
+  C `inline` keyword now drives a real qbe inline pass. cproc forwards
+  the keyword as a QBE IR linkage hint
+  (`Lnk.inline_hint`); qbe's new `inline.c` records each eligible
+  callee's body during the per-function pipeline and splices it into
+  caller IR at every direct call site. Eligibility heuristic:
+  linear-flow (no phi, no conditional jumps), no nested `Ocall`, no
+  `Oalloc*`, ≤ 8 IR instructions (overridable via
+  `CC_INLINE_MAX_INSTR=N` env var). The bench's `helper(helper(x))`
+  pattern was the motivated target — its previous +31.9 % regression
+  becomes a −59.6 % win once `helper` is marked `static inline`.
+  Reference: `compiler/qbe/inline.c`, qbe SHAs `13d9b14`, `29b0941`,
+  `77d07a0`. 410/410 quick suite green throughout.
+
+- **Deferred asm emission + consumption-aware standalone suppression
+  (cross-TU enabler).** The earlier inline ship only worked within a
+  single TU (user `static inline` helpers in their own .c file). For
+  lib helpers defined in a header to inline at example call sites, the
+  body needs to reach the inline pass without the linker seeing
+  duplicate symbols. Implementation: cproc/decl.c always emits inline
+  bodies into IR (drops the C99-inlinedefn-based skip);
+  qbe/main.c buffers each function's asm in an `open_memstream` buffer
+  during the per-function pipeline; qbe/inline.c tracks
+  per-fn `n_direct` / `n_inlined` / `n_declined` / `n_indirect`
+  consumption counters; `flush_pending()` skips the standalone in two
+  cases — (a) every direct caller in this TU inlined and no indirect
+  refs, or (b) the function isn't used in this TU at all
+  (header-only inclusion). A canonical TU forces the standalone via a
+  data-section indirect reference (`void(*const force_emit)(...) = fn;`).
+  Reference: `compiler/qbe/main.c`, `compiler/qbe/inline.c`,
+  qbe SHA `988073d`, cproc SHA `42a5c46`.
+
+- **`CC_INLINE_MAX_INSTR` default bumped 8 → 16 (qbe `2eb9f53`).**
+  Opens wave 4 candidates (`textSetPos` 10, `fixCos` 11,
+  `colorMathEnable` 14). Dormant for the 12 helpers shipped with the
+  ≤ 8 cap. No measurable bank-$00 ROM regression.
+
+- **A6.8: large-frame indirect addressing + Kl slot widening
+  (qbe `4aa4989`).** Standalone prerequisite for the in-flight A6+A7
+  atomic patch (full pointer ABI, parked on
+  `wip/a6-a7-atomic-v3`). Adds an indirect addressing fallback for
+  functions whose stack offsets exceed the 8-bit `<N>,s` cap, and
+  widens Kl temp slots to 4 bytes. Not user-visible in v0.18.0; lays
+  the groundwork.
+
+### Library (perf retrofits)
+
+Sixteen lib helpers now ship with the C99 `inline` pattern. Every TU
+that includes the right header inlines the body at direct call sites;
+the canonical `.c` file emits one standalone fallback for fn-pointer
+callers. Per-call overhead drops from ~28 cycles (JSL + RTL + prologue
++ epilogue) to zero.
+
+- **Wave 2 (`ebcf428`):** `getBrightness`, `mosaicInit`,
+  `hdmaWaveSetSpeed`, `scopeCalibrate`, `colorMathInit`,
+  `colorMathDisable` — 6 helpers, ~28 cycles each per call, 2 with
+  active example callers (scopeCalibrate × 1, colorMathInit × 1).
+- **Wave 3 (`98387fd`):** `setScreenOn` (the big win — **55** example
+  callers), `getFrameCount`, `gsuInit`, `scopeSetHoldDelay`, plus the
+  static-inline of `mosaic_update_register` collapsing 5 intra-TU
+  callers. Saves ~1736 cycles across the SDK on the dominant
+  setScreenOn path.
+- **Wave 4 (`85416eb`):** `textSetPos`, `fixCos` (+ paired `fixSin`),
+  `colorMathEnable` — the 9-14 IR-instr range opened by the threshold
+  bump. ~112 cycles saved across 3 examples (random, aim_target,
+  transparency).
+- **Wave 1 was `setScreenOff`** (already in the deferred-emit ship,
+  `2b4e2f8`) — 22 example callers, the first symbol exercised end-to-end.
+
+Total: ~2700+ cycles saved across the SDK at typical example call
+sites. The pattern (`extern u8 state;` in header + `inline void
+fn(...)` body + `void(*const force_emit)(...) = fn;` in canonical .c)
+is reusable; the audit in
+`.claude/notes/chantiers/lib_inline_retrofit_assessment.md` documents
+when to retrofit and when to skip.
+
+### Performance
+
+- **Cycle benchmark TOTAL: 1341 → 1282** (-4.4 % vs v0.17.0).
+- **vs PVSnesLib+816-opt total: -29.1 % → -32.2 %** (improvement of
+  +2.3 percentage points).
+- **`call_chain` recovered**: 62 → 19 cycles, going from
+  +31.9 % vs PVSnesLib+opt to −59.6 % (a 91-point swing on the
+  benchmark's previously-worst case).
+- **`helper` standalone eliminated post-deferred-emit**: counted as
+  0 cycles in the table with a (†) footnote — its body lives
+  exclusively inside `call_chain` after the inline splice. ROM-size
+  win (~6 bytes per fully-inlined helper).
+
+The wins concentrate on:
+- direct-call elimination at user call sites (every `setScreenOn()`
+  collapses to two register writes)
+- dead-standalone removal (fully-inlined helpers don't bloat ROM)
+- `call_chain`-shaped patterns (small wrapper around a small wrapper)
+
+### Docs / Catalogue
+
+- **A4 oamSet perf cliff RESOLVED 🟢** (commit `5fdad3b`). The fix
+  actually shipped 2026-03-03 (commit `39dbff8`) via ASM rewrite in
+  `lib/source/sprite_oamset.asm` — framesize dropped from 158 to 0.
+  Catalogue + `KNOWN_LIMITATIONS.md` had 2.5 months of drift; both
+  updated to reflect reality.
+- **B4 (`hdmaSetup` hardcodes bank $00) → 🟡 partial** (commit
+  `6db13fc`): `hdmaSetupBank()` shipped, 1/5 HDMA examples migrated.
+- **B6 (no atan2/sqrt/pow) → 🟡 partial**: `sqrt16`, `atan2_8`,
+  `fixSqrt` shipped (algorithmic, not LUTs as originally proposed,
+  but functional). `pow_lut` is the remaining gap.
+- **D1 (snes9x doesn't detect GSU) → 🟡 partial**: Mesen2 visual
+  regression phase shipped and CI installs Mesen2 unconditionally
+  (ubuntu-22.04 ABI match + xvfb for headless). The "fail-build if
+  Mesen2 unavailable" criterion is met for CI; local dev still skips.
+- **Function inlining audit + assessment docs**: full Phase 0/1
+  audit before implementation, post-mortem on the C99 strict pattern
+  attempt, then the unblock when the cproc/QBE deferred-emit chantier
+  shipped. References:
+  `.claude/notes/chantiers/function_inlining_audit.md`,
+  `.claude/notes/chantiers/lib_inline_retrofit_assessment.md`.
+- **Wip/* branch policy** (`060dd93`): squash-merge then delete.
+  Documented in `.claude/rules/release.md` after a cleanup pass found
+  5 stale `worktree-agent-*` branches + 1 `backup/develop-pre-reword-*`
+  living forever.
+- **Bench re-baselined twice** (`ccaf9c7` post-v0.17.0, `022572d`
+  post-deferred-emit). `docs/BENCHMARK.md` reflects the
+  −32.2 % current state with full per-function breakdown.
+- **A6+A7 chantier audit phase complete** (multiple docs commits):
+  the in-flight full-pointer-ABI chantier has its 9-site atomic patch
+  plan, the empirical findings of two implementation attempts, and a
+  replay script. Parked on `wip/a6-a7-atomic-v3` for the focused
+  session that needs Mesen2-debugger access to close the residual 46
+  failures.
+
+### Tooling / Infrastructure
+
+- `compiler/PINS.md`: bumped to qbe `5c23467` (40 patches, was 31)
+  and cproc `42a5c46` (10 patches, was 8). Patch count grew across
+  the function-inlining + deferred-emit chantier; trend opposite of
+  catalogue A5's "shrink toward upstream" goal but the patches are
+  load-bearing for the perf wins.
+
+### Build & CI (cross-platform unblock)
+
+Three pre-existing CI failures resolved end-to-end in the same session
+that closed the v0.18.0 release. The Linux + Functional Tests jobs
+were already green; macOS arm64 and Windows MinGW had been red for
+many commits. All four jobs now green on the release tip.
+
+- **`open_memstream` dependency removed (qbe `eaf6116`).** The earlier
+  deferred-emit chantier bufferised each function's asm output through
+  `open_memstream` (POSIX 2008). MSYS2's UCRT does not ship the call,
+  which broke the Windows qbe build before any lib compile ran.
+  Redesigned as a 2-pass parse: pass 1 (in the parse callback) runs
+  SSA cleanup + `inline_record` and collects every Fn; pass 1.b runs
+  `inline_check` module-wide so consumption counters see every TU
+  caller; pass 2 finalises and emits, skipping fully-consumed inline
+  bodies. The w65816 backend writes `w65816_alloc_size[]` /
+  `w65816_alloc_slots` globals in abi0 and reads them at emit time;
+  the new abi0 snapshots the per-fn state into a side list and emit
+  restores it, since the 2-pass model separates abi0 from emit by
+  many other functions' processing. Output is byte-identical to the
+  previous design across the lib and every example.
+
+- **macOS arm64 SIGBUS fixed (qbe `444edea`).** `parsedat` declared
+  `Dat d` on the stack and fired the `DStart` callback before
+  `d.isref` / `d.u.ref.name` were written, so those bytes carried
+  stack garbage. The OpenSNES `data()` callback's `inline_record_dat_ref`
+  lookup then dereferenced a junk pointer at `r->n_indirect` (offset
+  108 in `InlRec`). Linux x86_64 / aarch64 typically saw zero bytes
+  there so the surrounding `if (d->isref && d->u.ref.name)` test
+  failed harmlessly; macOS arm64's stricter stack hygiene produced
+  reliable SIGBUS when compiling `background.c`. Fix gates the call
+  on `d->type != DStart && d->type != DEnd` so the `isref` byte is
+  only trusted once parsedat has written it. Diagnosed with a
+  SIGBUS/SIGSEGV crash handler added in qbe `4de6a97` that dumps
+  `backtrace_symbols_fd()` output — pinpointed the crash site without
+  arm64-Apple hardware.
+
+- **Windows MinGW build fix (qbe `5c23467`).** The diagnostic handler
+  used `<execinfo.h>`, which is glibc + Apple libsystem only. MinGW
+  does not ship it, so the Windows qbe build aborted before any lib
+  compile reached the cproc segfault retry. The handler is now guarded
+  behind `__has_include(<execinfo.h>)` so it compiles out on Windows;
+  Windows crashes continue to be diagnosed via
+  `msys2_cproc_diagnostic.yml` + the retry loop in
+  `opensnes_build.yml`.
+
 ## [0.17.0] - 2026-05-09
 
 Compiler & runtime hardening release. Five structural defects from

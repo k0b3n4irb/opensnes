@@ -3,9 +3,26 @@
 ## Format
 
 [Conventional Commits](https://www.conventionalcommits.org/):
-- Types: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `chore`, `build`
-- Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
-- Format: `type(scope): description` (lowercase, imperative mood, no period)
+- Types: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `chore`,
+  `build`, `style`, `ci`, `revert`
+- Scopes: canonical six from CLAUDE.md (`lib`, `compiler`, `runtime`,
+  `tools`, `examples`, `build`) plus practical extensions present in
+  the repo's directory structure (`ci`, `devtools`, `docs`, `claude`,
+  `contributing`, `release`, `submodule`, `deps`, `readme`,
+  `changelog`, `test`, `tests`) plus emerged categories matching real
+  paths (`chantiers` → `.claude/notes/chantiers/`, `rules` →
+  `.claude/rules/`, `bench` → bench fixtures). The canonical
+  source-of-truth list lives in `devtools/lint_commits.py`'s
+  `ALLOWED_SCOPES` set — extend BOTH places in the same commit.
+- Format: `type(scope): description` (lowercase, imperative mood, no
+  period).
+- **Description first-letter exception**: technical terms that are
+  conventionally uppercase (acronyms like `OAM`, `DMA`, `GSU`, `API`;
+  standard names like `C99`, `K8`) may start the description without
+  a lowercase rewrite. Detected as a first word matching
+  `[A-Z][A-Z0-9]*[a-z]?` (acronym, optional trailing lowercase suffix
+  like `OAMs`) or `[A-Z][0-9]+` (standard name). Anything else (e.g.
+  prose `Refactor the foo`) still trips.
 
 ## Merge commits are exempt from the format check
 

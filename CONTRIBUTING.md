@@ -144,6 +144,27 @@ under these conditions:
 
 4. **Do NOT add `Co-Authored-By` trailers** for AI tools in commit messages.
 
+### Project knowledge in `.claude/`
+
+Two directories under `.claude/` capture knowledge that AI assistants and
+human contributors share:
+
+- [`.claude/rules/`](.claude/rules/) — **normative** rules (auto-loaded
+  by Claude Code). Commit policy, debugging methodology, testing
+  workflow, NMI audit checklist, etc. Treat these like project policy:
+  follow them, change them only by PR with rationale.
+- [`.claude/notes/`](.claude/notes/) — **observational** project knowledge.
+  Lessons learned, technical references, active chantier handoffs, FIXED
+  bugs preserved for context, structured project reviews. Read what's
+  relevant; add to it when you learn something a future contributor (or
+  your future self) will need.
+
+When learning something project-specific, append to
+`.claude/notes/<category>/`. The category README explains the layout.
+Per-user cross-project preferences (your editor habits, etc.) belong in
+your personal `~/.claude/projects/.../memory/`, not here. The convention
+is documented in [`.claude/rules/memory_routing.md`](.claude/rules/memory_routing.md).
+
 ## Documentation
 
 Every new feature or example must have:

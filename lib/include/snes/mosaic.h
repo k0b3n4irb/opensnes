@@ -22,6 +22,7 @@
 #define OPENSNES_MOSAIC_H
 
 #include <snes/types.h>
+#include <snes/registers.h>  /* REG_MOSAIC for the inline mosaicInit body */
 
 /*============================================================================
  * Background Mask Constants
@@ -48,8 +49,15 @@
  * @brief Initialize mosaic system
  *
  * Disables all mosaic effects. Call this once during setup.
+ * Inlined for zero-call-overhead access.
  */
-void mosaicInit(void);
+extern u8 mosaic_size;
+extern u8 mosaic_bg_mask;
+inline void mosaicInit(void) {
+    mosaic_size = 0;
+    mosaic_bg_mask = 0;
+    REG_MOSAIC = 0;
+}
 
 /**
  * @brief Enable mosaic effect for specified backgrounds

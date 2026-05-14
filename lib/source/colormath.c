@@ -32,33 +32,24 @@
  *   Bits 4-0: Intensity (0-31)
  *============================================================================*/
 
-/* Internal state */
-static u8 cgwsel;
-static u8 cgadsub;
+/* Internal state. External linkage so the `inline colorMathInit()` and
+ * `inline colorMathDisable()` in colormath.h can access them. */
+u8 cgwsel;
+u8 cgadsub;
 
 /*============================================================================
  * Core Color Math Functions
  *============================================================================*/
 
-void colorMathInit(void) {
-    cgwsel = 0;
-    cgadsub = 0;
+/* colorMathInit() is `inline` in colormath.h. Force-emit the standalone
+ * here via address-taking so fn-pointer / fallback callers can link. */
+void (*const __opensnes_force_emit_colorMathInit)(void) = colorMathInit;
 
-    REG_CGWSEL = 0;
-    REG_CGADSUB = 0;
-    REG_COLDATA = 0;
-}
+/* colorMathEnable() is `inline` in colormath.h. Force-emit canonical here. */
+void (*const __opensnes_force_emit_colorMathEnable)(u8) = colorMathEnable;
 
-void colorMathEnable(u8 layers) {
-    /* Set layer enable bits (bits 0-5 of CGADSUB) */
-    cgadsub = (cgadsub & 0xC0) | (layers & 0x3F);
-    REG_CGADSUB = cgadsub;
-}
-
-void colorMathDisable(void) {
-    cgadsub &= 0xC0;  /* Clear layer bits */
-    REG_CGADSUB = cgadsub;
-}
+/* colorMathDisable() is `inline` in colormath.h. Same force-emit pattern. */
+void (*const __opensnes_force_emit_colorMathDisable)(void) = colorMathDisable;
 
 void colorMathSetOp(u8 op) {
     if (op == COLORMATH_SUB) {

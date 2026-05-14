@@ -81,6 +81,30 @@ See `.claude/rules/commits.md` for format and restrictions.
 - New code must have Doxygen documentation (`/** @brief */`)
 - Binary assets must be from PVSnesLib or original work (track in ATTRIBUTION.md)
 
+## Working branches (wip/*) policy
+
+Internal multi-day chantiers ship via short-lived `wip/<name>` branches:
+
+1. **Create** from current develop tip: `git checkout -b wip/<name>`.
+2. **Work** with as many WIP commits as needed for safety/restore points.
+3. **Validate** on the wip branch: `make clean && make`, full quick suite,
+   Mesen2 spot check on representative examples.
+4. **Squash-merge** into develop as ONE coherent commit with a clear
+   conventional-commit subject summarising the chantier's outcome.
+5. **Delete** the wip branch immediately (local AND `origin`) after the
+   merge lands. Don't keep it as an archive — the commit message on
+   develop is the archive.
+
+The squash-merge keeps develop history scannable (one chantier = one
+commit). WIP commits' details remain accessible via `git reflog` and
+the wip branch's history in `git log <sha>` for as long as `origin`
+keeps the SHA (until garbage collection).
+
+Anti-pattern: leaving `wip/*` branches lying around after merge. This
+project's history was polluted with 5 stale `worktree-agent-*` branches
++ a `backup/develop-pre-reword-*` until cleanup on 2026-05-12 — be the
+person who deletes their wip branches.
+
 ## Version Tagging
 
 ```bash
