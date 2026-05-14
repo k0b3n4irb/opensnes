@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 42a5c4641f1d60bbc33c4b7794f3413973591399 | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 5c23467d66c8156c2b4f03ff5a21a5d1423e7189 | github.com/k0b3n4irb/qbe:main |
+| compiler/cproc | 6bdd923cc826b4c369b18cf87184edd045a6fecb | github.com/k0b3n4irb/cproc:master |
+| compiler/qbe | 7a7f77f4eff5955b1eba2249c0ab8973c5ddf29a | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 10 patches (upstream merge-base: 7051114)
+### compiler/cproc — 11 patches (upstream merge-base: 7051114)
 
 ```
+6bdd923  feat(65816): pointer size/align 8/8 → 4/2 (chantier A6.1)
 cceac4b  fix(65816): preserve volatile through QBE IR  (chantier A2)
 7f26c16  fix(65816): align int/long type sizes with the w65816 target  (chantier A1)
 3618c72  fix: eliminate all Clang warnings
@@ -62,11 +63,16 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 36 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 41 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+179676e  feat(w65816): chantier A6+A7 — full pointer ABI + Kl pair lowering
+5c23467  fix(qbe): guard crash_handler behind __has_include(<execinfo.h>)
+444edea  fix(qbe): guard inline_record_dat_ref against DStart/DEnd stack garbage
+4de6a97  chore(qbe): install SIGBUS/SIGSEGV crash handler with backtrace
+eaf6116  refactor(qbe): replace open_memstream with 2-pass parse architecture
 2d3af4d  feat(w65816): chantier A6.8 — large-frame indirect addressing + Kl slot widening
 9878b9f  fix(build): apply chantier A2 hygiene fixes to clean compile
 90b81e1  fix(w65816): respect volatile loads/stores via `volat` IR keyword  (chantier A2)

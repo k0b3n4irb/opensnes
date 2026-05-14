@@ -70,19 +70,22 @@ hdmaSetup:
     .ACCU 16
     .INDEX 16
 
-    ; Stack layout after PHP (1 byte) + JSL return (3 bytes):
-    ;   1,s = P
-    ;   2-4,s = return address
-    ;   5-6,s = table (rightmost arg, pushed first)
-    ;   7-8,s = destReg (8-bit in 16-bit slot)
-    ;   9-10,s = mode (8-bit in 16-bit slot)
-    ;   11-12,s = channel (leftmost arg, pushed last)
+    ; A6+A7 chantier — post-A6 layout: cproc passes 4-byte pointers.
+    ; Stack after PHP (1 byte) + JSL return (3 bytes):
+    ;   1,s     = P
+    ;   2-4,s   = return address
+    ;   5-6,s   = table low 16 (rightmost arg, pushed last)
+    ;   7,s     = table bank byte
+    ;   8,s     = pad
+    ;   9-10,s  = destReg (u8 in 16-bit slot)
+    ;   11-12,s = mode (u8 in 16-bit slot)
+    ;   13-14,s = channel (leftmost arg, pushed first)
 
     ; Calculate DMA register base address for this channel
     ; Channel registers are at $4300 + (channel * $10)
     sep #$20
     .ACCU 8
-    lda 11,s                ; channel (8-bit)
+    lda 13,s                ; channel (8-bit)
     cmp #8
     bcs @done               ; Invalid channel, bail out
 
@@ -100,33 +103,24 @@ hdmaSetup:
     ; Set HDMA mode (DMAPx at $43x0)
     sep #$20
     .ACCU 8
-    lda 9,s                 ; mode (8-bit)
+    lda 11,s                ; mode (8-bit)
     sta.l $0000,x           ; $43x0 = DMAP
 
     ; Set destination register (BBADx at $43x1)
-    lda 7,s                 ; destReg (8-bit)
+    lda 9,s                 ; destReg (8-bit)
     sta.l $0001,x           ; $43x1 = BBAD
 
     ; Set table address (A1Tx at $43x2-$43x4)
     rep #$20
     .ACCU 16
-    lda 5,s                 ; table address (16-bit)
+    lda 5,s                 ; table low 16
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
 
-    ; For bank: if address >= $8000, it's ROM in bank 0 (LoROM)
-    ; For addresses < $8000, assume bank $7E (RAM)
+    ; Bank byte now lives directly in the 4-byte pointer at offset 7,s
+    ; (post-A6). No heuristic needed.
     sep #$20
     .ACCU 8
-    lda 6,s                 ; High byte of table address
-    cmp #$80
-    bcc @use_ram_bank
-    ; ROM address ($8000+) - use bank 0
-    lda #$00
-    bra @set_bank
-@use_ram_bank:
-    ; RAM address (< $8000) - use bank $7E (WRAM)
-    lda #$7E
-@set_bank:
+    lda 7,s                 ; table bank byte
     sta.l $0004,x           ; $43x4 = A1B (bank)
 
 @done:
