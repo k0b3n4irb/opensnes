@@ -884,3 +884,145 @@ first: **disable A6.4 (keep dtype_size[DL] = 8)** while keeping
 A6.1 (C-side ptr size = 4). This decouples ROM data layout from
 the IR layout change and lets us isolate whether the failures come
 from compiler emission or from data section width.
+
+---
+
+## 2026-05-14 Mesen2 diagnostic + breakthrough
+
+Re-attacked the chantier after rebasing `wip/a6-a7-atomic-v3` onto
+develop tip (qbe 5c23467, post-2-pass + macOS arm64 SIGBUS fix +
+Windows MinGW fix). Replay scaffolding applied cleanly on the new
+base; reproduced the 221/267 baseline.
+
+Phase-1 hypothesis tests (each ran the full `--quick` suite with
+`BANK0_FAIL_THRESHOLD=0` to bypass the 3 examples that consume
+extra const space under A6):
+
+| Test | Pass/Fail count | Delta |
+|---|---|---|
+| Full replay (no further mods) | 221/267 | baseline |
+| Revert A6.4 alone (`[DL]=8`) | 222/267 | +1 |
+| Revert w65816/emit.c hunks only | 226/267 | +5 |
+| Revert w65816/abi.c hunks only | 210/266 | -11 (worse) |
+| Targeted `dmaCopyVram` bank-byte lib ASM fix | 223/267 | +2 |
+
+The abi.c revert getting worse confirms those hunks are correct
+(Kl param loading with byte accumulator). The emit.c hunks contain
+some imperfections but aren't the major culprit. The bug is
+elsewhere.
+
+### The breakthrough — Mesen2 step-through on text/hello_world
+
+User ran Mesen2 (`Debug → Register Viewer`) on the failing
+hello_world ROM. PPU state at runtime:
+
+```
+$2100.0-3 Brightness   = 0
+$2100.7 Forced Blank   = true
+```
+
+→ The screen is force-blanked because `setScreenOn()` never ran.
+Three break-pause captures showed PC bouncing inside
+`main@while_body_28` (the message-write loop), with `LDA $08,S`
+reading the loop counter `i = $AD17` after millions of cycles —
+massively out of range for a 12-character message buffer.
+
+Generated-asm trace of `tile = message[i]`:
+
+```asm
+lda 8,s            ; A = i_low
+sta 14,s           ; slot 14 = i_low (Kl low half of extended i)
+lda.w #0
+sta 16,s           ; slot 16 = 0 (Kl high half of extended i)
+                   ; A = 0 NOW
+clc
+adc.w #message     ; A = 0 + #message   ← BUG
+sta 18,s           ; slot 18 = #message_low (no `i` added)
+lda 16,s
+adc.w #:message
+sta 20,s           ; slot 20 = #message_bank
+lda 18,s
+tax
+sep #$20
+lda.l $0000,x      ; tile = message[0] every iteration
+```
+
+The pointer arithmetic computes `0 + message` instead of
+`i + message`. `i` is never added — the loop reads `message[0]`
+forever, which is not 0xFF, so the loop never terminates.
+
+### Root cause: stale A-cache after emit_store_high
+
+The 4 ext ops (Oextub, Oextsh, Oextuh, Oextsw) with Kl destination
+all emit:
+
+```c
+emitload(r0, fn);          // A = src_low
+emitstore(i->to, fn);      // sta to dst's low slot; acache_set(dst)
+if (i->cls == Kl) {
+    fprintf(outf, "\tlda.w #0\n"); // A = 0 (or high half)
+    emit_store_high(i->to, fn);    // sta to dst's high slot
+}
+```
+
+After this, A holds the HIGH-half value (e.g. 0) but the acache
+still says "A = dst's full value". Any subsequent
+`emitload(dst, fn)` hits `acache_has(dst) = true`, skips the load,
+and operates on the stale A. The Kl Oadd that consumes the
+extended `i` then computes `0 + pointer` instead of `i + pointer`.
+
+### Fix (5 lines, 1 site)
+
+`compiler/qbe/w65816/emit.c` — `emit_store_high` now invalidates the
+acache on entry:
+
+```c
+static void
+emit_store_high(Ref r, Fn *fn)
+{
+    int slot;
+    if (req(r, R)) return;
+    acache_invalidate();   /* ← the fix */
+    ...
+}
+```
+
+Result: **221/267 → 259/269** (−36 failures, 80 % of the gap closed
+in one fix).
+
+### Remaining 10 failures (chantier A6.12+ split)
+
+```
+basics/random — 105 px
+games/mapandobjects — 57344 px (full screen)
+graphics/backgrounds/mode7_perspective — 26530 px
+graphics/effects/gradient_colors — 33656 px
+graphics/effects/parallax_scrolling — 21119 px
+graphics/effects/transparent_window — 17304 px
+graphics/effects/window — 2329 px
+maps/mapscroll — 57344 px (full screen)
+maps/slopemario — 31882 px
+maps/tiled — 57344 px (full screen)
+```
+
+Concentration in maps + HDMA effects. Suspected lib ASM gaps:
+DMA wrappers other than dmaCopyVram still hardcode bank-0 logic,
+HDMA setup expects 16-bit pointer push width, etc. Per the
+README's abort condition, lib ASM rework splits into chantier
+A6.12+ rather than bundling into this patch.
+
+Three additional examples (likemario, mapandobjects, tetris) hit
+the bank-`$00` 16-byte fail-threshold ratchet — A6 consumes more
+const space than develop. Separate from the codegen bug.
+
+### Current state
+
+- `cproc wip/a6-a7-atomic-v3` @ `9e2a5d6` — A6.1 (ptr size 4/2)
+- `qbe wip/a6-a7-atomic-v3` @ `2bab670` — 9-site patch + acache fix
+- Main `wip/a6-a7-atomic-v3` — submodule pointers need bumping +
+  PINS update. Not committed yet.
+
+DO NOT merge to develop until:
+1. Lib ASM A6.12 chantier closes the remaining 10 failures.
+2. Bank-`$00` impact addressed for the 3 ratchet-hitting examples.
+3. Audit doc reviewed by maintainer.
