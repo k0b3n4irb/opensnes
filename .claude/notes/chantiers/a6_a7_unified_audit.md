@@ -1026,3 +1026,56 @@ DO NOT merge to develop until:
 1. Lib ASM A6.12 chantier closes the remaining 10 failures.
 2. Bank-`$00` impact addressed for the 3 ratchet-hitting examples.
 3. Audit doc reviewed by maintainer.
+
+---
+
+## 2026-05-14 (late): residual basics/random — triaged as baseline drift, not A6 bug
+
+After A6.12 + A6.13 closed 9 of 10 residual failures, `basics/random`
+remained at 105-px diff. Root cause investigation:
+
+`lib/source/console.c` initializes the PRNG seed from PPU hardware
+counters in `consoleInit()`:
+
+```c
+rand_seed = REG_OPHCT | (REG_OPVCT << 8);
+if (rand_seed == 0) rand_seed = 0xACE1;
+```
+
+The seed therefore depends on the exact PPU H/V counter values at the
+moment `consoleInit()` executes. Any change in compiled code size or
+boot sequence cycle count (which A6 induces via 4-byte pointer pushes
+at every `pea.w :sym ; pea.w sym` call site) shifts those counters
+and produces a different deterministic PRNG sequence.
+
+The 105-px diff is the rendered hex+decimal pair `current_value`
+displayed at row 12/14 after 120 frames — different seed → different
+sequence → different displayed numbers.
+
+This is **expected baseline drift**, not a regression. Confirmed by
+`tools/opensnes-emu/test/BASELINES.md`:
+
+> `rom_sha256` is the **drift signal**: if the current ROM hashes
+> differently, a noisy diff is expected — the example was rebuilt
+> since this baseline was captured.
+
+Our baseline `tools/opensnes-emu/test/baselines/basics_random.meta`
+records `rom_sha256: 0cae05a3...` (pre-chantier). Current ROM hashes
+differ post-A6.
+
+### Action
+
+NO code fix. Regenerate the baseline as part of the pre-merge
+cleanup, alongside any other example whose ROM SHA shifted under
+A6+A7. Per `BASELINES.md`'s procedure:
+
+```sh
+cd tools/opensnes-emu
+node test/run-all-tests.mjs --capture-baselines basics_random
+# Visual-spot-check the new baseline in Mesen2 reference
+git add test/baselines/basics_random.{bin,meta}
+git commit -m "test(visual): regenerate basics_random baseline (A6+A7 ROM hash drift)"
+```
+
+This must NOT happen on wip; baseline regen is part of the dev->main
+merge sequence so the baseline matches the final shipped binary.
