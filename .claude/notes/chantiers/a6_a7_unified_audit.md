@@ -1079,3 +1079,50 @@ git commit -m "test(visual): regenerate basics_random baseline (A6+A7 ROM hash d
 
 This must NOT happen on wip; baseline regen is part of the dev->main
 merge sequence so the baseline matches the final shipped binary.
+
+---
+
+## 2026-05-14 (PR #42 CI triage): 2 unit-test residuals deferred
+
+The squash-PR opened (#42) surfaced 3 CI gates failing:
+
+1. **Cycle bench +22.5%** — overridden via `Cycle-Regression-OK:` trailer
+   in a follow-up commit. Structural cost of 4-byte pointer ops.
+2. **`variable_shift_u8_compound`** — test extraction needed update to
+   pick the shift-loop's pha/pla pair instead of the array-write's.
+   Fixed (opensnes-emu wip/a6-a7-atomic-v3 @ f9e1759).
+3. **`indirect_store_acache`** — pre-A6 frameless/no-pha optimisation
+   on `array_write(u16 *, u16, u16)` is structurally unreachable
+   post-A6 (Kl-pair add needs slots, pha around tax is forced).
+   Test updated to keep surviving correctness invariants.
+   Fixed (same commit).
+
+### Two residuals NOT fixed tonight
+
+- **`unit/collision` — 12 failed / 16 passed** (28 assertions, runtime).
+- **`unit/text` — 2 failed / 26 passed**.
+
+These ROMs are built fresh by the test runner's build phase (which
+`--quick` skips, masking the failures locally — we missed them
+all evening). The collision unit ROM exercises `collideRect(&a, &b)`,
+`collidePoint(x, y, &r)`, `collideTile(x, y, tilemap, w)`,
+`rectInit(&r, ...)`, `rectSetPos(&r, ...)`, `rectGetCenter(&r, ...)`
+— every assertion touches a struct pointer or array pointer.
+
+Post-acache-fix, the remaining failures suggest more codegen
+subtleties in struct-pointer-deref + Kl-pair-arithmetic patterns
+that the existing tests don't surface. Same diagnostic loop as the
+acache bug (Mesen2 step-through on the failing assertions) will
+likely reveal another stale-cache or wrong-slot site.
+
+This is a follow-up chantier — A6.14 unit-test codegen residuals
+— scoped for a dedicated 4-6h session. The PR (#42) is left open
+in non-mergeable state with these documented as known residuals.
+
+### Don't merge develop until A6.14 closes
+
+The 2 unit-test residuals are runtime correctness failures, not
+test-pattern drift. They MUST be fixed before merging A6+A7 to
+develop — silent collision-bug shipping to users is the exact
+"silent failure" class the chantier was meant to close, ironic to
+ship one on the way out.
