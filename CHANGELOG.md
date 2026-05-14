@@ -7,7 +7,7 @@ covers changes made since the fork.
 
 ## [Unreleased]
 
-## [0.18.0] — 2026-05-13
+## [0.18.0] — 2026-05-14
 
 Function inlining + lib retrofit release. The compiler gains end-to-end
 `inline` keyword support (chantier "function inlining"), plus deferred
@@ -160,11 +160,57 @@ The wins concentrate on:
 
 ### Tooling / Infrastructure
 
-- `compiler/PINS.md`: bumped to qbe `988073d` (36 patches, was 31)
+- `compiler/PINS.md`: bumped to qbe `5c23467` (40 patches, was 31)
   and cproc `42a5c46` (10 patches, was 8). Patch count grew across
   the function-inlining + deferred-emit chantier; trend opposite of
   catalogue A5's "shrink toward upstream" goal but the patches are
   load-bearing for the perf wins.
+
+### Build & CI (cross-platform unblock)
+
+Three pre-existing CI failures resolved end-to-end in the same session
+that closed the v0.18.0 release. The Linux + Functional Tests jobs
+were already green; macOS arm64 and Windows MinGW had been red for
+many commits. All four jobs now green on the release tip.
+
+- **`open_memstream` dependency removed (qbe `eaf6116`).** The earlier
+  deferred-emit chantier bufferised each function's asm output through
+  `open_memstream` (POSIX 2008). MSYS2's UCRT does not ship the call,
+  which broke the Windows qbe build before any lib compile ran.
+  Redesigned as a 2-pass parse: pass 1 (in the parse callback) runs
+  SSA cleanup + `inline_record` and collects every Fn; pass 1.b runs
+  `inline_check` module-wide so consumption counters see every TU
+  caller; pass 2 finalises and emits, skipping fully-consumed inline
+  bodies. The w65816 backend writes `w65816_alloc_size[]` /
+  `w65816_alloc_slots` globals in abi0 and reads them at emit time;
+  the new abi0 snapshots the per-fn state into a side list and emit
+  restores it, since the 2-pass model separates abi0 from emit by
+  many other functions' processing. Output is byte-identical to the
+  previous design across the lib and every example.
+
+- **macOS arm64 SIGBUS fixed (qbe `444edea`).** `parsedat` declared
+  `Dat d` on the stack and fired the `DStart` callback before
+  `d.isref` / `d.u.ref.name` were written, so those bytes carried
+  stack garbage. The OpenSNES `data()` callback's `inline_record_dat_ref`
+  lookup then dereferenced a junk pointer at `r->n_indirect` (offset
+  108 in `InlRec`). Linux x86_64 / aarch64 typically saw zero bytes
+  there so the surrounding `if (d->isref && d->u.ref.name)` test
+  failed harmlessly; macOS arm64's stricter stack hygiene produced
+  reliable SIGBUS when compiling `background.c`. Fix gates the call
+  on `d->type != DStart && d->type != DEnd` so the `isref` byte is
+  only trusted once parsedat has written it. Diagnosed with a
+  SIGBUS/SIGSEGV crash handler added in qbe `4de6a97` that dumps
+  `backtrace_symbols_fd()` output — pinpointed the crash site without
+  arm64-Apple hardware.
+
+- **Windows MinGW build fix (qbe `5c23467`).** The diagnostic handler
+  used `<execinfo.h>`, which is glibc + Apple libsystem only. MinGW
+  does not ship it, so the Windows qbe build aborted before any lib
+  compile reached the cproc segfault retry. The handler is now guarded
+  behind `__has_include(<execinfo.h>)` so it compiles out on Windows;
+  Windows crashes continue to be diagnosed via
+  `msys2_cproc_diagnostic.yml` + the retry loop in
+  `opensnes_build.yml`.
 
 ## [0.17.0] - 2026-05-09
 
