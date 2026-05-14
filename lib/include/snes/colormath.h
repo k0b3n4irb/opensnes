@@ -51,6 +51,7 @@
 #define OPENSNES_COLORMATH_H
 
 #include <snes/types.h>
+#include <snes/registers.h>  /* REG_CGWSEL / REG_CGADSUB / REG_COLDATA */
 
 /*============================================================================
  * Layer Masks (for colorMathEnable)
@@ -133,26 +134,49 @@
  * Core Color Math Functions
  *============================================================================*/
 
+/* Internal state, exposed for the inline init/disable bodies below.
+ * cgwsel + cgadsub shadow the corresponding hardware registers (which
+ * are write-only). User code should manipulate via the colorMath* API,
+ * not direct writes. */
+extern u8 cgwsel;
+extern u8 cgadsub;
+
 /**
  * @brief Initialize color math to defaults
  *
- * Disables all color math effects.
+ * Disables all color math effects. Inlined for zero-call-overhead.
  */
-void colorMathInit(void);
+inline void colorMathInit(void) {
+    cgwsel = 0;
+    cgadsub = 0;
+    REG_CGWSEL = 0;
+    REG_CGADSUB = 0;
+    REG_COLDATA = 0;
+}
 
 /**
  * @brief Enable color math for specified layers
  *
  * Enables color math blending for the given layers.
+ * Inlined for zero-call-overhead access (wave 4 retrofit).
  *
  * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, etc.)
  */
-void colorMathEnable(u8 layers);
+inline void colorMathEnable(u8 layers) {
+    /* Set layer enable bits (bits 0-5 of CGADSUB) */
+    cgadsub = (cgadsub & 0xC0) | (layers & 0x3F);
+    REG_CGADSUB = cgadsub;
+}
 
 /**
  * @brief Disable all color math
+ *
+ * Inlined for zero-call-overhead access.
  */
-void colorMathDisable(void);
+inline void colorMathDisable(void) {
+    cgadsub &= 0xC0;  /* Clear layer bits */
+    REG_CGADSUB = cgadsub;
+}
 
 /**
  * @brief Set color math operation (add or subtract)

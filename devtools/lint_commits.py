@@ -48,6 +48,13 @@ ALLOWED_SCOPES = {
     # Practical extensions used in this repo's history:
     "ci", "devtools", "docs", "claude", "contributing", "release",
     "submodule", "deps", "readme", "changelog", "test", "tests",
+    # Emerged-organically categories (added 2026-05-13 alongside the
+    # function-inlining + lib-retrofit chantier batch — these match
+    # real directories / files in the repo):
+    #   `chantiers` -> .claude/notes/chantiers/
+    #   `rules`     -> .claude/rules/
+    #   `bench`     -> tools/opensnes-emu/test/fixtures/benchmark/
+    "chantiers", "rules", "bench",
 }
 
 SUBJECT_RE = re.compile(
@@ -110,10 +117,23 @@ def check_subject(subject: str) -> list[str]:
         )
     if not desc:
         errors.append("empty description")
-    elif desc[0].isupper():
-        errors.append("description should start with a lower-case letter")
     elif desc.endswith("."):
         errors.append("description should not end with a period")
+    elif desc[0].isupper():
+        # The lowercase-first rule exists to keep prose descriptions
+        # consistent. Technical tokens (acronyms, standard names,
+        # register names) legitimately start with uppercase and would
+        # otherwise force unnatural rewrites ("c99" for "C99",
+        # "oam buffer" for "OAM buffer"). Allow when the first
+        # whitespace-delimited word is an acronym/techterm:
+        #   - all caps with optional digits (OAM, DMA, GSU, API, ABI)
+        #   - letter + digits (C99, K8, R64)
+        # Anything else (e.g., "Refactor the foo") still trips.
+        first_word = desc.split()[0]
+        is_techterm = bool(re.fullmatch(r"[A-Z][A-Z0-9]*[a-z]?", first_word)) \
+                      or bool(re.fullmatch(r"[A-Z][0-9]+", first_word))
+        if not is_techterm:
+            errors.append("description should start with a lower-case letter")
 
     return errors
 

@@ -41,9 +41,10 @@ extern u16 tilemap_src_addr;
 /* Global text configuration */
 TextConfig text_config;
 
-/* Current cursor position */
-static u8 cursor_x = 0;
-static u8 cursor_y = 0;
+/* Current cursor position. External linkage so the `inline textSetPos()`
+ * in text.h reads/writes these from any TU (wave 4 retrofit). */
+u8 cursor_x = 0;
+u8 cursor_y = 0;
 
 /**
  * @brief Build tilemap entry for a character
@@ -112,10 +113,8 @@ void textLoadFont(u16 vram_addr) {
     asm_textDMAFont();
 }
 
-void textSetPos(u8 x, u8 y) {
-    cursor_x = x;
-    cursor_y = y;
-}
+/* textSetPos() is `inline` in text.h. Force-emit canonical here. */
+void (*const __opensnes_force_emit_textSetPos)(u8, u8) = textSetPos;
 
 u8 textGetX(void) {
     return cursor_x;

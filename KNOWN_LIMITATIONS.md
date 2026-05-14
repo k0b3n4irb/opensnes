@@ -280,31 +280,33 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ## Performance traps
 
-### 🟡 `oamSet()` has framesize=158 — visible jitter past ~3 calls per frame
-The QBE backend allocates 158 bytes of SSA temporary storage for every
-`oamSet(id, x, y, attr, size, tile)` invocation, manipulated on the stack at
-each call site. On a 3.58 MHz CPU that overhead is visible: more than ~3
-`oamSet()` calls per frame in the main loop produces jerky movement on real
-hardware (and shows up as lag-frame spikes in the test suite). The function
-itself is correct — the cost lives in the calling convention, not in the OAM
-write.
+### 🟢 `oamSet()` framesize cliff — RESOLVED via ASM rewrite (2026-03-03)
+The QBE backend used to allocate 158 bytes of SSA temporary storage for
+every `oamSet(id, x, y, attr, size, tile)` invocation, manipulated on the
+stack at each call site. More than ~3 calls per frame produced visible
+jitter on real hardware.
 
-**Mitigation:** for any sprite that updates every frame, write directly to
-the `oamMemory[]` shadow buffer and let the NMI handler DMA it to OAM. The
-SDK ships two ergonomic helpers:
+**Fix shipped** in commit `39dbff8` (2026-03-03): `oamSet()` was rewritten
+in hand-optimised assembly (`lib/source/sprite_oamset.asm`) with
+**framesize=0** — direct stack-relative addressing, no SSA temps,
+~100 cycles saved per call. The function is fully ABI-compatible; user
+code is unchanged.
 
-- `oamSetFast(id, x, y, attr, size, tile)` — drop-in macro replacement for
-  `oamSet()` that compiles to direct memory writes (see
-  `lib/include/snes/sprite.h`'s "Fast Macro Sprite API" section).
-- `oamSetXYFast(id, x, y)` — position-only update, the most common
-  per-frame case.
+The macro-form helpers `oamSetFast()` / `oamSetXYFast()` are still
+shipped for callers that want explicit "no function call at all" intent
+(zero JSL + zero RTL + zero frame), but the perf cliff that made them
+mandatory for per-frame paths no longer exists. The breakout, mouse,
+and similar examples continue to use direct `oamMemory[]` writes by
+preference, not necessity.
 
-Both are documented in `sprite.h` next to the function form. Use the
-function `oamSet()` for one-shot setup at scene init (where the 158-byte
-frame is paid once and clarity wins); use the macros for the per-frame
-update path. The breakout, collision_demo, animated_sprite, mouse, and
-superscope examples all switched to direct `oamMemory[]` writes for this
-reason — see their READMEs for worked examples.
+**Lingering observation (informational, 🟢 severity)**: other multi-arg
+C helpers still carry larger-than-ideal framesizes — `oamSetX` (148),
+`oamDrawMeta` (142), `oamDrawMetaFlip` (200), `collideRectEx` (176),
+`hdmaColorGradient` (162). A 2026-05-13 audit confirmed none of these
+are per-frame hot paths in shipping examples (`oamSetX` has 0 example
+callers; the others have 0–1). If one becomes hot for a future user,
+the same tactic (ASM rewrite) is available, OR the catalogued QBE
+coalescer chantier (`.claude/STRUCTURAL_DEFECTS.md` A4) can be revived.
 
 ---
 

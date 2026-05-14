@@ -1,20 +1,24 @@
 # Compiler Benchmark — OpenSNES vs PVSnesLib
 
-*Last updated: 2026-03-27. Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
+*Last updated: 2026-05-13 (re-baselined post deferred-emit + lib retrofit
+chantier; toolchain pins qbe `988073d`, cproc `42a5c46`).
+Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| **Total cycle reduction** | **-30.3%** vs PVSnesLib + 816-opt |
+| **Total cycle reduction** | **-32.2%** vs PVSnesLib + 816-opt |
 | Functions tested | 34 |
 | OpenSNES wins | 32 |
 | PVSnesLib+opt wins | 2 |
 | Ties | 0 |
+| Helpers fully inlined-away | 1 (`helper`, dead-code-eliminated post-splice) |
 
-OpenSNES's cc65816 compiler (cproc + QBE w65816 backend with 13 optimization phases)
-produces code that is **30% faster** than PVSnesLib's tcc816 + 816-opt peephole
-optimizer on our benchmark suite of 34 isolated functions.
+OpenSNES's cc65816 compiler (cproc + QBE w65816 backend with 13 optimization phases,
+plus the 2026-05-12 function-inlining pass and the 2026-05-13 deferred-emit /
+consumption-aware suppression) produces code that is **32% faster** than PVSnesLib's
+tcc816 + 816-opt peephole optimizer on our benchmark suite of 34 isolated functions.
 
 ## Methodology
 
@@ -46,7 +50,7 @@ no page-crossing penalties).
   bitwise_and                 39        32        19    -40.6%
   bitwise_or                  39        32        19    -40.6%
   conditional                 81        65        40    -38.5%
-  loop_sum                   208       185       124    -33.0%
+  loop_sum                   208       185       119    -35.7%
   array_write                 74        65        36    -44.6%
   array_read                  68        60        31    -48.3%
   struct_sum                 111        86        74    -14.0%
@@ -60,8 +64,8 @@ no page-crossing penalties).
   global_increment            49        43        21    -51.2%
   zero_store_global           23        19        14    -26.3%
   compare_and_branch         136       129        60    -53.5%
-  helper                      25        22        16    -27.3%
-  call_chain                  56        47        34    -27.7%
+  helper                      25        22         0   -100.0% (†)
+  call_chain                  56        47        19    -59.6%
   pea_constant_args           36        33        37    +12.1%
   mul_const_24                45        42        32    -23.8%
   mul_const_48                45        42        34    -19.0%
@@ -69,7 +73,7 @@ no page-crossing penalties).
   mul_const_40                45        42        34    -19.0%
   mul_const_96                45        42        36    -14.3%
   ────────────────────  ────────  ────────  ────────  ────────
-  TOTAL                     2178      1891      1318    -30.3%
+  TOTAL                     2178      1891      1282    -32.2%
 ```
 
 ## Analysis
@@ -96,6 +100,43 @@ no page-crossing penalties).
 The `pea_constant_args` regression is a trade-off: `pea.w` is smaller in code size
 (2 bytes vs 3) but costs 1 extra cycle. PVSnesLib's `lda #imm; pha` is faster but
 larger. Both approaches are valid.
+
+The previous `call_chain` regression (+31.9%) was resolved by the 2026-05-12
+function-inlining chantier (qbe commits `13d9b14`, `29b0941`, `77d07a0`). With
+`helper` marked `static inline`, the qbe inline pass collapses `helper(helper(x))`
+to inlined arithmetic, dropping the function from 62 cycles to 19 (-59.6 % vs
+PVSnesLib+opt's 47).
+
+The 2026-05-13 follow-up (qbe `988073d`, cproc `42a5c46`) added deferred
+asm emission and consumption-aware standalone suppression: when every direct
+caller of an inline-marked function in a TU has been spliced and no
+indirect reference remains, the QBE emit stage drops the standalone body
+entirely. The bench `helper` ends up "0 cycles" in the table marker (†)
+because its body now lives exclusively inside `call_chain` — the
+standalone is dead-code-eliminated at compile time. Cycle-count semantics
+are unchanged (the work always happened inside `call_chain`); the win is
+ROM-size (≈ 6 bytes per such helper).
+
+The pre-inlining historical note is preserved for context: TCO had landed
+in qbe `ed840fb` and lowered TOTAL from 1420 (pre-TCO) to 1341 (post-TCO),
+trading +14 cycles on `call_chain` for wins elsewhere. The function-inlining
+chantier took TOTAL from 1341 to 1298 by recovering the `call_chain`
+regression entirely (and going further: -28 cycles below PVSnesLib+opt rather
+than +14 above the pre-TCO baseline). The deferred-emit follow-up dropped
+TOTAL another 16 cycles to 1282 via the `helper` dead-code elimination.
+
+Inlining is opt-in via the `inline` keyword and gated by a conservative
+heuristic (linear flow, ≤ 8 IR instructions, no nested calls, no allocas).
+Functions that don't qualify fall back to JSL/JML and incur no overhead.
+Lib helpers using the C99 inline pattern (`inline` body in header +
+force-emit anchor in canonical `.c`) participate automatically — 7 lib
+symbols retrofitted as of v0.17.0+ (`setScreenOff`, `getBrightness`,
+`mosaicInit`, `hdmaWaveSetSpeed`, `scopeCalibrate`, `colorMathInit`,
+`colorMathDisable`).
+
+(†) `helper` appears as 0 cycles because its standalone is suppressed
+post-inline. The PVSnesLib values (25 raw, 22 opt) remain the baseline
+for comparison.
 
 ### Key Optimization Phases Contributing
 

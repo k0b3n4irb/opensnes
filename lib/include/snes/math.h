@@ -169,7 +169,11 @@ fixed fixDiv(fixed a, fixed b);
  *
  * @note Table-based lookup, very fast
  */
-fixed fixSin(u8 angle);
+extern const s16 sine_table[256];
+
+inline fixed fixSin(u8 angle) {
+    return sine_table[angle];
+}
 
 /**
  * @brief Get cosine value for angle
@@ -181,8 +185,12 @@ fixed fixSin(u8 angle);
  * u8 angle = 0;  // 0 degrees
  * fixed cos_val = fixCos(angle);  // 256 = 1.0
  * @endcode
+ * Inlined for zero-call-overhead access (wave 4 retrofit).
  */
-fixed fixCos(u8 angle);
+inline fixed fixCos(u8 angle) {
+    /* cos(x) = sin(x + 90°) = sin(x + 64) */
+    return sine_table[(u8)(angle + 64)];
+}
 
 /*============================================================================
  * Integer Math (Safe Alternatives)

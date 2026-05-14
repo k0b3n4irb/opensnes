@@ -88,8 +88,15 @@ void textLoadFont4bpp(u16 vram_addr);
  *
  * @param x Column (0-31 or 0-63)
  * @param y Row (0-31 or 0-63)
+ * Inlined for zero-call-overhead access (wave 4 retrofit; uses the
+ * relaxed CC_INLINE_MAX_INSTR=16 default).
  */
-void textSetPos(u8 x, u8 y);
+extern u8 cursor_x;
+extern u8 cursor_y;
+inline void textSetPos(u8 x, u8 y) {
+    cursor_x = x;
+    cursor_y = y;
+}
 
 /**
  * @brief Get current cursor X position

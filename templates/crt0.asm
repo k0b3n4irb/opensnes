@@ -81,6 +81,17 @@
     ; just-drawn sprites need hiding (see memory note on the 0/old-counter
     ; race that broke B.5 the first time around).
     oam_dynamic_draining dsb 1
+    ; Frame-pointer slot for large-frame functions (chantier A6.8).
+    ; The 65816's `lda <off>,s` addressing mode caps offsets at 8 bits
+    ; (0-255). Functions with framesize > 255 cannot reach all their
+    ; locals/params via direct stack-relative — the assembler rejects the
+    ; emission. The compiler's prologue for such functions stores SP into
+    ; tcc__fp (low 16 of address; high byte stays 0 from the WRAM
+    ; zero-init that runs at boot), and stack accesses lower to
+    ; `ldy.w #N; lda [tcc__fp],y` (24-bit indirect, ignores DBR — works
+    ; even when lib code temporarily sets DBR != 0). 4 bytes total
+    ; (low 16 + bank byte + 1 alignment), 16-bit aligned.
+    tcc__fp     dsb 4
 .ENDS
 
 ;------------------------------------------------------------------------------

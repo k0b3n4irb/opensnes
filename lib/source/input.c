@@ -243,14 +243,12 @@ u16 scopeButtonsHeld(void) {
     return scope_held;
 }
 
-void scopeCalibrate(void) {
-    scope_centerh = 0x80 - scope_shothraw;
-    scope_centerv = 0x70 - scope_shotvraw;
-}
+/* scopeCalibrate() is `inline` in input.h. Force-emit the standalone
+ * here via address-taking for fn-pointer fallback. */
+void (*const __opensnes_force_emit_scopeCalibrate)(void) = scopeCalibrate;
 
-void scopeSetHoldDelay(u16 frames) {
-    scope_holddelay = frames;
-}
+/* scopeSetHoldDelay() is `inline` in input.h. Force-emit canonical here. */
+void (*const __opensnes_force_emit_scopeSetHoldDelay)(u16) = scopeSetHoldDelay;
 
 void scopeSetRepeatDelay(u16 frames) {
     scope_repdelay = frames;

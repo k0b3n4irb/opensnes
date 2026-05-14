@@ -18,7 +18,10 @@
  * Sine values range from -256 to 256 (-1.0 to 1.0 in 8.8).
  *============================================================================*/
 
-static const s16 sine_table[256] = {
+/* External linkage so the `inline fixSin/fixCos` in math.h can index
+ * into the table from any TU (wave 4 retrofit). One copy of the table
+ * lives here; every caller links to the same symbol. */
+const s16 sine_table[256] = {
     /* 0-15 (0° to 21°) */
        0,    6,   13,   19,   25,   31,   37,   44,
       50,   56,   62,   68,   74,   80,   86,   92,
@@ -73,14 +76,10 @@ static const s16 sine_table[256] = {
  * Trigonometry Functions
  *============================================================================*/
 
-fixed fixSin(u8 angle) {
-    return sine_table[angle];
-}
-
-fixed fixCos(u8 angle) {
-    /* cos(x) = sin(x + 90°) = sin(x + 64) */
-    return sine_table[(u8)(angle + 64)];
-}
+/* fixSin / fixCos are `inline` in math.h. Force-emit canonical bodies
+ * here for fn-pointer / fallback callers (wave 4 retrofit). */
+fixed (*const __opensnes_force_emit_fixSin)(u8) = fixSin;
+fixed (*const __opensnes_force_emit_fixCos)(u8) = fixCos;
 
 /*============================================================================
  * Fixed-Point Arithmetic
