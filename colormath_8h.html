@@ -92,7 +92,8 @@ $(document).ready(function(){initNavTree('colormath_8h.html',''); initResizable(
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">colormath.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -100,6 +101,7 @@ $(document).ready(function(){initNavTree('colormath_8h.html',''); initResizable(
 <p>SNES Color Math (Blending/Transparency)  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">snes/types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="registers_8h_source.html">snes/registers.h</a>&gt;</code><br />
 </div>
 <p><a href="colormath_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -204,6 +206,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a7b1686084387c3e5613000109551b719" id="r_a7b1686084387c3e5613000109551b719"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="colormath_8h.html#a7b1686084387c3e5613000109551b719">colorMathTransparency50</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers)</td></tr>
 <tr class="memdesc:a7b1686084387c3e5613000109551b719"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up 50% transparency for layers.  <br /></td></tr>
 <tr class="separator:a7b1686084387c3e5613000109551b719"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a04f8eea3f1443f8187e3de9375ffc56f" id="r_a04f8eea3f1443f8187e3de9375ffc56f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="colormath_8h.html#a04f8eea3f1443f8187e3de9375ffc56f">cgadsub</a></td></tr>
+<tr class="separator:a04f8eea3f1443f8187e3de9375ffc56f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f3160284cd5e2752bb2b5d48735863e" id="r_a7f3160284cd5e2752bb2b5d48735863e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="colormath_8h.html#a7f3160284cd5e2752bb2b5d48735863e">cgwsel</a></td></tr>
+<tr class="separator:a7f3160284cd5e2752bb2b5d48735863e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Color Math (Blending/Transparency) </p>
@@ -232,10 +241,10 @@ Usage Example</h2>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);   <span class="comment">// Add mode</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a>(1);              <span class="comment">// Divide by 2 = 50%</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a>);  <span class="comment">// Blend with sub screen</span></div>
-<div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:95</div></div>
-<div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens)</div><div class="ttdef"><b>Definition</b> colormath.h:85</div></div>
-<div class="ttc" id="acolormath_8h_html_a546876b0dadd1d28989de89def196c27"><div class="ttname"><a href="colormath_8h.html#a546876b0dadd1d28989de89def196c27">COLORMATH_BG2</a></div><div class="ttdeci">#define COLORMATH_BG2</div><div class="ttdoc">Apply color math to BG2.</div><div class="ttdef"><b>Definition</b> colormath.h:63</div></div>
-<div class="ttc" id="acolormath_8h_html_a6f41bf26504344d98f9d5ba58694c3e2"><div class="ttname"><a href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a></div><div class="ttdeci">void colorMathEnable(u8 layers)</div><div class="ttdoc">Enable color math for specified layers.</div></div>
+<div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:96</div></div>
+<div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens)</div><div class="ttdef"><b>Definition</b> colormath.h:86</div></div>
+<div class="ttc" id="acolormath_8h_html_a546876b0dadd1d28989de89def196c27"><div class="ttname"><a href="colormath_8h.html#a546876b0dadd1d28989de89def196c27">COLORMATH_BG2</a></div><div class="ttdeci">#define COLORMATH_BG2</div><div class="ttdoc">Apply color math to BG2.</div><div class="ttdef"><b>Definition</b> colormath.h:64</div></div>
+<div class="ttc" id="acolormath_8h_html_a6f41bf26504344d98f9d5ba58694c3e2"><div class="ttname"><a href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a></div><div class="ttdeci">void colorMathEnable(u8 layers)</div><div class="ttdoc">Enable color math for specified layers.</div><div class="ttdef"><b>Definition</b> colormath.h:165</div></div>
 <div class="ttc" id="acolormath_8h_html_aa5667a2a54eb543bd71dbbd9cd41bd10"><div class="ttname"><a href="colormath_8h.html#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a></div><div class="ttdeci">void colorMathSetHalf(u8 enable)</div><div class="ttdoc">Enable or disable half mode.</div></div>
 <div class="ttc" id="acolormath_8h_html_ac014d3ff6d4d18a0b5e597560636d38f"><div class="ttname"><a href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a></div><div class="ttdeci">void colorMathSetOp(u8 op)</div><div class="ttdoc">Set color math operation (add or subtract)</div></div>
 <div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
@@ -248,10 +257,10 @@ Usage Example</h2>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a>);</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea">COLORMATH_SUB</a>);    <span class="comment">// Subtract = darken</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>);   <span class="comment">// Apply to all layers</span></div>
-<div class="ttc" id="acolormath_8h_html_a6c2c8c46d31bdc310520d1d11f3e68b8"><div class="ttname"><a href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a></div><div class="ttdeci">#define COLORMATH_ALL</div><div class="ttdoc">Apply color math to all layers.</div><div class="ttdef"><b>Definition</b> colormath.h:78</div></div>
+<div class="ttc" id="acolormath_8h_html_a6c2c8c46d31bdc310520d1d11f3e68b8"><div class="ttname"><a href="colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a></div><div class="ttdeci">#define COLORMATH_ALL</div><div class="ttdoc">Apply color math to all layers.</div><div class="ttdef"><b>Definition</b> colormath.h:79</div></div>
 <div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
-<div class="ttc" id="acolormath_8h_html_aba2a18b87756e861ed9c66e8766f2579"><div class="ttname"><a href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a></div><div class="ttdeci">#define COLORMATH_SRC_FIXED</div><div class="ttdoc">Use fixed color as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:98</div></div>
-<div class="ttc" id="acolormath_8h_html_abcda76899184da13fe9c9a4637ca82ea"><div class="ttname"><a href="colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea">COLORMATH_SUB</a></div><div class="ttdeci">#define COLORMATH_SUB</div><div class="ttdoc">Subtract colors (darkens)</div><div class="ttdef"><b>Definition</b> colormath.h:88</div></div>
+<div class="ttc" id="acolormath_8h_html_aba2a18b87756e861ed9c66e8766f2579"><div class="ttname"><a href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a></div><div class="ttdeci">#define COLORMATH_SRC_FIXED</div><div class="ttdoc">Use fixed color as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:99</div></div>
+<div class="ttc" id="acolormath_8h_html_abcda76899184da13fe9c9a4637ca82ea"><div class="ttname"><a href="colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea">COLORMATH_SUB</a></div><div class="ttdeci">#define COLORMATH_SUB</div><div class="ttdoc">Subtract colors (darkens)</div><div class="ttdef"><b>Definition</b> colormath.h:89</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -565,6 +574,9 @@ Usage Example</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void colorMathDisable </td>
@@ -574,9 +586,15 @@ Usage Example</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Disable all color math. </p>
+<p>Inlined for zero-call-overhead access. </p>
 
 </div>
 </div>
@@ -585,6 +603,9 @@ Usage Example</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void colorMathEnable </td>
@@ -594,10 +615,15 @@ Usage Example</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Enable color math for specified layers. </p>
-<p>Enables color math blending for the given layers.</p>
+<p>Enables color math blending for the given layers. Inlined for zero-call-overhead access (wave 4 retrofit).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">layers</td><td>Layer mask (COLORMATH_BG1, COLORMATH_BG2, etc.) </td></tr>
@@ -612,6 +638,9 @@ Usage Example</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void colorMathInit </td>
@@ -621,10 +650,15 @@ Usage Example</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Initialize color math to defaults. </p>
-<p>Disables all color math effects. </p>
+<p>Disables all color math effects. Inlined for zero-call-overhead. </p>
 
 </div>
 </div>
@@ -958,6 +992,51 @@ Usage Example</h2>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>You must also set REG_TS to include the transparent layers </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a04f8eea3f1443f8187e3de9375ffc56f" name="a04f8eea3f1443f8187e3de9375ffc56f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04f8eea3f1443f8187e3de9375ffc56f">&#9670;&#160;</a></span>cgadsub</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> cgadsub</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7f3160284cd5e2752bb2b5d48735863e" name="a7f3160284cd5e2752bb2b5d48735863e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f3160284cd5e2752bb2b5d48735863e">&#9670;&#160;</a></span>cgwsel</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> cgwsel</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

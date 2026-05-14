@@ -74,7 +74,7 @@ var searchData=
   ['lines_71',['5. Gravity in Two Lines',['../examples_games_likemario.html#autotoc_md850',1,'']]],
   ['lines_5funtil_5flevelup_72',['lines_until_levelup',['../games_2tetris_2main_8c.html#a02305f14a2f396c35ce29aa7d7f2a380',1,'main.c']]],
   ['linker_20errors_20about_20size_73',['&quot;ROM too large&quot; or linker errors about size',['../troubleshooting.html#autotoc_md574',1,'']]],
-  ['links_74',['links',['../contributing.html#autotoc_md1568',1,'Links'],['../index.html#autotoc_md9',1,'Links']]],
+  ['links_74',['links',['../contributing.html#autotoc_md1569',1,'Links'],['../index.html#autotoc_md9',1,'Links']]],
   ['list_75',['Todo List',['../todo.html',1,'']]],
   ['lives_76',['lives',['../games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa',1,'main.c']]],
   ['lives_20in_20c_77',['All Data Lives in C',['../examples_graphics_effects_hdma_wave.html#autotoc_md1116',1,'']]],

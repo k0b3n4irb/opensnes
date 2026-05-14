@@ -213,7 +213,15 @@ AI-Assisted Contributions</h2>
 <li><b>Same quality bar.</b> AI-assisted code must pass all tests, follow code style, and handle SNES hardware constraints correctly (VBlank timing, DMA budgets, bank boundaries). No exceptions.</li>
 <li><b>Do NOT add <code>Co-Authored-By</code> trailers</b> for AI tools in commit messages.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md1566"></a>
+<h3><a class="anchor" id="autotoc_md1566"></a>
+Project knowledge in &lt;tt&gt;.claude/&lt;/tt&gt;</h3>
+<p>Two directories under <code>.claude/</code> capture knowledge that AI assistants and human contributors share:</p>
+<ul>
+<li><a href=".claude/rules/"><code>.claude/rules/</code></a> — <b>normative</b> rules (auto-loaded by Claude Code). Commit policy, debugging methodology, testing workflow, NMI audit checklist, etc. Treat these like project policy: follow them, change them only by PR with rationale.</li>
+<li><a href=".claude/notes/"><code>.claude/notes/</code></a> — <b>observational</b> project knowledge. Lessons learned, technical references, active chantier handoffs, FIXED bugs preserved for context, structured project reviews. Read what's relevant; add to it when you learn something a future contributor (or your future self) will need.</li>
+</ul>
+<p>When learning something project-specific, append to <code>.claude/notes/&lt;category&gt;/</code>. The category README explains the layout. Per-user cross-project preferences (your editor habits, etc.) belong in your personal <code>~/.claude/projects/.../memory/</code>, not here. The convention is documented in `.claude/rules/memory_routing.md`.</p>
+<h2><a class="anchor" id="autotoc_md1567"></a>
 Documentation</h2>
 <p>Every new feature or example must have:</p>
 <ol type="1">
@@ -223,10 +231,10 @@ Documentation</h2>
 </ol>
 <p>For code style conventions, see <a href="https://k0b3n4irb.github.io/opensnes/code_style.html">Code Style Guide</a>.</p>
 <p>When using external code, add an entry to ATTRIBUTION.md with the source, author, license, and description of modifications. Include a header comment in the source file.</p>
-<h2><a class="anchor" id="autotoc_md1567"></a>
+<h2><a class="anchor" id="autotoc_md1568"></a>
 Good First Issues</h2>
 <p>Look for issues labeled <a href="https://github.com/k0b3n4irb/opensnes/labels/good%20first%20issue"><code>good first issue</code></a>. These are small, self-contained tasks with clear instructions — designed for your first contribution to the project.</p>
-<h2><a class="anchor" id="autotoc_md1568"></a>
+<h2><a class="anchor" id="autotoc_md1569"></a>
 Links</h2>
 <ul>
 <li><a href="https://k0b3n4irb.github.io/opensnes/">Documentation</a></li>

@@ -31,5 +31,7 @@ var colormath_8h =
     [ "colorMathSetSource", "colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084", null ],
     [ "colorMathShadow", "colormath_8h.html#a74617df72273156acc7bf429ed1d25d5", null ],
     [ "colorMathTint", "colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4", null ],
-    [ "colorMathTransparency50", "colormath_8h.html#a7b1686084387c3e5613000109551b719", null ]
+    [ "colorMathTransparency50", "colormath_8h.html#a7b1686084387c3e5613000109551b719", null ],
+    [ "cgadsub", "colormath_8h.html#a04f8eea3f1443f8187e3de9375ffc56f", null ],
+    [ "cgwsel", "colormath_8h.html#a7f3160284cd5e2752bb2b5d48735863e", null ]
 ];

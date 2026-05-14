@@ -155,20 +155,21 @@ Usage</h2>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> dx = <a class="code hl_function" href="group__mouse__input.html#ga9f99c41040c01525f1aaa1fd229a31b5">mouseGetX</a>(0);</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> dy = <a class="code hl_function" href="group__mouse__input.html#ga2cdb51c5e8b9145b02d9ae990cd1b2cf">mouseGetY</a>(0);</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cursor_x</a> += dx;</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cursor_y</a> += dy;</div>
+<div class="line">    <a class="code hl_variable" href="text_8h.html#a2f3631c011b3a55707c8f8a7e8494b0b">cursor_x</a> += dx;</div>
+<div class="line">    <a class="code hl_variable" href="text_8h.html#a09f5b2e804373ebc11c190b2b824786d">cursor_y</a> += dy;</div>
 <div class="line">    <span class="keywordflow">if</span> (<a class="code hl_function" href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a>(0) &amp; <a class="code hl_define" href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a>) {</div>
 <div class="line">        <span class="comment">// Left click!</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga2cdb51c5e8b9145b02d9ae990cd1b2cf"><div class="ttname"><a href="group__mouse__input.html#ga2cdb51c5e8b9145b02d9ae990cd1b2cf">mouseGetY</a></div><div class="ttdeci">s16 mouseGetY(u8 port)</div><div class="ttdoc">Get Y displacement since last frame.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga67d41b5dcdb6d241343bf97e15304079"><div class="ttname"><a href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a></div><div class="ttdeci">#define MOUSE_BUTTON_LEFT</div><div class="ttdef"><b>Definition</b> input.h:191</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga7452fe56733af8f085a8c7c7b814de0e"><div class="ttname"><a href="group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e">mouseInit</a></div><div class="ttdeci">u8 mouseInit(u8 port)</div><div class="ttdoc">Initialize mouse on given port.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_ga9f99c41040c01525f1aaa1fd229a31b5"><div class="ttname"><a href="group__mouse__input.html#ga9f99c41040c01525f1aaa1fd229a31b5">mouseGetX</a></div><div class="ttdeci">s16 mouseGetX(u8 port)</div><div class="ttdoc">Get X displacement since last frame.</div></div>
 <div class="ttc" id="agroup__mouse__input_html_gafc97172b71c6aafca462a667f3eb2f8d"><div class="ttname"><a href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a></div><div class="ttdeci">u8 mouseButtonsPressed(u8 port)</div><div class="ttdoc">Get newly pressed mouse buttons this frame.</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
+<div class="ttc" id="atext_8h_html_a09f5b2e804373ebc11c190b2b824786d"><div class="ttname"><a href="text_8h.html#a09f5b2e804373ebc11c190b2b824786d">cursor_y</a></div><div class="ttdeci">u8 cursor_y</div></div>
+<div class="ttc" id="atext_8h_html_a2f3631c011b3a55707c8f8a7e8494b0b"><div class="ttname"><a href="text_8h.html#a2f3631c011b3a55707c8f8a7e8494b0b">cursor_x</a></div><div class="ttdeci">u8 cursor_x</div><div class="ttdoc">Set cursor position.</div></div>
 </div><!-- fragment --> <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga67d41b5dcdb6d241343bf97e15304079" name="ga67d41b5dcdb6d241343bf97e15304079"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga67d41b5dcdb6d241343bf97e15304079">&#9670;&#160;</a></span>MOUSE_BUTTON_LEFT</h2>

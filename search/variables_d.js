@@ -27,13 +27,15 @@ var searchData=
   ['mariogfx_24',['mariogfx',['../maps_2slopemario_2mario_8c.html#a53716e2abcc85b968842b92a4705dd50',1,'mario.c']]],
   ['marioid_25',['marioid',['../games_2mapandobjects_2mario_8c.html#a3486f7a8cf9a9894d082c117181c957f',1,'marioid:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#a3486f7a8cf9a9894d082c117181c957f',1,'marioid:&#160;mario.c']]],
   ['mariopal_26',['mariopal',['../maps_2slopemario_2mario_8c.html#a9c404b92f0c1acebd3283646550fc797',1,'mario.c']]],
-  ['mariox_27',['mariox',['../games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c']]],
+  ['mariox_27',['mariox',['../maps_2slopemario_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c'],['../games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c']]],
   ['marioy_28',['marioy',['../games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1',1,'marioy:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1',1,'marioy:&#160;mario.c']]],
   ['max_5fscroll_5fheight_29',['max_scroll_height',['../maps_2dynamic__map_2main_8c.html#a799e60ce2f39f87a4e9712520da582fd',1,'main.c']]],
   ['max_5fscroll_5fwidth_30',['max_scroll_width',['../maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b',1,'main.c']]],
   ['message_31',['message',['../text_2hello__world_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e',1,'main.c']]],
   ['monster_32',['monster',['../graphics_2sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024',1,'main.c']]],
-  ['msg_5fcolor_33',['msg_color',['../render_8c.html#a469f97fefc467199cf6aff4660f44a64',1,'render.c']]],
-  ['msg_5fcolor_5fdirty_34',['msg_color_dirty',['../render_8c.html#ad5580510b96399f26c9b790102375a05',1,'render.c']]],
-  ['msg_5fcolors_35',['msg_colors',['../games_2tetris_2main_8c.html#a8b6b563c4208dd393057af60078e429e',1,'main.c']]]
+  ['mosaic_5fbg_5fmask_33',['mosaic_bg_mask',['../mosaic_8h.html#a0d30b0e360569ff5622ae6a70bfd1a4b',1,'mosaic.h']]],
+  ['mosaic_5fsize_34',['mosaic_size',['../mosaic_8h.html#af189df89c0fa9121e42d72c3b4d04403',1,'mosaic.h']]],
+  ['msg_5fcolor_35',['msg_color',['../render_8c.html#a469f97fefc467199cf6aff4660f44a64',1,'render.c']]],
+  ['msg_5fcolor_5fdirty_36',['msg_color_dirty',['../render_8c.html#ad5580510b96399f26c9b790102375a05',1,'render.c']]],
+  ['msg_5fcolors_37',['msg_colors',['../games_2tetris_2main_8c.html#a8b6b563c4208dd393057af60078e429e',1,'main.c']]]
 ];

@@ -13,5 +13,7 @@ var mosaic_8h =
     [ "mosaicFadeOut", "mosaic_8h.html#a706149f9c377234abaca910959bddb0d", null ],
     [ "mosaicGetSize", "mosaic_8h.html#a2433e0447ad6ac1d10969ee1067d526f", null ],
     [ "mosaicInit", "mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649", null ],
-    [ "mosaicSetSize", "mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823", null ]
+    [ "mosaicSetSize", "mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823", null ],
+    [ "mosaic_bg_mask", "mosaic_8h.html#a0d30b0e360569ff5622ae6a70bfd1a4b", null ],
+    [ "mosaic_size", "mosaic_8h.html#af189df89c0fa9121e42d72c3b4d04403", null ]
 ];

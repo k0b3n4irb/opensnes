@@ -93,7 +93,8 @@ $(document).ready(function(){initNavTree('math_8h.html',''); initResizable(); })
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">math.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -155,7 +156,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:aaa8ca4460928f28892217658eca661bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply two fixed-point values.  <br /></td></tr>
 <tr class="separator:aaa8ca4460928f28892217658eca661bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc155bebfc5f7c5240e9c2a3d9f5835c" id="r_abc155bebfc5f7c5240e9c2a3d9f5835c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> angle)</td></tr>
-<tr class="memdesc:abc155bebfc5f7c5240e9c2a3d9f5835c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get sine value for angle.  <br /></td></tr>
 <tr class="separator:abc155bebfc5f7c5240e9c2a3d9f5835c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5da2bf6880e934a85f84e9f070d612f5" id="r_a5da2bf6880e934a85f84e9f070d612f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8h.html#a5da2bf6880e934a85f84e9f070d612f5">fixSqrt</a> (<a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> x)</td></tr>
 <tr class="memdesc:a5da2bf6880e934a85f84e9f070d612f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Square root in 8.8 fixed-point.  <br /></td></tr>
@@ -169,6 +169,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a8cc43b9aa47696123ad5d893daee75ea" id="r_a8cc43b9aa47696123ad5d893daee75ea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea">sqrt16</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> n)</td></tr>
 <tr class="memdesc:a8cc43b9aa47696123ad5d893daee75ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer square root.  <br /></td></tr>
 <tr class="separator:a8cc43b9aa47696123ad5d893daee75ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aa20b21cd7b12f72a2bfc0cbbf5fcabab" id="r_aa20b21cd7b12f72a2bfc0cbbf5fcabab"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8h.html#aa20b21cd7b12f72a2bfc0cbbf5fcabab">sine_table</a> [256]</td></tr>
+<tr class="memdesc:aa20b21cd7b12f72a2bfc0cbbf5fcabab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get sine value for angle.  <br /></td></tr>
+<tr class="separator:aa20b21cd7b12f72a2bfc0cbbf5fcabab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Fixed-Point Math. </p>
@@ -207,9 +213,9 @@ Angles</h2>
 <div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> + <a class="code hl_function" href="math_8h.html#aaa8ca4460928f28892217658eca661bf">fixMul</a>(speed, dx);</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-<div class="ttc" id="amath_8h_html_a0a04487d24a25131a75e3c35b4edcabb"><div class="ttname"><a href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a></div><div class="ttdeci">fixed fixCos(u8 angle)</div><div class="ttdoc">Get cosine value for angle.</div></div>
+<div class="ttc" id="amath_8h_html_a0a04487d24a25131a75e3c35b4edcabb"><div class="ttname"><a href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a></div><div class="ttdeci">fixed fixCos(u8 angle)</div><div class="ttdoc">Get cosine value for angle.</div><div class="ttdef"><b>Definition</b> math.h:190</div></div>
 <div class="ttc" id="amath_8h_html_aaa8ca4460928f28892217658eca661bf"><div class="ttname"><a href="math_8h.html#aaa8ca4460928f28892217658eca661bf">fixMul</a></div><div class="ttdeci">fixed fixMul(fixed a, fixed b)</div><div class="ttdoc">Multiply two fixed-point values.</div></div>
-<div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdoc">Get sine value for angle.</div></div>
+<div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdef"><b>Definition</b> math.h:174</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -559,6 +565,9 @@ Angles</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> fixCos </td>
@@ -568,6 +577,11 @@ Angles</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get cosine value for angle. </p>
@@ -580,7 +594,8 @@ Angles</h2>
 <dl class="section return"><dt>Returns</dt><dd>Cosine value in 8.8 fixed-point (-256 to 256)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> angle = 0;  <span class="comment">// 0 degrees</span></div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> cos_val = <a class="code hl_function" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a>(angle);  <span class="comment">// 256 = 1.0</span></div>
-</div><!-- fragment --> 
+</div><!-- fragment --><p> Inlined for zero-call-overhead access (wave 4 retrofit). </p>
+
 </div>
 </div>
 <a id="ac1b5b08f47109af37b8874161e3a87d9" name="ac1b5b08f47109af37b8874161e3a87d9"></a>
@@ -722,6 +737,9 @@ Angles</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> fixSin </td>
@@ -731,19 +749,12 @@ Angles</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Get sine value for angle. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">angle</td><td>8-bit angle (0-255 = 0°-360°) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Sine value in 8.8 fixed-point (-256 to 256, i.e., -1.0 to 1.0)</dd></dl>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> angle = 64;  <span class="comment">// 90 degrees</span></div>
-<div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> sin_val = <a class="code hl_function" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a>(angle);  <span class="comment">// 256 = 1.0</span></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Table-based lookup, very fast </dd></dl>
 
 </div>
 </div>
@@ -890,6 +901,41 @@ Angles</h2>
 <div class="ttc" id="amath_8h_html_a8cc43b9aa47696123ad5d893daee75ea"><div class="ttname"><a href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea">sqrt16</a></div><div class="ttdeci">u16 sqrt16(u16 n)</div><div class="ttdoc">Integer square root.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Range guarantee: <code>sqrt16(n)</code> is always ≤ 255, so the result fits in <code>u8</code>. Useful when distance is bounded by screen size.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="math_8h.html#a5da2bf6880e934a85f84e9f070d612f5" title="Square root in 8.8 fixed-point.">fixSqrt</a> for the 8.8 fixed-point variant. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aa20b21cd7b12f72a2bfc0cbbf5fcabab" name="aa20b21cd7b12f72a2bfc0cbbf5fcabab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa20b21cd7b12f72a2bfc0cbbf5fcabab">&#9670;&#160;</a></span>sine_table</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> sine_table[256]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get sine value for angle. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">angle</td><td>8-bit angle (0-255 = 0°-360°) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Sine value in 8.8 fixed-point (-256 to 256, i.e., -1.0 to 1.0)</dd></dl>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> angle = 64;  <span class="comment">// 90 degrees</span></div>
+<div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> sin_val = <a class="code hl_function" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a>(angle);  <span class="comment">// 256 = 1.0</span></div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Table-based lookup, very fast </dd></dl>
 
 </div>
 </div>

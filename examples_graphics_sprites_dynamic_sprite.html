@@ -184,7 +184,7 @@ Static vs Dynamic Sprites</h3>
 <p>Dynamic sprites are the right choice when sprites have many animation frames (RPG characters with walk cycles, attack animations, etc.) or when multiple unique characters share limited VRAM space.</p>
 <h3><a class="anchor" id="autotoc_md1241"></a>
 Force Blank for Initial Setup</h3>
-<p>This demo uses <code><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank)">setScreenOff()</a></code> (which sets <code>REG_INIDISP = 0x80</code>) during setup to allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank only.</p>
+<p>This demo uses <code><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></code> (which sets <code>REG_INIDISP = 0x80</code>) during setup to allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank only.</p>
 <h2><a class="anchor" id="autotoc_md1242"></a>
 Project Structure</h2>
 <table class="markdownTable">

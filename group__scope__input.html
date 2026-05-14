@@ -92,7 +92,8 @@ $(document).ready(function(){initNavTree('group__scope__input.html',''); initRes
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Super Scope Input</div></div>
 </div><!--header-->
 <div class="contents">
@@ -127,7 +128,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga81b12c4a14aec097adf26b2e99080ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get newly pressed buttons this frame.  <br /></td></tr>
 <tr class="separator:ga81b12c4a14aec097adf26b2e99080ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5e28e1c68fdfa123dacdb209abdc478e" id="r_ga5e28e1c68fdfa123dacdb209abdc478e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a> (<a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>)</td></tr>
-<tr class="memdesc:ga5e28e1c68fdfa123dacdb209abdc478e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrate aim from a center-screen shot.  <br /></td></tr>
 <tr class="separator:ga5e28e1c68fdfa123dacdb209abdc478e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac2ec7014e3673e2ecc39dc6571cabed4" id="r_gac2ec7014e3673e2ecc39dc6571cabed4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#gac2ec7014e3673e2ecc39dc6571cabed4">scopeGetRawX</a> (<a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>)</td></tr>
 <tr class="memdesc:gac2ec7014e3673e2ecc39dc6571cabed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get raw (uncalibrated) H position from PPU.  <br /></td></tr>
@@ -148,7 +148,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga865c2249dcdf9265bca5c70991ab348a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if Super Scope is connected.  <br /></td></tr>
 <tr class="separator:ga865c2249dcdf9265bca5c70991ab348a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7d4402727331f161185f2b0dceabe5ff" id="r_ga7d4402727331f161185f2b0dceabe5ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga7d4402727331f161185f2b0dceabe5ff">scopeSetHoldDelay</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">frames</a>)</td></tr>
-<tr class="memdesc:ga7d4402727331f161185f2b0dceabe5ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set hold delay (frames before hold triggers).  <br /></td></tr>
 <tr class="separator:ga7d4402727331f161185f2b0dceabe5ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab8752dda2561271655c015698a4787af" id="r_gab8752dda2561271655c015698a4787af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#gab8752dda2561271655c015698a4787af">scopeSetRepeatDelay</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">frames</a>)</td></tr>
 <tr class="memdesc:gab8752dda2561271655c015698a4787af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set repeat delay (frames between repeat fires after hold).  <br /></td></tr>
@@ -156,6 +155,21 @@ Functions</h2></td></tr>
 <tr class="memitem:ga1bc41db00d3b5875405a440d733a2d07" id="r_ga1bc41db00d3b5875405a440d733a2d07"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07">scopeSinceShot</a> (<a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a>)</td></tr>
 <tr class="memdesc:ga1bc41db00d3b5875405a440d733a2d07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get frames since last detected shot.  <br /></td></tr>
 <tr class="separator:ga1bc41db00d3b5875405a440d733a2d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ga516fdcd3e3a976926d05d0bdd4613bb8" id="r_ga516fdcd3e3a976926d05d0bdd4613bb8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga516fdcd3e3a976926d05d0bdd4613bb8">scope_centerh</a></td></tr>
+<tr class="separator:ga516fdcd3e3a976926d05d0bdd4613bb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56fe34259c287cf9d2f4a2f8ab129010" id="r_ga56fe34259c287cf9d2f4a2f8ab129010"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga56fe34259c287cf9d2f4a2f8ab129010">scope_centerv</a></td></tr>
+<tr class="separator:ga56fe34259c287cf9d2f4a2f8ab129010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga76eb62a4521e047f428188fbaae31852" id="r_ga76eb62a4521e047f428188fbaae31852"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga76eb62a4521e047f428188fbaae31852">scope_holddelay</a></td></tr>
+<tr class="memdesc:ga76eb62a4521e047f428188fbaae31852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set hold delay (frames before hold triggers).  <br /></td></tr>
+<tr class="separator:ga76eb62a4521e047f428188fbaae31852"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0a4b2ee026abe14a6e00bd3eeff3476c" id="r_ga0a4b2ee026abe14a6e00bd3eeff3476c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#ga0a4b2ee026abe14a6e00bd3eeff3476c">scope_shothraw</a></td></tr>
+<tr class="memdesc:ga0a4b2ee026abe14a6e00bd3eeff3476c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrate aim from a center-screen shot.  <br /></td></tr>
+<tr class="separator:ga0a4b2ee026abe14a6e00bd3eeff3476c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac503829bd31d171d162ab3da7667d499" id="r_gac503829bd31d171d162ab3da7667d499"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__scope__input.html#gac503829bd31d171d162ab3da7667d499">scope_shotvraw</a></td></tr>
+<tr class="separator:gac503829bd31d171d162ab3da7667d499"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>SNES Super Scope support (port 2 only) </p>
@@ -182,7 +196,7 @@ Usage</h2>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__scope__input_html_ga344f48f7c3fce32fbc23768dff4e0b57"><div class="ttname"><a href="group__scope__input.html#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a></div><div class="ttdeci">#define SSC_FIRE</div><div class="ttdef"><b>Definition</b> input.h:311</div></div>
-<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdoc">Calibrate aim from a center-screen shot.</div></div>
+<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdef"><b>Definition</b> input.h:400</div></div>
 <div class="ttc" id="agroup__scope__input_html_ga81b12c4a14aec097adf26b2e99080ef6"><div class="ttname"><a href="group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a></div><div class="ttdeci">u16 scopeButtonsPressed(void)</div><div class="ttdoc">Get newly pressed buttons this frame.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaa7b48b9a04fc0ba5acd4b9e955e0a52c"><div class="ttname"><a href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c">scopeGetX</a></div><div class="ttdeci">u16 scopeGetX(void)</div><div class="ttdoc">Get calibration-adjusted H position.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaaf4c02e6cd035506e27613290014ef2d"><div class="ttname"><a href="group__scope__input.html#gaaf4c02e6cd035506e27613290014ef2d">scopeInit</a></div><div class="ttdeci">u8 scopeInit(void)</div><div class="ttdoc">Detect Super Scope on port 2.</div></div>
@@ -349,6 +363,9 @@ Usage</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a> scopeCalibrate </td>
@@ -358,10 +375,12 @@ Usage</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Calibrate aim from a center-screen shot. </p>
-<p>Call this after the user fires at the center of the screen (128, 112). Computes calibration offsets: centerh = 128 - rawX, centerv = 112 - rawY. The NMI handler applies these offsets to all subsequent readings. </p>
 
 </div>
 </div>
@@ -497,6 +516,9 @@ Usage</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">void</a> scopeSetHoldDelay </td>
@@ -506,15 +528,12 @@ Usage</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Set hold delay (frames before hold triggers). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">frames</td><td>Number of frames (default: 60 = 1 second at 60Hz) </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -562,6 +581,113 @@ Usage</h2>
 
 <p>Get frames since last detected shot. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of frames since last PPU latch (shot detection) </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="ga516fdcd3e3a976926d05d0bdd4613bb8" name="ga516fdcd3e3a976926d05d0bdd4613bb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga516fdcd3e3a976926d05d0bdd4613bb8">&#9670;&#160;</a></span>scope_centerh</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scope_centerh</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga56fe34259c287cf9d2f4a2f8ab129010" name="ga56fe34259c287cf9d2f4a2f8ab129010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga56fe34259c287cf9d2f4a2f8ab129010">&#9670;&#160;</a></span>scope_centerv</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scope_centerv</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga76eb62a4521e047f428188fbaae31852" name="ga76eb62a4521e047f428188fbaae31852"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga76eb62a4521e047f428188fbaae31852">&#9670;&#160;</a></span>scope_holddelay</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scope_holddelay</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set hold delay (frames before hold triggers). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frames</td><td>Number of frames (default: 60 = 1 second at 60Hz) Inlined for zero-call-overhead access. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga0a4b2ee026abe14a6e00bd3eeff3476c" name="ga0a4b2ee026abe14a6e00bd3eeff3476c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0a4b2ee026abe14a6e00bd3eeff3476c">&#9670;&#160;</a></span>scope_shothraw</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scope_shothraw</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calibrate aim from a center-screen shot. </p>
+<p>Call this after the user fires at the center of the screen (128, 112). Computes calibration offsets: centerh = 128 - rawX, centerv = 112 - rawY. The NMI handler applies these offsets to all subsequent readings.</p>
+<p>Inlined for zero-call-overhead access. </p>
+
+</div>
+</div>
+<a id="gac503829bd31d171d162ab3da7667d499" name="gac503829bd31d171d162ab3da7667d499"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac503829bd31d171d162ab3da7667d499">&#9670;&#160;</a></span>scope_shotvraw</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scope_shotvraw</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

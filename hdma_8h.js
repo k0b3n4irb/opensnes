@@ -48,5 +48,6 @@ var hdma_8h =
     [ "hdmaWaveSetSpeed", "hdma_8h.html#a51e3697c2d4ec0f4a9f121822f5f584e", null ],
     [ "hdmaWaveStop", "hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1", null ],
     [ "hdmaWaveUpdate", "hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216", null ],
-    [ "hdmaWindowShape", "hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6", null ]
+    [ "hdmaWindowShape", "hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6", null ],
+    [ "hdma_wave_speed", "hdma_8h.html#a7a4b4b53d0c65b8ca3f485409f38bc90", null ]
 ];

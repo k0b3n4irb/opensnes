@@ -19,5 +19,7 @@ var text_8h =
     [ "textPrintU16", "text_8h.html#aa052ff3cbdcefdf7239317f29eec64a4", null ],
     [ "textPutChar", "text_8h.html#acd3f984c3d3308883e2729a50db16413", null ],
     [ "textSetPos", "text_8h.html#aa4df5148cb4a677b1d1e58b2535b73b0", null ],
+    [ "cursor_x", "text_8h.html#a2f3631c011b3a55707c8f8a7e8494b0b", null ],
+    [ "cursor_y", "text_8h.html#a09f5b2e804373ebc11c190b2b824786d", null ],
     [ "text_config", "text_8h.html#a4c8b919fa5577be029b9a19817496c2a", null ]
 ];

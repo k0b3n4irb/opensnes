@@ -309,7 +309,7 @@ Variables</h2></td></tr>
 <p>Main entry point &ndash; Super Scope detection, calibration, and fire tracking. </p>
 <p>Implements a three-state machine:</p><ul>
 <li>STATE_DETECT: polls <a class="el" href="group__scope__input.html#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a> / <a class="el" href="group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a" title="Check if Super Scope is connected.">scopeIsConnected()</a> each frame until the Super Scope is detected on controller port 2.</li>
-<li>STATE_CALIBRATE: displays a crosshair target on BG2 and waits for the player to shoot the center. <a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e" title="Calibrate aim from a center-screen shot.">scopeCalibrate()</a> records the aim offset so subsequent coordinate readings are accurate.</li>
+<li>STATE_CALIBRATE: displays a crosshair target on BG2 and waits for the player to shoot the center. <a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate()</a> records the aim offset so subsequent coordinate readings are accurate.</li>
 <li>STATE_READY: tracks FIRE events, reads calibrated X/Y via <a class="el" href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c" title="Get calibration-adjusted H position.">scopeGetX()</a> / <a class="el" href="group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1" title="Get calibration-adjusted V position.">scopeGetY()</a>, and places a red dot sprite at the hit position. The PAUSE button returns to calibration for re-aiming.</li>
 </ul>
 <p>The fire_armed flag prevents stale FIRE events from the previous state from triggering immediately on state entry.</p>

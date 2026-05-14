@@ -91,7 +91,8 @@ $(document).ready(function(){initNavTree('console_8h.html',''); initResizable();
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">console.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -99,6 +100,7 @@ $(document).ready(function(){initNavTree('console_8h.html',''); initResizable();
 <p>SNES Console Initialization and Core Functions.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">snes/types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="registers_8h_source.html">snes/registers.h</a>&gt;</code><br />
 </div>
 <p><a href="console_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -111,7 +113,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a61f5e51d0173ceaad88679ed162359d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize console with options.  <br /></td></tr>
 <tr class="separator:a61f5e51d0173ceaad88679ed162359d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10a8dd24d5584e2cb833c5acfbf332c6" id="r_a10a8dd24d5584e2cb833c5acfbf332c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a10a8dd24d5584e2cb833c5acfbf332c6">getBrightness</a> (void)</td></tr>
-<tr class="memdesc:a10a8dd24d5584e2cb833c5acfbf332c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current brightness.  <br /></td></tr>
 <tr class="separator:a10a8dd24d5584e2cb833c5acfbf332c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fd1f41354b0d09ca258af07c1cb6fa6" id="r_a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a> (void)</td></tr>
 <tr class="memdesc:a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get frame counter.  <br /></td></tr>
@@ -135,7 +136,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a5a1bfaf2babf4d8dac31cafc468c735f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set screen brightness.  <br /></td></tr>
 <tr class="separator:a5a1bfaf2babf4d8dac31cafc468c735f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5380410c3dc97fbaa3b36b095d631512" id="r_a5380410c3dc97fbaa3b36b095d631512"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a> (void)</td></tr>
-<tr class="memdesc:a5380410c3dc97fbaa3b36b095d631512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable screen display (blank)  <br /></td></tr>
 <tr class="separator:a5380410c3dc97fbaa3b36b095d631512"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8cb701c5b08484903555e77347f460a" id="r_af8cb701c5b08484903555e77347f460a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a> (void)</td></tr>
 <tr class="memdesc:af8cb701c5b08484903555e77347f460a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable screen display.  <br /></td></tr>
@@ -146,6 +146,15 @@ Functions</h2></td></tr>
 <tr class="memitem:abd33830487e4764e5ec22ec98b749f4b" id="r_abd33830487e4764e5ec22ec98b749f4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a> (void)</td></tr>
 <tr class="memdesc:abd33830487e4764e5ec22ec98b749f4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for next VBlank period.  <br /></td></tr>
 <tr class="separator:abd33830487e4764e5ec22ec98b749f4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a70e5d6b33bccb97aec6b0d706fb1a6d7" id="r_a70e5d6b33bccb97aec6b0d706fb1a6d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a70e5d6b33bccb97aec6b0d706fb1a6d7">current_brightness</a></td></tr>
+<tr class="memdesc:a70e5d6b33bccb97aec6b0d706fb1a6d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current brightness.  <br /></td></tr>
+<tr class="separator:a70e5d6b33bccb97aec6b0d706fb1a6d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ba3fc43e69c483b4fcd603363de1f09" id="r_a8ba3fc43e69c483b4fcd603363de1f09"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a8ba3fc43e69c483b4fcd603363de1f09">force_blanked</a></td></tr>
+<tr class="memdesc:a8ba3fc43e69c483b4fcd603363de1f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable screen display (blank)  <br /></td></tr>
+<tr class="separator:a8ba3fc43e69c483b4fcd603363de1f09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Console Initialization and Core Functions. </p>
@@ -220,7 +229,7 @@ Attribution</h2>
 <div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -257,6 +266,9 @@ Attribution</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> getBrightness </td>
@@ -266,10 +278,12 @@ Attribution</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Get current brightness. </p>
-<dl class="section return"><dt>Returns</dt><dd>Current brightness level (0-15) </dd></dl>
 
 </div>
 </div>
@@ -278,6 +292,9 @@ Attribution</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> getFrameCount </td>
@@ -287,14 +304,20 @@ Attribution</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get frame counter. </p>
 <p>Returns the number of VBlanks since initialization. Wraps at 65535.</p>
+<p>Inlined for zero-call-overhead access (just a 16-bit load).</p>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:232</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --> 
 </div>
@@ -451,6 +474,9 @@ Attribution</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void setScreenOff </td>
@@ -460,15 +486,13 @@ Attribution</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Disable screen display (blank) </p>
-<p>Turns off the display. Use during major VRAM updates that can't complete during VBlank.</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
-<div class="line"><span class="comment">// ... massive VRAM update ...</span></div>
-<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdoc">Disable screen display (blank)</div></div>
-</div><!-- fragment --> 
 </div>
 </div>
 <a id="af8cb701c5b08484903555e77347f460a" name="af8cb701c5b08484903555e77347f460a"></a>
@@ -476,6 +500,9 @@ Attribution</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void setScreenOn </td>
@@ -485,10 +512,16 @@ Attribution</h2>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Enable screen display. </p>
 <p>Turns on the display after initialization or a screen blank. Sets full brightness (15).</p>
+<p>Inlined for zero-call-overhead access (saves ~28 cycles per call). Shares the same <code>force_blanked</code> and <code>current_brightness</code> shadows as <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a>; both are declared extern below.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"><span class="comment">// ... load graphics ...</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();  <span class="comment">// Display is now visible</span></div>
@@ -561,6 +594,63 @@ Attribution</h2>
 <div class="line">}</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>VBlank occurs ~60 times/second (NTSC) or ~50 times/second (PAL) </dd></dl>
 
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a70e5d6b33bccb97aec6b0d706fb1a6d7" name="a70e5d6b33bccb97aec6b0d706fb1a6d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70e5d6b33bccb97aec6b0d706fb1a6d7">&#9670;&#160;</a></span>current_brightness</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> current_brightness</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get current brightness. </p>
+<p>Inlined for zero-call-overhead access. The standalone definition is still available (force-emitted in console.c) for fn-pointer callers.</p>
+<dl class="section return"><dt>Returns</dt><dd>Current brightness level (0-15) </dd></dl>
+
+</div>
+</div>
+<a id="a8ba3fc43e69c483b4fcd603363de1f09" name="a8ba3fc43e69c483b4fcd603363de1f09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ba3fc43e69c483b4fcd603363de1f09">&#9670;&#160;</a></span>force_blanked</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> force_blanked</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Disable screen display (blank) </p>
+<p>Turns off the display. Use during major VRAM updates that can't complete during VBlank.</p>
+<p>Inlined for zero-call-overhead access (saves ~28 cycles per call). The standalone definition in console.c is still emitted (via the <code>extern inline</code> declaration there) for ABI compatibility — direct call sites collapse to two stores.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
+<div class="line"><span class="comment">// ... massive VRAM update ...</span></div>
+<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 </div><!-- contents -->

@@ -18,5 +18,10 @@ var group__scope__input =
     [ "scopeIsConnected", "group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a", null ],
     [ "scopeSetHoldDelay", "group__scope__input.html#ga7d4402727331f161185f2b0dceabe5ff", null ],
     [ "scopeSetRepeatDelay", "group__scope__input.html#gab8752dda2561271655c015698a4787af", null ],
-    [ "scopeSinceShot", "group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07", null ]
+    [ "scopeSinceShot", "group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07", null ],
+    [ "scope_centerh", "group__scope__input.html#ga516fdcd3e3a976926d05d0bdd4613bb8", null ],
+    [ "scope_centerv", "group__scope__input.html#ga56fe34259c287cf9d2f4a2f8ab129010", null ],
+    [ "scope_holddelay", "group__scope__input.html#ga76eb62a4521e047f428188fbaae31852", null ],
+    [ "scope_shothraw", "group__scope__input.html#ga0a4b2ee026abe14a6e00bd3eeff3476c", null ],
+    [ "scope_shotvraw", "group__scope__input.html#gac503829bd31d171d162ab3da7667d499", null ]
 ];

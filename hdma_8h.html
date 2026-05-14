@@ -92,7 +92,8 @@ $(document).ready(function(){initNavTree('hdma_8h.html',''); initResizable(); })
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">hdma.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -244,7 +245,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a2658bf1d97761d3e7a940b29ac560438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize HDMA wave effect system.  <br /></td></tr>
 <tr class="separator:a2658bf1d97761d3e7a940b29ac560438"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51e3697c2d4ec0f4a9f121822f5f584e" id="r_a51e3697c2d4ec0f4a9f121822f5f584e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a51e3697c2d4ec0f4a9f121822f5f584e">hdmaWaveSetSpeed</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
-<tr class="memdesc:a51e3697c2d4ec0f4a9f121822f5f584e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set wave speed.  <br /></td></tr>
 <tr class="separator:a51e3697c2d4ec0f4a9f121822f5f584e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0579bc90a6b79d6737dcf2c15a3eb7e1" id="r_a0579bc90a6b79d6737dcf2c15a3eb7e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1">hdmaWaveStop</a> (void)</td></tr>
 <tr class="memdesc:a0579bc90a6b79d6737dcf2c15a3eb7e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop wave effect and disable HDMA channel.  <br /></td></tr>
@@ -255,6 +255,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a765faa4cbc6e070b2c6ec768cf9762f6" id="r_a765faa4cbc6e070b2c6ec768cf9762f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6">hdmaWindowShape</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, const void *windowTable)</td></tr>
 <tr class="memdesc:a765faa4cbc6e070b2c6ec768cf9762f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up window position HDMA for shape effects.  <br /></td></tr>
 <tr class="separator:a765faa4cbc6e070b2c6ec768cf9762f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a7a4b4b53d0c65b8ca3f485409f38bc90" id="r_a7a4b4b53d0c65b8ca3f485409f38bc90"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hdma_8h.html#a7a4b4b53d0c65b8ca3f485409f38bc90">hdma_wave_speed</a></td></tr>
+<tr class="memdesc:a7a4b4b53d0c65b8ca3f485409f38bc90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set wave speed.  <br /></td></tr>
+<tr class="separator:a7a4b4b53d0c65b8ca3f485409f38bc90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES HDMA (Horizontal-blanking DMA) </p>
@@ -1528,6 +1534,9 @@ Call <a class="el" href="hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1" title="
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void hdmaWaveSetSpeed </td>
@@ -1537,15 +1546,12 @@ Call <a class="el" href="hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1" title="
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-
-<p>Set wave speed. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">speed</td><td>Animation speed (1=slow, 4=fast, default=2) </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -1630,6 +1636,37 @@ Call <a class="el" href="hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1" title="
 <dl class="section note"><dt>Note</dt><dd>Table format: line count + 2 bytes (left, right) per entry </dd>
 <dd>
 Uses mode 2REG to write both WH0 and WH1 </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a7a4b4b53d0c65b8ca3f485409f38bc90" name="a7a4b4b53d0c65b8ca3f485409f38bc90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a4b4b53d0c65b8ca3f485409f38bc90">&#9670;&#160;</a></span>hdma_wave_speed</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hdma_wave_speed</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set wave speed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">speed</td><td>Animation speed (1=slow, 4=fast, default=2) Inlined for zero-call-overhead access. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

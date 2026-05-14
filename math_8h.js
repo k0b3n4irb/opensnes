@@ -18,5 +18,6 @@ var math_8h =
     [ "fixSqrt", "math_8h.html#a5da2bf6880e934a85f84e9f070d612f5", null ],
     [ "mod16", "math_8h.html#ae2d0745b4830f0f51732ebccb6bb7d1d", null ],
     [ "mul16", "math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54", null ],
-    [ "sqrt16", "math_8h.html#a8cc43b9aa47696123ad5d893daee75ea", null ]
+    [ "sqrt16", "math_8h.html#a8cc43b9aa47696123ad5d893daee75ea", null ],
+    [ "sine_table", "math_8h.html#aa20b21cd7b12f72a2bfc0cbbf5fcabab", null ]
 ];

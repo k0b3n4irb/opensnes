@@ -184,7 +184,7 @@ Walkthrough</h2>
 <p>The example uses three states:</p>
 <ul>
 <li><b>DETECT</b>: Calls <code><a class="el" href="group__scope__input.html#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a></code> each frame until <code><a class="el" href="group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a" title="Check if Super Scope is connected.">scopeIsConnected()</a></code> returns true</li>
-<li><b>CALIBRATE</b>: Waits for a fire event, then calls <code><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e" title="Calibrate aim from a center-screen shot.">scopeCalibrate()</a></code> to set the aim offset</li>
+<li><b>CALIBRATE</b>: Waits for a fire event, then calls <code><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate()</a></code> to set the aim offset</li>
 <li><b>READY</b>: Reads <code><a class="el" href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c" title="Get calibration-adjusted H position.">scopeGetX()</a></code>/<code><a class="el" href="group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1" title="Get calibration-adjusted V position.">scopeGetY()</a></code> on fire events and moves the red dot</li>
 </ul>
 <p>The <code>fire_armed</code> flag prevents the calibration fire from immediately re-triggering in the next state (debouncing).</p>
