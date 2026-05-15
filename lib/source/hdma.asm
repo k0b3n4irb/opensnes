@@ -70,93 +70,24 @@ hdmaSetup:
     .ACCU 16
     .INDEX 16
 
-    ; Stack layout after PHP (1 byte) + JSL return (3 bytes):
-    ;   1,s = P
-    ;   2-4,s = return address
-    ;   5-6,s = table (rightmost arg, pushed first)
-    ;   7-8,s = destReg (8-bit in 16-bit slot)
-    ;   9-10,s = mode (8-bit in 16-bit slot)
-    ;   11-12,s = channel (leftmost arg, pushed last)
+    ; A6+A7 chantier — post-A6 layout: cproc passes 4-byte pointers.
+    ; Stack after PHP (1 byte) + JSL return (3 bytes):
+    ;   1,s     = P
+    ;   2-4,s   = return address
+    ;   5-6,s   = table low 16 (rightmost arg, pushed last)
+    ;   7,s     = table bank byte
+    ;   8,s     = pad
+    ;   9-10,s  = destReg (u8 in 16-bit slot)
+    ;   11-12,s = mode (u8 in 16-bit slot)
+    ;   13-14,s = channel (leftmost arg, pushed first)
 
     ; Calculate DMA register base address for this channel
     ; Channel registers are at $4300 + (channel * $10)
     sep #$20
     .ACCU 8
-    lda 11,s                ; channel (8-bit)
-    cmp #8
-    bcs @done               ; Invalid channel, bail out
-
-    rep #$20
-    .ACCU 16
-    and #$00FF              ; Mask to 8-bit
-    asl a
-    asl a
-    asl a
-    asl a                   ; channel * 16
-    clc
-    adc #$4300              ; Base address
-    tax                     ; X = register base ($43x0)
-
-    ; Set HDMA mode (DMAPx at $43x0)
-    sep #$20
-    .ACCU 8
-    lda 9,s                 ; mode (8-bit)
-    sta.l $0000,x           ; $43x0 = DMAP
-
-    ; Set destination register (BBADx at $43x1)
-    lda 7,s                 ; destReg (8-bit)
-    sta.l $0001,x           ; $43x1 = BBAD
-
-    ; Set table address (A1Tx at $43x2-$43x4)
-    rep #$20
-    .ACCU 16
-    lda 5,s                 ; table address (16-bit)
-    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
-
-    ; For bank: if address >= $8000, it's ROM in bank 0 (LoROM)
-    ; For addresses < $8000, assume bank $7E (RAM)
-    sep #$20
-    .ACCU 8
-    lda 6,s                 ; High byte of table address
-    cmp #$80
-    bcc @use_ram_bank
-    ; ROM address ($8000+) - use bank 0
-    lda #$00
-    bra @set_bank
-@use_ram_bank:
-    ; RAM address (< $8000) - use bank $7E (WRAM)
-    lda #$7E
-@set_bank:
-    sta.l $0004,x           ; $43x4 = A1B (bank)
-
-@done:
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
-; void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank)
-;
-; Same as hdmaSetup but with explicit bank byte for HDMA tables in banks > $00.
-;
-; Stack layout (after PHP):
-;   5-6,s = bank (rightmost, u8 in 16-bit slot)
-;   7-8,s = table (16-bit pointer)
-;   9-10,s = destReg (u8 in 16-bit slot)
-;   11-12,s = mode (u8 in 16-bit slot)
-;   13-14,s = channel (leftmost, u8 in 16-bit slot)
-;------------------------------------------------------------------------------
-hdmaSetupBank:
-    php
-    rep #$30                ; 16-bit A and X/Y
-    .ACCU 16
-    .INDEX 16
-
-    ; Calculate DMA register base address for this channel
-    sep #$20
-    .ACCU 8
     lda 13,s                ; channel (8-bit)
     cmp #8
-    bcs @hdmaSetupBank_done ; Invalid channel, bail out
+    bcs @done               ; Invalid channel, bail out
 
     rep #$20
     .ACCU 16
@@ -179,10 +110,82 @@ hdmaSetupBank:
     lda 9,s                 ; destReg (8-bit)
     sta.l $0001,x           ; $43x1 = BBAD
 
+    ; Set table address (A1Tx at $43x2-$43x4)
+    rep #$20
+    .ACCU 16
+    lda 5,s                 ; table low 16
+    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+
+    ; Bank byte now lives directly in the 4-byte pointer at offset 7,s
+    ; (post-A6). No heuristic needed.
+    sep #$20
+    .ACCU 8
+    lda 7,s                 ; table bank byte
+    sta.l $0004,x           ; $43x4 = A1B (bank)
+
+@done:
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank)
+;
+; Same as hdmaSetup but with explicit bank byte for HDMA tables in banks > $00.
+; (The `bank` arg overrides what the 4-byte pointer's bank half would give.)
+;
+; A6+A7 chantier — post-A6 layout: cproc passes 4-byte pointers, so the
+; table arg occupies 4 bytes on stack (low word + bank word). All later
+; args (destReg, mode, channel) shift +2 vs the pre-A6 layout.
+;
+; Stack layout (after PHP):
+;   1,s     = P (saved status)
+;   2-4,s   = return address (3 bytes from JSL)
+;   5-6,s   = bank (rightmost, u8 in 16-bit slot — last pushed)
+;   7-8,s   = table low 16
+;   9-10,s  = table bank word (caller's `pea.w :sym` push, ignored here —
+;             the explicit `bank` arg at 5,s overrides)
+;   11-12,s = destReg (u8 in 16-bit slot)
+;   13-14,s = mode (u8 in 16-bit slot)
+;   15-16,s = channel (leftmost, u8 in 16-bit slot)
+;------------------------------------------------------------------------------
+hdmaSetupBank:
+    php
+    rep #$30                ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
+
+    ; Calculate DMA register base address for this channel
+    sep #$20
+    .ACCU 8
+    lda 15,s                ; channel (8-bit)
+    cmp #8
+    bcs @hdmaSetupBank_done ; Invalid channel, bail out
+
+    rep #$20
+    .ACCU 16
+    and #$00FF              ; Mask to 8-bit
+    asl a
+    asl a
+    asl a
+    asl a                   ; channel * 16
+    clc
+    adc #$4300              ; Base address
+    tax                     ; X = register base ($43x0)
+
+    ; Set HDMA mode (DMAPx at $43x0)
+    sep #$20
+    .ACCU 8
+    lda 13,s                ; mode (8-bit)
+    sta.l $0000,x           ; $43x0 = DMAP
+
+    ; Set destination register (BBADx at $43x1)
+    lda 11,s                ; destReg (8-bit)
+    sta.l $0001,x           ; $43x1 = BBAD
+
     ; Set table address (A1Tx at $43x2-$43x3)
     rep #$20
     .ACCU 16
-    lda 7,s                 ; table address (16-bit)
+    lda 7,s                 ; table low 16
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
 
     ; Set bank from explicit parameter
@@ -274,9 +277,15 @@ hdmaGetEnabled:
 ;
 ; Updates the table pointer for an HDMA channel.
 ;
+; A6+A7 chantier — post-A6 layout: 4-byte pointer, so `channel` shifts +2.
+;
 ; Stack layout (after PHP):
-;   5-6,s = table (rightmost, 16-bit)
-;   7-8,s = channel (leftmost, 8-bit in 16-bit slot)
+;   1,s     = P (saved status)
+;   2-4,s   = return address
+;   5-6,s   = table low 16 (rightmost, last pushed)
+;   7,s     = table bank byte (caller's `pea.w :sym` push)
+;   8,s     = pad
+;   9-10,s  = channel (leftmost, u8 in 16-bit slot)
 ;------------------------------------------------------------------------------
 hdmaSetTable:
     php
@@ -287,7 +296,7 @@ hdmaSetTable:
     ; Calculate register base
     sep #$20
     .ACCU 8
-    lda 7,s                 ; channel
+    lda 9,s                 ; channel
     cmp #8
     bcs @done
 
@@ -303,20 +312,13 @@ hdmaSetTable:
     tax
 
     ; Set table address
-    lda 5,s                 ; table address
+    lda 5,s                 ; table low 16
     sta.l $0002,x
 
-    ; Set bank (same logic as hdmaSetup)
+    ; Bank byte now lives directly in the 4-byte pointer at offset 7,s (post-A6).
     sep #$20
     .ACCU 8
-    lda 6,s                 ; High byte of address
-    cmp #$80
-    bcc @use_ram
-    lda #$00
-    bra @set
-@use_ram:
-    lda #$7E
-@set:
+    lda 7,s                 ; table bank byte
     sta.l $0004,x
 
 @done:

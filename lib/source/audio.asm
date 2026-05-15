@@ -2,6 +2,15 @@
 ; OpenSNES Audio Library - Multi-Voice Implementation
 ;==============================================================================
 ;
+; lint-asm-abi: skip-file pvsneslib-legacy-cc
+;
+; The functions in this file use the PVSnesLib calling convention
+; (right-to-left push, 1-byte-per-u8 packed args) — incompatible with
+; cc65816's left-to-right + 2-byte-slot ABI. Multi-arg functions called
+; from C operate on garbage. See `lib/include/snes/audio.h` @warning
+; block and `.claude/notes/tech/audio_legacy_pvsneslib_abi.md` for the
+; full analysis and resolution paths.
+;
 ; A comprehensive audio system featuring:
 ;   - 8 simultaneous voices with independent volume/pan/pitch
 ;   - Dynamic BRR sample loading (up to 64 samples)
