@@ -10,6 +10,13 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
+<!-- jquery.js, dynsections.js, clipboard.js are sourced by the default
+     doxygen 1.13 header, but a custom HTML_HEADER drops them silently.
+     Without jQuery the inline $(function(){initNavTree(...)}) call fails
+     and the sidebar / TOC never render. Source them explicitly. -->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
 <script type="text/javascript" src="navtreedata.js"></script>
@@ -21,6 +28,13 @@
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<!-- doxygen-awesome-css companion scripts. HTML_EXTRA_FILES copies these to
+     the output directory but does NOT auto-source them; without the <script>
+     tags below, the inline init() calls throw ReferenceError and stop all
+     subsequent JS (incl. navtree/TOC rendering). -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt MIT */
 DoxygenAwesomeDarkModeToggle.init()
@@ -277,6 +291,10 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>OpenSNES Audio System. </p>
+<dl class="section warning"><dt>Warning</dt><dd><b>LEGACY API — NOT cc65816-compatible.</b> The ASM implementation in <code>lib/source/audio.asm</code> uses PVSnesLib's calling convention (right-to-left push, 1-byte-per-u8 packed args, 24-bit pointers). cc65816 emits left-to-right, 2-byte-slot args, post-A6 4-byte pointers — the opposite of each choice. Multi-arg and pointer-taking functions called from C read their arguments from the wrong stack slots and operate on garbage.</dd></dl>
+<p><b>What actually works from C today</b>: zero-arg functions (<code>audioInit</code>, <code>audioUpdate</code>, <code>audioStopAll</code>, <code>audioIsReady</code>, <code>audioGetVolume</code>, <code>audioGetFreeMemory</code>, <code>audioDisableEcho</code>) and single-u8-arg functions (<code>audioSetVolume</code>, <code>audioStopVoice</code>, <code>audioPlaySample</code>, <code>audioUnloadSample</code>, <code>audioEnableEcho</code>, <code>audioSetGain</code>). The single-arg case works by coincidence (cc65816's slot 5..6 aligns with the legacy 6,s read).</p>
+<p><b>What is broken from C</b>: multi-arg functions (<code>audioPlaySampleEx</code>, <code>audioSetVoiceVolume</code>, <code>audioSetVoicePitch</code>, <code>audioSetADSR</code>, <code>audioSetEcho</code>), pointer-taking functions (<code>audioLoadSample</code>, <code>audioGetSampleInfo</code>, <code>audioGetVoiceState</code>, <code>audioSetEchoFilter</code>), and any function returning a struct.</p>
+<p><b>What to use instead</b>: SNESMOD (<code>examples/audio/snesmod_*</code>, lib <code>LIB_MODULES += snesmod</code>). SNESMOD has been validated end-to-end on cc65816 and is the supported audio path. The detailed analysis lives in <code>.claude/notes/tech/audio_legacy_pvsneslib_abi.md</code>.</p>
 <p>Comprehensive audio API featuring:</p><ul>
 <li>8 simultaneous voices with independent volume/pan/pitch</li>
 <li>Dynamic BRR sample loading (up to 64 samples)</li>
@@ -284,8 +302,12 @@ Functions</h2></td></tr>
 <li>Per-voice ADSR envelope control</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md11"></a>
-Quick Start</h2>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
+Quick Start (legacy — read the warning above before using)</h2>
+<div class="fragment"><div class="line"><span class="comment">// NOTE: audioLoadSample is a multi-arg + pointer function and currently</span></div>
+<div class="line"><span class="comment">//       does NOT pass its args correctly under cc65816. Treat the snippet</span></div>
+<div class="line"><span class="comment">//       below as historical PVSnesLib usage, not a working OpenSNES</span></div>
+<div class="line"><span class="comment">//       pattern. Prefer SNESMOD for new code.</span></div>
+<div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> beep_brr[];</div>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> beep_brr_end[];</div>

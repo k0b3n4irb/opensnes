@@ -10,6 +10,13 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
+<!-- jquery.js, dynsections.js, clipboard.js are sourced by the default
+     doxygen 1.13 header, but a custom HTML_HEADER drops them silently.
+     Without jQuery the inline $(function(){initNavTree(...)}) call fails
+     and the sidebar / TOC never render. Source them explicitly. -->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
 <script type="text/javascript" src="navtreedata.js"></script>
@@ -21,6 +28,13 @@
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<!-- doxygen-awesome-css companion scripts. HTML_EXTRA_FILES copies these to
+     the output directory but does NOT auto-source them; without the <script>
+     tags below, the inline init() calls throw ReferenceError and stop all
+     subsequent JS (incl. navtree/TOC rendering). -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt MIT */
 DoxygenAwesomeDarkModeToggle.init()
@@ -271,15 +285,15 @@ Files</h2></td></tr>
 <p>All 41 OpenSNES example programs with annotated source code. </p>
 <p>Each example demonstrates specific SNES hardware concepts. The source files include <code>@par SNES Concepts</code> (what hardware features are used), <code>@par What to Observe</code> (what to look for in the emulator), and <code>@par Modules Used</code> (which library modules to link).</p>
 <p>Browse by category: <a class="el" href="examples_by_category.html">Browse Examples by Category</a></p>
-<h2><a class="anchor" id="autotoc_md1540"></a>
+<h2><a class="anchor" id="autotoc_md1527"></a>
 By Topic</h2>
-<h3><a class="anchor" id="autotoc_md1541"></a>
+<h3><a class="anchor" id="autotoc_md1528"></a>
 Getting Started</h3>
 <ul>
 <li><a class="el" href="text_2hello__world_2main_8c.html">Hello World</a> — Hand-coded font, Mode 0, direct VRAM writes</li>
 <li><a class="el" href="text_2text__test_2main_8c.html">Text Module</a> — textInit/textPrintAt/textFlush workflow</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1542"></a>
+<h3><a class="anchor" id="autotoc_md1529"></a>
 Backgrounds</h3>
 <ul>
 <li><a class="el" href="graphics_2backgrounds_2mode0_2main_8c.html">Mode 0</a> — Four 2bpp layers with parallax</li>
@@ -292,7 +306,7 @@ Backgrounds</h3>
 <li><a class="el" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html">Continuous Scroll</a> — Streaming tile columns</li>
 <li><a class="el" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html">Mixed Scroll</a> — Dual-layer compositing</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1543"></a>
+<h3><a class="anchor" id="autotoc_md1530"></a>
 Sprites</h3>
 <ul>
 <li><a class="el" href="graphics_2sprites_2simple__sprite_2main_8c.html">Simple Sprite</a> — OAM basics</li>
@@ -301,7 +315,7 @@ Sprites</h3>
 <li><a class="el" href="graphics_2sprites_2metasprite_2main_8c.html">Metasprite</a> — Multi-tile composite sprites</li>
 <li><a class="el" href="graphics_2sprites_2object__size_2main_8c.html">Object Size</a> — OBJSEL size modes</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1544"></a>
+<h3><a class="anchor" id="autotoc_md1531"></a>
 Effects</h3>
 <ul>
 <li><a class="el" href="graphics_2effects_2fading_2main_8c.html">Fading</a> — INIDISP brightness transitions</li>
@@ -315,32 +329,32 @@ Effects</h3>
 <li><a class="el" href="graphics_2effects_2hdma__helpers_2main_8c.html">HDMA Helpers</a> — Library helper effects</li>
 <li><a class="el" href="graphics_2effects_2parallax__scrolling_2main_8c.html">Parallax</a> — HDMA scroll offsets</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1545"></a>
+<h3><a class="anchor" id="autotoc_md1532"></a>
 Input</h3>
 <ul>
 <li><a class="el" href="input_2mouse_2main_8c.html">Mouse</a> — SNES Mouse peripheral</li>
 <li><a class="el" href="input_2superscope_2main_8c.html">Super Scope</a> — Light gun detection and calibration</li>
 <li><a class="el" href="input_2two__players_2main_8c.html">Two Players</a> — Simultaneous controller input</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1546"></a>
+<h3><a class="anchor" id="autotoc_md1533"></a>
 Audio</h3>
 <ul>
 <li><a class="el" href="audio_2snesmod__music_2main_8c.html">Music</a> — Tracker playback via SPC700</li>
 <li><a class="el" href="audio_2snesmod__sfx_2main_8c.html">Sound Effects</a> — Standalone SFX with pitch control</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1547"></a>
+<h3><a class="anchor" id="autotoc_md1534"></a>
 Maps</h3>
 <ul>
 <li><a class="el" href="maps_2dynamic__map_2main_8c.html">Dynamic Map</a> — Extended WRAM tilemaps</li>
 <li><a class="el" href="maps_2slopemario_2main_8c.html">Slope Mario</a> — Slope collision with map engine</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1548"></a>
+<h3><a class="anchor" id="autotoc_md1535"></a>
 Memory</h3>
 <ul>
 <li><a class="el" href="memory_2hirom__demo_2main_8c.html">HiROM</a> — 64KB bank memory mapping</li>
 <li><a class="el" href="memory_2save__game_2main_8c.html">Save Game</a> — SRAM battery-backed save slots</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1549"></a>
+<h3><a class="anchor" id="autotoc_md1536"></a>
 Games</h3>
 <ul>
 <li><a class="el" href="games_2breakout_2main_8c.html">Breakout</a> — Complete game with collision and palette cycling</li>
@@ -348,7 +362,7 @@ Games</h3>
 <li><a class="el" href="games_2mapandobjects_2main_8c.html">Map &amp; Objects</a> — Map engine with enemy AI</li>
 <li><a class="el" href="games_2tetris_2main_8c.html">Tetris</a> — State machine, DAS input, HDMA effects</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1550"></a>
+<h3><a class="anchor" id="autotoc_md1537"></a>
 Basics</h3>
 <ul>
 <li><a class="el" href="basics_2collision__demo_2main_8c.html">Collision Demo</a> — AABB and tile collision </li>

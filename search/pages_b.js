@@ -1,14 +1,14 @@
 var searchData=
 [
   ['demo_0',['demo',['../examples_basics_collision_demo.html',1,'Collision Detection Demo'],['../examples_graphics_effects_hdma_helpers.html',1,'HDMA Helpers Demo']]],
-  ['demo_20understanding_20snes_20memory_20mapping_1',['HiROM Demo -- Understanding SNES Memory Mapping',['../examples_memory_hirom_demo.html',1,'examples_by_category']]],
-  ['detection_20demo_2',['Collision Detection Demo',['../examples_basics_collision_demo.html',1,'examples_by_category']]],
+  ['demo_20understanding_20snes_20memory_20mapping_1',['HiROM Demo -- Understanding SNES Memory Mapping',['../examples_memory_hirom_demo.html',1,'examples_memory']]],
+  ['detection_20demo_2',['Collision Detection Demo',['../examples_basics_collision_demo.html',1,'examples_basics']]],
   ['detection_20tutorial_3',['Collision Detection Tutorial',['../tutorial_collision.html',1,'index']]],
   ['development_4',['Learn SNES Development',['../learning_path.html',1,'index']]],
-  ['direction_20states_20and_20sprite_20sheets_5',['Animated Sprite -- Direction States and Sprite Sheets',['../examples_graphics_sprites_animated_sprite.html',1,'examples_by_category']]],
-  ['dma_20tutorial_6',['DMA Tutorial',['../tutorial_dma.html',1,'']]],
+  ['direction_20states_20and_20sprite_20sheets_5',['Animated Sprite -- Direction States and Sprite Sheets',['../examples_graphics_sprites_animated_sprite.html',1,'examples_graphics_sprites']]],
+  ['dma_20tutorial_6',['DMA Tutorial',['../tutorial_dma.html',1,'index']]],
   ['documentation_7',['OpenSNES Documentation',['../index.html',1,'']]],
-  ['dynamic_20map_8',['Dynamic Map',['../examples_maps_dynamic_map.html',1,'examples_by_category']]],
-  ['dynamic_20metasprite_20engine_9',['Dynamic Metasprite Engine',['../examples_graphics_sprites_dynamic_metasprite.html',1,'']]],
-  ['dynamic_20sprite_20vram_20streaming_20for_20animated_20sprites_10',['Dynamic Sprite -- VRAM Streaming for Animated Sprites',['../examples_graphics_sprites_dynamic_sprite.html',1,'examples_by_category']]]
+  ['dynamic_20map_8',['Dynamic Map',['../examples_maps_dynamic_map.html',1,'examples_maps']]],
+  ['dynamic_20metasprite_20engine_9',['Dynamic Metasprite Engine',['../examples_graphics_sprites_dynamic_metasprite.html',1,'examples_graphics_sprites']]],
+  ['dynamic_20sprite_20vram_20streaming_20for_20animated_20sprites_10',['Dynamic Sprite -- VRAM Streaming for Animated Sprites',['../examples_graphics_sprites_dynamic_sprite.html',1,'examples_graphics_sprites']]]
 ];

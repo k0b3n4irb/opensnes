@@ -10,6 +10,13 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
+<!-- jquery.js, dynsections.js, clipboard.js are sourced by the default
+     doxygen 1.13 header, but a custom HTML_HEADER drops them silently.
+     Without jQuery the inline $(function(){initNavTree(...)}) call fails
+     and the sidebar / TOC never render. Source them explicitly. -->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
 <script type="text/javascript" src="navtreedata.js"></script>
@@ -21,6 +28,13 @@
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<!-- doxygen-awesome-css companion scripts. HTML_EXTRA_FILES copies these to
+     the output directory but does NOT auto-source them; without the <script>
+     tags below, the inline init() calls throw ReferenceError and stop all
+     subsequent JS (incl. navtree/TOC rendering). -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt MIT */
 DoxygenAwesomeDarkModeToggle.init()
@@ -148,8 +162,10 @@ Graphics: Sprites</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_graphics_sprites_dynamic_sprite.html">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a>   </td><td class="markdownTableBodyNone">VRAM streaming, dynamic tile uploads    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_graphics_sprites_object_size.html">Object Size -- All 6 SNES Sprite Size Modes</a>   </td><td class="markdownTableBodyNone">OBJSEL size configurations (8x8 to 64x64)    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_graphics_sprites_dynamic_metasprite.html">Dynamic Metasprite Engine</a>   </td><td class="markdownTableBodyNone">Dynamic metasprite engine with batched OAM updates    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_graphics_sprites_object_size.html">Object Size -- All 6 SNES Sprite Size Modes</a>   </td><td class="markdownTableBodyNone">OBJSEL size configurations (8x8 to 64x64)    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_graphics_sprites_metasprite.html">Metasprite</a>   </td><td class="markdownTableBodyNone">Multi-tile composite sprites   </td></tr>
 </table>
 <hr  />
@@ -188,10 +204,12 @@ Input</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_input_two_players.html">Two Players Example</a>   </td><td class="markdownTableBodyNone">Joypad reading, two-player movement    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_input_controller.html">Controller Input</a>   </td><td class="markdownTableBodyNone">Standard joypad: button state, edge detection    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_input_mouse.html">SNES Mouse</a>   </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_input_two_players.html">Two Players Example</a>   </td><td class="markdownTableBodyNone">Joypad reading, two-player movement    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_input_mouse.html">SNES Mouse</a>   </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_input_superscope.html">Super Scope</a>   </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters   </td></tr>
 </table>
 <hr  />
@@ -202,7 +220,11 @@ Audio</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music.html">SNESMOD Music Example</a>   </td><td class="markdownTableBodyNone">SPC700 music playback, transport controls    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music.html">SNESMOD Music Example</a>   </td><td class="markdownTableBodyNone">SPC700 music playback, transport controls (LoROM)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music_hirom.html">SNESMOD HiROM Music</a>   </td><td class="markdownTableBodyNone">Same workflow as snesmod_music but built for HiROM    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_music_large.html">SNESMOD Large Soundbank Music</a>   </td><td class="markdownTableBodyNone">Large soundbank: multi-bank module split    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_snesmod_sfx.html">SNESMOD Sound Effects</a>   </td><td class="markdownTableBodyNone">Sound effects alongside music   </td></tr>
 </table>
@@ -216,7 +238,11 @@ Maps</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_maps_dynamic_map.html">Dynamic Map</a>   </td><td class="markdownTableBodyNone">Dynamic tile map streaming    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="examples_maps_slopemario.html">Slope Mario</a>   </td><td class="markdownTableBodyNone">Slopes and tile-based collision   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_maps_mapscroll.html">Map Scroll</a>   </td><td class="markdownTableBodyNone">Smooth tile-aligned scrolling with viewport tracking    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_maps_slopemario.html">Slope Mario</a>   </td><td class="markdownTableBodyNone">Slopes and tile-based collision    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_maps_tiled.html">Tiled Map Editor Integration</a>   </td><td class="markdownTableBodyNone">Tiled Map Editor (.tmx) integration   </td></tr>
 </table>
 <hr  />
 <h2><a class="anchor" id="autotoc_md438"></a>
@@ -238,7 +264,15 @@ Basics</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="examples_basics_collision_demo.html">Collision Detection Demo</a>   </td><td class="markdownTableBodyNone">Bounding-box sprite collision detection   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_aim_target.html">aim_target</a>   </td><td class="markdownTableBodyNone">Aim a cursor at moving targets — sprites + input    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_collision_demo.html">Collision Detection Demo</a>   </td><td class="markdownTableBodyNone">Bounding-box sprite collision detection    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_random.html">Random Numbers</a>   </td><td class="markdownTableBodyNone">LCG pseudo-random number generation    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_scene_stack.html">Scene Stack</a>   </td><td class="markdownTableBodyNone"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> stack: title → game → pause workflow    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_basics_timer.html">VBlank Timer</a>   </td><td class="markdownTableBodyNone">Frame-accurate timers with VBlank counters   </td></tr>
 </table>
 <hr  />
 <h2><a class="anchor" id="autotoc_md442"></a>
@@ -267,9 +301,9 @@ SA-1 Coprocessor</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">examples_enhancement_sa1_hello</a>   </td><td class="markdownTableBodyNone">Boot diagnostic: SA-1 init, I-RAM handshake, register verification    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_memory_sa1_hello.html">SA-1 Hello World</a>   </td><td class="markdownTableBodyNone">Boot diagnostic: SA-1 init, I-RAM handshake, register verification    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">examples_enhancement_sa1_starfield</a>   </td><td class="markdownTableBodyNone">128-dot Lissajous murmuration driven by SA-1 math   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_memory_sa1_starfield.html">SA-1 Starfield (Murmuration)</a>   </td><td class="markdownTableBodyNone">128-dot Lissajous murmuration driven by SA-1 math   </td></tr>
 </table>
 <h3><a class="anchor" id="autotoc_md446"></a>
 SuperFX (GSU)</h3>
@@ -278,9 +312,9 @@ SuperFX (GSU)</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example   </th><th class="markdownTableHeadNone">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">examples_enhancement_superfx_hello</a>   </td><td class="markdownTableBodyNone">Boot + SRAM + FMULT hardware tests    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_memory_superfx_hello.html">SuperFX Hello</a>   </td><td class="markdownTableBodyNone">Boot + SRAM + FMULT hardware tests    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">examples_enhancement_superfx_3d</a>   </td><td class="markdownTableBodyNone">Rotating wireframe cube (Star Fox style 3D)   </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="examples_graphics_effects_superfx_3d.html">SuperFX 3D Cube</a>   </td><td class="markdownTableBodyNone">Rotating wireframe cube (Star Fox style 3D)   </td></tr>
 </table>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

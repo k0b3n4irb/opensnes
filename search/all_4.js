@@ -1,7 +1,7 @@
 var searchData=
 [
   ['3_0',['Attribute Byte (Byte 3)',['../oam.html#autotoc_md607',1,'']]],
-  ['3_20—_20256_20color_20background_1',['Mode 3 — 256-Color Background',['../examples_graphics_backgrounds_mode3.html',1,'examples_by_category']]],
+  ['3_20—_20256_20color_20background_1',['Mode 3 — 256-Color Background',['../examples_graphics_backgrounds_mode3.html',1,'examples_graphics_backgrounds']]],
   ['3_202reg_5f2x_2',['HDMA Mode 3 (2REG_2X)',['../examples_graphics_effects_gradient_colors.html#autotoc_md1081',1,'']]],
   ['3_20and_208bpp_20tiles_3',['Mode 3 and 8bpp Tiles',['../examples_maps_dynamic_map.html#autotoc_md1376',1,'']]],
   ['3_20animation_20timing_4',['3. Animation timing',['../examples_graphics_sprites_animated_sprite.html#autotoc_md1217',1,'']]],
@@ -15,7 +15,7 @@ var searchData=
   ['3_20enable_20display_12',['3. Enable Display',['../examples_graphics_backgrounds_mode1.html#autotoc_md941',1,'']]],
   ['3_20enable_20mode_201_20with_20bg1_20bg2_13',['3. Enable Mode 1 with BG1 + BG2',['../examples_graphics_backgrounds_mixed_scroll.html#autotoc_md920',1,'']]],
   ['3_20initialize_20from_20c_14',['3. Initialize from C',['../tutorial_sa1.html#autotoc_md288',1,'']]],
-  ['3_20initialize_20text_20and_20load_20font_15',['3. Initialize Text and Load Font',['../examples_text_text_test.html#autotoc_md1535',1,'']]],
+  ['3_20initialize_20text_20and_20load_20font_15',['3. Initialize Text and Load Font',['../examples_text_text_test.html#autotoc_md1522',1,'']]],
   ['3_20load_20from_20sram_16',['3. Load from SRAM',['../examples_memory_save_game.html#autotoc_md1456',1,'']]],
   ['3_20load_20objects_20from_20map_20data_17',['3. Load Objects from Map Data',['../examples_games_mapandobjects.html#autotoc_md876',1,'']]],
   ['3_20load_20palette_20and_20tilemap_20uncompressed_18',['3. Load Palette and Tilemap (Uncompressed)',['../examples_graphics_backgrounds_mode1_lz77.html#autotoc_md987',1,'']]],
@@ -25,7 +25,7 @@ var searchData=
   ['3_20scroll_20updates_20via_20bgsetscroll_20dirty_20flags_22',['3. Scroll Updates via bgSetScroll Dirty Flags',['../examples_graphics_backgrounds_continuous_scroll.html#autotoc_md895',1,'']]],
   ['3_20scrolling_23',['3. Scrolling',['../examples_graphics_backgrounds_mode7_perspective.html#autotoc_md1024',1,'']]],
   ['3_20set_20up_20oam_20directly_24',['3. Set Up OAM Directly',['../examples_input_mouse.html#autotoc_md1307',1,'']]],
-  ['3_20setting_20up_20the_20ppu_25',['3. Setting Up the PPU',['../examples_text_hello_world.html#autotoc_md1502',1,'']]],
+  ['3_20setting_20up_20the_20ppu_25',['3. Setting Up the PPU',['../examples_text_hello_world.html#autotoc_md1489',1,'']]],
   ['3_20seven_20amplitude_20levels_26',['3. Seven Amplitude Levels',['../examples_graphics_effects_hdma_wave.html#autotoc_md1105',1,'']]],
   ['3_20streaming_3a_20the_20column_20pipeline_27',['3. Streaming: The Column Pipeline',['../examples_games_likemario.html#autotoc_md848',1,'']]],
   ['3_20toggle_20at_20runtime_28',['3. Toggle at runtime',['../examples_graphics_effects_gradient_colors.html#autotoc_md1078',1,'']]],
@@ -37,6 +37,6 @@ var searchData=
   ['3_3a_20scrolling_20and_20effects_34',['Level 3: Scrolling and Effects',['../learning_path.html#autotoc_md417',1,'']]],
   ['3_3a_20tile_20flip_35',['Exercise 3: Tile Flip',['../examples_graphics_backgrounds_mode1.html#autotoc_md955',1,'']]],
   ['3d_36',['SuperFX / GSU (custom RISC, bitmap + 3D)',['../learning_path.html#autotoc_md422',1,'']]],
-  ['3d_20cube_37',['SuperFX 3D Cube',['../examples_graphics_effects_superfx_3d.html',1,'']]],
-  ['3d_20ground_20effect_38',['Mode 7 Perspective -- Pseudo-3D Ground Effect',['../examples_graphics_backgrounds_mode7_perspective.html',1,'examples_by_category']]]
+  ['3d_20cube_37',['SuperFX 3D Cube',['../examples_graphics_effects_superfx_3d.html',1,'examples_graphics_effects']]],
+  ['3d_20ground_20effect_38',['Mode 7 Perspective -- Pseudo-3D Ground Effect',['../examples_graphics_backgrounds_mode7_perspective.html',1,'examples_graphics_backgrounds']]]
 ];
