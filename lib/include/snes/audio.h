@@ -38,7 +38,7 @@
  * - Echo/reverb effects with configurable FIR filter
  * - Per-voice ADSR envelope control
  *
- * ## Quick Start (legacy — see @warning above before using)
+ * ## Quick Start (legacy — read the warning above before using)
  *
  * @code
  * // NOTE: audioLoadSample is a multi-arg + pointer function and currently

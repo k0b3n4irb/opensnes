@@ -37,6 +37,22 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_game_states -- Game States & Transitions
 
+@subpage tutorial_dma -- DMA (direct memory access)
+
+@subpage tutorial_hdma -- HDMA (per-scanline effects)
+
+@subpage tutorial_mode7 -- Mode 7 Rotation and Scaling
+
+@subpage tutorial_colormath -- Colour Math (transparency, blending)
+
+@subpage tutorial_mosaic -- Mosaic pixelation effect
+
+@subpage tutorial_window -- Window Masking
+
+@subpage tutorial_math -- Fixed-Point Math
+
+@subpage tutorial_sram -- SRAM Battery-Backed Saves
+
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
 @subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
@@ -53,7 +69,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 ## Examples (Annotated Source Code)
 
-See the @ref example_sources "Example Source Code" page for all 54 examples organized by topic, with links to fully documented source files.
+@subpage examples -- All examples grouped by category (sources + READMEs)
+
+@subpage example_sources -- Example Source Code (annotated by topic)
 
 ## API Reference
 

@@ -48,7 +48,8 @@ RECURSIVE              = YES
 # Exclude patterns
 EXCLUDE_PATTERNS       = */doxygen-awesome-css/* \
                          */tech/* \
-                         */res/*
+                         */res/* \
+                         */README_TEMPLATE.md
 
 # Use markdown
 MARKDOWN_SUPPORT       = YES
