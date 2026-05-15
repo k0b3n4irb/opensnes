@@ -132,15 +132,16 @@ class CSig:
     header_path: Path
     line: int
 
-    def offsets(self, has_php: bool) -> dict[str, int]:
+    def offsets(self, has_php: bool, prologue_shift: int = 0) -> dict[str, int]:
         """Map each param name to its stack offset (from the callee's view).
 
         has_php controls the base: with PHP, args start at 5,s; without, 4,s.
+        prologue_shift adds the bytes pushed by phb/phx/phy on top of that.
         """
         # Args are pushed left-to-right; last pushed (rightmost) sits at base.
         # Walk RIGHT to LEFT, accumulating offsets.
         result: dict[str, int] = {}
-        off = 5 if has_php else 4
+        off = (5 if has_php else 4) + prologue_shift
         for p in reversed(self.params):
             if p.size <= 0:
                 return {}
@@ -170,6 +171,34 @@ def parse_params(s: str) -> list[CParam]:
     return out
 
 
+# File-level marker: when present in an ASM source's first 30 lines,
+# the entire file is skipped by the lint. Use this for legacy code that
+# uses a non-cc65816 calling convention (e.g. PVSnesLib R-to-L + 1-byte
+# packed u8). The detail is captured in a chantier note; the marker
+# turns lint passes back to green without papering over the issue.
+#
+#   ; lint-asm-abi: skip-file pvsneslib-legacy-cc
+#
+ASM_FILE_SKIP_RX = re.compile(
+    r";\s*lint-asm-abi:\s*skip-file\b",
+    re.IGNORECASE,
+)
+
+
+def file_is_skipped(asm_path: Path) -> bool:
+    """True if the file's first 30 lines carry the skip-file marker."""
+    try:
+        with asm_path.open() as f:
+            for i, line in enumerate(f):
+                if i >= 30:
+                    return False
+                if ASM_FILE_SKIP_RX.search(line):
+                    return True
+    except OSError:
+        return False
+    return False
+
+
 def load_signatures(include_dir: Path) -> dict[str, CSig]:
     """Walk include_dir for *.h, return name → CSig for every function decl."""
     sigs: dict[str, CSig] = {}
@@ -196,11 +225,18 @@ def load_signatures(include_dir: Path) -> dict[str, CSig]:
 
 # Match a function entry label at column 0, alphanumeric + underscore.
 ASM_LABEL_RX = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*):\s*$")
-# Functions that push extra registers (phb, phd, phx, phy) shift their arg
-# offsets by an amount that depends on processor mode at push time (8 vs
-# 16-bit X/Y). Detecting the exact shift is fragile; just skip these.
-# Standard cc65816 prologue is php (and only php) plus the JSL return.
-ASM_CUSTOM_CC_RX = re.compile(r"^\s*(phb|phd|phx|phy)\b", re.IGNORECASE)
+# Prologue pushes that shift the arg base by a known number of bytes:
+#   phb  → +1   (data bank reg, 1 byte)
+#   phd  → +2   (direct page reg, 2 bytes) — and a strong PVSnesLib-legacy marker
+#   phx  → +2   (assumed 16-bit X — the OpenSNES lib convention)
+#   phy  → +2   (assumed 16-bit Y)
+ASM_PROLOGUE_PUSH_RX = re.compile(r"^\s*(phb|phd|phx|phy)\b", re.IGNORECASE)
+PROLOGUE_PUSH_SHIFT = {"phb": 1, "phd": 2, "phx": 2, "phy": 2}
+# `phd` is the canonical marker for legacy PVSnesLib code: it indicates the
+# function saves the direct-page register and uses the old R-to-L 1-byte-packed
+# convention. Only audio.asm uses phd in the OpenSNES lib today. Functions
+# matching this stay skipped (the calling convention itself is non-cc65816).
+ASM_PVSNESLIB_MARKER_RX = re.compile(r"^\s*phd\b", re.IGNORECASE)
 # PHP push — shifts arg base from 4,s to 5,s.
 ASM_PHP_RX = re.compile(r"^\s*php\b", re.IGNORECASE)
 # Functions that allocate a local frame (`tsa; sec; sbc #N; tas` or similar)
@@ -233,19 +269,29 @@ class AsmRead:
 class AsmFunction:
     name: str
     reads: list[AsmRead]
-    # True if the prologue pushes phb/phd or otherwise uses a custom CC.
-    # Lint skips these — they aren't using the standard cc65816 stack layout.
-    custom_cc: bool
+    # True if the prologue pushes phd (PVSnesLib R-to-L marker).
+    # Lint skips these — the calling convention itself is non-cc65816.
+    pvsneslib_cc: bool
     # True if the function pushes PHP in its prologue. Affects the base offset
     # of arguments: with PHP, args start at 5,s; without, at 4,s.
     has_php: bool
+    # Bytes pushed in the prologue ON TOP of PHP+JSL return (i.e. phb/phx/phy).
+    # Added to the base offset before consulting param positions.
+    prologue_shift: int
+
+    # Backwards-compat alias: the lint historically used `custom_cc` to mean
+    # "skip this function entirely". Keep the same surface but route it
+    # through the new pvsneslib_cc field.
+    @property
+    def custom_cc(self) -> bool:
+        return self.pvsneslib_cc
 
 
 def parse_asm(asm_path: Path) -> list[AsmFunction]:
     """Walk asm_path, return parsed function info."""
     funcs: list[AsmFunction] = []
     current: AsmFunction | None = None
-    seen_label_recently = False  # tracks "we just hit a label, watching for phb/phd"
+    seen_label_recently = False  # tracks "we just hit a label, scanning prologue"
     with asm_path.open() as f:
         for lineno, line in enumerate(f, start=1):
             stripped = line.rstrip("\n")
@@ -255,8 +301,8 @@ def parse_asm(asm_path: Path) -> list[AsmFunction]:
                 if current is not None:
                     funcs.append(current)
                 current = AsmFunction(
-                    name=label_m.group(1), reads=[], custom_cc=False,
-                    has_php=False,
+                    name=label_m.group(1), reads=[], pvsneslib_cc=False,
+                    has_php=False, prologue_shift=0,
                 )
                 seen_label_recently = True
                 continue
@@ -265,12 +311,17 @@ def parse_asm(asm_path: Path) -> list[AsmFunction]:
                 continue
 
             # Detect prologue features in the first few instructions:
-            # - phb/phd → custom CC, skip the function
+            # - phd → PVSnesLib R-to-L marker, skip the function
+            # - phb/phx/phy → shift arg base by a known amount
             # - php → arg base shifts from 4,s to 5,s
             # Once we hit a stack-relative read, we're past the prologue.
             if seen_label_recently:
-                if ASM_CUSTOM_CC_RX.match(stripped):
-                    current.custom_cc = True
+                if ASM_PVSNESLIB_MARKER_RX.match(stripped):
+                    current.pvsneslib_cc = True
+                push_m = ASM_PROLOGUE_PUSH_RX.match(stripped)
+                if push_m:
+                    current.prologue_shift += PROLOGUE_PUSH_SHIFT[
+                        push_m.group(1).lower()]
                 if ASM_PHP_RX.match(stripped):
                     current.has_php = True
                 if ASM_STACK_RX.match(stripped):
@@ -342,14 +393,17 @@ def check(asm_files: list[Path], sigs: dict[str, CSig]) -> list[str]:
     """Return list of human-readable error messages (empty = all good)."""
     errors: list[str] = []
     for asm in asm_files:
+        if file_is_skipped(asm):
+            continue
         funcs = parse_asm(asm)
         for fn in funcs:
             sig = sigs.get(fn.name)
             if sig is None:
                 continue  # internal helper, no declared C signature
-            if fn.custom_cc:
-                continue  # phb/phd prologue → custom CC, skip
-            offsets = sig.offsets(has_php=fn.has_php)
+            if fn.pvsneslib_cc:
+                continue  # phd marker → PVSnesLib R-to-L CC, skip
+            offsets = sig.offsets(has_php=fn.has_php,
+                                  prologue_shift=fn.prologue_shift)
             if not offsets:
                 continue  # unparseable signature
 
