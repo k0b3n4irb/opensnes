@@ -5,7 +5,7 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
-## [Unreleased]
+## [0.19.0] — 2026-05-15
 
 Chantier A6+A7 — full 24-bit pointer ABI + Kl pair lowering. The QBE
 w65816 backend now treats pointers as 4 bytes (24-bit address +
@@ -15,6 +15,14 @@ release completes the ABI by closing the pointer-size cascade that
 A1 deliberately left for a dedicated chantier. Subsumes catalogue
 defects B1 / B2 / B3 / B4 (the bank-`$00`-strangled chip-ROM and
 mode-7 cases all stem from the 16-bit-pointer assumption in lib ASM).
+
+Beyond the chantier, this release ships a three-layer defensive
+infrastructure against the kind of retrofit miss that produced the
+post-merge `hdma_gradient` regression: a build-time ASM↔C-signature
+ABI lint, five runtime probes via mesen2-rpc, and documented
+opt-out conventions. The published documentation site nav was also
+broken (empty sidebar + TOC) — caused by missing jQuery/clipboard
+script tags in the custom Doxygen header; fixed here.
 
 ### Compiler
 
@@ -73,11 +81,131 @@ mode-7 cases all stem from the 16-bit-pointer assumption in lib ASM).
 ### Tooling / Infrastructure
 
 - **`compiler/PINS.md` bumped** to cproc `6bdd923` (11 patches, was 10),
-  qbe `179676e` (41 patches, was 36). The qbe count grew because the
+  qbe `7a7f77f` (42 patches, was 36). The qbe count grew because the
   v0.18.0 hardening (open_memstream removal, macOS arm64 SIGBUS fix,
   Windows MinGW `__has_include` guard, diagnostic crash handler) plus
-  the chantier A6+A7 atomic commit add 5 patches between the two pre-
-  and post-A6 SHAs.
+  the chantier A6+A7 atomic commit and the post-merge `leaf_opt` Kl
+  frameless fix add 6 patches between the two pre- and post-A6 SHAs.
+
+### Library
+
+- **`lib/source/hdma.asm` post-merge retrofit (commit `c5689f5`).**
+  `hdmaSetupBank` and `hdmaSetTable` were missed in the A6.12 lib
+  retrofit pass. Their stack-offset reads still assumed the legacy
+  2-byte pointer layout, which under the new 4-byte ABI sent
+  `hdma_gradient` into a frozen state (gradient never animated under
+  the **A** button input). Offsets shifted by +2 in `hdmaSetupBank`,
+  channel offset by +2 in `hdmaSetTable`, and the bank-byte read
+  switched to an explicit `lda 7,s` instead of the pre-A6 heuristic.
+  Diagnosed by visual diff on the live ROM in Mesen2 — caught after
+  the A6+A7 main merge, before users hit it.
+
+### Tooling / Infrastructure
+
+- **`devtools/check_asm_abi.py` — build-time ABI lint.** Parses C
+  signatures in `lib/include/snes/*.h`, computes expected `lda N,s`
+  offsets under the cc65816 L-to-R + post-A6 4-byte-pointer ABI, and
+  flags any `lda N,s ; commentNamingParam` whose offset disagrees.
+  Catches the same class of bug as the hdma_gradient regression
+  *before* it reaches Mesen2. Wired into `make lint-asm-abi` and
+  `make lint`. The lint is also prologue-aware: `phb` shifts the
+  arg base by +1, `phx`/`phy` by +2 (16-bit mode assumed), so
+  functions saving extra registers are still verified instead of
+  skipped. 68 functions covered today (up from 0 — they were
+  previously classified as "custom CC, skip"). The `phd` instruction
+  is the canonical marker for legacy PVSnesLib R-to-L conventions
+  and remains skipped; a file-level `; lint-asm-abi: skip-file`
+  marker covers the one file that uses the legacy ABI without
+  `phd` (audio.asm). Full policy in `.claude/rules/abi_lint.md`.
+
+- **`tools/opensnes-emu` — 5 functional probes via mesen2-rpc.**
+  Runtime behavioural assertions complementing the static lint. Each
+  probe loads a ROM in mesen2-rpc, runs N frames, and asserts on a
+  specific lib effect:
+  - `hdma.test.mjs` — DMA channel 6 DMAP/BBAD configured for HDMA
+    after `hdmaSetupBank` runs.
+  - `oam.test.mjs` — `simple_sprite` OAM entry at $7E:0300 has
+    X=112, Y=95 (96-1 for the SNES PPU Y+1 quirk), tile=$10.
+  - `dma.test.mjs` — `dmaCopyVram(font_tiles, 0, 144)` round-trips
+    bytes ROM→VRAM byte-for-byte.
+  - `cgram.test.mjs` — `dmaCopyCGram(bg_palette, 0, 4)` round-trips
+    ROM→CGRAM.
+  - `scroll.test.mjs` — `bgSetScroll(0, 0, 208)` writes the right
+    arg to `bg_scroll_y[0]`, exercises a 3-arg-mixed-width signature.
+
+  The probes share a `spawn-mesen.mjs` harness and run on TCP 9930
+  one at a time (`--test-concurrency=1`).
+
+- **`devtools/check_asm_abi.py` shift-aware extension.** Before this
+  release the lint skipped every function whose prologue saved extra
+  registers (`phb`, `phx`, `phy`, `phd`) by marking them `custom_cc`.
+  Most of those 65 skipped functions actually use the standard
+  cc65816 ABI — they just save the data bank or X/Y. The lint now
+  tracks prologue pushes, adds the cumulative shift to the arg base,
+  and verifies the offsets normally. `audio.asm` opts out via a
+  file-level marker because it uses the legacy PVSnesLib R-to-L
+  1-byte-packed convention. Coverage net: ~186 → ~254 functions
+  verified, 22 explicitly skipped (audio.asm whole file), 128
+  internal helpers with no public signature.
+
+### Documentation
+
+- **GitHub Pages nav + per-page TOC restored.** The published site
+  at `k0b3n4irb.github.io/opensnes` had an empty left sidebar and
+  empty TOC. Root cause: Doxygen 1.13's default header sources
+  `jquery.js`, `dynsections.js`, and `clipboard.js` automatically,
+  but the custom `docs/header.html` was dropping those tags
+  silently. The inline `$(function(){initNavTree(...)})` then hit
+  `$ is not defined`, JS halted, the sidebar container stayed empty.
+  Fixed by sourcing the three scripts explicitly. The doxygen-awesome
+  companion scripts (`darkmode-toggle.js`, `fragment-copy-button.js`,
+  `paragraph-link.js`) had the same problem and are also now sourced.
+  Validated end-to-end via jsdom probe: `#side-nav` content grew
+  from 207 chars (empty container) to 10 486 chars (58 anchor links).
+
+- **`docs/mainpage.md` — 8 missing tutorial `@subpage` refs added.**
+  `tutorial_colormath`, `tutorial_dma`, `tutorial_hdma`, `tutorial_math`,
+  `tutorial_mode7`, `tutorial_mosaic`, `tutorial_sram`, `tutorial_window`
+  existed on disk but never appeared under the "Tutorials" mainpage
+  section; they were flat top-level orphans in the nav. Now 18/18
+  tutorials nest correctly.
+
+- **`docs/EXAMPLES_BY_CATEGORY.md` and `docs/LEARNING_PATH.md` —
+  broken `examples_enhancement_*` refs fixed.** Four IDs
+  (`_sa1_hello`, `_sa1_starfield`, `_superfx_hello`, `_superfx_3d`)
+  pointed to pages that never existed; the actual targets are under
+  `examples_memory_*` and `examples_graphics_effects_*`. Eleven
+  example pages that existed on disk but were never referenced are
+  now `@subpage`'d: `aim_target`, `random`, `scene_stack`, `timer`,
+  `controller`, `mapscroll`, `tiled`, `snesmod_music_hirom`,
+  `snesmod_music_large`, `dynamic_metasprite`, plus the `superfx_3d`
+  rename.
+
+- **`docs/doxygen_md_filter.py` — auto-`@subpage` of child READMEs.**
+  When the filter processes a `README.md`, it now scans for sibling
+  sub-directories with their own `README.md` and injects `\subpage`
+  directives at the end of the rendered page. This means category
+  hubs (`examples_audio`, `examples_basics`, etc.) automatically
+  become parents of their child example pages in the nav tree
+  without manual edits per file. Top-level orphan count: 41 → 5
+  (Mainpage, Topics, Classes, Files, Todo — all legitimate Doxygen
+  built-ins).
+
+- **`docs/Doxyfile` — `*/README_TEMPLATE.md` excluded.** Was leaking
+  as a phantom `[Example Name]` top-level page in the nav.
+
+- **`lib/include/snes/audio.h` — legacy ABI `@warning` block.**
+  The 26 functions in `lib/source/audio.asm` use PVSnesLib's
+  right-to-left push + 1-byte-packed u8 args, not cc65816's
+  left-to-right + 2-byte-slot ABI. Multi-arg and pointer-taking
+  audio functions called from C operate on garbage. Zero examples
+  call this API today (SNESMOD is the working audio path), so the
+  bug class has been latent. The header now lists which functions
+  work (zero-arg + single-u8-arg, by coincidence) vs which are
+  broken, and points users at SNESMOD. Detailed analysis in
+  `.claude/notes/tech/audio_legacy_pvsneslib_abi.md`. Audio
+  rewrite/shim deferred to a dedicated chantier when a caller
+  surface appears.
 
 ## [0.18.0] — 2026-05-14
 
