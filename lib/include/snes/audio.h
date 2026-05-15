@@ -2,15 +2,49 @@
  * @file audio.h
  * @brief OpenSNES Audio System
  *
+ * @warning **LEGACY API — NOT cc65816-compatible.** The ASM implementation
+ *          in `lib/source/audio.asm` uses PVSnesLib's calling convention
+ *          (right-to-left push, 1-byte-per-u8 packed args, 24-bit pointers).
+ *          cc65816 emits left-to-right, 2-byte-slot args, post-A6 4-byte
+ *          pointers — the opposite of each choice. Multi-arg and
+ *          pointer-taking functions called from C read their arguments
+ *          from the wrong stack slots and operate on garbage.
+ *
+ *          **What actually works from C today**: zero-arg functions
+ *          (`audioInit`, `audioUpdate`, `audioStopAll`, `audioIsReady`,
+ *          `audioGetVolume`, `audioGetFreeMemory`, `audioDisableEcho`)
+ *          and single-u8-arg functions (`audioSetVolume`,
+ *          `audioStopVoice`, `audioPlaySample`, `audioUnloadSample`,
+ *          `audioEnableEcho`, `audioSetGain`). The single-arg case
+ *          works by coincidence (cc65816's slot 5..6 aligns with the
+ *          legacy 6,s read).
+ *
+ *          **What is broken from C**: multi-arg functions
+ *          (`audioPlaySampleEx`, `audioSetVoiceVolume`,
+ *          `audioSetVoicePitch`, `audioSetADSR`, `audioSetEcho`),
+ *          pointer-taking functions (`audioLoadSample`,
+ *          `audioGetSampleInfo`, `audioGetVoiceState`,
+ *          `audioSetEchoFilter`), and any function returning a struct.
+ *
+ *          **What to use instead**: SNESMOD
+ *          (`examples/audio/snesmod_*`, lib `LIB_MODULES += snesmod`).
+ *          SNESMOD has been validated end-to-end on cc65816 and is the
+ *          supported audio path. The detailed analysis lives in
+ *          `.claude/notes/tech/audio_legacy_pvsneslib_abi.md`.
+ *
  * Comprehensive audio API featuring:
  * - 8 simultaneous voices with independent volume/pan/pitch
  * - Dynamic BRR sample loading (up to 64 samples)
  * - Echo/reverb effects with configurable FIR filter
  * - Per-voice ADSR envelope control
  *
- * ## Quick Start
+ * ## Quick Start (legacy — see @warning above before using)
  *
  * @code
+ * // NOTE: audioLoadSample is a multi-arg + pointer function and currently
+ * //       does NOT pass its args correctly under cc65816. Treat the snippet
+ * //       below as historical PVSnesLib usage, not a working OpenSNES
+ * //       pattern. Prefer SNESMOD for new code.
  * #include <snes.h>
  *
  * extern u8 beep_brr[];
