@@ -271,44 +271,48 @@ mode7SetAngle:
     rtl
 
 ;------------------------------------------------------------------------------
-; mode7SetCenter - Set center of rotation
-; Input: 5,s = x, 7,s = y
+; mode7SetCenter(s16 x, s16 y) - Set center of rotation
+; cc65816 L-to-R: x pushed first (farthest), y last (closest).
+;   5-6,s = y    (last pushed, closest to SP)
+;   7-8,s = x    (first pushed, farthest)
 ;------------------------------------------------------------------------------
 mode7SetCenter:
     php
     sep #$20
     .ACCU 8
 
-    lda 5,s             ; X low
+    lda 7,s             ; x low
     sta.l $211F
-    lda 6,s             ; X high
+    lda 8,s             ; x high
     sta.l $211F
 
-    lda 7,s             ; Y low
+    lda 5,s             ; y low
     sta.l $2120
-    lda 8,s             ; Y high
+    lda 6,s             ; y high
     sta.l $2120
 
     plp
     rtl
 
 ;------------------------------------------------------------------------------
-; mode7SetScroll - Set scroll position
-; Input: 5,s = x, 7,s = y
+; mode7SetScroll(s16 x, s16 y) - Set scroll position
+; cc65816 L-to-R: x pushed first (farthest), y last (closest).
+;   5-6,s = y    (last pushed, closest to SP)
+;   7-8,s = x    (first pushed, farthest)
 ;------------------------------------------------------------------------------
 mode7SetScroll:
     php
     sep #$20
     .ACCU 8
 
-    lda 5,s             ; X low
+    lda 7,s             ; x low
     sta.l $210D
-    lda 6,s             ; X high
+    lda 8,s             ; x high
     sta.l $210D
 
-    lda 7,s             ; Y low
+    lda 5,s             ; y low
     sta.l $210E
-    lda 8,s             ; Y high
+    lda 6,s             ; y high
     sta.l $210E
 
     plp
@@ -372,41 +376,46 @@ mode7Rotate:
     rtl
 
 ;------------------------------------------------------------------------------
-; mode7Transform - Set rotation and scale together
-; Input: 5,s = degrees, 7,s = scalePercent (100 = 1.0)
+; mode7Transform(s16 degrees, s16 scalePercent) - Set rotation and scale together
+; cc65816 L-to-R: degrees pushed first (farthest), scalePercent last (closest).
+;   5-6,s = scalePercent
+;   7-8,s = degrees
+;
+; The original tail-jmp into mode7Rotate assumed degrees was at 5,s
+; (PVSnesLib R-to-L convention) — under L-to-R it is at 7,s, so we convert
+; to a regular call: push degrees explicitly, jsl, pop. ~6 bytes / a few
+; cycles more than the tail-jmp but unambiguously correct.
 ;------------------------------------------------------------------------------
 mode7Transform:
     php
     rep #$20
     .ACCU 16
 
-    ; Convert percentage to 8.8 fixed point
-    ; scalePercent * 256 / 100 = scalePercent * 2.56 ≈ scalePercent * 656 / 256
-    ; Simplified: (scalePercent * 256 + 50) / 100
-    ; Even simpler approximation: scalePercent * 2 + scalePercent/2 + scalePercent/16
-
-    ; For now, use: scale = (percent << 8) / 100
-    ; We'll use a simpler approximation: scale = percent * 2 + percent/2
-
-    lda 7,s             ; scalePercent
+    ; scale = percent * 2 + percent/2 (approximation of *2.56 for 8.8 fixed-point)
+    lda 5,s             ; scalePercent
     asl a               ; * 2
     sta.l m7_scale_x
-    lda 7,s
+    lda 5,s
     lsr a               ; / 2
     clc
     adc.l m7_scale_x    ; * 2.5 (close enough to * 2.56)
     sta.l m7_scale_x
     sta.l m7_scale_y
 
-    plp
+    ; Call mode7Rotate(degrees). degrees is at 7,s in our frame.
+    lda 7,s             ; degrees
+    pha                 ; push as mode7Rotate's only arg
+    jsl mode7Rotate
+    pla                 ; pop arg
 
-    ; Now call mode7Rotate with the degrees parameter
-    ; We need to call it with the same stack layout
-    jmp mode7Rotate     ; Tail call (degrees is still at 5,s)
+    plp
+    rtl
 
 ;------------------------------------------------------------------------------
-; mode7SetPivot - Set pivot point (screen coordinates)
-; Input: 5,s = x (8-bit), 6,s = y (8-bit)
+; mode7SetPivot(u8 x, u8 y) - Set pivot point (screen coordinates)
+; cc65816 L-to-R: each u8 occupies a 2-byte slot.
+;   5-6,s = y    (last pushed, closest to SP)
+;   7-8,s = x    (first pushed, farthest)
 ;------------------------------------------------------------------------------
 mode7SetPivot:
     php
@@ -414,12 +423,12 @@ mode7SetPivot:
     .ACCU 8
 
     ; Set center point
-    lda 5,s             ; X
+    lda 7,s             ; x
     sta.l $211F         ; M7X low
     lda #0
     sta.l $211F         ; M7X high
 
-    lda 6,s             ; Y
+    lda 5,s             ; y
     sta.l $2120         ; M7Y low
     lda #0
     sta.l $2120         ; M7Y high

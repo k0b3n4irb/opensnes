@@ -1,0 +1,24 @@
+diff --git a/type.c b/type.c
+index d4bee47..6fcfd89 100644
+--- a/type.c
++++ b/type.c
+@@ -45,7 +45,7 @@ struct type typefloat   = FLTTYPE(TYPEFLOAT, 4);
+ struct type typedouble  = FLTTYPE(TYPEDOUBLE, 8);
+ struct type typeldouble = FLTTYPE(TYPELDOUBLE, 16);
+ 
+-struct type typenullptr = {.kind = TYPENULLPTR, .size = 8, .align = 8, .prop = PROPSCALAR};
++struct type typenullptr = {.kind = TYPENULLPTR, .size = 4, .align = 2, .prop = PROPSCALAR};
+ 
+ struct type *typeadjvalist;
+ 
+@@ -78,8 +78,8 @@ mkpointertype(struct type *base, enum typequal qual)
+ 	t = mktype(TYPEPOINTER, PROPSCALAR);
+ 	t->base = base;
+ 	t->qual = qual;
+-	t->size = 8;
+-	t->align = 8;
++	t->size = 4;
++	t->align = 2;
+ 	if (base)
+ 		t->prop |= base->prop & PROPVM;
+ 

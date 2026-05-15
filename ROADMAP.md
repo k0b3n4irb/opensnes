@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.18.0 (developing toward v0.19.0)
+## Current Status: post-v0.19.0 (developing toward v0.20.0)
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler

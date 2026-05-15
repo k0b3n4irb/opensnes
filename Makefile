@@ -98,9 +98,17 @@ lint-commits:
 lint-docs:
 	@python3 devtools/check_doc_drift.py
 
+# ASM ↔ C signature ABI consistency. Catches the class of bug that bit us
+# at chantier A6+A7 hdmaSetupBank: hand-written ASM reading a param at an
+# offset that contradicts the C signature's calling-convention layout.
+# See devtools/check_asm_abi.py for the matching rules.
+lint-asm-abi:
+	@python3 devtools/check_asm_abi.py --quiet
+
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
+	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain

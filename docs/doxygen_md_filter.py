@@ -83,7 +83,54 @@ def main():
         flags=re.MULTILINE,
     )
 
+    # For README.md files only, auto-inject \subpage directives for every
+    # immediate sub-directory that itself contains a README.md. This keeps
+    # the navigation hierarchical without requiring each README to manually
+    # list its children, and Doxygen treats \subpage inside a \page body as
+    # a parent→child link.
+    if basename == "README.md":
+        children = _discover_subpage_children(filepath)
+        if children:
+            block = "\n\n<!-- Auto-generated subpage links (doxygen_md_filter.py) -->\n"
+            for child_id in children:
+                block += f"\\subpage {child_id}\n"
+            block += "<!-- /auto-generated -->\n"
+            content = content.rstrip() + block
+
     sys.stdout.write(content)
+
+
+def _discover_subpage_children(filepath: str) -> list[str]:
+    """Return page IDs for every direct sub-directory's README.md.
+
+    The IDs follow the same dirpath→underscore convention used for the
+    parent page, so they line up with Doxygen's \\page declarations
+    elsewhere in the tree.
+    """
+    parent_dir = os.path.dirname(os.path.abspath(filepath))
+    if not os.path.isdir(parent_dir):
+        return []
+    children: list[str] = []
+    for entry in sorted(os.listdir(parent_dir)):
+        sub = os.path.join(parent_dir, entry)
+        if not os.path.isdir(sub):
+            continue
+        child_readme = os.path.join(sub, "README.md")
+        if not os.path.isfile(child_readme):
+            continue
+        # Derive the child page ID the same way the main page-id pass does:
+        # take the relative path to cwd, strip leading ".." components, join
+        # with underscores.
+        rel = os.path.relpath(sub)
+        parts = [
+            p
+            for p in rel.replace(os.sep, "/").split("/")
+            if p and p != ".."
+        ]
+        if not parts:
+            continue
+        children.append("_".join(parts).replace("-", "_"))
+    return children
 
 
 if __name__ == "__main__":

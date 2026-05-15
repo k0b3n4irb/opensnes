@@ -222,7 +222,18 @@ _mucend:
 
 ;------------------------------------------------------------------------------
 ; void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)
-; Stack: 5-8 9-12 13-16
+;
+; A6+A7 chantier — post-A6: cproc passes 4-byte pointers (24-bit addr + pad).
+; Stack layout (after php/phb/phx/phy = 6 saves + 3-byte JSL return):
+;   SP+10..11 = tilesprop  low 16
+;   SP+12     = tilesprop  bank byte
+;   SP+13     = pad
+;   SP+14..15 = layertiles low 16
+;   SP+16     = layertiles bank byte
+;   SP+17     = pad
+;   SP+18..19 = layer1map  low 16
+;   SP+20     = layer1map  bank byte
+;   SP+21     = pad
 ;------------------------------------------------------------------------------
 mapLoad:
     php
@@ -231,20 +242,21 @@ mapLoad:
     phx
     phy
 
-    ; cproc L-to-R: tilesprop(p3) SP+10, layertiles(p2) SP+12, layer1map(p1) SP+14
-    ; cproc passes 16-bit pointers only (no bank byte), use bank $00
+    ; Set DB to layer1map's bank so subsequent `lda 0,x` (X = layer1map low
+    ; 16) reads from the correct bank. Also store the bank byte into
+    ; maptile_L1b for later use.
     sep #$20
     .ACCU 8
-    lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
+    lda 20,s                                ; layer1map bank byte
     pha
     plb
     sta.l maptile_L1b
 
     rep #$20
     .ACCU 16
-    lda 14,s                                ; layer1map addr (param 1)
+    lda 18,s                                ; layer1map low 16 (param 1)
     tax
-    lda 0,x                                 ; get mapwidth
+    lda 0,x                                 ; get mapwidth (DB:X)
     sta.l mapwidth
     lda 2,x                                 ; get mapheight
     sta.l mapheight
@@ -253,12 +265,12 @@ mapLoad:
     sta.l x_pos
     sta.l y_pos
 
-    lda 14,s                                ; layer1map addr (param 1) again
+    lda 18,s                                ; layer1map low 16 again
     clc
     adc.w #0006                             ; add width, height and size
     sta.l maptile_L1d
 
-    lda 12,s                                ; layertiles addr (param 2)
+    lda 14,s                                ; layertiles low 16 (param 2)
     sta.l $4302
 
     lda #MAP_MAXMTILES*4*2                  ; metatile max are 4 x 8x8
@@ -276,7 +288,7 @@ mapLoad:
     pha
     plb
 
-    lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
+    lda 16,s                                ; layertiles bank byte
     sta.l $4304
 
     ldx #$8000                              ; type of DMA
@@ -287,7 +299,7 @@ mapLoad:
 
     rep	#$20
     .ACCU 16
-    lda	10,s	                            ; tilesprop addr (param 3)
+    lda	10,s	                            ; tilesprop low 16 (param 3)
 	sta.l	$4302
 
     lda.w #MAP_MAXMTILES*2*2
@@ -301,7 +313,7 @@ mapLoad:
     lda #$7e
     sta.l $2183
 
-    lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
+    lda 12,s                                ; tilesprop bank byte
     sta.l $4304
 
     ldx	#$8000

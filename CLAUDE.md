@@ -117,6 +117,7 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `release.md` — Release workflow, CHANGELOG format, version tagging
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
 - `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
+- `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
 
 ## Strategic Planning
 

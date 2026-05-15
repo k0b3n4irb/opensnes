@@ -1,0 +1,643 @@
+diff --git a/emit.c b/emit.c
+index d79fd2a..d891d9b 100644
+--- a/emit.c
++++ b/emit.c
+@@ -48,7 +48,7 @@ static int dtype_size[] = {
+ 	[DB] = 1,
+ 	[DH] = 2,
+ 	[DW] = 4,
+-	[DL] = 8
++	[DL] = 4
+ };
+ 
+ /* Emit a string with proper handling of null terminators for WLA-DX.
+diff --git a/w65816/abi.c b/w65816/abi.c
+index 7cff0eb..e13b4bb 100644
+--- a/w65816/abi.c
++++ b/w65816/abi.c
+@@ -160,15 +160,17 @@ w65816_abi(Fn *fn)
+ {
+     Blk *b;
+     Ins *i;
+-    int paroff;  /* parameter offset from return address */
++    int paroff;  /* parameter offset from return address (byte accumulator) */
+     int npars;   /* number of parameters */
+-    int parn;    /* current parameter number (0 = first) */
++    int parn;    /* current parameter number (0 = first) — kept for debug */
+ 
+     for (b = fn->start; b; b = b->link) {
+         curi = &insb[NIns];
+         npars = countpars(b);
+         (void)npars;
+         parn = 0;
++        (void)parn;  /* parn is incremented for debug clarity only */
++        paroff = 0;  /* === A6.10: byte accumulator for class-mixed param sizes === */
+ 
+         for (i = &b->ins[b->nins]; i > b->ins;) {
+             i--;
+@@ -179,13 +181,22 @@ w65816_abi(Fn *fn)
+             case Oparub:
+             case Oparsh:
+             case Oparuh:
+-                /* Parameter: load from stack */
+-                /* Encode byte offset above return address as negative slot */
+-                /* Iterating backwards: first encountered = last declared param */
+-                /* Last param is at lowest offset (closest to ret addr) */
+-                /* slot = -(parn + 1) * 2 encodes byte offset from ret addr */
+-                paroff = (parn + 1) * 2;  /* 2, 4, 6, ... */
+-                emit(Oloadsw, Kw, i->to, SLOT(-paroff), R);
++                /* Parameter: load from stack.
++                 * paroff accumulates byte size of params already processed
++                 * (backwards order, so last-declared is processed first and
++                 * lives at the LOWEST offset above the return address).
++                 *
++                 * Kl params occupy 4 bytes (low 16 + high 16), Kw and the
++                 * other narrow classes occupy 2 bytes. SLOT(-paroff) addresses
++                 * the LOW half of the current param; the Oload Kl emitter
++                 * loads the high half from SLOT(-paroff)+2 byte offset. */
++                paroff += 2;
++                if (i->cls == Kl) {
++                    emit(Oload, Kl, i->to, SLOT(-paroff), R);
++                    paroff += 2;  /* consume high half byte budget */
++                } else {
++                    emit(Oloadsw, Kw, i->to, SLOT(-paroff), R);
++                }
+                 parn++;
+                 break;
+ 
+diff --git a/w65816/emit.c b/w65816/emit.c
+index 599446d..8d6fefa 100644
+--- a/w65816/emit.c
++++ b/w65816/emit.c
+@@ -116,6 +116,119 @@ emit_stack_op(const char *op, int frame_off, int sp_adjust)
+  */
+ #define PARAM_OFFSET 2  /* framesize + PARAM_OFFSET + (-slot) */
+ 
++/* Forward declaration — acache_invalidate is defined just below the Kl
++ * helpers but the helpers call it on high-half load. */
++static void acache_invalidate(void);
++
++/* === Kl-class high-half helpers (chantiers A6 + A7) ===
++ *
++ * A Kl temp owns 2 consecutive slots: low 16 at byte (slot+1)*2, high 16 at
++ * (slot+1)*2 + 2. These helpers operate on the high half so the Kl pair
++ * lowering paths (Oload Kl, Ostorel, Oadd/Osub Kl, Oarg Kl push, indirect
++ * call bank) stay readable. */
++static void
++emit_load_high(Ref r, Fn *fn, int sp_adjust)
++{
++    Con *c;
++    int slot;
++
++    /* High half is a different value from low — invalidate A-cache. */
++    acache_invalidate();
++
++    switch (rtype(r)) {
++    case RTmp:
++        if (r.val >= Tmp0) {
++            slot = fn->tmp[r.val].slot;
++            if (slot >= 0)
++                emit_stack_load((slot + 1) * 2 + 2, sp_adjust);
++            else
++                fprintf(outf, "\t; unallocated temp high %d\n", r.val);
++        } else {
++            /* R0-R7 vregs are 16-bit only — no high half to load. */
++            fprintf(outf, "\tlda.w #0\n");
++        }
++        break;
++    case RCon:
++        c = &fn->con[r.val];
++        if (c->type == CBits) {
++            fprintf(outf, "\tlda.w #%d\n", (int)((c->bits.i >> 16) & 0xFFFF));
++        } else if (c->type == CAddr) {
++            /* Bank byte of a 24-bit symbol — `:sym` resolves to 8-bit bank. */
++            fprintf(outf, "\tlda.w #:%s\n", stripsym(str(c->sym.id)));
++        }
++        break;
++    case RSlot:
++        slot = rsval(r);
++        if (slot < 0)
++            emit_stack_load(framesize + PARAM_OFFSET + (-slot) + 2, sp_adjust);
++        else
++            emit_stack_load((slot + 1) * 2 + 2, sp_adjust);
++        break;
++    default:
++        fprintf(outf, "\t; emit_load_high: unknown ref type %d\n", rtype(r));
++        break;
++    }
++}
++
++/* Store A to the high half of a Kl-class ref. RTmp/RSlot only — high half
++ * for RCon would be meaningless. */
++static void
++emit_store_high(Ref r, Fn *fn)
++{
++    int slot;
++
++    if (req(r, R))
++        return;
++
++    if (rtype(r) == RTmp && r.val >= Tmp0) {
++        slot = fn->tmp[r.val].slot;
++        if (slot >= 0)
++            emit_stack_store((slot + 1) * 2 + 2, 0);
++    } else if (rtype(r) == RSlot) {
++        slot = rsval(r);
++        if (slot < 0)
++            emit_stack_store(framesize + PARAM_OFFSET + (-slot) + 2, 0);
++        else
++            emit_stack_store((slot + 1) * 2 + 2, 0);
++    }
++}
++
++/* Emit ALU op2 on the high half of a Kl-class ref. Mirrors emitop2. */
++static void
++emitop2_high(char *op, Ref r, Fn *fn)
++{
++    Con *c;
++    int slot;
++
++    switch (rtype(r)) {
++    case RTmp:
++        if (r.val >= Tmp0) {
++            slot = fn->tmp[r.val].slot;
++            if (slot >= 0)
++                emit_stack_op(op, (slot + 1) * 2 + 2, 0);
++        }
++        break;
++    case RCon:
++        c = &fn->con[r.val];
++        if (c->type == CBits) {
++            fprintf(outf, "\t%s.w #%d\n", op, (int)((c->bits.i >> 16) & 0xFFFF));
++        } else if (c->type == CAddr) {
++            /* Bank byte of a 24-bit symbol. */
++            fprintf(outf, "\t%s.w #:%s\n", op, stripsym(str(c->sym.id)));
++        }
++        break;
++    case RSlot:
++        slot = rsval(r);
++        if (slot < 0)
++            emit_stack_op(op, framesize + PARAM_OFFSET + (-slot) + 2, 0);
++        else
++            emit_stack_op(op, (slot + 1) * 2 + 2, 0);
++        break;
++    default:
++        break;
++    }
++}
++
+ /* A-register cache: track which Ref is currently in A to skip redundant loads */
+ static int acache_valid;
+ static Ref acache_ref;
+@@ -905,6 +1018,17 @@ detect_block_tail_call(Blk *b, Fn *fn)
+         }
+     }
+ 
++    /* TCO byte-position logic assumes 2-byte args. Reject if any arg is
++     * Kl (4 bytes) — it'd shift target offsets and we don't lower the
++     * 4-byte stack write here. The normal push path handles it. */
++    for (i = tail_call_first_arg; i < &b->ins[b->nins - 1]; i++) {
++        if ((i->op == Oarg || i->op == Oargsb || i->op == Oargub
++             || i->op == Oargsh || i->op == Oarguh) && i->cls == Kl) {
++            TCO_REJECT("Kl arg — TCO position logic assumes 2-byte stride");
++            return;
++        }
++    }
++
+     /* Check: callee arg bytes == our param bytes */
+     callee_bytes = nargs * 2;
+     if (callee_bytes != caller_param_bytes) {
+@@ -1172,9 +1296,11 @@ emitload_adj(Ref r, Fn *fn, int sp_adjust)
+             /* Virtual register - direct page */
+             fprintf(outf, "\tlda.b $%02X\n", regaddr(r.val));
+         } else if (r.val >= Tmp0) {
+-            /* Check for leaf-opt alias to param slot */
++            /* Check for leaf-opt alias to param slot. Disabled for Kl —
++             * the alias slot is 16-bit, can't carry the high half. */
+             int idx = r.val - Tmp0;
+-            if (leaf_opt && idx >= 0 && idx < MAX_ALIAS_TEMPS && temp_alias[idx] != 0) {
++            if (leaf_opt && idx >= 0 && idx < MAX_ALIAS_TEMPS
++                && temp_alias[idx] != 0 && fn->tmp[r.val].cls != Kl) {
+                 int neg_slot = temp_alias[idx];
+                 emit_stack_load(framesize + PARAM_OFFSET + (-neg_slot), sp_adjust);
+             } else {
+@@ -1251,8 +1377,11 @@ emitstore(Ref r, Fn *fn)
+     if (req(r, R))
+         return;
+ 
+-    /* Leaf opt: skip store to aliased temp (A already has the value) */
+-    if (leaf_opt && rtype(r) == RTmp && r.val >= Tmp0) {
++    /* Leaf opt: skip store to aliased temp (A already has the value).
++     * Disabled for Kl — the alias mechanism tracks a single 16-bit slot
++     * and can't represent the high half of a 4-byte value. */
++    if (leaf_opt && rtype(r) == RTmp && r.val >= Tmp0
++        && fn->tmp[r.val].cls != Kl) {
+         int idx = r.val - Tmp0;
+         if (idx >= 0 && idx < MAX_ALIAS_TEMPS && temp_alias[idx] != 0) {
+             acache_set(r);
+@@ -1260,8 +1389,11 @@ emitstore(Ref r, Fn *fn)
+         }
+     }
+ 
+-    /* Dead store elimination: skip store when temp's slot is never read */
+-    if (rtype(r) == RTmp && r.val >= Tmp0) {
++    /* Dead store elimination: skip store when temp's slot is never read.
++     * Disabled for Kl temps — the opt assumes the value stays in A for the
++     * next consumer, but Kl handling necessarily clobbers A (to load/store
++     * the high half) between definition and use. */
++    if (rtype(r) == RTmp && r.val >= Tmp0 && fn->tmp[r.val].cls != Kl) {
+         int idx = r.val - Tmp0;
+         if (idx >= 0 && idx < MAX_ALIAS_TEMPS && temp_is_dead_store[idx]) {
+             acache_set(r);
+@@ -1269,8 +1401,10 @@ emitstore(Ref r, Fn *fn)
+         }
+     }
+ 
+-    /* Dead return store elimination: skip store when temp is only used as retval */
+-    if (skip_dead_retstore_temp >= 0 && rtype(r) == RTmp && r.val >= Tmp0) {
++    /* Dead return store elimination: skip store when temp is only used as
++     * retval. Disabled for Kl — same A-clobber rationale as the other opts. */
++    if (skip_dead_retstore_temp >= 0 && rtype(r) == RTmp && r.val >= Tmp0
++        && fn->tmp[r.val].cls != Kl) {
+         int idx = r.val - Tmp0;
+         if (idx == skip_dead_retstore_temp) {
+             acache_set(r);
+@@ -1489,6 +1623,18 @@ emitins(Ins *i, Fn *fn)
+ 
+     switch (i->op) {
+     case Oadd:
++        /* === A7.5: Kl pair add with carry propagation === */
++        if (i->cls == Kl) {
++            emitload(r0, fn);
++            fprintf(outf, "\tclc\n");
++            emitop2("adc", r1, fn);
++            emitstore(i->to, fn);
++            emit_load_high(r0, fn, 0);
++            emitop2_high("adc", r1, fn);  /* no clc — carry from low half */
++            emit_store_high(i->to, fn);
++            acache_invalidate();
++            break;
++        }
+         /* INC/DEC optimization: inc a (2 cyc) vs clc;adc #1 (5 cyc) */
+         if (rtype(r1) == RCon && fn->con[r1.val].type == CBits
+             && (fn->con[r1.val].bits.i & 0xFFFF) == 1) {
+@@ -1520,6 +1666,18 @@ emitins(Ins *i, Fn *fn)
+         break;
+ 
+     case Osub:
++        /* === A7.5: Kl pair sub with borrow propagation === */
++        if (i->cls == Kl) {
++            emitload(r0, fn);
++            fprintf(outf, "\tsec\n");
++            emitop2("sbc", r1, fn);
++            emitstore(i->to, fn);
++            emit_load_high(r0, fn, 0);
++            emitop2_high("sbc", r1, fn);  /* no sec — borrow from low half */
++            emit_store_high(i->to, fn);
++            acache_invalidate();
++            break;
++        }
+         /* DEC optimization: dec a (2 cyc) vs sec;sbc #1 (5 cyc) */
+         if (rtype(r1) == RCon && fn->con[r1.val].type == CBits
+             && (fn->con[r1.val].bits.i & 0xFFFF) == 1) {
+@@ -2175,47 +2333,48 @@ emitins(Ins *i, Fn *fn)
+         break;
+ 
+     case Ostorel:
+-        /* Store long (32-bit) - store low word then high word at +2 */
+-        /* For 65816, we treat this as storing a 32-bit value in two parts */
++        /* === A7.4: store 32-bit value (Kl) — both halves from r0 ===
++         * Old code hardcoded the high word to 0, which silently dropped
++         * the bank byte of any pointer or the high half of any u32.
++         * Now: low half via emitload, high half via emit_load_high. */
+         emitload(r0, fn);  /* Load low 16 bits */
+         {
+             int aslot = getallocslot(r1, fn);
+             if (aslot >= 0) {
+-                /* Store to stack-allocated local variable */
+                 emit_stack_store((aslot + 1) * 2, 0);
+-                /* High word is typically 0 for near pointers */
+-                fprintf(outf, "\tlda.w #0\n");
++                emit_load_high(r0, fn, 0);
+                 emit_stack_store((aslot + 1) * 2 + 2, 0);
+             } else if (isvreg(r1)) {
+                 fprintf(outf, "\tsta ($%02X)\n", regaddr(r1.val));
+-                fprintf(outf, "\tlda.w #0\n");
++                emit_load_high(r0, fn, 0);
+                 fprintf(outf, "\tldy.w #2\n");
+                 fprintf(outf, "\tsta ($%02X),y\n", regaddr(r1.val));
+             } else if (rtype(r1) == RCon) {
+-                /* Direct address constant or symbol */
+                 c = &fn->con[r1.val];
+                 if (c->type == CAddr) {
+                     fprintf(outf, "\tsta.w %s", stripsym(str(c->sym.id)));
+                     if (c->bits.i)
+                         fprintf(outf, "+%d", (int)c->bits.i);
+                     fprintf(outf, "\n");
+-                    /* Store high word (always 0 for near pointers) */
+-                    fprintf(outf, "\tstz.w %s+%d\n", stripsym(str(c->sym.id)),
+-                            (int)c->bits.i + 2);
++                    emit_load_high(r0, fn, 0);
++                    fprintf(outf, "\tsta.w %s+%d\n",
++                            stripsym(str(c->sym.id)), (int)c->bits.i + 2);
+                 } else {
+-                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i);
+-                    fprintf(outf, "\tlda.w #0\n");
+-                    fprintf(outf, "\tsta.l $%06lX\n", (unsigned long)c->bits.i + 2);
++                    fprintf(outf, "\tsta.l $%06lX\n",
++                            (unsigned long)c->bits.i);
++                    emit_load_high(r0, fn, 0);
++                    fprintf(outf, "\tsta.l $%06lX\n",
++                            (unsigned long)c->bits.i + 2);
+                 }
+             } else {
+-                /* Address in temp - indirect store */
+-                fprintf(outf, "\tpha\n");
+-                emitload_adj(r1, fn, 2);
++                /* Address in temp — push low value, load high to A,
++                 * push it too, then pop both in order via X-indirect. */
++                fprintf(outf, "\tpha\n");                /* save low */
++                emitload_adj(r1, fn, 2);                 /* dest addr */
+                 fprintf(outf, "\ttax\n");
+-                fprintf(outf, "\tpla\n");
++                fprintf(outf, "\tpla\n");                /* restore low */
+                 fprintf(outf, "\tsta.l $0000,x\n");
+-                /* Store high word at +2 */
+-                fprintf(outf, "\tlda.w #0\n");
++                emit_load_high(r0, fn, 0);
+                 fprintf(outf, "\tsta.l $0002,x\n");
+             }
+         }
+@@ -2362,6 +2521,60 @@ emitins(Ins *i, Fn *fn)
+     case Oloadsw:
+     case Oloaduw:
+     case Oload:
++        /* === A7.3: Kl pair load (32-bit / pointer load) ===
++         * Lowers `Oload Kl` to two 16-bit loads (low at addr, high at
++         * addr+2), each stored to the corresponding half of the dest Kl
++         * temp's widened slot. */
++        if (i->op == Oload && i->cls == Kl) {
++            int aslot = getallocslot(r0, fn);
++            if (aslot >= 0) {
++                emit_stack_load((aslot + 1) * 2, 0);
++                emitstore(i->to, fn);
++                emit_stack_load((aslot + 1) * 2 + 2, 0);
++                emit_store_high(i->to, fn);
++            } else if (rtype(r0) == RSlot) {
++                int s = rsval(r0);
++                int low_off = (s < 0)
++                    ? framesize + PARAM_OFFSET + (-s)
++                    : (s + 1) * 2;
++                emit_stack_load(low_off, 0);
++                emitstore(i->to, fn);
++                emit_stack_load(low_off + 2, 0);
++                emit_store_high(i->to, fn);
++            } else if (rtype(r0) == RCon && fn->con[r0.val].type == CAddr) {
++                Con *c0 = &fn->con[r0.val];
++                int off = (int)c0->bits.i;
++                fprintf(outf, "\tlda.w %s", stripsym(str(c0->sym.id)));
++                if (off)
++                    fprintf(outf, "+%d", off);
++                fprintf(outf, "\n");
++                emitstore(i->to, fn);
++                fprintf(outf, "\tlda.w %s+%d\n",
++                        stripsym(str(c0->sym.id)), off + 2);
++                emit_store_high(i->to, fn);
++            } else if (isvreg(r0)) {
++                /* Near-pointer in DP virtual register — bank is implicit. */
++                fprintf(outf, "\tlda ($%02X)\n", regaddr(r0.val));
++                emitstore(i->to, fn);
++                fprintf(outf, "\tldy.w #2\n");
++                fprintf(outf, "\tlda ($%02X),y\n", regaddr(r0.val));
++                emit_store_high(i->to, fn);
++            } else {
++                /* 24-bit pointer in temp — copy to tcc__r9 (3 bytes),
++                 * indirect-load 4 bytes. */
++                emitload(r0, fn);
++                fprintf(outf, "\tsta.b tcc__r9\n");
++                emit_load_high(r0, fn, 0);
++                fprintf(outf, "\tsta.b tcc__r9+2\n");
++                fprintf(outf, "\tlda [tcc__r9]\n");
++                emitstore(i->to, fn);
++                fprintf(outf, "\tldy.w #2\n");
++                fprintf(outf, "\tlda [tcc__r9],y\n");
++                emit_store_high(i->to, fn);
++            }
++            acache_invalidate();
++            break;
++        }
+         /* Leaf opt: alias param slot loads instead of copying */
+         if (leaf_opt && rtype(r0) == RSlot && rsval(r0) < 0) {
+             int idx = (rtype(i->to) == RTmp && i->to.val >= Tmp0) ? i->to.val - Tmp0 : -1;
+@@ -2446,7 +2659,7 @@ emitins(Ins *i, Fn *fn)
+         break;
+ 
+     case Oextsb:
+-        /* Sign extend byte to word */
++        /* Sign extend byte to word (or to long if i->cls == Kl) */
+         emitload(r0, fn);
+         fprintf(outf, "\tand.w #$00FF\n");
+         fprintf(outf, "\tcmp.w #$0080\n");
+@@ -2454,19 +2667,32 @@ emitins(Ins *i, Fn *fn)
+         fprintf(outf, "\tora.w #$FF00\n");
+         fprintf(outf, "+\n");
+         emitstore(i->to, fn);
++        /* === A6.11: extend high half for Kl dest === */
++        if (i->cls == Kl) {
++            fprintf(outf, "\tbpl +\n");
++            fprintf(outf, "\tlda.w #$FFFF\n");
++            fprintf(outf, "\tbra ++\n");
++            fprintf(outf, "+\tlda.w #0\n");
++            fprintf(outf, "++\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oextub:
+-        /* Zero extend byte to word */
++        /* Zero extend byte to word (or to long if i->cls == Kl) */
+         emitload(r0, fn);
+         fprintf(outf, "\tand.w #$00FF\n");
+         emitstore(i->to, fn);
++        if (i->cls == Kl) {
++            fprintf(outf, "\tlda.w #0\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oextsh:
+-        /* Sign extend half (already 16-bit, no-op for 65816) */
+-        /* Leaf opt: propagate alias through nop extension */
+-        if (leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
++        /* Sign extend half (already 16-bit, no-op for Kw dest). For Kl
++         * dest, propagate sign bit to high half. */
++        if (i->cls != Kl && leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
+             && rtype(i->to) == RTmp && i->to.val >= Tmp0) {
+             int si = r0.val - Tmp0;
+             int di = i->to.val - Tmp0;
+@@ -2478,12 +2704,20 @@ emitins(Ins *i, Fn *fn)
+         }
+         emitload(r0, fn);
+         emitstore(i->to, fn);
++        if (i->cls == Kl) {
++            fprintf(outf, "\tbpl +\n");
++            fprintf(outf, "\tlda.w #$FFFF\n");
++            fprintf(outf, "\tbra ++\n");
++            fprintf(outf, "+\tlda.w #0\n");
++            fprintf(outf, "++\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oextuh:
+-        /* Zero extend half (already 16-bit, no-op for 65816) */
+-        /* Leaf opt: propagate alias through nop extension */
+-        if (leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
++        /* Zero extend half (already 16-bit, no-op for Kw dest). For Kl
++         * dest, high half = 0. */
++        if (i->cls != Kl && leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
+             && rtype(i->to) == RTmp && i->to.val >= Tmp0) {
+             int si = r0.val - Tmp0;
+             int di = i->to.val - Tmp0;
+@@ -2495,12 +2729,16 @@ emitins(Ins *i, Fn *fn)
+         }
+         emitload(r0, fn);
+         emitstore(i->to, fn);
++        if (i->cls == Kl) {
++            fprintf(outf, "\tlda.w #0\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oextsw:
+-        /* Sign extend word to long - for 16-bit 65816, just copy the value. */
+-        /* Leaf opt: propagate alias through nop extension */
+-        if (leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
++        /* Sign extend word to long. For Kw dest: copy. For Kl dest:
++         * propagate sign bit to high half. */
++        if (i->cls != Kl && leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
+             && rtype(i->to) == RTmp && i->to.val >= Tmp0) {
+             int si = r0.val - Tmp0;
+             int di = i->to.val - Tmp0;
+@@ -2512,12 +2750,20 @@ emitins(Ins *i, Fn *fn)
+         }
+         emitload(r0, fn);
+         emitstore(i->to, fn);
++        if (i->cls == Kl) {
++            fprintf(outf, "\tbpl +\n");
++            fprintf(outf, "\tlda.w #$FFFF\n");
++            fprintf(outf, "\tbra ++\n");
++            fprintf(outf, "+\tlda.w #0\n");
++            fprintf(outf, "++\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oextuw:
+-        /* Zero extend word to long - for 16-bit 65816, just copy the value. */
+-        /* Leaf opt: propagate alias through nop extension */
+-        if (leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
++        /* Zero extend word to long. For Kw dest: copy. For Kl dest:
++         * high half = 0. */
++        if (i->cls != Kl && leaf_opt && rtype(r0) == RTmp && r0.val >= Tmp0
+             && rtype(i->to) == RTmp && i->to.val >= Tmp0) {
+             int si = r0.val - Tmp0;
+             int di = i->to.val - Tmp0;
+@@ -2529,6 +2775,10 @@ emitins(Ins *i, Fn *fn)
+         }
+         emitload(r0, fn);
+         emitstore(i->to, fn);
++        if (i->cls == Kl) {
++            fprintf(outf, "\tlda.w #0\n");
++            emit_store_high(i->to, fn);
++        }
+         break;
+ 
+     case Oarg:
+@@ -2574,8 +2824,46 @@ emitins(Ins *i, Fn *fn)
+         /* Normal: push argument to stack.
+          * Use pea.w for constants (saves 1 byte + 2 cycles, doesn't touch A).
+          * For variables, use lda+pha. pha doesn't modify A, so set A-cache after.
+-         */
+-        if (rtype(r0) == RCon) {
++         *
++         * Kl args (pointers, u32) push 4 bytes: HIGH 16 first, then LOW 16.
++         * Order is chosen so the callee reads the low half at the lower
++         * stack offset (closer to the return address) — matches how
++         * abi.c lays out param offsets for 16-bit args. */
++        if (i->cls == Kl) {
++            /* === Kl arg: push high then low === */
++            if (rtype(r0) == RCon) {
++                Con *ac = &fn->con[r0.val];
++                if (ac->type == CBits) {
++                    fprintf(outf, "\tpea.w %d\n",
++                            (int)((ac->bits.i >> 16) & 0xFFFF));
++                    fprintf(outf, "\tpea.w %d\n",
++                            (int)(ac->bits.i & 0xFFFF));
++                } else if (ac->type == CAddr) {
++                    /* Bank byte via WLA-DX `:sym` operator. */
++                    fprintf(outf, "\tpea.w :%s\n",
++                            stripsym(str(ac->sym.id)));
++                    fprintf(outf, "\tpea.w %s",
++                            stripsym(str(ac->sym.id)));
++                    if (ac->bits.i)
++                        fprintf(outf, "+%d", (int)ac->bits.i);
++                    fprintf(outf, "\n");
++                } else {
++                    /* Numeric constant Kl — fallback */
++                    emit_load_high(r0, fn, argbytes);
++                    fprintf(outf, "\tpha\n");
++                    emitload_adj(r0, fn, argbytes + 2);
++                    fprintf(outf, "\tpha\n");
++                    acache_invalidate();
++                }
++            } else {
++                emit_load_high(r0, fn, argbytes);
++                fprintf(outf, "\tpha\n");
++                emitload_adj(r0, fn, argbytes + 2);
++                fprintf(outf, "\tpha\n");
++                acache_invalidate();
++            }
++            argbytes += 4;
++        } else if (rtype(r0) == RCon) {
+             Con *ac = &fn->con[r0.val];
+             if (ac->type == CBits) {
+                 fprintf(outf, "\tpea.w %d\n", (int)(ac->bits.i & 0xFFFF));
+@@ -2589,12 +2877,13 @@ emitins(Ins *i, Fn *fn)
+                 fprintf(outf, "\tpha\n");
+                 acache_set(r0);  /* pha doesn't change A — restore cache */
+             }
++            argbytes += 2;
+         } else {
+             emitload_adj(r0, fn, argbytes);
+             fprintf(outf, "\tpha\n");
+             acache_set(r0);  /* pha doesn't change A — restore cache */
++            argbytes += 2;
+         }
+-        argbytes += 2;  /* All args pushed as 16-bit */
+         break;
+ 
+     case Ocall:
+@@ -2644,17 +2933,14 @@ emitins(Ins *i, Fn *fn)
+                 fprintf(outf, "\tjsl $%06lX\n", (unsigned long)c->bits.i);
+             }
+         } else {
+-            /* Indirect call: function pointer in temp/slot.
+-             * Load the 16-bit address, store to DP scratch (tcc__r9),
+-             * set bank byte to current bank ($00), then jml [tcc__r9].
+-             * Push return address for RTL to work correctly.
+-             */
++            /* Indirect call: function pointer in temp/slot (Kl class post-A6).
++             * Load the 24-bit address into DP scratch tcc__r9 (low 16) +
++             * tcc__r9+2 (bank byte in low 8), then jml [tcc__r9].
++             * Push return address for RTL to work correctly. */
+             emitload_adj(r0, fn, argbytes);
+             fprintf(outf, "\tsta.b tcc__r9\n");
+-            emit_sep20();
+-            fprintf(outf, "\tlda #$00\n");
++            emit_load_high(r0, fn, argbytes);  /* bank byte in low 8 of A */
+             fprintf(outf, "\tsta.b tcc__r9+2\n");
+-            emit_rep20();
+             fprintf(outf, "\tphk\n");
+             fprintf(outf, "\tpea ++-1\n");
+             fprintf(outf, "\tjml [tcc__r9]\n");

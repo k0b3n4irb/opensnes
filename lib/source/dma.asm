@@ -286,10 +286,15 @@ dmaCopyOam:
 ; Bank detection: addresses >= $8000 → bank $00 (ROM), else bank $7E (RAM).
 ;
 ; Stack layout (after PHP):
-;   5-6,s = tilesSize (rightmost)
-;   7-8,s = tiles pointer
-;   9-10,s = tilemapSize
-;   11-12,s = tilemap pointer (leftmost)
+; A6+A7 chantier — post-A6 layout (cproc passes 4-byte pointers):
+;   5-6,s   = tilesSize (rightmost arg)
+;   7-8,s   = tiles low 16
+;   9,s     = tiles bank byte
+;   10,s    = pad
+;   11-12,s = tilemapSize
+;   13-14,s = tilemap low 16
+;   15,s    = tilemap bank byte
+;   16,s    = pad
 ;------------------------------------------------------------------------------
 dmaCopyVramMode7:
     php
@@ -310,21 +315,14 @@ dmaCopyVramMode7:
 
     rep #$20
     .ACCU 16
-    lda 11,s                ; tilemap address (16-bit)
+    lda 13,s                ; tilemap low 16
     sta.l $4302             ; DMA source address
-    lda 9,s                 ; tilemapSize
+    lda 11,s                ; tilemapSize
     sta.l $4305             ; DMA transfer size
 
     sep #$20
     .ACCU 8
-    lda 12,s                ; high byte of tilemap address
-    cmp #$80
-    bcc @tilemap_ram_bank
-    lda #$00                ; ROM address → bank $00
-    bra @tilemap_set_bank
-@tilemap_ram_bank:
-    lda #$7E                ; RAM address → bank $7E
-@tilemap_set_bank:
+    lda 15,s                ; tilemap bank byte (post-A6)
     sta.l $4304             ; DMA source bank
 
     lda #$01
@@ -347,21 +345,14 @@ dmaCopyVramMode7:
 
     rep #$20
     .ACCU 16
-    lda 7,s                 ; tiles address (16-bit)
+    lda 7,s                 ; tiles low 16
     sta.l $4302             ; DMA source address
     lda 5,s                 ; tilesSize
     sta.l $4305             ; DMA transfer size
 
     sep #$20
     .ACCU 8
-    lda 8,s                 ; high byte of tiles address
-    cmp #$80
-    bcc @tiles_ram_bank
-    lda #$00                ; ROM address → bank $00
-    bra @tiles_set_bank
-@tiles_ram_bank:
-    lda #$7E                ; RAM address → bank $7E
-@tiles_set_bank:
+    lda 9,s                 ; tiles bank byte (post-A6)
     sta.l $4304             ; DMA source bank
 
     lda #$01

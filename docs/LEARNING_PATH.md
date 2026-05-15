@@ -104,12 +104,12 @@ SA-1 uses the same 65816 ISA at 3x speed; SuperFX is a custom RISC processor.
 
 ### SA-1 Coprocessor (same ISA, 10.74 MHz)
 
-@subpage examples_enhancement_sa1_hello
+@subpage examples_memory_sa1_hello
 
-@subpage examples_enhancement_sa1_starfield
+@subpage examples_memory_sa1_starfield
 
 ### SuperFX / GSU (custom RISC, bitmap + 3D)
 
-@subpage examples_enhancement_superfx_hello
+@subpage examples_memory_superfx_hello
 
-@subpage examples_enhancement_superfx_3d
+@subpage examples_graphics_effects_superfx_3d

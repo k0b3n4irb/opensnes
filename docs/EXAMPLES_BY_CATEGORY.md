@@ -44,6 +44,7 @@ Sprite display, animation, and OAM management.
 | @subpage examples_graphics_sprites_simple_sprite | Basic OAM setup, sprite display |
 | @subpage examples_graphics_sprites_animated_sprite | Frame animation, sprite sheets, H-flip |
 | @subpage examples_graphics_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
+| @subpage examples_graphics_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
 | @subpage examples_graphics_sprites_object_size | OBJSEL size configurations (8x8 to 64x64) |
 | @subpage examples_graphics_sprites_metasprite | Multi-tile composite sprites |
 
@@ -74,6 +75,7 @@ Controller input: joypads, mouse, and Super Scope.
 
 | Example | Description |
 |---------|-------------|
+| @subpage examples_input_controller | Standard joypad: button state, edge detection |
 | @subpage examples_input_two_players | Joypad reading, two-player movement |
 | @subpage examples_input_mouse | Mouse detection, cursor, sensitivity |
 | @subpage examples_input_superscope | Light gun detection, PPU H/V counters |
@@ -86,7 +88,9 @@ Music and sound effects via SNESMOD (Impulse Tracker format).
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls |
+| @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls (LoROM) |
+| @subpage examples_audio_snesmod_music_hirom | Same workflow as snesmod_music but built for HiROM |
+| @subpage examples_audio_snesmod_music_large | Large soundbank: multi-bank module split |
 | @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
 
 ---
@@ -98,7 +102,9 @@ Tile-based maps, streaming, and collision.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_maps_dynamic_map | Dynamic tile map streaming |
+| @subpage examples_maps_mapscroll | Smooth tile-aligned scrolling with viewport tracking |
 | @subpage examples_maps_slopemario | Slopes and tile-based collision |
+| @subpage examples_maps_tiled | Tiled Map Editor (.tmx) integration |
 
 ---
 
@@ -119,7 +125,11 @@ Fundamental game mechanics.
 
 | Example | Description |
 |---------|-------------|
+| @subpage examples_basics_aim_target | Aim a cursor at moving targets — sprites + input |
 | @subpage examples_basics_collision_demo | Bounding-box sprite collision detection |
+| @subpage examples_basics_random | LCG pseudo-random number generation |
+| @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
+| @subpage examples_basics_timer | Frame-accurate timers with VBlank counters |
 
 ---
 
@@ -147,8 +157,8 @@ sharing I-RAM with the main CPU for inter-processor communication.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_enhancement_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
-| @subpage examples_enhancement_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
+| @subpage examples_memory_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
+| @subpage examples_memory_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
 
 ### SuperFX (GSU)
 
@@ -157,5 +167,5 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_enhancement_superfx_hello | Boot + SRAM + FMULT hardware tests |
-| @subpage examples_enhancement_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
+| @subpage examples_memory_superfx_hello | Boot + SRAM + FMULT hardware tests |
+| @subpage examples_graphics_effects_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
