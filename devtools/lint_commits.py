@@ -125,13 +125,18 @@ def check_subject(subject: str) -> list[str]:
         # register names) legitimately start with uppercase and would
         # otherwise force unnatural rewrites ("c99" for "C99",
         # "oam buffer" for "OAM buffer"). Allow when the first
-        # whitespace-delimited word is an acronym/techterm:
+        # whitespace-delimited word's PREFIX (up to the first '.' or '-')
+        # is an acronym/techterm:
         #   - all caps with optional digits (OAM, DMA, GSU, API, ABI)
         #   - letter + digits (C99, K8, R64)
-        # Anything else (e.g., "Refactor the foo") still trips.
+        # The prefix-split lets hyphenated/dotted chantier identifiers
+        # through: A1-followup (prefix A1), A6.13 (prefix A6),
+        # A1-followup-extra (prefix A1). Anything else
+        # (e.g., "Refactor the foo", "Refactor-something") still trips.
         first_word = desc.split()[0]
-        is_techterm = bool(re.fullmatch(r"[A-Z][A-Z0-9]*[a-z]?", first_word)) \
-                      or bool(re.fullmatch(r"[A-Z][0-9]+", first_word))
+        prefix = re.split(r"[-.]", first_word, maxsplit=1)[0]
+        is_techterm = bool(re.fullmatch(r"[A-Z][A-Z0-9]*[a-z]?", prefix)) \
+                      or bool(re.fullmatch(r"[A-Z][0-9]+", prefix))
         if not is_techterm:
             errors.append("description should start with a lower-case letter")
 
