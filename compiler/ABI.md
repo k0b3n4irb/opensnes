@@ -139,12 +139,47 @@ For functions that need to clean up a frame, the epilogue uses `tax / tsa /
 adc.w #F / tas / txa` (save A in X, fix SP, restore A) — never `tsa` then
 `txa` directly because `tsa` would overwrite A.
 
-### 32-bit values (u32, s32, struct {u16, u16})
+### 32-bit values (u32, s32, pointer)
 
-Caller reserves 4 stack bytes; callee writes the result there before
-returning. Implementation detail: the runtime helpers `__mul32`, `__div32`
-etc. read operands from `SP+5..SP+8` and write the 32-bit result to the
-caller's reserved slot.
+Convention depends on call shape:
+
+**Compiler-generated `jsl` to a C function returning `long`** (post-A1-followup
+2026-05-16): callee returns the low 16 bits in `A`. The high 16 bits are
+currently **not** explicitly conveyed across the call — the destination
+Kl temp's high half is left at whatever the caller's emit_store_high
+produces, which for a fresh temp slot is the slot's prior contents. In
+practice the SDK does not yet ship any C function whose `long` return is
+consumed as a full 32-bit value; this is a latent issue tracked in
+`KNOWN_LIMITATIONS.md`.
+
+**Runtime helpers (`__mul32`, `__[s]divmod32`)**: low 16 returned in `A`,
+high 16 (and remainder halves where applicable) returned in named scratch
+slots — `mul32_hi`, `div32_qh`, `div32_rl`, `div32_rh` — that the caller
+reads with `lda.l`. This convention exists because the helpers are leaf
+asm and `tcc__r0`/`tcc__r1` are user-clobberable.
+
+Helper call shape (compiler emits at every `Omul Kl` / `Odiv Kl` / etc.):
+```asm
+    ; push 2 Kl args = 8 bytes (high then low per arg, r1 first per __mul16
+    ; convention so the multiplicand sits at the lower stack offset)
+    jsl __mul32
+    tax                  ; save A = result low
+    tsa
+    clc
+    adc.w #8             ; cleanup 8 bytes (faster than 4×plx with retval)
+    tas
+    txa                  ; restore A
+    sta <dest_low>,s     ; emitstore low
+    lda.l mul32_hi
+    sta <dest_high>,s    ; emit_store_high
+```
+
+### Larger structs (deprecated path)
+
+Pre-A1-followup the comment here noted "caller reserves 4 stack bytes;
+callee writes the result there" — that text described a hypothetical
+not-quite-implemented convention. See the runtime-helper paragraph above
+for the actual mechanism.
 
 ### Larger structs
 
@@ -306,19 +341,20 @@ For the assembly source, see `lib/source/sprite_oamset.asm`.
 
 ## Type sizes
 
-| C type | Size (bytes) | Notes |
-|--------|:------------:|-------|
-| `u8` / `s8` / `bool` / `_Bool` | 1 (storage), 2 (stack slot) | Always zero/sign-extended when passed as argument. |
-| `u16` / `s16` / `int` / `unsigned int` | 2 | Native word size on the w65816 target. (Aligned with SNES expectations since chantier A1, 2026-05-08.) |
-| `u32` / `s32` / `long` / `unsigned long` | 4 | Stack-passed and stack-returned. |
-| `long long` / `unsigned long long` | 8 | C99 requires ≥ 64-bit. |
-| pointer | 8 in IR, 2 on stack | Pointer storage in `static const` structs is 8 bytes (cproc IR holdover; chantier A6 will reduce to 4). On the runtime stack, parameters take 2 bytes per slot per the w65816 ABI. Function pointers preserve the bank byte via the 8-byte storage layout — reducing it requires a coordinated emit-pass change (A6). |
-| `float` / `double` | 4 / 8 | Software floats — extremely slow, used only by `printf`-style helpers. Avoid in game code. |
+| C type | Size (bytes) | IR class | Notes |
+|--------|:------------:|:--------:|-------|
+| `u8` / `s8` / `bool` / `_Bool` | 1 (storage), 2 (stack slot) | Kw | Always zero/sign-extended when passed as argument. |
+| `u16` / `s16` / `int` / `unsigned int` | 2 | Kw | Native word size on the w65816 target. (Aligned with SNES expectations since chantier A1, 2026-05-08.) |
+| `u32` / `s32` / `long` / `unsigned long` | 4 | **Kl** | Two 16-bit halves on the stack (high then low at higher offset). All arithmetic flows through the QBE w65816 backend's Kl handlers (Oadd/Osub carry, Omul via `__mul32`, Odiv via `__[s]divmod32`, cascade compares, cross-half shifts). 32-bit semantics shipped in chantier A1-followup, 2026-05-16. |
+| `long long` / `unsigned long long` | 8 | (host) | C99 requires ≥ 64-bit. Not exercised in the SDK; cproc still emits via the host-target lowering. |
+| pointer (function / data) | 4 | Kl | Storage is 24-bit address (low 16 + bank byte) + 1 byte alignment. Indirect calls read the bank byte from the pointer's high half (chantier A6+A7, shipped 2026-05-15 in v0.19.0). |
+| `float` / `double` | 4 / 8 | Ks / Kd | Software floats — extremely slow, used only by `printf`-style helpers. Avoid in game code. |
 
 For SDK code, prefer the explicit fixed-width types `u8`, `u16`, `s16`,
 `u32` from `lib/include/snes/types.h` for **portability** (cross-compiler
-clarity). Bare `int` is now correct on this target since chantier A1
-shipped (2026-05-08).
+clarity). Bare `int` is correct on this target since chantier A1 shipped
+(2026-05-08); bare `long` carries proper 32-bit semantics since A1-followup
+(2026-05-16).
 
 ---
 
