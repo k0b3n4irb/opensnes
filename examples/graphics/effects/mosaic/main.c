@@ -47,39 +47,9 @@ void WaitForKey(void) {
     while (padHeld(0) == 0) WaitForVBlank();
 }
 
-/**
- * @brief Fade the screen from full brightness to black over ~30 frames.
- *
- * Decrements the SNES master brightness register (INIDISP, $2100) from 15
- * (full) to 0 (black). Each brightness step lasts 2 frames (~33ms), producing
- * a smooth ~500ms fade-out. The PPU multiplies all pixel colors by
- * (brightness / 15), so brightness 0 = completely black.
- */
-void doFadeOut(void) {
-    u8 i;
-    for (i = 15; i > 0; i--) {
-        setBrightness(i);
-        WaitForVBlank();
-        WaitForVBlank();
-    }
-    setBrightness(0);
-}
-
-/**
- * @brief Fade the screen from black to full brightness over ~32 frames.
- *
- * Increments INIDISP brightness from 0 to 15. Two WaitForVBlank() calls per
- * step create a 2-frame hold at each level, matching doFadeOut() timing for
- * a symmetrical fade cycle.
- */
-void doFadeIn(void) {
-    u8 i;
-    for (i = 0; i <= 15; i++) {
-        setBrightness(i);
-        WaitForVBlank();
-        WaitForVBlank();
-    }
-}
+/* Brightness fade helpers have moved to the lib — `fadeOut(speed)` and
+ * `fadeIn(speed)` in snes/console.h. This example used speed=2 (two
+ * VBlank waits per brightness step, ~500 ms total). */
 
 /**
  * @brief Activate the hardware mosaic filter and animate pixel blocks growing.
@@ -136,11 +106,11 @@ int main(void) {
     WaitForKey();
 
     while (1) {
-        doFadeOut();
+        fadeOut(2);
         WaitForVBlank();
         WaitForKey();
 
-        doFadeIn();
+        fadeIn(2);
         WaitForVBlank();
         WaitForKey();
 
