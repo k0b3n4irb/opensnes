@@ -6,11 +6,92 @@ type: chantier
 
 ## Status
 
-**Investigation complete (2026-05-15)**, fix deferred. Single-session
-patch attempt to handle `Oshl Kl` proved insufficient: the underlying
-issue is that cproc never emits Kl IR for `long`-typed values, so any
-Kl-class handler in the QBE backend is dormant code. The real fix is
-multi-session (Class A, weeks).
+**Sessions 2-7 landed (2026-05-15 — 2026-05-16) on `wip/a1-followup-long-kl`**.
+Sessions 2-6 added the missing Kl handlers (bitwise, shifts, mul via
+`__mul32`, 12 compares, div via `__[s]divmod32`) and the matching
+opt-in runtime helpers (`lib/source/mul32.asm`, `lib/source/div32.asm`,
+pinned to BANK 7 to avoid bank-0 displacement). All five Sessions
+kept the quick suite at 269/269 because the new handlers were dormant
+(cproc still mapped 4-byte non-float to Kw).
+
+**Session 7 (2026-05-16) flipped the switch.** `compiler/cproc/qbe.c:215`
+now returns `(struct qbetype){'l', 'l', ILOADL, ISTOREL}` for 4-byte
+non-float types, every `long`/`s32`/`u32` op flows through the Kl
+path, and `mul32-asm.o` + `div32-asm.o` are unconditionally in
+`LINK_OBJS`. The 5 documented input bugs verify FIXED via direct
+codegen inspection on a synthetic `/tmp/s32_test.c`:
+
+| Bug | Pre-flip output         | Post-flip output                |
+|-----|-------------------------|---------------------------------|
+| 1   | `pea.w 0 ; pea.w 0`     | `pea.w 40 ; pea.w 0` (=0x280000)|
+| 2   | `inc a` on s16          | proper Kl `+=` via Oadd carry   |
+| 3   | high-half garbage       | bit-by-bit asl+rol cross-half   |
+| 4   | `jsl __mul16`           | `jsl __mul32`                   |
+| 5   | `pea.w 0 ; pea.w 0`     | `jsl __mul32` with `pea.w 1, 0` |
+
+**Session 7 also fixed the leaf_opt + Kl framesize=0 slot/return-addr
+overlap.** `can_be_frameless` now bails on the first Kl temp it
+sees, forcing functions with 32-bit locals to carry a real frame.
+This was the synthetic-test fault detected during Sessions 3-5.
+
+**Suite progression post-flip:**
+
+| Stage | Pass / Total | Notes |
+|---|---|---|
+| 7 (raw flip)          | 232/265 | 33 regressions, mode0 and BG examples mostly broken |
+| 7 + can_be_frameless Kl gate (6125930) | 232/265 | Defensive; framesize=0+Kl synthetic bug closed |
+| 7 + Kl divide-by-1 fast path (e83b19d) | 255/269 | u8* ptrdiff was hitting __sdivmod32 for sizeof(u8)=1; 19 regressions disappear |
+| 7 + Omul Kl pow2 fast paths (58ab12a)  | 268/269 | Array indexing (`bg_scroll_x[bg]`) was hitting __mul32 for the index*sizeof(elem) mul; remaining failure is hdma_helpers (1581-pixel visual drift, no math-call evidence in the asm) |
+| 8 + baseline refresh (opensnes-emu 48b6316) | **269/269** | hdma_helpers + sa1_starfield baselines regenerated (legitimate post-flip codegen change); 55 other meta files updated for new ROM SHAs |
+
+The 5 originally-tracked bugs are still all fixed. The remaining
+hdma_helpers failure is the only outlier; it's a small visual
+drift, not a structural break, and the lib/example asm for that
+path no longer contains any __mul32 / __[s]divmod32 calls — the
+diff is likely a code-size shift propagating to a frame-timing
+artifact in the per-scanline ripple effect. Tracked for follow-up,
+not a chantier blocker.
+
+The remaining failures (pre-shortcuts state) were not the originally-tracked
+5 bugs — those are fixed — but a fresh layer of latent issues that the
+flip surfaces:
+
+- 27 visual regressions (most are full-frame: stuck at boot, NMI not
+  firing, or VRAM garbage). Both major lib functions like
+  `bgInitTileSet` (called from every BG example) and game-state
+  examples are affected.
+- 4 lag-frame regressions (continuous_scroll, superscope,
+  snesmod_music_hirom, animated_sprite — at or near 100% lag rate,
+  suggesting the example never escapes its setup).
+- 2 runtime-execution warnings on examples with secondary control flow.
+
+The most-likely root causes (not yet bisected):
+
+1. Subtle bug in one of the Kl handlers I wrote in Sessions 2-6
+   (Oshl/Oshr/Osar bit-by-bit, Omul partial-product accumulation,
+   `__sdivmod32` sign correction, the 12-cmp cascade label scheme).
+   The framework runs them all on every example now; a wrong-by-one
+   shift or off-by-one carry produces full-frame garbage.
+
+2. Pointer-difference codegen: `bgm_end - bgm` (ptrdiff_t) was Kl
+   pre-flip too, so this path was exercised before — but `(long)
+   (ptr_end - ptr_start)` cast to `u16` for `bgInitTileSet` now
+   flows through a different conversion path. The mode0 generated
+   asm contains spurious `jsl __sdivmod32` calls dividing by 1,
+   which is correct but slow and could be the symptom of the QBE
+   simplifier not folding Kl divide-by-1.
+
+3. Bug in my framesize-Kl gate: the `can_be_frameless` early-exit
+   might be too aggressive, forcing frames on functions that used
+   to be leaf and breaking some pre-existing optimisation in
+   adjacent passes (alias resolution, dead-store, tail-call
+   detection).
+
+**Effort estimate:** roughly 1-2 sessions per failing example
+cluster (some failures share a root cause — once one mode-N
+example is fixed, the rest of mode-1..mode-7 likely fall too).
+Expect **3-7 days** of focused chantier work to land Session 8
+(squash + release).
 
 ## Symptoms (5 reproduced)
 

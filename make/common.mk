@@ -96,6 +96,11 @@ ROMSIZE     ?= $$08
 # Derived configuration (one-liners using $(if))
 LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
 RUNTIME_OBJ  := $(LIBDIR)/runtime-asm.o
+# 32-bit math helpers (always linked post-A1-followup chantier — every long
+# arithmetic op may emit jsl __mul32 / jsl __[s|u]divmod32 once cproc maps
+# the 4-byte non-float class to Kl).
+MUL32_OBJ    := $(LIBDIR)/mul32-asm.o
+DIV32_OBJ    := $(LIBDIR)/div32-asm.o
 HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_SUPERFX)),hdr_superfx.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm)))
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
 CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_SRAM)),$$02,$$00)))
@@ -335,7 +340,7 @@ LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
-LINK_OBJS += $(SOUNDBANK_OBJ) data_init_end.o
+LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) data_init_end.o
 
 linkfile: $(LINK_OBJS)
 	@echo "[objects]" > $@
