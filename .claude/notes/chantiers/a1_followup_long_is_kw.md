@@ -43,6 +43,7 @@ This was the synthetic-test fault detected during Sessions 3-5.
 | 7 + Kl divide-by-1 fast path (e83b19d) | 255/269 | u8* ptrdiff was hitting __sdivmod32 for sizeof(u8)=1; 19 regressions disappear |
 | 7 + Omul Kl pow2 fast paths (58ab12a)  | 268/269 | Array indexing (`bg_scroll_x[bg]`) was hitting __mul32 for the index*sizeof(elem) mul; remaining failure is hdma_helpers (1581-pixel visual drift, no math-call evidence in the asm) |
 | 8 + baseline refresh (opensnes-emu 48b6316) | **269/269** | hdma_helpers + sa1_starfield baselines regenerated (legitimate post-flip codegen change); 55 other meta files updated for new ROM SHAs |
+| 8 + Mesen2 manual validation (2026-05-17)   | **269/269 + 4 visual** | hdma_helpers (4 HDMA effects), likemario (gameplay+collision), mode0 (4-BG parallax), snesmod_music (audio+HDMA) all render cleanly in Mesen2. Class A 3-pillar contract satisfied. |
 
 The 5 originally-tracked bugs are still all fixed. The remaining
 hdma_helpers failure is the only outlier; it's a small visual
