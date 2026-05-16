@@ -58,14 +58,12 @@ extern u8 mapmario[];
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
 extern u8 tilesetatt[];
 
-/**
- * @brief DMA all tile and palette data from ROM to VRAM/CGRAM.
- *
- * Implemented in assembly because SUPERFREE sections may land in ROM
- * banks $01+. The assembly uses `:label` to get the correct bank byte
- * for each DMA source, which C cannot express.
- */
-extern void loadGraphics(void);
+/** @brief Asset symbols from data.asm (.incbin sections in SUPERFREE banks).
+ * Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram
+ * read it directly — no ASM loader stub needed. */
+extern u8 tiles_til[], tiles_tilend[];
+extern u8 tiles_pal[], tiles_palend[];
+extern u8 mario_sprite_pal[], mario_sprite_palend[];
 
 /**
  * @brief Get the ROM bank byte of mario_sprite_til.
@@ -703,8 +701,11 @@ int main(void) {
     bgSetGfxPtr(0, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_MAP, SC_64x32);
 
-    /* DMA all tile/palette data with correct bank bytes (SUPERFREE may be bank $01+) */
-    loadGraphics();
+    /* DMA tile + palette assets. C pointers carry the bank byte post-A6+A7
+     * so dmaCopyVram / dmaCopyCGram resolve SUPERFREE source banks natively. */
+    dmaCopyVram(tiles_til,        VRAM_BG_TILES, tiles_tilend - tiles_til);
+    dmaCopyCGram(tiles_pal,        0,             tiles_palend - tiles_pal);
+    dmaCopyCGram(mario_sprite_pal, 128,           mario_sprite_palend - mario_sprite_pal);
 
     {
         static const OamDynamicConfig dyn_cfg = {

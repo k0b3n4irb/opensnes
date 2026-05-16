@@ -190,8 +190,9 @@ color shifting left and right. The checkerboard makes the distortion obvious.
 - **Layer-specific waves:** Use a second HDMA channel on BG2HOFS with a different
   amplitude or frequency. Two layers waving independently creates impressive depth.
 
-- **Next example:** [HDMA Gradient](../hdma_gradient/) — using HDMA to create smooth
-  color gradients across the screen.
+- **Next example:** [HDMA Helpers](../hdma_helpers/) — the high-level helper
+  API for brightness gradients, color gradients, iris wipes, and water
+  ripples, all in one interactive showcase.
 
 ---
 

@@ -40,15 +40,16 @@
 /**
  * @brief Assembly DMA loader for SUPERFREE graphics data.
  *
- * Handles DMA transfers with correct bank bytes for tile/tilemap/palette data
- * that may be placed in ROM banks beyond $00 by the linker. C code cannot
- * reliably specify bank bytes for SUPERFREE sections, so an assembly routine
- * uses the `:label` syntax to get the linker-resolved bank at link time.
- *
- * Defined in data.asm. Loads BG1 (4bpp landscape) and BG3 (2bpp clouds)
- * tile data, tilemaps, and palettes to their respective VRAM/CGRAM addresses.
+ * Asset symbols from data.asm (.incbin sections). Post-A6+A7 (v0.19.0)
+ * C pointers carry the bank byte, so `dmaCopyVram` / `dmaCopyCGram`
+ * resolve the correct source bank automatically — no ASM stub needed.
  */
-extern void loadGraphics(void);
+extern u8 land_tiles[], land_tiles_end[];
+extern u8 land_map[], land_map_end[];
+extern u8 land_pal[], land_pal_end[];
+extern u8 cloud_tiles[], cloud_tiles_end[];
+extern u8 cloud_map[], cloud_map_end[];
+extern u8 cloud_pal[], cloud_pal_end[];
 
 /**
  * @brief Entry point: color math transparency with scrolling clouds over a landscape.
@@ -74,9 +75,15 @@ int main(void) {
      * for a single VBlank DMA transfer (~4KB budget). */
     setScreenOff();
 
-    /* Load all tile data, tilemaps, and palettes via assembly DMA.
-     * This handles bank bytes correctly for SUPERFREE ROM data. */
-    loadGraphics();
+    /* Load BG1 (4bpp landscape) tiles, tilemap, and palette */
+    dmaCopyVram(land_tiles, 0x0000, land_tiles_end - land_tiles);
+    dmaCopyVram(land_map,   0x2000, land_map_end   - land_map);
+    dmaCopyCGram(land_pal,  16,     land_pal_end   - land_pal);
+
+    /* Load BG3 (2bpp clouds) tiles, tilemap, and palette */
+    dmaCopyVram(cloud_tiles, 0x1000, cloud_tiles_end - cloud_tiles);
+    dmaCopyVram(cloud_map,   0x2400, cloud_map_end   - cloud_map);
+    dmaCopyCGram(cloud_pal,  0,      cloud_pal_end   - cloud_pal);
 
     /* BG1 screen map at VRAM $2000, 32x32 tile arrangement (SC_32x32).
      * The screen size bits (0-1) are 0x00 = 32x32. The upper bits hold

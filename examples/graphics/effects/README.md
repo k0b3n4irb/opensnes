@@ -14,7 +14,6 @@ give SNES games their distinctive visual style.
 | [transparency](transparency/) | Intermediate | Color math add/subtract blending between layers |
 | [transparent_window](transparent_window/) | Intermediate | Combining color math with windowed regions |
 | [gradient_colors](gradient_colors/) | Intermediate | HDMA-driven CGRAM color gradients per scanline |
-| [hdma_gradient](hdma_gradient/) | Intermediate | HDMA brightness/color gradient effect |
 | [parallax_scrolling](parallax_scrolling/) | Advanced | HDMA-driven multi-rate parallax scrolling |
 | [hdma_wave](hdma_wave/) | Advanced | HDMA wave distortion (wavy scanline offsets) |
 
