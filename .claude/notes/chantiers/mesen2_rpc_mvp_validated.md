@@ -71,16 +71,69 @@ chantiers.
 | MCP server | Stdio bridge, all 27 tools exposed as `snes_*` Claude tools |
 | Autonomous flow | Address derivation from disasm + sym + ASM inspection works |
 
-## What's NOT yet validated
+## ROI realised — tetris `__mul32` bug (2026-05-17)
 
-- **Acache bug reproduction**. The detection *shape* is proven, but
-  the actual A6 fix is in place, so there's no bug to detect right
-  now. To truly close Phase 5 with full force we'd:
-  - branch off A6 with the acache fix reverted
-  - run the demo
-  - watch i_loop exceed 12 at some iteration
-  - confirm the script flags it
-  Deferred — the structural proof is enough for now.
+The first **real** chantier-level bug solved autonomously via mesen2-rpc.
+Closes the loop on "is the 4-6 month investment worth it?" — the answer
+landed on the first non-trivial use.
+
+**Bug**: `__mul32` was declared in `lib/source/mul32.asm` as
+`.DEFINE __mul32 tcc_mul32` with `.EXPORT __mul32`. WLA-DX's `.DEFINE`
+captures the value at parse time, before sections are placed, so the
+exported symbol carried only the 16-bit offset ($8000) and dropped
+BANK 7. The linker resolved `__mul32` to $00:8000 — the address of
+`tcc_mul16` (BANK 0 SEMIFREE, placed first). Every `JSL __mul32` from
+C jumped to `tcc_mul16`. With incompatible stack layouts, every Kl
+mul returned 0. `board[r][c]` always indexed `board[0][c]` →
+tetris broken since A1-followup landed (v0.20.0).
+
+**Hidden from static analysis**: the asm looked correct (`jsl __mul32`).
+The symbol table looked correct (`__mul32 = $008000`). The qbe codegen
+looked correct. The mul32.asm code looked correct. Only at runtime,
+disassembling `$00:8000`, did the lie surface: that address held
+tcc_mul16's bytes, not tcc_mul32's. Static review missed it for
+~3 days of investigation that had me considering rewriting most of
+qbe's Kl handlers.
+
+**mesen2-rpc workflow that found it**:
+1. Build tetris with stateTitle() patched to auto-start (no input
+   simulation tool in MCP yet — workaround: bypass the START check).
+2. Load via `snes_load_rom`, run frames to enter gameplay.
+3. Read board state via `snes_mem_read_range($0061, 240)` — saw type=4
+   cells at row 0 cols 3,4,5 (PIECE_S locked at HIDDEN spawn row).
+4. Set exec BP at `boardLockPiece` entry ($00:E75B), wait for hit.
+5. Read stack args: row=22, col=3, type=4 — correct.
+6. Walk into the function, BP at `STA $0000,X` (the actual board
+   write), read X = $0064 = `board[0][3]`. Should have been $0141 =
+   `board[22][4]`.
+7. Backtrack: the address came from a `__mul32(22, 10)` call that
+   returned 0 instead of 220.
+8. Step into `JSL $008000`, disassemble — discovered `tcc_mul16`'s
+   code at $00:8000 instead of `tcc_mul32`'s.
+
+Total round-trips to the emulator: **~25**. Wall time: **~3 minutes**.
+Without mesen2-rpc, this would have been hours of "open Mesen2,
+click breakpoint, type address, observe register, swap windows to
+the asm dump, scroll, re-set breakpoint, repeat" — and the user
+would have done all of it manually because Claude can't drive a GUI.
+
+**ROI verdict**: paid for itself on the first real use. The
+detection shape proven in May 14's mvp-demo.mjs (BP + step +
+mem.read composing into a corruption check) is exactly the shape
+that surfaced this bug. The structural-blindness era is over.
+
+**Tool gaps surfaced**:
+- No input injection (joypad write). Workaround: patch the C source
+  to bypass input-gated state machines. Acceptable for autonomous
+  debugging but inconvenient. Future tool: `snes_input_set(buttons)`.
+- No memory write tool. Could not e.g. write `game_state = STATE_PLAYING`
+  directly to skip the title screen — had to recompile. Future tool:
+  `snes_mem_write_byte/word`.
+
+Both deferred — workarounds work, the surface already covered the
+diagnostic need.
+
+## What's NOT yet validated
 
 - **Cross-CPU breakpoints** (SA-1, SuperFX). All testing was on the
   main 65816 CPU. The BPM splits by CPU type; we'd need a separate
