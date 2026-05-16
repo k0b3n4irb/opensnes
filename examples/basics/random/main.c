@@ -26,7 +26,7 @@
  * - After re-seeding, the sequence changes unpredictably
  *
  * @par Modules Used
- * console, sprite, dma, background, text, input
+ * console, sprite, dma, background, text, input, gameloop
  *
  * @see console.h (rand, srand)
  */

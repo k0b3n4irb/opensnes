@@ -25,7 +25,7 @@
  * - Press B to re-enable the gradient effect
  *
  * @par Modules Used
- * console, dma, background, sprite, hdma, input, math
+ * console, dma, background, sprite, hdma, input
  *
  * @see hdma.h, background.h, input.h, video.h
  */

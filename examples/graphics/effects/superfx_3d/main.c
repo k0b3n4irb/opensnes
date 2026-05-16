@@ -2,6 +2,33 @@
  * @file main.c
  * @brief SuperFX 3D — auto-rotating wireframe cube (2-axis rotation)
  * @ingroup examples
+ *
+ * Demonstrates GSU (SuperFX) coprocessor execution. The 65816 sets up a
+ * Mode 1 bitmap framebuffer in VRAM, then hands control to a small GSU
+ * program (compiled separately by wla-superfx) that rotates a cube's 8
+ * vertices via the GSU's hardware sine LUT and writes the edge bytes
+ * into SRAM. The 65816 streams those edge bytes back to VRAM each
+ * frame via DMA. The result: a smoothly rotating 3D wireframe entirely
+ * driven by the GSU.
+ *
+ * @par SNES Concepts
+ * - GSU launch via `gsuLaunch()` (gsuRun + cache prefetch)
+ * - GSU ↔ 65816 communication via SRAM as shared scratch
+ * - DMA full-frame transfer from SRAM to VRAM each frame
+ * - HDMA-driven force-blank during transfer (gsuSetupHdmaBlanking)
+ *
+ * @par What to Observe
+ * - A wireframe cube rotates continuously on two axes (X and Y).
+ * - No input — the rotation is autonomous; reset to restart from
+ *   the initial angle.
+ * - GSU presence is detected via the ROM header bits; Mesen2 is the
+ *   canonical emulator for this example (snes9x's GSU detection
+ *   is unreliable on our header layout — see KNOWN_LIMITATIONS).
+ *
+ * @par Modules Used
+ * console, sprite, dma, background, input, superfx
+ *
+ * @see superfx.h, dma.h, background.h
  */
 
 #include <snes.h>

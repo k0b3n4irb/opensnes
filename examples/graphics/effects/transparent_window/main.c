@@ -28,7 +28,7 @@
  * - The rectangle edges are pixel-sharp (HDMA-defined per scanline)
  *
  * @par Modules Used
- * console, sprite, dma, background, window, colormath, hdma, math
+ * console, sprite, dma, background, window, colormath, hdma
  *
  * @see hdma.h, colormath.h, video.h
  */
