@@ -27,12 +27,10 @@
 .endif
 .endif
 
-.DEFINE __mul32 tcc_mul32
-.EXPORT __mul32
-
 ; Pinned to bank 7 (highest LoROM/HiROM bank, empty in every example as of
 ; the A1-followup chantier) so the ~200-byte helper doesn't displace const
 ; strings out of bank 0 in examples that were already brushing the limit.
+.EXPORT tcc_mul32
 .SECTION ".mul32" BANK 7 FREE
 
 .ACCU 16
@@ -40,6 +38,17 @@
 
 ;------------------------------------------------------------------------------
 ; tcc_mul32 - 32-bit multiplication (low 32 bits of product)
+;
+; CRITICAL: this section exports `tcc_mul32` directly — the qbe backend
+; emits `jsl tcc_mul32` so the call target carries the full 24-bit address
+; (bank 7 + offset $8000). The previous setup used
+;   .DEFINE __mul32 tcc_mul32 ; .EXPORT __mul32
+; which captured only the 16-bit offset at .DEFINE time (sections aren't
+; placed until link). `__mul32` resolved to $00:8000 — colliding with
+; `tcc_mul16` which also exports $8000 from BANK 0. Every Kl mul call
+; from C jumped to mul16 instead and computed the wrong 16-bit product.
+; Was tetris's root cause: every `board[r][c]` indexed `board[0][c]`
+; because `r * 10` always returned 0.
 ;------------------------------------------------------------------------------
 ; For two's-complement multiply, the low N bits of a*b are identical whether
 ; a,b are interpreted as signed or unsigned, so no sign handling is needed
