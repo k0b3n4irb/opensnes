@@ -181,15 +181,27 @@ The fork burden is real (`compiler/cproc` carries 6 patches,
 `compiler/qbe` carries 28); each item below either makes that burden
 worse or is gated by it.
 
-#### A1. `int = 32 bits`, `long = 64 bits` on cc65816 🔴
+#### A1. `int = 32 bits`, `long = 64 bits` on cc65816 — RESOLVED 🟢 (v0.20.0, 2026-05-17)
 
-> **Status (2026-05-08): PARTIAL — `int=2, long=4` shipped; pointer change
-> deliberately separated into a new chantier A6.** The empirical investigation
-> revealed that combining the int/long change with the pointer change (the
-> original Q1 Option B "all-at-once" plan from 2026-05-08 session) cascades
-> catastrophically through QBE w65816's indirect-call emit pass. Splitting
-> was forced by reality, not preference. See A6 below for the deferred
-> pointer chantier.
+> **Status: FULLY RESOLVED.**
+>
+> - **Sizes** shipped in v0.17.0 / chantier A1 (2026-05-08):
+>   `sizeof(int) = 2`, `sizeof(long) = 4`.
+> - **Pointer** shipped in v0.19.0 / chantier A6+A7 (2026-05-15):
+>   pointer storage 8 → 4 (24-bit address + 1 pad), Kl pair lowering
+>   in the w65816 backend.
+> - **`long` semantics** shipped in v0.20.0 / chantier A1-followup
+>   (2026-05-17): cproc maps 4-byte non-float to QBE class `'l'`
+>   instead of `'w'`. Every arithmetic op (Oadd/Osub with carry,
+>   shifts with cross-half rol, multiply via `__mul32`, divide
+>   via `__[s]divmod32`, 12-way cmp cascade, bitwise, neg, sign/zero
+>   extend) flows through the Kl handlers added in Sessions 2-6 of
+>   the A1-followup chantier. The five latent truncation bugs
+>   documented in `.claude/notes/chantiers/a1_followup_long_is_kw.md`
+>   are all closed (verified by direct codegen inspection).
+>
+> Kept below for historical context of the May 2026 investigation
+> that split A1 into the three milestones.
 
 **Symptom**: code using bare `int` or `long` produces 32-bit / 64-bit
 arithmetic on a 16-bit CPU, doubling cycles and RAM. Particularly bites

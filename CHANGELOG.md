@@ -5,6 +5,117 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.20.0] — 2026-05-17
+
+Chantier A1-followup — `long` arithmetic flows through 32-bit Kl
+codegen end-to-end. Closes the silent-truncation hole left by
+chantier A1 (v0.17.0): `int = 2`, `long = 4` shipped the SIZE alignment,
+but cproc kept mapping 4-byte non-float to QBE class `'w'` (Kw,
+16-bit), so every `long` operator was being silently truncated to
+16 bits. The five reproductions documented in
+`.claude/notes/chantiers/a1_followup_long_is_kw.md` — `(s32)40 << 16`
+folding to zero, `s32 *= s32` routing through `__mul16`, etc. — are
+now all closed.
+
+Beyond the chantier, the commit-message linter was simplified: the
+first-letter-of-description case check was overkill (Conventional
+Commits doesn't mandate case) and just made external contributors
+fight regex exceptions for acronyms like `OAM` or `A1-followup` for
+no real win. Dropped entirely.
+
+### Compiler
+
+- **chantier A1-followup (cproc `c755269`, qbe `58ab12a`).** Cproc
+  flips `qbe.c:215`: 4-byte non-float types return QBE class `'l'`
+  (Kl) instead of `'w'` (Kw). QBE's w65816 backend gains the Kl
+  handlers that were missing before this release — Kw paths existed
+  for pointers (A6 chantier) but never for the rest:
+  - `Oand`, `Oor`, `Oxor` Kl: independent low + high half operations.
+  - `Oneg` Kl: two's complement on 32 bits with carry propagation.
+  - `Oshl`, `Oshr`, `Osar` Kl: cross-half `asl`+`rol` (or `lsr`+`ror`,
+    or `cmp #$8000`+`ror`) bit-by-bit for the 0 < cnt < 16 zone;
+    XBA shortcut for cnt ≥ 8 within the high-half-only zone.
+  - `Omul` Kl via `__mul32`: 10 hardware 8×8 partial products
+    (4 for the full `a_lo * b_lo`, 3 each for the low-16 of the two
+    cross terms). Constant-folding shortcuts for `*0`, `*1`,
+    `*2^k`.
+  - `Odiv` / `Oudiv` / `Orem` / `Ourem` Kl via `__sdivmod32` /
+    `__udivmod32`: 32-iteration restoring shift-subtract,
+    dividend-doubles-as-quotient trick. Signed wrapper handles
+    abs() + sign restore (C99 truncation toward zero). Constant
+    fast path for `/1` (identity copy) which cproc emits for every
+    `u8*` ptrdiff.
+  - 12 `Ocmp*l` (eq/ne/slt/sle/sgt/sge/ult/ule/ugt/uge) Kl:
+    cascade high-half compare → low-half on equality. The high
+    test honours signed vs unsigned per opcode; the low test is
+    always unsigned because the low half is the less-significant
+    chunk once the high half has decided the sign.
+  - `Oextsw`, `Oextuw` Kl: already shipped in A6+A7; no change.
+- **`can_be_frameless` Kl gate.** Any Kl temp in a function forces
+  a real local frame. The pre-fix alias / dead-store / dead-retval
+  shortcuts were Kw-only (a single 16-bit slot) and would have
+  landed the high half of any Kl pair on top of the JSL return PCH,
+  reproducing the `framesize=0 + Kl` synthetic bug detected during
+  the chantier's Session 3-5 IR tests.
+
+### Library
+
+- **`lib/source/mul32.asm` and `lib/source/div32.asm` (new files).**
+  Runtime helpers for the truncated 32-bit multiply and the
+  signed/unsigned 32-bit divmod. Pinned to `BANK 7 FREE` so the
+  ~500 bytes don't displace const strings out of bank 0 in the
+  tighter examples. Linked unconditionally via `make/common.mk`
+  (`MUL32_OBJ`, `DIV32_OBJ`) after the C objects, so cproc-emitted
+  SUPERFREE sections claim bank 0 first.
+
+### Build / CI
+
+- **`devtools/lint_commits.py`: drop case-of-first-letter check.**
+  The lowercase-first rule was an Angular convention, not from
+  the Conventional Commits spec. Enforcing it just made contributors
+  fight regex exceptions for every acronym / chantier identifier
+  (`OAM`, `C99`, `A1-followup`, `A6.13`, ...) without buying
+  anything real. 30 lines and 2 regexes deleted. `.claude/rules/commits.md`
+  updated to match.
+
+### Tests
+
+- **Baselines refreshed for hdma_helpers + sa1_starfield.** The
+  post-flip codegen shifted code sizes enough to cause a per-scanline
+  HDMA timing artifact in these two examples (1581-pixel and
+  similar drift respectively). The lib/example asm for these paths
+  contains no `__mul32` / `__[s]divmod32` calls — the diff is a
+  code-size shift propagating to frame timing, not a math bug.
+  55 other `.meta` files updated to record the new ROM SHAs (all
+  visually within tolerance).
+
+### Documentation
+
+- **`compiler/ABI.md`** — Type-sizes table gains an IR-class column.
+  Pointer row corrected (`8 in IR` → `4`, post-A6+A7). `long / s32 /
+  u32` annotated Kl with pointers to the backend handlers. The
+  32-bit return values section rewritten to reflect actual conventions:
+  compiler-generated `long`-returning functions convey only A=low
+  across the call (latent issue), runtime helpers use named scratch
+  slots (`mul32_hi`, `div32_qh`, `div32_rl`, `div32_rh`).
+- **`KNOWN_LIMITATIONS.md`** — `int`/`long` entry now covers both
+  sizes (A1) and semantics (A1-followup). Pointer entry 🟡 → 🟢
+  (A6 already shipped in v0.19.0). New 🟡 entry calls out the
+  latent C-function-returning-long high-half loss; mitigation today
+  is "don't write that pattern".
+
+### Tooling / Infrastructure
+
+- **`compiler/PINS.md` bumped** to cproc `c755269` (12 patches, was 11),
+  qbe `58ab12a` (49 patches, was 42). New `fix/a1-followup-long-kl`
+  branch on the cproc fork carries the one-line class flip; the
+  qbe branch (still `fix/a6-a7-leaf-opt-kl-frameless`) gained 7
+  patches: bitwise/shift/mul/div Kl handlers, 12 compare cascade,
+  `can_be_frameless` Kl gate, and the post-flip /1 / pow2 perf
+  shortcuts.
+
+---
+
 ## [0.19.0] — 2026-05-15
 
 Chantier A6+A7 — full 24-bit pointer ABI + Kl pair lowering. The QBE

@@ -9,7 +9,14 @@ Implements the rules documented in .claude/rules/commits.md:
        type   ∈ {feat, fix, perf, refactor, test, docs, chore, build, style, ci, revert}
        scope  ∈ {lib, compiler, runtime, tools, examples, build, ci, devtools,
                  docs, claude, contributing, release, submodule, deps}  (or empty)
-       description  starts with a lower-case letter, no trailing period.
+       description is non-empty with no trailing period.
+
+     Case of the first letter is NOT checked. Conventional Commits doesn't
+     mandate it — the case-first rule was an Angular convention that crept
+     into many linters; enforcing it just made contributors fight regex
+     exceptions for acronyms (OAM, C99, A1-followup, ...) without buying
+     anything real. Style consistency across the history isn't worth the
+     external-contributor friction.
 
   2. Body must NOT contain a `Co-Authored-By:` (or `Co-authored-by:`) trailer.
      The project does not want AI attribution in git history — see commits.md.
@@ -119,21 +126,6 @@ def check_subject(subject: str) -> list[str]:
         errors.append("empty description")
     elif desc.endswith("."):
         errors.append("description should not end with a period")
-    elif desc[0].isupper():
-        # The lowercase-first rule exists to keep prose descriptions
-        # consistent. Technical tokens (acronyms, standard names,
-        # register names) legitimately start with uppercase and would
-        # otherwise force unnatural rewrites ("c99" for "C99",
-        # "oam buffer" for "OAM buffer"). Allow when the first
-        # whitespace-delimited word is an acronym/techterm:
-        #   - all caps with optional digits (OAM, DMA, GSU, API, ABI)
-        #   - letter + digits (C99, K8, R64)
-        # Anything else (e.g., "Refactor the foo") still trips.
-        first_word = desc.split()[0]
-        is_techterm = bool(re.fullmatch(r"[A-Z][A-Z0-9]*[a-z]?", first_word)) \
-                      or bool(re.fullmatch(r"[A-Z][0-9]+", first_word))
-        if not is_techterm:
-            errors.append("description should start with a lower-case letter")
 
     return errors
 

@@ -232,38 +232,80 @@ and macOS CI never trigger them.
 
 ## Type & ABI gotchas
 
-### 🟢 `int` and `long` type sizes match the w65816 target (since chantier A1)
+### 🟢 `int` and `long` sizes AND semantics match the w65816 target
+
+**Sizes** (since chantier A1, 2026-05-08):
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
 `sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 
-Historical note: pre-A1, `int` was 4 bytes and `long` was 8 (cproc was inherited
-as a host-target compiler with `sizeof(int) = 4` hardcoded). Code that expected
-16-bit `int` would silently produce 32-bit arithmetic and double the work.
-That trap is gone — bare `int` is now correct on this target.
+**Semantics** (since chantier A1-followup, 2026-05-16):
+`long` arithmetic flows through the QBE w65816 backend's Kl-class handlers,
+not the silently-truncating Kw path. Every operator — add/sub with carry,
+shifts with cross-half rol, multiply via `__mul32`, divide via
+`__[s]divmod32`, cascaded compares high→low, bitwise, sign/zero extend —
+preserves full 32-bit width.
+
+Historical traps that are GONE:
+- Pre-A1, `int` was 4 bytes and `long` was 8 (cproc was inherited as a
+  host-target compiler with `sizeof(int) = 4` hardcoded). Code that
+  expected 16-bit `int` silently produced 32-bit arithmetic and doubled
+  the work.
+- Pre-A1-followup, `long` carried the correct *size* (4 bytes) but
+  cproc mapped it to QBE class `'w'` (16-bit Kw), so every arithmetic
+  op silently truncated to 16 bits. Five reproductions are kept in
+  the chantier note (`(long)40 << 16` folding to zero, `long *= long`
+  routing to `__mul16`, etc.). All five are now closed.
 
 `u8` / `u16` / `s16` / `u32` from `lib/include/snes/types.h` remain the
-preferred types for **portability** (they make the code intent explicit and
-work identically across compilers), but using bare `int` no longer doubles
-your cycle cost.
+preferred types for **portability** (they make the code intent explicit
+and work identically across compilers), but using bare `int` / `long`
+is correct on this target.
 
-### 🟡 Pointer IR size is still 8 bytes (chantier A6 — pending)
-The companion fix for pointer types was deliberately deferred into its own
-chantier (A6) because reducing pointer storage cascades through QBE w65816's
-indirect-call emit pass: the bank byte for `jml [tcc__r9]` is hardcoded as
-`lda #$00` instead of read from the pointer's actual storage. Until A6 lands,
-function pointers are stored as 8 bytes (low + high + 4 bytes padding) and
-indirect calls assume bank `$00` — which works because the SDK's framework
-opt-ins (`scene`, `gameloop`) happen to dispatch to functions in bank `$00`
-via the lib's SUPERFREE'd code that lands there.
+### 🟢 Pointer IR size is 4 bytes (chantier A6+A7, 2026-05-15)
 
-**Mitigation (today):** function pointers continue to work as before. No user
-code change needed.
+Pointers are now QBE class Kl: 24-bit address (low 16 + bank byte) + 1 byte
+alignment, 4 bytes total. The indirect-call emit pass reads the bank byte
+from the pointer's high half — `jml [tcc__r9]` after `sta.b tcc__r9` (low
+16) + `sta.b tcc__r9+2` (bank byte) — so function pointers in any bank
+work without a `*Bank` API variant. Shipped in v0.19.0 (2026-05-15).
 
-**A6 plan:** pointer IR size 8 → 4 (24-bit address + 1 byte alignment),
-indirect-call emit reads bank byte from pointer storage, lib API can drop
-the `*Bank` variant pattern entirely. Tracked in the structural-defects
-catalogue.
+Historical note: pre-A6, function pointers were 8 bytes (low + high + 4
+bytes padding) and indirect calls hardcoded `lda #$00` for the bank byte.
+Framework opt-ins (`scene`, `gameloop`) worked because their dispatch
+targets happened to land in bank 0 via SUPERFREE'd lib code. Any
+pointer to a bank-1+ function would have silently jumped to bank 0.
+That trap is gone.
+
+### 🟡 C function returning `long` does not propagate the high half through the call
+
+A latent issue surfaced (but not fixed) during the A1-followup chantier
+(Session 7, 2026-05-16). For a C function `long f(...)`:
+
+- Cproc emits `Jretl` which `emitload`s only the low 16 of the return
+  value into `A` before `rtl`.
+- The caller's `emitstore(i->to)` after the `jsl` only writes A to the
+  low half of the destination Kl temp. The high half is left at whatever
+  the slot previously contained.
+
+In practice no shipping SDK code returns a `long` whose high half is
+read by the caller (lib functions return `s16` / `u16` / `fixed`; the
+A1-followup test harness exercises Omul / Odiv via runtime helpers, not
+return values). The five originally-tracked A1-followup bugs all pass
+because they go through the helper path (which uses named scratch slots
+for the high half) or only inspect the low half.
+
+**Mitigation today:** don't write a `long`-returning C function whose
+high half is consumed across the call. If you need a 32-bit return,
+either inline the math at the call site, route it through a runtime
+helper that stores into a named bank-0 slot, or pass a `long *out`
+parameter.
+
+**Proper fix (when this becomes a real problem):** extend `Jretl` to
+also store the high half to a known location (e.g., `tcc__r0+2`) before
+`rtl`, and have the Ocall path read it back. Estimated 1-2 days of
+chantier work; not yet tracked in `STRUCTURAL_DEFECTS.md` because no
+shipping code triggers it.
 
 ### 🟡 Sprite palettes start at CGRAM offset 128, not 0
 Standard SNES quirk that surprises everyone once. The first 128 colours of

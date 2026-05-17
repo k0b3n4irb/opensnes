@@ -14,15 +14,14 @@
   `.claude/rules/`, `bench` → bench fixtures). The canonical
   source-of-truth list lives in `devtools/lint_commits.py`'s
   `ALLOWED_SCOPES` set — extend BOTH places in the same commit.
-- Format: `type(scope): description` (lowercase, imperative mood, no
-  period).
-- **Description first-letter exception**: technical terms that are
-  conventionally uppercase (acronyms like `OAM`, `DMA`, `GSU`, `API`;
-  standard names like `C99`, `K8`) may start the description without
-  a lowercase rewrite. Detected as a first word matching
-  `[A-Z][A-Z0-9]*[a-z]?` (acronym, optional trailing lowercase suffix
-  like `OAMs`) or `[A-Z][0-9]+` (standard name). Anything else (e.g.
-  prose `Refactor the foo`) still trips.
+- Format: `type(scope): description` — non-empty description, no
+  trailing period, imperative mood recommended.
+- Case of the first letter is NOT enforced. Conventional Commits doesn't
+  mandate it (the lowercase-first convention is from Angular's commit
+  guide, not the spec), and forcing it just made contributors fight
+  regex exceptions for `OAM`, `C99`, `A1-followup` etc. without
+  buying anything real. Both `feat(lib): add foo` and
+  `feat(lib): OAM buffer fix` are accepted.
 
 ## Merge commits are exempt from the format check
 

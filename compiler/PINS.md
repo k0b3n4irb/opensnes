@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 6bdd923cc826b4c369b18cf87184edd045a6fecb | github.com/k0b3n4irb/cproc:master |
-| compiler/qbe | 7a7f77f4eff5955b1eba2249c0ab8973c5ddf29a | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
+| compiler/cproc | c7552693ae7fe3bee034d48e06a182ecc5da08bd | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
+| compiler/qbe | 58ab12a65919ad0a6cfcd48095c1af1f49a5ba1b | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -39,7 +39,7 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 11 patches (upstream merge-base: 7051114)
+### compiler/cproc — 12 patches (upstream merge-base: 7051114)
 
 ```
 6bdd923  feat(65816): pointer size/align 8/8 → 4/2 (chantier A6.1)
@@ -63,7 +63,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 41 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 49 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
