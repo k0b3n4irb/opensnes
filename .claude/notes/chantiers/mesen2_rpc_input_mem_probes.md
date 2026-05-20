@@ -1,6 +1,6 @@
 ---
-name: mesen2-rpc input + mem.write surface, functional probe suite tripled
-description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to triple the functional probe suite and add an autonomous boot sweep across all 55 examples.
+name: mesen2-rpc input + mem.write surface, functional probe suite expanded
+description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 12 input-driven probes + 1 boot sweep covering all 55 examples. Three input patterns (on-press / on-release / just-pressed) now have probe coverage.
 type: project
 ---
 
@@ -13,8 +13,11 @@ bypass title-screen state machines, which was acceptable for one-shot
 debugging but blocked any autonomous regression coverage. This chantier
 ships both tools, then uses the new surface to:
 
-1. Triple the input-driven functional probe count (1 → 4, then to 4 + 1
-   sweep = 5 covering all 55 examples).
+1. Grow the input-driven functional probe count from 0 to 7 (covering
+   tetris, breakout, likemario, mapscroll, dynamic_map, scene_stack,
+   collision_demo), spanning all three input patterns the lib exposes:
+   on-press (D-pad hold), on-release (`pad_released`), and just-pressed
+   (`padPressed`).
 2. Refactor the entire probe suite to parse `.sym` files at runtime
    instead of hardcoding addresses, killing the silent-drift class that
    bit us when mul32/div32 RAMSECTION shifted bank-0 layout.
@@ -73,9 +76,10 @@ Total deferred-tool count: **31**.
 
 ### Functional probes (opensnes-emu submodule, feat/functional-probes)
 
-Submodule head: `7749511` (after sym-parsing refactor + boot sweep).
+Submodule head: `1b0c0b5` (after the second wave of probes).
 
-- `b47bef8` — input-driven probes for tetris, breakout, likemario:
+- `b47bef8` — first wave of input-driven probes (tetris, breakout,
+  likemario):
   - **tetris**: START transitions `game_state` 0→1; LEFT decrements
     `cur_col`. Symmetric ROI proof for the same `__mul32` bug class.
   - **breakout**: D-pad RIGHT/LEFT moves paddle (`px`).
@@ -97,22 +101,55 @@ Submodule head: `7749511` (after sym-parsing refactor + boot sweep).
   loadRom calls. **55/55 examples currently green in ~170s**. Skippable
   via `SKIP_BOOT_SWEEP=1` for fast iteration.
 
+- `1b0c0b5` — second wave of input-driven probes (mapscroll,
+  dynamic_map, scene_stack, collision_demo):
+  - **mapscroll**: D-pad RIGHT/LEFT advances `xloc` under
+    camera-follow; covers `mapUpdateCamera` + column streaming.
+  - **dynamic_map**: A button toggles `is_map32x32` via the
+    `pad0_released` mask — first probe to exercise the on-release
+    pattern. The handler does 4× WaitForVBlank + 4× smapDma; the
+    probe waits 60 frames between presses to let it complete.
+  - **scene_stack**: START on title pushes counter (`scene_top` 1→2),
+    START on counter pops (`scene_top` 2→1). Tests `scenePush` +
+    `scenePop` + `padPressed()` just-pressed mask end-to-end.
+  - **collision_demo**: D-pad RIGHT/DOWN advances `player_x`/`player_y`
+    through the open center of the arena; coarse smoke detector for
+    the `collideRect` + `collideTile` path.
+
 ### Parent develop pointer bumps
 
-- `b6e655d`, `8403941`, `961c5f7`, `eaa195c` — each bumps the
-  opensnes-emu submodule pointer to track the probe-suite progression.
-  Plus the orphan `b5_fix32_orbit_sketch.md` preserved at `b6e655d`
-  (was an untracked draft inside the emu submodule's wrong directory).
+- `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0` —
+  each bumps the opensnes-emu submodule pointer to track the
+  probe-suite progression. Plus the orphan `b5_fix32_orbit_sketch.md`
+  preserved at `b6e655d` (was an untracked draft inside the emu
+  submodule's wrong directory). `eba4329` filed this very chantier note.
 
 ## Functional suite, before vs after
 
 | Phase     | Before today | After today |
 |-----------|--------------|-------------|
-| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 8 + 1 sweep covering 55 examples |
-| Inputs    | 0 (all observation-only)         | 3 input-driven (tetris, breakout, likemario) |
+| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 12 + 1 sweep covering 55 examples |
+| Inputs    | 0 (all observation-only)         | 7 input-driven (tetris, breakout, likemario, mapscroll, dynamic_map, scene_stack, collision_demo) |
+| Input pattern coverage | n/a       | on-press (D-pad hold), on-release (`pad_released`), just-pressed (`padPressed`) — all three lib masks |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~25s for 8 probes + ~170s sweep |
+| Runtime   | ~10s for 5 probes                | ~40s for 12 probes + ~170s sweep |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
+
+### Subsystem coverage matrix
+
+| Subsystem                  | Probe                       |
+|----------------------------|-----------------------------|
+| CGRAM upload (dmaCopyCGram) | cgram                       |
+| VRAM upload (dmaCopyVram)   | dma                         |
+| HDMA channel + enable       | hdma                        |
+| OAM shadow buffer + Y quirk | oam                         |
+| BG scroll cache             | scroll                      |
+| Map engine (camera-follow)  | mapscroll                   |
+| Dynamic VRAM re-init        | dynamic_map                 |
+| Scene stack (push/pop)      | scene_stack                 |
+| AABB + tile collision       | collision_demo              |
+| Game state machine + input  | tetris, breakout, likemario |
+| NMI + force-blank avoidance | boot-sweep (× 55 examples)  |
 
 ## Lessons learned
 
@@ -153,7 +190,17 @@ Submodule head: `7749511` (after sym-parsing refactor + boot sweep).
    loadRoms is ~170s total. The savings buy headroom for adding more
    per-ROM checks without bloating wall time.
 
-5. **The MCP surface enrichments paid off in the same session**. Both
+5. **Probe timing must respect the example's handler cost**. Probes
+   that drive an action requiring heavy work in the C handler
+   (dynamic_map's toggle: 4× WaitForVBlank + 4× smapDma; ~30 frames
+   blocking) need a settle window longer than the handler — otherwise
+   the *next* press is consumed during the still-running prior
+   handler. First version of the dynamic_map probe used 8 frames
+   between presses; the second toggle silently missed. 60 frames
+   worked. **Rule of thumb**: if the C handler does ≥1 WaitForVBlank,
+   the inter-press settle should be ≥ (handler_vblanks × 2) frames.
+
+6. **The MCP surface enrichments paid off in the same session**. Both
    input.set and mem.write_* were shipped at the start of the session
    and applied within the same hours to the probe suite. No deferred
    ROI: the tools are already eating their cost.
@@ -162,14 +209,15 @@ Submodule head: `7749511` (after sym-parsing refactor + boot sweep).
 
 - **Wire functional probes into the canonical `--quick` path?** Task
   #112 was deferred (separate is cleaner; quick stays snes9x-only,
-  ~30-60s; functional stays Mesen2-based, ~25s + sweep). Re-evaluate
+  ~30-60s; functional stays Mesen2-based, ~40s + sweep). Re-evaluate
   if a future regression class is *only* catchable via the functional
   surface and the user wants pre-commit gating.
 
-- **More input-driven probes** for currently-uncovered interactive
-  examples: mapscroll (D-pad scroll), dynamic_map (UP/DOWN toggle),
-  collision_demo (D-pad sprite move), aim_target (B button shoot),
-  scene_stack (push/pop on START).
+- **Still-uncovered interactive examples**: `aim_target` (B shoots,
+  exercises RNG + dynamic sprite spawn), `random` (B/A advance RNG
+  stream), `controller` (every-button echo — would test every joypad
+  bit individually), `mouse` / `superscope` (alternate-controller
+  pad reads). Each is ~30 lines following the established pattern.
 
 - **GSU/SA-1 introspection extensions to mesen2-rpc**. The current
   surface is 65816-only. Adding GSU register/PC inspection and SA-1
@@ -193,10 +241,11 @@ Submodule head: `7749511` (after sym-parsing refactor + boot sweep).
 
 ## Branch / commit state at end of session
 
-- **opensnes develop**: `eaa195c` (4 commits since the start of the
+- **opensnes develop**: `d4cc2a0` (6 commits since the start of the
   cleanup-and-extend phase: baselines bump → export warnings fix →
-  probes bump → boot-sweep bump).
-- **opensnes-emu feat/functional-probes**: `7749511` (4 commits:
-  baselines refresh → input probes → sym-parsing refactor → boot sweep).
-- **mesen2-rpc dev/rpc-server**: `b9a22115` (last published 2 commits
-  added input.set + mem.write_*; later commits not pushed).
+  probes bump → boot-sweep bump → chantier note → 2nd wave bump).
+- **opensnes-emu feat/functional-probes**: `1b0c0b5` (5 commits:
+  baselines refresh → input probes wave 1 → sym-parsing refactor →
+  boot sweep → input probes wave 2).
+- **mesen2-rpc dev/rpc-server**: `b9a22115` (input.set + mem.write_*
+  pushed; no later commits this session).
