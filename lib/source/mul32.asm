@@ -30,7 +30,14 @@
 ; Pinned to bank 7 (highest LoROM/HiROM bank, empty in every example as of
 ; the A1-followup chantier) so the ~200-byte helper doesn't displace const
 ; strings out of bank 0 in examples that were already brushing the limit.
-.EXPORT tcc_mul32
+;
+; No `.EXPORT tcc_mul32` here — that directive applies to `.DEFINE`d names
+; only, not labels. Labels in a FREE/SEMIFREE section are visible to other
+; object files automatically. The previous setup
+;   .DEFINE __mul32 tcc_mul32 ; .EXPORT __mul32
+; captured the 16-bit offset at .DEFINE parse-time, before BANK 7 placement,
+; so `__mul32` resolved to $00:8000 and collided with tcc_mul16. Dropping
+; the alias and emitting `jsl tcc_mul32` directly from qbe is the fix.
 .SECTION ".mul32" BANK 7 FREE
 
 .ACCU 16
