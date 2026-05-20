@@ -1,6 +1,6 @@
 ---
 name: mesen2-rpc input + mem.write surface, functional probe suite expanded
-description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 12 input-driven probes + 1 boot sweep covering all 55 examples. Three input patterns (on-press / on-release / just-pressed) now have probe coverage.
+description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 15 input-driven probes + 1 boot sweep covering all 55 examples. All 3 input patterns (on-press / on-release / just-pressed), all 12 SNES joypad bits, and all 9 lib subsystems touched by examples are now covered.
 type: project
 ---
 
@@ -13,11 +13,13 @@ bypass title-screen state machines, which was acceptable for one-shot
 debugging but blocked any autonomous regression coverage. This chantier
 ships both tools, then uses the new surface to:
 
-1. Grow the input-driven functional probe count from 0 to 7 (covering
+1. Grow the input-driven functional probe count from 0 to 10 (covering
    tetris, breakout, likemario, mapscroll, dynamic_map, scene_stack,
-   collision_demo), spanning all three input patterns the lib exposes:
-   on-press (D-pad hold), on-release (`pad_released`), and just-pressed
-   (`padPressed`).
+   collision_demo, aim_target, random, controller), spanning all three
+   input patterns the lib exposes: on-press (D-pad hold), on-release
+   (`pad_released`), and just-pressed (`padPressed`). The `controller`
+   probe additionally validates every individual SNES joypad bit
+   (12 buttons + 3 combos) — the lib's most granular input-decode gate.
 2. Refactor the entire probe suite to parse `.sym` files at runtime
    instead of hardcoding addresses, killing the silent-drift class that
    bit us when mul32/div32 RAMSECTION shifted bank-0 layout.
@@ -76,7 +78,7 @@ Total deferred-tool count: **31**.
 
 ### Functional probes (opensnes-emu submodule, feat/functional-probes)
 
-Submodule head: `1b0c0b5` (after the second wave of probes).
+Submodule head: `75c1ba6` (after the third wave of probes).
 
 - `b47bef8` — first wave of input-driven probes (tetris, breakout,
   likemario):
@@ -116,23 +118,42 @@ Submodule head: `1b0c0b5` (after the second wave of probes).
     through the open center of the arena; coarse smoke detector for
     the `collideRect` + `collideTile` path.
 
+- `75c1ba6` — third (final) wave of input-driven probes:
+  - **aim_target**: D-pad RIGHT/UP advances `target_x`/`target_y`
+    under per-axis clamps (247 / 0). Despite the name, the example
+    is the canonical `fixCos`/`fixSin`/`atan2_8` math demo; the probe
+    catches the upstream "target frozen" failure that would make the
+    trig readout unobservable.
+  - **random**: A button advances the LFSR-based `current_value`
+    via the lib's `rand()`. Two independent presses against the
+    boot snapshot; combined flake rate ~2e-10 per run.
+  - **controller**: the heavyweight — iterates all 12 SNES buttons
+    plus 3 multi-button combinations, injects each alone via
+    `input.set`, asserts `pad_keys[0]` exactly equals the expected
+    mask. The lib's most granular input-decode gate: a single-bit
+    regression in `lib/source/input.asm` would surface here. Error
+    message names the XOR'd bits so the failure tells you which
+    button is broken.
+
 ### Parent develop pointer bumps
 
-- `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0` —
-  each bumps the opensnes-emu submodule pointer to track the
-  probe-suite progression. Plus the orphan `b5_fix32_orbit_sketch.md`
-  preserved at `b6e655d` (was an untracked draft inside the emu
-  submodule's wrong directory). `eba4329` filed this very chantier note.
+- `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0`,
+  `e2abe08`, `10a0628` — each bumps the opensnes-emu submodule
+  pointer to track the probe-suite progression. Plus the orphan
+  `b5_fix32_orbit_sketch.md` preserved at `b6e655d` (was an untracked
+  draft inside the emu submodule's wrong directory). `eba4329` filed
+  this chantier note; `e2abe08` updated it for wave 2.
 
 ## Functional suite, before vs after
 
 | Phase     | Before today | After today |
 |-----------|--------------|-------------|
-| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 12 + 1 sweep covering 55 examples |
-| Inputs    | 0 (all observation-only)         | 7 input-driven (tetris, breakout, likemario, mapscroll, dynamic_map, scene_stack, collision_demo) |
+| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 15 + 1 sweep covering 55 examples |
+| Inputs    | 0 (all observation-only)         | 10 input-driven |
 | Input pattern coverage | n/a       | on-press (D-pad hold), on-release (`pad_released`), just-pressed (`padPressed`) — all three lib masks |
+| Joypad-bit coverage | n/a              | every individual SNES button (12 buttons + 3 combos via `controller.test.mjs`) |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~40s for 12 probes + ~170s sweep |
+| Runtime   | ~10s for 5 probes                | ~53s for 15 probes + ~170s sweep |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
 
 ### Subsystem coverage matrix
@@ -149,6 +170,9 @@ Submodule head: `1b0c0b5` (after the second wave of probes).
 | Scene stack (push/pop)      | scene_stack                 |
 | AABB + tile collision       | collision_demo              |
 | Game state machine + input  | tetris, breakout, likemario |
+| Trig LUT host (fixCos/atan2_8) | aim_target               |
+| LFSR PRNG (rand)            | random                      |
+| Per-bit joypad decode       | controller                  |
 | NMI + force-blank avoidance | boot-sweep (× 55 examples)  |
 
 ## Lessons learned
@@ -213,11 +237,12 @@ Submodule head: `1b0c0b5` (after the second wave of probes).
   if a future regression class is *only* catchable via the functional
   surface and the user wants pre-commit gating.
 
-- **Still-uncovered interactive examples**: `aim_target` (B shoots,
-  exercises RNG + dynamic sprite spawn), `random` (B/A advance RNG
-  stream), `controller` (every-button echo — would test every joypad
-  bit individually), `mouse` / `superscope` (alternate-controller
-  pad reads). Each is ~30 lines following the established pattern.
+- **Alternate-controller probes** (`mouse`, `superscope`, the two
+  `two_players` and `mouse` examples): the current `input.set` API
+  drives standard joypads only. Validating mouse/superscope pad
+  reads needs a separate Mesen2 RPC method that overrides those
+  controller types' MMIO read paths. Track as a mesen2-rpc surface
+  enhancement.
 
 - **GSU/SA-1 introspection extensions to mesen2-rpc**. The current
   surface is 65816-only. Adding GSU register/PC inspection and SA-1
@@ -241,11 +266,12 @@ Submodule head: `1b0c0b5` (after the second wave of probes).
 
 ## Branch / commit state at end of session
 
-- **opensnes develop**: `d4cc2a0` (6 commits since the start of the
+- **opensnes develop**: `10a0628` (8 commits since the start of the
   cleanup-and-extend phase: baselines bump → export warnings fix →
-  probes bump → boot-sweep bump → chantier note → 2nd wave bump).
-- **opensnes-emu feat/functional-probes**: `1b0c0b5` (5 commits:
+  probes bump → boot-sweep bump → chantier note → 2nd wave bump →
+  chantier note update → 3rd wave bump).
+- **opensnes-emu feat/functional-probes**: `75c1ba6` (6 commits:
   baselines refresh → input probes wave 1 → sym-parsing refactor →
-  boot sweep → input probes wave 2).
+  boot sweep → input probes wave 2 → input probes wave 3).
 - **mesen2-rpc dev/rpc-server**: `b9a22115` (input.set + mem.write_*
   pushed; no later commits this session).
