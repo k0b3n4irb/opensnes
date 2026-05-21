@@ -647,6 +647,128 @@ fix32Div:
     plp
     rtl
 
+;------------------------------------------------------------------------------
+; fixed32 fix32Sin(u8 angle)
+;
+; Lifts the existing 8.8 sine_table[256] to 16.16 by shifting left 8.
+; Implemented in asm because the C inline form `(s32)fixSin(angle) << 8`
+; trips a qbe codegen bug where the high half is computed from an
+; unstored stack slot (sin(64) = 256 should give 0x00010000 but the
+; codegen produces 0).
+;
+; Stack: 5,6,s = angle (u8 in 2-byte slot)
+;
+; Algorithm:
+;   1. Read angle from stack (low byte of slot 5,s).
+;   2. Index sine_table[angle] → 16-bit signed value V in A.
+;   3. Compute V << 8 as 32-bit signed:
+;        result_lo = (V & 0xFF) << 8     (low byte of V → high byte of low half)
+;        result_hi = (V >> 8) | sign_ext (high byte of V → low byte of high half)
+;      For positive V: result_hi = V >> 8 (0 or 1).
+;      For negative V: result_hi = (V >> 8) | 0xFF00 (sign-extends the high half).
+;------------------------------------------------------------------------------
+fix32Sin:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+
+    ; Read angle, mask to u8, multiply by 2 for word index
+    lda 5,s
+    and #$00FF
+    asl a                       ; angle * 2 (word offset)
+    tax
+    lda.l sine_table,x          ; V = sine_table[angle] (16-bit signed)
+
+    ; Store V in a temp so we can compute both halves of (V << 8 as s32)
+    sta.w f32_res_lo            ; reuse the result slot as scratch for V
+
+    ; Compute result_lo = (V & 0x00FF) << 8 — keep low byte of V, shift to high byte of result_lo
+    and #$00FF
+    xba                         ; swap bytes: 00:vlo → vlo:00 = vlo << 8
+    sta.w f32_res_lo            ; result_lo
+
+    ; Compute result_hi = (V_byte_hi) sign-extended
+    ; V_byte_hi = (V >> 8) & 0xFF. We need to sign-extend it: if V was negative
+    ; (bit 15 set), result_hi = 0xFFXX where XX is V_byte_hi; else 0x00XX.
+    lda.w f32_res_lo + 0        ; wait that's already shifted. Need to reload V.
+    ; Actually we trashed result_lo. Let me redo using a different scratch.
+
+    ; Re-load V
+    lda 5,s                     ; A = angle (with junk in high byte)
+    and #$00FF
+    asl a
+    tax
+    lda.l sine_table,x          ; A = V again
+
+    ; Sign-extend V to s32 via bit-15 test
+    bpl @v_pos
+        ; Negative V: result_hi high byte = 0xFF, low byte = V_byte_hi
+        xba                     ; A = V_lo : V_hi (swap)
+        and #$00FF              ; A = 00 : V_hi (just the high byte of V, in low position)
+        ora #$FF00              ; A = FF : V_hi (sign-extended high half)
+        bra @apply
+@v_pos:
+        ; Positive V: result_hi high byte = 0, low byte = V_byte_hi
+        xba
+        and #$00FF              ; A = 00 : V_hi
+@apply:
+    sta.b tcc__retval_hi        ; high half via the Kl return convention
+
+    ; Now A doesn't hold result_lo. Reload it.
+    lda.w f32_res_lo
+
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; fixed32 fix32Cos(u8 angle) — same as fix32Sin but with angle + 64.
+; cos(x) = sin(x + 90°) = sin(x + 64) using the 8-bit angle convention.
+;------------------------------------------------------------------------------
+fix32Cos:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+
+    lda 5,s
+    and #$00FF
+    clc
+    adc #$0040                  ; angle + 64 (wraps in u8 naturally via mask below)
+    and #$00FF                  ; mask back to u8
+    asl a
+    tax
+    lda.l sine_table,x          ; V = sine_table[(angle + 64) & 0xFF]
+
+    sta.w f32_res_lo            ; spill V to scratch
+    and #$00FF
+    xba
+    sta.w f32_res_lo            ; result_lo = (V & 0xFF) << 8
+
+    lda 5,s
+    and #$00FF
+    clc
+    adc #$0040
+    and #$00FF
+    asl a
+    tax
+    lda.l sine_table,x
+
+    bpl @cv_pos
+        xba
+        and #$00FF
+        ora #$FF00
+        bra @cv_apply
+@cv_pos:
+        xba
+        and #$00FF
+@cv_apply:
+    sta.b tcc__retval_hi
+    lda.w f32_res_lo
+
+    plp
+    rtl
+
 .ENDS
 
 ;------------------------------------------------------------------------------

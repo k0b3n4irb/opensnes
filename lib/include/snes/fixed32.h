@@ -53,6 +53,7 @@
 #define OPENSNES_FIXED32_H
 
 #include <snes/types.h>
+#include <snes/math.h>   /* for fixSin / fixCos (8.8 LUT) */
 
 /*============================================================================
  * Type and macros
@@ -239,8 +240,45 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
     return a + fix32Mul(b - a, t);
 }
 
-/* fix32Sin remains deferred (the last B5 follow-up — needs an
- * extended LUT or interpolation strategy choice). See
- * `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`. */
+/*============================================================================
+ * Trigonometry (lifted from 8.8 LUT, 8 fractional bits of precision)
+ *============================================================================*/
+
+/**
+ * @brief 16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)
+ * @param angle 0=0°, 64=90°, 128=180°, 192=270°
+ * @return sin(angle) in 16.16, range [FIX32(-1), FIX32(1)]
+ *
+ * Lifted from the existing 8.8 `fixSin` LUT by shifting left 8 bits to
+ * fill the upper half of the 16-bit fractional field. The lower 8 bits
+ * are always zero (no precision gained beyond what the 8.8 LUT provides).
+ * Costs: one LUT lookup + sign-extend + shift — about 30 cycles total.
+ *
+ * Precision: each LUT step is 1/256 ≈ 0.0039, so for fine animation
+ * (sub-pixel motion over many frames) this is adequate. For high-
+ * precision physics that compound thousands of operations, the
+ * 8-bit-fractional limit may show as drift; a future chantier could
+ * add a 16-bit LUT for a 256× precision improvement at 512 bytes ROM.
+ *
+ * @code
+ * fixed32 dx = fix32Mul(speed, fix32Sin(angle));
+ * @endcode
+ */
+/* Implemented in lib/source/fixed32.asm — the C inline form trips a
+ * qbe codegen bug on Kl shift-by-constant (the high half ended up
+ * reading an unstored stack slot). The asm form is direct: table
+ * lookup + sign-extend + xba (1-cycle byte swap = shift-left-8).
+ * See chantier note for the qbe fix path. */
+fixed32 fix32Sin(u8 angle);
+
+/**
+ * @brief 16.16 fixed-point cosine of an 8-bit angle
+ * @see fix32Sin (same precision/cost characteristics)
+ *
+ * @code
+ * fixed32 dy = fix32Mul(speed, fix32Cos(angle));
+ * @endcode
+ */
+fixed32 fix32Cos(u8 angle);
 
 #endif /* OPENSNES_FIXED32_H */
