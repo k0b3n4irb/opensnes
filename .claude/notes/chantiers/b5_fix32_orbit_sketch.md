@@ -46,6 +46,50 @@ int main(void) {
 - The sketch currently only drives horizontal motion — for a real orbit, swap the linear X derivation for `sinf32(angle32)` + `cosf32(angle32)` once B5 implements those.
 - The `& 0x3F` mask is a hack to wrap motion to 64 px — drop it once trig is available.
 
+## B5 chantier progress (2026-05-21)
+
+**Phase 1 — SHIPPED**: `lib/include/snes/fixed32.h`. Type alias + macros
+(`FIX32`, `UNFIX32`, `FIX32_FRAC`, `FIX32_MAKE`) + inline helpers
+(`fix32Abs`, `fix32Clamp`, `fix32Min`, `fix32Max`). All work via the
+compiler's existing Kl support — no asm needed because the operations
+stay within the function boundary (stack slots / globals, no Kl return
+crossings).
+
+**Phase 2 — BLOCKED on cc65816 Kl return convention**:
+`fix32Mul(fixed32, fixed32) → fixed32` cannot ship today. Discovered
+mid-implementation that cc65816's Kl (32-bit) return path is
+**incomplete**:
+
+  ```c
+  long bar(long a, long b) { return a + b; }
+  ```
+
+  Generates correct in-frame 32-bit addition (sum_lo at 18,s,
+  sum_hi at 20,s) but the function epilogue only emits
+  `lda 18,s ; tax ; <teardown> ; txa ; rtl` — **only the low 16 bits
+  reach A**. The caller does `lda 4,s` after the call expecting the
+  high 16 there, but no convention is implemented for the callee to
+  write it there before rtl. The high half reads garbage from the
+  caller's frame.
+
+  Test reproduction: `cc65816 /tmp/test_long.c` — see the `bar` and
+  `test` functions in the output. The compiler chantier to fix this
+  is a prerequisite for B5 phase 2 and any other helper that wants
+  to return s32/u32 from C code.
+
+  ASM draft for `fix32Mul` is archived at
+  [[b5_fix32mul_asm_draft.asm]] in this directory. It implements
+  16.16 multiply via the algebraic decomposition
+  `(a*b)>>16 = ml1 + ml2 + ll_hi + (hh_lo << 16)` using three
+  16×16→32 unsigned products + one 16×16→16 product. ~250 lines
+  of asm, untested because the calling convention can't reach it
+  cleanly.
+
+**Phase 3-4 — Deferred**: `fix32Div`, `fix32Sin`, `fix32Lerp` all
+depend on phase 2 landing first.
+
 ## Source
 
-Originally drafted ~2026-05-16, found unstaged in submodule on 2026-05-20.
+Originally drafted ~2026-05-16, found unstaged in submodule on
+2026-05-20. B5 chantier opened 2026-05-21 with phase 1 shipping
+that day; phases 2-4 blocked on a separate compiler chantier.
