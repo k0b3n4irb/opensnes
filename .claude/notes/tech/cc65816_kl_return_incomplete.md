@@ -1,10 +1,27 @@
 ---
-name: cc65816 Kl (s32/u32) return convention incomplete
-description: A function returning s32/u32 (Kl class) only carries the LOW 16 bits across the call boundary. The HIGH 16 bits are computed inside the callee but never transmitted to the caller. Blocks B5 fixed32 phase 2 and any future helper returning a 32-bit value from C code.
+name: cc65816 Kl (s32/u32) return convention — RESOLVED
+description: Historical record of a bug found 2026-05-21 and fixed the same day. A function returning s32/u32 (Kl class) only carried the LOW 16 bits across the call boundary; the fix added a global `tcc__retval_hi` for the high half (qbe 3e79c8c, opensnes faaf803). Preserved for context — future contributors hitting Kl return issues should start here.
 type: tech
 ---
 
-# cc65816 Kl return convention — incomplete (found 2026-05-21)
+# cc65816 Kl return convention — RESOLVED 2026-05-21
+
+**Status as of 2026-05-21**: FIXED. qbe commit `3e79c8c` on
+`fix/a6-a7-leaf-opt-kl-frameless` adds the missing convention via a
+`tcc__retval_hi` global (declared in `templates/crt0.asm`). Both
+sides of every Kl-returning call now propagate the full 32 bits.
+
+This note is preserved because:
+1. The bug-class (incomplete return convention) is the kind of thing
+   that could recur in a future backend rewrite or new target.
+2. The diagnostic pattern (compile a tiny `long bar(long, long)` and
+   inspect the asm) is worth knowing.
+3. The history of why `tcc__retval_hi` exists is useful when someone
+   reads `templates/crt0.asm` and wonders about it.
+
+---
+
+# Historical context (found 2026-05-21, fixed same day)
 
 Any C function returning `s32`/`u32`/`long`/`unsigned long`/`fixed32`
 silently drops the **high 16 bits** of its return value. The low 16
@@ -102,33 +119,56 @@ because pointers are special — see the post-A6 pointer ABI).
 So the bug class only surfaces when someone tries to write the first
 real Kl-returning C function. That was 2026-05-21 with `fix32Mul`.
 
-## What needs to happen
+## What was needed → resolution chosen
 
-Pick a convention for the high half and implement it in the qbe
-backend (`Jretl` handler at `emit.c:4197`). Options:
+Original options considered:
 
 1. **Caller-allocated slot at fixed offset**: the caller's prologue
    reserves N bytes; the callee writes high 16 to a stack offset just
-   above its own frame (in the caller's reserved region). The current
-   `lda 4,s` pattern in the caller suggests this was the intended
-   design — just never implemented on the callee side.
+   above its own frame. The current `lda 4,s` pattern in the caller
+   suggested this was the intended design — but coordinating the
+   offset between callee and caller would require teaching the callee
+   about the caller's frame layout. Rejected.
 
 2. **Global "return-high" register**: like `mul32_hi`. Callee writes
    high 16 to a fixed memory location before rtl; caller reads from
-   there. Mirrors the existing runtime-helper pattern. Simple but
-   not re-entrant (a Kl-returning function calling another Kl-returning
-   function would overwrite the global before the outer caller reads
-   it).
+   there. Mirrors the existing runtime-helper pattern.
 
-3. **A:Y or A:X register pair**: callee leaves high 16 in Y (or X);
-   caller reads from there immediately after the call. Cleanest from
-   a perf standpoint (no memory traffic) but requires the qbe
-   backend to model Y/X as live across calls in a new way.
+3. **A:Y or A:X register pair**: cleanest perf but requires the qbe
+   backend to model Y/X as live across calls in a new way — bigger
+   surgery in the register allocator. Rejected for scope.
 
-Recommended: option 1, matching what the existing caller-side codegen
-already expects. The work is in the `Jretl` handler: before rtl, emit
-`lda <high>; sta <caller_offset>,s` where `<caller_offset>` is the
-stack slot the caller's prologue allocated.
+**Chosen: option 2** — landed in qbe `3e79c8c` (2026-05-21):
+
+  ```cpp
+  /* Callee (Jretl in build_block): */
+  if (b->jmp.type == Jretl) {
+      emit_load_high(b->jmp.arg, fn, 0);
+      fprintf(outf, "\tsta.b tcc__retval_hi\n");
+  }
+  emitload(b->jmp.arg, fn);
+
+  /* Caller (Ocall post-call): */
+  if (i->cls == Kl) {
+      fprintf(outf, "\tlda.b tcc__retval_hi\n");
+      emit_store_high(i->to, fn);
+  }
+  ```
+
+`tcc__retval_hi` is a 2-byte global declared in
+`templates/crt0.asm`'s `.registers` RAMSECTION, alongside the
+existing `tcc__r0..r10h` scratch registers. At `$00:0xxx` for
+fast direct-page access.
+
+**Re-entrancy note**: a Kl-returning function calling another
+Kl-returning function WILL overwrite `tcc__retval_hi` before the
+outer caller reads it — but at the point the outer callee writes
+its OWN final high before `rtl`, that overwrites whatever the
+inner call left behind. Since the outer's caller reads
+immediately after the outer's `rtl`, the value is correct. So
+the pattern works for arbitrary nesting; only concurrent reads
+within a single expression (impossible — sequential statements)
+would be a problem.
 
 ## Cross-references
 
