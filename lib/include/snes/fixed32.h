@@ -189,7 +189,28 @@ inline fixed32 fix32Max(fixed32 a, fixed32 b) {
  */
 fixed32 fix32Mul(fixed32 a, fixed32 b);
 
-/* fix32Div, fix32Sin, fix32Lerp remain deferred to follow-up chantiers
- * (see `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`). */
+/**
+ * @brief 16.16 fixed-point divide
+ * @param a Numerator
+ * @param b Denominator (must be non-zero; division by zero is undefined)
+ * @return (a / b) at 16.16 precision (low 32 bits of (a << 16) / b)
+ *
+ * Algorithm: 48-iteration bit-by-bit long divide of (|a| << 16) by |b|,
+ * with sign-magnitude handling. The 48-bit dividend doesn't fit in a
+ * single 32-bit register, so we can't reuse tcc_udivmod32 directly —
+ * the custom loop processes one quotient bit per iteration with an
+ * 80-bit working register.
+ *
+ * Cycles: ~1500 (much slower than fix32Mul; use sparingly in hot loops).
+ *
+ * @code
+ * fixed32 velocity = fix32Div(distance, time);
+ * fixed32 ratio = fix32Div(width, FIX32(2));  // halve width
+ * @endcode
+ */
+fixed32 fix32Div(fixed32 a, fixed32 b);
+
+/* fix32Sin, fix32Lerp remain deferred to follow-up chantiers (see
+ * `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`). */
 
 #endif /* OPENSNES_FIXED32_H */

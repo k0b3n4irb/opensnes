@@ -502,6 +502,151 @@ fix32Mul:
     sta.w f32_hh_lo
     rts
 
+;------------------------------------------------------------------------------
+; fixed32 fix32Div(fixed32 a, fixed32 b)
+;
+; 16.16 signed fixed-point divide. Computes (a * 2^16) / b as a 32-bit
+; result, with sign-magnitude handling.
+;
+; Math: result_repr = result_real * 2^16 = (a_real / b_real) * 2^16 =
+;       (a_repr * 2^16) / b_repr — that's a 48-bit / 32-bit divide
+;       yielding a 32-bit quotient.
+;
+; Algorithm: 48-iteration bit-by-bit long divide.
+;   State: 80-bit register {rem[32], dividend[48]}
+;          dividend initially = abs(a) << 16 (i.e. abs_a_hi:abs_a_lo:0000)
+;          rem initially = 0
+;   Each iteration: shift {rem, dividend} left by 1; the MSB of dividend
+;   enters the LSB of rem (after rem's own shift). If rem >= divisor,
+;   subtract and set the LSB of dividend (which holds the next quotient bit).
+;   After 48 iterations, dividend[bits 0-47] holds the quotient; we take
+;   the low 32 bits.
+;
+; Cycles: roughly 48 × 30 = 1440 cycles for the inner loop, plus sign
+; handling. Comparable cost to a full software 32-bit divide.
+;
+; Stack: same layout as fix32Mul (4-byte arg slots):
+;   5,6,s   = b_lo
+;   7,8,s   = b_hi
+;   9,10,s  = a_lo
+;   11,12,s = a_hi
+;
+; Division by zero: undefined (the loop produces 0xFFFFFFFF and the
+; remainder is meaningless). Caller's responsibility to range-check.
+;------------------------------------------------------------------------------
+fix32Div:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+
+    ; ---- Sign tracking ----
+    lda 11,s                ; a_hi
+    eor 7,s                 ; XOR b_hi
+    sta.w f32_sign
+
+    ; ---- abs(a) into f32d_div_hi:f32d_div_mid; f32d_div_lo = 0 ----
+    lda 9,s                 ; a_lo
+    sta.w f32d_div_mid
+    lda 11,s                ; a_hi
+    sta.w f32d_div_hi
+    bpl @a_pos
+        ; Negate (div_hi : div_mid)
+        lda.w f32d_div_mid
+        eor #$FFFF
+        clc
+        adc #1
+        sta.w f32d_div_mid
+        lda.w f32d_div_hi
+        eor #$FFFF
+        adc #0
+        sta.w f32d_div_hi
+@a_pos:
+    stz.w f32d_div_lo
+
+    ; ---- abs(b) into f32d_divisor_hi:f32d_divisor_lo ----
+    lda 5,s
+    sta.w f32d_divisor_lo
+    lda 7,s
+    sta.w f32d_divisor_hi
+    bpl @b_pos
+        lda.w f32d_divisor_lo
+        eor #$FFFF
+        clc
+        adc #1
+        sta.w f32d_divisor_lo
+        lda.w f32d_divisor_hi
+        eor #$FFFF
+        adc #0
+        sta.w f32d_divisor_hi
+@b_pos:
+
+    ; ---- Init remainder to 0 ----
+    stz.w f32d_rem_lo
+    stz.w f32d_rem_hi
+
+    ; ---- 48-iter shift-and-subtract long divide ----
+    ldx.w #48
+@dloop:
+    ; Shift the 80-bit register {rem_hi:rem_lo:div_hi:div_mid:div_lo} left by 1
+    asl.w f32d_div_lo
+    rol.w f32d_div_mid
+    rol.w f32d_div_hi
+    rol.w f32d_rem_lo
+    rol.w f32d_rem_hi
+
+    ; Trial subtract: (rem_hi:rem_lo) - (divisor_hi:divisor_lo)
+    ; If carry set after the SBC sequence: rem >= divisor.
+    lda.w f32d_rem_lo
+    cmp.w f32d_divisor_lo
+    lda.w f32d_rem_hi
+    sbc.w f32d_divisor_hi
+    bcc @no_sub
+
+    ; rem >= divisor: subtract for real and set bit 0 of div_lo (next quotient bit)
+    lda.w f32d_rem_lo
+    sec
+    sbc.w f32d_divisor_lo
+    sta.w f32d_rem_lo
+    lda.w f32d_rem_hi
+    sbc.w f32d_divisor_hi
+    sta.w f32d_rem_hi
+    lda.w f32d_div_lo
+    ora #1
+    sta.w f32d_div_lo
+@no_sub:
+    dex
+    bne @dloop
+
+    ; ---- Quotient is in div_hi:div_mid:div_lo (48 bits) ----
+    ; We take the low 32: div_mid:div_lo
+    lda.w f32d_div_lo
+    sta.w f32_res_lo
+    lda.w f32d_div_mid
+    sta.w f32_res_hi
+
+    ; ---- Apply sign ----
+    bit.w f32_sign
+    bpl @result_pos
+        lda.w f32_res_lo
+        eor #$FFFF
+        clc
+        adc #1
+        sta.w f32_res_lo
+        lda.w f32_res_hi
+        eor #$FFFF
+        adc #0
+        sta.w f32_res_hi
+@result_pos:
+
+    ; ---- Return: low 16 in A, high 16 in tcc__retval_hi ----
+    lda.w f32_res_hi
+    sta.b tcc__retval_hi
+    lda.w f32_res_lo
+
+    plp
+    rtl
+
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -530,4 +675,14 @@ fix32Mul:
     f32_hh_lo:      dsb 2
     f32_res_lo:     dsb 2
     f32_res_hi:     dsb 2
+
+    ; fix32Div scratch — 48-bit dividend (which doubles as quotient
+    ; accumulator) + 32-bit divisor + 32-bit remainder.
+    f32d_div_lo:     dsb 2    ; bits 0-15 of dividend / final quotient
+    f32d_div_mid:    dsb 2    ; bits 16-31
+    f32d_div_hi:     dsb 2    ; bits 32-47
+    f32d_divisor_lo: dsb 2
+    f32d_divisor_hi: dsb 2
+    f32d_rem_lo:     dsb 2
+    f32d_rem_hi:     dsb 2
 .ENDS
