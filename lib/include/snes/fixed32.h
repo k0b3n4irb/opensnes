@@ -210,7 +210,37 @@ fixed32 fix32Mul(fixed32 a, fixed32 b);
  */
 fixed32 fix32Div(fixed32 a, fixed32 b);
 
-/* fix32Sin, fix32Lerp remain deferred to follow-up chantiers (see
- * `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`). */
+/**
+ * @brief 16.16 fixed-point linear interpolation
+ * @param a Start value (returned when t = 0)
+ * @param b End value (returned when t = FIX32(1))
+ * @param t Interpolation parameter in 16.16, typically [0, FIX32(1)]
+ * @return a + (b - a) * t at 16.16 precision
+ *
+ * Inline: just `a + fix32Mul(b - a, t)`. No new asm — the multiply
+ * carries the cost (~280 cycles), the add is one Kl op.
+ *
+ * Extrapolation is supported: t > FIX32(1) extends past b, t < 0
+ * extends before a. The caller is responsible for clamping if a
+ * strict interpolation is needed.
+ *
+ * Precision caveat: when (b - a) approaches the fix32 range limit
+ * (close to ±32768), the intermediate multiply may lose precision
+ * at the bottom of the fractional part. For tight cases, prefer
+ * direct `a*(1-t) + b*t` formulation (one extra mul, no subtraction
+ * round-trip).
+ *
+ * @code
+ * fixed32 midpoint = fix32Lerp(p0, p1, FIX32(1) >> 1);  // (p0 + p1) / 2
+ * fixed32 eased = fix32Lerp(start, end, easing_curve_t);
+ * @endcode
+ */
+inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
+    return a + fix32Mul(b - a, t);
+}
+
+/* fix32Sin remains deferred (the last B5 follow-up — needs an
+ * extended LUT or interpolation strategy choice). See
+ * `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`. */
 
 #endif /* OPENSNES_FIXED32_H */
