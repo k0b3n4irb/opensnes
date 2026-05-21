@@ -159,12 +159,13 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 ### Parent develop pointer bumps
 
 - `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0`,
-  `e2abe08`, `10a0628`, `32a09da`, `3de8932` — each bumps the
-  opensnes-emu submodule pointer to track the probe-suite
-  progression. Plus the orphan `b5_fix32_orbit_sketch.md` preserved
-  at `b6e655d` (was an untracked draft inside the emu submodule's
-  wrong directory). `eba4329` filed this chantier note; `e2abe08`
-  and `32a09da` updated it for waves 2 and 3.
+  `e2abe08`, `10a0628`, `32a09da`, `3de8932`, `3dc5ec4`, `c6403f4`,
+  `c14b317`, `92d2617` — each bumps the opensnes-emu submodule
+  pointer or updates the chantier note. The orphan
+  `b5_fix32_orbit_sketch.md` was preserved at `b6e655d`. This chantier
+  note was first filed at `eba4329`, updated for waves 2 / 3 / alt-
+  controller at `e2abe08` / `32a09da` / `3dc5ec4` / `c6403f4` /
+  `c14b317`. The `--quick` wiring landed at `92d2617`.
 
 ## Functional suite, before vs after
 
@@ -176,7 +177,8 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 | Joypad-bit coverage | n/a              | every individual SNES button (12 buttons + 3 combos via `controller.test.mjs`) |
 | Alt-controller coverage | n/a          | full pipeline: no-controller detection + positive-path (mouse deltas, scope PPU latch) |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~67s for 17 probes + ~170s sweep |
+| Runtime   | ~10s for 5 probes                | ~67s for 17 probes + ~170s sweep (standalone), or ~120s end-to-end in `--quick` (sweep auto-skipped) |
+| Pre-commit gate | snes9x-only `--quick` (~60s, 265 checks) | snes9x + Mesen2 functional in `--quick` (~120s, 282 checks) |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
 
 ### Subsystem coverage matrix
@@ -334,11 +336,12 @@ indirection (e.g. a separate manager class).
 
 ## Pending follow-ups
 
-- **Wire functional probes into the canonical `--quick` path?** Task
-  #112 was deferred (separate is cleaner; quick stays snes9x-only,
-  ~30-60s; functional stays Mesen2-based, ~40s + sweep). Re-evaluate
-  if a future regression class is *only* catchable via the functional
-  surface and the user wants pre-commit gating.
+- ~~Wire functional probes into the canonical `--quick` path~~ —
+  **SHIPPED** 2026-05-21 (emu `bb407d5`, develop `92d2617`). Phase 9
+  "Functional Probes" added to run-all-tests.mjs; the 17 non-sweep
+  probes run inline in `--quick`, boot-sweep auto-skipped via
+  `SKIP_BOOT_SWEEP=1`. Skipped cleanly if mesen2-rpc binary absent
+  (CI without Mesen2 won't fail).
 
 - **Alt-controller positive-path probes**: **SHIPPED** 2026-05-21 (Mesen2
   `5fc4e387`, OpenSNES emu `430001f`). Both mouse and superscope probes
@@ -367,15 +370,16 @@ indirection (e.g. a separate manager class).
 
 ## Branch / commit state at end of chantier
 
-- **opensnes develop**: `3de8932` (10 commits since the start of the
-  cleanup-and-extend phase: baselines bump → export warnings fix →
-  probes bump → boot-sweep bump → chantier note → 2nd wave bump →
-  chantier note update → 3rd wave bump → chantier note update →
-  4th wave alt-controller bump).
-- **opensnes-emu feat/functional-probes**: `7a66f8f` (7 commits:
+- **opensnes develop**: `92d2617` (14+ commits across the cleanup-and-
+  extend phase: baselines → export warnings → probes waves 1-3 →
+  boot-sweep → alt-controller no-controller → alt-controller positive-
+  path → `--quick` wiring).
+- **opensnes-emu feat/functional-probes**: `bb407d5` (10 commits:
   baselines refresh → input probes wave 1 → sym-parsing refactor →
-  boot sweep → input probes wave 2 → input probes wave 3 →
-  alt-controller no-controller probes).
+  boot sweep → input probes wave 2 → input probes wave 3 → alt-
+  controller probes (no-controller) → docstring update → alt-
+  controller probes (positive-path) → Phase 9 wiring into
+  `run-all-tests.mjs`).
 - **mesen2-rpc dev/rpc-server**: `5fc4e387` (full alt-controller surface
   shipped — controller.connect + input.set_mouse + input.set_scope all
   functional via static-singleton override tables).
