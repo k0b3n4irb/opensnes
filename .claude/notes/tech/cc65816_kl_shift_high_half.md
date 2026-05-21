@@ -138,7 +138,7 @@ vs the correctness gain.
 
 - Workaround: `lib/source/fixed32.asm` (fix32Sin / fix32Cos)
 - The original chantier where this surfaced:
-  [[b5_fix32_orbit_sketch]]
+  [[b5_fix32_complete]]
 - The first Kl-related bug found and fixed in qbe:
   [[cc65816_kl_return_incomplete]]
 - qbe emit.c around line 2400-2700 (the Omul/Oshl/Oshr handlers)

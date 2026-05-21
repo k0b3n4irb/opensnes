@@ -172,8 +172,8 @@ would be a problem.
 
 ## Cross-references
 
-- B5 chantier note: [[b5_fix32_orbit_sketch]]
-- B5 archived asm draft: `b5_fix32mul_asm_draft.asm` (preserved for
+- B5 chantier note (archived after completion): [[b5_fix32_complete]]
+- B5 asm now in `lib/source/fixed32.asm` (originally a draft preserved for
   the eventual phase 2)
 - Existing Kl runtime helpers: `lib/source/mul32.asm`, `div32.asm`
 - QBE emit.c Jretl handler at line 4197

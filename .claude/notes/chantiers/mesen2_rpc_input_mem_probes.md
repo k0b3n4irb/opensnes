@@ -175,8 +175,10 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 - `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0`,
   `e2abe08`, `10a0628`, `32a09da`, `3de8932`, `3dc5ec4`, `c6403f4`,
   `c14b317`, `92d2617` — each bumps the opensnes-emu submodule
-  pointer or updates the chantier note. The orphan
-  `b5_fix32_orbit_sketch.md` was preserved at `b6e655d`. This chantier
+  pointer or updates the chantier note. The orphan B5 sketch was
+  preserved at `b6e655d` and ultimately landed as the complete
+  fixed32 stack (now archived as `archive/b5_fix32_complete.md`).
+  This chantier
   note was first filed at `eba4329`, updated for waves 2 / 3 / alt-
   controller at `e2abe08` / `32a09da` / `3dc5ec4` / `c6403f4` /
   `c14b317`. The `--quick` wiring landed at `92d2617`.
@@ -371,9 +373,11 @@ indirection (e.g. a separate manager class).
   hello/starfield). Track under structural defects if it becomes a
   blocker.
 
-- **B5 fixed32 chantier**. The orphan `b5_fix32_orbit_sketch.md` is
-  preserved as a starting sketch. When B5 lands, the input-driven
-  probe pattern will validate the orbit motion end-to-end.
+- ~~B5 fixed32 chantier~~ — **SHIPPED** 2026-05-21 (develop `df37da1`).
+  Full 16.16 fixed-point math suite (Mul/Div/Lerp/Sin/Cos) + the
+  `fix32_orbit` demo example + matching functional probe that validates
+  the trig-driven motion end-to-end. See archived
+  `archive/b5_fix32_complete.md` for the chantier history.
 
 ## Cross-references
 
@@ -382,7 +386,7 @@ indirection (e.g. a separate manager class).
 - Plan: `.claude/plans/tender-yawning-cake.md`
 - Probe authoring: `tools/opensnes-emu/test/functional/README.md`
 - Sym parser source: `tools/opensnes-emu/test/functional/lib/symbols.mjs`
-- B5 follow-up: [[b5_fix32_orbit_sketch]]
+- B5 follow-up (now archived as COMPLETE): [[b5_fix32_complete]]
 - Repo: <https://github.com/k0b3n4irb/mesen2-rpc>
 
 ## Bonus: breakout autoplay demo (proof-of-capability)
