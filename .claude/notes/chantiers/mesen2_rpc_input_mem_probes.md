@@ -171,12 +171,12 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 | Phase     | Before chantier | After chantier |
 |-----------|--------------|-------------|
 | Probes    | 5 (hdma, dma, cgram, oam, scroll) | 17 + 1 sweep covering 55 examples |
-| Inputs    | 0 (all observation-only)         | 10 input-driven + 2 negative-path alt-controller |
+| Inputs    | 0 (all observation-only)         | 12 input-driven (10 joypad + 2 alt-controller positive-path) |
 | Input pattern coverage | n/a       | on-press (D-pad hold), on-release (`pad_released`), just-pressed (`padPressed`) — all three lib masks |
 | Joypad-bit coverage | n/a              | every individual SNES button (12 buttons + 3 combos via `controller.test.mjs`) |
-| Alt-controller coverage | n/a          | no-controller detection path for mouse + scope (false-positive guard) |
+| Alt-controller coverage | n/a          | full pipeline: no-controller detection + positive-path (mouse deltas, scope PPU latch) |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~57s for 17 probes + ~170s sweep |
+| Runtime   | ~10s for 5 probes                | ~67s for 17 probes + ~170s sweep |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
 
 ### Subsystem coverage matrix
@@ -196,8 +196,8 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 | Trig LUT host (fixCos/atan2_8)  | aim_target                  |
 | LFSR PRNG (rand)                | random                      |
 | Per-bit joypad decode           | controller                  |
-| Mouse no-controller detection   | mouse                       |
-| Scope no-controller detection   | superscope                  |
+| Mouse detect + delta accumulation | mouse                     |
+| Scope detect + PPU H/V latch    | superscope                  |
 | NMI + force-blank avoidance     | boot-sweep (× 55 examples)  |
 
 ## Lessons learned
@@ -254,77 +254,83 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
    and applied within the same hours to the probe suite. No deferred
    ROI: the tools are already eating their cost.
 
-## Partial alt-controller surface (2026-05-21)
+## Positive-path alt-controller surface (2026-05-21)
 
-Mesen2 commit `2f118512` on `dev/rpc-server` ships the **infrastructure**
-for positive-path SnesMouse / SuperScope overrides, but the actual
-dispatch is disabled pending a heap-corruption fix.
+**SHIPPED**: Mesen2 commit `5fc4e387` on `dev/rpc-server` enables the
+full positive-path SnesMouse / SuperScope override pipeline. The
+earlier partial state at `2f118512` (heap-corruption bug blocked
+dispatch) is now closed.
 
 ### What ships and works
 
-- **`controller.connect(port, type)` RPC method**: hot-swaps Port1/Port2
-  controller type at runtime via SnesConfig + a new
-  `ConfigApi.RefreshControlDevices()` DllExport. Types: `"controller"`,
-  `"mouse"`, `"scope"`, `"none"`. The C++ side calls
-  `SnesControlManager::UpdateControlDevices()` which sees the config
-  diff and rebuilds the device list.
+- **`controller.connect(port, type)`**: hot-swaps Port1/Port2 controller
+  type at runtime via SnesConfig + `ConfigApi.RefreshControlDevices()`
+  DllExport. Types: `"controller"`, `"mouse"`, `"scope"`, `"none"`.
+- **`input.set_mouse(port, dx, dy, left, right)`**: drives SnesMouse
+  displacement + button state. Per-frame, the SnesDebugger dispatch
+  calls `SnesMouse::SetMovementFromOverride` + `SetBitValue`. The
+  movement is one-shot per strobe-poll cycle (drained by GetMovement).
+- **`input.set_scope(port, x, y, fire, cursor, turbo, pause)`**: drives
+  SuperScope coordinates + buttons. Re-calls
+  `SuperScope::TriggerLatchAfterOverride()` so the PPU H/V latch
+  request fires on the current frame (UpdateInputState ran
+  OnAfterSetState BEFORE the override applied — a re-call is required).
 - **`DebugMouseOverride` / `DebugScopeOverride` structs** (C++ in
-  `Core/Debugger/DebugTypes.h`, C# in `UI/Interop/DebugApi.cs`).
-  Kept separate from the cross-console `DebugControllerState` to avoid
-  perturbing its layout.
+  `Core/Debugger/DebugTypes.h`, C# in `UI/Interop/DebugApi.cs`). Kept
+  separate from `DebugControllerState` to avoid perturbing the
+  cross-console struct layout.
 - **`SnesMouse::SetMovementFromOverride(MouseMovement)` and
   `SuperScope::TriggerLatchAfterOverride()`** public wrappers around
   protected base methods.
-- **`SuperScope::Buttons` enum** lifted from `private` to `public` so
-  the debugger can name the bits.
-- **TS client `controller.connect()` method** + MCP
-  `snes_controller_connect` tool.
+- **`SuperScope::Buttons` enum** lifted from `private` to `public`.
+- **TS client `input.setMouse()` / `input.setScope()` /
+  `controller.connect()`** + corresponding MCP tools
+  (`snes_input_set_mouse`, `snes_input_set_scope`, `snes_controller_connect`).
 
-### What ships but currently errors
+### How the heap corruption was resolved (path 3, not path 2)
 
-- `input.set_mouse(port, dx, dy, left, right)` — RPC method present;
-  returns JSON-RPC error -32601 "not yet implemented" with a
-  pointer to the heap-corruption issue.
-- `input.set_scope(port, x, y, fire, cursor, turbo, pause)` — same shape.
-- TS `input.setMouse()` / `input.setScope()` exposed; surface the
-  C# error.
-- MCP `snes_input_set_mouse` / `snes_input_set_scope` tool defs
-  match.
+The chantier note initially recommended **path 2** (heap-allocated
+`unique_ptr<DebugMouseOverride[]>` members). I tried that first —
+**it didn't work**. Same `double free or corruption` after a few
+joypad `input.set` calls, even though the unique_ptr storage isn't
+touched in that code path.
 
-### The heap-corruption bug
+What actually worked was **path 3**: store the override tables as
+file-scope statics in `Debugger.cpp`:
 
-First implementation added override arrays to `Debugger.h`:
 ```cpp
-DebugMouseOverride _mouseOverrides[8] = {};
-DebugScopeOverride _scopeOverrides[8] = {};
+static DebugMouseOverride g_mouseOverrides[8] = {};
+static DebugScopeOverride g_scopeOverrides[8] = {};
 ```
 
-This caused `free(): invalid pointer` / `malloc(): unaligned tcache
-chunk detected` on subsequent joypad `input.set` calls — *before* any
-mouse/scope override was issued. The corruption surfaced through
-spawn-mesen.mjs but NOT through manual command-line launches of the
-same binary calling the same RPC sequence. Unclear root cause.
+The `Debugger` class's own layout doesn't change at all — methods
+`SetMouseOverride` / `GetMouseOverride` / etc. forward to these
+file-scope arrays. Single-emulator-instance assumption is already
+baked into the existing `_inputOverrides` member, so singleton tables
+for alt-controllers are consistent.
 
-Hypotheses:
-1. C# `DllImport`-marshalled struct layout doesn't match C++ default
-   alignment for the new `int16_t`+`bool` mixed-size structs.
-2. Some downstream consumer of the `Debugger` object's member offsets
-   assumes the pre-extension layout (no other consumer was identified
-   in a manual code search).
-3. Test harness state (spawn-mesen.mjs's `stdio: ["ignore", "ignore",
-   "pipe"]` vs. manual TTY launch) interacts with the new code path.
+**Why path 2 failed**: adding any member to `Debugger.h` (whether
+in-line array or `unique_ptr`) triggers the heap corruption. Suggests
+something else in the codebase compiles against the `Debugger`
+object's size or member offsets without including `Debugger.h`. The
+file-scope statics avoid that entirely.
 
-### Resolution paths
+This is documented because if someone tries to add a NEW member
+to `Debugger` in the future, they'll likely hit the same crash. The
+workaround is either file-scope statics OR using an unrelated
+indirection (e.g. a separate manager class).
 
-1. **`#pragma pack(1)` / `[StructLayout(Pack=1)]`** on the new structs
-   to remove platform-dependent alignment ambiguity.
-2. **Heap-allocate the override arrays** (`unique_ptr<DebugMouseOverride[]>`)
-   so the `Debugger` object's own size doesn't change.
-3. **Static state instead of `Debugger` members** — keep the override
-   tables in a separate translation unit.
+### Validation
 
-Recommended: try path 2 first (least invasive, sidesteps any potential
-struct-alignment issues entirely).
+- `mouse.test.mjs`: 2-phase (no-controller + positive-path); pos_x
+  advances from 128 under 30 frames of `setMouse(0, dx=5)`.
+- `superscope.test.mjs`: 2-phase; scope_shoth/scope_shotv latch from
+  the PPU H/V counters when `setScope(1, x=100, y=80, fire=true)`
+  is held for 8 frames. **Port index 1** (= SNES Port 2) because
+  `scopeInit()` reads REG_JOY2.
+- `controller.test.mjs`: 12 buttons + 3 combos still pass — joypad
+  path uncorrupted.
+- Full functional suite: 17/17 green in ~67s (excluding boot-sweep).
 
 ## Pending follow-ups
 
@@ -334,12 +340,10 @@ struct-alignment issues entirely).
   if a future regression class is *only* catchable via the functional
   surface and the user wants pre-commit gating.
 
-- **Alt-controller positive-path probes** (mouse delta consumption,
-  Super Scope fire latching, sensitivity changes). **PARTIAL**: the
-  Mesen2-side surface infrastructure is in place on 2026-05-21 (commit
-  `2f118512` on `dev/rpc-server`), but the actual dispatch is disabled
-  pending a heap-corruption bug fix. See the "Partial alt-controller
-  surface" section below.
+- **Alt-controller positive-path probes**: **SHIPPED** 2026-05-21 (Mesen2
+  `5fc4e387`, OpenSNES emu `430001f`). Both mouse and superscope probes
+  exercise the full pipeline (no-controller + positive-path). See
+  "Positive-path alt-controller surface" below.
 
 - **GSU/SA-1 introspection extensions to mesen2-rpc**. The current
   surface is 65816-only. Adding GSU register/PC inspection and SA-1
@@ -372,7 +376,6 @@ struct-alignment issues entirely).
   baselines refresh → input probes wave 1 → sym-parsing refactor →
   boot sweep → input probes wave 2 → input probes wave 3 →
   alt-controller no-controller probes).
-- **mesen2-rpc dev/rpc-server**: `2f118512` (input.set + mem.write_*
-  earlier; `2f118512` adds the partial alt-controller surface —
-  controller.connect works, input.set_mouse/scope return -32601
-  pending heap-corruption fix).
+- **mesen2-rpc dev/rpc-server**: `5fc4e387` (full alt-controller surface
+  shipped — controller.connect + input.set_mouse + input.set_scope all
+  functional via static-singleton override tables).
