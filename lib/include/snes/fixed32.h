@@ -76,7 +76,9 @@ typedef s32 fixed32;
  * fixed32 half = FIX32(1) >> 1; // 0.5 (32768 in raw)
  * @endcode
  */
-#define FIX32(x) ((fixed32)((s32)(x) << 16))
+/* Cast through u32 before shifting to avoid the C UB on left-shifting a
+ * negative signed value. Final cast back to fixed32 preserves bit pattern. */
+#define FIX32(x) ((fixed32)((u32)(s32)(x) << 16))
 
 /**
  * @brief Convert fixed32 to integer (truncate toward zero)
@@ -163,22 +165,31 @@ inline fixed32 fix32Max(fixed32 a, fixed32 b) {
 }
 
 /*============================================================================
- * Multiply / divide — deferred
+ * ASM-backed multiply
  *============================================================================*/
 
-/* fix32Mul, fix32Div, fix32Sin, fix32Lerp are NOT YET AVAILABLE.
+/**
+ * @brief 16.16 fixed-point multiply
+ * @param a First operand
+ * @param b Second operand
+ * @return (a * b) at 16.16 precision (bits 16-47 of the full 64-bit product)
  *
- * They are blocked on a cc65816 compiler issue: the Kl (32-bit) return
- * convention is incomplete — `s32 foo() { return ...; }` only returns
- * the low 16 bits, with the high 16 reading uninitialised memory at the
- * caller. See `.claude/notes/chantiers/b5_fix32_orbit_sketch.md` and the
- * archived asm draft alongside it (b5_fix32mul_asm_draft.asm) for the
- * implementation plan once the compiler blocker is resolved.
+ * Algorithm: three 16×16→32 unsigned partial products (a_l*b_l, a_l*b_h,
+ * a_h*b_l) + one 16×16→16 (low 16 of a_h*b_h) combined as
+ *   result = ml1 + ml2 + (ll >> 16) + (hh_lo << 16)
+ * Each 16×16→32 uses 4 hardware 8×8 multiplies — ~280 cycles total.
  *
- * In the meantime, all the inline ops above (Add/Sub via `+` / `-`,
- * Abs, Clamp, Min, Max) work because the C compiler handles them
- * directly via stack slots / globals — no Kl return value crosses a
- * function boundary.
+ * Sign-magnitude internally: result = sign(a) XOR sign(b) applied to
+ * the unsigned 32-bit magnitude. Overflow wraps modulo 2^32.
+ *
+ * @code
+ * fixed32 area = fix32Mul(FIX32(width), FIX32(height));
+ * fixed32 dy = fix32Mul(velocity, FIX32(dt));
+ * @endcode
  */
+fixed32 fix32Mul(fixed32 a, fixed32 b);
+
+/* fix32Div, fix32Sin, fix32Lerp remain deferred to follow-up chantiers
+ * (see `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`). */
 
 #endif /* OPENSNES_FIXED32_H */

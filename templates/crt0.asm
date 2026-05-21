@@ -66,6 +66,12 @@
     tcc__r9h    dsb 2
     tcc__r10    dsb 2
     tcc__r10h   dsb 2
+    ; Kl (32-bit) return-value high half. Callee writes here before rtl;
+    ; caller reads it immediately after the call. Mirrors the mul32_hi /
+    ; div32_qh pattern but for arbitrary C functions returning s32/u32.
+    ; Added 2026-05-21 to fix the incomplete Kl return convention (see
+    ; .claude/notes/tech/cc65816_kl_return_incomplete.md).
+    tcc__retval_hi  dsb 2
     ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
     nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
     nmi_has_callback dsb 1  ; 0 = default no-op, 1 = user callback active

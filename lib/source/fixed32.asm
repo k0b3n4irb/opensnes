@@ -31,7 +31,10 @@
 .endif
 .endif
 
-.EXPORT fix32Mul
+; Note: no `.EXPORT fix32Mul` — `.EXPORT` is for `.DEFINE`d symbols,
+; not labels. Labels in a SUPERFREE section are visible to other
+; object files automatically. (Same lesson as the mul32/div32 alias
+; trap; see lib/source/mul32.asm header.)
 .SECTION ".fix32mul" SUPERFREE
 
 ;------------------------------------------------------------------------------
@@ -169,9 +172,12 @@ fix32Mul:
         sta.w f32_res_hi
 @result_pos:
 
-    ; ---- Return result in (Y high : A low) per cc65816 ABI for Kl ----
-    ; The Kl ABI returns 32-bit values: low 16 in A, high 16 in Y.
-    ldy.w f32_res_hi
+    ; ---- Return per cc65816 Kl convention (added 2026-05-21) ----
+    ; Low 16 in A, high 16 in the tcc__retval_hi global. The caller reads
+    ; tcc__retval_hi back into A and stores to the high half of the
+    ; destination temp.
+    lda.w f32_res_hi
+    sta.b tcc__retval_hi
     lda.w f32_res_lo
 
     plp
