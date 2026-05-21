@@ -1,6 +1,6 @@
 ---
 name: mesen2-rpc input + mem.write surface, functional probe suite expanded
-description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 17 probes (10 input-driven + 2 no-controller alt-controller detection + 5 observation-only) + 1 boot sweep covering all 55 examples. All 3 input patterns, all 12 SNES joypad bits, the no-controller detection path for both alt-controllers (mouse, superscope), and all 9 lib subsystems touched by examples are now covered.
+description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 20 probes (13 input-driven joypad + 2 alt-controller positive-path + 5 observation-only) + 1 boot sweep covering all 55 examples. All 3 input patterns, all 12 SNES joypad bits, the full alt-controller pipeline (mouse + superscope), Mode 7 / HDMA differential / Tiled-editor maps. Plus a breakout autoplay AI demonstrating the surface is reach enough for autonomous real-time gameplay (V4 reads brick state + targets via paddle hit zones).
 type: project
 ---
 
@@ -135,6 +135,20 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
     message names the XOR'd bits so the failure tells you which
     button is broken.
 
+- `b1b7a85` — fifth wave: three more probes targeting examples with
+  non-trivial state machines that boot-sweep + visual regression
+  don't fully cover:
+  - **tiled**: D-pad scrolls `mapscx` through a 224-tile Tiled-editor-
+    authored map. Larger map than mapscroll, exercises the column-
+    streaming math more thoroughly.
+  - **parallax_scrolling**: validates HDMA three-zone differential
+    scrolling. Over 60 frames, sky=~60px, hills=~120px, ground=~240px;
+    cross-checks strict monotonic ordering. Catches the regression
+    class where one zone freezes but the screenshot still looks fine.
+  - **mode7_perspective**: D-pad drives `sx`/`sy` Mode 7 camera scroll
+    — the upstream gate for the HDMA perspective tables + M7A-M7D
+    matrix updates.
+
 - `7a66f8f` — fourth wave: alt-controller no-controller detection
   probes (negative-path only):
   - **mouse**: asserts `mouseConnect[0]`, `mouse_x[0]`, `mouse_y[0]`,
@@ -171,14 +185,14 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 
 | Phase     | Before chantier | After chantier |
 |-----------|--------------|-------------|
-| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 17 + 1 sweep covering 55 examples |
-| Inputs    | 0 (all observation-only)         | 12 input-driven (10 joypad + 2 alt-controller positive-path) |
+| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 20 + 1 sweep covering 55 examples |
+| Inputs    | 0 (all observation-only)         | 15 input-driven (13 joypad + 2 alt-controller positive-path) |
 | Input pattern coverage | n/a       | on-press (D-pad hold), on-release (`pad_released`), just-pressed (`padPressed`) — all three lib masks |
 | Joypad-bit coverage | n/a              | every individual SNES button (12 buttons + 3 combos via `controller.test.mjs`) |
 | Alt-controller coverage | n/a          | full pipeline: no-controller detection + positive-path (mouse deltas, scope PPU latch) |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~67s for 17 probes + ~170s sweep (standalone), or ~120s end-to-end in `--quick` (sweep auto-skipped) |
-| Pre-commit gate | snes9x-only `--quick` (~60s, 265 checks) | snes9x + Mesen2 functional in `--quick` (~120s, 282 checks) |
+| Runtime   | ~10s for 5 probes                | ~73s for 20 probes + ~170s sweep (standalone), or ~130s end-to-end in `--quick` (sweep auto-skipped) |
+| Pre-commit gate | snes9x-only `--quick` (~60s, 265 checks) | snes9x + Mesen2 functional in `--quick` (~130s, 285 checks) |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
 
 ### Subsystem coverage matrix
@@ -200,6 +214,9 @@ Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 | Per-bit joypad decode           | controller                  |
 | Mouse detect + delta accumulation | mouse                     |
 | Scope detect + PPU H/V latch    | superscope                  |
+| Large map column streaming      | tiled                       |
+| HDMA differential scrolling     | parallax_scrolling          |
+| Mode 7 camera + matrix updates  | mode7_perspective           |
 | NMI + force-blank avoidance     | boot-sweep (× 55 examples)  |
 
 ## Lessons learned
@@ -368,18 +385,49 @@ indirection (e.g. a separate manager class).
 - B5 follow-up: [[b5_fix32_orbit_sketch]]
 - Repo: <https://github.com/k0b3n4irb/mesen2-rpc>
 
+## Bonus: breakout autoplay demo (proof-of-capability)
+
+`test/functional/breakout_autoplay.mjs` is **not** a regression probe
+— it's a demonstration that the MCP surface is reach enough for
+autonomous real-time gameplay. The script evolved through 4 versions,
+each consuming more of the MCP surface:
+
+| Version | Strategy | RPC/frame | Result | Bottleneck |
+|---|---|---|---|---|
+| V1 | Chase ball X (5-line tracker) | 2 | 163/30s | none — works |
+| V2 | Mirror outer hit zones (sharp angles) | 5 | 198/60s | plateau, middle bricks unreachable |
+| V3 | Mild inner hit zones (vertical angles) | 5 | 198/60s | same plateau |
+| V4 | Brick-centroid targeting (reads `blocks[]`) | 5 + 100B/30f | 236/60s, 48/100 bricks broken | heuristic quality, not MCP |
+
+V4 reads the full 100-byte brick grid at `$00:1A00` every 30 frames,
+computes a row-weighted centroid, and picks the paddle hit zone
+(0..3) so the bounce physics (vel_x = ±2 zone 0/3, ±1 zone 1/2)
+deflects the ball toward remaining bricks.
+
+**Headline finding**: 8 RPC calls per frame fit comfortably in the
+16.67ms frame budget (~40ms headroom on localhost). The MCP isn't
+the bottleneck — AI heuristic quality is. With `bp.*` + `mem.write_*`
++ `snap.save/restore` also available, more elaborate AI shapes
+(snapshot-and-replay for what-if branching, state-machine
+reconstruction, RL on snapshot rollouts) are tractable.
+
+This demo doesn't run in the test suite — it takes 60 seconds and
+its assertions are vibes-based ("did the score go up"). Reserved for
+manual invocation as a chantier-level proof.
+
 ## Branch / commit state at end of chantier
 
-- **opensnes develop**: `92d2617` (14+ commits across the cleanup-and-
+- **opensnes develop**: `6cc1ca9` (16+ commits across the cleanup-and-
   extend phase: baselines → export warnings → probes waves 1-3 →
   boot-sweep → alt-controller no-controller → alt-controller positive-
-  path → `--quick` wiring).
-- **opensnes-emu feat/functional-probes**: `bb407d5` (10 commits:
+  path → `--quick` wiring → wave 5 (tiled/parallax/mode7) → breakout
+  autoplay V4).
+- **opensnes-emu feat/functional-probes**: `5e26eae` (12 commits:
   baselines refresh → input probes wave 1 → sym-parsing refactor →
   boot sweep → input probes wave 2 → input probes wave 3 → alt-
   controller probes (no-controller) → docstring update → alt-
-  controller probes (positive-path) → Phase 9 wiring into
-  `run-all-tests.mjs`).
+  controller probes (positive-path) → Phase 9 wiring → wave 5 +
+  breakout autoplay V1 → autoplay V4 brick-targeting).
 - **mesen2-rpc dev/rpc-server**: `5fc4e387` (full alt-controller surface
   shipped — controller.connect + input.set_mouse + input.set_scope all
   functional via static-singleton override tables).
