@@ -1,6 +1,6 @@
 ---
 name: mesen2-rpc input + mem.write surface, functional probe suite expanded
-description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 15 input-driven probes + 1 boot sweep covering all 55 examples. All 3 input patterns (on-press / on-release / just-pressed), all 12 SNES joypad bits, and all 9 lib subsystems touched by examples are now covered.
+description: Closes the input-injection / mem-write gaps surfaced by the tetris __mul32 bug, then leverages the new surface to grow the functional probe suite from 5 to 17 probes (10 input-driven + 2 no-controller alt-controller detection + 5 observation-only) + 1 boot sweep covering all 55 examples. All 3 input patterns, all 12 SNES joypad bits, the no-controller detection path for both alt-controllers (mouse, superscope), and all 9 lib subsystems touched by examples are now covered.
 type: project
 ---
 
@@ -78,7 +78,7 @@ Total deferred-tool count: **31**.
 
 ### Functional probes (opensnes-emu submodule, feat/functional-probes)
 
-Submodule head: `75c1ba6` (after the third wave of probes).
+Submodule head: `7a66f8f` (after the fourth wave of probes — alt-controllers).
 
 - `b47bef8` — first wave of input-driven probes (tetris, breakout,
   likemario):
@@ -118,7 +118,7 @@ Submodule head: `75c1ba6` (after the third wave of probes).
     through the open center of the arena; coarse smoke detector for
     the `collideRect` + `collideTile` path.
 
-- `75c1ba6` — third (final) wave of input-driven probes:
+- `75c1ba6` — third wave of input-driven probes:
   - **aim_target**: D-pad RIGHT/UP advances `target_x`/`target_y`
     under per-axis clamps (247 / 0). Despite the name, the example
     is the canonical `fixCos`/`fixSin`/`atan2_8` math demo; the probe
@@ -135,45 +135,70 @@ Submodule head: `75c1ba6` (after the third wave of probes).
     message names the XOR'd bits so the failure tells you which
     button is broken.
 
+- `7a66f8f` — fourth wave: alt-controller no-controller detection
+  probes (negative-path only):
+  - **mouse**: asserts `mouseConnect[0]`, `mouse_x[0]`, `mouse_y[0]`,
+    `mouseButton[0]` all stay 0 when no mouse is plugged. Catches a
+    regression in the mouse-signature check at crt0.asm:1402-1404
+    that would falsely report a mouse and produce garbage
+    displacements via the bit-bang loop.
+  - **superscope**: asserts `scope_con` + all 4 position vars
+    (shoth/shotv + raw) + all 3 button vars (down/now/held) stay 0
+    when no scope is plugged. Catches the false-positive that would
+    start latching ghost PPU H/V counters every NMI.
+  - **Limitation**: positive-path testing (actual mouse delta / scope
+    fire) requires a Mesen2-side extension —
+    `SnesDebugger::ProcessInputOverrides` currently only routes to
+    `SnesController` via `dynamic_pointer_cast`. The mem.write
+    injection trick used elsewhere doesn't work here: the NMI
+    handler resets `mouseConnect` / `scope_con` every cycle when no
+    actual hardware signature is detected, overwriting any C-side
+    write before the example's main loop reads it. Tracked as
+    follow-up.
+
 ### Parent develop pointer bumps
 
 - `b6e655d`, `8403941`, `961c5f7`, `eaa195c`, `eba4329`, `d4cc2a0`,
-  `e2abe08`, `10a0628` — each bumps the opensnes-emu submodule
-  pointer to track the probe-suite progression. Plus the orphan
-  `b5_fix32_orbit_sketch.md` preserved at `b6e655d` (was an untracked
-  draft inside the emu submodule's wrong directory). `eba4329` filed
-  this chantier note; `e2abe08` updated it for wave 2.
+  `e2abe08`, `10a0628`, `32a09da`, `3de8932` — each bumps the
+  opensnes-emu submodule pointer to track the probe-suite
+  progression. Plus the orphan `b5_fix32_orbit_sketch.md` preserved
+  at `b6e655d` (was an untracked draft inside the emu submodule's
+  wrong directory). `eba4329` filed this chantier note; `e2abe08`
+  and `32a09da` updated it for waves 2 and 3.
 
 ## Functional suite, before vs after
 
-| Phase     | Before today | After today |
+| Phase     | Before chantier | After chantier |
 |-----------|--------------|-------------|
-| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 15 + 1 sweep covering 55 examples |
-| Inputs    | 0 (all observation-only)         | 10 input-driven |
+| Probes    | 5 (hdma, dma, cgram, oam, scroll) | 17 + 1 sweep covering 55 examples |
+| Inputs    | 0 (all observation-only)         | 10 input-driven + 2 negative-path alt-controller |
 | Input pattern coverage | n/a       | on-press (D-pad hold), on-release (`pad_released`), just-pressed (`padPressed`) — all three lib masks |
 | Joypad-bit coverage | n/a              | every individual SNES button (12 buttons + 3 combos via `controller.test.mjs`) |
+| Alt-controller coverage | n/a          | no-controller detection path for mouse + scope (false-positive guard) |
 | Address   | Hardcoded literals               | Parsed from `.sym` at module load |
-| Runtime   | ~10s for 5 probes                | ~53s for 15 probes + ~170s sweep |
+| Runtime   | ~10s for 5 probes                | ~57s for 17 probes + ~170s sweep |
 | Failure mode on lib bss shift | Silent (assertions hit wrong byte) | Clear error: `Symbol "foo" not found in foo.sym` |
 
 ### Subsystem coverage matrix
 
-| Subsystem                  | Probe                       |
-|----------------------------|-----------------------------|
-| CGRAM upload (dmaCopyCGram) | cgram                       |
-| VRAM upload (dmaCopyVram)   | dma                         |
-| HDMA channel + enable       | hdma                        |
-| OAM shadow buffer + Y quirk | oam                         |
-| BG scroll cache             | scroll                      |
-| Map engine (camera-follow)  | mapscroll                   |
-| Dynamic VRAM re-init        | dynamic_map                 |
-| Scene stack (push/pop)      | scene_stack                 |
-| AABB + tile collision       | collision_demo              |
-| Game state machine + input  | tetris, breakout, likemario |
-| Trig LUT host (fixCos/atan2_8) | aim_target               |
-| LFSR PRNG (rand)            | random                      |
-| Per-bit joypad decode       | controller                  |
-| NMI + force-blank avoidance | boot-sweep (× 55 examples)  |
+| Subsystem                       | Probe                       |
+|---------------------------------|-----------------------------|
+| CGRAM upload (dmaCopyCGram)     | cgram                       |
+| VRAM upload (dmaCopyVram)       | dma                         |
+| HDMA channel + enable           | hdma                        |
+| OAM shadow buffer + Y quirk     | oam                         |
+| BG scroll cache                 | scroll                      |
+| Map engine (camera-follow)      | mapscroll                   |
+| Dynamic VRAM re-init            | dynamic_map                 |
+| Scene stack (push/pop)          | scene_stack                 |
+| AABB + tile collision           | collision_demo              |
+| Game state machine + input      | tetris, breakout, likemario |
+| Trig LUT host (fixCos/atan2_8)  | aim_target                  |
+| LFSR PRNG (rand)                | random                      |
+| Per-bit joypad decode           | controller                  |
+| Mouse no-controller detection   | mouse                       |
+| Scope no-controller detection   | superscope                  |
+| NMI + force-blank avoidance     | boot-sweep (× 55 examples)  |
 
 ## Lessons learned
 
@@ -237,12 +262,20 @@ Submodule head: `75c1ba6` (after the third wave of probes).
   if a future regression class is *only* catchable via the functional
   surface and the user wants pre-commit gating.
 
-- **Alternate-controller probes** (`mouse`, `superscope`, the two
-  `two_players` and `mouse` examples): the current `input.set` API
-  drives standard joypads only. Validating mouse/superscope pad
-  reads needs a separate Mesen2 RPC method that overrides those
-  controller types' MMIO read paths. Track as a mesen2-rpc surface
-  enhancement.
+- **Alt-controller positive-path probes** (mouse delta consumption,
+  Super Scope fire latching, sensitivity changes). Negative-path
+  detection is already covered (`mouse.test.mjs`, `superscope.test.mjs`),
+  but actual input-driven behavior needs a Mesen2-side extension to
+  `SnesDebugger::ProcessInputOverrides` to dispatch to `SnesMouse` /
+  `SuperScope` instead of just `SnesController`. Shape of the work:
+  1. Extend `DebugControllerState` (or add a parallel struct) with
+     mouse delta + scope position fields.
+  2. In `ProcessInputOverrides`, also `dynamic_pointer_cast<SnesMouse>`
+     and `<SuperScope>`, set their internal state.
+  3. New C# RPC methods: `input.set_mouse(port, dx, dy, btnL, btnR)`,
+     `input.set_scope(port, x, y, fire, cursor, turbo, pause)`.
+  4. Plumbing: TS client + MCP server.
+  Estimated effort: 2-4h C++/C# work.
 
 - **GSU/SA-1 introspection extensions to mesen2-rpc**. The current
   surface is 65816-only. Adding GSU register/PC inspection and SA-1
@@ -264,14 +297,16 @@ Submodule head: `75c1ba6` (after the third wave of probes).
 - B5 follow-up: [[b5_fix32_orbit_sketch]]
 - Repo: <https://github.com/k0b3n4irb/mesen2-rpc>
 
-## Branch / commit state at end of session
+## Branch / commit state at end of chantier
 
-- **opensnes develop**: `10a0628` (8 commits since the start of the
+- **opensnes develop**: `3de8932` (10 commits since the start of the
   cleanup-and-extend phase: baselines bump → export warnings fix →
   probes bump → boot-sweep bump → chantier note → 2nd wave bump →
-  chantier note update → 3rd wave bump).
-- **opensnes-emu feat/functional-probes**: `75c1ba6` (6 commits:
+  chantier note update → 3rd wave bump → chantier note update →
+  4th wave alt-controller bump).
+- **opensnes-emu feat/functional-probes**: `7a66f8f` (7 commits:
   baselines refresh → input probes wave 1 → sym-parsing refactor →
-  boot sweep → input probes wave 2 → input probes wave 3).
+  boot sweep → input probes wave 2 → input probes wave 3 →
+  alt-controller no-controller probes).
 - **mesen2-rpc dev/rpc-server**: `b9a22115` (input.set + mem.write_*
-  pushed; no later commits this session).
+  pushed; no later commits this chantier).
