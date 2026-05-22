@@ -2,18 +2,19 @@
 ; shmup_1942 — Graphics Data
 ;
 ; Asset-bundle symbols consumed by snes/asset.h's DECLARE_BG_ASSET (prefix
-; `ground`). The .incbin files are produced by gfx4snes from res/ground.png.
+; `scene`). The .incbin files are produced by gfx4snes from res/scene.png,
+; itself composed from ground.png by res/compose_scene.py.
 ;==============================================================================
 
 .section ".rodata1" superfree
 
-ground_tiles: .incbin "res/ground.pic"
-ground_tiles_end:
+scene_tiles: .incbin "res/scene.pic"
+scene_tiles_end:
 
-ground_map: .incbin "res/ground.map"
-ground_map_end:
+scene_map: .incbin "res/scene.map"
+scene_map_end:
 
-ground_pal: .incbin "res/ground.pal"
-ground_pal_end:
+scene_pal: .incbin "res/scene.pal"
+scene_pal_end:
 
 .ends

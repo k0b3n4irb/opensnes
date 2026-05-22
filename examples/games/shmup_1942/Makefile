@@ -20,20 +20,20 @@ ASMSRC     := data.asm
 include $(OPENSNES)/make/common.mk
 
 #------------------------------------------------------------------------------
-# Graphics conversion (4bpp Mode 1 background — grass biome terrain)
+# Graphics conversion (4bpp Mode 1 background — composed grass-biome scene)
 #------------------------------------------------------------------------------
-# ground.png is 192×112 with 18 unique colors. gfx4snes quantises to 16 (2
-# colours folded into nearest neighbours) and produces a 24×14 tilemap. The
-# tilemap occupies the top-left of the 32×32 SNES screen at scroll (0,0); the
-# rest of the screen falls back to tile 0 from the converted library.
+# scene.png is 256×256 (exactly one SNES screen) with 12 unique colours,
+# built by res/compose_scene.py from the 16×16 source tiles in ground.png.
+# A pure grass-fill (6,2) covers the whole screen with trees, two red tent
+# enemy bases and decorative bushes/rings sprinkled on top.
 
-res/ground.pic res/ground.pal res/ground.map: res/ground.png
-	@echo "[GFX] Converting ground tileset..."
+res/scene.pic res/scene.pal res/scene.map: res/scene.png
+	@echo "[GFX] Converting scene tileset..."
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
-combined.asm: res/ground.pic
+combined.asm: res/scene.pic
 
 clean: clean-shmup_1942
 .PHONY: clean-shmup_1942
 clean-shmup_1942:
-	@rm -f res/ground.pic res/ground.pal res/ground.map res/ground.inc res/ground_data.as
+	@rm -f res/scene.pic res/scene.pal res/scene.map res/scene.inc res/scene_data.as

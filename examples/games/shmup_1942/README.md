@@ -5,22 +5,26 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 ![Screenshot](screenshot.png)
 
-## Current stage — S1: static tile-library preview
+## Current stage — S1: static scene render
 
-Proves the asset pipeline end to end: `gfx4snes` converts
-`res/ground.png` (the 192×112 grass-biome terrain library, 18 → 16
-colours after quantisation) into `.pic` / `.pal` / `.map`, and `main.c`
-hands the bundle to `bgLoad()` for a single static frame on BG1 in
-Mode 1.
+A 256×256 grass-biome screen composed from the 16×16 source tiles in
+`res/ground.png` by `res/compose_scene.py`:
 
-The 24×14 tile-library occupies the top of the 32×32 screen; the rest
-fills with tile 0 from the library. **It is not a designed level** —
-the actual screen composition, player ship and scrolling come in S2
-and S3.
+- Pure grass fill across the whole screen (the source pack has exactly
+  one borderless grass tile — `(6,2)` — so we tile it everywhere)
+- Twelve trees scattered off-grid for visual texture
+- Two red tent assemblies (roof + body + flag, three tiles vertical) as
+  enemy bases — these will be bombable in S5
+- Bushes in the four corners + a couple of wooden rings for breaks
+
+The composed `scene.png` (12 unique colours) feeds `gfx4snes`, which
+emits `.pic` / `.pal` / `.map`. `main.c` hands the bundle to `bgLoad()`
+for a single static frame on BG1 in Mode 1. No movement, no sprites,
+no scrolling.
 
 ## SNES Concepts shown
 
-- Mode 1 (4bpp BG1, up to 16 colours)
+- Mode 1 (4bpp BG1, up to 16 colours per palette slot)
 - `DECLARE_BG_ASSET` bundling tiles + palette + tilemap
 - `bgLoad()` one-shot VRAM/CGRAM setup
 - VRAM layout: tilemap at $0000, tile graphics at $4000
@@ -33,6 +37,16 @@ cd examples/games/shmup_1942 && make
 
 Produces `shmup_1942.sfc` (LoROM, 256 KB).
 
+## Re-composing the scene
+
+`res/compose_scene.py` is the source of truth for the scene layout —
+edit the tile selections and tent/tree positions there, then re-run:
+
+```bash
+python3 res/compose_scene.py
+make
+```
+
 ## Modules Used
 
 `console`, `dma`, `background`, `asset`.
@@ -41,11 +55,11 @@ Produces `shmup_1942.sfc` (LoROM, 256 KB).
 
 | Stage | What it adds |
 |-------|--------------|
-| **S1** *(this stage)* | gfx4snes pipeline + static tilemap render |
-| S2 | Player ship (sprites) with D-pad movement |
+| **S1** *(this stage)* | gfx4snes pipeline + composed static scene |
+| S2 | Player ship (sprite) with D-pad movement |
 | S3 | Vertical auto-scroll of the BG |
 | S4 | Basic enemy spawns with sprite pool |
-| S5 | Bullets + AABB collision + explosions |
+| S5 | Bullets + AABB collision + explosions on the tents |
 | S6 | HUD (score, lives, power-ups) |
 
 ## Licence
