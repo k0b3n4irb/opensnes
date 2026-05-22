@@ -264,12 +264,21 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * fixed32 dx = fix32Mul(speed, fix32Sin(angle));
  * @endcode
  */
-/* Implemented in lib/source/fixed32.asm — the C inline form trips a
- * qbe codegen bug on Kl shift-by-constant (the high half ended up
- * reading an unstored stack slot). The asm form is direct: table
- * lookup + sign-extend + xba (1-cycle byte swap = shift-left-8).
- * See chantier note for the qbe fix path. */
+/* Implemented in lib/source/fixed32.asm. Two qbe codegen bugs make the
+ * one-line C body `(u32)(s32)fixSin(angle) << 8` produce wrong results:
+ *
+ *   1. Kl shift-by-constant spill (fixed in qbe 2026-05-22): the high
+ *      half was computed from an unstored stack slot. Resolved.
+ *
+ *   2. Kw → Kl widening sign assumption (UNFIXED): ref_is_high_zero()
+ *      treats all Kw operands as zero-extended. Wrong for signed
+ *      s16 → s32 — produces 0x00FF0000 instead of 0xFFFF0000 for
+ *      sin(270°) = -1.
+ *
+ * The asm form sign-extends explicitly and avoids both. See
+ * lib/source/math.c for the full notes. */
 fixed32 fix32Sin(u8 angle);
+fixed32 fix32Cos(u8 angle);
 
 /**
  * @brief 16.16 fixed-point cosine of an 8-bit angle
@@ -279,6 +288,6 @@ fixed32 fix32Sin(u8 angle);
  * fixed32 dy = fix32Mul(speed, fix32Cos(angle));
  * @endcode
  */
-fixed32 fix32Cos(u8 angle);
+/* fix32Cos declared above with fix32Sin — both bodies in math.c. */
 
 #endif /* OPENSNES_FIXED32_H */
