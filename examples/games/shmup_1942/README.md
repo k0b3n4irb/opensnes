@@ -5,51 +5,52 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 ![Screenshot](screenshot.png)
 
-## Current stage — S2: vertical auto-scroll
+## Current stage — S3: player ship + D-pad
 
-Extends the S1 procedural scene to **256×512 pixels (two screens
-tall)** and scrolls it vertically at 1 px per frame. The 32×64
-tilemap is loaded once into VRAM and the SNES BG scroll register
-cycles through the full map height, wrapping back to the top after
-about 8.5 s at 60 fps. Water channels, dirt patches with tents, and
-tree clusters come into view and pass below the visible window as the
-"camera" moves upward.
+Adds a controllable 32×32 player ship on top of the S2 scrolling
+terrain. The ship — `ship_0000` from Kenney's `ships_packed.png`, a
+blue chasseur — is extracted by `res/extract_player.py` with its
+dark-blue background forced to palette index 0 (transparent in SNES
+sprite rendering). The terrain continues its 1 px/frame auto-scroll
+while the player moves freely with the D-pad, clamped to a
+192×160-px playing field so the sprite stays fully on screen.
 
-## Algorithm
+## Algorithm / architecture
 
 ```
-1. Pure-grass fill on the 16×32 macro grid (256×512 px).
-2. Water mask via cellular automata + post-CA edge re-seed.
-   → 15-tile sand-in-water autotile resolves the coast (NESW
-     pattern lookup, missing T-junctions derived via H/V flip).
-3. Dirt mask via cellular automata on grass-interior cells.
-   → Same autotile, runtime RECOLOURED (sand→dirt-brown,
-     water→grass-green) gives organic dirt patches with curved
-     boundaries.
-4. Tents stacked on the largest dirt-patch components (≥3 cells,
-   centre column with a 3-cell vertical run).
-5. Trees clustered near grass-to-water boundary (Poisson-disk
-   sampling), bushes and rings sparse.
-6. `gfx4snes` converts the 256×512 scene to .pic + .pal + .map.
-7. `main.c` loads the bundle into BG1 with SC_32x64 (two-screen
-   tilemap), then in the main loop:
-        scroll_y = (scroll_y + 1) % 512;
-        bgSetScroll(0, 0, scroll_y);
-        WaitForVBlank();
-   The hardware scrolls smoothly because `bgSetScroll` defers the
-   register write to the next NMI via a dirty flag.
+Build
+  - res/extract_player.py     ─→ res/player.png      (32×32 indexed)
+  - gfx4snes -s 32  on player.png   ─→ player.pic + player.pal
+  - gfx4snes -s 8   on scene.png    ─→ scene.pic + scene.pal + scene.map
+
+VRAM map
+  $0000 ─ BG1 tilemap        (SC_32x64 = 2 KB)
+  $4000 ─ BG1 tiles          (49 unique 8×8 tiles after dedup)
+  $6000 ─ Sprite tiles       (16 8×8 tiles for the 32×32 ship, padded
+                              to 64 slots for OAM tile-row stride)
+
+main loop (per frame)
+  - WaitForVBlank()
+  - scroll_y = (scroll_y + 1) % 512;
+  - pad = padHeld(0);
+    LEFT/RIGHT/UP/DOWN → player_x/_y ±= 2 px (with clamping)
+  - oamSet(0, player_x, player_y, …);
+  - bgSetScroll(0, 0, scroll_y);
 ```
 
-`SEED = 17` is the same seed as S1; the algorithm naturally extended
-to the taller grid produces a varied vertical scrolling landscape.
+`bgSetScroll` and `oamSet` defer to the NMI handler via dirty flags,
+so the per-frame work is just a few bytes of buffer writes; the
+hardware-register updates happen atomically at VBlank.
 
 ## SNES Concepts shown
 
 - Mode 1 (4bpp BG1, up to 16 colours per palette slot)
-- SC_32x64 tilemap (2 KB VRAM, 32 wide × 64 tall)
-- `bgSetScroll()` deferred register write via NMI dirty flag
-- Wrap-around scroll using modulo on a `u16` counter
-- VRAM layout: tilemap at $0000, tile graphics at $4000
+- SC_32x64 tilemap with continuous vertical auto-scroll
+- OAM: `oamInitGfxSet` loads sprite tiles + palette + configures OBJSEL
+- `OBJ_SIZE32_L64`: small sprites are 32×32 (our ship), large are 64
+- Sprite palette in CGRAM 128+ (we use sprite palette 0 → CGRAM 128-143)
+- VRAM region planning to avoid BG/sprite tile clashes
+- `padHeld(0)` for read-while-pressed input
 
 ## Build
 
@@ -59,27 +60,25 @@ cd examples/games/shmup_1942 && make
 
 Produces `shmup_1942.sfc` (LoROM, 256 KB).
 
-## Re-composing the scene
+## Re-generating assets
 
 ```bash
-python3 res/compose_scene.py   # regenerates scene.png
-make                            # rebuilds the ROM
+python3 res/extract_player.py   # if you want to swap the player ship
+python3 res/compose_scene.py    # to redraw the terrain (bump SEED)
+make
 ```
-
-Bump `SEED` in the script for a different layout, or tune the CA fill
-percentages (water `0.32`, dirt `0.28`) to shift biome balance.
 
 ## Modules Used
 
-`console`, `dma`, `background`, `asset`.
+`console`, `dma`, `background`, `asset`, `sprite`, `input`.
 
 ## Roadmap
 
 | Stage | What it adds |
 |-------|--------------|
 | S1 | gfx4snes pipeline + procedural land-with-water-channels |
-| **S2** *(this stage)* | 256×512 scene + SC_32x64 + vertical auto-scroll |
-| S3 | Player ship (sprite) with D-pad movement |
+| S2 | 256×512 scene + SC_32x64 + vertical auto-scroll |
+| **S3** *(this stage)* | Player ship (sprite) + D-pad movement |
 | S4 | Basic enemy spawns with sprite pool |
 | S5 | Bullets + AABB collision + explosions on the tents |
 | S6 | HUD (score, lives, power-ups) |

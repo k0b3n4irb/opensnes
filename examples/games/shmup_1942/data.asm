@@ -2,8 +2,7 @@
 ; shmup_1942 — Graphics Data
 ;
 ; Asset-bundle symbols consumed by snes/asset.h's DECLARE_BG_ASSET (prefix
-; `scene`). The .incbin files are produced by gfx4snes from res/scene.png,
-; itself composed from ground.png by res/compose_scene.py.
+; `scene`) plus a sprite tile + palette pair for the player ship.
 ;==============================================================================
 
 .section ".rodata1" superfree
@@ -16,5 +15,15 @@ scene_map_end:
 
 scene_pal: .incbin "res/scene.pal"
 scene_pal_end:
+
+;------------------------------------------------------------------------------
+; Player ship sprite (32×32, 4bpp, 16-colour palette).
+; Tiles laid out for OBJ_SIZE32_L64 (small = 32×32 = our ship).
+;------------------------------------------------------------------------------
+player_tiles: .incbin "res/player.pic"
+player_tiles_end:
+
+player_pal: .incbin "res/player.pal"
+player_pal_end:
 
 .ends
