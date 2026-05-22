@@ -1,32 +1,33 @@
 /**
  * @file main.c
- * @brief shmup_1942 — S1: static scene render
+ * @brief shmup_1942 — S2: vertical auto-scroll
  * @ingroup examples
  *
- * First stage of an iterative shoot 'em up project built on Kenney's CC0
- * *Pixel Shmup* pack. `res/scene.png` is a 256×256 grass-biome screen
- * composed from `ground.png`'s 16×16 source tiles by
- * `res/compose_scene.py` — pure grass fill with scattered trees, two red
- * tent enemy bases and a few bushes/rings. gfx4snes converts it into a
- * tileset + palette + tilemap, and main() hands the bundle to `bgLoad()`
- * for a single static frame on BG1 in Mode 1.
+ * The scene from S1 (procedurally-generated grass with water channels,
+ * sand beaches and organic dirt patches with tents) is now extended to
+ * 256×512 pixels — two screens tall — and scrolls vertically at 1 px
+ * per frame. The 32×64 tilemap is loaded once into VRAM and the SNES
+ * BG-scroll register cycles through it indefinitely, wrapping at the
+ * map height.
  *
- * No movement, no sprites, no scrolling — the player ship, scrolling and
- * enemies come in S2-S4.
+ * Vertical scroll matches the 1942 / Aero Fighters camera convention:
+ * the terrain flows downward across the screen while the player ship
+ * (added in S3) appears to fly upward over it.
  *
  * @par SNES Concepts
- * - Mode 1: BG1 is 4bpp (up to 16 colours per palette slot)
- * - `DECLARE_BG_ASSET` bundles tiles + palette + tilemap with the colour
- *   mode and map size locked at declaration time
- * - `bgLoad()` collapses three manual VRAM/CGRAM setup calls into one
- * - VRAM layout: tilemap at $0000, tile graphics at $4000 (no overlap)
+ * - SC_32x64 / `BG_MAP_32x64`: 32×64 tilemap (two screens tall, 2 KB
+ *   of VRAM)
+ * - `bgSetScroll()` writes BG scroll registers via the dirty-flag
+ *   mechanism; the actual hardware register update happens in the NMI
+ *   handler, so scroll changes apply cleanly at the next VBlank
+ * - Constant-velocity scroll: increment Y each frame, wrap at the map
+ *   height in pixels (512)
  *
  * @par What to Observe
- * - A 256×256 grass field fills the whole screen
- * - Two red tents (stacked 3 tiles tall: roof + body + flag) sit in the
- *   middle band
- * - Trees, bushes and wooden rings scatter for visual texture
- * - Everything is static
+ * - The terrain flows downward across the screen continuously
+ * - Water channels, dirt patches and tents come into view and pass
+ *   below the visible window
+ * - After ~8.5 s the scroll wraps back to the top of the map
  *
  * @par Modules Used
  * console, dma, background, asset
@@ -38,24 +39,24 @@
 #include <snes/asset.h>
 
 /**
- * @brief Composed scene bundle (4bpp, 16 colours, 32×32 tilemap).
- *
- * `DECLARE_BG_ASSET(scene, ...)` expands to extern declarations for
- * `scene_tiles`, `scene_pal`, `scene_map` (with matching `_end` labels)
- * and a `static const BgAsset scene = {...}`. The data symbols themselves
- * live in `data.asm`.
+ * @brief Composed scene bundle (4bpp, 16 colours, 32×64 tilemap).
  */
-DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x32);
+DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x64);
+
+/** Map height in pixels — full tilemap, used for scroll wraparound. */
+#define MAP_HEIGHT_PX 512
 
 /**
- * @brief Entry point — load the scene and hold a static frame.
+ * @brief Entry point — load the scene and auto-scroll vertically.
  *
- * @return Never returns (infinite VBlank wait).
+ * @return Never returns.
  */
 int main(void) {
     setScreenOff();
 
-    /* BG1: tilemap at VRAM $0000, tiles at $4000, palette slot 0 */
+    /* BG1: tilemap at VRAM $0000, tiles at $4000, palette slot 0.
+     * The SC_32x64 size in the asset bundle wires the tilemap layout
+     * automatically — bgLoad() writes the full 2 KB tilemap. */
     bgLoad(0, &scene, 0, 0x4000, 0x0000);
 
     setMode(BG_MODE1, 0);
@@ -64,8 +65,16 @@ int main(void) {
 
     setScreenOn();
 
+    u16 scroll_y = 0;
     while (1) {
         WaitForVBlank();
+
+        /* Advance the scroll by 1 px per frame. The modulo wraps the
+         * value at the map height — SNES hardware also wraps the scroll
+         * register at the map boundary, but doing it in C keeps the
+         * counter bounded and the wraparound point predictable. */
+        scroll_y = (u16)((scroll_y + 1) % MAP_HEIGHT_PX);
+        bgSetScroll(0, 0, scroll_y);
     }
 
     return 0;

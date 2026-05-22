@@ -57,7 +57,11 @@ SRC = HERE / "ground.png"
 OUT = HERE / "scene.png"
 
 TILE = 16
-COLS = ROWS = 256 // TILE
+# 32×64 macro grid → 256×512 px scene = SC_32x64 tilemap (2 screens tall).
+# Vertical scroll cycles through the full 512 px before wrapping; that's
+# ~8.5 s of unique terrain at 60 fps with 1 px/frame.
+COLS = 16
+ROWS = 32
 SEED = 17
 
 
@@ -254,7 +258,7 @@ def generate_water_mask(rng, fill_pct=0.32, iters=4):
     return grid
 
 
-def generate_dirt_mask(rng, grass_interior_set, fill_pct=0.20, iters=3):
+def generate_dirt_mask(rng, grass_interior_set, fill_pct=0.28, iters=3):
     """CA mask for dirt patches. We generate everywhere, then mask to
     grass-interior cells (which excludes water + coast). The 'alive' rule
     is more permissive so patches stay small but connected."""
@@ -381,7 +385,7 @@ def build() -> None:
     sand_catalog = decode_sand_bank(src)
     dirt_catalog = build_dirt_catalog(sand_catalog)
 
-    scene = Image.new("RGB", (256, 256))
+    scene = Image.new("RGB", (COLS * TILE, ROWS * TILE))
 
     # Layer 0: pure grass everywhere
     grass_tile = tile(src, *GRASS_FILL)
@@ -462,8 +466,10 @@ def build() -> None:
     placed_decor: set[tuple[int, int]] = set()
     dirt_components = connected_components(dirt_mask)
     dirt_components.sort(key=len, reverse=True)
-    for comp in dirt_components[:3]:
-        if len(comp) < 4:
+    # On a 32-row scene we want more tents (each comes into view as the
+    # player scrolls). Cap at 5 and only require ≥3 cells per cluster.
+    for comp in dirt_components[:5]:
+        if len(comp) < 3:
             continue
         # Find a column with 3 vertical dirt cells
         cols_with_3 = []
