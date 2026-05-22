@@ -1,37 +1,54 @@
 # shmup_1942
 
-Vertical "1942-style" shoot 'em up using Kenney's CC0 *Pixel Shmup* assets.
+Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
+*Pixel Shmup* pack. Lands in stages so each commit is a working ROM.
 
-## Status
+![Screenshot](screenshot.png)
 
-**Work in progress — asset import stage only.** No `Makefile` or `main.c`
-yet; this directory currently holds the staged source art and the
-reproducible split script that prepares it for `gfx4snes`.
+## Current stage — S1: static tile-library preview
 
-## Assets (`res/`)
+Proves the asset pipeline end to end: `gfx4snes` converts
+`res/ground.png` (the 192×112 grass-biome terrain library, 18 → 16
+colours after quantisation) into `.pic` / `.pal` / `.map`, and `main.c`
+hands the bundle to `bgLoad()` for a single static frame on BG1 in
+Mode 1.
 
-| File | Dim | Unique colors | Source | Role |
-|------|-----|---------------|--------|------|
-| `tiles_packed.png` | 192×160 | 23 | Kenney *Pixel Shmup* | Original packed sheet (committed for traceability) |
-| `sprites.png`      | 192×48  | 14 | Split top 3 rows | gfx4snes input — sprite/HUD tiles |
-| `ground.png`       | 192×112 | 18 | Split bottom 7 rows | gfx4snes input — BG terrain tiles |
-| `ships_packed.png` | 128×192 | 15 | Kenney *Pixel Shmup* | 24 ships @ 32×32 — player + enemies |
-| `import.sh`        | —       | —  | — | Reproduces `sprites.png` + `ground.png` from `tiles_packed.png` |
+The 24×14 tile-library occupies the top of the 32×32 screen; the rest
+fills with tile 0 from the library. **It is not a designed level** —
+the actual screen composition, player ship and scrolling come in S2
+and S3.
 
-The split exists because the original packed sheet bundles sprite/HUD
-tiles with terrain tiles on a single image, but the SNES needs them on
-distinct palettes (sprites in CGRAM 128+, BG in CGRAM 0+). `import.sh`
-slices the sheet at y=48 and is deterministic at the pixel level.
+## SNES Concepts shown
 
-## Biome
+- Mode 1 (4bpp BG1, up to 16 colours)
+- `DECLARE_BG_ASSET` bundling tiles + palette + tilemap
+- `bgLoad()` one-shot VRAM/CGRAM setup
+- VRAM layout: tilemap at $0000, tile graphics at $4000
 
-**Grass** for the MVP — the warmest palette in the pack and the most
-forgiving under quantisation. `ground.png` ships with all three biomes
-present (grass, desert, snow) because the VRAM cost is negligible (84
-tiles × 32 bytes = 2.7 KB), and keeping them avoids re-splitting if a
-later level wants to swap.
+## Build
+
+```bash
+cd examples/games/shmup_1942 && make
+```
+
+Produces `shmup_1942.sfc` (LoROM, 256 KB).
+
+## Modules Used
+
+`console`, `dma`, `background`, `asset`.
+
+## Roadmap
+
+| Stage | What it adds |
+|-------|--------------|
+| **S1** *(this stage)* | gfx4snes pipeline + static tilemap render |
+| S2 | Player ship (sprites) with D-pad movement |
+| S3 | Vertical auto-scroll of the BG |
+| S4 | Basic enemy spawns with sprite pool |
+| S5 | Bullets + AABB collision + explosions |
+| S6 | HUD (score, lives, power-ups) |
 
 ## Licence
 
-All assets are CC0 from [Kenney](https://kenney.nl/assets/pixel-shmup).
-See [ATTRIBUTION.md](../../../ATTRIBUTION.md) for the entry.
+Source artwork: CC0 from [Kenney](https://kenney.nl/assets/pixel-shmup).
+See [ATTRIBUTION.md](../../../ATTRIBUTION.md).
