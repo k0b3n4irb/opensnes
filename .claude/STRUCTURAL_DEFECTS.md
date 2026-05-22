@@ -1392,19 +1392,28 @@ multiplier in multi-step form or a software multiply).
 
 ---
 
-#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` — PARTIAL 🟡 (2 of 3 shipped, algorithmic not LUT)
+#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` — RESOLVED 🟢 (2026-05-22)
 
-**Status update 2026-05-13**: The audit reveals three helpers
-already exist in `<snes/math.h>`: `u16 sqrt16(u16)`, `u8
-atan2_8(s16, s16)`, and `fixed fixSqrt(fixed)`. The implementations
-are algorithmic (bit-by-bit isqrt; quadrant-folded LUT for atan2),
-not pure LUTs as the acceptance criterion specified, but they meet
-the user need. `pow_lut` is the remaining gap.
+**Closed 2026-05-22**: All three helper families now ship in
+`<snes/math.h>`:
+- `u16 sqrt16(u16)`, `fixed fixSqrt(fixed)` — algorithmic bit-by-bit
+  isqrt (chantier B6 first pass, 2026-05-13).
+- `u8 atan2_8(s16, s16)` — quadrant-folded LUT (same first pass).
+- `u8 ease_in_quad(u8)` / `u8 ease_out_quad(u8)` — 256-byte
+  `ease_quad_table[]` (LUT-backed t² normalised easing curve, MVP
+  final piece 2026-05-22).
 
-Severity stays 🟡 — the helpers are present and used by `atan2`
-example callers (1 caller for `atan2_8` per 2026-05-13 audit).
-Acceptance criterion partially met; adding `pow_lut` if a future
-chantier needs it is a small follow-up.
+The "pow" gap closed via the `ease_quad_table` LUT — chose ease
+curves over a generic `pow(base, exp)` because:
+1. Game-dev use is dominated by quadratic/cubic easing for animation,
+   not arbitrary-exponent power.
+2. A generic 2D LUT (base × exp) would cost ~16 KB ROM; the curve
+   LUT costs 256 bytes.
+3. Live `x*x` is cheap (hw multiplier); LUT is for the divided form
+   `x²/255` which compiler can't free-optimise.
+
+Validation: 9/9 ease cases bit-exact (live MCP smoke test).
+Acceptance criterion fully met.
 
 ---
 
