@@ -5,41 +5,47 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 ![Screenshot](screenshot.png)
 
-## Current stage — S1: procedurally-generated archipelago
+## Current stage — S1: procedural land-with-water-channels
 
-A 256×256 grass-biome screen composed by `res/compose_scene.py` from
-Kenney's tile pack. The composition uses:
+A 256×256 grass-biome screen composed by `res/compose_scene.py`, with
+the same visual language as the official Kenney preview render: **grass
+is the base biome and water carves into it from off-screen**, with a
+sand beach band at every grass/water boundary and small organic dirt
+patches scattered inland.
 
-- **Cellular automata** to generate a binary land/water mask
-  (~52 % initial fill, 4 smoothing iterations of the classic cave-gen
-  "5+ neighbours" rule, a 1-cell water border forced around the
-  screen). The result is one or more organic island shapes — not
-  rectangles.
-- **15-tile autotile resolver** for the sand-in-water transition.
-  Each of the 15 tiles in the bank (rows 3-5 cols 7-11 of ground.png)
-  is auto-classified by sampling its 4 mid-edge pixels for water vs
-  land, building a NESW → tile catalog. For every land cell in the
-  mask, the four cardinal neighbours determine the 4-bit pattern,
-  which selects the appropriate tile from the catalog. The bank is
-  missing the all-land interior and the two horizontal T-junctions,
-  so those fall back to a pure sand fill (6,8) and the nearest
-  available pattern respectively.
-- **Layered biomes inside each island**: connected components ≥ 12
-  cells get a rectangular grass area dropped inside, then a 3×3-to-5×4
-  dirt clearing inside the grass, then a 3-tile red tent stack in the
-  centre of the dirt clearing.
-- **Decorations**: tree clusters on the grass interior via
-  Poisson-disk min-distance sampling (5 cluster centres, each seeding
-  2-4 trees with tight gaussian offsets), plus sparse bushes and
-  wooden rings.
+## Algorithm
 
-`SEED = 17` was picked from a 6-seed comparison sweep because it
-produces an L-shaped island with the most natural-looking coastline
-curvature. Bump SEED for an entirely different layout.
+```
+1. Pure-grass fill everywhere.
+2. Water mask (cellular automata, ~32% fill, 4 iters)
+   + forced edge seed on 2 random sides (post-CA re-seeded so visible
+     water reaches the screen edge).
+   → rendered with the 15-tile sand-in-water autotile from rows 3-5
+     cols 7-11 of ground.png, looked up by NESW neighbour pattern.
+     The two missing T-junctions (0b0111 and 0b1110) are derived at
+     runtime by flipping their symmetric counterparts.
+3. Dirt mask (cellular automata, ~20% fill, 3 iters)
+   masked to grass-interior cells (dist ≥ 2 from water).
+   → rendered with a runtime-RECOLOURED copy of the same 15-tile
+     autotile (sand→dirt-brown, sand-edge→dirt-highlight, water→grass)
+     producing organic dirt patches with curved boundaries.
+4. Tents placed on the largest dirt-patch connected components,
+   wherever there's a 3-cell vertical column to stack the roof + body
+   + flag.
+5. Tree clusters via Poisson-disk min-distance sampling, biased
+   toward grass cells 1-3 cells away from water (vegetation grows
+   along coasts).
+6. Bushes and wooden rings sparse on the remaining open interior.
+```
 
-`main.c` hands the converted bundle to `bgLoad()` for a single static
-frame on BG1 in Mode 1. No movement, no sprites, no scrolling — those
-come in S2-S6.
+The runtime recolour for the dirt autotile uses an exact RGB→RGB
+mapping derived from sampling the existing dirt-in-grass autotile
+(rows 3-5 cols 1-3). Same pattern lookup as the water pass — only
+the rendered tile images differ.
+
+`SEED = 17` was picked from a 10-seed comparison sweep — it gives
+the most natural distribution of water, dirt and tents for a
+1942-style combat scene.
 
 ## SNES Concepts shown
 
@@ -58,14 +64,13 @@ Produces `shmup_1942.sfc` (LoROM, 256 KB).
 
 ## Re-composing the scene
 
-`res/compose_scene.py` is the source of truth for the scene layout —
-edit the `SEED`, the cellular-automata parameters or the tile catalog,
-then re-run:
-
 ```bash
-python3 res/compose_scene.py
-make
+python3 res/compose_scene.py   # regenerates scene.png
+make                            # rebuilds the ROM
 ```
+
+Bump `SEED` in the script for a different layout, or tune the CA fill
+percentages (water `0.32`, dirt `0.20`) to shift biome balance.
 
 ## Modules Used
 
@@ -75,7 +80,7 @@ make
 
 | Stage | What it adds |
 |-------|--------------|
-| **S1** *(this stage)* | gfx4snes pipeline + procedural archipelago |
+| **S1** *(this stage)* | gfx4snes pipeline + procedural land-with-water-channels |
 | S2 | Player ship (sprite) with D-pad movement |
 | S3 | Vertical auto-scroll of the BG |
 | S4 | Basic enemy spawns with sprite pool |
