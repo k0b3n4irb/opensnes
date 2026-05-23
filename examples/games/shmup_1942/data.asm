@@ -26,4 +26,14 @@ player_tiles_end:
 player_pal: .incbin "res/player.pal"
 player_pal_end:
 
+;------------------------------------------------------------------------------
+; Enemy ship sprite (32×32, 4bpp, 16-colour palette).
+; Loaded to its own VRAM region so multiple enemies share one tile copy.
+;------------------------------------------------------------------------------
+enemy_tiles: .incbin "res/enemy.pic"
+enemy_tiles_end:
+
+enemy_pal: .incbin "res/enemy.pal"
+enemy_pal_end:
+
 .ends

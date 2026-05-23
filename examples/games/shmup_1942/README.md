@@ -5,52 +5,71 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 ![Screenshot](screenshot.png)
 
-## Current stage — S3: player ship + D-pad
+## Current stage — S4: enemy spawns with a sprite pool
 
-Adds a controllable 32×32 player ship on top of the S2 scrolling
-terrain. The ship — `ship_0000` from Kenney's `ships_packed.png`, a
-blue chasseur — is extracted by `res/extract_player.py` with its
-dark-blue background forced to palette index 0 (transparent in SNES
-sprite rendering). The terrain continues its 1 px/frame auto-scroll
-while the player moves freely with the D-pad, clamped to a
-192×160-px playing field so the sprite stays fully on screen.
+Up to eight red chasseurs spawn from above the screen every 30 frames,
+drift downward at 2 px/frame, and despawn when they exit the bottom.
+The blue player ship (S3) and the auto-scrolling terrain (S2) keep
+working unchanged.
 
-## Algorithm / architecture
+The architecture: player and enemies share the OAM but occupy distinct
+VRAM tile regions and distinct sprite palettes. Each on-screen enemy
+is one OAM entry referencing the same 16 enemy tiles — the pool is
+in CPU state, not a per-enemy VRAM copy.
+
+## Architecture
 
 ```
-Build
-  - res/extract_player.py     ─→ res/player.png      (32×32 indexed)
-  - gfx4snes -s 32  on player.png   ─→ player.pic + player.pal
-  - gfx4snes -s 8   on scene.png    ─→ scene.pic + scene.pal + scene.map
+VRAM (word addresses, fed to VMADDR)
+  $0000 ─ BG1 tilemap         (SC_32x64, 2 KB)
+  $2000 ─ BG1 tiles           (49 unique 8×8 tiles)
+  $6000 ─ Player sprite tiles (16 tiles padded to 64 OAM-grid slots)
+  $6400 ─ Enemy  sprite tiles (idem)
 
-VRAM map
-  $0000 ─ BG1 tilemap        (SC_32x64 = 2 KB)
-  $4000 ─ BG1 tiles          (49 unique 8×8 tiles after dedup)
-  $6000 ─ Sprite tiles       (16 8×8 tiles for the 32×32 ship, padded
-                              to 64 slots for OAM tile-row stride)
+CGRAM
+  128-143 ─ player palette  (sprite palette 0)
+  144-159 ─ enemy  palette  (sprite palette 1)
+
+OAM
+  slot 0      ─ player (tile 0,  palette 0)
+  slot 1..8   ─ enemy pool (tile 64, palette 1)
+                inactive slots hidden via off-screen Y (240)
 
 main loop (per frame)
   - WaitForVBlank()
   - scroll_y = (scroll_y + 1) % 512;
-  - pad = padHeld(0);
-    LEFT/RIGHT/UP/DOWN → player_x/_y ±= 2 px (with clamping)
-  - oamSet(0, player_x, player_y, …);
+  - D-pad → player position (clamped to visible area)
+  - every ENEMY_SPAWN_PERIOD frames: find inactive slot, spawn at top
+  - enemies_update(): drift down at 2 px/frame, despawn at y ≥ 224
+  - enemies_render(): oamSetFast for each of the 8 slots
   - bgSetScroll(0, 0, scroll_y);
 ```
 
-`bgSetScroll` and `oamSet` defer to the NMI handler via dirty flags,
-so the per-frame work is just a few bytes of buffer writes; the
-hardware-register updates happen atomically at VBlank.
+`oamSetFast()` (zero-overhead macro) replaces `oamSet()` (framesize=158)
+because the loop now does 9 sprite updates per frame — beyond the
+2-3-per-frame jitter limit documented for the function form.
+
+## Gotcha: dmaCopyVram word vs byte addressing
+
+The first cut put enemies at `vramAddr = 0x6800` because I'd computed
+that as `$6000 + 64 × 32` byte offsets. Wrong: `dmaCopyVram()` takes a
+**word** VRAM address (it writes the value straight to `REG_VMADDR`,
+which the PPU interprets in 16-bit words). The correct word offset is
+`64 × 16 = 0x400` past the base, so enemy tiles live at `vramAddr =
+0x6400`. The README's note here is louder than a doc comment because
+that mismatch silently looked like a transparent sprite; nothing in
+the build flagged it.
 
 ## SNES Concepts shown
 
-- Mode 1 (4bpp BG1, up to 16 colours per palette slot)
-- SC_32x64 tilemap with continuous vertical auto-scroll
-- OAM: `oamInitGfxSet` loads sprite tiles + palette + configures OBJSEL
-- `OBJ_SIZE32_L64`: small sprites are 32×32 (our ship), large are 64
-- Sprite palette in CGRAM 128+ (we use sprite palette 0 → CGRAM 128-143)
-- VRAM region planning to avoid BG/sprite tile clashes
-- `padHeld(0)` for read-while-pressed input
+- VRAM region planning for two sprite types in the same OAM tile grid
+- `OBJ_SIZE32_L64` for 32×32 sprites
+- Distinct sprite palettes loaded via `dmaCopyCGram(pal, 128+N*16, …)`
+- Sprite pool pattern: fixed OAM slot allocation per logical entity
+- Off-screen Y trick (240) to hide inactive sprites without disturbing
+  attributes
+- `oamSetFast()` macro for ≥4-sprite-per-frame loops
+- 16-bit LCG for spawn jitter (`x = x * 25173 + 13849`)
 
 ## Build
 
@@ -63,8 +82,8 @@ Produces `shmup_1942.sfc` (LoROM, 256 KB).
 ## Re-generating assets
 
 ```bash
-python3 res/extract_player.py   # if you want to swap the player ship
-python3 res/compose_scene.py    # to redraw the terrain (bump SEED)
+python3 res/extract_sprites.py   # re-extract player + enemy
+python3 res/compose_scene.py     # redraw the terrain (bump SEED)
 make
 ```
 
@@ -78,8 +97,8 @@ make
 |-------|--------------|
 | S1 | gfx4snes pipeline + procedural land-with-water-channels |
 | S2 | 256×512 scene + SC_32x64 + vertical auto-scroll |
-| **S3** *(this stage)* | Player ship (sprite) + D-pad movement |
-| S4 | Basic enemy spawns with sprite pool |
+| S3 | Player ship (sprite) + D-pad movement |
+| **S4** *(this stage)* | Enemy spawns with sprite pool (≤8 simultaneous) |
 | S5 | Bullets + AABB collision + explosions on the tents |
 | S6 | HUD (score, lives, power-ups) |
 
