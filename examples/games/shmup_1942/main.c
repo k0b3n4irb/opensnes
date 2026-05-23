@@ -72,6 +72,26 @@ extern u8 bullet_pal[], bullet_pal_end[];
 #define BULLET_SPRITE      32           /* full 32×32 OAM slot — visible bullet is centred top */
 #define FIRE_COOLDOWN      8            /* frames between consecutive shots */
 
+/* Pre-computed OAM attribute bytes for direct-write rendering. Matches
+ * breakout's pattern: write OAM bytes directly into oamMemory[] each
+ * frame, avoiding even the oamSetFast macro's per-call work. Constants
+ * computed from OAM_ATTR(tile, pal, prio, flags). */
+#define PLAYER_ATTR        0x20         /* tile 0,   pal 0, prio 2, no flip */
+#define ENEMY_ATTR         0xA2         /* tile 64,  pal 1, prio 2, V-flip  */
+#define BULLET_ATTR        0x24         /* tile 128, pal 2, prio 2, no flip */
+
+/* Direct oamMemory[] write: 4 bytes per sprite, no X-high bit (all our
+ * sprites stay at X < 256), no oam_update_flag (set once at end of
+ * frame). This is the fastest possible sprite update on this SDK —
+ * same pattern breakout uses for its 10-sprite playfield. */
+#define OAM_WRITE(_id, _x, _y, _tile, _attr) do { \
+    u16 _o = (u16)(_id) << 2; \
+    oamMemory[_o + 0] = (u8)(_x); \
+    oamMemory[_o + 1] = (u8)((_y) - 1); \
+    oamMemory[_o + 2] = (u8)(_tile); \
+    oamMemory[_o + 3] = (_attr); \
+} while(0)
+
 typedef struct {
     s16 x;
     s16 y;
@@ -118,11 +138,12 @@ static void enemy_spawn(void) {
     }
 }
 
-/* On transition active → inactive, write Y=HIDE_Y once via oamSetFast.
- * Subsequent frames don't touch this slot — the OAM byte sticks until
- * the slot becomes active again. Same trick for bullets. */
+/* On transition active → inactive, write Y=HIDE_Y once via direct
+ * oamMemory[] write. Subsequent frames don't touch this slot — the
+ * OAM byte sticks until the slot becomes active again. Same trick
+ * for bullets. */
 static void enemy_hide(u8 i) {
-    oamSetFast(ENEMY_OAM_BASE + i, 0, ENEMY_HIDE_Y, ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
+    OAM_WRITE(ENEMY_OAM_BASE + i, 0, ENEMY_HIDE_Y, ENEMY_TILE, ENEMY_ATTR);
 }
 
 static void enemies_update(void) {
@@ -138,15 +159,17 @@ static void enemies_update(void) {
 }
 
 static void enemies_render(void) {
-    /* Only render ACTIVE enemies. Inactive slots stay hidden from their
-     * last active→inactive transition (or from enemies_init's hide
-     * pass), saving oamSetFast cycles when many slots are idle. */
-    for (u8 i = 0; i < MAX_ENEMIES; i++) {
+    /* Direct oamMemory[] writes — breakout's pattern. The base offset
+     * for OAM entry N is N*4. Slot 1 → bytes 4..7, slot 2 → 8..11, etc.
+     * We use a running pointer to dodge cc65816's per-iteration index
+     * recomputation (each `i*4` inside a loop expands to a multiply). */
+    u16 off = (u16)ENEMY_OAM_BASE << 2;   /* = 4 (slot 1) */
+    for (u8 i = 0; i < MAX_ENEMIES; i++, off += 4) {
         if (!game.enemies[i].active) continue;
-        oamSetFast(ENEMY_OAM_BASE + i,
-                   (u16)game.enemies[i].x,
-                   (u16)game.enemies[i].y,
-                   ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
+        oamMemory[off + 0] = (u8)game.enemies[i].x;
+        oamMemory[off + 1] = (u8)(game.enemies[i].y - 1);
+        oamMemory[off + 2] = ENEMY_TILE;
+        oamMemory[off + 3] = ENEMY_ATTR;
     }
 }
 
@@ -179,7 +202,7 @@ static void bullet_fire(void) {
 }
 
 static void bullet_hide(u8 i) {
-    oamSetFast(BULLET_OAM_BASE + i, 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_PALETTE, 2, 0);
+    OAM_WRITE(BULLET_OAM_BASE + i, 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_ATTR);
 }
 
 static void bullets_update(void) {
@@ -196,14 +219,13 @@ static void bullets_update(void) {
 }
 
 static void bullets_render(void) {
-    /* Active-only render; inactive slots remain hidden from their last
-     * hide transition (or from bullets_init's pass). */
-    for (u8 i = 0; i < MAX_BULLETS; i++) {
+    u16 off = (u16)BULLET_OAM_BASE << 2;
+    for (u8 i = 0; i < MAX_BULLETS; i++, off += 4) {
         if (!game.bullets[i].active) continue;
-        oamSetFast(BULLET_OAM_BASE + i,
-                   (u16)game.bullets[i].x,
-                   (u16)game.bullets[i].y,
-                   BULLET_TILE, BULLET_PALETTE, 2, 0);
+        oamMemory[off + 0] = (u8)game.bullets[i].x;
+        oamMemory[off + 1] = (u8)(game.bullets[i].y - 1);
+        oamMemory[off + 2] = BULLET_TILE;
+        oamMemory[off + 3] = BULLET_ATTR;
     }
 }
 
@@ -276,9 +298,29 @@ int main(void) {
     enemies_init();
     bullets_init();
 
-    /* Hide every enemy and bullet OAM slot once at boot. The render
-     * passes only update ACTIVE slots; inactive ones rely on this
-     * initial state plus the per-transition hide_*() calls. */
+    /* Clear the OAM extension table bits for the slots we render.
+     *
+     * Background: oamClear (called by oamInit) leaves the ext table at
+     * 0x55 = X-high bit set on every sprite, which combined with Y=240
+     * pushes them fully off-screen (32×32 sprites at Y=240 otherwise
+     * wrap their bottom half back to the top of the screen — see the
+     * crt0.asm note above the ext-table init).
+     *
+     * Our direct oamMemory[] writes for enemies/bullets don't touch
+     * the ext table, so they'd inherit X-high=1 and render at X+256.
+     * We clear the bits for slots 0..16 only (player + enemies +
+     * bullets). Slots 17..127 stay at 0x55 → invisible.
+     *
+     * Ext table layout: 1 byte per 4 sprites, 2 bits per sprite
+     * (bit 0 = X-high, bit 1 = size). Slots 0-15 = bytes 512-515
+     * (clear fully). Slot 16 = bits 0-1 of byte 516. */
+    oamMemory[512] = 0;     /* slots 0-3 */
+    oamMemory[513] = 0;     /* slots 4-7 */
+    oamMemory[514] = 0;     /* slots 8-11 */
+    oamMemory[515] = 0;     /* slots 12-15 */
+    oamMemory[516] &= 0xFC; /* clear slot 16's two bits, preserve 17-19 */
+
+    /* Hide every enemy and bullet OAM slot once at boot. */
     for (u8 i = 0; i < MAX_ENEMIES; i++) enemy_hide(i);
     for (u8 i = 0; i < MAX_BULLETS; i++) bullet_hide(i);
 
@@ -306,9 +348,10 @@ int main(void) {
         bullets_update();
         collisions_resolve();
 
-        oamSetFast(0, (u16)game.player_x, (u16)game.player_y, 0, 0, 2, 0);
+        oamSet(0, (u16)game.player_x, (u16)game.player_y, 0, 0, 2, 0);
         enemies_render();
         bullets_render();
+        oam_update_flag = 1;  /* re-arm after our direct writes */
         bgSetScroll(0, 0, game.scroll_y);
     }
 
