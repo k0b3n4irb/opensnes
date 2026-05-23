@@ -118,6 +118,13 @@ static void enemy_spawn(void) {
     }
 }
 
+/* On transition active → inactive, write Y=HIDE_Y once via oamSetFast.
+ * Subsequent frames don't touch this slot — the OAM byte sticks until
+ * the slot becomes active again. Same trick for bullets. */
+static void enemy_hide(u8 i) {
+    oamSetFast(ENEMY_OAM_BASE + i, 0, ENEMY_HIDE_Y, ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
+}
+
 static void enemies_update(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
         if (!game.enemies[i].active) continue;
@@ -125,21 +132,21 @@ static void enemies_update(void) {
         if (game.enemies[i].y >= 224) {
             game.enemies[i].active = 0;
             game.enemies[i].y = ENEMY_HIDE_Y;
+            enemy_hide(i);
         }
     }
 }
 
 static void enemies_render(void) {
+    /* Only render ACTIVE enemies. Inactive slots stay hidden from their
+     * last active→inactive transition (or from enemies_init's hide
+     * pass), saving oamSetFast cycles when many slots are idle. */
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
-        u16 ex, ey;
-        if (game.enemies[i].active) {
-            ex = (u16)game.enemies[i].x;
-            ey = (u16)game.enemies[i].y;
-        } else {
-            ex = 0;
-            ey = ENEMY_HIDE_Y;
-        }
-        oamSetFast(ENEMY_OAM_BASE + i, ex, ey, ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
+        if (!game.enemies[i].active) continue;
+        oamSetFast(ENEMY_OAM_BASE + i,
+                   (u16)game.enemies[i].x,
+                   (u16)game.enemies[i].y,
+                   ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
     }
 }
 
@@ -171,6 +178,10 @@ static void bullet_fire(void) {
     }
 }
 
+static void bullet_hide(u8 i) {
+    oamSetFast(BULLET_OAM_BASE + i, 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_PALETTE, 2, 0);
+}
+
 static void bullets_update(void) {
     if (game.fire_cd > 0) game.fire_cd--;
     for (u8 i = 0; i < MAX_BULLETS; i++) {
@@ -179,52 +190,58 @@ static void bullets_update(void) {
         if (game.bullets[i].y < -BULLET_SPRITE) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
+            bullet_hide(i);
         }
     }
 }
 
 static void bullets_render(void) {
+    /* Active-only render; inactive slots remain hidden from their last
+     * hide transition (or from bullets_init's pass). */
     for (u8 i = 0; i < MAX_BULLETS; i++) {
-        u16 bx, by;
-        if (game.bullets[i].active) {
-            bx = (u16)game.bullets[i].x;
-            by = (u16)game.bullets[i].y;
-        } else {
-            bx = 0;
-            by = BULLET_HIDE_Y;
-        }
-        oamSetFast(BULLET_OAM_BASE + i, bx, by, BULLET_TILE, BULLET_PALETTE, 2, 0);
+        if (!game.bullets[i].active) continue;
+        oamSetFast(BULLET_OAM_BASE + i,
+                   (u16)game.bullets[i].x,
+                   (u16)game.bullets[i].y,
+                   BULLET_TILE, BULLET_PALETTE, 2, 0);
     }
 }
 
 /* ---- Collision -----------------------------------------------------------*/
 
-/* AABB overlap for two 32×32 sprites anchored at top-left (ax,ay) and
- * (bx,by). True when bounding boxes intersect. We loosen the hit box on
- * bullets slightly (the visible bullet pixels are a small column inside
- * the 32×32 canvas — using the full 32×32 makes shots feel generous, OK
- * for a demo). */
-static u8 aabb32(s16 ax, s16 ay, s16 bx, s16 by) {
-    if (ax + 32 <= bx) return 0;
-    if (bx + 32 <= ax) return 0;
-    if (ay + 32 <= by) return 0;
-    if (by + 32 <= ay) return 0;
-    return 1;
-}
+/* Point-in-rect collision. The bullet's VISIBLE pixels are an 8×8 ball
+ * at canvas (12,4)..(19,11) — centre at (16, 8). The enemy ship's
+ * visible silhouette doesn't quite fill its 32×32 canvas, so we use an
+ * inset 20×20 hit-box anchored at (ex+6, ey+6). A hit is registered
+ * when the bullet's centre point falls inside the enemy hit-box —
+ * tight enough that bullets must visibly touch the ship, cheap enough
+ * to run 64× per frame on a 65816. */
+#define BULLET_CX_OFFSET 16
+#define BULLET_CY_OFFSET 8
+#define ENEMY_HITBOX_INSET 6
+#define ENEMY_HITBOX_END   (32 - ENEMY_HITBOX_INSET)
 
 static void collisions_resolve(void) {
     for (u8 b = 0; b < MAX_BULLETS; b++) {
         if (!game.bullets[b].active) continue;
+        s16 bcx = game.bullets[b].x + BULLET_CX_OFFSET;
+        s16 bcy = game.bullets[b].y + BULLET_CY_OFFSET;
         for (u8 e = 0; e < MAX_ENEMIES; e++) {
             if (!game.enemies[e].active) continue;
-            if (aabb32(game.bullets[b].x, game.bullets[b].y,
-                       game.enemies[e].x, game.enemies[e].y)) {
-                game.bullets[b].active = 0;
-                game.bullets[b].y = BULLET_HIDE_Y;
-                game.enemies[e].active = 0;
-                game.enemies[e].y = ENEMY_HIDE_Y;
-                break;  /* this bullet is gone; move to next bullet */
-            }
+            s16 ex = game.enemies[e].x;
+            s16 ey = game.enemies[e].y;
+            if (bcx <= ex + ENEMY_HITBOX_INSET) continue;
+            if (bcx >= ex + ENEMY_HITBOX_END)   continue;
+            if (bcy <= ey + ENEMY_HITBOX_INSET) continue;
+            if (bcy >= ey + ENEMY_HITBOX_END)   continue;
+            /* Hit! */
+            game.bullets[b].active = 0;
+            game.bullets[b].y = BULLET_HIDE_Y;
+            bullet_hide(b);
+            game.enemies[e].active = 0;
+            game.enemies[e].y = ENEMY_HIDE_Y;
+            enemy_hide(e);
+            break;
         }
     }
 }
@@ -259,9 +276,13 @@ int main(void) {
     enemies_init();
     bullets_init();
 
+    /* Hide every enemy and bullet OAM slot once at boot. The render
+     * passes only update ACTIVE slots; inactive ones rely on this
+     * initial state plus the per-transition hide_*() calls. */
+    for (u8 i = 0; i < MAX_ENEMIES; i++) enemy_hide(i);
+    for (u8 i = 0; i < MAX_BULLETS; i++) bullet_hide(i);
+
     oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
-    enemies_render();
-    bullets_render();
     bgSetScroll(0, 0, 0);
 
     setScreenOn();

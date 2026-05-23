@@ -71,26 +71,25 @@ def extract(index: int, out_path: Path) -> None:
 
 
 def build_bullet(out_path: Path) -> None:
-    """Draw a 32×32 bullet sprite: small yellow vertical pellet at the
-    top-centre, transparent everywhere else. Same palette-swap trick:
-    background colour at palette index 0 = transparent for gfx4snes."""
-    BG = (0, 0, 0)            # any colour; ends up at palette idx 0 = transparent
+    """Draw a 32×32 bullet sprite: small yellow ball anchored top-centre,
+    transparent everywhere else. Background colour goes to palette index
+    0 = transparent (same trick as the ships). The ball is 6×6 px so the
+    collision hit-box around its centre stays tight."""
+    BG = (0, 0, 0)
     OUTLINE = (78, 51, 11)
     BODY = (252, 195, 51)
     HIGHLIGHT = (255, 232, 122)
 
     img = Image.new("RGB", (TILE, TILE), BG)
     d = ImageDraw.Draw(img)
-    # Vertical pellet, ~6×14 px, anchored at top-centre of the 32×32 canvas
+    # 8×8 ball centred horizontally at canvas (16, 8). Drawn as a 6×6
+    # body with a 1-px outline ring and a 2-px highlight crescent on the
+    # top-left — gives the ball a sense of volume at SNES resolution.
     cx = TILE // 2
-    top = 4
-    bot = top + 14
-    # outline pill
-    d.rectangle((cx - 3, top, cx + 2, bot), fill=OUTLINE)
-    # body
-    d.rectangle((cx - 2, top + 1, cx + 1, bot - 1), fill=BODY)
-    # 1-px highlight strip on the body's left edge
-    d.line(((cx - 2, top + 2), (cx - 2, bot - 2)), fill=HIGHLIGHT)
+    cy = 8
+    d.ellipse((cx - 4, cy - 4, cx + 3, cy + 3), fill=OUTLINE)
+    d.ellipse((cx - 3, cy - 3, cx + 2, cy + 2), fill=BODY)
+    d.rectangle((cx - 2, cy - 2, cx - 1, cy - 1), fill=HIGHLIGHT)
 
     quant = img.convert(
         "P",
