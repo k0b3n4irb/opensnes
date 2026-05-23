@@ -347,7 +347,12 @@ int main(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) enemy_hide(i);
     for (u8 i = 0; i < MAX_BULLETS; i++) bullet_hide(i);
 
-    oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
+    /* Init player OAM slot with direct write to match the main loop. */
+    oamMemory[0] = (u8)game.player_x;
+    oamMemory[1] = (u8)(game.player_y - 1);
+    oamMemory[2] = 0;
+    oamMemory[3] = PLAYER_ATTR;
+    oam_update_flag = 1;
     bgSetScroll(0, 0, 0);
 
     setScreenOn();
@@ -371,10 +376,15 @@ int main(void) {
         bullets_update();
         collisions_resolve();
 
-        oamSet(0, (u16)game.player_x, (u16)game.player_y, 0, 0, 2, 0);
+        /* Player: direct OAM write — saves oamSet's 158-byte framesize
+         * per frame compared to the function form. */
+        oamMemory[0] = (u8)game.player_x;
+        oamMemory[1] = (u8)(game.player_y - 1);
+        oamMemory[2] = 0;
+        oamMemory[3] = PLAYER_ATTR;
         enemies_render();
         bullets_render();
-        oam_update_flag = 1;  /* re-arm after our direct writes */
+        oam_update_flag = 1;
         bgSetScroll(0, 0, game.scroll_y);
     }
 
