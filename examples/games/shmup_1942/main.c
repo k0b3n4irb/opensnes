@@ -210,14 +210,12 @@ static void bullets_update(void) {
     for (u8 i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) continue;
         game.bullets[i].y -= BULLET_SPEED;
-        /* Despawn as soon as the visible ball clears the top of the
-         * screen. The ball lives at canvas y 4..11 of its 32×32 sprite,
-         * so its bottom edge leaves the playfield when sprite_y + 11 < 0
-         * → sprite_y < -11. -12 gives one frame of safety. Letting it
-         * run further (e.g. < -32) makes the OAM Y byte wrap to ~$E0
-         * and the bullet flashes at the bottom of the screen for one
-         * frame before despawn. */
-        if (game.bullets[i].y < -12) {
+        /* Despawn well after the visible ball has cleared the top. The
+         * bullets_render hides the sprite cleanly while it's still
+         * "alive" but off-screen, so this threshold just stops
+         * touching the slot once the bullet can no longer matter for
+         * anything (no collision, no render). */
+        if (game.bullets[i].y < -BULLET_SPRITE) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
             bullet_hide(i);
@@ -229,8 +227,27 @@ static void bullets_render(void) {
     u16 off = (u16)BULLET_OAM_BASE << 2;
     for (u8 i = 0; i < MAX_BULLETS; i++, off += 4) {
         if (!game.bullets[i].active) continue;
-        oamMemory[off + 0] = (u8)game.bullets[i].x;
-        oamMemory[off + 1] = (u8)(game.bullets[i].y - 1);
+        /* The visible ball lives at canvas y 4..11 of the 32×32 sprite.
+         * Bullet stays VISIBLE up to sprite_y = -11 (ball bottom at
+         * world y 0). For sprite_y in [-12, -BULLET_SPRITE) the bullet
+         * is still "alive" (so collision and update keep working) but
+         * OFF the top of the screen.
+         *
+         * Without special handling, writing OAM_y = (u8)(sprite_y - 1)
+         * for a negative sprite_y wraps to high OAM values and the
+         * SNES re-renders the 32×32 sprite split across the bottom
+         * AND the top of the screen — the bullet "teleports" briefly
+         * before despawn. To avoid that flash, when the bullet is off-
+         * screen top we park its OAM_y at 224 (the only Y value where
+         * a full 32×32 sprite lands entirely inside the 224-255
+         * invisible scanline band, no wrap). */
+        if (game.bullets[i].y < -11) {
+            oamMemory[off + 0] = 0;
+            oamMemory[off + 1] = 224;
+        } else {
+            oamMemory[off + 0] = (u8)game.bullets[i].x;
+            oamMemory[off + 1] = (u8)(game.bullets[i].y - 1);
+        }
         oamMemory[off + 2] = BULLET_TILE;
         oamMemory[off + 3] = BULLET_ATTR;
     }
