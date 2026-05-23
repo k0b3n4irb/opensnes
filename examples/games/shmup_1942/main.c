@@ -192,8 +192,15 @@ static void bullet_fire(void) {
              * bullet pixel column lives at canvas x=14..17 of its 32×32
              * sprite, so subtracting 16 from the player centre lands
              * the muzzle on the ship's nose. */
+            /* Spawn at the player's top edge, not 16 px above. The visible
+             * ball lives at canvas y 4-11, so the muzzle appears just
+             * above the player's nose. The previous -16 offset meant
+             * bullets fired while the player was near the top of the
+             * screen spawned at y≈0 and were gone in two frames — felt
+             * like the bullet's lifetime was "computed at fire time" but
+             * was really just a spawn-position artefact. */
             game.bullets[i].x = game.player_x;
-            game.bullets[i].y = game.player_y - 16;
+            game.bullets[i].y = game.player_y;
             game.bullets[i].active = 1;
             game.fire_cd = FIRE_COOLDOWN;
             return;
@@ -210,12 +217,12 @@ static void bullets_update(void) {
     for (u8 i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) continue;
         game.bullets[i].y -= BULLET_SPEED;
-        /* Despawn well after the visible ball has cleared the top. The
-         * bullets_render hides the sprite cleanly while it's still
-         * "alive" but off-screen, so this threshold just stops
-         * touching the slot once the bullet can no longer matter for
-         * anything (no collision, no render). */
-        if (game.bullets[i].y < -BULLET_SPRITE) {
+        /* Despawn one frame after the visible ball clears the top.
+         * Natural SNES sprite wrap keeps the ball visible at the top
+         * of the screen for sprite_y down to -10 (the ball's bottom
+         * pixel at world scanline 0). Below that the ball is in the
+         * 224-255 hidden Y zone — no render gymnastics needed. */
+        if (game.bullets[i].y < -10) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
             bullet_hide(i);
@@ -227,27 +234,8 @@ static void bullets_render(void) {
     u16 off = (u16)BULLET_OAM_BASE << 2;
     for (u8 i = 0; i < MAX_BULLETS; i++, off += 4) {
         if (!game.bullets[i].active) continue;
-        /* The visible ball lives at canvas y 4..11 of the 32×32 sprite.
-         * Bullet stays VISIBLE up to sprite_y = -11 (ball bottom at
-         * world y 0). For sprite_y in [-12, -BULLET_SPRITE) the bullet
-         * is still "alive" (so collision and update keep working) but
-         * OFF the top of the screen.
-         *
-         * Without special handling, writing OAM_y = (u8)(sprite_y - 1)
-         * for a negative sprite_y wraps to high OAM values and the
-         * SNES re-renders the 32×32 sprite split across the bottom
-         * AND the top of the screen — the bullet "teleports" briefly
-         * before despawn. To avoid that flash, when the bullet is off-
-         * screen top we park its OAM_y at 224 (the only Y value where
-         * a full 32×32 sprite lands entirely inside the 224-255
-         * invisible scanline band, no wrap). */
-        if (game.bullets[i].y < -11) {
-            oamMemory[off + 0] = 0;
-            oamMemory[off + 1] = 224;
-        } else {
-            oamMemory[off + 0] = (u8)game.bullets[i].x;
-            oamMemory[off + 1] = (u8)(game.bullets[i].y - 1);
-        }
+        oamMemory[off + 0] = (u8)game.bullets[i].x;
+        oamMemory[off + 1] = (u8)(game.bullets[i].y - 1);
         oamMemory[off + 2] = BULLET_TILE;
         oamMemory[off + 3] = BULLET_ATTR;
     }
