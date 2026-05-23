@@ -5,86 +5,99 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 ![Screenshot](screenshot.png)
 
-## Current stage — S5: bullets and collision
+## Final stage — S6: HUD on BG3
 
-Press A to fire a yellow pellet upward from the player's nose
-(8-frame cooldown between shots). Bullets travel at 4 px/frame.
-Bullet/enemy AABB collision deactivates both on hit. Up to eight
-bullets and eight enemies live in the OAM simultaneously.
+The S5 gameplay (player + scrolling terrain + enemy pool + bullets +
+collision) is now topped with a HUD on BG3 showing live score (`S
+NNN`) and lives (`L N`). Each enemy hit increments the score by 10
+and sets a dirty flag; the next frame's main loop repaints the BG3
+tilemap via `textPrintAt` + `textPrintU16`. Lives default to 3 and
+don't decrement yet (no enemy bullets in this roadmap).
 
 ## Architecture
 
 ```
-VRAM (word addresses, fed to VMADDR)
-  $0000 ─ BG1 tilemap         (SC_32x64, 2 KB)
-  $2000 ─ BG1 tiles           (49 unique 8×8 tiles)
-  $6000 ─ Player tiles        (32×32, OBJ_SIZE32_L64)
-  $6400 ─ Enemy  tiles
-  $6800 ─ Bullet tiles        (32×32 canvas with a small visible
-                               pellet at top-centre; rest is index 0
-                               = transparent)
+VRAM (BYTE / WORD addresses)
+  $0000 / $0000  BG1 tilemap          (SC_32x64, 4 KB)
+  $1000 / $0800  BG3 tilemap          (32×32, 2 KB)
+  $2000 / $1000  BG3 font tiles       (96 chars × 16 B = 1.5 KB, 2bpp)
+  $4000 / $2000  BG1 tiles            (49 unique 8×8)
+  $C000 / $6000  Sprite tiles         (player + enemy + bullet)
 
 CGRAM
-  128-143 ─ player palette  (sprite palette 0)
-  144-159 ─ enemy  palette  (sprite palette 1)
-  160-175 ─ bullet palette  (sprite palette 2)
+   0-15  BG1 palette 0 (terrain)
+  16-19  BG3 palette 4 (HUD: transparent + white)
+ 128-143 sprite palette 0 (player)
+ 144-159 sprite palette 1 (enemy)
+ 160-175 sprite palette 2 (bullet)
 
-OAM slots
-  0      ─ player
-  1..8   ─ enemy pool   (tile 64,  palette 1, V-flipped)
-  9..16  ─ bullet pool  (tile 128, palette 2)
+OAM
+   0       player
+   1..8    enemy pool
+   9..16   bullet pool
 
-main loop (per frame)
-  - WaitForVBlank()
-  - scroll_y -= 1 (wrapping 0 → 511): terrain flows DOWN across the
-    screen — player flies UP into the world, 1942 convention
-  - D-pad → player position (clamped to visible area)
-  - KEY_A → bullet_fire() if fire_cd == 0
-  - every 32 frames (mask, not modulo): enemy spawn
-  - enemies_update(): drift down at 2 px/frame, despawn at y ≥ 224
-  - bullets_update(): drift up at 4 px/frame, despawn at y < -32
-  - collisions_resolve(): O(MAX_BULLETS × MAX_ENEMIES) AABB scan with
-    early-out on inactive slots
-  - render: oamSetFast for player + 8 enemies + 8 bullets (17 sprites,
-    well under the OAM limit of 128 and within per-frame budget)
+setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+setMainScreen(TM_BG1 | TM_BG3 | TM_OBJ);
 ```
 
-## Performance gotchas
+## Footguns encountered (mémorisés in-code)
 
-- **Spawn period must be a power of 2.** First cut used `% 30` for the
-  spawn check, which compiles to a software 16×16 division on cc65816
-  (no hardware div). At 17 sprite updates per frame plus 64-iteration
-  collision scan worst-case, the extra few hundred cycles tipped the
-  example over the lag-frame threshold (6/300 = 2 % > 5/300 = 1.7 %
-  ceiling). Switching to `& (PERIOD - 1)` with `PERIOD = 32` brought
-  it back under budget without changing the visible cadence.
-- **`oamSetFast` is mandatory above ~3 sprites per frame.** The
-  function form of `oamSet` carries a documented framesize=158 each,
-  so doing 17 of those would mean 2700 bytes of stack work alone
-  (and visible jitter on real hardware). The macro is zero-overhead.
+The text-module + BG3 setup tripped four silent failure modes in a
+row — all documented in the code so the next person doesn't redo
+the chase:
+
+1. **API address-unit inconsistency.** `textInit()` takes a BYTE
+   address; `bgSetMapPtr()`, `bgSetGfxPtr()`, `textLoadFont()` all
+   take WORD addresses. Mismatching them puts BG3 reading from one
+   spot while the text module writes to another — symptom is a
+   blank HUD with no error.
+
+2. **`bgSetGfxPtr()` only addresses `$1000`-WORD boundaries.** The
+   character base register stores `vramAddr / $1000`, so word
+   addresses like `$0C00` silently truncate to base 0 and collide
+   with BG1's tilemap at byte `$0000`. Tiles must land at word
+   `$0000`, `$1000`, `$2000`, etc.
+
+3. **`BG3_MODE1_PRIORITY_HIGH` is mandatory for HUD overlay.**
+   Without it, BG3 draws BEHIND BG1 — score text gets hidden under
+   the terrain.
+
+4. **Bank `$00` ROM budget.** Adding `text` + a couple of string
+   labels pushed bank 0 to 12 bytes free, below the 16-byte
+   fail threshold. Long labels (`"SCORE\0"` + `"LIVES\0"` = 12 B)
+   spilled to bank 1 = silently rendered as garbage. Shortened to
+   `"S"` and `"L"` — 4 bytes total, sits comfortably in bank 0.
+
+## Build
+
+```bash
+cd examples/games/shmup_1942 && make
+```
+
+Produces `shmup_1942.sfc` (LoROM, 256 KB).
 
 ## Re-generating assets
 
 ```bash
-python3 res/extract_sprites.py   # re-extract player + enemy, redraw bullet
+python3 res/extract_sprites.py   # re-extract player + enemy + draw bullet
 python3 res/compose_scene.py     # redraw the terrain (bump SEED)
 make
 ```
 
 ## Modules Used
 
-`console`, `dma`, `background`, `asset`, `sprite`, `input`.
+`console`, `dma`, `background`, `asset`, `sprite`, `input`, `text`.
 
-## Roadmap
+## Roadmap recap
 
-| Stage | What it adds |
-|-------|--------------|
+| Stage | What it added |
+|-------|---------------|
 | S1 | gfx4snes pipeline + procedural land-with-water-channels |
 | S2 | 256×512 scene + SC_32x64 + vertical auto-scroll |
 | S3 | Player ship (sprite) + D-pad movement |
-| S4 | Enemy spawns with sprite pool (≤8 simultaneous) |
-| **S5** *(this stage)* | Bullets + AABB collision (≤8 bullets) |
-| S6 | HUD (score, lives, power-ups) |
+| S4 | Enemy spawn pool (≤8 simultaneous) |
+| S5 | Bullets + AABB collision |
+| **S6** *(this stage)* | HUD on BG3 (score / lives via `text` module) |
 
 ## Licence
 
