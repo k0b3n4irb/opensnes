@@ -36,4 +36,14 @@ enemy_tiles_end:
 enemy_pal: .incbin "res/enemy.pal"
 enemy_pal_end:
 
+;------------------------------------------------------------------------------
+; Bullet sprite (32×32, mostly transparent — drawn programmatically by
+; res/extract_sprites.py). Same VRAM-row stride as player/enemy.
+;------------------------------------------------------------------------------
+bullet_tiles: .incbin "res/bullet.pic"
+bullet_tiles_end:
+
+bullet_pal: .incbin "res/bullet.pal"
+bullet_pal_end:
+
 .ends

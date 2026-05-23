@@ -39,7 +39,11 @@ res/enemy.pic res/enemy.pal: res/enemy.png
 	@echo "[GFX] Converting enemy sprite..."
 	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
 
-combined.asm: res/scene.pic res/player.pic res/enemy.pic
+res/bullet.pic res/bullet.pal: res/bullet.png
+	@echo "[GFX] Converting bullet sprite..."
+	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
+
+combined.asm: res/scene.pic res/player.pic res/enemy.pic res/bullet.pic
 
 clean: clean-shmup_1942
 .PHONY: clean-shmup_1942
@@ -47,3 +51,4 @@ clean-shmup_1942:
 	@rm -f res/scene.pic res/scene.pal res/scene.map res/scene.inc res/scene_data.as
 	@rm -f res/player.pic res/player.pal res/player.inc res/player_data.as
 	@rm -f res/enemy.pic res/enemy.pal res/enemy.inc res/enemy_data.as
+	@rm -f res/bullet.pic res/bullet.pal res/bullet.inc res/bullet_data.as

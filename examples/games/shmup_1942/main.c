@@ -1,36 +1,30 @@
 /**
  * @file main.c
- * @brief shmup_1942 — S4: enemy spawns with a sprite pool
+ * @brief shmup_1942 — S5: bullets, collision and enemy destruction
  * @ingroup examples
  *
- * Adds a fixed-size enemy pool on top of S3's player + scrolling. Up to
- * eight red chasseurs spawn from above the screen at pseudo-random X
- * positions, drift downward, and despawn when they exit the bottom.
- * The player ship (blue, S3) is unchanged and still controllable.
- *
- * Architecture: the player and enemies share OAM but use distinct
- * VRAM tile regions ($6000 for player, $6800 for enemy) and distinct
- * sprite palettes (0 and 1). Each on-screen enemy is one OAM entry
- * referencing the SAME 16 enemy tiles — the pool is in CPU state, not
- * a per-enemy VRAM copy.
+ * Adds player bullets and bullet↔enemy AABB collision on top of S4.
+ * Pressing A fires a bullet upward (with a small cooldown). Bullets
+ * travel at 4 px/frame; when a bullet's bounding box overlaps an
+ * enemy, both deactivate. The scene composition, scroll direction
+ * and enemy spawn logic are unchanged from S4.
  *
  * @par SNES Concepts
- * - VRAM region planning for two sprite types in the same OAM tile
- *   grid: player at tile 0 (16 tiles), enemy at tile 64 (next
- *   OAM-grid row of 32×32 sprites, 4 rows × 16 tiles down)
- * - Sprite palette 0 = CGRAM 128-143 (player), palette 1 = 144-159
- *   (enemy). `dmaCopyCGram(enemy_pal, 144, ...)` loads it during
- *   force blank.
- * - Sprite pool: 8 OAM entries reserved for enemies, hidden via the
- *   off-screen Y trick (set Y to OBJ_HIDE_Y when inactive)
- * - LCG pseudo-random for spawn X position
+ * - Sprite pools as fixed-size arrays of `{x, y, active}` slots
+ *   (player gets OAM slot 0, enemies 1-8, bullets 9-16)
+ * - Multiple sprite types in the same OAM grid: distinct VRAM regions
+ *   (player @ $6000, enemy @ $6400, bullet @ $6800 — all word
+ *   addresses) plus distinct sprite palettes (0/1/2)
+ * - Axis-aligned bounding-box (AABB) overlap test for 32×32 sprites
+ * - Input edge detection via `padPressed()` for one-shot fire
  *
  * @par What to Observe
- * - Blue player ship responds to D-pad (same as S3)
- * - Red enemies spawn from above the screen every second and drift
- *   downward at 2 px/frame
- * - Up to 8 enemies on screen simultaneously
- * - Background continues scrolling at 1 px/frame
+ * - Press A to fire a bullet upward from the player's nose
+ * - Bullets travel at 4 px/frame; they despawn at the top of the
+ *   screen or on hitting an enemy
+ * - Enemies hit by a bullet vanish immediately (S5.1 will add
+ *   explosion animations)
+ * - The terrain keeps scrolling and the enemy pool keeps spawning
  *
  * @par Modules Used
  * console, dma, background, asset, sprite, input
@@ -42,13 +36,14 @@
 #include <snes/asset.h>
 #include <snes/input.h>
 
-/** Composed scene bundle (4bpp, 16 colours, 32×64 tilemap). */
 DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x64);
 
 extern u8 player_tiles[], player_tiles_end[];
 extern u8 player_pal[], player_pal_end[];
 extern u8 enemy_tiles[], enemy_tiles_end[];
 extern u8 enemy_pal[], enemy_pal_end[];
+extern u8 bullet_tiles[], bullet_tiles_end[];
+extern u8 bullet_pal[], bullet_pal_end[];
 
 #define MAP_HEIGHT_PX  512
 #define PLAYER_SPEED   2
@@ -59,19 +54,29 @@ extern u8 enemy_pal[], enemy_pal_end[];
 #define PLAYER_MAX_Y   176
 
 #define MAX_ENEMIES        8
-#define ENEMY_OAM_BASE     1            /**< OAM slot 0 is player; 1..8 are enemies */
-#define ENEMY_TILE         64           /**< OBJ tile index for enemy sprite (= VRAM word $6400) */
-#define ENEMY_PALETTE      1            /**< Sprite palette 1 = CGRAM 144-159 */
-#define ENEMY_SPEED        2            /**< px/frame downward (faster than BG scroll) */
-#define ENEMY_SPAWN_PERIOD 30           /**< frames between spawns at full pool */
-#define ENEMY_HIDE_Y       240          /**< sprite Y value that hides it (below visible area) */
-#define ENEMY_SPRITE       32           /**< full sprite extent (32×32) */
+#define ENEMY_OAM_BASE     1
+#define ENEMY_TILE         64           /* OBJ tile 64 = VRAM word $6400 */
+#define ENEMY_PALETTE      1
+#define ENEMY_SPEED        2
+#define ENEMY_SPAWN_PERIOD 32      /* power of 2 → mask, not modulo (cc65816 has no fast %) */
+#define ENEMY_SPAWN_MASK   (ENEMY_SPAWN_PERIOD - 1)
+#define ENEMY_HIDE_Y       240
+#define ENEMY_SPRITE       32
+
+#define MAX_BULLETS        8
+#define BULLET_OAM_BASE    (ENEMY_OAM_BASE + MAX_ENEMIES)  /* = 9 */
+#define BULLET_TILE        128          /* OBJ tile 128 = VRAM word $6800 */
+#define BULLET_PALETTE     2
+#define BULLET_SPEED       4
+#define BULLET_HIDE_Y      240
+#define BULLET_SPRITE      32           /* full 32×32 OAM slot — visible bullet is centred top */
+#define FIRE_COOLDOWN      8            /* frames between consecutive shots */
 
 typedef struct {
     s16 x;
     s16 y;
     u8  active;
-} Enemy;
+} Entity;
 
 typedef struct {
     s16 player_x;
@@ -79,17 +84,19 @@ typedef struct {
     u16 scroll_y;
     u16 frame;
     u16 prng;
-    Enemy enemies[MAX_ENEMIES];
+    u8  fire_cd;
+    Entity enemies[MAX_ENEMIES];
+    Entity bullets[MAX_BULLETS];
 } GameState;
 
 static GameState game;
 
-/** 16-bit LCG. Galois constants from Knuth — cheap and good enough for
- *  spawn jitter on the 65816. */
 static u16 prng_next(void) {
     game.prng = (u16)(game.prng * 25173u + 13849u);
     return game.prng;
 }
+
+/* ---- Enemy pool ----------------------------------------------------------*/
 
 static void enemies_init(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
@@ -103,8 +110,6 @@ static void enemy_spawn(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
         if (!game.enemies[i].active) {
             u16 r = prng_next();
-            /* Range: [8, 8 + 208) = [8, 216) so the 32-px sprite stays
-             * inside the visible 256-px screen */
             game.enemies[i].x = (s16)((r % 208u) + 8u);
             game.enemies[i].y = -ENEMY_SPRITE;
             game.enemies[i].active = 1;
@@ -125,10 +130,6 @@ static void enemies_update(void) {
 }
 
 static void enemies_render(void) {
-    /* oamSet() has framesize=158 per call; calling it nine times per frame
-     * (1 player + 8 enemies) blows past the documented 2-3 jitter limit.
-     * oamSetFast() is a macro with zero stack overhead and is the
-     * recommended API for per-frame sprite updates. */
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
         u16 ex, ey;
         if (game.enemies[i].active) {
@@ -138,35 +139,114 @@ static void enemies_render(void) {
             ex = 0;
             ey = ENEMY_HIDE_Y;
         }
-        /* OBJ_FLIPY rotates the enemy sprite 180° so its nose points DOWN
-         * (toward the player) — the source art has every ship pointing
-         * up by Kenney's convention. */
         oamSetFast(ENEMY_OAM_BASE + i, ex, ey, ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
     }
 }
 
+/* ---- Bullet pool ---------------------------------------------------------*/
+
+static void bullets_init(void) {
+    for (u8 i = 0; i < MAX_BULLETS; i++) {
+        game.bullets[i].active = 0;
+        game.bullets[i].x = 0;
+        game.bullets[i].y = BULLET_HIDE_Y;
+    }
+    game.fire_cd = 0;
+}
+
+static void bullet_fire(void) {
+    if (game.fire_cd != 0) return;
+    for (u8 i = 0; i < MAX_BULLETS; i++) {
+        if (!game.bullets[i].active) {
+            /* Spawn just above the player ship's nose. The visible
+             * bullet pixel column lives at canvas x=14..17 of its 32×32
+             * sprite, so subtracting 16 from the player centre lands
+             * the muzzle on the ship's nose. */
+            game.bullets[i].x = game.player_x;
+            game.bullets[i].y = game.player_y - 16;
+            game.bullets[i].active = 1;
+            game.fire_cd = FIRE_COOLDOWN;
+            return;
+        }
+    }
+}
+
+static void bullets_update(void) {
+    if (game.fire_cd > 0) game.fire_cd--;
+    for (u8 i = 0; i < MAX_BULLETS; i++) {
+        if (!game.bullets[i].active) continue;
+        game.bullets[i].y -= BULLET_SPEED;
+        if (game.bullets[i].y < -BULLET_SPRITE) {
+            game.bullets[i].active = 0;
+            game.bullets[i].y = BULLET_HIDE_Y;
+        }
+    }
+}
+
+static void bullets_render(void) {
+    for (u8 i = 0; i < MAX_BULLETS; i++) {
+        u16 bx, by;
+        if (game.bullets[i].active) {
+            bx = (u16)game.bullets[i].x;
+            by = (u16)game.bullets[i].y;
+        } else {
+            bx = 0;
+            by = BULLET_HIDE_Y;
+        }
+        oamSetFast(BULLET_OAM_BASE + i, bx, by, BULLET_TILE, BULLET_PALETTE, 2, 0);
+    }
+}
+
+/* ---- Collision -----------------------------------------------------------*/
+
+/* AABB overlap for two 32×32 sprites anchored at top-left (ax,ay) and
+ * (bx,by). True when bounding boxes intersect. We loosen the hit box on
+ * bullets slightly (the visible bullet pixels are a small column inside
+ * the 32×32 canvas — using the full 32×32 makes shots feel generous, OK
+ * for a demo). */
+static u8 aabb32(s16 ax, s16 ay, s16 bx, s16 by) {
+    if (ax + 32 <= bx) return 0;
+    if (bx + 32 <= ax) return 0;
+    if (ay + 32 <= by) return 0;
+    if (by + 32 <= ay) return 0;
+    return 1;
+}
+
+static void collisions_resolve(void) {
+    for (u8 b = 0; b < MAX_BULLETS; b++) {
+        if (!game.bullets[b].active) continue;
+        for (u8 e = 0; e < MAX_ENEMIES; e++) {
+            if (!game.enemies[e].active) continue;
+            if (aabb32(game.bullets[b].x, game.bullets[b].y,
+                       game.enemies[e].x, game.enemies[e].y)) {
+                game.bullets[b].active = 0;
+                game.bullets[b].y = BULLET_HIDE_Y;
+                game.enemies[e].active = 0;
+                game.enemies[e].y = ENEMY_HIDE_Y;
+                break;  /* this bullet is gone; move to next bullet */
+            }
+        }
+    }
+}
+
+/* ---- Main ----------------------------------------------------------------*/
+
 int main(void) {
     setScreenOff();
 
-    /* BG1: tilemap at VRAM $0000, tiles at $4000, palette slot 0. */
     bgLoad(0, &scene, 0, 0x4000, 0x0000);
 
-    /* Player tiles → VRAM $6000, palette 0 (CGRAM 128-143).
-     * OBJ_SIZE32_L64 makes "small" = 32×32 = our sprite size. */
     oamInitGfxSet(player_tiles, (u16)(player_tiles_end - player_tiles),
                   player_pal,   (u16)(player_pal_end   - player_pal),
                   0, 0x6000, OBJ_SIZE32_L64);
 
-    /* Enemy tiles → VRAM word $6400. dmaCopyVram takes a WORD address
-     * for VMADDR; OBJ tile N has VRAM word offset N×16 from the OBJ
-     * tile base ($6000 here). So tile 64 = word $6000 + 64×16 = $6400.
-     * One 2-KB chunk holds the 16 actual sprite tiles (padded to 64
-     * slots for the OAM 16-tile-row stride); every enemy OAM entry
-     * references this same data, varying only x/y. */
+    /* Enemy tiles at VRAM word $6400 (= OBJ tile 64), palette 1. */
     dmaCopyVram(enemy_tiles, 0x6400, (u16)(enemy_tiles_end - enemy_tiles));
-
-    /* Enemy palette → CGRAM 144 (sprite palette 1, 16 colours). */
     dmaCopyCGram(enemy_pal, 144, (u16)(enemy_pal_end - enemy_pal));
+
+    /* Bullet tiles at VRAM word $6800 (= OBJ tile 128), palette 2. */
+    dmaCopyVram(bullet_tiles, 0x6800, (u16)(bullet_tiles_end - bullet_tiles));
+    dmaCopyCGram(bullet_pal, 160, (u16)(bullet_pal_end - bullet_pal));
 
     setMode(BG_MODE1, 0);
     setMainScreen(TM_BG1 | TM_OBJ);
@@ -175,12 +255,13 @@ int main(void) {
     game.player_y = 160;
     game.scroll_y = 0;
     game.frame    = 0;
-    game.prng     = 0xACE1;  /* arbitrary non-zero seed */
+    game.prng     = 0xACE1;
     enemies_init();
+    bullets_init();
 
-    /* Hide every enemy OAM entry before display goes live */
     oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
     enemies_render();
+    bullets_render();
     bgSetScroll(0, 0, 0);
 
     setScreenOn();
@@ -189,10 +270,6 @@ int main(void) {
         WaitForVBlank();
 
         game.frame++;
-        /* Scroll Y DOWN through the BG (scroll_y decreases). Visually the
-         * terrain flows from top to bottom of the screen, matching the
-         * 1942 / Aero Fighters convention where the player flies UP into
-         * the world. Wrap at 0 → MAP_HEIGHT_PX - 1. */
         if (game.scroll_y == 0) game.scroll_y = MAP_HEIGHT_PX;
         game.scroll_y--;
 
@@ -201,14 +278,16 @@ int main(void) {
         if (pad & KEY_RIGHT && game.player_x < PLAYER_MAX_X) game.player_x += PLAYER_SPEED;
         if (pad & KEY_UP    && game.player_y > PLAYER_MIN_Y) game.player_y -= PLAYER_SPEED;
         if (pad & KEY_DOWN  && game.player_y < PLAYER_MAX_Y) game.player_y += PLAYER_SPEED;
+        if (pad & KEY_A) bullet_fire();
 
-        if (game.frame % ENEMY_SPAWN_PERIOD == 0) {
-            enemy_spawn();
-        }
+        if ((game.frame & ENEMY_SPAWN_MASK) == 0) enemy_spawn();
         enemies_update();
+        bullets_update();
+        collisions_resolve();
 
-        oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
+        oamSetFast(0, (u16)game.player_x, (u16)game.player_y, 0, 0, 2, 0);
         enemies_render();
+        bullets_render();
         bgSetScroll(0, 0, game.scroll_y);
     }
 
