@@ -12,7 +12,7 @@ TARGET     := shmup_1942.sfc
 ROM_NAME   := SHMUP 1942
 
 USE_LIB    := 1
-LIB_MODULES := console dma background asset sprite input text
+LIB_MODULES := console dma background asset sprite input
 
 CSRC       := main.c
 ASMSRC     := data.asm

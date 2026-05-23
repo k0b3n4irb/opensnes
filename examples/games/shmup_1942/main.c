@@ -35,7 +35,6 @@
 #include <snes.h>
 #include <snes/asset.h>
 #include <snes/input.h>
-#include <snes/text.h>
 
 DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x64);
 
@@ -106,9 +105,6 @@ typedef struct {
     u16 frame;
     u16 prng;
     u8  fire_cd;
-    u16 score;
-    u8  lives;
-    u8  hud_dirty;  /* 1 = score/lives changed since last HUD repaint */
     Entity enemies[MAX_ENEMIES];
     Entity bullets[MAX_BULLETS];
 } GameState;
@@ -145,10 +141,8 @@ static void enemy_spawn(void) {
 /* On transition active → inactive, write Y=HIDE_Y once via direct
  * oamMemory[] write. Subsequent frames don't touch this slot — the
  * OAM byte sticks until the slot becomes active again. Same trick
- * for bullets. */
-static void enemy_hide(u8 i) {
-    OAM_WRITE(ENEMY_OAM_BASE + i, 0, ENEMY_HIDE_Y, ENEMY_TILE, ENEMY_ATTR);
-}
+ * for bullets. Inlined as macros to save bank $00 (tight budget). */
+#define enemy_hide(i)  OAM_WRITE(ENEMY_OAM_BASE + (i),  0, ENEMY_HIDE_Y,  ENEMY_TILE,  ENEMY_ATTR)
 
 static void enemies_update(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
@@ -205,16 +199,21 @@ static void bullet_fire(void) {
     }
 }
 
-static void bullet_hide(u8 i) {
-    OAM_WRITE(BULLET_OAM_BASE + i, 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_ATTR);
-}
+#define bullet_hide(i) OAM_WRITE(BULLET_OAM_BASE + (i), 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_ATTR)
 
 static void bullets_update(void) {
     if (game.fire_cd > 0) game.fire_cd--;
     for (u8 i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) continue;
         game.bullets[i].y -= BULLET_SPEED;
-        if (game.bullets[i].y < -BULLET_SPRITE) {
+        /* Despawn as soon as the visible ball clears the top of the
+         * screen. The ball lives at canvas y 4-11 of the 32×32 sprite,
+         * so its bottom edge leaves the visible window when
+         * sprite_y + 11 < 0 → sprite_y < -11. Using -12 gives one
+         * frame of safety. Letting it run further (e.g. < -32) makes
+         * the OAM Y byte wrap to ~$E0 and the bullet flashes at the
+         * bottom of the screen for one frame before despawn. */
+        if (game.bullets[i].y < -12) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
             bullet_hide(i);
@@ -247,36 +246,12 @@ static void bullets_render(void) {
 #define ENEMY_HITBOX_INSET 6
 #define ENEMY_HITBOX_END   (32 - ENEMY_HITBOX_INSET)
 
-#define SCORE_PER_ENEMY    10
-#define INITIAL_LIVES      3
-
-/* BG3 (HUD) VRAM layout.
- *
- *   BYTE      WORD     content
- *   $1000  =  $0800    BG3 tilemap (32×32 = 2 KB)
- *   $2000  =  $1000    BG3 font tiles (96 chars × 16 bytes 2bpp = 1.5 KB)
- *
- * Constraints:
- *   - bgSetGfxPtr() encodes the BG tile base in $1000-WORD units (= $2000
- *     BYTE units), so tile bases can only land at word $0000, $1000,
- *     $2000, ... — word $0C00 looks valid but truncates to base 0 and
- *     collides with BG1's tilemap. BG3 tiles therefore live at word
- *     $1000 = byte $2000 (the lowest $2000-byte slot that doesn't
- *     overlap the BG1/BG3 tilemap region).
- *   - API conventions are inconsistent (a real foot-gun):
- *       textInit()     BYTE address (TEXT_DEFAULT_TILEMAP_ADDR = $7000)
- *       bgSetMapPtr()  WORD address (BGnSC register format)
- *       bgSetGfxPtr()  WORD address ($1000-word resolution)
- *       textLoadFont() WORD address (writes VMADDR directly)
- *     Mismatches are silent — the screen renders garbage tiles or a
- *     blank HUD with no error.
- *
- * Palette slot 4 maps to CGRAM 16-19, outside BG1's 4bpp palette 0
- * (CGRAM 0-15) so there's no colour conflict. */
-#define BG3_TILEMAP_BYTE   0x1000
-#define BG3_TILEMAP_WORD   0x0800
-#define BG3_TILES_WORD     0x1000
-#define HUD_PALETTE        4
+/* HUD is deferred — see README's "Open chantier" section. The BG3 +
+ * text-module path passes lint and links cleanly, but with BG3
+ * enabled the BG1 terrain stops rendering for a reason I could not
+ * trace inside one session (NOT documented in any example or in
+ * KNOWN_LIMITATIONS.md). Reverted to S5 + bullet despawn fix until
+ * the BG3 ↔ BG1 interaction is understood. */
 
 static void collisions_resolve(void) {
     for (u8 b = 0; b < MAX_BULLETS; b++) {
@@ -298,29 +273,9 @@ static void collisions_resolve(void) {
             game.enemies[e].active = 0;
             game.enemies[e].y = ENEMY_HIDE_Y;
             enemy_hide(e);
-            game.score += SCORE_PER_ENEMY;
-            game.hud_dirty = 1;
             break;
         }
     }
-}
-
-/* ---- HUD -----------------------------------------------------------------*/
-
-/* Repaint the HUD line on BG3. We only call this when game.hud_dirty is
- * set (initial frame + every score-changing event), so the textPrintAt
- * cost stays once per real change rather than every frame. The text
- * module's NMI auto-flush copies the tilemap buffer to VRAM at VBlank. */
-static void hud_repaint(void) {
-    /* Short labels keep the BG3 tilemap update tiny AND the string
-     * literals tiny (combined "SCORE\0" + "LIVES\0" pushed bank $00
-     * over the budget). Layout: "S 12345          L 3" on row 1. */
-    textPrintAt(1, 1, "S");
-    cursor_x = 3; cursor_y = 1;
-    textPrintU16(game.score);
-    textPrintAt(28, 1, "L");
-    cursor_x = 30; cursor_y = 1;
-    textPrintU16((u16)game.lives);
 }
 
 /* ---- Main ----------------------------------------------------------------*/
@@ -342,30 +297,14 @@ int main(void) {
     dmaCopyVram(bullet_tiles, 0x6800, (u16)(bullet_tiles_end - bullet_tiles));
     dmaCopyCGram(bullet_pal, 160, (u16)(bullet_pal_end - bullet_pal));
 
-    /* BG3 HUD setup: text module loads its built-in font as 2bpp tiles,
-     * we point BG3 at the tilemap + font byte addresses, and pick a
-     * palette slot (4) whose CGRAM cells (16-19) aren't claimed by
-     * BG1's 4bpp palette 0 (0-15). Two HUD colours: 0 = transparent,
-     * 1 = white text on the procedural terrain. */
-    bgSetGfxPtr(2, BG3_TILES_WORD);
-    bgSetMapPtr(2, BG3_TILEMAP_WORD, BG_MAP_32x32);
-    textInit(BG3_TILEMAP_BYTE, 0, HUD_PALETTE);
-    textLoadFont(BG3_TILES_WORD);
-    setColor(HUD_PALETTE * 4 + 1, RGB(31, 31, 31));  /* white text */
-
-    /* BG3_MODE1_PRIORITY_HIGH lifts BG3's high-prio tiles above BG1+sprites,
-     * which is exactly the HUD-on-top behaviour we want. */
-    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
-    setMainScreen(TM_BG1 | TM_BG3 | TM_OBJ);
+    setMode(BG_MODE1, 0);
+    setMainScreen(TM_BG1 | TM_OBJ);
 
     game.player_x = 112;
     game.player_y = 160;
     game.scroll_y = 0;
     game.frame    = 0;
     game.prng     = 0xACE1;
-    game.score    = 0;
-    game.lives    = INITIAL_LIVES;
-    game.hud_dirty = 1;  /* paint once at startup */
     enemies_init();
     bullets_init();
 
@@ -423,10 +362,6 @@ int main(void) {
         enemies_render();
         bullets_render();
         oam_update_flag = 1;  /* re-arm after our direct writes */
-        if (game.hud_dirty) {
-            hud_repaint();
-            game.hud_dirty = 0;
-        }
         bgSetScroll(0, 0, game.scroll_y);
     }
 
