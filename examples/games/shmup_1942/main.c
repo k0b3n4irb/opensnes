@@ -78,7 +78,7 @@ extern u8 bullet_pal[], bullet_pal_end[];
  * computed from OAM_ATTR(tile, pal, prio, flags). */
 #define PLAYER_ATTR        0x20         /* tile 0,   pal 0, prio 2, no flip */
 #define ENEMY_ATTR         0xA2         /* tile 64,  pal 1, prio 2, V-flip  */
-#define BULLET_ATTR        0x24         /* tile 128, pal 2, prio 2, no flip */
+#define BULLET_ATTR        0x34         /* tile 128, pal 2, prio 3 (max), no flip */
 
 /* Direct oamMemory[] write: 4 bytes per sprite, no X-high bit (all our
  * sprites stay at X < 256), no oam_update_flag (set once at end of
@@ -192,15 +192,14 @@ static void bullet_fire(void) {
              * bullet pixel column lives at canvas x=14..17 of its 32×32
              * sprite, so subtracting 16 from the player centre lands
              * the muzzle on the ship's nose. */
-            /* Spawn at the player's top edge, not 16 px above. The visible
-             * ball lives at canvas y 4-11, so the muzzle appears just
-             * above the player's nose. The previous -16 offset meant
-             * bullets fired while the player was near the top of the
-             * screen spawned at y≈0 and were gone in two frames — felt
-             * like the bullet's lifetime was "computed at fire time" but
-             * was really just a spawn-position artefact. */
-            game.bullets[i].x = game.player_x;
-            game.bullets[i].y = game.player_y;
+            /* Spawn so the visible ball sits just above the player's nose.
+             * 16×16 bullet sprite, ball centre at canvas (8, 8). To put
+             * ball centre at world y = player_y (top of player), set
+             * sprite_y = player_y - 8. The visible ball lands at world
+             * y player_y - 4 to player_y + 3 = right at the player's
+             * top edge, looks like a muzzle flash. */
+            game.bullets[i].x = game.player_x + 8;  /* centre over player's 32×32 */
+            game.bullets[i].y = game.player_y - 8;
             game.bullets[i].active = 1;
             game.fire_cd = FIRE_COOLDOWN;
             return;
@@ -217,12 +216,12 @@ static void bullets_update(void) {
     for (u8 i = 0; i < MAX_BULLETS; i++) {
         if (!game.bullets[i].active) continue;
         game.bullets[i].y -= BULLET_SPEED;
-        /* Despawn one frame after the visible ball clears the top.
-         * Natural SNES sprite wrap keeps the ball visible at the top
-         * of the screen for sprite_y down to -10 (the ball's bottom
-         * pixel at world scanline 0). Below that the ball is in the
-         * 224-255 hidden Y zone — no render gymnastics needed. */
-        if (game.bullets[i].y < -10) {
+        /* Despawn when sprite_y crosses 0. With OAM_y = sprite_y - 1,
+         * sprite_y = 0 puts OAM_y = 255 which the SNES PPU treats as
+         * "below visible" (drops the sprite). The last visibly-rendered
+         * sprite_y is 1, so killing at < 0 keeps the last frame on
+         * screen and avoids the dropped/wrap visual mismatch. */
+        if (game.bullets[i].y < 0) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
             bullet_hide(i);
@@ -250,7 +249,7 @@ static void bullets_render(void) {
  * when the bullet's centre point falls inside the enemy hit-box —
  * tight enough that bullets must visibly touch the ship, cheap enough
  * to run 64× per frame on a 65816. */
-#define BULLET_CX_OFFSET 16
+#define BULLET_CX_OFFSET 8    /* ball centre in the 16×16 bullet canvas */
 #define BULLET_CY_OFFSET 8
 #define ENEMY_HITBOX_INSET 6
 #define ENEMY_HITBOX_END   (32 - ENEMY_HITBOX_INSET)
@@ -287,9 +286,16 @@ int main(void) {
 
     bgLoad(0, &scene, 0, 0x4000, 0x0000);
 
+    /* OBJSEL = OBJ_SIZE16_L32: small=16×16 (used by bullets), large=32×32
+     * (used by player + enemies via size bit set in ext table below).
+     * The 32×32-only mode couldn't render the bullet's ball at world y < 12
+     * because the minimum sprite_y to keep OAM_y in 0-239 is 1, and a
+     * 32×32 sprite with the visible ball anywhere inside the canvas
+     * lands its top pixel at world y ≥ canvas_y_of_ball_top.  16×16
+     * sprites fit at OAM_y = 0 with the ball reaching world y 4. */
     oamInitGfxSet(player_tiles, (u16)(player_tiles_end - player_tiles),
                   player_pal,   (u16)(player_pal_end   - player_pal),
-                  0, 0x6000, OBJ_SIZE32_L64);
+                  0, 0x6000, OBJ_SIZE16_L32);
 
     /* Enemy tiles at VRAM word $6400 (= OBJ tile 64), palette 1. */
     dmaCopyVram(enemy_tiles, 0x6400, (u16)(enemy_tiles_end - enemy_tiles));
@@ -326,11 +332,16 @@ int main(void) {
      * Ext table layout: 1 byte per 4 sprites, 2 bits per sprite
      * (bit 0 = X-high, bit 1 = size). Slots 0-15 = bytes 512-515
      * (clear fully). Slot 16 = bits 0-1 of byte 516. */
-    oamMemory[512] = 0;     /* slots 0-3 */
-    oamMemory[513] = 0;     /* slots 4-7 */
-    oamMemory[514] = 0;     /* slots 8-11 */
-    oamMemory[515] = 0;     /* slots 12-15 */
-    oamMemory[516] &= 0xFC; /* clear slot 16's two bits, preserve 17-19 */
+    /* OBJ_SIZE16_L32 means each OAM ext-table size bit picks 16×16 (0)
+     * or 32×32 (1). Player slot 0 + enemy slots 1-8 need LARGE (32×32)
+     * so we OR the size bits (0x02 / 0x08 / 0x20 / 0x80 by slot-within-
+     * byte). Bullet slots 9-16 use SMALL (16×16) → size bit 0. X-high
+     * bit cleared throughout (sprite X stays < 256). */
+    oamMemory[512] = 0xAA;          /* slots 0-3 = 1 player + 3 enemies LARGE */
+    oamMemory[513] = 0xAA;          /* slots 4-7 enemies LARGE */
+    oamMemory[514] = 0x02;          /* slot 8 enemy LARGE, 9-11 bullets SMALL */
+    oamMemory[515] = 0;             /* slots 12-15 bullets SMALL */
+    oamMemory[516] = (oamMemory[516] & 0xFC); /* slot 16 bullet SMALL, 17-19 preserved */
 
     /* Hide every enemy and bullet OAM slot once at boot. */
     for (u8 i = 0; i < MAX_ENEMIES; i++) enemy_hide(i);

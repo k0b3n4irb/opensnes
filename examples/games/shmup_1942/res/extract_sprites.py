@@ -71,22 +71,29 @@ def extract(index: int, out_path: Path) -> None:
 
 
 def build_bullet(out_path: Path) -> None:
-    """Draw a 32×32 bullet sprite: small yellow ball anchored top-centre,
-    transparent everywhere else. Background colour goes to palette index
-    0 = transparent (same trick as the ships). The ball is 6×6 px so the
-    collision hit-box around its centre stays tight."""
+    """Draw a 32×32 bullet sprite: small yellow ball at the CANVAS CENTRE,
+    transparent everywhere else. The ball must sit at canvas y 12-19
+    (centre-y) rather than canvas y 4-11 (top) so it can render at the
+    top of the screen via OAM Y wrap-around without the SNES PPU
+    dropping the sprite into the 224-255 hidden Y zone.
+
+    Why: SNES OAM Y is 8-bit and the PPU treats top edges in 224-255
+    as "below visible". For a 32×32 sprite with visible content at
+    canvas y 4-11, putting the ball at world y 0 would require
+    sprite_y = -4 → OAM_y = 251 → hidden. Moving the ball down the
+    canvas means sprite_y stays near 0 (OAM_y near 0) when the ball
+    crosses the top of the screen, and the wrap-around scanlines
+    actually fall in the visible 0-31 band."""
     BG = (0, 0, 0)
     OUTLINE = (78, 51, 11)
     BODY = (252, 195, 51)
     HIGHLIGHT = (255, 232, 122)
 
-    img = Image.new("RGB", (TILE, TILE), BG)
+    SIZE = 16  # 16x16 sprite: can render its top edge near scanline 0
+    img = Image.new("RGB", (SIZE, SIZE), BG)
     d = ImageDraw.Draw(img)
-    # 8×8 ball centred horizontally at canvas (16, 8). Drawn as a 6×6
-    # body with a 1-px outline ring and a 2-px highlight crescent on the
-    # top-left — gives the ball a sense of volume at SNES resolution.
-    cx = TILE // 2
-    cy = 8
+    cx = SIZE // 2          # canvas centre x = 8
+    cy = SIZE // 2          # canvas centre y = 8
     d.ellipse((cx - 4, cy - 4, cx + 3, cy + 3), fill=OUTLINE)
     d.ellipse((cx - 3, cy - 3, cx + 2, cy + 2), fill=BODY)
     d.rectangle((cx - 2, cy - 2, cx - 1, cy - 1), fill=HIGHLIGHT)

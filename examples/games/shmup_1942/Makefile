@@ -41,7 +41,7 @@ res/enemy.pic res/enemy.pal: res/enemy.png
 
 res/bullet.pic res/bullet.pal: res/bullet.png
 	@echo "[GFX] Converting bullet sprite..."
-	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
+	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
 combined.asm: res/scene.pic res/player.pic res/enemy.pic res/bullet.pic
 
