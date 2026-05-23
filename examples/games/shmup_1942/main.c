@@ -138,7 +138,10 @@ static void enemies_render(void) {
             ex = 0;
             ey = ENEMY_HIDE_Y;
         }
-        oamSetFast(ENEMY_OAM_BASE + i, ex, ey, ENEMY_TILE, ENEMY_PALETTE, 2, 0);
+        /* OBJ_FLIPY rotates the enemy sprite 180° so its nose points DOWN
+         * (toward the player) — the source art has every ship pointing
+         * up by Kenney's convention. */
+        oamSetFast(ENEMY_OAM_BASE + i, ex, ey, ENEMY_TILE, ENEMY_PALETTE, 2, OBJ_FLIPY);
     }
 }
 
