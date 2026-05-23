@@ -37,7 +37,8 @@ OAM
 
 main loop (per frame)
   - WaitForVBlank()
-  - scroll_y = (scroll_y + 1) % 512;
+  - scroll_y -= 1 (wrapping 0 → 511): terrain flows DOWN across the
+    screen — player flies UP into the world, 1942 convention
   - D-pad → player position (clamped to visible area)
   - every ENEMY_SPAWN_PERIOD frames: find inactive slot, spawn at top
   - enemies_update(): drift down at 2 px/frame, despawn at y ≥ 224

@@ -189,7 +189,12 @@ int main(void) {
         WaitForVBlank();
 
         game.frame++;
-        game.scroll_y = (game.scroll_y + 1) % MAP_HEIGHT_PX;
+        /* Scroll Y DOWN through the BG (scroll_y decreases). Visually the
+         * terrain flows from top to bottom of the screen, matching the
+         * 1942 / Aero Fighters convention where the player flies UP into
+         * the world. Wrap at 0 → MAP_HEIGHT_PX - 1. */
+        if (game.scroll_y == 0) game.scroll_y = MAP_HEIGHT_PX;
+        game.scroll_y--;
 
         u16 pad = padHeld(0);
         if (pad & KEY_LEFT  && game.player_x > PLAYER_MIN_X) game.player_x -= PLAYER_SPEED;
