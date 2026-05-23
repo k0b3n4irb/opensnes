@@ -141,8 +141,10 @@ static void enemy_spawn(void) {
 /* On transition active → inactive, write Y=HIDE_Y once via direct
  * oamMemory[] write. Subsequent frames don't touch this slot — the
  * OAM byte sticks until the slot becomes active again. Same trick
- * for bullets. Inlined as macros to save bank $00 (tight budget). */
-#define enemy_hide(i)  OAM_WRITE(ENEMY_OAM_BASE + (i),  0, ENEMY_HIDE_Y,  ENEMY_TILE,  ENEMY_ATTR)
+ * for bullets. */
+static void enemy_hide(u8 i) {
+    OAM_WRITE(ENEMY_OAM_BASE + i, 0, ENEMY_HIDE_Y, ENEMY_TILE, ENEMY_ATTR);
+}
 
 static void enemies_update(void) {
     for (u8 i = 0; i < MAX_ENEMIES; i++) {
@@ -199,7 +201,9 @@ static void bullet_fire(void) {
     }
 }
 
-#define bullet_hide(i) OAM_WRITE(BULLET_OAM_BASE + (i), 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_ATTR)
+static void bullet_hide(u8 i) {
+    OAM_WRITE(BULLET_OAM_BASE + i, 0, BULLET_HIDE_Y, BULLET_TILE, BULLET_ATTR);
+}
 
 static void bullets_update(void) {
     if (game.fire_cd > 0) game.fire_cd--;
@@ -207,12 +211,12 @@ static void bullets_update(void) {
         if (!game.bullets[i].active) continue;
         game.bullets[i].y -= BULLET_SPEED;
         /* Despawn as soon as the visible ball clears the top of the
-         * screen. The ball lives at canvas y 4-11 of the 32×32 sprite,
-         * so its bottom edge leaves the visible window when
-         * sprite_y + 11 < 0 → sprite_y < -11. Using -12 gives one
-         * frame of safety. Letting it run further (e.g. < -32) makes
-         * the OAM Y byte wrap to ~$E0 and the bullet flashes at the
-         * bottom of the screen for one frame before despawn. */
+         * screen. The ball lives at canvas y 4..11 of its 32×32 sprite,
+         * so its bottom edge leaves the playfield when sprite_y + 11 < 0
+         * → sprite_y < -11. -12 gives one frame of safety. Letting it
+         * run further (e.g. < -32) makes the OAM Y byte wrap to ~$E0
+         * and the bullet flashes at the bottom of the screen for one
+         * frame before despawn. */
         if (game.bullets[i].y < -12) {
             game.bullets[i].active = 0;
             game.bullets[i].y = BULLET_HIDE_Y;
@@ -245,13 +249,6 @@ static void bullets_render(void) {
 #define BULLET_CY_OFFSET 8
 #define ENEMY_HITBOX_INSET 6
 #define ENEMY_HITBOX_END   (32 - ENEMY_HITBOX_INSET)
-
-/* HUD is deferred — see README's "Open chantier" section. The BG3 +
- * text-module path passes lint and links cleanly, but with BG3
- * enabled the BG1 terrain stops rendering for a reason I could not
- * trace inside one session (NOT documented in any example or in
- * KNOWN_LIMITATIONS.md). Reverted to S5 + bullet despawn fix until
- * the BG3 ↔ BG1 interaction is understood. */
 
 static void collisions_resolve(void) {
     for (u8 b = 0; b < MAX_BULLETS; b++) {
