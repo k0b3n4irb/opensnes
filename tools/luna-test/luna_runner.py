@@ -42,6 +42,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -81,6 +82,50 @@ def find_luna() -> str:
         "ERROR: luna binary not found. Run scripts/install-luna.sh, set $LUNA_BIN, "
         f"or put `luna` on PATH. Expected luna {LUNA_VERSION}."
     )
+
+
+def load_manifest() -> dict:
+    """Per-example overrides from manifest.toml (default_steps + [examples.*])."""
+    path = HERE / "manifest.toml"
+    if not path.is_file():
+        return {"default_steps": 3_000_000, "examples": {}}
+    with path.open("rb") as f:
+        m = tomllib.load(f)
+    m.setdefault("default_steps", 3_000_000)
+    m.setdefault("examples", {})
+    return m
+
+
+def example_key(rom: Path) -> str:
+    """Example path relative to examples/ (the dir holding main.c)."""
+    return str(rom.parent.relative_to(REPO_ROOT / "examples"))
+
+
+def liveness(state: dict) -> tuple[bool, str]:
+    """Is the machine actually *running* (not just rendering)?
+
+    'renders' != 'works': a big PNG can be a crashed/hung/forced-blank frame.
+    The robust running signal is the NMI/VBlank handshake advancing and the CPU
+    not halted. Catches crashes, hangs and dead-NMI; does NOT catch a ROM that
+    runs but waits on an unmodelled device (e.g. Mouse/Super Scope DETECT) —
+    that's handled by the manifest's input_dependent flag, not here.
+    """
+    sch = state.get("scheduler", {})
+    cpu = state.get("cpu", {})
+    frames = sch.get("frame_count", 0)
+    nmis = sch.get("nmis_serviced", 0)
+    if cpu.get("stopped"):
+        return False, "CPU stopped (STP)"
+    if frames <= 0:
+        return False, "no PPU frames advanced"
+    if nmis <= 0:
+        return False, "no NMIs serviced (VBlank handshake dead)"
+    # NOTE: frames - nmis is the boot offset (frames before NMI was enabled),
+    # which varies by example init (audio drivers load in forced blank; GSU
+    # compute) — it is NOT lag, so we do not gate on the ratio. Catching a
+    # frozen-after-boot ROM would need a two-snapshot delta (nmis advanced
+    # between N1 and N2) — noted as future hardening.
+    return True, f"live ({frames}f/{nmis}nmi)"
 
 
 def discover_example_roms() -> list[Path]:
@@ -174,58 +219,79 @@ def run(update: bool, only: str | None) -> int:
     return 1 if failures else 0
 
 
-DEFAULT_STEPS = 3_000_000  # uniform warm-up for the whole-corpus coverage pass
+def render_state(luna: str, rom: Path, steps: int, png: Path) -> dict:
+    """Run `luna state` → return parsed EmulatorState JSON (+ write a PNG)."""
+    png.parent.mkdir(parents=True, exist_ok=True)
+    proc = subprocess.run(
+        [luna, "state", "-n", str(steps), "--out", "-", "--screenshot", str(png), str(rom)],
+        capture_output=True, text=True, timeout=300,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"luna state failed: {proc.stderr.strip()[:300]}")
+    return json.loads(proc.stdout)
 
 
 def coverage(luna: str) -> int:
-    """Run EVERY built example ROM through luna and report compatibility.
+    """Whole-corpus headless pass: does luna *run* every OpenSNES example?
 
-    Mirrors `luna bench`: a whole-corpus headless pass that answers the key
-    migration-confidence question — does luna render all OpenSNES examples?
-    Writes a markdown report; PNGs go to /tmp (not committed). A render is
-    flagged SUSPECT if its PNG is implausibly small (likely a blank frame).
+    Upgrade over the old PNG-size heuristic ('renders' != 'works'): each ROM is
+    checked for real LIVENESS from `luna state` (NMI/VBlank handshake advancing,
+    CPU not halted). Examples whose device input luna can't drive (manifest
+    input_dependent, gap G4) are reported as boot+visual only, not a clean pass.
     """
     out_dir = Path("/tmp/luna-test-corpus")
     out_dir.mkdir(parents=True, exist_ok=True)
+    manifest = load_manifest()
+    default_steps = manifest["default_steps"]
     roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
-    rows, ok, suspect, fail = [], 0, 0, 0
-    SUSPECT_BYTES = 700  # a content-free 256×224 PNG compresses tiny
+    rows, ok, inputdep, dead, fail = [], 0, 0, 0, 0
     for rom in roms:
-        label = "_".join(rom.relative_to(REPO_ROOT).with_suffix("").parts[1:])
-        png = out_dir / f"{label}.png"
+        key = example_key(rom)
+        cfg = manifest["examples"].get(key, {})
+        steps = cfg.get("steps", default_steps)
+        png = out_dir / f"{key.replace('/', '_')}.png"
         try:
-            render(luna, rom, DEFAULT_STEPS, png)
-            size = png.stat().st_size
-            if size < SUSPECT_BYTES:
-                status, suspect = "SUSPECT", suspect + 1
-            else:
-                status, ok = "OK", ok + 1
-            rows.append((label, status, f"{size} B"))
-            print(f"  {status:8} {label}  ({size} B)")
+            state = render_state(luna, rom, steps, png)
         except Exception as e:  # noqa: BLE001 — bench-style panic-safety
-            status, fail = "FAIL", fail + 1
-            rows.append((label, status, str(e)[:80]))
-            print(f"  {status:8} {label}: {str(e)[:80]}")
+            fail += 1
+            rows.append((key, "FAIL", str(e)[:80]))
+            print(f"  {'FAIL':9} {key}: {str(e)[:80]}")
+            continue
+        live, why = liveness(state)
+        if not live:
+            dead += 1
+            status = "DEAD"
+        elif cfg.get("input_dependent"):
+            inputdep += 1
+            status = "INPUT-DEP"
+        else:
+            ok += 1
+            status = "OK"
+        rows.append((key, status, why))
+        print(f"  {status:9} {key}  ({why})")
 
     report = HERE / "CORPUS_COVERAGE.md"
     lines = [
-        "# Luna corpus coverage (whole-suite headless pass)",
+        "# Luna corpus coverage (whole-suite headless liveness pass)",
         "",
-        f"luna {LUNA_VERSION} · `luna run -n {DEFAULT_STEPS}` per ROM · "
-        f"{len(roms)} ROMs · **{ok} OK, {suspect} SUSPECT (tiny/likely-blank), {fail} FAIL**",
+        f"luna {LUNA_VERSION} · `luna state -n <steps>` per ROM · {len(roms)} ROMs · "
+        f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
         "",
-        "> SUSPECT = rendered but the PNG is implausibly small (often a "
-        "title/forced-blank screen that needs scripted input, not a real bug). "
-        "FAIL = luna errored/timed out. PNGs: `/tmp/luna-test-corpus/`.",
+        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not "
+        "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
+        "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
+        "clean functional pass. **DEAD** = ran but not live (crash/hang). "
+        "**FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`.",
         "",
         "| Example | Status | Detail |",
         "|---|---|---|",
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
     report.write_text("\n".join(lines) + "\n")
-    print(f"\nCoverage: {ok} OK / {suspect} SUSPECT / {fail} FAIL of {len(roms)}.")
+    print(f"\nCoverage: {ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL "
+          f"of {len(roms)}.")
     print(f"Report: {report.relative_to(REPO_ROOT)}")
-    return 1 if fail else 0
+    return 1 if (dead or fail) else 0
 
 
 def main() -> int:
