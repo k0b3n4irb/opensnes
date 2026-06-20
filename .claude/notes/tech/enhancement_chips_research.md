@@ -51,6 +51,41 @@ battle system.
 main 65816 and SA-1. Our compiler output would work on SA-1 unmodified
 (same ISA). Just need ROM header + memory map support.
 
+## SA-1 SIWP/CIWP polarity — DISPUTED, kept at $FF (2026-06-20)
+
+Investigated the P1-3 finding (crt0 writes `$FF` to SIWP `$2229` under the
+guess "*maybe bit=1 means WRITABLE*"). **Documentation and our emulators
+flatly disagree on the polarity — and the emulators win for now.**
+
+Documentation side (says `$FF` is wrong, `$00` writable):
+- [Super Famicom Dev Wiki — SA-1 registers](https://wiki.superfamicom.org/sa-1-registers):
+  "$2229 ... 0 = Disable protection, 1 = Enable protection"; full write
+  access = `$00`.
+- [PeterLemon/SNES SNES_SA-1.INC](https://github.com/PeterLemon/SNES/blob/master/LIB/SNES_SA-1.INC)
+  names it "SA-1 I-RAM Write Protection (S-CPU Controlled)".
+
+Emulator side (says `$FF` is correct), tested in Mesen2 (our accuracy
+reference) on `sa1_hello`:
+- `$FF` → crt0 I-RAM self-test passes, `sa1_status=$A5`, `$3000=$A5`.
+- `$00` → self-test **fails**, `sa1_status=$FF`, `$3000=$DB` (the SNES-CPU
+  write to I-RAM was blocked).
+- snes9x agrees with Mesen2 (the CI suite is green with `$FF`).
+
+### LESSON (the important part)
+
+I initially trusted the wiki, flipped crt0 to `$00`, and it **broke** SA-1
+in Mesen2. Reverted to `$FF`. *Empirical test before doc-driven "fix"* — the
+project's own rule (`debugging.md`: verify in Mesen2, never guess) would
+have caught this up front. Don't flip this again without a **real SA-1
+cartridge** test that proves the wiki polarity; the crt0 self-test
+(`_sa1_iram_fail` → `sa1_status=$FF`) is the runtime safety net either way.
+
+**State:** crt0 stays at `$FF` (both sites); `KNOWN_LIMITATIONS.md`,
+`docs/hardware/REGISTERS.md`, `docs/tutorials/sa1.md` rewritten to present
+the conflict honestly instead of asserting either polarity. **Open:**
+hardware verification; and the whose-writes detail (does SIWP gate S-CPU
+or SA-1 writes?) — unresolved by primary sources.
+
 ## Next Steps
 
 - [ ] Study SuperFX memory map and cartridge header format

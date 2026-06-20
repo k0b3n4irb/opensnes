@@ -52,10 +52,21 @@ The SA-1 also sees it at **$0000-$07FF** (its direct page region).
 This is how the two CPUs communicate: the main CPU writes data to I-RAM,
 the SA-1 reads it, computes results, writes them back, and signals "done."
 
-> **Write protection gotcha**: Both CPUs have independent write protection
-> registers (SIWP at $2229, CIWP at $222A). **Bit = 1 means WRITABLE**
-> (despite the register name). The default is $00 = all protected!
-> You must write $FF to enable writes.
+> **Write protection gotcha (disputed polarity)**: Both CPUs have
+> independent write-protection registers (SIWP at $2229, CIWP at $222A).
+> The polarity is genuinely contested:
+> - The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
+>   and fullsnes say **bit = 1 PROTECTS** a 256-byte page, so `$00` = all
+>   writable, `$FF` = all protected.
+> - **Mesen2** (our accuracy reference) and **snes9x** behave the *opposite*
+>   way: writing `$FF` leaves I-RAM writable (the crt0 self-test passes,
+>   `sa1_status=$A5`); writing `$00` blocks the writes and the self-test
+>   fails.
+>
+> OpenSNES writes **`$FF`** because that is what works on the emulators we
+> test against. If you target real hardware, verify this on a cartridge —
+> the tie is unbroken. The crt0 I-RAM self-test catches a wrong choice at
+> runtime (`sa1IsReady()` returns false).
 
 ## Getting Started
 
@@ -107,9 +118,10 @@ SA1Start:
     sep #$20
     .ACCU 8
 
-    ; Enable SA-1 I-RAM writes (CRITICAL!)
+    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable on Mesen2/snes9x;
+    ; polarity is disputed vs the wiki — see the gotcha box above.
     lda #$FF
-    sta.l $00222A           ; CIWP = $FF (bit=1 = WRITABLE)
+    sta.l $00222A           ; CIWP = $FF (writable per our emulators)
 
     ; Signal ready to main CPU
     lda #$A5
@@ -320,8 +332,13 @@ Mesen2 has a dedicated SA-1 debugger:
 4. **Watch $3000** — verify the $A5 magic byte appears after boot
 
 Common issues:
-- **SA-1 PC stuck at $0000**: CIWP not set — SA-1 can't write I-RAM
-- **I-RAM reads return $FF**: SIWP not set — main CPU can't read I-RAM
+- **SA-1 PC stuck at $0000**: reset vector ($2203/$2204) wrong, or I-RAM
+  write-protection (CIWP $222A) left in the protected state so the SA-1
+  can't write its handshake — set it the same way the crt0 does (`$FF` on
+  Mesen2/snes9x; see the polarity note above)
+- **I-RAM reads return $FF**: SIWP/CIWP only gate *writes*, never reads —
+  so this is not a protection problem; the SA-1 simply hasn't written
+  I-RAM yet (not released from reset, or wrong reset vector)
 - **Counter not incrementing**: Check that `$2200` was written correctly ($00 = release)
 
 ## Examples
