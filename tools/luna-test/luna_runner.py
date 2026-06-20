@@ -50,21 +50,6 @@ HERE = Path(__file__).resolve().parent
 BASELINE_DIR = HERE / "baselines"
 LUNA_VERSION = "v0.2.0"  # pinned (decision #4)
 
-# Phase 1 first batch — representative coverage across the axes that matter:
-# basic render, sprites, scrolling map (our B1 bank-$02 case), audio driver,
-# and the two enhancement chips snes9x cannot run.
-#   steps = CPU instructions before capture. Any fixed value is fine for a
-#   deterministic baseline; pick one past boot/scene-setup for that example.
-MANIFEST = [
-    {"label": "text_hello_world",      "rom": "examples/text/hello_world/hello_world.sfc",      "steps": 1_000_000},
-    {"label": "maps_mapscroll",        "rom": "examples/maps/mapscroll/mapscroll.sfc",          "steps": 3_000_000},
-    {"label": "graphics_sprites_metasprite", "rom": "examples/graphics/sprites/metasprite/metasprite.sfc", "steps": 2_000_000},
-    {"label": "audio_snesmod_music",   "rom": "examples/audio/snesmod_music/music.sfc",         "steps": 4_000_000},
-    {"label": "memory_superfx_hello",  "rom": "examples/memory/superfx_hello/superfx_hello.sfc","steps": 3_000_000},
-    {"label": "memory_sa1_hello",      "rom": "examples/memory/sa1_hello/sa1_hello.sfc",        "steps": 3_000_000},
-]
-
-
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
@@ -161,38 +146,38 @@ def render(luna: str, rom: Path, steps: int, out_png: Path) -> None:
 
 
 def run(update: bool, only: str | None) -> int:
+    """Visual-regression over the WHOLE corpus (56 examples).
+
+    Key = SHA-256 of the rendered framebuffer PNG (byte-deterministic run-to-run).
+    Baselines: baselines/<label>.png + baselines.json (label = example path with
+    '/'→'_'). Steps come from manifest.toml (per-example override or default).
+    """
     luna = find_luna()
+    manifest = load_manifest()
+    default_steps = manifest["default_steps"]
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     manifest_path = BASELINE_DIR / "baselines.json"
     db = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
 
     failures, count = 0, 0
-    for entry in MANIFEST:
-        label = entry["label"]
+    for rom in discover_example_roms():
+        key = example_key(rom)
+        label = key.replace("/", "_")
         if only and only not in label:
             continue
         count += 1
-        rom = REPO_ROOT / entry["rom"]
-        if not rom.is_file():
-            print(f"  SKIP  {label}: ROM missing ({entry['rom']}) — build it first")
-            failures += 1
-            continue
-
+        steps = manifest["examples"].get(key, {}).get("steps", default_steps)
         baseline_png = BASELINE_DIR / f"{label}.png"
         if update:
-            render(luna, rom, entry["steps"], baseline_png)
+            render(luna, rom, steps, baseline_png)
             digest = sha256_file(baseline_png)
-            db[label] = {
-                "sha256": digest,
-                "steps": entry["steps"],
-                "rom_sha256": sha256_file(rom),
-                "luna_version": LUNA_VERSION,
-            }
-            print(f"  BASELINE  {label}  sha256={digest[:16]}…  ({baseline_png.stat().st_size} B)")
+            db[label] = {"sha256": digest, "steps": steps,
+                         "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
+            print(f"  BASELINE  {label}  {digest[:16]}…  ({baseline_png.stat().st_size} B)")
         else:
             ref = db.get(label)
             if not ref:
-                print(f"  MISS  {label}: no baseline — run with --update first")
+                print(f"  MISS  {label}: no baseline — run --update first")
                 failures += 1
                 continue
             actual_png = Path("/tmp/luna-test-actual") / f"{label}.png"
@@ -202,18 +187,15 @@ def run(update: bool, only: str | None) -> int:
                 print(f"  ERROR {label}: {e}")
                 failures += 1
                 continue
-            digest = sha256_file(actual_png)
-            if digest == ref["sha256"]:
+            if sha256_file(actual_png) == ref["sha256"]:
                 print(f"  PASS  {label}")
             else:
-                print(f"  FAIL  {label}: sha256 {digest[:16]}… != baseline {ref['sha256'][:16]}…")
-                print(f"        actual PNG kept at {actual_png} for diff")
+                print(f"  FAIL  {label}: framebuffer != baseline ({actual_png})")
                 failures += 1
 
     if update:
         manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n")
         print(f"\nWrote {manifest_path.relative_to(REPO_ROOT)} ({count} entries).")
-
     print(f"\n{'UPDATE' if update else 'COMPARE'}: {count - failures}/{count} ok"
           + (f", {failures} failed" if failures else ""))
     return 1 if failures else 0
@@ -303,8 +285,11 @@ def main() -> int:
                     help="run EVERY built example ROM and write a compatibility report")
     args = ap.parse_args()
     if args.list:
-        for e in MANIFEST:
-            print(f"  {e['label']:32} {e['rom']}  (-n {e['steps']})")
+        manifest = load_manifest()
+        for rom in discover_example_roms():
+            key = example_key(rom)
+            steps = manifest["examples"].get(key, {}).get("steps", manifest["default_steps"])
+            print(f"  {key:40} -n {steps}")
         return 0
     if args.coverage:
         return coverage(find_luna())
