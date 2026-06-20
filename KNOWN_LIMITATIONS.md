@@ -161,29 +161,17 @@ behaves differently, the init silently fails and the chip is half-configured.
 way, exercise it on real hardware before shipping. We track this in
 `memory/enhancement_chips_research.md`.
 
-### 🟢 SuperFX: snes9x does not detect the GSU chip — Mesen2-headless covers it in CI
-The opensnes-emu CI test harness runs ROMs through snes9x's libretro core
-in the main `Visual Regression` phase. For SuperFX examples, snes9x's
-chip-detection logic does not pick up the GSU from our ROM header
-configuration — the example boot path renders "GSU: NOT DETECTED" and
-the actual GSU code never runs. Visual baselines of those screenshots
-happily compare equal frame-to-frame, but the snes9x phase proves only
-"boots in snes9x", not "runs SuperFX correctly".
-
-**Mitigation (active since P3.4):** the test suite ships a separate
-`Mesen2 Visual Regression` phase
-(`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) that runs the
-vendored Mesen2 binary in `--testrunner` mode against the chip-using
-examples (currently 4 SuperFX/SA-1 ROMs). Mesen2 detects the GSU
-correctly and is the reference emulator for SuperFX. The phase is
-gated by the presence of the Mesen2 binary
-(`scripts/install-mesen2.sh` fetches it once per CI run, cached
-locally), so it is a no-op on contributor machines that haven't
-installed Mesen2 yet but mandatory in CI. Both phases together give
-SuperFX ROMs end-to-end coverage. (An earlier version of this entry
-blamed Mesen2 for a "backward-branch bug"; re-validation showed the
-original observation conflated a snes9x mis-run with a Mesen2 bug.
-Reference behaviour was Mesen2's all along.)
+### 🟢 SuperFX / SA-1 chips: covered natively (resolved by the luna migration)
+**Resolved 2026-06-20.** The previous harness (snes9x compiled to WASM) could
+not detect the GSU from our ROM header — SuperFX examples rendered "GSU: NOT
+DETECTED" and the chip code never ran, so the suite needed a separate vendored
+**Mesen2** phase under `xvfb` just for the 4 chip ROMs. The test harness now
+runs on [**luna**](https://github.com/k0b3n4irb/luna), a cycle-accurate native
+emulator that detects and executes **SA-1, Super FX (GSU) and DSP-1** directly
+(verified: `superfx_hello` → "ALL TESTS PASSED", `superfx_3d` → GSU-rendered 3D
+cube, `sa1_hello`/`sa1_starfield` → `sa1_status=$A5`). The chip-ROM side channel
+and the whole snes9x-WASM + Mesen2 + xvfb stack are gone. See
+`.claude/notes/chantiers/luna_migration.md`.
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be

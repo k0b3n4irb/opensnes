@@ -126,7 +126,10 @@ examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
 tests:
-	@echo "Tests moved to tools/opensnes-emu. Run: node tools/opensnes-emu/test/run-all-tests.mjs"
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/luna_runner.py --coverage
+	@python3 tools/luna-test/luna_runner.py --compare
+	@python3 tools/luna-test/probes/run_all.py
 
 docs:
 	cd docs && doxygen Doxyfile

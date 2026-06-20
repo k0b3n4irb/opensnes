@@ -277,8 +277,10 @@ def coverage(luna: str) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Luna visual-regression runner (Phase 1 prototype)")
+    ap = argparse.ArgumentParser(description="Luna-driven test harness for OpenSNES")
     ap.add_argument("--update", action="store_true", help="(re)write baselines instead of comparing")
+    ap.add_argument("--compare", action="store_true",
+                    help="visual regression vs baselines (the default action; explicit alias)")
     ap.add_argument("--only", metavar="SUBSTR", help="restrict to labels containing SUBSTR")
     ap.add_argument("--list", action="store_true", help="print the manifest and exit")
     ap.add_argument("--coverage", action="store_true",

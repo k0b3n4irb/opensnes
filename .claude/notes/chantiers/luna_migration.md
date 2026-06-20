@@ -78,6 +78,18 @@ Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.m
   portable; remaining ~20 `test/functional/*.test.mjs` are mechanical follow-up
   (mouse/superscope excluded — gap G4).
 
+- ✅ **Full-corpus visual regression** — `run()` unified over all 56 examples
+  (key = framebuffer PNG SHA-256, steps from manifest). `baselines/` committed
+  (56 PNGs, aarch64). `--update`/`--compare` → 56/56.
+- ✅ **DECOMMISSION (Phase 6)** — removed the `tools/opensnes-emu` submodule
+  (snes9x-WASM core + Node runner + Mesen2). Rewrote the CI `functional-tests`
+  job → luna (install-luna + coverage + probes + visual-regression; no
+  emsdk/WASM/Node/Mesen2/xvfb/ubuntu-22.04 pin; visual-regression kept
+  `continue-on-error` until x86_64 cross-arch confirmed). `make tests` → luna.
+  Disabled `benchmark.yml` (depended on the removed run-benchmark.mjs + fixture).
+  Updated CLAUDE.md, .claude/rules/testing.md (2-pillar), KNOWN_LIMITATIONS.md
+  (GSU entry resolved). **Reversible: this is on the wip branch, not merged.**
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
