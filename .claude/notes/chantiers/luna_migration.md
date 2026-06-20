@@ -65,6 +65,19 @@ Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.m
   code. Cross-arch resolved by baselining on the CI arch (= snes9x's existing
   single-build-pin model).
 
+- ✅ **WS-R 2.1 (manifest + liveness)** — `manifest.toml` (default_steps +
+  per-example overrides + `input_dependent` for mouse/superscope) ; `liveness()`
+  from `luna state` (NMI/VBlank advancing + CPU not stopped — the boot-offset
+  frames−nmis is NOT gated, a first naive ratio gate false-flagged 7 healthy
+  examples). Coverage now **54 OK / 2 INPUT-DEP / 0 DEAD / 0 FAIL** (honest, vs
+  the earlier "57/57 renders").
+- ✅ **WS-R 2.3 (functional probes)** — `tools/luna-test/probes/`: `lib.py`
+  (symbol resolution via `.sym`, scripted `--input`, WRAM via `--peek`),
+  `run_all.py`, and 2 ported probes (`controller` — input→pad_keys==mask;
+  `mapscroll` — D-pad→xloc directional). Both PASS headless on luna. Pattern is
+  portable; remaining ~20 `test/functional/*.test.mjs` are mechanical follow-up
+  (mouse/superscope excluded — gap G4).
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
