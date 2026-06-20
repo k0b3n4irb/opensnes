@@ -1,0 +1,38 @@
+{
+  "audio_snesmod_music": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "f8c46149941f3d725ed8306065d63e0bfeac4fe605c9a2199ac79a87e4ff3435",
+    "sha256": "0330031f6c4ecd8cacc8274b6a18229e5c9b18593d72bd83745630efa41d744d",
+    "steps": 4000000
+  },
+  "graphics_sprites_metasprite": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "d4bb1a738b24e56288c78c29ce05a0e345cd42a465a9b8e6011b662ef45a58fa",
+    "sha256": "59202c04ead19d733413cbef5d4097e4ee5ea60c35ec84311617a6a8263dc974",
+    "steps": 2000000
+  },
+  "maps_mapscroll": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "c12bc1cee538084381f0b15ead124242bac5f9563338b6097866cc89575cbb3c",
+    "sha256": "95843f5ddfb2757595eb036fec79bb4b54d356f9c8d034621c623c4c8052fc6e",
+    "steps": 3000000
+  },
+  "memory_sa1_hello": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "82452b06339810a7b8426112fd8fba60d01d5e51cdf075266d8973f8367491e1",
+    "sha256": "364457522f898b1b8adbb925bbc8859e4eedd2dee0fb62b80ba561e2415bd210",
+    "steps": 3000000
+  },
+  "memory_superfx_hello": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "640b7ac98174f0145d30ee4f3e6657eead70134964c434e82dcfde83efab404f",
+    "sha256": "b889f4f5f9c3831c925800d1f04b51c3d8268d2e7d2b5268e8b22715004b1dd0",
+    "steps": 3000000
+  },
+  "text_hello_world": {
+    "luna_version": "v0.2.0",
+    "rom_sha256": "10671ed625d162c33545ed273e8961f9bb6b9ef95ebf01fe531d9569ab89cae1",
+    "sha256": "1b21e1ada191e32a7d286f745e1c8271a14cfbc15882d3eab5b5900a4cceebee",
+    "steps": 1000000
+  }
+}
