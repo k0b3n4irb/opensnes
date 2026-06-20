@@ -58,10 +58,26 @@ def peek(luna: str, rom: Path, steps: int, bank: int, offset: int,
     return [int(b, 16) for b in m.group(1).split()][:count]
 
 
+def peek_byte(luna: str, rom: Path, steps: int, bank: int, offset: int,
+              input_script: str | None = None) -> int:
+    return peek(luna, rom, steps, bank, offset, 1, input_script)[0]
+
+
 def peek_word(luna: str, rom: Path, steps: int, bank: int, offset: int,
               input_script: str | None = None) -> int:
     lo, hi = peek(luna, rom, steps, bank, offset, 2, input_script)
     return lo | (hi << 8)
+
+
+def peek_sword(luna: str, rom: Path, steps: int, bank: int, offset: int,
+               input_script: str | None = None) -> int:
+    """Signed 16-bit read (two's complement) — for s16 world coords."""
+    v = peek_word(luna, rom, steps, bank, offset, input_script)
+    return v - 0x10000 if v >= 0x8000 else v
+
+
+def sym_of(rom: Path, name: str) -> tuple[int, int]:
+    return load_symbols(rom)[name]
 
 
 def rom_path(rel: str) -> Path:
