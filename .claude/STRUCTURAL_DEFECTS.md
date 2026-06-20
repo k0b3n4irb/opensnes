@@ -1168,11 +1168,60 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
   applicable.
 
 **References**:
-- `compiler/ABI.md:303-314` (pointer is 2 bytes).
+- `compiler/ABI.md` "Type sizes" table (pointer is 4 bytes post-A6/A7; the
+  16-bit *short* pointer this entry is about is the pre-A6 model — see the
+  investigation log re: which helpers still assume bank `$00`).
 - `lib/include/snes/dma.h` (existing `*Bank` variants).
 - `KNOWN_LIMITATIONS.md` "Bank `$00` ROM overflow".
 - `.claude/rules/bank0_budget.md` (the ratchet policy).
 - 2026-05-07 audit § 8 / § 15-#3 / § 11 (the bank-`$00`-tightness map).
+
+**Investigation log — 2026-06-20 (P1-2 from the engine review):**
+
+Measured the 11 currently-tight examples (all report **exactly 12 bytes
+free**: `likemario`, `mapandobjects`, `tetris`, `continuous_scroll`,
+`mode5`, `mode7`, `mode7_perspective`, `window`, `mapscroll`, `slopemario`,
+`tiled`). Two findings refine — but do **not** invalidate — this entry:
+
+1. **The uniform "12 bytes" is partly a measurement artifact.** In every
+   tight example the *highest* bank-`$00` symbol is a `__opensnes_force_emit_*`
+   anchor sitting at `$FFF0` (or `$FFE0`). These are inert `const` function
+   pointers (4 bytes, nothing reads them at runtime); WLA's SUPERFREE
+   allocator tucks them into the **unused gaps of the interrupt-vector
+   table** ($FFE0-$FFE3, $FFF0-$FFF3). `symmap.py`
+   (`check_bank0_rom_overflow`, line ~347) then computes
+   `free = 0x10000 - (highest + size) = 0x10000 - 0xFFF4 = 12`, i.e. it
+   measures to the **top of the bank**, ignoring the 64-byte header/vector
+   reservation ($FFC0-$FFFF) and getting anchored to a vector-gap symbol.
+   So "12" is really "the leftover of the vector-table region," not a
+   general-allocation headroom figure.
+
+2. **But bank `$00` is genuinely near-full anyway.** Excluding the anchors,
+   the highest *real* code/data symbol is already at ~`$FFB6`-`$FFB8` (just
+   below the `$FFC0` header), and the linker has spilled other force-emit
+   anchors (`getFrameCount`, `scopeCalibrate`, …) all the way to **bank
+   `$02`** — proof that no 4-byte gap remained in bank `$00` *or* `$01`. The
+   packing is real; the artifact only explains why the *number* is a
+   suspiciously-uniform 12.
+
+**Consequences for the fix:**
+- The silent-corruption risk is correctly gated by the *separate* spill
+  check (const data in bank `$01+`), which is unaffected by the artifact.
+  The "free < threshold" ratchet is a secondary proxy; its number is
+  cosmetically wrong but errs **safe** (alarms early).
+- Two cheap, independent sub-tasks worth splitting out of the 2-3 week B1:
+  (a) **symmap metric honesty** — measure free against the header start
+  ($FFC0) and/or exclude vector-region anchors from `highest`, so the
+  reported number reflects real allocatable headroom. Caution: this shifts
+  every example's reported "free" and may flip ratchet status — re-tune
+  `BANK0_FAIL_THRESHOLD`/`--warn-threshold` in the same change.
+  (b) **route force-emit anchors out of bank `$00`** — they're inert, so
+  unlike the abandoned all-`emitdat`-to-bank-1 attempt (2026-05-14) they
+  can move without touching real const data. Needs a way to bias *only*
+  the `__opensnes_force_emit_*` SUPERFREE sections to high banks.
+- The headline B1 fix (24-bit `*Bank` helper variants so user assets leave
+  bank `$00`) remains the real win for user-facing ROMs; the above only
+  buys SDK-example headroom and metric clarity.
 
 ---
 
