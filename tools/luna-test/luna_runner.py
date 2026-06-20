@@ -68,6 +68,9 @@ def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
         return env
+    installed = HERE / "bin" / "luna"  # scripts/install-luna.sh target
+    if installed.is_file():
+        return str(installed)
     on_path = shutil.which("luna")
     if on_path:
         return on_path
@@ -75,9 +78,24 @@ def find_luna() -> str:
     if vendored.is_file():
         return str(vendored)
     sys.exit(
-        "ERROR: luna binary not found. Set $LUNA_BIN, put `luna` on PATH, or "
-        f"vendor it under tools/luna-test/vendor/. Expected luna {LUNA_VERSION}."
+        "ERROR: luna binary not found. Run scripts/install-luna.sh, set $LUNA_BIN, "
+        f"or put `luna` on PATH. Expected luna {LUNA_VERSION}."
     )
+
+
+def discover_example_roms() -> list[Path]:
+    """Canonical corpus = one ROM per example *that has a main.c* (N_corpus=56).
+
+    Discovering via main.c (not a loose `*.sfc` glob) excludes stale build
+    residue like the source-less examples/graphics/effects/hdma_gradient/ that
+    inflated an earlier `.sfc` count to 57. One .sfc is expected per example dir.
+    """
+    roms: list[Path] = []
+    for main_c in sorted(REPO_ROOT.glob("examples/**/main.c")):
+        sfcs = sorted(main_c.parent.glob("*.sfc"))
+        if sfcs:
+            roms.append(sfcs[0])
+    return roms
 
 
 def sha256_file(path: Path) -> str:
@@ -169,7 +187,7 @@ def coverage(luna: str) -> int:
     """
     out_dir = Path("/tmp/luna-test-corpus")
     out_dir.mkdir(parents=True, exist_ok=True)
-    roms = sorted(REPO_ROOT.glob("examples/**/*.sfc"))
+    roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
     rows, ok, suspect, fail = [], 0, 0, 0
     SUSPECT_BYTES = 700  # a content-free 256×224 PNG compresses tiny
     for rom in roms:

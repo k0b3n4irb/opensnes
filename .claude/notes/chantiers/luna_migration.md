@@ -51,6 +51,20 @@ Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.m
   cube), mode7 (PVSnesLib logo). `input_mouse`/`input_superscope` render fine —
   only their device *input* is uncovered (decision #2).
 
+- ✅ **J0 prerequisites (P1-P3)** — `tools/luna-test/luna.version` (=v0.2.0),
+  `scripts/install-luna.sh` (download+SHA-256+install to `bin/luna`, honours
+  `$LUNA_BIN` for local-luna co-dev), runner resolves `bin/luna`. **N_corpus
+  reconciled = 56** (git-tracked `main.c`). Finding: `examples/graphics/effects/
+  hdma_gradient/` is **stale build residue** (no tracked `main.c`/`Makefile`) that
+  inflated the earlier `.sfc` count to 57 — runner now discovers via `main.c`, so
+  the phantom is excluded (56/56). The dir should be `rm`'d at some point.
+- **Plan of record:** `/tmp/luna_migration_FINAL_2026-06-20.md`. Architecture
+  CLOSED → Option B (Python runner + pinned native binary, no submodule, no WASM).
+  WS-L luna features (G1 `framebuffer_hash` CLI / G2 `--assert` / G3 `$21FC`/WDM)
+  are **optional enhancements, not gates** — migration + cutover need zero luna
+  code. Cross-arch resolved by baselining on the CI arch (= snes9x's existing
+  single-build-pin model).
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines

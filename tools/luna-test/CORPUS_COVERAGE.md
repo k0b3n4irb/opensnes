@@ -1,6 +1,6 @@
 # Luna corpus coverage (whole-suite headless pass)
 
-luna v0.2.0 · `luna run -n 3000000` per ROM · 57 ROMs · **57 OK, 0 SUSPECT (tiny/likely-blank), 0 FAIL**
+luna v0.2.0 · `luna run -n 3000000` per ROM · 56 ROMs · **56 OK, 0 SUSPECT (tiny/likely-blank), 0 FAIL**
 
 > SUSPECT = rendered but the PNG is implausibly small (often a title/forced-blank screen that needs scripted input, not a real bug). FAIL = luna errored/timed out. PNGs: `/tmp/luna-test-corpus/`.
 
@@ -33,7 +33,6 @@ luna v0.2.0 · `luna run -n 3000000` per ROM · 57 ROMs · **57 OK, 0 SUSPECT (t
 | `graphics_backgrounds_mode7_perspective_mode7_perspective` | OK | 38224 B |
 | `graphics_effects_fading_fading` | OK | 2487 B |
 | `graphics_effects_gradient_colors_gradient_colors` | OK | 2743 B |
-| `graphics_effects_hdma_gradient_hdma_gradient` | OK | 2515 B |
 | `graphics_effects_hdma_helpers_hdma_helpers` | OK | 5014 B |
 | `graphics_effects_hdma_wave_hdma_wave` | OK | 1499 B |
 | `graphics_effects_mosaic_mosaic` | OK | 2487 B |
