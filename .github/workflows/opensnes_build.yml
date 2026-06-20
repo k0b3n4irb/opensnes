@@ -245,6 +245,9 @@ jobs:
           export OPENSNES_HOME=$(pwd)
           make
 
+      - name: Compiler C→ASM pattern checks
+        run: python3 devtools/compiler-tests/run.py
+
       - name: Install luna (pinned binary)
         env:
           GH_TOKEN: ${{ github.token }}

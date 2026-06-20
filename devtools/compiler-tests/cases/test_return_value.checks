@@ -1,0 +1,3 @@
+# return value preserved across stack-frame teardown via tax/txa
+present \btax\b
+present \btxa\b

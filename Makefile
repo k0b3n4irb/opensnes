@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -125,11 +125,15 @@ lib: compiler
 examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
-tests:
+tests: test-compiler
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+
+# Compile-time cc65816 C→ASM pattern checks (no emulator needed).
+test-compiler:
+	@python3 devtools/compiler-tests/run.py
 
 docs:
 	cd docs && doxygen Doxyfile
