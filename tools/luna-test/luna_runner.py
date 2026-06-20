@@ -156,16 +156,74 @@ def run(update: bool, only: str | None) -> int:
     return 1 if failures else 0
 
 
+DEFAULT_STEPS = 3_000_000  # uniform warm-up for the whole-corpus coverage pass
+
+
+def coverage(luna: str) -> int:
+    """Run EVERY built example ROM through luna and report compatibility.
+
+    Mirrors `luna bench`: a whole-corpus headless pass that answers the key
+    migration-confidence question — does luna render all OpenSNES examples?
+    Writes a markdown report; PNGs go to /tmp (not committed). A render is
+    flagged SUSPECT if its PNG is implausibly small (likely a blank frame).
+    """
+    out_dir = Path("/tmp/luna-test-corpus")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    roms = sorted(REPO_ROOT.glob("examples/**/*.sfc"))
+    rows, ok, suspect, fail = [], 0, 0, 0
+    SUSPECT_BYTES = 700  # a content-free 256×224 PNG compresses tiny
+    for rom in roms:
+        label = "_".join(rom.relative_to(REPO_ROOT).with_suffix("").parts[1:])
+        png = out_dir / f"{label}.png"
+        try:
+            render(luna, rom, DEFAULT_STEPS, png)
+            size = png.stat().st_size
+            if size < SUSPECT_BYTES:
+                status, suspect = "SUSPECT", suspect + 1
+            else:
+                status, ok = "OK", ok + 1
+            rows.append((label, status, f"{size} B"))
+            print(f"  {status:8} {label}  ({size} B)")
+        except Exception as e:  # noqa: BLE001 — bench-style panic-safety
+            status, fail = "FAIL", fail + 1
+            rows.append((label, status, str(e)[:80]))
+            print(f"  {status:8} {label}: {str(e)[:80]}")
+
+    report = HERE / "CORPUS_COVERAGE.md"
+    lines = [
+        "# Luna corpus coverage (whole-suite headless pass)",
+        "",
+        f"luna {LUNA_VERSION} · `luna run -n {DEFAULT_STEPS}` per ROM · "
+        f"{len(roms)} ROMs · **{ok} OK, {suspect} SUSPECT (tiny/likely-blank), {fail} FAIL**",
+        "",
+        "> SUSPECT = rendered but the PNG is implausibly small (often a "
+        "title/forced-blank screen that needs scripted input, not a real bug). "
+        "FAIL = luna errored/timed out. PNGs: `/tmp/luna-test-corpus/`.",
+        "",
+        "| Example | Status | Detail |",
+        "|---|---|---|",
+    ]
+    lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
+    report.write_text("\n".join(lines) + "\n")
+    print(f"\nCoverage: {ok} OK / {suspect} SUSPECT / {fail} FAIL of {len(roms)}.")
+    print(f"Report: {report.relative_to(REPO_ROOT)}")
+    return 1 if fail else 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Luna visual-regression runner (Phase 1 prototype)")
     ap.add_argument("--update", action="store_true", help="(re)write baselines instead of comparing")
     ap.add_argument("--only", metavar="SUBSTR", help="restrict to labels containing SUBSTR")
     ap.add_argument("--list", action="store_true", help="print the manifest and exit")
+    ap.add_argument("--coverage", action="store_true",
+                    help="run EVERY built example ROM and write a compatibility report")
     args = ap.parse_args()
     if args.list:
         for e in MANIFEST:
             print(f"  {e['label']:32} {e['rom']}  (-n {e['steps']})")
         return 0
+    if args.coverage:
+        return coverage(find_luna())
     return run(args.update, args.only)
 
 

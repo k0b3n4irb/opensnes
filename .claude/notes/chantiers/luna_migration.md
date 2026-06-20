@@ -40,6 +40,17 @@ Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.m
   pass/fail. 6/6 baseline + 6/6 compare PASS; negative control (tampered hash)
   → FAIL rc=1. Baselines in `tools/luna-test/baselines/`.
 
+- ✅ **Corpus coverage (branch `wip/luna-migration-corpus`)** — `luna_runner.py
+  --coverage` runs every built example ROM headless and writes
+  `tools/luna-test/CORPUS_COVERAGE.md`. Result: **57/57 OK, 0 SUSPECT, 0 FAIL**
+  — luna renders 100% of the OpenSNES example suite (all BG modes 0/1/3/5/7 +
+  mode7-perspective, HDMA gradient/wave/helpers, both SuperFX demos incl. a 3D
+  wireframe cube, both SA-1 demos, HiROM, all games/sprites/audio/input). The
+  GSU examples snes9x could never run are fully rendered. Spot-checked visually:
+  mapscroll (bank-$02 map), superfx_hello (ALL TESTS PASSED), superfx_3d (3D
+  cube), mode7 (PVSnesLib logo). `input_mouse`/`input_superscope` render fine —
+  only their device *input* is uncovered (decision #2).
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
