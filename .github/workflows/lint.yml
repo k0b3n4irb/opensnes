@@ -79,11 +79,13 @@ jobs:
       - name: Run check_doc_drift.py
         # Anchored claims that drift behind code: version macros in
         # lib/include/snes.h, ROADMAP "Current Status: post-vX.Y.Z" line,
-        # and "<N> examples" counts in active rule files. Caught
-        # historically as v0.1.0-dev macro stuck while the project shipped
-        # v0.16.0; "post-v0.13.0" ROADMAP three minors behind; and "53
-        # examples" sticking after v0.16.0 added the 54th. Fix policy lives
-        # in .claude/rules/doc_consistency.md.
+        # "<N> examples" counts in active rule files, and ABI prototypes in
+        # compiler/ABI.md vs lib/include/snes/*.h. Caught historically as
+        # v0.1.0-dev macro stuck while the project shipped v0.16.0;
+        # "post-v0.13.0" ROADMAP three minors behind; "53 examples" sticking
+        # after v0.16.0 added the 54th; and the oamSet worked example pinning
+        # a stale 6-arg signature. Fix policy lives in
+        # .claude/rules/doc_consistency.md.
         run: python3 devtools/check_doc_drift.py
 
   nmi-race-tests:
