@@ -1223,6 +1223,61 @@ free**: `likemario`, `mapandobjects`, `tetris`, `continuous_scroll`,
   bank `$00`) remains the real win for user-facing ROMs; the above only
   buys SDK-example headroom and metric clarity.
 
+**Increment 1 — 2026-06-20 (`wip/b1-bank0-pointers`):**
+
+Audited the map path end-to-end (the worst bank-`$00` offender: BG1 maps
+are 18-25 KB and several examples pinned them to bank `$00`). Findings:
+
+- Post-A6/A7 the pointer ABI is **already 4-byte / bank-carrying**, and
+  `mapLoad`'s *load-time* path is already bank-aware (it reads the bank
+  byte of `layer1map`/`layertiles`/`tilesprop` and DMAs `layertiles` +
+  `tilesprop` into `$7E` WRAM from any bank).
+- **The one remaining lib offender**: the *runtime* scroll/query readers
+  (`_mapDAS1`, `_phb1`, `_pvb1`, `mapGetMetaTile`, `mapGetMetaTilesProp`
+  in `lib/source/map.asm`) hardcoded `lda #$00 / pha / plb` to force
+  DB=`$00` before `lda 0,x` — so the layer-1 map *had* to live in bank
+  `$00` even though its bank byte was already stored in `maptile_L1b`.
+  **Fixed**: all 5 sites now `lda maptile_L1b` (honour the stored bank).
+  Backward-compatible — an example whose map stays in bank `$00` has
+  `maptile_L1b=$00`, identical behaviour. Whole suite 293/293 unchanged.
+- **Proven end-to-end** on `maps/mapscroll`: pinned its 25 KB map +
+  tileset data to bank `2` (`data.asm` `.section ".rodata2" semifree
+  bank 2`). Bank `$00` free went **12 → 17093 bytes**; visual regression
+  (incl. the Mesen2 phase + scrolling) stayed pixel-identical.
+
+**Remaining for B1 (not yet done):**
+1. The same per-example data relocation for the other `mapLoad` users.
+   **Done**: `maps/mapscroll` (25 KB → bank 2) and `maps/tiled` (13 KB →
+   bank 2). **Remaining**: `mapandobjects`, `slopemario` also read the map
+   via **C pointers** (see #2), so they can't move until that's resolved.
+2. **C-level pointer-deref of ROM** (`games/likemario` does
+   `map_data = (u16*)mapmario; … map_data[i]`). **Resolved 2026-06-20 —
+   it's a compiler-codegen wall, split into its own sub-chantier.**
+   Disassembled `map_get_tile_prop` in `likemario`'s `main.c.asm`:
+   - Reading a *fixed-address* global pointer array IS bank-aware —
+     `map_row_ptrs[ty]` builds a 24-bit pointer (`#:map_row_ptrs` for the
+     bank) and uses `lda [tcc__r9]`.
+   - But dereferencing a *runtime* pointer value is **hardcoded to bank
+     `$00`**: `… tax / lda.l $0000,x` for both `map_row_ptrs[ty][tx]` and
+     `tile_props[…]`. Only the low 16 bits of the (4-byte, post-A6)
+     pointer are used; the bank byte is discarded at the load.
+   So `*ptr` / `ptr[i]` on ROM data always reads bank `$00`, regardless of
+   the pointer's stored bank. This is the same root behaviour as the
+   documented "`sta.l $0000,x` always reads bank `$00`" constraint (see
+   B2) applied to *reads through a runtime pointer*. Consequence:
+   `likemario`, `mapandobjects`, `slopemario` (which read the map via C
+   pointers, not `mapLoad`'s runtime) **cannot** move their map out of
+   bank `$00` until cc65816/QBE emits a bank-aware load for runtime
+   pointer derefs (use the pointer's bank byte → `lda [dp],y` long
+   indirect). That is a **compiler** change, not a lib or data-section
+   one — track it as a Category-A/B-adjacent codegen sub-chantier, shared
+   root with B2.
+3. A non-fragile bank-assignment policy (hand-picking `bank N` per example
+   collides as ROMs grow — the multi-bank-fallback problem from the parent
+   entry). Until then, per-example pins are acceptable for SDK examples.
+4. Re-tune `BANK0_FAIL_THRESHOLD` / `--warn-threshold` once the tight
+   examples have real headroom, and fix the symmap metric (sub-task a).
+
 ---
 
 #### B2. C RAM forced below `$2000` 🔴
