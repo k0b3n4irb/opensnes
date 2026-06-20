@@ -41,7 +41,9 @@ def load_symbols(rom: Path) -> dict[str, tuple[int, int]]:
     return out
 
 
-_PEEK_RE = re.compile(r"\$[0-9A-Fa-f]{6}\s+((?:[0-9A-Fa-f]{2}\s*)+)")
+# Each peek dump line is "$AABBCC  XX XX …" (≤16 bytes). A multi-byte peek
+# spans several such lines, so collect bytes from ALL of them.
+_PEEK_LINE_RE = re.compile(r"\$[0-9A-Fa-f]{6}\s+((?:[0-9A-Fa-f]{2}\s*)+)")
 
 
 def peek(luna: str, rom: Path, steps: int, bank: int, offset: int,
@@ -52,10 +54,34 @@ def peek(luna: str, rom: Path, steps: int, bank: int, offset: int,
     if input_script:
         cmd[6:6] = ["--input", input_script]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-    m = _PEEK_RE.search(proc.stderr)
-    if not m:
-        raise RuntimeError(f"peek parse failed for {rom.name}: {proc.stderr.strip()[:200]}")
-    return [int(b, 16) for b in m.group(1).split()][:count]
+    out: list[int] = []
+    for m in _PEEK_LINE_RE.finditer(proc.stderr):
+        out += [int(b, 16) for b in m.group(1).split()]
+    if len(out) < count:
+        raise RuntimeError(f"peek parse failed for {rom.name} "
+                           f"(got {len(out)}/{count}): {proc.stderr.strip()[:200]}")
+    return out[:count]
+
+
+def dump_vram(luna: str, rom: Path, steps: int) -> bytes:
+    """Run `luna state --dump-vram` and return the raw 64 KB VRAM bytes."""
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".vram") as tf:
+        proc = subprocess.run(
+            [luna, "state", "-n", str(steps), "--out", "/dev/null",
+             "--dump-vram", tf.name, str(rom)],
+            capture_output=True, text=True, timeout=300)
+        if proc.returncode != 0:
+            raise RuntimeError(f"dump-vram failed: {proc.stderr.strip()[:200]}")
+        return Path(tf.name).read_bytes()
+
+
+def cgram_words(luna: str, rom: Path, steps: int) -> list[int]:
+    """Return CGRAM as 256 15-bit colour words (from `luna state` JSON ppu.cgram)."""
+    cmd = [luna, "state", "-n", str(steps), "--out", "-", str(rom)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    import json as _json
+    return _json.loads(proc.stdout)["ppu"]["cgram"]
 
 
 def peek_byte(luna: str, rom: Path, steps: int, bank: int, offset: int,
@@ -78,6 +104,18 @@ def peek_sword(luna: str, rom: Path, steps: int, bank: int, offset: int,
 
 def sym_of(rom: Path, name: str) -> tuple[int, int]:
     return load_symbols(rom)[name]
+
+
+_SIZE_RE = re.compile(r"^([0-9A-Fa-f]{8})\s+_sizeof_(\S+)")
+
+
+def sym_size(rom: Path, name: str) -> int:
+    """`_sizeof_<name>` from the .sym (wlalink emits one per data symbol)."""
+    for line in rom.with_suffix(".sym").read_text().splitlines():
+        m = _SIZE_RE.match(line)
+        if m and m.group(2) == name:
+            return int(m.group(1), 16)
+    raise KeyError(f"_sizeof_{name} not in {rom.name}.sym")
 
 
 def rom_path(rel: str) -> Path:
