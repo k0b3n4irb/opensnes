@@ -134,9 +134,9 @@ jobs:
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       # ------------------------------------ #
-      # Tests (moved to opensnes-emu)        #
+      # Tests (luna harness, see make tests) #
       # ------------------------------------ #
-      # Full test suite: node tools/opensnes-emu/test/run-all-tests.mjs
+      # Full test suite: make tests   (luna coverage + visual + probes)
       # CI validates build success only. Symmap overlap check on built examples:
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'

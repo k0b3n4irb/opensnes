@@ -90,6 +90,26 @@ Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.m
   Updated CLAUDE.md, .claude/rules/testing.md (2-pillar), KNOWN_LIMITATIONS.md
   (GSU entry resolved). **Reversible: this is on the wip branch, not merged.**
 
+- ✅ **Doc sweep** — updated user/contributor/normative docs off the old harness:
+  README, CONTRIBUTING, ROADMAP (test-suite desc + P3.4 superseded note),
+  PHILOSOPHY, docs/GETTING_STARTED, docs/BENCHMARK (disabled banner),
+  docs/tutorials/{superfx,sram}, tools/README, `.claude/rules/{compiler,release,
+  regression_method,doc_consistency,abi_lint,new_example,testing}.md`,
+  .github/{pull_request_template,workflows/release.yml}, and the superfx_3d /
+  superfx_hello example READMEs (added a luna ✅ row). `make lint-docs` green.
+  Left intentionally: `.claude/notes/**` + CHANGELOG (history), `docs/build/`
+  (generated), user-facing "open in Mesen2 (recommended)" lines and the snes9x
+  emulator-list entry (legit user advice), and the kept snes9x "❌ GSU" rows.
+
+## ⚠️ Coverage regression introduced by the decommission
+
+Removing `opensnes-emu` also removed the **60 C→ASM compiler-pattern checks**
+(`tools/opensnes-emu/test/compiler/`) and the **cycle-count benchmark**
+(`run-benchmark.mjs` + `bench_functions.c`). The luna harness covers runtime
+(coverage/visual/probes) but NOT these compile-time checks. **Re-home both into
+the repo** (e.g. `devtools/`), independent of the emulator — high priority
+follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
