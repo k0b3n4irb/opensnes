@@ -140,6 +140,8 @@ follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
   on `--dma-trace` for the exact per-VBlank budget). Plan:
   `/tmp/luna_test_hardening_ideas.md` (H1/H3/H4/H6/H8–H12 remain).
 
+- ✅ **Test hardening batch 2 (2026-06-21):** **H8** (`probes/vram_aram.py` — VRAM/ARAM content: tiles/SPC-driver actually uploaded) + **H9** (`probes/oam_struct.py` — decoded sprite structure via `assets-dump` oam.json). Probes 10/10. **H1/H3** (VRAM-outside-VBlank, NMI WRAM-port detectors) are **blocked on luna L14** (address-range `--mem-trace` filter — bank-00 trace floods with ROM code fetches); filed. H4 dropped (redundant with dma_cgram).
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
