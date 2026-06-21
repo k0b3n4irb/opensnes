@@ -5,7 +5,7 @@
 # its SHA-256, and installs it locally. luna is consumed as a *pinned binary*,
 # not a submodule (see /tmp/luna_migration_FINAL_2026-06-20.md §0bis).
 #
-#   - Version pin:   tools/luna-test/luna.version  (e.g. "v0.2.0")
+#   - Version pin:   tools/luna-test/luna.version  (e.g. "v0.3.0")
 #   - Install path:  tools/luna-test/bin/luna      (gitignored)
 #   - Dev override:  $LUNA_BIN  → if set to an existing file, skip the download
 #                    and use that binary (local luna build for co-development).

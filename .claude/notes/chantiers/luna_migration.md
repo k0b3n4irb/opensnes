@@ -110,6 +110,16 @@ Removing `opensnes-emu` also removed the **60 C→ASM compiler-pattern checks**
 the repo** (e.g. `devtools/`), independent of the emulator — high priority
 follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
 
+- ✅ **Bumped pin v0.2.0 → v0.3.0 (2026-06-21).** Most luna feature requests
+  (`/tmp/luna_feature_requests.md`) landed: `--print-fbhash` (L1),
+  `--assert`/`--assert-aram`/`--assert-vram` (L2), `$21FC` Nocash + `WDM` capture
+  (L3), `--cpu-trace`/`--dma-trace`/`--mem-trace-bank` (L5), `--srm` (L6).
+  **Still missing: L4 Mouse + Super Scope.** Suite green on v0.3.0 with NO
+  re-baseline (v0.2.0 baselines byte-identical under v0.3.0): coverage 54 OK /
+  2 INPUT-DEP, visual 56/56, probes 6/6. Follow-ups now unblocked by v0.3.0:
+  switch the baseline key to `--print-fbhash` (cross-arch, L1); add `--assert`/
+  `$21FC` probe oracles; re-home the cycle benchmark via `--cpu-trace`.
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines

@@ -13,7 +13,7 @@ deterministic framebuffer, then:
                   tools/luna-test/baselines/.
   * default     : re-renders and compares the framebuffer SHA-256 against the
                   stored baseline → pass/fail (the runner computes the
-                  verdict; luna has no --assert flag yet, decision #3).
+                  verdict via framebuffer SHA-256; luna v0.3.0 also offers --assert for WRAM).
 
 Why hashing the PNG is sound: luna's headless framebuffer render is
 byte-deterministic run-to-run (verified in the Phase 0 spike — identical PNG
@@ -48,7 +48,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 HERE = Path(__file__).resolve().parent
 BASELINE_DIR = HERE / "baselines"
-LUNA_VERSION = "v0.2.0"  # pinned (decision #4)
+LUNA_VERSION = "v0.3.0"  # pinned (decision #4)
 
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
