@@ -260,11 +260,11 @@ jobs:
         run: python3 tools/luna-test/probes/run_all.py
 
       - name: Visual regression
-        # Baselines are committed (captured on aarch64). On the x86_64 runner
-        # this step also validates cross-arch framebuffer byte-stability.
-        # Kept soft until that is confirmed; if it diverges, regenerate with
-        # `luna_runner.py --update` on x86_64 and commit, then drop this flag.
-        continue-on-error: true
+        # Keyed on luna's `--print-fbhash` (a hash of the pre-PNG pixels luna
+        # documents as cross-architecture-stable), so aarch64-captured baselines
+        # are expected to match on this x86_64 runner — the step is blocking.
+        # (If a luna release ever breaks fbhash cross-arch, that's a luna bug;
+        # regenerate baselines with `luna_runner.py --update` meanwhile.)
         run: python3 tools/luna-test/luna_runner.py --compare
 
       - name: Upload luna artifacts on failure

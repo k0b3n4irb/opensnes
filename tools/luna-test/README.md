@@ -48,16 +48,15 @@ framebuffer key (see the cross-arch note below).
 Baselines live in `baselines/`: `<label>.png` + a single `baselines.json`
 manifest (`sha256`, `steps`, `rom_sha256`, `luna_version`).
 
-## ⚠️ Open validation item — cross-machine / cross-arch byte-stability
+## Cross-arch baseline key
 
-The baselines committed here were generated with the **aarch64** v0.3.0 binary,
-keyed on the SHA-256 of the encoded PNG. Run-to-run determinism is verified, and
-v0.2.0→v0.3.0 produced byte-identical baselines (no re-baseline on the bump).
-**Cross-arch (x86_64 ↔ aarch64) byte-identity is the remaining check** (the CI
-runs the visual step `continue-on-error` until confirmed). luna v0.3.0 now ships
-`--print-fbhash` (`fbhash=<hex>`) — a hash of the pre-PNG pixels described as
-cross-architecture-stable — so the clean fix is to switch the runner's key from
-the PNG hash to `--print-fbhash`; do that once a multi-arch CI run confirms it.
+The regression key is luna's **`--print-fbhash`** (v0.3.0) — a hash of the
+pre-PNG pixels luna documents as **cross-architecture-stable**. So the baselines
+committed here (captured on aarch64) are expected to match on the x86_64 CI
+runner, and the CI visual step is a **hard gate** (no `continue-on-error`). The
+PNG is kept only for human diffing, not hashed. If a future luna release ever
+breaks fbhash cross-arch stability, that's a luna bug — regenerate baselines with
+`luna_runner.py --update` on the CI arch as a stopgap and report it.
 
 ## Not yet migrated (tracked in the chantier note)
 

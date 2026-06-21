@@ -7,19 +7,19 @@ Part of the migration off snes9x-WASM + Mesen2 onto luna
 
 What it does
 ------------
-For each example in MANIFEST it drives the headless `luna` CLI to render a
+For each discovered example it drives the headless `luna` CLI to render a
 deterministic framebuffer, then:
-  * `--update`  : writes the baseline (PNG + SHA-256 + provenance) to
-                  tools/luna-test/baselines/.
-  * default     : re-renders and compares the framebuffer SHA-256 against the
-                  stored baseline → pass/fail (the runner computes the
-                  verdict via framebuffer SHA-256; luna v0.3.0 also offers --assert for WRAM).
+  * `--update`  : writes the baseline (fbhash + provenance) to
+                  tools/luna-test/baselines/ (+ the PNG for human diffing).
+  * default     : re-renders and compares luna's `--print-fbhash` against the
+                  stored baseline → pass/fail.
 
-Why hashing the PNG is sound: luna's headless framebuffer render is
-byte-deterministic run-to-run (verified in the Phase 0 spike — identical PNG
-bytes across two runs), so a SHA-256 of the PNG is a stable, drift-free
-regression key. The PNG itself is kept alongside for human diffing
-(decision #1: "both" — hash gate + PNG debug).
+The regression key is luna's `--print-fbhash` — a hash of the *pre-PNG* pixels
+that luna documents as cross-architecture-stable. That makes aarch64-captured
+baselines match on an x86_64 CI runner (immune to PNG-encoder drift), so the
+visual step is a hard gate. The PNG is still written alongside for human diffing
+(decision #1: "both" — fbhash gate + PNG debug). For direct WRAM/VRAM/ARAM
+assertions, luna v0.3.0 offers `--assert` (used by the probes in probes/).
 
 luna binary resolution order: $LUNA_BIN, then `luna` on PATH, then the
 vendored extract under tools/luna-test/vendor/.
@@ -39,6 +39,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -134,15 +135,22 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def render(luna: str, rom: Path, steps: int, out_png: Path) -> None:
-    """Render a deterministic framebuffer PNG for `rom` after `steps` instructions."""
+def render(luna: str, rom: Path, steps: int, out_png: Path) -> str:
+    """Render `rom` after `steps`: write the PNG (for human diffing) and return
+    luna's `--print-fbhash` — a hash of the pre-PNG pixels that luna documents as
+    cross-architecture-stable, so it's the regression key (immune to PNG-encoder
+    drift, unlike hashing the encoded PNG)."""
     out_png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
-        [luna, "run", "-n", str(steps), "--screenshot", str(out_png), str(rom)],
+        [luna, "run", "-n", str(steps), "--print-fbhash", "--screenshot", str(out_png), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out_png.is_file():
         raise RuntimeError(f"luna run failed for {rom.name}: {proc.stderr.strip()[:400]}")
+    m = re.search(r"fbhash=([0-9a-fA-F]+)", proc.stdout)
+    if not m:
+        raise RuntimeError(f"no fbhash from luna for {rom.name}: {proc.stdout.strip()[:200]}")
+    return m.group(1)
 
 
 def run(update: bool, only: str | None) -> int:
@@ -169,11 +177,10 @@ def run(update: bool, only: str | None) -> int:
         steps = manifest["examples"].get(key, {}).get("steps", default_steps)
         baseline_png = BASELINE_DIR / f"{label}.png"
         if update:
-            render(luna, rom, steps, baseline_png)
-            digest = sha256_file(baseline_png)
-            db[label] = {"sha256": digest, "steps": steps,
+            fbhash = render(luna, rom, steps, baseline_png)
+            db[label] = {"fbhash": fbhash, "steps": steps,
                          "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
-            print(f"  BASELINE  {label}  {digest[:16]}…  ({baseline_png.stat().st_size} B)")
+            print(f"  BASELINE  {label}  fbhash={fbhash}")
         else:
             ref = db.get(label)
             if not ref:
@@ -182,15 +189,15 @@ def run(update: bool, only: str | None) -> int:
                 continue
             actual_png = Path("/tmp/luna-test-actual") / f"{label}.png"
             try:
-                render(luna, rom, ref["steps"], actual_png)
+                fbhash = render(luna, rom, ref["steps"], actual_png)
             except RuntimeError as e:
                 print(f"  ERROR {label}: {e}")
                 failures += 1
                 continue
-            if sha256_file(actual_png) == ref["sha256"]:
+            if fbhash == ref.get("fbhash"):
                 print(f"  PASS  {label}")
             else:
-                print(f"  FAIL  {label}: framebuffer != baseline ({actual_png})")
+                print(f"  FAIL  {label}: fbhash {fbhash} != baseline {ref.get('fbhash')} ({actual_png})")
                 failures += 1
 
     if update:
