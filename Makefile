@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests test-compiler submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -134,6 +134,10 @@ tests: test-compiler
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
+
+# Compiler cycle-count regression guard (static estimate vs committed baseline).
+bench:
+	@python3 devtools/cyclecount/bench.py
 
 docs:
 	cd docs && doxygen Doxyfile

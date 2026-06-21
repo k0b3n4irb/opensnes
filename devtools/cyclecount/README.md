@@ -42,3 +42,23 @@ python3 devtools/cyclecount/cyclecount.py -v -f my_func game.asm
 | `-v`, `--verbose` | Per-instruction cycle breakdown |
 | `--branches-taken` | Count conditional branches as taken (+1 cycle) |
 | `--pvsneslib` | Force PVSnesLib format (auto-detected by default) |
+
+## Compiler cycle benchmark (`bench.py`)
+
+`bench.py` re-homes the codegen cycle-regression guard that used to live in
+`opensnes-emu/test/run-benchmark.mjs`: it compiles `bench_functions.c` (33
+functions) with `bin/cc65816`, runs `cyclecount.py` for per-function estimates,
+and compares against `bench_baseline.json`.
+
+```bash
+make bench                                   # compare vs baseline (exit 1 on regression)
+python3 devtools/cyclecount/bench.py --update  # re-baseline after an intentional change
+```
+
+Thresholds: total > +5%, or per-function > +25% AND > +50 absolute cycles.
+
+**Ground-truth upgrade (luna feature L5):** `cyclecount.py` is a *static* estimate.
+luna v0.3.0 ships `--cpu-trace` (actual per-opcode cycles). The planned upgrade
+cross-checks the estimate against ground truth by building a small ROM harness
+that calls each `bench_functions.c` function, running `luna run --cpu-trace`, and
+attributing cycles per function via the `.sym` PC ranges.

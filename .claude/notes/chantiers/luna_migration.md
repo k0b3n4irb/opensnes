@@ -120,6 +120,18 @@ follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
   switch the baseline key to `--print-fbhash` (cross-arch, L1); add `--assert`/
   `$21FC` probe oracles; re-home the cycle benchmark via `--cpu-trace`.
 
+- ✅ **v0.3.0 feature adoption (3 follow-ups, 2026-06-21):**
+  - **L1** visual key → `--print-fbhash` (cross-arch stable); CI visual step now a
+    hard gate (dropped `continue-on-error`). 56/56.
+  - **L2/L3** probes use `--assert` (controller); the visual pass captures the SDK
+    `SNES_ASSERT`/WDM channel via `--wdm-out` → any in-ROM assertion that trips
+    FAILs that example (free global oracle; no example uses it yet).
+  - **L5** cycle benchmark re-homed: `devtools/cyclecount/bench.py` +
+    `bench_functions.c` + baseline; `make bench` + CI step. Static estimate vs
+    baseline (the `--cpu-trace` ground-truth cross-check is documented as the next
+    step — needs a ROM harness). benchmark.yml note updated.
+  - L4 (Mouse/Super Scope) still the only missing luna feature.
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines

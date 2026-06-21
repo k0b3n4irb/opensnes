@@ -27,11 +27,13 @@ name: Benchmark
 # +50-cycle-absolute floor on per-function rules out small-routine
 # noise, and the 5% total threshold smooths over individual swings.
 
-# DISABLED 2026-06-20: this gate ran `tools/opensnes-emu/test/run-benchmark.mjs`
-# + the `bench_functions.c` fixture, both removed with the opensnes-emu submodule
-# during the luna migration. Re-home the cycle-count benchmark off opensnes-emu
-# (devtools/cyclecount + an in-repo fixture, optionally cross-checked against
-# luna's `enable_cpu_trace`) before re-enabling. Manual-only until then.
+# DISABLED 2026-06-20: this PR-vs-base gate ran the removed
+# `opensnes-emu/test/run-benchmark.mjs`. The cycle-count benchmark itself is now
+# re-homed in-repo (`devtools/cyclecount/bench.py` + `bench_functions.c`, run by
+# `make bench` and the `functional-tests` CI job — static estimate vs a committed
+# baseline). This workflow (which compiled at both PR HEAD and base to post a
+# per-function delta comment) stays manual; rebuild it on `bench.py` if the PR
+# delta comment is wanted, and add luna `--cpu-trace` ground-truth then (L5).
 on:
   workflow_dispatch:
 
