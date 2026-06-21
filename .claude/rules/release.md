@@ -33,7 +33,7 @@ main     ──────────●─●  (fast-forward; tag is the seco
 1. **Full rebuild**: `make clean && make` — zero C-side warnings; bank $00
    nearly-full warnings tolerated only above `BANK0_FAIL_THRESHOLD` (see
    `.claude/rules/bank0_budget.md`).
-2. **Full test suite**: `cd tools/opensnes-emu && node test/run-all-tests.mjs` — all checks pass. The `--allow-known-bugs` escape was retired in chantier A3 (2026-05-09); the optimisations it gated had all shipped, the markers were stale.
+2. **Full test suite**: `make tests` (luna coverage + visual regression + probes) — all pass.
 3. **Mesen2 validation**: test key examples manually (at minimum: hello_world, one sprite example, one audio example)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release
 5. **Version macros bumped**: `lib/include/snes.h:30-40`

@@ -44,16 +44,21 @@
 ;------------------------------------------------------------------------------
 ; void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)
 ;
-; NOTE: In the current cproc compiler, pointers are 16-bit.
-; For ROM data, we assume bank 0 (LoROM $00:8000-$FFFF).
-; Data in SUPERFREE sections MUST be in bank 0 or use dmaCopyVramBank().
+; Post-A6+A7 (v0.19.0): pointers are 4 bytes (24-bit address + 1 pad
+; byte). cproc emits `pea.w :sym ; pea.w sym` at every call site, so the
+; caller-pushed Kl pointer's high half carries the bank byte. dmaCopyVram
+; reads it directly — no hardcoded bank 0, no `cmp #$80` heuristic, no
+; need for the `loadGraphics()` ASM stubs that several pre-A6 examples
+; shipped to bypass this routine.
 ;
-; Stack layout (after PHP):
-;   1,s = P (processor status)
-;   2-4,s = return address (3 bytes from JSL)
-;   5-6,s = size (pushed first - rightmost arg)
-;   7-8,s = vramAddr (pushed second)
-;   9-10,s = source (pushed last - leftmost arg)
+; Stack layout (after PHP), cc65816 left-to-right push:
+;   1,s     = P (processor status, from PHP)
+;   2-4,s   = return address (3 bytes from JSL)
+;   5-6,s   = size                   (rightmost arg, pushed last)
+;   7-8,s   = vramAddr
+;   9-10,s  = source LOW (16-bit offset within bank)
+;   11,s    = source bank byte       (low byte of Kl high half)
+;   12,s    = pad                    (high byte of Kl high half, unused)
 ;------------------------------------------------------------------------------
 dmaCopyVram:
     php
@@ -66,7 +71,7 @@ dmaCopyVram:
     lda 5,s                 ; size
     sta.l $4305             ; DMA size
 
-    lda 9,s                 ; source address (16-bit)
+    lda 9,s                 ; source LOW (16-bit offset within bank)
     sta.l $4302             ; DMA source address
 
     sep #$20
@@ -74,23 +79,8 @@ dmaCopyVram:
     lda #$80
     sta.l $2115             ; REG_VMAIN: increment after high byte write
 
-    ; Get bank from source address high bits
-    ; For LoROM, addresses $8000+ are in ROM
-    ; Bank = (source >> 16) but we only have 16-bit address
-    ; So we need to figure out the bank from the address
-    ; If address >= $8000, it's in ROM bank determined by linker
-    ; For now, assume bank 0 for addresses < $8000 (shouldn't happen for ROM)
-    ; and let the linker handle bank placement
-    lda 10,s                ; high byte of source address
-    cmp #$80
-    bcc +
-    ; Address is $8000+, which is LoROM space
-    ; In LoROM, bank 0 $8000-$FFFF = first 32KB of ROM
-    lda #$00
-    bra ++
-+   ; Address is < $8000, use it as-is (shouldn't happen for ROM data)
-    lda #$00
-++  sta.l $4304             ; DMA source bank
+    lda 11,s                ; source bank byte (Kl high half low byte)
+    sta.l $4304             ; DMA source bank
 
     lda #$01
     sta.l $4300             ; DMA mode: 2-register write (word)
@@ -152,10 +142,15 @@ dmaCopyVramBank:
 ;------------------------------------------------------------------------------
 ; void dmaCopyCGram(u8 *source, u16 startColor, u16 size)
 ;
-; Stack layout (after PHP):
-;   5-6,s = size (rightmost arg)
-;   7-8,s = startColor
-;   9-10,s = source (leftmost arg)
+; Post-A6+A7: bank byte read from the Kl pointer's high half — same fix
+; as dmaCopyVram. Palette data in any bank now copies correctly.
+;
+; Stack layout (after PHP), cc65816 left-to-right push:
+;   5-6,s   = size (rightmost arg, pushed last)
+;   7-8,s   = startColor
+;   9-10,s  = source LOW
+;   11,s    = source bank byte (Kl high half low byte)
+;   12,s    = pad
 ;------------------------------------------------------------------------------
 dmaCopyCGram:
     php
@@ -170,12 +165,12 @@ dmaCopyCGram:
     lda 5,s                 ; size
     sta.l $4305             ; DMA size
 
-    lda 9,s                 ; source address
+    lda 9,s                 ; source LOW
     sta.l $4302             ; DMA source address
 
     sep #$20
     .ACCU 8
-    lda #$00                ; Source bank = 0 (same limitation as dmaCopyVram)
+    lda 11,s                ; source bank byte (Kl high half low byte)
     sta.l $4304             ; DMA source bank
 
     lda #$00

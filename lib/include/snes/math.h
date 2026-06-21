@@ -363,4 +363,52 @@ fixed fixSqrt(fixed x);
  */
 u8 atan2_8(s16 dy, s16 dx);
 
+/*============================================================================
+ * Easing Curves (B6 final, 2026-05-22)
+ *============================================================================*/
+
+/**
+ * @brief 256-byte quadratic easing LUT — i² normalised to [0, 255]
+ *
+ * `ease_quad_table[i] = floor(i² / 255)`. Underlies `ease_in_quad`
+ * and `ease_out_quad`. Exposed as `extern` so user code can index it
+ * directly for custom curve compositions.
+ *
+ * Cost: ~5 cycles per lookup vs ~12 for `(x * x) / 255` live.
+ * ROM cost: 256 bytes (placed in a SUPERFREE section by the linker).
+ */
+extern const u8 ease_quad_table[256];
+
+/**
+ * @brief Ease-in quadratic: t² curve, output [0, 255]
+ * @param t Input in [0, 255]
+ * @return `ease_quad_table[t]` — starts slow, accelerates toward 255
+ *
+ * Canonical animation curve. Use to drive a value from 0 to its
+ * final state over N frames where the motion feels "wound up" at
+ * the start:
+ *
+ * @code
+ * for (u8 t = 0; t < 255; t++) {
+ *     u8 alpha = ease_in_quad(t);
+ *     // ... draw with alpha ...
+ * }
+ * @endcode
+ */
+inline u8 ease_in_quad(u8 t) {
+    return ease_quad_table[t];
+}
+
+/**
+ * @brief Ease-out quadratic: 1 - (1-t)² curve, output [0, 255]
+ * @param t Input in [0, 255]
+ * @return `255 - ease_quad_table[255 - t]` — starts fast, settles toward 255
+ *
+ * Mirror of `ease_in_quad`. Use when the motion should "decelerate"
+ * into its final state (e.g., a sprite sliding into position).
+ */
+inline u8 ease_out_quad(u8 t) {
+    return 255 - ease_quad_table[255 - t];
+}
+
 #endif /* OPENSNES_MATH_H */

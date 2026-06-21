@@ -207,7 +207,7 @@ OpenSNES SDK build complete!
 ### B3. Run Tests
 
 ```bash
-cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
+make tests   # luna: coverage + visual regression + probes
 ```
 
 ### B4. Development Workflow

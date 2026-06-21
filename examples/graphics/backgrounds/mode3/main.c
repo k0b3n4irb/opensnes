@@ -39,31 +39,41 @@
  *
  * Because Mode 3 tile data (64 bytes per 8x8 tile) typically exceeds 32KB,
  * it cannot fit in a single ROM bank. The linker places SUPERFREE sections
- * in whatever bank has space, potentially bank $01 or higher. C code cannot
- * access these banks directly (lda.l $0000,x always reads bank $00), so an
- * assembly routine uses the linker-provided bank byte (:label) to set the
- * DMA source bank register ($4304) correctly for each transfer.
+ * in whatever bank has space, potentially bank $01 or higher. Post-A6+A7
+ * (v0.19.0) C pointers carry the bank byte natively, and dmaCopyVram /
+ * dmaCopyCGram read it from the caller's Kl pointer — no more
+ * `loadGraphics()` ASM stub needed.
  */
-extern void loadGraphics(void);
+
+/** @brief Tile/palette/tilemap symbols defined in data.asm (.incbin). */
+extern u8 tiles[], tiles_end[];
+extern u8 tiles2[], tiles2_end[];
+extern u8 tilemap[], tilemap_end[];
+extern u8 palette[], palette_end[];
 
 /**
- * @brief Entry point -- load 256-color tileset via ASM and display Mode 3 image
+ * @brief Entry point -- load 256-color tileset and display Mode 3 image
  *
- * Forces blank, calls the assembly DMA loader to transfer 8bpp tile data,
- * tilemap, and 256-color palette into VRAM/CGRAM with correct bank bytes,
- * then configures Mode 3 and turns on the screen. Mode 3 supports a single
- * BG layer with 256 colors per tile (8 bitplanes), providing the richest
- * color depth available in any tiled SNES mode. The tradeoff is that only
- * one BG layer is available (plus a second 4-color direct-color BG that
- * is unused here).
+ * Forces blank, DMAs 8bpp tile data (split across two ROM sections to
+ * exceed the 32KB bank-0 limit), tilemap, and 256-color palette into
+ * VRAM/CGRAM, then configures Mode 3 and turns on the screen. Mode 3
+ * supports a single BG layer with 256 colors per tile (8 bitplanes),
+ * the richest color depth in any tiled SNES mode. The tradeoff is that
+ * only one BG layer is available (plus a second 4-color direct-color
+ * BG that is unused here).
  *
  * @return Never returns (infinite loop).
  */
 int main(void) {
     setScreenOff();
 
-    /* Load all assets via ASM (correct bank bytes for >32KB tileset) */
-    loadGraphics();
+    /* Tile data is split across two SUPERFREE sections so the linker can
+     * place each half in whatever bank has room. The 4-byte Kl pointer
+     * pushed by cproc carries the bank byte; lib/source/dma.asm reads it. */
+    dmaCopyVram(tiles,   0x0000, tiles_end - tiles);
+    dmaCopyVram(tiles2,  0x4000, tiles2_end - tiles2);
+    dmaCopyVram(tilemap, 0x6000, tilemap_end - tilemap);
+    dmaCopyCGram(palette, 0,     palette_end - palette);
 
     bgSetMapPtr(0, 0x6000, SC_32x32);
 

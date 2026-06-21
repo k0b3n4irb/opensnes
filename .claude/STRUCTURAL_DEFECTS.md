@@ -1168,11 +1168,115 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
   applicable.
 
 **References**:
-- `compiler/ABI.md:303-314` (pointer is 2 bytes).
+- `compiler/ABI.md` "Type sizes" table (pointer is 4 bytes post-A6/A7; the
+  16-bit *short* pointer this entry is about is the pre-A6 model — see the
+  investigation log re: which helpers still assume bank `$00`).
 - `lib/include/snes/dma.h` (existing `*Bank` variants).
 - `KNOWN_LIMITATIONS.md` "Bank `$00` ROM overflow".
 - `.claude/rules/bank0_budget.md` (the ratchet policy).
 - 2026-05-07 audit § 8 / § 15-#3 / § 11 (the bank-`$00`-tightness map).
+
+**Investigation log — 2026-06-20 (P1-2 from the engine review):**
+
+Measured the 11 currently-tight examples (all report **exactly 12 bytes
+free**: `likemario`, `mapandobjects`, `tetris`, `continuous_scroll`,
+`mode5`, `mode7`, `mode7_perspective`, `window`, `mapscroll`, `slopemario`,
+`tiled`). Two findings refine — but do **not** invalidate — this entry:
+
+1. **The uniform "12 bytes" is partly a measurement artifact.** In every
+   tight example the *highest* bank-`$00` symbol is a `__opensnes_force_emit_*`
+   anchor sitting at `$FFF0` (or `$FFE0`). These are inert `const` function
+   pointers (4 bytes, nothing reads them at runtime); WLA's SUPERFREE
+   allocator tucks them into the **unused gaps of the interrupt-vector
+   table** ($FFE0-$FFE3, $FFF0-$FFF3). `symmap.py`
+   (`check_bank0_rom_overflow`, line ~347) then computes
+   `free = 0x10000 - (highest + size) = 0x10000 - 0xFFF4 = 12`, i.e. it
+   measures to the **top of the bank**, ignoring the 64-byte header/vector
+   reservation ($FFC0-$FFFF) and getting anchored to a vector-gap symbol.
+   So "12" is really "the leftover of the vector-table region," not a
+   general-allocation headroom figure.
+
+2. **But bank `$00` is genuinely near-full anyway.** Excluding the anchors,
+   the highest *real* code/data symbol is already at ~`$FFB6`-`$FFB8` (just
+   below the `$FFC0` header), and the linker has spilled other force-emit
+   anchors (`getFrameCount`, `scopeCalibrate`, …) all the way to **bank
+   `$02`** — proof that no 4-byte gap remained in bank `$00` *or* `$01`. The
+   packing is real; the artifact only explains why the *number* is a
+   suspiciously-uniform 12.
+
+**Consequences for the fix:**
+- The silent-corruption risk is correctly gated by the *separate* spill
+  check (const data in bank `$01+`), which is unaffected by the artifact.
+  The "free < threshold" ratchet is a secondary proxy; its number is
+  cosmetically wrong but errs **safe** (alarms early).
+- Two cheap, independent sub-tasks worth splitting out of the 2-3 week B1:
+  (a) **symmap metric honesty** — measure free against the header start
+  ($FFC0) and/or exclude vector-region anchors from `highest`, so the
+  reported number reflects real allocatable headroom. Caution: this shifts
+  every example's reported "free" and may flip ratchet status — re-tune
+  `BANK0_FAIL_THRESHOLD`/`--warn-threshold` in the same change.
+  (b) **route force-emit anchors out of bank `$00`** — they're inert, so
+  unlike the abandoned all-`emitdat`-to-bank-1 attempt (2026-05-14) they
+  can move without touching real const data. Needs a way to bias *only*
+  the `__opensnes_force_emit_*` SUPERFREE sections to high banks.
+- The headline B1 fix (24-bit `*Bank` helper variants so user assets leave
+  bank `$00`) remains the real win for user-facing ROMs; the above only
+  buys SDK-example headroom and metric clarity.
+
+**Increment 1 — 2026-06-20 (`wip/b1-bank0-pointers`):**
+
+Audited the map path end-to-end (the worst bank-`$00` offender: BG1 maps
+are 18-25 KB and several examples pinned them to bank `$00`). Findings:
+
+- Post-A6/A7 the pointer ABI is **already 4-byte / bank-carrying**, and
+  `mapLoad`'s *load-time* path is already bank-aware (it reads the bank
+  byte of `layer1map`/`layertiles`/`tilesprop` and DMAs `layertiles` +
+  `tilesprop` into `$7E` WRAM from any bank).
+- **The one remaining lib offender**: the *runtime* scroll/query readers
+  (`_mapDAS1`, `_phb1`, `_pvb1`, `mapGetMetaTile`, `mapGetMetaTilesProp`
+  in `lib/source/map.asm`) hardcoded `lda #$00 / pha / plb` to force
+  DB=`$00` before `lda 0,x` — so the layer-1 map *had* to live in bank
+  `$00` even though its bank byte was already stored in `maptile_L1b`.
+  **Fixed**: all 5 sites now `lda maptile_L1b` (honour the stored bank).
+  Backward-compatible — an example whose map stays in bank `$00` has
+  `maptile_L1b=$00`, identical behaviour. Whole suite 293/293 unchanged.
+- **Proven end-to-end** on `maps/mapscroll`: pinned its 25 KB map +
+  tileset data to bank `2` (`data.asm` `.section ".rodata2" semifree
+  bank 2`). Bank `$00` free went **12 → 17093 bytes**; visual regression
+  (incl. the Mesen2 phase + scrolling) stayed pixel-identical.
+
+**Remaining for B1 (not yet done):**
+1. The same per-example data relocation for the other `mapLoad` users.
+   **Done**: `maps/mapscroll` (25 KB → bank 2) and `maps/tiled` (13 KB →
+   bank 2). **Remaining**: `mapandobjects`, `slopemario` also read the map
+   via **C pointers** (see #2), so they can't move until that's resolved.
+2. **C-level pointer-deref of ROM** (`games/likemario` does
+   `map_data = (u16*)mapmario; … map_data[i]`). **Resolved 2026-06-20 —
+   it's a compiler-codegen wall, split into its own sub-chantier.**
+   Disassembled `map_get_tile_prop` in `likemario`'s `main.c.asm`:
+   - Reading a *fixed-address* global pointer array IS bank-aware —
+     `map_row_ptrs[ty]` builds a 24-bit pointer (`#:map_row_ptrs` for the
+     bank) and uses `lda [tcc__r9]`.
+   - But dereferencing a *runtime* pointer value is **hardcoded to bank
+     `$00`**: `… tax / lda.l $0000,x` for both `map_row_ptrs[ty][tx]` and
+     `tile_props[…]`. Only the low 16 bits of the (4-byte, post-A6)
+     pointer are used; the bank byte is discarded at the load.
+   So `*ptr` / `ptr[i]` on ROM data always reads bank `$00`, regardless of
+   the pointer's stored bank. This is the same root behaviour as the
+   documented "`sta.l $0000,x` always reads bank `$00`" constraint (see
+   B2) applied to *reads through a runtime pointer*. Consequence:
+   `likemario`, `mapandobjects`, `slopemario` (which read the map via C
+   pointers, not `mapLoad`'s runtime) **cannot** move their map out of
+   bank `$00` until cc65816/QBE emits a bank-aware load for runtime
+   pointer derefs (use the pointer's bank byte → `lda [dp],y` long
+   indirect). That is a **compiler** change, not a lib or data-section
+   one — track it as a Category-A/B-adjacent codegen sub-chantier, shared
+   root with B2.
+3. A non-fragile bank-assignment policy (hand-picking `bank N` per example
+   collides as ROMs grow — the multi-bank-fallback problem from the parent
+   entry). Until then, per-example pins are acceptable for SDK examples.
+4. Re-tune `BANK0_FAIL_THRESHOLD` / `--warn-threshold` once the tight
+   examples have real headroom, and fix the symmap metric (sub-task a).
 
 ---
 
@@ -1392,19 +1496,28 @@ multiplier in multi-step form or a software multiply).
 
 ---
 
-#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` — PARTIAL 🟡 (2 of 3 shipped, algorithmic not LUT)
+#### B6. No `atan2`, `sqrt`, `pow` in `<snes/math.h>` — RESOLVED 🟢 (2026-05-22)
 
-**Status update 2026-05-13**: The audit reveals three helpers
-already exist in `<snes/math.h>`: `u16 sqrt16(u16)`, `u8
-atan2_8(s16, s16)`, and `fixed fixSqrt(fixed)`. The implementations
-are algorithmic (bit-by-bit isqrt; quadrant-folded LUT for atan2),
-not pure LUTs as the acceptance criterion specified, but they meet
-the user need. `pow_lut` is the remaining gap.
+**Closed 2026-05-22**: All three helper families now ship in
+`<snes/math.h>`:
+- `u16 sqrt16(u16)`, `fixed fixSqrt(fixed)` — algorithmic bit-by-bit
+  isqrt (chantier B6 first pass, 2026-05-13).
+- `u8 atan2_8(s16, s16)` — quadrant-folded LUT (same first pass).
+- `u8 ease_in_quad(u8)` / `u8 ease_out_quad(u8)` — 256-byte
+  `ease_quad_table[]` (LUT-backed t² normalised easing curve, MVP
+  final piece 2026-05-22).
 
-Severity stays 🟡 — the helpers are present and used by `atan2`
-example callers (1 caller for `atan2_8` per 2026-05-13 audit).
-Acceptance criterion partially met; adding `pow_lut` if a future
-chantier needs it is a small follow-up.
+The "pow" gap closed via the `ease_quad_table` LUT — chose ease
+curves over a generic `pow(base, exp)` because:
+1. Game-dev use is dominated by quadratic/cubic easing for animation,
+   not arbitrary-exponent power.
+2. A generic 2D LUT (base × exp) would cost ~16 KB ROM; the curve
+   LUT costs 256 bytes.
+3. Live `x*x` is cheap (hw multiplier); LUT is for the divided form
+   `x²/255` which compiler can't free-optimise.
+
+Validation: 9/9 ease cases bit-exact (live MCP smoke test).
+Acceptance criterion fully met.
 
 ---
 

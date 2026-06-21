@@ -1,0 +1,29 @@
+# luna-test manifest — per-example overrides.
+#
+# The runner auto-discovers the 56 examples via their git-tracked main.c and
+# applies these overrides. Most examples need nothing here; only list the ones
+# that want a non-default warm-up, scripted input, or a coverage annotation.
+#
+# Keys under [examples."<path>"] use the example path relative to examples/
+# (the directory that holds main.c), e.g. "input/mouse", "audio/snesmod_music".
+
+default_steps = 3_000_000   # CPU instructions before capture (any fixed value is
+                            # fine for a deterministic baseline; past boot/setup)
+
+# --- Examples whose *device input* luna cannot drive (gap G4: Mouse/Super Scope)
+# They boot and render fine, but sit in their controller-DETECT state forever
+# (luna answers the device-ID handshake as a plain pad). Marked input_dependent
+# so coverage reports them as "boot+visual only (input N/A)" instead of full pass
+# — "renders" != "works". Liveness still applies (they run; NMIs climb).
+[examples."input/mouse"]
+input_dependent = true
+
+[examples."input/superscope"]
+input_dependent = true
+
+# --- Examples wanting extra warm-up so the captured scene is representative.
+[examples."audio/snesmod_music"]
+steps = 4_000_000
+
+[examples."basics/random"]
+steps = 4_000_000   # cycles through values; later frame is more representative

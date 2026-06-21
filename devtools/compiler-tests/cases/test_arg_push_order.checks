@@ -1,0 +1,2 @@
+# args pushed LEFT-TO-RIGHT: pea.w 0x1111,0x2222,0x3333 in order
+in caller_three_literals: present pea\.w 4369[\s\S]*?pea\.w 8738[\s\S]*?pea\.w 13107

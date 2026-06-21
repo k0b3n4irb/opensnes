@@ -190,8 +190,9 @@ color shifting left and right. The checkerboard makes the distortion obvious.
 - **Layer-specific waves:** Use a second HDMA channel on BG2HOFS with a different
   amplitude or frequency. Two layers waving independently creates impressive depth.
 
-- **Next example:** [HDMA Gradient](../hdma_gradient/) — using HDMA to create smooth
-  color gradients across the screen.
+- **Next example:** [HDMA Helpers](../hdma_helpers/) — the high-level helper
+  API for brightness gradients, color gradients, iris wipes, and water
+  ripples, all in one interactive showcase.
 
 ---
 
@@ -202,24 +203,34 @@ color shifting left and right. The checkerboard makes the distortion obvious.
 ```makefile
 TARGET      := hdma_wave.sfc
 CSRC        := main.c
+ASMSRC      := data.asm
 USE_LIB     := 1
 LIB_MODULES := console dma sprite input hdma
 ```
 
-### All Data Lives in C
+### Where the Data Lives
 
-Notice there's no `ASMSRC` and no graphics tools. The entire HDMA table — all 7042
-bytes of pre-computed sine waves — is a `static const` array in `main.c`. The compiler
-places `const` data directly in ROM (in a `SUPERFREE` section), so it costs zero RAM.
+The 7042-byte HDMA table (7 amplitudes × 1006 bytes) is a binary blob
+in `res/hdma_wave_tables.bin`, brought in by `data.asm` via a single
+`.incbin` directive. `main.c` declares it as `extern u8 hdma_tables[];`
+and indexes into it with `&hdma_tables[amp_offsets[idx]]`.
 
-The checkerboard background tiles are also generated at runtime with a simple loop,
-not loaded from an asset file. This makes the example fully self-contained: one C file,
-no external dependencies.
+Up to v0.20.x this lived inline in `main.c` as a ~408-line
+`static const u8 hdma_tables[] = { 0x81, 0x00, 0x00, ... };`. The
+inline form pinned the table to bank `$00` (where C const data lands
+unless coaxed otherwise) and made `main.c` 661 lines. Lifting it to
+`.incbin` lets the linker place the bytes in any free bank — bank 0
+gains ~7 KB of headroom — and shrinks `main.c` to ~250 lines.
 
-> **When should data go in C vs. assembly?** Rule of thumb: if the data is generated
-> by a tool (gfx4snes, smconv) or is a binary blob (`.pic`, `.pal`, `.brr`), put it in
-> assembly with `.INCBIN`. If the data is hand-written or computed (lookup tables, HDMA
-> tables, font tiles), a `const` array in C is simpler and keeps everything in one place.
+The checkerboard background tiles are still generated at runtime with
+a simple loop, no asset file needed.
+
+> **When should data go in C vs. assembly `.incbin`?** Rule of thumb:
+> if the data is binary, large, or could spill bank 0, put it in
+> `.incbin` (SUPERFREE section, linker picks the bank, C pointer
+> carries the bank byte post-A6+A7). If it's small and immutable
+> (≤ ~256 bytes), a `static const` array in C is simpler and keeps
+> everything in one place.
 
 ### Why These Modules?
 

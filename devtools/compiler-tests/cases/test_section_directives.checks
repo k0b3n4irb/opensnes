@@ -1,0 +1,3 @@
+# .ACCU 16 / .INDEX 16 emitted right after the function's .SECTION header
+present \.SECTION "\.text\.trivial"[\s\S]{0,300}?\.ACCU 16
+present \.SECTION "\.text\.trivial"[\s\S]{0,300}?\.INDEX 16

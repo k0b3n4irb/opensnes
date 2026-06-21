@@ -29,7 +29,7 @@
  * - The response is instant (1 frame = 16ms latency)
  *
  * @par Modules Used
- * console, sprite, dma, background, text, input
+ * console, sprite, dma, background, text, input, gameloop
  *
  * @see input.h
  */

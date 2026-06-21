@@ -8,16 +8,17 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.20.0 (developing toward v0.21.0)
+## Current Status: post-v0.21.0 (developing toward v0.22.0)
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
 produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 54
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
-test suite (`opensnes-emu` snes9x WASM + visual regression + lag detection +
-compiler tests + input sequences). Run `cd tools/opensnes-emu && node
-test/run-all-tests.mjs --list` for the current check count — the suite grows
+test suite (luna, cycle-accurate native — corpus liveness + visual
+regression + functional probes; SA-1/Super FX/DSP-1 run natively). Run
+`make tests`, or `python3 tools/luna-test/luna_runner.py --list` for the corpus —
+the suite grows
 with new chantiers and a single hard-coded number rots fast.
 
 ### Audience
@@ -233,7 +234,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
       C and ASM implementations of `sprite` and `text`. Benchmark each,
       decide migration vs documentation, eliminate duplications. Largest
       remaining cleanup item (2–3 weeks, perf-critical so risk is real).
-- [x] **SuperFX / SA-1 functional tests** (P3.4) — added a Mesen2-headless
+- [x] **SuperFX / SA-1 functional tests** (P3.4) — *(SUPERSEDED 2026-06-20: luna runs SA-1 / Super FX natively in the headless harness; the Mesen2 phase and the `opensnes-emu` submodule were removed. See `.claude/notes/chantiers/luna_migration.md`.)* Originally added a Mesen2-headless
       visual regression phase
       (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) running the
       vendored Mesen2 binary in `--testrunner` mode against the four

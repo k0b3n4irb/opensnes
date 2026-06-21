@@ -10,6 +10,7 @@
 |----------|--------|
 | **Mesen2** | ✅ Recommended — detects the GSU correctly and runs SuperFX cleanly |
 | **bsnes** | ✅ Cycle-accurate; useful as a second reference |
+| **luna** | ✅ Detects and runs the GSU natively (used by the test harness) |
 | **snes9x** | ❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED" |
 
 ## Build & Run

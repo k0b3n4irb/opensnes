@@ -297,26 +297,28 @@ Constraints to respect:
 `lib/include/snes/sprite.h` declares:
 
 ```c
-void oamSet(u8 id, u16 x, u16 y, u16 attr, u8 size, u16 tile);
+void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 ```
 
 A C call:
 
 ```c
-oamSet(0, 100, 50, 0x30, 0, 0x100);
+oamSet(0, 100, 50, 0x100, 0, 3, 0x40);
 ```
 
 Generates:
 
 ```asm
-    pea.w 0          ; id (zero-extended u8)
+    pea.w 0          ; id
     pea.w 100        ; x
     pea.w 50         ; y
-    pea.w 48         ; attr (0x30)
-    pea.w 0          ; size (zero-extended u8)
-    pea.w 256        ; tile
+    pea.w 256        ; tile (0x100)
+    pea.w 0          ; palette
+    pea.w 3          ; priority
+    pea.w 64         ; flags (0x40)
     jsl oamSet
-    plx              ; pop 6 args (12 bytes total)
+    plx              ; pop 7 args (14 bytes total)
+    plx
     plx
     plx
     plx
@@ -328,14 +330,17 @@ Inside `oamSet`'s ASM (with framesize F):
 
 | Offset | Param |
 |--------|-------|
-| `F+4`  | tile (rightmost arg, low byte) |
-| `F+6`  | size (zero-extended u8 — only low byte meaningful) |
-| `F+8`  | attr |
-| `F+10` | y |
-| `F+12` | x |
-| `F+14` | id (zero-extended u8) |
+| `F+4`  | flags (rightmost arg, last pushed) |
+| `F+6`  | priority |
+| `F+8`  | palette |
+| `F+10` | tile |
+| `F+12` | y |
+| `F+14` | x |
+| `F+16` | id (leftmost arg, first pushed) |
 
-For the assembly source, see `lib/source/sprite_oamset.asm`.
+All seven parameters are `u16`, so each occupies a 2-byte stack slot.
+For the assembly source, see `lib/source/sprite_oamset.asm` (whose header
+comment lists the same `16,s … 4,s` offsets at framesize 0).
 
 ---
 

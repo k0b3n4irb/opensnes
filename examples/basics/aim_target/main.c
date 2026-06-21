@@ -42,22 +42,35 @@
  *     - `ANGLE` is the 8-bit angle from the player to the target,
  *       printed in hex; the equivalent in degrees follows in
  *       parentheses (≈ angle × 360 / 256).
- *     - `COS` / `SIN` are the 8.8 fixed-point components of the unit
- *       direction vector. Their values match the angle: at
- *       `ANGLE = 0x40` (90°, target is straight south on a SNES
- *       screen) you see `COS = 0x0000` and `SIN = 0x0100`.
+ *     - `COS 8.8` / `SIN 8.8` are the 8.8 fixed-point components of
+ *       the unit direction vector. At `ANGLE = 0x40` (90°, target is
+ *       straight south) you see `COS = 0x0000`, `SIN = 0x0100`.
+ *     - `COS 16.16` / `SIN 16.16` are the SAME values lifted to the
+ *       new fix32 type from B5 (2026-05-21). Look at the bottom hex
+ *       digits: they're always `00` because `fix32Cos`/`fix32Sin`
+ *       reuse the 8.8 LUT and shift up. A future 16-bit LUT would
+ *       fill those bits with real precision — the comparison row
+ *       makes the 8-bit-LUT precision floor visible at runtime.
+ *
+ * @par Before / after — fix32 demonstration
+ * Pre-B5, this example only used `fixCos`/`fixSin` (8.8). The B5
+ * chantier added the parallel `fix32Cos`/`fix32Sin` display rows so
+ * users can see the 16.16 representation alongside, with the
+ * trailing zeros that expose the LUT-lifting strategy. Not a
+ * functional change — a pedagogical one.
  *
  * @par Modules Used
- * console, sprite, dma, background, text, input, gameloop, math
+ * console, sprite, dma, background, text, input, gameloop, math, fixed32
  *
- * @see math.h, sprite.h, text.h, gameloop.h
+ * @see math.h, fixed32.h, sprite.h, text.h, gameloop.h
  *
- * @copyright MIT License — chantier B6 (2026-05-09)
+ * @copyright MIT License — chantier B6 (2026-05-09), B5 fix32 row added (2026-05-22)
  */
 
 #include <snes.h>
 #include <snes/text.h>
 #include <snes/math.h>
+#include <snes/fixed32.h>      /* fix32Cos / fix32Sin (B5 chantier, 2026-05-21) */
 #include <snes/gameloop.h>
 
 /*============================================================================
@@ -188,8 +201,17 @@ static void on_init(void) {
     textPrintAt(2, 18, "DY:");
     textPrintAt(2, 19, "DIST:");
     textPrintAt(2, 20, "ANGLE:");
-    textPrintAt(2, 22, "COS(ANGLE):");
-    textPrintAt(2, 23, "SIN(ANGLE):");
+    /* COS / SIN shown in both formats to expose the 8.8 vs 16.16
+     * tradeoff at runtime. 8.8 is what the lib has always provided;
+     * 16.16 is the new fix32 stack (B5 chantier, 2026-05-21). Since
+     * our fix32Cos/Sin lift the same 8.8 LUT, the low byte of the
+     * 16.16 fractional half is always zero — visible in the hex
+     * readout as a trailing `00`. A future 16-bit LUT would fill
+     * those bits with real precision. */
+    textPrintAt(2, 22, "COS 8.8:");
+    textPrintAt(2, 23, "SIN 8.8:");
+    textPrintAt(2, 24, "COS 16.16:");
+    textPrintAt(2, 25, "SIN 16.16:");
 
     /* Both BG1 (text) and OBJ (sprites) on the main screen. */
     setMainScreen(TM_BG1 | TM_OBJ);
@@ -205,7 +227,8 @@ static void on_update(void) {
     u16 dx2, dy2;
     u16 dist;
     u8  angle;
-    fixed cos_v, sin_v;
+    fixed   cos_v,  sin_v;   /* 8.8 lib trig (original) */
+    fixed32 cos32, sin32;    /* 16.16 lifted trig (B5 chantier addition) */
 
     pad = padHeld(0);
 
@@ -253,6 +276,12 @@ static void on_update(void) {
     cos_v = fixCos(angle);
     sin_v = fixSin(angle);
 
+    /* Same angle, lifted to 16.16. Cost: ~25 cycles each (table
+     * lookup + xba byte-swap + sign-extend). Used in the new
+     * fix32_orbit example for sub-pixel-precise circular motion. */
+    cos32 = fix32Cos(angle);
+    sin32 = fix32Sin(angle);
+
     /* Live readout — all six lines update every frame. The
      * trailing spaces ensure leading-zero changes overwrite stale
      * digits from a previous longer print. */
@@ -272,12 +301,22 @@ static void on_update(void) {
     textPrintU16((u16)((u16)((u16)angle * 45) >> 5));
     textPrint(" DEG)   ");
 
-    textSetPos(15, 22); textPrint("0X");
+    textSetPos(13, 22); textPrint("0X");
     textPrintHex((u16)cos_v, 4);
-    textPrint(" ");
-    textSetPos(15, 23); textPrint("0X");
+    textPrint("    ");
+    textSetPos(13, 23); textPrint("0X");
     textPrintHex((u16)sin_v, 4);
-    textPrint(" ");
+    textPrint("    ");
+
+    /* 16.16 display: high half then low half. Notice the low half
+     * is always 0x00XX (low byte zero) because fix32Cos/Sin lift
+     * the 8.8 LUT — the bottom 8 fractional bits are unused. */
+    textSetPos(13, 24); textPrint("0X");
+    textPrintHex((u16)((u32)cos32 >> 16), 4);
+    textPrintHex((u16)((u32)cos32 & 0xFFFF), 4);
+    textSetPos(13, 25); textPrint("0X");
+    textPrintHex((u16)((u32)sin32 >> 16), 4);
+    textPrintHex((u16)((u32)sin32 & 0xFFFF), 4);
 }
 
 int main(void) {

@@ -24,3 +24,11 @@ Demonstrates the four HDMA library helper effects available in the OpenSNES SDK.
 ## Modules
 
 `console sprite dma input background hdma`
+
+## Related examples
+
+- [graphics/backgrounds/mode3](../../backgrounds/mode3/) — the canonical
+  "8bpp single-layer background" example. If you want the brightness/color
+  gradient effects above applied to an 8bpp Mode 3 image instead of a
+  4bpp Mode 1 image, start from `mode3` for the BG setup and add a
+  `hdmaBrightnessGradient()` / `hdmaColorGradient()` call afterwards.

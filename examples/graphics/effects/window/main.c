@@ -30,7 +30,7 @@
  * - Press B to apply window to both BG1 and BG2
  *
  * @par Modules Used
- * console, sprite, dma, input, background, window, hdma, math
+ * console, sprite, dma, input, background, window, hdma
  *
  * @see hdma.h, video.h, background.h
  */

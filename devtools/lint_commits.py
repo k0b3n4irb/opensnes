@@ -62,10 +62,12 @@ ALLOWED_SCOPES = {
     #   `rules`     -> .claude/rules/
     #   `bench`     -> tools/opensnes-emu/test/fixtures/benchmark/
     "chantiers", "rules", "bench",
+    # luna test-harness migration (2026-06-21): real path tools/luna-test/
+    "luna-test",
 }
 
 SUBJECT_RE = re.compile(
-    r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_/-]+)\))?(?P<bang>!)?: (?P<desc>.+)$"
+    r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_/, -]+)\))?(?P<bang>!)?: (?P<desc>.+)$"
 )
 COAUTHOR_RE = re.compile(r"^\s*co-authored-by\s*:", re.IGNORECASE | re.MULTILINE)
 
@@ -118,10 +120,14 @@ def check_subject(subject: str) -> list[str]:
         errors.append(
             f"type {t!r} is not in {sorted(ALLOWED_TYPES)}"
         )
-    if s is not None and s not in ALLOWED_SCOPES:
-        errors.append(
-            f"scope {s!r} is not in {sorted(ALLOWED_SCOPES)}"
-        )
+    if s is not None:
+        # A comma-separated list of scopes is allowed (e.g. `feat(compiler,lib):`);
+        # each must be valid.
+        for one in (part.strip() for part in s.split(",")):
+            if one not in ALLOWED_SCOPES:
+                errors.append(
+                    f"scope {one!r} is not in {sorted(ALLOWED_SCOPES)}"
+                )
     if not desc:
         errors.append("empty description")
     elif desc.endswith("."):

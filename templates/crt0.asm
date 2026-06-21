@@ -66,6 +66,12 @@
     tcc__r9h    dsb 2
     tcc__r10    dsb 2
     tcc__r10h   dsb 2
+    ; Kl (32-bit) return-value high half. Callee writes here before rtl;
+    ; caller reads it immediately after the call. Mirrors the mul32_hi /
+    ; div32_qh pattern but for arbitrary C functions returning s32/u32.
+    ; Added 2026-05-21 to fix the incomplete Kl return convention (see
+    ; .claude/notes/tech/cc65816_kl_return_incomplete.md).
+    tcc__retval_hi  dsb 2
     ; VBlank callback (must be in direct page for JML [nmi_callback] to work)
     nmi_callback    dsb 4   ; 24-bit function pointer + padding (PVSnesLib compatible)
     nmi_has_callback dsb 1  ; 0 = default no-op, 1 = user callback active
@@ -508,10 +514,19 @@ FastStart:
     .ACCU 8
 
 .ifdef SA1
-    ; SA-1: Enable I-RAM writes for SNES CPU
-    ; Try $FF — maybe bit=1 means WRITABLE (not PROTECTED)
+    ; SA-1: Enable I-RAM writes for the SNES CPU via SIWP ($2229).
+    ; POLARITY IS DISPUTED — do not "fix" this to $00 without a hardware test:
+    ;   * Super Famicom Dev Wiki / fullsnes: bit=1 PROTECTS a 256-byte page,
+    ;     so $00 = all writable.
+    ;   * Mesen2 (our accuracy reference) and snes9x: $FF = writable, $00 =
+    ;     write-blocked. Empirically, $00 makes the crt0 I-RAM self-test
+    ;     below fail (sa1_status=$FF); $FF makes it pass (sa1_status=$A5).
+    ; We follow the emulators we actually test on (=$FF). The self-test is
+    ; the safety net if a future emulator/cartridge disagrees.
+    ; See KNOWN_LIMITATIONS.md "SA-1 SIWP/CIWP" and
+    ; .claude/notes/tech/enhancement_chips_research.md.
     lda #$FF
-    sta.l $002229           ; SIWP = $FF
+    sta.l $002229           ; SIWP = $FF (writable per Mesen2/snes9x)
 .endif
 
     ; Set up stack at $1FFF
@@ -623,8 +638,10 @@ FastStart:
     ; === SA-1 INIT ===
 
     ; 1. Disable I-RAM write protection (redundant with early init, but safe)
+    ;    $FF = writable per Mesen2/snes9x; polarity disputed vs the wiki —
+    ;    see the SIWP note at the early-init site above before changing.
     lda #$FF
-    sta.l $002229           ; SIWP: try $FF = all bits set = writable?
+    sta.l $002229           ; SIWP = $FF (writable per Mesen2/snes9x)
 
     ; 2. SELF-TEST: verify SNES CPU can write/read I-RAM
     ;    Use STA.L/LDA.L to force bank $00 (bypass DB)

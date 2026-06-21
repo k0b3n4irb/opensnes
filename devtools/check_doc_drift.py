@@ -19,6 +19,15 @@ Anchored claims currently watched:
      Historical entries in ``CHANGELOG.md`` are exempt — they freeze a
      past state.
 
+  4. Public C function prototypes quoted in ``compiler/ABI.md`` must match
+     the canonical declaration in ``lib/include/snes/*.h``. ABI.md is the
+     canonical ABI reference; a stale prototype there makes its whole
+     stack-offset table wrong. Caught historically as the ``oamSet`` worked
+     example pinning a 6-arg ``(u8 id, u16 x, u16 y, u16 attr, u8 size,
+     u16 tile)`` signature while the real API is the 7-arg ``(u16 id,
+     u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)`` —
+     the entire offset table was off.
+
 Why this exists: the v0.1.0-dev macro stuck at v0.16.0, the post-v0.13.0
 ROADMAP stale by three minor versions, and the "53 examples" / "54 examples"
 count drift across rules — all of these were caught by a 1-day external
@@ -211,6 +220,160 @@ def check_examples_count(canonical: int) -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# Check 4: ABI.md C prototypes vs canonical headers
+# --------------------------------------------------------------------------
+
+HEADER_DIR = "lib/include/snes"
+
+# A C function prototype: <return type> <name>(<params>);
+#
+# Deliberately strict to avoid matching prose with parentheses:
+#   * the return type and name sit on a single line (no newline in `ret`,
+#     none between `name` and `(`) — a real declaration never wraps there;
+#   * the parameter list admits only the characters of an actual param list
+#     (identifiers, whitespace, `*`, `,`, `[]`) — backticks, prose
+#     punctuation and nested `(` are excluded, so a sentence like
+#     ``handshakes (`vblank_flag`, ...)`` can never be mistaken for one.
+# Function-pointer params are not modelled (the SDK has none); such a
+# prototype simply won't match and is skipped rather than mis-parsed.
+_C_PROTO_RE = re.compile(
+    r"(?P<ret>[A-Za-z_][\w \t\*]*?)\b(?P<name>[A-Za-z_]\w*)[ \t]*"
+    r"\((?P<params>[\w\s\*,\[\]]*)\)[ \t]*;",
+)
+
+# C block/line comments stripped before prototype scanning.
+_C_BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
+_C_LINE_COMMENT_RE = re.compile(r"//[^\n]*")
+
+
+def _strip_c_comments(text: str) -> str:
+    """Blank out C comments while preserving offsets and line numbering.
+
+    Each comment is replaced by spaces and its own newlines, so a match's
+    ``start()`` still maps to the right line in the original text.
+    """
+    def _blank(m: re.Match) -> str:
+        return "".join("\n" if ch == "\n" else " " for ch in m.group(0))
+
+    text = _C_BLOCK_COMMENT_RE.sub(_blank, text)
+    text = _C_LINE_COMMENT_RE.sub(_blank, text)
+    return text
+
+
+def _is_typed_param_list(params: str) -> bool:
+    """True if every parameter looks like a typed declaration (``type name``).
+
+    This is what separates a real prototype (``oamSet(u16 id, u16 x, ...)``)
+    from a *call* in a code block (``oamSet(0, 100, ...)``) or a fenced-code
+    language tag bleeding into the match. Function-call arguments are bare
+    literals / dotted expressions with no ``type name`` shape.
+    """
+    s = params.strip()
+    if s == "" or s == "void":
+        return True
+    for p in s.split(","):
+        toks = re.sub(r"\*", " * ", p).split()
+        idents = [t for t in toks if t != "*"]
+        # Need at least a type token and a name token, both plain C identifiers.
+        if len(idents) < 2:
+            return False
+        if not re.fullmatch(r"[A-Za-z_]\w*", idents[0]):
+            return False
+        if not re.fullmatch(r"[A-Za-z_]\w*", idents[-1]):
+            return False
+    return True
+
+
+def _normalize_param(decl: str) -> str:
+    """Normalize one parameter declaration to a canonical 'type name' string."""
+    decl = decl.strip()
+    if not decl or decl == "void":
+        return ""
+    # Trailing identifier is the parameter name; the rest is the type.
+    m = re.search(r"([A-Za-z_]\w*)\s*$", decl)
+    if not m:
+        return re.sub(r"\s+", " ", decl)
+    name = m.group(1)
+    typ = decl[: m.start()].strip()
+    typ = re.sub(r"\s*\*\s*", " *", typ)  # canonical pointer spacing
+    typ = re.sub(r"\s+", " ", typ).strip()
+    if not typ:  # bare type with no name (e.g. unnamed); keep as type only
+        return name
+    return f"{typ} {name}"
+
+
+def _normalize_signature(ret: str, name: str, params: str) -> str:
+    ret = re.sub(r"\s*\*\s*", " *", ret)
+    ret = re.sub(r"\s+", " ", ret).strip()
+    parts = [p for p in (_normalize_param(p) for p in params.split(",")) if p]
+    return f"{ret} {name}({', '.join(parts)})"
+
+
+def _header_signatures() -> dict[str, tuple[str, str]]:
+    """Map public function name -> (normalized signature, source 'file').
+
+    If a name is declared in more than one header, the first wins and the
+    duplicate is ignored (the ABI doc references a single canonical decl).
+    """
+    sigs: dict[str, tuple[str, str]] = {}
+    hdr_dir = repo_path(HEADER_DIR)
+    if not hdr_dir.is_dir():
+        return sigs
+    for hdr in sorted(hdr_dir.glob("*.h")):
+        text = _strip_c_comments(hdr.read_text(encoding="utf-8"))
+        for m in _C_PROTO_RE.finditer(text):
+            name = m.group("name")
+            ret = m.group("ret").strip()
+            params = m.group("params")
+            # Skip control-flow keywords masquerading as return types and
+            # anything that doesn't look like a declaration (e.g. 'if (...)').
+            if ret in ("", "return", "if", "while", "for", "switch", "sizeof"):
+                continue
+            if not _is_typed_param_list(params):
+                continue
+            norm = _normalize_signature(ret, name, params)
+            sigs.setdefault(name, (norm, hdr.name))
+    return sigs
+
+
+def check_abi_signatures() -> list[str]:
+    """ABI.md prototypes for public SDK functions must match the headers."""
+    abi = repo_path("compiler/ABI.md")
+    if not abi.is_file():
+        return []
+    headers = _header_signatures()
+    if not headers:
+        return []
+
+    drifts: list[str] = []
+    text = abi.read_text(encoding="utf-8")
+    for m in _C_PROTO_RE.finditer(_strip_c_comments(text)):
+        name = m.group("name")
+        if name not in headers:
+            continue  # illustrative prototype, not a real SDK function
+        ret = m.group("ret").strip()
+        if ret in ("return", "if", "while", "for", "switch", "sizeof"):
+            continue
+        params = m.group("params")
+        if not _is_typed_param_list(params):
+            continue  # a call or non-declaration, not a prototype
+        actual = _normalize_signature(ret, name, params)
+        expected, src = headers[name]
+        if actual != expected:
+            # Line number of the match start in the original text.
+            lineno = text.count("\n", 0, m.start()) + 1
+            drifts.append(
+                f"compiler/ABI.md:{lineno}: prototype for `{name}` is\n"
+                f"      {actual}\n"
+                f"    but {HEADER_DIR}/{src} declares\n"
+                f"      {expected}\n"
+                f"    — update the ABI.md worked example (signature, codegen "
+                f"push list, and the stack-offset table) to match the header"
+            )
+    return drifts
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -228,6 +391,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_snes_h_version(canonical_ver))
     all_drifts.extend(check_roadmap_status(canonical_ver))
     all_drifts.extend(check_examples_count(canonical_n))
+    all_drifts.extend(check_abi_signatures())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

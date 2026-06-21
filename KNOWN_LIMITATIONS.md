@@ -151,39 +151,43 @@ before committing.
 
 ## Toolchain & emulator coverage
 
-### 🟡 SA-1 SIWP register init is an unsourced assumption
-`templates/crt0.asm:557+` initialises the SA-1 by writing `$FF` to register
-`$002229` (SIWP) with the comment "*maybe bit=1 means WRITABLE*". This came
-from observation, not from a published spec. If a future SA-1 cartridge revision
-behaves differently, the init silently fails and the chip is half-configured.
+### 🟡 SA-1 SIWP/CIWP write-protection polarity is disputed
+`templates/crt0.asm` enables SA-1 I-RAM access by writing the SIWP register
+`$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
+~`:636-642`), value `$FF`. **The polarity of this register is genuinely
+contested between documentation and emulators:**
 
-**Mitigation:** none currently. If your project depends on SA-1 in a serious
-way, exercise it on real hardware before shipping. We track this in
-`memory/enhancement_chips_research.md`.
+- The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
+  and fullsnes say each bit *enables* write-protection for one 256-byte
+  I-RAM page (bit=1 protects, bit=0 writable), i.e. `$00` = all writable.
+- **Mesen2** (this project's accuracy reference) and **snes9x** behave the
+  *opposite* way. Tested empirically (2026-06-20): with `$FF` the crt0
+  I-RAM self-test passes (`sa1_status=$A5`); with `$00` the SNES-CPU write
+  to I-RAM is blocked and the self-test fails (`sa1_status=$FF`).
 
-### 🟢 SuperFX: snes9x does not detect the GSU chip — Mesen2-headless covers it in CI
-The opensnes-emu CI test harness runs ROMs through snes9x's libretro core
-in the main `Visual Regression` phase. For SuperFX examples, snes9x's
-chip-detection logic does not pick up the GSU from our ROM header
-configuration — the example boot path renders "GSU: NOT DETECTED" and
-the actual GSU code never runs. Visual baselines of those screenshots
-happily compare equal frame-to-frame, but the snes9x phase proves only
-"boots in snes9x", not "runs SuperFX correctly".
+OpenSNES writes `$FF` because that is what works on the emulators we
+validate against. A `$00` "fix" (matching the wiki) **breaks** SA-1 in
+Mesen2/snes9x and was reverted — do not re-apply it without a real-hardware
+test that proves the wiki polarity.
 
-**Mitigation (active since P3.4):** the test suite ships a separate
-`Mesen2 Visual Regression` phase
-(`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) that runs the
-vendored Mesen2 binary in `--testrunner` mode against the chip-using
-examples (currently 4 SuperFX/SA-1 ROMs). Mesen2 detects the GSU
-correctly and is the reference emulator for SuperFX. The phase is
-gated by the presence of the Mesen2 binary
-(`scripts/install-mesen2.sh` fetches it once per CI run, cached
-locally), so it is a no-op on contributor machines that haven't
-installed Mesen2 yet but mandatory in CI. Both phases together give
-SuperFX ROMs end-to-end coverage. (An earlier version of this entry
-blamed Mesen2 for a "backward-branch bug"; re-validation showed the
-original observation conflated a snes9x mis-run with a Mesen2 bug.
-Reference behaviour was Mesen2's all along.)
+**Mitigation:** the crt0 self-test (`:639-647`: write `$42` to I-RAM, read
+back, fail to `sa1_status=$FF`) means a wrong choice is **detected** at
+runtime — `sa1IsReady()` returns false unless the SA-1 reaches `$A5`, so
+the failure is not silent. If your project depends on SA-1, verify on a
+real cartridge before shipping. Background + sources:
+`.claude/notes/tech/enhancement_chips_research.md`.
+
+### 🟢 SuperFX / SA-1 chips: covered natively (resolved by the luna migration)
+**Resolved 2026-06-20.** The previous harness (snes9x compiled to WASM) could
+not detect the GSU from our ROM header — SuperFX examples rendered "GSU: NOT
+DETECTED" and the chip code never ran, so the suite needed a separate vendored
+**Mesen2** phase under `xvfb` just for the 4 chip ROMs. The test harness now
+runs on [**luna**](https://github.com/k0b3n4irb/luna), a cycle-accurate native
+emulator that detects and executes **SA-1, Super FX (GSU) and DSP-1** directly
+(verified: `superfx_hello` → "ALL TESTS PASSED", `superfx_3d` → GSU-rendered 3D
+cube, `sa1_hello`/`sa1_starfield` → `sa1_status=$A5`). The chip-ROM side channel
+and the whole snes9x-WASM + Mesen2 + xvfb stack are gone. See
+`.claude/notes/chantiers/luna_migration.md`.
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be

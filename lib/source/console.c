@@ -129,6 +129,30 @@ void setBrightness(u8 brightness) {
     }
 }
 
+void fadeOut(u8 speed) {
+    s8 brightness;
+    u8 i;
+
+    for (brightness = 15; brightness >= 0; brightness--) {
+        setBrightness((u8)brightness);
+        for (i = 0; i < speed; i++) {
+            WaitForVBlank();
+        }
+    }
+}
+
+void fadeIn(u8 speed) {
+    u8 brightness;
+    u8 i;
+
+    for (brightness = 0; brightness <= 15; brightness++) {
+        setBrightness(brightness);
+        for (i = 0; i < speed; i++) {
+            WaitForVBlank();
+        }
+    }
+}
+
 /* getBrightness() is `inline` in console.h. Force-emit the standalone
  * in this TU via address-taking, mirror of setScreenOff's pattern. */
 u8 (*const __opensnes_force_emit_getBrightness)(void) = getBrightness;
