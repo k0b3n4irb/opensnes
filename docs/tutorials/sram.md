@@ -323,7 +323,7 @@ compilers.
 
 - **snes9x** and **Mesen2**: persist SRAM to a `.srm` file alongside
   the ROM. Save game survives reset and emulator restart.
-- **opensnes-emu** (the lib's snes9x-WASM build): SRAM is in-memory
+- **luna** (the test harness): SRAM is in-memory (captured in save-states; cross-run `.srm` persistence is a luna roadmap item) —
   only — does not persist across runs by default. The test harness
   resets SRAM between tests.
 - **Real hardware via FXPak Pro**: persists to the SD card's

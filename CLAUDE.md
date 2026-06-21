@@ -33,14 +33,20 @@ cd examples/text/hello_world && make
 
 ## Testing
 
-All testing goes through opensnes-emu (snes9x WASM):
+All testing goes through **luna** (cycle-accurate native emulator, pinned
+binary — no Node/WASM/Mesen2):
 ```bash
-cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
+scripts/install-luna.sh                                  # fetch pinned luna (tools/luna-test/luna.version)
+python3 tools/luna-test/luna_runner.py --coverage        # corpus liveness
+python3 tools/luna-test/luna_runner.py --compare         # visual regression (framebuffer SHA-256)
+python3 tools/luna-test/probes/run_all.py                # functional probes (input→WRAM)
+make tests                                               # all of the above
 ```
 
-Runs 7 phases: preconditions, compiler tests (60 C→ASM pattern checks), build, static analysis, runtime execution, visual regression, lag detection.
-
-See `.claude/rules/testing.md` for the mandatory 3-pillar validation workflow (opensnes-emu + Mesen2 + full rebuild). Changes are classified A/B/C/D by impact scope.
+luna runs SA-1 / Super FX / DSP-1 natively, so there is no chip-ROM side
+channel. See `.claude/rules/testing.md` for the validation workflow and
+`.claude/notes/chantiers/luna_migration.md` for the migration off snes9x-WASM.
+Changes are classified A/B/C/D by impact scope.
 
 ## Compilation Pipeline
 
@@ -58,13 +64,13 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE emits 65816 
 - **lib/** — Hardware library. C sources in `lib/source/*.c`, ASM in `lib/source/*.asm`, headers in `lib/include/snes/`. Built as separate LoROM, HiROM, SA-1, and SuperFX object sets.
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
-- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), `opensnes-emu/` (debug emulator + test suite)
+- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), `luna-test/` (luna-driven test harness: runner, manifest, baselines, probes)
 - **examples/** — 54 ROMs organized by category (text, graphics, input, audio, maps, memory, games)
 
 ### Enhancement Chip Support
 
 - **SA-1** (`USE_SA1=1`): Same 65816 ISA at 10.74 MHz. Shares I-RAM ($3000-$37FF) with main CPU. Per-example `sa1_boot.asm` for custom coprocessor code. See `docs/tutorials/sa1.md`.
-- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **Validate with Mesen2** — it is the most accurate emulator currently available for GSU. **Do not use snes9x** for SuperFX validation: snes9x does not detect the GSU chip in our ROM headers (the example shows "GSU: NOT DETECTED"), so the snes9x-based CI test suite can only confirm boot, not GSU execution. P3.4 in `ROADMAP.md` tracks adding a Mesen2-headless CI path for real coverage.
+- **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **Validated by luna**, which detects and executes the GSU natively in the headless test harness (the old snes9x-WASM harness could not detect the GSU — "GSU: NOT DETECTED" — and needed a Mesen2 side channel; both are gone since the luna migration).
 
 ### Example Makefile Pattern
 

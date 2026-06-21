@@ -13,7 +13,7 @@ SNES development is niche — every contributor matters.
 2. Use the **Bug Report** template — it asks the right questions
 3. Include a **minimal reproduction** (a small `main.c` that triggers the bug)
 4. Attach screenshots or a short video if it's a visual issue
-5. Specify the emulator used (Mesen2, snes9x, bsnes)
+5. Specify the emulator used (luna, Mesen2, bsnes)
 
 ## Suggesting Features
 
@@ -106,7 +106,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 Before submitting:
 
 1. `make clean && make` — full rebuild must succeed
-2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` — all checks must pass (run with `--list` to see the current count)
+2. `make tests` — luna coverage + visual regression + probes must all pass
 3. Test affected examples in [Mesen2](https://www.mesen.ca/)
 4. New examples must include a working Makefile following the standard pattern
 

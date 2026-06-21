@@ -70,6 +70,17 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   - **Andrey Beletsky** — BMP BI_RLE8 compression support
 
 
+## Game Assets
+
+### Kenney "Pixel Shmup"
+- **Author**: Kenney (https://kenney.nl/)
+- **Pack**: https://kenney.nl/assets/pixel-shmup
+- **License**: CC0 (Public Domain)
+- **Used in**: `examples/games/shmup_1942/res/` —
+  `tiles_packed.png`, `ships_packed.png`, and the `sprites.png` /
+  `ground.png` split outputs derived from `tiles_packed.png` via
+  `res/import.sh`.
+
 ## Documentation Sources
 - **SNESdev Wiki** (https://snes.nesdev.org/) — CC-BY-SA
 - **Fullsnes by Nocash** (https://problemkaputt.de/fullsnes.htm)

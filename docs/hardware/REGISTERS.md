@@ -544,8 +544,17 @@ set and programming details, see `.claude/SA-1.md`.
 |----------|---------|-----|-------------|
 | CCNT | $2200 | W | SA-1 CPU control: reset, IRQ, NMI, 4-bit message to SA-1 |
 | CRV | $2203-$2204 | W | SA-1 Reset Vector (address SA-1 jumps to on release from reset) |
-| SIWP | $2229 | W | SNES I-RAM Write Protection (bit=1 means page is **writable**) |
-| CIWP | $222A | W | SA-1 I-RAM Write Protection (bit=1 means page is **writable**) |
+| SIWP | $2229 | W | SNES I-RAM Write Protection (**polarity disputed** — see note; OpenSNES writes `$FF`) |
+| CIWP | $222A | W | SA-1 I-RAM Write Protection (**polarity disputed** — see note; OpenSNES writes `$FF`) |
+
+> **SIWP/CIWP polarity is disputed.** The [Super Famicom Dev
+> Wiki](https://wiki.superfamicom.org/sa-1-registers) and fullsnes say each
+> bit *enables* protection for one 256-byte I-RAM page (so `$00` = all
+> writable, `$FF` = all protected). But **Mesen2** (our accuracy reference)
+> and **snes9x** behave the opposite way: with `$FF` the crt0 I-RAM
+> self-test passes (`sa1_status=$A5`), with `$00` it fails. OpenSNES writes
+> `$FF` because that is what works on the emulators we validate against. The
+> tie has not been broken on real SA-1 hardware. See `KNOWN_LIMITATIONS.md`.
 | SFR | $2300 | R | Status Flags: SA-1 IRQ/NMI pending, 4-bit message from SA-1 |
 
 **Typical boot sequence:**
@@ -557,10 +566,11 @@ sta.l $2203          ; CRV low
 lda.w #sa1_entry>>8
 sta.l $2204          ; CRV high (bank handled by mapping)
 
-; Enable I-RAM writes for both CPUs
+; Enable I-RAM writes for both CPUs ($FF = writable on Mesen2/snes9x;
+; polarity disputed vs the wiki — see the note above)
 lda #$FF
-sta.l $2229          ; SIWP — all pages writable by SNES
-sta.l $222A          ; CIWP — all pages writable by SA-1
+sta.l $2229          ; SIWP — I-RAM writable by SNES (per our emulators)
+sta.l $222A          ; CIWP — I-RAM writable by SA-1 (per our emulators)
 
 ; Release SA-1 from reset
 lda #$00

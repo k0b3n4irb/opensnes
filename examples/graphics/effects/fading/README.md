@@ -74,6 +74,12 @@ Bits 5-7: Unused
 
 ## Basic Fade Implementation
 
+> **Already in the lib.** `fadeOut(u8 speed)` and `fadeIn(u8 speed)` are
+> exposed from `snes/console.h` since v0.20.x — same signature, same
+> semantics as the snippets below. The example calls those directly;
+> the algorithm below is kept for pedagogical purposes so you can see
+> how a fade works on the wire.
+
 ### Fade In (Black to Full)
 
 ```c

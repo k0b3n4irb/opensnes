@@ -28,7 +28,7 @@
  * - The scene is static (no scrolling or animation)
  *
  * @par Modules Used
- * console, sprite, dma, background
+ * console, sprite, dma, background, asset
  *
  * @see background.h, dma.h, video.h
  */

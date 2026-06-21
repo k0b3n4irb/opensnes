@@ -4,40 +4,45 @@ IMPORTANT: Every change must pass this workflow before commit.
 
 ## Test Command
 
+The test harness runs on **luna** (cycle-accurate native emulator, pinned
+binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
+
 ```bash
-cd tools/opensnes-emu && node test/run-all-tests.mjs --quick
+scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
+python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
+python3 tools/luna-test/luna_runner.py --compare     # visual regression (framebuffer SHA-256 vs baselines)
+python3 tools/luna-test/probes/run_all.py            # functional probes (scripted input → WRAM asserts)
 ```
 
-This runs 8 phases (~390 checks total):
-1. **Preconditions** — toolchain and dependencies present
-2. **Compiler tests** — 60 C→ASM pattern checks
-3. **Build** — every example compiles cleanly (`find examples -name main.c | wc -l` for the count; `--list` for the per-phase breakdown)
-4. **Static analysis** — ROM headers, memory maps, symbol overlaps
-5. **Runtime execution** — emulated run of each ROM
-6. **Visual regression** — screenshot comparison against baselines
-7. **Lag detection** — frame timing verification
+Coverage covers every example (`luna_runner.py --list`). Static analysis
+(`symmap.py`), the build (`make`), and compiler C→ASM checks remain separate
+make/devtools steps. luna runs SA-1 / Super FX / DSP-1 natively — no chip-ROM
+side channel. Migration off snes9x-WASM: `.claude/notes/chantiers/luna_migration.md`.
 
 ## Change Classification
 
 | Class | What changed | Required validation |
 |-------|-------------|-------------------|
-| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full test suite + Mesen2 on ALL affected examples |
-| **B** | Library module (lib/source/) | `make lib` + test suite + Mesen2 on examples using that module |
-| **C** | Single example or new example | Build that example + test suite + Mesen2 on that example |
-| **D** | Docs, Makefile, tools only | Test suite only (no Mesen2 needed) |
+| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples |
+| **B** | Library module (lib/source/) | `make lib` + `make tests` covering examples using that module |
+| **C** | Single example or new example | Build that example + `make tests` (`luna_runner.py --only <ex>`) |
+| **D** | Docs, Makefile, tools only | `make tests` only |
 
-## 3-Pillar Validation
+## 2-Pillar Validation
 
-Every non-trivial change requires all 3 pillars:
+luna unifies what used to be two emulators (snes9x automated + Mesen2 manual),
+so validation is now 2 pillars:
 
-1. **opensnes-emu** (automated) — `node test/run-all-tests.mjs --quick`
-2. **Mesen2** (manual) — ask the user to validate visually in Mesen2 emulator
-3. **Full rebuild** — `make clean && make` must succeed with zero warnings
+1. **luna** (automated) — `make tests` (coverage + visual regression + probes).
+   luna is cycle-accurate and runs the chips, so it is both the automated suite
+   and the visual reference (no separate manual Mesen2 pass). For deep
+   interactive debugging, luna's GUI / MCP (`luna mcp`) is available.
+2. **Full rebuild** — `make clean && make` must succeed with zero warnings.
 
 ## Before Commit Checklist
 
 1. `make clean && make` — zero warnings
-2. `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick`
+2. `make tests` (luna coverage + visual regression + probes)
 3. **Triage impacted examples — short list, not exhaustive dump.** Apply the
    workflow in the next section (Impacted-Examples Triage). The output is a
    smart-selected list with one "what to look for" line per entry, not a wall

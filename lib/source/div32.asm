@@ -35,13 +35,21 @@
 .endif
 .endif
 
-.DEFINE __udivmod32 tcc_udivmod32
-.DEFINE __sdivmod32 tcc_sdivmod32
-.EXPORT __udivmod32
-.EXPORT __sdivmod32
-
 ; Pinned to bank 7 — same rationale as mul32.asm. ~270 bytes here would
 ; otherwise spill bank 0 string literals in the tighter examples.
+;
+; No `.EXPORT` directives here — that's for `.DEFINE`d names only, not labels.
+; Labels in a FREE section are visible across object files automatically.
+; The qbe backend emits `jsl tcc_udivmod32` / `jsl tcc_sdivmod32` directly,
+; and the linker resolves them via this section's symbol table with the
+; correct BANK 7 prefix.
+;
+; The previous setup used `.DEFINE __X tcc_X ; .EXPORT __X`, but WLA-DX's
+; `.DEFINE` captures only the 16-bit offset at parse time — section bank
+; placement isn't resolved until link, so `__X` would resolve to $00:8000
+; and collide with whatever bank-0 helper happened to land there. This
+; was the bug that broke tetris via `__mul32` colliding with `tcc_mul16`
+; (see commit 1208c53).
 .SECTION ".div32" BANK 7 FREE
 
 .ACCU 16

@@ -57,57 +57,9 @@ static void wait_for_key(void) {
     while (padHeld(0) == 0) WaitForVBlank();
 }
 
-/**
- * @brief Fade the screen from full brightness to black.
- *
- * Steps the INIDISP register ($2100) brightness field from 15 (full) down
- * to 0 (black). The @p speed parameter controls how many VBlank frames to
- * wait between each brightness step -- higher values produce slower fades.
- *
- * At 60 fps (NTSC):
- * - speed=1: 16 frames = ~0.27 seconds (fast/snappy)
- * - speed=3: 48 frames = ~0.80 seconds (cinematic)
- * - speed=6: 96 frames = ~1.60 seconds (dramatic)
- *
- * @param speed Number of VBlank frames to wait between each brightness step.
- *              1 = fastest (1 frame/step), 6 = slowest (6 frames/step).
- */
-static void fade_out(u8 speed) {
-    s8 brightness;
-    u8 i;
-
-    for (brightness = 15; brightness >= 0; brightness--) {
-        setBrightness((u8)brightness);
-
-        for (i = 0; i < speed; i++) {
-            WaitForVBlank();
-        }
-    }
-}
-
-/**
- * @brief Fade the screen from black to full brightness.
- *
- * Steps the INIDISP register ($2100) brightness field from 0 (black) up
- * to 15 (full). Symmetric counterpart to fade_out().
- *
- * @param speed Number of VBlank frames to wait between each brightness step.
- *              1 = fastest, 6 = slowest.
- *
- * @see fade_out() for timing details.
- */
-static void fade_in(u8 speed) {
-    u8 brightness;
-    u8 i;
-
-    for (brightness = 0; brightness <= 15; brightness++) {
-        setBrightness(brightness);
-
-        for (i = 0; i < speed; i++) {
-            WaitForVBlank();
-        }
-    }
-}
+/* Note: the previous example-local `fade_out` / `fade_in` helpers have
+ * been promoted to the lib (snes/console.h) as `fadeOut` / `fadeIn`.
+ * Use those directly — same signature, same semantics. */
 
 /**
  * @brief Entry point -- cycles through fade-out/fade-in at three speeds.
@@ -169,32 +121,32 @@ int main(void) {
     /* Main loop - cycle through fade effects */
     while (1) {
         /* Fast fade out (1 frame per step) */
-        fade_out(1);
+        fadeOut(1);
         WaitForVBlank();
         wait_for_key();
 
         /* Fast fade in */
-        fade_in(1);
+        fadeIn(1);
         WaitForVBlank();
         wait_for_key();
 
         /* Slow fade out (3 frames per step) */
-        fade_out(3);
+        fadeOut(3);
         WaitForVBlank();
         wait_for_key();
 
         /* Slow fade in */
-        fade_in(3);
+        fadeIn(3);
         WaitForVBlank();
         wait_for_key();
 
         /* Very slow fade out (6 frames per step) */
-        fade_out(6);
+        fadeOut(6);
         WaitForVBlank();
         wait_for_key();
 
         /* Very slow fade in */
-        fade_in(6);
+        fadeIn(6);
         WaitForVBlank();
         wait_for_key();
     }

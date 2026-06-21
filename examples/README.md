@@ -9,7 +9,7 @@ from basic concepts to complete games.
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [basics/](basics/) | 4 | Collision, timing, scene stack, randomness |
-| [graphics/](graphics/) | 27 | Backgrounds, sprites, visual effects, Mode 7 |
+| [graphics/](graphics/) | 26 | Backgrounds, sprites, visual effects, Mode 7 |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 4 | Music and sound effects via SNESMOD |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
@@ -47,37 +47,36 @@ from basic concepts to complete games.
 | 13 | [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
 | 14 | [graphics/backgrounds/mixed_scroll](graphics/backgrounds/mixed_scroll/) | Multiple BG layers scrolling at different rates |
 | 15 | [graphics/effects/hdma_wave](graphics/effects/hdma_wave/) | HDMA scanline wave distortion |
-| 16 | [graphics/effects/hdma_gradient](graphics/effects/hdma_gradient/) | HDMA color gradient per scanline |
-| 17 | [graphics/effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
-| 18 | [graphics/effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
-| 19 | [graphics/effects/transparency](graphics/effects/transparency/) | Color math (add/subtract blending) |
-| 20 | [graphics/effects/window](graphics/effects/window/) | Hardware window masking |
-| 21 | [graphics/effects/transparent_window](graphics/effects/transparent_window/) | Color math + HDMA windowed transparency |
+| 16 | [graphics/effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
+| 17 | [graphics/effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
+| 18 | [graphics/effects/transparency](graphics/effects/transparency/) | Color math (add/subtract blending) |
+| 19 | [graphics/effects/window](graphics/effects/window/) | Hardware window masking |
+| 20 | [graphics/effects/transparent_window](graphics/effects/transparent_window/) | Color math + HDMA windowed transparency |
 
 ### Level 4 -- Advanced Topics
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 22 | [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
-| 23 | [graphics/backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
-| 24 | [graphics/sprites/metasprite](graphics/sprites/metasprite/) | Multi-tile composite sprites |
-| 25 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
-| 26 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
-| 27 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
-| 28 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
-| 29 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
-| 30 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
+| 21 | [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
+| 22 | [graphics/backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 23 | [graphics/sprites/metasprite](graphics/sprites/metasprite/) | Multi-tile composite sprites |
+| 24 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
+| 25 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
+| 26 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 27 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 28 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
+| 29 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
 
 ### Level 5 -- Maps and Complete Projects
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 31 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
-| 32 | [maps/slopemario](maps/slopemario/) | Slopes and tile-based collision |
-| 33 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
-| 34 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
-| 35 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
-| 36 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
+| 30 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
+| 31 | [maps/slopemario](maps/slopemario/) | Slopes and tile-based collision |
+| 32 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
+| 33 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 34 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
+| 35 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
 
 ## Building
 

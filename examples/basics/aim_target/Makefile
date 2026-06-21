@@ -4,7 +4,7 @@ TARGET     := aim_target.sfc
 ROM_NAME   := AIM TARGET DEMO
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background text input gameloop math
+LIB_MODULES := console sprite dma background text input gameloop math fixed32
 
 CSRC       := main.c
 

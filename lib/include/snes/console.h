@@ -158,6 +158,45 @@ inline void setScreenOff(void) {
 void setBrightness(u8 brightness);
 
 /**
+ * @brief Fade the screen from full brightness (15) down to black (0).
+ *
+ * Steps INIDISP brightness from 15 → 0, waiting @p speed VBlank frames
+ * between each step. Final state: `setBrightness(0)` (visually black,
+ * screen still rendering). Combine with `setScreenOff()` afterwards if
+ * you want to also enter force-blank for safe VRAM updates.
+ *
+ * At 60 fps (NTSC):
+ * - `speed=1` → 16 frames (~0.27 s, fast/snappy)
+ * - `speed=3` → 48 frames (~0.80 s, cinematic)
+ * - `speed=6` → 96 frames (~1.60 s, dramatic)
+ *
+ * @param speed VBlank frames to wait between each brightness step.
+ *              `speed=0` falls through with no inter-step delay (visible
+ *              flash, ~16 frames if every step still hits VBlank via
+ *              loop overhead — not typically useful).
+ *
+ * @code
+ * fadeOut(3);              // ~0.8 s cinematic fade
+ * setScreenOff();          // force-blank for VRAM swap
+ * dmaCopyVram(new_tiles, 0, ...);
+ * setScreenOn();
+ * fadeIn(3);
+ * @endcode
+ */
+void fadeOut(u8 speed);
+
+/**
+ * @brief Fade the screen from black (0) up to full brightness (15).
+ *
+ * Symmetric counterpart to @ref fadeOut. Steps INIDISP brightness from
+ * 0 → 15, waiting @p speed VBlank frames between each step.
+ *
+ * @param speed VBlank frames to wait between steps (see @ref fadeOut for
+ *              the wall-clock cost at common values).
+ */
+void fadeIn(u8 speed);
+
+/**
  * @brief Get current brightness
  *
  * Inlined for zero-call-overhead access. The standalone definition is

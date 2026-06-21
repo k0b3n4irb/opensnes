@@ -1,0 +1,153 @@
+# Chantier — Migration test harness → Luna
+
+**Goal:** replace `tools/opensnes-emu` (snes9x compiled to WASM) **and** Mesen2
+with [luna](https://github.com/k0b3n4irb/luna), a cycle-accurate Rust SNES
+emulator (headless CLI + API + MCP) that natively runs SA-1 / Super FX / DSP-1.
+
+Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.md`.
+
+## Why (value-add)
+
+- **Unifies two emulators into one** headless Rust binary; kills the heavy CI
+  stack (Emscripten + WASM build + Node-core + Mesen2 + xvfb + ubuntu-22.04 pin).
+- **Runs the chips snes9x can't**: snes9x reports "GSU: NOT DETECTED" for our
+  SuperFX ROMs → the dual-baseline hack (`.bin` "boots only" + `.mesen2.bin`
+  "the real one") disappears. luna v0.2.0 detects `mapper = SuperFx` and reaches
+  `sa1_status = $A5` (= Mesen2), verified in the spike.
+- More accurate (CPU/SPC 100% Tom Harte), richer introspection, deterministic.
+- Aside: luna already defaults SIWP/CIWP to `$FF` *specifically for our
+  `sa1_starfield` demo* — same convention as our crt0 (ties into finding P1-3).
+
+## Locked decisions (2026-06-20)
+
+| # | Decision |
+|---|---|
+| 1 | Baseline format = **both**: SHA-256 framebuffer gate + PNG debug |
+| 2 | **Drop Mouse/Super Scope** (nothing to test it with). `input/mouse` + `input/superscope` → boot+visual only, no input coverage. Document in KNOWN_LIMITATIONS + their READMEs |
+| 3 | Pass/fail computed **in the runner** (luna has no `--assert` yet); upstream `--assert` optional |
+| 4 | Pin **luna v0.2.0** |
+| 5 | **Rewrite the runner off Node** — Python (consistent with `devtools/*.py`), shelling out to `luna` |
+| 6 | **Temporary double-run** CI (luna alongside the old suite) to prove value-add, then decommission |
+
+## Progress
+
+- ✅ **Phase 0 (spike) — GO** (2026-06-20). v0.2.0 aarch64 binary, SHA-256 OK,
+  ran headless. hello_world / mapscroll(B1 bank-$02 map) render; superfx_hello →
+  `SuperFx`; sa1_hello → `$A5`; framebuffer **byte-identical** across two runs.
+- ✅ **Phase 1 (prototype, in progress)** — `tools/luna-test/luna_runner.py`:
+  deterministic visual-regression over a 6-example first batch (text, maps,
+  sprites, audio, superfx, sa1). `--update`/compare/`--only`, runner-side
+  pass/fail. 6/6 baseline + 6/6 compare PASS; negative control (tampered hash)
+  → FAIL rc=1. Baselines in `tools/luna-test/baselines/`.
+
+- ✅ **Corpus coverage (branch `wip/luna-migration-corpus`)** — `luna_runner.py
+  --coverage` runs every built example ROM headless and writes
+  `tools/luna-test/CORPUS_COVERAGE.md`. Result: **57/57 OK, 0 SUSPECT, 0 FAIL**
+  — luna renders 100% of the OpenSNES example suite (all BG modes 0/1/3/5/7 +
+  mode7-perspective, HDMA gradient/wave/helpers, both SuperFX demos incl. a 3D
+  wireframe cube, both SA-1 demos, HiROM, all games/sprites/audio/input). The
+  GSU examples snes9x could never run are fully rendered. Spot-checked visually:
+  mapscroll (bank-$02 map), superfx_hello (ALL TESTS PASSED), superfx_3d (3D
+  cube), mode7 (PVSnesLib logo). `input_mouse`/`input_superscope` render fine —
+  only their device *input* is uncovered (decision #2).
+
+- ✅ **J0 prerequisites (P1-P3)** — `tools/luna-test/luna.version` (=v0.2.0),
+  `scripts/install-luna.sh` (download+SHA-256+install to `bin/luna`, honours
+  `$LUNA_BIN` for local-luna co-dev), runner resolves `bin/luna`. **N_corpus
+  reconciled = 56** (git-tracked `main.c`). Finding: `examples/graphics/effects/
+  hdma_gradient/` is **stale build residue** (no tracked `main.c`/`Makefile`) that
+  inflated the earlier `.sfc` count to 57 — runner now discovers via `main.c`, so
+  the phantom is excluded (56/56). The dir should be `rm`'d at some point.
+- **Plan of record:** `/tmp/luna_migration_FINAL_2026-06-20.md`. Architecture
+  CLOSED → Option B (Python runner + pinned native binary, no submodule, no WASM).
+  WS-L luna features (G1 `framebuffer_hash` CLI / G2 `--assert` / G3 `$21FC`/WDM)
+  are **optional enhancements, not gates** — migration + cutover need zero luna
+  code. Cross-arch resolved by baselining on the CI arch (= snes9x's existing
+  single-build-pin model).
+
+- ✅ **WS-R 2.1 (manifest + liveness)** — `manifest.toml` (default_steps +
+  per-example overrides + `input_dependent` for mouse/superscope) ; `liveness()`
+  from `luna state` (NMI/VBlank advancing + CPU not stopped — the boot-offset
+  frames−nmis is NOT gated, a first naive ratio gate false-flagged 7 healthy
+  examples). Coverage now **54 OK / 2 INPUT-DEP / 0 DEAD / 0 FAIL** (honest, vs
+  the earlier "57/57 renders").
+- ✅ **WS-R 2.3 (functional probes)** — `tools/luna-test/probes/`: `lib.py`
+  (symbol resolution via `.sym`, scripted `--input`, WRAM via `--peek`),
+  `run_all.py`, and 2 ported probes (`controller` — input→pad_keys==mask;
+  `mapscroll` — D-pad→xloc directional). Both PASS headless on luna. Pattern is
+  portable; remaining ~20 `test/functional/*.test.mjs` are mechanical follow-up
+  (mouse/superscope excluded — gap G4).
+
+- ✅ **Full-corpus visual regression** — `run()` unified over all 56 examples
+  (key = framebuffer PNG SHA-256, steps from manifest). `baselines/` committed
+  (56 PNGs, aarch64). `--update`/`--compare` → 56/56.
+- ✅ **DECOMMISSION (Phase 6)** — removed the `tools/opensnes-emu` submodule
+  (snes9x-WASM core + Node runner + Mesen2). Rewrote the CI `functional-tests`
+  job → luna (install-luna + coverage + probes + visual-regression; no
+  emsdk/WASM/Node/Mesen2/xvfb/ubuntu-22.04 pin; visual-regression kept
+  `continue-on-error` until x86_64 cross-arch confirmed). `make tests` → luna.
+  Disabled `benchmark.yml` (depended on the removed run-benchmark.mjs + fixture).
+  Updated CLAUDE.md, .claude/rules/testing.md (2-pillar), KNOWN_LIMITATIONS.md
+  (GSU entry resolved). **Reversible: this is on the wip branch, not merged.**
+
+- ✅ **Doc sweep** — updated user/contributor/normative docs off the old harness:
+  README, CONTRIBUTING, ROADMAP (test-suite desc + P3.4 superseded note),
+  PHILOSOPHY, docs/GETTING_STARTED, docs/BENCHMARK (disabled banner),
+  docs/tutorials/{superfx,sram}, tools/README, `.claude/rules/{compiler,release,
+  regression_method,doc_consistency,abi_lint,new_example,testing}.md`,
+  .github/{pull_request_template,workflows/release.yml}, and the superfx_3d /
+  superfx_hello example READMEs (added a luna ✅ row). `make lint-docs` green.
+  Left intentionally: `.claude/notes/**` + CHANGELOG (history), `docs/build/`
+  (generated), user-facing "open in Mesen2 (recommended)" lines and the snes9x
+  emulator-list entry (legit user advice), and the kept snes9x "❌ GSU" rows.
+
+## ⚠️ Coverage regression introduced by the decommission
+
+Removing `opensnes-emu` also removed the **60 C→ASM compiler-pattern checks**
+(`tools/opensnes-emu/test/compiler/`) and the **cycle-count benchmark**
+(`run-benchmark.mjs` + `bench_functions.c`). The luna harness covers runtime
+(coverage/visual/probes) but NOT these compile-time checks. **Re-home both into
+the repo** (e.g. `devtools/`), independent of the emulator — high priority
+follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
+
+- ✅ **Bumped pin v0.2.0 → v0.3.0 (2026-06-21).** Most luna feature requests
+  (`/tmp/luna_feature_requests.md`) landed: `--print-fbhash` (L1),
+  `--assert`/`--assert-aram`/`--assert-vram` (L2), `$21FC` Nocash + `WDM` capture
+  (L3), `--cpu-trace`/`--dma-trace`/`--mem-trace-bank` (L5), `--srm` (L6).
+  **Still missing: L4 Mouse + Super Scope.** Suite green on v0.3.0 with NO
+  re-baseline (v0.2.0 baselines byte-identical under v0.3.0): coverage 54 OK /
+  2 INPUT-DEP, visual 56/56, probes 6/6. Follow-ups now unblocked by v0.3.0:
+  switch the baseline key to `--print-fbhash` (cross-arch, L1); add `--assert`/
+  `$21FC` probe oracles; re-home the cycle benchmark via `--cpu-trace`.
+
+- ✅ **v0.3.0 feature adoption (3 follow-ups, 2026-06-21):**
+  - **L1** visual key → `--print-fbhash` (cross-arch stable); CI visual step now a
+    hard gate (dropped `continue-on-error`). 56/56.
+  - **L2/L3** probes use `--assert` (controller); the visual pass captures the SDK
+    `SNES_ASSERT`/WDM channel via `--wdm-out` → any in-ROM assertion that trips
+    FAILs that example (free global oracle; no example uses it yet).
+  - **L5** cycle benchmark re-homed: `devtools/cyclecount/bench.py` +
+    `bench_functions.c` + baseline; `make bench` + CI step. Static estimate vs
+    baseline (the `--cpu-trace` ground-truth cross-check is documented as the next
+    step — needs a ROM harness). benchmark.yml note updated.
+  - L4 (Mouse/Super Scope) still the only missing luna feature.
+
+## Open / next
+
+- ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
+  generated on aarch64). The #1 thing the double-run period must confirm. If
+  x86_64 ≠ aarch64, fall back to: canonical-arch baseline, or hash raw RGBA /
+  `framebuffer_hash()` instead of the encoded PNG. (See tool README.)
+- Migrate remaining phases: runtime/WRAM (`state --peek`), lag (`state.stats`),
+  input (`--input`), corpus (`bench`), MCP swap (`luna mcp`).
+- Expand manifest to all 56 examples.
+- CI: add a non-blocking luna job next to `functional-tests`; compare verdicts
+  1-2 weeks; then rewrite the job and decommission `tools/opensnes-emu` (incl.
+  the Node/TS runner, WASM core, Mesen2 install) + the `.bin`/`.mesen2.bin`
+  baselines. Update `CLAUDE.md`, `.claude/rules/testing.md`, `KNOWN_LIMITATIONS.md`
+  (the "snes9x can't detect GSU" entry becomes obsolete).
+
+## Branch
+
+`wip/luna-migration` (off develop). Reversible until the Phase-4
+decommissioning; the old suite stays in place during the double-run.

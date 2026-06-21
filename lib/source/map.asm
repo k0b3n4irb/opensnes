@@ -502,10 +502,10 @@ _mapDAS1:
     phb
     sep #$20
     .ACCU 8
-    lda #$00
-    pha
-    plb
-    rep #$20
+    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    pha                                     ; hardcoded bank $00; now honours the
+    plb                                     ; pointer's bank so the map can live
+    rep #$20                                ; outside bank $00)
     .ACCU 16
     lda 0,x
     plb
@@ -617,10 +617,10 @@ _phb1:
     phb
     sep #$20
     .ACCU 8
-    lda #$00
-    pha
-    plb
-    rep #$20
+    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    pha                                     ; hardcoded bank $00; now honours the
+    plb                                     ; pointer's bank so the map can live
+    rep #$20                                ; outside bank $00)
     .ACCU 16
     lda 0,x
     plb
@@ -683,10 +683,10 @@ _pvb1:
     phb
     sep #$20
     .ACCU 8
-    lda #$00
-    pha
-    plb
-    rep #$20
+    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    pha                                     ; hardcoded bank $00; now honours the
+    plb                                     ; pointer's bank so the map can live
+    rep #$20                                ; outside bank $00)
     .ACCU 16
     lda 0,x
     plb
@@ -1139,10 +1139,10 @@ mapGetMetaTile:
     phb
     sep #$20
     .ACCU 8
-    lda #$00
-    pha
-    plb
-    rep #$20
+    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    pha                                     ; hardcoded bank $00; now honours the
+    plb                                     ; pointer's bank so the map can live
+    rep #$20                                ; outside bank $00)
     .ACCU 16
     lda 0,x
     plb
@@ -1200,10 +1200,10 @@ mapGetMetaTilesProp:
     phb
     sep #$20
     .ACCU 8
-    lda #$00
-    pha
-    plb
-    rep #$20
+    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    pha                                     ; hardcoded bank $00; now honours the
+    plb                                     ; pointer's bank so the map can live
+    rep #$20                                ; outside bank $00)
     .ACCU 16
     lda 0,x
     plb

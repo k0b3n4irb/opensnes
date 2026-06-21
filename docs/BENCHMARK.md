@@ -2,7 +2,9 @@
 
 *Last updated: 2026-05-13 (re-baselined post deferred-emit + lib retrofit
 chantier; toolchain pins qbe `988073d`, cproc `42a5c46`).
-Run: `cd tools/opensnes-emu && node test/run-benchmark.mjs`*
+Run: (currently **DISABLED** — depended on the removed `opensnes-emu`
+submodule; pending re-home off the old harness, see
+`.claude/notes/chantiers/luna_migration.md`)*
 
 ## Summary
 

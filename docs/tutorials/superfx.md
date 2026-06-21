@@ -30,6 +30,7 @@ registers, hardware PLOT for pixel rendering, and an instruction cache.
 |----------|--------|
 | **Mesen2** | Recommended -- detects the GSU correctly and runs all current SuperFX examples |
 | **bsnes** | Cycle-accurate -- useful as a second reference |
+| **luna** | Detects and runs the GSU natively (the headless test harness validates SuperFX end-to-end) |
 | **snes9x** | Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED") |
 
 ## Getting Started

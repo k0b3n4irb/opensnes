@@ -11,11 +11,14 @@
   `contributing`, `release`, `submodule`, `deps`, `readme`,
   `changelog`, `test`, `tests`) plus emerged categories matching real
   paths (`chantiers` → `.claude/notes/chantiers/`, `rules` →
-  `.claude/rules/`, `bench` → bench fixtures). The canonical
+  `.claude/rules/`, `bench` → bench fixtures, `luna-test` →
+  `tools/luna-test/`). The canonical
   source-of-truth list lives in `devtools/lint_commits.py`'s
   `ALLOWED_SCOPES` set — extend BOTH places in the same commit.
 - Format: `type(scope): description` — non-empty description, no
   trailing period, imperative mood recommended.
+- A commit touching two areas may use a **comma-separated scope list**
+  (`feat(compiler,lib): …`); each scope must be in the allowlist.
 - Case of the first letter is NOT enforced. Conventional Commits doesn't
   mandate it (the lowercase-first convention is from Angular's commit
   guide, not the spec), and forcing it just made contributors fight

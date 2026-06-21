@@ -26,7 +26,7 @@
  * - No input required; the effect runs continuously
  *
  * @par Modules Used
- * console, dma, background, sprite, hdma, input, math
+ * console, dma, background, sprite, hdma, input
  *
  * @see hdma.h, background.h, dma.h
  */

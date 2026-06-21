@@ -24,7 +24,7 @@
  * - The image remains stationary (no scrolling)
  *
  * @par Modules Used
- * console, sprite, dma, background
+ * console, sprite, dma, background, asset
  *
  * @see background.h, dma.h, video.h
  */

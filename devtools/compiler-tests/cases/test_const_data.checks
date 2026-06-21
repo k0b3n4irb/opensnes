@@ -1,0 +1,4 @@
+# const arrays → ROM (not RAMSECTION); mutable array → RAM (not SUPERFREE)
+section const_arr: absent \.RAMSECTION
+section const_u8_arr: absent \.RAMSECTION
+section mut_arr: absent SUPERFREE

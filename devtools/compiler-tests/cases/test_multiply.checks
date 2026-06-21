@@ -1,0 +1,4 @@
+# const multiply inlined (no __mul16); variable multiply uses __mul16
+in mul_by_13: absent __mul16
+in mul_var: present __mul16
+in mul_var: present pha

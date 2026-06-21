@@ -16,7 +16,10 @@ tilesetpal_end:
 .ends
 
 ;--- Map data (from tmx2snes) ---
-.section ".rodata2" superfree
+; B1 proof: pinned to bank 2 (out of bank $00). mapLoad + the scroll
+; runtime now honour the pointer's bank byte, so the 25 KB map no longer
+; has to sit in bank $00.
+.section ".rodata2" semifree bank 2
 
 mapdata:
 .incbin "res/BG1.m16"

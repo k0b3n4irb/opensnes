@@ -88,7 +88,7 @@ See existing examples in `docs/examples_group.md` for the format.
 Every example directory MUST have a `README.md` with:
 
 1. **Title** — example name as H1
-2. **Screenshot** — embedded screenshot from opensnes-emu (`![Screenshot](screenshot.png)`)
+2. **Screenshot** — embedded screenshot from luna (`![Screenshot](screenshot.png)`)
 3. **Description** — what the example demonstrates (2-3 sentences)
 4. **SNES Concepts** — bullet list of hardware/software concepts shown
 5. **How to Build** — standard build command
@@ -96,20 +96,12 @@ Every example directory MUST have a `README.md` with:
 
 ### Screenshot Generation
 
-Use opensnes-emu to generate screenshots autonomously:
+Use luna to generate screenshots autonomously (run far enough in to reach
+a representative scene; pulse Start via `--input` if the example waits on it):
 ```bash
-cd tools/opensnes-emu && node -e "
-const { createHeadlessEmulator } = require('./dist/server/headless.js');
-const { writeFileSync } = require('fs');
-(async () => {
-  const emu = await createHeadlessEmulator();
-  await emu.loadROM('../../examples/<path>/<rom>.sfc');
-  emu.runFrames(120);
-  const png = emu.screenshot.captureFrame(1);
-  writeFileSync('../../examples/<path>/screenshot.png', png);
-  emu.destroy();
-})();
-"
+scripts/install-luna.sh   # once
+tools/luna-test/bin/luna run -n 3000000 \
+  --screenshot examples/<path>/screenshot.png examples/<path>/<rom>.sfc
 ```
 
 Save the screenshot as `screenshot.png` in the example directory.
