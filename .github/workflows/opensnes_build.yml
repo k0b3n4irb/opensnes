@@ -270,11 +270,11 @@ jobs:
         # regenerate baselines with `luna_runner.py --update` meanwhile.)
         run: python3 tools/luna-test/luna_runner.py --compare
 
-      - name: WRAM-state regression
-        # Per-frame WRAM hash stream (wram-trace) vs committed baseline — catches
-        # runtime-state regressions invisible to the framebuffer. Cross-arch
-        # stable (content hashes of deterministic RAM).
-        run: python3 tools/luna-test/wram_regress.py
+      # NOTE: the WRAM-state regression (`make test-wram`) is intentionally NOT a
+      # CI gate. Unlike the framebuffer (luna guarantees `--print-fbhash`
+      # cross-arch), raw WRAM content is not a cross-arch guarantee: two examples
+      # (mapandobjects, slopemario) hash differently x86_64 ↔ aarch64. It stays a
+      # local, same-arch developer tool for "did my change alter invisible state?".
 
       - name: Upload luna artifacts on failure
         if: failure()

@@ -129,14 +129,16 @@ tests: test-compiler
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
-	@python3 tools/luna-test/wram_regress.py
 	@python3 tools/luna-test/probes/run_all.py
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
 
-# WRAM-state regression (per-frame state oracle, stronger than the framebuffer).
+# WRAM-state regression — a LOCAL, same-arch developer tool ("did my change alter
+# invisible runtime state?"), NOT part of `make tests`/CI: raw WRAM content is not
+# a luna cross-arch guarantee (the framebuffer is). Re-baseline on your machine
+# with `python3 tools/luna-test/wram_regress.py --update`.
 test-wram:
 	@python3 tools/luna-test/wram_regress.py
 

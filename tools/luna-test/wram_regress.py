@@ -7,11 +7,15 @@ compare it against a committed baseline. This catches runtime-state regressions
 that never reach the screen (an uninitialised read, a mis-stepped counter, a
 changed allocation) — which the framebuffer fbhash can't see.
 
-The WRAM hashes are content hashes of deterministic RAM, so the key is
-cross-architecture-stable (same model as the fbhash visual key).
+LOCAL, SAME-ARCH TOOL — NOT a CI gate. Unlike the framebuffer (luna guarantees
+`--print-fbhash` cross-arch), raw WRAM content is *not* a cross-arch guarantee:
+most examples hash identically across hosts, but two (mapandobjects, slopemario)
+diverge x86_64 ↔ aarch64. So the committed `baselines/wram.json` is only valid on
+its capture arch; run `--update` on your own machine, then `--compare` to catch
+"did my change alter invisible runtime state?" that the framebuffer can't see.
 
-  make test-wram                                    # compare vs baseline
-  python3 tools/luna-test/wram_regress.py --update  # re-baseline (after an intended change)
+  make test-wram                                    # compare vs (your) baseline
+  python3 tools/luna-test/wram_regress.py --update  # (re)baseline on this machine
 
 Exit 0 = all match, 1 = any drift.
 """
