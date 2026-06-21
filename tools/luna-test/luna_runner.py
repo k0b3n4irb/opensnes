@@ -135,14 +135,19 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def render(luna: str, rom: Path, steps: int, out_png: Path) -> str:
-    """Render `rom` after `steps`: write the PNG (for human diffing) and return
-    luna's `--print-fbhash` — a hash of the pre-PNG pixels that luna documents as
-    cross-architecture-stable, so it's the regression key (immune to PNG-encoder
-    drift, unlike hashing the encoded PNG)."""
+def render(luna: str, rom: Path, steps: int, out_png: Path) -> tuple[str, bool]:
+    """Render `rom` after `steps`; return (fbhash, wdm_fired).
+
+    fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
+    as cross-architecture-stable) — the regression key, immune to PNG-encoder
+    drift. wdm_fired = whether the SDK's in-ROM `SNES_ASSERT`/WDM channel tripped
+    during the run (`--wdm-out` non-empty, feature L3) — a free assertion oracle.
+    The PNG is written for human diffing."""
     out_png.parent.mkdir(parents=True, exist_ok=True)
+    wdm = out_png.with_suffix(".wdm.txt")
     proc = subprocess.run(
-        [luna, "run", "-n", str(steps), "--print-fbhash", "--screenshot", str(out_png), str(rom)],
+        [luna, "run", "-n", str(steps), "--print-fbhash",
+         "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out_png.is_file():
@@ -150,7 +155,7 @@ def render(luna: str, rom: Path, steps: int, out_png: Path) -> str:
     m = re.search(r"fbhash=([0-9a-fA-F]+)", proc.stdout)
     if not m:
         raise RuntimeError(f"no fbhash from luna for {rom.name}: {proc.stdout.strip()[:200]}")
-    return m.group(1)
+    return m.group(1), (wdm.is_file() and wdm.stat().st_size > 0)
 
 
 def run(update: bool, only: str | None) -> int:
@@ -177,10 +182,11 @@ def run(update: bool, only: str | None) -> int:
         steps = manifest["examples"].get(key, {}).get("steps", default_steps)
         baseline_png = BASELINE_DIR / f"{label}.png"
         if update:
-            fbhash = render(luna, rom, steps, baseline_png)
+            fbhash, wdm = render(luna, rom, steps, baseline_png)
             db[label] = {"fbhash": fbhash, "steps": steps,
                          "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
-            print(f"  BASELINE  {label}  fbhash={fbhash}")
+            print(f"  BASELINE  {label}  fbhash={fbhash}"
+                  + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm else ""))
         else:
             ref = db.get(label)
             if not ref:
@@ -189,12 +195,15 @@ def run(update: bool, only: str | None) -> int:
                 continue
             actual_png = Path("/tmp/luna-test-actual") / f"{label}.png"
             try:
-                fbhash = render(luna, rom, ref["steps"], actual_png)
+                fbhash, wdm = render(luna, rom, ref["steps"], actual_png)
             except RuntimeError as e:
                 print(f"  ERROR {label}: {e}")
                 failures += 1
                 continue
-            if fbhash == ref.get("fbhash"):
+            if wdm:
+                print(f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run")
+                failures += 1
+            elif fbhash == ref.get("fbhash"):
                 print(f"  PASS  {label}")
             else:
                 print(f"  FAIL  {label}: fbhash {fbhash} != baseline {ref.get('fbhash')} ({actual_png})")
@@ -209,7 +218,7 @@ def run(update: bool, only: str | None) -> int:
 
 
 def render_state(luna: str, rom: Path, steps: int, png: Path) -> dict:
-    """Run `luna state` → return parsed EmulatorState JSON (+ write a PNG)."""
+    """Run `luna state` → parsed EmulatorState JSON (+ write a PNG)."""
     png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
         [luna, "state", "-n", str(steps), "--out", "-", "--screenshot", str(png), str(rom)],
@@ -270,7 +279,8 @@ def coverage(luna: str) -> int:
         "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
         "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
         "clean functional pass. **DEAD** = ran but not live (crash/hang). "
-        "**FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`.",
+        "**FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM "
+        "`SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)",
         "",
         "| Example | Status | Detail |",
         "|---|---|---|",

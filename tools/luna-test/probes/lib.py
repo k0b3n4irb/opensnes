@@ -118,5 +118,30 @@ def sym_size(rom: Path, name: str) -> int:
     raise KeyError(f"_sizeof_{name} not in {rom.name}.sym")
 
 
+def assert_mem(luna: str, rom: Path, steps: int,
+               specs: list[tuple[int, int, str]],
+               input_script: str | None = None) -> tuple[bool, str]:
+    """Delegate WRAM equality to luna's `--assert BANK:OFFSET=HEX` (L2).
+
+    specs = [(bank, offset, hexbytes), …] where hexbytes is the in-memory byte
+    sequence (e.g. a u16 value 0x0080 → "8000", little-endian). Returns luna's
+    own pass/fail (exit code) plus its PASS/FAIL stdout for detail.
+    """
+    cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null"]
+    if input_script:
+        cmd += ["--input", input_script]
+    for bank, off, hexb in specs:
+        cmd += ["--assert", f"{bank:02X}:{off:04X}={hexb}"]
+    cmd.append(str(rom))
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    detail = " ".join(l.strip() for l in proc.stdout.splitlines() if "FAIL" in l) or "all assertions pass"
+    return proc.returncode == 0, detail
+
+
+def word_bytes(value: int) -> str:
+    """u16 value → little-endian in-memory hex (for assert_mem specs)."""
+    return f"{value & 0xFF:02X}{(value >> 8) & 0xFF:02X}"
+
+
 def rom_path(rel: str) -> Path:
     return REPO_ROOT / "examples" / rel
