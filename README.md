@@ -88,7 +88,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
 | **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP register init is an assumption, not a published spec. |
-| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validate with Mesen2** — most accurate GSU emulator we have currently. **snes9x does not detect the GSU chip** in our ROM headers, so the snes9x-based CI test suite cannot validate SuperFX execution end-to-end (P3.4 tracks adding a Mesen2-headless CI path). |
+| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by luna**, which detects and executes the GSU natively in the headless test harness. |
 
 ---
 
@@ -101,7 +101,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
 | **54 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
-| **Debug emulator** | snes9x WASM with ~390 automated checks (compiler tests + visual regression + lag detection + runtime + input sequences) |
+| **Debug emulator** | luna (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
 
 ## Design Philosophy

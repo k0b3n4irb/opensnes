@@ -62,6 +62,8 @@ ALLOWED_SCOPES = {
     #   `rules`     -> .claude/rules/
     #   `bench`     -> tools/opensnes-emu/test/fixtures/benchmark/
     "chantiers", "rules", "bench",
+    # luna test-harness migration (2026-06-21): real path tools/luna-test/
+    "luna-test",
 }
 
 SUBJECT_RE = re.compile(

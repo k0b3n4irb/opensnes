@@ -1,0 +1,9 @@
+# tail-call optimisation: jml not jsl+rtl; chained keeps first jsl
+in call_add: present \tjml add_u16
+in call_add: absent \tjsl
+in call_add: absent \trtl
+in call_chain: present \tjml add_one
+in call_chain: present \tjsl add_one
+in call_chain: absent \trtl
+in no_tail_call: absent \tjml
+in no_tail_call: present \trtl

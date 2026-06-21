@@ -17,7 +17,7 @@
 ## Self-Review Checklist
 
 - [ ] `make clean && make` passes without warnings
-- [ ] `cd tools/opensnes-emu && node test/run-all-tests.mjs --quick` passes
+- [ ] `make tests` (luna) passes
 - [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
 - [ ] No unrelated changes mixed in (one topic per PR)
 - [ ] New code has Doxygen documentation

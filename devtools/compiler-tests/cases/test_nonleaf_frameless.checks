@@ -1,0 +1,5 @@
+# intermediate-across-call needs a frame (sbc); tail-only call gets leaf_opt=1
+in compute_across_call: present \bsbc\b
+in compute_across_call: present jsl
+in forward_with_work: present \bsbc\b
+present forward_with_work.*leaf_opt=1

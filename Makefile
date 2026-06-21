@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -125,8 +125,19 @@ lib: compiler
 examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
-tests:
-	@echo "Tests moved to tools/opensnes-emu. Run: node tools/opensnes-emu/test/run-all-tests.mjs"
+tests: test-compiler
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/luna_runner.py --coverage
+	@python3 tools/luna-test/luna_runner.py --compare
+	@python3 tools/luna-test/probes/run_all.py
+
+# Compile-time cc65816 C→ASM pattern checks (no emulator needed).
+test-compiler:
+	@python3 devtools/compiler-tests/run.py
+
+# Compiler cycle-count regression guard (static estimate vs committed baseline).
+bench:
+	@python3 devtools/cyclecount/bench.py
 
 docs:
 	cd docs && doxygen Doxyfile

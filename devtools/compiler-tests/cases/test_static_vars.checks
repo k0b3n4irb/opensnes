@@ -1,0 +1,4 @@
+# stores to statics must not collapse to bank 0 offset 0; symbols defined
+absent sta\.l\s+\$000000
+present \nmy_static_byte:
+present \nmy_static_word:

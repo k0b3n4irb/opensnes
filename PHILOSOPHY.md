@@ -32,7 +32,7 @@ the same stack and are complementary rather than adversarial:
 | NMI / VBlank | User-managed | Auto-orchestrated (auto-flush hook, scroll sync, OAM DMA) |
 | Hardware quirks | Exposed (Y-position +1 scanline, etc.) | Hidden behind APIs, documented in `docs/hardware/` |
 | Font / asset model | Bring-your-own (caller provides tile + palette pointers) | Battery-included (default font shipped, asset pipeline opt-in) |
-| Test infrastructure | Lightweight | 261-check CI suite (visual regression on snes9x + Mesen2, lag detection, runtime, static, compiler patterns) |
+| Test infrastructure | Lightweight | luna-driven CI suite (corpus liveness + visual regression + functional probes; chips run natively), plus static analysis + compiler-pattern checks |
 | Scope | Library | Library + framework opt-ins (sprite engine, scene system, …) |
 
 A user moving from one to the other should feel a **change in altitude**,
