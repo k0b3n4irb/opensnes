@@ -17,10 +17,10 @@ probes. Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
 
-- The pinned luna binary, **`v0.3.0`** (decision #4). Resolution order:
-  `$LUNA_BIN` → `luna` on `PATH` → `tools/luna-test/vendor/luna-v0.3.0-linux-<arch>/luna`.
-  Download: `gh release download v0.3.0 --repo k0b3n4irb/luna --pattern '*linux-<arch>*'`
-  (verify the `.sha256`).
+- The pinned luna binary — version in `tools/luna-test/luna.version` (currently
+  **`v0.3.2`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+  `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
+  `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
   Emscripten, no WASM, no Mesen2, no xvfb.**
 
