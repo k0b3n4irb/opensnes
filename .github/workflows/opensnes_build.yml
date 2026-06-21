@@ -129,10 +129,9 @@ jobs:
 
       # ------------------------------------ #
       # Functional tests run in a separate   #
-      # job (see `functional-tests` below):  #
-      # opensnes-emu is Linux-only (WASM     #
-      # build via emsdk), so we don't try    #
-      # to run it on Windows/macOS legs.     #
+      # job (see `functional-tests` below),  #
+      # which runs the luna suite on Linux;  #
+      # these per-OS legs are build-only.    #
       # ------------------------------------ #
 
       # ------------------------------------ #
