@@ -5,6 +5,33 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.21.0] — 2026-06-21
+
+Test-harness migration: OpenSNES now validates ROMs with **luna**, a
+cycle-accurate native emulator, replacing the snes9x-WASM + Mesen2 stack. luna
+runs SA-1 / Super FX / DSP-1 natively, so the chip-ROM Mesen2 side channel (and
+the whole emsdk / WASM / Node / xvfb CI burden) is gone.
+
+### Added
+- `tools/luna-test/` — luna-driven test harness (Python): `make tests` runs
+  corpus liveness coverage + full-corpus visual regression (56 examples, keyed on
+  luna's cross-arch-stable `--print-fbhash`) + functional probes (scripted
+  input → WRAM via `--assert`) + the SDK `SNES_ASSERT`/WDM assertion oracle
+  (`--wdm-out`).
+- `scripts/install-luna.sh` — fetch the pinned luna binary (v0.3.0), verify its
+  SHA-256; honours `$LUNA_BIN` for a local luna build.
+- `devtools/compiler-tests/` — re-homed cc65816 C→ASM pattern checks
+  (`make test-compiler`) with a declarative `.checks` DSL and 66 fixtures.
+- `devtools/cyclecount/bench.py` — re-homed compiler cycle-count benchmark
+  (`make bench`) against a committed baseline.
+
+### Changed
+- `make tests` and the CI `functional-tests` job now run on luna; removed the
+  `tools/opensnes-emu` submodule (snes9x libretro WASM core + Node runner +
+  vendored Mesen2 binary) and the dual-baseline (`.bin` / `.mesen2.bin`) scheme.
+- Docs swept off snes9x/Mesen2 onto the luna harness; `KNOWN_LIMITATIONS.md`
+  "snes9x can't detect the GSU" entry resolved (luna runs it natively).
+
 ## [0.20.0] — 2026-05-17
 
 Chantier A1-followup — `long` arithmetic flows through 32-bit Kl
