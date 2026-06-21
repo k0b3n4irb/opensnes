@@ -130,6 +130,7 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@echo "ALL CHECKS PASSED (luna)"
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:

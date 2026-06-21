@@ -30,6 +30,6 @@ fi
 
 # Tests not run today — block
 cat <<'EOF'
-{"decision": "block", "reason": "BLOCKED: OpenSNES test suite has not been run today.\n\nRun the test suite first:\n\n  cd tools/opensnes-emu && node test/run-all-tests.mjs --quick\n\nIf all checks pass, the marker /tmp/opensnes_tests_passed_$(date +%Y-%m-%d) is created automatically.\n\nTo bypass for trivial changes (docs, comments), touch the marker manually:\n\n  touch /tmp/opensnes_tests_passed_$(date +%Y-%m-%d)\n\nSee CONTRIBUTING.md for the full testing workflow."}
+{"decision": "block", "reason": "BLOCKED: OpenSNES test suite has not been run today.\n\nRun the test suite first (single tool: luna):\n\n  make tests\n\nWhen it prints 'ALL CHECKS PASSED' the marker /tmp/opensnes_tests_passed_$(date +%Y-%m-%d) is created automatically.\n\nTo bypass for trivial changes (docs, comments), touch the marker manually:\n\n  touch /tmp/opensnes_tests_passed_$(date +%Y-%m-%d)\n\nSee CONTRIBUTING.md for the full testing workflow."}
 EOF
 exit 0
