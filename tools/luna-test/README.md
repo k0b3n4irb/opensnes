@@ -65,3 +65,17 @@ sequences (`--input`), `luna bench` corpus run, the MCP swap (`luna mcp`), the
 full 56-example manifest, and the CI rewrite. Mouse/Super Scope coverage is
 **dropped** (decision #2) — `input/mouse` + `input/superscope` get boot+visual
 validation only.
+
+## Hardening tests (luna v0.3.0 capabilities)
+
+Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
+never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
+
+- **Audio** (`probes/audio.py`, H5) — SNESMOD examples must have ≥1 active SPC
+  voice + non-silent PCM (`--audio-out`); the SFX driver must be alive.
+- **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
+  `wram-trace` hash stream vs a committed baseline; catches runtime-state
+  regressions invisible to the framebuffer. Cross-arch stable.
+- **VBlank DMA budget** (`probes/dma_budget.py`, H2) — estimates steady-state
+  VRAM-DMA bytes/frame and flags > ~4 KB/VBlank. Estimate pending luna L13
+  (frame column on `--dma-trace`).

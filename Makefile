@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests test-compiler bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -129,11 +129,16 @@ tests: test-compiler
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
+	@python3 tools/luna-test/wram_regress.py
 	@python3 tools/luna-test/probes/run_all.py
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
+
+# WRAM-state regression (per-frame state oracle, stronger than the framebuffer).
+test-wram:
+	@python3 tools/luna-test/wram_regress.py
 
 # Compiler cycle-count regression guard (static estimate vs committed baseline).
 bench:

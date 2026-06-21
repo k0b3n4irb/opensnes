@@ -132,6 +132,14 @@ follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
     step — needs a ROM harness). benchmark.yml note updated.
   - L4 (Mouse/Super Scope) still the only missing luna feature.
 
+- ✅ **Test hardening batch 1 (2026-06-21, branch `wip/luna-test-hardening`):**
+  new coverage axes via luna v0.3.0 — **H5 audio** (`probes/audio.py`: SPC voices
+  + PCM RMS), **H7 WRAM-state regression** (`wram_regress.py` + baseline,
+  `make test-wram`), **H2 VBlank DMA budget** (`probes/dma_budget.py`, estimate).
+  All green (probes 8/8, wram 56/56). Surfaced luna request **L13** (frame column
+  on `--dma-trace` for the exact per-VBlank budget). Plan:
+  `/tmp/luna_test_hardening_ideas.md` (H1/H3/H4/H6/H8–H12 remain).
+
 ## Open / next
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
