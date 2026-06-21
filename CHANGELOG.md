@@ -7,30 +7,63 @@ covers changes made since the fork.
 
 ## [0.21.0] — 2026-06-21
 
-Test-harness migration: OpenSNES now validates ROMs with **luna**, a
-cycle-accurate native emulator, replacing the snes9x-WASM + Mesen2 stack. luna
-runs SA-1 / Super FX / DSP-1 natively, so the chip-ROM Mesen2 side channel (and
-the whole emsdk / WASM / Node / xvfb CI burden) is gone.
+Two headline efforts: a new **`fix32` fixed-point math module** and a full
+**test-harness migration to luna** (a cycle-accurate native emulator). Plus
+compiler `Kl` (32-bit) correctness fixes, the engine-review follow-ups, and a
+procedurally-generated shoot-'em-up example.
 
 ### Added
-- `tools/luna-test/` — luna-driven test harness (Python): `make tests` runs
-  corpus liveness coverage + full-corpus visual regression (56 examples, keyed on
-  luna's cross-arch-stable `--print-fbhash`) + functional probes (scripted
-  input → WRAM via `--assert`) + the SDK `SNES_ASSERT`/WDM assertion oracle
-  (`--wdm-out`).
-- `scripts/install-luna.sh` — fetch the pinned luna binary (v0.3.0), verify its
-  SHA-256; honours `$LUNA_BIN` for a local luna build.
-- `devtools/compiler-tests/` — re-homed cc65816 C→ASM pattern checks
-  (`make test-compiler`) with a declarative `.checks` DSL and 66 fixtures.
-- `devtools/cyclecount/bench.py` — re-homed compiler cycle-count benchmark
-  (`make bench`) against a committed baseline.
+- **`fix32` 16.16 fixed-point math** (chantier B5): `fix32Mul`, `fix32Div`
+  (48-iteration long divide), `fix32Lerp`, `fix32Sin` / `fix32Cos`, the
+  `snes/fixed32.h` header and inline helpers — backed by a new compiler **`Kl`
+  (64-bit-class) return convention** for 32-bit results.
+- **Easing LUTs** (chantier B6): `ease_in_quad` / `ease_out_quad`.
+- New examples: **`fix32_orbit`** (B5 capstone), **`aim_target`** (fix32Cos/Sin
+  alongside 8.8), and **`shmup_1942`** — a procedurally-generated vertical
+  shoot-'em-up (cellular-automata archipelago + autotile resolver, vertical
+  auto-scroll, 8-enemy spawn pool, AABB collision, BG3 HUD).
+- `fadeOut` / `fadeIn` promoted into `snes/console.h`.
+- **luna test harness** (`tools/luna-test/`, Python): `make tests` runs corpus
+  liveness coverage + full-corpus visual regression (56 examples, keyed on luna's
+  cross-arch-stable `--print-fbhash`) + functional probes (scripted input → WRAM
+  via `--assert`) + audio checks (`--audio-out` + SPC voices) + WRAM-state
+  regression (`wram-trace`) + VRAM/ARAM content + decoded sprite structure + the
+  SDK `SNES_ASSERT`/WDM assertion oracle (`--wdm-out`).
+- `scripts/install-luna.sh` — fetch + SHA-256-verify the pinned luna binary
+  (v0.3.0); honours `$LUNA_BIN` for a local build.
+- Re-homed compile-time checks off the removed emulator submodule:
+  `devtools/compiler-tests/` (cc65816 C→ASM pattern checks, `make test-compiler`,
+  declarative `.checks` DSL) and `devtools/cyclecount/bench.py` (cycle-count
+  benchmark, `make bench`).
 
 ### Changed
-- `make tests` and the CI `functional-tests` job now run on luna; removed the
-  `tools/opensnes-emu` submodule (snes9x libretro WASM core + Node runner +
-  vendored Mesen2 binary) and the dual-baseline (`.bin` / `.mesen2.bin`) scheme.
+- `dmaCopyVram` / `dmaCopyCGram` read the source bank from the caller's `Kl`
+  pointer — DMA sources (and map data) can now live outside bank $00.
+- Test harness migrated to **luna**: removed the `tools/opensnes-emu` submodule
+  (snes9x libretro WASM core + Node runner + vendored Mesen2) and the
+  dual-baseline (`.bin` / `.mesen2.bin`) scheme. CI drops emsdk / WASM build /
+  Node-core / Mesen2 / xvfb / the ubuntu-22.04 pin. luna runs SA-1 / Super FX /
+  DSP-1 natively, so the chip-ROM Mesen2 side channel is gone.
+- `hdma_wave` moves its 7 KB tables out of `main.c` (bank $00 hygiene).
 - Docs swept off snes9x/Mesen2 onto the luna harness; `KNOWN_LIMITATIONS.md`
   "snes9x can't detect the GSU" entry resolved (luna runs it natively).
+
+### Fixed
+- **Compiler `Kl` (32-bit) codegen**: `__mul32` alias dropped the bank byte
+  (broke pointer / board indexing); `qbe` `Kl` shift-by-constant now spills
+  `low_orig` before the `asl` chain; `mul32` / `div32` export fixes (the
+  `tcc_[us]divmod32` alias trap, spurious `.EXPORT` in FREE sections).
+- **Map data outside bank $00** (chantier B1, first milestone): the map-scroll
+  path honours the layer bank, so large maps no longer silently read garbage.
+- `oamSet` signature corrected in `compiler/ABI.md` (P0-1), now guarded by a
+  doc-drift check.
+- SA-1 SIWP/CIWP power-on polarity documented (kept `$FF`; P1-3).
+- `shmup_1942` rendering fixes (bullet spawn / reach-top, BG scroll direction,
+  enemy sprite V-flip).
+
+### Performance
+- `shmup_1942` writes player / bullet OAM directly, dropping per-frame `oamSet`
+  overhead and fixing scroll lag.
 
 ## [0.20.0] — 2026-05-17
 
