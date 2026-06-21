@@ -2,7 +2,7 @@ var indexSectionsWithContent =
 {
   0: "$0123456789_abcdefghijklmnopqrstuvwxyz×–—→≥🔴🟠🟡🟢",
   1: "abeglmoprst",
-  2: "abcdeghiklmoprstvw",
+  2: "abcdefghiklmoprstvw",
   3: "abcdefghiklmnoprstuw",
   4: "_abcdefghijklmnoprstuvwxy",
   5: "bfgstuv",

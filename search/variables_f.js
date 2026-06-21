@@ -20,5 +20,7 @@ var searchData=
   ['oby_17',['oby',['../games_2breakout_2main_8c.html#ab8301075e8707b76d42be10e10874bcc',1,'main.c']]],
   ['onscreen_18',['onscreen',['../structt__objs.html#a158edcd064c0b2a21b8eea4cc5dcfa8a',1,'t_objs']]],
   ['orange_5fpal_19',['orange_pal',['../render_8c.html#a94c4f8909d4b4082dba8c626f326134b',1,'render.c']]],
-  ['orange_5fpal_5fend_20',['orange_pal_end',['../render_8c.html#a758423799a10ec752d719b45d37fd944',1,'render.c']]]
+  ['orange_5fpal_5fend_20',['orange_pal_end',['../render_8c.html#a758423799a10ec752d719b45d37fd944',1,'render.c']]],
+  ['orbiter_5fpal_21',['orbiter_pal',['../basics_2fix32__orbit_2main_8c.html#a84c66313a5d44bf5342efb6fd7e34471',1,'main.c']]],
+  ['orbiter_5ftile_22',['orbiter_tile',['../basics_2fix32__orbit_2main_8c.html#a56bc2b83bbb0f8b7b79646801c964fd7',1,'main.c']]]
 ];

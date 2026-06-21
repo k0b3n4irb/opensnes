@@ -2,6 +2,8 @@ var console_8h =
 [
     [ "consoleInit", "console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1", null ],
     [ "consoleInitEx", "console_8h.html#a61f5e51d0173ceaad88679ed162359d1", null ],
+    [ "fadeIn", "console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb", null ],
+    [ "fadeOut", "console_8h.html#a6c68f9393684a2b251292a9e93891a02", null ],
     [ "getBrightness", "console_8h.html#a10a8dd24d5584e2cb833c5acfbf332c6", null ],
     [ "getFrameCount", "console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6", null ],
     [ "getRegion", "console_8h.html#a2dc1e4cf693184256120eada1beaca14", null ],

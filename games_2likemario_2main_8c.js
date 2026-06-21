@@ -21,7 +21,6 @@ var games_2likemario_2main_8c =
     [ "VRAM_SPR_SMALL", "games_2likemario_2main_8c.html#a7969a37ad80a90f7ec11c8eccd822291", null ],
     [ "asr8", "games_2likemario_2main_8c.html#ab9e45c26644c427a0c4a665d44d2c2bd", null ],
     [ "getSpriteTilBank", "games_2likemario_2main_8c.html#a50b0f07ee9375582d2f51bc2ef8c4a0f", null ],
-    [ "loadGraphics", "games_2likemario_2main_8c.html#ab112b2561151944d1c248b0f35b86eb0", null ],
     [ "main", "games_2likemario_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "map_flush_column", "games_2likemario_2main_8c.html#a6e673294f4ea577471b6a8b49aeb0575", null ],
     [ "map_get_tile_prop", "games_2likemario_2main_8c.html#a239872ea5ac806101f72b27dca4fcea4", null ],
@@ -52,6 +51,8 @@ var games_2likemario_2main_8c =
     [ "mapmario", "games_2likemario_2main_8c.html#ac1309b0fbf0de7ed50dcd666c4f6995f", null ],
     [ "mario_action", "games_2likemario_2main_8c.html#abf248dfba13f521a932e34626741bacd", null ],
     [ "mario_anim_idx", "games_2likemario_2main_8c.html#acfc065e24c9bd4da82cdfe2d6e60844c", null ],
+    [ "mario_sprite_pal", "games_2likemario_2main_8c.html#a9af184ace3867c5be24dd33e44af0da6", null ],
+    [ "mario_sprite_palend", "games_2likemario_2main_8c.html#a11a8a7513255e600674887fb85159d0f", null ],
     [ "mario_sprite_til", "games_2likemario_2main_8c.html#a67fd1acd5ce2ce121082795cd1b28695", null ],
     [ "mario_x", "games_2likemario_2main_8c.html#a3f5722ffc5d3e0c7a778e8ff46794706", null ],
     [ "mario_xfrac", "games_2likemario_2main_8c.html#af256f257e72a75081871dc3bd08def7d", null ],
@@ -61,5 +62,9 @@ var games_2likemario_2main_8c =
     [ "mario_yvel", "games_2likemario_2main_8c.html#a05709ec4afee417fb1d9d0bc3432e02d", null ],
     [ "sfx_jump_slot", "games_2likemario_2main_8c.html#a986e5fe5d150399d454bd76e054a771a", null ],
     [ "tile_props", "games_2likemario_2main_8c.html#a365e9b5b6ab48524dde57eb550149a40", null ],
+    [ "tiles_pal", "games_2likemario_2main_8c.html#a78181ef85e5654d84864c62594ea2973", null ],
+    [ "tiles_palend", "games_2likemario_2main_8c.html#a8d43101d158fd384f23308d6c6e4a160", null ],
+    [ "tiles_til", "games_2likemario_2main_8c.html#a51595c729c9abdf4532ec0b74a4dd272", null ],
+    [ "tiles_tilend", "games_2likemario_2main_8c.html#a6eb885e6f296dd921a08cb0b10a06a53", null ],
     [ "tilesetatt", "games_2likemario_2main_8c.html#a7c2cc3f600a848059ca53a4f836c1a40", null ]
 ];

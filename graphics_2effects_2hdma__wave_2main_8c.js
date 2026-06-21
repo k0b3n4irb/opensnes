@@ -9,7 +9,7 @@ var graphics_2effects_2hdma__wave_2main_8c =
     [ "amp_idx", "graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6", null ],
     [ "amp_offsets", "graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08", null ],
     [ "animating", "graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9", null ],
-    [ "hdma_tables", "graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072", null ],
+    [ "hdma_tables", "graphics_2effects_2hdma__wave_2main_8c.html#ae05a9c41b2bc58d8bf8855428f8ab2bf", null ],
     [ "phase", "graphics_2effects_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1", null ],
     [ "tiles", "graphics_2effects_2hdma__wave_2main_8c.html#a13912a192faf5a9d70b395935f61472c", null ],
     [ "wave_on", "graphics_2effects_2hdma__wave_2main_8c.html#a1217eca99ae6132b71291ce224f6faf8", null ]

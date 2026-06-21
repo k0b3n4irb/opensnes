@@ -143,9 +143,9 @@ Variables</h2></td></tr>
 <tr class="memitem:abdd3cff453194f6dbcc796e20b76dd08" id="r_abdd3cff453194f6dbcc796e20b76dd08"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08">amp_offsets</a> [7]</td></tr>
 <tr class="memdesc:abdd3cff453194f6dbcc796e20b76dd08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed byte offsets into hdma_tables[] for each amplitude level.  <br /></td></tr>
 <tr class="separator:abdd3cff453194f6dbcc796e20b76dd08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac773506df458c7fe6bcb8a67fe258072" id="r_ac773506df458c7fe6bcb8a67fe258072"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2hdma__wave_2main_8c.html#ac773506df458c7fe6bcb8a67fe258072">hdma_tables</a> [7 *1006]</td></tr>
-<tr class="memdesc:ac773506df458c7fe6bcb8a67fe258072"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed HDMA sine wave tables for 7 amplitude levels.  <br /></td></tr>
-<tr class="separator:ac773506df458c7fe6bcb8a67fe258072"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05a9c41b2bc58d8bf8855428f8ab2bf" id="r_ae05a9c41b2bc58d8bf8855428f8ab2bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2hdma__wave_2main_8c.html#ae05a9c41b2bc58d8bf8855428f8ab2bf">hdma_tables</a> []</td></tr>
+<tr class="memdesc:ae05a9c41b2bc58d8bf8855428f8ab2bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed HDMA sine wave tables for 7 amplitude levels.  <br /></td></tr>
+<tr class="separator:ae05a9c41b2bc58d8bf8855428f8ab2bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13912a192faf5a9d70b395935f61472c" id="r_a13912a192faf5a9d70b395935f61472c"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphics_2effects_2hdma__wave_2main_8c.html#a13912a192faf5a9d70b395935f61472c">tiles</a> []</td></tr>
 <tr class="memdesc:a13912a192faf5a9d70b395935f61472c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimal 4bpp tile data: one empty tile and one solid tile.  <br /></td></tr>
 <tr class="separator:a13912a192faf5a9d70b395935f61472c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -363,8 +363,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ac773506df458c7fe6bcb8a67fe258072" name="ac773506df458c7fe6bcb8a67fe258072"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac773506df458c7fe6bcb8a67fe258072">&#9670;&#160;</a></span>hdma_tables</h2>
+<a id="ae05a9c41b2bc58d8bf8855428f8ab2bf" name="ae05a9c41b2bc58d8bf8855428f8ab2bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae05a9c41b2bc58d8bf8855428f8ab2bf">&#9670;&#160;</a></span>hdma_tables</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -373,22 +373,26 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hdma_tables[7 * 1006]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hdma_tables[]</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Pre-computed HDMA sine wave tables for 7 amplitude levels. </p>
-<p>Each amplitude level has TABLE_SIZE (1006) bytes containing 335 HDMA entries plus a 0x00 terminator. Each entry is 3 bytes:</p><ul>
-<li>Byte 0: 0x81 = repeat flag (bit 7) + 1 scanline count (bits 6-0). The repeat flag tells HDMA to re-read data bytes for every scanline in the group (here, just 1 scanline), which is required for smooth per-line distortion.</li>
-<li>Bytes 1-2: BG1HOFS low byte and high byte (16-bit scroll offset). Positive values shift the BG right, negative (two's complement, e.g. 0xFF,0xFF = -1) shift left.</li>
+<p>7 × 1006 = 7042 bytes, defined in <code>res/hdma_wave_tables.bin</code> and brought in by <code>data.asm</code> via <code>.incbin</code>. Layout per amplitude level (TABLE_SIZE = 1006 bytes):</p><ul>
+<li>335 HDMA entries, each 3 bytes:<ul>
+<li>Byte 0: 0x81 = repeat flag (bit 7) + 1 scanline count (bits 6-0). The repeat flag tells HDMA to re-read data bytes for every scanline in the group (here, just 1 scanline), required for smooth per-line distortion.</li>
+<li>Bytes 1-2: BG1HOFS low + high (signed 16-bit scroll offset). Positive shifts BG right, negative (two's complement, 0xFF 0xFF = -1) shifts left.</li>
 </ul>
-<p>The 335 entries cover 224 visible scanlines plus 111 extra entries. By advancing the HDMA start pointer by 3 bytes (one entry) per frame, the wave pattern appears to scroll vertically. After 112 entries (one full sine period), the pattern repeats seamlessly due to the wrap region.</p>
+</li>
+<li>1 terminator byte (0x00).</li>
+</ul>
+<p>The 335 entries cover 224 visible scanlines plus 111 wrap entries. By advancing the HDMA start pointer by 3 bytes (one entry) per frame, the wave pattern appears to scroll vertically. After 112 entries (one full sine period), the pattern repeats seamlessly thanks to the wrap region.</p>
 <p>Amplitude levels: 0, 4, 8, 12, 16, 20, 24 pixels peak displacement. </p>
 
 </div>

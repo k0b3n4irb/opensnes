@@ -360,7 +360,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Sprite (Object) Management. </p>
 <p>Functions for managing hardware sprites (OBJ).</p>
-<h2><a class="anchor" id="autotoc_md54"></a>
+<h2><a class="anchor" id="autotoc_md57"></a>
 SNES Sprite Limits</h2>
 <ul>
 <li>128 sprites total</li>
@@ -368,7 +368,7 @@ SNES Sprite Limits</h2>
 <li>Sizes: 8x8, 16x16, 32x32, 64x64</li>
 <li>8 palettes (16 colors each, sharing color 0)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md55"></a>
+<h2><a class="anchor" id="autotoc_md58"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Initialize sprite system (defaults: 8x8/16x16 sprites, tile base 0)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a9d6fcc9729fec7dfbc71fc435783c12e">oamInit</a>(<a class="code hl_define" href="sprite_8h.html#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a>, <a class="code hl_define" href="sprite_8h.html#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a>);</div>
@@ -387,7 +387,7 @@ Usage</h2>
 <div class="ttc" id="asprite_8h_html_a9d6fcc9729fec7dfbc71fc435783c12e"><div class="ttname"><a href="sprite_8h.html#a9d6fcc9729fec7dfbc71fc435783c12e">oamInit</a></div><div class="ttdeci">void oamInit(u16 size, u16 tile_base)</div><div class="ttdoc">Initialize the sprite (OAM) system.</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License</dd></dl>
-<h2><a class="anchor" id="autotoc_md56"></a>
+<h2><a class="anchor" id="autotoc_md59"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib sprite system by Alekmaul </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -1882,8 +1882,8 @@ Attribution</h2>
 <div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a>[];</div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a>(<a class="code hl_variable" href="basics_2aim__target_2main_8c.html#a8a93c98a1e1bf824c8c791a3653f4d09">sprite_tiles</a>, <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a> - <a class="code hl_variable" href="basics_2aim__target_2main_8c.html#a8a93c98a1e1bf824c8c791a3653f4d09">sprite_tiles</a>,</div>
 <div class="line">              <a class="code hl_variable" href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a>, 32, 0, 0x6000, <a class="code hl_define" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>);</div>
-<div class="ttc" id="abasics_2aim__target_2main_8c_html_a8a93c98a1e1bf824c8c791a3653f4d09"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#a8a93c98a1e1bf824c8c791a3653f4d09">sprite_tiles</a></div><div class="ttdeci">static const u8 sprite_tiles[64]</div><div class="ttdoc">Two 8×8 sprite tiles in SNES 4bpp format (64 bytes total).</div><div class="ttdef"><b>Definition</b> main.c:80</div></div>
-<div class="ttc" id="abasics_2aim__target_2main_8c_html_ad00b9a7770bb3ca84c9ff3c5504255e1"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a></div><div class="ttdeci">static const u8 sprite_pal[]</div><div class="ttdoc">Sprite palette — single palette shared by player and target.</div><div class="ttdef"><b>Definition</b> main.c:111</div></div>
+<div class="ttc" id="abasics_2aim__target_2main_8c_html_a8a93c98a1e1bf824c8c791a3653f4d09"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#a8a93c98a1e1bf824c8c791a3653f4d09">sprite_tiles</a></div><div class="ttdeci">static const u8 sprite_tiles[64]</div><div class="ttdoc">Two 8×8 sprite tiles in SNES 4bpp format (64 bytes total).</div><div class="ttdef"><b>Definition</b> main.c:93</div></div>
+<div class="ttc" id="abasics_2aim__target_2main_8c_html_ad00b9a7770bb3ca84c9ff3c5504255e1"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a></div><div class="ttdeci">static const u8 sprite_pal[]</div><div class="ttdoc">Sprite palette — single palette shared by player and target.</div><div class="ttdef"><b>Definition</b> main.c:124</div></div>
 <div class="ttc" id="agraphics_2sprites_2animated__sprite_2main_8c_html_ab70c48d98fc2ba28acebfe2acc51c291"><div class="ttname"><a href="graphics_2sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a></div><div class="ttdeci">u8 sprite_tiles_end[]</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
 <div class="ttc" id="asprite_8h_html_a429bb77c76f029e8ee367f6a1bd27dca"><div class="ttname"><a href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible)</div></div>
 </div><!-- fragment --> 

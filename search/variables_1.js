@@ -2,7 +2,7 @@ var searchData=
 [
   ['a_0',['a',['../games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a',1,'main.c']]],
   ['action_1',['action',['../structt__objs.html#af4bfdc0bbd947feb9ea45fd95f735a9d',1,'t_objs']]],
-  ['active_2',['active',['../structAudioVoiceState.html#ae623a907318e5108f0385f6474a4894b',1,'AudioVoiceState']]],
+  ['active_2',['active',['../structAudioVoiceState.html#ae623a907318e5108f0385f6474a4894b',1,'AudioVoiceState::active'],['../structEntity.html#a8e337523bd3e53b390fc1624a2aa1c46',1,'Entity::active']]],
   ['active_5feffect_3',['active_effect',['../structEffectState.html#a27d734cda7b83e2ce99d435c0ee582b4',1,'EffectState']]],
   ['aim_5ftarget_5fmap_4',['aim_target_map',['../input_2superscope_2main_8c.html#a35859279ec6a363be2a0c91d75550e7f',1,'main.c']]],
   ['aim_5ftarget_5fmap_5fend_5',['aim_target_map_end',['../input_2superscope_2main_8c.html#a4cdde5edfe65f3612c751be90e094935',1,'main.c']]],

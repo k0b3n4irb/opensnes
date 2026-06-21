@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('tutorial_window.html',''); initResizab
 <div class="contents">
 <div class="textblock"><p>This tutorial covers the SNES window-masking hardware: two configurable rectangles that clip individual BG layers, sprites, and the colour-math area on a per-pixel basis. The reach of this feature is wider than its name suggests — windows are how you do spotlights, scene transitions (an iris fade), split-screen status bars, animated triangle / diamond / circle reveals, and the area gate for transparency / blending effects.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html">Graphics</a> tutorial. The animated-shape patterns also depend on the <a class="el" href="hdma_8md.html">HDMA tutorial</a>. The pair tutorial is <a class="el" href="colormath_8md.html">Colormath</a>, which uses the window to gate which screen region gets blended.</p>
-<h2><a class="anchor" id="autotoc_md371"></a>
+<h2><a class="anchor" id="autotoc_md374"></a>
 What windows are</h2>
 <p>The SNES PPU keeps two independent windows: <code>Window 1</code> and <code>Window 2</code>. Each window is defined by a left and right pixel position (registers <code>WH0</code>/<code>WH1</code> for Window 1, <code>WH2</code>/<code>WH3</code> for Window 2 — <code>0</code>–<code>255</code> inclusive). Per scanline, every screen pixel is either <em>inside</em> or <em>outside</em> each window; that boolean is then fed to a per-layer mask that decides whether to draw the pixel.</p>
 <p>Three orthogonal axes:</p>
@@ -134,7 +134,7 @@ What windows are</h2>
 <p>The default is <code>OR</code>. Use <code>AND</code> for "intersect the two windows" (a smaller, central area). Use <code>XOR</code> for "show one or the other but not
 the overlap" — useful for split-screen reveals.</p>
 <p>Finally, the windowing system has separate gates for the <b>main screen</b> (what's actually displayed) and the <b>sub screen</b> (used by colour math for blending source). <code>windowSetMainMask(layers)</code> selects which layers on the main screen consult their window setup; <code>windowSetSubMask(layers)</code> does the same for the sub screen. Most common use is <code>windowSetMainMask(WINDOW_ALL)</code> to apply windowing on the visible image.</p>
-<h2><a class="anchor" id="autotoc_md372"></a>
+<h2><a class="anchor" id="autotoc_md375"></a>
 The minimum viable window</h2>
 <p>The smallest useful pattern: hide a strip of BG1 in the middle of the screen.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -173,7 +173,7 @@ windowing" — every layer renders normally. Always call it before configuring (
 <p>The default invert state is "show inside, hide outside" — meaning the slab from x=80 to x=176 <em>covers</em> BG1, and pixels outside are kept. That's usually what you want for "spotlight" effects. To flip:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="window_8h.html#ace412a79a04227a3b380fa54723a749a">windowSetInvert</a>(<a class="code hl_define" href="window_8h.html#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="window_8h.html#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>, 1);   <span class="comment">/* show outside, hide inside */</span></div>
 <div class="ttc" id="awindow_8h_html_ace412a79a04227a3b380fa54723a749a"><div class="ttname"><a href="window_8h.html#ace412a79a04227a3b380fa54723a749a">windowSetInvert</a></div><div class="ttdeci">void windowSetInvert(u8 window, u8 layers, u8 invert)</div><div class="ttdoc">Set window inversion for layers.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md373"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md376"></a>
 Static shapes vs animated shapes</h2>
 <p>The window's left/right boundaries are <em>single registers per window</em>. If you write them once, the boundaries stay the same on every scanline of the next frame — you get a vertical strip the full height of the screen.</p>
 <p>To get any other shape, you write the boundary registers <b>per scanline via HDMA</b>. The shape is encoded as a table of "for these N
@@ -195,20 +195,20 @@ scanlines, the window should be from `left` to `right`":</p>
 <p>The shipped <code>examples/graphics/effects/window</code> uses HDMA channels 4 and 5 in repeat mode to write <code>WH0</code> (<code>$2126</code>) and <code>WH1</code> (<code>$2127</code>) per scanline, producing an animated triangle/diamond. Read the example for the table-build pattern; the principle is "compute &lt;tt&gt;left[s]&lt;/tt&gt; and
 &lt;tt&gt;right[s]&lt;/tt&gt; for each scanline &lt;tt&gt;s&lt;/tt&gt;, lay them out as an HDMA table,
 trigger".</p>
-<h2><a class="anchor" id="autotoc_md374"></a>
+<h2><a class="anchor" id="autotoc_md377"></a>
 When the window register acts strange</h2>
 <p>Two non-obvious behaviours:</p>
-<h3><a class="anchor" id="autotoc_md375"></a>
+<h3><a class="anchor" id="autotoc_md378"></a>
 &lt;tt&gt;left &gt; right&lt;/tt&gt; is an "empty" window</h3>
 <p>If you set <code>left = 200, right = 100</code>, the window is <em>empty</em> — no pixel is inside it. Useful for "turn off the window mid-frame" via HDMA: a table line that sets <code>left = 1, right = 0</code> removes the window for that scanline group without disabling the whole layer.</p>
-<h3><a class="anchor" id="autotoc_md376"></a>
+<h3><a class="anchor" id="autotoc_md379"></a>
 Boundaries are inclusive on both ends</h3>
 <p>Pixel at <code>x = left</code> is inside; pixel at <code>x = right</code> is also inside. A "1-pixel wide" window has <code>left == right</code>. A window of width 256 spans the whole screen with <code>left = 0, right = 255</code>.</p>
-<h2><a class="anchor" id="autotoc_md377"></a>
+<h2><a class="anchor" id="autotoc_md380"></a>
 The window logic op trap</h2>
 <p>When you call <code>windowEnable(WINDOW_1, WINDOW_BG1)</code> and <code>windowEnable(WINDOW_2, WINDOW_BG1)</code>, both windows now affect BG1 — and the PPU consults the <b>logic op</b> for BG1 to decide. The default logic is <code>OR</code>.</p>
 <p>If you only ever use one window per layer, the logic op is irrelevant. If you use two windows on the same layer, set the op explicitly with <code>windowSetLogic(layer, WINDOW_LOGIC_*)</code> — relying on the default <code>OR</code> is fine but spelled-out logic is easier for the next reader.</p>
-<h2><a class="anchor" id="autotoc_md378"></a>
+<h2><a class="anchor" id="autotoc_md381"></a>
 The lib API</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -236,9 +236,9 @@ The lib API</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>windowSplit(splitX)</code>   </td><td class="markdownTableBodyNone">Helper: configure W1 = left half (<code>0..splitX</code>), W2 = right half (<code>splitX..255</code>) for split-screen.   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md379"></a>
+<h2><a class="anchor" id="autotoc_md382"></a>
 Worked patterns (the two shipped examples)</h2>
-<h3><a class="anchor" id="autotoc_md380"></a>
+<h3><a class="anchor" id="autotoc_md383"></a>
 Animated triangle reveal — &lt;tt&gt;examples/graphics/effects/window&lt;/tt&gt;</h3>
 <p>A diamond/triangle shape that reveals BG1 only inside the shape, with runtime layer selection:</p>
 <ul>
@@ -247,30 +247,30 @@ Animated triangle reveal — &lt;tt&gt;examples/graphics/effects/window&lt;/tt&g
 <li>Press <b>B</b>: apply window to both BG1 and BG2.</li>
 </ul>
 <p>Two HDMA channels (4 and 5) write <code>WH0</code>/<code>WH1</code> per scanline. The example uses <b>bare-metal register writes</b> rather than the lib helpers because that path was tested for byte-perfect parity with the PVSnesLib original. For new code, the lib helpers are preferred — they read more like SNES vocabulary.</p>
-<h3><a class="anchor" id="autotoc_md381"></a>
+<h3><a class="anchor" id="autotoc_md384"></a>
 Window + colour math — &lt;tt&gt;examples/graphics/effects/transparent_window&lt;/tt&gt;</h3>
 <p>Pairs the window system with the colour-math pipeline to produce a spotlight that <b>blends</b> BG1 onto BG2 (rather than just hiding it). The window covers part of the screen; inside the window, BG1 is half-transparent over BG2; outside, BG1 is fully opaque. The bridge is <code>WINDOW_MATH</code> — a layer mask bit that targets the <em>colour-math area</em> rather than a BG/OBJ. See the <a class="el" href="colormath_8md.html">Colormath tutorial</a> for the blending side; this example is the canonical "you need both" demo.</p>
-<h2><a class="anchor" id="autotoc_md382"></a>
+<h2><a class="anchor" id="autotoc_md385"></a>
 Gotchas</h2>
-<h3><a class="anchor" id="autotoc_md383"></a>
+<h3><a class="anchor" id="autotoc_md386"></a>
 🟠 HDMA on &lt;tt&gt;WH0&lt;/tt&gt;/&lt;tt&gt;WH1&lt;/tt&gt; requires repeat mode</h3>
 <p>The window boundary registers are <em>write-only</em> — the PPU consumes the written value for one scanline, then "forgets" it. To keep the window shape across scanlines, the HDMA table must use repeat mode (line-count high bit set) so the same data writes every scanline:</p>
 <div class="fragment"><div class="line">.db $A0, 80, 176    ; $A0 = $80 | 32 → repeat for 32 scanlines, write WH0=80,WH1=176</div>
 </div><!-- fragment --><p>Non-repeat mode (<code>.db 32, 80, 176</code>) writes once on line 1 and the window resets on lines 2–32 — visible as the shape "collapsing" after its first row. The <a class="el" href="hdma_8md.html">HDMA tutorial</a> covers the repeat-mode discipline more broadly.</p>
-<h3><a class="anchor" id="autotoc_md384"></a>
+<h3><a class="anchor" id="autotoc_md387"></a>
 🟠 &lt;tt&gt;windowEnable(window, WINDOW_MATH)&lt;/tt&gt; is the gate to colour math</h3>
 <p><code>WINDOW_MATH</code> is one of the layer-mask bits, but it doesn't refer to a BG or OBJ — it refers to the colour-math <em>area mask</em>. Setting it tells the PPU "this window restricts where colour math applies". It has no visible effect on its own; you also need colour math configured (see the <a class="el" href="colormath_8md.html">Colormath tutorial</a>) and the math area mask written via the registers <code>$2130</code>–<code>$2131</code>. Easy to forget either side of that handshake.</p>
-<h3><a class="anchor" id="autotoc_md385"></a>
+<h3><a class="anchor" id="autotoc_md388"></a>
 🟡 Always pair &lt;tt&gt;windowEnable&lt;/tt&gt; with &lt;tt&gt;windowSetMainMask&lt;/tt&gt;</h3>
 <p><code>windowEnable</code> tells <em>which</em> windows affect <em>which</em> layers; it does not by itself say "actually apply this window on the screen". The final gate is <code>windowSetMainMask(layers)</code> (or <code>windowSetSubMask(layers)</code>), which writes <code>TMW</code> (<code>$212E</code>) for the main screen.</p>
 <p>A scene that calls <code>windowEnable(WINDOW_1, WINDOW_BG1)</code> but forgets <code>windowSetMainMask(WINDOW_BG1)</code> shows BG1 normally — the window is configured but ignored. The <code><a class="el" href="window_8h.html#a950e61e7616f970db1d7dab2a851a8b7" title="Initialize window system.">windowInit()</a></code> default leaves both masks empty, so this is the common newcomer trap.</p>
-<h3><a class="anchor" id="autotoc_md386"></a>
+<h3><a class="anchor" id="autotoc_md389"></a>
 🟡 Window state survives between scenes</h3>
 <p><code><a class="el" href="window_8h.html#a950e61e7616f970db1d7dab2a851a8b7" title="Initialize window system.">windowInit()</a></code> is <em>not</em> called by <code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code>. If you switch scenes in your game, residual window state from the previous scene can mask the new scene's layers. Call <code><a class="el" href="window_8h.html#a950e61e7616f970db1d7dab2a851a8b7" title="Initialize window system.">windowInit()</a></code> (or <code><a class="el" href="window_8h.html#abc5aaec4f8b14ffdaa8aa487492962cb" title="Disable all windows.">windowDisableAll()</a></code> plus an explicit reconfiguration) at the start of each scene's setup.</p>
-<h3><a class="anchor" id="autotoc_md387"></a>
+<h3><a class="anchor" id="autotoc_md390"></a>
 🟡 Boundary register sequencing during HDMA</h3>
 <p>HDMA writes <code>WH0</code>, then <code>WH1</code>. If you also poke these registers manually mid-frame (without HDMA), keep both writes adjacent — a write to <code>WH0</code> followed by an unrelated PPU register write before <code>WH1</code> can land the second value in the wrong register. The lib helpers do this correctly; bare-metal code needs to keep the pair tight.</p>
-<h2><a class="anchor" id="autotoc_md388"></a>
+<h2><a class="anchor" id="autotoc_md391"></a>
 Cycle cost</h2>
 <p>The window logic itself is free — it's part of the PPU's per-pixel shader. The cost of <em>animating</em> the window comes from HDMA writes, and follows the <a class="el" href="hdma_8md.html">HDMA tutorial's cycle table</a>:</p>
 <ul>
@@ -279,7 +279,7 @@ Cycle cost</h2>
 <li>Two-channel HDMA (W1 left/right): about double the above, still under 1 % of CPU.</li>
 </ul>
 <p>Window animation is one of the cheapest scanline-effect patterns because the data per scanline is small (1–2 bytes per channel).</p>
-<h2><a class="anchor" id="autotoc_md389"></a>
+<h2><a class="anchor" id="autotoc_md392"></a>
 See also</h2>
 <ul>
 <li><code><a class="el" href="window_8h.html" title="SNES Window/Masking System.">lib/include/snes/window.h</a></code> — full API reference.</li>

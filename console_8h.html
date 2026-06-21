@@ -126,6 +126,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a61f5e51d0173ceaad88679ed162359d1" id="r_a61f5e51d0173ceaad88679ed162359d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a61f5e51d0173ceaad88679ed162359d1">consoleInitEx</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> options)</td></tr>
 <tr class="memdesc:a61f5e51d0173ceaad88679ed162359d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize console with options.  <br /></td></tr>
 <tr class="separator:a61f5e51d0173ceaad88679ed162359d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ab05fa0c4c26a7efb81e86d57661fb" id="r_a54ab05fa0c4c26a7efb81e86d57661fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
+<tr class="memdesc:a54ab05fa0c4c26a7efb81e86d57661fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade the screen from black (0) up to full brightness (15).  <br /></td></tr>
+<tr class="separator:a54ab05fa0c4c26a7efb81e86d57661fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c68f9393684a2b251292a9e93891a02" id="r_a6c68f9393684a2b251292a9e93891a02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
+<tr class="memdesc:a6c68f9393684a2b251292a9e93891a02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade the screen from full brightness (15) down to black (0).  <br /></td></tr>
+<tr class="separator:a6c68f9393684a2b251292a9e93891a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10a8dd24d5584e2cb833c5acfbf332c6" id="r_a10a8dd24d5584e2cb833c5acfbf332c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a10a8dd24d5584e2cb833c5acfbf332c6">getBrightness</a> (void)</td></tr>
 <tr class="separator:a10a8dd24d5584e2cb833c5acfbf332c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fd1f41354b0d09ca258af07c1cb6fa6" id="r_a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a> (void)</td></tr>
@@ -275,6 +281,74 @@ Attribution</h2>
 
 </div>
 </div>
+<a id="a54ab05fa0c4c26a7efb81e86d57661fb" name="a54ab05fa0c4c26a7efb81e86d57661fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54ab05fa0c4c26a7efb81e86d57661fb">&#9670;&#160;</a></span>fadeIn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void fadeIn </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fade the screen from black (0) up to full brightness (15). </p>
+<p>Symmetric counterpart to <a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>. Steps INIDISP brightness from 0 → 15, waiting <code>speed</code> VBlank frames between each step.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">speed</td><td>VBlank frames to wait between steps (see <a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a> for the wall-clock cost at common values). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6c68f9393684a2b251292a9e93891a02" name="a6c68f9393684a2b251292a9e93891a02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c68f9393684a2b251292a9e93891a02">&#9670;&#160;</a></span>fadeOut()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void fadeOut </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fade the screen from full brightness (15) down to black (0). </p>
+<p>Steps INIDISP brightness from 15 → 0, waiting <code>speed</code> VBlank frames between each step. Final state: <code>setBrightness(0)</code> (visually black, screen still rendering). Combine with <code><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></code> afterwards if you want to also enter force-blank for safe VRAM updates.</p>
+<p>At 60 fps (NTSC):</p><ul>
+<li><code>speed=1</code> → 16 frames (~0.27 s, fast/snappy)</li>
+<li><code>speed=3</code> → 48 frames (~0.80 s, cinematic)</li>
+<li><code>speed=6</code> → 96 frames (~1.60 s, dramatic)</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">speed</td><td>VBlank frames to wait between each brightness step. <code>speed=0</code> falls through with no inter-step delay (visible flash, ~16 frames if every step still hits VBlank via loop overhead — not typically useful).</td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(3);              <span class="comment">// ~0.8 s cinematic fade</span></div>
+<div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();          <span class="comment">// force-blank for VRAM swap</span></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(new_tiles, 0, ...);</div>
+<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
+<div class="line"><a class="code hl_function" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(3);</div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
+<div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
+<div class="ttc" id="aconsole_8h_html_a6c68f9393684a2b251292a9e93891a02"><div class="ttname"><a href="console_8h.html#a6c68f9393684a2b251292a9e93891a02">fadeOut</a></div><div class="ttdeci">void fadeOut(u8 speed)</div><div class="ttdoc">Fade the screen from full brightness (15) down to black (0).</div></div>
+<div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible)</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a id="a10a8dd24d5584e2cb833c5acfbf332c6" name="a10a8dd24d5584e2cb833c5acfbf332c6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a10a8dd24d5584e2cb833c5acfbf332c6">&#9670;&#160;</a></span>getBrightness()</h2>
 
@@ -331,7 +405,7 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:232</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:271</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
 </div><!-- fragment --> 
 </div>
@@ -663,7 +737,6 @@ Attribution</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
 <div class="line"><span class="comment">// ... massive VRAM update ...</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

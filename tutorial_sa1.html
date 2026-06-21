@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('tutorial_sa1.html',''); initResizable(
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers the SA-1 coprocessor — a second 65816 CPU running at 10.74 MHz inside the cartridge, giving your SNES game 3× the processing power.</p>
-<h2><a class="anchor" id="autotoc_md282"></a>
+<h2><a class="anchor" id="autotoc_md285"></a>
 What Is SA-1?</h2>
 <p>The SA-1 is a <b>65c816 clone</b> clocked at 10.74 MHz (vs 3.58 MHz for the main CPU). It shares the same instruction set, so you already know how to program it. Games like <em>Kirby Super Star</em>, <em>Super Mario RPG</em>, and <em>Kirby's Dream Land 3</em> used it to handle AI, physics, and decompression that the main CPU couldn't keep up with.</p>
 <table class="markdownTable">
@@ -132,7 +132,7 @@ What Is SA-1?</h2>
 <td class="markdownTableBodyNone">BW-RAM access   </td><td class="markdownTableBodyNone">Yes (via $6000 window)   </td><td class="markdownTableBodyNone">Yes (256 KB max)   </td></tr>
 </table>
 <p>The key constraint: <b>SA-1 cannot touch WRAM, PPU, or APU</b>. It can only read ROM and read/write I-RAM and BW-RAM. All communication with the main CPU happens through the 2 KB shared I-RAM.</p>
-<h2><a class="anchor" id="autotoc_md283"></a>
+<h2><a class="anchor" id="autotoc_md286"></a>
 Memory Architecture</h2>
 <div class="fragment"><div class="line">┌─────────────────────────────────────────────────────┐</div>
 <div class="line">│                    ROM (up to 8 MB)                  │</div>
@@ -148,16 +148,20 @@ Memory Architecture</h2>
 <div class="line"> │ WRAM 128K │   │ $3000-    │   │ BW-RAM   │</div>
 <div class="line"> │ PPU / APU │   │ $37FF     │   │ 256 KB   │</div>
 <div class="line"> └───────────┘   └───────────┘   └──────────┘</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md284"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md287"></a>
 I-RAM — The Mailbox</h3>
 <p>I-RAM is 2 KB of fast SRAM at <b>$3000-$37FF</b> (both CPUs see this address). The SA-1 also sees it at <b>$0000-$07FF</b> (its direct page region).</p>
 <p>This is how the two CPUs communicate: the main CPU writes data to I-RAM, the SA-1 reads it, computes results, writes them back, and signals "done."</p>
 <blockquote class="doxtable">
-<p>&zwj;<b>Write protection gotcha</b>: Both CPUs have independent write protection registers (SIWP at $2229, CIWP at $222A). <b>Bit = 1 means WRITABLE</b> (despite the register name). The default is $00 = all protected! You must write $FF to enable writes. </p>
+<p>&zwj;<b>Write protection gotcha (disputed polarity)</b>: Both CPUs have independent write-protection registers (SIWP at $2229, CIWP at $222A). The polarity is genuinely contested:</p><ul>
+<li>The <a href="https://wiki.superfamicom.org/sa-1-registers">Super Famicom Dev Wiki</a> and fullsnes say <b>bit = 1 PROTECTS</b> a 256-byte page, so <code>$00</code> = all writable, <code>$FF</code> = all protected.</li>
+<li><b>Mesen2</b> (our accuracy reference) and <b>snes9x</b> behave the <em>opposite</em> way: writing <code>$FF</code> leaves I-RAM writable (the crt0 self-test passes, <code>sa1_status=$A5</code>); writing <code>$00</code> blocks the writes and the self-test fails.</li>
+</ul>
+<p>OpenSNES writes **<code>$FF</code>** because that is what works on the emulators we test against. If you target real hardware, verify this on a cartridge — the tie is unbroken. The crt0 I-RAM self-test catches a wrong choice at runtime (<code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sa1IsReady()</a></code> returns false). </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md285"></a>
+<h2><a class="anchor" id="autotoc_md288"></a>
 Getting Started</h2>
-<h3><a class="anchor" id="autotoc_md286"></a>
+<h3><a class="anchor" id="autotoc_md289"></a>
 1. Enable SA-1 in Your Makefile</h3>
 <div class="fragment"><div class="line">OPENSNES := $(shell cd ../../.. &amp;&amp; pwd)</div>
 <div class="line">TARGET   := mygame.sfc</div>
@@ -174,7 +178,7 @@ Getting Started</h2>
 <li>Links the SA-1 library variant</li>
 <li>Includes your SA-1 boot stub in the ROM</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md287"></a>
+<h3><a class="anchor" id="autotoc_md290"></a>
 2. Write Your SA-1 Boot Code</h3>
 <p>Create <code>sa1_boot.asm</code> <b>in your example directory</b> (not in templates/). This code runs on the SA-1 at 10.74 MHz:</p>
 <div class="fragment"><div class="line">.ifdef SA1</div>
@@ -199,9 +203,10 @@ Getting Started</h2>
 <div class="line">    sep #$20</div>
 <div class="line">    .ACCU 8</div>
 <div class="line"> </div>
-<div class="line">    ; Enable SA-1 I-RAM writes (CRITICAL!)</div>
+<div class="line">    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable on Mesen2/snes9x;</div>
+<div class="line">    ; polarity is disputed vs the wiki — see the gotcha box above.</div>
 <div class="line">    lda #$FF</div>
-<div class="line">    sta.l $00222A           ; CIWP = $FF (bit=1 = WRITABLE)</div>
+<div class="line">    sta.l $00222A           ; CIWP = $FF (writable per our emulators)</div>
 <div class="line"> </div>
 <div class="line">    ; Signal ready to main CPU</div>
 <div class="line">    lda #$A5</div>
@@ -218,7 +223,7 @@ Getting Started</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why <code>sta.l</code> everywhere?</b> The SA-1's data bank register (DB) is undefined at boot. Using <code>sta.l</code> (long absolute, opcode $8F) bypasses DB entirely. This is the safest pattern for SA-1 code. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md288"></a>
+<h3><a class="anchor" id="autotoc_md291"></a>
 3. Initialize from C</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="sa1_8h.html">snes/sa1.h</a>&gt;</span></div>
@@ -247,9 +252,9 @@ Getting Started</h2>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p><code><a class="el" href="sa1_8h.html#acd5594c8f4e4a51d822db1fa86f35f87" title="Initialize and start the SA-1 coprocessor.">sa1Init()</a></code> returns 1 if the SA-1 wrote the $A5 magic byte to I-RAM $3000 within the timeout. The boot sequence (in <code>crt0.asm</code>) handles all the register setup: reset vector, I-RAM write protection, and SA-1 release.</p>
-<h2><a class="anchor" id="autotoc_md289"></a>
+<h2><a class="anchor" id="autotoc_md292"></a>
 Communication Patterns</h2>
-<h3><a class="anchor" id="autotoc_md290"></a>
+<h3><a class="anchor" id="autotoc_md293"></a>
 Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <p>The SA-1 computes data, sets a flag. The main CPU reads the data, clears the flag. Used by the <b>sa1_starfield</b> example.</p>
 <div class="fragment"><div class="line">┌──────────┐     I-RAM      ┌──────────┐</div>
@@ -289,7 +294,7 @@ Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="amemory_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="memory_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:27</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md291"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md294"></a>
 Pattern 2: Free-Running Counter</h3>
 <p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. See sa1_hello for register readback examples.</p>
 <div class="fragment"><div class="line">; SA-1 side: increment 32-bit counter forever</div>
@@ -306,7 +311,7 @@ Pattern 2: Free-Running Counter</h3>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">lo</a> = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3002;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">hi</a> = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3004;</div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:52</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md292"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md295"></a>
 I-RAM Layout Convention</h2>
 <p>We recommend this layout for SA-1 projects:</p>
 <table class="markdownTable">
@@ -324,9 +329,9 @@ I-RAM Layout Convention</h2>
 <p>Both CPUs must agree on this layout. Define constants in both your C code and assembly:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SA1_SYNC      (*(volatile u8*)0x3001)</span></div>
 <div class="line"><span class="preprocessor">#define SA1_BUFFER    ((volatile u8*)0x3010)</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md293"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md296"></a>
 SA-1 Assembly Tips</h2>
-<h3><a class="anchor" id="autotoc_md294"></a>
+<h3><a class="anchor" id="autotoc_md297"></a>
 Use &lt;tt&gt;sta.l&lt;/tt&gt; / &lt;tt&gt;lda.l&lt;/tt&gt; for Everything</h3>
 <p>The SA-1's DB register is undefined at boot. Don't use <code>sta addr</code> (absolute) — use <code>sta.l addr</code> (long absolute) to specify the full 24-bit address.</p>
 <div class="fragment"><div class="line">; WRONG — depends on DB register:</div>
@@ -334,7 +339,7 @@ Use &lt;tt&gt;sta.l&lt;/tt&gt; / &lt;tt&gt;lda.l&lt;/tt&gt; for Everything</h3>
 <div class="line"> </div>
 <div class="line">; CORRECT — full 24-bit address, no DB dependency:</div>
 <div class="line">sta.l $3008</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md295"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md298"></a>
 ROM Table Lookups with &lt;tt&gt;lda.l table,x&lt;/tt&gt;</h3>
 <p>To read data tables in ROM from the SA-1, use <code>lda.l table,x</code> (opcode $BF). This is a long indexed read — no DB dependency:</p>
 <div class="fragment"><div class="line">; Sine table in the same SUPERFREE section</div>
@@ -346,7 +351,7 @@ ROM Table Lookups with &lt;tt&gt;lda.l table,x&lt;/tt&gt;</h3>
 <div class="line">sep #$20</div>
 <div class="line">.ACCU 8</div>
 <div class="line">lda.l sine_table,x  ; opcode $BF — full 24-bit + X</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md296"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md299"></a>
 No &lt;tt&gt;stx.l&lt;/tt&gt; — Save X Through A</h3>
 <p>The 65816 has no <code>stx.l</code> instruction. To save/restore X via I-RAM:</p>
 <div class="fragment"><div class="line">txa                 ; X → A</div>
@@ -355,7 +360,7 @@ No &lt;tt&gt;stx.l&lt;/tt&gt; — Save X Through A</h3>
 <div class="line">; ... later ...</div>
 <div class="line">lda.l $3008         ; reload</div>
 <div class="line">tax                 ; A → X</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md297"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md300"></a>
 Explicit &lt;tt&gt;.ACCU&lt;/tt&gt; After Every &lt;tt&gt;rep&lt;/tt&gt;/&lt;tt&gt;sep&lt;/tt&gt;</h3>
 <p>WLA-DX loses accumulator width tracking after branch merges. Always add explicit <code>.ACCU 8</code>/<code>.ACCU 16</code> directives:</p>
 <div class="fragment"><div class="line">rep #$20</div>
@@ -365,7 +370,7 @@ Explicit &lt;tt&gt;.ACCU&lt;/tt&gt; After Every &lt;tt&gt;rep&lt;/tt&gt;/&lt;tt&
 <div class="line">sep #$20</div>
 <div class="line">.ACCU 8             ; ALWAYS add this!</div>
 <div class="line">; ... 8-bit code ...</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md298"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md301"></a>
 Debugging in Mesen2</h2>
 <p>Mesen2 has a dedicated SA-1 debugger:</p>
 <ol type="1">
@@ -375,11 +380,11 @@ Debugging in Mesen2</h2>
 <li><b>Watch $3000</b> — verify the $A5 magic byte appears after boot</li>
 </ol>
 <p>Common issues:</p><ul>
-<li><b>SA-1 PC stuck at $0000</b>: CIWP not set — SA-1 can't write I-RAM</li>
-<li><b>I-RAM reads return $FF</b>: SIWP not set — main CPU can't read I-RAM</li>
+<li><b>SA-1 PC stuck at $0000</b>: reset vector ($2203/$2204) wrong, or I-RAM write-protection (CIWP $222A) left in the protected state so the SA-1 can't write its handshake — set it the same way the crt0 does (<code>$FF</code> on Mesen2/snes9x; see the polarity note above)</li>
+<li><b>I-RAM reads return $FF</b>: SIWP/CIWP only gate <em>writes</em>, never reads — so this is not a protection problem; the SA-1 simply hasn't written I-RAM yet (not released from reset, or wrong reset vector)</li>
 <li><b>Counter not incrementing</b>: Check that <code>$2200</code> was written correctly ($00 = release)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md299"></a>
+<h2><a class="anchor" id="autotoc_md302"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -389,7 +394,7 @@ Examples</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_starfield/">sa1_starfield</a>   </td><td class="markdownTableBodyNone">128 sprites with sine-wave Lissajous patterns   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md300"></a>
+<h2><a class="anchor" id="autotoc_md303"></a>
 What SA-1 Can't Do</h2>
 <ul>
 <li><b>No PPU access</b> — SA-1 can compute sprite positions but can't write OAM/VRAM</li>
@@ -398,7 +403,7 @@ What SA-1 Can't Do</h2>
 <li><b>No joypad reading</b> — input comes through main CPU → I-RAM</li>
 </ul>
 <p>The SA-1 is a <b>compute accelerator</b>. The main CPU remains the "director" — it reads input, talks to the PPU/APU, and delegates heavy math to the SA-1.</p>
-<h2><a class="anchor" id="autotoc_md301"></a>
+<h2><a class="anchor" id="autotoc_md304"></a>
 Further Reading</h2>
 <ul>
 <li>SA-1 Register Reference — complete register documentation</li>

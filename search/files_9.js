@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['learning_5fpath_2emd_0',['LEARNING_PATH.md',['../LEARNING__PATH_8md.html',1,'']]],
-  ['lzss_2eh_1',['lzss.h',['../lzss_8h.html',1,'']]]
+  ['koopatroopa_2ec_0',['koopatroopa.c',['../koopatroopa_8c.html',1,'']]],
+  ['koopatroopa_2eh_1',['koopatroopa.h',['../koopatroopa_8h.html',1,'']]]
 ];

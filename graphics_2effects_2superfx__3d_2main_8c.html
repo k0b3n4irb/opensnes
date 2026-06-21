@@ -162,6 +162,22 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SuperFX 3D — auto-rotating wireframe cube (2-axis rotation) </p>
+<p>Demonstrates GSU (SuperFX) coprocessor execution. The 65816 sets up a Mode 1 bitmap framebuffer in VRAM, then hands control to a small GSU program (compiled separately by wla-superfx) that rotates a cube's 8 vertices via the GSU's hardware sine LUT and writes the edge bytes into SRAM. The 65816 streams those edge bytes back to VRAM each frame via DMA. The result: a smoothly rotating 3D wireframe entirely driven by the GSU.</p>
+<dl class="section user"><dt>SNES Concepts</dt><dd><ul>
+<li>GSU launch via <code><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe)">gsuLaunch()</a></code> (gsuRun + cache prefetch)</li>
+<li>GSU ↔ 65816 communication via SRAM as shared scratch</li>
+<li>DMA full-frame transfer from SRAM to VRAM each frame</li>
+<li>HDMA-driven force-blank during transfer (gsuSetupHdmaBlanking)</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd><ul>
+<li>A wireframe cube rotates continuously on two axes (X and Y).</li>
+<li>No input — the rotation is autonomous; reset to restart from the initial angle.</li>
+<li>GSU presence is detected via the ROM header bits; Mesen2 is the canonical emulator for this example (snes9x's GSU detection is unreliable on our header layout — see KNOWN_LIMITATIONS).</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, input, superfx</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="superfx_8h.html" title="SuperFX (GSU) coprocessor library — registers, config, and API.">superfx.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access)">dma.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a> </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a9ab89667514f31b155bfd2bd2ada0b00" name="a9ab89667514f31b155bfd2bd2ada0b00"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ab89667514f31b155bfd2bd2ada0b00">&#9670;&#160;</a></span>buildEdges()</h2>

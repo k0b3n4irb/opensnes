@@ -113,7 +113,7 @@ $(document).ready(function(){initNavTree('examples_basics_aim_target.html',''); 
 Screenshot</div></div>
     <p>Live demonstration of the four math primitives a 2D action game leans on the most: **<code>sqrt16</code>** (pixel distance), **<code>atan2_8</code>** (8-bit angle to a target), and the **<code>fixCos</code> / <code>fixSin</code> LUTs** (project a velocity vector along that angle). Everything updates live as the user moves the target with the D-pad — the numbers on screen are real arithmetic, not pre-baked.</p>
 <p>The player diamond stays anchored at the screen centre; the X follows the D-pad. Each frame the example recomputes <code>dx</code>/<code>dy</code> from the two positions, calls <code>sqrt16(dx² + dy²)</code> for the pixel distance, calls <code>atan2_8(dy, dx)</code> for the 8-bit angle, then calls <code>fixCos</code> and <code>fixSin</code> on that angle to read back the unit direction vector.</p>
-<h2><a class="anchor" id="autotoc_md770"></a>
+<h2><a class="anchor" id="autotoc_md773"></a>
 SNES Concepts</h2>
 <ul>
 <li><code>&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</code> square-root and atan2 (chantier B6, 2026-05-09):<ul>
@@ -124,7 +124,7 @@ SNES Concepts</h2>
 <li>LUT chaining — feed the <code>atan2_8</code> output back into the trig LUT to recover a unit direction vector that points from player to target. This is the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
 <li>Mode 0 + sprite overlay — BG1 hosts the text via the <code>text</code> module; the player and target are 8×8 OBJ sprites on the OBJ layer so they don't disturb the text display. Sprite tiles are placed at VRAM $4000 to keep $0000 free for the text font.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md771"></a>
+<h2><a class="anchor" id="autotoc_md774"></a>
 What to Observe</h2>
 <p>The live readout panel updates every frame:</p>
 <ul>
@@ -134,14 +134,14 @@ What to Observe</h2>
 <li><code>COS</code> / <code>SIN</code> — 8.8 fixed-point components of the unit direction vector. Their values match the angle: at <code>ANGLE = 0x40</code> (90°, target straight south on a SNES screen) you see <code>COS = 0x0000</code> and <code>SIN = 0x0100</code>.</li>
 </ul>
 <p>Move the X around with the D-pad and watch the entire panel react in real time.</p>
-<h2><a class="anchor" id="autotoc_md772"></a>
+<h2><a class="anchor" id="autotoc_md775"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make -C examples/basics/aim_target</div>
 </div><!-- fragment --><p>The ROM lands at <code>examples/basics/aim_target/aim_target.sfc</code>.</p>
-<h2><a class="anchor" id="autotoc_md773"></a>
+<h2><a class="anchor" id="autotoc_md776"></a>
 Modules Used</h2>
 <p><code>console</code>, <code>sprite</code>, <code>dma</code>, <code>background</code>, <code>text</code>, <code>input</code>, <code>gameloop</code>, <code>math</code>.</p>
-<h2><a class="anchor" id="autotoc_md774"></a>
+<h2><a class="anchor" id="autotoc_md777"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="math_8md.html">`docs/tutorials/math.md`</a> — the full fixed-point math tutorial, including the section on <code>sqrt16</code>/<code>atan2_8</code> added with chantier B6.</li>

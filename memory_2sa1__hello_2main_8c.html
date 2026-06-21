@@ -128,6 +128,21 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SA-1 boot diagnostic (Phase 1) </p>
+<p>Minimal SA-1 readiness check. The SA-1 coprocessor (Super Accelerator 1) runs the 65816 ISA at 10.74 MHz alongside the main CPU's 3.58 MHz. This example boots the SA-1, has it write a status byte to shared I-RAM (<code>$3000-$37FF</code>), then reports the byte's value on screen — proving that the SA-1 coprocessor is running and the main CPU can read its output.</p>
+<dl class="section user"><dt>SNES Concepts</dt><dd><ul>
+<li>SA-1 vs 65816 dual-CPU: same ISA, different clock, separate memory map</li>
+<li>Shared I-RAM as the dispatch / status channel</li>
+<li>The <code>sa1_boot.asm</code> per-example entry point (each SA-1 ROM brings its own)</li>
+<li>Pre-A6+A7 ABI quirks: the SA-1 wrapper API is minimal, all coordination happens in assembly today</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd><ul>
+<li>On boot you see "SA1 status: NN" where NN is the byte the SA-1 wrote to its shared status slot. Any non-zero value confirms the coprocessor ran. The expected value here is <code>0xA1</code> (set by the bundled <code>sa1_boot.asm</code>).</li>
+<li>If status is 0x00, the SA-1 didn't run — check that the emulator recognises SA-1 from the ROM header (Mesen2 is reliable; some snes9x builds miss it).</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, sa1</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="sa1_8h.html" title="SA-1 Enhancement Chip Interface.">sa1.h</a>, .claude/notes/tech/sa1_phase1_diagnostic.md </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>

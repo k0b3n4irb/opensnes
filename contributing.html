@@ -108,28 +108,28 @@ $(document).ready(function(){initNavTree('contributing.html',''); initResizable(
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Thank you for your interest in contributing to OpenSNES!</p>
-<h2><a class="anchor" id="autotoc_md1538"></a>
+<h2><a class="anchor" id="autotoc_md1542"></a>
 Code of Conduct</h2>
 <p>Please read and follow our Code of Conduct. SNES development is niche — every contributor matters.</p>
-<h2><a class="anchor" id="autotoc_md1539"></a>
+<h2><a class="anchor" id="autotoc_md1543"></a>
 Reporting Bugs</h2>
 <ol type="1">
 <li>Search <a href="https://github.com/k0b3n4irb/opensnes/issues">existing issues</a> first</li>
 <li>Use the <b>Bug Report</b> template — it asks the right questions</li>
 <li>Include a <b>minimal reproduction</b> (a small <code>main.c</code> that triggers the bug)</li>
 <li>Attach screenshots or a short video if it's a visual issue</li>
-<li>Specify the emulator used (Mesen2, snes9x, bsnes)</li>
+<li>Specify the emulator used (luna, Mesen2, bsnes)</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md1540"></a>
+<h2><a class="anchor" id="autotoc_md1544"></a>
 Suggesting Features</h2>
 <ol type="1">
 <li>Check the Roadmap first</li>
 <li>Use the <b>Feature Request</b> template</li>
 <li>Explain the <b>use case</b>, not just the feature</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md1541"></a>
+<h2><a class="anchor" id="autotoc_md1545"></a>
 Submitting Code</h2>
-<h3><a class="anchor" id="autotoc_md1542"></a>
+<h3><a class="anchor" id="autotoc_md1546"></a>
 Setup</h3>
 <div class="fragment"><div class="line">gh repo fork k0b3n4irb/opensnes</div>
 <div class="line">git clone https://github.com/YOUR_NAME/opensnes</div>
@@ -137,7 +137,7 @@ Setup</h3>
 <div class="line">git remote add upstream https://github.com/k0b3n4irb/opensnes</div>
 <div class="line">git fetch upstream develop</div>
 <div class="line">git checkout -b feature/my-feature upstream/develop</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1543"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md1547"></a>
 Branching and release policy</h3>
 <p>The repository uses two long-lived branches with strict invariants. Knowing which branch you are on tells you what guarantees apply.</p>
 <table class="markdownTable">
@@ -155,12 +155,12 @@ Branching and release policy</h3>
 <li>Tags <code>vX.Y.Z</code> are cut <b>only from <code>main</code></b> — <code>release.yml</code> rejects a tag whose commit is not on <code>main</code>.</li>
 <li><code>main</code> is <b>never</b> force-pushed. If a release ships a regression, fix it forward (a <code>vX.Y.Z+1</code> tag) rather than rewriting history.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1544"></a>
+<h3><a class="anchor" id="autotoc_md1548"></a>
 Pull Request Rules</h3>
-<h4><a class="anchor" id="autotoc_md1545"></a>
+<h4><a class="anchor" id="autotoc_md1549"></a>
 Target branch</h4>
 <p>All PRs must be submitted against the **<code>develop</code>** branch. PRs targeting <code>main</code> are reserved for the release process (a single PR that brings <code>develop</code>'s green tip into <code>main</code> when the maintainers cut a release). Random PRs to <code>main</code> will be closed without review.</p>
-<h4><a class="anchor" id="autotoc_md1546"></a>
+<h4><a class="anchor" id="autotoc_md1550"></a>
 One topic per PR</h4>
 <p>Each PR must address <b>exactly one logical change</b>. Never mix:</p><ul>
 <li>A bug fix with a refactor</li>
@@ -168,7 +168,7 @@ One topic per PR</h4>
 <li>A library change with an example change</li>
 </ul>
 <p>If you need to do both, submit two PRs where the second depends on the first.</p>
-<h4><a class="anchor" id="autotoc_md1547"></a>
+<h4><a class="anchor" id="autotoc_md1551"></a>
 Keep PRs small</h4>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -182,7 +182,7 @@ Keep PRs small</h4>
 </table>
 <p>Asset files (<code>.pic</code>, <code>.pal</code>, <code>.map</code>) and generated assembly don't count toward these limits — only human-written code.</p>
 <p><b>A 1000-line PR with no explanation will not be reviewed.</b> It's not that we don't want your contribution — it's that we can't verify it's correct.</p>
-<h4><a class="anchor" id="autotoc_md1548"></a>
+<h4><a class="anchor" id="autotoc_md1552"></a>
 Commit messages</h4>
 <p>We follow <a href="https://www.conventionalcommits.org/">Conventional Commits</a>:</p>
 <div class="fragment"><div class="line">&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;</div>
@@ -192,16 +192,16 @@ Commit messages</h4>
 <div class="line">[optional footer]</div>
 </div><!-- fragment --><p><b>Types</b>: <code>feat</code>, <code>fix</code>, <code>perf</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>build</code></p>
 <p><b>Scopes</b>: <code>lib</code>, <code>compiler</code>, <code>runtime</code>, <code>tools</code>, <code>examples</code>, <code>build</code></p>
-<h4><a class="anchor" id="autotoc_md1549"></a>
+<h4><a class="anchor" id="autotoc_md1553"></a>
 Testing</h4>
 <p>Before submitting:</p>
 <ol type="1">
 <li><code>make clean &amp;&amp; make</code> — full rebuild must succeed</li>
-<li><code>cd tools/opensnes-emu &amp;&amp; node test/run-all-tests.mjs --quick</code> — all checks must pass (run with <code>--list</code> to see the current count)</li>
+<li><code>make tests</code> — luna coverage + visual regression + probes must all pass</li>
 <li>Test affected examples in <a href="https://www.mesen.ca/">Mesen2</a></li>
 <li>New examples must include a working Makefile following the standard pattern</li>
 </ol>
-<h4><a class="anchor" id="autotoc_md1550"></a>
+<h4><a class="anchor" id="autotoc_md1554"></a>
 Self-review checklist</h4>
 <ul>
 <li>[ ] <code>make clean &amp;&amp; make</code> passes without warnings</li>
@@ -210,7 +210,7 @@ Self-review checklist</h4>
 <li>[ ] New code has Doxygen documentation (<code>/** @brief */</code>)</li>
 <li>[ ] Binary assets are from PVSnesLib or are original work</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1551"></a>
+<h3><a class="anchor" id="autotoc_md1555"></a>
 Code Review</h3>
 <ul>
 <li>All PRs require review before merge</li>
@@ -218,7 +218,7 @@ Code Review</h3>
 <li>Maintainers aim to respond within 7 days</li>
 <li><b>What reviewers check</b>: correctness, VBlank safety (VRAM writes only during blank), DMA budget, bank overflow risk, naming conventions</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1552"></a>
+<h2><a class="anchor" id="autotoc_md1556"></a>
 AI-Assisted Contributions</h2>
 <p>We accept contributions that used AI tools (Copilot, Claude, ChatGPT, etc.) under these conditions:</p>
 <ol type="1">
@@ -227,7 +227,7 @@ AI-Assisted Contributions</h2>
 <li><b>Same quality bar.</b> AI-assisted code must pass all tests, follow code style, and handle SNES hardware constraints correctly (VBlank timing, DMA budgets, bank boundaries). No exceptions.</li>
 <li><b>Do NOT add <code>Co-Authored-By</code> trailers</b> for AI tools in commit messages.</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md1553"></a>
+<h3><a class="anchor" id="autotoc_md1557"></a>
 Project knowledge in &lt;tt&gt;.claude/&lt;/tt&gt;</h3>
 <p>Two directories under <code>.claude/</code> capture knowledge that AI assistants and human contributors share:</p>
 <ul>
@@ -235,7 +235,7 @@ Project knowledge in &lt;tt&gt;.claude/&lt;/tt&gt;</h3>
 <li><a href=".claude/notes/"><code>.claude/notes/</code></a> — <b>observational</b> project knowledge. Lessons learned, technical references, active chantier handoffs, FIXED bugs preserved for context, structured project reviews. Read what's relevant; add to it when you learn something a future contributor (or your future self) will need.</li>
 </ul>
 <p>When learning something project-specific, append to <code>.claude/notes/&lt;category&gt;/</code>. The category README explains the layout. Per-user cross-project preferences (your editor habits, etc.) belong in your personal <code>~/.claude/projects/.../memory/</code>, not here. The convention is documented in `.claude/rules/memory_routing.md`.</p>
-<h2><a class="anchor" id="autotoc_md1554"></a>
+<h2><a class="anchor" id="autotoc_md1558"></a>
 Documentation</h2>
 <p>Every new feature or example must have:</p>
 <ol type="1">
@@ -245,10 +245,10 @@ Documentation</h2>
 </ol>
 <p>For code style conventions, see <a href="https://k0b3n4irb.github.io/opensnes/code_style.html">Code Style Guide</a>.</p>
 <p>When using external code, add an entry to ATTRIBUTION.md with the source, author, license, and description of modifications. Include a header comment in the source file.</p>
-<h2><a class="anchor" id="autotoc_md1555"></a>
+<h2><a class="anchor" id="autotoc_md1559"></a>
 Good First Issues</h2>
 <p>Look for issues labeled <a href="https://github.com/k0b3n4irb/opensnes/labels/good%20first%20issue"><code>good first issue</code></a>. These are small, self-contained tasks with clear instructions — designed for your first contribution to the project.</p>
-<h2><a class="anchor" id="autotoc_md1556"></a>
+<h2><a class="anchor" id="autotoc_md1560"></a>
 Links</h2>
 <ul>
 <li><a href="https://k0b3n4irb.github.io/opensnes/">Documentation</a></li>

@@ -1,7 +1,5 @@
 var graphics_2effects_2fading_2main_8c =
 [
-    [ "fade_in", "graphics_2effects_2fading_2main_8c.html#a3fff55a1d67b8f33695300c33862020d", null ],
-    [ "fade_out", "graphics_2effects_2fading_2main_8c.html#a6acbfe53e87fb4cfc5ae5f01cc77de7b", null ],
     [ "main", "graphics_2effects_2fading_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "wait_for_key", "graphics_2effects_2fading_2main_8c.html#a77cebcad141a74189b9e975a8919d304", null ],
     [ "palette", "graphics_2effects_2fading_2main_8c.html#aa81235770612a39a2668d11264dc308f", null ],

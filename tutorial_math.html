@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('tutorial_math.html',''); initResizable
 <div class="contents">
 <div class="textblock"><p>This tutorial covers <code>&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</code>: the lib's fixed-point arithmetic, sin/cos lookup tables, and safe integer multiply/divide. The SNES has <b>no floating-point unit</b> — every smooth movement, every rotation, every interpolation in your game is built on fixed-point or LUTs.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html">Graphics</a> tutorial. The <a class="el" href="mode7_8md.html">Mode 7 tutorial</a> is the natural pair — Mode 7's matrix maths goes through <code>fixSin</code>/<code>fixCos</code>/<code>fixMul</code> constantly.</p>
-<h2><a class="anchor" id="autotoc_md226"></a>
+<h2><a class="anchor" id="autotoc_md229"></a>
 Why fixed-point on the SNES</h2>
 <p>Floating point on the SNES is <b>possible</b> but <b>expensive</b>. cproc / QBE can emit software-float code (the lib avoids it deliberately — <code>PHILOSOPHY.md</code> calls out "no `printf` in core lib" partly because formatted-output helpers force software floats), but a single <code>float</code> multiply costs ~500 cycles. At 60 fps with 1369 cycles per scanline, a few floats per frame is fine; per-sprite or per-particle is infeasible.</p>
 <p>Fixed-point is the canonical alternative: integers that <b>interpret</b> some bits as fractional. With 8.8 fixed-point (16-bit total), the high byte is the integer part and the low byte is <code>n/256</code>. A multiply is a 16 × 16 → 32-bit integer multiply followed by a shift — the SNES has hardware for the first part (multiplier registers <code>$4202</code>-<code>$4206</code>) and the lib does the shift.</p>
@@ -121,7 +121,7 @@ Why fixed-point on the SNES</h2>
 <li><code>mul16(a, b)</code> (16 × 16 → low 16): ~10 cycles (hardware).</li>
 </ul>
 <p>Order-of-magnitude: fixed-point is 10–25× faster than software floats. For real-time game logic, that's the difference between "playable" and "choppy".</p>
-<h2><a class="anchor" id="autotoc_md227"></a>
+<h2><a class="anchor" id="autotoc_md230"></a>
 The 8.8 fixed-point format</h2>
 <p>The lib's <code>fixed</code> type is a 16-bit signed value (<code>s16</code>) interpreted as:</p>
 <table class="markdownTable">
@@ -134,7 +134,7 @@ The 8.8 fixed-point format</h2>
 </table>
 <p>So <code>fixed value = 0x0140</code> represents <code>1.25</code> (integer = 1, fraction = 0x40 = 64/256 = 0.25). A <code>fixed</code> with value <code>0xFF80</code> represents <code>-0.5</code> (the standard two's-complement sign-extension applies).</p>
 <p>Total range: roughly <b>-128.0 to +127.996</b>. Precision: <b>1/256 ≈ 0.0039</b>. Good enough for screen-space coordinates (the SNES displays 256 × 224, so 8.8 covers the full screen with sub-pixel precision). Not enough for distances over a few hundred units — in that case, drop to integer pixel coordinates and reserve fixed for velocity/acceleration.</p>
-<h2><a class="anchor" id="autotoc_md228"></a>
+<h2><a class="anchor" id="autotoc_md231"></a>
 The conversion macros</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="math_8h.html">snes/math.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -162,7 +162,7 @@ The conversion macros</h2>
 <li>**<code>UNFIX</code> truncates toward zero** — same behaviour as integer C division. <code>UNFIX(FIX(-1) / 2)</code> = <code>0</code>, not <code>-1</code>. For round-to-nearest, use <code>UNFIX_ROUND(x + 128)</code> (the <code>+128</code> adds half before truncating).</li>
 <li>**<code><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(x)</a></code> is <code>(x &lt;&lt; 8)</code>** — only safe for <code>x</code> in <code>-128..127</code>. <code><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(200)</a></code> overflows the high byte and wraps to <code>-56.0</code>. The compiler doesn't warn; check your inputs.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md229"></a>
+<h2><a class="anchor" id="autotoc_md232"></a>
 Fixed-point arithmetic</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">pos</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(100);</div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">velocity</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(1) / 4;     <span class="comment">/* 0.25 */</span></div>
@@ -174,7 +174,7 @@ Fixed-point arithmetic</h2>
 <div class="ttc" id="amath_8h_html_aaa8ca4460928f28892217658eca661bf"><div class="ttname"><a href="math_8h.html#aaa8ca4460928f28892217658eca661bf">fixMul</a></div><div class="ttdeci">fixed fixMul(fixed a, fixed b)</div><div class="ttdoc">Multiply two fixed-point values.</div></div>
 </div><!-- fragment --><p>The trap: <code>pos * scale</code> (using the C <code>*</code> operator) treats both as plain <code>s16</code>s and gives you <code>(pos × scale) &gt;&gt; 0</code> — an enormous wrong number. <b>Always use <code>fixMul</code></b> when both operands are <code>fixed</code>. The function does a 32-bit intermediate multiply and re-shifts back to 8.8 format.</p>
 <p>For division: <code>fixDiv(a, b)</code> produces <code>a / b</code> as fixed-point. <b>Returns 0 on divide-by-zero</b> — silent failure mode, but predictable. Validate divisors before passing them.</p>
-<h2><a class="anchor" id="autotoc_md230"></a>
+<h2><a class="anchor" id="autotoc_md233"></a>
 Trigonometry (sin/cos lookup tables)</h2>
 <p>The SDK uses <b>8-bit angles</b>: 0–255 maps linearly to 0°–360°. So <code>64</code> = 90°, <code>128</code> = 180°, <code>192</code> = 270°. Wrapping is automatic — adding 1 to angle 255 wraps to 0 in <code>u8</code>.</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">angle</a> = 0;</div>
@@ -200,7 +200,7 @@ Trigonometry (sin/cos lookup tables)</h2>
 <div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdef"><b>Definition</b> math.h:174</div></div>
 </div><!-- fragment --><p>Both <code>fixSin</code> and <code>fixCos</code> return values in <code>[-256, +256]</code> (i.e., <code>-1.0</code> to <code>+1.0</code> in 8.8 fixed). The result of <code>fixMul(speed, fixSin(a))</code> is a velocity vector component in 8.8 fixed.</p>
 <p>The LUTs are 256-entry, 2 bytes per entry, 512 bytes total. They live in ROM in <code>lib/source/math.asm</code>. Lookups are <a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">O(1)</a> — ~20 cycles per call.</p>
-<h2><a class="anchor" id="autotoc_md231"></a>
+<h2><a class="anchor" id="autotoc_md234"></a>
 Hardware multiplier and divider</h2>
 <p>The SNES CPU has a hardware 8-bit unsigned multiplier (<code>WRMPYA</code> / <code>WRMPYB</code> at <code>$4202</code>/<code>$4203</code>, result in <code>RDMPYL</code>/<code>RDMPYH</code>) and a 16-bit unsigned divider (<code>WRDIVL</code>/<code>WRDIVH</code>/<code>WRDIVB</code> at <code>$4204</code>–<code>$4206</code>, result in <code>RDDIVL</code>/<code>RDDIVH</code> for quotient and <code>RDMPYL</code>/<code>RDMPYH</code> for remainder).</p>
 <p>The lib's <code>mul16</code> / <code>div16</code> / <code>mod16</code> use these:</p>
@@ -220,7 +220,7 @@ Hardware multiplier and divider</h2>
 <li>The compiler's <code>*</code> / <code>/</code> operator may produce slow code or call a runtime helper.</li>
 </ul>
 <p>The lib functions wait the required cycle delay (8 cycles for multiply, 16 for divide) before reading the result. Hand-rolled access to the hardware registers must respect those delays — read too early and you get garbage.</p>
-<h2><a class="anchor" id="autotoc_md232"></a>
+<h2><a class="anchor" id="autotoc_md235"></a>
 Utilities</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">v</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(-3) + 64;          <span class="comment">/* -2.75 */</span></div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">positive</a> = <a class="code hl_function" href="math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a">fixAbs</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">v</a>);      <span class="comment">/* 2.75 */</span></div>
@@ -232,9 +232,9 @@ Utilities</h2>
 <div class="ttc" id="amath_8h_html_a7b242d1463b266b75f1ef4ffa222cabd"><div class="ttname"><a href="math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd">fixLerp</a></div><div class="ttdeci">fixed fixLerp(fixed a, fixed b, u8 t)</div><div class="ttdoc">Linear interpolation.</div></div>
 <div class="ttc" id="amath_8h_html_aa1c28dae34a0097f2f4c5e4bf4160e4a"><div class="ttname"><a href="math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a">fixAbs</a></div><div class="ttdeci">fixed fixAbs(fixed x)</div><div class="ttdoc">Absolute value of fixed-point.</div></div>
 </div><!-- fragment --><p><code>fixLerp(a, b, t)</code> interpolates between <code>a</code> and <code>b</code> with <code>t</code> from <code>0</code> (returns <code>a</code>) to <code>256</code> (returns <code>b</code>). Linear; the canonical way to animate values smoothly between two endpoints.</p>
-<h2><a class="anchor" id="autotoc_md233"></a>
+<h2><a class="anchor" id="autotoc_md236"></a>
 Worked patterns</h2>
-<h3><a class="anchor" id="autotoc_md234"></a>
+<h3><a class="anchor" id="autotoc_md237"></a>
 Smooth sprite movement</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(64);</div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(112);</div>
@@ -259,7 +259,7 @@ Smooth sprite movement</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ae162ea9295db01996b894786eb967116"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae162ea9295db01996b894786eb967116">vel_x</a></div><div class="ttdeci">static s16 vel_x</div><div class="ttdoc">Ball X velocity (-2 to +2 pixels/frame).</div><div class="ttdef"><b>Definition</b> main.c:175</div></div>
 <div class="ttc" id="asprite_8h_html_ac83845cbc50f6c9f19844a317b59b66f"><div class="ttname"><a href="sprite_8h.html#ac83845cbc50f6c9f19844a317b59b66f">oamSetXYFast</a></div><div class="ttdeci">#define oamSetXYFast(_id, _x, _y)</div><div class="ttdoc">Update sprite position only (most common per-frame operation)</div><div class="ttdef"><b>Definition</b> sprite.h:791</div></div>
 </div><!-- fragment --><p>The fixed-point representation gives sub-pixel precision so the sprite advances 0.25 px/frame <em>visibly</em> — every fourth frame the integer coordinate increments by one. With pure-integer velocity this would round to 0 per frame, and the sprite would never move.</p>
-<h3><a class="anchor" id="autotoc_md235"></a>
+<h3><a class="anchor" id="autotoc_md238"></a>
 Rotation around a point</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">angle</a> = 0;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cx</a> = 128, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">cy</a> = 112;            <span class="comment">/* rotation centre on screen */</span></div>
@@ -277,7 +277,7 @@ Rotation around a point</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This pattern (radius × cos / radius × sin) is used everywhere a sprite needs to orbit, swing, or rotate around a fixed point. Mode 7 matrix construction is conceptually the same operation, just emitted to the M7A–M7D registers instead of OAM coordinates.</p>
-<h3><a class="anchor" id="autotoc_md236"></a>
+<h3><a class="anchor" id="autotoc_md239"></a>
 Smooth interpolation</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Camera follows player, but lags by 25 % each frame for smoothness */</span></div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272">camera_x</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(0);</div>
@@ -289,21 +289,21 @@ Smooth interpolation</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="abackground_8h_html_a255b7012c710513afe464505ec420d3c"><div class="ttname"><a href="background_8h.html#a255b7012c710513afe464505ec420d3c">bgSetScrollX</a></div><div class="ttdeci">void bgSetScrollX(u8 bg, u16 x)</div><div class="ttdoc">Set horizontal scroll only.</div></div>
-<div class="ttc" id="agames_2likemario_2main_8c_html_a83de021d1aa1562571948e0f36032272"><div class="ttname"><a href="games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272">camera_x</a></div><div class="ttdeci">static s16 camera_x</div><div class="ttdef"><b>Definition</b> main.c:152</div></div>
+<div class="ttc" id="agames_2likemario_2main_8c_html_a83de021d1aa1562571948e0f36032272"><div class="ttname"><a href="games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272">camera_x</a></div><div class="ttdeci">static s16 camera_x</div><div class="ttdef"><b>Definition</b> main.c:150</div></div>
 </div><!-- fragment --><p>The lerp toward the target with <code>t = 0.25</code> produces a critically-damped smooth follow — every frame the camera covers a quarter of the remaining distance. Common pattern for "the camera glides instead of
 snapping".</p>
-<h3><a class="anchor" id="autotoc_md237"></a>
+<h3><a class="anchor" id="autotoc_md240"></a>
 HDMA gradient table generation</h3>
 <p>The HDMA gradient example uses fixed-point under the hood: a brightness ramp from level 15 at the top to level 0 at the bottom of the screen, computed as a fixed-point linear interpolation over 224 scanlines. The lib's <code>hdmaBrightnessGradient(channel, top, bottom)</code> helper does this internally.</p>
 <p>For custom HDMA tables, the same pattern applies: compute fixed-point fractional values per scanline, <code>UNFIX</code> to integer when writing the table byte.</p>
-<h2><a class="anchor" id="autotoc_md238"></a>
+<h2><a class="anchor" id="autotoc_md241"></a>
 Gotchas</h2>
-<h3><a class="anchor" id="autotoc_md239"></a>
+<h3><a class="anchor" id="autotoc_md242"></a>
 🟢 &lt;tt&gt;int&lt;/tt&gt; and &lt;tt&gt;long&lt;/tt&gt; sizes are correct on this target (since chantier A1)</h3>
 <p><code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sizeof(int)</a> == 2</code>, <code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sizeof(long)</a> == 4</code>. Bare <code>int</code> is the native 16-bit word; <code>long</code> is 32 bits. C convention says <code>int</code> is the natural word size of the machine, and on the w65816 that's now true.</p>
 <p>For <b>portability</b> across compilers (cross-platform tooling, code shared with PC-side helpers), keep using <code>s16</code>, <code>u16</code>, <code>s32</code>, <code>u32</code>, <code>fixed</code> from <code><a class="el" href="types_8h.html" title="OpenSNES Standard Types.">lib/include/snes/types.h</a></code> — they make intent explicit and work identically everywhere. Bare <code>int speed = 5;</code> no longer doubles your cycle cost on cc65816, but a build of the same code with a different compiler may behave differently.</p>
 <p>The <code>fixed</code> type is still <code>s16</code>. No change for fixed-point users.</p>
-<h3><a class="anchor" id="autotoc_md240"></a>
+<h3><a class="anchor" id="autotoc_md243"></a>
 🔴 &lt;tt&gt;FIX(x)&lt;/tt&gt; overflows for &lt;tt&gt;|x| ≥ 128&lt;/tt&gt;</h3>
 <p><code><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(x)</a></code> is <code>(x &lt;&lt; 8)</code>. For <code>x = 128</code>, the result is <code>0x8000</code> = <code>-32768</code> interpreted as <code>s16</code> = <code>-128.0</code> in fixed-point — wrap around. There's no compile-time error and no runtime warning.</p>
 <p>If you need values larger than <code>±127</code>, either:</p>
@@ -311,14 +311,14 @@ Gotchas</h2>
 <li>Switch to <b>integer pixel coordinates</b> for position and reserve fixed-point for <em>velocity</em> / <em>acceleration</em> (which stay small).</li>
 <li>Use a custom <b>16.16 format</b> in <code>s32</code> for higher range. The lib doesn't ship 16.16 helpers — write them per-game.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md241"></a>
+<h3><a class="anchor" id="autotoc_md244"></a>
 🔴 &lt;tt&gt;fixMul&lt;/tt&gt; truncates fractional precision</h3>
 <p><code>fixMul(0x0080, 0x0080)</code> (0.5 × 0.5) returns <code>0x0040</code> (0.25). Correct. But <code>fixMul(0x0001, 0x0001)</code> (~0.004 × ~0.004) returns <code>0x0000</code> — the result underflows to zero. For very small fixed values, the shift back to 8.8 throws away precision.</p>
 <p>This is intrinsic to 8.8 fixed-point: ~0.0039 is the minimum representable non-zero. Multiplying two such values gives ~1.5e-5, unrepresentable. If you need tiny scale factors (e.g., very slow acceleration), use a wider fixed-point format or accumulate without multiplying.</p>
-<h3><a class="anchor" id="autotoc_md242"></a>
+<h3><a class="anchor" id="autotoc_md245"></a>
 🟠 &lt;tt&gt;fixDiv&lt;/tt&gt; returns 0 on divide-by-zero</h3>
 <p>Silent failure: <code>fixDiv(<a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(10)</a>, <a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(0)</a>)</code> returns <code>0</code>, not a sentinel, not a trap. Validate divisors before calling — especially for user-derived inputs (e.g., dividing by a velocity that could be zero when the player isn't moving).</p>
-<h3><a class="anchor" id="autotoc_md243"></a>
+<h3><a class="anchor" id="autotoc_md246"></a>
 🟠 Compiler &lt;tt&gt;*&lt;/tt&gt; vs &lt;tt&gt;mul16&lt;/tt&gt;</h3>
 <p>The C <code>*</code> operator works correctly on <code>s16</code>/<code>u16</code> operands; the "runtime can have bugs" caveat in <code>mul16</code>'s docstring is historical (early QBE backend bugs that have shipped fixes per <code>compiler/PINS.md</code>). Today, <code>a * b</code> where both are <code>u16</code> is generally safe and faster than <code>mul16(a, b)</code> (the compiler inlines the hardware multiplier write).</p>
 <p>Use <code>mul16</code> when:</p>
@@ -327,13 +327,13 @@ Gotchas</h2>
 <li>You're paranoid about a specific corner case (the 32-bit intermediate is guaranteed).</li>
 <li>You're matching a PVSnesLib port byte-for-byte.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md244"></a>
+<h3><a class="anchor" id="autotoc_md247"></a>
 🟡 Hardware multiplier read timing</h3>
 <p>The hardware multiplier needs <b>8 CPU cycles</b> between writing <code>WRMPYB</code> and reading <code>RDMPYL</code>/<code>RDMPYH</code>. The hardware divider needs <b>16 cycles</b> between <code>WRDIVB</code> and <code>RDDIVL</code>/<code>RDDIVH</code>/<code>RDMPYL</code>. The lib inserts the right delays in <code>mul16</code>/<code>div16</code>/<code>mod16</code>. Custom assembly that touches the multiplier registers must respect this — read too early and you get partial results.</p>
-<h3><a class="anchor" id="autotoc_md245"></a>
+<h3><a class="anchor" id="autotoc_md248"></a>
 🟡 Sin/cos LUTs are unsigned-angle, signed-result</h3>
 <p><code>fixSin(angle)</code> and <code>fixCos(angle)</code> take <code>u8</code> (no sign — the 8-bit angle wraps naturally). They return <code>fixed</code> (signed <code>s16</code>). This is the right shape for game code, but if you're translating from a different engine, watch the signedness boundary.</p>
-<h3><a class="anchor" id="autotoc_md246"></a>
+<h3><a class="anchor" id="autotoc_md249"></a>
 &lt;tt&gt;atan2&lt;/tt&gt; and &lt;tt&gt;sqrt&lt;/tt&gt; ship in the lib (chantier B6, 2026-05-09)</h3>
 <p>The full inverse-trig and square-root surface arrived together so the canonical "where is the target relative to me, and how far?" question is one call away. Three entry points cover almost every game-side use:</p>
 <table class="markdownTable">
@@ -359,11 +359,11 @@ Gotchas</h2>
 <div class="ttc" id="amath_8h_html_ac0e3632ad4ed7071906c0aaae0fd50b5"><div class="ttname"><a href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5">atan2_8</a></div><div class="ttdeci">u8 atan2_8(s16 dy, s16 dx)</div><div class="ttdoc">8-bit two-argument arctangent</div></div>
 </div><!-- fragment --><p><code>atan2_8</code> is scale-invariant — pass any 16-bit signed dy/dx and the function reduces magnitudes by power-of-two right shifts internally to keep its single 16-bit divide overflow-free. Precision degrades by ≤ 1 angle unit (≈ 1.4°) when reduction fires, which is below the perceptual floor for projectile aiming or sprite rotation in any 256-pixel-wide playfield.</p>
 <p><code>sqrt16</code> is the canonical "how far is that thing" helper. The result is bounded to 255 (since <code><a class="el" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">sqrt(65535)</a> ≈ 255.99</code>), so it fits in <code>u8</code> for tile-grid distances. For the 8.8 fractional variant use <code>fixSqrt</code>. Note that <code>fixSqrt</code>'s precision is intentionally capped at 4 fractional bits — the 32-bit shift needed for full 8 bits of fraction would currently truncate under the QBE 32-bit codegen gap (catalogue chantier A7); we chose deterministic 4-bit precision over deceptive 8-bit output that's only correct for small inputs.</p>
-<h3><a class="anchor" id="autotoc_md247"></a>
+<h3><a class="anchor" id="autotoc_md250"></a>
 What's still missing: &lt;tt&gt;pow&lt;/tt&gt;, &lt;tt&gt;exp&lt;/tt&gt;, &lt;tt&gt;log&lt;/tt&gt;</h3>
 <p>These remain off the SDK's beaten path because no shipped example needs them. Integer exponentiation for small exponents is two lines of repeated <code>fixMul</code>; everything else (logarithm, general power) is per-game territory — bake a LUT for the specific range your game cares about.</p>
 <p>The PHILOSOPHY non-goal "no `printf` in core lib" extends here in spirit: the lib provides what most games need, and skips the heavy weight that most games don't.</p>
-<h2><a class="anchor" id="autotoc_md248"></a>
+<h2><a class="anchor" id="autotoc_md251"></a>
 Cycle cost summary</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -392,7 +392,7 @@ Cycle cost summary</h2>
 <td class="markdownTableBodyNone"><code>atan2_8(dy, dx)</code>   </td><td class="markdownTableBodyRight">~120 (LUT + one 16-bit divide)   </td></tr>
 </table>
 <p>A typical sprite-physics frame (position update + sin/cos rotation + two <code>fixMul</code> calls per sprite × 64 sprites) is ~6 K cycles, well under 1 % of the frame. Fixed-point is <em>cheap</em>; the budget is rarely binding.</p>
-<h2><a class="anchor" id="autotoc_md249"></a>
+<h2><a class="anchor" id="autotoc_md252"></a>
 See also</h2>
 <ul>
 <li><code><a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">lib/include/snes/math.h</a></code> — full API reference.</li>

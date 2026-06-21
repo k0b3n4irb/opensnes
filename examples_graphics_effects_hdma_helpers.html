@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('examples_graphics_effects_hdma_helpers
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2><a class="anchor" id="autotoc_md1095"></a>
+    <h2><a class="anchor" id="autotoc_md1098"></a>
 Effects</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -130,16 +130,21 @@ Effects</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">START   </td><td class="markdownTableBodyNone">Stop   </td><td class="markdownTableBodyNone">Disable current effect   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md1096"></a>
+<h2><a class="anchor" id="autotoc_md1099"></a>
 Architecture</h2>
 <ul>
 <li><b>BG1</b>: Static background image (OpenSNES logo)</li>
 <li><b>HDMA</b>: One channel driven by library helper functions</li>
 <li>Each effect builds a per-scanline HDMA table in RAM</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md1097"></a>
+<h2><a class="anchor" id="autotoc_md1100"></a>
 Modules</h2>
-<p><code>console sprite dma input background hdma</code> </p>
+<p><code>console sprite dma input background hdma</code></p>
+<h2><a class="anchor" id="autotoc_md1101"></a>
+Related examples</h2>
+<ul>
+<li><a href="../../backgrounds/mode3/">graphics/backgrounds/mode3</a> — the canonical "8bpp single-layer background" example. If you want the brightness/color gradient effects above applied to an 8bpp Mode 3 image instead of a 4bpp Mode 1 image, start from <code>mode3</code> for the BG setup and add a <code><a class="el" href="hdma_8h.html#a4473b558fc1715556b995a576644b4d8" title="Create a vertical brightness gradient.">hdmaBrightnessGradient()</a></code> / <code><a class="el" href="hdma_8h.html#a72729443b1db1842e795d733563d5c90" title="Create a per-scanline CGRAM color gradient.">hdmaColorGradient()</a></code> call afterwards. </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

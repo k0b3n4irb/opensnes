@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('examples_graphics_backgrounds_continuo
 <p>&zwj;Two-layer parallax scrolling with a player sprite that triggers camera movement. Move with the D-pad. Walk past the threshold and the world scrolls to follow. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2><a class="anchor" id="autotoc_md888"></a>
+<h2><a class="anchor" id="autotoc_md901"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -119,12 +119,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-Pad   </td><td class="markdownTableBodyNone">Move the character   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md889"></a>
+<h2><a class="anchor" id="autotoc_md902"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/backgrounds/continuous_scroll</div>
 </div><!-- fragment --><p>Then open <code>continuous_scroll.sfc</code> in your emulator (Mesen2 recommended).</p>
-<h2><a class="anchor" id="autotoc_md890"></a>
+<h2><a class="anchor" id="autotoc_md903"></a>
 What You'll Learn</h2>
 <ul>
 <li>How SNES background scrolling actually works (it's not moving tiles &ndash; it's moving the camera)</li>
@@ -133,9 +133,9 @@ What You'll Learn</h2>
 <li>Why scroll register updates must happen during VBlank (and how bgSetScroll's dirty-flag mechanism guarantees it)</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md892"></a>
+<h2><a class="anchor" id="autotoc_md905"></a>
 Walkthrough</h2>
-<h3><a class="anchor" id="autotoc_md893"></a>
+<h3><a class="anchor" id="autotoc_md906"></a>
 1. Two Layers, Two Speeds</h3>
 <p>This example uses Mode 1 with two background layers: BG1 is the main scene, BG2 is a distant backdrop. When the camera scrolls, both layers move together (though parallax could use different speeds for a depth illusion). A character sprite overlays the scrolling backgrounds.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
@@ -162,39 +162,39 @@ Walkthrough</h2>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why palette slot 2 and 4?</b> Each BG palette slot holds 16 colors. Slot 0 starts at CGRAM address 0, slot 2 at address 32, slot 4 at address 64. Using different slots means BG1 and BG2 get independent color palettes. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md894"></a>
+<h3><a class="anchor" id="autotoc_md907"></a>
 2. The Threshold Scroll Pattern</h3>
 <p>The player moves freely on screen. But when they reach a threshold (column 140 going right, column 80 going left), the background starts scrolling and the player gets pushed back:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SCROLL_THRESHOLD_RIGHT 140</span></div>
 <div class="line"><span class="preprocessor">#define SCROLL_THRESHOLD_LEFT  80</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">player_x</a> &gt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a> &amp;&amp; <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a> &lt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>) {</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a> += 1;</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">bg2_scroll_x</a> += 1;</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">player_x</a> -= 1;   <span class="comment">/* Push player back to keep them visually centered */</span></div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">player_x</a> &gt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a> &amp;&amp; <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a> &lt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>) {</div>
+<div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a> += 1;</div>
+<div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">bg2_scroll_x</a> += 1;</div>
+<div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">player_x</a> -= 1;   <span class="comment">/* Push player back to keep them visually centered */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="agraphics_2backgrounds_2continuous__scroll_2main_8c_html_a73de383a83473e9a755b640ccca7fd44"><div class="ttname"><a href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></div><div class="ttdeci">GameState game</div><div class="ttdoc">Global game state instance with initial values.</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
+<div class="ttc" id="agames_2shmup__1942_2main_8c_html_a73de383a83473e9a755b640ccca7fd44"><div class="ttname"><a href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></div><div class="ttdeci">static GameState game</div><div class="ttdef"><b>Definition</b> main.c:112</div></div>
 <div class="ttc" id="agraphics_2backgrounds_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
 <div class="ttc" id="agraphics_2backgrounds_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
 <div class="ttc" id="astructGameState_html_ac63759cbb1d5e2dfee0ac788e5bc6df2"><div class="ttname"><a href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">GameState::bg1_scroll_x</a></div><div class="ttdeci">s16 bg1_scroll_x</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
-<div class="ttc" id="astructGameState_html_acad6079a04372bf6b88f5cddf28bbb3e"><div class="ttname"><a href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">GameState::player_x</a></div><div class="ttdeci">s16 player_x</div><div class="ttdef"><b>Definition</b> main.c:94</div></div>
+<div class="ttc" id="astructGameState_html_acad6079a04372bf6b88f5cddf28bbb3e"><div class="ttname"><a href="structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e">GameState::player_x</a></div><div class="ttdeci">s16 player_x</div><div class="ttdef"><b>Definition</b> main.c:102</div></div>
 <div class="ttc" id="astructGameState_html_afd37cb72cd408fd9a6cc894c645e1ac8"><div class="ttname"><a href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">GameState::bg2_scroll_x</a></div><div class="ttdeci">s16 bg2_scroll_x</div><div class="ttdef"><b>Definition</b> main.c:98</div></div>
 </div><!-- fragment --><p>The player walks right, reaches column 140, the world scrolls right while the player stays at column 140. It looks like the camera is following the character, but it's actually the background moving in the opposite direction.</p>
 <blockquote class="doxtable">
 <p>&zwj;<b>Why push the player back?</b> Without <code>player_x -= 1</code>, the player would walk past the threshold and keep going off-screen. The push-back keeps them locked to the threshold while the world scrolls beneath them. This is the same pattern used in Super Mario World's camera system. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md895"></a>
+<h3><a class="anchor" id="autotoc_md908"></a>
 3. Scroll Updates via bgSetScroll Dirty Flags</h3>
 <p>Scroll registers are write-only and take effect immediately. If you write them during active display (while the PPU is drawing), you'll get a visible tear &ndash; the top half of the screen shows the old scroll position, the bottom half shows the new one.</p>
 <p>This example calls <code><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></code> from the main loop, which does NOT write to the PPU directly. Instead, it stores the new scroll values and sets a dirty flag. The NMI handler (triggered at VBlank) checks the dirty flags and writes the actual scroll registers at a safe time:</p>
 <div class="fragment"><div class="line"><span class="comment">/* In the main loop -- sets dirty flags, does NOT touch PPU registers */</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a>, <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#a8f3218ef588885e79b0158bb2522fa62">bg1_scroll_y</a>);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(1, <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">bg2_scroll_x</a>, <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#a5464dc5890aac24141f95592ab38f3b7">bg2_scroll_y</a>);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#ac63759cbb1d5e2dfee0ac788e5bc6df2">bg1_scroll_x</a>, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#a8f3218ef588885e79b0158bb2522fa62">bg1_scroll_y</a>);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(1, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#afd37cb72cd408fd9a6cc894c645e1ac8">bg2_scroll_x</a>, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.<a class="code hl_variable" href="structGameState.html#a5464dc5890aac24141f95592ab38f3b7">bg2_scroll_y</a>);</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
 <div class="ttc" id="astructGameState_html_a5464dc5890aac24141f95592ab38f3b7"><div class="ttname"><a href="structGameState.html#a5464dc5890aac24141f95592ab38f3b7">GameState::bg2_scroll_y</a></div><div class="ttdeci">s16 bg2_scroll_y</div><div class="ttdef"><b>Definition</b> main.c:99</div></div>
 <div class="ttc" id="astructGameState_html_a8f3218ef588885e79b0158bb2522fa62"><div class="ttname"><a href="structGameState.html#a8f3218ef588885e79b0158bb2522fa62">GameState::bg1_scroll_y</a></div><div class="ttdeci">s16 bg1_scroll_y</div><div class="ttdef"><b>Definition</b> main.c:97</div></div>
 </div><!-- fragment --><p>This deferred-write mechanism ensures glitch-free scrolling without needing a custom VBlank callback. The initial scroll values are also set before <code><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></code> so the first visible frame shows the correct position.</p>
-<h3><a class="anchor" id="autotoc_md896"></a>
+<h3><a class="anchor" id="autotoc_md909"></a>
 4. Input Reading</h3>
 <p>The example reads the joypad directly from hardware registers after waiting for the auto-joypad read to complete:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -205,7 +205,7 @@ Walkthrough</h2>
 <div class="ttc" id="agroup__cpu__regs_html_gaa7f10b9a2db0fb936560d2475717bf73"><div class="ttname"><a href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a></div><div class="ttdeci">#define REG_JOY1H</div><div class="ttdoc">Joypad 1 data high (R)</div><div class="ttdef"><b>Definition</b> registers.h:328</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gac0a6bd5981a6d53791eca06ea2bd5772"><div class="ttname"><a href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a></div><div class="ttdeci">#define REG_JOY1L</div><div class="ttdoc">Joypad 1 data low (R)</div><div class="ttdef"><b>Definition</b> registers.h:325</div></div>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R)</div><div class="ttdef"><b>Definition</b> registers.h:301</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md897"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md910"></a>
 5. The Game State Struct</h3>
 <p>All game variables live in one struct:</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
@@ -217,17 +217,17 @@ Walkthrough</h2>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> bg2_scroll_y;</div>
 <div class="line">} <a class="code hl_struct" href="structGameState.html">GameState</a>;</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_struct" href="structGameState.html">GameState</a> <a class="code hl_variable" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a> = {20, 100, 0, 32, 0, 32};</div>
+<div class="line"><a class="code hl_struct" href="structGameState.html">GameState</a> <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a> = {20, 100, 0, 32, 0, 32};</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:49</div></div>
-<div class="ttc" id="astructGameState_html"><div class="ttname"><a href="structGameState.html">GameState</a></div><div class="ttdoc">Centralized game state structure.</div><div class="ttdef"><b>Definition</b> main.c:93</div></div>
+<div class="ttc" id="astructGameState_html"><div class="ttname"><a href="structGameState.html">GameState</a></div><div class="ttdoc">Centralized game state structure.</div><div class="ttdef"><b>Definition</b> main.c:101</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>&zwj;<b>Why a struct instead of separate variables?</b> The OpenSNES compiler has a known quirk: separate <code>static u16</code> variables can generate broken code for some access patterns, while struct members work correctly. Using a struct also keeps related state together, which makes the code easier to follow. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md898"></a>
+<h2><a class="anchor" id="autotoc_md911"></a>
 &lt;/blockquote&gt;</h2>
-<h2><a class="anchor" id="autotoc_md899"></a>
+<h2><a class="anchor" id="autotoc_md912"></a>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> gets stuck at the edge?</b> Check your threshold values. If <code>SCROLL_THRESHOLD_RIGHT</code> is too high (close to 256), the player can walk off-screen before scrolling kicks in.</li>
@@ -235,7 +235,7 @@ Tips &amp; Tricks</h2>
 <li><b>Sprite disappears at the left edge?</b> The SNES uses 9-bit X coordinates for sprites. Values below 0 wrap to 256+, which is off-screen. Clamp <code>player_x</code> to a minimum of 0.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md901"></a>
+<h2><a class="anchor" id="autotoc_md914"></a>
 Go Further</h2>
 <ul>
 <li><b>Add tile streaming:</b> Right now the tilemap is static. For larger worlds, you'd upload new tile columns as the camera scrolls. See <a href="../../../games/likemario/">LikeMario</a> for a working implementation.</li>
@@ -244,16 +244,16 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../../../games/likemario/">LikeMario</a> &ndash; full platformer with gravity, collision, and tile streaming.</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md903"></a>
+<h2><a class="anchor" id="autotoc_md916"></a>
 Under the Hood: The Build</h2>
-<h3><a class="anchor" id="autotoc_md904"></a>
+<h3><a class="anchor" id="autotoc_md917"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := continuous_scroll.sfc</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console sprite input background dma</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">ASMSRC      := data.asm</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md905"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md918"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -270,7 +270,7 @@ Why These Modules?</h3>
 <td class="markdownTableBodyNone"><code>dma</code>   </td><td class="markdownTableBodyNone"><code><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible)">dmaCopyVram()</a></code>, <code><a class="el" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4" title="Copy palette data to CGRAM (PVSnesLib compatible)">dmaCopyCGram()</a></code> for bulk asset transfers, plus OAM DMA in NMI   </td></tr>
 </table>
 <hr  />
-<h2><a class="anchor" id="autotoc_md907"></a>
+<h2><a class="anchor" id="autotoc_md920"></a>
 Technical Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -290,7 +290,7 @@ Technical Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">INIDISP   </td><td class="markdownTableBodyNone">$2100   </td><td class="markdownTableBodyNone">Force blank / brightness control   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md908"></a>
+<h2><a class="anchor" id="autotoc_md921"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -302,7 +302,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>Makefile</code>   </td><td class="markdownTableBodyNone"><code>LIB_MODULES := console sprite input background dma</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md909"></a>
+<h2><a class="anchor" id="autotoc_md922"></a>
 Credits</h2>
 <ul>
 <li>Original: odelot (PVSnesLib example)</li>

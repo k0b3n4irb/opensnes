@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('tutorial_mosaic.html',''); initResizab
 <div class="textblock"><p>This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block filter that progressively enlarges the pixels of selected BG layers. Used canonically for <b>RPG battle transitions</b> (Final Fantasy IV–VI), <b>death sequences</b>, <b>damage flashes</b>, <b>scene transitions</b> ("the
 screen pixelates, then resolves into the new room"), and any retro visual style that wants chunky pixels on demand.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html">Graphics</a> tutorial. Mosaic is one of the simplest PPU effects on the SNES — under 100 lines of C typically suffices.</p>
-<h2><a class="anchor" id="autotoc_md269"></a>
+<h2><a class="anchor" id="autotoc_md272"></a>
 What mosaic actually is</h2>
 <p>The PPU has a single hardware filter that says "render this BG layer at
 1× pixel size, but display each pixel as an N × N block". Internally, it samples one pixel out of every N × N region and replicates it to fill the block — so finer detail collapses into chunky squares.</p>
@@ -135,7 +135,7 @@ What mosaic actually is</h2>
 <td class="markdownTableBodyNone">0   </td><td class="markdownTableBodyNone">BG1 enable   </td></tr>
 </table>
 <p>Both axes change instantly — no DMA, no VBlank discipline. Write the register and the next frame uses the new value.</p>
-<h2><a class="anchor" id="autotoc_md270"></a>
+<h2><a class="anchor" id="autotoc_md273"></a>
 The minimum viable mosaic</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -166,7 +166,7 @@ The minimum viable mosaic</h2>
 <div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:121</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>The two-line API: enable the layers you want, set the size. That's it.</p>
-<h2><a class="anchor" id="autotoc_md271"></a>
+<h2><a class="anchor" id="autotoc_md274"></a>
 Animated transitions</h2>
 <p>The lib ships two helpers that block-and-animate, the canonical RPG-style transition:</p>
 <div class="fragment"><div class="line"><span class="comment">/* &quot;Pixelate the screen, then load a new level, then resolve into it&quot; */</span></div>
@@ -193,7 +193,7 @@ Animated transitions</h2>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();   <span class="comment">/* speed=2 between steps */</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:46</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md272"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md275"></a>
 The lib API</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -213,7 +213,7 @@ The lib API</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>mosaicFadeOut(speed)</code>   </td><td class="markdownTableBodyNone">Animate size 0 → 15, blocking.   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md273"></a>
+<h2><a class="anchor" id="autotoc_md276"></a>
 Worked pattern (the shipped example)</h2>
 <p><code>examples/graphics/effects/mosaic</code> cycles through four transitions on button press: brightness fade out, brightness fade in, mosaic fade out, mosaic fade in. The example pairs **<code><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></code>** (the <code>INIDISP</code>-based global brightness scale) with mosaic so you can compare the two transition shapes side by side.</p>
 <p>The takeaway: brightness goes through black; mosaic goes through chunky pixels. They have very different aesthetics and very different gameplay-readability tradeoffs:</p>
@@ -222,9 +222,9 @@ Worked pattern (the shipped example)</h2>
 <li><b>Mosaic fade</b> — the player keeps <em>low-frequency</em> visual information throughout. Good for "the screen reorganises itself" feel; works well when you want continuity (the camera has moved but you can still see <em>where</em>).</li>
 </ul>
 <p>Many RPGs use both: mosaic for "battle starts!" (continuity), brightness fade for "scene transition" (cut).</p>
-<h2><a class="anchor" id="autotoc_md274"></a>
+<h2><a class="anchor" id="autotoc_md277"></a>
 Gotchas</h2>
-<h3><a class="anchor" id="autotoc_md275"></a>
+<h3><a class="anchor" id="autotoc_md278"></a>
 🟠 Mosaic does not affect OBJ (sprites)</h3>
 <p>The MOSAIC register has no bit for OBJ — sprites always render at 1 × 1 pixel resolution. If you fade the BG layers but leave sprites visible, the sprites stay sharp on top of pixelated backgrounds. This is sometimes the desired effect ("the world dissolves but the
 character stays") and sometimes the wrong effect ("the player sprite
@@ -234,11 +234,11 @@ looks weird floating on chunky blocks").</p>
 <li>Move all OBJ entries off-screen via <code>oamMemory[]</code> (Y = 240 hides them).</li>
 <li>Use a brightness fade alongside the mosaic to dim sprites uniformly.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md276"></a>
+<h3><a class="anchor" id="autotoc_md279"></a>
 🟠 Mosaic + Mode 7 = unusual</h3>
 <p>In Mode 7, the only BG is BG1. Setting <code>MOSAIC_BG1</code> on a Mode 7 plane applies the pixel-block filter to the affine-transformed image — you get pixelated rotation/scaling. Visually distinctive, but the pattern is rarely used outside specific stylistic effects.</p>
 <p>In Mode 5/6 (high-resolution modes), mosaic acts on the half-width pixel grid; the visual block size is half what you'd expect from a Mode 0/1 reading.</p>
-<h3><a class="anchor" id="autotoc_md277"></a>
+<h3><a class="anchor" id="autotoc_md280"></a>
 🟡 Mosaic block size is "size + 1" pixels</h3>
 <p>The register stores 0–15, but the actual block size is the value plus 1:</p>
 <table class="markdownTable">
@@ -255,19 +255,19 @@ looks weird floating on chunky blocks").</p>
 </table>
 <p>Most code doesn't notice, but if you compute "this is the first
 visible mosaic step", remember to start at register value 1, not 0. The lib's <code>MOSAIC_MIN</code> = 0 reflects the register, not the visible threshold.</p>
-<h3><a class="anchor" id="autotoc_md278"></a>
+<h3><a class="anchor" id="autotoc_md281"></a>
 🟡 &lt;tt&gt;mosaicFadeIn&lt;/tt&gt; / &lt;tt&gt;mosaicFadeOut&lt;/tt&gt; are blocking</h3>
 <p>They call <code><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></code> internally per step. While they run, your main thread does nothing else. That's fine for screen transitions (the "fade until the level swap" pattern) but wrong for "mosaic on
 just the boss layer while the player keeps moving".</p>
 <p>For non-blocking animation, write the manual loop yourself — see the "Animated transitions" section above.</p>
-<h3><a class="anchor" id="autotoc_md279"></a>
+<h3><a class="anchor" id="autotoc_md282"></a>
 🟡 Mosaic state is not reset by &lt;tt&gt;consoleInit&lt;/tt&gt;</h3>
 <p><code><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></code> does not call <code><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649">mosaicInit()</a></code>. If a previous scene left mosaic enabled (and you didn't call <code>mosaicDisable</code> or <code>mosaicInit</code>), the new scene boots with stale mosaic configuration. The PPU defaults at hard reset are "all off" so the first-boot case is fine, but scene-to-scene cycles need explicit <code><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649">mosaicInit()</a></code> calls.</p>
-<h2><a class="anchor" id="autotoc_md280"></a>
+<h2><a class="anchor" id="autotoc_md283"></a>
 Cycle cost</h2>
 <p>Mosaic costs <b>zero CPU</b> during display — the PPU does the pixel-block sampling in hardware. The configuration writes are a single byte to <code>$2106</code> per change (~10 cycles total).</p>
 <p>The blocking fade helpers (<code>mosaicFadeIn</code>/<code>mosaicFadeOut</code>) cost the duration of the fade in real time (16 × <code>speed</code> frames), but that's a gameplay-pacing decision, not a CPU-budget one.</p>
-<h2><a class="anchor" id="autotoc_md281"></a>
+<h2><a class="anchor" id="autotoc_md284"></a>
 See also</h2>
 <ul>
 <li><code><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></code> — full API reference.</li>

@@ -1,13 +1,22 @@
 var searchData=
 [
-  ['fade_5fin_0',['fade_in',['../graphics_2effects_2fading_2main_8c.html#a3fff55a1d67b8f33695300c33862020d',1,'main.c']]],
-  ['fade_5fout_1',['fade_out',['../graphics_2effects_2fading_2main_8c.html#a6acbfe53e87fb4cfc5ae5f01cc77de7b',1,'main.c']]],
-  ['fixabs_2',['fixAbs',['../math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a',1,'math.h']]],
-  ['fixclamp_3',['fixClamp',['../math_8h.html#a5b18775a4f5e401550270ef08ab62a1e',1,'math.h']]],
-  ['fixcos_4',['fixCos',['../math_8h.html#a0a04487d24a25131a75e3c35b4edcabb',1,'math.h']]],
-  ['fixdiv_5',['fixDiv',['../math_8h.html#ac1b5b08f47109af37b8874161e3a87d9',1,'math.h']]],
-  ['fixlerp_6',['fixLerp',['../math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd',1,'math.h']]],
-  ['fixmul_7',['fixMul',['../math_8h.html#aaa8ca4460928f28892217658eca661bf',1,'math.h']]],
-  ['fixsin_8',['fixSin',['../math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c',1,'math.h']]],
-  ['fixsqrt_9',['fixSqrt',['../math_8h.html#a5da2bf6880e934a85f84e9f070d612f5',1,'math.h']]]
+  ['fadein_0',['fadeIn',['../console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb',1,'console.h']]],
+  ['fadeout_1',['fadeOut',['../console_8h.html#a6c68f9393684a2b251292a9e93891a02',1,'console.h']]],
+  ['fix32abs_2',['fix32Abs',['../fixed32_8h.html#ae40d5f5a8873c513827e7e9dbf657496',1,'fixed32.h']]],
+  ['fix32clamp_3',['fix32Clamp',['../fixed32_8h.html#ace9e4f3b18e047566b089f1e888f5ddc',1,'fixed32.h']]],
+  ['fix32cos_4',['fix32Cos',['../fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2',1,'fixed32.h']]],
+  ['fix32div_5',['fix32Div',['../fixed32_8h.html#a95491946dfb53ae88bcca37c07350848',1,'fixed32.h']]],
+  ['fix32lerp_6',['fix32Lerp',['../fixed32_8h.html#a343426d35901f867c501d137c6ac9c2f',1,'fixed32.h']]],
+  ['fix32max_7',['fix32Max',['../fixed32_8h.html#a2c3f87e060fc000498e9a7f1faa5800c',1,'fixed32.h']]],
+  ['fix32min_8',['fix32Min',['../fixed32_8h.html#add048208d24faa8f52bb9b3ca5c55800',1,'fixed32.h']]],
+  ['fix32mul_9',['fix32Mul',['../fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673',1,'fixed32.h']]],
+  ['fix32sin_10',['fix32Sin',['../fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3',1,'fixed32.h']]],
+  ['fixabs_11',['fixAbs',['../math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a',1,'math.h']]],
+  ['fixclamp_12',['fixClamp',['../math_8h.html#a5b18775a4f5e401550270ef08ab62a1e',1,'math.h']]],
+  ['fixcos_13',['fixCos',['../math_8h.html#a0a04487d24a25131a75e3c35b4edcabb',1,'math.h']]],
+  ['fixdiv_14',['fixDiv',['../math_8h.html#ac1b5b08f47109af37b8874161e3a87d9',1,'math.h']]],
+  ['fixlerp_15',['fixLerp',['../math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd',1,'math.h']]],
+  ['fixmul_16',['fixMul',['../math_8h.html#aaa8ca4460928f28892217658eca661bf',1,'math.h']]],
+  ['fixsin_17',['fixSin',['../math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c',1,'math.h']]],
+  ['fixsqrt_18',['fixSqrt',['../math_8h.html#a5da2bf6880e934a85f84e9f070d612f5',1,'math.h']]]
 ];

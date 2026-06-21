@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['x_0',['x',['../structRect.html#a9e32b68a268c298487173d197726d6ab',1,'Rect::x'],['../structMonster.html#a8fe078bb2419edd3161269feb476e91b',1,'Monster::x'],['../structPlayer.html#afb40e5ed60c0e9318f89535c76466a71',1,'Player::x']]],
+  ['x_0',['x',['../structRect.html#a9e32b68a268c298487173d197726d6ab',1,'Rect::x'],['../structEntity.html#abb39fb6fdbad51636ea22e63fdc0fcd7',1,'Entity::x'],['../structMonster.html#a8fe078bb2419edd3161269feb476e91b',1,'Monster::x'],['../structPlayer.html#afb40e5ed60c0e9318f89535c76466a71',1,'Player::x']]],
   ['x_5fpos_1',['x_pos',['../map_8h.html#a52d9f95007fdae0115aa0d5b21317257',1,'map.h']]],
   ['xloc_2',['xloc',['../maps_2mapscroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8',1,'main.c']]],
   ['xmax_3',['xmax',['../structt__objs.html#acd8923cc8af679f29948a046cc75facf',1,'t_objs']]],

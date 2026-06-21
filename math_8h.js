@@ -8,6 +8,8 @@ var math_8h =
     [ "fixed", "math_8h.html#ac1976de9516b58f7a0352917f8d8bedd", null ],
     [ "atan2_8", "math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5", null ],
     [ "div16", "math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab", null ],
+    [ "ease_in_quad", "math_8h.html#a8a300b912155f22476053ffc3cc15d33", null ],
+    [ "ease_out_quad", "math_8h.html#a8b6668394e715b1f4faf5b11dda38fa2", null ],
     [ "fixAbs", "math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a", null ],
     [ "fixClamp", "math_8h.html#a5b18775a4f5e401550270ef08ab62a1e", null ],
     [ "fixCos", "math_8h.html#a0a04487d24a25131a75e3c35b4edcabb", null ],
@@ -19,5 +21,6 @@ var math_8h =
     [ "mod16", "math_8h.html#ae2d0745b4830f0f51732ebccb6bb7d1d", null ],
     [ "mul16", "math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54", null ],
     [ "sqrt16", "math_8h.html#a8cc43b9aa47696123ad5d893daee75ea", null ],
+    [ "ease_quad_table", "math_8h.html#a1d00d3d61fbf201e34b45eccc2113a7b", null ],
     [ "sine_table", "math_8h.html#aa20b21cd7b12f72a2bfc0cbbf5fcabab", null ]
 ];

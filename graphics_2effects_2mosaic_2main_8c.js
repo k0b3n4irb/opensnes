@@ -1,7 +1,5 @@
 var graphics_2effects_2mosaic_2main_8c =
 [
-    [ "doFadeIn", "graphics_2effects_2mosaic_2main_8c.html#a25501938b4a84e9817574af50141b2b8", null ],
-    [ "doFadeOut", "graphics_2effects_2mosaic_2main_8c.html#a74cd7ceedfb01d706e852aa6ee36f962", null ],
     [ "doMosaicIn", "graphics_2effects_2mosaic_2main_8c.html#ad24ec53abd5ffdb7e80c3e894e5efa62", null ],
     [ "doMosaicOut", "graphics_2effects_2mosaic_2main_8c.html#a8f770fb59cba307b44c7c22adaeed074", null ],
     [ "main", "graphics_2effects_2mosaic_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
