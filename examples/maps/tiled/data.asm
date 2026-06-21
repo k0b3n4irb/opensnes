@@ -24,7 +24,9 @@ tilesetpal_end:
 ; maplevel01.t16: Metatile definitions (4 tiles per metatile)
 ; maplevel01.b16: Tile attributes (collision properties per metatile)
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+; B1: pinned out of bank $00 (bank 2). mapLoad + the scroll runtime honour
+; the pointer's bank byte, so the 13 KB map need not sit in bank $00.
+.section ".rodata2" semifree bank 2
 
 mapdata:
 .incbin "res/BG1.m16"

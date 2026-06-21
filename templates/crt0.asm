@@ -514,10 +514,19 @@ FastStart:
     .ACCU 8
 
 .ifdef SA1
-    ; SA-1: Enable I-RAM writes for SNES CPU
-    ; Try $FF — maybe bit=1 means WRITABLE (not PROTECTED)
+    ; SA-1: Enable I-RAM writes for the SNES CPU via SIWP ($2229).
+    ; POLARITY IS DISPUTED — do not "fix" this to $00 without a hardware test:
+    ;   * Super Famicom Dev Wiki / fullsnes: bit=1 PROTECTS a 256-byte page,
+    ;     so $00 = all writable.
+    ;   * Mesen2 (our accuracy reference) and snes9x: $FF = writable, $00 =
+    ;     write-blocked. Empirically, $00 makes the crt0 I-RAM self-test
+    ;     below fail (sa1_status=$FF); $FF makes it pass (sa1_status=$A5).
+    ; We follow the emulators we actually test on (=$FF). The self-test is
+    ; the safety net if a future emulator/cartridge disagrees.
+    ; See KNOWN_LIMITATIONS.md "SA-1 SIWP/CIWP" and
+    ; .claude/notes/tech/enhancement_chips_research.md.
     lda #$FF
-    sta.l $002229           ; SIWP = $FF
+    sta.l $002229           ; SIWP = $FF (writable per Mesen2/snes9x)
 .endif
 
     ; Set up stack at $1FFF
@@ -629,8 +638,10 @@ FastStart:
     ; === SA-1 INIT ===
 
     ; 1. Disable I-RAM write protection (redundant with early init, but safe)
+    ;    $FF = writable per Mesen2/snes9x; polarity disputed vs the wiki —
+    ;    see the SIWP note at the early-init site above before changing.
     lda #$FF
-    sta.l $002229           ; SIWP: try $FF = all bits set = writable?
+    sta.l $002229           ; SIWP = $FF (writable per Mesen2/snes9x)
 
     ; 2. SELF-TEST: verify SNES CPU can write/read I-RAM
     ;    Use STA.L/LDA.L to force bank $00 (bypass DB)

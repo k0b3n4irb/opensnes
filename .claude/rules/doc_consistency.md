@@ -26,6 +26,16 @@ opt-in list.
    v0.16.0 shipped the new `scene_stack` example. `CHANGELOG.md` is
    exempt — historical entries freeze a past state on purpose.
 
+4. **ABI prototypes quoted in `compiler/ABI.md`** must match the canonical
+   declaration in `lib/include/snes/*.h`. `ABI.md` is the canonical ABI
+   reference; a stale prototype there silently invalidates its whole
+   stack-offset table. Caught historically as the `oamSet` worked example
+   pinning a 6-arg `(u8 id, u16 x, u16 y, u16 attr, u8 size, u16 tile)`
+   signature while the real API is 7-arg `(u16 id, u16 x, u16 y, u16 tile,
+   u16 palette, u16 priority, u16 flags)` — every offset in the table was
+   wrong. Only prototypes whose function name exists in a header are
+   checked; illustrative prototypes and code-block *calls* are ignored.
+
 ## Mandatory workflow
 
 Before committing any change that touches one of those classes:
@@ -47,6 +57,10 @@ It exits 0 on green, 1 on drift with an actionable message per finding.
   rules. The canonical pattern is "every example" / "the full suite" —
   see `testing.md:14` and `nmi_audit.md:57` for the form. Hard-coded
   numbers belong in changelog snapshots and release notes only.
+- **ABI prototypes in `compiler/ABI.md`**: whenever a public function's
+  signature changes in `lib/include/snes/*.h`, update the matching worked
+  example in `ABI.md` in the same commit — the signature line, the codegen
+  push list, and the stack-offset table all move together.
 
 ## Adding a new anchor
 
