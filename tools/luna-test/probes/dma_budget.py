@@ -1,23 +1,30 @@
-"""Probe: VBlank DMA→VRAM budget (H2).
+"""Probe: VBlank DMA→VRAM budget (H2) — EXACT per-frame (luna v1.0.0).
 
 The SNES can DMA ~4 KB to VRAM per VBlank; more silently corrupts on real
 hardware (KNOWN_LIMITATIONS 🟡). luna's `--dma-trace` logs every byte an MDMA
-writes to $2118/$2119. We measure *steady-state* (post-boot) VRAM-DMA volume per
-PPU frame and flag examples that exceed the budget.
+writes to $2118/$2119, and v1.0.0 tags each row with `frame,line,blank`. So we
+no longer estimate an average — we bucket bytes by PPU frame and check the
+**peak** single frame, which is the real hardware risk (one over-budget VBlank
+corrupts, even if the average is fine).
 
-NOTE — estimate, not exact: `--dma-trace` rows are `seq,src,vram_word,reg,value`
-with **no frame/scanline column**, so per-VBlank bucketing isn't possible
-directly. We approximate bytes/frame over a post-boot window (frame delta from
-two `state` snapshots). The exact per-VBlank check needs a luna enhancement —
-filed as feature request **L13** (frame/scanline column on `--dma-trace`).
-Boot-time uploads run in forced blank (unbudgeted) and are excluded by warming
-past them.
+`blank` is the **VBlank-period** flag (verified empirically: blank=1 rows land on
+lines ~230-253, blank=0 on lines ~3-91). The budgeted window is VBlank, so we
+count `blank=1` bytes per frame. Boot uploads run in INIDISP forced-blank and are
+warmed past with `--dma-trace-from`.
+
+HONEST SCOPE: the current example corpus uploads all VRAM at boot (forced blank)
+and scrolls via BG registers / streams sprites via OAM ($2104, not VRAM) — *none*
+stream tiles to VRAM per frame in steady state, so the measured steady-state peak
+is ~0 for every example. This probe therefore acts as a **regression guard**: the
+baseline is "well under budget", and it will fire if a future example/change
+starts pushing a heavy per-VBlank VRAM-DMA load. (A corpus example that streams
+VRAM each frame would give it teeth; see the chantier note.)
 """
 from __future__ import annotations
 
-import json
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 from lib import find_luna, rom_path
@@ -40,13 +47,8 @@ EXAMPLES = [
 ]
 
 
-def _frame(luna: str, rom: Path, steps: int) -> int:
-    p = subprocess.run([luna, "state", "-n", str(steps), "--out", "-", str(rom)],
-                       capture_output=True, text=True, timeout=300)
-    return json.loads(p.stdout)["scheduler"]["frame_count"]
-
-
-def _vram_dma_bytes(luna: str, rom: Path) -> int:
+def _peak_vram_dma_per_frame(luna: str, rom: Path) -> int:
+    """Peak VBlank (blank=1) VRAM-DMA bytes written in any single PPU frame."""
     out = Path("/tmp/luna-dma") / (rom.stem + ".csv")
     out.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run([luna, "state", "-n", str(WARM + WINDOW),
@@ -55,8 +57,17 @@ def _vram_dma_bytes(luna: str, rom: Path) -> int:
                    capture_output=True, text=True, timeout=300)
     if not out.is_file():
         return 0
-    n = sum(1 for _ in out.open()) - 1   # minus header; one row = one byte
-    return max(0, n)
+    lines = out.read_text().splitlines()
+    if len(lines) < 2:
+        return 0
+    cols = lines[0].split(",")
+    fi, bi = cols.index("frame"), cols.index("blank")
+    per_frame: Counter[str] = Counter()
+    for row in lines[1:]:                 # one row = one byte to $2118/$2119
+        f = row.split(",")
+        if f[bi] == "1":                  # VBlank window = the budgeted period
+            per_frame[f[fi]] += 1
+    return max(per_frame.values()) if per_frame else 0
 
 
 def run() -> tuple[bool, str]:
@@ -64,16 +75,13 @@ def run() -> tuple[bool, str]:
     results = []
     for rel in EXAMPLES:
         rom = rom_path(rel)
-        f1 = _frame(luna, rom, WARM)
-        f2 = _frame(luna, rom, WARM + WINDOW)
-        frames = max(1, f2 - f1)
-        per_frame = _vram_dma_bytes(luna, rom) / frames
-        ok = per_frame <= BUDGET_BYTES
-        results.append((ok, f"{rom.parent.name}: ~{per_frame:.0f} B/frame"))
+        peak = _peak_vram_dma_per_frame(luna, rom)
+        results.append((peak <= BUDGET_BYTES, f"{rom.parent.name}: {peak} B peak/frame"))
     bad = [m for ok, m in results if not ok]
     if bad:
         return False, f"OVER BUDGET (>{BUDGET_BYTES} B/VBlank): " + "; ".join(bad)
-    return True, f"{len(results)} examples within ~{BUDGET_BYTES} B/VBlank (estimate)"
+    peaks = ", ".join(m for _, m in results)
+    return True, f"{len(results)} examples within {BUDGET_BYTES} B/VBlank (exact peak: {peaks})"
 
 
 if __name__ == "__main__":

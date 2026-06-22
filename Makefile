@@ -132,6 +132,8 @@ tests: test-compiler
 	@python3 tools/luna-test/probes/run_all.py
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit
 	@python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel
+	@python3 devtools/compiler-tests/runtime/debug_channel/test_debug_channel.py
 	@echo "ALL CHECKS PASSED (luna)"
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
