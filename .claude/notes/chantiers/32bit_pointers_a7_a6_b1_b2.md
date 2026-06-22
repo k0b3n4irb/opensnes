@@ -302,6 +302,68 @@ already gets wrong (data must fit in its bank); (S) introduces no NEW unsoundnes
 - `make clean && make` + full `make tests`.
 - Add far-pointer cases that exercise stores, struct fields, and `p[i]` (indexed).
 
+## 3e. Attempt #1 (2026-06-22) — regressed, NOT shipped
+
+First implementation pass. **Built:** DP scratch `tcc__farptr` (crt0, reserved +
+NMI-mirrored, validated inert), far **byte-load** path (DP-indirect-long via
+`tcc__farptr`), `mark_addr_only_kl` gated on `ref_is_high_zero` (so a far
+pointer's bank stays live), `mark_high_zero` extended through `Oadd Kl` + treats
+`CAddr` as bank-`$00`.
+
+- **Isolated far byte-load: PROVEN correct** — `a6_farptr` r_d0/d3/d7 XPASS. The
+  core mechanism (addr_only gating + DP-indirect-long deref) works.
+- **Full validation FAILED → not shipped:** **7 visual regressions** (aim_target,
+  random, timer, breakout, tetris, metasprite, superscope) + **+8% cycles**
+  (bench 1476 → 1595).
+
+**Root causes:**
+1. **Incomplete** — only the byte-load got the far path; **stores + word/half
+   loads still emit `$0000,x`**. Making their address temps non-addr-only (bank
+   kept live) without a matching far emit is incoherent at scale — the bulk of
+   the 7 regressions trace here.
+2. **Analysis too coarse** — `ref_is_high_zero` under-approximates real bank-`$00`
+   derefs, so many fell through to the (slower) far default → the +8% and wider
+   far-path exposure.
+
+WIP preserved (NOT merged): qbe `wip/a6-deref-attempt1` (`b40f919`) + superproject
+`chantier/a6-codegen` (`fae7444`). develop stays clean (pin `1884a20`).
+
+## 3f. Attempt #2 plan — sequence the two concerns separately
+
+Attempt #1 changed perf-analysis AND far-codegen at once, so a regression could be
+either. Attempt #2 splits them into independently-validatable steps, default-safe
+toward the *current* (fast, correct-for-bank-0) behavior:
+
+**#2a — Strengthen the bank-`$00` proof, ALONE (no far path yet).**
+Extend `mark_high_zero` propagation until ~every real bank-`$00` deref in the 56
+examples is *provably* high-zero: add `Ocopy`/`Ophi` propagation, `Omul`-of-
+high-zero-by-const, and re-check the `arr[i]`/struct patterns the 7 regressions
+used. This only feeds existing consumers (Oshl/Omul shortcuts) → **gate: visual
+56/56 + `make bench` ≤ 1476** (neutral or faster). Commit when green. *This
+removes the +8% risk before any far codegen exists.*
+
+**#2b — Far path for ALL deref sizes, behind the now-strong proof.**
+With #2a making bank-`$00` provably-fast, add the dispatch (`ref_is_high_zero` →
+fast `$0000,x`; else far) to **every** site together — byte/half/word loads AND
+byte/half/word/long stores — via a shared `emit_farptr_setup()` helper (write the
+3-byte pointer to `tcc__farptr`, then `lda/sta [tcc__farptr]` with size-correct
+sep/rep; stores preserve the value across the setup). Extend `a6_farptr` with
+**store + word-load + struct-field + `p[i]` indexed** cases. **Gate: a6_farptr
+fully green (drop all xfails) + visual 56/56 + bench ≤ 1476 + `make clean && make`
++ full `make tests`.**
+
+**#2c — Root-cause-first discipline.** Before #2b, reproduce each of the 7
+attempt-#1 regressions on the wip qbe (`b40f919`) and asm-diff vs clean to confirm
+each is "unimplemented store/word site" vs "analysis false-positive" vs "far-path
+bug". A false-positive (fast path on an actually-far pointer) is the only
+corruption risk — must be zero before shipping.
+
+**Safety invariant (both steps):** the fast `$0000,x` path is only taken when
+`ref_is_high_zero` is *sound* (no false "is bank-0"); everything else goes far.
+Wrong-direction error (far on a bank-0 ptr) is only a perf cost (#2a shrinks it);
+the dangerous direction (fast on a far ptr) cannot happen if `ref_is_high_zero`
+never over-claims — which #2c verifies per-example.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
