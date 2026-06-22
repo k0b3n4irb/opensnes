@@ -364,6 +364,33 @@ Wrong-direction error (far on a bank-0 ptr) is only a perf cost (#2a shrinks it)
 the dangerous direction (fast on a far ptr) cannot happen if `ref_is_high_zero`
 never over-claims — which #2c verifies per-example.
 
+## 3g. Attempt-#2 investigation notes (2026-06-22) — narrowed + a build footgun
+
+Partial #2c investigation against the wip (`b40f919`):
+
+- **The regression is LIB-localized, not user code.** `examples/basics/random`
+  `main.c.asm` is **byte-identical** clean-vs-wip. The only modules whose codegen
+  the wip changed are **`lib/source/text.c` (3 far-deref sites)** and
+  **`lib/source/collision.c` (6)** — those are where `tcc__farptr` appears.
+  So #2c should focus the asm-diff on those two `.c` files.
+- **Suspect ranking:** `text.c` is used by ~all examples yet only 7 regressed →
+  its far site is probably a correct far LOAD (or a conditionally-hit path);
+  `collision.c` + the `mark_addr_only_kl` ripple (Oadd/Omul high-half now computed
+  for non-addr-only temps) are the prime suspects. The far **STORE** path was
+  never implemented (only byte-load) — re-confirm whether text/collision hit a
+  store/word-load far site.
+
+- **⚠️ BUILD STALENESS FOOTGUN (cost me real time; fix the workflow):**
+  `make compiler` does **not** rebuild qbe after a submodule SHA checkout (stale
+  `.o` newer than the freshly-checked-out source), and `make lib` does **not**
+  recompile `.c.asm` after a compiler change. Both silently reuse stale output, so
+  a "clean vs wip" diff can compare wip-vs-wip and show 0. **For any
+  compiler-change validation use `make clean && make` (or `make -C compiler/qbe
+  clean` + `make -C lib clean`), and verify the binary directly:
+  `strings bin/qbe | grep -c tcc__farptr`.** This very likely contaminated some
+  intermediate checks during attempt #1 — re-run attempt #2's gates from a full
+  clean build, not partial rebuilds.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
