@@ -302,36 +302,174 @@ already gets wrong (data must fit in its bank); (S) introduces no NEW unsoundnes
 - `make clean && make` + full `make tests`.
 - Add far-pointer cases that exercise stores, struct fields, and `p[i]` (indexed).
 
-### Phase 1 — implementation ATTEMPT #1 (2026-06-22) — regressed, NOT shipped
+## 3e. Attempt #1 (2026-06-22) — regressed, NOT shipped
 
-Built: DP scratch `tcc__farptr` (crt0, reserved + NMI-mirrored, validated inert),
-far **byte-load** path (DP-indirect-long via `tcc__farptr`), `mark_addr_only_kl`
-gated on `ref_is_high_zero` (so a far pointer's bank stays live), and
-`mark_high_zero` extended to propagate through `Oadd Kl` (+ treat CAddr as bank-0).
+First implementation pass. **Built:** DP scratch `tcc__farptr` (crt0, reserved +
+NMI-mirrored, validated inert), far **byte-load** path (DP-indirect-long via
+`tcc__farptr`), `mark_addr_only_kl` gated on `ref_is_high_zero` (so a far
+pointer's bank stays live), `mark_high_zero` extended through `Oadd Kl` + treats
+`CAddr` as bank-`$00`.
 
-- **Isolated far byte-load: PROVEN correct** — `a6_farptr` r_d0/d3/d7 XPASS (the
-  mechanism works: addr_only gating + DP-indirect-long deref).
-- **Full validation FAILED** → not shipped:
-  - **7 visual regressions**: aim_target, random, timer, breakout, tetris,
-    metasprite, superscope (fbhash drift = wrong codegen at scale).
-  - **+8% cycles** (bench 1476→1595): bank-0 derefs not proven high-zero fell to
-    the slower far path.
+- **Isolated far byte-load: PROVEN correct** — `a6_farptr` r_d0/d3/d7 XPASS. The
+  core mechanism (addr_only gating + DP-indirect-long deref) works.
+- **Full validation FAILED → not shipped:** **7 visual regressions** (aim_target,
+  random, timer, breakout, tetris, metasprite, superscope) + **+8% cycles**
+  (bench 1476 → 1595).
 
-**Lessons for attempt #2:**
-1. Only the **byte-load** far path was implemented; **stores + word/half loads**
-   still use `$0000,x`, so making their address temps non-addr-only (high half
-   computed) without a matching far emit is incoherent — implement ALL deref
-   sizes together, or none.
-2. The `mark_high_zero` Oadd/CAddr extension is too coarse and/or the far path
-   has edge cases — the 7 regressions must be root-caused individually (likely
-   far STOREs and far word-loads hitting the unimplemented sites, plus the
-   perf fall-through). Bisect per-example with `CC_TRACE`/asm diff.
-3. The +8% confirms the high-zero analysis under-approximates real bank-0
-   derefs — it must prove high-zero for ~all current patterns before the far
-   default is acceptable.
+**Root causes:**
+1. **Incomplete** — only the byte-load got the far path; **stores + word/half
+   loads still emit `$0000,x`**. Making their address temps non-addr-only (bank
+   kept live) without a matching far emit is incoherent at scale — the bulk of
+   the 7 regressions trace here.
+2. **Analysis too coarse** — `ref_is_high_zero` under-approximates real bank-`$00`
+   derefs, so many fell through to the (slower) far default → the +8% and wider
+   far-path exposure.
 
-WIP kept on branch `chantier/a6-codegen` (NOT merged — develop stays correct).
-The gate (`a6_farptr`) + this design remain on develop for attempt #2.
+WIP preserved (NOT merged): qbe `wip/a6-deref-attempt1` (`b40f919`) + superproject
+`chantier/a6-codegen` (`fae7444`). develop stays clean (pin `1884a20`).
+
+## 3f. Attempt #2 plan — sequence the two concerns separately
+
+Attempt #1 changed perf-analysis AND far-codegen at once, so a regression could be
+either. Attempt #2 splits them into independently-validatable steps, default-safe
+toward the *current* (fast, correct-for-bank-0) behavior:
+
+**#2a — Strengthen the bank-`$00` proof, ALONE (no far path yet).**
+Extend `mark_high_zero` propagation until ~every real bank-`$00` deref in the 56
+examples is *provably* high-zero: add `Ocopy`/`Ophi` propagation, `Omul`-of-
+high-zero-by-const, and re-check the `arr[i]`/struct patterns the 7 regressions
+used. This only feeds existing consumers (Oshl/Omul shortcuts) → **gate: visual
+56/56 + `make bench` ≤ 1476** (neutral or faster). Commit when green. *This
+removes the +8% risk before any far codegen exists.*
+
+**#2b — Far path for ALL deref sizes, behind the now-strong proof.**
+With #2a making bank-`$00` provably-fast, add the dispatch (`ref_is_high_zero` →
+fast `$0000,x`; else far) to **every** site together — byte/half/word loads AND
+byte/half/word/long stores — via a shared `emit_farptr_setup()` helper (write the
+3-byte pointer to `tcc__farptr`, then `lda/sta [tcc__farptr]` with size-correct
+sep/rep; stores preserve the value across the setup). Extend `a6_farptr` with
+**store + word-load + struct-field + `p[i]` indexed** cases. **Gate: a6_farptr
+fully green (drop all xfails) + visual 56/56 + bench ≤ 1476 + `make clean && make`
++ full `make tests`.**
+
+**#2c — Root-cause-first discipline.** Before #2b, reproduce each of the 7
+attempt-#1 regressions on the wip qbe (`b40f919`) and asm-diff vs clean to confirm
+each is "unimplemented store/word site" vs "analysis false-positive" vs "far-path
+bug". A false-positive (fast path on an actually-far pointer) is the only
+corruption risk — must be zero before shipping.
+
+**Safety invariant (both steps):** the fast `$0000,x` path is only taken when
+`ref_is_high_zero` is *sound* (no false "is bank-0"); everything else goes far.
+Wrong-direction error (far on a bank-0 ptr) is only a perf cost (#2a shrinks it);
+the dangerous direction (fast on a far ptr) cannot happen if `ref_is_high_zero`
+never over-claims — which #2c verifies per-example.
+
+## 3g. Attempt-#2 investigation notes (2026-06-22) — narrowed + a build footgun
+
+Partial #2c investigation against the wip (`b40f919`):
+
+- **The regression is LIB-localized, not user code.** `examples/basics/random`
+  `main.c.asm` is **byte-identical** clean-vs-wip. The only modules whose codegen
+  the wip changed are **`lib/source/text.c` (3 far-deref sites)** and
+  **`lib/source/collision.c` (6)** — those are where `tcc__farptr` appears.
+  So #2c should focus the asm-diff on those two `.c` files.
+- **Suspect ranking:** `text.c` is used by ~all examples yet only 7 regressed →
+  its far site is probably a correct far LOAD (or a conditionally-hit path);
+  `collision.c` + the `mark_addr_only_kl` ripple (Oadd/Omul high-half now computed
+  for non-addr-only temps) are the prime suspects. The far **STORE** path was
+  never implemented (only byte-load) — re-confirm whether text/collision hit a
+  store/word-load far site.
+
+- **⚠️ BUILD STALENESS FOOTGUN (cost me real time; fix the workflow):**
+  `make compiler` does **not** rebuild qbe after a submodule SHA checkout (stale
+  `.o` newer than the freshly-checked-out source), and `make lib` does **not**
+  recompile `.c.asm` after a compiler change. Both silently reuse stale output, so
+  a "clean vs wip" diff can compare wip-vs-wip and show 0. **For any
+  compiler-change validation use `make clean && make` (or `make -C compiler/qbe
+  clean` + `make -C lib clean`), and verify the binary directly:
+  `strings bin/qbe | grep -c tcc__farptr`.** This very likely contaminated some
+  intermediate checks during attempt #1 — re-run attempt #2's gates from a full
+  clean build, not partial rebuilds.
+
+## 3h. Root-cause CONFIRMED + a better analysis for attempt #2 (2026-06-22)
+
+Reliable IR-pipe diff (same cproc IR through clean vs wip qbe, bypassing the build
+staleness) of `text.c` and `collision.c`:
+
+- **`arr[i]` on a bank-`$00` symbol is NOT the problem.** `tilemapBuffer[i]` lowers
+  to `add($tilemapBuffer, extuw(...))`; both operands are high-zero (CAddr +
+  `extuw` seed) so attempt-#1's `Oadd` extension already marks it → fast path,
+  unchanged. Good.
+- **The regressions are derefs of LOADED pointers** (`%p =l loadl …`; text.c has 7,
+  e.g. `u8 *str` params, cursor/string pointers). attempt-#1's `ref_is_high_zero`
+  can't prove a `loadl` high-zero → they take the far path, and (a) only byte-load
+  has a far emit (stores/word-loads still `$0000,x` → wrong bank), and (b) the
+  `mark_addr_only` gating un-skips their high-half `adc` computation (carry-
+  dependent, + the +8%). That combination is the 7 visual regressions + the bench.
+
+**Better analysis for attempt #2 — taint-from-`loadl` instead of high-zero:**
+The deref dispatch should ask *"is this address derived from a loaded pointer
+VALUE?"*, not *"is it provably high-zero?"*:
+- A temp is **far-tainted** iff it is an `Oloadl` result, or an `add/sub/copy/phi`
+  with a far-tainted operand. (Provenance, not value — so **no `Omul` overflow
+  soundness worry** that the high-zero framing has.)
+- Dispatch: **far-tainted → far path; else → current fast `$0000,x`** (sound under
+  the existing no-bank-wrap assumption for symbol/stack/Kw-rooted addresses).
+- This keeps ALL symbol-based bank-`$00` access (`arr[i]`, struct, `&global`) on
+  the fast path by construction (never loadl-rooted) → **no perf regression**, and
+  routes only genuine pointer-VALUE derefs to far. Correctness risk (fast on a
+  far ptr) only if a loaded far pointer escapes the taint — impossible for the
+  add/sub/copy/phi closure; the lone gap is a far C symbol deref'd *directly by
+  its symbol*, which is already unsupported (C symbols are bank-`$00`).
+
+**Attempt #2 (revised) execution:**
+1. Implement the `far_tainted` pre-pass (loadl closure over add/sub/copy/phi).
+2. Far emit for **all** deref sizes via a shared `emit_farptr_setup` helper
+   (byte/half/word loads + byte/half/word/long stores; preserve the store value).
+3. Replace the attempt-#1 dispatch (`ref_is_high_zero`) and the `mark_addr_only`
+   gating with `far_tainted`. Keep `mark_high_zero`/`ref_is_high_zero` as-is for
+   the Oshl/Omul shortcuts (untouched).
+4. Gate from a **full clean build**: a6_farptr (all sizes, drop xfails) + visual
+   56/56 + bench ≤ 1476 + `make tests`.
+
+This supersedes §3f's high-zero-based #2a/#2b. The DP scratch (`tcc__farptr`) and
+the proven far byte-load emit from attempt #1 (`wip/a6-deref-attempt1`) are reused.
+
+## 3i. Attempt #2 (taint-from-loadl) — regressed, NOT shipped (2026-06-22)
+
+Implemented in full: `far_tainted` pre-pass (loadl closure over add/sub/copy/phi),
+dispatch + `mark_addr_only` gating switched to taint, `emit_farptr_setup` helper,
+far emit for byte/word loads + byte/word/half/long stores. **a6_farptr 4/4** (far
+loads correct in isolation). But the full clean-build suite regressed **again**:
+same 7 visual (all use `text.c`) + **bench +14%** (worse than #1's +8%).
+WIP: qbe `wip/a6-deref-attempt2` (`6d25025`), superproject `chantier/a6-codegen`
+(`af8212e`). NOT merged; develop clean (pin `1884a20`, 56/56).
+
+**Two NEW, precise root causes (the real blockers for attempt #3):**
+
+1. **Far-pointer HIGH HALF (bank) is dropped in Kl COPY/PHI moves.** The taint
+   gating I added only covers the load/store *address* uses (`is_addr_use`). The
+   high-half-skip optimization ALSO fires in Kl **copy and phi moves** (governed
+   by `temp_addr_only`/`ref_to_is_addr_only` consulted in the copy/phi emit). A
+   loop pointer copied as `lda 10,s ; sta 6,s` keeps only the LOW half; the later
+   `lda [tcc__farptr]` reads a **stale bank** from the un-updated high slot →
+   wrong load. Confirmed in `text.c` asm (the lone far site at the string-loop
+   pointer). **Fix: gate EVERY high-half-skip (copy, phi, add, mul emit — not just
+   the load/store address classification) on `!far_tainted`.**
+
+2. **The taint SEED over-taints → the +14%.** Seeding on *every* `Oload Kl` taints
+   all 32-bit loads (incl. plain `u32`/`s32` data, not just pointers). Tainted
+   temps lose `addr_only` → high-half computed everywhere → the cycle blow-up.
+   **Fix: seed only loads whose result is actually used as a deref address** (or
+   propagate taint only along address-forming chains), so non-pointer 32-bit data
+   doesn't taint.
+
+**Attempt #3 = attempt #2 + (1) gate all high-half-skip sites on taint + (2)
+tighten the taint seed.** Both narrow, now-located. The far load/store emit and
+the dispatch are correct; the gap is purely *high-half preservation through moves*
+and *seed precision*. NB: two attempts have failed on the same class (the bank
+byte dropped by a high-half optimization) — attempt #3 should add a focused asm
+check that the pointer's high slot is written before any far deref of it.
 
 ## 4. Test strategy (luna, not the removed bridge)
 
