@@ -5,6 +5,25 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.21.2] — 2026-06-22
+
+Patch release — one compiler correctness fix (32-bit arithmetic) plus the
+test-infrastructure that found it. No API / library / runtime changes.
+
+### Fixed
+- **Compiler (32-bit `Kl`)**: arithmetic shift-right of a *negative* 32-bit
+  constant was constant-folded with the sign dropped — `(s32)-256 >> 4` gave
+  `0x0FFFFFF0` instead of `0xFFFFFFF0`. QBE's fold pass evaluated the `Kl` shift
+  as 64-bit on a zero-extended constant; on w65816 `Kl` is 32-bit, so `Osar` now
+  folds with 32-bit signed semantics (`compiler/qbe/fold.c`). (chantier A7)
+
+### Added
+- 32-bit (`s32`/`u32`) **runtime-correctness fixture**
+  (`devtools/compiler-tests/runtime/a7_32bit/`, 18 cases checked via
+  `luna state --assert`), wired into `make tests` and CI — a permanent codegen
+  gate the static C→ASM checks can't provide (they pass even on broken 32-bit
+  arithmetic).
+
 ## [0.21.1] — 2026-06-22
 
 Test-infrastructure hardening + cleanup release. No SDK API, library, compiler,
