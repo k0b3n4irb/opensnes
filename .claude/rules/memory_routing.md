@@ -20,7 +20,7 @@ versioned, shared, and survives clones. Migration completed 2026-05-10.
 | Active multi-day chantier handoff | `.claude/notes/chantiers/` | A7 Phase 0 handoff |
 | Reusable workflow patterns | `.claude/notes/patterns/` | gfx4snes 2bpp, PVSnesLib porting |
 | Technical references / analyses | `.claude/notes/tech/` | HDMA notes, compiler optimizations, SuperFX expert feedback |
-| Current state of a moving target | `.claude/notes/status/` | opensnes-emu status, pending validations |
+| Current state of a moving target | `.claude/notes/status/` | luna harness status, pending validations |
 | FIXED bugs preserved for context | `.claude/notes/archive/` | mktype UB, JSL codegen bug |
 | Structured project reviews | `.claude/notes/reviews/` | dated `YYYY-MM-DD_topic.md` |
 | Sub-project notes | `.claude/notes/projects/` | RPG project asset references |

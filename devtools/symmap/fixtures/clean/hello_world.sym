@@ -1,0 +1,111 @@
+; this file was created with wlalink by ville helin <ville.helin@iki.fi>.
+; wla symbolic information for "hello_world.sfc".
+
+[information]
+version 3
+wlasymbol true
+
+[labels]
+00:81b9 EmptyHandler
+00:0000 tcc__r0
+00:0002 tcc__r0h
+00:0004 tcc__r1
+00:0006 tcc__r1h
+00:0008 tcc__r2
+00:000a tcc__r2h
+00:000c tcc__r3
+00:000e tcc__r3h
+00:0010 tcc__r4
+00:0012 tcc__r4h
+00:0014 tcc__r5
+00:0016 tcc__r5h
+00:0018 tcc__r9
+00:001a tcc__r9h
+00:001c tcc__r10
+00:001e tcc__r10h
+00:0240 vblank_flag
+00:0241 oam_update_flag
+00:0020 oamMemory
+00:8000 InitHardware
+00:80ab Start
+00:80e8 NmiHandler
+00:810a IrqHandler
+00:810b oam_set_tile
+00:811a oam_init_sprite0
+00:813b oam_hide_all
+00:816d oam_set_pos
+00:8181 oam_set_attr
+00:8190 oamUpdate
+00:83d0 font_tiles
+00:8460 message
+00:81bf main
+00:81c8 main@start.1
+00:81cb main@body.2
+00:8215 main@for_cond.3
+00:8234 main@for_body.4
+00:8287 main@for_cont.5
+00:8296 main@for_join.6
+00:82eb main@for_cond.7
+00:830a main@for_body.8
+00:8323 main@for_cont.9
+00:8332 main@for_join.10
+00:8350 main@while_cond.11
+00:8353 main@while_body.12
+00:838a main@if_false.15
+00:83ae main@if_true.14
+00:83b1 main@while_join.13
+00:83ca main@while_cond.16
+00:83cd main@while_body.17
+00:0000 RAM_USAGE_SLOT_1_BANK_0_START
+00:0241 RAM_USAGE_SLOT_1_BANK_0_END
+
+[definitions]
+00000006 _sizeof_EmptyHandler
+00000002 _sizeof_tcc__r0
+00000002 _sizeof_tcc__r0h
+00000002 _sizeof_tcc__r1
+00000002 _sizeof_tcc__r1h
+00000002 _sizeof_tcc__r2
+00000002 _sizeof_tcc__r2h
+00000002 _sizeof_tcc__r3
+00000002 _sizeof_tcc__r3h
+00000002 _sizeof_tcc__r4
+00000002 _sizeof_tcc__r4h
+00000002 _sizeof_tcc__r5
+00000002 _sizeof_tcc__r5h
+00000002 _sizeof_tcc__r9
+00000002 _sizeof_tcc__r9h
+00000002 _sizeof_tcc__r10
+00000002 _sizeof_tcc__r10h
+00000001 _sizeof_vblank_flag
+00000001 _sizeof_oam_update_flag
+00000220 _sizeof_oamMemory
+000000ab _sizeof_InitHardware
+0000003d _sizeof_Start
+00000022 _sizeof_NmiHandler
+00000001 _sizeof_IrqHandler
+0000000f _sizeof_oam_set_tile
+00000021 _sizeof_oam_init_sprite0
+00000032 _sizeof_oam_hide_all
+00000014 _sizeof_oam_set_pos
+0000000f _sizeof_oam_set_attr
+00000029 _sizeof_oamUpdate
+00000090 _sizeof_font_tiles
+0000000d _sizeof_message
+00000211 _sizeof_main
+
+[sections]
+000001bf 00:01bf 81bf 00000211 .text.main
+0000010b 00:010b 810b 000000ae .oam_helpers
+00000000 00:0000 8000 000000ab .init
+000003d0 00:03d0 83d0 00000090 .rodata.1
+000000ab 00:00ab 80ab 0000003d .start
+000000e8 00:00e8 80e8 00000022 .nmi
+00000460 00:0460 8460 0000000d .rodata.2
+000001b9 00:01b9 81b9 00000006 .empty_handler
+0000010a 00:010a 810a 00000001 .irq
+
+[ramsections]
+00:0020 0020 00000220 .oam_buffer
+00:0000 0000 00000020 .registers
+00:0240 0240 00000002 .system

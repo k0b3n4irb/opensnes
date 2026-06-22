@@ -1,0 +1,32 @@
+; this file was created with wlalink by ville helin <ville.helin@iki.fi>.
+; Test fixture: WRAM overlap bug (2_animation bug reproduction)
+; This simulates oamMemory at $7E:0000 overlapping with game_vars at $00:0020
+00000000 tcc__registers
+00000000 tcc__r0
+00000002 tcc__r0h
+00000004 tcc__r1
+00000006 tcc__r1h
+00000008 tcc__r2
+0000000a tcc__r2h
+0000000c tcc__r3
+0000000e tcc__r3h
+00000010 tcc__r4
+00000012 tcc__r4h
+00000014 tcc__r5
+00000016 tcc__r5h
+00000018 tcc__r9
+0000001a tcc__r9h
+0000001c tcc__r10
+0000001e tcc__r10h
+00000020 game_vars
+00000020 monster_x
+00000022 monster_y
+00000024 monster_frame
+00000026 monster_anim_count
+00000100 tcc__registers_nmi_isr
+007e0000 oamMemory
+007e0220 oamHighTable
+007e0240 some_other_buffer
+0000c000 main
+0000c100 game_init
+0000c200 game_update

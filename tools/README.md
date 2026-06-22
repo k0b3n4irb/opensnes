@@ -18,7 +18,6 @@ benchmark, BRR↔IT conversion, snesdbg), see `devtools/`.
 | [`tmx2snes/`](tmx2snes/) | Tiled (`.tmx`) → SNES tilemap | `examples/maps/tiled` |
 | [`sa1-patch/`](sa1-patch/) | Patch SA-1 ROM header byte | post-link step in `make/common.mk` for SA-1 examples |
 | [`luna-test/`](luna-test/) | luna-driven test harness (runner, manifest, baselines, probes) | `make tests` — the project's main validation gate |
-| [`debug-fixtures/`](debug-fixtures/) | Test-fixture ROMs (a known-good `clean/` set + an intentionally-broken `broken/` set) | the static-analysis checks verify their detectors flag the broken set and clear the clean set |
 
 ## Naming notes
 

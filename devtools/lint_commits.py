@@ -60,7 +60,7 @@ ALLOWED_SCOPES = {
     # real directories / files in the repo):
     #   `chantiers` -> .claude/notes/chantiers/
     #   `rules`     -> .claude/rules/
-    #   `bench`     -> tools/opensnes-emu/test/fixtures/benchmark/
+    #   `bench`     -> devtools/cyclecount/ (cycle-count benchmark fixtures)
     "chantiers", "rules", "bench",
     # luna test-harness migration (2026-06-21): real path tools/luna-test/
     "luna-test",

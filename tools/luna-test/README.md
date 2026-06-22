@@ -17,10 +17,10 @@ probes. Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
 
-- The pinned luna binary, **`v0.3.0`** (decision #4). Resolution order:
-  `$LUNA_BIN` → `luna` on `PATH` → `tools/luna-test/vendor/luna-v0.3.0-linux-<arch>/luna`.
-  Download: `gh release download v0.3.0 --repo k0b3n4irb/luna --pattern '*linux-<arch>*'`
-  (verify the `.sha256`).
+- The pinned luna binary — version in `tools/luna-test/luna.version` (currently
+  **`v0.3.2`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+  `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
+  `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
   Emscripten, no WASM, no Mesen2, no xvfb.**
 
@@ -65,3 +65,20 @@ sequences (`--input`), `luna bench` corpus run, the MCP swap (`luna mcp`), the
 full 56-example manifest, and the CI rewrite. Mouse/Super Scope coverage is
 **dropped** (decision #2) — `input/mouse` + `input/superscope` get boot+visual
 validation only.
+
+## Hardening tests (luna v0.3.0 capabilities)
+
+Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
+never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
+
+- **Audio** (`probes/audio.py`, H5) — SNESMOD examples must have ≥1 active SPC
+  voice + non-silent PCM (`--audio-out`); the SFX driver must be alive.
+- **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
+  `wram-trace` hash stream vs a baseline; catches runtime-state regressions
+  invisible to the framebuffer. **Local, same-arch tool — not a CI gate:** raw
+  WRAM content (unlike the framebuffer) isn't a luna cross-arch guarantee
+  (mapandobjects, slopemario diverge x86_64 ↔ aarch64), so `--update` on your own
+  machine before `--compare`.
+- **VBlank DMA budget** (`probes/dma_budget.py`, H2) — estimates steady-state
+  VRAM-DMA bytes/frame and flags > ~4 KB/VBlank. Estimate pending luna L13
+  (frame column on `--dma-trace`).

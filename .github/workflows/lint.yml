@@ -104,3 +104,19 @@ jobs:
         # here against synthetic fixtures so the rules can't silently
         # rot. Wired in chantier E1 (2026-05-09).
         run: python3 devtools/test_check_nmi_wram_race.py
+
+  symmap-tests:
+    name: symmap WRAM-overlap detector regression (test_symmap.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Run test_symmap.py
+        # Regression suite for devtools/symmap/symmap.py --check-overlap, the
+        # static analysis that catches bank $00 ↔ bank $7E WRAM-mirror
+        # collisions. Pins its verdict against committed .sym fixtures (a
+        # broken one must fail, a clean one must pass) so the detector can't
+        # silently rot. Fixtures re-homed from the removed tools/debug-fixtures
+        # (formerly consumed by the opensnes-emu runner).
+        run: python3 devtools/symmap/test_symmap.py
