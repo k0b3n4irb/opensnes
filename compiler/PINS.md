@@ -113,10 +113,9 @@ git fetch
 git checkout <new-sha>
 cd ../..
 
-# 2. Run the FULL test suite (not --quick) — this is the gate
-cd tools/opensnes-emu
-node test/run-all-tests.mjs --allow-known-bugs
-# Must report 393/393. Investigate any new failure before continuing.
+# 2. Run the full test suite — this is the gate
+make tests
+# Must end with `ALL CHECKS PASSED (luna)`. Investigate any failure first.
 
 # 3. Update PINS.md: replace the SHA in the table above, document any new
 #    local patches in the per-submodule list. Keep the rationale terse.
@@ -144,5 +143,5 @@ unauthorised submodule pointer can never produce a release artifact.
 ## Out of scope (intentionally)
 
 - `docs/doxygen-awesome-css` — cosmetic, third-party, low-risk; not pinned.
-- `tools/opensnes-emu` — pinned by submodule pointer alone; the emu repo's
-  own test suite is the gate, not this file.
+- **luna** (test backend) — not a submodule; pinned as a downloaded binary via
+  `tools/luna-test/luna.version` + `scripts/install-luna.sh` (SHA-256 verified).

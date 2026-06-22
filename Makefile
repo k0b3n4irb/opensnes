@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests test-compiler bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -130,10 +130,18 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@echo "ALL CHECKS PASSED (luna)"
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
+
+# WRAM-state regression — a LOCAL, same-arch developer tool ("did my change alter
+# invisible runtime state?"), NOT part of `make tests`/CI: raw WRAM content is not
+# a luna cross-arch guarantee (the framebuffer is). Re-baseline on your machine
+# with `python3 tools/luna-test/wram_regress.py --update`.
+test-wram:
+	@python3 tools/luna-test/wram_regress.py
 
 # Compiler cycle-count regression guard (static estimate vs committed baseline).
 bench:

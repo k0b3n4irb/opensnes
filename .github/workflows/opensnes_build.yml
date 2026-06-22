@@ -129,10 +129,9 @@ jobs:
 
       # ------------------------------------ #
       # Functional tests run in a separate   #
-      # job (see `functional-tests` below):  #
-      # opensnes-emu is Linux-only (WASM     #
-      # build via emsdk), so we don't try    #
-      # to run it on Windows/macOS legs.     #
+      # job (see `functional-tests` below),  #
+      # which runs the luna suite on Linux;  #
+      # these per-OS legs are build-only.    #
       # ------------------------------------ #
 
       # ------------------------------------ #
@@ -269,6 +268,12 @@ jobs:
         # (If a luna release ever breaks fbhash cross-arch, that's a luna bug;
         # regenerate baselines with `luna_runner.py --update` meanwhile.)
         run: python3 tools/luna-test/luna_runner.py --compare
+
+      # NOTE: the WRAM-state regression (`make test-wram`) is intentionally NOT a
+      # CI gate. Unlike the framebuffer (luna guarantees `--print-fbhash`
+      # cross-arch), raw WRAM content is not a cross-arch guarantee: two examples
+      # (mapandobjects, slopemario) hash differently x86_64 ↔ aarch64. It stays a
+      # local, same-arch developer tool for "did my change alter invisible state?".
 
       - name: Upload luna artifacts on failure
         if: failure()

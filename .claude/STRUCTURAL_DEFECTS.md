@@ -19,6 +19,20 @@ during the post-audit chantier wave; promoted to a permanent
 maintainer-internal doc on 2026-05-09 once the catalogue was demonstrably
 load-bearing for cross-session continuity).
 
+> **⚠️ Test-stack migration (2026-06, shipped in v0.21.0).** The test harness
+> moved off **snes9x-WASM + Mesen2** to **luna** (a cycle-accurate native
+> emulator). Consequences for this document:
+> - **D1 is RESOLVED** — luna detects and runs the GSU natively, so there is no
+>   "snes9x can't detect the GSU" vacuous-pass problem and **no Mesen2 side
+>   channel is needed**. The whole "Mesen2 mandatory" concern is moot.
+> - The **`tools/opensnes-emu/...`** submodule (snes9x libretro WASM core + Node
+>   runner + Mesen2) was **removed**. Every reference to `tools/opensnes-emu/...`,
+>   `*.mjs`, `run-all-tests.mjs`, `run-benchmark.mjs`, or Mesen2 below is
+>   **historical** — the live equivalents are `make tests` (luna),
+>   `tools/luna-test/`, `devtools/compiler-tests/`, and `devtools/cyclecount/`.
+> These older entries are kept as investigation logs (they froze a past state on
+> purpose); only the headline status lines are updated.
+
 **Baseline**: external review delivered 2026-05-07; 18 commits shipped on
 `develop` between 2026-05-07 and 2026-05-08 closing 9 / 10 of the Top 10
 audit items + the tutorials wave (8 / 8) + the cycle-count CI gate (soft
@@ -76,11 +90,12 @@ categories:
   parallel C and ASM implementations. Bus factor + benchmark-driven
   consolidation.
 
-- **Category D — Toolchain & emulator** (3 items, one intrinsic). snes9x
-  doesn't detect the GSU chip in OpenSNES's SuperFX ROM headers; SA-1's
-  SIWP register init is an unsourced assumption never validated on
-  hardware; SuperFX has no C compiler (intrinsic to the chip's RISC ISA,
-  not fixable).
+- **Category D — Toolchain & emulator** (3 items; **D1 resolved by the
+  luna migration**, one intrinsic). ~~snes9x doesn't detect the GSU chip in
+  OpenSNES's SuperFX ROM headers~~ → luna runs the GSU natively, D1 closed;
+  SA-1's SIWP register init is an unsourced assumption never validated on
+  hardware (D2); SuperFX has no C compiler (intrinsic to the chip's RISC
+  ISA, not fixable — D3).
 
 - **Category E — Runtime / NMI / hardware-level** (2 items). The WRAM
   data port `$2180–$2183` race on NMI is documented but only enforced by
@@ -103,9 +118,8 @@ on; fixing C2 unblocks understanding of how C1 should be sliced.
 - **A1 (`int = 32 bits`)** is the highest-impact compiler item but also
   the riskiest — every patched optimisation in QBE may have implicit
   assumptions about IR int width.
-- **D1 (Mesen2 mandatory)** is the cheapest meaningful item in the list
-  (3–5 days) and closes a real validation gap for shipped chip-using
-  examples.
+- ~~**D1 (Mesen2 mandatory)** is the cheapest meaningful item~~ — **resolved**
+  by the luna migration (luna runs the GSU/SA-1 natively; no Mesen2 gap left).
 
 Items are **not gates** on each other in the strict sense — most can be
 worked in any order. The recommended sequencing in §6 optimises for
@@ -1685,9 +1699,18 @@ in ROADMAP as 2–3 weeks.
 
 ### Category D — Toolchain & emulator coverage
 
-#### D1. snes9x doesn't detect GSU in OpenSNES SuperFX ROM headers — PARTIAL 🟡 (Mesen2 phase shipped + CI-installed)
+#### D1. snes9x doesn't detect GSU in OpenSNES SuperFX ROM headers — RESOLVED ✅ (luna migration, 2026-06)
 
-**Status update 2026-05-13**: Path D1.a is largely shipped. The
+**Resolution 2026-06 (v0.21.0)**: closed by replacing the test backend with
+**luna**, which detects and executes the GSU **natively** in the headless
+harness. There is no longer a "snes9x can't see the GSU" vacuous-pass, and no
+Mesen2 side channel: the SuperFX/SA-1 examples are covered by luna's own visual
+regression + liveness. `tools/opensnes-emu` (snes9x-WASM + Node + Mesen2) was
+removed. The 2026-05-13 partial status and original entry below are kept as the
+historical investigation log.
+
+**Status update 2026-05-13** (superseded — historical): Path D1.a was largely
+shipped. The
 Mesen2 visual-regression phase exists
 (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`), runs 4
 SuperFX/SA-1 examples through Mesen2's `--testrunner`, and

@@ -5,6 +5,44 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.21.1] — 2026-06-22
+
+Test-infrastructure hardening + cleanup release. No SDK API, library, compiler,
+or runtime changes — existing ROMs build byte-for-byte the same.
+
+### Added
+- luna test-harness probes for coverage axes the old harness never had:
+  **audio** (SNESMOD SPC voices + PCM RMS), **VRAM/ARAM content**
+  (`--dump-vram`/`--dump-aram` upload verification), **decoded sprite structure**
+  (`assets-dump` `oam.json`), and a **VBlank DMA-budget** estimate (`--dma-trace`).
+  `probes/run_all.py` now runs 10 probes.
+- `devtools/symmap/test_symmap.py` — regression test pinning `symmap.py
+  --check-overlap` against committed `.sym` fixtures (broken map must fail, clean
+  must pass); wired into the Lint workflow. Re-homes the orphaned
+  `tools/debug-fixtures/`.
+- `make test-wram` — local WRAM-state regression tool (`wram-trace` per-frame hash
+  stream); not a CI gate (WRAM content, unlike the framebuffer, is not a luna
+  cross-arch guarantee).
+
+### Changed
+- Bump the pinned luna binary **v0.3.0 → v0.3.2** (no rendering drift; visual
+  baselines byte-identical). `LUNA_VERSION` now reads `tools/luna-test/luna.version`
+  (single source of truth with `install-luna.sh`).
+- Commit-scope lint accepts comma-separated scopes (`feat(compiler,lib): …`).
+
+### Removed
+- `.github/workflows/benchmark.yml` (disabled, contained dead `node
+  opensnes-emu/...run-benchmark.mjs` steps; the cycle benchmark is re-homed to
+  `devtools/cyclecount/bench.py` and runs in CI).
+
+### Fixed
+- Retire all dead references to the removed snes9x/Node test backend from active
+  files: the Claude Code test hooks (now key on `make tests` + an
+  `ALL CHECKS PASSED` banner), `compiler/PINS.md`, `opensnes_build.yml`,
+  `lint_commits.py`, `abi_lint.md`/`memory_routing.md`, and the `ROADMAP.md`
+  test-suite sections; `STRUCTURAL_DEFECTS.md` D1 marked resolved by the luna
+  migration. luna is the sole automated test backend.
+
 ## [0.21.0] — 2026-06-21
 
 Two headline efforts: a new **`fix32` fixed-point math module** and a full

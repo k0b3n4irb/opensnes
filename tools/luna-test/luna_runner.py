@@ -49,7 +49,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 HERE = Path(__file__).resolve().parent
 BASELINE_DIR = HERE / "baselines"
-LUNA_VERSION = "v0.3.0"  # pinned (decision #4)
+# Single source of truth for the pin: tools/luna-test/luna.version (what
+# install-luna.sh downloads). Read it here too so a version bump touches one file.
+LUNA_VERSION = (HERE / "luna.version").read_text().strip()
 
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
