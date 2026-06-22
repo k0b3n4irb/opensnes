@@ -12,9 +12,9 @@ sys.path.insert(0, str(HERE.parents[3] / "tools" / "luna-test" / "probes"))
 from lib import find_luna, sym_of, assert_mem  # noqa: E402
 ROM = HERE / "a6_farptr.sfc"; STEPS = 1_000_000
 CASES = [("r_ptrhi", 2, 0x0002), ("r_d0", 1, 0x11), ("r_d3", 1, 0x44), ("r_d7", 1, 0x88)]
-# Deref through a far pointer is bank-$00-hardcoded (emit.c `lda.l $0000,x`);
-# fixed in A6 Phase 1. r_ptrhi (the pointer value's bank byte) already works.
-KNOWN_FAIL = {"r_d0", "r_d3", "r_d7"}
+# A6 Phase 1 (attempt #2, taint-from-loadl): far deref lowers to a 24-bit
+# DP-indirect-long; all cases pass, no xfail.
+KNOWN_FAIL: set = set()
 def le(v, w): return "".join(f"{(v>>(8*i))&0xFF:02X}" for i in range(w))
 def run():
     if not ROM.is_file(): sys.exit(f"ROM missing: {ROM} (run make)")
