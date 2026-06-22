@@ -255,6 +255,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: scripts/install-luna.sh
 
+      - name: A7 32-bit runtime correctness
+        # Builds the s32/u32 fixture ROM and asserts its WRAM results via luna.
+        # Runtime gate the static C→ASM checks can't provide (they pass even on
+        # broken 32-bit codegen — see chantier A7 Phase 0/1).
+        run: |
+          make -s -C devtools/compiler-tests/runtime/a7_32bit
+          python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
+
       - name: Corpus liveness coverage
         run: python3 tools/luna-test/luna_runner.py --coverage
 

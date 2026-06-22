@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | c7552693ae7fe3bee034d48e06a182ecc5da08bd | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
-| compiler/qbe | e50f1481f0f0afb1d6b4c82bfe277fac43a20ccf | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
+| compiler/qbe | 1884a20cf7f3b500b5e6986022a9a4ee43ba21d2 | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -63,11 +63,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 49 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 50 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1884a20  fix(qbe): fold Osar as 32-bit signed on w65816 (chantier A7 Phase 1)
 179676e  feat(w65816): chantier A6+A7 — full pointer ABI + Kl pair lowering
 5c23467  fix(qbe): guard crash_handler behind __has_include(<execinfo.h>)
 444edea  fix(qbe): guard inline_record_dat_ref against DStart/DEnd stack garbage

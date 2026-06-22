@@ -26,6 +26,12 @@ u32 r_and;     /* 0x0F0F0F0F & 0x00FFFF00   -> 0x000F0F00 */
 u32 r_or;      /* 0x0F0F0F0F | 0x00FFFF00   -> 0x0FFFFF0F */
 u32 r_xor;     /* 0x0F0F0F0F ^ 0x00FFFF00   -> 0x0FF0F00F */
 u16 r_cmp;     /* (0x10000u > 0xFFFFu)      -> 1 (high-half-aware compare) */
+/* Latent siblings of the Osar fold bug: signed Kl ops on negative 32-bit consts. */
+u32 r_sdiv;    /* (s32)-256 / 16  (signed)  -> 0xFFFFFFF0 (-16) */
+u32 r_smod;    /* (s32)-257 % 16  (signed)  -> 0xFFFFFFFF (-1) */
+u16 r_slt;     /* ((s32)-1 < 0)             -> 1 (signed compare) */
+u16 r_sgt;     /* ((s32)-5 > (s32)3)        -> 0 (signed compare) */
+u32 r_sar8;    /* (s32)-1 >> 8    (arith)   -> 0xFFFFFFFF */
 
 int main(void) {
     u32 a, b;
@@ -45,6 +51,11 @@ int main(void) {
     r_or  = a | b;
     r_xor = a ^ b;
     r_cmp = (0x00010000u > 0x0000FFFFu) ? 1u : 0u;
+    s = -256; r_sdiv = (u32)(s / 16);
+    s = -257; r_smod = (u32)(s % 16);
+    s = -1;   r_slt  = (s < 0) ? 1u : 0u;
+    s = -5;   r_sgt  = (s > 3) ? 1u : 0u;
+    s = -1;   r_sar8 = (u32)(s >> 8);
 
     consoleInit();
     setScreenOn();
