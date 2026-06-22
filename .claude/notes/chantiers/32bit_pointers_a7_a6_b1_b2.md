@@ -1,6 +1,8 @@
 # Chantier — Full 32-bit codegen + 24-bit pointers (A7 → A6 → B1/B2)
 
-**Status:** PLANNED (2026-06-22) · **Owner:** TBD · **Risk:** High · **Effort:** ~6–10 weeks
+**Status:** A7 SCOPED (2026-06-22) — immediate scope is **A7 only** (Phases 0–1,
+ships as a patch); A6/B1/B2 (Phases 2–4) deferred to a follow-up chantier. See §7.
+· **Owner:** TBD · **Risk:** High (A7 alone: Medium) · **Effort:** A7 ≈ 2 weeks; full thread ~6–10
 **Catalogue entries:** `.claude/STRUCTURAL_DEFECTS.md` A7, A6, B1, B2 (per-item
 symptom/root-cause/acceptance live there; this doc is the *sequencing & execution*
 plan that ties them into one chantier).
@@ -137,15 +139,41 @@ important deliverable of Phase 0.
 - One CHANGELOG section (likely a minor bump, e.g. v0.22.0) covering the unblock:
   "assets and C RAM are no longer confined to bank `$00` / below `$2000`."
 
-## 7. Open questions for the maintainer
+## 7. Decisions (maintainer, 2026-06-22)
 
-1. **One chantier or staged releases?** A7 alone (Phase 1) is shippable as a patch
-   (finishes 32-bit math). A6+B1+B2 is the bigger minor. Ship A7 first, or hold all
-   for one v0.22.0?
-2. **Pointer size 4 vs 3 bytes** — the catalogue picks 4 (alignment sanity, dead
-   high byte). Confirm before Phase 2 (it's expensive to change later).
-3. **B2 emit:** per-symbol bank detection vs always-explicit-bank for RAM (simpler,
-   ~1 cycle/access). Recommend always-explicit unless a hot-path benchmark objects.
+1. **Scope: A7 ONLY for now.** Do Phase 0 + Phase 1 (finish 32-bit `Kl` codegen)
+   and ship it as a **patch** release. **A6, B1, B2 are deferred** to a separate
+   follow-up chantier (a later minor, e.g. v0.22.0) — this doc keeps their phases
+   (2–4) as the pre-written plan for when that chantier opens. Immediate scope
+   below collapses to Phases 0–1.
+
+2. **Pointer size = 4 bytes** (decided for A6, not needed for A7). Rationale: the
+   65816 has no 3-byte load — a pointer is always read as a 16-bit word + a bank
+   byte, so 3 vs 4 doesn't change access cost; 4 aligns with `long`=4 (post-A1) so
+   mixed int/long/pointer structs stay aligned and the C.5 padding bug class stays
+   closed; the only cost is one dead byte/pointer (negligible outside large pointer
+   arrays). Revisit only if a pointer-array-heavy ROM shows real bloat.
+
+3. **B2 emit = per-symbol bank detection** (decided for B2, not needed for A7).
+   Rationale: a 24-bit RAM access costs ~1 cycle + 1 byte more than the implicit
+   bank-`$00` form; *always-explicit* would tax **every** RAM access (incl. the
+   ~99% that stay in bank `$00`) → a global perf regression. Per-symbol keeps the
+   cheap form for bank-`$00` symbols and only pays the 24-bit tax for data
+   deliberately placed high. Fall back to always-explicit only if per-symbol bank
+   tracking proves too invasive in QBE.
+
+### Immediate scope (this chantier) = Phases 0–1 only
+
+- **Phase 0** — audit current `Kl` op coverage + build the luna runtime-correctness
+  harness (the permanent gate).
+- **Phase 1** — finish the `Kl` codegen (4-byte slot allocator + remaining ops +
+  `__mul32`/`__udiv32`/`__sdiv32` gaps), runtime fixtures green, ABI/PINS updated.
+- **Ship**: a patch release ("32-bit `s32`/`u32` arithmetic is now correct
+  end-to-end"). The slot-allocator widening done here is the shared piece the
+  deferred A6 will reuse.
+
+Phases 2–4 (A6 / B2 / B1) remain documented above but are **out of scope** until
+the follow-up chantier opens; decisions #2 and #3 are pre-recorded for it.
 
 ---
 
