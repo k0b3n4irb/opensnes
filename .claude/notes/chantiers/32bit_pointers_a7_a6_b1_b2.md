@@ -106,6 +106,49 @@ rules).
 - Update `KNOWN_LIMITATIONS.md` (severity drops on the bank-`$00` and RAM-`$2000`
   entries); close **B1/B3/B4 in the catalogue as "subsumed by A6"**, mark B2 done.
 
+## 3b. Phase 0 OUTCOME (2026-06-22) — A7 is far more done than the catalogue says
+
+**Audit.** The QBE w65816 backend already implements the `Kl` class broadly —
+`Oload`/`Ostore`/`Ostorel`, `Oadd`/`Osub` (carry chains), `Omul` (`__mul32`),
+`Odiv`/`Oudiv`/`Orem`/`Ourem` (`tcc_sdivmod32`/`tcc_udivmod32`), `Oshl`/`Oshr`/
+`Osar` (pair sequences), `Oneg`/`Oand`/`Oor`/`Oxor`, comparisons, plus high-half
+dead/zero optimization pre-passes. The catalogue's premise ("never extended past
+16-bit", "NOT yet attempted") is **stale** — prior chantiers (incl. fix32 v0.21.0)
+did the bulk. **A7's remaining work is verification + edge-case fixes, not a
+from-scratch implementation.**
+
+**Runtime harness built** — `devtools/compiler-tests/runtime/a7_32bit/`
+(`main.c` + `Makefile` + `test_a7_32bit.py`): a ROM computing 13 s32/u32 ops into
+WRAM globals, checked via `luna state --assert`. Run:
+`cd devtools/compiler-tests/runtime/a7_32bit && make && python3 test_a7_32bit.py`.
+**Result: 12/13 correct, 1 real bug (xfail'd).** This is the permanent A7 gate —
+the static C→ASM checks pass even on the broken case, so only this catches it.
+
+**The one real bug (= A7 Phase 1 scope):**
+`(s32)-256 >> 4` folds to `0x0FFFFFF0` instead of `0xFFFFFFF0`. Root cause is
+**not the codegen** (the `Osar Kl` emit path looks correct) but the **constant
+folder**: `compiler/qbe/fold.c:80`
+`case Osar: x = (w ? l.s : (int32_t)l.s) >> (r.u & (31|w<<5));`
+On w65816 `Kl` is **32-bit**, but QBE folds it as 64-bit (`w==1` → `l.s`,
+64-bit). A negative 32-bit constant is stored in the 64-bit `con` **without
+sign-extension** (`0x00000000FFFFFF00`), so the 64-bit arithmetic `>>` fills from
+bit 63 (=0). `Oshr` (logical) survives because logical-shifting a zero-extended
+value gives the right low-32; only sign-dependent folds break.
+
+**Latent siblings (verify in Phase 1):** the same non-sign-extended-con issue
+affects **signed `Kl` divide/mod and signed comparisons** on negative 32-bit
+constants — add cases to the harness before fixing.
+
+**Phase 1 fix options (decide before coding — Class A, fold pass is delicate):**
+- **(A) sign-extend 32-bit constants into the 64-bit `con` at materialization** —
+  fixes Osar + signed div/cmp at the source, keeps `fold.c` generic. More
+  invasive (find the Kl-constant build path); broadest correctness.
+- **(B) make `fold.c` treat `Kl` as 32-bit on this fork** (`(int32_t)l.s` for
+  Osar, mask others to 32-bit) — localized, matches the backend's Kl=32-bit
+  reality, but touches generic QBE core and must be swept across every Kl fold.
+- Either way: extend the harness (signed div/cmp), then fix, then gate green,
+  then revisit B5's "blocked by A7" note (already shipped) and ship A7 as a patch.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
