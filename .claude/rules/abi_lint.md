@@ -143,9 +143,9 @@ skipped via marker, 128 internal helpers with no public signature.
   documented (see the tech note).
 - `combined.asm` and `*.c.asm` — those are compiler output, not
   hand-written. Verifying them is the compiler test suite's job
-  (the C→ASM compiler-pattern checks; these lived in the removed
-  `opensnes-emu` submodule and are pending re-homing into the repo — see
-  `.claude/notes/chantiers/luna_migration.md`).
+  (the C→ASM compiler-pattern checks in `devtools/compiler-tests/`,
+  re-homed there after the `opensnes-emu` submodule was removed — run
+  via `make test-compiler`).
 - SuperFX `.sfx` sources — GSU has its own ISA and its own ABI.
 - `runtime.asm`'s `tcc_*` helpers — internal compiler runtime, called
   by codegen via a different convention.

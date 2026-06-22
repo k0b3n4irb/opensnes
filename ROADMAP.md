@@ -62,14 +62,15 @@ This stretch focused on closing process gaps surfaced by an internal audit
   and vice versa).
 - `KNOWN_LIMITATIONS.md`: 14-entry severity-tagged catalog of silent
   failures inherited from the 65816 / SNES architecture and the toolchain.
-- `tools/opensnes-emu/test/BASELINES.md`: documented protocol for
-  regenerating visual baselines, with `rom_sha256` + `snes9x_commit` drift
-  warnings.
+- `tools/luna-test/`: luna-driven test harness — visual baselines keyed on
+  luna's cross-arch-stable `--print-fbhash`, regenerated with
+  `luna_runner.py --update`.
 
 ### Test suite
-- **opensnes-emu** is now a public submodule
-  (`github.com/k0b3n4irb/opensnes-emu`) — was local-only before.
-- **CI runs the full ~390-check suite** on Linux instead of build-only.
+- **luna** is the sole automated test backend (cycle-accurate native emulator,
+  pinned binary; runs SA-1 / Super FX / DSP-1 natively).
+- **CI runs the full luna suite** on Linux (coverage + visual regression +
+  functional probes) plus the compiler C→ASM checks and the cycle benchmark.
 - **2 new compiler regression guards** (`test_arg_push_order`,
   `test_section_directives`) cover the ABI invariants P2.2 identified.
 - Visual baselines now carry provenance metadata (rom hash, snes9x commit,
@@ -161,13 +162,13 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] Memmap-template dependency tracking (no more `make clean` after edits)
 
 ### Testing & quality
-- [x] **opensnes-emu** debug emulator (snes9x WASM, public submodule)
-- [x] ~390 automated checks across 8 phases:
-      preconditions, compiler tests, build, static analysis,
-      runtime execution, visual regression, lag detection, input sequences
-- [x] **62 compiler regression tests** (C → ASM pattern checks)
-- [x] **Visual regression** with provenance metadata (rom_sha256, snes9x_commit)
-- [x] **Lag-frame detection**
+- [x] **luna** test backend (cycle-accurate native; runs SA-1 / Super FX / DSP-1)
+- [x] Automated luna suite: corpus liveness coverage, visual regression,
+      functional probes (input→WRAM via `--assert`), audio + VRAM/ARAM +
+      sprite-structure checks, and the `SNES_ASSERT`/WDM oracle
+- [x] **Compiler regression tests** (C → ASM pattern checks, `make test-compiler`)
+- [x] **Visual regression** keyed on luna's cross-arch-stable `--print-fbhash`
+- [x] **Cycle-count benchmark** (`make bench`)
 - [x] **Bank $00 ROM overflow** check on every link (build-time guard)
 - [x] **Toolchain pin verification** (`make verify-toolchain`)
 - [x] **clang `-Wall -Wextra -Werror`** syntax check on every C source
