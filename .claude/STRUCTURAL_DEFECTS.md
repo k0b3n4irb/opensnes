@@ -875,15 +875,23 @@ representation in the toolchain.
 
 ---
 
-#### A7. QBE w65816 32-bit (`Kl` class) codegen never extended past 16-bit 🟡 PARTIAL
+#### A7. QBE w65816 32-bit (`Kl` class) codegen — RESOLVED 🟢 (2026-06-22, ships v0.21.2)
 
-> **Execution plan (2026-06-22):** A7 → A6 → B1/B2 are sequenced as ONE chantier
-> in `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md` (compiler-first; A6
-> subsumes B1/B3/B4; shared 4-byte slot allocator). **Partial progress:** the
-> fix32 chantier (B5, v0.21.0) already shipped the `Kl` *return* convention,
-> `__mul32`, the `Kl` shift-by-constant fix, and a 48-iter long divide — so A7 is
-> no longer greenfield. Phase 0 of the plan audits exactly which `Kl` ops are
-> done before filling gaps.
+> **Resolution (chantier A7, Phases 0–1 — see
+> `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md`):** the catalogue's
+> "never extended past 16-bit" premise was stale — the `Kl` class was already
+> implemented broadly (prior chantiers + fix32 v0.21.0: return convention,
+> `__mul32`, long divide, pair lowering). Phase 0 built a luna runtime-correctness
+> harness (`devtools/compiler-tests/runtime/a7_32bit/`, 18 s32/u32 cases) which
+> the static C→ASM checks couldn't provide; it found exactly **one** real bug —
+> the `Osar` constant-fold dropped the sign on negative 32-bit constants
+> (`compiler/qbe/fold.c`, folded `Kl` as 64-bit). Fixed (qbe `1884a20`, 32-bit
+> signed fold); harness 18/18, full suite green (visual 56/56, no fbhash drift),
+> wired as a permanent gate in `make tests` + CI.
+>
+> **Scope note:** only A7 shipped here (maintainer decision 2026-06-22). A6
+> (24-bit pointers) / B1 / B2 remain a deferred follow-up chantier; A7's
+> slot-allocator work that A6 would reuse is already present in the backend.
 
 > **Status (2026-05-09): identified during B5 investigation, validated
 > with a runtime ROM, NOT yet attempted.** This chantier exists because

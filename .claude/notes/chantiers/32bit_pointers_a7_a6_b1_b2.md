@@ -149,6 +149,29 @@ constants — add cases to the harness before fixing.
 - Either way: extend the harness (signed div/cmp), then fix, then gate green,
   then revisit B5's "blocked by A7" note (already shipped) and ship A7 as a patch.
 
+## 3c. Phase 1 DONE (2026-06-22) — A7 fixed
+
+**Blast radius (measured by extending the harness with signed div/mod/compare on
+negative 32-bit constants):** narrower than feared. The asm proved signed
+`Kl` div/mod take the **runtime** path (`tcc_sdivmod32`, not folded) and signed
+compares are branch-coded — both correct. **Only the `Osar` constant-fold was
+broken** (two cases: `>>4` and `>>8`).
+
+**Fix:** `compiler/qbe/fold.c` `case Osar` now uses 32-bit signed semantics
+(`(int32_t)l.s >> (r.u & 31)`) — correct for w65816 where `Kl` is 32-bit and there
+is no 64-bit integer. One-line change, commented for a future QBE rebase. qbe
+fork commit `1884a20` on `fix/a6-a7-leaf-opt-kl-frameless`; `compiler/PINS.md`
+bumped `e50f148 → 1884a20` (50 patches); `make verify-toolchain` green.
+
+**Validation:** the runtime harness is now **18/18** (no xfail) and is a permanent
+gate — wired into `make tests` and the CI `functional-tests` job. Full Class-A
+re-validation: `make clean && make` (compiler + lib + 56 examples) + `make tests`
+→ compiler checks 10/10, coverage 54 OK / 2 INPUT-DEP, **visual 56/56 (no fbhash
+drift)**, probes 10/10. Ships as a patch (v0.21.2).
+
+**Deferred (unchanged):** A6 / B1 / B2 (Phases 2–4) remain a follow-up chantier;
+decisions #2 (pointer = 4 bytes) and #3 (B2 per-symbol bank) pre-recorded above.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference

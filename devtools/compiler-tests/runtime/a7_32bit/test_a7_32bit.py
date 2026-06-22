@@ -34,6 +34,11 @@ CASES = [
     ("r_or",    4, 0x0FFFFF0F),
     ("r_xor",   4, 0x0FF0F00F),
     ("r_cmp",   2, 0x0001),
+    ("r_sdiv",  4, 0xFFFFFFF0),
+    ("r_smod",  4, 0xFFFFFFFF),
+    ("r_slt",   2, 0x0001),
+    ("r_sgt",   2, 0x0000),
+    ("r_sar8",  4, 0xFFFFFFFF),
 ]
 
 
@@ -43,12 +48,13 @@ def le_bytes(value: int, width: int) -> str:
 
 # Known-failing cases (xfail) — documented A7 bugs not yet fixed. Remove an entry
 # when its fix lands; an unexpected PASS (XPASS) then flags the stale xfail.
-#   r_sar: QBE constant-fold of `Osar` on a Kl (32-bit-on-w65816) value uses
-#          64-bit arithmetic on a NON-sign-extended con, so arithmetic-shift-right
-#          of a negative 32-bit constant fills from bit 63 (=0) instead of bit 31.
-#          Root cause: compiler/qbe/fold.c:80. Same class is latent for signed
-#          Kl divide/compare on negative constants. Fix = chantier A7 Phase 1.
-KNOWN_FAIL = {"r_sar"}
+#
+# (empty) — the Osar fold bug found in Phase 0 is FIXED: `compiler/qbe/fold.c`
+# now folds `Osar` with 32-bit signed semantics (w65816 Kl is 32-bit), so
+# arithmetic-shift-right of a negative 32-bit constant sign-extends correctly
+# (r_sar, r_sar8). Signed Kl div/mod/compare were verified to go through the
+# runtime path (not folded), so they were never affected.
+KNOWN_FAIL: set[str] = set()
 
 
 def run() -> int:
