@@ -84,6 +84,37 @@ def lint_text(text: str):
     return issues
 
 
+def check_specs() -> int:
+    """Validate every committed vram_map.h against its vram.spec (no ortools).
+
+    Examples that opt into the generated-layout workflow carry a `vram.spec`
+    (the asset manifest) and a generated `vram_map.h` (the committed bases). The
+    generator (devtools/vram_layout, ortools) is opt-in; THIS gate re-checks the
+    committed header is still aligned, non-overlapping and fits — so a stale or
+    hand-edited header can't ship a silently broken layout, and the build never
+    needs ortools.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "vram_layout"))
+    import vram_spec  # noqa: E402  (stdlib-only helper)
+
+    failures = 0
+    for spec in sorted((REPO / "examples").rglob("vram.spec")):
+        header = spec.with_name("vram_map.h")
+        rel = spec.parent.relative_to(REPO)
+        if not header.is_file():
+            print(f"{rel}: vram.spec present but vram_map.h missing — run the generator")
+            failures += 1
+            continue
+        regions = vram_spec.parse_spec(spec)
+        layout = vram_spec.parse_header(header)
+        ok, issues = vram_spec.validate(layout, regions)
+        if not ok:
+            for i in issues:
+                print(f"{rel}/vram_map.h: {i}")
+            failures += 1
+    return failures
+
+
 def main() -> int:
     failures = 0
     for c in sorted((REPO / "examples").rglob("*.c")):
@@ -92,10 +123,11 @@ def main() -> int:
             print(f"{rel}:{line}: {name} base 0x{addr:04X} not aligned to 0x{align:X}"
                   f" -> hardware silently uses 0x{masked:04X}")
             failures += 1
+    failures += check_specs()
     if failures:
-        print(f"\nVRAM alignment: {failures} misaligned base(s) — silent-failure bug.")
+        print(f"\nVRAM layout: {failures} issue(s) — silent-failure bug.")
         return 1
-    print("VRAM alignment: OK (no misaligned BG/sprite bases).")
+    print("VRAM layout: OK (bases aligned; committed vram_map.h valid vs spec).")
     return 0
 
 

@@ -1,58 +1,69 @@
-# VRAM layout solver — PILOT (OR-Tools CP-SAT)
+# VRAM layout — declarative spec → generated bases → build-gated
 
-A proof-of-concept that constraint solving can auto-place an example's VRAM
-regions (BG tilesets, tilemaps, sprite tiles) — satisfying the SNES hardware
-alignment rules, never overlapping, fitting in 64 KB — and **validate** an
-existing layout (a linter for the #1 silent VRAM bug: tile/map/sprite overlap the
-PPU ignores with no error).
+Replaces hand-typed VRAM magic numbers with a tiny per-example **`vram.spec`**
+(asset manifest) from which a CP-SAT solver generates a **`vram_map.h`** of base
+addresses that satisfy the SNES hardware alignment rules, never overlap, fit in
+64 KB, and minimise the VRAM high-water mark. The committed header is what the
+build consumes — **ortools is not a build dependency** — and a pure-stdlib gate
+re-validates it on every CI run.
 
-## Status: prototype / opt-in. NOT a build dependency.
+## Workflow
 
-Requires `ortools` (`pip install --user ortools`). The build stays stdlib-only —
-this is a tool you run to (re)generate or check a layout, then commit the result.
-The solver is pinned single-threaded with a fixed seed, so its output is
-**reproducible** (mandatory for this project's deterministic builds).
-
-```sh
-python3 devtools/vram_layout/vram_layout.py
+```
+vram.spec  ──(ortools, opt-in)──>  vram_map.h  ──#include──>  main.c
+   │                                    │
+   └──────────── make lint-vram ────────┘   (stdlib: alignment + no-overlap + fit)
 ```
 
-## What the pilot proved (on examples/basics/collision_demo)
+1. Declare regions in `examples/<path>/vram.spec`:
+   ```
+   # name      kind     size_words
+   bg_tiles    bg_char  0x10
+   bg_tilemap  bg_map   0x400
+   obj_tiles   obj      0x20
+   ```
+   `kind` → hardware alignment, read from the SDK source so the model can't drift:
+   `bg_char` 0x1000 (background.c BG12NBA), `bg_map` 0x400 (BGnSC),
+   `obj` 0x2000 (sprite.h OBJ_BASE).
 
-The alignment granularities are read straight from the SDK source, so the model
-can't drift from what the lib programs:
+2. Generate (needs `ortools`, run by a dev, output committed):
+   ```sh
+   python3 devtools/vram_layout/vram_layout.py --emit examples/<path>
+   #   --keep-low <region>   pin a region at 0x0000 (e.g. an OBJSEL base the code hardcodes)
+   ```
 
-| region kind | align (words) | source |
-|---|---|---|
-| `bg_char` (tiles)   | `0x1000` | `background.c` bgSetGfxPtr → BG12NBA `vramAddr>>12` |
-| `bg_map` (tilemap)  | `0x400`  | `background.c` bgSetMapPtr → BGnSC `(vramAddr>>8)&0xFC` |
-| `obj` (sprite tiles)| `0x2000` | `sprite.h` OBJ_BASE `(vram_addr>>13)&0x07` |
+3. `main.c` does `#include "vram_map.h"` and uses `VRAM_<NAME>` for every base
+   and base-relative offset — no magic numbers.
 
-Results:
+4. Build gate (`make lint-vram`, pure stdlib, in CI): re-validates each committed
+   `vram_map.h` against its `vram.spec` (aligned, non-overlapping, fits) so a
+   stale or hand-edited header can't ship a silently broken layout.
 
-1. **Linter** — validated collision_demo's hand-coded layout (bg_tiles `0x0000`,
-   tilemap `0x0400`, sprites `0x4000`): VALID.
-2. **Auto-placement** — the solver re-derived a valid layout from sizes+types
-   alone and compacted it: sprites `0x0000`, tilemap `0x0400`, bg_tiles `0x1000`
-   → high-water `0x4020` → `0x1010` words, **reclaiming ~24 KB of VRAM**.
-3. **Functional equivalence (the decisive test)** — applying the auto layout to
-   collision_demo (base pointers + DMA upload addresses updated consistently),
-   rebuilding, and running luna's visual regression gave an **identical fbhash**
-   (`COMPARE: 1/1 ok`). The auto-computed layout renders pixel-for-pixel like the
-   hand-tuned one. (The example was reverted afterwards — this is a pilot.)
+## In production (proven, identical fbhash under luna)
 
-## Verdict / where this goes
+| example | result |
+|---|---|
+| `examples/basics/collision_demo` | 3 regions; solver compacted high-water `0x4020 → 0x1010` (**~24 KB reclaimed**); visual regression identical. |
+| `examples/graphics/sprites/metasprite` | obj sheet (2 name pages, `--keep-low`) + font + tilemap; high-water `0x6C00 → 0x2C00` (**~16 KB reclaimed**); visual regression identical. |
 
-Constraint solving is a genuine fit for the SDK's *placement/packing* problems,
-not codegen. The natural next targets, in order:
+Functional equivalence is guaranteed by the project's own gate: VRAM addresses are
+internal, so a valid re-placement renders pixel-for-pixel — `luna_runner.py
+--compare` proves it against the committed baseline.
 
-- **VRAM layout** (this) — generate a per-example `vram_map.inc` of base
-  addresses from a declared asset list; the visual probe already proves
-  equivalence.
-- **Bank-$00 packing** (the high-value sibling) — assign `.const` sections to ROM
-  banks under the 32 KB-per-bank limit. **Gated on chantier A6**: until the
-  compiler emits 24-bit far reads, C data can only live in bank $00, so a packer
-  can optimise *within* bank $00 but not spread across banks. After A6 it becomes
-  an optimal multi-bank allocator.
+## Scope / limits
 
-See the design discussion in the chantier notes for the full rationale.
+- **Top-level regions only.** Sub-sheet packing inside an `obj` region (e.g.
+  metasprite's hero32/16/8) stays manual — the example lays those out at fixed
+  offsets from the generated base. Modeling sub-sheets is a possible extension.
+- **ortools = generation only.** The solver is pinned single-threaded with a
+  fixed seed → reproducible output (same spec ⇒ same header). The build/CI never
+  needs it.
+- **Sibling target: bank-$00 packing** — same technique on `.const`→bank
+  assignment, but gated on chantier A6 (until the compiler emits 24-bit far
+  reads, C data can only live in bank $00).
+
+## Files
+
+- `vram_spec.py` — stdlib: spec/header parse, `validate()`, `emit_header()`.
+- `vram_layout.py` — ortools: CP-SAT `solve()` + `--emit`.
+- `../check_vram_layout.py` — the build gate (alignment scan + spec validation).
