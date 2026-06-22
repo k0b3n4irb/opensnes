@@ -172,6 +172,48 @@ drift)**, probes 10/10. Ships as a patch (v0.21.2).
 **Deferred (unchanged):** A6 / B1 / B2 (Phases 2–4) remain a follow-up chantier;
 decisions #2 (pointer = 4 bytes) and #3 (B2 per-symbol bank) pre-recorded above.
 
+## 3d. A6 Phase 0 OUTCOME (2026-06-22) — the gap is the data deref, not the pointer
+
+Audit of the actual backend state (same method as A7 — the catalogue was stale):
+
+- **Pointer SIZE: already done.** `compiler/cproc/type.c` `mkpointertype()` is
+  `t->size = 4, t->align = 2` — exactly A6's proposed fix (the catalogue's
+  `size = 8` is stale). cproc already lays out 4-byte (24-bit + pad) pointers.
+- **Indirect CALLS (function pointers): handled.** The A6+A7 backend commit
+  (qbe `179676e`) added "full pointer ABI + Kl pair lowering" incl. the indirect
+  call reading the bank byte from pointer storage; the framework examples
+  (scene_stack, gameloop, nmiSet callbacks) run green, exercising it.
+- **THE REMAINING GAP — data load/store through a pointer is bank-`$00`-hardcoded.**
+  `compiler/qbe/w65816/emit.c` (explicitly documented at lines 533–543) lowers
+  `*ptr` loads/stores as `lda.l $0000,x` / `sta.l $0000,x` (sites 3482/3519/3552/
+  3617): X = the low 16 bits of the address, **bank fixed to $00**, the pointer's
+  bank byte ignored. There's even a `temp_addr_only` optimization that drops the
+  high-half (bank) computation *because* it's dead at every deref consumer. **This
+  is the real B1/B2 root cause:** `*ptr` to data outside bank `$00` reads garbage.
+
+### Phase 1 scope (now precise)
+1. Lower pointer load/store as a **24-bit deref using the bank byte** — the
+   65816 way is direct-page indirect long (`lda [dp],y` / `sta [dp],y`), reading
+   the full 3-byte pointer from a DP slot, instead of `lda.l $0000,x`. Touches
+   the 4 `$0000,x` sites + their load counterparts.
+2. **Retire / gate the `temp_addr_only` optimization** — it assumes the bank byte
+   is dead; it must only fire when the pointer is provably bank-`$00`, else the
+   bank byte is now live.
+3. Decision #3 (per-symbol bank) applies to **named RAM symbols** (B2); arbitrary
+   pointer derefs (this item) must always carry the bank since the bank isn't
+   known at compile time.
+
+### Runtime harness — needs cross-bank placement (Phase 1 infra)
+Unlike A7 (pure arithmetic), proving this needs **data physically outside bank
+`$00`**, which fights the bank-`$00`-overflow guard. Approach: a fixture that
+places a known sentinel array in a high bank via a `.section … BANK N` directive
+(asm or linker), takes a pointer to it, derefs through the pointer, and luna
+`--assert`s the value. Build this first in Phase 1 (it's the gate), then fix the
+codegen.
+
+**Net:** A6 is ~half done (pointer size + calls); the hard, high-value half (data
+deref → lifts B1/B2) remains and is now precisely scoped.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
