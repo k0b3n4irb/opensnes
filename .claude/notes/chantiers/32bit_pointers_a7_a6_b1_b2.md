@@ -214,6 +214,38 @@ codegen.
 **Net:** A6 is ~half done (pointer size + calls); the hard, high-value half (data
 deref → lifts B1/B2) remains and is now precisely scoped.
 
+### Phase 1 — runtime gate built + bug proven (2026-06-22)
+`devtools/compiler-tests/runtime/a6_farptr/` puts a sentinel in **BANK 2**
+(`a6_sentinel.asm`, lands at `02:8000`), takes a **volatile** far pointer to it
+(forces a register-indirect deref the compiler can't fold to a direct access),
+and luna-`--assert`s the results. Outcome, isolating storage vs deref:
+- **`r_ptrhi == 0x0002` PASS** — the pointer *value* keeps its bank byte (storage
+  is correct).
+- **`r_d0/d3/d7` FAIL** (xfail) — the deref reads bank `$00` garbage (0x08/0xe2/
+  0x8d at `$00:8000+`) instead of 0x11/0x44/0x88. The gap is the **deref only**.
+
+So the bug is proven and isolated. The harness is committed with the 3 deref
+cases xfail'd (not yet wired into `make tests`/CI — flips green when fixed).
+
+### Phase 1 — the codegen design decision (maintainer call needed)
+Each deref site (`emit.c` ~3482/3519/3552/3617 + load counterparts) is
+`tax … lda.l/sta.l $0000,x` — X = the pointer's low 16, bank fixed `$00`. The
+65816 has no "store to (X + runtime bank)"; the fix is **direct-page indirect
+long** (`lda [dp],y` / `sta [dp],y`) after writing the 3-byte pointer to a DP
+scratch. That costs ~+2–5 cyc **plus** ~3 stores to set up the DP pointer, **per
+deref**. Two ways:
+- **(F) always-far** — every pointer deref uses `[dp],y`. Simple, but a real perf
+  regression on the ~99% bank-`$00` case (every array index / C-RAM access).
+- **(S) bank-0 fast path** — keep `lda.l $0000,x` when the pointer is *provably*
+  bank `$00` (C RAM, `&local`, bank-0 globals), use `[dp],y` only for
+  possibly-far pointers. Preserves perf; needs a "provably bank-0" dataflow
+  analysis (related to the existing `mark_addr_only_kl`/`temp_addr_only` machinery,
+  which already tracks "bank byte dead"). More complex, higher risk.
+
+**Recommendation: (S)** — a game SDK can't eat a per-access cycle tax on every
+array index. (S) is multi-day and must be done carefully (a wrong bank-0 proof =
+silent corruption). This is the decision to confirm before the codegen work.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
