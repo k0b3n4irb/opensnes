@@ -391,6 +391,50 @@ Partial #2c investigation against the wip (`b40f919`):
   intermediate checks during attempt #1 — re-run attempt #2's gates from a full
   clean build, not partial rebuilds.
 
+## 3h. Root-cause CONFIRMED + a better analysis for attempt #2 (2026-06-22)
+
+Reliable IR-pipe diff (same cproc IR through clean vs wip qbe, bypassing the build
+staleness) of `text.c` and `collision.c`:
+
+- **`arr[i]` on a bank-`$00` symbol is NOT the problem.** `tilemapBuffer[i]` lowers
+  to `add($tilemapBuffer, extuw(...))`; both operands are high-zero (CAddr +
+  `extuw` seed) so attempt-#1's `Oadd` extension already marks it → fast path,
+  unchanged. Good.
+- **The regressions are derefs of LOADED pointers** (`%p =l loadl …`; text.c has 7,
+  e.g. `u8 *str` params, cursor/string pointers). attempt-#1's `ref_is_high_zero`
+  can't prove a `loadl` high-zero → they take the far path, and (a) only byte-load
+  has a far emit (stores/word-loads still `$0000,x` → wrong bank), and (b) the
+  `mark_addr_only` gating un-skips their high-half `adc` computation (carry-
+  dependent, + the +8%). That combination is the 7 visual regressions + the bench.
+
+**Better analysis for attempt #2 — taint-from-`loadl` instead of high-zero:**
+The deref dispatch should ask *"is this address derived from a loaded pointer
+VALUE?"*, not *"is it provably high-zero?"*:
+- A temp is **far-tainted** iff it is an `Oloadl` result, or an `add/sub/copy/phi`
+  with a far-tainted operand. (Provenance, not value — so **no `Omul` overflow
+  soundness worry** that the high-zero framing has.)
+- Dispatch: **far-tainted → far path; else → current fast `$0000,x`** (sound under
+  the existing no-bank-wrap assumption for symbol/stack/Kw-rooted addresses).
+- This keeps ALL symbol-based bank-`$00` access (`arr[i]`, struct, `&global`) on
+  the fast path by construction (never loadl-rooted) → **no perf regression**, and
+  routes only genuine pointer-VALUE derefs to far. Correctness risk (fast on a
+  far ptr) only if a loaded far pointer escapes the taint — impossible for the
+  add/sub/copy/phi closure; the lone gap is a far C symbol deref'd *directly by
+  its symbol*, which is already unsupported (C symbols are bank-`$00`).
+
+**Attempt #2 (revised) execution:**
+1. Implement the `far_tainted` pre-pass (loadl closure over add/sub/copy/phi).
+2. Far emit for **all** deref sizes via a shared `emit_farptr_setup` helper
+   (byte/half/word loads + byte/half/word/long stores; preserve the store value).
+3. Replace the attempt-#1 dispatch (`ref_is_high_zero`) and the `mark_addr_only`
+   gating with `far_tainted`. Keep `mark_high_zero`/`ref_is_high_zero` as-is for
+   the Oshl/Omul shortcuts (untouched).
+4. Gate from a **full clean build**: a6_farptr (all sizes, drop xfails) + visual
+   56/56 + bench ≤ 1476 + `make tests`.
+
+This supersedes §3f's high-zero-based #2a/#2b. The DP scratch (`tcc__farptr`) and
+the proven far byte-load emit from attempt #1 (`wip/a6-deref-attempt1`) are reused.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
