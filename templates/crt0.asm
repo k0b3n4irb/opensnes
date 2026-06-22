@@ -98,6 +98,13 @@
     ; even when lib code temporarily sets DBR != 0). 4 bytes total
     ; (low 16 + bank byte + 1 alignment), 16-bit aligned.
     tcc__fp     dsb 4
+    ; Far-pointer deref scratch (chantier A6 Phase 1). A 24-bit data deref
+    ; through a pointer whose bank byte != 0 cannot use `lda.l $0000,x`
+    ; (bank-$00-hardcoded); the codegen writes the full 3-byte pointer here and
+    ; emits `lda [tcc__farptr]` (direct-page indirect long). Dedicated scratch
+    ; (never allocated to a temp) so no liveness analysis / clobber risk. Mirrored
+    ; in tcc__nmi_registers (below) so a far deref inside an NMI callback is safe.
+    tcc__farptr dsb 4
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -113,7 +120,8 @@
 ;------------------------------------------------------------------------------
 
 .RAMSECTION ".nmi_registers" BANK 0 SLOT 1 ALIGN $0100
-    tcc__nmi_registers dsb 48   ; Same layout as main registers: r0..r10h + callback area
+    tcc__nmi_registers dsb 52   ; Same layout as main registers: r0..r10h + callback area
+                                ; + tcc__farptr scratch (offset $30, A6 Phase 1)
 .ENDS
 
 ;------------------------------------------------------------------------------

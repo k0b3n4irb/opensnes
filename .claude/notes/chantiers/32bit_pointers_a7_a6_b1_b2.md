@@ -302,6 +302,37 @@ already gets wrong (data must fit in its bank); (S) introduces no NEW unsoundnes
 - `make clean && make` + full `make tests`.
 - Add far-pointer cases that exercise stores, struct fields, and `p[i]` (indexed).
 
+### Phase 1 — implementation ATTEMPT #1 (2026-06-22) — regressed, NOT shipped
+
+Built: DP scratch `tcc__farptr` (crt0, reserved + NMI-mirrored, validated inert),
+far **byte-load** path (DP-indirect-long via `tcc__farptr`), `mark_addr_only_kl`
+gated on `ref_is_high_zero` (so a far pointer's bank stays live), and
+`mark_high_zero` extended to propagate through `Oadd Kl` (+ treat CAddr as bank-0).
+
+- **Isolated far byte-load: PROVEN correct** — `a6_farptr` r_d0/d3/d7 XPASS (the
+  mechanism works: addr_only gating + DP-indirect-long deref).
+- **Full validation FAILED** → not shipped:
+  - **7 visual regressions**: aim_target, random, timer, breakout, tetris,
+    metasprite, superscope (fbhash drift = wrong codegen at scale).
+  - **+8% cycles** (bench 1476→1595): bank-0 derefs not proven high-zero fell to
+    the slower far path.
+
+**Lessons for attempt #2:**
+1. Only the **byte-load** far path was implemented; **stores + word/half loads**
+   still use `$0000,x`, so making their address temps non-addr-only (high half
+   computed) without a matching far emit is incoherent — implement ALL deref
+   sizes together, or none.
+2. The `mark_high_zero` Oadd/CAddr extension is too coarse and/or the far path
+   has edge cases — the 7 regressions must be root-caused individually (likely
+   far STOREs and far word-loads hitting the unimplemented sites, plus the
+   perf fall-through). Bisect per-example with `CC_TRACE`/asm diff.
+3. The +8% confirms the high-zero analysis under-approximates real bank-0
+   derefs — it must prove high-zero for ~all current patterns before the far
+   default is acceptable.
+
+WIP kept on branch `chantier/a6-codegen` (NOT merged — develop stays correct).
+The gate (`a6_farptr`) + this design remain on develop for attempt #2.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
