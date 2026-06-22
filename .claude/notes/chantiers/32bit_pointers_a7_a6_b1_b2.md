@@ -246,6 +246,62 @@ deref**. Two ways:
 array index. (S) is multi-day and must be done carefully (a wrong bank-0 proof =
 silent corruption). This is the decision to confirm before the codegen work.
 
+### DECIDED: (S). Implementation spec (2026-06-22)
+
+Design completed + de-risked; the codegen is a focused multi-day execution.
+
+**Safety principle (why (S) won't corrupt):** default every deref to the FAR path;
+use the fast bank-`$00` path ONLY when the address is *provably* high-zero via the
+existing `ref_is_high_zero()` (emit.c:495). A genuinely-far pointer is never
+high-zero-provable (its base is a `loadl`/non-zero value), so it always takes the
+far path → correct. The only "fast on non-zero" risk is a low-16 add that carries
+past `$FFFF` into the bank — which the *current* hardcoded-`$0000,x` codegen
+already gets wrong (data must fit in its bank); (S) introduces no NEW unsoundness.
+
+**Three pieces:**
+
+1. **Deref dispatch.** At each `$0000,x` load/store site, branch on
+   `ref_is_high_zero(addr, fn)`:
+   - true  → keep the current fast path (`lda.l/sta.l $0000,x`, or `lda.w sym` for
+     a CAddr operand);
+   - false → far path (below).
+   Sites: stores `emit.c` ~3482/3519/3552/3617, loads ~3741/3769 (+ the
+   `Oloadsw/Oloaduw/Oload` and `Oloadsb/Oloadub` / half variants).
+
+2. **Keep `arr[i]` fast — extend `mark_high_zero()`** (emit.c:466). Today it marks
+   only `Oextuw` temps; `buf[i]` lowers to `add $buf, extuw(idx)` whose *result*
+   isn't marked → would wrongly take the far path (perf regression). Extend the
+   pre-pass to also mark `Oadd`/`Osub` Kl temps when **both** operands are
+   high-zero (RCon high16==0, Kw class, or already-marked), to a fixpoint. Sound
+   under the same no-bank-wrap assumption the fast path already relies on.
+
+3. **Far-path codegen** (byte-load shape; mirror for word/half + stores): write the
+   3-byte pointer to a DP scratch, then DP-indirect-long:
+   ```
+   emitload(r0, fn);            ; A = ptr low16
+   sta.b  <DP>                  ; DP,DP+1 = low16
+   emit_load_high(r0, fn, 0);   ; A = ptr high16 (bank in low byte)
+   sep #$20
+   sta.b  <DP+2>                ; DP+2 = bank byte
+   lda    [<DP>]                ; 24-bit load (sep for byte; rep+lda [DP] for word)
+   rep #$20
+   ```
+   **KEY OPEN RISK — the DP scratch.** `lda [dp]` needs 3 contiguous direct-page
+   bytes that are FREE at the deref site (not a live `tcc__rN`). Options: reserve a
+   dedicated 3-byte deref scratch in the runtime DP map (`templates`/runtime DP
+   allocation), or prove a `tcc__rN` dead here. This allocation (without clobbering
+   a live temp across all variants) is the crux of the remaining work — nail it
+   before writing the emit code.
+
+**Validation gates (all required before commit — Class A):**
+- `devtools/compiler-tests/runtime/a6_farptr/` flips green (remove the 3 xfails;
+  far deref now correct) AND a new far-STORE case added.
+- `luna_runner.py --compare` 56/56 (bank-`$00` fast path preserved → no fbhash drift).
+- `make bench` no cycle regression (the `mark_high_zero` Oadd extension keeps
+  `arr[i]` on the fast path).
+- `make clean && make` + full `make tests`.
+- Add far-pointer cases that exercise stores, struct fields, and `p[i]` (indexed).
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
