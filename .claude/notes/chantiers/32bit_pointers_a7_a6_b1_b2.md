@@ -435,6 +435,42 @@ VALUE?"*, not *"is it provably high-zero?"*:
 This supersedes §3f's high-zero-based #2a/#2b. The DP scratch (`tcc__farptr`) and
 the proven far byte-load emit from attempt #1 (`wip/a6-deref-attempt1`) are reused.
 
+## 3i. Attempt #2 (taint-from-loadl) — regressed, NOT shipped (2026-06-22)
+
+Implemented in full: `far_tainted` pre-pass (loadl closure over add/sub/copy/phi),
+dispatch + `mark_addr_only` gating switched to taint, `emit_farptr_setup` helper,
+far emit for byte/word loads + byte/word/half/long stores. **a6_farptr 4/4** (far
+loads correct in isolation). But the full clean-build suite regressed **again**:
+same 7 visual (all use `text.c`) + **bench +14%** (worse than #1's +8%).
+WIP: qbe `wip/a6-deref-attempt2` (`6d25025`), superproject `chantier/a6-codegen`
+(`af8212e`). NOT merged; develop clean (pin `1884a20`, 56/56).
+
+**Two NEW, precise root causes (the real blockers for attempt #3):**
+
+1. **Far-pointer HIGH HALF (bank) is dropped in Kl COPY/PHI moves.** The taint
+   gating I added only covers the load/store *address* uses (`is_addr_use`). The
+   high-half-skip optimization ALSO fires in Kl **copy and phi moves** (governed
+   by `temp_addr_only`/`ref_to_is_addr_only` consulted in the copy/phi emit). A
+   loop pointer copied as `lda 10,s ; sta 6,s` keeps only the LOW half; the later
+   `lda [tcc__farptr]` reads a **stale bank** from the un-updated high slot →
+   wrong load. Confirmed in `text.c` asm (the lone far site at the string-loop
+   pointer). **Fix: gate EVERY high-half-skip (copy, phi, add, mul emit — not just
+   the load/store address classification) on `!far_tainted`.**
+
+2. **The taint SEED over-taints → the +14%.** Seeding on *every* `Oload Kl` taints
+   all 32-bit loads (incl. plain `u32`/`s32` data, not just pointers). Tainted
+   temps lose `addr_only` → high-half computed everywhere → the cycle blow-up.
+   **Fix: seed only loads whose result is actually used as a deref address** (or
+   propagate taint only along address-forming chains), so non-pointer 32-bit data
+   doesn't taint.
+
+**Attempt #3 = attempt #2 + (1) gate all high-half-skip sites on taint + (2)
+tighten the taint seed.** Both narrow, now-located. The far load/store emit and
+the dispatch are correct; the gap is purely *high-half preservation through moves*
+and *seed precision*. NB: two attempts have failed on the same class (the bank
+byte dropped by a high-half optimization) — attempt #3 should add a focused asm
+check that the pointer's high slot is written before any far deref of it.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
