@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -105,10 +105,18 @@ lint-docs:
 lint-asm-abi:
 	@python3 devtools/check_asm_abi.py --quiet
 
+# VRAM base-alignment linter. BG/sprite VRAM bases are programmed through
+# registers that hold only the high address bits, so a misaligned base is
+# silently masked (the value you wrote is not the one the PPU uses). Catches that
+# silent-failure class statically. See devtools/check_vram_layout.py.
+lint-vram:
+	@python3 devtools/check_vram_layout.py
+
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
 	@$(MAKE) lint-asm-abi
+	@$(MAKE) lint-vram
 	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain
