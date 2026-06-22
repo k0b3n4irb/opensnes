@@ -471,6 +471,45 @@ and *seed precision*. NB: two attempts have failed on the same class (the bank
 byte dropped by a high-half optimization) — attempt #3 should add a focused asm
 check that the pointer's high slot is written before any far deref of it.
 
+## 3j. Attempt #3 — Ocopy high-half fixed but INSUFFICIENT; rethink needed (2026-06-22)
+
+Fix #1 applied: **`Ocopy` now copies the Kl HIGH half when the dest is not
+addr_only** (qbe `a6c57f3`, wip/a6-deref-attempt3 + superproject `bd6ab27`). This
+is a genuine latent-bug fix — `Ocopy` only ever moved the low 16 bits, so even a
+plain `u32 a = b;` dropped the high half. **Kept for its own sake.**
+
+But the suite STILL regresses (same 7 + 14%). Tracing `textPrint`: the `char *`
+param pointer is materialised by a **slot-to-slot copy** `lda 26,s ; sta 6,s`
+(low only) — slot `8,s` (bank) is never written in the function, so the far load
+reads a garbage bank. That move is NOT an `Ocopy` (it's the param/RSlot
+materialisation path), so fix #1 doesn't touch it. **The high half is dropped at
+MULTIPLE move/materialisation sites**, not one — each `lda N,s ; sta M,s`
+16-bit slot move of a Kl pointer is a separate leak.
+
+**Conclusion after 3 attempts:** the deref-far architecture requires EVERY Kl
+move/materialisation (Ocopy, phi-out, param/RSlot copy, spill/reload, alias) to
+preserve the bank byte for far-tainted values — a pervasive, whack-a-mole change
+across the backend, each miss = silent wrong-bank. This is much larger/riskier
+than the per-deref-site work the plan assumed.
+
+**Strategic options for the maintainer (decide before attempt #4):**
+- **(A) Uniform 4-byte Kl moves.** Make ALL Kl slot moves copy both halves
+  unconditionally (drop the low-only optimization for Kl), then re-add addr_only
+  low-only as a *proven-safe* narrowing. Closes the whole leak class at once;
+  costs cycles/size on every Kl move until the narrowing is re-tightened. Big but
+  finite; the safest correctness-first route.
+- **(B) Reconsider the lib-led `*Bank` API** (what §1 deliberately rejected).
+  After 3 failed compiler-led attempts, the explicit `*Bank` variants (B1's
+  original plan) are far lower-risk: no compiler change, no high-half class. They
+  don't deliver transparent "far data just works", but they unblock B1/B2's
+  *user-facing* need (assets/RAM outside bank $00) at a fraction of the risk.
+  Pragmatic given the evidence.
+- Recommend: try **(A)** once (it's the honest compiler-led finish); if it also
+  thrashes, fall back to **(B)**.
+
+WIP preserved: qbe `wip/a6-deref-attempt3` (a6c57f3), superproject
+`chantier/a6-codegen` (bd6ab27). develop clean (pin 1884a20, 56/56, luna v1.0.0).
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
