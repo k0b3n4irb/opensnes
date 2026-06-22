@@ -5,6 +5,26 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.21.3] — 2026-06-22
+
+Maintenance release — test-backend pin bump only. **No API / library / runtime /
+compiler changes**: the shipped compiler, library and example ROMs are unchanged
+from v0.21.2. This release captures the luna v1.0.0 migration on `main`.
+
+### Changed
+- **Test backend**: pinned luna bumped `v0.3.2` → `v1.0.0`
+  (`tools/luna-test/luna.version`). The v0.3.x releases were removed upstream,
+  which broke CI; v1.0.0 is CLI-compatible and produces no rendering drift
+  (visual regression 56/56). Affects the dev/CI test harness only.
+
+### Internal
+- A6 (24-bit far-pointer deref) chantier investigation recorded across attempts
+  #1–#3: a real latent `Ocopy` high-half bug was fixed, but the deref-far
+  approach needs bank-byte preservation across *every* `Kl` move site; two
+  strategic options documented for a future attempt. Not shipped (develop clean,
+  WIP preserved on `wip/a6-deref-attempt3`). See
+  `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md`.
+
 ## [0.21.2] — 2026-06-22
 
 Patch release — one compiler correctness fix (32-bit arithmetic) plus the
