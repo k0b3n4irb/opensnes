@@ -66,11 +66,22 @@ full 56-example manifest, and the CI rewrite. Mouse/Super Scope coverage is
 **dropped** (decision #2) — `input/mouse` + `input/superscope` get boot+visual
 validation only.
 
-## Hardening tests (luna v0.3.0 capabilities)
+## Hardening tests (luna v1.0.0 capabilities)
 
 Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
 never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
 
+- **Coprocessor execution** (`probes/coproc.py`) — Super FX (`--superfx-trace`)
+  and SA-1 (`--sa1-trace`) examples must execute ≥1 coprocessor instruction. The
+  old harness could not even *detect* the GSU ("GSU: NOT DETECTED"); luna runs it
+  natively and this turns that into a positive, regression-guarding assertion (a
+  silent codegen/template break that stops the chip is invisible to the
+  framebuffer gate).
+- **SRAM persistence** (`probes/sram.py`) — battery save round-trip on
+  `save_game`: drive a save, persist the battery with `--srm-out`, power-cycle by
+  reloading it with `--srm-in`, assert the loaded struct matches, with a
+  no-battery negative control proving the match came from the file (not ROM
+  determinism). Exercises `snes/sram.h` end-to-end.
 - **Audio** (`probes/audio.py`, H5) — SNESMOD examples must have ≥1 active SPC
   voice + non-silent PCM (`--audio-out`); the SFX driver must be alive.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame

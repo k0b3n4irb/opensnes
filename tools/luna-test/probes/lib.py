@@ -120,22 +120,61 @@ def sym_size(rom: Path, name: str) -> int:
 
 def assert_mem(luna: str, rom: Path, steps: int,
                specs: list[tuple[int, int, str]],
-               input_script: str | None = None) -> tuple[bool, str]:
+               input_script: str | None = None,
+               srm_in: "str | Path | None" = None) -> tuple[bool, str]:
     """Delegate WRAM equality to luna's `--assert BANK:OFFSET=HEX` (L2).
 
     specs = [(bank, offset, hexbytes), …] where hexbytes is the in-memory byte
     sequence (e.g. a u16 value 0x0080 → "8000", little-endian). Returns luna's
     own pass/fail (exit code) plus its PASS/FAIL stdout for detail.
+
+    `srm_in` (luna v1.0.0) pre-loads a battery `.srm` before the run — the read
+    half of a power-cycle test (write it with `capture_srm`).
     """
     cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null"]
     if input_script:
         cmd += ["--input", input_script]
+    if srm_in:
+        cmd += ["--srm-in", str(srm_in)]
     for bank, off, hexb in specs:
         cmd += ["--assert", f"{bank:02X}:{off:04X}={hexb}"]
     cmd.append(str(rom))
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     detail = " ".join(l.strip() for l in proc.stdout.splitlines() if "FAIL" in l) or "all assertions pass"
     return proc.returncode == 0, detail
+
+
+def trace_lines(luna: str, rom: Path, steps: int, flag: str,
+                input_script: str | None = None) -> int:
+    """Run `luna state -n steps <flag> FILE rom`; return data-line count (excl header).
+
+    `flag` is a coprocessor/SPC trace switch (luna v1.0.0): `--superfx-trace`,
+    `--sa1-trace`, `--spc-trace`, … A return > 0 proves the coprocessor actually
+    executed instructions during the run (the old snes9x harness could not even
+    *detect* the GSU; luna runs it natively and lets us assert it ran).
+    """
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".csv") as tf:
+        cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null", flag, tf.name]
+        if input_script:
+            cmd += ["--input", input_script]
+        cmd.append(str(rom))
+        subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        lines = Path(tf.name).read_text().splitlines()
+    return max(0, len(lines) - 1)  # drop the CSV header row
+
+
+def capture_srm(luna: str, rom: Path, steps: int, input_script: str,
+                srm_out: "str | Path") -> bytes:
+    """Run with scripted input + `--srm-out` (luna v1.0.0); return the battery bytes.
+
+    The write half of a power-cycle test: drive the ROM to save into SRAM, then
+    read the persisted `.srm` back (feed it to `assert_mem(..., srm_in=…)`).
+    """
+    cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null",
+           "--input", input_script, "--srm-out", str(srm_out), str(rom)]
+    subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    return Path(srm_out).read_bytes()
 
 
 def word_bytes(value: int) -> str:
