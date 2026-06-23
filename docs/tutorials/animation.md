@@ -425,7 +425,7 @@ Background tile animation involves VRAM writes, which **must happen during VBlan
 
 ## Performance Considerations
 
-1. **oamSet() is expensive** (framesize=158). For more than 2-3 sprites per frame, use `oamSetFast()` or write directly to `oamMemory[]`
+1. **oamSet() is cheap** — the old framesize=158 cliff was resolved (see `KNOWN_LIMITATIONS.md`); use it freely. For extreme sprite counts, `oamSetFast()` / `oamSetXYFast()` or direct `oamMemory[]` writes trim a little more
 2. **Only set `oamrefresh = 1` when the frame changes** -- redundant VRAM uploads waste VBlank time
 3. **The dynamic engine uploads up to 7 sprites per frame**. If you need more animated sprites, spread their refresh across multiple frames
 4. **BG tile animation competes with sprite DMA for VBlank time**. Budget carefully: ~4 KB total per VBlank
