@@ -54,9 +54,9 @@ int main(void) {
 ### Setting a Sprite
 
 ```c
-// oamSet(id, x, y, priority, hflip, vflip, palette)
-oamSet(0, 100, 80, 0, 0, 0, 0);  // Sprite 0 at (100, 80)
-oamSet(1, 120, 80, 0, 0, 0, 1);  // Sprite 1 with palette 1
+// oamSet(id, x, y, tile, palette, priority, flags)
+oamSet(0, 100, 80, 0, 0, 0, 0);  // Sprite 0 at (100, 80), tile 0
+oamSet(1, 120, 80, 0, 1, 0, 0);  // Sprite 1 with palette 1
 ```
 
 ### Updating OAM
@@ -179,8 +179,8 @@ void update_player(u16 pad) {
         facing_right = 1;
     }
 
-    // Update sprite with horizontal flip based on direction
-    oamSet(0, player_x, player_y, 0, !facing_right, 0, 0);
+    // Update sprite with horizontal flip based on direction (flip = flags arg)
+    oamSet(0, player_x, player_y, 0, 0, 0, facing_right ? 0 : OBJ_FLIPX);
 }
 ```
 

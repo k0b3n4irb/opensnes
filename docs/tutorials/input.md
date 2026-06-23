@@ -187,7 +187,7 @@ while (1) {
 
     // Update sprites
     oamSet(0, p1_x, p1_y, 0, 0, 0, 0);  // Player 1
-    oamSet(1, p2_x, p2_y, 0, 0, 0, 1);  // Player 2
+    oamSet(1, p2_x, p2_y, 0, 1, 0, 0);  // Player 2 (palette 1)
     oamUpdate();
 }
 ```
