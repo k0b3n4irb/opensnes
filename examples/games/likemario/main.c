@@ -229,7 +229,7 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
         base = VRAM_BG_MAP + 0x0400 + (vram_col - 32);
 
     /* Caller must ensure force blank or VBlank */
-    REG_VMAIN = 0x81;
+    REG_VMAIN = VMAIN_INC32;
     REG_VMADDL = base & 0xFF;
     REG_VMADDH = base >> 8;
 
@@ -243,7 +243,7 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
         REG_VMDATAH = 0;
     }
 
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
 }
 
 /**
@@ -329,7 +329,7 @@ static void map_flush_column(void) {
     if (!col_pending) return;
 
     /* Set VRAM address and vertical column mode (increment by 32 words) */
-    REG_VMAIN = 0x81;
+    REG_VMAIN = VMAIN_INC32;
     REG_VMADDL = col_vram_base & 0xFF;
     REG_VMADDH = col_vram_base >> 8;
 
@@ -345,7 +345,7 @@ static void map_flush_column(void) {
     REG_DASH(1) = 0;
     REG_MDMAEN  = 0x02;            /* Fire DMA channel 1 */
 
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
     col_pending = 0;
 }
 
