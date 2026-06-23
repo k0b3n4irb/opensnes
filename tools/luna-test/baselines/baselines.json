@@ -42,9 +42,9 @@
     "steps": 3000000
   },
   "basics_random": {
-    "fbhash": "8376822c60366b87",
-    "luna_version": "v0.3.2",
-    "rom_sha256": "49502ea06f47b16d62b56f1da97400c2ebd5ce36a1c1f921c73e2d4c0d42685e",
+    "fbhash": "9345cc491df437cf",
+    "luna_version": "v1.1.0",
+    "rom_sha256": "f2be2bfb99a321b2ad23bdc5d6ce0618ad96cbd70ed33259a4d06b49097285ab",
     "steps": 4000000
   },
   "basics_scene_stack": {

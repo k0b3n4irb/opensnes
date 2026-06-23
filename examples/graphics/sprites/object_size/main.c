@@ -197,9 +197,9 @@ int main(void) {
     setMode(BG_MODE1, 0);
 
     /* Initialize the text system on BG1 (4bpp font in Mode 1).
-     * TEXT_DEFAULT_* constants give: tilemap at byte $7000 (=word $3800),
-     * font_tile=0, palette=0. Font tiles are loaded to VRAM $0000 and BG1
-     * is configured to read tiles from $0000 and the tilemap from $3800. */
+     * TEXT_DEFAULT_* constants give: tilemap at word $3800, font_tile=0,
+     * palette=0. Font tiles are loaded to VRAM $0000 and BG1 is configured
+     * to read tiles from $0000 and the tilemap from $3800. */
     textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
     textLoadFont4bpp(0x0000);
     bgSetGfxPtr(0, 0x0000);
