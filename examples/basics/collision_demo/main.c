@@ -39,6 +39,7 @@
 
 #include <snes.h>
 #include <snes/collision.h>
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
@@ -229,12 +230,12 @@ static void load_graphics(void) {
     setScreenOff();
 
     /* Load BG tiles via DMA (tile 0 = empty, tile 1 = wall) */
-    dmaCopyVram((u8 *)empty_tile, 0x0000, 16);
-    dmaCopyVram((u8 *)wall_tile, 0x0008, 16);
+    dmaCopyVram((u8 *)empty_tile, VRAM_BG_TILES, 16);
+    dmaCopyVram((u8 *)wall_tile, VRAM_BG_TILES + 8, 16);
 
-    /* Load sprite tiles via DMA at $4000 */
-    dmaCopyVram((u8 *)player_tile, 0x4000, 32);
-    dmaCopyVram((u8 *)enemy_tile, 0x4010, 32);
+    /* Load sprite tiles via DMA */
+    dmaCopyVram((u8 *)player_tile, VRAM_OBJ_TILES, 32);
+    dmaCopyVram((u8 *)enemy_tile, VRAM_OBJ_TILES + 0x10, 32);
 
     /* Load palettes via DMA */
     dmaCopyCGram((u8 *)sprite_palette, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
@@ -261,13 +262,13 @@ static void draw_tilemap(void) {
     REG_VMAIN = 0x80;
 
     /* Clear entire 32x32 tilemap at $0400 with tile 0 (empty) */
-    dmaFillVRAM(0, 0x0400, 1024 * 2);
+    dmaFillVRAM(0, VRAM_BG_TILEMAP, 1024 * 2);
 
     /* Draw collision map tiles */
     for (ty = 0; ty < MAP_HEIGHT; ty++) {
         for (tx = 0; tx < MAP_WIDTH; tx++) {
             /* Calculate screen position */
-            addr = 0x0400 + ((ty + 7) * 32) + (tx + 8);
+            addr = VRAM_BG_TILEMAP + ((ty + 7) * 32) + (tx + 8);
 
             REG_VMADDL = addr & 0xFF;
             REG_VMADDH = addr >> 8;
@@ -417,12 +418,12 @@ int main(void) {
     draw_tilemap();
 
     /* Configure BG1 */
-    bgSetMapPtr(0, 0x0400, BG_MAP_32x32);
-    bgSetGfxPtr(0, 0x0000);
+    bgSetMapPtr(0, VRAM_BG_TILEMAP, BG_MAP_32x32);
+    bgSetGfxPtr(0, VRAM_BG_TILES);
     setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Object settings */
-    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
+    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, VRAM_OBJ_TILES);
 
     /* Initialize player position - tile (7,7) = open area below center platform */
     player_x = MAP_OFFSET_X + 56;
