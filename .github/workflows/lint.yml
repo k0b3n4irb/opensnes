@@ -88,6 +88,15 @@ jobs:
         # .claude/rules/doc_consistency.md.
         run: python3 devtools/check_doc_drift.py
 
+      - name: Run test_check_doc_drift.py
+        # Regression suite for the TIER-1 sentinel extensions: the phantom-API
+        # detector (a function called in an onboarding-doc C snippet must exist in
+        # the headers — caught consoleDrawText) and the extended example-count
+        # patterns (must match the real phrasings, must NOT match prose like
+        # "12 examples were flagged").
+        working-directory: devtools
+        run: python3 -m unittest test_check_doc_drift
+
   nmi-race-tests:
     name: NMI/WRAM race lint regression tests (test_check_nmi_wram_race.py)
     runs-on: ubuntu-latest
@@ -140,3 +149,30 @@ jobs:
       - name: Run test_check_vram_layout.py
         working-directory: devtools
         run: python3 -m unittest test_check_vram_layout
+
+  doc-render:
+    name: Doc render leaks (check_doc_render.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
+        # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test
+        # the SAME version that publishes the docs, so it pins 1.16.1 too.
+        run: |
+          curl -fsSL -o /tmp/doxygen.tgz https://www.doxygen.nl/files/doxygen-1.16.1.linux.bin.tar.gz
+          tar xzf /tmp/doxygen.tgz -C /tmp
+          sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/
+          doxygen --version
+
+      - name: Build docs + scan for un-rendered Markdown
+        # Doxygen mangles an inline `code` span placed inside an ASCII "..." quote:
+        # it leaks into the page as a literal &lt;tt&gt; tag (when the line wraps)
+        # or as raw backticks (single line). A source-side regex can't tell "code
+        # inside a quote" from "code between two quotes", so we build the HTML and
+        # scan the rendered output (zero false positives). Caught historically as
+        # `<tt>WH0</tt>`-style literals across the window/hdma/math/sram tutorials.
+        run: |
+          make docs
+          python3 devtools/check_doc_render.py

@@ -153,13 +153,13 @@ int main(void) {
 
         /* Player 1 movement */
         if (pad1 & KEY_UP)    { if (p1.y > 0) p1.y--; }
-        if (pad1 & KEY_DOWN)  { if (p1.y < 224) p1.y++; }
+        if (pad1 & KEY_DOWN)  { if (p1.y < SCREEN_HEIGHT) p1.y++; }
         if (pad1 & KEY_LEFT)  { if (p1.x > 0) p1.x--; }
         if (pad1 & KEY_RIGHT) { if (p1.x < 248) p1.x++; }
 
         /* Player 2 movement */
         if (pad2 & KEY_UP)    { if (p2.y > 0) p2.y--; }
-        if (pad2 & KEY_DOWN)  { if (p2.y < 224) p2.y++; }
+        if (pad2 & KEY_DOWN)  { if (p2.y < SCREEN_HEIGHT) p2.y++; }
         if (pad2 & KEY_LEFT)  { if (p2.x > 0) p2.x--; }
         if (pad2 & KEY_RIGHT) { if (p2.x < 248) p2.x++; }
 

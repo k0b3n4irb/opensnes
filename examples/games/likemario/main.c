@@ -229,7 +229,7 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
         base = VRAM_BG_MAP + 0x0400 + (vram_col - 32);
 
     /* Caller must ensure force blank or VBlank */
-    REG_VMAIN = 0x81;
+    REG_VMAIN = VMAIN_INC32;
     REG_VMADDL = base & 0xFF;
     REG_VMADDH = base >> 8;
 
@@ -243,7 +243,7 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
         REG_VMDATAH = 0;
     }
 
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
 }
 
 /**
@@ -329,7 +329,7 @@ static void map_flush_column(void) {
     if (!col_pending) return;
 
     /* Set VRAM address and vertical column mode (increment by 32 words) */
-    REG_VMAIN = 0x81;
+    REG_VMAIN = VMAIN_INC32;
     REG_VMADDL = col_vram_base & 0xFF;
     REG_VMADDH = col_vram_base >> 8;
 
@@ -345,7 +345,7 @@ static void map_flush_column(void) {
     REG_DASH(1) = 0;
     REG_MDMAEN  = 0x02;            /* Fire DMA channel 1 */
 
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
     col_pending = 0;
 }
 
@@ -407,7 +407,7 @@ static void mario_init(void) {
 
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
-    oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
+    oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
     OAM_SET_GFX_BANK(0, mario_sprite_til, getSpriteTilBank());
 }
 
@@ -432,7 +432,7 @@ static void mario_handle_input(void) {
         if (mario_xvel < -MARIO_MAXACCEL)
             mario_xvel = -MARIO_MAXACCEL;
     } else if (pad & KEY_RIGHT) {
-        oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
+        oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
         if (mario_action == MARIO_ACT_STAND)
             mario_action = MARIO_ACT_WALK;
         mario_xvel += MARIO_ACCEL;

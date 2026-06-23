@@ -107,7 +107,7 @@ CSRC     := main.c
 
 # Use OpenSNES library
 USE_LIB  := 1
-LIB_MODULES := console sprite dma background input
+LIB_MODULES := console dma text background
 
 # Include the build system
 include $(OPENSNES)/make/common.mk
@@ -118,8 +118,8 @@ include $(OPENSNES)/make/common.mk
 #include <snes.h>
 
 int main(void) {
-    consoleInit();
-    consoleDrawText(8, 10, "Hello SNES!");
+    textModeInit();                     /* sets up the PPU + text engine in one call */
+    textPrintAt(8, 10, "Hello SNES!");  /* NMI auto-flushes the text to VRAM */
     setScreenOn();
 
     while (1) {
@@ -200,7 +200,7 @@ This takes a few minutes. Expected output:
 Building cc65816 compiler...
 Building WLA-DX assembler...
 Building OpenSNES library...
-Building examples... (52 ROMs)
+Building examples... (56 ROMs)
 OpenSNES SDK build complete!
 ```
 

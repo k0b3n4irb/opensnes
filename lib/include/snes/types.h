@@ -29,11 +29,12 @@
  * @defgroup types Fixed-Width Types
  * @brief Integer types with guaranteed sizes
  *
- * On the 65816 CPU (cproc compiler):
- * - char = 8 bits
+ * On the 65816 CPU (cproc compiler), since chantier A1 (2026-05-08):
+ * - char  = 8 bits
  * - short = 16 bits
- * - int = 32 bits (4 bytes)
- * - long = 64 bits (8 bytes — NOT 32-bit!)
+ * - int   = 16 bits (2 bytes)
+ * - long  = 32 bits (4 bytes)
+ * (see compiler/cproc/type.c — `typeint` size 2, `typelong` size 4.)
  *
  * Always use these typedefs instead of C primitive types.
  * @{

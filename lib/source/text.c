@@ -80,19 +80,17 @@ static void buffer_write_entry(u8 x, u8 y, u16 entry) {
 }
 
 void textInit(u16 tilemap_addr, u16 font_tile, u8 palette) {
-    /* tilemap_addr is a VRAM byte address. The PPU tilemap pointer
-     * registers (BG1SC..BG4SC) expect a word address — divide by 2 for
-     * the storage. This matches v1 textInitEx convention; the v1
-     * textInit(void) used a hard-coded word address (0x3800) which is
-     * the same as byte $7000 / 2. */
-    text_config.tilemap_addr = tilemap_addr >> 1;
+    /* tilemap_addr is a VRAM WORD address — same unit as bgSetMapPtr,
+     * bgSetGfxPtr, dmaCopyVram, textLoadFont and the rest of the SDK.
+     * (Before v0.23.0 this was a byte address; the >>1 conversion is gone.) */
+    text_config.tilemap_addr = tilemap_addr;
     text_config.font_tile    = font_tile;
     text_config.palette      = palette & 0x07;
     text_config.priority     = 0;
     text_config.map_width    = 32;
 
     /* DMA target for NMI handler is the same word address. */
-    tilemap_vram_addr = tilemap_addr >> 1;
+    tilemap_vram_addr = tilemap_addr;
     tilemap_src_addr  = (u16)tilemapBuffer;
 
     cursor_x = 0;

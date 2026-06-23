@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 54 examples organized by topic, building
+Learn SNES development step by step. 56 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -23,7 +23,7 @@ from basic concepts to complete games.
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
 | 1 | [text/hello_world](text/hello_world/) | PPU, backgrounds, tiles, palette -- your first ROM |
-| 2 | [text/text_test](text/text_test/) | Text positioning, formatting, consoleDrawText |
+| 2 | [text/text_test](text/text_test/) | Text positioning, formatting, textPrintAt |
 | 3 | [graphics/sprites/simple_sprite](graphics/sprites/simple_sprite/) | OAM, sprite display, CGRAM split |
 | 4 | [input/two_players](input/two_players/) | Joypad reading, multiplayer input |
 

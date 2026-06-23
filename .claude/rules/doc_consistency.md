@@ -46,6 +46,23 @@ make lint-docs
 
 It exits 0 on green, 1 on drift with an actionable message per finding.
 
+## Doc-render convention: never put an inline `code` span inside `"..."`
+
+Doxygen's Markdown parser mangles an inline code span placed inside an ASCII
+double-quoted phrase — it leaks into the page as a literal `<tt>…</tt>` tag (when
+the line wraps) or as raw backticks (single line). So write the citation **or**
+the code, not code-inside-a-quote:
+
+- ✅ `the principle: compute the` `` `left` `` `and` `` `right` `` `edge …`
+- ✅ `PHILOSOPHY.md calls out "no printf in core lib"`  (quote, no backticks)
+- ❌ `"read from bank` `` `$00` `` `"`  ·  ❌ `"no` `` `printf` `` `in core lib"`
+
+A source-side regex can't reliably catch this (a code span *between* two quotes
+looks like one *inside* a quote), so the guard scans the **generated HTML**:
+`make docs && python3 devtools/check_doc_render.py` (wired into the `doc-render`
+CI job). Caught historically as `<tt>WH0</tt>`-style literals across the
+window/hdma/math/sram tutorials.
+
 ## When to update each anchor
 
 - **Version macros (`lib/include/snes.h:30-40`)**: in the same commit as

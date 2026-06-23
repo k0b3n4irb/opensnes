@@ -152,8 +152,8 @@ oamInitGfxSet(sprite_gfx, sprite_gfx_end - sprite_gfx,
               sprite_pal, sprite_pal_end - sprite_pal,
               0, 0x0000, OBJ_SIZE8_L16);
 
-// 3. Set sprite properties
-oamSet(0, x, y, 3, 0, 0, 0, 0);
+// 3. Set sprite properties — oamSet(id, x, y, tile, palette, priority, flags)
+oamSet(0, x, y, 0, 0, 3, 0);
 
 // 4. Make sure sprite is visible (not hidden)
 // oamSetVisible(0, OBJ_SHOW);  // If needed
@@ -183,7 +183,8 @@ if (pressed & KEY_B) { }    // B button (bit 15)
 **For basic audio**:
 ```c
 audioInit();
-audioPlaySample(channel, sample_data, sample_size, pitch);
+audioLoadSample(0, sample_brr, sample_brr_end - sample_brr, 0); // id, BRR data, size, loop point
+audioPlaySample(0);                                             // play sample id 0
 ```
 
 **For SNESMOD**:

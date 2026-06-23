@@ -99,7 +99,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
 | **30 hardware modules** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **54 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **56 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
 | **Debug emulator** | luna (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |

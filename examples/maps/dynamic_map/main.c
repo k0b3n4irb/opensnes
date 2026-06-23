@@ -325,7 +325,7 @@ int main(void) {
     bgSetGfxPtr(1, VRAM_BG2_GFX);
     bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
     textLoadFont4bpp(VRAM_FONT);
-    textInit(VRAM_BG2_MAP * 2, FONT_TILE_OFFSET, 1);
+    textInit(VRAM_BG2_MAP, FONT_TILE_OFFSET, 1);
 
     /* Set text palette (palette 1, color 1 = white) */
     setColor(17, RGB(31, 31, 31));  /* palette 1, color 1 = white */

@@ -7,14 +7,21 @@
  *
  * @author OpenSNES Team
  * @copyright MIT License
- *
- * @todo Implement video functions
  */
 
 #ifndef OPENSNES_VIDEO_H
 #define OPENSNES_VIDEO_H
 
 #include <snes/types.h>
+
+/*============================================================================
+ * Screen dimensions (NTSC visible area)
+ *============================================================================*/
+
+/** @brief Visible screen width in pixels. */
+#define SCREEN_WIDTH   256
+/** @brief Visible screen height in pixels (NTSC, 224 lines). */
+#define SCREEN_HEIGHT  224
 
 /*============================================================================
  * Background Modes

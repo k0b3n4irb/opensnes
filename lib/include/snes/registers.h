@@ -110,6 +110,12 @@
 
 /** @brief VRAM address increment mode (W) */
 #define REG_VMAIN       (*(vu8*)0x2115)
+/** @brief VMAIN: auto-increment the VRAM address by 1 word after the high-byte
+ *  write ($2119) — the standard word-at-a-time write mode. */
+#define VMAIN_INC1      0x80
+/** @brief VMAIN: auto-increment the VRAM address by 32 words after the high-byte
+ *  write ($2119) — for writing tilemap columns down a 32-wide map. */
+#define VMAIN_INC32     0x81
 
 /** @brief VRAM address low (W) */
 #define REG_VMADDL      (*(vu8*)0x2116)
