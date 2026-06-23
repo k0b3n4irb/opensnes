@@ -18,9 +18,7 @@ HDMA is different in three ways:
 1. **Timing** — the PPU's HBlank window between scanlines, every scanline,
    for as long as the channel stays enabled. Not on demand; it just keeps
    running once configured.
-2. **Cadence** — you supply a *table* in memory that says "write this
-   value(s) for *N* scanlines, then write that value for *M* scanlines,
-   then stop". The PPU walks the table as it draws each frame.
+2. **Cadence** — you supply a *table* in memory that says: write this value(s) for `N` scanlines, then write that value for `M` scanlines, then stop. The PPU walks the table as it draws each frame.
 3. **Cost** — HDMA reads steal a few machine cycles from each scanline.
    The 65816 still runs your code, just slightly slower during active
    display. You're paying for the per-scanline write.
@@ -264,7 +262,7 @@ This is enforced by convention, not by code. The lib's documentation
 `hdmaSetup` hardcodes bank `$00` for ROM source addresses (≥ `$8000`).
 If your table is a `static const u8 mytable[] = …` and bank `$00`'s 32 KB
 filled up, the linker spills the table into bank `$01+` — but `hdmaSetup`
-still tells the PPU "read from bank `$00`, address X". The PPU happily
+still tells the PPU to read from bank `$00`, address X. The PPU happily
 reads garbage from wherever bank `$00` address X lands.
 
 Two fixes:

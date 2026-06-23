@@ -323,7 +323,7 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
  *
  * @note **Performance**: the old framesize=158 cliff (≈3 calls/frame caused
  * jitter) was RESOLVED by an ASM rewrite — see KNOWN_LIMITATIONS.md
- * ("`oamSet()` framesize cliff — RESOLVED"). `oamSet()` is now cheap; use it
+ * ("oamSet() framesize cliff — RESOLVED"). `oamSet()` is now cheap; use it
  * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
  * (see "Fast Macro Sprite API" below) trim a little more overhead.
  *

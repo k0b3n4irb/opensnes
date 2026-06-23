@@ -149,3 +149,24 @@ jobs:
       - name: Run test_check_vram_layout.py
         working-directory: devtools
         run: python3 -m unittest test_check_vram_layout
+
+  doc-render:
+    name: Doc render leaks (check_doc_render.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Build docs + scan for un-rendered Markdown
+        # Doxygen mangles an inline `code` span placed inside an ASCII "..." quote:
+        # it leaks into the page as a literal &lt;tt&gt; tag (when the line wraps)
+        # or as raw backticks (single line). A source-side regex can't tell "code
+        # inside a quote" from "code between two quotes", so we build the HTML and
+        # scan the rendered output (zero false positives). Caught historically as
+        # `<tt>WH0</tt>`-style literals across the window/hdma/math/sram tutorials.
+        run: |
+          make docs
+          python3 devtools/check_doc_render.py
