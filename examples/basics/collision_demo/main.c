@@ -259,7 +259,7 @@ static void draw_tilemap(void) {
     u16 addr;
     u8 tile;
 
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
 
     /* Clear entire 32x32 tilemap at $0400 with tile 0 (empty) */
     dmaFillVRAM(0, VRAM_BG_TILEMAP, 1024 * 2);

@@ -267,7 +267,7 @@ demo; production code is not.
 ### 🔴 Battery dies → silent corruption
 
 A 10–20-year-old cartridge's coin-cell battery can fail. When it
-does, SRAM contents drift toward "all `$00`" or "all `$FF`" or
+does, SRAM contents drift toward "all $00" or "all $FF" or
 random patterns. Your validation must catch both:
 
 - **Magic number**: deterministic — fails if SRAM is all `$00`,

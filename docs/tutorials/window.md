@@ -115,9 +115,7 @@ scanlines, the window should be from `left` to `right`":
 The shipped `examples/graphics/effects/window` uses HDMA channels 4
 and 5 in repeat mode to write `WH0` (`$2126`) and `WH1` (`$2127`) per
 scanline, producing an animated triangle/diamond. Read the example for
-the table-build pattern; the principle is "compute `left[s]` and
-`right[s]` for each scanline `s`, lay them out as an HDMA table,
-trigger".
+the table-build pattern; the principle: compute the `left` and `right` window edge for each scanline `s`, lay them out as an HDMA table, then trigger.
 
 ## When the window register acts strange
 

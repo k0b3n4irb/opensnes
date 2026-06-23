@@ -321,11 +321,11 @@ void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
  * @param priority Priority (0-3, 3=highest)
  * @param flags Flip flags (bit 6 = H flip, bit 7 = V flip)
  *
- * @warning **Performance**: oamSet() has framesize=158 per call (158 bytes of
- * stack manipulation due to SSA temporaries). Calling it more than 2-3 times
- * per frame in the main loop causes visible jitter on real hardware.
- * Use oamSetFast() or oamSetXYFast() macros for performance-critical code
- * (see "Fast Macro Sprite API" section below).
+ * @note **Performance**: the old framesize=158 cliff (≈3 calls/frame caused
+ * jitter) was RESOLVED by an ASM rewrite — see KNOWN_LIMITATIONS.md
+ * ("oamSet() framesize cliff — RESOLVED"). `oamSet()` is now cheap; use it
+ * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
+ * (see "Fast Macro Sprite API" below) trim a little more overhead.
  *
  * @warning **Coordinate Variable Pattern**: Due to a compiler quirk, sprite
  * coordinates MUST be stored in a struct with s16 members for correct behavior.

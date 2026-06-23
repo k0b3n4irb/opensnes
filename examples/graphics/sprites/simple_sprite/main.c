@@ -52,6 +52,7 @@ extern u8 palsprite32[];
  */
 int main(void) {
     consoleInit();
+    setMode(BG_MODE1, 0);  /* set the video mode up front, before VRAM/OAM setup */
 
     /* DMA sprite tiles to VRAM word address $2100.
      * WaitForVBlank() ensures we are in VBlank when the DMA runs, because
@@ -81,10 +82,9 @@ int main(void) {
      * Visibility is controlled by Y position; oamSet above placed it on-screen. */
     oamSetSize(0, OBJ_LARGE);
 
-    /* Enable Mode 1 with only the OBJ (sprite) layer visible.
-     * No background layers are enabled, so the backdrop color (CGRAM 0) fills
-     * the rest of the screen. */
-    setMode(BG_MODE1, 0);
+    /* Show only the OBJ (sprite) layer; no BG layers are enabled, so the
+     * backdrop colour (CGRAM 0) fills the rest of the screen.
+     * setScreenOn() is always last. */
     setMainScreen(LAYER_OBJ);
     setScreenOn();
 
