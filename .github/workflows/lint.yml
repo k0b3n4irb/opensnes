@@ -120,3 +120,23 @@ jobs:
         # silently rot. Fixtures re-homed from the removed tools/debug-fixtures
         # (formerly consumed by the opensnes-emu runner).
         run: python3 devtools/symmap/test_symmap.py
+
+  vram-layout:
+    name: VRAM base alignment (check_vram_layout.py)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v4
+
+      - name: Run check_vram_layout.py
+        # BG/sprite VRAM bases are programmed through registers that store only
+        # the high address bits, so a misaligned base (e.g. bgSetGfxPtr(0,0x0800)
+        # -> tiles silently read from 0x0000) is a silent failure with no error.
+        # This scans every example .c, resolves literal / simple-#define VRAM
+        # bases, and fails on a misaligned one (unresolvable args are skipped, so
+        # it never false-fails). Also runs per-PR via `make lint`.
+        run: python3 devtools/check_vram_layout.py
+
+      - name: Run test_check_vram_layout.py
+        working-directory: devtools
+        run: python3 -m unittest test_check_vram_layout

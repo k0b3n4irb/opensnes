@@ -12,7 +12,8 @@
   `changelog`, `test`, `tests`) plus emerged categories matching real
   paths (`chantiers` → `.claude/notes/chantiers/`, `rules` →
   `.claude/rules/`, `bench` → bench fixtures, `luna-test` →
-  `tools/luna-test/`). The canonical
+  `tools/luna-test/`, `conventions` → `.claude/notes/conventions/`).
+  The canonical
   source-of-truth list lives in `devtools/lint_commits.py`'s
   `ALLOWED_SCOPES` set — extend BOTH places in the same commit.
 - Format: `type(scope): description` — non-empty description, no

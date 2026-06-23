@@ -57,6 +57,7 @@ extern u8 spritehero8_til[];
 #include "res/hero8_meta.inc"
 #include "res/hero16_meta.inc"
 #include "res/hero32_meta.inc"
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /*
  * VRAM Layout — all three sprite sizes are loaded contiguously:
@@ -70,16 +71,15 @@ extern u8 spritehero8_til[];
  * All sprite tiles are addressable as OAM tile numbers 0-303.
  */
 
+/* VRAM_SPRITES / VRAM_FONT / VRAM_TEXT_MAP come from the generated vram_map.h.
+ * The three hero sub-sheets are laid out at fixed offsets inside the sprite
+ * region (the solver places the region base; sub-sheet packing stays manual). */
 /** @brief VRAM word address for 32x32 hero tiles */
-#define VRAM_HERO32   0x0000
+#define VRAM_HERO32   VRAM_SPRITES
 /** @brief VRAM word address for 16x16 hero tiles (after 32x32 tiles) */
-#define VRAM_HERO16   0x0C00
+#define VRAM_HERO16   (VRAM_SPRITES + 0x0C00)
 /** @brief VRAM word address for 8x8 hero tiles (after 16x16 tiles) */
-#define VRAM_HERO8    0x1200
-/** @brief VRAM word address for the 4bpp BG1 font tiles */
-#define VRAM_FONT     0x4000
-/** @brief VRAM word address for the BG1 text tilemap */
-#define VRAM_TEXT_MAP 0x6800
+#define VRAM_HERO8    (VRAM_SPRITES + 0x1200)
 
 /** @brief Number of tiles in the 32x32 hero sprite sheet */
 #define HERO32_TILES  192

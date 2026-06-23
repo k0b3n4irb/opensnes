@@ -64,6 +64,9 @@ ALLOWED_SCOPES = {
     "chantiers", "rules", "bench",
     # luna test-harness migration (2026-06-21): real path tools/luna-test/
     "luna-test",
+    # conventions notes (2026-06-23): real path .claude/notes/conventions/
+    # (sibling of `chantiers`/`rules` above).
+    "conventions",
 }
 
 SUBJECT_RE = re.compile(

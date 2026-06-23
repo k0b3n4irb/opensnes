@@ -5,6 +5,41 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.22.0] — 2026-06-23
+
+Developer-experience & test-infrastructure release. **No lib / compiler / runtime
+API changes** — those shipped binaries are unchanged from v0.21.3; the gains are
+new devtools, a major test-harness expansion, and two examples migrated to a
+generated VRAM layout (which render pixel-identically).
+
+### Added
+- **VRAM layout tooling** (`devtools/vram_layout/`): a declarative per-example
+  `vram.spec` → an OR-Tools CP-SAT solver generates a committed `vram_map.h` of
+  base addresses (aligned, non-overlapping, fit, min high-water). ortools is
+  generation-only (pinned seed → reproducible); the build consumes the committed
+  header and never needs it.
+- **VRAM linter** (`make lint-vram`, CI): pure-stdlib gate that flags a misaligned
+  BG/sprite base (silently masked by the hardware → wrong tiles) and validates each
+  committed `vram_map.h` against its `vram.spec`. Catches the silent-failure class
+  statically; never false-fails.
+- **Test-harness expansion** (luna): coprocessor-execution proof (Super FX / SA-1
+  instruction traces) with SA-1 chip→I-RAM handshake assertion; SRAM battery
+  power-cycle round-trip; debug-channel runtime harness (`SNES_NOCASH` / `SNES_ASSERT`
+  → `--nocash-out` / `--wdm-out`); SNES Mouse and Super Scope input probes; and a
+  VRAM-DMA **timing-safety** check (`force_blank`) that asserts zero VRAM writes
+  during active display — the #1 silent failure, testable for the first time.
+  Functional probes 10 → 14.
+
+### Changed
+- **Test backend**: pinned luna `v1.0.0` → `v1.1.0` (peripheral input + `force_blank`
+  trace column, both from our RFE). No rendering drift (visual regression 56/56).
+- **Examples**: `collision_demo` and `metasprite` migrated to the generated
+  `vram_map.h` (single source of truth, no magic numbers); identical rendering,
+  ~24 KB / ~16 KB of VRAM high-water reclaimed respectively.
+
+### Docs
+- `gh` auth-via-`.env` convention note (`.claude/notes/conventions/`).
+
 ## [0.21.3] — 2026-06-22
 
 Maintenance release — test-backend pin bump only. **No API / library / runtime /
