@@ -5,6 +5,45 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.23.0] — 2026-06-23
+
+API-consistency & documentation-quality release, from a 3-agent audit (API
+currency, magic numbers, developer experience). One breaking API fix, two new
+constant sets, and a deep doc-rendering fix.
+
+### Changed
+- **BREAKING — `textInit()` takes a VRAM word address** (was a byte address). It
+  was the SDK's lone unit inconsistency: every other call (`dmaCopyVram`,
+  `bgSetGfxPtr`/`bgSetMapPtr`, `oam*`, `textLoadFont`) already uses word
+  addresses. Migration: pass `W` where you used to pass `W * 2`;
+  `TEXT_DEFAULT_TILEMAP_ADDR` is now `0x3800`. All in-repo call sites updated;
+  runtime result unchanged (visual regression 56/56).
+
+### Added
+- `VMAIN_INC1` / `VMAIN_INC32` (registers.h) — named VRAM-increment modes,
+  replacing raw `REG_VMAIN = 0x80/0x81`.
+- `SCREEN_WIDTH` (256) / `SCREEN_HEIGHT` (224) (video.h).
+
+### Fixed
+- **Docs rendering**: inline `code` spans inside `"..."` quotes were mangled by
+  Doxygen (literal `<tt>`/`<em>` tags / raw backticks leaking into the published
+  pages). Fixed the affected tutorial + header spans, and **pinned Doxygen to
+  1.16.1** for the docs build (ubuntu's 1.9.8 has a severe form of the bug that
+  was breaking the live GitHub Pages site).
+- **Onboarding doc drift**: phantom `consoleDrawText()` in GETTING_STARTED (won't
+  link) → `textModeInit`/`textPrintAt`; stale `oamSet` framesize warning removed;
+  `oamSet` signature corrected in TROUBLESHOOTING + tutorials (was the old
+  PVSnesLib arg order); `types.h`/`CLAUDE.md` int/long sizes corrected to the
+  post-A1 truth (int=2, long=4); example counts → 56; `sa1_hello` comment
+  0xA1→0xA5; `video.h` stale `@todo` removed.
+- `simple_sprite` init order (`setMode` moved before VRAM/OAM setup); raw `0x40`
+  H-flip → `OBJ_FLIPX` across likemario/koopatroopa/slopemario.
+
+### Tooling
+- New doc sentinels: phantom-API detector (GETTING_STARTED/TROUBLESHOOTING) and
+  `check_doc_render.py` (scans the generated HTML for un-rendered Markdown);
+  example-count drift check extended to onboarding docs. All wired into CI.
+
 ## [0.22.0] — 2026-06-23
 
 Developer-experience & test-infrastructure release. **No lib / compiler / runtime
