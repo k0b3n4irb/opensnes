@@ -13,7 +13,7 @@ maths goes through `fixSin`/`fixCos`/`fixMul` constantly.
 
 Floating point on the SNES is **possible** but **expensive**. cproc /
 QBE can emit software-float code (the lib avoids it deliberately —
-`PHILOSOPHY.md` calls out "no `printf` in core lib" partly because
+`PHILOSOPHY.md` calls out "no printf in core lib" partly because
 formatted-output helpers force software floats), but a single
 `float` multiply costs ~500 cycles. At 60 fps with 1369 cycles per
 scanline, a few floats per frame is fine; per-sprite or per-particle is
@@ -396,7 +396,7 @@ lines of repeated `fixMul`; everything else (logarithm, general
 power) is per-game territory — bake a LUT for the specific
 range your game cares about.
 
-The PHILOSOPHY non-goal "no `printf` in core lib" extends here in
+The PHILOSOPHY non-goal "no printf in core lib" extends here in
 spirit: the lib provides what most games need, and skips the heavy
 weight that most games don't.
 
