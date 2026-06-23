@@ -16,6 +16,8 @@ var video_8h =
     [ "LAYER_OBJ", "group__layer__enable.html#ga900967011f520c45c1cba018d929baa0", null ],
     [ "RGB", "video_8h.html#a4a118ad3ee36468a3fa616977a64864e", null ],
     [ "RGB24", "video_8h.html#ad8da1514f9cd03e3cda94953525627f2", null ],
+    [ "SCREEN_HEIGHT", "video_8h.html#a6974d08a74da681b3957b2fead2608b8", null ],
+    [ "SCREEN_WIDTH", "video_8h.html#a2cd109632a6dcccaa80b43561b1ab700", null ],
     [ "setColor", "video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c", null ],
     [ "setMainScreen", "video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d", null ],
     [ "setSubScreen", "video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe", null ],

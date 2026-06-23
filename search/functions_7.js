@@ -26,10 +26,10 @@ var searchData=
   ['hdmawindowshape_23',['hdmaWindowShape',['../hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6',1,'hdma.h']]],
   ['hexchar_24',['hexchar',['../memory_2superfx__hello_2main_8c.html#a0dc46f9cd79db57d53512e535e63278e',1,'main.c']]],
   ['hidedot_25',['hideDot',['../input_2superscope_2main_8c.html#ac07b8b77915794eb44a0c607312d2a5d',1,'main.c']]],
-  ['hudclearmessage_26',['hudclearmessage',['../hud_8c.html#a39e871ce996a37670216b9d07b624347',1,'hudClearMessage(void):&#160;hud.c'],['../hud_8h.html#a39e871ce996a37670216b9d07b624347',1,'hudClearMessage(void):&#160;hud.c']]],
-  ['hudinit_27',['hudinit',['../hud_8h.html#a4322f64e04a2bb7be09a2c11f3f6a0f1',1,'hudInit(void):&#160;hud.c'],['../hud_8c.html#a4322f64e04a2bb7be09a2c11f3f6a0f1',1,'hudInit(void):&#160;hud.c']]],
-  ['hudshowmessage_28',['hudshowmessage',['../hud_8c.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c'],['../hud_8h.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c']]],
-  ['hudupdatelevel_29',['hudupdatelevel',['../hud_8c.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c'],['../hud_8h.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c']]],
-  ['hudupdatelines_30',['hudupdatelines',['../hud_8c.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c'],['../hud_8h.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c']]],
-  ['hudupdatescore_31',['hudupdatescore',['../hud_8c.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c'],['../hud_8h.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c']]]
+  ['hudclearmessage_26',['hudClearMessage',['../hud_8c.html#a39e871ce996a37670216b9d07b624347',1,'hudClearMessage(void):&#160;hud.c'],['../hud_8h.html#a39e871ce996a37670216b9d07b624347',1,'hudClearMessage(void):&#160;hud.c']]],
+  ['hudinit_27',['hudInit',['../hud_8c.html#a4322f64e04a2bb7be09a2c11f3f6a0f1',1,'hudInit(void):&#160;hud.c'],['../hud_8h.html#a4322f64e04a2bb7be09a2c11f3f6a0f1',1,'hudInit(void):&#160;hud.c']]],
+  ['hudshowmessage_28',['hudShowMessage',['../hud_8c.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c'],['../hud_8h.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c']]],
+  ['hudupdatelevel_29',['hudUpdateLevel',['../hud_8c.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c'],['../hud_8h.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c']]],
+  ['hudupdatelines_30',['hudUpdateLines',['../hud_8c.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c'],['../hud_8h.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c']]],
+  ['hudupdatescore_31',['hudUpdateScore',['../hud_8c.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c'],['../hud_8h.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c']]]
 ];

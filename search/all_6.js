@@ -8,7 +8,7 @@ var searchData=
   ['5_20enemy_20ai_20goomba_20example_5',['5. Enemy AI (Goomba Example)',['../examples_games_mapandobjects.html#autotoc_md883',1,'']]],
   ['5_20gravity_20in_20two_20lines_6',['5. Gravity in Two Lines',['../examples_games_likemario.html#autotoc_md855',1,'']]],
   ['5_20grid_20collision_20don_20t_20loop_20over_20100_20bricks_7',['5. Grid Collision (Don&apos;t Loop Over 100 Bricks)',['../examples_games_breakout.html#autotoc_md827',1,'']]],
-  ['5_20idle_20loop_8',['5 idle loop',['../examples_graphics_backgrounds_mode1_lz77.html#autotoc_md1002',1,'5. Idle Loop'],['../examples_text_text_test.html#autotoc_md1528',1,'5. Idle Loop']]],
+  ['5_20idle_20loop_8',['5 Idle Loop',['../examples_graphics_backgrounds_mode1_lz77.html#autotoc_md1002',1,'5. Idle Loop'],['../examples_text_text_test.html#autotoc_md1528',1,'5. Idle Loop']]],
   ['5_20ndash_20maps_20and_20complete_20projects_9',['Level 5 &amp;ndash; Maps and Complete Projects',['../examples.html#autotoc_md1481',1,'']]],
   ['5_20text_20display_10',['5. Text display',['../examples_memory_save_game.html#autotoc_md1462',1,'']]],
   ['5_20the_20game_20state_20struct_11',['5. The Game State Struct',['../examples_graphics_backgrounds_continuous_scroll.html#autotoc_md910',1,'']]],

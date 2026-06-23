@@ -5,7 +5,7 @@ var searchData=
   ['7_20drop_20shadows_20free_20depth_2',['7. Drop Shadows (Free Depth)',['../examples_games_breakout.html#autotoc_md829',1,'']]],
   ['7_20is_20reserved_20for_20oam_20dma_3',['🔴 Channel 7 is reserved for OAM DMA',['../tutorial_hdma.html#autotoc_md208',1,'']]],
   ['7_20lights_20on_4',['7. Lights On',['../examples_text_hello_world.html#autotoc_md1497',1,'']]],
-  ['7_20needs_20tt_20dmacopyvrammode7_20tt_20not_20tt_20dmacopyvram_20tt_5',['🟡 Mode 7 needs &lt;tt&gt;dmaCopyVramMode7&lt;/tt&gt;, not &lt;tt&gt;dmaCopyVram&lt;/tt&gt;',['../tutorial_dma.html#autotoc_md164',1,'']]],
+  ['7_20needs_20dmacopyvrammode7_20not_20dmacopyvram_5',['🟡 Mode 7 needs &lt;span class=&quot;tt&quot;&gt;dmaCopyVramMode7&lt;/span&gt;, not &lt;span class=&quot;tt&quot;&gt;dmaCopyVram&lt;/span&gt;',['../tutorial_dma.html#autotoc_md164',1,'']]],
   ['7_20perspective_20pseudo_203d_20ground_20effect_6',['Mode 7 Perspective -- Pseudo-3D Ground Effect',['../examples_graphics_backgrounds_mode7_perspective.html',1,'examples_graphics_backgrounds']]],
   ['7_20rotation_20and_20scaling_7',['Mode 7 -- Rotation and Scaling',['../examples_graphics_backgrounds_mode7.html',1,'examples_graphics_backgrounds']]],
   ['7_20the_20main_20loop_8',['7. The Main Loop',['../examples_games_likemario.html#autotoc_md857',1,'']]],

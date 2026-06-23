@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['background_0',['background',['../examples_graphics_backgrounds_mode0.html',1,'Mode 0 — 4-Layer 2bpp Background'],['../examples_graphics_backgrounds_mode3.html',1,'Mode 3 — 256-Color Background'],['../examples_graphics_backgrounds_mode5.html',1,'Mode 5 — Hi-Res 512×256 Background']]],
-  ['background_20examples_1',['Background Examples',['../examples_graphics_backgrounds.html',1,'examples_graphics']]],
-  ['backgrounds_2',['Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds',['../examples_graphics_backgrounds_mode1_bg3_priority.html',1,'examples_graphics_backgrounds']]],
-  ['backgrounds_20tutorial_3',['Graphics &amp; Backgrounds Tutorial',['../tutorial_graphics.html',1,'index']]],
-  ['basics_20examples_4',['Basics Examples',['../examples_basics.html',1,'examples']]],
-  ['bg3_20high_20priority_20hud_20layer_20over_20backgrounds_5',['Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds',['../examples_graphics_backgrounds_mode1_bg3_priority.html',1,'examples_graphics_backgrounds']]],
-  ['block_20effect_6',['Mosaic -- PPU Pixel Block Effect',['../examples_graphics_effects_mosaic.html',1,'examples_graphics_effects']]],
-  ['breakout_7',['Breakout',['../examples_games_breakout.html',1,'examples_games']]],
-  ['browse_20examples_20by_20category_8',['Browse Examples by Category',['../examples_by_category.html',1,'index']]],
-  ['by_20category_9',['Browse Examples by Category',['../examples_by_category.html',1,'index']]]
+  ['8_208_20fixed_20point_20format_0',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md230',1,'']]],
+  ['8_208_20fixed_20point_20scale_1',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1027',1,'']]],
+  ['8_20color_20cycling_20between_20levels_2',['8. Color Cycling Between Levels',['../examples_games_breakout.html#autotoc_md830',1,'']]],
+  ['8_20fixed_20point_20format_3',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md230',1,'']]],
+  ['8_20fixed_20point_20scale_4',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1027',1,'']]],
+  ['8_20transfer_20modes_5',['The 8 transfer modes',['../tutorial_dma.html#autotoc_md152',1,'']]],
+  ['8bpp_20tiles_6',['Mode 3 and 8bpp Tiles',['../examples_maps_dynamic_map.html#autotoc_md1380',1,'']]]
 ];

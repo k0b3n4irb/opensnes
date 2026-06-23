@@ -32,7 +32,7 @@ var searchData=
   ['objloadobjects_29',['objLoadObjects',['../object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a',1,'object.h']]],
   ['objnew_30',['objNew',['../object_8h.html#a5f3dd63b163cced3299b0d1d48d2b17a',1,'object.h']]],
   ['objrefreshall_31',['objRefreshAll',['../object_8h.html#aede8c571a7e8bdb8129b5df55b45225b',1,'object.h']]],
-  ['objregistertypes_32',['objregistertypes',['../maps_2slopemario_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c'],['../games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c']]],
+  ['objregistertypes_32',['objRegisterTypes',['../games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c'],['../maps_2slopemario_2main_8c.html#a74052cbd6e76b231e97756db972f22a8',1,'objRegisterTypes(void):&#160;main.c']]],
   ['objupdateall_33',['objUpdateAll',['../object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83',1,'object.h']]],
   ['objupdatexy_34',['objUpdateXY',['../object_8h.html#af27124be823e35daf579362d3820738d',1,'object.h']]],
   ['on_5finit_35',['on_init',['../basics_2aim__target_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c'],['../basics_2random_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c'],['../basics_2timer_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c'],['../input_2controller_2main_8c.html#a8a0d3bc95bdfda1fef8948aa09b48dd4',1,'on_init(void):&#160;main.c']]],

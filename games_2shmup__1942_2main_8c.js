@@ -39,7 +39,6 @@ var games_2shmup__1942_2main_8c =
     [ "bullets_render", "games_2shmup__1942_2main_8c.html#a130d46bc8814527c43630807fd70cf92", null ],
     [ "bullets_update", "games_2shmup__1942_2main_8c.html#ab2ea1aafd7d5a6283af67b3db431d88d", null ],
     [ "collisions_resolve", "games_2shmup__1942_2main_8c.html#ae7918e32f1952e750d4cde8b15a1068b", null ],
-    [ "DECLARE_BG_ASSET", "games_2shmup__1942_2main_8c.html#ab89fd6715a2d151f8bc9be0be89be811", null ],
     [ "enemies_init", "games_2shmup__1942_2main_8c.html#ad0ad1b3a2c87c160bb04994a90a8f2e3", null ],
     [ "enemies_render", "games_2shmup__1942_2main_8c.html#a7ec57cfaeb4d61596ac1ed3374698a7f", null ],
     [ "enemies_update", "games_2shmup__1942_2main_8c.html#ac0081dca576e0c6e41c8f645209098a9", null ],
@@ -59,5 +58,12 @@ var games_2shmup__1942_2main_8c =
     [ "player_pal", "games_2shmup__1942_2main_8c.html#a021cc3af08a3b3cec2749e7514e08222", null ],
     [ "player_pal_end", "games_2shmup__1942_2main_8c.html#ac68063429b056a8cda19fe5e74412e46", null ],
     [ "player_tiles", "games_2shmup__1942_2main_8c.html#a10e1db9413b95cad058f73b48d03cad4", null ],
-    [ "player_tiles_end", "games_2shmup__1942_2main_8c.html#a39a5cbf3814a39bc1a44491227835d0a", null ]
+    [ "player_tiles_end", "games_2shmup__1942_2main_8c.html#a39a5cbf3814a39bc1a44491227835d0a", null ],
+    [ "scene", "games_2shmup__1942_2main_8c.html#a9181964c99c78f9d466d51f152714e38", null ],
+    [ "scene_map", "games_2shmup__1942_2main_8c.html#a05047ee49321b67bc87e77c89285b152", null ],
+    [ "scene_map_end", "games_2shmup__1942_2main_8c.html#a7b64fca1dc7d9906abfa123eccc902e1", null ],
+    [ "scene_pal", "games_2shmup__1942_2main_8c.html#ae4d4b714aec8bb0c844a27fa7b9e72ab", null ],
+    [ "scene_pal_end", "games_2shmup__1942_2main_8c.html#aab1d8cd251cfff79f65665263d882051", null ],
+    [ "scene_tiles", "games_2shmup__1942_2main_8c.html#ad76d024dce41d4f4220ecab845ad0481", null ],
+    [ "scene_tiles_end", "games_2shmup__1942_2main_8c.html#acab8c1be494f228a4d49edb9ffd98558", null ]
 ];

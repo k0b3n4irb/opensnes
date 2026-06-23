@@ -26,7 +26,6 @@ var NAVTREE =
 [
   [ "OpenSNES", "index.html", [
     [ "OpenSNES Documentation", "index.html", "index" ],
-    [ "Todo List", "todo.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -56,13 +55,14 @@ var NAVTREEINDEX =
 "annotated.html",
 "examples_basics_aim_target.html#autotoc_md774",
 "examples_maps_mapscroll.html",
-"globals_vars_o.html",
-"group__ppu__regs.html",
-"index.html#autotoc_md9",
-"object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a",
-"sprite_8h.html#a656a4fc2908d4968baf82e82fa45f040",
-"system_8h.html#aaaa70a72e192e5cc318437192516fe9c"
+"globals_vars_t.html",
+"group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190",
+"input_2mouse_2main_8c.html",
+"object_8h.html#a9e81915d1e68d22798a93bb27eb74188",
+"sprite_8h.html#a697c4b66632525f55f21fb6008582b3f",
+"system_8h_source.html"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

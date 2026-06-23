@@ -23,7 +23,7 @@ var searchData=
   ['col_5fpending_20',['col_pending',['../games_2likemario_2main_8c.html#ada8c20d885ae7f2fca648d33d5ee7e06',1,'main.c']]],
   ['col_5fvram_5fbase_21',['col_vram_base',['../games_2likemario_2main_8c.html#aeaf219553df60aec9bc94d606d2fc2b5',1,'main.c']]],
   ['collision_5fflags_22',['collision_flags',['../basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444',1,'main.c']]],
-  ['collision_5fmap_23',['collision_map',['../basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e',1,'main.c']]],
+  ['collision_5fmap_23',['collision_map',['../basics_2collision__demo_2main_8c.html#a793d2b17e73273def2dc524d48aa51ba',1,'main.c']]],
   ['collision_5fpalette_24',['collision_palette',['../basics_2collision__demo_2main_8c.html#a9bf113cc8c0a116a54e1ee9a645f9e4a',1,'main.c']]],
   ['color_25',['color',['../games_2breakout_2main_8c.html#afbe561487f384d8fc8576b24bda1f8b6',1,'main.c']]],
   ['color_5fmode_26',['color_mode',['../structGfxAsset.html#a5acf752e53bfafcc243d041ecb3d5a80',1,'GfxAsset']]],

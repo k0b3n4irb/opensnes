@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['declare_5fbg_5fasset_0',['declare_bg_asset',['../graphics_2backgrounds_2mode1_2main_8c.html#a55596dc048998d585b7698be6be2ece4',1,'DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32):&#160;main.c'],['../games_2shmup__1942_2main_8c.html#ab89fd6715a2d151f8bc9be0be89be811',1,'DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x64):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a41837044e95f04ce84340e84f74419c3',1,'DECLARE_BG_ASSET(bg3, BG_16COLORS, SC_32x32):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a8d26087713a31b723cdd08af006acfb3',1,'DECLARE_BG_ASSET(bg2, BG_16COLORS, SC_32x32):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a3dd0b9511c15869f4bd0e682b31031ad',1,'DECLARE_BG_ASSET(bg1, BG_16COLORS, SC_32x32):&#160;main.c']]],
+  ['declare_5fbg_5fasset_0',['DECLARE_BG_ASSET',['../graphics_2backgrounds_2mode1_2main_8c.html#a55596dc048998d585b7698be6be2ece4',1,'DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a3dd0b9511c15869f4bd0e682b31031ad',1,'DECLARE_BG_ASSET(bg1, BG_16COLORS, SC_32x32):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a8d26087713a31b723cdd08af006acfb3',1,'DECLARE_BG_ASSET(bg2, BG_16COLORS, SC_32x32):&#160;main.c'],['../graphics_2backgrounds_2mode1__bg3__priority_2main_8c.html#a41837044e95f04ce84340e84f74419c3',1,'DECLARE_BG_ASSET(bg3, BG_16COLORS, SC_32x32):&#160;main.c']]],
   ['die_1',['die',['../games_2breakout_2main_8c.html#adf3df1987cbb4300fdb910db84941579',1,'main.c']]],
   ['disablegradient_2',['disableGradient',['../graphics_2effects_2gradient__colors_2main_8c.html#a2b343bc67d8186b5bbaafe2711db8f94',1,'main.c']]],
   ['div16_3',['div16',['../math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab',1,'math.h']]],
@@ -20,12 +20,12 @@ var searchData=
   ['drawcursor_17',['drawCursor',['../graphics_2sprites_2object__size_2main_8c.html#a75bf0618c1d4e0f24afec3970e446a23',1,'main.c']]],
   ['drawmenu_18',['drawMenu',['../graphics_2sprites_2metasprite_2main_8c.html#a2dda27b37416157c96a876cd65710e7f',1,'main.c']]],
   ['drawplayfieldborder_19',['drawPlayfieldBorder',['../render_8c.html#aa976412847a62d7ea34364534e51bb13',1,'render.c']]],
-  ['drawsprite32x32_20',['drawsprite32x32',['../map32x32_8c.html#a7b46608f32c311138a37d5685e9ed0b6',1,'drawSprite32x32(u8 x, u8 y, u16 sprite):&#160;map32x32.c'],['../map32x32_8h.html#a7b46608f32c311138a37d5685e9ed0b6',1,'drawSprite32x32(u8 x, u8 y, u16 sprite):&#160;map32x32.c']]],
-  ['drawsprite64x64_21',['drawsprite64x64',['../map64x64_8c.html#a597829947e5cc8ee2f1e397c4762fdbe',1,'drawSprite64x64(u8 x, u8 y, u16 sprite):&#160;map64x64.c'],['../map64x64_8h.html#a597829947e5cc8ee2f1e397c4762fdbe',1,'drawSprite64x64(u8 x, u8 y, u16 sprite):&#160;map64x64.c']]],
+  ['drawsprite32x32_20',['drawSprite32x32',['../map32x32_8c.html#a7b46608f32c311138a37d5685e9ed0b6',1,'drawSprite32x32(u8 x, u8 y, u16 sprite):&#160;map32x32.c'],['../map32x32_8h.html#a7b46608f32c311138a37d5685e9ed0b6',1,'drawSprite32x32(u8 x, u8 y, u16 sprite):&#160;map32x32.c']]],
+  ['drawsprite64x64_21',['drawSprite64x64',['../map64x64_8c.html#a597829947e5cc8ee2f1e397c4762fdbe',1,'drawSprite64x64(u8 x, u8 y, u16 sprite):&#160;map64x64.c'],['../map64x64_8h.html#a597829947e5cc8ee2f1e397c4762fdbe',1,'drawSprite64x64(u8 x, u8 y, u16 sprite):&#160;map64x64.c']]],
   ['drawspriteframe32x32_22',['drawSpriteFrame32x32',['../maps_2dynamic__map_2main_8c.html#a4f445bc77deb6426f13e88492ea7700c',1,'main.c']]],
   ['drawspriteframe64x64_23',['drawSpriteFrame64x64',['../maps_2dynamic__map_2main_8c.html#a78c0c057f07815196421a2de2e51c7dd',1,'main.c']]],
   ['drawspriteraw32x32_24',['drawSpriteRaw32x32',['../map32x32_8c.html#aab61b44f0d9b89575e635964bf1ab3ed',1,'map32x32.c']]],
   ['drawspriteraw64x64_25',['drawSpriteRaw64x64',['../map64x64_8c.html#a61124d39bf69d92930c4ec2f5425256f',1,'map64x64.c']]],
-  ['drawsprites_26',['drawsprites',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c'],['../graphics_2sprites_2metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c']]],
+  ['drawsprites_26',['drawSprites',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c'],['../graphics_2sprites_2metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c']]],
   ['drawtext_27',['drawText',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#a10ff78cf96efa1288ccd4155d97161a4',1,'main.c']]]
 ];

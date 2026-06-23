@@ -1,14 +1,11 @@
 var searchData=
 [
-  ['oam_20object_20attribute_20memory_0',['SNES OAM (Object Attribute Memory)',['../oam.html',1,'index']]],
-  ['oam_20sprite_1',['Simple Sprite -- Your First OAM Sprite',['../examples_graphics_sprites_simple_sprite.html',1,'examples_graphics_sprites']]],
-  ['object_20attribute_20memory_2',['SNES OAM (Object Attribute Memory)',['../oam.html',1,'index']]],
-  ['object_20size_20all_206_20snes_20sprite_20size_20modes_3',['Object Size -- All 6 SNES Sprite Size Modes',['../examples_graphics_sprites_object_size.html',1,'examples_graphics_sprites']]],
-  ['objects_4',['Map and Objects',['../examples_games_mapandobjects.html',1,'examples_games']]],
-  ['opensnes_5',['opensnes',['../contributing.html',1,'Contributing to OpenSNES'],['../getting_started.html',1,'Getting Started with OpenSNES'],['../troubleshooting.html',1,'Troubleshooting OpenSNES']]],
-  ['opensnes_20code_20style_20guide_6',['OpenSNES Code Style Guide',['../code_style.html',1,'index']]],
-  ['opensnes_20documentation_7',['OpenSNES Documentation',['../index.html',1,'']]],
-  ['opensnes_20examples_8',['OpenSNES Examples',['../examples.html',1,'index']]],
-  ['over_20backgrounds_9',['Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds',['../examples_graphics_backgrounds_mode1_bg3_priority.html',1,'examples_graphics_backgrounds']]],
-  ['overview_10',['SNES Hardware Overview',['../hardware_overview.html',1,'index']]]
+  ['jerky_0',['Scrolling is jerky',['../troubleshooting.html#autotoc_md575',1,'']]],
+  ['joy1_204_20auto_20read_20results_1',['$4218-$421F - JOY1-4 (Auto-Read Results)',['../registers.html#autotoc_md690',1,'']]],
+  ['joypad_20bit_20layout_2',['Joypad Bit Layout',['../examples_input.html#autotoc_md1318',1,'']]],
+  ['joypad_20read_3',['Auto-Joypad Read',['../examples_input_two_players.html#autotoc_md1372',1,'']]],
+  ['joypad_20registers_4',['Joypad Registers',['../registers.html#autotoc_md689',1,'']]],
+  ['joypad_20status_5',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md673',1,'']]],
+  ['just_20move_20the_20pointer_6',['5. Animation = Just Move the Pointer',['../examples_graphics_effects_hdma_wave.html#autotoc_md1111',1,'']]],
+  ['just_20works_7',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#autotoc_md615',1,'']]]
 ];

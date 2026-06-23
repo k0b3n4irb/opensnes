@@ -29,7 +29,7 @@ var searchData=
   ['mariogfx_26',['mariogfx',['../maps_2slopemario_2mario_8c.html#a53716e2abcc85b968842b92a4705dd50',1,'mario.c']]],
   ['marioid_27',['marioid',['../games_2mapandobjects_2mario_8c.html#a3486f7a8cf9a9894d082c117181c957f',1,'marioid:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#a3486f7a8cf9a9894d082c117181c957f',1,'marioid:&#160;mario.c']]],
   ['mariopal_28',['mariopal',['../maps_2slopemario_2mario_8c.html#a9c404b92f0c1acebd3283646550fc797',1,'mario.c']]],
-  ['mariox_29',['mariox',['../maps_2slopemario_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c'],['../games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c']]],
+  ['mariox_29',['mariox',['../games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2',1,'mariox:&#160;mario.c']]],
   ['marioy_30',['marioy',['../games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1',1,'marioy:&#160;mario.c'],['../maps_2slopemario_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1',1,'marioy:&#160;mario.c']]],
   ['max_5fscroll_5fheight_31',['max_scroll_height',['../maps_2dynamic__map_2main_8c.html#a799e60ce2f39f87a4e9712520da582fd',1,'main.c']]],
   ['max_5fscroll_5fwidth_32',['max_scroll_width',['../maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b',1,'main.c']]],

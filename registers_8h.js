@@ -120,5 +120,7 @@ var registers_8h =
     [ "TM_BG2", "group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433", null ],
     [ "TM_BG3", "group__reg__const.html#ga4bb07912d1f93dcb1ab7d52ba2c7d758", null ],
     [ "TM_BG4", "group__reg__const.html#ga5d2e79f6af8edc7fa6134dc75bc3168e", null ],
-    [ "TM_OBJ", "group__reg__const.html#ga904faa4d363b90e91ea62d36dbbab949", null ]
+    [ "TM_OBJ", "group__reg__const.html#ga904faa4d363b90e91ea62d36dbbab949", null ],
+    [ "VMAIN_INC1", "group__ppu__regs.html#ga29e0fc8e6004e011f0e32bec557a25ee", null ],
+    [ "VMAIN_INC32", "group__ppu__regs.html#ga936828c61204c8d80cf616377efdf070", null ]
 ];

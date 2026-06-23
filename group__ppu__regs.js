@@ -63,5 +63,7 @@ var group__ppu__regs =
     [ "REG_WH2", "group__ppu__regs.html#gad1a3df26afa53c8a9bcaadae8eb0c529", null ],
     [ "REG_WH3", "group__ppu__regs.html#ga8aa8f353fd99ab0fc06c5204172e4ef0", null ],
     [ "REG_WOBJLOG", "group__ppu__regs.html#gaf035bcd93033b2a2389394a9138bb94d", null ],
-    [ "REG_WOBJSEL", "group__ppu__regs.html#gabfb8b85d25c2b954e2d78cc27b4c0f71", null ]
+    [ "REG_WOBJSEL", "group__ppu__regs.html#gabfb8b85d25c2b954e2d78cc27b4c0f71", null ],
+    [ "VMAIN_INC1", "group__ppu__regs.html#ga29e0fc8e6004e011f0e32bec557a25ee", null ],
+    [ "VMAIN_INC32", "group__ppu__regs.html#ga936828c61204c8d80cf616377efdf070", null ]
 ];

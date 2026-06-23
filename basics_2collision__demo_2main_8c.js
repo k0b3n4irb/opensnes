@@ -16,7 +16,7 @@ var basics_2collision__demo_2main_8c =
     [ "update_sprites", "basics_2collision__demo_2main_8c.html#aba5f9aa34a63dd9bb122b71e58b88689", null ],
     [ "bg_palette", "basics_2collision__demo_2main_8c.html#af651334dea15b1ee583e22816ed290e7", null ],
     [ "collision_flags", "basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444", null ],
-    [ "collision_map", "basics_2collision__demo_2main_8c.html#a180c6e6fa533d22284477eea00f5e63e", null ],
+    [ "collision_map", "basics_2collision__demo_2main_8c.html#a793d2b17e73273def2dc524d48aa51ba", null ],
     [ "collision_palette", "basics_2collision__demo_2main_8c.html#a9bf113cc8c0a116a54e1ee9a645f9e4a", null ],
     [ "empty_tile", "basics_2collision__demo_2main_8c.html#a16dc96ce6b56ea6c030a6a86de599555", null ],
     [ "enemy_box", "basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a", null ],

@@ -16,7 +16,7 @@ var searchData=
   ['player_5fmin_5fx_13',['PLAYER_MIN_X',['../games_2shmup__1942_2main_8c.html#ab5f00d51972f39735de1b07d450a7300',1,'main.c']]],
   ['player_5fmin_5fy_14',['PLAYER_MIN_Y',['../games_2shmup__1942_2main_8c.html#a86d7b56831c95a7ec22e001a0e55ff11',1,'main.c']]],
   ['player_5fsize_15',['PLAYER_SIZE',['../basics_2collision__demo_2main_8c.html#a5fac8f2cc29ea5bde30c8fa4a4daa306',1,'main.c']]],
-  ['player_5fspeed_16',['player_speed',['../games_2shmup__1942_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c'],['../basics_2collision__demo_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c']]],
+  ['player_5fspeed_16',['PLAYER_SPEED',['../basics_2collision__demo_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c'],['../games_2shmup__1942_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c']]],
   ['player_5fx_17',['PLAYER_X',['../basics_2aim__target_2main_8c.html#a11d58baaffc49494ab91da16621b6a5c',1,'main.c']]],
   ['player_5fy_18',['PLAYER_Y',['../basics_2aim__target_2main_8c.html#ae22bdd9c98feb24a0843a4ff0fa6e662',1,'main.c']]],
   ['pos_5flevel_5fl_19',['POS_LEVEL_L',['../hud_8c.html#aa0a12af1a9b16c3c9e1d4166c5438588',1,'hud.c']]],

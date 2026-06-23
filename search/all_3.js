@@ -31,7 +31,7 @@ var searchData=
   ['2_20the_20vram_20map_20—_20a_20deliberate_20overlap_28',['2. The VRAM Map — A Deliberate Overlap',['../examples_games_breakout.html#autotoc_md824',1,'']]],
   ['2_20write_20gsu_20assembly_20code_29',['2. Write GSU Assembly Code',['../tutorial_superfx.html#autotoc_md359',1,'']]],
   ['2_20write_20your_20sa_201_20boot_20code_30',['2. Write Your SA-1 Boot Code',['../tutorial_sa1.html#autotoc_md290',1,'']]],
-  ['2026_2005_2009_31',['&lt;tt&gt;atan2&lt;/tt&gt; and &lt;tt&gt;sqrt&lt;/tt&gt; ship in the lib (chantier B6, 2026-05-09)',['../tutorial_math.html#autotoc_md249',1,'']]],
+  ['2026_2005_2009_31',['&lt;span class=&quot;tt&quot;&gt;atan2&lt;/span&gt; and &lt;span class=&quot;tt&quot;&gt;sqrt&lt;/span&gt; ship in the lib (chantier B6, 2026-05-09)',['../tutorial_math.html#autotoc_md249',1,'']]],
   ['256_20color_20background_32',['Mode 3 — 256-Color Background',['../examples_graphics_backgrounds_mode3.html',1,'examples_graphics_backgrounds']]],
   ['256_20color_20palette_33',['256-Color Palette',['../examples_graphics_backgrounds_mode7.html#autotoc_md1026',1,'']]],
   ['256_20colors_20×_202_20bytes_34',['CGRAM Layout (256 colors × 2 bytes)',['../snes_graphics_guide.html#autotoc_md494',1,'']]],

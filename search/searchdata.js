@@ -10,7 +10,7 @@ var indexSectionsWithContent =
   7: "sw",
   8: "abcdefghkmnoprstuvw",
   9: "abcdefilmprstvw",
-  10: "01234567abcdefghilmnoprstuvwy—"
+  10: "$0123456789abcdefghijklmnopqrstuvwxyz×–—→≥🔴🟠🟡🟢"
 };
 
 var indexSectionNames =
