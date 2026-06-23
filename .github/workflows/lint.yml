@@ -157,8 +157,14 @@ jobs:
       - name: Check out OpenSNES
         uses: actions/checkout@v4
 
-      - name: Install Doxygen
-        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+      - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
+        # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test
+        # the SAME version that publishes the docs, so it pins 1.16.1 too.
+        run: |
+          curl -fsSL -o /tmp/doxygen.tgz https://www.doxygen.nl/files/doxygen-1.16.1.linux.bin.tar.gz
+          tar xzf /tmp/doxygen.tgz -C /tmp
+          sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/
+          doxygen --version
 
       - name: Build docs + scan for un-rendered Markdown
         # Doxygen mangles an inline `code` span placed inside an ASCII "..." quote:
