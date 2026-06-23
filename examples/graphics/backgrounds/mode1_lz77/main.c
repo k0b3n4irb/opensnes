@@ -33,6 +33,7 @@
  * @see lzss.h, background.h, dma.h, video.h
  */
 #include <snes.h>
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 #include <snes/console.h>
 #include <snes/video.h>
 #include <snes/dma.h>
@@ -69,19 +70,19 @@ int main(void) {
     setScreenOff();
 
     /* Decompress tiles directly to VRAM at $4000 (LZ77 → VRAM) */
-    LzssDecodeVram(patterns, 0x4000);
+    LzssDecodeVram(patterns, VRAM_BG_TILES);
 
     /* Load palette (16 colors) */
     dmaCopyCGram(palette, 0,
                  (u16)(palette_end - palette));
 
     /* Load tilemap to VRAM at $0000 */
-    dmaCopyVram(map, 0x0000,
+    dmaCopyVram(map, VRAM_BG_MAP,
                 (u16)(map_end - map));
 
     /* Configure BG1: tilemap at $0000, tiles at $4000 */
-    bgSetMapPtr(0, 0x0000, SC_32x32);
-    bgSetGfxPtr(0, 0x4000);
+    bgSetMapPtr(0, VRAM_BG_MAP, SC_32x32);
+    bgSetGfxPtr(0, VRAM_BG_TILES);
 
     /* Mode 1, enable BG1 only */
     setMode(BG_MODE1, 0);
