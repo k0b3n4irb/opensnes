@@ -121,7 +121,8 @@ def sym_size(rom: Path, name: str) -> int:
 def assert_mem(luna: str, rom: Path, steps: int,
                specs: list[tuple[int, int, str]],
                input_script: str | None = None,
-               srm_in: "str | Path | None" = None) -> tuple[bool, str]:
+               srm_in: "str | Path | None" = None,
+               extra: "list[str] | None" = None) -> tuple[bool, str]:
     """Delegate WRAM equality to luna's `--assert BANK:OFFSET=HEX` (L2).
 
     specs = [(bank, offset, hexbytes), …] where hexbytes is the in-memory byte
@@ -130,12 +131,16 @@ def assert_mem(luna: str, rom: Path, steps: int,
 
     `srm_in` (luna v1.0.0) pre-loads a battery `.srm` before the run — the read
     half of a power-cycle test (write it with `capture_srm`).
+    `extra` (luna v1.1.0) injects extra luna flags, e.g. peripheral input
+    `["--port1", "mouse", "--mouse", "30:20,20,0"]`.
     """
     cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null"]
     if input_script:
         cmd += ["--input", input_script]
     if srm_in:
         cmd += ["--srm-in", str(srm_in)]
+    if extra:
+        cmd += extra
     for bank, off, hexb in specs:
         cmd += ["--assert", f"{bank:02X}:{off:04X}={hexb}"]
     cmd.append(str(rom))

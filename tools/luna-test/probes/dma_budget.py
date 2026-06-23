@@ -1,24 +1,22 @@
-"""Probe: VBlank DMA→VRAM budget (H2) — EXACT per-frame (luna v1.0.0).
+"""Probe: VRAM-DMA timing safety + VBlank budget (H2) — luna v1.1.0.
 
-The SNES can DMA ~4 KB to VRAM per VBlank; more silently corrupts on real
-hardware (KNOWN_LIMITATIONS 🟡). luna's `--dma-trace` logs every byte an MDMA
-writes to $2118/$2119, and v1.0.0 tags each row with `frame,line,blank`. So we
-no longer estimate an average — we bucket bytes by PPU frame and check the
-**peak** single frame, which is the real hardware risk (one over-budget VBlank
-corrupts, even if the average is fine).
+Two checks per example, both from luna's `--dma-trace` (one CSV row per byte an
+MDMA writes to $2118/$2119), columns
+`seq,frame,line,blank,force_blank,src,vram_word,reg,value`:
 
-`blank` is the **VBlank-period** flag (verified empirically: blank=1 rows land on
-lines ~230-253, blank=0 on lines ~3-91). The budgeted window is VBlank, so we
-count `blank=1` bytes per frame. Boot uploads run in INIDISP forced-blank and are
-warmed past with `--dma-trace-from`.
+1. TIMING SAFETY (the #1 silent failure: "VRAM writes only work during VBlank or
+   forced blank; the PPU silently ignores them during active display"). luna
+   v1.1.0 tags each write with `force_blank` (INIDISP $2100 bit 7), so a write is
+   SAFE iff `blank || force_blank`. We assert ZERO unsafe writes (active display,
+   screen on) across the whole run — this is now testable for the first time
+   (before v1.1.0 we could not tell a safe forced-blank boot upload from an unsafe
+   active-display one).
 
-HONEST SCOPE: the current example corpus uploads all VRAM at boot (forced blank)
-and scrolls via BG registers / streams sprites via OAM ($2104, not VRAM) — *none*
-stream tiles to VRAM per frame in steady state, so the measured steady-state peak
-is ~0 for every example. This probe therefore acts as a **regression guard**: the
-baseline is "well under budget", and it will fire if a future example/change
-starts pushing a heavy per-VBlank VRAM-DMA load. (A corpus example that streams
-VRAM each frame would give it teeth; see the chantier note.)
+2. VBLANK BUDGET: the SNES does ~4 KB of VRAM DMA per VBlank; more corrupts. We
+   bucket the safe VBlank-window bytes (`blank=1`) by PPU frame and check the peak
+   single frame. The corpus uploads at boot and streams sprites via OAM (not VRAM),
+   so steady-state peaks are ~0 — this acts as a regression guard that fires if a
+   change starts pushing a heavy per-VBlank VRAM load.
 """
 from __future__ import annotations
 
@@ -29,12 +27,10 @@ from pathlib import Path
 
 from lib import find_luna, rom_path
 
-BUDGET_BYTES = 4096          # ~one VBlank's worth
-WARM = 3_000_000            # past boot uploads (forced-blank)
-WINDOW = 2_000_000          # steady-state window after WARM
+BUDGET_BYTES = 4096
+STEPS = 5_000_000          # boot + plenty of steady-state frames
 
-# DMA-relevant examples (per-frame VRAM streaming / effects). Non-DMA examples
-# do all their VRAM work at boot and can't breach a per-VBlank budget.
+# DMA-relevant examples (per-frame VRAM streaming / effects + boot uploads).
 EXAMPLES = [
     "graphics/backgrounds/continuous_scroll/continuous_scroll.sfc",
     "graphics/effects/parallax_scrolling/parallax_scrolling.sfc",
@@ -47,41 +43,46 @@ EXAMPLES = [
 ]
 
 
-def _peak_vram_dma_per_frame(luna: str, rom: Path) -> int:
-    """Peak VBlank (blank=1) VRAM-DMA bytes written in any single PPU frame."""
+def _trace(luna: str, rom: Path):
+    """Return (unsafe_write_count, peak_vblank_bytes_per_frame)."""
     out = Path("/tmp/luna-dma") / (rom.stem + ".csv")
     out.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run([luna, "state", "-n", str(WARM + WINDOW),
-                    "--dma-trace", str(out), "--dma-trace-from", str(WARM),
+    subprocess.run([luna, "state", "-n", str(STEPS), "--dma-trace", str(out),
                     "--out", "/dev/null", str(rom)],
                    capture_output=True, text=True, timeout=300)
     if not out.is_file():
-        return 0
+        return 0, 0
     lines = out.read_text().splitlines()
     if len(lines) < 2:
-        return 0
-    cols = lines[0].split(",")
-    fi, bi = cols.index("frame"), cols.index("blank")
-    per_frame: Counter[str] = Counter()
-    for row in lines[1:]:                 # one row = one byte to $2118/$2119
+        return 0, 0
+    col = {name: i for i, name in enumerate(lines[0].split(","))}
+    fi, bi, gi = col["frame"], col["blank"], col["force_blank"]
+    unsafe = 0
+    per_frame_vblank: Counter[str] = Counter()
+    for row in lines[1:]:               # one row = one byte to $2118/$2119
         f = row.split(",")
-        if f[bi] == "1":                  # VBlank window = the budgeted period
-            per_frame[f[fi]] += 1
-    return max(per_frame.values()) if per_frame else 0
+        in_vblank, in_fblank = f[bi] == "1", f[gi] == "1"
+        if not (in_vblank or in_fblank):
+            unsafe += 1                 # active display, screen on → PPU ignores it
+        elif in_vblank:
+            per_frame_vblank[f[fi]] += 1
+    return unsafe, (max(per_frame_vblank.values()) if per_frame_vblank else 0)
 
 
 def run() -> tuple[bool, str]:
     luna = find_luna()
-    results = []
+    peaks = []
     for rel in EXAMPLES:
         rom = rom_path(rel)
-        peak = _peak_vram_dma_per_frame(luna, rom)
-        results.append((peak <= BUDGET_BYTES, f"{rom.parent.name}: {peak} B peak/frame"))
-    bad = [m for ok, m in results if not ok]
-    if bad:
-        return False, f"OVER BUDGET (>{BUDGET_BYTES} B/VBlank): " + "; ".join(bad)
-    peaks = ", ".join(m for _, m in results)
-    return True, f"{len(results)} examples within {BUDGET_BYTES} B/VBlank (exact peak: {peaks})"
+        unsafe, peak = _trace(luna, rom)
+        if unsafe:
+            return False, f"{rom.parent.name}: {unsafe} UNSAFE VRAM writes "\
+                          "(active display, no forced-blank) — silent PPU-ignore bug"
+        if peak > BUDGET_BYTES:
+            return False, f"{rom.parent.name}: {peak} B in one VBlank > {BUDGET_BYTES}"
+        peaks.append(f"{rom.parent.name}:{peak}")
+    return True, f"{len(EXAMPLES)} examples: 0 unsafe writes; VBlank peak ≤ {BUDGET_BYTES} B "\
+                 f"({', '.join(peaks)})"
 
 
 if __name__ == "__main__":

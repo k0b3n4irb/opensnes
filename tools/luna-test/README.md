@@ -18,7 +18,7 @@ probes. Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 ## Requirements
 
 - The pinned luna binary — version in `tools/luna-test/luna.version` (currently
-  **`v1.0.0`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+  **`v1.1.0`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
   `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
   `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
@@ -62,11 +62,11 @@ breaks fbhash cross-arch stability, that's a luna bug — regenerate baselines w
 
 Runtime/WRAM probes (`luna state --peek`), lag detection (`state.stats`), input
 sequences (`--input`), `luna bench` corpus run, the MCP swap (`luna mcp`), the
-full 56-example manifest, and the CI rewrite. Mouse/Super Scope coverage is
-**dropped** (decision #2) — `input/mouse` + `input/superscope` get boot+visual
-validation only.
+full 56-example manifest, and the CI rewrite. (Mouse/Super Scope were boot+visual
+only until luna v1.1.0 added scripted peripheral input — now covered by
+`probes/mouse.py` + `probes/superscope.py`, see below.)
 
-## Hardening tests (luna v1.0.0 capabilities)
+## Hardening tests (luna v1.1.0 capabilities)
 
 Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
 never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
@@ -82,6 +82,13 @@ never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
   reloading it with `--srm-in`, assert the loaded struct matches, with a
   no-battery negative control proving the match came from the file (not ROM
   determinism). Exercises `snes/sram.h` end-to-end.
+- **Mouse input** (`probes/mouse.py`) — luna v1.1.0 `--port1 mouse --mouse`
+  injects SNES Mouse motion; the probe drives sustained motion and asserts the
+  cursor saturates to the clamp ((255,223) right/down, (0,0) left/up) — a
+  sensitivity-independent deterministic check that `input/mouse` decodes deltas.
+- **Super Scope** (`probes/superscope.py`) — `--port2 superscope --superscope`
+  fires the light gun at a known aim; the probe asserts the lib's decoded raw beam
+  position (`input/superscope`). Closes the last two boot+visual-only examples.
 - **Audio** (`probes/audio.py`, H5) — SNESMOD examples must have ≥1 active SPC
   voice + non-silent PCM (`--audio-out`); the SFX driver must be alive.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
@@ -90,6 +97,8 @@ never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
   WRAM content (unlike the framebuffer) isn't a luna cross-arch guarantee
   (mapandobjects, slopemario diverge x86_64 ↔ aarch64), so `--update` on your own
   machine before `--compare`.
-- **VBlank DMA budget** (`probes/dma_budget.py`, H2) — estimates steady-state
-  VRAM-DMA bytes/frame and flags > ~4 KB/VBlank. Estimate pending luna L13
-  (frame column on `--dma-trace`).
+- **VRAM-DMA timing safety + budget** (`probes/dma_budget.py`, H2) — luna v1.1.0
+  tags each `--dma-trace` write with `force_blank` (INIDISP), so a write is safe
+  iff `blank || force_blank`. The probe asserts **zero unsafe writes** (active
+  display, screen on — the #1 silent failure, now testable) and that the per-VBlank
+  peak stays ≤ 4 KB (real bytes now: `dynamic_metasprite` peaks ~3.5 KB).
