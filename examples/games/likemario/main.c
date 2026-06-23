@@ -407,7 +407,7 @@ static void mario_init(void) {
 
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
-    oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
+    oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
     OAM_SET_GFX_BANK(0, mario_sprite_til, getSpriteTilBank());
 }
 
@@ -432,7 +432,7 @@ static void mario_handle_input(void) {
         if (mario_xvel < -MARIO_MAXACCEL)
             mario_xvel = -MARIO_MAXACCEL;
     } else if (pad & KEY_RIGHT) {
-        oambuffer[0].oamattribute = OBJ_PRIO(3) | 0x40;
+        oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
         if (mario_action == MARIO_ACT_STAND)
             mario_action = MARIO_ACT_WALK;
         mario_xvel += MARIO_ACCEL;
