@@ -87,7 +87,7 @@ include $(OPENSNES)/make/common.mk
 ## Code Style
 
 - C: 4 spaces, K&R braces, snake_case functions/vars, UPPER_CASE constants
-- Use fixed-width types: `u8`, `u16`, `s16`, `u32` (from `snes.h`). `unsigned int` = 4 bytes, `unsigned long` = 8 bytes on this target.
+- Use fixed-width types: `u8`, `u16`, `s16`, `u32` (from `snes.h`). `unsigned int` = 2 bytes, `unsigned long` = 4 bytes on this target (since chantier A1; `compiler/cproc/type.c` `typeint` size 2 / `typelong` size 4). This matches `.claude/rules/compiler.md`.
 - ASM: labels at column 0, instructions indented with tab, `.section` for organization
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(scope):`, `fix(scope):`, `perf(scope):`, etc.
 - Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
