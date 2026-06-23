@@ -92,7 +92,7 @@ void marioupdate(u16 idx) {
         if (pad0 & KEY_LEFT) {
             if ((marioflp > 3) || (marioflp < 2))
                 marioflp = 2;
-            oambuffer[0].oamattribute &= ~0x40;  /* no H-flip */
+            oambuffer[0].oamattribute &= ~OBJ_FLIPX;  /* no H-flip */
 
             objWorkspace.action = ACT_WALK;
             objWorkspace.xvel -= MARIO_ACCEL;
@@ -102,7 +102,7 @@ void marioupdate(u16 idx) {
         if (pad0 & KEY_RIGHT) {
             if ((marioflp > 3) || (marioflp < 2))
                 marioflp = 2;
-            oambuffer[0].oamattribute |= 0x40;   /* H-flip */
+            oambuffer[0].oamattribute |= OBJ_FLIPX;   /* H-flip */
 
             objWorkspace.action = ACT_WALK;
             objWorkspace.xvel += MARIO_ACCEL;

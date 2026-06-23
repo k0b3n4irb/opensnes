@@ -76,8 +76,8 @@ static void koopatroopa_animate(u16 idx) {
             objWorkspace.sprflip = 1;
             objWorkspace.xvel = +KOOPATROOPA_XVELOC;
             objWorkspace.yvel = 0;
-            oambuffer[n].oamattribute |= 0x40;
-            oambuffer[n + 1].oamattribute |= 0x40;
+            oambuffer[n].oamattribute |= OBJ_FLIPX;
+            oambuffer[n + 1].oamattribute |= OBJ_FLIPX;
         } else {
             objWorkspace.xvel = -KOOPATROOPA_XVELOC;
         }
@@ -87,8 +87,8 @@ static void koopatroopa_animate(u16 idx) {
             objWorkspace.sprflip = 0;
             objWorkspace.xvel = -KOOPATROOPA_XVELOC;
             objWorkspace.yvel = 0;
-            oambuffer[n].oamattribute &= ~0x40;
-            oambuffer[n + 1].oamattribute &= ~0x40;
+            oambuffer[n].oamattribute &= ~OBJ_FLIPX;
+            oambuffer[n + 1].oamattribute &= ~OBJ_FLIPX;
         } else {
             objWorkspace.xvel = +KOOPATROOPA_XVELOC;
         }

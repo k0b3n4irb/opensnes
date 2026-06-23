@@ -57,6 +57,14 @@ extern TextConfig text_config;
  * @param font_tile    Tile number of the first font glyph in VRAM
  *                     (use TEXT_DEFAULT_FONT_TILE for tile 0)
  * @param palette      Palette slot 0-7 (use TEXT_DEFAULT_PALETTE for 0)
+ *
+ * @warning UNIT MISMATCH (the SDK's one documented inconsistency): this
+ *          `tilemap_addr` is a **byte** address, whereas the rest of the SDK —
+ *          `dmaCopyVram`, `bgSetGfxPtr`/`bgSetMapPtr`, the `oam*` calls, and even
+ *          `textLoadFont()` just below — all take **word** addresses. If you have
+ *          a word address `W` (e.g. from a `vram_map.h` or a VRAM map), pass
+ *          `W * 2` here. Prefer `TEXT_DEFAULT_TILEMAP_ADDR` when you don't need a
+ *          custom slot.
  */
 void textInit(u16 tilemap_addr, u16 font_tile, u8 palette);
 
