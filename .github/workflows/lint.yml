@@ -88,6 +88,15 @@ jobs:
         # .claude/rules/doc_consistency.md.
         run: python3 devtools/check_doc_drift.py
 
+      - name: Run test_check_doc_drift.py
+        # Regression suite for the TIER-1 sentinel extensions: the phantom-API
+        # detector (a function called in an onboarding-doc C snippet must exist in
+        # the headers — caught consoleDrawText) and the extended example-count
+        # patterns (must match the real phrasings, must NOT match prose like
+        # "12 examples were flagged").
+        working-directory: devtools
+        run: python3 -m unittest test_check_doc_drift
+
   nmi-race-tests:
     name: NMI/WRAM race lint regression tests (test_check_nmi_wram_race.py)
     runs-on: ubuntu-latest

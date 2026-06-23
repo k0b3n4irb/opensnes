@@ -7,8 +7,6 @@
  *
  * @author OpenSNES Team
  * @copyright MIT License
- *
- * @todo Implement video functions
  */
 
 #ifndef OPENSNES_VIDEO_H
