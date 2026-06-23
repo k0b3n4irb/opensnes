@@ -15,6 +15,15 @@
 #include <snes/types.h>
 
 /*============================================================================
+ * Screen dimensions (NTSC visible area)
+ *============================================================================*/
+
+/** @brief Visible screen width in pixels. */
+#define SCREEN_WIDTH   256
+/** @brief Visible screen height in pixels (NTSC, 224 lines). */
+#define SCREEN_HEIGHT  224
+
+/*============================================================================
  * Background Modes
  *============================================================================*/
 

@@ -150,7 +150,7 @@ static const u8 init_palette[] = {
 static void write_tile(u8 x, u8 y, u8 tile) {
     u16 addr;
     addr = TILEMAP_ADDR + y * 32 + x;
-    REG_VMAIN = 0x80;
+    REG_VMAIN = VMAIN_INC1;
     REG_VMADDL = addr & 0xFF;
     REG_VMADDH = addr >> 8;
     REG_VMDATAL = tile;
