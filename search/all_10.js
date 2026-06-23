@@ -68,7 +68,7 @@ var searchData=
   ['enemy_5fspawn_5fperiod_65',['ENEMY_SPAWN_PERIOD',['../games_2shmup__1942_2main_8c.html#a11fd0a97597f1c92c043d29d0da5b19f',1,'main.c']]],
   ['enemy_5fspeed_66',['ENEMY_SPEED',['../games_2shmup__1942_2main_8c.html#a918e3124d6f55628dce6a99d2a615be6',1,'main.c']]],
   ['enemy_5fsprite_67',['ENEMY_SPRITE',['../games_2shmup__1942_2main_8c.html#ae02b975d8407723ae67aca31bfa2195d',1,'main.c']]],
-  ['enemy_5ftile_68',['enemy_tile',['../games_2shmup__1942_2main_8c.html#a1f2ab1965619eae03f45d35f987ae0a9',1,'ENEMY_TILE:&#160;main.c'],['../basics_2collision__demo_2main_8c.html#a25335bd710faba5ef21e459eca381dc9',1,'enemy_tile:&#160;main.c']]],
+  ['enemy_5ftile_68',['enemy_tile',['../basics_2collision__demo_2main_8c.html#a25335bd710faba5ef21e459eca381dc9',1,'enemy_tile:&#160;main.c'],['../games_2shmup__1942_2main_8c.html#a1f2ab1965619eae03f45d35f987ae0a9',1,'ENEMY_TILE:&#160;main.c']]],
   ['enemy_5ftiles_69',['enemy_tiles',['../games_2shmup__1942_2main_8c.html#ac0143e3714d1ca79bb94ddd7687630d3',1,'main.c']]],
   ['enemy_5ftiles_5fend_70',['enemy_tiles_end',['../games_2shmup__1942_2main_8c.html#a2eb10061228b4f0bea644f9bbaf07043',1,'main.c']]],
   ['enemy_5fx_71',['enemy_x',['../basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297',1,'main.c']]],

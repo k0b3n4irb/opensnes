@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"globals_vars_o.html":[4,1,2,14],
+"globals_vars_p.html":[4,1,2,15],
+"globals_vars_r.html":[4,1,2,16],
+"globals_vars_s.html":[4,1,2,17],
+"globals_vars_t.html":[4,1,2,18],
 "globals_vars_v.html":[4,1,2,19],
 "globals_vars_w.html":[4,1,2,20],
 "globals_vars_x.html":[4,1,2,21],
@@ -46,6 +51,11 @@ var NAVTREEINDEX3 =
 "graphics_2sprites_2dynamic__metasprite_2main_8c.html":[2,11,36],
 "graphics_2sprites_2dynamic__sprite_2main_8c.html":[2,11,37],
 "graphics_2sprites_2metasprite_2main_8c.html":[2,11,38],
+"graphics_2sprites_2metasprite_2vram__map_8h.html":[4,0,0,3,2,3,1],
+"graphics_2sprites_2metasprite_2vram__map_8h.html#a42f9b2d893d66eedd0255d9b236dc2e4":[4,0,0,3,2,3,1,0],
+"graphics_2sprites_2metasprite_2vram__map_8h.html#a723a43d336256e6d28543c1f170d1171":[4,0,0,3,2,3,1,2],
+"graphics_2sprites_2metasprite_2vram__map_8h.html#ae6ebd5847cf9d8a28544fbbb3ee32a10":[4,0,0,3,2,3,1,1],
+"graphics_2sprites_2metasprite_2vram__map_8h_source.html":[4,0,0,3,2,3,1],
 "graphics_2sprites_2object__size_2main_8c.html":[2,11,39],
 "graphics_2sprites_2simple__sprite_2main_8c.html":[2,11,40],
 "group__apu__regs.html":[2,1],
@@ -239,15 +249,5 @@ var NAVTREEINDEX3 =
 "group__mouse__input.html#gaba64f1f305bb293e1c0f10b97f4409df":[2,20,4],
 "group__mouse__input.html#gae62804387f4df3c1b2ab28e4ad8a7fa3":[2,20,1],
 "group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d":[2,20,12],
-"group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d":[2,20,6],
-"group__ppu__regs.html":[2,21],
-"group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64":[2,21,50],
-"group__ppu__regs.html#ga07640bb0bfa4bc0f278920220cc0cadd":[2,21,56],
-"group__ppu__regs.html#ga0876479f76d0a58b10b4893dc6d2bbb3":[2,21,11],
-"group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190":[2,21,52],
-"group__ppu__regs.html#ga165959d614d718e17d008060049491bc":[2,21,51],
-"group__ppu__regs.html#ga182c4c0a976be88919146755c53ab44a":[2,21,10],
-"group__ppu__regs.html#ga19771159f16c9467e0c0e039e5f88a87":[2,21,21],
-"group__ppu__regs.html#ga1c64488065746dab4b05ad917c276841":[2,21,54],
-"group__ppu__regs.html#ga261b7ab26b206f1adc8e98a0b6a4f099":[2,21,59]
+"group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d":[2,20,6]
 };

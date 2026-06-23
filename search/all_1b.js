@@ -149,7 +149,7 @@ var searchData=
   ['player_5ftile_146',['player_tile',['../basics_2collision__demo_2main_8c.html#af7bebc333bb37cb95439a8f6a636c610',1,'main.c']]],
   ['player_5ftiles_147',['player_tiles',['../games_2shmup__1942_2main_8c.html#a10e1db9413b95cad058f73b48d03cad4',1,'main.c']]],
   ['player_5ftiles_5fend_148',['player_tiles_end',['../games_2shmup__1942_2main_8c.html#a39a5cbf3814a39bc1a44491227835d0a',1,'main.c']]],
-  ['player_5fx_149',['player_x',['../basics_2aim__target_2main_8c.html#a11d58baaffc49494ab91da16621b6a5c',1,'PLAYER_X:&#160;main.c'],['../basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26',1,'player_x:&#160;main.c'],['../structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e',1,'GameState::player_x']]],
+  ['player_5fx_149',['player_x',['../basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26',1,'player_x:&#160;main.c'],['../basics_2aim__target_2main_8c.html#a11d58baaffc49494ab91da16621b6a5c',1,'PLAYER_X:&#160;main.c'],['../structGameState.html#acad6079a04372bf6b88f5cddf28bbb3e',1,'GameState::player_x']]],
   ['player_5fy_150',['player_y',['../basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b',1,'player_y:&#160;main.c'],['../basics_2aim__target_2main_8c.html#ae22bdd9c98feb24a0843a4ff0fa6e662',1,'PLAYER_Y:&#160;main.c'],['../structGameState.html#a6fe0c090fa3af40a42b5b7ad11f843aa',1,'GameState::player_y']]],
   ['players_151',['Example: Two Players',['../tutorial_sprites.html#autotoc_md331',1,'']]],
   ['players_20example_152',['Two Players Example',['../examples_input_two_players.html',1,'examples_input']]],
