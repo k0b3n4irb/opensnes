@@ -223,8 +223,8 @@ int main(void) {
 
     /* Load font for text on BG1 (4bpp in Mode 1) */
     textLoadFont4bpp(VRAM_FONT);
-    /* textInitEx takes byte address (word addr * 2), font_tile=0 (font at BG base) */
-    textInit(VRAM_TEXT_MAP * 2, 0, 0);
+    /* textInit takes a VRAM word address; font_tile=0 = font at the BG base */
+    textInit(VRAM_TEXT_MAP, 0, 0);
 
     /* Font palette: BG palette 0, color 0=black, color 1=white */
     setColor(0, RGB(0, 0, 0));
