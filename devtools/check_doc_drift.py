@@ -168,9 +168,15 @@ def check_roadmap_status(canonical: str) -> list[str]:
 # past state intentionally.
 COUNT_PATTERNS = [
     re.compile(r"\b(\d{2,3})\s+working\s+examples?\b", re.IGNORECASE),
-    re.compile(r"\b(\d{2,3})\s+examples?\s+(?:cover|organized|across)", re.IGNORECASE),
+    re.compile(r"\b(\d{2,3})\s+examples?\s+(?:cover|organized|across|from|by topic|as a)",
+               re.IGNORECASE),
+    re.compile(r"\bthrough\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "path through N examples"
+    re.compile(r"\b(\d{2,3})\s+example\s+ROMs?\b", re.IGNORECASE),
+    re.compile(r"\*\*(\d{2,3})\s+examples?\*\*", re.IGNORECASE),  # README bold table cell
     re.compile(r"\bAll\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),
     re.compile(r"\ball\s+(\d{2,3})\s+examples\s+compile\s+cleanly\b", re.IGNORECASE),
+    # Targeted phrasings only (NOT a bare "\d examples") so prose like
+    # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
 
 # Files where an example count is allowed to be stale (historical record).
@@ -182,6 +188,14 @@ def _gather_active_doc_paths() -> list[Path]:
     rules = repo_path(".claude/rules")
     if rules.is_dir():
         paths.extend(sorted(rules.glob("*.md")))
+    # Onboarding docs that quote the corpus count (added 2026-06-23, TIER 1):
+    # these are where a newcomer first reads "N examples". docs/ at large is NOT
+    # scanned — some tutorials intentionally pin a past state.
+    for rel in ("examples/README.md", "docs/EXAMPLES_BY_CATEGORY.md",
+                "docs/LEARNING_PATH.md", "docs/mainpage.md"):
+        p = repo_path(rel)
+        if p.is_file():
+            paths.append(p)
     return paths
 
 
@@ -215,6 +229,82 @@ def check_examples_count(canonical: int) -> list[str]:
                     f"`find examples -name main.c | wc -l = {canonical}` — "
                     f"update the line or, if it's an off-by-one drift, "
                     f"replace the number with `<run --list>`-style language"
+                )
+    return drifts
+
+
+# --------------------------------------------------------------------------
+# Check 5: phantom API in onboarding docs (added 2026-06-23, TIER 1)
+# A function CALLED in a ```c block of an onboarding doc must exist in the
+# public headers — else the newcomer's first program fails to link. Caught
+# historically as `consoleDrawText()` in GETTING_STARTED.md ("your first
+# program") and `audioPlaySample(channel, data, size, pitch)` in TROUBLESHOOTING.
+# --------------------------------------------------------------------------
+
+PHANTOM_DOC_PATHS = ["docs/GETTING_STARTED.md", "docs/TROUBLESHOOTING.md"]
+
+# Control-flow + common C stdlib identifiers that appear as `name(` but are not
+# SDK API (so they are not "phantom").
+_PHANTOM_ALLOW = {
+    "if", "for", "while", "switch", "return", "sizeof", "do", "else", "main",
+    "defined", "memcpy", "memset", "memmove", "malloc", "calloc", "realloc",
+    "free", "printf", "sprintf", "snprintf", "strlen", "strcpy", "strncpy",
+    "strcmp", "abs",
+}
+
+
+def _public_api_names() -> set[str]:
+    """Identifiers declared as functions / function-like macros in the headers."""
+    names: set[str] = set()
+    inc = repo_path("lib/include")
+    for hdr in list(inc.glob("snes.h")) + sorted(inc.glob("snes/*.h")):
+        text = hdr.read_text(encoding="utf-8", errors="replace")
+        for m in re.finditer(r"\b([A-Za-z_]\w*)\s*\(", text):
+            names.add(m.group(1))
+    return names
+
+
+def _strip_c_comments(code: str) -> str:
+    code = re.sub(r"/\*.*?\*/", " ", code, flags=re.DOTALL)
+    code = re.sub(r"//[^\n]*", " ", code)
+    return code
+
+
+def phantom_names_in_code(code: str, api: set[str]) -> list[str]:
+    """Pure core (unit-testable): SDK-shaped calls in `code` not in `api`.
+
+    Strips comments, ignores locally-defined functions, control flow, and common
+    stdlib; only considers lowerCamel (oamSet) / CapWord (WaitForVBlank) names so
+    UPPER_CASE macros (KEY_*, OBJSEL) and casts are never flagged.
+    """
+    code = _strip_c_comments(code)
+    defined = set(re.findall(r"\b(?:void|u8|u16|s16|u32|int|static)\s+(\w+)\s*\(", code))
+    bad: list[str] = []
+    for m in re.finditer(r"\b([a-zA-Z_]\w*)\s*\(", code):
+        name = m.group(1)
+        if not re.match(r"^[a-z][A-Za-z0-9]*$|^[A-Z][a-z]\w*$", name):
+            continue
+        if name in api or name in _PHANTOM_ALLOW or name in defined:
+            continue
+        bad.append(name)
+    return bad
+
+
+def check_phantom_api() -> list[str]:
+    api = _public_api_names()
+    drifts: list[str] = []
+    for rel in PHANTOM_DOC_PATHS:
+        path = repo_path(rel)
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for block in re.findall(r"```c\b(.*?)```", text, re.DOTALL):
+            for name in phantom_names_in_code(block, api):
+                idx = text.find(name + "(")
+                lineno = text[:idx].count("\n") + 1 if idx >= 0 else 0
+                drifts.append(
+                    f"{rel}:{lineno}: `{name}(...)` called in a C snippet but not "
+                    f"declared in lib/include/snes/*.h — phantom API (won't link)."
                 )
     return drifts
 
@@ -391,6 +481,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_snes_h_version(canonical_ver))
     all_drifts.extend(check_roadmap_status(canonical_ver))
     all_drifts.extend(check_examples_count(canonical_n))
+    all_drifts.extend(check_phantom_api())
     all_drifts.extend(check_abi_signatures())
 
     if all_drifts:

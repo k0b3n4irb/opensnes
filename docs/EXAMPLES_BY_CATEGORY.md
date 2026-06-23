@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 54 examples organized by topic. For a progressive learning path, see
+All 56 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -12,7 +12,7 @@ Display text on screen using background tiles and fonts.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_text_hello_world | Your first ROM: PPU setup, tiles, palette, tilemap |
-| @subpage examples_text_text_test | Text positioning, formatting with consoleDrawText |
+| @subpage examples_text_text_test | Text positioning, formatting with textPrintAt |
 
 ---
 
