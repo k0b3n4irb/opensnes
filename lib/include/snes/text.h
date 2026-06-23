@@ -27,19 +27,19 @@ typedef struct {
 /**
  * @brief Default text configuration
  *
- * Assumes font at tile 0, tilemap at $7000, palette 0
+ * Assumes font at tile 0, tilemap at word $3800, palette 0
  */
 extern TextConfig text_config;
 
 /**
- * @brief Default tilemap byte address — 32×32 tilemap at VRAM byte $7000.
+ * @brief Default tilemap WORD address — 32×32 tilemap at VRAM word $3800.
  *
  * Convenience constant for the most common text setup (BG3 in Mode 0/1
- * with text drawn at the standard tile-map slot). Pass to textInit() if
- * you don't have a project-specific layout. textInit() expects a *byte*
- * VRAM address — the value $7000 is what you'd read off a VRAM map.
+ * with text drawn at the standard tile-map slot). Pass to textInit() if you
+ * don't have a project-specific layout. This is a VRAM **word** address — the
+ * same unit as bgSetMapPtr() and the rest of the SDK.
  */
-#define TEXT_DEFAULT_TILEMAP_ADDR  0x7000
+#define TEXT_DEFAULT_TILEMAP_ADDR  0x3800
 /** @brief Default first font tile (zero — font occupies tiles 0-95). */
 #define TEXT_DEFAULT_FONT_TILE     0
 /** @brief Default palette slot (palette 0). */
@@ -52,19 +52,16 @@ extern TextConfig text_config;
  * slot used for text glyphs. Replaces the v1 textInit/textInitEx pair —
  * pass TEXT_DEFAULT_* constants for the previous textInit(void) defaults.
  *
- * @param tilemap_addr VRAM **byte** address for the tilemap
- *                     (use TEXT_DEFAULT_TILEMAP_ADDR for the standard $7000)
+ * @param tilemap_addr VRAM **word** address for the tilemap — the same unit as
+ *                     bgSetMapPtr() and the rest of the SDK (use
+ *                     TEXT_DEFAULT_TILEMAP_ADDR for the standard $3800)
  * @param font_tile    Tile number of the first font glyph in VRAM
  *                     (use TEXT_DEFAULT_FONT_TILE for tile 0)
  * @param palette      Palette slot 0-7 (use TEXT_DEFAULT_PALETTE for 0)
  *
- * @warning UNIT MISMATCH (the SDK's one documented inconsistency): this
- *          `tilemap_addr` is a **byte** address, whereas the rest of the SDK —
- *          `dmaCopyVram`, `bgSetGfxPtr`/`bgSetMapPtr`, the `oam*` calls, and even
- *          `textLoadFont()` just below — all take **word** addresses. If you have
- *          a word address `W` (e.g. from a `vram_map.h` or a VRAM map), pass
- *          `W * 2` here. Prefer `TEXT_DEFAULT_TILEMAP_ADDR` when you don't need a
- *          custom slot.
+ * @note As of v0.23.0 this takes a VRAM **word** address. It used to take a byte
+ *       address (the lone SDK unit inconsistency, now removed); old call sites
+ *       that passed `W * 2` should now pass `W`.
  */
 void textInit(u16 tilemap_addr, u16 font_tile, u8 palette);
 
