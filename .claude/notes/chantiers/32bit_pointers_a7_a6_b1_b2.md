@@ -510,6 +510,43 @@ than the per-deref-site work the plan assumed.
 WIP preserved: qbe `wip/a6-deref-attempt3` (a6c57f3), superproject
 `chantier/a6-codegen` (bd6ab27). develop clean (pin 1884a20, 56/56, luna v1.0.0).
 
+## 3k. Attempt #4 — uniform Kl moves: a6_farptr PASSES, corpus REGRESSES (Tier 2 go/no-go, 2026-06-24)
+
+Ran the Option-A "uniform Kl moves" spike to resolve the Tier 2 go/no-go: started
+from attempt #3 (qbe `a6c57f3`) and **disabled the high-half-skip entirely** —
+`ref_to_is_addr_only()` returns 0, so every Kl value carries both halves through
+all moves/copies/phi/materialisation (no per-site gating to miss). qbe
+`wip/a6-deref-attempt4` (`a74685d`).
+
+**Result — the move-bank-preservation works, the far-dispatch does not:**
+- `a6_farptr` harness: **4/4 for the first time** — `r_ptrhi=0x0002` (bank carried)
+  AND the three bank-2 derefs `r_d0=0x11`/`r_d3=0x44`/`r_d7=0x88` (XPASS, the A6
+  deref gap closed). Uniform moves provably preserve the bank end-to-end.
+- Corpus visual: **32/56 — 24 regressions**, including `text_test` whose data is
+  ALL in bank $00. So the far path is being taken for ordinary bank-$00 pointers
+  and producing wrong results — the **far-dispatch (over-taint seed from attempt
+  #2: every `Oload Kl`) + the far emit are not correct for ordinary pointers**,
+  not just a perf-narrowing issue. (text_test regressing rules out "only
+  higher-bank derefs are wrong".)
+
+**Verdict: NO-GO for a near-term landing.** A6 Tier 2 is confirmed to be the
+multi-week, HIGH-risk chantier the catalogue describes. The spike split the problem
+cleanly into two sub-problems and solved the first:
+1. **(DONE in attempt #4)** preserve the bank through every Kl move — uniform copy.
+2. **(THE REMAINING HARD PART)** decide *when* to deref far and emit it correctly
+   for every pointer storage form (slot/reg/CAddr/RSlot). The far path must fire
+   only for pointers whose bank is genuinely non-$00 (or be correct for bank-$00
+   too — text_test shows it currently isn't), and the over-taint must be replaced
+   by a precise "this deref address can point outside bank $00" analysis. Then
+   re-add the addr_only narrowing to recover the cycles.
+
+Next attempt should keep attempt #4's uniform moves and focus *only* on #2 (far
+emit correctness for bank-$00 first, then the dispatch precision). Estimate stands
+at 2–4 weeks, HIGH risk.
+
+WIP preserved: qbe `wip/a6-deref-attempt4` (`a74685d`). develop restored clean
+(pin 1884a20, 56/56, luna v1.1.0).
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
