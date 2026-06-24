@@ -2,9 +2,14 @@
 
 CRITICAL: Bank $00 ROM overflow is a silent-failure 🔴 documented in
 `KNOWN_LIMITATIONS.md`. The compiler emits 16-bit addresses that always
-read bank $00, so any `static const` array (string literals, LUTs, asset
-data) that spills past the 32 KB bank-$00 boundary is read as **garbage**
-at runtime. No error, no warning at runtime — just wrong data.
+read bank $00 **for a C dereference**, so a `static const` array (string
+literals, LUTs, C-indexed data) that is read by C code (`arr[i]`, `*p`) and
+spills past the 32 KB bank-$00 boundary is read as **garbage** at runtime —
+no error, no warning, just wrong data. (Data merely *passed* to a lib
+DMA/asset function — tiles/maps/palettes/fonts via `dmaCopyVram` &
+friends — carries its bank in the 4-byte pointer and works in any bank; see
+`KNOWN_LIMITATIONS.md`. The ratchet still guards the C-deref + string-literal
+class, which remains the silent failure.)
 
 The build system enforces a two-step ratchet on this. Read this file before
 adding const data, refactoring an example, or tuning the threshold.
