@@ -809,6 +809,25 @@ representation in the toolchain.
 
 **Investigation log**:
 
+- **2026-06-25 (LATEST — A6 closed for now; Tier 1 shipped, Tier 2 scoped)** —
+  Re-scoped A6 into three tiers (see
+  `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md` §8 for the full
+  cold-start plan). **Tier 1 (lib-led practical relief) SHIPPED**: verified the
+  ASM DMA path (`dmaCopyVram` & friends) already reads the pointer's bank byte, so
+  assets in banks >$00 already load; corrected `KNOWN_LIMITATIONS.md` +
+  `bank0_budget.md` to the true (narrower) constraint — the limit only bites a C
+  *dereference* of spilled const data. **Tier 2 (the compiler deref) scoped +
+  tooled, not landed**: attempts #4 (uniform Kl moves) and a per-cell #1 (bank-
+  aware byte load) both turn the `a6_farptr` matrix cells green but regress the
+  corpus. A forced-bank-$00 diagnostic split cell #1's 22 regressions into **17
+  pointer-bank-byte provenance + 5 shared-scratch (tcc__r9) clobber**. Conclusion:
+  the deref emit is small + correct; the real Tier-2 cost is **upstream
+  bank-byte provenance** (every pointer-producing op must carry the correct high
+  half) + a dedicated far-deref scratch — both pervasive, 2–4 weeks, HIGH risk,
+  now *cadré* by the new `a6_farptr` test matrix (the per-cell diagnostic the 4
+  prior attempts lacked). WIP preserved: qbe `wip/a6-deref-attempt4`,
+  `wip/a6-a2-byte-load`. develop clean (1884a20, 56/56).
+
 - **2026-05-09** — Partial implementation attempted (A6.1 + A6.3) and
   reverted. Diff was 163 lines in `compiler/qbe/w65816/emit.c` adding:
   (a) a new `emit_load_bankbyte()` helper, and (b) bank-byte storage
