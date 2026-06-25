@@ -577,6 +577,42 @@ then re-add the addr_only narrowing (Phase B) gated by `make bench`.
 marathon tail — the 3–4 prior regressions came from big-bang/rushing. One form,
 one gate, at a time.
 
+## 3m. A2 cell #1 (byte load) — green on the matrix, regresses the corpus; TWO obstacles isolated (2026-06-25)
+
+Implemented cell #1 isolated on a clean 1884a20 base (qbe `wip/a6-a2-byte-load`,
+`fd5d93e`): two coordinated changes —
+(1) drop `Oloadsb`/`Oloadub` from the `mark_addr_only_kl` bank-discarding
+classification so byte-deref address temps keep their high half (bank);
+(2) emit the byte deref via `lda [tcc__r9]` (copy the 3-byte pointer to tcc__r9),
+mirroring the already-bank-aware Kl-load else path, instead of `lda.l $0000,x`.
+
+**Matrix: worked** — `b2_0`, `b2_7` (byte, bank $02) AND `fp2` (param byte, same
+load path) all XPASS; 8/8 expected-green held. **Corpus: regressed 34/56 (22 fail).**
+
+A forced-bank-$00 diagnostic (`stz tcc__r9+2` instead of the real high half)
+isolated the 22 into TWO independent obstacles:
+- **~17 = garbage pointer high-halves.** With bank $00 forced, the corpus
+  recovers to **51/56** — so ~17 of the failures are pointers whose high half
+  (bank byte) is WRONG when the byte load finally reads it. The codegen never
+  maintained correct pointer bank bytes (byte derefs used `$0000,x` and didn't
+  need them), so making the byte load bank-aware exposes corpus-wide bad
+  provenance. **This is the pervasive A6 work** (correct bank byte at every
+  pointer-producing op: Oadd/Ocopy/phi/load/param), not a per-cell emit fix.
+- **5 = tcc__r9 clobber.** Even with bank $00 forced (mechanism-only), 5 examples
+  still fail. The byte load is a HOT path and tcc__r9 is a shared scratch live
+  across some byte derefs. A bank-aware byte deref needs a DEDICATED, never-
+  allocated DP scratch (cf. attempt #4's `tcc__farptr`, crt0-reserved + NMI-
+  mirrored) or a save/restore, not the shared tcc__r9.
+
+**Verdict:** cell #1 NO-GO as-is, but the matrix delivered exactly what it was
+built for — a *precise* signal (5 mechanism + 17 provenance) instead of "24
+opaque regressions". Conclusion stands and is now sharper: A6 Tier 2's real cost
+is **(a) a clobber-safe far-deref scratch** + **(b) corpus-wide pointer-bank-byte
+provenance correctness** — both pervasive, the 2–4 week HIGH-risk chantier. The
+emit change itself is small and correct (proven by the matrix); the hard part is
+upstream of it. WIP preserved: qbe `wip/a6-a2-byte-load` (`fd5d93e`). develop
+clean (1884a20, 56/56).
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
