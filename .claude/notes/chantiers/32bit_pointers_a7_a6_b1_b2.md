@@ -547,6 +547,36 @@ at 2–4 weeks, HIGH risk.
 WIP preserved: qbe `wip/a6-deref-attempt4` (`a74685d`). develop restored clean
 (pin 1884a20, 56/56, luna v1.1.0).
 
+## 3l. Phase A started — A1 test matrix landed + the A2 recipe (2026-06-25)
+
+**A1 (done, on develop `5c2c5a0`, PR #84):** turned the single-case `a6_farptr`
+fixture into a **matrix** — each cell is a pointer deref crossed by
+{byte, word, long, param/RSlot, phi} × {bank $00, bank $02}, so a red cell names
+the exact broken emit path (the diagnostic attempts #1–#4 lacked). Run fails only
+on a regression of an expected-green cell → safe gate while Phase A is in flight.
+Baseline on qbe 1884a20: **8/8 expected-green; 6 xfail = the A6 gap** (bank-$02
+byte×2, word×2, param, phi derefs).
+
+**The A2 recipe (the key finding):** the matrix revealed the Kl (u32) **long-load
+path is ALREADY bank-aware** — `l2_0` reads bank $02 correctly on stock 1884a20,
+while byte/word/param/phi derefs codegen as `lda.l $0000,x` (bank-$00-hardcoded;
+see emit.c high-half-skip comment ~L387). So A2 is NOT inventing a far path from
+scratch — it's **replicating the already-correct long-load 24-bit addressing
+(`lda [dp],y` / indirect-long, cf. the `lda [tcc__fp],y` large-frame helper and
+attempt #4's `emit_farptr_setup`) for the byte/word/param/phi load+store emit**,
+one storage form at a time, each gated by:
+  matrix cell green  →  visual 56/56 (no regression)  →  next form.
+
+**A2 entry point:** branch from qbe `wip/a6-deref-attempt4` (`a74685d`, already has
+uniform Kl moves so the bank survives moves). Sites: emit.c byte/word load
+(3741/3769) + store (3482/3484/3519/3552/3617). Correctness for bank-$00 FIRST
+(text_test broke in attempt #4 = far emit wrong even for bank $00), then bank-$02,
+then re-add the addr_only narrowing (Phase B) gated by `make bench`.
+
+**Pace:** A2 is the multi-day HIGH-risk core; do it as a focused effort, not a
+marathon tail — the 3–4 prior regressions came from big-bang/rushing. One form,
+one gate, at a time.
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
