@@ -30,6 +30,7 @@
  */
 
 #include <snes.h>
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /** @brief BG1 tile data -- repeating shader pattern (4bpp, tiles at VRAM $4000). */
 extern u8 bg1_tiles, bg1_tiles_end;
@@ -78,7 +79,7 @@ int main(void) {
     bgInitTileSet(1, &bg2_tiles, &bg2_pal, 0,
                   &bg2_tiles_end - &bg2_tiles,
                   &bg2_pal_end - &bg2_pal,
-                  BG_16COLORS, 0x5000);
+                  BG_16COLORS, VRAM_BG2_TILES);
 
     /* Load BG1 tiles + palette (shader pattern).
      * Palette slot 1 = CGRAM offset 16 (colors 16-31).
@@ -86,18 +87,18 @@ int main(void) {
     bgInitTileSet(0, &bg1_tiles, &bg1_pal, 1,
                   &bg1_tiles_end - &bg1_tiles,
                   &bg1_pal_end - &bg1_pal,
-                  BG_16COLORS, 0x4000);
+                  BG_16COLORS, VRAM_BG1_TILES);
 
     /* Set tilemap locations -- tilemaps must not overlap each other
      * or the tile data regions. Each SC_32x32 tilemap is 2KB (0x400 words). */
-    bgSetMapPtr(1, 0x1400, SC_32x32);
-    bgSetMapPtr(0, 0x1800, SC_32x32);
+    bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
+    bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);
 
     /* Copy tilemaps to VRAM -- must happen during VBlank or forced blank
      * because the PPU silently ignores VRAM writes during active display. */
     WaitForVBlank();
-    dmaCopyVram(&bg2_map, 0x1400, &bg2_map_end - &bg2_map);
-    dmaCopyVram(&bg1_map, 0x1800, &bg1_map_end - &bg1_map);
+    dmaCopyVram(&bg2_map, VRAM_BG2_MAP, &bg2_map_end - &bg2_map);
+    dmaCopyVram(&bg1_map, VRAM_BG1_MAP, &bg1_map_end - &bg1_map);
 
     /* Mode 1, enable only BG1 + BG2 (BG3 disabled).
      * TM_BG1 | TM_BG2 enables both layers on the main screen. */

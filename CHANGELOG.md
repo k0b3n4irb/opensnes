@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.24.0] — 2026-06-28
+
+First release with a native Linux **aarch64 (arm64)** SDK package. The
+release pipeline now builds on a GitHub-hosted `ubuntu-24.04-arm` runner
+alongside the existing x86_64 Linux, macOS, and Windows targets.
+
+### Added
+- ci(release): add Linux arm64 (aarch64) build target — each tagged
+  release now ships `opensnes_<tag>_linux_arm64.zip` (#85)
+
 ## [0.23.0] — 2026-06-23
 
 API-consistency & documentation-quality release, from a 3-agent audit (API

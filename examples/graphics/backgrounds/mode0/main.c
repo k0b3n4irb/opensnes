@@ -32,6 +32,7 @@
  */
 
 #include <snes.h>
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /** @name BG0 asset pointers (defined in data.asm via .incbin)
  * @{ */
@@ -86,24 +87,24 @@ int main(void) {
     /* Load 4 tilesets to VRAM at separate addresses.
      * Mode 0 palette banking: each BG has its own 4-color palette bank.
      * BG0=bank 0, BG1=bank 1, BG2=bank 2, BG3=bank 3 */
-    bgInitTileSet(0, t0, p0, 0, t0_end - t0, 8, BG_4COLORS0, 0x2000);
-    bgInitTileSet(1, t1, p1, 0, t1_end - t1, 8, BG_4COLORS0, 0x3000);
-    bgInitTileSet(2, t2, p2, 0, t2_end - t2, 8, BG_4COLORS0, 0x4000);
-    bgInitTileSet(3, t3, p3, 0, t3_end - t3, 16, BG_4COLORS0, 0x5000);
+    bgInitTileSet(0, t0, p0, 0, t0_end - t0, 8, BG_4COLORS0, VRAM_BG0_TILES);
+    bgInitTileSet(1, t1, p1, 0, t1_end - t1, 8, BG_4COLORS0, VRAM_BG1_TILES);
+    bgInitTileSet(2, t2, p2, 0, t2_end - t2, 8, BG_4COLORS0, VRAM_BG2_TILES);
+    bgInitTileSet(3, t3, p3, 0, t3_end - t3, 16, BG_4COLORS0, VRAM_BG3_TILES);
 
     /* Load 4 tilemaps */
     WaitForVBlank();
-    dmaCopyVram(bgm0, 0x0000, bgm0_end - bgm0);
-    bgSetMapPtr(0, 0x0000, SC_32x32);
+    dmaCopyVram(bgm0, VRAM_BG0_MAP, bgm0_end - bgm0);
+    bgSetMapPtr(0, VRAM_BG0_MAP, SC_32x32);
 
-    dmaCopyVram(bgm1, 0x0400, bgm1_end - bgm1);
-    bgSetMapPtr(1, 0x0400, SC_32x32);
+    dmaCopyVram(bgm1, VRAM_BG1_MAP, bgm1_end - bgm1);
+    bgSetMapPtr(1, VRAM_BG1_MAP, SC_32x32);
 
-    dmaCopyVram(bgm2, 0x0800, bgm2_end - bgm2);
-    bgSetMapPtr(2, 0x0800, SC_32x32);
+    dmaCopyVram(bgm2, VRAM_BG2_MAP, bgm2_end - bgm2);
+    bgSetMapPtr(2, VRAM_BG2_MAP, SC_32x32);
 
-    dmaCopyVram(bgm3, 0x0C00, bgm3_end - bgm3);
-    bgSetMapPtr(3, 0x0C00, SC_32x32);
+    dmaCopyVram(bgm3, VRAM_BG3_MAP, bgm3_end - bgm3);
+    bgSetMapPtr(3, VRAM_BG3_MAP, SC_32x32);
 
     /* Mode 0: 4 BGs — enable all on main screen */
     setMode(BG_MODE0, 0);

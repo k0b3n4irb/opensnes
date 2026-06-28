@@ -59,11 +59,20 @@ where the actual risk lives. Bypass for a single build with
 `SKIP_NMI_RACE_CHECK=1`. Regression suite:
 `python3 devtools/test_check_nmi_wram_race.py` (6 cases).
 
-### 🟢 Bank $00 ROM overflow → garbage const reads (caught at link time)
-`static const` arrays each get a SUPERFREE section. The compiler emits 16-bit
-addresses (`lda.l $XXXX,x` where `XXXX < $8000` is bank $00 implicitly), so if
-bank $00's 32 KB ROM area fills, new const sections spill to bank $01+ but the
-generated code still reads bank $00 → returns garbage data.
+### 🟢 Bank $00 ROM overflow → garbage const reads **when dereferenced in C** (caught at link time)
+The limit is narrower than it looks. `static const` arrays each get a SUPERFREE
+section; if bank $00's 32 KB ROM area fills, new const sections spill to bank
+$01+. What breaks depends on **how you read the data**:
+
+- **Passed to a lib DMA/asset function — works in ANY bank.** `dmaCopyVram`,
+  `dmaCopyCGram`, `dmaCopyVramMode7`, `LzssDecodeVram`, `mapLoad`, etc. take a
+  4-byte pointer whose high byte carries the real bank, and the asm reads it
+  (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register). So
+  tiles / palettes / maps / fonts can live in any bank — this is the common case.
+- **Dereferenced directly in C (`ptr[i]`, `*ptr`) — bank $00 only.** The compiler
+  still emits `lda.l $XXXX,x` (implicit bank $00) for a C deref, so a `static
+  const` array you index in C must fit bank $00 or it returns garbage. (This is
+  the remaining half of chantier A6.)
 
 **Mitigation (active since P1.5):** `make/common.mk` runs
 `devtools/symmap/symmap.py --check-bank0-overflow` after every link.
@@ -72,9 +81,13 @@ overflow" message. Tight free-space (< 2 KB) prints a soft warning. Set
 `SKIP_BANK0_CHECK=1` to bypass for debugging.
 
 If you hit this:
-- Combine related const arrays into one large array + offset macros
-- Move large const data to RAM (drop the `const`)
-- Use assembly with explicit bank addressing for very large blobs
+- **Prefer the DMA path:** keep big assets `const` and feed them to the lib's
+  DMA/asset functions — they already work from any bank (see above). For a
+  runtime-computed bank, the explicit `dmaCopyVramBank(src, bank, …)` /
+  `dmaCopyCGramBank(src, bank, …)` variants take the bank as a parameter.
+- Combine related const arrays read in C into one array + offset macros.
+- Move large C-dereferenced const data to RAM (drop the `const`).
+- Use assembly with explicit bank addressing for very large blobs.
 
 ### 🔴 All C RAM must live below $2000 (DP wraparound)
 `sta.l $0000,x` and friends always access bank $00. If the linker places a
