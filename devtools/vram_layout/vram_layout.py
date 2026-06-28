@@ -85,11 +85,18 @@ def main(argv) -> int:
     if "--emit" in argv:
         i = argv.index("--emit")
         example_dir = argv[i + 1]
-        pin = None
+        pin = {}
         if "--keep-low" in argv:
-            name = argv[argv.index("--keep-low") + 1]
-            pin = {name: 0x0000}
-        return emit(example_dir, pin=pin)
+            pin[argv[argv.index("--keep-low") + 1]] = 0x0000
+        # --pin name=0xADDR (repeatable): freeze a region at an exact base —
+        # used when generalising an existing example (keep its addresses, just
+        # name + validate them), so the render is byte-identical.
+        while "--pin" in argv:
+            i = argv.index("--pin")
+            name, _, addr = argv[i + 1].partition("=")
+            pin[name] = int(addr, 0)
+            del argv[i:i + 2]
+        return emit(example_dir, pin=pin or None)
     # No args: demo on collision_demo's spec.
     demo = Path(__file__).resolve().parents[2] / "examples" / "basics" / "collision_demo"
     if (demo / "vram.spec").is_file():

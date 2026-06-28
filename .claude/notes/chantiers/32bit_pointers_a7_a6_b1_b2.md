@@ -510,6 +510,109 @@ than the per-deref-site work the plan assumed.
 WIP preserved: qbe `wip/a6-deref-attempt3` (a6c57f3), superproject
 `chantier/a6-codegen` (bd6ab27). develop clean (pin 1884a20, 56/56, luna v1.0.0).
 
+## 3k. Attempt #4 — uniform Kl moves: a6_farptr PASSES, corpus REGRESSES (Tier 2 go/no-go, 2026-06-24)
+
+Ran the Option-A "uniform Kl moves" spike to resolve the Tier 2 go/no-go: started
+from attempt #3 (qbe `a6c57f3`) and **disabled the high-half-skip entirely** —
+`ref_to_is_addr_only()` returns 0, so every Kl value carries both halves through
+all moves/copies/phi/materialisation (no per-site gating to miss). qbe
+`wip/a6-deref-attempt4` (`a74685d`).
+
+**Result — the move-bank-preservation works, the far-dispatch does not:**
+- `a6_farptr` harness: **4/4 for the first time** — `r_ptrhi=0x0002` (bank carried)
+  AND the three bank-2 derefs `r_d0=0x11`/`r_d3=0x44`/`r_d7=0x88` (XPASS, the A6
+  deref gap closed). Uniform moves provably preserve the bank end-to-end.
+- Corpus visual: **32/56 — 24 regressions**, including `text_test` whose data is
+  ALL in bank $00. So the far path is being taken for ordinary bank-$00 pointers
+  and producing wrong results — the **far-dispatch (over-taint seed from attempt
+  #2: every `Oload Kl`) + the far emit are not correct for ordinary pointers**,
+  not just a perf-narrowing issue. (text_test regressing rules out "only
+  higher-bank derefs are wrong".)
+
+**Verdict: NO-GO for a near-term landing.** A6 Tier 2 is confirmed to be the
+multi-week, HIGH-risk chantier the catalogue describes. The spike split the problem
+cleanly into two sub-problems and solved the first:
+1. **(DONE in attempt #4)** preserve the bank through every Kl move — uniform copy.
+2. **(THE REMAINING HARD PART)** decide *when* to deref far and emit it correctly
+   for every pointer storage form (slot/reg/CAddr/RSlot). The far path must fire
+   only for pointers whose bank is genuinely non-$00 (or be correct for bank-$00
+   too — text_test shows it currently isn't), and the over-taint must be replaced
+   by a precise "this deref address can point outside bank $00" analysis. Then
+   re-add the addr_only narrowing to recover the cycles.
+
+Next attempt should keep attempt #4's uniform moves and focus *only* on #2 (far
+emit correctness for bank-$00 first, then the dispatch precision). Estimate stands
+at 2–4 weeks, HIGH risk.
+
+WIP preserved: qbe `wip/a6-deref-attempt4` (`a74685d`). develop restored clean
+(pin 1884a20, 56/56, luna v1.1.0).
+
+## 3l. Phase A started — A1 test matrix landed + the A2 recipe (2026-06-25)
+
+**A1 (done, on develop `5c2c5a0`, PR #84):** turned the single-case `a6_farptr`
+fixture into a **matrix** — each cell is a pointer deref crossed by
+{byte, word, long, param/RSlot, phi} × {bank $00, bank $02}, so a red cell names
+the exact broken emit path (the diagnostic attempts #1–#4 lacked). Run fails only
+on a regression of an expected-green cell → safe gate while Phase A is in flight.
+Baseline on qbe 1884a20: **8/8 expected-green; 6 xfail = the A6 gap** (bank-$02
+byte×2, word×2, param, phi derefs).
+
+**The A2 recipe (the key finding):** the matrix revealed the Kl (u32) **long-load
+path is ALREADY bank-aware** — `l2_0` reads bank $02 correctly on stock 1884a20,
+while byte/word/param/phi derefs codegen as `lda.l $0000,x` (bank-$00-hardcoded;
+see emit.c high-half-skip comment ~L387). So A2 is NOT inventing a far path from
+scratch — it's **replicating the already-correct long-load 24-bit addressing
+(`lda [dp],y` / indirect-long, cf. the `lda [tcc__fp],y` large-frame helper and
+attempt #4's `emit_farptr_setup`) for the byte/word/param/phi load+store emit**,
+one storage form at a time, each gated by:
+  matrix cell green  →  visual 56/56 (no regression)  →  next form.
+
+**A2 entry point:** branch from qbe `wip/a6-deref-attempt4` (`a74685d`, already has
+uniform Kl moves so the bank survives moves). Sites: emit.c byte/word load
+(3741/3769) + store (3482/3484/3519/3552/3617). Correctness for bank-$00 FIRST
+(text_test broke in attempt #4 = far emit wrong even for bank $00), then bank-$02,
+then re-add the addr_only narrowing (Phase B) gated by `make bench`.
+
+**Pace:** A2 is the multi-day HIGH-risk core; do it as a focused effort, not a
+marathon tail — the 3–4 prior regressions came from big-bang/rushing. One form,
+one gate, at a time.
+
+## 3m. A2 cell #1 (byte load) — green on the matrix, regresses the corpus; TWO obstacles isolated (2026-06-25)
+
+Implemented cell #1 isolated on a clean 1884a20 base (qbe `wip/a6-a2-byte-load`,
+`fd5d93e`): two coordinated changes —
+(1) drop `Oloadsb`/`Oloadub` from the `mark_addr_only_kl` bank-discarding
+classification so byte-deref address temps keep their high half (bank);
+(2) emit the byte deref via `lda [tcc__r9]` (copy the 3-byte pointer to tcc__r9),
+mirroring the already-bank-aware Kl-load else path, instead of `lda.l $0000,x`.
+
+**Matrix: worked** — `b2_0`, `b2_7` (byte, bank $02) AND `fp2` (param byte, same
+load path) all XPASS; 8/8 expected-green held. **Corpus: regressed 34/56 (22 fail).**
+
+A forced-bank-$00 diagnostic (`stz tcc__r9+2` instead of the real high half)
+isolated the 22 into TWO independent obstacles:
+- **~17 = garbage pointer high-halves.** With bank $00 forced, the corpus
+  recovers to **51/56** — so ~17 of the failures are pointers whose high half
+  (bank byte) is WRONG when the byte load finally reads it. The codegen never
+  maintained correct pointer bank bytes (byte derefs used `$0000,x` and didn't
+  need them), so making the byte load bank-aware exposes corpus-wide bad
+  provenance. **This is the pervasive A6 work** (correct bank byte at every
+  pointer-producing op: Oadd/Ocopy/phi/load/param), not a per-cell emit fix.
+- **5 = tcc__r9 clobber.** Even with bank $00 forced (mechanism-only), 5 examples
+  still fail. The byte load is a HOT path and tcc__r9 is a shared scratch live
+  across some byte derefs. A bank-aware byte deref needs a DEDICATED, never-
+  allocated DP scratch (cf. attempt #4's `tcc__farptr`, crt0-reserved + NMI-
+  mirrored) or a save/restore, not the shared tcc__r9.
+
+**Verdict:** cell #1 NO-GO as-is, but the matrix delivered exactly what it was
+built for — a *precise* signal (5 mechanism + 17 provenance) instead of "24
+opaque regressions". Conclusion stands and is now sharper: A6 Tier 2's real cost
+is **(a) a clobber-safe far-deref scratch** + **(b) corpus-wide pointer-bank-byte
+provenance correctness** — both pervasive, the 2–4 week HIGH-risk chantier. The
+emit change itself is small and correct (proven by the matrix); the hard part is
+upstream of it. WIP preserved: qbe `wip/a6-a2-byte-load` (`fd5d93e`). develop
+clean (1884a20, 56/56).
+
 ## 4. Test strategy (luna, not the removed bridge)
 
 The catalogue's acceptance criteria predate the luna migration and reference
@@ -578,6 +681,59 @@ important deliverable of Phase 0.
 
 Phases 2–4 (A6 / B2 / B1) remain documented above but are **out of scope** until
 the follow-up chantier opens; decisions #2 and #3 are pre-recorded for it.
+
+## 8. Dedicated-session plan — pointer bank-byte PROVENANCE (the remaining A6 Tier 2)
+
+Closed A6 here on 2026-06-25 (Tier 1 practical relief shipped; Tier 2 scoped +
+tooled, not landed). This section is the **cold-start plan** for the dedicated
+session that finishes Tier 2. Read §3e–§3m first — they are every attempt's root
+cause.
+
+**The one-line insight (from §3m):** the far-deref EMIT is small and *correct*
+(the A1 matrix proves byte/param bank-$02 cells go green). The corpus regresses
+because pointer **high halves (bank bytes) are garbage** — codegen never
+maintained them (byte/word derefs used `lda.l $0000,x`, never needed the bank). So
+Tier 2's real work is **upstream provenance**, not the deref. Quantified: a
+forced-bank-$00 diagnostic split cell #1's 22 regressions into **17 provenance + 5
+scratch-clobber**.
+
+**Two workstreams:**
+- **(a) Dedicated far-deref scratch** (bounded, ~1–2 days): the deref emit must NOT
+  reuse the shared `tcc__r9` (live across hot byte derefs → 5 regressions). Add a
+  never-allocated DP scratch, crt0-reserved + NMI-mirrored (the `tcc__farptr`
+  pattern already on qbe `wip/a6-deref-attempt4` + superproject crt0 diff vs
+  `origin/chantier/a6-codegen`). Fixes the 5.
+- **(b) Bank-byte provenance** (the core, the multi-week part): every
+  pointer-producing op must carry the correct high half (bank):
+  - pointer LOAD (`Oload Kl`): already bank-aware (`l2_0` green). ✓
+  - `&sym` (CAddr): high = symbol bank (`lda.w #:sym`).
+  - pointer arith (`Oadd`/`Osub Kl`): high = base.high + carry — verify the real
+    high path, not the `addr_only`-skipped stub.
+  - copy/phi (`Ocopy`/phi-out) + param (RSlot materialisation): copy BOTH halves
+    (attempt #4's uniform moves — but scoped to genuine pointers, to keep perf).
+  - near pointers (stack/vreg, bank $00): high must be a real `$00`, not garbage.
+
+**Method — the gate discipline that makes it converge (it's why the 5 attempts
+thrashed without it):**
+1. Base: qbe `wip/a6-a2-byte-load` (`fd5d93e`, cell #1 emit) + land (a) first.
+2. Enable bank-aware deref ONE form at a time (byte → word/half → store), each
+   gated: **matrix cell green → visual 56/56 → `make bench` acceptable → next**.
+3. Per failing matrix cell, the form names the broken provenance path; per corpus
+   regression, **bisect to the pointer-producing op** (`regression_method`).
+4. Re-add the `addr_only` low-only narrowing **LAST** (perf), gated by bench.
+
+**Acceptance:** matrix 14/14 green + visual 56/56 + bench within budget; then
+revert the C.5 `.dsb` padding, confirm `sizeof(void*)==4` round-trips, close
+B1/B3/B4 as subsumed, retighten `BANK0_FAIL_THRESHOLD`, update `KNOWN_LIMITATIONS`
+/ `bank0_budget` / `compiler/ABI.md`. (B2 — RAM > $2000 — is separable, §3 Phase 3.)
+
+**Estimate:** 2–4 weeks, HIGH risk — but *cadré*: the emit is known-correct, the
+matrix gives a per-cell gate, and the two obstacles are named + measured.
+
+**Entry artifacts:** matrix `devtools/compiler-tests/runtime/a6_farptr/` (on
+develop); qbe wips `a6-deref-attempt4` (uniform moves) + `a6-a2-byte-load` (cell #1
+emit); §3e–§3m (per-attempt root causes); crt0 `tcc__farptr` diff on
+`origin/chantier/a6-codegen`.
 
 ---
 

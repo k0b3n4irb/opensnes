@@ -31,6 +31,7 @@
  */
 
 #include <snes.h>
+#include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /*============================================================================
  * External Graphics Data (defined in data.asm)
@@ -81,7 +82,7 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1 tilemap at VRAM $1000, 32x32 tiles */
-    bgSetMapPtr(0, 0x1000, SC_32x32);
+    bgSetMapPtr(0, VRAM_BG_MAP, SC_32x32);
 
     /*------------------------------------------------------------------------
      * Load Background Tiles and Palette
@@ -91,13 +92,13 @@ int main(void) {
     bgInitTileSet(0, tiles, palette, 0,
                   tiles_end - tiles,
                   palette_end - palette,
-                  BG_16COLORS, 0x4000);
+                  BG_16COLORS, VRAM_BG_TILES);
 
     /*------------------------------------------------------------------------
      * Load Tilemap Data
      *------------------------------------------------------------------------*/
 
-    dmaCopyVram(tilemap, 0x1000, tilemap_end - tilemap);
+    dmaCopyVram(tilemap, VRAM_BG_MAP, tilemap_end - tilemap);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
