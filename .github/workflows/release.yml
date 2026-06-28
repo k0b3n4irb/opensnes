@@ -43,6 +43,9 @@ jobs:
           - os: ubuntu-latest
             name: linux
             arch: x86_64
+          - os: ubuntu-24.04-arm
+            name: linux
+            arch: arm64
           - os: windows-latest
             name: windows
             arch: x86_64
@@ -211,6 +214,7 @@ jobs:
           | Platform | File | Architecture |
           |----------|------|--------------|
           | **Linux** | \`opensnes_${TAG}_linux_x86_64.zip\` | x86_64 |
+          | **Linux** | \`opensnes_${TAG}_linux_arm64.zip\` | arm64 (aarch64) |
           | **macOS** | \`opensnes_${TAG}_darwin_arm64.zip\` | arm64 (Apple Silicon) |
           | **Windows** | \`opensnes_${TAG}_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
 
@@ -233,5 +237,6 @@ jobs:
           prerelease: ${{ contains(steps.tag.outputs.version, '-rc') || contains(steps.tag.outputs.version, '-beta') }}
           files: |
             artifacts/opensnes-${{ steps.tag.outputs.version }}-linux-x86_64/opensnes_${{ steps.tag.outputs.version }}_linux_x86_64.zip
+            artifacts/opensnes-${{ steps.tag.outputs.version }}-linux-arm64/opensnes_${{ steps.tag.outputs.version }}_linux_arm64.zip
             artifacts/opensnes-${{ steps.tag.outputs.version }}-darwin-arm64/opensnes_${{ steps.tag.outputs.version }}_darwin_arm64.zip
             artifacts/opensnes-${{ steps.tag.outputs.version }}-windows-x86_64/opensnes_${{ steps.tag.outputs.version }}_windows_x86_64.zip
