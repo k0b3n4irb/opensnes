@@ -56,11 +56,11 @@ var NAVTREEINDEX =
 "examples_basics_aim_target.html#autotoc_md774",
 "examples_maps_mapscroll.html",
 "globals_vars_t.html",
-"group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190",
-"input_2mouse_2main_8c.html",
-"object_8h.html#a9e81915d1e68d22798a93bb27eb74188",
-"sprite_8h.html#a697c4b66632525f55f21fb6008582b3f",
-"system_8h_source.html"
+"group__macros.html#ga3c7c6a69f690fc8d2abf0e385280a532",
+"hud_8c.html#afb7d77d2cb1b2d6ac51e982dbc580af5",
+"mosaic_8h.html#a310a4d7b11cd15e26c8b0276f49714d6",
+"sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f",
+"superfx_8h.html#ad49cfcd5809d7d410a438b19b51db933"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

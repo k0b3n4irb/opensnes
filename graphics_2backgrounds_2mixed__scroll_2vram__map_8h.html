@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/graphics/backgrounds/mixed_scroll Directory Reference</title>
+<title>/home/runner/work/opensnes/opensnes/examples/graphics/backgrounds/mixed_scroll/vram_map.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -76,7 +76,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('dir_3d598cdfc89743e7f67879c28acf14de.html','',''); });
+$(function(){initNavTree('graphics_2backgrounds_2mixed__scroll_2vram__map_8h.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -102,16 +102,76 @@ $(function(){initNavTree('dir_3d598cdfc89743e7f67879c28acf14de.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">mixed_scroll Directory Reference</div></div>
+  <div class="headertitle"><div class="title">vram_map.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a href="graphics_2backgrounds_2mixed__scroll_2vram__map_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-files" class="groupheader"><a id="files" name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight"><a class="el" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html">main.c</a></td></tr>
-<tr class="memdesc:graphics_2backgrounds_2mixed__scroll_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mixed scrolling with fixed and auto-scrolling background layers. <br /></td></tr>
-<tr class="memitem:vram_5Fmap_2Eh" id="r_vram_5Fmap_2Eh"><td class="memItemLeft"><a href="graphics_2backgrounds_2mixed__scroll_2vram__map_8h_source.html"><span class="icondoc"><div class="doc-icon"></div></span></a>&#160;</td><td class="memItemRight"><a class="el" href="graphics_2backgrounds_2mixed__scroll_2vram__map_8h.html">vram_map.h</a></td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a062335e0c6d2c2294bf2782b300c7a60" id="r_a062335e0c6d2c2294bf2782b300c7a60"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a062335e0c6d2c2294bf2782b300c7a60">VRAM_BG1_MAP</a>&#160;&#160;&#160;0x1800  /* bg_map, 1024 words */</td></tr>
+<tr class="memitem:a75ec3171efbfd345d2b96dcede29ded2" id="r_a75ec3171efbfd345d2b96dcede29ded2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a75ec3171efbfd345d2b96dcede29ded2">VRAM_BG1_TILES</a>&#160;&#160;&#160;0x4000  /* bg_char, 4096 words */</td></tr>
+<tr class="memitem:a887794f9b169e435e406eed5ff0a9c3b" id="r_a887794f9b169e435e406eed5ff0a9c3b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a887794f9b169e435e406eed5ff0a9c3b">VRAM_BG2_MAP</a>&#160;&#160;&#160;0x1400  /* bg_map, 1024 words */</td></tr>
+<tr class="memitem:ab202e5cd47fa03ebeb38e0a3b0c8940b" id="r_ab202e5cd47fa03ebeb38e0a3b0c8940b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab202e5cd47fa03ebeb38e0a3b0c8940b">VRAM_BG2_TILES</a>&#160;&#160;&#160;0x5000  /* bg_char, 4096 words */</td></tr>
 </table>
+<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a062335e0c6d2c2294bf2782b300c7a60" name="a062335e0c6d2c2294bf2782b300c7a60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a062335e0c6d2c2294bf2782b300c7a60">&#9670;&#160;</a></span>VRAM_BG1_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_MAP&#160;&#160;&#160;0x1800  /* bg_map, 1024 words */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a75ec3171efbfd345d2b96dcede29ded2" name="a75ec3171efbfd345d2b96dcede29ded2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75ec3171efbfd345d2b96dcede29ded2">&#9670;&#160;</a></span>VRAM_BG1_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_TILES&#160;&#160;&#160;0x4000  /* bg_char, 4096 words */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a887794f9b169e435e406eed5ff0a9c3b" name="a887794f9b169e435e406eed5ff0a9c3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a887794f9b169e435e406eed5ff0a9c3b">&#9670;&#160;</a></span>VRAM_BG2_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG2_MAP&#160;&#160;&#160;0x1400  /* bg_map, 1024 words */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab202e5cd47fa03ebeb38e0a3b0c8940b" name="ab202e5cd47fa03ebeb38e0a3b0c8940b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab202e5cd47fa03ebeb38e0a3b0c8940b">&#9670;&#160;</a></span>VRAM_BG2_TILES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG2_TILES&#160;&#160;&#160;0x5000  /* bg_char, 4096 words */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
@@ -125,7 +185,7 @@ Files</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_4251b06da62033b8d905b2cbf64b4698.html">graphics</a></li><li class="navelem"><a href="dir_672c964aadd4a21b298f7c71cf1f0668.html">backgrounds</a></li><li class="navelem"><a href="dir_3d598cdfc89743e7f67879c28acf14de.html">mixed_scroll</a></li>
+    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_4251b06da62033b8d905b2cbf64b4698.html">graphics</a></li><li class="navelem"><a href="dir_672c964aadd4a21b298f7c71cf1f0668.html">backgrounds</a></li><li class="navelem"><a href="dir_3d598cdfc89743e7f67879c28acf14de.html">mixed_scroll</a></li><li class="navelem"><a href="graphics_2backgrounds_2mixed__scroll_2vram__map_8h.html">vram_map.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>
