@@ -61,7 +61,7 @@ Download the latest release for your platform from the
 | Platform | File |
 |----------|------|
 | Linux x86_64 | `opensnes_<version>_linux_x86_64.zip` |
-| Linux aarch64 | `opensnes_<version>_linux_aarch64.zip` |
+| Linux aarch64 | `opensnes_<version>_linux_arm64.zip` |
 | macOS arm64 | `opensnes_<version>_darwin_arm64.zip` |
 | Windows x86_64 | `opensnes_<version>_windows_x86_64.zip` |
 
@@ -84,7 +84,37 @@ You should see "Hello World!" on screen.
 
 ### A5. Create Your Own Project
 
-Create a new directory anywhere on your machine:
+The SDK ships an **`opensnes` CLI** (in the extracted `bin/` directory) that
+scaffolds, builds, and runs a project for you. Put it on your `PATH` once — from
+the extracted SDK directory:
+
+```bash
+export PATH="$PWD/bin:$PATH"   # add to your shell profile to make it permanent
+```
+
+Then create, build, and run your first project in three commands:
+
+```bash
+opensnes init my-game --template game   # scaffolds Makefile + main.c + res/
+cd my-game
+opensnes run                            # builds the ROM and launches your emulator
+```
+
+`opensnes init` gives you a project that builds and runs from the start. Pick a
+template:
+
+- **`--template blank`** — a "HELLO SNES!" text screen, the simplest starting point.
+- **`--template game`** — a white sprite you move with the D-pad, a starting
+  point for an action game.
+
+Other commands: `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
+your toolchain, library, and emulator and tells you what is missing). Run
+`opensnes help` for the full list.
+
+#### Manual setup (the long way)
+
+Prefer to wire it by hand, or curious what `init` generates? Create a new
+directory anywhere on your machine:
 
 ```bash
 mkdir ~/my-snes-game
