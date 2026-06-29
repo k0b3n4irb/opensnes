@@ -5,6 +5,36 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.25.0] — 2026-06-29
+
+Onboarding & developer-experience release. The first impression now matches the
+project's goal of being approachable at any level, and the `opensnes` project CLI
+— previously uninstalled and undocumented — is shipped as the headline "start
+your own game" path.
+
+### Added
+- feat(build,tools): ship the `opensnes` project CLI (`init` / `build` / `run` /
+  `doctor`) — installed into `bin/` and the release zip; scaffolds a working
+  project from `blank` or `game` templates (#88)
+- docs: `SECURITY.md` — private vulnerability disclosure policy and supported
+  versions (#87)
+- docs: `examples/basics/fix32_orbit` gains a README + screenshot, completing the
+  "every example has a README and screenshot" guarantee (#87)
+
+### Changed
+- docs: README "Who is OpenSNES for?" reframed from a gatekeeping list into
+  on-ramps by level (new-to-SNES / comfortable / porting+perf) (#87)
+- docs: `GETTING_STARTED.md` "Create Your Own Project" is now CLI-first, with the
+  hand-written Makefile + `main.c` kept as a manual alternative (#88)
+
+### Fixed
+- fix(tools): the CLI `blank`/`game` templates now compile against the current
+  API (`textModeInit()`); the `game` template renders a visible, D-pad-movable
+  sprite (#88)
+- fix(build): `.vscode/tasks.json` test tasks pointed at `tests/*.sh` removed in
+  the luna migration — now `make tests` / `make test-compiler` (#87)
+- docs: link `luna` mentions in the README to the luna project
+
 ## [0.24.0] — 2026-06-28
 
 First release with a native Linux **aarch64 (arm64)** SDK package. The

@@ -57,35 +57,21 @@
             "presentation": { "reveal": "always", "clear": true }
         },
 
-        // ── Tests ────────────────────────────────────────────────
+        // ── Tests (luna harness — see make tests) ────────────────
         {
-            "label": "Run Unit Tests",
+            "label": "Run Tests (luna)",
             "type": "shell",
-            "command": "./tests/unit/run_unit_tests.sh",
-            "group": "test",
-            "problemMatcher": []
+            "command": "make tests",
+            "group": { "kind": "test", "isDefault": true },
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "clear": true }
         },
         {
             "label": "Run Compiler Tests",
             "type": "shell",
-            "command": "./tests/compiler/run_tests.sh",
+            "command": "make test-compiler",
             "group": "test",
             "problemMatcher": []
-        },
-        {
-            "label": "Run Example Validation",
-            "type": "shell",
-            "command": "OPENSNES_HOME=${workspaceFolder} ./tests/examples/validate_examples.sh --quick",
-            "group": "test",
-            "problemMatcher": []
-        },
-        {
-            "label": "Run All Tests",
-            "type": "shell",
-            "command": "./tests/unit/run_unit_tests.sh && ./tests/compiler/run_tests.sh && OPENSNES_HOME=${workspaceFolder} ./tests/examples/validate_examples.sh --quick",
-            "group": { "kind": "test", "isDefault": true },
-            "problemMatcher": [],
-            "presentation": { "reveal": "always", "clear": true }
         }
     ]
 }

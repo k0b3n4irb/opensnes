@@ -46,32 +46,33 @@ If that sounds exciting rather than terrifying, you're in the right place.
 
 ## Who is OpenSNES for?
 
-OpenSNES is built for developers who already know the SNES — or who are willing
-to invest the time to learn it. Concretely, you'll be productive here if:
+OpenSNES meets you at your level. The SDK does the hardware bookkeeping so you
+can start in C, and gets out of the way when you're ready to go deeper. There's
+a lane here whether you're curious, comfortable, or hardcore:
 
-- You're comfortable reading and writing **65816 assembly** when needed (most
-  game code is C, but you will hit assembly: HDMA tables, the NMI handler,
-  perf-critical inner loops).
-- You understand the **NMI / VBlank model** — when you can write to VRAM, why
-  DMA outside of VBlank silently fails, what a 4 KB VBlank budget means.
-- You can read a hex address. OAM, CGRAM, VRAM, BG tilemap addresses, palette
-  base offsets — these are part of the daily vocabulary.
-- You're porting from PVSnesLib, or coming from another SNES SDK, or you've
-  already shipped something for a comparable retro target.
+- **New to the SNES but fluent in C?** Start with
+  [`examples/text/hello_world`](examples/text/hello_world/) and follow the
+  [learning path](docs/LEARNING_PATH.md). You'll have a ROM running in minutes
+  and meet the hardware one example at a time — no assembly required to get
+  moving.
+- **Comfortable with retro hardware?** The library covers sprites, backgrounds,
+  DMA, HDMA, input, audio and Mode 7 through a clean C API, so your time goes
+  into the game, not the boilerplate.
+- **Porting from PVSnesLib, or chasing cycles?** Drop to 65816 assembly
+  whenever you want — [`compiler/ABI.md`](compiler/ABI.md) documents the calling
+  convention with worked examples, and the SDK never hides the hardware from you.
 
-It is **not** the right SDK if any of these apply:
+Two honest expectations before you start:
 
-- You're new to SNES development and just want to "make a game in C". The
-  language is the easy part; the hardware is the hard part. Start with a
-  beginner-friendly engine (Godot, GameMaker, etc.), then come back when the
-  retro itch is specific.
-- You want a fully managed runtime that hides the hardware. There isn't one
-  to hide it behind — the silent-failure list is real and inherited from the
-  machine.
-- You need a stable production toolchain for a deadline-driven project. The
-  SDK is **late beta** — the test suite is green and CI is enforced, but
-  several optimisations and chip APIs are still planned (see the
-  [roadmap](ROADMAP.md)).
+- **The SNES doesn't hide its hardware, and neither do we.** The language is the
+  easy part; the machine is the hard part. You'll meet VRAM-only-in-VBlank, DMA
+  budgets, and hex addresses — that's the nature of the target, not a flaw in
+  the SDK. The difference here is that you can learn it incrementally, in C, with
+  a worked example for each step.
+- **The SDK is late beta.** The test suite is green and CI is enforced on three
+  platforms, but several optimisations and chip APIs are still planned (see the
+  [roadmap](ROADMAP.md)). It's a great place to learn and build; pin a commit if
+  you need a frozen toolchain for a hard deadline.
 
 **Read [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) before you start.** It
 catalogs every silent failure we know about, with severity tags and
@@ -88,7 +89,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
 | **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP register init is an assumption, not a published spec. |
-| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by luna**, which detects and executes the GSU natively in the headless test harness. |
+| **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by [luna](https://github.com/k0b3n4irb/luna)**, which detects and executes the GSU natively in the headless test harness. |
 
 ---
 
@@ -101,7 +102,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
 | **56 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
-| **Debug emulator** | luna (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
+| **Debug emulator** | [luna](https://github.com/k0b3n4irb/luna) (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
 
 ## Design Philosophy
@@ -134,7 +135,15 @@ make
 
 Open `examples/text/hello_world/hello_world.sfc` in [Mesen2](https://www.mesen.ca/) and you're running on a Super Nintendo.
 
-For prerequisites and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting_started.html)**.
+To start your own game, the build installs an `opensnes` CLI in `bin/`:
+
+```bash
+bin/opensnes init my-game --template game   # scaffolds a working project
+cd my-game && ../bin/opensnes run           # builds and launches your emulator
+```
+
+`opensnes doctor` checks your toolchain, library, and emulator. For prerequisites
+and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting_started.html)**.
 
 ## Examples
 
