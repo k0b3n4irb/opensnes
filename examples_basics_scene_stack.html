@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_basics_scene_stack.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md803"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md809"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to split a game into <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> callbacks (<span class="tt">init</span> + <span class="tt">update</span>)</li>
@@ -118,7 +118,7 @@ What You'll Learn</h2>
 <li>How <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> resumes a suspended scene <b>without</b> re-running its <span class="tt">init</span></li>
 <li>How <span class="tt"><a class="el" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> replaces the standard <span class="tt">while (1) { <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>; update(); }</span> loop</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md804"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md810"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -132,9 +132,9 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Pause  </td><td class="markdownTableBodyNone">Select  </td><td class="markdownTableBodyNone">Pop back to counter (counter resumes from where it was)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md805"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md811"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md806"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md812"></a>
 The Scene struct</h3>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    void (*init)(void);    <span class="comment">// optional, NULL skip; runs once on first push</span></div>
@@ -142,21 +142,21 @@ The Scene struct</h3>
 <div class="line">} <a class="code hl_struct" href="structScene.html">Scene</a>;</div>
 <div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
 </div><!-- fragment --><p>Three callbacks live in this example: <span class="tt">title_init/update</span>, <span class="tt">counter_init/update</span>, <span class="tt">pause_init/update</span>. Each is a small function (8-15 lines) that does one thing.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md807"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md813"></a>
 Push/pop semantics</h3>
 <ul>
 <li><b>Push</b> suspends the currently-executing scene's <span class="tt">update</span> finishes its frame, then the next VBlank dispatches to the new top scene. <span class="tt">init</span> runs exactly once on push.</li>
 <li><b>Pop</b> removes the top scene; the resumed scene's <span class="tt">update</span> runs on the next VBlank — no <span class="tt">init</span> re-run, so its state survives. The counter's <span class="tt"><a class="el" href="basics_2scene__stack_2main_8c.html#a6d6fa96aac96b2643656c7cd3c5c3b17" title="Counter value, lives across pause/resume because counter&#39;s init runs once on push,...">counter_value</a></span> global persists across pause/resume because of this.</li>
 <li>The bottom of the stack is immortal. <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> on a stack of size 1 is a silent no-op (the title screen can't accidentally exit).</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md808"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md814"></a>
 Why a framework instead of a switch</h3>
 <p>The hand-rolled equivalent is a <span class="tt">enum State current; switch (current) { ... }</span> plus an array for the suspend stack. ~15 lines of state-machine boilerplate per game. The framework brings it to 5: declare the <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs, call <span class="tt"><a class="el" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span>. The runtime cost is one indirect call per frame (~20 cycles on top of <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>'s overhead) — negligible against a 357K-cycle frame budget.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md809"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md815"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>Then load <span class="tt">scene_stack.sfc</span> in your favourite SNES emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md810"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md816"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">text</span>, <span class="tt">input</span>, <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a9181964c99c78f9d466d51f152714e38">scene</a></span> </p>
 </div></div><!-- contents -->

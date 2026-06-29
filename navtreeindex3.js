@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"globals_vars_s.html":[3,1,2,17],
 "globals_vars_t.html":[3,1,2,18],
 "globals_vars_v.html":[3,1,2,19],
 "globals_vars_w.html":[3,1,2,20],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "group__layer__enable.html#gad739d38370db8d874382ea94ba39d16e":[1,16,3],
 "group__macros.html":[1,8],
 "group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4":[1,8,8],
-"group__macros.html#ga3a8ea58898cb58fc96013383d39f482c":[1,8,1],
-"group__macros.html#ga3acffbd305ee72dcd4593c0d8af64a4f":[1,8,7]
+"group__macros.html#ga3a8ea58898cb58fc96013383d39f482c":[1,8,1]
 };

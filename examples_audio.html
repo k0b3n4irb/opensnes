@@ -107,7 +107,7 @@ $(function(){initNavTree('examples_audio.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The SNES has a dedicated audio processor &ndash; the SPC700 &ndash; with its own 64KB of RAM, its own DSP chip, and its own instruction set. It runs independently from the main CPU. The two communicate through just 4 shared I/O bytes.</p>
 <p>These examples use <b>SNESMOD</b>, a tracker-based audio engine. You write <span class="tt">.it</span> files in a tracker (OpenMPT, Schism Tracker, etc.), the <span class="tt">smconv</span> tool converts them to SPC700 format, and the library handles playback from C.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md699"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md700"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -117,13 +117,13 @@ Examples</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="snesmod_sfx/">snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Playing sound effects alongside music  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md700"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md701"></a>
 Prerequisites</h2>
 <ul>
 <li>Build the <span class="tt">smconv</span> tool: <span class="tt">make tools</span></li>
 <li>A tracker module in <span class="tt">.it</span> format (Impulse Tracker)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md701"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md702"></a>
 Key Concepts</h2>
 <ul>
 <li>The SPC700 runs its own program independently of the 65816 CPU</li>

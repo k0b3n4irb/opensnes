@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_basics_timer.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md811"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md817"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the NMI handler increments <span class="tt"><a class="el" href="system_8h.html#a393cdd9777ac31290693d930c63d2a83" title="Frame counter incremented every VBlank by the NMI handler.">frame_count</a></span> every VBlank — the heartbeat of every SNES game</li>
@@ -118,7 +118,7 @@ What You'll Learn</h2>
 <li>How <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> synchronizes the main loop to exactly 60/50 fps</li>
 <li>How to read input with <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for single-press detection</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md812"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md818"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -126,15 +126,15 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Reset counter to 0  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md813"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md819"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md814"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md820"></a>
 VBlank and frame_count</h3>
 <p>The SNES PPU triggers an NMI interrupt at the end of every visible frame (scanline 225). The NMI handler in <span class="tt">crt0.asm</span> increments <span class="tt"><a class="el" href="system_8h.html#a393cdd9777ac31290693d930c63d2a83" title="Frame counter incremented every VBlank by the NMI handler.">frame_count</a></span> — a 16-bit counter that wraps at 65535 (~18 minutes at 60 fps). This counter is the basis for all game timing: animation delays, physics steps, input polling, and audio updates all synchronize to it.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md815"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md821"></a>
 WaitForVBlank</h3>
 <p><span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> blocks the main loop until the next NMI fires. This guarantees the game runs at a fixed frame rate. Without it, the main loop would spin freely and produce inconsistent timing.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md816"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md822"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -152,7 +152,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for single-press reset button  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md817"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md823"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/timer</div>

@@ -106,7 +106,7 @@ $(function(){initNavTree('examples_graphics_sprites.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Learn SNES sprite (OBJ) handling from basic display to dynamic VRAM management. The SNES supports 128 hardware sprites with configurable sizes, priorities, and palette assignments.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1272"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1278"></a>
 Examples</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -122,9 +122,9 @@ Examples</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="dynamic_sprite/">dynamic_sprite</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">Dynamic VRAM tile streaming for many unique sprites  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1273"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1279"></a>
 Key Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1274"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1280"></a>
 OAM Structure</h3>
 <p>128 sprites, 4 bytes each in the low table (512 bytes):</p><ul>
 <li>Byte 0: X position (low 8 bits)</li>
@@ -133,7 +133,7 @@ OAM Structure</h3>
 <li>Byte 3: Attributes (vhoopppc &ndash; flip, priority, palette, tile high bit)</li>
 </ul>
 <p>High table (32 bytes): 2 bits per sprite for X high bit and size select.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1275"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1281"></a>
 Sprite Sizes (OBJSEL $2101)</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -151,7 +151,7 @@ Sprite Sizes (OBJSEL $2101)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">32x32  </td><td class="markdownTableBodyNone">64x64  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1276"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1282"></a>
 Performance Tip</h3>
 <p>For many sprites per frame, write directly to the <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> buffer instead of calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> repeatedly. The NMI handler DMAs the buffer to OAM hardware when <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> is set.</p>
 <hr  />

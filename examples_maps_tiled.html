@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_maps_tiled.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1415"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1421"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to design levels in Tiled and convert them for the SNES</li>
@@ -118,7 +118,7 @@ What You'll Learn</h2>
 <li>How tile properties (collision, palette, priority) flow from Tiled to the game</li>
 <li>The complete asset pipeline: Tiled → tmx2snes → ROM</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1416"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1422"></a>
 The Tiled Workflow</h2>
 <div class="fragment"><div class="line">  Tiled Editor              gfx4snes              tmx2snes</div>
 <div class="line">┌──────────────┐        ┌──────────────┐      ┌──────────────┐</div>
@@ -135,9 +135,9 @@ The Tiled Workflow</h2>
 </div><!-- fragment --><p><b>Step 4.</b> Convert the Tiled map with tmx2snes: </p><div class="fragment"><div class="line">tmx2snes maplevel01.tmj tileslevel1.map</div>
 <div class="line"># Outputs: BG1.m16 (tilemap), maplevel01.t16 (tile defs), maplevel01.b16 (attributes)</div>
 </div><!-- fragment --><p><b>Step 5.</b> Include all binaries in <span class="tt">data.asm</span> and call <span class="tt"><a class="el" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> in your game.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1417"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1423"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1418"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1424"></a>
 Map Engine Streaming</h3>
 <p>The SNES has limited VRAM — a 32x32 tilemap is only 2KB. A 224-tile-wide level won't fit. The map engine solves this by keeping the full level in ROM and streaming only the visible 32-tile window to VRAM:</p>
 <ul>
@@ -147,7 +147,7 @@ Map Engine Streaming</h3>
 <li><span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> — DMAs the column updates to VRAM during VBlank</li>
 </ul>
 <p>The tilemap lives at VRAM <span class="tt">$6800</span> with <span class="tt"><a class="el" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></span> layout — this is required by the map engine.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1419"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1425"></a>
 Tile Properties</h3>
 <p>Each tile in the Tiled editor can have custom properties:</p>
 <table class="markdownTable">
@@ -161,7 +161,7 @@ Tile Properties</h3>
 <td class="markdownTableBodyNone"><span class="tt">priority</span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">BG priority bit (bit 13 of tilemap entry)  </td></tr>
 </table>
 <p>These are stored in <span class="tt">.b16</span> (attributes) and <span class="tt">.t16</span> (palette+priority) files by tmx2snes.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1420"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1426"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -171,7 +171,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RIGHT  </td><td class="markdownTableBodyNone">Scroll camera right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1421"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1427"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">tiled/</div>
 <div class="line">├── main.c          — Initialize map engine, scroll with D-pad</div>
@@ -186,7 +186,7 @@ Project Structure</h2>
 <div class="line">    ├── BG1.m16             — Generated: full level tilemap</div>
 <div class="line">    ├── maplevel01.t16      — Generated: tile palette+priority</div>
 <div class="line">    └── maplevel01.b16      — Generated: tile collision attributes</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1422"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1428"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -204,12 +204,12 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="graphics_2backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span>, <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> — the streaming map engine  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1423"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1429"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/tiled</div>
 </div><!-- fragment --><p>Open <span class="tt">tiled.sfc</span> in Mesen2 and scroll with LEFT/RIGHT.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1424"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1430"></a>
 Making Your Own Level</h2>
 <ol type="1">
 <li>Install <a href="https://www.mapeditor.org/">Tiled</a> (free, cross-platform)</li>

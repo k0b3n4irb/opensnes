@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"superfx_8h.html#ad0dda9707c81cac4b8034ae6e33bf243":[3,0,2,0,0,26,24],
 "superfx_8h.html#ad49cfcd5809d7d410a438b19b51db933":[3,0,2,0,0,26,26],
 "superfx_8h.html#ad4ec6523b6b4fd649bd3fc198dce3fb2":[3,0,2,0,0,26,22],
 "superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06":[3,0,2,0,0,26,48],

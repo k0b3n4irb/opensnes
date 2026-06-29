@@ -109,12 +109,12 @@ $(function(){initNavTree('examples_basics_collision_demo.html','',''); });
 <p>AABB sprite-vs-sprite and tile-based wall collision in a walled arena. Move the white square with the D-pad. Overlapping a red enemy turns both green. </p>
 </blockquote>
 <p><img src="screenshot.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md778"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md779"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/collision_demo</div>
 </div><!-- fragment --><p>Then open <span class="tt">collision_demo.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md779"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md780"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -122,7 +122,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-Pad  </td><td class="markdownTableBodyNone">Move player sprite (2 pixels/frame)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md780"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md781"></a>
 What You'll Learn</h2>
 <ul>
 <li>AABB collision via <span class="tt"><a class="el" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8" title="Check rectangle vs rectangle collision (AABB).">collideRect()</a></span> with <span class="tt"><a class="el" href="structRect.html" title="Axis-aligned bounding box (rectangle).">Rect</a></span> struct pointers</li>
@@ -133,9 +133,9 @@ What You'll Learn</h2>
 <li>Palette bank swapping for visual collision feedback</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md782"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md783"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md783"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md784"></a>
 AABB Collision with Rect Pointers</h3>
 <p><span class="tt"><a class="el" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8" title="Check rectangle vs rectangle collision (AABB).">collideRect()</a></span> takes two <span class="tt">Rect*</span> pointers and returns non-zero if the rectangles overlap. The <span class="tt"><a class="el" href="structRect.html" title="Axis-aligned bounding box (rectangle).">Rect</a></span> struct holds <span class="tt">x</span>, <span class="tt">y</span>, <span class="tt">width</span>, and <span class="tt">height</span> fields:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a6b135eb85318c9cd14e19a4325b765c6">player_box</a>.x = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
@@ -155,7 +155,7 @@ AABB Collision with Rect Pointers</h3>
 <div class="ttc" id="acollision_8h_html_abb09495fb18f03c5f57e7d91afbbaba8"><div class="ttname"><a href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8">collideRect</a></div><div class="ttdeci">u8 collideRect(Rect *a, Rect *b)</div><div class="ttdoc">Check rectangle vs rectangle collision (AABB).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 </div><!-- fragment --><p>The example checks the player against four static enemy sprites each frame, storing results in a bitmask (<span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#a09f5942c1c4cbb4530e773cfab273444" title="Bitmask tracking which enemies the player is currently overlapping.">collision_flags</a></span>). Bit N set means enemy N is overlapping.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md784"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md785"></a>
 Tile-Based Wall Collision</h3>
 <p><span class="tt"><a class="el" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> takes four parameters: a pixel X coordinate, a pixel Y coordinate, a pointer to the collision map array, and the map width in tiles:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a>(map_x, map_y, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a793d2b17e73273def2dc524d48aa51ba">collision_map</a>, <a class="code hl_define" href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a>)</div>
@@ -163,7 +163,7 @@ Tile-Based Wall Collision</h3>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_aa037a6d6a4f04d51c7ec1c9ee9054e76"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#aa037a6d6a4f04d51c7ec1c9ee9054e76">MAP_WIDTH</a></div><div class="ttdeci">#define MAP_WIDTH</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 <div class="ttc" id="acollision_8h_html_a653ce0d0c8ee01d02993035990f64a03"><div class="ttname"><a href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03">collideTile</a></div><div class="ttdeci">u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth)</div><div class="ttdoc">Check collision with tile at pixel coordinates.</div></div>
 </div><!-- fragment --><p>It converts the pixel position to a tile index (dividing by 8) and returns the tile value &ndash; 1 for solid, 0 for passable. The example checks all four corners of the player's 8x8 bounding box to detect wall overlap.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md785"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md786"></a>
 Per-Axis Sliding</h3>
 <p>When a diagonal movement would collide, each axis is tested independently. If only the X component collides, the Y movement still applies (and vice versa). This lets the player slide along walls:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (!<a class="code hl_function" href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a>(new_x, new_y)) {</div>
@@ -174,7 +174,7 @@ Per-Axis Sliding</h3>
 <div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, new_y)) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = new_y;</div>
 <div class="line">}</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_affd96b773b68b544ff0e952b63d80678"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#affd96b773b68b544ff0e952b63d80678">check_wall_collision</a></div><div class="ttdeci">static u8 check_wall_collision(s16 new_x, s16 new_y)</div><div class="ttdoc">Test whether a position would overlap a solid wall tile.</div><div class="ttdef"><b>Definition</b> main.c:372</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md786"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md787"></a>
 Direct oamMemory[] Writes</h3>
 <p>Instead of calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> (which has a 158-byte stack frame per call), the example writes sprite data directly into the OAM buffer. Each sprite is 4 bytes: X low, Y, tile number, and attribute byte (priority + palette bank):</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[0] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
@@ -188,7 +188,7 @@ Direct oamMemory[] Writes</h3>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
 </div><!-- fragment --><p>When a collision is active, the palette bank switches from 0 (normal colors: white player, red enemies) to 1 (green highlight for both), providing instant visual feedback.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md787"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md788"></a>
 Collision Map Layout</h3>
 <p>The arena is a 16x14 tile grid (128x112 pixels) centered on the 256x224 screen. Walls form the border with symmetric internal platforms:</p>
 <div class="fragment"><div class="line">1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1   (top wall)</div>
@@ -201,7 +201,7 @@ Collision Map Layout</h3>
 <div class="line">1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1   (bottom wall)</div>
 </div><!-- fragment --><p>The same data drives both the visual BG tilemap (drawn once at init) and the runtime collision checks (read every frame).</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md789"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md790"></a>
 Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -211,7 +211,7 @@ Files</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build config (<span class="tt">LIB_MODULES := console input sprite dma collision background</span>)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md790"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md791"></a>
 What's Next?</h2>
 <p><b>Game:</b> <a href="../../games/breakout/">Breakout</a> - Complete game with collision, sprites, and levels </p>
 </div></div><!-- contents -->

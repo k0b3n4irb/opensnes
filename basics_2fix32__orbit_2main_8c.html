@@ -129,14 +129,14 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>16.16 fixed-point orbit demo (B5 capstone) </p>
 <p>A single 8x8 sprite orbits the screen centre. The orbit is driven entirely by the lib's <span class="tt">&lt;<a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">snes/fixed32.h</a>&gt;</span> API — <span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul</a></span>, plus straight Kl arithmetic on <span class="tt"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></span> accumulators.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md791"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md792"></a>
 What this example demonstrates</h2>
 <ul>
 <li><span class="tt"><a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a></span> (<a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a> 16.16) for an angle accumulator that stays smooth across many frames without 8.8 rounding drift.</li>
 <li><span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin</a></span> / <span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos</a></span> lifted from the 8.8 LUT to 16.16 (8 bits of fractional precision, ~25 cycles each — adequate for sub-pixel animation).</li>
 <li><span class="tt">fix32Mul(radius, fix32Cos(angle))</span> as the canonical pattern for trig-driven motion: a <span class="tt">radius * sin/cos</span> term used in every 2D game that needs aim/orbit/parallax-around-a-point.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md792"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md793"></a>
 Inputs / interaction</h2>
 <p>None — the sprite orbits autonomously. The example is structured as the simplest possible <a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a> fixture; later examples (likemario, aim_target, breakout) compose the same primitives into game logic.</p>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, <a class="el" href="fixed32_8h.html#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a>, math </dd></dl>

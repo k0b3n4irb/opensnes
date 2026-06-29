@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_input_controller.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1294"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1300"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to read controller state with <span class="tt">padHeld(0)</span> (returns a 16-bit bitmask)</li>
@@ -118,7 +118,7 @@ What You'll Learn</h2>
 <li>That the NMI handler reads joypads automatically — no manual polling needed</li>
 <li>The difference between <span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></span> (held right now) and <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> (just pressed this frame)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1295"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1301"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -138,12 +138,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">None  </td><td class="markdownTableBodyNone">(blank)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1296"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1302"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1297"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1303"></a>
 How Input Works on the SNES</h3>
 <p>The SNES joypad is a shift register — the hardware clocks out 16 bits of button state every frame during the auto-joypad read period (after VBlank). The NMI handler in <span class="tt">crt0.asm</span> captures this automatically into <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[]</span>. Your code never touches hardware registers directly.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1298"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1304"></a>
 padHeld vs padPressed</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> held = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);      <span class="comment">// Buttons held RIGHT NOW (every frame)</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pressed = <a class="code hl_function" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0); <span class="comment">// Buttons pressed THIS FRAME ONLY (edge detection)</span></div>
@@ -151,7 +151,7 @@ padHeld vs padPressed</h3>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
 </div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld</a></span> for continuous actions (movement, charging). Use <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed</a></span> for one-shot actions (jump, menu select, pause toggle).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1299"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1305"></a>
 Button Bitmask</h3>
 <p>Multiple buttons can be held simultaneously. Test with bitwise AND:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) { <span class="comment">/* A is held */</span> }</div>
@@ -159,7 +159,7 @@ Button Bitmask</h3>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga600bb1ce7eb7b6ca4dcbb41546c32ec5"><div class="ttname"><a href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></div><div class="ttdeci">#define KEY_L</div><div class="ttdef"><b>Definition</b> input.h:83</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaa020da9e48a194889ac72f94408b3c25"><div class="ttname"><a href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div><div class="ttdeci">#define KEY_R</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1300"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1306"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -177,7 +177,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></span>, <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for reading controller state  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1301"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1307"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/controller</div>

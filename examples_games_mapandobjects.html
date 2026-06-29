@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_games_mapandobjects.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md872"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md878"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to use the map engine for tile-based level scrolling with collision data</li>
@@ -119,18 +119,18 @@ What You'll Learn</h2>
 <li>How to build a multi-file C project on the SNES (separate .c files per entity)</li>
 <li>How the dynamic sprite engine streams sprite tiles into VRAM on demand</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md873"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md879"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md874"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md880"></a>
 Map Engine and Tile Collision</h3>
 <p>The SNES PPU renders backgrounds from tilemaps in VRAM, but it has no built-in concept of "solid ground." The map engine bridges this gap by maintaining a collision attribute table (<span class="tt"><a class="el" href="games_2likemario_2main_8c.html#a7c2cc3f600a848059ca53a4f836c1a40" title="Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format).">tilesetatt</a></span> / <span class="tt">.b16</span> file) that marks each tile as solid, passable, or hazardous. When <span class="tt"><a class="el" href="object_8h.html#a69633332bdfb7f5ef7d1225003dc680e" title="Check object collision with map tiles.">objCollidMap()</a></span> is called, it checks the object's position against this table and adjusts velocity accordingly &ndash; stopping downward movement when standing on a solid tile, for example. The tilemap sits at VRAM $6800 in a 64x32 layout (<span class="tt"><a class="el" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></span>), giving a world 512 pixels wide &ndash; wider than the 256-pixel screen, which is what enables scrolling.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md875"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md881"></a>
 Object Engine</h3>
 <p>The object engine manages a pool of game entities. Each object type registers two callbacks: an <b>init</b> function and an <b>update</b> function. These callbacks are registered in assembly (<span class="tt">data.asm</span>) because the 65816 requires 24-bit addresses (16-bit pointer + 8-bit bank byte) and the C compiler only emits 16-bit pointers. Each frame, <span class="tt"><a class="el" href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83" title="Update all active objects.">objUpdateAll()</a></span> iterates over all active objects, loads their state into <span class="tt"><a class="el" href="object_8h.html#aff685114554f887d186a87bacbe786b9" title="Object workspace (Bank $00).">objWorkspace</a></span>, and calls their update function.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md876"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md882"></a>
 Dynamic Sprites</h3>
 <p>Unlike static sprite allocation where tiles live at fixed VRAM addresses, the dynamic sprite engine (<span class="tt"><a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c" title="Draw a dynamic sprite — engine picks the size routine.">oamDynamicDraw</a></span>) uploads only the tiles that are visible each frame. This is essential when you have multiple animated characters, since SNES OBJ VRAM is limited to 32 KB. Sprite graphics are stored in ROM and streamed to VRAM as needed during VBlank — the NMI handler auto-flushes the VRAM tile queue, so the main loop just calls <span class="tt">oamDynamicDraw(id)</span> per sprite.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md877"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md883"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -142,9 +142,9 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Up + A  </td><td class="markdownTableBodyNone">High jump  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md878"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md884"></a>
 How It Works</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md879"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md885"></a>
 1. Initialize the Map and Sprite System</h3>
 <p>The tileset is loaded to VRAM $2000, and the tilemap pointer is set to $6800 with a 64x32 tile layout. The dynamic sprite engine is initialized with large sprites at VRAM $0000 and small sprites at $1000.</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structOamDynamicConfig.html">OamDynamicConfig</a> dyn = {</div>
@@ -169,13 +169,13 @@ How It Works</h2>
 <div class="ttc" id="asprite_8h_html_a333ce995f2762b9da596948ab43c5d54"><div class="ttname"><a href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a></div><div class="ttdeci">void oamDynamicInit(const OamDynamicConfig *cfg)</div><div class="ttdoc">Initialize the dynamic sprite engine from a config struct.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet).</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
 <div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:559</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md880"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md886"></a>
 2. Register Object Types in Assembly</h3>
 <p>Each object type (Mario=0, Goomba=1, Koopa Troopa=2) has its init and update function pointers stored with correct bank bytes. This must be done in assembly because C cannot express 24-bit far pointers:</p>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8">objRegisterTypes</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"><a class="code hl_function" href="games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8">objRegisterTypes</a>();</div>
 <div class="ttc" id="agames_2mapandobjects_2main_8c_html_a74052cbd6e76b231e97756db972f22a8"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8">objRegisterTypes</a></div><div class="ttdeci">void objRegisterTypes(void)</div><div class="ttdoc">Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md881"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md887"></a>
 3. Load Objects from Map Data</h3>
 <p>Objects are defined in the level editor and stored in a <span class="tt">.o16</span> file. The object engine parses this data, calling each type's init function to spawn entities at their map positions:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a">objLoadObjects</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3">objmario</a>);</div>
@@ -187,7 +187,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="amap_8h_html_acbc2c1bd8e111d2f1bf776cc15f1f104"><div class="ttname"><a href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104">mapLoad</a></div><div class="ttdeci">void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop)</div><div class="ttdoc">Load map data into the engine and flush to VRAM.</div></div>
 <div class="ttc" id="aobject_8h_html_a6d3d7ee4565b89ae91b57ed95c8b8e7a"><div class="ttname"><a href="object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a">objLoadObjects</a></div><div class="ttdeci">void objLoadObjects(u8 *sourceO)</div><div class="ttdoc">Load objects from a data table.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md882"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md888"></a>
 4. Main Loop: Update, Draw, Sync</h3>
 <p>Every frame: update the map scroll state, update all objects (physics + AI), wait for VBlank, then let <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> flush tilemap changes. The NMI handler auto-flushes the dynamic sprite engine — no <span class="tt">oamInitDynamicSpriteEndFrame</span> or <span class="tt">oamVramQueueUpdate</span> calls needed in the main loop.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
@@ -200,7 +200,7 @@ How It Works</h2>
 <div class="ttc" id="amap_8h_html_aa36598a0b40be791f4845574e0c5db1f"><div class="ttname"><a href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a></div><div class="ttdeci">void mapVblank(void)</div><div class="ttdoc">Transfer map updates to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
 <div class="ttc" id="aobject_8h_html_ae992e39d4420d4053b6b9e9084ee9b83"><div class="ttname"><a href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83">objUpdateAll</a></div><div class="ttdeci">void objUpdateAll(void)</div><div class="ttdoc">Update all active objects.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md883"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md889"></a>
 5. Enemy AI (Goomba Example)</h3>
 <p>Each Goomba patrols between <span class="tt">xmin</span> and <span class="tt">xmax</span> boundaries. A frame counter triggers animation and direction changes every 10 ticks. Screen position is computed by subtracting the camera scroll (<span class="tt"><a class="el" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257" title="Current camera X position in pixels.">x_pos</a></span>, <span class="tt"><a class="el" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be" title="Current camera Y position in pixels.">y_pos</a></span>):</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="goomba_8c.html#a5af8f39b4f7cd5a9ae448a28511dca97">goombax</a> = <a class="code hl_variable" href="goomba_8c.html#a5af8f39b4f7cd5a9ae448a28511dca97">goombax</a> - <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>;</div>
@@ -211,7 +211,7 @@ How It Works</h2>
 <div class="ttc" id="amap_8h_html_a52d9f95007fdae0115aa0d5b21317257"><div class="ttname"><a href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a></div><div class="ttdeci">u16 x_pos</div><div class="ttdoc">Current camera X position in pixels.</div></div>
 <div class="ttc" id="asprite_8h_html_a26ae9bbf7a98025a5d9b529bbe403a7f"><div class="ttname"><a href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a></div><div class="ttdeci">t_sprites oambuffer[128]</div><div class="ttdoc">Dynamic sprite buffer (128 entries, 2048 bytes).</div></div>
 <div class="ttc" id="asprite_8h_html_a6160a02efb71cd4b2bac8c1553f9f57c"><div class="ttname"><a href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a></div><div class="ttdeci">void oamDynamicDraw(u16 id)</div><div class="ttdoc">Draw a dynamic sprite — engine picks the size routine.</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md884"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md890"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">mapandobjects/</div>
 <div class="line">├── main.c             — Initialization, main loop, map/object engine setup</div>
@@ -221,7 +221,7 @@ Project Structure</h2>
 <div class="line">├── data.asm           — ROM data + object type registration (ASM)</div>
 <div class="line">├── Makefile           — Build config (4 C files, 8 library modules)</div>
 <div class="line">└── res/               — Tileset, sprite sheets, level data (.m16/.o16/.t16/.b16)</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md885"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md891"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/games/mapandobjects</div>

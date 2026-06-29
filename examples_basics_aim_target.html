@@ -111,7 +111,7 @@ $(function(){initNavTree('examples_basics_aim_target.html','',''); });
 Screenshot</div></div>
     <p>Live demonstration of the four math primitives a 2D action game leans on the most: <b><span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a></span></b> (pixel distance), <b><span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span></b> (8-bit angle to a target), and the <b><span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> / <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span> LUTs</b> (project a velocity vector along that angle). Everything updates live as the user moves the target with the D-pad — the numbers on screen are real arithmetic, not pre-baked.</p>
 <p>The player diamond stays anchored at the screen centre; the X follows the D-pad. Each frame the example recomputes <span class="tt">dx</span>/<span class="tt">dy</span> from the two positions, calls <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a>(dx² + dy²)</span> for the pixel distance, calls <span class="tt">atan2_8(dy, dx)</span> for the 8-bit angle, then calls <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> and <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span> on that angle to read back the unit direction vector.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md773"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md774"></a>
 SNES Concepts</h2>
 <ul>
 <li><span class="tt">&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</span> square-root and atan2 (chantier B6, 2026-05-09):<ul>
@@ -122,7 +122,7 @@ SNES Concepts</h2>
 <li>LUT chaining — feed the <span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> output back into the trig LUT to recover a unit direction vector that points from player to target. This is the canonical pattern for projectile aiming, pursuit AI, and any "rotate sprite to face X" code.</li>
 <li>Mode 0 + sprite overlay — BG1 hosts the text via the <span class="tt">text</span> module; the player and target are 8×8 OBJ sprites on the OBJ layer so they don't disturb the text display. Sprite tiles are placed at VRAM $4000 to keep $0000 free for the text font.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md774"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md775"></a>
 What to Observe</h2>
 <p>The live readout panel updates every frame:</p>
 <ul>
@@ -132,14 +132,14 @@ What to Observe</h2>
 <li><span class="tt">COS</span> / <span class="tt">SIN</span> — 8.8 fixed-point components of the unit direction vector. Their values match the angle: at <span class="tt">ANGLE = 0x40</span> (90°, target straight south on a SNES screen) you see <span class="tt">COS = 0x0000</span> and <span class="tt">SIN = 0x0100</span>.</li>
 </ul>
 <p>Move the X around with the D-pad and watch the entire panel react in real time.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md775"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md776"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make -C examples/basics/aim_target</div>
 </div><!-- fragment --><p>The ROM lands at <span class="tt">examples/basics/aim_target/aim_target.sfc</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md776"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md777"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">text</span>, <span class="tt">input</span>, <span class="tt">gameloop</span>, <span class="tt">math</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md777"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md778"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="math_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/math.md"><span class="tt">docs/tutorials/math.md</span></a> — the full fixed-point math tutorial, including the section on <span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a></span>/<span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> added with chantier B6.</li>

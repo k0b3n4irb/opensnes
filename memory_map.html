@@ -106,10 +106,10 @@ $(function(){initNavTree('memory_map.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Complete memory layout reference for SNES development.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md593"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md594"></a>
 Address Space Overview</h2>
 <p>The 65816 CPU has a 24-bit address bus, allowing access to 16 MB of memory. The address format is <span class="tt">$BB:AAAA</span> where BB is the bank (0-255) and AAAA is the offset within that bank (0-65535).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md594"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md595"></a>
 LoROM Memory Map (Default)</h2>
 <div class="fragment"><div class="line">Bank    Address         Size    Description</div>
 <div class="line">────────────────────────────────────────────────────────────────</div>
@@ -137,9 +137,9 @@ LoROM Memory Map (Default)</h2>
 <div class="line"> </div>
 <div class="line">$80-$BF                         Mirror of $00-$3F</div>
 <div class="line">$C0-$FF                         Mirror of $40-$7F (ROM only)</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md595"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md596"></a>
 Key Memory Regions</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md596"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md597"></a>
 Work RAM ($7E:0000 - $7F:FFFF)</h3>
 <p>128 KB of general-purpose RAM.</p>
 <table class="markdownTable">
@@ -156,7 +156,7 @@ Work RAM ($7E:0000 - $7F:FFFF)</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$7F:0000-$7F:FFFF  </td><td class="markdownTableBodyNone">64 KB  </td><td class="markdownTableBodyNone">General use / buffers  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md597"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md598"></a>
 Video RAM ($2116-$2119)</h3>
 <p>64 KB accessed through registers, not directly mapped.</p>
 <table class="markdownTable">
@@ -170,7 +170,7 @@ Video RAM ($2116-$2119)</h3>
 <td class="markdownTableBodyNone">$8000-$FFFF  </td><td class="markdownTableBodyNone">Tilemaps  </td></tr>
 </table>
 <p>Actual layout depends on your configuration.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md598"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md599"></a>
 OAM (Object Attribute Memory)</h3>
 <p>544 bytes accessed through registers $2102-$2104.</p>
 <div class="fragment"><div class="line"><span class="comment">// Structure per sprite (bytes 0-511, 4 bytes each)</span></div>
@@ -184,7 +184,7 @@ OAM (Object Attribute Memory)</h3>
 <div class="line"><span class="comment">// Extension table (bytes 512-543)</span></div>
 <div class="line"><span class="comment">// 2 bits per sprite: X high bit, size select</span></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md599"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md600"></a>
 CGRAM (Color RAM)</h3>
 <p>512 bytes (256 colors x 2 bytes each).</p>
 <table class="markdownTable">
@@ -196,7 +196,7 @@ CGRAM (Color RAM)</h3>
 <td class="markdownTableBodyNone">256-511  </td><td class="markdownTableBodyNone">Sprite palettes (8 palettes x 16 colors)  </td></tr>
 </table>
 <p>Color format: <span class="tt">0BBBBBGGGGGRRRRR</span> (15-bit)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md600"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md601"></a>
 PPU Registers ($2100-$213F)</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -242,7 +242,7 @@ PPU Registers ($2100-$213F)</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$2133  </td><td class="markdownTableBodyNone">SETINI  </td><td class="markdownTableBodyNone">Screen settings  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md601"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md602"></a>
 CPU Registers ($4200-$44FF)</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -274,7 +274,7 @@ CPU Registers ($4200-$44FF)</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$4218-1F  </td><td class="markdownTableBodyNone">JOY1L-4H  </td><td class="markdownTableBodyNone">Joypad data  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md602"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md603"></a>
 DMA Registers ($43x0-$43xF)</h2>
 <p>8 DMA channels (x = 0-7):</p>
 <table class="markdownTable">
@@ -295,7 +295,7 @@ DMA Registers ($43x0-$43xF)</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$43xA  </td><td class="markdownTableBodyNone">NTRLx  </td><td class="markdownTableBodyNone">HDMA line counter  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md603"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md604"></a>
 Example: Setting Up Memory</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define variables in different memory regions</span></div>
 <div class="line"><span class="preprocessor">#pragma bss-name(push, &quot;BSS&quot;)    </span><span class="comment">// Goes to $7E:0200+</span></div>
@@ -310,9 +310,9 @@ Example: Setting Up Memory</h2>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a>;</div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_af743d5de011168f86bbdb716e0afbc47"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></div><div class="ttdeci">static u8 frame_counter</div><div class="ttdoc">Global frame counter for animation timing.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md604"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md605"></a>
 Enhancement Chip Memory</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md605"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md606"></a>
 SA-1 Cartridge</h3>
 <p>The SA-1 adds a second 65816 CPU and extra RAM to the cartridge.</p>
 <div class="fragment"><div class="line">Address         Size      Description</div>
@@ -324,7 +324,7 @@ SA-1 Cartridge</h3>
 <div class="line">                256 KB</div>
 </div><!-- fragment --><p><b>I-RAM ($3000-$37FF)</b> is the primary communication channel between the SNES main CPU and the SA-1. Both processors can read and write it, gated by the SIWP ($2229) and CIWP ($222A) write-protection registers.</p>
 <p><b>BW-RAM</b> is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB window visible at $6000-$7FFF for convenient access from bank $00 code.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md606"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md607"></a>
 SuperFX Cartridge</h3>
 <p>The SuperFX (GSU) has its own register space and uses cartridge SRAM as a shared framebuffer.</p>
 <div class="fragment"><div class="line">Address         Size      Description</div>
@@ -335,7 +335,7 @@ SuperFX Cartridge</h3>
 </div><!-- fragment --><p><b>GSU registers ($3000-$303F)</b> control the SuperFX processor. The SNES CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).</p>
 <p><b>Code cache ($3100-$32FF)</b> holds the currently cached GSU instructions. The SNES can read but not write this region.</p>
 <p><b>Cartridge SRAM ($70-$71)</b> serves as the GSU framebuffer. The SuperFX PLOT instruction writes pixels here, and the SNES reads it back for display. Bus ownership is controlled by the SCMR register ($303A) — the SNES and GSU cannot access SRAM simultaneously.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md607"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md608"></a>
 Further Reading</h2>
 <ul>
 <li><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Hardware Registers</a> - PPU, DMA, I/O registers</li>

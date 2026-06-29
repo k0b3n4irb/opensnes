@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_maps_slopemario.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1405"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1411"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to use <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></span> for diagonal terrain collision</li>
@@ -119,21 +119,21 @@ What You'll Learn</h2>
 <li>How dynamic sprites handle animation frames with state machines</li>
 <li>How to register object type callbacks from assembly (for correct bank bytes)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1406"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1412"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1407"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1413"></a>
 The Map Engine</h3>
 <p>The OpenSNES map engine handles large scrolling worlds that exceed the 32x32 or 64x64 tile hardware limits. It loads map data from <span class="tt">.m16</span> files (tilemap), <span class="tt">.t16</span> files (tile type definitions), and <span class="tt">.b16</span> files (tile attribute/behavior data). The map is initialized with <span class="tt"><a class="el" href="map_8h.html#acbc2c1bd8e111d2f1bf776cc15f1f104" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and updated each frame with <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span>, which streams new tile columns/rows into VRAM as the camera scrolls. The <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> function performs the actual VRAM transfers during VBlank.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1408"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1414"></a>
 Object Engine and Slope Collision</h3>
 <p>Each object type has an init callback and an update callback, registered via <span class="tt"><a class="el" href="games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8" title="Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.">objRegisterTypes()</a></span>. The engine calls these automatically during <span class="tt"><a class="el" href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83" title="Update all active objects.">objUpdateAll()</a></span>. The key function <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></span> reads tile attribute data (from <span class="tt">.b16</span>) to determine which tiles are solid, which are slopes (types <span class="tt"><a class="el" href="map_8h.html#a008d4ae062a79ec7335e08db7760cbe9" title="Slope 1x1 ascending right (floor rises left-to-right).">T_SLOPEU1</a></span> through <span class="tt"><a class="el" href="map_8h.html#ac0824c3b9bd01205245b0c57e256e852" title="Slope 2x1 upper half descending right.">T_SLOPEUD2</a></span>), and adjusts the object's Y position to follow diagonal surfaces. The object's <span class="tt">tilestand</span> field indicates whether the character is on ground &ndash; essential for jump detection.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1409"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1415"></a>
 Dynamic Sprite Engine</h3>
 <p>The dynamic sprite engine (<span class="tt"><a class="el" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54" title="Initialize the dynamic sprite engine from a config struct.">oamDynamicInit</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c" title="Draw a dynamic sprite — engine picks the size routine.">oamDynamicDraw</a></span>) manages OAM entries and VRAM tile uploads automatically. Each <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[]</span> entry tracks position, current frame ID, and a refresh flag. When <span class="tt">oamrefresh</span> is set to 1, the engine re-uploads that sprite's tile data to VRAM during the next VBlank — the NMI handler auto-flushes the queue, so the application code never calls <span class="tt">oamVramQueueUpdate</span> or <span class="tt">oamInitDynamicSpriteEndFrame</span> from the main loop. The engine is configured at startup with an <span class="tt"><a class="el" href="structOamDynamicConfig.html" title="Configuration for the dynamic sprite engine.">OamDynamicConfig</a></span> struct (<span class="tt">vramLarge=0x0000</span>, <span class="tt">vramSmall=0x1000</span>, <span class="tt">sizeMode=<a class="el" href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf" title="Sprite size indices (for oamInit, oamInitGfxSet).">OBJ_SIZE8_L16</a></span>).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1410"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1416"></a>
 Assembly Bank Byte Registration</h3>
 <p>The compiler produces 16-bit function pointers without bank bytes, but C functions may be placed in bank $01+ by the linker. The <span class="tt"><a class="el" href="games_2mapandobjects_2main_8c.html#a74052cbd6e76b231e97756db972f22a8" title="Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.">objRegisterTypes()</a></span> assembly function uses WLA-DX's <span class="tt">:label</span> syntax to resolve the correct bank byte at link time, storing the full 24-bit address in the object callback tables (<span class="tt">objfctinit</span>, <span class="tt">objfctupd</span>).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1411"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1417"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -143,7 +143,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">Jump (hold Up + A for a higher jump)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1412"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1418"></a>
 How It Works</h2>
 <p><b>1. Setup</b> &ndash; The tileset is loaded to VRAM, the map engine is initialized with slope attribute data, and Mario's object type is registered:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structOamDynamicConfig.html">OamDynamicConfig</a> dyn = {</div>
@@ -234,7 +234,7 @@ How It Works</h2>
 <div class="ttc" id="amap_8h_html_aa36598a0b40be791f4845574e0c5db1f"><div class="ttname"><a href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f">mapVblank</a></div><div class="ttdeci">void mapVblank(void)</div><div class="ttdoc">Transfer map updates to VRAM.</div></div>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="map_8h.html#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
 <div class="ttc" id="aobject_8h_html_ae992e39d4420d4053b6b9e9084ee9b83"><div class="ttname"><a href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83">objUpdateAll</a></div><div class="ttdeci">void objUpdateAll(void)</div><div class="ttdoc">Update all active objects.</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1413"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1419"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">slopemario/</div>
 <div class="line">├── main.c          — Console init, map/object setup, main loop</div>
@@ -249,7 +249,7 @@ Project Structure</h2>
 <div class="line">    ├── map_1_1.o16      — Object placement data (Mario spawn point)</div>
 <div class="line">    ├── map_1_1.t16      — Tile type definitions (solid, slope, empty)</div>
 <div class="line">    └── map_1_1.b16      — Tile behavior/attribute data</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1414"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1420"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/slopemario</div>

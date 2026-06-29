@@ -110,7 +110,7 @@ $(function(){initNavTree('examples_games_shmup_1942.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md889"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md895"></a>
 Roadmap status</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -130,12 +130,12 @@ Roadmap status</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>S6</b> <em>(open chantier)</em>  </td><td class="markdownTableBodyNone">HUD on BG3 (deferred — see below)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md890"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md896"></a>
 Bullet despawn fix (S5.2)</h2>
 <p>Earlier the bullet's <span class="tt">despawn</span> test was <span class="tt">y &lt; -<a class="el" href="games_2shmup__1942_2main_8c.html#a72605ae476d1728c661c90513b007ef5">BULLET_SPRITE</a></span> (= <span class="tt">-32</span>). That left the bullet "alive" all the way down to the moment its sprite-anchor <span class="tt">y</span> reached <span class="tt">-32</span>, but the actual visible ball pixels (canvas y=4..11 of the 32×32 sprite) had already cleared the top of the screen at <span class="tt">y ≈ -12</span>. Between those two thresholds, the SNES 8-bit OAM <span class="tt">y</span> byte wrapped (<span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)(-33) = 223</span>) and the bullet flashed at the <em>bottom</em> of the screen for one frame before despawning.</p>
 <p>Symptom from the user POV: "bullets stop before reaching the top of
 the screen". Fix in code: despawn at <span class="tt">y &lt; -12</span>, just after the visible ball exits the top of the playfield.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md891"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md897"></a>
 Open chantier — S6 HUD on BG3</h2>
 <p>I attempted a BG3 + <span class="tt">text</span> module HUD (score / lives) and it produced two symptoms I couldn't resolve in one session:</p>
 <ol type="1">
@@ -149,7 +149,7 @@ Open chantier — S6 HUD on BG3</h2>
 </li>
 </ol>
 <p>The S6 work was reverted to keep the ROM in a known-good state. A future chantier can pick up the investigation — likely candidates: the BG3 tile priority bit semantics, REG_BG3SC quirks at non-default word boundaries, or a CGRAM colour-math interaction with the HUD palette slot.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md892"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md898"></a>
 Architecture (current)</h2>
 <div class="fragment"><div class="line">VRAM (BYTE / WORD addresses)</div>
 <div class="line">  $0000 / $0000  BG1 tilemap          (SC_32x64, 4 KB)</div>
@@ -169,19 +169,19 @@ Architecture (current)</h2>
 <div class="line"> </div>
 <div class="line">setMode(BG_MODE1, 0);</div>
 <div class="line">setMainScreen(TM_BG1 | TM_OBJ);</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md893"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md899"></a>
 Build</h2>
 <div class="fragment"><div class="line">cd examples/games/shmup_1942 &amp;&amp; make</div>
 </div><!-- fragment --><p>Produces <span class="tt">shmup_1942.sfc</span> (LoROM, 256 KB).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md894"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md900"></a>
 Re-generating assets</h2>
 <div class="fragment"><div class="line">python3 res/extract_sprites.py   # re-extract player + enemy + draw bullet</div>
 <div class="line">python3 res/compose_scene.py     # redraw the terrain (bump SEED)</div>
 <div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md895"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md901"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">asset</span>, <span class="tt">sprite</span>, <span class="tt">input</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md896"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md902"></a>
 Licence</h2>
 <p>Source artwork: CC0 from <a href="https://kenney.nl/assets/pixel-shmup">Kenney</a>. See ATTRIBUTION.md. </p>
 </div></div><!-- contents -->
