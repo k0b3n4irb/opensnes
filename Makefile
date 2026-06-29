@@ -54,13 +54,13 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean install compiler tools lib examples cli tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
 #------------------------------------------------------------------------------
 
-all: submodules compiler tools lib examples
+all: submodules compiler tools lib examples cli
 	@echo ""
 	@echo "=========================================="
 	@echo "OpenSNES SDK build complete!"
@@ -73,9 +73,18 @@ clean:
 	$(MAKE) -C $(EXAMPLES_PATH) clean
 	-rm -rf bin/
 
-install: compiler tools lib
+install: compiler tools lib cli
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
+
+# Install the `opensnes` project CLI (init/build/run/doctor) into bin/ so it
+# ships in the dev tree and, via the release target's `cp -r bin/*`, in the
+# release zip. The CLI resolves the SDK root from its own bin/ location.
+cli:
+	@mkdir -p bin
+	@cp scripts/opensnes bin/opensnes
+	@chmod +x bin/opensnes
+	@echo "Installed CLI: bin/opensnes  (run 'bin/opensnes doctor')"
 
 #------------------------------------------------------------------------------
 # Components

@@ -135,7 +135,15 @@ make
 
 Open `examples/text/hello_world/hello_world.sfc` in [Mesen2](https://www.mesen.ca/) and you're running on a Super Nintendo.
 
-For prerequisites and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting_started.html)**.
+To start your own game, the build installs an `opensnes` CLI in `bin/`:
+
+```bash
+bin/opensnes init my-game --template game   # scaffolds a working project
+cd my-game && ../bin/opensnes run           # builds and launches your emulator
+```
+
+`opensnes doctor` checks your toolchain, library, and emulator. For prerequisites
+and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb.github.io/opensnes/getting_started.html)**.
 
 ## Examples
 
