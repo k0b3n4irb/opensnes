@@ -1,5 +1,7 @@
 # Mode 7 -- Rotation and Scaling
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 ## What This Example Shows
