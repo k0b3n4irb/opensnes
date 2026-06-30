@@ -2,6 +2,8 @@
 
 Demonstrates the four HDMA library helper effects available in the OpenSNES SDK.
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 ## Effects

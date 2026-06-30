@@ -1,5 +1,7 @@
 # Fading Example
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 Screen brightness transitions for fade in/out effects.

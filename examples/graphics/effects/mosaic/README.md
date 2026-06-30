@@ -1,5 +1,7 @@
 # Mosaic -- PPU Pixel Block Effect
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 ## What This Example Shows
