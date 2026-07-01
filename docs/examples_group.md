@@ -41,7 +41,6 @@ Browse by category: @ref examples_by_category
 - @ref window/main.c "Window" — Clipping regions
 - @ref transparent_window/main.c "Transparent Window" — Window + color math
 - @ref gradient_colors/main.c "Gradient Colors" — HDMA per-scanline palette
-- @ref hdma_gradient/main.c "HDMA Gradient" — Brightness gradient
 - @ref hdma_wave/main.c "HDMA Wave" — Sine distortion
 - @ref hdma_helpers/main.c "HDMA Helpers" — Library helper effects
 - @ref parallax_scrolling/main.c "Parallax" — HDMA scroll offsets
