@@ -84,6 +84,12 @@ trap 'rm -f "$TMPFILE" "$IRFILE"' EXIT
 # on both code paths despite cc65816 having long=4 and host having long=8.
 cc -E -D__OPENSNES__=1 "${CFLAGS[@]}" "$INPUT" > "$TMPFILE"
 
+# Cooper: under -g, tell cproc where to write the aggregate-layout sidecar
+# (struct/array type trees for the debugger's Locals expansion).
+if [[ -n "$CC65816_G" && -n "$OUTPUT" ]]; then
+    export CC65816_DBG="${OUTPUT%.asm}.dbg"
+fi
+
 # Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
 # Using a pipe hides cproc crashes: QBE receives truncated IR and reports
 # misleading parse errors. With a temp file, cproc failures are caught cleanly.
@@ -116,9 +122,13 @@ done
 rm -f /tmp/cc65816_cproc_err.$$
 
 # Stage 3: QBE IR -> 65816 assembly
+# Cooper source-level debug: CC65816_G=1 passes -g (keep C locals in memory) so
+# the debugger can read typed locals. Off by default (it disables optimisation).
+QBE_G=""
+[[ -n "$CC65816_G" ]] && QBE_G="-g"
 if [[ -z "$OUTPUT" ]]; then
-    "$QBE" -t w65816 "$IRFILE"
+    "$QBE" $QBE_G -t w65816 "$IRFILE"
 else
-    "$QBE" -t w65816 "$IRFILE" > "$OUTPUT"
+    "$QBE" $QBE_G -t w65816 "$IRFILE" > "$OUTPUT"
     echo "Generated: $OUTPUT"
 fi
