@@ -269,14 +269,14 @@ The bank byte for an `extern` symbol resolves at link time as
 extern u8 huge_tileset[];
 /* `:huge_tileset` is the linker-resolved bank — assembly only.
  * From C, you typically build a small assembly helper that knows
- * the bank, like the asm_loadGraphics() helper in
- * examples/graphics/effects/hdma_gradient. */
+ * the bank, like the asm_loadSkyData() helper in
+ * examples/graphics/backgrounds/mode7_perspective. */
 ```
 
 Most projects either (a) keep all assets in bank `$00` (small games),
 or (b) write a small assembly DMA helper per asset to handle the
-correct bank. Both shipped examples that hit this case
-(`hdma_gradient`, `mode7_perspective`) take option (b).
+correct bank. The shipped example that hits this case
+(`mode7_perspective`) takes option (b).
 
 ### 🟠 Channel 0 vs HDMA on channel 0
 

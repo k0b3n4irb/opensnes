@@ -45,8 +45,6 @@ HDMA, parallax, color math, hardware windows.
 
 @subpage examples_graphics_effects_hdma_wave
 
-@subpage examples_graphics_effects_hdma_gradient
-
 @subpage examples_graphics_effects_hdma_helpers
 
 @subpage examples_graphics_effects_gradient_colors
