@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | c7552693ae7fe3bee034d48e06a182ecc5da08bd | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
-| compiler/qbe | 1884a20cf7f3b500b5e6986022a9a4ee43ba21d2 | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
+| compiler/cproc | 97c2dc1d5a6091a39a8d8245cb799210c7ebb850 | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
+| compiler/qbe | 6794fb7758e63b2e27ddfa53191ece8d92b300f8 | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
