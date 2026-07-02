@@ -127,6 +127,15 @@ jobs:
           export OPENSNES_HOME=$(pwd)
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
+      # Cooper source-level debug path: a normal build must stay debug-free
+      # (byte-identical release codegen), and a CC65816_G=1 build must emit
+      # @cline / @dbglocal / the .dbg sidecar. Reuses the toolchain just built.
+      - name: Verify Cooper -g debug-info path
+        if: matrix.name == 'linux'
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          devtools/check_debug_info.sh
+
       # ------------------------------------ #
       # Functional tests run in a separate   #
       # job (see `functional-tests` below),  #
