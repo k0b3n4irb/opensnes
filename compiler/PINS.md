@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 97c2dc1d5a6091a39a8d8245cb799210c7ebb850 | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
+| compiler/cproc | 7b3200bb92fc968cd0d3f65a3eb19c8c78f01b5a | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
 | compiler/qbe | bd929f53e38dcaf7d96bb700fabe0589226cc1ef | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
