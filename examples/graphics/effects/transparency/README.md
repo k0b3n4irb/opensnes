@@ -3,6 +3,8 @@
 > Additive blending between two background layers: a static landscape with
 > semi-transparent clouds scrolling over it. No input required.
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 ## Build & Run

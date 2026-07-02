@@ -59,7 +59,6 @@ Visual effects using HDMA, color math, and hardware windows.
 | @subpage examples_graphics_effects_fading | Brightness control, screen transitions |
 | @subpage examples_graphics_effects_mosaic | Mosaic pixelation effect |
 | @subpage examples_graphics_effects_hdma_wave | HDMA scanline wave distortion |
-| @subpage examples_graphics_effects_hdma_gradient | HDMA color gradient per scanline |
 | @subpage examples_graphics_effects_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
 | @subpage examples_graphics_effects_gradient_colors | HDMA + CGRAM color gradients |
 | @subpage examples_graphics_effects_parallax_scrolling | HDMA parallax scrolling |

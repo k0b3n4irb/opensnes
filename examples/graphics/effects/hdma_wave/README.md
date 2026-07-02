@@ -4,6 +4,8 @@
 > Press A to toggle, D-pad to control amplitude and animation.
 > This is the same trick used for water reflections in Chrono Trigger.
 
+![Demo](demo.gif)
+
 ![Screenshot](screenshot.png)
 
 ## Controls

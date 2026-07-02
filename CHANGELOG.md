@@ -5,6 +5,27 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.26.0] — 2026-07-02
+
+Source-level C debugging for the Cooper VS Code extension, plus the animated
+example gallery and a docs-integrity pass.
+
+### Added
+- feat(compiler): source-level debug info, opt-in via `CC65816_G` — `; @cline`
+  PC↔C-line markers, typed `; @dbglocal` locals, and a `.dbg` aggregate-layout
+  sidecar, consumed by Cooper. A normal build stays byte-identical (verified in
+  CI); debug metadata is emitted only under `-g` (#92)
+- feat(examples): animated `demo.gif` for 7 dynamic examples (mode7,
+  parallax_scrolling, transparency, hdma_wave, hdma_helpers, mosaic, fading) (#90)
+- ci(compiler): CI coverage for the `-g` debug path (`check_debug_info.sh`) (#92)
+
+### Fixed
+- fix(compiler): debug metadata no longer perturbs release codegen — gate the
+  emission behind `CC65816_G` (cproc) and exclude `dbgloc` from inline
+  eligibility (qbe), so inline helpers like `colorMathEnable` don't spill a
+  duplicate symbol (#92)
+- docs: repoint the dangling references to the removed `hdma_gradient` example (#91)
+
 ## [0.25.0] — 2026-06-29
 
 Onboarding & developer-experience release. The first impression now matches the

@@ -2,7 +2,7 @@
 
 This tutorial covers SNES HDMA (Horizontal-blanking DMA): what it is, when
 to reach for it, the four registers per channel, the eight transfer modes,
-and the per-scanline patterns the seven shipped examples exercise. It
+and the per-scanline patterns the six shipped examples exercise. It
 assumes you have already worked through the [Graphics](graphics.md) and
 [Scrolling](scrolling.md) tutorials.
 
@@ -177,21 +177,11 @@ Two things often forgotten:
    before the source/mode/destination are settled gives the PPU a frame
    of garbage HDMA reads.
 
-## Worked patterns (the seven shipped examples)
+## Worked patterns (the six shipped examples)
 
 Every shipped example exercises a distinct HDMA case. Read the
 `@par What to Observe` block at the top of each `main.c` for the
 interactive demo; the patterns themselves are reusable building blocks.
-
-### Background colour gradient — `examples/graphics/effects/hdma_gradient`
-
-Builds a brightness gradient at runtime via the
-`hdmaBrightnessGradient(channel, topBrightness, bottomBrightness)` helper,
-which interpolates between the two values across 224 scanlines and emits
-an HDMA table writing `$2100` (INIDISP) per scanline group. Press **A**
-to cycle gradients; **B** to disable. The 8 bpp Mode 3 background
-underneath shows the smooth fade from full brightness at top to dark at
-bottom.
 
 ### Per-scanline wave distortion — `examples/graphics/effects/hdma_wave`
 
@@ -335,7 +325,6 @@ inner game-logic loops.
 - `lib/include/snes/hdma.h` — full API reference (function signatures,
   mode constants, destination-register constants).
 - `lib/source/hdma.asm` and `lib/source/hdma.c` — implementation.
-- [`examples/graphics/effects/hdma_gradient`](../../examples/graphics/effects/hdma_gradient/README.md) — runtime gradient builder.
 - [`examples/graphics/effects/hdma_wave`](../../examples/graphics/effects/hdma_wave/README.md) — sine-wave per-scanline scroll.
 - [`examples/graphics/effects/hdma_helpers`](../../examples/graphics/effects/hdma_helpers/README.md) — API surface walkthrough.
 - [`examples/graphics/effects/parallax_scrolling`](../../examples/graphics/effects/parallax_scrolling/README.md) — RAM table, two-speed parallax.
