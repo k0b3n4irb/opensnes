@@ -310,9 +310,9 @@ Gotchas</h2>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> huge_tileset[];</div>
 <div class="line"><span class="comment">/* `:huge_tileset` is the linker-resolved bank — assembly only.</span></div>
 <div class="line"><span class="comment"> * From C, you typically build a small assembly helper that knows</span></div>
-<div class="line"><span class="comment"> * the bank, like the asm_loadGraphics() helper in</span></div>
-<div class="line"><span class="comment"> * examples/graphics/effects/hdma_gradient. */</span></div>
-</div><!-- fragment --><p>Most projects either (a) keep all assets in bank <span class="tt">$00</span> (small games), or (b) write a small assembly DMA helper per asset to handle the correct bank. Both shipped examples that hit this case (<span class="tt">hdma_gradient</span>, <span class="tt">mode7_perspective</span>) take option (b).</p>
+<div class="line"><span class="comment"> * the bank, like the asm_loadSkyData() helper in</span></div>
+<div class="line"><span class="comment"> * examples/graphics/backgrounds/mode7_perspective. */</span></div>
+</div><!-- fragment --><p>Most projects either (a) keep all assets in bank <span class="tt">$00</span> (small games), or (b) write a small assembly DMA helper per asset to handle the correct bank. The shipped example that hits this case (<span class="tt">mode7_perspective</span>) takes option (b).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md162"></a>
 🟠 Channel 0 vs HDMA on channel 0</h3>
 <p><span class="tt"><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> and friends use channel 0. If you also configure HDMA on channel 0 (which the lib documents as discouraged but doesn't actively prevent), the next <span class="tt"><a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> call clobbers the HDMA setup. Same class of bug as the OAM-DMA-on-channel-7 trap — different channel.</p>
