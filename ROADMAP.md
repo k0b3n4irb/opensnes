@@ -8,11 +8,11 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.26.0 (developing toward v0.27.0)
+## Current Status: post-v0.27.0 (developing toward v0.28.0)
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 54
+produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 56
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -137,17 +137,17 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (53)
+### Examples (56)
 - **Text**: hello_world, text_test
 - **Sprites**: simple_sprite, animated_sprite, dynamic_sprite, dynamic_metasprite, metasprite, object_size
 - **Backgrounds**: mode0, mode1, mode1_bg3_priority, mode1_lz77, mode3, mode5, mode7, mode7_perspective, continuous_scroll, mixed_scroll
-- **Effects**: fading, hdma_wave, hdma_gradient, hdma_helpers, gradient_colors, parallax_scrolling, mosaic, transparency, window, transparent_window
-- **Input**: two_players, mouse, superscope
+- **Effects**: fading, hdma_wave, hdma_helpers, gradient_colors, parallax_scrolling, mosaic, transparency, window, transparent_window, superfx_3d
+- **Input**: controller, two_players, mouse, superscope
 - **Audio**: snesmod_music, snesmod_sfx, snesmod_music_large, snesmod_music_hirom
-- **Memory**: save_game, hirom_demo, sa1_hello, sa1_speed, sa1_starfield, superfx_hello
+- **Memory**: save_game, hirom_demo, sa1_hello, sa1_starfield, superfx_hello
 - **Maps**: dynamic_map, mapscroll, slopemario, tiled
-- **Basics**: collision_demo, random, timer
-- **Games**: breakout, likemario, mapandobjects, tetris
+- **Basics**: aim_target, collision_demo, fix32_orbit, random, scene_stack, timer
+- **Games**: breakout, likemario, mapandobjects, shmup_1942, tetris
 
 ### Build system
 - [x] Cross-platform (Linux, macOS, Windows / MSYS2)
@@ -183,7 +183,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (53 / 53)
+- [x] Example READMEs with hardware explanations (56 / 56)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -227,7 +227,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Pixel mode (Mode 3 direct drawing) | Not started | Feature parity with PVSnesLib (niche) |
 | Tiled map editor integration | Not started | Workflow convenience for level designers |
 | Video tutorials | Not started | Wider audience reach |
-| Project scaffolding (`opensnes init`) | Not started | Reduce friction for new users |
+| Project scaffolding (`opensnes init`) | **Shipped (v0.25.0)** — `opensnes` CLI: init/build/run/doctor | Reduce friction for new users |
 
 ### Next steps (audit-driven, prioritised)
 
@@ -284,6 +284,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-05-07. Anchored claims (version, examples count, framework
+*Last updated: 2026-07-04. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

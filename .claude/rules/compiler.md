@@ -15,10 +15,11 @@ Three git submodules:
 
 The `bin/cc65816` wrapper orchestrates the pipeline:
 ```
-.c → cproc → QBE IR → qbe w65816 → .asm → sed transform → wla-65816 → .obj
+.c → cc -E → cproc → QBE IR → qbe w65816 → .asm → wla-65816 → .obj
 ```
 
-The sed transform converts QBE output syntax to WLA-DX syntax (`.byte`→`.db`, `.word`→`.dw`, etc.).
+The qbe w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`)
+— the historical sed post-transform is gone.
 
 ## Build
 

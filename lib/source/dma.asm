@@ -3,31 +3,12 @@
 ;
 ; These functions handle DMA transfers from ROM to VRAM/CGRAM.
 ;
-; IMPORTANT: Source addresses are 24-bit (bank + offset) to support data
-; in any ROM bank. The compiler passes 16-bit pointers, and we extract
-; the bank from the high byte of the 24-bit far address.
-;
-; For LoROM with SUPERFREE sections, data can be in any bank.
-; The linker places data and we need to DMA from the correct bank.
-;
-;==============================================================================
-; BANK LIMITATION
-;==============================================================================
-; The current implementation of dmaCopyVram() and dmaCopyCGram() assumes
-; source data is in bank $00 for ROM addresses ($8000-$FFFF). This works
-; for most cases because:
-;
-;   1. Small ROMs (< 32KB code) fit entirely in bank 0
-;   2. SUPERFREE sections typically land in bank 0 for small projects
-;   3. Graphics data defined in the same compilation unit is usually nearby
-;
-; For projects with data in higher banks, use dmaCopyVramBank() with an
-; explicit bank parameter, or restructure data placement.
-;
-; Technical reason: The cproc compiler only passes 16-bit pointers. We cannot
-; determine the bank from the pointer alone, so we default to bank 0 for
-; ROM addresses and bank $7E for RAM addresses.
-;==============================================================================
+; Source addresses are 24-bit far pointers. Since chantier A6 the compiler
+; passes pointers as 4-byte Kl values, so every function here reads the
+; source bank straight from the pointer's bank byte on the stack (see the
+; per-function stack-layout comments) — data can live in ANY bank,
+; including SUPERFREE sections the linker placed outside bank $00.
+; No bank is assumed or hardcoded; see compiler/ABI.md for the layout.
 
 .ifdef SA1
 .include "memmap_sa1.inc"
@@ -278,7 +259,8 @@ dmaCopyOam:
 ; VRAM destination is always $0000 (Mode 7 uses the full 32K word space).
 ; Must be called during forced blank (INIDISP=$80) or VBlank.
 ;
-; Bank detection: addresses >= $8000 → bank $00 (ROM), else bank $7E (RAM).
+; Source banks are read from the far pointers' bank bytes (9,s and 15,s
+; below) — no address-range heuristic.
 ;
 ; Stack layout (after PHP):
 ; A6+A7 chantier — post-A6 layout (cproc passes 4-byte pointers):

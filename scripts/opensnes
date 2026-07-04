@@ -365,6 +365,14 @@ cmd_doctor() {
         return
     fi
 
+    # Host C preprocessor — cc65816 preprocesses with the system `cc -E`
+    # before cproc, so a missing/odd host compiler breaks every C build.
+    if command -v cc >/dev/null 2>&1; then
+        ok "host cc ($(cc --version 2>/dev/null | head -1))"
+    else
+        fail "host cc — not found; cc65816 needs it for the preprocessing stage"
+    fi
+
     # Toolchain binaries
     local bin_dir="$sdk/bin"
     local b

@@ -10,7 +10,7 @@ binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
 ```bash
 scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
-python3 tools/luna-test/luna_runner.py --compare     # visual regression (framebuffer SHA-256 vs baselines)
+python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `steps = [a, b]`)
 python3 tools/luna-test/probes/run_all.py            # functional probes (scripted input → WRAM asserts)
 ```
 
@@ -50,7 +50,9 @@ so validation is now 2 pillars:
 4. **For library changes (Class B)**: grep all example Makefiles for the changed
    module name in LIB_MODULES to enumerate the candidate set, then triage.
 5. **NEVER commit without user validation.** Do not assume examples work because
-   they compiled. Visual validation in Mesen2 is required on the triaged subset.
+   they compiled. The luna visual-regression pass is the visual reference; the
+   triaged subset is presented to the user, who may additionally spot-check
+   interactively (luna GUI / `luna mcp`, or Mesen2 as debugger).
 6. Conventional Commits format in message
 
 ## Impacted-Examples Triage
@@ -91,8 +93,8 @@ For every change, run this three-step pipeline before asking the user to validat
    Keep the list to 2–5 entries when possible. If the change genuinely needs
    wider coverage say so explicitly with the reasoning.
 
-**Why triage instead of an exhaustive list:** Class A changes can touch all 53
-examples; asking the user to walk through every one is both unrealistic and
+**Why triage instead of an exhaustive list:** Class A changes can touch every
+example; asking the user to walk through every one is both unrealistic and
 wasteful — most are redundant for any given change. The triage forces explicit
 reasoning about which axes of coverage actually matter for *this* change, and
 the "what to look for" makes the validation an active check (the user knows

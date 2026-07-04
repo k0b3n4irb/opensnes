@@ -26,7 +26,11 @@ main     ──────────●─●  (fast-forward; tag is the seco
 3. After merge, tag the new `main` head: `git tag -a vX.Y.Z -m "..."` then
    `git push origin vX.Y.Z`.
 4. `release.yml` runs the tag-on-main guard, then builds the per-OS
-   release zips and creates a GitHub Release with the assets.
+   release zips and creates a GitHub Release with the assets. On the two
+   Linux legs (x86_64 + arm64) it also smoke-tests the built tree with a
+   full luna corpus-liveness pass (all examples incl. SA-1/SuperFX) — a
+   shipped artifact must have executed ROMs on its own arch, not merely
+   compiled.
 
 ## Pre-Release Checklist
 

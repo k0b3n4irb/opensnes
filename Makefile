@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean install compiler tools lib examples cli tests test-compiler test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -147,20 +147,46 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@# Runtime fixture ROMs are rebuilt from clean: a stale .sfc built with an
+	@# experimental toolchain once produced misleading XPASSes (a6_farptr trap,
+	@# 2026-07-04). Each is a single-TU ROM; the clean rebuild costs seconds.
+	@# clean and the build are SEPARATE invocations — this Makefile exports
+	@# -j, and `clean all` in one command runs both goals concurrently
+	@# (clean deleted crt0.o mid-link on the first parallel run).
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit
 	@python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel
 	@python3 devtools/compiler-tests/runtime/debug_channel/test_debug_channel.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr clean
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr
+	@python3 devtools/compiler-tests/runtime/a6_farptr/test_a6_farptr.py
+	@$(MAKE) -s -C devtools/libtests clean
+	@$(MAKE) -s -C devtools/libtests
+	@python3 devtools/libtests/test_libtest.py
 	@echo "ALL CHECKS PASSED (luna)"
+
+# Clean example build artifacts only — keeps the toolchain binaries in bin/
+# (a full `make clean` wipes bin/ and forces a compiler rebuild).
+clean-examples:
+	$(MAKE) -C $(EXAMPLES_PATH) clean
 
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
 
-# WRAM-state regression — a LOCAL, same-arch developer tool ("did my change alter
-# invisible runtime state?"), NOT part of `make tests`/CI: raw WRAM content is not
-# a luna cross-arch guarantee (the framebuffer is). Re-baseline on your machine
-# with `python3 tools/luna-test/wram_regress.py --update`.
+# Golden-output tests for the asset tools (gfx4snes, smconv). Byte-compares
+# tool output against committed goldens — needs `make tools` first.
+test-tools:
+	@python3 tools/gfx4snes/tests/run_golden.py
+	@python3 tools/smconv/tests/run_golden.py
+
+# WRAM-state regression ("did my change alter invisible runtime state?").
+# CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
+# (mapandobjects, slopemario) are skipped by default; add --all on a machine
+# matching the baseline capture arch. Re-baseline after an intentional change
+# with `python3 tools/luna-test/wram_regress.py --update` (same commit).
 test-wram:
 	@python3 tools/luna-test/wram_regress.py
 

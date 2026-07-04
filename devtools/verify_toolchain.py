@@ -135,6 +135,17 @@ def main() -> int:
 
     # ASCII only — Windows cp1252 stdout breaks on non-Latin1 characters.
     print(f"OK: toolchain pins match ({len(pins)} submodule(s) verified)")
+    # Informational: the host preprocessor is the one UNPINNED stage of the
+    # C pipeline (cc65816 runs `cc -E` before cproc). Print its identity so
+    # cross-machine codegen differences can at least be traced to it.
+    try:
+        cc_out = subprocess.run(
+            ["cc", "--version"], capture_output=True, text=True, timeout=10,
+        ).stdout.splitlines()
+        cc_id = cc_out[0].strip() if cc_out else "unknown"
+    except (OSError, subprocess.TimeoutExpired):
+        cc_id = "cc not found"
+    print(f"note: host preprocessor (unpinned): {cc_id}")
     return 0
 
 

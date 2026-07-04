@@ -5,6 +5,85 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.27.0] — 2026-07-04
+
+Hardening release, driven by a full project review: silent-failure fixes in
+the library, a broad test-coverage wave (WRAM CI gate, linux/arm64 functional
+leg, asset-tool golden tests, lib assertion ROM, compiler-fixture ratchet,
+multi-point visual regression), a root-cause verdict on the historical MSYS2
+cproc segfaults, and a first API pruning.
+
+### Added
+- test(lib): `libtest` assertion ROM — executes lib functions with known
+  vectors (div16/mod16/mul16/sqrt16, text cursor-wrap sentinel) and asserts
+  the WRAM results via luna; wired into `make tests` and CI
+- test(tools): golden-output tests for gfx4snes and smconv (`make test-tools`
+  + a lint-workflow job) — the asset converters previously had zero tests
+- test(luna-test): the WRAM-state regression now gates CI on both arches
+  (54/56 examples; the two cross-arch-fragile ones are excluded by default,
+  `--all` includes them against a same-arch baseline)
+- test(luna-test): multi-point visual regression, opt-in per example via
+  `manifest.toml` `steps = [a, b]` — a timing shift breaks some-but-not-all
+  points (reported as "timing drift?") while a real regression breaks all;
+  enabled for the two self-animating examples
+- ci: the functional-tests job runs on linux/arm64 too (a shipped release
+  artifact never executed a ROM in CI before), and release builds get a full
+  luna corpus-liveness smoke pass on both Linux arches before upload
+- ci(compiler): cproc segfault-retry telemetry — every Windows build reports
+  its retry count in the job summary; the MSYS2 diagnostic workflow is
+  repaired (it referenced a dead test tree) and now a monthly gating monitor
+- feat(devtools): doc-drift sentinel extensions — soft-wrapped (multi-line)
+  count claims, `Examples (N)` / `(N / N)` forms, example-path existence,
+  per-category sums in `examples/README.md`, ROADMAP footer date, and a
+  stale-ASM-bank-comment anchor
+- build(tools): `make clean-examples` (keep the toolchain, clean the ROMs);
+  `opensnes doctor` checks the host `cc`; `make verify-toolchain` prints the
+  (unpinned) host preprocessor identity
+- build: `USE_SUPERFX := 1` auto-adds the `superfx` lib module, like
+  sram/snesmod
+
+### Changed
+- refactor(lib): **`oamSetVisible` and `OBJ_SHOW`/`OBJ_HIDE` removed** — the
+  show direction was structurally a silent no-op (SNES visibility is
+  Y-position-based, there is nothing to restore); use `oamHide()` to hide and
+  `oamSetY()`/`oamSet()` with a valid Y to show
+- test(compiler): all 66 fixtures compile on every run (56 were previously
+  never exercised) with a ratchet on unchecked cases; `test_metasprite`
+  compiled for the first time (missing SDK include path, caught immediately)
+- test(compiler): the `a6_farptr` far-deref runtime gate is wired into
+  `make tests` and CI (xfail-tolerant; runtime fixture ROMs now rebuild from
+  clean so a stale artifact can't produce a misleading verdict)
+- ci: the Windows make-level retry loop is dismantled — a broken build fails
+  honestly; the narrow cc65816-level retry (exit-139-only) stays, counted
+- ci: pinned Doxygen is fetched from the official GitHub release with SHA-256
+  verification (doxygen.nl started returning 403 to CI runners; the download
+  was also the last unverified binary fetch)
+- docs: ROADMAP, `examples/README.md` and `GETTING_STARTED.md` resynced with
+  the real tree (56 examples, regenerated inventory, shipped CLI status,
+  dead `superfx_3d` path fixed)
+
+### Fixed
+- fix(lib): **text cursor overflow** — `cursor_y` was never bounded, so
+  printing past row 31 wrote beyond `tilemapBuffer` into adjacent bank-`$00`
+  WRAM (silent corruption); `textPutChar` wraps, `textFillRect`/`textSetPos`
+  clamp
+- fix(lib): `RGB()` masks each component to 5 bits so an out-of-range value
+  can't bleed into the neighbouring channel (compile-time-folded at every
+  existing call site — ROMs verified bit-identical)
+- fix(luna-test): the WRAM runner could hash a stale trace file when
+  `wram-trace` failed silently, poisoning the baseline (caught live); it now
+  unlinks the output first and checks the exit code
+- fix(build): the cc65816 wrapper's cproc stderr capture moves from a
+  hardcoded `/tmp` path to `mktemp` under the cleanup trap
+- docs: stale pre-A6 "BANK LIMITATION" claims in `dma.asm`, a contradictory
+  bank-`$00` threshold comment in `common.mk`, the phantom `sed` stage in the
+  pipeline docs, and pre-luna-migration claims in the test docs reconciled
+
+### Performance
+- perf(lib): `div16`/`mod16` rewritten as bounded binary long division —
+  the previous repeated-subtraction loop was O(quotient)
+  (`div16(65535, 1)` took 65535 iterations)
+
 ## [0.26.0] — 2026-07-02
 
 Source-level C debugging for the Cooper VS Code extension, plus the animated

@@ -150,6 +150,29 @@ jobs:
         working-directory: devtools
         run: python3 -m unittest test_check_vram_layout
 
+  tools-golden:
+    name: Asset-tool golden outputs (gfx4snes, smconv)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OpenSNES (with submodules)
+        # `make tools` runs the top-level verify-toolchain dependency, which
+        # needs the compiler submodules checked out.
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build asset tools
+        run: make tools
+
+      - name: Run golden-output tests
+        # Byte-compares gfx4snes/smconv output against committed goldens.
+        # These converters feed every example's graphics/audio; a silent
+        # regression here previously only surfaced as an unlocalized
+        # visual-hash churn downstream. Also runs via `make test-tools`.
+        run: |
+          python3 tools/gfx4snes/tests/run_golden.py
+          python3 tools/smconv/tests/run_golden.py
+
   doc-render:
     name: Doc render leaks (check_doc_render.py)
     runs-on: ubuntu-latest
@@ -160,8 +183,11 @@ jobs:
       - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
         # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test
         # the SAME version that publishes the docs, so it pins 1.16.1 too.
+        # Fetched from the official GitHub release (doxygen.nl 403s GitHub
+        # runners) and SHA-256-verified, same pattern as install-luna.sh.
         run: |
-          curl -fsSL -o /tmp/doxygen.tgz https://www.doxygen.nl/files/doxygen-1.16.1.linux.bin.tar.gz
+          curl -fsSL -o /tmp/doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+          echo "a56f885d37e3aae08a99f638d17bbb381224c03a878d9e2dda4f9fa4baf1d8bd  /tmp/doxygen.tgz" | sha256sum -c -
           tar xzf /tmp/doxygen.tgz -C /tmp
           sudo cp /tmp/doxygen-1.16.1/bin/* /usr/local/bin/
           doxygen --version

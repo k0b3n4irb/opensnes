@@ -8,15 +8,19 @@ from basic concepts to complete games.
 | Category | Examples | What It Covers |
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
-| [basics/](basics/) | 4 | Collision, timing, scene stack, randomness |
+| [basics/](basics/) | 6 | Collision, timing, scene stack, randomness, fixed-point, aiming |
 | [graphics/](graphics/) | 26 | Backgrounds, sprites, visual effects, Mode 7 |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 4 | Music and sound effects via SNESMOD |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 5 | HiROM mode, battery-backed saves, SA-1, SuperFX |
-| [games/](games/) | 4 | Complete game projects (Tetris, Breakout, Mario-like, map+objects) |
+| [games/](games/) | 5 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup) |
 
 ## Learning Path
+
+A curated progression — it doesn't list every example. Use the category
+table above for the full set; anything not listed here is a variant or
+deep-dive of a step below.
 
 ### Level 1 -- First Steps
 

@@ -8,7 +8,13 @@ previously the "60 compiler tests" inside the removed opensnes-emu submodule
 (JS port of the older `tests/compiler/run_tests.sh`). Re-homed here, dependency-
 free, alongside the other devtools linters.
 
-Run:  python3 devtools/compiler-tests/run.py        # all cases that have .checks
+Every `cases/<name>.c` is compiled — a fixture without a `.checks` file still
+runs as a compile-only case (a cproc/QBE crash or empty output fails it). The
+number of unchecked fixtures is RATCHETED by MAX_UNCHECKED below: adding a new
+fixture without assertions fails the run. Port a fixture, then lower the
+constant — never raise it (same pattern as BANK0_FAIL_THRESHOLD).
+
+Run:  python3 devtools/compiler-tests/run.py        # all cases (checked + compile-only)
       python3 devtools/compiler-tests/run.py --only tail_call
       python3 devtools/compiler-tests/run.py --list  # cases missing a .checks (TODO)
 
@@ -36,11 +42,18 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 CASES = Path(__file__).resolve().parent / "cases"
 CC = REPO_ROOT / "bin" / "cc65816"
 
+# Ratchet on fixtures lacking a .checks file. 56 of 66 cases predate the
+# .checks DSL and run compile-only. Porting a fixture lowers this number;
+# it must NEVER go up — a new fixture ships with its assertions.
+MAX_UNCHECKED = 56
+
 
 def compile_asm(src: Path) -> str:
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         out = Path(tf.name)
-    proc = subprocess.run([str(CC), str(src), "-o", str(out)],
+    # SDK include path: fixtures may use <snes/*.h> (e.g. test_metasprite).
+    proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
+                           str(src), "-o", str(out)],
                           capture_output=True, text=True, timeout=60)
     if not out.is_file() or out.stat().st_size == 0:
         raise RuntimeError(f"compile failed: {(proc.stderr or proc.stdout).strip()[:300]}")
@@ -117,22 +130,25 @@ def apply_check(asm: str, line: str) -> str | None:
 
 
 def run(only: str | None) -> int:
-    checks = sorted(CASES.glob("*.checks"))
-    passed = failed = 0
-    for cf in checks:
-        name = cf.stem
+    sources = sorted(CASES.glob("*.c"))
+    passed = failed = compile_only = unchecked = 0
+    for src in sources:
+        name = src.stem
+        cf = CASES / f"{name}.checks"
+        if not cf.is_file():
+            unchecked += 1
         if only and only not in name:
-            continue
-        src = CASES / f"{name}.c"
-        if not src.is_file():
-            print(f"  FAIL {name}: missing {src.name}")
-            failed += 1
             continue
         try:
             asm = compile_asm(src)
         except RuntimeError as e:
             print(f"  FAIL {name}: {e}")
             failed += 1
+            continue
+        if not cf.is_file():
+            # Compile-only tier: no assertions yet, but a toolchain crash or
+            # empty output on this fixture still fails the suite.
+            compile_only += 1
             continue
         errs = []
         for raw in cf.read_text().splitlines():
@@ -148,7 +164,16 @@ def run(only: str | None) -> int:
         else:
             print(f"  PASS {name}")
             passed += 1
-    print(f"\nCompiler checks: {passed} passed, {failed} failed")
+    print(f"\nCompiler checks: {passed} passed, {failed} failed"
+          f" (+{compile_only} compile-only; {unchecked}/{MAX_UNCHECKED} unchecked ratchet)")
+    if only is None and unchecked > MAX_UNCHECKED:
+        print(f"ERROR: {unchecked} fixtures lack a .checks file, ratchet allows "
+              f"{MAX_UNCHECKED}. New fixtures ship with assertions — port the "
+              f"fixture or write its .checks (see --list).")
+        return 1
+    if only is None and unchecked < MAX_UNCHECKED:
+        print(f"NOTE: unchecked count dropped to {unchecked} — lower MAX_UNCHECKED "
+              f"in run.py to lock in the progress.")
     return 1 if failed else 0
 
 

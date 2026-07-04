@@ -216,6 +216,10 @@ u16 mul16(u16 a, u16 b);
 /**
  * @brief Safe 16-bit division
  *
+ * Bounded binary long division — always 16 iterations regardless of the
+ * operands, so the cost is predictable. (A future optimisation could use
+ * the hardware divider at $4204-$4206 for divisors up to 255.)
+ *
  * @param dividend Number to divide
  * @param divisor Number to divide by (must not be zero)
  * @return Quotient
@@ -227,9 +231,13 @@ u16 div16(u16 dividend, u16 divisor);
 /**
  * @brief Get remainder of division
  *
+ * Same bounded binary long division as div16() — always 16 iterations.
+ *
  * @param dividend Number to divide
  * @param divisor Number to divide by (must not be zero)
  * @return Remainder
+ *
+ * @warning Returns 0 if divisor is 0
  */
 u16 mod16(u16 dividend, u16 divisor);
 

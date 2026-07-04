@@ -80,10 +80,11 @@ void consoleInit(void) {
      *   BG1 tile data at VRAM $0000 (BG12NBA low nibble = $0)
      *
      * Users can override with bgSetMapPtr() / bgSetGfxPtr() after init.
-     * We use direct register writes to avoid depending on the background module.
+     * Direct register writes (not bgSet*) to avoid depending on the
+     * background module — but through the REG_* names like everywhere else.
      */
-    *(volatile u8*)0x2107 = 0x04;  /* BG1SC: tilemap at VRAM $0400, 32x32 */
-    *(volatile u8*)0x210B = 0x00;  /* BG12NBA: BG1 tiles at VRAM $0000 */
+    REG_BG1SC = 0x04;    /* tilemap at VRAM $0400, 32x32 */
+    REG_BG12NBA = 0x00;  /* BG1 tiles at VRAM $0000 */
 
     /* Disable mosaic effect (register can have garbage on power-up) */
     REG_MOSAIC = 0;

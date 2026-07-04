@@ -141,10 +141,11 @@ int main(void) {
                   0, 0x0000, OBJ_SIZE16_L32);
 
     /* Initialize OAM entry 0 at the monster's starting position.
-     * Tile 0, palette 0, priority 3 (in front of all BGs), no flip. */
+     * Tile 0, palette 0, priority 3 (in front of all BGs), no flip.
+     * The valid on-screen Y set here is what makes the sprite visible —
+     * SNES visibility is Y-based, there is no separate "show" call. */
     oamSet(0, monster.x, monster.y, 0, 0, 3, 0);
     oamSetSize(0, 0);       /* 0 = use small size (16x16 in this OBJSEL mode) */
-    oamSetVisible(0, 1);    /* Make sprite 0 visible */
 
     /* The SNES has 128 hardware sprites. Any unused sprites must be hidden
      * (moved off-screen) to prevent garbage tiles from appearing. */

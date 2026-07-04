@@ -239,11 +239,24 @@ reports the actual optimisation state per function (not always 1
 or always 0), so reading it is reliable.
 
 MSYS2-specific cproc segfaults (struct pointer init, nested structs,
-unions, string initializers, `.rodata`-vs-`RAMSECTION` flake) remain
-behind `knownBug()` calls in `compiler-tests.mjs`, gated on the
-`r.segfault` signal — they only fire on Windows / MSYS2 builds and
-are tracked in `.github/workflows/msys2_cproc_diagnostic.yml`. Linux
-and macOS CI never trigger them.
+unions, string initializers) are **believed fixed** since cproc
+`ea95cac` (2026-03-07, "initialize all struct type fields in mktype()
+to prevent UB" — uninitialized type fields read heap garbage, whose
+layout-dependence explains both the non-determinism and the
+Windows-only footprint). A 2026-07-04 investigation found zero retry
+firings across sampled Windows CI builds (late June–July window) and
+zero ASan/UBSan/MSan findings on Linux over the full corpus, including
+a 200x stress of the five historical culprit files. The status is
+**under surveillance, not closed**: the make-level retry loop was
+dismantled on 2026-07-04 (it could also mask real build failures); the
+`cc65816`-level retry (x3 on exit 139) stays as cheap insurance while
+telemetry proves the fix out — every Windows build reports its retry
+count in the job summary, and
+`.github/workflows/msys2_cproc_diagnostic.yml` stress-tests the
+culprit files 100x monthly and fails on any segfault. Remaining
+retirement step: after 2–3 months of zero-count telemetry, drop the
+cc65816 retry too and close this entry. Full investigation log:
+`.claude/notes/tech/cproc_msys2_segfault_investigation.md`.
 
 ---
 

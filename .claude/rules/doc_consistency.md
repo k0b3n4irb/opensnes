@@ -36,6 +36,32 @@ opt-in list.
    wrong. Only prototypes whose function name exists in a header are
    checked; illustrative prototypes and code-block *calls* are ignored.
 
+5. **Example paths quoted in onboarding docs** (`ROADMAP.md`,
+   `examples/README.md`, `docs/GETTING_STARTED.md`) must exist under
+   `examples/`. Caught historically as GETTING_STARTED sending newcomers
+   to `memory/superfx_3d` (real home: `graphics/effects/superfx_3d`) and
+   ROADMAP listing a `sa1_speed` example that never existed.
+
+6. **Per-category counts in `examples/README.md`'s table** must match the
+   per-directory `main.c` count, and their sum the corpus total. Caught
+   historically as the table summing to 53 under a "56 examples" header.
+
+7. **`ROADMAP.md` footer date** (`*Last updated: YYYY-MM-DD`) must not
+   predate the head release date in `CHANGELOG.md`. Caught historically
+   as a 2026-05-07 footer under a post-v0.26.0 (2026-07-02) status line.
+
+8. **No pre-A6 bank-assumption prose in `lib/source/*.asm`** — comments
+   claiming "assumes … bank $00" or "only passes 16-bit pointers"
+   describe the pre-A6 ABI; post-A6 the bank is read from the far
+   pointer's bank byte. Caught historically as dma.asm's "BANK
+   LIMITATION" header contradicting its own per-function stack maps —
+   prose the ABI lint (which only reads `lda N,s` annotations) can't see.
+
+Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
+(single newlines count as spaces), so a claim split across two lines —
+ROADMAP's historical `54\nworking examples` — can no longer hide, and the
+`### Examples (N)` / `(N / N)` forms are matched too.
+
 ## Mandatory workflow
 
 Before committing any change that touches one of those classes:

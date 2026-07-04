@@ -74,7 +74,8 @@ fi
 # -t template: portable across macOS, Linux, and Git Bash/MSYS on Windows
 TMPFILE=$(mktemp -t cc65816.XXXXXX) || TMPFILE=$(mktemp)
 IRFILE=$(mktemp -t cc65816_ir.XXXXXX) || IRFILE=$(mktemp)
-trap 'rm -f "$TMPFILE" "$IRFILE"' EXIT
+CPROC_ERR=$(mktemp -t cc65816_cproc_err.XXXXXX) || CPROC_ERR=$(mktemp)
+trap 'rm -f "$TMPFILE" "$IRFILE" "$CPROC_ERR"' EXIT
 
 # Stage 1: Preprocess with system cc.
 # `-D__OPENSNES__=1` lets headers detect that they're being preprocessed
@@ -100,7 +101,7 @@ fi
 CPROC_RETRIES=3
 for _try in $(seq 1 $CPROC_RETRIES); do
     set +e
-    "$CPROC" "$TMPFILE" > "$IRFILE" 2>/tmp/cc65816_cproc_err.$$
+    "$CPROC" "$TMPFILE" > "$IRFILE" 2>"$CPROC_ERR"
     CPROC_EXIT=$?
     set -e
 
@@ -111,15 +112,20 @@ for _try in $(seq 1 $CPROC_RETRIES); do
     # Exit code 139 = killed by signal 11 (SIGSEGV)
     if [[ $CPROC_EXIT -eq 139 ]] && [[ $_try -lt $CPROC_RETRIES ]]; then
         echo "cc65816: cproc segfault (attempt $_try/$CPROC_RETRIES), retrying..." >&2
+        # Telemetry: the segfault class is believed FIXED since cproc ea95cac
+        # (mktype uninitialized fields, 2026-03-07). CI sets CC65816_RETRY_LOG
+        # and reports the count per build, so any resurgence is visible
+        # instead of silently absorbed. See KNOWN_LIMITATIONS.md (MSYS2 note).
+        if [[ -n "${CC65816_RETRY_LOG:-}" ]]; then
+            echo "$(basename "$INPUT") attempt=$_try exit=139" >> "$CC65816_RETRY_LOG"
+        fi
         continue
     fi
 
     # Not a segfault or last retry — propagate the error
-    cat /tmp/cc65816_cproc_err.$$ >&2
-    rm -f /tmp/cc65816_cproc_err.$$
+    cat "$CPROC_ERR" >&2
     exit $CPROC_EXIT
 done
-rm -f /tmp/cc65816_cproc_err.$$
 
 # Stage 3: QBE IR -> 65816 assembly
 # Cooper source-level debug: CC65816_G=1 passes -g (keep C locals in memory) so

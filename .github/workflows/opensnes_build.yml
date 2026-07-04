@@ -108,18 +108,28 @@ jobs:
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          # cproc non-deterministically segfaults on MSYS2; retry make up to 3 times
-          for attempt in 1 2 3; do
-            if make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "Build failed after 3 attempts"
-              exit 1
-            fi
-            echo "=== Build attempt $attempt failed (likely cproc segfault), retrying... ==="
-            make clean
-          done
+          # The MSYS2 cproc segfault class is believed FIXED since cproc
+          # ea95cac (2026-03-07, mktype uninitialized fields); the make-level
+          # retry loop was dismantled 2026-07-04 (it could also mask real
+          # build failures). The cc65816-level retry (x3 on exit 139) stays
+          # as cheap insurance, with its firings counted below — see
+          # KNOWN_LIMITATIONS.md (MSYS2 note).
+          export CC65816_RETRY_LOG=$(pwd)/cproc_retries.log
+          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+
+      - name: Report cproc segfault-retry count (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          n=0
+          [ -f cproc_retries.log ] && n=$(wc -l < cproc_retries.log)
+          echo "### cproc segfault retries: $n" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$n" -gt 0 ]; then
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat cproc_retries.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::cproc segfault retry fired $n time(s) — the MSYS2 segfault class may have resurfaced (see KNOWN_LIMITATIONS.md)"
+          fi
 
       - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'
@@ -236,8 +246,20 @@ jobs:
   # channel. Runs: corpus liveness, visual regression, functional probes.  #
   # ====================================================================== #
   functional-tests:
-    name: Functional Tests (luna)
-    runs-on: ubuntu-latest
+    name: Functional Tests (luna, ${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+          # linux/arm64 is a SHIPPED release artifact (release.yml builds
+          # opensnes_*_linux_arm64.zip) — it must execute ROMs in CI too,
+          # not just compile. Baselines are captured on aarch64, so the
+          # fbhash comparison is native here.
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - name: Check out OpenSNES (with submodules)
@@ -272,6 +294,22 @@ jobs:
           make -s -C devtools/compiler-tests/runtime/a7_32bit
           python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
 
+      - name: A6 far-pointer runtime matrix
+        # xfail-tolerant gate over the far-deref matrix (storage form × bank).
+        # Fails ONLY on a regression of an expected-green cell; the remaining
+        # A6 word/phi gaps are tracked in KNOWN_FAIL inside the test.
+        run: |
+          make -s -C devtools/compiler-tests/runtime/a6_farptr
+          python3 devtools/compiler-tests/runtime/a6_farptr/test_a6_farptr.py
+
+      - name: Lib runtime assertions (libtest)
+        # Executes lib/source functions with known vectors and asserts the WRAM
+        # results — the execution gate the library lacks (examples exercise it
+        # only transitively; the visual hash can't see a wrong return value).
+        run: |
+          make -s -C devtools/libtests
+          python3 devtools/libtests/test_libtest.py
+
       - name: Corpus liveness coverage
         run: python3 tools/luna-test/luna_runner.py --coverage
 
@@ -286,11 +324,14 @@ jobs:
         # regenerate baselines with `luna_runner.py --update` meanwhile.)
         run: python3 tools/luna-test/luna_runner.py --compare
 
-      # NOTE: the WRAM-state regression (`make test-wram`) is intentionally NOT a
-      # CI gate. Unlike the framebuffer (luna guarantees `--print-fbhash`
-      # cross-arch), raw WRAM content is not a cross-arch guarantee: two examples
-      # (mapandobjects, slopemario) hash differently x86_64 ↔ aarch64. It stays a
-      # local, same-arch developer tool for "did my change alter invisible state?".
+      - name: WRAM-state regression (54/56, cross-arch exclusions)
+        # Per-frame WRAM oracle — catches runtime-state regressions that never
+        # reach the screen (uninitialised reads, mis-stepped counters). The two
+        # examples whose WRAM stream is arch-dependent (mapandobjects,
+        # slopemario) are skipped by CROSS_ARCH_EXCLUDE in the runner; the
+        # other 54 gate both arches. Rebaseline after an intentional change:
+        # `python3 tools/luna-test/wram_regress.py --update` (same commit).
+        run: python3 tools/luna-test/wram_regress.py
 
       - name: Upload luna artifacts on failure
         if: failure()

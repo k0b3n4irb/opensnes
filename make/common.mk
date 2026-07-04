@@ -102,18 +102,24 @@ RUNTIME_OBJ  := $(LIBDIR)/runtime-asm.o
 MUL32_OBJ    := $(LIBDIR)/mul32-asm.o
 DIV32_OBJ    := $(LIBDIR)/div32-asm.o
 HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filter 1,$(USE_SUPERFX)),hdr_superfx.asm,$(if $(filter 1,$(USE_HIROM)),hdr_hirom.asm,hdr.asm)))
+# No superfx memmap branch: GSU cartridges are LoROM-mapped on the 65816
+# side (the GSU has its own ROM view), so plain memmap.inc is intentional.
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
 CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_SRAM)),$$02,$$00)))
 SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
-# SRAM/SNESMOD auto-add modules
+# SRAM/SNESMOD/SuperFX auto-add modules (duplicates are harmless — the
+# dependency resolver below runs $(sort) which dedups)
 LIB_MODULES ?= console
 ifeq ($(USE_SRAM),1)
 LIB_MODULES += sram
 endif
 ifeq ($(USE_SNESMOD),1)
 LIB_MODULES += snesmod
+endif
+ifeq ($(USE_SUPERFX),1)
+LIB_MODULES += superfx
 endif
 
 # Assembler flags
@@ -365,10 +371,10 @@ endif
 	@# The compiler emits 16-bit addresses that always read bank $$00, so spilled
 	@# string.N symbols return GARBAGE silently in production. The fail-threshold
 	@# is a ratchet: catches "one-const-literal-away-from-spill" regressions
-	@# before they ship. Default 16 sits below the current example minimum
-	@# (28 bytes free in mapscroll.sfc as of v0.16.0) so the build still passes;
-	@# bumping it tighter is a deliberate audit step — see
-	@# .claude/rules/bank0_budget.md for the policy.
+	@# before they ship. The default lives at the BANK0_FAIL_THRESHOLD
+	@# definition near the top of this file (single source of truth) and is
+	@# always set just below the current example minimum; bumping it tighter
+	@# is a deliberate audit step — see .claude/rules/bank0_budget.md.
 	@# exit 1 from symmap = critical spill OR imminent overflow (hard fail).
 	@# exit 2 = soft warning (low free space) — printed but build continues.
 	@# Set SKIP_BANK0_CHECK=1 to disable; BANK0_FAIL_THRESHOLD=N to retune.

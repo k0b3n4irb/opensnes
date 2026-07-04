@@ -75,12 +75,16 @@ void setMode(u8 mode, u8 flags);
 /**
  * @brief Create RGB color value
  *
- * @param r Red (0-31)
- * @param g Green (0-31)
- * @param b Blue (0-31)
+ * @param r Red (0-31; masked to 5 bits)
+ * @param g Green (0-31; masked to 5 bits)
+ * @param b Blue (0-31; masked to 5 bits)
  * @return 15-bit BGR color
+ *
+ * @note Operands are masked to 5 bits so an out-of-range component can't
+ * bleed into the neighbouring channel. With constant arguments (every
+ * call site in the SDK) the masks fold away at compile time — zero cost.
  */
-#define RGB(r, g, b) (((b) << 10) | ((g) << 5) | (r))
+#define RGB(r, g, b) ((((b) & 31) << 10) | (((g) & 31) << 5) | ((r) & 31))
 
 /**
  * @brief Convert 24-bit RGB to SNES format

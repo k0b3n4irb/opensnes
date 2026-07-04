@@ -1,6 +1,6 @@
 # luna-test manifest — per-example overrides.
 #
-# The runner auto-discovers the 56 examples via their git-tracked main.c and
+# The runner auto-discovers every example via its git-tracked main.c and
 # applies these overrides. Most examples need nothing here; only list the ones
 # that want a non-default warm-up, scripted input, or a coverage annotation.
 #
@@ -10,11 +10,11 @@
 default_steps = 3_000_000   # CPU instructions before capture (any fixed value is
                             # fine for a deterministic baseline; past boot/setup)
 
-# --- Examples whose *device input* luna cannot drive (gap G4: Mouse/Super Scope)
-# They boot and render fine, but sit in their controller-DETECT state forever
-# (luna answers the device-ID handshake as a plain pad). Marked input_dependent
-# so coverage reports them as "boot+visual only (input N/A)" instead of full pass
-# — "renders" != "works". Liveness still applies (they run; NMIs climb).
+# --- Examples that idle in a device-detect state under the VISUAL pillar's
+# plain-pad boot (no scripted device input at capture time), so their capture
+# is boot-screen-only. Their real functionality IS exercised by the functional
+# probes (probes/mouse.py, probes/superscope.py) since luna v1.1.0 models both
+# devices; input_dependent only annotates the coverage/visual pillars.
 [examples."input/mouse"]
 input_dependent = true
 
@@ -27,3 +27,19 @@ steps = 4_000_000
 
 [examples."basics/random"]
 steps = 4_000_000   # cycles through values; later frame is more representative
+
+# --- Multi-frame opt-in: SELF-animating examples are captured at TWO points.
+# A real visual regression breaks both hashes; a pure timing shift breaks only
+# one — the runner labels the partial case "timing drift?" so the diagnosis is
+# immediate. Extra points cost one luna run each, only here.
+#
+# Deliberately only these two: the other demo.gif examples (mode7, fading,
+# hdma_helpers, hdma_wave, mosaic) animate on BUTTON PRESS and idle on the
+# same frame at every un-scripted capture point (verified 1M→6M: identical
+# fbhash) — a second point there is cost without coverage. Covering their
+# animations needs scripted input, which is the functional probes' domain.
+[examples."graphics/effects/parallax_scrolling"]
+steps = [3_000_000, 6_000_000]
+
+[examples."graphics/effects/transparency"]
+steps = [3_000_000, 6_000_000]

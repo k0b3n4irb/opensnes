@@ -9,6 +9,6 @@ GSUSRC      := gsu_3d.sfx
 
 USE_LIB     := 1
 USE_SUPERFX := 1
-LIB_MODULES := console sprite dma background input superfx
+LIB_MODULES := console sprite dma background input   # superfx auto-added by USE_SUPERFX
 
 include $(OPENSNES)/make/common.mk

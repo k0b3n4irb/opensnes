@@ -44,6 +44,14 @@ extern TextConfig text_config;
 #define TEXT_DEFAULT_FONT_TILE     0
 /** @brief Default palette slot (palette 0). */
 #define TEXT_DEFAULT_PALETTE       0
+/**
+ * @brief Tilemap buffer height in rows.
+ *
+ * The RAM tilemap buffer is 32×32 entries (2048 bytes). The cursor wraps
+ * back to row 0 past the last row — text output never writes outside the
+ * buffer.
+ */
+#define TEXT_MAP_ROWS              32
 
 /**
  * @brief Initialize the text rendering system.
@@ -91,16 +99,16 @@ void textLoadFont4bpp(u16 vram_addr);
 /**
  * @brief Set cursor position
  *
- * @param x Column (0-31 or 0-63)
- * @param y Row (0-31 or 0-63)
+ * @param x Column (0-31; masked to the 32-column buffer)
+ * @param y Row (0-31; masked to TEXT_MAP_ROWS)
  * Inlined for zero-call-overhead access (wave 4 retrofit; uses the
  * relaxed CC_INLINE_MAX_INSTR=16 default).
  */
 extern u8 cursor_x;
 extern u8 cursor_y;
 inline void textSetPos(u8 x, u8 y) {
-    cursor_x = x;
-    cursor_y = y;
+    cursor_x = x & 31;
+    cursor_y = y & (TEXT_MAP_ROWS - 1);
 }
 
 /**

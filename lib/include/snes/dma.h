@@ -109,7 +109,15 @@ void dmaCopyVramMode7(u8 *tilemap, u16 tilemapSize, u8 *tiles, u16 tilesSize);
  *
  * @param value Value to fill (repeated as word)
  * @param dest Destination word address in VRAM
- * @param size Number of bytes to fill (0 = 65536)
+ * @param size Number of bytes to fill — 0 means 65536 (the full VRAM),
+ *             which is how dmaClearVRAM() uses it
+ *
+ * @note Uses DMA channel 0 with a fixed source address, like the other
+ * lib DMA helpers (oamUpdate, dmaCopyVram). Safe when calls are
+ * sequential from the main loop; do NOT call from an NMI callback while
+ * a main-thread DMA setup on channel 0 may be in flight.
+ * @warning Must be called during forced blank (INIDISP=$80) or VBlank —
+ * the PPU silently ignores VRAM writes during active display.
  */
 void dmaFillVRAM(u16 value, u16 dest, u16 size);
 

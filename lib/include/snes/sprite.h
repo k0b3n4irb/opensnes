@@ -95,10 +95,6 @@
 /** @brief Y position to hide sprite */
 #define OBJ_HIDE_Y  240
 
-/** @brief Sprite visibility */
-#define OBJ_SHOW    1   /**< Sprite visible */
-#define OBJ_HIDE    0   /**< Sprite hidden */
-
 /** @brief Sprite size selection */
 #define OBJ_SMALL   0   /**< Use small sprite size */
 #define OBJ_LARGE   1   /**< Use large sprite size */
@@ -384,25 +380,11 @@ void oamSetXY(u8 id, u16 x, u8 y);
  */
 void oamSetTile(u8 id, u16 tile);
 
-/**
- * @brief Set sprite visibility
- *
- * @param id Sprite ID (0-127)
- * @param visible OBJ_SHOW (1) or OBJ_HIDE (0)
- *
- * @note **Important**: SNES sprite visibility is controlled by Y position.
- * Setting Y to 240 (OBJ_HIDE_Y) hides the sprite below the visible screen.
- * This function only handles HIDING (sets Y=240). Passing OBJ_SHOW does
- * nothing - to show a sprite, set a valid Y coordinate using oamSetY() or
- * oamSet(). For explicit hiding, use oamHide() which is clearer.
- *
- * @code
- * oamSetVisible(0, OBJ_HIDE);  // Hides sprite 0 (sets Y=240)
- * oamSetVisible(0, OBJ_SHOW);  // Does nothing! Sprite stays hidden.
- * oamSetY(0, 100);             // This shows the sprite at Y=100
- * @endcode
- */
-void oamSetVisible(u8 id, u8 visible);
+/* Note: there is deliberately no oamSetVisible(id, show) — SNES sprite
+ * visibility is Y-position-based, so a "show" call can't know which Y to
+ * restore and could only be a silent no-op (which the removed v0.x
+ * function was). Use oamHide() to hide and oamSetY()/oamSet() with a
+ * valid Y to show. */
 
 /**
  * @brief Hide sprite

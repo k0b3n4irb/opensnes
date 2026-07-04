@@ -127,6 +127,7 @@ void textPutChar(char c) {
     if (c == '\n') {
         cursor_x = 0;
         cursor_y++;
+        if (cursor_y >= TEXT_MAP_ROWS) cursor_y = 0;   /* wrap: buffer is 32 rows */
         return;
     }
 
@@ -144,6 +145,7 @@ void textPutChar(char c) {
     if (cursor_x >= text_config.map_width) {
         cursor_x = 0;
         cursor_y++;
+        if (cursor_y >= TEXT_MAP_ROWS) cursor_y = 0;   /* wrap: buffer is 32 rows */
     }
 
     /* Auto-flush: NMI handler will DMA the tilemap during the next
@@ -221,6 +223,12 @@ static void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
     u8 lo = entry & 0xFF;
     u8 hi = entry >> 8;
     u16 row_offset;
+
+    /* Clamp to the 32×32 buffer — a rectangle reaching past the edge must
+     * not write outside tilemapBuffer. */
+    if (x >= text_config.map_width || y >= TEXT_MAP_ROWS) return;
+    if ((u16)x + w > text_config.map_width) w = text_config.map_width - x;
+    if ((u16)y + h > TEXT_MAP_ROWS)         h = TEXT_MAP_ROWS - y;
 
     /* Compute offset once per row, increment in inner loop */
     for (row = 0; row < h; row++) {

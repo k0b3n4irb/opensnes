@@ -130,15 +130,6 @@ void oamSetTile(u8 id, u16 tile) {
     oam_update_flag = 1;
 }
 
-void oamSetVisible(u8 id, u8 visible) {
-    if (visible) {
-        /* Visibility is controlled by Y position - no specific "show" */
-        /* User should set proper Y position */
-    } else {
-        oamHide(id);
-    }
-}
-
 void oamHide(u8 id) {
     if (id >= MAX_SPRITES) return;
     /* Y=240 + X=256 (high bit set) to hide off-screen.

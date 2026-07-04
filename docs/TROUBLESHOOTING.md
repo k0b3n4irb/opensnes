@@ -155,8 +155,8 @@ oamInitGfxSet(sprite_gfx, sprite_gfx_end - sprite_gfx,
 // 3. Set sprite properties — oamSet(id, x, y, tile, palette, priority, flags)
 oamSet(0, x, y, 0, 0, 3, 0);
 
-// 4. Make sure sprite is visible (not hidden)
-// oamSetVisible(0, OBJ_SHOW);  // If needed
+// 4. Visibility is the Y position itself: a valid on-screen Y (set by
+//    oamSet above) shows the sprite; oamHide() parks it at Y=240.
 
 // 5. Update OAM (usually done in VBlank by the library)
 // The NMI handler calls oamUpdate() automatically

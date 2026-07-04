@@ -28,6 +28,27 @@ Anchored claims currently watched:
      u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)`` —
      the entire offset table was off.
 
+  6. Example paths quoted in onboarding docs (``ROADMAP.md``,
+     ``examples/README.md``, ``docs/GETTING_STARTED.md``) must exist under
+     ``examples/``. Caught historically as GETTING_STARTED pointing
+     newcomers at ``memory/superfx_3d`` (real home:
+     ``graphics/effects/superfx_3d``) and ROADMAP listing a ``sa1_speed``
+     example that never existed.
+
+  7. The per-category counts in ``examples/README.md``'s table must match
+     the per-directory ``main.c`` count, and their sum the corpus total.
+     Caught historically as the table summing to 53 under a "56 examples"
+     header (basics said 4, was 6; games said 4, was 5).
+
+  8. ``ROADMAP.md``'s footer ``*Last updated: YYYY-MM-DD`` date must not be
+     older than the head release date in ``CHANGELOG.md``. Caught
+     historically as a 2026-05-07 footer under a post-v0.26.0 status line
+     (release dated 2026-07-02).
+
+Count claims (check 3) are matched on a soft-wrapped view of each doc —
+single newlines count as spaces — so a claim split across two lines
+("54\\nworking examples") can no longer hide from the scan.
+
 Why this exists: the v0.1.0-dev macro stuck at v0.16.0, the post-v0.13.0
 ROADMAP stale by three minor versions, and the "53 examples" / "54 examples"
 count drift across rules — all of these were caught by a 1-day external
@@ -175,6 +196,9 @@ COUNT_PATTERNS = [
     re.compile(r"\*\*(\d{2,3})\s+examples?\*\*", re.IGNORECASE),  # README bold table cell
     re.compile(r"\bAll\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),
     re.compile(r"\ball\s+(\d{2,3})\s+examples\s+compile\s+cleanly\b", re.IGNORECASE),
+    re.compile(r"\bExamples?\s*\((\d{2,3})\)", re.IGNORECASE),  # "### Examples (56)" heading
+    re.compile(r"\((\d{2,3})\s*/\s*\d{2,3}\)"),   # "(56 / 56)" completion claim, numerator
+    re.compile(r"\(\d{2,3}\s*/\s*(\d{2,3})\)"),   # ...and its denominator
     # Targeted phrasings only (NOT a bare "\d examples") so prose like
     # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
@@ -199,6 +223,24 @@ def _gather_active_doc_paths() -> list[Path]:
     return paths
 
 
+def soft_wrap(text: str) -> str:
+    """Offset-preserving soft-wrap: a single newline (not part of a blank
+    line) becomes a space, so a claim split across two lines still matches,
+    while paragraph breaks keep unrelated sentences apart. Caught
+    historically as ROADMAP's "54\\nworking examples" hiding from the
+    line-by-line scan."""
+    chars = list(text)
+    n = len(text)
+    for i, ch in enumerate(text):
+        if ch != "\n":
+            continue
+        prev_nl = i > 0 and text[i - 1] == "\n"
+        next_nl = i + 1 < n and text[i + 1] == "\n"
+        if not prev_nl and not next_nl:
+            chars[i] = " "
+    return "".join(chars)
+
+
 def check_examples_count(canonical: int) -> list[str]:
     seen: set[tuple[str, int, int]] = set()
     drifts: list[str] = []
@@ -208,17 +250,18 @@ def check_examples_count(canonical: int) -> list[str]:
         if not path.is_file():
             continue
         text = path.read_text(encoding="utf-8")
-        for lineno, line in enumerate(text.splitlines(), 1):
-            for rx in COUNT_PATTERNS:
-                m = rx.search(line)
-                if not m:
-                    continue
+        wrapped = soft_wrap(text)
+        for rx in COUNT_PATTERNS:
+            for m in rx.finditer(wrapped):
                 count = int(m.group(1))
                 # Skip obviously-irrelevant numbers (e.g. "all 256 colours").
                 if count < 10 or count > 999:
                     continue
                 if count == canonical:
                     continue
+                # soft_wrap preserves offsets, so the match position maps
+                # back to the original line number.
+                lineno = text.count("\n", 0, m.start(1)) + 1
                 rel = str(path.relative_to(REPO_ROOT))
                 key = (rel, lineno, count)
                 if key in seen:
@@ -264,12 +307,6 @@ def _public_api_names() -> set[str]:
     return names
 
 
-def _strip_c_comments(code: str) -> str:
-    code = re.sub(r"/\*.*?\*/", " ", code, flags=re.DOTALL)
-    code = re.sub(r"//[^\n]*", " ", code)
-    return code
-
-
 def phantom_names_in_code(code: str, api: set[str]) -> list[str]:
     """Pure core (unit-testable): SDK-shaped calls in `code` not in `api`.
 
@@ -306,6 +343,147 @@ def check_phantom_api() -> list[str]:
                     f"{rel}:{lineno}: `{name}(...)` called in a C snippet but not "
                     f"declared in lib/include/snes/*.h — phantom API (won't link)."
                 )
+    return drifts
+
+
+# --------------------------------------------------------------------------
+# Check 6: example paths quoted in onboarding docs must exist
+# --------------------------------------------------------------------------
+
+EXAMPLE_PATH_DOC_PATHS = ["ROADMAP.md", "examples/README.md",
+                          "docs/GETTING_STARTED.md"]
+
+# Backticked `category/name` paths and relative markdown links like
+# [text/hello_world](text/hello_world/). The category filter (first segment
+# must be a real examples/ subdirectory) keeps lib/, docs/, tools/ paths out.
+_EXAMPLE_PATH_RES = [
+    re.compile(r"`([a-z0-9_]+(?:/[a-z0-9_]+)+)`"),
+    re.compile(r"\]\(([a-z0-9_]+(?:/[a-z0-9_]+)+)/?\)"),
+]
+
+
+def extract_example_paths(text: str, categories: set[str]) -> list[tuple[str, int]]:
+    """Pure core (unit-testable): (path, lineno) of every quoted example path."""
+    out: list[tuple[str, int]] = []
+    for rx in _EXAMPLE_PATH_RES:
+        for m in rx.finditer(text):
+            path = m.group(1)
+            if path.split("/")[0] in categories:
+                out.append((path, text.count("\n", 0, m.start(1)) + 1))
+    return out
+
+
+def check_example_paths() -> list[str]:
+    ex_root = repo_path("examples")
+    if not ex_root.is_dir():
+        return []
+    categories = {p.name for p in ex_root.iterdir() if p.is_dir()}
+    drifts: list[str] = []
+    seen: set[tuple[str, str]] = set()
+    for rel in EXAMPLE_PATH_DOC_PATHS:
+        doc = repo_path(rel)
+        if not doc.is_file():
+            continue
+        text = doc.read_text(encoding="utf-8")
+        for path, lineno in extract_example_paths(text, categories):
+            if (ex_root / path).is_dir() or (rel, path) in seen:
+                continue
+            seen.add((rel, path))
+            drifts.append(
+                f"{rel}:{lineno}: references `{path}` but examples/{path} "
+                f"does not exist — fix the path or drop the reference"
+            )
+    return drifts
+
+
+# --------------------------------------------------------------------------
+# Check 7: examples/README.md per-category counts vs the filesystem
+# --------------------------------------------------------------------------
+
+_CATEGORY_ROW_RE = re.compile(r"\|\s*\[(\w+)/\]\([^)]+\)\s*\|\s*(\d+)\s*\|")
+
+
+def parse_category_rows(text: str) -> dict[str, int]:
+    """Pure core (unit-testable): {category: claimed count} from the table."""
+    return {m.group(1): int(m.group(2)) for m in _CATEGORY_ROW_RE.finditer(text)}
+
+
+def check_category_sums(canonical: int) -> list[str]:
+    doc = repo_path("examples/README.md")
+    if not doc.is_file():
+        return []
+    rows = parse_category_rows(doc.read_text(encoding="utf-8"))
+    if not rows:
+        return ["examples/README.md: category table not found (parser drift?)"]
+    drifts: list[str] = []
+    for cat, claimed in rows.items():
+        cat_dir = repo_path("examples", cat)
+        actual = len(list(cat_dir.rglob("main.c"))) if cat_dir.is_dir() else 0
+        if actual != claimed:
+            drifts.append(
+                f"examples/README.md: category [{cat}/] claims {claimed} "
+                f"example(s) but the directory holds {actual}"
+            )
+    total = sum(rows.values())
+    if total != canonical:
+        drifts.append(
+            f"examples/README.md: category rows sum to {total} but the corpus "
+            f"holds {canonical} examples — a row is stale"
+        )
+    return drifts
+
+
+# --------------------------------------------------------------------------
+# Check 8: ROADMAP footer date must not predate the head release
+# --------------------------------------------------------------------------
+
+ROADMAP_FOOTER_RE = re.compile(r"\*Last updated:\s*(\d{4}-\d{2}-\d{2})")
+
+
+def check_roadmap_footer_date(canonical_date: str) -> list[str]:
+    text = repo_path("ROADMAP.md").read_text(encoding="utf-8")
+    m = ROADMAP_FOOTER_RE.search(text)
+    if not m:
+        return ["ROADMAP.md: footer '*Last updated: YYYY-MM-DD' not found"]
+    footer = m.group(1)
+    # ISO dates compare correctly as strings.
+    if footer < canonical_date:
+        return [
+            f"ROADMAP.md: footer says 'Last updated: {footer}' but the head "
+            f"release in CHANGELOG.md is dated {canonical_date} — the footer "
+            f"must move with (or after) each release"
+        ]
+    return []
+
+
+# --------------------------------------------------------------------------
+# Check 9: stale pre-A6 bank-assumption comments in hand-written ASM
+# --------------------------------------------------------------------------
+
+# Post-A6, every lib ASM function reads the source bank from the far
+# pointer's bank byte — prose claiming a bank $00 assumption or 16-bit-only
+# pointers describes the pre-A6 world. dma.asm's "BANK LIMITATION" header
+# survived two chantiers this way (the ABI lint only reads `lda N,s`
+# annotations, never prose).
+_STALE_BANK_COMMENT_RE = re.compile(
+    r"assumes?[^\n]*bank \$00|only passes 16-bit pointers", re.IGNORECASE)
+
+
+def check_asm_bank_comments() -> list[str]:
+    drifts: list[str] = []
+    src = repo_path("lib/source")
+    if not src.is_dir():
+        return []
+    for asm in sorted(src.glob("*.asm")):
+        text = asm.read_text(encoding="utf-8", errors="replace")
+        m = _STALE_BANK_COMMENT_RE.search(text)
+        if m:
+            lineno = text.count("\n", 0, m.start()) + 1
+            drifts.append(
+                f"lib/source/{asm.name}:{lineno}: comment claims a pre-A6 "
+                f"bank-$00 / 16-bit-pointer limitation — post-A6 the bank is "
+                f"read from the far pointer; fix the prose (see compiler/ABI.md)"
+            )
     return drifts
 
 
@@ -483,6 +661,10 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_examples_count(canonical_n))
     all_drifts.extend(check_phantom_api())
     all_drifts.extend(check_abi_signatures())
+    all_drifts.extend(check_example_paths())
+    all_drifts.extend(check_category_sums(canonical_n))
+    all_drifts.extend(check_roadmap_footer_date(canonical_date))
+    all_drifts.extend(check_asm_bank_comments())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

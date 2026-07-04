@@ -1,8 +1,9 @@
 """Run every functional probe in probes/ and report pass/fail.
 
 Each probe is a standalone module exposing `run() -> (ok, msg)` (and runnable
-directly). Mouse/Super Scope probes are intentionally absent (gap G4 — luna
-doesn't model those devices; their examples get boot+visual coverage only).
+directly). Probes auto-register: drop a new `*.py` with a `run()` here.
+Mouse and Super Scope ARE probed (mouse.py, superscope.py) since luna v1.1.0
+added device modelling — the old "gap G4" no longer exists.
 """
 from __future__ import annotations
 

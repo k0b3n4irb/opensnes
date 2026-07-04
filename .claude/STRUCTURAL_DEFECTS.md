@@ -1132,6 +1132,43 @@ tests don't currently exercise 32-bit math).
 
 ---
 
+#### A8. MSYS2 cproc non-deterministic segfaults — BELIEVED FIXED, under telemetry 🟡 (2026-07-04)
+
+Previously only a side-note in A3's log and KNOWN_LIMITATIONS; promoted to
+its own entry when the 2026-07-04 P3 investigation produced a verdict.
+
+> **Verdict:** very likely fixed since cproc `ea95cac` (2026-03-07,
+> "initialize all struct type fields in mktype() to prevent UB"). The
+> profile matches exactly: uninitialized type fields → heap-layout-
+> dependent garbage reads → non-determinism; the five culprit files
+> (union/nested-struct/string-init/struct-ptr/global-struct) are all
+> type-creation heavy; UCRT heap ≠ glibc heap explains Windows-only.
+> The retry mitigations (2026-03-05/06) and the fix (03-07) landed a
+> day apart and were never re-evaluated — four months of retries
+> protecting against a probable ghost.
+>
+> **Evidence (2026-07-04):** zero retry firings across sampled Windows
+> CI builds; ASan+UBSan+MSan clean on Linux over the full 156-TU corpus
+> incl. a 200x stress of the culprit files; 1 MB-stack run clean.
+> Limits: GH log retention only reaches late June; no telemetry existed
+> before.
+>
+> **Shipped (v0.27.0 window):** retry telemetry (`CC65816_RETRY_LOG` +
+> per-build job-summary count), diagnostic workflow repaired (it
+> referenced the dead `tests/compiler/` tree — even manual dispatches
+> tested nothing) and turned into a monthly gating monitor (100x
+> stress, fails on any segfault); make-level retry loop dismantled
+> (maintainer decision — it could mask real failures).
+>
+> **Remaining:** after 2–3 months of zero-count telemetry, remove the
+> cc65816-level retry, close the KNOWN_LIMITATIONS entry, archive the
+> note. Untried lead if it resurfaces: clang-cl + `/fsanitize=address`
+> on native windows-latest (ASan exists there, unlike MSYS2/MinGW).
+>
+> Full log: `.claude/notes/tech/cproc_msys2_segfault_investigation.md`.
+
+---
+
 ### Category B — Library API surface
 
 Six items, four of them sharing a common root cause (the 16-bit pointer

@@ -174,27 +174,43 @@ u16 mul16(u16 a, u16 b) {
 
 u16 div16(u16 dividend, u16 divisor) {
     u16 quotient = 0;
+    u16 rem = 0;
+    u8 i;
 
     if (divisor == 0) return 0;
 
-    /* Use repeated subtraction */
-    while (dividend >= divisor) {
-        dividend = dividend - divisor;
-        quotient = quotient + 1;
+    /* Binary long division — always 16 iterations, regardless of the
+     * quotient. The previous repeated-subtraction loop was O(quotient):
+     * div16(65535, 1) took 65535 iterations. */
+    for (i = 16; i > 0; i--) {
+        rem = (rem << 1) | (dividend >> 15);
+        dividend <<= 1;
+        quotient <<= 1;
+        if (rem >= divisor) {
+            rem -= divisor;
+            quotient |= 1;
+        }
     }
 
     return quotient;
 }
 
 u16 mod16(u16 dividend, u16 divisor) {
+    u16 rem = 0;
+    u8 i;
+
     if (divisor == 0) return 0;
 
-    /* Use repeated subtraction */
-    while (dividend >= divisor) {
-        dividend = dividend - divisor;
+    /* Same bounded binary long division as div16, keeping the remainder. */
+    for (i = 16; i > 0; i--) {
+        rem = (rem << 1) | (dividend >> 15);
+        dividend <<= 1;
+        if (rem >= divisor) {
+            rem -= divisor;
+        }
     }
 
-    return dividend;
+    return rem;
 }
 
 /*============================================================================
