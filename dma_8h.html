@@ -463,10 +463,12 @@ Bank Limitation</h2>
   <table class="params">
     <tr><td class="paramname">value</td><td>Value to fill (repeated as word) </td></tr>
     <tr><td class="paramname">dest</td><td>Destination word address in VRAM </td></tr>
-    <tr><td class="paramname">size</td><td>Number of bytes to fill (0 = 65536) </td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes to fill — 0 means 65536 (the full VRAM), which is how <a class="el" href="#a40e788e1f17c83a2b199df7f5bae0d62" title="Clear all VRAM to zero.">dmaClearVRAM()</a> uses it</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>Uses DMA channel 0 with a fixed source address, like the other lib DMA helpers (oamUpdate, dmaCopyVram). Safe when calls are sequential from the main loop; do NOT call from an NMI callback while a main-thread DMA setup on channel 0 may be in flight. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Must be called during forced blank (INIDISP=$80) or VBlank — the PPU silently ignores VRAM writes during active display. </dd></dl>
 
 </div>
 </div>

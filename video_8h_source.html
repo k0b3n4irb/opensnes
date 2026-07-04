@@ -140,41 +140,41 @@ $(function(){initNavTree('video_8h_source.html','',''); });
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment"> * Palette</span></div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment"> *============================================================================*/</span></div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">   83</a></span><span class="preprocessor">#define RGB(r, g, b) (((b) &lt;&lt; 10) | ((g) &lt;&lt; 5) | (r))</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="video_8h.html#ad8da1514f9cd03e3cda94953525627f2">   93</a></span><span class="preprocessor">#define RGB24(r, g, b) RGB((r) &gt;&gt; 3, (g) &gt;&gt; 3, (b) &gt;&gt; 3)</span></div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="comment"> * Layer Enable Constants (for REG_TM / REG_TS / setMainScreen / setSubScreen)</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span></div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">  103</a></span><span class="preprocessor">#define LAYER_BG1   0x01  </span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">  104</a></span><span class="preprocessor">#define LAYER_BG2   0x02  </span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga2791a83fd98eb211a254edce8db2a7f0">  105</a></span><span class="preprocessor">#define LAYER_BG3   0x04  </span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="group__layer__enable.html#gad739d38370db8d874382ea94ba39d16e">  106</a></span><span class="preprocessor">#define LAYER_BG4   0x08  </span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">  107</a></span><span class="preprocessor">#define LAYER_OBJ   0x10  </span><span class="preprocessor"></span><span class="preprocessor"></span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment"> * Screen Layer Control</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span></div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">  128</a></span><span class="preprocessor">#define setMainScreen(layers) (REG_TM = (u8)(layers))</span></div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span></div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe">  142</a></span><span class="preprocessor">#define setSubScreen(layers) (REG_TS = (u8)(layers))</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="comment"> * Palette Helpers</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span></div>
-<div class="foldopen" id="foldopen00163" data-start="" data-end="">
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno"><a class="line" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">  163</a></span><span class="preprocessor">#define setColor(index, color) do { \</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span><span class="preprocessor">    REG_CGADD = (u8)(index); \</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span><span class="preprocessor">    REG_CGDATA = (u8)((color) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="preprocessor">    REG_CGDATA = (u8)(((color) &gt;&gt; 8) &amp; 0xFF); \</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span><span class="preprocessor">} while(0)</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">   87</a></span><span class="preprocessor">#define RGB(r, g, b) ((((b) &amp; 31) &lt;&lt; 10) | (((g) &amp; 31) &lt;&lt; 5) | ((r) &amp; 31))</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span></div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="video_8h.html#ad8da1514f9cd03e3cda94953525627f2">   97</a></span><span class="preprocessor">#define RGB24(r, g, b) RGB((r) &gt;&gt; 3, (g) &gt;&gt; 3, (b) &gt;&gt; 3)</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="comment"> * Layer Enable Constants (for REG_TM / REG_TS / setMainScreen / setSubScreen)</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span></div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">  107</a></span><span class="preprocessor">#define LAYER_BG1   0x01  </span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">  108</a></span><span class="preprocessor">#define LAYER_BG2   0x02  </span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga2791a83fd98eb211a254edce8db2a7f0">  109</a></span><span class="preprocessor">#define LAYER_BG3   0x04  </span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="group__layer__enable.html#gad739d38370db8d874382ea94ba39d16e">  110</a></span><span class="preprocessor">#define LAYER_BG4   0x08  </span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">  111</a></span><span class="preprocessor">#define LAYER_OBJ   0x10  </span><span class="preprocessor"></span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span><span class="comment"> * Screen Layer Control</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">  132</a></span><span class="preprocessor">#define setMainScreen(layers) (REG_TM = (u8)(layers))</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span></div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno"><a class="line" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe">  146</a></span><span class="preprocessor">#define setSubScreen(layers) (REG_TS = (u8)(layers))</span></div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span> </div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span><span class="comment"> * Palette Helpers</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span></div>
+<div class="foldopen" id="foldopen00167" data-start="" data-end="">
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">  167</a></span><span class="preprocessor">#define setColor(index, color) do { \</span></div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span><span class="preprocessor">    REG_CGADD = (u8)(index); \</span></div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="preprocessor">    REG_CGDATA = (u8)((color) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="preprocessor">    REG_CGDATA = (u8)(((color) &gt;&gt; 8) &amp; 0xFF); \</span></div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="preprocessor">} while(0)</span></div>
 </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_VIDEO_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_VIDEO_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">OpenSNES Standard Types.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>

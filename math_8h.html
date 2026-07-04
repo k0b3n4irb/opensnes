@@ -450,6 +450,7 @@ Angles</h2>
 </div><div class="memdoc">
 
 <p>Safe 16-bit division. </p>
+<p>Bounded binary long division — always 16 iterations regardless of the operands, so the cost is predictable. (A future optimisation could use the hardware divider at $4204-$4206 for divisors up to 255.)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dividend</td><td>Number to divide </td></tr>
@@ -498,7 +499,7 @@ Angles</h2>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> alpha = <a class="code hl_function" href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a>(t);</div>
 <div class="line">    <span class="comment">// ... draw with alpha ...</span></div>
 <div class="line">}</div>
-<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:398</div></div>
+<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:406</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -825,6 +826,7 @@ Angles</h2>
 </div><div class="memdoc">
 
 <p>Get remainder of division. </p>
+<p>Same bounded binary long division as <a class="el" href="#a6088dfaae404ecf484ca911a8ed7b6ab" title="Safe 16-bit division.">div16()</a> — always 16 iterations.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">dividend</td><td>Number to divide </td></tr>
@@ -832,7 +834,8 @@ Angles</h2>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Remainder </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Remainder</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Returns 0 if divisor is 0 </dd></dl>
 
 </div>
 </div>

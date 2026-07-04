@@ -4,6 +4,7 @@ var text_8h =
     [ "TEXT_DEFAULT_FONT_TILE", "text_8h.html#a6aeb037193a9aff1d616ceed3becbdce", null ],
     [ "TEXT_DEFAULT_PALETTE", "text_8h.html#a71516b8ec619ca3a786d4d3784ff8839", null ],
     [ "TEXT_DEFAULT_TILEMAP_ADDR", "text_8h.html#afdb3005611dd240d7b9850474c575548", null ],
+    [ "TEXT_MAP_ROWS", "text_8h.html#afc27c39bd83c2b987a5ad21082611108", null ],
     [ "textClear", "text_8h.html#a3ee3aa74832395d0ee83d3bfcf456650", null ],
     [ "textClearRect", "text_8h.html#a5b0d49c65eb292f8d6ab738a5106482c", null ],
     [ "textFlush", "text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404", null ],

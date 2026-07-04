@@ -177,19 +177,20 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(((<a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>) &lt;&lt; 10) | ((g) &lt;&lt; 5) | (r))</div>
+<b>Value:</b><div class="fragment"><div class="line">((((<a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>) &amp; 31) &lt;&lt; 10) | (((g) &amp; 31) &lt;&lt; 5) | ((r) &amp; 31))</div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
 </div><!-- fragment -->
 <p>Create RGB color value. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">r</td><td>Red (0-31) </td></tr>
-    <tr><td class="paramname">g</td><td>Green (0-31) </td></tr>
-    <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></td><td>Blue (0-31) </td></tr>
+    <tr><td class="paramname">r</td><td>Red (0-31; masked to 5 bits) </td></tr>
+    <tr><td class="paramname">g</td><td>Green (0-31; masked to 5 bits) </td></tr>
+    <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></td><td>Blue (0-31; masked to 5 bits) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>15-bit BGR color </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>15-bit BGR color</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Operands are masked to 5 bits so an out-of-range component can't bleed into the neighbouring channel. With constant arguments (every call site in the SDK) the masks fold away at compile time — zero cost. </dd></dl>
 
 </div>
 </div>
@@ -217,7 +218,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a>((r) &gt;&gt; 3, (g) &gt;&gt; 3, (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>) &gt;&gt; 3)</div>
-<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:83</div></div>
+<div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:87</div></div>
 </div><!-- fragment -->
 <p>Convert 24-bit RGB to SNES format. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -304,7 +305,7 @@ Functions</h2></td></tr>
 <div class="fragment"><div class="line"><a class="code hl_define" href="#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(0, <a class="code hl_define" href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(0, 0, 0));        <span class="comment">// Color 0 = black</span></div>
 <div class="line"><a class="code hl_define" href="#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(1, <a class="code hl_define" href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 31, 31));     <span class="comment">// Color 1 = white</span></div>
 <div class="line"><a class="code hl_define" href="#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a>(128, <a class="code hl_define" href="#a4a118ad3ee36468a3fa616977a64864e">RGB</a>(31, 0, 0));     <span class="comment">// Sprite palette 0, color 0 = red</span></div>
-<div class="ttc" id="avideo_8h_html_aac65457ee33ca72f75a6ae3cc8af2f7c"><div class="ttname"><a href="#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a></div><div class="ttdeci">#define setColor(index, color)</div><div class="ttdoc">Set a single CGRAM color.</div><div class="ttdef"><b>Definition</b> video.h:163</div></div>
+<div class="ttc" id="avideo_8h_html_aac65457ee33ca72f75a6ae3cc8af2f7c"><div class="ttname"><a href="#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a></div><div class="ttdeci">#define setColor(index, color)</div><div class="ttdoc">Set a single CGRAM color.</div><div class="ttdef"><b>Definition</b> video.h:167</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -335,10 +336,10 @@ Functions</h2></td></tr>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_define" href="#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a> | <a class="code hl_define" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a>);   <span class="comment">// Show BG1 + sprites</span></div>
 <div class="line"><a class="code hl_define" href="#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a> | <a class="code hl_define" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a>);   <span class="comment">// Show BG1 + BG2</span></div>
-<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:103</div></div>
-<div class="ttc" id="agroup__layer__enable_html_ga4491b560e6f9decf7efa9c0b23906ec2"><div class="ttname"><a href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a></div><div class="ttdeci">#define LAYER_BG2</div><div class="ttdef"><b>Definition</b> video.h:104</div></div>
-<div class="ttc" id="agroup__layer__enable_html_ga900967011f520c45c1cba018d929baa0"><div class="ttname"><a href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a></div><div class="ttdeci">#define LAYER_OBJ</div><div class="ttdef"><b>Definition</b> video.h:107</div></div>
-<div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:128</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:107</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga4491b560e6f9decf7efa9c0b23906ec2"><div class="ttname"><a href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a></div><div class="ttdeci">#define LAYER_BG2</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga900967011f520c45c1cba018d929baa0"><div class="ttname"><a href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a></div><div class="ttdeci">#define LAYER_OBJ</div><div class="ttdef"><b>Definition</b> video.h:111</div></div>
+<div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:132</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -368,7 +369,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_define" href="#a0bd5181ba6d21fca96ad627fa0ed4abe">setSubScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a>);  <span class="comment">// BG2 as color math source</span></div>
-<div class="ttc" id="avideo_8h_html_a0bd5181ba6d21fca96ad627fa0ed4abe"><div class="ttname"><a href="#a0bd5181ba6d21fca96ad627fa0ed4abe">setSubScreen</a></div><div class="ttdeci">#define setSubScreen(layers)</div><div class="ttdoc">Enable layers on the sub screen.</div><div class="ttdef"><b>Definition</b> video.h:142</div></div>
+<div class="ttc" id="avideo_8h_html_a0bd5181ba6d21fca96ad627fa0ed4abe"><div class="ttname"><a href="#a0bd5181ba6d21fca96ad627fa0ed4abe">setSubScreen</a></div><div class="ttdeci">#define setSubScreen(layers)</div><div class="ttdoc">Enable layers on the sub screen.</div><div class="ttdef"><b>Definition</b> video.h:146</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

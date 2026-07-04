@@ -216,8 +216,8 @@ Sprites don't appear</h3>
 <div class="line"><span class="comment">// 3. Set sprite properties — oamSet(id, x, y, tile, palette, priority, flags)</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, x, y, 0, 0, 3, 0);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// 4. Make sure sprite is visible (not hidden)</span></div>
-<div class="line"><span class="comment">// oamSetVisible(0, OBJ_SHOW);  // If needed</span></div>
+<div class="line"><span class="comment">// 4. Visibility is the Y position itself: a valid on-screen Y (set by</span></div>
+<div class="line"><span class="comment">//    oamSet above) shows the sprite; oamHide() parks it at Y=240.</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// 5. Update OAM (usually done in VBlank by the library)</span></div>
 <div class="line"><span class="comment">// The NMI handler calls oamUpdate() automatically</span></div>
