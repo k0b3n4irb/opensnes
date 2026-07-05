@@ -2,9 +2,11 @@
 
 *Last updated: 2026-05-13 (re-baselined post deferred-emit + lib retrofit
 chantier; toolchain pins qbe `988073d`, cproc `42a5c46`).
-Run: (currently **DISABLED** — depended on the removed `opensnes-emu`
-submodule; pending re-home off the old harness, see
-`.claude/notes/chantiers/luna_migration.md`)*
+Run: `python3 devtools/cyclecount/bench.py` — the suite was re-homed to
+`devtools/cyclecount/` after the old `opensnes-emu` harness was removed, and
+runs in CI on every push as a cycle-count regression gate against the
+committed baseline. The comparative PVSnesLib numbers below are frozen at
+the 2026-05-13 measurement (re-running them needs a tcc816 toolchain).*
 
 ## Summary
 
@@ -24,7 +26,7 @@ tcc816 + 816-opt peephole optimizer on our benchmark suite of 34 isolated functi
 
 ## Methodology
 
-Each function in `tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c` isolates one code generation
+Each function in `devtools/cyclecount/bench_functions.c` isolates one code generation
 pattern (arithmetic, shifts, loops, struct access, function calls, etc.). Both
 compilers process the same source file:
 
@@ -229,7 +231,7 @@ Why a trailer rather than a PR label or special comment marker:
 ### What the gate does NOT cover
 
 The benchmark surface is narrow: 34 isolated functions in
-`tools/opensnes-emu/test/fixtures/benchmark/bench_functions.c`. A PR can
+`devtools/cyclecount/bench_functions.c`. A PR can
 regress on real-world code without regressing on the benchmark, and vice
 versa. The gate is one input among several when evaluating
 compiler-touching changes — the visual-regression suite, runtime tests,

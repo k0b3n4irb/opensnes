@@ -1,19 +1,19 @@
-# luna-test — Luna-backed test harness (migration, Phase 1)
+# luna-test — Luna-backed test harness
 
-Prototype replacement for `tools/opensnes-emu` (snes9x-WASM) + Mesen2, built on
+The project's test harness, built on
 [luna](https://github.com/k0b3n4irb/luna) — a cycle-accurate Rust SNES emulator
 that runs headless, detects/executes SA-1 + Super FX (GSU) + DSP-1, and exposes
 the full machine state via CLI / API / MCP.
 
-See the full plan: `/tmp/luna_migration_report_2026-06-20.md` and
-`.claude/notes/chantiers/luna_migration.md`.
+Migration history: `.claude/notes/chantiers/luna_migration.md`.
 
 ## Status
 
-**Active backend.** luna is now the **sole** test backend: the snes9x-WASM +
-Mesen2 harness (`tools/opensnes-emu`) was removed. `make tests` runs corpus
-liveness coverage + full-corpus visual regression (56 examples) + functional
-probes. Compile-time cc65816 checks live in `devtools/compiler-tests/`.
+**Sole test backend** (the snes9x-WASM + Mesen2 harness `tools/opensnes-emu`
+was removed). `make tests` runs corpus liveness coverage + full-corpus visual
+regression + functional probes (scripted input → WRAM asserts), and CI adds
+the WRAM-state stream regression (`wram_regress.py`, cross-arch exclusions).
+Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
 
@@ -36,17 +36,18 @@ python3 tools/luna-test/luna_runner.py --only sa1  # one label substring
 
 ## How it works
 
-For each example the runner calls `luna run -n <steps> --screenshot <png>` and
-keys the regression on the **SHA-256 of the rendered PNG**. luna's headless
-framebuffer is byte-deterministic run-to-run (verified in the Phase 0 spike), so
-the hash is a stable, drift-free gate; the PNG is kept next to it for human
-diffing (decision #1: hash gate **+** PNG debug). The runner computes the visual
-verdict itself; luna v0.3.0 also provides `--assert BANK:OFFSET=HEX` (+ `-aram`/
-`-vram`) for direct WRAM assertions, and `--print-fbhash` for a cross-arch-stable
-framebuffer key (see the cross-arch note below).
+For each example the runner calls `luna run -n <steps> --print-fbhash
+--screenshot <png>` and keys the regression on **luna's `fbhash`** — a hash of
+the pre-PNG pixels, byte-deterministic run-to-run and cross-arch-stable (see
+the note below); the PNG is kept next to it for human diffing (hash gate **+**
+PNG debug). luna also provides `--assert BANK:OFFSET=HEX` (+ `-aram`/`-vram`)
+for direct WRAM assertions, used by the probes.
 
 Baselines live in `baselines/`: `<label>.png` + a single `baselines.json`
-manifest (`sha256`, `steps`, `rom_sha256`, `luna_version`).
+manifest (`fbhash`, `steps`, `rom_sha256`, `luna_version`). Self-animating
+examples opt into MULTIPLE capture points via `manifest.toml`
+`steps = [a, b]` — `fbhash`/`steps` become lists, extra PNGs are
+`<label>@<steps>.png`, and a partial mismatch is reported as "timing drift?".
 
 ## Cross-arch baseline key
 
@@ -58,13 +59,14 @@ PNG is kept only for human diffing, not hashed. If a future luna release ever
 breaks fbhash cross-arch stability, that's a luna bug — regenerate baselines with
 `luna_runner.py --update` on the CI arch as a stopgap and report it.
 
-## Not yet migrated (tracked in the chantier note)
+## Migration complete
 
-Runtime/WRAM probes (`luna state --peek`), lag detection (`state.stats`), input
-sequences (`--input`), `luna bench` corpus run, the MCP swap (`luna mcp`), the
-full 56-example manifest, and the CI rewrite. (Mouse/Super Scope were boot+visual
-only until luna v1.1.0 added scripted peripheral input — now covered by
-`probes/mouse.py` + `probes/superscope.py`, see below.)
+Everything the chantier scoped has landed: runtime/WRAM probes (`probes/`,
+incl. mouse + Super Scope via luna v1.1.0's scripted peripheral input), the
+WRAM-stream regression (`wram_regress.py`, CI-gated with cross-arch
+exclusions), input sequences (`--input`), the full-corpus manifest, and the
+CI rewrite (both Linux arches). For interactive debugging, `luna mcp` /
+luna's GUI are available alongside Mesen2.
 
 ## Hardening tests (luna v1.1.0 capabilities)
 

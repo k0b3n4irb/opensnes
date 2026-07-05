@@ -21,6 +21,9 @@ $treeview
 $search
 $mathjax
 $darkmode
+<!-- tabs.css is part of the default doxygen header; dropping it left the
+     dynamic menu's toggle rendering as a raw checkbox + label text. -->
+<link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
 <!-- doxygen-awesome-css companion scripts. HTML_EXTRA_FILES copies these to
@@ -43,3 +46,16 @@ DoxygenAwesomeFragmentCopyButton.init()
 DoxygenAwesomeParagraphLink.init()
 /* @license-end */
 </script>
+<!-- Standard Doxygen title area, dropped when this custom header was first
+     written — doxygen-awesome's sidebar-only layout relocates it to the top
+     of the fixed sidebar, so without it the site shows no logo or project
+     name anywhere. Placeholders are substituted by Doxygen from Doxyfile. -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0"><tbody><tr>
+ <td id="projectlogo"><a href="$relpath^index.html"><img alt="OpenSNES" src="$relpath^logo_64x64.png"/></a></td>
+ <td id="projectalign">
+  <div id="projectname">$projectname</div>
+  <div id="projectbrief">$projectbrief</div>
+ </td>
+</tr></tbody></table>
+</div>

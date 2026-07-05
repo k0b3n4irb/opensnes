@@ -1,6 +1,7 @@
 [submodule "compiler/wla-dx"]
 	path = compiler/wla-dx
 	url = https://github.com/k0b3n4irb/wla-dx.git
+	ignore = dirty
 [submodule "compiler/cproc"]
 	path = compiler/cproc
 	url = https://github.com/k0b3n4irb/cproc.git

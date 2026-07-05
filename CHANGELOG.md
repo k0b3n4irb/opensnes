@@ -5,6 +5,31 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.27.1] — 2026-07-05
+
+Documentation-site branding and repository housekeeping.
+
+### Added
+- feat(docs): OpenSNES brand theme for the documentation site — palette
+  extracted from the logo (SNES-violet primary in light mode; logo-navy page
+  with terminal-green links in dark mode), the logo's tri-color accent bar as
+  a page-top signature, and the logo + wordmark now present on every page.
+  Every text/background pair verified WCAG AA
+
+### Fixed
+- fix(docs): the docs site rendered a raw "Toggle main menu visibility"
+  checkbox on every page and showed no project name or logo anywhere — the
+  custom Doxygen header had dropped the standard title area and the
+  `tabs.css` link; both restored
+
+### Changed
+- docs: stale migration-era claims retired (luna-test "Phase 1 prototype"
+  framing, dead `/tmp` report links, BENCHMARK.md "currently DISABLED" while
+  the re-homed suite gates CI, contradictory fbhash/SHA-256 phrasing)
+- build: `git status` no longer stays noisy from the pinned wla-dx
+  submodule's in-tree build artifacts (`ignore = dirty`; SHA drift remains
+  guarded by `make verify-toolchain`)
+
 ## [0.27.0] — 2026-07-04
 
 Hardening release, driven by a full project review: silent-failure fixes in

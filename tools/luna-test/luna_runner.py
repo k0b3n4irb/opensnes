@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Luna-backed visual-regression runner (Phase 1 prototype).
+"""Luna-backed visual-regression runner.
 
-Part of the migration off snes9x-WASM + Mesen2 onto luna
-(see /tmp/luna_migration_report_2026-06-20.md and
+Successor to the snes9x-WASM + Mesen2 harness (migration history:
 .claude/notes/chantiers/luna_migration.md).
 
 What it does

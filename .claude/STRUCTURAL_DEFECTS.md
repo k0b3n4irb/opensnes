@@ -826,7 +826,10 @@ representation in the toolchain.
   half) + a dedicated far-deref scratch — both pervasive, 2–4 weeks, HIGH risk,
   now *cadré* by the new `a6_farptr` test matrix (the per-cell diagnostic the 4
   prior attempts lacked). WIP preserved: qbe `wip/a6-deref-attempt4`,
-  `wip/a6-a2-byte-load`. develop clean (1884a20, 56/56).
+  `wip/a6-a2-byte-load`. develop clean (1884a20, 56/56). Attempt #3 (Ocopy
+  high-half fix, judged insufficient) lived on the opensnes branch
+  `chantier/a6-codegen`, deleted 2026-07-04 per branch policy — its 4 wip
+  commits remain reachable at SHA `bd6ab276` until GC.
 
 - **2026-05-09** — Partial implementation attempted (A6.1 + A6.3) and
   reverted. Diff was 163 lines in `compiler/qbe/w65816/emit.c` adding:

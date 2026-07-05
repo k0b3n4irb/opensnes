@@ -4,7 +4,9 @@
 with [luna](https://github.com/k0b3n4irb/luna), a cycle-accurate Rust SNES
 emulator (headless CLI + API + MCP) that natively runs SA-1 / Super FX / DSP-1.
 
-Full pre-migration report (exhaustive): `/tmp/luna_migration_report_2026-06-20.md`.
+(The exhaustive pre-migration report lived at
+`/tmp/luna_migration_report_2026-06-20.md` — a scratch file, gone with the
+machine; this note is the surviving record.)
 
 ## Why (value-add)
 

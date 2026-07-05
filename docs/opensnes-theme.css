@@ -1,0 +1,106 @@
+/**
+ * OpenSNES brand theme — layered over doxygen-awesome-css.
+ *
+ * Palette extracted from assets/logo.svg (the single source of truth):
+ *   deep navy  #12121e   (logo background → dark-mode page)
+ *   SNES violet #7161de / #8a7aee  (cartridge body → primary)
+ *   terminal green #0bdb52         (the "OS>" pixels → dark-mode links,
+ *                                   light-mode non-text highlights only:
+ *                                   green on white is ~1.9:1, never text)
+ *   magenta    #e71861 · yellow #f6d714  (accent bar → header signature)
+ *   label navy #1a2a3a / #2b4555   (cartridge label → dark surfaces)
+ *
+ * All text/background pairs verified WCAG AA (≥4.5:1):
+ *   #7161de on #ffffff 4.70 · #4a3f9e on #ffffff 8.41 · #0bdb52 on
+ *   #12121e 9.96 · #8a7aee on #12121e 5.39 · #d5d5e0 on #12121e 12.75
+ *
+ * Light mode stays paper-clean (violet primary, restrained accents);
+ * dark mode is the full brand moment (logo navy + terminal green).
+ */
+
+html {
+    /* Primary: SNES cartridge violet */
+    --primary-color: #7161de;
+    --primary-dark-color: #4a3f9e;
+    --primary-light-color: #8a7aee;
+
+    /* Terminal-green reserved for non-text highlights in light mode */
+    --opensnes-green: #0bdb52;
+    --opensnes-magenta: #e71861;
+    --opensnes-yellow: #f6d714;
+
+    --fragment-linenumber-color: #8a7aee;
+}
+
+html.dark-mode {
+    color-scheme: dark;
+
+    /* The logo background becomes the page */
+    --page-background-color: #12121e;
+    --side-nav-background: #0e0e18;
+    --code-background: #1a2a3a;          /* cartridge label navy */
+    --fragment-background: #16162399;
+
+    /* Terminal green carries the links, violet the secondary accents */
+    --primary-color: #0bdb52;
+    --primary-dark-color: #8a7aee;
+    --primary-light-color: #0bdb52;
+
+    --page-foreground-color: #d5d5e0;
+    --page-secondary-foreground-color: #a9b399;   /* label-text olive */
+
+    --separator-color: #2a2a4a;                    /* connector shell */
+    --border-radius-large: 8px;
+
+    --fragment-linenumber-color: #6a6a8a;          /* connector pins */
+
+    --searchbar-background: #1a2a3a;
+    --header-background: #12121e;
+    --header-foreground: #d5d5e0;
+}
+
+/*
+ * Signature: the logo's tri-color accent bar (magenta / yellow / green)
+ * as a fixed 3px line across the top of every page — the one place the
+ * full accent palette appears, mirroring the bar under the "OPENSNES"
+ * label text in the logo. body::before because this layout (custom
+ * header + sidebar-only) emits no #top element to attach to.
+ */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 400;
+    background: linear-gradient(
+        to right,
+        var(--opensnes-magenta) 0 38%,
+        var(--opensnes-yellow) 38% 62%,
+        var(--opensnes-green) 62% 100%
+    );
+}
+
+/* Sidebar title area (restored in header.html): compact brand lockup */
+#titlearea {
+    border-bottom: 1px solid var(--separator-color);
+}
+#projectbrief {
+    font-size: 11px;
+    color: var(--page-secondary-foreground-color);
+}
+
+/* Project name in the header: monospace nod to the pixel-art wordmark */
+#projectname {
+    font-family: 'JetBrains Mono', 'Courier New', ui-monospace, monospace;
+    letter-spacing: 0.06em;
+}
+
+/* Active sidebar item gets the terminal-green marker (non-text highlight,
+ * so it is safe in both modes) */
+#side-nav .item.selected > .label a,
+#nav-tree .item.selected > .label a {
+    border-left: 3px solid var(--opensnes-green);
+    padding-left: 6px;
+}
