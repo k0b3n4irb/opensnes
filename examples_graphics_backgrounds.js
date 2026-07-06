@@ -1,14 +1,14 @@
 var examples_graphics_backgrounds =
 [
-    [ "Sub-Categories", "examples_graphics.html#autotoc_md1214", null ],
-    [ "Quick Reference", "examples_graphics.html#autotoc_md1215", [
-      [ "Background Modes", "examples_graphics.html#autotoc_md1216", null ],
-      [ "Sprite Palette Locations", "examples_graphics.html#autotoc_md1217", null ],
-      [ "Examples", "examples_graphics_backgrounds.html#autotoc_md1049", null ],
-      [ "Key Concepts", "examples_graphics_backgrounds.html#autotoc_md1050", [
-        [ "BG Scroll Registers", "examples_graphics_backgrounds.html#autotoc_md1051", null ],
-        [ "Tilemap Entry (2 bytes)", "examples_graphics_backgrounds.html#autotoc_md1052", null ],
-        [ "Continuous Scroll Strategy", "examples_graphics_backgrounds.html#autotoc_md1053", null ]
+    [ "Sub-Categories", "examples_graphics.html#autotoc_md1224", null ],
+    [ "Quick Reference", "examples_graphics.html#autotoc_md1225", [
+      [ "Background Modes", "examples_graphics.html#autotoc_md1226", null ],
+      [ "Sprite Palette Locations", "examples_graphics.html#autotoc_md1227", null ],
+      [ "Examples", "examples_graphics_backgrounds.html#autotoc_md1059", null ],
+      [ "Key Concepts", "examples_graphics_backgrounds.html#autotoc_md1060", [
+        [ "BG Scroll Registers", "examples_graphics_backgrounds.html#autotoc_md1061", null ],
+        [ "Tilemap Entry (2 bytes)", "examples_graphics_backgrounds.html#autotoc_md1062", null ],
+        [ "Continuous Scroll Strategy", "examples_graphics_backgrounds.html#autotoc_md1063", null ]
       ] ]
     ] ],
     [ "Continuous Scroll", "examples_graphics_backgrounds_continuous_scroll.html", null ],

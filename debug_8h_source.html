@@ -133,27 +133,27 @@ $(function(){initNavTree('debug_8h_source.html','',''); });
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * Functions (implemented in debug.asm)</span></div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> *============================================================================*/</span></div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">   50</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">consoleMesenBreakpoint</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79">   62</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79">consoleNocashMessage</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *msg);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment">/*============================================================================</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment"> * Macros</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment"> *============================================================================*/</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno"><a class="line" href="debug_8h.html#a2bfec3c05a1c52d8a6b31762500af6e4">   71</a></span><span class="preprocessor">#define SNES_BREAK() consoleMesenBreakpoint()</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="debug_8h.html#a0d70da9a3ad98f46019e0066b9805837">   77</a></span><span class="preprocessor">#define SNES_NOCASH(msg) consoleNocashMessage(msg)</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span></div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">#ifdef NDEBUG</span></div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">  #define SNES_ASSERT(cond) ((void)0)</span></div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="debug_8h.html#ace0973c12e9f5c64790c99c36375f086">   90</a></span><span class="preprocessor">  #define SNES_ASSERT(cond) do { if (!(cond)) { SNES_BREAK(); } } while(0)</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_DEBUG_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">   52</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">consoleMesenBreakpoint</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno"><a class="line" href="debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79">   64</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79">consoleNocashMessage</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *msg);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment">/*============================================================================</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment"> * Macros</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment"> *============================================================================*/</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="debug_8h.html#a2bfec3c05a1c52d8a6b31762500af6e4">   73</a></span><span class="preprocessor">#define SNES_BREAK() consoleMesenBreakpoint()</span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="debug_8h.html#a0d70da9a3ad98f46019e0066b9805837">   79</a></span><span class="preprocessor">#define SNES_NOCASH(msg) consoleNocashMessage(msg)</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#ifdef NDEBUG</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">  #define SNES_ASSERT(cond) ((void)0)</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="debug_8h.html#ace0973c12e9f5c64790c99c36375f086">   92</a></span><span class="preprocessor">  #define SNES_ASSERT(cond) do { if (!(cond)) { SNES_BREAK(); } } while(0)</span></div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_DEBUG_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="adebug_8h_html_a9bb5e44906ed9c96cee028075f4bef79"><div class="ttname"><a href="debug_8h.html#a9bb5e44906ed9c96cee028075f4bef79">consoleNocashMessage</a></div><div class="ttdeci">void consoleNocashMessage(const char *msg)</div><div class="ttdoc">Send a debug message to the Nocash debug console.</div></div>
-<div class="ttc" id="adebug_8h_html_aed31ad362f383e6b8acdc2fde42160fd"><div class="ttname"><a href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">consoleMesenBreakpoint</a></div><div class="ttdeci">void consoleMesenBreakpoint(void)</div><div class="ttdoc">Trigger a Mesen2 debugger breakpoint.</div></div>
+<div class="ttc" id="adebug_8h_html_aed31ad362f383e6b8acdc2fde42160fd"><div class="ttname"><a href="debug_8h.html#aed31ad362f383e6b8acdc2fde42160fd">consoleMesenBreakpoint</a></div><div class="ttdeci">void consoleMesenBreakpoint(void)</div><div class="ttdoc">Trigger an emulator breakpoint (WDM $00).</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">OpenSNES Standard Types.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

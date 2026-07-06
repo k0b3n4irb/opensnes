@@ -1,27 +1,27 @@
 var examples_memory =
 [
     [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", [
-      [ "Examples", "examples_memory.html#autotoc_md1445", null ],
-      [ "Key Concepts", "examples_memory.html#autotoc_md1446", [
-        [ "LoROM vs HiROM", "examples_memory.html#autotoc_md1447", null ],
-        [ "SRAM (Battery Backup)", "examples_memory.html#autotoc_md1448", null ],
-        [ "What This Example Shows", "examples_memory_hirom_demo.html#autotoc_md1430", null ],
-        [ "Prerequisites", "examples_memory_hirom_demo.html#autotoc_md1431", null ],
-        [ "Controls", "examples_memory_hirom_demo.html#autotoc_md1432", null ],
-        [ "Build &amp; Run", "examples_memory_hirom_demo.html#autotoc_md1433", null ],
-        [ "How It Works", "examples_memory_hirom_demo.html#autotoc_md1434", [
-          [ "1. Enable HiROM in the Makefile", "examples_memory_hirom_demo.html#autotoc_md1435", null ],
-          [ "2. The code is identical to LoROM", "examples_memory_hirom_demo.html#autotoc_md1436", null ],
-          [ "3. Embedded font (no external assets)", "examples_memory_hirom_demo.html#autotoc_md1437", null ],
-          [ "4. Interactive feedback", "examples_memory_hirom_demo.html#autotoc_md1438", null ]
+      [ "Examples", "examples_memory.html#autotoc_md1455", null ],
+      [ "Key Concepts", "examples_memory.html#autotoc_md1456", [
+        [ "LoROM vs HiROM", "examples_memory.html#autotoc_md1457", null ],
+        [ "SRAM (Battery Backup)", "examples_memory.html#autotoc_md1458", null ],
+        [ "What This Example Shows", "examples_memory_hirom_demo.html#autotoc_md1440", null ],
+        [ "Prerequisites", "examples_memory_hirom_demo.html#autotoc_md1441", null ],
+        [ "Controls", "examples_memory_hirom_demo.html#autotoc_md1442", null ],
+        [ "Build &amp; Run", "examples_memory_hirom_demo.html#autotoc_md1443", null ],
+        [ "How It Works", "examples_memory_hirom_demo.html#autotoc_md1444", [
+          [ "1. Enable HiROM in the Makefile", "examples_memory_hirom_demo.html#autotoc_md1445", null ],
+          [ "2. The code is identical to LoROM", "examples_memory_hirom_demo.html#autotoc_md1446", null ],
+          [ "3. Embedded font (no external assets)", "examples_memory_hirom_demo.html#autotoc_md1447", null ],
+          [ "4. Interactive feedback", "examples_memory_hirom_demo.html#autotoc_md1448", null ]
         ] ],
-        [ "SNES Concepts", "examples_memory_hirom_demo.html#autotoc_md1439", [
-          [ "LoROM vs HiROM", "examples_memory_hirom_demo.html#autotoc_md1440", null ],
-          [ "When to Use HiROM", "examples_memory_hirom_demo.html#autotoc_md1441", null ],
-          [ "Address Translation", "examples_memory_hirom_demo.html#autotoc_md1442", null ]
+        [ "SNES Concepts", "examples_memory_hirom_demo.html#autotoc_md1449", [
+          [ "LoROM vs HiROM", "examples_memory_hirom_demo.html#autotoc_md1450", null ],
+          [ "When to Use HiROM", "examples_memory_hirom_demo.html#autotoc_md1451", null ],
+          [ "Address Translation", "examples_memory_hirom_demo.html#autotoc_md1452", null ]
         ] ],
-        [ "Project Structure", "examples_memory_hirom_demo.html#autotoc_md1443", null ],
-        [ "Going Further", "examples_memory_hirom_demo.html#autotoc_md1444", null ]
+        [ "Project Structure", "examples_memory_hirom_demo.html#autotoc_md1453", null ],
+        [ "Going Further", "examples_memory_hirom_demo.html#autotoc_md1454", null ]
       ] ]
     ] ],
     [ "SA-1 Hello World", "examples_memory_sa1_hello.html", null ],
