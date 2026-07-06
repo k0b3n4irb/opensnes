@@ -5,7 +5,7 @@ These are the **end-user-facing tools** of the OpenSNES SDK, built by
 Makefile in `examples/` calls into them through `make/common.mk`.
 
 For maintainer-only Python scripts (linters, symbol-map analysis,
-benchmark, BRR↔IT conversion, snesdbg), see `devtools/`.
+benchmark, BRR↔IT conversion), see `devtools/`.
 
 ## Available tools
 
@@ -55,7 +55,7 @@ to expect from the static-link path.
 
 - [`devtools/README.md`](../devtools/README.md) — maintainer-only Python
   tooling (symmap, cyclecount, check_mvn, brr2it, font2snes Python ref,
-  gen_hud_bar, benchmark, snesdbg, lint_asm, lint_commits,
+  gen_hud_bar, benchmark, lint_asm, lint_commits,
   verify_toolchain, check_doc_drift).
 - [`make/common.mk`](../make/common.mk) — how the per-example Makefiles
   reach into `tools/` for the asset pipeline.

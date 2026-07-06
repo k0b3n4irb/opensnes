@@ -7,25 +7,23 @@ pulse the button (hold a few frames, release) between reads.
 from __future__ import annotations
 
 import sys
-from lib import find_luna, sym_of, peek_byte, rom_path, A, START
+from lib import find_luna, peek_byte, rom_path, A, START
 
 
 def _dynamic_map(luna) -> tuple[bool, str]:
     rom = rom_path("maps/dynamic_map/dynamic_map.sfc")
-    bank, off = sym_of(rom, "is_map32x32")
-    s0 = peek_byte(luna, rom, 5_000_000, bank, off)                       # boot
-    s1 = peek_byte(luna, rom, 6_000_000, bank, off, "60:0x80,64:0")       # 1 pulse A
-    s2 = peek_byte(luna, rom, 7_000_000, bank, off, "60:0x80,64:0,120:0x80,124:0")  # 2 pulses
+    s0 = peek_byte(luna, rom, 5_000_000, "is_map32x32")                       # boot
+    s1 = peek_byte(luna, rom, 6_000_000, "is_map32x32", "60:0x80,64:0")       # 1 pulse A
+    s2 = peek_byte(luna, rom, 7_000_000, "is_map32x32", "60:0x80,64:0,120:0x80,124:0")  # 2 pulses
     ok = (s1 != s0) and (s2 == s0)
     return ok, f"dynamic_map is_map32x32 {s0}→{s1}→{s2}"
 
 
 def _scene_stack(luna) -> tuple[bool, str]:
     rom = rom_path("basics/scene_stack/scene_stack.sfc")
-    bank, off = sym_of(rom, "scene_top")
-    t0 = peek_byte(luna, rom, 4_000_000, bank, off)                       # boot
-    t1 = peek_byte(luna, rom, 5_500_000, bank, off, "60:0x1000,64:0")     # START → push
-    t2 = peek_byte(luna, rom, 7_000_000, bank, off,
+    t0 = peek_byte(luna, rom, 4_000_000, "scene_top")                       # boot
+    t1 = peek_byte(luna, rom, 5_500_000, "scene_top", "60:0x1000,64:0")     # START → push
+    t2 = peek_byte(luna, rom, 7_000_000, "scene_top",
                    "60:0x1000,64:0,120:0x1000,124:0")                      # START → pop
     ok = (t1 != t0) and (t2 == t0)
     return ok, f"scene_stack scene_top {t0}→push {t1}→pop {t2}"

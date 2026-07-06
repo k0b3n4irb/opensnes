@@ -107,7 +107,8 @@ Before submitting:
 
 1. `make clean && make` — full rebuild must succeed
 2. `make tests` — luna coverage + visual regression + probes must all pass
-3. Test affected examples in [Mesen2](https://www.mesen.ca/)
+3. Test affected examples (luna covers automated + visual; see
+   `docs/tutorials/debugging.md` for interactive debugging)
 4. New examples must include a working Makefile following the standard pattern
 
 #### Self-review checklist

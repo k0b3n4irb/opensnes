@@ -38,7 +38,9 @@ main     ──────────●─●  (fast-forward; tag is the seco
    nearly-full warnings tolerated only above `BANK0_FAIL_THRESHOLD` (see
    `.claude/rules/bank0_budget.md`).
 2. **Full test suite**: `make tests` (luna coverage + visual regression + probes) — all pass.
-3. **Mesen2 validation**: test key examples manually (at minimum: hello_world, one sprite example, one audio example)
+3. **Interactive spot-check**: key examples by hand (at minimum: hello_world,
+   one sprite example, one audio example) — luna GUI / `luna mcp`, or any
+   third-party emulator (see docs/tutorials/debugging.md)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release
 5. **Version macros bumped**: `lib/include/snes.h:30-40`
    (`OPENSNES_VERSION_{MAJOR,MINOR,PATCH,STRING}`) updated to match the
@@ -92,7 +94,7 @@ Internal multi-day chantiers ship via short-lived `wip/<name>` branches:
 1. **Create** from current develop tip: `git checkout -b wip/<name>`.
 2. **Work** with as many WIP commits as needed for safety/restore points.
 3. **Validate** on the wip branch: `make clean && make`, full quick suite,
-   Mesen2 spot check on representative examples.
+   an interactive spot check on representative examples (luna).
 4. **Squash-merge** into develop as ONE coherent commit with a clear
    conventional-commit subject summarising the chantier's outcome.
 5. **Delete** the wip branch immediately (local AND `origin`) after the

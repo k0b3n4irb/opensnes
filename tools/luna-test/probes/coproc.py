@@ -12,7 +12,7 @@ it where the visual gate can't.
 from __future__ import annotations
 
 import sys
-from lib import find_luna, trace_lines, assert_mem, sym_of, rom_path
+from lib import find_luna, trace_lines, assert_mem, rom_path
 
 # (label, rom, trace flag, minimum instructions expected, handshake-or-None).
 # `handshake` = (wram_sym, hexval): a value the coprocessor writes into shared
@@ -42,8 +42,7 @@ def run() -> tuple[bool, str]:
         tag = str(n)
         if handshake:
             sym, hexval = handshake
-            bank, off = sym_of(rom, sym)
-            ok, det = assert_mem(luna, rom, STEPS, [(bank, off, hexval)])
+            ok, det = assert_mem(luna, rom, STEPS, [(sym, hexval)])
             if not ok:
                 return False, f"{label}: ran ({n}) but handshake {sym}={hexval} failed ({det})"
             tag += f"+hs:{sym}={hexval}"

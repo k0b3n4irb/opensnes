@@ -45,7 +45,9 @@ sudo dnf install make
 
 ### A2. Get an Emulator
 
-Pick one (Mesen is recommended for debugging):
+luna (the SDK test/debug backend, installed by `scripts/install-luna.sh`)
+covers headless debugging — see `tutorials/debugging.md`. For playing your
+ROM in a window, pick any GUI emulator:
 
 | Emulator | Best For | Download |
 |----------|----------|----------|

@@ -14,7 +14,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
-from lib import find_luna, sym_of, assert_mem  # noqa: E402
+from lib import find_luna, assert_mem  # noqa: E402
 
 ROM = HERE / "a7_32bit.sfc"
 STEPS = 1_000_000
@@ -63,8 +63,7 @@ def run() -> int:
     luna = find_luna()
     real_fails = 0
     for name, width, want in CASES:
-        bank, off = sym_of(ROM, name)
-        ok, detail = assert_mem(luna, ROM, STEPS, [(bank, off, le_bytes(want, width))])
+        ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))])
         if name in KNOWN_FAIL:
             if ok:
                 print(f"  XPASS {name} == 0x{want:0{width*2}X}  ← fixed! remove from KNOWN_FAIL")

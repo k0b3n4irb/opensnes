@@ -115,13 +115,29 @@ find_emulator() {
     fi
 
     local cmd
-    for cmd in mesen Mesen Mesen2 bsnes bsnes-hd snes9x snes9x-gtk; do
+    for cmd in luna-gui mesen Mesen Mesen2 bsnes bsnes-hd snes9x snes9x-gtk; do
         if command -v "$cmd" >/dev/null 2>&1; then
             echo "$cmd"
             return
         fi
     done
 
+    return 1
+}
+
+# The luna CLI (headless: tests, MCP debugger) — distinct from the run
+# emulators above. Resolution mirrors tools/luna-test/luna_runner.py:
+# $LUNA_BIN, then the pinned harness binary, then PATH.
+find_luna_cli() {
+    if [ -n "${LUNA_BIN:-}" ] && [ -x "$LUNA_BIN" ]; then
+        echo "$LUNA_BIN"; return
+    fi
+    local sdk
+    sdk="$(find_sdk_root 2>/dev/null)" || true
+    if [ -n "$sdk" ] && [ -x "$sdk/tools/luna-test/bin/luna" ]; then
+        echo "$sdk/tools/luna-test/bin/luna"; return
+    fi
+    command -v luna 2>/dev/null && return
     return 1
 }
 
@@ -394,13 +410,22 @@ cmd_doctor() {
         fail "Library not built. Run 'make lib' in SDK root."
     fi
 
-    # Emulator
+    # luna CLI — the test harness and MCP debugger backend
+    local luna_cli
+    luna_cli="$(find_luna_cli)" || true
+    if [ -n "$luna_cli" ]; then
+        ok "luna: $luna_cli ($("$luna_cli" --version 2>/dev/null | head -1))"
+    else
+        warn "luna not found — run scripts/install-luna.sh (tests + 'luna mcp' debugging need it)"
+    fi
+
+    # GUI emulator (for 'opensnes run')
     local emu
     emu="$(find_emulator)" || true
     if [ -n "$emu" ]; then
         ok "Emulator: $(basename "$emu")"
     else
-        warn "No emulator found. Install Mesen, bsnes, or snes9x."
+        warn "No GUI emulator found. Install luna-gui, Mesen, bsnes, or snes9x."
     fi
 
     # Project

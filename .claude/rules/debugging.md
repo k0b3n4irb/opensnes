@@ -18,7 +18,8 @@ and breaks other examples or future code that hits the same path.
 ## Mandatory Debugging Steps
 
 ### 1. Reproduce with PVSnesLib original
-Before any fix attempt, compare with the PVSnesLib original side-by-side in Mesen2.
+Before any fix attempt, compare with the PVSnesLib original side-by-side
+(luna screenshots/`assets-dump` of both ROMs, or any GUI emulator).
 Path: `$PVSNESLIB_HOME/snes-examples/` (set `PVSNESLIB_HOME` to your local PVSnesLib clone)
 
 ### 2. Identify the LAYER, not just the symptom
@@ -39,11 +40,11 @@ Compare actual instruction bytes with expected. This catches:
 - WLA-DX `.ACCU` tracking bugs (wrong operand sizes)
 - Linker address resolution errors
 
-### 4. Use Mesen2 debugger for runtime verification
-- **VRAM breakpoints** (write) to verify DMA actually targets expected addresses
-- **Watch panel** to monitor variable values (`[$B0]` for address $00B0)
-- **Tile Viewer** to compare VRAM contents with PVSnesLib
-- **Sprite Viewer** to check OAM entries (tile numbers, sizes, positions)
+### 4. Use luna for runtime verification (docs/tutorials/debugging.md)
+- **`run_until_mem_write`** (MCP) to catch who writes a VRAM-bound buffer or a variable
+- **`peek_memory` / `state`** to monitor variable values by address (resolve names from the `.sym`)
+- **`assets-dump`** to compare VRAM tile sheets/tilemaps with PVSnesLib output
+- **`oam.json` / `ppu.oam_full`** to check OAM entries (tile numbers, sizes, positions)
 
 ### 5. Cross-check ASM/C constant definitions
 After ANY change to shared constants:

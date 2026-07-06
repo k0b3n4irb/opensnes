@@ -55,4 +55,3 @@ python3 brr2it/brr2it.py input.brr output.it "SampleName" 8363
 | [`font2snes/`](font2snes/) | Font conversion (Python reference implementation) | [README](font2snes/README.md) |
 | [`gen_hud_bar/`](gen_hud_bar/) | Generate HUD health bar sprite sheets | [README](gen_hud_bar/README.md) |
 | [`benchmark/`](benchmark/) | Compiler benchmark (OpenSNES vs PVSnesLib) | [README](benchmark/README.md) |
-| [`snesdbg/`](snesdbg/) | Lua debugging library for Mesen2 | [README](snesdbg/README.md) |

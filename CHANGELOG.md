@@ -5,6 +5,49 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.28.0] — 2026-07-06
+
+luna becomes OpenSNES's **sole emulator** — automated pillars *and* a
+feature-complete interactive debugger. A same-week collaboration with the
+luna project (epic luna#63) shipped first-class breakpoints, native WLA-DX
+symbol resolution and a 39-tool MCP surface; OpenSNES consumed each release
+the day it landed. Mesen2 is now an optional third-party alternative, the
+Lua debugging layer is gone entirely, and the test harness asserts by
+variable name.
+
+### Added
+- docs(tutorials): `debugging.md` — the six standard interactive-debugging
+  workflows on luna's CLI + MCP surface (state inspection,
+  who-writes-this-variable via breakpoints, break-at-function, OAM
+  shadow-vs-hardware, poke-and-observe, temporal-artefact capture)
+- feat(tools): `opensnes doctor` detects the luna CLI (pinned binary,
+  `$LUNA_BIN`, or PATH) and reports its version; `luna-gui` joins the
+  GUI-emulator detection for `opensnes run`
+
+### Changed
+- chore(luna-test): pinned luna bumped v1.1.0 → v1.7.0 (v1.6.0
+  interactive-debugger parity + v1.7.0 GUI step/breakpoints and CLI symbol
+  resolution). One legitimate visual/WRAM rebaseline pair at v1.6.0
+  (HDMA-faithful gradient, timing-phase cube rotation), zero drift at v1.7.0
+- refactor(luna-test,test): the probes and runtime-assertion ROMs assert and
+  peek **by symbol name** — luna resolves the auto-detected `<rom>.sym`
+  natively, and the harness's duplicated wlalink parser is deleted
+- docs(rules): luna-first debugging everywhere — the workflow rules that
+  still made a manual Mesen2 pass mandatory (in contradiction with
+  testing.md since the luna migration) are re-pointed; Mesen2 remains cited
+  only as an optional alternative and as the historical accuracy reference
+
+### Removed
+- refactor(devtools): `devtools/snesdbg/` — the Mesen2-bound Lua debugging
+  library (~2,360 LOC, zero automated usage). Its four workflows live on in
+  `docs/tutorials/debugging.md` over luna MCP; no Lua remains in the
+  repository
+
+### Fixed
+- fix(luna-test): the aim_target WRAM baseline had been captured from a
+  stale local ROM — caught by the WRAM CI gate disagreeing on both arches,
+  restored from a clean build (the example had in fact never drifted)
+
 ## [0.27.1] — 2026-07-05
 
 Documentation-site branding and repository housekeeping.

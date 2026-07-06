@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.27.1 (developing toward v0.28.0)
+## Current Status: post-v0.28.0 (developing toward v0.29.0)
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
@@ -198,7 +198,9 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] **lint_commits.py** — Conventional-Commits + no-`Co-Authored-By` lint
 - [x] **cyclecount.py** — CPU cycle estimation
 - [x] **check_mvn.py** — MVN/MVP operand linter
-- [x] **snesdbg** — Mesen2 Lua debugging library (BDD-style tests)
+- [x] **Interactive debugging via luna** (CLI + MCP) — replaced the retired
+      Mesen2-bound snesdbg Lua library (see `docs/tutorials/debugging.md`;
+      breakpoints/symbols tracked upstream as luna#63)
 - [x] **brr2it** — BRR → Impulse Tracker conversion
 - [x] **benchmark** — Compiler-performance comparison tool
 - [x] **gen_hud_bar** — HUD bar generator
@@ -284,6 +286,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-07-05. Anchored claims (version, examples count, framework
+*Last updated: 2026-07-06. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

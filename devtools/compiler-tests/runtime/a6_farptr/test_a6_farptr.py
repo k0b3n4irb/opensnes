@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[3] / "tools" / "luna-test" / "probes"))
-from lib import find_luna, sym_of, assert_mem  # noqa: E402
+from lib import find_luna, assert_mem  # noqa: E402
 
 ROM = HERE / "a6_farptr.sfc"
 STEPS = 1_000_000
@@ -54,8 +54,7 @@ def run():
     luna = find_luna()
     regress, xfail, xpass = [], [], []
     for name, w, want, bank, form in CASES:
-        b, o = sym_of(ROM, name)
-        ok, _ = assert_mem(luna, ROM, STEPS, [(b, o, le(want, w))])
+        ok, _ = assert_mem(luna, ROM, STEPS, [(name, le(want, w))])
         if name in KNOWN_FAIL:
             (xpass if ok else xfail).append(name)
             note = "  <- XPASS: promote out of KNOWN_FAIL" if ok else "  (A6 gap, xfail)"

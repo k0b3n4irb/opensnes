@@ -133,7 +133,7 @@ cd opensnes
 make
 ```
 
-Open `examples/text/hello_world/hello_world.sfc` in [Mesen2](https://www.mesen.ca/) and you're running on a Super Nintendo.
+Open `examples/text/hello_world/hello_world.sfc` in your favourite emulator ([luna](https://github.com/k0b3n4irb/luna), [Mesen2](https://www.mesen.ca/), bsnes…) and you're running on a Super Nintendo.
 
 To start your own game, the build installs an `opensnes` CLI in `bin/`:
 

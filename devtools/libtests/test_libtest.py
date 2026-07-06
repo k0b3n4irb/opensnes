@@ -20,7 +20,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
-from lib import find_luna, sym_of, assert_mem  # noqa: E402
+from lib import find_luna, assert_mem  # noqa: E402
 
 ROM = HERE / "libtest.sfc"
 STEPS = 1_000_000
@@ -50,8 +50,8 @@ def run() -> int:
     luna = find_luna()
     fails = 0
     for name, width, want in CASES:
-        bank, off = sym_of(ROM, name)
-        ok, detail = assert_mem(luna, ROM, STEPS, [(bank, off, le_bytes(want, width))])
+        # luna resolves the symbol name itself (v1.7.0, auto-detected .sym)
+        ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))])
         if ok:
             print(f"  PASS  {name} == 0x{want:0{width*2}X}")
         else:

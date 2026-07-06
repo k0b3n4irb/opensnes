@@ -7,14 +7,13 @@ must land the exact bytes in the OAM shadow at $7E:0300 (X,Y,tile,attr).
 from __future__ import annotations
 
 import sys
-from lib import find_luna, sym_of, peek_word, peek, rom_path, A
+from lib import find_luna, peek_word, peek, rom_path, A
 
 
 def _random(luna) -> tuple[bool, str]:
     rom = rom_path("basics/random/random.sfc")
-    bank, off = sym_of(rom, "current_value")
-    v0 = peek_word(luna, rom, 4_000_000, bank, off)
-    v1 = peek_word(luna, rom, 5_500_000, bank, off, "60:0x80,64:0")   # pulse A once
+    v0 = peek_word(luna, rom, 4_000_000, "current_value")
+    v1 = peek_word(luna, rom, 5_500_000, "current_value", "60:0x80,64:0")   # pulse A once
     ok = v0 != v1
     return ok, f"random current_value {v0}→A→{v1}"
 
@@ -25,8 +24,7 @@ def _simple_sprite(luna) -> tuple[bool, str]:
     # PPU pipeline delay), so the shadow Y is 95, not 96. (luna reads 95 — the
     # snes9x-era test's expected 96 ignored this y-1 convention.)
     rom = rom_path("graphics/sprites/simple_sprite/simple_sprite.sfc")
-    bank, off = sym_of(rom, "oamMemory")  # 7E:0300
-    x, y, tile, attr = peek(luna, rom, 4_000_000, bank, off, 4)
+    x, y, tile, attr = peek(luna, rom, 4_000_000, "oamMemory", 4)  # 7E:0300
     ok = (x == 112 and y == 95 and tile == 0x10 and (attr & 0x3E) == 0x30)
     return ok, f"simple_sprite OAM0 x={x} y={y}(=96-1) tile=0x{tile:02X} attr=0x{attr:02X}"
 

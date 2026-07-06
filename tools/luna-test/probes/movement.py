@@ -8,7 +8,7 @@ input → C-state link and that example's movement logic.
 from __future__ import annotations
 
 import sys
-from lib import (find_luna, sym_of, peek_sword, rom_path,
+from lib import (find_luna, peek_sword, rom_path,
                  LEFT, RIGHT, UP, DOWN)
 
 # (example rom, [(symbol, dir_mask, want_increase)])
@@ -33,9 +33,8 @@ def run() -> tuple[bool, str]:
         rom = rom_path(rel)
         name = rom.parent.name
         for symname, mask, want_inc in checks:
-            bank, off = sym_of(rom, symname)
-            base = peek_sword(luna, rom, 4_000_000, bank, off)
-            held = peek_sword(luna, rom, 6_000_000, bank, off, f"40:0x{mask:04X}")
+            base = peek_sword(luna, rom, 4_000_000, symname)
+            held = peek_sword(luna, rom, 6_000_000, symname, f"40:0x{mask:04X}")
             moved_up = held > base
             ok = (moved_up == want_inc)
             arrow = "↑" if want_inc else "↓"

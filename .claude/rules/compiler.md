@@ -27,7 +27,7 @@ The qbe w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`)
 make compiler       # Build all three submodules
 ```
 
-This is a Class A change — requires `make clean && make` + full test suite + Mesen2 on ALL examples.
+This is a Class A change — requires `make clean && make` + full test suite (luna) on ALL examples.
 
 ## Critical Constraints
 
@@ -41,5 +41,7 @@ This is a Class A change — requires `make clean && make` + full test suite + M
 
 1. `make clean && make` — full rebuild (stale objects cause phantom bugs)
 2. `make tests` — luna coverage + visual regression + probes
-3. Ask user for Mesen2 validation on representative examples
+3. Present the triaged representative examples to the user (luna visual
+   pass is the reference; interactive spot-check via `luna mcp` / luna GUI
+   if needed — see docs/tutorials/debugging.md)
 4. Check for regressions in code generation with compiler test patterns

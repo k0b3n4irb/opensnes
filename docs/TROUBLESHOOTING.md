@@ -136,7 +136,8 @@ python3 devtools/symmap/symmap.py --check-overlap game.sym
 3. **Uninitialized pointers** - C doesn't zero local variables
 
 **Debug**:
-1. Use Mesen's debugger to see where it crashes
+1. Use luna to see where it crashes (`run_until_pc` / `state` over MCP —
+   see the [debugging tutorial](tutorials/debugging.md))
 2. Check the call stack depth
 3. Look for NULL pointer dereferences
 
@@ -289,7 +290,13 @@ xxd -s 0x7FC0 -l 32 game.sfc
 ls -la game.sfc
 ```
 
-### Using Mesen Debugger
+### Interactive debugging with luna
+
+See the [debugging tutorial](tutorials/debugging.md) for the full workflows
+(who-writes-this-variable, break-at-function, OAM shadow-vs-hardware, poke
+and observe). A third-party GUI debugger also works:
+
+### Using Mesen Debugger (alternative)
 
 1. Load ROM in Mesen
 2. Tools → Debugger

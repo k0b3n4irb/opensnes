@@ -3,7 +3,7 @@
  * @brief Debug utilities for SNES development
  *
  * Provides breakpoints, Nocash debug messages, and runtime assertions
- * for use with emulators (Mesen2, no$sns).
+ * for use with emulators (luna, Mesen2, no$sns).
  *
  * ## Usage
  *
@@ -16,7 +16,7 @@
  *     SNES_NOCASH("enemy_update called");
  *     // ...
  *     if (something_wrong) {
- *         SNES_BREAK();  // Halts in Mesen2 debugger
+ *         SNES_BREAK();  // WDM $00 — assert channel in luna, breakpoint in Mesen2
  *     }
  * }
  * @endcode
@@ -42,9 +42,11 @@
  *============================================================================*/
 
 /**
- * @brief Trigger a Mesen2 debugger breakpoint
+ * @brief Trigger an emulator breakpoint (WDM $00)
  *
- * Emits a WDM $00 instruction which Mesen2 recognizes as a breakpoint.
+ * Emits a WDM $00 instruction — luna captures it as an assert/WDM event
+ * (fails the test harness run); Mesen2 recognizes it as a breakpoint.
+ * (Function name kept for source compatibility.)
  * Has no effect on real hardware (WDM is a 2-byte NOP on 65816).
  */
 void consoleMesenBreakpoint(void);
@@ -53,7 +55,7 @@ void consoleMesenBreakpoint(void);
  * @brief Send a debug message to the Nocash debug console
  *
  * Writes a null-terminated string byte-by-byte to the debug register
- * at $21FC. Visible in Mesen2's debug console and no$sns.
+ * at $21FC. Visible in luna's nocash log, Mesen2's debug console and no$sns.
  *
  * @param msg Null-terminated string to display
  *
@@ -66,7 +68,7 @@ void consoleNocashMessage(const char *msg);
  *============================================================================*/
 
 /**
- * @brief Breakpoint — halts execution in Mesen2 debugger
+ * @brief Breakpoint — WDM $00 (luna assert channel / Mesen2 debugger halt)
  */
 #define SNES_BREAK() consoleMesenBreakpoint()
 

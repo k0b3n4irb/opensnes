@@ -284,7 +284,8 @@ clean-example:
 1. Full rebuild: `make clean && make`
 2. Compiler tests: `./tests/compiler/run_tests.sh --allow-known-bugs`
 3. Example validation: `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick`
-4. **STOP** — Ask user to validate in Mesen2 (Category C protocol)
+4. **STOP** — Ask user to validate interactively (luna GUI / `luna mcp`;
+   Category C protocol)
 5. Compare side-by-side with PVSnesLib ROM if possible
 
 ## Critical Pitfalls (from hard experience)

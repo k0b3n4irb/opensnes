@@ -7,19 +7,18 @@ doesn't move under D-pad, the input→C link or the map engine is broken.
 from __future__ import annotations
 
 import sys
-from lib import find_luna, load_symbols, peek_word, rom_path, LEFT, RIGHT
+from lib import find_luna, peek_word, rom_path, LEFT, RIGHT
 
 
 def run() -> tuple[bool, str]:
     luna = find_luna()
     rom = rom_path("maps/mapscroll/mapscroll.sfc")
-    bank, off = load_symbols(rom)["xloc"]
 
     # Independent deterministic runs from boot; input frames kept low so a
     # generous -n always passes them. Reads happen at -n (well after release).
-    x_start = peek_word(luna, rom, 4_000_000, bank, off)                       # no input
-    x_right = peek_word(luna, rom, 6_000_000, bank, off, "40:0x100,120:0")     # hold RIGHT 40-119
-    x_left  = peek_word(luna, rom, 8_000_000, bank, off,
+    x_start = peek_word(luna, rom, 4_000_000, "xloc")                       # no input
+    x_right = peek_word(luna, rom, 6_000_000, "xloc", "40:0x100,120:0")     # hold RIGHT 40-119
+    x_left  = peek_word(luna, rom, 8_000_000, "xloc",
                         "40:0x100,120:0,140:0x200,210:0")                       # then hold LEFT 140-209
 
     if not x_right > x_start:

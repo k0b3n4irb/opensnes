@@ -18,7 +18,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from pathlib import Path
-from lib import find_luna, sym_of, assert_mem, capture_srm, rom_path, A, B
+from lib import find_luna, assert_mem, capture_srm, rom_path, A, B
 
 ROM = "memory/save_game/save_game.sfc"
 STEPS = 2_500_000
@@ -32,8 +32,6 @@ def run() -> tuple[bool, str]:
     rom = rom_path(ROM)
     if not rom.is_file():
         return False, f"ROM missing ({rom})"
-    _, vtl_off = sym_of(rom, "vtl")  # load buffer, bank $00 WRAM mirror
-
     with tempfile.TemporaryDirectory() as td:
         srm = Path(td) / "save_game.srm"
 
@@ -44,13 +42,13 @@ def run() -> tuple[bool, str]:
             return False, f"WRITE: .srm slot1 = {got}, expected {SAVED}"
 
         # 2. READ — power-cycle: reload the battery, load slot 1, assert vtl.
-        ok, det = assert_mem(luna, rom, STEPS, [(0x00, vtl_off, SAVED)],
+        ok, det = assert_mem(luna, rom, STEPS, [("vtl", SAVED)],
                              input_script=PRESS_B, srm_in=srm)
         if not ok:
             return False, f"READ: persisted slot1 not loaded into vtl ({det})"
 
         # 3. CONTROL — no battery: load must NOT yield the saved values.
-        ok_ctrl, _ = assert_mem(luna, rom, STEPS, [(0x00, vtl_off, SAVED)],
+        ok_ctrl, _ = assert_mem(luna, rom, STEPS, [("vtl", SAVED)],
                                 input_script=PRESS_B)
         if ok_ctrl:
             return False, "CONTROL: vtl matched saved values WITHOUT --srm-in — "\

@@ -8,7 +8,7 @@ Proves the DMA engine moved the exact source bytes to the right destination.
 from __future__ import annotations
 
 import sys
-from lib import (find_luna, sym_of, sym_size, peek, dump_vram, cgram_words,
+from lib import (find_luna, sym_size, peek, dump_vram, cgram_words,
                  rom_path)
 
 ROM = "text/hello_world/hello_world.sfc"
@@ -16,9 +16,8 @@ ROM = "text/hello_world/hello_world.sfc"
 
 def _dma_vram(luna) -> tuple[bool, str]:
     rom = rom_path(ROM)
-    bank, off = sym_of(rom, "font_tiles")
     size = sym_size(rom, "font_tiles")            # 144
-    src = peek(luna, rom, 1_000_000, bank, off, size)
+    src = peek(luna, rom, 1_000_000, "font_tiles", size)
     vram = dump_vram(luna, rom, 1_000_000)[:size]  # dest word 0x0000 → byte 0
     ok = bytes(src) == vram
     return ok, f"dma→VRAM {size}B {'match' if ok else 'MISMATCH'}"
@@ -26,9 +25,8 @@ def _dma_vram(luna) -> tuple[bool, str]:
 
 def _dma_cgram(luna) -> tuple[bool, str]:
     rom = rom_path(ROM)
-    bank, off = sym_of(rom, "bg_palette")
     size = sym_size(rom, "bg_palette")            # 4 bytes = 2 colours
-    src = peek(luna, rom, 1_000_000, bank, off, size)
+    src = peek(luna, rom, 1_000_000, "bg_palette", size)
     cg = cgram_words(luna, rom, 1_000_000)
     ok = True
     for i in range(size // 2):

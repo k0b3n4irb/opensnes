@@ -52,7 +52,7 @@ so validation is now 2 pillars:
 5. **NEVER commit without user validation.** Do not assume examples work because
    they compiled. The luna visual-regression pass is the visual reference; the
    triaged subset is presented to the user, who may additionally spot-check
-   interactively (luna GUI / `luna mcp`, or Mesen2 as debugger).
+   interactively (luna GUI / `luna mcp` — see docs/tutorials/debugging.md).
 6. Conventional Commits format in message
 
 ## Impacted-Examples Triage
@@ -107,4 +107,5 @@ When a ported example has visual bugs:
    and compare the generated ASM output (stack offsets, VRAM layout, register values)
 2. **Check VRAM layout** — sprite tiles, font tiles, and tilemaps must not overlap
 3. **Check OBJSEL** — Name Base and Name Select gap determine where tiles 256+ are read
-4. **Never guess** — use Mesen2 debugger (VRAM viewer, OAM viewer) to verify actual state
+4. **Never guess** — verify actual state with luna (`assets-dump` for
+   VRAM/tilemaps/OAM, `state`/`peek_memory` over MCP; docs/tutorials/debugging.md)

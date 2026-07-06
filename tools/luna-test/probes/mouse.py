@@ -13,7 +13,7 @@ the mouse sensitivity setting, hence a robust deterministic assertion.
 from __future__ import annotations
 
 import sys
-from lib import find_luna, sym_of, assert_mem, word_bytes, rom_path
+from lib import find_luna, assert_mem, word_bytes, rom_path
 
 ROM = "input/mouse/mouse.sfc"
 STEPS = 2_500_000
@@ -23,25 +23,24 @@ MOUSE_ON = ["--port1", "mouse"]
 def run() -> tuple[bool, str]:
     luna = find_luna()
     rom = rom_path(ROM)
-    cb, co = sym_of(rom, "mouse_con")   # connection flag (u8)
-    xb, xo = sym_of(rom, "pos_x")       # cursor X (s16), init 128, clamp 0..255
-    _, yo = sym_of(rom, "pos_y")        # cursor Y (s16), init 112, clamp 0..223
+    # mouse_con: connection flag (u8); pos_x/pos_y: cursor (s16), init
+    # 128/112, clamped 0..255 / 0..223 — names resolve in luna (v1.7.0).
 
     # 1. The Mouse must be detected on port 1.
-    ok, det = assert_mem(luna, rom, STEPS, [(cb, co, "01")], extra=MOUSE_ON + ["--mouse", "30:0,0,0"])
+    ok, det = assert_mem(luna, rom, STEPS, [("mouse_con", "01")], extra=MOUSE_ON + ["--mouse", "30:0,0,0"])
     if not ok:
         return False, f"mouse not detected (mouse_con != 1): {det}"
 
     # 2. Sustained right+down saturates the cursor to the bottom-right clamp.
     ok, det = assert_mem(luna, rom, STEPS,
-                         [(xb, xo, word_bytes(255)), (xb, yo, word_bytes(223))],
+                         [("pos_x", word_bytes(255)), ("pos_y", word_bytes(223))],
                          extra=MOUSE_ON + ["--mouse", "30:20,20,0"])
     if not ok:
         return False, f"right/down motion did not saturate to (255,223): {det}"
 
     # 3. Sustained left+up saturates to the top-left clamp (proves sign handling).
     ok, det = assert_mem(luna, rom, STEPS,
-                         [(xb, xo, word_bytes(0)), (xb, yo, word_bytes(0))],
+                         [("pos_x", word_bytes(0)), ("pos_y", word_bytes(0))],
                          extra=MOUSE_ON + ["--mouse", "30:-20,-20,0"])
     if not ok:
         return False, f"left/up motion did not saturate to (0,0): {det}"

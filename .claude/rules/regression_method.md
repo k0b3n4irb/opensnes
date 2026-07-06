@@ -24,7 +24,7 @@ IMPORTANT: When a bug is introduced, use bisection — do NOT guess.
 | Symbol overlap check | `python devtools/symmap/symmap.py --check-overlap <rom>.sym` | Bank $00 overflow detection |
 | ROM hex dump | `xxd <rom>.sfc \| head -100` | Verify ROM header, vectors |
 | Visual regression | `python3 tools/luna-test/luna_runner.py --compare` | Framebuffer comparison vs luna baselines |
-| Mesen2 debugger | Open ROM in Mesen2 → Debug → Breakpoints | Step-through debugging |
+| luna MCP debugger | `luna mcp` → `run_until_pc` / `step` / `state` | Step-through debugging (docs/tutorials/debugging.md) |
 
 ## Common Regression Patterns
 
