@@ -128,8 +128,6 @@ $(function(){initNavTree('structMonster.html','','structMonster-members'); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a9866806505fb8b256a2897ad1fb7e323" id="r_a9866806505fb8b256a2897ad1fb7e323"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9866806505fb8b256a2897ad1fb7e323">anim_delay</a></td></tr>
-<tr class="memitem:a46e4766a089bbdb88eaa7c06b5529a17" id="r_a46e4766a089bbdb88eaa7c06b5529a17"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a46e4766a089bbdb88eaa7c06b5529a17">anim_frame</a></td></tr>
 <tr class="memitem:af18fac6f28430cbeddf1873240e24ade" id="r_af18fac6f28430cbeddf1873240e24ade"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af18fac6f28430cbeddf1873240e24ade">flipx</a></td></tr>
 <tr class="memitem:af48434d537b961db46339532f773f5ef" id="r_af48434d537b961db46339532f773f5ef"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af48434d537b961db46339532f773f5ef">gfx_frame</a></td></tr>
 <tr class="memitem:a5868c7c64bfcf3f8887a6c141c3f9783" id="r_a5868c7c64bfcf3f8887a6c141c3f9783"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5868c7c64bfcf3f8887a6c141c3f9783">state</a></td></tr>
@@ -140,36 +138,6 @@ Public Attributes</h2></td></tr>
 <div class="textblock"><p>Sprite state structure holding position, animation, and direction. </p>
 <p>Combines all per-sprite data into one struct. On the SNES, each OAM entry only stores position and tile number — animation state must be tracked separately in RAM and used to compute the correct tile each frame. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a9866806505fb8b256a2897ad1fb7e323" name="a9866806505fb8b256a2897ad1fb7e323"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9866806505fb8b256a2897ad1fb7e323">&#9670;&#160;</a></span>anim_delay</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> Monster::anim_delay</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Frame counter for animation timing (counts up to ANIM_DELAY) </p>
-
-</div>
-</div>
-<a id="a46e4766a089bbdb88eaa7c06b5529a17" name="a46e4766a089bbdb88eaa7c06b5529a17"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46e4766a089bbdb88eaa7c06b5529a17">&#9670;&#160;</a></span>anim_frame</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> Monster::anim_frame</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Current frame index within the walk cycle (0 to FRAMES_PER_ANIMATION-1) </p>
-
-</div>
-</div>
 <a id="af18fac6f28430cbeddf1873240e24ade" name="af18fac6f28430cbeddf1873240e24ade"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af18fac6f28430cbeddf1873240e24ade">&#9670;&#160;</a></span>flipx</h2>
 

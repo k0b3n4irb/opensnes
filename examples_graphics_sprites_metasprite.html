@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_graphics_sprites_metasprite.html','',''); });
 <img src="screenshot.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1263"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1264"></a>
 What You'll Learn</h2>
 <ul>
 <li>How metasprites combine multiple hardware sprites into one logical character</li>
@@ -136,9 +136,9 @@ What You'll Learn</h2>
 <li>How <span class="tt"><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a></span> places a list of hardware sprites from a single function call</li>
 <li>How VRAM tile layout relates to OAM tile numbering</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1264"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1265"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1265"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1266"></a>
 OBJ Size Modes (Register $2101)</h3>
 <p>The SNES PPU supports 128 hardware sprites (OAM entries), but only two sizes are available at any time, controlled by bits 5-7 of register $2101 (OBJSEL). Each OAM entry has a size bit selecting either "small" or "large." The three modes used in this example:</p>
 <table class="markdownTable">
@@ -152,7 +152,7 @@ OBJ Size Modes (Register $2101)</h3>
 <td class="markdownTableBodyNone">OBJ_SIZE16_L32  </td><td class="markdownTableBodyNone">16x16  </td><td class="markdownTableBodyNone">32x32  </td><td class="markdownTableBodyNone"><span class="tt">0x60</span> (bits 7-5)  </td></tr>
 </table>
 <p>You cannot mix three sizes (e.g. 8x8 + 16x16 + 32x32) in one frame. Choose the two sizes that best suit your game's needs.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1266"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1267"></a>
 MetaspriteItem Structure</h3>
 <p>A metasprite is defined as an array of <span class="tt"><a class="el" href="structMetaspriteItem.html" title="Metasprite item structure (PVSnesLib compatible).">MetaspriteItem</a></span> entries, terminated by <span class="tt"><a class="el" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a" title="End marker for metasprite data (dx = -128).">METASPR_TERM</a></span>. Each item specifies the X/Y offset from the metasprite origin, a tile number, and attribute flags (palette, priority, flip):</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> <a class="code hl_variable" href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a>[] = {</div>
@@ -165,12 +165,12 @@ MetaspriteItem Structure</h3>
 <div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
 <div class="line">};</div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__metasprite_2main_8c_html_ae2ffd37454763f04bc54b520f8e8c323"><div class="ttname"><a href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero16_frame0[]</div><div class="ttdoc">16x16 metasprite: 32x48 character (2x3 grid of 16x16)</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:461</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:449</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:452</div></div>
-<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:458</div></div>
-<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:437</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1267"></a>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:473</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:461</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:464</div></div>
+<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:470</div></div>
+<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:449</div></div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1268"></a>
 VRAM Tile Layout and OAM Tile Numbers</h3>
 <p>OAM tile numbers reference 8x8 tiles in VRAM, regardless of the hardware sprite size. A 16x16 sprite uses 4 consecutive 8x8 tiles (2 across x 2 down in the VRAM character grid, which is 16 tiles wide). A 32x32 sprite uses 16 tiles. The <span class="tt">-T</span> flag in gfx4snes transposes the sprite sheet to match the SNES OBJ VRAM grid layout, so tile indices in the metasprite data correspond directly to positions in the converted <span class="tt">.pic</span> file.</p>
 <p>This example packs all three sprite sheets into contiguous VRAM starting at $0000:</p>
@@ -184,7 +184,7 @@ VRAM Tile Layout and OAM Tile Numbers</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">hero8  </td><td class="markdownTableBodyNone">$1200  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">288  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1268"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1269"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -194,7 +194,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Select next OBJ size mode  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1269"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1270"></a>
 How It Works</h2>
 <p><b>1. Load all sprite tiles</b> &ndash; Three sprite sheets are DMA'd to contiguous VRAM regions while the screen is blanked:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(<a class="code hl_variable" href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#a4a7f6eee3d43e9509a60fe80f1738130">spritehero32_til</a>, <a class="code hl_define" href="graphics_2sprites_2metasprite_2main_8c.html#a0a79e7c1576f67a4ba27a5f569e1fdcc">VRAM_HERO32</a>, <a class="code hl_define" href="graphics_2sprites_2metasprite_2main_8c.html#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a> * <a class="code hl_define" href="graphics_2sprites_2metasprite_2main_8c.html#aa7b33c8c3bad27994dad6959ba8854b8">TILE_BYTES</a>);</div>
@@ -207,13 +207,13 @@ How It Works</h2>
 <div class="ttc" id="agraphics_2sprites_2dynamic__metasprite_2main_8c_html_a31447f39fe58257bd10616a4fe45f35d"><div class="ttname"><a href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#a31447f39fe58257bd10616a4fe45f35d">spritehero16_til</a></div><div class="ttdeci">u8 spritehero16_til[]</div></div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__metasprite_2main_8c_html_a4a7f6eee3d43e9509a60fe80f1738130"><div class="ttname"><a href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#a4a7f6eee3d43e9509a60fe80f1738130">spritehero32_til</a></div><div class="ttdeci">u8 spritehero32_til[]</div></div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__metasprite_2main_8c_html_aeaf8c79ab42cf83a6b899f58c55ac559"><div class="ttname"><a href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#aeaf8c79ab42cf83a6b899f58c55ac559">spritehero32_pal</a></div><div class="ttdeci">u8 spritehero32_pal[]</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a0a79e7c1576f67a4ba27a5f569e1fdcc"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a0a79e7c1576f67a4ba27a5f569e1fdcc">VRAM_HERO32</a></div><div class="ttdeci">#define VRAM_HERO32</div><div class="ttdoc">Metasprite frame definitions generated by gfx4snes -P.</div><div class="ttdef"><b>Definition</b> main.c:78</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a1ecc54ba9c97d7721f0d6c440a30682c"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a1ecc54ba9c97d7721f0d6c440a30682c">VRAM_HERO16</a></div><div class="ttdeci">#define VRAM_HERO16</div><div class="ttdoc">VRAM word address for 16x16 hero tiles (after 32x32 tiles).</div><div class="ttdef"><b>Definition</b> main.c:80</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a4f57bf1b0dd5795e61e30ed31e8b6f17"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a4f57bf1b0dd5795e61e30ed31e8b6f17">HERO8_TILES</a></div><div class="ttdeci">#define HERO8_TILES</div><div class="ttdoc">Number of tiles in the 8x8 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:89</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a59b5a14aa33d14442649fd18da5b16c9"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a></div><div class="ttdeci">#define HERO32_TILES</div><div class="ttdoc">Number of tiles in the 32x32 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:85</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a6bfff52a25b42cefaa6314f09d416da6"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a></div><div class="ttdeci">#define HERO16_TILES</div><div class="ttdoc">Number of tiles in the 16x16 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:87</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_aa7b33c8c3bad27994dad6959ba8854b8"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#aa7b33c8c3bad27994dad6959ba8854b8">TILE_BYTES</a></div><div class="ttdeci">#define TILE_BYTES</div><div class="ttdoc">Bytes per 4bpp 8x8 tile (8 rows x 4 bits/pixel x 8 pixels / 8 bits = 32).</div><div class="ttdef"><b>Definition</b> main.c:91</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_afe1890aa4ac8c4c3d2cb1ee5c5f08320"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#afe1890aa4ac8c4c3d2cb1ee5c5f08320">VRAM_HERO8</a></div><div class="ttdeci">#define VRAM_HERO8</div><div class="ttdoc">VRAM word address for 8x8 hero tiles (after 16x16 tiles).</div><div class="ttdef"><b>Definition</b> main.c:82</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a0a79e7c1576f67a4ba27a5f569e1fdcc"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a0a79e7c1576f67a4ba27a5f569e1fdcc">VRAM_HERO32</a></div><div class="ttdeci">#define VRAM_HERO32</div><div class="ttdoc">VRAM word address for 32x32 hero tiles.</div><div class="ttdef"><b>Definition</b> main.c:99</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a1ecc54ba9c97d7721f0d6c440a30682c"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a1ecc54ba9c97d7721f0d6c440a30682c">VRAM_HERO16</a></div><div class="ttdeci">#define VRAM_HERO16</div><div class="ttdoc">VRAM word address for 16x16 hero tiles (after 32x32 tiles).</div><div class="ttdef"><b>Definition</b> main.c:101</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a4f57bf1b0dd5795e61e30ed31e8b6f17"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a4f57bf1b0dd5795e61e30ed31e8b6f17">HERO8_TILES</a></div><div class="ttdeci">#define HERO8_TILES</div><div class="ttdoc">Number of tiles in the 8x8 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:110</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a59b5a14aa33d14442649fd18da5b16c9"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a></div><div class="ttdeci">#define HERO32_TILES</div><div class="ttdoc">Number of tiles in the 32x32 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:106</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a6bfff52a25b42cefaa6314f09d416da6"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a></div><div class="ttdeci">#define HERO16_TILES</div><div class="ttdoc">Number of tiles in the 16x16 hero sprite sheet.</div><div class="ttdef"><b>Definition</b> main.c:108</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_aa7b33c8c3bad27994dad6959ba8854b8"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#aa7b33c8c3bad27994dad6959ba8854b8">TILE_BYTES</a></div><div class="ttdeci">#define TILE_BYTES</div><div class="ttdoc">Bytes per 4bpp 8x8 tile (8 rows x 4 bits/pixel x 8 pixels / 8 bits = 32).</div><div class="ttdef"><b>Definition</b> main.c:112</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_afe1890aa4ac8c4c3d2cb1ee5c5f08320"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#afe1890aa4ac8c4c3d2cb1ee5c5f08320">VRAM_HERO8</a></div><div class="ttdeci">#define VRAM_HERO8</div><div class="ttdoc">VRAM word address for 8x8 hero tiles (after 16x16 tiles).</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
 </div><!-- fragment --><p><b>2. Set OBJ size mode</b> &ndash; When the user switches modes, the OBJSEL register is updated and OAM is cleared:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#a99b104ba99a16132b181b2938e27a66b">changeObjSize</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
@@ -241,13 +241,13 @@ How It Works</h2>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a>(nextId, 160, 148, <a class="code hl_variable" href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#abc082b417d7da07574502ec922386fb4">hero8_frame0</a>,</div>
 <div class="line">            <a class="code hl_define" href="graphics_2sprites_2metasprite_2main_8c.html#a9071483b8a3b1fc7e806c58f5a4f08cb">BASE_TILE_8</a>, 0, <a class="code hl_define" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a>);</div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__metasprite_2main_8c_html_abc082b417d7da07574502ec922386fb4"><div class="ttname"><a href="graphics_2sprites_2dynamic__metasprite_2main_8c.html#abc082b417d7da07574502ec922386fb4">hero8_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero8_frame0[]</div><div class="ttdoc">8x8 metasprite: 16x16 character (2x2 grid of 8x8)</div><div class="ttdef"><b>Definition</b> main.c:74</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a9071483b8a3b1fc7e806c58f5a4f08cb"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a9071483b8a3b1fc7e806c58f5a4f08cb">BASE_TILE_8</a></div><div class="ttdeci">#define BASE_TILE_8</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
-<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_acac94c2679c53549cb9dacfcfb08be1a"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#acac94c2679c53549cb9dacfcfb08be1a">BASE_TILE_16</a></div><div class="ttdeci">#define BASE_TILE_16</div><div class="ttdef"><b>Definition</b> main.c:102</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_a9071483b8a3b1fc7e806c58f5a4f08cb"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#a9071483b8a3b1fc7e806c58f5a4f08cb">BASE_TILE_8</a></div><div class="ttdeci">#define BASE_TILE_8</div><div class="ttdef"><b>Definition</b> main.c:124</div></div>
+<div class="ttc" id="agraphics_2sprites_2metasprite_2main_8c_html_acac94c2679c53549cb9dacfcfb08be1a"><div class="ttname"><a href="graphics_2sprites_2metasprite_2main_8c.html#acac94c2679c53549cb9dacfcfb08be1a">BASE_TILE_16</a></div><div class="ttdeci">#define BASE_TILE_16</div><div class="ttdef"><b>Definition</b> main.c:123</div></div>
 <div class="ttc" id="asprite_8h_html_a19ef362e8093598fdbcc437ca54e15e4"><div class="ttname"><a href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a></div><div class="ttdeci">u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">Draw a metasprite (PVSnesLib compatible).</div></div>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:100</div></div>
 <div class="ttc" id="asprite_8h_html_a908b094470fa9632302b14321338ae7a"><div class="ttname"><a href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a></div><div class="ttdeci">#define OBJ_SMALL</div><div class="ttdoc">Sprite size selection.</div><div class="ttdef"><b>Definition</b> sprite.h:99</div></div>
 </div><!-- fragment --><p><b>4. Text menu</b> &ndash; A text overlay on BG1 (Mode 1, 4bpp font) shows the current selection and the two active sprite sizes, updated whenever the user presses Up or Down.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1270"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1271"></a>
 Project Structure</h2>
 <div class="fragment"><div class="line">metasprite/</div>
 <div class="line">├── main.c              — OBJ mode switching, metasprite drawing, text menu</div>
@@ -260,7 +260,7 @@ Project Structure</h2>
 <div class="line">    ├── hero32_meta.inc     — MetaspriteItem definitions for 32x32 frames</div>
 <div class="line">    ├── hero16_meta.inc     — MetaspriteItem definitions for 16x16 frames</div>
 <div class="line">    └── hero8_meta.inc      — MetaspriteItem definitions for 8x8 frames</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1271"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1272"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/graphics/sprites/metasprite</div>

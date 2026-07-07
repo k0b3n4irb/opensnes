@@ -2,7 +2,7 @@ var searchData=
 [
   ['—_20256_20color_20background_0',['Mode 3 — 256-Color Background',['../examples_graphics_backgrounds_mode3.html',1,'examples_graphics_backgrounds']]],
   ['—_204_20layer_202bpp_20background_1',['Mode 0 — 4-Layer 2bpp Background',['../examples_graphics_backgrounds_mode0.html',1,'examples_graphics_backgrounds']]],
-  ['—_20a_20deliberate_20overlap_2',['2. The VRAM Map — A Deliberate Overlap',['../examples_games_breakout.html#autotoc_md839',1,'']]],
+  ['—_20a_20deliberate_20overlap_2',['2. The VRAM Map — A Deliberate Overlap',['../examples_games_breakout.html#autotoc_md840',1,'']]],
   ['—_20break_20at_20a_20function_3',['Recipe 3 — Break at a function',['../tutorial_debugging.html#autotoc_md153',1,'']]],
   ['—_20but_20you_20don_20t_20have_20to_20think_20about_20it_4',['🟠 Endianness — but you don&apos;t have to think about it',['../tutorial_sram.html#autotoc_md358',1,'']]],
   ['—_20examples_20graphics_20backgrounds_20mode7_5',['Basic rotation + scaling — &lt;span class=&quot;tt&quot;&gt;examples/graphics/backgrounds/mode7&lt;/span&gt;',['../tutorial_mode7.html#autotoc_md269',1,'']]],
@@ -18,7 +18,7 @@ var searchData=
   ['—_20inspect_20the_20machine_20at_20a_20point_20in_20time_15',['Recipe 1 — Inspect the machine at a point in time',['../tutorial_debugging.html#autotoc_md151',1,'']]],
   ['—_20poke_20and_20observe_16',['Recipe 5 — Poke and observe',['../tutorial_debugging.html#autotoc_md155',1,'']]],
   ['—_20read_20the_20warning_20above_20before_20using_17',['Quick Start (legacy — read the warning above before using)',['../audio_8h.html#autotoc_md11',1,'']]],
-  ['—_20s6_20hud_20on_20bg3_18',['Open chantier — S6 HUD on BG3',['../examples_games_shmup_1942.html#autotoc_md906',1,'']]],
+  ['—_20s6_20hud_20on_20bg3_18',['Open chantier — S6 HUD on BG3',['../examples_games_shmup_1942.html#autotoc_md907',1,'']]],
   ['—_20save_20x_20through_20a_19',['No &lt;span class=&quot;tt&quot;&gt;stx.l&lt;/span&gt; — Save X Through A',['../tutorial_sa1.html#autotoc_md307',1,'']]],
   ['—_20sprite_20oam_20debugging_20shadow_20buffer_20vs_20hardware_20',['Recipe 4 — Sprite/OAM debugging (shadow buffer vs hardware)',['../tutorial_debugging.html#autotoc_md154',1,'']]],
   ['—_20superfree_20spillover_20trap_21',['🔴 &lt;span class=&quot;tt&quot;&gt;dmaCopyVram&lt;/span&gt; hardcodes source bank &lt;span class=&quot;tt&quot;&gt;$00&lt;/span&gt; — SUPERFREE spillover trap',['../tutorial_dma.html#autotoc_md170',1,'']]],

@@ -15,6 +15,5 @@ var searchData=
   ['frame_5fjump_12',['FRAME_JUMP',['../games_2likemario_2main_8c.html#aeef02da41fe024e74efcfcb5fe7c9e68',1,'main.c']]],
   ['frame_5fstand_13',['FRAME_STAND',['../games_2likemario_2main_8c.html#a166c5c3f56b25f8980f4b6709d8492a0',1,'main.c']]],
   ['frame_5fwalk0_14',['FRAME_WALK0',['../games_2likemario_2main_8c.html#ad43823ee9b7b60480d1b5e24572ff6a7',1,'main.c']]],
-  ['frame_5fwalk1_15',['FRAME_WALK1',['../games_2likemario_2main_8c.html#aeb271d5d238c925a18a210f49fbd3a9a',1,'main.c']]],
-  ['frames_5fper_5fanimation_16',['FRAMES_PER_ANIMATION',['../graphics_2sprites_2animated__sprite_2main_8c.html#aacb988fff541a047d8ce1b3a98553a6f',1,'main.c']]]
+  ['frame_5fwalk1_15',['FRAME_WALK1',['../games_2likemario_2main_8c.html#aeb271d5d238c925a18a210f49fbd3a9a',1,'main.c']]]
 ];

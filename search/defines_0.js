@@ -11,5 +11,15 @@ var searchData=
   ['adrspritlarge_8',['ADRSPRITLARGE',['../graphics_2sprites_2object__size_2main_8c.html#af5abf90329e34db698a7774c40402b56',1,'main.c']]],
   ['amp_5fdefault_9',['AMP_DEFAULT',['../graphics_2effects_2hdma__wave_2main_8c.html#aaecfdabcd93ab543a6f69765773602b5',1,'main.c']]],
   ['amp_5flevels_10',['AMP_LEVELS',['../graphics_2effects_2hdma__wave_2main_8c.html#ac247b6d2f61c4934c01ade8749276784',1,'main.c']]],
-  ['anim_5fdelay_11',['ANIM_DELAY',['../graphics_2sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8',1,'main.c']]]
+  ['anim_5fdelay_11',['ANIM_DELAY',['../graphics_2sprites_2animated__sprite_2main_8c.html#aca96d6bd10d9a1eca2363540f9d3f5a8',1,'main.c']]],
+  ['anim_5ff_5ffinished_12',['ANIM_F_FINISHED',['../anim_8h.html#a110b5780938c96a03aed4ecd81f8dc84',1,'anim.h']]],
+  ['anim_5floop_13',['ANIM_LOOP',['../anim_8h.html#ac2f8f711a52b203de5a6469e086c963f',1,'anim.h']]],
+  ['anim_5fnone_14',['ANIM_NONE',['../anim_8h.html#afc6d314e5df07a5fce2d77091e49f704',1,'anim.h']]],
+  ['anim_5fonce_15',['ANIM_ONCE',['../anim_8h.html#a4c7972dd8d73f731f0edc53d87a60be4',1,'anim.h']]],
+  ['anim_5fplayer_5finit_16',['ANIM_PLAYER_INIT',['../anim_8h.html#a25f993fda11a7a5575dd46548ef6c30c',1,'anim.h']]],
+  ['animdone_17',['animDone',['../anim_8h.html#ad397c6782d558d6edfd0e7d5d010050b',1,'anim.h']]],
+  ['animframe_18',['animFrame',['../anim_8h.html#abc3e816720673a92012cafe18ddad90d',1,'anim.h']]],
+  ['animstop_19',['animStop',['../anim_8h.html#a5aade032e76fa23c37fe77fe3342f1a5',1,'anim.h']]],
+  ['animtickmeta_20',['animTickMeta',['../anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57',1,'anim.h']]],
+  ['animtickoam_21',['animTickOam',['../anim_8h.html#adaabd540bba5a7d29a706b44f873ed3a',1,'anim.h']]]
 ];

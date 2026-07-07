@@ -13,9 +13,6 @@ var searchData=
   ['all_5fshapes_10',['all_shapes',['../piece_8c.html#a38b764f5e51ebf2b31492e409379edae',1,'piece.c']]],
   ['amp_5fidx_11',['amp_idx',['../graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6',1,'main.c']]],
   ['amp_5foffsets_12',['amp_offsets',['../graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08',1,'main.c']]],
-  ['anim_5fdelay_13',['anim_delay',['../structMonster.html#a9866806505fb8b256a2897ad1fb7e323',1,'Monster']]],
-  ['anim_5fframe_14',['anim_frame',['../structMonster.html#a46e4766a089bbdb88eaa7c06b5529a17',1,'Monster']]],
-  ['anim_5ftick_15',['anim_tick',['../games_2likemario_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570',1,'main.c']]],
-  ['animating_16',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
-  ['attr_17',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
+  ['animating_13',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
+  ['attr_14',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
 ];

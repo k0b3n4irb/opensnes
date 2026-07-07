@@ -126,6 +126,7 @@ $(function(){initNavTree('games_2likemario_2main_8c.html','',''); });
 <p>Side-scrolling platformer with scroll streaming and SNESMOD audio.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="anim_8h_source.html">snes/anim.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="snesmod_8h_source.html">snes/snesmod.h</a>&gt;</code><br />
 <code>#include &quot;soundbank.h&quot;</code><br />
 </div><table class="memberdecls">
@@ -209,9 +210,14 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a07f5870d2abcd56b01d370ff190a7570" id="r_a07f5870d2abcd56b01d370ff190a7570"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a07f5870d2abcd56b01d370ff190a7570">anim_tick</a></td></tr>
 <tr class="memitem:ab82521ff2e2f8a537bf4ea99692e5e53" id="r_ab82521ff2e2f8a537bf4ea99692e5e53"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab82521ff2e2f8a537bf4ea99692e5e53">cam_max_x</a></td></tr>
 <tr class="memitem:a83de021d1aa1562571948e0f36032272" id="r_a83de021d1aa1562571948e0f36032272"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a83de021d1aa1562571948e0f36032272">camera_x</a></td></tr>
+<tr class="memitem:abc4f823638f8805a143203c3d39d7f99" id="r_abc4f823638f8805a143203c3d39d7f99"><td class="memItemLeft">static <a class="el" href="structAnimClip.html">AnimClip</a>&#160;</td><td class="memItemRight"><a class="el" href="#abc4f823638f8805a143203c3d39d7f99">clip_jump</a> = { <a class="el" href="#a96d981104dad90c802cc5ac21a025bcc">clip_jump_frames</a>, 0, 1, 1, 0 , 0 }</td></tr>
+<tr class="memitem:a96d981104dad90c802cc5ac21a025bcc" id="r_a96d981104dad90c802cc5ac21a025bcc"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a96d981104dad90c802cc5ac21a025bcc">clip_jump_frames</a> [] = { 1 }</td></tr>
+<tr class="memitem:a610433743b269cb5c8db9bcf397dd931" id="r_a610433743b269cb5c8db9bcf397dd931"><td class="memItemLeft">static <a class="el" href="structAnimClip.html">AnimClip</a>&#160;</td><td class="memItemRight"><a class="el" href="#a610433743b269cb5c8db9bcf397dd931">clip_stand</a> = { <a class="el" href="#ad65b3b9e11c097ccd24c14392f3412e0">clip_stand_frames</a>, 0, 1, 1, 0 , 0 }</td></tr>
+<tr class="memitem:ad65b3b9e11c097ccd24c14392f3412e0" id="r_ad65b3b9e11c097ccd24c14392f3412e0"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad65b3b9e11c097ccd24c14392f3412e0">clip_stand_frames</a> [] = { 6 }</td></tr>
+<tr class="memitem:a39b14cbf099d624886497760efc86e9d" id="r_a39b14cbf099d624886497760efc86e9d"><td class="memItemLeft">static <a class="el" href="structAnimClip.html">AnimClip</a>&#160;</td><td class="memItemRight"><a class="el" href="#a39b14cbf099d624886497760efc86e9d">clip_walk</a> = { <a class="el" href="#acfa2283641bd5e2a930ba51b59c5c647">clip_walk_frames</a>, 0, 2, 4, 0 , 0 }</td></tr>
+<tr class="memitem:acfa2283641bd5e2a930ba51b59c5c647" id="r_acfa2283641bd5e2a930ba51b59c5c647"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#acfa2283641bd5e2a930ba51b59c5c647">clip_walk_frames</a> [] = { 2 , 3 }</td></tr>
 <tr class="memitem:a00f92a2e1ceca5a59009973e4e9c85da" id="r_a00f92a2e1ceca5a59009973e4e9c85da"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a00f92a2e1ceca5a59009973e4e9c85da">col_buffer</a> [32]</td></tr>
 <tr class="memdesc:a00f92a2e1ceca5a59009973e4e9c85da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Column tile buffer for deferred VRAM streaming.  <br /></td></tr>
 <tr class="memitem:ada8c20d885ae7f2fca648d33d5ee7e06" id="r_ada8c20d885ae7f2fca648d33d5ee7e06"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ada8c20d885ae7f2fca648d33d5ee7e06">col_pending</a></td></tr>
@@ -226,7 +232,7 @@ Variables</h2></td></tr>
 <tr class="memitem:ac1309b0fbf0de7ed50dcd666c4f6995f" id="r_ac1309b0fbf0de7ed50dcd666c4f6995f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac1309b0fbf0de7ed50dcd666c4f6995f">mapmario</a> []</td></tr>
 <tr class="memdesc:ac1309b0fbf0de7ed50dcd666c4f6995f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map data (tile indices + header with width/height).  <br /></td></tr>
 <tr class="memitem:abf248dfba13f521a932e34626741bacd" id="r_abf248dfba13f521a932e34626741bacd"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abf248dfba13f521a932e34626741bacd">mario_action</a></td></tr>
-<tr class="memitem:acfc065e24c9bd4da82cdfe2d6e60844c" id="r_acfc065e24c9bd4da82cdfe2d6e60844c"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acfc065e24c9bd4da82cdfe2d6e60844c">mario_anim_idx</a></td></tr>
+<tr class="memitem:aa76ec2900485bf1fadac5ac5b141958e" id="r_aa76ec2900485bf1fadac5ac5b141958e"><td class="memItemLeft">static <a class="el" href="structAnimPlayer.html">AnimPlayer</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa76ec2900485bf1fadac5ac5b141958e">mario_anim</a> = {0, 0, 0, 0, 0}</td></tr>
 <tr class="memitem:a9af184ace3867c5be24dd33e44af0da6" id="r_a9af184ace3867c5be24dd33e44af0da6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9af184ace3867c5be24dd33e44af0da6">mario_sprite_pal</a> []</td></tr>
 <tr class="memitem:a11a8a7513255e600674887fb85159d0f" id="r_a11a8a7513255e600674887fb85159d0f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a11a8a7513255e600674887fb85159d0f">mario_sprite_palend</a> []</td></tr>
 <tr class="memitem:a67fd1acd5ce2ce121082795cd1b28695" id="r_a67fd1acd5ce2ce121082795cd1b28695"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a67fd1acd5ce2ce121082795cd1b28695">mario_sprite_til</a> []</td></tr>
@@ -871,7 +877,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Update Mario's sprite animation frame based on current action. </p>
-<p>Walking alternates between WALK0 and WALK1 every 4 frames. Jumping and falling use the JUMP frame. Standing uses the STAND frame. The oamrefresh flag tells the dynamic sprite engine to re-upload the new frame's tile data to VRAM on the next flush. </p>
+<p>Pure state-&gt;clip mapping: select the clip for the current action and tick. The anim module handles cadence (walk alternates every 4 ticks), continue-if-same (walking keeps its phase), and the oamrefresh flag (tile re-upload only when the frame actually changes). </p>
 
 </div>
 </div>
@@ -1111,29 +1117,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a07f5870d2abcd56b01d370ff190a7570" name="a07f5870d2abcd56b01d370ff190a7570"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07f5870d2abcd56b01d370ff190a7570">&#9670;&#160;</a></span>anim_tick</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_tick</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Frame counter for animation timing </p>
-
-</div>
-</div>
 <a id="ab82521ff2e2f8a537bf4ea99692e5e53" name="ab82521ff2e2f8a537bf4ea99692e5e53"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab82521ff2e2f8a537bf4ea99692e5e53">&#9670;&#160;</a></span>cam_max_x</h2>
 
@@ -1177,6 +1160,138 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Current camera X scroll offset in pixels </p>
+
+</div>
+</div>
+<a id="abc4f823638f8805a143203c3d39d7f99" name="abc4f823638f8805a143203c3d39d7f99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc4f823638f8805a143203c3d39d7f99">&#9670;&#160;</a></span>clip_jump</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structAnimClip.html">AnimClip</a> clip_jump = { <a class="el" href="#a96d981104dad90c802cc5ac21a025bcc">clip_jump_frames</a>, 0, 1, 1, 0 , 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a96d981104dad90c802cc5ac21a025bcc" name="a96d981104dad90c802cc5ac21a025bcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96d981104dad90c802cc5ac21a025bcc">&#9670;&#160;</a></span>clip_jump_frames</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> clip_jump_frames[] = { 1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a610433743b269cb5c8db9bcf397dd931" name="a610433743b269cb5c8db9bcf397dd931"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a610433743b269cb5c8db9bcf397dd931">&#9670;&#160;</a></span>clip_stand</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structAnimClip.html">AnimClip</a> clip_stand = { <a class="el" href="#ad65b3b9e11c097ccd24c14392f3412e0">clip_stand_frames</a>, 0, 1, 1, 0 , 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad65b3b9e11c097ccd24c14392f3412e0" name="ad65b3b9e11c097ccd24c14392f3412e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad65b3b9e11c097ccd24c14392f3412e0">&#9670;&#160;</a></span>clip_stand_frames</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> clip_stand_frames[] = { 6 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a39b14cbf099d624886497760efc86e9d" name="a39b14cbf099d624886497760efc86e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39b14cbf099d624886497760efc86e9d">&#9670;&#160;</a></span>clip_walk</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structAnimClip.html">AnimClip</a> clip_walk = { <a class="el" href="#acfa2283641bd5e2a930ba51b59c5c647">clip_walk_frames</a>, 0, 2, 4, 0 , 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acfa2283641bd5e2a930ba51b59c5c647" name="acfa2283641bd5e2a930ba51b59c5c647"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acfa2283641bd5e2a930ba51b59c5c647">&#9670;&#160;</a></span>clip_walk_frames</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> clip_walk_frames[] = { 2 , 3 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -1438,8 +1553,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acfc065e24c9bd4da82cdfe2d6e60844c" name="acfc065e24c9bd4da82cdfe2d6e60844c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfc065e24c9bd4da82cdfe2d6e60844c">&#9670;&#160;</a></span>mario_anim_idx</h2>
+<a id="aa76ec2900485bf1fadac5ac5b141958e" name="aa76ec2900485bf1fadac5ac5b141958e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa76ec2900485bf1fadac5ac5b141958e">&#9670;&#160;</a></span>mario_anim</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1448,7 +1563,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mario_anim_idx</td>
+          <td class="memname"><a class="el" href="structAnimPlayer.html">AnimPlayer</a> mario_anim = {0, 0, 0, 0, 0}</td>
         </tr>
       </table>
   </td>
@@ -1457,7 +1572,7 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Walk animation toggle (0 or 1, selects WALK0/WALK1) </p>
+<p>Mario's animation state </p>
 
 </div>
 </div>

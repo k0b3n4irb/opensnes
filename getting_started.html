@@ -253,14 +253,44 @@ Project Structure</h3>
 <div class="fragment"><div class="line">my-snes-game/</div>
 <div class="line">├── Makefile        # Build configuration</div>
 <div class="line">├── main.c          # Your game code</div>
-<div class="line">└── res/            # Assets (optional)</div>
-<div class="line">    ├── tiles.png</div>
-<div class="line">    └── music.it</div>
-</div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md412"></a>
+<div class="line">├── res/            # Assets (optional)</div>
+<div class="line">│   ├── tiles.png</div>
+<div class="line">│   └── music.it</div>
+<div class="line">└── test/           # Project tests (optional — see below)</div>
+<div class="line">    ├── manifest.toml</div>
+<div class="line">    └── baselines.json</div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md411"></a>
+Test Your Game</h3>
+<p>Projects can declare automated tests that run in <b>luna</b>, the same cycle-accurate emulator the SDK's own test suite uses. Opt-in is simply the presence of <span class="tt">test/manifest.toml</span> (the <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span> template ships one):</p>
+<div class="fragment"><div class="line">default_steps = 3_000_000</div>
+<div class="line"> </div>
+<div class="line"># Visual baseline (fbhash) + WRAM asserts by symbol name.</div>
+<div class="line"># Assert values are little-endian hex bytes (an s16 of 120 -&gt; &quot;7800&quot;).</div>
+<div class="line">[tests.boot]</div>
+<div class="line">assert = [&quot;player_x = 7800&quot;]</div>
+<div class="line"> </div>
+<div class="line"># Input-driven: hold RIGHT for 60 frames, then check the game state.</div>
+<div class="line"># Input format is &quot;frame:buttons_hex&quot; (RIGHT = 0x100).</div>
+<div class="line">[tests.walk_right]</div>
+<div class="line">input = &quot;30:0x100,90:0&quot;</div>
+<div class="line">assert = [&quot;player_x = b400&quot;]</div>
+</div><!-- fragment --><p>Workflow:</p>
+<div class="fragment"><div class="line">scripts/install-luna.sh   # once, from the SDK root: fetch the pinned luna</div>
+<div class="line">make test-update          # seed test/baselines.json + reference PNGs</div>
+<div class="line">make test                 # from now on: exit 0 = green, 1 = regression</div>
+</div><!-- fragment --><p>(Or <span class="tt">opensnes test</span> / <span class="tt">opensnes test --update</span> from the project directory.)</p>
+<p>Three oracles run per test:</p>
+<ul>
+<li><b>WRAM asserts</b> — <span class="tt">symbol = hexbytes</span> entries are checked by luna directly, with symbol names resolved from your ROM's <span class="tt">.sym</span> file;</li>
+<li><b>Visual baselines</b> — tests <em>without</em> an <span class="tt">input</span> script compare a framebuffer hash per capture point (<span class="tt">steps</span> can be a list for multi-point capture); failures leave the actual PNG in <span class="tt">test/actual/</span> for eyeballing;</li>
+<li><b>In-ROM assertions</b> — any <span class="tt"><a class="el" href="debug_8h.html#ace0973c12e9f5c64790c99c36375f086" title="Runtime assertion — breaks in emulator if condition is false.">SNES_ASSERT</a></span> that fires during a visual run fails the test for free.</li>
+</ul>
+<p>Commit <span class="tt">test/</span> to your repo; rerun <span class="tt">make test-update</span> when you intentionally change what the game shows or does.</p>
+<hr  />
+<h2 class="doxsection"><a class="anchor" id="autotoc_md413"></a>
 Path B: SDK Developer</h2>
 <p>You want to modify the compiler, library, tools, or build system itself. This requires building the entire SDK from source.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md413"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md414"></a>
 B1. Install Prerequisites</h3>
 <p>You need a full C/C++ development environment.</p>
 <p><b>macOS:</b> </p><div class="fragment"><div class="line">xcode-select --install</div>
@@ -274,7 +304,7 @@ B1. Install Prerequisites</h3>
 <div class="line">pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-cmake base-devel git python</div>
 </div><!-- fragment --></li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md414"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md415"></a>
 B2. Clone and Build</h3>
 <div class="fragment"><div class="line"># Clone with submodules (--recursive is required!)</div>
 <div class="line">git clone --recursive https://github.com/k0b3n4irb/opensnes.git</div>
@@ -287,10 +317,10 @@ B2. Clone and Build</h3>
 <div class="line">Building OpenSNES library...</div>
 <div class="line">Building examples... (56 ROMs)</div>
 <div class="line">OpenSNES SDK build complete!</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md415"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md416"></a>
 B3. Run Tests</h3>
 <div class="fragment"><div class="line">make tests   # luna: coverage + visual regression + probes</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md416"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md417"></a>
 B4. Development Workflow</h3>
 <div class="fragment"><div class="line">make clean &amp;&amp; make     # Full rebuild (required after compiler changes)</div>
 <div class="line">make lib               # Rebuild library only</div>
@@ -298,7 +328,7 @@ B4. Development Workflow</h3>
 <div class="line">make -C examples/text/hello_world  # Rebuild one example</div>
 </div><!-- fragment --><p>See CLAUDE.md for architecture details and coding conventions.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md418"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md419"></a>
 What's Next?</h2>
 <p>Explore by complexity:</p>
 <table class="markdownTable">
@@ -318,7 +348,7 @@ What's Next?</h2>
 <td class="markdownTableBodyNone"><b>SuperFX (GSU)</b>  </td><td class="markdownTableBodyNone"><span class="tt">memory/superfx_hello</span>, <span class="tt">graphics/effects/superfx_3d</span>  </td><td class="markdownTableBodyNone">RISC coprocessor, 3D rendering (<a class="el" href="superfx_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/superfx.md">tutorial</a>)  </td></tr>
 </table>
 <p>Browse all examples: </p><div class="fragment"><div class="line">ls examples/*/</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md419"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md420"></a>
 Tutorials</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -340,18 +370,18 @@ Tutorials</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">SA-1 Coprocessor  </td><td class="markdownTableBodyNone"><a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">tutorials/sa1.md</a>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md420"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md421"></a>
 Troubleshooting</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md421"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md422"></a>
 "command not found: make"</h3>
 <p>Install build tools (see prerequisites for your path above).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md422"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md423"></a>
 "fatal: repository not found" or empty compiler folder</h3>
 <p>You forgot <span class="tt">--recursive</span> when cloning. Fix it: </p><div class="fragment"><div class="line">git submodule update --init --recursive</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md423"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md424"></a>
 Build fails with "Library not built"</h3>
 <p>Run <span class="tt">make</span> from the SDK root first — the library must be compiled before examples: </p><div class="fragment"><div class="line">cd /path/to/opensnes &amp;&amp; make lib</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md424"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md425"></a>
 Black screen when running ROM</h3>
 <p>Your ROM built but doesn't display anything. Common causes:</p><ol type="1">
 <li>Missing <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> call</li>
@@ -359,13 +389,13 @@ Black screen when running ROM</h3>
 <li>Wrong <span class="tt">LIB_MODULES</span> — check that you include all needed modules</li>
 </ol>
 <p>See <a class="el" href="TROUBLESHOOTING_8md.html" title="/home/runner/work/opensnes/opensnes/docs/TROUBLESHOOTING.md">TROUBLESHOOTING.md</a> for more solutions.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md425"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md426"></a>
 Build fails with "unhandled op" or assembly errors</h3>
 <p>This is usually a compiler limitation. Check:</p><ul>
 <li>Are you using <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>/<span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span>? Prefer <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>/<span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> when possible</li>
 <li>Use <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span>, <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span> types from <span class="tt"><a class="el" href="snes_8h.html" title="OpenSNES common-case master header.">snes.h</a></span> (not <span class="tt">int</span> or <span class="tt">long</span>)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md426"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md427"></a>
 Getting Help</h2>
 <ul>
 <li><b>Issues</b>: <a href="https://github.com/k0b3n4irb/opensnes/issues">github.com/k0b3n4irb/opensnes/issues</a></li>

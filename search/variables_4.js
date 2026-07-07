@@ -5,6 +5,7 @@ var searchData=
   ['das_5fright_5ftimer_2',['das_right_timer',['../games_2tetris_2main_8c.html#a1a00968618829279097d7e44b8ed5edf',1,'main.c']]],
   ['dir_3',['dir',['../structt__objs.html#ae2bb79aa63d37e6f2a0a98762a12c60f',1,'t_objs']]],
   ['dot_5ftile_4',['dot_tile',['../memory_2sa1__starfield_2main_8c.html#a5a0158a895fec2258ed59056f9904acc',1,'main.c']]],
-  ['dx_5',['dx',['../structMetaspriteItem.html#a5d07f89607940a1d70300bfec816b08f',1,'MetaspriteItem']]],
-  ['dy_6',['dy',['../structMetaspriteItem.html#a845726a319cfae2a703b5ed90b4094a4',1,'MetaspriteItem']]]
+  ['durations_5',['durations',['../structAnimClip.html#a18fcb0e62fb6d1c06bb8156433674769',1,'AnimClip']]],
+  ['dx_6',['dx',['../structMetaspriteItem.html#a5d07f89607940a1d70300bfec816b08f',1,'MetaspriteItem']]],
+  ['dy_7',['dy',['../structMetaspriteItem.html#a845726a319cfae2a703b5ed90b4094a4',1,'MetaspriteItem']]]
 ];

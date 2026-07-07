@@ -1,7 +1,7 @@
 var searchData=
 [
   ['fire_5fcd_0',['fire_cd',['../structGameState.html#a397e4b11a429c1d02e06b399926c8075',1,'GameState']]],
-  ['flags_1',['flags',['../structAudioSample.html#a0b4a12b0741a71424ba4b51f09a9b65e',1,'AudioSample']]],
+  ['flags_1',['flags',['../structAnimPlayer.html#a02a38e0cff5efd0b330b064183ec33db',1,'AnimPlayer::flags'],['../structAudioSample.html#a0b4a12b0741a71424ba4b51f09a9b65e',1,'AudioSample::flags']]],
   ['flash_5ftimer_2',['flash_timer',['../games_2tetris_2main_8c.html#a7beb604a8de72684319bc5c99d9a64aa',1,'main.c']]],
   ['flip_3',['flip',['../games_2mapandobjects_2mario_8c.html#ac3ec10c7966221f17621e68908bfa9b4',1,'flip:&#160;mario.c'],['../graphics_2backgrounds_2mode0_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924',1,'flip:&#160;main.c'],['../maps_2mapscroll_2main_8c.html#aa48841d5d53b15359fc2ebe7b1cc0924',1,'flip:&#160;main.c'],['../maps_2slopemario_2mario_8c.html#ac3ec10c7966221f17621e68908bfa9b4',1,'flip:&#160;mario.c']]],
   ['flipx_4',['flipx',['../structMonster.html#af18fac6f28430cbeddf1873240e24ade',1,'Monster::flipx'],['../maps_2mapscroll_2main_8c.html#a8819ae0e38a6565e016c379e527b426d',1,'flipx:&#160;main.c']]],
@@ -10,7 +10,7 @@ var searchData=
   ['font_5ftile_7',['font_tile',['../structTextConfig.html#a57476fe40cc993144b0cd3b07842bdf4',1,'TextConfig']]],
   ['font_5ftiles_8',['font_tiles',['../memory_2hirom__demo_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c'],['../text_2hello__world_2main_8c.html#aee6022ef8595e19358ccaafa6967a8f9',1,'font_tiles:&#160;main.c']]],
   ['force_5fblanked_9',['force_blanked',['../console_8h.html#a8ba3fc43e69c483b4fcd603363de1f09',1,'console.h']]],
-  ['frame_10',['frame',['../structGameState.html#a2da93ad048b30e59f0d1fae97969dcc3',1,'GameState::frame'],['../maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4',1,'frame:&#160;main.c']]],
+  ['frame_10',['frame',['../structAnimPlayer.html#a988df65ac2b5dcf7002752a4e7595294',1,'AnimPlayer::frame'],['../structGameState.html#a2da93ad048b30e59f0d1fae97969dcc3',1,'GameState::frame'],['../maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4',1,'frame:&#160;main.c']]],
   ['frame0_11',['frame0',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e',1,'main.c']]],
   ['frame1_12',['frame1',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a514500046679145273f113c61af16cd5',1,'main.c']]],
   ['frame2_13',['frame2',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#a8f122651a50ccf7482b22659b3217821',1,'main.c']]],
@@ -18,5 +18,6 @@ var searchData=
   ['frame_5fcount_15',['frame_count',['../system_8h.html#a393cdd9777ac31290693d930c63d2a83',1,'system.h']]],
   ['frame_5fcounter_16',['frame_counter',['../graphics_2sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47',1,'main.c']]],
   ['frameidx_17',['frameidx',['../maps_2mapscroll_2main_8c.html#affac57a4c6f56d54fc5e576becd0a387',1,'main.c']]],
-  ['fx_18',['fx',['../graphics_2effects_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0',1,'main.c']]]
+  ['frames_18',['frames',['../structAnimClip.html#ab08bf0ce71c6ec010d04e699f38b009f',1,'AnimClip']]],
+  ['fx_19',['fx',['../graphics_2effects_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0',1,'main.c']]]
 ];
