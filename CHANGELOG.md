@@ -5,6 +5,57 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.29.0] — 2026-07-07
+
+Cooper's two asks land: a **declarative animation player** (the anim module,
+with a public layout contract editors can emit) and **`make test` for user
+game projects** (the SDK's luna harness, packaged and project-rooted).
+Dogfooding the new module surfaced two compiler bugs and a hole in the
+bank $00 ratchet — all fixed at the root layer, and the whole class of
+platform-dependent lib const spills is now structurally impossible.
+
+### Added
+- feat(lib): `anim` — opt-in declarative animation module (#97). AnimClip
+  (ROM, 12 bytes) + AnimPlayer (RAM, 8 bytes) are a public tooling contract;
+  `animPlay` (continue-if-same) / `animTick` / `animTickOam` /
+  `animTickMeta` / `DECLARE_ANIM_CLIP`; frame values are opaque u16
+- feat(tools,build): project test harness — `make test` / `make test-update`
+  in any user project, opt-in by the presence of `test/manifest.toml` (#98).
+  Three oracles: WRAM asserts by symbol name, fbhash visual baselines
+  (multi-point), and the in-ROM SNES_ASSERT/WDM channel. `opensnes test`
+  CLI command; the game template scaffolds a verified manifest
+- feat(tools): gfx4snes `-T` emits OBJ_FLIPX/OBJ_FLIPY attributes when tile
+  dedup kept a flipped variant (golden-tested; closes the metasprites.c TODO)
+- ci: end-to-end user-story step (init → build → test-update → test,
+  including the failure half)
+- docs: animation tutorial leads with the anim module; GETTING_STARTED gains
+  "Test your game"; MetaspriteItem tile units documented as a contract
+  (gfx4snes -T block-unit mismatch tracked as #100)
+
+### Changed
+- refactor(examples): animated_sprite, metasprite and likemario animate via
+  the anim module (metasprite is now self-animating with two-point capture;
+  likemario's mario_animate() is a 6-line state→clip mapping)
+
+### Fixed
+- fix(compiler): ROM-const numeric DW/DL fields emit the full 4-byte slot —
+  WLA's `.dl` truncates numbers to 24 bits (found by dogfooding; the u8 RMW
+  pointer bug also found is tracked as #99 with an XFAIL vector)
+- fix(devtools): symmap hard-fails ANY C const section spilled past bank $00
+  by parsing the linker's `.rodata.N` sections — named top-level statics
+  were invisible to the old string.N heuristics (likemario's clips shipped
+  a silently dead animation right through the ratchet)
+- fix(lib,devtools): lib C modules carry no ROM const data (hdma sine +
+  channel masks, text hex digits, math atan LUT) — WLA-DX section placement
+  varies by platform, so a tight example could spill a lib LUT to bank $01+
+  on one OS only (caught live on the macOS CI leg). Enforced by a new
+  `make lint` check (`devtools/check_lib_rodata.py`)
+- build(release): the SDK zip now ships the project test harness AND the
+  post-link checks (`symmap.py`, `check_nmi_wram_race.py`) that
+  make/common.mk runs — release users were silently skipping both
+- fix(tools): `opensnes init <absolute/path>` no longer breaks the generated
+  Makefile (leaf name used for TARGET/ROM_NAME)
+
 ## [0.28.0] — 2026-07-06
 
 luna becomes OpenSNES's **sole emulator** — automated pillars *and* a

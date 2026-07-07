@@ -218,6 +218,28 @@ int main(void) {
     return 0;
 }
 MAIN_C
+
+    # Test scaffold: one declared boot test. Seed the baselines with
+    # `make test-update` (or `opensnes test --update`), then `make test`.
+    mkdir -p "$dir/test"
+    cat > "$dir/test/manifest.toml" << 'MANIFEST'
+# Project tests — run with `make test`, rebaseline with `make test-update`.
+# Docs: OpenSNES GETTING_STARTED.md, section "Test your game".
+
+default_steps = 3_000_000
+
+# Boot test: visual baseline (fbhash) + WRAM asserts by symbol name.
+# Assert values are little-endian hex bytes (s16 120 -> "7800").
+[tests.boot]
+assert = ["player_x = 7800", "player_y = 6400"]
+
+# Input-driven example: hold RIGHT for 60 frames (frames 30-89), then
+# check the player moved. Input format is "frame:buttons_hex" (RIGHT is
+# 0x100). Uncomment and adjust the expected bytes for your game logic.
+# [tests.walk_right]
+# input = "30:0x100,90:0"
+# assert = ["player_x = b400"]   # 120 + 60 = 180 = 0x00B4
+MANIFEST
 }
 
 lib_modules_for_template() {
@@ -287,10 +309,13 @@ cmd_init() {
         *)     die "Unknown template: $template. Available: blank, game" ;;
     esac
 
-    local rom_name
-    rom_name="$(echo "$name" | tr '_-' '  ')"
+    # `name` may be a path (opensnes init ~/projects/mygame): the directory
+    # keeps the full path, but TARGET/ROM_NAME must use the leaf name only.
+    local proj_name rom_name
+    proj_name="$(basename "$name")"
+    rom_name="$(echo "$proj_name" | tr '_-' '  ')"
 
-    write_makefile "$name" "$name" "$rom_name" "$sdk" "$lib_modules"
+    write_makefile "$name" "$proj_name" "$rom_name" "$sdk" "$lib_modules"
 
     info "Created project: $name/"
     info "  Template:  $template"
@@ -329,6 +354,27 @@ cmd_clean() {
     proj="$(require_project)"
 
     OPENSNES_HOME="$sdk" make -C "$proj" clean
+}
+
+cmd_test() {
+    local update=0
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --update|-u) update=1; shift ;;
+            *)           die "Unknown option: $1" ;;
+        esac
+    done
+
+    local sdk proj
+    sdk="$(require_sdk)"
+    proj="$(require_project)"
+
+    if [ "$update" -eq 1 ]; then
+        OPENSNES_HOME="$sdk" make -C "$proj" test-update
+    else
+        OPENSNES_HOME="$sdk" make -C "$proj" test
+    fi
 }
 
 cmd_run() {
@@ -454,12 +500,15 @@ Commands:
     build         Build the current project (--clean to rebuild)
     clean         Clean build artifacts
     run           Build and run in emulator (--emulator NAME)
+    test          Run the project's tests in luna (--update to rebaseline)
     doctor        Check SDK installation
 
 Examples:
     opensnes init my-game --template game
     cd my-game && opensnes build
     opensnes run --emulator mesen
+    opensnes test --update   # first run: seed the baselines
+    opensnes test
 EOF
     exit 0
 }
@@ -471,6 +520,7 @@ case "$1" in
     build)   shift; cmd_build "$@" ;;
     clean)   shift; cmd_clean "$@" ;;
     run)     shift; cmd_run "$@" ;;
+    test)    shift; cmd_test "$@" ;;
     doctor)  shift; cmd_doctor "$@" ;;
     -h|--help|help) usage ;;
     *)       die "Unknown command: $1. Run 'opensnes help' for usage." ;;

@@ -1,0 +1,6 @@
+# NULL pointer field: two .dw halves (4 bytes), tag immediately after.
+present \.dw 0\n\t\.dw 0\n\t\.db 171
+# 32-bit literal 0x12345678: low half 0x5678=22136, high half 0x1234=4660.
+present \.dw 22136\n\t\.dw 4660
+# The broken emission shape must not come back.
+absent \.dl 0\n\t\.db 171

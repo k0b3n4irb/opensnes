@@ -43,3 +43,7 @@ steps = [3_000_000, 6_000_000]
 
 [examples."graphics/effects/transparency"]
 steps = [3_000_000, 6_000_000]
+
+# hero16 walks in place via the anim module since #97 — self-animating.
+[examples."graphics/sprites/metasprite"]
+steps = [3_000_000, 6_000_000]

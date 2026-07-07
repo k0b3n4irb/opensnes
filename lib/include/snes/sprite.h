@@ -433,11 +433,23 @@ void oamClear(void);
  *
  * Each item represents one hardware sprite within a metasprite.
  * Uses 8-byte alignment for efficient access.
+ *
+ * @par Tile units (tooling-facing contract)
+ * `tile` is in **8x8 OAM character-name units** relative to the base tile,
+ * for the sprite sheet as it sits in VRAM. It is NOT a block index: a
+ * 16x16 sub-sprite one block to the right of another is `+2` (two 8x8
+ * columns), and moving one block row down adds the sheet's row stride
+ * (16 names for a 128px-wide sheet). Editors emitting these structs
+ * (Cooper) must compute names from their own sheet geometry.
+ *
+ * @warning gfx4snes `-T` currently emits block indices, not names — its
+ * pointer tables render wrong for 16/32px blocks (tracked as issue #100).
+ * The hand-authored `.inc` files in the examples show the correct values.
  */
 typedef struct {
     s16 dx;         /**< X offset from metasprite origin */
     s16 dy;         /**< Y offset from metasprite origin */
-    u16 tile;       /**< Tile number offset from base */
+    u16 tile;       /**< Character name offset from base, 8x8 units (see above) */
     u8 attr;        /**< Attributes: flip flags, palette offset, priority */
     u8 reserved;    /**< Padding for 8-byte alignment */
 } MetaspriteItem;

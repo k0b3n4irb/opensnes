@@ -127,14 +127,16 @@ void metasprite_save (const char *filename, unsigned short *sprites, int nbtilex
 #endif
 
                 fprintf(fp,
-                    "\tMETASPR_ITEM(%d, %d, %d, OBJ_PAL(%d) | OBJ_PRIO(%d)),\n",
+                    "\tMETASPR_ITEM(%d, %d, %d, OBJ_PAL(%d) | OBJ_PRIO(%d)%s%s),\n",
 #if 0
                     ofsmtx, ofsmty, vram_tile_index & TILEIDX_MASK, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio
 #else
-                    ofsmtx,ofsmty,sprites[idxmetaspr] & TILEIDX_MASK, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio
+                    ofsmtx,ofsmty,sprites[idxmetaspr] & TILEIDX_MASK, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio,
+                    // map-entry flip bits (set by -F flip-aware dedup) → OAM attrs
+                    (sprites[idxmetaspr] & 0x4000) ? " | OBJ_FLIPX" : "",
+                    (sprites[idxmetaspr] & 0x8000) ? " | OBJ_FLIPY" : ""
 #endif
-
-                ); // we need to manage flipx & flipy
+                );
                 ofsmtx+=blocksize;
                 idxmetaspr++;
             }

@@ -194,7 +194,7 @@ INCBIN_DEPS += $(GSU_BINS)
 # Build Targets
 #------------------------------------------------------------------------------
 
-.PHONY: all clean
+.PHONY: all clean test test-update
 
 all: $(TARGET)
 	@echo "==============================================="
@@ -414,6 +414,23 @@ ifneq ($(SKIP_NMI_RACE_CHECK),1)
 		fi; \
 	fi
 endif
+
+#------------------------------------------------------------------------------
+# Project tests — opt-in by presence of test/manifest.toml (no flag needed).
+# `make test` runs the project's declared tests against the built ROM with
+# the pinned luna; `make test-update` (re)writes the project-local baselines.
+# See docs/GETTING_STARTED.md ("Test your game") for the manifest format.
+#------------------------------------------------------------------------------
+
+test test-update: $(TARGET)
+	@if [ ! -f test/manifest.toml ]; then \
+		echo "No test manifest: this project declares no tests."; \
+		echo "Create test/manifest.toml — see docs/GETTING_STARTED.md,"; \
+		echo "section 'Test your game' (manifest format + baselines)."; \
+		exit 1; \
+	fi
+	@python3 $(OPENSNES)/tools/luna-test/project_test.py \
+		--rom $(TARGET) $(if $(filter test-update,$@),--update)
 
 #------------------------------------------------------------------------------
 # Cleanup

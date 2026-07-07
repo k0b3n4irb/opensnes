@@ -35,6 +35,12 @@ CASES = [
      ["bg.pic", "bg.pal", "bg.map", "bg.inc", "bg_data.as"]),
     ("spr.png", ["-s", "16", "-p"],
      ["spr.pic", "spr.pal", "spr.inc", "spr_data.as"]),
+    # Metasprite path (-T) with flip-aware dedup (-F): flip.png holds one
+    # asymmetric 16x16 tile and its exact H-mirror, so the golden pins the
+    # OBJ_FLIPX emission and the canonical-tile reference (issue #97).
+    ("flip.png", ["-s", "16", "-o", "16", "-u", "16", "-p", "-T",
+                  "-X", "32", "-Y", "16", "-P", "2", "-F"],
+     ["flip.pic", "flip.pal", "flip.inc", "flip_data.as", "flip_meta.inc"]),
 ]
 
 

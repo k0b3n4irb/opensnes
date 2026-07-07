@@ -74,11 +74,14 @@ $01+. What breaks depends on **how you read the data**:
   const` array you index in C must fit bank $00 or it returns garbage. (This is
   the remaining half of chantier A6.)
 
-**Mitigation (active since P1.5):** `make/common.mk` runs
-`devtools/symmap/symmap.py --check-bank0-overflow` after every link.
-String-literal spills (the worst case) fail the build with a "Bank $00 ROM
-overflow" message. Tight free-space (< 2 KB) prints a soft warning. Set
-`SKIP_BANK0_CHECK=1` to bypass for debugging.
+**Mitigation (active since P1.5, extended 2026-07-07):** `make/common.mk` runs
+`devtools/symmap/symmap.py --check-bank0-overflow` after every link. Any C
+const data spilled to bank $01+ fails the build with a "Bank $00 ROM
+overflow" message naming the symbols — both string literals and named
+`static const` data (the checker reads the linker's `.rodata.N` sections, so
+top-level statics without a `.N` symbol suffix are covered too; harmless
+`__opensnes_force_emit_*` anchors are exempt). Tight free-space (< 2 KB)
+prints a soft warning. Set `SKIP_BANK0_CHECK=1` to bypass for debugging.
 
 If you hit this:
 - **Prefer the DMA path:** keep big assets `const` and feed them to the lib's

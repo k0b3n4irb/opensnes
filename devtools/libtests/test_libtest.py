@@ -34,10 +34,30 @@ CASES = [
     ("r_mod_zero", 2, 0),
     ("r_mul",      2, 5535),
     ("r_sqrt",     2, 12),
+    ("r_rmw_u8",      2, 200),
+    ("r_anim_loop",   2, 10),
+    ("r_anim_once",   2, 6),
+    ("r_anim_done",   2, 1),
+    ("r_anim_switch", 2, 77),
+    ("r_anim_cont",   2, 20),
+    ("r_anim_stop",   2, 0xFFFF),
     ("s_map_width", 1, 32),
     ("s_cursor_y",  1, 8),
     ("r_done",     2, 0xBEEF),
 ]
+
+
+# Expected-fail vectors: real, minimally-pinned compiler bugs. A FAIL here is
+# the known baseline; an unexpected PASS (XPASS) means the compiler got fixed —
+# promote the vector out. Pattern copied from test_a6_farptr.py.
+KNOWN_FAIL = {
+    # u8 read-modify-write through a pointer, then re-read: the post-store
+    # reload of the address happens in 8-bit accumulator mode (stale high
+    # byte), so the ==0 comparison reads the wrong location. Found while
+    # building lib/source/anim.c (which ships the local-variable form).
+    # Tracked as opensnes#99.
+    "r_rmw_u8",
+}
 
 
 def le_bytes(value: int, width: int) -> str:
@@ -52,7 +72,13 @@ def run() -> int:
     for name, width, want in CASES:
         # luna resolves the symbol name itself (v1.7.0, auto-detected .sym)
         ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))])
-        if ok:
+        if name in KNOWN_FAIL:
+            if ok:
+                print(f"  XPASS {name} == 0x{want:0{width*2}X}  <- fixed! promote out of KNOWN_FAIL")
+                fails += 1
+            else:
+                print(f"  XFAIL {name} (known compiler bug, see KNOWN_FAIL)")
+        elif ok:
             print(f"  PASS  {name} == 0x{want:0{width*2}X}")
         else:
             print(f"  FAIL  {name} == 0x{want:0{width*2}X}  [{detail}]")

@@ -124,6 +124,7 @@ lint-vram:
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
+	@python3 devtools/check_lib_rodata.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
 	@$(MAKE) lint-commits
@@ -221,6 +222,21 @@ release: all docs
 	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
+	@# Project test harness (`make test` in user projects) + the pinned-luna
+	@# installer. Only the pieces project_test.py imports — not the SDK's
+	@# corpus manifest/baselines.
+	@mkdir -p $(RELEASE_DIR)/opensnes/tools/luna-test/probes
+	@mkdir -p $(RELEASE_DIR)/opensnes/scripts
+	@cp tools/luna-test/project_test.py tools/luna-test/luna_runner.py \
+		tools/luna-test/luna.version $(RELEASE_DIR)/opensnes/tools/luna-test/
+	@cp tools/luna-test/probes/lib.py $(RELEASE_DIR)/opensnes/tools/luna-test/probes/
+	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
+	@# Post-link checks common.mk runs on every user build (bank $$00
+	@# overflow ratchet + NMI/WRAM race lint) — without these the zip's
+	@# make/common.mk references scripts that don't exist.
+	@mkdir -p $(RELEASE_DIR)/opensnes/devtools/symmap
+	@cp devtools/symmap/symmap.py $(RELEASE_DIR)/opensnes/devtools/symmap/
+	@cp devtools/check_nmi_wram_race.py $(RELEASE_DIR)/opensnes/devtools/
 	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
 	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
 	@find $(RELEASE_DIR)/opensnes/examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;

@@ -175,10 +175,58 @@ That's it — you're making SNES games.
 my-snes-game/
 ├── Makefile        # Build configuration
 ├── main.c          # Your game code
-└── res/            # Assets (optional)
-    ├── tiles.png
-    └── music.it
+├── res/            # Assets (optional)
+│   ├── tiles.png
+│   └── music.it
+└── test/           # Project tests (optional — see below)
+    ├── manifest.toml
+    └── baselines.json
 ```
+
+### Test Your Game
+
+Projects can declare automated tests that run in **luna**, the same
+cycle-accurate emulator the SDK's own test suite uses. Opt-in is simply the
+presence of `test/manifest.toml` (the `game` template ships one):
+
+```toml
+default_steps = 3_000_000
+
+# Visual baseline (fbhash) + WRAM asserts by symbol name.
+# Assert values are little-endian hex bytes (an s16 of 120 -> "7800").
+[tests.boot]
+assert = ["player_x = 7800"]
+
+# Input-driven: hold RIGHT for 60 frames, then check the game state.
+# Input format is "frame:buttons_hex" (RIGHT = 0x100).
+[tests.walk_right]
+input = "30:0x100,90:0"
+assert = ["player_x = b400"]
+```
+
+Workflow:
+
+```bash
+scripts/install-luna.sh   # once, from the SDK root: fetch the pinned luna
+make test-update          # seed test/baselines.json + reference PNGs
+make test                 # from now on: exit 0 = green, 1 = regression
+```
+
+(Or `opensnes test` / `opensnes test --update` from the project directory.)
+
+Three oracles run per test:
+
+- **WRAM asserts** — `symbol = hexbytes` entries are checked by luna
+  directly, with symbol names resolved from your ROM's `.sym` file;
+- **Visual baselines** — tests *without* an `input` script compare a
+  framebuffer hash per capture point (`steps` can be a list for
+  multi-point capture); failures leave the actual PNG in `test/actual/`
+  for eyeballing;
+- **In-ROM assertions** — any `SNES_ASSERT` that fires during a visual
+  run fails the test for free.
+
+Commit `test/` to your repo; rerun `make test-update` when you
+intentionally change what the game shows or does.
 
 ---
 

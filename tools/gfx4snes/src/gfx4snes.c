@@ -180,7 +180,11 @@ int main(int argc, const char **argv)
 
 			// convert map to a snes format if needed and /!\ optimize tiles in tiles_snes_mt
 			// debug fprintf(stdout,"meta blksx=%d blksy=%d tilewidth=%d tileheight=%d\n",blksx,blksy,gfx4snes_args.tilewidth, gfx4snes_args.tileheight);
-			map_snes = map_convertsnes(tiles_snes_mt, &nbtiles, gfx4snes_args.tilewidth, gfx4snes_args.tileheight, blksx, blksy, gfx4snes_args.palettecolors, gfx4snes_args.paletteentry, 0, 1, 0, 0, 0, gfx4snes_args.quietmode);
+			// isflip honours -F: in noreduction mode the sheet keeps every
+			// tile (VRAM layout unchanged) but mirrored cells reference their
+			// canonical tile with the flip bits set — metasprite_save turns
+			// those into OBJ_FLIPX/OBJ_FLIPY attributes.
+			map_snes = map_convertsnes(tiles_snes_mt, &nbtiles, gfx4snes_args.tilewidth, gfx4snes_args.tileheight, blksx, blksy, gfx4snes_args.palettecolors, gfx4snes_args.paletteentry, 0, 1, 0, 0, gfx4snes_args.tileflip, gfx4snes_args.quietmode);
 
 			// save metasprites
 			metasprite_save (gfx4snes_args.filebase, map_snes, blksx, blksy, gfx4snes_args.tilesize, gfx4snes_args.metawidth, gfx4snes_args.metaheight, gfx4snes_args.metapriority, snesimage.header.width, snesimage.header.height, gfx4snes_args.quietmode);

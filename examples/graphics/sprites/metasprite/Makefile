@@ -6,7 +6,7 @@ CSRC     := main.c
 ASMSRC   := data.asm
 
 USE_LIB  := 1
-LIB_MODULES := console sprite dma text text4bpp background input
+LIB_MODULES := console sprite dma text text4bpp background input anim
 
 include $(OPENSNES)/make/common.mk
 

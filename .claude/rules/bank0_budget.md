@@ -25,6 +25,15 @@ adding const data, refactoring an example, or tuning the threshold.
 Implementation: `devtools/symmap/symmap.py` (`print_bank0_overflow_check`)
 + `make/common.mk` (the post-link check after every `.sfc` build).
 
+Spill detection (since 2026-07-07) is **section-based**: the checker parses
+the .sym `[sections]` block and hard-fails any `.rodata.N` section (QBE's
+per-datum C const emission) placed in bank $01+, naming the contained
+symbols. This covers named top-level statics, which the older
+`string.N`/`name.N` symbol heuristics missed — likemario's anim clips
+spilled right through the ratchet and shipped a dead animation before
+this. Sections holding only `__opensnes_force_emit_*` anchors are exempt
+(linker-only data, never C-deref'd).
+
 ## Default threshold (8 bytes on wip/a6-a7-atomic-v3; 16 on develop)
 
 The threshold is **always set just below the current example minimum**

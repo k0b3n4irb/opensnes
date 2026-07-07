@@ -1,6 +1,37 @@
 # Animation Tutorial {#tutorial_animation}
 
-This tutorial covers sprite and background animation techniques on the SNES, from simple frame cycling to the dynamic sprite engine.
+This tutorial covers sprite and background animation techniques on the SNES, from the declarative anim module to manual frame cycling and the dynamic sprite engine.
+
+## The anim Module (Recommended)
+
+The library ships a declarative animation player (`<snes/anim.h>`, add `anim` to `LIB_MODULES`). Instead of hand-rolling a tick counter, a modulo gate and manual tile pokes per character, you describe each animation as data and tick a player once per frame:
+
+```c
+#include <snes.h>
+#include <snes/anim.h>
+
+/* One clip per action: frames + speed + loop mode, all data. */
+DECLARE_ANIM_CLIP(clip_walk,  ANIM_LOOP, 4, FRAME_WALK0, FRAME_WALK1);
+DECLARE_ANIM_CLIP(clip_stand, ANIM_LOOP, 1, FRAME_STAND);
+static AnimPlayer hero_anim = ANIM_PLAYER_INIT;
+
+void hero_animate(void) {
+    /* Callable unconditionally every frame: continue-if-same keeps a
+     * running clip's phase instead of restarting it. */
+    animPlay(&hero_anim, walking ? &clip_walk : &clip_stand);
+    animTickOam(&hero_anim, 0);   /* dynamic engine: refresh only on change */
+}
+```
+
+A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
+
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/graphics/sprites/animated_sprite`);
+- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMeta()` directly (`examples/graphics/sprites/metasprite`);
+- `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything).
+
+`ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API, the layout contract, and the bank $00 note for nearly-full ROMs.
+
+The sections below cover what the module does under the hood — worth understanding, and still the right tool for one-off effects.
 
 ## Frame-Based Animation
 
@@ -126,7 +157,6 @@ Most game characters have different frames for each movement direction. The comm
 From `examples/graphics/sprites/animated_sprite/`:
 
 ```c
-#define FRAMES_PER_ANIMATION 3
 #define ANIM_DELAY 6
 
 enum SpriteState {
@@ -139,13 +169,17 @@ enum SpriteState {
 typedef struct {
     s16 x, y;
     u16 gfx_frame;
-    u16 anim_frame;
-    u16 anim_delay;
     u8 state;
     u8 flipx;
 } Monster;
 
-Monster monster = {100, 100, 0, 0, 0, W_DOWN, 0};
+Monster monster = {100, 100, 0, W_DOWN, 0};
+
+/* One clip per facing — the frame values are raw 16x16 tile numbers. */
+DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 2, 4);
+DECLARE_ANIM_CLIP(walk_up,   ANIM_LOOP, ANIM_DELAY, 6, 8, 10);
+DECLARE_ANIM_CLIP(walk_side, ANIM_LOOP, ANIM_DELAY, 12, 14, 32);
+AnimPlayer monster_anim = ANIM_PLAYER_INIT;
 ```
 
 ### Input and State Changes
@@ -175,45 +209,28 @@ if (pad0 & KEY_DOWN) {
 }
 ```
 
-### Calculating the Tile Number
+### Selecting the Clip and Ticking
 
-Map the current state and animation frame to a tile number, then apply the flip flag:
+Map the facing to a clip, tick, and apply the flip flag. `animPlay()` has continue-if-same semantics, so calling it every frame keeps a running walk cycle instead of restarting it:
 
 ```c
-/* Compute tile from state + frame */
-if (monster.state == W_DOWN) {
-    monster.gfx_frame = monster.anim_frame * 2;        /* 0, 2, 4 */
-} else if (monster.state == W_UP) {
-    monster.gfx_frame = 6 + monster.anim_frame * 2;    /* 6, 8, 10 */
-} else {
-    /* W_RIGHT / W_LEFT (same tiles, flip differs) */
-    if (monster.anim_frame < 2)
-        monster.gfx_frame = 12 + monster.anim_frame * 2;
+if (pad0 != 0) {
+    if (monster.state == W_DOWN)
+        animPlay(&monster_anim, &walk_down);
+    else if (monster.state == W_UP)
+        animPlay(&monster_anim, &walk_up);
     else
-        monster.gfx_frame = 32;   /* Wraps to next tile row */
+        animPlay(&monster_anim, &walk_side);   /* W_RIGHT / W_LEFT */
+
+    monster.gfx_frame = animTick(&monster_anim);
 }
+/* No buttons held: no tick — the sprite freezes on its current frame. */
 
 u16 flags = monster.flipx ? OBJ_FLIPX : 0;
 oamSet(0, monster.x, monster.y, monster.gfx_frame, 0, 3, flags);
 ```
 
-### Animation Timing with Idle Check
-
-Only advance the animation counter while the character is moving:
-
-```c
-if (pad0 != 0) {
-    monster.anim_delay++;
-    if (monster.anim_delay >= ANIM_DELAY) {
-        monster.anim_delay = 0;
-        monster.anim_frame++;
-        if (monster.anim_frame >= FRAMES_PER_ANIMATION)
-            monster.anim_frame = 0;
-    }
-}
-```
-
-When no buttons are held, `anim_delay` stops incrementing and the sprite freezes on its current frame.
+Pausing on idle costs nothing: an un-ticked player simply holds its state, and the walk resumes mid-cycle when input returns. This is the full pattern of `examples/graphics/sprites/animated_sprite/`.
 
 ## The Dynamic Sprite Engine
 

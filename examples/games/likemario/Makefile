@@ -14,7 +14,7 @@ CSRC        := main.c
 ASMSRC      := data.asm
 
 USE_LIB     := 1
-LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background
+LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background anim
 
 USE_SNESMOD    := 1
 SOUNDBANK_SRC  := res/overworld.it res/jump_sfx.it

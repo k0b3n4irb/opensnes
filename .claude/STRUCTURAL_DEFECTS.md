@@ -809,7 +809,29 @@ representation in the toolchain.
 
 **Investigation log**:
 
-- **2026-06-25 (LATEST — A6 closed for now; Tier 1 shipped, Tier 2 scoped)** —
+- **2026-07-07 (ratchet hole closed; two live spills caught)** — Dogfooding
+  the #97 anim module hit the Tier-2 deref limit in the wild: likemario's
+  `static const` AnimClips spilled to bank $02 and the animation died
+  silently — and the symmap hard-fail did NOT fire, because
+  `check_bank0_rom_overflow` only classified `string.N`/`name.N` symbols
+  (named top-level statics have no `.N` suffix → invisible). Fixed by
+  parsing the .sym `[sections]` block: any `.rodata.N` section in bank $01+
+  is now a hard fail unless it only holds `__opensnes_force_emit_*` anchors.
+  Corpus sweep with the fixed checker found a second, pre-existing spill:
+  `sine_quarter` (lib hdma.c) in the window example — dead at runtime there,
+  fixed by making the LUT initialized RAM (bank-safe via data_init DMA).
+  Pattern to remember: lib C modules should avoid `static const` LUTs, and
+  nearly-full examples can use RAM-backed anim clips (documented in
+  `anim.h` @warning + likemario).
+  **Follow-up same day**: the macOS CI leg then failed where Linux passed —
+  WLA-DX SUPERFREE placement varies by platform, so a *different* hdma LUT
+  (`channel_mask`) spilled only there. Placement whack-a-mole is unwinnable;
+  the class was removed at the source: **lib C modules now carry zero ROM
+  const data** (channel_mask → variable shift, hex_chars/atan_lut →
+  initialized RAM), enforced by `devtools/check_lib_rodata.py` in
+  `make lint`. Examples' own const data remains user-controlled and
+  ratchet-guarded.
+- **2026-06-25 (A6 closed for now; Tier 1 shipped, Tier 2 scoped)** —
   Re-scoped A6 into three tiers (see
   `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md` §8 for the full
   cold-start plan). **Tier 1 (lib-led practical relief) SHIPPED**: verified the

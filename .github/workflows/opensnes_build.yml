@@ -324,6 +324,22 @@ jobs:
         # regenerate baselines with `luna_runner.py --update` meanwhile.)
         run: python3 tools/luna-test/luna_runner.py --compare
 
+      - name: User-project test story (init → build → test)
+        # Guards the full #98 contract end-to-end, exactly as a user runs it:
+        # scaffold a game project, build it against this tree, seed the
+        # project-local baselines, then require green — including the FAIL
+        # path (a deliberately wrong assert must exit non-zero).
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          scripts/opensnes init /tmp/ci_game --template game
+          make -C /tmp/ci_game
+          make -C /tmp/ci_game test-update
+          make -C /tmp/ci_game test
+          sed -i 's/player_x = 7800/player_x = 9999/' /tmp/ci_game/test/manifest.toml
+          if make -C /tmp/ci_game test; then
+            echo "ERROR: broken assert did not fail 'make test'"; exit 1
+          fi
+
       - name: WRAM-state regression (54/56, cross-arch exclusions)
         # Per-frame WRAM oracle — catches runtime-state regressions that never
         # reach the screen (uninitialised reads, mis-stepped counters). The two

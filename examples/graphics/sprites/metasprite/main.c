@@ -36,6 +36,7 @@
  */
 
 #include <snes.h>
+#include <snes/anim.h>
 
 /** @brief 4bpp tile data for the 32x32 hero sprite (defined in data.asm) */
 extern u8 spritehero32_til[];
@@ -58,6 +59,26 @@ extern u8 spritehero8_til[];
 #include "res/hero16_meta.inc"
 #include "res/hero32_meta.inc"
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
+
+/*============================================================================
+ * hero16 walk cycle — anim module dogfood
+ *
+ * The four hand-authored hero16 frames become an AnimClip whose frame
+ * values index this pointer table; animTickMeta() resolves tick -> frame
+ * -> MetaspriteItem* in one expression. This is exactly the shape an
+ * editor (Cooper) emits: a frame-pointer table + a clip over indices.
+ *============================================================================*/
+
+/** @brief Frame-pointer table the clip's u16 frame values index into */
+static const MetaspriteItem *const hero16_walk_table[] = {
+    hero16_frame0, hero16_frame1, hero16_frame2, hero16_frame3
+};
+
+/** @brief Walk cycle: frames 0-3, 8 ticks each, looping */
+DECLARE_ANIM_CLIP(hero16_walk, ANIM_LOOP, 8, 0, 1, 2, 3);
+
+/** @brief Player state for the hero16 character */
+static AnimPlayer hero16_anim = ANIM_PLAYER_INIT;
 
 /*
  * VRAM Layout — all three sprite sizes are loaded contiguously:
@@ -183,7 +204,8 @@ static void drawSprites(void) {
 
     if (selectedItem == 0) {
         /* Mode 0: hero16 as LARGE (16x16) + hero8 as SMALL (8x8) */
-        nextId = oamDrawMeta(0, 64, 140, hero16_frame0,
+        nextId = oamDrawMeta(0, 64, 140,
+                             animTickMeta(&hero16_anim, hero16_walk_table),
                              BASE_TILE_16, 0, OBJ_LARGE);
         oamDrawMeta(nextId, 160, 148, hero8_frame0,
                     BASE_TILE_8, 0, OBJ_SMALL);
@@ -197,7 +219,8 @@ static void drawSprites(void) {
         /* Mode 2: hero32 as LARGE (32x32) + hero16 as SMALL (16x16) */
         nextId = oamDrawMeta(0, 48, 108, hero32_frame0,
                              BASE_TILE_32, 0, OBJ_LARGE);
-        oamDrawMeta(nextId, 160, 124, hero16_frame0,
+        oamDrawMeta(nextId, 160, 124,
+                    animTickMeta(&hero16_anim, hero16_walk_table),
                     BASE_TILE_16, 0, OBJ_SMALL);
     }
 }
@@ -247,6 +270,7 @@ int main(void) {
     setMainScreen(TM_BG1 | TM_OBJ);
 
     drawMenu();
+    animPlay(&hero16_anim, &hero16_walk);
     drawSprites();
     WaitForVBlank();
     setScreenOn();

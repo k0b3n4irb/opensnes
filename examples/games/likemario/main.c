@@ -44,6 +44,7 @@
  */
 
 #include <snes.h>
+#include <snes/anim.h>
 #include <snes/snesmod.h>
 #include "soundbank.h"
 
@@ -157,8 +158,24 @@ static u8  mario_yfrac;       /**< Mario Y sub-pixel fraction (8.8 fixed-point l
 static s16 mario_xvel;        /**< Mario X velocity in 8.8 fixed-point */
 static s16 mario_yvel;        /**< Mario Y velocity in 8.8 fixed-point (negative = upward) */
 static u8  mario_action;      /**< Current action state (MARIO_ACT_STAND/WALK/JUMP/FALL) */
-static u8  mario_anim_idx;    /**< Walk animation toggle (0 or 1, selects WALK0/WALK1) */
-static u8  anim_tick;         /**< Frame counter for animation timing */
+
+/* Animation as data (anim module): one clip per action, one player.
+ * animPlay() is called unconditionally each frame — continue-if-same
+ * keeps the walk cycle running instead of restarting it.
+ *
+ * The clips are initialized RAM statics, NOT DECLARE_ANIM_CLIP (which
+ * emits ROM const): this ROM's bank $00 is within a few bytes of full,
+ * so const clips spill to bank $01+ and the 16-bit C deref reads garbage
+ * — the KNOWN_LIMITATIONS bank $00 class, now caught at link time by the
+ * symmap ratchet. RAM-backed clips are the documented mitigation
+ * (44 bytes of WRAM); the layout and the API are identical. */
+static u16 clip_walk_frames[]  = { FRAME_WALK0, FRAME_WALK1 };
+static u16 clip_jump_frames[]  = { FRAME_JUMP };
+static u16 clip_stand_frames[] = { FRAME_STAND };
+static AnimClip clip_walk  = { clip_walk_frames,  0, 2, 4, ANIM_LOOP, 0 };
+static AnimClip clip_jump  = { clip_jump_frames,  0, 1, 1, ANIM_LOOP, 0 };
+static AnimClip clip_stand = { clip_stand_frames, 0, 1, 1, ANIM_LOOP, 0 };
+static AnimPlayer mario_anim = ANIM_PLAYER_INIT;  /**< Mario's animation state */
 
 static s16 map_max_x;         /**< Rightmost valid Mario X position (map_width*8 - 16) */
 static s16 cam_max_x;         /**< Maximum camera X offset (map_width*8 - 256) */
@@ -402,8 +419,7 @@ static void mario_init(void) {
     mario_xvel = 0;
     mario_yvel = 0;
     mario_action = MARIO_ACT_STAND;
-    mario_anim_idx = 0;
-    anim_tick = 0;
+    animPlay(&mario_anim, &clip_stand);
 
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
@@ -618,31 +634,19 @@ static void mario_clamp_and_transition(void) {
 /**
  * @brief Update Mario's sprite animation frame based on current action.
  *
- * Walking alternates between WALK0 and WALK1 every 4 frames. Jumping
- * and falling use the JUMP frame. Standing uses the STAND frame.
- * The oamrefresh flag tells the dynamic sprite engine to re-upload
- * the new frame's tile data to VRAM on the next flush.
+ * Pure state->clip mapping: select the clip for the current action and
+ * tick. The anim module handles cadence (walk alternates every 4 ticks),
+ * continue-if-same (walking keeps its phase), and the oamrefresh flag
+ * (tile re-upload only when the frame actually changes).
  */
 static void mario_animate(void) {
-    anim_tick++;
-
-    if (mario_action == MARIO_ACT_WALK) {
-        if ((anim_tick & 3) == 3) {
-            mario_anim_idx ^= 1;
-            oambuffer[0].oamframeid = FRAME_WALK0 + mario_anim_idx;
-            oambuffer[0].oamrefresh = 1;
-        }
-    } else if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL) {
-        if (oambuffer[0].oamframeid != FRAME_JUMP) {
-            oambuffer[0].oamframeid = FRAME_JUMP;
-            oambuffer[0].oamrefresh = 1;
-        }
-    } else {
-        if (oambuffer[0].oamframeid != FRAME_STAND) {
-            oambuffer[0].oamframeid = FRAME_STAND;
-            oambuffer[0].oamrefresh = 1;
-        }
-    }
+    if (mario_action == MARIO_ACT_WALK)
+        animPlay(&mario_anim, &clip_walk);
+    else if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL)
+        animPlay(&mario_anim, &clip_jump);
+    else
+        animPlay(&mario_anim, &clip_stand);
+    animTickOam(&mario_anim, 0);
 }
 
 /**

@@ -82,6 +82,15 @@ class MemoryRegion:
 
 
 @dataclass
+class SectionRec:
+    """A linker section from the .sym [sections] block"""
+    name: str
+    bank: int
+    address: int  # CPU-visible address ($8000+ for LoROM)
+    size: int
+
+
+@dataclass
 class Overlap:
     """Represents a memory overlap between two symbols"""
     bank0_symbol: Symbol
@@ -107,15 +116,35 @@ class SymbolTable:
     def __init__(self):
         self.symbols: dict[str, Symbol] = {}  # name -> Symbol
         self.banks: dict[int, list[Symbol]] = {}  # bank -> list of symbols
+        self.sections: list[SectionRec] = []  # from the [sections] block
 
     def parse(self, sym_path: Path) -> None:
         """Parse a WLA-DX .sym file"""
+        block = None
         with open(sym_path, 'r') as f:
             for line in f:
                 line = line.strip()
 
                 # Skip comments and empty lines
                 if not line or line.startswith(';'):
+                    continue
+
+                if line.startswith('['):
+                    block = line
+                    continue
+
+                # [sections] rows: "ROMOFF8 BB:AAAA CPUA SIZE8 name"
+                # e.g. "00011167 02:1167 9167 0000000c .rodata.2"
+                if block == '[sections]':
+                    m = re.match(
+                        r'^[0-9a-fA-F]{8}\s+([0-9a-fA-F]{2}):[0-9a-fA-F]{4}'
+                        r'\s+([0-9a-fA-F]{4})\s+([0-9a-fA-F]{8})\s+(\S+)$', line)
+                    if m:
+                        self.sections.append(SectionRec(
+                            name=m.group(4),
+                            bank=int(m.group(1), 16),
+                            address=int(m.group(2), 16),
+                            size=int(m.group(3), 16)))
                     continue
 
                 # Try colon format first: "BB:AAAA symbol_name"
@@ -333,6 +362,27 @@ class SymbolTable:
                 elif self._is_c_generated_data(sym):
                     warnings.append(sym)
 
+        # QBE emits every C const datum into a ".rodata.N" SUPERFREE section.
+        # Any such section landing in bank $01+ is read as garbage by the
+        # 16-bit C deref — UNLESS it only holds __opensnes_force_emit_*
+        # anchors, which exist for the linker and are never read.
+        # Caught 2026-07-07: likemario's anim clips (named top-level statics,
+        # no `.N` suffix, so invisible to the symbol heuristics above)
+        # spilled to bank $02 and shipped a silently dead animation.
+        already = {(s.bank, s.address) for s in critical}
+        for sec in self.sections:
+            if sec.bank == 0x00 or not re.match(r'^\.rodata\.\d+$', sec.name):
+                continue
+            contained = [s for s in self.banks.get(sec.bank, [])
+                         if sec.address <= s.address < sec.address + sec.size
+                         and not s.name.startswith('_sizeof_')]
+            live = [s for s in contained
+                    if not s.name.startswith('__opensnes_force_emit_')]
+            for sym in live:
+                if (sym.bank, sym.address) not in already:
+                    critical.append(sym)
+                    already.add((sym.bank, sym.address))
+
         # Calculate bank $00 ROM free space
         bank0_syms = self.banks.get(0x00, [])
         bank0_rom = [s for s in bank0_syms if s.address >= 0x8000]
@@ -512,9 +562,9 @@ def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048,
     critical, warnings, free_bytes = table.check_bank0_rom_overflow()
 
     if critical:
-        print(f"{Colors.RED}{Colors.BOLD}OVERFLOW: String literals spilled to bank $01+!{Colors.RESET}\n")
+        print(f"{Colors.RED}{Colors.BOLD}OVERFLOW: C const data spilled to bank $01+!{Colors.RESET}\n")
         print("The compiler generates 16-bit addresses that always read bank $00.")
-        print("These string constants are in bank $01+ and will be read as GARBAGE:\n")
+        print("These C constants are in bank $01+ and will be read as GARBAGE:\n")
 
         for sym in critical:
             print(f"  {Colors.RED}${sym.bank:02X}:{sym.address:04X}{Colors.RESET}  {sym.name}")

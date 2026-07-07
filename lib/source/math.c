@@ -248,9 +248,13 @@ fixed fixClamp(fixed x, fixed min, fixed max) {
  *
  * The table covers the first octant (slope 0 → slope 1, angle 0 → 32);
  * the other 7 octants are reached by mirror / quadrant logic in
- * atan2_8 below. Total ROM cost: 65 bytes.
+ * atan2_8 below. Total cost: 65 bytes of RAM (initialized by data_init).
+ * RAM, not const: lib C modules carry no ROM const data — a SUPERFREE
+ * .rodata section can spill to bank $01+ on a tight example (platform-
+ * dependent placement) where the 16-bit C deref reads garbage; the
+ * symmap ratchet hard-fails the build when it happens.
  */
-static const u8 atan_lut[65] = {
+static u8 atan_lut[65] = {
      0,  1,  1,  2,  3,  4,  5,  6,
      6,  7,  8,  9, 10, 10, 11, 12,
     13, 14, 14, 15, 16, 17, 17, 18,

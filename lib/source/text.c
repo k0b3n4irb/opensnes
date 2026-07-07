@@ -190,7 +190,9 @@ void textPrintU16(u16 value) {
 }
 
 void textPrintHex(u16 value, u8 digits) {
-    static const char hex_chars[] = "0123456789ABCDEF";
+    /* RAM, not const: lib C modules carry no ROM const data (a spilled
+     * .rodata section reads as garbage from bank $01+ — symmap ratchet). */
+    static char hex_chars[] = "0123456789ABCDEF";
     char buf[5];
     u8 i;
 

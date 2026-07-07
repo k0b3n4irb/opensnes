@@ -35,6 +35,7 @@
  */
 
 #include <snes.h>
+#include <snes/anim.h>
 
 /*============================================================================
  * External Graphics Data (defined in data.asm)
@@ -49,8 +50,6 @@ extern u8 sprite_pal[], sprite_pal_end[];
  * Constants
  *============================================================================*/
 
-/** @brief Number of distinct frames in each directional walk cycle */
-#define FRAMES_PER_ANIMATION 3
 
 /**
  * @brief Animation direction states.
@@ -94,8 +93,6 @@ enum {
 typedef struct {
     s16 x, y;          /**< Screen position in pixels (signed for off-screen clamping) */
     u16 gfx_frame;     /**< Current tile number to display in OAM */
-    u16 anim_frame;    /**< Current frame index within the walk cycle (0 to FRAMES_PER_ANIMATION-1) */
-    u16 anim_delay;    /**< Frame counter for animation timing (counts up to ANIM_DELAY) */
     u8 state;          /**< Current direction (SpriteState enum value) */
     u8 flipx;          /**< Horizontal flip flag: 1 = mirror sprite for left-facing */
 } Monster;
@@ -110,7 +107,22 @@ typedef struct {
 #define ANIM_DELAY 6
 
 /** @brief The player-controlled character sprite, initialized facing down at (100, 100) */
-Monster monster = {100, 100, 0, 0, 0, W_DOWN, 0};
+Monster monster = {100, 100, 0, W_DOWN, 0};
+
+/*============================================================================
+ * Animation clips (anim module) — one clip per facing.
+ *
+ * A frame value here is a raw OAM tile number (the sheet lays 16x16
+ * sprites two tiles apart). LEFT reuses the RIGHT clip with H-flip.
+ * ANIM_DELAY ticks per frame = the same 100ms cadence the old hand-rolled
+ * anim_delay counter produced.
+ *============================================================================*/
+DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 2, 4);
+DECLARE_ANIM_CLIP(walk_up,   ANIM_LOOP, ANIM_DELAY, 6, 8, 10);
+DECLARE_ANIM_CLIP(walk_side, ANIM_LOOP, ANIM_DELAY, 12, 14, 32);
+
+/** @brief Playback head for the monster (zero-init = stopped). */
+AnimPlayer monster_anim = ANIM_PLAYER_INIT;
 
 /*============================================================================
  * Main
@@ -193,35 +205,21 @@ int main(void) {
                 monster.flipx = 0;
             }
 
-            /* Advance animation with delay */
-            monster.anim_delay++;
-            if (monster.anim_delay >= ANIM_DELAY) {
-                monster.anim_delay = 0;
-                monster.anim_frame++;
-                if (monster.anim_frame >= FRAMES_PER_ANIMATION)
-                    monster.anim_frame = 0;
-            }
-        }
+            /* Select the clip for the current facing — animPlay's
+             * continue-if-same semantics make this safe to call every
+             * frame: holding a direction keeps the cycle running, and
+             * changing direction restarts the new clip cleanly. */
+            if (monster.state == W_DOWN)      animPlay(&monster_anim, &walk_down);
+            else if (monster.state == W_UP)   animPlay(&monster_anim, &walk_up);
+            else                              animPlay(&monster_anim, &walk_side);
 
-        /* Calculate tile based on state and animation frame
-         * Sprite sheet layout (16x16 sprites, tile numbers):
-         *   DOWN:  0, 2, 4
-         *   UP:    6, 8, 10
-         *   RIGHT: 12, 14, 32
-         *   LEFT:  same as RIGHT with H-flip
-         */
-        if (monster.state == W_DOWN) {
-            monster.gfx_frame = monster.anim_frame * 2;        /* 0, 2, 4 */
-        } else if (monster.state == W_UP) {
-            monster.gfx_frame = 6 + monster.anim_frame * 2;    /* 6, 8, 10 */
-        } else {
-            /* W_RIGHT / W_LEFT */
-            if (monster.anim_frame < 2) {
-                monster.gfx_frame = 12 + monster.anim_frame * 2; /* 12, 14 */
-            } else {
-                monster.gfx_frame = 32;                         /* 32 */
-            }
+            /* Advance one tick — the clip data owns the cadence (the old
+             * anim_delay/anim_frame counters are gone). */
+            monster.gfx_frame = animTick(&monster_anim);
         }
+        /* Idle: no tick — a paused animation costs nothing and the last
+         * frame simply stays in OAM (same behavior as before). */
+
         u16 flags = monster.flipx ? OBJ_FLIPX : 0;
         oamSet(0, monster.x, monster.y, monster.gfx_frame, 0, 3, flags);
     }
