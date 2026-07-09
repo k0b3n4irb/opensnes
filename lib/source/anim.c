@@ -63,12 +63,14 @@ u16 animTick(AnimPlayer *p) {
         return out;  /* ANIM_ONCE holds its last frame */
     }
 
-    /* Single load/store via a local. Deliberate: the natural
-     * `p->ticks--; if (p->ticks == 0)` form miscompiles on cc65816 — the
-     * post-store re-read of the u8 field goes through an address reloaded
-     * in 8-bit accumulator mode (stale high byte), so the comparison reads
-     * the wrong location. Pinned by the r_rmw_u8 KNOWN_FAIL vector in devtools/libtests; tracked
-     * as opensnes#99. */
+    /* Single load/store via a local. The natural
+     * `p->ticks--; if (p->ticks == 0)` form is now correct too — the
+     * cc65816 miscompile that motivated this (post-store re-read through an
+     * address reloaded in 8-bit accumulator mode) was fixed in qbe w65816
+     * (opensnes#99, pinned by the r_rmw_u8 vector in devtools/libtests and
+     * the test_rmw_ptr_reread codegen check). This form is kept as-is to
+     * avoid rebuilding every anim-linked ROM for a no-op; it is equally
+     * correct and one load/store cheaper. */
     {
         u8 t = p->ticks - 1;
         p->ticks = t;

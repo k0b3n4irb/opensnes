@@ -439,12 +439,9 @@ void oamClear(void);
  * for the sprite sheet as it sits in VRAM. It is NOT a block index: a
  * 16x16 sub-sprite one block to the right of another is `+2` (two 8x8
  * columns), and moving one block row down adds the sheet's row stride
- * (16 names for a 128px-wide sheet). Editors emitting these structs
- * (Cooper) must compute names from their own sheet geometry.
- *
- * @warning gfx4snes `-T` currently emits block indices, not names — its
- * pointer tables render wrong for 16/32px blocks (tracked as issue #100).
- * The hand-authored `.inc` files in the examples show the correct values.
+ * (16 names for a 128px-wide sheet). gfx4snes `-T` emits these names
+ * directly (fixed in issue #100); editors composing their own sheet
+ * (Cooper) compute them from their own geometry.
  */
 typedef struct {
     s16 dx;         /**< X offset from metasprite origin */

@@ -41,6 +41,20 @@ CASES = [
     ("flip.png", ["-s", "16", "-o", "16", "-u", "16", "-p", "-T",
                   "-X", "32", "-Y", "16", "-P", "2", "-F"],
      ["flip.pic", "flip.pal", "flip.inc", "flip_data.as", "flip_meta.inc"]),
+    # Metasprite tile field is an 8x8 CHARACTER NAME, not a block index
+    # (issue #100). two.png = two distinct 16x16 blocks -> the second block's
+    # tiles live at char name 2 (2 columns of 8x8), not index 1. Pins the
+    # positional conversion in metasprites.c.
+    ("two.png", ["-s", "16", "-o", "16", "-u", "16", "-p", "-T",
+                 "-X", "32", "-Y", "16", "-P", "2"],
+     ["two_meta.inc"]),
+    # three.png = [A, H-mirror of A, distinct B]. The mirror makes the
+    # compacted tile counter lag the reading position, so a naive index would
+    # emit B at 2 instead of its true char name 4. Pins the position-based
+    # canonical reference in maps.c (issue #100 multi-mirror drift).
+    ("three.png", ["-s", "16", "-o", "16", "-u", "16", "-p", "-T",
+                   "-X", "48", "-Y", "16", "-P", "2", "-F"],
+     ["three_meta.inc"]),
 ]
 
 

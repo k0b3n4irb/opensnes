@@ -1,0 +1,8 @@
+# The fixed re-read: after the byte store, rep #$20 restores 16-bit BEFORE
+# the address reload (lda N,s; tax), then sep #$20 for the byte load.
+present sta\.l \$0000,x\n\trep #\$20\n\tlda \d+,s\n\ttax\n\tsep #\$20\n\tlda\.l \$0000,x
+# The bug signature must never come back: byte store, then address reload
+# + tax + byte load with NO mode switch between them — the store's 8-bit
+# mode leaked through, so the reload ran in 8-bit and grabbed only the low
+# byte. (Verified this exact regex matched the pre-fix output.)
+absent sta\.l \$0000,x\n\tlda \d+,s\n\ttax\n\tlda\.l \$0000,x

@@ -362,12 +362,22 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
                         }
                         if (flipmask == 0) cnt_orig++; else if (flipmask == 0x4000) cnt_h++; else if (flipmask == 0x8000) cnt_v++; else if (flipmask == 0xC000) cnt_hv++;
                     } else {
-                        // add new tile
-                        i = newnbtiles;
-                        memcpy(&imgbuf[newnbtiles * sizetile], &imgbuf[currenttile * sizetile], sizetile);
-                        tilevalue = newnbtiles + blanktileabsent;
+                        // add new tile. Under NO reduction the saved tile
+                        // sheet keeps EVERY block in reading order, so the map
+                        // must reference the block's reading-order POSITION,
+                        // not the compacted newnbtiles index. Otherwise an
+                        // earlier mirrored cell (which skips newnbtiles++)
+                        // makes the counter lag the position and every later
+                        // reference drifts — a metasprite-visible bug for
+                        // multi-mirror sheets (issue #100). Hash the canonical
+                        // by its position against the UNCOMPACTED imgbuf (no
+                        // memcpy here — compaction would overwrite an earlier
+                        // canonical's original tile data at a low slot, which
+                        // is precisely the position a later find compares).
+                        i = currenttile;
+                        tilevalue = currenttile + blanktileabsent;
                         // insert new canonical tile into all hash tables
-                        const unsigned char *t = &imgbuf[i * sizetile];
+                        const unsigned char *t = &imgbuf[currenttile * sizetile];
                         uint32_t ih0 = tile_hash_orient(t, blksizex, blksizey, 0);
                         uint32_t ihh = tile_hash_orient(t, blksizex, blksizey, 1);
                         uint32_t ihv = tile_hash_orient(t, blksizex, blksizey, 2);

@@ -96,46 +96,40 @@ void metasprite_save (const char *filename, unsigned short *sprites, int nbtilex
 	else  // go after the /
 		incname++;
 
-#if 0
-    // SNES sprites are arranged in VRAM with 8 sprites per row (128 pixels wide)
-    // For 16x16 sprites: 8 sprites per row, for 32x32 sprites: 4 per row, for 8x8: 16 per row
-    int sprites_per_vram_row = 128 / blocksize;  // 8 for 16x16, 4 for 32x32, 16 for 8x8
-    int metasprites_per_vram_row = sprites_per_vram_row / nbsprx;  // how many metasprites fit per VRAM row
-#endif
+    // MetaspriteItem.tile is an 8x8 OAM CHARACTER NAME, not a block index
+    // (issue #100). The saved .pic (gfx4snes.c re-converts the source into a
+    // fixed 128px-wide raster before serializing 8x8 tiles) lays each block
+    // out positionally: a block spans `sub` 8x8 tiles per edge, and there are
+    // `bpr` blocks per 128px VRAM row. So a block at reading-order position p
+    // has its top-left 8x8 tile at name (p / bpr) * (sub rows * 16 wide) +
+    // (p % bpr) * sub. For 16x16 (sub=2) that is the hand-authored 0,2,4,...
+    // convention; for 8x8 (sub=1,bpr=16) it collapses to the identity.
+    // The map value is that reading-order position: for a mirrored cell the
+    // -F path stores the CANONICAL block's position (maps.c), so canonical +
+    // flip stays positionally correct.
+    int sub = blocksize / 8;             // 8x8 tiles per block edge (1, 2 or 4)
+    int bpr = 16 / sub;                  // blocks per 128px VRAM raster row
+    if (bpr < 1) bpr = 1;                // blocksize > 128 is rejected upstream
     for (i=0; i<nbmetasprites;i++)
     {
         int ofsmtx=0;
         int ofsmty=0;
         idxmetaspr=i*(nbincrspr);  // reset index for each metasprite (for palette access)
 
-#if 0
-        // Calculate base position of this metasprite in VRAM layout
-        int meta_base_x = (i % metasprites_per_vram_row) * nbsprx;
-        int meta_base_y = (i / metasprites_per_vram_row) * nbspry;
-#endif
-
         fprintf(fp, "const t_metasprite %s_metasprite%d[] = {\n", incname, i);
         for (y=0;y<nbspry;y++)
         {
             for (x=0;x<nbsprx;x++)
             {
-#if 0
-                // Calculate VRAM-layout-aware tile index
-                // This matches pvsneslib's lkup16idT lookup table which expects 8 sprites per row
-                int vram_tile_index = (meta_base_y + y) * sprites_per_vram_row + (meta_base_x + x);
-                fprintf(stdout,"vram_tile_index=%d sprites[idxmetaspr]=%d\n",vram_tile_index,sprites[idxmetaspr] & TILEIDX_MASK); fflush(stdout);
-#endif
+                int bidx = sprites[idxmetaspr] & TILEIDX_MASK;   // block reading-order position
+                int name = (bidx / bpr) * (sub * 16) + (bidx % bpr) * sub;
 
                 fprintf(fp,
                     "\tMETASPR_ITEM(%d, %d, %d, OBJ_PAL(%d) | OBJ_PRIO(%d)%s%s),\n",
-#if 0
-                    ofsmtx, ofsmty, vram_tile_index & TILEIDX_MASK, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio
-#else
-                    ofsmtx,ofsmty,sprites[idxmetaspr] & TILEIDX_MASK, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio,
+                    ofsmtx, ofsmty, name, ((sprites[idxmetaspr] & PALETTE_MASK)>>PALETTE_OFS), metaprio,
                     // map-entry flip bits (set by -F flip-aware dedup) → OAM attrs
                     (sprites[idxmetaspr] & 0x4000) ? " | OBJ_FLIPX" : "",
                     (sprites[idxmetaspr] & 0x8000) ? " | OBJ_FLIPY" : ""
-#endif
                 );
                 ofsmtx+=blocksize;
                 idxmetaspr++;

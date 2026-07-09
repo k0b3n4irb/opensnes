@@ -5,6 +5,35 @@ All notable changes to OpenSNES are documented in this file.
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 
+## [0.29.1] — 2026-07-09
+
+Two compiler/tool correctness fixes surfaced while wiring the anim module
+(#97) — both matter for editor-generated content (Cooper).
+
+### Fixed
+- fix(compiler): u8 read-modify-write through a pointer now re-reads the
+  correct page (#99). qbe w65816 ran the 16-bit pointer-address reload in a
+  byte load's indirect path while still in 8-bit mode (a preceding byte
+  store left A 8-bit and byte ops skip the entry `rep #$20`), so it loaded
+  only the pointer's low byte and dereferenced the wrong page — for structs
+  outside page zero. Reached `consoleInit`'s PPU-register read; the fix adds
+  the `rep #$20` the store-indirect path already used. Pinned by
+  `test_rmw_ptr_reread` (codegen) and the libtest `r_rmw_u8` runtime vector.
+- fix(tools): gfx4snes `-T` emits 8x8 OAM character names, not block indices
+  (#100). `metasprite_save` emitted the map's block index while the saved
+  `.pic` is a fixed 128px-wide raster, so the tables rendered wrong for
+  16/32px blocks. Now emits positional names (`(p/bpr)*(sub*16)+(p%bpr)*sub`);
+  the `-F` path stores the canonical block's reading-order position so
+  flip+canonical stays correct for multi-mirror sheets. Two golden fixtures
+  added.
+
+### Changed
+- chore(luna-test): rebaselined 2 visual + 49 WRAM streams. The #99 fix adds
+  4 instructions to `consoleInit` (called by every example); captures keyed
+  on instruction-step count shift by that offset — same behaviour, offset
+  state (verified: 54/56 render identically, the 2 timing-sensitive displays
+  render valid frames, `is_pal_system` unchanged).
+
 ## [0.29.0] — 2026-07-07
 
 Cooper's two asks land: a **declarative animation player** (the anim module,

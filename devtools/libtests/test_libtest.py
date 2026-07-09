@@ -50,14 +50,13 @@ CASES = [
 # Expected-fail vectors: real, minimally-pinned compiler bugs. A FAIL here is
 # the known baseline; an unexpected PASS (XPASS) means the compiler got fixed —
 # promote the vector out. Pattern copied from test_a6_farptr.py.
-KNOWN_FAIL = {
-    # u8 read-modify-write through a pointer, then re-read: the post-store
-    # reload of the address happens in 8-bit accumulator mode (stale high
-    # byte), so the ==0 comparison reads the wrong location. Found while
-    # building lib/source/anim.c (which ships the local-variable form).
-    # Tracked as opensnes#99.
-    "r_rmw_u8",
-}
+#
+# r_rmw_u8 lived here until opensnes#99 was fixed (qbe w65816 emit: the byte
+# load's indirect path now emits rep #$20 before the 16-bit address reload,
+# so a preceding byte store no longer corrupts the pointer's high byte). It
+# is now a normal passing vector below — the reproducer stays as a permanent
+# regression pin.
+KNOWN_FAIL = set()
 
 
 def le_bytes(value: int, width: int) -> str:

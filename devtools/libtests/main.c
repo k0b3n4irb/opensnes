@@ -46,16 +46,16 @@ u16 r_anim_cont;    /* play A, tick x3 (frame 1), play A again (no-op),
                      * tick -> still frame 1 value 20 (continue-if-same) */
 u16 r_anim_stop;    /* tick on a zero-init player -> ANIM_NONE (0xFFFF) */
 
-/* --- compiler bug repro: u8 RMW through a pointer, then re-read ---
- * `p->f--; if (p->f == 0)` miscompiles (the post-store re-read goes
- * through an address reloaded in 8-bit accumulator mode). Minimal pin:
- * decrement 3 from 2 -> the ==0 branch must be taken exactly once.
- * KNOWN_FAIL in test_libtest.py until the cc65816 issue is fixed. */
-/* Faithful skeleton of animTick's shape: indexed deref through a struct
+/* --- regression pin for opensnes#99 (FIXED): u8 RMW through a pointer,
+ * then re-read --- `p->f--; if (p->f == 0)` used to miscompile: the
+ * post-store re-read reloaded the address in 8-bit accumulator mode
+ * (stale high byte). Minimal pin: decrement 3 from 2 -> the ==0 branch
+ * must be taken exactly once. A normal PASS vector since the qbe fix.
+ * Faithful skeleton of animTick's shape: indexed deref through a struct
  * pointer field, an 8-bit flag test, then the u8 RMW + re-read.
  * CRITICAL trigger: the probe struct must live on the STACK ($01xx) —
- * the bad reload only corrupts the address high byte, so a zero-page
- * static ($00xx) masks the bug. */
+ * the bad reload only corrupted the address high byte, so a zero-page
+ * static ($00xx) masked the bug. */
 typedef struct { const u16 *tab; u8 idx; u8 cnt; u8 fl; u8 rsv; } RmwProbe;
 static const u16 rmw_tab[3] = { 100, 200, 300 };
 static u16 rmw_step(RmwProbe *q) {
