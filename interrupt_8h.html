@@ -129,6 +129,13 @@ $(function(){initNavTree('interrupt_8h.html','',''); });
 </div>
 <p><a href="interrupt_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:aaece8b46f8a1058e500a960282748b8e" id="r_aaece8b46f8a1058e500a960282748b8e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aaece8b46f8a1058e500a960282748b8e">IRQ_HTIMER</a>&#160;&#160;&#160;0x10</td></tr>
+<tr class="memdesc:aaece8b46f8a1058e500a960282748b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fire an IRQ when the H counter reaches the HTIME value (every scanline).  <br /></td></tr>
+<tr class="memitem:a947b19bbddfaa5c9b41960ba1027bae9" id="r_a947b19bbddfaa5c9b41960ba1027bae9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a947b19bbddfaa5c9b41960ba1027bae9">IRQ_VTIMER</a>&#160;&#160;&#160;0x20</td></tr>
+<tr class="memdesc:a947b19bbddfaa5c9b41960ba1027bae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fire an IRQ when the V counter reaches the VTIME value (once per frame).  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:aa38e3794779028b8480958ff866d102b" id="r_aa38e3794779028b8480958ff866d102b"><td class="memItemLeft">typedef void(*&#160;</td><td class="memItemRight"><a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a>) (void)</td></tr>
@@ -136,6 +143,20 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:abb372cb6d422bba46803658ccce77f42" id="r_abb372cb6d422bba46803658ccce77f42"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#abb372cb6d422bba46803658ccce77f42">irqClear</a> (void)</td></tr>
+<tr class="memdesc:abb372cb6d422bba46803658ccce77f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restore the default IRQ handler (acknowledge + return).  <br /></td></tr>
+<tr class="memitem:a7824431e7a255f980b881a0e29773a1a" id="r_a7824431e7a255f980b881a0e29773a1a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7824431e7a255f980b881a0e29773a1a">irqDisable</a> (void)</td></tr>
+<tr class="memdesc:a7824431e7a255f980b881a0e29773a1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable H/V timer IRQs.  <br /></td></tr>
+<tr class="memitem:ada4c1ec4449e797d007bd17766156e9f" id="r_ada4c1ec4449e797d007bd17766156e9f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ada4c1ec4449e797d007bd17766156e9f">irqEnable</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flags)</td></tr>
+<tr class="memdesc:ada4c1ec4449e797d007bd17766156e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable H/V timer IRQs and unmask interrupts (CLI).  <br /></td></tr>
+<tr class="memitem:a69f348e722cc5916ff3b4007eadcc928" id="r_a69f348e722cc5916ff3b4007eadcc928"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928">irqSet</a> (void *handler)</td></tr>
+<tr class="memdesc:a69f348e722cc5916ff3b4007eadcc928"><td class="mdescLeft">&#160;</td><td class="mdescRight">Install a raw hardware IRQ handler (H/V timer interrupts).  <br /></td></tr>
+<tr class="memitem:ae06802aa2d547c5c1481fd24b5fd5785" id="r_ae06802aa2d547c5c1481fd24b5fd5785"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae06802aa2d547c5c1481fd24b5fd5785">irqSetBank</a> (void *handler, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank)</td></tr>
+<tr class="memdesc:ae06802aa2d547c5c1481fd24b5fd5785"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> with an explicit ROM bank for the handler  <br /></td></tr>
+<tr class="memitem:a979596926059d6d8cab64e9b719a7df9" id="r_a979596926059d6d8cab64e9b719a7df9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a979596926059d6d8cab64e9b719a7df9">irqSetHTimer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> h)</td></tr>
+<tr class="memdesc:a979596926059d6d8cab64e9b719a7df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the H-timer target (0-339 dots).  <br /></td></tr>
+<tr class="memitem:a1579b3231b62226f9bf5ba4077660409" id="r_a1579b3231b62226f9bf5ba4077660409"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1579b3231b62226f9bf5ba4077660409">irqSetVTimer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> v)</td></tr>
+<tr class="memdesc:a1579b3231b62226f9bf5ba4077660409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the V-timer target (0-261 scanlines NTSC).  <br /></td></tr>
 <tr class="memitem:a4a0a4690d2c70b58584eed95377325a1" id="r_a4a0a4690d2c70b58584eed95377325a1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4a0a4690d2c70b58584eed95377325a1">nmiClear</a> (void)</td></tr>
 <tr class="memdesc:a4a0a4690d2c70b58584eed95377325a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the VBlank callback.  <br /></td></tr>
 <tr class="memitem:a54a7e26f751984f6f3241ed2d2c5eda7" id="r_a54a7e26f751984f6f3241ed2d2c5eda7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7">nmiSet</a> (<a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a> callback)</td></tr>
@@ -148,7 +169,40 @@ Functions</h2></td></tr>
 <p>Manages NMI (VBlank), IRQ, and other interrupts.</p>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
-</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="aaece8b46f8a1058e500a960282748b8e" name="aaece8b46f8a1058e500a960282748b8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaece8b46f8a1058e500a960282748b8e">&#9670;&#160;</a></span>IRQ_HTIMER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IRQ_HTIMER&#160;&#160;&#160;0x10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fire an IRQ when the H counter reaches the HTIME value (every scanline). </p>
+
+</div>
+</div>
+<a id="a947b19bbddfaa5c9b41960ba1027bae9" name="a947b19bbddfaa5c9b41960ba1027bae9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a947b19bbddfaa5c9b41960ba1027bae9">&#9670;&#160;</a></span>IRQ_VTIMER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IRQ_VTIMER&#160;&#160;&#160;0x20</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fire an IRQ when the V counter reaches the VTIME value (once per frame). </p>
+
+</div>
+</div>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
 <a id="aa38e3794779028b8480958ff866d102b" name="aa38e3794779028b8480958ff866d102b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa38e3794779028b8480958ff866d102b">&#9670;&#160;</a></span>VBlankCallback</h2>
 
@@ -167,6 +221,176 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="abb372cb6d422bba46803658ccce77f42" name="abb372cb6d422bba46803658ccce77f42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb372cb6d422bba46803658ccce77f42">&#9670;&#160;</a></span>irqClear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqClear </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Restore the default IRQ handler (acknowledge + return). </p>
+
+</div>
+</div>
+<a id="a7824431e7a255f980b881a0e29773a1a" name="a7824431e7a255f980b881a0e29773a1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7824431e7a255f980b881a0e29773a1a">&#9670;&#160;</a></span>irqDisable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqDisable </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable H/V timer IRQs. </p>
+<p>Clears both timer bits in the NMITIMEN shadow. The I flag is left clear — with no timer source enabled, no IRQ can fire. </p>
+
+</div>
+</div>
+<a id="ada4c1ec4449e797d007bd17766156e9f" name="ada4c1ec4449e797d007bd17766156e9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada4c1ec4449e797d007bd17766156e9f">&#9670;&#160;</a></span>irqEnable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqEnable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>flags</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable H/V timer IRQs and unmask interrupts (CLI). </p>
+<p>Sets the requested timer bits in the NMITIMEN shadow (NMI and auto-joypad bits are preserved) and clears the CPU I flag. Install the handler with <a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> and program the timer with <a class="el" href="#a979596926059d6d8cab64e9b719a7df9" title="Set the H-timer target (0-339 dots).">irqSetHTimer()</a>/irqSetVTimer() BEFORE calling this.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">flags</td><td>IRQ_HTIMER, IRQ_VTIMER, or both </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a69f348e722cc5916ff3b4007eadcc928" name="a69f348e722cc5916ff3b4007eadcc928"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69f348e722cc5916ff3b4007eadcc928">&#9670;&#160;</a></span>irqSet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqSet </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>handler</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Install a raw hardware IRQ handler (H/V timer interrupts). </p>
+<p>The crt0 IRQ vector does a single <span class="tt">JML [irq_callback]</span> into your handler — nothing is saved, acknowledged, or set up for you. This is deliberate: an H-timer IRQ fires EVERY SCANLINE (~15.7 kHz) and cannot afford a C prologue, so the SDK imposes zero overhead and zero policy.</p>
+<dl class="section warning"><dt>Warning</dt><dd>ASM handlers only. The handler contract:<ul>
+<li>Save and restore every register it touches (A/X/Y, DP, DBR — the interrupted code is arbitrary C). P is restored by RTI automatically.</li>
+<li>Read REG_TIMEUP ($4211) to acknowledge the IRQ, or it re-fires forever.</li>
+<li>Return with <span class="tt">rti</span>.</li>
+<li>After any <span class="tt">rep</span>/<span class="tt">sep</span>, add explicit <span class="tt">.ACCU</span>/<span class="tt">.INDEX</span> directives (WLA-DX tracking rule). A C function pointer passed here WILL corrupt the main thread — cc65816 C prologues assume the tcc register file, which the raw vector does not bank-switch (unlike the NMI path's DP isolation).</li>
+</ul>
+</dd>
+<dd>
+A handler that fires general DMA owns that channel: don't call lib DMA helpers (dmaCopyVram etc.) from the main loop while such a handler is armed — the channel registers are shared state.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handler</td><td>Address of the ASM handler (see examples/graphics/effects/ hicolor_1792/irq_stream.asm for the canonical shape) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae06802aa2d547c5c1481fd24b5fd5785" name="ae06802aa2d547c5c1481fd24b5fd5785"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae06802aa2d547c5c1481fd24b5fd5785">&#9670;&#160;</a></span>irqSetBank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqSetBank </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>handler</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>bank</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> with an explicit ROM bank for the handler </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handler</td><td>Address of the ASM handler </td></tr>
+    <tr><td class="paramname">bank</td><td>ROM bank containing the handler </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a979596926059d6d8cab64e9b719a7df9" name="a979596926059d6d8cab64e9b719a7df9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a979596926059d6d8cab64e9b719a7df9">&#9670;&#160;</a></span>irqSetHTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqSetHTimer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>h</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the H-timer target (0-339 dots). </p>
+<p>With IRQ_HTIMER enabled, the IRQ fires at this horizontal position on every scanline. Values near the end of the visible line (e.g. 190) let a short handler's PPU writes land in H-blank. </p>
+
+</div>
+</div>
+<a id="a1579b3231b62226f9bf5ba4077660409" name="a1579b3231b62226f9bf5ba4077660409"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1579b3231b62226f9bf5ba4077660409">&#9670;&#160;</a></span>irqSetVTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void irqSetVTimer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>v</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the V-timer target (0-261 scanlines NTSC). </p>
+<p>With IRQ_VTIMER enabled, the IRQ fires once per frame at this scanline (combined with IRQ_HTIMER: at that exact H/V position). </p>
+
+</div>
+</div>
 <a id="a4a0a4690d2c70b58584eed95377325a1" name="a4a0a4690d2c70b58584eed95377325a1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a0a4690d2c70b58584eed95377325a1">&#9670;&#160;</a></span>nmiClear()</h2>
 

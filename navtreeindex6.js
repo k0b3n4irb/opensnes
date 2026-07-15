@@ -1,5 +1,14 @@
 var NAVTREEINDEX6 =
 {
+"memory_2superfx__hello_2main_8c.html":[2,11,60],
+"memory_map.html":[0,35],
+"mode7_8h.html":[4,0,2,0,0,17],
+"mode7_8h.html#a0c468d883ece574391e63d990e082aa7":[4,0,2,0,0,17,3],
+"mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0":[4,0,2,0,0,17,8],
+"mode7_8h.html#a37acc01b1081f2d4da881f270149cf66":[4,0,2,0,0,17,10],
+"mode7_8h.html#a42a1485d7600874477a6805a9567a32d":[4,0,2,0,0,17,4],
+"mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310":[4,0,2,0,0,17,12],
+"mode7_8h.html#a5fdfa5a6feaf4eb76c6b9a02535fb890":[4,0,2,0,0,17,13],
 "mode7_8h.html#a6063eb2e9a238110cd87ee75221fb9b4":[4,0,2,0,0,17,14],
 "mode7_8h.html#a606b68a9ff05a4c930d30640277a4668":[4,0,2,0,0,17,11],
 "mode7_8h.html#a7faf52e08e105b3ad83b5c79c01603ef":[4,0,2,0,0,17,6],
@@ -240,14 +249,5 @@ var NAVTREEINDEX6 =
 "sa1_8h.html#af54436bf39e48e4259410121a6a6720f":[4,0,2,0,0,22,19],
 "sa1_8h.html#af8379b63cad513bbdc7c5b7b97fc6338":[4,0,2,0,0,22,12],
 "sa1_8h.html#afbde8860c749cfb87af677fb5cacc2f0":[4,0,2,0,0,22,0],
-"sa1_8h_source.html":[4,0,2,0,0,22],
-"scene_8h.html":[4,0,2,0,0,23],
-"scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b":[4,0,2,0,0,23,4],
-"scene_8h.html#a437432b9f2edd6543cedc3053889fe1a":[4,0,2,0,0,23,1],
-"scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564":[4,0,2,0,0,23,2],
-"scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6":[4,0,2,0,0,23,3],
-"scene_8h_source.html":[4,0,2,0,0,23],
-"snes_8h.html":[4,0,2,0,1],
-"snes_8h.html#a409c167562806a982baffc275742c677":[4,0,2,0,1,3],
-"snes_8h.html#a52dcd00f96e302db0233afedf45d42d3":[4,0,2,0,1,0]
+"sa1_8h_source.html":[4,0,2,0,0,22]
 };

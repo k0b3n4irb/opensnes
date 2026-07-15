@@ -1,20 +1,20 @@
 var examples_input =
 [
     [ "Controller Input", "examples_input_controller.html", [
-      [ "Examples", "examples_input.html#autotoc_md1332", null ],
-      [ "Key Concepts", "examples_input.html#autotoc_md1333", [
-        [ "Joypad Bit Layout", "examples_input.html#autotoc_md1334", null ],
-        [ "Edge Detection Pattern", "examples_input.html#autotoc_md1335", null ],
-        [ "Input Devices", "examples_input.html#autotoc_md1336", null ],
-        [ "What You'll Learn", "examples_input_controller.html#autotoc_md1310", null ],
-        [ "Controls", "examples_input_controller.html#autotoc_md1311", null ],
-        [ "SNES Concepts", "examples_input_controller.html#autotoc_md1312", [
-          [ "How Input Works on the SNES", "examples_input_controller.html#autotoc_md1313", null ],
-          [ "padHeld vs padPressed", "examples_input_controller.html#autotoc_md1314", null ],
-          [ "Button Bitmask", "examples_input_controller.html#autotoc_md1315", null ]
+      [ "Examples", "examples_input.html#autotoc_md1375", null ],
+      [ "Key Concepts", "examples_input.html#autotoc_md1376", [
+        [ "Joypad Bit Layout", "examples_input.html#autotoc_md1377", null ],
+        [ "Edge Detection Pattern", "examples_input.html#autotoc_md1378", null ],
+        [ "Input Devices", "examples_input.html#autotoc_md1379", null ],
+        [ "What You'll Learn", "examples_input_controller.html#autotoc_md1353", null ],
+        [ "Controls", "examples_input_controller.html#autotoc_md1354", null ],
+        [ "SNES Concepts", "examples_input_controller.html#autotoc_md1355", [
+          [ "How Input Works on the SNES", "examples_input_controller.html#autotoc_md1356", null ],
+          [ "padHeld vs padPressed", "examples_input_controller.html#autotoc_md1357", null ],
+          [ "Button Bitmask", "examples_input_controller.html#autotoc_md1358", null ]
         ] ],
-        [ "Modules Used", "examples_input_controller.html#autotoc_md1316", null ],
-        [ "Build &amp; Run", "examples_input_controller.html#autotoc_md1317", null ]
+        [ "Modules Used", "examples_input_controller.html#autotoc_md1359", null ],
+        [ "Build &amp; Run", "examples_input_controller.html#autotoc_md1360", null ]
       ] ]
     ] ],
     [ "SNES Mouse", "examples_input_mouse.html", null ],

@@ -18,9 +18,10 @@ var searchData=
   ['boardlockpiece_15',['boardLockPiece',['../board_8c.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c'],['../board_8h.html#a7be9c7c84fda2aea89b072ce4c88c0ca',1,'boardLockPiece(u8 type, u8 rot, s8 row, s8 col):&#160;board.c']]],
   ['boardremovelines_16',['boardRemoveLines',['../board_8c.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c'],['../board_8h.html#afd8482c028475d73af8bde2a897c0fdb',1,'boardRemoveLines(LineClearResult *result):&#160;board.c']]],
   ['buildedges_17',['buildEdges',['../graphics_2effects_2superfx__3d_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00',1,'main.c']]],
-  ['bullet_5ffire_18',['bullet_fire',['../games_2shmup__1942_2main_8c.html#a9a56b8c79dce3512a930237c147e27d2',1,'main.c']]],
-  ['bullet_5fhide_19',['bullet_hide',['../games_2shmup__1942_2main_8c.html#ae77ccc6c7f44ffa926b7ca3ff0bb1888',1,'main.c']]],
-  ['bullets_5finit_20',['bullets_init',['../games_2shmup__1942_2main_8c.html#a1bc50634ba8cb3daf0e573936da61d13',1,'main.c']]],
-  ['bullets_5frender_21',['bullets_render',['../games_2shmup__1942_2main_8c.html#a130d46bc8814527c43630807fd70cf92',1,'main.c']]],
-  ['bullets_5fupdate_22',['bullets_update',['../games_2shmup__1942_2main_8c.html#ab2ea1aafd7d5a6283af67b3db431d88d',1,'main.c']]]
+  ['buildtilemap_18',['buildTilemap',['../graphics_2effects_2hicolor__1792_2main_8c.html#a0fe0fc52c8cfb28a22393505a74c8669',1,'main.c']]],
+  ['bullet_5ffire_19',['bullet_fire',['../games_2shmup__1942_2main_8c.html#a9a56b8c79dce3512a930237c147e27d2',1,'main.c']]],
+  ['bullet_5fhide_20',['bullet_hide',['../games_2shmup__1942_2main_8c.html#ae77ccc6c7f44ffa926b7ca3ff0bb1888',1,'main.c']]],
+  ['bullets_5finit_21',['bullets_init',['../games_2shmup__1942_2main_8c.html#a1bc50634ba8cb3daf0e573936da61d13',1,'main.c']]],
+  ['bullets_5frender_22',['bullets_render',['../games_2shmup__1942_2main_8c.html#a130d46bc8814527c43630807fd70cf92',1,'main.c']]],
+  ['bullets_5fupdate_23',['bullets_update',['../games_2shmup__1942_2main_8c.html#ab2ea1aafd7d5a6283af67b3db431d88d',1,'main.c']]]
 ];

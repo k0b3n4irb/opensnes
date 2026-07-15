@@ -13,6 +13,7 @@ var searchData=
   ['all_5fshapes_10',['all_shapes',['../piece_8c.html#a38b764f5e51ebf2b31492e409379edae',1,'piece.c']]],
   ['amp_5fidx_11',['amp_idx',['../graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6',1,'main.c']]],
   ['amp_5foffsets_12',['amp_offsets',['../graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08',1,'main.c']]],
-  ['animating_13',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
-  ['attr_14',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
+  ['angle_13',['angle',['../graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3',1,'main.c']]],
+  ['animating_14',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
+  ['attr_15',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
 ];

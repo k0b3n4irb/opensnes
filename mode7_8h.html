@@ -148,7 +148,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab0ab87a9cdbf57823ba802fb068c5cbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize Mode 7.  <br /></td></tr>
 <tr class="memitem:a7faf52e08e105b3ad83b5c79c01603ef" id="r_a7faf52e08e105b3ad83b5c79c01603ef"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7faf52e08e105b3ad83b5c79c01603ef">mode7Rotate</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> degrees)</td></tr>
 <tr class="memdesc:a7faf52e08e105b3ad83b5c79c01603ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set rotation in degrees (0-359).  <br /></td></tr>
-<tr class="memitem:aa09e1447cada89498932411fc81452fe" id="r_aa09e1447cada89498932411fc81452fe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> angle)</td></tr>
+<tr class="memitem:aa09e1447cada89498932411fc81452fe" id="r_aa09e1447cada89498932411fc81452fe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>)</td></tr>
 <tr class="memdesc:aa09e1447cada89498932411fc81452fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 rotation angle.  <br /></td></tr>
 <tr class="memitem:a2ebd44e45d6c3a6c754115fc750aa3f0" id="r_a2ebd44e45d6c3a6c754115fc750aa3f0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ebd44e45d6c3a6c754115fc750aa3f0">mode7SetCenter</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
 <tr class="memdesc:a2ebd44e45d6c3a6c754115fc750aa3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 center point.  <br /></td></tr>
@@ -179,15 +179,16 @@ Usage</h2>
 <div class="line"><a class="code hl_function" href="#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(0x0100, 0x0100);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set rotation angle (0-255, where 256 = 360 degrees)</span></div>
-<div class="line"><a class="code hl_function" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(angle);</div>
+<div class="line"><a class="code hl_function" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// In main loop</span></div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    angle++;</div>
-<div class="line">    <a class="code hl_function" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(angle);</div>
+<div class="line">    <a class="code hl_variable" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>++;</div>
+<div class="line">    <a class="code hl_function" href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
+<div class="ttc" id="agraphics_2effects_2mode7__perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Rotation step index, 0..47.</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
 <div class="ttc" id="amode7_8h_html_a606b68a9ff05a4c930d30640277a4668"><div class="ttname"><a href="#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a></div><div class="ttdeci">void mode7SetScale(u16 scale_x, u16 scale_y)</div><div class="ttdoc">Set Mode 7 scale factors.</div></div>
 <div class="ttc" id="amode7_8h_html_aa09e1447cada89498932411fc81452fe"><div class="ttname"><a href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a></div><div class="ttdeci">void mode7SetAngle(u8 angle)</div><div class="ttdoc">Set Mode 7 rotation angle.</div></div>
 <div class="ttc" id="amode7_8h_html_ab0ab87a9cdbf57823ba802fb068c5cbc"><div class="ttname"><a href="#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a></div><div class="ttdeci">void mode7Init(void)</div><div class="ttdoc">Initialize Mode 7.</div></div>
@@ -360,7 +361,7 @@ Mode 7 VRAM Layout</h2>
 <p>Sets the rotation angle and recalculates the transformation matrix. The angle is 0-255 where 256 would equal 360 degrees (wraps at 256).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">angle</td><td>Rotation angle (0-255)</td></tr>
+    <tr><td class="paramname"><a class="el" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Rotation step index, 0..47.">angle</a></td><td>Rotation angle (0-255)</td></tr>
   </table>
   </dd>
 </dl>

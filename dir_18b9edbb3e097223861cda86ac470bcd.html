@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/maps/dynamic_map/maputil.c File Reference</title>
+<title>/home/runner/work/opensnes/opensnes/examples/graphics/effects/window_multi_hdma Directory Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -93,7 +93,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('maputil_8c.html','',''); });
+$(function(){initNavTree('dir_18b9edbb3e097223861cda86ac470bcd.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -119,91 +119,15 @@ $(function(){initNavTree('maputil_8c.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">maputil.c File Reference</div></div>
+  <div class="headertitle"><div class="title">window_multi_hdma Directory Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &quot;<a class="el" href="maputil_8h_source.html">maputil.h</a>&quot;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a71f556cd57ca17ce8222f9666d6604e6" id="r_a71f556cd57ca17ce8222f9666d6604e6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a71f556cd57ca17ce8222f9666d6604e6">screenRefresh</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
-<tr class="memitem:aa8781301696bbcd02606a211625e2f8a" id="r_aa8781301696bbcd02606a211625e2f8a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa8781301696bbcd02606a211625e2f8a">screenRefreshTile</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tile, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
-<tr class="memitem:a917e20f94898d50947290c35e5612d6e" id="r_a917e20f94898d50947290c35e5612d6e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a917e20f94898d50947290c35e5612d6e">smapDma</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_offset, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_count)</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-files" class="groupheader"><a id="files" name="files"></a>
+Files</h2></td></tr>
+<tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft"><span class="icondoc"><div class="doc-icon"></div></span>&#160;</td><td class="memItemRight"><a class="el" href="graphics_2effects_2window__multi__hdma_2main_8c.html">main.c</a></td></tr>
+<tr class="memdesc:graphics_2effects_2window__multi__hdma_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-window HDMA — both windows' edges driven per scanline. <br /></td></tr>
 </table>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a71f556cd57ca17ce8222f9666d6604e6" name="a71f556cd57ca17ce8222f9666d6604e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71f556cd57ca17ce8222f9666d6604e6">&#9670;&#160;</a></span>screenRefresh()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void screenRefresh </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>address</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa8781301696bbcd02606a211625e2f8a" name="aa8781301696bbcd02606a211625e2f8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8781301696bbcd02606a211625e2f8a">&#9670;&#160;</a></span>screenRefreshTile()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void screenRefreshTile </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>tile</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>address</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a917e20f94898d50947290c35e5612d6e" name="a917e20f94898d50947290c35e5612d6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a917e20f94898d50947290c35e5612d6e">&#9670;&#160;</a></span>smapDma()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void smapDma </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_offset</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vram_addr</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_count</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
@@ -217,7 +141,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_5721716b92c86ca26c00feff56bdae2a.html">maps</a></li><li class="navelem"><a href="dir_7a9ea5e86e7276e47e8cf5c9cdcd4aac.html">dynamic_map</a></li><li class="navelem"><a href="maputil_8c.html">maputil.c</a></li>
+    <li class="navelem"><a href="dir_d28a4824dc47e487b107a5db32ef43c4.html">examples</a></li><li class="navelem"><a href="dir_4251b06da62033b8d905b2cbf64b4698.html">graphics</a></li><li class="navelem"><a href="dir_9910001127f52aec6dc16161e58b246f.html">effects</a></li><li class="navelem"><a href="dir_18b9edbb3e097223861cda86ac470bcd.html">window_multi_hdma</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

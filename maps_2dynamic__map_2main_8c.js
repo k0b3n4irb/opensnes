@@ -1,7 +1,6 @@
 var maps_2dynamic__map_2main_8c =
 [
     [ "FONT_TILE_OFFSET", "maps_2dynamic__map_2main_8c.html#a0b47bfbb9b7441e6917d8b5fbaca6dc0", null ],
-    [ "SPRITE_EMPTY", "maps_2dynamic__map_2main_8c.html#aba839c10f6b6b3c7f4d000c0701fff6c", null ],
     [ "SPRITE_GARGOYLE", "maps_2dynamic__map_2main_8c.html#a9aaa6ccc6e62fad36ea1b4448e58565d", null ],
     [ "SPRITE_ROCKFORD", "maps_2dynamic__map_2main_8c.html#acc0379dc42a2a5e3cba577361b96776c", null ],
     [ "VRAM_BG2_GFX", "maps_2dynamic__map_2main_8c.html#aba14270cc3cca97712782e0ed46263be", null ],
@@ -14,12 +13,10 @@ var maps_2dynamic__map_2main_8c =
     [ "initDemoMap32x32", "maps_2dynamic__map_2main_8c.html#a654d38d017c0c89fe361aa787dfcc0a5", null ],
     [ "initDemoMap64x64", "maps_2dynamic__map_2main_8c.html#a9f6bc00b38bcfe94d921eed5e1c10c76", null ],
     [ "main", "maps_2dynamic__map_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "smapClear", "maps_2dynamic__map_2main_8c.html#a3c13d72fbe5aca196252d3046d42c7fd", null ],
     [ "smapDma", "maps_2dynamic__map_2main_8c.html#a917e20f94898d50947290c35e5612d6e", null ],
     [ "is_map32x32", "maps_2dynamic__map_2main_8c.html#aee4468215190b975dc2661b09e698851", null ],
     [ "max_scroll_height", "maps_2dynamic__map_2main_8c.html#a799e60ce2f39f87a4e9712520da582fd", null ],
     [ "max_scroll_width", "maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b", null ],
-    [ "number_of_sprites", "maps_2dynamic__map_2main_8c.html#a1f3dfe8a6f0f44464cf7312eec68c86c", null ],
     [ "palsprite16", "maps_2dynamic__map_2main_8c.html#acbf1453a7b5b29c674fe5ad6b95038af", null ],
     [ "palsprite16_64x64", "maps_2dynamic__map_2main_8c.html#a439390c51be79ec9a36a644fcbe10039", null ],
     [ "palsprite16_64x64_end", "maps_2dynamic__map_2main_8c.html#af9dd4bc41fb916ae544b72541d912eb0", null ],

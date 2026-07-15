@@ -21,5 +21,9 @@ var video_8h =
     [ "setColor", "video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c", null ],
     [ "setMainScreen", "video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d", null ],
     [ "setSubScreen", "video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe", null ],
-    [ "setMode", "video_8h.html#ad89d023577743a32d3407027e535b0ff", null ]
+    [ "setMode", "video_8h.html#ad89d023577743a32d3407027e535b0ff", null ],
+    [ "videoSetInterlace", "video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c", null ],
+    [ "videoSetObjInterlace", "video_8h.html#a542ceb7939e855fa5f34ee1484051e83", null ],
+    [ "videoSetOverscan", "video_8h.html#a8f0c88465ed48927d9f21656e404a96f", null ],
+    [ "videoSetPseudoHires", "video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73", null ]
 ];

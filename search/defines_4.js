@@ -11,5 +11,6 @@ var searchData=
   ['enemy_5fspawn_5fperiod_8',['ENEMY_SPAWN_PERIOD',['../games_2shmup__1942_2main_8c.html#a11fd0a97597f1c92c043d29d0da5b19f',1,'main.c']]],
   ['enemy_5fspeed_9',['ENEMY_SPEED',['../games_2shmup__1942_2main_8c.html#a918e3124d6f55628dce6a99d2a615be6',1,'main.c']]],
   ['enemy_5fsprite_10',['ENEMY_SPRITE',['../games_2shmup__1942_2main_8c.html#ae02b975d8407723ae67aca31bfa2195d',1,'main.c']]],
-  ['enemy_5ftile_11',['ENEMY_TILE',['../games_2shmup__1942_2main_8c.html#a1f2ab1965619eae03f45d35f987ae0a9',1,'main.c']]]
+  ['enemy_5ftile_11',['ENEMY_TILE',['../games_2shmup__1942_2main_8c.html#a1f2ab1965619eae03f45d35f987ae0a9',1,'main.c']]],
+  ['entry_5fbytes_12',['ENTRY_BYTES',['../graphics_2effects_2hdma__wave__table_2main_8c.html#ab4a96af1cf26126286b97851804254cf',1,'main.c']]]
 ];

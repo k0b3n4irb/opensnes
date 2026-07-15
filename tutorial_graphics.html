@@ -310,6 +310,15 @@ Using gfx4snes</h2>
 Example: Complete Background Setup</h2>
 <p>See <span class="tt">examples/graphics/effects/parallax_scrolling/</span> for a complete parallax scrolling example.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md202"></a>
+Hi-res and interlace (Modes 5/6, SETINI)</h2>
+<p>BG Mode 5 renders <b>512 horizontal pixels</b> (16x8 tiles, stored as 8x8 character pairs N/N+1); adding screen interlace (<span class="tt">videoSetInterlace(1)</span>, SETINI bit 0 through the lib's write-only shadow) doubles vertical to <b>448 lines</b>. Three traps, all demonstrated by <span class="tt">examples/graphics/effects/hires_text</span>:</p>
+<ol type="1">
+<li>Hi-res content displays through BOTH screens: <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_BG1)</a></span> AND <span class="tt"><a class="el" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe" title="Enable layers on the sub screen.">setSubScreen(LAYER_BG1)</a></span>, or odd columns stay blank.</li>
+<li>In interlace, tile texel rows map 1:1 to hi-res lines — a full-height page needs 56 tile rows (a 32x64 tilemap), not 28.</li>
+<li>On a modern LCD the alternating columns show as fringing; a period CRT blended them. The example's README has the full explainer.</li>
+</ol>
+<p><span class="tt"><a class="el" href="video_8h.html#a542ceb7939e855fa5f34ee1484051e83" title="Enable/disable sprite interlace (SETINI bit 1).">videoSetObjInterlace</a></span>, <span class="tt"><a class="el" href="video_8h.html#a8f0c88465ed48927d9f21656e404a96f" title="Enable/disable overscan (SETINI bit 2).">videoSetOverscan</a></span> and <span class="tt"><a class="el" href="video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73" title="Enable/disable pseudo-hires (SETINI bit 3).">videoSetPseudoHires</a></span> cover the other SETINI bits — overscan shrinks the VBlank DMA budget by ~15 lines, see the header warning.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md203"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_sprites.html" title="Sprites &amp; Animation Tutorial">Sprites &amp; Animation</a></li>

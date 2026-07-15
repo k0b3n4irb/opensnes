@@ -169,12 +169,18 @@ Macros</h2></td></tr>
 <tr class="memdesc:a12213bf95f16dc7f5c0bbb6d50eb9baf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: INIDISP brightness ($2100).  <br /></td></tr>
 <tr class="memitem:aa36d2b537ff8a8e55794746c8bca656a" id="r_aa36d2b537ff8a8e55794746c8bca656a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa36d2b537ff8a8e55794746c8bca656a">HDMA_DEST_M7A</a>&#160;&#160;&#160;0x1B</td></tr>
 <tr class="memdesc:aa36d2b537ff8a8e55794746c8bca656a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix A ($211B).  <br /></td></tr>
+<tr class="memitem:a3f1c8e8e24116c64c09540ee8990372e" id="r_a3f1c8e8e24116c64c09540ee8990372e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3f1c8e8e24116c64c09540ee8990372e">HDMA_DEST_M7B</a>&#160;&#160;&#160;0x1C</td></tr>
+<tr class="memdesc:a3f1c8e8e24116c64c09540ee8990372e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix B ($211C).  <br /></td></tr>
+<tr class="memitem:acab327cb78b597d1395bc5fbcac9c0dd" id="r_acab327cb78b597d1395bc5fbcac9c0dd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acab327cb78b597d1395bc5fbcac9c0dd">HDMA_DEST_M7C</a>&#160;&#160;&#160;0x1D</td></tr>
+<tr class="memdesc:acab327cb78b597d1395bc5fbcac9c0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix C ($211D).  <br /></td></tr>
+<tr class="memitem:adf7aaaf1182e265983a513b75584302a" id="r_adf7aaaf1182e265983a513b75584302a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#adf7aaaf1182e265983a513b75584302a">HDMA_DEST_M7D</a>&#160;&#160;&#160;0x1E</td></tr>
+<tr class="memdesc:adf7aaaf1182e265983a513b75584302a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix D ($211E).  <br /></td></tr>
 <tr class="memitem:ad92f713a4e3a27aa73b0f162a6f2f40b" id="r_ad92f713a4e3a27aa73b0f162a6f2f40b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad92f713a4e3a27aa73b0f162a6f2f40b">HDMA_DEST_WH0</a>&#160;&#160;&#160;0x26</td></tr>
 <tr class="memdesc:ad92f713a4e3a27aa73b0f162a6f2f40b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Window 1 left ($2126).  <br /></td></tr>
 <tr class="memitem:ad6ab1c05c8d7f89fde75617894d686e0" id="r_ad6ab1c05c8d7f89fde75617894d686e0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad6ab1c05c8d7f89fde75617894d686e0">HDMA_DEST_WH1</a>&#160;&#160;&#160;0x27</td></tr>
 <tr class="memdesc:ad6ab1c05c8d7f89fde75617894d686e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Window 1 right ($2127).  <br /></td></tr>
 <tr class="memitem:a6f06e1a32a25d66fbd9943315c4660da" id="r_a6f06e1a32a25d66fbd9943315c4660da"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6f06e1a32a25d66fbd9943315c4660da">HDMA_INDIRECT</a>&#160;&#160;&#160;0x40</td></tr>
-<tr class="memdesc:a6f06e1a32a25d66fbd9943315c4660da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indirect HDMA flag (OR with mode).  <br /></td></tr>
+<tr class="memdesc:a6f06e1a32a25d66fbd9943315c4660da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indirect HDMA flag (DMAP bit 6) — use <a class="el" href="#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a>.  <br /></td></tr>
 <tr class="memitem:a84c42564b2a8bb1f61d468e3df77e0c3" id="r_a84c42564b2a8bb1f61d468e3df77e0c3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memdesc:a84c42564b2a8bb1f61d468e3df77e0c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA mode: 1 register, 1 byte.  <br /></td></tr>
 <tr class="memitem:a6f1d39135eb520f43cadad7c6a2931bc" id="r_a6f1d39135eb520f43cadad7c6a2931bc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6f1d39135eb520f43cadad7c6a2931bc">HDMA_MODE_1REG_2X</a>&#160;&#160;&#160;0x02</td></tr>
@@ -218,6 +224,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:accfc69511911e1c0fdc59823c43c7a23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up an HDMA channel.  <br /></td></tr>
 <tr class="memitem:a79da757d3be21ef94b3e9a78b9cdf2f0" id="r_a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a79da757d3be21ef94b3e9a78b9cdf2f0">hdmaSetupBank</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, const void *table, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank)</td></tr>
 <tr class="memdesc:a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up an HDMA channel with explicit source bank byte.  <br /></td></tr>
+<tr class="memitem:a35d67e382ab2f45cb99ec5943d38d318" id="r_a35d67e382ab2f45cb99ec5943d38d318"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a35d67e382ab2f45cb99ec5943d38d318">hdmaSetupIndirect</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, const void *table, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dataBank)</td></tr>
+<tr class="memdesc:a35d67e382ab2f45cb99ec5943d38d318"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure an INDIRECT HDMA channel (table of pointers to data).  <br /></td></tr>
 <tr class="memitem:af4cd68c6a5535d13dd11fa4c487abbfe" id="r_af4cd68c6a5535d13dd11fa4c487abbfe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
 <tr class="memdesc:af4cd68c6a5535d13dd11fa4c487abbfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a water ripple distortion effect.  <br /></td></tr>
 <tr class="memitem:a2ef7d5f50fba237731cac30b5a3af241" id="r_a2ef7d5f50fba237731cac30b5a3af241"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frequency)</td></tr>
@@ -610,6 +618,54 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 
 </div>
 </div>
+<a id="a3f1c8e8e24116c64c09540ee8990372e" name="a3f1c8e8e24116c64c09540ee8990372e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f1c8e8e24116c64c09540ee8990372e">&#9670;&#160;</a></span>HDMA_DEST_M7B</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_M7B&#160;&#160;&#160;0x1C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: Mode 7 matrix B ($211C). </p>
+
+</div>
+</div>
+<a id="acab327cb78b597d1395bc5fbcac9c0dd" name="acab327cb78b597d1395bc5fbcac9c0dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acab327cb78b597d1395bc5fbcac9c0dd">&#9670;&#160;</a></span>HDMA_DEST_M7C</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_M7C&#160;&#160;&#160;0x1D</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: Mode 7 matrix C ($211D). </p>
+
+</div>
+</div>
+<a id="adf7aaaf1182e265983a513b75584302a" name="adf7aaaf1182e265983a513b75584302a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf7aaaf1182e265983a513b75584302a">&#9670;&#160;</a></span>HDMA_DEST_M7D</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_M7D&#160;&#160;&#160;0x1E</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: Mode 7 matrix D ($211E). </p>
+
+</div>
+</div>
 <a id="ad92f713a4e3a27aa73b0f162a6f2f40b" name="ad92f713a4e3a27aa73b0f162a6f2f40b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad92f713a4e3a27aa73b0f162a6f2f40b">&#9670;&#160;</a></span>HDMA_DEST_WH0</h2>
 
@@ -654,8 +710,9 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Indirect HDMA flag (OR with mode). </p>
-<p>When set, table contains pointers to data instead of data itself. Useful for large tables or dynamic data. </p>
+<p>Indirect HDMA flag (DMAP bit 6) — use <a class="el" href="#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a>. </p>
+<p>When set, the table contains [count][ptr16] entries whose pointers reference the actual data. Useful for large or dynamic per-line data (e.g. a full CGRAM gradient per scanline).</p>
+<dl class="section warning"><dt>Warning</dt><dd>Do NOT simply OR this into the mode of <a class="el" href="#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a>: indirect transfers also need the indirect DATA BANK register ($43x7), which plain hdmaSetup never programs — the pointers would dereference an unprogrammed bank. <a class="el" href="#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a> sets both the bit and $43x7. </dd></dl>
 
 </div>
 </div>
@@ -1222,7 +1279,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, <a class="code hl_define" href="#a84c42564b2a8bb1f61d468e3df77e0c3">HDMA_MODE_1REG</a>, <a class="code hl_define" href="#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a>, my_table);</div>
 <div class="line"><a class="code hl_function" href="#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(<a class="code hl_define" href="#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
-<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132).</div><div class="ttdef"><b>Definition</b> hdma.h:212</div></div>
+<div class="ttc" id="ahdma_8h_html_abd06fabf187b6275574809241b2aed81"><div class="ttname"><a href="#abd06fabf187b6275574809241b2aed81">HDMA_DEST_COLDATA</a></div><div class="ttdeci">#define HDMA_DEST_COLDATA</div><div class="ttdoc">Destination: Fixed color ($2132).</div><div class="ttdef"><b>Definition</b> hdma.h:218</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1269,6 +1326,56 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
     <tr><td class="paramname">destReg</td><td>Destination B-bus register (low byte of $21xx address) </td></tr>
     <tr><td class="paramname">table</td><td>Pointer to HDMA table in ROM or RAM </td></tr>
     <tr><td class="paramname">bank</td><td>Source bank byte ($00-$3F for LoROM) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a35d67e382ab2f45cb99ec5943d38d318" name="a35d67e382ab2f45cb99ec5943d38d318"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35d67e382ab2f45cb99ec5943d38d318">&#9670;&#160;</a></span>hdmaSetupIndirect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hdmaSetupIndirect </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>channel</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>destReg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *</td>          <td class="paramname"><span class="paramname"><em>table</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>dataBank</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Configure an INDIRECT HDMA channel (table of pointers to data). </p>
+<p>Table entries are [count][ptr_lo][ptr_hi]: each 16-bit pointer references <span class="tt">count</span> lines worth of data in <span class="tt">dataBank</span>. The INDIRECT bit is OR'd into <span class="tt">mode</span> internally — pass a plain HDMA_MODE_*. The table's own bank comes from the far pointer (any bank works); <span class="tt">dataBank</span> is the bank of the POINTED-TO data ($43x7).</p>
+<p>Classic use: per-scanline CGRAM reloads (HiColor-style gradients) — each table entry points at a block of palette data for that line.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">channel</td><td>HDMA channel (0-7) </td></tr>
+    <tr><td class="paramname">mode</td><td>Transfer pattern (HDMA_MODE_*, without HDMA_INDIRECT) </td></tr>
+    <tr><td class="paramname">destReg</td><td>Destination register (HDMA_DEST_*) </td></tr>
+    <tr><td class="paramname">table</td><td>Indirect table ([count][ptr16] entries + 0 terminator) </td></tr>
+    <tr><td class="paramname">dataBank</td><td>Bank byte of the data the pointers reference. For a C array, extract it from the far pointer: <span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)my_data &gt;&gt; 16)</span> (post-A6 pointers carry the bank in byte 2) — RAM arrays give 0. </td></tr>
   </table>
   </dd>
 </dl>

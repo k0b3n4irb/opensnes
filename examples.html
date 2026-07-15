@@ -122,8 +122,8 @@ $(function(){initNavTree('examples.html','',''); });
   <div class="headertitle"><div class="title">OpenSNES Examples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Learn SNES development step by step. 56 examples organized by topic, building from basic concepts to complete games.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1491"></a>
+<div class="textblock"><p>Learn SNES development step by step. 63 examples organized by topic, building from basic concepts to complete games.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1534"></a>
 Categories</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -133,7 +133,7 @@ Categories</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="basics/">basics/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="graphics/">graphics/</a>  </td><td class="markdownTableBodyNone">26  </td><td class="markdownTableBodyNone">Backgrounds, sprites, visual effects, Mode 7  </td></tr>
+<td class="markdownTableBodyNone"><a href="graphics/">graphics/</a>  </td><td class="markdownTableBodyNone">33  </td><td class="markdownTableBodyNone">Backgrounds, sprites, visual effects, Mode 7  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Joypads, mouse, Super Scope, multi-player  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -145,10 +145,10 @@ Categories</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1492"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1535"></a>
 Learning Path</h2>
 <p>A curated progression — it doesn't list every example. Use the category table above for the full set; anything not listed here is a variant or deep-dive of a step below.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1493"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1536"></a>
 Level 1 &ndash; First Steps</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -162,7 +162,7 @@ Level 1 &ndash; First Steps</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone"><a href="input/two_players/">input/two_players</a>  </td><td class="markdownTableBodyNone">Joypad reading, multiplayer input  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1494"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1537"></a>
 Level 2 &ndash; Graphics Fundamentals</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -184,7 +184,7 @@ Level 2 &ndash; Graphics Fundamentals</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">12  </td><td class="markdownTableBodyNone"><a href="graphics/effects/mosaic/">graphics/effects/mosaic</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1495"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1538"></a>
 Level 3 &ndash; Scrolling and Effects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -196,17 +196,31 @@ Level 3 &ndash; Scrolling and Effects</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">15  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hdma_wave/">graphics/effects/hdma_wave</a>  </td><td class="markdownTableBodyNone">HDMA scanline wave distortion  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15b  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hdma_wave_table/">graphics/effects/hdma_wave_table</a>  </td><td class="markdownTableBodyNone">Raw HDMA table built in C, krom-style repoint animation  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">15c  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hdma_indirect_gradient/">graphics/effects/hdma_indirect_gradient</a>  </td><td class="markdownTableBodyNone">Indirect HDMA: pointer table drives a backdrop gradient (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15d  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hicolor_1792/">graphics/effects/hicolor_1792</a>  </td><td class="markdownTableBodyNone">H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">15e  </td><td class="markdownTableBodyNone"><a href="graphics/effects/mode7_perspective_rotate/">graphics/effects/mode7_perspective_rotate</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix per scanline: rotating perspective (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15f  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hires_text/">graphics/effects/hires_text</a>  </td><td class="markdownTableBodyNone">BG Mode 5 + interlace: 512x448 hi-res text (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">15g  </td><td class="markdownTableBodyNone"><a href="graphics/effects/window_multi_hdma/">graphics/effects/window_multi_hdma</a>  </td><td class="markdownTableBodyNone">Both windows shaped per scanline: HDMA porthole grid (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15h  </td><td class="markdownTableBodyNone"><a href="graphics/effects/gradient_9bit/">graphics/effects/gradient_9bit</a>  </td><td class="markdownTableBodyNone">Brightness-dithered backdrop: the 9-bit color trick (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone"><a href="graphics/effects/gradient_colors/">graphics/effects/gradient_colors</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM color gradients  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">17  </td><td class="markdownTableBodyNone"><a href="graphics/effects/parallax_scrolling/">graphics/effects/parallax_scrolling</a>  </td><td class="markdownTableBodyNone">HDMA parallax scrolling  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparency/">graphics/effects/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="graphics/effects/window/">graphics/effects/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
+<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparency/">graphics/effects/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="graphics/effects/window/">graphics/effects/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparent_window/">graphics/effects/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1496"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1539"></a>
 Level 4 &ndash; Advanced Topics</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -230,7 +244,7 @@ Level 4 &ndash; Advanced Topics</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1497"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1540"></a>
 Level 5 &ndash; Maps and Complete Projects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -248,7 +262,7 @@ Level 5 &ndash; Maps and Complete Projects</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">35  </td><td class="markdownTableBodyNone"><a href="games/mapandobjects/">games/mapandobjects</a>  </td><td class="markdownTableBodyNone">Maps with interactive objects  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1498"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1541"></a>
 Building</h2>
 <div class="fragment"><div class="line"># Build all examples</div>
 <div class="line">cd opensnes</div>
@@ -259,12 +273,12 @@ Building</h2>
 <div class="line"> </div>
 <div class="line"># Clean and rebuild</div>
 <div class="line">make clean &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1499"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1542"></a>
 Running</h2>
 <p>We recommend <a href="https://github.com/SourMesen/Mesen2">Mesen2</a> for accurate SNES emulation:</p>
 <div class="fragment"><div class="line">mesen examples/text/hello_world/hello_world.sfc</div>
 </div><!-- fragment --><p>Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1500"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1543"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Follow the order</b> &ndash; each example builds on concepts from earlier ones</li>

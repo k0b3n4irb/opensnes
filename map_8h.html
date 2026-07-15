@@ -666,7 +666,9 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA.</dd>
+<dd>
+Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt"><a class="el" href="maps_2mapscroll_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72" title="Full level tilemap from tmx2snes.">mapdata</a>[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
 
 </div>
 </div>
@@ -739,10 +741,11 @@ Attribution</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="X positions for the four sprites displayed in a horizontal row.">xpos</a></td><td>X coordinate to focus on (in map pixels) </td></tr>
-    <tr><td class="paramname">ypos</td><td>Y coordinate to focus on (in map pixels) </td></tr>
+    <tr><td class="paramname">ypos</td><td>Y coordinate to focus on (in map pixels)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>Pass the position of the object to FOLLOW (typically the player, as in examples/maps/mapandobjects) — NOT a scroll/view origin. The view centers itself on the point with edge clamping; feeding it a view origin shifts the level by half a screen from where it was painted. </dd></dl>
 
 </div>
 </div>

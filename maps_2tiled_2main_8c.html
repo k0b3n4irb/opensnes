@@ -135,10 +135,10 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a227c68e862019565bec898cb08a1c38f" id="r_a227c68e862019565bec898cb08a1c38f"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a227c68e862019565bec898cb08a1c38f">focusx</a></td></tr>
+<tr class="memdesc:a227c68e862019565bec898cb08a1c38f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Focus-point X in map pixels — the point the camera FOLLOWS (your player's position), NOT a scroll origin. <a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a> centers the view on it with boundary clamping; passing a view origin here shifts the whole level by half a screen (see <a class="el" href="map_8h.html" title="Scrolling tilemap engine for Mode 1 backgrounds.">map.h</a>).  <br /></td></tr>
 <tr class="memitem:aa8892da899241eed696fcdcb7ccb6b72" id="r_aa8892da899241eed696fcdcb7ccb6b72"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa8892da899241eed696fcdcb7ccb6b72">mapdata</a> []</td></tr>
 <tr class="memdesc:aa8892da899241eed696fcdcb7ccb6b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16).  <br /></td></tr>
-<tr class="memitem:ad40dae39666d2dff6946413ed5f969c7" id="r_ad40dae39666d2dff6946413ed5f969c7"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad40dae39666d2dff6946413ed5f969c7">mapscx</a></td></tr>
-<tr class="memdesc:ad40dae39666d2dff6946413ed5f969c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Camera X position in map pixels. Controls which part of the level is visible.  <br /></td></tr>
 <tr class="memitem:a88074065e44bab6048421a86d5c2011a" id="r_a88074065e44bab6048421a86d5c2011a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a88074065e44bab6048421a86d5c2011a">tileset</a> []</td></tr>
 <tr class="memdesc:a88074065e44bab6048421a86d5c2011a"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tileset graphics (converted from tileslevel1.png)  <br /></td></tr>
 <tr class="memitem:a2ea3f462c860f7f0c35ae2204a43d598" id="r_a2ea3f462c860f7f0c35ae2204a43d598"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a> []</td></tr>
@@ -202,6 +202,22 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a227c68e862019565bec898cb08a1c38f" name="a227c68e862019565bec898cb08a1c38f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a227c68e862019565bec898cb08a1c38f">&#9670;&#160;</a></span>focusx</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> focusx</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Focus-point X in map pixels — the point the camera FOLLOWS (your player's position), NOT a scroll origin. <a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a> centers the view on it with boundary clamping; passing a view origin here shifts the whole level by half a screen (see <a class="el" href="map_8h.html" title="Scrolling tilemap engine for Mode 1 backgrounds.">map.h</a>). </p>
+
+</div>
+</div>
 <a id="aa8892da899241eed696fcdcb7ccb6b72" name="aa8892da899241eed696fcdcb7ccb6b72"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa8892da899241eed696fcdcb7ccb6b72">&#9670;&#160;</a></span>mapdata</h2>
 
@@ -223,22 +239,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16). </p>
-
-</div>
-</div>
-<a id="ad40dae39666d2dff6946413ed5f969c7" name="ad40dae39666d2dff6946413ed5f969c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad40dae39666d2dff6946413ed5f969c7">&#9670;&#160;</a></span>mapscx</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> mapscx</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Camera X position in map pixels. Controls which part of the level is visible. </p>
 
 </div>
 </div>
