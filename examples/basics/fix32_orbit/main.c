@@ -41,14 +41,16 @@
  *============================================================================*/
 
 static const u8 orbiter_tile[32] = {
-    /* Plane 0 (bit 0 of each pixel): all set */
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    /* Plane 1: clear */
-    0, 0, 0, 0, 0, 0, 0, 0,
-    /* Plane 2: clear */
-    0, 0, 0, 0, 0, 0, 0, 0,
-    /* Plane 3: clear */
-    0, 0, 0, 0, 0, 0, 0, 0,
+    /* SNES 4bpp tiles interleave planes PER ROW: bytes 0-15 are
+     * (row0 p0, row0 p1), (row1 p0, row1 p1), ...; bytes 16-31 are the
+     * same rows for planes 2-3. The original array laid the planes out
+     * consecutively (8 bytes each), which puts 0xFF into planes 0 AND 1
+     * of rows 0-3 -> palette colour 3 (black) on the top half and
+     * transparent on the bottom: an invisible sprite (#115). */
+    0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0,   /* rows 0-3: p0=FF, p1=0  */
+    0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0,   /* rows 4-7: p0=FF, p1=0  */
+    0, 0, 0, 0, 0, 0, 0, 0,               /* rows 0-3: p2=0,  p3=0  */
+    0, 0, 0, 0, 0, 0, 0, 0,               /* rows 4-7: p2=0,  p3=0  */
 };
 
 /* 4 bytes = 2 BGR555 colours.
@@ -88,10 +90,13 @@ int main(void) {
     dmaCopyVram((u8 *)orbiter_tile, 0x4000, sizeof orbiter_tile);
     dmaCopyCGram((u8 *)orbiter_pal, OBJ_CGRAM_BASE, sizeof orbiter_pal);
 
-    /* OBJSEL: sprite tile base at $4000 word-addr, small/large = 8x8 / 16x16. */
-    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, 0x4000);
-
-    oamInit(OBJ_SIZE8_L16, 1);
+    /* Sprite tile base at VRAM word $4000 = oamInit base index 4
+     * (each step is $2000 word addresses). The example shipped with
+     * index 1 ($1000) while the tile was DMA'd to $4000 — the sprite
+     * read blank VRAM and rendered fully transparent (#115: invisible
+     * since creation; the black baseline hid it). oamInit writes
+     * OBJSEL itself — no manual REG_OBJSEL needed. */
+    oamInit(OBJ_SIZE8_L16, 2);
     setMainScreen(LAYER_OBJ);
     setScreenOn();
 

@@ -170,4 +170,65 @@ void setMode(u8 mode, u8 flags);
     REG_CGDATA = (u8)(((color) >> 8) & 0xFF); \
 } while(0)
 
+/*============================================================================
+ * Screen Mode Extras — SETINI ($2133)
+ *============================================================================
+ * SETINI is write-only; all four setters compose their bit through a
+ * software shadow (same discipline as the NMITIMEN shadow), so they can
+ * be combined freely and never clobber each other.
+ *============================================================================*/
+
+/**
+ * @brief Enable/disable screen interlace (SETINI bit 0)
+ *
+ * With BG Mode 5/6 this doubles the vertical resolution to 448 visible
+ * lines (the PPU alternates odd/even fields). Modes 5/6 also render
+ * 512 pixels horizontally and use 16x8 tiles.
+ *
+ * @warning Hi-res/interlace content displays through BOTH screens: enable
+ *   the layer on the MAIN and SUB screen (`setMainScreen(LAYER_BG1);
+ *   setSubScreen(LAYER_BG1);`) or the odd columns/fields stay blank —
+ *   the classic Mode 5 trap.
+ *
+ * @param on 1 to enable, 0 to disable
+ */
+void videoSetInterlace(u8 on);
+
+/**
+ * @brief Enable/disable sprite interlace (SETINI bit 1)
+ *
+ * In interlace mode, sprites are halved vertically and rendered per
+ * field — doubles apparent sprite vertical resolution.
+ *
+ * @param on 1 to enable, 0 to disable
+ */
+void videoSetObjInterlace(u8 on);
+
+/**
+ * @brief Enable/disable overscan (SETINI bit 2)
+ *
+ * Extends the visible frame from 224 to 239 lines (PAL-style height on
+ * NTSC). VBlank starts at line 240 instead of 225 — the VBlank budget
+ * for DMA shrinks by ~15 lines.
+ *
+ * @warning The SDK's NMI handler assumes the standard 224-line frame
+ *   for its DMA budget guidance; with overscan on, heavy per-frame
+ *   VRAM transfers may no longer fit VBlank. The lib does not adjust
+ *   anything automatically.
+ *
+ * @param on 1 to enable, 0 to disable
+ */
+void videoSetOverscan(u8 on);
+
+/**
+ * @brief Enable/disable pseudo-hires (SETINI bit 3)
+ *
+ * Renders 512 horizontal pixels in ANY BG mode by alternating main and
+ * sub screen pixels — the poor man's Mode 5 (used for cross-fade blend
+ * effects). Configure the sub screen layers before enabling.
+ *
+ * @param on 1 to enable, 0 to disable
+ */
+void videoSetPseudoHires(u8 on);
+
 #endif /* OPENSNES_VIDEO_H */

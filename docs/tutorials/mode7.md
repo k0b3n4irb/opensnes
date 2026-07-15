@@ -350,3 +350,14 @@ perspective example consumes ~6 % of CPU during active display.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — VBlank DMA
   budget, bank `$00` overflow, and the runtime traps that bite Mode 7
   projects with large 8 bpp tilesets.
+
+## Per-scanline matrix: rotating perspective
+
+`graphics/backgrounds/mode7_perspective` drives M7A/M7D per line for the
+F-Zero ground; `graphics/effects/mode7_perspective_rotate` drives the FULL
+matrix — cos into M7A and M7D, sin/-sin into M7B/M7C — from 48 pre-built
+angle tables (entry = `trig(2*pi*a/48) * 20480 / scanline`, 8.8 fixed:
+the hyperbolic perspective divide). Four HDMA channels, one per register,
+repointed per frame with `hdmaSetup(ch, HDMA_MODE_1REG_2X,
+HDMA_DEST_M7A..D, table + angle * 673)`. The tables are machine-verified
+against the math by `devtools/m7ptables.py verify`.

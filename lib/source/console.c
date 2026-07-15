@@ -26,6 +26,11 @@ extern volatile u16 frame_count;
 extern volatile u8 nmi_callback[4];     /* 24-bit function pointer + padding (PVSnesLib compatible) */
 extern volatile u8 nmi_has_callback;    /* 0 = default no-op, 1 = user callback */
 extern void DefaultNmiCallback(void);  /* Default callback in crt0.asm */
+extern volatile u8 irq_callback[4];     /* 24-bit raw IRQ handler pointer + padding */
+extern volatile u8 nmitimen_shadow;     /* Software copy of write-only $4200 */
+extern void DefaultIrqHandler(void);   /* Default IRQ handler (ack+rti) in crt0.asm */
+extern void unmaskIrq(void);           /* ASM helper: CLI (crt0 boots with SEI) */
+extern void clearIrqFlag(void);        /* ASM helper: read $4211 to drop a pending IRQ */
 
 /*============================================================================
  * Static Variables
@@ -64,8 +69,14 @@ void consoleInit(void) {
     /* Set default brightness (screen still blanked) */
     current_brightness = 15;
 
-    /* Initialize random seed from hardware */
+    /* Initialize random seed from hardware.
+     * OPHCT/OPVCT are 2-read registers (low byte then high bit) with an
+     * internal read pointer per register. Reading each ONCE for entropy
+     * leaves both pointers mid-sequence, silently corrupting every later
+     * latch read (H-IRQ handlers, profileScanline). The STAT78 read that
+     * follows resets both pointers — it must stay AFTER the counter reads. */
     rand_seed = REG_OPHCT | (REG_OPVCT << 8);
+    rand_seed ^= REG_STAT78;
     if (rand_seed == 0) rand_seed = 0xACE1;
 
     /* Set up Mode 1 as default */
@@ -97,8 +108,11 @@ void consoleInit(void) {
         REG_CGDATA = 0;
     }
 
-    /* Enable NMI (VBlank interrupt) and auto-joypad read */
-    REG_NMITIMEN = NMITIMEN_NMI_ENABLE | NMITIMEN_JOY_ENABLE;
+    /* Enable NMI (VBlank interrupt) and auto-joypad read. consoleInit is a
+     * full console reset, so timer IRQ bits are deliberately dropped —
+     * resync the shadow rather than routing through it. */
+    nmitimen_shadow = NMITIMEN_NMI_ENABLE | NMITIMEN_JOY_ENABLE;
+    REG_NMITIMEN = nmitimen_shadow;
 }
 
 void consoleInitEx(u16 options) {
@@ -246,8 +260,9 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
     /* Clear NMI flag to prevent spurious interrupt */
     clearNmiFlag();
 
-    /* Re-enable NMI and auto-joypad */
-    REG_NMITIMEN = NMITIMEN_NMI_ENABLE | NMITIMEN_JOY_ENABLE;
+    /* Restore from the shadow — preserves any H/V timer IRQ bits enabled
+     * via irqEnable() instead of clobbering them with a literal. */
+    REG_NMITIMEN = nmitimen_shadow;
 }
 
 void nmiSet(VBlankCallback callback) {
@@ -261,3 +276,72 @@ void nmiClear(void) {
     nmiSetBank((VBlankCallback)DefaultNmiCallback, 0);
     nmi_has_callback = 0;
 }
+
+/*============================================================================
+ * Hardware IRQ (H/V timer) — see interrupt.h for the raw-handler contract
+ *============================================================================*/
+
+void irqSetBank(void *handler, u8 bank) {
+    /* Mask timer IRQ sources during the pointer write so a mid-update
+     * JML [irq_callback] can't read a half-written vector. NMI stays on. */
+    REG_NMITIMEN = nmitimen_shadow & (u8)~(IRQ_HTIMER | IRQ_VTIMER);
+
+    irq_callback[0] = (u16)handler & 0xFF;
+    irq_callback[1] = ((u16)handler >> 8) & 0xFF;
+    irq_callback[2] = bank;
+    irq_callback[3] = 0x00;
+
+    REG_NMITIMEN = nmitimen_shadow;
+}
+
+void irqSet(void *handler) {
+    /* cc65816 code lives in bank 0 by default; use irqSetBank otherwise. */
+    irqSetBank(handler, 0);
+}
+
+void irqClear(void) {
+    irqSetBank((void *)DefaultIrqHandler, 0);
+}
+
+void irqSetHTimer(u16 h) {
+    REG_HTIMEL = (u8)h;
+    REG_HTIMEH = (u8)(h >> 8);
+}
+
+void irqSetVTimer(u16 v) {
+    REG_VTIMEL = (u8)v;
+    REG_VTIMEH = (u8)(v >> 8);
+}
+
+void irqEnable(u8 flags) {
+    nmitimen_shadow = (nmitimen_shadow & (u8)~(IRQ_HTIMER | IRQ_VTIMER))
+                    | (flags & (IRQ_HTIMER | IRQ_VTIMER));
+    REG_NMITIMEN = nmitimen_shadow;
+    unmaskIrq(); /* crt0 boots with SEI; timer IRQs also need the I flag clear */
+}
+
+void irqDisable(void) {
+    nmitimen_shadow &= (u8)~(IRQ_HTIMER | IRQ_VTIMER);
+    REG_NMITIMEN = nmitimen_shadow;
+    /* Drop any already-latched timer IRQ so it can't fire one last time. */
+    clearIrqFlag();
+}
+
+/*============================================================================
+ * SETINI ($2133, write-only) — see video.h for the setter contracts
+ *============================================================================*/
+
+extern volatile u8 setini_shadow; /* crt0 sysvar, zeroed at boot */
+
+static void setiniWrite(u8 bit, u8 on) {
+    if (on)
+        setini_shadow |= bit;
+    else
+        setini_shadow &= (u8)~bit;
+    REG_SETINI = setini_shadow;
+}
+
+void videoSetInterlace(u8 on)    { setiniWrite(0x01, on); }
+void videoSetObjInterlace(u8 on) { setiniWrite(0x02, on); }
+void videoSetOverscan(u8 on)     { setiniWrite(0x04, on); }
+void videoSetPseudoHires(u8 on)  { setiniWrite(0x08, on); }

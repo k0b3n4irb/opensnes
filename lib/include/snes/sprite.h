@@ -272,9 +272,12 @@ extern t_sprites oambuffer[128];
  *
  * @param size       Sprite size mode (OBJ_SIZE_*; use OAM_DEFAULT_SIZE for
  *                   the standard 8×8/16×16 layout)
- * @param tile_base  VRAM tile-base index 0-7 (each step = $1000 word
- *                   addresses; use OAM_DEFAULT_TILE_BASE for tiles at
- *                   VRAM $0000)
+ * @param tile_base  VRAM tile-base index 0-7 in OBSEL name-base units —
+ *                   each step is $2000 WORD addresses (16 KB), so tiles
+ *                   DMA'd to word $4000 need index 2 (addr >> 13). The
+ *                   doc previously claimed $1000-word steps, which made
+ *                   fix32_orbit's sprite read blank VRAM (#115). Use
+ *                   OAM_DEFAULT_TILE_BASE for tiles at VRAM $0000.
  */
 void oamInit(u16 size, u16 tile_base);
 

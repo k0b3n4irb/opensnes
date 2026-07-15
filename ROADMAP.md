@@ -8,11 +8,11 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.29.1 (developing toward v0.30.0)
+## Current Status: post-v0.30.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 56
+produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 63
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -137,7 +137,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (56)
+### Examples (63)
 - **Text**: hello_world, text_test
 - **Sprites**: simple_sprite, animated_sprite, dynamic_sprite, dynamic_metasprite, metasprite, object_size
 - **Backgrounds**: mode0, mode1, mode1_bg3_priority, mode1_lz77, mode3, mode5, mode7, mode7_perspective, continuous_scroll, mixed_scroll
@@ -183,7 +183,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (56 / 56)
+- [x] Example READMEs with hardware explanations (63 / 63)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -220,7 +220,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows the 30 % improvement with data |
 | Migration guide PVSnesLib → OpenSNES | Not started | Smoothest adoption path for existing PVSnesLib users |
 | FAQ | Not started | Reduces support load |
-| `examples/maps/dynamic_map` cleanup | Not started | Last example with non-trivial dead-code (`convertC64Sprite`) |
+| `examples/maps/dynamic_map` cleanup | **Done (2026-07-12)** | Dead code removed: unused `maputil.c` TU, `getSprite*`/`updateSprite*`/`calculateSprite*` engine paths, `sram*` ASM helpers + 16 KB dead `$7F` RAMSECTION; stale C64-converter claims corrected |
 
 ### Nice-to-have
 
@@ -286,6 +286,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-07-09. Anchored claims (version, examples count, framework
+*Last updated: 2026-07-15. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

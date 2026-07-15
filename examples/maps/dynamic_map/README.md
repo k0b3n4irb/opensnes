@@ -1,6 +1,6 @@
 # Dynamic Map
 
-This example demonstrates a custom tilemap-based sprite engine that treats BG1 as a grid of 16x16 "sprites" (not OAM hardware sprites). Each sprite is composed of tilemap entries pointing to 8bpp tile data in VRAM, allowing you to place, move, and scroll dozens of graphical elements on a background layer. The example supports two map modes (32x32 and 64x64) and includes a C64-to-SNES sprite format converter, showing how retro formats can be adapted to SNES hardware.
+This example demonstrates a custom tilemap-based sprite engine that treats BG1 as a grid of 16x16 "sprites" (not OAM hardware sprites). Each sprite is composed of tilemap entries pointing to 8bpp tile data in VRAM, allowing you to place, move, and scroll dozens of graphical elements on a background layer. The example supports two map modes (32x32 and 64x64) and displays a C64 Boulder Dash Rockford sprite from a pre-computed SNES 8bpp planar array, uploaded to VRAM while the screen is on.
 
 ![Screenshot](screenshot.png)
 
@@ -10,7 +10,7 @@ This example demonstrates a custom tilemap-based sprite engine that treats BG1 a
 - How SNES tilemaps are organized as SC_64x64 (four 32x32 pages)
 - How to manage large RAM buffers in bank $7E extended WRAM via assembly helpers
 - How to perform safe VBlank DMA transfers using the 1-page-per-VBlank pattern
-- How to convert C64 sprite data to SNES 8bpp tile format
+- How 8bpp planar tile data is laid out, and how to upload tiles to VRAM during VBlank with the screen on
 
 ## SNES Concepts
 
@@ -24,7 +24,7 @@ An SC_64x64 tilemap consists of four 32x32 tile pages (8KB total). In memory, th
 
 ### Extended WRAM and Assembly Helpers
 
-The SNES has 128KB of WRAM at banks $7E-$7F. The compiler generates `sta.l $0000,x` which can only reach bank $00:$0000-$1FFF (8KB). To use the remaining WRAM, the tilemap buffer lives at $7E:$2000 and is accessed through assembly helper functions (`smapWrite`, `smapRead`, `smapDma`, `smapClear`) that set the correct bank byte.
+The SNES has 128KB of WRAM at banks $7E-$7F. The compiler generates `sta.l $0000,x` which can only reach bank $00:$0000-$1FFF (8KB). To use the remaining WRAM, the tilemap buffer lives at $7E:$2000 and is accessed through assembly helper functions (`smapWrite`, `smapClear`, `smapDma`) that set the correct bank byte.
 
 ### 1-Page-Per-VBlank DMA Pattern
 
@@ -38,7 +38,7 @@ The SNES PPU ignores VRAM writes during active display. VBlank provides roughly 
 | A      | Toggle between 32x32 and 64x64 map mode |
 | B      | Toggle scroll lock on/off |
 | X      | Place a random gargoyle sprite on the map |
-| Y      | Display a C64 Rockford sprite (Boulder Dash) converted to SNES format |
+| Y      | Display the C64 Boulder Dash Rockford sprite (pre-converted 8bpp data) |
 
 ## How It Works
 
@@ -77,20 +77,18 @@ smapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
 /* ... pages 2 and 3 */
 ```
 
-**4. C64 sprite conversion** -- The `convertC64Sprite()` function reads 2-bit C64 pixel data and repacks it into SNES 8bpp bitplane format (8 interleaved bitplanes per 8-pixel row, 4 tiles per 16x16 sprite).
+**4. Rockford sprite display** -- A 256-byte `rockford_8bpp[]` array holds the Boulder Dash character pre-converted to SNES 8bpp planar format (8 interleaved bitplanes per 8-pixel row, 4 tiles per 16x16 sprite); pressing Y DMAs it straight to VRAM during VBlank.
 
 ## Project Structure
 
 ```
 dynamic_map/
-├── main.c          — Main loop, controls, C64 converter, demo init
+├── main.c          — Main loop, controls, Rockford sprite data, demo init
 ├── map32x32.c      — 32x32 grid engine (8x8 tile mode, 4 tiles per sprite)
 ├── map32x32.h      — API for 32x32 mode
 ├── map64x64.c      — 64x64 grid engine (16x16 tile mode, 1 tile per sprite)
 ├── map64x64.h      — API for 64x64 mode
-├── maputil.c       — Screen refresh (tilemap DMA to VRAM)
-├── maputil.h       — Refresh API
-├── data.asm        — ROM data: 8bpp sprite tiles, palette, C64 sprite bytes
+├── data.asm        — ROM data: 8bpp sprite tiles and palettes
 ├── ram.asm         — Bank $7E/$7F RAM sections and assembly DMA helpers
 ├── Makefile        — Build configuration
 └── res/

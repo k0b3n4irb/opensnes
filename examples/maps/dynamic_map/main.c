@@ -10,12 +10,13 @@
  *
  * The tilemap buffer lives in bank $7E extended WRAM (above the 8KB
  * low-WRAM limit) and is accessed via assembly helpers (smapWrite,
- * smapRead, smapDma) because the compiler generates `sta.l $0000,x`
+ * smapClear, smapDma) because the compiler generates `sta.l $0000,x`
  * which always reads bank $00. Tilemap DMA to VRAM uses the 1-page-per-
  * VBlank pattern (2KB per frame) to avoid flicker.
  *
- * Also includes a C64-to-SNES 8bpp sprite format converter that
- * demonstrates bitplane interleaving for the SNES graphics format.
+ * Also displays a C64 Boulder Dash Rockford sprite from a pre-computed
+ * SNES 8bpp planar array, demonstrating direct VRAM tile upload while
+ * the screen is on.
  *
  * Port of the PVSnesLib DynamicMap example.
  *
@@ -24,7 +25,7 @@
  * - Extended WRAM ($7E:2000+) for large tilemap buffers
  * - SC_64x64 tilemap layout (4 nametable pages, 8KB total)
  * - 1-page-per-VBlank DMA pattern for flicker-free tilemap updates
- * - 8bpp bitplane format and C64-to-SNES pixel conversion
+ * - 8bpp planar tile format and direct VRAM tile upload
  * - 16x16 tile mode (BG1_TSIZE16x16) for 64x64 map variant
  *
  * @par What to Observe
@@ -32,7 +33,7 @@
  * - A = toggle between 32x32 and 64x64 map modes
  * - B = toggle scroll lock on/off
  * - X = place gargoyle sprites at random positions
- * - Y = display a converted C64 Boulder Dash Rockford sprite
+ * - Y = display the C64 Boulder Dash Rockford sprite
  * - D-pad = scroll the map (respects scroll lock bounds)
  *
  * @par Modules Used
@@ -42,15 +43,12 @@
  */
 
 #include <snes.h>
-#include "maputil.h"
 #include "map32x32.h"
 #include "map64x64.h"
 
-/** @brief Tile index for an empty (cleared) cell in the sprite map */
-#define SPRITE_EMPTY    0
 /** @brief Tile index for the gargoyle character sprite */
 #define SPRITE_GARGOYLE 1
-/** @brief Tile index for the C64-converted Rockford character sprite */
+/** @brief Tile index for the Rockford character sprite (pre-converted C64 data) */
 #define SPRITE_ROCKFORD 2
 
 /** @brief 8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) */
@@ -61,12 +59,6 @@ extern u8 palsprite16, palsprite16_end;
 extern u8 sprite16_64x64, sprite16_64x64_end;
 /** @brief Palette for gargoyle sprite in 64x64 mode */
 extern u8 palsprite16_64x64, palsprite16_64x64_end;
-
-/**
- * @brief Clear the extended WRAM tilemap buffer ($7E:2000+).
- * @param byte_count Number of bytes to zero in the tilemap buffer
- */
-extern void smapClear(u16 byte_count);
 
 /**
  * @brief DMA a portion of the WRAM tilemap buffer to VRAM.
@@ -107,8 +99,6 @@ extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
 /** @brief Total size of the SC_64x64 tilemap in bytes (4 pages x 2KB) */
 u16 spritemap_len = 0x2000;
-/** @brief Maximum number of unique sprite-tile entries in the map */
-u16 number_of_sprites = 0x40;
 
 /** @brief When true, scrolling is clamped to map boundaries; when false, wraps freely */
 u8 scroll_lock = 1;
@@ -308,7 +298,7 @@ static void drawSpriteFrame64x64(u16 sprite) {
  * Initializes Mode 3 (8bpp BG1) with a text overlay on BG2, sets up the
  * extended WRAM tilemap buffer via assembly helpers, and enters a loop
  * handling scrolling, map mode toggling (32x32 / 64x64), random sprite
- * placement, and C64 sprite conversion display. Tilemap updates to VRAM
+ * placement, and Rockford sprite display. Tilemap updates to VRAM
  * use the 1-page-per-VBlank pattern (2KB per frame) for flicker-free DMA.
  *
  * @return 0 (never reached -- infinite game loop)
@@ -334,7 +324,7 @@ int main(void) {
     textPrintAt(6, 12, "A = Map size 32x32");
     textPrintAt(6, 14, "B = Scroll lock ON ");
     textPrintAt(6, 16, "X = Random sprite");
-    textPrintAt(6, 18, "Y = Convert C64 sprite");
+    textPrintAt(6, 18, "Y = Show C64 sprite");
     textPrintAt(6, 20, "DPAD = Scroll map");
 
     /* Init 32x32 map demo */
@@ -447,7 +437,7 @@ int main(void) {
         /* Display pre-computed C64 Rockford sprite.
          * 1) DMA sprite tiles during VBlank (screen ON, 256 bytes fits)
          * 2) Compute tilemap entries during active display (RAM writes only)
-         * 3) DMA tilemap directly (bypassing screenRefresh's __mul16 overhead).
+         * 3) DMA the tilemap pages directly.
          *    SC_64x64 = 4 pages × 2048 bytes. 2 pages per VBlank = 4KB DMA
          *    (~33K cycles, fits in ~41K available VBlank cycles). */
         if (pad0 & KEY_Y) {

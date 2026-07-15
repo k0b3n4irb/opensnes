@@ -16,6 +16,16 @@ on:
       - "main"
       - "develop"
 
+# One run per branch head. `head_ref` (PR source) and `ref_name` (push) both
+# resolve to the same branch name, so the push-to-develop run and the
+# develop→main release-PR run land in the same group and the newer cancels
+# the older — killing the push+PR double-fire. Superseded rapid pushes are
+# cancelled too. Safe: neither main nor develop is a protected branch with
+# required checks. Release tags are handled by release.yml (unique per tag).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 # ------------------------------------ #
 # Set O.S matrix                       #
 # ------------------------------------ #
@@ -83,6 +93,26 @@ jobs:
         with:
           submodules: recursive
 
+      # Prebuilt toolchain cache (see functional-tests for the rationale). Same
+      # key formula, so build-linux/x86_64 shares its cache with the
+      # functional-tests x86_64 leg. Saves the toolchain-compile portion of
+      # each build (~20-30s/leg; the rest — lib+examples+docs+zip — still runs).
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        shell: bash
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch -t 203001010000 {} + 2>/dev/null || true
+
       # ------------------------------------ #
       # Verify compiler toolchain pins        #
       # ------------------------------------ #
@@ -145,6 +175,19 @@ jobs:
         run: |
           export OPENSNES_HOME=$(pwd)
           devtools/check_debug_info.sh
+
+      # Save the toolchain once it's built (cache miss only; after a green
+      # `make release`, so a failed build never poisons the cache).
+      - name: Save prebuilt toolchain (cache miss only)
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: ${{ steps.toolchain.outputs.cache-primary-key }}
 
       # ------------------------------------ #
       # Functional tests run in a separate   #
@@ -267,6 +310,33 @@ jobs:
         with:
           submodules: recursive
 
+      # Restore the prebuilt cc65816 toolchain (cproc+qbe+wla-dx). The key
+      # hashes every toolchain determinant — the pinned submodule SHAs
+      # (PINS.md), the build orchestration (Makefile, make/**) and the tools
+      # source — so any toolchain change busts it. restore/save is split so a
+      # failed build never poisons the cache (save runs only after a green
+      # toolchain build).
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        run: |
+          # A hit means the toolchain sources are byte-identical (the key
+          # hashes them), so the cached binaries are valid. Stamp them to a
+          # fixed future time so make treats the toolchain as up-to-date and
+          # skips recompilation. If the stamp somehow doesn't take, make just
+          # rebuilds from the same-SHA cached source — never wrong output.
+          find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch -t 203001010000 {} + 2>/dev/null || true
+
       - name: Verify compiler toolchain pins
         run: python3 devtools/verify_toolchain.py
 
@@ -274,6 +344,17 @@ jobs:
         run: |
           export OPENSNES_HOME=$(pwd)
           make
+
+      - name: Save prebuilt toolchain (cache miss only)
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: ${{ steps.toolchain.outputs.cache-primary-key }}
 
       - name: Compiler C→ASM pattern checks
         run: python3 devtools/compiler-tests/run.py

@@ -148,6 +148,15 @@ extern u16 y_pos;
  *
  * @note Must be called during forced blank (screen off). The function
  *       writes directly to VRAM via DMA.
+ *
+ * @note Data placement: the three blobs may live in ANY bank — mapLoad
+ * and the scroll runtime honour each far pointer's bank byte, so pinning
+ * the map out of bank $00 (e.g. `.section ".rodata2" semifree bank 2`)
+ * is the recommended layout for big maps. But that data is then for the
+ * MAP ENGINE only: reading it directly from C (`mapdata[6]`, `*ptr`)
+ * silently reads bank $00 instead (cc65816 near-pointer deref — see
+ * KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use
+ * mapGetMetaTile()/mapGetMetaTilesProp() — they are bank-safe.
  */
 void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop);
 
@@ -177,6 +186,11 @@ void mapVblank(void);
  *
  * @param xpos X coordinate to focus on (in map pixels)
  * @param ypos Y coordinate to focus on (in map pixels)
+ *
+ * @note Pass the position of the object to FOLLOW (typically the player,
+ * as in examples/maps/mapandobjects) — NOT a scroll/view origin. The view
+ * centers itself on the point with edge clamping; feeding it a view origin
+ * shifts the level by half a screen from where it was painted.
  */
 void mapUpdateCamera(u16 xpos, u16 ypos);
 

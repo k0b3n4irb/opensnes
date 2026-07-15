@@ -14,10 +14,8 @@
 
 /* Assembly helpers */
 extern void smapWrite(u16 byte_offset, u16 value);
-extern u16 smapRead(u16 byte_offset);
 extern void smapClear(u16 byte_count);
 extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
-extern void sramDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
 static u16 map32_len;
 
@@ -45,11 +43,6 @@ static void drawSpriteRaw32x32(u8 x, u8 y, u16 sprite) {
     smapWrite(i + 66, sprite + 3);
 }
 
-static u16 getSpriteRaw32x32(u8 x, u8 y) {
-    u16 i = (u16)(64 * y + x * 2) * 2;
-    return smapRead(i);
-}
-
 void drawSprite32x32(u8 x, u8 y, u16 sprite) {
     if (x < 16 && y < 16)
         drawSpriteRaw32x32(x, y, sprite);
@@ -61,28 +54,8 @@ void drawSprite32x32(u8 x, u8 y, u16 sprite) {
         drawSpriteRaw32x32(x - 16, y + 32, sprite);
 }
 
-u16 getSprite32x32(u8 x, u8 y) {
-    if (x < 16 && y < 16)
-        return getSpriteRaw32x32(x, y);
-    else if (x < 32 && y < 16)
-        return getSpriteRaw32x32(x - 16, y + 16);
-    else if (x < 16 && y < 32)
-        return getSpriteRaw32x32(x, y + 16);
-    else if (x < 32 && y < 32)
-        return getSpriteRaw32x32(x - 16, y + 32);
-    return 0;
-}
-
 u16 element2sprite32x32(u8 elem) {
     return (u16)elem * 4;   /* 4 tiles per sprite in 8x8 mode */
-}
-
-u16 calculateSpriteIndex32x32(u8 elem) {
-    return (u16)elem * 256; /* 256 bytes per sprite (8bpp, 4 tiles × 64 bytes) */
-}
-
-u16 calculateSpritesLength32x32(u16 number_of_sprites) {
-    return 256 * number_of_sprites;
 }
 
 void screenRefreshPos32x32(u8 x, u8 y, u16 address) {
@@ -100,8 +73,3 @@ void screenRefreshPos32x32(u8 x, u8 y, u16 address) {
     smapDma(offset * 2, address + offset, 256);
 }
 
-void updateSprite32x32(u16 vram_addr, u16 elem) {
-    u16 src_off = calculateSpriteIndex32x32(elem);
-    u16 dst_vram = vram_addr + element2sprite32x32(elem) * 32;
-    sramDma(src_off, dst_vram, 256);
-}

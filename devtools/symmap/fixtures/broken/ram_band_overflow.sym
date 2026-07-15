@@ -1,0 +1,12 @@
+; Synthetic fixture: C RAM placed across/past the $2000 band boundary.
+; --check-ram-budget must FAIL (rc 1) on both patterns (defect B2):
+;   - a bank-$00 RAMSECTION crossing $2000 (C reads past $1FFF wrong-banked)
+;   - a bank-$00 RAMSECTION entirely past $2000 (hardware register space)
+[labels]
+00:0000 tcc__r0
+00:1f00 too_big_buffer
+00:2100 register_collision
+[ramsections]
+00:0000 0000 00000030 .registers
+00:1f00 1f00 00000200 .too_big_buffer
+00:2100 2100 00000040 .register_collision

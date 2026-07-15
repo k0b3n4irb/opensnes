@@ -97,10 +97,16 @@ If you hit this:
 RAM section above $2000, C code reading via short addressing reads from bank
 $00 instead — silent corruption.
 
-**Mitigation:** the templates' memory maps reserve `$00:0000-$1FFF` for C RAM
-and don't put C-accessible variables higher. Custom RAMSECTION users must respect
-this. If you really need data above $2000, access it via assembly with explicit
-bank prefix (`lda.l $7E:NNNN,x`).
+**Mitigation (checked at link time since 2026-07-11):** the templates' memory
+maps reserve `$00:0000-$1FFF` for C RAM, and `make/common.mk` runs
+`symmap.py --check-ram-budget` after every link — the RAM twin of the bank
+$00 ROM ratchet. A bank-$00 RAM section crossing or placed past $2000 fails
+the build; free space below `RAM_FAIL_THRESHOLD` (default 512 bytes) fails
+too, and below `RAM_WARN_THRESHOLD` (default 1024) prints the largest RAM
+sections as refactor candidates. The free-byte count prints at every link,
+so approaching the 8 KB ceiling is a visible number, not a surprise. Set
+`SKIP_RAM_CHECK=1` to bypass for debugging. If you really need data above
+$2000, access it via assembly with explicit bank prefix (`lda.l $7E:NNNN,x`).
 
 ---
 
@@ -166,6 +172,19 @@ before committing.
 ---
 
 ## Toolchain & emulator coverage
+
+### 🟡 `fixMul()` / `fixLerp()` are not safe inside nmiSet() callbacks
+
+They use the hardware multiplier ($4202-$4217) plus shared WRAM
+temporaries; the hardware unit reads auto-joypad garbage during the
+window NMI callbacks run in, and is not reentrant against an interrupted
+main-thread multiply. Plain C `*` / `/` / `%` **are** callback-safe —
+the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
+to software paths. Symptom if ignored: silently wrong fixed-point values,
+only when computed inside the callback. Mitigation: compute fixed-point
+math in the main loop, or use plain integer operators in the callback.
+(Headers carry the same @warning; see
+`.claude/notes/tech/nmi_context_hardware_muldiv.md` for the full story.)
 
 ### 🟡 SA-1 SIWP/CIWP write-protection polarity is disputed
 `templates/crt0.asm` enables SA-1 I-RAM access by writing the SIWP register

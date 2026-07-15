@@ -30,6 +30,34 @@ u16 r_mod_zero; /* mod16(42, 0)     -> 0 (documented contract) */
 u16 r_mul;      /* mul16(123, 45)   -> 5535 */
 u16 r_sqrt;     /* sqrt16(144)      -> 12 */
 
+/* --- NMI-context math vectors (#113) --- */
+/* The C operators below run inside an nmiSet callback, where the
+ * hardware mul/div unit reads garbage (auto-joypad window) — the
+ * runtime must take its software path (in_nmi_ctx gate). Operands are
+ * volatile so cproc can't constant-fold the ops away. Pre-fix, r_nmi_mul
+ * read 0. */
+/* regression pin for opensnes#114: an explicit (s16) cast of an
+ * unsigned-derived operand must produce a SIGNED division. Pre-fix the
+ * stale look-through-casts heuristic emitted __div16 (unsigned):
+ * -30000/49 read 725 instead of -612. */
+u16 r_sdiv_cast; /* (s16)-30000 / (s16)(op|1), op=49 -> -612 = 0xFD9C */
+
+u16 r_nmi_mul;  /* 123 * 673 in callback -> 82779 & 0xFFFF = 17243 */
+u16 r_nmi_div;  /* 33000 / 7 in callback -> 4714 (8-bit-divisor path) */
+u16 r_nmi_mod;  /* 33000 % 7 in callback -> 2 */
+static volatile u16 sdiv_op = 49;
+static volatile u16 nmi_op_a = 123, nmi_op_b = 673;
+static volatile u16 nmi_op_c = 33000, nmi_op_d = 7;
+static volatile u8 nmi_math_done;
+
+static void nmiMathProbe(void) {
+    if (nmi_math_done) return;
+    r_nmi_mul = nmi_op_a * nmi_op_b;
+    r_nmi_div = nmi_op_c / nmi_op_d;
+    r_nmi_mod = nmi_op_c % nmi_op_d;
+    nmi_math_done = 1;
+}
+
 /* --- text overflow sentinels --- */
 u8 s_map_width; /* text_config.map_width after 40 printed rows -> 32.
                  * Pre-fix, rows 32+ wrote past tilemapBuffer into whatever
@@ -70,6 +98,20 @@ static u16 rmw_step(RmwProbe *q) {
 }
 u16 r_rmw_u8;  /* 3 steps from {idx0,cnt2}: 100,100,200 -> expected 200 */
 
+/* --- map module: #103 regression pin — the collision getters called
+ * FROM C. metatilesprop/mapadrrowlut/maptile_L1* live at $7E:3000+
+ * (above the WRAM mirror); the getters used to read them with the
+ * caller's DB ($00 from C) -> open bus. Real tmx2snes data (shared
+ * with examples/maps/mapscroll), pinned in bank 2 (B1 path).
+ * Expected values host-parsed from the committed blobs:
+ * entry(1280,80) = tile 21, b16[21] = 0xFF00 (T_SOLID); (0,0) -> 0. */
+extern u8 mapdata[];     /* BG1.m16        (data.asm, bank 2) */
+extern u8 tilesetdef[];  /* tiledMario.t16 */
+extern u8 tilesetatt[];  /* tiledMario.b16 */
+u16 r_map_tile;   /* mapGetMetaTile(1280,80)      -> 21     */
+u16 r_map_prop;   /* mapGetMetaTilesProp(1280,80) -> 0xFF00 */
+u16 r_map_prop0;  /* mapGetMetaTilesProp(0,0)     -> 0      */
+
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -88,6 +130,7 @@ int main(void) {
     r_mod_zero = mod16(42, 0);
     r_mul      = mul16(123, 45);
     r_sqrt     = sqrt16(144);
+    r_sdiv_cast = (u16)((s16)-30000 / (s16)(sdiv_op | 1));
 
     rmw.tab = rmw_tab; rmw.idx = 0; rmw.cnt = 2; rmw.fl = 0; rmw.rsv = 0;
     rmw_step(&rmw);
@@ -119,6 +162,12 @@ int main(void) {
     for (i = 0; i < 5; i++) r_anim_once = animTick(&ap);
     r_anim_done = animDone(&ap) ? 1 : 0;
 
+    /* map getters from C (issue #103): load the real map, consult it */
+    mapLoad(mapdata, tilesetdef, tilesetatt);
+    r_map_tile  = mapGetMetaTile(1280, 80);
+    r_map_prop  = mapGetMetaTilesProp(1280, 80);
+    r_map_prop0 = mapGetMetaTilesProp(0, 0);
+
     textModeInit();
 
     /* 40 rows of >= 7 glyphs each: rows 32-39 must wrap to rows 0-7.
@@ -131,6 +180,15 @@ int main(void) {
 
     s_map_width = text_config.map_width;
     s_cursor_y  = textGetY();
+
+    /* NMI-context math (#113): compute once inside the callback, then
+     * wait until it ran before declaring the fixture done. */
+    nmiSetBank(nmiMathProbe, (u8)((u32)(void *)nmiMathProbe >> 16));
+    while (!nmi_math_done) {
+        WaitForVBlank();
+    }
+    nmiClear();
+
     r_done      = 0xBEEF;
 
     setScreenOn();

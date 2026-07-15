@@ -1,6 +1,6 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.7.0 · `luna state -n <steps>` per ROM · 56 ROMs · **54 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.9.0 · `luna state -n <steps>` per ROM · 63 ROMs · **61 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
 > Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
@@ -13,9 +13,9 @@ luna v1.7.0 · `luna state -n <steps>` per ROM · 56 ROMs · **54 OK, 2 INPUT-DE
 | `basics/aim_target` | OK | live (77f/77nmi) |
 | `basics/collision_demo` | OK | live (82f/81nmi) |
 | `basics/fix32_orbit` | OK | live (76f/75nmi) |
-| `basics/random` | OK | live (275f/274nmi) |
+| `basics/random` | OK | live (303f/303nmi) |
 | `basics/scene_stack` | OK | live (72f/71nmi) |
-| `basics/timer` | OK | live (184f/184nmi) |
+| `basics/timer` | OK | live (187f/186nmi) |
 | `games/breakout` | OK | live (85f/84nmi) |
 | `games/likemario` | OK | live (109f/100nmi) |
 | `games/mapandobjects` | OK | live (88f/87nmi) |
@@ -32,22 +32,29 @@ luna v1.7.0 · `luna state -n <steps>` per ROM · 56 ROMs · **54 OK, 2 INPUT-DE
 | `graphics/backgrounds/mode7` | OK | live (71f/71nmi) |
 | `graphics/backgrounds/mode7_perspective` | OK | live (74f/73nmi) |
 | `graphics/effects/fading` | OK | live (71f/70nmi) |
+| `graphics/effects/gradient_9bit` | OK | live (73f/72nmi) |
 | `graphics/effects/gradient_colors` | OK | live (72f/71nmi) |
 | `graphics/effects/hdma_helpers` | OK | live (71f/70nmi) |
+| `graphics/effects/hdma_indirect_gradient` | OK | live (72f/71nmi) |
 | `graphics/effects/hdma_wave` | OK | live (73f/72nmi) |
+| `graphics/effects/hdma_wave_table` | OK | live (146f/145nmi) |
+| `graphics/effects/hicolor_1792` | OK | live (164f/164nmi) |
+| `graphics/effects/hires_text` | OK | live (71f/70nmi) |
+| `graphics/effects/mode7_perspective_rotate` | OK | live (77f/76nmi) |
 | `graphics/effects/mosaic` | OK | live (71f/70nmi) |
 | `graphics/effects/parallax_scrolling` | OK | live (143f/142nmi) |
-| `graphics/effects/superfx_3d` | OK | live (289f/145nmi) |
+| `graphics/effects/superfx_3d` | OK | live (289f/146nmi) |
 | `graphics/effects/transparency` | OK | live (141f/140nmi) |
 | `graphics/effects/transparent_window` | OK | live (72f/71nmi) |
 | `graphics/effects/window` | OK | live (72f/71nmi) |
+| `graphics/effects/window_multi_hdma` | OK | live (73f/72nmi) |
 | `graphics/sprites/animated_sprite` | OK | live (73f/72nmi) |
 | `graphics/sprites/dynamic_metasprite` | OK | live (89f/88nmi) |
 | `graphics/sprites/dynamic_sprite` | OK | live (75f/75nmi) |
 | `graphics/sprites/metasprite` | OK | live (185f/184nmi) |
 | `graphics/sprites/object_size` | OK | live (75f/74nmi) |
 | `graphics/sprites/simple_sprite` | OK | live (71f/70nmi) |
-| `input/controller` | OK | live (109f/108nmi) |
+| `input/controller` | OK | live (110f/109nmi) |
 | `input/mouse` | INPUT-DEP | live (73f/72nmi) |
 | `input/superscope` | INPUT-DEP | live (73f/72nmi) |
 | `input/two_players` | OK | live (75f/74nmi) |

@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 56 examples organized by topic. For a progressive learning path, see
+All 63 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -59,6 +59,8 @@ Visual effects using HDMA, color math, and hardware windows.
 | @subpage examples_graphics_effects_fading | Brightness control, screen transitions |
 | @subpage examples_graphics_effects_mosaic | Mosaic pixelation effect |
 | @subpage examples_graphics_effects_hdma_wave | HDMA scanline wave distortion |
+| @subpage examples_graphics_effects_hdma_wave_table | Raw HDMA table in C, krom-style repoint animation |
+| @subpage examples_graphics_effects_hdma_indirect_gradient | Indirect HDMA pointer-table gradient (krom port) |
 | @subpage examples_graphics_effects_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
 | @subpage examples_graphics_effects_gradient_colors | HDMA + CGRAM color gradients |
 | @subpage examples_graphics_effects_parallax_scrolling | HDMA parallax scrolling |

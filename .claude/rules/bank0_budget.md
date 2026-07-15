@@ -108,6 +108,28 @@ done | sort -n
 Read the bottom of the list. Anything below 100 bytes is a candidate for
 the next refactor wave.
 
+## The RAM twin: C RAM band budget (since 2026-07-11)
+
+The same silent-failure family exists for RAM: all C-accessible RAM must
+sit in `$00:0000-$1FFF` (the 8 KB WRAM mirror) — anything higher is
+silently wrong-banked by the compiler's `sta.l $0000,x` addressing
+(structural defect B2). `make/common.mk` runs
+`symmap.py --check-ram-budget` after every link:
+
+| Stage | Trigger | Outcome |
+|-------|---------|---------|
+| 🔴 Hard fail | a bank-$00 RAM section crosses or sits past `$2000` | build fails (exit 1) |
+| 🔴 Hard fail | free space < `RAM_FAIL_THRESHOLD` (default **512 bytes**) | build fails (exit 1) |
+| 🟡 Soft warn | free space < `RAM_WARN_THRESHOLD` (default **1024**) | warning + largest-sections list, build continues |
+
+The free-byte count prints at every link — this is the *instrument* that
+turns "will the game hit the 8 KB RAM ceiling?" into a tracked number
+(the decision gate for scheduling the B2 chantier). Corpus baseline at
+introduction: breakout 668 bytes free, tetris 928 — warnings on those
+two are deliberate, they really are within 1 KB of the ceiling.
+`SKIP_RAM_CHECK=1` bypasses; the same ratchet discipline applies (never
+raise the fail threshold above the corpus minimum without a refactor).
+
 ## Why this rule exists
 
 A 1-day external review on 2026-05-07 flagged that 12 examples were

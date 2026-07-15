@@ -98,6 +98,11 @@
     ; even when lib code temporarily sets DBR != 0). 4 bytes total
     ; (low 16 + bank byte + 1 alignment), 16-bit aligned.
     tcc__fp     dsb 4
+    ; Hardware IRQ vector (H/V timer). IrqHandler does JML [irq_callback],
+    ; so this must live in bank $00 direct page like nmi_callback. Points
+    ; at DefaultIrqHandler (ack+rti) until irqSet() repoints it. Appended
+    ; at the end of the enum — PVSnesLib-compatible offsets above untouched.
+    irq_callback dsb 4  ; 24-bit handler pointer + padding
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -152,6 +157,20 @@
     mouseRequestChangeSensitivity dsb 2 ; Deferred sensitivity command per port
     sa1_status      dsb 1   ; SA-1 boot status ($A5=OK, $00=not started/failed)
     superfx_status  dsb 1   ; SuperFX GSU version (0=not detected, non-zero=chip version)
+    nmitimen_shadow dsb 1   ; Software copy of $4200 (write-only reg). ALL
+                            ; NMITIMEN writes must go through this shadow so
+                            ; nmiSet/irqEnable don't clobber each other's bits.
+    in_nmi_ctx      dsb 1   ; 1 while the user NMI callback runs. tcc_mul16 /
+                            ; tcc_div16 test it and take their software path:
+                            ; the hardware mul/div unit ($4202-$4217) reads
+                            ; garbage during the auto-joypad window the
+                            ; callback runs in, and is not reentrant against
+                            ; a main-thread multiply the NMI interrupted.
+    setini_shadow   dsb 1   ; Software copy of SETINI $2133 (write-only).
+                            ; videoSetInterlace/ObjInterlace/Overscan/
+                            ; PseudoHires compose their bits through it
+                            ; (same pattern as nmitimen_shadow). Zeroed
+                            ; by the WRAM clear at boot = reset state.
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -569,6 +588,16 @@ FastStart:
     lda #:DefaultNmiCallback
     sta nmi_callback+2
 
+    ; Initialize hardware IRQ vector to default (ack + rti)
+    rep #$20
+    .ACCU 16
+    lda #DefaultIrqHandler
+    sta irq_callback
+    sep #$20
+    .ACCU 8
+    lda #:DefaultIrqHandler
+    sta irq_callback+2
+
     ; Initialize dynamic sprite NMI flush hook to default no-op.
     ; oamInitDynamicSprite repoints it at oamDynamicNmiFlush when the
     ; dynamic sprite engine is brought up.
@@ -621,6 +650,7 @@ FastStart:
     .ACCU 8
     lda #$81            ; NMI + auto joypad
     sta $4200
+    sta nmitimen_shadow ; Keep the write-only reg's software copy in sync
     rep #$20
     .ACCU 16
 
@@ -1064,6 +1094,15 @@ FastNmi:
     .INDEX 16
 
 @do_callback:
+    ; Flag the NMI context so the mul/div runtime avoids the hardware
+    ; unit (auto-joypad window + non-reentrancy — see in_nmi_ctx decl).
+    sep #$20
+    .ACCU 8
+    lda #1
+    sta.w in_nmi_ctx
+    rep #$20
+    .ACCU 16
+
     ; Set data bank to $7E for C variable access
     ; D already = tcc__nmi_registers (callback uses NMI register space)
     pea $7E7E
@@ -1079,6 +1118,12 @@ FastNmi:
     pea $0000
     plb
     plb
+
+    sep #$20
+    .ACCU 8
+    stz.w in_nmi_ctx
+    rep #$20
+    .ACCU 16
 
 @skip_callback:
     sep #$20            ; 8-bit A
@@ -1749,14 +1794,36 @@ ReadScope:
 ;------------------------------------------------------------------------------
 ; IrqHandler - Hardware IRQ (H/V counter, etc.)
 ;------------------------------------------------------------------------------
-; Called when H/V timer IRQ fires (if enabled via $4200).
-; Must read TIMEUP ($4211) to acknowledge the interrupt.
+; Fires when an H/V timer IRQ is enabled (irqEnable → $4200 bits 4/5) AND
+; the I flag is clear. Dispatches through irq_callback with ZERO imposed
+; overhead — per-scanline handlers can't afford a fixed prologue, so the
+; callback owns EVERYTHING: save/restore of any register it touches, the
+; $4211 TIMEUP acknowledge read, and the final RTI. P is auto-restored by
+; RTI (pushed at interrupt entry); A/X/Y/DP/DBR are NOT.
+;
+; Register a handler from C with irqSet()/irqSetBank() — ASM handlers
+; only, see lib/include/snes/interrupt.h for the full contract.
 ;------------------------------------------------------------------------------
 IrqHandler:
-    sep #$20            ; 8-bit A
+    jml [irq_callback]  ; Indirect long jump (reads pointer from bank $00 DP)
+
+;------------------------------------------------------------------------------
+; DefaultIrqHandler - installed at boot and by irqClear()
+;------------------------------------------------------------------------------
+; Acknowledges the IRQ and returns, preserving all registers. A spurious
+; IRQ with no handler must not corrupt the interrupted C code.
+;------------------------------------------------------------------------------
+DefaultIrqHandler:
+    rep #$20            ; 16-bit A: push both halves whatever the entry mode
+    .ACCU 16
+    pha
+    sep #$20
     .ACCU 8
-    lda $4211           ; Read TIMEUP to acknowledge IRQ
-    rti
+    lda $4211           ; Read TIMEUP to acknowledge the IRQ line
+    rep #$20
+    .ACCU 16
+    pla
+    rti                 ; P (incl. M/X width bits) restored from stack
 
 .ENDS
 

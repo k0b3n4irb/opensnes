@@ -71,6 +71,14 @@ tcc_mul16:
     sep #$20            ; 8-bit A
     .ACCU 8
 
+    ; NMI-callback context: the hardware unit reads garbage during the
+    ; auto-joypad window the callback runs in, and firing it here would
+    ; also corrupt a main-thread multiply the NMI interrupted (found as
+    ; #113 — mul silently returned 0 from nmiSet callbacks). Take the
+    ; software path instead. Long addressing: DBR is $7E in callbacks.
+    lda.l in_nmi_ctx
+    bne @soft_mul
+
     ; --- a_lo * b_lo ---
     lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
@@ -136,6 +144,37 @@ tcc_mul16:
     plp
     rtl
 
+@soft_mul:
+    ; Shift-and-add 16x16 (low 16 bits), no hardware unit. Same tcc__r2
+    ; clobber contract as the hardware path; DP-relative access hits the
+    ; NMI-isolated register page during callbacks. Worst case ~330
+    ; cycles, early-exits when the remaining multiplier bits are 0.
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    pea $0000           ; result accumulator (args shift to 7,s / 9,s)
+    lda 7,s
+    sta tcc__r2         ; shifting multiplicand
+    lda 9,s
+    tay                 ; Y = shifting multiplier
+@sm_loop:
+    tya
+    beq @sm_done        ; no multiplier bits left
+    lsr a
+    tay                 ; multiplier >>= 1, C = old bit 0
+    bcc @sm_next
+    lda tcc__r2
+    clc
+    adc 1,s
+    sta 1,s             ; result += multiplicand
+@sm_next:
+    asl tcc__r2         ; multiplicand <<= 1
+    bra @sm_loop
+@sm_done:
+    pla                 ; A = result (same return contract)
+    plp
+    rtl
+
 ;------------------------------------------------------------------------------
 ; tcc_div16 - Unsigned 16-bit division
 ;------------------------------------------------------------------------------
@@ -156,7 +195,18 @@ tcc_div16:
     lda tcc__r1
     beq @div_zero
 
+    ; NMI-callback context: hardware divider unusable (same rationale as
+    ; tcc_mul16's @soft_mul — auto-joypad window + non-reentrancy, #113).
+    ; The existing software path handles any divisor.
+    sep #$20
+    .ACCU 8
+    lda.l in_nmi_ctx
+    rep #$20
+    .ACCU 16
+    bne @software_div
+
     ; Check if divisor fits in 8 bits
+    lda tcc__r1
     and #$FF00
     bne @software_div
 

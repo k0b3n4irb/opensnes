@@ -26,6 +26,10 @@ tilesetpal_end:
 ;------------------------------------------------------------------------------
 ; B1: pinned out of bank $00 (bank 2). mapLoad + the scroll runtime honour
 ; the pointer's bank byte, so the 13 KB map need not sit in bank $00.
+; /!\ bank 2 is for the MAP ENGINE (far pointers). Do NOT read these
+; symbols directly from C: a near-pointer deref (`mapdata[6]`) silently
+; reads bank $00. From C, consult the map via mapGetMetaTile()/
+; mapGetMetaTilesProp() (bank-safe) — see mapLoad's doc in map.h.
 .section ".rodata2" semifree bank 2
 
 mapdata:

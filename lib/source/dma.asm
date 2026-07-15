@@ -355,4 +355,29 @@ clearNmiFlag:
     plp
     rtl
 
+;------------------------------------------------------------------------------
+; void clearIrqFlag(void)
+;
+; Reads REG_TIMEUP ($4211) to drop a latched H/V timer IRQ. Same rationale
+; as clearNmiFlag: the acknowledge is a READ whose value is discarded, so
+; it lives in ASM rather than relying on a discarded C volatile read.
+;------------------------------------------------------------------------------
+clearIrqFlag:
+    php
+    sep #$20
+    .ACCU 8
+    lda.l $4211             ; Read REG_TIMEUP to clear a pending IRQ
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; void unmaskIrq(void)
+;
+; Clears the CPU I flag. crt0 boots with SEI and nothing else ever CLIs;
+; irqEnable() calls this so H/V timer IRQs can actually be taken.
+;------------------------------------------------------------------------------
+unmaskIrq:
+    cli
+    rtl
+
 .ENDS

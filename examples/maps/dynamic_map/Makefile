@@ -13,7 +13,7 @@ ROM_NAME   := DYNAMIC MAP
 USE_LIB    := 1
 LIB_MODULES := console sprite dma background text text4bpp input
 
-CSRC       := main.c map32x32.c map64x64.c maputil.c
+CSRC       := main.c map32x32.c map64x64.c
 ASMSRC     := data.asm ram.asm
 
 include $(OPENSNES)/make/common.mk

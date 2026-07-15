@@ -125,6 +125,8 @@ lint-vram:
 lint: lint-docs
 	@python3 devtools/lint_asm.py
 	@python3 devtools/check_lib_rodata.py
+	@python3 devtools/check_bank_reads.py --selftest
+	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
 	@$(MAKE) lint-commits
@@ -144,6 +146,10 @@ examples: compiler tools lib
 	$(MAKE) -C $(EXAMPLES_PATH)
 
 tests: test-compiler
+	@# Corpus freshness guard (issue #105): incremental trees have produced
+	@# ROMs that differ from clean builds; baselines captured from them get
+	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
+	@python3 devtools/check_corpus_fresh.py
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare

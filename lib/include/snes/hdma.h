@@ -167,10 +167,16 @@
 #define HDMA_MODE_4REG      0x04
 
 /**
- * @brief Indirect HDMA flag (OR with mode)
+ * @brief Indirect HDMA flag (DMAP bit 6) — use hdmaSetupIndirect()
  *
- * When set, table contains pointers to data instead of data itself.
- * Useful for large tables or dynamic data.
+ * When set, the table contains [count][ptr16] entries whose pointers
+ * reference the actual data. Useful for large or dynamic per-line data
+ * (e.g. a full CGRAM gradient per scanline).
+ *
+ * @warning Do NOT simply OR this into the mode of hdmaSetup(): indirect
+ * transfers also need the indirect DATA BANK register ($43x7), which
+ * plain hdmaSetup never programs — the pointers would dereference an
+ * unprogrammed bank. hdmaSetupIndirect() sets both the bit and $43x7.
  */
 #define HDMA_INDIRECT       0x40
 
@@ -217,6 +223,15 @@
 /** @brief Destination: Mode 7 matrix A ($211B) */
 #define HDMA_DEST_M7A       0x1B
 
+/** @brief Destination: Mode 7 matrix B ($211C) */
+#define HDMA_DEST_M7B       0x1C
+
+/** @brief Destination: Mode 7 matrix C ($211D) */
+#define HDMA_DEST_M7C       0x1D
+
+/** @brief Destination: Mode 7 matrix D ($211E) */
+#define HDMA_DEST_M7D       0x1E
+
 /*============================================================================
  * Core HDMA Functions
  *============================================================================*/
@@ -253,6 +268,30 @@ void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
  * @param bank     Source bank byte ($00-$3F for LoROM)
  */
 void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank);
+
+/**
+ * @brief Configure an INDIRECT HDMA channel (table of pointers to data)
+ *
+ * Table entries are [count][ptr_lo][ptr_hi]: each 16-bit pointer
+ * references `count` lines worth of data in `dataBank`. The INDIRECT
+ * bit is OR'd into `mode` internally — pass a plain HDMA_MODE_*.
+ * The table's own bank comes from the far pointer (any bank works);
+ * `dataBank` is the bank of the POINTED-TO data ($43x7).
+ *
+ * Classic use: per-scanline CGRAM reloads (HiColor-style gradients) —
+ * each table entry points at a block of palette data for that line.
+ *
+ * @param channel  HDMA channel (0-7)
+ * @param mode     Transfer pattern (HDMA_MODE_*, without HDMA_INDIRECT)
+ * @param destReg  Destination register (HDMA_DEST_*)
+ * @param table    Indirect table ([count][ptr16] entries + 0 terminator)
+ * @param dataBank Bank byte of the data the pointers reference. For a C
+ *                 array, extract it from the far pointer:
+ *                 `(u8)((u32)(void *)my_data >> 16)` (post-A6 pointers
+ *                 carry the bank in byte 2) — RAM arrays give 0.
+ */
+void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
+                       u8 dataBank);
 
 /**
  * @brief Enable HDMA channel(s)

@@ -203,12 +203,21 @@ def run(update: bool, only: str | None) -> int:
         steps = manifest["examples"].get(key, {}).get("steps", default_steps)
         points = steps_points(steps)
         if update:
+            # fbhash of an all-black 256x224 frame — a broken ROM must not
+            # be able to self-certify (fix32_orbit shipped a black baseline
+            # for weeks, #115). Refuse it unless explicitly allowed.
+            BLACK_FBHASH = "aacf80a995eb8c67"
             hashes, wdm_any = [], False
             for i, step in enumerate(points):
                 png = _png_for(BASELINE_DIR, label, step, i == 0)
                 fbhash, wdm = render(luna, rom, step, png)
                 hashes.append(fbhash)
                 wdm_any = wdm_any or wdm
+            if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
+                print(f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
+                      f"(ALLOW_BLANK_BASELINE=1 to override)")
+                failures += 1
+                continue
             single = len(points) == 1
             db[label] = {"fbhash": hashes[0] if single else hashes,
                          "steps": points[0] if single else points,

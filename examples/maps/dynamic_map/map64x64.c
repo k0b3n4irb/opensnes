@@ -14,10 +14,8 @@
 
 /* Assembly helpers */
 extern void smapWrite(u16 byte_offset, u16 value);
-extern u16 smapRead(u16 byte_offset);
 extern void smapClear(u16 byte_count);
 extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
-extern void sramDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
 static u16 map64_len;
 
@@ -42,11 +40,6 @@ static void drawSpriteRaw64x64(u8 x, u8 y, u16 sprite) {
     smapWrite(i, sprite);
 }
 
-static u16 getSpriteRaw64x64(u8 x, u8 y) {
-    u16 i = (u16)(32 * y + x) * 2;
-    return smapRead(i);
-}
-
 void drawSprite64x64(u8 x, u8 y, u16 sprite) {
     if (x < 32 && y < 32)
         drawSpriteRaw64x64(x, y, sprite);
@@ -58,36 +51,10 @@ void drawSprite64x64(u8 x, u8 y, u16 sprite) {
         drawSpriteRaw64x64(x - 32, y + 64, sprite);
 }
 
-u16 getSprite64x64(u8 x, u8 y) {
-    if (x < 32 && y < 32)
-        return getSpriteRaw64x64(x, y);
-    else if (x < 64 && y < 32)
-        return getSpriteRaw64x64(x - 32, y + 32);
-    else if (x < 32 && y < 64)
-        return getSpriteRaw64x64(x, y + 32);
-    else if (x < 64 && y < 64)
-        return getSpriteRaw64x64(x - 32, y + 64);
-    return 0;
-}
-
 u16 element2sprite64x64(u8 elem) {
     /* BG1_TSIZE16x16: tile index with row-of-16 wrap */
     u8 mult = elem / 8;
     return (u16)(elem * 2) + (u16)(mult * 16);
-}
-
-u16 calculateSpriteIndex64x64(u8 elem) {
-    /* In 16x16 tile mode, top and bottom halves are 1024 bytes apart.
-     * To prevent top overwriting an existing bottom, apply correction. */
-    u16 index = (u16)elem * 128;
-    u8 mult = index / 1024;
-    index += (u16)1024 * mult;
-    return index;
-}
-
-u16 calculateSpritesLength64x64(u16 number_of_sprites) {
-    /* Last sprite's top + 1024 gap + 128 bottom bytes */
-    return calculateSpriteIndex64x64(number_of_sprites - 1) + 1024 + 128;
 }
 
 void screenRefreshPos64x64(u8 x, u8 y, u16 address) {
@@ -104,11 +71,3 @@ void screenRefreshPos64x64(u8 x, u8 y, u16 address) {
     smapDma(offset * 2, address + offset, 256);
 }
 
-void updateSprite64x64(u16 vram_addr, u16 elem) {
-    u16 src_off = calculateSpriteIndex64x64(elem);
-    u16 vram_base = vram_addr + element2sprite64x64(elem) * 32;
-    /* DMA top half (128 bytes) */
-    sramDma(src_off, vram_base, 128);
-    /* DMA bottom half (128 bytes, 1024 bytes later in source, 512 words later in VRAM) */
-    sramDma(src_off + 1024, vram_base + 512, 128);
-}

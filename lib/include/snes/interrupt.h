@@ -73,4 +73,90 @@ void nmiSetBank(VBlankCallback callback, u8 bank);
  */
 void nmiClear(void);
 
+/*============================================================================
+ * Hardware IRQ (H/V timer)
+ *============================================================================*/
+
+/** @brief Fire an IRQ when the H counter reaches the HTIME value (every scanline). */
+#define IRQ_HTIMER 0x10
+/** @brief Fire an IRQ when the V counter reaches the VTIME value (once per frame). */
+#define IRQ_VTIMER 0x20
+
+/**
+ * @brief Install a raw hardware IRQ handler (H/V timer interrupts)
+ *
+ * The crt0 IRQ vector does a single `JML [irq_callback]` into your handler —
+ * nothing is saved, acknowledged, or set up for you. This is deliberate:
+ * an H-timer IRQ fires EVERY SCANLINE (~15.7 kHz) and cannot afford a C
+ * prologue, so the SDK imposes zero overhead and zero policy.
+ *
+ * @warning ASM handlers only. The handler contract:
+ *   - Save and restore every register it touches (A/X/Y, DP, DBR — the
+ *     interrupted code is arbitrary C). P is restored by RTI automatically.
+ *   - Read REG_TIMEUP ($4211) to acknowledge the IRQ, or it re-fires forever.
+ *   - Return with `rti`.
+ *   - After any `rep`/`sep`, add explicit `.ACCU`/`.INDEX` directives
+ *     (WLA-DX tracking rule).
+ *   A C function pointer passed here WILL corrupt the main thread —
+ *   cc65816 C prologues assume the tcc register file, which the raw
+ *   vector does not bank-switch (unlike the NMI path's DP isolation).
+ *
+ * @warning A handler that fires general DMA owns that channel: don't call
+ *   lib DMA helpers (dmaCopyVram etc.) from the main loop while such a
+ *   handler is armed — the channel registers are shared state.
+ *
+ * @param handler Address of the ASM handler (see examples/graphics/effects/
+ *                hicolor_1792/irq_stream.asm for the canonical shape)
+ */
+void irqSet(void *handler);
+
+/**
+ * @brief irqSet() with an explicit ROM bank for the handler
+ * @param handler Address of the ASM handler
+ * @param bank ROM bank containing the handler
+ */
+void irqSetBank(void *handler, u8 bank);
+
+/**
+ * @brief Restore the default IRQ handler (acknowledge + return)
+ */
+void irqClear(void);
+
+/**
+ * @brief Set the H-timer target (0-339 dots)
+ *
+ * With IRQ_HTIMER enabled, the IRQ fires at this horizontal position on
+ * every scanline. Values near the end of the visible line (e.g. 190) let
+ * a short handler's PPU writes land in H-blank.
+ */
+void irqSetHTimer(u16 h);
+
+/**
+ * @brief Set the V-timer target (0-261 scanlines NTSC)
+ *
+ * With IRQ_VTIMER enabled, the IRQ fires once per frame at this scanline
+ * (combined with IRQ_HTIMER: at that exact H/V position).
+ */
+void irqSetVTimer(u16 v);
+
+/**
+ * @brief Enable H/V timer IRQs and unmask interrupts (CLI)
+ *
+ * Sets the requested timer bits in the NMITIMEN shadow (NMI and auto-joypad
+ * bits are preserved) and clears the CPU I flag. Install the handler with
+ * irqSet() and program the timer with irqSetHTimer()/irqSetVTimer() BEFORE
+ * calling this.
+ *
+ * @param flags IRQ_HTIMER, IRQ_VTIMER, or both
+ */
+void irqEnable(u8 flags);
+
+/**
+ * @brief Disable H/V timer IRQs
+ *
+ * Clears both timer bits in the NMITIMEN shadow. The I flag is left clear —
+ * with no timer source enabled, no IRQ can fire.
+ */
+void irqDisable(void);
+
 #endif /* OPENSNES_INTERRUPT_H */

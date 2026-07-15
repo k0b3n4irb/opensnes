@@ -63,6 +63,17 @@ TEMPLATES := $(OPENSNES)/templates
 # See .claude/rules/bank0_budget.md for the policy.
 BANK0_FAIL_THRESHOLD ?= 8
 
+# C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
+# above (structural defect B2: all C-accessible RAM must sit in the 8 KB
+# WRAM mirror; anything higher is silently wrong-banked). Placement past
+# $2000 always hard-fails; the free-space ratchet is set just below the
+# corpus minimum (breakout: 668 bytes free as of 2026-07-11) so the next
+# big RAMSECTION fails fast instead of corrupting at runtime. The warn
+# threshold gives early drift visibility (breakout/tetris warn today —
+# deliberate: they ARE within 1 KB of the ceiling).
+RAM_FAIL_THRESHOLD ?= 512
+RAM_WARN_THRESHOLD ?= 1024
+
 # Check toolchain exists (skip for 'clean' target)
 ifneq ($(MAKECMDGOALS),clean)
 ifeq ($(wildcard $(CC)),)
@@ -175,6 +186,12 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 
 GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
 C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
+
+# Example C objects must rebuild when the lib API changes (issue #105:
+# incremental builds linked stale-ABI objects against a new lib; the
+# aim_target WRAM stream diverged from a clean build twice before this).
+# Coarse — any header change recompiles the example — but correct.
+LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
@@ -276,7 +293,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # Step 3: wrap with memmap and assemble via wla-65816.
 # SKIP_LINT=1 disables the syntax check (escape hatch for environments
 # without clang; CI always runs with the check enabled).
-%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP)
+%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -387,6 +404,40 @@ ifneq ($(SKIP_BANK0_CHECK),1)
 		if [ "$$rc" -eq 1 ]; then \
 			echo "ERROR: bank \$$00 ROM overflow / imminent overflow — see symmap output above"; \
 			echo "       reduce const data, split arrays, or set SKIP_BANK0_CHECK=1 to bypass."; \
+			exit 1; \
+		fi; \
+	fi
+endif
+	@# C RAM band budget check — the RAM twin of the ROM ratchet above
+	@# (defect B2: C RAM must sit below $$2000; higher is silently
+	@# wrong-banked). Prints the free-space number at every link so
+	@# approaching the 8 KB ceiling is visible long before it corrupts.
+	@# Set SKIP_RAM_CHECK=1 to disable; RAM_{FAIL,WARN}_THRESHOLD=N to retune.
+ifneq ($(SKIP_RAM_CHECK),1)
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-ram-budget \
+			--ram-fail-threshold $(RAM_FAIL_THRESHOLD) \
+			--ram-warn-threshold $(RAM_WARN_THRESHOLD) "$$SYM"; \
+		rc=$$?; \
+		if [ "$$rc" -eq 1 ]; then \
+			echo "ERROR: C RAM band overflow / imminent overflow — see symmap output above"; \
+			echo "       shrink RAM usage below \$$2000, or set SKIP_RAM_CHECK=1 to bypass."; \
+			exit 1; \
+		fi; \
+	fi
+endif
+	@# Bank-blind C reads of bank $$01+ data (issue #104): the read-side
+	@# symmetric of the spill ratchet. A symbol deref'd from C without a
+	@# bank reference must be linked in bank $$00 — otherwise the 16-bit
+	@# deref reads garbage. SKIP_BANKREAD_CHECK=1 to bypass.
+ifneq ($(SKIP_BANKREAD_CHECK),1)
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/check_bank_reads.py "$$SYM" . ; \
+		rc=$$?; \
+		if [ "$$rc" -ne 0 ]; then \
+			echo "ERROR: bank-blind C read of bank \$$01+ data — see above."; \
 			exit 1; \
 		fi; \
 	fi

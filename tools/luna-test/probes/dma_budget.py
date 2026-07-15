@@ -13,8 +13,14 @@ MDMA writes to $2118/$2119), columns
    active-display one).
 
 2. VBLANK BUDGET: the SNES does ~4 KB of VRAM DMA per VBlank; more corrupts. We
-   bucket the safe VBlank-window bytes (`blank=1`) by PPU frame and check the peak
-   single frame. The corpus uploads at boot and streams sprites via OAM (not VRAM),
+   bucket the safe VBlank-window bytes (`blank=1` AND screen on) by PPU frame and
+   check the peak single frame. Force-blank bytes are excluded even when they
+   land on VBlank lines: the 4 KB budget exists because of the VBlank *deadline*
+   with the screen on — under force blank there is no deadline, which is exactly
+   why big boot uploads use it. (Counting them was a latent misclassification:
+   dynamic_map's 8 KB force-blank boot upload only passed while it straddled
+   active-display lines; a few cycles of timing shift moved it inside one
+   frame's VBlank lines and tripped the guard, 2026-07-12.) The corpus uploads at boot and streams sprites via OAM (not VRAM),
    so steady-state peaks are ~0 — this acts as a regression guard that fires if a
    change starts pushing a heavy per-VBlank VRAM load.
 """
@@ -64,7 +70,10 @@ def _trace(luna: str, rom: Path):
         in_vblank, in_fblank = f[bi] == "1", f[gi] == "1"
         if not (in_vblank or in_fblank):
             unsafe += 1                 # active display, screen on → PPU ignores it
-        elif in_vblank:
+        elif in_vblank and not in_fblank:
+            # Screen-on VBlank byte: subject to the per-frame deadline budget.
+            # Force-blank bytes are budget-exempt (no deadline) even on VBlank
+            # lines — see docstring.
             per_frame_vblank[f[fi]] += 1
     return unsafe, (max(per_frame_vblank.values()) if per_frame_vblank else 0)
 

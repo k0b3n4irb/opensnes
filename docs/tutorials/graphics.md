@@ -196,6 +196,25 @@ sprite_pal_end:
 
 See `examples/graphics/effects/parallax_scrolling/` for a complete parallax scrolling example.
 
+## Hi-res and interlace (Modes 5/6, SETINI)
+
+BG Mode 5 renders **512 horizontal pixels** (16x8 tiles, stored as 8x8
+character pairs N/N+1); adding screen interlace (`videoSetInterlace(1)`,
+SETINI bit 0 through the lib's write-only shadow) doubles vertical to
+**448 lines**. Three traps, all demonstrated by
+`examples/graphics/effects/hires_text`:
+
+1. Hi-res content displays through BOTH screens: `setMainScreen(LAYER_BG1)`
+   AND `setSubScreen(LAYER_BG1)`, or odd columns stay blank.
+2. In interlace, tile texel rows map 1:1 to hi-res lines — a full-height
+   page needs 56 tile rows (a 32x64 tilemap), not 28.
+3. On a modern LCD the alternating columns show as fringing; a period CRT
+   blended them. The example's README has the full explainer.
+
+`videoSetObjInterlace`, `videoSetOverscan` and `videoSetPseudoHires`
+cover the other SETINI bits — overscan shrinks the VBlank DMA budget by
+~15 lines, see the header warning.
+
 ## Next Steps
 
 - @ref tutorial_sprites "Sprites & Animation"

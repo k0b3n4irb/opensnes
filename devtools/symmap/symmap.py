@@ -117,6 +117,7 @@ class SymbolTable:
         self.symbols: dict[str, Symbol] = {}  # name -> Symbol
         self.banks: dict[int, list[Symbol]] = {}  # bank -> list of symbols
         self.sections: list[SectionRec] = []  # from the [sections] block
+        self.ramsections: list[SectionRec] = []  # from the [ramsections] block
 
     def parse(self, sym_path: Path) -> None:
         """Parse a WLA-DX .sym file"""
@@ -141,6 +142,20 @@ class SymbolTable:
                         r'\s+([0-9a-fA-F]{4})\s+([0-9a-fA-F]{8})\s+(\S+)$', line)
                     if m:
                         self.sections.append(SectionRec(
+                            name=m.group(4),
+                            bank=int(m.group(1), 16),
+                            address=int(m.group(2), 16),
+                            size=int(m.group(3), 16)))
+                    continue
+
+                # [ramsections] rows: "BB:AAAA AAAA SIZE8 name"
+                # e.g. "00:0700 0700 00000800 .dynamic_sprite_buffer"
+                if block == '[ramsections]':
+                    m = re.match(
+                        r'^([0-9a-fA-F]{2}):([0-9a-fA-F]{4})\s+[0-9a-fA-F]{4}'
+                        r'\s+([0-9a-fA-F]{8})\s+(\S+)$', line)
+                    if m:
+                        self.ramsections.append(SectionRec(
                             name=m.group(4),
                             bank=int(m.group(1), 16),
                             address=int(m.group(2), 16),
@@ -617,6 +632,92 @@ def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048,
     return 0
 
 
+def print_ram_budget_check(table: SymbolTable, warn_threshold: int = 1024,
+                           fail_threshold: int = 0) -> int:
+    """Check and print C RAM band ($00:0000-$1FFF) budget status.
+
+    The compiler's RAM addressing is bank-$00-implicit (`sta.l $0000,x`),
+    so all C-accessible RAM must live in the 8 KB WRAM mirror below $2000
+    (KNOWN_LIMITATIONS.md / structural defect B2). This is the RAM twin of
+    the bank $00 ROM ratchet: it turns "are we near the 8 KB ceiling?"
+    into a number printed at every link, instead of a silent-corruption
+    surprise when the ceiling is hit.
+
+    Exit code 1 (hard fail): a bank-$00 RAM section crosses or sits past
+        $2000 (its C accesses are silently wrong / collide with hardware
+        registers), OR free space below ``fail_threshold`` (> 0).
+    Exit code 2: free space below ``warn_threshold`` (soft warning, with
+        the largest sections listed as refactor candidates).
+    Exit code 0: within budget.
+    """
+    BAND_END = 0x2000
+
+    band = [s for s in table.ramsections
+            if s.bank == 0x00 and s.address < BAND_END]
+    out_of_band = [s for s in table.ramsections
+                   if s.bank == 0x00 and BAND_END <= s.address < 0x8000]
+    crossers = [s for s in band if s.address + s.size > BAND_END]
+
+    if not band and not out_of_band:
+        # Older .sym without a [ramsections] block: fall back to wlalink's
+        # high-water marker if present.
+        end = table.symbols.get('RAM_USAGE_SLOT_1_BANK_0_END')
+        if end is None:
+            print(f"{Colors.YELLOW}NOTE: no [ramsections] block and no "
+                  f"RAM_USAGE marker — C RAM budget not measurable{Colors.RESET}")
+            return 0
+        used_top = end.address + 1
+        free_bytes = BAND_END - used_top
+        total = used_top  # no per-section detail available
+        nsections = 0
+    else:
+        used_top = max(s.address + s.size for s in band) if band else 0
+        free_bytes = BAND_END - used_top
+        total = sum(s.size for s in band)
+        nsections = len(band)
+
+    if crossers or out_of_band:
+        print(f"{Colors.RED}{Colors.BOLD}FAIL: C RAM outside the $0000-$1FFF "
+              f"band!{Colors.RESET}\n")
+        print("The compiler's RAM addressing is bank-$00-implicit, so RAM")
+        print("past $1FFF is silently wrong-banked (or collides with the")
+        print("hardware registers at $2100+). These sections are affected:\n")
+        for s in crossers:
+            print(f"  {Colors.RED}$00:{s.address:04X}+{s.size:04X}{Colors.RESET}"
+                  f"  {s.name}  (crosses $2000)")
+        for s in out_of_band:
+            print(f"  {Colors.RED}$00:{s.address:04X}+{s.size:04X}{Colors.RESET}"
+                  f"  {s.name}  (entirely past $2000)")
+        print("\nFIX: shrink RAM usage below the 8 KB band (see the section")
+        print("     list via --check-ram-budget on a passing build), or keep")
+        print("     the data ASM-only with explicit bank addressing.")
+        return 1
+
+    if fail_threshold > 0 and free_bytes < fail_threshold:
+        print(f"{Colors.RED}{Colors.BOLD}FAIL: C RAM band nearly full "
+              f"({free_bytes} bytes free, fail-threshold: {fail_threshold})"
+              f"{Colors.RESET}")
+        print("  The next RAMSECTION may not fit below $2000 — C reads of")
+        print("  anything placed higher are silently wrong (defect B2).")
+        return 1
+
+    if free_bytes < warn_threshold:
+        print(f"{Colors.YELLOW}WARNING: C RAM band nearly full "
+              f"({free_bytes} bytes free below $2000, threshold: "
+              f"{warn_threshold}){Colors.RESET}")
+        biggest = sorted(band, key=lambda s: s.size, reverse=True)[:3]
+        if biggest:
+            print("  Largest RAM sections (refactor candidates):")
+            for s in biggest:
+                print(f"    {s.size:5d} bytes  {s.name}")
+        return 2
+
+    print(f"{Colors.GREEN}OK: C RAM band $0000-$1FFF: {free_bytes} bytes free "
+          f"(top at ${used_top:04X}; {total} bytes in {nsections} sections)"
+          f"{Colors.RESET}")
+    return 0
+
+
 def print_symbol_search(table: SymbolTable, name: str):
     """Search for and print symbol information"""
     results = table.find_symbol(name, fuzzy=True)
@@ -704,6 +805,15 @@ Examples:
                         help='Show all symbols in memory layout')
     parser.add_argument('--check-overlap', action='store_true',
                         help='Check for WRAM mirror overlaps (main use case)')
+    parser.add_argument('--check-ram-budget', action='store_true',
+                        help='Check C RAM band ($00:0000-$1FFF) usage — the RAM '
+                             'twin of the bank $00 ROM ratchet (defect B2)')
+    parser.add_argument('--ram-warn-threshold', type=int, default=1024, metavar='N',
+                        help='Warn when C RAM band free space drops below N bytes '
+                             '(default: 1024)')
+    parser.add_argument('--ram-fail-threshold', type=int, default=0, metavar='N',
+                        help='Fail when C RAM band free space drops below N bytes '
+                             '(default: 0 = disabled)')
     parser.add_argument('--check-bank0-overflow', action='store_true',
                         help='Check for C-generated data that spilled from bank $00')
     parser.add_argument('--warn-threshold', type=int, default=2048, metavar='N',
@@ -748,6 +858,11 @@ Examples:
 
     if args.check_overlap:
         return print_overlap_check(table)
+
+    if args.check_ram_budget:
+        return print_ram_budget_check(table,
+                                      warn_threshold=args.ram_warn_threshold,
+                                      fail_threshold=args.ram_fail_threshold)
 
     if args.check_bank0_overflow:
         return print_bank0_overflow_check(table,

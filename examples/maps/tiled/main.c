@@ -67,8 +67,11 @@ extern u8 tilesetatt[];
  * Game State
  *============================================================================*/
 
-/** @brief Camera X position in map pixels. Controls which part of the level is visible. */
-s16 mapscx;
+/** @brief Focus-point X in map pixels — the point the camera FOLLOWS
+ *  (your player's position), NOT a scroll origin. mapUpdateCamera()
+ *  centers the view on it with boundary clamping; passing a view origin
+ *  here shifts the whole level by half a screen (see map.h). */
+s16 focusx;
 
 /**
  * @brief Entry point — initialize hardware, load map, scroll with D-pad
@@ -113,14 +116,16 @@ int main(void) {
     setScreenOn();
 
     /*
-     * Step 5: Main loop — scroll the camera with D-pad
+     * Step 5: Main loop — scroll with the D-pad
      *
-     * The camera X position (mapscx) is in map pixel coordinates.
-     * The map engine handles converting this to tile-aligned VRAM updates.
+     * focusx is the point to FOLLOW (in a game: the player), in map pixel
+     * coordinates. mapUpdateCamera() centers the view on it and clamps at
+     * the map edges; the engine converts to tile-aligned VRAM updates.
+     * See mapandobjects, which passes the player position (mariox, marioy).
      *
      * Bounds: 128px (half screen) to 1664px (map width - half screen)
      */
-    mapscx = 16 * 8;
+    focusx = 16 * 8;
 
     while (1) {
         /* Update the visible tilemap window based on camera position */
@@ -130,16 +135,17 @@ int main(void) {
         pad = padHeld(0);
 
         if (pad & KEY_LEFT) {
-            if (mapscx > 16 * 8)
-                mapscx--;
+            if (focusx > 16 * 8)
+                focusx--;
         }
         if (pad & KEY_RIGHT) {
-            if (mapscx < 208 * 8)
-                mapscx++;
+            if (focusx < 208 * 8)
+                focusx++;
         }
 
-        /* Tell the map engine where the camera is */
-        mapUpdateCamera(mapscx, 0);
+        /* mapUpdateCamera() takes the point to FOLLOW (player), not a
+         * scroll origin — the view centers on it with clamping */
+        mapUpdateCamera(focusx, 0);
 
         /* Wait for VBlank, then DMA the tilemap updates to VRAM */
         WaitForVBlank();

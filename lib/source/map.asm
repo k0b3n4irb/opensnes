@@ -1127,11 +1127,12 @@ mapGetMetaTile:
     lsr
     and #$FFFE
     clc
-    adc mapadrrowlut,x
-    tax
-
+    adc.l mapadrrowlut,x                    ; long: table at $7E:3000+, above the
+    tax                                     ; WRAM mirror — absolute,X with the
+                                            ; caller's DB reads open bus from C
+                                            ; (DB=$00, issue #103)
     phx
-    lda maptile_L1d
+    lda.l maptile_L1d                       ; long: same $7E RAMSECTION (#103)
     clc
     adc 1,s
     tax
@@ -1139,7 +1140,7 @@ mapGetMetaTile:
     phb
     sep #$20
     .ACCU 8
-    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    lda.l maptile_L1b                       ; DB = layer1map's bank (B1: was #$00,
     pha                                     ; hardcoded bank $00; now honours the
     plb                                     ; pointer's bank so the map can live
     rep #$20                                ; outside bank $00)
@@ -1188,11 +1189,12 @@ mapGetMetaTilesProp:
     lsr
     and #$FFFE
     clc
-    adc mapadrrowlut,x
-    tax
-
+    adc.l mapadrrowlut,x                    ; long: table at $7E:3000+, above the
+    tax                                     ; WRAM mirror — absolute,X with the
+                                            ; caller's DB reads open bus from C
+                                            ; (DB=$00, issue #103)
     phx
-    lda maptile_L1d
+    lda.l maptile_L1d                       ; long: same $7E RAMSECTION (#103)
     clc
     adc 1,s
     tax
@@ -1200,7 +1202,7 @@ mapGetMetaTilesProp:
     phb
     sep #$20
     .ACCU 8
-    lda maptile_L1b                         ; DB = layer1map's bank (B1: was #$00,
+    lda.l maptile_L1b                       ; DB = layer1map's bank (B1: was #$00,
     pha                                     ; hardcoded bank $00; now honours the
     plb                                     ; pointer's bank so the map can live
     rep #$20                                ; outside bank $00)
@@ -1212,7 +1214,8 @@ mapGetMetaTilesProp:
 
     asl a
     tax
-    lda	metatilesprop, x
+    lda.l metatilesprop,x                   ; long: $7E table, caller DB is $00
+                                            ; from C — the issue #103 read
 
     sta.w tcc__r0
 

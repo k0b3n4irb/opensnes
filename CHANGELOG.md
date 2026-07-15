@@ -2,6 +2,68 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.30.0] — 2026-07-15
+
+The PeterLemon port series: six krom demos reproduced in C with measured
+parity (pixel-exact / IoU 1.0 / cycle-exact cadence), each landing the
+SDK surface it exposed as missing. 63 examples.
+
+### Added
+- feat(lib): H/V-timer IRQ surface — `irqSet`/`irqSetBank`/`irqClear`,
+  `irqSetHTimer`/`irqSetVTimer`, `irqEnable`/`irqDisable`; raw crt0
+  dispatcher (`jml [irq_callback]`, zero imposed overhead) with the
+  ASM-only handler contract documented in `interrupt.h`
+- feat(lib): SETINI video surface — `videoSetInterlace`,
+  `videoSetObjInterlace`, `videoSetOverscan`, `videoSetPseudoHires`,
+  composing through a write-only-register shadow
+- feat(lib): `hdmaSetupIndirect` (the indirect HDMA the header promised)
+  + `HDMA_DEST_M7B/C/D` defines
+- feat(examples): six krom (Peter Lemon) ports, each with a
+  register-fidelity table and measured parity in its README —
+  `hdma_wave_table` (repoint animation, residual-0 displacement field),
+  `hdma_indirect_gradient` (pixel-exact), `hicolor_1792` (1792 colors
+  via H-IRQ CGRAM streaming, cadence cycle-exact in luna AND Mesen2),
+  `mode7_perspective_rotate` (full matrix per scanline, IoU 1.0000 at
+  90°), `hires_text` (512×448, Mode 5 + interlace), `window_multi_hdma`
+  (both windows per scanline), `gradient_9bit` (0 differing pixels)
+- feat(devtools): `check_bank_reads.py` (bank-blind C read post-link
+  guard, #104), `check_corpus_fresh.py` (stale-corpus gate, #105),
+  `m7ptables.py` (Mode 7 table extraction + 32256/32256 math
+  verification), `hicolor64.py` (per-tile-row palette converter)
+- test(luna-test): blank-baseline guard — a broken ROM can no longer
+  self-certify a black frame (#115); NMI-context math + #114 + #99
+  regression pins in the libtest ROM (24 vectors)
+
+### Fixed
+- fix(runtime): NMI-safe mul/div — C's `*`/`/`/`%` inside nmiSet
+  callbacks silently returned auto-joypad garbage (hardware mul/div
+  unit conflict); the runtime now takes software paths in NMI context
+  (#113). `fixMul`/`fixLerp` stay hardware and carry loud warnings.
+- fix(compiler): signed division through explicit casts — cproc's
+  stale pre-16-bit-int signedness heuristic forced `(s16)` casts of
+  unsigned-derived operands back to unsigned div/mod/shr/compares
+  (#114); signedness now follows the operand type per the C standard
+- fix(lib): `consoleInit` left the OPHCT/OPVCT latch read pointers
+  mid-sequence (single-read rand seeding) — every later latched
+  H/V-counter read was hi/lo-swapped garbage
+- fix(lib): `nmiSetBank` restored NMITIMEN from a literal, clobbering
+  timer-IRQ enable bits — all $4200 writes now compose through a shadow
+- fix(lib): map getters read their $7E tables with long addressing —
+  usable from C (#103)
+- fix(examples): `fix32_orbit` renders its orbiting dot for the first
+  time — mis-interleaved 4bpp tile data + wrong OBSEL base, masked for
+  weeks by a black baseline (#115); `oamInit` tile_base doc corrected
+  ($2000-word steps, not $1000)
+
+### Changed
+- docs: effects-arc techniques integrated into the hdma/window/mode7/
+  graphics tutorials; hi-res physics explainer; KNOWN_LIMITATIONS entry
+  for fixMul-in-NMI
+- build: targeted gitignore artifact names replace the *.asm/*.bin/*.h
+  catch-alls (fresh-checkout builds were losing committed assets)
+- chore(luna-test): pinned luna bumped to v1.9.0 (`--force-mapper` on
+  run, typed `dma.channels[]` state, `luna frames`)
+
 OpenSNES is forked from [PVSnesLib](https://github.com/alekmaul/pvsneslib). This changelog
 covers changes made since the fork.
 

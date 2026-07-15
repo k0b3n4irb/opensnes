@@ -1409,8 +1409,16 @@ the correct 24-bit form for above-`$2000` data.
   `$7E:0300–$051F` for the OAM buffer (page-aligned mirror).
 - Custom `RAMSECTION` users must respect this; documented in
   `KNOWN_LIMITATIONS.md` as a 🔴 silent-corruption mode.
-- No automated check (no equivalent of the bank-`$00`-overflow ratchet
-  for RAM placement).
+- **Automated check since 2026-07-11**: `symmap.py --check-ram-budget`
+  runs after every link (make/common.mk), the RAM twin of the bank-$00
+  ROM ratchet. Hard-fails a bank-$00 RAM section crossing/past $2000
+  and free space < `RAM_FAIL_THRESHOLD` (512); warns < 1024 with the
+  largest sections listed. Corpus baseline at introduction: breakout
+  668 bytes free (`.game_buffers` 4708 B), tetris 928 — the two real
+  games are already within 1 KB of the ceiling, which is the empirical
+  trigger data for scheduling this chantier: if the showcase RPG's
+  free-space number trends below ~2 KB with state still to add, B2
+  moves up the queue (decision gate set 2026-07-11).
 
 **Proposed fix**: teach QBE w65816's emit pass to emit proper 24-bit
 addressing for RAM accesses outside `$00`. Specifically:

@@ -162,7 +162,7 @@ is fine but spelled-out logic is easier for the next reader.
 | `windowCentered(window, width)` | Helper: position window symmetrically around screen centre with given width. |
 | `windowSplit(splitX)` | Helper: configure W1 = left half (`0..splitX`), W2 = right half (`splitX..255`) for split-screen. |
 
-## Worked patterns (the two shipped examples)
+## Worked patterns (the shipped examples)
 
 ### Animated triangle reveal — `examples/graphics/effects/window`
 
@@ -275,3 +275,13 @@ because the data per scanline is small (1–2 bytes per channel).
   blending side of `transparent_window`.
 - [Graphics tutorial](graphics.md) — companion read for the BG-layer
   fundamentals the window operates on.
+
+### Both windows per scanline — `examples/graphics/effects/window_multi_hdma`
+
+One channel in `HDMA_MODE_4REG` streams WH0-WH3 — both windows' left AND
+right edges — per band, cutting a porthole grid into BG1. The window
+algebra: W1 and W2 both enabled on the layer, both INVERTED
+(`windowSetInvert`), combined with `WINDOW_LOGIC_AND`, masked on the main
+screen (`windowSetMainMask`) — the layer is hidden where (outside W1) AND
+(outside W2), i.e. visible inside either window. A degenerate window
+(left=1, right=0) is the standard "band fully masked" table value.

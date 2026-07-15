@@ -98,6 +98,26 @@ jobs:
         with:
           submodules: recursive
 
+      # Prebuilt toolchain cache — same key formula as opensnes_build.yml, so
+      # a release reuses the caches develop CI already populated for each
+      # os/arch. Save on miss so the first release for a new toolchain still
+      # seeds it. See opensnes_build.yml for the full rationale.
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        shell: bash
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch -t 203001010000 {} + 2>/dev/null || true
+
       # ------------------------------------ #
       # Build & create release package       #
       # ------------------------------------ #
@@ -140,6 +160,17 @@ jobs:
         run: |
           export OPENSNES_HOME=$(pwd)
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+
+      - name: Save prebuilt toolchain (cache miss only)
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: ${{ steps.toolchain.outputs.cache-primary-key }}
 
       # ------------------------------------ #
       # Tests (luna harness, see make tests) #

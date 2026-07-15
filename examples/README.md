@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 56 examples organized by topic, building
+Learn SNES development step by step. 63 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -9,7 +9,7 @@ from basic concepts to complete games.
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [basics/](basics/) | 6 | Collision, timing, scene stack, randomness, fixed-point, aiming |
-| [graphics/](graphics/) | 26 | Backgrounds, sprites, visual effects, Mode 7 |
+| [graphics/](graphics/) | 33 | Backgrounds, sprites, visual effects, Mode 7 |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 4 | Music and sound effects via SNESMOD |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
@@ -51,6 +51,13 @@ deep-dive of a step below.
 | 13 | [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
 | 14 | [graphics/backgrounds/mixed_scroll](graphics/backgrounds/mixed_scroll/) | Multiple BG layers scrolling at different rates |
 | 15 | [graphics/effects/hdma_wave](graphics/effects/hdma_wave/) | HDMA scanline wave distortion |
+| 15b | [graphics/effects/hdma_wave_table](graphics/effects/hdma_wave_table/) | Raw HDMA table built in C, krom-style repoint animation |
+| 15c | [graphics/effects/hdma_indirect_gradient](graphics/effects/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
+| 15d | [graphics/effects/hicolor_1792](graphics/effects/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
+| 15e | [graphics/effects/mode7_perspective_rotate](graphics/effects/mode7_perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
+| 15f | [graphics/effects/hires_text](graphics/effects/hires_text/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
+| 15g | [graphics/effects/window_multi_hdma](graphics/effects/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
+| 15h | [graphics/effects/gradient_9bit](graphics/effects/gradient_9bit/) | Brightness-dithered backdrop: the 9-bit color trick (krom port) |
 | 16 | [graphics/effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
 | 17 | [graphics/effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
 | 18 | [graphics/effects/transparency](graphics/effects/transparency/) | Color math (add/subtract blending) |

@@ -199,6 +199,79 @@ hdmaSetupBank:
     rtl
 
 ;------------------------------------------------------------------------------
+; void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg,
+;                        const void *table, u8 dataBank)
+;
+; Indirect HDMA: the table holds [count][ptr_lo][ptr_hi] entries whose
+; 16-bit pointers reference the actual data in `dataBank` ($43x7). The
+; INDIRECT bit ($40) is OR'd into the mode HERE — callers pass a plain
+; HDMA_MODE_*. Plain hdmaSetup does NOT program $43x7, so an indirect
+; transfer through it dereferences garbage (the HDMA_INDIRECT define
+; used to advertise that path; see hdma.h).
+;
+; cc65816 L-to-R. Stack layout (after PHP):
+;   15,s = channel  (u8 in 16-bit slot)
+;   13,s = mode     (u8 in 16-bit slot)
+;   11,s = destReg  (u8 in 16-bit slot)
+;   7,s  = table    (4-byte far pointer: low16 at 7,s, bank at 9,s)
+;   5,s  = dataBank (u8 in 16-bit slot)
+;------------------------------------------------------------------------------
+hdmaSetupIndirect:
+    php
+    rep #$30                ; 16-bit A and X/Y
+    .ACCU 16
+    .INDEX 16
+
+    ; Calculate DMA register base address for this channel
+    sep #$20
+    .ACCU 8
+    lda 15,s                ; channel (8-bit)
+    cmp #8
+    bcs @hdmaSetupIndirect_done ; Invalid channel, bail out
+
+    rep #$20
+    .ACCU 16
+    and #$00FF              ; Mask to 8-bit
+    asl a
+    asl a
+    asl a
+    asl a                   ; channel * 16
+    clc
+    adc #$4300              ; Base address
+    tax                     ; X = register base ($43x0)
+
+    ; Set HDMA mode with the INDIRECT bit (DMAPx at $43x0)
+    sep #$20
+    .ACCU 8
+    lda 13,s                ; mode (8-bit)
+    ora #$40                ; HDMA_INDIRECT: table entries are pointers
+    sta.l $0000,x           ; $43x0 = DMAP
+
+    ; Set destination register (BBADx at $43x1)
+    lda 11,s                ; destReg (8-bit)
+    sta.l $0001,x           ; $43x1 = BBAD
+
+    ; Set table address (A1Tx at $43x2-$43x3)
+    rep #$20
+    .ACCU 16
+    lda 7,s                 ; table low 16
+    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+
+    ; Table bank from the far pointer (post-A6, like hdmaSetup)
+    sep #$20
+    .ACCU 8
+    lda 9,s                 ; table bank byte
+    sta.l $0004,x           ; $43x4 = A1B (table bank)
+
+    ; Indirect DATA bank — the register plain hdmaSetup never programs
+    lda 5,s                 ; dataBank (8-bit)
+    sta.l $0007,x           ; $43x7 = DASBx (indirect data bank)
+
+@hdmaSetupIndirect_done:
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
 ; void hdmaEnable(u8 channelMask)
 ;
 ; Enables specified HDMA channels.

@@ -22,30 +22,38 @@ SYMMAP = HERE / "symmap.py"
 FIXTURES = HERE / "fixtures"
 
 
-def _check(sym: Path) -> int:
+def _check(sym: Path, flag: str = "--check-overlap") -> int:
     return subprocess.run(
-        [sys.executable, str(SYMMAP), "--check-overlap", "--no-color", str(sym)],
+        [sys.executable, str(SYMMAP), flag, "--no-color", str(sym)],
         capture_output=True, text=True,
     ).returncode
 
 
 def main() -> int:
     cases = [
-        ("broken/wram_overlap.sym", 1, "overlap must be detected"),
-        ("clean/hello_world.sym", 0, "clean map must pass"),
+        ("broken/wram_overlap.sym", "--check-overlap", 1,
+         "overlap must be detected"),
+        ("clean/hello_world.sym", "--check-overlap", 0,
+         "clean map must pass"),
+        # RAM band budget (defect B2): a bank-$00 RAMSECTION crossing or
+        # placed past $2000 is silently wrong-banked by C code — must fail.
+        ("broken/ram_band_overflow.sym", "--check-ram-budget", 1,
+         "RAM past $2000 must be detected"),
+        ("clean/hello_world.sym", "--check-ram-budget", 0,
+         "in-band RAM must pass"),
     ]
     failures = 0
-    for rel, want, desc in cases:
+    for rel, flag, want, desc in cases:
         sym = FIXTURES / rel
         if not sym.is_file():
             print(f"  FAIL  {rel}: fixture missing")
             failures += 1
             continue
-        got = _check(sym)
+        got = _check(sym, flag)
         if got == want:
-            print(f"  PASS  {rel} (rc={got}) — {desc}")
+            print(f"  PASS  {rel} [{flag}] (rc={got}) — {desc}")
         else:
-            print(f"  FAIL  {rel}: rc={got}, expected {want} — {desc}")
+            print(f"  FAIL  {rel} [{flag}]: rc={got}, expected {want} — {desc}")
             failures += 1
 
     if failures:

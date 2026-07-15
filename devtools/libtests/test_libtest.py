@@ -33,6 +33,10 @@ CASES = [
     ("r_div_zero", 2, 0),
     ("r_mod_zero", 2, 0),
     ("r_mul",      2, 5535),
+    ("r_sdiv_cast", 2, 0xFD9C),  # (s16)-30000/(s16)49 — signed div through casts (#114)
+    ("r_nmi_mul",  2, 17243),  # 123*673 & 0xFFFF, computed in the nmiSet callback (#113)
+    ("r_nmi_div",  2, 4714),   # 33000/7 in the callback — 8-bit-divisor (hardware) path pre-fix
+    ("r_nmi_mod",  2, 2),      # 33000%7 in the callback
     ("r_sqrt",     2, 12),
     ("r_rmw_u8",      2, 200),
     ("r_anim_loop",   2, 10),
@@ -41,6 +45,12 @@ CASES = [
     ("r_anim_switch", 2, 77),
     ("r_anim_cont",   2, 20),
     ("r_anim_stop",   2, 0xFFFF),
+    # map getters called from C (issue #103): expected values host-parsed
+    # from the committed mapscroll blobs (entry(1280,80)=tile 21,
+    # b16[21]=0xFF00=T_SOLID). Pre-fix these read open bus at $00:3000+.
+    ("r_map_tile",  2, 21),
+    ("r_map_prop",  2, 0xFF00),
+    ("r_map_prop0", 2, 0),
     ("s_map_width", 1, 32),
     ("s_cursor_y",  1, 8),
     ("r_done",     2, 0xBEEF),

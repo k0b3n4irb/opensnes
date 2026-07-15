@@ -134,3 +134,11 @@ binary), which is acceptable under GPL terms.
 Incompatible (do not use without isolation):
 - GPL (for library code — would require relicensing)
 - Proprietary
+
+## examples/graphics/effects/hdma_wave_table
+
+- `res/water.bmp` — original work: procedurally generated water caustics
+  (sum-of-sines field, 256-color indexed), created for this example.
+  The HDMA technique it demonstrates is a C port of "SNES Wave HDMA Demo"
+  by krom (Peter Lemon), github.com/PeterLemon/SNES — code technique
+  credited, no krom assets used.

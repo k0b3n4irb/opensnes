@@ -132,6 +132,13 @@ typedef s16 fixed;
  * @endcode
  *
  * @note Uses 32-bit intermediate for accuracy
+ *
+ * @warning NOT safe inside an nmiSet() callback: uses the hardware
+ *   multiplier (garbage during the auto-joypad window callbacks run in)
+ *   plus shared WRAM temporaries. Plain C `*` / `/` / `%` ARE
+ *   callback-safe (the runtime switches to a software path there —
+ *   see .claude/notes/tech/nmi_context_hardware_muldiv.md). fixLerp()
+ *   carries the same restriction.
  */
 fixed fixMul(fixed a, fixed b);
 

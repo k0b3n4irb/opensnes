@@ -177,7 +177,7 @@ Two things often forgotten:
    before the source/mode/destination are settled gives the PPU a frame
    of garbage HDMA reads.
 
-## Worked patterns (the six shipped examples)
+## Worked patterns (the shipped examples)
 
 Every shipped example exercises a distinct HDMA case. Read the
 `@par What to Observe` block at the top of each `main.c` for the
@@ -231,6 +231,53 @@ registers once (and then "every scanline" since window registers are
 write-only and forget on the next scanline). The window position holds
 across the visible region; the effect is a static masked area rather
 than animation.
+
+### Indirect HDMA — `examples/graphics/effects/hdma_indirect_gradient`
+
+`hdmaSetupIndirect()` (DMAP bit 6): table entries hold POINTERS to the
+payload instead of the payload itself, letting many scanline bands share
+data blocks. The example reproduces krom's RedSpace gradient pixel-exactly
+with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to
+blocks goes in `$43x7` — pass it with the bank-extraction idiom
+(`(u8)((u32)(void *)table >> 16)`).
+
+### Table repointing as animation — `examples/graphics/effects/hdma_wave_table`
+
+krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries, and the
+per-frame "animation" is just `hdmaSetup(..., table + phase * 3)` — a
+zero-copy pointer bump. Cheaper than regenerating tables and immune to
+the VBlank budget.
+
+### Full Mode 7 matrix per line — `examples/graphics/effects/mode7_perspective_rotate`
+
+Four channels, one per matrix register (M7A/B/C/D ← `HDMA_DEST_M7A..D`),
+each in `HDMA_MODE_1REG_2X`. See the Mode 7 tutorial for the technique;
+the HDMA lesson here is arming: **`hdmaSetup()` configures but does NOT
+enable** — without `hdmaEnable(0x0F)` you get a static 1:1 view that can
+look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
+typed state when an HDMA effect "does nothing".
+
+### Two channels, one visual — `examples/graphics/effects/gradient_9bit`
+
+Channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
+CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
+line. Colour x brightness plus per-line jitter dithers the gradient into
+more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the
+stream: the demo never calls `setScreenOn()`.
+
+## When HDMA isn't enough: H-timer IRQ streaming
+
+HDMA's widest mode moves 4 bytes per scanline. Some techniques need more —
+HiColor reloads 16 bytes (8 colours) of CGRAM every line. The tool for
+that is the **H-timer IRQ**: `irqSet()` a raw ASM handler, `irqSetHTimer(190)`
+so it fires near the end of the visible line, `irqEnable(IRQ_HTIMER)` —
+the handler fires a general DMA whose source auto-advances across
+transfers. See `examples/graphics/effects/hicolor_1792` (1792 colours
+from a 4bpp BG) and the loud contract in `<snes/interrupt.h>`: handlers
+are ASM-only (a C callback cannot afford per-scanline prologue latency),
+must ack `$4211`, and must save what they touch. Plain C `*`/`/`/`%` in
+*NMI* callbacks is safe (the runtime switches to software paths there),
+but `fixMul()`/`fixLerp()` are not — see KNOWN_LIMITATIONS.
 
 ## Gotchas
 
