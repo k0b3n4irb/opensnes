@@ -1,6 +1,11 @@
 # The fixed re-read: after the byte store, rep #$20 restores 16-bit BEFORE
 # the address reload (lda N,s; tax), then sep #$20 for the byte load.
-present sta\.l \$0000,x\n\trep #\$20\n\tlda \d+,s\n\ttax\n\tsep #\$20\n\tlda\.l \$0000,x
+# Re-pinned 2026-07-22 (issue #132): the invariant is that the byte
+# store's 8-bit mode is restored before ANY 16-bit address work, not the
+# exact sequence that followed it. The emitter now recomputes the
+# address (lda/clc/adc) instead of reloading it, so the old regex no
+# longer matched while the property it protects still held.
+present sta\.l \$0000,x\n\trep #\$20
 # The bug signature must never come back: byte store, then address reload
 # + tax + byte load with NO mode switch between them — the store's 8-bit
 # mode leaked through, so the reload ran in 8-bit and grabbed only the low

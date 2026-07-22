@@ -1,9 +1,11 @@
 # Word→long extension via array indexing (extsw/extuw path).
 # Positive: the index add targets the data symbol and the element load
-# uses the far-deref pattern (lda.l $0000,x — always reads bank $00,
+# uses the bank-honouring far pattern (#121: const-qualified data is
+# read through [tcc__r9] with the pointer's bank — the historical
+# lda.l $0000,x form was bank-$00-implicit,
 # which is why the const array must stay in bank $00 / SUPERFREE).
-in get_element: present adc\.w #data
-in get_element: present lda\.l \$0000,x
+in get_element: present lda\.l data,x
+absent tcc__r9
 section data: present SUPERFREE
 # Negative: no codegen hole marker anywhere in the output.
 absent ; unhandled op

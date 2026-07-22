@@ -84,6 +84,16 @@ void colorMathSetCondition(u8 condition) {
     REG_CGWSEL = cgwsel;
 }
 
+void colorMathSetDirectColor(u8 enable) {
+    /* Bit 0: 8bpp BG pixels bypass CGRAM and are read as BBGGGRRR */
+    if (enable) {
+        cgwsel |= 0x01;
+    } else {
+        cgwsel &= ~0x01;
+    }
+    REG_CGWSEL = cgwsel;
+}
+
 void colorMathSetFixedColor(u8 r, u8 g, u8 b) {
     /* Write each channel separately with channel select bits */
     REG_COLDATA = COLDATA_RED | (r & 0x1F);

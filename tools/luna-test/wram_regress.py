@@ -18,6 +18,15 @@ slopemario) diverge x86_64 ↔ aarch64. Those two are skipped by default
   python3 tools/luna-test/wram_regress.py --all     # incl. arch-fragile pair
   python3 tools/luna-test/wram_regress.py --update  # (re)baseline on this machine
 
+Provenance (issue #120): each baseline entry records the sha256 of the ROM
+it was captured from. On a mismatch, the report distinguishes "ROM changed —
+rebaseline or investigate the build" from "ROM identical but stream changed —
+emulator/timing suspect". `--update` refuses to capture from a stale tree
+(the corpus-fresh guard, #105, plus a per-example source-mtime check) so a
+stale-ROM rebaseline — which shipped a wrong aim_target baseline on
+2026-07-17 — fails loudly at capture time instead of in CI. Legacy entries
+(bare stream strings) are still readable; a full --update migrates them.
+
 Exit 0 = all match, 1 = any drift.
 """
 from __future__ import annotations
@@ -43,6 +52,45 @@ FRAMES = 90   # consecutive vblank-aligned frames to hash
 CROSS_ARCH_EXCLUDE = {"games_mapandobjects", "maps_slopemario"}
 
 
+# Build-input suffixes for the per-example staleness check. Deliberately
+# excludes docs (README.md, screenshot regen) so editing prose never blocks a
+# capture; includes generated intermediates (.bin, .pic, .pal, .map) because a
+# ROM older than its own inputs is stale by definition.
+SOURCE_SUFFIXES = {".c", ".h", ".asm", ".inc", ".s", ".sfx", ".py",
+                   ".png", ".bmp", ".pic", ".pal", ".map", ".brr", ".it", ".bin"}
+
+
+def rom_sha256(rom: Path) -> str:
+    return hashlib.sha256(rom.read_bytes()).hexdigest()
+
+
+def entry_parts(entry) -> tuple[str, str | None]:
+    """Return (stream_hash, rom_sha256|None), accepting legacy bare strings."""
+    if isinstance(entry, str):
+        return entry, None
+    return entry["stream"], entry.get("rom_sha256")
+
+
+def stale_sources(rom: Path) -> list[Path]:
+    """Build inputs in the example dir newer than the ROM (empty = fresh)."""
+    rom_m = rom.stat().st_mtime
+    stale = []
+    for f in rom.parent.rglob("*"):
+        if (f.is_file() and f.suffix in SOURCE_SUFFIXES
+                and f.name != "screenshot.png"  # README artifact, not an input
+                and f.stat().st_mtime > rom_m):
+            stale.append(f)
+    return stale
+
+
+def corpus_is_fresh() -> bool:
+    """Run the corpus-fresh guard (#105) — the make-tests gate, enforced here
+    too so a direct --update can't capture from a stale tree."""
+    sys.path.insert(0, str(HERE.parent.parent / "devtools"))
+    import check_corpus_fresh  # noqa: E402
+    return check_corpus_fresh.main() == 0
+
+
 def stream_hash(luna: str, rom: Path) -> str:
     out = Path("/tmp/luna-wram") / f"{example_key(rom).replace('/', '_')}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -66,9 +114,17 @@ def main() -> int:
     ap.add_argument("--only", metavar="SUBSTR")
     ap.add_argument("--all", action="store_true",
                     help="include the arch-fragile pair (same-arch baseline only)")
+    ap.add_argument("--force-stale", action="store_true",
+                    help="capture from a stale tree anyway (debugging only — "
+                         "NEVER commit a baseline captured with this)")
     args = ap.parse_args()
     luna = find_luna()
     db = json.loads(BASELINE.read_text()) if BASELINE.is_file() else {}
+
+    if args.update and not args.force_stale and not corpus_is_fresh():
+        print("REFUSED: --update from a stale tree writes wrong baselines "
+              "(#120). Rebuild first, or --force-stale for local debugging.")
+        return 1
 
     fails = updated = count = skipped = 0
     for rom in discover_example_roms():
@@ -90,17 +146,36 @@ def main() -> int:
             fails += 1
             continue
         if args.update:
-            db[label] = h
+            newer = stale_sources(rom)
+            if newer and not args.force_stale:
+                print(f"  REFUSED {label}: ROM older than "
+                      f"{newer[0].relative_to(rom.parent)}"
+                      + (f" (+{len(newer) - 1} more)" if len(newer) > 1 else "")
+                      + " — rebuild before capturing (#120)")
+                fails += 1
+                continue
+            db[label] = {"stream": h, "rom_sha256": rom_sha256(rom)}
             updated += 1
             print(f"  BASELINE {label}  {h[:16]}…")
         elif label not in db:
             print(f"  MISS  {label}: no baseline — run --update first")
             fails += 1
-        elif h == db[label]:
-            print(f"  PASS  {label}")
         else:
-            print(f"  FAIL  {label}: WRAM-state stream changed ({h[:16]}… != {db[label][:16]}…)")
-            fails += 1
+            base_h, base_rom = entry_parts(db[label])
+            if h == base_h:
+                print(f"  PASS  {label}")
+            else:
+                if base_rom is None:
+                    why = "no ROM provenance recorded (legacy entry)"
+                elif rom_sha256(rom) == base_rom:
+                    why = ("ROM IDENTICAL to baseline capture — emulator/"
+                           "timing suspect (luna version change?)")
+                else:
+                    why = ("ROM bytes differ from baseline capture — "
+                           "if intentional, rebuild clean then --update")
+                print(f"  FAIL  {label}: WRAM-state stream changed "
+                      f"({h[:16]}… != {base_h[:16]}…; {why})")
+                fails += 1
 
     if args.update:
         BASELINE.parent.mkdir(parents=True, exist_ok=True)

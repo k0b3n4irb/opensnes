@@ -66,6 +66,21 @@ void warning (const char *format, ...)
 }
 
 //-------------------------------------------------------------------------------------------------
+// Print a continuation line for the warning above it - no severity tag, so a
+// multi-line explanation does not read as several independent diagnostics.
+void note (const char *format, ...)
+{
+  va_list ap;
+
+  va_start (ap, format);
+  fprintf (stderr, "%s:          ", ERRORBRIGHT("gfx4snes"));
+  vfprintf (stderr, format, ap);
+  va_end (ap);
+  fputc ('\n', stderr);
+  fflush(stderr);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Print an error message - output produced, but terminate execution is elsewhere.
 void errorcontinue (const char *format, ...)
 {

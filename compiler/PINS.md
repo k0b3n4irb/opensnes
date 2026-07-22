@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 03d9e5151d298309fdd65e612ffd72e54bafec25 | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
-| compiler/qbe | f9c6faaa8cf0ada679568d19463f38d48b413494 | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
+| compiler/cproc | e045ccc5d57b9dba9a64d58fca7a3c95fab28d6f | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
+| compiler/qbe | 1f38c0c1ca44476f2ccd59ae904bef4f2662404b | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
 <!-- END PINS -->
 
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 12 patches (upstream merge-base: 7051114)
+### compiler/cproc — 13 patches (upstream merge-base: 7051114)
 
 ```
+e045ccc fix(qbe): int->class mapping and operand widening for a 4-byte `l`
 6bdd923  feat(65816): pointer size/align 8/8 → 4/2 (chantier A6.1)
 cceac4b  fix(65816): preserve volatile through QBE IR  (chantier A2)
 7f26c16  fix(65816): align int/long type sizes with the w65816 target  (chantier A1)
@@ -63,11 +64,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 50 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 51 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1f38c0c fix(load): teach load forwarding the target's word size
 1884a20  fix(qbe): fold Osar as 32-bit signed on w65816 (chantier A7 Phase 1)
 179676e  feat(w65816): chantier A6+A7 — full pointer ABI + Kl pair lowering
 5c23467  fix(qbe): guard crash_handler behind __has_include(<execinfo.h>)

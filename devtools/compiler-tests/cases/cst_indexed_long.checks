@@ -1,0 +1,8 @@
+# Indexed-long cst load fusion (#121 follow-up): const_array[i] must
+# read through absolute long indexed addressing (one instruction, the
+# hardware adds X to the full 24-bit address) — not the [tcc__r9] far
+# setup, and never the bank-blind lda.w/lda.l $0000,x forms.
+
+in byteidx: present lda\.l romtab,x
+in wordidx: present lda\.l romtab16,x
+absent tcc__r9

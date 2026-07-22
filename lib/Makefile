@@ -39,6 +39,8 @@ MEMMAP_SUPERFX = ../templates/memmap.inc
 # Tools (using QBE-based compiler)
 CC = ../bin/cc65816
 AS = ../bin/wla-65816
+SPC_AS = ../bin/wla-spc700
+LD = ../bin/wlalink
 
 # Flags
 CFLAGS = -I$(INCDIR)
@@ -52,8 +54,10 @@ ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 #       scope). They build with the same pipeline, but lib/contrib/README.md flags
 #       them as non-essential — examples that don't need them won't link them.
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
-# Exclude crt0 (per-ROM), sm_spc (included by snesmod), superfx (SuperFX-only)
-ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm, $(wildcard $(SRCDIR)/*.asm)) \
+# Exclude crt0 (per-ROM), sm_spc (included by snesmod), superfx (SuperFX-only),
+# audio_driver.spc700 (SPC700 source — built by wla-spc700 into the blob that
+# audio_blob.asm incbins, NOT a 65816 source)
+ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm $(SRCDIR)/audio_driver.spc700.asm, $(wildcard $(SRCDIR)/*.asm)) \
               $(wildcard $(CONTRIBDIR)/*.asm)
 ASM_SOURCES_SUPERFX_ONLY = $(SRCDIR)/superfx.asm
 
@@ -96,6 +100,38 @@ all: lorom hirom sa1 superfx
 	@echo "    SA-1:     $(BUILDDIR_SA1)/"
 	@echo "    SuperFX:  $(BUILDDIR_SUPERFX)/"
 	@echo "========================================"
+
+#------------------------------------------------------------------------------
+# Audio v2 SPC700 driver — built from source into the blob audio_blob.asm
+# incbins. Same binary for all 4 variants (ARAM is mapper-agnostic).
+# 2 KB budget enforced here: the ARAM map reserves $0200-$09FF for driver
+# code (see .claude/notes/chantiers/audio_v2.md).
+# NOTE: this block sits AFTER `all:` on purpose — the first rule in a
+# Makefile is the default goal.
+#------------------------------------------------------------------------------
+
+DRIVER_BIN = $(SRCDIR)/audio_driver.spc700.bin
+DRIVER_BUDGET = 2048
+
+$(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc
+	@echo "[SPC] $< -> $@"
+	@$(SPC_AS) -I ../templates -o $(SRCDIR)/audio_driver.spc700.o $<
+	@echo "[objects]" > $(SRCDIR)/audio_driver.link
+	@echo "$(SRCDIR)/audio_driver.spc700.o" >> $(SRCDIR)/audio_driver.link
+	@$(LD) -b $(SRCDIR)/audio_driver.link $@
+	@rm -f $(SRCDIR)/audio_driver.spc700.o $(SRCDIR)/audio_driver.link
+	@size=$$(wc -c < $@ | tr -d ' '); \
+	if [ $$size -gt $(DRIVER_BUDGET) ]; then \
+		echo "FAIL: audio driver is $$size bytes > $(DRIVER_BUDGET)-byte ARAM budget"; \
+		rm -f $@; exit 1; \
+	fi
+
+# The blob wrapper must re-assemble whenever the driver binary changes
+# (dependency merged into the pattern rules of each variant).
+$(BUILDDIR_LOROM)/audio_blob-asm.o: $(DRIVER_BIN)
+$(BUILDDIR_HIROM)/audio_blob-asm.o: $(DRIVER_BIN)
+$(BUILDDIR_SA1)/audio_blob-asm.o: $(DRIVER_BIN)
+$(BUILDDIR_SUPERFX)/audio_blob-asm.o: $(DRIVER_BIN)
 
 #------------------------------------------------------------------------------
 # LoROM Build
@@ -212,3 +248,4 @@ $(BUILDDIR_SUPERFX):
 clean:
 	@echo "[CLEAN] Removing build files..."
 	-rm -rf build
+	-rm -f $(DRIVER_BIN)

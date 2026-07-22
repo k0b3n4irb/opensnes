@@ -2,6 +2,94 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.31.0] — 2026-07-22
+
+Written by building a real game. The RPG template (#7) was the forcing
+function: every silent failure it hit became a fix, a guard, or a
+sentence someone else will not have to rediscover at 2am. 74 examples.
+
+### Added
+- feat(examples): RPG template driven by Tiled — `res/town.tmj` carries
+  terrain, per-tile collision, entity positions *and* each villager's
+  line of dialogue, so adding a villager is a map edit. Two scenes (the
+  town and a house interior, each with its own tileset, palette,
+  collision and entities), a HUD with hearts and a purse, tile-exact
+  collision and a 9-slice dialog box (#7)
+- feat(lib): opt-in `panel` module — 9-slice boxes on a BG layer.
+  Several panels share one tilemap and one upload, the caller owns the
+  buffer (2 KB is a quarter of a game's RAM band — the cost stays
+  visible), and `panelFlush()` does its DMA under forced blank so the
+  #130 trap cannot be reached through it (#123)
+- feat(tools): `tmx2snes -e` emits the Entities layer as C defines
+  (struct shape + rows, custom properties included) and `-Q` emits a
+  quadrant-ordered 64x64 tilemap for the `background` module. The `-Q`
+  golden is byte-identical to the RPG's hand-written Python converter.
+  New golden suite in `make test-tools` (#128)
+- feat(tools): `gfx4snes -c FILE` imposes a palette and fails, naming
+  the colour and the pixel, when the image uses one that is not in it.
+  Adaptive quantisation is a function of the whole image, so adding a
+  tile re-derives all 16 slots and shifts every existing tile's hue —
+  which is how the RPG's roads turned pink (#131)
+- feat(build): `ASSET_SECTION` (templates/assets.inc, included in every
+  assembled file) plus a post-link report of how much asset payload sits
+  in bank $00. Assets travel as far pointers or const far reads, so they
+  never needed the code bank; the RPG went from 12 to 9902 free bytes
+  there (#127)
+- docs: `docs/API_INDEX.md` — the SDK indexed by what you are trying to
+  do, with the example that does it. Its example paths are checked by
+  the doc-drift sentinel (#126)
+
+### Fixed
+- fix(compiler): a `const` array of structs indexed at runtime kept its
+  bank byte. Three defects in a chain, the first two masking each other:
+  `convert()` used QBE's native class model (`l` is 8 bytes) on a target
+  where `l` is 4; the pointer-arithmetic widening keyed on the C type
+  kind, which repaired that by accident while truncating already-wide
+  member addresses; and QBE's load forwarding, reachable only once the
+  first two were fixed, served byte loads out of a word load by shifting
+  16 and 24 bits from a load that fetched 2. Closes #132 and takes the
+  A6 far-pointer matrix from 7/8 with 4 XPASS to **8/8 with 5 XPASS**
+- fix(lib): `collideTile`/`collideTileEx`/`collideRectTile` take a
+  `const` tilemap, so a collision map may live in any bank. It compiled
+  to `lda.l $0000,x` before — bank $00, silently, whatever the map's
+  real bank. `collision_demo` had paid 224 bytes of WRAM to work around
+  it
+- fix(lib): pointers to caller-owned read-only data are `const`
+  throughout `dma`, `background`, `sprite`, `map`, `lzss`, `object` and
+  `sram`. The SDK was forcing `const` *off* users' own assets, which
+  then made every C index of them a bank-$00 read (#122)
+- fix(lib): `oamInit`'s second parameter is named `name_base` and
+  documented as a page number 0-7, with `OBJ_NAME_BASE(addr)` to convert
+  from a VRAM address. Passing an address — the natural mistake — masks
+  to 3 bits and renders sprites as background garbage (#122)
+- fix(tools): `tmx2snes` minifies the JSON before parsing, so a
+  pretty-printed `.tmj` works; a real parse failure now reports
+  cute_tiled's reason and line instead of a bare "Cannot load map"
+  (#125)
+- fix(tools): `gfx4snes` warns when an image is not an exact multiple of
+  the block size — the last row is built from pixels that are not there
+  (#122)
+
+### Documentation
+- docs(lib): the VRAM write window on `setBrightness` and `dmaCopyVram`.
+  `setBrightness(0)` blacks the screen but leaves the PPU fetching, so
+  writes are still dropped; only `setScreenOff()` opens the window. The
+  failure survives testing — a small transfer lands in VBlank and is
+  correct every time (#130)
+- docs(lib): `dma.h` claimed source data must live in bank $00. That has
+  been false since chantier A6; the stale note is where a wrong bank-$00
+  claim about `dmaCopyCGram` in #122 came from
+- docs(lib): `oamHide()` carries the reason to call it — OAM coordinates
+  wrap, so an off-camera entity reappears somewhere plausible rather
+  than vanishing (#129)
+- docs: the top-down straddle convention in the collision tutorial, and
+  the `-s` rule in the sprite tutorial (`-s` is the SPRITE's size, not
+  the tile size) (#124, #122)
+
+### Testing
+- test: `make tests` now runs the per-frame WRAM oracle, which only CI
+  ran. The gate contributors are told to run must be the gate CI runs
+
 ## [0.30.0] — 2026-07-15
 
 The PeterLemon port series: six krom demos reproduced in C with measured

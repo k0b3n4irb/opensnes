@@ -154,6 +154,12 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
+	@# be a separate target, so `make tests` could be green on a codegen
+	@# change that CI then rejected on all five platforms — which is
+	@# exactly what happened on 2026-07-22. The gate a contributor is told
+	@# to run must be the gate CI runs.
+	@python3 tools/luna-test/wram_regress.py
 	@# Runtime fixture ROMs are rebuilt from clean: a stale .sfc built with an
 	@# experimental toolchain once produced misleading XPASSes (a6_farptr trap,
 	@# 2026-07-04). Each is a single-TU ROM; the clean rebuild costs seconds.
@@ -187,6 +193,7 @@ test-compiler:
 # tool output against committed goldens — needs `make tools` first.
 test-tools:
 	@python3 tools/gfx4snes/tests/run_golden.py
+	@python3 tools/tmx2snes/tests/run_golden.py
 	@python3 tools/smconv/tests/run_golden.py
 
 # WRAM-state regression ("did my change alter invisible runtime state?").

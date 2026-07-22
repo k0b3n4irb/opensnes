@@ -409,3 +409,97 @@ void palette_save (const char *filename, int *palette,int nbcolors, bool isquiet
 	free (outputname);
 }
 
+//-------------------------------------------------------------------------------------------------
+// Impose a palette read from a raw SNES .pal file (16-bit little-endian
+// BGR555 entries) instead of using the one the image came with.
+//
+// Why this exists: the normal path derives the palette from the image, so
+// it is a function of the WHOLE image. Add one tile and all 16 colours are
+// re-derived — every tile already drawn shifts hue, silently. Imposing the
+// palette makes indices stable across edits and turns "this colour is not
+// in the palette" into a build error instead of a surprise.
+//
+// Matching is done in SNES space (the image palette has already been
+// converted), so an 8-bit source colour that truncates onto an imposed
+// entry matches.
+void palette_impose(const char *filename, t_image *image, int *palettesnes,
+                    int nbcolors, bool isquiet)
+{
+    FILE *fp;
+    unsigned char raw[512];
+    int imposed[256];
+    int remap[256];
+    int nbimposed, i, j, npixels, found;
+    size_t got;
+
+    fp = fopen(filename, "rb");
+    if (fp == NULL)
+    {
+        fatal("can't open imposed palette file [%s]", filename);
+    }
+    got = fread(raw, 1, sizeof(raw), fp);
+    fclose(fp);
+    if (got < 2 || (got & 1))
+    {
+        fatal("[%s] is not a raw SNES palette (%zu bytes; expected an even count of 16-bit entries)",
+              filename, got);
+    }
+    nbimposed = (int)(got / 2);
+    for (i = 0; i < nbimposed; i++)
+    {
+        imposed[i] = raw[i * 2] | (raw[i * 2 + 1] << 8);
+    }
+    if (nbcolors > 0 && nbimposed < nbcolors)
+    {
+        warning("imposed palette has %d colors but -u asks for %d.", nbimposed, nbcolors);
+    }
+
+    // work out which source indices the image actually uses, and map each
+    // of them onto the imposed palette
+    npixels = (int)(image->header.width * image->header.height);
+    for (i = 0; i < 256; i++)
+    {
+        remap[i] = -1;
+    }
+    for (i = 0; i < npixels; i++)
+    {
+        int idx = image->buffer[i];
+        if (remap[idx] != -1)
+        {
+            continue;
+        }
+        found = -1;
+        for (j = 0; j < nbimposed; j++)
+        {
+            if (imposed[j] == palettesnes[idx])
+            {
+                found = j;
+                break;
+            }
+        }
+        if (found < 0)
+        {
+            int v = palettesnes[idx];
+            fatal("color #%04X (R%d G%d B%d, 5-bit) at pixel (%d,%d) is not in [%s].\n"
+                  "         Every color in the image must exist in the imposed palette.",
+                  v, v & 31, (v >> 5) & 31, (v >> 10) & 31,
+                  i % (int)image->header.width, i / (int)image->header.width,
+                  filename);
+        }
+        remap[idx] = found;
+    }
+
+    for (i = 0; i < npixels; i++)
+    {
+        image->buffer[i] = (unsigned char)remap[image->buffer[i]];
+    }
+    for (i = 0; i < 256; i++)
+    {
+        palettesnes[i] = (i < nbimposed) ? imposed[i] : 0;
+    }
+
+    if (!isquiet)
+    {
+        info("imposed palette from [%s] (%d colors)", filename, nbimposed);
+    }
+}

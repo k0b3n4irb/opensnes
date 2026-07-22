@@ -373,3 +373,9 @@ This is usually a compiler limitation. Check:
 
 - **Issues**: [github.com/k0b3n4irb/opensnes/issues](https://github.com/k0b3n4irb/opensnes/issues)
 - **SNES Dev Wiki**: [snes.nesdev.org](https://snes.nesdev.org/)
+
+## Which API do I need?
+
+See [API_INDEX.md](API_INDEX.md) — the SDK indexed by *what you are
+trying to do*, with the example that does it. Worth a scan before you
+write a helper: several already exist.

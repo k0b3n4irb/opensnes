@@ -66,6 +66,46 @@ from 16 → 8 on wip is justified by the documented post-A6 minimum;
 the goal is to claw it back to 16 once one of the recovery paths
 above lands.
 
+## Keeping assets out of bank $00 in the first place (since 2026-07-22)
+
+Most bank-$00 pressure is not code — it is payload that never needed to
+be there. `.SECTION … SUPERFREE` lets the linker choose, and it chooses
+the first bank that fits, which is bank $00. `examples/games/rpg` sat at
+**12 free bytes** with 12 KB of map data parked in the code bank.
+
+Assets do not need bank $00:
+
+- anything handed to a lib DMA function (tiles, tilemaps, palettes,
+  fonts) travels as a **far pointer** — `dmaCopyVram` and friends read
+  the bank byte;
+- anything C reads through a **`const`** pointer is a far read (#121).
+
+Only const data that C dereferences through a *non*-const pointer must
+stay. So declare payload with the macro from `templates/assets.inc`,
+included automatically in every assembled file:
+
+```asm
+ASSET_SECTION "townmap", 2
+town_map:    .incbin "res/town_map.bin"
+.ENDS
+```
+
+Pick banks upward from 2 (bank 1 is often full — audio projects pack it
+with sample data) and group related assets rather than scattering them.
+The RPG went from 12 to **9902** free bytes in bank $00 this way, with a
+pixel-identical ROM.
+
+Every link now also prints how much declared payload ended up in bank
+$00 (`report_bank0_asset_payload` in `symmap.py`). It matches section
+names exactly — `.rodata*` from QBE and `asset.*` from the macro —
+because an earlier heuristic version flagged `.text.bgSetMapPtr` for
+containing "map", and a report you cannot trust is worse than none.
+Sections that opt out of the macro are simply not counted.
+
+Issue #127 tracks the remaining piece: making non-bank-$00 the *default*
+placement rather than an opt-in. That is a chantier — it interacts with
+the audio examples, whose bank 1 is packed solid.
+
 ## When to bump `BANK0_FAIL_THRESHOLD` tighter
 
 Bumping the default tighter (say 64 → 128 → 256) is a **deliberate audit

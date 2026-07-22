@@ -41,11 +41,12 @@ Place it in a comment within the first 30 lines of the file. The
 lint scans line-by-line for the regex `; lint-asm-abi: skip-file\b`,
 case-insensitive, and skips every function in the file when found.
 
-Current users (one):
-
-| File          | Reason                          | Doc                                                       |
-|---------------|---------------------------------|-----------------------------------------------------------|
-| `audio.asm`   | PVSnesLib R-to-L + 1-byte packed| `.claude/notes/tech/audio_legacy_pvsneslib_abi.md`        |
+Current users: **none** (as of the audio v2 chantier, 2026-07). The
+historical user was `audio.asm` (PVSnesLib R-to-L + 1-byte packed
+args), deleted when the audio engine was rebuilt as pure C over the
+raw-APU path — see `.claude/notes/chantiers/audio_v2.md` and
+`.claude/notes/tech/audio_legacy_pvsneslib_abi.md`. The marker
+machinery stays: any future import of foreign-ABI ASM uses it.
 
 ### When to use the marker
 
@@ -134,13 +135,13 @@ for asm in sorted(Path('lib/source').glob('*.asm')):
 "
 ```
 
-Today's totals: 68 functions actively verified, 22 in `audio.asm`
-skipped via marker, 128 internal helpers with no public signature.
+Totals since the audio v2 chantier: 68+ functions actively verified,
+ZERO skipped via marker (the 22 legacy `audio.asm` functions are gone
+with the file), internal helpers with no public signature unchecked
+by design.
 
 ## When this rule does NOT apply
 
-- `lib/source/audio.asm` itself — the marker is intentional and
-  documented (see the tech note).
 - `combined.asm` and `*.c.asm` — those are compiler output, not
   hand-written. Verifying them is the compiler test suite's job
   (the C→ASM compiler-pattern checks in `devtools/compiler-tests/`,
@@ -155,7 +156,5 @@ skipped via marker, 128 internal helpers with no public signature.
 - `devtools/check_asm_abi.py` — the implementation.
 - `compiler/ABI.md` — the canonical cc65816 calling-convention spec.
 - `.claude/notes/tech/audio_legacy_pvsneslib_abi.md` — the legacy
-  module the marker exists for.
-- `lib/include/snes/audio.h` — the `@warning` block paired with the
-  marker.
+  module the marker existed for (retired by the audio v2 chantier).
 - Commit `595dc27` (develop) — the shift-aware lint extension.

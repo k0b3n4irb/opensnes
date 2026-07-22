@@ -139,6 +139,13 @@ u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY);
  * @param mapWidth Width of tilemap in tiles
  * @return Tile value at position (0 if empty/out of bounds)
  *
+ * @note `tilemap` is `const` ON PURPOSE: const-qualified loads compile
+ *       to bank-honouring far reads (#121), so the collision map may
+ *       live in ANY bank — typically a multi-KB `.incbin` in a
+ *       SUPERFREE section. With a non-const pointer the dereference is
+ *       bank-$00-hardcoded and a map outside bank $00 reads garbage
+ *       SILENTLY, which forced callers to waste RAM on their map.
+ *
  * @code
  * // Check if player would hit ground
  * if (collideTile(player_x + 8, player_y + 16, collision_map, 32)) {
@@ -147,7 +154,7 @@ u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY);
  * }
  * @endcode
  */
-u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth);
+u8 collideTile(s16 px, s16 py, const u8 *tilemap, u16 mapWidth);
 
 /**
  * @brief Check collision with tile using custom tile size
@@ -161,7 +168,7 @@ u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth);
  * @param tileSize Size of tiles in pixels (must be power of 2: 8, 16, 32)
  * @return Tile value at position (0 if empty/out of bounds)
  */
-u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize);
+u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize);
 
 /**
  * @brief Check collision between rectangle and tilemap
@@ -181,7 +188,7 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize);
  * }
  * @endcode
  */
-u8 collideRectTile(Rect *r, u8 *tilemap, u16 mapWidth);
+u8 collideRectTile(Rect *r, const u8 *tilemap, u16 mapWidth);
 
 /*============================================================================
  * Helper Functions

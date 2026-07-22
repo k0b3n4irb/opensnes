@@ -248,3 +248,65 @@ Total audio RAM: 64KB
 
 - @ref snesmod.h "SNESMOD API Reference"
 - @ref tutorial_graphics "Back to Graphics"
+
+## The audio module (v2) — samples and effects from pure C
+
+For sound effects and sample playback, `LIB_MODULES += audio` gives
+you the full engine with no SPC700 code of your own: the lib ships a
+resident driver (built from source at lib build time) and `audio.h`'s
+22 functions drive it — `audioInit()`, `audioLoadSample()` (BRR
+streamed into APU RAM at runtime), `audioPlaySampleEx()` (volume/pan/
+pitch, 8-voice round-robin polyphony), per-voice ADSR/GAIN, and a
+configurable echo with FIR filter. Every call is bounded — the API
+returns `AUDIO_ERR_TIMEOUT` rather than hanging. Worked example:
+`audio/soundboard`. Main-thread only; one engine per ROM (don't link
+`audio` and `snesmod` together).
+
+Choosing a path: **snesmod** for tracker music (IT modules),
+**audio** for C-driven samples and DSP effects, **apu** (below) for
+writing your own SPC700 program.
+
+## The raw APU path (no snesmod)
+
+Since the SPC700 arc, the SDK has a second audio path: the `apu` module
+uploads a wla-spc700-assembled program straight through the IPL boot-ROM
+protocol — `apuWaitBoot()`, `apuUpload()`, `apuExecute()` — giving full
+DSP control (voices, ADSR, echo, pitch) with no tracker involved. Worked
+example: `audio/speech_synth` (phoneme-bank speech — upload, DSP
+config, per-phoneme sequencing). The two paths are exclusive:
+don't link `apu` and `snesmod` in one ROM.
+
+APU-side memory layout matters: the flat binary is laid out by
+`wlalink -b`, and an `.ORG` section that overlaps your growing code
+OVERWRITES it silently (the SPC700-arc sequencer died exactly this way during development).
+Budget the code page before placing the sample directory.
+
+### Hot-swapping APU programs
+
+`apuWaitBoot()` only works once — the IPL handshake is consumed at
+boot. To replace the running program later, use the cooperative reset
+protocol (worked example: `audio/apu_switch`):
+
+1. Build the APU program with `APU_CHECK_RESET` (from
+   `templates/memmap_spc700.inc`) inside its wait loops. The idiom
+   polls CPUIO0 for `APU_RESET_MAGIC`; on match it silences the DSP,
+   acks, re-enables the IPL ROM and jumps to `$FFC0` — the boot ROM is
+   re-entrant.
+2. On the 65816, call `apuReset()`, then `apuUpload()`/`apuExecute()`
+   for the next program — but NOT `apuWaitBoot()` (the reset already
+   consumed the ready signal).
+
+Two contract points, both learned the hard way in `apu_switch`:
+`apuReset()` blocks forever on a program that never polls for the
+magic, and the next program receives the DSP *dirty* — a residual
+`ADSR1` bit 7 from the previous program silently overrides `GAIN`, so
+every register a voice depends on must be written explicitly.
+
+## Debugging audio: luna's spc-dump
+
+`luna spc-dump` runs a ROM and exports the complete APU state — 64 KB of
+ARAM plus all 128 DSP registers — as a standard playable `.spc`. Diffing
+two dumps (yours vs a reference, or two instants of your own ROM) answers
+in seconds what ears cannot localize: upload integrity, directory/loop
+addresses, per-voice ADSR/pitch/envelope state, phoneme/note schedules.
+`--audio-out` (WAV capture) complements it for spectral verification.

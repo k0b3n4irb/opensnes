@@ -1695,13 +1695,19 @@ tutorial update.
 
 ### Category C — Code organisation & maintenance burden
 
-#### C1. Five 100 % ASM modules in `lib/source/` 🟠
+#### C1. ~~Five~~ 100 % ASM modules in `lib/source/` ✅ RESOLVED (audit complete, 2026-07-20)
 
-**Symptom**: 5 modules in `lib/source/` are 100 % assembly with no C
-side: `audio.asm` 1324 LOC, `map.asm` 1240, `sprite_dynamic.asm` 1232,
-`snesmod.asm` 1201, `mode7.asm` 481. **Total: 5478 LOC of hand-written
-65816 assembly**. Bus factor concentrates on contributors fluent in 65816
+**Symptom**: 3 modules in `lib/source/` are 100 % assembly with no C
+side: `map.asm` 1240 LOC, `sprite_dynamic.asm` 1232, `snesmod.asm`
+1201. **Total: 3673 LOC of hand-written 65816 assembly**. Bus factor concentrates on contributors fluent in 65816
 assembly. When something breaks, the path to fix is narrow.
+
+*(2026-07-19: `audio.asm` (1324 LOC, broken-ABI dead code) retired by
+the audio v2 chantier; `mode7.asm` (481 LOC) MIGRATED to C the same
+day under the C1 audit — benchmark-backed, bit-identical corpus, and
+the migration forced a corpus-wide emitter win (byte-pair store
+fusion). Two down. See `.claude/notes/chantiers/audio_v2.md` and
+`.claude/notes/chantiers/c1_asm_audit.md`.)*
 
 **Root cause**: historical perf optimisation. These modules contain the
 hot paths (NMI flush, OAM upload queue, BRR playback). Writing them in
@@ -1730,11 +1736,14 @@ question:
    (the 28 patches each closed some gap). Re-measure before deciding.
 
 **Effort estimate**: **4–6 weeks** total, distributed:
-- `mode7.asm` (481 LOC, simplest) — 1 week
+- ~~`mode7.asm`~~ DONE (C1 audit, 2026-07-19 — migrated to C, one
+  session thanks to benchrom + the fusion peephole)
+- ~~`map.asm`~~ DONE (C1 audit, 2026-07-19 — verdict KEEP, probe-backed:
+  +33 % on the lightest far path; invariants documented in the header)
 - `sprite_dynamic.asm` (1232 LOC, medium) — 1.5 weeks
-- `map.asm` (1240 LOC, medium) — 1.5 weeks
-- `audio.asm`, `snesmod.asm` (1324 + 1201 LOC, complex — SPC700
-  interaction) — 2–3 weeks combined
+- ~~`audio.asm`~~ DONE (audio v2 chantier, 2026-07 — deleted, not
+  migrated: it was dead code); `snesmod.asm` (1201 LOC, complex —
+  SPC700 interaction) — 1–1.5 weeks
 
 **Dependencies / interactions**:
 - C2 (sprite/text duplication) is a sub-set: addressing it informs the

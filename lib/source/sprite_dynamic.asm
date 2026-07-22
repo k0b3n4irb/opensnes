@@ -11,6 +11,39 @@
 ;
 ; Author: OpenSNES Team
 ; License: MIT (original code zlib by Alekmaul)
+;
+;------------------------------------------------------------------------------
+; C1 AUDIT VERDICT (2026-07-20): KEEP AS ASM — probe-backed.
+;
+; This module is already the hybrid the audit aims for: cold paths
+; (dispatch, size helpers, metasprite walker) live in C next door
+; (sprite_dynamic_dispatch.c / _helpers.c / _meta.c); THIS file keeps
+; only the hot core. A C model of the steady oamDynamic16Draw path
+; (real engine state via bank-0 externs, computed masks) measured
+; ~+50 % on the draw+EndFrame pair (1486 vs 968 cyc) even after a
+; codegen-friendly rewrite: the ASM pins X (OAM offset), Y (oambuffer
+; offset) and DB ($7E = WRAM mirror) across the whole function while
+; compiled C re-derives every array index per statement — a register-
+; allocation gap, not a peephole one. Regressions here multiply by
+; sprite count per frame AND eat VBlank budget in oamDynamicNmiFlush,
+; the strictest zone in the lib. Numbers + method:
+; .claude/notes/chantiers/c1_asm_audit.md.
+;
+; INTERNAL INVARIANTS (read before editing):
+; - DB discipline: draw paths set DB=$7E and reach bank-0 WRAM through
+;   the $7E:0000-$1FFF mirror (absolute,Y on oambuffer/oamMemory);
+;   ROM LUTs are read with `.l` long addressing. Restore DB on exit.
+; - Register pinning: X = OAM byte offset (oamnumberperframe), Y =
+;   oambuffer byte offset (id*16) across each draw function; the
+;   php/carry trick around the X-high-bit ror MUST keep the pair
+;   (see _o16d_xhigh) — the carry crosses a mode switch.
+; - oamDynamicNmiFlush runs INSIDE the NMI handler: VBlank budget
+;   applies (idle floor ~283 cyc; each queued 16x16 refresh adds
+;   ~1100 incl. DMA). Max 7 queued uploads/frame by design.
+; - oambuffer's 16-byte layout is a PUBLIC C contract (t_sprites in
+;   sprite.h, compile-time asserts) — fields move in lockstep.
+; - After any rep/sep: explicit .ACCU/.INDEX markers (WLA-DX loses
+;   tracking after branch merges — lint-enforced).
 ;==============================================================================
 
 .ifdef SA1

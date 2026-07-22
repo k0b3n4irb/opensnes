@@ -89,10 +89,11 @@ static u8 collision_flags;
  * index (px/8) and looks up this array to determine if the tile is solid.
  * The border is all walls with internal platforms at symmetric positions.
  *
- * @note This is mutable (not const) because collideTile() takes a non-const
- *       pointer. It lives in WRAM, not ROM.
+ * @note `const`, so it lives in ROM and costs zero WRAM. collideTile()
+ *       takes a `const u8 *`, and const-qualified loads compile to
+ *       bank-honouring far reads — the map may sit in any bank.
  */
-static u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
+static const u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  /* Top wall */
     1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
     1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,

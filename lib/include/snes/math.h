@@ -386,7 +386,9 @@ u8 atan2_8(s16 dy, s16 dx);
  * @brief 256-byte quadratic easing LUT — i² normalised to [0, 255]
  *
  * `ease_quad_table[i] = floor(i² / 255)`. Underlies `ease_in_quad`
- * and `ease_out_quad`. Exposed as `extern` so user code can index it
+ * and `ease_out_quad`. Lives in the opt-in `math_ease` module
+ * (`LIB_MODULES += math_ease`) so math users who don't ease don't pay
+ * its 256 bank-$00 bytes. Exposed as `extern` so user code can index it
  * directly for custom curve compositions.
  *
  * Cost: ~5 cycles per lookup vs ~12 for `(x * x) / 255` live.

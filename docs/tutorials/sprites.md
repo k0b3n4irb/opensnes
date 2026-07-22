@@ -115,6 +115,40 @@ void load_sprite_tiles(void) {
 }
 ```
 
+### Converting a sheet: `-s` must match the sprite size
+
+A 16x16 OBJ does not read four consecutive tiles. It reads `n`, `n+1`,
+`n+16`, `n+17` — the second row comes from **16 tiles later**, because
+the hardware treats the sheet as 16 tiles (128 px) wide. Same idea for
+32x32 (`n`, `n+1`, `n+2`, `n+3`, `n+16` …) and 64x64.
+
+`gfx4snes` produces exactly that layout **when you tell it the sprite
+size**:
+
+```bash
+gfx4snes -s 8  -p -i cursor.png    # a sheet of 8x8 sprites
+gfx4snes -s 16 -p -i hero.png      # a sheet of 16x16 sprites
+gfx4snes -s 32 -p -i boss.png      # a sheet of 32x32 sprites
+```
+
+With `-s 16` the converter cuts the image into 16x16 blocks and emits
+each one as the four tiles the hardware expects, whatever the sheet's
+width or height.
+
+**The trap**: converting a sheet of 16x16 frames with `-s 8`. It
+succeeds, produces the right number of tiles, and the sprite renders —
+wrong. The top half is one frame and the bottom half is whatever tile
+happened to land 16 slots later, which depends on the PNG's width. A
+sheet 16 tiles wide happens to work; make it 18 tiles wide by adding a
+frame and every sprite in the game breaks at once, with no diagnostic.
+
+The rule is one line: **`-s` is the sprite's size, not the tile size.**
+
+`gfx4snes` cannot catch the mistake — with `-s 8` it has no way to know
+you meant 16x16 sprites. It *does* warn when the image is not an exact
+multiple of the block size, since the last row or column of blocks would
+then be built from pixels that are not in the image.
+
 ## Sprite Palettes
 
 Sprite palettes use CGRAM addresses 128-255:

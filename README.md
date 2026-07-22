@@ -22,7 +22,7 @@
 
 ## Introduction
 
-OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 63 example ROMs.
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 74 example ROMs.
 
 This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
@@ -54,7 +54,9 @@ a lane here whether you're curious, comfortable, or hardcore:
   [`examples/text/hello_world`](examples/text/hello_world/) and follow the
   [learning path](docs/LEARNING_PATH.md). You'll have a ROM running in minutes
   and meet the hardware one example at a time — no assembly required to get
-  moving.
+  moving. Once you have a project of your own,
+  [`docs/API_INDEX.md`](docs/API_INDEX.md) indexes the SDK by *what you are
+  trying to do* — scan it before writing a helper, several already exist.
 - **Comfortable with retro hardware?** The library covers sprites, backgrounds,
   DMA, HDMA, input, audio and Mode 7 through a clean C API, so your time goes
   into the game, not the boilerplate.
@@ -100,7 +102,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
 | **30 hardware modules** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **63 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **74 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
 | **Debug emulator** | [luna](https://github.com/k0b3n4irb/luna) (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
@@ -147,7 +149,7 @@ and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb
 
 ## Examples
 
-63 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+74 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
 
 **[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
 

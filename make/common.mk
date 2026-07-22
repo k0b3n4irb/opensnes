@@ -48,6 +48,7 @@ endif
 CC       := $(OPENSNES)/bin/cc65816
 AS       := $(OPENSNES)/bin/wla-65816
 GSU_AS   := $(OPENSNES)/bin/wla-superfx
+SPC_AS   := $(OPENSNES)/bin/wla-spc700
 LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
@@ -87,6 +88,7 @@ endif
 
 CSRC        ?= main.c
 ASMSRC      ?=
+SPCSRC      ?=
 GFXSRC      ?=
 SPRITE_SIZE ?= 8
 BPP         ?= 4
@@ -156,6 +158,9 @@ _DEP_text4bpp        := dma
 _DEP_object          := map
 _DEP_map             := dma
 _DEP_snesmod         := console
+# console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
+# surfaced by the first example linking console WITHOUT dma (SPC700 arc)
+_DEP_console         := dma
 _DEP_superfx         := dma
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
@@ -167,6 +172,10 @@ _DEP_hdma            := dma math_sqrt
 # on math_sqrt — the resolver flattens this transitively.
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
+_DEP_panel           := dma console
+# audio v2: C layer needs the apu upload primitives + the embedded
+# SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
+_DEP_audio           := apu audio_blob
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
@@ -194,6 +203,7 @@ C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
+SPC_BINS := $(patsubst %.spc700.asm,%.spc700.bin,$(SPCSRC))
 SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
 
 # Add soundbank header for C compilation dependency
@@ -204,8 +214,12 @@ endif
 # Extract .incbin dependencies from ASMSRC
 INCBIN_DEPS := $(if $(ASMSRC),$(shell grep -hi '\.incbin' $(ASMSRC) 2>/dev/null | \
     sed -n 's/.*\.incbin[[:space:]]*"\([^"]*\)".*/\1/p' | sort -u))
-# GSU binaries must be built before ASM objects that .incbin them
-INCBIN_DEPS += $(GSU_BINS)
+# .incbin dependencies INSIDE SPC700 programs (surfaced on the SPC700 arc: a
+# regenerated BRR sample did not rebuild the .spc700.bin)
+SPC_INCBIN_DEPS := $(if $(SPCSRC),$(shell grep -hi '\.incbin' $(SPCSRC) 2>/dev/null | \
+    sed -n 's/.*\.incbin[[:space:]]*"\([^"]*\)".*/\1/p' | sort -u))
+# GSU/SPC binaries must be built before ASM objects that .incbin them
+INCBIN_DEPS += $(GSU_BINS) $(SPC_BINS)
 
 #------------------------------------------------------------------------------
 # Build Targets
@@ -258,6 +272,19 @@ ifneq ($(GSUSRC),)
 	@rm -f $*.sfx.o $*.sfx.link
 endif
 
+# SPC700 (APU) programs: same two-stage shape as the GSU. %.spc700.asm
+# assembles with wla-spc700 against memmap_spc700.inc into a flat
+# binary that the lib's apuUpload() pushes over the IPL protocol.
+ifneq ($(SPCSRC),)
+%.spc700.bin: %.spc700.asm $(SPC_INCBIN_DEPS)
+	@echo "[SPC] $< -> $@"
+	@$(SPC_AS) -I $(TEMPLATES) -o $*.spc700.o $<
+	@echo "[objects]" > $*.spc700.link
+	@echo "$*.spc700.o" >> $*.spc700.link
+	@$(LD) -b $*.spc700.link $@
+	@rm -f $*.spc700.o $*.spc700.link
+endif
+
 #------------------------------------------------------------------------------
 # Compilation
 #------------------------------------------------------------------------------
@@ -270,7 +297,7 @@ endif
 MEMMAP_DEP := $(TEMPLATES)/$(MEMMAP_INC)
 
 define wrap_asm
-	@{ echo '.include "$(MEMMAP_INC)"'; echo ''; cat $(1); } > $(basename $(2)).wrap.asm
+	@{ echo '.include "$(MEMMAP_INC)"'; echo '.include "assets.inc"'; echo ''; cat $(1); } > $(basename $(2)).wrap.asm
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $(2) $(basename $(2)).wrap.asm
 endef
 
@@ -498,3 +525,4 @@ clean:
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link)
+	@rm -f $(SPC_BINS) $(SPCSRC:.spc700.asm=.spc700.o) $(SPCSRC:.spc700.asm=.spc700.link)

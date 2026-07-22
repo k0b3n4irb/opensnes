@@ -14,6 +14,25 @@
 ;   - Volume fading
 ;   - Position synchronization
 ;
+;------------------------------------------------------------------------------
+; C1 AUDIT VERDICT (2026-07-20): KEEP AS ASM — provenance, not perf.
+;
+; This is mukunda's SNESMOD driver (via KungFuFurby's WLA-DX port),
+; not OpenSNES-original code. Its value is PARITY with the upstream
+; driver ecosystem (sm_spc.asm SPC700 blob + this 65816 half evolved
+; together; tracker tooling and .it conversion target their exact
+; behaviour). A C rewrite would fork it from upstream for zero
+; functional gain — the audit's keep-without-benching case, decided
+; on provenance. The OpenSNES-native alternative for C-driven audio
+; is the audio v2 engine (lib/source/audio.c); snesmod remains the
+; tracker-music path. See .claude/notes/chantiers/c1_asm_audit.md.
+;
+; INVARIANTS: coupled to sm_spc.asm's SPC700 driver (command protocol
+; and timing are upstream contracts — do not "fix" one side alone);
+; cc65816 left-to-right args verified by the ABI lint; explicit
+; .ACCU/.INDEX after every rep/sep (lint-enforced).
+;------------------------------------------------------------------------------
+;
 ; This software is provided 'as-is', without any express or implied
 ; warranty. In no event will the authors be held liable for any damages
 ; arising from the use of this software.

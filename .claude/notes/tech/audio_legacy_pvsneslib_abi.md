@@ -72,7 +72,18 @@ check it on those terms, it would have to:
 That's a separate lint with its own rules. Not worth building unless
 the audio API gets a real caller surface.
 
-## Resolution paths (none done yet)
+## RESOLVED — 2026-07-19, "Path E" (rebuild on the raw-APU path)
+
+`audio.asm` is DELETED. The audio v2 chantier
+(`.claude/notes/chantiers/audio_v2.md`) rebuilt the engine as pure C
+(`lib/source/audio.c`, cc65816 ABI for free) commanding a resident
+SPC700 driver built from source (`audio_driver.spc700.asm`), on the
+apu-module foundation from #119. The ABI lint's skip-file marker list
+is empty again. The header's 22-function surface is being implemented
+phase by phase (phase 1: init/volume/voice control — live; phases
+2-3: samples, echo). The analysis below is kept for history.
+
+## Resolution paths (as analyzed pre-chantier)
 
 In rough order of effort:
 

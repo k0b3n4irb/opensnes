@@ -22,11 +22,21 @@ import re
 import sys
 from pathlib import Path
 
-# `lda.w sym`, `sta.w sym+3`, `adc.w #sym` ... but not `#:sym`, not `$..`,
-# not registers, not local labels (@/_/+/-), not immediates of numbers.
-REF_RE = re.compile(
+# Two reference classes with DIFFERENT rules (gap closed 2026-07-20:
+# a TU that builds a far pointer — `lda.w #sym` + `lda.w #:sym` — used
+# to exempt the whole symbol, hiding a constant-folded DIRECT read
+# `lda.w sym+4478` of bank-$01 data in the same TU; caught live on
+# mode7_racing's track_class):
+#  - MEM_RE: NON-immediate `.w sym[+off]` memory operands. These read
+#    through DB=$00 unconditionally -> never exempted.
+#  - IMM_RE: immediate `#sym` address materialisation -> exempt when
+#    the TU also takes `#:sym` (far-pointer building, the safe idiom).
+MEM_RE = re.compile(
     r'\b(?:lda|sta|ldx|stx|ldy|sty|adc|sbc|cmp|cpx|cpy|and|ora|eor)\.w\s+'
-    r'#?(?!:)([A-Za-z_][A-Za-z0-9_]*)\b')
+    r'(?![#$:])([A-Za-z_][A-Za-z0-9_]*)\b')
+IMM_RE = re.compile(
+    r'\b(?:lda|sta|ldx|stx|ldy|sty|adc|sbc|cmp|cpx|cpy|and|ora|eor)\.w\s+'
+    r'#(?!:)([A-Za-z_][A-Za-z0-9_]*)\b')
 BANKREF_RE = re.compile(r'#:([A-Za-z_][A-Za-z0-9_]*)\b')
 PEA_RE = re.compile(r'\bpea\.w\s+(?!:)([A-Za-z_][A-Za-z0-9_]*)\b')
 PEA_BANK_RE = re.compile(r'\bpea\.w\s+:([A-Za-z_][A-Za-z0-9_]*)\b')
@@ -48,7 +58,8 @@ def main() -> int:
     for casm in sorted(srcdir.glob("*.c.asm")):
         text = casm.read_text()
         banked = set(BANKREF_RE.findall(text)) | set(PEA_BANK_RE.findall(text))
-        blind = (set(REF_RE.findall(text)) | set(PEA_RE.findall(text))) - banked
+        blind = (set(IMM_RE.findall(text)) | set(PEA_RE.findall(text))) - banked
+        blind |= set(MEM_RE.findall(text))     # direct reads: no exemption
         for name in sorted(blind):
             if name not in syms:
                 continue                       # registers/defines, not linked symbols

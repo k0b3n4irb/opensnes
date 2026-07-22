@@ -142,3 +142,34 @@ Incompatible (do not use without isolation):
   The HDMA technique it demonstrates is a C port of "SNES Wave HDMA Demo"
   by krom (Peter Lemon), github.com/PeterLemon/SNES — code technique
   credited, no krom assets used.
+
+## examples/audio/pitch_mod
+
+- `res/cello.brr` — the cello BRR sample shipped with krom (Peter
+  Lemon)'s PitchMod demo (github.com/PeterLemon/SNES,
+  `SPC700/PitchMod/BRR/`), used at his exact loop point (4167) and
+  pitch. krom's repository carries no explicit license, and the
+  recording's original source is unknown — revisit before any
+  commercial redistribution. The companion 9-byte LFO square wave is
+  transcribed in `player.spc700.asm` (technique, not an asset).
+
+## examples/audio/soundboard
+
+- `res/cello.brr` — same sample and caveat as
+  `examples/audio/pitch_mod` (byte-identical copy).
+- `res/ss.brr`, `res/pp.brr` — OpenSNES-original formant-synthesized
+  phonemes (byte-identical copies from `examples/audio/speech_synth`,
+  original work, MIT).
+- `res/au.brr` — RMS-boosted regeneration of speech_synth's AU
+  (original work, MIT; generator: `gen_au_boost.py` in the example).
+
+## examples/audio/apu_switch
+
+- `res/cello.brr` — same sample and caveat as
+  `examples/audio/pitch_mod` above (byte-identical copy; the example
+  hot-swaps between this repo's own drum and cello APU programs).
+  krom's PlayTwoSong demo, whose *protocol* this example ports, ships
+  songs built from samples ripped from commercial games — none of
+  those assets are used here.
+  `audio/play_noise` ships no assets at all (DSP noise generator only,
+  technique credited to the same repository).

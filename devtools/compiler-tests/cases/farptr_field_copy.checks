@@ -1,0 +1,21 @@
+# Regression pin — dead-store elision vs emission-nop divergence
+# (audio v2 chantier, 2026-07-19). `info->a = mirror[id].a` with `info`
+# a far pointer param: the loaded value's spill was elided because an
+# intervening `extuw Kl` (pointer low-half materialisation — REAL code)
+# was nop-listed by mark_dead_stores' scanner. The consumer (storew's
+# r1-in-A-cache path) then read the never-written slot: garbage stores.
+# Fix: is_nop_instruction mirrors every emission-side skip condition
+# (leaf_opt gate + cls != Kl on extensions).
+#
+# The pin: every far load feeding a far store must spill before A is
+# clobbered — i.e., an indirect load is IMMEDIATELY followed by a store
+# of its result. Two field copies in getinfo -> at least 2 such pairs.
+
+# Re-pinned 2026-07-22 (issue #132): the invariant is "an indirect load
+# is IMMEDIATELY followed by a spill of its result", not one particular
+# spelling of the spill. With the load-forwarding word-size fix the
+# emitter uses `pha` for one of the two copies and `sta N,s` for the
+# other; both preserve the value, and pinning only `sta` made a
+# correctness-neutral codegen improvement look like a regression.
+in getinfo: absent lda\.l \$0000,x\n\tlda
+count 2 lda\.l \$0000,x\n\t(?:sta|pha)

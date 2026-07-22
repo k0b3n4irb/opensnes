@@ -103,3 +103,4 @@ soundbank.h
 !tools/*/tests/golden/*
 
 .mcp.json
+lib/source/audio_driver.spc700.bin

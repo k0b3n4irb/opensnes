@@ -193,6 +193,59 @@ static u16 map_get_tile_prop(s16 px, s16 py) {
 
 This avoids storing a duplicate collision map -- the visual tilemap doubles as the collision source.
 
+## Where the sprite is vs where it collides
+
+In a top-down game the character occupies **one tile**, but its sprite
+is usually 16×16 — twice that tile. Where you draw those 16×16 pixels
+relative to the tile decides whether collision *feels* right, and it is
+the single most common source of "my collision is broken" reports that
+turn out to have nothing wrong with the collision code.
+
+The naive version draws the sprite at the tile's corner:
+
+```c
+oamSet(id, tile_x * 8 - cam_x, tile_y * 8 - cam_y, ...);   /* wrong */
+```
+
+The tile is 8×8 and the sprite is 16×16, so the visible body sits half a
+tile away from the thing that actually collides. Walking up to a wall,
+you stop with a visible gap on one side and clipping into it on the
+other, *depending on the direction you approached from*. Players report
+that as "collisions are random — sometimes too early, sometimes too
+late", which sends you reading `collideTile()`, where there is no bug.
+
+The convention is to **straddle** the tile: feet on it, body overhanging
+upward.
+
+```c
+u16 sx = (u16)(tile_x * 8 - cam_x - 4);   /* centre the 16px body on an 8px tile */
+u16 sy = (u16)(tile_y * 8 - cam_y - 8);   /* stand the feet on the tile */
+oamSet(id, sx, sy, ...);
+```
+
+```
+        ┌────────┐
+        │        │      the sprite (16×16)
+        │  body  │
+        ├───┬────┤
+        │   │▓▓▓▓│      the tile it occupies (8×8),
+        └───┴────┘      and the only thing that collides
+```
+
+Now what you see is what collides, from every direction. `examples/games/rpg`
+does this in `draw_char()`.
+
+Two consequences worth knowing:
+
+- **The sprite overlaps the tile above it.** That is intended — it is
+  what makes a character look like it is standing *in* the scene rather
+  than on top of it. It also means the tile above must be drawn before
+  the sprite, i.e. the sprite needs a priority that puts it over the
+  background layer.
+- **Collision stays tile-exact.** You are not colliding a 16×16 box
+  against tiles; you are asking "is the tile I want to step into
+  solid?". One `collideTile()` call per step, not four per frame.
+
 ## Collision Response Patterns
 
 Detecting a collision is only half the problem. What happens next matters more.

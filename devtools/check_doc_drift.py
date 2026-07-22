@@ -284,7 +284,8 @@ def check_examples_count(canonical: int) -> list[str]:
 # program") and `audioPlaySample(channel, data, size, pitch)` in TROUBLESHOOTING.
 # --------------------------------------------------------------------------
 
-PHANTOM_DOC_PATHS = ["docs/GETTING_STARTED.md", "docs/TROUBLESHOOTING.md"]
+PHANTOM_DOC_PATHS = ["docs/GETTING_STARTED.md", "docs/TROUBLESHOOTING.md",
+                     "docs/API_INDEX.md"]
 
 # Control-flow + common C stdlib identifiers that appear as `name(` but are not
 # SDK API (so they are not "phantom").
@@ -351,7 +352,8 @@ def check_phantom_api() -> list[str]:
 # --------------------------------------------------------------------------
 
 EXAMPLE_PATH_DOC_PATHS = ["ROADMAP.md", "examples/README.md",
-                          "docs/GETTING_STARTED.md"]
+                          "docs/GETTING_STARTED.md",
+                          "docs/API_INDEX.md"]
 
 # Backticked `category/name` paths and relative markdown links like
 # [text/hello_world](text/hello_world/). The category filter (first segment
@@ -359,6 +361,8 @@ EXAMPLE_PATH_DOC_PATHS = ["ROADMAP.md", "examples/README.md",
 _EXAMPLE_PATH_RES = [
     re.compile(r"`([a-z0-9_]+(?:/[a-z0-9_]+)+)`"),
     re.compile(r"\]\(([a-z0-9_]+(?:/[a-z0-9_]+)+)/?\)"),
+    # docs/ pages link out of their own directory: `](../examples/cat/name/)`
+    re.compile(r"\]\(\.\./examples/([a-z0-9_]+(?:/[a-z0-9_]+)+)/?\)"),
 ]
 
 

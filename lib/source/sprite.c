@@ -41,16 +41,16 @@ extern u8 oam_max_id; /* Defined in crt0.asm - highest sprite ID written */
  * Initialization
  *============================================================================*/
 
-void oamInit(u16 size, u16 tile_base) {
+void oamInit(u16 size, u16 name_base) {
     /* All parameters u16 to avoid calling convention issues. */
     /* OBJSEL packs sprite size (bits 5-7) and tile base (bits 0-2). */
-    REG_OBJSEL = (u8)((size << 5) | (tile_base & 0x07));
+    REG_OBJSEL = (u8)((size << 5) | (name_base & 0x07));
 
     /* Clear OAM buffer — hide all sprites. */
     oamClear();
 }
 
-void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
+void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
                    u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize) {
     /* Load sprite tiles to VRAM */
     dmaCopyVram(tileSource, vramAddr, tileSize);

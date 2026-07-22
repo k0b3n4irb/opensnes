@@ -121,7 +121,7 @@ void bgInit(u8 bg) {
  * Combined Initialization (PVSnesLib compatible)
  *============================================================================*/
 
-void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
+void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette,
                    u8 paletteEntry, u16 tileSize, u16 paletteSize,
                    u16 colorMode, u16 vramAddr) {
     /* Calculate palette color index based on color mode and entry
@@ -157,7 +157,7 @@ void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
     bgSetGfxPtr(bgNumber, vramAddr);
 }
 
-void bgInitTileSetData(u8 bgNumber, u8 *tileSource, u16 tileSize, u16 vramAddr) {
+void bgInitTileSetData(u8 bgNumber, const u8 *tileSource, u16 tileSize, u16 vramAddr) {
     /* Copy tile graphics to VRAM */
     dmaCopyVram(tileSource, vramAddr, tileSize);
 

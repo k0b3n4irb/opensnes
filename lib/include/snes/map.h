@@ -158,7 +158,7 @@ extern u16 y_pos;
  * KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use
  * mapGetMetaTile()/mapGetMetaTilesProp() — they are bank-safe.
  */
-void mapLoad(u8 *layer1map, u8 *layertiles, u8 *tilesprop);
+void mapLoad(const u8 *layer1map, const u8 *layertiles, const u8 *tilesprop);
 
 /**
  * @brief Update map scroll buffers based on camera position

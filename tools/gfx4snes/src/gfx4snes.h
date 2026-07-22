@@ -57,6 +57,7 @@ typedef struct
     int palettecolors;	        												// number of colors to use (4, 16, 128 or 256)
     int palettesave;		           											// 1 = save the palette
     int paletteround;                  											// 1 = round palette up & down
+    char *fixpalette;									// imposed palette file (raw SNES .pal), NULL = quantise
     int paletterearrange;				    									// 1 = compute palette to fit with snes capabilities
     int spritemap;                                                              // 1 = print sprite tile number map
 } t_gfx4snes_args;

@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 63 examples organized by topic. For a progressive learning path, see
+All 74 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -144,6 +144,7 @@ Complete game projects combining multiple subsystems.
 | @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
 | @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |
+| @subpage examples_games_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
 
 ---
 

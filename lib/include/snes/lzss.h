@@ -50,6 +50,6 @@
  *       If the tag doesn't match, the function returns immediately.
  * @note Interrupts are disabled during decompression and restored after.
  */
-void LzssDecodeVram(u8 *source, u16 address);
+void LzssDecodeVram(const u8 *source, u16 address);
 
 #endif /* OPENSNES_LZSS_H */

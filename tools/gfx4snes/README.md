@@ -87,6 +87,31 @@ gfx4snes -y -s 8 -o 16 -u 16 -e 2 -p -m -i scrollbg.png
 gfx4snes -z -s 8 -o 16 -u 16 -p -m -i background.png
 ```
 
+## Imposing a palette (`-c`)
+
+By default the palette is derived from the image, which makes it a
+function of the **whole** image: add one tile and all 16 colours are
+re-derived, so every tile already drawn shifts hue. Nothing reports it —
+you notice when you compare two screenshots. It cost the RPG template its
+road colour when a blue-roofed house was added to a 12-tile town sheet.
+
+`-c` imposes a palette you author and commit:
+
+```bash
+gfx4snes -s 8 -p -m -c town_fixed.pal -i tileset.png
+```
+
+- every colour in the image must exist in `town_fixed.pal`, or the tool
+  fails naming the colour, its 5-bit components and the pixel it is at;
+- indices come from the file, so they are stable across edits;
+- the emitted `.pal` is the imposed palette, unchanged.
+
+The file is raw SNES palette data — 16-bit little-endian BGR555 entries,
+the same format `-p` writes. `examples/games/rpg` generates both of its
+palettes this way (`gen_assets.py`, `write_pal()`), so a colour that
+creeps into the art without being declared is a build error rather than a
+silent recolouring of the whole scene.
+
 ## Flag Reference
 
 ### Tiles
@@ -115,6 +140,7 @@ gfx4snes -z -s 8 -o 16 -u 16 -p -m -i background.png
 | Flag | Description |
 |------|-------------|
 | `-p` | Generate palette output (.pal) |
+| `-c FILE` | Impose FILE as the palette; fail if the image uses a colour that is not in it |
 | `-a` | Rearrange palette across banks (preserves tilemap references) |
 | `-e N` | Palette entry offset in tilemap (0-7) |
 | `-o N` | Number of colors to output (0-256) |

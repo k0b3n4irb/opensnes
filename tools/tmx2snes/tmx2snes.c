@@ -131,6 +131,11 @@ void PrintOptions(char *str)
     printf("\n  where tmxfilename is a Tiled tmx file (in json format)");
     printf("\n        mapfilename is the map file of tileset for tileset optimization");
     printf("\n\n  tmx2snes will do:");
+    printf("\n  options:");
+    printf("\n  	-e  also write <map>.inc, the Entities layer as C defines");
+    printf("\n  	-Q  also write <layer>.q16, a quadrant-ordered 64x64 tilemap");
+    printf("\n  	-q  quiet");
+    printf("\n");
     printf("\n  	.m16 file for map");
     printf("\n  	.b16 file for tileset attribute (blocker, etc...)");
     printf("\n  	.o16 file for objects");
@@ -152,6 +157,253 @@ void PrintVersion(void)
 {
     printf("tmx2snes (" TMX2SNESDATE ") version " TMX2SNESVERSION "");
     printf("\nCopyright (c) 2022 Alekmaul\n");
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// -Q : a quadrant-ordered 64x64 tilemap, for the `background` module.
+//
+// The .m16 format above is what the `map` module streams. A game that
+// just scrolls a fixed 64x64 area with bgSetScroll needs the layout the
+// PPU actually reads: four 32x32 pages (TL, TR, BL, BR), no header, and
+// the per-tile palette and priority folded into each entry so the blob
+// can go straight to VRAM.
+void WriteQuadrantMap(void)
+{
+    int qx, qy, tx, ty, gx, gy, tileattr, tilesnes;
+    char *lastpostslash;
+
+    if (map->width != 64 || map->height != 64)
+    {
+        printf("tmx2snes: error '-Q needs a 64x64 map (this one is %dx%d)'\n",
+               map->width, map->height);
+        printf("tmx2snes:        A SNES 64x64 background is four 32x32 pages;\n");
+        printf("tmx2snes:        any other size has no quadrant layout.\n");
+        exit(1);
+    }
+
+    strcpy(filemapname, filebase);
+    lastpostslash = strrchr(filemapname, '/');
+    if (lastpostslash != NULL)
+        sprintf(lastpostslash + 1, "%s.q16", layer->name.ptr);
+    else
+        sprintf(filemapname, "%s.q16", layer->name.ptr);
+
+    if (quietmode == 0)
+        printf("tmx2snes:     Writing quadrant tiles map file...\n");
+    fpo = fopen(filemapname, "wb");
+    if (fpo == NULL)
+    {
+        printf("tmx2snes: error 'Can't open quadrant map file [%s] for writing'\n", filemapname);
+        exit(1);
+    }
+
+    data = layer->data;
+    for (qy = 0; qy < 2; qy++)
+    {
+        for (qx = 0; qx < 2; qx++)
+        {
+            for (ty = 0; ty < 32; ty++)
+            {
+                for (tx = 0; tx < 32; tx++)
+                {
+                    gx = qx * 32 + tx;
+                    gy = qy * 32 + ty;
+                    tileattr = data[gy * map->width + gx];
+                    if (tileattr)
+                    {
+                        int t = (tileattr - 1) & 0x03FF;
+                        tilesnes = t;
+                        tilesnes |= (tileprop[t][2] & 0x07) << 10;  // palette
+                        if (tileprop[t][1])
+                            tilesnes |= (1 << 13);                  // priority
+                        if (tileattr & CUTE_TILED_FLIPPED_HORIZONTALLY_FLAG)
+                            tilesnes |= (1 << 14);
+                        if (tileattr & CUTE_TILED_FLIPPED_VERTICALLY_FLAG)
+                            tilesnes |= (1 << 15);
+                        PutWord(tilesnes, fpo);
+                    }
+                    else
+                        PutWord(0x0000, fpo);
+                }
+            }
+        }
+    }
+    fclose(fpo);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// -e : the Entities layer as C defines.
+//
+// Tiled's object layer is where a designer puts the spawn point, the
+// NPCs, the doors — with custom properties on each (an NPC's line of
+// dialogue, a door's destination). The .o16 output packs that into the
+// `object` module's binary format, which is no use to a game that does
+// not use that module. This writes the same information as a header you
+// #include, so that adding a villager is a map edit.
+//
+// Objects are grouped by their Tiled TYPE. For each type:
+//     <TYPE>_COUNT           how many there are
+//     <TYPE>_FIELDS          a struct-member list: tx, ty, then one
+//                            member per custom property
+//     <TYPE>_TABLE           a brace-enclosed initialiser, one row each
+// and, when there is exactly one, the scalar forms <TYPE>_TX, <TYPE>_TY,
+// <TYPE>_<PROP> as well.
+//
+// The table is an array of structs, which is what a game wants to write.
+// It briefly was not: until 2026-07-22 a `const` array of structs indexed
+// at runtime lost its bank byte, so this emitted parallel scalar tables
+// and the README called it a design choice. It was a compiler bug
+// (issue #132) and it is fixed; the workaround is gone with it.
+static void upcase_ident(const char *in, char *out, int outsz)
+{
+    int i;
+    for (i = 0; in[i] != '\0' && i < outsz - 1; i++)
+    {
+        char c = in[i];
+        if (c >= 'a' && c <= 'z')
+            c = (char)(c - 'a' + 'A');
+        else if (!((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')))
+            c = '_';
+        out[i] = c;
+    }
+    out[i] = '\0';
+}
+
+void WriteEntityHeader(void)
+{
+    cute_tiled_object_t *o, *p;
+    char hdrname[1024];
+    char type[64], prop[64];
+    int i, count, first, tw, th;
+    FILE *fph;
+
+    strcpy(hdrname, filebase);
+    {
+        char *dot = strrchr(hdrname, '.');
+        if (dot != NULL)
+            *dot = '\0';
+    }
+    strcat(hdrname, ".inc");
+
+    fph = fopen(hdrname, "w");
+    if (fph == NULL)
+    {
+        printf("tmx2snes: error 'Can't open entity header [%s] for writing'\n", hdrname);
+        exit(1);
+    }
+    if (quietmode == 0)
+        printf("tmx2snes:     Writing entity header [%s]...\n", hdrname);
+
+    tw = map->tilewidth;
+    th = map->tileheight;
+    fprintf(fph, "/* Generated from the Entities layer by tmx2snes -e.\n"
+                 " * Do not edit: edit the map. */\n");
+
+    // one pass per distinct type, in first-seen order
+    for (o = layer->objects; o != NULL; o = o->next)
+    {
+        // skip if this type was already emitted
+        for (p = layer->objects; p != o; p = p->next)
+        {
+            if (strcmp(p->type.ptr, o->type.ptr) == 0)
+                break;
+        }
+        if (p != o)
+            continue;
+
+        upcase_ident(o->type.ptr, type, sizeof(type));
+        count = 0;
+        for (p = layer->objects; p != NULL; p = p->next)
+            if (strcmp(p->type.ptr, o->type.ptr) == 0)
+                count++;
+
+        fprintf(fph, "\n#define %s_COUNT %d\n", type, count);
+
+        // the struct shape: tx, ty, then one member per custom property
+        fprintf(fph, "#define %s_FIELDS \\\n    u8 tx; u8 ty;", type);
+        for (i = 0; i < o->property_count; i++)
+        {
+            cute_tiled_property_t *pr = o->properties + i;
+            char lower[64];
+            int k;
+            for (k = 0; pr->name.ptr[k] != '\0' && k < 63; k++)
+            {
+                char ch = pr->name.ptr[k];
+                if (ch >= 'A' && ch <= 'Z')
+                    ch = (char)(ch - 'A' + 'a');
+                else if (!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')))
+                    ch = '_';
+                lower[k] = ch;
+            }
+            lower[k] = '\0';
+            if (pr->type == CUTE_TILED_PROPERTY_STRING)
+                fprintf(fph, " const char *%s;", lower);
+            else
+                fprintf(fph, " u16 %s;", lower);
+        }
+        fprintf(fph, "\n");
+
+        // the rows
+        fprintf(fph, "#define %s_TABLE {", type);
+        first = 1;
+        for (p = layer->objects; p != NULL; p = p->next)
+        {
+            int j;
+            if (strcmp(p->type.ptr, o->type.ptr) != 0)
+                continue;
+            fprintf(fph, "%s \\\n    { %d, %d", first ? "" : ",",
+                    (int)(p->x) / tw, (int)(p->y) / th);
+            first = 0;
+            for (i = 0; i < o->property_count; i++)
+            {
+                cute_tiled_property_t *pr = o->properties + i;
+                for (j = 0; j < p->property_count; j++)
+                {
+                    cute_tiled_property_t *q = p->properties + j;
+                    if (strcmp(q->name.ptr, pr->name.ptr) != 0)
+                        continue;
+                    if (q->type == CUTE_TILED_PROPERTY_STRING)
+                        fprintf(fph, ", \"%s\"", q->data.string.ptr);
+                    else if (q->type == CUTE_TILED_PROPERTY_INT)
+                        fprintf(fph, ", %d", q->data.integer);
+                    else if (q->type == CUTE_TILED_PROPERTY_BOOL)
+                        fprintf(fph, ", %d", q->data.boolean ? 1 : 0);
+                    else
+                        fprintf(fph, ", 0");
+                    break;
+                }
+                if (j >= p->property_count)
+                    fprintf(fph, ", 0");
+            }
+            fprintf(fph, " }");
+        }
+        fprintf(fph, " \\\n}\n");
+
+        // scalars for a lone object of its type — the common case for a
+        // spawn point, a door, an exit
+        if (count == 1)
+        {
+            fprintf(fph, "#define %s_TX %d\n", type, (int)(o->x) / tw);
+            fprintf(fph, "#define %s_TY %d\n", type, (int)(o->y) / th);
+            for (i = 0; i < o->property_count; i++)
+            {
+                cute_tiled_property_t *pr = o->properties + i;
+                upcase_ident(pr->name.ptr, prop, sizeof(prop));
+                fprintf(fph, "#define %s_%s ", type, prop);
+                if (pr->type == CUTE_TILED_PROPERTY_STRING)
+                    fprintf(fph, "\"%s\"\n", pr->data.string.ptr);
+                else if (pr->type == CUTE_TILED_PROPERTY_INT)
+                    fprintf(fph, "%d\n", pr->data.integer);
+                else if (pr->type == CUTE_TILED_PROPERTY_BOOL)
+                    fprintf(fph, "%d\n", pr->data.boolean ? 1 : 0);
+                else
+                    fprintf(fph, "0\n");
+            }
+        }
+    }
+
+    fclose(fph);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -402,6 +654,9 @@ void WriteEntities(void)
 }
 
 /// M A I N ////////////////////////////////////////////////////////////
+int emitheader = 0;   // -e: write <base>.inc, the entities as C defines
+int quadrant = 0;     // -Q: write <layer>.q16, a quadrant-ordered 64x64 map
+
 int main(int argc, char **argv)
 {
     int i;
@@ -432,6 +687,14 @@ int main(int argc, char **argv)
             else if (argv[i][1] == 'q') // quiet mode
             {
                 quietmode = 1;
+            }
+            else if (argv[i][1] == 'e') // emit a C header of entities
+            {
+                emitheader = 1;
+            }
+            else if (argv[i][1] == 'Q') // quadrant-ordered 64x64 tilemap
+            {
+                quadrant = 1;
             }
             else // invalid option
             {
@@ -491,12 +754,57 @@ int main(int argc, char **argv)
     // load the map in memory
     if (quietmode == 0)
         printf("tmx2snes: Loading map: [%s]\n", filebase);
-    map = cute_tiled_load_map_from_file(filebase, 0);
-    if (map == NULL)
+
+    // cute_tiled's parser does not skip insignificant whitespace, so a
+    // pretty-printed .tmj — anything written with an indent, which is
+    // what a generator script produces by default — fails to parse.
+    // Tiled's own export happens to be compact, so the trap only springs
+    // on generated maps, which is exactly what a content pipeline makes.
+    // Minify the buffer ourselves rather than make every generator author
+    // discover this.
     {
-        printf("tmx2snes: error 'Cannot load map'\n");
-        fclose(fpi);
-        return 1;
+        char *json = (char *)malloc((size_t)filesize + 1);
+        if (json == NULL)
+        {
+            printf("tmx2snes: error 'Out of memory reading [%s]'\n", filebase);
+            fclose(fpi);
+            return 1;
+        }
+        size_t got = fread(json, 1, (size_t)filesize, fpi);
+        json[got] = '\0';
+
+        // strip whitespace outside string literals, in place
+        size_t w = 0;
+        int in_string = 0, escaped = 0;
+        for (size_t r = 0; r < got; r++)
+        {
+            char c = json[r];
+            if (in_string)
+            {
+                json[w++] = c;
+                if (escaped)          escaped = 0;
+                else if (c == '\\')   escaped = 1;
+                else if (c == '"')    in_string = 0;
+                continue;
+            }
+            if (c == '"') { in_string = 1; json[w++] = c; continue; }
+            if (c == ' ' || c == '\t' || c == '\n' || c == '\r') continue;
+            json[w++] = c;
+        }
+
+        map = cute_tiled_load_map_from_memory(json, (int)w, 0);
+        if (map == NULL)
+        {
+            printf("tmx2snes: error 'Cannot load map [%s]'\n", filebase);
+            if (cute_tiled_error_reason != NULL)
+                printf("tmx2snes:        %s (json line %d)\n",
+                       cute_tiled_error_reason, cute_tiled_error_line);
+            printf("tmx2snes:        Is it a Tiled JSON map (.tmj / .json)?\n");
+            free(json);
+            fclose(fpi);
+            return 1;
+        }
+        free(json);
     }
 
     // close the input file
@@ -610,6 +918,8 @@ int main(int argc, char **argv)
         {
             // Write .o16 file ...
             WriteEntities();
+            if (emitheader)
+                WriteEntityHeader();
         }
         // No it is a map layer
         else
@@ -617,6 +927,8 @@ int main(int argc, char **argv)
             // write .m16 and .t16 files ...
             WriteMap();
             WriteMapTileset();
+            if (quadrant)
+                WriteQuadrantMap();
         }
 
         layer = layer->next;

@@ -23,3 +23,14 @@ tilesetatt:
 tilesetatt_end:
 
 .ends
+
+; audio v2 phase-2 vector: a single looping BRR block (header $C3 =
+; range $C, filter 0, loop+end; +7/-7 nibbles — the pitch_mod LFO
+; square). 9 bytes streamed through audioLoadSample in libtest.
+.section ".rodata_beep" superfree
+
+beep_brr:
+.db $C3, $77, $99, $77, $99, $77, $99, $77, $99
+beep_brr_end:
+
+.ends

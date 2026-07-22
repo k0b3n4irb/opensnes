@@ -101,7 +101,7 @@
  * @note Uses bank $70 (LoROM SRAM), starting at address $0000
  * @warning Ensure ROM header has SRAM enabled!
  */
-void sramSave(u8 *data, u16 size);
+void sramSave(const u8 *data, u16 size);
 
 /**
  * @brief Load data from SRAM
@@ -135,7 +135,7 @@ void sramLoad(u8 *data, u16 size);
  * sramSaveOffset(saveData, 256, 512);
  * @endcode
  */
-void sramSaveOffset(u8 *data, u16 size, u16 offset);
+void sramSaveOffset(const u8 *data, u16 size, u16 offset);
 
 /**
  * @brief Load data from SRAM at offset
@@ -193,6 +193,6 @@ void sramClear(u16 size);
  * }
  * @endcode
  */
-u8 sramChecksum(u8 *data, u16 size);
+u8 sramChecksum(const u8 *data, u16 size);
 
 #endif /* OPENSNES_SRAM_H */

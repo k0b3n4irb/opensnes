@@ -26,11 +26,19 @@
  * can be safely transferred per frame. While the theoretical maximum is higher,
  * 4KB is a safe practical limit that accounts for NMI handler overhead.
  *
- * ## Bank Limitation
+ * ## Banks
  *
- * @note The current implementation assumes source data is in bank $00 for
- * ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using
- * dmaCopyVramBank() or dmaCopyCGramBank() with an explicit bank parameter.
+ * @note Every dmaCopy* function takes a **far pointer** and uses its bank
+ * byte, so the source may live in any bank — a SUPERFREE section, a bank
+ * you pinned yourself, anywhere. This has been true since the A6 chantier
+ * made pointer arguments 4 bytes; the *Bank variants remain for the case
+ * where an address and its bank are held separately.
+ *
+ * This header claimed the opposite ("source data must be in bank $00")
+ * long after it stopped being true, and that prose is why the RPG
+ * template shipped a pointless `semifree bank 0` section for its
+ * palettes — and why issue #122 carried a bank-$00 claim about
+ * dmaCopyCGram that testing then had to retract.
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -62,13 +70,26 @@
  * dmaCopyVram(tileset, 0x0000, tileset_end - tileset);
  * @endcode
  *
- * @warning Must be called during VBlank or force blank! Calling during
- * active display causes visual corruption.
+ * @warning Must be called during VBlank or forced blank. During active
+ *          display the PPU rejects VRAM writes and the transfer is
+ *          silently lost.
  *
- * @note Source data must be in bank $00 (LoROM $00:8000-$FFFF). For data
- * in other banks, use dmaCopyVramBank().
+ *          Forced blank means setScreenOff() — INIDISP bit 7.
+ *          setBrightness(0) blacks the screen but leaves the PPU
+ *          fetching, so it does NOT open the write window.
+ *
+ * @warning **VBlank fits roughly 4 KB.** A larger transfer has its tail
+ *          dropped during active display, and the failure is partial:
+ *          the first few KB land, so the screen is half right. Anything
+ *          bigger than a few KB belongs between setScreenOff() and
+ *          setScreenOn(), not in VBlank.
+ *
+ * @note The bank is taken from @p source's own bank byte, so the data
+ *       may live in ANY bank — a SUPERFREE section, a bank you pinned
+ *       yourself. dmaCopyVramBank() exists for the case where the
+ *       address and the bank are held separately.
  */
-void dmaCopyVram(u8 *source, u16 vramAddr, u16 size);
+void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
 
 /**
  * @brief Copy data to VRAM with explicit source bank byte.
@@ -83,7 +104,7 @@ void dmaCopyVram(u8 *source, u16 vramAddr, u16 size);
  *
  * @warning Must be called during VBlank or force blank!
  */
-void dmaCopyVramBank(u8 *source, u8 bank, u16 vramAddr, u16 size);
+void dmaCopyVramBank(const u8 *source, u8 bank, u16 vramAddr, u16 size);
 
 /**
  * @brief Load Mode 7 interleaved data to VRAM.
@@ -102,7 +123,7 @@ void dmaCopyVramBank(u8 *source, u8 bank, u16 vramAddr, u16 size);
  *
  * @warning Must be called during forced blank (INIDISP=$80) or VBlank.
  */
-void dmaCopyVramMode7(u8 *tilemap, u16 tilemapSize, u8 *tiles, u16 tilesSize);
+void dmaCopyVramMode7(const u8 *tilemap, u16 tilemapSize, const u8 *tiles, u16 tilesSize);
 
 /**
  * @brief Set VRAM to a value
@@ -147,13 +168,15 @@ void dmaClearVRAM(void);
  * dmaCopyCGram(palette, 0, 32);  // 16 colors * 2 bytes
  * @endcode
  *
- * @warning Must be called during VBlank or force blank! Calling during
- * active display causes palette corruption.
+ * @warning Must be called during VBlank or forced blank — setScreenOff(),
+ *          INIDISP bit 7. setBrightness(0) blacks the screen but leaves
+ *          the PPU fetching and the write is rejected.
  *
- * @note Source data must be in bank $00. For data in other banks,
- * use dmaCopyCGramBank() with an explicit bank parameter.
+ * @note The bank comes from @p source's own bank byte: a palette may
+ *       live in any bank. dmaCopyCGramBank() exists for the case where
+ *       the address and the bank are held separately.
  */
-void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
+void dmaCopyCGram(const u8 *source, u16 startColor, u16 size);
 
 /**
  * @brief Copy palette data to CGRAM with explicit source bank byte.
@@ -168,7 +191,7 @@ void dmaCopyCGram(u8 *source, u16 startColor, u16 size);
  *
  * @warning Must be called during VBlank or force blank!
  */
-void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size);
+void dmaCopyCGramBank(const u8 *source, u8 bank, u16 startColor, u16 size);
 
 /*============================================================================
  * OAM Transfers
@@ -184,7 +207,7 @@ void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size);
  * dmaCopyOam(oamBuffer, 544);
  * @endcode
  */
-void dmaCopyOam(u8 *source, u16 size);
+void dmaCopyOam(const u8 *source, u16 size);
 
 /*============================================================================
  * Generic DMA

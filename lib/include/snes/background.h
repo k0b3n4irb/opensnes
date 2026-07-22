@@ -177,7 +177,7 @@ void bgInit(u8 bg);
  * bgInitTileSet(0, tiles, palette, 0, tiles_end - tiles, 32, BG_16COLORS, 0x2000);
  * @endcode
  */
-void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
+void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette,
                    u8 paletteEntry, u16 tileSize, u16 paletteSize,
                    u16 colorMode, u16 vramAddr);
 
@@ -189,7 +189,7 @@ void bgInitTileSet(u8 bgNumber, u8 *tileSource, u8 *tilePalette,
  * @param tileSize Size of tile data in bytes
  * @param vramAddr VRAM address for tiles
  */
-void bgInitTileSetData(u8 bgNumber, u8 *tileSource, u16 tileSize, u16 vramAddr);
+void bgInitTileSetData(u8 bgNumber, const u8 *tileSource, u16 tileSize, u16 vramAddr);
 
 /*============================================================================
  * Tilemap Utilities

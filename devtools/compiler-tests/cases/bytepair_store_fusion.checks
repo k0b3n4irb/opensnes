@@ -1,0 +1,7 @@
+# Byte-pair store fusion (C1 audit peephole, 2026-07-19): the PPU
+# double-write idiom `REG = (u8)v; REG = (u8)(v >> 8);` must emit as
+# ONE 16-bit load + sep + sta + xba + sta — not two independent byte
+# stores with a rep/xba/and high-byte rematerialisation in between.
+
+in setcenter: present sta\.l \$00211F\n\txba\n\tsta\.l \$00211F
+count 1 lda 4,s

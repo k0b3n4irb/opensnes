@@ -147,6 +147,17 @@ inline void setScreenOff(void) {
  *
  * @param brightness Brightness level (0-15, 0=black, 15=full)
  *
+ * @warning `setBrightness(0)` is NOT forced blank. It makes the screen
+ *          black, but the PPU keeps fetching, so **VRAM and CGRAM
+ *          writes are still rejected**. Only setScreenOff() (INIDISP
+ *          bit 7) opens the write window outside VBlank.
+ *
+ *          The mistake survives testing: a small transfer written this
+ *          way lands inside VBlank and is correct every time, while a
+ *          multi-KB one has its tail dropped during active display. Use
+ *          setScreenOff() / setScreenOn() around any upload that is not
+ *          comfortably inside the VBlank budget — see dmaCopyVram().
+ *
  * @code
  * // Fade in effect
  * for (u8 i = 0; i <= 15; i++) {

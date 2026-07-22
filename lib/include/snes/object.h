@@ -235,7 +235,7 @@ void objKillAll(void);
  *
  * @param sourceO Pointer to object data table
  */
-void objLoadObjects(u8 *sourceO);
+void objLoadObjects(const u8 *sourceO);
 
 /**
  * @brief Update all active objects

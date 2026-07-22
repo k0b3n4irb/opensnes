@@ -272,14 +272,39 @@ extern t_sprites oambuffer[128];
  *
  * @param size       Sprite size mode (OBJ_SIZE_*; use OAM_DEFAULT_SIZE for
  *                   the standard 8×8/16×16 layout)
- * @param tile_base  VRAM tile-base index 0-7 in OBSEL name-base units —
- *                   each step is $2000 WORD addresses (16 KB), so tiles
- *                   DMA'd to word $4000 need index 2 (addr >> 13). The
- *                   doc previously claimed $1000-word steps, which made
- *                   fix32_orbit's sprite read blank VRAM (#115). Use
+ * @param name_base  OBJ name base, a PAGE NUMBER 0-7 — **not** a VRAM
+ *                   address. Each page is $2000 WORD addresses (16 KB),
+ *                   so tiles DMA'd to word $4000 need base 2. Prefer
+ *                   OBJ_NAME_BASE(addr) over computing it by hand; use
  *                   OAM_DEFAULT_TILE_BASE for tiles at VRAM $0000.
+ *
+ * @warning The value is masked to 3 bits. Passing a VRAM address — the
+ *          natural mistake, since every other VRAM parameter in the SDK
+ *          takes one — silently yields a wrong base: `0x6000 & 7` is 0,
+ *          and the sprites render whatever tiles sit at word 0. There is
+ *          no diagnostic; the symptom is a sprite drawn as background
+ *          garbage. The doc also once claimed $1000-word steps, which
+ *          made fix32_orbit's sprite read blank VRAM (#115).
  */
-void oamInit(u16 size, u16 tile_base);
+void oamInit(u16 size, u16 name_base);
+
+/**
+ * @brief Convert a VRAM **word** address into an OBJ name base (0-7).
+ *
+ * OBJSEL stores the sprite tile area as a 3-bit *page number*, not an
+ * address: page N means word address `N << 13`. Passing a VRAM address
+ * to oamInit() directly is therefore wrong — it is masked to 3 bits, so
+ * `0x6000` becomes base 0 and the sprites render whatever tiles happen
+ * to live at word 0 (usually the background's). Nothing reports it.
+ *
+ * Use this macro and the intent survives the call:
+ * @code
+ * oamInit(OBJ_SIZE8_L16, OBJ_NAME_BASE(0x6000));   // base 3
+ * @endcode
+ *
+ * @param vram_word_addr VRAM word address, a multiple of $2000
+ */
+#define OBJ_NAME_BASE(vram_word_addr) (((vram_word_addr) >> 13) & 0x07)
 
 /**
  * @brief Initialize sprite graphics and palette (PVSnesLib compatible)
@@ -302,7 +327,7 @@ void oamInit(u16 size, u16 tile_base);
  *               sprite_pal, 32, 0, 0x6000, OBJ_SIZE16_L32);
  * @endcode
  */
-void oamInitGfxSet(u8 *tileSource, u16 tileSize, u8 *tilePalette,
+void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
                    u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize);
 
 /*============================================================================
@@ -390,9 +415,32 @@ void oamSetTile(u8 id, u16 tile);
  * valid Y to show. */
 
 /**
- * @brief Hide sprite
+ * @brief Park a sprite off screen.
+ *
+ * Use this for **anything outside the camera**. OAM X is 9 bits and Y is
+ * 8: a sprite drawn at a position beyond the screen does not disappear,
+ * its coordinates WRAP and it reappears somewhere plausible. In a
+ * scrolling world that reads as an entity standing where no entity is —
+ * a villager inside a wall — which you find by looking at the screen,
+ * not by reading the code.
+ *
+ * @code
+ * s16 sx = (s16)world_x - (s16)cam_x;
+ * s16 sy = (s16)world_y - (s16)cam_y;
+ * if (sx < -16 || sx > 255 || sy < -16 || sy > 223) {
+ *     oamHide(id);
+ * } else {
+ *     oamSet(id, (u16)sx, (u16)sy, tile, pal, prio, 0);
+ * }
+ * @endcode
+ *
+ * Sets Y to OBJ_HIDE_Y **and** X's high bit, because Y=240 alone still
+ * wraps for sprites taller than 16 px. That is why this is a function
+ * and not a `oamSetXY(id, 0, 240)` you write yourself.
  *
  * @param id Sprite ID (0-127)
+ *
+ * @see examples/games/rpg — culls its villagers this way
  */
 void oamHide(u8 id);
 
@@ -686,7 +734,7 @@ void oamDynamicDrainQueue(void);
  * @endcode
  */
 void oamMetaDrawDyn(u16 id, s16 x, s16 y,
-                    const MetaspriteItem *meta, u8 *gfxptr, u8 size_class);
+                    const MetaspriteItem *meta, const u8 *gfxptr, u8 size_class);
 
 /*============================================================================
  * Fast Macro Sprite API

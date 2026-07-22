@@ -200,3 +200,5 @@ Cross-references:
 - `KNOWN_LIMITATIONS.md` for the silent-failure catalogue
 - `docs/hardware/` for the quirk documentation referenced in Principle 2
 - `compiler/ABI.md` for the calling convention referenced in Principle 4
+- `lib/ARCHITECTURE.md` for the C / ASM split policy (Principle 5 made
+  operational: every keep-ASM decision is benchmark-backed)

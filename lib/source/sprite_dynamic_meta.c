@@ -43,7 +43,7 @@ extern u8 oam_dynamic_size_mode;
  * @param size_class  OBJ_SMALL (0) or OBJ_LARGE (1).
  */
 void oamMetaDrawDyn(u16 id, s16 x, s16 y,
-                    const MetaspriteItem *meta, u8 *gfxptr, u8 size_class) {
+                    const MetaspriteItem *meta, const u8 *gfxptr, u8 size_class) {
     u8 refresh = oambuffer[id].oamrefresh;
     u8 pixel_size;
     u8 attr_or;

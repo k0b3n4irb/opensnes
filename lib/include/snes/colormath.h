@@ -212,6 +212,28 @@ void colorMathSetSource(u8 source);
 void colorMathSetCondition(u8 condition);
 
 /**
+ * @brief Enable or disable direct color mode (CGWSEL bit 0)
+ *
+ * In direct color mode the PPU stops looking 256-color (8bpp) BG
+ * pixels up in CGRAM: the tile's pixel byte IS the color, interpreted
+ * as BBGGGRRR (2 bits blue, 3 green, 3 red) and expanded to 15-bit
+ * BGR by shifting each field left — B: bits 7-6 -> color bits 14-13,
+ * G: bits 5-3 -> 9-7, R: bits 2-0 -> 4-2. The tilemap entry's palette
+ * bits stop selecting a palette and instead supply one extra LOW bit
+ * per channel (pal bit 0 -> red bit 1, pal bit 1 -> green bit 6, pal
+ * bit 2 -> blue bit 12), for 2048 distinct colors with no CGRAM cost.
+ *
+ * Only affects 8bpp layers: BG1 in modes 3/4 and the Mode 7 layer
+ * (EXTBG included). 2/4bpp layers and sprites keep using CGRAM, so a
+ * HUD or sprite palette coexists untouched. Worked example:
+ * `examples/graphics/effects/direct_color` (the same VRAM bytes drawn
+ * both ways).
+ *
+ * @param enable 1 = pixel bytes are colors, 0 = CGRAM lookup (default)
+ */
+void colorMathSetDirectColor(u8 enable);
+
+/**
  * @brief Set fixed color for blending
  *
  * Sets the fixed color used when source is COLORMATH_SRC_FIXED.

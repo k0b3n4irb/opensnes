@@ -107,7 +107,7 @@ u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY) {
  * Tile-Based Collision Functions
  *============================================================================*/
 
-u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth) {
+u8 collideTile(s16 px, s16 py, const u8 *tilemap, u16 mapWidth) {
     u16 tileX, tileY;
     u16 offset;
 
@@ -137,7 +137,7 @@ u8 collideTile(s16 px, s16 py, u8 *tilemap, u16 mapWidth) {
     return tilemap[offset];
 }
 
-u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
+u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize) {
     u16 tileX, tileY;
     u16 offset;
     u8 shift;
@@ -167,7 +167,7 @@ u8 collideTileEx(s16 px, s16 py, u8 *tilemap, u16 mapWidth, u8 tileSize) {
     return tilemap[offset];
 }
 
-u8 collideRectTile(Rect *r, u8 *tilemap, u16 mapWidth) {
+u8 collideRectTile(Rect *r, const u8 *tilemap, u16 mapWidth) {
     s16 right, bottom;
 
     right = r->x + r->width - 1;

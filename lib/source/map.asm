@@ -9,6 +9,38 @@
 ; Original: undisbeliever's castle_platformer
 ; License: zlib (compatible with MIT)
 ;
+;------------------------------------------------------------------------------
+; C1 AUDIT VERDICT (2026-07-19): KEEP AS ASM — benchmark-backed.
+;
+; This module's essence is bulk buffer manipulation in a BANK $7E
+; RAMSECTION (~10 KB: metatile defs 4K, properties 2K, row LUT 1K,
+; tilemap buffer 2K+) — deliberately ABOVE the C-visible WRAM mirror
+; ($0000-$1FFF, constraint B2). The ASM reaches it at 5-6 cycles per
+; access via the DB register (phb / lda #$7e / pha / plb); compiled C
+; must go through 4-byte far pointers ([tcc__r9] indirect, ~13
+; cycles). Measured on the LIGHTEST far path (mapGetMetaTile, 2 far
+; reads): ASM 208 cyc vs C far-model 277 (+33 %) — already past the
+; audit's +10 % rule before touching the buffer loops, which do
+; dozens of $7E accesses per streamed column/row on the
+; VBlank-adjacent path. Numbers + method:
+; .claude/notes/chantiers/c1_asm_audit.md.
+;
+; INTERNAL INVARIANTS (read before editing):
+; - DB discipline: every function that touches the $7E state sets
+;   DB=$7E (or the map-data bank read from maptile_L1b) and restores
+;   it before returning. C callers arrive with DB=$00 — reading the
+;   $7E symbols with an absolute,X and the caller's DB is the #103
+;   open-bus bug class; use `.l` long addressing or set DB.
+; - x_pos/y_pos live in the BANK 0 section (C-accessible on purpose);
+;   everything else is bank $7E — do not move symbols between the two
+;   sections without auditing every access mode.
+; - mapVblank runs INSIDE the NMI handler: VBlank budget applies
+;   (~211 cyc idle, more when a column/row is pending) and it must
+;   not touch the WRAM data port ($2180-83, nmi_audit.md).
+; - After any rep/sep: explicit .ACCU/.INDEX markers (WLA-DX loses
+;   tracking after branch merges — lint-enforced).
+; - Args are cc65816 left-to-right; stack maps are per-function
+;   comments, verified by the ABI lint (no skip-file marker here).
 ;==============================================================================
 
 .ifdef SA1

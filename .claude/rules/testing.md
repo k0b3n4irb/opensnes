@@ -12,7 +12,16 @@ scripts/install-luna.sh                              # fetch pinned luna (tools/
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
 python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `steps = [a, b]`)
 python3 tools/luna-test/probes/run_all.py            # functional probes (scripted input → WRAM asserts)
+python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
 ```
+
+The WRAM oracle hashes every WRAM page at each vblank, **including the
+stack**, so it moves on any codegen change even when behaviour is
+identical. That is the point: it makes you justify the change rather
+than notice it three commits later. After an intentional codegen change,
+rebuild clean and `wram_regress.py --update` — and say in the commit why
+the drift is benign. Precedent: `aa595933` after the indexed-long
+fusion, `912fb24a` after the #132 compiler fix.
 
 Coverage covers every example (`luna_runner.py --list`). Static analysis
 (`symmap.py`), the build (`make`), and compiler C→ASM checks remain separate
