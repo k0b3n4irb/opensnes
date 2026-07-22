@@ -185,6 +185,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:afaca2c8a6f1ec17c5fd5339b75da5aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a single fixed color channel.  <br /></td></tr>
 <tr class="memitem:a15da8aea1fb4d880f7547dd3dfe2320c" id="r_a15da8aea1fb4d880f7547dd3dfe2320c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a15da8aea1fb4d880f7547dd3dfe2320c">colorMathSetCondition</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> condition)</td></tr>
 <tr class="memdesc:a15da8aea1fb4d880f7547dd3dfe2320c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set when color math is enabled (window control).  <br /></td></tr>
+<tr class="memitem:aec2f316006392f5dca68003a3fb0f280" id="r_aec2f316006392f5dca68003a3fb0f280"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aec2f316006392f5dca68003a3fb0f280">colorMathSetDirectColor</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> enable)</td></tr>
+<tr class="memdesc:aec2f316006392f5dca68003a3fb0f280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable direct color mode (CGWSEL bit 0).  <br /></td></tr>
 <tr class="memitem:a94502e76334cf02b8e862126427f62c7" id="r_a94502e76334cf02b8e862126427f62c7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> r, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> g, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
 <tr class="memdesc:a94502e76334cf02b8e862126427f62c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set fixed color for blending.  <br /></td></tr>
 <tr class="memitem:aa5667a2a54eb543bd71dbbd9cd41bd10" id="r_aa5667a2a54eb543bd71dbbd9cd41bd10"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> enable)</td></tr>
@@ -725,6 +727,33 @@ Usage Example</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>COLORMATH_ALWAYS, COLORMATH_INSIDE, COLORMATH_OUTSIDE, or COLORMATH_NEVER </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aec2f316006392f5dca68003a3fb0f280" name="aec2f316006392f5dca68003a3fb0f280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec2f316006392f5dca68003a3fb0f280">&#9670;&#160;</a></span>colorMathSetDirectColor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void colorMathSetDirectColor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>enable</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable or disable direct color mode (CGWSEL bit 0). </p>
+<p>In direct color mode the PPU stops looking 256-color (8bpp) BG pixels up in CGRAM: the tile's pixel byte IS the color, interpreted as BBGGGRRR (2 bits blue, 3 green, 3 red) and expanded to 15-bit BGR by shifting each field left — B: bits 7-6 -&gt; color bits 14-13, G: bits 5-3 -&gt; 9-7, R: bits 2-0 -&gt; 4-2. The tilemap entry's palette bits stop selecting a palette and instead supply one extra LOW bit per channel (pal bit 0 -&gt; red bit 1, pal bit 1 -&gt; green bit 6, pal bit 2 -&gt; blue bit 12), for 2048 distinct colors with no CGRAM cost.</p>
+<p>Only affects 8bpp layers: BG1 in modes 3/4 and the Mode 7 layer (EXTBG included). 2/4bpp layers and sprites keep using CGRAM, so a HUD or sprite palette coexists untouched. Worked example: <span class="tt">examples/graphics/effects/direct_color</span> (the same VRAM bytes drawn both ways).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">enable</td><td>1 = pixel bytes are colors, 0 = CGRAM lookup (default) </td></tr>
   </table>
   </dd>
 </dl>

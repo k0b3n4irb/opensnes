@@ -1,6 +1,7 @@
 var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
 [
     [ "anim.h", "anim_8h.html", "anim_8h" ],
+    [ "apu.h", "apu_8h.html", "apu_8h" ],
     [ "asset.h", "asset_8h.html", "asset_8h" ],
     [ "audio.h", "audio_8h.html", "audio_8h" ],
     [ "background.h", "background_8h.html", "background_8h" ],
@@ -20,6 +21,7 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "mode7.h", "mode7_8h.html", "mode7_8h" ],
     [ "mosaic.h", "mosaic_8h.html", "mosaic_8h" ],
     [ "object.h", "object_8h.html", "object_8h" ],
+    [ "panel.h", "panel_8h.html", "panel_8h" ],
     [ "profile.h", "profile_8h.html", "profile_8h" ],
     [ "registers.h", "registers_8h.html", "registers_8h" ],
     [ "sa1.h", "sa1_8h.html", "sa1_8h" ],

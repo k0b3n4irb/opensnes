@@ -365,7 +365,7 @@ Variables</h2></td></tr>
 <div class="line">}</div>
 </div><!-- fragment -->
 <p>Sprite palette — single palette shared by player and target. </p>
-<p>Both sprites use palette 0; the visual difference between them is entirely the tile shape (diamond vs. X). Keeping the palette minimal trims four bytes off the CGRAM upload and avoids the second <span class="tt"><a class="el" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> call that an earlier draft used.</p>
+<p>Both sprites use palette 0; the visual difference between them is entirely the tile shape (diamond vs. X). Keeping the palette minimal trims four bytes off the CGRAM upload and avoids the second <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> call that an earlier draft used.</p>
 <p>BGR555 layout: <span class="tt">[R5G5B5]</span> packed into two bytes, low byte first. Only colour 3 is rendered — the tile bitplanes above always resolve to index 3. </p>
 
 </div>

@@ -14,6 +14,20 @@ var searchData=
   ['hero16_5fwalk_5ftable_11',['hero16_walk_table',['../graphics_2sprites_2metasprite_2main_8c.html#ae1a0395a6fce5e36f6e901dcf25ebcf3',1,'main.c']]],
   ['hero32_5fframe0_12',['hero32_frame0',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#a39748e25a7a4234b8d7fe367a6199c94',1,'main.c']]],
   ['hero8_5fframe0_13',['hero8_frame0',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#abc082b417d7da07574502ec922386fb4',1,'main.c']]],
-  ['hiscore_14',['hiscore',['../games_2breakout_2main_8c.html#ada91ff5c946fe8702016a0b4fc0f9a54',1,'main.c']]],
-  ['hitpoints_15',['hitpoints',['../structt__objs.html#a66724708a48c464c7c9e1a00a6b81b6d',1,'t_objs']]]
+  ['hero_5ffacing_14',['hero_facing',['../games_2rpg_2main_8c.html#ac81e751b11e39a34beb51ddc08e01d65',1,'main.c']]],
+  ['hero_5fhp_15',['hero_hp',['../games_2rpg_2main_8c.html#a9d4103d95694e4e6d7f6909f19c62de9',1,'main.c']]],
+  ['hero_5fpal_16',['hero_pal',['../games_2rpg_2main_8c.html#a9b21e29063c8d2b1be8b05654463d6c0',1,'main.c']]],
+  ['hero_5ftiles_17',['hero_tiles',['../games_2rpg_2main_8c.html#afc5391e424cce3cbd12a48c21e2f9c34',1,'main.c']]],
+  ['hero_5ftiles_5fend_18',['hero_tiles_end',['../games_2rpg_2main_8c.html#a4a4dbf216b7922a3cf8775aacb7ed67e',1,'main.c']]],
+  ['hero_5fx_19',['hero_x',['../games_2rpg_2main_8c.html#a00bf7e567a21358159eedc20291c0602',1,'main.c']]],
+  ['hero_5fy_20',['hero_y',['../games_2rpg_2main_8c.html#a4c8f2f7228133dd17220040c98d7facf',1,'main.c']]],
+  ['hicolor_5fpal_21',['hicolor_pal',['../graphics_2effects_2hicolor__hires_2main_8c.html#a21fa44407d141c3d555345a958704d19',1,'main.c']]],
+  ['hicolor_5fpal_5fend_22',['hicolor_pal_end',['../graphics_2effects_2hicolor__hires_2main_8c.html#aa21079fb09505c3aa63723e75961f621',1,'main.c']]],
+  ['hiscore_23',['hiscore',['../games_2breakout_2main_8c.html#ada91ff5c946fe8702016a0b4fc0f9a54',1,'main.c']]],
+  ['hitpoints_24',['hitpoints',['../structt__objs.html#a66724708a48c464c7c9e1a00a6b81b6d',1,'t_objs']]],
+  ['house_5fcollision_25',['house_collision',['../games_2rpg_2main_8c.html#a3185fe42d33e03f236eebe812d038352',1,'main.c']]],
+  ['house_5fmap_26',['house_map',['../games_2rpg_2main_8c.html#aa676b51f71d3ba23878dcc4067cdeb71',1,'main.c']]],
+  ['house_5fpal_27',['house_pal',['../games_2rpg_2main_8c.html#a343b272b331aff30fc0b71982fe72aa2',1,'main.c']]],
+  ['house_5ftiles_28',['house_tiles',['../games_2rpg_2main_8c.html#aa60d7d2e05169a3c958feae598a89c78',1,'main.c']]],
+  ['house_5ftiles_5fend_29',['house_tiles_end',['../games_2rpg_2main_8c.html#a755289ff57cd54e81dd642d327dcd95d',1,'main.c']]]
 ];

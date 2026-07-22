@@ -163,8 +163,8 @@ Variables</h2></td></tr>
 <tr class="memdesc:af651334dea15b1ee583e22816ed290e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG palette (2 BGR555 colors): black background + gray walls.  <br /></td></tr>
 <tr class="memitem:a09f5942c1c4cbb4530e773cfab273444" id="r_a09f5942c1c4cbb4530e773cfab273444"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a09f5942c1c4cbb4530e773cfab273444">collision_flags</a></td></tr>
 <tr class="memdesc:a09f5942c1c4cbb4530e773cfab273444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitmask tracking which enemies the player is currently overlapping.  <br /></td></tr>
-<tr class="memitem:a793d2b17e73273def2dc524d48aa51ba" id="r_a793d2b17e73273def2dc524d48aa51ba"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a793d2b17e73273def2dc524d48aa51ba">collision_map</a> [16 *14]</td></tr>
-<tr class="memdesc:a793d2b17e73273def2dc524d48aa51ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area).  <br /></td></tr>
+<tr class="memitem:a302ff1b83f64306177e701ff28e81c89" id="r_a302ff1b83f64306177e701ff28e81c89"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a302ff1b83f64306177e701ff28e81c89">collision_map</a> [16 *14]</td></tr>
+<tr class="memdesc:a302ff1b83f64306177e701ff28e81c89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area).  <br /></td></tr>
 <tr class="memitem:a9bf113cc8c0a116a54e1ee9a645f9e4a" id="r_a9bf113cc8c0a116a54e1ee9a645f9e4a"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9bf113cc8c0a116a54e1ee9a645f9e4a">collision_palette</a> []</td></tr>
 <tr class="memdesc:a9bf113cc8c0a116a54e1ee9a645f9e4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite palette 1 &ndash; collision highlight (CGRAM offset 144).  <br /></td></tr>
 <tr class="memitem:a16dc96ce6b56ea6c030a6a86de599555" id="r_a16dc96ce6b56ea6c030a6a86de599555"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a16dc96ce6b56ea6c030a6a86de599555">empty_tile</a> []</td></tr>
@@ -196,7 +196,7 @@ Variables</h2></td></tr>
 <p>The example also illustrates the direct oamMemory[] write pattern instead of calling <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> per sprite, which avoids the 158-byte stack frame overhead of <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a> and keeps the main loop fast enough for 5 sprites at 60 fps.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>AABB collision via <a class="el" href="collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8" title="Check rectangle vs rectangle collision (AABB).">collideRect()</a> for sprite-vs-sprite overlap testing</li>
-<li>Tile collision via <a class="el" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03" title="Check collision with tile at pixel coordinates.">collideTile()</a> for sprite-vs-map wall rejection</li>
+<li>Tile collision via <a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a> for sprite-vs-map wall rejection</li>
 <li>Direct OAM buffer writes (oamMemory[]) with oam_update_flag for NMI DMA</li>
 <li>OAM high table management (bytes 512+) for X high bit and sprite size</li>
 <li>Separate sprite palette banks for normal and collision-highlight colors</li>
@@ -397,7 +397,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Test whether a position would overlap a solid wall tile. </p>
-<p>Converts screen coordinates to collision map coordinates (subtracting the map offset), then probes all four corners of the player's 8x8 bounding box against the collision_map[] via <a class="el" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03" title="Check collision with tile at pixel coordinates.">collideTile()</a>. If any corner lands on a solid tile (value 1), the function returns 1 to reject the movement.</p>
+<p>Converts screen coordinates to collision map coordinates (subtracting the map offset), then probes all four corners of the player's 8x8 bounding box against the collision_map[] via <a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a>. If any corner lands on a solid tile (value 1), the function returns 1 to reject the movement.</p>
 <p>The caller uses per-axis rejection: if the combined (new_x, new_y) collides, it tries each axis independently so the player can slide along walls instead of stopping dead.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -588,8 +588,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a793d2b17e73273def2dc524d48aa51ba" name="a793d2b17e73273def2dc524d48aa51ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a793d2b17e73273def2dc524d48aa51ba">&#9670;&#160;</a></span>collision_map</h2>
+<a id="a302ff1b83f64306177e701ff28e81c89" name="a302ff1b83f64306177e701ff28e81c89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a302ff1b83f64306177e701ff28e81c89">&#9670;&#160;</a></span>collision_map</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -598,7 +598,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> collision_map[16 *14]</td>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> collision_map[16 *14]</td>
         </tr>
       </table>
   </td>
@@ -607,7 +607,7 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                        = {</div>
+<b>Initial value:</b><div class="fragment"><div class="line">                              = {</div>
 <div class="line">    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  </div>
 <div class="line">    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,</div>
 <div class="line">    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,</div>
@@ -625,8 +625,8 @@ Variables</h2></td></tr>
 <div class="line">}</div>
 </div><!-- fragment -->
 <p>Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area). </p>
-<p>A flat 2D array where 1 = solid wall and 0 = passable. The map is stored in row-major order. <a class="el" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03" title="Check collision with tile at pixel coordinates.">collideTile()</a> converts a pixel coordinate to a tile index (px/8) and looks up this array to determine if the tile is solid. The border is all walls with internal platforms at symmetric positions.</p>
-<dl class="section note"><dt>Note</dt><dd>This is mutable (not const) because <a class="el" href="collision_8h.html#a653ce0d0c8ee01d02993035990f64a03" title="Check collision with tile at pixel coordinates.">collideTile()</a> takes a non-const pointer. It lives in WRAM, not ROM. </dd></dl>
+<p>A flat 2D array where 1 = solid wall and 0 = passable. The map is stored in row-major order. <a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a> converts a pixel coordinate to a tile index (px/8) and looks up this array to determine if the tile is solid. The border is all walls with internal platforms at symmetric positions.</p>
+<dl class="section note"><dt>Note</dt><dd><span class="tt">const</span>, so it lives in ROM and costs zero WRAM. <a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a> takes a <span class="tt">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> *</span>, and const-qualified loads compile to bank-honouring far reads — the map may sit in any bank. </dd></dl>
 
 </div>
 </div>

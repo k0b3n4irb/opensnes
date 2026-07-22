@@ -150,8 +150,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initialize the audio system. </p>
-<p>Uploads the SPC700 driver and prepares for playback. Call once during game initialization.</p>
-<dl class="section note"><dt>Note</dt><dd>Takes several frames to upload driver via IPL protocol. Interrupts are disabled during upload. </dd></dl>
+<p>Uploads the SPC700 driver (built into the lib as audio_driver_blob) through the IPL boot-ROM protocol and starts it, then verifies the command channel with a PING. Call once during game initialization; check <a class="el" href="#ga4149a6d84a9f9c0368e3657f65c1dd52" title="Check if audio system is ready.">audioIsReady()</a> afterwards.</p>
+<dl class="section note"><dt>Note</dt><dd>Blocks for the duration of the upload (~a frame for the small driver). Interrupts stay enabled; the NMI handler does not touch the APU ports. </dd></dl>
 
 </div>
 </div>

@@ -14,7 +14,7 @@ var object_8h =
     [ "objInitGravity", "object_8h.html#ad308f742d023cc15efdb73ec4ed362aa", null ],
     [ "objKill", "object_8h.html#a4ad7c03653fa3b7fdc7c36b3e82a9565", null ],
     [ "objKillAll", "object_8h.html#a2269ecc9324f6e78a7007e2ac9f3aa0e", null ],
-    [ "objLoadObjects", "object_8h.html#a6d3d7ee4565b89ae91b57ed95c8b8e7a", null ],
+    [ "objLoadObjects", "object_8h.html#aa14cd55e5ffb19f7030a32f47e84f2a5", null ],
     [ "objNew", "object_8h.html#a5f3dd63b163cced3299b0d1d48d2b17a", null ],
     [ "objRefreshAll", "object_8h.html#aede8c571a7e8bdb8129b5df55b45225b", null ],
     [ "objUpdateAll", "object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83", null ],

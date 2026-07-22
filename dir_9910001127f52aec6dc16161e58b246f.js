@@ -1,5 +1,6 @@
 var dir_9910001127f52aec6dc16161e58b246f =
 [
+    [ "direct_color", "dir_aa39c5c674d653ccdfc6c4eae176c361.html", "dir_aa39c5c674d653ccdfc6c4eae176c361" ],
     [ "fading", "dir_643fb75a9d02351c770e847fc016754f.html", "dir_643fb75a9d02351c770e847fc016754f" ],
     [ "gradient_9bit", "dir_bc17e9b63767a85346926a359bbaa399.html", "dir_bc17e9b63767a85346926a359bbaa399" ],
     [ "gradient_colors", "dir_fca81c2543d65479b948257acaa03e2e.html", "dir_fca81c2543d65479b948257acaa03e2e" ],
@@ -8,6 +9,8 @@ var dir_9910001127f52aec6dc16161e58b246f =
     [ "hdma_wave", "dir_c5499cbdd384a78e5a6e11a8fd277c09.html", "dir_c5499cbdd384a78e5a6e11a8fd277c09" ],
     [ "hdma_wave_table", "dir_1f8c4faea88b51e0e5f19703d82f16a8.html", "dir_1f8c4faea88b51e0e5f19703d82f16a8" ],
     [ "hicolor_1792", "dir_271a488ae1a965c22c1a5356a1fc61f3.html", "dir_271a488ae1a965c22c1a5356a1fc61f3" ],
+    [ "hicolor_blend", "dir_2a45abc0202df483dd8ff4711d5fd687.html", "dir_2a45abc0202df483dd8ff4711d5fd687" ],
+    [ "hicolor_hires", "dir_929332e5ce7275ce416dde86898b2f0e.html", "dir_929332e5ce7275ce416dde86898b2f0e" ],
     [ "hires_text", "dir_c4c1e53a5f3e13943244219a81142d36.html", "dir_c4c1e53a5f3e13943244219a81142d36" ],
     [ "mode7_perspective_rotate", "dir_fae3be23f8d1fcaa2b3854619ac1d08c.html", "dir_fae3be23f8d1fcaa2b3854619ac1d08c" ],
     [ "mosaic", "dir_166bdc4315508af9f747ee42f178da15.html", "dir_166bdc4315508af9f747ee42f178da15" ],

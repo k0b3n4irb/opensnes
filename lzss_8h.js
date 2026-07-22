@@ -1,4 +1,4 @@
 var lzss_8h =
 [
-    [ "LzssDecodeVram", "lzss_8h.html#ae01a97bc31a2c32d3cdae197a9fbe9dc", null ]
+    [ "LzssDecodeVram", "lzss_8h.html#a73d3df913983c4b7ee22f1cdbe61e1ed", null ]
 ];

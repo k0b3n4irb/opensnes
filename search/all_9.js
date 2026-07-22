@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['8_208_20fixed_20point_20format_0',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md244',1,'']]],
-  ['8_208_20fixed_20point_20scale_1',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1051',1,'']]],
-  ['8_20color_20cycling_20between_20levels_2',['8. Color Cycling Between Levels',['../examples_games_breakout.html#autotoc_md854',1,'']]],
-  ['8_20fixed_20point_20format_3',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md244',1,'']]],
-  ['8_20fixed_20point_20scale_4',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1051',1,'']]],
-  ['8_20transfer_20modes_5',['The 8 transfer modes',['../tutorial_dma.html#autotoc_md161',1,'']]],
-  ['8bpp_20tiles_6',['Mode 3 and 8bpp Tiles',['../examples_maps_dynamic_map.html#autotoc_md1439',1,'']]]
+  ['8_208_20fixed_20point_20format_0',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md249',1,'']]],
+  ['8_208_20fixed_20point_20scale_1',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1088',1,'']]],
+  ['8_20color_20cycling_20between_20levels_2',['8. Color Cycling Between Levels',['../examples_games_breakout.html#autotoc_md881',1,'']]],
+  ['8_20fixed_20point_20format_3',['The 8.8 fixed-point format',['../tutorial_math.html#autotoc_md249',1,'']]],
+  ['8_20fixed_20point_20scale_4',['8.8 Fixed-Point Scale',['../examples_graphics_backgrounds_mode7.html#autotoc_md1088',1,'']]],
+  ['8_20transfer_20modes_5',['The 8 transfer modes',['../tutorial_dma.html#autotoc_md166',1,'']]],
+  ['8bpp_20tiles_6',['Mode 3 and 8bpp Tiles',['../examples_maps_dynamic_map.html#autotoc_md1482',1,'']]]
 ];

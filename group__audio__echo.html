@@ -212,13 +212,14 @@ Functions</h2></td></tr>
 <p>Configure echo parameters. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">delay</td><td>Echo delay (1-15, delay_ms = value * 16) </td></tr>
+    <tr><td class="paramname">delay</td><td>Echo delay 1-7 (delay_ms = value * 16; values above 7 are clamped — the ARAM map reserves 14 KB max for the echo ring, keeping 46 KB for samples) </td></tr>
     <tr><td class="paramname">feedback</td><td>Feedback amount (-128 to 127) </td></tr>
     <tr><td class="paramname">volumeL</td><td>Left echo volume (-128 to 127) </td></tr>
-    <tr><td class="paramname">volumeR</td><td>Right echo volume (-128 to 127) </td></tr>
+    <tr><td class="paramname">volumeR</td><td>Right echo volume (-128 to 127)</td></tr>
   </table>
   </dd>
 </dl>
+<p>Reconfiguration clears the whole echo ring before re-enabling echo writes (~9 ms per delay unit) — call at scene setup, not per frame. Call this BEFORE <a class="el" href="#ga663f776667e4907fbed12543f2c83bc1" title="Enable echo for specific voices.">audioEnableEcho()</a>. </p>
 
 </div>
 </div>

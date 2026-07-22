@@ -310,7 +310,7 @@ Variables</h2></td></tr>
 
 <p>Load sprite tiles for the selected size mode under force blank. </p>
 <p>Force blank (INIDISP bit 7 = 1) disables rendering, giving unlimited time for VRAM writes. This is necessary because large sprites (32x32, 64x64) require more than the ~4KB VBlank DMA budget to transfer.</p>
-<p>For each mode, the small sprite tiles are loaded with <a class="el" href="sprite_8h.html#a429bb77c76f029e8ee367f6a1bd27dca" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a> (which also sets OBJSEL) and the large sprite tiles are loaded separately via <a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>. Each size uses a different palette loaded to CGRAM address 128+16 (sprite palette slot 1).</p>
+<p>For each mode, the small sprite tiles are loaded with <a class="el" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c" title="Initialize sprite graphics and palette (PVSnesLib compatible).">oamInitGfxSet()</a> (which also sets OBJSEL) and the large sprite tiles are loaded separately via <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>. Each size uses a different palette loaded to CGRAM address 128+16 (sprite palette slot 1).</p>
 <p>After loading, two OAM entries are configured: one small sprite on the left and one large sprite on the right. </p>
 
 </div>

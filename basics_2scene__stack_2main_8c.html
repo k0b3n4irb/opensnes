@@ -153,7 +153,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> stack demo — title → counter → pause overlay. </p>
-<p>Demonstrates the opt-in <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a9181964c99c78f9d466d51f152714e38">scene</a></span> framework: the running game is split into three <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs that push and pop without a hand-rolled state machine. The demo is deliberately minimal — three text screens that swap when buttons are pressed — so you can read the dispatch shape without graphics noise getting in the way.</p>
+<p>Demonstrates the opt-in <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> framework: the running game is split into three <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs that push and pop without a hand-rolled state machine. The demo is deliberately minimal — three text screens that swap when buttons are pressed — so you can read the dispatch shape without graphics noise getting in the way.</p>
 <p>Flow:</p><ol type="1">
 <li><span class="tt">title</span> scene: shows "PRESS START". Start pushes <span class="tt">counter</span>.</li>
 <li><span class="tt">counter</span> scene: increments a number every frame. Select pushes <span class="tt">pause</span> (counter is suspended; numbers stop). Start pops back to title.</li>

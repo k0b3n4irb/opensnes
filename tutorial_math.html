@@ -124,7 +124,7 @@ $(function(){initNavTree('tutorial_math.html','',''); });
 <div class="contents">
 <div class="textblock"><p>This tutorial covers <span class="tt">&lt;<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>&gt;</span>: the lib's fixed-point arithmetic, sin/cos lookup tables, and safe integer multiply/divide. The SNES has <b>no floating-point unit</b> — every smooth movement, every rotation, every interpolation in your game is built on fixed-point or LUTs.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. The <a class="el" href="mode7_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/mode7.md">Mode 7 tutorial</a> is the natural pair — Mode 7's matrix maths goes through <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span>/<span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span>/<span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul</a></span> constantly.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md243"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md248"></a>
 Why fixed-point on the SNES</h2>
 <p>Floating point on the SNES is <b>possible</b> but <b>expensive</b>. cproc / QBE can emit software-float code (the lib avoids it deliberately — <span class="tt">PHILOSOPHY.md</span> calls out "no printf in core lib" partly because formatted-output helpers force software floats), but a single <span class="tt">float</span> multiply costs ~500 cycles. At 60 fps with 1369 cycles per scanline, a few floats per frame is fine; per-sprite or per-particle is infeasible.</p>
 <p>Fixed-point is the canonical alternative: integers that <b>interpret</b> some bits as fractional. With 8.8 fixed-point (16-bit total), the high byte is the integer part and the low byte is <span class="tt">n/256</span>. A multiply is a 16 × 16 → 32-bit integer multiply followed by a shift — the SNES has hardware for the first part (multiplier registers <span class="tt">$4202</span>-<span class="tt">$4206</span>) and the lib does the shift.</p>
@@ -136,7 +136,7 @@ Why fixed-point on the SNES</h2>
 <li><span class="tt">mul16(a, b)</span> (16 × 16 → low 16): ~10 cycles (hardware).</li>
 </ul>
 <p>Order-of-magnitude: fixed-point is 10–25× faster than software floats. For real-time game logic, that's the difference between "playable" and "choppy".</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md244"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md249"></a>
 The 8.8 fixed-point format</h2>
 <p>The lib's <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> type is a 16-bit signed value (<span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>) interpreted as:</p>
 <table class="markdownTable">
@@ -149,7 +149,7 @@ The 8.8 fixed-point format</h2>
 </table>
 <p>So <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a> value = 0x0140</span> represents <span class="tt">1.25</span> (integer = 1, fraction = 0x40 = 64/256 = 0.25). A <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> with value <span class="tt">0xFF80</span> represents <span class="tt">-0.5</span> (the standard two's-complement sign-extension applies).</p>
 <p>Total range: roughly <b>-128.0 to +127.996</b>. Precision: <b>1/256 ≈ 0.0039</b>. Good enough for screen-space coordinates (the SNES displays 256 × 224, so 8.8 covers the full screen with sub-pixel precision). Not enough for distances over a few hundred units — in that case, drop to integer pixel coordinates and reserve fixed for velocity/acceleration.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md245"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md250"></a>
 The conversion macros</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="math_8h.html">snes/math.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -176,7 +176,7 @@ The conversion macros</h2>
 <li><b><span class="tt"><a class="el" href="math_8h.html#a05738893be2affe52229eb12b99f4fba" title="Convert fixed-point to integer (truncate).">UNFIX</a></span> truncates toward zero</b> — same behaviour as integer C division. <span class="tt"><a class="el" href="math_8h.html#a05738893be2affe52229eb12b99f4fba" title="Convert fixed-point to integer (truncate).">UNFIX</a>(<a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX</a>(-1) / 2)</span> = <span class="tt">0</span>, not <span class="tt">-1</span>. For round-to-nearest, use <span class="tt"><a class="el" href="math_8h.html#a78f48b221690b41e9f1b59cc6b056ceb" title="Convert fixed-point to integer (rounded).">UNFIX_ROUND</a>(x + 128)</span> (the <span class="tt">+128</span> adds half before truncating).</li>
 <li><b><span class="tt"><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(x)</a></span> is <span class="tt">(x &lt;&lt; 8)</span></b> — only safe for <span class="tt">x</span> in <span class="tt">-128..127</span>. <span class="tt"><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(200)</a></span> overflows the high byte and wraps to <span class="tt">-56.0</span>. The compiler doesn't warn; check your inputs.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md246"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md251"></a>
 Fixed-point arithmetic</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> pos = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(100);</div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> velocity = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(1) / 4;     <span class="comment">/* 0.25 */</span></div>
@@ -188,7 +188,7 @@ Fixed-point arithmetic</h2>
 <div class="ttc" id="amath_8h_html_aaa8ca4460928f28892217658eca661bf"><div class="ttname"><a href="math_8h.html#aaa8ca4460928f28892217658eca661bf">fixMul</a></div><div class="ttdeci">fixed fixMul(fixed a, fixed b)</div><div class="ttdoc">Multiply two fixed-point values.</div></div>
 </div><!-- fragment --><p>The trap: <span class="tt">pos * scale</span> (using the C <span class="tt">*</span> operator) treats both as plain <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>s and gives you <span class="tt">(pos × scale) &gt;&gt; 0</span> — an enormous wrong number. <b>Always use <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul</a></span></b> when both operands are <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span>. The function does a 32-bit intermediate multiply and re-shifts back to 8.8 format.</p>
 <p>For division: <span class="tt">fixDiv(a, b)</span> produces <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a> / <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span> as fixed-point. <b>Returns 0 on divide-by-zero</b> — silent failure mode, but predictable. Validate divisors before passing them.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md247"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md252"></a>
 Trigonometry (sin/cos lookup tables)</h2>
 <p>The SDK uses <b>8-bit angles</b>: 0–255 maps linearly to 0°–360°. So <span class="tt">64</span> = 90°, <span class="tt">128</span> = 180°, <span class="tt">192</span> = 270°. Wrapping is automatic — adding 1 to angle 255 wraps to 0 in <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span>.</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a> = 0;</div>
@@ -215,7 +215,7 @@ Trigonometry (sin/cos lookup tables)</h2>
 <div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdef"><b>Definition</b> math.h:181</div></div>
 </div><!-- fragment --><p>Both <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span> and <span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> return values in <span class="tt">[-256, +256]</span> (i.e., <span class="tt">-1.0</span> to <span class="tt">+1.0</span> in 8.8 fixed). The result of <span class="tt">fixMul(speed, fixSin(a))</span> is a velocity vector component in 8.8 fixed.</p>
 <p>The LUTs are 256-entry, 2 bytes per entry, 512 bytes total. They live in ROM in <span class="tt">lib/source/math.asm</span>. Lookups are O(1) — ~20 cycles per call.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md248"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md253"></a>
 Hardware multiplier and divider</h2>
 <p>The SNES CPU has a hardware 8-bit unsigned multiplier (<span class="tt">WRMPYA</span> / <span class="tt">WRMPYB</span> at <span class="tt">$4202</span>/<span class="tt">$4203</span>, result in <span class="tt">RDMPYL</span>/<span class="tt">RDMPYH</span>) and a 16-bit unsigned divider (<span class="tt">WRDIVL</span>/<span class="tt">WRDIVH</span>/<span class="tt">WRDIVB</span> at <span class="tt">$4204</span>–<span class="tt">$4206</span>, result in <span class="tt">RDDIVL</span>/<span class="tt">RDDIVH</span> for quotient and <span class="tt">RDMPYL</span>/<span class="tt">RDMPYH</span> for remainder).</p>
 <p>The lib's <span class="tt"><a class="el" href="math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54" title="Safe 16-bit multiplication.">mul16</a></span> / <span class="tt"><a class="el" href="math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab" title="Safe 16-bit division.">div16</a></span> / <span class="tt"><a class="el" href="math_8h.html#ae2d0745b4830f0f51732ebccb6bb7d1d" title="Get remainder of division.">mod16</a></span> use these:</p>
@@ -235,7 +235,7 @@ Hardware multiplier and divider</h2>
 <li>The compiler's <span class="tt">*</span> / <span class="tt">/</span> operator may produce slow code or call a runtime helper.</li>
 </ul>
 <p>The lib functions wait the required cycle delay (8 cycles for multiply, 16 for divide) before reading the result. Hand-rolled access to the hardware registers must respect those delays — read too early and you get garbage.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md249"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md254"></a>
 Utilities</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> v = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(-3) + 64;          <span class="comment">/* -2.75 */</span></div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> positive = <a class="code hl_function" href="math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a">fixAbs</a>(v);      <span class="comment">/* 2.75 */</span></div>
@@ -247,9 +247,9 @@ Utilities</h2>
 <div class="ttc" id="amath_8h_html_a7b242d1463b266b75f1ef4ffa222cabd"><div class="ttname"><a href="math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd">fixLerp</a></div><div class="ttdeci">fixed fixLerp(fixed a, fixed b, u8 t)</div><div class="ttdoc">Linear interpolation.</div></div>
 <div class="ttc" id="amath_8h_html_aa1c28dae34a0097f2f4c5e4bf4160e4a"><div class="ttname"><a href="math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a">fixAbs</a></div><div class="ttdeci">fixed fixAbs(fixed x)</div><div class="ttdoc">Absolute value of fixed-point.</div></div>
 </div><!-- fragment --><p><span class="tt">fixLerp(a, b, t)</span> interpolates between <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></span> and <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span> with <span class="tt">t</span> from <span class="tt">0</span> (returns <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></span>) to <span class="tt">256</span> (returns <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span>). Linear; the canonical way to animate values smoothly between two endpoints.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md250"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md255"></a>
 Worked patterns</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md251"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md256"></a>
 Smooth sprite movement</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(64);</div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(112);</div>
@@ -272,9 +272,9 @@ Smooth sprite movement</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a03956d7bf1f05c56957071e0c5e4dba7"><div class="ttname"><a href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></div><div class="ttdeci">static s16 pos_x</div><div class="ttdef"><b>Definition</b> main.c:177</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aa4286d0de16674bb408ebd89c0e74fc5"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a></div><div class="ttdeci">static s16 pos_y</div><div class="ttdef"><b>Definition</b> main.c:178</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ae162ea9295db01996b894786eb967116"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae162ea9295db01996b894786eb967116">vel_x</a></div><div class="ttdeci">static s16 vel_x</div><div class="ttdoc">Ball X velocity (-2 to +2 pixels/frame).</div><div class="ttdef"><b>Definition</b> main.c:175</div></div>
-<div class="ttc" id="asprite_8h_html_ac83845cbc50f6c9f19844a317b59b66f"><div class="ttname"><a href="sprite_8h.html#ac83845cbc50f6c9f19844a317b59b66f">oamSetXYFast</a></div><div class="ttdeci">#define oamSetXYFast(_id, _x, _y)</div><div class="ttdoc">Update sprite position only (most common per-frame operation).</div><div class="ttdef"><b>Definition</b> sprite.h:785</div></div>
+<div class="ttc" id="asprite_8h_html_ac83845cbc50f6c9f19844a317b59b66f"><div class="ttname"><a href="sprite_8h.html#ac83845cbc50f6c9f19844a317b59b66f">oamSetXYFast</a></div><div class="ttdeci">#define oamSetXYFast(_id, _x, _y)</div><div class="ttdoc">Update sprite position only (most common per-frame operation).</div><div class="ttdef"><b>Definition</b> sprite.h:833</div></div>
 </div><!-- fragment --><p>The fixed-point representation gives sub-pixel precision so the sprite advances 0.25 px/frame <em>visibly</em> — every fourth frame the integer coordinate increments by one. With pure-integer velocity this would round to 0 per frame, and the sprite would never move.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md252"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md257"></a>
 Rotation around a point</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a> = 0;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> cx = 128, cy = 112;            <span class="comment">/* rotation centre on screen */</span></div>
@@ -292,7 +292,7 @@ Rotation around a point</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This pattern (radius × cos / radius × sin) is used everywhere a sprite needs to orbit, swing, or rotate around a fixed point. Mode 7 matrix construction is conceptually the same operation, just emitted to the M7A–M7D registers instead of OAM coordinates.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md253"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md258"></a>
 Smooth interpolation</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Camera follows player, but lags by 25 % each frame for smoothness */</span></div>
 <div class="line"><a class="code hl_typedef" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="code hl_variable" href="games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272">camera_x</a> = <a class="code hl_define" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(0);</div>
@@ -307,18 +307,18 @@ Smooth interpolation</h3>
 <div class="ttc" id="agames_2likemario_2main_8c_html_a83de021d1aa1562571948e0f36032272"><div class="ttname"><a href="games_2likemario_2main_8c.html#a83de021d1aa1562571948e0f36032272">camera_x</a></div><div class="ttdeci">static s16 camera_x</div><div class="ttdef"><b>Definition</b> main.c:151</div></div>
 </div><!-- fragment --><p>The lerp toward the target with <span class="tt">t = 0.25</span> produces a critically-damped smooth follow — every frame the camera covers a quarter of the remaining distance. Common pattern for "the camera glides instead of
 snapping".</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md254"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md259"></a>
 HDMA gradient table generation</h3>
 <p>The HDMA gradient example uses fixed-point under the hood: a brightness ramp from level 15 at the top to level 0 at the bottom of the screen, computed as a fixed-point linear interpolation over 224 scanlines. The lib's <span class="tt">hdmaBrightnessGradient(channel, top, bottom)</span> helper does this internally.</p>
 <p>For custom HDMA tables, the same pattern applies: compute fixed-point fractional values per scanline, <span class="tt"><a class="el" href="math_8h.html#a05738893be2affe52229eb12b99f4fba" title="Convert fixed-point to integer (truncate).">UNFIX</a></span> to integer when writing the table byte.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md255"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md260"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md256"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md261"></a>
 🟢 <span class="tt">int</span> and <span class="tt">long</span> sizes are correct on this target (since chantier A1)</h3>
 <p><span class="tt">sizeof(int) == 2</span>, <span class="tt">sizeof(long) == 4</span>. Bare <span class="tt">int</span> is the native 16-bit word; <span class="tt">long</span> is 32 bits. C convention says <span class="tt">int</span> is the natural word size of the machine, and on the w65816 that's now true.</p>
 <p>For <b>portability</b> across compilers (cross-platform tooling, code shared with PC-side helpers), keep using <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span>, <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>, <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> from <span class="tt"><a class="el" href="types_8h.html" title="OpenSNES Standard Types.">lib/include/snes/types.h</a></span> — they make intent explicit and work identically everywhere. Bare <span class="tt">int speed = 5;</span> no longer doubles your cycle cost on cc65816, but a build of the same code with a different compiler may behave differently.</p>
 <p>The <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> type is still <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>. No change for fixed-point users.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md257"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md262"></a>
 🔴 <span class="tt">FIX(x)</span> overflows for <span class="tt">|x| ≥ 128</span></h3>
 <p><span class="tt"><a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(x)</a></span> is <span class="tt">(x &lt;&lt; 8)</span>. For <span class="tt">x = 128</span>, the result is <span class="tt">0x8000</span> = <span class="tt">-32768</span> interpreted as <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> = <span class="tt">-128.0</span> in fixed-point — wrap around. There's no compile-time error and no runtime warning.</p>
 <p>If you need values larger than <span class="tt">±127</span>, either:</p>
@@ -326,14 +326,14 @@ Gotchas</h2>
 <li>Switch to <b>integer pixel coordinates</b> for position and reserve fixed-point for <em>velocity</em> / <em>acceleration</em> (which stay small).</li>
 <li>Use a custom <b>16.16 format</b> in <span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span> for higher range. The lib doesn't ship 16.16 helpers — write them per-game.</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md258"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md263"></a>
 🔴 <span class="tt">fixMul</span> truncates fractional precision</h3>
 <p><span class="tt">fixMul(0x0080, 0x0080)</span> (0.5 × 0.5) returns <span class="tt">0x0040</span> (0.25). Correct. But <span class="tt">fixMul(0x0001, 0x0001)</span> (~0.004 × ~0.004) returns <span class="tt">0x0000</span> — the result underflows to zero. For very small fixed values, the shift back to 8.8 throws away precision.</p>
 <p>This is intrinsic to 8.8 fixed-point: ~0.0039 is the minimum representable non-zero. Multiplying two such values gives ~1.5e-5, unrepresentable. If you need tiny scale factors (e.g., very slow acceleration), use a wider fixed-point format or accumulate without multiplying.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md259"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md264"></a>
 🟠 <span class="tt">fixDiv</span> returns 0 on divide-by-zero</h3>
 <p>Silent failure: <span class="tt"><a class="el" href="math_8h.html#ac1b5b08f47109af37b8874161e3a87d9" title="Divide two fixed-point values.">fixDiv</a>(<a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(10)</a>, <a class="el" href="math_8h.html#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(0)</a>)</span> returns <span class="tt">0</span>, not a sentinel, not a trap. Validate divisors before calling — especially for user-derived inputs (e.g., dividing by a velocity that could be zero when the player isn't moving).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md260"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md265"></a>
 🟠 Compiler <span class="tt">*</span> vs <span class="tt">mul16</span></h3>
 <p>The C <span class="tt">*</span> operator works correctly on <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>/<span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> operands; the "runtime can have bugs" caveat in <span class="tt"><a class="el" href="math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54" title="Safe 16-bit multiplication.">mul16</a></span>'s docstring is historical (early QBE backend bugs that have shipped fixes per <span class="tt">compiler/PINS.md</span>). Today, <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a> * <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span> where both are <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> is generally safe and faster than <span class="tt">mul16(a, b)</span> (the compiler inlines the hardware multiplier write).</p>
 <p>Use <span class="tt"><a class="el" href="math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54" title="Safe 16-bit multiplication.">mul16</a></span> when:</p>
@@ -342,13 +342,13 @@ Gotchas</h2>
 <li>You're paranoid about a specific corner case (the 32-bit intermediate is guaranteed).</li>
 <li>You're matching a PVSnesLib port byte-for-byte.</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md261"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md266"></a>
 🟡 Hardware multiplier read timing</h3>
 <p>The hardware multiplier needs <b>8 CPU cycles</b> between writing <span class="tt">WRMPYB</span> and reading <span class="tt">RDMPYL</span>/<span class="tt">RDMPYH</span>. The hardware divider needs <b>16 cycles</b> between <span class="tt">WRDIVB</span> and <span class="tt">RDDIVL</span>/<span class="tt">RDDIVH</span>/<span class="tt">RDMPYL</span>. The lib inserts the right delays in <span class="tt"><a class="el" href="math_8h.html#ae39b71a6b26ef2ac643bbc8978f7be54" title="Safe 16-bit multiplication.">mul16</a></span>/<span class="tt"><a class="el" href="math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab" title="Safe 16-bit division.">div16</a></span>/<span class="tt"><a class="el" href="math_8h.html#ae2d0745b4830f0f51732ebccb6bb7d1d" title="Get remainder of division.">mod16</a></span>. Custom assembly that touches the multiplier registers must respect this — read too early and you get partial results.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md262"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md267"></a>
 🟡 Sin/cos LUTs are unsigned-angle, signed-result</h3>
 <p><span class="tt">fixSin(angle)</span> and <span class="tt">fixCos(angle)</span> take <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span> (no sign — the 8-bit angle wraps naturally). They return <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> (signed <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>). This is the right shape for game code, but if you're translating from a different engine, watch the signedness boundary.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md263"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md268"></a>
 <span class="tt">atan2</span> and <span class="tt">sqrt</span> ship in the lib (chantier B6, 2026-05-09)</h3>
 <p>The full inverse-trig and square-root surface arrived together so the canonical "where is the target relative to me, and how far?" question is one call away. Three entry points cover almost every game-side use:</p>
 <table class="markdownTable">
@@ -374,11 +374,11 @@ Gotchas</h2>
 <div class="ttc" id="amath_8h_html_ac0e3632ad4ed7071906c0aaae0fd50b5"><div class="ttname"><a href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5">atan2_8</a></div><div class="ttdeci">u8 atan2_8(s16 dy, s16 dx)</div><div class="ttdoc">8-bit two-argument arctangent</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8</a></span> is scale-invariant — pass any 16-bit signed dy/dx and the function reduces magnitudes by power-of-two right shifts internally to keep its single 16-bit divide overflow-free. Precision degrades by ≤ 1 angle unit (≈ 1.4°) when reduction fires, which is below the perceptual floor for projectile aiming or sprite rotation in any 256-pixel-wide playfield.</p>
 <p><span class="tt"><a class="el" href="math_8h.html#a8cc43b9aa47696123ad5d893daee75ea" title="Integer square root.">sqrt16</a></span> is the canonical "how far is that thing" helper. The result is bounded to 255 (since <span class="tt">sqrt(65535) ≈ 255.99</span>), so it fits in <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span> for tile-grid distances. For the 8.8 fractional variant use <span class="tt"><a class="el" href="math_8h.html#a5da2bf6880e934a85f84e9f070d612f5" title="Square root in 8.8 fixed-point.">fixSqrt</a></span>. Note that <span class="tt"><a class="el" href="math_8h.html#a5da2bf6880e934a85f84e9f070d612f5" title="Square root in 8.8 fixed-point.">fixSqrt</a></span>'s precision is intentionally capped at 4 fractional bits — the 32-bit shift needed for full 8 bits of fraction would currently truncate under the QBE 32-bit codegen gap (catalogue chantier A7); we chose deterministic 4-bit precision over deceptive 8-bit output that's only correct for small inputs.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md264"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md269"></a>
 What's still missing: <span class="tt">pow</span>, <span class="tt">exp</span>, <span class="tt">log</span></h3>
 <p>These remain off the SDK's beaten path because no shipped example needs them. Integer exponentiation for small exponents is two lines of repeated <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul</a></span>; everything else (logarithm, general power) is per-game territory — bake a LUT for the specific range your game cares about.</p>
 <p>The PHILOSOPHY non-goal "no printf in core lib" extends here in spirit: the lib provides what most games need, and skips the heavy weight that most games don't.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md265"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md270"></a>
 Cycle cost summary</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -407,7 +407,7 @@ Cycle cost summary</h2>
 <td class="markdownTableBodyNone"><span class="tt">atan2_8(dy, dx)</span>  </td><td class="markdownTableBodyRight">~120 (LUT + one 16-bit divide)  </td></tr>
 </table>
 <p>A typical sprite-physics frame (position update + sin/cos rotation + two <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul</a></span> calls per sprite × 64 sprites) is ~6 K cycles, well under 1 % of the frame. Fixed-point is <em>cheap</em>; the budget is rarely binding.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md266"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md271"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">lib/include/snes/math.h</a></span> — full API reference.</li>

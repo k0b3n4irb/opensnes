@@ -122,8 +122,8 @@ $(function(){initNavTree('examples.html','',''); });
   <div class="headertitle"><div class="title">OpenSNES Examples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Learn SNES development step by step. 63 examples organized by topic, building from basic concepts to complete games.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1534"></a>
+<div class="textblock"><p>Learn SNES development step by step. 74 examples organized by topic, building from basic concepts to complete games.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1577"></a>
 Categories</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -133,22 +133,22 @@ Categories</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="basics/">basics/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="graphics/">graphics/</a>  </td><td class="markdownTableBodyNone">33  </td><td class="markdownTableBodyNone">Backgrounds, sprites, visual effects, Mode 7  </td></tr>
+<td class="markdownTableBodyNone"><a href="graphics/">graphics/</a>  </td><td class="markdownTableBodyNone">36  </td><td class="markdownTableBodyNone">Backgrounds, sprites, visual effects, Mode 7  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Joypads, mouse, Super Scope, multi-player  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="audio/">audio/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Music and sound effects via SNESMOD  </td></tr>
+<td class="markdownTableBodyNone"><a href="audio/">audio/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">Music and sound effects: SNESMOD and raw APU/DSP  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="maps/">maps/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Tile maps, dynamic streaming, slopes  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="memory/">memory/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">HiROM mode, battery-backed saves, SA-1, SuperFX  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup)  </td></tr>
+<td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1535"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1578"></a>
 Learning Path</h2>
 <p>A curated progression — it doesn't list every example. Use the category table above for the full set; anything not listed here is a variant or deep-dive of a step below.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1536"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1579"></a>
 Level 1 &ndash; First Steps</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -162,7 +162,7 @@ Level 1 &ndash; First Steps</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone"><a href="input/two_players/">input/two_players</a>  </td><td class="markdownTableBodyNone">Joypad reading, multiplayer input  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1537"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1580"></a>
 Level 2 &ndash; Graphics Fundamentals</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -184,7 +184,7 @@ Level 2 &ndash; Graphics Fundamentals</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">12  </td><td class="markdownTableBodyNone"><a href="graphics/effects/mosaic/">graphics/effects/mosaic</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1538"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1581"></a>
 Level 3 &ndash; Scrolling and Effects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -210,17 +210,23 @@ Level 3 &ndash; Scrolling and Effects</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">15h  </td><td class="markdownTableBodyNone"><a href="graphics/effects/gradient_9bit/">graphics/effects/gradient_9bit</a>  </td><td class="markdownTableBodyNone">Brightness-dithered backdrop: the 9-bit color trick (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">15i  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hicolor_hires/">graphics/effects/hicolor_hires</a>  </td><td class="markdownTableBodyNone">H-IRQ CGRAM streaming x pseudo-hires: 1792 slots at 512px (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">15j  </td><td class="markdownTableBodyNone"><a href="graphics/effects/hicolor_blend/">graphics/effects/hicolor_blend</a>  </td><td class="markdownTableBodyNone">RGB channel-split color-math blend: 3840 colors (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">15k  </td><td class="markdownTableBodyNone"><a href="graphics/effects/direct_color/">graphics/effects/direct_color</a>  </td><td class="markdownTableBodyNone">Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone"><a href="graphics/effects/gradient_colors/">graphics/effects/gradient_colors</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM color gradients  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">17  </td><td class="markdownTableBodyNone"><a href="graphics/effects/parallax_scrolling/">graphics/effects/parallax_scrolling</a>  </td><td class="markdownTableBodyNone">HDMA parallax scrolling  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparency/">graphics/effects/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="graphics/effects/window/">graphics/effects/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
+<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparency/">graphics/effects/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="graphics/effects/window/">graphics/effects/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="graphics/effects/transparent_window/">graphics/effects/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1539"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1582"></a>
 Level 4 &ndash; Advanced Topics</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -243,8 +249,18 @@ Level 4 &ndash; Advanced Topics</h3>
 <td class="markdownTableBodyNone">28  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_music/">audio/snesmod_music</a>  </td><td class="markdownTableBodyNone">SPC700 music playback via SNESMOD  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">42c  </td><td class="markdownTableBodyNone"><a href="audio/speech_synth/">audio/speech_synth</a>  </td><td class="markdownTableBodyNone">Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">42d  </td><td class="markdownTableBodyNone"><a href="audio/play_noise/">audio/play_noise</a>  </td><td class="markdownTableBodyNone">Drum kit from the DSP noise generator — zero samples (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">42e  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">42f  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">42g  </td><td class="markdownTableBodyNone"><a href="audio/soundboard/">audio/soundboard</a>  </td><td class="markdownTableBodyNone">The audio v2 engine from pure C: dynamic samples, pan/pitch, echo  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1540"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1583"></a>
 Level 5 &ndash; Maps and Complete Projects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -261,8 +277,14 @@ Level 5 &ndash; Maps and Complete Projects</h3>
 <td class="markdownTableBodyNone">34  </td><td class="markdownTableBodyNone"><a href="games/likemario/">games/likemario</a>  </td><td class="markdownTableBodyNone">Platformer with scrolling and animation  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">35  </td><td class="markdownTableBodyNone"><a href="games/mapandobjects/">games/mapandobjects</a>  </td><td class="markdownTableBodyNone">Maps with interactive objects  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">36  </td><td class="markdownTableBodyNone"><a href="games/mode7_racing/">games/mode7_racing</a>  </td><td class="markdownTableBodyNone">F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">37  </td><td class="markdownTableBodyNone"><a href="games/mode7_flying/">games/mode7_flying</a>  </td><td class="markdownTableBodyNone">Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">38  </td><td class="markdownTableBodyNone"><a href="games/rpg/">games/rpg</a>  </td><td class="markdownTableBodyNone">RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1541"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1584"></a>
 Building</h2>
 <div class="fragment"><div class="line"># Build all examples</div>
 <div class="line">cd opensnes</div>
@@ -273,12 +295,12 @@ Building</h2>
 <div class="line"> </div>
 <div class="line"># Clean and rebuild</div>
 <div class="line">make clean &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1542"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1585"></a>
 Running</h2>
 <p>We recommend <a href="https://github.com/SourMesen/Mesen2">Mesen2</a> for accurate SNES emulation:</p>
 <div class="fragment"><div class="line">mesen examples/text/hello_world/hello_world.sfc</div>
 </div><!-- fragment --><p>Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1543"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1586"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Follow the order</b> &ndash; each example builds on concepts from earlier ones</li>

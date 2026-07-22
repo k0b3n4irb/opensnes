@@ -517,7 +517,7 @@ Angles</h2>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> alpha = <a class="code hl_function" href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a>(t);</div>
 <div class="line">    <span class="comment">// ... draw with alpha ...</span></div>
 <div class="line">}</div>
-<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:413</div></div>
+<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:415</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -948,7 +948,7 @@ Angles</h2>
 </div><div class="memdoc">
 
 <p>256-byte quadratic easing LUT — i² normalised to [0, 255] </p>
-<p><span class="tt"><a class="el" href="#a1d00d3d61fbf201e34b45eccc2113a7b" title="256-byte quadratic easing LUT — i² normalised to [0, 255]">ease_quad_table</a>[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = floor(i² / 255)</span>. Underlies <span class="tt"><a class="el" href="#a8a300b912155f22476053ffc3cc15d33" title="Ease-in quadratic: t² curve, output [0, 255].">ease_in_quad</a></span> and <span class="tt"><a class="el" href="#a8b6668394e715b1f4faf5b11dda38fa2" title="Ease-out quadratic: 1 - (1-t)² curve, output [0, 255].">ease_out_quad</a></span>. Exposed as <span class="tt">extern</span> so user code can index it directly for custom curve compositions.</p>
+<p><span class="tt"><a class="el" href="#a1d00d3d61fbf201e34b45eccc2113a7b" title="256-byte quadratic easing LUT — i² normalised to [0, 255]">ease_quad_table</a>[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = floor(i² / 255)</span>. Underlies <span class="tt"><a class="el" href="#a8a300b912155f22476053ffc3cc15d33" title="Ease-in quadratic: t² curve, output [0, 255].">ease_in_quad</a></span> and <span class="tt"><a class="el" href="#a8b6668394e715b1f4faf5b11dda38fa2" title="Ease-out quadratic: 1 - (1-t)² curve, output [0, 255].">ease_out_quad</a></span>. Lives in the opt-in <span class="tt">math_ease</span> module (<span class="tt">LIB_MODULES += math_ease</span>) so math users who don't ease don't pay its 256 bank-$00 bytes. Exposed as <span class="tt">extern</span> so user code can index it directly for custom curve compositions.</p>
 <p>Cost: ~5 cycles per lookup vs ~12 for <span class="tt">(x * x) / 255</span> live. ROM cost: 256 bytes (placed in a SUPERFREE section by the linker). </p>
 
 </div>

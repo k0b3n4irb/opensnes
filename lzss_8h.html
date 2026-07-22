@@ -131,8 +131,8 @@ $(function(){initNavTree('lzss_8h.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae01a97bc31a2c32d3cdae197a9fbe9dc" id="r_ae01a97bc31a2c32d3cdae197a9fbe9dc"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae01a97bc31a2c32d3cdae197a9fbe9dc">LzssDecodeVram</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
-<tr class="memdesc:ae01a97bc31a2c32d3cdae197a9fbe9dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decompress LZ77 data directly to VRAM.  <br /></td></tr>
+<tr class="memitem:a73d3df913983c4b7ee22f1cdbe61e1ed" id="r_a73d3df913983c4b7ee22f1cdbe61e1ed"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a73d3df913983c4b7ee22f1cdbe61e1ed">LzssDecodeVram</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
+<tr class="memdesc:a73d3df913983c4b7ee22f1cdbe61e1ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decompress LZ77 data directly to VRAM.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>LZSS (LZ77) Decompression for SNES. </p>
@@ -151,17 +151,17 @@ Usage</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Decompress to VRAM during force blank</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;  <span class="comment">// Force blank (required for VRAM writes)</span></div>
-<div class="line"><a class="code hl_function" href="#ae01a97bc31a2c32d3cdae197a9fbe9dc">LzssDecodeVram</a>(compressed_tiles, 0x0000);</div>
+<div class="line"><a class="code hl_function" href="#a73d3df913983c4b7ee22f1cdbe61e1ed">LzssDecodeVram</a>(compressed_tiles, 0x0000);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x0F;  <span class="comment">// Screen on, full brightness</span></div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W).</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="alzss_8h_html_ae01a97bc31a2c32d3cdae197a9fbe9dc"><div class="ttname"><a href="#ae01a97bc31a2c32d3cdae197a9fbe9dc">LzssDecodeVram</a></div><div class="ttdeci">void LzssDecodeVram(u8 *source, u16 address)</div><div class="ttdoc">Decompress LZ77 data directly to VRAM.</div></div>
+<div class="ttc" id="alzss_8h_html_a73d3df913983c4b7ee22f1cdbe61e1ed"><div class="ttname"><a href="#a73d3df913983c4b7ee22f1cdbe61e1ed">LzssDecodeVram</a></div><div class="ttdeci">void LzssDecodeVram(const u8 *source, u16 address)</div><div class="ttdoc">Decompress LZ77 data directly to VRAM.</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>VRAM writes must happen during VBlank or force blank. LzssDecodeVram disables interrupts internally, so call it during force blank for safety.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team (ported from PVSnesLib by Alekmaul) </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>zlib License </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ae01a97bc31a2c32d3cdae197a9fbe9dc" name="ae01a97bc31a2c32d3cdae197a9fbe9dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae01a97bc31a2c32d3cdae197a9fbe9dc">&#9670;&#160;</a></span>LzssDecodeVram()</h2>
+<a id="a73d3df913983c4b7ee22f1cdbe61e1ed" name="a73d3df913983c4b7ee22f1cdbe61e1ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73d3df913983c4b7ee22f1cdbe61e1ed">&#9670;&#160;</a></span>LzssDecodeVram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -169,7 +169,7 @@ Usage</h2>
         <tr>
           <td class="memname">void LzssDecodeVram </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

@@ -177,7 +177,7 @@ Variables</h2></td></tr>
 Basic Usage</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="comment">// Initialize hardware</span></div>
 <div class="line">    <a class="code hl_function" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
@@ -193,7 +193,7 @@ Basic Usage</h2>
 <div class="line">        <span class="comment">// Update sprites/backgrounds</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="aaudio_2snesmod__music_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">Entry point — initialize audio, display controls, run transport loop.</div><div class="ttdef"><b>Definition</b> main.c:37</div></div>
+<div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -230,7 +230,7 @@ Attribution</h2>
 <li>VBlank interrupt setup</li>
 </ul>
 <p>After calling, screen is blanked (black). Call <a class="el" href="#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> to enable display after you've set up your graphics.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2snesmod__music_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Load graphics...</span></div>
@@ -329,13 +329,13 @@ Attribution</h2>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(3);              <span class="comment">// ~0.8 s cinematic fade</span></div>
 <div class="line"><a class="code hl_function" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();          <span class="comment">// force-blank for VRAM swap</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(new_tiles, 0, ...);</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(new_tiles, 0, ...);</div>
 <div class="line"><a class="code hl_function" href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"><a class="code hl_function" href="#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(3);</div>
 <div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
 <div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
 <div class="ttc" id="aconsole_8h_html_a6c68f9393684a2b251292a9e93891a02"><div class="ttname"><a href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a></div><div class="ttdeci">void fadeOut(u8 speed)</div><div class="ttdoc">Fade the screen from full brightness (15) down to black (0).</div></div>
-<div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -393,7 +393,7 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:271</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:282</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --> 
 </div>
@@ -529,6 +529,8 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
+<dl class="section warning"><dt>Warning</dt><dd><span class="tt">setBrightness(0)</span> is NOT forced blank. It makes the screen black, but the PPU keeps fetching, so <b>VRAM and CGRAM writes are still rejected</b>. Only <a class="el" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> (INIDISP bit 7) opens the write window outside VBlank.</dd></dl>
+<p>The mistake survives testing: a small transfer written this way lands inside VBlank and is correct every time, while a multi-KB one has its tail dropped during active display. Use <a class="el" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> / <a class="el" href="#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> around any upload that is not comfortably inside the VBlank budget — see <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a>.</p>
 <div class="fragment"><div class="line"><span class="comment">// Fade in effect</span></div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt;= 15; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
 <div class="line">    <a class="code hl_function" href="#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>

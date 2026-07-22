@@ -178,7 +178,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Assembly helper to load Mode 7 tile data, tilemap, and palette. </p>
-<p>Mode 7 uses a unique interleaved VRAM format: each VRAM word has the tilemap byte in the low byte and the 8bpp pixel data in the high byte. This requires special DMA sequencing that cannot be done with the standard <a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> function. The assembly routine handles the interleaved write and also loads the 256-color palette to CGRAM.</p>
+<p>Mode 7 uses a unique interleaved VRAM format: each VRAM word has the tilemap byte in the low byte and the 8bpp pixel data in the high byte. This requires special DMA sequencing that cannot be done with the standard <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> function. The assembly routine handles the interleaved write and also loads the 256-color palette to CGRAM.</p>
 <p>Must be called during forced blank (screen off) since it writes to VRAM. </p>
 
 </div>

@@ -133,18 +133,18 @@ $(function(){initNavTree('dma_8h.html','',''); });
 Functions</h2></td></tr>
 <tr class="memitem:a40e788e1f17c83a2b199df7f5bae0d62" id="r_a40e788e1f17c83a2b199df7f5bae0d62"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a40e788e1f17c83a2b199df7f5bae0d62">dmaClearVRAM</a> (void)</td></tr>
 <tr class="memdesc:a40e788e1f17c83a2b199df7f5bae0d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all VRAM to zero.  <br /></td></tr>
-<tr class="memitem:a0f6f27b79519ffd9a9031b9ca52b69a4" id="r_a0f6f27b79519ffd9a9031b9ca52b69a4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startColor, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a0f6f27b79519ffd9a9031b9ca52b69a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM (PVSnesLib compatible).  <br /></td></tr>
-<tr class="memitem:a137c4b2ae69fc6dd5e0ea0c42182df57" id="r_a137c4b2ae69fc6dd5e0ea0c42182df57"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a137c4b2ae69fc6dd5e0ea0c42182df57">dmaCopyCGramBank</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startColor, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a137c4b2ae69fc6dd5e0ea0c42182df57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM with explicit source bank byte.  <br /></td></tr>
-<tr class="memitem:ae3be346bcc28bc733e25fd5fe46a8b9c" id="r_ae3be346bcc28bc733e25fd5fe46a8b9c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:ae3be346bcc28bc733e25fd5fe46a8b9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM data (PVSnesLib compatible).  <br /></td></tr>
-<tr class="memitem:afea0f88cf525ded08d70e9e4e74a5a51" id="r_afea0f88cf525ded08d70e9e4e74a5a51"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:afea0f88cf525ded08d70e9e4e74a5a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM (PVSnesLib compatible).  <br /></td></tr>
-<tr class="memitem:a9f8b37269fa2086f1e65090356bb1b23" id="r_a9f8b37269fa2086f1e65090356bb1b23"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9f8b37269fa2086f1e65090356bb1b23">dmaCopyVramBank</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a9f8b37269fa2086f1e65090356bb1b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM with explicit source bank byte.  <br /></td></tr>
-<tr class="memitem:a6e380a37b7453d36c6dd881bb7a374f2" id="r_a6e380a37b7453d36c6dd881bb7a374f2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6e380a37b7453d36c6dd881bb7a374f2">dmaCopyVramMode7</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilemapSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode3_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilesSize)</td></tr>
-<tr class="memdesc:a6e380a37b7453d36c6dd881bb7a374f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load Mode 7 interleaved data to VRAM.  <br /></td></tr>
+<tr class="memitem:a7124f044ed12d1073cafd7192a00d09f" id="r_a7124f044ed12d1073cafd7192a00d09f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startColor, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a7124f044ed12d1073cafd7192a00d09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM (PVSnesLib compatible).  <br /></td></tr>
+<tr class="memitem:afbe87d891e0c97c09ecc7caf7c9aca4c" id="r_afbe87d891e0c97c09ecc7caf7c9aca4c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afbe87d891e0c97c09ecc7caf7c9aca4c">dmaCopyCGramBank</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startColor, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:afbe87d891e0c97c09ecc7caf7c9aca4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy palette data to CGRAM with explicit source bank byte.  <br /></td></tr>
+<tr class="memitem:a50a418c73f494651a1be98404d753c21" id="r_a50a418c73f494651a1be98404d753c21"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a50a418c73f494651a1be98404d753c21">dmaCopyOam</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a50a418c73f494651a1be98404d753c21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM data (PVSnesLib compatible).  <br /></td></tr>
+<tr class="memitem:a428ee7d96f20485046c89d95f8719ca5" id="r_a428ee7d96f20485046c89d95f8719ca5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a428ee7d96f20485046c89d95f8719ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM (PVSnesLib compatible).  <br /></td></tr>
+<tr class="memitem:a8c812453a507900f68899520ac4f61b9" id="r_a8c812453a507900f68899520ac4f61b9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8c812453a507900f68899520ac4f61b9">dmaCopyVramBank</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *source, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a8c812453a507900f68899520ac4f61b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy data to VRAM with explicit source bank byte.  <br /></td></tr>
+<tr class="memitem:a9a9ce9e607d6aa14f3dfeb40fad3c3eb" id="r_a9a9ce9e607d6aa14f3dfeb40fad3c3eb"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9a9ce9e607d6aa14f3dfeb40fad3c3eb">dmaCopyVramMode7</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilemapSize, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *<a class="el" href="graphics_2backgrounds_2mode3_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tilesSize)</td></tr>
+<tr class="memdesc:a9a9ce9e607d6aa14f3dfeb40fad3c3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load Mode 7 interleaved data to VRAM.  <br /></td></tr>
 <tr class="memitem:afcc5b9f47bd12569f7d51adb0acdfa0e" id="r_afcc5b9f47bd12569f7d51adb0acdfa0e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afcc5b9f47bd12569f7d51adb0acdfa0e">dmaFillVRAM</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dest, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:afcc5b9f47bd12569f7d51adb0acdfa0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set VRAM to a value.  <br /></td></tr>
 <tr class="memitem:ab4cfc3809e7d91bb69254f3e572e0e26" id="r_ab4cfc3809e7d91bb69254f3e572e0e26"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab4cfc3809e7d91bb69254f3e572e0e26">dmaTransfer</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> srcBank, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> srcAddr, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
@@ -167,8 +167,9 @@ VBlank Timing Requirement</h2>
 <dd>
 <b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
-Bank Limitation</h2>
-<dl class="section note"><dt>Note</dt><dd>The current implementation assumes source data is in bank $00 for ROM addresses. Data in SUPERFREE sections beyond bank 0 requires using <a class="el" href="#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> or <a class="el" href="#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter.</dd></dl>
+Banks</h2>
+<dl class="section note"><dt>Note</dt><dd>Every dmaCopy* function takes a <b>far pointer</b> and uses its bank byte, so the source may live in any bank — a SUPERFREE section, a bank you pinned yourself, anywhere. This has been true since the A6 chantier made pointer arguments 4 bytes; the *Bank variants remain for the case where an address and its bank are held separately.</dd></dl>
+<p>This header claimed the opposite ("source data must be in bank $00") long after it stopped being true, and that prose is why the RPG template shipped a pointless <span class="tt">semifree bank 0</span> section for its palettes — and why issue #122 carried a bank-$00 claim about dmaCopyCGram that testing then had to retract.</p>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
@@ -192,8 +193,8 @@ Bank Limitation</h2>
 
 </div>
 </div>
-<a id="a0f6f27b79519ffd9a9031b9ca52b69a4" name="a0f6f27b79519ffd9a9031b9ca52b69a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f6f27b79519ffd9a9031b9ca52b69a4">&#9670;&#160;</a></span>dmaCopyCGram()</h2>
+<a id="a7124f044ed12d1073cafd7192a00d09f" name="a7124f044ed12d1073cafd7192a00d09f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7124f044ed12d1073cafd7192a00d09f">&#9670;&#160;</a></span>dmaCopyCGram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,7 +202,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyCGram </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -228,17 +229,17 @@ Bank Limitation</h2>
 </dl>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[];</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line"><a class="code hl_function" href="#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
+<div class="line"><a class="code hl_function" href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 32);  <span class="comment">// 16 colors * 2 bytes</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
-</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank! Calling during active display causes palette corruption.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Source data must be in bank $00. For data in other banks, use <a class="el" href="#a137c4b2ae69fc6dd5e0ea0c42182df57" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> with an explicit bank parameter. </dd></dl>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank — <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a>, INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching and the write is rejected.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The bank comes from <code class="param">source's</code> own bank byte: a palette may live in any bank. <a class="el" href="#afbe87d891e0c97c09ecc7caf7c9aca4c" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> exists for the case where the address and the bank are held separately. </dd></dl>
 
 </div>
 </div>
-<a id="a137c4b2ae69fc6dd5e0ea0c42182df57" name="a137c4b2ae69fc6dd5e0ea0c42182df57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a137c4b2ae69fc6dd5e0ea0c42182df57">&#9670;&#160;</a></span>dmaCopyCGramBank()</h2>
+<a id="afbe87d891e0c97c09ecc7caf7c9aca4c" name="afbe87d891e0c97c09ecc7caf7c9aca4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbe87d891e0c97c09ecc7caf7c9aca4c">&#9670;&#160;</a></span>dmaCopyCGramBank()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +247,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyCGramBank </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -267,7 +268,7 @@ Bank Limitation</h2>
 </div><div class="memdoc">
 
 <p>Copy palette data to CGRAM with explicit source bank byte. </p>
-<p>Same as <a class="el" href="#a0f6f27b79519ffd9a9031b9ca52b69a4" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a> but allows specifying the ROM bank for data in banks other than $00 (e.g., SUPERFREE sections placed by linker).</p>
+<p>Same as <a class="el" href="#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a> but allows specifying the ROM bank for data in banks other than $00 (e.g., SUPERFREE sections placed by linker).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Source address (16-bit offset within bank) </td></tr>
@@ -281,8 +282,8 @@ Bank Limitation</h2>
 
 </div>
 </div>
-<a id="ae3be346bcc28bc733e25fd5fe46a8b9c" name="ae3be346bcc28bc733e25fd5fe46a8b9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3be346bcc28bc733e25fd5fe46a8b9c">&#9670;&#160;</a></span>dmaCopyOam()</h2>
+<a id="a50a418c73f494651a1be98404d753c21" name="a50a418c73f494651a1be98404d753c21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50a418c73f494651a1be98404d753c21">&#9670;&#160;</a></span>dmaCopyOam()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -290,7 +291,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyOam </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -308,13 +309,13 @@ Bank Limitation</h2>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a class="code hl_function" href="#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a>(oamBuffer, 544);</div>
-<div class="ttc" id="adma_8h_html_ae3be346bcc28bc733e25fd5fe46a8b9c"><div class="ttname"><a href="#ae3be346bcc28bc733e25fd5fe46a8b9c">dmaCopyOam</a></div><div class="ttdeci">void dmaCopyOam(u8 *source, u16 size)</div><div class="ttdoc">Copy OAM data (PVSnesLib compatible).</div></div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="#a50a418c73f494651a1be98404d753c21">dmaCopyOam</a>(oamBuffer, 544);</div>
+<div class="ttc" id="adma_8h_html_a50a418c73f494651a1be98404d753c21"><div class="ttname"><a href="#a50a418c73f494651a1be98404d753c21">dmaCopyOam</a></div><div class="ttdeci">void dmaCopyOam(const u8 *source, u16 size)</div><div class="ttdoc">Copy OAM data (PVSnesLib compatible).</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="afea0f88cf525ded08d70e9e4e74a5a51" name="afea0f88cf525ded08d70e9e4e74a5a51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afea0f88cf525ded08d70e9e4e74a5a51">&#9670;&#160;</a></span>dmaCopyVram()</h2>
+<a id="a428ee7d96f20485046c89d95f8719ca5" name="a428ee7d96f20485046c89d95f8719ca5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a428ee7d96f20485046c89d95f8719ca5">&#9670;&#160;</a></span>dmaCopyVram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -322,7 +323,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyVram </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -350,17 +351,19 @@ Bank Limitation</h2>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>[];</div>
 <div class="line"><span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a>[];</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line"><a class="code hl_function" href="#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>, 0x0000, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a> - <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>);</div>
-<div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="line"><a class="code hl_function" href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>, 0x0000, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a> - <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>);</div>
+<div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="agames_2mapandobjects_2main_8c_html_ad82028c95075b062fde3c871e9dabdbd"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a></div><div class="ttdeci">u8 tileset</div><div class="ttdoc">BG1 tileset tile data (4bpp) – start label.</div></div>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a2ea3f462c860f7f0c35ae2204a43d598"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a></div><div class="ttdeci">u8 tileset_end[]</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
-</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank! Calling during active display causes visual corruption.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Source data must be in bank $00 (LoROM $00:8000-$FFFF). For data in other banks, use <a class="el" href="#a9f8b37269fa2086f1e65090356bb1b23" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a>. </dd></dl>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank. During active display the PPU rejects VRAM writes and the transfer is silently lost.</dd></dl>
+<p>Forced blank means <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> — INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching, so it does NOT open the write window.</p>
+<dl class="section warning"><dt>Warning</dt><dd><b>VBlank fits roughly 4 KB.</b> A larger transfer has its tail dropped during active display, and the failure is partial: the first few KB land, so the screen is half right. Anything bigger than a few KB belongs between <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> and <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>, not in VBlank.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The bank is taken from <code class="param">source's</code> own bank byte, so the data may live in ANY bank — a SUPERFREE section, a bank you pinned yourself. <a class="el" href="#a8c812453a507900f68899520ac4f61b9" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> exists for the case where the address and the bank are held separately. </dd></dl>
 
 </div>
 </div>
-<a id="a9f8b37269fa2086f1e65090356bb1b23" name="a9f8b37269fa2086f1e65090356bb1b23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f8b37269fa2086f1e65090356bb1b23">&#9670;&#160;</a></span>dmaCopyVramBank()</h2>
+<a id="a8c812453a507900f68899520ac4f61b9" name="a8c812453a507900f68899520ac4f61b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c812453a507900f68899520ac4f61b9">&#9670;&#160;</a></span>dmaCopyVramBank()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -368,7 +371,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyVramBank </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>source</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -389,7 +392,7 @@ Bank Limitation</h2>
 </div><div class="memdoc">
 
 <p>Copy data to VRAM with explicit source bank byte. </p>
-<p>Same as <a class="el" href="#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> but allows specifying the ROM bank for data in banks other than $00 (e.g., SUPERFREE sections placed by linker).</p>
+<p>Same as <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> but allows specifying the ROM bank for data in banks other than $00 (e.g., SUPERFREE sections placed by linker).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Source address (16-bit offset within bank) </td></tr>
@@ -403,8 +406,8 @@ Bank Limitation</h2>
 
 </div>
 </div>
-<a id="a6e380a37b7453d36c6dd881bb7a374f2" name="a6e380a37b7453d36c6dd881bb7a374f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e380a37b7453d36c6dd881bb7a374f2">&#9670;&#160;</a></span>dmaCopyVramMode7()</h2>
+<a id="a9a9ce9e607d6aa14f3dfeb40fad3c3eb" name="a9a9ce9e607d6aa14f3dfeb40fad3c3eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a9ce9e607d6aa14f3dfeb40fad3c3eb">&#9670;&#160;</a></span>dmaCopyVramMode7()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -412,7 +415,7 @@ Bank Limitation</h2>
         <tr>
           <td class="memname">void dmaCopyVramMode7 </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>tilemap</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>tilemap</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -422,7 +425,7 @@ Bank Limitation</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>tiles</em></span>, </td>
+          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>tiles</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

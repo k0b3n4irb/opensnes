@@ -210,7 +210,7 @@ Using getFrameCount()</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Cycle through 4 frames, changing every 8 VBlanks */</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> = (<a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a>(0, <a class="code hl_variable" href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a> * 2);</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:271</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:282</div></div>
 <div class="ttc" id="amaps_2mapscroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2mapscroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 </div><!-- fragment --><p>The manual counter is preferred for gameplay animations because you can pause it (stop incrementing when the character is idle) or reset it on state changes.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md73"></a>
@@ -342,7 +342,7 @@ Selecting the Clip and Ticking</h3>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.x, <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.y, <a class="code hl_variable" href="graphics_2sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.gfx_frame, 0, 3, flags);</div>
 <div class="ttc" id="aanim_8h_html_a7a416dc50a4020c4810d7b205bb0304b"><div class="ttname"><a href="anim_8h.html#a7a416dc50a4020c4810d7b205bb0304b">animTick</a></div><div class="ttdeci">u16 animTick(AnimPlayer *p)</div><div class="ttdoc">Advance one tick; return the current frame value.</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:476</div></div>
+<div class="ttc" id="asprite_8h_html_a71b310f8efd32bb7d355c278a9b7b6c3"><div class="ttname"><a href="sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3">OBJ_FLIPX</a></div><div class="ttdeci">#define OBJ_FLIPX</div><div class="ttdoc">Metasprite horizontal flip flag.</div><div class="ttdef"><b>Definition</b> sprite.h:524</div></div>
 </div><!-- fragment --><p>Pausing on idle costs nothing: an un-ticked player simply holds its state, and the walk resumes mid-cycle when input returns. This is the full pattern of <span class="tt">examples/graphics/sprites/animated_sprite/</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md80"></a>
 The Dynamic Sprite Engine</h2>
@@ -380,12 +380,12 @@ Initialization</h3>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a>(&amp;dyn);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load palette (sprite palettes start at CGRAM 128) */</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a>(spr16_pal, 128, 32);</div>
-<div class="ttc" id="adma_8h_html_a0f6f27b79519ffd9a9031b9ca52b69a4"><div class="ttname"><a href="dma_8h.html#a0f6f27b79519ffd9a9031b9ca52b69a4">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(spr16_pal, 128, 32);</div>
+<div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="agraphics_2sprites_2dynamic__sprite_2main_8c_html_ac917b076df172412b9f00526ac9ecc7c"><div class="ttname"><a href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ac917b076df172412b9f00526ac9ecc7c">spr16_tiles</a></div><div class="ttdeci">u8 spr16_tiles[]</div><div class="ttdoc">ROM source for the 16x16 sprite sheet tile data.</div></div>
 <div class="ttc" id="asprite_8h_html_a333ce995f2762b9da596948ab43c5d54"><div class="ttname"><a href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a></div><div class="ttdeci">void oamDynamicInit(const OamDynamicConfig *cfg)</div><div class="ttdoc">Initialize the dynamic sprite engine from a config struct.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet).</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:553</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:601</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md83"></a>
 Setting Up a Dynamic Sprite</h3>
 <p>Use the <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[]</span> array (type <span class="tt"><a class="el" href="structt__sprites.html" title="Dynamic sprite state structure (16 bytes, PVSnesLib compatible).">t_sprites</a></span>) instead of <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>:</p>
@@ -397,7 +397,7 @@ Setting Up a Dynamic Sprite</h3>
 <div class="line"><a class="code hl_define" href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec">OAM_SET_GFX</a>(0, <a class="code hl_variable" href="graphics_2sprites_2dynamic__sprite_2main_8c.html#ac917b076df172412b9f00526ac9ecc7c">spr16_tiles</a>);               <span class="comment">/* Point to ROM tile data */</span></div>
 <div class="ttc" id="asprite_8h_html_a1c1735026f1119e7fd947aa6eed9a2ec"><div class="ttname"><a href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec">OAM_SET_GFX</a></div><div class="ttdeci">#define OAM_SET_GFX(id, gfx)</div><div class="ttdoc">Set sprite graphics address (bank $00 only).</div><div class="ttdef"><b>Definition</b> sprite.h:221</div></div>
 <div class="ttc" id="asprite_8h_html_a26ae9bbf7a98025a5d9b529bbe403a7f"><div class="ttname"><a href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a></div><div class="ttdeci">t_sprites oambuffer[128]</div><div class="ttdoc">Dynamic sprite buffer (128 entries, 2048 bytes).</div></div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:473</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:521</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md84"></a>
 The Game Loop</h3>
 <p>From <span class="tt">examples/graphics/sprites/dynamic_sprite/</span>:</p>
@@ -435,14 +435,14 @@ Action-Based Animation (LikeMario)</h3>
 <div class="line"><span class="preprocessor">#define FRAME_WALK1  3</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mario_anim_idx = 0;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_tick = 0;</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570">anim_tick</a> = 0;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="games_2likemario_2main_8c.html#ac5ea4e14d98f4c7ff74754bf56bf01d4">mario_animate</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line">    anim_tick++;</div>
+<div class="line">    <a class="code hl_variable" href="games_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570">anim_tick</a>++;</div>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2likemario_2main_8c.html#abf248dfba13f521a932e34626741bacd">mario_action</a> == <a class="code hl_define" href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a>) {</div>
 <div class="line">        <span class="comment">/* Toggle between walk frames every 4 VBlanks */</span></div>
-<div class="line">        <span class="keywordflow">if</span> ((anim_tick &amp; 3) == 3) {</div>
+<div class="line">        <span class="keywordflow">if</span> ((<a class="code hl_variable" href="games_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570">anim_tick</a> &amp; 3) == 3) {</div>
 <div class="line">            mario_anim_idx ^= 1;</div>
 <div class="line">            <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamframeid = <a class="code hl_define" href="games_2likemario_2main_8c.html#ad43823ee9b7b60480d1b5e24572ff6a7">FRAME_WALK0</a> + mario_anim_idx;</div>
 <div class="line">            <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamrefresh = 1;</div>
@@ -463,6 +463,7 @@ Action-Based Animation (LikeMario)</h3>
 <div class="ttc" id="agames_2likemario_2main_8c_html_abf248dfba13f521a932e34626741bacd"><div class="ttname"><a href="games_2likemario_2main_8c.html#abf248dfba13f521a932e34626741bacd">mario_action</a></div><div class="ttdeci">static u8 mario_action</div><div class="ttdef"><b>Definition</b> main.c:160</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_ac5ea4e14d98f4c7ff74754bf56bf01d4"><div class="ttname"><a href="games_2likemario_2main_8c.html#ac5ea4e14d98f4c7ff74754bf56bf01d4">mario_animate</a></div><div class="ttdeci">static void mario_animate(void)</div><div class="ttdoc">Update Mario&#39;s sprite animation frame based on current action.</div><div class="ttdef"><b>Definition</b> main.c:642</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_aeef02da41fe024e74efcfcb5fe7c9e68"><div class="ttname"><a href="games_2likemario_2main_8c.html#aeef02da41fe024e74efcfcb5fe7c9e68">FRAME_JUMP</a></div><div class="ttdeci">#define FRAME_JUMP</div><div class="ttdoc">Dynamic sprite frame index: jump pose.</div><div class="ttdef"><b>Definition</b> main.c:125</div></div>
+<div class="ttc" id="agames_2rpg_2main_8c_html_a07f5870d2abcd56b01d370ff190a7570"><div class="ttname"><a href="games_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570">anim_tick</a></div><div class="ttdeci">static u8 anim_tick</div><div class="ttdef"><b>Definition</b> main.c:171</div></div>
 <div class="ttc" id="amap_8h_html_a4617d14626ea66580d7996705d0a5bce"><div class="ttname"><a href="map_8h.html#a4617d14626ea66580d7996705d0a5bce">ACT_JUMP</a></div><div class="ttdeci">#define ACT_JUMP</div><div class="ttdef"><b>Definition</b> map.h:95</div></div>
 <div class="ttc" id="amap_8h_html_a8c450076e1da6d4f8aa6e1f7e6737444"><div class="ttname"><a href="map_8h.html#a8c450076e1da6d4f8aa6e1f7e6737444">ACT_FALL</a></div><div class="ttdeci">#define ACT_FALL</div><div class="ttdef"><b>Definition</b> map.h:96</div></div>
 <div class="ttc" id="amap_8h_html_a912cfae6ccf6375f3c2831d65646c76b"><div class="ttname"><a href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a></div><div class="ttdeci">#define ACT_WALK</div><div class="ttdef"><b>Definition</b> map.h:94</div></div>
@@ -533,9 +534,9 @@ Approach 2: Overwrite Tile Graphics</h3>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga09d7fb089889aaa434f7c88ebccb5190">REG_VMAIN</a> = 0x80;</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga165959d614d718e17d008060049491bc">REG_VMADDL</a> = (WATER_TILE_VRAM) &amp; 0xFF;</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga0579806de7fa683e46ebe36fe5b89c64">REG_VMADDH</a> = (WATER_TILE_VRAM) &gt;&gt; 8;</div>
-<div class="line">    <a class="code hl_function" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a>(src, WATER_TILE_VRAM, 32);</div>
+<div class="line">    <a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(src, WATER_TILE_VRAM, 32);</div>
 <div class="line">}</div>
-<div class="ttc" id="adma_8h_html_afea0f88cf525ded08d70e9e4e74a5a51"><div class="ttname"><a href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 </div><!-- fragment --><p>This approach is more efficient when many tilemap positions use the same animated tile, since you update the graphics once rather than rewriting every tilemap entry.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md90"></a>
 VBlank Budget</h3>

@@ -195,7 +195,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Load sky background tiles and tilemap to VRAM via assembly DMA. </p>
-<p>Loads the Mode 3 sky image (tiles at VRAM $5000, tilemap at VRAM $4000). Uses assembly because the data may span multiple ROM banks (SUPERFREE sections), requiring correct bank byte handling that the C-level <a class="el" href="dma_8h.html#afea0f88cf525ded08d70e9e4e74a5a51" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> cannot provide.</p>
+<p>Loads the Mode 3 sky image (tiles at VRAM $5000, tilemap at VRAM $4000). Uses assembly because the data may span multiple ROM banks (SUPERFREE sections), requiring correct bank byte handling that the C-level <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> cannot provide.</p>
 <p>Must be called during forced blank. </p>
 
 </div>
@@ -288,7 +288,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Mode 7 ground tilemap (128x128 entries, one byte per tile index). </p>
-<p>Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255) referencing the 8bpp tile set. Loaded to VRAM via <a class="el" href="dma_8h.html#a6e380a37b7453d36c6dd881bb7a374f2" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> which handles the interleaved format (map in low bytes, tiles in high bytes). </p>
+<p>Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255) referencing the 8bpp tile set. Loaded to VRAM via <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> which handles the interleaved format (map in low bytes, tiles in high bytes). </p>
 
 </div>
 </div>
@@ -365,7 +365,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB). </p>
-<p>Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile). Written to the high bytes of VRAM words by <a class="el" href="dma_8h.html#a6e380a37b7453d36c6dd881bb7a374f2" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>. </p>
+<p>Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile). Written to the high bytes of VRAM words by <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>. </p>
 
 </div>
 </div>
