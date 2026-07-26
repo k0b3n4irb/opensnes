@@ -2,12 +2,12 @@ var searchData=
 [
   ['k_0',['k',['../games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6',1,'main.c']]],
   ['kb_20per_20frame_1',['🔴 VBlank DMA budget is ~4 KB per frame',['../tutorial_dma.html#autotoc_md174',1,'']]],
-  ['keep_20prs_20small_2',['Keep PRs small',['../contributing.html#autotoc_md1653',1,'']]],
-  ['key_20capabilities_3',['Key Capabilities',['../snes_sound_guide.html#autotoc_md538',1,'']]],
-  ['key_20concepts_4',['Key Concepts',['../hardware_overview.html#autotoc_md658',1,'Key Concepts'],['../examples_audio.html#autotoc_md739',1,'Key Concepts'],['../examples_basics.html#autotoc_md852',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md1106',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md1252',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1375',1,'Key Concepts'],['../examples_input.html#autotoc_md1419',1,'Key Concepts'],['../examples_memory.html#autotoc_md1543',1,'Key Concepts'],['../examples_text.html#autotoc_md1613',1,'Key Concepts']]],
-  ['key_20features_5',['Key Features',['../examples_audio_snesmod_music.html#autotoc_md749',1,'']]],
-  ['key_20memory_20regions_6',['Key Memory Regions',['../memory_map.html#autotoc_md621',1,'']]],
-  ['key_20snes_20concepts_7',['Key SNES Concepts',['../examples_maps.html#autotoc_md1501',1,'']]],
+  ['keep_20prs_20small_2',['Keep PRs small',['../contributing.html#autotoc_md1675',1,'']]],
+  ['key_20capabilities_3',['Key Capabilities',['../snes_sound_guide.html#autotoc_md560',1,'']]],
+  ['key_20concepts_4',['Key Concepts',['../hardware_overview.html#autotoc_md680',1,'Key Concepts'],['../examples_audio.html#autotoc_md761',1,'Key Concepts'],['../examples_basics.html#autotoc_md874',1,'Key Concepts'],['../examples_graphics_backgrounds.html#autotoc_md1128',1,'Key Concepts'],['../examples_graphics_effects.html#autotoc_md1274',1,'Key Concepts'],['../examples_graphics_sprites.html#autotoc_md1397',1,'Key Concepts'],['../examples_input.html#autotoc_md1441',1,'Key Concepts'],['../examples_memory.html#autotoc_md1565',1,'Key Concepts'],['../examples_text.html#autotoc_md1635',1,'Key Concepts']]],
+  ['key_20features_5',['Key Features',['../examples_audio_snesmod_music.html#autotoc_md771',1,'']]],
+  ['key_20memory_20regions_6',['Key Memory Regions',['../memory_map.html#autotoc_md643',1,'']]],
+  ['key_20snes_20concepts_7',['Key SNES Concepts',['../examples_maps.html#autotoc_md1523',1,'']]],
   ['key_5fa_8',['KEY_A',['../group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7',1,'input.h']]],
   ['key_5fb_9',['KEY_B',['../group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7',1,'input.h']]],
   ['key_5fdown_10',['KEY_DOWN',['../group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf',1,'input.h']]],
@@ -23,7 +23,7 @@ var searchData=
   ['key_5fx_20',['KEY_X',['../group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10',1,'input.h']]],
   ['key_5fy_21',['KEY_Y',['../group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac',1,'input.h']]],
   ['kit_20with_20zero_20samples_22',['play_noise — a drum kit with zero samples',['../examples_audio_play_noise.html',1,'examples_audio']]],
-  ['knowledge_20in_20claude_23',['Project knowledge in &lt;span class=&quot;tt&quot;&gt;.claude/&lt;/span&gt;',['../contributing.html#autotoc_md1659',1,'']]],
+  ['knowledge_20in_20claude_23',['Project knowledge in &lt;span class=&quot;tt&quot;&gt;.claude/&lt;/span&gt;',['../contributing.html#autotoc_md1681',1,'']]],
   ['koopatroopa_2ec_24',['koopatroopa.c',['../koopatroopa_8c.html',1,'']]],
   ['koopatroopa_2eh_25',['koopatroopa.h',['../koopatroopa_8h.html',1,'']]],
   ['koopatroopa_5fanimate_26',['koopatroopa_animate',['../koopatroopa_8c.html#aa7602ebdfef931c3e93e0028b1a6c50a',1,'koopatroopa.c']]],
@@ -37,5 +37,5 @@ var searchData=
   ['koopatroopaupdate_34',['koopatroopaupdate',['../koopatroopa_8c.html#a6e322dfd5bed31b9e788a5ba7804031b',1,'koopatroopaupdate(u16 idx):&#160;koopatroopa.c'],['../koopatroopa_8h.html#a6e322dfd5bed31b9e788a5ba7804031b',1,'koopatroopaupdate(u16 idx):&#160;koopatroopa.c']]],
   ['koopatroopax_35',['koopatroopax',['../koopatroopa_8c.html#a6233b6b9ad8f42297bbf552f29e5ce2a',1,'koopatroopa.c']]],
   ['koopatroopay_36',['koopatroopay',['../koopatroopa_8c.html#a5eb98bd1101ba8eb86b987c859f2ff0c',1,'koopatroopa.c']]],
-  ['krom_20s_20map_37',['Controls (krom&apos;s map)',['../examples_graphics_effects_mode7_perspective_rotate.html#autotoc_md1216',1,'']]]
+  ['krom_20s_20map_37',['Controls (krom&apos;s map)',['../examples_graphics_effects_mode7_perspective_rotate.html#autotoc_md1238',1,'']]]
 ];

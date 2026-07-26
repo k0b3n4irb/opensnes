@@ -26,7 +26,6 @@ var NAVTREE =
 [
   [ "OpenSNES", "index.html", [
     [ "OpenSNES Documentation", "index.html", "index" ],
-    [ "Interactive Debugging with luna", "tutorial_debugging.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -55,13 +54,13 @@ var NAVTREEINDEX =
 [
 "anim_8h.html",
 "dir_fb6a4478874ec3489cd1ff1dc1d9bfde.html",
-"examples_graphics_sprites_simple_sprite.html",
-"globals_func_b.html",
-"group__cpu__regs.html#ga1f4ae68960a3b23a90d92e379391f9c4",
-"hdma_8h.html#a4473b558fc1715556b995a576644b4d8",
-"math_8h.html#a5b18775a4f5e401550270ef08ab62a1e",
-"sa1_8h.html#a86cfdbc037baccc5c5651ba8ac8d28bf",
-"structt__objs.html#a21e8d3d85cb12f5160be92def802a264"
+"examples_graphics_sprites_animated_sprite.html#autotoc_md1345",
+"globals_defs_i.html",
+"group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f",
+"group__volatile__types.html#ga84c4ebe721fa065d9bd514ce8d76c455",
+"maps_2slopemario_2mario_8c.html#a718bd8c5a9a328db12da0a2bb924921c",
+"sa1_8h.html#a30b2026a15f8ed98e81e475485af4f77",
+"structSaveState.html#a9c7f3ac91ee1a4fba9c154c4f1d71de1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -123,12 +123,12 @@ $(function(){initNavTree('examples_graphics_effects_hires_text.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
-<img src="screenshot.png" alt=""/>
+<img src="hires_text.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>InterlaceFont</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Interlace/InterlaceFont</span>). BG Mode 5 renders <b>512 horizontal pixels</b> with 16×8 tiles; SETINI bit 0 adds screen interlace for <b>448 visible lines</b>. This example lands the SDK's SETINI surface (<span class="tt">videoSetInterlace/ObjInterlace/Overscan/PseudoHires</span>, all composing through a write-only-register shadow) with a text page as the canonical hi-res payload — every glyph is 8 px wide, unrepresentable at 256.</p>
 <p>The page is original art (<span class="tt">gen_assets.py</span> renders it and converts to Mode 5's paired-tile format; outputs committed so builds don't need Pillow). The 1-pixel stripe/checker bands are the acid test: at true 512 px they alternate every column — a 256-wide mode would alias them to flat gray.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1210"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1232"></a>
 SNES Concepts</h2>
 <ul>
 <li>BG Mode 5: 512 px, 16×8 tiles stored as 8×8 character pairs (N, N+1)</li>
@@ -136,7 +136,7 @@ SNES Concepts</h2>
 <li><b>The Mode 5 trap</b>: content displays through main AND sub screen — <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_BG1)</a>; <a class="el" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe" title="Enable layers on the sub screen.">setSubScreen(LAYER_BG1)</a>;</span> or odd columns stay blank</li>
 <li>Interlace vertical addressing: tile texel rows map 1:1 to hi-res lines, so a full 448-line page needs 56 tile rows → a 32×64 tilemap</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1211"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1233"></a>
 Understanding what you see</h2>
 <p>Mode 5's 512 columns interleave the sub screen (even columns) and main screen (odd columns) — a period CRT blended adjacent columns into smooth strokes, while a modern LCD's crisp pixel grid shows them individually:</p>
 <ul>
@@ -145,7 +145,7 @@ Understanding what you see</h2>
 <li><b>The cyan/gold band still resolves into visible stripes</b> — its period is 4 px (2 px per color), coarse enough to survive scaling: direct visual proof you are looking at 512 columns.</li>
 <li><b>The 1-px checkerboard reads as gray</b> — same physics, both axes.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1212"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1234"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -161,15 +161,15 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">BG12NBA  </td><td class="markdownTableBodyNone">tiles word $8000  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr</a></span>) — verified  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1213"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1235"></a>
 Validation notes (luna v1.9.0)</h2>
 <p>luna renders hi-res/interlace CONTENT correctly but captures at 256×224 (≈2×2 downsample of the 512×448 field pair) — native-resolution capture is <a href="https://github.com/k0b3n4irb/luna/issues/115">luna#115</a>. The full 448-line page displays once with no vertical wrap (the 32×64 map fix — a 32-row map only covers 256 hi-res lines in interlace), and the 1-px bands render as the correct blend grays.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1214"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1236"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/graphics/effects/hires_text &amp;&amp; make</div>
 <div class="line"># regenerate the page (needs Pillow + numpy):</div>
 <div class="line">python3 gen_assets.py &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1215"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1237"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span> </p>
 </div></div><!-- contents -->

@@ -123,11 +123,11 @@ $(function(){initNavTree('examples_graphics_effects_hicolor_hires.html','',''); 
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
-<img src="screenshot.png" alt=""/>
+<img src="hicolor_hires.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>HiColor64PerTileRowPseudoHiRes</b> (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/HDMA/HiColor64PerTileRowPseudoHiRes</span>) — the integration of the two surfaces the effects arc landed separately: <span class="tt">hicolor_1792</span>'s per-scanline H-IRQ CGRAM stream runs UNDER <span class="tt">videoSetPseudoHires(1)</span>. The 512×224 sunset (original art, aspect-corrected for half-width pixels) is split by column parity — odd columns on BG1 (main), even on BG2 (sub) — and the PPU re-interleaves them while the 64-color row palettes reload per scanline. Color math (ADD-half of the subscreen into BG1+backdrop, krom's CGWSEL $02 / CGADSUB $61) softens column fringing.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1208"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1230"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -146,7 +146,7 @@ Register fidelity vs the original</h2>
 <td class="markdownTableBodyNone">IRQ stream  </td><td class="markdownTableBodyNone">HTIME 190, 16 B/line, VBlank rewind  </td><td class="markdownTableBodyNone"><span class="tt">hicolor_1792</span>'s handler, verbatim  </td></tr>
 </table>
 <p>Converter: <span class="tt">devtools/hicolor64hires.py</span> (krom's SNESBGPAL64tilerowHiRes.py contract — outputs committed).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1209"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1231"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span> </p>
 </div></div><!-- contents -->

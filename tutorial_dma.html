@@ -291,15 +291,15 @@ Lib API tour</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Function  </th><th class="markdownTableHeadNone">What it does  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">dmaCopyVram(src, vramAddr, size)</span>  </td><td class="markdownTableBodyNone">Copy bytes from WRAM/ROM (bank <span class="tt">$00</span>) to VRAM. Mode 1 (write <span class="tt">$2118</span>/<span class="tt">$2119</span>). The workhorse.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">dmaCopyVram(src, vramAddr, size)</span>  </td><td class="markdownTableBodyNone">Copy bytes from WRAM/ROM to VRAM. The bank is taken from <span class="tt">src</span>'s own bank byte, so the source may live in any bank. Mode 1 (write <span class="tt">$2118</span>/<span class="tt">$2119</span>). The workhorse.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">dmaCopyVramBank(src, bank, vramAddr, size)</span>  </td><td class="markdownTableBodyNone">Same, with explicit source bank. <b>Required</b> when source data lives in bank <span class="tt">$01+</span> (SUPERFREE spillover).  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">dmaCopyVramBank(src, bank, vramAddr, size)</span>  </td><td class="markdownTableBodyNone">Same, for when the address and bank are held separately (16-bit offset + explicit bank byte).  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">dmaFillVRAM(value, dest, size)</span>  </td><td class="markdownTableBodyNone">Fill a VRAM region with a fixed 16-bit value (fixed-source mode). Used to clear tilemaps.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a40e788e1f17c83a2b199df7f5bae0d62" title="Clear all VRAM to zero.">dmaClearVRAM(void)</a></span>  </td><td class="markdownTableBodyNone">Zero all 64 KB of VRAM. Boot-time use only (force blank required).  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">dmaCopyCGram(src, startColor, size)</span>  </td><td class="markdownTableBodyNone">Copy palette data from bank <span class="tt">$00</span> to CGRAM. Mode 0 (write <span class="tt">$2122</span>).  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">dmaCopyCGram(src, startColor, size)</span>  </td><td class="markdownTableBodyNone">Copy palette data to CGRAM. Mode 0 (write <span class="tt">$2122</span>).  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">dmaCopyCGramBank(src, bank, startColor, size)</span>  </td><td class="markdownTableBodyNone">Same, with explicit source bank.  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -321,15 +321,8 @@ Gotchas</h2>
 <p>Exceed it and the PPU starts reading mid-DMA — you get garbage tiles on the top scanlines for that frame. The corruption is <em>visible</em>, not silent — but it's also intermittent and hard to debug because it depends on game state.</p>
 <p><b>Mitigation</b>: count your bytes. If a per-frame update needs &gt; 4 KB, either drop into force blank (visible flash, OK for boss intro / scene transition) or split across multiple VBlanks ("1-page-per-VBlank" pattern — <span class="tt">KNOWN_LIMITATIONS.md</span> documents the canonical form).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md175"></a>
-🔴 <span class="tt">dmaCopyVram</span> hardcodes source bank <span class="tt">$00</span> — SUPERFREE spillover trap</h3>
-<p>The lib's <span class="tt">dmaCopyVram(src, vramAddr, size)</span> puts the source bank byte to <span class="tt">$00</span> in the DMA setup. If the linker placed your asset in bank <span class="tt">$01</span> or higher (because bank <span class="tt">$00</span>'s 32 KB ROM filled up — see <span class="tt">.claude/rules/bank0_budget.md</span>), the DMA reads the <em>wrong</em> bank and writes garbage to VRAM.</p>
-<p><b>Mitigation</b>: <span class="tt">dmaCopyVramBank(src, bank, vramAddr, size)</span>. The bank byte for an <span class="tt">extern</span> symbol resolves at link time as <span class="tt">:symbol</span>, so:</p>
-<div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> huge_tileset[];</div>
-<div class="line"><span class="comment">/* `:huge_tileset` is the linker-resolved bank — assembly only.</span></div>
-<div class="line"><span class="comment"> * From C, you typically build a small assembly helper that knows</span></div>
-<div class="line"><span class="comment"> * the bank, like the asm_loadSkyData() helper in</span></div>
-<div class="line"><span class="comment"> * examples/graphics/backgrounds/mode7_perspective. */</span></div>
-</div><!-- fragment --><p>Most projects either (a) keep all assets in bank <span class="tt">$00</span> (small games), or (b) write a small assembly DMA helper per asset to handle the correct bank. The shipped example that hits this case (<span class="tt">mode7_perspective</span>) takes option (b).</p>
+🟢 SUPERFREE assets in any bank just work</h3>
+<p><span class="tt">dmaCopyVram(src, vramAddr, size)</span> takes the source bank from <span class="tt">src</span>'s own bank byte, so an asset the linker placed in bank <span class="tt">$01</span> or higher (because bank <span class="tt">$00</span>'s 32 KB ROM filled up — see <span class="tt">.claude/rules/bank0_budget.md</span>) transfers correctly with no extra work. <span class="tt"><a class="el" href="dma_8h.html#a8c812453a507900f68899520ac4f61b9" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a></span> remains for the rarer case where the address and bank are held separately.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md176"></a>
 🟠 Channel 0 vs HDMA on channel 0</h3>
 <p><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> and friends use channel 0. If you also configure HDMA on channel 0 (which the lib documents as discouraged but doesn't actively prevent), the next <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> call clobbers the HDMA setup. Same class of bug as the OAM-DMA-on-channel-7 trap — different channel.</p>

@@ -123,19 +123,19 @@ $(function(){initNavTree('examples_graphics_effects_mode7_perspective_rotate.htm
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="image">
-<img src="screenshot.png" alt=""/>
+<img src="mode7_perspective_rotate.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>Mode7 Perspective</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Mode7/Perspective</span>). Four HDMA channels each stream one Mode 7 matrix register per scanline — M7A and M7D from a cosine table, M7B from sine, M7C from -sine — so the ground plane is simultaneously <b>perspective-projected</b> (each line scaled by <span class="tt">20480/y</span>, an 80× zoom-out at the horizon shrinking hyperbolically to 0.36× up close) and <b>rotated</b> (48 steps of 7.5°). The sibling example <span class="tt">graphics/backgrounds/mode7_perspective</span> drives only the diagonal terms (no rotation); this one exercises the full affine matrix.</p>
 <p>The tables are krom's exact bytes (<span class="tt">res/m7{cos,sin,nsin}.bin</span>, extracted verbatim), their math reverse-engineered and verified: <span class="tt">entry(a,y) = trig(2πa/48)·20480/y</span> in 8.8 fixed point — 32256/32256 entries proven by <span class="tt">devtools/m7ptables.py verify</span>. The track art is original (9 prefab tiles composed into a 128×128 Mode 7 world).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1216"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1238"></a>
 Controls (krom's map)</h2>
 <ul>
 <li><b>D-pad</b> — move over the plane (scroll + pivot together)</li>
 <li><b>L / R</b> — rotate the world in 7.5° steps</li>
 <li><b>Y / A</b> — nudge the pivot on X · <b>X / B</b> — nudge it on Y</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1217"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1239"></a>
 SNES Concepts</h2>
 <ul>
 <li>Per-scanline Mode 7 matrix writes (perspective + rotation combined)</li>
@@ -144,7 +144,7 @@ SNES Concepts</h2>
 <li>Mode 7 interleaved VRAM (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>); out-of-map backdrop (M7SEL=$80)</li>
 <li>VBlank-window discipline: repoint right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> — re-arming an HDMA channel mid-frame restarts its table walk</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1218"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1240"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -164,23 +164,23 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Table repoint  </td><td class="markdownTableBodyNone">A1Tx rewrite after WaitNMI  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> ×4 after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1219"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1241"></a>
 Measured parity (luna v1.9.0)</h2>
 <ul>
 <li>Tables: <b>byte-identical</b> to the reference (extracted verbatim, math verified 32256/32256).</li>
 <li>In-bounds projection: point-samples of the rendered frame match the world image through the documented matrix model (same check passes on the reference against its own art).</li>
 <li><b>Rotation parity, the strong number</b>: at +90° (12 L-presses) both ROMs show the same out-of-map black except one green wedge — <b>590 non-black pixels in both, IoU = 1.0000</b> (pixel-exact geometry); at 180° both are fully black. The "rotate into the void" behavior is the reference's own (pivot outside the 1024² world, M7SEL=$80 backdrop).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1220"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1242"></a>
 Two integration lessons this port surfaced</h2>
 <ol type="1">
 <li><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures but does <b>not</b> enable — <span class="tt">hdmaEnable(mask)</span> is a separate call (the un-enabled state renders a convincing static 1:1 view that LOOKS like a broken perspective; check <span class="tt">dma.hdmaen</span>).</li>
 <li>Calling <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> from an <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet</a></span> callback did not take effect (registers unchanged) while the same call works from the main loop — under investigation as a potential NMI-context/ABI interaction; the main-loop placement right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> is krom's own pattern and still inside VBlank.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1221"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1243"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/graphics/effects/mode7_perspective_rotate &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1222"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1244"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">hdma</span>, <span class="tt">input</span>, <span class="tt">mode7</span> </p>
 </div></div><!-- contents -->

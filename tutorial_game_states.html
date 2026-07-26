@@ -140,8 +140,43 @@ What Are Game States?</h2>
 </table>
 <p>Each state has its own update logic, and transitions between states involve screen fades, VRAM reloads, or both.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md183"></a>
-Simple State Machine</h2>
-<p>The standard SNES pattern uses a state variable and a <span class="tt">switch</span> in the main loop. Define states as constants and dispatch each frame:</p>
+The scene stack (recommended) — <span class="tt">scene</span> module</h2>
+<p>Before hand-rolling a state variable, reach for the opt-in <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> module (<span class="tt">LIB_MODULES += <a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span>). It gives you a stack of <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> structs — each a pair of callbacks — that push and pop, so "title → play → pause → back to
+play" is a data structure instead of an <span class="tt">enum</span> and a <span class="tt">switch</span>:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="scene_8h.html">snes/scene.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845">title_init</a>(<span class="keywordtype">void</span>);   <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2">title_update</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> play_init(<span class="keywordtype">void</span>);    <span class="keyword">static</span> <span class="keywordtype">void</span> play_update(<span class="keywordtype">void</span>);</div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#ac60a285c5c6c5451a68676f82d129ea2">pause_update</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> title = { <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845">title_init</a>, <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2">title_update</a> };</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> <a class="code hl_function" href="audio_2soundboard_2main_8c.html#a05ef604166c8c9c5975be6d9379b8233">play</a>  = { play_init,  play_update  };</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> pause = { <a class="code hl_define" href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>,       <a class="code hl_function" href="basics_2scene__stack_2main_8c.html#ac60a285c5c6c5451a68676f82d129ea2">pause_update</a> };   <span class="comment">// init may be NULL</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// in title_update:  if (start_pressed) scenePush(&amp;play);</span></div>
+<div class="line"><span class="comment">// in play_update:   if (start_pressed) scenePush(&amp;pause);</span></div>
+<div class="line"><span class="comment">// in pause_update:  if (start_pressed) scenePop();        // back to play, unchanged</span></div>
+<div class="ttc" id="aaudio_2soundboard_2main_8c_html_a05ef604166c8c9c5975be6d9379b8233"><div class="ttname"><a href="audio_2soundboard_2main_8c.html#a05ef604166c8c9c5975be6d9379b8233">play</a></div><div class="ttdeci">static void play(u8 sample, u8 vol, u8 pan, u16 pitch, u16 tint)</div><div class="ttdoc">Play + tint the backdrop + update the probe oracles.</div><div class="ttdef"><b>Definition</b> main.c:71</div></div>
+<div class="ttc" id="abasics_2scene__stack_2main_8c_html_a2c550c4e8527adc3ce18a8828012b845"><div class="ttname"><a href="basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845">title_init</a></div><div class="ttdeci">static void title_init(void)</div><div class="ttdef"><b>Definition</b> main.c:79</div></div>
+<div class="ttc" id="abasics_2scene__stack_2main_8c_html_a63dece4b1b47311852fc485049f7b6d2"><div class="ttname"><a href="basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2">title_update</a></div><div class="ttdeci">static void title_update(void)</div><div class="ttdef"><b>Definition</b> main.c:87</div></div>
+<div class="ttc" id="abasics_2scene__stack_2main_8c_html_ac60a285c5c6c5451a68676f82d129ea2"><div class="ttname"><a href="basics_2scene__stack_2main_8c.html#ac60a285c5c6c5451a68676f82d129ea2">pause_update</a></div><div class="ttdeci">static void pause_update(void)</div><div class="ttdef"><b>Definition</b> main.c:127</div></div>
+<div class="ttc" id="agroup__macros_html_ga070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div><div class="ttdoc">Null pointer constant.</div><div class="ttdef"><b>Definition</b> types.h:167</div></div>
+<div class="ttc" id="ascene_8h_html"><div class="ttname"><a href="scene_8h.html">scene.h</a></div><div class="ttdoc">Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.</div></div>
+<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
+</div><!-- fragment --><ul>
+<li><b><span class="tt">init</span></b> runs once when a scene is first pushed — load its tiles / palettes here (it happens before the first <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>). It is <b>not</b> re-run when a scene is resumed after a pop, so a pause overlay that pops back to <span class="tt"><a class="el" href="audio_2soundboard_2main_8c.html#a05ef604166c8c9c5975be6d9379b8233" title="Play + tint the backdrop + update the probe oracles.">play</a></span> leaves the game exactly as it was.</li>
+<li><b><span class="tt">update</span></b> runs every VBlank while the scene is on top. A suspended scene (one below the top) gets no callbacks — that is your pause-freeze for free.</li>
+<li><b><span class="tt"><a class="el" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span>/<span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span></b> record the change; the new top's <span class="tt">init</span>/<span class="tt">update</span> dispatch on the next VBlank. To <em>replace</em> rather than stack, call <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop()</a>; <a class="el" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a>(&amp;next);</span>.</li>
+</ul>
+<p>Pair it with <b><span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun</a></span></b> (<span class="tt">gameloop</span> module) so you don't even write the <span class="tt">while (1) <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> loop:</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a> cfg = { .init = onInit, .update = onUpdate };</div>
+<div class="line"><a class="code hl_function" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6">gameLoopRun</a>(&amp;cfg);   <span class="comment">// never returns</span></div>
+<div class="ttc" id="agameloop_8h_html_a5d1a6a94538a167bfa984b00cf166af6"><div class="ttname"><a href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6">gameLoopRun</a></div><div class="ttdeci">void gameLoopRun(const GameLoopConfig *cfg)</div><div class="ttdoc">Run the OpenSNES game loop. Never returns.</div></div>
+<div class="ttc" id="agameloop_8h_html_abd4907749765c5550a229850c698c856"><div class="ttname"><a href="gameloop_8h.html#abd4907749765c5550a229850c698c856">GameLoopConfig</a></div><div class="ttdeci">Scene GameLoopConfig</div><div class="ttdoc">Game loop callbacks. Alias for Scene from &lt;snes/scene.h&gt;.</div><div class="ttdef"><b>Definition</b> gameloop.h:99</div></div>
+</div><!-- fragment --><p><span class="tt">examples/basics/scene_stack</span> is the worked example: title → counter → pause overlay, three <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> structs, no hand-rolled dispatch. Prefer this for new games — it is the approach the manual pattern below exists to replace.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md184"></a>
+The manual state machine (under the hood)</h2>
+<p>The classic SNES pattern uses a state variable and a <span class="tt">switch</span> in the main loop. It is what <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> is built on top of, and it is still the right tool when you need a custom rhythm (half-rate updates, a bespoke transition) or are reading the shipped games <span class="tt">tetris</span>/<span class="tt">breakout</span>, which use it directly. Define states as constants and dispatch each frame:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#define STATE_TITLE      0</span></div>
@@ -193,10 +228,10 @@ Simple State Machine</h2>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
 </div><!-- fragment --><p>This is the exact pattern used in <span class="tt"><a class="el" href="games_2tetris_2main_8c.html" title="Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio.">examples/games/tetris/main.c</a></span>. Each state function runs once per frame and can change <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a></span> to trigger a transition.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md184"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md185"></a>
 State Transitions</h2>
 <p>Transitioning between states often requires reloading VRAM, resetting variables, or fading the screen. The SNES PPU silently ignores VRAM writes during active display, so transitions must happen during VBlank or forced blank.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md185"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md186"></a>
 Fade Out / Fade In</h3>
 <p>The INIDISP register (<span class="tt">$2100</span>) controls screen brightness (0-15). Stepping through brightness levels over multiple frames creates a smooth fade:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> fade_out(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed) {</div>
@@ -226,7 +261,7 @@ Fade Out / Fade In</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agroup__types_html_ga151f780fb455885061d3b77ec1c90c03"><div class="ttname"><a href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a></div><div class="ttdeci">signed char s8</div><div class="ttdoc">8-bit signed integer (-128 to 127)</div><div class="ttdef"><b>Definition</b> types.h:44</div></div>
 </div><!-- fragment --><p>A speed of 1 gives a fast 16-frame fade (~267ms). A speed of 3 gives a slower cinematic fade. See <span class="tt">examples/graphics/effects/fading/</span> for a complete working example.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md186"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md187"></a>
 VRAM Reload Between States</h3>
 <p>When switching from title screen to gameplay (or vice versa), you typically need to load different tiles, tilemaps, and palettes. Use forced blank to guarantee VRAM writes succeed:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> transition_to_gameplay(<span class="keywordtype">void</span>) {</div>
@@ -258,7 +293,7 @@ VRAM Reload Between States</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:165</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">static u16 score</div><div class="ttdef"><b>Definition</b> main.c:161</div></div>
 </div><!-- fragment --><p>The key rule: call <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></span> before bulk VRAM/CGRAM writes, and <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> after. This is the forced blank pattern used throughout the OpenSNES examples.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md187"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md188"></a>
 Title Screen Implementation</h2>
 <p>A title screen waits for the player to press START, then transitions to gameplay. The pattern from <span class="tt"><a class="el" href="games_2tetris_2main_8c.html" title="Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio.">examples/games/tetris/main.c</a></span>:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2tetris_2main_8c.html#ad8a61053de03cf7f9efbc95d349ba66e">stateTitle</a>(<span class="keywordtype">void</span>) {</div>
@@ -279,7 +314,7 @@ Title Screen Implementation</h2>
 <div class="ttc" id="agames_2tetris_2main_8c_html_ae615335cd0b31c24fe89bec2450a99b6"><div class="ttname"><a href="games_2tetris_2main_8c.html#ae615335cd0b31c24fe89bec2450a99b6">startGame</a></div><div class="ttdeci">static void startGame(void)</div><div class="ttdoc">Initialize a new game: clear board, reset state, start music.</div><div class="ttdef"><b>Definition</b> main.c:393</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga90b3ea4616669bfe7fab021c68db7abf"><div class="ttname"><a href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a></div><div class="ttdeci">#define KEY_START</div><div class="ttdef"><b>Definition</b> input.h:74</div></div>
 </div><!-- fragment --><p>The release-wait loop (<span class="tt">do { <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>; } while (<a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[0] &amp; <a class="el" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a>)</span>) prevents the START press from triggering an immediate pause in the gameplay state. This is a standard debounce pattern on the SNES.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md188"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md189"></a>
 Complete Title Flow</h3>
 <p>Breakout (<span class="tt"><a class="el" href="games_2breakout_2main_8c.html" title="Breakout game with brick collision, paddle physics, and level cycling.">examples/games/breakout/main.c</a></span>) shows the full sequence: display "READY" text, wait for START, clear the message, then enter the game loop:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Display ready message in tilemap */</span></div>
@@ -301,7 +336,7 @@ Complete Title Flow</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_acfa2f5b2f39afd44db3e650704e8fdb6"><div class="ttname"><a href="games_2breakout_2main_8c.html#acfa2f5b2f39afd44db3e650704e8fdb6">ST_READY</a></div><div class="ttdeci">#define ST_READY</div><div class="ttdef"><b>Definition</b> main.c:105</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ad1545da3f0a593a3aad9c35e8dfdfd9c"><div class="ttname"><a href="games_2breakout_2main_8c.html#ad1545da3f0a593a3aad9c35e8dfdfd9c">writestring</a></div><div class="ttdeci">static void writestring(const char *st, u16 *tilemap, u16 pos, u16 offset)</div><div class="ttdoc">Write a null-terminated string to a tilemap buffer.</div><div class="ttdef"><b>Definition</b> main.c:202</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aebeba782b315ded5acb666f7a67bfa3f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aebeba782b315ded5acb666f7a67bfa3f">ST_BLANK</a></div><div class="ttdeci">#define ST_BLANK</div><div class="ttdef"><b>Definition</b> main.c:108</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md189"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md190"></a>
 Pause Screen</h2>
 <p>Pausing overlays a message on the current gameplay, freezes all game logic, and resumes when START is pressed again. The key is a three-phase wait: release START, wait for START press, wait for release again.</p>
 <p>From <span class="tt"><a class="el" href="games_2breakout_2main_8c.html" title="Breakout game with brick collision, paddle physics, and level cycling.">examples/games/breakout/main.c</a></span>:</p>
@@ -342,7 +377,7 @@ Pause Screen</h2>
 <div class="ttc" id="agames_2tetris_2main_8c_html_ad5bad3d3ae9d56603b80d2eca3e8ee44"><div class="ttname"><a href="games_2tetris_2main_8c.html#ad5bad3d3ae9d56603b80d2eca3e8ee44">prev_pad</a></div><div class="ttdeci">static u16 prev_pad</div><div class="ttdoc">Previous frame&#39;s joypad state (for edge-triggered button detection).</div><div class="ttdef"><b>Definition</b> main.c:168</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="ahud_8c_html_a8673634c556f2d5f695756ec8d7e8d9c"><div class="ttname"><a href="hud_8c.html#a8673634c556f2d5f695756ec8d7e8d9c">hudShowMessage</a></div><div class="ttdeci">void hudShowMessage(const char *str)</div><div class="ttdef"><b>Definition</b> hud.c:108</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md190"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md191"></a>
 Pause Design Rules</h3>
 <ul>
 <li><b>Do not reload VRAM</b> for a simple pause overlay. Write to a tilemap buffer and DMA it.</li>
@@ -350,10 +385,10 @@ Pause Design Rules</h3>
 <li><b>The NMI handler keeps running</b> during pause. Input is still read, OAM is still transferred. Only your game logic stops.</li>
 <li><b>Redraw sprites</b> before entering the pause loop if you use delta rendering, so the screen looks correct while frozen.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md191"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md192"></a>
 Game Over</h2>
 <p>Game over detection happens in gameplay logic. When the end condition is met, display a message and wait for player input before restarting.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md192"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md193"></a>
 Simple Game Over (Breakout)</h3>
 <p>Breakout detects game over when lives reach zero. It shows a message and halts:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2breakout_2main_8c.html#adf3df1987cbb4300fdb910db84941579">die</a>(<span class="keywordtype">void</span>) {</div>
@@ -377,7 +412,7 @@ Simple Game Over (Breakout)</h3>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aa4286d0de16674bb408ebd89c0e74fc5"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a></div><div class="ttdeci">static s16 pos_y</div><div class="ttdef"><b>Definition</b> main.c:178</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aa937ed962efcbcb29961338b1974f6ca"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa937ed962efcbcb29961338b1974f6ca">ST_GAMEOVER</a></div><div class="ttdeci">#define ST_GAMEOVER</div><div class="ttdef"><b>Definition</b> main.c:106</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_adf3df1987cbb4300fdb910db84941579"><div class="ttname"><a href="games_2breakout_2main_8c.html#adf3df1987cbb4300fdb910db84941579">die</a></div><div class="ttdeci">static void die(void)</div><div class="ttdoc">Handle player losing a life.</div><div class="ttdef"><b>Definition</b> main.c:481</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md193"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md194"></a>
 Restart Game Over (Tetris)</h3>
 <p>Tetris allows restarting. When a new piece cannot spawn (board full), the game transitions to <span class="tt"><a class="el" href="games_2tetris_2main_8c.html#a1a58a3335baaf4735bbae9dc604fd630" title="Game over: board frozen, &quot;GAME OVER&quot; rainbow cycle, await restart.">STATE_GAME_OVER</a></span>, which shows a message, waits for START, then calls <span class="tt"><a class="el" href="games_2tetris_2main_8c.html#ae615335cd0b31c24fe89bec2450a99b6" title="Initialize a new game: clear board, reset state, start music.">startGame()</a></span> to reinitialize everything:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069">stateGameOver</a>(<span class="keywordtype">void</span>) {</div>
@@ -404,7 +439,7 @@ Restart Game Over (Tetris)</h3>
 <div class="ttc" id="ahud_8c_html_a39e871ce996a37670216b9d07b624347"><div class="ttname"><a href="hud_8c.html#a39e871ce996a37670216b9d07b624347">hudClearMessage</a></div><div class="ttdeci">void hudClearMessage(void)</div><div class="ttdef"><b>Definition</b> hud.c:139</div></div>
 <div class="ttc" id="arender_8c_html_abdd31c65b3cc779be294f7555d2806d7"><div class="ttname"><a href="render_8c.html#abdd31c65b3cc779be294f7555d2806d7">renderFlush</a></div><div class="ttdeci">void renderFlush(void)</div><div class="ttdef"><b>Definition</b> render.c:382</div></div>
 <div class="ttc" id="arender_8c_html_ad2e33cd2f19dd60e72f5b915964b1cf5"><div class="ttname"><a href="render_8c.html#ad2e33cd2f19dd60e72f5b915964b1cf5">renderBoard</a></div><div class="ttdeci">void renderBoard(void)</div><div class="ttdef"><b>Definition</b> render.c:277</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md194"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md195"></a>
 Game Over with Fade</h3>
 <p>Combining game over with a fade transition creates a polished feel:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069">stateGameOver</a>(<span class="keywordtype">void</span>) {</div>
@@ -432,7 +467,7 @@ Game Over with Fade</h3>
 <div class="line">    <a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>;</div>
 <div class="line">}</div>
 <div class="ttc" id="amemory_2hirom__demo_2main_8c_html_a60b214eb168a301978b985734feb083a"><div class="ttname"><a href="memory_2hirom__demo_2main_8c.html#a60b214eb168a301978b985734feb083a">TILEMAP_ADDR</a></div><div class="ttdeci">#define TILEMAP_ADDR</div><div class="ttdoc">VRAM word address for the BG1 tilemap (32x32 = 2KB).</div><div class="ttdef"><b>Definition</b> main.c:119</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md195"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md196"></a>
 State Machine Summary</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -454,9 +489,10 @@ State Machine Summary</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Game over  </td><td class="markdownTableBodyNone">Message, wait for input, reinitialize or halt  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md196"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md197"></a>
 Next Steps</h2>
 <ul>
+<li><a class="el" href="scene_8h.html" title="scene.h">Scene stack API</a> · <a class="el" href="gameloop_8h.html" title="gameloop.h">Game loop API</a> — the recommended framework, <span class="tt">examples/basics/scene_stack</span></li>
 <li><a class="el" href="tutorial_graphics.html" title="Graphics &amp; Backgrounds Tutorial">Graphics &amp; Backgrounds</a></li>
 <li><a class="el" href="tutorial_sprites.html" title="Sprites &amp; Animation Tutorial">Sprites &amp; Animation</a></li>
 <li><a class="el" href="tutorial_input.html" title="Controller Input Tutorial">Controller Input</a> </li>

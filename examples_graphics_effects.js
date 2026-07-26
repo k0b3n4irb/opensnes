@@ -1,16 +1,16 @@
 var examples_graphics_effects =
 [
     [ "direct_color — the pixel byte IS the color", "examples_graphics_effects_direct_color.html", [
-      [ "Examples", "examples_graphics_effects.html#autotoc_md1251", null ],
-      [ "Key Concepts", "examples_graphics_effects.html#autotoc_md1252", [
-        [ "Screen Brightness (INIDISP $2100)", "examples_graphics_effects.html#autotoc_md1253", null ],
-        [ "Mosaic ($2106)", "examples_graphics_effects.html#autotoc_md1254", null ],
-        [ "Hardware Windows ($2123-$212B)", "examples_graphics_effects.html#autotoc_md1255", null ],
-        [ "HDMA (Horizontal Blank DMA)", "examples_graphics_effects.html#autotoc_md1256", null ],
-        [ "Color Math ($2130-$2132)", "examples_graphics_effects.html#autotoc_md1257", null ],
-        [ "SNES Concepts", "examples_graphics_effects_direct_color.html#autotoc_md1111", null ],
-        [ "How to Build", "examples_graphics_effects_direct_color.html#autotoc_md1112", null ],
-        [ "Modules Used", "examples_graphics_effects_direct_color.html#autotoc_md1113", null ]
+      [ "Examples", "examples_graphics_effects.html#autotoc_md1273", null ],
+      [ "Key Concepts", "examples_graphics_effects.html#autotoc_md1274", [
+        [ "Screen Brightness (INIDISP $2100)", "examples_graphics_effects.html#autotoc_md1275", null ],
+        [ "Mosaic ($2106)", "examples_graphics_effects.html#autotoc_md1276", null ],
+        [ "Hardware Windows ($2123-$212B)", "examples_graphics_effects.html#autotoc_md1277", null ],
+        [ "HDMA (Horizontal Blank DMA)", "examples_graphics_effects.html#autotoc_md1278", null ],
+        [ "Color Math ($2130-$2132)", "examples_graphics_effects.html#autotoc_md1279", null ],
+        [ "SNES Concepts", "examples_graphics_effects_direct_color.html#autotoc_md1133", null ],
+        [ "How to Build", "examples_graphics_effects_direct_color.html#autotoc_md1134", null ],
+        [ "Modules Used", "examples_graphics_effects_direct_color.html#autotoc_md1135", null ]
       ] ]
     ] ],
     [ "Fading Example", "examples_graphics_effects_fading.html", null ],

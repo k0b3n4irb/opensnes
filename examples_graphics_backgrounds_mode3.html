@@ -124,13 +124,13 @@ $(function(){initNavTree('examples_graphics_backgrounds_mode3.html','',''); });
 <div class="contents">
 <div class="textblock"><p>Demonstrates BG Mode 3 with a single 256-color (8bpp) background layer.</p>
 <div class="image">
-<img src="screenshot.png" alt=""/>
+<img src="mode3.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1067"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1089"></a>
 Description</h2>
 <p>Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The tileset exceeds 32KB, requiring split DMA loading with explicit bank bytes via an assembly loader.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1068"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1090"></a>
 Architecture</h2>
 <ul>
 <li><b>Mode 3</b>: One BG, 8bpp (256 colors)</li>
@@ -138,10 +138,10 @@ Architecture</h2>
 <li>Tileset split: first 32KB + remaining ~7KB in separate DMA transfers</li>
 <li>Assembly DMA loader handles bank byte for SUPERFREE sections in bank $01+</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1069"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1091"></a>
 Ported from</h2>
 <p>PVSnesLib "Mode3" example.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1070"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1092"></a>
 Modules</h2>
 <p><span class="tt">console dma background</span> </p>
 </div></div><!-- contents -->
