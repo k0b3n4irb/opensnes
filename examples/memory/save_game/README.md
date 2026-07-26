@@ -1,6 +1,6 @@
 # Save Game -- SRAM Persistence
 
-![Screenshot](screenshot.png)
+![Screenshot](save_game.png)
 
 ## What This Example Shows
 

@@ -6,7 +6,7 @@ character (Mario) walks and jumps through a side-scrolling level populated with
 enemies (Goombas and Koopa Troopas) that patrol back and forth. This example
 demonstrates how real SNES games organize their world and entity logic.
 
-![Screenshot](screenshot.png)
+![Screenshot](mapandobjects.png)
 
 ## What You'll Learn
 

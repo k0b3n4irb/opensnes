@@ -6,7 +6,7 @@ The expected result is a dark blue screen with "TEXT MODULE TEST" displayed in
 white. This example serves as a diagnostic: if the text module is broken, this is
 the simplest program that will reveal it.
 
-![Screenshot](screenshot.png)
+![Screenshot](text_test.png)
 
 ## What You'll Learn
 

@@ -1,6 +1,5 @@
 # apu_switch — hot-swapping APU programs at runtime
 
-![Screenshot](screenshot.png)
 
 The `apu` module's upload path runs once, at boot. This example adds
 the missing capability: **replacing the running APU program at any

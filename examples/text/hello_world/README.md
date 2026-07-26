@@ -2,7 +2,7 @@
 
 > Your first SNES ROM. Nine tiles, two colors, one message. Welcome to 1990.
 
-![Screenshot](screenshot.png)
+![Screenshot](hello_world.png)
 
 ## Build & Run
 

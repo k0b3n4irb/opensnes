@@ -67,6 +67,9 @@ ALLOWED_SCOPES = {
     # conventions notes (2026-06-23): real path .claude/notes/conventions/
     # (sibling of `chantiers`/`rules` above).
     "conventions",
+    # tech notes (2026-07-26): real path .claude/notes/tech/ (sibling of
+    # `chantiers`/`conventions` above — technical references and analyses).
+    "tech",
 }
 
 SUBJECT_RE = re.compile(

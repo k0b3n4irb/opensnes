@@ -1,6 +1,6 @@
 # Two Players Example
 
-![Screenshot](screenshot.png)
+![Screenshot](two_players.png)
 
 Simultaneous multi-controller input handling.
 

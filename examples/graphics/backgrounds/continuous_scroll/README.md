@@ -3,7 +3,7 @@
 > Two-layer parallax scrolling with a player sprite that triggers camera movement.
 > Move with the D-pad. Walk past the threshold and the world scrolls to follow.
 
-![Screenshot](screenshot.png)
+![Screenshot](continuous_scroll.png)
 
 ## Controls
 

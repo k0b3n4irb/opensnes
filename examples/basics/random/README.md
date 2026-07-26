@@ -2,7 +2,7 @@
 
 Generates and displays random 16-bit numbers on button press. Every game needs randomness — enemy spawns, item drops, damage variance, shuffle order. The SNES has no hardware RNG, so we use a software pseudo-random number generator (LFSR) seeded from the frame counter.
 
-![Screenshot](screenshot.png)
+![Screenshot](random.png)
 
 ## What You'll Learn
 

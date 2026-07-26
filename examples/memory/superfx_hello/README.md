@@ -2,7 +2,7 @@
 
 > GSU coprocessor boot diagnostic with SRAM tests and FMULT validation
 
-![Screenshot](screenshot.png)
+![Screenshot](superfx_hello.png)
 
 ## Emulator Compatibility
 

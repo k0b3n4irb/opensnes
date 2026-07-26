@@ -2,7 +2,7 @@
 
 This example shows how to use maps created in the [Tiled](https://www.mapeditor.org/) map editor with the OpenSNES map engine. A 224x30 tile level (1792x240 pixels) scrolls horizontally with the D-pad. Only the visible 32-tile window is in VRAM at any time — the map engine streams new columns as the camera moves.
 
-![Screenshot](screenshot.png)
+![Screenshot](tiled.png)
 
 ## What You'll Learn
 

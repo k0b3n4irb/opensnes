@@ -31,7 +31,7 @@ reformat without updating the script.
 |------|-----|--------|
 | compiler/cproc | e045ccc5d57b9dba9a64d58fca7a3c95fab28d6f | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
 | compiler/qbe | 1f38c0c1ca44476f2ccd59ae904bef4f2662404b | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
-| compiler/wla-dx | ffe59ca1db32a4e7b40e16674acb844a5a0160ef | github.com/k0b3n4irb/wla-dx:master |
+| compiler/wla-dx | 91c52b1f4ef3cc8ba3c0638f7536539579af6a9f | github.com/k0b3n4irb/wla-dx v10.7 (release tag) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -96,13 +96,21 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 0 patches ahead of upstream master
+### compiler/wla-dx — 0 patches ahead; pinned to the **v10.7 release**
 
-The submodule HEAD is at `ffe59ca`, currently 12 commits behind
-`upstream/master`. Patches relevant to OpenSNES (notably the .ACCU/.INDEX
-warning at `ffe59ca`) were merged upstream but the assembler doesn't have a
-post-PR tagged release yet — we pin to the merge commit until Vhelin tags
-the next release. See `~/.claude/.../memory/project_wladx_release.md`.
+The submodule HEAD is the `v10.7` release tag (`91c52b1f`), which our
+fork mirrors from upstream. Zero local patches.
+
+**Why not the newer master.** upstream master (`4f8bbdce`, `v10.7-9`)
+carries a regression: a `SUPERFREE` section that exactly fills a ROM bank
+fails to link (`FIX_LABEL_ADDRESSES: cannot map label`). Bisected to
+`4c3c042e` (`v10.7-7`, "Added SPAN to .SECTIONs"). The v10.7 **release**
+predates it (`v10.7-0`) and is clean — verified by a full corpus build +
+suite on 2026-07-25 (74/74 fbhash, 72/72 WRAM, all identical to the
+previous `ffe59ca1` pin, so the 90-commit advance is behaviour-neutral).
+See `.claude/notes/tech/wla_span_regression.md` and the draft upstream
+report. Do not advance past `a369bec5` (`v10.7-6`) until the regression
+is fixed upstream.
 
 ## Updating a pin
 

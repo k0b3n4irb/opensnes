@@ -537,8 +537,8 @@ if (REG_HVBJOY & 0x80) { /* In VBlank */ }
 ## SA-1 Registers ($2200-$230E)
 
 The SA-1 is a second 65816 CPU at 10.74 MHz. These registers control
-inter-processor communication and memory protection. For the full register
-set and programming details, see `.claude/SA-1.md`.
+inter-processor communication and memory protection. For the library-side
+register macros, see [`sa1.h`](../../lib/include/snes/sa1.h).
 
 | Register | Address | R/W | Description |
 |----------|---------|-----|-------------|
@@ -550,7 +550,7 @@ set and programming details, see `.claude/SA-1.md`.
 > **SIWP/CIWP polarity is disputed.** The [Super Famicom Dev
 > Wiki](https://wiki.superfamicom.org/sa-1-registers) and fullsnes say each
 > bit *enables* protection for one 256-byte I-RAM page (so `$00` = all
-> writable, `$FF` = all protected). But **Mesen2** (our accuracy reference)
+> writable, `$FF` = all protected). But **Mesen2** (a GUI reference emulator)
 > and **snes9x** behave the opposite way: with `$FF` the crt0 I-RAM
 > self-test passes (`sa1_status=$A5`), with `$00` it fails. OpenSNES writes
 > `$FF` because that is what works on the emulators we validate against. The

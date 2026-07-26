@@ -1,6 +1,5 @@
 # soundboard — the audio v2 engine, driven entirely from C
 
-![Screenshot](screenshot.png)
 
 The first audio example with **zero SPC700 assembly**. The lib's
 `audio` module ships its own resident SPC700 driver (built from

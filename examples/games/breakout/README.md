@@ -3,7 +3,7 @@
 > A fully playable Breakout clone — ball, paddle, bricks, levels, score, and shadows.
 > This is the "put it all together" example. If you can follow this one, you can make a game.
 
-![Screenshot](screenshot.png)
+![Screenshot](breakout.png)
 
 ## Controls
 

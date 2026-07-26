@@ -2,7 +2,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](mode7.png)
 
 ## What This Example Shows
 

@@ -10,7 +10,7 @@
 #---------------------------------------------------------------------------
 
 PROJECT_NAME           = "OpenSNES"
-PROJECT_NUMBER         = "0.11.0"
+PROJECT_NUMBER         = "0.32.0"
 PROJECT_BRIEF          = "Modern Open-Source SNES Development SDK"
 PROJECT_LOGO           = ../assets/logo_64x64.png
 
@@ -59,13 +59,79 @@ USE_MDFILE_AS_MAINPAGE = mainpage.md
 # Markdown filter: inject \page directives for unique page IDs
 FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
 
-# Image path for example screenshots
-IMAGE_PATH             = ../examples/audio/snesmod_music \
-                         ../examples/audio/snesmod_sfx \
+# Image path for example screenshots.
+# IMAGE_PATH is how Doxygen COPIES markdown-referenced images (![](x.png)) into
+# the flat html/ output — it is NOT recursive, so every example directory that
+# has a screenshot must be listed. Each screenshot has a UNIQUE basename
+# (<example>.png, enforced by devtools/check_doc_drift.py) so they no longer
+# collide in the flat output. This list is generated from the README references;
+# check_doc_drift.py's IMAGE_PATH check fails the build if an example's
+# screenshot dir is missing here.
+IMAGE_PATH             = ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
+                         ../examples/basics/fix32_orbit \
+                         ../examples/basics/random \
+                         ../examples/basics/scene_stack \
+                         ../examples/basics/timer \
                          ../examples/games/breakout \
                          ../examples/games/likemario \
-                         ../examples/games/mapandobjects
+                         ../examples/games/mapandobjects \
+                         ../examples/games/mode7_flying \
+                         ../examples/games/mode7_racing \
+                         ../examples/games/rpg \
+                         ../examples/games/shmup_1942 \
+                         ../examples/games/tetris \
+                         ../examples/graphics/backgrounds/continuous_scroll \
+                         ../examples/graphics/backgrounds/mixed_scroll \
+                         ../examples/graphics/backgrounds/mode0 \
+                         ../examples/graphics/backgrounds/mode1 \
+                         ../examples/graphics/backgrounds/mode1_bg3_priority \
+                         ../examples/graphics/backgrounds/mode1_lz77 \
+                         ../examples/graphics/backgrounds/mode3 \
+                         ../examples/graphics/backgrounds/mode5 \
+                         ../examples/graphics/backgrounds/mode7 \
+                         ../examples/graphics/backgrounds/mode7_perspective \
+                         ../examples/graphics/effects/direct_color \
+                         ../examples/graphics/effects/fading \
+                         ../examples/graphics/effects/gradient_9bit \
+                         ../examples/graphics/effects/gradient_colors \
+                         ../examples/graphics/effects/hdma_helpers \
+                         ../examples/graphics/effects/hdma_indirect_gradient \
+                         ../examples/graphics/effects/hdma_wave \
+                         ../examples/graphics/effects/hdma_wave_table \
+                         ../examples/graphics/effects/hicolor_1792 \
+                         ../examples/graphics/effects/hicolor_blend \
+                         ../examples/graphics/effects/hicolor_hires \
+                         ../examples/graphics/effects/hires_text \
+                         ../examples/graphics/effects/mode7_perspective_rotate \
+                         ../examples/graphics/effects/mosaic \
+                         ../examples/graphics/effects/parallax_scrolling \
+                         ../examples/graphics/effects/superfx_3d \
+                         ../examples/graphics/effects/transparency \
+                         ../examples/graphics/effects/transparent_window \
+                         ../examples/graphics/effects/window \
+                         ../examples/graphics/effects/window_multi_hdma \
+                         ../examples/graphics/sprites/animated_sprite \
+                         ../examples/graphics/sprites/dynamic_metasprite \
+                         ../examples/graphics/sprites/dynamic_sprite \
+                         ../examples/graphics/sprites/metasprite \
+                         ../examples/graphics/sprites/object_size \
+                         ../examples/graphics/sprites/simple_sprite \
+                         ../examples/input/controller \
+                         ../examples/input/mouse \
+                         ../examples/input/superscope \
+                         ../examples/input/two_players \
+                         ../examples/maps/dynamic_map \
+                         ../examples/maps/mapscroll \
+                         ../examples/maps/slopemario \
+                         ../examples/maps/tiled \
+                         ../examples/memory/hirom_demo \
+                         ../examples/memory/sa1_hello \
+                         ../examples/memory/sa1_starfield \
+                         ../examples/memory/save_game \
+                         ../examples/memory/superfx_hello \
+                         ../examples/text/hello_world \
+                         ../examples/text/text_test
 
 #---------------------------------------------------------------------------
 # Build Configuration

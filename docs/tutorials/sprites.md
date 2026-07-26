@@ -40,7 +40,7 @@ int main(void) {
     consoleInit();
 
     // Initialize OAM (hides all sprites)
-    oamInit();
+    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
     // Enable sprites on main screen
     REG_TM = TM_OBJ;
@@ -79,8 +79,26 @@ while (1) {
 // Hide a specific sprite (moves Y off-screen)
 oamHide(5);
 
-// Hide all sprites
-oamInit();
+// Hide every sprite at once
+oamClear();
+```
+
+Re-initialising is *not* how you hide sprites — `oamInit()` reconfigures
+OBJSEL. Call `oamHide(id)` per sprite, or `oamClear()` to hide them all.
+
+### The `name_base` argument is a page number, not a VRAM address
+
+`oamInit(size, name_base)` takes `name_base` as a **page number 0-7**,
+not a VRAM address. Each page is $2000 word addresses (16 KB), so tiles
+DMA'd to word $4000 need base 2. The value is masked to 3 bits: passing
+a VRAM address — the natural mistake, since every other VRAM parameter in
+the SDK takes one — silently yields a wrong base (`0x6000 & 7` is 0) and
+the sprites render whatever tiles sit at word 0, with no diagnostic. Use
+the `OBJ_NAME_BASE(addr)` macro to convert, so the intent survives the
+call:
+
+```c
+oamInit(OBJ_SIZE8_L16, OBJ_NAME_BASE(0x6000));   // base 3
 ```
 
 ## Loading Sprite Tiles

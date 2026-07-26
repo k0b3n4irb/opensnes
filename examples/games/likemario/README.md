@@ -3,7 +3,7 @@
 > A side-scrolling platformer with gravity, tile collision, and a camera that follows
 > the player across a world bigger than the screen. This is the real deal.
 
-![Screenshot](screenshot.png)
+![Screenshot](likemario.png)
 
 ## Controls
 

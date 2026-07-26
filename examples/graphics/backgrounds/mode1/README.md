@@ -1,6 +1,6 @@
 # Mode 1 Example
 
-![Screenshot](screenshot.png)
+![Screenshot](mode1.png)
 
 The most common SNES video mode with two 16-color and one 4-color background.
 

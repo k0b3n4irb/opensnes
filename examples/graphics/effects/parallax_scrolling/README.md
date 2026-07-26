@@ -2,7 +2,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](parallax_scrolling.png)
 
 Multi-speed horizontal scrolling using HDMA -- one background image, three scroll zones.
 

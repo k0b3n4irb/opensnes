@@ -1,6 +1,6 @@
 # Window -- HDMA Triangle Masking
 
-![Screenshot](screenshot.png)
+![Screenshot](window.png)
 
 A triangle-shaped window mask driven by HDMA, showing how per-scanline window
 boundary updates create non-rectangular shapes. Press **A**, **X**, or **B** to

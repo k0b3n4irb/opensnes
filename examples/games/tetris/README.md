@@ -2,7 +2,7 @@
 
 Classic Tetris game with Korobeiniki music.
 
-![Screenshot](screenshot.png)
+![Screenshot](tetris.png)
 
 ## Features
 

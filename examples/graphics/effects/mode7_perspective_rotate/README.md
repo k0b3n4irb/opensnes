@@ -1,6 +1,6 @@
 # Mode 7 rotating perspective — the full matrix, per scanline
 
-![Screenshot](screenshot.png)
+![Screenshot](mode7_perspective_rotate.png)
 
 Port of krom (Peter Lemon)'s **Mode7 Perspective** demo
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/Mode7/Perspective`).

@@ -179,7 +179,17 @@ gfx4snes -s 16 -p -i sprites.png
 # Convert with metasprite definition (for animation)
 gfx4snes -s 16 -p -T -X 32 -Y 48 -i character.png
 # Output: character.pic, character.pal, character_meta.inc
+
+# Convert against a committed palette (do not re-quantise)
+gfx4snes -s 8 -c master.pal -i tiles.png
 ```
+
+`-c <file.pal>` imposes a committed palette instead of quantising the
+image's own colours. The build **fails** — naming the offending colour —
+if the image uses any colour not in that palette. This is the fix for the
+"adding one tile re-quantises the whole palette and shifts every existing
+tile's hue" problem: author the palette once, commit it, and impose it on
+every conversion so a new tile can only reuse existing entries.
 
 Include the generated data in your assembly file:
 ```asm

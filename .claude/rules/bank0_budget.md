@@ -85,15 +85,20 @@ stay. So declare payload with the macro from `templates/assets.inc`,
 included automatically in every assembled file:
 
 ```asm
-ASSET_SECTION "townmap", 2
+ASSET_SECTION "townmap"
 town_map:    .incbin "res/town_map.bin"
 .ENDS
 ```
 
-Pick banks upward from 2 (bank 1 is often full — audio projects pack it
-with sample data) and group related assets rather than scattering them.
-The RPG went from 12 to **9902** free bytes in bank $00 this way, with a
-pixel-identical ROM.
+You do not pick a bank. The macro uses `SEMISUPERFREE BANKS 7-1`, so the
+linker tries the highest bank first and walks down; bank $00 is simply
+not a candidate. The RPG went from 12 to **9393** free bytes in bank $00
+this way, with a pixel-identical ROM.
+
+The list is literal because it must be: a `.DEFINE` is not expanded
+inside a `BANKS` clause (wlalink: "malformed BANKS list") and a bank
+outside the memory map is a hard link error ("out of range [0, 8]").
+Banks 1-7 exist in every ROM memory map the SDK ships.
 
 Every link now also prints how much declared payload ended up in bank
 $00 (`report_bank0_asset_payload` in `symmap.py`). It matches section
@@ -102,9 +107,29 @@ because an earlier heuristic version flagged `.text.bgSetMapPtr` for
 containing "map", and a report you cannot trust is worse than none.
 Sections that opt out of the macro are simply not counted.
 
-Issue #127 tracks the remaining piece: making non-bank-$00 the *default*
-placement rather than an opt-in. That is a chantier — it interacts with
-the audio examples, whose bank 1 is packed solid.
+### What still blocks making it the default
+
+Issue #127's remaining piece is non-bank-$00 placement for C const data
+(`.rodata.N`, emitted by QBE) without an opt-in. Measured 2026-07-22, it
+needs one of:
+
+- **a wla-dx change** — `SUPERFREE` searches banks ascending, so bank
+  $00 wins by construction. A search-order flag (or reversing it for
+  data sections) would flip the default with no per-project setup. This
+  is the clean answer and the only one that needs no knowledge of the
+  ROM layout at compile time. `compiler/wla-dx` currently carries **0
+  local patches**, so this is a deliberate fork decision, not a drive-by;
+- **or a generated per-layout macro** — QBE cannot emit `BANKS <list>`
+  because it does not know the bank count, and the list can be neither
+  a `.DEFINE` nor over-range. `make/common.mk` already generates
+  `project_config.inc`; it could generate the section-declaration macro
+  with a literal list matching the memory map in use. Workable, but it
+  moves ROM-layout knowledge into the build system.
+
+The 2026-05-14 attempt (`.SECTION X BANK 1 FREE` in qbe `emitdat`) failed
+for a different reason — a single hardcoded bank, which the audio
+examples fill with sample data. `SEMISUPERFREE`'s fallback list is what
+that attempt was missing.
 
 ## When to bump `BANK0_FAIL_THRESHOLD` tighter
 

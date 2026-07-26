@@ -1,6 +1,6 @@
 # Transparent Window -- Color Math + HDMA
 
-![Screenshot](screenshot.png)
+![Screenshot](transparent_window.png)
 
 A semi-transparent darkened rectangle rendered over a background image using
 SNES color math and HDMA-driven window boundaries. No input -- the effect is

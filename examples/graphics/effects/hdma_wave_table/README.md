@@ -1,6 +1,6 @@
 # HDMA Wave Table
 
-![Screenshot](screenshot.png)
+![Screenshot](hdma_wave_table.png)
 
 Builds a raw HDMA table by hand in C and animates it krom-style: the table is
 written once, and each VBlank only the table **start pointer** advances by one

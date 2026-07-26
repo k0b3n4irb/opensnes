@@ -13,6 +13,11 @@
 .ROMBANKSIZE $8000          ; 32KB banks (LoROM)
 .ROMBANKS 8                 ; Match ROM configuration
 
+; Bank search order for ASSET_SECTION payload: highest first, so bulk
+; read-only data lands away from the code bank without anyone picking
+; a number by hand. Must name only banks this memory map declares.
+.DEFINE ASSET_BANKS "7-1"
+
 ; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
 .ASCIITABLE
 MAP ' ' TO '~' = ' '

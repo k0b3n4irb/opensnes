@@ -27,13 +27,12 @@
 ;
 ; ## Use
 ;
-;     ASSET_SECTION "townmap", 2
+;     ASSET_SECTION "townmap"
 ;     town_map:    .incbin "res/town_map.bin"
 ;     .ENDS
 ;
-; Pick banks upward from 2 (bank 1 is often taken — audio projects pack
-; it with sample data). Group related assets in one bank rather than
-; scattering them: a bank is 32 KB and you have plenty.
+; The linker packs them itself, highest bank first, falling back down
+; toward 1. Bank $00 is not in the list, which is the whole point.
 ;
 ; If you get it wrong, the post-link check tells you: every build prints
 ; how much asset data ended up in bank $00, and the existing ratchet
@@ -45,11 +44,35 @@
 ; in bank $00 — the compiler emits `lda.l $0000,x` for it and will read
 ; garbage from anywhere else. The build's bank-blind check catches that
 ; case, so if you are unsure: move it out, and let the build tell you.
+;
+; ## HiROM caveat (untested, latent — see the chantier note)
+;
+; This macro is verified on LoROM and SA-1. On HiROM the placement below
+; puts payload at offset $0000 in a low-numbered bank, and a HiROM
+; experiment (2026-07-25) showed generic far access — `dmaCopyVram`, a
+; `:sym` far pointer — to that location reading garbage, while a FORCE
+; section at offset $8000 (how snesmod places SOUNDBANK) reads fine. No
+; shipped example uses ASSET_SECTION on HiROM, so this is latent, not a
+; live bug. If you are the first: do NOT trust it on HiROM until
+; `.claude/notes/chantiers/127_rodata_default_placement.md` is resolved —
+; verify the DMA'd bytes with luna, or keep the data in bank $00.
 ;----------------------------------------------------------------------
 
+; SEMISUPERFREE with an explicit bank order: the linker tries 7 first and
+; walks down, so payload packs away from the code bank and bank $00 is
+; never a candidate. You do not pick a bank — an earlier version of this
+; macro made you, which just moved the guesswork to the caller.
+;
+; The list is literal because it has to be: a `.DEFINE` is not expanded
+; inside a BANKS clause (wlalink reports "malformed BANKS list"), and a
+; bank outside the memory map is a hard link error ("out of range").
+; 1-7 exist in every ROM memory map this SDK ships (LoROM, HiROM and
+; SA-1 all declare 8 banks); if you write your own with fewer, narrow
+; this list to match.
+;
 ; The section name is prefixed with "asset." so the post-link report can
 ; identify declared payload exactly, instead of guessing from names (an
 ; earlier heuristic flagged `.text.bgSetMapPtr` because it contains "map").
-.MACRO ASSET_SECTION ARGS name, bnk
-.SECTION "asset.\1" FREE BANK bnk
+.MACRO ASSET_SECTION ARGS name
+.SECTION "asset.\1" SEMISUPERFREE BANKS ASSET_BANKS
 .ENDM

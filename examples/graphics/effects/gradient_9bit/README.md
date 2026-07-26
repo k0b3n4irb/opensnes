@@ -1,6 +1,6 @@
 # "9-bit" gradient — brightness-dithered backdrop
 
-![Screenshot](screenshot.png)
+![Screenshot](gradient_9bit.png)
 
 Port of krom (Peter Lemon)'s **RedSpace9BitHDMA** demo
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/HDMA/RedSpace9BitHDMA`).

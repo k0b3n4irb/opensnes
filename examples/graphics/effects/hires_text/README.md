@@ -1,6 +1,6 @@
 # Hi-res text — BG Mode 5 + interlace (512 × 448)
 
-![Screenshot](screenshot.png)
+![Screenshot](hires_text.png)
 
 Port of krom (Peter Lemon)'s **InterlaceFont** demo
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/Interlace/InterlaceFont`).

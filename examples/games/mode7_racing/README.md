@@ -1,6 +1,6 @@
 # mode7_racing — an F-Zero-style mini game
 
-![Screenshot](screenshot.png)
+![Screenshot](mode7_racing.png)
 
 A drivable race circuit on the Mode 7 plane (#4, part 1). The car
 stays fixed low on screen and the **world** rotates and scrolls under

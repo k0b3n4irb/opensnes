@@ -5,7 +5,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](transparency.png)
 
 ## Build & Run
 

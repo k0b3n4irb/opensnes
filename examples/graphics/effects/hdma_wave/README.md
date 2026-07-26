@@ -6,7 +6,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](hdma_wave.png)
 
 ## Controls
 

@@ -3,7 +3,6 @@
 > Sound effect playback with pitch control. Five instrument samples on the buttons,
 > three pitch settings on the D-pad. No background music -- effects only.
 
-![Screenshot](screenshot.png)
 
 ## Build & Run
 

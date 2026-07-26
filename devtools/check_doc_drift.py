@@ -492,6 +492,78 @@ def check_asm_bank_comments() -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# Check: example screenshot basenames must be unique across READMEs
+#
+# Doxygen flattens every markdown-referenced image into the single html/
+# output dir keyed by BASENAME. Two example READMEs referencing the same
+# basename (the historical `screenshot.png`) collide there — one image ends
+# up served on every page (the Mario-on-audio-pages bug). Enforce that each
+# example's screenshot has a unique basename so the collision cannot return.
+# --------------------------------------------------------------------------
+
+_README_IMG_RE = re.compile(r"!\[[^\]]*\]\(([^)]+?\.png)\)")
+
+
+def _doxyfile_image_path_dirs() -> set[str]:
+    """The set of directories (repo-relative) listed in Doxyfile IMAGE_PATH."""
+    dox = repo_path("docs/Doxyfile")
+    if not dox.is_file():
+        return set()
+    text = dox.read_text(encoding="utf-8", errors="replace")
+    m = re.search(r"^IMAGE_PATH\s*=(.*?)(?=^\S|\Z)", text, re.M | re.S)
+    if not m:
+        return set()
+    dirs = set()
+    for tok in m.group(1).replace("\\", " ").split():
+        # IMAGE_PATH entries are relative to docs/, e.g. ../examples/text/foo
+        dirs.add(tok.lstrip("./").replace("../", "", 1) if tok.startswith("../")
+                 else tok)
+    return dirs
+
+
+def check_screenshot_basenames() -> list[str]:
+    ex_root = repo_path("examples")
+    if not ex_root.is_dir():
+        return []
+    image_dirs = _doxyfile_image_path_dirs()
+    seen: dict[str, str] = {}
+    drifts: list[str] = []
+    for readme in sorted(ex_root.rglob("README.md")):
+        text = readme.read_text(encoding="utf-8", errors="replace")
+        rel = readme.relative_to(repo_path("."))
+        exdir = readme.parent
+        exrel = exdir.relative_to(repo_path(".")).as_posix()
+        for m in _README_IMG_RE.finditer(text):
+            ref = m.group(1)
+            base = ref.rsplit("/", 1)[-1]
+            # 1. unique basename (Doxygen flattens by basename)
+            if base in seen:
+                drifts.append(
+                    f"{rel}: screenshot basename '{base}' also used by "
+                    f"{seen[base]} — Doxygen flattens images by basename, so "
+                    f"identical names collide site-wide. Name it after the "
+                    f"example's folder (e.g. <example>.png)."
+                )
+            else:
+                seen[base] = str(rel)
+            # 2. the referenced image file must exist
+            if "/" not in ref and not (exdir / ref).is_file():
+                drifts.append(
+                    f"{rel}: references screenshot '{ref}' but the file does "
+                    f"not exist in {exrel}/."
+                )
+            # 3. the example dir must be in Doxyfile IMAGE_PATH, or Doxygen
+            #    (which does not recurse IMAGE_PATH) will not copy the image.
+            if image_dirs and exrel not in image_dirs:
+                drifts.append(
+                    f"{rel}: {exrel} references a screenshot but is not in "
+                    f"docs/Doxyfile IMAGE_PATH — the image will not be copied "
+                    f"to the site. Add '../{exrel}' to IMAGE_PATH."
+                )
+    return drifts
+
+
+# --------------------------------------------------------------------------
 # Check 4: ABI.md C prototypes vs canonical headers
 # --------------------------------------------------------------------------
 
@@ -669,6 +741,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_category_sums(canonical_n))
     all_drifts.extend(check_roadmap_footer_date(canonical_date))
     all_drifts.extend(check_asm_bank_comments())
+    all_drifts.extend(check_screenshot_basenames())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

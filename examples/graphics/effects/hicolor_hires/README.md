@@ -1,6 +1,6 @@
 # HiColor × pseudo-hires — 1792 palette slots at 512 pixels
 
-![Screenshot](screenshot.png)
+![Screenshot](hicolor_hires.png)
 
 Port of krom (Peter Lemon)'s **HiColor64PerTileRowPseudoHiRes**
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/HDMA/HiColor64PerTileRowPseudoHiRes`)

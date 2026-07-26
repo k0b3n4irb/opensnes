@@ -2,7 +2,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](fading.png)
 
 Screen brightness transitions for fade in/out effects.
 

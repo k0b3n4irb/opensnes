@@ -2,7 +2,7 @@
 
 > Auto-rotating wireframe cube at 60 FPS — Star Fox style 3D on SNES
 
-![Screenshot](screenshot.png)
+![Screenshot](superfx_3d.png)
 
 ## Emulator Compatibility
 

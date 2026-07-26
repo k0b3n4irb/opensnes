@@ -1,6 +1,6 @@
 # aim_target
 
-![Screenshot](screenshot.png)
+![Screenshot](aim_target.png)
 
 Live demonstration of the four math primitives a 2D action game leans on
 the most: **`sqrt16`** (pixel distance), **`atan2_8`** (8-bit angle to a

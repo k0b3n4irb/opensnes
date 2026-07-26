@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.31.0
+## Current Status: post-v0.32.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
@@ -122,6 +122,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `input` | Joypad, mouse, Super Scope, MultiPlayer5 | core |
 | `text`, `text4bpp` | Text rendering (2bpp and 4bpp) | core |
 | `snesmod` | Tracker music and SFX (.it format, multi-bank) | core |
+| `audio`, `apu` | Audio v2 engine: pure-C driver over the raw APU (SPC700) path | core |
+| `anim` | Declarative data-driven frame animation player | core |
 | `mode7` | Mode 7 rotation/scaling | core |
 | `window` | Window masking | core |
 | `colormath` | Transparency, color blending | core |
@@ -131,6 +133,10 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `mosaic` | Mosaic pixelation | core |
 | `lzss` | LZ77 decompression to VRAM | core |
 | `map` | Tile-based map engine with streaming | core |
+| `fixed32` | 16.16 signed fixed-point math for world-space coordinates | core |
+| `gameloop` | Opt-in game-loop framework (VBlank-synced update/render) | core |
+| `scene` | Opt-in scene/state stack (push/pop game scenes) | core |
+| `panel` | Opt-in 9-slice bordered panels on a background layer | core |
 | `debug` | Nocash messages, Mesen breakpoints | core |
 | `video` | Video mode and display control | core |
 | `sa1` | SA-1 enhancement-chip helpers | experimental |
@@ -286,6 +292,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-07-22. Anchored claims (version, examples count, framework
+*Last updated: 2026-07-26. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

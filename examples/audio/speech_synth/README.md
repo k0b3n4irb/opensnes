@@ -1,6 +1,5 @@
 # speech_synth — the SNES says "OPEN SNES"
 
-![Screenshot](screenshot.png)
 
 Port of krom (Peter Lemon)'s **SpeechSynth**
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `SPC700/SpeechSynth`).

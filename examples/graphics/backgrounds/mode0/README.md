@@ -2,7 +2,7 @@
 
 Demonstrates BG Mode 0 with four independent background layers, each using a 4-color (2bpp) palette.
 
-![Screenshot](screenshot.png)
+![Screenshot](mode0.png)
 
 ## Description
 

@@ -1,6 +1,6 @@
 # Multi-window HDMA — both windows animated per scanline
 
-![Screenshot](screenshot.png)
+![Screenshot](window_multi_hdma.png)
 
 Port of krom (Peter Lemon)'s **WindowMultiHDMA** demo
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/Window/WindowMultiHDMA`).

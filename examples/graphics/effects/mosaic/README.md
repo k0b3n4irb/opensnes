@@ -2,7 +2,7 @@
 
 ![Demo](demo.gif)
 
-![Screenshot](screenshot.png)
+![Screenshot](mosaic.png)
 
 ## What This Example Shows
 

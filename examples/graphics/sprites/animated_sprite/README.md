@@ -1,6 +1,6 @@
 # Animated Sprite -- Direction States and Sprite Sheets
 
-![Screenshot](screenshot.png)
+![Screenshot](animated_sprite.png)
 
 ## What This Example Shows
 

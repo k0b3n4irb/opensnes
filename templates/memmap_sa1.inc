@@ -14,6 +14,11 @@
 .ROMBANKSIZE $8000          ; 32KB banks (LoROM-based)
 .ROMBANKS 8                 ; Match ROM configuration
 
+; Bank search order for bulk read-only payload: highest first, so it lands
+; away from the code bank. A STRING define — a bare 7-1 would be read as an
+; expression and BANKS needs the literal text.
+.DEFINE ASSET_BANKS "7-1"
+
 ; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
 .ASCIITABLE
 MAP ' ' TO '~' = ' '

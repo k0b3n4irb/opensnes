@@ -146,7 +146,7 @@ python3 devtools/symmap/symmap.py --check-overlap game.sym
 **Checklist**:
 ```c
 // 1. Initialize OAM
-oamInit();
+oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
 
 // 2. Load sprite graphics to VRAM
 oamInitGfxSet(sprite_gfx, sprite_gfx_end - sprite_gfx,

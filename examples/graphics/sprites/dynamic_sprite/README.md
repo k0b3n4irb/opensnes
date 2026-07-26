@@ -1,6 +1,6 @@
 # Dynamic Sprite -- VRAM Streaming for Animated Sprites
 
-![Screenshot](screenshot.png)
+![Screenshot](dynamic_sprite.png)
 
 ## What This Example Shows
 

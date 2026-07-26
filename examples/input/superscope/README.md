@@ -1,6 +1,6 @@
 # Super Scope
 
-![Screenshot](screenshot.png)
+![Screenshot](superscope.png)
 
 Light gun detection, calibration via PPU H/V counters, and fire tracking with a red dot sprite.
 

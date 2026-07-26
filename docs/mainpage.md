@@ -33,9 +33,13 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_collision -- Collision Detection
 
+@subpage tutorial_map -- Scrolling Maps & the Tiled Pipeline
+
 @subpage tutorial_audio -- Audio & Music
 
 @subpage tutorial_game_states -- Game States & Transitions
+
+@subpage tutorial_panel -- 9-Slice Panels (dialog boxes, HUDs)
 
 @subpage tutorial_dma -- DMA (direct memory access)
 
@@ -56,6 +60,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
 @subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
+
+@subpage tutorial_debugging -- Debugging with luna
 
 ## Hardware Reference
 

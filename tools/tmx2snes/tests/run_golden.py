@@ -17,6 +17,10 @@ What the cases pin:
   - the `-e` entity header. Object types become macro prefixes, custom
     properties become tables, and a lone object of its type also gets
     scalar forms.
+  - the `-C` per-cell collision grid. Verified against the RPG's
+    hand-written Python converter: identical in 4094 of 4096 cells, the
+    two exceptions being the villagers' own tiles, which the game blocks
+    as game logic and the tool deliberately does not.
   - that a pretty-printed .tmj parses at all (issue #125): the fixture is
     indented, which cute_tiled cannot read without the minify pass.
 
@@ -40,8 +44,8 @@ TOOL = REPO / "bin" / "tmx2snes"
 
 # (map fixture, extra flags, expected outputs — all byte-compared)
 CASES = [
-    ("town.tmj", ["-e", "-Q"],
-     ["BG1.q16", "town.inc", "BG1.m16", "town.b16", "town.o16"]),
+    ("town.tmj", ["-e", "-Q", "-C"],
+     ["BG1.q16", "BG1.c16", "town.inc", "BG1.m16", "town.b16", "town.o16"]),
     # no flags: the historical outputs must be untouched by the additions
     ("town.tmj", [], ["BG1.m16", "town.b16", "town.o16"]),
 ]

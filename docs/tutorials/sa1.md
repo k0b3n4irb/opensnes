@@ -58,7 +58,7 @@ the SA-1 reads it, computes results, writes them back, and signals "done."
 > - The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
 >   and fullsnes say **bit = 1 PROTECTS** a 256-byte page, so `$00` = all
 >   writable, `$FF` = all protected.
-> - **Mesen2** (our accuracy reference) and **snes9x** behave the *opposite*
+> - **Mesen2** (a GUI reference emulator) and **snes9x** behave the *opposite*
 >   way: writing `$FF` leaves I-RAM writable (the crt0 self-test passes,
 >   `sa1_status=$A5`); writing `$00` blocks the writes and the self-test
 >   fails.
@@ -360,5 +360,5 @@ it reads input, talks to the PPU/APU, and delegates heavy math to the SA-1.
 
 ## Further Reading
 
-- [SA-1 Register Reference](../../.claude/SA-1.md) — complete register documentation
+- [SA-1 Register Reference](../hardware/REGISTERS.md#sa-1-registers-2200-230e) — register tables and programming details
 - [sa1.h API](../../lib/include/snes/sa1.h) — library header with register macros

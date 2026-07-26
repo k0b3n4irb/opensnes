@@ -7,7 +7,7 @@ Converts Tiled map editor JSON exports (.tmj) to SNES binary formats compatible 
 ## Usage
 
 ```bash
-tmx2snes [-e] [-Q] [-q] <map.tmj> <tileset.map>
+tmx2snes [-e] [-Q] [-C] [-q] <map.tmj> <tileset.map>
 ```
 
 - `map.tmj` — Tiled map exported as JSON (.tmj format)
@@ -35,6 +35,28 @@ bgSetMapPtr(0, VRAM_TOWN_MAP, SC_64x64);
 
 The map must be exactly 64x64; any other size has no quadrant layout and
 the tool says so rather than emitting something plausible.
+
+### `-C` — a per-cell collision grid
+
+`.b16` is per **tileset tile**: 32 bytes for a 16-tile tileset, which a
+game indexes after reading the tile id back out of the tilemap. That is
+what the `map` module wants. A game holding its own map in ROM and
+asking *"is the tile at (x, y) solid?"* wants the answer already
+flattened. `-C` writes `<layer>.c16`, one byte per map cell, indexed
+directly — the shape `collideTile()` takes:
+
+```c
+if (collideTile(px, py, town_collision, 64) == 0) { /* walkable */ }
+```
+
+It costs `w * h` bytes instead of 32 — 4 KB for a 64×64 map, which
+belongs outside bank $00 anyway (`ASSET_SECTION`).
+
+It reflects the map only. Whether an NPC blocks the tile it stands on is
+a game decision — some games let you walk through them — so the tool
+leaves it to you. Checked against a hand-written converter on a 64×64
+map: identical in 4094 of 4096 cells, the two exceptions being exactly
+the villagers' tiles.
 
 ### `-e` — the Entities layer as C defines
 
@@ -77,6 +99,7 @@ Tiled, give it a `text` property, rebuild.
 |-----------|---------|-------------------|
 | `<layer>.m16` | Tilemap data (tile indices + flip bits) | `mapLoad()` arg 1 |
 | `<layer>.q16` | Quadrant-ordered 64x64 tilemap (`-Q`) | direct `dmaCopyVram` |
+| `<layer>.c16` | Per-cell collision grid (`-C`) | `collideTile()` |
 | `<map>.inc` | Entities as C defines (`-e`) | `#include` it |
 | `<base>.t16` | Tile properties (palette + priority per tile) | `mapLoad()` arg 2 |
 | `<base>.b16` | Tile attributes (collision types per tile) | `mapLoad()` arg 3 |

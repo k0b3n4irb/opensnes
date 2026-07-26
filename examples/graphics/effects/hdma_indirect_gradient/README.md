@@ -1,6 +1,6 @@
 # HDMA Indirect Gradient
 
-![Screenshot](screenshot.png)
+![Screenshot](hdma_indirect_gradient.png)
 
 A 32-band red gradient rendered entirely by an **indirect** HDMA channel on
 the naked backdrop — no BG layers, no tiles, no assets, zero per-frame CPU.

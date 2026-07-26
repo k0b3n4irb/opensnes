@@ -2,7 +2,7 @@
 
 This example demonstrates platformer physics with slope collision detection. Mario walks, jumps, and slides along diagonal terrain using the `objCollidMapWithSlopes()` function from the OpenSNES object engine. It combines the map engine (scrolling tiled backgrounds), the object engine (entity management with callbacks), and the dynamic sprite engine (animated character rendering) into a complete platformer framework. No audio -- the focus is on collision mechanics.
 
-![Screenshot](screenshot.png)
+![Screenshot](slopemario.png)
 
 ## What You'll Learn
 

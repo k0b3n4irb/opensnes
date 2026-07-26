@@ -2,7 +2,7 @@
 
 Demonstrates BG Mode 3 with a single 256-color (8bpp) background layer.
 
-![Screenshot](screenshot.png)
+![Screenshot](mode3.png)
 
 ## Description
 

@@ -2,6 +2,47 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.32.0] — 2026-07-26
+
+The follow-through release. The #127/#128 asset work grew its second
+half, the documentation caught up with the code, and the toolchain moved
+onto the upstream wla-dx v10.7 release.
+
+### Added
+- feat(build,examples): `ASSET_SECTION` picks the bank itself.
+  `SEMISUPERFREE BANKS 7-1` walks from the top bank down, so declared
+  payload never lands in bank $00 unless nothing else fits — no
+  per-project bank choice, no silent code-bank pressure. Every link now
+  reports how much declared payload ended up in bank $00 (#127)
+- feat(tools): `tmx2snes -C` emits a per-cell collision grid — one byte
+  per map cell from the Tiled collision layer — alongside the existing
+  `-e`/`-Q` outputs, with a golden in `make test-tools` (#128)
+
+### Changed
+- build(submodule): wla-dx pin advanced to the upstream **v10.7**
+  release. The SPAN regression that blocks a straight follow of `master`
+  is not present in v10.7; it is root-caused, reduced to a minimal repro,
+  and filed upstream as vhelin/wla-dx#729 (notes in `.claude/notes/tech`)
+- docs: new `map` and `panel` tutorials (both modules shipped without
+  one); `game_states` reframed to lead with the `scene` stack and keep
+  the manual `switch` as "under the hood"; the example index lists the
+  full 74 (two complete games were invisible); stale counts and the
+  Mesen2→luna narrative corrected across the guides
+
+### Fixed
+- fix(docs): every example screenshot has a unique basename. All 74
+  READMEs referenced `screenshot.png`; Doxygen flattens images by
+  basename, so one capture (Mario, from `mapandobjects`) served every
+  page — audio pages included. Audio pages now carry no screenshot (no
+  visual to show) and three effect captures were regenerated to show
+  their actual effect. `IMAGE_PATH` lists each example dir and a
+  doc-drift guard fails the build on a duplicate basename, a missing
+  file, or a dir absent from `IMAGE_PATH`
+- fix(docs): tutorial claims that no longer matched the code — the
+  removed "DMA source must live in bank $00" restriction, `oamInit()`
+  written without its arguments (would not compile), dead `.claude/*.md`
+  links, and Mesen2 described as the accuracy reference (luna is)
+
 ## [0.31.0] — 2026-07-22
 
 Written by building a real game. The RPG template (#7) was the forcing

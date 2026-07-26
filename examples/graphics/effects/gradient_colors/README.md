@@ -1,6 +1,6 @@
 # Gradient Colors -- HDMA Color Gradients
 
-![Screenshot](screenshot.png)
+![Screenshot](gradient_colors.png)
 
 ## What This Example Shows
 

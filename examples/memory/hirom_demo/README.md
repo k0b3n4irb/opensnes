@@ -1,6 +1,6 @@
 # HiROM Demo -- Understanding SNES Memory Mapping
 
-![Screenshot](screenshot.png)
+![Screenshot](hirom_demo.png)
 
 ## What This Example Shows
 

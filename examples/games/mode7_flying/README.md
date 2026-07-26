@@ -1,6 +1,6 @@
 # mode7_flying — a Pilotwings-style demo
 
-![Screenshot](screenshot.png)
+![Screenshot](mode7_flying.png)
 
 A plane over a Mode 7 landscape (#4, part 2). The core trick:
 **altitude drives the Mode 7 scale** — climbing zooms the terrain out,

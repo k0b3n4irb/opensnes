@@ -2,7 +2,6 @@
 
 > HiROM music playback via SNESMOD
 
-![Screenshot](screenshot.png)
 
 ## Build & Run
 

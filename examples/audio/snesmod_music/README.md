@@ -1,6 +1,5 @@
 # SNESMOD Music Example
 
-![Screenshot](screenshot.png)
 
 Full music playback using SNESMOD, a tracker-based audio engine for the SNES.
 

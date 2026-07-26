@@ -66,7 +66,15 @@ Visual effects using HDMA, color math, and hardware windows.
 | @subpage examples_graphics_effects_parallax_scrolling | HDMA parallax scrolling |
 | @subpage examples_graphics_effects_transparency | Color math (add/subtract blending) |
 | @subpage examples_graphics_effects_window | Hardware window masking |
+| @subpage examples_graphics_effects_window_multi_hdma | Both hardware windows animated per scanline (krom port) |
 | @subpage examples_graphics_effects_transparent_window | Color math + HDMA windowed transparency |
+| @subpage examples_graphics_effects_direct_color | Direct color mode: the 8bpp pixel byte IS the RGB color |
+| @subpage examples_graphics_effects_gradient_9bit | Brightness-dithered "9-bit" gradient backdrop (krom port) |
+| @subpage examples_graphics_effects_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
+| @subpage examples_graphics_effects_hicolor_blend | 3840 colors via RGB channel-split blend (krom port) |
+| @subpage examples_graphics_effects_hicolor_hires | HiColor at 512-pixel pseudo-hires (krom port) |
+| @subpage examples_graphics_effects_hires_text | Mode 5 + interlace hi-res text (512×448) (krom port) |
+| @subpage examples_graphics_effects_mode7_perspective_rotate | Full Mode 7 matrix rotation per scanline (krom port) |
 
 ---
 
@@ -93,6 +101,11 @@ Music and sound effects via SNESMOD (Impulse Tracker format).
 | @subpage examples_audio_snesmod_music_hirom | Same workflow as snesmod_music but built for HiROM |
 | @subpage examples_audio_snesmod_music_large | Large soundbank: multi-bank module split |
 | @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
+| @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
+| @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
+| @subpage examples_audio_play_noise | A drum kit from the S-DSP white-noise generator (krom port) |
+| @subpage examples_audio_pitch_mod | Hardware vibrato via pitch modulation (PMON) (krom port) |
+| @subpage examples_audio_speech_synth | BRR speech playback: the SNES says "OPEN SNES" (krom port) |
 
 ---
 
@@ -131,6 +144,7 @@ Fundamental game mechanics.
 | @subpage examples_basics_random | LCG pseudo-random number generation |
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_timer | Frame-accurate timers with VBlank counters |
+| @subpage examples_basics_fix32_orbit | 16.16 fixed-point API: a sprite orbits the screen centre |
 
 ---
 
@@ -145,6 +159,9 @@ Complete game projects combining multiple subsystems.
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
 | @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |
 | @subpage examples_games_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
+| @subpage examples_games_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
+| @subpage examples_games_mode7_flying | Pilotwings-style flight: altitude drives Mode 7 scale |
+| @subpage examples_games_mode7_racing | F-Zero-style racer on the rotating Mode 7 plane |
 
 ---
 

@@ -2,7 +2,7 @@
 
 > 128 dots in Lissajous sine patterns computed by SA-1 at 10.74 MHz
 
-![Screenshot](screenshot.png)
+![Screenshot](sa1_starfield.png)
 
 ## Build & Run
 

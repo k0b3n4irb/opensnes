@@ -2,7 +2,7 @@
 
 This example demonstrates how to compose large characters from multiple hardware sprites using the metasprite system. The SNES OAM supports only two sprite sizes per frame (selected via register $2101), so characters larger than one hardware sprite must be assembled from several. This example displays hero characters at three different OBJ size configurations -- 8x8/16x16, 8x8/32x32, and 16x16/32x32 -- and lets you switch between them with the D-PAD to see how the same character is built from different hardware sprite sizes.
 
-![Screenshot](screenshot.png)
+![Screenshot](metasprite.png)
 
 ## What You'll Learn
 

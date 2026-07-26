@@ -82,6 +82,12 @@ open -a Mesen hello_world.sfc  # macOS
 start Mesen.exe hello_world.sfc  # Windows
 ```
 
+> **Note:** `mesen` must be on your `PATH` for the Linux command above. Install
+> Mesen from [mesen.ca](https://www.mesen.ca/) and either add its directory to
+> `PATH` or alias it (`alias mesen=~/Mesen/Mesen`). No emulator installed? The
+> SDK's own `luna` backend also plays ROMs: `luna hello_world.sfc` (install it
+> once with `scripts/install-luna.sh`).
+
 You should see "Hello World!" on screen.
 
 ### A5. Create Your Own Project
@@ -280,7 +286,7 @@ This takes a few minutes. Expected output:
 Building cc65816 compiler...
 Building WLA-DX assembler...
 Building OpenSNES library...
-Building examples... (56 ROMs)
+Building examples... (74 ROMs)
 OpenSNES SDK build complete!
 ```
 
@@ -323,6 +329,10 @@ ls examples/*/
 
 ## Tutorials
 
+The full set (all 19 tutorials, always current) is on the docs home page —
+see @ref index "the tutorial navigation in mainpage". The most common
+starting points:
+
 | Topic | Guide |
 |-------|-------|
 | Graphics & Backgrounds | [tutorials/graphics.md](tutorials/graphics.md) |
@@ -331,8 +341,18 @@ ls examples/*/
 | Collision Detection | [tutorials/collision.md](tutorials/collision.md) |
 | Input Handling | [tutorials/input.md](tutorials/input.md) |
 | Audio & Music | [tutorials/audio.md](tutorials/audio.md) |
+| Math & Fixed-Point | [tutorials/math.md](tutorials/math.md) |
+| DMA | [tutorials/dma.md](tutorials/dma.md) |
+| HDMA Effects | [tutorials/hdma.md](tutorials/hdma.md) |
+| Color Math | [tutorials/colormath.md](tutorials/colormath.md) |
+| Hardware Windows | [tutorials/window.md](tutorials/window.md) |
+| Mosaic | [tutorials/mosaic.md](tutorials/mosaic.md) |
+| Mode 7 | [tutorials/mode7.md](tutorials/mode7.md) |
 | Game States | [tutorials/game_states.md](tutorials/game_states.md) |
+| SRAM Saves | [tutorials/sram.md](tutorials/sram.md) |
 | SA-1 Coprocessor | [tutorials/sa1.md](tutorials/sa1.md) |
+| SuperFX (GSU) | [tutorials/superfx.md](tutorials/superfx.md) |
+| Debugging | [tutorials/debugging.md](tutorials/debugging.md) |
 
 ## Troubleshooting
 

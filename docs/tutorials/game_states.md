@@ -15,9 +15,59 @@ A game state represents what the game is currently doing. Most SNES games cycle 
 
 Each state has its own update logic, and transitions between states involve screen fades, VRAM reloads, or both.
 
-## Simple State Machine
+## The scene stack (recommended) — `scene` module
 
-The standard SNES pattern uses a state variable and a `switch` in the main loop. Define states as constants and dispatch each frame:
+Before hand-rolling a state variable, reach for the opt-in `scene` module
+(`LIB_MODULES += scene`). It gives you a stack of `Scene` structs — each a
+pair of callbacks — that push and pop, so "title → play → pause → back to
+play" is a data structure instead of an `enum` and a `switch`:
+
+```c
+#include <snes/scene.h>
+
+static void title_init(void);   static void title_update(void);
+static void play_init(void);    static void play_update(void);
+static void pause_update(void);
+
+static const Scene title = { title_init, title_update };
+static const Scene play  = { play_init,  play_update  };
+static const Scene pause = { NULL,       pause_update };   // init may be NULL
+
+// in title_update:  if (start_pressed) scenePush(&play);
+// in play_update:   if (start_pressed) scenePush(&pause);
+// in pause_update:  if (start_pressed) scenePop();        // back to play, unchanged
+```
+
+- **`init`** runs once when a scene is first pushed — load its tiles /
+  palettes here (it happens before the first `WaitForVBlank`). It is **not**
+  re-run when a scene is resumed after a pop, so a pause overlay that pops
+  back to `play` leaves the game exactly as it was.
+- **`update`** runs every VBlank while the scene is on top. A suspended
+  scene (one below the top) gets no callbacks — that is your pause-freeze
+  for free.
+- **`scenePush`/`scenePop`** record the change; the new top's `init`/`update`
+  dispatch on the next VBlank. To *replace* rather than stack, call
+  `scenePop(); scenePush(&next);`.
+
+Pair it with **`gameLoopRun`** (`gameloop` module) so you don't even write
+the `while (1) WaitForVBlank()` loop:
+
+```c
+GameLoopConfig cfg = { .init = onInit, .update = onUpdate };
+gameLoopRun(&cfg);   // never returns
+```
+
+`examples/basics/scene_stack` is the worked example: title → counter → pause
+overlay, three `Scene` structs, no hand-rolled dispatch. Prefer this for new
+games — it is the approach the manual pattern below exists to replace.
+
+## The manual state machine (under the hood)
+
+The classic SNES pattern uses a state variable and a `switch` in the main
+loop. It is what `scene` is built on top of, and it is still the right tool
+when you need a custom rhythm (half-rate updates, a bespoke transition) or
+are reading the shipped games `tetris`/`breakout`, which use it directly.
+Define states as constants and dispatch each frame:
 
 ```c
 #include <snes.h>
@@ -322,6 +372,8 @@ static void stateGameOver(void) {
 
 ## Next Steps
 
+- @ref scene.h "Scene stack API" · @ref gameloop.h "Game loop API" —
+  the recommended framework, `examples/basics/scene_stack`
 - @ref tutorial_graphics "Graphics & Backgrounds"
 - @ref tutorial_sprites "Sprites & Animation"
 - @ref tutorial_input "Controller Input"

@@ -1,6 +1,6 @@
 # "3840 colors" — RGB channel-split blend
 
-![Screenshot](screenshot.png)
+![Screenshot](hicolor_blend.png)
 
 Port of krom (Peter Lemon)'s **HiColor3840**
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/Blend/HiColor/HiColor3840`).

@@ -1,6 +1,6 @@
 # direct_color — the pixel byte IS the color
 
-![Screenshot](screenshot.png)
+![Screenshot](direct_color.png)
 
 Effects arc 4/7. Direct color mode (CGWSEL bit 0, exposed as
 `colorMathSetDirectColor()`) makes the PPU read 8bpp BG pixels as

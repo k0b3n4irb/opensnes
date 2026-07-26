@@ -1,6 +1,5 @@
 # play_noise — a drum kit with zero samples
 
-![Screenshot](screenshot.png)
 
 Port of krom (Peter Lemon)'s **PlayNoise** demo. The S-DSP has a
 built-in white-noise generator: set a voice's `NON` flag and the voice

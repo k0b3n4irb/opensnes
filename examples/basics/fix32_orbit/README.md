@@ -1,6 +1,6 @@
 # fix32_orbit
 
-![Screenshot](screenshot.png)
+![Screenshot](fix32_orbit.png)
 
 A single 8×8 sprite orbits the screen centre, driven entirely by the lib's
 **16.16 fixed-point** API (`<snes/fixed32.h>`). It's the simplest possible

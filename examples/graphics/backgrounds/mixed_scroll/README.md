@@ -6,7 +6,7 @@ while BG2 (a logo image) remains fixed in place. This demonstrates how the SNES
 PPU can scroll each background layer independently, which is the foundation for
 parallax effects, title screens with animated backgrounds, and layered game worlds.
 
-![Screenshot](screenshot.png)
+![Screenshot](mixed_scroll.png)
 
 ## What You'll Learn
 

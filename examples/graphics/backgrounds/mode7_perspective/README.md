@@ -1,6 +1,6 @@
 # Mode 7 Perspective -- Pseudo-3D Ground Effect
 
-![Screenshot](screenshot.png)
+![Screenshot](mode7_perspective.png)
 
 ## What This Example Shows
 

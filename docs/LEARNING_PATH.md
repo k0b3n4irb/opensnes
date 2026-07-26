@@ -1,7 +1,9 @@
 # Learn SNES Development {#learning_path}
 
-A progressive learning path through 74 examples, from your first ROM to complete games.
-Each example builds on concepts from earlier ones.
+A curated learning path through the 74 examples — a hand-picked progression
+from your first ROM to complete games, where each step builds on concepts from
+earlier ones. This is a selected subset, not the full list; for the exhaustive
+index see @ref examples_by_category.
 
 ## Level 1: First Steps
 
@@ -98,6 +100,10 @@ Tile maps, collision, and complete games.
 @subpage examples_games_mapandobjects
 
 @subpage examples_games_rpg
+
+@subpage examples_games_shmup_1942
+
+@subpage examples_games_mode7_flying
 
 ## Level 6: Enhancement Chips
 

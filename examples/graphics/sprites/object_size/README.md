@@ -1,6 +1,6 @@
 # Object Size -- All 6 SNES Sprite Size Modes
 
-![Screenshot](screenshot.png)
+![Screenshot](object_size.png)
 
 ## What This Example Shows
 

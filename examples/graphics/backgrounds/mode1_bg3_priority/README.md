@@ -1,6 +1,6 @@
 # Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds
 
-![Screenshot](screenshot.png)
+![Screenshot](mode1_bg3_priority.png)
 
 ## What This Example Shows
 

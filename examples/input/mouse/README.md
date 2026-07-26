@@ -6,7 +6,7 @@ responding to left/right button clicks. The SNES Mouse was a real accessory
 (bundled with Mario Paint) and a handful of commercial games supported it. This
 example covers the full workflow from detection to input handling.
 
-![Screenshot](screenshot.png)
+![Screenshot](mouse.png)
 
 ## What You'll Learn
 

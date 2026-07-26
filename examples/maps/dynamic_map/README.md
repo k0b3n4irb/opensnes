@@ -2,7 +2,7 @@
 
 This example demonstrates a custom tilemap-based sprite engine that treats BG1 as a grid of 16x16 "sprites" (not OAM hardware sprites). Each sprite is composed of tilemap entries pointing to 8bpp tile data in VRAM, allowing you to place, move, and scroll dozens of graphical elements on a background layer. The example supports two map modes (32x32 and 64x64) and displays a C64 Boulder Dash Rockford sprite from a pre-computed SNES 8bpp planar array, uploaded to VRAM while the screen is on.
 
-![Screenshot](screenshot.png)
+![Screenshot](dynamic_map.png)
 
 ## What You'll Learn
 

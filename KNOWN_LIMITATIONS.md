@@ -195,15 +195,16 @@ contested between documentation and emulators:**
 - The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
   and fullsnes say each bit *enables* write-protection for one 256-byte
   I-RAM page (bit=1 protects, bit=0 writable), i.e. `$00` = all writable.
-- **Mesen2** (this project's accuracy reference) and **snes9x** behave the
-  *opposite* way. Tested empirically (2026-06-20): with `$FF` the crt0
-  I-RAM self-test passes (`sa1_status=$A5`); with `$00` the SNES-CPU write
-  to I-RAM is blocked and the self-test fails (`sa1_status=$FF`).
+- **Mesen2** and **snes9x** behave the *opposite* way. Tested empirically
+  (2026-06-20): with `$FF` the crt0 I-RAM self-test passes (`sa1_status=$A5`);
+  with `$00` the SNES-CPU write to I-RAM is blocked and the self-test fails
+  (`sa1_status=$FF`). luna, now this project's accuracy backend, agrees:
+  `sa1_hello` reaches `sa1_status=$A5` with the `$FF` write.
 
-OpenSNES writes `$FF` because that is what works on the emulators we
-validate against. A `$00` "fix" (matching the wiki) **breaks** SA-1 in
-Mesen2/snes9x and was reverted — do not re-apply it without a real-hardware
-test that proves the wiki polarity.
+OpenSNES writes `$FF` because that is what works on the emulator we
+validate against (luna, and the earlier Mesen2/snes9x runs). A `$00` "fix"
+(matching the wiki) **breaks** SA-1 and was reverted — do not re-apply it
+without a real-hardware test that proves the wiki polarity.
 
 **Mitigation:** the crt0 self-test (`:639-647`: write `$42` to I-RAM, read
 back, fail to `sa1_status=$FF`) means a wrong choice is **detected** at

@@ -2,7 +2,7 @@
 
 Demonstrates the opt-in `scene` framework: title → counter → pause overlay, three Scene structs swapping via `scenePush` / `scenePop` instead of a hand-rolled state machine.
 
-![Screenshot](screenshot.png)
+![Screenshot](scene_stack.png)
 
 ## What You'll Learn
 

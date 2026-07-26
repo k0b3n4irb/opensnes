@@ -1,6 +1,6 @@
 # HiColor — 1792 colors from a 4bpp background
 
-![Screenshot](screenshot.png)
+![Screenshot](hicolor_1792.png)
 
 Port of krom (Peter Lemon)'s **HiColor64PerTileRow** demo
 ([PeterLemon/SNES](https://github.com/PeterLemon/SNES), `PPU/HDMA/HiColor64PerTileRow`).

@@ -210,11 +210,11 @@ setScreenOn();
 
 | Function | What it does |
 |---|---|
-| `dmaCopyVram(src, vramAddr, size)` | Copy bytes from WRAM/ROM (bank `$00`) to VRAM. Mode 1 (write `$2118`/`$2119`). The workhorse. |
-| `dmaCopyVramBank(src, bank, vramAddr, size)` | Same, with explicit source bank. **Required** when source data lives in bank `$01+` (SUPERFREE spillover). |
+| `dmaCopyVram(src, vramAddr, size)` | Copy bytes from WRAM/ROM to VRAM. The bank is taken from `src`'s own bank byte, so the source may live in any bank. Mode 1 (write `$2118`/`$2119`). The workhorse. |
+| `dmaCopyVramBank(src, bank, vramAddr, size)` | Same, for when the address and bank are held separately (16-bit offset + explicit bank byte). |
 | `dmaFillVRAM(value, dest, size)` | Fill a VRAM region with a fixed 16-bit value (fixed-source mode). Used to clear tilemaps. |
 | `dmaClearVRAM(void)` | Zero all 64 KB of VRAM. Boot-time use only (force blank required). |
-| `dmaCopyCGram(src, startColor, size)` | Copy palette data from bank `$00` to CGRAM. Mode 0 (write `$2122`). |
+| `dmaCopyCGram(src, startColor, size)` | Copy palette data to CGRAM. Mode 0 (write `$2122`). |
 | `dmaCopyCGramBank(src, bank, startColor, size)` | Same, with explicit source bank. |
 | `dmaCopyOam(src, size)` | One-shot OAM transfer, write `$2104`. Mostly used at init — the NMI handler does the per-frame OAM DMA automatically. |
 | `dmaCopyVramMode7(tilemap, mapSize, tiles, tilesSize)` | Two-pass interleaved DMA for Mode 7's split low-byte/high-byte VRAM layout. See the [Mode 7 tutorial](mode7.md). |
@@ -253,30 +253,14 @@ either drop into force blank (visible flash, OK for boss intro / scene
 transition) or split across multiple VBlanks ("1-page-per-VBlank"
 pattern — `KNOWN_LIMITATIONS.md` documents the canonical form).
 
-### 🔴 `dmaCopyVram` hardcodes source bank `$00` — SUPERFREE spillover trap
+### 🟢 SUPERFREE assets in any bank just work
 
-The lib's `dmaCopyVram(src, vramAddr, size)` puts the source bank byte
-to `$00` in the DMA setup. If the linker placed your asset in bank
-`$01` or higher (because bank `$00`'s 32 KB ROM filled up — see
-`.claude/rules/bank0_budget.md`), the DMA reads the *wrong* bank and
-writes garbage to VRAM.
-
-**Mitigation**: `dmaCopyVramBank(src, bank, vramAddr, size)`.
-The bank byte for an `extern` symbol resolves at link time as
-`:symbol`, so:
-
-```c
-extern u8 huge_tileset[];
-/* `:huge_tileset` is the linker-resolved bank — assembly only.
- * From C, you typically build a small assembly helper that knows
- * the bank, like the asm_loadSkyData() helper in
- * examples/graphics/backgrounds/mode7_perspective. */
-```
-
-Most projects either (a) keep all assets in bank `$00` (small games),
-or (b) write a small assembly DMA helper per asset to handle the
-correct bank. The shipped example that hits this case
-(`mode7_perspective`) takes option (b).
+`dmaCopyVram(src, vramAddr, size)` takes the source bank from `src`'s
+own bank byte, so an asset the linker placed in bank `$01` or higher
+(because bank `$00`'s 32 KB ROM filled up — see
+`.claude/rules/bank0_budget.md`) transfers correctly with no extra
+work. `dmaCopyVramBank()` remains for the rarer case where the address
+and bank are held separately.
 
 ### 🟠 Channel 0 vs HDMA on channel 0
 

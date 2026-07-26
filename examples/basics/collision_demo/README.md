@@ -3,7 +3,7 @@
 > AABB sprite-vs-sprite and tile-based wall collision in a walled arena.
 > Move the white square with the D-pad. Overlapping a red enemy turns both green.
 
-![Screenshot](screenshot.png)
+![Screenshot](collision_demo.png)
 
 ## Build & Run
 

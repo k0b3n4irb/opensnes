@@ -1,6 +1,6 @@
 # Simple Sprite -- Your First OAM Sprite
 
-![Screenshot](screenshot.png)
+![Screenshot](simple_sprite.png)
 
 ## What This Example Shows
 

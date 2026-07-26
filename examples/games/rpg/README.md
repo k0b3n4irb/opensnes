@@ -1,6 +1,6 @@
 # rpg — an RPG template driven by a Tiled map
 
-![Screenshot](screenshot.png)
+![Screenshot](rpg.png)
 
 The SDK's modules composed into a playable RPG skeleton. Two things
 make it a *template* rather than a demo:

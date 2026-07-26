@@ -3,7 +3,7 @@
 Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 *Pixel Shmup* pack. Lands in stages so each commit is a working ROM.
 
-![Screenshot](screenshot.png)
+![Screenshot](shmup_1942.png)
 
 ## Roadmap status
 

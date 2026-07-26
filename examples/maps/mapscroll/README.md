@@ -2,7 +2,7 @@
 
 A large Tiled map scrolls as a Mario sprite moves left and right. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen. This is the stepping stone between "static background" and the full continuous_scroll example.
 
-![Screenshot](screenshot.png)
+![Screenshot](mapscroll.png)
 
 ## What You'll Learn
 

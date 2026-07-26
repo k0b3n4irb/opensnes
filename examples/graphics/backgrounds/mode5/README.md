@@ -2,7 +2,7 @@
 
 Demonstrates BG Mode 5, the SNES high-resolution mode with 512×256 pixel display.
 
-![Screenshot](screenshot.png)
+![Screenshot](mode5.png)
 
 ## Description
 

@@ -2,8 +2,11 @@
 
 > **One-line summary**: what this example does, visible on screen.
 
-![Screenshot](screenshot.png)
-<!-- Real Mesen2 capture. Remove this line if no screenshot yet. -->
+![Screenshot](EXAMPLE_NAME.png)
+<!-- Name the file after this example's folder (e.g. hello_world.png), NOT
+     screenshot.png — a shared basename collides in the flat Doxygen output
+     and one image ends up on every page. Real luna capture. Remove this
+     line entirely if the example has no meaningful visual (e.g. audio). -->
 
 ## Controls
 
@@ -173,8 +176,9 @@ LENGTH:
 - If a section gets long, it might be two examples in one
 
 SCREENSHOTS:
-- Real PNG capture from Mesen2 (File > Save Screenshot)
-- Named screenshot.png in the same folder
+- Real PNG capture from luna (`luna run -n <steps> --screenshot out.png rom.sfc`)
+- Named after the example's folder (e.g. `hello_world.png`), NOT
+  `screenshot.png` — a shared basename collides in the flat Doxygen output
 - Multiple captures OK if the example has multiple visual states
 
 CROSS-REFERENCES:

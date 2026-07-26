@@ -2,7 +2,6 @@
 
 > Large soundbank music playback (>32KB, multi-bank LoROM)
 
-![Screenshot](screenshot.png)
 
 ## Build & Run
 

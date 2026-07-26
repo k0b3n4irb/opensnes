@@ -2,7 +2,7 @@
 
 > Multi-tile sprite characters with dynamic VRAM streaming
 
-![Screenshot](screenshot.png)
+![Screenshot](dynamic_metasprite.png)
 
 ## Build & Run
 

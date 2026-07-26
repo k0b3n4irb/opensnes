@@ -7,7 +7,7 @@ cartridge with limited ROM space, compression like this is essential for fitting
 large tilesets, and the SNES hardware can decompress data fast enough to load
 during force blank.
 
-![Screenshot](screenshot.png)
+![Screenshot](mode1_lz77.png)
 
 ## What You'll Learn
 

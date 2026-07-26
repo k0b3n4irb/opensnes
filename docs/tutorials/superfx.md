@@ -306,7 +306,7 @@ setScreenOn();
 
 ## Further Reading
 
-- [SuperFX register reference](../../.claude/SUPERFX.md) -- complete register documentation
+- [SuperFX register reference](../hardware/REGISTERS.md) -- register tables and programming details
 - [superfx.h API](../../lib/include/snes/superfx.h) -- register macros
 - [PeterLemon/SNES](https://github.com/PeterLemon/SNES) -- reference PLOT examples
 - [casfx](https://github.com/ARM9/casfx) -- complete SuperFX demo

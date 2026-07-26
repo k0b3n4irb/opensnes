@@ -2,7 +2,7 @@
 
 > SA-1 boot diagnostic -- verifies coprocessor initialization
 
-![Screenshot](screenshot.png)
+![Screenshot](sa1_hello.png)
 
 ## Build & Run
 

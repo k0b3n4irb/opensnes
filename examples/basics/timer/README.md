@@ -2,7 +2,7 @@
 
 Displays a live frame counter that increments every VBlank (60 fps NTSC, 50 fps PAL). The simplest possible real-time display on the SNES: read a hardware counter, render it as text, repeat.
 
-![Screenshot](screenshot.png)
+![Screenshot](timer.png)
 
 ## What You'll Learn
 

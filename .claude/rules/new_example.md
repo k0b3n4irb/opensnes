@@ -88,7 +88,11 @@ See existing examples in `docs/examples_group.md` for the format.
 Every example directory MUST have a `README.md` with:
 
 1. **Title** — example name as H1
-2. **Screenshot** — embedded screenshot from luna (`![Screenshot](screenshot.png)`)
+2. **Screenshot** — embedded luna capture named after the example's folder
+   (`![Screenshot](<example>.png)`), or omit entirely if there is no
+   meaningful visual (e.g. audio examples). NOT `screenshot.png` — a shared
+   basename collides in the flat Doxygen output (enforced by
+   `check_doc_drift.py`'s basename check)
 3. **Description** — what the example demonstrates (2-3 sentences)
 4. **SNES Concepts** — bullet list of hardware/software concepts shown
 5. **How to Build** — standard build command
@@ -101,11 +105,13 @@ a representative scene; pulse Start via `--input` if the example waits on it):
 ```bash
 scripts/install-luna.sh   # once
 tools/luna-test/bin/luna run -n 3000000 \
-  --screenshot examples/<path>/screenshot.png examples/<path>/<rom>.sfc
+  --screenshot examples/<path>/<example>.png examples/<path>/<rom>.sfc
 ```
 
-Save the screenshot as `screenshot.png` in the example directory.
-Reference it in README.md as `![Screenshot](screenshot.png)`.
+Save it as `<example>.png` (the folder name) in the example directory and
+reference it in README.md as `![Screenshot](<example>.png)`. A shared
+`screenshot.png` basename collides site-wide in Doxygen's flat output — the
+`check_doc_drift.py` basename check fails the build if two examples share one.
 
 ## Before Committing
 

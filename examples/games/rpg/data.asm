@@ -13,44 +13,44 @@
 ; See issue #127.
 ;----------------------------------------------------------------------
 
-ASSET_SECTION "rodata_tiles", 3
+ASSET_SECTION "rodata_tiles"
 town_tiles:  .incbin "res/tileset.pic"
 town_tiles_end:
 .ends
 
-ASSET_SECTION "rodata_townmap", 2
+ASSET_SECTION "rodata_townmap"
 town_map:    .incbin "res/town_map.bin"
 town_map_end:
 .ends
 
-ASSET_SECTION "rodata_coll", 2
+ASSET_SECTION "rodata_coll"
 town_collision: .incbin "res/town_collision.bin"
 town_collision_end:
 .ends
 
-ASSET_SECTION "rodata_interior", 3
+ASSET_SECTION "rodata_interior"
 house_tiles: .incbin "res/interior.pic"
 house_tiles_end:
 house_map:   .incbin "res/house_map.bin"
 house_map_end:
 .ends
 
-ASSET_SECTION "rodata_hcoll", 3
+ASSET_SECTION "rodata_hcoll"
 house_collision: .incbin "res/house_collision.bin"
 house_collision_end:
 .ends
 
-ASSET_SECTION "rodata_hero", 3
+ASSET_SECTION "rodata_hero"
 hero_tiles:  .incbin "res/hero.pic"
 hero_tiles_end:
 .ends
 
-ASSET_SECTION "rodata_ui", 3
+ASSET_SECTION "rodata_ui"
 ui_tiles:    .incbin "res/uibox.pic"
 ui_tiles_end:
 .ends
 
-ASSET_SECTION "rpgpal", 3
+ASSET_SECTION "rpgpal"
 town_pal:  .incbin "res/tileset.pal"
 town_pal_end:
 hero_pal:  .incbin "res/hero.pal"

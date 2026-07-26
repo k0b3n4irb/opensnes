@@ -2,7 +2,7 @@
 
 Reads the SNES controller and displays which button is currently held. The simplest possible input example — press a button, see its name on screen.
 
-![Screenshot](screenshot.png)
+![Screenshot](controller.png)
 
 ## What You'll Learn
 

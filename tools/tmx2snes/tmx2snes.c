@@ -134,6 +134,7 @@ void PrintOptions(char *str)
     printf("\n  options:");
     printf("\n  	-e  also write <map>.inc, the Entities layer as C defines");
     printf("\n  	-Q  also write <layer>.q16, a quadrant-ordered 64x64 tilemap");
+    printf("\n  	-C  also write <layer>.c16, one collision byte per map cell");
     printf("\n  	-q  quiet");
     printf("\n");
     printf("\n  	.m16 file for map");
@@ -228,6 +229,54 @@ void WriteQuadrantMap(void)
                 }
             }
         }
+    }
+    fclose(fpo);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// -C : one collision byte per map CELL.
+//
+// The .b16 output is per TILESET TILE: 32 bytes for a 16-tile tileset,
+// which a game indexes after reading the tile id back out of the
+// tilemap. That is the right shape for the `map` module. A game that
+// keeps its own map in ROM and asks "is the tile at (x,y) solid?" wants
+// the answer already flattened — one byte per cell, indexed directly,
+// which is what collideTile() takes.
+//
+// Costs w*h bytes instead of 32, and buys a lookup with no indirection.
+// For a 64x64 map that is 4 KB, which belongs outside bank $00 anyway
+// (ASSET_SECTION).
+void WriteCellCollision(void)
+{
+    int i, idx;
+    char *lastpostslash;
+
+    strcpy(filemapname, filebase);
+    lastpostslash = strrchr(filemapname, '/');
+    if (lastpostslash != NULL)
+        sprintf(lastpostslash + 1, "%s.c16", layer->name.ptr);
+    else
+        sprintf(filemapname, "%s.c16", layer->name.ptr);
+
+    if (quietmode == 0)
+        printf("tmx2snes:     Writing per-cell collision grid...\n");
+    fpo = fopen(filemapname, "wb");
+    if (fpo == NULL)
+    {
+        printf("tmx2snes: error 'Can't open collision grid [%s] for writing'\n", filemapname);
+        exit(1);
+    }
+
+    data = layer->data;
+    for (i = 0; i < layer->data_count; i++)
+    {
+        int solid = 0;
+        if (data[i])
+        {
+            idx = (data[i] - 1) & 0x03FF;
+            solid = tileprop[idx][0] ? 1 : 0;
+        }
+        fputc(solid, fpo);
     }
     fclose(fpo);
 }
@@ -656,6 +705,7 @@ void WriteEntities(void)
 /// M A I N ////////////////////////////////////////////////////////////
 int emitheader = 0;   // -e: write <base>.inc, the entities as C defines
 int quadrant = 0;     // -Q: write <layer>.q16, a quadrant-ordered 64x64 map
+int cellcollision = 0; // -C: write <layer>.c16, one collision byte per map cell
 
 int main(int argc, char **argv)
 {
@@ -695,6 +745,10 @@ int main(int argc, char **argv)
             else if (argv[i][1] == 'Q') // quadrant-ordered 64x64 tilemap
             {
                 quadrant = 1;
+            }
+            else if (argv[i][1] == 'C') // per-CELL collision grid
+            {
+                cellcollision = 1;
             }
             else // invalid option
             {
@@ -929,6 +983,8 @@ int main(int argc, char **argv)
             WriteMapTileset();
             if (quadrant)
                 WriteQuadrantMap();
+            if (cellcollision)
+                WriteCellCollision();
         }
 
         layer = layer->next;

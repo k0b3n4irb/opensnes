@@ -1,6 +1,5 @@
 # pitch_mod — hardware vibrato via pitch modulation
 
-![Screenshot](screenshot.png)
 
 Port of krom (Peter Lemon)'s **PitchMod** demo. The S-DSP's `PMON`
 feature multiplies a voice's pitch by the *output* of the previous
