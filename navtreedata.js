@@ -53,14 +53,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "anim_8h.html",
-"dir_fb6a4478874ec3489cd1ff1dc1d9bfde.html",
-"examples_graphics_sprites_animated_sprite.html#autotoc_md1345",
-"globals_defs_i.html",
-"group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f",
-"group__volatile__types.html#ga84c4ebe721fa065d9bd514ce8d76c455",
-"maps_2slopemario_2mario_8c.html#a718bd8c5a9a328db12da0a2bb924921c",
-"sa1_8h.html#a30b2026a15f8ed98e81e475485af4f77",
-"structSaveState.html#a9c7f3ac91ee1a4fba9c154c4f1d71de1"
+"dir_8bf93428b4f036486d5de62ec229335a.html",
+"examples_games_breakout.html#autotoc_md1098",
+"examples_text_print_string.html#autotoc_md1584",
+"group__audio__const.html#ga550c3ad05d3a17001713a00d6cb829ac",
+"group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3",
+"map32x32_8c.html#ae672de960d84e9e82707e6e2fe664ffd",
+"render_8c.html#a560334ad9f49e5ff6644a495434d351b",
+"structAnimClip.html#a262d98c3d53c1153e6c23acb44c4227b",
+"tutorial_debugging.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

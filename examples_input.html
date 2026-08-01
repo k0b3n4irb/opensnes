@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Input Examples</title>
+<title>Input &amp; peripherals</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,50 +119,36 @@ $(function(){initNavTree('examples_input.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Input Examples </div></div>
+  <div class="headertitle"><div class="title">Input &amp; peripherals </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The SNES supports standard controllers (12 buttons + D-pad), the SNES Mouse, and the Super Scope light gun. The console reads controller state automatically every frame via auto-joypad read and stores the result in hardware registers.</p>
-<p>The key skill is <b>edge detection</b> &ndash; distinguishing "button is held" from "button was
-just pressed this frame." Without it, a single tap registers dozens of times at 60fps.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1440"></a>
-Examples</h2>
+<div class="textblock"><p><b>Family 4 — "can the player act?"</b> This is the rung that turns a demo into a game. Read the pad, move something with it, then branch out to the SNES's exotic controllers. The console auto-reads every input device each VBlank; you just read the result.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1261"></a>
+The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Difficulty  </th><th class="markdownTableHeadNone">Description  </th></tr>
+<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="two_players/">two_players</a>  </td><td class="markdownTableBodyNone">Beginner  </td><td class="markdownTableBodyNone">Reading both controllers independently  </td></tr>
+<td class="markdownTableBodyNone">4.1  </td><td class="markdownTableBodyNone"><a href="controller/">controller</a>  </td><td class="markdownTableBodyNone">How do I read a joypad — held vs just-pressed?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="mouse/">mouse</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Mouse detection, cursor movement, button handling, sensitivity  </td></tr>
+<td class="markdownTableBodyNone">4.2  </td><td class="markdownTableBodyNone"><a href="move_sprite/">move_sprite</a>  </td><td class="markdownTableBodyNone">How do I drive a sprite with the pad?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="superscope/">superscope</a>  </td><td class="markdownTableBodyNone">Advanced  </td><td class="markdownTableBodyNone">Light gun detection, calibration, PPU H/V counter targeting  </td></tr>
-</table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1441"></a>
-Key Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1442"></a>
-Joypad Bit Layout</h3>
-<div class="fragment"><div class="line">Bit: 15  14  13  12  11  10  9   8   7   6   5   4   3-0</div>
-<div class="line">     B   Y   Sel Sta Up  Dn  Lt  Rt  A   X   L   R   (ID)</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1443"></a>
-Edge Detection Pattern</h3>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> held = padsCurrent(0);</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pressed = padsDown(0);   <span class="comment">// newly pressed this frame only</span></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1444"></a>
-Input Devices</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Device  </th><th class="markdownTableHeadNone">Port  </th><th class="markdownTableHeadNone">Detection  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Joypad  </td><td class="markdownTableBodyNone">1-2  </td><td class="markdownTableBodyNone">Always present (default)  </td></tr>
+<td class="markdownTableBodyNone">4.3  </td><td class="markdownTableBodyNone"><a href="two_players/">two_players</a>  </td><td class="markdownTableBodyNone">How do I read two players independently?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Mouse  </td><td class="markdownTableBodyNone">1-2  </td><td class="markdownTableBodyNone">Check device ID bits  </td></tr>
+<td class="markdownTableBodyNone">4.4  </td><td class="markdownTableBodyNone"><a href="mouse/">mouse</a>  </td><td class="markdownTableBodyNone">How do I read the SNES Mouse?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Super Scope  </td><td class="markdownTableBodyNone">Port 2 only  </td><td class="markdownTableBodyNone">Check device ID bits, requires CRT/emulator support  </td></tr>
+<td class="markdownTableBodyNone">4.5  </td><td class="markdownTableBodyNone"><a href="superscope/">superscope</a>  </td><td class="markdownTableBodyNone">How do I read the Super Scope light gun?  </td></tr>
 </table>
-<hr  />
-<p>Start with <b>two_players</b> for basic joypad input, then explore <b>mouse</b> and <b>superscope</b> for alternate input devices.</p>
-<p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a> <a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a> <a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a> <a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a> </p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1262"></a>
+The idea in one screen</h2>
+<p><span class="tt">padHeld(0)</span> returns a 16-bit bitmask of the buttons held this frame; <span class="tt">padPressed(0)</span> returns only those <em>newly</em> pressed (edge detection — without it, a single tap registers dozens of times at 60 Hz). Act on the bits, and for movement push the result to a sprite with <span class="tt"><a class="el" href="sprite_8h.html#a5f6e7cb46f76cc6b03e2309b08e2092a" title="Set sprite position.">oamSetXY</a></span>.</p>
+<div class="fragment"><div class="line">Bit: 15  14  13   12   11  10  9   8   7  6  5  4</div>
+<div class="line">     B   Y   Sel  Sta  Up  Dn  Lt  Rt  A  X  L  R</div>
+</div><!-- fragment --><p>The <b>mouse</b> and <b>Super Scope</b> are read the same way after a device-ID check; the Super Scope lives on port 2 and latches its aim from the PPU's H/V counters.</p>
+<blockquote class="doxtable">
+<p>Start at 4.1 to read the pad, then 4.2 to feel a sprite respond to it — that's the moment it becomes a game. </p>
+</blockquote>
+<p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a> <a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a> <a class="el" href="examples_input_move_sprite.html" title="Drive a sprite with the pad">Drive a sprite with the pad</a> <a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a> <a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

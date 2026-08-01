@@ -216,7 +216,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ad53b403f29a83339eb6d772bf3096379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a circular window mask (iris/spotlight effect).  <br /></td></tr>
 <tr class="memitem:a4fa6761b1dc96c462e1d5bbc2176bb33" id="r_a4fa6761b1dc96c462e1d5bbc2176bb33"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4fa6761b1dc96c462e1d5bbc2176bb33">hdmaIrisWipeStop</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel)</td></tr>
 <tr class="memdesc:a4fa6761b1dc96c462e1d5bbc2176bb33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop iris wipe effect and restore window registers.  <br /></td></tr>
-<tr class="memitem:adf1c0451139948b3f1049b84580ce906" id="r_adf1c0451139948b3f1049b84580ce906"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, const void *scrollTable)</td></tr>
+<tr class="memitem:adf1c0451139948b3f1049b84580ce906" id="r_adf1c0451139948b3f1049b84580ce906"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a>, const void *scrollTable)</td></tr>
 <tr class="memdesc:adf1c0451139948b3f1049b84580ce906"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a background parallax scroll effect.  <br /></td></tr>
 <tr class="memitem:a60a2966565cd8b728a5acd019859e8e6" id="r_a60a2966565cd8b728a5acd019859e8e6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a60a2966565cd8b728a5acd019859e8e6">hdmaSetTable</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, const void *table)</td></tr>
 <tr class="memdesc:a60a2966565cd8b728a5acd019859e8e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update HDMA table pointer (for dynamic effects).  <br /></td></tr>
@@ -226,9 +226,9 @@ Functions</h2></td></tr>
 <tr class="memdesc:a79da757d3be21ef94b3e9a78b9cdf2f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up an HDMA channel with explicit source bank byte.  <br /></td></tr>
 <tr class="memitem:a35d67e382ab2f45cb99ec5943d38d318" id="r_a35d67e382ab2f45cb99ec5943d38d318"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a35d67e382ab2f45cb99ec5943d38d318">hdmaSetupIndirect</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> destReg, const void *table, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dataBank)</td></tr>
 <tr class="memdesc:a35d67e382ab2f45cb99ec5943d38d318"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure an INDIRECT HDMA channel (table of pointers to data).  <br /></td></tr>
-<tr class="memitem:af4cd68c6a5535d13dd11fa4c487abbfe" id="r_af4cd68c6a5535d13dd11fa4c487abbfe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
+<tr class="memitem:af4cd68c6a5535d13dd11fa4c487abbfe" id="r_af4cd68c6a5535d13dd11fa4c487abbfe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af4cd68c6a5535d13dd11fa4c487abbfe">hdmaWaterRipple</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
 <tr class="memdesc:af4cd68c6a5535d13dd11fa4c487abbfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a water ripple distortion effect.  <br /></td></tr>
-<tr class="memitem:a2ef7d5f50fba237731cac30b5a3af241" id="r_a2ef7d5f50fba237731cac30b5a3af241"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frequency)</td></tr>
+<tr class="memitem:a2ef7d5f50fba237731cac30b5a3af241" id="r_a2ef7d5f50fba237731cac30b5a3af241"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> channel, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amplitude, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> frequency)</td></tr>
 <tr class="memdesc:a2ef7d5f50fba237731cac30b5a3af241"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up horizontal wave effect (water reflection).  <br /></td></tr>
 <tr class="memitem:a2658bf1d97761d3e7a940b29ac560438" id="r_a2658bf1d97761d3e7a940b29ac560438"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a> (void)</td></tr>
 <tr class="memdesc:a2658bf1d97761d3e7a940b29ac560438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize HDMA wave effect system.  <br /></td></tr>
@@ -1197,7 +1197,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">channel</td><td>HDMA channel to use </td></tr>
-    <tr><td class="paramname">bg</td><td>Background layer (0=BG1, 1=BG2, 2=BG3) </td></tr>
+    <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background layer (0=BG1, 1=BG2, 2=BG3) </td></tr>
     <tr><td class="paramname">scrollTable</td><td>HDMA table with scroll values</td></tr>
   </table>
   </dd>
@@ -1416,7 +1416,7 @@ COLDATA format: bits 7-5 = color select (RGB), bits 4-0 = intensity </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">channel</td><td>HDMA channel (6 or 7 recommended) </td></tr>
-    <tr><td class="paramname">bg</td><td>Background layer (0=BG1, 1=BG2, 2=BG3) </td></tr>
+    <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background layer (0=BG1, 1=BG2, 2=BG3) </td></tr>
     <tr><td class="paramname">amplitude</td><td>Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped) </td></tr>
     <tr><td class="paramname">speed</td><td>Animation speed (1=slow, 4=fast)</td></tr>
   </table>
@@ -1478,7 +1478,7 @@ Call <a class="el" href="#a0579bc90a6b79d6737dcf2c15a3eb7e1" title="Stop wave ef
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">channel</td><td>HDMA channel to use (6 or 7 recommended) </td></tr>
-    <tr><td class="paramname">bg</td><td>Background layer to affect (0=BG1, 1=BG2, 2=BG3) </td></tr>
+    <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background layer to affect (0=BG1, 1=BG2, 2=BG3) </td></tr>
     <tr><td class="paramname">amplitude</td><td>Wave amplitude in pixels (1-60, clamped internally) </td></tr>
     <tr><td class="paramname">frequency</td><td>Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.</td></tr>
   </table>

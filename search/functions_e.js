@@ -28,5 +28,6 @@ var searchData=
   ['profilegetscanline_25',['profileGetScanline',['../profile_8h.html#a30c81ab840017529f70ad63238c8a79f',1,'profile.h']]],
   ['profileinit_26',['profileInit',['../profile_8h.html#acc2a7d890f2e61d20dc72d9964d92c9d',1,'profile.h']]],
   ['profilescanlineend_27',['profileScanlineEnd',['../profile_8h.html#ac059c33b80ae59cf02b491ddb89b014a',1,'profile.h']]],
-  ['profilescanlinestart_28',['profileScanlineStart',['../profile_8h.html#a2028d9104ba1295ca45717dae0dcc05a',1,'profile.h']]]
+  ['profilescanlinestart_28',['profileScanlineStart',['../profile_8h.html#a2028d9104ba1295ca45717dae0dcc05a',1,'profile.h']]],
+  ['put_5ftile_29',['put_tile',['../basics_2panel__hud_2main_8c.html#a4485932d05cb6f6162b011a9c83ec592',1,'main.c']]]
 ];

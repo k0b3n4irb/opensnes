@@ -1,0 +1,28 @@
+var sprites_2sprite__sizes_2main_8c =
+[
+    [ "ADRSPRITE", "sprites_2sprite__sizes_2main_8c.html#aa9c94dbebbb68676d0e4a03bc5b8f79a", null ],
+    [ "ADRSPRITLARGE", "sprites_2sprite__sizes_2main_8c.html#af5abf90329e34db698a7774c40402b56", null ],
+    [ "PALETTESPRSIZE", "sprites_2sprite__sizes_2main_8c.html#ac2968ae95966edabc01549b91d731d2e", null ],
+    [ "TILE_LARGE", "sprites_2sprite__sizes_2main_8c.html#a4c20a6f34e4718ee68b4bf13e8987072", null ],
+    [ "TILE_SMALL", "sprites_2sprite__sizes_2main_8c.html#a9f934140ea125cd0c817be3e243dfc69", null ],
+    [ "changeObjSize", "sprites_2sprite__sizes_2main_8c.html#a639d8dac137f049df085726a0a72076c", null ],
+    [ "drawCursor", "sprites_2sprite__sizes_2main_8c.html#a75bf0618c1d4e0f24afec3970e446a23", null ],
+    [ "main", "sprites_2sprite__sizes_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
+    [ "palsprite16", "sprites_2sprite__sizes_2main_8c.html#a956ba5c01adb5de963a3be795b69ebd2", null ],
+    [ "palsprite16_end", "sprites_2sprite__sizes_2main_8c.html#a41ff91ab4cc758eb20af065fda1ef779", null ],
+    [ "palsprite32", "sprites_2sprite__sizes_2main_8c.html#ae7fc7b7e2d40971d1889700902ece784", null ],
+    [ "palsprite32_end", "sprites_2sprite__sizes_2main_8c.html#a87a31f97ab27a1bc5bc4dc6648e75146", null ],
+    [ "palsprite64", "sprites_2sprite__sizes_2main_8c.html#aad2bd146104de8219c31e04d17faee21", null ],
+    [ "palsprite64_end", "sprites_2sprite__sizes_2main_8c.html#a2eaa18c8c844ec970c745b920e6209a3", null ],
+    [ "palsprite8", "sprites_2sprite__sizes_2main_8c.html#ac2d5d63c3525982feffba3df7f8421c7", null ],
+    [ "palsprite8_end", "sprites_2sprite__sizes_2main_8c.html#a3aa27003a3390c81fd3a7104fddf2dec", null ],
+    [ "selectedItem", "sprites_2sprite__sizes_2main_8c.html#a588ff5082ccab493c90422d028d31b4d", null ],
+    [ "sprite16", "sprites_2sprite__sizes_2main_8c.html#a080d27298f89976bee877cbaf3d17b4a", null ],
+    [ "sprite16_end", "sprites_2sprite__sizes_2main_8c.html#a5d0521dbc42e1d7b1f6515e0490d6bd3", null ],
+    [ "sprite32", "sprites_2sprite__sizes_2main_8c.html#a49792cd3b2365c1f10bed7be6e830759", null ],
+    [ "sprite32_end", "sprites_2sprite__sizes_2main_8c.html#a1a85e2c184625aee857345308a67ab50", null ],
+    [ "sprite64", "sprites_2sprite__sizes_2main_8c.html#abcec115c0ff168ae1eae89f71e09ec99", null ],
+    [ "sprite64_end", "sprites_2sprite__sizes_2main_8c.html#af99f9695f82bacd6261bc8f1d45f3874", null ],
+    [ "sprite8", "sprites_2sprite__sizes_2main_8c.html#a23294ed35e3d2c2784b8218f56991f04", null ],
+    [ "sprite8_end", "sprites_2sprite__sizes_2main_8c.html#a66eed545e46a00ac0699913ac0186df8", null ]
+];

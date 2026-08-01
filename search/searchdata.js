@@ -8,7 +8,7 @@ var indexSectionsWithContent =
   5: "bfgstuv",
   6: "s",
   7: "sw",
-  8: "abcdefghiklmnoprstuvw",
+  8: "abcdefghiklmnoprstuvwxy",
   9: "abcdefilmprstvw",
   10: "$0123456789abcdefghijklmnopqrstuvwxyz×–—→≥🔴🟠🟡🟢"
 };

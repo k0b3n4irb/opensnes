@@ -277,7 +277,7 @@ Getting Started</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="superfx_8h.html">snes/superfx.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="memory_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -287,7 +287,7 @@ Getting Started</h2>
 <div class="line">        <span class="keywordflow">while</span> (1) { <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>(); }</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="memory_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>();</div>
+<div class="line">    <a class="code hl_function" href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Read result from GSU R0 */</span></div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> result = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3000;</div>
@@ -297,11 +297,11 @@ Getting Started</h2>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="achips_2superfx__hello_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div><div class="ttdoc">Launch GSU program, wait for completion (defined in gsu_loader.asm).</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="amemory_2superfx__hello_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="memory_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div><div class="ttdoc">Launch GSU program, wait for completion (defined in gsu_loader.asm).</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asuperfx_8h_html"><div class="ttname"><a href="superfx_8h.html">superfx.h</a></div><div class="ttdoc">SuperFX (GSU) coprocessor library — registers, config, and API.</div></div>
 <div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Initialize SuperFX — detect hardware, set default config.</div><div class="ttdef"><b>Definition</b> superfx.h:109</div></div>
@@ -372,7 +372,7 @@ Column-Major Tile Layout</h3>
 <div class="line">SRAM tile 1  = screen position (col=0, row=1)   &lt;- NOT (1,0)!</div>
 <div class="line">SRAM tile 16 = screen position (col=1, row=0)</div>
 </div><!-- fragment --><p>The SNES PPU tilemap must compensate: </p><div class="fragment"><div class="line">tilemap[row * 32 + col] = col * tiles_per_column + row</div>
-</div><!-- fragment --><p>For 4bpp height=128: <span class="tt"><a class="el" href="graphics_2backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>[row*32 + col] = col*16 + row</span></p>
+</div><!-- fragment --><p>For 4bpp height=128: <span class="tt"><a class="el" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>[row*32 + col] = col*16 + row</span></p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md414"></a>
 SRAM to VRAM Transfer</h3>
 <p>After the GSU finishes, DMA the framebuffer during forced blank:</p>
@@ -387,9 +387,9 @@ Examples</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What it demonstrates  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="../../../examples/memory/superfx_hello/">superfx_hello</a>  </td><td class="markdownTableBodyNone">Boot, registers, SRAM read/write  </td></tr>
+<td class="markdownTableBodyNone"><a href="../../../examples/chips/superfx_hello/">superfx_hello</a>  </td><td class="markdownTableBodyNone">Boot, registers, SRAM read/write  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="../../../examples/memory/superfx_3d/">superfx_3d</a>  </td><td class="markdownTableBodyNone">Rotating wireframe cube, Bresenham line drawing, 3D projection  </td></tr>
+<td class="markdownTableBodyNone"><a href="../../../examples/chips/superfx_3d/">superfx_3d</a>  </td><td class="markdownTableBodyNone">Rotating wireframe cube, Bresenham line drawing, 3D projection  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md416"></a>
 Further Reading</h2>

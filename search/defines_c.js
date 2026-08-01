@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['nbands_0',['NBANDS',['../graphics_2effects_2hdma__indirect__gradient_2main_8c.html#a46ee023ac3f5d103e533843238d2e52a',1,'main.c']]],
-  ['nbirds_1',['NBIRDS',['../memory_2sa1__starfield_2main_8c.html#ae33cce9568cb8d271c2d716d88786445',1,'main.c']]],
+  ['nbands_0',['NBANDS',['../hdma_2hdma__indirect__gradient_2main_8c.html#a46ee023ac3f5d103e533843238d2e52a',1,'main.c']]],
+  ['nbirds_1',['NBIRDS',['../chips_2sa1__starfield_2main_8c.html#ae33cce9568cb8d271c2d716d88786445',1,'NBIRDS:&#160;main.c'],['../sprites_2sprite__swarm_2main_8c.html#ae33cce9568cb8d271c2d716d88786445',1,'NBIRDS:&#160;main.c']]],
   ['next_5fbox_5fcol_2',['NEXT_BOX_COL',['../render_8c.html#a6cb9fb4cb945dc633b05ab2e51d19f2e',1,'render.c']]],
   ['next_5fbox_5frow_3',['NEXT_BOX_ROW',['../render_8c.html#a7c92b0bbf13cad4d4606b341db08293a',1,'render.c']]],
   ['num_5feffects_4',['NUM_EFFECTS',['../audio_2snesmod__sfx_2main_8c.html#adae8021d63052c74619497c15c70595e',1,'main.c']]],

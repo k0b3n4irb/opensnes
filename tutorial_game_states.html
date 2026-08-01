@@ -184,16 +184,16 @@ The manual state machine (under the hood)</h2>
 <div class="line"><span class="preprocessor">#define STATE_PAUSED     2</span></div>
 <div class="line"><span class="preprocessor">#define STATE_GAME_OVER  3</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>;</div>
+<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line">    <a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>;</div>
+<div class="line">    <a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>;</div>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">while</span> (1) {</div>
-<div class="line">        <span class="keywordflow">switch</span> (<a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>) {</div>
+<div class="line">        <span class="keywordflow">switch</span> (<a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>) {</div>
 <div class="line">            <span class="keywordflow">case</span> <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>:</div>
 <div class="line">                <a class="code hl_function" href="games_2tetris_2main_8c.html#ad8a61053de03cf7f9efbc95d349ba66e">stateTitle</a>();</div>
 <div class="line">                <span class="keywordflow">break</span>;</div>
@@ -214,9 +214,9 @@ The manual state machine (under the hood)</h2>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="abasics_2game__skeleton_2main_8c_html_ab0c65527cb79d56c8c675dcf0978c8e6"><div class="ttname"><a href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a></div><div class="ttdeci">u8 game_state</div><div class="ttdoc">Probe oracle: current state (0 title, 1 play, 2 over).</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agames_2rpg_2main_8c_html_ab0c65527cb79d56c8c675dcf0978c8e6"><div class="ttname"><a href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a></div><div class="ttdeci">u8 game_state</div><div class="ttdef"><b>Definition</b> main.c:163</div></div>
 <div class="ttc" id="agames_2tetris_2main_8c_html_a1a58a3335baaf4735bbae9dc604fd630"><div class="ttname"><a href="games_2tetris_2main_8c.html#a1a58a3335baaf4735bbae9dc604fd630">STATE_GAME_OVER</a></div><div class="ttdeci">#define STATE_GAME_OVER</div><div class="ttdoc">Game over: board frozen, &quot;GAME OVER&quot; rainbow cycle, await restart.</div><div class="ttdef"><b>Definition</b> main.c:91</div></div>
 <div class="ttc" id="agames_2tetris_2main_8c_html_a419dde1f1ac1a18c1d724656fe327d99"><div class="ttname"><a href="games_2tetris_2main_8c.html#a419dde1f1ac1a18c1d724656fe327d99">STATE_PLAYING</a></div><div class="ttdeci">#define STATE_PLAYING</div><div class="ttdoc">Active gameplay: piece falling, player input, gravity.</div><div class="ttdef"><b>Definition</b> main.c:87</div></div>
 <div class="ttc" id="agames_2tetris_2main_8c_html_a59c2cf3a123a19cd0db0ae30e9497069"><div class="ttname"><a href="games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069">stateGameOver</a></div><div class="ttdeci">static void stateGameOver(void)</div><div class="ttdoc">Game over state: display frozen board with rainbow &quot;GAME OVER&quot; text.</div><div class="ttdef"><b>Definition</b> main.c:583</div></div>
@@ -227,7 +227,7 @@ The manual state machine (under the hood)</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><p>This is the exact pattern used in <span class="tt"><a class="el" href="games_2tetris_2main_8c.html" title="Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio.">examples/games/tetris/main.c</a></span>. Each state function runs once per frame and can change <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a></span> to trigger a transition.</p>
+</div><!-- fragment --><p>This is the exact pattern used in <span class="tt"><a class="el" href="games_2tetris_2main_8c.html" title="Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio.">examples/games/tetris/main.c</a></span>. Each state function runs once per frame and can change <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a></span> to trigger a transition.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md185"></a>
 State Transitions</h2>
 <p>Transitioning between states often requires reloading VRAM, resetting variables, or fading the screen. The SNES PPU silently ignores VRAM writes during active display, so transitions must happen during VBlank or forced blank.</p>
@@ -260,7 +260,7 @@ Fade Out / Fade In</h3>
 <div class="ttc" id="aconsole_8h_html_a5a1bfaf2babf4d8dac31cafc468c735f"><div class="ttname"><a href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a></div><div class="ttdeci">void setBrightness(u8 brightness)</div><div class="ttdoc">Set screen brightness.</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agroup__types_html_ga151f780fb455885061d3b77ec1c90c03"><div class="ttname"><a href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a></div><div class="ttdeci">signed char s8</div><div class="ttdoc">8-bit signed integer (-128 to 127)</div><div class="ttdef"><b>Definition</b> types.h:44</div></div>
-</div><!-- fragment --><p>A speed of 1 gives a fast 16-frame fade (~267ms). A speed of 3 gives a slower cinematic fade. See <span class="tt">examples/graphics/effects/fading/</span> for a complete working example.</p>
+</div><!-- fragment --><p>A speed of 1 gives a fast 16-frame fade (~267ms). A speed of 3 gives a slower cinematic fade. See <span class="tt">examples/transitions/fading/</span> for a complete working example.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md187"></a>
 VRAM Reload Between States</h3>
 <p>When switching from title screen to gameplay (or vice versa), you typically need to load different tiles, tilemaps, and palettes. Use forced blank to guarantee VRAM writes succeed:</p>
@@ -277,21 +277,21 @@ VRAM Reload Between States</h3>
 <div class="line">    <a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(gameplay_palette, 0, 256);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Reset game variables */</span></div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a> = 0;</div>
+<div class="line">    <a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a> = 0;</div>
 <div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a> = 3;</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Turn screen back on and fade in */</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line">    fade_in(2);</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#a419dde1f1ac1a18c1d724656fe327d99">STATE_PLAYING</a>;</div>
+<div class="line">    <a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#a419dde1f1ac1a18c1d724656fe327d99">STATE_PLAYING</a>;</div>
 <div class="line">}</div>
+<div class="ttc" id="abasics_2game__skeleton_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="basics_2game__skeleton_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">u16 score</div><div class="ttdoc">Probe oracle: coins collected.</div><div class="ttdef"><b>Definition</b> main.c:69</div></div>
 <div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:165</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="games_2breakout_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">static u16 score</div><div class="ttdef"><b>Definition</b> main.c:161</div></div>
 </div><!-- fragment --><p>The key rule: call <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></span> before bulk VRAM/CGRAM writes, and <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> after. This is the forced blank pattern used throughout the OpenSNES examples.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md188"></a>
 Title Screen Implementation</h2>
@@ -464,7 +464,7 @@ Game Over with Fade</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line">    fade_in(2);</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_variable" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>;</div>
+<div class="line">    <a class="code hl_variable" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = <a class="code hl_define" href="games_2tetris_2main_8c.html#af6737d62160ca5469ab3293849eeabea">STATE_TITLE</a>;</div>
 <div class="line">}</div>
 <div class="ttc" id="amemory_2hirom__demo_2main_8c_html_a60b214eb168a301978b985734feb083a"><div class="ttname"><a href="memory_2hirom__demo_2main_8c.html#a60b214eb168a301978b985734feb083a">TILEMAP_ADDR</a></div><div class="ttdeci">#define TILEMAP_ADDR</div><div class="ttdoc">VRAM word address for the BG1 tilemap (32x32 = 2KB).</div><div class="ttdef"><b>Definition</b> main.c:119</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md196"></a>
@@ -473,11 +473,11 @@ State Machine Summary</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Concern  </th><th class="markdownTableHeadNone">Pattern  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">State storage  </td><td class="markdownTableBodyNone"><span class="tt">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>;</span> with <span class="tt">#define</span> constants  </td></tr>
+<td class="markdownTableBodyNone">State storage  </td><td class="markdownTableBodyNone"><span class="tt">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a>;</span> with <span class="tt">#define</span> constants  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Dispatch  </td><td class="markdownTableBodyNone"><span class="tt">switch (<a class="el" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a>)</span> in main loop, one call per frame  </td></tr>
+<td class="markdownTableBodyNone">Dispatch  </td><td class="markdownTableBodyNone"><span class="tt">switch (<a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a>)</span> in main loop, one call per frame  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Transition  </td><td class="markdownTableBodyNone">Set <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6">game_state</a> = NEW_STATE;</span> then <span class="tt">return;</span>  </td></tr>
+<td class="markdownTableBodyNone">Transition  </td><td class="markdownTableBodyNone">Set <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a> = NEW_STATE;</span> then <span class="tt">return;</span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">VRAM reload  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></span> before DMA, <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> after  </td></tr>
 <tr class="markdownTableRowOdd">

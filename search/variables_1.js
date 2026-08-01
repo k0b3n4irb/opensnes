@@ -12,10 +12,10 @@ var searchData=
   ['aim_5ftarget_5ftiles_5fend_9',['aim_target_tiles_end',['../input_2superscope_2main_8c.html#a1ad9275b167fd0034b2886e140037768',1,'main.c']]],
   ['airborne_10',['airborne',['../games_2mode7__flying_2main_8c.html#a3669420760f75c33d787a4fc776e2877',1,'main.c']]],
   ['all_5fshapes_11',['all_shapes',['../piece_8c.html#a38b764f5e51ebf2b31492e409379edae',1,'piece.c']]],
-  ['amp_5fidx_12',['amp_idx',['../graphics_2effects_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6',1,'main.c']]],
-  ['amp_5foffsets_13',['amp_offsets',['../graphics_2effects_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08',1,'main.c']]],
-  ['angle_14',['angle',['../graphics_2effects_2mode7__perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3',1,'main.c']]],
+  ['amp_5fidx_12',['amp_idx',['../hdma_2hdma__wave_2main_8c.html#a4f5bf0d24f1c1e07461c5631f84a2ee6',1,'main.c']]],
+  ['amp_5foffsets_13',['amp_offsets',['../hdma_2hdma__wave_2main_8c.html#abdd3cff453194f6dbcc796e20b76dd08',1,'main.c']]],
+  ['angle_14',['angle',['../mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3',1,'main.c']]],
   ['anim_5ftick_15',['anim_tick',['../games_2rpg_2main_8c.html#a07f5870d2abcd56b01d370ff190a7570',1,'main.c']]],
-  ['animating_16',['animating',['../graphics_2effects_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
+  ['animating_16',['animating',['../hdma_2hdma__wave_2main_8c.html#aeafbd2df4bb2c4f71ecfb2bae657e2c9',1,'main.c']]],
   ['attr_17',['attr',['../structMetaspriteItem.html#a87a219488459d4028cf885270f48eceb',1,'MetaspriteItem']]]
 ];

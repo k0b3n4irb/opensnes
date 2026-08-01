@@ -124,33 +124,37 @@ $(function(){initNavTree('examples_text.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The SNES has no built-in text rendering. Text is displayed the same way as any other graphics: font characters are stored as tiles in VRAM, and a tilemap references those tiles to spell out words on screen.</p>
 <p>These examples teach the tile/tilemap fundamentals that underpin all SNES graphics.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1634"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1585"></a>
 Examples</h2>
+<p>A ladder of developer questions: <em>how do I show text? → how do I move it?</em></p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Difficulty  </th><th class="markdownTableHeadNone">Description  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="hello_world/">hello_world</a>  </td><td class="markdownTableBodyNone">Beginner  </td><td class="markdownTableBodyNone">Your first SNES ROM &ndash; display text on a background layer  </td></tr>
+<td class="markdownTableBodyNone"><a href="print_string/">print_string</a>  </td><td class="markdownTableBodyNone">1.1  </td><td class="markdownTableBodyNone">Print a string with the built-in font (<span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit</a></span> + <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="text_test/">text_test</a>  </td><td class="markdownTableBodyNone">Beginner  </td><td class="markdownTableBodyNone">Text positioning, formatting, and consoleDrawText usage  </td></tr>
+<td class="markdownTableBodyNone"><a href="scroll_message/">scroll_message</a>  </td><td class="markdownTableBodyNone">1.4  </td><td class="markdownTableBodyNone">Move text &ndash; scroll the text BG layer for a marquee (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1635"></a>
+<blockquote class="doxtable">
+<p>Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in <a href="../fundamentals/text_glyphs/"><span class="tt">fundamentals/text_glyphs</span></a>. </p>
+</blockquote>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1586"></a>
 Key Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1636"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1587"></a>
 How Text Works on SNES</h3>
 <div class="fragment"><div class="line">Font Image (PNG) --&gt; gfx4snes/font2snes --&gt; Tile Data (VRAM)</div>
 <div class="line">                                        --&gt; Tilemap (VRAM)</div>
 <div class="line">                                                |</div>
 <div class="line">                                        PPU renders screen</div>
 </div><!-- fragment --><p>Each character is an 8x8 pixel tile. A font is a collection of tiles covering the ASCII range. The tilemap is a grid of tile numbers that defines which character appears at each screen position.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1637"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1588"></a>
 2BPP Tile Format</h3>
 <p>"2bpp" means 2 bits per pixel = 4 possible colors (indices 0-3). Each 8x8 tile is 16 bytes: 8 bytes for bitplane 0, 8 bytes for bitplane 1.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1638"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1589"></a>
 VRAM Layout for Text</h3>
 <div class="fragment"><div class="line">$0000-$0FFF: Tile data (font graphics)</div>
 <div class="line">$1000-$17FF: BG1 tilemap (32x32 = 2KB)</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1639"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md1590"></a>
 Mode 0 Palette</h3>
 <p>In Mode 0, each background layer gets 4 colors:</p><ul>
 <li>BG1: Colors 0-3</li>
@@ -159,8 +163,8 @@ Mode 0 Palette</h3>
 <li>BG4: Colors 12-15</li>
 </ul>
 <hr  />
-<p>Start with <b>hello_world</b> to get your first ROM running, then use <b>text_test</b> to explore text positioning and formatting.</p>
-<p><a class="el" href="examples_text_hello_world.html" title="Hello World">Hello World</a> <a class="el" href="examples_text_text_test.html" title="Text Module Test">Text Module Test</a> </p>
+<p>Start with <b>print_string</b> to get your first ROM running, then <b>scroll_message</b> to make it move. To see what the <span class="tt">text</span> module hides, read <b>fundamentals/text_glyphs</b>.</p>
+<p><a class="el" href="examples_text_print_string.html" title="Print a string">Print a string</a> <a class="el" href="examples_text_scroll_message.html" title="Scroll a message">Scroll a message</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

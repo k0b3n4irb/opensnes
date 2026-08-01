@@ -313,10 +313,10 @@ tile's hue" problem: author the palette once, commit it, and impose it on every 
 <div class="line">sprite_pal_end:</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md207"></a>
 Example: Complete Background Setup</h2>
-<p>See <span class="tt">examples/graphics/effects/parallax_scrolling/</span> for a complete parallax scrolling example.</p>
+<p>See <span class="tt">examples/scrolling/parallax_scroll/</span> for a complete parallax scrolling example.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md208"></a>
 Hi-res and interlace (Modes 5/6, SETINI)</h2>
-<p>BG Mode 5 renders <b>512 horizontal pixels</b> (16x8 tiles, stored as 8x8 character pairs N/N+1); adding screen interlace (<span class="tt">videoSetInterlace(1)</span>, SETINI bit 0 through the lib's write-only shadow) doubles vertical to <b>448 lines</b>. Three traps, all demonstrated by <span class="tt">examples/graphics/effects/hires_text</span>:</p>
+<p>BG Mode 5 renders <b>512 horizontal pixels</b> (16x8 tiles, stored as 8x8 character pairs N/N+1); adding screen interlace (<span class="tt">videoSetInterlace(1)</span>, SETINI bit 0 through the lib's write-only shadow) doubles vertical to <b>448 lines</b>. Three traps, all demonstrated by <span class="tt">examples/backgrounds/mode5_hires</span>:</p>
 <ol type="1">
 <li>Hi-res content displays through BOTH screens: <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_BG1)</a></span> AND <span class="tt"><a class="el" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe" title="Enable layers on the sub screen.">setSubScreen(LAYER_BG1)</a></span>, or odd columns stay blank.</li>
 <li>In interlace, tile texel rows map 1:1 to hi-res lines — a full-height page needs 56 tile rows (a 32x64 tilemap), not 28.</li>

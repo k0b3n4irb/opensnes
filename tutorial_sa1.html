@@ -170,7 +170,7 @@ I-RAM — The Mailbox</h3>
 <blockquote class="doxtable">
 <p><b>Write protection gotcha (disputed polarity)</b>: Both CPUs have independent write-protection registers (SIWP at $2229, CIWP at $222A). The polarity is genuinely contested:</p><ul>
 <li>The <a href="https://wiki.superfamicom.org/sa-1-registers">Super Famicom Dev Wiki</a> and fullsnes say <b>bit = 1 PROTECTS</b> a 256-byte page, so <span class="tt">$00</span> = all writable, <span class="tt">$FF</span> = all protected.</li>
-<li><b>Mesen2</b> (a GUI reference emulator) and <b>snes9x</b> behave the <em>opposite</em> way: writing <span class="tt">$FF</span> leaves I-RAM writable (the crt0 self-test passes, <span class="tt"><a class="el" href="memory_2sa1__hello_2main_8c.html#a25d8027e6c3f5d31c6a5f7e3f966146a">sa1_status</a>=$A5</span>); writing <span class="tt">$00</span> blocks the writes and the self-test fails.</li>
+<li><b>Mesen2</b> (a GUI reference emulator) and <b>snes9x</b> behave the <em>opposite</em> way: writing <span class="tt">$FF</span> leaves I-RAM writable (the crt0 self-test passes, <span class="tt"><a class="el" href="chips_2sa1__hello_2main_8c.html#a25d8027e6c3f5d31c6a5f7e3f966146a">sa1_status</a>=$A5</span>); writing <span class="tt">$00</span> blocks the writes and the self-test fails.</li>
 </ul>
 <p>OpenSNES writes <b><span class="tt">$FF</span></b> because that is what works on the emulators we test against. If you target real hardware, verify this on a cartridge — the tie is unbroken. The crt0 I-RAM self-test catches a wrong choice at runtime (<span class="tt">sa1IsReady()</span> returns false). </p>
 </blockquote>
@@ -296,18 +296,18 @@ Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <div class="line"><span class="preprocessor">#define SA1_BUF  ((volatile u8*)0x3010)</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
-<div class="line">    <span class="keywordflow">while</span> (!<a class="code hl_define" href="memory_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a>) { }   <span class="comment">/* Wait for SA-1 */</span></div>
+<div class="line">    <span class="keywordflow">while</span> (!<a class="code hl_define" href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a>) { }   <span class="comment">/* Wait for SA-1 */</span></div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Read results from I-RAM */</span></div>
 <div class="line">    <span class="keywordflow">for</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; count; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
 <div class="line">        result[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = SA1_BUF[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>];</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_define" href="memory_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a> = 0;           <span class="comment">/* Tell SA-1 we consumed */</span></div>
+<div class="line">    <a class="code hl_define" href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a> = 0;           <span class="comment">/* Tell SA-1 we consumed */</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
+<div class="ttc" id="achips_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:27</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
-<div class="ttc" id="amemory_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="memory_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:27</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md335"></a>
 Pattern 2: Free-Running Counter</h3>
 <p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. See sa1_hello for register readback examples.</p>
@@ -404,9 +404,9 @@ Examples</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What it demonstrates  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_hello/">sa1_hello</a>  </td><td class="markdownTableBodyNone">Boot diagnostic — verifies SA-1 initialization  </td></tr>
+<td class="markdownTableBodyNone"><a href="../../../examples/chips/sa1_hello/">sa1_hello</a>  </td><td class="markdownTableBodyNone">Boot diagnostic — verifies SA-1 initialization  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="../../../examples/memory/sa1_starfield/">sa1_starfield</a>  </td><td class="markdownTableBodyNone">128 sprites with sine-wave Lissajous patterns  </td></tr>
+<td class="markdownTableBodyNone"><a href="../../../examples/chips/sa1_starfield/">sa1_starfield</a>  </td><td class="markdownTableBodyNone">128 sprites with sine-wave Lissajous patterns  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md344"></a>
 What SA-1 Can't Do</h2>

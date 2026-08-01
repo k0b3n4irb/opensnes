@@ -2,7 +2,7 @@ var searchData=
 [
   ['ease_5fquad_5ftable_0',['ease_quad_table',['../math_8h.html#a1d00d3d61fbf201e34b45eccc2113a7b',1,'math.h']]],
   ['echo_5fon_1',['echo_on',['../audio_2soundboard_2main_8c.html#a9313bf26ebffdabd4a82279b0d1e44f8',1,'main.c']]],
-  ['edge_5fbuffer_2',['edge_buffer',['../graphics_2effects_2superfx__3d_2main_8c.html#a13e8a460af470496c612612de060c050',1,'main.c']]],
+  ['edge_5fbuffer_2',['edge_buffer',['../chips_2superfx__3d_2main_8c.html#a13e8a460af470496c612612de060c050',1,'main.c']]],
   ['empty_5ftile_3',['empty_tile',['../basics_2collision__demo_2main_8c.html#a16dc96ce6b56ea6c030a6a86de599555',1,'main.c']]],
   ['enemies_4',['enemies',['../structGameState.html#a592b98be5c4621d0ab1f675140caddc2',1,'GameState']]],
   ['enemy_5fbox_5',['enemy_box',['../basics_2collision__demo_2main_8c.html#abd583ad309c983b08f00fe94fb7dd85a',1,'main.c']]],

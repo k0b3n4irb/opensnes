@@ -2,7 +2,7 @@ var searchData=
 [
   ['pal1_0',['PAL1',['../render_8c.html#ac051922d6263b9fddb3531561ff2a419',1,'render.c']]],
   ['palette_5f16_5fsize_1',['PALETTE_16_SIZE',['../sprite_8h.html#a36d13bc82e1a6a64d0a2d59a961d9dfe',1,'sprite.h']]],
-  ['palettesprsize_2',['PALETTESPRSIZE',['../graphics_2sprites_2object__size_2main_8c.html#ac2968ae95966edabc01549b91d731d2e',1,'main.c']]],
+  ['palettesprsize_2',['PALETTESPRSIZE',['../sprites_2sprite__sizes_2main_8c.html#ac2968ae95966edabc01549b91d731d2e',1,'main.c']]],
   ['panel_5fh_3',['PANEL_H',['../games_2rpg_2main_8c.html#af8b3442139f0d622eddbe7183c340a84',1,'main.c']]],
   ['panel_5fw_4',['PANEL_W',['../games_2rpg_2main_8c.html#a55fa872cddbb2f9104301cd565f60f14',1,'main.c']]],
   ['panel_5fx_5',['PANEL_X',['../games_2rpg_2main_8c.html#a5b92bccb93e9247a389e875ca4c681b8',1,'main.c']]],
@@ -25,7 +25,7 @@ var searchData=
   ['player_5fmin_5fx_22',['PLAYER_MIN_X',['../games_2shmup__1942_2main_8c.html#ab5f00d51972f39735de1b07d450a7300',1,'main.c']]],
   ['player_5fmin_5fy_23',['PLAYER_MIN_Y',['../games_2shmup__1942_2main_8c.html#a86d7b56831c95a7ec22e001a0e55ff11',1,'main.c']]],
   ['player_5fsize_24',['PLAYER_SIZE',['../basics_2collision__demo_2main_8c.html#a5fac8f2cc29ea5bde30c8fa4a4daa306',1,'main.c']]],
-  ['player_5fspeed_25',['PLAYER_SPEED',['../basics_2collision__demo_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c'],['../games_2shmup__1942_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c']]],
+  ['player_5fspeed_25',['PLAYER_SPEED',['../basics_2collision__demo_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c'],['../basics_2game__skeleton_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c'],['../games_2shmup__1942_2main_8c.html#af49bad41acef45feb40939c0cf9d5d35',1,'PLAYER_SPEED:&#160;main.c']]],
   ['player_5fx_26',['PLAYER_X',['../basics_2aim__target_2main_8c.html#a11d58baaffc49494ab91da16621b6a5c',1,'main.c']]],
   ['player_5fy_27',['PLAYER_Y',['../basics_2aim__target_2main_8c.html#ae22bdd9c98feb24a0843a4ff0fa6e662',1,'main.c']]],
   ['pos_5flevel_5fl_28',['POS_LEVEL_L',['../hud_8c.html#aa0a12af1a9b16c3c9e1d4166c5438588',1,'hud.c']]],
@@ -41,5 +41,9 @@ var searchData=
   ['profile_5fmagenta_38',['PROFILE_MAGENTA',['../profile_8h.html#af8d9e9e2028c9665ba3c747c5aca9ba0',1,'profile.h']]],
   ['profile_5fred_39',['PROFILE_RED',['../profile_8h.html#aafce9d527876301c4d22eae1ea946631',1,'profile.h']]],
   ['profile_5fwhite_40',['PROFILE_WHITE',['../profile_8h.html#a7ee7d566af8cf6b15c9e1edeb53ec39c',1,'profile.h']]],
-  ['profile_5fyellow_41',['PROFILE_YELLOW',['../profile_8h.html#ac130467a2fa8d19c757d293ae2d1e83f',1,'profile.h']]]
+  ['profile_5fyellow_41',['PROFILE_YELLOW',['../profile_8h.html#ac130467a2fa8d19c757d293ae2d1e83f',1,'profile.h']]],
+  ['px_5fmax_42',['PX_MAX',['../basics_2game__skeleton_2main_8c.html#a47dca70e524e0846904e5d7036bc6cb2',1,'main.c']]],
+  ['px_5fmin_43',['PX_MIN',['../basics_2game__skeleton_2main_8c.html#aa725a67797327416f6f412eeb958d8e5',1,'main.c']]],
+  ['py_5fmax_44',['PY_MAX',['../basics_2game__skeleton_2main_8c.html#abb052ed7fc774c9fd91dfdb21a5e5ef3',1,'main.c']]],
+  ['py_5fmin_45',['PY_MIN',['../basics_2game__skeleton_2main_8c.html#a89d00fa93ab6c57c4063b6f06c5caf85',1,'main.c']]]
 ];

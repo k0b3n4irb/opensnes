@@ -184,14 +184,14 @@ A3. Download OpenSNES SDK</h3>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md443"></a>
 A4. Run Your First ROM</h3>
 <p>The SDK comes with pre-built example ROMs:</p>
-<div class="fragment"><div class="line">cd opensnes/examples/text/hello_world</div>
+<div class="fragment"><div class="line">cd opensnes/examples/text/print_string</div>
 <div class="line"> </div>
 <div class="line"># Open in your emulator</div>
-<div class="line">mesen hello_world.sfc        # Linux</div>
-<div class="line">open -a Mesen hello_world.sfc  # macOS</div>
-<div class="line">start Mesen.exe hello_world.sfc  # Windows</div>
+<div class="line">mesen print_string.sfc        # Linux</div>
+<div class="line">open -a Mesen print_string.sfc  # macOS</div>
+<div class="line">start Mesen.exe print_string.sfc  # Windows</div>
 </div><!-- fragment --><blockquote class="doxtable">
-<p><b>Note:</b> <span class="tt">mesen</span> must be on your <span class="tt">PATH</span> for the Linux command above. Install Mesen from <a href="https://www.mesen.ca/">mesen.ca</a> and either add its directory to <span class="tt">PATH</span> or alias it (<span class="tt">alias mesen=~/Mesen/Mesen</span>). No emulator installed? The SDK's own <span class="tt">luna</span> backend also plays ROMs: <span class="tt">luna hello_world.sfc</span> (install it once with <span class="tt">scripts/install-luna.sh</span>). </p>
+<p><b>Note:</b> <span class="tt">mesen</span> must be on your <span class="tt">PATH</span> for the Linux command above. Install Mesen from <a href="https://www.mesen.ca/">mesen.ca</a> and either add its directory to <span class="tt">PATH</span> or alias it (<span class="tt">alias mesen=~/Mesen/Mesen</span>). No emulator installed? The SDK's own <span class="tt">luna</span> backend also plays ROMs: <span class="tt">luna print_string.sfc</span> (install it once with <span class="tt">scripts/install-luna.sh</span>). </p>
 </blockquote>
 <p>You should see "Hello World!" on screen.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md444"></a>
@@ -328,7 +328,7 @@ B4. Development Workflow</h3>
 <div class="fragment"><div class="line">make clean &amp;&amp; make     # Full rebuild (required after compiler changes)</div>
 <div class="line">make lib               # Rebuild library only</div>
 <div class="line">make examples          # Rebuild examples only</div>
-<div class="line">make -C examples/text/hello_world  # Rebuild one example</div>
+<div class="line">make -C examples/text/print_string  # Rebuild one example</div>
 </div><!-- fragment --><p>See CLAUDE.md for architecture details and coding conventions.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="autotoc_md455"></a>
@@ -338,17 +338,17 @@ What's Next?</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Level  </th><th class="markdownTableHeadNone">Examples  </th><th class="markdownTableHeadNone">What You'll Learn  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Beginner</b>  </td><td class="markdownTableBodyNone"><span class="tt">text/hello_world</span>, <span class="tt">text/text_test</span>  </td><td class="markdownTableBodyNone">Console output, text formatting  </td></tr>
+<td class="markdownTableBodyNone"><b>Beginner</b>  </td><td class="markdownTableBodyNone"><span class="tt">text/print_string</span>, <span class="tt">text/scroll_message</span>  </td><td class="markdownTableBodyNone">Console output, text formatting  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Intermediate</b>  </td><td class="markdownTableBodyNone"><span class="tt">graphics/sprites/simple_sprite</span>, <span class="tt">input/two_players</span>  </td><td class="markdownTableBodyNone">Sprites, controller input  </td></tr>
+<td class="markdownTableBodyNone"><b>Intermediate</b>  </td><td class="markdownTableBodyNone"><span class="tt">sprites/simple_sprite</span>, <span class="tt">input/two_players</span>  </td><td class="markdownTableBodyNone">Sprites, controller input  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Advanced</b>  </td><td class="markdownTableBodyNone"><span class="tt">graphics/backgrounds/mode7</span>, <span class="tt">audio/snesmod_music</span>  </td><td class="markdownTableBodyNone">Mode 7, tracker music  </td></tr>
+<td class="markdownTableBodyNone"><b>Advanced</b>  </td><td class="markdownTableBodyNone"><span class="tt">mode7/rotate_scale</span>, <span class="tt">audio/snesmod_music</span>  </td><td class="markdownTableBodyNone">Mode 7, tracker music  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Expert</b>  </td><td class="markdownTableBodyNone"><span class="tt">games/breakout</span>, <span class="tt">games/likemario</span>  </td><td class="markdownTableBodyNone">Complete game structure  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>SA-1 Coprocessor</b>  </td><td class="markdownTableBodyNone"><span class="tt">memory/sa1_hello</span>, <span class="tt">memory/sa1_starfield</span>  </td><td class="markdownTableBodyNone">10.74 MHz second CPU (<a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">tutorial</a>)  </td></tr>
+<td class="markdownTableBodyNone"><b>SA-1 Coprocessor</b>  </td><td class="markdownTableBodyNone"><span class="tt">chips/sa1_hello</span>, <span class="tt">chips/sa1_starfield</span>  </td><td class="markdownTableBodyNone">10.74 MHz second CPU (<a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">tutorial</a>)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>SuperFX (GSU)</b>  </td><td class="markdownTableBodyNone"><span class="tt">memory/superfx_hello</span>, <span class="tt">graphics/effects/superfx_3d</span>  </td><td class="markdownTableBodyNone">RISC coprocessor, 3D rendering (<a class="el" href="superfx_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/superfx.md">tutorial</a>)  </td></tr>
+<td class="markdownTableBodyNone"><b>SuperFX (GSU)</b>  </td><td class="markdownTableBodyNone"><span class="tt">chips/superfx_hello</span>, <span class="tt">chips/superfx_3d</span>  </td><td class="markdownTableBodyNone">RISC coprocessor, 3D rendering (<a class="el" href="superfx_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/superfx.md">tutorial</a>)  </td></tr>
 </table>
 <p>Browse all examples: </p><div class="fragment"><div class="line">ls examples/*/</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md456"></a>

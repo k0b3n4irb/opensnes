@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['wait_5ffor_5fkey_0',['wait_for_key',['../graphics_2effects_2fading_2main_8c.html#a77cebcad141a74189b9e975a8919d304',1,'main.c']]],
-  ['waitforkey_1',['WaitForKey',['../graphics_2effects_2mosaic_2main_8c.html#aa2bb73af30ab2b37bd663250970e7332',1,'main.c']]],
+  ['wait_5ffor_5fkey_0',['wait_for_key',['../transitions_2fading_2main_8c.html#a77cebcad141a74189b9e975a8919d304',1,'main.c']]],
+  ['waitforkey_1',['WaitForKey',['../transitions_2mosaic_2main_8c.html#aa2bb73af30ab2b37bd663250970e7332',1,'main.c']]],
   ['waitforvblank_2',['WaitForVBlank',['../console_8h.html#abd33830487e4764e5ec22ec98b749f4b',1,'console.h']]],
   ['windowcentered_3',['windowCentered',['../window_8h.html#a11a35f5ec93736ea033380fd399e6bdd',1,'window.h']]],
   ['windowdisable_4',['windowDisable',['../window_8h.html#aade31a5a8942e5aed6e954ae4ac5508b',1,'window.h']]],
@@ -16,7 +16,7 @@ var searchData=
   ['windowsplit_13',['windowSplit',['../window_8h.html#a977a0f5193aa0688fef854dce181d2de',1,'window.h']]],
   ['write_5ftile_14',['write_tile',['../memory_2hirom__demo_2main_8c.html#a7e612617242d479ac289ab6632a5116e',1,'main.c']]],
   ['write_5fvram_5fcolumn_15',['write_vram_column',['../games_2likemario_2main_8c.html#a08f0ca6d6bd43a513eb762fdbfb5f64d',1,'main.c']]],
-  ['writeedgestosram_16',['writeEdgesToSRAM',['../graphics_2effects_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
+  ['writeedgestosram_16',['writeEdgesToSRAM',['../chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
   ['writenum_17',['writenum',['../games_2breakout_2main_8c.html#a42f75a3892f52c5edcfbdd129fdec6a9',1,'main.c']]],
   ['writenum_5fbg2_18',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
   ['writestring_19',['writestring',['../games_2breakout_2main_8c.html#ad1545da3f0a593a3aad9c35e8dfdfd9c',1,'main.c']]],

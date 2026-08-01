@@ -122,72 +122,84 @@ $(function(){initNavTree('learning_path.html','',''); });
   <div class="headertitle"><div class="title">Learn SNES Development </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A curated learning path through the 74 examples — a hand-picked progression from your first ROM to complete games, where each step builds on concepts from earlier ones. This is a selected subset, not the full list; for the exhaustive index see <a class="el" href="examples_by_category.html" title="Browse Examples by Category">Browse Examples by Category</a>.</p>
+<div class="textblock"><p>A curated path through the 75 examples — not a feature tour, a <b>developer's journey</b>. You don't wake up wanting "Mode 7"; you wake up with a question about the game you're building, and it changes as you go. Each stage below is one of those questions, and the confidence it buys you. This is a hand-picked subset; for the exhaustive index see <a class="el" href="examples_by_category.html" title="Browse Examples by Category">Browse Examples by Category</a>.</p>
+<p>At every step the goal is the same: never a wall you can't climb with what you just learned, always a result that works, always the <em>why</em>.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md465"></a>
-Level 1: First Steps</h2>
-<p>Learn the basics: display text, show sprites, read input.</p>
-<p><a class="el" href="examples_text_hello_world.html" title="Hello World">Hello World</a></p>
-<p><a class="el" href="examples_text_text_test.html" title="Text Module Test">Text Module Test</a></p>
-<p><a class="el" href="examples_graphics_sprites_simple_sprite.html" title="Simple Sprite -- Your First OAM Sprite">Simple Sprite -- Your First OAM Sprite</a></p>
-<p><a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a></p>
+Stage 0 — "Does my setup even work?"</h2>
+<p><em>Confidence: the toolchain isn't scary.</em> Get one ROM built and running, and learn the rhythm of a frame — you set things up during blanking, then let the machine run at 60 Hz.</p>
+<p><a class="el" href="examples_text_print_string.html" title="Print a string">Print a string</a></p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md466"></a>
-Level 2: Graphics Fundamentals</h2>
-<p>Background modes, sprite animation, screen effects.</p>
-<p><a class="el" href="examples_graphics_backgrounds_mode1.html" title="Mode 1 Example">Mode 1 Example</a></p>
-<p><a class="el" href="examples_graphics_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a></p>
-<p><a class="el" href="examples_graphics_backgrounds_mode1_lz77.html" title="Mode 1 LZ77">Mode 1 LZ77</a></p>
-<p><a class="el" href="examples_graphics_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a></p>
-<p><a class="el" href="examples_graphics_sprites_dynamic_sprite.html" title="Dynamic Sprite -- VRAM Streaming for Animated Sprites">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a></p>
-<p><a class="el" href="examples_graphics_sprites_object_size.html" title="Object Size -- All 6 SNES Sprite Size Modes">Object Size -- All 6 SNES Sprite Size Modes</a></p>
-<p><a class="el" href="examples_graphics_effects_fading.html" title="Fading Example">Fading Example</a></p>
-<p><a class="el" href="examples_graphics_effects_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a></p>
+Stage 1 — "Can I put something on screen?"</h2>
+<p><em>Confidence: I control the picture.</em> Text, a background from your own art, a sprite that isn't tied to the grid. The tile / palette / VRAM trinity that underpins everything visual on the SNES.</p>
+<p><a class="el" href="examples_text_scroll_message.html" title="Scroll a message">Scroll a message</a></p>
+<p><a class="el" href="examples_backgrounds_mode1.html" title="Mode 1 Example">Mode 1 Example</a></p>
+<p><a class="el" href="examples_sprites_simple_sprite.html" title="Simple Sprite -- Your First OAM Sprite">Simple Sprite -- Your First OAM Sprite</a></p>
+<p><a class="el" href="examples_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a></p>
+<p><a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a></p>
+<blockquote class="doxtable">
+<p>Under the hood — how a glyph becomes pixels with no module at all: <a class="el" href="examples_fundamentals_text_glyphs.html" title="Fundamentals: how a glyph is drawn">Fundamentals: how a glyph is drawn</a> </p>
+</blockquote>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md467"></a>
-Level 3: Scrolling and Effects</h2>
-<p>HDMA, parallax, color math, hardware windows.</p>
-<p><a class="el" href="examples_graphics_backgrounds_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a></p>
-<p><a class="el" href="examples_graphics_backgrounds_mixed_scroll.html" title="Mixed Scroll">Mixed Scroll</a></p>
-<p><a class="el" href="examples_graphics_effects_hdma_wave.html" title="HDMA Wave">HDMA Wave</a> <a class="el" href="examples_graphics_effects_hdma_wave_table.html" title="HDMA Wave Table">HDMA Wave Table</a> <a class="el" href="examples_graphics_effects_hdma_indirect_gradient.html" title="HDMA Indirect Gradient">HDMA Indirect Gradient</a></p>
-<p><a class="el" href="examples_graphics_effects_hdma_helpers.html" title="HDMA Helpers Demo">HDMA Helpers Demo</a></p>
-<p><a class="el" href="examples_graphics_effects_gradient_colors.html" title="Gradient Colors -- HDMA Color Gradients">Gradient Colors -- HDMA Color Gradients</a></p>
-<p><a class="el" href="examples_graphics_effects_parallax_scrolling.html" title="Parallax Scrolling">Parallax Scrolling</a></p>
-<p><a class="el" href="examples_graphics_effects_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a></p>
-<p><a class="el" href="examples_graphics_effects_window.html" title="Window -- HDMA Triangle Masking">Window -- HDMA Triangle Masking</a></p>
-<p><a class="el" href="examples_graphics_effects_transparent_window.html" title="Transparent Window -- Color Math + HDMA">Transparent Window -- Color Math + HDMA</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md468"></a>
-Level 4: Advanced Topics</h2>
-<p>Mode 7, input devices, memory, audio.</p>
-<p><a class="el" href="examples_graphics_backgrounds_mode7.html" title="Mode 7 -- Rotation and Scaling">Mode 7 -- Rotation and Scaling</a></p>
-<p><a class="el" href="examples_graphics_backgrounds_mode7_perspective.html" title="Mode 7 Perspective -- Pseudo-3D Ground Effect">Mode 7 Perspective -- Pseudo-3D Ground Effect</a></p>
-<p><a class="el" href="examples_graphics_sprites_metasprite.html" title="Metasprite">Metasprite</a></p>
+Stage 2 — "Can the player act?"</h2>
+<p><em>Confidence: it's a game, not a demo.</em> Read the pad, move something with it, then branch out to the SNES's exotic controllers.</p>
+<p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a></p>
+<p><a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a></p>
 <p><a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a></p>
 <p><a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a></p>
-<p><a class="el" href="examples_memory_hirom_demo.html" title="HiROM Demo -- Understanding SNES Memory Mapping">HiROM Demo -- Understanding SNES Memory Mapping</a></p>
-<p><a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a></p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md468"></a>
+Stage 3 — "Can I build a world?"</h2>
+<p><em>Confidence: bigger than one screen.</em> Scroll a background past the camera, stream a world larger than VRAM, drive it from a Tiled map, and stand on the ground with tile collision.</p>
+<p><a class="el" href="examples_scrolling_mixed_scroll.html" title="Mixed Scroll">Mixed Scroll</a></p>
+<p><a class="el" href="examples_scrolling_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a></p>
+<p><a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a></p>
+<p><a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a></p>
+<p><a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a></p>
+<p><a class="el" href="examples_basics_collision_demo.html" title="Collision Detection Demo">Collision Detection Demo</a></p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md469"></a>
+Stage 4 — "Can I make it feel good?"</h2>
+<p><em>Confidence: it feels like a real game.</em> This is where the SNES becomes the SNES — fades and mosaic transitions, per-scanline HDMA effects, colour math, windows, the Mode 7 plane, and sound.</p>
+<p><a class="el" href="examples_transitions_fading.html" title="Fading Example">Fading Example</a></p>
+<p><a class="el" href="examples_transitions_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a></p>
+<p><a class="el" href="examples_hdma_hdma_wave.html" title="HDMA Wave">HDMA Wave</a></p>
+<p><a class="el" href="examples_hdma_gradient_colors.html" title="Gradient Colors -- HDMA Color Gradients">Gradient Colors -- HDMA Color Gradients</a></p>
+<p><a class="el" href="examples_color_palette_cycle.html" title="palette_cycle — animate by rotating CGRAM">palette_cycle — animate by rotating CGRAM</a></p>
+<p><a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a></p>
+<p><a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a></p>
+<p><a class="el" href="examples_windows_window.html" title="Window -- HDMA Triangle Masking">Window -- HDMA Triangle Masking</a></p>
+<p><a class="el" href="examples_mode7_rotate_scale.html" title="Mode 7 -- Rotation and Scaling">Mode 7 -- Rotation and Scaling</a></p>
+<p><a class="el" href="examples_mode7_perspective.html" title="Mode 7 Perspective -- Pseudo-3D Ground Effect">Mode 7 Perspective -- Pseudo-3D Ground Effect</a></p>
 <p><a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a></p>
 <p><a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md469"></a>
-Level 5: Maps and Complete Projects</h2>
-<p>Tile maps, collision, and complete games.</p>
-<p><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a></p>
-<p><a class="el" href="examples_maps_slopemario.html" title="Slope Mario">Slope Mario</a></p>
-<p><a class="el" href="examples_basics_collision_demo.html" title="Collision Detection Demo">Collision Detection Demo</a></p>
+<p><a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a></p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md470"></a>
+Stage 5 — "Can I hold it all together?"</h2>
+<p><em>Confidence: architecture, not spaghetti.</em> Stop hand-rolling the main loop and the state machine; assemble a skeleton, and pick up the reusable maths every game needs.</p>
+<p><a class="el" href="examples_basics_timer.html" title="VBlank Timer">VBlank Timer</a></p>
+<p><a class="el" href="examples_basics_scene_stack.html" title="Scene Stack">Scene Stack</a></p>
+<p><a class="el" href="examples_basics_panel_hud.html" title="panel_hud — a HUD that survives a dialog box">panel_hud — a HUD that survives a dialog box</a></p>
+<p><a class="el" href="examples_basics_game_skeleton.html" title="game_skeleton — the smallest complete game">game_skeleton — the smallest complete game</a></p>
+<p><a class="el" href="examples_basics_aim_target.html" title="aim_target">aim_target</a></p>
+<p><a class="el" href="examples_basics_fix32_orbit.html" title="fix32_orbit">fix32_orbit</a></p>
+<p><a class="el" href="examples_basics_random.html" title="Random Numbers">Random Numbers</a></p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md471"></a>
+Stage 6 — "Can I finish and ship?"</h2>
+<p><em>Confidence: a complete cartridge.</em> Persist progress, choose a mapper, reach for a coprocessor when you need more, and study complete games that fuse everything above.</p>
+<p><a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a></p>
+<p><a class="el" href="examples_memory_hirom_demo.html" title="HiROM Demo -- Understanding SNES Memory Mapping">HiROM Demo -- Understanding SNES Memory Mapping</a></p>
 <p><a class="el" href="examples_games_breakout.html" title="Breakout">Breakout</a></p>
 <p><a class="el" href="examples_games_likemario.html" title="LikeMario">LikeMario</a></p>
 <p><a class="el" href="examples_games_mapandobjects.html" title="Map and Objects">Map and Objects</a></p>
 <p><a class="el" href="examples_games_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a></p>
 <p><a class="el" href="examples_games_shmup_1942.html" title="shmup_1942">shmup_1942</a></p>
+<p><a class="el" href="examples_games_mode7_racing.html" title="mode7_racing — an F-Zero-style mini game">mode7_racing — an F-Zero-style mini game</a></p>
 <p><a class="el" href="examples_games_mode7_flying.html" title="mode7_flying — a Pilotwings-style demo">mode7_flying — a Pilotwings-style demo</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md470"></a>
-Level 6: Enhancement Chips</h2>
-<p>Cartridge coprocessors that push the SNES beyond its base hardware. SA-1 uses the same 65816 ISA at 3x speed; SuperFX is a custom RISC processor.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md471"></a>
-SA-1 Coprocessor (same ISA, 10.74 MHz)</h3>
-<p><a class="el" href="examples_memory_sa1_hello.html" title="SA-1 Hello World">SA-1 Hello World</a></p>
-<p><a class="el" href="examples_memory_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a></p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md472"></a>
-SuperFX / GSU (custom RISC, bitmap + 3D)</h3>
-<p><a class="el" href="examples_memory_superfx_hello.html" title="SuperFX Hello">SuperFX Hello</a></p>
-<p><a class="el" href="examples_graphics_effects_superfx_3d.html" title="SuperFX 3D Cube">SuperFX 3D Cube</a> </p>
+More horsepower — the cartridge coprocessors</h3>
+<p>When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz; SuperFX / GSU is a custom RISC processor for bitmaps and 3D.</p>
+<p><a class="el" href="examples_chips_sa1_hello.html" title="SA-1 Hello World">SA-1 Hello World</a></p>
+<p><a class="el" href="examples_chips_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a></p>
+<p><a class="el" href="examples_chips_superfx_hello.html" title="SuperFX Hello">SuperFX Hello</a></p>
+<p><a class="el" href="examples_chips_superfx_3d.html" title="SuperFX 3D Cube">SuperFX 3D Cube</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

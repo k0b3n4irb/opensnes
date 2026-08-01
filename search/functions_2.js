@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['changeobjsize_0',['changeObjSize',['../graphics_2sprites_2dynamic__metasprite_2main_8c.html#a99b104ba99a16132b181b2938e27a66b',1,'changeObjSize(void):&#160;main.c'],['../graphics_2sprites_2metasprite_2main_8c.html#a639d8dac137f049df085726a0a72076c',1,'changeObjSize(void):&#160;main.c'],['../graphics_2sprites_2object__size_2main_8c.html#a639d8dac137f049df085726a0a72076c',1,'changeObjSize(void):&#160;main.c']]],
+  ['changeobjsize_0',['changeObjSize',['../sprites_2dynamic__metasprite_2main_8c.html#a99b104ba99a16132b181b2938e27a66b',1,'changeObjSize(void):&#160;main.c'],['../sprites_2metasprite_2main_8c.html#a639d8dac137f049df085726a0a72076c',1,'changeObjSize(void):&#160;main.c'],['../sprites_2sprite__sizes_2main_8c.html#a639d8dac137f049df085726a0a72076c',1,'changeObjSize(void):&#160;main.c']]],
   ['check_5fbricks_1',['check_bricks',['../games_2breakout_2main_8c.html#a717b5d7a72b0be4dee8111dbdeb757ed',1,'main.c']]],
   ['check_5fcollisions_2',['check_collisions',['../basics_2collision__demo_2main_8c.html#a8e9e3205fb372379b5f6787f13e8e7b2',1,'main.c']]],
   ['check_5fpaddle_3',['check_paddle',['../games_2breakout_2main_8c.html#ab3fb8acabd08cd49c4d24492477abc52',1,'main.c']]],

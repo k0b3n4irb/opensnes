@@ -289,11 +289,11 @@ The lib API</h2>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md142"></a>
 Worked patterns (the two shipped examples)</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md143"></a>
-Additive cloud overlay — <span class="tt">examples/graphics/effects/transparency</span></h3>
+Additive cloud overlay — <span class="tt">examples/color/transparency</span></h3>
 <p>The simplest blend pattern. BG1 (main) shows a 4 bpp landscape; BG3 (main + sub) shows 2 bpp scrolling clouds. Colour math is set to <b>add</b> with half disabled (saturating add), applied to BG1 and the backdrop. The clouds <em>brighten</em> what's underneath without dimming themselves — characteristic of additive blending.</p>
 <p>The example uses Mode 1 with BG3 priority high (so the 2 bpp cloud layer renders above BG1). It uses bare-metal <span class="tt"><a class="el" href="group__ppu__regs.html#ga31783a38f8bf7129cd0186641e598fe4" title="Color math control A (W).">REG_CGWSEL</a></span> / <span class="tt"><a class="el" href="group__ppu__regs.html#ga4de43c070a90869390fca11731a2692e" title="Color math control B (W).">REG_CGADSUB</a></span> writes for byte-perfect parity with the PVSnesLib original, but the lib's helpers cover the same configuration.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md144"></a>
-Window-gated spotlight blend — <span class="tt">examples/graphics/effects/transparent_window</span></h3>
+Window-gated spotlight blend — <span class="tt">examples/windows/transparent_window</span></h3>
 <p>Combines colour math with a <em>window-gated</em> math area. Inside the window, BG1 is half-blended with BG2 (true transparency); outside, BG1 is fully opaque. The example also uses HDMA to animate the window shape — see the <a class="el" href="window_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/window.md">Window</a> and <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA</a> tutorials for those sides.</p>
 <p>This is the canonical demonstration of how three SNES PPU subsystems (window, colour math, HDMA) compose: window says where, colour math says what to blend, HDMA animates the shape per scanline.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md145"></a>
@@ -339,8 +339,8 @@ See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="colormath_8h.html" title="SNES Color Math (Blending/Transparency).">lib/include/snes/colormath.h</a></span> — full API reference, polarity-fixed helper definitions.</li>
 <li><span class="tt">lib/source/colormath.c</span> — implementation; commit history records the <span class="tt">CGWSEL</span> bit-1 polarity fix.</li>
-<li><a class="el" href="dir_7e61d567d6a36fd6ff35a56f7163f974.html" title="/home/runner/work/opensnes/opensnes/examples/graphics/effects/transparency/README.md"><span class="tt">examples/graphics/effects/transparency</span></a> — additive cloud overlay.</li>
-<li><a class="el" href="dir_64d894911213963f880485919df5ef58.html" title="/home/runner/work/opensnes/opensnes/examples/graphics/effects/transparent_window/README.md"><span class="tt">examples/graphics/effects/transparent_window</span></a> — window-gated spotlight blend.</li>
+<li><a class="el" href="dir_b535caf38cf74252936932e59da65221.html" title="/home/runner/work/opensnes/opensnes/examples/color/transparency/README.md"><span class="tt">examples/color/transparency</span></a> — additive cloud overlay.</li>
+<li><a class="el" href="dir_99e208758b27166c625155f30ad77e9d.html" title="/home/runner/work/opensnes/opensnes/examples/windows/transparent_window/README.md"><span class="tt">examples/windows/transparent_window</span></a> — window-gated spotlight blend.</li>
 <li><a class="el" href="window_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/window.md">Window tutorial</a> — the pair tutorial; covers <span class="tt"><a class="el" href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177" title="Color math (affects color blending).">WINDOW_MATH</a></span> and the window-area gate that the math source mask references.</li>
 <li><a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a> — for animating colour-math configuration per scanline (gradients on <span class="tt">COLDATA</span>, etc.).</li>
 <li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — companion read for the BG-layer fundamentals colour math operates on.</li>

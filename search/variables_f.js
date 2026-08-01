@@ -11,7 +11,7 @@ var searchData=
   ['oamx_8',['oamx',['../structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004',1,'t_sprites']]],
   ['oamy_9',['oamy',['../structt__sprites.html#a6c499b96e640bbad488eb8874bf36281',1,'t_sprites']]],
   ['objgetid_10',['objgetid',['../object_8h.html#ad4b2cf3a008d2011baf65b7ed74eaf65',1,'object.h']]],
-  ['objmario_11',['objmario',['../games_2mapandobjects_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c'],['../maps_2slopemario_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c']]],
+  ['objmario_11',['objmario',['../games_2mapandobjects_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c'],['../maps_2slope__collision_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c']]],
   ['objnotused_12',['objnotused',['../structt__objs.html#aed65e6435d869acf9aa711fa28e740de',1,'t_objs']]],
   ['objptr_13',['objptr',['../object_8h.html#a9e81915d1e68d22798a93bb27eb74188',1,'object.h']]],
   ['objtokill_14',['objtokill',['../object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3',1,'object.h']]],

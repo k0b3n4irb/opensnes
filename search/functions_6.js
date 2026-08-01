@@ -12,7 +12,7 @@ var searchData=
   ['gsudmafullframe_9',['gsuDmaFullFrame',['../superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8',1,'superfx.h']]],
   ['gsuinit_10',['gsuInit',['../superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10',1,'superfx.h']]],
   ['gsulaunch_11',['gsuLaunch',['../superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8',1,'superfx.h']]],
-  ['gsusetprogram_12',['gsuSetProgram',['../graphics_2effects_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e',1,'main.c']]],
+  ['gsusetprogram_12',['gsuSetProgram',['../chips_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e',1,'main.c']]],
   ['gsusetupbitmaptilemap_13',['gsuSetupBitmapTilemap',['../superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50',1,'superfx.h']]],
   ['gsusetuphdmablanking_14',['gsuSetupHdmaBlanking',['../superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a',1,'superfx.h']]]
 ];

@@ -207,7 +207,7 @@ scanlines, the window should be from `left` to `right`":</p>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Letterbox / iris fade  </td><td class="markdownTableBodyNone"><span class="tt">left = 0, right = 255</span> outside the band, <span class="tt">left &gt; right</span> (empty window) inside  </td></tr>
 </table>
-<p>The shipped <span class="tt">examples/graphics/effects/window</span> uses HDMA channels 4 and 5 in repeat mode to write <span class="tt">WH0</span> (<span class="tt">$2126</span>) and <span class="tt">WH1</span> (<span class="tt">$2127</span>) per scanline, producing an animated triangle/diamond. Read the example for the table-build pattern; the principle: compute the <span class="tt">left</span> and <span class="tt">right</span> window edge for each scanline <span class="tt">s</span>, lay them out as an HDMA table, then trigger.</p>
+<p>The shipped <span class="tt">examples/windows/window</span> uses HDMA channels 4 and 5 in repeat mode to write <span class="tt">WH0</span> (<span class="tt">$2126</span>) and <span class="tt">WH1</span> (<span class="tt">$2127</span>) per scanline, producing an animated triangle/diamond. Read the example for the table-build pattern; the principle: compute the <span class="tt">left</span> and <span class="tt">right</span> window edge for each scanline <span class="tt">s</span>, lay them out as an HDMA table, then trigger.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md420"></a>
 When the window register acts strange</h2>
 <p>Two non-obvious behaviours:</p>
@@ -252,7 +252,7 @@ The lib API</h2>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md425"></a>
 Worked patterns (the shipped examples)</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md426"></a>
-Animated triangle reveal — <span class="tt">examples/graphics/effects/window</span></h3>
+Animated triangle reveal — <span class="tt">examples/windows/window</span></h3>
 <p>A diamond/triangle shape that reveals BG1 only inside the shape, with runtime layer selection:</p>
 <ul>
 <li>Press <b>A</b>: apply window to BG1 only.</li>
@@ -261,7 +261,7 @@ Animated triangle reveal — <span class="tt">examples/graphics/effects/window</
 </ul>
 <p>Two HDMA channels (4 and 5) write <span class="tt">WH0</span>/<span class="tt">WH1</span> per scanline. The example uses <b>bare-metal register writes</b> rather than the lib helpers because that path was tested for byte-perfect parity with the PVSnesLib original. For new code, the lib helpers are preferred — they read more like SNES vocabulary.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md427"></a>
-Window + colour math — <span class="tt">examples/graphics/effects/transparent_window</span></h3>
+Window + colour math — <span class="tt">examples/windows/transparent_window</span></h3>
 <p>Pairs the window system with the colour-math pipeline to produce a spotlight that <b>blends</b> BG1 onto BG2 (rather than just hiding it). The window covers part of the screen; inside the window, BG1 is half-transparent over BG2; outside, BG1 is fully opaque. The bridge is <span class="tt"><a class="el" href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177" title="Color math (affects color blending).">WINDOW_MATH</a></span> — a layer mask bit that targets the <em>colour-math area</em> rather than a BG/OBJ. See the <a class="el" href="colormath_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/colormath.md">Colormath tutorial</a> for the blending side; this example is the canonical "you need both" demo.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md428"></a>
 Gotchas</h2>
@@ -297,14 +297,14 @@ See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="window_8h.html" title="SNES Window/Masking System.">lib/include/snes/window.h</a></span> — full API reference.</li>
 <li><span class="tt">lib/source/window.c</span> — implementation (270 LOC, mostly register bookkeeping for the four-axis state).</li>
-<li><a class="el" href="dir_06f8c0f6f1808f02f4837fce52b78990.html" title="/home/runner/work/opensnes/opensnes/examples/graphics/effects/window/README.md"><span class="tt">examples/graphics/effects/window</span></a> — animated triangle reveal.</li>
-<li><a class="el" href="dir_64d894911213963f880485919df5ef58.html" title="/home/runner/work/opensnes/opensnes/examples/graphics/effects/transparent_window/README.md"><span class="tt">examples/graphics/effects/transparent_window</span></a> — window + colour math (the pair example).</li>
+<li><a class="el" href="dir_48d1372267f661946c55cb171d37ab4d.html" title="/home/runner/work/opensnes/opensnes/examples/windows/window/README.md"><span class="tt">examples/windows/window</span></a> — animated triangle reveal.</li>
+<li><a class="el" href="dir_99e208758b27166c625155f30ad77e9d.html" title="/home/runner/work/opensnes/opensnes/examples/windows/transparent_window/README.md"><span class="tt">examples/windows/transparent_window</span></a> — window + colour math (the pair example).</li>
 <li><a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a> — required reading for animated window shapes.</li>
 <li><a class="el" href="colormath_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/colormath.md">Colormath tutorial</a> — the pair tutorial; covers the blending side of <span class="tt">transparent_window</span>.</li>
 <li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — companion read for the BG-layer fundamentals the window operates on.</li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md436"></a>
-Both windows per scanline — <span class="tt">examples/graphics/effects/window_multi_hdma</span></h3>
+Both windows per scanline — <span class="tt">examples/windows/window_multi_hdma</span></h3>
 <p>One channel in <span class="tt"><a class="el" href="hdma_8h.html#ae1cd2638b518b8b92200d4d72d4aef7d" title="HDMA mode: 4 registers, 4 bytes.">HDMA_MODE_4REG</a></span> streams WH0-WH3 — both windows' left AND right edges — per band, cutting a porthole grid into BG1. The window algebra: W1 and W2 both enabled on the layer, both INVERTED (<span class="tt"><a class="el" href="window_8h.html#ace412a79a04227a3b380fa54723a749a" title="Set window inversion for layers.">windowSetInvert</a></span>), combined with <span class="tt"><a class="el" href="window_8h.html#a34339b4322e501b9f95cf07ebae08381" title="AND: mask if inside window 1 AND window 2.">WINDOW_LOGIC_AND</a></span>, masked on the main screen (<span class="tt"><a class="el" href="window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c" title="Set main screen window masking.">windowSetMainMask</a></span>) — the layer is hidden where (outside W1) AND (outside W2), i.e. visible inside either window. A degenerate window (left=1, right=0) is the standard "band fully masked" table value. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

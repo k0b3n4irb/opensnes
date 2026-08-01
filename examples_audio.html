@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>Audio Examples</title>
+<title>Audio</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,38 +119,45 @@ $(function(){initNavTree('examples_audio.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Audio Examples </div></div>
+  <div class="headertitle"><div class="title">Audio </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The SNES has a dedicated audio processor &ndash; the SPC700 &ndash; with its own 64KB of RAM, its own DSP chip, and its own instruction set. It runs independently from the main CPU. The two communicate through just 4 shared I/O bytes.</p>
-<p>These examples use <b>SNESMOD</b>, a tracker-based audio engine. You write <span class="tt">.it</span> files in a tracker (OpenMPT, Schism Tracker, etc.), the <span class="tt">smconv</span> tool converts them to SPC700 format, and the library handles playback from C.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md759"></a>
-Examples</h2>
+<div class="textblock"><p><b>Family 8 — "make it sound like a game."</b> The SNES has a whole second processor for sound — the SPC700, with its own 64 KB of RAM, its own S-DSP, and its own instruction set, talking to the main CPU through just 4 I/O bytes. This family has two on-ramps — tracker music, and driving the DSP straight from C — then the DSP's party tricks.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md776"></a>
+The ladder</h2>
+<p><b>Tracker music (SNESMOD)</b> — compose in a tracker, <span class="tt">smconv</span> converts the <span class="tt">.it</span>, the lib plays it:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Difficulty  </th><th class="markdownTableHeadNone">Description  </th></tr>
+<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="snesmod_music/">snesmod_music</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Tracker music playback with smconv and the SNESMOD process loop  </td></tr>
+<td class="markdownTableBodyNone">8.1  </td><td class="markdownTableBodyNone"><a href="snesmod_music/">snesmod_music</a>  </td><td class="markdownTableBodyNone">How do I play tracker music with transport controls?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="snesmod_sfx/">snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Intermediate  </td><td class="markdownTableBodyNone">Playing sound effects alongside music  </td></tr>
+<td class="markdownTableBodyNone">8.2  </td><td class="markdownTableBodyNone"><a href="snesmod_music_large/">snesmod_music_large</a>  </td><td class="markdownTableBodyNone">How do I play a &gt;32 KB multi-bank soundbank?  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">8.3  </td><td class="markdownTableBodyNone"><a href="snesmod_sfx/">snesmod_sfx</a>  </td><td class="markdownTableBodyNone">How do I mix SFX over music?  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md760"></a>
-Prerequisites</h2>
-<ul>
-<li>Build the <span class="tt">smconv</span> tool: <span class="tt">make tools</span></li>
-<li>A tracker module in <span class="tt">.it</span> format (Impulse Tracker)</li>
-</ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md761"></a>
-Key Concepts</h2>
-<ul>
-<li>The SPC700 runs its own program independently of the 65816 CPU</li>
-<li>SNESMOD uploads its driver + song data to SPC700 RAM at init</li>
-<li>Call <span class="tt">spcProcess()</span> every frame to keep audio synchronized</li>
-<li>Sound effects use separate channels and can play over music</li>
-</ul>
-<hr  />
-<p>Start with <b>snesmod_music</b> to get music playing, then move to <b>snesmod_sfx</b> to layer sound effects on top.</p>
-<p><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — hot-swapping APU programs at runtime">apu_switch — hot-swapping APU programs at runtime</a> <a class="el" href="examples_audio_pitch_mod.html" title="pitch_mod — hardware vibrato via pitch modulation">pitch_mod — hardware vibrato via pitch modulation</a> <a class="el" href="examples_audio_play_noise.html" title="play_noise — a drum kit with zero samples">play_noise — a drum kit with zero samples</a> <a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a> <a class="el" href="examples_audio_snesmod_music_hirom.html" title="SNESMOD HiROM Music">SNESMOD HiROM Music</a> <a class="el" href="examples_audio_snesmod_music_large.html" title="SNESMOD Large Soundbank Music">SNESMOD Large Soundbank Music</a> <a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a> <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a> <a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES&quot;">speech_synth — the SNES says "OPEN SNES"</a> </p>
+<p><b>Raw APU from C (audio v2)</b> — the lib uploads its own resident SPC700 driver; everything else is plain C:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">8.4  </td><td class="markdownTableBodyNone"><a href="soundboard/">soundboard</a>  </td><td class="markdownTableBodyNone">How do I drive the whole audio-v2 engine from C?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">8.5  </td><td class="markdownTableBodyNone"><a href="apu_switch/">apu_switch</a>  </td><td class="markdownTableBodyNone">How do I hot-swap APU programs at runtime?  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">8.6  </td><td class="markdownTableBodyNone"><a href="play_noise/">play_noise</a>  </td><td class="markdownTableBodyNone">How do I make drums from the S-DSP noise generator?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">8.7  </td><td class="markdownTableBodyNone"><a href="pitch_mod/">pitch_mod</a>  </td><td class="markdownTableBodyNone">How do I do hardware vibrato (pitch modulation)?  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">8.8  </td><td class="markdownTableBodyNone"><a href="speech_synth/">speech_synth</a>  </td><td class="markdownTableBodyNone">How do I play BRR speech?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">8.9  </td><td class="markdownTableBodyNone"><a href="echo/">echo</a>  </td><td class="markdownTableBodyNone">How do I add echo / reverb from the S-DSP?  </td></tr>
+</table>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md777"></a>
+The idea in one screen</h2>
+<p>Sound is a co-processor problem: you never touch the DSP registers from the 65816 directly — you hand a driver a command over the 4 I/O ports and it runs on the SPC700. SNESMOD's driver plays a compiled tracker module; the audio-v2 driver exposes voices, ADSR, BRR samples and the echo unit as C calls (<span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a></span>, <span class="tt"><a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx</a></span>, <span class="tt"><a class="el" href="group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7" title="Configure echo parameters.">audioSetEcho</a></span>…). Both share the same 64 KB of ARAM, so samples, the echo ring and the driver all compete for it.</p>
+<p><em>(Audio examples have no screenshot — the lesson is audible. Run them with sound.)</em></p>
+<p><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — hot-swapping APU programs at runtime">apu_switch — hot-swapping APU programs at runtime</a> <a class="el" href="examples_audio_echo.html" title="Echo / reverb">Echo / reverb</a> <a class="el" href="examples_audio_pitch_mod.html" title="pitch_mod — hardware vibrato via pitch modulation">pitch_mod — hardware vibrato via pitch modulation</a> <a class="el" href="examples_audio_play_noise.html" title="play_noise — a drum kit with zero samples">play_noise — a drum kit with zero samples</a> <a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a> <a class="el" href="examples_audio_snesmod_music_large.html" title="SNESMOD Large Soundbank Music">SNESMOD Large Soundbank Music</a> <a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a> <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a> <a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES&quot;">speech_synth — the SNES says "OPEN SNES"</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

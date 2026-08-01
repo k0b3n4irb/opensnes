@@ -145,7 +145,7 @@ Wrap Behavior</h3>
 <p>When the scroll offset exceeds the tilemap dimensions, the PPU wraps back to the beginning. This means a 32x32 tilemap scrolled to X=260 displays the same content as X=4.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md348"></a>
 Basic BG Scrolling</h2>
-<p>Use <span class="tt">bgSetScroll(bg, x, y)</span> to set the scroll offset for a background layer. The <span class="tt">bg</span> parameter is 0-indexed (0 = BG1, 1 = BG2, etc.).</p>
+<p>Use <span class="tt">bgSetScroll(bg, x, y)</span> to set the scroll offset for a background layer. The <span class="tt"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></span> parameter is 0-indexed (0 = BG1, 1 = BG2, etc.).</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scroll_x = 0;</div>
@@ -235,21 +235,21 @@ D-PAD Controlled Scrolling</h2>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md350"></a>
 Mixed Scroll (Static + Moving Layers)</h2>
 <p>A common technique is scrolling one background while keeping another fixed. This works well for a moving pattern behind a static logo or HUD.</p>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a> = 0, <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a> = 0;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a> = 0, <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a> = 0;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <span class="comment">/* BG1 scrolls diagonally */</span></div>
-<div class="line">    <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>++;</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a>++;</div>
-<div class="line">    <a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>, <a class="code hl_variable" href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a>);</div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>++;</div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a>++;</div>
+<div class="line">    <a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a>, <a class="code hl_variable" href="scrolling_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* BG2 stays fixed at (0, 0) - no bgSetScroll call needed */</span></div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
-<div class="ttc" id="agraphics_2backgrounds_2mixed__scroll_2main_8c_html_a2349c3f40df58d5ea4c0d99fe5a2ca73"><div class="ttname"><a href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a></div><div class="ttdeci">s16 scrY</div><div class="ttdoc">BG1 vertical scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:52</div></div>
-<div class="ttc" id="agraphics_2backgrounds_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="graphics_2backgrounds_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 horizontal scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
-</div><!-- fragment --><p>See <span class="tt">examples/graphics/backgrounds/mixed_scroll/</span> for a complete example where a shader pattern auto-scrolls behind a static logo.</p>
+<div class="ttc" id="ascrolling_2mixed__scroll_2main_8c_html_a2349c3f40df58d5ea4c0d99fe5a2ca73"><div class="ttname"><a href="scrolling_2mixed__scroll_2main_8c.html#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a></div><div class="ttdeci">s16 scrY</div><div class="ttdoc">BG1 vertical scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:52</div></div>
+<div class="ttc" id="ascrolling_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 horizontal scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
+</div><!-- fragment --><p>See <span class="tt">examples/scrolling/mixed_scroll/</span> for a complete example where a shader pattern auto-scrolls behind a static logo.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md351"></a>
 Parallax Scrolling</h2>
 <p>Parallax creates a depth illusion by scrolling background layers at different speeds. Distant layers move slowly; near layers move quickly.</p>
@@ -276,7 +276,7 @@ HDMA Parallax (Per-Scanline Scroll)</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* HDMA table in RAM: [line_count] [scroll_lo] [scroll_hi] per zone */</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[10];</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[10];</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -289,35 +289,35 @@ HDMA Parallax (Per-Scanline Scroll)</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Define 3 scroll zones */</span></div>
-<div class="line">    <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[0] = 72;                  <span class="comment">/* Top: 72 scanlines */</span></div>
-<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[1] = 0;          <span class="comment">/* Initial offset */</span></div>
-<div class="line">    <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[3] = 88;                  <span class="comment">/* Middle: 88 scanlines */</span></div>
-<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[4] = 0;</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[6] = 64;                  <span class="comment">/* Bottom: 64 scanlines */</span></div>
-<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[7] = 0;</div>
-<div class="line">    <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[9] = 0x00;               <span class="comment">/* End of table */</span></div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[0] = 72;                  <span class="comment">/* Top: 72 scanlines */</span></div>
+<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[1] = 0;          <span class="comment">/* Initial offset */</span></div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[3] = 88;                  <span class="comment">/* Middle: 88 scanlines */</span></div>
+<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[4] = 0;</div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[6] = 64;                  <span class="comment">/* Bottom: 64 scanlines */</span></div>
+<div class="line">    *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[7] = 0;</div>
+<div class="line">    <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[9] = 0x00;               <span class="comment">/* End of table */</span></div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Start HDMA on channel 6, targeting BG1 horizontal scroll */</span></div>
-<div class="line">    <a class="code hl_function" href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, <a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>);</div>
+<div class="line">    <a class="code hl_function" href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, 0, <a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>);</div>
 <div class="line">    <a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">while</span> (1) {</div>
 <div class="line">        <span class="comment">/* Each zone scrolls at a different speed */</span></div>
-<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[1] += 1;    <span class="comment">/* Slow (sky) */</span></div>
-<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[4] += 2;    <span class="comment">/* Medium (midground) */</span></div>
-<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[7] += 4;    <span class="comment">/* Fast (foreground) */</span></div>
+<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[1] += 1;    <span class="comment">/* Slow (sky) */</span></div>
+<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[4] += 2;    <span class="comment">/* Medium (midground) */</span></div>
+<div class="line">        *(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[7] += 4;    <span class="comment">/* Fast (foreground) */</span></div>
 <div class="line"> </div>
 <div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="agraphics_2effects_2parallax__scrolling_2main_8c_html_aba022e1ff2be864bac42428679aea901"><div class="ttname"><a href="graphics_2effects_2parallax__scrolling_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a></div><div class="ttdeci">u8 scroll_table[10]</div><div class="ttdoc">HDMA scroll table in RAM (must be in bank $00 WRAM, &lt; $2000).</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga6129b86a7c2913a31f1bca293fa7c1e7"><div class="ttname"><a href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></div><div class="ttdeci">#define SC_64x32</div><div class="ttdef"><b>Definition</b> background.h:37</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s).</div></div>
 <div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA — never used by the runtime).</div><div class="ttdef"><b>Definition</b> hdma.h:120</div></div>
 <div class="ttc" id="ahdma_8h_html_adf1c0451139948b3f1049b84580ce906"><div class="ttname"><a href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a></div><div class="ttdeci">void hdmaParallax(u8 channel, u8 bg, const void *scrollTable)</div><div class="ttdoc">Set up a background parallax scroll effect.</div></div>
-</div><!-- fragment --><p>See <span class="tt">examples/graphics/effects/parallax_scrolling/</span> for the complete implementation.</p>
+<div class="ttc" id="ascrolling_2parallax__scroll_2main_8c_html_aba022e1ff2be864bac42428679aea901"><div class="ttname"><a href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a></div><div class="ttdeci">u8 scroll_table[10]</div><div class="ttdoc">HDMA scroll table in RAM (must be in bank $00 WRAM, &lt; $2000).</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
+</div><!-- fragment --><p>See <span class="tt">examples/scrolling/parallax_scroll/</span> for the complete implementation.</p>
 <p><b>Important:</b> The scroll table must live in RAM (not <span class="tt">const</span>) because the main loop updates it every frame. HDMA reads from the table during rendering, so always update the values <em>before</em> <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md354"></a>
 Continuous / Infinite Scrolling</h2>
@@ -346,7 +346,7 @@ The Streaming Pattern</h3>
 <div class="ttc" id="astructGameState_html"><div class="ttname"><a href="structGameState.html">GameState</a></div><div class="ttdoc">Centralized game state structure.</div><div class="ttdef"><b>Definition</b> main.c:101</div></div>
 </div><!-- fragment --><p>The main loop reads input, moves the player, and applies auto-scrolling when the player crosses a screen threshold:</p>
 <div class="fragment"><div class="line"><span class="comment">/* Auto-scroll when player reaches the edge of the visible area */</span></div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.player_x &gt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a> &amp;&amp; <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg1_scroll_x &lt; <a class="code hl_define" href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.player_x &gt; <a class="code hl_define" href="scrolling_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a> &amp;&amp; <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg1_scroll_x &lt; <a class="code hl_define" href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a>) {</div>
 <div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg1_scroll_x += 1;</div>
 <div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_x += 1;</div>
 <div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.player_x -= 1;      <span class="comment">/* Push player back to stay centered */</span></div>
@@ -355,9 +355,9 @@ The Streaming Pattern</h3>
 <div class="line"><span class="comment">/* Update hardware scroll */</span></div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg1_scroll_x, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg1_scroll_y);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(1, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_x, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_y);</div>
-<div class="ttc" id="agraphics_2backgrounds_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
-<div class="ttc" id="agraphics_2backgrounds_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="graphics_2backgrounds_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
-</div><!-- fragment --><p>See <span class="tt">examples/graphics/backgrounds/continuous_scroll/</span> for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.</p>
+<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
+<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
+</div><!-- fragment --><p>See <span class="tt">examples/scrolling/continuous_scroll/</span> for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md356"></a>
 Streaming Tips</h3>
 <ul>

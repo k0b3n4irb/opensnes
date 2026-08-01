@@ -181,7 +181,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; platformer initialization and game loop.  <br /></td></tr>
 <tr class="memitem:a6e673294f4ea577471b6a8b49aeb0575" id="r_a6e673294f4ea577471b6a8b49aeb0575"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a6e673294f4ea577471b6a8b49aeb0575">map_flush_column</a> (void)</td></tr>
 <tr class="memdesc:a6e673294f4ea577471b6a8b49aeb0575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flush the buffered column to VRAM via DMA (flush phase).  <br /></td></tr>
-<tr class="memitem:a239872ea5ac806101f72b27dca4fcea4" id="r_a239872ea5ac806101f72b27dca4fcea4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a239872ea5ac806101f72b27dca4fcea4">map_get_tile_prop</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#a8e889bed9bbd7b21d9d0d22217333d02">px</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> py)</td></tr>
+<tr class="memitem:a239872ea5ac806101f72b27dca4fcea4" id="r_a239872ea5ac806101f72b27dca4fcea4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a239872ea5ac806101f72b27dca4fcea4">map_get_tile_prop</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="basics_2game__skeleton_2main_8c.html#a671319f4182d55a90e3dc6b3573d8c05">px</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a>)</td></tr>
 <tr class="memdesc:a239872ea5ac806101f72b27dca4fcea4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Look up the collision property of the tile at pixel coordinates.  <br /></td></tr>
 <tr class="memitem:aa4b870388d79b1b7bf19a1e5fad1d571" id="r_aa4b870388d79b1b7bf19a1e5fad1d571"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa4b870388d79b1b7bf19a1e5fad1d571">map_load</a> (void)</td></tr>
 <tr class="memdesc:aa4b870388d79b1b7bf19a1e5fad1d571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the map from ROM and populate the initial VRAM tilemap.  <br /></td></tr>
@@ -749,8 +749,8 @@ Variables</h2></td></tr>
 <p>Converts pixel coordinates to tile coordinates, reads the tile index from the map via precomputed row pointers, then looks up the tile's property (T_SOLID or T_EMPTY) in the attribute table. Out-of-bounds coordinates above or left return T_SOLID (wall); below or right return T_EMPTY (open air, allowing fall-off-screen respawn).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#a8e889bed9bbd7b21d9d0d22217333d02">px</a></td><td>World X position in pixels </td></tr>
-    <tr><td class="paramname">py</td><td>World Y position in pixels </td></tr>
+    <tr><td class="paramname"><a class="el" href="basics_2game__skeleton_2main_8c.html#a671319f4182d55a90e3dc6b3573d8c05">px</a></td><td>World X position in pixels </td></tr>
+    <tr><td class="paramname"><a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a></td><td>World Y position in pixels </td></tr>
   </table>
   </dd>
 </dl>

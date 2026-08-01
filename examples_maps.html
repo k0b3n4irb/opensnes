@@ -122,32 +122,30 @@ $(function(){initNavTree('examples_maps.html','',''); });
   <div class="headertitle"><div class="title">Maps </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This category contains examples that demonstrate tilemap-based engines and map collision systems on the SNES. On the SNES, "maps" refer to both the hardware tilemaps (the 32x32 or 64x64 grids of tile entries that the PPU renders as backgrounds) and the higher-level game maps built on top of them (scrolling worlds, collision grids, entity placement). These examples show two different approaches: a custom tilemap sprite engine that treats background tiles as movable objects, and a full platformer using the OpenSNES map and object engines with slope collision.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1520"></a>
-Examples</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1521"></a>
-<a href="dynamic_map/">dynamic_map</a></h3>
-<p><b>Custom Tilemap Sprite Engine</b> &ndash; Demonstrates how to build a tile-based sprite system on BG1 using Mode 3 (8bpp, 256 colors). Supports both 32x32 and 64x64 map grids, with gargoyle sprites placed and scrolled interactively. Includes a C64-to-SNES sprite format converter. Teaches extended WRAM buffer management (bank $7E) and the 1-page-per-VBlank DMA pattern for safe tilemap transfers.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1522"></a>
-<a href="slopemario/">slopemario</a></h3>
-<p><b>Platformer with Slope Collision</b> &ndash; A Mario-style platformer that uses <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></span> for diagonal terrain. Combines the map engine (scrolling tile world), the object engine (entity init/update callbacks), and the dynamic sprite engine (animated character rendering). Demonstrates player physics with acceleration, jumping, and slope-following, plus camera tracking via <span class="tt"><a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1523"></a>
-Key SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1524"></a>
-Hardware Tilemaps</h3>
-<p>The PPU reads tile indices from VRAM tilemap regions configured via registers $2107-$210A (BG1SC through BG4SC). Each tilemap entry is 2 bytes: a 10-bit tile number plus palette, priority, and horizontal/vertical flip bits. The PPU renders these tiles automatically every frame &ndash; the CPU only needs to update the tilemap data in VRAM.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1525"></a>
-Tilemap Sizes</h3>
-<p>Tilemaps can be 32x32 (SC_32x32, 2KB) up to 64x64 (SC_64x64, 8KB = four 32x32 pages). Larger tilemaps allow the hardware scroll registers ($210D-$2114) to pan across a bigger area without any CPU tile streaming. For worlds even larger than 64x64 tiles, software must stream new rows and columns into VRAM during VBlank.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1526"></a>
-Tile-Based Collision</h3>
-<p>Instead of checking sprite-to-sprite bounding boxes, the game reads tile type data from ROM arrays at the player's position. Tile types encode properties like solid, empty, platform, slope angle, and hazard. The <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></span> function extends basic collision with diagonal surface support.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1527"></a>
-VBlank DMA Budget</h3>
-<p>The SNES PPU ignores VRAM writes during active display. All tilemap and tile data updates must happen during VBlank (~41,000 master cycles available after NMI overhead). At 8 cycles per byte, a safe transfer limit is roughly 4-5KB per frame. Larger transfers require splitting across multiple VBlanks or using forced blank.</p>
-<hr  />
-<p>Study <b>dynamic_map</b> first for tilemap manipulation fundamentals, then <b>slopemario</b> for a complete platformer framework with slope collision.</p>
-<p><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a> <a class="el" href="examples_maps_mapscroll.html" title="Map Scroll">Map Scroll</a> <a class="el" href="examples_maps_slopemario.html" title="Slope Mario">Slope Mario</a> <a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a> </p>
+<div class="textblock"><p><b>Family 5, second half — "let an engine drive the world."</b> Where <a href="../scrolling/"><span class="tt">scrolling/</span></a> moves a background past the camera by hand, these examples hand the world to the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> engine and a Tiled pipeline: a scrolling tile world bigger than VRAM, authored in a real editor, read for collision, and walked with slopes. This is Stage 3, "can I build a world?"</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1337"></a>
+The ladder</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">5.5  </td><td class="markdownTableBodyNone"><a href="map_scroll/">map_scroll</a>  </td><td class="markdownTableBodyNone">How do I scroll a map bigger than VRAM (the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module)?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5.6  </td><td class="markdownTableBodyNone"><a href="tiled/">tiled</a>  </td><td class="markdownTableBodyNone">How do I author a map in Tiled and load it?  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">5.7  </td><td class="markdownTableBodyNone"><a href="dynamic_map/">dynamic_map</a>  </td><td class="markdownTableBodyNone">How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5.8  </td><td class="markdownTableBodyNone"><a href="slope_collision/">slope_collision</a>  </td><td class="markdownTableBodyNone">How do I do tile collision with slopes — a full platformer?  </td></tr>
+</table>
+<p>Climb from a scrolling world (5.5) to an authored one (5.6) to a sprite that reads it (5.7) to a character that stands on its slopes (5.8).</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1338"></a>
+The idea in one screen</h2>
+<p>A <b>hardware tilemap</b> is a 32×32 (2 KB) up to 64×64 (8 KB) grid of tile entries the PPU renders every frame; the hardware scroll registers pan across it for free. When the world is larger than 64×64, the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module <b>streams</b> fresh rows/columns into VRAM during VBlank as the camera moves (<span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>/<span class="tt"><a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera</a></span>), and <span class="tt">tmx2snes</span> turns a Tiled <span class="tt">.tmx</span>/<span class="tt">.tmj</span> into the <span class="tt">.m16</span>/<span class="tt">.b16</span> data it consumes. <b>Collision</b> reads tile <em>properties</em> (solid, platform, slope angle) from the map rather than testing sprite boxes; <span class="tt"><a class="el" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597" title="Check collision with tile using custom tile size.">collideTileEx</a></span> / <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes</a></span> add diagonal surfaces.</p>
+<p>Everything here runs inside the ~4 KB VBlank DMA budget by streaming one page per frame — the pattern <span class="tt">dynamic_map</span> demonstrates directly.</p>
+<blockquote class="doxtable">
+<p>The capstone that fuses maps + entities + dialog is <a href="../games/rpg/"><span class="tt">games/rpg</span></a>. </p>
+</blockquote>
+<p><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a> <a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> <a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a> <a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

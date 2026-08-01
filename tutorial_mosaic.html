@@ -229,7 +229,7 @@ The lib API</h2>
 </table>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md308"></a>
 Worked pattern (the shipped example)</h2>
-<p><span class="tt">examples/graphics/effects/mosaic</span> cycles through four transitions on button press: brightness fade out, brightness fade in, mosaic fade out, mosaic fade in. The example pairs <b><span class="tt"><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></span></b> (the <span class="tt">INIDISP</span>-based global brightness scale) with mosaic so you can compare the two transition shapes side by side.</p>
+<p><span class="tt">examples/transitions/mosaic</span> cycles through four transitions on button press: brightness fade out, brightness fade in, mosaic fade out, mosaic fade in. The example pairs <b><span class="tt"><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></span></b> (the <span class="tt">INIDISP</span>-based global brightness scale) with mosaic so you can compare the two transition shapes side by side.</p>
 <p>The takeaway: brightness goes through black; mosaic goes through chunky pixels. They have very different aesthetics and very different gameplay-readability tradeoffs:</p>
 <ul>
 <li><b>Brightness fade</b> — the player loses <em>all</em> visual information mid-fade. Good for "scene cut" feel; bad if the player needs to keep tracking motion across the transition.</li>
@@ -286,7 +286,7 @@ See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></span> — full API reference.</li>
 <li><span class="tt">lib/source/mosaic.asm</span> — implementation (compact, mostly register bookkeeping and the fade loops).</li>
-<li><a class="el" href="dir_166bdc4315508af9f747ee42f178da15.html" title="/home/runner/work/opensnes/opensnes/examples/graphics/effects/mosaic/README.md"><span class="tt">examples/graphics/effects/mosaic</span></a> — four transitions cycled on button press: brightness fade out/in and mosaic fade out/in.</li>
+<li><a class="el" href="dir_d8cebe9da14b04610db02310d3d59b09.html" title="/home/runner/work/opensnes/opensnes/examples/transitions/mosaic/README.md"><span class="tt">examples/transitions/mosaic</span></a> — four transitions cycled on button press: brightness fade out/in and mosaic fade out/in.</li>
 <li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — for the BG layer fundamentals mosaic operates on.</li>
 <li><a class="el" href="game__states_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/game_states.md">Game States tutorial</a> — for putting transitions into the game loop (state-machine pattern for "fade out → swap
   level → fade in"). </li>

@@ -5,5 +5,5 @@ var searchData=
   ['init_5fpalette_2',['init_palette',['../memory_2hirom__demo_2main_8c.html#af7061e0598975eadee3bb865f4cfdad0',1,'main.c']]],
   ['iris_5fradius_3',['iris_radius',['../structEffectState.html#a343a7c940aad945667eb9b9d69f9ee8a',1,'EffectState']]],
   ['is_5fmap32x32_4',['is_map32x32',['../maps_2dynamic__map_2main_8c.html#aee4468215190b975dc2661b09e698851',1,'main.c']]],
-  ['itable_5',['itable',['../graphics_2effects_2hdma__indirect__gradient_2main_8c.html#a0f089355db851d283a48715859fcb354',1,'main.c']]]
+  ['itable_5',['itable',['../hdma_2hdma__indirect__gradient_2main_8c.html#a0f089355db851d283a48715859fcb354',1,'main.c']]]
 ];

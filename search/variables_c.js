@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['land_5fmap_0',['land_map',['../graphics_2effects_2transparency_2main_8c.html#a8f7a4141bdd153e64dad8cd2a9fe5528',1,'main.c']]],
-  ['land_5fmap_5fend_1',['land_map_end',['../graphics_2effects_2transparency_2main_8c.html#a5bbe41c121ccabc1b3a8fca1104c3741',1,'main.c']]],
-  ['land_5fpal_2',['land_pal',['../graphics_2effects_2transparency_2main_8c.html#a98c15811ad04663cc16de6058454c19d',1,'main.c']]],
-  ['land_5fpal_5fend_3',['land_pal_end',['../graphics_2effects_2transparency_2main_8c.html#a0701b204cf6683656eece2c4b2333677',1,'main.c']]],
-  ['land_5ftiles_4',['land_tiles',['../graphics_2effects_2transparency_2main_8c.html#a6f7a32363d1dbbcce3e220021bc9f589',1,'main.c']]],
-  ['land_5ftiles_5fend_5',['land_tiles_end',['../graphics_2effects_2transparency_2main_8c.html#a2269f675583a4b09b5818afa8f8346f1',1,'main.c']]],
+  ['land_5fmap_0',['land_map',['../color_2transparency_2main_8c.html#a8f7a4141bdd153e64dad8cd2a9fe5528',1,'main.c']]],
+  ['land_5fmap_5fend_1',['land_map_end',['../color_2transparency_2main_8c.html#a5bbe41c121ccabc1b3a8fca1104c3741',1,'main.c']]],
+  ['land_5fpal_2',['land_pal',['../color_2transparency_2main_8c.html#a98c15811ad04663cc16de6058454c19d',1,'main.c']]],
+  ['land_5fpal_5fend_3',['land_pal_end',['../color_2transparency_2main_8c.html#a0701b204cf6683656eece2c4b2333677',1,'main.c']]],
+  ['land_5ftiles_4',['land_tiles',['../color_2transparency_2main_8c.html#a6f7a32363d1dbbcce3e220021bc9f589',1,'main.c']]],
+  ['land_5ftiles_5fend_5',['land_tiles_end',['../color_2transparency_2main_8c.html#a2269f675583a4b09b5818afa8f8346f1',1,'main.c']]],
   ['landings_6',['landings',['../games_2mode7__flying_2main_8c.html#a687da0a79cf0b0bffb02a65ae278196c',1,'main.c']]],
   ['last_5ftile_5fx_7',['last_tile_x',['../games_2likemario_2main_8c.html#a651d5e42c88d986bb70cfdc5138afda4',1,'main.c']]],
   ['last_5fvoice_8',['last_voice',['../audio_2soundboard_2main_8c.html#a2977825c9ddee492dbf3df33146c3342',1,'main.c']]],

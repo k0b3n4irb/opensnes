@@ -19,5 +19,6 @@ var searchData=
   ['fixmul_16',['fixMul',['../math_8h.html#aaa8ca4460928f28892217658eca661bf',1,'math.h']]],
   ['fixsin_17',['fixSin',['../math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c',1,'math.h']]],
   ['fixsqrt_18',['fixSqrt',['../math_8h.html#a5da2bf6880e934a85f84e9f070d612f5',1,'math.h']]],
-  ['front_5ftile_19',['front_tile',['../games_2rpg_2main_8c.html#a4174676dc02aa2043bd420699a10cfea',1,'main.c']]]
+  ['flush_5fhud_5frow_19',['flush_hud_row',['../basics_2panel__hud_2main_8c.html#acdd93236bca869d95e6723353e313772',1,'main.c']]],
+  ['front_5ftile_20',['front_tile',['../games_2rpg_2main_8c.html#a4174676dc02aa2043bd420699a10cfea',1,'main.c']]]
 ];
