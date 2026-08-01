@@ -104,4 +104,4 @@ to VRAM.
 
 **SNESMOD Music:** [SNESMOD Music](../snesmod_music/) - Tracker music playback
 
-**Graphics:** [Simple Sprite](../../graphics/sprites/simple_sprite/) - Display a sprite on screen
+**Graphics:** [Simple Sprite](../../sprites/simple_sprite/) - Display a sprite on screen

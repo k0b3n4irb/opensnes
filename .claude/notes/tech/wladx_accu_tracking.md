@@ -8,8 +8,23 @@ WLA-DX accumulator/index size tracking fails in complex ASM functions with branc
 
 **Why:** WLA-DX tracks `rep #$20`/`sep #$20` to determine immediate operand size (1 vs 2 bytes). But after branch merge points (e.g., `bcs label` with fallthrough + `jmp` reconvergence), WLA-DX can lose track of the current accumulator width. If it thinks A is 16-bit when it's 8-bit, `lda #$00` (2 bytes) is encoded as `lda #$0000` (3 bytes), **shifting all subsequent instructions by 1 byte**. The CPU then executes misaligned garbage.
 
-**Upstream issue filed**: https://github.com/vhelin/wla-dx/issues/704
-Includes minimal reproduction case, expected vs actual binary output, and fix suggestions.
+**Upstream status — issue CLOSED (2026-07-27), root behaviour NOT fixed.**
+- Filed as https://github.com/vhelin/wla-dx/issues/704 (minimal repro,
+  expected vs actual binary output, fix suggestions).
+- Addressed by our own PR https://github.com/vhelin/wla-dx/pull/705
+  (`k0b3n4irb`, merged upstream 2026-03-22, and **present in our pinned
+  v10.7 release** — `808bcfe5` is an ancestor of `91c52b1f`; see
+  `compiler/PINS.md`).
+- **#705 adds a *warning*, not a control-flow-aware fix.** It warns at a
+  branch merge point when an explicit `.ACCU`/`.INDEX` overrides the
+  linearly-tracked width; the assembler still tracks `rep`/`sep` linearly,
+  ignoring control flow. So the silent-miscompile becomes a *diagnostic*,
+  but the underlying bug is unchanged.
+- Closed as "completed" because the mitigation we intended (surface the
+  danger via a warning) shipped. The manual discipline below therefore
+  **remains mandatory** — the warning helps you notice a miss, it does not
+  remove the need to assert widths. Reopen upstream if a real
+  control-flow-aware width pass ever becomes in scope.
 
 **How to apply:**
 - This is the SECOND time this class of bug has occurred (first was `.INDEX 16` missing for `cpx` in shift loops)

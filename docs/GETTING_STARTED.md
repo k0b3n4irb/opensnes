@@ -74,18 +74,18 @@ Extract the archive somewhere permanent (e.g., `~/opensnes` or `C:\opensnes`).
 The SDK comes with pre-built example ROMs:
 
 ```bash
-cd opensnes/examples/text/hello_world
+cd opensnes/examples/text/print_string
 
 # Open in your emulator
-mesen hello_world.sfc        # Linux
-open -a Mesen hello_world.sfc  # macOS
-start Mesen.exe hello_world.sfc  # Windows
+mesen print_string.sfc        # Linux
+open -a Mesen print_string.sfc  # macOS
+start Mesen.exe print_string.sfc  # Windows
 ```
 
 > **Note:** `mesen` must be on your `PATH` for the Linux command above. Install
 > Mesen from [mesen.ca](https://www.mesen.ca/) and either add its directory to
 > `PATH` or alias it (`alias mesen=~/Mesen/Mesen`). No emulator installed? The
-> SDK's own `luna` backend also plays ROMs: `luna hello_world.sfc` (install it
+> SDK's own `luna` backend also plays ROMs: `luna print_string.sfc` (install it
 > once with `scripts/install-luna.sh`).
 
 You should see "Hello World!" on screen.
@@ -302,7 +302,7 @@ make tests   # luna: coverage + visual regression + probes
 make clean && make     # Full rebuild (required after compiler changes)
 make lib               # Rebuild library only
 make examples          # Rebuild examples only
-make -C examples/text/hello_world  # Rebuild one example
+make -C examples/text/print_string  # Rebuild one example
 ```
 
 See [CLAUDE.md](../CLAUDE.md) for architecture details and coding conventions.
@@ -315,12 +315,12 @@ Explore by complexity:
 
 | Level | Examples | What You'll Learn |
 |-------|----------|-------------------|
-| **Beginner** | `text/hello_world`, `text/text_test` | Console output, text formatting |
-| **Intermediate** | `graphics/sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
-| **Advanced** | `graphics/backgrounds/mode7`, `audio/snesmod_music` | Mode 7, tracker music |
+| **Beginner** | `text/print_string`, `text/scroll_message` | Console output, text formatting |
+| **Intermediate** | `sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
+| **Advanced** | `mode7/rotate_scale`, `audio/snesmod_music` | Mode 7, tracker music |
 | **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
-| **SA-1 Coprocessor** | `memory/sa1_hello`, `memory/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
-| **SuperFX (GSU)** | `memory/superfx_hello`, `graphics/effects/superfx_3d` | RISC coprocessor, 3D rendering ([tutorial](tutorials/superfx.md)) |
+| **SA-1 Coprocessor** | `chips/sa1_hello`, `chips/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
+| **SuperFX (GSU)** | `chips/superfx_hello`, `chips/superfx_3d` | RISC coprocessor, 3D rendering ([tutorial](tutorials/superfx.md)) |
 
 Browse all examples:
 ```bash

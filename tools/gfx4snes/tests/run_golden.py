@@ -11,7 +11,7 @@ reviewing the diff).
 
 Fixture provenance (both PVSnesLib-derived assets already in the repo,
 see ATTRIBUTION.md):
-  fixtures/bg.png  = examples/graphics/backgrounds/mode1/res/opensnes.png
+  fixtures/bg.png  = examples/backgrounds/mode1/res/opensnes.png
   fixtures/spr.png = examples/games/likemario/res/mario_sprite.png
 
 Run:  python3 tools/gfx4snes/tests/run_golden.py

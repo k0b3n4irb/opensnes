@@ -25,8 +25,8 @@ void hero_animate(void) {
 
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
-- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/graphics/sprites/animated_sprite`);
-- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMeta()` directly (`examples/graphics/sprites/metasprite`);
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/sprites/animated_sprite`);
+- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMeta()` directly (`examples/sprites/metasprite`);
 - `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything).
 
 `ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API, the layout contract, and the bank $00 note for nearly-full ROMs.
@@ -82,7 +82,7 @@ if (anim_timer >= 8) {
 }
 ```
 
-This is the pattern used in `examples/graphics/sprites/dynamic_sprite/`. The counter increments once per VBlank, and every 8th frame the animation advances.
+This is the pattern used in `examples/sprites/dynamic_sprite/`. The counter increments once per VBlank, and every 8th frame the animation advances.
 
 ### Using getFrameCount()
 
@@ -118,7 +118,7 @@ A single 16x16 sprite uses a 2x2 block. Its tile number is the **top-left** 8x8 
 
 ### Sprite Sheet Organization
 
-A typical character sprite sheet is organized as rows of animation directions. For the animated sprite example (`examples/graphics/sprites/animated_sprite/`):
+A typical character sprite sheet is organized as rows of animation directions. For the animated sprite example (`examples/sprites/animated_sprite/`):
 
 ```
 Row 0 (tiles 0-15):   Walk Down frames    | Walk Up frames    | Walk Right frames
@@ -154,7 +154,7 @@ sprite_pal_end:
 
 Most game characters have different frames for each movement direction. The common pattern uses an **enum for states** and **H-flip for left/right mirroring**.
 
-From `examples/graphics/sprites/animated_sprite/`:
+From `examples/sprites/animated_sprite/`:
 
 ```c
 #define ANIM_DELAY 6
@@ -230,7 +230,7 @@ u16 flags = monster.flipx ? OBJ_FLIPX : 0;
 oamSet(0, monster.x, monster.y, monster.gfx_frame, 0, 3, flags);
 ```
 
-Pausing on idle costs nothing: an un-ticked player simply holds its state, and the walk resumes mid-cycle when input returns. This is the full pattern of `examples/graphics/sprites/animated_sprite/`.
+Pausing on idle costs nothing: an un-ticked player simply holds its state, and the walk resumes mid-cycle when input returns. This is the full pattern of `examples/sprites/animated_sprite/`.
 
 ## The Dynamic Sprite Engine
 
@@ -289,7 +289,7 @@ OAM_SET_GFX(0, spr16_tiles);               /* Point to ROM tile data */
 
 ### The Game Loop
 
-From `examples/graphics/sprites/dynamic_sprite/`:
+From `examples/sprites/dynamic_sprite/`:
 
 ```c
 u8 frame_counter = 0;
@@ -449,8 +449,8 @@ Background tile animation involves VRAM writes, which **must happen during VBlan
 
 ## Example References
 
-- `examples/graphics/sprites/animated_sprite/` -- basic 4-direction sprite animation with H-flip
-- `examples/graphics/sprites/dynamic_sprite/` -- dynamic sprite engine with VRAM streaming
+- `examples/sprites/animated_sprite/` -- basic 4-direction sprite animation with H-flip
+- `examples/sprites/dynamic_sprite/` -- dynamic sprite engine with VRAM streaming
 - `examples/games/likemario/` -- action-state animation (walk, jump, stand) with camera and physics
 
 ## Next Steps

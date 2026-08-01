@@ -1,6 +1,6 @@
 """Probe: DMA→VRAM and DMA→CGRAM byte-exact copies (ported from dma/cgram).
 
-hello_world boots with:
+fundamentals/text_glyphs boots with:
   - dmaCopyVram(font_tiles, 0x0000, 144) → VRAM[0..144] must equal font_tiles.
   - dmaCopyCGram(bg_palette, 0, 4)       → CGRAM[0..2 colours] must equal bg_palette.
 Proves the DMA engine moved the exact source bytes to the right destination.
@@ -11,7 +11,7 @@ import sys
 from lib import (find_luna, sym_size, peek, dump_vram, cgram_words,
                  rom_path)
 
-ROM = "text/hello_world/hello_world.sfc"
+ROM = "fundamentals/text_glyphs/text_glyphs.sfc"
 
 
 def _dma_vram(luna) -> tuple[bool, str]:

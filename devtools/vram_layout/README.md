@@ -44,7 +44,7 @@ vram.spec  ──(ortools, opt-in)──>  vram_map.h  ──#include──>  ma
 | example | result |
 |---|---|
 | `examples/basics/collision_demo` | 3 regions; solver compacted high-water `0x4020 → 0x1010` (**~24 KB reclaimed**); visual regression identical. |
-| `examples/graphics/sprites/metasprite` | obj sheet (2 name pages, `--keep-low`) + font + tilemap; high-water `0x6C00 → 0x2C00` (**~16 KB reclaimed**); visual regression identical. |
+| `examples/sprites/metasprite` | obj sheet (2 name pages, `--keep-low`) + font + tilemap; high-water `0x6C00 → 0x2C00` (**~16 KB reclaimed**); visual regression identical. |
 
 Functional equivalence is guaranteed by the project's own gate: VRAM addresses are
 internal, so a valid re-placement renders pixel-for-pixel — `luna_runner.py

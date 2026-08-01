@@ -10,7 +10,7 @@ changed allocation) — which the framebuffer fbhash can't see.
 CI gate with a cross-arch exclusion list. Unlike the framebuffer (luna
 guarantees `--print-fbhash` cross-arch), raw WRAM content is *not* a cross-arch
 guarantee: most examples hash identically across hosts, but two (mapandobjects,
-slopemario) diverge x86_64 ↔ aarch64. Those two are skipped by default
+slope_collision) diverge x86_64 ↔ aarch64. Those two are skipped by default
 (CROSS_ARCH_EXCLUDE below) so the remaining 54 gate CI on both arches; pass
 `--all` on your own machine to cover them too against a same-arch baseline.
 
@@ -49,7 +49,7 @@ FRAMES = 90   # consecutive vblank-aligned frames to hash
 # (long interactive game loops; divergence root cause untracked). Skipped by
 # default so the other 54 can gate CI on both arches; include with --all when
 # running against a baseline captured on your own arch.
-CROSS_ARCH_EXCLUDE = {"games_mapandobjects", "maps_slopemario"}
+CROSS_ARCH_EXCLUDE = {"games_mapandobjects", "maps_slope_collision"}
 
 
 # Build-input suffixes for the per-example staleness check. Deliberately

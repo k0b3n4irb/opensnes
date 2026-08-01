@@ -12,7 +12,7 @@ SDK".
 
 | File | Lines | Purpose | Used by |
 |------|------:|---------|---------|
-| `object.asm` | 3 124 | Game-object engine: linked-list management of up to 80 entities, type-based dispatch (init/update/refresh callbacks), workspace pattern for Bank-$7E objects, fixed-point physics, object-vs-object and object-vs-map collision, optional slope support. | `examples/games/mapandobjects/`, `examples/maps/slopemario/` |
+| `object.asm` | 3 124 | Game-object engine: linked-list management of up to 80 entities, type-based dispatch (init/update/refresh callbacks), workspace pattern for Bank-$7E objects, fixed-point physics, object-vs-object and object-vs-map collision, optional slope support. | `examples/games/mapandobjects/`, `examples/maps/slope_collision/` |
 
 ## What "contrib" means here
 

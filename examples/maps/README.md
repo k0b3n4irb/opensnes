@@ -1,35 +1,35 @@
 # Maps
 
-This category contains examples that demonstrate tilemap-based engines and map collision systems on the SNES. On the SNES, "maps" refer to both the hardware tilemaps (the 32x32 or 64x64 grids of tile entries that the PPU renders as backgrounds) and the higher-level game maps built on top of them (scrolling worlds, collision grids, entity placement). These examples show two different approaches: a custom tilemap sprite engine that treats background tiles as movable objects, and a full platformer using the OpenSNES map and object engines with slope collision.
+**Family 5, second half — "let an engine drive the world."** Where
+[`scrolling/`](../scrolling/) moves a background past the camera by hand,
+these examples hand the world to the `map` engine and a Tiled pipeline: a
+scrolling tile world bigger than VRAM, authored in a real editor, read for
+collision, and walked with slopes. This is Stage 3, "can I build a world?"
 
-## Examples
+## The ladder
 
-### [dynamic_map](dynamic_map/)
+| Rung | Example | Developer question |
+|------|---------|--------------------|
+| 5.5 | [map_scroll](map_scroll/) | How do I scroll a map bigger than VRAM (the `map` module)? |
+| 5.6 | [tiled](tiled/) | How do I author a map in Tiled and load it? |
+| 5.7 | [dynamic_map](dynamic_map/) | How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes? |
+| 5.8 | [slope_collision](slope_collision/) | How do I do tile collision with slopes — a full platformer? |
 
-**Custom Tilemap Sprite Engine** -- Demonstrates how to build a tile-based sprite system on BG1 using Mode 3 (8bpp, 256 colors). Supports both 32x32 and 64x64 map grids, with gargoyle sprites placed and scrolled interactively. Includes a C64-to-SNES sprite format converter. Teaches extended WRAM buffer management (bank $7E) and the 1-page-per-VBlank DMA pattern for safe tilemap transfers.
+Climb from a scrolling world (5.5) to an authored one (5.6) to a sprite that
+reads it (5.7) to a character that stands on its slopes (5.8).
 
-### [slopemario](slopemario/)
+## The idea in one screen
 
-**Platformer with Slope Collision** -- A Mario-style platformer that uses `objCollidMapWithSlopes()` for diagonal terrain. Combines the map engine (scrolling tile world), the object engine (entity init/update callbacks), and the dynamic sprite engine (animated character rendering). Demonstrates player physics with acceleration, jumping, and slope-following, plus camera tracking via `mapUpdateCamera()`.
+A **hardware tilemap** is a 32×32 (2 KB) up to 64×64 (8 KB) grid of tile
+entries the PPU renders every frame; the hardware scroll registers pan across
+it for free. When the world is larger than 64×64, the `map` module **streams**
+fresh rows/columns into VRAM during VBlank as the camera moves
+(`mapLoad`/`mapUpdateCamera`), and `tmx2snes` turns a Tiled `.tmx`/`.tmj` into
+the `.m16`/`.b16` data it consumes. **Collision** reads tile *properties*
+(solid, platform, slope angle) from the map rather than testing sprite boxes;
+`collideTileEx` / `objCollidMapWithSlopes` add diagonal surfaces.
 
-## Key SNES Concepts
+Everything here runs inside the ~4 KB VBlank DMA budget by streaming one page
+per frame — the pattern `dynamic_map` demonstrates directly.
 
-### Hardware Tilemaps
-
-The PPU reads tile indices from VRAM tilemap regions configured via registers $2107-$210A (BG1SC through BG4SC). Each tilemap entry is 2 bytes: a 10-bit tile number plus palette, priority, and horizontal/vertical flip bits. The PPU renders these tiles automatically every frame -- the CPU only needs to update the tilemap data in VRAM.
-
-### Tilemap Sizes
-
-Tilemaps can be 32x32 (SC_32x32, 2KB) up to 64x64 (SC_64x64, 8KB = four 32x32 pages). Larger tilemaps allow the hardware scroll registers ($210D-$2114) to pan across a bigger area without any CPU tile streaming. For worlds even larger than 64x64 tiles, software must stream new rows and columns into VRAM during VBlank.
-
-### Tile-Based Collision
-
-Instead of checking sprite-to-sprite bounding boxes, the game reads tile type data from ROM arrays at the player's position. Tile types encode properties like solid, empty, platform, slope angle, and hazard. The `objCollidMapWithSlopes()` function extends basic collision with diagonal surface support.
-
-### VBlank DMA Budget
-
-The SNES PPU ignores VRAM writes during active display. All tilemap and tile data updates must happen during VBlank (~41,000 master cycles available after NMI overhead). At 8 cycles per byte, a safe transfer limit is roughly 4-5KB per frame. Larger transfers require splitting across multiple VBlanks or using forced blank.
-
----
-
-Study **dynamic_map** first for tilemap manipulation fundamentals, then **slopemario** for a complete platformer framework with slope collision.
+> The capstone that fuses maps + entities + dialog is [`games/rpg`](../games/rpg/).

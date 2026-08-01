@@ -17,7 +17,6 @@ from lib import find_luna, rom_path
 
 MUSIC = [
     "audio/snesmod_music/music.sfc",
-    "audio/snesmod_music_hirom/music_hirom.sfc",
     "audio/snesmod_music_large/music_large.sfc",
 ]
 SFX = "audio/snesmod_sfx/sfx.sfc"

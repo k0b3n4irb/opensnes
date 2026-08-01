@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 74 examples organized by topic, building
+Learn SNES development step by step. 80 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -8,12 +8,21 @@ from basic concepts to complete games.
 | Category | Examples | What It Covers |
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
-| [basics/](basics/) | 6 | Collision, timing, scene stack, randomness, fixed-point, aiming |
-| [graphics/](graphics/) | 36 | Backgrounds, sprites, visual effects, Mode 7 |
-| [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
+| [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
+| [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
+| [backgrounds/](backgrounds/) | 7 | BG modes 0/1/3/5, priority, LZ77, hi-res |
+| [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm |
+| [hdma/](hdma/) | 5 | Per-scanline HDMA effects: gradients, waves, raster |
+| [color/](color/) | 7 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks |
+| [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
+| [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
+| [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
+| [mode7/](mode7/) | 3 | Mode 7: rotation, scaling, per-scanline perspective |
+| [input/](input/) | 5 | Joypads, drive a sprite, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 9 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
-| [memory/](memory/) | 5 | HiROM mode, battery-backed saves, SA-1, SuperFX |
+| [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
+| [chips/](chips/) | 4 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
 | [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Learning Path
@@ -26,54 +35,53 @@ deep-dive of a step below.
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 1 | [text/hello_world](text/hello_world/) | PPU, backgrounds, tiles, palette -- your first ROM |
-| 2 | [text/text_test](text/text_test/) | Text positioning, formatting, textPrintAt |
-| 3 | [graphics/sprites/simple_sprite](graphics/sprites/simple_sprite/) | OAM, sprite display, CGRAM split |
+| 1 | [text/print_string](text/print_string/) | Your first ROM: text on a background, the VBlank rhythm |
+| 2 | [text/scroll_message](text/scroll_message/) | Move text -- bgSetScroll on the text layer |
+| 3 | [sprites/simple_sprite](sprites/simple_sprite/) | OAM, sprite display, CGRAM split |
 | 4 | [input/two_players](input/two_players/) | Joypad reading, multiplayer input |
 
 ### Level 2 -- Graphics Fundamentals
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 5 | [graphics/backgrounds/mode1](graphics/backgrounds/mode1/) | Mode 1 multi-layer backgrounds |
-| 6 | [graphics/backgrounds/mode1_bg3_priority](graphics/backgrounds/mode1_bg3_priority/) | BG3 priority bit in Mode 1 |
-| 7 | [graphics/backgrounds/mode1_lz77](graphics/backgrounds/mode1_lz77/) | LZ77-compressed background data |
-| 8 | [graphics/sprites/animated_sprite](graphics/sprites/animated_sprite/) | Frame animation, sprite sheets, H-flip |
-| 9 | [graphics/sprites/dynamic_sprite](graphics/sprites/dynamic_sprite/) | VRAM streaming, dynamic tile uploads |
-| 10 | [graphics/sprites/object_size](graphics/sprites/object_size/) | OBJSEL sprite size configurations |
-| 11 | [graphics/effects/fading](graphics/effects/fading/) | Brightness control, screen transitions |
-| 12 | [graphics/effects/mosaic](graphics/effects/mosaic/) | Mosaic pixelation effect |
+| 5 | [backgrounds/mode1](backgrounds/mode1/) | Mode 1 multi-layer backgrounds |
+| 6 | [backgrounds/mode1_bg3_priority](backgrounds/mode1_bg3_priority/) | BG3 priority bit in Mode 1 |
+| 7 | [backgrounds/mode1_lz77](backgrounds/mode1_lz77/) | LZ77-compressed background data |
+| 8 | [sprites/animated_sprite](sprites/animated_sprite/) | Frame animation, sprite sheets, H-flip |
+| 9 | [sprites/dynamic_sprite](sprites/dynamic_sprite/) | VRAM streaming, dynamic tile uploads |
+| 10 | [sprites/sprite_sizes](sprites/sprite_sizes/) | OBJSEL sprite size configurations |
+| 11 | [transitions/fading](transitions/fading/) | Brightness control, screen transitions |
+| 12 | [transitions/mosaic](transitions/mosaic/) | Mosaic pixelation effect |
 
 ### Level 3 -- Scrolling and Effects
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 13 | [graphics/backgrounds/continuous_scroll](graphics/backgrounds/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
-| 14 | [graphics/backgrounds/mixed_scroll](graphics/backgrounds/mixed_scroll/) | Multiple BG layers scrolling at different rates |
-| 15 | [graphics/effects/hdma_wave](graphics/effects/hdma_wave/) | HDMA scanline wave distortion |
-| 15b | [graphics/effects/hdma_wave_table](graphics/effects/hdma_wave_table/) | Raw HDMA table built in C, krom-style repoint animation |
-| 15c | [graphics/effects/hdma_indirect_gradient](graphics/effects/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
-| 15d | [graphics/effects/hicolor_1792](graphics/effects/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
-| 15e | [graphics/effects/mode7_perspective_rotate](graphics/effects/mode7_perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
-| 15f | [graphics/effects/hires_text](graphics/effects/hires_text/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
-| 15g | [graphics/effects/window_multi_hdma](graphics/effects/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
-| 15h | [graphics/effects/gradient_9bit](graphics/effects/gradient_9bit/) | Brightness-dithered backdrop: the 9-bit color trick (krom port) |
-| 15i | [graphics/effects/hicolor_hires](graphics/effects/hicolor_hires/) | H-IRQ CGRAM streaming x pseudo-hires: 1792 slots at 512px (krom port) |
-| 15j | [graphics/effects/hicolor_blend](graphics/effects/hicolor_blend/) | RGB channel-split color-math blend: 3840 colors (krom port) |
-| 15k | [graphics/effects/direct_color](graphics/effects/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
-| 16 | [graphics/effects/gradient_colors](graphics/effects/gradient_colors/) | HDMA + CGRAM color gradients |
-| 17 | [graphics/effects/parallax_scrolling](graphics/effects/parallax_scrolling/) | HDMA parallax scrolling |
-| 18 | [graphics/effects/transparency](graphics/effects/transparency/) | Color math (add/subtract blending) |
-| 19 | [graphics/effects/window](graphics/effects/window/) | Hardware window masking |
-| 20 | [graphics/effects/transparent_window](graphics/effects/transparent_window/) | Color math + HDMA windowed transparency |
+| 13 | [scrolling/continuous_scroll](scrolling/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
+| 14 | [scrolling/mixed_scroll](scrolling/mixed_scroll/) | Multiple BG layers scrolling at different rates |
+| 15 | [hdma/hdma_wave](hdma/hdma_wave/) | HDMA scanline wave distortion |
+| 15b | [hdma/hdma_wave_table](hdma/hdma_wave_table/) | Raw HDMA table built in C, krom-style repoint animation |
+| 15c | [hdma/hdma_indirect_gradient](hdma/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
+| 15d | [color/hicolor_1792](color/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
+| 15e | [mode7/perspective_rotate](mode7/perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
+| 15f | [backgrounds/mode5_hires](backgrounds/mode5_hires/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
+| 15g | [windows/window_multi_hdma](windows/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
+| 15h | [color/gradient_9bit](color/gradient_9bit/) | Brightness-dithered backdrop: the 9-bit color trick (krom port) |
+| 15j | [color/hicolor_blend](color/hicolor_blend/) | RGB channel-split color-math blend: 3840 colors (krom port) |
+| 15k | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
+| 16 | [hdma/gradient_colors](hdma/gradient_colors/) | HDMA + CGRAM color gradients |
+| 17 | [scrolling/parallax_scroll](scrolling/parallax_scroll/) | HDMA parallax scrolling |
+| 18 | [color/transparency](color/transparency/) | Color math (add/subtract blending) |
+| 19 | [windows/window](windows/window/) | Hardware window masking |
+| 20 | [windows/transparent_window](windows/transparent_window/) | Color math + HDMA windowed transparency |
 
 ### Level 4 -- Advanced Topics
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 21 | [graphics/backgrounds/mode7](graphics/backgrounds/mode7/) | Mode 7 rotation and scaling |
-| 22 | [graphics/backgrounds/mode7_perspective](graphics/backgrounds/mode7_perspective/) | Pseudo-3D perspective (F-Zero style) |
-| 23 | [graphics/sprites/metasprite](graphics/sprites/metasprite/) | Multi-tile composite sprites |
+| 21 | [mode7/rotate_scale](mode7/rotate_scale/) | Mode 7 rotation and scaling |
+| 22 | [mode7/perspective](mode7/perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 23 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
 | 24 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
 | 25 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
 | 26 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
@@ -91,7 +99,7 @@ deep-dive of a step below.
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
 | 30 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
-| 31 | [maps/slopemario](maps/slopemario/) | Slopes and tile-based collision |
+| 31 | [maps/slope_collision](maps/slope_collision/) | Slopes and tile-based collision |
 | 32 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
 | 33 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
 | 34 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
@@ -108,7 +116,7 @@ cd opensnes
 make
 
 # Build a single example
-make -C examples/text/hello_world
+make -C examples/text/print_string
 
 # Clean and rebuild
 make clean && make
@@ -119,7 +127,7 @@ make clean && make
 We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate SNES emulation:
 
 ```bash
-mesen examples/text/hello_world/hello_world.sfc
+mesen examples/text/print_string/print_string.sfc
 ```
 
 Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.
@@ -133,4 +141,4 @@ Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in r
 
 ---
 
-**Ready?** Start with [text/hello_world](text/hello_world/) and build your first SNES ROM.
+**Ready?** Start with [text/print_string](text/print_string/) and build your first SNES ROM.

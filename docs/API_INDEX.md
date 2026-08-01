@@ -18,24 +18,24 @@ nothing you do not list is linked.
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| print text | `textInit`, `textPrintAt`, `textFlush` | `text` | [text/hello_world](../examples/text/hello_world/) |
-| show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [graphics/backgrounds/mode1](../examples/graphics/backgrounds/mode1/) |
-| bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [graphics/backgrounds/mode1](../examples/graphics/backgrounds/mode1/) |
-| draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [graphics/sprites/simple_sprite](../examples/graphics/sprites/simple_sprite/) |
+| print text | `textInit`, `textPrintAt`, `textFlush` | `text` | [text/print_string](../examples/text/print_string/) |
+| show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
+| bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
+| draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
 | hide a sprite that left the screen | `oamHide` | `sprite` | [games/rpg](../examples/games/rpg/) |
-| animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [graphics/sprites/animated_sprite](../examples/graphics/sprites/animated_sprite/) |
-| draw one character out of many tiles | `oamDrawMeta`, `MetaspriteItem` | `sprite` | [graphics/sprites/metasprite](../examples/graphics/sprites/metasprite/) |
+| animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
+| draw one character out of many tiles | `oamDrawMeta`, `MetaspriteItem` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
 
 ## Moving around a world
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| scroll a background | `bgSetScroll` | `background` | [graphics/effects/parallax_scrolling](../examples/graphics/effects/parallax_scrolling/) |
-| scroll a map bigger than VRAM | `mapLoad`, `mapUpdate` | `map` | [maps/mapscroll](../examples/maps/mapscroll/) |
+| scroll a background | `bgSetScroll` | `background` | [scrolling/parallax_scroll](../examples/scrolling/parallax_scroll/) |
+| scroll a map bigger than VRAM | `mapLoad`, `mapUpdate` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
 | load a map made in Tiled | `tmx2snes` → `.m16`/`.b16` | `map` | [maps/tiled](../examples/maps/tiled/) |
 | ask whether a tile is solid | `collideTile`, `collideTileEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | ask whether two boxes overlap | `collideRect`, `collideRectEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
-| handle slopes | `collideTileEx` + per-tile attributes | `collision` | [maps/slopemario](../examples/maps/slopemario/) |
+| handle slopes | `collideTileEx` + per-tile attributes | `collision` | [maps/slope_collision](../examples/maps/slope_collision/) |
 | place the sprite so collision *feels* right | the straddle convention | — | [collision tutorial](tutorials/collision.md#where-the-sprite-is-vs-where-it-collides) |
 
 ## Input
@@ -66,12 +66,12 @@ nothing you do not list is linked.
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| fade in or out | `fadeIn`, `fadeOut` | `console` | [graphics/effects/fading](../examples/graphics/effects/fading/) |
-| blend two layers | `colormath*` | `colormath` | [graphics/effects/transparency](../examples/graphics/effects/transparency/) |
-| mask part of the screen | `windowSet*` | `window` | [graphics/effects/window](../examples/graphics/effects/window/) |
-| change a register mid-frame | `hdmaEnable`, `hdmaGradient` | `hdma` | [graphics/effects/window_multi_hdma](../examples/graphics/effects/window_multi_hdma/) |
+| fade in or out | `fadeIn`, `fadeOut` | `console` | [transitions/fading](../examples/transitions/fading/) |
+| blend two layers | `colormath*` | `colormath` | [color/transparency](../examples/color/transparency/) |
+| mask part of the screen | `windowSet*` | `window` | [windows/window](../examples/windows/window/) |
+| change a register mid-frame | `hdmaEnable`, `hdmaGradient` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
 | rotate or scale a background | `mode7*` | `mode7` | [games/mode7_racing](../examples/games/mode7_racing/) |
-| pixelate | `mosaicEnable`, `mosaicFadeIn` | `mosaic` | [graphics/effects/mosaic](../examples/graphics/effects/mosaic/) |
+| pixelate | `mosaicEnable`, `mosaicFadeIn` | `mosaic` | [transitions/mosaic](../examples/transitions/mosaic/) |
 
 ## Moving data around
 
@@ -80,6 +80,11 @@ nothing you do not list is linked.
 | upload tiles or a tilemap | `dmaCopyVram` | `dma` | VBlank fits ~4 KB; more needs `setScreenOff()` |
 | upload a palette | `dmaCopyCGram` | `dma` | the source may live in any bank |
 | set one colour | `setColor` | `console` | sprite palettes start at CGRAM 128 |
+| cycle a palette (waterfall/fire/lights) | `setColor`, `dmaCopyCGram` | `dma` | [color/palette_cycle](../examples/color/palette_cycle/) — animate with zero VRAM traffic |
+| darken or colour-cast a whole scene (night/underwater/sunset) | `colorMathShadow`, `colorMathTint` | `colormath` | [color/shadow_tint](../examples/color/shadow_tint/) |
+| draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
+| structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
+| move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `LzssDecodeVram` | `lzss` | |
 
 ## Going faster

@@ -168,25 +168,25 @@ void textPrintAt(u8 x, u8 y, const char *str) {
 }
 
 void textPrintU16(u16 value) {
-    char buf[6];  /* Max 65535 = 5 digits + null */
-    char *p = buf + 5;
-    *p = '\0';
+    /* Print most-significant digit first, no reversed stack buffer / pointer.
+     * (The reversed-buffer form miscompiled under some link layouts — see
+     * .claude/notes/tech/textprintu16_codegen_hang.md.) */
+    u16 place = 10000;
+    u8 started = 0;
 
-    /* Handle zero case */
     if (value == 0) {
         textPutChar('0');
         return;
     }
-
-    /* Convert digits (reverse order) */
-    while (value > 0) {
-        p--;
-        *p = '0' + (value % 10);
-        value /= 10;
+    while (place > 0) {
+        u8 digit = (u8)(value / place);
+        if (digit != 0 || started) {
+            textPutChar((char)('0' + digit));
+            started = 1;
+        }
+        value = (u16)(value % place);
+        place = (u16)(place / 10);
     }
-
-    /* Print the string */
-    textPrint(p);
 }
 
 void textPrintHex(u16 value, u8 digits) {

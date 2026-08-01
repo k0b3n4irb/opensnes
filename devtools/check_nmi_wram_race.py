@@ -26,7 +26,7 @@ itself plus any function passed to nmiSet/nmiSetBank) and flags any
 function in the closure that writes to $2180-$2183.
 
 Usage:
-    check_nmi_wram_race.py --rom-dir examples/text/hello_world
+    check_nmi_wram_race.py --rom-dir examples/fundamentals/text_glyphs
 
 Returns:
     0 if no $2180-$2183 writes in NMI closure

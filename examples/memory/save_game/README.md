@@ -10,7 +10,7 @@ classic SNES games like Zelda and Final Fantasy save progress.
 
 ## Prerequisites
 
-Read `text/hello_world` first (console setup, text display).
+Read `text/print_string` first (console setup, text display).
 
 ## Controls
 

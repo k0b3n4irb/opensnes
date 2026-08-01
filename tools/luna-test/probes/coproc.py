@@ -21,10 +21,10 @@ from lib import find_luna, trace_lines, assert_mem, rom_path
 # #$A5, copied into `sa1_status`. sa1_starfield's SYNC flag is set/cleared each
 # frame (transient), so it gets execution-only coverage.
 CASES = [
-    ("superfx_hello", "memory/superfx_hello/superfx_hello.sfc",     "--superfx-trace", 1, None),
-    ("superfx_3d",    "graphics/effects/superfx_3d/superfx_3d.sfc", "--superfx-trace", 1, None),
-    ("sa1_hello",     "memory/sa1_hello/sa1_hello.sfc",             "--sa1-trace",     1, ("sa1_status", "A5")),
-    ("sa1_starfield", "memory/sa1_starfield/sa1_starfield.sfc",     "--sa1-trace",     1, None),
+    ("superfx_hello", "chips/superfx_hello/superfx_hello.sfc",     "--superfx-trace", 1, None),
+    ("superfx_3d",    "chips/superfx_3d/superfx_3d.sfc", "--superfx-trace", 1, None),
+    ("sa1_hello",     "chips/sa1_hello/sa1_hello.sfc",             "--sa1-trace",     1, ("sa1_status", "A5")),
+    ("sa1_starfield", "chips/sa1_starfield/sa1_starfield.sfc",     "--sa1-trace",     1, None),
 ]
 STEPS = 1_000_000
 

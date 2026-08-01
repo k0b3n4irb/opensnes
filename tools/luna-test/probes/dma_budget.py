@@ -38,14 +38,14 @@ STEPS = 5_000_000          # boot + plenty of steady-state frames
 
 # DMA-relevant examples (per-frame VRAM streaming / effects + boot uploads).
 EXAMPLES = [
-    "graphics/backgrounds/continuous_scroll/continuous_scroll.sfc",
-    "graphics/effects/parallax_scrolling/parallax_scrolling.sfc",
-    "maps/mapscroll/mapscroll.sfc",
+    "scrolling/continuous_scroll/continuous_scroll.sfc",
+    "scrolling/parallax_scroll/parallax_scroll.sfc",
+    "maps/map_scroll/map_scroll.sfc",
     "maps/tiled/tiled.sfc",
     "maps/dynamic_map/dynamic_map.sfc",
-    "graphics/effects/hdma_helpers/hdma_helpers.sfc",
-    "graphics/sprites/animated_sprite/animated_sprite.sfc",
-    "graphics/sprites/dynamic_metasprite/dynamic_metasprite.sfc",
+    "hdma/hdma_helpers/hdma_helpers.sfc",
+    "sprites/animated_sprite/animated_sprite.sfc",
+    "sprites/dynamic_metasprite/dynamic_metasprite.sfc",
 ]
 
 

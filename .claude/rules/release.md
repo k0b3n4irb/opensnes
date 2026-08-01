@@ -38,7 +38,7 @@ main     ──────────●─●  (fast-forward; tag is the seco
    nearly-full warnings tolerated only above `BANK0_FAIL_THRESHOLD` (see
    `.claude/rules/bank0_budget.md`).
 2. **Full test suite**: `make tests` (luna coverage + visual regression + probes) — all pass.
-3. **Interactive spot-check**: key examples by hand (at minimum: hello_world,
+3. **Interactive spot-check**: key examples by hand (at minimum: print_string,
    one sprite example, one audio example) — luna GUI / `luna mcp`, or any
    third-party emulator (see docs/tutorials/debugging.md)
 4. **CHANGELOG.md updated**: new version section at top with all changes since last release

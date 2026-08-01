@@ -345,8 +345,8 @@ Common issues:
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [sa1_hello](../../../examples/memory/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
-| [sa1_starfield](../../../examples/memory/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
+| [sa1_hello](../../../examples/chips/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
+| [sa1_starfield](../../../examples/chips/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
 
 ## What SA-1 Can't Do
 

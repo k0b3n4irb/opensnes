@@ -112,7 +112,7 @@ scanlines, the window should be from `left` to `right`":
 | Circle | sin-table or pre-computed (top-half symmetric to bottom-half) |
 | Letterbox / iris fade | `left = 0, right = 255` outside the band, `left > right` (empty window) inside |
 
-The shipped `examples/graphics/effects/window` uses HDMA channels 4
+The shipped `examples/windows/window` uses HDMA channels 4
 and 5 in repeat mode to write `WH0` (`$2126`) and `WH1` (`$2127`) per
 scanline, producing an animated triangle/diamond. Read the example for
 the table-build pattern; the principle: compute the `left` and `right` window edge for each scanline `s`, lay them out as an HDMA table, then trigger.
@@ -164,7 +164,7 @@ is fine but spelled-out logic is easier for the next reader.
 
 ## Worked patterns (the shipped examples)
 
-### Animated triangle reveal — `examples/graphics/effects/window`
+### Animated triangle reveal — `examples/windows/window`
 
 A diamond/triangle shape that reveals BG1 only inside the shape, with
 runtime layer selection:
@@ -179,7 +179,7 @@ because that path was tested for byte-perfect parity with the
 PVSnesLib original. For new code, the lib helpers are
 preferred — they read more like SNES vocabulary.
 
-### Window + colour math — `examples/graphics/effects/transparent_window`
+### Window + colour math — `examples/windows/transparent_window`
 
 Pairs the window system with the colour-math pipeline to produce a
 spotlight that **blends** BG1 onto BG2 (rather than just hiding it).
@@ -267,8 +267,8 @@ because the data per scanline is small (1–2 bytes per channel).
 - `lib/include/snes/window.h` — full API reference.
 - `lib/source/window.c` — implementation (270 LOC, mostly register
   bookkeeping for the four-axis state).
-- [`examples/graphics/effects/window`](../../examples/graphics/effects/window/README.md) — animated triangle reveal.
-- [`examples/graphics/effects/transparent_window`](../../examples/graphics/effects/transparent_window/README.md) — window + colour math (the pair example).
+- [`examples/windows/window`](../../examples/windows/window/README.md) — animated triangle reveal.
+- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window + colour math (the pair example).
 - [HDMA tutorial](hdma.md) — required reading for animated window
   shapes.
 - [Colormath tutorial](colormath.md) — the pair tutorial; covers the
@@ -276,7 +276,7 @@ because the data per scanline is small (1–2 bytes per channel).
 - [Graphics tutorial](graphics.md) — companion read for the BG-layer
   fundamentals the window operates on.
 
-### Both windows per scanline — `examples/graphics/effects/window_multi_hdma`
+### Both windows per scanline — `examples/windows/window_multi_hdma`
 
 One channel in `HDMA_MODE_4REG` streams WH0-WH3 — both windows' left AND
 right edges — per band, cutting a porthole grid into BG1. The window

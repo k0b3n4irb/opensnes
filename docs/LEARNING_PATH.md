@@ -1,97 +1,133 @@
 # Learn SNES Development {#learning_path}
 
-A curated learning path through the 74 examples — a hand-picked progression
-from your first ROM to complete games, where each step builds on concepts from
-earlier ones. This is a selected subset, not the full list; for the exhaustive
-index see @ref examples_by_category.
+A curated path through the 75 examples — not a feature tour, a **developer's
+journey**. You don't wake up wanting "Mode 7"; you wake up with a question
+about the game you're building, and it changes as you go. Each stage below is
+one of those questions, and the confidence it buys you. This is a hand-picked
+subset; for the exhaustive index see @ref examples_by_category.
 
-## Level 1: First Steps
+At every step the goal is the same: never a wall you can't climb with what
+you just learned, always a result that works, always the *why*.
 
-Learn the basics: display text, show sprites, read input.
+## Stage 0 — "Does my setup even work?"
 
-@subpage examples_text_hello_world
+*Confidence: the toolchain isn't scary.* Get one ROM built and running, and
+learn the rhythm of a frame — you set things up during blanking, then let the
+machine run at 60 Hz.
 
-@subpage examples_text_text_test
+@subpage examples_text_print_string
 
-@subpage examples_graphics_sprites_simple_sprite
+## Stage 1 — "Can I put something on screen?"
+
+*Confidence: I control the picture.* Text, a background from your own art, a
+sprite that isn't tied to the grid. The tile / palette / VRAM trinity that
+underpins everything visual on the SNES.
+
+@subpage examples_text_scroll_message
+
+@subpage examples_backgrounds_mode1
+
+@subpage examples_sprites_simple_sprite
+
+@subpage examples_sprites_animated_sprite
+
+@subpage examples_sprites_sprite_swarm
+
+> Under the hood — how a glyph becomes pixels with no module at all:
+> @subpage examples_fundamentals_text_glyphs
+
+## Stage 2 — "Can the player act?"
+
+*Confidence: it's a game, not a demo.* Read the pad, move something with it,
+then branch out to the SNES's exotic controllers.
+
+@subpage examples_input_controller
 
 @subpage examples_input_two_players
-
-## Level 2: Graphics Fundamentals
-
-Background modes, sprite animation, screen effects.
-
-@subpage examples_graphics_backgrounds_mode1
-
-@subpage examples_graphics_backgrounds_mode1_bg3_priority
-
-@subpage examples_graphics_backgrounds_mode1_lz77
-
-@subpage examples_graphics_sprites_animated_sprite
-
-@subpage examples_graphics_sprites_dynamic_sprite
-
-@subpage examples_graphics_sprites_object_size
-
-@subpage examples_graphics_effects_fading
-
-@subpage examples_graphics_effects_mosaic
-
-## Level 3: Scrolling and Effects
-
-HDMA, parallax, color math, hardware windows.
-
-@subpage examples_graphics_backgrounds_continuous_scroll
-
-@subpage examples_graphics_backgrounds_mixed_scroll
-
-@subpage examples_graphics_effects_hdma_wave
-@subpage examples_graphics_effects_hdma_wave_table
-@subpage examples_graphics_effects_hdma_indirect_gradient
-
-@subpage examples_graphics_effects_hdma_helpers
-
-@subpage examples_graphics_effects_gradient_colors
-
-@subpage examples_graphics_effects_parallax_scrolling
-
-@subpage examples_graphics_effects_transparency
-
-@subpage examples_graphics_effects_window
-
-@subpage examples_graphics_effects_transparent_window
-
-## Level 4: Advanced Topics
-
-Mode 7, input devices, memory, audio.
-
-@subpage examples_graphics_backgrounds_mode7
-
-@subpage examples_graphics_backgrounds_mode7_perspective
-
-@subpage examples_graphics_sprites_metasprite
 
 @subpage examples_input_mouse
 
 @subpage examples_input_superscope
 
-@subpage examples_memory_hirom_demo
+## Stage 3 — "Can I build a world?"
 
-@subpage examples_memory_save_game
+*Confidence: bigger than one screen.* Scroll a background past the camera,
+stream a world larger than VRAM, drive it from a Tiled map, and stand on the
+ground with tile collision.
+
+@subpage examples_scrolling_mixed_scroll
+
+@subpage examples_scrolling_continuous_scroll
+
+@subpage examples_maps_map_scroll
+
+@subpage examples_maps_tiled
+
+@subpage examples_maps_slope_collision
+
+@subpage examples_basics_collision_demo
+
+## Stage 4 — "Can I make it feel good?"
+
+*Confidence: it feels like a real game.* This is where the SNES becomes the
+SNES — fades and mosaic transitions, per-scanline HDMA effects, colour math,
+windows, the Mode 7 plane, and sound.
+
+@subpage examples_transitions_fading
+
+@subpage examples_transitions_mosaic
+
+@subpage examples_hdma_hdma_wave
+
+@subpage examples_hdma_gradient_colors
+
+@subpage examples_color_palette_cycle
+
+@subpage examples_color_transparency
+
+@subpage examples_color_shadow_tint
+
+@subpage examples_windows_window
+
+@subpage examples_mode7_rotate_scale
+
+@subpage examples_mode7_perspective
 
 @subpage examples_audio_snesmod_music
 
 @subpage examples_audio_snesmod_sfx
 
-## Level 5: Maps and Complete Projects
+@subpage examples_audio_soundboard
 
-Tile maps, collision, and complete games.
+## Stage 5 — "Can I hold it all together?"
 
-@subpage examples_maps_dynamic_map
+*Confidence: architecture, not spaghetti.* Stop hand-rolling the main loop
+and the state machine; assemble a skeleton, and pick up the reusable maths
+every game needs.
 
-@subpage examples_maps_slopemario
+@subpage examples_basics_timer
 
-@subpage examples_basics_collision_demo
+@subpage examples_basics_scene_stack
+
+@subpage examples_basics_panel_hud
+
+@subpage examples_basics_game_skeleton
+
+@subpage examples_basics_aim_target
+
+@subpage examples_basics_fix32_orbit
+
+@subpage examples_basics_random
+
+## Stage 6 — "Can I finish and ship?"
+
+*Confidence: a complete cartridge.* Persist progress, choose a mapper, reach
+for a coprocessor when you need more, and study complete games that fuse
+everything above.
+
+@subpage examples_memory_save_game
+
+@subpage examples_memory_hirom_demo
 
 @subpage examples_games_breakout
 
@@ -103,21 +139,19 @@ Tile maps, collision, and complete games.
 
 @subpage examples_games_shmup_1942
 
+@subpage examples_games_mode7_racing
+
 @subpage examples_games_mode7_flying
 
-## Level 6: Enhancement Chips
+### More horsepower — the cartridge coprocessors
 
-Cartridge coprocessors that push the SNES beyond its base hardware.
-SA-1 uses the same 65816 ISA at 3x speed; SuperFX is a custom RISC processor.
+When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz;
+SuperFX / GSU is a custom RISC processor for bitmaps and 3D.
 
-### SA-1 Coprocessor (same ISA, 10.74 MHz)
+@subpage examples_chips_sa1_hello
 
-@subpage examples_memory_sa1_hello
+@subpage examples_chips_sa1_starfield
 
-@subpage examples_memory_sa1_starfield
+@subpage examples_chips_superfx_hello
 
-### SuperFX / GSU (custom RISC, bitmap + 3D)
-
-@subpage examples_memory_superfx_hello
-
-@subpage examples_graphics_effects_superfx_3d
+@subpage examples_chips_superfx_3d

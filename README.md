@@ -22,7 +22,7 @@
 
 ## Introduction
 
-OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 74 example ROMs.
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 80 example ROMs.
 
 This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
@@ -51,7 +51,7 @@ can start in C, and gets out of the way when you're ready to go deeper. There's
 a lane here whether you're curious, comfortable, or hardcore:
 
 - **New to the SNES but fluent in C?** Start with
-  [`examples/text/hello_world`](examples/text/hello_world/) and follow the
+  [`examples/text/print_string`](examples/text/print_string/) and follow the
   [learning path](docs/LEARNING_PATH.md). You'll have a ROM running in minutes
   and meet the hardware one example at a time — no assembly required to get
   moving. Once you have a project of your own,
@@ -102,7 +102,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
 | **30 hardware modules** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **74 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **80 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
 | **Debug emulator** | [luna](https://github.com/k0b3n4irb/luna) (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
@@ -135,7 +135,7 @@ cd opensnes
 make
 ```
 
-Open `examples/text/hello_world/hello_world.sfc` in your favourite emulator ([luna](https://github.com/k0b3n4irb/luna), [Mesen2](https://www.mesen.ca/), bsnes…) and you're running on a Super Nintendo.
+Open `examples/text/print_string/print_string.sfc` in your favourite emulator ([luna](https://github.com/k0b3n4irb/luna), [Mesen2](https://www.mesen.ca/), bsnes…) and you're running on a Super Nintendo.
 
 To start your own game, the build installs an `opensnes` CLI in `bin/`:
 
@@ -149,7 +149,7 @@ and platform-specific setup, see the **[Getting Started guide](https://k0b3n4irb
 
 ## Examples
 
-74 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+80 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
 
 **[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
 

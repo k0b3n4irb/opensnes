@@ -183,7 +183,7 @@ Every shipped example exercises a distinct HDMA case. Read the
 `@par What to Observe` block at the top of each `main.c` for the
 interactive demo; the patterns themselves are reusable building blocks.
 
-### Per-scanline wave distortion — `examples/graphics/effects/hdma_wave`
+### Per-scanline wave distortion — `examples/hdma/hdma_wave`
 
 Pre-computes seven sine tables (224 + 111 wrap entries each) at amplitudes
 0–24 pixels, then runs HDMA channel 6 in `HDMA_MODE_1REG_2X` to write
@@ -192,7 +192,7 @@ table pointer by 3 bytes per frame to scroll the wave continuously. The
 alternating solid/empty tile pattern in the background makes the
 distortion clearly visible.
 
-### Parallax scrolling — `examples/graphics/effects/parallax_scrolling`
+### Parallax scrolling — `examples/scrolling/parallax_scroll`
 
 A static BG3 with a moving BG1 on top, where BG1 scrolls at one rate at
 the top of the screen and a *different* rate at the bottom — classic
@@ -202,21 +202,21 @@ example is also a real-world demonstration of why HDMA tables that
 change every frame want to be in RAM rather than in const ROM (see
 "bank byte trap" below).
 
-### Static colour gradient — `examples/graphics/effects/gradient_colors`
+### Static colour gradient — `examples/hdma/gradient_colors`
 
 A simpler form of the brightness gradient: a fixed table in ROM written
 to CGADD/CGDATA changes the BG palette colour on different rows, giving
 a banded sky. Useful pattern when the gradient never animates and the
 table can live in const ROM.
 
-### Helpers showcase — `examples/graphics/effects/hdma_helpers`
+### Helpers showcase — `examples/hdma/hdma_helpers`
 
 Walks through the lib's HDMA helpers (`hdmaSetup`, `hdmaSetupBank`,
 `hdmaEnable`, `hdmaDisable`, the brightness-gradient builder) on a
 single screen, with on-screen text labelling each. The example to skim
 when you want to remember the API surface.
 
-### Window animation — `examples/graphics/effects/transparent_window`
+### Window animation — `examples/windows/transparent_window`
 
 Combines HDMA with the window/colour-math pipeline. HDMA writes to the
 window position registers (`WH0L`, `WH0H`, `WH1L`, `WH1H`) per scanline
@@ -224,7 +224,7 @@ to animate a moving window, while colour math blends the BG1 layer
 through the window onto the BG2 layer beneath. Mode 4 transfer (4 bytes,
 4 sequential registers) does the four window writes in one HDMA group.
 
-### Stationary window — `examples/graphics/effects/window`
+### Stationary window — `examples/windows/window`
 
 The non-animated cousin: HDMA in repeat mode writes to the window
 registers once (and then "every scanline" since window registers are
@@ -232,7 +232,7 @@ write-only and forget on the next scanline). The window position holds
 across the visible region; the effect is a static masked area rather
 than animation.
 
-### Indirect HDMA — `examples/graphics/effects/hdma_indirect_gradient`
+### Indirect HDMA — `examples/hdma/hdma_indirect_gradient`
 
 `hdmaSetupIndirect()` (DMAP bit 6): table entries hold POINTERS to the
 payload instead of the payload itself, letting many scanline bands share
@@ -241,14 +241,14 @@ with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to
 blocks goes in `$43x7` — pass it with the bank-extraction idiom
 (`(u8)((u32)(void *)table >> 16)`).
 
-### Table repointing as animation — `examples/graphics/effects/hdma_wave_table`
+### Table repointing as animation — `examples/hdma/hdma_wave_table`
 
 krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries, and the
 per-frame "animation" is just `hdmaSetup(..., table + phase * 3)` — a
 zero-copy pointer bump. Cheaper than regenerating tables and immune to
 the VBlank budget.
 
-### Full Mode 7 matrix per line — `examples/graphics/effects/mode7_perspective_rotate`
+### Full Mode 7 matrix per line — `examples/mode7/perspective_rotate`
 
 Four channels, one per matrix register (M7A/B/C/D ← `HDMA_DEST_M7A..D`),
 each in `HDMA_MODE_1REG_2X`. See the Mode 7 tutorial for the technique;
@@ -257,7 +257,7 @@ enable** — without `hdmaEnable(0x0F)` you get a static 1:1 view that can
 look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
 typed state when an HDMA effect "does nothing".
 
-### Two channels, one visual — `examples/graphics/effects/gradient_9bit`
+### Two channels, one visual — `examples/color/gradient_9bit`
 
 Channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
 CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
@@ -272,7 +272,7 @@ HiColor reloads 16 bytes (8 colours) of CGRAM every line. The tool for
 that is the **H-timer IRQ**: `irqSet()` a raw ASM handler, `irqSetHTimer(190)`
 so it fires near the end of the visible line, `irqEnable(IRQ_HTIMER)` —
 the handler fires a general DMA whose source auto-advances across
-transfers. See `examples/graphics/effects/hicolor_1792` (1792 colours
+transfers. See `examples/color/hicolor_1792` (1792 colours
 from a 4bpp BG) and the loud contract in `<snes/interrupt.h>`: handlers
 are ASM-only (a C callback cannot afford per-scanline prologue latency),
 must ack `$4211`, and must save what they touch. Plain C `*`/`/`/`%` in
@@ -372,12 +372,12 @@ inner game-logic loops.
 - `lib/include/snes/hdma.h` — full API reference (function signatures,
   mode constants, destination-register constants).
 - `lib/source/hdma.asm` and `lib/source/hdma.c` — implementation.
-- [`examples/graphics/effects/hdma_wave`](../../examples/graphics/effects/hdma_wave/README.md) — sine-wave per-scanline scroll.
-- [`examples/graphics/effects/hdma_helpers`](../../examples/graphics/effects/hdma_helpers/README.md) — API surface walkthrough.
-- [`examples/graphics/effects/parallax_scrolling`](../../examples/graphics/effects/parallax_scrolling/README.md) — RAM table, two-speed parallax.
-- [`examples/graphics/effects/gradient_colors`](../../examples/graphics/effects/gradient_colors/README.md) — static ROM gradient table.
-- [`examples/graphics/effects/window`](../../examples/graphics/effects/window/README.md) — stationary window via HDMA.
-- [`examples/graphics/effects/transparent_window`](../../examples/graphics/effects/transparent_window/README.md) — animated window + colour math.
+- [`examples/hdma/hdma_wave`](../../examples/hdma/hdma_wave/README.md) — sine-wave per-scanline scroll.
+- [`examples/hdma/hdma_helpers`](../../examples/hdma/hdma_helpers/README.md) — API surface walkthrough.
+- [`examples/scrolling/parallax_scroll`](../../examples/scrolling/parallax_scroll/README.md) — RAM table, two-speed parallax.
+- [`examples/hdma/gradient_colors`](../../examples/hdma/gradient_colors/README.md) — static ROM gradient table.
+- [`examples/windows/window`](../../examples/windows/window/README.md) — stationary window via HDMA.
+- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — animated window + colour math.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — bank `$00` overflow,
   channel-7 reservation, and the runtime traps that bite HDMA work.
 - [Scrolling tutorial](scrolling.md) — companion read; HDMA on

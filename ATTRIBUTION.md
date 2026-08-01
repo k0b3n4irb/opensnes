@@ -135,7 +135,7 @@ Incompatible (do not use without isolation):
 - GPL (for library code — would require relicensing)
 - Proprietary
 
-## examples/graphics/effects/hdma_wave_table
+## examples/hdma/hdma_wave_table
 
 - `res/water.bmp` — original work: procedurally generated water caustics
   (sum-of-sines field, 256-color indexed), created for this example.

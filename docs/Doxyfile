@@ -69,6 +69,8 @@ FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
 # screenshot dir is missing here.
 IMAGE_PATH             = ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
+                         ../examples/basics/game_skeleton \
+                         ../examples/basics/panel_hud \
                          ../examples/basics/fix32_orbit \
                          ../examples/basics/random \
                          ../examples/basics/scene_stack \
@@ -81,57 +83,61 @@ IMAGE_PATH             = ../examples/basics/aim_target \
                          ../examples/games/rpg \
                          ../examples/games/shmup_1942 \
                          ../examples/games/tetris \
-                         ../examples/graphics/backgrounds/continuous_scroll \
-                         ../examples/graphics/backgrounds/mixed_scroll \
-                         ../examples/graphics/backgrounds/mode0 \
-                         ../examples/graphics/backgrounds/mode1 \
-                         ../examples/graphics/backgrounds/mode1_bg3_priority \
-                         ../examples/graphics/backgrounds/mode1_lz77 \
-                         ../examples/graphics/backgrounds/mode3 \
-                         ../examples/graphics/backgrounds/mode5 \
-                         ../examples/graphics/backgrounds/mode7 \
-                         ../examples/graphics/backgrounds/mode7_perspective \
-                         ../examples/graphics/effects/direct_color \
-                         ../examples/graphics/effects/fading \
-                         ../examples/graphics/effects/gradient_9bit \
-                         ../examples/graphics/effects/gradient_colors \
-                         ../examples/graphics/effects/hdma_helpers \
-                         ../examples/graphics/effects/hdma_indirect_gradient \
-                         ../examples/graphics/effects/hdma_wave \
-                         ../examples/graphics/effects/hdma_wave_table \
-                         ../examples/graphics/effects/hicolor_1792 \
-                         ../examples/graphics/effects/hicolor_blend \
-                         ../examples/graphics/effects/hicolor_hires \
-                         ../examples/graphics/effects/hires_text \
-                         ../examples/graphics/effects/mode7_perspective_rotate \
-                         ../examples/graphics/effects/mosaic \
-                         ../examples/graphics/effects/parallax_scrolling \
-                         ../examples/graphics/effects/superfx_3d \
-                         ../examples/graphics/effects/transparency \
-                         ../examples/graphics/effects/transparent_window \
-                         ../examples/graphics/effects/window \
-                         ../examples/graphics/effects/window_multi_hdma \
-                         ../examples/graphics/sprites/animated_sprite \
-                         ../examples/graphics/sprites/dynamic_metasprite \
-                         ../examples/graphics/sprites/dynamic_sprite \
-                         ../examples/graphics/sprites/metasprite \
-                         ../examples/graphics/sprites/object_size \
-                         ../examples/graphics/sprites/simple_sprite \
+                         ../examples/scrolling/continuous_scroll \
+                         ../examples/scrolling/mixed_scroll \
+                         ../examples/backgrounds/mode0 \
+                         ../examples/backgrounds/mode1 \
+                         ../examples/backgrounds/mode1_bg3_priority \
+                         ../examples/backgrounds/mode1_lz77 \
+                         ../examples/backgrounds/mode3 \
+                         ../examples/backgrounds/mode5 \
+                         ../examples/mode7/rotate_scale \
+                         ../examples/mode7/perspective \
+                         ../examples/color/direct_color \
+                         ../examples/color/palette_cycle \
+                         ../examples/color/shadow_tint \
+                         ../examples/transitions/fading \
+                         ../examples/color/gradient_9bit \
+                         ../examples/hdma/gradient_colors \
+                         ../examples/hdma/hdma_helpers \
+                         ../examples/hdma/hdma_indirect_gradient \
+                         ../examples/hdma/hdma_wave \
+                         ../examples/hdma/hdma_wave_table \
+                         ../examples/color/hicolor_1792 \
+                         ../examples/color/hicolor_blend \
+                         ../examples/backgrounds/mode5_hires \
+                         ../examples/mode7/perspective_rotate \
+                         ../examples/transitions/mosaic \
+                         ../examples/scrolling/parallax_scroll \
+                         ../examples/chips/superfx_3d \
+                         ../examples/color/transparency \
+                         ../examples/windows/transparent_window \
+                         ../examples/windows/window \
+                         ../examples/windows/window_multi_hdma \
+                         ../examples/sprites/animated_sprite \
+                         ../examples/sprites/dynamic_metasprite \
+                         ../examples/sprites/dynamic_sprite \
+                         ../examples/sprites/metasprite \
+                         ../examples/sprites/sprite_sizes \
+                         ../examples/sprites/simple_sprite \
+                         ../examples/sprites/sprite_swarm \
                          ../examples/input/controller \
+                         ../examples/input/move_sprite \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
                          ../examples/input/two_players \
                          ../examples/maps/dynamic_map \
-                         ../examples/maps/mapscroll \
-                         ../examples/maps/slopemario \
+                         ../examples/maps/map_scroll \
+                         ../examples/maps/slope_collision \
                          ../examples/maps/tiled \
                          ../examples/memory/hirom_demo \
-                         ../examples/memory/sa1_hello \
-                         ../examples/memory/sa1_starfield \
+                         ../examples/chips/sa1_hello \
+                         ../examples/chips/sa1_starfield \
                          ../examples/memory/save_game \
-                         ../examples/memory/superfx_hello \
-                         ../examples/text/hello_world \
-                         ../examples/text/text_test
+                         ../examples/chips/superfx_hello \
+                         ../examples/fundamentals/text_glyphs \
+                         ../examples/text/print_string \
+                         ../examples/text/scroll_message
 
 #---------------------------------------------------------------------------
 # Build Configuration

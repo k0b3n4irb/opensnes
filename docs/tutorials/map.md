@@ -122,11 +122,11 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
 
 ## Worked patterns (the shipped examples)
 
-- **`examples/maps/mapscroll`** — the minimum scroller above, a large map
+- **`examples/maps/map_scroll`** — the minimum scroller above, a large map
   moved with the D-pad.
 - **`examples/maps/tiled`** — the full Tiled pipeline: a `.tmj` drawn in
   Tiled, converted with `tmx2snes`, loaded with `mapLoad`.
-- **`examples/maps/slopemario`** — per-tile collision *attributes* driving
+- **`examples/maps/slope_collision`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
 - **`examples/maps/dynamic_map`** — rewriting map tiles at runtime.
 

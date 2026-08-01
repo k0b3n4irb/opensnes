@@ -198,7 +198,7 @@ test-tools:
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
-# (mapandobjects, slopemario) are skipped by default; add --all on a machine
+# (mapandobjects, slope_collision) are skipped by default; add --all on a machine
 # matching the baseline capture arch. Re-baseline after an intentional change
 # with `python3 tools/luna-test/wram_regress.py --update` (same commit).
 test-wram:

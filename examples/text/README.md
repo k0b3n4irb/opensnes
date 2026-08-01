@@ -8,10 +8,15 @@ These examples teach the tile/tilemap fundamentals that underpin all SNES graphi
 
 ## Examples
 
-| Example | Difficulty | Description |
-|---------|------------|-------------|
-| [hello_world](hello_world/) | Beginner | Your first SNES ROM -- display text on a background layer |
-| [text_test](text_test/) | Beginner | Text positioning, formatting, and consoleDrawText usage |
+A ladder of developer questions: *how do I show text? → how do I move it?*
+
+| Example | Rung | Description |
+|---------|------|-------------|
+| [print_string](print_string/) | 1.1 | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
+| [scroll_message](scroll_message/) | 1.4 | Move text -- scroll the text BG layer for a marquee (`bgSetScroll`) |
+
+> Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in
+> [`fundamentals/text_glyphs`](../fundamentals/text_glyphs/).
 
 ## Key Concepts
 
@@ -50,5 +55,6 @@ In Mode 0, each background layer gets 4 colors:
 
 ---
 
-Start with **hello_world** to get your first ROM running, then use **text_test**
-to explore text positioning and formatting.
+Start with **print_string** to get your first ROM running, then **scroll_message**
+to make it move. To see what the `text` module hides, read
+**fundamentals/text_glyphs**.

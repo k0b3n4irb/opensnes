@@ -27,7 +27,7 @@ Usage
 -----
     python3 tools/luna-test/luna_runner.py --update          # (re)baseline all
     python3 tools/luna-test/luna_runner.py                   # compare all
-    python3 tools/luna-test/luna_runner.py --only mapscroll  # one label substring
+    python3 tools/luna-test/luna_runner.py --only map_scroll  # one label substring
     python3 tools/luna-test/luna_runner.py --list            # show the manifest
 
 Exit code: 0 = all pass, 1 = at least one mismatch / error.

@@ -19,7 +19,7 @@ CASES = [
      [("player_x", RIGHT, True), ("player_y", DOWN, True)]),
     ("maps/tiled/tiled.sfc",
      [("focusx", RIGHT, True), ("focusx", LEFT, False)]),
-    ("graphics/backgrounds/mode7_perspective/mode7_perspective.sfc",
+    ("mode7/perspective/perspective.sfc",
      [("sx", RIGHT, True), ("sy", DOWN, True)]),
     ("games/likemario/likemario.sfc",
      [("mario_x", RIGHT, True)]),

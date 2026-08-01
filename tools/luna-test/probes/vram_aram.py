@@ -29,9 +29,9 @@ def _nz(b: bytes) -> int:
 
 # (example, space, min_nonzero_bytes) — destination must be populated post-boot.
 CASES = [
-    ("text/hello_world/hello_world.sfc",                 "--dump-vram", 32),    # font tiles
-    ("graphics/backgrounds/mode3/mode3.sfc",             "--dump-vram", 5000),  # large tileset
-    ("graphics/sprites/metasprite/metasprite.sfc",       "--dump-vram", 200),   # sprite tiles
+    ("fundamentals/text_glyphs/text_glyphs.sfc",         "--dump-vram", 32),    # font tiles
+    ("backgrounds/mode3/mode3.sfc",             "--dump-vram", 5000),  # large tileset
+    ("sprites/metasprite/metasprite.sfc",       "--dump-vram", 200),   # sprite tiles
     ("audio/snesmod_music/music.sfc",                    "--dump-aram", 20000), # SPC driver + samples
 ]
 

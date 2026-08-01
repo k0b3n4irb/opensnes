@@ -2,6 +2,54 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.33.0] — 2026-08-01
+
+The example-curriculum release. The corpus is reorganized from the old
+`graphics/{backgrounds,sprites,effects}` grouping into 17 use-case
+families, grows from 74 to 80 with new showcase and capstone examples that
+fill the gaps a learner would actually hit, and a latent CPU-hang in
+`textPrintU16` is root-caused and fixed along the way.
+
+### Added
+- feat(examples): eight new examples across the reorganized curriculum —
+  **palette_cycle** (Colour 6b) and **shadow_tint** (6c.2) complete the
+  Colour family; **sprite_swarm** caps the sprites family with an honest
+  OAM-throughput showcase (and the measured ~32-sprite 60 fps ceiling for
+  per-sprite C motion); **panel_hud** demonstrates the 9-slice `panel`
+  module in isolation; **game_skeleton** is the smallest complete
+  title → play → game-over game, a fork-ready capstone; plus
+  **move_sprite** (Input 4.2), **scroll_message** (Text 1.4) and **echo**
+  (Audio 8.9, S-DSP reverb) from the reorg waves
+- docs(examples): every family now has a README "ladder" that walks a
+  learner rung by rung, and a pedagogy charter + reframed LEARNING_PATH
+  present the whole corpus as a seven-stage developer's journey
+
+### Changed
+- docs(examples): the example corpus is reorganized into 17 use-case
+  families (text, fundamentals, backgrounds, sprites, scrolling, mode7,
+  hdma, color, windows, transitions, input, audio, maps, basics, memory,
+  chips, games) — `graphics/` is dissolved entirely; a naming audit
+  renames examples to consistent per-family patterns (the redundant
+  `mode7_` prefix dropped, `object_size` → `sprite_sizes`, `mapscroll` →
+  `map_scroll`, `slopemario` → `slope_collision`, `hires_text` →
+  `mode5_hires`, `parallax_scrolling` → `parallax_scroll`)
+- docs(examples): low-value duplicates discarded (`hicolor_hires`,
+  `snesmod_music_hirom`); `text_test` renamed to `print_string`
+
+### Fixed
+- fix(lib): `textPrintU16` rewritten to a codegen-robust MSD-first loop.
+  The old reversed-buffer/decrementing-pointer form miscompiled under
+  some link layouts — the pointer underflowed the stack buffer and the
+  CPU hung forever in `textPrint` — a latent hang for any game printing a
+  number in a sprite-using loop. Output is byte-identical
+  (`.claude/notes/tech/textprintu16_codegen_hang.md`)
+- fix(examples): track `echo`'s `pp.brr` — the `*.brr` gitignore rule
+  silently dropped it, breaking clean-checkout CI
+- fix(luna-test,devtools): rename-sweep stragglers (movement-probe ROM
+  path, ATTRIBUTION path, doc references)
+- test(luna-test): re-key the WRAM oracle to the reorg'd example names and
+  prune 44 stale pre-reorg keys — one baseline per example
+
 ## [0.32.0] — 2026-07-26
 
 The follow-through release. The #127/#128 asset work grew its second

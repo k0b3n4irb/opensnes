@@ -33,7 +33,7 @@ def run() -> tuple[bool, str]:
 
     # simple_sprite: oamSet(0, 112, 96, tile 0x10, prio 3) → exactly one 32×32
     # sprite at (112, 95) [y-1], tile 16, priority 3.
-    oam = _oam(luna, rom_path("graphics/sprites/simple_sprite/simple_sprite.sfc"))
+    oam = _oam(luna, rom_path("sprites/simple_sprite/simple_sprite.sfc"))
     vis = _visible(oam)
     s0 = oam[0]
     ok = (len(vis) == 1 and s0["x"] == 112 and s0["y"] == 95 and s0["tile"] == 16
@@ -43,8 +43,8 @@ def run() -> tuple[bool, str]:
 
     # metasprite / animated_sprite: a metasprite is several hardware sprites →
     # expect more than one visible sprite placed on screen.
-    for rel, name in [("graphics/sprites/metasprite/metasprite.sfc", "metasprite"),
-                      ("graphics/sprites/animated_sprite/animated_sprite.sfc", "animated_sprite")]:
+    for rel, name in [("sprites/metasprite/metasprite.sfc", "metasprite"),
+                      ("sprites/animated_sprite/animated_sprite.sfc", "animated_sprite")]:
         vis = _visible(_oam(luna, rom_path(rel)))
         ok = len(vis) >= 1
         results.append((ok, f"{name}: {len(vis)} visible sprites"))

@@ -23,7 +23,7 @@ def _simple_sprite(luna) -> tuple[bool, str]:
     # oamSet stores y-1 ("dec a" in sprite_oamset.asm: compensate the +1 scanline
     # PPU pipeline delay), so the shadow Y is 95, not 96. (luna reads 95 — the
     # snes9x-era test's expected 96 ignored this y-1 convention.)
-    rom = rom_path("graphics/sprites/simple_sprite/simple_sprite.sfc")
+    rom = rom_path("sprites/simple_sprite/simple_sprite.sfc")
     x, y, tile, attr = peek(luna, rom, 4_000_000, "oamMemory", 4)  # 7E:0300
     ok = (x == 112 and y == 95 and tile == 0x10 and (attr & 0x3E) == 0x30)
     return ok, f"simple_sprite OAM0 x={x} y={y}(=96-1) tile=0x{tile:02X} attr=0x{attr:02X}"

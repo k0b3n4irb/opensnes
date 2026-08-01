@@ -144,7 +144,7 @@ static void fade_in(u8 speed) {
 }
 ```
 
-A speed of 1 gives a fast 16-frame fade (~267ms). A speed of 3 gives a slower cinematic fade. See `examples/graphics/effects/fading/` for a complete working example.
+A speed of 1 gives a fast 16-frame fade (~267ms). A speed of 3 gives a slower cinematic fade. See `examples/transitions/fading/` for a complete working example.
 
 ### VRAM Reload Between States
 

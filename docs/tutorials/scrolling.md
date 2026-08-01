@@ -122,7 +122,7 @@ while (1) {
 }
 ```
 
-See `examples/graphics/backgrounds/mixed_scroll/` for a complete example where a shader pattern auto-scrolls behind a static logo.
+See `examples/scrolling/mixed_scroll/` for a complete example where a shader pattern auto-scrolls behind a static logo.
 
 ## Parallax Scrolling
 
@@ -195,7 +195,7 @@ int main(void) {
 }
 ```
 
-See `examples/graphics/effects/parallax_scrolling/` for the complete implementation.
+See `examples/scrolling/parallax_scroll/` for the complete implementation.
 
 **Important:** The scroll table must live in RAM (not `const`) because the main loop updates it every frame. HDMA reads from the table during rendering, so always update the values *before* `WaitForVBlank()`.
 
@@ -239,7 +239,7 @@ bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
 bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
 ```
 
-See `examples/graphics/backgrounds/continuous_scroll/` for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.
+See `examples/scrolling/continuous_scroll/` for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.
 
 ### Streaming Tips
 

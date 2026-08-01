@@ -1,6 +1,35 @@
 # wla-dx upstream regression — SPAN commit breaks SUPERFREE placement
 
-Status: **root-caused, filed upstream** as
+Status: **FIXED UPSTREAM & VERIFIED — issue #729 closed (2026-07-31).**
+vhelin fixed it in commit `d3fe5143` ("Fixed SUPERFREE .SECTION placing",
+2026-07-28) — a ~1-day turnaround. The fix teaches `wlalink/write.c`'s
+`_rom_section_get_location` an `allow_section_end` flag so a section's **end
+label** landing exactly on a bank boundary (`bank_address ==
+g_banksizes[bank]`) is accepted instead of rejected. He also added a
+regression test, `tests/6502/superfree_bank_boundary_test/`.
+
+**Verified rigorously (negative control):** rebuilt wla-dx at `d3fe5143` —
+our minimal repro (below) links cleanly (32768-byte output) and vhelin's
+test passes; its **parent** `c2924977` still fails with the original
+`cannot map label "big_end"`, so the fix is unambiguously the cause.
+
+**Pin status — DECISION (2026-07-31): wait for the release.** Stay on the
+v10.7 release (`91c52b1f`, 0 local patches); keep the clean "tagged release,
+no local patches" discipline rather than pinning to an untagged master commit
+(v10.7 → `d3fe5143` is ~90 unrelated master commits — possible other
+surprises). #127.3 (what SPAN unblocks) is the last open issue but not urgent
+— the `ASSET_SECTION` opt-in already works around it.
+
+**Trigger to act:** when vhelin tags a release that contains `d3fe5143`,
+advance the wla-dx pin to that tag (`make verify-toolchain`, full
+`make clean && make` + luna suite), then reopen #127.3 (QBE const-data
+default placement out of bank $00).
+
+---
+
+## Original report (root-cause + repro), for the record
+
+Was: **root-caused, filed upstream** as
 https://github.com/vhelin/wla-dx/issues/729 (2026-07-26). Our pin is the
 v10.7 release (clean); do not advance past `a369bec5` until this is fixed.
 

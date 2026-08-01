@@ -97,7 +97,7 @@ never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **Local, same-arch tool — not a CI gate:** raw
   WRAM content (unlike the framebuffer) isn't a luna cross-arch guarantee
-  (mapandobjects, slopemario diverge x86_64 ↔ aarch64), so `--update` on your own
+  (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), so `--update` on your own
   machine before `--compare`. Baseline entries carry `rom_sha256` provenance
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example

@@ -301,8 +301,8 @@ setScreenOn();
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [superfx_hello](../../../examples/memory/superfx_hello/) | Boot, registers, SRAM read/write |
-| [superfx_3d](../../../examples/memory/superfx_3d/) | Rotating wireframe cube, Bresenham line drawing, 3D projection |
+| [superfx_hello](../../../examples/chips/superfx_hello/) | Boot, registers, SRAM read/write |
+| [superfx_3d](../../../examples/chips/superfx_3d/) | Rotating wireframe cube, Bresenham line drawing, 3D projection |
 
 ## Further Reading
 

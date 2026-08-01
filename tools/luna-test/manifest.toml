@@ -38,16 +38,24 @@ steps = 4_000_000   # cycles through values; later frame is more representative
 # same frame at every un-scripted capture point (verified 1M→6M: identical
 # fbhash) — a second point there is cost without coverage. Covering their
 # animations needs scripted input, which is the functional probes' domain.
-[examples."graphics/effects/parallax_scrolling"]
+[examples."scrolling/parallax_scroll"]
 steps = [3_000_000, 6_000_000]
 
-[examples."graphics/effects/transparency"]
+[examples."color/transparency"]
+steps = [3_000_000, 6_000_000]
+
+# palette cycling rotates CGRAM every frame with no input — self-animating.
+[examples."color/palette_cycle"]
 steps = [3_000_000, 6_000_000]
 
 # hero16 walks in place via the anim module since #97 — self-animating.
-[examples."graphics/sprites/metasprite"]
+[examples."sprites/metasprite"]
 steps = [3_000_000, 6_000_000]
 
 # raw HDMA wave (krom port) scrolls continuously — self-animating.
-[examples."graphics/effects/hdma_wave_table"]
+[examples."hdma/hdma_wave_table"]
+steps = [3_000_000, 6_000_000]
+
+# 32 sprites bounce continuously with no input — self-animating.
+[examples."sprites/sprite_swarm"]
 steps = [3_000_000, 6_000_000]

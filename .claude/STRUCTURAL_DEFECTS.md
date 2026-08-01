@@ -33,6 +33,29 @@ load-bearing for cross-session continuity).
 > These older entries are kept as investigation logs (they froze a past state on
 > purpose); only the headline status lines are updated.
 
+> **📊 Status refresh (2026-07-26).** The §1 executive summary below was
+> written at baseline (2026-05-08) and its strategic prose predates the
+> compiler and lib chantiers that have since shipped — read this ledger,
+> not §1, for current status. Of the catalogued items:
+> - **RESOLVED 🟢 (12):** A1 (int/long width, v0.20.0), A2 (`volatile`,
+>   2026-05-09), A3 (TCO residual), A4 (`oamSet` cliff), **A6 (24-bit
+>   pointer IR, v0.19.0)**, A7 (`Kl` codegen, v0.21.2), **B1 (lib pointer
+>   ABI — superseded by A6+A7 + #122 + #127)**, B5 (`fixed32`), B6
+>   (`atan2`/`sqrt`/`pow`), C1 (ASM-module audit), D1 (GSU detection —
+>   luna), E1 (WRAM NMI race), E2 (cycle-count gate). *(A6 and B1 were the
+>   two stale-marked items corrected in this refresh.)*
+> - **OPEN — real chantiers:** **B2 🔴** (C RAM 8 KB ceiling
+>   `$00:0000–$1FFF` — the highest-value real-game lever); **C2 🟠**
+>   (sprite/text parallel C+ASM implementations); **B3 🟠** (no
+>   `mode7LoadGraphics` helper); **D2 🟡** (SA-1 SIWP hw validation); **A5
+>   🟡** (compiler-fork divergence — ongoing maintenance, not a discrete
+>   fix); **B4 🟡** (`hdmaSetup` — API shipped, example migration pending);
+>   **A8 🟡** (MSYS2 cproc segfaults — believed fixed, under telemetry).
+> - **INTRINSIC (not fixable):** D3 (SuperFX has no C compiler — GSU RISC ISA).
+> - **Cross-ref:** the only *public* open issue is **#127** (its remaining
+>   piece, #127.3, = QBE const-data default placement). Everything else
+>   here is maintainer-internal.
+
 **Baseline**: external review delivered 2026-05-07; 18 commits shipped on
 `develop` between 2026-05-07 and 2026-05-08 closing 9 / 10 of the Top 10
 audit items + the tutorials wave (8 / 8) + the cycle-count CI gate (soft
@@ -654,16 +677,20 @@ cycles take weeks per patch.
 
 ---
 
-#### A6. Pointer IR size + indirect-call bank-byte preservation 🔴
+#### A6. Pointer IR size + indirect-call bank-byte preservation — RESOLVED 🟢 (v0.19.0, 2026-05-15)
 
-> **Status (2026-05-08): identified during A1 investigation, not yet
-> attempted.** This chantier exists because A1's empirical investigation
-> revealed that changing pointer IR size in cproc cascades catastrophically
-> through QBE w65816's indirect-call emit pass. Splitting it out of A1 was
-> a forced choice driven by the test-suite signal (9 failures with pointer=2,
-> 1 baseline drift with pointer kept at 8).
+> **Status: FULLY RESOLVED (chantier A6+A7, shipped 2026-05-15 in
+> v0.19.0).** Pointers are a 24-bit address (low 16 + bank byte) stored in
+> a 4-byte / `Kl` slot; indirect calls read the bank byte from the
+> pointer's high half. See `compiler/ABI.md` (pointer row: "4 … chantier
+> A6+A7, shipped 2026-05-15 in v0.19.0") and the `a6_farptr` runtime gate
+> in `devtools/compiler-tests/`. The #132 fix (v0.31.0) took the A6
+> far-pointer matrix to **8/8 with 5 XPASS**. The original 2026-05-08
+> "not yet attempted" note and the pointer=8-bytes symptom below are
+> **historical** — preserved as the investigation log that led to the
+> chantier; the code no longer matches them.
 
-**Symptom**: cproc's IR has pointers at **8 bytes**
+**Symptom** *(historical — the pre-A6 state)*: cproc's IR had pointers at **8 bytes**
 (`compiler/cproc/type.c:74`, the original `mkpointertype()` size). On a
 target where pointers are actually 24-bit (3 bytes — bank byte + 16-bit
 address), this is wrong. Three concrete consequences:
@@ -1200,9 +1227,27 @@ Six items, four of them sharing a common root cause (the 16-bit pointer
 ABI). Fixing them together yields larger gains than picking one in
 isolation.
 
-#### B1. 16-bit pointer ABI in lib helpers (root cause for §15-#3 residual) 🔴
+#### B1. 16-bit pointer ABI in lib helpers — RESOLVED 🟢 (superseded by A6+A7 + #122 + #127)
 
-**Symptom**: 6 examples build with bank `$00` ROM under 100 bytes free;
+> **Status: RESOLVED, by a better path than the `*Bank`-variant plan
+> below.** Three chantiers closed the root cause without adding a parallel
+> Bank-suffixed API:
+> - **A6+A7 (v0.19.0)** made pointers a full 24-bit address (bank byte +
+>   16-bit), so a `const` pointer deref reads from the pointer's own bank —
+>   no implicit bank `$00`.
+> - **#122 (v0.31.0)** made the caller-owned read-only params `const`
+>   throughout `dma`, `background`, `sprite`, `map`, `lzss`, `object`,
+>   `sram` — turning every C index of user assets into a far read.
+> - **#127 (`ASSET_SECTION`, v0.31/v0.32)** keeps asset payload out of
+>   bank `$00` in the first place (`SEMISUPERFREE BANKS 7-1`).
+>
+> The residual is **not** a lib-ABI problem: it is making non-bank-`$00`
+> the *default* placement for QBE's C const data (`.rodata.N`), tracked as
+> **issue #127 point 3** — see `.claude/rules/bank0_budget.md`. The
+> `*Bank`-variant plan below is **historical** (the path not taken); the
+> symptom/mitigations describe the pre-A6 state.
+
+**Symptom** *(historical — pre-A6)*: 6 examples build with bank `$00` ROM under 100 bytes free;
 adding a single string literal to any of them fails the build (caught by
 the `BANK0_FAIL_THRESHOLD=16` ratchet shipped 2026-05-08). The ratchet
 prevents regression but does not free the underlying margin. User assets

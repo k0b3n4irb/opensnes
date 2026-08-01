@@ -35,7 +35,7 @@ u16 r_m7_setcenter;  /* mode7SetCenter(x, y)                       */
 u16 r_m7_setmatrix;  /* mode7SetMatrix(a, b, c, d)                 */
 u16 r_m7_transform;  /* mode7Transform(deg, scale) — the heavy one */
 
-/* map.asm measurement points (real mapscroll data, loaded once).
+/* map.asm measurement points (real map_scroll data, loaded once).
  * mapVblank is called OUTSIDE VBlank on purpose: the PPU ignores the
  * VRAM writes but the CPU work — the thing we measure — is identical. */
 u16 r_map_getmeta;   /* mapGetMetaTile(1280, 80)                    */

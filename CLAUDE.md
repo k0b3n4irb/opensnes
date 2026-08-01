@@ -28,7 +28,7 @@ make clean && make      # Full rebuild (REQUIRED after compiler or runtime chang
 
 Build a single example:
 ```bash
-cd examples/text/hello_world && make
+cd examples/text/print_string && make
 ```
 
 ## Testing

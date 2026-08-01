@@ -196,7 +196,7 @@ Most of OpenSNES treats Y as `visual_top`, which is what programmers expect.
 The dynamic engine is the exception because its collision-driven `oamy`
 field is set by ported PVSnesLib code that already accounts for the quirk.
 Adding our own compensation on top would double the offset and lift sprites
-2 px off the ground — easily visible on slopemario / likemario.
+2 px off the ground — easily visible on slope_collision / likemario.
 
 ## Timing
 
@@ -241,4 +241,4 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 
 - [Registers](REGISTERS.md) - Full register reference
 - [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md) - Graphics system overview
-- [Animated Sprite Example](/examples/graphics/sprites/animated_sprite/) - Working sprite animation code
+- [Animated Sprite Example](/examples/sprites/animated_sprite/) - Working sprite animation code

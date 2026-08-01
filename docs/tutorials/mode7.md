@@ -202,7 +202,7 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 
 ## Worked patterns (the two shipped examples)
 
-### Basic rotation + scaling — `examples/graphics/backgrounds/mode7`
+### Basic rotation + scaling — `examples/mode7/rotate_scale`
 
 The "hello-world" of Mode 7. `mode7SetAngle()` and `mode7SetScale()`
 update the matrix every frame in response to D-pad input — A/B rotate,
@@ -212,7 +212,7 @@ mode7Init, mode7SetScale, mode7SetAngle, setMainScreen(TM_BG1),
 setScreenOn) and the per-frame update path. ~100 lines of C; the entire
 demo fits on one screen.
 
-### F-Zero perspective via HDMA — `examples/graphics/backgrounds/mode7_perspective`
+### F-Zero perspective via HDMA — `examples/mode7/perspective`
 
 The trick that gives Mode 7 its reputation. The 2 × 2 matrix is *constant
 per frame* in plain Mode 7, which means the BG plane stays "flat" — no
@@ -341,8 +341,8 @@ perspective example consumes ~6 % of CPU during active display.
 - `lib/include/snes/mode7.h` — full API reference.
 - `lib/source/mode7.asm` — implementation (matrix multiply, sin/cos
   table).
-- [`examples/graphics/backgrounds/mode7`](../../examples/graphics/backgrounds/mode7/README.md) — basic rotation + scaling demo.
-- [`examples/graphics/backgrounds/mode7_perspective`](../../examples/graphics/backgrounds/mode7_perspective/README.md) — F-Zero-style perspective via 4-channel HDMA.
+- [`examples/mode7/rotate_scale`](../../examples/mode7/rotate_scale/README.md) — basic rotation + scaling demo.
+- [`examples/mode7/perspective`](../../examples/mode7/perspective/README.md) — F-Zero-style perspective via 4-channel HDMA.
 - [HDMA tutorial](hdma.md) — required reading for the perspective
   pattern.
 - [Graphics tutorial](graphics.md) — companion read for the regular
@@ -353,8 +353,8 @@ perspective example consumes ~6 % of CPU during active display.
 
 ## Per-scanline matrix: rotating perspective
 
-`graphics/backgrounds/mode7_perspective` drives M7A/M7D per line for the
-F-Zero ground; `graphics/effects/mode7_perspective_rotate` drives the FULL
+`mode7/perspective` drives M7A/M7D per line for the
+F-Zero ground; `mode7/perspective_rotate` drives the FULL
 matrix — cos into M7A and M7D, sin/-sin into M7B/M7C — from 48 pre-built
 angle tables (entry = `trig(2*pi*a/48) * 20480 / scanline`, 8.8 fixed:
 the hyperbolic perspective divide). Four HDMA channels, one per register,

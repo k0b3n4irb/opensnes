@@ -13,8 +13,9 @@ Browse by category: @ref examples_by_category
 ## By Topic
 
 ### Getting Started
-- @ref hello_world/main.c "Hello World" — Hand-coded font, Mode 0, direct VRAM writes
-- @ref text_test/main.c "Text Module" — textInit/textPrintAt/textFlush workflow
+- @ref print_string/main.c "Print a string" — textModeInit + textPrintAt, NMI auto-flush
+- @ref scroll_message/main.c "Scroll a message" — move text with bgSetScroll (marquee)
+- @ref text_glyphs/main.c "Text glyphs (fundamentals)" — hand-coded 2bpp font, direct VRAM writes
 
 ### Backgrounds
 - @ref mode0/main.c "Mode 0" — Four 2bpp layers with parallax
@@ -32,7 +33,7 @@ Browse by category: @ref examples_by_category
 - @ref animated_sprite/main.c "Animated Sprite" — Frame cycling and direction flip
 - @ref dynamic_sprite/main.c "Dynamic Sprite" — VRAM streaming engine
 - @ref metasprite/main.c "Metasprite" — Multi-tile composite sprites
-- @ref object_size/main.c "Object Size" — OBJSEL size modes
+- @ref sprite_sizes/main.c "Object Size" — OBJSEL size modes
 
 ### Effects
 - @ref fading/main.c "Fading" — INIDISP brightness transitions
@@ -45,7 +46,7 @@ Browse by category: @ref examples_by_category
 - @ref hdma_wave_table/main.c "HDMA Wave Table" — Raw HDMA table in C (krom port)
 - @ref hdma_indirect_gradient/main.c "HDMA Indirect Gradient" — Pointer-table gradient (krom port)
 - @ref hdma_helpers/main.c "HDMA Helpers" — Library helper effects
-- @ref parallax_scrolling/main.c "Parallax" — HDMA scroll offsets
+- @ref parallax_scroll/main.c "Parallax" — HDMA scroll offsets
 
 ### Input
 - @ref mouse/main.c "Mouse" — SNES Mouse peripheral
@@ -58,7 +59,7 @@ Browse by category: @ref examples_by_category
 
 ### Maps
 - @ref dynamic_map/main.c "Dynamic Map" — Extended WRAM tilemaps
-- @ref slopemario/main.c "Slope Mario" — Slope collision with map engine
+- @ref slope_collision/main.c "Slope Mario" — Slope collision with map engine
 
 ### Memory
 - @ref hirom_demo/main.c "HiROM" — 64KB bank memory mapping

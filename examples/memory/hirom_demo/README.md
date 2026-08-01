@@ -11,7 +11,7 @@ work correctly in HiROM mode.
 
 ## Prerequisites
 
-Read `text/hello_world` first (basic PPU setup). Understanding of hexadecimal
+Read `text/print_string` first (basic PPU setup). Understanding of hexadecimal
 addressing is helpful but not required.
 
 ## Controls

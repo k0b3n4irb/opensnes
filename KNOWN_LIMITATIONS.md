@@ -232,7 +232,7 @@ of a SuperFX project orchestrates GSU jobs and reads results — it doesn't
 generate GSU code.
 
 **Mitigation:** documented in `docs/tutorials/sa1.md` and the SuperFX example
-under `examples/memory/superfx_*`. Plan accordingly: heavy compute lives in
+under `examples/chips/superfx_*`. Plan accordingly: heavy compute lives in
 GSU assembly, not in your C main.
 
 ### 🟢 Compiler submodule drift (caught by verify-toolchain)

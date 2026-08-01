@@ -280,7 +280,7 @@ smconv -s -o soundbank music/song.it
 
 **Sound Effects:** [SNESMOD SFX](../snesmod_sfx/) - Sound effect playback with pitch control
 
-**Graphics:** [Simple Sprite](../../graphics/sprites/simple_sprite/) - Display a sprite on screen
+**Graphics:** [Simple Sprite](../../sprites/simple_sprite/) - Display a sprite on screen
 
 ---
 
