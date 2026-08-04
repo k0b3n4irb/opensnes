@@ -1,31 +1,32 @@
 var examples_by_category =
 [
     [ "Print a string", "examples_text_print_string.html", [
-      [ "Text", "examples_by_category.html#autotoc_md474", null ],
-      [ "Fundamentals", "examples_by_category.html#autotoc_md476", null ],
-      [ "Backgrounds", "examples_by_category.html#autotoc_md478", null ],
-      [ "Sprites", "examples_by_category.html#autotoc_md480", null ],
-      [ "Scrolling", "examples_by_category.html#autotoc_md482", null ],
-      [ "Mode 7", "examples_by_category.html#autotoc_md484", null ],
-      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md486", null ],
-      [ "Colour", "examples_by_category.html#autotoc_md488", null ],
-      [ "Windows", "examples_by_category.html#autotoc_md490", null ],
-      [ "Transitions", "examples_by_category.html#autotoc_md492", null ],
-      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md494", null ],
-      [ "Audio", "examples_by_category.html#autotoc_md496", null ],
-      [ "Maps", "examples_by_category.html#autotoc_md498", null ],
-      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md500", null ],
-      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md502", null ],
-      [ "Enhancement chips", "examples_by_category.html#autotoc_md504", [
-        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md505", null ],
-        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md506", null ]
+      [ "Text", "examples_by_category.html#autotoc_md506", null ],
+      [ "Fundamentals", "examples_by_category.html#autotoc_md508", null ],
+      [ "Backgrounds", "examples_by_category.html#autotoc_md510", null ],
+      [ "Sprites", "examples_by_category.html#autotoc_md512", null ],
+      [ "Scrolling", "examples_by_category.html#autotoc_md514", null ],
+      [ "Mode 7", "examples_by_category.html#autotoc_md516", null ],
+      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md518", null ],
+      [ "Colour", "examples_by_category.html#autotoc_md520", null ],
+      [ "Windows", "examples_by_category.html#autotoc_md522", null ],
+      [ "Transitions", "examples_by_category.html#autotoc_md524", null ],
+      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md526", null ],
+      [ "Audio", "examples_by_category.html#autotoc_md528", null ],
+      [ "Maps", "examples_by_category.html#autotoc_md530", null ],
+      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md532", null ],
+      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md534", null ],
+      [ "Enhancement chips", "examples_by_category.html#autotoc_md536", [
+        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md537", null ],
+        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md538", null ],
+        [ "DSP-1 Coprocessor", "examples_by_category.html#autotoc_md539", null ]
       ] ],
-      [ "Games (capstones)", "examples_by_category.html#autotoc_md508", [
-        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1580", null ],
-        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1581", null ],
-        [ "How to build", "examples_text_print_string.html#autotoc_md1582", null ],
-        [ "Modules used", "examples_text_print_string.html#autotoc_md1583", null ],
-        [ "Next rung", "examples_text_print_string.html#autotoc_md1584", null ]
+      [ "Games (capstones)", "examples_by_category.html#autotoc_md541", [
+        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1627", null ],
+        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1628", null ],
+        [ "How to build", "examples_text_print_string.html#autotoc_md1629", null ],
+        [ "Modules used", "examples_text_print_string.html#autotoc_md1630", null ],
+        [ "Next rung", "examples_text_print_string.html#autotoc_md1631", null ]
       ] ]
     ] ],
     [ "Scroll a message", "examples_text_scroll_message.html", null ],
@@ -36,6 +37,7 @@ var examples_by_category =
     [ "Mode 0 — 4-Layer 2bpp Background", "examples_backgrounds_mode0.html", null ],
     [ "Mode 3 — 256-Color Background", "examples_backgrounds_mode3.html", null ],
     [ "Mode 5 — Hi-Res 512×256 Background", "examples_backgrounds_mode5.html", null ],
+    [ "mode2 — offset-per-tile: per-column scroll from BG3", "examples_backgrounds_mode2.html", null ],
     [ "Hi-res text — BG Mode 5 + interlace (512 × 448)", "examples_backgrounds_mode5_hires.html", null ],
     [ "Simple Sprite -- Your First OAM Sprite", "examples_sprites_simple_sprite.html", null ],
     [ "Object Size -- All 6 SNES Sprite Size Modes", "examples_sprites_sprite_sizes.html", null ],
@@ -76,6 +78,7 @@ var examples_by_category =
     [ "SNESMOD Large Soundbank Music", "examples_audio_snesmod_music_large.html", null ],
     [ "SNESMOD Sound Effects", "examples_audio_snesmod_sfx.html", null ],
     [ "soundboard — the audio v2 engine, driven entirely from C", "examples_audio_soundboard.html", null ],
+    [ "SFX from WAV", "examples_audio_sfx_from_wav.html", null ],
     [ "apu_switch — hot-swapping APU programs at runtime", "examples_audio_apu_switch.html", null ],
     [ "play_noise — a drum kit with zero samples", "examples_audio_play_noise.html", null ],
     [ "pitch_mod — hardware vibrato via pitch modulation", "examples_audio_pitch_mod.html", null ],
@@ -99,6 +102,7 @@ var examples_by_category =
     [ "SA-1 Starfield (Murmuration)", "examples_chips_sa1_starfield.html", null ],
     [ "SuperFX Hello", "examples_chips_superfx_hello.html", null ],
     [ "SuperFX 3D Cube", "examples_chips_superfx_3d.html", null ],
+    [ "DSP-1 Cube", "examples_chips_dsp1_cube.html", null ],
     [ "Breakout", "examples_games_breakout.html", null ],
     [ "Tetris", "examples_games_tetris.html", null ],
     [ "LikeMario", "examples_games_likemario.html", null ],

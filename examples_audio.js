@@ -1,23 +1,24 @@
 var examples_audio =
 [
-    [ "Categories", "examples.html#autotoc_md1435", null ],
-    [ "Learning Path", "examples.html#autotoc_md1436", [
-      [ "Level 1 &ndash; First Steps", "examples.html#autotoc_md1437", null ],
-      [ "Level 2 &ndash; Graphics Fundamentals", "examples.html#autotoc_md1438", null ],
-      [ "Level 3 &ndash; Scrolling and Effects", "examples.html#autotoc_md1439", null ],
-      [ "Level 4 &ndash; Advanced Topics", "examples.html#autotoc_md1440", null ],
-      [ "Level 5 &ndash; Maps and Complete Projects", "examples.html#autotoc_md1441", null ]
+    [ "Categories", "examples.html#autotoc_md1482", null ],
+    [ "Learning Path", "examples.html#autotoc_md1483", [
+      [ "Level 1 &ndash; First Steps", "examples.html#autotoc_md1484", null ],
+      [ "Level 2 &ndash; Graphics Fundamentals", "examples.html#autotoc_md1485", null ],
+      [ "Level 3 &ndash; Scrolling and Effects", "examples.html#autotoc_md1486", null ],
+      [ "Level 4 &ndash; Advanced Topics", "examples.html#autotoc_md1487", null ],
+      [ "Level 5 &ndash; Maps and Complete Projects", "examples.html#autotoc_md1488", null ]
     ] ],
-    [ "Building", "examples.html#autotoc_md1442", null ],
-    [ "Running", "examples.html#autotoc_md1443", null ],
-    [ "Tips", "examples.html#autotoc_md1444", [
-      [ "The ladder", "examples_audio.html#autotoc_md776", null ],
-      [ "The idea in one screen", "examples_audio.html#autotoc_md777", null ]
+    [ "Building", "examples.html#autotoc_md1489", null ],
+    [ "Running", "examples.html#autotoc_md1490", null ],
+    [ "Tips", "examples.html#autotoc_md1491", [
+      [ "The ladder", "examples_audio.html#autotoc_md809", null ],
+      [ "The idea in one screen", "examples_audio.html#autotoc_md810", null ]
     ] ],
     [ "apu_switch — hot-swapping APU programs at runtime", "examples_audio_apu_switch.html", null ],
     [ "Echo / reverb", "examples_audio_echo.html", null ],
     [ "pitch_mod — hardware vibrato via pitch modulation", "examples_audio_pitch_mod.html", null ],
     [ "play_noise — a drum kit with zero samples", "examples_audio_play_noise.html", null ],
+    [ "SFX from WAV", "examples_audio_sfx_from_wav.html", null ],
     [ "SNESMOD Music Example", "examples_audio_snesmod_music.html", null ],
     [ "SNESMOD Large Soundbank Music", "examples_audio_snesmod_music_large.html", null ],
     [ "SNESMOD Sound Effects", "examples_audio_snesmod_sfx.html", null ],

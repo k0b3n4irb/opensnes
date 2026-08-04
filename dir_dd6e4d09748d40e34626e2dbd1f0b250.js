@@ -10,6 +10,7 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "console.h", "console_8h.html", "console_8h" ],
     [ "debug.h", "debug_8h.html", "debug_8h" ],
     [ "dma.h", "dma_8h.html", "dma_8h" ],
+    [ "dsp1.h", "dsp1_8h.html", "dsp1_8h" ],
     [ "fixed32.h", "fixed32_8h.html", "fixed32_8h" ],
     [ "gameloop.h", "gameloop_8h.html", "gameloop_8h" ],
     [ "hdma.h", "hdma_8h.html", "hdma_8h" ],

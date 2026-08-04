@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_color_hicolor_1792.html','',''); });
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>HiColor64PerTileRow</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/HDMA/HiColor64PerTileRow</span>). An H-timer IRQ fires on every scanline and general-DMAs 16 bytes (8 colors) into CGRAM while the PPU draws; over each 8-line tile row that streams a fresh 64-color set. Even tile rows render from CGRAM 0-63 while the stream refills 64-127 for the odd rows, and vice versa — 28 rows × 64 = <b>1792 palette slots</b> from a mode that nominally allows 128. HDMA cannot do this: its widest mode moves 4 bytes per scanline; the technique needs 16.</p>
 <p>The sunset art is original (procedural, <span class="tt">res/sunset.png</span> — 15,885 source colors); <span class="tt">devtools/hicolor64.py</span> reimplements krom's converter contract (64×8-pixel segments quantized to 15 colors + black). 357 distinct colors land on screen — any static 4bpp screen caps at 128.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1027"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1074"></a>
 SNES Concepts</h2>
 <ul>
 <li>H-timer IRQ (<span class="tt"><a class="el" href="interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet</a></span> / <span class="tt"><a class="el" href="interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9" title="Set the H-timer target (0-339 dots).">irqSetHTimer</a></span> / <span class="tt"><a class="el" href="interrupt_8h.html#ada4c1ec4449e797d007bd17766156e9f" title="Enable H/V timer IRQs and unmask interrupts (CLI).">irqEnable</a></span>) — per-scanline interrupts</li>
@@ -137,7 +137,7 @@ SNES Concepts</h2>
 <li>CGRAM double-banking via tilemap palette bits (rows alternate palettes 0-3 / 4-7)</li>
 <li>OPHCT/OPVCT 2-read latch discipline (<span class="tt">$213F</span> read-pointer reset)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1028"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1075"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -163,7 +163,7 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">VBlank rewind  </td><td class="markdownTableBodyNone">VBLANKIRQ verbatim  </td><td class="markdownTableBodyNone">C callback via <span class="tt"><a class="el" href="interrupt_8h.html#af408cb8d09dc9ab56ae7245c18792c2d" title="Register a VBlank callback with explicit bank.">nmiSetBank</a></span>  </td><td class="markdownTableBodyNone">CGADD=0, 128 B, source reset  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1029"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1076"></a>
 Measured parity (luna v1.9.0 + Mesen2 cross-check)</h2>
 <ul>
 <li><b>Stream cadence is cycle-exact in both emulators</b>: DMA source at scanline 100 = <span class="tt"><a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a> + 128 + 100×16</span> = <span class="tt">$86C0</span> in luna AND Mesen2 (in-ROM probe reading <span class="tt">$4302</span> back).</li>
@@ -171,18 +171,18 @@ Measured parity (luna v1.9.0 + Mesen2 cross-check)</h2>
 <li>Residual vs the static per-row expectation concentrates on the first scanline of each band — the palette-race window inherent to the technique. Same structure as the reference: krom's ROM in luna diverges from its own shipped PNG on exactly those lines (first-line residual 149.0 on his test pattern vs 16.7 on our smooth gradients; other lines 3.0 vs 6.5).</li>
 <li>Render is frame-stable (0 differing pixels across consecutive frames).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1030"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1077"></a>
 Two SDK bugs this port surfaced</h2>
 <ol type="1">
 <li><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span> seeded the RNG with single reads of OPHCT/OPVCT, leaving the latch read pointers mid-sequence for the whole session — every later latched V read returned hi/lo-swapped garbage. Fixed in <span class="tt">lib/source/console.c</span> (STAT78 read after seeding resets the pointers).</li>
 <li><span class="tt"><a class="el" href="interrupt_8h.html#af408cb8d09dc9ab56ae7245c18792c2d" title="Register a VBlank callback with explicit bank.">nmiSetBank()</a></span> restored NMITIMEN from a literal, which would have clobbered IRQ enable bits — replaced by the <span class="tt">nmitimen_shadow</span> scheme (all $4200 writes compose through the shadow).</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1031"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1078"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/color/hicolor_1792 &amp;&amp; make</div>
 </div><!-- fragment --><p>To regenerate the assets from different art (requires Pillow):</p>
 <div class="fragment"><div class="line">python3 ../../../../devtools/hicolor64.py res/sunset.png res/sunset</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1032"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1079"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span> </p>
 </div></div><!-- contents -->

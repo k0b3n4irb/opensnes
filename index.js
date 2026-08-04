@@ -2,22 +2,24 @@ var index =
 [
     [ "Start Here", "index.html#autotoc_md0", null ],
     [ "Guides", "index.html#autotoc_md1", null ],
-    [ "Tutorials", "index.html#autotoc_md2", null ],
-    [ "Hardware Reference", "index.html#autotoc_md3", null ],
-    [ "Examples (Annotated Source Code)", "index.html#autotoc_md4", null ],
-    [ "API Reference", "index.html#autotoc_md5", [
-      [ "Framework opt-ins", "index.html#autotoc_md6", null ]
+    [ "Game-Craft", "index.html#autotoc_md2", null ],
+    [ "Tutorials", "index.html#autotoc_md3", null ],
+    [ "Hardware Reference", "index.html#autotoc_md4", null ],
+    [ "Examples (Annotated Source Code)", "index.html#autotoc_md5", null ],
+    [ "API Reference", "index.html#autotoc_md6", [
+      [ "Framework opt-ins", "index.html#autotoc_md7", null ]
     ] ],
-    [ "Contributing", "index.html#autotoc_md7", null ],
-    [ "Acknowledgments", "index.html#autotoc_md8", null ],
-    [ "Links", "index.html#autotoc_md9", null ],
-    [ "License", "index.html#autotoc_md10", null ],
+    [ "Contributing", "index.html#autotoc_md8", null ],
+    [ "Acknowledgments", "index.html#autotoc_md9", null ],
+    [ "Links", "index.html#autotoc_md10", null ],
+    [ "License", "index.html#autotoc_md11", null ],
     [ "Getting Started with OpenSNES", "getting_started.html", null ],
     [ "Learn SNES Development", "learning_path.html", "learning_path" ],
     [ "Browse Examples by Category", "examples_by_category.html", "examples_by_category" ],
     [ "SNES Graphics Programming Guide", "snes_graphics_guide.html", null ],
     [ "SNES Sound Programming Guide", "snes_sound_guide.html", null ],
     [ "Troubleshooting OpenSNES", "troubleshooting.html", null ],
+    [ "Game-Craft Guides", "craft.html", "craft" ],
     [ "Graphics &amp; Backgrounds Tutorial", "tutorial_graphics.html", null ],
     [ "Sprites &amp; Animation Tutorial", "tutorial_sprites.html", null ],
     [ "Animation Tutorial", "tutorial_animation.html", null ],

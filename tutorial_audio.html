@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_audio.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES audio including the SPC700 sound chip, BRR samples, and SNESMOD tracker playback.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md94"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md95"></a>
 SNES Audio Architecture</h2>
 <p>The SNES has a dedicated <b>SPC700</b> sound processor with:</p>
 <ul>
@@ -133,20 +133,21 @@ SNES Audio Architecture</h2>
 <li>Hardware ADSR envelopes</li>
 <li>Echo/reverb effects</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md95"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md96"></a>
 Audio Options in OpenSNES</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Method  </th><th class="markdownTableHeadNone">Best For  </th><th class="markdownTableHeadNone">Size  </th><th class="markdownTableHeadNone">Complexity  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Legacy Audio</b>  </td><td class="markdownTableBodyNone">Simple SFX, tones  </td><td class="markdownTableBodyNone">~500 bytes  </td><td class="markdownTableBodyNone">Low  </td></tr>
+<td class="markdownTableBodyNone"><b>Direct BRR samples</b>  </td><td class="markdownTableBodyNone">One-shot SFX, voice clips  </td><td class="markdownTableBodyNone">per sample  </td><td class="markdownTableBodyNone">Low  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>SNESMOD</b>  </td><td class="markdownTableBodyNone">Music + SFX  </td><td class="markdownTableBodyNone">~5.5KB  </td><td class="markdownTableBodyNone">Medium  </td></tr>
+<td class="markdownTableBodyNone"><b>SNESMOD</b>  </td><td class="markdownTableBodyNone">Music + tracker SFX  </td><td class="markdownTableBodyNone">~5.5KB  </td><td class="markdownTableBodyNone">Medium  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md96"></a>
+<p>Reach for <b>direct BRR samples</b> when you want a jump, a hit, a coin, or a voice clip played on demand — you load a <span class="tt">.brr</span> into the SPC700 and trigger it from C (see <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a>). Reach for <b>SNESMOD</b> when you want music, or SFX that share a tracker soundbank with it. The two can coexist. To <em>make</em> a <span class="tt">.brr</span> from your own audio, see <a class="el" href="#audio_wav2brr" title="One-shot samples from WAV (wav2brr)">One-shot samples from WAV</a> below.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md97"></a>
 SNESMOD (Recommended)</h2>
 <p>SNESMOD is a tracker-based audio engine supporting Impulse Tracker (.it) modules.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md97"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md98"></a>
 Setup</h3>
 <ol type="1">
 <li>Create music in a tracker (OpenMPT recommended)</li>
@@ -154,7 +155,7 @@ Setup</h3>
 <li>Convert with smconv tool</li>
 <li>Link soundbank with your ROM</li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md98"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md99"></a>
 Makefile Configuration</h3>
 <div class="fragment"><div class="line"># Enable SNESMOD</div>
 <div class="line">USE_SNESMOD    := 1</div>
@@ -163,7 +164,7 @@ Makefile Configuration</h3>
 <div class="line"> </div>
 <div class="line"># Soundbank source files</div>
 <div class="line">SOUNDBANK_SRC  := music/mymusic.it sfx/effects.it</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md100"></a>
 Basic Music Playback</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
@@ -205,7 +206,7 @@ Basic Music Playback</h3>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asnesmod_8h_html"><div class="ttname"><a href="snesmod_8h.html">snesmod.h</a></div><div class="ttdoc">SNESMOD - Tracker-based Audio Engine.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md101"></a>
 Sound Effects</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
@@ -238,7 +239,36 @@ Sound Effects</h3>
 <div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:332</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md101"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="audio_wav2brr"></a>
+One-shot samples from WAV (wav2brr)</h3>
+<p>SNESMOD is built around tracker modules. For a plain one-shot effect — a jump, a hit, a UI blip, a bit of speech — the lighter path is a <b>direct BRR sample</b>: convert an audio file to the SNES's BRR format once, bake it into the ROM, and trigger it from C. This is what <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a> does.</p>
+<p><b>1. Convert your WAV to BRR.</b> <span class="tt">wav2brr</span> (built by <span class="tt">make tools</span>) turns a PCM <span class="tt">.wav</span> into a <span class="tt">.brr</span> using the same encoder smconv uses on its own samples:</p>
+<div class="fragment"><div class="line"># one-shot effect</div>
+<div class="line">wav2brr res/jump.wav res/jump.brr</div>
+<div class="line"> </div>
+<div class="line"># a looping sample (loop between sample indices 2048 and 8192)</div>
+<div class="line">wav2brr --loop 2048 8192 res/cello.wav res/cello.brr</div>
+</div><!-- fragment --><p>Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep the source at or below <b>32 kHz</b>; that is the DSP's ceiling, and a higher rate just plays back sharp. Pass <span class="tt">-v</span> to see the block count, loop offset, and a ready-to-paste <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> line.</p>
+<p><b>2. Bake the <span class="tt">.brr</span> into the ROM.</b> Put it in a <span class="tt">data.asm</span> with a label and an end label, exactly as the example does:</p>
+<div class="fragment"><div class="line">.section &quot;.samples&quot; superfree</div>
+<div class="line">brr_jump:     .incbin &quot;res/jump.brr&quot;</div>
+<div class="line">brr_jump_end:</div>
+<div class="line">.ends</div>
+</div><!-- fragment --><p><b>3. Load it once, play it on demand.</b> The label becomes a C symbol; the size is the two labels subtracted, and the loop point is the byte offset <span class="tt">wav2brr</span> reported (0 for a one-shot):</p>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brr_jump[], brr_jump_end[];</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a>(0, brr_jump, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(brr_jump_end - brr_jump), 0);</div>
+<div class="line"><span class="comment">// ...later, when the player jumps:</span></div>
+<div class="line"><a class="code hl_function" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a>(0);</div>
+<div class="ttc" id="agroup__audio__playback_html_gac3b302f98812d4adfcb042412d3d64ff"><div class="ttname"><a href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a></div><div class="ttdeci">u8 audioPlaySample(u8 sampleId)</div><div class="ttdoc">Play a sample with default settings.</div></div>
+<div class="ttc" id="agroup__audio__samples_html_gadeb5b5b2ca5fd6cad1127442a546af6d"><div class="ttname"><a href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a></div><div class="ttdeci">u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint)</div><div class="ttdoc">Load a BRR sample into SPC700 RAM.</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+</div><!-- fragment --><p>See <a class="el" href="group__audio__samples.html" title="Sample Management">Sample Management</a> in the API reference for the full sample API (<span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a></span>, <span class="tt"><a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample</a></span>, <span class="tt"><a class="el" href="group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88" title="Unload a sample from a slot.">audioUnloadSample</a></span>).</p>
+<blockquote class="doxtable">
+<p>A <span class="tt">.brr</span> is a build input, like a converted PNG — generate it with <span class="tt">wav2brr</span> and commit it next to your source WAV. There is no automatic <span class="tt">.wav</span> → <span class="tt">.brr</span> build step yet; run the tool when the source audio changes. </p>
+</blockquote>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md102"></a>
 Volume Control</h3>
 <div class="fragment"><div class="line"><span class="comment">// Set master volume (0-127)</span></div>
 <div class="line"><a class="code hl_function" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a>(127);</div>
@@ -257,7 +287,7 @@ Volume Control</h3>
 <div class="ttc" id="agroup__snesmod__module_html_gaf35e6e51f4a13c2183365eb814605bd2"><div class="ttname"><a href="group__snesmod__module.html#gaf35e6e51f4a13c2183365eb814605bd2">snesmodResume</a></div><div class="ttdeci">void snesmodResume(void)</div><div class="ttdoc">Resume module playback.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga256f12e62b2fae20a93a5ab05a53db5f"><div class="ttname"><a href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f">snesmodSetModuleVolume</a></div><div class="ttdeci">void snesmodSetModuleVolume(u8 volume)</div><div class="ttdoc">Set module volume.</div></div>
 <div class="ttc" id="agroup__snesmod__volume_html_ga9681d3b7715b34884cd81e2caf51d477"><div class="ttname"><a href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477">snesmodFadeVolume</a></div><div class="ttdeci">void snesmodFadeVolume(u8 targetVolume, u8 speed)</div><div class="ttdoc">Fade module volume.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md102"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md103"></a>
 Creating Music with OpenMPT</h3>
 <ol type="1">
 <li>Download <a href="https://openmpt.org/">OpenMPT</a> (free)</li>
@@ -270,7 +300,7 @@ Creating Music with OpenMPT</h3>
 </li>
 <li>Export as .it file</li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md103"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md104"></a>
 smconv Tool</h3>
 <div class="fragment"><div class="line"># Convert music for soundbank</div>
 <div class="line">smconv -s -o soundbank -b 1 music.it effects.it</div>
@@ -279,12 +309,12 @@ smconv Tool</h3>
 <div class="line"># - soundbank.asm  (link with ROM)</div>
 <div class="line"># - soundbank.h    (module/effect IDs)</div>
 <div class="line"># - soundbank.bnk  (binary data)</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md104"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md105"></a>
 Pitch Constants</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SNESMOD_PITCH_LOW    4   </span><span class="comment">// 16kHz - lower pitch</span></div>
 <div class="line"><span class="preprocessor">#define SNESMOD_PITCH_NORMAL 8   </span><span class="comment">// 32kHz - normal pitch</span></div>
 <div class="line"><span class="preprocessor">#define SNESMOD_PITCH_HIGH   12  </span><span class="comment">// 48kHz - higher pitch</span></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md105"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md106"></a>
 Important: Call snesmodProcess()!</h2>
 <p><b>You MUST call <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> every frame!</b> Failure to do so causes:</p><ul>
 <li>Audio glitches and stuttering</li>
@@ -297,7 +327,7 @@ Important: Call snesmodProcess()!</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ... game logic</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md106"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md107"></a>
 Example: Music + SFX</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snesmod_8h.html">snes/snesmod.h</a>&gt;</span></div>
@@ -350,8 +380,7 @@ Example: Music + SFX</h2>
 <div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R).</div><div class="ttdef"><b>Definition</b> registers.h:307</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md107"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md108"></a>
 Memory Usage</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -364,7 +393,7 @@ Memory Usage</h2>
 <td class="markdownTableBodyNone">Echo Buffer  </td><td class="markdownTableBodyNone">~4KB (at $D000-$FFFF)  </td></tr>
 </table>
 <p>Total audio RAM: 64KB</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md108"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md109"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Keep samples small</b> - Use lower sample rates for less important sounds</li>
@@ -372,27 +401,27 @@ Tips</h2>
 <li><b>Test on hardware</b> - Emulator timing may differ</li>
 <li><b>Use echo sparingly</b> - Takes 4KB+ of audio RAM</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md109"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md110"></a>
 Examples</h2>
 <ul>
 <li><span class="tt">examples/audio/snesmod_music/</span> - Music playback demo</li>
 <li><span class="tt">examples/audio/snesmod_sfx/</span> - Sound effects demo</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md110"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md111"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="snesmod_8h.html" title="snesmod.h">SNESMOD API Reference</a></li>
 <li><a class="el" href="tutorial_graphics.html" title="Graphics &amp; Backgrounds Tutorial">Back to Graphics</a></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md111"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md112"></a>
 The audio module (v2) — samples and effects from pure C</h2>
 <p>For sound effects and sample playback, <span class="tt">LIB_MODULES += audio</span> gives you the full engine with no SPC700 code of your own: the lib ships a resident driver (built from source at lib build time) and <span class="tt"><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">audio.h</a></span>'s 22 functions drive it — <span class="tt"><a class="el" href="group__audio__init.html#gaca805f5c6782ded195a7d479cffb5e5f" title="Initialize the audio system.">audioInit()</a></span>, <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> (BRR streamed into APU RAM at runtime), <span class="tt"><a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a></span> (volume/pan/ pitch, 8-voice round-robin polyphony), per-voice ADSR/GAIN, and a configurable echo with FIR filter. Every call is bounded — the API returns <span class="tt"><a class="el" href="group__audio__const.html#gaca08de6a9f9291ca6cd6a8d9157df860">AUDIO_ERR_TIMEOUT</a></span> rather than hanging. Worked example: <span class="tt">audio/soundboard</span>. Main-thread only; one engine per ROM (don't link <span class="tt">audio</span> and <span class="tt">snesmod</span> together).</p>
 <p>Choosing a path: <b>snesmod</b> for tracker music (IT modules), <b>audio</b> for C-driven samples and DSP effects, <b>apu</b> (below) for writing your own SPC700 program.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md112"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md113"></a>
 The raw APU path (no snesmod)</h2>
 <p>Since the SPC700 arc, the SDK has a second audio path: the <span class="tt">apu</span> module uploads a wla-spc700-assembled program straight through the IPL boot-ROM protocol — <span class="tt"><a class="el" href="apu_8h.html#ae0fc8c8351fdc849ebbb6c74e68645b4" title="Block until the IPL ROM signals readiness ($AA/$BB).">apuWaitBoot()</a></span>, <span class="tt"><a class="el" href="apu_8h.html#a0c853aaed1d9bf7118baafcda2ce8b71" title="Upload a memory block into APU RAM via the IPL protocol.">apuUpload()</a></span>, <span class="tt"><a class="el" href="apu_8h.html#a102578fd6e5cbef30f1ea10b72451a2f" title="End the upload session and start APU execution.">apuExecute()</a></span> — giving full DSP control (voices, ADSR, echo, pitch) with no tracker involved. Worked example: <span class="tt">audio/speech_synth</span> (phoneme-bank speech — upload, DSP config, per-phoneme sequencing). The two paths are exclusive: don't link <span class="tt">apu</span> and <span class="tt">snesmod</span> in one ROM.</p>
 <p>APU-side memory layout matters: the flat binary is laid out by <span class="tt">wlalink -<a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span>, and an <span class="tt">.ORG</span> section that overlaps your growing code OVERWRITES it silently (the SPC700-arc sequencer died exactly this way during development). Budget the code page before placing the sample directory.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md113"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md114"></a>
 Hot-swapping APU programs</h3>
 <p><span class="tt"><a class="el" href="apu_8h.html#ae0fc8c8351fdc849ebbb6c74e68645b4" title="Block until the IPL ROM signals readiness ($AA/$BB).">apuWaitBoot()</a></span> only works once — the IPL handshake is consumed at boot. To replace the running program later, use the cooperative reset protocol (worked example: <span class="tt">audio/apu_switch</span>):</p>
 <ol type="1">
@@ -400,7 +429,7 @@ Hot-swapping APU programs</h3>
 <li>On the 65816, call <span class="tt"><a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a></span>, then <span class="tt"><a class="el" href="apu_8h.html#a0c853aaed1d9bf7118baafcda2ce8b71" title="Upload a memory block into APU RAM via the IPL protocol.">apuUpload()</a></span>/<span class="tt"><a class="el" href="apu_8h.html#a102578fd6e5cbef30f1ea10b72451a2f" title="End the upload session and start APU execution.">apuExecute()</a></span> for the next program — but NOT <span class="tt"><a class="el" href="apu_8h.html#ae0fc8c8351fdc849ebbb6c74e68645b4" title="Block until the IPL ROM signals readiness ($AA/$BB).">apuWaitBoot()</a></span> (the reset already consumed the ready signal).</li>
 </ol>
 <p>Two contract points, both learned the hard way in <span class="tt">apu_switch</span>: <span class="tt"><a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a></span> blocks forever on a program that never polls for the magic, and the next program receives the DSP <em>dirty</em> — a residual <span class="tt">ADSR1</span> bit 7 from the previous program silently overrides <span class="tt">GAIN</span>, so every register a voice depends on must be written explicitly.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md114"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md115"></a>
 Debugging audio: luna's spc-dump</h2>
 <p><span class="tt">luna spc-dump</span> runs a ROM and exports the complete APU state — 64 KB of ARAM plus all 128 DSP registers — as a standard playable <span class="tt">.spc</span>. Diffing two dumps (yours vs a reference, or two instants of your own ROM) answers in seconds what ears cannot localize: upload integrity, directory/loop addresses, per-voice ADSR/pitch/envelope state, phoneme/note schedules. <span class="tt">--audio-out</span> (WAV capture) complements it for spectral verification. </p>
 </div></div><!-- contents -->

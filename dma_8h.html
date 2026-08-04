@@ -153,7 +153,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES DMA (Direct Memory Access). </p>
 <p>Functions for fast memory transfers using DMA.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
 DMA Overview</h2>
 <p>DMA allows fast transfers between:</p><ul>
 <li>Work RAM ↔ VRAM (video RAM)</li>
@@ -161,12 +161,12 @@ DMA Overview</h2>
 <li>Work RAM ↔ OAM (sprite RAM)</li>
 </ul>
 <p>DMA is much faster than CPU copying and should be used for all bulk transfers during VBlank.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
 VBlank Timing Requirement</h2>
 <dl class="section warning"><dt>Warning</dt><dd><b>CRITICAL</b>: VRAM, CGRAM, and OAM can only be safely accessed during VBlank (vertical blanking period) or when the screen is in force blank mode (INIDISP bit 7 set). Accessing these memories during active display causes visual corruption and undefined behavior.</dd>
 <dd>
 <b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md26"></a>
 Banks</h2>
 <dl class="section note"><dt>Note</dt><dd>Every dmaCopy* function takes a <b>far pointer</b> and uses its bank byte, so the source may live in any bank — a SUPERFREE section, a bank you pinned yourself, anywhere. This has been true since the A6 chantier made pointer arguments 4 bytes; the *Bank variants remain for the case where an address and its bank are held separately.</dd></dl>
 <p>This header claimed the opposite ("source data must be in bank $00") long after it stopped being true, and that prose is why the RPG template shipped a pointless <span class="tt">semifree bank 0</span> section for its palettes — and why issue #122 carried a bank-$00 claim about dmaCopyCGram that testing then had to retract.</p>

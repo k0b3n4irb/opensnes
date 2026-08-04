@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_input.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 4 — "can the player act?"</b> This is the rung that turns a demo into a game. Read the pad, move something with it, then branch out to the SNES's exotic controllers. The console auto-reads every input device each VBlank; you just read the result.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1261"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1308"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -139,7 +139,7 @@ The ladder</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">4.5  </td><td class="markdownTableBodyNone"><a href="superscope/">superscope</a>  </td><td class="markdownTableBodyNone">How do I read the Super Scope light gun?  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1262"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1309"></a>
 The idea in one screen</h2>
 <p><span class="tt">padHeld(0)</span> returns a 16-bit bitmask of the buttons held this frame; <span class="tt">padPressed(0)</span> returns only those <em>newly</em> pressed (edge detection — without it, a single tap registers dozens of times at 60 Hz). Act on the bits, and for movement push the result to a sprite with <span class="tt"><a class="el" href="sprite_8h.html#a5f6e7cb46f76cc6b03e2309b08e2092a" title="Set sprite position.">oamSetXY</a></span>.</p>
 <div class="fragment"><div class="line">Bit: 15  14  13   12   11  10  9   8   7  6  5  4</div>

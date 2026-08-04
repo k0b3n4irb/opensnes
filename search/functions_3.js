@@ -36,5 +36,11 @@ var searchData=
   ['drawspriteraw32x32_33',['drawSpriteRaw32x32',['../map32x32_8c.html#aab61b44f0d9b89575e635964bf1ab3ed',1,'map32x32.c']]],
   ['drawspriteraw64x64_34',['drawSpriteRaw64x64',['../map64x64_8c.html#a61124d39bf69d92930c4ec2f5425256f',1,'map64x64.c']]],
   ['drawsprites_35',['drawSprites',['../sprites_2dynamic__metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c'],['../sprites_2metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09',1,'drawSprites(void):&#160;main.c']]],
-  ['drawtext_36',['drawText',['../sprites_2dynamic__metasprite_2main_8c.html#a10ff78cf96efa1288ccd4155d97161a4',1,'main.c']]]
+  ['drawtext_36',['drawText',['../sprites_2dynamic__metasprite_2main_8c.html#a10ff78cf96efa1288ccd4155d97161a4',1,'main.c']]],
+  ['dsp1attitude_37',['dsp1Attitude',['../dsp1_8h.html#a4f48e8bd2d0865a223d81b00dc7d0244',1,'dsp1.h']]],
+  ['dsp1init_38',['dsp1Init',['../dsp1_8h.html#a07cbf1c377508911986a414336ad4fd8',1,'dsp1.h']]],
+  ['dsp1multiply_39',['dsp1Multiply',['../dsp1_8h.html#a56e4866725fffcfcf7710d4dd1ae6dac',1,'dsp1.h']]],
+  ['dsp1objective_40',['dsp1Objective',['../dsp1_8h.html#a351e716537c49d2587a195d327448f57',1,'dsp1.h']]],
+  ['dsp1rotate_41',['dsp1Rotate',['../dsp1_8h.html#adb861416d471a3218480f16d3331f55f',1,'dsp1.h']]],
+  ['dsp1triangle_42',['dsp1Triangle',['../dsp1_8h.html#a30bcc07948d43ad0fca8fb3ccc210208',1,'dsp1.h']]]
 ];

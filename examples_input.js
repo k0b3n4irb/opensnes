@@ -1,17 +1,17 @@
 var examples_input =
 [
     [ "Controller Input", "examples_input_controller.html", [
-      [ "The ladder", "examples_input.html#autotoc_md1261", null ],
-      [ "The idea in one screen", "examples_input.html#autotoc_md1262", [
-        [ "What You'll Learn", "examples_input_controller.html#autotoc_md1234", null ],
-        [ "Controls", "examples_input_controller.html#autotoc_md1235", null ],
-        [ "SNES Concepts", "examples_input_controller.html#autotoc_md1236", [
-          [ "How Input Works on the SNES", "examples_input_controller.html#autotoc_md1237", null ],
-          [ "padHeld vs padPressed", "examples_input_controller.html#autotoc_md1238", null ],
-          [ "Button Bitmask", "examples_input_controller.html#autotoc_md1239", null ]
+      [ "The ladder", "examples_input.html#autotoc_md1308", null ],
+      [ "The idea in one screen", "examples_input.html#autotoc_md1309", [
+        [ "What You'll Learn", "examples_input_controller.html#autotoc_md1281", null ],
+        [ "Controls", "examples_input_controller.html#autotoc_md1282", null ],
+        [ "SNES Concepts", "examples_input_controller.html#autotoc_md1283", [
+          [ "How Input Works on the SNES", "examples_input_controller.html#autotoc_md1284", null ],
+          [ "padHeld vs padPressed", "examples_input_controller.html#autotoc_md1285", null ],
+          [ "Button Bitmask", "examples_input_controller.html#autotoc_md1286", null ]
         ] ],
-        [ "Modules Used", "examples_input_controller.html#autotoc_md1240", null ],
-        [ "Build &amp; Run", "examples_input_controller.html#autotoc_md1241", null ]
+        [ "Modules Used", "examples_input_controller.html#autotoc_md1287", null ],
+        [ "Build &amp; Run", "examples_input_controller.html#autotoc_md1288", null ]
       ] ]
     ] ],
     [ "SNES Mouse", "examples_input_mouse.html", null ],

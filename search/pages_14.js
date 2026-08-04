@@ -1,11 +1,14 @@
 var searchData=
 [
-  ['jerky_0',['Scrolling is jerky',['../troubleshooting.html#autotoc_md634',1,'']]],
-  ['joy1_204_20auto_20read_20results_1',['$4218-$421F - JOY1-4 (Auto-Read Results)',['../registers.html#autotoc_md750',1,'']]],
-  ['joypad_20read_2',['Auto-Joypad Read',['../examples_input_two_players.html#autotoc_md1313',1,'']]],
-  ['joypad_20registers_3',['Joypad Registers',['../registers.html#autotoc_md749',1,'']]],
-  ['joypad_20status_4',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md733',1,'']]],
-  ['just_20move_20the_20pointer_5',['5. Animation = Just Move the Pointer',['../examples_hdma_hdma_wave.html#autotoc_md1214',1,'']]],
-  ['just_20work_6',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md175',1,'']]],
-  ['just_20works_7',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#autotoc_md675',1,'']]]
+  ['jerky_0',['Scrolling is jerky',['../troubleshooting.html#autotoc_md667',1,'']]],
+  ['job_1',['Give every layer a job',['../craft_backgrounds.html#autotoc_md438',1,'']]],
+  ['joy1_204_20auto_20read_20results_2',['$4218-$421F - JOY1-4 (Auto-Read Results)',['../registers.html#autotoc_md783',1,'']]],
+  ['joypad_20read_3',['Auto-Joypad Read',['../examples_input_two_players.html#autotoc_md1360',1,'']]],
+  ['joypad_20registers_4',['Joypad Registers',['../registers.html#autotoc_md782',1,'']]],
+  ['joypad_20status_5',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md766',1,'']]],
+  ['just_20building_20it_6',['Designing the level, not just building it',['../craft_tiles_to_levels.html#autotoc_md468',1,'']]],
+  ['just_20move_20the_20pointer_7',['5. Animation = Just Move the Pointer',['../examples_hdma_hdma_wave.html#autotoc_md1261',1,'']]],
+  ['just_20pixels_8',['A tile carries meaning, not just pixels',['../craft_tiles_to_levels.html#autotoc_md464',1,'']]],
+  ['just_20work_9',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md176',1,'']]],
+  ['just_20works_10',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#autotoc_md708',1,'']]]
 ];

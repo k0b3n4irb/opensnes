@@ -125,7 +125,7 @@ $(function(){initNavTree('examples_audio_play_noise.html','',''); });
 <div class="textblock"><p>Port of krom (Peter Lemon)'s <b>PlayNoise</b> demo. The S-DSP has a built-in white-noise generator: set a voice's <span class="tt">NON</span> flag and the voice plays noise instead of BRR data. Every drum in the looping bar — kick, closed hi-hat, open hi-hat, snare — is nothing but three register writes: the noise clock (<span class="tt">FLG</span> bits 0-4: low = rumble, high = hiss), an ADSR envelope (fast one-shot = closed hat, long release = open hat), and a bare <span class="tt">KON</span>. A single-tap FIR echo gives the kit its room. The example ships <b>zero bytes of sample data</b>.</p>
 <p>ROM mode: LoROM (project default).</p>
 <p>Measured against the original (luna <span class="tt">--audio-out</span>, 40 s captures): onset gap patterns identical to 0.01 s, per-hit spectral centroids within 2 %, RMS within 1 %.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md773"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md806"></a>
 SNES Concepts</h2>
 <ul>
 <li>The S-DSP noise source (<span class="tt">NON</span>, <span class="tt">FLG</span> noise clock) as an instrument</li>
@@ -133,10 +133,10 @@ SNES Concepts</h2>
 <li>FIR echo configuration (<span class="tt">ESA</span>/<span class="tt">EDL</span>/<span class="tt">EFB</span>/<span class="tt">FIR0</span>) and clearing the echo buffer RAM before enabling writes</li>
 <li>Raw APU programming via the <span class="tt">apu</span> module (IPL upload from C)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md774"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md807"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md775"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md808"></a>
 Modules Used</h2>
 <p>console, apu </p>
 </div></div><!-- contents -->

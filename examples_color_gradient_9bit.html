@@ -129,7 +129,7 @@ Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>RedSpace9BitHDMA</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/HDMA/RedSpace9BitHDMA</span>). The SNES has 5 bits per color channel; this classic trick fakes more: HDMA channel 0 rewrites the backdrop color every scanline while channel 1 rewrites INIDISP master brightness (16 levels) on the same line. Red level × brightness, plus per-line jitter in both of krom's tables, dithers the 224-line ramp into far more perceptual steps than 32 — "9-bit" color. Compare with <span class="tt">hdma_indirect_gradient</span> (pure 5-bit ramp): this one has visibly finer banding.</p>
 <p>There is no BG at all (TM=0) — the whole image is the backdrop — and the demo never calls <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span>: INIDISP is owned by the HDMA stream.</p>
 <p><b>Measured parity: 0 differing pixels</b> against krom's ROM (both rendered in luna v1.9.0) — the tables are his exact bytes, extracted verbatim.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1023"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1070"></a>
 SNES Concepts</h2>
 <ul>
 <li>Two HDMA channels cooperating on one visual (color + brightness)</li>
@@ -137,7 +137,7 @@ SNES Concepts</h2>
 <li><span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> into CGADD: <span class="tt">[addr16][data16]</span> = one palette write/line</li>
 <li>Backdrop-only rendering; screen-on via HDMA instead of <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1024"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1071"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -153,10 +153,10 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Tables  </td><td class="markdownTableBodyNone">224+224 entries  </td><td class="markdownTableBodyNone">byte-verbatim (res/*.bin)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1025"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1072"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/color/gradient_9bit &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1026"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1073"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">hdma</span> </p>
 </div></div><!-- contents -->

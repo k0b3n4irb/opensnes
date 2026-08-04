@@ -154,6 +154,8 @@ Files</h2></td></tr>
 <tr class="memdesc:backgrounds_2mode1__bg3__priority_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 1 BG3 high-priority overlay for HUD-style layering. <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html">main.c</a></td></tr>
 <tr class="memdesc:backgrounds_2mode1__lz77_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">LZ77-compressed tile loading with LZSS decompression to VRAM. <br /></td></tr>
+<tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="backgrounds_2mode2_2main_8c.html">main.c</a></td></tr>
+<tr class="memdesc:backgrounds_2mode2_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Backgrounds — Mode 2 offset-per-tile: per-column scroll from BG3. <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="backgrounds_2mode3_2main_8c.html">main.c</a></td></tr>
 <tr class="memdesc:backgrounds_2mode3_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 3 full-color (256-color, 8bpp) background with assembly DMA loader. <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="backgrounds_2mode5_2main_8c.html">main.c</a></td></tr>
@@ -176,6 +178,8 @@ Files</h2></td></tr>
 <tr class="memdesc:basics_2scene__stack_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> stack demo — title → counter → pause overlay. <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="basics_2timer_2main_8c.html">main.c</a></td></tr>
 <tr class="memdesc:basics_2timer_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">VBlank frame counter display, written against the gameloop framework. <br /></td></tr>
+<tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="chips_2dsp1__cube_2main_8c.html">main.c</a></td></tr>
+<tr class="memdesc:chips_2dsp1__cube_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">DSP-1 pseudo-3D: a cube tumbling in 3D, rotated by the coprocessor. <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="chips_2sa1__hello_2main_8c.html">main.c</a></td></tr>
 <tr class="memdesc:chips_2sa1__hello_2main_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">SA-1 boot diagnostic (Phase 1). <br /></td></tr>
 <tr class="memitem:main_2Ec" id="r_main_2Ec"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="chips_2sa1__starfield_2main_8c.html">main.c</a></td></tr>
@@ -293,16 +297,16 @@ Files</h2></td></tr>
 <div class="textblock"><p>All 41 OpenSNES example programs with annotated source code. </p>
 <p>Each example demonstrates specific SNES hardware concepts. The source files include <span class="tt">@par SNES Concepts</span> (what hardware features are used), <span class="tt">@par What to Observe</span> (what to look for in the emulator), and <span class="tt">@par Modules Used</span> (which library modules to link).</p>
 <p>Browse by category: <a class="el" href="examples_by_category.html" title="Browse Examples by Category">Browse Examples by Category</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1679"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1726"></a>
 By Topic</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1680"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1727"></a>
 Getting Started</h3>
 <ul>
 <li><a class="el" href="text_2print__string_2main_8c.html" title="print_string/main.c">Print a string</a> — textModeInit + textPrintAt, NMI auto-flush</li>
 <li><a class="el" href="text_2scroll__message_2main_8c.html" title="scroll_message/main.c">Scroll a message</a> — move text with bgSetScroll (marquee)</li>
 <li><a class="el" href="fundamentals_2text__glyphs_2main_8c.html" title="text_glyphs/main.c">Text glyphs (fundamentals)</a> — hand-coded 2bpp font, direct VRAM writes</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1681"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1728"></a>
 Backgrounds</h3>
 <ul>
 <li><a class="el" href="backgrounds_2mode0_2main_8c.html" title="mode0/main.c">Mode 0</a> — Four 2bpp layers with parallax</li>
@@ -315,7 +319,7 @@ Backgrounds</h3>
 <li><a class="el" href="scrolling_2continuous__scroll_2main_8c.html" title="continuous_scroll/main.c">Continuous Scroll</a> — Streaming tile columns</li>
 <li><a class="el" href="scrolling_2mixed__scroll_2main_8c.html" title="mixed_scroll/main.c">Mixed Scroll</a> — Dual-layer compositing</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1682"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1729"></a>
 Sprites</h3>
 <ul>
 <li><a class="el" href="sprites_2simple__sprite_2main_8c.html" title="simple_sprite/main.c">Simple Sprite</a> — OAM basics</li>
@@ -324,7 +328,7 @@ Sprites</h3>
 <li><a class="el" href="sprites_2metasprite_2main_8c.html" title="metasprite/main.c">Metasprite</a> — Multi-tile composite sprites</li>
 <li><a class="el" href="sprites_2sprite__sizes_2main_8c.html" title="sprite_sizes/main.c">Object Size</a> — OBJSEL size modes</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1683"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1730"></a>
 Effects</h3>
 <ul>
 <li><a class="el" href="transitions_2fading_2main_8c.html" title="fading/main.c">Fading</a> — INIDISP brightness transitions</li>
@@ -339,32 +343,32 @@ Effects</h3>
 <li><a class="el" href="hdma_2hdma__helpers_2main_8c.html" title="hdma_helpers/main.c">HDMA Helpers</a> — Library helper effects</li>
 <li><a class="el" href="scrolling_2parallax__scroll_2main_8c.html" title="parallax_scroll/main.c">Parallax</a> — HDMA scroll offsets</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1684"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1731"></a>
 Input</h3>
 <ul>
 <li><a class="el" href="input_2mouse_2main_8c.html" title="mouse/main.c">Mouse</a> — SNES Mouse peripheral</li>
 <li><a class="el" href="input_2superscope_2main_8c.html" title="superscope/main.c">Super Scope</a> — Light gun detection and calibration</li>
 <li><a class="el" href="input_2two__players_2main_8c.html" title="two_players/main.c">Two Players</a> — Simultaneous controller input</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1685"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1732"></a>
 Audio</h3>
 <ul>
 <li><a class="el" href="audio_2snesmod__music_2main_8c.html" title="snesmod_music/main.c">Music</a> — Tracker playback via SPC700</li>
 <li><a class="el" href="audio_2snesmod__sfx_2main_8c.html" title="snesmod_sfx/main.c">Sound Effects</a> — Standalone SFX with pitch control</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1686"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1733"></a>
 Maps</h3>
 <ul>
 <li><a class="el" href="maps_2dynamic__map_2main_8c.html" title="dynamic_map/main.c">Dynamic Map</a> — Extended WRAM tilemaps</li>
 <li><a class="el" href="maps_2slope__collision_2main_8c.html" title="slope_collision/main.c">Slope Mario</a> — Slope collision with map engine</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1687"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1734"></a>
 Memory</h3>
 <ul>
 <li><a class="el" href="memory_2hirom__demo_2main_8c.html" title="hirom_demo/main.c">HiROM</a> — 64KB bank memory mapping</li>
 <li><a class="el" href="memory_2save__game_2main_8c.html" title="save_game/main.c">Save Game</a> — SRAM battery-backed save slots</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1688"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1735"></a>
 Games</h3>
 <ul>
 <li><a class="el" href="games_2breakout_2main_8c.html" title="breakout/main.c">Breakout</a> — Complete game with collision and palette cycling</li>
@@ -372,7 +376,7 @@ Games</h3>
 <li><a class="el" href="games_2mapandobjects_2main_8c.html" title="mapandobjects/main.c">Map &amp; Objects</a> — Map engine with enemy AI</li>
 <li><a class="el" href="games_2tetris_2main_8c.html" title="tetris/main.c">Tetris</a> — State machine, DAS input, HDMA effects</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1689"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1736"></a>
 Basics</h3>
 <ul>
 <li><a class="el" href="basics_2collision__demo_2main_8c.html" title="collision_demo/main.c">Collision Demo</a> — AABB and tile collision </li>

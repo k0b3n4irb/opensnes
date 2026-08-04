@@ -197,7 +197,7 @@ Variables</h2></td></tr>
 <li>Fixed-point position and velocity</li>
 <li>Object-to-object collision detection</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md47"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
 Workspace Pattern</h2>
 <p>Because the object buffer resides in Bank $7E (not directly accessible from C), a workspace pattern is used. Before each C callback, the engine copies the current object's data to <span class="tt"><a class="el" href="#aff685114554f887d186a87bacbe786b9" title="Object workspace (Bank $00).">objWorkspace</a></span> (Bank $00). After the callback returns, changes are copied back.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -221,7 +221,7 @@ Workspace Pattern</h2>
 <div class="ttc" id="aobject_8h_html_af27124be823e35daf579362d3820738d"><div class="ttname"><a href="#af27124be823e35daf579362d3820738d">objUpdateXY</a></div><div class="ttdeci">void objUpdateXY(u16 objindex)</div><div class="ttdoc">Update object position from velocity.</div></div>
 <div class="ttc" id="aobject_8h_html_aff685114554f887d186a87bacbe786b9"><div class="ttname"><a href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a></div><div class="ttdeci">t_objs objWorkspace</div><div class="ttdoc">Object workspace (Bank $00).</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md49"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib object engine by Alekmaul Slope management: Nub1604 License: zlib (compatible with MIT) </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>

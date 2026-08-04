@@ -63,6 +63,6 @@ var searchData=
   ['prng_60',['prng',['../structGameState.html#a6d34396c63555f6cd44b3de2b8616a0d',1,'GameState']]],
   ['purple_5fpal_61',['purple_pal',['../render_8c.html#aefceb6cf92e76283b14ede69fadcecd9',1,'render.c']]],
   ['purple_5fpal_5fend_62',['purple_pal_end',['../render_8c.html#a99342b720ab9bf1ff1d7589277b5ebfd',1,'render.c']]],
-  ['px_63',['px',['../basics_2game__skeleton_2main_8c.html#a671319f4182d55a90e3dc6b3573d8c05',1,'px:&#160;main.c'],['../basics_2panel__hud_2main_8c.html#a74098e4602b8556df3349bc817680573',1,'px:&#160;main.c'],['../games_2breakout_2main_8c.html#a8e889bed9bbd7b21d9d0d22217333d02',1,'px:&#160;main.c'],['../sprites_2sprite__swarm_2main_8c.html#a74098e4602b8556df3349bc817680573',1,'px:&#160;main.c']]],
+  ['px_63',['px',['../backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573',1,'px:&#160;main.c'],['../basics_2game__skeleton_2main_8c.html#a671319f4182d55a90e3dc6b3573d8c05',1,'px:&#160;main.c'],['../basics_2panel__hud_2main_8c.html#a74098e4602b8556df3349bc817680573',1,'px:&#160;main.c'],['../games_2breakout_2main_8c.html#a8e889bed9bbd7b21d9d0d22217333d02',1,'px:&#160;main.c'],['../sprites_2sprite__swarm_2main_8c.html#a74098e4602b8556df3349bc817680573',1,'px:&#160;main.c']]],
   ['py_64',['py',['../basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453',1,'main.c']]]
 ];
