@@ -8,11 +8,11 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.33.0
+## Current Status: post-v0.34.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 80
+produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 83
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -143,9 +143,9 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (80)
+### Examples (83)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
-- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode3, mode5, mode5_hires
+- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode5, mode5_hires
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
 - **Scrolling**: mixed_scroll, continuous_scroll, parallax_scroll
 - **Mode 7**: rotate_scale, perspective, perspective_rotate
@@ -193,7 +193,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (80 / 80)
+- [x] Example READMEs with hardware explanations (83 / 83)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -296,6 +296,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-08-01. Anchored claims (version, examples count, framework
+*Last updated: 2026-08-04. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

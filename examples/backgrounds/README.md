@@ -15,6 +15,7 @@ trade of colours against layers against resolution.
 | 2.5 | [mode0](mode0/) | How do I run four 2bpp layers (Mode 0)? |
 | 2.6 | [mode3](mode3/) | How do I show a 256-colour (8bpp, Mode 3) background? |
 | 2.7 | [mode5](mode5/) · [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |
+| 2.8 | [mode2](mode2/) | How do I scroll each column independently (offset-per-tile, modes 2/4/6)? |
 
 > Under-the-hood rung to come — **2.2 a tilemap built by hand in C**: what the
 > asset macro hides, for the `fundamentals/` tier.

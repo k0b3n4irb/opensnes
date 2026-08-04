@@ -26,6 +26,7 @@ INPUT                  = mainpage.md \
                          ../lib/include/snes \
                          ../lib/include/snes.h \
                          tutorials/ \
+                         craft/ \
                          GETTING_STARTED.md \
                          LEARNING_PATH.md \
                          EXAMPLES_BY_CATEGORY.md \
@@ -67,7 +68,8 @@ FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
 # collide in the flat output. This list is generated from the README references;
 # check_doc_drift.py's IMAGE_PATH check fails the build if an example's
 # screenshot dir is missing here.
-IMAGE_PATH             = ../examples/basics/aim_target \
+IMAGE_PATH             = ../examples/audio/sfx_from_wav \
+                         ../examples/basics/aim_target \
                          ../examples/basics/collision_demo \
                          ../examples/basics/game_skeleton \
                          ../examples/basics/panel_hud \
@@ -90,6 +92,7 @@ IMAGE_PATH             = ../examples/basics/aim_target \
                          ../examples/backgrounds/mode1_bg3_priority \
                          ../examples/backgrounds/mode1_lz77 \
                          ../examples/backgrounds/mode3 \
+                         ../examples/backgrounds/mode2 \
                          ../examples/backgrounds/mode5 \
                          ../examples/mode7/rotate_scale \
                          ../examples/mode7/perspective \
@@ -131,6 +134,7 @@ IMAGE_PATH             = ../examples/basics/aim_target \
                          ../examples/maps/slope_collision \
                          ../examples/maps/tiled \
                          ../examples/memory/hirom_demo \
+                         ../examples/chips/dsp1_cube \
                          ../examples/chips/sa1_hello \
                          ../examples/chips/sa1_starfield \
                          ../examples/memory/save_game \

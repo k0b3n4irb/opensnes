@@ -14,6 +14,7 @@ benchmark, BRR↔IT conversion), see `devtools/`.
 | [`gfx4snes/`](gfx4snes/) | PNG/BMP → SNES tiles, palettes, tilemaps (2bpp / 4bpp / 8bpp; LZ77; tile dedup) | every example with graphics, via `GFXSRC` in `make/common.mk` |
 | [`font2snes/`](font2snes/) | PNG → 2bpp / 4bpp font tiles (compiled C version) | text-rendering pipeline |
 | [`smconv/`](smconv/) | Impulse Tracker (`.it`) → SNESMOD soundbank for SPC700 | every audio example, via `USE_SNESMOD` |
+| [`wav2brr/`](wav2brr/) | PCM `.wav` → SNES `.brr` sample (one-shot / looping SFX, voice) | `.brr` `.incbin`'d + loaded via `audioLoadSample`, e.g. `examples/audio/soundboard` |
 | [`img2snes/`](img2snes/) | RGB / RGBA PNG → indexed PNG (quantize, BGR555 round, scale) | upstream of `gfx4snes` for assets authored in RGB. No example currently calls it from a Makefile — it is a manual artist-pipeline step run before committing PNGs. |
 | [`tmx2snes/`](tmx2snes/) | Tiled (`.tmx`) → SNES tilemap | `examples/maps/tiled` |
 | [`sa1-patch/`](sa1-patch/) | Patch SA-1 ROM header byte | post-link step in `make/common.mk` for SA-1 examples |

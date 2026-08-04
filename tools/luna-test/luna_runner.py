@@ -71,6 +71,25 @@ def find_luna() -> str:
     )
 
 
+def firmware_dir() -> Path:
+    """luna's coprocessor-firmware folder (where dsp1b.rom lives)."""
+    base = os.environ.get("XDG_CONFIG_HOME")
+    root = Path(base) if base else Path.home() / ".config"
+    return root / "luna" / "firmware"
+
+
+def missing_firmware(key: str, manifest: dict) -> str | None:
+    """The firmware filename an example needs but that is NOT installed, else
+    None. Lets CI (which can't ship copyrighted coprocessor firmware like
+    dsp1b.rom) SKIP firmware-gated examples in the visual/WRAM pillars instead
+    of failing on them; a dev/CI that has the firmware still gets full coverage.
+    Marked per-example via a `firmware = "<file>"` key in manifest.toml."""
+    fw = manifest.get("examples", {}).get(key, {}).get("firmware")
+    if not fw:
+        return None
+    return None if (firmware_dir() / fw).is_file() else fw
+
+
 def load_manifest() -> dict:
     """Per-example overrides from manifest.toml (default_steps + [examples.*])."""
     path = HERE / "manifest.toml"
@@ -198,6 +217,10 @@ def run(update: bool, only: str | None) -> int:
         key = example_key(rom)
         label = key.replace("/", "_")
         if only and only not in label:
+            continue
+        fw = missing_firmware(key, manifest)
+        if fw:
+            print(f"  SKIP  {label} (needs coprocessor firmware '{fw}' — not installed)")
             continue
         count += 1
         steps = manifest["examples"].get(key, {}).get("steps", default_steps)

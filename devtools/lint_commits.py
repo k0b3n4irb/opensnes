@@ -70,6 +70,9 @@ ALLOWED_SCOPES = {
     # tech notes (2026-07-26): real path .claude/notes/tech/ (sibling of
     # `chantiers`/`conventions` above — technical references and analyses).
     "tech",
+    # game-craft docs (2026-08-02): real path docs/craft/ (sibling of
+    # docs/tutorials/ — design/decision guides, not API reference).
+    "craft",
 }
 
 SUBJECT_RE = re.compile(

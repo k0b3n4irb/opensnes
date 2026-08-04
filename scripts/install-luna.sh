@@ -48,13 +48,19 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 echo "install-luna: fetching ${TARBALL} (${VERSION}, ${ARCH})"
-if command -v gh >/dev/null 2>&1; then
+# luna is a public repo: the release-download URL needs no auth. Prefer curl so
+# a stale/absent GH_TOKEN (locally or in CI) can't break the install with a 401
+# — the old gh-first path did exactly that. gh is a fallback for a private repo.
+if curl -fsSL "$BASE/${TARBALL}"        -o "$TMP/${TARBALL}" \
+   && curl -fsSL "$BASE/${TARBALL}.sha256" -o "$TMP/${TARBALL}.sha256"; then
+    :
+elif command -v gh >/dev/null 2>&1; then
     gh release download "$VERSION" --repo "$REPO" \
         --pattern "${TARBALL}" --pattern "${TARBALL}.sha256" \
         --dir "$TMP" --clobber
 else
-    curl -fsSL "$BASE/${TARBALL}"        -o "$TMP/${TARBALL}"
-    curl -fsSL "$BASE/${TARBALL}.sha256" -o "$TMP/${TARBALL}.sha256"
+    echo "install-luna: download failed (curl error and no gh available)" >&2
+    exit 1
 fi
 
 echo "install-luna: verifying SHA-256"

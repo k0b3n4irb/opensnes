@@ -12,7 +12,8 @@ it where the visual gate can't.
 from __future__ import annotations
 
 import sys
-from lib import find_luna, trace_lines, assert_mem, rom_path
+from lib import find_luna, trace_lines, assert_mem, rom_path, dsp1_instructions
+from luna_runner import missing_firmware, load_manifest
 
 # (label, rom, trace flag, minimum instructions expected, handshake-or-None).
 # `handshake` = (wram_sym, hexval): a value the coprocessor writes into shared
@@ -47,6 +48,23 @@ def run() -> tuple[bool, str]:
                 return False, f"{label}: ran ({n}) but handshake {sym}={hexval} failed ({det})"
             tag += f"+hs:{sym}={hexval}"
         results.append((label, tag))
+
+    # DSP-1 uses the state block's `instructions_executed` (luna v1.13.0+), not a
+    # trace flag. It is firmware-gated: luna LLE-emulates the DSP-1 and needs
+    # dsp1b.rom (copyright, absent in CI), so skip cleanly when it isn't installed.
+    dsp_key = "chips/dsp1_cube"
+    fw = missing_firmware(dsp_key, load_manifest())
+    if fw:
+        results.append(("dsp1_cube", f"SKIP(no {fw})"))
+    else:
+        rom = rom_path(f"{dsp_key}/dsp1_cube.sfc")
+        if not rom.is_file():
+            return False, f"dsp1_cube: ROM missing ({rom})"
+        n = dsp1_instructions(luna, rom, STEPS)
+        if n < 1:
+            return False, f"dsp1_cube: {n} DSP-1 instructions executed (< 1) — coprocessor not running"
+        results.append(("dsp1_cube", str(n)))
+
     detail = ", ".join(f"{lbl}={tag}" for lbl, tag in results)
     return True, f"all coprocessors executed ({detail})"
 

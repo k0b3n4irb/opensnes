@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 80 examples organized by topic, building
+Learn SNES development step by step. 83 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -10,7 +10,7 @@ from basic concepts to complete games.
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 7 | BG modes 0/1/3/5, priority, LZ77, hi-res |
+| [backgrounds/](backgrounds/) | 8 | BG modes 0/1/2/3/5, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm |
 | [hdma/](hdma/) | 5 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 7 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks |
@@ -19,10 +19,10 @@ from basic concepts to complete games.
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 3 | Mode 7: rotation, scaling, per-scanline perspective |
 | [input/](input/) | 5 | Joypads, drive a sprite, mouse, Super Scope, multi-player |
-| [audio/](audio/) | 9 | Music and sound effects: SNESMOD and raw APU/DSP |
+| [audio/](audio/) | 10 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 4 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
+| [chips/](chips/) | 5 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
 | [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Learning Path

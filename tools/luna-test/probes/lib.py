@@ -88,6 +88,16 @@ def cgram_words(luna: str, rom: Path, steps: int) -> list[int]:
     return _json.loads(proc.stdout)["ppu"]["cgram"]
 
 
+def dsp1_instructions(luna: str, rom: Path, steps: int) -> int:
+    """DSP-1 microcode instructions executed (luna state JSON
+    `dsp1.instructions_executed`, luna v1.13.0+). Returns 0 if the coprocessor
+    never ran — e.g. the firmware (dsp1b.rom) is absent and the chip stays inert."""
+    cmd = [luna, "state", "-n", str(steps), "--out", "-", str(rom)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    import json as _json
+    return _json.loads(proc.stdout).get("dsp1", {}).get("instructions_executed", 0)
+
+
 def peek_byte(luna: str, rom: Path, steps: int, addr: Addr,
               input_script: str | None = None) -> int:
     return peek(luna, rom, steps, addr, 1, input_script)[0]

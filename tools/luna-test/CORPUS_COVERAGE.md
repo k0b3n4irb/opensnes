@@ -1,6 +1,6 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.9.0 · `luna state -n <steps>` per ROM · 80 ROMs · **78 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.13.0 · `luna state -n <steps>` per ROM · 83 ROMs · **81 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
 > Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
@@ -10,15 +10,17 @@ luna v1.9.0 · `luna state -n <steps>` per ROM · 80 ROMs · **78 OK, 2 INPUT-DE
 | `audio/echo` | OK | live (81f/80nmi) |
 | `audio/pitch_mod` | OK | live (78f/78nmi) |
 | `audio/play_noise` | OK | live (71f/70nmi) |
+| `audio/sfx_from_wav` | OK | live (81f/80nmi) |
 | `audio/snesmod_music` | OK | live (117f/108nmi) |
 | `audio/snesmod_music_large` | OK | live (128f/119nmi) |
 | `audio/snesmod_sfx` | OK | live (97f/88nmi) |
 | `audio/soundboard` | OK | live (162f/161nmi) |
 | `audio/speech_synth` | OK | live (79f/78nmi) |
 | `backgrounds/mode0` | OK | live (71f/70nmi) |
-| `backgrounds/mode1` | OK | live (70f/70nmi) |
+| `backgrounds/mode1` | OK | live (71f/70nmi) |
 | `backgrounds/mode1_bg3_priority` | OK | live (71f/70nmi) |
 | `backgrounds/mode1_lz77` | OK | live (74f/73nmi) |
+| `backgrounds/mode2` | OK | live (191f/190nmi) |
 | `backgrounds/mode3` | OK | live (71f/70nmi) |
 | `backgrounds/mode5` | OK | live (71f/70nmi) |
 | `backgrounds/mode5_hires` | OK | live (71f/70nmi) |
@@ -27,20 +29,21 @@ luna v1.9.0 · `luna state -n <steps>` per ROM · 80 ROMs · **78 OK, 2 INPUT-DE
 | `basics/fix32_orbit` | OK | live (76f/75nmi) |
 | `basics/game_skeleton` | OK | live (76f/75nmi) |
 | `basics/panel_hud` | OK | live (99f/98nmi) |
-| `basics/random` | OK | live (269f/268nmi) |
+| `basics/random` | OK | live (239f/238nmi) |
 | `basics/scene_stack` | OK | live (72f/71nmi) |
 | `basics/timer` | OK | live (179f/178nmi) |
+| `chips/dsp1_cube` | OK | live (178f/177nmi) |
 | `chips/sa1_hello` | OK | live (72f/71nmi) |
 | `chips/sa1_starfield` | OK | live (133f/132nmi) |
-| `chips/superfx_3d` | OK | live (290f/147nmi) |
+| `chips/superfx_3d` | OK | live (315f/211nmi) |
 | `chips/superfx_hello` | OK | live (74f/73nmi) |
 | `color/direct_color` | OK | live (126f/125nmi) |
-| `color/gradient_9bit` | OK | live (73f/72nmi) |
-| `color/hicolor_1792` | OK | live (164f/164nmi) |
+| `color/gradient_9bit` | OK | live (74f/73nmi) |
+| `color/hicolor_1792` | OK | live (168f/168nmi) |
 | `color/hicolor_blend` | OK | live (71f/70nmi) |
 | `color/palette_cycle` | OK | live (147f/146nmi) |
 | `color/shadow_tint` | OK | live (75f/74nmi) |
-| `color/transparency` | OK | live (141f/140nmi) |
+| `color/transparency` | OK | live (141f/141nmi) |
 | `fundamentals/text_glyphs` | OK | live (71f/70nmi) |
 | `games/breakout` | OK | live (88f/87nmi) |
 | `games/likemario` | OK | live (111f/102nmi) |
@@ -49,29 +52,29 @@ luna v1.9.0 · `luna state -n <steps>` per ROM · 80 ROMs · **78 OK, 2 INPUT-DE
 | `games/mode7_racing` | OK | live (79f/78nmi) |
 | `games/rpg` | OK | live (84f/83nmi) |
 | `games/shmup_1942` | OK | live (148f/147nmi) |
-| `games/tetris` | OK | live (90f/81nmi) |
-| `hdma/gradient_colors` | OK | live (72f/71nmi) |
+| `games/tetris` | OK | live (91f/82nmi) |
+| `hdma/gradient_colors` | OK | live (72f/72nmi) |
 | `hdma/hdma_helpers` | OK | live (71f/70nmi) |
-| `hdma/hdma_indirect_gradient` | OK | live (72f/71nmi) |
+| `hdma/hdma_indirect_gradient` | OK | live (73f/72nmi) |
 | `hdma/hdma_wave` | OK | live (73f/72nmi) |
-| `hdma/hdma_wave_table` | OK | live (146f/145nmi) |
-| `input/controller` | OK | live (103f/102nmi) |
+| `hdma/hdma_wave_table` | OK | live (147f/146nmi) |
+| `input/controller` | OK | live (103f/103nmi) |
 | `input/mouse` | INPUT-DEP | live (72f/72nmi) |
 | `input/move_sprite` | OK | live (73f/72nmi) |
 | `input/superscope` | INPUT-DEP | live (73f/72nmi) |
 | `input/two_players` | OK | live (75f/74nmi) |
 | `maps/dynamic_map` | OK | live (79f/78nmi) |
-| `maps/map_scroll` | OK | live (76f/75nmi) |
+| `maps/map_scroll` | OK | live (76f/76nmi) |
 | `maps/slope_collision` | OK | live (86f/85nmi) |
 | `maps/tiled` | OK | live (73f/72nmi) |
 | `memory/hirom_demo` | OK | live (71f/70nmi) |
 | `memory/save_game` | OK | live (73f/72nmi) |
-| `mode7/perspective` | OK | live (74f/73nmi) |
-| `mode7/perspective_rotate` | OK | live (77f/76nmi) |
+| `mode7/perspective` | OK | live (75f/74nmi) |
+| `mode7/perspective_rotate` | OK | live (79f/78nmi) |
 | `mode7/rotate_scale` | OK | live (72f/71nmi) |
 | `scrolling/continuous_scroll` | OK | live (73f/73nmi) |
 | `scrolling/mixed_scroll` | OK | live (71f/70nmi) |
-| `scrolling/parallax_scroll` | OK | live (143f/142nmi) |
+| `scrolling/parallax_scroll` | OK | live (144f/143nmi) |
 | `sprites/animated_sprite` | OK | live (73f/72nmi) |
 | `sprites/dynamic_metasprite` | OK | live (94f/93nmi) |
 | `sprites/dynamic_sprite` | OK | live (76f/75nmi) |
@@ -83,6 +86,6 @@ luna v1.9.0 · `luna state -n <steps>` per ROM · 80 ROMs · **78 OK, 2 INPUT-DE
 | `text/scroll_message` | OK | live (72f/71nmi) |
 | `transitions/fading` | OK | live (71f/70nmi) |
 | `transitions/mosaic` | OK | live (71f/70nmi) |
-| `windows/transparent_window` | OK | live (72f/71nmi) |
-| `windows/window` | OK | live (72f/71nmi) |
+| `windows/transparent_window` | OK | live (73f/72nmi) |
+| `windows/window` | OK | live (73f/72nmi) |
 | `windows/window_multi_hdma` | OK | live (73f/72nmi) |

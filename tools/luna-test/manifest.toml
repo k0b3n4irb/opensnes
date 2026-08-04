@@ -59,3 +59,16 @@ steps = [3_000_000, 6_000_000]
 # 32 sprites bounce continuously with no input — self-animating.
 [examples."sprites/sprite_swarm"]
 steps = [3_000_000, 6_000_000]
+
+# Mode 2 offset-per-tile: a per-column sine wave that scrolls every frame.
+[examples."backgrounds/mode2"]
+steps = [3_000_000, 6_000_000]
+
+# DSP-1 cube: the coprocessor rotates 8 corners every frame (self-animating,
+# two capture points). Firmware-gated — luna LLE-emulates the DSP-1 and needs
+# Sony's dsp1b.rom (copyright, not shipped); CI without it SKIPs the visual +
+# WRAM pillars for this example (coverage/liveness still runs — it boots fine,
+# the coprocessor just stays inert). A dev/CI with the firmware gets full coverage.
+[examples."chips/dsp1_cube"]
+firmware = "dsp1b.rom"
+steps = [3_000_000, 6_000_000]

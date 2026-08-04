@@ -16,8 +16,15 @@ The SNES has a dedicated **SPC700** sound processor with:
 
 | Method | Best For | Size | Complexity |
 |--------|----------|------|------------|
-| **Legacy Audio** | Simple SFX, tones | ~500 bytes | Low |
-| **SNESMOD** | Music + SFX | ~5.5KB | Medium |
+| **Direct BRR samples** | One-shot SFX, voice clips | per sample | Low |
+| **SNESMOD** | Music + tracker SFX | ~5.5KB | Medium |
+
+Reach for **direct BRR samples** when you want a jump, a hit, a coin, or a
+voice clip played on demand — you load a `.brr` into the SPC700 and trigger it
+from C (see @ref examples_audio_soundboard). Reach for **SNESMOD** when you
+want music, or SFX that share a tracker soundbank with it. The two can
+coexist. To *make* a `.brr` from your own audio, see
+[One-shot samples from WAV](#audio_wav2brr) below.
 
 ## SNESMOD (Recommended)
 
@@ -107,6 +114,58 @@ void play_coin_sound(void) {
     snesmodPlayEffect(1, 100, 128, SNESMOD_PITCH_HIGH);
 }
 ```
+
+### One-shot samples from WAV (wav2brr) {#audio_wav2brr}
+
+SNESMOD is built around tracker modules. For a plain one-shot effect — a jump,
+a hit, a UI blip, a bit of speech — the lighter path is a **direct BRR
+sample**: convert an audio file to the SNES's BRR format once, bake it into the
+ROM, and trigger it from C. This is what @ref examples_audio_soundboard does.
+
+**1. Convert your WAV to BRR.** `wav2brr` (built by `make tools`) turns a PCM
+`.wav` into a `.brr` using the same encoder smconv uses on its own samples:
+
+```sh
+# one-shot effect
+wav2brr res/jump.wav res/jump.brr
+
+# a looping sample (loop between sample indices 2048 and 8192)
+wav2brr --loop 2048 8192 res/cello.wav res/cello.brr
+```
+
+Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep
+the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
+just plays back sharp. Pass `-v` to see the block count, loop offset, and a
+ready-to-paste `audioLoadSample()` line.
+
+**2. Bake the `.brr` into the ROM.** Put it in a `data.asm` with a label and an
+end label, exactly as the example does:
+
+```asm
+.section ".samples" superfree
+brr_jump:     .incbin "res/jump.brr"
+brr_jump_end:
+.ends
+```
+
+**3. Load it once, play it on demand.** The label becomes a C symbol; the size
+is the two labels subtracted, and the loop point is the byte offset `wav2brr`
+reported (0 for a one-shot):
+
+```c
+extern u8 brr_jump[], brr_jump_end[];
+
+audioLoadSample(0, brr_jump, (u16)(brr_jump_end - brr_jump), 0);
+// ...later, when the player jumps:
+audioPlaySample(0);
+```
+
+See @ref audio_samples in the API reference for the full sample API
+(`audioLoadSample`, `audioPlaySample`, `audioUnloadSample`).
+
+> A `.brr` is a build input, like a converted PNG — generate it with `wav2brr`
+> and commit it next to your source WAV. There is no automatic `.wav` → `.brr`
+> build step yet; run the tool when the source audio changes.
 
 ### Volume Control
 

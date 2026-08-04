@@ -12,6 +12,8 @@
 #   CSRC      - C source files (default: main.c)
 #   ASMSRC    - Additional ASM files to include
 #   GFXSRC    - PNG files to convert (uses gfx4snes, outputs .pic/.pal)
+#   (BRR)     - a .wav .incbin'd as its .brr auto-converts via wav2brr
+#               (one-shot SFX; --loop samples: run wav2brr by hand)
 #   CFLAGS    - Additional C compiler flags
 #   SPRITE_SIZE - Sprite/tile size for gfx4snes (default: 8)
 #   BPP       - Bits per pixel for graphics (default: 4)
@@ -52,6 +54,7 @@ SPC_AS   := $(OPENSNES)/bin/wla-spc700
 LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
+WAV2BRR  := $(OPENSNES)/bin/wav2brr
 TEMPLATES := $(OPENSNES)/templates
 
 # Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
@@ -98,6 +101,7 @@ USE_FASTROM ?= 0
 USE_SRAM    ?= 0
 USE_SA1     ?= 0
 USE_SUPERFX ?= 0
+USE_DSP1    ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
 SOUNDBANK_SRC ?=
@@ -118,7 +122,7 @@ HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filt
 # No superfx memmap branch: GSU cartridges are LoROM-mapped on the 65816
 # side (the GSU has its own ROM view), so plain memmap.inc is intentional.
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_SRAM)),$$02,$$00)))
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_DSP1)),$$03,$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
 SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
@@ -136,7 +140,7 @@ LIB_MODULES += superfx
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 
 # Check library is built (skip for 'clean')
@@ -257,6 +261,17 @@ $(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1)
 	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
 endef
 $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
+
+#------------------------------------------------------------------------------
+# BRR sample conversion — .wav → .brr (one-shot SFX)
+#------------------------------------------------------------------------------
+# Zero-config: drop a PCM .wav next to your source and .incbin the matching
+# .brr in an ASM file. The .incbin dependency (INCBIN_DEPS above) makes the
+# .brr a prerequisite, and this rule generates it with wav2brr. For a looping
+# sample, run wav2brr --loop by hand and commit the .brr instead.
+%.brr: %.wav
+	@echo "[BRR] $< -> $@"
+	@$(WAV2BRR) $< $@
 
 #------------------------------------------------------------------------------
 # SuperFX (GSU) Assembly — two-stage build: .sfx → .sfx.o → .sfx.bin

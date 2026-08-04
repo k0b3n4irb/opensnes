@@ -84,6 +84,7 @@ nothing you do not list is linked.
 | darken or colour-cast a whole scene (night/underwater/sunset) | `colorMathShadow`, `colorMathTint` | `colormath` | [color/shadow_tint](../examples/color/shadow_tint/) |
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
+| scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `LzssDecodeVram` | `lzss` | |
 

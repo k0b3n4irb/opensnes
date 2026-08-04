@@ -13,7 +13,7 @@
   paths (`chantiers` → `.claude/notes/chantiers/`, `rules` →
   `.claude/rules/`, `bench` → bench fixtures, `luna-test` →
   `tools/luna-test/`, `conventions` → `.claude/notes/conventions/`,
-  `tech` → `.claude/notes/tech/`).
+  `tech` → `.claude/notes/tech/`, `craft` → `docs/craft/`).
   The canonical
   source-of-truth list lives in `devtools/lint_commits.py`'s
   `ALLOWED_SCOPES` set — extend BOTH places in the same commit.

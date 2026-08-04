@@ -1,0 +1,20 @@
+# Build output
+*.sfc
+*.sym
+*.o
+*.obj
+combined.asm
+*.c.asm
+*.wrap.asm
+linkfile
+project_config.inc
+project_hdr.asm
+project_sa1_boot.asm
+
+# gfx4snes / wav2brr generated assets (regenerated from res/*.png and res/*.wav)
+res/*.pic
+res/*.pal
+res/*.inc
+res/*_data.as
+res/*.brr
+res/*.map

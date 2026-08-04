@@ -214,6 +214,21 @@ jobs:
           echo "=== Building Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           make examples 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
 
+      # Validate the starter project builds via the OPENSNES= consumption path
+      # a downstream user follows (proves the release-consumption contract).
+      - name: Build starter project (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: |
+          echo "=== Building starter ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          make -C starter OPENSNES="$PWD" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
+      - name: Build starter project (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: |
+          echo "=== Building starter ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          make -C starter OPENSNES="$PWD" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+
       # Validate examples: symmap overlap check on built .sym files
       - name: Validate examples (Linux/macOS)
         if: matrix.name != 'windows'

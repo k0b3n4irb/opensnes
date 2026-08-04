@@ -1,0 +1,42 @@
+# Builds your game.sfc on every push and uploads it as an artifact.
+# This runs in YOUR repo once you use this template — it does nothing in the
+# OpenSNES repo itself (only the repo-root workflows run there).
+name: Build ROM
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Get the OpenSNES SDK. Fastest path: the latest prebuilt release for
+      # Linux x86_64 (GitHub runners are x86_64). If you need an unreleased
+      # SDK, replace this step with a clone + `make` of the opensnes repo.
+      - name: Fetch OpenSNES SDK
+        run: |
+          set -euo pipefail
+          url=$(curl -sL https://api.github.com/repos/k0b3n4irb/opensnes/releases/latest \
+                | grep -oE 'https://[^"]*_linux_x86_64\.zip' | head -1)
+          test -n "$url" || { echo "No linux x86_64 release asset found."; exit 1; }
+          echo "Downloading $url"
+          curl -sL "$url" -o sdk.zip
+          mkdir -p sdk && unzip -q sdk.zip -d sdk
+          # The SDK root is the directory that contains make/common.mk.
+          common=$(find sdk -type f -path '*/make/common.mk' | head -1)
+          test -n "$common" || { echo "SDK layout unexpected (no make/common.mk)."; exit 1; }
+          root=$(cd "$(dirname "$common")/.." && pwd)
+          echo "OPENSNES=$root" >> "$GITHUB_ENV"
+
+      - name: Build ROM
+        run: make OPENSNES="$OPENSNES"
+
+      - name: Upload ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-rom
+          path: game.sfc

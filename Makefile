@@ -195,6 +195,7 @@ test-tools:
 	@python3 tools/gfx4snes/tests/run_golden.py
 	@python3 tools/tmx2snes/tests/run_golden.py
 	@python3 tools/smconv/tests/run_golden.py
+	@python3 tools/wav2brr/tests/run_golden.py
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
@@ -203,6 +204,12 @@ test-tools:
 # with `python3 tools/luna-test/wram_regress.py --update` (same commit).
 test-wram:
 	@python3 tools/luna-test/wram_regress.py
+
+# PPU resource-budget report (VRAM/CGRAM/OAM footprint per example, via luna).
+# The PPU-side twin of symmap's bank $00 / C-RAM checks. Report-only; pairs
+# with docs/craft/planning.md. `make budget ARGS="--only mode2"` to focus.
+budget:
+	@python3 tools/luna-test/budget.py $(ARGS)
 
 # Compiler cycle-count regression guard (static estimate vs committed baseline).
 bench:
@@ -235,6 +242,9 @@ release: all docs
 	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
+	@# Starter project — extract the zip and `make` in opensnes/starter/ works
+	@# with zero config (its OPENSNES default resolves to the SDK root at ..).
+	@cp -r starter $(RELEASE_DIR)/opensnes/
 	@# Project test harness (`make test` in user projects) + the pinned-luna
 	@# installer. Only the pieces project_test.py imports — not the SDK's
 	@# corpus manifest/baselines.

@@ -2,6 +2,47 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.34.0] — 2026-08-04
+
+The DSP-1 & developer-ecosystem release. OpenSNES gains first-class **DSP-1**
+(NEC µPD77C25) support — the third user-programmable SNES coprocessor beside
+SA-1 and Super FX — with a pseudo-3D cube example, alongside a wave of
+developer-experience tooling: a project starter, a WAV→BRR sound tool, a PPU
+budget report, and a hardware-grounded game-craft documentation track. The
+example corpus grows 80 → 83.
+
+### Added
+- feat(lib,examples): **DSP-1 coprocessor support** (NEC µPD77C25) driven from
+  C — `snes/dsp1.h` command wrappers (Multiply, Triangle sin/cos, Rotate,
+  Attitude + Objective for 3D transforms, and `dsp1Init` for the `$80` resync
+  handshake), the `USE_DSP1` build mode (cartridge-type `$03`), and a
+  `chips/dsp1_cube` pseudo-3D example — 8 cube corners rotated in 3D by the
+  DSP-1 each frame. Each command was verified on luna against known math.
+  Firmware-gated tests: luna LLE-emulates the DSP-1 and needs Sony's
+  (non-shippable) `dsp1b.rom`, so CI skips the firmware-dependent pillars
+  cleanly while a dev with the dump gets full coverage
+- feat(tools): **wav2brr** — a WAV→SNES-BRR sample converter that reuses
+  smconv's own BRR encoder, plus a zero-config `.wav` → `.brr` build rule and a
+  `audio/sfx_from_wav` one-shot-SFX example
+- feat(build): **opensnes-starter** — a copy-out / "Use this template" project
+  (a movable-sprite game with a CI workflow) that consumes the SDK via
+  `OPENSNES=`, shipped in the release zip
+- feat(luna-test): **`make budget`** — a per-example PPU VRAM/CGRAM/OAM
+  footprint report, the runtime companion to the planning guide
+- feat(examples): **backgrounds/mode2** — offset-per-tile (OPT) per-column scroll
+- docs(craft): a **game-craft guide track** (`docs/craft/`) — planning your
+  game, composing backgrounds, the frame budget, and from-tiles-to-levels:
+  hardware-grounded *design* advice that links the universal and owns the
+  SNES-specific
+
+### Changed
+- test(luna-test): luna pin **v1.9.0 → v1.13.0** — adopts the DSP-1 visibility
+  work luna shipped from our request (`--dsp1-trace` / `--dsp1-trace-commands`
+  and `dsp1.instructions_executed`); adds a DSP-1 coproc-liveness probe assert;
+  makes `install-luna.sh` curl-first (fixes a 401 on the now-public luna repo,
+  local and CI); the visual/WRAM corpus is re-baselined (benign — the ROMs are
+  byte-identical, only luna's rendering/timing moved across the version bump)
+
 ## [0.33.0] — 2026-08-01
 
 The example-curriculum release. The corpus is reorganized from the old

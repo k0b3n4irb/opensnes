@@ -40,7 +40,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import find_luna, discover_example_roms, example_key  # noqa: E402
+from luna_runner import (  # noqa: E402
+    find_luna, discover_example_roms, example_key, load_manifest, missing_firmware,
+)
 
 BASELINE = HERE / "baselines" / "wram.json"
 FRAMES = 90   # consecutive vblank-aligned frames to hash
@@ -76,8 +78,14 @@ def stale_sources(rom: Path) -> list[Path]:
     rom_m = rom.stat().st_mtime
     stale = []
     for f in rom.parent.rglob("*"):
+        # A .png directly in the example root is the README screenshot (an
+        # OUTPUT captured from the built ROM), not a build input — build-input
+        # images live under res/. Excluding it stops a freshly-captured
+        # screenshot from falsely marking the ROM stale (covers the old
+        # screenshot.png special-case and the <example>.png convention).
+        if f.suffix == ".png" and f.parent == rom.parent:
+            continue
         if (f.is_file() and f.suffix in SOURCE_SUFFIXES
-                and f.name != "screenshot.png"  # README artifact, not an input
                 and f.stat().st_mtime > rom_m):
             stale.append(f)
     return stale
@@ -126,10 +134,19 @@ def main() -> int:
               "(#120). Rebuild first, or --force-stale for local debugging.")
         return 1
 
+    manifest = load_manifest()
     fails = updated = count = skipped = 0
     for rom in discover_example_roms():
-        label = example_key(rom).replace("/", "_")
+        key = example_key(rom)
+        label = key.replace("/", "_")
         if args.only and args.only not in label:
+            continue
+        # Firmware-gated (e.g. DSP-1 needs dsp1b.rom): without it the coprocessor
+        # is inert and the WRAM stream differs, so skip rather than mis-fail.
+        fw = missing_firmware(key, manifest)
+        if fw:
+            skipped += 1
+            print(f"  SKIP  {label} (needs coprocessor firmware '{fw}')")
             continue
         # --update always refreshes the full set (incl. the fragile pair, so a
         # same-arch --all run has a current baseline); only compares skip them.

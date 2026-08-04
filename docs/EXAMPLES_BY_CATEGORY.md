@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 80 examples organized by topic. For a progressive learning path, see
+All 83 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -38,6 +38,7 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
 | @subpage examples_backgrounds_mode5 | Mode 5: hi-res 512×256 (16-color) |
+| @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |
 
 ---
@@ -159,6 +160,7 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | @subpage examples_audio_snesmod_music_large | Large soundbank: multi-bank module split |
 | @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
+| @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: the zero-config .wav to .brr build rule (wav2brr) |
 | @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
 | @subpage examples_audio_play_noise | A drum kit from the S-DSP white-noise generator (krom port) |
 | @subpage examples_audio_pitch_mod | Hardware vibrato via pitch modulation (PMON) (krom port) |
@@ -231,6 +233,15 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 |---------|-------------|
 | @subpage examples_chips_superfx_hello | Boot + SRAM + FMULT hardware tests |
 | @subpage examples_chips_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
+
+### DSP-1 Coprocessor
+
+The DSP-1 (NEC µPD77C25) is a fixed-function fixed-point math coprocessor —
+matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).
+
+| Example | Description |
+|---------|-------------|
+| @subpage examples_chips_dsp1_cube | Pseudo-3D: a cube's 8 corners tumbling in 3D, rotated by the DSP-1 |
 
 ---
 
