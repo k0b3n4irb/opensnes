@@ -2,6 +2,39 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.35.0] — 2026-08-07
+
+A documentation-and-tooling release. The developer-experience push from 0.34.0
+continues: a static, build-time asset-budget report to pair with the runtime
+one, a complete **Tools** documentation section so newcomers discover and learn
+every asset converter from the docs, and two more game-craft guides.
+
+### Added
+- feat(devtools,build): **static VRAM/CGRAM asset-budget report** — a new
+  `make asset-budget` command that weighs the converted graphics on disk (tiles
+  and maps → VRAM, palettes → CGRAM) against the 64 KB / 256-colour limits, the
+  build-time twin of the runtime `make budget`. It also prints a compact
+  `[ASSETS]` instrument line at every example link (silent for asset-less
+  builds, `SKIP_ASSET_BUDGET=1` to disable). Report-only, never a gate — an
+  inventory upper bound, since streaming and palette swaps legitimately exceed
+  the limits.
+
+### Documentation
+- docs(tools): a **complete Tools documentation section** (`docs/tools/`) — a
+  toolbox landing page plus a presentation-and-tutorial page for each converter
+  (gfx4snes, tmx2snes, img2snes, font2snes, wav2brr, smconv), wired into the
+  doc site and nav. Facts verified against each tool's README and live `--help`.
+- docs(craft): two **craft companions** — *camera* (deadzone, look-ahead,
+  platform snapping, room-locking, all derived from one camera value) and
+  *game-feel* (screen shake, hit flash via color math, hitstop, fades, palette
+  cycling — the SNES-specific tricks).
+- docs(craft): a **cost-by-mode table** in the planning guide — per-mode layer
+  layout, bytes/tile by colour depth, and the VRAM trade for each background
+  mode.
+- docs(rules): the **luna-first** transitory-tooling convention (internal
+  contributor rule) — everything validates through luna; internal scripts are
+  transitory prototypes to be retired once luna owns the capability.
+
 ## [0.34.0] — 2026-08-04
 
 The DSP-1 & developer-ecosystem release. OpenSNES gains first-class **DSP-1**

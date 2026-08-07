@@ -469,6 +469,16 @@ ifneq ($(SKIP_RAM_CHECK),1)
 		fi; \
 	fi
 endif
+	@# PPU asset budget — a per-build instrument (VRAM/CGRAM weight of the
+	@# converted graphics on disk), the build-time twin of `make budget`
+	@# (runtime footprint via luna). Report-only, NEVER a gate: an inventory
+	@# over 100% is legitimate (streaming, per-scene/per-scanline palette
+	@# swaps), so it only prints the number, no alarm. Silent for asset-less
+	@# examples. `|| true` keeps a tool hiccup from ever failing a build.
+	@# Set SKIP_ASSET_BUDGET=1 to disable; see docs/craft/craft_planning.
+ifneq ($(SKIP_ASSET_BUDGET),1)
+	@python3 $(OPENSNES)/devtools/asset_budget.py --oneline "$(CURDIR)" || true
+endif
 	@# Bank-blind C reads of bank $$01+ data (issue #104): the read-side
 	@# symmetric of the spill ratchet. A symbol deref'd from C without a
 	@# bank reference must be linked in bank $$00 — otherwise the 16-bit

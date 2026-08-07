@@ -34,8 +34,12 @@ Two ideas run through every guide here:
 - @subpage craft_tiles_to_levels — **From tiles to levels.** Think in metatiles,
   attach collision and meaning to tiles, stream a level bigger than VRAM, and
   author it in Tiled instead of by hand.
-
-*(More on the way: per-technique craft companions — camera, game-feel.)*
+- @subpage craft_camera — **Following the player: the camera.** Deadzones,
+  look-ahead, platform snapping, room-locking — all derived from one camera
+  value that feeds every layer's scroll.
+- @subpage craft_game_feel — **Game feel: juice on real hardware.** Screen
+  shake, hit flash, hitstop, fades, palette cycling — the SNES-specific tricks
+  that make an action feel good, each a few cheap frames.
 
 ## Go deeper — the curated shelf
 

@@ -23,6 +23,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
 
+## Tools
+
+@subpage tools -- The asset pipeline: turn images, maps, fonts and audio into SNES data
+
 ## Tutorials
 
 @subpage tutorial_graphics -- Graphics & Backgrounds

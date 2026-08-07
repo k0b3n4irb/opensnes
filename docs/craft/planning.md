@@ -77,12 +77,15 @@ examples_sprites_sprite_swarm measures exactly where this ceiling bites.
 > [SNES PPU article](https://fabiensanglard.net/snes_ppus_why/). It turns the
 > numbers above from arbitrary into obvious.
 
-> **Check it, don't guess it.** Once your ROM builds, run
-> `python3 tools/luna-test/budget.py your_game.sfc` for the live
-> VRAM/CGRAM/OAM footprint of a scene — this worksheet as a measured number.
-> `make budget` reports the same for every example in the SDK, so you can see
-> where a real game lands. (It measures non-zero content at the captured
-> frame, a lower bound — a gut-check, not a linker map.)
+> **Check it, don't guess it — twice.** Before the ROM even runs,
+> `make asset-budget` weighs your converted graphics — tiles, maps, palettes —
+> against the 64 KB / 256-colour limits: this worksheet, computed from the files
+> you built. Then once it runs, `make budget` reports the live VRAM/CGRAM/OAM
+> footprint of a scene via luna. The first bounds what you *built* (an upper
+> bound — a streaming game ships more than fits at once); the second measures
+> what a scene actually *loads* (a lower bound — non-zero content at one frame).
+> Between them you know where you stand. Add `ARGS="--only <name>"` to focus
+> either on one example.
 
 ## Choose a background mode from your genre
 
@@ -103,6 +106,34 @@ depth for its special power. Put your HUD on the low-priority layer (Mode 1's
 BG3) so it draws over the action; see @ref craft_backgrounds for how to
 compose layers, and @ref examples_backgrounds_mode1_bg3_priority for the HUD
 overlay in practice.
+
+### The cost side: tiles by mode
+
+Each mode also trades layers and colour depth against **how much VRAM a tile
+costs**, because a tile's size is fixed by its colour depth (@ref
+snes_graphics_guide for the register detail):
+
+| Mode | Layers (colours) | Bytes/tile | The budget trade |
+|------|------------------|-----------|------------------|
+| 0 | BG1–BG4, all 4-colour (2bpp) | 16 each | Cheapest tiles, most layers — 3 colours + transparent per layer. Grids, menus, board games. |
+| **1** | BG1+BG2 16-colour (4bpp), BG3 4-colour (2bpp) | 32 / 32 / 16 | Two rich layers + a cheap HUD/backdrop. The default — best colour-per-byte balance. |
+| 2 | BG1+BG2 16-colour (4bpp) | 32 each | Two rich layers with per-column scroll (offset-per-tile); you give up BG3. |
+| 3 | BG1 256-colour (8bpp), BG2 16-colour (4bpp) | 64 / 32 | One lavish layer at **2× tile cost** — and rich art dedupes poorly, so a full 8bpp screen runs ~40 KB. No room for a second big layer. See @ref examples_backgrounds_mode3. |
+| 4 | BG1 256-colour (8bpp), BG2 4-colour (2bpp) | 64 / 16 | An 8bpp main layer plus a cheap second one, with per-column scroll. |
+| 5 | BG1 16-colour (4bpp), BG2 4-colour (2bpp), hi-res | 32 / 16 | Double horizontal resolution (512 px) — the wider display means bigger maps and a tighter sprite budget. |
+| 6 | BG1 16-colour (4bpp), hi-res | 32 | One hi-res layer with per-column scroll. |
+| 7 | one 256-colour (8bpp) layer, rotate/scale | 64 | Rotation and scaling in hardware, at a **fixed** cost: the 128×128 map is always 16 KB and tiles cap at 256 (16 KB) — roughly 32 KB whatever you draw. See @ref examples_mode7_rotate_scale. |
+
+Two patterns are worth internalising. **8bpp doubles your tile cost** (Modes 3,
+4, 7), and a **painterly image dedupes badly** — a game tileset reuses sky and
+bricks down to a few KB, but a near-photographic screen keeps most of its 896
+cells (32×28) as unique tiles. Together that is why one Mode 3 screen can cost
+40 KB while a Mode 1 playfield costs about 3 KB. Mode 7 is the odd one out: its
+cost is *fixed* by the 128×128 map, not by your art.
+
+> **See it as numbers.** `make asset-budget` prints exactly this per example —
+> the tile/map/palette weight of every mode in the library — so you can weigh
+> the trade against a real scene before committing to a mode.
 
 ## Scope a first game you can finish
 

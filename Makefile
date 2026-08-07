@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-wram bench submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -210,6 +210,13 @@ test-wram:
 # with docs/craft/planning.md. `make budget ARGS="--only mode2"` to focus.
 budget:
 	@python3 tools/luna-test/budget.py $(ARGS)
+
+# Static asset-budget report (VRAM/CGRAM weight of the converted graphics on
+# disk, no ROM run). The build-time twin of `make budget`: that measures the
+# runtime footprint via luna, this weighs the assets you built. Report-only —
+# an inventory upper bound, not a gate. `make asset-budget ARGS="--only mode1"`.
+asset-budget:
+	@python3 devtools/asset_budget.py $(ARGS)
 
 # Compiler cycle-count regression guard (static estimate vs committed baseline).
 bench:
