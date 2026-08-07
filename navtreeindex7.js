@@ -1,5 +1,10 @@
 var NAVTREEINDEX7 =
 {
+"piece_8h.html#a2a6cc746fc6654970a62559f1d77a962":[3,0,1,6,7,6,8],
+"piece_8h.html#a307f6e8b1e81977d90d1d89d82606556":[3,0,1,6,7,6,12],
+"piece_8h.html#a35b88195092e30210aba2f4d646f3a9c":[3,0,1,6,7,6,6],
+"piece_8h.html#a4bc025c64e509ecad93ae3246421e86f":[3,0,1,6,7,6,13],
+"piece_8h.html#a5434eb03f71e40e08f66393ab94a730e":[3,0,1,6,7,6,15],
 "piece_8h.html#a5469577e45e27a38a27d2e27b0ed2205":[3,0,1,6,7,6,10],
 "piece_8h.html#a7b883cacc2683cafbb55441f0c2f4b0e":[3,0,1,6,7,6,11],
 "piece_8h.html#a91553c0e2fac0272cc71951d9787bf7e":[3,0,1,6,7,6,1],
@@ -29,7 +34,7 @@ var NAVTREEINDEX7 =
 "profile_8h.html#acddb56e86b147fe8d8b6e0b72a37d702":[3,0,3,0,0,23,7],
 "profile_8h.html#af8d9e9e2028c9665ba3c747c5aca9ba0":[3,0,3,0,0,23,3],
 "profile_8h_source.html":[3,0,3,0,0,23],
-"registers.html":[0,41],
+"registers.html":[0,43],
 "registers_8h.html":[3,0,3,0,0,24],
 "registers_8h_source.html":[3,0,3,0,0,24],
 "render_8c.html":[3,0,1,6,7,7],
@@ -192,8 +197,8 @@ var NAVTREEINDEX7 =
 "snes_8h.html#ac7010da4aff784c937f4eb21b9aff806":[3,0,3,0,1,1],
 "snes_8h.html#af2660331ece9bb304cf9068ce6f4972a":[3,0,3,0,1,2],
 "snes_8h_source.html":[3,0,3,0,1],
-"snes_graphics_guide.html":[0,14],
-"snes_sound_guide.html":[0,15],
+"snes_graphics_guide.html":[0,15],
+"snes_sound_guide.html":[0,16],
 "snesmod_8h.html":[3,0,3,0,0,27],
 "snesmod_8h_source.html":[3,0,3,0,0,27],
 "sprite_8h.html":[3,0,3,0,0,28],
@@ -244,10 +249,5 @@ var NAVTREEINDEX7 =
 "sprite_8h.html#a97ae87053188793e008d80c64ee050cb":[3,0,3,0,0,28,12],
 "sprite_8h.html#a9f9f390a57460914e27c7604b7d8379a":[3,0,3,0,0,28,7],
 "sprite_8h.html#aa1d425dcce3cd104751744535b6a389a":[3,0,3,0,0,28,6],
-"sprite_8h.html#aa4a3dec16e47237ca76dafdef88883b8":[3,0,3,0,0,28,25],
-"sprite_8h.html#aa7fbd1a015711bb1b9dc0d71278ca4d3":[3,0,3,0,0,28,28],
-"sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf":[3,0,3,0,0,28,35],
-"sprite_8h.html#aabc9778e950220ff7adbac8a01faa148":[3,0,3,0,0,28,42],
-"sprite_8h.html#aabedfca9210feb740c636184ed205501":[3,0,3,0,0,28,48],
-"sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c":[3,0,3,0,0,28,55]
+"sprite_8h.html#aa4a3dec16e47237ca76dafdef88883b8":[3,0,3,0,0,28,25]
 };

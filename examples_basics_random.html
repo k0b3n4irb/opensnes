@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_basics_random.html','',''); });
 <img src="random.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1017"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1069"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to generate random numbers with <span class="tt"><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></span> (returns 0-65535)</li>
@@ -135,7 +135,7 @@ What You'll Learn</h2>
 <li>Why seeding from <span class="tt"><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a></span> at a player-triggered moment gives good randomness</li>
 <li>How to display numbers in both hex and decimal with the text module</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1018"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1070"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -145,12 +145,12 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">Re-seed the PRNG from the frame counter  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1019"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1071"></a>
 SNES Concepts</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1020"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1072"></a>
 Why Seed Matters</h3>
 <p><span class="tt"><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></span> produces a deterministic sequence — the same seed always gives the same numbers. For a game, you want unpredictability. The trick: call <span class="tt">srand(getFrameCount())</span> when the player presses START on the title screen. Since the player presses at an unpredictable frame, the seed varies each playthrough.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1021"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1073"></a>
 Using rand() in Games</h3>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;        <span class="comment">// Random X position (0-255)</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> damage = 10 + (<a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 6);    <span class="comment">// Damage 10-15</span></div>
@@ -159,7 +159,7 @@ Using rand() in Games</h3>
 <div class="ttc" id="aconsole_8h_html_af907eeb70a7322d16123cbab3094c2a2"><div class="ttname"><a href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a></div><div class="ttdeci">u16 rand(void)</div><div class="ttdoc">Get random 16-bit number.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1022"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1074"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -177,7 +177,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for single-press button detection  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1023"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1075"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/basics/random</div>

@@ -125,11 +125,11 @@ $(function(){initNavTree('examples_audio_pitch_mod.html','',''); });
 <div class="textblock"><p>Port of krom (Peter Lemon)'s <b>PitchMod</b> demo. The S-DSP's <span class="tt">PMON</span> feature multiplies a voice's pitch by the <em>output</em> of the previous voice, every sample, in hardware. Voice 1 holds a looping cello note at C5; voice 0 plays a 9-byte square-wave BRR block at pitch <span class="tt">$0003</span> — far below audibility, it is a slow LFO whose tiny amplitude (<span class="tt">GAIN = 2</span>) sets the vibrato depth. The cello enters dry; one second in, the LFO keys on and the note starts to sing. Each note rings out like a bow stroke (instant attack, ~7 s fade — the ADSR the sample was shipped with) and is re-bowed every 7 s. A maximum-length FIR echo (<span class="tt">EDL 15</span>, feedback 100) does the concert hall.</p>
 <p>ROM mode: LoROM (project default).</p>
 <p>Measured against the original (luna <span class="tt">--audio-out</span>, same window): pitch 174.4 Hz vs 174.3 Hz, vibrato depth ±0.82 % on both, LFO rate ~5 Hz on both.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md801"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md853"></a>
 Why the envelope differs from the original (a true story)</h2>
 <p>krom's demo sets a flat <span class="tt">GAIN 127</span> — which would sustain the note forever — yet his demo audibly decays like a bow stroke. The reason: his SPC700 program has <b>no final idle loop</b>. After the last <span class="tt">KON</span>, execution falls off the end of the code, through the sample directory, and starts executing the cello's BRR bytes <em>as opcodes</em> (verified with luna's <span class="tt">spc-dump</span>: his SPC700 PC ends up at <span class="tt">$0548</span>, inside the sample data). The decay in the original is that runaway code eventually scribbling on the DSP registers — an accident, not a design.</p>
 <p>This port keeps the bow-stroke <em>sound</em> but produces it on purpose: the cello's filename in krom's repo encodes its intended envelope (<span class="tt">ADSR $FF/$E8</span> — instant attack, sustain level 7/8, gentle rate-8 fade), so we program that ADSR, park the CPU in a clean idle loop, and re-key the voice every 7 s for the next stroke.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md802"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md854"></a>
 SNES Concepts</h2>
 <ul>
 <li>Pitch modulation (<span class="tt">PMON</span>): voice N−1's output scales voice N's pitch</li>
@@ -138,13 +138,13 @@ SNES Concepts</h2>
 <li>Sample directory layout (<span class="tt">[start][loop]</span> pairs) with a hand-written single-block BRR wave next to an <span class="tt">.incbin</span> sample</li>
 <li>Raw APU programming via the <span class="tt">apu</span> module (IPL upload from C)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md803"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md855"></a>
 Sample provenance</h2>
 <p><span class="tt">res/cello.brr</span> is the cello sample shipped with krom's PitchMod demo (loop point 4167, played at his exact C5 pitch <span class="tt">$08BB</span> = <span class="tt">$8BB0 &gt;&gt; 4</span>). See <span class="tt">ATTRIBUTION.md</span> at the repo root for the provenance caveat.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md804"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md856"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md805"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md857"></a>
 Modules Used</h2>
 <p>console, apu </p>
 </div></div><!-- contents -->

@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_text_print_string.html','',''); });
 <img src="print_string.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1627"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1679"></a>
 What you'll learn</h2>
 <ul>
 <li>The OpenSNES text module in one call: <span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit()</a></span> configures the hardware <em>and</em> the text engine, then <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a>(col, row, "…")</span> writes to an off-screen buffer.</li>
@@ -136,17 +136,17 @@ What you'll learn</h2>
 <li>Colour 0 is the universal backdrop; <span class="tt"><a class="el" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c" title="Set a single CGRAM color.">setColor(0, RGB(r,g,b))</a></span> sets it.</li>
 <li><span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> is called <b>last</b>, after a <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>, so all VRAM writes land during blanking (no garbage first frame).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1628"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1680"></a>
 SNES concepts</h2>
 <p>The SNES has no text hardware. Characters are background tiles: a font lives in VRAM as tiles, and a tilemap maps each screen cell to a tile index. The <span class="tt">text</span> module owns both — you just call <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>. Mode 0 is used because the built-in font is 2bpp (4 colours), which is all monochrome text needs.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1629"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1681"></a>
 How to build</h2>
 <div class="fragment"><div class="line">make -C examples/text/print_string</div>
 </div><!-- fragment --><p>Then run <span class="tt">print_string.sfc</span> in <a href="https://github.com/k0b3n4irb/luna">luna</a> (or any SNES emulator). You should see <b>TEXT MODULE TEST</b> in white on dark blue.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1630"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1682"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span>, <span class="tt">sprite</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1631"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1683"></a>
 Next rung</h2>
 <p>→ <b>1.2 Load a custom font from a PNG</b> · under the hood: how a glyph is 2bpp bitplanes + a tilemap → <a href="../../fundamentals/text_glyphs/"><span class="tt">fundamentals/text_glyphs</span></a>. </p>
 </div></div><!-- contents -->

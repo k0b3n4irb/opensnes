@@ -124,23 +124,24 @@ $(function(){initNavTree('craft.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The API tutorials teach you <b>how to call</b> the SDK. These guides teach you <b>how to decide</b> — the seam between "I know the sprite API" and "I shipped a
 small game." They are hardware-grounded design advice, not reference: for the registers and exact hardware behaviour, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md459"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md476"></a>
 The philosophy</h2>
 <p>Two ideas run through every guide here:</p>
 <ol type="1">
 <li><b>Constraints are creative fuel.</b> The SNES gives you 8 background modes, 64 KB of VRAM, 256 colours, and 32 sprites per scanline. Those are not walls to memorise and resent — they are the design language of the machine. Every classic you remember was <em>shaped</em> by them. We frame each limit as a lever, not a ceiling.</li>
 <li><b>Link the universal, own the SNES-specific.</b> Camera design, "game feel," and why the PPU works as it does are already explained brilliantly elsewhere — we link that gold-standard material rather than rewrite it, and spend our words on the one thing nobody else covers: <em>how to do it on real SNES hardware</em>, with this SDK.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md460"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md477"></a>
 The guides</h2>
 <ul>
 <li><a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> — <b>Planning your SNES game.</b> Budget your VRAM, CGRAM and sprites <em>before</em> you draw a pixel; choose a background mode from your genre, not a spec sheet; scope a first game you can actually finish.</li>
 <li><a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a> — <b>Composing with backgrounds &amp; layers.</b> How to use BG1/BG2/BG3 and sprites together for parallax, HUDs, foreground occlusion — as composition decisions, anchored to working examples.</li>
 <li><a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a> — <b>The frame budget.</b> What one frame can do at 60 Hz: the VBlank DMA budget, the sprite-per-line limit, CPU time, and when 30 fps is the right call. The <em>time</em> companion to Planning's <em>space</em>.</li>
 <li><a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> — <b>From tiles to levels.</b> Think in metatiles, attach collision and meaning to tiles, stream a level bigger than VRAM, and author it in Tiled instead of by hand.</li>
+<li><a class="el" href="craft_camera.html" title="Following the player: the camera">Following the player: the camera</a> — <b>Following the player: the camera.</b> Deadzones, look-ahead, platform snapping, room-locking — all derived from one camera value that feeds every layer's scroll.</li>
+<li><a class="el" href="craft_game_feel.html" title="Game feel: juice on real hardware">Game feel: juice on real hardware</a> — <b>Game feel: juice on real hardware.</b> Screen shake, hit flash, hitstop, fades, palette cycling — the SNES-specific tricks that make an action feel good, each a few cheap frames.</li>
 </ul>
-<p><em>(More on the way: per-technique craft companions — camera, game-feel.)</em></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md461"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md478"></a>
 Go deeper — the curated shelf</h2>
 <p>When a topic is universal, we point you at the best explanation that exists. Read these; they are worth your time:</p>
 <table class="markdownTable">
@@ -161,7 +162,7 @@ Go deeper — the curated shelf</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>Pixel art within a palette</b> (indexed, 15+1)  </td><td class="markdownTableBodyNone">2D Will Never Die, <em>So You Want Your Sprites to Be 16 Colors</em> — <a href="https://2dwillneverdie.com/tutorial/so-you-want-your-sprites-to-be-16-colors/">read</a>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md462"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md479"></a>
 The hardware references we cite</h2>
 <p>Every number in these guides traces to one of these; when we say "≈4 KB per
 VBlank" or "32 sprites per line," this is where it comes from:</p>

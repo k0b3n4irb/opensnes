@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_color_hicolor_blend.html','',''); });
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>HiColor3840</b> (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Blend/HiColor/HiColor3840</span>). The image's green+blue channels live on BG1 (Mode 3, 240 colors at CGRAM 16-255); the red channel lives on BG2 (16-level 4bpp ramp at CGRAM 0-15); color math ADDs them per pixel — 240 × 16 = "3840 colors", static, no HDMA, no IRQ. Original trefoil-wheel art (<span class="tt">gen_assets.py</span>, outputs committed).</p>
 <p><b>Measured proof — the corpus's first colormath dogfood</b>: the captured frame is <b>bit-exact (0/57344 pixels differ)</b> against a mathematical model of SNES color addition (<span class="tt">min(GB+R, 31)</span> per 5-bit channel) applied to the committed tile+palette data. <span class="tt">colorMathSetSource(SUBSCREEN)</span> + <span class="tt">SetOp(ADD)</span> + <span class="tt">SetHalf(0)</span> + <span class="tt">Enable(BG1|BACKDROP)</span> reproduce krom's CGWSEL $02 / CGADSUB $21 exactly.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1080"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1132"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span> </p>
 </div></div><!-- contents -->

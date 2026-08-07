@@ -139,7 +139,7 @@ Screenshot</div></div>
 </table>
 <p>Grass slows the car to a crawl; the red border wall is solid. The track (rounded rectangle + chicane, checker start line) is generated at build time by <span class="tt">gen_track.py</span> (committed, deterministic) and converted with <span class="tt">gfx4snes -M 7</span>.</p>
 <p>ROM mode: LoROM (project default).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1208"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1260"></a>
 SNES Concepts</h2>
 <ul>
 <li>The F-Zero camera: <span class="tt">mode7SetCenter(car)</span> pivots rotation on the car, <span class="tt">SetScroll</span> places it low on screen, <span class="tt">SetAngle(heading)</span> spins the world — heading shares the math module's 0-255 angle unit, so it feeds <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span>/<span class="tt"><a class="el" href="math_8h.html#a0a04487d24a25131a75e3c35b4edcabb" title="Get cosine value for angle.">fixCos</a></span> (velocity) and the PPU matrix directly</li>
@@ -147,11 +147,11 @@ SNES Concepts</h2>
 <li><b>Banked-data access (B2)</b>: the 16 KB collision class map lives outside bank $00, where C pointer derefs cannot reach (they are bank-$00-hardcoded) — a one-instruction ASM accessor (<span class="tt">lda.l track_class,x</span>) does it right, and the hardened <span class="tt">check_bank_reads</span> guard fails any build that tries from C</li>
 <li>Mode 7 VRAM interleave (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>) + OBJ tiles at name base 3; a procedural 4bpp car sprite built in C</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1209"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1261"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>(Regenerate the track: <span class="tt">python3 gen_track.py</span>, then <span class="tt">make</span>.)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1210"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1262"></a>
 Modules Used</h2>
 <p>console, dma, background, sprite, math, mode7, input </p>
 </div></div><!-- contents -->

@@ -129,7 +129,7 @@ Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>WindowMultiHDMA</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Window/WindowMultiHDMA</span>). One HDMA channel in <b>4-register mode</b> streams WH0-WH3 ($2126-$2129) — both windows' left AND right edges — per scanline band, cutting a 2×2 grid of portholes into BG1. The green backdrop shows wherever the combined mask disables the layer; the D-pad scrolls the ring artwork behind the fixed portholes. <span class="tt"><a class="el" href="hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6" title="Set up window position HDMA for shape effects.">hdmaWindowShape</a></span> covers a single window; this is the two-window composition the arc audit flagged.</p>
 <p>Window algebra (krom's exact setup): W1 and W2 both enabled on BG1 and both inverted, combined with AND — masked where (outside W1) AND (outside W2) = visible inside either window.</p>
 <p>The table is krom's exact 14-band data (in <span class="tt">main.c</span>); the artwork is original (procedural radial color wheel, tiled 2×2 so gfx4snes dedups it into 16 KB of tiles).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1722"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1774"></a>
 SNES Concepts</h2>
 <ul>
 <li><span class="tt"><a class="el" href="hdma_8h.html#ae1cd2638b518b8b92200d4d72d4aef7d" title="HDMA mode: 4 registers, 4 bytes.">HDMA_MODE_4REG</a></span>: one channel drives 4 consecutive PPU registers/line</li>
@@ -140,7 +140,7 @@ SNES Concepts</h2>
 </li>
 <li>Degenerate window (left=1, right=0) as the "fully masked" band value</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1723"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1775"></a>
 Register fidelity vs the original</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -160,10 +160,10 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Backdrop  </td><td class="markdownTableBodyNone">green (CGRAM 0)  </td><td class="markdownTableBodyNone">same (<span class="tt"><a class="el" href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c" title="Set a single CGRAM color.">setColor(0, RGB(0,31,0))</a></span>)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1724"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1776"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/windows/window_multi_hdma &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1725"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1777"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">hdma</span>, <span class="tt">window</span>, <span class="tt">input</span> </p>
 </div></div><!-- contents -->

@@ -1,5 +1,9 @@
 var NAVTREEINDEX5 =
 {
+"group__ppu__regs.html#ga4f287a5385050275961326652a04c3f3":[1,21,37],
+"group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde":[1,21,17],
+"group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0":[1,21,14],
+"group__ppu__regs.html#ga53012aa6801fe51e422cf4f17d5c8a35":[1,21,47],
 "group__ppu__regs.html#ga57c22200728100831889c1b2849d5262":[1,21,40],
 "group__ppu__regs.html#ga68fd672e1ea4124fbb5a895c2bc551e7":[1,21,25],
 "group__ppu__regs.html#ga6b33454f7968061e6820463ae5b5d07c":[1,21,57],
@@ -117,7 +121,7 @@ var NAVTREEINDEX5 =
 "group__volatile__types.html#ga6c6cf6e3aedfd399080c6f52c2870063":[1,31,1],
 "group__volatile__types.html#ga84c4ebe721fa065d9bd514ce8d76c455":[1,31,0],
 "group__volatile__types.html#gabcdd5d61f51cb4c472ac6637916cf72a":[1,31,4],
-"hardware_overview.html":[0,39],
+"hardware_overview.html":[0,41],
 "hdma_2gradient__colors_2main_8c.html":[1,11,46],
 "hdma_2hdma__helpers_2main_8c.html":[1,11,47],
 "hdma_2hdma__indirect__gradient_2main_8c.html":[1,11,48],
@@ -225,13 +229,14 @@ var NAVTREEINDEX5 =
 "index.html#autotoc_md1":[0,1],
 "index.html#autotoc_md10":[0,9],
 "index.html#autotoc_md11":[0,10],
+"index.html#autotoc_md12":[0,11],
 "index.html#autotoc_md2":[0,2],
 "index.html#autotoc_md3":[0,3],
 "index.html#autotoc_md4":[0,4],
 "index.html#autotoc_md5":[0,5],
 "index.html#autotoc_md6":[0,6],
-"index.html#autotoc_md7":[0,6,0],
-"index.html#autotoc_md8":[0,7],
+"index.html#autotoc_md7":[0,7],
+"index.html#autotoc_md8":[0,7,0],
 "index.html#autotoc_md9":[0,8],
 "input_2controller_2main_8c.html":[1,11,51],
 "input_2mouse_2main_8c.html":[1,11,52],
@@ -244,10 +249,5 @@ var NAVTREEINDEX5 =
 "input_8h.html#a81de395bc8d5dc741526d1378981a261":[3,0,3,0,0,14,34],
 "input_8h.html#abcf020412a5fcc70c31c207517f97a48":[3,0,3,0,0,14,36],
 "input_8h.html#ac697a43420bb5e1a038e129d79e88de8":[3,0,3,0,0,14,35],
-"input_8h_source.html":[3,0,3,0,0,14],
-"interrupt_8h.html":[3,0,3,0,0,15],
-"interrupt_8h.html#a1579b3231b62226f9bf5ba4077660409":[3,0,3,0,0,15,9],
-"interrupt_8h.html#a4a0a4690d2c70b58584eed95377325a1":[3,0,3,0,0,15,10],
-"interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7":[3,0,3,0,0,15,11],
-"interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928":[3,0,3,0,0,15,6]
+"input_8h_source.html":[3,0,3,0,0,14]
 };

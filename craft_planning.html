@@ -124,10 +124,10 @@ $(function(){initNavTree('craft_planning.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The single most common way a first SNES game dies is not a bug — it is a scene that cannot fit in the hardware, discovered <em>after</em> the art is drawn and the code is written. This guide is the planning you do first: budget the three scarce resources, pick a background mode from your genre, and scope something you can actually finish.</p>
 <p>For the register-level detail behind every number here, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>. This guide is about the <em>decisions</em>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md452"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md468"></a>
 The three budgets</h2>
 <p>A SNES scene lives inside three fixed pools. Plan them on paper before you draw, the way you would a level's layout.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md453"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md469"></a>
 1. VRAM — 64 KB, shared by everything on screen</h3>
 <p>VRAM holds your background tiles, your background maps, <b>and</b> your sprite tiles, all at once. It is one pool, not three. The cost of a tile depends only on its colour depth:</p>
 <table class="markdownTable">
@@ -148,7 +148,7 @@ The three budgets</h2>
 <div class="line">           +  font/UI tiles</div>
 <div class="line">           must stay under 64 KB — all of it, simultaneously.</div>
 </div><!-- fragment --><p>The lever: <b>unique</b> tiles are what cost you, not screen size — a background built from a small, reused tileset is nearly free to make bigger. This is why 16×16 metatiles and tile reuse are the backbone of SNES level art.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md454"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md470"></a>
 2. CGRAM — 256 colours, split BG vs sprites</h3>
 <p>CGRAM holds exactly 256 colours (512 bytes, 15-bit BGR). In the common 4bpp modes it is eight 16-colour sub-palettes, and the near-universal convention is:</p>
 <ul>
@@ -156,7 +156,7 @@ The three budgets</h2>
 <li><b>sprites use palettes 8–15 (colours 128–255)</b></li>
 </ul>
 <p>Colour 0 of every sub-palette is transparent, so a 16-colour sprite really gives you 15 visible colours plus transparency (the "15+1" convention). Budget your art <em>per sub-palette</em>, and decide early which tiles share which palette — because re-quantising one image can shift the colours of everything that shares a sub-palette with it. (A project-level palette planner is on our tooling roadmap for exactly this reason.)</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md455"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md471"></a>
 3. OAM — 128 sprites, but far fewer per line</h3>
 <p>You get 128 hardware sprites total, but the real constraint is per-scanline: the PPU draws at most <b>32 sprites</b> and <b>34 8×8 tile-slivers</b> on any single horizontal line. Cross either limit and sprites drop out — and the cull starts from the <em>lowest</em> OAM priority, so your least-important sprites vanish first. One more trap worth planning around: a sprite parked off-screen to the left still counts toward the 32-per-line limit (a documented PPU quirk).</p>
 <p>The lever: spread your action vertically, keep big sprites few, and reserve OAM headroom for the moment everything happens at once. <a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a> measures exactly where this ceiling bites.</p>
@@ -164,9 +164,9 @@ The three budgets</h2>
 <p><b>Go deeper.</b> For <em>why</em> these limits exist — the VRAM fetch timing and the sprite line-buffer — read Fabien Sanglard's <a href="https://fabiensanglard.net/snes_ppus_why/">SNES PPU article</a>. It turns the numbers above from arbitrary into obvious. </p>
 </blockquote>
 <blockquote class="doxtable">
-<p><b>Check it, don't guess it.</b> Once your ROM builds, run <span class="tt">python3 tools/luna-test/budget.py your_game.sfc</span> for the live VRAM/CGRAM/OAM footprint of a scene — this worksheet as a measured number. <span class="tt">make budget</span> reports the same for every example in the SDK, so you can see where a real game lands. (It measures non-zero content at the captured frame, a lower bound — a gut-check, not a linker map.) </p>
+<p><b>Check it, don't guess it — twice.</b> Before the ROM even runs, <span class="tt">make asset-budget</span> weighs your converted graphics — tiles, maps, palettes — against the 64 KB / 256-colour limits: this worksheet, computed from the files you built. Then once it runs, <span class="tt">make budget</span> reports the live VRAM/CGRAM/OAM footprint of a scene via luna. The first bounds what you <em>built</em> (an upper bound — a streaming game ships more than fits at once); the second measures what a scene actually <em>loads</em> (a lower bound — non-zero content at one frame). Between them you know where you stand. Add <span class="tt">ARGS="--only &lt;name&gt;"</span> to focus either on one example. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md456"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md472"></a>
 Choose a background mode from your genre</h2>
 <p>The SNES has eight background modes. The wikis tell you what each <em>is</em>; here is how to <em>pick</em> one, starting from the game you want to make:</p>
 <table class="markdownTable">
@@ -184,7 +184,34 @@ Choose a background mode from your genre</h2>
 <td class="markdownTableBodyNone">Per-column effects (flag, heat-haze)  </td><td class="markdownTableBodyNone"><b>Mode 2</b>  </td><td class="markdownTableBodyNone">Offset-per-tile: each column scrolls independently  </td><td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>  </td></tr>
 </table>
 <p>Default to <b>Mode 1</b> unless your game has a specific reason not to — it is what most of the library used, and every other mode trades a layer or colour depth for its special power. Put your HUD on the low-priority layer (Mode 1's BG3) so it draws over the action; see <a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a> for how to compose layers, and <a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a> for the HUD overlay in practice.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md457"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md473"></a>
+The cost side: tiles by mode</h3>
+<p>Each mode also trades layers and colour depth against <b>how much VRAM a tile costs</b>, because a tile's size is fixed by its colour depth (<a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a> for the register detail):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Mode  </th><th class="markdownTableHeadNone">Layers (colours)  </th><th class="markdownTableHeadNone">Bytes/tile  </th><th class="markdownTableHeadNone">The budget trade  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyNone">BG1–BG4, all 4-colour (2bpp)  </td><td class="markdownTableBodyNone">16 each  </td><td class="markdownTableBodyNone">Cheapest tiles, most layers — 3 colours + transparent per layer. Grids, menus, board games.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>1</b>  </td><td class="markdownTableBodyNone">BG1+BG2 16-colour (4bpp), BG3 4-colour (2bpp)  </td><td class="markdownTableBodyNone">32 / 32 / 16  </td><td class="markdownTableBodyNone">Two rich layers + a cheap HUD/backdrop. The default — best colour-per-byte balance.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">BG1+BG2 16-colour (4bpp)  </td><td class="markdownTableBodyNone">32 each  </td><td class="markdownTableBodyNone">Two rich layers with per-column scroll (offset-per-tile); you give up BG3.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">BG1 256-colour (8bpp), BG2 16-colour (4bpp)  </td><td class="markdownTableBodyNone">64 / 32  </td><td class="markdownTableBodyNone">One lavish layer at <b>2× tile cost</b> — and rich art dedupes poorly, so a full 8bpp screen runs ~40 KB. No room for a second big layer. See <a class="el" href="examples_backgrounds_mode3.html" title="Mode 3 — 256-Color Background">Mode 3 — 256-Color Background</a>.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">BG1 256-colour (8bpp), BG2 4-colour (2bpp)  </td><td class="markdownTableBodyNone">64 / 16  </td><td class="markdownTableBodyNone">An 8bpp main layer plus a cheap second one, with per-column scroll.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">BG1 16-colour (4bpp), BG2 4-colour (2bpp), hi-res  </td><td class="markdownTableBodyNone">32 / 16  </td><td class="markdownTableBodyNone">Double horizontal resolution (512 px) — the wider display means bigger maps and a tighter sprite budget.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">BG1 16-colour (4bpp), hi-res  </td><td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone">One hi-res layer with per-column scroll.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">one 256-colour (8bpp) layer, rotate/scale  </td><td class="markdownTableBodyNone">64  </td><td class="markdownTableBodyNone">Rotation and scaling in hardware, at a <b>fixed</b> cost: the 128×128 map is always 16 KB and tiles cap at 256 (16 KB) — roughly 32 KB whatever you draw. See <a class="el" href="examples_mode7_rotate_scale.html" title="Mode 7 -- Rotation and Scaling">Mode 7 -- Rotation and Scaling</a>.  </td></tr>
+</table>
+<p>Two patterns are worth internalising. <b>8bpp doubles your tile cost</b> (Modes 3, 4, 7), and a <b>painterly image dedupes badly</b> — a game tileset reuses sky and bricks down to a few KB, but a near-photographic screen keeps most of its 896 cells (32×28) as unique tiles. Together that is why one Mode 3 screen can cost 40 KB while a Mode 1 playfield costs about 3 KB. Mode 7 is the odd one out: its cost is <em>fixed</em> by the 128×128 map, not by your art.</p>
+<blockquote class="doxtable">
+<p><b>See it as numbers.</b> <span class="tt">make asset-budget</span> prints exactly this per example — the tile/map/palette weight of every mode in the library — so you can weigh the trade against a real scene before committing to a mode. </p>
+</blockquote>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md474"></a>
 Scope a first game you can finish</h2>
 <p>The community's hardest-won lesson, repeated across SNESdev game-jam devlogs: <b>ship something tiny.</b> First projects die from scope, not difficulty.</p>
 <ul>
@@ -193,7 +220,7 @@ Scope a first game you can finish</h2>
 <li><b>Budget before you draw.</b> Fill in the VRAM/CGRAM worksheet above for your one screen. If it does not fit on paper, it will not fit in the ROM.</li>
 <li><b>Cut the second level.</b> A finished one-level game beats an abandoned epic. You can always grow it — reused tiles make a bigger world nearly free.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md458"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md475"></a>
 Checklist before you write code</h2>
 <ul class="check">
 <li class="unchecked">Genre → background mode chosen (table above)</li>

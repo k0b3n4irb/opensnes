@@ -123,7 +123,7 @@ $(function(){initNavTree('craft_backgrounds.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Once <a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> has you in the right background mode, the craft is <em>composition</em>: deciding what each layer is <b>for</b> and how they stack. A SNES screen is a small stack of transparencies — a few background layers plus the sprite layer — and the art is assigning each element to the right sheet, at the right depth. This guide is those decisions; for the priority bits and registers that implement them, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md438"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md439"></a>
 Give every layer a job</h2>
 <p>In Mode 1 (your usual choice) you have three background layers and the sprites. Assign roles before you draw:</p>
 <table class="markdownTable">
@@ -139,7 +139,7 @@ Give every layer a job</h2>
 <td class="markdownTableBodyNone"><b>Sprites (OBJ)</b>  </td><td class="markdownTableBodyNone">anything that moves independently — player, enemies, pickups, cursor  </td></tr>
 </table>
 <p>The mistake to avoid is treating layers as "more space for tiles." Each layer is a <em>depth</em>, and depth is a design tool: foreground, playfield, midground, sky. Spend them on separation, not just capacity.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md439"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md440"></a>
 Depth is priority, not layer order</h2>
 <p>The powerful, non-obvious part: <b>you interleave sprites <em>between</em> background layers using priority bits</b>, so draw order is not fixed by which layer is which. A single scene can read as:</p>
 <div class="fragment"><div class="line">  far backdrop (BG3, low priority)</div>
@@ -148,9 +148,9 @@ Depth is priority, not layer order</h2>
 <div class="line">&lt; the player        (sprites, high priority)</div>
 <div class="line">&lt; the HUD           (BG3 tiles flagged high priority)</div>
 </div><!-- fragment --><p>That is how you get a character walking <em>behind</em> a foreground column, or a HUD that always sits on top, without extra hardware layers — just priority flags on tiles and sprites. Plan your scene as a set of depths first, then assign each element a layer + priority that lands it there.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md440"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md441"></a>
 Three compositions you will reuse</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md441"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md442"></a>
 Parallax — depth from motion</h3>
 <p>Scroll layers at different speeds and the eye reads distance. A far layer that creeps, a midground that keeps pace with the camera, a foreground that races past. Two ways to do it:</p><ul>
 <li><b>Per-layer scroll</b> — simplest: give each BG its own scroll rate. See <a class="el" href="examples_scrolling_mixed_scroll.html" title="Mixed Scroll">Mixed Scroll</a> and <a class="el" href="examples_scrolling_parallax_scroll.html" title="Parallax Scrolling">Parallax Scrolling</a>.</li>
@@ -159,23 +159,23 @@ Parallax — depth from motion</h3>
 <blockquote class="doxtable">
 <p><b>Go deeper.</b> For camera <em>movement</em> itself — deadzones, look-ahead, room-locking — read Itay Keren's <a href="https://docs.google.com/document/d/1iNSQIyNpVGHeak6isbP6AHdHD50gs8MNXF1GCf08efg/pub">Scroll Back</a>, the definitive taxonomy. Compose your parallax layers here; decide how the camera <em>follows the player</em> there. </p>
 </blockquote>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md442"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md443"></a>
 The HUD — always on top, cheaply</h3>
 <p>Put the status bar on the layer whose priority keeps it above the action — Mode 1's BG3 is the classic home. Two routes:</p><ul>
 <li><b>Tiles with the priority bit set</b> — a fixed HUD baked into BG3. See <a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a>.</li>
 <li><b>A 9-slice panel</b> — bordered boxes stamped at runtime (health, dialog). See <a class="el" href="examples_basics_panel_hud.html" title="panel_hud — a HUD that survives a dialog box">panel_hud — a HUD that survives a dialog box</a>.</li>
 </ul>
 <p>Keep the HUD out of the scrolling world: it should not move when the camera does. Give it its own layer (or a fixed region) so gameplay scroll never drags it.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md443"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md444"></a>
 Foreground occlusion — walking behind things</h3>
 <p>Flag a foreground layer (or specific tiles) high-priority so the player sprite passes <em>behind</em> it. Pillars, foliage, doorways, tunnel mouths — cheap depth that makes a flat tilemap feel three-dimensional. It is the same priority mechanism as the HUD, aimed the other way.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md444"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md445"></a>
 When you need more than layers can give</h2>
 <ul>
 <li><b>Four cheap layers</b> (menus, board games, busy backdrops): drop to Mode 0 — four 4-colour layers. See <a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a>. You trade colour depth for layer count.</li>
 <li><b>Per-column motion on one layer</b> (a rippling flag, heat-haze, water): offset-per-tile in Mode 2 gives every column its own scroll from a table. See <a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>. This does per-*column* what HDMA parallax does per-*scanline*.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md445"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md446"></a>
 The one rule</h2>
 <p>Design the screen as <b>depths</b> — sky, far, playfield, foreground, HUD — then map each depth to a (layer, priority) pair. Layers are how the hardware composites; depth is what the player sees. Start from what they see. </p>
 </div></div><!-- contents -->

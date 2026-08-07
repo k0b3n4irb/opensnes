@@ -1,32 +1,32 @@
 var examples_by_category =
 [
     [ "Print a string", "examples_text_print_string.html", [
-      [ "Text", "examples_by_category.html#autotoc_md506", null ],
-      [ "Fundamentals", "examples_by_category.html#autotoc_md508", null ],
-      [ "Backgrounds", "examples_by_category.html#autotoc_md510", null ],
-      [ "Sprites", "examples_by_category.html#autotoc_md512", null ],
-      [ "Scrolling", "examples_by_category.html#autotoc_md514", null ],
-      [ "Mode 7", "examples_by_category.html#autotoc_md516", null ],
-      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md518", null ],
-      [ "Colour", "examples_by_category.html#autotoc_md520", null ],
-      [ "Windows", "examples_by_category.html#autotoc_md522", null ],
-      [ "Transitions", "examples_by_category.html#autotoc_md524", null ],
-      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md526", null ],
-      [ "Audio", "examples_by_category.html#autotoc_md528", null ],
-      [ "Maps", "examples_by_category.html#autotoc_md530", null ],
-      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md532", null ],
-      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md534", null ],
-      [ "Enhancement chips", "examples_by_category.html#autotoc_md536", [
-        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md537", null ],
-        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md538", null ],
-        [ "DSP-1 Coprocessor", "examples_by_category.html#autotoc_md539", null ]
+      [ "Text", "examples_by_category.html#autotoc_md558", null ],
+      [ "Fundamentals", "examples_by_category.html#autotoc_md560", null ],
+      [ "Backgrounds", "examples_by_category.html#autotoc_md562", null ],
+      [ "Sprites", "examples_by_category.html#autotoc_md564", null ],
+      [ "Scrolling", "examples_by_category.html#autotoc_md566", null ],
+      [ "Mode 7", "examples_by_category.html#autotoc_md568", null ],
+      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md570", null ],
+      [ "Colour", "examples_by_category.html#autotoc_md572", null ],
+      [ "Windows", "examples_by_category.html#autotoc_md574", null ],
+      [ "Transitions", "examples_by_category.html#autotoc_md576", null ],
+      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md578", null ],
+      [ "Audio", "examples_by_category.html#autotoc_md580", null ],
+      [ "Maps", "examples_by_category.html#autotoc_md582", null ],
+      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md584", null ],
+      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md586", null ],
+      [ "Enhancement chips", "examples_by_category.html#autotoc_md588", [
+        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md589", null ],
+        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md590", null ],
+        [ "DSP-1 Coprocessor", "examples_by_category.html#autotoc_md591", null ]
       ] ],
-      [ "Games (capstones)", "examples_by_category.html#autotoc_md541", [
-        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1627", null ],
-        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1628", null ],
-        [ "How to build", "examples_text_print_string.html#autotoc_md1629", null ],
-        [ "Modules used", "examples_text_print_string.html#autotoc_md1630", null ],
-        [ "Next rung", "examples_text_print_string.html#autotoc_md1631", null ]
+      [ "Games (capstones)", "examples_by_category.html#autotoc_md593", [
+        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1679", null ],
+        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1680", null ],
+        [ "How to build", "examples_text_print_string.html#autotoc_md1681", null ],
+        [ "Modules used", "examples_text_print_string.html#autotoc_md1682", null ],
+        [ "Next rung", "examples_text_print_string.html#autotoc_md1683", null ]
       ] ]
     ] ],
     [ "Scroll a message", "examples_text_scroll_message.html", null ],

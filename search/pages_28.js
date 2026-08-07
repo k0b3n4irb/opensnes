@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['→_20silent_20corruption_0',['🔴 Battery dies → silent corruption',['../tutorial_sram.html#autotoc_md390',1,'']]]
+  ['→_20silent_20corruption_0',['🔴 Battery dies → silent corruption',['../tutorial_sram.html#autotoc_md391',1,'']]]
 ];

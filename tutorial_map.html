@@ -123,11 +123,11 @@ $(function(){initNavTree('tutorial_map.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module — the scrolling tilemap engine that streams a world larger than VRAM, and the Tiled content pipeline that feeds it. Add <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> to <span class="tt">LIB_MODULES</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md250"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md251"></a>
 What the map module is</h2>
 <p>A SNES background tilemap is a fixed 32×32 (or 64×64) grid in VRAM. A game world is bigger than that. The <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module holds the <em>whole</em> map in ROM and streams the strip of tiles the camera is about to reveal into VRAM one column/row at a time, during VBlank — so scrolling costs a few tiles per frame instead of a full-screen upload.</p>
 <p>It works in <b>metatiles</b>: 8×8 blocks indexed through a small tile definition, which is how a large map fits in ROM. You give it three things at load time and then just move the camera each frame.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md251"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md252"></a>
 The Tiled pipeline</h2>
 <p>You do not hand-author the binary formats. Draw the map in <a href="https://www.mapeditor.org/">Tiled</a>, export JSON (<span class="tt">.tmj</span>), and convert with the SDK's <span class="tt">tmx2snes</span>:</p>
 <div class="fragment"><div class="line">tmx2snes town.tmj tileset.map</div>
@@ -159,7 +159,7 @@ The Tiled pipeline</h2>
 <blockquote class="doxtable">
 <p><b>cute_tiled needs no special export.</b> <span class="tt">tmx2snes</span> minifies the JSON itself, so a pretty-printed <span class="tt">.tmj</span> from a generator script parses fine. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md252"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md253"></a>
 The minimum viable scroller</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="map_8h.html">snes/map.h</a>&gt;</span></div>
@@ -215,7 +215,7 @@ The minimum viable scroller</h2>
 <li><b><span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span></b> — compute which column/row just came into view and stage it. Cheap; runs in the active frame.</li>
 <li><b><span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span></b> — do the actual VRAM DMA of the staged strip. Must run in VBlank (call it right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md253"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md254"></a>
 Collision against the map</h2>
 <p>The map already knows which tiles are solid (the <span class="tt">.b16</span> attributes). Query it by world pixel:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>) == 0) {</div>
@@ -227,7 +227,7 @@ Collision against the map</h2>
 <div class="ttc" id="amap_8h_html_a49fd2a70bfc38c5c4ba5ea883b863dc7"><div class="ttname"><a href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a></div><div class="ttdeci">u16 mapGetMetaTilesProp(u16 xpos, u16 ypos)</div><div class="ttdoc">Get tile collision property at map coordinates.</div></div>
 <div class="ttc" id="amap_8h_html_ad95ef475b3953c77cd646919e1cf1ce3"><div class="ttname"><a href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a></div><div class="ttdeci">u16 mapGetMetaTile(u16 xpos, u16 ypos)</div><div class="ttdoc">Get metatile index at map coordinates.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp</a></span> is the map-engine equivalent of <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span>; use it when the map lives in the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module. (A game on the <span class="tt">background</span> module with a <span class="tt">-C</span> grid uses <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> instead — see the <a class="el" href="collision_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/collision.md">collision tutorial</a>.)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md254"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md255"></a>
 One-way and second-layer options</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a>(<a class="code hl_define" href="map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30">MAP_OPT_1WAY</a>);   <span class="comment">// horizontal-only — skips the vertical</span></div>
 <div class="line">                                  <span class="comment">// buffer, cheaper for a side-scroller</span></div>
@@ -235,7 +235,7 @@ One-way and second-layer options</h2>
 <div class="ttc" id="amap_8h_html_a1697378c813c532a862943726625bd5b"><div class="ttname"><a href="map_8h.html#a1697378c813c532a862943726625bd5b">MAP_OPT_BG2</a></div><div class="ttdeci">#define MAP_OPT_BG2</div><div class="ttdoc">Scroll BG2 instead of BG1 (VRAM address is still $6800).</div><div class="ttdef"><b>Definition</b> map.h:109</div></div>
 <div class="ttc" id="amap_8h_html_a58e5d28fd6d1ce78aaba19e7bb697e13"><div class="ttname"><a href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a></div><div class="ttdeci">void mapSetMapOptions(u8 optmap)</div><div class="ttdoc">Set map engine options.</div></div>
 <div class="ttc" id="amap_8h_html_aaaaeb07f437c99e9497c94bf585d7a30"><div class="ttname"><a href="map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30">MAP_OPT_1WAY</a></div><div class="ttdeci">#define MAP_OPT_1WAY</div><div class="ttdoc">Only allow scrolling to the right (no left scroll).</div><div class="ttdef"><b>Definition</b> map.h:106</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md255"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md256"></a>
 Worked patterns (the shipped examples)</h2>
 <ul>
 <li><b><span class="tt">examples/maps/map_scroll</span></b> — the minimum scroller above, a large map moved with the D-pad.</li>
@@ -243,18 +243,18 @@ Worked patterns (the shipped examples)</h2>
 <li><b><span class="tt">examples/maps/slope_collision</span></b> — per-tile collision <em>attributes</em> driving slope physics (the <span class="tt">.b16</span> values mean more than solid/empty).</li>
 <li><b><span class="tt">examples/maps/dynamic_map</span></b> — rewriting map tiles at runtime.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md256"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md257"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md257"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md258"></a>
 🔴 <span class="tt">mapLoad()</span> must run before <span class="tt">setScreenOn()</span></h3>
 <p><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span> flushes the first screen of tilemap to VRAM internally. Call it after <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> and that flush lands during active display — garbage tiles on the first frame. Load during force blank, like every other VRAM setup.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md258"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md259"></a>
 🟠 <span class="tt">mapVblank()</span> belongs in VBlank, <span class="tt">mapUpdate()</span> does not</h3>
 <p><span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate</a></span> stages (cheap, active frame); <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank</a></span> writes VRAM (must be in VBlank). Swapping them, or calling <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank</a></span> outside VBlank, drops the reveal strip and the leading edge of the scroll shows stale tiles.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md259"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md260"></a>
 🟡 <span class="tt">map</span> streams <span class="tt">.m16</span>; <span class="tt">background</span> wants <span class="tt">.q16</span></h3>
 <p>These are different formats for different modules. A 64×64 fixed area scrolled with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> needs the quadrant layout (<span class="tt">tmx2snes -Q</span>), not the streaming <span class="tt">.m16</span>. Feeding one module the other's format is silent garbage. Match the format to the module.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md260"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md261"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="scrolling_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/scrolling.md">Scrolling &amp; parallax</a> — raw <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> when you don't need a streamed map.</li>
