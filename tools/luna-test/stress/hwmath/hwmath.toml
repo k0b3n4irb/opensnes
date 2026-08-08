@@ -1,0 +1,15 @@
+# Acceptance test for luna#181: reproduce the OpenSNES probes/hw_math.py
+# verdict (CPU hardware multiply/divide, incl. the divide-by-zero quirk) as a
+# native `luna test` manifest. Values verified bit-exact vs Mesen2 + fullsnes.
+rom = "hwmath.sfc"
+steps = 500000
+
+[asserts]
+wdm_empty = true               # no SNES_ASSERT fired during the run
+
+[asserts.values]               # results[] block at $00:00AC, little-endian u16
+"00:00AE" = 0xFE01             # results[1]  mul(255,255) = 65025
+"00:00BC" = 0xFFFF             # results[8]  div 1000/0 -> quotient $FFFF (quirk)
+"00:00BE" = 0x03E8             # results[9]  div 1000/0 -> remainder = dividend (1000)
+"00:00C4" = 0xFFFF             # results[12] div 65535/1 -> quotient 65535
+"00:00CA" = 0xC0DE             # results[15] done marker

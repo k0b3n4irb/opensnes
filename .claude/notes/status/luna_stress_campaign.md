@@ -51,6 +51,24 @@ its internal reputation.
   (5C78) version **2**, Mesen2 **3**. Chip-revision modelling choice (real
   consoles ship rev 1/2/3), not a bug → **owner question, not filed**.
 
+## Wave 3 — luna v1.14.0 "OpenSNES DX release" adoption (2026-08-08)
+
+luna shipped #168–#181 in v1.14.0, explicitly built for this project (native
+`luna test` runner, full CLI↔MCP parity, determinism oracles, debugging API
+v2, JSON `--peek`). Their release asks OpenSNES to test three things.
+
+- **Pin bumped v1.13.0 → v1.14.0.** Validated render- and behaviour-identical:
+  coverage 81 OK/0 FAIL, visual 83/83 fbhash match, probes 19/19, WRAM 81/81.
+  No baseline re-capture. Committed.
+- **#181 acceptance — MET.** Ported `probes/hw_math.py` to a native
+  `luna test` manifest (`stress/hwmath/hwmath.toml`, `[asserts.values]` on the
+  div/mul result slots incl. the ÷0 quirk + `wdm_empty`). `luna test` returns
+  the same verdict: PASS on correct values, FAIL (precise expected/got) on a
+  tampered value, exit contract 0/1/2 confirmed. This proves the native runner
+  can subsume the Python harness → path to deleting transitory code (luna-first).
+- Remaining asks (not yet done): switch `probes/lib.py` peek parsing to the
+  JSON `peeks` array (#175); drive a full debug session over MCP.
+
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
 
