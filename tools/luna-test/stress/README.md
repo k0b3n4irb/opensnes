@@ -30,6 +30,7 @@ sits beside its ROM and asserts result slots via `[asserts.values]`:
 
 ## Prototypes (transitory)
 
+- **`mcp_sweep.py`**  exhaustive one-shot sweep of all 94 MCP tools (dependency-ordered, schema-correct args)  94/94 OK on v1.14.0. Built on `mcp_probe.py`. One-time surface validation, not a standing regression.
 - **`mcp_probe.py`** — a minimal MCP-over-stdio client that drives `luna mcp`
   (newline-delimited JSON-RPC): handshake, `tools/list`, and `tools/call`.
   Used to validate luna's MCP debug surface end-to-end (call stack, traces,

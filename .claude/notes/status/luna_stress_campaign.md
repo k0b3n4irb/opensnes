@@ -103,6 +103,30 @@ Pattern proven: a fixed-value-assert probe ports 1:1 to a manifest. Next
 candidates are the other pure-assert probes (controller, dma_cgram slots);
 probes with Python logic (RMS, directional, JSON state) stay Python for now.
 
+## Wave 5 — full MCP surface sweep (2026-08-08)
+
+Answering "did you test everything v1.14.0 delivered?" — the earlier waves
+covered the 3 asks + a representative slice, not the whole catalogue. So:
+
+- **`stress/mcp_sweep.py`** calls **all 94 MCP tools** once, dependency-ordered
+  (setup → action → observe → mutate → cleanup), schema-correct args:
+  **94/94 OK, 0 errors, 0 not attempted.** Covers the untested surface —
+  pokes (VRAM/CGRAM/OAM/ARAM/mem), all enable/take traces, breakpoints v2
+  (add/list/set_enabled/remove/clear), symbols v2 (`load_symbols_str`,
+  `clear_symbols`, `symbol_for_addr`, ARAM/SPC space), `wram_snapshot`,
+  `loop_probe`, `render_*`, `decode_sprites`, `export_spc`, `sram_get/set`,
+  `save_state`/`load_state`, `load_rom_bytes`, `set_port_device`,
+  `set_cpu_register`, `run_until_pc/mem_read/mem_write/break`, etc.
+- A first sweep flagged 6 "errors" — all self-inflicted: a malformed
+  `load_symbols_str` text (`count:0`) **REPLACED** the symbol table and wiped
+  `current_song`. Lesson recorded: `load_symbols_str` replaces, not appends.
+- **#167 `search_memory` $7F fix verified**: poked `AB CD EF` into `$7F:1234`
+  and searched — luna returns `0x7F1234` (correct), not the old bogus
+  `$7E:1xxxx`. `poke_memory`/`peek_memory` handle bank `$7F` correctly too.
+
+Net: the entire luna v1.14.0 delivery (94 MCP tools + the search_memory fix +
+`luna test` + JSON peeks + the CLI surface exercised by probes) is validated.
+
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
 
