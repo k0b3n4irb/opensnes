@@ -36,17 +36,20 @@ Key realisation: several harness-documented "gaps" were already shipped
 The harness docs trail the pin (README says v1.1.0). luna is more mature than
 its internal reputation.
 
-## Wave 2 — open-bus / MDR (in progress, 2026-08-08)
+## Wave 2 — open-bus / MDR (DONE 2026-08-08)
 
-- `stress/openbus`: luna matches Mesen2 on all open-bus reads except `$213F`
-  STAT78 — luna reports PPU2 (5C78) version **2**, Mesen2 reports **3**. This
-  is a chip-revision modelling choice (real consoles ship rev 1/2/3), not a
-  clear bug → **owner question, not a filed defect**.
-- Write-only/unmapped reads return `$00` in both emus, which is *correct* for
-  the `lda.l` long addressing the C compiler emits (open bus = bank byte `$00`).
-- **Follow-up**: a definitive MDR test needs **absolute-addressing asm** so the
-  open-bus value is the operand high byte (non-zero). Not yet written.
-  `openbus/` stays a transitory prototype (not promoted).
+- **luna models open-bus / MDR correctly — PASS (no finding).** A C pointer
+  read always hits bank $00 (structural limit), so the MDR bank byte can only
+  be exercised from asm. `stress/openbus/ob.asm` reads the $2100 mirror through
+  banks via `lda.l bb:2100`; luna returns the bank byte every time
+  (`3F 01 20 10`), `$00` for the control, and the real value for a readable
+  register — matching Mesen2 **byte-for-byte** and the fullsnes/anomie rules.
+  The earlier "all $00" was the compiler's bank-$00 `lda.l` (where $00 *is* the
+  correct MDR), not a luna gap.
+  → **Promoted** to a luna-only regression (`probes/open_bus.py`).
+- Only divergence in the whole probe: `$213F` STAT78 — luna reports PPU2
+  (5C78) version **2**, Mesen2 **3**. Chip-revision modelling choice (real
+  consoles ship rev 1/2/3), not a bug → **owner question, not filed**.
 
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
@@ -57,6 +60,8 @@ its internal reputation.
   untracked): can't repro single-arch here; needs x86↔arm comparison.
 
 ## Next
-- Finish the open-bus asm test (controlled non-zero MDR).
 - Deeper waves: mid-scanline raster/HDMA timing; DSP/audio fidelity;
   SA-1 / Super FX contention.
+- Standing takeaway so far: luna v1.13.0 passed every corner tested
+  (robustness, CPU math, PPU Mode 7 math, open-bus/MDR). Findings to date are
+  one closed bug (#126) + hard regression coverage, not defects.
