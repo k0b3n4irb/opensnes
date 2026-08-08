@@ -66,8 +66,14 @@ v2, JSON `--peek`). Their release asks OpenSNES to test three things.
   the same verdict: PASS on correct values, FAIL (precise expected/got) on a
   tampered value, exit contract 0/1/2 confirmed. This proves the native runner
   can subsume the Python harness → path to deleting transitory code (luna-first).
-- Remaining asks (not yet done): switch `probes/lib.py` peek parsing to the
-  JSON `peeks` array (#175); drive a full debug session over MCP.
+- **#175 adopted.** `probes/lib.py:peek()` now reads the structured `peeks`
+  array from the `--out` JSON (`{spec, space, addr, bytes_hex}`) instead of
+  regex-scraping the stderr hexdump. Behaviour-identical — all 19 probes pass
+  (symbol + BANK:OFFSET + signed-word paths). The stderr dump still exists but
+  the JSON is the supported channel.
+- Remaining ask (not yet done): drive a full debug session over MCP
+  (`luna mcp --rom …`). Longer-term: migrate probes to `luna test` manifests
+  and delete the transitory Python harness (luna-first steady state).
 
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
