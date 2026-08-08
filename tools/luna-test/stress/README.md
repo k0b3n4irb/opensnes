@@ -25,6 +25,14 @@ Verified bit-exact vs Mesen2 + fullsnes/anomie, now locked by
   returns the bank byte (the MDR) every time, matching Mesen2 + fullsnes.
   Locked by `../probes/open_bus.py`.
 
+## Prototypes (transitory)
+
+- **`mcp_probe.py`** — a minimal MCP-over-stdio client that drives `luna mcp`
+  (newline-delimited JSON-RPC): handshake, `tools/list`, and `tools/call`.
+  Used to validate luna's MCP debug surface end-to-end (call stack, traces,
+  search sessions, freezes, determinism oracles). Reference client + smoke
+  test; not a standing regression.
+
 ## Notes
 
 - The one open observation not locked: `$213F` STAT78 PPU2 (5C78) version —

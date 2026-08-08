@@ -71,9 +71,20 @@ v2, JSON `--peek`). Their release asks OpenSNES to test three things.
   regex-scraping the stderr hexdump. Behaviour-identical — all 19 probes pass
   (symbol + BANK:OFFSET + signed-word paths). The stderr dump still exists but
   the JSON is the supported channel.
-- Remaining ask (not yet done): drive a full debug session over MCP
-  (`luna mcp --rom …`). Longer-term: migrate probes to `luna test` manifests
-  and delete the transitory Python harness (luna-first steady state).
+- **MCP debug session — validated (3rd ask done).** `stress/mcp_probe.py`
+  drives `luna mcp` over stdio (newline-delimited JSON-RPC): handshake + the
+  full 94-tool catalogue, serverInfo `luna v1.14.0` (#167 handshake fix). A
+  real session on `apu_switch` exercised: `resolve_symbol`, `peek_memory`
+  (by symbol), `run`/`step_until_frame`, symbol-annotated `call_stack`
+  (WaitForVBlank JSL frame) and `cpu_trace`, memory search sessions
+  (`search_begin u8` → `refine eq/changed`, `remaining` counts narrow),
+  `freeze_add` (peek returns the frozen value across a run), and the
+  determinism oracles — **`frame_hash` matches the CLI `--print-fbhash`
+  byte-for-byte** (`714a220e2daaa1e4`) + `wram_page_hashes`.
+
+All three v1.14.0 release asks are now done (#181 acceptance, #175 JSON peeks,
+MCP debug session). Longer-term: migrate probes to `luna test` manifests and
+delete the transitory Python harness (luna-first steady state).
 
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
