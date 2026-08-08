@@ -83,8 +83,25 @@ v2, JSON `--peek`). Their release asks OpenSNES to test three things.
   byte-for-byte** (`714a220e2daaa1e4`) + `wram_page_hashes`.
 
 All three v1.14.0 release asks are now done (#181 acceptance, #175 JSON peeks,
-MCP debug session). Longer-term: migrate probes to `luna test` manifests and
-delete the transitory Python harness (luna-first steady state).
+MCP debug session).
+
+## Wave 4 — first probe migrated to `luna test` (2026-08-08)
+
+Started the luna-first endgame (retire the Python harness). **Migrated the
+`hw_math` probe** off Python onto native `luna test` manifests:
+
+- `stress/hwmath/hwmath.toml` + `stress/ppumul/ppumul.toml` assert the
+  multiply/divide + Mode 7 result slots via `[asserts.values]` (+ `wdm_empty`).
+- New `make test-manifests` target (builds the stress ROMs, runs `luna test`,
+  exit 0/1/2); wired into `make tests` after the probes.
+- **Deleted `probes/hw_math.py`** — the checks now live in luna's own runner.
+  Probe suite 19 → 18; the migrated coverage runs via `luna test` (2 passed).
+- Fixed a stale comment in `ppumul/main.c` (32767×127 = 4161409 = 0x3F7F81,
+  not 0x3F7F01 — luna's result was always correct; only the comment was wrong).
+
+Pattern proven: a fixed-value-assert probe ports 1:1 to a manifest. Next
+candidates are the other pure-assert probes (controller, dma_cgram slots);
+probes with Python logic (RMS, directional, JSON state) stay Python for now.
 
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).

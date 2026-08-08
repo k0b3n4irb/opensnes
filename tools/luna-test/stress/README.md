@@ -11,15 +11,18 @@ validation oracle, Mesen2 (MCP `mem_read`) — a differential that turns
 "is luna wrong?" into "luna=X, Mesen2=Y, reference=Z" (the project's
 anti-bogus-issue safeguard).
 
-## Promoted (permanent luna-only regression fixtures)
+## Migrated to native `luna test` manifests (luna#181)
 
-Verified bit-exact vs Mesen2 + fullsnes/anomie, now locked by
-`../probes/hw_math.py` (`luna --assert` on the known-correct blocks):
+Verified bit-exact vs Mesen2 + fullsnes/anomie, now run by **luna's own
+manifest runner** — `make test-manifests` (→ `luna test`), the luna-first
+direction (the Python `hw_math.py` probe was retired). Each `<name>.toml`
+sits beside its ROM and asserts result slots via `[asserts.values]`:
 
-- **`hwmath/`** — CPU multiply/divide ($4202/$4203→$4216, $4204-6→$4214/$4216),
-  including divide-by-zero (quotient=$FFFF, remainder=dividend).
-- **`ppumul/`** — PPU Mode 7 signed multiply ($211B M7A × $211C M7B →
-  signed 24-bit at $2134/$2135/$2136).
+- **`hwmath/`** (`hwmath.toml`) — CPU multiply/divide ($4202/$4203→$4216,
+  $4204-6→$4214/$4216), including divide-by-zero (quotient=$FFFF,
+  remainder=dividend).
+- **`ppumul/`** (`ppumul.toml`) — PPU Mode 7 signed multiply ($211B M7A ×
+  $211C M7B → signed 24-bit at $2134/$2135/$2136).
 - **`openbus/`** — open-bus / MDR reads (`ob.asm`, since a C read can't leave
   bank $00). Reads the $2100 mirror through banks via `lda.l bb:2100`; luna
   returns the bank byte (the MDR) every time, matching Mesen2 + fullsnes.

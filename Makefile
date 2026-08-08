@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -154,6 +154,7 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
 	@# change that CI then rejected on all five platforms — which is
@@ -197,6 +198,16 @@ test-tools:
 	@python3 tools/smconv/tests/run_golden.py
 	@python3 tools/wav2brr/tests/run_golden.py
 	@python3 tools/palplan/tests/run_golden.py
+
+# Native `luna test` manifests (issue #181) — probes migrated off the Python
+# harness onto luna's own manifest runner (the luna-first direction). Builds
+# the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
+test-manifests:
+	@$(MAKE) -s -C tools/luna-test/stress/hwmath
+	@$(MAKE) -s -C tools/luna-test/stress/ppumul
+	@tools/luna-test/bin/luna test \
+		tools/luna-test/stress/hwmath/hwmath.toml \
+		tools/luna-test/stress/ppumul/ppumul.toml
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
