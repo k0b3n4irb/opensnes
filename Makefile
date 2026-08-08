@@ -225,9 +225,18 @@ bench:
 
 docs:
 	cd docs && doxygen Doxyfile
+	@# The showcase landing page is the site's front door. Doxygen emits the
+	@# documentation hub (mainpage.md) as index.html; preserve it as
+	@# documentation.html, then install the showcase as the root index.html.
+	@# Every other generated page (getting_started.html, tools.html, …) is
+	@# untouched, so no doc URL breaks. Kept in the Makefile so a local
+	@# `make docs` and the CI deploy build the identical site.
+	@cp docs/build/html/index.html docs/build/html/documentation.html
+	@cp docs/landing/index.html docs/build/html/index.html
 	@echo "========================================="
 	@echo "Documentation generated in docs/build/html/"
-	@echo "Open docs/build/html/index.html in a browser"
+	@echo "  index.html         -> showcase landing (docs/landing/index.html)"
+	@echo "  documentation.html -> Doxygen docs hub (mainpage.md)"
 	@echo "========================================="
 
 #------------------------------------------------------------------------------
