@@ -196,6 +196,7 @@ test-tools:
 	@python3 tools/tmx2snes/tests/run_golden.py
 	@python3 tools/smconv/tests/run_golden.py
 	@python3 tools/wav2brr/tests/run_golden.py
+	@python3 tools/palplan/tests/run_golden.py
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
