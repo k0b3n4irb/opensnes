@@ -10,8 +10,11 @@ Single-button script, HELD without release on purpose: with a
 release checkpoint the press window can fall inside audioInit's
 boot+load phase and be missed entirely (codegen changes shift init
 timing — bit us after #121's cst far loads). A held mask produces
-exactly one padPressed edge at the first poll, whenever that is.
-(luna#126 re-fire also stays harmless: >= asserts.)
+exactly one padPressed edge at the first poll, whenever that is —
+independent of the exact init timing, which is why it is held rather
+than pulsed. (luna#126, the earlier checkpoint re-fire, was fixed in
+v1.13.0; the held mask remains the right call for the init-timing
+reason above.)
 """
 from __future__ import annotations
 

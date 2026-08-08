@@ -6,22 +6,21 @@ Assertions on examples/audio/apu_switch:
    the whole cooperative reset handshake ran, or the blocking upload would
    never have returned).
 
-Input-timing note: `luna state --input` currently misapplies checkpoint
-frames (first mask latched at boot; the checkpoint list re-fires
-periodically — bug reported upstream). These asserts are held-value and
-edge-count-insensitive by design: a spurious extra B press cannot flip
-current_song back (main.c ignores presses for the already-active song).
-The cello->drums direction (an A press after B) is NOT asserted here —
-with re-firing checkpoints the final state of a B+A script depends on
-where the spurious cycle lands at the step count; add it back once the
-upstream input bug is fixed.
+3. cello->drums direction: press B then A -> current_song flips back to 0
+   (main.c selects a specific song per button; A = drums, B = cello).
+
+History: this direction assert was disabled while `luna state --input`
+misapplied checkpoint frames (luna#126 — first mask latched at boot, list
+re-fired periodically). luna#126 is fixed as of v1.13.0 (verified with a
+frame-exact repro; checkpoints now land on their scheduled frame and fire
+once), so the B->A direction is asserted again here.
 """
 from __future__ import annotations
 
 import subprocess
 import sys
 
-from lib import find_luna, rom_path, peek, B
+from lib import find_luna, rom_path, peek, A, B
 
 ROM_REL = "audio/apu_switch/apu_switch.sfc"
 STEPS = 12_000_000  # ~5 s: past boot + at least one swap
@@ -54,11 +53,13 @@ def run() -> tuple[bool, str]:
     boot = _song(luna, rom, None)
     rms = _rms(luna, rom)
     after_b = _song(luna, rom, f"60:{B:#x},63:0")
+    after_ba = _song(luna, rom, f"60:{B:#x},63:0,120:{A:#x},123:0")
 
     checks = [
         (boot == 0, f"boot song={boot} (want 0)"),
         (rms > 100.0, f"drums RMS={rms:.0f} (want >100)"),
         (after_b == 1, f"after B song={after_b} (want 1)"),
+        (after_ba == 0, f"after B+A song={after_ba} (want 0)"),
     ]
     bad = [m for ok, m in checks if not ok]
     if bad:

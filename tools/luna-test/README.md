@@ -17,8 +17,9 @@ Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
 
-- The pinned luna binary — version in `tools/luna-test/luna.version` (currently
-  **`v1.1.0`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+- The pinned luna binary — the exact version lives in
+  `tools/luna-test/luna.version` (the single source of truth; **`v1.13.0`** at
+  time of writing). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
   `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
   `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
@@ -68,7 +69,7 @@ exclusions), input sequences (`--input`), the full-corpus manifest, and the
 CI rewrite (both Linux arches). For interactive debugging, `luna mcp` /
 luna's GUI are available alongside Mesen2.
 
-## Hardening tests (luna v1.1.0 capabilities)
+## Hardening tests (luna scripted-input & trace capabilities)
 
 Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
 never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
