@@ -205,9 +205,11 @@ test-tools:
 test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/hwmath
 	@$(MAKE) -s -C tools/luna-test/stress/ppumul
+	@$(MAKE) -s -C tools/luna-test/stress/openbus
 	@tools/luna-test/bin/luna test \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
+		tools/luna-test/stress/openbus/openbus.toml \
 		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").

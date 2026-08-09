@@ -120,6 +120,18 @@ Ported the two probes luna asked for (the #205 acceptance):
 - Deleted both Python probes; suite 18 → 16; `make test-manifests` now runs
   9 manifests (2 stress + 7 example), all green.
 
+**Second batch (same day):** migrated `map_scroll` (delta), `state_machine`
+(2: dynamic_map `changed`, scene_stack push/pop with `width=1` — scene_top is a
+1-byte counter with a noisy high byte), `open_bus` (`[asserts.blocks]` on the
+`res` symbol, ROM built by the target), and `coproc`'s Super FX / SA-1 cases
+(`[asserts.trace] {min=1}` + sa1_hello handshake via `[asserts.values]`).
+`coproc.py` slimmed to the **firmware-gated DSP-1** check only (a manifest
+can't express the `dsp1b.rom` skip). Probe suite **19 → 13**; `make
+test-manifests` now runs **17 manifests**, all green. Still Python (by need):
+audio_v2 (DSP register file), dma_budget (DMA-budget metric), mouse/superscope
+(peripheral input), sram (srm round-trip) — plus the migratable-next batch
+(apu_switch, audio, controller, soundboard, sprites_random).
+
 **Pinch reported to luna (as asked):** `[asserts.blocks]` keys the block by its
 offset, so two spaces at the same offset (VRAM[0] and CGRAM[0]) collide as a
 duplicate TOML key — dma_cgram needs two manifests instead of one. A free-label
