@@ -127,10 +127,24 @@ Ported the two probes luna asked for (the #205 acceptance):
 (`[asserts.trace] {min=1}` + sa1_hello handshake via `[asserts.values]`).
 `coproc.py` slimmed to the **firmware-gated DSP-1** check only (a manifest
 can't express the `dsp1b.rom` skip). Probe suite **19 → 13**; `make
-test-manifests` now runs **17 manifests**, all green. Still Python (by need):
-audio_v2 (DSP register file), dma_budget (DMA-budget metric), mouse/superscope
-(peripheral input), sram (srm round-trip) — plus the migratable-next batch
-(apu_switch, audio, controller, soundboard, sprites_random).
+test-manifests` now runs **17 manifests**, all green. **Third batch (same day):** migrated `controller` (6 checkpoints, held button →
+`[checkpoint.values] pad_keys`), `soundboard` (idle then A → play_count/
+last_voice), `sprites_random` (random `delta changed` + simple_sprite OAM via
+`[asserts.blocks]` on the `oamMemory` symbol). Probe suite **13 → 10**;
+manifests **21** run, all green.
+
+**Pinch found (filed):** `audio_rms_min` reads a **silent ring (RMS 0.0)** under
+`luna test` for a ROM that is demonstrably playing (`state.apu.active_voices=5`,
+`luna run --audio-out` RMS≈3968 at the same point). So `audio` and the RMS half
+of `apu_switch` can't migrate yet — both stay Python. Also learned: for a
+CPU-addressable WRAM block, the `[asserts.blocks]` key must be a symbol or
+BANK:OFFSET (a bare offset with `space="wram"` is rejected); `space` is for
+vram/cgram/oam/aram.
+
+Still Python (by need): audio_v2 (DSP register file), dma_budget (DMA-budget
+metric), mouse/superscope (peripheral input), sram (srm round-trip), vram_aram
+(non-zero-count assert), audio + apu_switch (audio_rms_min pinch), coproc-dsp1
+(firmware gate).
 
 **Pinch reported to luna (as asked):** `[asserts.blocks]` keys the block by its
 offset, so two spaces at the same offset (VRAM[0] and CGRAM[0]) collide as a
