@@ -196,9 +196,11 @@ determinism oracles, DSP/APU visibility. Remaining needs:
 
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
-- #205 — OPEN (enh): richer `luna test` asserts to fully subsume the harness.
+- #205 — CLOSED: richer `luna test` asserts — SHIPPED in luna v1.15.0.
 - #207 — OPEN (question): STAT78 ($213F) reports 5C78/PPU2 version 2; Mesen2
   reports 3. Modelling choice, not a bug — asked whether it's intentional.
+- #210 — OPEN (enh): [asserts.blocks] keys by offset; two spaces at the same
+  offset can't share a manifest (dma_cgram pinch). Suggested offset field / array.
 
 ## Resolved / no longer open
 - Cross-arch WRAM determinism — RESOLVED, no bug (CI x86==arm on v1.14.0;
