@@ -170,11 +170,19 @@ determinism oracles, DSP/APU visibility. Remaining needs:
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
 - #205 — OPEN (enh): richer `luna test` asserts to fully subsume the harness.
+- #207 — OPEN (question): STAT78 ($213F) reports 5C78/PPU2 version 2; Mesen2
+  reports 3. Modelling choice, not a bug — asked whether it's intentional.
 
-## Candidate owner-questions (not filed)
-- STAT78 PPU2 version: which 5C78 revision does luna intend to model (2 vs 3)?
-- Cross-arch WRAM determinism (mapandobjects/slope_collision, root cause
-  untracked): can't repro single-arch here; needs x86↔arm comparison.
+## Resolved / no longer open
+- Cross-arch WRAM determinism — RESOLVED, no bug (CI x86==arm on v1.14.0;
+  CROSS_ARCH_EXCLUDE removed, WRAM gates 83/83 both arches). See above.
+- Audio *content* analysis — parked (no reliable prototype = no sound spec).
+
+## Nothing else fileable
+Full campaign turned up no other defect: 94/94 MCP tools, robustness,
+CPU/PPU math, open-bus all pass. Remaining "luna should own this" items
+(WRAM-stream digest, DMA unsafe-write metric, `_sizeof_` via luna#77) are
+marginal or folded into #205 — not worth standalone issues.
 
 ## Next
 - Deeper waves: mid-scanline raster/HDMA timing; DSP/audio fidelity;
