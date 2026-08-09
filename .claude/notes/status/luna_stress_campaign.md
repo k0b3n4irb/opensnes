@@ -137,8 +137,20 @@ determinism oracles, DSP/APU visibility. Remaining needs:
    log) can't express ~13 of our 18 probes (deltas/directional, thresholds,
    audio energy, trace-count, block/non-WRAM-space). Blocks retiring the Python
    harness. **Filed: luna#205** (the prototype = our probes = the spec).
-2. **Cross-arch WRAM determinism** — mapandobjects/slope_collision diverge
-   x86↔arm (root cause untracked). **Characterised (v1.14.0, aarch64, 2026-08-09):**
+2. **Cross-arch WRAM determinism — RESOLVED (no bug), 2026-08-09.** Ran a
+   one-off CI matrix (x86_64 `ubuntu-latest` + arm64 `ubuntu-24.04-arm`) that
+   `wram-trace`s the two formerly-excluded ROMs on the pinned luna v1.14.0:
+   **CI x86_64 == CI arm64 == the committed aarch64 baseline, bit-identical**
+   (mapandobjects `56571bbf3ba2f27d`, slope_collision `824adfbd24c4b613`). So
+   there is NO cross-arch bug on v1.14.0 — the old exclusion was a stale/older-
+   luna artifact. **Removed `CROSS_ARCH_EXCLUDE`** (now empty, kept as an escape
+   hatch); the WRAM oracle now gates **83/83 on both arches** (was 81/81 + 2
+   skipped). The pre-drafted cross-arch bug issue was **dropped** (nothing to
+   file). Method note: GitHub gives free x86_64 *and* arm64 Linux runners, so
+   cross-arch questions can be settled entirely in CI.
+
+   Original characterisation (v1.14.0, aarch64) that made the CI check
+   conclusive:
    - power-on WRAM = **all zero** (131072 B, 0 non-zero, hash `c74b47c8c74a2325`)
      → a zeroed Rust buffer is arch-independent;
    - **same-arch fully deterministic** (run-to-run identical);

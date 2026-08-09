@@ -12,7 +12,7 @@ Migration history: `.claude/notes/chantiers/luna_migration.md`.
 **Sole test backend** (the snes9x-WASM + Mesen2 harness `tools/opensnes-emu`
 was removed). `make tests` runs corpus liveness coverage + full-corpus visual
 regression + functional probes (scripted input → WRAM asserts), and CI adds
-the WRAM-state stream regression (`wram_regress.py`, cross-arch exclusions).
+the WRAM-state stream regression (`wram_regress.py`, whole corpus on both arches).
 Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
