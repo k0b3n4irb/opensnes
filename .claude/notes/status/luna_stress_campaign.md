@@ -138,8 +138,20 @@ determinism oracles, DSP/APU visibility. Remaining needs:
    audio energy, trace-count, block/non-WRAM-space). Blocks retiring the Python
    harness. **Filed: luna#205** (the prototype = our probes = the spec).
 2. **Cross-arch WRAM determinism** — mapandobjects/slope_collision diverge
-   x86↔arm (root cause untracked). Needs a cross-arch repro to file; can't
-   reproduce single-arch here. Still open.
+   x86↔arm (root cause untracked). **Characterised (v1.14.0, aarch64, 2026-08-09):**
+   - power-on WRAM = **all zero** (131072 B, 0 non-zero, hash `c74b47c8c74a2325`)
+     → a zeroed Rust buffer is arch-independent;
+   - **same-arch fully deterministic** (run-to-run identical);
+   - active region = WRAM pages `0x0000-0x5FFF`.
+   Logic: zeroed power-on + same-arch determinism + integer emulation ⇒ WRAM
+   after N frames MUST be bit-identical cross-arch UNLESS luna has a
+   host-dependent path (HashMap order / float / UB cast / uninitialised read in
+   luna's own Rust). So **if the divergence still reproduces on v1.14.0 it is a
+   genuine bug**, not uninitialised RAM. Can't confirm mono-arch — needs an x86
+   run. aarch64 v1.14.0 stream fingerprints (`wram-trace -n 0 -c 90`):
+   mapandobjects `56571bbf3ba2f27d`, slope_collision `824adfbd24c4b613`.
+   Repro protocol: run the same on x86_64; differ ⇒ file (first differing line =
+   frame,page); identical ⇒ the old note was a stale/version artifact, drop it.
 3. **Audio *content* analysis** (melody/tempo) — the audio_analyze graveyard.
    We prove DSP registers, not "right notes". Hard; maybe not luna's job yet.
 
