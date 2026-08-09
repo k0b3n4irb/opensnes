@@ -228,6 +228,9 @@ determinism oracles, DSP/APU visibility. Remaining needs:
 - #210 — OPEN (enh): [asserts.blocks] keys by offset; two spaces at the same
   offset can't share a manifest (dma_cgram pinch). Suggested offset field / array.
 - #211 — OPEN (bug): audio_rms_min reads a silent ring (RMS 0.0) under luna
+- #212 — OPEN (enh): remaining manifest-coverage gaps (peripheral input,
+  DSP regs, footprint floor, DMA-budget, SRAM round-trip, firmware-skip) —
+  the last 10 probes, each probe = the spec.
   test for a ROM that is playing (blocks audio + apu_switch migration).
 
 ## Resolved / no longer open
