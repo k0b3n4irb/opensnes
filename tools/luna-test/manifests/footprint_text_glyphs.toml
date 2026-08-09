@@ -1,0 +1,4 @@
+rom = "../../../examples/fundamentals/text_glyphs/text_glyphs.sfc"
+steps = 4000000
+[asserts.footprint]
+vram = { nonzero_min = 32 }
