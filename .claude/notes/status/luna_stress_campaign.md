@@ -275,3 +275,26 @@ Remaining 2 Python probes (both justified):
 ## Filed this session (recap): #205✅ #207✅ #209✅ #210✅ #211✅ #212✅ (all shipped)
 Open follow-ups: #217 ([asserts.dma] classification), #218 ([asserts.oam]
  decoded sprite fields — retires the last probe, oam_struct).
+
+## Wave 8 — v1.17.0: ZERO PROBES, harness retired (2026-08-09)
+
+luna v1.17.0 ("the zero-probe release") shipped #217 (`[asserts.dma]` now
+buckets exactly like the probe — VRAM ports only, force-blank excluded; the
+parallax_scroll "712 unsafe" were HDMA scroll-register writes, correctly
+dropped) and #218 (`[asserts.oam]` decoded, proposed grammar verbatim). Bump
+v1.16.0 → v1.17.0 clean (test-runner only; visual 83/83, WRAM 83/83, no drift).
+
+Migrated the final two:
+- **dma_budget** → 8 `[asserts.dma]` manifests (all pass — reconciled).
+- **oam_struct** → 3 `[asserts.oam]` manifests (simple_sprite exact fields +
+  visible count; metasprite/animated visible ≥ 1).
+
+**Python functional probes: 19 → 0.** `make test-manifests` runs **45**, all
+green. `probes/` retains only `lib.py` (used by `project_test.py`, the
+user-facing `make test` — a legitimate keep per luna_tooling's orchestration
+exception) and `run_all.py` (graceful 0/0 no-op + extension point). The
+transitory Python harness is retired; `luna test` is the harness. luna-first
+end state reached.
+
+Campaign arc: luna v1.13.0 → v1.17.0 in ~2 days; issues #126,#205,#207,#209,
+#210,#211,#212,#217,#218 all shipped; 19 probes → 45 native manifests.
