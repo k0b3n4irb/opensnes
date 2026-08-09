@@ -1,0 +1,7 @@
+# Power-cycle: reload the battery, press B -> load slot1 into vtl == saved.
+rom = "../../../examples/memory/save_game/save_game.sfc"
+frames = 120
+input = "30:0x8000"
+srm_in = "sram_save.srm"
+[asserts.blocks]
+vtl = "09000A0034127856"

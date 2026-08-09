@@ -1,0 +1,16 @@
+# Migrated from probes/audio_v2.py (v1.16.0 [asserts.dsp]). libtest fixture runs
+# audioInit + setters; assert the S-DSP register file they poked.
+rom = "../../../devtools/libtests/libtest.sfc"
+steps = 3000000
+[asserts.dsp]
+MVOL_L = 100
+MVOL_R = 100
+V2_VOLL = 80
+V2_VOLR = 40
+V3_PITCHL = 0x34
+V3_PITCHH = 0x12
+V1_ADSR1 = 0xFF
+V1_ADSR2 = 0xE8
+V4_ADSR1 = 0x00
+V4_GAIN = 0x5A
+DIR = 0x0A
