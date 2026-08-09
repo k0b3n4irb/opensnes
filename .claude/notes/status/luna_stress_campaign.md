@@ -308,3 +308,10 @@ the borrow (00−01→99). luna == Mesen2 **byte-for-byte** (values + carry + V/
 flags: `102c...dec0`) == documented 65816. No finding — luna's decimal unit is
 correct and the toolchain assembled/ran it fine. Locked as a luna-only
 regression (`bcd.toml`); test-manifests now 46. No new luna request warranted.
+
+## Wave 10 — sprite-per-line overflow (2026-08-09)
+40 small sprites on one scanline (`stress/sprite_overflow`): STAT77 range-over
+(bit6) sets, time-over (bit7) correctly does NOT (range caps eval at 32 → 32
+slivers ≤ 34). luna == Mesen2 byte-for-byte (`0141414141414141`) == documented
+range/time interaction. No finding — luna's OBJ evaluation and the SDK's
+oamSet+NMI-OAM-DMA path both correct. Locked; test-manifests now 47.

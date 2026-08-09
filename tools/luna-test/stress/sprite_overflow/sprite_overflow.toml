@@ -1,0 +1,8 @@
+# PPU sprite-per-scanline overflow. 40 small sprites on line 100: STAT77 range-
+# over (bit6) sets; time-over (bit7) stays clear because range caps evaluation at
+# 32 sprites -> 32 slivers <= 34. Verified bit-exact vs Mesen2 + the documented
+# range/time-over interaction. Frame 0 = 0x01 (OAM DMA lands in NMI), then 0x41.
+rom = "sprite_overflow.sfc"
+steps = 2000000
+[asserts.blocks]
+stat77_res = "0141414141414141"

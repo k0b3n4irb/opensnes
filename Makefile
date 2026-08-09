@@ -207,12 +207,14 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/ppumul
 	@$(MAKE) -s -C tools/luna-test/stress/openbus
 	@$(MAKE) -s -C tools/luna-test/stress/bcd
+	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
 	@tools/luna-test/bin/luna test \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
 		tools/luna-test/stress/openbus/openbus.toml \
 		tools/luna-test/stress/bcd/bcd.toml \
+		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
 		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
