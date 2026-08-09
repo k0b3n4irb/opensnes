@@ -103,6 +103,33 @@ Pattern proven: a fixed-value-assert probe ports 1:1 to a manifest. Next
 candidates are the other pure-assert probes (controller, dma_cgram slots);
 probes with Python logic (RMS, directional, JSON state) stay Python for now.
 
+## Wave 6 — v1.15.0 + migrate movement & dma_cgram (2026-08-09)
+
+luna shipped **#205 in v1.15.0** (asserts v2: checkpoint/delta, thresholds,
+blocks/spaces, trace-min, audio_rms_min) and **answered/fixed #207** (STAT78
+→ PPU2 rev 3, via #209, lands next release). Bumped pin v1.14.0 → v1.15.0,
+validated render/behaviour-identical (coverage 81/0, visual 83/83, WRAM 83/83).
+
+Ported the two probes luna asked for (the #205 acceptance):
+- **`movement.py` → 5 `[[checkpoint]]`/delta manifests** (aim_target, tiled,
+  perspective, likemario, collision_demo) under `tools/luna-test/manifests/`.
+  baseline checkpoint, then a leg holds a direction and asserts the delta
+  (`increased`/`decreased`) vs the prior checkpoint. All pass.
+- **`dma_cgram.py` → 2 `[asserts.blocks]` manifests** (VRAM font_tiles 144B,
+  CGRAM bg_palette). All pass.
+- Deleted both Python probes; suite 18 → 16; `make test-manifests` now runs
+  9 manifests (2 stress + 7 example), all green.
+
+**Pinch reported to luna (as asked):** `[asserts.blocks]` keys the block by its
+offset, so two spaces at the same offset (VRAM[0] and CGRAM[0]) collide as a
+duplicate TOML key — dma_cgram needs two manifests instead of one. A free-label
+key + explicit `offset` field is rejected ("invalid digit"). Suggest an
+`offset` field or `[[asserts.blocks]]` array-of-tables. (Filed: see below.)
+
+Note (not a bug): `--peek NAME:COUNT` parses COUNT as **hex** (documented for
+BANK:OFFSET, applies to symbols too) — 144 → 0x144 = 324 bytes. Our
+`probes/lib.py` sends decimal and truncates, so it over-reads harmlessly.
+
 ## Wave 5 — full MCP surface sweep (2026-08-08)
 
 Answering "did you test everything v1.14.0 delivered?" — the earlier waves

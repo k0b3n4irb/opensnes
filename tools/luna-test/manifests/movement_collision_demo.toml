@@ -1,0 +1,19 @@
+# Migrated from probes/movement.py (luna#205 [[checkpoint]]/delta). Pressing a
+# direction moves the world coordinate the expected way. Baseline settles, then
+# each leg holds a direction and asserts the delta vs the previous checkpoint.
+rom = "../../../examples/basics/collision_demo/collision_demo.sfc"
+
+[[checkpoint]]              # baseline
+at_frame = 60
+
+[[checkpoint]]             # hold RIGHT -> player_x increases
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+player_x = "increased"
+
+[[checkpoint]]             # hold DOWN -> player_y increases
+at_frame = 180
+input = "120:0x0400,179:0"
+[checkpoint.delta]
+player_y = "increased"

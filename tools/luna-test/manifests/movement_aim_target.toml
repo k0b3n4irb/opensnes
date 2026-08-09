@@ -1,0 +1,14 @@
+# Migrated from probes/movement.py.
+rom = "../../../examples/basics/aim_target/aim_target.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]                 # RIGHT -> target_x up
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+target_x = "increased"
+[[checkpoint]]                 # UP -> target_y down
+at_frame = 180
+input = "120:0x0800,179:0"
+[checkpoint.delta]
+target_y = "decreased"

@@ -1,0 +1,14 @@
+# Migrated from probes/movement.py.
+rom = "../../../examples/mode7/perspective/perspective.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]                 # RIGHT -> sx up
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+sx = "increased"
+[[checkpoint]]                 # DOWN -> sy up
+at_frame = 180
+input = "120:0x0400,179:0"
+[checkpoint.delta]
+sy = "increased"

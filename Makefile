@@ -207,7 +207,8 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/ppumul
 	@tools/luna-test/bin/luna test \
 		tools/luna-test/stress/hwmath/hwmath.toml \
-		tools/luna-test/stress/ppumul/ppumul.toml
+		tools/luna-test/stress/ppumul/ppumul.toml \
+		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent

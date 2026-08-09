@@ -1,0 +1,9 @@
+# Migrated from probes/dma_cgram.py (luna#205 [asserts.blocks]). text_glyphs
+# boots with dmaCopyVram(font_tiles -> VRAM word 0, 144 bytes). Assert the DMA
+# landed those exact bytes. (CGRAM half is dma_cgram_cgram.toml — see the note:
+# two spaces at the same offset can't share one manifest, since [asserts.blocks]
+# keys are the offset.)
+rom = "../../../examples/fundamentals/text_glyphs/text_glyphs.sfc"
+steps = 1000000
+[asserts.blocks]
+"0000" = { space = "vram", hex = "000000000000000000000000000000006600660066007e0066006600660000007e00600060007c00600060007e0000006000600060006000600060007e0000003c00660066006600660066003c000000c600c600c600d600fe00ee00c60000007c00660066007c006c0066006600000078006c006600660066006c007800000018001800180018001800000018000000" }
