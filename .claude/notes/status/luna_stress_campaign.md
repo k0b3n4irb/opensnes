@@ -273,4 +273,5 @@ Remaining 2 Python probes (both justified):
   coarser. Candidate for a future [asserts.oam]. Kept Python.
 
 ## Filed this session (recap): #205✅ #207✅ #209✅ #210✅ #211✅ #212✅ (all shipped)
-Open follow-ups: #217 ([asserts.dma] classification).
+Open follow-ups: #217 ([asserts.dma] classification), #218 ([asserts.oam]
+ decoded sprite fields — retires the last probe, oam_struct).
