@@ -250,3 +250,27 @@ marginal or folded into #205 — not worth standalone issues.
 - Standing takeaway so far: luna v1.13.0 passed every corner tested
   (robustness, CPU math, PPU Mode 7 math, open-bus/MDR). Findings to date are
   one closed bug (#126) + hard regression coverage, not defects.
+
+## Wave 7 — v1.16.0 finale: harness retirement to 2 probes (2026-08-09)
+
+luna v1.16.0 shipped #210/#211/#212 + #207 (STAT78→rev3) same-day. Bump caused
+a benign corpus-wide drift (STAT78 folds into `rand_seed` via console.c → RNG
+shift; only basics_random changed visually) — re-baselined from a clean rebuild
+with justification. Then migrated the last-10:
+- **Batch A**: audio (audio_rms_min #211 + sfx footprint), apu_switch (checkpoints
+  + audio_rms_min), vram_aram ([asserts.footprint] ×4).
+- **Batch B**: mouse, superscope ([[checkpoint]] mouse=/superscope= scripts),
+  coproc/dsp1 (firmware gate + [asserts.trace]).
+- **Batch C**: sram (srm_out/srm_in round-trip, 3 sorted manifests), audio_v2
+  ([asserts.dsp] register file).
+**Probe suite 19 → 2**; `make test-manifests` runs 34, all green.
+
+Remaining 2 Python probes (both justified):
+- **dma_budget** — luna's [asserts.dma] disagrees with the probe's classification
+  (force-blank boot uploads counted in max_vblank_bytes; unsafe_writes count) →
+  **filed #217**.
+- **oam_struct** — decoded x/y/tile/count semantics; a raw OAM block golden is
+  coarser. Candidate for a future [asserts.oam]. Kept Python.
+
+## Filed this session (recap): #205✅ #207✅ #209✅ #210✅ #211✅ #212✅ (all shipped)
+Open follow-ups: #217 ([asserts.dma] classification).
