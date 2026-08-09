@@ -227,6 +227,8 @@ determinism oracles, DSP/APU visibility. Remaining needs:
   reports 3. Modelling choice, not a bug — asked whether it's intentional.
 - #210 — OPEN (enh): [asserts.blocks] keys by offset; two spaces at the same
   offset can't share a manifest (dma_cgram pinch). Suggested offset field / array.
+- #211 — OPEN (bug): audio_rms_min reads a silent ring (RMS 0.0) under luna
+  test for a ROM that is playing (blocks audio + apu_switch migration).
 
 ## Resolved / no longer open
 - Cross-arch WRAM determinism — RESOLVED, no bug (CI x86==arm on v1.14.0;
