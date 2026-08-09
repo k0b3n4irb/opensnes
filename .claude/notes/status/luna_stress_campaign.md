@@ -127,8 +127,25 @@ covered the 3 asks + a representative slice, not the whole catalogue. So:
 Net: the entire luna v1.14.0 delivery (94 MCP tools + the search_memory fix +
 `luna test` + JSON peeks + the CLI surface exercised by probes) is validated.
 
+## Does luna meet our needs? (assessment 2026-08-09)
+
+Core needs — **met**: headless run/coverage/visual-regression/WRAM oracle,
+native chips (SA-1/SuperFX/DSP-1), full MCP debug surface (94/94), `luna test`,
+determinism oracles, DSP/APU visibility. Remaining needs:
+
+1. **`luna test` assert expressiveness** — the manifest grammar (value/fbhash/
+   log) can't express ~13 of our 18 probes (deltas/directional, thresholds,
+   audio energy, trace-count, block/non-WRAM-space). Blocks retiring the Python
+   harness. **Filed: luna#205** (the prototype = our probes = the spec).
+2. **Cross-arch WRAM determinism** — mapandobjects/slope_collision diverge
+   x86↔arm (root cause untracked). Needs a cross-arch repro to file; can't
+   reproduce single-arch here. Still open.
+3. **Audio *content* analysis** (melody/tempo) — the audio_analyze graveyard.
+   We prove DSP registers, not "right notes". Hard; maybe not luna's job yet.
+
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
+- #205 — OPEN (enh): richer `luna test` asserts to fully subsume the harness.
 
 ## Candidate owner-questions (not filed)
 - STAT78 PPU2 version: which 5C78 revision does luna intend to model (2 vs 3)?
