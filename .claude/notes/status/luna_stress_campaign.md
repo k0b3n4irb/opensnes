@@ -298,3 +298,13 @@ end state reached.
 
 Campaign arc: luna v1.13.0 → v1.17.0 in ~2 days; issues #126,#205,#207,#209,
 #210,#211,#212,#217,#218 all shipped; 19 probes → 45 native manifests.
+
+## Wave 9 — post-retirement accuracy probe: decimal mode (2026-08-09)
+
+Fresh corner (owner: "keep éprouver luna and the SDK"): 65816 **decimal-mode
+(BCD) ADC/SBC** via `stress/bcd` (asm — the D flag isn't reachable from C).
+7 cases incl. the invalid-nibble adjust (0A→10), 99+1 wrap, 50+50=BCD-100, and
+the borrow (00−01→99). luna == Mesen2 **byte-for-byte** (values + carry + V/Z/N
+flags: `102c...dec0`) == documented 65816. No finding — luna's decimal unit is
+correct and the toolchain assembled/ran it fine. Locked as a luna-only
+regression (`bcd.toml`); test-manifests now 46. No new luna request warranted.
