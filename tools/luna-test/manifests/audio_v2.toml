@@ -14,3 +14,14 @@ V1_ADSR2 = 0xE8
 V4_ADSR1 = 0x00
 V4_GAIN = 0x5A
 DIR = 0x0A
+# Echo/FIR block (restored coverage the Python probe had: values are luna's,
+# verified — the old probe printed some decimal: EFB 40=0x28, EVOL 20=0x14,
+# FIR0 96=0x60).
+FLG = 0x00
+ESA = 0xC0
+EDL = 0x03
+EFB = 0x28
+EON = 0x01
+EVOL_L = 0x14
+EVOL_R = 0x14
+FIR0 = 0x60
