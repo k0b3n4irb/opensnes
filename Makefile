@@ -198,6 +198,7 @@ test-tools:
 	@python3 tools/smconv/tests/run_golden.py
 	@python3 tools/wav2brr/tests/run_golden.py
 	@python3 tools/palplan/tests/run_golden.py
+	@python3 tools/aseprite2snes/tests/run_golden.py
 
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds

@@ -13,6 +13,7 @@
 *.dbg
 
 # Binary executables (rebuilt from source)
+tools/aseprite2snes/aseprite2snes
 tools/font2snes/font2snes
 tools/gfx4snes/gfx4snes
 tools/img2snes/img2snes

@@ -56,6 +56,7 @@ GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
 WAV2BRR  := $(OPENSNES)/bin/wav2brr
 PALPLAN  := $(OPENSNES)/bin/palplan
+ASEPRITE2SNES := $(OPENSNES)/bin/aseprite2snes
 TEMPLATES := $(OPENSNES)/templates
 
 # Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.

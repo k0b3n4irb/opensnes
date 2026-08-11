@@ -25,6 +25,9 @@ Most assets flow through a short, one-way pipeline from source art to ROM data:
   font.png ──► font2snes ──► text tiles      (dmaCopyVram)
   sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)
   music.it ──► smconv    ──► SNESMOD bank    (spcLoad / spcPlay)
+
+  hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMeta)
+            └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)
 ```
 
 Each tool does exactly one conversion; the Makefile chains them. It is the
@@ -42,6 +45,7 @@ testable steps rather than one opaque converter.
 | @subpage tools_wav2brr | a PCM `.wav` | a `.brr` sound sample | auto (drop a WAV in `res/`) |
 | @subpage tools_smconv | an Impulse Tracker `.it` | a SNESMOD soundbank | auto (`USE_SNESMOD`) |
 | @subpage tools_palplan | a manifest of `.pal` files | a CGRAM layout + C header | manual, project-level |
+| @subpage tools_aseprite2snes | an Aseprite animation export | AnimClip tables (one per tag) | one line per sprite |
 
 ## Three levels of wiring
 
