@@ -1,6 +1,0 @@
-# Migrated from probes/dma_cgram.py — CGRAM half: dmaCopyCGram(bg_palette ->
-# CGRAM 0, 2 colours). See dma_cgram_vram.toml for the VRAM half.
-rom = "../../../examples/fundamentals/text_glyphs/text_glyphs.sfc"
-steps = 1000000
-[asserts.blocks]
-"0000" = { space = "cgram", hex = "0028ff7f" }

@@ -1,0 +1,13 @@
+# Migrated from probes/dma_cgram.py. text_glyphs performs two boot DMAs:
+#   dmaCopyVram(font_tiles  -> VRAM word 0, 144 bytes)
+#   dmaCopyCGram(bg_palette -> CGRAM 0,     2 colours)
+# Assert both landed exactly. Merged from the former dma_cgram_vram.toml +
+# dma_cgram_cgram.toml: pre-#210 the [asserts.blocks] key WAS the offset, so
+# two spaces at offset 0 (VRAM[0] + CGRAM[0]) collided as a duplicate TOML key
+# and needed two files. luna v1.16.0 (#210) accepts a free-label key + an
+# explicit `offset` field, so they coexist here in one manifest.
+rom = "../../../examples/fundamentals/text_glyphs/text_glyphs.sfc"
+steps = 1000000
+[asserts.blocks]
+font_tiles = { space = "vram",  offset = "0000", hex = "000000000000000000000000000000006600660066007e0066006600660000007e00600060007c00600060007e0000006000600060006000600060007e0000003c00660066006600660066003c000000c600c600c600d600fe00ee00c60000007c00660066007c006c0066006600000078006c006600660066006c007800000018001800180018001800000018000000" }
+bg_palette = { space = "cgram", offset = "0000", hex = "0028ff7f" }
