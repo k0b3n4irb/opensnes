@@ -80,6 +80,26 @@ failure is silent. This is why the example was written with `if/else` around two
 `textPrintAt` calls rather than a ternary — a deliberate avoidance with this
 note as the paper trail, **not** a fix.
 
+## Blast radius (measured 2026-08-13, repro `..._blast.c`)
+
+Not arg-specific. Every *use* of a ternary-of-address-constants drops the bank —
+the phi predecessors only write the low word (`sta 4,s`); consumers correctly
+read both `4,s` and `6,s`, but `6,s` is never initialised:
+
+| Pattern | Broken? | Evidence |
+|---|---|---|
+| `sink(x ? "A" : "B")` (call arg) | **yes** | pushes `6,s` twice, low word dropped |
+| `int *f(x){ return x ? &ga : &gb; }` (pointer return) | **yes** | `sta.b tcc__retval_hi` reads uninit `6,s` |
+| `gptr = x ? "A" : "B"` (store to global far ptr) | **yes** | `sta.w gptr+2` from uninit `6,s` |
+| `x ? 11 : 22` (int ternary) | no | control — 2-byte value, correct |
+| `tbl[x]` (array-of-ptr index) | no | the #121 far-read path, unaffected |
+
+The through-line: the phi/copy of an address constant is lowered as a **16-bit
+word** (`lda.w #sym ; sta lo`) with no companion bank write (`lda.w #:sym ; sta
+hi`), so the temp's high half is stack garbage regardless of how it is later
+consumed. The fix must make the copy/phi lowering of an address-constant into a
+4-byte (Kl/pointer) temp emit BOTH halves, mirroring the direct-use far path.
+
 ## Suggested next steps
 
 1. Reproduce with the file above; bisect the QBE lowering (`regression_method`).

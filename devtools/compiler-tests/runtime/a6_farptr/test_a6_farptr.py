@@ -41,7 +41,16 @@ CASES = [
 # A2 cell-#1 byte-load experiment (matrix green, corpus regressed, never
 # merged). A clean rebuild on the PINNED toolchain fails them. Before trusting
 # an XPASS here, `make clean` this directory first; `make tests` now does.
-KNOWN_FAIL = {"b2_0", "b2_7", "w2_0", "w2_2", "fp2", "ph2"}
+#
+# ph2 promoted out 2026-08-13: `pp = cond ? p2 : p0; ph2 = pp[5]` failed
+# because qbe's phi lowering (emitphimoves) dropped the SELECTED pointer's
+# bank byte — a phi/conditional yielding a Kl (far) value stored only the low
+# 16 bits, so the deref read the wrong bank. Fixed in w65816/emit.c; verified
+# fail->pass across a clean rebuild on the unfixed vs fixed compiler (NOT the
+# stale-ROM trap above). See .claude/notes/tech/ternary_addr_const_bank_drop.md.
+# (b2_0/b2_7/w2_0/w2_2/fp2 remain listed — they XPASS as a separate stale A6
+# far-deref-gap closure, out of scope for this fix.)
+KNOWN_FAIL = {"b2_0", "b2_7", "w2_0", "w2_2", "fp2"}
 
 
 def le(v, w):

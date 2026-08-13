@@ -1,0 +1,8 @@
+# The phi of two string-literal address constants (`x ? "A" : "B"`) must emit,
+# in EACH of the two predecessors, the bank half of the far pointer next to the
+# offset word. Two predecessors -> exactly two of each.
+#
+# Bank half: `lda.w #:sym` (WLA-DX `:` = 8-bit bank operator). Was missing.
+count 2 lda\.w #:string
+# Offset word: `lda.w #sym` (no colon). Present before and after the fix.
+count 2 lda\.w #string\.[0-9]

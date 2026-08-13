@@ -45,7 +45,7 @@ luna v1.17.0 · `luna state -n <steps>` per ROM · 84 ROMs · **82 OK, 2 INPUT-D
 | `color/shadow_tint` | OK | live (75f/74nmi) |
 | `color/transparency` | OK | live (141f/141nmi) |
 | `fundamentals/text_glyphs` | OK | live (71f/70nmi) |
-| `games/breakout` | OK | live (88f/87nmi) |
+| `games/breakout` | OK | live (89f/88nmi) |
 | `games/likemario` | OK | live (111f/102nmi) |
 | `games/mapandobjects` | OK | live (87f/86nmi) |
 | `games/mode7_flying` | OK | live (81f/80nmi) |
