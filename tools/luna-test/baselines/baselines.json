@@ -455,6 +455,12 @@
     "rom_sha256": "ef1297ed5a964b47a1192aa6123a54333ced984f521f524f8ad5737b1a4689cd",
     "steps": 3000000
   },
+  "sprites_aseprite_pipeline": {
+    "fbhash": "1eee854ed6dc2b94",
+    "luna_version": "v1.17.0",
+    "rom_sha256": "5128b53d9e8ee98e16363b5729aa844bc011282ac635c21d111d8cb47e114ee4",
+    "steps": 3000000
+  },
   "sprites_dynamic_metasprite": {
     "fbhash": "d8277d29bfd925c3",
     "luna_version": "v1.16.0",

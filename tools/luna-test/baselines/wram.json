@@ -279,6 +279,10 @@
     "stream": "a9a2571a333edfa68d215a8357c8ada1a6550e4f5cc30dc6329fe9abda5c0867",
     "rom_sha256": "ef1297ed5a964b47a1192aa6123a54333ced984f521f524f8ad5737b1a4689cd"
   },
+  "sprites_aseprite_pipeline": {
+    "stream": "2f7caca5b72528bf8c5aaaf0ba0b3a3f03c0722aa8c5806b562db38bdf9e972b",
+    "rom_sha256": "5128b53d9e8ee98e16363b5729aa844bc011282ac635c21d111d8cb47e114ee4"
+  },
   "sprites_dynamic_metasprite": {
     "stream": "f561d14fd67c2d17cdc00130e29926676ee5ac9d6f2fa6d00d1ff0dce097a6a5",
     "rom_sha256": "048f5ce1ebfeb545c22cd02a7ae867827b49720da6dd819761e9297bbe915860"

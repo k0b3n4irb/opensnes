@@ -1,0 +1,12 @@
+# The aseprite_pipeline demo: gfx4snes -P metasprite table + aseprite2snes
+# AnimClip, drawn by oamDrawMeta. The 32x48 hero expands to 6 hardware sprites;
+# asserting them present guards the whole generated-asset pipeline at once.
+rom = "../../../examples/sprites/aseprite_pipeline/aseprite_pipeline.sfc"
+steps = 3000000
+[asserts.oam]
+visible = { ge = 6 }
+[asserts.oam.sprites.0]
+x = 112
+y = 87
+w = 16
+h = 16
