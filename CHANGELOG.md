@@ -2,6 +2,62 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.36.0] — 2026-08-14
+
+A testing-infrastructure and sprite-tooling release, with one user-facing
+compiler fix. The **luna-first migration completes**: every functional probe
+now runs as a native `luna test` manifest — the last 19 Python probes retired,
+zero left — and a stress campaign hardened luna across CPU/PPU/APU accuracy and
+reliability (9 issues filed and shipped upstream, luna v1.14.0 → v1.17.0). Two
+new asset tools — **palplan** and **aseprite2snes** — plus a full
+Aseprite → animated-metasprite example round out the sprite pipeline.
+
+### Added
+- feat(tools): **aseprite2snes** — converts an Aseprite `--data --list-tags`
+  export into OpenSNES `anim.h` `AnimClip` tables, one clip per tag, with
+  per-frame durations (ms → ticks) and playback direction folded into the frame
+  order. Pairs with `gfx4snes -P`: gfx4snes owns the pixels and metasprite
+  table, aseprite2snes owns the timeline that indexes it. Golden-tested,
+  documented (`docs/tools/aseprite2snes.md`).
+- feat(examples): **aseprite_pipeline** — a sprites example whose every byte of
+  animation data is machine-generated from one Aseprite project
+  (`gfx4snes -P` + `aseprite2snes`), animated via `animTickMeta`/`oamDrawMeta`;
+  press A to toggle the two generated clips. The living reference for the
+  two-tool sprite pipeline.
+- feat(tools): **palplan** — a project shared-palette planner that packs many
+  `.pal` files into the SNES's 8 BG + 8 sprite CGRAM slots, merges identical
+  palettes, fails loudly on over-subscription, and emits a C header of named
+  offsets. Wired into the `rpg` example's sprite-palette layout.
+
+### Fixed
+- fix(compiler): a **conditional or ternary that selects a far pointer no longer
+  drops the pointer's bank byte** — a silent-failure codegen bug. qbe's phi
+  lowering stored only the low 16 bits of a `Kl` (4-byte far) phi result, so
+  `x ? "A" : "B"` or `cond ? pa : pb` passed a corrupt pointer (wrong bank) to a
+  call, return, or store. Now both halves are emitted. Guarded by a compile-time
+  pin and the `a6_farptr` runtime matrix's `ph2` cell.
+
+### Changed
+- test(luna-test): **the luna-first harness migration is complete** — all 19
+  remaining Python functional probes were ported to native `luna test`
+  manifests (input/mouse/Super Scope, SRAM round-trip, DSP registers, DMA
+  budget/safety, OAM decode, audio energy, coprocessor execution, …). The
+  functional harness is now `luna test` over ~47 manifests; `probes/` retains
+  only the thin orchestration helpers.
+- test(luna-test): a **luna stress campaign** added accuracy and reliability
+  regression probes — hardware math (`$4202`-`$4216`), open-bus/MDR, 65816
+  decimal mode (BCD), PPU sprite-per-line overflow (STAT77 range/time-over),
+  and a full 94-tool MCP surface sweep — each cross-checked luna == Mesen2 ==
+  published reference. Nine luna issues were filed and shipped (luna v1.14.0
+  → v1.17.0); the pinned binary tracks v1.17.0.
+- test(compiler): the `a6_farptr` far-pointer runtime matrix is **fully green**
+  (14/14) — the A6 far-deref gap closed and its stale `KNOWN_FAIL` cells were
+  cleared, so every deref form is now an active regression guard.
+
+### Documentation
+- docs: the **OpenSNES showcase is the doc-site landing page**, and the craft
+  and tools sections are woven into the newcomer journey.
+
 ## [0.35.0] — 2026-08-07
 
 A documentation-and-tooling release. The developer-experience push from 0.34.0
