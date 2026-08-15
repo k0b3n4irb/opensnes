@@ -72,6 +72,7 @@
 #include <snes/panel.h>
 
 #include "res/entities.inc"     /* SPAWN/CHEST/NPC_TABLE from the .tmj */
+#include "res/palplan.h"        /* PAL_HERO_* / PAL_NPC_* — sprite-slot plan */
 
 /** @brief A villager: where it stands and what it says. The struct
  * shape and the rows both come from the Entities layer of town.tmj, so
@@ -378,10 +379,12 @@ int main(void) {
     bgSetMapPtr(1, VRAM_UI_MAP, SC_32x32);
     build_panel();
 
-    /* OBJ: hero (palette 0) and villager (palette 1) share the tiles */
+    /* OBJ: hero and villager share the tiles, one palette slot each.
+     * The CGRAM offsets come from res/palplan.h — palplan assigned the
+     * slots, so these never collide even as more sprite palettes appear. */
     dmaCopyVram(hero_tiles, VRAM_HERO, (u16)(hero_tiles_end - hero_tiles));
-    dmaCopyCGram(hero_pal, 128, 32);       /* OBJ palette 0 */
-    dmaCopyCGram(npc_pal, 144, 32);        /* OBJ palette 1 */
+    dmaCopyCGram(hero_pal, PAL_HERO_CGRAM, 32);   /* OBJ slot PAL_HERO_SLOT */
+    dmaCopyCGram(npc_pal, PAL_NPC_CGRAM, 32);     /* OBJ slot PAL_NPC_SLOT  */
     oamInit(OBJ_SIZE8_L16, OBJ_NAME_BASE(VRAM_HERO));
 
     /* spawn from the Tiled Entities layer */
@@ -506,12 +509,13 @@ int main(void) {
             bgSetScroll(0, cam_x, cam_y);
         }
 
-        draw_char(0, hero_x, hero_y, cam_x, cam_y, hero_facing, walk_phase, 0);
+        draw_char(0, hero_x, hero_y, cam_x, cam_y, hero_facing, walk_phase,
+                  PAL_HERO_SLOT);
         {
             u8 n;
             if (scene == SCENE_HOUSE) {
                 draw_char(1, HOUSE_NPC_TX * 8, HOUSE_NPC_TY * 8,
-                          cam_x, cam_y, FACE_DOWN, 0, 1);
+                          cam_x, cam_y, FACE_DOWN, 0, PAL_NPC_SLOT);
                 for (n = 1; n < NPC_COUNT; n++) {
                     oamHide((u8)(n + 1));
                 }
@@ -520,7 +524,7 @@ int main(void) {
                 for (n = 0; n < NPC_COUNT; n++) {
                     draw_char((u8)(n + 1), (u16)(npcs[n].tx * 8),
                               (u16)(npcs[n].ty * 8), cam_x, cam_y,
-                              FACE_DOWN, 0, 1);
+                              FACE_DOWN, 0, PAL_NPC_SLOT);
                 }
             }
         }

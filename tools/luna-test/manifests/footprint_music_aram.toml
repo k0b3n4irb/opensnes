@@ -1,0 +1,4 @@
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+steps = 4000000
+[asserts.footprint]
+aram = { nonzero_min = 20000 }

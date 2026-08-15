@@ -1,0 +1,13 @@
+# Migrated from probes/soundboard.py. cp1: audioInit done, nothing pressed
+# (play_count 0). cp2: hold A -> play_count>=1, last_voice 0 (round-robin).
+rom = "../../../examples/audio/soundboard/soundboard.sfc"
+[[checkpoint]]
+at_frame = 200
+[checkpoint.values]
+play_count = { eq = 0, width = 2 }
+[[checkpoint]]
+at_frame = 320
+input = "220:0x0080"
+[checkpoint.values]
+play_count = { ge = 1, width = 2 }
+last_voice = { eq = 0, width = 1 }

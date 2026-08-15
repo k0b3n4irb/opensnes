@@ -1,0 +1,14 @@
+# Migrated from probes/state_machine.py (dynamic_map: A toggles is_map32x32).
+rom = "../../../examples/maps/dynamic_map/dynamic_map.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]                 # pulse A -> toggles
+at_frame = 120
+input = "60:0x0080,64:0"
+[checkpoint.delta]
+is_map32x32 = "changed"
+[[checkpoint]]                 # pulse A -> toggles back
+at_frame = 180
+input = "120:0x0080,124:0"
+[checkpoint.delta]
+is_map32x32 = "changed"

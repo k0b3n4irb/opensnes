@@ -1,0 +1,14 @@
+# Migrated from probes/map_scroll.py.
+rom = "../../../examples/maps/map_scroll/map_scroll.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+xloc = "increased"
+[[checkpoint]]
+at_frame = 180
+input = "120:0x0200,179:0"
+[checkpoint.delta]
+xloc = "decreased"

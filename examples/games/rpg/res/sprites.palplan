@@ -1,0 +1,15 @@
+# Sprite-palette plan for the RPG template.
+#
+# The OBJ palettes are the axis that grows as the game gains NPCs, enemies
+# and items — exactly where a planner earns its keep. palplan assigns each
+# a collision-free sprite slot and writes palplan.h, so main.c never
+# hard-codes a CGRAM index or an OAM palette number: add a villager here
+# and the slots stay correct for free.
+#
+# (The BG palettes are managed differently — the two scenes SWAP the same
+#  slot 0 at runtime and the text layer owns slot 1 via setColor(), a
+#  dynamic layout palplan's static plan deliberately does not model.)
+#
+# name   type    file
+hero     sprite  hero.pal
+npc      sprite  npc.pal

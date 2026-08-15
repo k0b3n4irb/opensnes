@@ -1,0 +1,20 @@
+# Migrated from probes/mouse.py (v1.16.0 peripheral input). Sustained pushes
+# saturate the clamped cursor — value independent of sensitivity.
+rom = "../../../examples/input/mouse/mouse.sfc"
+[[checkpoint]]
+at_frame = 60
+mouse = "30:0,0,0"
+[checkpoint.values]
+mouse_con = { eq = 1, width = 1 }
+[[checkpoint]]
+at_frame = 180
+mouse = "60:20,20,0"
+[checkpoint.values]
+pos_x = { eq = 255, width = 2 }
+pos_y = { eq = 223, width = 2 }
+[[checkpoint]]
+at_frame = 300
+mouse = "180:-20,-20,0"
+[checkpoint.values]
+pos_x = { eq = 0, width = 2 }
+pos_y = { eq = 0, width = 2 }

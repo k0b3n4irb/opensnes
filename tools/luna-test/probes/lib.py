@@ -14,6 +14,7 @@ on a held value, so exact frame landing is not required.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -42,28 +43,31 @@ def _addr_spec(addr: Addr) -> str:
     return f"{bank:02X}:{off:04X}"
 
 
-# Each peek dump line is "$AABBCC  XX XX …" (≤16 bytes). A multi-byte peek
-# spans several such lines, so collect bytes from ALL of them.
-_PEEK_LINE_RE = re.compile(r"\$[0-9A-Fa-f]{6}\s+((?:[0-9A-Fa-f]{2}\s*)+)")
-
-
 def peek(luna: str, rom: Path, steps: int, addr: Addr,
          count: int, input_script: str | None = None) -> list[int]:
     """Run `luna state -n steps [--input …] --peek <addr>:count`; return bytes.
 
     `addr` is a symbol name (luna resolves it from `<rom>.sym`) or (bank, off).
+
+    Reads the structured `peeks` array from the `--out` JSON (luna#175, the
+    supported channel), not the stderr hexdump: `--out -` emits the state JSON
+    on stdout, and each `--peek` becomes one `{spec, space, addr, bytes_hex}`
+    entry. A single `--peek` is issued here, so `peeks[0].bytes_hex` is the data.
     """
-    cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null",
+    cmd = [luna, "state", "-n", str(steps), "--out", "-",
            "--peek", f"{_addr_spec(addr)}:{count}", str(rom)]
     if input_script:
         cmd[6:6] = ["--input", input_script]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-    out: list[int] = []
-    for m in _PEEK_LINE_RE.finditer(proc.stderr):
-        out += [int(b, 16) for b in m.group(1).split()]
+    try:
+        peeks = json.loads(proc.stdout)["peeks"]
+        out = list(bytes.fromhex(peeks[0]["bytes_hex"]))
+    except (json.JSONDecodeError, KeyError, IndexError, ValueError) as e:
+        raise RuntimeError(
+            f"peek JSON parse failed for {rom.name} ({type(e).__name__}): "
+            f"{(proc.stderr or proc.stdout).strip()[:200]}") from e
     if len(out) < count:
-        raise RuntimeError(f"peek parse failed for {rom.name} "
-                           f"(got {len(out)}/{count}): {proc.stderr.strip()[:200]}")
+        raise RuntimeError(f"peek short for {rom.name} (got {len(out)}/{count})")
     return out[:count]
 
 

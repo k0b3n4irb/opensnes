@@ -1,0 +1,6 @@
+# Migrated from probes/dma_budget.py (#217: [asserts.dma] buckets like the probe).
+rom = "../../../examples/sprites/animated_sprite/animated_sprite.sfc"
+steps = 5000000
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 4096

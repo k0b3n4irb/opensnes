@@ -1,0 +1,9 @@
+# Migrated from probes/movement.py.
+rom = "../../../examples/games/likemario/likemario.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]                 # RIGHT -> mario_x up
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+mario_x = "increased"

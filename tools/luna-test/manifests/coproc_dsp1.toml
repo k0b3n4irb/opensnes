@@ -1,0 +1,6 @@
+# Migrated from probes/coproc.py (DSP-1). firmware gate SKIPs in CI (no dsp1b.rom).
+rom = "../../../examples/chips/dsp1_cube/dsp1_cube.sfc"
+steps = 5000000
+firmware = "dsp1b.rom"
+[asserts.trace]
+dsp1 = { min = 1 }

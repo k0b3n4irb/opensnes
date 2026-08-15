@@ -1,0 +1,19 @@
+# Migrated from probes/hw_math.py (the ppumul half) to a native `luna test`
+# manifest — luna#181. PPU Mode 7 signed multiply ($211B M7A × $211C M7B ->
+# signed 24-bit at $2134/$2135/$2136). Values verified bit-exact vs Mesen2 +
+# fullsnes during the stress campaign. res[] block at $00:00C8, 3 raw product
+# bytes per case (low u16 + high u8).
+rom = "ppumul.sfc"
+steps = 500000
+
+[asserts]
+wdm_empty = true               # no SNES_ASSERT fired
+
+[asserts.values]               # low u16 (+ high u8 where the sign matters)
+"00:C8" = 0x1388               # 1000 * 5      = +5000        (0x001388)
+"00:CB" = 0xEC78               # -1000 * 5     = -5000        (low 16 of 0xFFEC78)
+"00:CD" = 0xFF                 #   ...high byte $FF -> negative
+"00:D4" = 0x7F81               # 32767 * 127   = +4161409     (low 16 of 0x3F7F81)
+"00:D6" = 0x3F                 #   ...high byte $3F
+"00:D9" = 0x40                 # -32768 * -128 = +4194304     (0x400000) high byte
+"00:E0" = 0xC0DE               # done marker

@@ -1,0 +1,15 @@
+# Migrated from probes/state_machine.py (scene_stack: START push then pop).
+# scene_top is a 1-byte depth counter (width=1; the byte above it is unrelated).
+rom = "../../../examples/basics/scene_stack/scene_stack.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]                 # START -> push
+at_frame = 120
+input = "60:0x1000,64:0"
+[checkpoint.delta]
+scene_top = { dir = "increased", width = 1 }
+[[checkpoint]]                 # START -> pop
+at_frame = 180
+input = "120:0x1000,124:0"
+[checkpoint.delta]
+scene_top = { dir = "decreased", width = 1 }

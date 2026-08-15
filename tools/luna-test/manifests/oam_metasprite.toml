@@ -1,0 +1,5 @@
+# Migrated from probes/oam_struct.py (#218): metasprite/animated place >=1 sprite.
+rom = "../../../examples/sprites/metasprite/metasprite.sfc"
+steps = 3000000
+[asserts.oam]
+visible = { ge = 1 }

@@ -1,0 +1,9 @@
+spr0 sprite spr0.pal
+spr1 sprite spr1.pal
+spr2 sprite spr2.pal
+spr3 sprite spr3.pal
+spr4 sprite spr4.pal
+spr5 sprite spr5.pal
+spr6 sprite spr6.pal
+spr7 sprite spr7.pal
+spr8 sprite spr8.pal

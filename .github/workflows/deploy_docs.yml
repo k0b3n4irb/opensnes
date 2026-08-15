@@ -29,7 +29,11 @@ jobs:
           doxygen --version
 
       - name: Build documentation
-        run: cd docs && doxygen Doxyfile
+        # `make docs` runs Doxygen and then installs the showcase landing page
+        # as index.html (preserving the Doxygen hub as documentation.html).
+        # Using the Makefile target keeps the local build and the deployed
+        # site identical — see the `docs:` target in the root Makefile.
+        run: make docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

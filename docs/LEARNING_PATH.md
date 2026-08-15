@@ -1,10 +1,14 @@
 # Learn SNES Development {#learning_path}
 
-A curated path through the 75 examples — not a feature tour, a **developer's
+A curated path through the examples — not a feature tour, a **developer's
 journey**. You don't wake up wanting "Mode 7"; you wake up with a question
 about the game you're building, and it changes as you go. Each stage below is
 one of those questions, and the confidence it buys you. This is a hand-picked
 subset; for the exhaustive index see @ref examples_by_category.
+
+Two companions run alongside this journey: @ref craft for the *design* decisions
+behind each step — what to build, and how to budget it on the hardware — and
+@ref tools for turning your own art, maps and audio into SNES data.
 
 At every step the goal is the same: never a wall you can't climb with what
 you just learned, always a result that works, always the *why*.
@@ -32,6 +36,10 @@ underpins everything visual on the SNES.
 @subpage examples_sprites_animated_sprite
 
 @subpage examples_sprites_sprite_swarm
+
+> Making it *your* art: @ref tools_gfx4snes turns a PNG into the tiles, palette
+> and tilemap this stage builds on, and @ref craft_planning budgets the VRAM
+> before you draw a pixel.
 
 > Under the hood — how a glyph becomes pixels with no module at all:
 > @subpage examples_fundamentals_text_glyphs
@@ -66,6 +74,10 @@ ground with tile collision.
 @subpage examples_maps_slope_collision
 
 @subpage examples_basics_collision_demo
+
+> Author the world, don't hand-code it: @ref craft_tiles_to_levels is the
+> think-in-metatiles workflow, and @ref tools_tmx2snes converts a Tiled level
+> into the map binaries `map_scroll` and `tiled` load.
 
 ## Stage 4 — "Can I make it feel good?"
 

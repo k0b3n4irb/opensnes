@@ -1,0 +1,5 @@
+# Migrated from probes/audio.py (music): SPC/S-DSP audibly playing (audio_rms_min, #211 fixed).
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+frames = 240
+[asserts]
+audio_rms_min = 100.0

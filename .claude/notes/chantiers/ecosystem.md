@@ -100,8 +100,28 @@ example; "constraints as creative fuel" framing.
    README ↔ CLI). Not created as a separate external GitHub repo — the in-repo
    dir is the source of truth, publishable as a template later. ATTRIBUTION
    entry added for the sprite.
-4. **`palplan`** — project shared-palette planner (build on tiledpalettequant,
-   MIT; locked-index repack-on-demand). #1 community pain; highest value.
+4. **`palplan`** — DONE 2026-08-08 (`tools/palplan/`, wired into `make tools` +
+   `make test-tools` + `make/common.mk` `PALPLAN :=`). Scoped v1 as an
+   **allocator over existing `.pal` files**, NOT the tiledpalettequant-style
+   repack-on-demand — deliberately: merging non-identical palettes means
+   re-indexing tile pixels, which palplan never sees, so a blind merge would
+   silently wrong-colour tiles (exactly the failure class PHILOSOPHY.md
+   refuses). So v1 only merges byte-identical palettes (always safe) and
+   *reports* near-duplicates as manual merge candidates. Single-file C tool
+   (`src/palplan.c`): manifest parse (`name type file`, `#` comments, paths
+   relative to manifest dir) → load raw LE BGR555 (mirrors gfx4snes
+   `palette_impose()`) → identity-merge within region → slot allocation (BG
+   0-127 / sprite 128-255, `n*16`) → over-subscription hard-fail (>8 per
+   region, exit 1) → near-dup hints (incl. the sprite "differ only at
+   transparent colour 0" strong case) → emit C header (`PAL_<NAME>_CGRAM/
+   _SLOT/_COLORS`) + optional combined 512-byte CGRAM image. Golden test =
+   committed BGR555 fixtures (identical pair, 2-apart pair, transparent-0
+   pair, 4-colour palette) byte-compared + over-subscription exit assertion.
+   Docs: `docs/tools/palplan.md {#tools_palplan}`, `tools/README.md` glance
+   row + level-3 wiring note, `tools/palplan/README.md`. Anchored to
+   collision_demo (hand-picked offsets it would name) + rpg (asset count where
+   it earns its keep). v2 left documented: tight-pack 2bpp (base coupled to
+   bgnum) and re-quantise merge (upstream tiledpalettequant/SuperFamiconv).
 5. **`aseprite2snes`** — Aseprite CLI JSON (tags→frames) → metasprite+anim.
 6. **DX**: watch/live-reload (fswatch→Mesen2), linker→Mesen2 C-symbol export,
    curate ~8–10 examples as annotated "study carts".

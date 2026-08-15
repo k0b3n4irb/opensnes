@@ -1,0 +1,7 @@
+# Migrated from probes/coproc.py — SA-1 ran AND the chip->I-RAM->C handshake landed.
+rom = "../../../examples/chips/sa1_hello/sa1_hello.sfc"
+steps = 1000000
+[asserts.trace]
+sa1 = { min = 1 }
+[asserts.values]
+sa1_status = 0xA5

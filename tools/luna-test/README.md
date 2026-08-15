@@ -12,13 +12,14 @@ Migration history: `.claude/notes/chantiers/luna_migration.md`.
 **Sole test backend** (the snes9x-WASM + Mesen2 harness `tools/opensnes-emu`
 was removed). `make tests` runs corpus liveness coverage + full-corpus visual
 regression + functional probes (scripted input → WRAM asserts), and CI adds
-the WRAM-state stream regression (`wram_regress.py`, cross-arch exclusions).
+the WRAM-state stream regression (`wram_regress.py`, whole corpus on both arches).
 Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 
 ## Requirements
 
-- The pinned luna binary — version in `tools/luna-test/luna.version` (currently
-  **`v1.1.0`**). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+- The pinned luna binary — the exact version lives in
+  `tools/luna-test/luna.version` (the single source of truth; **`v1.14.0`** at
+  time of writing). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
   `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
   `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
@@ -68,7 +69,7 @@ exclusions), input sequences (`--input`), the full-corpus manifest, and the
 CI rewrite (both Linux arches). For interactive debugging, `luna mcp` /
 luna's GUI are available alongside Mesen2.
 
-## Hardening tests (luna v1.1.0 capabilities)
+## Hardening tests (luna scripted-input & trace capabilities)
 
 Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
 never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):

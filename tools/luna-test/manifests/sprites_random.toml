@@ -1,0 +1,10 @@
+# Migrated from probes/sprites_random.py (random half): pulsing A advances the
+# PRNG output current_value. (simple_sprite OAM half is sprite_oam.toml.)
+rom = "../../../examples/basics/random/random.sfc"
+[[checkpoint]]
+at_frame = 60
+[[checkpoint]]
+at_frame = 120
+input = "60:0x0080,64:0"
+[checkpoint.delta]
+current_value = "changed"

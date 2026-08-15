@@ -1,0 +1,18 @@
+# Migrated from probes/apu_switch.py. Song select via B/A + audio playing.
+rom = "../../../examples/audio/apu_switch/apu_switch.sfc"
+[asserts]
+audio_rms_min = 100.0
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+current_song = { eq = 0, width = 1 }
+[[checkpoint]]
+at_frame = 120
+input = "60:0x8000,63:0"
+[checkpoint.values]
+current_song = { eq = 1, width = 1 }
+[[checkpoint]]
+at_frame = 180
+input = "120:0x0080,123:0"
+[checkpoint.values]
+current_song = { eq = 0, width = 1 }

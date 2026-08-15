@@ -1,0 +1,7 @@
+# Negative control: no srm_in -> empty SRAM -> vtl stays zero (so the read match
+# can only have come from the persisted file).
+rom = "../../../examples/memory/save_game/save_game.sfc"
+frames = 120
+input = "30:0x8000"
+[asserts.blocks]
+vtl = "0000000000000000"

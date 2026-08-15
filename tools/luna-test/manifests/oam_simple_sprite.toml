@@ -1,0 +1,12 @@
+# Migrated from probes/oam_struct.py (#218 [asserts.oam]).
+rom = "../../../examples/sprites/simple_sprite/simple_sprite.sfc"
+steps = 3000000
+[asserts.oam]
+visible = 1
+[asserts.oam.sprites.0]
+x = 112
+y = 95
+tile = 16
+priority = 3
+w = 32
+h = 32

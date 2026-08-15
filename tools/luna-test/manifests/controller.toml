@@ -1,0 +1,33 @@
+# Migrated from probes/controller.py. Hold each button during its leg; the NMI
+# auto-joypad read decodes it into pad_keys[0] (u16). One checkpoint per button.
+rom = "../../../examples/input/controller/controller.sfc"
+[[checkpoint]]
+at_frame = 40
+input = "20:0x8000"
+[checkpoint.values]
+pad_keys = 0x8000            # B
+[[checkpoint]]
+at_frame = 70
+input = "50:0x1000"
+[checkpoint.values]
+pad_keys = 0x1000            # START
+[[checkpoint]]
+at_frame = 100
+input = "80:0x0800"
+[checkpoint.values]
+pad_keys = 0x0800            # UP
+[[checkpoint]]
+at_frame = 130
+input = "110:0x0100"
+[checkpoint.values]
+pad_keys = 0x0100            # RIGHT
+[[checkpoint]]
+at_frame = 160
+input = "140:0x0080"
+[checkpoint.values]
+pad_keys = 0x0080            # A
+[[checkpoint]]
+at_frame = 190
+input = "170:0x0020"
+[checkpoint.values]
+pad_keys = 0x0020            # L

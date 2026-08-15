@@ -1,0 +1,7 @@
+# Migrated from probes/sprites_random.py (simple_sprite half): oamSet(0,112,96,
+# 0x10,0,3,0) lands X=112,Y=95(y-1 pipeline),tile=0x10,attr=0x30 in the OAM
+# shadow oamMemory ($7E:0300). Exact 4-byte golden (CPU-bus symbol read).
+rom = "../../../examples/sprites/simple_sprite/simple_sprite.sfc"
+steps = 4000000
+[asserts.blocks]
+oamMemory = "705f1030"

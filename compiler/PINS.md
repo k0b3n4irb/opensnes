@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | e045ccc5d57b9dba9a64d58fca7a3c95fab28d6f | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
-| compiler/qbe | 1f38c0c1ca44476f2ccd59ae904bef4f2662404b | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
+| compiler/qbe | 8fbdc297fd3d1cacbfb18824e3b361fc1057d20f | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | 91c52b1f4ef3cc8ba3c0638f7536539579af6a9f | github.com/k0b3n4irb/wla-dx v10.7 (release tag) |
 <!-- END PINS -->
 
@@ -64,11 +64,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 51 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 52 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+8fbdc29 fix(w65816): emit the bank half for Kl phi args (conditional far pointers)
 1f38c0c fix(load): teach load forwarding the target's word size
 1884a20  fix(qbe): fold Osar as 32-bit signed on w65816 (chantier A7 Phase 1)
 179676e  feat(w65816): chantier A6+A7 — full pointer ABI + Kl pair lowering

@@ -1,0 +1,19 @@
+{ "frames": [
+   { "filename": "hero 0.aseprite", "frame": { "x": 0,  "y": 0, "w": 32, "h": 48 }, "duration": 120 },
+   { "filename": "hero 1.aseprite", "frame": { "x": 32, "y": 0, "w": 32, "h": 48 }, "duration": 120 },
+   { "filename": "hero 2.aseprite", "frame": { "x": 64, "y": 0, "w": 32, "h": 48 }, "duration": 90  },
+   { "filename": "hero 3.aseprite", "frame": { "x": 96, "y": 0, "w": 32, "h": 48 }, "duration": 120 }
+ ],
+ "meta": {
+   "app": "http://www.aseprite.org/",
+   "version": "1.3.7",
+   "image": "hero.png",
+   "format": "RGBA8888",
+   "size": { "w": 128, "h": 48 },
+   "scale": "1",
+   "frameTags": [
+     { "name": "walk", "from": 0, "to": 3, "direction": "forward",  "repeat": "0" },
+     { "name": "wave", "from": 0, "to": 3, "direction": "pingpong", "repeat": "0" }
+   ]
+ }
+}
