@@ -31,17 +31,28 @@ CASES = [
     ("fp2",  1, 0x44,       2, "param"), ("ph2",  1, 0x66,       2, "phi"),
     ("hi2",  2, 0x0002,     2, "ptr-hi"),   # pointer VALUE carries bank → passes pre-A6
 ]
-# The A6 gap: far DEREF of bank-$02 data. (hi2 is the pointer value, not a deref.)
-# FINDING (A1 baseline): l2_0 — the Kl (u32) load — is ALREADY bank-aware on qbe
-# 1884a20 (reads bank $02 correctly) while byte/word/param/phi are not. So the
-# long-load emit path is the working model to replicate for the other forms in A2.
+# The A6 gap this matrix was built to track — far DEREF of bank-$02 data
+# (byte/word/param/phi; hi2 is the pointer VALUE, not a deref) — is now CLOSED
+# on the pinned toolchain. Every cell is a green regression guard; KNOWN_FAIL
+# is empty.
 #
-# TRAP (2026-07-04): b2_0/b2_7/fp2 were briefly promoted out after XPASSing
-# locally — the XPASS came from a STALE local a6_farptr.sfc built during the
-# A2 cell-#1 byte-load experiment (matrix green, corpus regressed, never
-# merged). A clean rebuild on the PINNED toolchain fails them. Before trusting
-# an XPASS here, `make clean` this directory first; `make tests` now does.
-KNOWN_FAIL = {"b2_0", "b2_7", "w2_0", "w2_2", "fp2", "ph2"}
+# Closure history:
+#   - l2_0 (Kl long load) was already bank-aware at the A1 baseline (qbe
+#     1884a20); its long-load emit path was the model the other forms copied.
+#   - b2_0/b2_7/w2_0/w2_2/fp2 (byte/word/param DEREF) closed with the A6+A7
+#     far-pointer ABI; the KNOWN_FAIL set then went stale (a stale entry only
+#     prints "promote", never fails, so it lingered). Promoted out 2026-08-13.
+#   - ph2 (`pp = cond ? p2 : p0; ph2 = pp[5]`) closed 2026-08-13 by the
+#     phi-bank-drop fix in qbe emitphimoves — the conditional dropped the
+#     selected pointer's bank byte. See
+#     .claude/notes/tech/ternary_addr_const_bank_drop.md.
+#
+# TRAP (2026-07-04, kept as method): b2_0/b2_7/fp2 were once promoted out on a
+# STALE local a6_farptr.sfc (matrix green while the corpus regressed, never
+# merged). Before trusting an XPASS here, `make clean` this directory first
+# (`make tests` does) AND confirm the full corpus is green — both were done for
+# the 2026-08-13 promotion.
+KNOWN_FAIL = set()
 
 
 def le(v, w):

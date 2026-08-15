@@ -1,0 +1,14 @@
+# Migrated from probes/superscope.py (v1.16.0 peripheral input). Fire at (100,80);
+# raw h=124 (100 + ~24 latch offset), v=80 exact.
+rom = "../../../examples/input/superscope/superscope.sfc"
+[[checkpoint]]
+at_frame = 90
+superscope = "60:128,112,0"
+[checkpoint.values]
+scope_con = { eq = 1, width = 1 }
+[[checkpoint]]
+at_frame = 200
+superscope = "100:100,80,1;130:100,80,0;160:100,80,1"
+[checkpoint.values]
+scope_shothraw = { eq = 124, width = 2 }
+scope_shotvraw = { eq = 80, width = 2 }

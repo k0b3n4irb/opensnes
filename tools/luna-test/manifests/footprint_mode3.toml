@@ -1,0 +1,4 @@
+rom = "../../../examples/backgrounds/mode3/mode3.sfc"
+steps = 4000000
+[asserts.footprint]
+vram = { nonzero_min = 5000 }

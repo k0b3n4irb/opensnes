@@ -1,0 +1,8 @@
+# Migrated from probes/sram.py (v1.16.0 srm_out). Press A -> save slot1 to SRAM
+# ($70:0000), persist to sram_save.srm.
+rom = "../../../examples/memory/save_game/save_game.sfc"
+frames = 120
+input = "30:0x0080"
+srm_out = "sram_save.srm"
+[asserts.blocks]
+"70:0000" = "09000A0034127856"

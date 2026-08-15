@@ -25,6 +25,9 @@ Most assets flow through a short, one-way pipeline from source art to ROM data:
   font.png ──► font2snes ──► text tiles      (dmaCopyVram)
   sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)
   music.it ──► smconv    ──► SNESMOD bank    (spcLoad / spcPlay)
+
+  hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMeta)
+            └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)
 ```
 
 Each tool does exactly one conversion; the Makefile chains them. It is the
@@ -41,6 +44,8 @@ testable steps rather than one opaque converter.
 | @subpage tools_font2snes | a 96-glyph font PNG | 2bpp/4bpp text tiles | manual, optional |
 | @subpage tools_wav2brr | a PCM `.wav` | a `.brr` sound sample | auto (drop a WAV in `res/`) |
 | @subpage tools_smconv | an Impulse Tracker `.it` | a SNESMOD soundbank | auto (`USE_SNESMOD`) |
+| @subpage tools_palplan | a manifest of `.pal` files | a CGRAM layout + C header | manual, project-level |
+| @subpage tools_aseprite2snes | an Aseprite animation export | AnimClip tables (one per tag) | one line per sprite |
 
 ## Three levels of wiring
 
@@ -56,6 +61,9 @@ right one:
 3. **By hand, when you need them.** `img2snes` (RGB → indexed) and `font2snes`
    (custom font) are standalone pre-steps you run once and commit the result.
    Looping `wav2brr` samples are also hand-built (the loop points are yours).
+   `palplan` sits a level up from the per-asset tools: it plans your *whole
+   project's* palettes into the SNES's 8 BG + 8 sprite slots at once, so you run
+   it when your palette count grows, not per asset.
 
 All binaries live in `bin/` and are built by `make tools`. Every tool prints
 `--help`; the pages here are the guided version.

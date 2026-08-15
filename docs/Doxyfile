@@ -118,6 +118,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/windows/transparent_window \
                          ../examples/windows/window \
                          ../examples/windows/window_multi_hdma \
+                         ../examples/sprites/aseprite_pipeline \
                          ../examples/sprites/animated_sprite \
                          ../examples/sprites/dynamic_metasprite \
                          ../examples/sprites/dynamic_sprite \

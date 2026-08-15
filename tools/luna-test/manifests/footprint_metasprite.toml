@@ -1,0 +1,4 @@
+rom = "../../../examples/sprites/metasprite/metasprite.sfc"
+steps = 4000000
+[asserts.footprint]
+vram = { nonzero_min = 200 }

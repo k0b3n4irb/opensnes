@@ -1,0 +1,7 @@
+# Migrated from probes/open_bus.py (luna#205 [asserts.blocks]). ob.asm reads the
+# $2100 mirror through banks via lda.l bb:2100; the open bus returns the bank
+# byte (the MDR). res[] holds the raw results (see ob.asm). Verified vs Mesen2.
+rom = "openbus.sfc"
+steps = 500000
+[asserts.blocks]
+res = "3F0120100000000000000000DEC00000"

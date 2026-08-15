@@ -1,0 +1,5 @@
+# Migrated from probes/coproc.py — coprocessor executed >=1 instruction.
+rom = "../../../examples/chips/sa1_starfield/sa1_starfield.sfc"
+steps = 1000000
+[asserts.trace]
+sa1 = { min = 1 }

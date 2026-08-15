@@ -7,15 +7,15 @@ compare it against a committed baseline. This catches runtime-state regressions
 that never reach the screen (an uninitialised read, a mis-stepped counter, a
 changed allocation) — which the framebuffer fbhash can't see.
 
-CI gate with a cross-arch exclusion list. Unlike the framebuffer (luna
-guarantees `--print-fbhash` cross-arch), raw WRAM content is *not* a cross-arch
-guarantee: most examples hash identically across hosts, but two (mapandobjects,
-slope_collision) diverge x86_64 ↔ aarch64. Those two are skipped by default
-(CROSS_ARCH_EXCLUDE below) so the remaining 54 gate CI on both arches; pass
-`--all` on your own machine to cover them too against a same-arch baseline.
+CI gate on both arches — the WHOLE corpus. Historically two examples
+(mapandobjects, slope_collision) hashed differently x86_64 ↔ aarch64 and were
+excluded; re-verified on luna v1.14.0 via CI on both runner arches (2026-08-09),
+CI x86_64 == CI arm64 == the committed aarch64 baseline (bit-identical stream
+hash), so the exclusion is gone and every example gates WRAM on both arches now.
+CROSS_ARCH_EXCLUDE stays (empty) as an escape hatch. `--all` is therefore a
+no-op today (kept for when the set is non-empty again).
 
-  make test-wram                                    # compare vs baseline (54/56)
-  python3 tools/luna-test/wram_regress.py --all     # incl. arch-fragile pair
+  make test-wram                                    # compare vs baseline
   python3 tools/luna-test/wram_regress.py --update  # (re)baseline on this machine
 
 Provenance (issue #120): each baseline entry records the sha256 of the ROM
@@ -47,11 +47,16 @@ from luna_runner import (  # noqa: E402
 BASELINE = HERE / "baselines" / "wram.json"
 FRAMES = 90   # consecutive vblank-aligned frames to hash
 
-# The only two examples whose WRAM stream hashes differently x86_64 ↔ aarch64
-# (long interactive game loops; divergence root cause untracked). Skipped by
-# default so the other 54 can gate CI on both arches; include with --all when
-# running against a baseline captured on your own arch.
-CROSS_ARCH_EXCLUDE = {"games_mapandobjects", "maps_slope_collision"}
+# Cross-arch WRAM stability. Historically two examples (games_mapandobjects,
+# maps_slope_collision) hashed differently x86_64 ↔ aarch64 and were excluded
+# from the cross-arch gate. Re-verified on luna v1.14.0 via CI on BOTH runner
+# arches (2026-08-09): CI x86_64, CI arm64 and the committed aarch64 baseline
+# all produce the IDENTICAL stream hash (mapandobjects 56571bbf…,
+# slope_collision 824adfbd…). The old divergence was a stale/older-luna
+# artifact — the whole corpus now gates WRAM on both arches. The set stays
+# (empty) as an escape hatch should a future luna regression re-introduce a
+# host-dependent divergence.
+CROSS_ARCH_EXCLUDE = set()
 
 
 # Build-input suffixes for the per-example staleness check. Deliberately

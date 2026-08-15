@@ -1,0 +1,9 @@
+# palplan golden fixture — deterministic BGR555 palettes, OpenSNES-original.
+# name    type    file
+bg1       bg      bg1.pal
+bg2       bg      bg2.pal
+hud       bg      hud.pal
+hero      sprite  hero.pal
+enemy     sprite  enemy.pal
+boss      sprite  boss.pal
+ghost     sprite  ghost.pal

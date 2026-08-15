@@ -1,0 +1,7 @@
+# 65816 decimal-mode (BCD) ADC/SBC accuracy — verified bit-exact vs Mesen2 and
+# the documented 65816 behaviour (values + carry + V/Z/N flags), incl. the
+# invalid-nibble adjust (0A->10), the 99+1 wrap, and the borrow. Locked luna-only.
+rom = "bcd.sfc"
+steps = 500000
+[asserts.blocks]
+bcd_res = "102c472c002f006f102c252d99acdec0"

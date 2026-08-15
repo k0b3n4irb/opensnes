@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 83 examples organized by topic, building
+Learn SNES development step by step. 84 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -11,7 +11,7 @@ from basic concepts to complete games.
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 8 | BG modes 0/1/2/3/5, priority, LZ77, hi-res, offset-per-tile |
-| [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm |
+| [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 5 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 7 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
@@ -82,6 +82,7 @@ deep-dive of a step below.
 | 21 | [mode7/rotate_scale](mode7/rotate_scale/) | Mode 7 rotation and scaling |
 | 22 | [mode7/perspective](mode7/perspective/) | Pseudo-3D perspective (F-Zero style) |
 | 23 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
+| 23b | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
 | 24 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
 | 25 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
 | 26 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |

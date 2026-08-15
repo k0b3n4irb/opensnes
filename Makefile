@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -154,6 +154,7 @@ tests: test-compiler
 	@python3 tools/luna-test/luna_runner.py --coverage
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
+	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
 	@# change that CI then rejected on all five platforms — which is
@@ -196,6 +197,26 @@ test-tools:
 	@python3 tools/tmx2snes/tests/run_golden.py
 	@python3 tools/smconv/tests/run_golden.py
 	@python3 tools/wav2brr/tests/run_golden.py
+	@python3 tools/palplan/tests/run_golden.py
+	@python3 tools/aseprite2snes/tests/run_golden.py
+
+# Native `luna test` manifests (issue #181) — probes migrated off the Python
+# harness onto luna's own manifest runner (the luna-first direction). Builds
+# the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
+test-manifests:
+	@$(MAKE) -s -C tools/luna-test/stress/hwmath
+	@$(MAKE) -s -C tools/luna-test/stress/ppumul
+	@$(MAKE) -s -C tools/luna-test/stress/openbus
+	@$(MAKE) -s -C tools/luna-test/stress/bcd
+	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
+	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
+	@tools/luna-test/bin/luna test \
+		tools/luna-test/stress/hwmath/hwmath.toml \
+		tools/luna-test/stress/ppumul/ppumul.toml \
+		tools/luna-test/stress/openbus/openbus.toml \
+		tools/luna-test/stress/bcd/bcd.toml \
+		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
+		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
@@ -224,9 +245,18 @@ bench:
 
 docs:
 	cd docs && doxygen Doxyfile
+	@# The showcase landing page is the site's front door. Doxygen emits the
+	@# documentation hub (mainpage.md) as index.html; preserve it as
+	@# documentation.html, then install the showcase as the root index.html.
+	@# Every other generated page (getting_started.html, tools.html, …) is
+	@# untouched, so no doc URL breaks. Kept in the Makefile so a local
+	@# `make docs` and the CI deploy build the identical site.
+	@cp docs/build/html/index.html docs/build/html/documentation.html
+	@cp docs/landing/index.html docs/build/html/index.html
 	@echo "========================================="
 	@echo "Documentation generated in docs/build/html/"
-	@echo "Open docs/build/html/index.html in a browser"
+	@echo "  index.html         -> showcase landing (docs/landing/index.html)"
+	@echo "  documentation.html -> Doxygen docs hub (mainpage.md)"
 	@echo "========================================="
 
 #------------------------------------------------------------------------------

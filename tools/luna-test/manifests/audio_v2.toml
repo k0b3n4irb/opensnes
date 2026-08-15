@@ -1,0 +1,27 @@
+# Migrated from probes/audio_v2.py (v1.16.0 [asserts.dsp]). libtest fixture runs
+# audioInit + setters; assert the S-DSP register file they poked.
+rom = "../../../devtools/libtests/libtest.sfc"
+steps = 3000000
+[asserts.dsp]
+MVOL_L = 100
+MVOL_R = 100
+V2_VOLL = 80
+V2_VOLR = 40
+V3_PITCHL = 0x34
+V3_PITCHH = 0x12
+V1_ADSR1 = 0xFF
+V1_ADSR2 = 0xE8
+V4_ADSR1 = 0x00
+V4_GAIN = 0x5A
+DIR = 0x0A
+# Echo/FIR block (restored coverage the Python probe had: values are luna's,
+# verified — the old probe printed some decimal: EFB 40=0x28, EVOL 20=0x14,
+# FIR0 96=0x60).
+FLG = 0x00
+ESA = 0xC0
+EDL = 0x03
+EFB = 0x28
+EON = 0x01
+EVOL_L = 0x14
+EVOL_R = 0x14
+FIR0 = 0x60
