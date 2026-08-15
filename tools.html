@@ -124,7 +124,7 @@ $(function(){initNavTree('tools.html','',''); });
 <div class="contents">
 <div class="textblock"><p>Your game is written in C, but the SNES does not eat PNGs, Tiled maps, or WAV files — it eats tiles, tilemaps, BGR555 palettes, BRR samples, and SPC700 soundbanks. The OpenSNES tools are the converters that bridge the two: each takes an artist- or musician-friendly source format and emits the exact binary the hardware (and this SDK's runtime) expects.</p>
 <p>You rarely run most of them by hand — the build system wires the common ones in, so dropping a <span class="tt">.png</span> or <span class="tt">.wav</span> in an example's <span class="tt">res/</span> is usually enough. But knowing what each tool does, and which knobs it exposes, is what takes you from "the example builds" to "I shaped my own assets on purpose." That confidence is what this section is here to give.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md502"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md513"></a>
 The pipeline</h2>
 <p>Most assets flow through a short, one-way pipeline from source art to ROM data:</p>
 <div class="fragment"><div class="line">RGB art ──► img2snes ──► gfx4snes ──► tmx2snes ──► map engine</div>
@@ -135,8 +135,11 @@ The pipeline</h2>
 <div class="line">font.png ──► font2snes ──► text tiles      (dmaCopyVram)</div>
 <div class="line">sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)</div>
 <div class="line">music.it ──► smconv    ──► SNESMOD bank    (spcLoad / spcPlay)</div>
+<div class="line"> </div>
+<div class="line">hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMeta)</div>
+<div class="line">          └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)</div>
 </div><!-- fragment --><p>Each tool does exactly one conversion; the Makefile chains them. It is the Unix-pipe idea applied to asset building — small, composable, individually testable steps rather than one opaque converter.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md503"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md514"></a>
 The tools at a glance</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -153,17 +156,21 @@ The tools at a glance</h2>
 <td class="markdownTableBodyNone"><a class="el" href="tools_wav2brr.html" title="wav2brr — WAV to BRR sound samples">wav2brr — WAV to BRR sound samples</a>  </td><td class="markdownTableBodyNone">a PCM <span class="tt">.wav</span>  </td><td class="markdownTableBodyNone">a <span class="tt">.brr</span> sound sample  </td><td class="markdownTableBodyNone">auto (drop a WAV in <span class="tt">res/</span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="tools_smconv.html" title="smconv — tracker modules to SNESMOD soundbanks">smconv — tracker modules to SNESMOD soundbanks</a>  </td><td class="markdownTableBodyNone">an Impulse Tracker <span class="tt">.it</span>  </td><td class="markdownTableBodyNone">a SNESMOD soundbank  </td><td class="markdownTableBodyNone">auto (<span class="tt">USE_SNESMOD</span>)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="tools_palplan.html" title="palplan — project shared-palette planner">palplan — project shared-palette planner</a>  </td><td class="markdownTableBodyNone">a manifest of <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> files  </td><td class="markdownTableBodyNone">a CGRAM layout + C header  </td><td class="markdownTableBodyNone">manual, project-level  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="tools_aseprite2snes.html" title="aseprite2snes — Aseprite animations → AnimClip tables">aseprite2snes — Aseprite animations → AnimClip tables</a>  </td><td class="markdownTableBodyNone">an Aseprite animation export  </td><td class="markdownTableBodyNone"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a> tables (one per tag)  </td><td class="markdownTableBodyNone">one line per sprite  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md504"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md515"></a>
 Three levels of wiring</h2>
 <p>The tools sit at three levels of automation — worth knowing so you reach for the right one:</p>
 <ol type="1">
 <li><b>Zero-config, automatic.</b> <span class="tt">gfx4snes</span> (via the <span class="tt">GFXSRC</span> Makefile variable) and <span class="tt">wav2brr</span> (any <span class="tt">res/*.wav</span>) and <span class="tt">smconv</span> (<span class="tt">USE_SNESMOD := 1</span>) run for you during <span class="tt">make</span>. Drop the source in, reference the output, done.</li>
 <li><b>One explicit line.</b> <span class="tt">tmx2snes</span> is called from an example's own Makefile, because a Tiled project has choices (which layers, which extra outputs) the build cannot guess.</li>
-<li><b>By hand, when you need them.</b> <span class="tt">img2snes</span> (RGB → indexed) and <span class="tt">font2snes</span> (custom font) are standalone pre-steps you run once and commit the result. Looping <span class="tt">wav2brr</span> samples are also hand-built (the loop points are yours).</li>
+<li><b>By hand, when you need them.</b> <span class="tt">img2snes</span> (RGB → indexed) and <span class="tt">font2snes</span> (custom font) are standalone pre-steps you run once and commit the result. Looping <span class="tt">wav2brr</span> samples are also hand-built (the loop points are yours). <span class="tt">palplan</span> sits a level up from the per-asset tools: it plans your <em>whole project's</em> palettes into the SNES's 8 BG + 8 sprite slots at once, so you run it when your palette count grows, not per asset.</li>
 </ol>
 <p>All binaries live in <span class="tt">bin/</span> and are built by <span class="tt">make tools</span>. Every tool prints <span class="tt">--help</span>; the pages here are the guided version.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md505"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md516"></a>
 Where they fit with the rest of the docs</h2>
 <ul>
 <li>The <b>why</b> behind the numbers these tools produce — bpp, VRAM cost, palette conventions — is <a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a>. Read it before you commit to a mode.</li>

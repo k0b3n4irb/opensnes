@@ -123,20 +123,20 @@ $(function(){initNavTree('examples_basics_game_skeleton.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 5 (Game math &amp; framework) · a capstone.</b></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1057"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1068"></a>
 Why it matters for your game</h2>
 <p>Every example so far teaches one system. This one teaches the <em>shape that holds them together</em>: a title screen, a play loop with a goal and a clock, and a game-over screen that loops back. It's small enough to read in one sitting and fork as the starting point for your own game.</p>
 <div class="image">
 <img src="game_skeleton.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1058"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1069"></a>
 What you'll learn</h2>
 <p>The single idea: <b>a game is a state machine around one frame loop.</b> Every frame you <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>, read the pad, then <span class="tt">switch (<a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a>)</span> to the code for the screen you're on. A transition is just an assignment to <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a></span> plus a one-time setup for the new screen:</p>
 <div class="fragment"><div class="line">TITLE  --START--&gt;  PLAY  --timer hits 0--&gt;  OVER  --START--&gt;  TITLE</div>
 </div><!-- fragment --><p>It recombines rungs you've climbed: <b>input</b> drives the arrow sprite, a second <b>sprite</b> is the coin, a <b>bounding-box</b> test scores it, <b>text</b> is the HUD, and <span class="tt"><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></span>/<span class="tt"><a class="el" href="console_8h.html#ad0d76da31c2ffab064e9e44f523e8f0a" title="Seed random number generator.">srand()</a></span> scatter the coin. Motion and collision are deliberately trivial — the lesson is the <em>structure</em>, not the mechanics.</p>
 <p>When the enum + switch starts to sprawl in a bigger game, the opt-in <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> framework is the next step up — see <a href="../scene_stack/">scene_stack</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1059"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1070"></a>
 What to observe / if it breaks</h2>
 <ul>
 <li><b>Correct run:</b> title shows <span class="tt">PRESS START</span>; in play the D-pad moves the arrow, touching the coin bumps <span class="tt">SCORE</span> and respawns it, <span class="tt">TIME</span> counts down; at zero the game-over screen shows the final score; START plays again.</li>
@@ -145,14 +145,14 @@ What to observe / if it breaks</h2>
 <li><b>Number smears (<span class="tt">10</span> → <span class="tt">9</span> leaves <span class="tt">90</span>):</b> clear the field before reprinting — this example prints spaces over the old digits first.</li>
 </ul>
 <p>Probe oracles: <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ab0c65527cb79d56c8c675dcf0978c8e6" title="Probe oracle: current state (0 title, 1 play, 2 over).">game_state</a></span> (0 title / 1 play / 2 over), <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#af38f63b0c5a57bead247e022200124e5" title="Probe oracle: coins collected.">score</a></span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#a015fefbf14b3898d3e2ec7ea35e64c7a" title="Probe oracle: seconds remaining in a round.">time_left</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1060"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1071"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna game_skeleton.sfc   # luna-gui: tap START, steer with the D-pad</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1061"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1072"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">text</span>, <span class="tt">input</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1062"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1073"></a>
 Where you are</h2>
 <p>The capstone of the basics family — it ties input, sprites, text and a state machine into a whole game. For the same structure via the <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> framework, see <a href="../scene_stack/">scene_stack</a>; for a HUD box, <a href="../panel_hud/">panel_hud</a>. </p>
 </div></div><!-- contents -->

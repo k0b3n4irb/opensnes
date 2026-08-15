@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_maps.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 5, second half — "let an engine drive the world."</b> Where <a href="../scrolling/"><span class="tt">scrolling/</span></a> moves a background past the camera by hand, these examples hand the world to the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> engine and a Tiled pipeline: a scrolling tile world bigger than VRAM, authored in a real editor, read for collision, and walked with slopes. This is Stage 3, "can I build a world?"</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1436"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1447"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -138,7 +138,7 @@ The ladder</h2>
 <td class="markdownTableBodyNone">5.8  </td><td class="markdownTableBodyNone"><a href="slope_collision/">slope_collision</a>  </td><td class="markdownTableBodyNone">How do I do tile collision with slopes — a full platformer?  </td></tr>
 </table>
 <p>Climb from a scrolling world (5.5) to an authored one (5.6) to a sprite that reads it (5.7) to a character that stands on its slopes (5.8).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1437"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1448"></a>
 The idea in one screen</h2>
 <p>A <b>hardware tilemap</b> is a 32×32 (2 KB) up to 64×64 (8 KB) grid of tile entries the PPU renders every frame; the hardware scroll registers pan across it for free. When the world is larger than 64×64, the <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> module <b>streams</b> fresh rows/columns into VRAM during VBlank as the camera moves (<span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>/<span class="tt"><a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera</a></span>), and <span class="tt">tmx2snes</span> turns a Tiled <span class="tt">.tmx</span>/<span class="tt">.tmj</span> into the <span class="tt">.m16</span>/<span class="tt">.b16</span> data it consumes. <b>Collision</b> reads tile <em>properties</em> (solid, platform, slope angle) from the map rather than testing sprite boxes; <span class="tt"><a class="el" href="collision_8h.html#a68ea9ae72befca266d053e9e26d71597" title="Check collision with tile using custom tile size.">collideTileEx</a></span> / <span class="tt"><a class="el" href="object_8h.html#a2e1f315373d6fa48c4cc67d59f72f669" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes</a></span> add diagonal surfaces.</p>
 <p>Everything here runs inside the ~4 KB VBlank DMA budget by streaming one page per frame — the pattern <span class="tt">dynamic_map</span> demonstrates directly.</p>

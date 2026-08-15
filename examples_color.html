@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_color.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Part of Family 6 (Colour &amp; effects) — squeezing more colour out of the PPU.</b> The SNES shows 256 colours at once from a 15-bit (32768-colour) palette — unless you cheat. This family is the colour-math blend, the palette-bypass mode, and the tricks that push past 256 by reloading the palette mid-frame.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1139"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1150"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -143,7 +143,7 @@ The ladder</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">6d.3  </td><td class="markdownTableBodyNone"><a href="hicolor_blend/">hicolor_blend</a>  </td><td class="markdownTableBodyNone">How do I show 3840 colours via an RGB channel-split blend?  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1140"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1151"></a>
 The idea in one screen</h2>
 <p>The PPU reads pixel colours from CGRAM (256 slots). <b>Colour math</b> ($2130– $2132) adds or subtracts one layer's colour over another — transparency, shadows, tints. <b>Direct colour</b> spends the 8bpp pixel byte <em>as</em> a BGR value, skipping CGRAM entirely. And to beat the 256-at-once limit, you <b>reload CGRAM mid-frame</b> under an H-IRQ so different scanlines see different palettes (<span class="tt">hicolor_1792</span>), or split the RGB channels across two blended layers (<span class="tt">hicolor_blend</span>, 3840 colours).</p>
 <p><a class="el" href="examples_color_direct_color.html" title="direct_color — the pixel byte IS the color">direct_color — the pixel byte IS the color</a> <a class="el" href="examples_color_gradient_9bit.html" title="&quot;9-bit&quot; gradient — brightness-dithered backdrop">"9-bit" gradient — brightness-dithered backdrop</a> <a class="el" href="examples_color_hicolor_1792.html" title="HiColor — 1792 colors from a 4bpp background">HiColor — 1792 colors from a 4bpp background</a> <a class="el" href="examples_color_hicolor_blend.html" title="&quot;3840 colors&quot; — RGB channel-split blend">"3840 colors" — RGB channel-split blend</a> <a class="el" href="examples_color_palette_cycle.html" title="palette_cycle — animate by rotating CGRAM">palette_cycle — animate by rotating CGRAM</a> <a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a> <a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a> </p>

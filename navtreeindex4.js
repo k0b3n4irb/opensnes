@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"globals_vars_i.html":[3,1,2,8],
+"globals_vars_j.html":[3,1,2,9],
 "globals_vars_k.html":[3,1,2,10],
 "globals_vars_l.html":[3,1,2,11],
 "globals_vars_m.html":[3,1,2,12],
@@ -247,7 +249,5 @@ var NAVTREEINDEX4 =
 "group__ppu__regs.html#ga4545542b6058c4dfa9b60e85d398fbc0":[1,21,26],
 "group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1":[1,21,3],
 "group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46":[1,21,15],
-"group__ppu__regs.html#ga4d49034fd405fed8f5f42df44fa2b3a8":[1,21,45],
-"group__ppu__regs.html#ga4de43c070a90869390fca11731a2692e":[1,21,16],
-"group__ppu__regs.html#ga4e8398519a24701e4d3041e4f02edc00":[1,21,44]
+"group__ppu__regs.html#ga4d49034fd405fed8f5f42df44fa2b3a8":[1,21,45]
 };

@@ -125,7 +125,7 @@ $(function(){initNavTree('examples_audio_echo.html','',''); });
 <div class="textblock"><p><b>Family 8 — Audio · rung 8.9</b></p>
 <p>The S-DSP has a hardware <b>echo</b> (reverb) unit. This example isolates it — one short "pop" on a timer, turned into a decaying tail by the echo — with <b>START to toggle it off and on</b>, because you only hear reverb next to the dry sound.</p>
 <p><em>(No screenshot — the lesson is audible. Run it with sound and listen.)</em></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md848"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md859"></a>
 What you'll learn</h2>
 <ul>
 <li><span class="tt">audioSetEcho(delay, feedback, volL, volR)</span> sizes the echo ring and sets how long the tail rings (feedback) and how loud the wet signal is. Call it <b>before</b> enabling.</li>
@@ -133,17 +133,17 @@ What you'll learn</h2>
 <li><span class="tt">audioEnableEcho(voiceMask)</span> routes voices into the echo; <span class="tt"><a class="el" href="group__audio__echo.html#ga98ebf2573587509ddebcc27fdc3ab479" title="Disable echo for all voices.">audioDisableEcho()</a></span> turns it off.</li>
 <li>Echo costs <b>ARAM</b> — the ring buffer is real memory, sized by the delay, so a bigger hall leaves less room for samples.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md849"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md860"></a>
 SNES concepts</h2>
 <p>Echo is a DSP feature, not a CPU one: the S-DSP keeps a delay ring in APU RAM, feeds a fraction of the output back into it (the feedback), and mixes the delayed signal (the wet volume) back over the dry. <span class="tt"><a class="el" href="group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7" title="Configure echo parameters.">audioSetEcho</a></span> configures all of that in one call; <span class="tt"><a class="el" href="group__audio__echo.html#ga663f776667e4907fbed12543f2c83bc1" title="Enable echo for specific voices.">audioEnableEcho</a></span> chooses which of the 8 voices are sent in.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md850"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md861"></a>
 How to build</h2>
 <div class="fragment"><div class="line">make -C examples/audio/echo</div>
 </div><!-- fragment --><p>Run <span class="tt">echo.sfc</span> in <a href="https://github.com/k0b3n4irb/luna">luna</a> with audio and press <b>START</b> to hear dry vs wet.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md851"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md862"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">audio</span>, <span class="tt">input</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md852"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md863"></a>
 Ladder</h2>
 <p>The focused counterpart to <a href="../soundboard/"><span class="tt">soundboard</span></a> (which uses echo as one of many features). It builds on the audio v2 engine — see <span class="tt">soundboard</span> first for the sample-loading basics. </p>
 </div></div><!-- contents -->

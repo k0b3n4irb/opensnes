@@ -123,19 +123,19 @@ $(function(){initNavTree('examples_sprites_sprite_swarm.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 3 (Sprites) · rung 3.7 — the showcase, and an honest one.</b></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1673"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1688"></a>
 Why it matters for your game</h2>
 <p>Bullets, particles, a shower of coins, a flock of enemies — games throw a lot of sprites at the screen. This rung answers <em>how many can you actually move at 60 fps</em>, and the answer is more nuanced than "128, it's hardware": the sprites are free, but <b>touching each one from C every frame is not</b>. Knowing where that line sits — and how to cross it — is what lets you budget a busy scene instead of discovering the slowdown after you've built it.</p>
 <div class="image">
 <img src="sprite_swarm.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1674"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1689"></a>
 What you'll learn</h2>
 <p>The single idea: <b>the per-sprite update budget.</b> The SNES has 128 hardware sprites and moves them with one OAM DMA per frame — cheap. But computing and writing each sprite's position in C is not free: the OAM buffer lives in bank $7E (every write is a slow long address) and cc65816 spills registers in a busy loop. Measured on luna, the smooth-60 fps ceiling for per-sprite C motion is **~32 sprites**; 40 already drops to 30.</p>
 <p>So this swarm runs 32 dots at a rock-steady 60 fps, each bouncing independently. The motion is deliberately trivial (integer add + edge bounce — no multiply, no trig) so what you're seeing is the cost of the <em>OAM update itself</em>, not the maths. Positions are written straight into <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span>; a single <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> lets the NMI's DMA push them all.</p>
 <p><b>To go past the ceiling</b> you move the work off the main CPU or out of C: <a href="../../chips/sa1_starfield/">chips/sa1_starfield</a> runs 128 birds of Lissajous <em>trig</em> on the SA-1 at 10.74 MHz; a hand-written assembly update loop is the other route. Same 128-sprite hardware, a bigger compute budget.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1675"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1690"></a>
 What to observe / if it breaks</h2>
 <ul>
 <li><b>Correct run:</b> 32 red/cyan/yellow/white dots bounce around at a smooth 60 fps, reversing at the edges.</li>
@@ -144,14 +144,14 @@ What to observe / if it breaks</h2>
 <li><b>Nothing visible:</b> sprites need <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_OBJ)</a></span> and colour 1 of an OBJ palette (CGRAM 128+) set to something non-black.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="sprites_2sprite__swarm_2main_8c.html#aefd40df56c53cc83d5999610fa9bd9ad" title="Probe oracle: frames elapsed (advances while the flock animates).">swarm_frame</a></span> advances once per displayed frame.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1676"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1691"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 sprite_swarm.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1677"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1692"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1678"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1693"></a>
 Where you are</h2>
 <p>← previous: <a href="../dynamic_metasprite/">dynamic_metasprite</a> · streaming a multi-tile character · the family caps here — for 128 sprites of heavy math, see <a href="../../chips/sa1_starfield/">chips/sa1_starfield</a> </p>
 </div></div><!-- contents -->

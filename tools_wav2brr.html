@@ -123,11 +123,11 @@ $(function(){initNavTree('tools_wav2brr.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The SNES sound chip plays samples in its own compressed format, <b>BRR</b> (Bit Rate Reduction — a 9-byte block per 16 samples). <span class="tt">wav2brr</span> encodes an ordinary PCM <span class="tt">.wav</span> into a <span class="tt">.brr</span> you load at runtime with <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span>. It is the zero-config path for one-shot sound effects.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md516"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md527"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> a PCM <span class="tt">.wav</span> — 8- or 16-bit, mono or stereo (stereo is downmixed).</p>
 <p><b>Out:</b> a raw <span class="tt">.brr</span> (its size is always a multiple of 9 bytes). Default name is <span class="tt">input.brr</span> alongside the input.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md517"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md528"></a>
 The flags you will actually use</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -137,21 +137,21 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-v</span>  </td><td class="markdownTableBodyNone">verbose — prints the size breakdown, a sample-rate warning, and a ready-to-paste load line  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md518"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md529"></a>
 How you actually use it</h2>
 <p><b>One-shot SFX — automatic.</b> Drop a <span class="tt">.wav</span> in the example's <span class="tt">res/</span> and <span class="tt">.incbin</span> the matching <span class="tt">.brr</span> in an ASM file; the build's <span class="tt">%.brr: %.wav</span> rule runs <span class="tt">wav2brr</span> for you. No command to type:</p>
 <div class="fragment"><div class="line">res/blip.wav   ──(make)──►   res/blip.brr   ──.incbin──►   audioLoadSample()</div>
 </div><!-- fragment --><p><b>Looping samples — by hand.</b> A sustained instrument or a looping ambience needs loop points, which only you know, so build it once and commit the <span class="tt">.brr</span>:</p>
 <div class="fragment"><div class="line">wav2brr --loop 512 2048 instrument.wav instrument.brr</div>
 </div><!-- fragment --><p>Run with <span class="tt">-v</span> to see the block count and the exact <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> call to paste.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md519"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md530"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>Keep the source at or below 32 kHz.</b> That is the DSP's output ceiling; a higher-rate WAV is accepted but plays sharp (a note higher than authored). <span class="tt">-v</span> warns when it happens. The pitch you hear is set at <em>playback</em> by the DSP pitch value, relative to the sample's rate — see <a class="el" href="snes_sound_guide.html" title="SNES Sound Programming Guide">SNES Sound Programming Guide</a>.</li>
 <li><b>Looping bypasses the auto-rule.</b> The zero-config path makes one-shots only; anything with <span class="tt">--loop</span> is a hand-built, committed asset.</li>
 <li><b>Deterministic and shared.</b> wav2brr uses the same BRR encoder as <a class="el" href="tools_smconv.html" title="smconv — tracker modules to SNESMOD soundbanks">smconv — tracker modules to SNESMOD soundbanks</a>, so a sample sounds identical whether it is a standalone SFX or baked into a soundbank (golden-tested via <span class="tt">make test-tools</span>).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md520"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md531"></a>
 See it in practice</h2>
 <ul>
 <li><a class="el" href="examples_audio_sfx_from_wav.html" title="SFX from WAV">SFX from WAV</a> — one-shots auto-generated from <span class="tt">res/*.wav</span>.</li>

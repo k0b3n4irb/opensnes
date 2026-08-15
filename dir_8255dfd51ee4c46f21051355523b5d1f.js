@@ -1,6 +1,7 @@
 var dir_8255dfd51ee4c46f21051355523b5d1f =
 [
     [ "animated_sprite", "dir_4c43594cb340b9b81082e85d495f7dea.html", "dir_4c43594cb340b9b81082e85d495f7dea" ],
+    [ "aseprite_pipeline", "dir_ba4b90d82ccf0b2ebdb9a1116a048668.html", "dir_ba4b90d82ccf0b2ebdb9a1116a048668" ],
     [ "dynamic_metasprite", "dir_c0789b2f2bfa6ecdebca4f8a72ee2579.html", "dir_c0789b2f2bfa6ecdebca4f8a72ee2579" ],
     [ "dynamic_sprite", "dir_af253135f4f4187988965b0e0d1f47bb.html", "dir_af253135f4f4187988965b0e0d1f47bb" ],
     [ "metasprite", "dir_75792543266ec4b9abf9426b452dcf6e.html", "dir_75792543266ec4b9abf9426b452dcf6e" ],

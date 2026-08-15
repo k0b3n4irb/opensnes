@@ -69,6 +69,7 @@ var group__examples =
     [ "main.c", "scrolling_2mixed__scroll_2main_8c.html", null ],
     [ "main.c", "scrolling_2parallax__scroll_2main_8c.html", null ],
     [ "main.c", "sprites_2animated__sprite_2main_8c.html", null ],
+    [ "main.c", "sprites_2aseprite__pipeline_2main_8c.html", null ],
     [ "main.c", "sprites_2dynamic__metasprite_2main_8c.html", null ],
     [ "main.c", "sprites_2dynamic__sprite_2main_8c.html", null ],
     [ "main.c", "sprites_2metasprite_2main_8c.html", null ],

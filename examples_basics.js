@@ -1,13 +1,13 @@
 var examples_basics =
 [
     [ "aim_target", "examples_basics_aim_target.html", [
-      [ "Examples", "examples_basics.html#autotoc_md1076", null ],
-      [ "Key Concepts", "examples_basics.html#autotoc_md1077", [
-        [ "SNES Concepts", "examples_basics_aim_target.html#autotoc_md1032", null ],
-        [ "What to Observe", "examples_basics_aim_target.html#autotoc_md1033", null ],
-        [ "How to Build", "examples_basics_aim_target.html#autotoc_md1034", null ],
-        [ "Modules Used", "examples_basics_aim_target.html#autotoc_md1035", null ],
-        [ "See also", "examples_basics_aim_target.html#autotoc_md1036", null ]
+      [ "Examples", "examples_basics.html#autotoc_md1087", null ],
+      [ "Key Concepts", "examples_basics.html#autotoc_md1088", [
+        [ "SNES Concepts", "examples_basics_aim_target.html#autotoc_md1043", null ],
+        [ "What to Observe", "examples_basics_aim_target.html#autotoc_md1044", null ],
+        [ "How to Build", "examples_basics_aim_target.html#autotoc_md1045", null ],
+        [ "Modules Used", "examples_basics_aim_target.html#autotoc_md1046", null ],
+        [ "See also", "examples_basics_aim_target.html#autotoc_md1047", null ]
       ] ]
     ] ],
     [ "Collision Detection Demo", "examples_basics_collision_demo.html", null ],
