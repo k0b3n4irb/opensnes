@@ -228,59 +228,24 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
-; Dynamic Sprite Engine RAM
+; Dynamic Sprite Engine RAM — now fully opt-in (moved out of crt0)
 ;------------------------------------------------------------------------------
-; oambuffer: Game-level sprite state (128 sprites × 16 bytes = 2048 bytes)
-; oamQueueEntry: VRAM upload queue (128 entries × 6 bytes = 768 bytes)
-; State variables for sprite management
+; The dynamic sprite engine needs three WRAM blocks, ALL in Bank $00 SLOT 1
+; ($0000-$1FFF) so C code (sta.l $0000,x, always bank $00) and ASM (DB=$7E via
+; the WRAM mirror) both reach them:
 ;
-; oambuffer MUST be in Bank $00 mirror range ($0000-$1FFF) because the C
-; compiler generates `sta.l $0000,x` which always writes to bank $00.
-; Address $0520 is right after oamMemory ($0300-$051F).
-; Assembly code with DB=$7E reads $7E:0520 = same physical RAM (mirror).
+;   - oambuffer          (2048 bytes) — per-sprite state
+;   - oamQueueEntry      (768 bytes)  — VRAM upload queue
+;   - dynamic sprite state (~26 bytes)
+;
+; ALL THREE now live in lib/source/sprite_dynamic.asm, so they are allocated
+; ONLY when a project links `LIB_MODULES := ... sprite_dynamic ...`. crt0 used
+; to reserve the 768-byte queue + state unconditionally, costing ~794 bytes of
+; WRAM in every ROM — including games that never touch the dynamic engine and
+; are already tight against the 8 KB WRAM ceiling (a silent stack-overflow
+; hazard). Only oambuffer had been migrated; this completes it. crt0 itself
+; never references these symbols (only sprite_dynamic{,_dispatch} do).
 ;------------------------------------------------------------------------------
-
-; oambuffer (2048 bytes) is defined in sprite_dynamic.asm (BANK 0 SLOT 1)
-; so C code can access it via sta.l $0000,x. Only projects using
-; LIB_MODULES := ... sprite_dynamic ... allocate it.
-;
-; Dynamic sprite queue and state are also in BANK 0 SLOT 1 ($0000-$1FFF)
-; so both C (bank $00 absolute) and ASM (DB=$7E via WRAM mirror) can access
-; them. Previously at BANK $7E SLOT 2 ($2800+) which was above the WRAM
-; mirror, making them inaccessible from C code.
-
-.RAMSECTION ".dynamic_sprite_queue" BANK 0 SLOT 1
-    oamQueueEntry   dsb 768     ; 128 × 6 bytes (VRAM upload queue)
-.ENDS
-
-.RAMSECTION ".dynamic_sprite_state" BANK 0 SLOT 1
-    ; Temporary values for sprite calculations
-    sprit_val0      dsb 1       ; Temporary value #0
-    sprit_val1      dsb 1       ; Temporary value #1
-    sprit_val2      dsb 2       ; Temporary value #2 (16-bit)
-
-    ; Queue state
-    oamqueuenumber          dsb 2   ; Current position in VRAM upload queue
-
-    ; Per-frame sprite tracking
-    oamnumberperframe       dsb 2   ; Number of sprites drawn this frame (×4)
-    oamnumberperframeold    dsb 2   ; Number of sprites drawn last frame (×4)
-
-    ; Sprite slot counters (for each size category)
-    oamnumberspr0           dsb 2   ; Current large sprite slot
-    oamnumberspr0Init       dsb 2   ; Initial large sprite slot
-    oamnumberspr1           dsb 2   ; Current small sprite slot
-    oamnumberspr1Init       dsb 2   ; Initial small sprite slot
-
-    ; VRAM base addresses
-    spr0addrgfx             dsb 2   ; VRAM address for large sprites ($0000)
-    spr1addrgfx             dsb 2   ; VRAM address for small sprites ($1000)
-    spr16addrgfx            dsb 2   ; VRAM address for 16x16 sprites (context-dependent)
-
-    ; Metasprite temporary storage
-    sprit_mxsvg             dsb 2   ; Saved metasprite X origin
-    sprit_mysvg             dsb 2   ; Saved metasprite Y origin
-.ENDS
 
 ;------------------------------------------------------------------------------
 ; ROM Setup
