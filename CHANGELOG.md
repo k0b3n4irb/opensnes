@@ -2,6 +2,32 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.36.1] — 2026-08-16
+
+Two silent-failure fixes surfaced while building the `rpg` streaming overworld,
+both affecting any project — not just the RPG.
+
+### Fixed
+- fix(runtime,lib): **dynamic-sprite RAM is now opt-in** — `crt0.asm` reserved
+  the 768-byte dynamic-sprite VRAM upload queue (plus ~26 bytes of engine
+  state) in **every** ROM, even those that never link `sprite_dynamic`. That
+  ~794 bytes came straight off the 65816 stack budget (the stack grows down
+  from `$1FFF` into the C-data region), so a game near the 8 KB WRAM ceiling
+  could have its globals silently clobbered by a deep call chain — no error,
+  just corruption. `oambuffer` had already been migrated to `sprite_dynamic.asm`
+  to be opt-in; this finishes the job for the queue + state. Non-dynamic-sprite
+  games reclaim ~794 bytes of WRAM (measured on the `rpg` overworld: stack
+  headroom 410 → 1206 bytes). Transparent to dynamic-sprite users; validated
+  pixel-identical across the corpus.
+- fix(lib): **`nmiSet` installs the callback's real bank.** It hardcoded bank
+  `$00`, so a VBlank callback the linker placed in bank `$01+` was installed at
+  the wrong address and the NMI jumped into garbage. Post-A6 a function pointer
+  is a 4-byte far pointer carrying its bank, so `nmiSet` now derives it. This
+  also sidesteps a QBE miscompile that duplicated the pointer's high word when
+  forwarding a 4-byte-by-value pointer parameter (`nmiSet` now writes
+  `nmi_callback` inline). Any-bank VBlank callbacks work via plain `nmiSet`;
+  no `nmiSetBank` or hand-rolled trampoline needed.
+
 ## [0.36.0] — 2026-08-14
 
 A testing-infrastructure and sprite-tooling release, with one user-facing
