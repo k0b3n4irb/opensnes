@@ -322,7 +322,8 @@ class SymbolTable:
         """Check if a symbol is C-generated const data that uses 16-bit addressing.
 
         The compiler (cproc/QBE) generates 16-bit addresses for:
-        - String literals: string.N
+        - String literals: string.N (or <tu>_string.N — per-TU-namespaced since
+          the anonymous-label uniquing fix)
         - Static local const data: varname.N (e.g., size_mask.13)
 
         These are accessed via `pea.w` / `lda.l $0000,x` which always read bank $00.
@@ -334,8 +335,9 @@ class SymbolTable:
         """
         name = sym.name
 
-        # String literals from C code (most common victim)
-        if re.match(r'^string\.\d+$', name):
+        # String literals from C code (most common victim). Since the
+        # anonymous-label uniquing fix these carry a per-TU prefix (<tu>_string.N).
+        if re.match(r'^(?:\w+_)?string\.\d+$', name):
             return True
 
         # Static local const data: C identifier followed by .N
@@ -372,7 +374,7 @@ class SymbolTable:
             for sym in symbols:
                 if sym.address < 0x8000:
                     continue
-                if re.match(r'^string\.\d+$', sym.name):
+                if re.match(r'^(?:\w+_)?string\.\d+$', sym.name):
                     critical.append(sym)
                 elif self._is_c_generated_data(sym):
                     warnings.append(sym)

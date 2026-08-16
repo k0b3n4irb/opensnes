@@ -91,6 +91,16 @@ if [[ -n "$CC65816_G" && -n "$OUTPUT" ]]; then
     export CC65816_DBG="${OUTPUT%.asm}.dbg"
 fi
 
+# Per-TU label prefix. cproc numbers anonymous local-linkage globals (string
+# literals, __func__, compound literals) from a per-process counter that
+# restarts at 0 every translation unit, and the w65816 backend strips QBE's
+# ".L" local marker — so two .c files can ship the same global label
+# (string.15) and wlalink rejects the duplicate. Passing a stable per-file stem
+# lets cproc namespace those anonymous locals (<tu>_string.15) so they stay
+# unique across TUs. Exported symbols (functions/globals) are untouched.
+CC65816_TU=$(basename "$INPUT" | sed 's/\.[^.]*$//; s/[^A-Za-z0-9_]/_/g')
+export CC65816_TU
+
 # Stage 2: C frontend -> QBE IR (to temp file, NOT a pipe)
 # Using a pipe hides cproc crashes: QBE receives truncated IR and reports
 # misleading parse errors. With a temp file, cproc failures are caught cleanly.
