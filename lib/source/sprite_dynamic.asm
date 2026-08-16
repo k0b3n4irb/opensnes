@@ -100,6 +100,43 @@
     oambuffer       dsb 2048    ; 128 × 16 bytes
 .ENDS
 
+; VRAM upload queue + engine state. Moved here from crt0.asm (2026-08) so they
+; are allocated ONLY when a project links this module — crt0 reserved them
+; unconditionally, costing ~794 bytes of WRAM in every ROM (a stack-overflow
+; hazard for RAM-tight games). Same BANK 0 SLOT 1 requirement as oambuffer.
+.RAMSECTION ".dynamic_sprite_queue" BANK 0 SLOT 1
+    oamQueueEntry   dsb 768     ; 128 × 6 bytes (VRAM upload queue)
+.ENDS
+
+.RAMSECTION ".dynamic_sprite_state" BANK 0 SLOT 1
+    ; Temporary values for sprite calculations
+    sprit_val0      dsb 1       ; Temporary value #0
+    sprit_val1      dsb 1       ; Temporary value #1
+    sprit_val2      dsb 2       ; Temporary value #2 (16-bit)
+
+    ; Queue state
+    oamqueuenumber          dsb 2   ; Current position in VRAM upload queue
+
+    ; Per-frame sprite tracking
+    oamnumberperframe       dsb 2   ; Number of sprites drawn this frame (×4)
+    oamnumberperframeold    dsb 2   ; Number of sprites drawn last frame (×4)
+
+    ; Sprite slot counters (for each size category)
+    oamnumberspr0           dsb 2   ; Current large sprite slot
+    oamnumberspr0Init       dsb 2   ; Initial large sprite slot
+    oamnumberspr1           dsb 2   ; Current small sprite slot
+    oamnumberspr1Init       dsb 2   ; Initial small sprite slot
+
+    ; VRAM base addresses
+    spr0addrgfx             dsb 2   ; VRAM address for large sprites ($0000)
+    spr1addrgfx             dsb 2   ; VRAM address for small sprites ($1000)
+    spr16addrgfx            dsb 2   ; VRAM address for 16x16 sprites (context-dependent)
+
+    ; Metasprite temporary storage
+    sprit_mxsvg             dsb 2   ; Saved metasprite X origin
+    sprit_mysvg             dsb 2   ; Saved metasprite Y origin
+.ENDS
+
 ;==============================================================================
 ; Lookup Tables for OAM High Table Manipulation
 ;==============================================================================
