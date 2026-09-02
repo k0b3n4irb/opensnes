@@ -32,7 +32,7 @@ luna v1.17.0 · `luna state -n <steps>` per ROM · 84 ROMs · **82 OK, 2 INPUT-D
 | `basics/random` | OK | live (269f/268nmi) |
 | `basics/scene_stack` | OK | live (72f/71nmi) |
 | `basics/timer` | OK | live (179f/178nmi) |
-| `chips/dsp1_cube` | OK | live (178f/177nmi) |
+| `chips/dsp1_cube` | OK | live (199f/199nmi) |
 | `chips/sa1_hello` | OK | live (72f/71nmi) |
 | `chips/sa1_starfield` | OK | live (133f/132nmi) |
 | `chips/superfx_3d` | OK | live (315f/211nmi) |

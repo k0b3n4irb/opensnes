@@ -412,6 +412,12 @@ jobs:
       - name: Functional probes
         run: python3 tools/luna-test/probes/run_all.py
 
+      - name: Native luna test manifests
+        # The declarative pillar (manifests/*.toml incl. the coprocessor and
+        # SRAM asserts) — previously local-only via `make tests`. Firmware-gated
+        # manifests (coproc_dsp1) SKIP cleanly here: no dsp1b.rom in CI.
+        run: make test-manifests
+
       - name: Visual regression
         # Keyed on luna's `--print-fbhash` (a hash of the pre-PNG pixels luna
         # documents as cross-architecture-stable), so aarch64-captured baselines

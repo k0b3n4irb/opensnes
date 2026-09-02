@@ -104,8 +104,8 @@
     "rom_sha256": "1eeca2b4aaa6daa9c107775fec5c8b9da31b0eb104be55b4d8651b295dd98dc0"
   },
   "chips_dsp1_cube": {
-    "stream": "894d61f38e5739ddeb1b52097ab05d83a016385a680d6b53b42441aa75cfe721",
-    "rom_sha256": "4e593d4c7f259b1f2324127e9f1c18da730a96df2615204845d321c6d4c73df9"
+    "stream": "6783392b873cb971d037ca1954d739daea06f7cc160ad405e1d02f2123409d9e",
+    "rom_sha256": "59865ee8a154c41c491d6ac3cc236a4db05a0eeea38bb147b345e9a9d9304619"
   },
   "chips_sa1_hello": {
     "stream": "3e271cb2af38b20390631a2e4cf651becb2deea47976eda21d6073c6dcffe0c2",

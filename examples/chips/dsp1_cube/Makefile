@@ -5,7 +5,7 @@ ROM_NAME := DSP1 CUBE
 
 USE_LIB     := 1
 USE_DSP1    := 1
-LIB_MODULES := console dma sprite dsp1
+LIB_MODULES := console dma sprite   # dsp1 auto-added by USE_DSP1
 
 CSRC := main.c
 

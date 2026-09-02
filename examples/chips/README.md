@@ -5,7 +5,7 @@ SNES cartridges carry a coprocessor. These examples boot one, prove it runs,
 then put it to real work — the branch you reach for late in a project, not on
 day one.
 
-Two chips, each a boot-then-work pair:
+Three chips — SA-1 and Super FX as boot-then-work pairs, the DSP-1 as a single worked example (it needs no boot: the firmware is already on the chip):
 
 ## The ladder
 
@@ -15,6 +15,7 @@ Two chips, each a boot-then-work pair:
 | 11.2 | [sa1_starfield](sa1_starfield/) | How do I offload real math to the SA-1? | SA-1 |
 | 11.3 | [superfx_hello](superfx_hello/) | How do I boot the GSU and run a hardware test? | SuperFX |
 | 11.4 | [superfx_3d](superfx_3d/) | How do I render 3D with the SuperFX? | SuperFX |
+| 11.5 | [dsp1_cube](dsp1_cube/) | How do I offload 3D rotation + perspective to the DSP-1? | DSP-1 |
 
 Boot first (11.1 / 11.3 — prove the chip is alive and talking), then a real
 workload (11.2 / 11.4).
@@ -30,5 +31,8 @@ workload (11.2 / 11.4).
   assembled by `wla-superfx`), renders into cartridge RAM, and DMAs the result
   to VRAM. See the [SuperFX tutorial](../../docs/tutorials/superfx.md).
 
-Both are validated natively by luna, which detects and runs the SA-1 and the
-GSU in the headless test harness — no chip-ROM side channel needed.
+All three are validated natively by luna, which detects and runs the SA-1,
+the GSU and the DSP-1 in the headless test harness — no chip-ROM side channel
+needed. The DSP-1 leg additionally needs Sony's `dsp1b.rom` firmware installed
+into luna (copyrighted, not shipped); without it the test SKIPs rather than
+fails — see [dsp1_cube](dsp1_cube/).

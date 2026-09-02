@@ -2,6 +2,48 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.37.0] — 2026-09-02
+
+The DSP-1 v2 release: the coprocessor module gains the canonical 3D
+pipeline — true hardware perspective — plus the game-logic commands, and
+the `dsp1_cube` example renders with a real perspective divide computed
+on the NEC µPD77C25.
+
+### Added
+- feat(lib): **DSP-1 pipeline completed** — `dsp1Project` (world → screen
+  H/V + depth scale M), `dsp1Parameter` (projection-plane setup, 7 in /
+  4 out), `dsp1Distance` (hardware sqrt of a 3D vector), `dsp1Range`
+  (sphere test for collision/LOD), `dsp1Present` (bounded known-answer
+  probe that never hangs on a missing chip), and `fixed`↔T/A bridge
+  macros between the SDK's 8.8 fixed-point and the DSP-1's 1.15/angle
+  formats. Projection semantics characterised empirically on luna
+  (DSP-1B) and recorded: the all-zero Parameter setup is degenerate,
+  `azs=$4000` makes +Y the view axis, effective focal length ≈ lfe+les.
+- docs(docs): new **DSP-1 tutorial** (`docs/tutorials/dsp1.md`) — chip
+  model, RQM handshake, slot types, the Attitude→Objective→Project
+  pipeline, Distance/Range for game logic, firmware gotchas; DSP-1 rows
+  in `API_INDEX.md`; `snes.h` opt-in list now mentions `dsp1.h` and
+  `panel.h`.
+- ci: the native luna **test-manifests pillar now runs in CI** (it
+  previously ran only locally via `make tests`); the DSP-1 manifest
+  additionally asserts the full DR/SR handshake path (`dsp1_ok = 1`),
+  firmware-gated so it SKIPs cleanly on firmware-less runners.
+
+### Changed
+- feat(examples): `chips/dsp1_cube` upgraded from orthographic to
+  **hardware perspective projection**; `chips/README.md` gains the 11.5
+  rung and now presents the three-chip family.
+- build: `USE_DSP1 := 1` auto-adds the `dsp1` module to `LIB_MODULES`
+  (aligned with the SuperFX/SRAM pattern).
+
+### Fixed
+- docs(examples): the dsp1_cube README documented a `luna run --dsp1-rom`
+  flag that does not exist in the pinned luna — corrected to the
+  `luna state --dsp1-rom` install path; the stale Python-probes section
+  of the luna-test README replaced with the manifests view; dsp1_cube
+  baseline provenance repaired (visual and WRAM baselines were captured
+  from different builds).
+
 ## [0.36.2] — 2026-09-02
 
 A patch release with one linker-visible compiler fix and a full audit of

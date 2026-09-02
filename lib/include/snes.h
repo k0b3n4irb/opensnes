@@ -16,6 +16,8 @@
  * - `<snes/gameloop.h>` — gameloop framework opt-in
  * - `<snes/asset.h>` — typed background / tileset bundles
  * - `<snes/scene.h>` — push/pop scene stack
+ * - `<snes/panel.h>` — 9-slice HUD / dialog boxes on a BG layer
+ * - `<snes/dsp1.h>` — DSP-1 coprocessor 3D math (needs USE_DSP1 := 1)
  *
  * The Doxygen list at the bottom of this header repeats the same split
  * for IDE / cross-reference tooling.
@@ -53,13 +55,13 @@
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 36
+#define OPENSNES_VERSION_MINOR 37
 
 /** @brief OpenSNES patch version */
-#define OPENSNES_VERSION_PATCH 2
+#define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.36.2"
+#define OPENSNES_VERSION_STRING "0.37.0"
 
 /*============================================================================
  * Core Headers
