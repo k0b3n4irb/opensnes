@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | e045ccc5d57b9dba9a64d58fca7a3c95fab28d6f | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
+| compiler/cproc | 1a626e20ad45c2c186937efd20a6c991365684f6 | github.com/k0b3n4irb/cproc:fix/a1-followup-long-kl |
 | compiler/qbe | 8fbdc297fd3d1cacbfb18824e3b361fc1057d20f | github.com/k0b3n4irb/qbe:fix/a6-a7-leaf-opt-kl-frameless |
 | compiler/wla-dx | 91c52b1f4ef3cc8ba3c0638f7536539579af6a9f | github.com/k0b3n4irb/wla-dx v10.7 (release tag) |
 <!-- END PINS -->
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 13 patches (upstream merge-base: 7051114)
+### compiler/cproc — 14 patches (upstream merge-base: 7051114)
 
 ```
+1a626e2  qbe: namespace anonymous local-linkage globals per translation unit
 e045ccc fix(qbe): int->class mapping and operand widening for a 4-byte `l`
 6bdd923  feat(65816): pointer size/align 8/8 → 4/2 (chantier A6.1)
 cceac4b  fix(65816): preserve volatile through QBE IR  (chantier A2)

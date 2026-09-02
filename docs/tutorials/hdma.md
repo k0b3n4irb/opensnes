@@ -18,7 +18,7 @@ HDMA is different in three ways:
 1. **Timing** — the PPU's HBlank window between scanlines, every scanline,
    for as long as the channel stays enabled. Not on demand; it just keeps
    running once configured.
-2. **Cadence** — you supply a *table* in memory that says: write this value(s) for `N` scanlines, then write that value for `M` scanlines, then stop. The PPU walks the table as it draws each frame.
+2. **Cadence** — you supply a *table* in memory that says: write this value(s) for `N` scanlines, then write that value for `M` scanlines, then stop. The 5A22's DMA controller walks the table as the frame is drawn, pausing the CPU for each per-scanline transfer.
 3. **Cost** — HDMA reads steal a few machine cycles from each scanline.
    The 65816 still runs your code, just slightly slower during active
    display. You're paying for the per-scanline write.
@@ -95,12 +95,14 @@ on whether the high bit of the line count is set).
 
 The line-count byte's high bit is the **repeat flag**:
 
-- **Bit 7 = 0 — non-repeat mode.** "Write the data once, then hold the
-  destination register's value for *N* scanlines." Good for registers that
-  *latch* their value across scanlines (CGADD, COLDATA, INIDISP).
-- **Bit 7 = 1 — repeat mode.** "Write the data on every one of these *N*
-  scanlines." **Required** for registers that the PPU *consumes* every
-  scanline (BG scroll registers, Mode 7 matrix, window).
+- **Bit 7 = 0 — non-repeat mode.** The entry carries **one** scanline
+  worth of data. It is written once, then the destination register holds
+  the value for *N* scanlines (every PPU register latches what you write).
+  Right whenever the value is constant across the band.
+- **Bit 7 = 1 — repeat mode.** The count says how many *scanlines worth
+  of data* follow — one fresh group written per line. Needed only when
+  the value genuinely changes every line (scroll wave, smooth gradient,
+  moving window edge).
 
 A table ends with a line-count byte of `0`.
 
@@ -120,22 +122,24 @@ const u8 gradient_table[] = {
 };
 ```
 
-Same effect with repeat mode would write every scanline:
+Repeat mode, by contrast, carries one data group **per scanline** — a
+32-line repeat entry is followed by 32 groups, not one:
 
 ```c
 const u8 scroll_wave_table[] = {
-    0xA0, 0x10, 0x00,    /* $A0 = $80 | 32 → repeat for 32 scanlines */
-                          /* Each scanline writes BGnHOFS = 0x0010    */
-    0xA0, 0x20, 0x00,    /* Repeat for 32 scanlines, BGnHOFS = 0x0020 */
-    /* ... */
-    0,                    /* End */
+    0xA0,                /* $80 | 32 → 32 scanlines of per-line data */
+    0x10, 0x00,          /* line 0: BGnHOFS = 0x0010 */
+    0x11, 0x00,          /* line 1: BGnHOFS = 0x0011 */
+    /* ... 30 more { lo, hi } pairs, one per scanline ... */
+    0,                   /* End */
 };
 ```
 
-The "wrong mode" failure is silent and visible: scroll registers in
-non-repeat mode write only the first scanline of each group, then the
-PPU's latched scroll value drifts for the rest. You see the effect
-"glitching" instead of holding.
+The classic silent failure is a **layout mismatch**, not a register
+property: per-line data placed under a non-repeat count makes the
+hardware write the first group, hold it for the whole count, then
+misparse the remaining data bytes as line counts — the effect appears
+to work for the first line of each group and then falls apart.
 
 ## Setup pattern
 
@@ -226,11 +230,12 @@ through the window onto the BG2 layer beneath. Mode 4 transfer (4 bytes,
 
 ### Stationary window — `examples/windows/window`
 
-The non-animated cousin: HDMA in repeat mode writes to the window
-registers once (and then "every scanline" since window registers are
-write-only and forget on the next scanline). The window position holds
-across the visible region; the effect is a static masked area rather
-than animation.
+The non-animated cousin: a static window band needs only **non-repeat**
+entries — the window registers latch, so one write per band holds
+(end the table with an empty-window entry, left > right, if the shape
+must stop before the bottom of the frame). The shipped example keeps
+the repeat-mode table because it shares its build path with the
+animated variant; both produce the same static masked area.
 
 ### Indirect HDMA — `examples/hdma/hdma_indirect_gradient`
 
@@ -316,17 +321,28 @@ when const tables get big.
 
 ### 🟡 Repeat-mode discipline matters
 
-Three classes of registers, three rules:
+Every PPU register latches what you write — there is no register class
+that forgets its value between scanlines. The mode choice follows the
+**data**, not the register:
 
-| Register class | Examples | Mode |
+| Data shape | Examples | Mode |
 |---|---|:---:|
-| Self-latching (PPU holds value) | INIDISP, COLDATA, CGADD, MOSAIC | non-repeat OK |
-| Per-scanline-consumed | BG scroll, Mode 7 matrix | **repeat required** |
-| Write-only / forgets | WH0L/H, WH1L/H | **repeat required** |
+| Constant value per band | colour stripes, letterbox window, scroll split | non-repeat |
+| Fresh value every line | scroll wave, smooth gradient, moving window edge | repeat |
 
-Wrong mode for the second/third class shows as "the effect works for the
-first scanline of each group, then the latched value drifts". Verify in
-Mesen2's tile/window viewer if you suspect this.
+The two layouts differ (non-repeat = one data group held for the count;
+repeat = one data group *per line* of the count), so mixing them
+misparses the table — the effect works for the first line of each
+group, then falls apart. If you suspect this, dump the table bytes and
+walk them against the format above, or inspect the frame in luna.
+
+### 🟡 HDMA on BG1 scroll can corrupt Mode 7 writes (shared latch)
+
+$210D/$210E and the Mode 7 registers $211B-$2120 share a single
+write-twice latch. An HDMA channel (or IRQ) that writes a BG1 scroll
+register between the two writes of a Mode 7 register silently corrupts
+the value — and the Mode 7 multiplier result in $2134-$2136. See the
+matching gotcha in the [Mode 7 tutorial](mode7.md).
 
 ### 🟡 HDMA fires before the user callback in the NMI handler
 
@@ -362,10 +378,11 @@ Approximate budget (FastROM off):
 - A 4-byte repeat table on one channel: ~40 cycles per scanline, ~9 K
   cycles per frame.
 
-The 65816 has roughly 1369 cycles per scanline at 3.58 MHz, so a single
-HDMA channel costs 0.6 % – 3 % of CPU time. Two or three active channels
-are the practical limit before the cost shows up as missed timing in
-inner game-logic loops.
+A scanline is 1364 master cycles (about 1324 usable after the DRAM
+refresh pause — roughly 227 CPU cycles at 3.58 MHz FastROM), so a
+single HDMA channel costs about 1–3 % of the bus time. Two or three
+active channels are the practical limit before the cost shows up as
+missed timing in inner game-logic loops.
 
 ## See also
 

@@ -52,21 +52,17 @@ The SA-1 also sees it at **$0000-$07FF** (its direct page region).
 This is how the two CPUs communicate: the main CPU writes data to I-RAM,
 the SA-1 reads it, computes results, writes them back, and signals "done."
 
-> **Write protection gotcha (disputed polarity)**: Both CPUs have
-> independent write-protection registers (SIWP at $2229, CIWP at $222A).
-> The polarity is genuinely contested:
-> - The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
->   and fullsnes say **bit = 1 PROTECTS** a 256-byte page, so `$00` = all
->   writable, `$FF` = all protected.
-> - **Mesen2** (a GUI reference emulator) and **snes9x** behave the *opposite*
->   way: writing `$FF` leaves I-RAM writable (the crt0 self-test passes,
->   `sa1_status=$A5`); writing `$00` blocks the writes and the self-test
->   fails.
->
-> OpenSNES writes **`$FF`** because that is what works on the emulators we
-> test against. If you target real hardware, verify this on a cartridge —
-> the tie is unbroken. The crt0 I-RAM self-test catches a wrong choice at
-> runtime (`sa1IsReady()` returns false).
+> **Write protection (resolved polarity)**: Both CPUs have independent
+> write-protection registers (SIWP at $2229, CIWP at $222A). Each bit is a
+> **write-enable** flag for one 256-byte I-RAM page — bit=1 enables
+> writing, `$FF` = fully writable. This is what fullsnes, the official
+> Nintendo development manual (§4.1.25) and nocash's hardware debugging
+> all state, and how Mesen2, snes9x and luna behave. The
+> [Super Famicom Dev Wiki page](https://wiki.superfamicom.org/sa-1-registers)
+> documents the opposite polarity for $2229/$222A — that page is wrong
+> (and inconsistent with its own $2226/$2227 entries). OpenSNES writes
+> `$FF`; the crt0 I-RAM self-test catches any regression at runtime
+> (`sa1IsReady()` returns false). Details in `KNOWN_LIMITATIONS.md`.
 
 ## Getting Started
 

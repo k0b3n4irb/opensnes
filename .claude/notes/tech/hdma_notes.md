@@ -9,12 +9,20 @@ Each entry: `[count | 0x80] [data_lo] [data_hi]`
 - `0xA0` = repeat 32 lines (0x80 | 0x20)
 - 224 lines × 3 bytes + 1 end byte = 673 bytes for full-screen per-scanline
 
-### Direct Mode (BROKEN on this toolchain)
+### Direct Mode (~~BROKEN on this toolchain~~ — ROOT CAUSE FOUND 2026-09-02)
 Each entry: `[count] [data0_lo][data0_hi] [data1_lo][data1_hi] ...`
 - Different data per scanline within the count
 - Max count = 127 (7 bits)
 - Tested with 112+112 split — produced no visible effect (straight lines)
-- Root cause unknown — may be assembler/linker issue with table layout
+- ~~Root cause unknown — may be assembler/linker issue with table layout~~
+- **Root cause (Cartouche audit): the format above is wrong.** Per
+  anomie-regs: non-repeat = count + **one** scanline of data, written
+  once and held; only repeat mode (bit 7 set) carries per-line data.
+  A [112][112×data] table makes the hardware write the first group,
+  hold it 112 lines (the observed "straight lines"), then misparse the
+  rest as counts. Not a toolchain bug. This misreading later seeded the
+  false "registers forget → repeat required" doctrine in window.md /
+  hdma.md (corrected in the hardware-docs-audit chantier).
 
 ## Working Example: Static Sine Wave (ROM)
 ```c

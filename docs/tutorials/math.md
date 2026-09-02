@@ -15,9 +15,10 @@ Floating point on the SNES is **possible** but **expensive**. cproc /
 QBE can emit software-float code (the lib avoids it deliberately —
 `PHILOSOPHY.md` calls out "no printf in core lib" partly because
 formatted-output helpers force software floats), but a single
-`float` multiply costs ~500 cycles. At 60 fps with 1369 cycles per
-scanline, a few floats per frame is fine; per-sprite or per-particle is
-infeasible.
+`float` multiply costs ~500 CPU cycles — more than two scanlines of CPU
+time (a scanline is 1364 master cycles, roughly 227 CPU cycles at
+3.58 MHz FastROM). A few floats per frame is fine; per-sprite or
+per-particle is infeasible.
 
 Fixed-point is the canonical alternative: integers that **interpret**
 some bits as fractional. With 8.8 fixed-point (16-bit total), the
