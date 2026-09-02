@@ -544,17 +544,16 @@ register macros, see [`sa1.h`](../../lib/include/snes/sa1.h).
 |----------|---------|-----|-------------|
 | CCNT | $2200 | W | SA-1 CPU control: reset, IRQ, NMI, 4-bit message to SA-1 |
 | CRV | $2203-$2204 | W | SA-1 Reset Vector (address SA-1 jumps to on release from reset) |
-| SIWP | $2229 | W | SNES I-RAM Write Protection (**polarity disputed** — see note; OpenSNES writes `$FF`) |
-| CIWP | $222A | W | SA-1 I-RAM Write Protection (**polarity disputed** — see note; OpenSNES writes `$FF`) |
+| SIWP | $2229 | W | SNES I-RAM Write Protection — per-page **write-enable** bits; OpenSNES writes `$FF` (all writable) |
+| CIWP | $222A | W | SA-1 I-RAM Write Protection — per-page **write-enable** bits; OpenSNES writes `$FF` (all writable) |
 
-> **SIWP/CIWP polarity is disputed.** The [Super Famicom Dev
-> Wiki](https://wiki.superfamicom.org/sa-1-registers) and fullsnes say each
-> bit *enables* protection for one 256-byte I-RAM page (so `$00` = all
-> writable, `$FF` = all protected). But **Mesen2** (a GUI reference emulator)
-> and **snes9x** behave the opposite way: with `$FF` the crt0 I-RAM
-> self-test passes (`sa1_status=$A5`), with `$00` it fails. OpenSNES writes
-> `$FF` because that is what works on the emulators we validate against. The
-> tie has not been broken on real SA-1 hardware. See `KNOWN_LIMITATIONS.md`.
+> **SIWP/CIWP polarity (resolved).** Each bit is a write-**enable** flag for
+> one 256-byte I-RAM page: bit=1 writable, `$FF` = fully writable. fullsnes,
+> the official Nintendo development manual (§4.1.25) and nocash's hardware
+> debugging agree, and Mesen2, snes9x and luna behave accordingly. The
+> [Super Famicom Dev Wiki page](https://wiki.superfamicom.org/sa-1-registers)
+> states the opposite for $2229/$222A and is wrong (it is also inconsistent
+> with its own $2226/$2227 entries). See `KNOWN_LIMITATIONS.md` for sources.
 | SFR | $2300 | R | Status Flags: SA-1 IRQ/NMI pending, 4-bit message from SA-1 |
 
 **Typical boot sequence:**
@@ -566,11 +565,10 @@ sta.l $2203          ; CRV low
 lda.w #sa1_entry>>8
 sta.l $2204          ; CRV high (bank handled by mapping)
 
-; Enable I-RAM writes for both CPUs ($FF = writable on Mesen2/snes9x;
-; polarity disputed vs the wiki — see the note above)
+; Enable I-RAM writes for both CPUs (bit=1 = write-enable; see note above)
 lda #$FF
-sta.l $2229          ; SIWP — I-RAM writable by SNES (per our emulators)
-sta.l $222A          ; CIWP — I-RAM writable by SA-1 (per our emulators)
+sta.l $2229          ; SIWP — I-RAM fully writable by the SNES CPU
+sta.l $222A          ; CIWP — I-RAM fully writable by the SA-1
 
 ; Release SA-1 from reset
 lda #$00

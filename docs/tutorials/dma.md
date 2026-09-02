@@ -229,6 +229,13 @@ to `$2118`, `$2119`, `$2122`, `$2104`, etc. when active display is on.
 There is no error, no flag, no diagnostic. The next time you turn the
 screen on, the writes you "did" weren't.
 
+Two sharpening details from the hardware references: writes are also
+ignored during **HBlank** (only VBlank and force blank are safe), and
+the VRAM address in VMADD **still auto-increments even when the write
+is ignored** — which is why a transfer that straddles the end of
+VBlank resumes at the wrong VRAM address and shifts everything written
+after it.
+
 **Mitigation**: every DMA-touching function in the lib calls into a
 DMA register sequence that assumes VBlank or force blank. The
 discipline is yours: wrap heavy bulk transfers in
@@ -237,11 +244,13 @@ discipline is yours: wrap heavy bulk transfers in
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 
-NMI runs for ~35,000 master cycles after VBlank starts (the lib's NMI
-handler reserves some of that for OAM DMA, scroll sync, joypad read,
-user callback, etc.). DMA costs ~8 cycles per byte. Net: about 4 KB
-of *user* DMA before the PPU starts sampling registers for active
-display while you're still writing.
+VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
+about 50,500 master cycles (22 scanlines, ~30,000 cycles, with
+overscan). The lib's NMI handler reserves part of that for OAM DMA,
+scroll sync, joypad read and the user callback; DMA moves 1 byte per
+8 master cycles, so the raw ceiling is ~6 KB and the practical *user*
+budget is about 4 KB before the PPU starts sampling registers for
+active display while you're still writing.
 
 Exceed it and the PPU starts reading mid-DMA — you get garbage tiles
 on the top scanlines for that frame. The corruption is *visible*, not

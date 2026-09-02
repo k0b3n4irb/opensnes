@@ -191,21 +191,34 @@ the blending side; this example is the canonical "you need both" demo.
 
 ## Gotchas
 
-### 🟠 HDMA on `WH0`/`WH1` requires repeat mode
+### 🟡 Repeat vs non-repeat on `WH0`/`WH1` — pick by data shape, not by register
 
-The window boundary registers are *write-only* — the PPU consumes the
-written value for one scanline, then "forgets" it. To keep the window
-shape across scanlines, the HDMA table must use repeat mode (line-count
-high bit set) so the same data writes every scanline:
+The window boundary registers latch their value like every other PPU
+register: a value written once holds until the next write (that is why
+the static-rectangle row in the shapes table needs no HDMA at all).
+What the line-count high bit selects is the **table layout**:
 
 ```
-.db $A0, 80, 176    ; $A0 = $80 | 32 → repeat for 32 scanlines, write WH0=80,WH1=176
+.db 32, 80, 176     ; non-repeat: ONE pair, written once, held 32 lines
+.db $83, 80,176, 78,178, 76,180   ; repeat: 3 lines, one fresh pair PER line
 ```
 
-Non-repeat mode (`.db 32, 80, 176`) writes once on line 1 and the
-window resets on lines 2–32 — visible as the shape "collapsing" after
-its first row. The [HDMA tutorial](hdma.md) covers the repeat-mode
-discipline more broadly.
+- **Non-repeat** — one scanline worth of data per entry, held for the
+  count. Right for any band where the edges are constant (rectangle,
+  letterbox bar). If the shape doesn't reach the bottom of the frame,
+  end with an empty-window entry (left > right) or the last band's
+  latched values run to the bottom.
+- **Repeat** — the count says how many scanlines worth of data follow,
+  one fresh write per line. Needed only when the edges move every line
+  (diamond, circle, wave).
+
+Mixing the layouts is the classic silent failure: per-line data placed
+under a non-repeat count makes the hardware hold the first pair and
+misparse the following pairs as line counts — the shape appears to
+collapse after its first row. (An earlier version of this page blamed
+the registers for forgetting their value each scanline; the real
+hardware latches, and the collapse comes from the table misparse. See
+the table-format section of the [HDMA tutorial](hdma.md).)
 
 ### 🟠 `windowEnable(window, WINDOW_MATH)` is the gate to colour math
 

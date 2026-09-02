@@ -249,7 +249,7 @@ See `examples/scrolling/continuous_scroll/` for the full implementation includin
 
 ## VBlank Timing
 
-Scroll registers (`BG1HOFS`, `BG1VOFS`, etc.) are latched by the PPU at the start of each frame. Writing them during active display produces tearing or no visible effect.
+Scroll register writes (`BG1HOFS`, `BG1VOFS`, etc.) take effect from the next scanline — that is exactly what makes the HDMA parallax pattern above work. But an *unsynchronised* CPU write lands partway down the picture: the top of the frame shows the old scroll, the bottom the new one, visible as a one-frame tear.
 
 OpenSNES handles this automatically: `bgSetScroll()` writes to shadow variables and sets a dirty flag. The NMI handler checks the dirty flag during VBlank and commits only the changed values to hardware. You do not need to manually time your scroll writes.
 

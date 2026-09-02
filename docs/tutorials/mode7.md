@@ -244,6 +244,20 @@ display through it; the scaffolding is the same.
 
 ## Gotchas
 
+### 🟡 BG1 scroll and the Mode 7 registers share one write-twice latch
+
+`$210D`/`$210E` and `$211B`-`$2120` all go through a single shared
+prev-byte latch. If an HDMA channel or an IRQ writes a BG1 scroll
+register between the two writes of a Mode 7 register, the value — and
+the Mode 7 multiplier result MPY (`$2134`-`$2136`) — is silently
+corrupted (documented in the snesdev-wiki Errata). Practical rule: do
+matrix writes and MPY reads during VBlank, or disable any
+BG1-scroll-driving HDMA channel while rewriting the matrix. The
+perspective example is safe as shipped: HDMA channels run sequentially
+within a scanline, so one channel's two-byte M7A write is never split
+by another channel — the hazard is *CPU-side* matrix writes or MPY
+reads racing a scroll-writing HDMA channel mid-frame.
+
 ### 🔴 Single BG layer
 
 Mode 7 disables BG2, BG3, BG4 *in hardware*. `setMainScreen(TM_BG1 |
