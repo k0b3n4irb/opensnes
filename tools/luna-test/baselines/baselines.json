@@ -163,11 +163,11 @@
   },
   "chips_dsp1_cube": {
     "fbhash": [
-      "404a333f8f342337",
-      "9a122883506d8c9e"
+      "e8d3278e310f8d37",
+      "938092fa4f12be67"
     ],
-    "luna_version": "v1.16.0",
-    "rom_sha256": "1b76d46da7d6c1da8fc5abf11575ee3baa927a0f1d8b52eb1785598f8035f98a",
+    "luna_version": "v1.17.0",
+    "rom_sha256": "59865ee8a154c41c491d6ac3cc236a4db05a0eeea38bb147b345e9a9d9304619",
     "steps": [
       3000000,
       6000000

@@ -62,38 +62,34 @@ breaks fbhash cross-arch stability, that's a luna bug — regenerate baselines w
 
 ## Migration complete
 
-Everything the chantier scoped has landed: runtime/WRAM probes (`probes/`,
-incl. mouse + Super Scope via luna v1.1.0's scripted peripheral input), the
-WRAM-stream regression (`wram_regress.py`, CI-gated with cross-arch
-exclusions), input sequences (`--input`), the full-corpus manifest, and the
-CI rewrite (both Linux arches). For interactive debugging, `luna mcp` /
-luna's GUI are available alongside Mesen2.
+Everything the chantier scoped has landed — and the runtime probes have since
+been migrated from Python (`probes/*.py`, now deleted) to native luna
+manifests (`manifests/*.toml`, see the next section). Still here: the
+WRAM-stream regression (`wram_regress.py`), input sequences (`--input`),
+the full-corpus manifest, and the CI rewrite (both Linux arches). For
+interactive debugging, use `luna mcp` / luna's GUI.
 
 ## Hardening tests (luna scripted-input & trace capabilities)
 
-Beyond visual/coverage/probes, the harness exercises axes the old snes9x harness
-never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
+Beyond visual/coverage, the harness exercises axes the old snes9x harness
+never could. **These checks now live as native luna manifests under
+`manifests/*.toml`** (run by `luna test` via `make test-manifests`); the
+Python probes that pioneered them were deleted after the migration —
+`probes/` retains only `lib.py` (helper API, used by `project_test.py`)
+and `run_all.py`. Same coverage, declarative form:
 
-- **Coprocessor execution** (`probes/coproc.py`) — Super FX (`--superfx-trace`)
-  and SA-1 (`--sa1-trace`) examples must execute ≥1 coprocessor instruction. The
-  old harness could not even *detect* the GSU ("GSU: NOT DETECTED"); luna runs it
-  natively and this turns that into a positive, regression-guarding assertion (a
-  silent codegen/template break that stops the chip is invisible to the
-  framebuffer gate).
-- **SRAM persistence** (`probes/sram.py`) — battery save round-trip on
-  `save_game`: drive a save, persist the battery with `--srm-out`, power-cycle by
-  reloading it with `--srm-in`, assert the loaded struct matches, with a
-  no-battery negative control proving the match came from the file (not ROM
-  determinism). Exercises `snes/sram.h` end-to-end.
-- **Mouse input** (`probes/mouse.py`) — luna v1.1.0 `--port1 mouse --mouse`
-  injects SNES Mouse motion; the probe drives sustained motion and asserts the
-  cursor saturates to the clamp ((255,223) right/down, (0,0) left/up) — a
-  sensitivity-independent deterministic check that `input/mouse` decodes deltas.
-- **Super Scope** (`probes/superscope.py`) — `--port2 superscope --superscope`
-  fires the light gun at a known aim; the probe asserts the lib's decoded raw beam
-  position (`input/superscope`). Closes the last two boot+visual-only examples.
-- **Audio** (`probes/audio.py`, H5) — SNESMOD examples must have ≥1 active SPC
-  voice + non-silent PCM (`--audio-out`); the SFX driver must be alive.
+- **Coprocessor execution** (`manifests/coproc_*.toml`) — SA-1, Super FX
+  and DSP-1 examples must execute ≥1 coprocessor instruction
+  (`[asserts.trace]`); sa1_hello additionally asserts `sa1_status = 0xA5`.
+  The DSP-1 manifest is firmware-gated (`firmware = "dsp1b.rom"`) and
+  SKIPs cleanly when the dump is absent.
+- **SRAM persistence** (`manifests/a_sram_write.toml` & friends) —
+  battery save round-trip via `srm_out`/`srm_in` with block asserts.
+- **Mouse / Super Scope** (`manifests/mouse.toml`,
+  `manifests/superscope.toml`) — scripted peripheral input with
+  checkpointed WRAM value asserts.
+- **Audio** (`manifests/audio_v2.toml`) — `[asserts.dsp]` voice + PCM
+  liveness on the raw-APU driver fixture.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **Local, same-arch tool — not a CI gate:** raw
@@ -103,7 +99,7 @@ never could (see `/tmp/luna_test_hardening_ideas.md` for the full list):
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example
   source-mtime check) so stale-ROM rebaselines fail at capture time.
-- **VRAM-DMA timing safety + budget** (`probes/dma_budget.py`, H2) — luna v1.1.0
+- **VRAM-DMA timing safety + budget** (`manifests/dma_*.toml`, H2) — luna
   tags each `--dma-trace` write with `force_blank` (INIDISP), so a write is safe
   iff `blank || force_blank`. The probe asserts **zero unsafe writes** (active
   display, screen on — the #1 silent failure, now testable) and that the per-VBlank

@@ -16,6 +16,8 @@
  * - `<snes/gameloop.h>` — gameloop framework opt-in
  * - `<snes/asset.h>` — typed background / tileset bundles
  * - `<snes/scene.h>` — push/pop scene stack
+ * - `<snes/panel.h>` — 9-slice HUD / dialog boxes on a BG layer
+ * - `<snes/dsp1.h>` — DSP-1 coprocessor 3D math (needs USE_DSP1 := 1)
  *
  * The Doxygen list at the bottom of this header repeats the same split
  * for IDE / cross-reference tooling.

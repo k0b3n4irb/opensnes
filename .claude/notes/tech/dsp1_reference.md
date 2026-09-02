@@ -124,7 +124,7 @@ and see where it lands.
 ### Perspective projection (the pseudo-3D pipeline)
 | Opcode | Name | In | Out | Purpose |
 |--------|------|----|----|---------|
-| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → Cx,Cy,…). Out=4 CONFIRMED via luna SMK trace (#161, 112 consecutive txns); scalar *meanings* still ◆ |
+| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → Cx,Cy,…). Out=4 CONFIRMED twice: luna SMK trace (#161) AND direct probing 2026-09-02 (KAT `Multiply` green immediately after — no desync at 7-in/4-out). Behaviour characterised empirically (dsp1-v2 probe, luna DSP-1B): all-zero setup is **degenerate** (every Project → 0,0); `azs=$4000` → view axis = **+Y** (X across, Z up); projected offset ≈ `(lfe+les)·x/y` (lfe 96→256 scales H proportionally); `fz` shifts V (camera height); `aas=$8000` flips V and M signs, not H; H is mirrored (negative for +x) and V up-positive. Individual scalar semantics beyond that still ◆ |
 | `$06`,`$16`,`$26`,`$36` | **Project** | 3 (I x,y,z) | 3 (H,V,M) | world point → screen X, screen Y, scale/depth ★ |
 | `$0E`,`$1E`,`$2E`,`$3E` | Target | 2 (H,V) | 2 (x,y) | inverse of Project: screen → ground plane (aim/pick) ★ |
 | `$0A`,`$1A`,`$2A`,`$3A` | Raster | **5** (setup) | **unbounded** | per-scanline Mode-7 matrix STREAM; in=5 setup words (luna SMK #161), out is open-ended (384 words/frame in SMK) terminated by a CPU sentinel write — NOT a fixed count ★ |
@@ -148,6 +148,8 @@ Minimal cube (the module's first target):
 ```
 Init (once, or when camera moves):
   Parameter ($02): camera setup  -> cache Cx,Cy (tune Lfe/Les for FOV empirically)
+  [dsp1-v2, 2026-09-02: working reference config = (0,0,0, lfe=96, les=256,
+   aas=0, azs=$4000) — the dsp1_cube example + docs/tutorials/dsp1.md use it]
 Per frame:
   Attitude A ($01): S=$7FFF, θz,θy,θx        -> rotation matrix in slot A
   for each of 8 vertices (model x,y,z):
