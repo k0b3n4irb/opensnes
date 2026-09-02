@@ -9,5 +9,8 @@ var searchData=
   ['dlg_5fw_6',['DLG_W',['../basics_2panel__hud_2main_8c.html#acff5229cd8e842bcf952b99a9b3f3614',1,'main.c']]],
   ['dlg_5fx_7',['DLG_X',['../basics_2panel__hud_2main_8c.html#a5409eed0c8013cce661611c241207bff',1,'main.c']]],
   ['dlg_5fy_8',['DLG_Y',['../basics_2panel__hud_2main_8c.html#a383592ed20d138889dbe98a5af6a3456',1,'main.c']]],
-  ['drag_9',['DRAG',['../games_2mode7__racing_2main_8c.html#abcb9d181b7823861d7601d17e96dc4be',1,'main.c']]]
+  ['drag_9',['DRAG',['../games_2mode7__racing_2main_8c.html#abcb9d181b7823861d7601d17e96dc4be',1,'main.c']]],
+  ['dsp1_5fa_5ffrom_5ffix8_10',['DSP1_A_FROM_FIX8',['../dsp1_8h.html#ad82a852b0a2b20a5aad1004a05b61a3b',1,'dsp1.h']]],
+  ['dsp1_5ffix_5ffrom_5ft_11',['DSP1_FIX_FROM_T',['../dsp1_8h.html#a139bcf3d0975fbfdb803d62084eaab5e',1,'dsp1.h']]],
+  ['dsp1_5ft_5ffrom_5ffix_12',['DSP1_T_FROM_FIX',['../dsp1_8h.html#adfbfa0a8d0b8c1dc29d8971396b07cfb',1,'dsp1.h']]]
 ];

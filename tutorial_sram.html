@@ -124,7 +124,7 @@ $(function(){initNavTree('tutorial_sram.html','',''); });
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SRAM — the battery-backed RAM region on a SNES cartridge that survives power-off, used for save games on every cart that has one (Zelda, Final Fantasy VI, Super Mario World, …). The lib exposes a small set of byte-array helpers; the discipline lives in treating SRAM as <b>untrusted</b> data that needs validation on every load.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. The <a class="el" href="dma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/dma.md">DMA tutorial</a> is useful background but not required — SRAM access goes through plain CPU loads/stores, not DMA.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md381"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md392"></a>
 What SRAM actually is</h2>
 <p>A SNES cartridge contains:</p>
 <ul>
@@ -138,7 +138,7 @@ What SRAM actually is</h2>
 <li><b>Cartridge corruption</b> (cold-boot timing, marginal voltages) → SRAM contents become garbage <em>during</em> play.</li>
 </ol>
 <p>Both are silent failures. Your code <b>must</b> validate SRAM on every load — magic number, checksum, version field. A blind <span class="tt"><a class="el" href="sram_8h.html#a63e125097d3ec2339e7d13e918077314" title="Load data from SRAM.">sramLoad()</a></span> into a struct gives you whatever was in that battery-backed memory, correct or not.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md382"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md393"></a>
 Memory map</h2>
 <p>The SNES MMU maps SRAM into bank space differently for LoROM vs HiROM:</p>
 <table class="markdownTable">
@@ -152,10 +152,10 @@ Memory map</h2>
 <td class="markdownTableBodyNone"><b>SA-1</b>  </td><td class="markdownTableBodyNone">Different — see SA-1 chapter  </td><td class="markdownTableBodyNone">—  </td><td class="markdownTableBodyNone">SA-1 cart layouts depend on per-cart configuration.  </td></tr>
 </table>
 <p>The lib's <span class="tt"><a class="el" href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a63e125097d3ec2339e7d13e918077314" title="Load data from SRAM.">sramLoad</a></span> hide these details. You pass a WRAM/RAM pointer and a byte count; the helper assembles the correct 24-bit SRAM address. Unless you're writing custom SRAM access code, you don't need to know the bank/offset arithmetic.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md383"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md394"></a>
 Build setup</h2>
 <p>Two changes to enable SRAM in a project:</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md384"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md395"></a>
 1. Makefile</h3>
 <div class="fragment"><div class="line">OPENSNES := $(shell cd ../../.. &amp;&amp; pwd)</div>
 <div class="line">TARGET   := mygame.sfc</div>
@@ -182,7 +182,7 @@ Build setup</h2>
 <td class="markdownTableBodyCenter"><span class="tt">5</span>  </td><td class="markdownTableBodyCenter">32 KB  </td><td class="markdownTableBodyCenter"><span class="tt">$05</span>  </td></tr>
 </table>
 <p>Most homebrew picks 8 KB unless you genuinely need more. Larger SRAM declarations affect emulator save-state allocation and on real flash carts the actual reserved region.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md385"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md396"></a>
 2. ROM header</h3>
 <p>The build system fills the SNES ROM header automatically based on <span class="tt">USE_SRAM</span> and <span class="tt">SRAM_SIZE</span>:</p>
 <ul>
@@ -190,7 +190,7 @@ Build setup</h2>
 <li><span class="tt">SRAMSIZE</span> byte → matches <span class="tt">SRAM_SIZE</span>.</li>
 </ul>
 <p>Emulators read these bytes at ROM load to know how big to allocate the SRAM buffer and where to persist the <span class="tt">.srm</span> file. Mismatched declarations (Makefile says 8 KB, header says 2 KB) produce silent "my saves disappear after 2 KB worth of data" bugs.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md386"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md397"></a>
 The lib API</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -209,7 +209,7 @@ The lib API</h2>
 <td class="markdownTableBodyNone"><span class="tt">sramChecksum(data, size)</span>  </td><td class="markdownTableBodyNone">Compute an 8-bit XOR checksum of <span class="tt">data</span>. Use this for save-integrity validation.  </td></tr>
 </table>
 <p>The byte arrays are flat — there's no filesystem on SRAM, just a linear address space starting at offset 0. You pick the layout.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md387"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md398"></a>
 The minimum viable save</h2>
 <p>Single save slot with magic-number validation:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -286,7 +286,7 @@ The minimum viable save</h2>
 <li><b>Always validate</b>. SRAM contents on first boot are undefined — real hardware gives you whatever was in those memory cells when the cartridge was assembled. Magic-number-or-die is the canonical fix.</li>
 <li><b>Compute the checksum with the stored field zeroed</b>. Otherwise the very value you're computing depends on itself, and you'll produce a different checksum every save. The pattern: zero the field, compute, write the field, save.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md388"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md399"></a>
 Multi-slot saves</h2>
 <p>For "Slot 1, Slot 2, Slot 3" RPG-style saves, use offset addressing:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define SLOT_SIZE   256</span></div>
@@ -303,14 +303,14 @@ Multi-slot saves</h2>
 <div class="ttc" id="asram_8h_html_a33eaa8d30319fe6c1a8a2f1586c09752"><div class="ttname"><a href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a></div><div class="ttdeci">void sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
 <div class="ttc" id="asram_8h_html_ab68f968d67c1b0afcfef2aeb92c92002"><div class="ttname"><a href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --><p>The SDK's <span class="tt">examples/memory/save_game</span> is exactly this pattern: two slots, distinct offsets, full struct round-trip with on-screen verification of the loaded values.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md389"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md400"></a>
 "Delete save"</h2>
 <p>Zero the relevant region:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a>(<span class="keyword">sizeof</span>(SaveData));        <span class="comment">/* slot 0 only */</span></div>
 <div class="line"><a class="code hl_function" href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a>(N_SLOTS * SLOT_SIZE);     <span class="comment">/* all slots */</span></div>
 <div class="ttc" id="asram_8h_html_a5fb4001e2b3432597a28e97af0a907c0"><div class="ttname"><a href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a></div><div class="ttdeci">void sramClear(u16 size)</div><div class="ttdoc">Clear SRAM to zero.</div></div>
 </div><!-- fragment --><p>The next load attempt fails magic-number validation and falls back to defaults. (Don't try "delete by setting magic to invalid" — a direct write is simpler and survives partial-write failures.)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md390"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md401"></a>
 Worked pattern (the shipped example)</h2>
 <p><span class="tt">examples/memory/save_game</span> — two save slots, each holding a <span class="tt"><a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> { posX, posY, camX, camY }</span>. Press <b>A</b> to save test data to slot 1, <b>B</b> to load it back; <b>X</b>/**Y** for slot 2. Loaded values are displayed as hex on screen so you can verify round-trip integrity. The example exercises:</p>
 <ul>
@@ -319,16 +319,16 @@ Worked pattern (the shipped example)</h2>
 <li>The Makefile + header pair (<span class="tt">USE_SRAM := 1</span>, <span class="tt">SRAM_SIZE := 3</span>) — this is the example to copy when starting a new save-supporting project.</li>
 </ul>
 <p>It does <b>not</b> implement magic-number / checksum validation — that's left as the production-readiness step the tutorial above documents. For real games, always add it.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md391"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md402"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md392"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md403"></a>
 🔴 SRAM contents on first boot are undefined</h3>
 <p>Real hardware: whatever was in the cells at cart assembly. Emulators: typically zero-filled, but flash carts and some emulator configurations preserve previous content across cart swaps. Your code <b>must</b> validate before trusting:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (save.magic != <span class="stringliteral">&quot;SAVE&quot;</span> || <a class="code hl_function" href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a>(...) != save.checksum) {</div>
 <div class="line">    initDefaults();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This is <em>not optional</em>. A <span class="tt"><a class="el" href="sram_8h.html#a63e125097d3ec2339e7d13e918077314" title="Load data from SRAM.">sramLoad</a></span> into a struct without validation gives you garbage and your game silently boots into corrupted state. The save_game example (which doesn't validate) is fine for a tech demo; production code is not.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md393"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md404"></a>
 🔴 Battery dies → silent corruption</h3>
 <p>A 10–20-year-old cartridge's coin-cell battery can fail. When it does, SRAM contents drift toward "all $00" or "all $FF" or random patterns. Your validation must catch both:</p>
 <ul>
@@ -336,21 +336,21 @@ Gotchas</h2>
 <li><b>Checksum</b>: deterministic — fails on partial corruption (one bad byte mid-struct).</li>
 <li><b>Version field</b> (advanced): track save format version so old saves from a previous game build can be migrated or rejected.</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md394"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md405"></a>
 🔴 <span class="tt">SRAM_SIZE</span> mismatch between Makefile and code</h3>
 <p>The lib's <span class="tt">sramSave/sramLoad</span> will happily write past the size declared in the ROM header. On emulators, the <span class="tt">.srm</span> file may be truncated; on real hardware, writes past the actual chip size wrap around or vanish. Always set <span class="tt">SRAM_SIZE</span> in your Makefile to match or exceed the largest offset your code writes.</p>
 <p>A common bug: <span class="tt">SRAM_SIZE := 1</span> (2 KB) in Makefile, then code uses <span class="tt">SLOT_SIZE = 1024</span> × 4 slots = 4 KB. Slots 2 and 3 silently fail to persist on hardware that respects the header.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md395"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md406"></a>
 🟠 SRAM access requires no special timing</h3>
 <p>Unlike VRAM/CGRAM/OAM (which need VBlank or force blank), SRAM is plain RAM mapped into the CPU's address space. You can read or write it at any time during active display. The lib's helpers do not call <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> and don't need to.</p>
 <p>This is good news ergonomically — <span class="tt"><a class="el" href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf" title="Save data to SRAM.">sramSave</a></span> mid-frame is fine — but newcomers from a "VBlank everything" mental model sometimes add unnecessary <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> calls around SRAM operations.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md396"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md407"></a>
 🟠 Cannot store pointers in SRAM</h3>
 <p>A pointer in WRAM points to bank <span class="tt">$00</span> (or <span class="tt">$7E</span>) at some specific address; that address is meaningful only while the cartridge runs this exact ROM. If you save a pointer and reload it on a future boot, the pointer might be valid (same ROM) or not (different game or emulator's memory layout). Always serialise structs as plain-old-data: counts, flags, indices, NEVER pointers.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md397"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md408"></a>
 🟠 Endianness — but you don't have to think about it</h3>
 <p>The SNES is little-endian (low byte first). <span class="tt">sramSave/sramLoad</span> copies raw bytes; struct fields land in the order the C compiler laid them out. Same compiler reading and writing → bit-perfect round-trip. If you ever migrate save data between PVSnesLib and OpenSNES (or any two compilers with different alignment rules), <b>check struct layout first</b> — padding bytes can shift between compilers.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md398"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md409"></a>
 🟡 Emulator persistence varies</h3>
 <ul>
 <li><b>snes9x</b> and <b>Mesen2</b>: persist SRAM to a <span class="tt">.srm</span> file alongside the ROM. Save game survives reset and emulator restart.</li>
@@ -359,10 +359,10 @@ Gotchas</h2>
 </ul>
 <p>If you write a tutorial / demo that "saves on cycle X and loads on
 boot", expect different behaviour across platforms. The save_game example uses two slots specifically so you can verify round-trip in a single boot cycle without depending on persistence.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md399"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md410"></a>
 🟡 <span class="tt">sramClear</span> is a memset, not a write-protect</h3>
 <p><span class="tt">sramClear(size)</span> writes zeros to SRAM. It does <b>not</b> disable SRAM, prevent future writes, or "format" the chip. Re-saving after clear works as normal. The function is for "wipe save data" UI flows, not for "secure erase".</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md400"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md411"></a>
 Cycle cost</h2>
 <p>SRAM saves go through the 65816's MVN block-move (<span class="tt">lib/source/sram.asm</span>), which costs <b>7 CPU cycles per byte</b> moved. A 256-byte save:</p>
 <ul>
@@ -370,7 +370,7 @@ Cycle cost</h2>
 </ul>
 <p>A full 8 KB save: ~57 K CPU cycles ≈ 430 K master cycles — slightly <em>more</em> than one full frame (a frame is ~357 K master cycles). SRAM access needs no VBlank window, so nothing corrupts, but the frame that runs the save arrives late. For multi-KB auto-saves during gameplay, split the save across frames (say 2 KB per frame) or accept the one-off hitch.</p>
 <p>There is no DMA path for SRAM — general DMA cannot copy between two A-bus addresses (WRAM and cartridge SRAM both live on the A bus), so MVN is the fastest option available.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md401"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md412"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">lib/include/snes/sram.h</a></span> — full API reference.</li>

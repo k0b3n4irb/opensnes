@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_panel.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers the <span class="tt">panel</span> module — bordered boxes on a background layer, the building block of dialog windows and HUDs. Add <span class="tt">panel</span> to <span class="tt">LIB_MODULES</span> (it pulls in <span class="tt">dma</span> and <span class="tt">console</span>).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md321"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md332"></a>
 What a panel is</h2>
 <p>Every SNES RPG draws the same thing: a bordered box over the map with text in it. Every status bar is the same shape. Both are a <b>9-slice panel</b> — four corners, four edges and a fill, stamped from a small 3×3 tile sheet so a box of any size reuses nine tiles:</p>
 <div class="fragment"><div class="line">┌───────┐     TL  T   TR</div>
@@ -133,7 +133,7 @@ What a panel is</h2>
 <blockquote class="doxtable">
 <p>Not to be confused with <span class="tt">window</span> — that's the PPU's masking registers. <span class="tt">panel</span> is unrelated furniture. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md322"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md333"></a>
 The <span class="tt">Panel</span> struct — the tilemap is yours</h2>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *<a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a>;        <span class="comment">// 32x32 tilemap entries in RAM. Caller-owned.</span></div>
@@ -150,7 +150,7 @@ The <span class="tt">Panel</span> struct — the tilemap is yours</h2>
 <div class="ttc" id="astructPanel_html"><div class="ttname"><a href="structPanel.html">Panel</a></div><div class="ttdoc">A 9-slice panel layer: one BG tilemap and the sheet to stamp from.</div><div class="ttdef"><b>Definition</b> panel.h:80</div></div>
 </div><!-- fragment --><p>You declare the 32×32 tilemap buffer, not the module. That is deliberate: a panel tilemap is 2 KB and C RAM is only an 8 KB band, so a module that allocated one silently would spend a quarter of a game's RAM without saying so. Declaring it yourself keeps the cost visible — and lets two BG layers each have their own panel.</p>
 <p><span class="tt">stride</span> is the sheet's width in tiles. It is 3 for a bare 9-slice, but a sheet often carries other art in later columns — the RPG's is 4 wide, with HUD icons in the fourth column reached via <span class="tt"><a class="el" href="panel_8h.html#a5d5d8b8c54b3e34bab41e43667f0d310" title="Put one tile of the sheet into the map, with the layer&#39;s palette and priority.">panelPut()</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md323"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md334"></a>
 The minimum viable dialog box</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="panel_8h.html">snes/panel.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -181,7 +181,7 @@ The minimum viable dialog box</h2>
 <li><b><span class="tt">panelPut(p, x, y, tile)</span></b> places one arbitrary sheet tile (an icon) with the layer's palette/priority.</li>
 <li><b><span class="tt">panelFlush(p)</span></b> uploads the whole tilemap to VRAM.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md324"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md335"></a>
 Several panels, one layer, one upload</h2>
 <p>Panels are stamped into the buffer, not uploaded individually. So a HUD at the top and a dialog box at the bottom are two <span class="tt"><a class="el" href="panel_8h.html#a91d9112413485a7ffc98910622032ae1" title="Stamp a bordered box of w x h tiles at (x, y).">panelDraw</a></span> calls into the same map and a <em>single</em> <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span>:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="panel_8h.html#a874fe29ea018e90fd74219f528f0bc72">panelInit</a>(&amp;<a class="code hl_variable" href="basics_2panel__hud_2main_8c.html#adb4660c7233d9cfcef3a529a39341bcb">ui</a>);</div>
@@ -196,19 +196,19 @@ Several panels, one layer, one upload</h2>
 <div class="line"><a class="code hl_function" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704">panelFlush</a>(&amp;<a class="code hl_variable" href="basics_2panel__hud_2main_8c.html#adb4660c7233d9cfcef3a529a39341bcb">ui</a>);</div>
 <div class="ttc" id="apanel_8h_html_a9bd6c333f3c6751d8f3040b9ad66f768"><div class="ttname"><a href="panel_8h.html#a9bd6c333f3c6751d8f3040b9ad66f768">panelClear</a></div><div class="ttdeci">void panelClear(const Panel *p, u8 x, u8 y, u8 w, u8 h)</div><div class="ttdoc">Blank a rectangle of the tilemap, leaving the rest alone.</div></div>
 </div><!-- fragment --><p>This is exactly how <span class="tt">examples/games/rpg</span> draws its HUD (hearts + a purse) and dialog box on one BG2 tilemap.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md325"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md336"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md326"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md337"></a>
 🔴 <span class="tt">panelFlush</span> uploads under forced blank — do not do it yourself with <span class="tt">setBrightness(0)</span></h3>
 <p>A 32×32 tilemap is 2 KB, which does not reliably fit the ~4 KB VBlank DMA budget alongside a game's own transfers. So <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span> wraps its DMA in <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></span> / <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> — real forced blank (INIDISP bit 7).</p>
 <p>If you were tempted to hand-roll the upload with <span class="tt">setBrightness(0)</span> around a <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span>, that is the trap the module exists to remove: <span class="tt">setBrightness(0)</span> blacks the screen but leaves the PPU fetching, so the VRAM write is <b>still dropped</b> — the tail of the transfer never lands. Only <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a></span> opens the write window. Let <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span> do it.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md327"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md338"></a>
 🟡 Text goes on a <em>different</em> layer, above the panel</h3>
 <p>The panel is a BG layer; the text sits on another BG in front of it (<span class="tt">text_config.priority</span> + the mode's BG-priority bit). Layers stack <em>scene &lt; panel &lt; text</em>. Drawing text into the panel's own tilemap is not how it works — draw the box on BG2, the text on BG3.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md328"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md339"></a>
 🟡 Match <span class="tt">base_tile</span>/<span class="tt">stride</span> to how the sheet was converted</h3>
 <p>The nine slices are read in raster order from <span class="tt">base_tile</span> across <span class="tt">stride</span> columns: <span class="tt">base+0/1/2</span> (top row), <span class="tt">base+stride/+1/+2</span> (middle), and so on. If the sheet is 4 wide (icons in column 4), <span class="tt">stride</span> is 4, not 3, or the middle row reads the wrong tiles.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md329"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md340"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="sprites_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sprites.md">Text rendering</a> and the <span class="tt">text</span> module — the text that goes in the box.</li>

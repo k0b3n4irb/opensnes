@@ -123,18 +123,18 @@ $(function(){initNavTree('examples_color_shadow_tint.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 6 (Colour &amp; effects) · rung 6c.2 — shadow &amp; tint.</b></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1154"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1165"></a>
 Why it matters for your game</h2>
 <p>Mood is colour. Nightfall, a dungeon, a cave — subtract a grey and the whole screen darkens. Underwater, poison gas, a lava cavern, a sepia flashback, the red flash of taking a hit — add a colour and everything takes that cast. The SNES does this to every pixel of a layer in one PPU pass, so a single register pair changes the entire scene's atmosphere for zero per-frame cost. It is the difference between one tileset and a tileset that reads as day, dusk, and midnight.</p>
 <div class="image">
 <img src="shadow_tint.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1155"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1166"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>colour math against a <em>fixed</em> colour.</b> The PPU takes the finished main-screen image and adds or subtracts a constant colour per layer — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow()</a></span> subtracts a grey (darken), <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint()</a></span> adds a colour (cast). This rests on the layers, tiles and palette you already know; the effect sits <em>on top</em> of them and touches no VRAM, CGRAM or OAM.</p>
 <p>Because both effects share the one fixed-colour register and the single add/subtract bit, <b>only one is active at a time</b> — which is exactly why the demo cycles through them rather than combining them. The scene is a 4×4 chart of sixteen game-world colours, built procedurally (zero assets), so you can watch the transform land on every hue together.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1156"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1167"></a>
 What to observe / if it breaks</h2>
 <ul>
 <li><b>Correct run:</b> the plain colour chart. Press <b>A</b> to cycle: <span class="tt">none → shadow (darkens) → underwater (blue cast) → sunset (warm cast)
@@ -144,14 +144,14 @@ What to observe / if it breaks</h2>
 <li><b>Shadow goes fully black / tint blows out white:</b> the fixed-colour intensity is too high — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow</a></span> subtracts, <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint</a></span> adds, both clamp at the channel limits.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="color_2shadow__tint_2main_8c.html#adf08111f5aa78a7eb0efff8c23f8d70a" title="Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset).">fx_state</a></span> (0 none, 1 shadow, 2 underwater, 3 sunset) advances on each A press; the effect matches CGADSUB (add/subtract) and COLDATA (the fixed colour).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1157"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1168"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 shadow_tint.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1158"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1169"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span>, <span class="tt">input</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1159"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1170"></a>
 Where you are</h2>
 <p>← previous: <a href="../transparency/">transparency</a> · colour math between two layers · → next in family: <a href="../direct_color/">direct_color</a> · the pixel byte <em>is</em> the colour </p>
 </div></div><!-- contents -->

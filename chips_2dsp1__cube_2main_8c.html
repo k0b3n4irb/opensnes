@@ -128,6 +128,16 @@ $(function(){initNavTree('chips_2dsp1__cube_2main_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="dsp1_8h_source.html">snes/dsp1.h</a>&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a70452993a6803d8849ad86f920dff52e" id="r_a70452993a6803d8849ad86f920dff52e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a70452993a6803d8849ad86f920dff52e">CUBE_DIST</a>&#160;&#160;&#160;400</td></tr>
+<tr class="memdesc:a70452993a6803d8849ad86f920dff52e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance from the camera to the cube's centre, along the DSP-1's depth axis. Empirically characterised on luna (DSP-1B): with azs=0x4000 the projection looks along +Y — X is across, Z is up. Rotated corners span ±~139 (80·√3), so 400 keeps every corner in front of the eye.  <br /></td></tr>
+<tr class="memitem:ad8b1f2c453b375f89a5548ebb38938dc" id="r_ad8b1f2c453b375f89a5548ebb38938dc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad8b1f2c453b375f89a5548ebb38938dc">VIEW_AZS</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memdesc:ad8b1f2c453b375f89a5548ebb38938dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen-plane zenith angle: 0x4000 (90°) = horizontal view, +Y is the depth axis. The all-zero setup is degenerate (every point projects to the origin) — this angle is what makes the projection live.  <br /></td></tr>
+<tr class="memitem:a6a18e17c7c8d487a40a2e72c56413c02" id="r_a6a18e17c7c8d487a40a2e72c56413c02"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6a18e17c7c8d487a40a2e72c56413c02">VIEW_LES</a>&#160;&#160;&#160;256</td></tr>
+<tr class="memitem:aae7d9a9e9ddc87a7c5718ce1d5dc8a9f" id="r_aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aae7d9a9e9ddc87a7c5718ce1d5dc8a9f">VIEW_LFE</a>&#160;&#160;&#160;96</td></tr>
+<tr class="memdesc:aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">dsp1Parameter FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -137,24 +147,91 @@ Variables</h2></td></tr>
 <tr class="memitem:a1b49ba06ad8a5160ef98bd665f58077c" id="r_a1b49ba06ad8a5160ef98bd665f58077c"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1b49ba06ad8a5160ef98bd665f58077c">cube</a> [8][3]</td></tr>
 <tr class="memitem:aff27dda3b84eb86334ca0c3452432f5a" id="r_aff27dda3b84eb86334ca0c3452432f5a"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aff27dda3b84eb86334ca0c3452432f5a">dot_pal</a> [4] = { 0x00, 0x00, 0xFF, 0x7F }</td></tr>
 <tr class="memitem:a038c1b5d9597eb67562da8969f062b51" id="r_a038c1b5d9597eb67562da8969f062b51"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a038c1b5d9597eb67562da8969f062b51">dot_tile</a> [32]</td></tr>
+<tr class="memitem:a12daf4f2dbff3923ffb1c93fdbdb13ab" id="r_a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a12daf4f2dbff3923ffb1c93fdbdb13ab">dsp1_ok</a> = 0</td></tr>
+<tr class="memdesc:a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 when the DSP-1 answered the known-answer probe — parked in WRAM so the luna test manifest can assert it (<span class="tt">coproc_dsp1.toml</span>).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>DSP-1 pseudo-3D: a cube tumbling in 3D, rotated by the coprocessor. </p>
-<p>Each frame the DSP-1 builds a rotation matrix (dsp1Attitude) and transforms the cube's 8 corners through it (dsp1Objective). The corners are drawn as 8 sprites at their orthographically-projected positions, so the cube visibly tumbles in 3D — all the 3D math runs on the NEC uPD77C25, not the 65816.</p>
+<p>Each frame the DSP-1 builds a rotation matrix (dsp1Attitude), transforms the cube's 8 corners through it (dsp1Objective), and projects each corner onto the screen with true hardware perspective (dsp1Project, set up once by dsp1Parameter). The corners are drawn as 8 sprites — all the 3D math, including the perspective divide, runs on the NEC uPD77C25, not the 65816.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>DSP-1 coprocessor command interface (matrix + vector transform)</li>
 <li>Fixed-point 3D rotation offloaded from the CPU</li>
-<li>Orthographic projection (x',y' straight to screen)</li>
+<li>Hardware perspective projection (Parameter -&gt; Project pipeline)</li>
+<li><a class="el" href="dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f" title="Is a DSP-1 responding? Known-answer self-test.">dsp1Present()</a> known-answer probe before relying on the chip</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>A cube of 8 dots rotating smoothly about two axes</li>
+<li>Perspective: corners swinging toward the camera drift outward (closer = bigger separation), the far face contracts — no longer a flat tumble</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, sprite, dsp1</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Needs the DSP-1 firmware in luna (dsp1b.rom) — see the README. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="dsp1_8h.html" title="DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C.">snes/dsp1.h</a>, .claude/notes/tech/dsp1_reference.md </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a70452993a6803d8849ad86f920dff52e" name="a70452993a6803d8849ad86f920dff52e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70452993a6803d8849ad86f920dff52e">&#9670;&#160;</a></span>CUBE_DIST</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CUBE_DIST&#160;&#160;&#160;400</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Distance from the camera to the cube's centre, along the DSP-1's depth axis. Empirically characterised on luna (DSP-1B): with azs=0x4000 the projection looks along +Y — X is across, Z is up. Rotated corners span ±~139 (80·√3), so 400 keeps every corner in front of the eye. </p>
+
+</div>
+</div>
+<a id="ad8b1f2c453b375f89a5548ebb38938dc" name="ad8b1f2c453b375f89a5548ebb38938dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8b1f2c453b375f89a5548ebb38938dc">&#9670;&#160;</a></span>VIEW_AZS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VIEW_AZS&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Screen-plane zenith angle: 0x4000 (90°) = horizontal view, +Y is the depth axis. The all-zero setup is degenerate (every point projects to the origin) — this angle is what makes the projection live. </p>
+
+</div>
+</div>
+<a id="a6a18e17c7c8d487a40a2e72c56413c02" name="a6a18e17c7c8d487a40a2e72c56413c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a18e17c7c8d487a40a2e72c56413c02">&#9670;&#160;</a></span>VIEW_LES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VIEW_LES&#160;&#160;&#160;256</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aae7d9a9e9ddc87a7c5718ce1d5dc8a9f" name="aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae7d9a9e9ddc87a7c5718ce1d5dc8a9f">&#9670;&#160;</a></span>VIEW_LFE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VIEW_LFE&#160;&#160;&#160;96</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>dsp1Parameter FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -248,6 +325,22 @@ Variables</h2></td></tr>
 <div class="line">    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>8x8 4bpp tile, colour index 1 everywhere. In the SNES 4bpp layout planes 0/1 interleave per row, so plane 0 all-set is the ODD bytes 0,2,…,14. </p>
+
+</div>
+</div>
+<a id="a12daf4f2dbff3923ffb1c93fdbdb13ab" name="a12daf4f2dbff3923ffb1c93fdbdb13ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12daf4f2dbff3923ffb1c93fdbdb13ab">&#9670;&#160;</a></span>dsp1_ok</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dsp1_ok = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>1 when the DSP-1 answered the known-answer probe — parked in WRAM so the luna test manifest can assert it (<span class="tt">coproc_dsp1.toml</span>). </p>
 
 </div>
 </div>

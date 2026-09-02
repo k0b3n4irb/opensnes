@@ -24,5 +24,6 @@ var searchData=
   ['colormath_5foutside_21',['COLORMATH_OUTSIDE',['../colormath_8h.html#af0d86f069412ad52e766931e954b6cde',1,'colormath.h']]],
   ['colormath_5fsrc_5ffixed_22',['COLORMATH_SRC_FIXED',['../colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579',1,'colormath.h']]],
   ['colormath_5fsrc_5fsubscreen_23',['COLORMATH_SRC_SUBSCREEN',['../colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b',1,'colormath.h']]],
-  ['colormath_5fsub_24',['COLORMATH_SUB',['../colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea',1,'colormath.h']]]
+  ['colormath_5fsub_24',['COLORMATH_SUB',['../colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea',1,'colormath.h']]],
+  ['cube_5fdist_25',['CUBE_DIST',['../chips_2dsp1__cube_2main_8c.html#a70452993a6803d8849ad86f920dff52e',1,'main.c']]]
 ];

@@ -141,7 +141,7 @@ Screenshot</div></div>
 <td class="markdownTableBodyNone">walk into the blue door  </td><td class="markdownTableBodyNone">enter the house; the mat inside takes you back  </td></tr>
 </table>
 <p>ROM mode: LoROM (project default).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1279"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1290"></a>
 SNES Concepts</h2>
 <ul>
 <li><b>Tiled as the content pipeline</b>: collision and entities are data. <span class="tt">gen_assets.py</span> reads <span class="tt">town.tmj</span> and emits the SNES tilemap, a 64×64 collision map and <span class="tt">entities.inc</span>.</li>
@@ -154,7 +154,7 @@ SNES Concepts</h2>
 <li><b>Two 9-slice panels on one layer</b> via the <span class="tt">panel</span> module: the HUD at the top and the dialog box at the bottom share BG2's tilemap, so one upload covers both and opening a dialog never disturbs the HUD. The module does that upload under forced blank, which is the part that is easy to get wrong. <span class="tt">text_config.priority</span> plus BGMODE bit 3 put the text in front of the opaque town.</li>
 <li><b>Collision through the SDK's <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span></b> over the Tiled map. Its <span class="tt"><a class="el" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a></span> parameter is <span class="tt">const</span>, so the lookup is a bank-honouring far read (#121) — the 4 KB map needs neither bank $00 nor a byte of RAM.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1280"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1291"></a>
 Editing the map</h2>
 <div class="fragment"><div class="line"># open res/town.tmj in Tiled, edit terrain / drag the Entities objects</div>
 <div class="line">python3 gen_assets.py --keep-map    # re-read town.tmj + house.tmj, rebuild</div>
@@ -164,10 +164,10 @@ Editing the map</h2>
 <p><span class="tt">town.tmj</span> is a standard Tiled map, so the SDK's own converter reads it too — a useful check that the file is well-formed:</p>
 <div class="fragment"><div class="line">../../../bin/tmx2snes -e -Q res/town.tmj res/tileset.map</div>
 </div><!-- fragment --><p><span class="tt">-Q</span> writes the quadrant-ordered 64×64 tilemap this example scrolls with the <span class="tt">background</span> module, and <span class="tt">-e</span> writes the entities as C defines — byte-identical to what <span class="tt">gen_assets.py</span> produces. The generator still runs the conversion itself because it also builds the per-cell collision grid and marks the villagers' tiles blocked, which is game logic rather than map data; moving the rest onto the tool is a Makefile change.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1281"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1292"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1282"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1293"></a>
 Modules Used</h2>
 <p>console, dma, background, sprite, text, input, collision, panel </p>
 </div></div><!-- contents -->

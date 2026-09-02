@@ -123,8 +123,8 @@ $(function(){initNavTree('examples_chips.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 11 — "more horsepower, when the base hardware isn't enough."</b> Some SNES cartridges carry a coprocessor. These examples boot one, prove it runs, then put it to real work — the branch you reach for late in a project, not on day one.</p>
-<p>Two chips, each a boot-then-work pair:</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1111"></a>
+<p>Three chips — SA-1 and Super FX as boot-then-work pairs, the DSP-1 as a single worked example (it needs no boot: the firmware is already on the chip):</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1122"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -137,15 +137,17 @@ The ladder</h2>
 <td class="markdownTableBodyNone">11.3  </td><td class="markdownTableBodyNone"><a href="superfx_hello/">superfx_hello</a>  </td><td class="markdownTableBodyNone">How do I boot the GSU and run a hardware test?  </td><td class="markdownTableBodyNone">SuperFX  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">11.4  </td><td class="markdownTableBodyNone"><a href="superfx_3d/">superfx_3d</a>  </td><td class="markdownTableBodyNone">How do I render 3D with the SuperFX?  </td><td class="markdownTableBodyNone">SuperFX  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">11.5  </td><td class="markdownTableBodyNone"><a href="dsp1_cube/">dsp1_cube</a>  </td><td class="markdownTableBodyNone">How do I offload 3D rotation + perspective to the DSP-1?  </td><td class="markdownTableBodyNone">DSP-1  </td></tr>
 </table>
 <p>Boot first (11.1 / 11.3 — prove the chip is alive and talking), then a real workload (11.2 / 11.4).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1112"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1123"></a>
 The two chips, in one screen</h2>
 <ul>
 <li><b>SA-1</b> — the <em>same</em> 65816 ISA as the main CPU, but at <b>10.74 MHz</b> and with its own I-RAM (<span class="tt">$3000–$37FF</span>) shared with the main CPU. So your SA-1 code is ordinary 65816 assembly; the art is the handshake (who writes what, when) through shared RAM. See the <a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">SA-1 tutorial</a>.</li>
 <li><b>SuperFX / GSU</b> — a <em>custom RISC</em> processor for bitmap and 3D work. It has its own ISA (no C compiler — the GSU code is assembly, <span class="tt">.sfx</span> sources assembled by <span class="tt">wla-superfx</span>), renders into cartridge RAM, and DMAs the result to VRAM. See the <a class="el" href="superfx_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/superfx.md">SuperFX tutorial</a>.</li>
 </ul>
-<p>Both are validated natively by luna, which detects and runs the SA-1 and the GSU in the headless test harness — no chip-ROM side channel needed.</p>
+<p>All three are validated natively by luna, which detects and runs the SA-1, the GSU and the DSP-1 in the headless test harness — no chip-ROM side channel needed. The DSP-1 leg additionally needs Sony's <span class="tt">dsp1b.rom</span> firmware installed into luna (copyrighted, not shipped); without it the test SKIPs rather than fails — see <a href="dsp1_cube/">dsp1_cube</a>.</p>
 <p><a class="el" href="examples_chips_dsp1_cube.html" title="DSP-1 Cube">DSP-1 Cube</a> <a class="el" href="examples_chips_sa1_hello.html" title="SA-1 Hello World">SA-1 Hello World</a> <a class="el" href="examples_chips_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a> <a class="el" href="examples_chips_superfx_3d.html" title="SuperFX 3D Cube">SuperFX 3D Cube</a> <a class="el" href="examples_chips_superfx_hello.html" title="SuperFX Hello">SuperFX Hello</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

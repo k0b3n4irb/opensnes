@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_hdma.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES HDMA (Horizontal-blanking DMA): what it is, when to reach for it, the four registers per channel, the eight transfer modes, and the per-scanline patterns the six shipped examples exercise. It assumes you have already worked through the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> and <a class="el" href="scrolling_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/scrolling.md">Scrolling</a> tutorials.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md212"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md223"></a>
 What HDMA actually is</h2>
 <p>A regular DMA (often written "MDMA" — <em>general-purpose</em> DMA — when you want to disambiguate from HDMA) moves a block of bytes between WRAM/ROM and a PPU register, synchronously, at the CPU's request. It happens once when you trigger it.</p>
 <p>HDMA is different in three ways:</p>
@@ -135,7 +135,7 @@ What HDMA actually is</h2>
 <p>The classic uses are effects whose look <em>changes vertically across the frame</em>: a colour gradient (top different from bottom), a wave that bends the picture, a parallax background where each layer scrolls at its own rate, a window mask that follows the screen down, a brightness fade. Anything that needs "the value of register X is different on scanline 100
 than it was on scanline 50" is reaching for HDMA.</p>
 <p>If your effect is the <em>same</em> across the whole frame, set the register once at VBlank and stop. HDMA pays its scanline cost regardless of whether the value actually changes per line.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md213"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md224"></a>
 The four channel registers</h2>
 <p>The SNES has eight DMA channels (0–7). Each channel has the same set of registers; HDMA configures them slightly differently from MDMA.</p>
 <p>For HDMA channel <span class="tt">n</span> (where <span class="tt">n</span> is 0–7), the addresses are <span class="tt">$43n0</span>, <span class="tt">$43n1</span>, <span class="tt">$43n2</span>, <span class="tt">$43n3</span>, <span class="tt">$43n4</span>. The lib defines them as <span class="tt">HDMA_CHANNEL_n</span>.</p>
@@ -162,7 +162,7 @@ The four channel registers</h2>
 <li><b><span class="tt">hdmaEnable(channelMask)</span></b> — set bits in <span class="tt">$420C</span> for the channels you want to run.</li>
 <li><b><span class="tt">hdmaDisable(channelMask)</span></b> — clear those bits.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md214"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md225"></a>
 Transfer modes</h2>
 <p>The "what does each table entry write" axis. Eight modes, set via the low 3 bits of <span class="tt">DMAPn</span>:</p>
 <table class="markdownTable">
@@ -186,7 +186,7 @@ Transfer modes</h2>
 <td class="markdownTableBodyCenter">7  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyNone">reg, reg+1, reg+2, reg+3  </td><td class="markdownTableBodyNone">Same as mode 4  </td></tr>
 </table>
 <p>The lib defines named constants — <span class="tt"><a class="el" href="hdma_8h.html#a84c42564b2a8bb1f61d468e3df77e0c3" title="HDMA mode: 1 register, 1 byte.">HDMA_MODE_1REG</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc" title="HDMA mode: 1 register, 2 bytes written twice.">HDMA_MODE_1REG_2X</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#aae087a8a7ee45b79832198a29e022200" title="HDMA mode: 2 registers, 2 bytes (low/high).">HDMA_MODE_2REG</a></span>, etc. Picking the right mode is mostly a question of "what register am I writing, and how many bytes does it want?".</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md215"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md226"></a>
 Table format</h2>
 <p>Every HDMA table is a sequence of <em>groups</em>. Each group starts with a <b>line-count byte</b>, followed by <span class="tt">N × byteCount</span> data bytes (where <span class="tt">byteCount</span> is the bytes-per-write of the transfer mode and <span class="tt">N</span> depends on whether the high bit of the line count is set).</p>
 <p>The line-count byte's high bit is the <b>repeat flag</b>:</p>
@@ -216,7 +216,7 @@ Table format</h2>
 <div class="line">    0,                   <span class="comment">/* End */</span></div>
 <div class="line">};</div>
 </div><!-- fragment --><p>The classic silent failure is a <b>layout mismatch</b>, not a register property: per-line data placed under a non-repeat count makes the hardware write the first group, hold it for the whole count, then misparse the remaining data bytes as line counts — the effect appears to work for the first line of each group and then falls apart.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md216"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md227"></a>
 Setup pattern</h2>
 <p>The full sequence to put HDMA on screen:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -258,49 +258,49 @@ Setup pattern</h2>
 <li><b>The destination register argument</b> is the <em>low byte</em> of the PPU register address, not the full 16-bit address. <span class="tt">0x32</span> for <span class="tt">$2132</span> (COLDATA), <span class="tt">0x0D</span> for <span class="tt">$210D</span> (BG1HOFS), <span class="tt">0x21</span> for <span class="tt">$2121</span> (CGADD), etc. See <span class="tt"><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">lib/include/snes/hdma.h</a></span> for the named constants (<span class="tt"><a class="el" href="hdma_8h.html#abd06fabf187b6275574809241b2aed81" title="Destination: Fixed color ($2132).">HDMA_DEST_COLDATA</a></span>, <span class="tt">HDMA_DEST_BGnHOFS</span>, etc.).</li>
 <li><b>Enable comes last.</b> Configure first, then flip <span class="tt">$420C</span>. Enabling before the source/mode/destination are settled gives the PPU a frame of garbage HDMA reads.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md217"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md228"></a>
 Worked patterns (the shipped examples)</h2>
 <p>Every shipped example exercises a distinct HDMA case. Read the <span class="tt">@par What to Observe</span> block at the top of each <span class="tt">main.c</span> for the interactive demo; the patterns themselves are reusable building blocks.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md218"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md229"></a>
 Per-scanline wave distortion — <span class="tt">examples/hdma/hdma_wave</span></h3>
 <p>Pre-computes seven sine tables (224 + 111 wrap entries each) at amplitudes 0–24 pixels, then runs HDMA channel 6 in <span class="tt"><a class="el" href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc" title="HDMA mode: 1 register, 2 bytes written twice.">HDMA_MODE_1REG_2X</a></span> to write both bytes of <span class="tt">BG1HOFS</span> ($210D) every scanline. Animation advances the table pointer by 3 bytes per frame to scroll the wave continuously. The alternating solid/empty tile pattern in the background makes the distortion clearly visible.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md219"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md230"></a>
 Parallax scrolling — <span class="tt">examples/scrolling/parallax_scroll</span></h3>
 <p>A static BG3 with a moving BG1 on top, where BG1 scrolls at one rate at the top of the screen and a <em>different</em> rate at the bottom — classic two-speed parallax. The HDMA table is regenerated each frame in RAM (non-const) to update the scroll offsets, written to <span class="tt">BG1HOFS</span>. This example is also a real-world demonstration of why HDMA tables that change every frame want to be in RAM rather than in const ROM (see "bank byte trap" below).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md220"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md231"></a>
 Static colour gradient — <span class="tt">examples/hdma/gradient_colors</span></h3>
 <p>A simpler form of the brightness gradient: a fixed table in ROM written to CGADD/CGDATA changes the BG palette colour on different rows, giving a banded sky. Useful pattern when the gradient never animates and the table can live in const ROM.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md221"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md232"></a>
 Helpers showcase — <span class="tt">examples/hdma/hdma_helpers</span></h3>
 <p>Walks through the lib's HDMA helpers (<span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#aafb1226c87da6fe510dc0ea0ae121a6c" title="Disable HDMA channel(s).">hdmaDisable</a></span>, the brightness-gradient builder) on a single screen, with on-screen text labelling each. The example to skim when you want to remember the API surface.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md222"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md233"></a>
 Window animation — <span class="tt">examples/windows/transparent_window</span></h3>
 <p>Combines HDMA with the window/colour-math pipeline. HDMA writes to the window position registers (<span class="tt">WH0L</span>, <span class="tt">WH0H</span>, <span class="tt">WH1L</span>, <span class="tt">WH1H</span>) per scanline to animate a moving window, while colour math blends the BG1 layer through the window onto the BG2 layer beneath. Mode 4 transfer (4 bytes, 4 sequential registers) does the four window writes in one HDMA group.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md223"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md234"></a>
 Stationary window — <span class="tt">examples/windows/window</span></h3>
 <p>The non-animated cousin: a static window band needs only <b>non-repeat</b> entries — the window registers latch, so one write per band holds (end the table with an empty-window entry, left &gt; right, if the shape must stop before the bottom of the frame). The shipped example keeps the repeat-mode table because it shares its build path with the animated variant; both produce the same static masked area.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md224"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md235"></a>
 Indirect HDMA — <span class="tt">examples/hdma/hdma_indirect_gradient</span></h3>
 <p><span class="tt"><a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a></span> (DMAP bit 6): table entries hold POINTERS to the payload instead of the payload itself, letting many scanline bands share data blocks. The example reproduces krom's RedSpace gradient pixel-exactly with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to blocks goes in <span class="tt">$43x7</span> — pass it with the bank-extraction idiom (<span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)table &gt;&gt; 16)</span>).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md225"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md236"></a>
 Table repointing as animation — <span class="tt">examples/hdma/hdma_wave_table</span></h3>
 <p>krom's WaveHDMA idiom: 896 pre-built <span class="tt">[1][offset16]</span> entries, and the per-frame "animation" is just <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a>(..., table + <a class="el" href="hdma_2hdma__wave_2main_8c.html#a69a06c0873c234e1242abb73b84755e1">phase</a> * 3)</span> — a zero-copy pointer bump. Cheaper than regenerating tables and immune to the VBlank budget.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md226"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md237"></a>
 Full Mode 7 matrix per line — <span class="tt">examples/mode7/perspective_rotate</span></h3>
 <p>Four channels, one per matrix register (M7A/B/C/D ← <span class="tt"><a class="el" href="hdma_8h.html#aa36d2b537ff8a8e55794746c8bca656a" title="Destination: Mode 7 matrix A ($211B).">HDMA_DEST_M7A</a>..D</span>), each in <span class="tt"><a class="el" href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc" title="HDMA mode: 1 register, 2 bytes written twice.">HDMA_MODE_1REG_2X</a></span>. See the Mode 7 tutorial for the technique; the HDMA lesson here is arming: <b><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures but does NOT enable</b> — without <span class="tt">hdmaEnable(0x0F)</span> you get a static 1:1 view that can look convincingly like a broken perspective. Check <span class="tt">dma.hdmaen</span> in luna's typed state when an HDMA effect "does nothing".</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md227"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md238"></a>
 Two channels, one visual — <span class="tt">examples/color/gradient_9bit</span></h3>
 <p>Channel 0 rewrites the backdrop colour per line (<span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> into CGADD: <span class="tt">[addr16][data16]</span>), channel 1 rewrites INIDISP brightness per line. Colour x brightness plus per-line jitter dithers the gradient into more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the stream: the demo never calls <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md228"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md239"></a>
 When HDMA isn't enough: H-timer IRQ streaming</h2>
 <p>HDMA's widest mode moves 4 bytes per scanline. Some techniques need more — HiColor reloads 16 bytes (8 colours) of CGRAM every line. The tool for that is the <b>H-timer IRQ</b>: <span class="tt"><a class="el" href="interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a></span> a raw ASM handler, <span class="tt">irqSetHTimer(190)</span> so it fires near the end of the visible line, <span class="tt">irqEnable(IRQ_HTIMER)</span> — the handler fires a general DMA whose source auto-advances across transfers. See <span class="tt">examples/color/hicolor_1792</span> (1792 colours from a 4bpp BG) and the loud contract in <span class="tt">&lt;<a class="el" href="interrupt_8h.html" title="SNES Interrupt Handling.">snes/interrupt.h</a>&gt;</span>: handlers are ASM-only (a C callback cannot afford per-scanline prologue latency), must ack <span class="tt">$4211</span>, and must save what they touch. Plain C <span class="tt">*</span>/<span class="tt">/</span>/<span class="tt">%</span> in <em>NMI</em> callbacks is safe (the runtime switches to software paths there), but <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a></span>/<span class="tt"><a class="el" href="math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd" title="Linear interpolation.">fixLerp()</a></span> are not — see KNOWN_LIMITATIONS.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md229"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md240"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md230"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md241"></a>
 🔴 Channel 7 is reserved for OAM DMA</h3>
 <p>The runtime's NMI handler uses <b>DMA channel 7</b> to transfer the OAM shadow buffer to the PPU each frame. <b>Do not configure HDMA on channel 7</b> — the OAM DMA will overwrite your HDMA register setup, the HDMA will read garbage, and you will spend an hour wondering why your gradient disappears every few frames. Use channels 1–6 for HDMA. Channel 0 is also taken by <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span>, so if you have a hot-loop that calls it, prefer channels 1–6 for HDMA.</p>
 <p>This is enforced by convention, not by code. The lib's documentation (<span class="tt"><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">lib/include/snes/hdma.h</a></span>) names the trap explicitly.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md231"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md242"></a>
 🔴 Bank byte trap on <span class="tt">hdmaSetup</span></h3>
 <p><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> hardcodes bank <span class="tt">$00</span> for ROM source addresses (≥ <span class="tt">$8000</span>). If your table is a <span class="tt">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> mytable[] = …</span> and bank <span class="tt">$00</span>'s 32 KB filled up, the linker spills the table into bank <span class="tt">$01+</span> — but <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> still tells the PPU to read from bank <span class="tt">$00</span>, address X. The PPU happily reads garbage from wherever bank <span class="tt">$00</span> address X lands.</p>
 <p>Two fixes:</p>
@@ -309,7 +309,7 @@ Gotchas</h2>
 <li><b>Use a RAM table.</b> RAM is in bank <span class="tt">$7E</span> (or its bank <span class="tt">$00</span> mirror), always at predictable addresses. Animated tables that change per frame want to be in RAM anyway, so this often happens naturally.</li>
 </ul>
 <p>The bank-overflow check (<span class="tt">make/common.mk</span> → <span class="tt">symmap.py</span>) flags when bank <span class="tt">$00</span> is filling up; pair that with an explicit choice of <span class="tt"><a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank</a></span> when const tables get big.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md232"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md243"></a>
 🟡 Repeat-mode discipline matters</h3>
 <p>Every PPU register latches what you write — there is no register class that forgets its value between scanlines. The mode choice follows the <b>data</b>, not the register:</p>
 <table class="markdownTable">
@@ -321,20 +321,20 @@ Gotchas</h2>
 <td class="markdownTableBodyNone">Fresh value every line  </td><td class="markdownTableBodyNone">scroll wave, smooth gradient, moving window edge  </td><td class="markdownTableBodyCenter">repeat  </td></tr>
 </table>
 <p>The two layouts differ (non-repeat = one data group held for the count; repeat = one data group <em>per line</em> of the count), so mixing them misparses the table — the effect works for the first line of each group, then falls apart. If you suspect this, dump the table bytes and walk them against the format above, or inspect the frame in luna.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md233"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md244"></a>
 🟡 HDMA on BG1 scroll can corrupt Mode 7 writes (shared latch)</h3>
 <p>$210D/$210E and the Mode 7 registers $211B-$2120 share a single write-twice latch. An HDMA channel (or IRQ) that writes a BG1 scroll register between the two writes of a Mode 7 register silently corrupts the value — and the Mode 7 multiplier result in $2134-$2136. See the matching gotcha in the <a class="el" href="mode7_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/mode7.md">Mode 7 tutorial</a>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md234"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md245"></a>
 🟡 HDMA fires before the user callback in the NMI handler</h3>
 <p><span class="tt">templates/crt0.asm</span>'s NMI handler runs the VRAM-critical work (OAM DMA, tilemap DMA, scroll sync) <em>first</em>, then calls your <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a></span> callback, then reads input. HDMA configuration done in the user callback takes effect <em>next</em> frame, not the current one. If you need to reconfigure HDMA each frame (e.g. to swap tables), do it in main-thread code before <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md235"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md246"></a>
 🟡 Don't enable channels you haven't configured</h3>
 <p><span class="tt">hdmaEnable(0xFF)</span> enables every HDMA channel, including channels that hold leftover register values from a previous configuration (or boot defaults). Always enable only the channels you've configured this frame:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, …);</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);   <span class="comment">/* good */</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(0xFF);                  <span class="comment">/* bad — channels 0-5, 7 are random */</span></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md236"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md247"></a>
 Cycle cost</h2>
 <p>HDMA reads steal cycles from the active-display window every scanline. Approximate budget (FastROM off):</p>
 <ul>
@@ -343,7 +343,7 @@ Cycle cost</h2>
 <li>A 4-byte repeat table on one channel: ~40 cycles per scanline, ~9 K cycles per frame.</li>
 </ul>
 <p>A scanline is 1364 master cycles (about 1324 usable after the DRAM refresh pause — roughly 227 CPU cycles at 3.58 MHz FastROM), so a single HDMA channel costs about 1–3 % of the bus time. Two or three active channels are the practical limit before the cost shows up as missed timing in inner game-logic loops.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md237"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md248"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">lib/include/snes/hdma.h</a></span> — full API reference (function signatures, mode constants, destination-register constants).</li>

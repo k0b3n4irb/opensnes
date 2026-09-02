@@ -124,7 +124,7 @@ $(function(){initNavTree('tools_palplan.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The SNES gives you exactly <b>8 background palettes and 8 sprite palettes</b> of 16 colours each — 256 CGRAM entries, no more. Every <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> your game loads has to land in one of those slots, at a CGRAM colour index you pass to <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span>. Pick two overlapping indices and one asset silently recolours the other; leave a slot half-used and you run out sooner than you had to. Fitting many palettes into that space is the single most-cited SNES asset headache, and nothing in the pipeline helped — until palplan.</p>
 <p>palplan reads a manifest of your project's palettes and plans the whole CGRAM layout for you: it merges identical palettes, assigns collision-free slots, tells you when you have asked for more than the hardware has, and writes a C header so your code never hard-codes a magic index again.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md509"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md520"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> a small text <b>manifest</b> listing your <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> files (the BGR555 palettes <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a> writes with <span class="tt">-p</span>), each tagged <span class="tt"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></span> or <span class="tt">sprite</span>.</p>
 <p><b>Out:</b></p>
@@ -138,7 +138,7 @@ What goes in, what comes out</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> (<span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span>)  </td><td class="markdownTableBodyNone">one combined 512-byte CGRAM image  </td><td class="markdownTableBodyNone"><span class="tt">dmaCopyCGram(img, 0, 512)</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md510"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md521"></a>
 The manifest</h2>
 <p>One palette per line, <span class="tt">#</span> comments, three whitespace columns — <span class="tt">name</span>, <span class="tt">type</span> (<span class="tt"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></span> or <span class="tt">sprite</span>), <span class="tt">file</span>. Paths resolve relative to the manifest's directory:</p>
 <div class="fragment"><div class="line"># name    type    file</div>
@@ -146,7 +146,7 @@ The manifest</h2>
 <div class="line">town      bg      res/town.pal</div>
 <div class="line">hero      sprite  res/hero.pal</div>
 <div class="line">enemy     sprite  res/enemy.pal</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md511"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md522"></a>
 The flags you will actually use</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -160,7 +160,7 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-q</span>  </td><td class="markdownTableBodyNone">quiet — suppress the table, keep hints and errors  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md512"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md523"></a>
 Worked examples</h2>
 <div class="fragment"><div class="line"># Plan the layout and read the report:</div>
 <div class="line">palplan project.txt</div>
@@ -183,7 +183,7 @@ Worked examples</h2>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asprite_8h_html_a36d13bc82e1a6a64d0a2d59a961d9dfe"><div class="ttname"><a href="sprite_8h.html#a36d13bc82e1a6a64d0a2d59a961d9dfe">PALETTE_16_SIZE</a></div><div class="ttdeci">#define PALETTE_16_SIZE</div><div class="ttdoc">Size of one 16-color palette in bytes (16 colors x 2 bytes per BGR555).</div><div class="ttdef"><b>Definition</b> sprite.h:81</div></div>
 </div><!-- fragment --><p>and <span class="tt">PAL_&lt;NAME&gt;_SLOT</span> is the palette bank you hand to <span class="tt">gfx4snes -e</span> so a tilemap's entries reference the matching slot.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md513"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md524"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>v1 merges only identical palettes.</b> A merge palplan performs is always the byte-for-byte case, so it can never make your colours silently wrong. Palettes that are <em>nearly</em> the same are reported as merge candidates, not merged — fusing them means re-indexing tile pixels, which palplan does not touch.</li>
@@ -191,7 +191,7 @@ Gotchas worth knowing up front</h2>
 <li><b>BG and sprite palettes never share.</b> They live in different CGRAM regions (0–127 vs 128–255) and are referenced differently, so identity-merge only applies within a region.</li>
 <li><b>Over-subscription is a hard error, not a warning.</b> More than 8 distinct BG or sprite palettes exits non-zero — the report points you at the near- duplicates to merge first.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md514"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md525"></a>
 See it in practice</h2>
 <ul>
 <li><a class="el" href="examples_basics_collision_demo.html" title="Collision Detection Demo">Collision Detection Demo</a> — loads three palettes into three distinct slots by hand (<span class="tt"><a class="el" href="sprite_8h.html#a6e29a6aabd5aef0cc3449f9104d4bc32" title="CGRAM base offset for sprite palettes (sprites use colors 128-255).">OBJ_CGRAM_BASE</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#abf173245420167e29ad4e1e615a2e1e4" title="CGRAM color index for sprite palette n (0-7).">OBJ_CGRAM_PAL(1)</a></span>, BG at 0) — exactly the offsets palplan would name for you.</li>

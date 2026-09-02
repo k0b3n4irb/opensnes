@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_audio_apu_switch.html','',''); });
 <p>The method is krom (Peter Lemon)'s PlayTwoSong protocol, productized: <span class="tt"><a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a></span> writes <span class="tt">APU_RESET_MAGIC</span> to I/O port 0; the SPC700 program polls for it inside its wait loops (the <span class="tt">APU_CHECK_RESET</span> idiom from <span class="tt">templates/memmap_spc700.inc</span>), silences the DSP, acks on its output ports, and jumps back to the IPL boot ROM at <span class="tt">$FFC0</span> — which is re-entrant, so the full boot handshake works again and the next <span class="tt"><a class="el" href="apu_8h.html#a0c853aaed1d9bf7118baafcda2ce8b71" title="Upload a memory block into APU RAM via the IPL protocol.">apuUpload()</a></span>/<span class="tt"><a class="el" href="apu_8h.html#a102578fd6e5cbef30f1ea10b72451a2f" title="End the upload session and start APU execution.">apuExecute()</a></span> proceeds exactly like the first.</p>
 <p>krom's original demo swaps between two songs whose samples are ripped from commercial games (Axelay, Final Fantasy VI, the Halken logo), so this port swaps between two OpenSNES-native programs instead — same protocol, zero rights issues.</p>
 <p>ROM mode: LoROM (project default).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md857"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md868"></a>
 SNES Concepts</h2>
 <ul>
 <li>Cooperative APU reset: CPU→APU messaging over <span class="tt">$2140</span> <em>after</em> boot</li>
@@ -134,13 +134,13 @@ SNES Concepts</h2>
 <li><b>Hot-swap hygiene</b>: the DSP arrives <em>dirty</em> in the second program (this example's cello inherited the hi-hat's ADSR on its LFO voice and lost its vibrato until the program zeroed <span class="tt">V0ADSR</span> explicitly). Every register a voice depends on must be written — never rely on reset defaults after a swap.</li>
 <li>Two independent APU programs in one ROM, uploaded on demand</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md858"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md869"></a>
 Validation</h2>
 <p>Functional probe (<span class="tt">tools/luna-test/probes/apu_switch.py</span>): boot state, non-silent drums, and the B-press swap asserted on <span class="tt"><a class="el" href="audio_2apu__switch_2main_8c.html#adcbe4ff89a6f218b8584a376ee181763" title="Active program: 0 = drums, 1 = cello (probe oracle).">current_song</a></span> via WRAM. Audio parity of each program vs its source example verified by capture (drums RMS/onsets; cello 174.6 Hz, vibrato ±1.1 %, LFO 5 Hz — identical to pitch_mod).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md859"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md870"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md860"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md871"></a>
 Modules Used</h2>
 <p>console, apu, input </p>
 </div></div><!-- contents -->

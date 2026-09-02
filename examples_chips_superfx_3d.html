@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_chips_superfx_3d.html','',''); });
 <p>Auto-rotating wireframe cube at 60 FPS — Star Fox style 3D on SNES </p>
 </blockquote>
 <p><img src="superfx_3d.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1121"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1132"></a>
 Emulator Compatibility</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,12 +140,12 @@ Emulator Compatibility</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>snes9x</b>  </td><td class="markdownTableBodyNone">❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED"  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1122"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1133"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/chips/superfx_3d</div>
 </div><!-- fragment --><p>Then open <span class="tt">superfx_3d.sfc</span> in luna (or any SNES emulator).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1123"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1134"></a>
 What You'll Learn</h2>
 <ul>
 <li><b>3D rotation</b>: Y+X axis rotation using 256-entry sine table (C-side)</li>
@@ -156,7 +156,7 @@ What You'll Learn</h2>
 <li><b>Vertex clamping</b>: projected coords clamped to framebuffer bounds (0-126)</li>
 <li><b>SuperFX library API</b>: <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).">gsuDmaFullFrame()</a></span></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1124"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1135"></a>
 Architecture</h2>
 <div class="fragment"><div class="line">SNES CPU (C)                    GSU (SuperFX ASM)</div>
 <div class="line">─────────────                   ─────────────────</div>
@@ -167,7 +167,7 @@ Architecture</h2>
 <div class="line">                                    ↓</div>
 <div class="line">HDMA blanking ──→ forced blank  DMA 16KB SRAM → VRAM</div>
 <div class="line">gsuDmaFullFrame()               ──→ display on BG1</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1125"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1136"></a>
 Per-Example Files</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -179,7 +179,7 @@ Per-Example Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">gsu_loader.asm</span>  </td><td class="markdownTableBodyNone">Minimal: <span class="tt">.incbin</span> + <span class="tt"><a class="el" href="chips_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e">gsuSetProgram</a></span> + <span class="tt"><a class="el" href="chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1">writeEdgesToSRAM</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1126"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1137"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

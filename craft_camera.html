@@ -123,7 +123,7 @@ $(function(){initNavTree('craft_camera.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a> composed the <em>layers</em>; this guide moves the <em>window</em> over them. A camera is how the visible 256×224 screen tracks the player through a world larger than itself — and on the SNES there is no camera object to configure, only scroll registers you write every frame. The universal theory of good cameras is written down beautifully already (see the Go-deeper box); this guide is how to land it on this hardware, with this SDK. For the registers themselves, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md449"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md460"></a>
 The camera <em>is</em> your scroll values</h2>
 <p>There is no viewport primitive. Moving the camera right means increasing BG1's horizontal scroll, which you push with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> and the PPU latches at VBlank. Everything below is just <em>what number to feed it each frame</em>.</p>
 <p>Two consequences fall straight out of the earlier guides:</p>
@@ -131,7 +131,7 @@ The camera <em>is</em> your scroll values</h2>
 <li><b>Parallax is the camera, scaled.</b> Your midground and sky are the same camera position multiplied by a fraction — see <a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a>. One camera drives every layer; you never track them separately.</li>
 <li><b>It is a PPU write, so it happens in VBlank.</b> Compute the new camera during active display; the scroll latch lands at VBlank (<a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a>). The SDK's NMI scroll-sync does the latching for you.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md450"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md461"></a>
 Don't glue the camera to the player — deadzone it</h2>
 <p>The beginner camera sets scroll to the player's position. It works, and it is subtly awful: every idle bob and half-pixel shoves the whole screen, and the eye never rests. The fix is a <b>deadzone</b> (camera window): a box in the middle of the screen the player moves <em>inside</em> freely; the camera only scrolls when they reach its edge, and then only enough to keep them in the box.</p>
 <div class="fragment"><div class="line">  screen</div>
@@ -141,10 +141,10 @@ Don't glue the camera to the player — deadzone it</h2>
 <div class="line">│   └───────┘   │     keep the box around the player.</div>
 <div class="line">└───────────────┘</div>
 </div><!-- fragment --><p>A wide horizontal deadzone with almost no vertical one is the platformer default: free side-to-side wander, tight vertical tracking.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md451"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md462"></a>
 Lead the action — look-ahead</h2>
 <p>Bias the camera <em>ahead</em> of the player in the direction they face or move, so they see what they are running into rather than sitting dead-centre. The trick is to move the target smoothly — ease the camera toward the offset over several frames rather than snapping — or a facing-flip turns into a lurch. This is the one place a little per-frame interpolation earns its cost.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md452"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md463"></a>
 Vertical wants different rules</h2>
 <p>Vertical camera motion is where cheap cameras get sickening: follow the player's Y exactly and every jump heaves the screen. Common fixes, in order of reach:</p>
 <ul>
@@ -152,7 +152,7 @@ Vertical wants different rules</h2>
 <li><b>Platform bands.</b> Move the vertical camera in discrete steps when the player settles on a new platform, not continuously.</li>
 </ul>
 <p><a class="el" href="examples_games_likemario.html" title="LikeMario">LikeMario</a> is a full platformer to read for how camera, scroll and streaming fit together.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md453"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md464"></a>
 Clamp to the world — room-locking</h2>
 <p>A camera that follows past the level's edge reveals the void beyond your tilemap. <b>Clamp the scroll</b> to the world: never below 0, never past <span class="tt">level_pixels − screen_pixels</span> on each axis. This is also where the camera meets the streaming map from <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> — the map engine ties the camera's position to which column it streams next, and the same clamp that stops the view at the edge stops you streaming past the last column.</p>
 <table class="markdownTable">
@@ -167,13 +167,13 @@ Clamp to the world — room-locking</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Free-scrolling 2D field  </td><td class="markdownTableBodyNone">clamp both axes to bounds  </td><td class="markdownTableBodyNone"><a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md454"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md465"></a>
 Write it at the right moment</h2>
 <p>Camera scroll is a PPU register write, so it obeys the <a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a> — do the follow math during active display, and let the scroll latch at VBlank. Latch mid-frame by hand and you tear the image — a layer scrolled on line 100 shows the seam. Let the NMI scroll-sync apply it and the whole screen moves as one.</p>
 <blockquote class="doxtable">
 <p><b>Go deeper.</b> For the movement theory itself — deadzones, look-ahead, platform snapping, room-locking, and a taxonomy of every camera in the canon — read Itay Keren's <a href="https://docs.google.com/document/d/1iNSQIyNpVGHeak6isbP6AHdHD50gs8MNXF1GCf08efg/pub">Scroll Back</a>. Compose your layers in <a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a>; decide how the camera <em>follows</em> here; feed both from one camera value. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md455"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md466"></a>
 The one rule</h2>
 <p>Track one camera position; derive everything — every layer's scroll, every parallax fraction, the streaming boundary — from it. The player should feel the world move, never the camera work. A deadzone plus an edge clamp gets you most of the way there before you write a line of easing.</p>
 <blockquote class="doxtable">

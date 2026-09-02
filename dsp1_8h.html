@@ -129,16 +129,38 @@ $(function(){initNavTree('dsp1_8h.html','',''); });
 </div>
 <p><a href="dsp1_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Bridges to the SDK fixed-point types</div></td></tr>
+<tr><td colspan="2" class="ititle"><div class="groupText"><p>The SDK's <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> (<a class="el" href="math_8h.html" title="SNES Fixed-Point Math.">snes/math.h</a>) is signed 8.8 and its angles are 8-bit (256 = full turn); the DSP-1 uses 1.15 fractions (T) and 16-bit angles (A). These macros convert. Note the T range is −1..+1: converting a <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> outside −1.0..+0.999 overflows — clamp first if your value can exceed it. </p>
+</div></td></tr>
+<tr class="memitem:ad82a852b0a2b20a5aad1004a05b61a3b" id="r_ad82a852b0a2b20a5aad1004a05b61a3b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad82a852b0a2b20a5aad1004a05b61a3b">DSP1_A_FROM_FIX8</a>(<a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>)</td></tr>
+<tr class="memdesc:ad82a852b0a2b20a5aad1004a05b61a3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">SDK 8-bit angle (256 = full turn) → DSP-1 A (2^16 = full turn).  <br /></td></tr>
+<tr class="memitem:a139bcf3d0975fbfdb803d62084eaab5e" id="r_a139bcf3d0975fbfdb803d62084eaab5e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a139bcf3d0975fbfdb803d62084eaab5e">DSP1_FIX_FROM_T</a>(t)</td></tr>
+<tr class="memdesc:a139bcf3d0975fbfdb803d62084eaab5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">DSP-1 T (1.15) → SDK 8.8 <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> (truncating).  <br /></td></tr>
+<tr class="memitem:adfbfa0a8d0b8c1dc29d8971396b07cfb" id="r_adfbfa0a8d0b8c1dc29d8971396b07cfb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#adfbfa0a8d0b8c1dc29d8971396b07cfb">DSP1_T_FROM_FIX</a>(f)</td></tr>
+<tr class="memdesc:adfbfa0a8d0b8c1dc29d8971396b07cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">SDK 8.8 <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> → DSP-1 T (1.15). Valid for −1.0 ≤ f &lt; 1.0.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a4f48e8bd2d0865a223d81b00dc7d0244" id="r_a4f48e8bd2d0865a223d81b00dc7d0244"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4f48e8bd2d0865a223d81b00dc7d0244">dsp1Attitude</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scale, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> az, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ay, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> ax)</td></tr>
 <tr class="memdesc:a4f48e8bd2d0865a223d81b00dc7d0244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a 3D rotation matrix into slot A (DSP-1 command $01, "Attitude").  <br /></td></tr>
+<tr class="memitem:af8c54ae3bc3a6017516b2b06ccbd711c" id="r_af8c54ae3bc3a6017516b2b06ccbd711c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af8c54ae3bc3a6017516b2b06ccbd711c">dsp1Distance</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
+<tr class="memdesc:af8c54ae3bc3a6017516b2b06ccbd711c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Euclidean length of a 3D vector (DSP-1 command $28, "Distance").  <br /></td></tr>
 <tr class="memitem:a07cbf1c377508911986a414336ad4fd8" id="r_a07cbf1c377508911986a414336ad4fd8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a07cbf1c377508911986a414336ad4fd8">dsp1Init</a> (void)</td></tr>
 <tr class="memdesc:a07cbf1c377508911986a414336ad4fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resynchronise the DSP-1 to a known command-wait state.  <br /></td></tr>
 <tr class="memitem:a56e4866725fffcfcf7710d4dd1ae6dac" id="r_a56e4866725fffcfcf7710d4dd1ae6dac"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a56e4866725fffcfcf7710d4dd1ae6dac">dsp1Multiply</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
 <tr class="memdesc:a56e4866725fffcfcf7710d4dd1ae6dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed 1.15 × 1.15 multiply (DSP-1 command $00).  <br /></td></tr>
 <tr class="memitem:a351e716537c49d2587a195d327448f57" id="r_a351e716537c49d2587a195d327448f57"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a351e716537c49d2587a195d327448f57">dsp1Objective</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
 <tr class="memdesc:a351e716537c49d2587a195d327448f57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a point by matrix A: local → world (DSP-1 command $0D, "Objective").  <br /></td></tr>
+<tr class="memitem:a9f4e45822ce7d01f4a61a80c136e1aa9" id="r_a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9f4e45822ce7d01f4a61a80c136e1aa9">dsp1Parameter</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="hdma_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0">fx</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fy, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fz, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> lfe, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> les, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> aas, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> azs)</td></tr>
+<tr class="memdesc:a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the projection plane (DSP-1 command $02, "Parameter").  <br /></td></tr>
+<tr class="memitem:ad09a7de4eb9586c1da0a738628af9b1f" id="r_ad09a7de4eb9586c1da0a738628af9b1f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad09a7de4eb9586c1da0a738628af9b1f">dsp1Present</a> (void)</td></tr>
+<tr class="memdesc:ad09a7de4eb9586c1da0a738628af9b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is a DSP-1 responding? Known-answer self-test.  <br /></td></tr>
+<tr class="memitem:a39767ab0d98ace72ba92e541085e1b60" id="r_a39767ab0d98ace72ba92e541085e1b60"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a39767ab0d98ace72ba92e541085e1b60">dsp1Project</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
+<tr class="memdesc:a39767ab0d98ace72ba92e541085e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world point to the screen (DSP-1 command $06, "Project").  <br /></td></tr>
+<tr class="memitem:a152f59d6d62b0d9f544e08db046de212" id="r_a152f59d6d62b0d9f544e08db046de212"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a152f59d6d62b0d9f544e08db046de212">dsp1Range</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> r)</td></tr>
+<tr class="memdesc:a152f59d6d62b0d9f544e08db046de212"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sphere test (DSP-1 command $18, "Range").  <br /></td></tr>
 <tr class="memitem:adb861416d471a3218480f16d3331f55f" id="r_adb861416d471a3218480f16d3331f55f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
 <tr class="memdesc:adb861416d471a3218480f16d3331f55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate a 2D point about the origin (DSP-1 command $0C, "Rotate").  <br /></td></tr>
 <tr class="memitem:a30bcc07948d43ad0fca8fb3ccc210208" id="r_a30bcc07948d43ad0fca8fb3ccc210208"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a30bcc07948d43ad0fca8fb3ccc210208">dsp1Triangle</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> radius)</td></tr>
@@ -150,6 +172,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:a50d2a07715de61e5e3c706de54b856b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-word DSP-1 result registers (written by multi-output commands).  <br /></td></tr>
 <tr class="memitem:a173400a4c478dc40a8754b8b7117cc67" id="r_a173400a4c478dc40a8754b8b7117cc67"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a></td></tr>
 <tr class="memitem:a6b8c0440cf7578bc7c98e40d39a43f06" id="r_a6b8c0440cf7578bc7c98e40d39a43f06"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></td></tr>
+<tr class="memitem:af126a02087f50c1591f744aa50d3c5f9" id="r_af126a02087f50c1591f744aa50d3c5f9"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af126a02087f50c1591f744aa50d3c5f9">dsp1_o3</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C. </p>
@@ -162,7 +185,9 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Multi-word results</dt><dd>Commands that return more than one word write their outputs to the module's result globals (<span class="tt"><a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="Multi-word DSP-1 result registers (written by multi-output commands).">dsp1_o0</a></span>, <span class="tt"><a class="el" href="#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a></span>, <span class="tt"><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></span>); read them after the call. Single-word commands return their value directly.</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>luna emulates the DSP-1 at low level and needs Sony's <span class="tt">dsp1b.rom</span> firmware installed (<span class="tt">~/.config/luna/firmware/</span> or <span class="tt">--dsp1-rom</span>). It is copyrighted and not shipped; DSP-1 examples are firmware-gated in CI.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>luna emulates the DSP-1 at low level and needs Sony's <span class="tt">dsp1b.rom</span> firmware installed (<span class="tt">~/.config/luna/firmware/</span> or via <span class="tt">luna state --dsp1-rom &lt;path&gt; &lt;rom&gt;</span> once — the setting persists). It is copyrighted and not shipped; DSP-1 examples are firmware-gated in CI.</dd>
+<dd>
+DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callbacks. A command is a multi-byte DR transaction; if NMI interrupts one mid-sequence and the callback issues its own DSP-1 command, both transactions are corrupted (same class as the <a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a> restriction in KNOWN_LIMITATIONS.md). Keep all DSP-1 work in the main loop.</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// rotate the point (100, 0) by 90 degrees -&gt; (0, 100)</span></div>
 <div class="line"><a class="code hl_function" href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a>(0x4000, 100, 0);</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x = <a class="code hl_variable" href="#a50d2a07715de61e5e3c706de54b856b4">dsp1_o0</a>;   <span class="comment">// ~0</span></div>
@@ -172,7 +197,71 @@ Variables</h2></td></tr>
 <div class="ttc" id="adsp1_8h_html_adb861416d471a3218480f16d3331f55f"><div class="ttname"><a href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a></div><div class="ttdeci">void dsp1Rotate(u16 angle, s16 x, s16 y)</div><div class="ttdoc">Rotate a 2D point about the origin (DSP-1 command $0C, &quot;Rotate&quot;).</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd>.claude/notes/tech/dsp1_reference.md — the full command reference. </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="ad82a852b0a2b20a5aad1004a05b61a3b" name="ad82a852b0a2b20a5aad1004a05b61a3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad82a852b0a2b20a5aad1004a05b61a3b">&#9670;&#160;</a></span>DSP1_A_FROM_FIX8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DSP1_A_FROM_FIX8</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>) &lt;&lt; 8))</div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+</div><!-- fragment -->
+<p>SDK 8-bit angle (256 = full turn) → DSP-1 A (2^16 = full turn). </p>
+
+</div>
+</div>
+<a id="a139bcf3d0975fbfdb803d62084eaab5e" name="a139bcf3d0975fbfdb803d62084eaab5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a139bcf3d0975fbfdb803d62084eaab5e">&#9670;&#160;</a></span>DSP1_FIX_FROM_T</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DSP1_FIX_FROM_T</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>t</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)((<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)(t) &gt;&gt; 7))</div>
+</div><!-- fragment -->
+<p>DSP-1 T (1.15) → SDK 8.8 <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> (truncating). </p>
+
+</div>
+</div>
+<a id="adfbfa0a8d0b8c1dc29d8971396b07cfb" name="adfbfa0a8d0b8c1dc29d8971396b07cfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfbfa0a8d0b8c1dc29d8971396b07cfb">&#9670;&#160;</a></span>DSP1_T_FROM_FIX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DSP1_T_FROM_FIX</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>f</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)((<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)(f) &lt;&lt; 7))</div>
+</div><!-- fragment -->
+<p>SDK 8.8 <span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> → DSP-1 T (1.15). Valid for −1.0 ≤ f &lt; 1.0. </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a4f48e8bd2d0865a223d81b00dc7d0244" name="a4f48e8bd2d0865a223d81b00dc7d0244"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4f48e8bd2d0865a223d81b00dc7d0244">&#9670;&#160;</a></span>dsp1Attitude()</h2>
 
@@ -213,6 +302,44 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <p>Produces no output — it loads the matrix the transform commands consume. Call once per frame (or whenever the orientation changes), then transform your points with dsp1Objective. </p>
+
+</div>
+</div>
+<a id="af8c54ae3bc3a6017516b2b06ccbd711c" name="af8c54ae3bc3a6017516b2b06ccbd711c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8c54ae3bc3a6017516b2b06ccbd711c">&#9670;&#160;</a></span>dsp1Distance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dsp1Distance </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>z</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Euclidean length of a 3D vector (DSP-1 command $28, "Distance"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>vector X (I) </td></tr>
+    <tr><td class="paramname">y</td><td>vector Y (I) </td></tr>
+    <tr><td class="paramname">z</td><td>vector Z (I) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>sqrt(x²+y²+z²), rounded (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>)</dd></dl>
+<p>Hardware square root — handy for homing missiles, audio attenuation, anything that needs a true distance rather than a compare. </p>
 
 </div>
 </div>
@@ -301,6 +428,169 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = x', <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = y', <a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = z' (world space). Run dsp1Attitude first to set the matrix. </p>
+
+</div>
+</div>
+<a id="a9f4e45822ce7d01f4a61a80c136e1aa9" name="a9f4e45822ce7d01f4a61a80c136e1aa9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f4e45822ce7d01f4a61a80c136e1aa9">&#9670;&#160;</a></span>dsp1Parameter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dsp1Parameter </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fy</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fz</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>lfe</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>les</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>aas</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>azs</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set up the projection plane (DSP-1 command $02, "Parameter"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname"><a class="el" href="hdma_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0" title="Global effect state instance with default values.">fx</a></td><td>projection-base X (I) </td></tr>
+    <tr><td class="paramname">fy</td><td>projection-base Y (I) </td></tr>
+    <tr><td class="paramname">fz</td><td>projection-base Z (I) </td></tr>
+    <tr><td class="paramname">lfe</td><td>distance eye → screen plane (I) — smaller = wider FOV </td></tr>
+    <tr><td class="paramname">les</td><td>distance screen plane → ground reference (I) </td></tr>
+    <tr><td class="paramname">aas</td><td>screen-plane azimuth angle (A) </td></tr>
+    <tr><td class="paramname">azs</td><td>screen-plane zenith angle (A)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = Cx and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = Cy (the raster coefficients); <span class="tt"><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></span>/<span class="tt"><a class="el" href="#af126a02087f50c1591f744aa50d3c5f9">dsp1_o3</a></span> receive two further words whose meaning is not yet confirmed by references. Call once (and again whenever the camera moves), then project points with dsp1Project. <span class="tt">lfe</span>/<span class="tt">les</span> are best tuned empirically — see the values used by examples/chips/dsp1_cube. </p>
+
+</div>
+</div>
+<a id="ad09a7de4eb9586c1da0a738628af9b1f" name="ad09a7de4eb9586c1da0a738628af9b1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad09a7de4eb9586c1da0a738628af9b1f">&#9670;&#160;</a></span>dsp1Present()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dsp1Present </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is a DSP-1 responding? Known-answer self-test. </p>
+<dl class="section return"><dt>Returns</dt><dd>1 if the chip answered dsp1Multiply(0x4000, 0x4000) == 0x2000, 0 if the status port never raised RQM or the product was wrong.</dd></dl>
+<p>Unlike the other calls this one cannot hang on a missing chip (bounded poll). Use it at boot the way sa1IsReady()/superfxIsPresent() are used — e.g. to fall back to software math when running on the wrong board or on an emulator without the firmware. </p>
+
+</div>
+</div>
+<a id="a39767ab0d98ace72ba92e541085e1b60" name="a39767ab0d98ace72ba92e541085e1b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39767ab0d98ace72ba92e541085e1b60">&#9670;&#160;</a></span>dsp1Project()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dsp1Project </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>z</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Project a world point to the screen (DSP-1 command $06, "Project"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>world X (I) </td></tr>
+    <tr><td class="paramname">y</td><td>world Y (I) </td></tr>
+    <tr><td class="paramname">z</td><td>world Z (I)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = H (screen X), <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = V (screen Y), <a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = M (scale/depth — use it to size sprites with distance). Requires a prior dsp1Parameter. Takes ~627 DSP cycles (~83 µs); the driver polls, so timing is handled for you. </p>
+
+</div>
+</div>
+<a id="a152f59d6d62b0d9f544e08db046de212" name="a152f59d6d62b0d9f544e08db046de212"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a152f59d6d62b0d9f544e08db046de212">&#9670;&#160;</a></span>dsp1Range()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> dsp1Range </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>z</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>r</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sphere test (DSP-1 command $18, "Range"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>offset X from the sphere centre (I) </td></tr>
+    <tr><td class="paramname">y</td><td>offset Y (I) </td></tr>
+    <tr><td class="paramname">z</td><td>offset Z (I) </td></tr>
+    <tr><td class="paramname">r</td><td>sphere radius (I) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>(x²+y²+z²) − r² : ≤ 0 means inside the sphere</dd></dl>
+<p>One call replaces three multiplies and two adds — cheap 3D proximity / LOD tests without ever leaving 16-bit C. </p>
 
 </div>
 </div>
@@ -441,6 +731,29 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="Multi-word DSP-1 result registers (written by multi-output commands).">dsp1_o0</a> </dd></dl>
+
+</div>
+</div>
+<a id="af126a02087f50c1591f744aa50d3c5f9" name="af126a02087f50c1591f744aa50d3c5f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af126a02087f50c1591f744aa50d3c5f9">&#9670;&#160;</a></span>dsp1_o3</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> dsp1_o3</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="Multi-word DSP-1 result registers (written by multi-output commands).">dsp1_o0</a> (4th word — <a class="el" href="#a9f4e45822ce7d01f4a61a80c136e1aa9" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1Parameter</a> only) </dd></dl>
 
 </div>
 </div>

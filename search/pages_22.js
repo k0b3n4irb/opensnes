@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['x_0',['ROM Table Lookups with &lt;span class=&quot;tt&quot;&gt;lda.l table,x&lt;/span&gt;',['../tutorial_sa1.html#autotoc_md343',1,'']]],
-  ['x_20≥_20128_1',['🔴 &lt;span class=&quot;tt&quot;&gt;FIX(x)&lt;/span&gt; overflows for &lt;span class=&quot;tt&quot;&gt;|x| ≥ 128&lt;/span&gt;',['../tutorial_math.html#autotoc_md277',1,'']]],
-  ['x_20overflows_20for_20x_20≥_20128_2',['🔴 &lt;span class=&quot;tt&quot;&gt;FIX(x)&lt;/span&gt; overflows for &lt;span class=&quot;tt&quot;&gt;|x| ≥ 128&lt;/span&gt;',['../tutorial_math.html#autotoc_md277',1,'']]],
-  ['x_20through_20a_3',['No &lt;span class=&quot;tt&quot;&gt;stx.l&lt;/span&gt; — Save X Through A',['../tutorial_sa1.html#autotoc_md344',1,'']]],
-  ['x_20voice_200_207_4',['Per-Voice Registers (x = voice 0-7)',['../snes_sound_guide.html#autotoc_md678',1,'']]],
-  ['x5_5',['ADSR1 Register (x5)',['../snes_sound_guide.html#autotoc_md687',1,'']]],
-  ['x6_6',['ADSR2 Register (x6)',['../snes_sound_guide.html#autotoc_md688',1,'']]],
-  ['xxx_7',['Build fails with &quot;unhandled op: XXX&quot;',['../troubleshooting.html#autotoc_md721',1,'']]]
+  ['x_0',['ROM Table Lookups with &lt;span class=&quot;tt&quot;&gt;lda.l table,x&lt;/span&gt;',['../tutorial_sa1.html#autotoc_md354',1,'']]],
+  ['x_20≥_20128_1',['🔴 &lt;span class=&quot;tt&quot;&gt;FIX(x)&lt;/span&gt; overflows for &lt;span class=&quot;tt&quot;&gt;|x| ≥ 128&lt;/span&gt;',['../tutorial_math.html#autotoc_md288',1,'']]],
+  ['x_20overflows_20for_20x_20≥_20128_2',['🔴 &lt;span class=&quot;tt&quot;&gt;FIX(x)&lt;/span&gt; overflows for &lt;span class=&quot;tt&quot;&gt;|x| ≥ 128&lt;/span&gt;',['../tutorial_math.html#autotoc_md288',1,'']]],
+  ['x_20through_20a_3',['No &lt;span class=&quot;tt&quot;&gt;stx.l&lt;/span&gt; — Save X Through A',['../tutorial_sa1.html#autotoc_md355',1,'']]],
+  ['x_20voice_200_207_4',['Per-Voice Registers (x = voice 0-7)',['../snes_sound_guide.html#autotoc_md689',1,'']]],
+  ['x5_5',['ADSR1 Register (x5)',['../snes_sound_guide.html#autotoc_md698',1,'']]],
+  ['x6_6',['ADSR2 Register (x6)',['../snes_sound_guide.html#autotoc_md699',1,'']]],
+  ['xxx_7',['Build fails with &quot;unhandled op: XXX&quot;',['../troubleshooting.html#autotoc_md732',1,'']]]
 ];
