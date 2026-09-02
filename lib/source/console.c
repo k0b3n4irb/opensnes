@@ -266,24 +266,11 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
 }
 
 void nmiSet(VBlankCallback callback) {
-    /* Post-A6 a function pointer is a 4-byte far pointer that carries its own
-     * bank in bits 16-23, so a callback in ANY bank works — no nmiSetBank or
-     * hand-rolled trampoline needed.
-     *
-     * We write nmi_callback here directly rather than forwarding to
-     * nmiSetBank(callback, bank): QBE miscompiles forwarding a 4-byte-by-value
-     * pointer *parameter* to another function (it duplicates the high word), so
-     * nmiSetBank would receive a corrupt offset. Writing the pointer inline
-     * sidesteps that. (nmiSetBank itself is fine when called with a literal
-     * bank; only the pointer-forward path was broken.) */
-    REG_NMITIMEN = 0;                                  /* mask NMI during write */
-    nmi_callback[0] = (u16)callback & 0xFF;            /* offset low  */
-    nmi_callback[1] = ((u16)callback >> 8) & 0xFF;     /* offset high */
-    nmi_callback[2] = (u8)((u32)callback >> 16);       /* real bank   */
-    nmi_callback[3] = 0x00;
-    nmi_has_callback = 1;
-    clearNmiFlag();
-    REG_NMITIMEN = nmitimen_shadow;
+    /* Post-A6 a function pointer is a 4-byte far pointer carrying its own bank
+     * in bits 16-23, so a callback in ANY bank works — derive the bank from the
+     * pointer and let nmiSetBank do the rest. The old bug was only the literal
+     * bank 0 here; the 4-byte pointer itself forwards correctly. */
+    nmiSetBank(callback, (u8)((u32)callback >> 16));
 }
 
 void nmiClear(void) {

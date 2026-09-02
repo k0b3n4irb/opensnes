@@ -12,9 +12,14 @@ offset was always 0 and the writes were real but constant).
 `tcc_mul16` / `tcc_div16` (the compiler runtime behind C's `*`, `/`,
 `%`) use the **hardware mul/div unit** ($4202-$4217):
 
-1. **Auto-joypad window**: the unit shares silicon with the auto-joypad
-   shift logic; while HVBJOY bit 0 is set (V≈225-227, ~4K master
-   clocks into VBlank) reads return garbage. The user NMI callback
+1. **Auto-joypad window**: while HVBJOY bit 0 is set (V≈225-227, ~4K
+   master clocks into VBlank) reads from the unit return garbage.
+   (Mechanism caveat, 2026-09-02: hardware references document garbage
+   reads of $4218-$421F during auto-read, but none confirms a coupling
+   to $4214-$4217 — the "shares silicon with the auto-joypad shift
+   logic" wording was our hypothesis. The garbage is observed fact;
+   the mechanism is unconfirmed, and hazard 2 below may account for
+   part of the observations.) The user NMI callback
    (step 4) runs EXACTLY in that window — the NMI handler's own joypad
    read (step 5) waits for the bit, but the callback runs before that
    wait. Observed garbage: 0x2A/0x00 patterns from the shift register.

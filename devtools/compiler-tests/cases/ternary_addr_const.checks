@@ -3,6 +3,7 @@
 # offset word. Two predecessors -> exactly two of each.
 #
 # Bank half: `lda.w #:sym` (WLA-DX `:` = 8-bit bank operator). Was missing.
-count 2 lda\.w #:string
+# The `(\w+_)?` allows the per-TU anonymous-label prefix (<tu>_string.N).
+count 2 lda\.w #:(\w+_)?string
 # Offset word: `lda.w #sym` (no colon). Present before and after the fix.
-count 2 lda\.w #string\.[0-9]
+count 2 lda\.w #(\w+_)?string\.[0-9]

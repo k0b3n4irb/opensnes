@@ -51,7 +51,27 @@ battle system.
 main 65816 and SA-1. Our compiler output would work on SA-1 unmodified
 (same ISA). Just need ROM header + memory map support.
 
-## SA-1 SIWP/CIWP polarity — DISPUTED, kept at $FF (2026-06-20)
+## SA-1 SIWP/CIWP polarity — RESOLVED: bit=1 = write-enable, $FF correct (2026-09-02)
+
+> **Resolution (2026-09-02, Cartouche corpus audit).** The dispute below is
+> settled: the wiki page is wrong, `$FF` is hardware-correct.
+> - fullsnes, [SA-1 memory control](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol):
+>   "2229h SNES SIWP — 0-7 Write enable flags for eight 256-byte chunks
+>   (0=Protect, 1=Write Enable)". (The earlier claim in our public docs that
+>   fullsnes sided with the wiki was an unsourced extension — this note never
+>   listed fullsnes on the protect side.)
+> - Official Nintendo dev manual, book 2 §4.1.25 SIWP: "Setting 0: Write
+>   disable, 1: Write enable".
+> - nocash, [nesdev p=237542](https://forums.nesdev.org/viewtopic.php?p=237542#p237542)
+>   (2019-04-14): "Unlocking is done by setting the write-enable bits (not by
+>   clearing them)"; corroborated by Near at p=237733.
+> - The wiki page is self-inconsistent (its $2226/$2227 entries use
+>   0=Protect / 1=Write enabled).
+> Public docs updated (KNOWN_LIMITATIONS, REGISTERS.md, sa1.md). The crt0
+> self-test stays as the runtime safety net. Historical record below kept
+> as-is.
+
+### Historical record — DISPUTED, kept at $FF (2026-06-20)
 
 Investigated the P1-3 finding (crt0 writes `$FF` to SIWP `$2229` under the
 guess "*maybe bit=1 means WRITABLE*"). **Documentation and our emulators

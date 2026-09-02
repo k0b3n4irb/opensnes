@@ -343,18 +343,23 @@ flows, not for "secure erase".
 
 ## Cycle cost
 
-SRAM access is plain CPU loads/stores via the cartridge bus, around
-8 master cycles per byte. A 256-byte save:
+SRAM saves go through the 65816's MVN block-move
+(`lib/source/sram.asm`), which costs **7 CPU cycles per byte** moved.
+A 256-byte save:
 
-- `sramSave(buffer, 256)`: ~256 × 8 = ~2 K cycles, plus a few
-  hundred for setup. Well under 1 ms total. Imperceptible.
+- `sramSave(buffer, 256)`: ~256 × 7 ≈ 1.8 K CPU cycles (~13 K master
+  cycles), plus a little setup. Well under 1 ms. Imperceptible.
 
-A full 8 KB save: ~64 K cycles, ~3 % of a 60 Hz frame. Still small
-enough to do during gameplay if you have to (auto-save).
+A full 8 KB save: ~57 K CPU cycles ≈ 430 K master cycles — slightly
+*more* than one full frame (a frame is ~357 K master cycles). SRAM
+access needs no VBlank window, so nothing corrupts, but the frame that
+runs the save arrives late. For multi-KB auto-saves during gameplay,
+split the save across frames (say 2 KB per frame) or accept the one-off
+hitch.
 
-There's no DMA path for SRAM; the lib uses CPU MVN/MVP block-move
-instructions which are fast enough that DMA wouldn't materially
-help.
+There is no DMA path for SRAM — general DMA cannot copy between two
+A-bus addresses (WRAM and cartridge SRAM both live on the A bus), so
+MVN is the fastest option available.
 
 ## See also
 

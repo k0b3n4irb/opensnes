@@ -1,0 +1,4 @@
+# The label must carry the per-TU prefix, and no BARE `string.N` may appear
+# (bare = preceded by a non-word char: it would export a colliding global).
+present anon_string_prefix_string\.[0-9]
+absent (?<![\w])string\.[0-9]

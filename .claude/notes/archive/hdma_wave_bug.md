@@ -1,6 +1,20 @@
-# hdmaWave Library Bug — TODO
+# hdmaWave Library Bug — ARCHIVED
 
-## Bug
+> **📁 ARCHIVED 2026-09-02 — cause documented, workaround permanent.**
+> The buggy implementation this note describes (bank-$7E tables written
+> through the WRAM data port $2180 with double buffering) no longer
+> exists: `hdmaWaveH()` / `hdmaWaveUpdate()` were rewritten with tables
+> in a bank-$00 RAMSECTION written by plain C (`lib/source/hdma.c`,
+> "Tables live in bank $00 RAMSECTION" comment), and work. The hardware
+> constraints the old investigation was groping toward are now
+> documented by arbiter sources (snesdev-wiki Errata / sfc-dev-wiki
+> register notes): general DMA cannot copy RAM→RAM through $2180, and
+> $2181-$2183 are open bus on read. The TODO below (port the PVSnesLib
+> Waves example, fix the old functions) is moot — kept for history.
+> Cross-ref: `.claude/notes/chantiers/hardware_docs_audit.md`
+> (retrospective section) and `.claude/rules/hardware_claims.md`.
+
+## Bug (historical)
 `hdmaWaveH()` / `hdmaWaveUpdate()` in `lib/source/hdma.c` produce corrupted output:
 - Double-buffering via WRAM data port ($2180-$2183) causes massive visual corruption
 - Image flickers between normal and heavily distorted frames

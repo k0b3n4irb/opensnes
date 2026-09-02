@@ -35,10 +35,13 @@ pattern (split tilemap DMAs into 2 KB chunks) is the canonical solution for
 large transfers.
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
-NMI runs for roughly 35,000 master cycles after vblank starts. DMA costs
-~8 cycles per byte, leaving a budget of about **4 KB total** per VBlank for
-OAM + tilemap + audio + scroll. Exceed it and the PPU starts displaying
-mid-DMA → garbage tiles for one or more rows.
+VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
+about 50,500 master cycles (~30,000 with overscan). DMA costs 8 master
+cycles per byte, so the raw ceiling is ~6 KB; after the NMI handler's
+own work (OAM DMA, scroll sync, joypad, callback) the practical budget
+is about **4 KB total** per VBlank for tilemap + audio + scroll.
+Exceed it and the PPU starts displaying mid-DMA → garbage tiles for
+one or more rows.
 
 **Mitigation:** count your DMAs. If a frame needs > 4 KB, split across multiple
 VBlanks (1-page pattern) or move the heavy load into a forced-blank window.
@@ -91,6 +94,25 @@ If you hit this:
 - Combine related const arrays read in C into one array + offset macros.
 - Move large C-dereferenced const data to RAM (drop the `const`).
 - Use assembly with explicit bank addressing for very large blobs.
+
+### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
+`$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll
+in mode 7), and together with the Mode 7 registers `$211B`-`$2120` they go
+through a **single shared write-twice latch**. If an HDMA channel or an IRQ
+handler writes a BG1 scroll register between the two writes of a Mode 7
+register, the 16-bit value — and the Mode 7 multiplier result MPY
+(`$2134`-`$2136`) — is silently corrupted
+([snesdev-wiki Errata](https://snes.nesdev.org/wiki/Errata)).
+
+The lib itself never reads MPY (it uses the CPU multiplier at `$4202`), so
+lib code is safe. The exposure is user code combining the `mode7` module
+with HDMA on BG1 scroll — including the per-scanline M7A/M7D perspective
+pattern from the Mode 7 tutorial.
+
+**Mitigation:** keep Mode 7 matrix writes and MPY reads out of any frame
+region where HDMA drives BG1 scroll — do matrix updates during VBlank, or
+disable the scroll HDMA channel while rewriting the matrix. See the gotchas
+in `docs/tutorials/mode7.md` and `docs/tutorials/hdma.md`.
 
 ### 🔴 All C RAM must live below $2000 (DP wraparound)
 `sta.l $0000,x` and friends always access bank $00. If the linker places a
@@ -176,9 +198,13 @@ before committing.
 ### 🟡 `fixMul()` / `fixLerp()` are not safe inside nmiSet() callbacks
 
 They use the hardware multiplier ($4202-$4217) plus shared WRAM
-temporaries; the hardware unit reads auto-joypad garbage during the
-window NMI callbacks run in, and is not reentrant against an interrupted
-main-thread multiply. Plain C `*` / `/` / `%` **are** callback-safe —
+temporaries. Empirically, reads from the unit inside the NMI-callback
+window return garbage while the auto-joypad read is in progress
+(observed 0x2A/0x00 shift-register-like patterns — the hardware
+references document garbage reads of $4218-$421F during auto-read, but
+no reference confirms a mechanism coupling it to $4214-$4217, so treat
+the coupling as observed-not-explained); independently, the unit is not
+reentrant against an interrupted main-thread multiply. Plain C `*` / `/` / `%` **are** callback-safe —
 the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
 to software paths. Symptom if ignored: silently wrong fixed-point values,
 only when computed inside the callback. Mitigation: compute fixed-point
@@ -186,32 +212,31 @@ math in the main loop, or use plain integer operators in the callback.
 (Headers carry the same @warning; see
 `.claude/notes/tech/nmi_context_hardware_muldiv.md` for the full story.)
 
-### 🟡 SA-1 SIWP/CIWP write-protection polarity is disputed
-`templates/crt0.asm` enables SA-1 I-RAM access by writing the SIWP register
-`$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
-~`:636-642`), value `$FF`. **The polarity of this register is genuinely
-contested between documentation and emulators:**
+### 🟢 SA-1 SIWP/CIWP write-protection polarity (resolved: bit=1 = write-enable)
+`templates/crt0.asm` enables SA-1 I-RAM access by writing `$FF` to the SIWP
+register `$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
+~`:636-642`). This polarity was long presented here as "disputed" because the
+[Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers) says
+bit=1 *protects* a page. **Resolved 2026-09-02: the wiki page is wrong** and
+`$FF` (bit=1 = write-enable) is correct, on four independent grounds:
 
-- The [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers)
-  and fullsnes say each bit *enables* write-protection for one 256-byte
-  I-RAM page (bit=1 protects, bit=0 writable), i.e. `$00` = all writable.
-- **Mesen2** and **snes9x** behave the *opposite* way. Tested empirically
-  (2026-06-20): with `$FF` the crt0 I-RAM self-test passes (`sa1_status=$A5`);
-  with `$00` the SNES-CPU write to I-RAM is blocked and the self-test fails
-  (`sa1_status=$FF`). luna, now this project's accuracy backend, agrees:
-  `sa1_hello` reaches `sa1_status=$A5` with the `$FF` write.
+- fullsnes ([SA-1 memory control](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol)):
+  SIWP bits are write **enable** flags for eight 256-byte chunks
+  (0=Protect, 1=Write Enable).
+- The official Nintendo development manual (book 2, §4.1.25 SIWP):
+  Setting 0 = write disable, 1 = write enable.
+- nocash on real-hardware debugging
+  ([nesdev p=237542](https://forums.nesdev.org/viewtopic.php?p=237542#p237542)):
+  unlocking is done by *setting* the write-enable bits, not clearing them.
+- Mesen2, snes9x and luna all behave accordingly (crt0 self-test passes with
+  `$FF`, fails with `$00` — tested 2026-06-20).
 
-OpenSNES writes `$FF` because that is what works on the emulator we
-validate against (luna, and the earlier Mesen2/snes9x runs). A `$00` "fix"
-(matching the wiki) **breaks** SA-1 and was reverted — do not re-apply it
-without a real-hardware test that proves the wiki polarity.
+The wiki page is also inconsistent with itself: its own `$2226`/`$2227`
+entries use the 0=Protect / 1=Write-enabled convention.
 
-**Mitigation:** the crt0 self-test (`:639-647`: write `$42` to I-RAM, read
-back, fail to `sa1_status=$FF`) means a wrong choice is **detected** at
-runtime — `sa1IsReady()` returns false unless the SA-1 reaches `$A5`, so
-the failure is not silent. If your project depends on SA-1, verify on a
-real cartridge before shipping. Background + sources:
-`.claude/notes/tech/enhancement_chips_research.md`.
+The crt0 self-test (`:639-647`) remains as a runtime safety net —
+`sa1IsReady()` returns false unless the SA-1 reaches `$A5`. History of the
+investigation: `.claude/notes/tech/enhancement_chips_research.md`.
 
 ### 🟢 SuperFX / SA-1 chips: covered natively (resolved by the luna migration)
 **Resolved 2026-06-20.** The previous harness (snes9x compiled to WASM) could

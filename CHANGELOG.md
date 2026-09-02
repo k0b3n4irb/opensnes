@@ -2,6 +2,57 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.36.2] — 2026-09-02
+
+A patch release with one linker-visible compiler fix and a full audit of
+the hardware documentation against authoritative SNES references
+(fullsnes, Anomie, snesdev-wiki, the official Nintendo dev manual). The
+audit corrected ten documentation findings; **no library or runtime
+behaviour changed** (ROMs are byte-identical — WRAM oracle 84/84).
+
+### Fixed
+- fix(compiler,devtools): **anonymous C string labels are now TU-unique.**
+  Two C files each using string literals could emit the same anonymous
+  label (`string.15`) and wlalink rejected the link ("Label defined more
+  than once") — cproc's per-process counter restarts each translation
+  unit and the w65816 backend ships the labels as plain globals. The
+  cc65816 wrapper now exports a per-file stem and cproc (submodule bump)
+  prefixes the labels per TU. ROM output byte-identical; new
+  compiler-test case guards the prefix.
+- docs(docs,runtime,tech): **hardware claims disproven by the source
+  audit corrected** across `KNOWN_LIMITATIONS.md`, `docs/hardware/` and
+  eight tutorials. Highlights: the SA-1 SIWP/CIWP "disputed polarity" is
+  resolved (bit=1 = write-enable; the Super Famicom Dev Wiki page is
+  wrong — fullsnes, the official Nintendo dev manual §4.1.25 and nocash
+  agree, so crt0's `$FF` was correct all along); the OAM pair-write
+  latch applies to the low table only (high-table writes are immediate);
+  hiding sprites needs Y=240 *plus* the X high bit for ≥32 px sprites
+  (the lib already did this); the real NTSC VBlank budget is ~50,500
+  master cycles (not 35,000); a scanline is 1364 master cycles (not
+  "1369 at 3.58 MHz"); the HDMA repeat-mode doctrine is rewritten (PPU
+  registers latch — the mode follows the data shape, verified on luna
+  with an A/B/C probe); scroll writes take effect from the next scanline
+  (not "latched at the start of each frame"); `sramSave` costs 7 CPU
+  cycles/byte via MVN (an 8 KB save is ~1 frame, not "~3 %").
+
+### Added
+- docs(docs): **new documented trap** — BG1 scroll and the Mode 7
+  matrix registers share one write-twice latch: an HDMA/IRQ write to a
+  BG1 scroll register between the two writes of an M7 register silently
+  corrupts the value and the MPY result (snesdev-wiki Errata). The lib
+  is unaffected (it never reads MPY); gotchas added to the mode7 and
+  hdma tutorials.
+- docs(rules): new auto-loaded rule `hardware_claims.md` — new hardware
+  claims in the docs must be verified against the arbitrated SNES
+  corpus (Cartouche MCP) before landing; unverifiable claims are
+  written as hypotheses.
+
+### Changed
+- refactor(lib): `nmiSet` is now a one-line forward to `nmiSetBank`
+  (the v0.36.1 inline write dodged a QBE forwarding bug that turned out
+  not to exist). Behaviour identical; WRAM oracle rebaselined for the
+  jsl-instead-of-inline-stores shape.
+
 ## [0.36.1] — 2026-08-16
 
 Two silent-failure fixes surfaced while building the `rpg` streaming overworld,

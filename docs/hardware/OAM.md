@@ -26,9 +26,8 @@ OAM is **544 bytes** total:
 Bit 7: Vertical flip
 Bit 6: Horizontal flip
 Bits 5-4: Priority (0-3)
-Bit 3: Palette (high bit, with bits 1-3 from palette select)
-Bits 1-3: Palette select (0-7)
-Bit 0: Tile number (bit 8, for second tile page)
+Bits 3-1: Palette (0-7)
+Bit 0: Tile number bit 8 (second tile page)
 ```
 
 ### Extended Table (2 bits per sprite)
@@ -42,14 +41,20 @@ Bit 0: X position (bit 8, for X > 255)
 
 **This is the most important thing to understand about OAM writes.**
 
-The SNES uses a **16-bit internal write buffer** for OAM:
+For the **main table** (bytes 0-511), the SNES uses a **16-bit internal
+write buffer**:
 
-1. First write to `$2104` → goes to internal **low byte buffer only**
-2. Second write to `$2104` → goes to **high byte buffer AND commits both bytes to OAM**
+1. Write to `$2104` at an even address → goes to the internal **low byte buffer only**
+2. Write at the following odd address → goes to the **high byte AND commits both bytes to OAM**
+
+The **extended table** (bytes 512-543) is the exception: writes there
+apply **immediately**, byte by byte, with no pair-latching. (Confirmed
+by the register references — the latch logic only applies below
+internal address $200.)
 
 ### The Problem
 
-If you only write one byte (e.g., just the X position), **nothing happens**. The byte sits in the internal buffer but is never committed to actual OAM.
+For the main table, if you only write one byte (e.g., just the X position), **nothing happens**. The byte sits in the internal buffer but is never committed to actual OAM.
 
 ```c
 // WRONG - Only writes X, never commits to OAM!
@@ -119,14 +124,28 @@ REG_OAMADDH = 1;  // Bit 0 = 1 selects high table (bytes 512+)
 
 ## Hiding Sprites
 
-To hide a sprite, set its Y position to 240 (off-screen):
+To hide a sprite, set its Y position to 240 **and** set its X-position
+high bit (placing it at X=256, off-screen to the right):
 
 ```c
 REG_OAMADDL = sprite_id * 4;
 REG_OAMADDH = 0;
-REG_OAMDATA = 0;    // X (don't care)
-REG_OAMDATA = 240;  // Y = 240 hides sprite
+REG_OAMDATA = 0;    // X low byte (don't care)
+REG_OAMDATA = 240;  // Y = 240
+// ...and set bit 0 of the sprite's extended-table pair (X bit 8).
 ```
+
+Y=240 alone only hides sprites up to 16 px tall: sprite Y wraps
+vertically, so a 32x32 sprite at Y=240 shows its last ~16 rows at the
+**top of the screen**, and no Y value can fully hide a 64x64. This is
+exactly what the lib's `oamHide()` / `oamClear()` do — prefer them over
+manual pokes.
+
+One refinement worth knowing: a sprite at X=256 is still treated as
+X=0 for the per-scanline range/time evaluation. A hidden *large*
+sprite whose Y wraps onto visible lines therefore still consumes the
+32-sprites / 34-slivers budget on those lines — if the top of your
+screen drops sprites mysteriously, audit your hidden large sprites.
 
 ## Sprite Y +1 Scanline Quirk
 
@@ -232,7 +251,7 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 
 ## Common Pitfalls
 
-1. **Writing single bytes** - Always write in pairs
+1. **Writing single bytes** - Always write the main table in pairs (extended-table writes are immediate)
 2. **Writing outside VBlank** - Can cause visual corruption
 3. **Forgetting extended table** - Large sprites need size bit set
 4. **X position > 255** - Need to set bit 0 in extended table

@@ -125,6 +125,7 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
 - `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
 - `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → luna issue → luna ships → delete). Must consult before adding any internal validation/analysis script.
+- `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
 
 ## Strategic Planning
 
