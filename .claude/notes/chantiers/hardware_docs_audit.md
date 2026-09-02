@@ -7,8 +7,9 @@ retrospective are appended at the bottom. Files touched: OAM.md,
 REGISTERS.md, KNOWN_LIMITATIONS.md, tutorials {dma, hdma, window,
 scrolling, sram, math, sa1, mode7}, templates/crt0.asm (comments only
 — zero emitted bytes), notes tech {enhancement_chips_research,
-nmi_context_hardware_muldiv, hdma_notes}. Remaining optional follow-up:
-the luna non-repeat window probe (empirical confirmation of F6).
+nmi_context_hardware_muldiv, hdma_notes}. Committed as `f91e1a63`.
+F6 empirically confirmed on luna 2026-09-02 (see the F6 section) —
+no follow-up remains open.
 **Origin:** full challenge of the SDK's hardware claims against the
 Cartouche RAG corpus (21 `snes_search` queries + 2 WebFetch
 counter-checks, session 2026-09-01). Audit report lived in
@@ -150,12 +151,25 @@ is shaped with HDMA in **"2 registers write once" mode** on WH0/WH1;
 the rectangle worked example states *"All segments can be built using
 non-repeating HDMA table entries"* (full pseudocode on the page).
 So "repeat required because window registers forget" is wrong.
-`window.md` is additionally **self-contradictory**: line 99 says "If
-you write them once, the boundaries stay the same on every scanline"
-(correct), line 197 says the PPU "forgets" per scanline (wrong).
-Rewrite window.md + hdma.md's three-classes table; run the luna
-non-repeat probe as empirical confirmation and to explain whatever
-symptom motivated the original claim.
+`window.md` was additionally self-contradictory (line 99 correct,
+line 197 wrong). Docs rewritten in `f91e1a63`.
+
+**Empirically CONFIRMED on luna, 2026-09-02** (one-shot A/B/C probe,
+out-of-tree copies of `examples/windows/window`, luna v1.17.0,
+`-n 3000000 --print-fbhash`; scratchpad dirs deleted after):
+- baseline repeat table → `fbhash=2df0535c62a11154`, the shipped diamond;
+- **8 non-repeat bands of 8 lines** (tails fixed to a 1-line non-repeat
+  entry) → `fbhash=a4c622b488265903`, a stable stair-stepped diamond:
+  each band written ONCE holds for 8 lines, and below the shape the
+  latched disable value holds to the bottom of the frame with zero
+  further HDMA writes — registers latch, non-repeat holds;
+- **repeat bit stripped, per-line data kept** (the historical "Direct
+  Mode" misreading) → `fbhash=586c4f54f0c00795`, collapsed garbage —
+  reproduces the 2026 "straight lines / collapse" symptom exactly.
+A bonus accidental repro: leaving the original `0xFF, 0` tail after
+non-repeat bands makes `0xFF` parse as a 127-line repeat count that
+reads past the table — same misparse family, same visual garbage.
+F6 is closed on both fronts (arbiter-documented + luna-verified).
 
 ### F8 (new) — scrolling.md:252 "latched at the start of each frame" is wrong
 snesdev-wiki PPU-registers (Scroll): *"The scroll offset is always
