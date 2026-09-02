@@ -140,6 +140,9 @@ endif
 ifeq ($(USE_SUPERFX),1)
 LIB_MODULES += superfx
 endif
+ifeq ($(USE_DSP1),1)
+LIB_MODULES += dsp1
+endif
 
 # Assembler flags
 ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)

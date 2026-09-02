@@ -4,3 +4,8 @@ steps = 5000000
 firmware = "dsp1b.rom"
 [asserts.trace]
 dsp1 = { min = 1 }
+[asserts.values]
+# dsp1Present() known-answer result parked by the example (1 = chip answered
+# Multiply 0.5*0.5 == 0.25). Guards the whole DR/SR handshake path, not just
+# "the chip executed something".
+dsp1_ok = { eq = 1, width = 2 }
