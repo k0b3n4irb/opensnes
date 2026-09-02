@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_backgrounds.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 2 — "fill the screen with your own art."</b> The background layers are the SNES's canvas. This family is a ladder through the PPU's background modes, from a single Mode 1 image up to 256-colour and hi-res, each mode a different trade of colours against layers against resolution.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1041"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1043"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -147,7 +147,7 @@ The ladder</h2>
 <p>Under-the-hood rung to come — <b>2.2 a tilemap built by hand in C</b>: what the asset macro hides, for the <span class="tt">fundamentals/</span> tier.</p>
 <p>Moving the world past the camera lives in its own family: <a href="../scrolling/"><span class="tt">scrolling/</span></a>. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1042"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1044"></a>
 The idea in one screen</h2>
 <p>A background is <em>tiles</em> (8×8 pixel art in VRAM) placed by a <em>tilemap</em> (a grid of tile indices) and coloured by a <em>palette</em>. A <b>mode</b> picks how many layers you get and how many colours each: Mode 1 gives two 4bpp layers + one 2bpp (the workhorse); Mode 0 gives four 2bpp layers; Mode 3 spends everything on one 8bpp (256-colour) layer; Mode 5 trades colour for 512-pixel width. Same three ingredients, six trade-offs — pick the mode your scene needs.</p>
 <p><a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a> <a class="el" href="examples_backgrounds_mode1.html" title="Mode 1 Example">Mode 1 Example</a> <a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a> <a class="el" href="examples_backgrounds_mode1_lz77.html" title="Mode 1 LZ77">Mode 1 LZ77</a> <a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a> <a class="el" href="examples_backgrounds_mode3.html" title="Mode 3 — 256-Color Background">Mode 3 — 256-Color Background</a> <a class="el" href="examples_backgrounds_mode5.html" title="Mode 5 — Hi-Res 512×256 Background">Mode 5 — Hi-Res 512×256 Background</a> <a class="el" href="examples_backgrounds_mode5_hires.html" title="Hi-res text — BG Mode 5 + interlace (512 × 448)">Hi-res text — BG Mode 5 + interlace (512 × 448)</a> </p>

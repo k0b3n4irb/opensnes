@@ -128,24 +128,24 @@ $(function(){initNavTree('examples_input_move_sprite.html','',''); });
 <img src="move_sprite.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1366"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1368"></a>
 What you'll learn</h2>
 <ul>
 <li><span class="tt">padHeld(0)</span> returns a 16-bit bitmask of the buttons held this frame. The NMI reads the pad automatically every VBlank; you just read the result.</li>
 <li>Test the D-pad bits (<span class="tt"><a class="el" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></span> / <span class="tt"><a class="el" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></span> / <span class="tt"><a class="el" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></span> / <span class="tt"><a class="el" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></span>) and nudge the sprite's position each frame.</li>
 <li><span class="tt">oamSetXY(id, x, y)</span> updates <b>only</b> a sprite's position, leaving its tile and size untouched — the per-frame call you want inside a game loop (vs. <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>, which rewrites the whole entry).</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1367"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1369"></a>
 SNES concepts</h2>
 <p>This reuses the entire <span class="tt">simple_sprite</span> setup — tiles to VRAM, palette to CGRAM 128, OBJSEL — and adds a single new thing: the input loop. Sprite position is 9-bit X and 8-bit Y, so if you walk off an edge the coordinate wraps around. That OAM coordinate quirk is visible here for free; real games park an off-screen sprite at a hidden Y instead of letting it wrap.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1368"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1370"></a>
 How to build</h2>
 <div class="fragment"><div class="line">make -C examples/input/move_sprite</div>
 </div><!-- fragment --><p>Run <span class="tt">move_sprite.sfc</span> in <a href="https://github.com/k0b3n4irb/luna">luna</a> and steer the sprite with the D-pad.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1369"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1371"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">sprite</span>, <span class="tt">input</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1370"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1372"></a>
 Ladder</h2>
 <p>← 4.1 <a href="../controller/"><span class="tt">controller</span></a> · → 4.3 <a href="../two_players/"><span class="tt">two_players</span></a> </p>
 </div></div><!-- contents -->

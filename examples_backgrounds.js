@@ -1,12 +1,12 @@
 var examples_backgrounds =
 [
     [ "Mode 0 — 4-Layer 2bpp Background", "examples_backgrounds_mode0.html", [
-      [ "The ladder", "examples_backgrounds.html#autotoc_md1041", null ],
-      [ "The idea in one screen", "examples_backgrounds.html#autotoc_md1042", [
-        [ "Description", "examples_backgrounds_mode0.html#autotoc_md952", null ],
-        [ "Architecture", "examples_backgrounds_mode0.html#autotoc_md953", null ],
-        [ "Ported from", "examples_backgrounds_mode0.html#autotoc_md954", null ],
-        [ "Modules", "examples_backgrounds_mode0.html#autotoc_md955", null ]
+      [ "The ladder", "examples_backgrounds.html#autotoc_md1043", null ],
+      [ "The idea in one screen", "examples_backgrounds.html#autotoc_md1044", [
+        [ "Description", "examples_backgrounds_mode0.html#autotoc_md954", null ],
+        [ "Architecture", "examples_backgrounds_mode0.html#autotoc_md955", null ],
+        [ "Ported from", "examples_backgrounds_mode0.html#autotoc_md956", null ],
+        [ "Modules", "examples_backgrounds_mode0.html#autotoc_md957", null ]
       ] ]
     ] ],
     [ "Mode 1 Example", "examples_backgrounds_mode1.html", null ],

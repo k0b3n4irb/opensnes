@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_chips_dsp1_cube.html','',''); });
 Screenshot</div></div>
     <p>A wireframe cube's 8 corners tumbling in 3D — with every rotation computed by the <b>DSP-1 coprocessor</b> (NEC µPD77C25), not the 65816. Each frame the CPU hands the DSP-1 a rotation matrix and 8 model-space points; the DSP-1 rotates them and hands back world-space coordinates, which are drawn as 8 sprites via orthographic projection.</p>
 <p>This is the SDK's first DSP-1 example, and the third leg of the enhancement-chip family alongside SA-1 and Super FX.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1105"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1107"></a>
 SNES Concepts</h2>
 <ul>
 <li><b>DSP-1 command interface</b> — the CPU drives the coprocessor over two registers (data + status) with an RQM handshake; see <span class="tt"><a class="el" href="dsp1_8h.html" title="DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C.">snes/dsp1.h</a></span></li>
@@ -136,19 +136,19 @@ SNES Concepts</h2>
 <li><b>Orthographic projection</b> — the rotated x'/y' map straight to screen; the DSP-1 does no rasterisation, so the CPU just places the 8 corner sprites</li>
 <li><b><span class="tt"><a class="el" href="dsp1_8h.html#a07cbf1c377508911986a414336ad4fd8" title="Resynchronise the DSP-1 to a known command-wait state.">dsp1Init()</a></span></b> — issues the <span class="tt">$80</span> resync handshake so the chip starts in a known command-wait state</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1106"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1108"></a>
 Firmware requirement</h2>
 <p>The DSP-1 runs Sony's mask-ROM firmware. Emulators that low-level-emulate the chip (including <b>luna</b>) need that firmware supplied — it is copyrighted and <b>not shipped with the SDK</b>:</p>
 <div class="fragment"><div class="line"># put your own dump here, then it persists</div>
 <div class="line">cp dsp1b.rom ~/.config/luna/firmware/dsp1b.rom</div>
 <div class="line"># or per-run:  luna run --dsp1-rom /path/to/dsp1b.rom dsp1_cube.sfc</div>
 </div><!-- fragment --><p>Without it, the ROM still boots but the coprocessor stays inert (the cube won't move). High-level-emulation emulators (snes9x) run it firmware-free.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1107"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1109"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/chips/dsp1_cube</div>
 <div class="line">make</div>
 </div><!-- fragment --><p>Run <span class="tt">dsp1_cube.sfc</span> in an emulator with the DSP-1 firmware available.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1108"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1110"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">sprite</span>, <span class="tt">dsp1</span> </p>
 </div></div><!-- contents -->

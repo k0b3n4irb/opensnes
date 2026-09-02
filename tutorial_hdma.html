@@ -129,7 +129,7 @@ What HDMA actually is</h2>
 <p>HDMA is different in three ways:</p>
 <ol type="1">
 <li><b>Timing</b> — the PPU's HBlank window between scanlines, every scanline, for as long as the channel stays enabled. Not on demand; it just keeps running once configured.</li>
-<li><b>Cadence</b> — you supply a <em>table</em> in memory that says: write this value(s) for <span class="tt">N</span> scanlines, then write that value for <span class="tt">M</span> scanlines, then stop. The PPU walks the table as it draws each frame.</li>
+<li><b>Cadence</b> — you supply a <em>table</em> in memory that says: write this value(s) for <span class="tt">N</span> scanlines, then write that value for <span class="tt">M</span> scanlines, then stop. The 5A22's DMA controller walks the table as the frame is drawn, pausing the CPU for each per-scanline transfer.</li>
 <li><b>Cost</b> — HDMA reads steal a few machine cycles from each scanline. The 65816 still runs your code, just slightly slower during active display. You're paying for the per-scanline write.</li>
 </ol>
 <p>The classic uses are effects whose look <em>changes vertically across the frame</em>: a colour gradient (top different from bottom), a wave that bends the picture, a parallax background where each layer scrolls at its own rate, a window mask that follows the screen down, a brightness fade. Anything that needs "the value of register X is different on scanline 100
@@ -191,10 +191,8 @@ Table format</h2>
 <p>Every HDMA table is a sequence of <em>groups</em>. Each group starts with a <b>line-count byte</b>, followed by <span class="tt">N × byteCount</span> data bytes (where <span class="tt">byteCount</span> is the bytes-per-write of the transfer mode and <span class="tt">N</span> depends on whether the high bit of the line count is set).</p>
 <p>The line-count byte's high bit is the <b>repeat flag</b>:</p>
 <ul>
-<li><b>Bit 7 = 0 — non-repeat mode.</b> "Write the data once, then hold the
-  destination register's value for *N* scanlines." Good for registers that <em>latch</em> their value across scanlines (CGADD, COLDATA, INIDISP).</li>
-<li><b>Bit 7 = 1 — repeat mode.</b> "Write the data on every one of these *N*
-  scanlines." <b>Required</b> for registers that the PPU <em>consumes</em> every scanline (BG scroll registers, Mode 7 matrix, window).</li>
+<li><b>Bit 7 = 0 — non-repeat mode.</b> The entry carries <b>one</b> scanline worth of data. It is written once, then the destination register holds the value for <em>N</em> scanlines (every PPU register latches what you write). Right whenever the value is constant across the band.</li>
+<li><b>Bit 7 = 1 — repeat mode.</b> The count says how many <em>scanlines worth of data</em> follow — one fresh group written per line. Needed only when the value genuinely changes every line (scroll wave, smooth gradient, moving window edge).</li>
 </ul>
 <p>A table ends with a line-count byte of <span class="tt">0</span>.</p>
 <p>Worked example, non-repeat — a gradient that writes one byte per group to set background colour intensity per stripe:</p>
@@ -209,15 +207,15 @@ Table format</h2>
 <div class="line">    0,           <span class="comment">/* End */</span></div>
 <div class="line">};</div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><p>Same effect with repeat mode would write every scanline:</p>
+</div><!-- fragment --><p>Repeat mode, by contrast, carries one data group <b>per scanline</b> — a 32-line repeat entry is followed by 32 groups, not one:</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> scroll_wave_table[] = {</div>
-<div class="line">    0xA0, 0x10, 0x00,    <span class="comment">/* $A0 = $80 | 32 → repeat for 32 scanlines */</span></div>
-<div class="line">                          <span class="comment">/* Each scanline writes BGnHOFS = 0x0010    */</span></div>
-<div class="line">    0xA0, 0x20, 0x00,    <span class="comment">/* Repeat for 32 scanlines, BGnHOFS = 0x0020 */</span></div>
-<div class="line">    <span class="comment">/* ... */</span></div>
-<div class="line">    0,                    <span class="comment">/* End */</span></div>
+<div class="line">    0xA0,                <span class="comment">/* $80 | 32 → 32 scanlines of per-line data */</span></div>
+<div class="line">    0x10, 0x00,          <span class="comment">/* line 0: BGnHOFS = 0x0010 */</span></div>
+<div class="line">    0x11, 0x00,          <span class="comment">/* line 1: BGnHOFS = 0x0011 */</span></div>
+<div class="line">    <span class="comment">/* ... 30 more { lo, hi } pairs, one per scanline ... */</span></div>
+<div class="line">    0,                   <span class="comment">/* End */</span></div>
 <div class="line">};</div>
-</div><!-- fragment --><p>The "wrong mode" failure is silent and visible: scroll registers in non-repeat mode write only the first scanline of each group, then the PPU's latched scroll value drifts for the rest. You see the effect "glitching" instead of holding.</p>
+</div><!-- fragment --><p>The classic silent failure is a <b>layout mismatch</b>, not a register property: per-line data placed under a non-repeat count makes the hardware write the first group, hold it for the whole count, then misparse the remaining data bytes as line counts — the effect appears to work for the first line of each group and then falls apart.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md216"></a>
 Setup pattern</h2>
 <p>The full sequence to put HDMA on screen:</p>
@@ -280,7 +278,7 @@ Window animation — <span class="tt">examples/windows/transparent_window</span>
 <p>Combines HDMA with the window/colour-math pipeline. HDMA writes to the window position registers (<span class="tt">WH0L</span>, <span class="tt">WH0H</span>, <span class="tt">WH1L</span>, <span class="tt">WH1H</span>) per scanline to animate a moving window, while colour math blends the BG1 layer through the window onto the BG2 layer beneath. Mode 4 transfer (4 bytes, 4 sequential registers) does the four window writes in one HDMA group.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md223"></a>
 Stationary window — <span class="tt">examples/windows/window</span></h3>
-<p>The non-animated cousin: HDMA in repeat mode writes to the window registers once (and then "every scanline" since window registers are write-only and forget on the next scanline). The window position holds across the visible region; the effect is a static masked area rather than animation.</p>
+<p>The non-animated cousin: a static window band needs only <b>non-repeat</b> entries — the window registers latch, so one write per band holds (end the table with an empty-window entry, left &gt; right, if the shape must stop before the bottom of the frame). The shipped example keeps the repeat-mode table because it shares its build path with the animated variant; both produce the same static masked area.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md224"></a>
 Indirect HDMA — <span class="tt">examples/hdma/hdma_indirect_gradient</span></h3>
 <p><span class="tt"><a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a></span> (DMAP bit 6): table entries hold POINTERS to the payload instead of the payload itself, letting many scanline bands share data blocks. The example reproduces krom's RedSpace gradient pixel-exactly with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to blocks goes in <span class="tt">$43x7</span> — pass it with the bank-extraction idiom (<span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)table &gt;&gt; 16)</span>).</p>
@@ -313,30 +311,30 @@ Gotchas</h2>
 <p>The bank-overflow check (<span class="tt">make/common.mk</span> → <span class="tt">symmap.py</span>) flags when bank <span class="tt">$00</span> is filling up; pair that with an explicit choice of <span class="tt"><a class="el" href="hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0" title="Set up an HDMA channel with explicit source bank byte.">hdmaSetupBank</a></span> when const tables get big.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md232"></a>
 🟡 Repeat-mode discipline matters</h3>
-<p>Three classes of registers, three rules:</p>
+<p>Every PPU register latches what you write — there is no register class that forgets its value between scanlines. The mode choice follows the <b>data</b>, not the register:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Register class  </th><th class="markdownTableHeadNone">Examples  </th><th class="markdownTableHeadCenter">Mode  </th></tr>
+<th class="markdownTableHeadNone">Data shape  </th><th class="markdownTableHeadNone">Examples  </th><th class="markdownTableHeadCenter">Mode  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Self-latching (PPU holds value)  </td><td class="markdownTableBodyNone">INIDISP, COLDATA, CGADD, MOSAIC  </td><td class="markdownTableBodyCenter">non-repeat OK  </td></tr>
+<td class="markdownTableBodyNone">Constant value per band  </td><td class="markdownTableBodyNone">colour stripes, letterbox window, scroll split  </td><td class="markdownTableBodyCenter">non-repeat  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Per-scanline-consumed  </td><td class="markdownTableBodyNone">BG scroll, Mode 7 matrix  </td><td class="markdownTableBodyCenter"><b>repeat required</b>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Write-only / forgets  </td><td class="markdownTableBodyNone">WH0L/H, WH1L/H  </td><td class="markdownTableBodyCenter"><b>repeat required</b>  </td></tr>
+<td class="markdownTableBodyNone">Fresh value every line  </td><td class="markdownTableBodyNone">scroll wave, smooth gradient, moving window edge  </td><td class="markdownTableBodyCenter">repeat  </td></tr>
 </table>
-<p>Wrong mode for the second/third class shows as "the effect works for the
-first scanline of each group, then the latched value drifts". Verify in Mesen2's tile/window viewer if you suspect this.</p>
+<p>The two layouts differ (non-repeat = one data group held for the count; repeat = one data group <em>per line</em> of the count), so mixing them misparses the table — the effect works for the first line of each group, then falls apart. If you suspect this, dump the table bytes and walk them against the format above, or inspect the frame in luna.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md233"></a>
+🟡 HDMA on BG1 scroll can corrupt Mode 7 writes (shared latch)</h3>
+<p>$210D/$210E and the Mode 7 registers $211B-$2120 share a single write-twice latch. An HDMA channel (or IRQ) that writes a BG1 scroll register between the two writes of a Mode 7 register silently corrupts the value — and the Mode 7 multiplier result in $2134-$2136. See the matching gotcha in the <a class="el" href="mode7_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/mode7.md">Mode 7 tutorial</a>.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md234"></a>
 🟡 HDMA fires before the user callback in the NMI handler</h3>
 <p><span class="tt">templates/crt0.asm</span>'s NMI handler runs the VRAM-critical work (OAM DMA, tilemap DMA, scroll sync) <em>first</em>, then calls your <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a></span> callback, then reads input. HDMA configuration done in the user callback takes effect <em>next</em> frame, not the current one. If you need to reconfigure HDMA each frame (e.g. to swap tables), do it in main-thread code before <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md234"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md235"></a>
 🟡 Don't enable channels you haven't configured</h3>
 <p><span class="tt">hdmaEnable(0xFF)</span> enables every HDMA channel, including channels that hold leftover register values from a previous configuration (or boot defaults). Always enable only the channels you've configured this frame:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>, …);</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a>);   <span class="comment">/* good */</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(0xFF);                  <span class="comment">/* bad — channels 0-5, 7 are random */</span></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md235"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md236"></a>
 Cycle cost</h2>
 <p>HDMA reads steal cycles from the active-display window every scanline. Approximate budget (FastROM off):</p>
 <ul>
@@ -344,8 +342,8 @@ Cycle cost</h2>
 <li>A 1-byte non-repeat table running on one channel: ~16 cycles per scanline, ~3.5 K cycles per frame.</li>
 <li>A 4-byte repeat table on one channel: ~40 cycles per scanline, ~9 K cycles per frame.</li>
 </ul>
-<p>The 65816 has roughly 1369 cycles per scanline at 3.58 MHz, so a single HDMA channel costs 0.6 % – 3 % of CPU time. Two or three active channels are the practical limit before the cost shows up as missed timing in inner game-logic loops.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md236"></a>
+<p>A scanline is 1364 master cycles (about 1324 usable after the DRAM refresh pause — roughly 227 CPU cycles at 3.58 MHz FastROM), so a single HDMA channel costs about 1–3 % of the bus time. Two or three active channels are the practical limit before the cost shows up as missed timing in inner game-logic loops.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md237"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">lib/include/snes/hdma.h</a></span> — full API reference (function signatures, mode constants, destination-register constants).</li>

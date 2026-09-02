@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_transitions.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Part of Family 6 (Colour &amp; effects) — how a scene <em>leaves</em>.</b> Cutting hard between screens looks cheap; a transition sells the change. The SNES gives you two cheap, hardware-cheap ways to do it — dim the whole screen, or dissolve it into blocks — and this family is those two.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1759"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1761"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -136,7 +136,7 @@ The ladder</h2>
 <blockquote class="doxtable">
 <p>Showcase rung to come — <b>6a.3 iris wipe</b>: an HDMA-shaped window closing to a shrinking circle (<span class="tt"><a class="el" href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379" title="Create a circular window mask (iris/spotlight effect).">hdmaIrisWipe</a></span>). </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1760"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1762"></a>
 The idea in one screen</h2>
 <p>Both are single-register effects the PPU applies for free every frame. <b>Fade</b> steps the master brightness (<span class="tt">INIDISP</span>, 0–15) across a few frames — <span class="tt"><a class="el" href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn</a></span> / <span class="tt"><a class="el" href="console_8h.html#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut</a></span> do the stepping for you. <b>Mosaic</b> (<span class="tt">$2106</span>) grows the pixel-block size 1→15, so the image dissolves into ever-coarser squares; <span class="tt"><a class="el" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e" title="Animate mosaic fade in (pixelated -&gt; clear).">mosaicFadeIn</a></span> runs it as a transition. Neither redraws anything — you change one register and the hardware does the rest, which is why they cost nothing and belong in every scene change.</p>
 <p><a class="el" href="examples_transitions_fading.html" title="Fading Example">Fading Example</a> <a class="el" href="examples_transitions_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a> </p>
