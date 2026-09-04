@@ -124,11 +124,10 @@ and see where it lands.
 ### Perspective projection (the pseudo-3D pipeline)
 | Opcode | Name | In | Out | Purpose |
 |--------|------|----|----|---------|
-| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → Cx,Cy,…). Out=4 CONFIRMED twice: luna SMK trace (#161) AND direct probing 2026-09-02 (KAT `Multiply` green immediately after — no desync at 7-in/4-out). Behaviour characterised empirically (dsp1-v2 probe, luna DSP-1B): all-zero setup is **degenerate** (every Project → 0,0); `azs=$4000` → view axis = **+Y** (X across, Z up); projected offset ≈ `(lfe+les)·x/y` (lfe 96→256 scales H proportionally); `fz` shifts V (camera height); `aas=$8000` flips V and M signs, not H; H is mirrored (negative for +x) and V up-positive. Individual scalar semantics beyond that still ◆ |
+| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → **Vof, Vva, Cx, Cy** — order per the official manual §5.4.1, confirmed by the Raster probe 2026-09-03, see §15). Out=4 CONFIRMED twice: luna SMK trace (#161) AND direct probing 2026-09-02. Behaviour characterised empirically (luna DSP-1B): all-zero setup is **degenerate** (every Project → 0,0); `azs=$4000` → view axis = **+Y** (X across, Z up); projected offset ≈ `(lfe+les)·x/y`; `fz` = camera height; H is mirrored (negative for +x) and Project V is up-positive. ★ |
 | `$06`,`$16`,`$26`,`$36` | **Project** | 3 (I x,y,z) | 3 (H,V,M) | world point → screen X, screen Y, scale/depth ★ |
-| `$0E`,`$1E`,`$2E`,`$3E` | Target | 2 (H,V) | 2 (x,y) | inverse of Project: screen → ground plane (aim/pick) ★ |
-| `$0A`,`$1A`,`$2A`,`$3A` | Raster | **5** (setup) | **unbounded** | per-scanline Mode-7 matrix STREAM; in=5 setup words (luna SMK #161), out is open-ended (384 words/frame in SMK) terminated by a CPU sentinel write — NOT a fixed count ★ |
-
+| `$0E`,`$1E`,`$2E`,`$3E` | Target | 2 (h,v) | 2 (x,y) | inverse of Project: screen → ground plane (aim/pick). Probed 2026-09-03: (h,v) are **raster-style** screen coords relative to the imaginary centre (v down-positive, NOT Project's up-positive V); Target(0,0) returns exactly (Cx,Cy). ★ |
+| `$0A` (**use this**), `$1A` (wedges — see §15) | Raster | **1** (Vs) + sentinel | 4 per raster, **unbounded** | per-scanline Mode-7 matrix STREAM: A→B→C→D→A… for rasters Vs, Vs+1, … until the CPU writes **`$8000` to DR in place of reading a D**. luna's "5 setup words" on SMK = Vs + 4×`$8000` (the game writes the sentinel four times so one lands on a D slot). Fully characterised by the 2026-09-03 probe, §15. ★ |
 ### Control / diagnostics (not demo math)
 - `$80` **Sync/Reset** — 0 in / 0 out. Flushes pending command state
   (`in_count=0`, `waiting4command`, `first_parameter` reset in snes9x HLE) →
@@ -314,7 +313,7 @@ originals are the ultimate primaries but only reachable via those derivatives.
   "install the firmware into luna" as a dev prereq beside `install-luna.sh`.
   CI skips it (no firmware) — the `INPUT-DEP` treatment.
 - **Verify-before-code items** (the ◆s): ~~DR byte order + RQM per-byte/word~~
-  ✅ RESOLVED Phase 0 (LSB-first, per-byte RQM — see §2). Remaining: Parameter
+  ✅ RESOLVED Phase 0 (LSB-first, per-byte RQM — see §2); Raster protocol, Parameter outputs and Target ✅ RESOLVED 2026-09-03 (§15). Remaining: Parameter
   operand scaling; Objective/Subjective direction; exact out-counts for
   Polar/Objective/Gyrate — resolve during the module bring-up (Attitude→
   Objective→Project) against a luna run + snes9x source.
@@ -331,3 +330,81 @@ originals are the ultimate primaries but only reachable via those derivatives.
 - `templates/hdr_sa1.asm`, `hdr_superfx.asm`, `memmap_*.inc` — the chip-integration pattern.
 - `make/common.mk` GSU two-stage build — the Path B integration template.
 - `tools/luna-test/luna_runner.py` — the `INPUT-DEP` gating pattern to reuse for firmware-gated examples.
+
+## 15. Raster protocol — Phase 0 probe results (2026-09-03, luna v1.17.0, DSP-1B LLE)
+
+Source of truth: official SNES Development Manual Book II §5.4.1–5.4.4
+(local corpus `snes-rag/corpus/manual/book2_text.pdf`) + a throwaway probe ROM
+(`--dsp1-trace-commands` + WRAM peeks). Everything below is measured unless
+marked *manual*.
+
+**Protocol (★)**
+- Command byte **`$0A`**, then **one word Vs** (raster number where the projected
+  display begins). Output then loops A→B→C→D→A→… one 4-word group per raster,
+  starting at raster Vs, forever. Every word LSB-first, RQM-gated per byte like
+  every other command.
+- **Termination**: write `$8000` to DR **in place of reading a D** (manual
+  §5.4.2, literal). Measured: a write landing on an A/B/C slot is *swallowed*
+  (the stream continues); only the D-slot write ends the command. That is why
+  Nintendo-style code (SMK, ARM9/snesdev) writes `$8000` **four times** after a
+  full group — one of them hits D. The lib does the manual-literal form: read
+  A,B,C of the next raster, then write `$8000` once (`in_words = 2` in the luna
+  trace). After the sentinel SR reads `$84` (bit 2 = DRC, 8-bit command mode) and
+  a `Multiply` KAT is green immediately.
+- **`$1A` wedges the chip on luna.** The manual lists `$0A` = "output via DMA"
+  and `$1A` = "not via DMA" (and §4.4 says DMA is unsupported on the SNES), but
+  measured: `$1A` never returns to command mode — every later byte is swallowed,
+  and **`dsp1Init()`'s 128× `$80` Sync does NOT recover it** (the `$80 $80` bytes
+  pair up as a 16-bit word inside the open stream). SMK and ARM9/snesdev both use
+  `$0A`. The lib uses `$0A` only. *Hypothesis unconfirmed on real silicon.*
+- A `Parameter` result persists across streams: three consecutive `$0A`
+  streams after one `Parameter` all produced consistent data.
+- **Quirk**: `Vs = 0` yields a duplicated first group (raster 0 appears twice,
+  then raster 1, 2, …). Any other Vs tested (−104, −46, −45, 32, 200) was clean.
+  Start ground streams at `Vva + 2` (below) and the quirk is never hit.
+
+**Parameter outputs = Vof, Vva, Cx, Cy (manual §5.4.1, ★)**
+
+Raster numbers used by Parameter/Raster/Target are **down-positive and relative
+to the screen centre** (the "imaginary centre" convention below); Project's V is
+the opposite (up-positive). Sweep (fz=100, lfe=96, les=256 unless noted):
+
+| azs | Vof | Vva | note |
+|---|---|---|---|
+| `$4000` (horizontal) | 46 | −46 | horizon = Vof+Vva = 0 = screen centre |
+| `$3800` (11.25° down) | 0 | −50 | 256·tan(11.25°) = 51 |
+| `$3000` (22.5° down) | 0 | −105 | 256·tan(22.5°) = 106 |
+| `$4800` (11.25° up) | 100 | −49 | horizon = 100−49 = +51 below centre |
+| `$4000`, les=128 | 23 | −23 | vertical focal = **Les** |
+| `$4000`, les=512 | 92 | −93 | |
+
+- **Vva is relative to Vof**: the horizon's screen raster is `Vof + Vva`
+  (screen line `112 + Vof + Vva`). When the true horizon sits at or below the
+  centre the firmware moves the *imaginary centre* down (Vof > 0) so its ground
+  maths has a reference below the horizon; when looking down enough, Vof = 0.
+  lfe and fz do not affect Vof/Vva.
+- **The stream's raster numbering is Vs-relative to the imaginary centre**: a
+  stream started at `Vs = Vva` produces −K at group 0, ∞ (clamped `$7FFE`) at
+  group 1 and K/1, K/2, K/3 … after, i.e. **raster `Vva+1` is the singular
+  horizon line and `Vva+2` is the first finite ground line** (A = K, very far).
+  So: stream from `Vs = Vva + 2`, and place that group on screen line
+  `112 + Vof + Vva + 2`.
+- A/B/C/D are Mode 7 8.8 matrix values ready for M7A–M7D. For aas = 0 B = C = 0
+  and D ≈ 5.6·A (D is the secant slope relative to the imaginary centre, which
+  is why M7VOFS must put the pivot on that line — see the dsp1_ground example).
+  With aas = `$2000` (45°) B and C are populated (253, −663, 253, 662): rotation
+  is free, keep all four words.
+- **Cx, Cy**: ground coordinates of the point under the imaginary centre, to be
+  written to M7X/M7Y. fx/fy offset them 1:1. Sign convention: aas=0 looks
+  toward **−Y on the ground plane** (Cy = fy − dist), aas=`$4000` toward +X,
+  aas=`$8000` toward +Y — i.e. ground Y = −world Y (world +Y is Project's
+  depth axis). This is the natural Mode 7 map convention (forward = up the map).
+
+**Target (`$0E`, 2→2, ★)**: (h, v) screen point → (x, y) ground, same ground
+convention as Cx/Cy, h mirrored like Project's H. Target(0,0) = (Cx,Cy) exactly.
+
+**Cost (measured, per-byte RQM polling, SlowROM)**: a 100-raster stream ≈ 122
+scanlines ≈ 7.8 ms ≈ 46 % of a frame, CPU-bound (≈ 8 bus cycles per byte of
+polling + read + store). The manual's DSP-side figure is 29.5 + 27.5·(n−1) µs
+(2.75 ms for 100 rasters). SMK streams 96 rasters per frame. Budget the ground
+at ≈ 100 lines/frame or refresh it every other frame.

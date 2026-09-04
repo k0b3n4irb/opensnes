@@ -220,6 +220,12 @@
 /** @brief Destination: INIDISP brightness ($2100) */
 #define HDMA_DEST_INIDISP   0x00
 
+/** @brief Destination: BGMODE ($2105) — mid-frame BG mode switch (F-Zero split) */
+#define HDMA_DEST_BGMODE    0x05
+
+/** @brief Destination: TM main-screen layer enable ($212C) */
+#define HDMA_DEST_TM        0x2C
+
 /** @brief Destination: Mode 7 matrix A ($211B) */
 #define HDMA_DEST_M7A       0x1B
 

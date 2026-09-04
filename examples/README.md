@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 84 examples organized by topic, building
+Learn SNES development step by step. 85 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -17,7 +17,7 @@ from basic concepts to complete games.
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
-| [mode7/](mode7/) | 3 | Mode 7: rotation, scaling, per-scanline perspective |
+| [mode7/](mode7/) | 4 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground |
 | [input/](input/) | 5 | Joypads, drive a sprite, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 10 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
@@ -81,6 +81,7 @@ deep-dive of a step below.
 |---|---------|---------------------|
 | 21 | [mode7/rotate_scale](mode7/rotate_scale/) | Mode 7 rotation and scaling |
 | 22 | [mode7/perspective](mode7/perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 22b | [mode7/dsp1_ground](mode7/dsp1_ground/) | Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices |
 | 23 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
 | 23b | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
 | 24 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
