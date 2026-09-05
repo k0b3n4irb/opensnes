@@ -316,14 +316,25 @@ slivers ≤ 34). luna == Mesen2 byte-for-byte (`0141414141414141`) == documented
 range/time interaction. No finding — luna's OBJ evaluation and the SDK's
 oamSet+NMI-OAM-DMA path both correct. Locked; test-manifests now 47.
 
-## Observation pending owner validation (2026-09-03, luna v1.17.0)
+## Observation pending owner validation (2026-09-03, reduced 2026-09-05, luna v1.17.0)
 
-- **`--input` is ignored when the run ends with `--until-frame`.** Same ROM,
-  same script: `luna state -n 5000000 --input "10:0x0100" …` drives the pad
-  (mode7/perspective `sx` moves, dsp1_ground turns); `luna state --until-frame
-  130 --input "10:0x0100,130:0" …` leaves the pad state at zero and the WRAM
-  untouched. Not yet reduced to a minimal repro nor cross-checked against the
-  docs' intended semantics (maybe `--until-frame` runs a different loop that
-  never latches checkpoints). Workaround in the harness: keep `-n` for
-  scripted-input runs (which is what `probes/lib.py` and the manifests do).
-  Owner to validate before any luna issue is filed.
+- **`--input` is ignored when the run ends with `--until-frame`.** Minimal
+  repro on a stock corpus ROM (mode7/perspective: D-pad Right increments `sx`
+  every frame, `pad0` mirrors `padHeld(0)`):
+
+  ```
+  luna state --until-frame 130 --input "10:0x0100" --out - \
+      --peek pad0:2 --peek sx:2 --peek frame_count:2 perspective.sfc
+      → pad0=0000 sx=0000 frame_count=0081   (130 frames ran, pad never latched)
+  luna state -n 3000000 --input "10:0x0100,60:0" --out - … perspective.sfc
+      → pad0=0000 sx=0032 frame_count=004A   (50 frames of Right, released at 60)
+  ```
+
+  Same with the checkpoint at frame 2 and with `--until-frame 400`: the
+  `--input` script never applies under `--until-frame`, while `-n` honours
+  it (checkpoint AND release). Expected: the frame-latched checkpoints apply
+  regardless of how the run is bounded — `--until-frame` is exactly the flag
+  the help text sells for "input→assert probes land on an exact frame".
+  Workaround in the harness: keep `-n` for scripted-input runs (what
+  `probes/lib.py` and the manifests do). Owner to validate, then file on
+  `k0b3n4irb/luna` with the repro above.
