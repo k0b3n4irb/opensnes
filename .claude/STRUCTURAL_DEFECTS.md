@@ -1465,6 +1465,11 @@ the correct 24-bit form for above-`$2000` data.
   free-space number trends below ~2 KB with state still to add, B2
   moves up the queue (decision gate set 2026-07-11).
 
+**Execution plan (2026-09-05)**: `.claude/notes/chantiers/b2_far_ram.md`
+— audited state (the #121 far-read path already exists; stores and
+placement are the gap), the `__far` opt-in design vs far-by-default, phases
+and gates. The proposal below is the original 2026-05 sketch.
+
 **Proposed fix**: teach QBE w65816's emit pass to emit proper 24-bit
 addressing for RAM accesses outside `$00`. Specifically:
 
