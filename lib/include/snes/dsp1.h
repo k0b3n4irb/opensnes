@@ -150,11 +150,20 @@ void dsp1Objective(s16 x, s16 y, s16 z);
  * @param aas screen-plane azimuth angle (A)
  * @param azs screen-plane zenith angle (A)
  *
- * Writes @ref dsp1_o0 = Cx and @ref dsp1_o1 = Cy (the raster coefficients);
- * `dsp1_o2`/`dsp1_o3` receive two further words whose meaning is not yet
- * confirmed by references. Call once (and again whenever the camera moves),
- * then project points with dsp1Project. `lfe`/`les` are best tuned
- * empirically — see the values used by examples/chips/dsp1_cube.
+ * Writes four words (order per the official manual §5.4.1, verified on luna):
+ * - @ref dsp1_o0 = **Vof**, the raster number of the "imaginary centre";
+ * - @ref dsp1_o1 = **Vva**, the horizon raster, relative to Vof — the horizon
+ *   is on screen line `112 + Vof + Vva`, and the ground below it streams
+ *   from raster `Vva + 2` (see dsp1Raster);
+ * - @ref dsp1_o2 = **Cx**, @ref dsp1_o3 = **Cy**: ground coordinates of the
+ *   point under the imaginary centre — write them to M7X/M7Y
+ *   (mode7SetCenter) when driving Mode 7 from dsp1Raster.
+ *
+ * Raster numbers are down-positive and relative to the screen centre; note
+ * that dsp1Project's V is the opposite (up-positive). Call once (and again
+ * whenever the camera moves), then dsp1Project points or dsp1Raster the
+ * ground. `lfe`/`les` are best tuned empirically — see the values used by
+ * examples/chips/dsp1_cube; `les` is also the vertical focal length.
  */
 void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
 
@@ -170,6 +179,49 @@ void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
  * polls, so timing is handled for you.
  */
 void dsp1Project(s16 x, s16 y, s16 z);
+
+/**
+ * @brief Screen point → ground plane (DSP-1 command $0E, "Target").
+ * @param h screen X relative to the centre (I; mirrored like dsp1Project's H)
+ * @param v screen raster relative to the imaginary centre (I; down-positive)
+ *
+ * The inverse of dsp1Project for the ground plane: which ground (x, y) is
+ * under a cursor, a crosshair, a missile scope. Writes @ref dsp1_o0 = ground
+ * X and @ref dsp1_o1 = ground Y, in the same convention as Cx/Cy —
+ * dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1Parameter.
+ * Requires a prior dsp1Parameter.
+ */
+void dsp1Target(s16 h, s16 v);
+
+/**
+ * @brief Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1
+ *        command $0A, "Raster").
+ * @param ab    destination for A,B: 4 bytes per raster (A lo, A hi, B lo, B hi)
+ * @param cd    destination for C,D: 4 bytes per raster (C lo, C hi, D lo, D hi)
+ * @param vs    first raster number (relative to the imaginary centre; use
+ *              `Vva + 2` from dsp1Parameter for the first ground line)
+ * @param count number of rasters to stream (at most 127 per HDMA repeat block)
+ *
+ * This is the Super Mario Kart / Pilotwings ground: the chip computes, for
+ * each raster, the Mode 7 matrix that projects the ground plane under the
+ * camera set by dsp1Parameter — perspective, and rotation when `aas` is
+ * non-zero. The two buffers are laid out as the payload of an
+ * `HDMA_MODE_2REG_2X` repeat block (M7A/M7B on one channel, M7C/M7D on the
+ * other); point the block's header at them and put the block on screen line
+ * `112 + Vof + vs`. Set M7VOFS so the Mode 7 pivot (M7X/M7Y = Cx/Cy) sits on
+ * the imaginary centre line: the D values are secant slopes relative to that
+ * line, not derivatives.
+ *
+ * The stream is closed the way the manual specifies (`$8000` written in place
+ * of a D read), so the chip is back in command mode on return. Cost is
+ * CPU-bound: about 80 µs per raster, roughly 100 rasters in a frame's budget —
+ * refresh the ground at that size, or every other frame.
+ *
+ * @warning Not NMI-safe (like every DSP-1 call), and the tables must not be
+ * the ones HDMA is reading this frame: double-buffer and swap with
+ * hdmaSetTable during VBlank.
+ */
+void dsp1Raster(u8 *ab, u8 *cd, s16 vs, u16 count);
 
 /**
  * @brief Euclidean length of a 3D vector (DSP-1 command $28, "Distance").

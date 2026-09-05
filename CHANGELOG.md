@@ -2,6 +2,51 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.38.0] — 2026-09-05
+
+The DSP-1 Raster release: the coprocessor now streams the per-scanline
+Mode 7 matrices of the Super Mario Kart / Pilotwings ground, and a new
+example drives an F-Zero split with a real camera computed on the chip.
+
+### Added
+- feat(lib): **`dsp1Raster(ab, cd, vs, count)`** — the DSP-1 Raster
+  command as a lib call: streams one A/B/C/D Mode 7 matrix per raster for
+  the camera set by `dsp1Parameter`, straight into two
+  `HDMA_MODE_2REG_2X` payloads (M7A/M7B, M7C/M7D), and closes the stream
+  the way the official manual specifies (`$8000` written in place of a D
+  read). Per-word RQM handshake with 16-bit port reads: 77 scanlines per
+  100 rasters. **`dsp1Target(h, v)`** — screen point → ground plane, the
+  inverse of Project for picking/aiming.
+- feat(examples): **`mode7/dsp1_ground`** (rung 7.4) — the Super Mario
+  Kart floor: F-Zero sky/ground split, a 126-raster floor streamed by the
+  DSP-1 every frame into double-buffered HDMA tables, D-pad turns the
+  camera (the floor rotates in true perspective, the sky pans) and drives
+  forward with `dsp1Triangle` as the movement sin/cos. Firmware-gated luna
+  manifest asserts the streamed raster count.
+- feat(lib): `HDMA_DEST_BGMODE` and `HDMA_DEST_TM` destination constants
+  for mid-frame mode/layer switches.
+- docs(docs): DSP-1 tutorial gains "The ground" (Raster pipeline, raster
+  coordinate convention, the imaginary-centre pivot rule, cost) and a
+  stream-resync gotcha; Mode 7 tutorial gains the DSP-1 worked pattern
+  and the CPU-side write rule under the shared M7 latch.
+
+### Changed
+- docs(lib): `dsp1Parameter`'s four outputs are documented as **Vof, Vva,
+  Cx, Cy** (official manual §5.4.1, verified on luna) — the previous
+  "Cx, Cy, two unconfirmed words" reading was wrong. Raster numbers are
+  centre-relative and down-positive; the horizon is on screen line
+  `112 + Vof + Vva`, the first finite ground raster is `Vva + 2`.
+- docs(tech): `dsp1_reference.md` §15 records the Raster protocol as
+  measured (DSP-1B LLE, luna v1.17.0): `$0A` + Vs, sentinel only on a D
+  slot (SMK's "5 setup words" are Vs + 4×`$8000`), `$1A` never returns to
+  command mode and `$80` Sync cannot recover it (unconfirmed on silicon),
+  `Vs = 0` duplicates the first group; Parameter sweep and Target
+  semantics.
+- test: WRAM oracle re-baselined for `chips/dsp1_cube` (the `.dsp1_asm`
+  section grew, moving stack return addresses — visual and KAT identical)
+  and captured for the new example; corpus 84 → 85 across the anchored
+  docs.
+
 ## [0.37.0] — 2026-09-02
 
 The DSP-1 v2 release: the coprocessor module gains the canonical 3D

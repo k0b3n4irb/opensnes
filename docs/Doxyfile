@@ -97,6 +97,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/backgrounds/mode5 \
                          ../examples/mode7/rotate_scale \
                          ../examples/mode7/perspective \
+                         ../examples/mode7/dsp1_ground \
                          ../examples/color/direct_color \
                          ../examples/color/palette_cycle \
                          ../examples/color/shadow_tint \

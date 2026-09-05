@@ -200,7 +200,7 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 | `mode7SetMatrix(a, b, c, d)` | Direct matrix control. Bypasses the angle/scale system. For shears, non-uniform scales, or arbitrary affine effects. |
 | `mode7SetSettings(M7SEL_value)` | Flip + out-of-bounds behaviour (the constants above). |
 
-## Worked patterns (the two shipped examples)
+## Worked patterns (the shipped examples)
 
 ### Basic rotation + scaling — `examples/mode7/rotate_scale`
 
@@ -242,6 +242,17 @@ gotchas: the example uses HDMA channels 1–4, leaves channel 0 for
 `dmaCopyVram` and channel 7 for the OAM DMA. Run any other split-mode
 display through it; the scaffolding is the same.
 
+### The Super Mario Kart floor via the DSP-1 — `examples/mode7/dsp1_ground`
+
+Same four-channel split as `perspective`, but the M7A–M7D tables are not
+precomputed: the DSP-1's Raster command streams them every frame for a
+real camera (position, height, heading, tilt), so the floor rotates and
+moves in true perspective. The M7A/M7B pair rides one
+`HDMA_MODE_2REG_2X` channel and M7C/M7D the other, double-buffered and
+swapped with `hdmaSetTable` in VBlank. The geometry that pins the
+matrices to the screen — horizon raster, Mode 7 centre and scroll —
+comes from `dsp1Parameter`; see the [DSP-1 tutorial](dsp1.md#the-ground-what-dsp1_ground-does).
+
 ## Gotchas
 
 ### 🟡 BG1 scroll and the Mode 7 registers share one write-twice latch
@@ -256,7 +267,11 @@ BG1-scroll-driving HDMA channel while rewriting the matrix. The
 perspective example is safe as shipped: HDMA channels run sequentially
 within a scanline, so one channel's two-byte M7A write is never split
 by another channel — the hazard is *CPU-side* matrix writes or MPY
-reads racing a scroll-writing HDMA channel mid-frame.
+reads racing a scroll-writing HDMA channel mid-frame. `dsp1_ground`
+follows the rule the other way round: its HDMA channels own M7A–M7D all
+frame long, so every CPU-side Mode 7 write (`mode7SetCenter`,
+`mode7SetScroll`) happens in VBlank, and `mode7SetAngle` — which also
+reads MPY — is never called while the split is live.
 
 ### 🔴 Single BG layer
 
@@ -357,6 +372,7 @@ perspective example consumes ~6 % of CPU during active display.
   table).
 - [`examples/mode7/rotate_scale`](../../examples/mode7/rotate_scale/README.md) — basic rotation + scaling demo.
 - [`examples/mode7/perspective`](../../examples/mode7/perspective/README.md) — F-Zero-style perspective via 4-channel HDMA.
+- [`examples/mode7/dsp1_ground`](../../examples/mode7/dsp1_ground/README.md) — the same split with matrices streamed by the DSP-1.
 - [HDMA tutorial](hdma.md) — required reading for the perspective
   pattern.
 - [Graphics tutorial](graphics.md) — companion read for the regular

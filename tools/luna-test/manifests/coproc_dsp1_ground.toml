@@ -1,0 +1,13 @@
+# DSP-1 Raster ground (mode7/dsp1_ground). firmware gate SKIPs in CI (no dsp1b.rom).
+rom = "../../../examples/mode7/dsp1_ground/dsp1_ground.sfc"
+steps = 5000000
+firmware = "dsp1b.rom"
+[asserts.trace]
+dsp1 = { min = 1 }
+[asserts.values]
+# dsp1Present() known-answer result parked by the example.
+dsp1_ok = { eq = 1, width = 2 }
+# Rasters streamed by the last dsp1Raster call: 224 - (112 + Vof + Vva + 2)
+# with the example's fixed tilt (Vof=30, Vva=-46 -> 126). A wrong Parameter
+# decode, a wedged stream or a broken sentinel all move this.
+raster_lines = { eq = 126, width = 2 }

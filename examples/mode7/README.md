@@ -13,9 +13,11 @@ its own matrix API and its own "I want to do THAT" pull.
 | 7.1 | [rotate_scale](rotate_scale/) | How do I rotate and scale a background? |
 | 7.2 | [perspective](perspective/) | How do I fake perspective with an HDMA matrix split (F-Zero floor)? |
 | 7.3 | [perspective_rotate](perspective_rotate/) | How do I drive the *full* matrix (A/B/C/D) per scanline — rotating perspective? |
+| 7.4 | [dsp1_ground](dsp1_ground/) | How did Super Mario Kart do it? The DSP-1 streams the per-scanline matrices for a real camera. |
 
 Climb from a flat spinning plane (7.1) to a receding horizon (7.2) to a
-horizon that also rotates (7.3).
+horizon that also rotates (7.3), then let the coprocessor compute the camera
+for you (7.4).
 
 ## The idea in one screen
 
