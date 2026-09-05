@@ -125,11 +125,11 @@ $(function(){initNavTree('learning_path.html','',''); });
 <div class="textblock"><p>A curated path through the examples — not a feature tour, a <b>developer's journey</b>. You don't wake up wanting "Mode 7"; you wake up with a question about the game you're building, and it changes as you go. Each stage below is one of those questions, and the confidence it buys you. This is a hand-picked subset; for the exhaustive index see <a class="el" href="examples_by_category.html" title="Browse Examples by Category">Browse Examples by Category</a>.</p>
 <p>Two companions run alongside this journey: <a class="el" href="craft.html" title="Game-Craft Guides">Game-Craft Guides</a> for the <em>design</em> decisions behind each step — what to build, and how to budget it on the hardware — and <a class="el" href="tools.html" title="The OpenSNES toolbox">The OpenSNES toolbox</a> for turning your own art, maps and audio into SNES data.</p>
 <p>At every step the goal is the same: never a wall you can't climb with what you just learned, always a result that works, always the <em>why</em>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md573"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md576"></a>
 Stage 0 — "Does my setup even work?"</h2>
 <p><em>Confidence: the toolchain isn't scary.</em> Get one ROM built and running, and learn the rhythm of a frame — you set things up during blanking, then let the machine run at 60 Hz.</p>
 <p><a class="el" href="examples_text_print_string.html" title="Print a string">Print a string</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md574"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md577"></a>
 Stage 1 — "Can I put something on screen?"</h2>
 <p><em>Confidence: I control the picture.</em> Text, a background from your own art, a sprite that isn't tied to the grid. The tile / palette / VRAM trinity that underpins everything visual on the SNES.</p>
 <p><a class="el" href="examples_text_scroll_message.html" title="Scroll a message">Scroll a message</a></p>
@@ -143,14 +143,14 @@ Stage 1 — "Can I put something on screen?"</h2>
 <blockquote class="doxtable">
 <p>Under the hood — how a glyph becomes pixels with no module at all: <a class="el" href="examples_fundamentals_text_glyphs.html" title="Fundamentals: how a glyph is drawn">Fundamentals: how a glyph is drawn</a> </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md575"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md578"></a>
 Stage 2 — "Can the player act?"</h2>
 <p><em>Confidence: it's a game, not a demo.</em> Read the pad, move something with it, then branch out to the SNES's exotic controllers.</p>
 <p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a></p>
 <p><a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a></p>
 <p><a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a></p>
 <p><a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md576"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md579"></a>
 Stage 3 — "Can I build a world?"</h2>
 <p><em>Confidence: bigger than one screen.</em> Scroll a background past the camera, stream a world larger than VRAM, drive it from a Tiled map, and stand on the ground with tile collision.</p>
 <p><a class="el" href="examples_scrolling_mixed_scroll.html" title="Mixed Scroll">Mixed Scroll</a></p>
@@ -162,7 +162,7 @@ Stage 3 — "Can I build a world?"</h2>
 <blockquote class="doxtable">
 <p>Author the world, don't hand-code it: <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> is the think-in-metatiles workflow, and <a class="el" href="tools_tmx2snes.html" title="tmx2snes — Tiled levels to SNES map data">tmx2snes — Tiled levels to SNES map data</a> converts a Tiled level into the map binaries <span class="tt">map_scroll</span> and <span class="tt">tiled</span> load. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md577"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md580"></a>
 Stage 4 — "Can I make it feel good?"</h2>
 <p><em>Confidence: it feels like a real game.</em> This is where the SNES becomes the SNES — fades and mosaic transitions, per-scanline HDMA effects, colour math, windows, the Mode 7 plane, and sound.</p>
 <p><a class="el" href="examples_transitions_fading.html" title="Fading Example">Fading Example</a></p>
@@ -178,7 +178,7 @@ Stage 4 — "Can I make it feel good?"</h2>
 <p><a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a></p>
 <p><a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a></p>
 <p><a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md578"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md581"></a>
 Stage 5 — "Can I hold it all together?"</h2>
 <p><em>Confidence: architecture, not spaghetti.</em> Stop hand-rolling the main loop and the state machine; assemble a skeleton, and pick up the reusable maths every game needs.</p>
 <p><a class="el" href="examples_basics_timer.html" title="VBlank Timer">VBlank Timer</a></p>
@@ -188,7 +188,7 @@ Stage 5 — "Can I hold it all together?"</h2>
 <p><a class="el" href="examples_basics_aim_target.html" title="aim_target">aim_target</a></p>
 <p><a class="el" href="examples_basics_fix32_orbit.html" title="fix32_orbit">fix32_orbit</a></p>
 <p><a class="el" href="examples_basics_random.html" title="Random Numbers">Random Numbers</a></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md579"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md582"></a>
 Stage 6 — "Can I finish and ship?"</h2>
 <p><em>Confidence: a complete cartridge.</em> Persist progress, choose a mapper, reach for a coprocessor when you need more, and study complete games that fuse everything above.</p>
 <p><a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a></p>
@@ -200,7 +200,7 @@ Stage 6 — "Can I finish and ship?"</h2>
 <p><a class="el" href="examples_games_shmup_1942.html" title="shmup_1942">shmup_1942</a></p>
 <p><a class="el" href="examples_games_mode7_racing.html" title="mode7_racing — an F-Zero-style mini game">mode7_racing — an F-Zero-style mini game</a></p>
 <p><a class="el" href="examples_games_mode7_flying.html" title="mode7_flying — a Pilotwings-style demo">mode7_flying — a Pilotwings-style demo</a></p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md580"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md583"></a>
 More horsepower — the cartridge coprocessors</h3>
 <p>When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz; SuperFX / GSU is a custom RISC processor for bitmaps and 3D.</p>
 <p><a class="el" href="examples_chips_sa1_hello.html" title="SA-1 Hello World">SA-1 Hello World</a></p>

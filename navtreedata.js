@@ -55,14 +55,14 @@ var NAVTREEINDEX =
 [
 "anim_8h.html",
 "dir_4a33f256780b3d83d2a399a144270042.html",
-"examples_chips_superfx_hello.html",
+"examples_chips_superfx_3d.html",
 "examples_scrolling_mixed_scroll.html",
-"globals_vars.html",
-"group__ppu__regs.html#ga32f150a19dc2983a17ffd402a8c015b9",
+"globals_vars_b.html",
+"group__ppu__regs.html#ga40b0af5f9d5abe1a520205d5a99c86ab",
 "input_2mouse_2main_8c.html",
-"piece_8c.html",
-"sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e",
-"superfx_8h.html#ac713273bf14b565605fb9b12595d9c46"
+"panel_8h_source.html",
+"sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3",
+"superfx_8h.html#aaae39a6799d57a1de176c8477797438c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

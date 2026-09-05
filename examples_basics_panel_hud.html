@@ -123,14 +123,14 @@ $(function(){initNavTree('examples_basics_panel_hud.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 5 (Game math &amp; framework) · a <span class="tt">panel</span> building block.</b></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1087"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1090"></a>
 Why it matters for your game</h2>
 <p>Every game has furniture: a status bar with hearts and a coin count, a dialog box that opens over the world and closes again. Both are the same primitive — a <b>9-slice panel</b>, a bordered box stamped from a 3×3 tile sheet (four corners, four edges, one fill). Without a helper it's ~60 lines of stamping loop and priority wiring per box; the <span class="tt">panel</span> module is that loop, done once and correctly, so your game code just says <em>draw a box here</em>.</p>
 <div class="image">
 <img src="panel_hud.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1088"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1091"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>the <span class="tt">panel</span> module — several boxes, one layer, one upload.</b> The HUD and the dialog live in the <em>same</em> tilemap on the <em>same</em> BG layer. <span class="tt"><a class="el" href="panel_8h.html#a91d9112413485a7ffc98910622032ae1" title="Stamp a bordered box of w x h tiles at (x, y).">panelDraw()</a></span> stamps a box (picking corner/edge/fill by position); <span class="tt"><a class="el" href="panel_8h.html#a5d5d8b8c54b3e34bab41e43667f0d310" title="Put one tile of the sheet into the map, with the layer&#39;s palette and priority.">panelPut()</a></span> drops a single sheet tile — a heart icon — into it; <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush()</a></span> uploads the whole map. Opening the dialog is <span class="tt"><a class="el" href="panel_8h.html#a91d9112413485a7ffc98910622032ae1" title="Stamp a bordered box of w x h tiles at (x, y).">panelDraw</a></span> + <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span>; closing it is <span class="tt"><a class="el" href="panel_8h.html#a9bd6c333f3c6751d8f3040b9ad66f768" title="Blank a rectangle of the tilemap, leaving the rest alone.">panelClear</a></span> + <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span>; and the HUD is untouched either way.</p>
 <p>Two things worth internalising:</p>
@@ -139,7 +139,7 @@ What you'll learn</h2>
 <li><b><span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush()</a></span> is forced-blank — use it for <em>structure</em>, not the HUD.</b> It pushes the whole 2 KB map, so it wraps the DMA in real forced blank (<span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></span>/<span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn</a></span>) and briefly blanks the screen. That is fine for a dialog box opening (a deliberate moment), but running it every time a heart changes would blink the top of the screen on every hit. So the hearts — which change often — upload only their own 64-byte tilemap row with an ordinary VBlank DMA (<span class="tt"><a class="el" href="basics_2panel__hud_2main_8c.html#acdd93236bca869d95e6723353e313772" title="Push ONLY the HUD&#39;s heart row to VRAM — a small VBlank-safe DMA.">flush_hud_row</a></span>): no forced blank, no flicker. <b>The rule: <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span> for structural changes, a small VBlank DMA for a frequently-updated HUD.</b></li>
 </ul>
 <p>The border and heart icons are generated in C — zero assets.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1089"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1092"></a>
 What to observe / if it breaks</h2>
 <ul>
 <li><b>Correct run:</b> a HUD box with 3 filled + 2 empty hearts sits over a rainbow background. <b>B</b> loses a heart, <b>A</b> gains one, <b>START</b> opens/closes a dialog box lower down — and the HUD never flinches when the dialog appears.</li>
@@ -148,14 +148,14 @@ What to observe / if it breaks</h2>
 <li><b>Top of the screen blinks dark when hearts change:</b> you're calling <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush()</a></span> for the HUD. Its forced blank overruns into the first scanlines. Push just the changed row with a small VBlank DMA instead (<span class="tt"><a class="el" href="basics_2panel__hud_2main_8c.html#acdd93236bca869d95e6723353e313772" title="Push ONLY the HUD&#39;s heart row to VRAM — a small VBlank-safe DMA.">flush_hud_row</a></span>); keep <span class="tt"><a class="el" href="panel_8h.html#abe2d36e123f747f0d8d827388363f704" title="Upload the tilemap to VRAM under forced blank.">panelFlush</a></span> for the dialog.</li>
 </ul>
 <p>Probe oracles: <span class="tt"><a class="el" href="basics_2panel__hud_2main_8c.html#a9d4103d95694e4e6d7f6909f19c62de9" title="Probe oracle: current hearts shown (0..MAX_HP).">hero_hp</a></span> (0–5, hearts shown) and <span class="tt"><a class="el" href="basics_2panel__hud_2main_8c.html#a48a831161c88fce928abb292d5de5b4c" title="Probe oracle: 1 while the dialog box is open.">dialog_shown</a></span> (0/1).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1090"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1093"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 panel_hud.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1091"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1094"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">panel</span>, <span class="tt">input</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1092"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1095"></a>
 Where you are</h2>
 <p>Uses the <span class="tt">panel</span> module in isolation. For a full game that combines it with text in the box (dialog lines, a numeric score), see <a href="../../games/rpg/">games/rpg</a>. </p>
 </div></div><!-- contents -->

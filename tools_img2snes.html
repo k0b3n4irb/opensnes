@@ -123,11 +123,11 @@ $(function(){initNavTree('tools_img2snes.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><span class="tt">gfx4snes</span> needs <b>indexed</b> images, but artists work in RGB. <span class="tt">img2snes</span> is the bridge: it quantises a full-colour PNG down to a SNES-legal indexed palette, so your artwork feeds the rest of the pipeline without hand-editing palettes in an image editor. Run it once on new art, commit the indexed result, and gfx4snes takes it from there.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md515"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md518"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> a <span class="tt">.png</span> — RGB, RGBA, or already indexed.</p>
 <p><b>Out:</b> a palette-indexed <span class="tt">.png</span> (2–256 colours, palette embedded). The default name is <span class="tt">&lt;input&gt;_indexed.png</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md516"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md519"></a>
 The flags you will actually use</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -149,7 +149,7 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">--batch</span>  </td><td class="markdownTableBodyNone">treat the input as a glob and convert many files  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md517"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md520"></a>
 Worked examples</h2>
 <div class="fragment"><div class="line"># Quantise a character sprite to 16 colours, SNES-rounded:</div>
 <div class="line">img2snes -i character.png -c 16 --round-snes</div>
@@ -160,7 +160,7 @@ Worked examples</h2>
 <div class="line"># Force several sprites to share one palette (pass a reference PNG):</div>
 <div class="line">img2snes -i enemy.png -p hero_indexed.png</div>
 </div><!-- fragment --><p>Then hand the indexed PNG to <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a> with a matching <span class="tt">-u</span> (16 colours → <span class="tt">-u 16</span>, etc.).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md518"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md521"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>Transparency = index 0.</b> Pixels with alpha below 128 map to colour 0, which the SNES treats as transparent — so paint your background in fully-transparent pixels, not a "magic" colour.</li>
@@ -168,7 +168,7 @@ Gotchas worth knowing up front</h2>
 <li><b><span class="tt">-p</span> for shared palettes.</b> When several sprites must live in one 16-colour sub-palette (the <a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> constraint), quantise the first, then map the rest onto its palette with <span class="tt">-p</span>.</li>
 <li><b>Optional and standalone.</b> img2snes is not wired into the build — it is a one-time artist pre-step. Its output is what you commit and reference.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md519"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md522"></a>
 Where it fits</h2>
 <p>img2snes is the very first box in the <a class="el" href="tools.html" title="The OpenSNES toolbox">The OpenSNES toolbox</a> pipeline: RGB art → indexed PNG → <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a> → tiles/palette/map. If your source art is already indexed (pixel-art tools often export that way), you can skip it entirely. </p>
 </div></div><!-- contents -->

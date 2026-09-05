@@ -123,7 +123,7 @@ $(function(){initNavTree('tools_tmx2snes.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><span class="tt">tmx2snes</span> is how a level you paint in <a href="https://www.mapeditor.org/">Tiled</a> becomes something the SNES map engine can load and scroll. It takes a Tiled map exported as JSON, plus the tile-optimisation table from <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a>, and emits the binary tilemap, collision, and object files the runtime reads. It is the tool that makes <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> a real workflow instead of a theory.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md535"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md538"></a>
 What goes in, what comes out</h2>
 <p><b>In</b> — two positional arguments, in this order:</p>
 <ol type="1">
@@ -154,14 +154,14 @@ What goes in, what comes out</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-C</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;layer&gt;.c16</span> — one collision byte per cell  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile</a></span> on a plain grid  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md536"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md539"></a>
 How you actually use it</h2>
 <p>Because a Tiled project has choices the build cannot guess, tmx2snes is called explicitly from the example's Makefile — typically from inside <span class="tt">res/</span>:</p>
 <div class="fragment"><div class="line">cd res &amp;&amp; tmx2snes maplevel01.tmj tileslevel1.map</div>
 </div><!-- fragment --><p>where the tileset <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> came from, e.g.:</p>
 <div class="fragment"><div class="line">gfx4snes -s 8 -o 48 -u 16 -p -m -i tileset.png</div>
 </div><!-- fragment --><p>Then in C you hand the three defaults to <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and scroll with the map engine — see <a class="el" href="tutorial_map.html" title="Scrolling maps">Scrolling maps</a> for the loading and scrolling code.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md537"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md540"></a>
 Authoring the level in Tiled</h2>
 <p>The data lives in Tiled tile <b>custom properties</b>, which tmx2snes reads and bakes into the binaries — this is how a tile carries <em>meaning</em>, not just pixels (the idea developed in <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a>):</p>
 <table class="markdownTable">
@@ -175,7 +175,7 @@ Authoring the level in Tiled</h2>
 <td class="markdownTableBodyNone"><span class="tt">priority</span>  </td><td class="markdownTableBodyNone">"0" / "1"  </td><td class="markdownTableBodyNone">whether the tile draws in front of sprites  </td></tr>
 </table>
 <p>Objects (spawns, doors, triggers) go in an <b>objectgroup</b> layer named <span class="tt">Entities</span>; each object's Tiled <em>type</em> groups it in the <span class="tt">.o16</span> / <span class="tt">.inc</span> output.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md538"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md541"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>JSON, not XML.</b> Export the map as <span class="tt">.tmj</span> (Tiled: <em>File → Export As → JSON</em>). The XML <span class="tt">.tmx</span> is the editor's own format; the tool ingests the JSON export.</li>
@@ -184,7 +184,7 @@ Gotchas worth knowing up front</h2>
 <li><b><span class="tt">-h</span>, not <span class="tt">--help</span>.</b> The long form is not recognised (it prints usage anyway).</li>
 <li><b><span class="tt">-C</span> reflects the map only.</b> Runtime blockers (an NPC standing in a doorway) are a game-logic decision, not baked into the collision grid.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md539"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md542"></a>
 See it in practice</h2>
 <ul>
 <li><a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a> — the complete Tiled → SNES worked example.</li>

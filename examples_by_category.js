@@ -1,32 +1,32 @@
 var examples_by_category =
 [
     [ "Print a string", "examples_text_print_string.html", [
-      [ "Text", "examples_by_category.html#autotoc_md582", null ],
-      [ "Fundamentals", "examples_by_category.html#autotoc_md584", null ],
-      [ "Backgrounds", "examples_by_category.html#autotoc_md586", null ],
-      [ "Sprites", "examples_by_category.html#autotoc_md588", null ],
-      [ "Scrolling", "examples_by_category.html#autotoc_md590", null ],
-      [ "Mode 7", "examples_by_category.html#autotoc_md592", null ],
-      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md594", null ],
-      [ "Colour", "examples_by_category.html#autotoc_md596", null ],
-      [ "Windows", "examples_by_category.html#autotoc_md598", null ],
-      [ "Transitions", "examples_by_category.html#autotoc_md600", null ],
-      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md602", null ],
-      [ "Audio", "examples_by_category.html#autotoc_md604", null ],
-      [ "Maps", "examples_by_category.html#autotoc_md606", null ],
-      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md608", null ],
-      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md610", null ],
-      [ "Enhancement chips", "examples_by_category.html#autotoc_md612", [
-        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md613", null ],
-        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md614", null ],
-        [ "DSP-1 Coprocessor", "examples_by_category.html#autotoc_md615", null ]
+      [ "Text", "examples_by_category.html#autotoc_md585", null ],
+      [ "Fundamentals", "examples_by_category.html#autotoc_md587", null ],
+      [ "Backgrounds", "examples_by_category.html#autotoc_md589", null ],
+      [ "Sprites", "examples_by_category.html#autotoc_md591", null ],
+      [ "Scrolling", "examples_by_category.html#autotoc_md593", null ],
+      [ "Mode 7", "examples_by_category.html#autotoc_md595", null ],
+      [ "HDMA &amp; raster", "examples_by_category.html#autotoc_md597", null ],
+      [ "Colour", "examples_by_category.html#autotoc_md599", null ],
+      [ "Windows", "examples_by_category.html#autotoc_md601", null ],
+      [ "Transitions", "examples_by_category.html#autotoc_md603", null ],
+      [ "Input &amp; peripherals", "examples_by_category.html#autotoc_md605", null ],
+      [ "Audio", "examples_by_category.html#autotoc_md607", null ],
+      [ "Maps", "examples_by_category.html#autotoc_md609", null ],
+      [ "Game math &amp; mechanics", "examples_by_category.html#autotoc_md611", null ],
+      [ "Memory &amp; mappers", "examples_by_category.html#autotoc_md613", null ],
+      [ "Enhancement chips", "examples_by_category.html#autotoc_md615", [
+        [ "SA-1 Coprocessor", "examples_by_category.html#autotoc_md616", null ],
+        [ "SuperFX (GSU)", "examples_by_category.html#autotoc_md617", null ],
+        [ "DSP-1 Coprocessor", "examples_by_category.html#autotoc_md618", null ]
       ] ],
-      [ "Games (capstones)", "examples_by_category.html#autotoc_md617", [
-        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1707", null ],
-        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1708", null ],
-        [ "How to build", "examples_text_print_string.html#autotoc_md1709", null ],
-        [ "Modules used", "examples_text_print_string.html#autotoc_md1710", null ],
-        [ "Next rung", "examples_text_print_string.html#autotoc_md1711", null ]
+      [ "Games (capstones)", "examples_by_category.html#autotoc_md620", [
+        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1717", null ],
+        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1718", null ],
+        [ "How to build", "examples_text_print_string.html#autotoc_md1719", null ],
+        [ "Modules used", "examples_text_print_string.html#autotoc_md1720", null ],
+        [ "Next rung", "examples_text_print_string.html#autotoc_md1721", null ]
       ] ]
     ] ],
     [ "Scroll a message", "examples_text_scroll_message.html", null ],
@@ -52,6 +52,7 @@ var examples_by_category =
     [ "Mode 7 -- Rotation and Scaling", "examples_mode7_rotate_scale.html", null ],
     [ "Mode 7 Perspective -- Pseudo-3D Ground Effect", "examples_mode7_perspective.html", null ],
     [ "Mode 7 rotating perspective — the full matrix, per scanline", "examples_mode7_perspective_rotate.html", null ],
+    [ "DSP-1 Ground — the Super Mario Kart floor", "examples_mode7_dsp1_ground.html", null ],
     [ "Gradient Colors -- HDMA Color Gradients", "examples_hdma_gradient_colors.html", null ],
     [ "HDMA Indirect Gradient", "examples_hdma_hdma_indirect_gradient.html", null ],
     [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ],

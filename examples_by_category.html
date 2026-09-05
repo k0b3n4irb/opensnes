@@ -122,9 +122,9 @@ $(function(){initNavTree('examples_by_category.html','',''); });
   <div class="headertitle"><div class="title">Browse Examples by Category </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>All 84 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
+<div class="textblock"><p>All 85 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md582"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md585"></a>
 Text</h2>
 <p>Print text, then move it.</p>
 <table class="markdownTable">
@@ -136,7 +136,7 @@ Text</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_text_scroll_message.html" title="Scroll a message">Scroll a message</a>  </td><td class="markdownTableBodyNone">Move text: scroll the text layer for a marquee (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>)  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md584"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md587"></a>
 Fundamentals</h2>
 <p>Under-the-hood: raw tiles and direct VRAM writes, with the module stripped away.</p>
 <table class="markdownTable">
@@ -146,7 +146,7 @@ Fundamentals</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_fundamentals_text_glyphs.html" title="Fundamentals: how a glyph is drawn">Fundamentals: how a glyph is drawn</a>  </td><td class="markdownTableBodyNone">How a glyph becomes pixels: a hand-coded 2bpp font written straight to VRAM  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md586"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md589"></a>
 Backgrounds</h2>
 <p>The PPU's background modes — colour vs layers vs resolution.</p>
 <table class="markdownTable">
@@ -170,7 +170,7 @@ Backgrounds</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode5_hires.html" title="Hi-res text — BG Mode 5 + interlace (512 × 448)">Hi-res text — BG Mode 5 + interlace (512 × 448)</a>  </td><td class="markdownTableBodyNone">Mode 5 + interlace hi-res text (512×448) (krom port)  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md588"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md591"></a>
 Sprites</h2>
 <p>Sprite display, animation, and OAM management.</p>
 <table class="markdownTable">
@@ -192,7 +192,7 @@ Sprites</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a>  </td><td class="markdownTableBodyNone">A bouncing swarm + the per-sprite OAM throughput ceiling  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md590"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md593"></a>
 Scrolling</h2>
 <p>Move a world past the camera.</p>
 <table class="markdownTable">
@@ -206,7 +206,7 @@ Scrolling</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_scrolling_parallax_scroll.html" title="Parallax Scrolling">Parallax Scrolling</a>  </td><td class="markdownTableBodyNone">Per-scanline HDMA parallax scrolling  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md592"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md595"></a>
 Mode 7</h2>
 <p>The rotate/scale plane — the SNES's signature trick.</p>
 <table class="markdownTable">
@@ -218,9 +218,11 @@ Mode 7</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_perspective.html" title="Mode 7 Perspective -- Pseudo-3D Ground Effect">Mode 7 Perspective -- Pseudo-3D Ground Effect</a>  </td><td class="markdownTableBodyNone">Pseudo-3D perspective (F-Zero style)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_perspective_rotate.html" title="Mode 7 rotating perspective — the full matrix, per scanline">Mode 7 rotating perspective — the full matrix, per scanline</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix rotation per scanline (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_mode7_dsp1_ground.html" title="DSP-1 Ground — the Super Mario Kart floor">DSP-1 Ground — the Super Mario Kart floor</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md594"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md597"></a>
 HDMA &amp; raster</h2>
 <p>Change a register every scanline.</p>
 <table class="markdownTable">
@@ -238,7 +240,7 @@ HDMA &amp; raster</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_hdma_hdma_helpers.html" title="HDMA Helpers Demo">HDMA Helpers Demo</a>  </td><td class="markdownTableBodyNone">High-level HDMA effect library (wave, ripple, iris)  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md596"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md599"></a>
 Colour</h2>
 <p>Colour math, palette bypass, and beating the 256-colour limit.</p>
 <table class="markdownTable">
@@ -260,7 +262,7 @@ Colour</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_hicolor_blend.html" title="&quot;3840 colors&quot; — RGB channel-split blend">"3840 colors" — RGB channel-split blend</a>  </td><td class="markdownTableBodyNone">3840 colors via RGB channel-split blend (krom port)  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md598"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md601"></a>
 Windows</h2>
 <p>Mask part of the screen — static or HDMA-shaped.</p>
 <table class="markdownTable">
@@ -274,7 +276,7 @@ Windows</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_windows_transparent_window.html" title="Transparent Window -- Color Math + HDMA">Transparent Window -- Color Math + HDMA</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md600"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md603"></a>
 Transitions</h2>
 <p>How a scene leaves.</p>
 <table class="markdownTable">
@@ -286,7 +288,7 @@ Transitions</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_transitions_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md602"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md605"></a>
 Input &amp; peripherals</h2>
 <p>Controller input: joypads, mouse, and Super Scope.</p>
 <table class="markdownTable">
@@ -304,7 +306,7 @@ Input &amp; peripherals</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md604"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md607"></a>
 Audio</h2>
 <p>Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.</p>
 <table class="markdownTable">
@@ -332,7 +334,7 @@ Audio</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_audio_echo.html" title="Echo / reverb">Echo / reverb</a>  </td><td class="markdownTableBodyNone">S-DSP echo / reverb, isolated — START toggles dry/wet  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md606"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md609"></a>
 Maps</h2>
 <p>Tile-based maps, streaming, Tiled pipeline, and collision.</p>
 <table class="markdownTable">
@@ -348,7 +350,7 @@ Maps</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a>  </td><td class="markdownTableBodyNone">Slopes and tile-based collision  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md608"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md611"></a>
 Game math &amp; mechanics</h2>
 <p>The reusable logic toolbox.</p>
 <table class="markdownTable">
@@ -372,7 +374,7 @@ Game math &amp; mechanics</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_basics_game_skeleton.html" title="game_skeleton — the smallest complete game">game_skeleton — the smallest complete game</a>  </td><td class="markdownTableBodyNone">The smallest complete game: title → play → game-over state machine  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md610"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md613"></a>
 Memory &amp; mappers</h2>
 <p>Persistence and ROM mapping.</p>
 <table class="markdownTable">
@@ -384,10 +386,10 @@ Memory &amp; mappers</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_memory_save_game.html" title="Save Game -- SRAM Persistence">Save Game -- SRAM Persistence</a>  </td><td class="markdownTableBodyNone">SRAM battery-backed saves  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md612"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md615"></a>
 Enhancement chips</h2>
 <p>Cartridge coprocessors that extend the SNES beyond its base hardware.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md613"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md616"></a>
 SA-1 Coprocessor</h3>
 <p>The SA-1 is a second 65816 CPU running at 10.74 MHz (3x main CPU speed), sharing I-RAM with the main CPU for inter-processor communication.</p>
 <table class="markdownTable">
@@ -398,7 +400,7 @@ SA-1 Coprocessor</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a>  </td><td class="markdownTableBodyNone">128-dot Lissajous murmuration driven by SA-1 math  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md614"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md617"></a>
 SuperFX (GSU)</h3>
 <p>The SuperFX is a custom RISC processor (GSU) with built-in pixel PLOT, hardware multiply, and direct framebuffer access for 3D and bitmap effects.</p>
 <table class="markdownTable">
@@ -409,7 +411,7 @@ SuperFX (GSU)</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_superfx_3d.html" title="SuperFX 3D Cube">SuperFX 3D Cube</a>  </td><td class="markdownTableBodyNone">Rotating wireframe cube (Star Fox style 3D)  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md615"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md618"></a>
 DSP-1 Coprocessor</h3>
 <p>The DSP-1 (NEC µPD77C25) is a fixed-function fixed-point math coprocessor — matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).</p>
 <table class="markdownTable">
@@ -419,7 +421,7 @@ DSP-1 Coprocessor</h3>
 <td class="markdownTableBodyNone"><a class="el" href="examples_chips_dsp1_cube.html" title="DSP-1 Cube">DSP-1 Cube</a>  </td><td class="markdownTableBodyNone">Pseudo-3D: a cube's 8 corners tumbling in 3D, rotated by the DSP-1  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="autotoc_md617"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md620"></a>
 Games (capstones)</h2>
 <p>Complete game projects combining multiple subsystems.</p>
 <table class="markdownTable">

@@ -123,7 +123,7 @@ $(function(){initNavTree('craft_frame_budget.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> budgets <em>space</em> — the VRAM, CGRAM and OAM your scene fills (and <span class="tt">make budget</span> measures it). This guide budgets <em>time</em>: what one frame can actually do at 60 Hz before the game stutters. Space is what fits on the cartridge; time is what fits in 1/60th of a second. Both are fixed, and both are design levers.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md467"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md470"></a>
 Where the time goes</h2>
 <p>Every 1/60 s (NTSC) the screen draws top to bottom, then blanks briefly before the next one:</p>
 <ul>
@@ -131,7 +131,7 @@ Where the time goes</h2>
 <li><b>VBlank (~38 lines):</b> the PPU is idle. This is your <b>only safe window to touch VRAM, CGRAM and OAM</b> — and it is short.</li>
 </ul>
 <p>The single most common frame-timing bug follows directly: do your heavy computation <em>first</em>, during active display, and fire the VRAM upload the instant VBlank starts. Compute <em>after</em> <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> and the upload spills past VBlank's end — the PPU drops it, and you get garbage or a dropped update. (<a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a> hit exactly this; its loop builds the offset table during active display and DMAs it at VBlank start.)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md468"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md471"></a>
 The VBlank DMA budget: ~4 KB</h2>
 <p>DMA moves roughly 1 byte per fast cycle, and VBlank is only ~38 scanlines, so the hard ceiling is about <b>6 KB</b> per VBlank — but once the NMI handler has read the controllers and done its own housekeeping, **~4 KB is the safe working budget** you should plan around.</p>
 <p>That shapes real decisions:</p>
@@ -146,11 +146,11 @@ The VBlank DMA budget: ~4 KB</h2>
 <blockquote class="doxtable">
 <p><b>Warning, from experience.</b> A "black flash at the top of the screen" on an update almost always means a force-blank upload that overran VBlank into the first scanlines. Move the write into VBlank, shrink it under the budget, or commit to a full force-blank frame — don't leave it straddling the boundary. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md469"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md472"></a>
 The sprite-per-line budget: 32</h2>
 <p>Separate from <em>how many</em> sprites exist (128) is <em>how many the PPU can draw on one scanline</em>: <b>32 sprites, and 34 8×8 tile-slivers</b>, per line. Cross either and sprites drop out — culled from the lowest OAM priority first, and an off-screen-left sprite still counts (a documented quirk). This is a <em>render</em> limit, distinct from the <em>CPU</em> cost of updating many sprites.</p>
 <p>The levers: spread action vertically so the busy lines are few; keep large sprites sparse; and remember that updating 128 sprites' positions in C is its own cost — <a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a> measures where per-sprite C motion runs out of frame time (around three dozen sprites), which is why heavy sprite math often moves off the main CPU.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md470"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md473"></a>
 The CPU budget: ~3.58 MHz</h2>
 <p>The 65816 runs at 3.58 MHz (FastROM) or 2.68 MHz (slow), so a frame is only so many thousand cycles. When logic outgrows it, in rough order of reach-for:</p>
 <ul>
@@ -158,10 +158,10 @@ The CPU budget: ~3.58 MHz</h2>
 <li><b>Do PPU tricks in the PPU, not the CPU.</b> A per-scanline gradient or wave is free via HDMA and ruinous in a CPU loop — see the <a class="el" href="examples_hdma_hdma_helpers.html" title="HDMA Helpers Demo">HDMA Helpers Demo</a> family. Per-column effects go through offset-per-tile (<a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>), not code.</li>
 <li><b>Offload the math.</b> The enhancement chips exist for exactly this: <a class="el" href="examples_chips_sa1_starfield.html" title="SA-1 Starfield (Murmuration)">SA-1 Starfield (Murmuration)</a> runs its 128-bird trig on the SA-1 at 10.74 MHz, and Super FX handles 3D. The same murmuration in plain C would not fit a frame.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md471"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md474"></a>
 When you blow the budget</h2>
 <p>The failure is graceful, not a crash: <b>lag frames.</b> Miss a VBlank and the game simply runs at 30 fps (or 20, or 15) instead of 60 — the classic 16-bit "slowdown." That is a legitimate design outcome, not only a bug: plenty of beloved SNES games drop to 30 fps in their busiest moments on purpose, and designing <em>for</em> 30 fps buys you double the CPU and DMA per update. Decide your target framerate up front and budget to it, rather than discovering it in the explosion that fills the screen.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md472"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md475"></a>
 The one rule</h2>
 <p>Space is measured with <span class="tt">make budget</span>; time is measured in frames. For both, <b>plan the busiest moment, not the average</b> — the scene with the most sprites, the biggest transfer, the heaviest logic. If the worst case fits the frame, the rest is comfortable.</p>
 <blockquote class="doxtable">

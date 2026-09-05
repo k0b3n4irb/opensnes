@@ -159,6 +159,8 @@ Macros</h2></td></tr>
 <tr class="memdesc:a0413efb5dff2c09fdde6e42f96f0ca9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: BG3 H scroll ($2111).  <br /></td></tr>
 <tr class="memitem:aa4c6a5efcf867353b9a51fdc3d159609" id="r_aa4c6a5efcf867353b9a51fdc3d159609"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa4c6a5efcf867353b9a51fdc3d159609">HDMA_DEST_BG3VOFS</a>&#160;&#160;&#160;0x12</td></tr>
 <tr class="memdesc:aa4c6a5efcf867353b9a51fdc3d159609"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: BG3 V scroll ($2112).  <br /></td></tr>
+<tr class="memitem:ae591f6ea8d0002a2cfb98b0603dc241e" id="r_ae591f6ea8d0002a2cfb98b0603dc241e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae591f6ea8d0002a2cfb98b0603dc241e">HDMA_DEST_BGMODE</a>&#160;&#160;&#160;0x05</td></tr>
+<tr class="memdesc:ae591f6ea8d0002a2cfb98b0603dc241e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: BGMODE ($2105) — mid-frame BG mode switch (F-Zero split).  <br /></td></tr>
 <tr class="memitem:af1addfa1b6fe98e5c4f1ff623f263ba0" id="r_af1addfa1b6fe98e5c4f1ff623f263ba0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af1addfa1b6fe98e5c4f1ff623f263ba0">HDMA_DEST_CGADD</a>&#160;&#160;&#160;0x21</td></tr>
 <tr class="memdesc:af1addfa1b6fe98e5c4f1ff623f263ba0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: CGRAM address ($2121) - for palette effects.  <br /></td></tr>
 <tr class="memitem:aeb23fedb4e6cf7a9fcd14156d09f85e0" id="r_aeb23fedb4e6cf7a9fcd14156d09f85e0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aeb23fedb4e6cf7a9fcd14156d09f85e0">HDMA_DEST_CGDATA</a>&#160;&#160;&#160;0x22</td></tr>
@@ -175,6 +177,8 @@ Macros</h2></td></tr>
 <tr class="memdesc:acab327cb78b597d1395bc5fbcac9c0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix C ($211D).  <br /></td></tr>
 <tr class="memitem:adf7aaaf1182e265983a513b75584302a" id="r_adf7aaaf1182e265983a513b75584302a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#adf7aaaf1182e265983a513b75584302a">HDMA_DEST_M7D</a>&#160;&#160;&#160;0x1E</td></tr>
 <tr class="memdesc:adf7aaaf1182e265983a513b75584302a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Mode 7 matrix D ($211E).  <br /></td></tr>
+<tr class="memitem:a1a39375e33c634e7c3b450d16a5a85fb" id="r_a1a39375e33c634e7c3b450d16a5a85fb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1a39375e33c634e7c3b450d16a5a85fb">HDMA_DEST_TM</a>&#160;&#160;&#160;0x2C</td></tr>
+<tr class="memdesc:a1a39375e33c634e7c3b450d16a5a85fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: TM main-screen layer enable ($212C).  <br /></td></tr>
 <tr class="memitem:ad92f713a4e3a27aa73b0f162a6f2f40b" id="r_ad92f713a4e3a27aa73b0f162a6f2f40b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad92f713a4e3a27aa73b0f162a6f2f40b">HDMA_DEST_WH0</a>&#160;&#160;&#160;0x26</td></tr>
 <tr class="memdesc:ad92f713a4e3a27aa73b0f162a6f2f40b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destination: Window 1 left ($2126).  <br /></td></tr>
 <tr class="memitem:ad6ab1c05c8d7f89fde75617894d686e0" id="r_ad6ab1c05c8d7f89fde75617894d686e0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad6ab1c05c8d7f89fde75617894d686e0">HDMA_DEST_WH1</a>&#160;&#160;&#160;0x27</td></tr>
@@ -538,6 +542,22 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 
 </div>
 </div>
+<a id="ae591f6ea8d0002a2cfb98b0603dc241e" name="ae591f6ea8d0002a2cfb98b0603dc241e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae591f6ea8d0002a2cfb98b0603dc241e">&#9670;&#160;</a></span>HDMA_DEST_BGMODE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_BGMODE&#160;&#160;&#160;0x05</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: BGMODE ($2105) — mid-frame BG mode switch (F-Zero split). </p>
+
+</div>
+</div>
 <a id="af1addfa1b6fe98e5c4f1ff623f263ba0" name="af1addfa1b6fe98e5c4f1ff623f263ba0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1addfa1b6fe98e5c4f1ff623f263ba0">&#9670;&#160;</a></span>HDMA_DEST_CGADD</h2>
 
@@ -663,6 +683,22 @@ IMPORTANT: Scroll Registers Require Repeat Mode</h2>
 </div><div class="memdoc">
 
 <p>Destination: Mode 7 matrix D ($211E). </p>
+
+</div>
+</div>
+<a id="a1a39375e33c634e7c3b450d16a5a85fb" name="a1a39375e33c634e7c3b450d16a5a85fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a39375e33c634e7c3b450d16a5a85fb">&#9670;&#160;</a></span>HDMA_DEST_TM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HDMA_DEST_TM&#160;&#160;&#160;0x2C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Destination: TM main-screen layer enable ($212C). </p>
 
 </div>
 </div>

@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_mode7.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 7 — the SNES's signature trick.</b> Mode 7 turns one background into a single texture the hardware can rotate, scale and skew per scanline — the floor of F-Zero, the map of Super Mario Kart, the world bending under Pilotwings. It gets its own family because it is a distinct render model with its own matrix API and its own "I want to do THAT" pull.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1540"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1550"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -134,16 +134,18 @@ The ladder</h2>
 <td class="markdownTableBodyNone">7.2  </td><td class="markdownTableBodyNone"><a href="perspective/">perspective</a>  </td><td class="markdownTableBodyNone">How do I fake perspective with an HDMA matrix split (F-Zero floor)?  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">7.3  </td><td class="markdownTableBodyNone"><a href="perspective_rotate/">perspective_rotate</a>  </td><td class="markdownTableBodyNone">How do I drive the <em>full</em> matrix (A/B/C/D) per scanline — rotating perspective?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">7.4  </td><td class="markdownTableBodyNone"><a href="dsp1_ground/">dsp1_ground</a>  </td><td class="markdownTableBodyNone">How did Super Mario Kart do it? The DSP-1 streams the per-scanline matrices for a real camera.  </td></tr>
 </table>
-<p>Climb from a flat spinning plane (7.1) to a receding horizon (7.2) to a horizon that also rotates (7.3).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1541"></a>
+<p>Climb from a flat spinning plane (7.1) to a receding horizon (7.2) to a horizon that also rotates (7.3), then let the coprocessor compute the camera for you (7.4).</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1551"></a>
 The idea in one screen</h2>
 <p>A Mode 7 background is one 128×128-tile plane (1024×1024 px) plus a 2×2 affine matrix (<span class="tt">M7A</span>–<span class="tt">M7D</span>) and a centre of rotation. Set the matrix once and the whole plane rotates/scales (7.1). Rewrite the matrix <b>every scanline</b> with HDMA and each line samples the texture at a different scale, so the plane appears to recede into the distance (7.2 does the diagonal terms; 7.3 drives all four for a horizon that rotates too).</p>
 <p>The capstone games live in <a href="../games/"><span class="tt">games/</span></a>: <b>mode7_racing</b> (F-Zero style) and <b>mode7_flying</b> (Pilotwings style) put this whole family to work.</p>
 <blockquote class="doxtable">
 <p>luna models the Mode 7 PPU natively, so each rung's render is verified by the visual-regression baseline — no emulator side channel needed. </p>
 </blockquote>
-<p><a class="el" href="examples_mode7_perspective.html" title="Mode 7 Perspective -- Pseudo-3D Ground Effect">Mode 7 Perspective -- Pseudo-3D Ground Effect</a> <a class="el" href="examples_mode7_perspective_rotate.html" title="Mode 7 rotating perspective — the full matrix, per scanline">Mode 7 rotating perspective — the full matrix, per scanline</a> <a class="el" href="examples_mode7_rotate_scale.html" title="Mode 7 -- Rotation and Scaling">Mode 7 -- Rotation and Scaling</a> </p>
+<p><a class="el" href="examples_mode7_dsp1_ground.html" title="DSP-1 Ground — the Super Mario Kart floor">DSP-1 Ground — the Super Mario Kart floor</a> <a class="el" href="examples_mode7_perspective.html" title="Mode 7 Perspective -- Pseudo-3D Ground Effect">Mode 7 Perspective -- Pseudo-3D Ground Effect</a> <a class="el" href="examples_mode7_perspective_rotate.html" title="Mode 7 rotating perspective — the full matrix, per scanline">Mode 7 rotating perspective — the full matrix, per scanline</a> <a class="el" href="examples_mode7_rotate_scale.html" title="Mode 7 -- Rotation and Scaling">Mode 7 -- Rotation and Scaling</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

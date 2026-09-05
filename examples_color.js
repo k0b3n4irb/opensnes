@@ -1,11 +1,11 @@
 var examples_color =
 [
     [ "direct_color — the pixel byte IS the color", "examples_color_direct_color.html", [
-      [ "The ladder", "examples_color.html#autotoc_md1163", null ],
-      [ "The idea in one screen", "examples_color.html#autotoc_md1164", [
-        [ "SNES Concepts", "examples_color_direct_color.html#autotoc_md1143", null ],
-        [ "How to Build", "examples_color_direct_color.html#autotoc_md1144", null ],
-        [ "Modules Used", "examples_color_direct_color.html#autotoc_md1145", null ]
+      [ "The ladder", "examples_color.html#autotoc_md1166", null ],
+      [ "The idea in one screen", "examples_color.html#autotoc_md1167", [
+        [ "SNES Concepts", "examples_color_direct_color.html#autotoc_md1146", null ],
+        [ "How to Build", "examples_color_direct_color.html#autotoc_md1147", null ],
+        [ "Modules Used", "examples_color_direct_color.html#autotoc_md1148", null ]
       ] ]
     ] ],
     [ "\"9-bit\" gradient — brightness-dithered backdrop", "examples_color_gradient_9bit.html", null ],

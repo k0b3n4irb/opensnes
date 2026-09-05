@@ -62,6 +62,7 @@ var group__examples =
     [ "main.c", "maps_2tiled_2main_8c.html", null ],
     [ "main.c", "memory_2hirom__demo_2main_8c.html", null ],
     [ "main.c", "memory_2save__game_2main_8c.html", null ],
+    [ "main.c", "mode7_2dsp1__ground_2main_8c.html", null ],
     [ "main.c", "mode7_2perspective_2main_8c.html", null ],
     [ "main.c", "mode7_2perspective__rotate_2main_8c.html", null ],
     [ "main.c", "mode7_2rotate__scale_2main_8c.html", null ],

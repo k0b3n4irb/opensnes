@@ -161,8 +161,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:a39767ab0d98ace72ba92e541085e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world point to the screen (DSP-1 command $06, "Project").  <br /></td></tr>
 <tr class="memitem:a152f59d6d62b0d9f544e08db046de212" id="r_a152f59d6d62b0d9f544e08db046de212"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a152f59d6d62b0d9f544e08db046de212">dsp1Range</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> r)</td></tr>
 <tr class="memdesc:a152f59d6d62b0d9f544e08db046de212"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sphere test (DSP-1 command $18, "Range").  <br /></td></tr>
+<tr class="memitem:aa405c363cda144924639fa91e6d2184a" id="r_aa405c363cda144924639fa91e6d2184a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa405c363cda144924639fa91e6d2184a">dsp1Raster</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *ab, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *cd, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> vs, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> count)</td></tr>
+<tr class="memdesc:aa405c363cda144924639fa91e6d2184a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, "Raster").  <br /></td></tr>
 <tr class="memitem:adb861416d471a3218480f16d3331f55f" id="r_adb861416d471a3218480f16d3331f55f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
 <tr class="memdesc:adb861416d471a3218480f16d3331f55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate a 2D point about the origin (DSP-1 command $0C, "Rotate").  <br /></td></tr>
+<tr class="memitem:a6b150c56e8f97f8932da84b2d2a6f106" id="r_a6b150c56e8f97f8932da84b2d2a6f106"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6b150c56e8f97f8932da84b2d2a6f106">dsp1Target</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> h, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> v)</td></tr>
+<tr class="memdesc:a6b150c56e8f97f8932da84b2d2a6f106"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen point → ground plane (DSP-1 command $0E, "Target").  <br /></td></tr>
 <tr class="memitem:a30bcc07948d43ad0fca8fb3ccc210208" id="r_a30bcc07948d43ad0fca8fb3ccc210208"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a30bcc07948d43ad0fca8fb3ccc210208">dsp1Triangle</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> radius)</td></tr>
 <tr class="memdesc:a30bcc07948d43ad0fca8fb3ccc210208"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scaled sine and cosine of an angle (DSP-1 command $04, "Triangle").  <br /></td></tr>
 </table><table class="memberdecls">
@@ -488,7 +492,12 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = Cx and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = Cy (the raster coefficients); <span class="tt"><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></span>/<span class="tt"><a class="el" href="#af126a02087f50c1591f744aa50d3c5f9">dsp1_o3</a></span> receive two further words whose meaning is not yet confirmed by references. Call once (and again whenever the camera moves), then project points with dsp1Project. <span class="tt">lfe</span>/<span class="tt">les</span> are best tuned empirically — see the values used by examples/chips/dsp1_cube. </p>
+<p>Writes four words (order per the official manual §5.4.1, verified on luna):</p><ul>
+<li><a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = <b>Vof</b>, the raster number of the "imaginary centre";</li>
+<li><a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = <b>Vva</b>, the horizon raster, relative to Vof — the horizon is on screen line <span class="tt">112 + Vof + Vva</span>, and the ground below it streams from raster <span class="tt">Vva + 2</span> (see dsp1Raster);</li>
+<li><a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = <b>Cx</b>, <a class="el" href="#af126a02087f50c1591f744aa50d3c5f9" title="dsp1_o3">dsp1_o3</a> = <b>Cy</b>: ground coordinates of the point under the imaginary centre — write them to M7X/M7Y (mode7SetCenter) when driving Mode 7 from dsp1Raster.</li>
+</ul>
+<p>Raster numbers are down-positive and relative to the screen centre; note that dsp1Project's V is the opposite (up-positive). Call once (and again whenever the camera moves), then dsp1Project points or dsp1Raster the ground. <span class="tt">lfe</span>/<span class="tt">les</span> are best tuned empirically — see the values used by examples/chips/dsp1_cube; <span class="tt">les</span> is also the vertical focal length. </p>
 
 </div>
 </div>
@@ -594,6 +603,51 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 
 </div>
 </div>
+<a id="aa405c363cda144924639fa91e6d2184a" name="aa405c363cda144924639fa91e6d2184a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa405c363cda144924639fa91e6d2184a">&#9670;&#160;</a></span>dsp1Raster()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dsp1Raster </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>ab</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>cd</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>vs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, "Raster"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ab</td><td>destination for A,B: 4 bytes per raster (A lo, A hi, B lo, B hi) </td></tr>
+    <tr><td class="paramname">cd</td><td>destination for C,D: 4 bytes per raster (C lo, C hi, D lo, D hi) </td></tr>
+    <tr><td class="paramname">vs</td><td>first raster number (relative to the imaginary centre; use <span class="tt">Vva + 2</span> from dsp1Parameter for the first ground line) </td></tr>
+    <tr><td class="paramname">count</td><td>number of rasters to stream (at most 127 per HDMA repeat block)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This is the Super Mario Kart / Pilotwings ground: the chip computes, for each raster, the Mode 7 matrix that projects the ground plane under the camera set by dsp1Parameter — perspective, and rotation when <span class="tt">aas</span> is non-zero. The two buffers are laid out as the payload of an <span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> repeat block (M7A/M7B on one channel, M7C/M7D on the other); point the block's header at them and put the block on screen line <span class="tt">112 + Vof + vs</span>. Set M7VOFS so the Mode 7 pivot (M7X/M7Y = Cx/Cy) sits on the imaginary centre line: the D values are secant slopes relative to that line, not derivatives.</p>
+<p>The stream is closed the way the manual specifies (<span class="tt">$8000</span> written in place of a D read), so the chip is back in command mode on return. Cost is CPU-bound: about 80 µs per raster, roughly 100 rasters in a frame's budget — refresh the ground at that size, or every other frame.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Not NMI-safe (like every DSP-1 call), and the tables must not be the ones HDMA is reading this frame: double-buffer and swap with hdmaSetTable during VBlank. </dd></dl>
+
+</div>
+</div>
 <a id="adb861416d471a3218480f16d3331f55f" name="adb861416d471a3218480f16d3331f55f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb861416d471a3218480f16d3331f55f">&#9670;&#160;</a></span>dsp1Rotate()</h2>
 
@@ -628,6 +682,37 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </dd>
 </dl>
 <p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = x' and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = y'. Rotation is clockwise in the SNES screen convention (Y down): (100,0) at 90° gives (0,-100). </p>
+
+</div>
+</div>
+<a id="a6b150c56e8f97f8932da84b2d2a6f106" name="a6b150c56e8f97f8932da84b2d2a6f106"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b150c56e8f97f8932da84b2d2a6f106">&#9670;&#160;</a></span>dsp1Target()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dsp1Target </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>h</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>v</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Screen point → ground plane (DSP-1 command $0E, "Target"). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">h</td><td>screen X relative to the centre (I; mirrored like dsp1Project's H) </td></tr>
+    <tr><td class="paramname">v</td><td>screen raster relative to the imaginary centre (I; down-positive)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The inverse of dsp1Project for the ground plane: which ground (x, y) is under a cursor, a crosshair, a missile scope. Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = ground X and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = ground Y, in the same convention as Cx/Cy — dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1Parameter. Requires a prior dsp1Parameter. </p>
 
 </div>
 </div>

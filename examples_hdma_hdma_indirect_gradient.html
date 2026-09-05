@@ -129,7 +129,7 @@ Screenshot</div></div>
     <p>A 32-band red gradient rendered entirely by an <b>indirect</b> HDMA channel on the naked backdrop — no BG layers, no tiles, no assets, zero per-frame CPU. The HDMA table carries <span class="tt">[count][pointer]</span> entries; the PPU fetches each band's 4-byte payload (<span class="tt">[CGADD][CGADD][color_lo][color_hi]</span>) through the pointer and rewrites CGRAM color 0 every 7 scanlines.</p>
 <p>C port of "SNES Red Space Indirect HDMA Demo" by krom (Peter Lemon), <a href="https://github.com/PeterLemon/SNES">github.com/PeterLemon/SNES</a> (<span class="tt">PPU/HDMA/RedSpaceIndirectHDMA</span>), on the <span class="tt"><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">snes/hdma.h</a></span> API — the permanent consumer of <span class="tt"><a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a></span> (the register plain <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> never programs, <span class="tt">$43x7</span>, is the whole point of this mode).</p>
 <p>The companion <a href="../gradient_colors"><span class="tt">gradient_colors</span></a> draws the same class of effect with a <b>direct</b> table (data inline); here the payload lives in a separate WRAM array the CPU can edit freely — the layout used for dynamic per-scanline palettes (the HiColor building block).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1324"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1327"></a>
 Fidelity to the original (measured, not assumed)</h2>
 <p>Register-level — krom's writes vs this ROM's generated code:</p>
 <table class="markdownTable">
@@ -163,7 +163,7 @@ Fidelity to the original (measured, not assumed)</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>Max per-line profile difference</b>  </td><td class="markdownTableBodyNone">—  </td><td class="markdownTableBodyNone"><b>0</b> (pixel-exact)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1325"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1328"></a>
 SNES Concepts</h2>
 <ul>
 <li>Indirect HDMA (DMAP bit 6): the table holds pointers; <span class="tt">$43x7</span> selects the data bank — <span class="tt"><a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a></span> programs both</li>
@@ -171,10 +171,10 @@ SNES Concepts</h2>
 <li><span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> to CGADD streams <span class="tt">$2121,$2121,$2122,$2122</span>: each block rewrites CGRAM color 0, i.e. the backdrop</li>
 <li>Bank of a C array for <span class="tt">$43x7</span>: <span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)arr &gt;&gt; 16)</span></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1326"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1329"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1327"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1330"></a>
 Modules Used</h2>
 <p>console, dma, hdma </p>
 </div></div><!-- contents -->

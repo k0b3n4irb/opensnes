@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_mode7.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SNES Mode 7: what the affine background mode actually is, why its VRAM format is interleaved, the matrix maths the lib hides behind <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span>/<span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale</a></span>, and how the F-Zero / Pilotwings "perspective ground plane" pattern is built by combining Mode 7 with HDMA. It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial and (for the perspective section) the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md298"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md300"></a>
 What Mode 7 actually is</h2>
 <p>The SNES PPU has eight BG modes, numbered 0–7. The first seven (Mode 0 through Mode 6) are variations on tilemap-based rendering with different colour-depth / layer-count tradeoffs. Mode 7 is the odd one out:</p>
 <ul>
@@ -135,7 +135,7 @@ What Mode 7 actually is</h2>
 <p>This is the mode F-Zero, Super Mario Kart, Pilotwings, and Final Fantasy VI's airship use. The single-layer / 128 × 128 / 8 bpp restrictions are the cost of the affine transform — which the SNES PPU does in hardware once per frame, not per scanline.</p>
 <p>(Per-scanline matrix changes — the F-Zero "ground recedes into the
 distance" effect — are <em>not</em> a Mode 7 feature; they are HDMA writing new matrix values every scanline. See the perspective section below.)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md299"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md301"></a>
 The matrix and the registers</h2>
 <p>The Mode 7 affine transformation maps each <em>screen</em> pixel <span class="tt">(x, y)</span> to a <em>tilemap</em> coordinate <span class="tt">(X, Y)</span> through a 2 × 2 matrix and two centre / scroll offsets:</p>
 <div class="fragment"><div class="line">X = A × (x - cx) + B × (y - cy) + sx + cx</div>
@@ -164,7 +164,7 @@ The matrix and the registers</h2>
 <td class="markdownTableBodyNone"><span class="tt">$211A</span>  </td><td class="markdownTableBodyNone">M7SEL  </td><td class="markdownTableBodyNone">Flip + out-of-bounds behaviour  </td></tr>
 </table>
 <p>All of <span class="tt">$211B</span>–<span class="tt">$2120</span> are <b>double-write</b> registers: write the low byte first, then the high byte, to the same address. The 65816's STA to a 16-bit register doesn't do this for you — the lib's helpers sequence the writes correctly.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md300"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md302"></a>
 The interleaved VRAM format</h2>
 <p>Mode 7's biggest gotcha lives in the VRAM layout. To save bandwidth, the PPU stores the <b>tilemap in the low byte of each VRAM word, and the tile pixel data in the high byte of each VRAM word</b> — both occupying the same address range <span class="tt">$0000</span>–<span class="tt">$3FFF</span>.</p>
 <p>This means a single VRAM word at address <span class="tt">N</span> contains:</p>
@@ -178,7 +178,7 @@ The interleaved VRAM format</h2>
 </ol>
 <p>The lib does not currently provide a <span class="tt">mode7LoadGraphics()</span> that hides this. Both shipped examples use an assembly helper (typically named <span class="tt"><a class="el" href="mode7_2rotate__scale_2main_8c.html#a79df767da35718bf6b0595880cb63cd6" title="Assembly helper to load Mode 7 tile data, tilemap, and palette.">asm_loadMode7Data</a></span> or <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#ade39154a095469eb17803cad6394217e" title="Load sky background tiles and tilemap to VRAM via assembly DMA.">asm_loadSkyData</a></span>) to do the interleaved DMA. Treat the asset-loading step as "write a small assembly routine, copy
 the pattern from the example".</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md301"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md303"></a>
 Setup pattern</h2>
 <p>The minimum sequence to bring up a rotating Mode 7 plane:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -235,7 +235,7 @@ Setup pattern</h2>
 <li><b>Set scale before angle</b>, not after. <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> reads the current scale and combines it with <span class="tt">sin</span>/<span class="tt">cos</span> to compute the matrix. Calling them in the wrong order writes a stale matrix that gets overwritten on the next angle change anyway, but produces a one-frame visual glitch.</li>
 <li><b><span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(TM_BG1)</a></span></b>, never any other layer. Mode 7 disables BG2/3/4 in hardware; enabling them via TM has no effect.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md302"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md304"></a>
 Coordinate system</h2>
 <p>The default after <span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></span>:</p>
 <ul>
@@ -246,7 +246,7 @@ Coordinate system</h2>
 <p>In this state, screen <span class="tt">(0, 0)</span> shows tilemap pixel <span class="tt">(0, 0)</span>, screen <span class="tt">(128, 112)</span> shows tilemap pixel <span class="tt">(128, 112)</span>, and so on. Pure identity.</p>
 <p>To <b>rotate around the screen centre</b>, set both centre and scroll so that the rotation pivot lines up with the visible region's middle. The helper <span class="tt">mode7SetPivot(x, y)</span> does this in screen coordinates: pass the screen pixel you want to be the rotation centre, and the lib sets <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#a465d1542191d54e5341db972cd8cae23">cx</a></span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#a12cd9a56141f0c4fcbd96c726ce1560c">cy</a></span>, <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></span>, <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></span> appropriately.</p>
 <p>To <b>zoom in</b>, decrease the scale below 1.0 (<span class="tt">0x0080</span> for 0.5 = 2× zoom in). To <b>zoom out</b>, increase scale above 1.0 (<span class="tt">0x0200</span> = 0.5×, the tilemap looks half-size and you see twice as much). Counter-intuitive at first, but the formula tells you why: a smaller <span class="tt">A</span>/<span class="tt">D</span> means each screen pixel covers more tilemap pixels.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md303"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md305"></a>
 Out-of-bounds behaviour</h2>
 <p>What happens at screen pixels that map outside the 128 × 128 tilemap? Three options, controlled by the high two bits of M7SEL (<span class="tt">$211A</span>), exposed via <span class="tt"><a class="el" href="mode7_8h.html#a5fdfa5a6feaf4eb76c6b9a02535fb890" title="Set Mode 7 settings register.">mode7SetSettings()</a></span>:</p>
 <table class="markdownTable">
@@ -260,7 +260,7 @@ Out-of-bounds behaviour</h2>
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="mode7_8h.html#ad4c105a9c2165ccf56070e30b8943bae" title="Show tile 0 when out of bounds.">MODE7_TILE0</a></span> (<span class="tt">0xC0</span>)  </td><td class="markdownTableBodyNone">Out-of-bounds always shows tile 0. Useful when the tileset's tile 0 is a "border" or "void" graphic.  </td></tr>
 </table>
 <p>For a flying-game where the player can fly far in any direction, <span class="tt">WRAP</span> gives an endless ground. For a fixed-arena game (a Mode 7 chess board, say), <span class="tt">TRANSPARENT</span> or <span class="tt">TILE0</span> keeps the world bounded.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md304"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md306"></a>
 The lib helpers and what they do</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -286,12 +286,12 @@ The lib helpers and what they do</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">mode7SetSettings(M7SEL_value)</span>  </td><td class="markdownTableBodyNone">Flip + out-of-bounds behaviour (the constants above).  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md305"></a>
-Worked patterns (the two shipped examples)</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md306"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md307"></a>
+Worked patterns (the shipped examples)</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md308"></a>
 Basic rotation + scaling — <span class="tt">examples/mode7/rotate_scale</span></h3>
 <p>The "hello-world" of Mode 7. <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> and <span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale()</a></span> update the matrix every frame in response to D-pad input — A/B rotate, UP/DOWN zoom. Read the example to see the exact init sequence (consoleInit, setScreenOff, asm_loadMode7Data, setMode(BG_MODE7, 0), mode7Init, mode7SetScale, mode7SetAngle, <a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(TM_BG1)</a>, setScreenOn) and the per-frame update path. ~100 lines of C; the entire demo fits on one screen.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md307"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md309"></a>
 F-Zero perspective via HDMA — <span class="tt">examples/mode7/perspective</span></h3>
 <p>The trick that gives Mode 7 its reputation. The 2 × 2 matrix is <em>constant per frame</em> in plain Mode 7, which means the BG plane stays "flat" — no perspective. To create the F-Zero "ground recedes into the distance" effect, you write <b>different matrix values per scanline</b> using HDMA on the M7A and M7D registers.</p>
 <p>The example is a 4-channel HDMA orchestration:</p>
@@ -303,18 +303,21 @@ F-Zero perspective via HDMA — <span class="tt">examples/mode7/perspective</spa
 </ul>
 <p>Read the example's <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473" title="Build and activate the 4-channel HDMA perspective split.">asm_setupHdmaPerspective</a></span> for the table-build algorithm. The math is straightforward: for scanline <span class="tt">s</span> at distance <span class="tt">d</span> from the horizon, the matrix factor is <span class="tt">1.0 / d</span> (inverse depth). What's hard is the channel bookkeeping — get the timing wrong and you see the wrong mode for one scanline, or the perspective curve "jumps".</p>
 <p>This is also a textbook case for the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a>'s gotchas: the example uses HDMA channels 1–4, leaves channel 0 for <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> and channel 7 for the OAM DMA. Run any other split-mode display through it; the scaffolding is the same.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md308"></a>
-Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md309"></a>
-🟡 BG1 scroll and the Mode 7 registers share one write-twice latch</h3>
-<p><span class="tt">$210D</span>/<span class="tt">$210E</span> and <span class="tt">$211B</span>-<span class="tt">$2120</span> all go through a single shared prev-byte latch. If an HDMA channel or an IRQ writes a BG1 scroll register between the two writes of a Mode 7 register, the value — and the Mode 7 multiplier result MPY (<span class="tt">$2134</span>-<span class="tt">$2136</span>) — is silently corrupted (documented in the snesdev-wiki Errata). Practical rule: do matrix writes and MPY reads during VBlank, or disable any BG1-scroll-driving HDMA channel while rewriting the matrix. The perspective example is safe as shipped: HDMA channels run sequentially within a scanline, so one channel's two-byte M7A write is never split by another channel — the hazard is <em>CPU-side</em> matrix writes or MPY reads racing a scroll-writing HDMA channel mid-frame.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md310"></a>
+The Super Mario Kart floor via the DSP-1 — <span class="tt">examples/mode7/dsp1_ground</span></h3>
+<p>Same four-channel split as <span class="tt">perspective</span>, but the M7A–M7D tables are not precomputed: the DSP-1's Raster command streams them every frame for a real camera (position, height, heading, tilt), so the floor rotates and moves in true perspective. The M7A/M7B pair rides one <span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> channel and M7C/M7D the other, double-buffered and swapped with <span class="tt"><a class="el" href="hdma_8h.html#a60a2966565cd8b728a5acd019859e8e6" title="Update HDMA table pointer (for dynamic effects).">hdmaSetTable</a></span> in VBlank. The geometry that pins the matrices to the screen — horizon raster, Mode 7 centre and scroll — comes from <span class="tt"><a class="el" href="dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1Parameter</a></span>; see the <a href="dsp1.md#the-ground-what-dsp1_ground-does">DSP-1 tutorial</a>.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md311"></a>
+Gotchas</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md312"></a>
+🟡 BG1 scroll and the Mode 7 registers share one write-twice latch</h3>
+<p><span class="tt">$210D</span>/<span class="tt">$210E</span> and <span class="tt">$211B</span>-<span class="tt">$2120</span> all go through a single shared prev-byte latch. If an HDMA channel or an IRQ writes a BG1 scroll register between the two writes of a Mode 7 register, the value — and the Mode 7 multiplier result MPY (<span class="tt">$2134</span>-<span class="tt">$2136</span>) — is silently corrupted (documented in the snesdev-wiki Errata). Practical rule: do matrix writes and MPY reads during VBlank, or disable any BG1-scroll-driving HDMA channel while rewriting the matrix. The perspective example is safe as shipped: HDMA channels run sequentially within a scanline, so one channel's two-byte M7A write is never split by another channel — the hazard is <em>CPU-side</em> matrix writes or MPY reads racing a scroll-writing HDMA channel mid-frame. <span class="tt">dsp1_ground</span> follows the rule the other way round: its HDMA channels own M7A–M7D all frame long, so every CPU-side Mode 7 write (<span class="tt"><a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter</a></span>, <span class="tt"><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll</a></span>) happens in VBlank, and <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span> — which also reads MPY — is never called while the split is live.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md313"></a>
 🔴 Single BG layer</h3>
 <p>Mode 7 disables BG2, BG3, BG4 <em>in hardware</em>. <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a>(<a class="el" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> |
 <a class="el" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>)</span> does nothing useful; only BG1 renders. If you want a sky on top of a Mode 7 ground, you HDMA the BGMODE register mid-frame (see the perspective example). There is no "Mode 7 + a normal
 tilemap" mode.</p>
 <p>OBJ (sprites) work as normal in Mode 7 — they are not BG layers and are not affected by the mode switch. You can put sprites on top of a Mode 7 plane.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md311"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md314"></a>
 🔴 Interleaved VRAM, no <span class="tt">mode7LoadGraphics</span> helper today</h3>
 <p><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span> writes to both bytes of each VRAM word; for Mode 7 you want only the low byte (tilemap) or only the high byte (tile data) per pass. The lib does not currently ship a function that hides this — both examples use an assembly helper. Pattern:</p>
 <div class="fragment"><div class="line">; Load Mode 7 tile pixel data: high-byte writes</div>
@@ -331,22 +334,22 @@ tilemap" mode.</p>
 <div class="line">; ... DMA setup, source = tilemap, dest = $2118 (VMDATAL)</div>
 <div class="line">sta.l $420B</div>
 </div><!-- fragment --><p>Treat the assembly helper as standard furniture for any Mode 7 project.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md312"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md315"></a>
 🟠 Double-write register sequencing</h3>
 <p>M7A–M7D, M7X, M7Y, BG1HOFS, BG1VOFS are all double-write registers — the SNES PPU expects the low byte then the high byte, and remembers the previous "low byte" between writes. If you write to <em>another</em> double-write register in between, the next high-byte write goes to the wrong place.</p>
 <p>The lib's helpers do this correctly. If you write to M7A–M7D directly (via <span class="tt"><a class="el" href="mode7_8h.html#a86be6a317594dfefb05d0786baecf98c" title="Set Mode 7 matrix directly.">mode7SetMatrix</a></span> or by hand), keep all four matrix writes together — don't intersperse with other PPU writes.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md313"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md316"></a>
 🟡 Set scale BEFORE angle</h3>
 <p><span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span> reads the current scale to compute the matrix. Reverse order writes the matrix using stale scale values for one frame; the <em>next</em> <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span> call corrects it. Cosmetic, but visible as a one-frame "blip" when you change scale and angle in the same frame.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md314"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md317"></a>
 🟡 Centre default is the tilemap centre, not the screen centre</h3>
 <p><span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init</a></span> sets <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#a465d1542191d54e5341db972cd8cae23">cx</a> = <a class="el" href="basics_2game__skeleton_2main_8c.html#a12cd9a56141f0c4fcbd96c726ce1560c">cy</a> = 128</span>, which is the centre of the 128 × 128 <em>tilemap</em>, not the centre of the 256 × 224 <em>screen</em>. To rotate around the screen centre, use <span class="tt">mode7SetPivot(128, 112)</span> (which positions the visible region's centre at the rotation pivot).</p>
 <p>This trips people up: "my plane rotates correctly but isn't centred on
 screen". The pivot helper is the fix.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md315"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md318"></a>
 🟡 Out-of-bounds with <span class="tt">MODE7_TRANSPARENT</span> shows the backdrop, not a layer</h3>
 <p>Mode 7 has no other BG to "see through to". <span class="tt"><a class="el" href="mode7_8h.html#a0c468d883ece574391e63d990e082aa7" title="Show transparent when out of bounds.">MODE7_TRANSPARENT</a></span> shows the backdrop colour (CGRAM[0]) where the tilemap doesn't extend. If you want a sky behind the Mode 7 plane, you must HDMA the BGMODE register to switch to a different mode for the sky region of the screen — see the perspective example.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md316"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md319"></a>
 Cycle cost</h2>
 <p>Mode 7's affine transformation is computed in PPU hardware, not on the CPU, so the <em>display</em> of a Mode 7 plane is free. The CPU cost lives in the matrix updates:</p>
 <ul>
@@ -355,18 +358,19 @@ Cycle cost</h2>
 <li>A direct <span class="tt"><a class="el" href="mode7_8h.html#a86be6a317594dfefb05d0786baecf98c" title="Set Mode 7 matrix directly.">mode7SetMatrix()</a></span> — just the four PPU writes ≈ 30–40 cycles.</li>
 </ul>
 <p>Per-frame matrix updates are cheap (well under 0.1 % of the frame). Per-scanline updates via HDMA are more expensive — see the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial's cycle-cost section</a>. The 4-channel perspective example consumes ~6 % of CPU during active display.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md317"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md320"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">lib/include/snes/mode7.h</a></span> — full API reference.</li>
 <li><span class="tt">lib/source/mode7.asm</span> — implementation (matrix multiply, sin/cos table).</li>
 <li><a class="el" href="dir_91a615ea1a84656dce823a29fa9fdcc8.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/rotate_scale/README.md"><span class="tt">examples/mode7/rotate_scale</span></a> — basic rotation + scaling demo.</li>
 <li><a class="el" href="dir_95ea0abe4773cff1cc22e5bd3c576b1b.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/perspective/README.md"><span class="tt">examples/mode7/perspective</span></a> — F-Zero-style perspective via 4-channel HDMA.</li>
+<li><a class="el" href="dir_fd5082750b92adad098a614dbe58c5c6.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/dsp1_ground/README.md"><span class="tt">examples/mode7/dsp1_ground</span></a> — the same split with matrices streamed by the DSP-1.</li>
 <li><a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a> — required reading for the perspective pattern.</li>
 <li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — companion read for the regular BG modes (0–6).</li>
 <li><span class="tt">KNOWN_LIMITATIONS.md</span> — VBlank DMA budget, bank <span class="tt">$00</span> overflow, and the runtime traps that bite Mode 7 projects with large 8 bpp tilesets.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md318"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md321"></a>
 Per-scanline matrix: rotating perspective</h2>
 <p><span class="tt">mode7/perspective</span> drives M7A/M7D per line for the F-Zero ground; <span class="tt">mode7/perspective_rotate</span> drives the FULL matrix — cos into M7A and M7D, sin/-sin into M7B/M7C — from 48 pre-built angle tables (entry = <span class="tt">trig(2*pi*a/48) * 20480 / scanline</span>, 8.8 fixed: the hyperbolic perspective divide). Four HDMA channels, one per register, repointed per frame with <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a>(ch, <a class="el" href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc" title="HDMA mode: 1 register, 2 bytes written twice.">HDMA_MODE_1REG_2X</a>,
 <a class="el" href="hdma_8h.html#aa36d2b537ff8a8e55794746c8bca656a" title="Destination: Mode 7 matrix A ($211B).">HDMA_DEST_M7A</a>..D, table + <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Rotation step index, 0..47.">angle</a> * 673)</span>. The tables are machine-verified against the math by <span class="tt">devtools/m7ptables.py verify</span>. </p>

@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3":[4,0,3,0,0,28,23],
 "sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e":[4,0,3,0,0,28,64],
 "sprite_8h.html#a7ad237518b773199a39686500d459ced":[4,0,3,0,0,28,43],
 "sprite_8h.html#a7e322aa2d519ca5856491a92e0827405":[4,0,3,0,0,28,17],
@@ -36,19 +37,19 @@ var NAVTREEINDEX8 =
 "sprite_8h.html#af660f585ad1752b1004dba4df84324a3":[4,0,3,0,0,28,68],
 "sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7":[4,0,3,0,0,28,29],
 "sprite_8h_source.html":[4,0,3,0,0,28],
-"sprites_2animated__sprite_2main_8c.html":[2,11,68],
-"sprites_2aseprite__pipeline_2main_8c.html":[2,11,69],
-"sprites_2dynamic__metasprite_2main_8c.html":[2,11,70],
-"sprites_2dynamic__sprite_2main_8c.html":[2,11,71],
-"sprites_2metasprite_2main_8c.html":[2,11,72],
+"sprites_2animated__sprite_2main_8c.html":[2,11,69],
+"sprites_2aseprite__pipeline_2main_8c.html":[2,11,70],
+"sprites_2dynamic__metasprite_2main_8c.html":[2,11,71],
+"sprites_2dynamic__sprite_2main_8c.html":[2,11,72],
+"sprites_2metasprite_2main_8c.html":[2,11,73],
 "sprites_2metasprite_2vram__map_8h.html":[4,0,1,13,4,1],
 "sprites_2metasprite_2vram__map_8h.html#a42f9b2d893d66eedd0255d9b236dc2e4":[4,0,1,13,4,1,0],
 "sprites_2metasprite_2vram__map_8h.html#a723a43d336256e6d28543c1f170d1171":[4,0,1,13,4,1,2],
 "sprites_2metasprite_2vram__map_8h.html#ae6ebd5847cf9d8a28544fbbb3ee32a10":[4,0,1,13,4,1,1],
 "sprites_2metasprite_2vram__map_8h_source.html":[4,0,1,13,4,1],
-"sprites_2simple__sprite_2main_8c.html":[2,11,73],
-"sprites_2sprite__sizes_2main_8c.html":[2,11,74],
-"sprites_2sprite__swarm_2main_8c.html":[2,11,75],
+"sprites_2simple__sprite_2main_8c.html":[2,11,74],
+"sprites_2sprite__sizes_2main_8c.html":[2,11,75],
+"sprites_2sprite__swarm_2main_8c.html":[2,11,76],
 "sram_8h.html":[4,0,3,0,0,29],
 "sram_8h.html#a07095ff815cfb5f1ef99aab2e81a10ef":[4,0,3,0,0,29,4],
 "sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309":[4,0,3,0,0,29,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX8 =
 "superfx_8h.html#a9778529684984e851c13865f09eb9b29":[4,0,3,0,0,30,38],
 "superfx_8h.html#a990fa82d8cff06a709dc3196a3dfd372":[4,0,3,0,0,30,10],
 "superfx_8h.html#a9fa22b7c694b756b2a2e8555419a927e":[4,0,3,0,0,30,30],
-"superfx_8h.html#aa96dbf2933de566840e56b543630e5d6":[4,0,3,0,0,30,46],
-"superfx_8h.html#aaae39a6799d57a1de176c8477797438c":[4,0,3,0,0,30,7]
+"superfx_8h.html#aa96dbf2933de566840e56b543630e5d6":[4,0,3,0,0,30,46]
 };

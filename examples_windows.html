@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_windows.html','',''); });
 <blockquote class="doxtable">
 <p>Not the same as <span class="tt">panel</span> (tile boxes) — these are the PPU's masking registers. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1774"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1784"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -139,7 +139,7 @@ The ladder</h2>
 <td class="markdownTableBodyNone">6f.3  </td><td class="markdownTableBodyNone"><a href="transparent_window/">transparent_window</a>  </td><td class="markdownTableBodyNone">How do I combine a window with colour math (a darkened region)?  </td></tr>
 </table>
 <p>Climb from one static rectangle (6f.1) to two HDMA-shaped windows (6f.2) to a window gating colour math (6f.3).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1775"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1785"></a>
 The idea in one screen</h2>
 <p>Each window is a left/right edge pair (<span class="tt">WH0</span>/<span class="tt">WH1</span>, <span class="tt">$2126</span>–<span class="tt">$2129</span>); a layer or colour math reads a per-layer bit that says "apply me inside / outside the
 window." Set the edges once and you get a static rectangle. Rewrite the edges <b>every scanline</b> with HDMA and the two straight edges trace any curve — a circle, a wave, a shrinking iris. Point colour math at the window instead of a layer and you darken/tint only the shape.</p>

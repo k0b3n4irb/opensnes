@@ -12,7 +12,7 @@ var searchData=
   ['dsp1_5fo1_9',['dsp1_o1',['../dsp1_8h.html#a173400a4c478dc40a8754b8b7117cc67',1,'dsp1.h']]],
   ['dsp1_5fo2_10',['dsp1_o2',['../dsp1_8h.html#a6b8c0440cf7578bc7c98e40d39a43f06',1,'dsp1.h']]],
   ['dsp1_5fo3_11',['dsp1_o3',['../dsp1_8h.html#af126a02087f50c1591f744aa50d3c5f9',1,'dsp1.h']]],
-  ['dsp1_5fok_12',['dsp1_ok',['../chips_2dsp1__cube_2main_8c.html#a12daf4f2dbff3923ffb1c93fdbdb13ab',1,'main.c']]],
+  ['dsp1_5fok_12',['dsp1_ok',['../chips_2dsp1__cube_2main_8c.html#a12daf4f2dbff3923ffb1c93fdbdb13ab',1,'dsp1_ok:&#160;main.c'],['../mode7_2dsp1__ground_2main_8c.html#a12daf4f2dbff3923ffb1c93fdbdb13ab',1,'dsp1_ok:&#160;main.c']]],
   ['durations_13',['durations',['../structAnimClip.html#a18fcb0e62fb6d1c06bb8156433674769',1,'AnimClip']]],
   ['dx_14',['dx',['../structMetaspriteItem.html#a5d07f89607940a1d70300bfec816b08f',1,'MetaspriteItem']]],
   ['dy_15',['dy',['../structMetaspriteItem.html#a845726a319cfae2a703b5ed90b4094a4',1,'MetaspriteItem']]]

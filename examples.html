@@ -122,8 +122,8 @@ $(function(){initNavTree('examples.html','',''); });
   <div class="headertitle"><div class="title">OpenSNES Examples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Learn SNES development step by step. 84 examples organized by topic, building from basic concepts to complete games.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1558"></a>
+<div class="textblock"><p>Learn SNES development step by step. 85 examples organized by topic, building from basic concepts to complete games.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1568"></a>
 Categories</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -149,7 +149,7 @@ Categories</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="scrolling/">scrolling/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Layer scrolling: parallax, streaming, per-scanline HDMA  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="mode7/">mode7/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Mode 7: rotation, scaling, per-scanline perspective  </td></tr>
+<td class="markdownTableBodyNone"><a href="mode7/">mode7/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Joypads, drive a sprite, mouse, Super Scope, multi-player  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -163,10 +163,10 @@ Categories</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1559"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1569"></a>
 Learning Path</h2>
 <p>A curated progression — it doesn't list every example. Use the category table above for the full set; anything not listed here is a variant or deep-dive of a step below.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1560"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1570"></a>
 Level 1 &ndash; First Steps</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -180,7 +180,7 @@ Level 1 &ndash; First Steps</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone"><a href="input/two_players/">input/two_players</a>  </td><td class="markdownTableBodyNone">Joypad reading, multiplayer input  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1561"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1571"></a>
 Level 2 &ndash; Graphics Fundamentals</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -202,7 +202,7 @@ Level 2 &ndash; Graphics Fundamentals</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">12  </td><td class="markdownTableBodyNone"><a href="transitions/mosaic/">transitions/mosaic</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1562"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1572"></a>
 Level 3 &ndash; Scrolling and Effects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -242,7 +242,7 @@ Level 3 &ndash; Scrolling and Effects</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="windows/transparent_window/">windows/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1563"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1573"></a>
 Level 4 &ndash; Advanced Topics</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -252,33 +252,35 @@ Level 4 &ndash; Advanced Topics</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">22  </td><td class="markdownTableBodyNone"><a href="mode7/perspective/">mode7/perspective</a>  </td><td class="markdownTableBodyNone">Pseudo-3D perspective (F-Zero style)  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">22b  </td><td class="markdownTableBodyNone"><a href="mode7/dsp1_ground/">mode7/dsp1_ground</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">23  </td><td class="markdownTableBodyNone"><a href="sprites/metasprite/">sprites/metasprite</a>  </td><td class="markdownTableBodyNone">Multi-tile composite sprites  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">23b  </td><td class="markdownTableBodyNone"><a href="sprites/aseprite_pipeline/">sprites/aseprite_pipeline</a>  </td><td class="markdownTableBodyNone">Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">24  </td><td class="markdownTableBodyNone"><a href="input/mouse/">input/mouse</a>  </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">25  </td><td class="markdownTableBodyNone"><a href="input/superscope/">input/superscope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">26  </td><td class="markdownTableBodyNone"><a href="memory/hirom_demo/">memory/hirom_demo</a>  </td><td class="markdownTableBodyNone">HiROM vs LoROM memory mapping  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">27  </td><td class="markdownTableBodyNone"><a href="memory/save_game/">memory/save_game</a>  </td><td class="markdownTableBodyNone">SRAM persistence (battery saves)  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">28  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_music/">audio/snesmod_music</a>  </td><td class="markdownTableBodyNone">SPC700 music playback via SNESMOD  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">42c  </td><td class="markdownTableBodyNone"><a href="audio/speech_synth/">audio/speech_synth</a>  </td><td class="markdownTableBodyNone">Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">42d  </td><td class="markdownTableBodyNone"><a href="audio/play_noise/">audio/play_noise</a>  </td><td class="markdownTableBodyNone">Drum kit from the DSP noise generator — zero samples (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">42e  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">42f  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
+<td class="markdownTableBodyNone">42e  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">42f  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">42g  </td><td class="markdownTableBodyNone"><a href="audio/soundboard/">audio/soundboard</a>  </td><td class="markdownTableBodyNone">The audio v2 engine from pure C: dynamic samples, pan/pitch, echo  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md1564"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md1574"></a>
 Level 5 &ndash; Maps and Complete Projects</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -302,7 +304,7 @@ Level 5 &ndash; Maps and Complete Projects</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">38  </td><td class="markdownTableBodyNone"><a href="games/rpg/">games/rpg</a>  </td><td class="markdownTableBodyNone">RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1565"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1575"></a>
 Building</h2>
 <div class="fragment"><div class="line"># Build all examples</div>
 <div class="line">cd opensnes</div>
@@ -313,12 +315,12 @@ Building</h2>
 <div class="line"> </div>
 <div class="line"># Clean and rebuild</div>
 <div class="line">make clean &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1566"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1576"></a>
 Running</h2>
 <p>We recommend <a href="https://github.com/SourMesen/Mesen2">Mesen2</a> for accurate SNES emulation:</p>
 <div class="fragment"><div class="line">mesen examples/text/print_string/print_string.sfc</div>
 </div><!-- fragment --><p>Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1567"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1577"></a>
 Tips</h2>
 <ol type="1">
 <li><b>Follow the order</b> &ndash; each example builds on concepts from earlier ones</li>

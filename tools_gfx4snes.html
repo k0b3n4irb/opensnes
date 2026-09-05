@@ -123,7 +123,7 @@ $(function(){initNavTree('tools_gfx4snes.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><span class="tt">gfx4snes</span> is the cornerstone of the asset pipeline. It takes an indexed image and produces the three things a background (or a sprite sheet) is made of on the SNES: <b>tile graphics</b>, a <b>palette</b>, and — for backgrounds — a <b>tilemap</b>. Almost every visual example in the SDK starts here.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md509"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md512"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> a <span class="tt">.png</span> or <span class="tt">.bmp</span> that is **256-colour *indexed*** — not RGB. (Artist art in RGB must pass through <a class="el" href="tools_img2snes.html" title="img2snes — RGB artwork to indexed palettes">img2snes — RGB artwork to indexed palettes</a> first; that is the single most common gfx4snes mistake.)</p>
 <p><b>Out</b>, depending on flags:</p>
@@ -141,7 +141,7 @@ What goes in, what comes out</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">.pc7</span> / <span class="tt">.mp7</span>  </td><td class="markdownTableBodyNone">Mode 7 packed tiles / tilemap  </td><td class="markdownTableBodyNone">Mode 7 setup  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md510"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md513"></a>
 The two flags that decide everything: <span class="tt">-u</span> and <span class="tt">-s</span></h2>
 <p>Colour depth is not a <span class="tt">--bpp</span> flag — it is implied by <span class="tt">-u</span> (colours <em>used</em> per tile), and it drives the VRAM cost you budgeted in <a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> —</p>
 <table class="markdownTable">
@@ -155,7 +155,7 @@ The two flags that decide everything: <span class="tt">-u</span> and <span class
 <td class="markdownTableBodyNone"><span class="tt">-u 256</span>  </td><td class="markdownTableBodyNone">8bpp (256 colours)  </td><td class="markdownTableBodyNone">64  </td><td class="markdownTableBodyNone">Mode 3 / Mode 7 lavish single layers  </td></tr>
 </table>
 <p>And <span class="tt">-s</span> sets the tile/cell size: <span class="tt">-s 8</span> for backgrounds, <span class="tt">-s 16</span> (or 32/64) for sprites and metasprites.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md511"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md514"></a>
 The flags you will actually use</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -181,7 +181,7 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-y</span>  </td><td class="markdownTableBodyNone">tilemap as 32×32 pages (for scrolling) · <span class="tt">-z</span> LZ77 · <span class="tt">-F</span> dedupe flipped  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md512"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md515"></a>
 Worked examples</h2>
 <div class="fragment"><div class="line"># A 4bpp background for Mode 1 (tiles + palette + map):</div>
 <div class="line">gfx4snes -s 8 -o 16 -u 16 -p -m -i background.png</div>
@@ -195,7 +195,7 @@ Worked examples</h2>
 <div class="line"># With a fixed, authored palette so colours never drift (recommended):</div>
 <div class="line">gfx4snes -s 8 -o 16 -u 16 -p -m -c res/town_fixed.pal -i tileset.png</div>
 </div><!-- fragment --><p>In the SDK you rarely type these: set <span class="tt">GFXSRC := background.png</span> in the example Makefile and the zero-config rule runs <span class="tt">gfx4snes -s $(SPRITE_SIZE) -p</span> for you. Add <span class="tt">-m</span>, <span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></span>, and friends when you outgrow the default.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md513"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md516"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>Indexed input only.</b> RGB/RGBA art produces garbage or an error — run <a class="el" href="tools_img2snes.html" title="img2snes — RGB artwork to indexed palettes">img2snes — RGB artwork to indexed palettes</a> first.</li>
@@ -203,7 +203,7 @@ Gotchas worth knowing up front</h2>
 <li><b>bpp is <span class="tt">-u</span>, not a bpp flag</b> — the most common source of confusion.</li>
 <li><b>Sprites skip <span class="tt">-m</span></b> — a sprite sheet has no tilemap.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md514"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md517"></a>
 See it in practice</h2>
 <ul>
 <li><a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a> — 2bpp, four cheap layers.</li>

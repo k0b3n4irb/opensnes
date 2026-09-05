@@ -123,11 +123,11 @@ $(function(){initNavTree('tools_font2snes.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The text module ships with a built-in font, so you may never need this tool. But when you want your <em>own</em> typeface — a chunky title font, a themed UI face — <span class="tt">font2snes</span> converts a font image into the SNES text tiles the text routines draw from.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md504"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md507"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> an indexed <span class="tt">.png</span> holding exactly <b>96 characters</b> (ASCII 32–127, so character 0 is the space), with dimensions that are multiples of 8.</p>
 <p><b>Out:</b> either a binary <span class="tt">.pic</span> of tiles (default), or a C header (<span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></span>) declaring <span class="tt">const unsigned char &lt;name&gt;_data[]</span> you can <span class="tt">#include</span> and upload at runtime.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md505"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md508"></a>
 The flags you will actually use</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,7 +140,7 @@ The flags you will actually use</h2>
 <td class="markdownTableBodyNone"><span class="tt">-v</span>  </td><td class="markdownTableBodyNone">verbose  </td></tr>
 </table>
 <p>Note the argument style: font2snes takes <b>positional</b> <span class="tt">input output</span>, unlike gfx4snes's <span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md506"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md509"></a>
 Worked examples</h2>
 <div class="fragment"><div class="line"># 2bpp font as a C header (drop-in, no separate asset file):</div>
 <div class="line">font2snes -c myfont.png myfont.h</div>
@@ -154,14 +154,14 @@ Worked examples</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;myfont.h&quot;</span></div>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(myfont_data, FONT_VRAM_ADDR, <span class="keyword">sizeof</span>(myfont_data));</div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md507"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md510"></a>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>Exactly 96 glyphs, ASCII 32–127.</b> Character cell 0 must be the space (ASCII 32). The layout is auto-detected — a 128×48 grid (recommended), a 768×8 strip, or any N×M whose cell count is 96.</li>
 <li><b>Positional args.</b> It is <span class="tt">font2snes input output</span>, not <span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span>/<span class="tt">-o</span>.</li>
 <li><b>Optional tool.</b> font2snes is not wired into the build and no example needs it — <span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont</a></span> already gives you a usable font. Reach for font2snes only when you want a custom typeface; see the notes in the <span class="tt">examples/text/</span> README.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md508"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md511"></a>
 Where it fits</h2>
 <p>A side-branch of the <a class="el" href="tools.html" title="The OpenSNES toolbox">The OpenSNES toolbox</a> pipeline: <span class="tt">font.png</span> → font2snes → text tiles. For drawing text with the built-in font (the common case), start from the text examples such as <a class="el" href="examples_text_print_string.html" title="Print a string">Print a string</a> instead. </p>
 </div></div><!-- contents -->

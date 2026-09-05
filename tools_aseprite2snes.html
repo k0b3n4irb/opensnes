@@ -124,14 +124,14 @@ $(function(){initNavTree('tools_aseprite2snes.html','',''); });
 <div class="contents">
 <div class="textblock"><p>Aseprite is where sprite animation is actually authored: frames on a timeline, grouped into named <b>tags</b> (<span class="tt">walk</span>, <span class="tt">idle</span>, <span class="tt">hurt</span>), each with a playback <b>direction</b> and a per-frame <b>duration</b> in milliseconds. That timeline is real design work — and until now none of it survived the trip to the SNES. <span class="tt">gfx4snes</span> turns a spritesheet into tiles and, with <span class="tt">-P</span>, into metasprite geometry, but it has no concept of a tag or a duration. So the animation was retyped by hand into <span class="tt"><a class="el" href="anim_8h.html#a35cf99090ec3c39a40eb25db6f87b05d" title="Declare a static const AnimClip with uniform frame duration.">DECLARE_ANIM_CLIP()</a></span> calls, one frame at a time — the single most tedious, error-prone step left in the sprite pipeline.</p>
 <p>aseprite2snes closes that gap. It reads the JSON Aseprite writes with <span class="tt">--data --list-tags</span> and emits a C header of ready-to-use <span class="tt"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a></span> tables for the <a class="el" href="tutorial_animation.html" title="Animation Tutorial">anim.h player</a> — one clip per tag, frame indices and per-frame tick durations included, playback direction folded into the frame order, looping vs one-shot derived from the tag.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md499"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md502"></a>
 Where it fits</h2>
 <p>aseprite2snes is the animation half of a two-tool sprite step, paired with <span class="tt">gfx4snes -P</span>:</p>
 <div class="fragment"><div class="line">            ┌─ gfx4snes -P    ──► tiles + metasprite pointer table  (oamDrawMeta)</div>
 <div class="line">hero.ase ──►┤</div>
 <div class="line">            └─ aseprite2snes  ──► AnimClip tables, one per tag       (animPlay / animTick)</div>
 </div><!-- fragment --><p>gfx4snes owns the pixels and the metasprite table; aseprite2snes owns the timeline that indexes it. The two outputs meet at the frame value: a clip's frame <em>i</em> selects metasprite <em>i</em>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md500"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md503"></a>
 Usage</h2>
 <div class="fragment"><div class="line">aseprite2snes [options] &lt;export.json&gt;</div>
 <div class="line"> </div>
@@ -146,7 +146,7 @@ Usage</h2>
 <div class="line">         --data hero.json --list-tags --format json-array</div>
 <div class="line">gfx4snes -s 16 -o 16 -u 16 -p -P 2 -i hero.png</div>
 <div class="line">aseprite2snes -o hero_anim.h -p hero hero.json</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md501"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md504"></a>
 The generated header</h2>
 <p>Given tags <span class="tt">walk</span> (per-frame timing), <span class="tt">idle</span> (uniform) and <span class="tt">hurt</span> (ping-pong, play once), you get an <span class="tt"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a></span> per tag plus an index enum and a pointer table over all clips:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> hero_walk_frames[]    = { 0, 1, 2, 3 };</div>
@@ -179,7 +179,7 @@ The generated header</h2>
 <div class="ttc" id="asprite_8h_html_a19ef362e8093598fdbcc437ca54e15e4"><div class="ttname"><a href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a></div><div class="ttdeci">u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">Draw a metasprite (PVSnesLib compatible).</div></div>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:100</div></div>
 <div class="ttc" id="astructAnimPlayer_html"><div class="ttname"><a href="structAnimPlayer.html">AnimPlayer</a></div><div class="ttdoc">A playback head — RAM, 8 bytes, array-friendly.</div><div class="ttdef"><b>Definition</b> anim.h:93</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md502"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md505"></a>
 Mapping rules</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -198,7 +198,7 @@ Mapping rules</h2>
 <td class="markdownTableBodyNone"><span class="tt">repeat</span> = 1  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="anim_8h.html#a4c7972dd8d73f731f0edc53d87a60be4" title="Loop mode: hold the last frame and raise ANIM_F_FINISHED.">ANIM_ONCE</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span> / absent / <span class="tt">&gt;1</span> → <span class="tt"><a class="el" href="anim_8h.html#ac2f8f711a52b203de5a6469e086c963f" title="Loop mode: wrap to frame 0 after the last frame.">ANIM_LOOP</a></span>  </td></tr>
 </table>
 <p><span class="tt">pingpong</span> runs out and back without repeating either endpoint. With no <span class="tt">--list-tags</span> metadata the tool emits a single clip named <span class="tt">all</span> over every frame and warns. Tag and prefix names are sanitised to C identifiers.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md503"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md506"></a>
 Scope</h2>
 <p>v1 is the animation layer only; it never touches image data. Decomposing frames into metasprites, laying out tiles and computing OAM tile numbers are owned by <span class="tt">gfx4snes -P</span> — see <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a>. An out-of-range tag range, missing <span class="tt">frames</span>, or malformed JSON is a hard error with a non-zero exit. </p>
 </div></div><!-- contents -->
