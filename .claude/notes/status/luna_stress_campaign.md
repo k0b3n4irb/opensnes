@@ -315,3 +315,15 @@ regression (`bcd.toml`); test-manifests now 46. No new luna request warranted.
 slivers ≤ 34). luna == Mesen2 byte-for-byte (`0141414141414141`) == documented
 range/time interaction. No finding — luna's OBJ evaluation and the SDK's
 oamSet+NMI-OAM-DMA path both correct. Locked; test-manifests now 47.
+
+## Observation pending owner validation (2026-09-03, luna v1.17.0)
+
+- **`--input` is ignored when the run ends with `--until-frame`.** Same ROM,
+  same script: `luna state -n 5000000 --input "10:0x0100" …` drives the pad
+  (mode7/perspective `sx` moves, dsp1_ground turns); `luna state --until-frame
+  130 --input "10:0x0100,130:0" …` leaves the pad state at zero and the WRAM
+  untouched. Not yet reduced to a minimal repro nor cross-checked against the
+  docs' intended semantics (maybe `--until-frame` runs a different loop that
+  never latches checkpoints). Workaround in the harness: keep `-n` for
+  scripted-input runs (which is what `probes/lib.py` and the manifests do).
+  Owner to validate before any luna issue is filed.

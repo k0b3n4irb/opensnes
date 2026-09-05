@@ -72,3 +72,8 @@ steps = [3_000_000, 6_000_000]
 [examples."chips/dsp1_cube"]
 firmware = "dsp1b.rom"
 steps = [3_000_000, 6_000_000]
+
+# DSP-1 ground: the coprocessor streams the floor every frame and the camera
+# idles, so one capture point suffices; firmware-gated like dsp1_cube.
+[examples."mode7/dsp1_ground"]
+firmware = "dsp1b.rom"

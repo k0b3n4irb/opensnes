@@ -104,8 +104,8 @@
     "rom_sha256": "1eeca2b4aaa6daa9c107775fec5c8b9da31b0eb104be55b4d8651b295dd98dc0"
   },
   "chips_dsp1_cube": {
-    "stream": "6783392b873cb971d037ca1954d739daea06f7cc160ad405e1d02f2123409d9e",
-    "rom_sha256": "59865ee8a154c41c491d6ac3cc236a4db05a0eeea38bb147b345e9a9d9304619"
+    "stream": "ea275e54513722b35abac8b4df085984164a9b9618884080a566adfa8e70fa6c",
+    "rom_sha256": "becdbfc2d83b30230a22a6f56037c65cc5b3b6316142a4f3d8687a5707897f74"
   },
   "chips_sa1_hello": {
     "stream": "3e271cb2af38b20390631a2e4cf651becb2deea47976eda21d6073c6dcffe0c2",
@@ -250,6 +250,10 @@
   "memory_save_game": {
     "stream": "f33c3416aa7e8c4900e1f13ec958f865928aa12ac8dbe6c123cd1687f341ad68",
     "rom_sha256": "4edaaec1e91c3bd1d3a68a1e518031022d00cf0023faa21294b9d293b3464fd6"
+  },
+  "mode7_dsp1_ground": {
+    "stream": "6992ce7f1d19c5509aae669e7aa69a13cf0f99b6e87d2ef644b929f7e26dc7ce",
+    "rom_sha256": "3bd94a064df30474e23e1c3654fd9ce75b5e01040b1f4799ee858ea01e915554"
   },
   "mode7_perspective": {
     "stream": "07e58d6acf1c9d69f47971077b5564729497c1db047ef91ba58bf8452e62b14f",

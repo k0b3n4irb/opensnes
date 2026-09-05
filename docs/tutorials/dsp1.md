@@ -65,6 +65,8 @@ that can exceed ±1.0.
 | `dsp1Objective(x,y,z)` | `$0D` | 3 → 3 | transform a point by the matrix |
 | `dsp1Parameter(…)` | `$02` | 7 → 4 | set up the projection plane |
 | `dsp1Project(x,y,z)` | `$06` | 3 → 3 | world point → screen H, V + scale M |
+| `dsp1Target(h,v)` | `$0E` | 2 → 2 | screen point → ground plane (pick / aim) |
+| `dsp1Raster(ab,cd,vs,n)` | `$0A` | 1 → 4·n (stream) | per-scanline Mode 7 matrices into HDMA payloads |
 | `dsp1Distance(x,y,z)` | `$28` | 3 → 1 | true 3D length (hardware sqrt) |
 | `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: ≤0 = inside |
 
@@ -108,9 +110,52 @@ treat them as measured behaviour, not gospel:
   natural driver for sizing sprites with distance.
 
 Copy those two `dsp1Parameter` values as your starting point and tune
-from there; `Parameter`'s seven scalars are only partially understood
-(the third and fourth output words are still unconfirmed — see
-`.claude/notes/tech/dsp1_reference.md` for the open questions).
+from there. Its four output words are **Vof, Vva, Cx, Cy** (official
+manual §5.4.1, verified on luna): the raster of the "imaginary centre",
+the horizon raster relative to it, and the ground point under that
+centre. They are what the ground pipeline below runs on.
+
+## The ground (what dsp1_ground does)
+
+The reason the chip was on the Super Mario Kart cartridge: the **Raster**
+command. Give it a camera and it streams, per scanline, the 2×2 Mode 7
+matrix that projects the ground plane — perspective *and* rotation, A,
+B, C and D — as an open-ended stream the CPU stops with a sentinel. The
+lib wraps the whole transaction:
+
+```c
+dsp1Parameter(x, y, height, 96, 256, heading, tilt);
+vof = dsp1_o0;  vva = dsp1_o1;  cx = dsp1_o2;  cy = dsp1_o3;
+
+/* ground = rasters Vva+2 .. (Vva+1 is the singular horizon line),
+ * on screen lines 112+Vof+Vva+2 .. 223                          */
+dsp1Raster(&tab_ab[HDR], &tab_cd[HDR], vva + 2, lines);
+
+/* VBlank: swap the HDMA tables and pin the centre */
+hdmaSetTable(CH_AB, tab_ab);  hdmaSetTable(CH_CD, tab_cd);
+mode7SetCenter(cx, cy);
+mode7SetScroll(cx - 128, cy - (112 + vof));
+```
+
+`tab_ab`/`tab_cd` are `HDMA_MODE_2REG_2X` repeat blocks (M7A/M7B on one
+channel, M7C/M7D on the other) whose payload the chip fills directly;
+`HDR` is the header the caller lays out. Three things to know:
+
+- **Raster numbers are down-positive and relative to the screen
+  centre**, unlike `dsp1Project`'s up-positive V. The horizon is on
+  screen line `112 + Vof + Vva`; `Vof` is where the firmware parks its
+  reference line (0 when looking well down, positive when the horizon is
+  near or below the centre).
+- **The D values are slopes relative to the imaginary centre line**, so
+  M7VOFS must put the pivot (M7X/M7Y = Cx/Cy) on that line — the
+  `mode7SetScroll` above. Get this wrong and the ground shears.
+- **Cost**: ≈ 50 µs per raster (per-word RQM handshake, 4 words), so a
+  126-line floor is ≈ 40 % of a frame. Super Mario Kart streams 96 lines
+  per frame. Double-buffer the tables and fill the back set during active
+  display, as the example does.
+
+`dsp1Target(h, v)` is the inverse for the same plane: the ground point
+under a screen pixel, in raster coordinates (Target(0, 0) = Cx/Cy).
 
 ## Distance and Range: the game-logic commands
 
@@ -146,6 +191,15 @@ issues a DSP-1 call while the main loop is mid-transaction, both are
 corrupted — same class as the `fixMul()` restriction in
 `KNOWN_LIMITATIONS.md`. Keep all DSP-1 work in the main loop.
 
+### 🟡 A Raster stream cannot be "resynced" — let the lib close it
+
+`dsp1Init()`'s `$80` Sync recovers an interrupted *fixed-length* command,
+not an open stream: inside a Raster stream every byte pair is swallowed
+as a 16-bit word, so a wedged stream never returns to command mode until
+`$8000` lands on a D slot. `dsp1Raster()` always closes its stream; do
+not hand-roll `$0A` (and never `$1A`, which the DSP-1B firmware never
+returns from — measured on luna, see the reference note).
+
 ### 🟡 Throughput is per-byte
 
 Every word costs two RQM-gated byte moves. The cube's 8 vertices ×
@@ -155,7 +209,8 @@ Parameter when the camera moves, and batch what you can.
 
 ## See also
 
-- [`examples/chips/dsp1_cube`](../../examples/chips/dsp1_cube/README.md) — the worked example
+- [`examples/chips/dsp1_cube`](../../examples/chips/dsp1_cube/README.md) — the 3D pipeline example
+- [`examples/mode7/dsp1_ground`](../../examples/mode7/dsp1_ground/README.md) — the Raster ground example
 - `snes/dsp1.h` — full API reference with per-slot types
 - `.claude/notes/tech/dsp1_reference.md` — command reference + open questions
 - [SA-1 tutorial](sa1.md), [Super FX tutorial](superfx.md) — the other chips
