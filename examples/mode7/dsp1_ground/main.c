@@ -84,9 +84,9 @@ extern u8 sky_map[], sky_map_end[];
 #define CH_CD    HDMA_CHANNEL_4
 
 /** @brief Double-buffered M7A/M7B tables: HDMA reads one while the DSP-1 fills the other. */
-static u8 tab_ab[2][TABLE_SIZE];
+static FAR u8 tab_ab[2][TABLE_SIZE];
 /** @brief Double-buffered M7C/M7D tables. */
-static u8 tab_cd[2][TABLE_SIZE];
+static FAR u8 tab_cd[2][TABLE_SIZE];
 /** @brief BGMODE table: Mode 3 for the sky lines, then Mode 7 for the rest. */
 static u8 tab_mode[5];
 /** @brief TM table: BG2 (sky) for the sky lines, then BG1 (ground). */
@@ -118,7 +118,7 @@ volatile u16 raster_lines = 0;
  * @param lines ground rasters (repeat entry: 4 bytes written every line)
  * @param diag  value of the diagonal term in the sky entry (A or D)
  */
-static void tableInit(u8 *t, u8 sky, u8 lines, u16 diag) {
+static void tableInit(u8 FAR *t, u8 sky, u8 lines, u16 diag) {
     t[0] = sky;
     t[1] = (u8)diag;  t[2] = (u8)(diag >> 8);   /* A (or C): identity 1.0 / 0 */
     t[3] = 0;         t[4] = 0;                 /* B (or D) sky value: see caller */

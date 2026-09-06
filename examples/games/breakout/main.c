@@ -126,7 +126,7 @@ extern const char str_blank[];
  * Modified at runtime when bricks are destroyed and HUD text updates.
  * DMAs to VRAM $0000-$07FF each time visuals change.
  */
-extern u16 blockmap[];
+extern FAR u16 blockmap[];
 /**
  * @brief BG3 tilemap RAM copy (0x400 entries = 2KB) at WRAM $1000.
  *
@@ -134,16 +134,16 @@ extern u16 blockmap[];
  * DMAs to VRAM $0400-$0BFF. Overlaps BG1 at VRAM $0400-$07FF, so
  * both must be uploaded atomically in the same VBlank.
  */
-extern u16 backmap[];
+extern FAR u16 backmap[];
 /** @brief Palette RAM copy (0x100 entries = 512 bytes) at WRAM $1800 */
-extern u16 pal[];
+extern FAR u16 pal[];
 /**
  * @brief Mutable brick state array (100 entries, one per grid cell).
  *
  * Values 0-7 = active brick with that color, 8 = destroyed/empty.
  * Initialized from the ROM brick_map[] template at each level start.
  */
-extern u8  blocks[];
+extern FAR u8  blocks[];
 
 /*============================================================================
  * Game State Variables
@@ -199,7 +199,7 @@ static s16 pos_y;             /**< Ball Y pixel position */
  *   Bit 14:     H-flip
  *   Bit 15:     V-flip
  */
-static void writestring(const char *st, u16 *tilemap, u16 pos, u16 offset) {
+static void writestring(const char *st, u16 FAR *tilemap, u16 pos, u16 offset) {
     u16 sp = pos;  /* Start position for newline handling */
     u8 ch;
 
@@ -224,7 +224,7 @@ static void writestring(const char *st, u16 *tilemap, u16 pos, u16 offset) {
  * @param pos     Starting position (leftmost digit position)
  * @param offset  Value added to digit (0-9) to get tile index
  */
-static void writenum(u16 num, u8 len, u16 *tilemap, u16 pos, u16 offset) {
+static void writenum(u16 num, u8 len, u16 FAR *tilemap, u16 pos, u16 offset) {
     u8 figure;
     pos += len - 1;  /* Start at rightmost position */
 
@@ -248,7 +248,7 @@ static void writenum(u16 num, u8 len, u16 *tilemap, u16 pos, u16 offset) {
  * Used instead of library memcpy to avoid bank addressing complexity.
  * Works for Bank 0 addresses only (ROM $8000+ and RAM $0000-$1FFF).
  */
-static void mycopy(u8 *dest, const u8 *src, u16 len) {
+static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
     while (len--) {
         *dest++ = *src++;
     }
@@ -403,8 +403,8 @@ static void new_level(void) {
      * that hide tile boundaries. Patterns 1-3 use multi-shade tiles that
      * create visible banding. Reuse pattern 0 for all levels; the palette
      * cycling already provides visual variety per level. */
-    mycopy((u8 *)backmap, bg2map0, 0x800);
-    mycopy((u8 *)blocks, brick_map, 100);
+    mycopy((u8 FAR *)backmap, bg2map0, 0x800);
+    mycopy((u8 FAR *)blocks, brick_map, 100);
 
     /* Update level display in tilemap */
     writenum(level2, 8, blockmap, 0x2D6, 0x426);
@@ -418,7 +418,7 @@ static void new_level(void) {
      * backpal.dat contains 7 sets of 8 colors (7 x 16 bytes).
      * Each set replaces CGRAM colors 16-23 (byte offset 32) = BG3 palettes 4-5.
      * This changes the background pattern color each level. */
-    mycopy((u8 *)pal + 32, backpal + color * 16, 0x10);
+    mycopy((u8 FAR *)pal + 32, backpal + color * 16, 0x10);
 
     /* BRICK INITIALIZATION:
      * Each brick is 2 tiles wide. The brick array contains color values 0-7.
@@ -451,9 +451,9 @@ static void new_level(void) {
      * disables rendering so VRAM writes are accepted at any time. */
     WaitForVBlank();
     setScreenOff();
-    dmaCopyCGram((u8 *)pal, 0, 256 * 2);
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
-    dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
+    dmaCopyCGram((const u8 *)pal, 0, 256 * 2);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)backmap, 0x0400, 0x800);
     setScreenOn();
 
     draw_screen();
@@ -472,7 +472,7 @@ static void new_level(void) {
     writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
     writestring(ST_BLANK, blockmap, 0x289, 0x3F6);
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 }
 
 /**
@@ -483,7 +483,7 @@ static void die(void) {
         /* Game over - display message and halt */
         writestring(ST_GAMEOVER, blockmap, 0x267, 0x3F6);
         WaitForVBlank();
-        dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
         while (1) { WaitForVBlank(); }
     }
 
@@ -504,7 +504,7 @@ static void die(void) {
     writenum(lives, 8, blockmap, 0x136, 0x426);
     writestring(ST_READY, blockmap, 0x248, 0x3F6);
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 
     draw_screen();
 
@@ -517,7 +517,7 @@ static void die(void) {
     writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
     writestring(ST_BLANK, blockmap, 0x289, 0x3F6);
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 }
 
 /*============================================================================
@@ -531,7 +531,7 @@ static void handle_pause(void) {
     if ((pad0 & KEY_START) != 0) {
         writestring(ST_PAUSED, blockmap, 0x269, 0x3F6);
         WaitForVBlank();
-        dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 
         /* Wait for START release, press, release sequence */
         do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
@@ -540,7 +540,7 @@ static void handle_pause(void) {
 
         writestring(ST_BLANK, blockmap, 0x269, 0x3F6);
         WaitForVBlank();
-        dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
     }
 }
 
@@ -679,8 +679,8 @@ static void remove_brick(void) {
 
     /* ATOMIC DMA: Both tilemaps in same VBlank (overlap at 0x0400-0x07FF) */
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
-    dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)backmap, 0x0400, 0x800);
 
     /* Level complete? */
     if (blockcount == 0) {
@@ -788,10 +788,10 @@ int main(void) {
     dmaCopyVram(tiles2, 0x2000, 0x0250);  /* 592 bytes of sprite tiles */
 
     /* Copy ROM data to RAM for runtime modification */
-    mycopy((u8 *)blockmap, bg1map, 0x800);
-    mycopy((u8 *)backmap, bg2map, 0x800);
-    mycopy((u8 *)blocks, brick_map, 100);
-    mycopy((u8 *)pal, palette, 0x200);
+    mycopy((u8 FAR *)blockmap, bg1map, 0x800);
+    mycopy((u8 FAR *)backmap, bg2map, 0x800);
+    mycopy((u8 FAR *)blocks, brick_map, 100);
+    mycopy((u8 FAR *)pal, palette, 0x200);
 
     /* Initialize game state */
     blockcount = 0;
@@ -842,9 +842,9 @@ int main(void) {
      * CRITICAL: Both tilemaps must be uploaded in the SAME VBlank
      * because they overlap at 0x0400-0x07FF! */
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
-    dmaCopyVram((u8 *)backmap, 0x0400, 0x800);
-    dmaCopyCGram((u8 *)pal, 0, 256 * 2);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)backmap, 0x0400, 0x800);
+    dmaCopyCGram((const u8 *)pal, 0, 256 * 2);
 
     /* SPRITE CONFIGURATION:
      * 8x8/16x16 sprites, name base=0, name select=0
@@ -883,7 +883,7 @@ int main(void) {
     writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
     writestring(ST_BLANK, blockmap, 0x289, 0x3F6);
     WaitForVBlank();
-    dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+    dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 
     /* Main game loop */
     while (1) {

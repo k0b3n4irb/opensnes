@@ -65,6 +65,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_sram -- SRAM Battery-Backed Saves
 
+@subpage tutorial_far_ram -- Far RAM (FAR objects beyond the 8 KB band)
+
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
 @subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor

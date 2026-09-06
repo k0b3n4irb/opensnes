@@ -1,6 +1,6 @@
 # Chantier B2 — C RAM beyond the 8 KB band (`__far` objects in bank $7E)
 
-**Status:** PLANNED (2026-09-05), not started. Branch `wip/b2-far-ram`,
+**Status:** DONE (2026-09-06) — Phases 0–4 on `wip/b2-far-ram`; ready to squash-merge into develop as a MINOR release. Follow-ups: the `cst`/`farram` flag pinning loads in QBE's optimiser (§10b); the HDMA A2A/NTRL hardware claim to verify against the corpus (§10f). Branch `wip/b2-far-ram`,
 squash-merge as `feat(compiler,runtime,lib,docs): …`, MINOR release.
 **Catalogue entry:** `.claude/STRUCTURAL_DEFECTS.md` §B2 (🔴). This note is
 the execution plan; the catalogue keeps symptom / acceptance.
@@ -189,7 +189,352 @@ Fixture green; corpus green on all three pillars plus the WRAM oracle;
 breakout migrated with identical visuals; `KNOWN_LIMITATIONS.md`, `ABI.md`,
 tutorial and catalogue updated; `FAR` documented in `<snes/types.h>`.
 
+
+## 8. Phase 0 outcome (2026-09-05)
+
+### 8a. The gate fixture — `devtools/compiler-tests/runtime/b2_far_ram/`
+
+Objects placed by hand in `.RAMSECTION ".b2_far" BANK $7E SLOT 2`, accessed
+from plain C. Wired into `make test-compiler` with the red cells as xfail
+(an XPASS flags a stale entry once Phase 2 lands).
+
+| Cell | Form | Today |
+|---|---|---|
+| `r_dir8/16/32` | symbol-direct load/store | red — `lda.w sym` / `sta.w sym`, DBR-relative (bank 0). *Read as green in the first Phase-0 run: store-to-load forwarding had replaced the load* |
+| `r_fld8/16/32` | struct field via symbol | red — same `.w` forms |
+| `r_hi` | bank byte of `&far_obj` | **green** (`$7E`) |
+| `r_idx8/16` | `sym[idx]`, runtime idx | red — Kl add + `tax` + `lda.l/sta.l $0000,x` |
+| `r_ptr8/16` | runtime pointer deref | red — same bank-blind forms |
+| `r_ptr32` | runtime pointer, 32-bit | red — the **load** is already far (`[tcc__r9],y`), the **store** is not |
+| `r_par8/parl8` | pointer through a param | red — RSlot path, bank-blind |
+| `c0_*` | bank-0 controls | green |
+
+Two cells passed by accident in the first run, both through store-to-load
+forwarding: the param cell (the callee returned the value it had just
+stored) and — found only once the far taint blocked forwarding in Phase 1 —
+the direct-symbol cells (QBE had folded `x = far_u8` into the constant just
+stored). Lesson for the fixture: a "green" cell is only meaningful when the
+load is opaque; the taint makes every far access opaque, and the bank-0
+controls stay forwardable on purpose (they test nothing about banks).
+
+Corrected reading: **every** far access form is bank-blind today, including
+symbol-direct (`lda.w sym`, emit.c 3896/3979; `sta.w sym`, 913/3694/3770/
+3832). The linker-24-bit `lda.l sym` form exists only under the const taint
+(3958/4002). Phase 2 starts there: it is the cheapest slice (`.w` → `.l`,
++1 cycle, +1 byte) and turns six cells green.
+
+### 8b. Emit sites that assume bank 0 for a runtime address (`compiler/qbe/w65816/emit.c`)
+
+| Site | Form | Fix in Phase 2 |
+|---|---|---|
+| 3715, 3752, 3785, 3850 | `sta.l $0000,x` (byte/word/long-low stores) | far-tainted → `sta [tcc__r9]` / `sta.l sym,x` |
+| 3987, 4042 | `lda.l $0000,x` (word / byte loads) | already have a far twin under `volat & 2`; key both taints |
+| 913, 3694, 3770, 3832 / 3896, 3979 | `sta.w sym` / `lda.w sym` symbol-direct (DBR-relative) | far-tainted → `sta.l sym` / `lda.l sym` |
+| `Ostorel` high half | `sta.l $0002,x` | `,y` = 2 through the same base |
+| 387 `temp_addr_only` + `is_high_dead_propagating` | drops the bank byte of address temps because every consumer discards it | exclude far-tainted consumers |
+| 937 / 4857 indexed-long load fusion | `add($sym, idx)` + cst load → `lda.l sym,x` | mirror for stores; key on the far taint too |
+| 981 `mark_addr_only_kl` premise | "bank-discarding opcodes" list | same exclusion |
+| `compiler/qbe/emit.c` 159 / 293 / 333 | `.RAMSECTION ".bss.N" BANK 0 SLOT 1`, `.data_init.N` records `{addr16,size16}` | far kind → `BANK $7E SLOT 2`; record gains a bank byte |
+| `templates/crt0.asm` 738 `CopyInitData` | `(tcc__r2),y` 16-bit destination, DBR = 0 | `[tcc__r2],y` with the record's bank |
+| `templates/crt0.asm` 515–520 zero-fill | `$0000–$1FFF` only | add the `$7E:2000–$FFFF` fill (DMA to `$2180`) |
+
+Lib audit: the hand-written ASM has **zero** DBR-relative indirect derefs
+(`(dp),y`); every pointer walk is `[tcc__r0],y` (apu, lzss, snesmod) —
+bank-honouring already. The C lib functions that take a *non-const* pointer
+and would deref a far object bank-blind: `rectInit/SetPos/GetCenter/Contains`,
+`collidePoint/Rect/RectEx`, `animTick/Restart`, `audioGetSampleInfo/VoiceState`,
+`sramLoad/LoadOffset`, `dsp1Raster` (ASM, far-safe), `irqSet*`/`objInitFunctions`
+(code pointers, n/a). Phase 3 list.
+
+### 8c. The cost — `devtools/benchrom/b2_deref/` (`make -C … && python3 bench.py`)
+
+Per access, loop overhead subtracted, one small-frame function per loop
+(the first cut put every loop in `main`, blew the 255-byte frame and put
+every local through `[tcc__fp],y`; those numbers were noise). Ratios matter,
+absolutes are this compiler's stack-temp style.
+
+| Access | near (today) | far (the #121 path a far object would get) | Δ |
+|---|---|---|---|
+| byte load, runtime pointer | 128 | 191 (`[tcc__r9]`) | **+50 %** |
+| word load, runtime pointer | 132 | 237 | **+80 %** |
+| byte load, `sym[idx]` | 125 | 105 (`lda.l sym,x`) | **−16 %** |
+| byte store, runtime pointer | 100 | — (no far store path yet) | expect ≈ +60 |
+| byte store, `sym[idx]` | 97 | — | expect ≈ near (fusion) |
+
+Reading: the far pointer path pays for **restaging the 24-bit pointer into
+`tcc__r9` at every access** (three DP stores), not for the `[dp]` addressing
+itself (+1 cycle). Symbol-indexed far is free — better than near, because the
+near path materialises the address in a Kl temp first. So:
+
+- **Option (A) confirmed by data**: far-by-default (B) would tax every
+  pointer walk +50–80 % today. (A) costs nothing on `sym[idx]` and on
+  symbol-direct, which is what bulk buffers mostly are.
+- **Phase 2 optimisation worth doing while in there**: hoist the `tcc__r9`
+  staging when the pointer temp is unchanged between accesses (loop-invariant
+  base, varying `y`), which turns the far pointer walk into `lda [tcc__r9],y`
+  per access — near parity. Also the 32-bit far load already exists; make the
+  far word load a single 16-bit `lda [tcc__r9]` (the byte path does
+  `sep/lda/rep/and`).
+
+## 9. Phase 1 outcome (2026-09-05) — the qualifier, end to end
+
+Shipped in the submodules (cproc `feat/b2-far-qualifier`, qbe
+`feat/b2-far-qualifier`) and `lib/include/snes/types.h` (`FAR`, empty under
+the clang syntax lint since host compilers have no address spaces).
+
+- **cproc**: `QUALFAR = 1<<5`, keyword `__far`, parsed with the other
+  qualifiers, propagates through pointer types. Loads *and stores* through a
+  far lvalue carry access-flag bit 4; objects get `section ".far"`.
+  Diagnostics: static storage required, `__far const` refused, and a plain
+  assignment dropping `__far` from a pointer is an error — cproc only checked
+  qualifier discards in initialisers and arguments (`exprassign`), never in
+  `p = q` (`mkassignexpr`), which is the one path that would have turned a
+  far pointer into a bank-blind deref silently. Explicit casts still work.
+- **QBE**: keyword `farram` (`far` collides with `sb` in the lexer's perfect
+  hash — see `parse.c` K/M), bit 4 on the instruction; `section ".far"` →
+  `.RAMSECTION ".far.N" BANK $7E SLOT 2`; initialised far data dies with a
+  Phase-2 pointer.
+- **cproc's qualifier model, learned the hard way**: `declarator()` stores
+  the *base* qualifiers on each derived type — a pointer type's `qual` is its
+  pointee's, an array type's `qual` is its element's — and returns the derived
+  type's own quals as the declaration's `d->qual`. Two consequences:
+  1. the object-qualifier rule is `d->qual | (array types' qual, walking
+     nested arrays)`, never `type->qual` of a pointer;
+  2. the pre-existing `.rodata` decision did consult `d->type->qual`, so a
+     mutable `const T *p = …` global (or an array of pointers to const,
+     `hero_metasprites[4]` in sprites/aseprite_pipeline) was sectioned into
+     ROM. Masked for zero-initialised pointers (QBE's pure-bss branch wins),
+     live for initialised ones — writes would have been silently lost. Fixed
+     by the same `objqual()`; the aseprite WRAM baseline moved (16 bytes
+     ROM→RAM+init record), visuals identical.
+- **Fixture honesty**: with the far taint blocking store-to-load forwarding,
+  the direct-symbol cells turned red — they had been green in Phase 0 only
+  because QBE folded the load into the stored constant. All 13 far cells are
+  now xfail; only the bank byte of `&far_obj` is green. `make test-compiler`
+  green (5/5 + 13 xfail), corpus visual 85/85, WRAM 85/85 after the one
+  justified update.
+- **Clock skew bit again** (`clock_skew_incremental_builds.md`): the first
+  `make compiler` after the edits rebuilt nothing — objects were dated 23
+  minutes in the future. Every compiler rebuild in this chantier is
+  `make -C compiler/{cproc,qbe} clean && make compiler`, and the corpus was
+  rebuilt from clean before the oracle.
+
+Phase 2 order, cheapest first: (1) symbol-direct `.w` → `.l` under the far
+flag (six cells); (2) `sym[idx]` store fusion + load fusion keyed on far
+(two cells); (3) runtime pointer stores via `[tcc__r9]` and the Kl store
+high half, params fall out (five cells); (4) `temp_addr_only` exclusion;
+(5) `tcc__r9` staging hoist; (6) initialised far data + CopyInitData bank +
+crt0 zero-fill of `$7E:2000–$FFFF`.
+
+## 10. Phase 2 outcome (2026-09-06) — the backend, end to end
+
+All 25 fixture cells green (13 former xfail + 8 new: u32 `sym[idx]`,
+struct fields through a far pointer, a far pointer walk, initialised far
+data, the boot zero-fill). `KNOWN_FAIL` is empty; an XPASS/FAIL now names
+the emit path. `devtools/compiler-tests/cases/far_ram_forms.checks` pins
+the forms at compile time.
+
+### 10a. Codegen (`compiler/qbe/w65816/emit.c`)
+
+- One predicate, `is_far(i)` = `volat & 6` (const #121 **or** far B2):
+  every #121 load path is now keyed on it; the store paths got their far
+  twins. Symbol-direct: `lda.l/sta.l sym[+off]` (word, byte, Kl both
+  halves). `stz` has no long form — far zero stores take `lda #0`.
+  Byte-pair store fusion is far-aware (`emit_sta_conaddr(…, far)`).
+- **Address decomposition** (`mark_far_decomp`, replaces the single-use
+  `try_fuse_cst_index_load`): a far access whose address temp is a Kl
+  `add` uses the add's operands —
+  `add $sym, idx` → `emitload(idx); tax; lda.l/sta.l sym+off,x`;
+  `add %p, N` → stage `p` in tcc__r9, `ldy #N`, `[tcc__r9],y`;
+  `add %p, idx` → stage `p`, `emitload(idx); tay`, `[tcc__r9],y`
+  (base = the Kl operand; when both are Kl the index is the one with
+  `temp_high_zero`, else no decomposition). When every use of the add is
+  such an access the add is not emitted (`far_decomp_all`) and its
+  index operand's high half is dead (addr_only), its base's is a
+  blocking use (the bank byte). Kl accesses reach the high half with
+  `+2,x` / `ldy #N+2` / `iny iny`.
+- **tcc__r9 cache** (`r9_ref`/`r9_valid`): `emit_cst_ptr_setup` skips
+  the 3-store staging when the same ref is already there. Dropped at
+  every block label and before any op that is not a load/store (Kl
+  arithmetic and mul bodies use tcc__r9 as scratch; phi copies write
+  temps). `p->a = …; p->b = …` stages once.
+- `mark_addr_only_kl`: far loads AND stores are blocking uses (they read
+  the bank byte through `[tcc__r9]`); the previous `Ostore* → always
+  addr_use` rule was the pre-B2 "stores are bank-blind" premise.
+- `temp_high_zero` now covers `extub`/`extuh` into Kl, not only `extuw`
+  (cproc widens a u8/u16 index with those). Side effect on the whole
+  corpus: the `Omul Kl pow2` / `Oshl Kl` narrow paths fire for u8/u16
+  indices too (fewer cross-half `asl/rol`) — WRAM oracle drift, benign.
+  `Oextub`/`Oextuh` also skip the high-half zero store when addr_only.
+- Byte loads through an alloc'd local are excluded from the far pointer
+  path (`getallocslot < 0`): a stack local's address temp has no valid
+  bank half.
+
+### 10b. cproc — attempted and REVERTED: `accessqual()`
+
+`e->qual | e->type->qual` (A2) taints a load of a **pointer variable**
+with its pointee's qualifiers (cproc keeps them on the pointer type): a
+`T FAR *p` global reads as `lda.l p` (+1 cycle, correct) and, through a
+struct pointer, takes the whole [tcc__r9] path; `const T *p` has done
+the same since #121. A one-line fix (`accessqual()`: pointer-/array-typed
+expressions contribute only `e->qual`) was tried and **reverted**: any
+non-zero access flag also pins the load in QBE's optimiser (`gcm.c`,
+`mem.c`, `load.c` test `i->volat` as a whole), so unpinning changed the
+IR of 18 lib modules (allocs promoted away — `temp N: slot=-1 alloc=2`
+— loads forwarded) and broke three examples at frame-equal comparison
+(hdma/gradient_colors and hdma/hdma_helpers: CGRAM entry 1 zeroed;
+basics/random: static screen). That is a latent QBE-optimiser-vs-backend
+bug unmasked by wider optimisation, not a B2 matter. **Follow-up
+chantier**: split the flag (bit 1 `cst` / bit 4 `farram` must not imply
+"volatile" in the optimiser passes; only bit 0 should), then fix whatever
+the promotion/forwarding exposes, with those three examples as the gate.
+The taint asymmetry is harmless meanwhile — it only ever adds a far path.
+
+### 10c. Data + runtime
+
+- Init record is `{addr16, bank8, size16, bytes}` (5-byte header, no
+  pad: `.data_init` is SEMIFREE in bank $00 and the ratchet sits at 12
+  bytes on some examples). QBE emits `.db :sym`; `CopyInitData` reads
+  the bank into `tcc__r2+2` and copies with `sta [tcc__r2],y`; the source
+  stays `(tcc__r1),y`. End marker `.dw 0 / .db 0 / .dw 0`
+  (`templates/data_init_{start,end}.asm`).
+- Initialised far objects: `.RAMSECTION ".far.N" BANK $7E SLOT 2` + a
+  record with bank $7E (the Phase-1 `die()` is gone).
+- crt0 zero-fills `$7E:2000-$FFFF` at boot with one fixed-source DMA to
+  `$2180` (`ZeroByte` in `.start`), before `InitHardware`, NMI still off.
+  Measured with luna (`stats.total_mclk` across the `sta $420B`): **472 730
+  master cycles = 22.0 ms**, 1.32 NTSC frames, once. NMI enable and the
+  first game frame shift by that much; the corpus visual baselines that
+  capture at a fixed instruction count moved on 8 animated examples for
+  this reason alone (verified: same list minus those 8 with the fill
+  compiled out).
+- `symmap.py --check-ram-budget` prints a second line: far band top, free
+  bytes, and how much of it is C `__far` (`.far.N` sections). No
+  threshold.
+
+### 10d. Cost (devtools/benchrom/b2_deref, cycles per access, loop overhead subtracted)
+
+| Access | near | `__far` | Δ |
+|---|---|---|---|
+| byte load, runtime pointer walk `p[k]` | 116 | 121 (`[tcc__r9],y`) | +4 % |
+| word load, runtime pointer walk | 132 | 137 | +3 % |
+| byte load, `sym[k]` | 107 | 88 (`lda.l sym,x`) | −18 % |
+| byte store, runtime pointer walk | 88 | 74 (`[tcc__r9],y`) | −17 % |
+| byte store, `sym[k]` | 79 | 41 (`sta.l sym,x`) | −48 % |
+
+Phase 0 had measured +50 / +80 % for the pointer walks: that was the
+per-access re-staging of tcc__r9 (three DP stores) plus the Kl address
+materialisation. The decomposition removes both; what remains is the
+`[dp],y` form itself (+1 cycle) and the per-iteration staging at the
+loop-body label. The `sym[idx]` forms beat near because near still
+materialises the 24-bit address in a Kl temp before `tax`.
+
+### 10e. Corpus validation
+
+- Coverage 83 OK / 2 INPUT-DEP (unchanged). `make test-compiler` 18/18 +
+  56 compile-only. Fixture 25/25.
+- Visual regression: 18 labels moved. Verified by a **frame-indexed**
+  comparison against a reference build of the previous commit
+  (`scratchpad/frame_compare.py`: binary-search the step count where
+  `scheduler.frame_count` reaches F, `--print-fbhash` both ROMs there,
+  allow ±3 frames for the boot offset): 15 self-animating labels match
+  at frames 200 and 400; `basics/random` differs only by its boot-time
+  seed; the two `hdma/*` labels were glitched baselines (§10f). Two causes for the instruction-count
+  drift: the 22 ms zero-fill (8 labels) and fewer instructions per frame
+  from the `temp_high_zero` widening (`extub`/`extuh` sources, small
+  scales) — the narrow `mul`/`shl` paths now fire on u8/u16 indices.
+- WRAM oracle: all 85 drift (expected: crt0 + codegen), `--update`d.
+
+### 10f. Found on the way: HDMA enabled mid-frame runs on stale A2A/NTRL (lib fix)
+
+Three labels still differed at frame-equal comparison after the drift
+analysis. Bisected over {zero-fill, extub addr-only skip, high-zero
+widening}: `basics/random` and `hdma/gradient_colors` follow the
+zero-fill only (random seeds from the frame counter at boot; gradient
+below); `hdma/hdma_helpers` followed none of them. Both HDMA cases have
+the same mechanism, which the hdma_helpers example already documents in
+`stopCurrentEffect()`: the PPU copies A1T → A2A and loads the first table
+entry only at the start of a frame, for channels enabled at that moment.
+A channel enabled during active display (`setScreenOn(); hdmaSetup();
+hdmaEnable()`) runs from the next HBlank with whatever A2A/NTRL hold —
+zero at reset — so it reads a "table" at `$00:0000`, i.e. the `tcc__r*`
+scratch bytes, and writes that residue to the destination register.
+What the residue is depends on what ran before (CopyInitData leaves
+different values with the 5-byte record) and on the exact scanline of the
+enable (the 22 ms zero-fill moved it): the **reference baselines
+themselves carried the glitch** — gradient_colors with CGRAM entry 2
+zeroed (a black band in the logo frame), hdma_helpers with BG1HOFS stuck
+at 2. luna showed both (`ppu.cgram`, `ppu.bgs[0].h_scroll`).
+
+Fix at the lib layer (`lib/source/hdma.asm`, the three `hdmaSetup*`):
+preset A2A = A1T and NTRL = 1 after programming the table, so the next
+HBlank reloads the real first entry and a mid-frame enable starts the
+table one line late and clean. Verified with luna: palette entries 1-15
+equal the ROM palette, h_scroll 0, and both examples render identically
+at frame-equal comparison between builds with and without the zero-fill
+(deterministic against boot timing now). The HBlank procedure this relies
+on (decrement, reload on zero) is anomie's; **to verify against the SNES
+corpus** — cartouche was unreachable in this session (see
+`.claude/rules/hardware_claims.md`, degrade path).
+
+### 10g. Lessons
+
+- **Rebuild the lib after ANY record-format change.** The first Phase-2
+  run crashed every cell including the bank-0 controls: the compiler was
+  rebuilt from clean but the lib's 108 `.c.asm` were not (clock skew
+  again), so math/hdma/mode7's init records were still 4-byte headers
+  and `CopyInitData` scattered their bytes over the stack (SP ended at
+  `$2101`). `make clean && make` is the only safe sequence here.
+- A fixture cell is only meaningful when the far access is opaque —
+  still true; the new cells route through non-inlined functions.
+
+## 11. Phase 3 outcome (2026-09-06) — lib + corpus
+
+- **Type rule (cproc)**: a `const` target satisfies `__far`. Since #121
+  every read through a const-qualified pointee is a far read (the backend
+  takes the bank from the pointer), so `T FAR *` converts implicitly to
+  `const T *` — the whole DMA/asset API (`dmaCopyVram(const u8 *…)`,
+  `hdmaSetup(…, const void *)`, `bgInitTileSet`, …) accepts far buffers
+  with no cast and no signature change. Dropping `__far` into a plain
+  non-const pointer stays an error (initialiser, argument, assignment).
+- **Far-tolerant signatures** where the ASM already honours the bank and
+  the use is legitimately bulk: `sramLoad(u8 FAR *…)`,
+  `sramLoadOffset(u8 FAR *…)` (`mvn $70,$7E` — bank $7E, whose first 8 KB
+  mirror bank 0, so both placements were always right),
+  `dsp1Raster(u8 FAR *ab, u8 FAR *cd, …)` (reads both bank bytes). Near
+  callers are unchanged (near → far is implicit). ABI lint parses `u8
+  FAR *` as a 4-byte slot; 290 signatures, no mismatch.
+- **Kept bank-0-only, by design**: the C helpers that walk small hot state
+  through a plain pointer — `rectInit/SetPos/GetCenter/Contains`,
+  `collidePoint/Rect/RectEx`, `animTick/Restart`,
+  `audioGetSampleInfo/VoiceState`. Their objects belong in the 8 KB band
+  (per-frame state), and the compiler refuses a far pointer there without
+  an explicit cast, so there is no silent path. Documented in Phase 4.
+- **games/breakout**: `.game_buffers` (blockmap, backmap, pal, blocks —
+  4708 B) → `.RAMSECTION BANK $7E SLOT 2`, `extern FAR …` on the C side,
+  the three local helpers take `FAR` pointers, the DMA casts become
+  `(const u8 *)`. C RAM band **1436 → 6880 bytes free** (the ORGA $0800
+  hole is gone too). Codegen: `blocks[b]` = `lda.l blocks,x`,
+  `blockmap[i] = v` = `sta.l blockmap,x`, six `[tcc__r9]` derefs in the
+  copy/text helpers. fbhash identical.
+- **mode7/dsp1_ground**: the double-buffered M7 tables (2 × 1030 B) →
+  `static FAR u8 tab_ab[2][…]`; `hdmaSetup` takes the far pointer, the
+  DSP-1 raster writes through `[tcc__r9]`. C RAM **1744 → 3937 bytes
+  free**. fbhash identical.
+
 ## 7. Decisions log
 
 - 2026-09-05: plan written; option (A) recommended; awaiting the
   maintainer's call on (A) vs (B) and on the `__far` / `FAR` spelling.
+- 2026-09-05: Phase 0 done (§8). (A) now backed by the bench: far runtime
+  pointer +50/+80 %, far `sym[idx]` −16 %.
+- 2026-09-05: maintainer chose (A), spelling `__far` / `FAR`. Phase 1 done (§9).
+- 2026-09-06: Phase 2 codegen done (§10); the single-use index fusion is
+  subsumed by the general decomposition; init record gains a bank byte.
+  cproc `accessqual()` tried and reverted (§10b) — follow-up chantier.
+- 2026-09-06: Phase 3 done (§11): `const` satisfies `__far`; breakout
+  1436 → 6880 bytes free in bank 0.
+- 2026-09-06: Phase 4 done — `docs/tutorials/far_ram.md`, KNOWN_LIMITATIONS
+  entry 🔴 → 🟡 with the `FAR` escape, `compiler/ABI.md` address-space
+  section, `bank0_budget.md` RAM twin, catalogue B2 → 🟢 shipped,
+  `snes/types.h` doc. Chantier complete.

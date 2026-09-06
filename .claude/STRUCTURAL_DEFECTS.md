@@ -44,8 +44,11 @@ load-bearing for cross-session continuity).
 >   (`atan2`/`sqrt`/`pow`), C1 (ASM-module audit), D1 (GSU detection —
 >   luna), E1 (WRAM NMI race), E2 (cycle-count gate). *(A6 and B1 were the
 >   two stale-marked items corrected in this refresh.)*
-> - **OPEN — real chantiers:** **B2 🔴** (C RAM 8 KB ceiling
->   `$00:0000–$1FFF` — the highest-value real-game lever); **C2 🟠**
+> - **RESOLVED 🟢 (B2, 2026-09-06):** the C RAM 8 KB ceiling — `__far`/`FAR`
+>   objects in bank $7E with bank-honouring codegen (chantier note
+>   `.claude/notes/chantiers/b2_far_ram.md`; breakout 1436 → 6880 bytes
+>   free in bank 0).
+> - **OPEN — real chantiers:** **C2 🟠**
 >   (sprite/text parallel C+ASM implementations); **B3 🟠** (no
 >   `mode7LoadGraphics` helper); **D2 🟡** (SA-1 SIWP hw validation); **A5
 >   🟡** (compiler-fork divergence — ongoing maintenance, not a discrete
@@ -1436,7 +1439,18 @@ are 18-25 KB and several examples pinned them to bank `$00`). Findings:
 
 ---
 
-#### B2. C RAM forced below `$2000` 🔴
+#### B2. C RAM forced below `$2000` 🟢 SHIPPED 2026-09-06
+
+**Outcome**: opt-in `__far` qualifier (`FAR` in `snes/types.h`), Phases
+0–3 on `wip/b2-far-ram` (2026-09-05/06). Every access to a far object is
+bank-honouring; `sym[idx]` is absolute long indexed (cheaper than bank
+0), pointer walks within 4 % of near; init records carry a bank byte;
+crt0 zero-fills `$7E:2000-$FFFF`; `const T *` accepts `T FAR *`.
+breakout and dsp1_ground migrated, fbhash identical. Two side findings:
+HDMA enabled mid-frame ran on stale A2A/NTRL (fixed in `hdmaSetup*`, hw
+claim to verify against the corpus) and the `cst`/`farram` access flag
+pins loads in QBE's optimiser (follow-up chantier, §10b of the note).
+Original entry kept below for the record.
 
 **Symptom**: the templates' memory map reserves `$00:0000–$1FFF` (8 KB)
 for C-accessible RAM. Anything above `$2000` is unreachable from C with

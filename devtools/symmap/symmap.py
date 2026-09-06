@@ -148,18 +148,20 @@ class SymbolTable:
                             size=int(m.group(3), 16)))
                     continue
 
-                # [ramsections] rows: "BB:AAAA AAAA SIZE8 name"
+                # [ramsections] rows: "BB:AAAA BBBB SIZE8 name" — the
+                # first address is SLOT-relative, the second absolute
+                # (they differ for SLOT 2 far sections: "7e:0000 2000").
                 # e.g. "00:0700 0700 00000800 .dynamic_sprite_buffer"
                 if block == '[ramsections]':
                     m = re.match(
-                        r'^([0-9a-fA-F]{2}):([0-9a-fA-F]{4})\s+[0-9a-fA-F]{4}'
+                        r'^([0-9a-fA-F]{2}):([0-9a-fA-F]{4})\s+([0-9a-fA-F]{4})'
                         r'\s+([0-9a-fA-F]{8})\s+(\S+)$', line)
                     if m:
                         self.ramsections.append(SectionRec(
-                            name=m.group(4),
+                            name=m.group(5),
                             bank=int(m.group(1), 16),
-                            address=int(m.group(2), 16),
-                            size=int(m.group(3), 16)))
+                            address=int(m.group(3), 16),
+                            size=int(m.group(4), 16)))
                     continue
 
                 # Try colon format first: "BB:AAAA symbol_name"
@@ -682,9 +684,10 @@ def print_ram_budget_check(table: SymbolTable, warn_threshold: int = 1024,
                            fail_threshold: int = 0) -> int:
     """Check and print C RAM band ($00:0000-$1FFF) budget status.
 
-    The compiler's RAM addressing is bank-$00-implicit (`sta.l $0000,x`),
-    so all C-accessible RAM must live in the 8 KB WRAM mirror below $2000
-    (KNOWN_LIMITATIONS.md / structural defect B2). This is the RAM twin of
+    The compiler's RAM addressing is bank-$00-implicit (`sta.l $0000,x`)
+    for plain objects, so C RAM lives in the 8 KB WRAM mirror below $2000
+    (KNOWN_LIMITATIONS.md); `__far` objects (chantier B2) are the escape
+    hatch into $7E:2000-$FFFF, reported separately. This is the RAM twin of
     the bank $00 ROM ratchet: it turns "are we near the 8 KB ceiling?"
     into a number printed at every link, instead of a silent-corruption
     surprise when the ceiling is hit.
@@ -761,6 +764,19 @@ def print_ram_budget_check(table: SymbolTable, warn_threshold: int = 1024,
     print(f"{Colors.GREEN}OK: C RAM band $0000-$1FFF: {free_bytes} bytes free "
           f"(top at ${used_top:04X}; {total} bytes in {nsections} sections)"
           f"{Colors.RESET}")
+    # Chantier B2: the second band. __far C objects (QBE `.far.N` sections)
+    # and lib bank-$7E state live in $7E:2000-$FFFF (56 KB, SLOT 2). No
+    # threshold yet — the number is the instrument.
+    far = [s for s in table.ramsections
+           if s.bank == 0x7E and 0x2000 <= s.address < 0x10000]
+    if far:
+        far_top = max(s.address + s.size for s in far)
+        far_total = sum(s.size for s in far)
+        far_c = sum(s.size for s in far if s.name.startswith('.far.'))
+        print(f"{Colors.GREEN}OK: far RAM band $7E:2000-$FFFF: "
+              f"{0x10000 - far_top} bytes free (top at ${far_top:04X}; "
+              f"{far_total} bytes in {len(far)} sections, {far_c} bytes "
+              f"of C __far objects){Colors.RESET}")
     return 0
 
 
