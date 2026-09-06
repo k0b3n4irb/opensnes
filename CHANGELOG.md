@@ -2,6 +2,64 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.39.0] — 2026-09-06
+
+The far RAM release: chantier B2 lifts the 8 KB C RAM ceiling. A global
+declared `FAR` lives in bank $7E (56 KB) and every access to it is
+compiled bank-honouring, at the cost of the bank-0 forms or less.
+breakout goes from 1436 to 6880 free bytes in bank 0, pixel-identical.
+
+### Added
+- feat(compiler): **`__far` type qualifier, `FAR` in `snes/types.h`** —
+  the object is placed in `$7E:2000-$FFFF`; direct accesses take
+  `lda.l/sta.l sym`, `sym[idx]` is one absolute-long-indexed instruction
+  (the address add is folded away), runtime pointers go through
+  `[tcc__r9]` with base+const and base+index decomposed onto `,y` and a
+  per-block pointer cache. Rides on the type like `const`: static storage
+  only, not `const`, dropping it into a plain pointer is a compile error,
+  and `T FAR *` converts to `const T *` freely so the DMA/HDMA/asset API
+  takes far buffers as they are. Initialisers work (the boot data-init
+  record carries the bank) and the band is zeroed at boot (one DMA,
+  22 ms). Cost (`devtools/benchrom/b2_deref`): pointer walks +3/+4 % vs
+  bank 0, `arr[i]` −18 %, stores −17 % / −48 %.
+- feat(devtools): `symmap.py --check-ram-budget` reports the far band
+  (`OK: far RAM band $7E:2000-$FFFF: N bytes free …`) next to the bank-0
+  one; runtime fixture `devtools/compiler-tests/runtime/b2_far_ram`
+  (25 cells) and `cases/far_ram_forms.checks` pin every far form.
+- docs(docs): **`docs/tutorials/far_ram.md`** — the two bands, the rules
+  the compiler enforces, the cost table, when to use `FAR` and when not,
+  the breakout migration as the worked example. `compiler/ABI.md` gains
+  an address-space section (bank 0 / const ROM / far RAM).
+
+### Changed
+- feat(lib): `sramLoad` / `sramLoadOffset` and `dsp1Raster` take `FAR`
+  pointers (their ASM already honoured the bank); bank-0 callers are
+  unchanged. The small hot-state helpers (`rect*`, `collide*`, `anim*`,
+  `audioGet*`) stay bank-0-only by design.
+- feat(examples): `games/breakout`'s 4708-byte tilemap/palette/brick
+  buffers and `mode7/dsp1_ground`'s double-buffered M7 tables move to
+  bank $7E — 1436 → 6880 and 1744 → 3937 bytes free in the C RAM band,
+  both fbhash-identical.
+- feat(runtime): the data-init record is `{addr16, bank8, size16, bytes}`
+  and `CopyInitData` writes through a 24-bit pointer; crt0 zero-fills
+  `$7E:2000-$FFFF` before `InitHardware`.
+- feat(compiler): a mutable `const T *p` global is no longer sectioned
+  into ROM (cproc's `.rodata` decision consulted the pointee's qualifier);
+  the narrow `mul`/`shl` paths now fire on `u8`/`u16` indices too.
+- docs(docs): `KNOWN_LIMITATIONS.md`'s "all C RAM below $2000" entry goes
+  🔴 → 🟡: plain objects and the link-time ratchet are unchanged, `FAR` is
+  the escape, the one remaining silent path is an explicit cast.
+
+### Fixed
+- fix(lib): **HDMA enabled mid-frame ran on stale A2A/NTRL** — a channel
+  enabled during active display started at the next HBlank reading a
+  "table" at `$00:0000` (the `tcc__r*` scratch) and wrote that residue to
+  its destination register; `hdmaSetup*` now preset A2A = A1T and
+  NTRL = 1 so the real first entry loads at the next HBlank. The
+  `hdma/gradient_colors` and `hdma/hdma_helpers` baselines carried the
+  glitch (CGRAM entry 2 zeroed, BG1HOFS stuck at 2). The HBlank reload
+  rule this relies on is to verify against the SNES corpus.
+
 ## [0.38.0] — 2026-09-05
 
 The DSP-1 Raster release: the coprocessor now streams the per-scanline
