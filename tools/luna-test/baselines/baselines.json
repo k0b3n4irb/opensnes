@@ -156,9 +156,9 @@
     "steps": 3000000
   },
   "basics_timer": {
-    "fbhash": "83872e3657c210de",
+    "fbhash": "c356a51baf965059",
     "luna_version": "v1.17.0",
-    "rom_sha256": "f688fe62bd91e200fedade0e9ea806ad9a16e42dcf1196023c78968a0a188c48",
+    "rom_sha256": "ba9618df788742dd59089708f5c2b0485e001934a42226e254054b5682c6caaa",
     "steps": 3000000
   },
   "chips_dsp1_cube": {
@@ -294,9 +294,9 @@
     "steps": 3000000
   },
   "games_shmup_1942": {
-    "fbhash": "dbe45fc9dc74cfdb",
+    "fbhash": "3a3fccb15c964e3d",
     "luna_version": "v1.17.0",
-    "rom_sha256": "37a1354d137573c9bc09c99135ce3e83eeb87112897bf541e8a8daaa31b5f680",
+    "rom_sha256": "e97255d0bb626df11377a2b2c0521b5ef3cef3aa42a88e149b1191012668c4ab",
     "steps": 3000000
   },
   "games_tetris": {
@@ -446,10 +446,10 @@
   "scrolling_parallax_scroll": {
     "fbhash": [
       "4b8c45862a99b904",
-      "71e2bc85ea25bc81"
+      "87b2f5f3a9686c20"
     ],
     "luna_version": "v1.17.0",
-    "rom_sha256": "825db7045e348ba3ec2f0d8810304a6aba698a65e4999465e5ff9bcd5fdef014",
+    "rom_sha256": "44458567ec5375929246e996e1a272082c5e68d31970df97a5e6a7a75ebcd11c",
     "steps": [
       3000000,
       6000000
@@ -481,11 +481,11 @@
   },
   "sprites_metasprite": {
     "fbhash": [
-      "d6792a100804edb0",
-      "d6792a100804edb0"
+      "a76c4c22ae3b4e3c",
+      "a76c4c22ae3b4e3c"
     ],
-    "luna_version": "v1.16.0",
-    "rom_sha256": "c4530eeed2b2a7c44e13fe66545693ee5c84c1ea6db406025618c4adba5d3dc4",
+    "luna_version": "v1.17.0",
+    "rom_sha256": "cc3841ee7ff9197047e1f7b88fde44def25130f7ab6ee999c9cdb5a81d4c61fc",
     "steps": [
       3000000,
       6000000

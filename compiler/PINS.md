@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | d35c136e42d5961c772aefbdf39422e2f222060e | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 7118e4c98257fcbf0b06d73aefcfaa25a3f102df | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 6d3953d27b0da0e5aa48af9e0d91f00fa829373a | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 852cea43c4c78ed15775bc838d00beb8ddb55429 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 91c52b1f4ef3cc8ba3c0638f7536539579af6a9f | github.com/k0b3n4irb/wla-dx v10.7 (release tag) |
 <!-- END PINS -->
 
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 16 patches (upstream merge-base: 7051114)
+### compiler/cproc — 17 patches (upstream merge-base: 7051114)
 
 ```
+6d3953d qbe: a pointer object's access is not tainted by its pointee's qualifiers (chantier A9)
 d35c136 expr: a const pointer target satisfies __far (chantier B2, Phase 3)
 f32e712  Add the __far type qualifier (chantier B2, Phase 1): QUALFAR, `farram` access flag, section ".far"; objqual() fixes pointer-to-const globals sectioned into ROM
 1a626e2  qbe: namespace anonymous local-linkage globals per translation unit
@@ -67,11 +68,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 54 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 55 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+852cea4 Only the volatile bit pins loads in loadopt / promote / gcm (chantier A9)
 7118e4c w65816: bank-honouring codegen for far RAM (chantier B2, Phase 2)
 80eaea2 Accept the `farram` access flag and section ".far" data (chantier B2, Phase 1)
 8fbdc29 fix(w65816): emit the bank half for Kl phi args (conditional far pointers)
