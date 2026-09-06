@@ -175,10 +175,16 @@ the next refactor wave.
 
 ## The RAM twin: C RAM band budget (since 2026-07-11)
 
-The same silent-failure family exists for RAM: all C-accessible RAM must
-sit in `$00:0000-$1FFF` (the 8 KB WRAM mirror) — anything higher is
-silently wrong-banked by the compiler's `sta.l $0000,x` addressing
-(structural defect B2). `make/common.mk` runs
+The same silent-failure family exists for RAM: **plain** C-accessible RAM
+must sit in `$00:0000-$1FFF` (the 8 KB WRAM mirror) — anything higher is
+silently wrong-banked by the compiler's `sta.l $0000,x` addressing. Since
+chantier B2 (2026-09) the escape is `FAR` (`snes/types.h`): the object
+goes to `$7E:2000-$FFFF` with bank-honouring codegen, and the link prints
+that band too (`OK: far RAM band $7E:2000-$FFFF: N bytes free …`, no
+threshold yet). When a plain-band warning names a bulk buffer (tilemap,
+palette, HDMA table, entity pool), the refactor is one `FAR` — see
+`docs/tutorials/far_ram.md` and the breakout migration (1436 → 6880 bytes
+free). `make/common.mk` runs
 `symmap.py --check-ram-budget` after every link:
 
 | Stage | Trigger | Outcome |

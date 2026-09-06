@@ -114,21 +114,33 @@ region where HDMA drives BG1 scroll — do matrix updates during VBlank, or
 disable the scroll HDMA channel while rewriting the matrix. See the gotchas
 in `docs/tutorials/mode7.md` and `docs/tutorials/hdma.md`.
 
-### 🔴 All C RAM must live below $2000 (DP wraparound)
-`sta.l $0000,x` and friends always access bank $00. If the linker places a
-RAM section above $2000, C code reading via short addressing reads from bank
-$00 instead — silent corruption.
+### 🟡 Plain C RAM lives below $2000; `FAR` is the way above it
+`sta.l $0000,x` and friends always access bank $00, so a plain C global
+must sit in the 8 KB band `$00:0000-$1FFF` (shared with the stack and the
+direct page). A hand-placed RAM section above $2000 reached through a
+plain pointer reads bank $00 instead — silent corruption.
 
-**Mitigation (checked at link time since 2026-07-11):** the templates' memory
-maps reserve `$00:0000-$1FFF` for C RAM, and `make/common.mk` runs
-`symmap.py --check-ram-budget` after every link — the RAM twin of the bank
-$00 ROM ratchet. A bank-$00 RAM section crossing or placed past $2000 fails
-the build; free space below `RAM_FAIL_THRESHOLD` (default 512 bytes) fails
-too, and below `RAM_WARN_THRESHOLD` (default 1024) prints the largest RAM
-sections as refactor candidates. The free-byte count prints at every link,
-so approaching the 8 KB ceiling is a visible number, not a surprise. Set
-`SKIP_RAM_CHECK=1` to bypass for debugging. If you really need data above
-$2000, access it via assembly with explicit bank prefix (`lda.l $7E:NNNN,x`).
+**Escape hatch (since chantier B2, 2026-09):** declare the object `FAR`
+(`FAR u8 buf[4096];`, header `snes/types.h`). It is placed in
+`$7E:2000-$FFFF` (56 KB) and every access — direct, `buf[i]`, or through a
+`u8 FAR *` — is compiled bank-honouring; initialisers work and the band is
+zeroed at boot. The qualifier rides on the type like `const`: passing a
+`FAR` pointer where a plain pointer is expected is a compile error, and
+`T FAR *` converts to `const T *` freely, so the DMA/HDMA/asset API takes
+`FAR` buffers as they are. Cost: `buf[i]` is cheaper than the bank-0 form,
+a pointer walk is within 4 %. Tutorial: `docs/tutorials/far_ram.md`. The
+one remaining silent path is an explicit cast that drops `FAR`.
+
+**Mitigation for the plain band (checked at link time since 2026-07-11):**
+the templates' memory maps reserve `$00:0000-$1FFF` for C RAM, and
+`make/common.mk` runs `symmap.py --check-ram-budget` after every link — the
+RAM twin of the bank $00 ROM ratchet. A bank-$00 RAM section crossing or
+placed past $2000 fails the build; free space below `RAM_FAIL_THRESHOLD`
+(default 512 bytes) fails too, and below `RAM_WARN_THRESHOLD` (default
+1024) prints the largest RAM sections as refactor candidates. Both bands'
+free-byte counts print at every link, so approaching a ceiling is a
+visible number, not a surprise. Set `SKIP_RAM_CHECK=1` to bypass for
+debugging.
 
 ---
 

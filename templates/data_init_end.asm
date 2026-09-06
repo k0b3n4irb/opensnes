@@ -5,6 +5,8 @@
 ;==============================================================================
 
 .SECTION ".data_init_end" SEMIFREE APPENDTO ".data_init"
-    .dw 0, 0    ; End marker: addr=0, size=0
+    .dw 0       ; End marker: addr=0
+    .db 0       ;             bank=0
+    .dw 0       ;             size=0
 DataInitEnd:
 .ENDS

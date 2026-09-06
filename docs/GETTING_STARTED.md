@@ -363,6 +363,7 @@ starting points:
 | Mode 7 | [tutorials/mode7.md](tutorials/mode7.md) |
 | Game States | [tutorials/game_states.md](tutorials/game_states.md) |
 | SRAM Saves | [tutorials/sram.md](tutorials/sram.md) |
+| Far RAM (`FAR` objects) | [tutorials/far_ram.md](tutorials/far_ram.md) |
 | SA-1 Coprocessor | [tutorials/sa1.md](tutorials/sa1.md) |
 | SuperFX (GSU) | [tutorials/superfx.md](tutorials/superfx.md) |
 | Debugging | [tutorials/debugging.md](tutorials/debugging.md) |

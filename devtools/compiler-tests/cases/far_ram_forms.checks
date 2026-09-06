@@ -1,0 +1,39 @@
+# Chantier B2 (2026-09-06): every access to a __far (bank $7E) object must
+# use bank-honouring addressing. The bank-$00-implicit forms — `lda.w sym`,
+# `sta.w sym`, `stz.w sym`, `lda.l $0000,x`, `sta.l $0000,x` — must never
+# appear on a far object.
+
+# symbol-direct: absolute long (the linker supplies the 24-bit address)
+in dir_rd:  present lda\.l fbuf\+3
+in dir_wr:  present sta\.l fbuf\+3
+in long_rd: present lda\.l flong\n
+in long_rd: present lda\.l flong\+2
+in long_wr: present sta\.l flong\+2
+
+# sym[idx]: absolute long INDEXED — one instruction, no [tcc__r9] setup,
+# the add($sym, idx) is folded into the access (index only, no high half)
+in idx_rd:   present tax\n\tsep #\$20\n\tlda\.l fbuf,x
+in idx_rd:   absent tcc__r9
+in idx_wr:   present sta\.l fbuf,x
+in idx_wr:   absent tcc__r9
+in idx_wr16: present sta\.l fwords,x
+in idx_wr16: absent adc\.w #:fwords
+
+# far pointer + constant field offset: the base staged ONCE in tcc__r9,
+# the field reached with `,y`
+in fld_rd: present ldy\.w #2\n\tlda \[tcc__r9\],y
+in fld_wr: present ldy\.w #4\n\tlda [^\n]*\n\tsta \[tcc__r9\],y
+in fld_wr: present ldy\.w #6\n\tsta \[tcc__r9\],y
+in fld_wr: absent (?s)sta\.b tcc__r9\+2.*sta\.b tcc__r9\+2
+
+# far pointer + runtime index: [tcc__r9],y with Y = index
+in walk: present tay\n\t(?:lda [^\n]*\n\t)?sep #\$20\n\t(?:lda [^\n]*\n\t)?sta \[tcc__r9\],y
+in walk: absent clc\n\tadc [0-9]+,s
+
+# nothing bank-blind anywhere in the file
+absent lda\.w fbuf
+absent sta\.w fbuf
+absent stz\.w fbuf
+absent lda\.w flong
+absent sta\.w flong
+absent \$0000,x

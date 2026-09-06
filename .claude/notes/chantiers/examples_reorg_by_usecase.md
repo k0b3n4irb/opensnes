@@ -1,12 +1,16 @@
 # Chantier — The example bundle, designed as a curriculum ("the ultimate tutorial")
 
-Status: IN PROGRESS (2026-07-31). **7 waves + the naming audit shipped;
-Audio and the Effects decomposition remain** (see the
-Execution log at the bottom). The design below is the north star; the
-Execution log tracks what is done and what remains, and the Migration
-recipe distils the reusable procedure learned across the shipped waves.
-The first of the two frontier projects (the other is
-[`audio_beyond_snesmod.md`](audio_beyond_snesmod.md)); start here.
+Status: **MOVES COMPLETE** (refreshed 2026-09-05). All 7 waves + the naming
+audit shipped: the Audio wave landed 2026-07-31 (`9962f5a1`) and the Effects
+decomposition finished 2026-07-31 (`e0df7e45`, `graphics/` dissolved into
+`hdma/`, `color/`, `windows/`, `transitions/`). The tree is the curriculum
+below; what remains open is the **Authoring backlog** (new rungs the lib
+is ahead of — see that section) and nothing structural. The design below is
+the north star; the Execution log tracks what shipped, and the Migration
+recipe distils the reusable procedure learned across the waves. The first
+of the two frontier projects (the other is
+[`audio_beyond_snesmod.md`](audio_beyond_snesmod.md)), which is now
+eligible to open.
 
 **Pivot (2026-07-29):** this chantier no longer "audits and re-homes the 74."
 The maintainer's decision is **greenfield-first** — design the ideal example

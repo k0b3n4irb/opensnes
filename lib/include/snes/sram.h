@@ -108,7 +108,9 @@ void sramSave(const u8 *data, u16 size);
  *
  * Copies data from battery-backed SRAM to Work RAM.
  *
- * @param data Pointer to destination buffer in Work RAM
+ * @param data Pointer to destination buffer in Work RAM — a bank-0 object
+ *             or a `FAR` (bank $7E) one; the copy runs as a block move into
+ *             bank $7E, whose first 8 KB mirror bank 0
  * @param size Number of bytes to load (max 32KB)
  *
  * @code
@@ -118,7 +120,7 @@ void sramSave(const u8 *data, u16 size);
  *
  * @note If no valid save exists, SRAM contents are undefined
  */
-void sramLoad(u8 *data, u16 size);
+void sramLoad(u8 FAR *data, u16 size);
 
 /**
  * @brief Save data to SRAM at offset
@@ -152,7 +154,7 @@ void sramSaveOffset(const u8 *data, u16 size, u16 offset);
  * sramLoadOffset(saveData, 256, 512);
  * @endcode
  */
-void sramLoadOffset(u8 *data, u16 size, u16 offset);
+void sramLoadOffset(u8 FAR *data, u16 size, u16 offset);
 
 /**
  * @brief Clear SRAM to zero

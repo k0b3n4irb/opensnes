@@ -176,6 +176,9 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr
 	@python3 devtools/compiler-tests/runtime/a6_farptr/test_a6_farptr.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram clean
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram
+	@python3 devtools/compiler-tests/runtime/b2_far_ram/test_b2_far_ram.py
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py

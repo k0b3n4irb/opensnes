@@ -221,7 +221,7 @@ void dsp1Target(s16 h, s16 v);
  * the ones HDMA is reading this frame: double-buffer and swap with
  * hdmaSetTable during VBlank.
  */
-void dsp1Raster(u8 *ab, u8 *cd, s16 vs, u16 count);
+void dsp1Raster(u8 FAR *ab, u8 FAR *cd, s16 vs, u16 count);
 
 /**
  * @brief Euclidean length of a 3D vector (DSP-1 command $28, "Distance").
