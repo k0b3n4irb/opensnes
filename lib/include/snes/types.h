@@ -105,6 +105,31 @@ typedef unsigned int u32;
  * @{
  */
 
+/**
+ * @brief Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.
+ *
+ * `FAR u8 buffer[4096];` — the object lives in `$7E:2000-$FFFF` and every
+ * access to it (direct, `buffer[i]`, or through a `u8 FAR *` pointer) is
+ * compiled with bank-honouring addressing. Use it for bulk state that does
+ * not fit the 8 KB band: HDMA tables, tilemaps built in RAM, entity pools.
+ * Restrictions: static storage only (the stack is bank 0) and not `const`
+ * (ROM is already reachable from any bank). Initialisers work (the boot
+ * data-init copy carries the bank); everything else is zero at boot.
+ * Handing a `FAR` pointer to code expecting a plain pointer is a compile
+ * error, as with `const`; a plain pointer converts to `FAR` silently and
+ * just takes the far path. A `T FAR *` converts to `const T *` without a
+ * cast — a read through a const pointee is already a far read — so the
+ * DMA/HDMA/asset helpers take `FAR` buffers as they are. Cost: `arr[i]`
+ * on a `FAR` array is one absolute-long-indexed instruction (cheaper than
+ * bank 0); a pointer walk is within 4 % of the bank-0 path.
+ * @see docs/tutorials/far_ram.md
+ */
+#ifdef __OPENSNES__
+#define FAR __far
+#else
+#define FAR             /* host compilers (the clang syntax lint) have no address spaces */
+#endif
+
 typedef volatile u8 vu8;
 typedef volatile u16 vu16;
 typedef volatile u32 vu32;

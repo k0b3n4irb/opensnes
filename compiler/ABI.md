@@ -401,6 +401,39 @@ it unless you know A doesn't carry the return.
 
 ---
 
+## Address spaces: bank 0, `const` ROM, `__far` RAM
+
+Three kinds of C object, three addressing forms (chantiers #121 and B2):
+
+| Object | Placement | Direct access | `sym[idx]` | Through a pointer |
+|---|---|---|---|---|
+| plain global / local | `$00:0000-$1FFF` (or the stack) | `lda.w sym` | `tax; lda.l $0000,x` | `tax; lda.l $0000,x` |
+| `const` | ROM, any bank (`SUPERFREE`) | `lda.l sym` | `tax; lda.l sym,x` | `[tcc__r9]` (+`,y`) |
+| `__far` (`FAR`) | `$7E:2000-$FFFF`, `.RAMSECTION ".far.N" BANK $7E SLOT 2` | `lda.l/sta.l sym` | `tax; lda.l/sta.l sym,x` | `[tcc__r9]` (+`,y`) |
+
+The plain forms are bank-0-implicit; the other two carry the bank — the
+linker's for a symbol, the pointer's bank byte (post-A6, 4-byte pointers)
+for a runtime address. cproc marks every load/store through a `const` or
+`__far` lvalue with an access flag (`cst` / `farram` in the IR) and the
+backend keys on it. A far access whose address is a `Kl add` uses the
+operands directly: `add $sym, idx` → indexed long; `add %p, N` → stage `p`
+in `tcc__r9` once, `ldy #N`; `add %p, idx` → `tay`. `tcc__r9` is a cache
+within a basic block across loads and stores only — any other op may
+scratch it.
+
+Type rules: a `T __far *` converts to `const T *` implicitly (a const
+read is already far); dropping `__far` into a plain pointer is an error;
+`__far` objects have static storage and are not `const`. ASM callees
+receive the same 4-byte pointer either way and read its bank byte
+(`lda N+2,s`), so a hand-written function that honours the bank works
+with both bands — the ABI lint sees `u8 FAR *` as a 4-byte slot.
+
+Boot: the data-init record is `{addr16, bank8, size16, bytes}` and
+`CopyInitData` writes through `[tcc__r2],y`; crt0 zero-fills the far band
+with one DMA to `$2180` (22 ms). See `docs/tutorials/far_ram.md`.
+
+---
+
 ## What the backend does NOT support
 
 - **Variadic functions** (`...`): no support. Wrappers like `printf` use

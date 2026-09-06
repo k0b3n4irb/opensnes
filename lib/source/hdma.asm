@@ -115,6 +115,7 @@ hdmaSetup:
     .ACCU 16
     lda 5,s                 ; table low 16
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+    sta.l $0008,x           ; $43x8-$43x9 = A2A, see the NTRL note below
 
     ; Bank byte now lives directly in the 4-byte pointer at offset 7,s
     ; (post-A6). No heuristic needed.
@@ -122,6 +123,22 @@ hdmaSetup:
     .ACCU 8
     lda 7,s                 ; table bank byte
     sta.l $0004,x           ; $43x4 = A1B (bank)
+
+    ; Mid-frame enable hazard (B2 chantier, 2026-09-06): the PPU copies
+    ; A1T -> A2A and loads the first table entry only at the start of a
+    ; frame, for channels enabled at that moment. A channel enabled during
+    ; active display runs from the next HBlank with whatever A2A/NTRL hold
+    ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
+    ; bytes, and writes that residue to the destination register). Presetting
+    ; A2A to the table and the line counter to 1 makes the next HBlank load
+    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; one line late and clean, whatever the boot timing or DP residue.
+    ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
+    ; procedure (decrement, reload on zero) is anomie's — to verify against
+    ; the SNES corpus (cartouche was unreachable when this landed).
+    lda #1
+    sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 
 @done:
     plp
@@ -187,12 +204,29 @@ hdmaSetupBank:
     .ACCU 16
     lda 7,s                 ; table low 16
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+    sta.l $0008,x           ; $43x8-$43x9 = A2A, see the NTRL note below
 
     ; Set bank from explicit parameter
     sep #$20
     .ACCU 8
     lda 5,s                 ; bank byte
     sta.l $0004,x           ; $43x4 = A1B (bank)
+
+    ; Mid-frame enable hazard (B2 chantier, 2026-09-06): the PPU copies
+    ; A1T -> A2A and loads the first table entry only at the start of a
+    ; frame, for channels enabled at that moment. A channel enabled during
+    ; active display runs from the next HBlank with whatever A2A/NTRL hold
+    ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
+    ; bytes, and writes that residue to the destination register). Presetting
+    ; A2A to the table and the line counter to 1 makes the next HBlank load
+    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; one line late and clean, whatever the boot timing or DP residue.
+    ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
+    ; procedure (decrement, reload on zero) is anomie's — to verify against
+    ; the SNES corpus (cartouche was unreachable when this landed).
+    lda #1
+    sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 
 @hdmaSetupBank_done:
     plp
@@ -256,12 +290,29 @@ hdmaSetupIndirect:
     .ACCU 16
     lda 7,s                 ; table low 16
     sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
+    sta.l $0008,x           ; $43x8-$43x9 = A2A, see the NTRL note below
 
     ; Table bank from the far pointer (post-A6, like hdmaSetup)
     sep #$20
     .ACCU 8
     lda 9,s                 ; table bank byte
     sta.l $0004,x           ; $43x4 = A1B (table bank)
+
+    ; Mid-frame enable hazard (B2 chantier, 2026-09-06): the PPU copies
+    ; A1T -> A2A and loads the first table entry only at the start of a
+    ; frame, for channels enabled at that moment. A channel enabled during
+    ; active display runs from the next HBlank with whatever A2A/NTRL hold
+    ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
+    ; bytes, and writes that residue to the destination register). Presetting
+    ; A2A to the table and the line counter to 1 makes the next HBlank load
+    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; one line late and clean, whatever the boot timing or DP residue.
+    ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
+    ; procedure (decrement, reload on zero) is anomie's — to verify against
+    ; the SNES corpus (cartouche was unreachable when this landed).
+    lda #1
+    sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 
     ; Indirect DATA bank — the register plain hdmaSetup never programs
     lda 5,s                 ; dataBank (8-bit)

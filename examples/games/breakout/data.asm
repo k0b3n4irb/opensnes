@@ -3,14 +3,17 @@
 ;==============================================================================
 
 ;------------------------------------------------------------------------------
-; RAM Buffers (placed at $0800 to avoid OAM buffer overlap at $0300-$051F)
+; RAM Buffers — far RAM (bank $7E, above the 8 KB C band)
 ;------------------------------------------------------------------------------
-; OAM buffer is at $7E:0300-$051F (544 bytes), which mirrors to $00:0300-$051F.
-; C static arrays were placed starting at $00A0, overlapping with OAM.
-; Fix: explicitly place large buffers at $0800 (after OAM).
+; 4708 bytes of tilemap/palette/brick state. They used to sit in bank 0 at
+; $0800 (ORGA, to dodge the OAM buffer) and left the C RAM band with 1436
+; bytes free. Declared `FAR` on the C side (chantier B2), every access is
+; bank-honouring — `blocks[b]` is an absolute-long-indexed read, the DMA
+; helpers take the bank from the far pointer — and bank 0 gets the space
+; back. SLOT 2 is $2000-$FFFF of bank $7E (templates/memmap.inc).
 ;------------------------------------------------------------------------------
 
-.RAMSECTION ".game_buffers" BANK 0 SLOT 1 ORGA $0800 FORCE
+.RAMSECTION ".game_buffers" BANK $7E SLOT 2
     blockmap    dsb $800    ; BG1 tilemap buffer (2KB)
     backmap     dsb $800    ; BG2 tilemap buffer (2KB)
     pal         dsb $200    ; Palette buffer (512 bytes)
