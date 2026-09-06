@@ -123,14 +123,14 @@ $(function(){initNavTree('examples_backgrounds_mode2.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 2 (Backgrounds) · rung 2.8 — the offset-per-tile modes (2/4/6).</b></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1037"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1044"></a>
 Why it matters for your game</h2>
 <p>Modes 2, 4 and 6 have a trick no other mode offers: <b>offset-per-tile (OPT)</b> lets every 8-pixel <em>column</em> of a layer scroll independently. That is how you get a flag rippling in the wind, a heat-haze shimmer, water distortion, or cheap per-column parallax — effects that would otherwise cost a scanline of HDMA or a full software redraw. It is niche, but when you want it, nothing else does it as cheaply.</p>
 <div class="image">
 <img src="mode2.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="autotoc_md1038"></a>
+    <h2 class="doxsection"><a class="anchor" id="autotoc_md1045"></a>
 What you'll learn</h2>
 <p>The single idea: in Mode 2, <b>BG3 stops being a drawable layer and becomes an offset table.</b> For each column of BG1/BG2, the PPU reads a scroll offset straight out of BG3's tilemap:</p>
 <ul>
@@ -138,7 +138,7 @@ What you'll learn</h2>
 <li><b>Offset word:</b> bit <span class="tt">0x2000</span> = apply to BG1 (<span class="tt">0x4000</span> = BG2); the V value is bits 0–9, the H value bits 3–9 (8-pixel-granular).</li>
 </ul>
 <p>This example puts a stack of horizontal colour bands on BG1 and writes a sine into BG3's V-offset row, so each column samples the bands at a different height — the bands ripple. The phase advances each frame. <b>Modes 4 and 6 reuse this exact data path</b> (mode 4 packs H/V into one word with a select bit), so this one example teaches the whole OPT family.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1039"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1046"></a>
 What to observe / if it breaks</h2>
 <ul>
 <li><b>Correct run:</b> rainbow bands ripple as a travelling wave; each column is at its own vertical offset, all from one 32-entry BG3 table.</li>
@@ -147,14 +147,14 @@ What to observe / if it breaks</h2>
 <li><b>Whole layer shifts uniformly (no ripple):</b> your offset words are missing the <span class="tt">0x2000</span> enable bit, so the PPU ignores them and uses the base scroll.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016" title="Probe oracle: wave phase, advances each frame.">wave_phase</a></span> advances every frame.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1040"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1047"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 mode2.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1041"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md1048"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">math</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1042"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1049"></a>
 Where you are</h2>
 <p>← the rest of the family covers the everyday modes (<a href="../mode1/">mode1</a>, <a href="../mode0/">mode0</a>, <a href="../mode3/">mode3</a>, <a href="../mode5/">mode5</a>); this rung is the specialist OPT modes. For per-scanline (rather than per-column) tricks, see the <a href="../../hdma/">hdma</a> family. </p>
 </div></div><!-- contents -->

@@ -5,6 +5,7 @@ var types_8h =
     [ "CLAMP", "group__macros.html#ga89d49301cef5e6c9a1683c78ec1349b3", null ],
     [ "FALSE", "group__bool__type.html#gaa93f0eb578d23995850d61f7d61c55c1", null ],
     [ "false", "group__bool__type.html#ga65e9886d74aaee76545e83dd09011727", null ],
+    [ "FAR", "group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed", null ],
     [ "HI_BYTE", "group__macros.html#gaa1b163a74a452aff52b1dd6f4bc0c5b8", null ],
     [ "LO_BYTE", "group__macros.html#ga960084e6916e491a74511cc9298ef86f", null ],
     [ "MAKE_WORD", "group__macros.html#gadba21e94be99de18d4a4eb0857a8f11d", null ],

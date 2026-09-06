@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_hdma.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Part of Family 6 (Colour &amp; effects) — changing a register mid-frame.</b> Normal DMA moves data during VBlank; <b>HDMA</b> hands the PPU a table and fires a transfer at the start of each scanline, so a register holds a <em>different</em> value on every line. That is how the SNES bends backgrounds, gradients the sky, and draws effects that look impossible for a 2D tile machine.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1358"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1365"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -142,7 +142,7 @@ The ladder</h2>
 <blockquote class="doxtable">
 <p><span class="tt">hdma_wave</span> (use a precomputed table) and <span class="tt">hdma_wave_table</span> (build it by hand) are the "use it" / "understand it" pair — slated to <b>merge</b> into one "build the table, then use the helper" rung (a code-merge left as a reviewed follow-up). On-ramp to author: <b>6e.1 a minimal single-channel HDMA</b>. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1359"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1366"></a>
 The idea in one screen</h2>
 <p>An HDMA table is a list of <span class="tt">(line count, value)</span> entries; the PPU walks it, writing <span class="tt">value</span> to a target register for <span class="tt">count</span> scanlines, then moves on. Aim it at the backdrop colour and you get a per-line gradient (<span class="tt">gradient_colors</span>); aim it at a BG scroll register with a sine table and the background ripples (<span class="tt">hdma_wave</span>). <b>Indirect</b> mode adds a level of pointer indirection so the table entries point at data elsewhere (<span class="tt">hdma_indirect_gradient</span>). The <span class="tt">hdma</span> module wraps the common cases (<span class="tt"><a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#af4cd68c6a5535d13dd11fa4c487abbfe" title="Create a water ripple distortion effect.">hdmaWaterRipple</a></span>, <span class="tt"><a class="el" href="hdma_8h.html#ad53b403f29a83339eb6d772bf3096379" title="Create a circular window mask (iris/spotlight effect).">hdmaIrisWipe</a></span>) so you rarely hand-roll the table — but building one once (<span class="tt">hdma_wave_table</span>) is how you understand what the helpers do.</p>
 <p><a class="el" href="examples_hdma_gradient_colors.html" title="Gradient Colors -- HDMA Color Gradients">Gradient Colors -- HDMA Color Gradients</a> <a class="el" href="examples_hdma_hdma_helpers.html" title="HDMA Helpers Demo">HDMA Helpers Demo</a> <a class="el" href="examples_hdma_hdma_indirect_gradient.html" title="HDMA Indirect Gradient">HDMA Indirect Gradient</a> <a class="el" href="examples_hdma_hdma_wave.html" title="HDMA Wave">HDMA Wave</a> <a class="el" href="examples_hdma_hdma_wave_table.html" title="HDMA Wave Table">HDMA Wave Table</a> </p>

@@ -123,14 +123,14 @@ $(function(){initNavTree('craft_tiles_to_levels.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> told you unique tiles are what cost VRAM, and reuse is nearly free. This guide is that idea taken all the way: a SNES level is not a picture you draw, it is a <em>rearrangement of a small alphabet of tiles</em>. Get the alphabet right and a huge world costs almost nothing; get it wrong and one screen blows the VRAM budget. Here is how to think in tiles, attach meaning to them, and stream a level far bigger than the hardware can hold at once.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md496"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md503"></a>
 The tile is the atom; the metatile is the word</h2>
 <p>The PPU draws everything from 8×8 tiles. But 8×8 is too small a unit to <em>design</em> in — a brick, a bush, a question block is really a <b>16×16 metatile</b>: a 2×2 group of four tiles you place as one. You paint the whole level in metatiles, and the four underlying tiles come along for free.</p>
 <p>This is not just convenience — it is the reuse that makes the VRAM budget work. A 40-screen level built from 200 unique metatiles still only needs those 200 metatiles' worth of tiles in VRAM; the size lives in the <em>map</em> (cheap, 2 bytes per cell), not the tileset. <a class="el" href="examples_maps_dynamic_map.html" title="Dynamic Map">Dynamic Map</a> treats a whole background as a grid of 16×16 blocks for exactly this reason.</p>
 <blockquote class="doxtable">
 <p><b>Go deeper.</b> nesdoug's <a href="https://nesdoug.com/2018/09/05/11-metatiles/">Metatiles</a> is the clearest explanation of the technique anywhere. It is written for the NES, but the idea — and the memory argument — transfers to the SNES unchanged. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md497"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md504"></a>
 A tile carries meaning, not just pixels</h2>
 <p>The map is not only what the level <em>looks</em> like — it is what the level <em>is</em>. Each tile can carry gameplay properties that travel from the editor into the running game:</p>
 <table class="markdownTable">
@@ -144,12 +144,12 @@ A tile carries meaning, not just pixels</h2>
 <td class="markdownTableBodyNone"><b>priority</b>  </td><td class="markdownTableBodyNone">draws in front of or behind sprites  </td><td class="markdownTableBodyNone">0 or 1 (bit 13)  </td></tr>
 </table>
 <p>So a floor tile is not "the grey one" — it is a tile tagged <span class="tt"><a class="el" href="map_8h.html#af873aaa17834669d0f263af08c2912c3" title="Solid tile (blocks movement).">T_SOLID</a></span>, and the physics code asks the map "what is at this pixel?" rather than hard-coding geometry. Slopes, ladders, one-way platforms and spikes are all just tile attributes; <a class="el" href="examples_maps_slope_collision.html" title="Slope Mario">Slope Mario</a> walks Mario up diagonal terrain purely from the slope attributes on its tiles, with no per-level collision code. Design your tile <em>semantics</em> alongside your tile art — decide early which tiles are solid, which hurt, which you can climb.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md498"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md505"></a>
 The level is bigger than VRAM — so stream it</h2>
 <p>A 32×32 tilemap is only <b>2 KB</b>, and VRAM holds just a screen or two of map at once. A 224-tile-wide level cannot live in VRAM. The answer is streaming: keep the <em>whole</em> level in ROM (and a working copy in extended WRAM), and copy only the visible ~32-tile window to VRAM, feeding one new column (or row) as the camera crosses each tile boundary.</p>
 <p>That is a direct application of the <a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a> rules: a single column is a tiny DMA, easily inside the ~4 KB VBlank budget, so scrolling stays smooth no matter how wide the world is. <a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> is the stepping stone — a Mario walking a level wider than the screen — and <a class="el" href="examples_scrolling_continuous_scroll.html" title="Continuous Scroll">Continuous Scroll</a> is the same idea run continuously. You do not manage the window by hand: the map engine's <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate</a></span> / <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank</a></span> detect the boundary crossing and queue the column for you.</p>
 <p>The design consequence: <b>build wide, not dense.</b> Level width is nearly free because it streams; what costs you is unique tiles (VRAM) and simultaneous on-screen sprites (<a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a>). A long level of reused metatiles is the SNES's comfort zone.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md499"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md506"></a>
 The workflow: design in Tiled, convert for the SNES</h2>
 <p>You do not hand-author map bytes. <a href="https://www.mapeditor.org/">Tiled</a> is a free level editor, and the SDK bridges it to the hardware. The pipeline (<a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a> is the complete worked example):</p>
 <div class="fragment"><div class="line"> Tiled  ──►  gfx4snes  ──►  tmx2snes  ──►  mapLoad()</div>
@@ -163,7 +163,7 @@ The workflow: design in Tiled, convert for the SNES</h2>
 <li><b>Load</b> them with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and scroll with the map engine.</li>
 </ol>
 <p>The point of the tooling is that <b>the Tiled file stays the single source of truth.</b> Change the level in the editor, re-run two commands, and the collision, palettes and visuals all move together — no separate hand-maintained collision map to drift out of sync.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md500"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md507"></a>
 Two ways to hold a level</h2>
 <p>Not every game wants the streaming map engine. Choose your representation from what the game needs:</p>
 <table class="markdownTable">
@@ -175,7 +175,7 @@ Two ways to hold a level</h2>
 <td class="markdownTableBodyNone">Fixed-screen puzzle / board  </td><td class="markdownTableBodyNone"><b>Your own array</b>  </td><td class="markdownTableBodyNone">A 64×64 area fits without streaming; you keep your own entity state  </td></tr>
 </table>
 <p><span class="tt">tmx2snes</span> serves both: its default output feeds the map engine, and its <span class="tt">-Q</span> flag emits a quadrant-ordered tilemap you can DMA straight to VRAM and drive with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> yourself — so even a game that does not use the engine still authors its levels in Tiled instead of by hand.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md501"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md508"></a>
 Designing the level, not just building it</h2>
 <p>Tooling gets pixels on screen; it does not make a level <em>good</em>. That is its own craft — pacing, teaching a mechanic before testing it, visual variety from a limited tileset. The best free primer is <a href="https://www.smwcentral.net/?p=beginners">SMW Central's beginners' guide</a>; it is about Super Mario World, but the level-design principles are universal.</p>
 <p>Two habits from <a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> carry over here:</p>

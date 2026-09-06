@@ -124,7 +124,7 @@ $(function(){initNavTree('examples_sprites.html','',''); });
 <div class="contents">
 <div class="textblock"><p><b>Family 3 of the developer journey — "things that move independently of the
 background."</b> Sprites (OBJ) are the heart of any game: the player, enemies, bullets, pickups. The SNES gives you 128 hardware sprites; this family is a ladder from one static sprite up to streaming a multi-tile character every frame.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1678"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1685"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -148,7 +148,7 @@ The ladder</h2>
 <p>3.7 is the showcase <em>and</em> a reality check: a smooth 32-sprite swarm plus the honest per-sprite budget (the base CPU tops out around three dozen in C — see <a href="../chips/sa1_starfield/">chips/sa1_starfield</a> for 128 via the SA-1). </p>
 </blockquote>
 <p>Start at 3.1 and climb: each rung adds exactly one idea onto the last.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1679"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1686"></a>
 Reference — OAM in one screen</h2>
 <p><b>OAM structure</b> — 128 sprites, 4 bytes each in the low table (512 bytes): X (low 8), Y, tile number (low 8), attributes (<span class="tt">vhoopppc</span> — flip, priority, palette, tile high bit). The high table (32 bytes) holds 2 bits/sprite: X high bit and size select.</p>
 <p><b>Sizes (OBJSEL <span class="tt">$2101</span>)</b> — each value picks a <em>small</em>/*large* pair, e.g. <span class="tt">1</span> = 8×8 / 32×32, <span class="tt">5</span> = 32×32 / 64×64. Rung 3.2 walks all six.</p>

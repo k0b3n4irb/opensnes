@@ -430,15 +430,15 @@ Grid-Based Collision (Breakout Bricks)</h3>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx &lt; 10 &amp;&amp; by &gt;</a>= 1 &amp;&amp; <a class="code hl_variable" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a> &lt;= 10) {</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx = <a class="code hl_variable" href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a> + (<a class="code hl_variable" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a> &lt;&lt; 3) + (<a class="code hl_variable" href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a> &lt;&lt; 1) - 10;</div>
-<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#af804f894e894a7c4f2c9b3771096c432">blocks</a>[idx] != 8) {</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a71f465d7293cb1efe0f936f73cd910b3">blocks</a>[idx] != 8) {</div>
 <div class="line">        <span class="comment">/* Brick hit -- remove it and bounce */</span></div>
 <div class="line">        <a class="code hl_function" href="games_2breakout_2main_8c.html#a36e3d90f4ce531ba21948495f1a2356d">remove_brick</a>();</div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a36e3d90f4ce531ba21948495f1a2356d"><div class="ttname"><a href="games_2breakout_2main_8c.html#a36e3d90f4ce531ba21948495f1a2356d">remove_brick</a></div><div class="ttdeci">static void remove_brick(void)</div><div class="ttdoc">Remove a brick and update score.</div><div class="ttdef"><b>Definition</b> main.c:642</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a71f465d7293cb1efe0f936f73cd910b3"><div class="ttname"><a href="games_2breakout_2main_8c.html#a71f465d7293cb1efe0f936f73cd910b3">blocks</a></div><div class="ttdeci">FAR u8 blocks[]</div><div class="ttdoc">Mutable brick state array (100 entries, one per grid cell).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_aca96a0ed334ef3db955cf3c1992e6a41"><div class="ttname"><a href="games_2breakout_2main_8c.html#aca96a0ed334ef3db955cf3c1992e6a41">bx</a></div><div class="ttdeci">static u16 bx</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_acaa2531ea968a59c1e1ca003c5e8773a"><div class="ttname"><a href="games_2breakout_2main_8c.html#acaa2531ea968a59c1e1ca003c5e8773a">by</a></div><div class="ttdeci">static u16 by</div><div class="ttdef"><b>Definition</b> main.c:159</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_af804f894e894a7c4f2c9b3771096c432"><div class="ttname"><a href="games_2breakout_2main_8c.html#af804f894e894a7c4f2c9b3771096c432">blocks</a></div><div class="ttdeci">u8 blocks[]</div><div class="ttdoc">Mutable brick state array (100 entries, one per grid cell).</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md135"></a>
 Performance Tips</h2>
 <ol type="1">

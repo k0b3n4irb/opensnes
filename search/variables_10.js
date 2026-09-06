@@ -8,7 +8,7 @@ var searchData=
   ['pad_5fkeys_5',['pad_keys',['../games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321',1,'pad_keys:&#160;main.c'],['../games_2tetris_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321',1,'pad_keys:&#160;main.c']]],
   ['pada_6',['pada',['../hdma_2gradient__colors_2main_8c.html#a35bf2dfefd617848209ae1f535119d6e',1,'main.c']]],
   ['padb_7',['padb',['../hdma_2gradient__colors_2main_8c.html#a1834737427fa0f0b2f09e8b9e39fd1ba',1,'main.c']]],
-  ['pal_8',['pal',['../chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd',1,'pal:&#160;main.c'],['../games_2breakout_2main_8c.html#a55e2dfee6cb6bff2bbfb31bb8fb1ded7',1,'pal:&#160;main.c']]],
+  ['pal_8',['pal',['../chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd',1,'pal:&#160;main.c'],['../games_2breakout_2main_8c.html#ab2b1d527fc1671bb06fc9a39bf715f21',1,'pal:&#160;main.c']]],
   ['pal_5fblue_9',['pal_blue',['../input_2two__players_2main_8c.html#a480e4b17de4de2de8697159f90b355b2',1,'main.c']]],
   ['pal_5foffset_10',['pal_offset',['../color_2hicolor__1792_2main_8c.html#aab69b39c0dc10b51b77e2d6aedc71bd8',1,'main.c']]],
   ['pal_5fred_11',['pal_red',['../input_2two__players_2main_8c.html#a020a97c9127c532ca4e982bddd59e3f6',1,'main.c']]],

@@ -8,8 +8,8 @@ var sram_8h =
     [ "SRAM_SIZE_NONE", "sram_8h.html#ac561bf6108641babc18b93efa8b028d3", null ],
     [ "sramChecksum", "sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309", null ],
     [ "sramClear", "sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0", null ],
-    [ "sramLoad", "sram_8h.html#a63e125097d3ec2339e7d13e918077314", null ],
-    [ "sramLoadOffset", "sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002", null ],
+    [ "sramLoad", "sram_8h.html#a27d8f498726727694f6631de1aa41b9f", null ],
+    [ "sramLoadOffset", "sram_8h.html#adc31b500d6dd4534bbaae396faa69df6", null ],
     [ "sramSave", "sram_8h.html#a7415ce406c368ab48f4224101eef11bf", null ],
     [ "sramSaveOffset", "sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752", null ]
 ];

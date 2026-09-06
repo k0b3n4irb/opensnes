@@ -159,8 +159,8 @@ Functions</h2></td></tr>
 <tr class="memitem:aa70a5d5ab5df3d622fb1ed40cf526e41" id="r_aa70a5d5ab5df3d622fb1ed40cf526e41"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa70a5d5ab5df3d622fb1ed40cf526e41">cameraUpdate</a> (void)</td></tr>
 <tr class="memdesc:aa70a5d5ab5df3d622fb1ed40cf526e41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Re-run the projection for the current camera and cache what the rest of the frame needs (horizon raster, ground centre).  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memitem:aaff87208a0a78ff938605d170d6fd898" id="r_aaff87208a0a78ff938605d170d6fd898"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aaff87208a0a78ff938605d170d6fd898">tableInit</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *t, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> lines, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> diag)</td></tr>
-<tr class="memdesc:aaff87208a0a78ff938605d170d6fd898"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build one matrix table skeleton: a sky entry holding the identity matrix, then the repeat-block header the DSP-1 payload sits under.  <br /></td></tr>
+<tr class="memitem:aad63c86c9eedc52c2d3179fe8f7294e9" id="r_aad63c86c9eedc52c2d3179fe8f7294e9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aad63c86c9eedc52c2d3179fe8f7294e9">tableInit</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *t, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> lines, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> diag)</td></tr>
+<tr class="memdesc:aad63c86c9eedc52c2d3179fe8f7294e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build one matrix table skeleton: a sky entry holding the identity matrix, then the repeat-block header the DSP-1 payload sits under.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -181,10 +181,10 @@ Variables</h2></td></tr>
 <tr class="memdesc:abedcfba005b8c73773b4b8fbe04fc615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rasters streamed in the last dsp1Raster call (luna manifest asserts it).  <br /></td></tr>
 <tr class="memitem:a93598385c70398be68e81a304480603d" id="r_a93598385c70398be68e81a304480603d"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a93598385c70398be68e81a304480603d">sky_lines</a></td></tr>
 <tr class="memdesc:a93598385c70398be68e81a304480603d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen line of the first ground raster and the block length.  <br /></td></tr>
-<tr class="memitem:aa86a0748c6f97f4ceedbecab95dca96a" id="r_aa86a0748c6f97f4ceedbecab95dca96a"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa86a0748c6f97f4ceedbecab95dca96a">tab_ab</a> [2][(6+127 *4+1)]</td></tr>
-<tr class="memdesc:aa86a0748c6f97f4ceedbecab95dca96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double-buffered M7A/M7B tables: HDMA reads one while the DSP-1 fills the other.  <br /></td></tr>
-<tr class="memitem:aa90c963485639e2a1d553ea1cc8488de" id="r_aa90c963485639e2a1d553ea1cc8488de"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa90c963485639e2a1d553ea1cc8488de">tab_cd</a> [2][(6+127 *4+1)]</td></tr>
-<tr class="memdesc:aa90c963485639e2a1d553ea1cc8488de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double-buffered M7C/M7D tables.  <br /></td></tr>
+<tr class="memitem:a10a1668cf42f86ae9ff17ac668ff50bc" id="r_a10a1668cf42f86ae9ff17ac668ff50bc"><td class="memItemLeft">static <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a10a1668cf42f86ae9ff17ac668ff50bc">tab_ab</a> [2][(6+127 *4+1)]</td></tr>
+<tr class="memdesc:a10a1668cf42f86ae9ff17ac668ff50bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double-buffered M7A/M7B tables: HDMA reads one while the DSP-1 fills the other.  <br /></td></tr>
+<tr class="memitem:ad4ce41ddccc495e2df271d5d663af373" id="r_ad4ce41ddccc495e2df271d5d663af373"><td class="memItemLeft">static <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad4ce41ddccc495e2df271d5d663af373">tab_cd</a> [2][(6+127 *4+1)]</td></tr>
+<tr class="memdesc:ad4ce41ddccc495e2df271d5d663af373"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double-buffered M7C/M7D tables.  <br /></td></tr>
 <tr class="memitem:ac19752e061ef8b90c6fed6ef3b7b820c" id="r_ac19752e061ef8b90c6fed6ef3b7b820c"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac19752e061ef8b90c6fed6ef3b7b820c">tab_mode</a> [5]</td></tr>
 <tr class="memdesc:ac19752e061ef8b90c6fed6ef3b7b820c"><td class="mdescLeft">&#160;</td><td class="mdescRight">BGMODE table: Mode 3 for the sky lines, then Mode 7 for the rest.  <br /></td></tr>
 <tr class="memitem:a7f2971ead73282ca27f21a125f22cda3" id="r_a7f2971ead73282ca27f21a125f22cda3"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7f2971ead73282ca27f21a125f22cda3">tab_tm</a> [5]</td></tr>
@@ -473,8 +473,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aaff87208a0a78ff938605d170d6fd898" name="aaff87208a0a78ff938605d170d6fd898"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaff87208a0a78ff938605d170d6fd898">&#9670;&#160;</a></span>tableInit()</h2>
+<a id="aad63c86c9eedc52c2d3179fe8f7294e9" name="aad63c86c9eedc52c2d3179fe8f7294e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad63c86c9eedc52c2d3179fe8f7294e9">&#9670;&#160;</a></span>tableInit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -485,7 +485,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void tableInit </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -922,8 +922,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa86a0748c6f97f4ceedbecab95dca96a" name="aa86a0748c6f97f4ceedbecab95dca96a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa86a0748c6f97f4ceedbecab95dca96a">&#9670;&#160;</a></span>tab_ab</h2>
+<a id="a10a1668cf42f86ae9ff17ac668ff50bc" name="a10a1668cf42f86ae9ff17ac668ff50bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10a1668cf42f86ae9ff17ac668ff50bc">&#9670;&#160;</a></span>tab_ab</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -932,7 +932,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tab_ab[2][(6+127 *4+1)]</td>
+          <td class="memname"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tab_ab[2][(6+127 *4+1)]</td>
         </tr>
       </table>
   </td>
@@ -946,8 +946,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa90c963485639e2a1d553ea1cc8488de" name="aa90c963485639e2a1d553ea1cc8488de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa90c963485639e2a1d553ea1cc8488de">&#9670;&#160;</a></span>tab_cd</h2>
+<a id="ad4ce41ddccc495e2df271d5d663af373" name="ad4ce41ddccc495e2df271d5d663af373"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4ce41ddccc495e2df271d5d663af373">&#9670;&#160;</a></span>tab_cd</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -956,7 +956,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tab_cd[2][(6+127 *4+1)]</td>
+          <td class="memname"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tab_cd[2][(6+127 *4+1)]</td>
         </tr>
       </table>
   </td>

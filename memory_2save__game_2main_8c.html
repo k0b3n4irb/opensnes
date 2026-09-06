@@ -152,14 +152,14 @@ Variables</h2></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
 <tr class="memdesc:a50a1287c6a673d98dd90c61df91fd33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current joypad state (read each frame in the main loop).  <br /></td></tr>
 <tr class="memitem:ab3904980c9a71424f906b737d40069b4" id="r_ab3904980c9a71424f906b737d40069b4"><td class="memItemLeft"><a class="el" href="structSaveState.html">SaveState</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab3904980c9a71424f906b737d40069b4">vtl</a></td></tr>
-<tr class="memdesc:ab3904980c9a71424f906b737d40069b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read buffer: populated by <a class="el" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002" title="Load data from SRAM at offset.">sramLoadOffset()</a> when loading from SRAM.  <br /></td></tr>
+<tr class="memdesc:ab3904980c9a71424f906b737d40069b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read buffer: populated by <a class="el" href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6" title="Load data from SRAM at offset.">sramLoadOffset()</a> when loading from SRAM.  <br /></td></tr>
 <tr class="memitem:ad1c5ad15a7e11834ff3a4a9acb0cc9dc" id="r_ad1c5ad15a7e11834ff3a4a9acb0cc9dc"><td class="memItemLeft"><a class="el" href="structSaveState.html">SaveState</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad1c5ad15a7e11834ff3a4a9acb0cc9dc">vts</a></td></tr>
 <tr class="memdesc:ad1c5ad15a7e11834ff3a4a9acb0cc9dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write buffer: filled with test data before saving to SRAM.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SRAM battery-backed save with multiple save slots. </p>
 <p>Demonstrates SRAM (Static RAM) persistence on the SNES. SRAM is a small battery-backed memory region (typically 2-32KB) mapped at $70:0000-$7D:FFFF (LoROM) that retains data when the console is powered off. This is how SNES cartridges implement save games.</p>
-<p>The example uses two save slots at different SRAM offsets, each storing a <a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> struct (player position and camera coordinates). <a class="el" href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752" title="Save data to SRAM at offset.">sramSaveOffset()</a> copies RAM data to SRAM, and <a class="el" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002" title="Load data from SRAM at offset.">sramLoadOffset()</a> reads it back. The loaded values are displayed as hex on screen to verify round-trip integrity.</p>
+<p>The example uses two save slots at different SRAM offsets, each storing a <a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> struct (player position and camera coordinates). <a class="el" href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752" title="Save data to SRAM at offset.">sramSaveOffset()</a> copies RAM data to SRAM, and <a class="el" href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6" title="Load data from SRAM at offset.">sramLoadOffset()</a> reads it back. The loaded values are displayed as hex on screen to verify round-trip integrity.</p>
 <p>The ROM header must declare SRAM support (USE_SRAM := 1) and size (SRAM_SIZE := 3 for 8KB) so emulators and flash carts allocate the battery-backed region.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SRAM battery-backed persistence for save games</li>
@@ -283,7 +283,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Read buffer: populated by <a class="el" href="sram_8h.html#ab68f968d67c1b0afcfef2aeb92c92002" title="Load data from SRAM at offset.">sramLoadOffset()</a> when loading from SRAM. </p>
+<p>Read buffer: populated by <a class="el" href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6" title="Load data from SRAM at offset.">sramLoadOffset()</a> when loading from SRAM. </p>
 
 </div>
 </div>

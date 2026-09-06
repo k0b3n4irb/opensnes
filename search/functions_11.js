@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['tableinit_0',['tableInit',['../mode7_2dsp1__ground_2main_8c.html#aaff87208a0a78ff938605d170d6fd898',1,'main.c']]],
+  ['tableinit_0',['tableInit',['../mode7_2dsp1__ground_2main_8c.html#aad63c86c9eedc52c2d3179fe8f7294e9',1,'main.c']]],
   ['terrain_5fclass_5fat_1',['terrain_class_at',['../games_2mode7__flying_2main_8c.html#adffdf154bc65129d27dcc65a861988e1',1,'main.c']]],
   ['textclear_2',['textClear',['../text_8h.html#a3ee3aa74832395d0ee83d3bfcf456650',1,'text.h']]],
   ['textclearrect_3',['textClearRect',['../text_8h.html#a5b0d49c65eb292f8d6ab738a5106482c',1,'text.h']]],

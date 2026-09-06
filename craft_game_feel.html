@@ -123,16 +123,16 @@ $(function(){initNavTree('craft_game_feel.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>"Game feel" is the layer of feedback that makes a jump feel springy and a hit feel like it landed — the same core mechanic reads as limp or delicious depending on it. The universal principles are covered definitively elsewhere (see Go-deeper); what nobody covers is <em>how to produce that juice on the SNES</em>, where you have no shader, no tween library, and a 4 KB VBlank budget. Almost every classic effect turns out to be a cheap trick on a PPU register. This guide is the SNES-specific toolbox; for the registers behind each, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md476"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md483"></a>
 Screen shake — nudge the scroll</h2>
 <p>The highest impact-per-byte effect on the machine: on a big hit, add a small random offset to every background's scroll for a few frames and decay it to zero. It is just the camera from <a class="el" href="craft_camera.html" title="Following the player: the camera">Following the player: the camera</a>, perturbed — a couple of pixels, three or four frames, fading out. Costs nothing, sells everything. Shake the sprite layer too (offset your OAM Y) for an impact that rattles the whole screen, or shake only the backgrounds for a softer thud.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md477"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md484"></a>
 Hit flash — color math, not palette edits</h2>
 <p>To flash a struck enemy white or tint the screen red on damage, do <b>not</b> rewrite palette entries every frame — that is a DMA you do not need. Use color math: the PPU adds or subtracts a fixed colour across a layer or the sprites in one register write. A one-frame white add on hit, a red subtract while the player is hurt, a blue wash underwater — all are <a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a> and <a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a> territory, applied for a handful of frames.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md478"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md485"></a>
 Freeze the frame — hitstop</h2>
 <p>The cheapest juice of all is <em>no</em> hardware: on a heavy hit, stop advancing the simulation for two to six frames. The image holds, the impact registers, then motion resumes. It is pure timing — a counter in your update loop — and it is what makes fighting games and action platformers feel like contact has weight. Pair it with a one-frame flash and a short shake and a plain collision becomes a <em>hit</em>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md479"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md486"></a>
 Punctuate scene changes — fades and dissolves</h2>
 <p>Cuts feel cheap; transitions feel authored. Two are nearly free on the SNES:</p>
 <ul>
@@ -140,19 +140,19 @@ Punctuate scene changes — fades and dissolves</h2>
 <li><b>Mosaic dissolve</b> — grow the mosaic size to pixelate the screen away, then shrink it back on the new scene. A distinctly SNES transition. See <a class="el" href="examples_transitions_mosaic.html" title="Mosaic -- PPU Pixel Block Effect">Mosaic -- PPU Pixel Block Effect</a>.</li>
 </ul>
 <p>Both are a single register animated over a dozen frames, and both read as production value far above their cost.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md480"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md487"></a>
 Ambient life — palette cycling</h2>
 <p>A static scene feels dead; a moving one feels alive. You do not need to animate tiles to get motion — <b>rotate a few palette entries</b> and water shimmers, lava churns, a portal pulses, with zero tile or DMA cost. It is the cheapest ongoing motion the hardware offers. See <a class="el" href="examples_color_palette_cycle.html" title="palette_cycle — animate by rotating CGRAM">palette_cycle — animate by rotating CGRAM</a>. The same lever gives you a low-health screen pulse or a power-up flash.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md481"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md488"></a>
 Squash and stretch without scaling</h2>
 <p>SNES sprites do not scale outside Mode 7, so you fake elasticity the old way: <b>pre-draw a few frames</b> — a squashed sprite for the landing, a stretched one for the launch, held for a frame or two. It is the animation principle, not a hardware feature, and it is what separates a character that <em>thumps</em> onto the ground from one that merely stops. See <a class="el" href="examples_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a> for frame-driven animation. For rippling heat, water or a hit-wobble on a whole layer, per-scanline distortion via HDMA does what sprite scaling cannot — see <a class="el" href="examples_hdma_hdma_wave.html" title="HDMA Wave">HDMA Wave</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md482"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md489"></a>
 Layer the little things</h2>
 <p>Juice compounds. A coin pickup that is satisfying is rarely one effect — it is a flash, a small sound, a number that pops and rises, and maybe a one-frame freeze, all at once and all gone within a quarter-second. <a class="el" href="examples_games_shmup_1942.html" title="shmup_1942">shmup_1942</a> is worth reading for how modest effects stack into a game that feels responsive.</p>
 <blockquote class="doxtable">
 <p><b>Go deeper.</b> Watch Jonasson &amp; Purho's <a href="https://www.gdcvault.com/play/1016487/Juice-It-or-Lose">Juice It or Lose It</a>: they take the same barebones game and layer juice onto it live. Every technique they show maps to a cheap trick above. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md483"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md490"></a>
 The one rule</h2>
 <p>Juice the verbs the player does most — jump, hit, collect, take damage — and make every effect <em>brief and decaying</em>: a few frames, fading to nothing. Feel comes from the sum of small, short responses to input, not from one big effect. Add them one at a time and stop when it feels right.</p>
 <blockquote class="doxtable">

@@ -150,10 +150,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1112f8f7d8aaf47129938cc4c35d0309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate simple checksum.  <br /></td></tr>
 <tr class="memitem:a5fb4001e2b3432597a28e97af0a907c0" id="r_a5fb4001e2b3432597a28e97af0a907c0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a5fb4001e2b3432597a28e97af0a907c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear SRAM to zero.  <br /></td></tr>
-<tr class="memitem:a63e125097d3ec2339e7d13e918077314" id="r_a63e125097d3ec2339e7d13e918077314"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a63e125097d3ec2339e7d13e918077314">sramLoad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a63e125097d3ec2339e7d13e918077314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM.  <br /></td></tr>
-<tr class="memitem:ab68f968d67c1b0afcfef2aeb92c92002" id="r_ab68f968d67c1b0afcfef2aeb92c92002"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
-<tr class="memdesc:ab68f968d67c1b0afcfef2aeb92c92002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM at offset.  <br /></td></tr>
+<tr class="memitem:a27d8f498726727694f6631de1aa41b9f" id="r_a27d8f498726727694f6631de1aa41b9f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a27d8f498726727694f6631de1aa41b9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM.  <br /></td></tr>
+<tr class="memitem:adc31b500d6dd4534bbaae396faa69df6" id="r_adc31b500d6dd4534bbaae396faa69df6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
+<tr class="memdesc:adc31b500d6dd4534bbaae396faa69df6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM at offset.  <br /></td></tr>
 <tr class="memitem:a7415ce406c368ab48f4224101eef11bf" id="r_a7415ce406c368ab48f4224101eef11bf"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a7415ce406c368ab48f4224101eef11bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save data to SRAM.  <br /></td></tr>
 <tr class="memitem:a33eaa8d30319fe6c1a8a2f1586c09752" id="r_a33eaa8d30319fe6c1a8a2f1586c09752"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
@@ -182,7 +182,7 @@ Usage Example</h2>
 <div class="line">SaveData save;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Load save data at game start</span></div>
-<div class="line"><a class="code hl_function" href="#a63e125097d3ec2339e7d13e918077314">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
+<div class="line"><a class="code hl_function" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
 <div class="line"><span class="keywordflow">if</span> (save.magic[0] != <span class="charliteral">&#39;S&#39;</span> || save.magic[1] != <span class="charliteral">&#39;A&#39;</span>) {</div>
 <div class="line">    <span class="comment">// No valid save, initialize defaults</span></div>
 <div class="line">    save.score = 0;</div>
@@ -199,7 +199,7 @@ Usage Example</h2>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:164</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="asram_8h_html_a63e125097d3ec2339e7d13e918077314"><div class="ttname"><a href="#a63e125097d3ec2339e7d13e918077314">sramLoad</a></div><div class="ttdeci">void sramLoad(u8 *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
+<div class="ttc" id="asram_8h_html_a27d8f498726727694f6631de1aa41b9f"><div class="ttname"><a href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a></div><div class="ttdeci">void sramLoad(u8 FAR *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
 <div class="ttc" id="asram_8h_html_a7415ce406c368ab48f4224101eef11bf"><div class="ttname"><a href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a></div><div class="ttdeci">void sramSave(const u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md65"></a>
 ROM Header Requirement</h2>
@@ -380,8 +380,8 @@ ROM Header Requirement</h2>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a63e125097d3ec2339e7d13e918077314" name="a63e125097d3ec2339e7d13e918077314"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63e125097d3ec2339e7d13e918077314">&#9670;&#160;</a></span>sramLoad()</h2>
+<a id="a27d8f498726727694f6631de1aa41b9f" name="a27d8f498726727694f6631de1aa41b9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27d8f498726727694f6631de1aa41b9f">&#9670;&#160;</a></span>sramLoad()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -389,7 +389,7 @@ ROM Header Requirement</h2>
         <tr>
           <td class="memname">void sramLoad </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -403,19 +403,19 @@ ROM Header Requirement</h2>
 <p>Copies data from battery-backed SRAM to Work RAM.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data</td><td>Pointer to destination buffer in Work RAM </td></tr>
+    <tr><td class="paramname">data</td><td>Pointer to destination buffer in Work RAM — a bank-0 object or a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> (bank $7E) one; the copy runs as a block move into bank $7E, whose first 8 KB mirror bank 0 </td></tr>
     <tr><td class="paramname">size</td><td>Number of bytes to load (max 32KB)</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> saveData[64];</div>
-<div class="line"><a class="code hl_function" href="#a63e125097d3ec2339e7d13e918077314">sramLoad</a>(saveData, 64);</div>
+<div class="line"><a class="code hl_function" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a>(saveData, 64);</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>If no valid save exists, SRAM contents are undefined </dd></dl>
 
 </div>
 </div>
-<a id="ab68f968d67c1b0afcfef2aeb92c92002" name="ab68f968d67c1b0afcfef2aeb92c92002"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab68f968d67c1b0afcfef2aeb92c92002">&#9670;&#160;</a></span>sramLoadOffset()</h2>
+<a id="adc31b500d6dd4534bbaae396faa69df6" name="adc31b500d6dd4534bbaae396faa69df6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc31b500d6dd4534bbaae396faa69df6">&#9670;&#160;</a></span>sramLoadOffset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +423,7 @@ ROM Header Requirement</h2>
         <tr>
           <td class="memname">void sramLoadOffset </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -439,7 +439,7 @@ ROM Header Requirement</h2>
 </div><div class="memdoc">
 
 <p>Load data from SRAM at offset. </p>
-<p>Like <a class="el" href="#a63e125097d3ec2339e7d13e918077314" title="Load data from SRAM.">sramLoad()</a> but reads from a specific offset within SRAM. Useful for multiple save slots.</p>
+<p>Like <a class="el" href="#a27d8f498726727694f6631de1aa41b9f" title="Load data from SRAM.">sramLoad()</a> but reads from a specific offset within SRAM. Useful for multiple save slots.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>Pointer to destination buffer in Work RAM </td></tr>
@@ -449,8 +449,8 @@ ROM Header Requirement</h2>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="comment">// Load slot 2 (each slot is 256 bytes)</span></div>
-<div class="line"><a class="code hl_function" href="#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a>(saveData, 256, 512);</div>
-<div class="ttc" id="asram_8h_html_ab68f968d67c1b0afcfef2aeb92c92002"><div class="ttname"><a href="#ab68f968d67c1b0afcfef2aeb92c92002">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
+<div class="line"><a class="code hl_function" href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a>(saveData, 256, 512);</div>
+<div class="ttc" id="asram_8h_html_adc31b500d6dd4534bbaae396faa69df6"><div class="ttname"><a href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

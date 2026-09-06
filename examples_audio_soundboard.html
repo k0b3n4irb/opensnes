@@ -143,7 +143,7 @@ $(function(){initNavTree('examples_audio_soundboard.html','',''); });
 </table>
 <p>The backdrop tints with each action. Up to 8 simultaneous voices, round-robin allocated by the engine.</p>
 <p>ROM mode: LoROM (project default).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md960"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md967"></a>
 SNES Concepts</h2>
 <ul>
 <li>Dynamic BRR loading: <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> streams sample data over the APU I/O ports — no fixed APU memory image, no <span class="tt">.spc700.asm</span></li>
@@ -151,13 +151,13 @@ SNES Concepts</h2>
 <li>ADSR as note articulation: one envelope per voice set at init — looping samples ring out and die instead of sustaining forever</li>
 <li>Echo: <span class="tt"><a class="el" href="group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7" title="Configure echo parameters.">audioSetEcho()</a></span> sizes and clears the ring, <span class="tt"><a class="el" href="group__audio__echo.html#gab056f4a5918e9a8d7efa634ebd4a75b6" title="Set FIR filter coefficients for echo.">audioSetEchoFilter()</a></span> sets the FIR, <span class="tt"><a class="el" href="group__audio__echo.html#ga663f776667e4907fbed12543f2c83bc1" title="Enable echo for specific voices.">audioEnableEcho()</a></span> routes voices in</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md961"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md968"></a>
 Sample provenance</h2>
 <p><span class="tt">res/cello.brr</span> is krom (Peter Lemon)'s PitchMod cello (see <span class="tt">ATTRIBUTION.md</span> for the caveat). The <span class="tt">ss</span>/<span class="tt">pp</span> phonemes are OpenSNES-original formant-synthesized BRRs from the speech_synth example. <span class="tt">au.brr</span> is an RMS-boosted regeneration of speech_synth's AU (<span class="tt">gen_au_boost.py</span> — the speech bank is peak-normalized, and a vowel's high crest factor made the original ~3x quieter than the recorded cello next to it).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md962"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md969"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md963"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md970"></a>
 Modules Used</h2>
 <p>console, audio, input </p>
 </div></div><!-- contents -->

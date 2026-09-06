@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_audio.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Family 8 — "make it sound like a game."</b> The SNES has a whole second processor for sound — the SPC700, with its own 64 KB of RAM, its own S-DSP, and its own instruction set, talking to the main CPU through just 4 I/O bytes. This family has two on-ramps — tracker music, and driving the DSP straight from C — then the DSP's party tricks.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md888"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md895"></a>
 The ladder</h2>
 <p><b>Tracker music (SNESMOD)</b> — compose in a tracker, <span class="tt">smconv</span> converts the <span class="tt">.it</span>, the lib plays it:</p>
 <table class="markdownTable">
@@ -153,7 +153,7 @@ The ladder</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">8.9  </td><td class="markdownTableBodyNone"><a href="echo/">echo</a>  </td><td class="markdownTableBodyNone">How do I add echo / reverb from the S-DSP?  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md889"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md896"></a>
 The idea in one screen</h2>
 <p>Sound is a co-processor problem: you never touch the DSP registers from the 65816 directly — you hand a driver a command over the 4 I/O ports and it runs on the SPC700. SNESMOD's driver plays a compiled tracker module; the audio-v2 driver exposes voices, ADSR, BRR samples and the echo unit as C calls (<span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a></span>, <span class="tt"><a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx</a></span>, <span class="tt"><a class="el" href="group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7" title="Configure echo parameters.">audioSetEcho</a></span>…). Both share the same 64 KB of ARAM, so samples, the echo ring and the driver all compete for it.</p>
 <p><em>(Audio examples have no screenshot — the lesson is audible. Run them with sound.)</em></p>

@@ -133,7 +133,7 @@ Screenshot</div></div>
 <div class="line">                                   (one AnimClip per Aseprite tag)</div>
 </div><!-- fragment --><p><span class="tt">gfx4snes</span> owns the pixels and the metasprite geometry; <span class="tt">aseprite2snes</span> owns the timeline (tags, per-frame durations, direction). They meet at the frame value: a clip's frame <em>i</em> selects <span class="tt">hero_metasprites[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>, resolved inline by <span class="tt"><a class="el" href="anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57" title="Tick + resolve against a gfx4snes metasprite pointer table.">animTickMeta()</a></span> and drawn with <span class="tt"><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a></span>.</p>
 <p>The artist authored two tags in Aseprite — <b>walk</b> (forward loop) and <b>wave</b> (ping-pong) — with per-frame millisecond durations. <span class="tt">aseprite2snes</span> converted those to ticks and folded the ping-pong into the frame order. Press <b>A</b> to toggle between the two generated clips.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1646"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1653"></a>
 SNES Concepts</h2>
 <ul>
 <li>Metasprite composition from multiple OAM entries (<span class="tt"><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta</a></span>)</li>
@@ -142,14 +142,14 @@ SNES Concepts</h2>
 <li>OBJSEL size mode and OBJ VRAM base for 16×16 hardware sprites</li>
 <li>Sprite palette at CGRAM 128 (<span class="tt"><a class="el" href="sprite_8h.html#a6e29a6aabd5aef0cc3449f9104d4bc32" title="CGRAM base offset for sprite palettes (sprites use colors 128-255).">OBJ_CGRAM_BASE</a></span>)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1647"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1654"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/sprites/aseprite_pipeline &amp;&amp; make</div>
 </div><!-- fragment --><p>The build runs the full pipeline automatically: <span class="tt">gfx4snes -P</span> on <span class="tt">res/hero.png</span> and <span class="tt">aseprite2snes</span> on <span class="tt">res/hero.json</span>, then compiles <span class="tt">main.c</span> (which <span class="tt">#include</span>s both generated files).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1648"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1655"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">text4bpp</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">anim</span></p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1649"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1656"></a>
 See Also</h2>
 <ul>
 <li><span class="tt">tools/aseprite2snes</span> — the animation-clip generator (<span class="tt"><a class="el" href="aseprite2snes_8md.html">docs/tools/aseprite2snes.md</a></span>)</li>

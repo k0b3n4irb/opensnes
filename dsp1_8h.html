@@ -161,8 +161,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a39767ab0d98ace72ba92e541085e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world point to the screen (DSP-1 command $06, "Project").  <br /></td></tr>
 <tr class="memitem:a152f59d6d62b0d9f544e08db046de212" id="r_a152f59d6d62b0d9f544e08db046de212"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a152f59d6d62b0d9f544e08db046de212">dsp1Range</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> r)</td></tr>
 <tr class="memdesc:a152f59d6d62b0d9f544e08db046de212"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sphere test (DSP-1 command $18, "Range").  <br /></td></tr>
-<tr class="memitem:aa405c363cda144924639fa91e6d2184a" id="r_aa405c363cda144924639fa91e6d2184a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa405c363cda144924639fa91e6d2184a">dsp1Raster</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *ab, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *cd, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> vs, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> count)</td></tr>
-<tr class="memdesc:aa405c363cda144924639fa91e6d2184a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, "Raster").  <br /></td></tr>
+<tr class="memitem:ae3a3ca2d7d42d475f5b73b962dce7da9" id="r_ae3a3ca2d7d42d475f5b73b962dce7da9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae3a3ca2d7d42d475f5b73b962dce7da9">dsp1Raster</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *ab, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *cd, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> vs, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> count)</td></tr>
+<tr class="memdesc:ae3a3ca2d7d42d475f5b73b962dce7da9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, "Raster").  <br /></td></tr>
 <tr class="memitem:adb861416d471a3218480f16d3331f55f" id="r_adb861416d471a3218480f16d3331f55f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
 <tr class="memdesc:adb861416d471a3218480f16d3331f55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate a 2D point about the origin (DSP-1 command $0C, "Rotate").  <br /></td></tr>
 <tr class="memitem:a6b150c56e8f97f8932da84b2d2a6f106" id="r_a6b150c56e8f97f8932da84b2d2a6f106"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6b150c56e8f97f8932da84b2d2a6f106">dsp1Target</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> h, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> v)</td></tr>
@@ -603,8 +603,8 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 
 </div>
 </div>
-<a id="aa405c363cda144924639fa91e6d2184a" name="aa405c363cda144924639fa91e6d2184a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa405c363cda144924639fa91e6d2184a">&#9670;&#160;</a></span>dsp1Raster()</h2>
+<a id="ae3a3ca2d7d42d475f5b73b962dce7da9" name="ae3a3ca2d7d42d475f5b73b962dce7da9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a3ca2d7d42d475f5b73b962dce7da9">&#9670;&#160;</a></span>dsp1Raster()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -612,12 +612,12 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
         <tr>
           <td class="memname">void dsp1Raster </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>ab</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>ab</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>cd</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>cd</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

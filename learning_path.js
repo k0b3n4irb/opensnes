@@ -1,19 +1,19 @@
 var learning_path =
 [
     [ "Print a string", "examples_text_print_string.html", [
-      [ "Stage 0 — \"Does my setup even work?\"", "learning_path.html#autotoc_md576", null ],
-      [ "Stage 1 — \"Can I put something on screen?\"", "learning_path.html#autotoc_md577", null ],
-      [ "Stage 2 — \"Can the player act?\"", "learning_path.html#autotoc_md578", null ],
-      [ "Stage 3 — \"Can I build a world?\"", "learning_path.html#autotoc_md579", null ],
-      [ "Stage 4 — \"Can I make it feel good?\"", "learning_path.html#autotoc_md580", null ],
-      [ "Stage 5 — \"Can I hold it all together?\"", "learning_path.html#autotoc_md581", null ],
-      [ "Stage 6 — \"Can I finish and ship?\"", "learning_path.html#autotoc_md582", [
-        [ "More horsepower — the cartridge coprocessors", "learning_path.html#autotoc_md583", null ],
-        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1717", null ],
-        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1718", null ],
-        [ "How to build", "examples_text_print_string.html#autotoc_md1719", null ],
-        [ "Modules used", "examples_text_print_string.html#autotoc_md1720", null ],
-        [ "Next rung", "examples_text_print_string.html#autotoc_md1721", null ]
+      [ "Stage 0 — \"Does my setup even work?\"", "learning_path.html#autotoc_md583", null ],
+      [ "Stage 1 — \"Can I put something on screen?\"", "learning_path.html#autotoc_md584", null ],
+      [ "Stage 2 — \"Can the player act?\"", "learning_path.html#autotoc_md585", null ],
+      [ "Stage 3 — \"Can I build a world?\"", "learning_path.html#autotoc_md586", null ],
+      [ "Stage 4 — \"Can I make it feel good?\"", "learning_path.html#autotoc_md587", null ],
+      [ "Stage 5 — \"Can I hold it all together?\"", "learning_path.html#autotoc_md588", null ],
+      [ "Stage 6 — \"Can I finish and ship?\"", "learning_path.html#autotoc_md589", [
+        [ "More horsepower — the cartridge coprocessors", "learning_path.html#autotoc_md590", null ],
+        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1724", null ],
+        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1725", null ],
+        [ "How to build", "examples_text_print_string.html#autotoc_md1726", null ],
+        [ "Modules used", "examples_text_print_string.html#autotoc_md1727", null ],
+        [ "Next rung", "examples_text_print_string.html#autotoc_md1728", null ]
       ] ]
     ] ],
     [ "Scroll a message", "examples_text_scroll_message.html", null ],

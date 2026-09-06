@@ -59,10 +59,10 @@ var NAVTREEINDEX =
 "examples_scrolling_mixed_scroll.html",
 "globals_vars_b.html",
 "group__ppu__regs.html#ga40b0af5f9d5abe1a520205d5a99c86ab",
-"input_2mouse_2main_8c.html",
-"panel_8h_source.html",
-"sprite_8h.html#a71b310f8efd32bb7d355c278a9b7b6c3",
-"superfx_8h.html#aaae39a6799d57a1de176c8477797438c"
+"input_2controller_2main_8c.html",
+"panel_8h.html#abe2d36e123f747f0d8d827388363f704",
+"sprite_8h.html#a719045957a857d18f56354a20313ae37",
+"superfx_8h.html#aa96dbf2933de566840e56b543630e5d6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

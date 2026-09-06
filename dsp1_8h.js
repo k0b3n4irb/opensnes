@@ -12,7 +12,7 @@ var dsp1_8h =
     [ "dsp1Present", "dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f", null ],
     [ "dsp1Project", "dsp1_8h.html#a39767ab0d98ace72ba92e541085e1b60", null ],
     [ "dsp1Range", "dsp1_8h.html#a152f59d6d62b0d9f544e08db046de212", null ],
-    [ "dsp1Raster", "dsp1_8h.html#aa405c363cda144924639fa91e6d2184a", null ],
+    [ "dsp1Raster", "dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9", null ],
     [ "dsp1Rotate", "dsp1_8h.html#adb861416d471a3218480f16d3331f55f", null ],
     [ "dsp1Target", "dsp1_8h.html#a6b150c56e8f97f8932da84b2d2a6f106", null ],
     [ "dsp1Triangle", "dsp1_8h.html#a30bcc07948d43ad0fca8fb3ccc210208", null ],

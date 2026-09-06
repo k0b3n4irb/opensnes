@@ -40,6 +40,7 @@ var index =
     [ "Window Masking Tutorial", "tutorial_window.html", null ],
     [ "Fixed-Point Math Tutorial", "tutorial_math.html", null ],
     [ "SRAM Save Tutorial", "tutorial_sram.html", null ],
+    [ "Far RAM Tutorial — FAR objects beyond the 8 KB band", "tutorial_far_ram.html", null ],
     [ "SA-1 Enhancement Chip Tutorial", "tutorial_sa1.html", null ],
     [ "SuperFX (GSU) Tutorial", "tutorial_superfx.html", null ],
     [ "Interactive Debugging with luna", "tutorial_debugging.html", null ],

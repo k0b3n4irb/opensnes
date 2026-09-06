@@ -126,6 +126,11 @@ $(function(){initNavTree('group__volatile__types.html','',''); });
 <p>Volatile types for hardware register access.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:gaef060b3456fdcc093a7210a762d5f2ed" id="r_gaef060b3456fdcc093a7210a762d5f2ed"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a>&#160;&#160;&#160;/* host compilers (the clang syntax lint) have no address spaces */</td></tr>
+<tr class="memdesc:gaef060b3456fdcc093a7210a762d5f2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ga84c4ebe721fa065d9bd514ce8d76c455" id="r_ga84c4ebe721fa065d9bd514ce8d76c455"><td class="memItemLeft">typedef volatile <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga84c4ebe721fa065d9bd514ce8d76c455">vs16</a></td></tr>
@@ -138,7 +143,25 @@ Typedefs</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Volatile types for hardware register access. </p>
 <p>Use these when accessing memory-mapped I/O registers to prevent the compiler from optimizing away reads/writes. </p>
-</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="gaef060b3456fdcc093a7210a762d5f2ed" name="gaef060b3456fdcc093a7210a762d5f2ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaef060b3456fdcc093a7210a762d5f2ed">&#9670;&#160;</a></span>FAR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FAR&#160;&#160;&#160;/* host compilers (the clang syntax lint) have no address spaces */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Place a global in bank $7E WRAM, outside the 8 KB bank-0 band. </p>
+<p><span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> buffer[4096];</span> — the object lives in <span class="tt">$7E:2000-$FFFF</span> and every access to it (direct, <span class="tt">buffer[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>, or through a <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> *</span> pointer) is compiled with bank-honouring addressing. Use it for bulk state that does not fit the 8 KB band: HDMA tables, tilemaps built in RAM, entity pools. Restrictions: static storage only (the stack is bank 0) and not <span class="tt">const</span> (ROM is already reachable from any bank). Initialisers work (the boot data-init copy carries the bank); everything else is zero at boot. Handing a <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> pointer to code expecting a plain pointer is a compile error, as with <span class="tt">const</span>; a plain pointer converts to <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> silently and just takes the far path. A <span class="tt">T <a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> *</span> converts to <span class="tt">const T *</span> without a cast — a read through a const pointee is already a far read — so the DMA/HDMA/asset helpers take <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> buffers as they are. Cost: <span class="tt">arr[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span> on a <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> array is one absolute-long-indexed instruction (cheaper than bank 0); a pointer walk is within 4 % of the bank-0 path. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="far__ram_8md.html">docs/tutorials/far_ram.md</a> </dd></dl>
+
+</div>
+</div>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
 <a id="ga84c4ebe721fa065d9bd514ce8d76c455" name="ga84c4ebe721fa065d9bd514ce8d76c455"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga84c4ebe721fa065d9bd514ce8d76c455">&#9670;&#160;</a></span>vs16</h2>
 

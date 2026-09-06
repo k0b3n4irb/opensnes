@@ -128,17 +128,17 @@ $(function(){initNavTree('examples_mode7_dsp1_ground.html','',''); });
 Screenshot</div></div>
     <p><span class="tt">mode7/perspective</span> fakes a receding floor with a precomputed M7A/M7D table. This example asks the DSP-1 for the real thing: every frame the coprocessor's <b>Raster</b> command streams one Mode 7 matrix per scanline — A, B, C <em>and</em> D — for the camera you describe with <span class="tt"><a class="el" href="dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1Parameter</a></span>, and two HDMA channels replay them the next frame. Turn with the D-pad and the whole floor rotates in true perspective, because the rotation is inside the matrices the chip computed.</p>
 <p>This is the technique Super Mario Kart and Pilotwings shipped with — the reason the DSP-1 was on the cartridge at all.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1522"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1529"></a>
 How it works</h2>
 <ol type="1">
 <li><span class="tt">dsp1Parameter(x, y, height, lfe, les, heading, tilt)</span> describes the camera and hands back four numbers: <b>Vof</b> (raster of the "imaginary
    centre"), <b>Vva</b> (horizon raster, relative to Vof), and <b>Cx/Cy</b> — the ground point under that centre, which goes straight to M7X/M7Y.</li>
-<li><span class="tt"><a class="el" href="dsp1_8h.html#aa405c363cda144924639fa91e6d2184a" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster</a>(ab, cd, Vva + 2, lines)</span> streams the per-raster matrices for the ground below the horizon into two buffers laid out as <span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> repeat payloads (M7A/M7B on one channel, M7C/M7D on the other). Raster <span class="tt">Vva+1</span> is the singular horizon line, so the ground starts at <span class="tt">Vva+2</span> on screen line <span class="tt">112 + Vof + Vva + 2</span>.</li>
+<li><span class="tt"><a class="el" href="dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster</a>(ab, cd, Vva + 2, lines)</span> streams the per-raster matrices for the ground below the horizon into two buffers laid out as <span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> repeat payloads (M7A/M7B on one channel, M7C/M7D on the other). Raster <span class="tt">Vva+1</span> is the singular horizon line, so the ground starts at <span class="tt">Vva+2</span> on screen line <span class="tt">112 + Vof + Vva + 2</span>.</li>
 <li>Two more HDMA channels do the F-Zero split above the horizon (BGMODE 3 + BG2 sky, then BGMODE 7 + BG1 ground) exactly like <span class="tt">mode7/perspective</span>.</li>
 <li>The tables are double-buffered: the DSP-1 fills the back set during active display (≈ 50 µs per raster, 126 rasters ≈ 40 % of the frame), and VBlank swaps them with <span class="tt"><a class="el" href="hdma_8h.html#a60a2966565cd8b728a5acd019859e8e6" title="Update HDMA table pointer (for dynamic effects).">hdmaSetTable</a></span> and moves M7X/M7Y and the Mode 7 scroll so the ground under the imaginary centre stays pinned to the middle of the screen.</li>
 </ol>
 <p>Moving forward uses the chip too: <span class="tt">dsp1Triangle(heading, speed)</span> gives the sin/cos step on the ground plane.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1523"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1530"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -148,7 +148,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-pad Up / Down  </td><td class="markdownTableBodyNone">Drive forward / backward along the heading  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1524"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1531"></a>
 SNES Concepts</h2>
 <ul>
 <li>DSP-1 Raster: an open-ended command that streams until the CPU writes the <span class="tt">$8000</span> sentinel in place of a D read (the lib does this for you)</li>
@@ -157,14 +157,14 @@ SNES Concepts</h2>
 <li>Double-buffered HDMA tables swapped in VBlank</li>
 <li>Mid-frame BG mode switch (sky above, Mode 7 below)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1525"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1532"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>The ROM needs a DSP-1 on the cartridge (<span class="tt">USE_DSP1 := 1</span> sets the header) and luna needs Sony's <span class="tt">dsp1b.rom</span> firmware installed once (<span class="tt">luna state --dsp1-rom &lt;path&gt; dsp1_ground.sfc</span>); the luna test manifest is firmware-gated and skips cleanly in CI.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1526"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1533"></a>
 Modules Used</h2>
 <p>console, dma, background, input, mode7, hdma, dsp1 (auto-added by <span class="tt">USE_DSP1</span>)</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1527"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1534"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -176,11 +176,11 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>, <span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">Textures shared with <span class="tt">mode7/perspective</span> (PVSnesLib Mode7Perspective, mills32 / alekmaul)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md1528"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md1535"></a>
 Going Further</h2>
 <ul>
 <li><span class="tt">dsp1Target(h, v)</span> is the inverse: which ground point is under a screen pixel — the missile scope of Pilotwings, a cursor on the track.</li>
-<li>Change <span class="tt"><a class="el" href="mode7_2dsp1__ground_2main_8c.html#a2f55f2b0f14df89146493d86e768d524" title="Zenith angle of the view line: 0x4000 is horizontal (horizon at the screen centre); 0x4000 - 655 tilt...">CAM_AZS</a></span> (tilt) and watch Vof/Vva move the horizon; keep the ground under 127 rasters per repeat block, or call <span class="tt"><a class="el" href="dsp1_8h.html#aa405c363cda144924639fa91e6d2184a" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster</a></span> twice for two blocks.</li>
+<li>Change <span class="tt"><a class="el" href="mode7_2dsp1__ground_2main_8c.html#a2f55f2b0f14df89146493d86e768d524" title="Zenith angle of the view line: 0x4000 is horizontal (horizon at the screen centre); 0x4000 - 655 tilt...">CAM_AZS</a></span> (tilt) and watch Vof/Vva move the horizon; keep the ground under 127 rasters per repeat block, or call <span class="tt"><a class="el" href="dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster</a></span> twice for two blocks.</li>
 <li><span class="tt">chips/dsp1_cube</span> — the other half of the chip: Attitude / Objective / Project for objects on top of this floor. </li>
 </ul>
 </div></div><!-- contents -->

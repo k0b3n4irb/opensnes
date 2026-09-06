@@ -1,18 +1,18 @@
 var examples_audio =
 [
-    [ "Categories", "examples.html#autotoc_md1568", null ],
-    [ "Learning Path", "examples.html#autotoc_md1569", [
-      [ "Level 1 &ndash; First Steps", "examples.html#autotoc_md1570", null ],
-      [ "Level 2 &ndash; Graphics Fundamentals", "examples.html#autotoc_md1571", null ],
-      [ "Level 3 &ndash; Scrolling and Effects", "examples.html#autotoc_md1572", null ],
-      [ "Level 4 &ndash; Advanced Topics", "examples.html#autotoc_md1573", null ],
-      [ "Level 5 &ndash; Maps and Complete Projects", "examples.html#autotoc_md1574", null ]
+    [ "Categories", "examples.html#autotoc_md1575", null ],
+    [ "Learning Path", "examples.html#autotoc_md1576", [
+      [ "Level 1 &ndash; First Steps", "examples.html#autotoc_md1577", null ],
+      [ "Level 2 &ndash; Graphics Fundamentals", "examples.html#autotoc_md1578", null ],
+      [ "Level 3 &ndash; Scrolling and Effects", "examples.html#autotoc_md1579", null ],
+      [ "Level 4 &ndash; Advanced Topics", "examples.html#autotoc_md1580", null ],
+      [ "Level 5 &ndash; Maps and Complete Projects", "examples.html#autotoc_md1581", null ]
     ] ],
-    [ "Building", "examples.html#autotoc_md1575", null ],
-    [ "Running", "examples.html#autotoc_md1576", null ],
-    [ "Tips", "examples.html#autotoc_md1577", [
-      [ "The ladder", "examples_audio.html#autotoc_md888", null ],
-      [ "The idea in one screen", "examples_audio.html#autotoc_md889", null ]
+    [ "Building", "examples.html#autotoc_md1582", null ],
+    [ "Running", "examples.html#autotoc_md1583", null ],
+    [ "Tips", "examples.html#autotoc_md1584", [
+      [ "The ladder", "examples_audio.html#autotoc_md895", null ],
+      [ "The idea in one screen", "examples_audio.html#autotoc_md896", null ]
     ] ],
     [ "apu_switch — hot-swapping APU programs at runtime", "examples_audio_apu_switch.html", null ],
     [ "Echo / reverb", "examples_audio_echo.html", null ],

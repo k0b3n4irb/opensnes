@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_audio_sfx_from_wav.html','',''); });
 Screenshot</div></div>
     <p>The smallest "press a button, hear a sound" example — and a showcase of the zero-config <b><span class="tt">.wav</span> → <span class="tt">.brr</span> build rule</b>. <span class="tt">res/blip.wav</span> and <span class="tt">res/coin.wav</span> are ordinary PCM WAV files; the build system converts each to a SNES BRR sample with <a href="../../../tools/wav2brr"><span class="tt">wav2brr</span></a> automatically, exactly the way a <span class="tt">.png</span> becomes a <span class="tt">.pic</span>. No <span class="tt">.brr</span> is committed — they are generated on demand. Press <b>A</b> for a blip, <b>B</b> for a coin.</p>
 <p>This is the one-shot / sound-effect counterpart to the SNESMOD examples: for a jump, a hit, or a UI blip you load a BRR sample directly and trigger it, with no tracker soundbank involved.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md890"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md897"></a>
 SNES Concepts</h2>
 <ul>
 <li><b>BRR samples</b> — the SNES's ADPCM sample format; the DSP plays BRR, nothing else</li>
@@ -136,16 +136,16 @@ SNES Concepts</h2>
 <li><b>Edge-triggered input</b> — <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> fires once per press, so one button tap plays one sound</li>
 <li><b>Asset pipeline</b> — a source <span class="tt">.wav</span> auto-converted at build time, the .brr <span class="tt">.incbin</span>'d and linked (see <span class="tt">data.asm</span>)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md891"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md898"></a>
 How the WAV becomes a sample</h2>
 <div class="fragment"><div class="line">res/blip.wav  --wav2brr--&gt;  res/blip.brr  --.incbin (data.asm)--&gt;  blip_brr[]</div>
 </div><!-- fragment --><p>The <span class="tt">.incbin</span> in <span class="tt">data.asm</span> makes <span class="tt">res/blip.brr</span> a build prerequisite, and <span class="tt">make/common.mk</span>'s <span class="tt">%.brr: %.wav</span> rule generates it. To make a looping sample (a sustained tone), run <span class="tt">wav2brr --loop START END</span> by hand and commit the <span class="tt">.brr</span> instead. See <span class="tt"><a class="el" href="audio_8md.html">docs/tutorials/audio.md</a></span> ("One-shot samples from WAV").</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md892"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md899"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/audio/sfx_from_wav</div>
 <div class="line">make</div>
 </div><!-- fragment --><p>Run <span class="tt">sfx_from_wav.sfc</span> in any emulator (or <span class="tt">luna run sfx_from_wav.sfc</span>).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md893"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md900"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">audio</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">text</span> </p>
 </div></div><!-- contents -->
