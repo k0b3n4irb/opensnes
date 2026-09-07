@@ -1,8 +1,8 @@
 # #127 proposal 3 — default non-bank-$00 placement for QBE const data
 
-Status: **measured, not shipped.** The one-line default-flip is safe for
-LoROM and SA-1 and **corrupts HiROM**. Reverted. This note is so the next
-attempt starts from the HiROM problem instead of re-running the safe half.
+Status: **SHIPPED 2026-09-07** (branch `wip/127-rodata-default`). The
+HiROM problem below is solved — see "Resolution" at the end. The 2026-07
+analysis is kept as written.
 
 ## The experiment
 
@@ -107,3 +107,44 @@ re-derive it. The whole of the remaining work is HiROM.
 Nothing in the compiler. The reusable BANKS-`.DEFINE` mechanism
 (`6943eccb`) and `ASSET_SECTION` picking its own bank (`aeabdad3`) are in
 `develop`; this default-flip is not. #127 stays open on HiROM.
+
+## Resolution (2026-09-07)
+
+The HiROM culprit was neither the offset per se, nor `dmaCopyVram`, nor
+the SEMISUPERFREE directive: it was the **bank byte**. Every unit's
+`:label` / 24-bit address used base 0 (the header's `.BASE $80` only
+applies to the header's own file, and only under FASTROM), so a label at
+offset $0000 of linker bank 1 became `$01:0000` — the half of that bank
+HiROM does not map at $00-$3F. `SOUNDBANK` at `01:8000` worked because
+the upper half is mirrored there. The same bug already bit the runtime:
+`.mul32`/`.div32` sat at `07:0000` in hirom_demo, i.e. `$07:0000`, a WRAM
+mirror — any HiROM C program doing 32-bit arithmetic would have crashed.
+
+Fix, two parts:
+
+1. `.BASE $C0` in `memmap_hirom.inc` (every C TU and asm wrap) and in
+   `hdr_hirom.asm` (crt0): the bank byte is `$C0 + linker bank`, the full
+   64 KB view, also the FastROM window. Code at `$8000+` stays reachable
+   both ways.
+2. wla-dx applied `.BASE` to RAMSECTION labels too (`get_snes_pc_bank`:
+   `x = (x + l->base) << 16` for every label): `oamMemory` at `$7E:0300`
+   became `$13E:0301`, out of 24-bit range — and under `.BASE $80` a `$7E`
+   buffer silently became `$FE`. One patch on the fork
+   (`opensnes/ram-labels-ignore-base`, `86df331`): a label in a RAM
+   section keeps its declared bank. First local patch on wla-dx, a
+   deliberate decision (`.claude/rules/bank0_budget.md`).
+
+`symmap.py` and `check_bank_reads.py` fold `$C0-$FF` / `$80-$BF` back to
+the linker bank when reading a `.sym` (the `.sym` now prints `c0:8afc
+main`, `c7:0000 tcc_mul32`, `7e:0300 oamMemory` for hirom_demo — a valid
+CPU address per line, which luna needs).
+
+Then the flip itself (qbe `ca50db8`), both emission sites, and the
+symmap spill heuristics retired (a `.rodata` or `string.N` in bank $01+
+is the intent now; `check_bank_reads.py` is the guard that remains).
+
+Corpus, clean rebuild: visual **85/85 identical**, manifests 50/50,
+coverage unchanged, bank-blind lint 0/85, hirom_demo pixel-identical with
+its data in bank 7. Bank $00 minimum **12 → 2168 bytes** (mode5_hires);
+tetris/likemario/mapandobjects leave the 12-byte cliff for good. WRAM
+oracle re-baselined (layout shift → return addresses on the stack).

@@ -59,7 +59,9 @@ load-bearing for cross-session continuity).
 >   `.claude/notes/chantiers/qbe_access_flag.md`).
 > - **INTRINSIC (not fixable):** D3 (SuperFX has no C compiler — GSU RISC ISA).
 > - **Cross-ref:** the only *public* open issue is **#127** (its remaining
->   piece, #127.3, = QBE const-data default placement). Everything else
+>   piece, #127.3 = QBE const-data default placement, **shipped
+>   2026-09-07** — bank $00 minimum 12 → 2168 bytes, HiROM fixed with
+>   `.BASE $C0` + a wlalink patch). Everything else
 >   here is maintainer-internal.
 
 **Baseline**: external review delivered 2026-05-07; 18 commits shipped on

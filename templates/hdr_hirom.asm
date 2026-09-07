@@ -101,9 +101,7 @@
 ;------------------------------------------------------------------------------
 
 .BANK 0
-.ifdef FASTROM
-.BASE $80
-.endif
+.BASE $C0                   ; full-view HiROM bank byte, see memmap_hirom.inc
 .ORG 0
 .SECTION ".hirom_reserved" FORCE
     .DSB $8000, $00     ; Fill $0000-$7FFF with zeros (reserved, inaccessible)

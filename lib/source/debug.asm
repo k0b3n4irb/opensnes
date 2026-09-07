@@ -56,14 +56,17 @@ consoleMesenBreakpoint:
 ; Write a null-terminated string to the Nocash debug port ($21FC).
 ; Each byte is written individually; the null terminator is NOT sent.
 ;
-; Stack layout (after PHP/PHB):
+;Stack layout (after PHP/PHB):
 ;   1,s   = P (processor status, from PHP)
 ;   2,s   = B (data bank, from PHB)
 ;   3-5,s = return address (3 bytes from JSL)
-;   6-7,s = msg pointer (16-bit, Bank $00)
+;   6-7,s = msg pointer low 16 bits
+;   8,s   = msg pointer bank byte (post-A6 4-byte pointer)
 ;
-; The message pointer is in Bank $00 (C compiler generates Bank $00 addresses).
-; We use long addressing with Bank $00 to read the string bytes.
+; The string is read through a 24-bit pointer: since #127.3 string
+; literals live in the asset banks (bank $07 on a LoROM map), and the old
+; `lda.l $000000,x` bank-$00 read returned garbage — caught by the
+; debug_channel runtime fixture at the flip.
 ;------------------------------------------------------------------------------
 consoleNocashMessage:
     php
@@ -73,17 +76,21 @@ consoleNocashMessage:
     .ACCU 16
     .INDEX 16
 
-    lda 6,s                     ; msg pointer (16-bit address in Bank $00)
-    tax                         ; X = current character pointer
+    lda 6,s                     ; msg pointer low 16
+    sta.b tcc__r0
+    lda 8,s                     ; msg pointer bank byte (high byte = pad)
+    and #$00FF
+    sta.b tcc__r0+2
+    ldy #0
 
     sep #$20                    ; 8-bit A for character reads
     .ACCU 8
 
 @loop:
-    lda.l $000000,x             ; read byte from Bank $00 + X
+    lda [tcc__r0],y             ; read byte through the 24-bit pointer
     beq @done                   ; null terminator? stop
     sta.l REG_DEBUG             ; write character to debug port
-    inx
+    iny
     bra @loop
 
 @done:

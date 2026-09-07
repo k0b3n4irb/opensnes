@@ -62,38 +62,45 @@ where the actual risk lives. Bypass for a single build with
 `SKIP_NMI_RACE_CHECK=1`. Regression suite:
 `python3 devtools/test_check_nmi_wram_race.py` (6 cases).
 
-### 🟢 Bank $00 ROM overflow → garbage const reads **when dereferenced in C** (caught at link time)
-The limit is narrower than it looks. `static const` arrays each get a SUPERFREE
-section; if bank $00's 32 KB ROM area fills, new const sections spill to bank
-$01+. What breaks depends on **how you read the data**:
+### 🟢 Bank $00 ROM: code only — C const data lives in the asset banks (since #127.3)
+`static const` arrays, string literals and initialised const structs are
+emitted as `.SECTION ".rodata.N" SEMISUPERFREE BANKS ASSET_BANKS`: the
+linker places them in the memory map's asset banks (highest first) and
+bank $00 keeps the code. This is safe because every way C reaches const
+data carries the bank:
 
-- **Passed to a lib DMA/asset function — works in ANY bank.** `dmaCopyVram`,
+- **Passed to a lib DMA/asset function — any bank.** `dmaCopyVram`,
   `dmaCopyCGram`, `dmaCopyVramMode7`, `LzssDecodeVram`, `mapLoad`, etc. take a
-  4-byte pointer whose high byte carries the real bank, and the asm reads it
-  (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register). So
-  tiles / palettes / maps / fonts can live in any bank — this is the common case.
-- **Dereferenced directly in C (`ptr[i]`, `*ptr`) — bank $00 only.** The compiler
-  still emits `lda.l $XXXX,x` (implicit bank $00) for a C deref, so a `static
-  const` array you index in C must fit bank $00 or it returns garbage. (This is
-  the remaining half of chantier A6.)
+  4-byte pointer whose high byte is the real bank, and the asm reads it
+  (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register).
+- **Dereferenced in C (`tab[i]`, `*p`, `p->field`) — any bank.** A read
+  through a `const` pointee is compiled with far addressing since #121:
+  `lda.l sym`, `lda.l sym,x` or `[tcc__r9]`.
+- **The one bank-blind path left:** casting the `const` away and reading
+  through a plain pointer (`*(u8 *)tab`) — the compiler then emits the
+  bank-$00-implicit `lda.l $0000,x`. `devtools/check_bank_reads.py` runs
+  at every link and fails on a symbol in bank $01+ read with bank-$00
+  addressing, so this cannot ship silently.
 
-**Mitigation (active since P1.5, extended 2026-07-07):** `make/common.mk` runs
-`devtools/symmap/symmap.py --check-bank0-overflow` after every link. Any C
-const data spilled to bank $01+ fails the build with a "Bank $00 ROM
-overflow" message naming the symbols — both string literals and named
-`static const` data (the checker reads the linker's `.rodata.N` sections, so
-top-level statics without a `.N` symbol suffix are covered too; harmless
-`__opensnes_force_emit_*` anchors are exempt). Tight free-space (< 2 KB)
-prints a soft warning. Set `SKIP_BANK0_CHECK=1` to bypass for debugging.
+HiROM: every HiROM unit carries `.BASE $C0` so a datum at offset $0000 of
+a high bank is addressed in the full 64 KB view (`$Cn:0000`); the wlalink
+fork keeps that base off RAMSECTION labels.
 
-If you hit this:
-- **Prefer the DMA path:** keep big assets `const` and feed them to the lib's
-  DMA/asset functions — they already work from any bank (see above). For a
-  runtime-computed bank, the explicit `dmaCopyVramBank(src, bank, …)` /
+**What the ratchet still guards:** bank $00 free space. `make/common.mk`
+runs `devtools/symmap/symmap.py --check-bank0-overflow` after every link:
+free space below `BANK0_FAIL_THRESHOLD` fails the build, below 2 KB
+prints a soft warning, and every link prints how much declared payload
+sits in bank $00. Set `SKIP_BANK0_CHECK=1` to bypass for debugging. Corpus
+minimum at the flip: 2168 bytes (was 12).
+
+If bank $00 still runs out (code plus hand-written asm payload):
+- Declare `.incbin` / `.db` payload with `ASSET_SECTION` (`templates/assets.inc`)
+  instead of a bank-$00 `.SECTION` — it takes the same asset banks the
+  compiler uses.
+- For a runtime-computed bank, the explicit `dmaCopyVramBank(src, bank, …)` /
   `dmaCopyCGramBank(src, bank, …)` variants take the bank as a parameter.
-- Combine related const arrays read in C into one array + offset macros.
-- Move large C-dereferenced const data to RAM (drop the `const`).
-- Use assembly with explicit bank addressing for very large blobs.
+- Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
+  bank-$00 sections.
 
 ### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
 `$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll

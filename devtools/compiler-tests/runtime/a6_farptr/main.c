@@ -19,7 +19,10 @@
 #include <snes.h>
 
 extern const u8 a6_sentinel[];                                /* BANK 2 */
-const u8 s0[8] = {0xA0,0xA1,0xA2,0xA3,0xA4,0xA5,0xA6,0xA7};   /* bank $00 */
+/* The bank-0 control is a MUTABLE initialised array: since #127.3 a `const`
+ * one is placed in the asset banks (this very object moved to 07:8000 at
+ * the flip and hi0 read 7), so only RAM-backed data is a bank-0 object. */
+u8 s0[8] = {0xA0,0xA1,0xA2,0xA3,0xA4,0xA5,0xA6,0xA7};         /* bank $00 (WRAM) */
 
 volatile const u8 *p2;
 volatile const u8 *p0;

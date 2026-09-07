@@ -107,29 +107,35 @@ because an earlier heuristic version flagged `.text.bgSetMapPtr` for
 containing "map", and a report you cannot trust is worse than none.
 Sections that opt out of the macro are simply not counted.
 
-### What still blocks making it the default
+### The default since #127.3 (2026-09-07)
 
-Issue #127's remaining piece is non-bank-$00 placement for C const data
-(`.rodata.N`, emitted by QBE) without an opt-in. Measured 2026-07-22, it
-needs one of:
+QBE now emits every C const datum as `.SECTION ".rodata.N" SEMISUPERFREE
+BANKS ASSET_BANKS` — the same directive as `ASSET_SECTION`, applied by
+the compiler. Nothing to opt into: `static const` tables, string
+literals and initialised const structs land in the asset banks (highest
+first) and bank $00 keeps code. What made it safe: every C read of const
+data is a far read (#121), every lib call carries a far pointer (A6), and
+`devtools/check_bank_reads.py` fails the link on any symbol in bank $01+
+read with bank-$00 addressing (0 hits across the corpus at the flip).
+The old `.rodata`-in-bank-$01+ and `string.N` spill heuristics in
+`symmap.py` are retired — that placement is the intent now.
 
-- **a wla-dx change** — `SUPERFREE` searches banks ascending, so bank
-  $00 wins by construction. A search-order flag (or reversing it for
-  data sections) would flip the default with no per-project setup. This
-  is the clean answer and the only one that needs no knowledge of the
-  ROM layout at compile time. `compiler/wla-dx` currently carries **0
-  local patches**, so this is a deliberate fork decision, not a drive-by;
-- **or a generated per-layout macro** — QBE cannot emit `BANKS <list>`
-  because it does not know the bank count, and the list can be neither
-  a `.DEFINE` nor over-range. `make/common.mk` already generates
-  `project_config.inc`; it could generate the section-declaration macro
-  with a literal list matching the memory map in use. Workable, but it
-  moves ROM-layout knowledge into the build system.
+HiROM, which broke in the 2026-07 experiment, needed two things: `.BASE
+$C0` on every HiROM unit (`memmap_hirom.inc`, `hdr_hirom.asm`) so a label
+at offset $0000 of linker bank *n* is addressed at `$Cn:0000` — the only
+mapping of that half — and a wlalink patch so `.BASE` does not leak into
+RAMSECTION labels (`$7E` + `$C0` was out of 24-bit range; `$7E` + `$80`
+under FastROM silently gave `$FE`). `compiler/wla-dx` therefore carries
+**1 local patch** (`opensnes/ram-labels-ignore-base`, see
+`compiler/PINS.md`). `symmap.py` and `check_bank_reads.py` fold the
+`$C0`/`$80` window back to the linker bank when they read a `.sym`.
 
-The 2026-05-14 attempt (`.SECTION X BANK 1 FREE` in qbe `emitdat`) failed
-for a different reason — a single hardcoded bank, which the audio
-examples fill with sample data. `SEMISUPERFREE`'s fallback list is what
-that attempt was missing.
+Corpus effect: the bank-$00 minimum went from **12 bytes** (tetris,
+likemario, mapandobjects) to **2168** (mode5_hires); the 2026-07 note's
+"honest ceiling" — hand-written asm payload such as tetris's `data.asm`
+strings or snesmod's driver — is what remains in bank $00 by choice.
+Tightening `BANK0_FAIL_THRESHOLD` from 8 is now possible and is the
+deliberate audit step below, not part of the flip.
 
 ## When to bump `BANK0_FAIL_THRESHOLD` tighter
 
