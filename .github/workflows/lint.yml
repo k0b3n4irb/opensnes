@@ -18,7 +18,7 @@ on:
 # Dedup the push+PR double-fire (see opensnes_build.yml for the rationale):
 # push and PR of the same branch head share a group, newer cancels older.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
