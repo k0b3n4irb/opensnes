@@ -1479,8 +1479,8 @@ bank-honouring; `sym[idx]` is absolute long indexed (cheaper than bank
 0), pointer walks within 4 % of near; init records carry a bank byte;
 crt0 zero-fills `$7E:2000-$FFFF`; `const T *` accepts `T FAR *`.
 breakout and dsp1_ground migrated, fbhash identical. Two side findings:
-HDMA enabled mid-frame ran on stale A2A/NTRL (fixed in `hdmaSetup*`, hw
-claim to verify against the corpus) and the `cst`/`farram` access flag
+HDMA enabled mid-frame ran on stale A2A/NTRL (fixed in `hdmaSetup*`,
+arbitrated against the corpus 2026-09-07: anomie-regs, snesdev-wiki) and the `cst`/`farram` access flag
 pins loads in QBE's optimiser (follow-up chantier, §10b of the note).
 Original entry kept below for the record.
 
