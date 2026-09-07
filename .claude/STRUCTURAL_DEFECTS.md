@@ -53,7 +53,10 @@ load-bearing for cross-session continuity).
 >   `mode7LoadGraphics` helper); **D2 🟡** (SA-1 SIWP hw validation); **A5
 >   🟡** (compiler-fork divergence — ongoing maintenance, not a discrete
 >   fix); **B4 🟡** (`hdmaSetup` — API shipped, example migration pending);
->   **A8 🟡** (MSYS2 cproc segfaults — believed fixed, under telemetry).
+>   **A8 🟡** (MSYS2 cproc segfaults — believed fixed, under telemetry);
+>   **A9 🟢 resolved 2026-09-06** (the `cst`/`farram` access flag pinned loads
+>   in QBE's optimiser as if volatile — lib −4.25 % instructions;
+>   `.claude/notes/chantiers/qbe_access_flag.md`).
 > - **INTRINSIC (not fixable):** D3 (SuperFX has no C compiler — GSU RISC ISA).
 > - **Cross-ref:** the only *public* open issue is **#127** (its remaining
 >   piece, #127.3, = QBE const-data default placement). Everything else
@@ -1229,6 +1232,35 @@ its own entry when the 2026-07-04 P3 investigation produced a verdict.
 Six items, four of them sharing a common root cause (the 16-bit pointer
 ABI). Fixing them together yields larger gains than picking one in
 isolation.
+
+#### A9. The access flag pins loads in QBE's optimiser — RESOLVED 🟢 (2026-09-06, same day)
+
+**Symptom**: every read of const data and every load of a `const T *` /
+`T FAR *` pointer variable is compiled as if `volatile`: never forwarded
+by loadopt, never promoted out of its alloca, never eliminated when
+unused. Correct code, slower than it should be — the lib alone carries
+188 accidentally pinned loads against 65 genuine volatile ones (Phase 0
+count, `CC65816_KEEP_IR`).
+
+**Root cause**: cproc's access flag packs three bits (volatile, const
+ROM, far RAM) into one `volat` field so the w65816 backend can pick the
+addressing form; `load.c`, `mem.c` and `gcm.c` (chantier A2) test the
+field as a whole. A first attempt to unpin the pointer-variable class
+(B2 Phase 2, reverted) changed 18 lib modules' IR and broke three
+examples at frame-equal comparison — a latent optimiser/backend
+interaction that pinning had been hiding.
+
+**Outcome**: `.claude/notes/chantiers/qbe_access_flag.md` — the three
+passes test bit 0 only and cproc's pointer-variable loads carry no
+pointee taint. The "latent bug" was the HDMA mid-frame glitch and the
+RNG boot seed (both explained in v0.39.0); the corpus is clean on the
+frame-equal protocol. Lib −685 instructions (−4.25 %), asset −34 % /
+anim −17 % / panel −15 % estimated cycles. No existing ROM bench
+exercises the gain (benchrom is ASM-path only) — recorded as a gap.
+
+**Acceptance criteria**: the three passes test bit 0 only; cproc's
+pointer-variable loads carry no pointee taint; corpus green on the
+frame-equal protocol; `make bench` re-baselined with the gain stated.
 
 #### B1. 16-bit pointer ABI in lib helpers — RESOLVED 🟢 (superseded by A6+A7 + #122 + #127)
 
