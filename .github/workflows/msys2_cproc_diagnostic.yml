@@ -39,7 +39,7 @@ jobs:
             git
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -182,7 +182,7 @@ jobs:
           ls -la diag_output/ 2>/dev/null || echo "(empty)"
 
       - name: Upload diagnostics
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: msys2-cproc-diagnostics
