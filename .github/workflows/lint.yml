@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES (full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # need full history for the range walk
 
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run lint_asm.py
         # Hand-written ASM in lib/source and templates must declare the
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run check_doc_drift.py
         # Anchored claims that drift behind code: version macros in
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run test_check_nmi_wram_race.py
         # Regression suite for devtools/check_nmi_wram_race.py — the
@@ -125,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run test_symmap.py
         # Regression suite for devtools/symmap/symmap.py --check-overlap, the
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run check_vram_layout.py
         # BG/sprite VRAM bases are programmed through registers that store only
@@ -163,7 +163,7 @@ jobs:
       - name: Check out OpenSNES (with submodules)
         # `make tools` runs the top-level verify-toolchain dependency, which
         # needs the compiler submodules checked out.
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Doxygen 1.16.1 (pinned — must match deploy_docs.yml)
         # ubuntu's Doxygen 1.9.8 has a severe Markdown bug; the guard must test

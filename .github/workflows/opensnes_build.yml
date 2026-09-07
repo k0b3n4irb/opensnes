@@ -89,7 +89,7 @@ jobs:
       # Checkout the project                 #
       # ------------------------------------ #
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -99,7 +99,7 @@ jobs:
       # each build (~20-30s/leg; the rest — lib+examples+docs+zip — still runs).
       - name: Restore prebuilt toolchain
         id: toolchain
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             bin
@@ -180,7 +180,7 @@ jobs:
       # `make release`, so a failed build never poisons the cache).
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             bin
@@ -281,7 +281,7 @@ jobs:
       # Upload SDK release                   #
       # ------------------------------------ #
       - name: Upload OpenSNES SDK release
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: OpenSNES SDK (${{ matrix.name }}_${{ matrix.arch }})
           path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
@@ -290,7 +290,7 @@ jobs:
       # Upload build logs                    #
       # ------------------------------------ #
       - name: Upload build logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: OpenSNES Logs (${{ matrix.name }})
@@ -321,7 +321,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out OpenSNES (with submodules)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -333,7 +333,7 @@ jobs:
       # toolchain build).
       - name: Restore prebuilt toolchain
         id: toolchain
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             bin
@@ -362,7 +362,7 @@ jobs:
 
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             bin
@@ -453,7 +453,7 @@ jobs:
 
       - name: Upload luna artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: luna-test artifacts
           path: |
