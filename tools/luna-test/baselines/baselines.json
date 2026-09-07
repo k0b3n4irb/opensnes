@@ -294,9 +294,9 @@
     "steps": 3000000
   },
   "games_shmup_1942": {
-    "fbhash": "3a3fccb15c964e3d",
+    "fbhash": "60dd0c81c65841b8",
     "luna_version": "v1.17.0",
-    "rom_sha256": "e97255d0bb626df11377a2b2c0521b5ef3cef3aa42a88e149b1191012668c4ab",
+    "rom_sha256": "ad9ea07eeca03e3596bf1e7a973266683f482d38353c0249be5f016ecc2d0f79",
     "steps": 3000000
   },
   "games_tetris": {
@@ -506,10 +506,10 @@
   "sprites_sprite_swarm": {
     "fbhash": [
       "acf3b754c94138ca",
-      "b89f4758b624086a"
+      "687f268a7f6e414b"
     ],
     "luna_version": "v1.17.0",
-    "rom_sha256": "28ba08ba382db11c659f85dd49226e670fd281e9b404547d5b4d0849bcb9f859",
+    "rom_sha256": "f89f63cccea73fe7fc3807ade114a71d866261ebf47b5f39a35d57f6387b8bd2",
     "steps": [
       3000000,
       6000000
