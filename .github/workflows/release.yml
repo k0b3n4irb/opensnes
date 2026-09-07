@@ -215,7 +215,7 @@ jobs:
       # Upload zip as artifact for release   #
       # ------------------------------------ #
       - name: Upload release zip
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: opensnes-${{ steps.version.outputs.tag }}-${{ matrix.name }}-${{ matrix.arch }}
           path: release/opensnes_${{ steps.version.outputs.tag }}_${{ matrix.name }}_${{ matrix.arch }}.zip
@@ -231,7 +231,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Download all release artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
 
