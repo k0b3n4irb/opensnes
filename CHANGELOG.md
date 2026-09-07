@@ -2,6 +2,61 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.41.0] — 2026-09-07
+
+The placement release: C const data leaves bank $00 by default, HiROM is
+addressed in its full 64 KB view, and the linker fork gets its first
+patch to make that correct. Plus a bench that finally measures the
+const-path gains, and a CI moved to Node 24.
+
+### Added
+- feat(compiler): **C const data is placed in the memory map's asset
+  banks by default** (#127.3, closes #127). QBE emits every `.rodata.N`
+  as `SEMISUPERFREE BANKS ASSET_BANKS` — the directive `ASSET_SECTION`
+  already used — so `static const` tables, string literals and const
+  structs land in the asset banks (highest first) and bank $00 keeps the
+  code. Safe because every C read of const data is a far read (#121),
+  every lib call carries a far pointer (A6), and `check_bank_reads.py`
+  fails the link on a bank-$01+ symbol read with bank-$00 addressing (0
+  hits across the corpus). Bank $00 minimum went from 12 bytes to 71 on
+  the code-heavy games, which now spill code (not data) into bank $01+
+  the way `jsl` allows. Visual regression 85/85 identical.
+- test(devtools): `benchrom` gains seven const-path workloads (animTick,
+  animTickMeta, const pointer walks, const→RAM copy, const struct
+  fields, `tab[i]`), the instrument the A9 optimiser change lacked:
+  v0.39.0 → v0.40.0 measured −9 % to −54 % per call. The runner reads
+  every result from one luna run instead of one per symbol.
+
+### Fixed
+- fix(build): **HiROM addressed in its full view.** Every HiROM unit now
+  carries `.BASE $C0`, so a label at offset $0000 of linker bank *n* is
+  addressed at `$Cn:0000` — the only mapping of that half. Until now the
+  runtime's `.mul32`/`.div32` sat at `07:0000`, a WRAM mirror: any HiROM
+  C program doing 32-bit arithmetic would have crashed, and the 2026-07
+  attempt at #127.3 corrupted HiROM for the same reason.
+- fix(compiler): **wla-dx fork, first local patch** — `.BASE` no longer
+  applies to RAMSECTION labels (`$7E + $C0` was out of 24-bit range;
+  `$7E + $80` under FastROM silently gave `$FE`). `symmap.py` and
+  `check_bank_reads.py` fold the `$C0`/`$80` window back to the linker
+  bank; the `.sym` prints one valid CPU address per line, which luna
+  needs.
+- fix(lib): `consoleNocashMessage` read its string through a 16-bit
+  bank-$00 pointer (pre-A6); it goes through the 24-bit pointer now.
+  Caught by the `debug_channel` runtime fixture the moment string
+  literals moved.
+- ci: the workflows' actions run on Node 24 (checkout v5, cache v5,
+  upload-artifact v6, download-artifact v7, action-gh-release v3); the
+  deprecation notices are gone.
+
+### Changed
+- docs(docs): `KNOWN_LIMITATIONS.md` bank-$00 ROM entry rewritten (code
+  only; the one bank-blind path left is an explicit cast that drops
+  `const`, guarded at link time); `.claude/rules/bank0_budget.md` records
+  the shipped default and retires the "what still blocks it" section;
+  `templates/assets.inc` HiROM caveat resolved; the two open hardware
+  claims (HDMA mid-frame enable, INIDISP at power-on) are arbitrated
+  against the SNES corpus and cited in `hdma.asm` / `crt0.asm`.
+
 ## [0.40.0] — 2026-09-07
 
 The optimiser release: const and far accesses were pinned in QBE's

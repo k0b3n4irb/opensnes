@@ -41,12 +41,37 @@ RESULTS = [
     ("r_sd_draw_rf",   "refresh+draw+EndFrame+flush"),
     ("r_sd_flush_idle", "NmiFlush (idle floor)"),
     ("r_sd_draw_c",    "C-model draw+EndFrame"),
+    # const paths — the A9 instrument (reads through `const` pointers/tables;
+    # per CALL of the loop body: animTick, or a 32-element walk/copy)
+    ("r_c_anim_tick",  "animTick (const clip)"),
+    ("r_c_anim_meta",  "animTickMeta (+const table)"),
+    ("r_c_walk8",      "const u8 walk x32", 8),
+    ("r_c_walk16",     "const u16 walk x32", 8),
+    ("r_c_copy",       "const->RAM copy x32", 8),
+    ("r_c_fields",     "const struct fields"),
+    ("r_c_index",      "const tab[i] (fused)"),
 ]
 
 
+_cache: dict[str, int] = {}
+
+
 def peek16(luna, sym):
-    b = probelib.peek(luna, ROM, STEPS, sym, 2)
-    return b[0] | (b[1] << 8)
+    """All results in ONE luna run (one --peek per symbol): a run is 200 M
+    steps, so one per symbol made the table take a quarter of an hour."""
+    if not _cache:
+        import json
+        import subprocess
+        syms = ["r_bench_done", "r_cal_empty", "r_c_val"] + [r[0] for r in RESULTS]
+        cmd = [luna, "state", "-n", str(STEPS), "--out", "-"]
+        for s in syms:
+            cmd += ["--peek", f"{s}:2"]
+        cmd.append(str(ROM))
+        out = subprocess.run(cmd, capture_output=True, text=True, timeout=1200).stdout
+        for p in json.loads(out)["peeks"]:
+            b = bytes.fromhex(p["bytes_hex"])
+            _cache[p["spec"].split(":")[0]] = b[0] | (b[1] << 8)
+    return _cache[sym]
 
 
 def main() -> int:
@@ -58,14 +83,20 @@ def main() -> int:
     if done != 0xBEEF:
         print(f"FAIL: fixture incomplete (r_bench_done={done:#x}) — raise STEPS?")
         return 1
+    val = peek16(luna, "r_c_val")
+    if val != 528:
+        print(f"FAIL: const-path correctness (r_c_val={val}, expected 528)")
+        return 1
     cal = peek16(luna, "r_cal_empty")
     cal_cyc = cal * CYCLES_PER_FRAME / N_ITER
     print(f"calibration: {cal} frames ({cal_cyc:.1f} cyc/iter loop overhead)\n")
-    print(f"{'function':<18} {'frames':>6} {'~cycles/call':>12}")
-    for sym, name in RESULTS:
+    print(f"{'function':<28} {'frames':>6} {'~cycles/call':>12}")
+    for row in RESULTS:
+        sym, name = row[0], row[1]
+        div = row[2] if len(row) > 2 else 1      # loops run N_ITER/div times
         f = peek16(luna, sym)
-        cyc = (f - cal) * CYCLES_PER_FRAME / N_ITER
-        print(f"{name:<18} {f:>6} {cyc:>12.0f}")
+        cyc = (f - cal / div) * CYCLES_PER_FRAME / (N_ITER / div)
+        print(f"{name:<28} {f:>6} {cyc:>12.0f}")
     return 0
 
 

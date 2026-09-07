@@ -21,6 +21,7 @@
 #include <snes/mode7.h>
 #include <snes/map.h>
 #include <snes/sprite.h>
+#include <snes/anim.h>
 
 /* Iterations per measured function. Chosen so cheap fns still span
  * >= ~20 frames (quantization < 5 %). volatile so the loop counter
@@ -62,9 +63,26 @@ u16 r_sd_draw;       /* draw+EndFrame pair, oamrefresh=0 (steady
 u16 r_sd_draw_rf;    /* refresh+draw+EndFrame+flush (full lifecycle)*/
 u16 r_sd_flush_idle; /* NmiFlush with empty queue (per-frame floor) */
 u16 r_sd_draw_c;     /* C model of the steady 16Draw + ASM EndFrame  */
+
+/* const-path measurement points (chantier A9, 2026-09-07). Every one of
+ * these reads ROM through a `const` pointer or a const table: exactly the
+ * accesses QBE's optimiser used to pin as if volatile (never forwarded,
+ * never promoted out of their alloca). benchrom's other functions are
+ * ASM paths and cannot see that class; these are its instrument. Each
+ * loop body is a small non-inlined function so the frame stays under
+ * 256 bytes (large-frame [tcc__fp],y addressing would dominate). */
+u16 r_c_anim_tick;   /* animTick(): lib anim, clip/frames/durations walk  */
+u16 r_c_anim_meta;   /* animTickMeta(): + const pointer table indexed     */
+u16 r_c_walk8;       /* sum of 32 bytes through `const u8 *p++`           */
+u16 r_c_walk16;      /* sum of 32 words through `const u16 *p++`          */
+u16 r_c_copy;        /* 32-byte `*dest++ = *src++`, const src (mycopy)    */
+u16 r_c_fields;      /* const struct fields through `const Rec *r`        */
+u16 r_c_index;       /* tab[i] on a const table (indexed-long fusion)     */
+u16 r_c_val;         /* correctness: walk8 sum (528) | walk16 sum & 0xFF  */
 u16 r_bench_done;    /* 0xBEEF when every result above is written  */
 
 static volatile u16 vi;   /* opaque loop bound (defeats folding) */
+static volatile u16 vc;   /* N_ITER/8 for the 32-element const walks   */
 
 /* --- C-port probe: far-access mapGetMetaTile model --- */
 extern u16 mapadrrowlut[];        /* $7E RAMSECTION (map.asm) */
@@ -122,6 +140,30 @@ static u16 c_getmetatile(u16 x, u16 y) {
     u16 off = lutp[((y >> 2) & 0xFFFE) >> 1] + ((x >> 2) & 0xFFFE);
     return *(const u16 *)(mapp + off) & 0x03FF;
 }
+
+/* --- const-path workloads (A9 instrument) --- */
+typedef struct { u8 a; u8 b; u16 w; u32 l; } CRec;
+static const u8  c_tab8[32]  = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+                                 17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32 };
+static const u16 c_tab16[32] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+                                 17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32 };
+static const CRec c_recs[8] = {
+    {1,2,300,40000UL},{3,4,500,60000UL},{5,6,700,80000UL},{7,8,900,100000UL},
+    {9,10,1100,120000UL},{11,12,1300,140000UL},{13,14,1500,160000UL},{15,16,1700,180000UL} };
+static const u16 c_frames[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+static const u8  c_durs[8]   = { 1, 2, 1, 3, 1, 2, 1, 1 };
+static const AnimClip c_clip = { c_frames, c_durs, 8, 1, ANIM_LOOP, 0 };
+static const u16 *const c_meta[8] = { c_tab16, c_tab16+1, c_tab16+2, c_tab16+3,
+                                      c_tab16+4, c_tab16+5, c_tab16+6, c_tab16+7 };
+static AnimPlayer c_player = ANIM_PLAYER_INIT;
+static u8 c_dst[32];
+static volatile u8 c_n;          /* opaque inner bound (32) */
+
+u16 c_walk8(void)  { const u8 *p = c_tab8;  u16 s = 0; u8 k, n = c_n; for (k = 0; k < n; k++) s += *p++; return s; }
+u16 c_walk16(void) { const u16 *p = c_tab16; u16 s = 0; u8 k, n = c_n; for (k = 0; k < n; k++) s += *p++; return s; }
+void c_copy(void)  { u8 *d = c_dst; const u8 *p = c_tab8; u8 k, n = c_n; for (k = 0; k < n; k++) *d++ = *p++; }
+u16 c_fields(u8 i) { const CRec *r = &c_recs[i & 7]; return (u16)(r->a + r->b + r->w + (u16)r->l); }
+u16 c_index(u8 i)  { return (u16)(c_tab8[i & 31] + c_tab16[i & 31]); }
 
 /* Frame bracket helpers */
 static u16 t0;
@@ -275,6 +317,54 @@ int main(void) {
         oamInitDynamicSpriteEndFrame();
     }
     r_sd_draw_c = bench_end();
+
+    /* --- const paths (A9 instrument) --- */
+    c_n = 32;
+    vc = N_ITER / 8;
+    animPlay(&c_player, &c_clip);
+    bench_begin();
+    for (i = 0; i < vi; i++) {
+        animTick(&c_player);
+    }
+    r_c_anim_tick = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vi; i++) {
+        c_dst[0] = (u8)*animTickMeta(&c_player, c_meta);
+    }
+    r_c_anim_meta = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vc; i++) {
+        c_walk8();
+    }
+    r_c_walk8 = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vc; i++) {
+        c_walk16();
+    }
+    r_c_walk16 = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vc; i++) {
+        c_copy();
+    }
+    r_c_copy = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vi; i++) {
+        c_fields((u8)i);
+    }
+    r_c_fields = bench_end();
+
+    bench_begin();
+    for (i = 0; i < vi; i++) {
+        c_index((u8)i);
+    }
+    r_c_index = bench_end();
+
+    r_c_val = (u16)(c_walk8() | (c_walk16() & 0xFF));   /* 528 | 16 = 528 */
 
     r_bench_done = 0xBEEF;
 

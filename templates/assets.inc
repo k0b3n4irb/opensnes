@@ -45,17 +45,14 @@
 ; garbage from anywhere else. The build's bank-blind check catches that
 ; case, so if you are unsure: move it out, and let the build tell you.
 ;
-; ## HiROM caveat (untested, latent — see the chantier note)
+; ## HiROM
 ;
-; This macro is verified on LoROM and SA-1. On HiROM the placement below
-; puts payload at offset $0000 in a low-numbered bank, and a HiROM
-; experiment (2026-07-25) showed generic far access — `dmaCopyVram`, a
-; `:sym` far pointer — to that location reading garbage, while a FORCE
-; section at offset $8000 (how snesmod places SOUNDBANK) reads fine. No
-; shipped example uses ASSET_SECTION on HiROM, so this is latent, not a
-; live bug. If you are the first: do NOT trust it on HiROM until
-; `.claude/notes/chantiers/127_rodata_default_placement.md` is resolved —
-; verify the DMA'd bytes with luna, or keep the data in bank $00.
+; Verified on LoROM, SA-1 and HiROM (#127.3, 2026-09-07). HiROM units carry
+; `.BASE $C0` (memmap_hirom.inc) so payload at offset $0000 of a high bank
+; is addressed in the full 64 KB view ($Cn:0000); the wlalink fork keeps
+; that base off RAMSECTION labels. Since #127.3 the compiler places its own
+; const data (`.rodata.N`) with this very directive, so ASSET_SECTION is
+; only needed for hand-written payload (.incbin, .db tables).
 ;----------------------------------------------------------------------
 
 ; SEMISUPERFREE with an explicit bank order: the linker tries 7 first and

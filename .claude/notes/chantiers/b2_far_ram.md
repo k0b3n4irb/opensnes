@@ -472,10 +472,12 @@ HBlank reloads the real first entry and a mid-frame enable starts the
 table one line late and clean. Verified with luna: palette entries 1-15
 equal the ROM palette, h_scroll 0, and both examples render identically
 at frame-equal comparison between builds with and without the zero-fill
-(deterministic against boot timing now). The HBlank procedure this relies
-on (decrement, reload on zero) is anomie's; **to verify against the SNES
-corpus** — cartouche was unreachable in this session (see
-`.claude/rules/hardware_claims.md`, degrade path).
+(deterministic against boot timing now). **Arbitrated 2026-09-07** once
+cartouche was back: anomie-regs marks `$43x8-9` and `$43xA` as required
+for a mid-frame start ("do the init process manually by setting
+$43x8-A"), the snesdev VBlank-routine page names the symptom, the
+sfc-dev-wiki gives the per-scanline order. Citations are in
+`lib/source/hdma.asm`.
 
 ### 10g. Lessons
 

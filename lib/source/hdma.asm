@@ -134,9 +134,17 @@ hdmaSetup:
     ; the real first entry instead: a mid-frame hdmaEnable() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
-    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
-    ; procedure (decrement, reload on zero) is anomie's — to verify against
-    ; the SNES corpus (cartouche was unreachable when this landed).
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
+    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
+    ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
+    ; be started mid-frame" — "you must basically do the init process
+    ; manually by setting $43x8-A"; the snesdev VBlank-routine page states
+    ; the symptom ("enabling a HDMA channel too late will not reset the
+    ; HDMA table position and cause invalid values to be written to the
+    ; target register"); the per-scanline order (decrement $43xA, reload
+    ; the entry when it reaches zero) is in the sfc-dev-wiki register
+    ; explanations. Sources: romhacking.net/documents/196,
+    ; snes.nesdev.org/wiki/VBlank_routine, wiki.superfamicom.org/registers.
     lda #1
     sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 
@@ -222,9 +230,17 @@ hdmaSetupBank:
     ; the real first entry instead: a mid-frame hdmaEnable() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
-    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
-    ; procedure (decrement, reload on zero) is anomie's — to verify against
-    ; the SNES corpus (cartouche was unreachable when this landed).
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
+    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
+    ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
+    ; be started mid-frame" — "you must basically do the init process
+    ; manually by setting $43x8-A"; the snesdev VBlank-routine page states
+    ; the symptom ("enabling a HDMA channel too late will not reset the
+    ; HDMA table position and cause invalid values to be written to the
+    ; target register"); the per-scanline order (decrement $43xA, reload
+    ; the entry when it reaches zero) is in the sfc-dev-wiki register
+    ; explanations. Sources: romhacking.net/documents/196,
+    ; snes.nesdev.org/wiki/VBlank_routine, wiki.superfamicom.org/registers.
     lda #1
     sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 
@@ -308,9 +324,17 @@ hdmaSetupIndirect:
     ; the real first entry instead: a mid-frame hdmaEnable() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
-    ; and hdma/hdma_helpers (BG1HOFS left at a stale value); the HBlank
-    ; procedure (decrement, reload on zero) is anomie's — to verify against
-    ; the SNES corpus (cartouche was unreachable when this landed).
+    ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
+    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
+    ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
+    ; be started mid-frame" — "you must basically do the init process
+    ; manually by setting $43x8-A"; the snesdev VBlank-routine page states
+    ; the symptom ("enabling a HDMA channel too late will not reset the
+    ; HDMA table position and cause invalid values to be written to the
+    ; target register"); the per-scanline order (decrement $43xA, reload
+    ; the entry when it reaches zero) is in the sfc-dev-wiki register
+    ; explanations. Sources: romhacking.net/documents/196,
+    ; snes.nesdev.org/wiki/VBlank_routine, wiki.superfamicom.org/registers.
     lda #1
     sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
 

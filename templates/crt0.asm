@@ -504,8 +504,11 @@ FastStart:
     ; 40.9 ms = 2.5 frames, visible on first launch, gone on "reload"
     ; (memory kept). luna zero-fills everything, so it could not show it.
     ; Long addressing: DBR is not set up yet. InitHardware writes $8F
-    ; again; that is fine. Power-on register state is not something to
-    ; rely on (to verify against the SNES corpus for the exact wording).
+    ; again; that is fine. The SNES corpus (Cartouche, 2026-09-07) states
+    ; no guaranteed power-on value for INIDISP; every reference boot
+    ; sequence writes $8F before touching anything else (e.g.
+    ; oldmachines.io/supernintendo/homebrew "from reset to a stable
+    ; frame"), which is what this does.
     lda #$8F
     sta.l $002100       ; INIDISP: forced blank, brightness 15
 

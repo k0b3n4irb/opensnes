@@ -103,6 +103,20 @@ class Overlap:
         return self.overlap_end - self.overlap_start + 1
 
 
+def rom_bank(bank: int) -> int:
+    """Fold a CPU-visible ROM bank byte back to the linker bank.
+
+    Since #127.3 the HiROM units carry `.BASE $C0` (and FastROM builds
+    `.BASE $80`), so the .sym prints ROM labels/sections as c0:8644 /
+    80:8644 while the linker bank is 0. WRAM banks ($7E/$7F, and the
+    bank-0 mirror) never carry a base and pass through unchanged."""
+    if 0xC0 <= bank <= 0xFF:
+        return bank - 0xC0
+    if 0x80 <= bank <= 0xBF:
+        return bank - 0x80
+    return bank
+
+
 class SymbolTable:
     """Parser and analyzer for WLA-DX .sym files"""
 
@@ -143,7 +157,7 @@ class SymbolTable:
                     if m:
                         self.sections.append(SectionRec(
                             name=m.group(4),
-                            bank=int(m.group(1), 16),
+                            bank=rom_bank(int(m.group(1), 16)),
                             address=int(m.group(2), 16),
                             size=int(m.group(3), 16)))
                     continue
@@ -159,7 +173,7 @@ class SymbolTable:
                     if m:
                         self.ramsections.append(SectionRec(
                             name=m.group(5),
-                            bank=int(m.group(1), 16),
+                            bank=rom_bank(int(m.group(1), 16)),
                             address=int(m.group(3), 16),
                             size=int(m.group(4), 16)))
                     continue
@@ -169,7 +183,7 @@ class SymbolTable:
                 match = re.match(r'^([0-9a-fA-F]{2}):([0-9a-fA-F]{4})\s+(\S+)$', line)
                 if match:
                     bank_str, addr_str, name = match.groups()
-                    bank = int(bank_str, 16)
+                    bank = rom_bank(int(bank_str, 16))
                     address = int(addr_str, 16)
                     full_addr = (bank << 16) | address
                 else:
@@ -369,38 +383,16 @@ class SymbolTable:
         critical = []
         warnings = []
 
-        # Check all banks > $00 for C-generated DATA symbols
-        for bank, symbols in self.banks.items():
-            if bank == 0x00:
-                continue
-            for sym in symbols:
-                if sym.address < 0x8000:
-                    continue
-                if re.match(r'^(?:\w+_)?string\.\d+$', sym.name):
-                    critical.append(sym)
-                elif self._is_c_generated_data(sym):
-                    warnings.append(sym)
-
-        # QBE emits every C const datum into a ".rodata.N" SUPERFREE section.
-        # Any such section landing in bank $01+ is read as garbage by the
-        # 16-bit C deref — UNLESS it only holds __opensnes_force_emit_*
-        # anchors, which exist for the linker and are never read.
-        # Caught 2026-07-07: likemario's anim clips (named top-level statics,
-        # no `.N` suffix, so invisible to the symbol heuristics above)
-        # spilled to bank $02 and shipped a silently dead animation.
-        already = {(s.bank, s.address) for s in critical}
-        for sec in self.sections:
-            if sec.bank == 0x00 or not re.match(r'^\.rodata\.\d+$', sec.name):
-                continue
-            contained = [s for s in self.banks.get(sec.bank, [])
-                         if sec.address <= s.address < sec.address + sec.size
-                         and not s.name.startswith('_sizeof_')]
-            live = [s for s in contained
-                    if not s.name.startswith('__opensnes_force_emit_')]
-            for sym in live:
-                if (sym.bank, sym.address) not in already:
-                    critical.append(sym)
-                    already.add((sym.bank, sym.address))
+        # #127.3 (2026-09-07): C const data is PLACED in bank $01+ on purpose
+        # now — QBE emits `.rodata.N` as SEMISUPERFREE BANKS ASSET_BANKS, and
+        # every C read of const data is a far read (#121), every lib call a
+        # far pointer (A6). A .rodata section or a string literal in a high
+        # bank is therefore the intended layout, not a spill: the old
+        # `string.N` / `.rodata.N`-in-bank-$01+ heuristics are retired. The
+        # read-side guard that still matters — a symbol in bank $01+ read
+        # with bank-$00 addressing — is devtools/check_bank_reads.py, run at
+        # every link. This method keeps its signature for the callers and
+        # reports the bank-$00 free space only.
 
         # Calculate bank $00 ROM free space
         bank0_syms = self.banks.get(0x00, [])
@@ -661,8 +653,8 @@ def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048,
     if fail_threshold > 0 and free_bytes < fail_threshold:
         print(f"{Colors.RED}{Colors.BOLD}FAIL: Bank $00 ROM imminent overflow "
               f"({free_bytes} bytes free, fail-threshold: {fail_threshold}){Colors.RESET}")
-        print("  One more const literal here will spill to bank $01+ and read")
-        print("  as garbage at runtime (see KNOWN_LIMITATIONS.md, severity 🔴).")
+        print("  The next code section or hand-written bank-$00 payload will not")
+        print("  fit (C const data goes to the asset banks since #127.3).")
         print(f"  See .claude/rules/bank0_budget.md for the refactor playbook.")
         return 1
 
@@ -670,11 +662,12 @@ def print_bank0_overflow_check(table: SymbolTable, warn_threshold: int = 2048,
     if free_bytes < warn_threshold:
         print(f"{Colors.YELLOW}WARNING: Bank $00 ROM nearly full "
               f"({free_bytes} bytes free, threshold: {warn_threshold}){Colors.RESET}")
-        print("  Adding more const data or string literals may cause overflow.")
+        print("  Only code and hand-written bank-$00 payload consume it now")
+        print("  (C const data goes to the asset banks since #127.3).")
         report_bank0_asset_payload(table)
         return 2
 
-    print(f"{Colors.GREEN}OK: No C-generated data in bank $01+ "
+    print(f"{Colors.GREEN}OK: bank $00 ROM (code) "
           f"(bank $00 ROM free: {free_bytes} bytes){Colors.RESET}")
     report_bank0_asset_payload(table)
     return 0

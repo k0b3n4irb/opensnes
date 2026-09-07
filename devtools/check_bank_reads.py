@@ -47,7 +47,14 @@ def sym_table(sym_path: Path) -> dict[str, tuple[int, int]]:
     for line in sym_path.read_text().splitlines():
         m = re.match(r'^([0-9a-fA-F]{2}):([0-9a-fA-F]{4})\s+(\S+)$', line.strip())
         if m:
-            out[m.group(3)] = (int(m.group(1), 16), int(m.group(2), 16))
+            bank = int(m.group(1), 16)
+            # HiROM units carry .BASE $C0 (FastROM .BASE $80): fold the
+            # CPU-visible ROM window back to the linker bank (#127.3)
+            if 0xC0 <= bank <= 0xFF:
+                bank -= 0xC0
+            elif 0x80 <= bank <= 0xBF:
+                bank -= 0x80
+            out[m.group(3)] = (bank, int(m.group(2), 16))
     return out
 
 
