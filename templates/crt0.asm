@@ -497,6 +497,18 @@ FastStart:
     sep #$20
     .ACCU 8
 
+    ; Force blank FIRST. Until InitHardware ran, INIDISP held whatever the
+    ; PPU powered on with, and the screen showed whatever VRAM/CGRAM held —
+    ; on Mesen2 (randomised power-on state) a burst of garbage that the
+    ; bank-0 clear + the far-band zero-fill (chantier B2) stretched to
+    ; 40.9 ms = 2.5 frames, visible on first launch, gone on "reload"
+    ; (memory kept). luna zero-fills everything, so it could not show it.
+    ; Long addressing: DBR is not set up yet. InitHardware writes $8F
+    ; again; that is fine. Power-on register state is not something to
+    ; rely on (to verify against the SNES corpus for the exact wording).
+    lda #$8F
+    sta.l $002100       ; INIDISP: forced blank, brightness 15
+
 .ifdef SA1
     ; SA-1: Enable I-RAM writes for the SNES CPU via SIWP ($2229).
     ; Each bit is a write-ENABLE flag for one 256-byte I-RAM page:

@@ -137,6 +137,14 @@ for _try in $(seq 1 $CPROC_RETRIES); do
     exit $CPROC_EXIT
 done
 
+# Audit aid: CC65816_KEEP_IR=<dir> keeps a copy of every TU's QBE IR
+# (<dir>/<tu>.ssa) so corpus-wide IR properties can be counted — access
+# flags, Kl temps, call shapes — without a second front-end run.
+if [[ -n "${CC65816_KEEP_IR:-}" ]]; then
+    _irname=$(printf '%s/%s' "$(pwd)" "$INPUT" | sed 's#^/##; s#[/ ]#__#g; s#\.c$##')
+    mkdir -p "$CC65816_KEEP_IR" && cp "$IRFILE" "$CC65816_KEEP_IR/${_irname}.ssa"
+fi
+
 # Stage 3: QBE IR -> 65816 assembly
 # Cooper source-level debug: CC65816_G=1 passes -g (keep C locals in memory) so
 # the debugger can read typed locals. Off by default (it disables optimisation).

@@ -2,6 +2,40 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.40.0] — 2026-09-07
+
+The optimiser release: const and far accesses were pinned in QBE's
+optimiser as if `volatile`; the lib alone loses 4 % of its instructions
+now that only the volatile bit pins. Plus a boot fix that every emulator
+with a randomised power-on state (and real hardware) could show.
+
+### Performance
+- perf(compiler): **the access flag no longer pins const/far loads in
+  QBE's optimiser** (chantier A9). `load.c`, `mem.c` and `gcm.c` tested
+  the whole access flag, so every const-data read, every `FAR` access and
+  every load of a `const T *` / `T FAR *` pointer variable was never
+  forwarded, never promoted out of its alloca, never eliminated. The
+  three passes now test the volatile bit only, and cproc no longer taints
+  a pointer variable's own load with its pointee's qualifiers (`lda.w p`,
+  not `lda.l p`). Corpus audit: 285 const loads and 65 far accesses pinned
+  by accident against 201 volatile loads. Lib −685 instructions
+  (−4.25 %); estimated cycles asset −34 %, anim −17 %, panel −15 %,
+  sprite −8 % — allocas holding const walkers are promoted, so a
+  `*dest++ = *src++` loop loses its per-iteration round trips. Verified
+  frame-identical to v0.39.0 on the whole corpus.
+- feat(devtools): `CC65816_KEEP_IR=<dir>` on the `cc65816` wrapper keeps
+  every translation unit's QBE IR for corpus-wide audits.
+
+### Fixed
+- fix(runtime): **force blank as the first thing after reset**. The first
+  INIDISP write happened in `InitHardware`, 40.9 ms after reset once the
+  bank-0 clear and the far-band zero-fill ran before it (2.5 frames,
+  measured with luna). On Mesen2, which randomises the power-on state, that
+  was a visible burst of garbage on first launch (not on "reload ROM"); luna
+  zero-fills everything and could not show it. The reset vector now writes
+  INIDISP = $8F at its 7th instruction. Reported by the maintainer on the
+  v0.39.0 build.
+
 ## [0.39.0] — 2026-09-06
 
 The far RAM release: chantier B2 lifts the 8 KB C RAM ceiling. A global
