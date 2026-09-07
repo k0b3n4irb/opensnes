@@ -30,8 +30,8 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 6d3953d27b0da0e5aa48af9e0d91f00fa829373a | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 852cea43c4c78ed15775bc838d00beb8ddb55429 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 91c52b1f4ef3cc8ba3c0638f7536539579af6a9f | github.com/k0b3n4irb/wla-dx v10.7 (release tag) |
+| compiler/qbe | ca50db8ae000a28e80d8b6202cc65c9ff9ff53b9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 86df3317f3ba40c7815d358160e06188d2011e7c | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 1) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -68,11 +68,12 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 55 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 56 patches (the bulk of the SDK's compiler magic)
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+ca50db8 Place C const data in the memory map's asset banks by default (chantier #127.3)
 852cea4 Only the volatile bit pins loads in loadopt / promote / gcm (chantier A9)
 7118e4c w65816: bank-honouring codegen for far RAM (chantier B2, Phase 2)
 80eaea2 Accept the `farram` access flag and section ".far" data (chantier B2, Phase 1)
@@ -104,7 +105,18 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 0 patches ahead; pinned to the **v10.7 release**
+### compiler/wla-dx — 1 patch ahead of the **v10.7 release** (chantier #127.3, 2026-09-07)
+
+```
+86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
+```
+
+The first local patch on this fork, a deliberate decision (see
+`.claude/rules/bank0_budget.md`): HiROM needs `.BASE $C0` on every unit
+so data at offset $0000 of a high linker bank is addressed in the full
+64 KB view, and upstream adds the base to WRAM labels too ($7E → $13E).
+
+### compiler/wla-dx — previously: pinned to the **v10.7 release**
 
 The submodule HEAD is the `v10.7` release tag (`91c52b1f`), which our
 fork mirrors from upstream. Zero local patches.

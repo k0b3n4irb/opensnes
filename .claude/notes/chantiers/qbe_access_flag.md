@@ -104,7 +104,11 @@ Rebuilt from clean; reference ROMs = the v0.39.0 build.
   paths — mode7, map, dynamic sprites — with no pinned access); the
   "instructions to frame F" proxy is *inverted* for idle-heavy ROMs
   (luna counts the halted `wai` loop) and flat for CPU-bound ones. No
-  existing bench measures this gain; the static numbers are the record.
+  existing bench measured this gain at the time; `devtools/benchrom` has
+  since gained const-path workloads (2026-09-07) — v0.39.0 → v0.40.0,
+  cycles per call: animTick 1224 → 989 (−19 %), animTickMeta 1346 → 1108
+  (−18 %), const u8/u16 walk ×32 −11/−12 %, const→RAM copy ×32 −9 %,
+  const struct fields 676 → 310 (−54 %), `tab[i]` unchanged (fused).
 - Correctness: `make test-compiler` 18/18, fixture 25/25, coverage
   83/85 unchanged, manifests 50/50, visual 81/85 with the 4 movers
   (basics_timer, games_shmup_1942, scrolling_parallax_scroll,

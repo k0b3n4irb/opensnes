@@ -15,6 +15,16 @@
 .ROMBANKSIZE $10000         ; 64KB per bank (HiROM standard)
 .ROMBANKS 8                 ; Match ROM configuration
 
+; Bank byte of every 24-bit address and `:label` in this unit = $C0 + linker
+; bank (#127.3, 2026-09-07). HiROM maps the FULL 64 KB of each ROM bank only
+; at $C0-$FF; banks $00-$3F / $80-$BF expose the upper half ($8000-$FFFF)
+; alone. Without this base a label at offset $0000 of linker bank 1 became
+; $01:0000 — WRAM mirror, not ROM — which is why the runtime's .mul32/.div32
+; at 07:0000 and any far-placed payload read garbage on HiROM. Code at
+; $8000+ is reachable both ways ($C0:8xxx mirrors $00:8xxx); $C0-$FF is
+; also the FastROM window, so nothing gets slower.
+.BASE $C0
+
 ; Bank search order for bulk read-only payload: highest first, so it lands
 ; away from the code bank. A STRING define — a bare 7-1 would be read as an
 ; expression and BANKS needs the literal text.

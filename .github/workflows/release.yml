@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # need full history to walk merge-base
 
@@ -94,7 +94,7 @@ jobs:
       # Checkout the project                 #
       # ------------------------------------ #
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -104,7 +104,7 @@ jobs:
       # seeds it. See opensnes_build.yml for the full rationale.
       - name: Restore prebuilt toolchain
         id: toolchain
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             bin
@@ -163,7 +163,7 @@ jobs:
 
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             bin
@@ -215,7 +215,7 @@ jobs:
       # Upload zip as artifact for release   #
       # ------------------------------------ #
       - name: Upload release zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: opensnes-${{ steps.version.outputs.tag }}-${{ matrix.name }}-${{ matrix.arch }}
           path: release/opensnes_${{ steps.version.outputs.tag }}_${{ matrix.name }}_${{ matrix.arch }}.zip
@@ -228,10 +228,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all release artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
 
@@ -279,7 +279,7 @@ jobs:
           NOTESEOF
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.version }}
           name: OpenSNES ${{ steps.tag.outputs.version }}
