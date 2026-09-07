@@ -1255,8 +1255,13 @@ passes test bit 0 only and cproc's pointer-variable loads carry no
 pointee taint. The "latent bug" was the HDMA mid-frame glitch and the
 RNG boot seed (both explained in v0.39.0); the corpus is clean on the
 frame-equal protocol. Lib −685 instructions (−4.25 %), asset −34 % /
-anim −17 % / panel −15 % estimated cycles. No existing ROM bench
-exercises the gain (benchrom is ASM-path only) — recorded as a gap.
+anim −17 % / panel −15 % estimated cycles. Measured on the ROM bench
+once `devtools/benchrom` gained const-path workloads (2026-09-07, luna,
+cycles per call, v0.39.0 → v0.40.0): animTick 1224 → 989 (−19 %),
+animTickMeta 1346 → 1108 (−18 %), const u8 walk ×32 7689 → 6832
+(−11 %), const u16 walk ×32 7380 → 6522 (−12 %), const→RAM copy ×32
+9738 → 8881 (−9 %), const struct fields 676 → 310 (−54 %), `tab[i]`
+203 → 203 (already fused). The ASM rows are unchanged, as they must be.
 
 **Acceptance criteria**: the three passes test bit 0 only; cproc's
 pointer-variable loads carry no pointee taint; corpus green on the

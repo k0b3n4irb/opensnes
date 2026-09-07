@@ -4,7 +4,7 @@ TARGET   := benchrom.sfc
 ROM_NAME := BENCHROM
 
 USE_LIB  := 1
-LIB_MODULES := console mode7 map sprite sprite_dynamic sprite_lut dma
+LIB_MODULES := console mode7 map sprite sprite_dynamic sprite_lut dma anim
 
 CSRC   := main.c
 ASMSRC := data.asm
