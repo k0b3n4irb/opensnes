@@ -294,9 +294,9 @@
     "steps": 3000000
   },
   "games_shmup_1942": {
-    "fbhash": "60dd0c81c65841b8",
+    "fbhash": "3a3fccb15c964e3d",
     "luna_version": "v1.17.0",
-    "rom_sha256": "ad9ea07eeca03e3596bf1e7a973266683f482d38353c0249be5f016ecc2d0f79",
+    "rom_sha256": "54216ec58eea9abfafcf1ffce33761fa46998a99e07d89e9b3fcf278b138e94f",
     "steps": 3000000
   },
   "games_tetris": {

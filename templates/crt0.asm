@@ -504,13 +504,24 @@ FastStart:
     ; 40.9 ms = 2.5 frames, visible on first launch, gone on "reload"
     ; (memory kept). luna zero-fills everything, so it could not show it.
     ; Long addressing: DBR is not set up yet. InitHardware writes $8F
-    ; again; that is fine. The SNES corpus (Cartouche, 2026-09-07) states
-    ; no guaranteed power-on value for INIDISP; every reference boot
-    ; sequence writes $8F before touching anything else (e.g.
-    ; oldmachines.io/supernintendo/homebrew "from reset to a stable
-    ; frame"), which is what this does.
+    ; again; that is fine. Arbitrated against the SNES corpus (Cartouche,
+    ; 2026-09-08): "most of the PPU registers start in an unknown state"
+    ; and "the first registers to reset should be the NMITIMEN and HDMAEN
+    ; registers. This will prevent Interrupts or HDMA from erroneously
+    ; changing the PPU registers in the middle of the routine"
+    ; (snes.nesdev.org/wiki/Init_code, arbiter); "VRAM, CGRAM, OAM and
+    ; WRAM hold whatever the silicon happened to power up as — emulators
+    ; often clear that memory for you" (oldmachines.io, the trap luna
+    ; fell into). So: blank the screen, then silence NMI/IRQ/auto-joypad
+    ; and HDMA, all before the 40 ms of memory clears below — a channel
+    ; left enabled by a random HDMAEN would otherwise write junk to the
+    ; PPU (or into $2180-$2183 during the far-band zero-fill) on real
+    ; hardware and on any emulator that randomises power-on state.
     lda #$8F
     sta.l $002100       ; INIDISP: forced blank, brightness 15
+    lda #$00            ; (stz has no long addressing mode)
+    sta.l $004200       ; NMITIMEN: no NMI, no IRQ, no auto-joypad yet
+    sta.l $00420C       ; HDMAEN: no HDMA channel running through the clears
 
 .ifdef SA1
     ; SA-1: Enable I-RAM writes for the SNES CPU via SIWP ($2229).
@@ -555,7 +566,8 @@ FastStart:
     ; to the WRAM data port: 56 KB at 8 master cycles/byte ≈ 21 ms, once,
     ; before any lib init (the lib's own bank-$7E state — map, lzss — is
     ; set up by its init functions anyway). Safe here: NMI is still off
-    ; ($4200 = 0, so nothing can touch $2180-$2183 mid-transfer).
+    ; (NMITIMEN and HDMAEN were zeroed at the reset vector, so nothing can
+    ; touch $2180-$2183 mid-transfer).
     stz.w $2181         ; WMADDL = $00
     lda #$20
     sta.w $2182         ; WMADDM = $20  → $7E:2000

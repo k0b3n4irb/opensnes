@@ -23,7 +23,7 @@ on:
 # cancelled too. Safe: neither main nor develop is a protected branch with
 # required checks. Release tags are handled by release.yml (unique per tag).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 # ------------------------------------ #
