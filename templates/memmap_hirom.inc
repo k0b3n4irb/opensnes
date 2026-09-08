@@ -18,7 +18,11 @@
 ; Bank byte of every 24-bit address and `:label` in this unit = $C0 + linker
 ; bank (#127.3, 2026-09-07). HiROM maps the FULL 64 KB of each ROM bank only
 ; at $C0-$FF; banks $00-$3F / $80-$BF expose the upper half ($8000-$FFFF)
-; alone. Without this base a label at offset $0000 of linker bank 1 became
+; alone (fullsnes "SNES Memory Map": HiROM banks 40h-7Dh with mirror at
+; C0h-FFh; snesdev-wiki "Memory map": "a linear view of the entire ROM at
+; $C0-$FF ... still provides access to the last 32 KiB of every bank in the
+; LoROM area" — arbitrated 2026-09-08). Without this base a label at offset
+; $0000 of linker bank 1 became
 ; $01:0000 — WRAM mirror, not ROM — which is why the runtime's .mul32/.div32
 ; at 07:0000 and any far-placed payload read garbage on HiROM. Code at
 ; $8000+ is reachable both ways ($C0:8xxx mirrors $00:8xxx); $C0-$FF is
