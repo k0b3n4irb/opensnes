@@ -2,6 +2,33 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.41.1] — 2026-09-08
+
+A boot-safety patch: the reset vector silences NMI and HDMA before the
+memory clears, on the strength of the corpus arbitration that came back
+online.
+
+### Fixed
+- fix(runtime): **NMITIMEN and HDMAEN are zeroed at the reset vector**,
+  right after the forced blank and before the 8 KB bank-0 clear and the
+  22 ms far-band zero-fill. They were reset only in `InitHardware`, and
+  the zero-fill assumed `$4200 = 0` as a given. On real hardware, or on
+  any emulator that randomises power-on state, an HDMA channel left
+  enabled could write junk to the PPU or into `$2180-$2183` mid-transfer.
+  Arbitrated: snesdev-wiki "Init code" — "most of the PPU registers start
+  in an unknown state ... the first registers to reset should be the
+  NMITIMEN and HDMAEN registers"; oldmachines — "VRAM, CGRAM, OAM and WRAM
+  hold whatever the silicon happened to power up as". luna zero-fills
+  everything and cannot see this class of bug.
+- ci: push and pull_request runs of the same commit no longer cancel each
+  other (the concurrency group includes the event name); release PRs read
+  as mergeable without a manual re-run.
+
+### Changed
+- docs(runtime): the HiROM `.BASE $C0` rationale in `memmap_hirom.inc`
+  cites the arbitrated mapping (fullsnes: HiROM banks 40h-7Dh with mirror
+  at C0h-FFh; snesdev-wiki: the linear view of the entire ROM at $C0-$FF).
+
 ## [0.41.0] — 2026-09-07
 
 The placement release: C const data leaves bank $00 by default, HiROM is
