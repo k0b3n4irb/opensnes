@@ -283,8 +283,11 @@ The full catalog with severity tags lives in
   A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
   `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
-- **All C variables must be in bank $00, < $2000** — compiler emits
-  `sta.l $0000,x`
+- **Plain C RAM must sit below $2000** (compiler emits `sta.l $0000,x`);
+  bulk buffers go above it with `FAR` (chantier B2, v0.39.0) — see
+  [`docs/tutorials/far_ram.md`](docs/tutorials/far_ram.md)
+- **C const data lives in the asset banks by default** (#127.3, v0.41.0);
+  bank $00 keeps the code
 - **Push order is LEFT-TO-RIGHT** (vs PVSnesLib's right-to-left) — see
   [`compiler/ABI.md`](compiler/ABI.md) before porting an ASM helper
 
