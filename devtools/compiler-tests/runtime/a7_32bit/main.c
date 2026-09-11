@@ -32,6 +32,13 @@ u32 r_smod;    /* (s32)-257 % 16  (signed)  -> 0xFFFFFFFF (-1) */
 u16 r_slt;     /* ((s32)-1 < 0)             -> 1 (signed compare) */
 u16 r_sgt;     /* ((s32)-5 > (s32)3)        -> 0 (signed compare) */
 u32 r_sar8;    /* (s32)-1 >> 8    (arith)   -> 0xFFFFFFFF */
+/* Kl shift of a value that arrives from a MEMORY LOAD (not a pre-spilled
+ * temp): (s32)tab[k] << 8. The 2026-05-21 codegen read the high half from a
+ * stack slot it never wrote (.claude/notes/tech/cc65816_kl_shift_high_half.md);
+ * fixed by A7. 0x0100 << 8 -> 0x00010000. */
+u32 r_shl8_ld;
+static const s16 shl_tab[4] = { 7, 0x0100, -3, 9 };
+volatile u8 shl_idx = 1;
 
 int main(void) {
     u32 a, b;
@@ -56,6 +63,7 @@ int main(void) {
     s = -1;   r_slt  = (s < 0) ? 1u : 0u;
     s = -5;   r_sgt  = (s > 3) ? 1u : 0u;
     s = -1;   r_sar8 = (u32)(s >> 8);
+    r_shl8_ld = (u32)((s32)shl_tab[shl_idx] << 8);
 
     consoleInit();
     setScreenOn();

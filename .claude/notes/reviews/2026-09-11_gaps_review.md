@@ -380,6 +380,15 @@ C features with **no test at all** (grep over every fixture and runtime main):
 | S4 | bitfields, `enum`, `goto`, recursion, varargs, inline asm | 0 tests each |
 | S5 | 32-bit arithmetic | `test_u32_arithmetic.c` contains no `*`, `/`, `%`; 32-bit mul/div/mod are covered only by the `a7_32bit` ROM; variable-count 32-bit shifts and static 32-bit compare checks are uncovered |
 
+> **Erratum (2026-09-11, item C3):** both bugs below were already fixed when
+> this review was written — the ternary bank drop on 2026-08-13 (pinned by
+> `cases/ternary_addr_const.checks` and the `ph2` cell of `a6_farptr`), the
+> `Kl` shift by chantier A7 (v0.21.2). The notes' status lines were stale,
+> which is itself the K9 finding: an agent reading `.claude/notes/tech/`
+> saw "OPEN" for closed bugs. The function-pointer-array crash also no
+> longer reproduces. C3 therefore closed the notes and added regression
+> coverage instead of KNOWN_LIMITATIONS entries.
+
 **K9 — two live silent-corruption bugs are documented only in
 `.claude/notes/tech/`.** `ternary_addr_const_bank_drop.md` ("Status: OPEN
 (unfixed)", Class A: a ternary yielding an address constant materialises
