@@ -116,7 +116,7 @@ jobs:
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'
         shell: bash
-        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch -t 203001010000 {} + 2>/dev/null || true
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch {} + 2>/dev/null || true  # stamp to NOW, not 2030 — see functional-tests
 
       # ------------------------------------ #
       # Build & create release package       #
