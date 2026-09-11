@@ -181,20 +181,26 @@ jobs:
         if: matrix.name != 'windows'
         run: |
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          fail=0
           for sym in $(find examples -name "*.sym" 2>/dev/null); do
             python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+            [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
           done
-          true
+          # Blocking: a WRAM-mirror overlap must not ship (gaps review, item P3).
+          exit $fail
 
       - name: Validate examples (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
         run: |
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
+          fail=0
           for sym in $(find examples -name "*.sym" 2>/dev/null); do
             python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+            [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
           done
-          true
+          # Blocking: a WRAM-mirror overlap must not ship (gaps review, item P3).
+          exit $fail
 
       - name: Smoke-test ROMs with luna (Linux)
         # A shipped artifact must have EXECUTED ROMs on its own arch before

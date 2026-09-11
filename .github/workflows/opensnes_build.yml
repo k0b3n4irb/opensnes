@@ -235,12 +235,16 @@ jobs:
         run: |
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           found=0
+          fail=0
           for sym in $(find examples -name "*.sym" 2>/dev/null); do
             python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+            [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
             found=1
           done
           [ "$found" = "0" ] && echo "No .sym files found (examples not built in CI)" | tee -a opensnes_release_${{ matrix.name }}.log
-          true
+          # A bank $00 <-> $7E WRAM-mirror overlap is silent corruption at
+          # runtime; the check is blocking (gaps review 2026-09-11, item P3).
+          exit $fail
 
       - name: Validate examples (Windows)
         if: matrix.name == 'windows'
@@ -248,12 +252,16 @@ jobs:
         run: |
           echo "=== Validating Examples ===" | tee -a opensnes_release_${{ matrix.name }}.log
           found=0
+          fail=0
           for sym in $(find examples -name "*.sym" 2>/dev/null); do
             python3 devtools/symmap/symmap.py --check-overlap "$sym" 2>&1 | tee -a opensnes_release_${{ matrix.name }}.log
+            [ "${PIPESTATUS[0]}" -eq 0 ] || fail=1
             found=1
           done
           [ "$found" = "0" ] && echo "No .sym files found (examples not built in CI)" | tee -a opensnes_release_${{ matrix.name }}.log
-          true
+          # A bank $00 <-> $7E WRAM-mirror overlap is silent corruption at
+          # runtime; the check is blocking (gaps review 2026-09-11, item P3).
+          exit $fail
 
       # ------------------------------------ #
       # Check library linking                #
