@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram test-project bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -182,7 +182,26 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
+	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
+
+# User-project test story (init → build → test-update → test → FAIL path),
+# exactly as a user runs it. Was CI-only until 2026-09-11, when a harness
+# rename broke project_test.py and `make tests` stayed green — the gate a
+# contributor runs must include everything CI runs. The deliberately wrong
+# assert must make `make test` exit non-zero. The sed is done in Python so
+# the target behaves the same on macOS (BSD sed) and Linux.
+TEST_PROJECT_DIR ?= /tmp/opensnes_test_project
+test-project:
+	@rm -rf $(TEST_PROJECT_DIR)
+	@OPENSNES_HOME=$(CURDIR) scripts/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
+	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
+	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
+	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
+	@python3 -c "import pathlib; p = pathlib.Path('$(TEST_PROJECT_DIR)/test/manifest.toml'); p.write_text(p.read_text().replace('player_x = 7800', 'player_x = 9999'))"
+	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
+		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
+	@echo "user-project test story: OK (incl. the FAIL path)"
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
 # (a full `make clean` wipes bin/ and forces a compiler rebuild).

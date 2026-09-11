@@ -177,8 +177,15 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def render(luna: str, rom: Path, frame: int, out_png: Path) -> tuple[str, bool]:
+def render(luna: str, rom: Path, frame: int, out_png: Path, *,
+           steps: int | None = None) -> tuple[str, bool]:
     """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
+
+    `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
+    `frame`. User-project tests (project_test.py) still key on instruction
+    counts: their manifests document `steps`, and their input-driven tests
+    cannot move to `--until-frame` until luna applies `--input` under it
+    (open observation, status/luna_stress_campaign.md).
 
     fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
     as cross-architecture-stable) — the regression key, immune to PNG-encoder
@@ -188,8 +195,9 @@ def render(luna: str, rom: Path, frame: int, out_png: Path) -> tuple[str, bool]:
     out_png.parent.mkdir(parents=True, exist_ok=True)
     wdm = out_png.with_suffix(".wdm.txt")
     proc = subprocess.run(
-        [luna, "run", "--until-frame", str(frame), "--print-fbhash",
-         "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
+        [luna, "run", *(["-n", str(steps)] if steps is not None
+                        else ["--until-frame", str(frame)]),
+         "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out_png.is_file():

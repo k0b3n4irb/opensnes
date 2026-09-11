@@ -45,7 +45,8 @@ from pathlib import Path
 # The SDK harness lives next to this file — reuse its luna resolution and
 # manifest helpers instead of duplicating them.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from luna_runner import LUNA_VERSION, find_luna, render, sha256_file, steps_points  # noqa: E402
+from luna_runner import LUNA_VERSION, find_luna, render, sha256_file  # noqa: E402
+from luna_runner import frame_points as steps_points  # noqa: E402  (same scalar-or-list normaliser)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "probes"))
 from lib import assert_mem  # noqa: E402
@@ -101,7 +102,9 @@ def run_tests(rom: Path, test_dir: Path, update: bool) -> int:
             entry = []
             for i, steps in enumerate(points):
                 png = capture_dir / (f"{name}.png" if i == 0 else f"{name}@{steps}.png")
-                fbhash, wdm_fired = render(luna, rom, steps, png)
+                # Project tests key on instruction counts (see the manifest
+                # format above), not PPU frames — hence steps=, frame unused.
+                fbhash, wdm_fired = render(luna, rom, 0, png, steps=steps)
                 if wdm_fired:
                     problems.append(f"@{steps}: in-ROM SNES_ASSERT fired (see "
                                     f"{png.with_suffix('.wdm.txt')})")
