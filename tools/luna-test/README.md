@@ -37,7 +37,7 @@ python3 tools/luna-test/luna_runner.py --only sa1  # one label substring
 
 ## How it works
 
-For each example the runner calls `luna run -n <steps> --print-fbhash
+For each example the runner calls `luna run --until-frame <N> --print-fbhash
 --screenshot <png>` and keys the regression on **luna's `fbhash`** — a hash of
 the pre-PNG pixels, byte-deterministic run-to-run and cross-arch-stable (see
 the note below); the PNG is kept next to it for human diffing (hash gate **+**
@@ -45,10 +45,10 @@ PNG debug). luna also provides `--assert BANK:OFFSET=HEX` (+ `-aram`/`-vram`)
 for direct WRAM assertions, used by the probes.
 
 Baselines live in `baselines/`: `<label>.png` + a single `baselines.json`
-manifest (`fbhash`, `steps`, `rom_sha256`, `luna_version`). Self-animating
+manifest (`fbhash`, `frames`, `rom_sha256`, `luna_version`). Self-animating
 examples opt into MULTIPLE capture points via `manifest.toml`
-`steps = [a, b]` — `fbhash`/`steps` become lists, extra PNGs are
-`<label>@<steps>.png`, and a partial mismatch is reported as "timing drift?".
+`frames = [a, b]` — `fbhash`/`frames` become lists, extra PNGs are
+`<label>@<frame>.png`, and a partial mismatch is reported as "phase drift?".
 
 ## Cross-arch baseline key
 

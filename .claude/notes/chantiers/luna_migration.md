@@ -163,3 +163,30 @@ follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
 
 `wip/luna-migration` (off develop). Reversible until the Phase-4
 decommissioning; the old suite stays in place during the double-run.
+
+## 2026-09-10 — capture points are PPU frames (luna v1.18.0 `--until-frame`)
+
+The visual and coverage pillars captured at an **instruction count**
+(`luna run -n 3_000_000`, ≈ 73-183 frames depending on how much of a frame
+the ROM spends in `wai`). Any codegen change moved the capture onto another
+animation phase and forced a corpus-wide re-baseline (luna issue #222 was
+filed from exactly that pain). luna v1.18.0 ships `--until-frame N` on
+`run`/`state`; the harness now keys on it:
+
+- `manifest.toml`: `default_frames = 200`, self-animating entries
+  `frames = [200, 400]`. The `default_steps`/`steps` keys are gone; the two
+  4M-instruction warm-ups (snesmod_music, random) were 118 / 239 frames, so
+  the 200-frame default already covers them.
+- `luna_runner.py`: `frame_points()` / `capture_frames()` replace
+  `steps_points()`; `render()`/`render_state()` pass `--until-frame`;
+  `baselines.json` stores `frames` (an old `steps`-keyed baseline is reported
+  as MISS with a "run --update" hint, never silently compared).
+- `budget.py` follows the same key. `wram_regress.py` (already per-vblank)
+  and the probe manifests (`at_frame`) were frame-indexed already;
+  `probes/lib.py` still ends runs at a generous `-n` after its last input
+  checkpoint — unchanged, its reads are directional, not phase-sensitive.
+- One deliberate re-baseline. Justification: the clean-rebuilt ROMs still
+  matched every old instruction-keyed hash (93/93 points) before the switch,
+  so the new hashes are a re-key of the same behaviour, not a visual change.
+  Corpus on the new key: coverage 83 OK + 2 INPUT-DEP, visual 85/85,
+  manifests 50/50, WRAM 85/85, budget 85 measured.
