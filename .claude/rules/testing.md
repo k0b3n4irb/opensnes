@@ -15,6 +15,7 @@ python3 tools/luna-test/probes/run_all.py            # functional probes (script
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
+python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
 ```
 
 The WRAM oracle hashes every WRAM page at each vblank, **including the

@@ -68,6 +68,19 @@ The reference tree is the `examples/` ROMs built before the change; a
 DIFF is a rendering change to explain, never something to re-baseline
 over.
 
+## Measured ROM coverage (the never-executed ratchet)
+
+`rom_coverage.py` asks luna for the set of executed PCs of every example
+(`luna profile --pc-set`, to the first manifest frame, no input), folds them
+onto the `.sym` labels (FastROM/HiROM mirrors folded like `symmap.py`) and
+unions the hits over the corpus. The public functions of
+`lib/include/snes/*.h` that no example executes are written to
+`baselines/never_executed.txt`; `make tests` fails if that set gains a
+name (a function shipped with no example and no libtest) and reports names
+that became executed so `--update` can shrink the list. `ROM_COVERAGE.md`
+is the human report. Input-driven code is under-counted by construction —
+the scripted manifest legs are the next step.
+
 ## Cross-arch baseline key
 
 The regression key is luna's **`--print-fbhash`** (since v1.21.0 "fbhash v2":

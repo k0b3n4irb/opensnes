@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram test-project bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -159,6 +159,11 @@ tests: test-compiler
 	@# zero-fill pass.
 	@python3 tools/luna-test/luna_runner.py --coverage --power-on random=1
 	@python3 tools/luna-test/luna_runner.py --compare
+	@# Measured ROM coverage of the public lib API (luna profile --pc-set):
+	@# a public function no example executes must already be in
+	@# baselines/never_executed.txt — the ratchet may shrink, never grow
+	@# (gaps review item R5).
+	@python3 tools/luna-test/rom_coverage.py
 	@python3 tools/luna-test/probes/run_all.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
@@ -208,6 +213,10 @@ test-project:
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
 	@echo "user-project test story: OK (incl. the FAIL path)"
+
+# Measured lib API coverage on its own (the `tests` target runs the check).
+rom-coverage:
+	@python3 tools/luna-test/rom_coverage.py
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
 # (a full `make clean` wipes bin/ and forces a compiler rebuild).
