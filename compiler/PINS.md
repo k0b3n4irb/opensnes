@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 6d3953d27b0da0e5aa48af9e0d91f00fa829373a | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 98ecf206e9668584cc7ca4f4e88ddc188286879f | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | ca50db8ae000a28e80d8b6202cc65c9ff9ff53b9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 86df3317f3ba40c7815d358160e06188d2011e7c | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 1) |
 <!-- END PINS -->
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 17 patches (upstream merge-base: 7051114)
+### compiler/cproc — 18 patches (upstream merge-base: 7051114)
 
 ```
+98ecf20 qbe: drop three dead fork-local symbols so cproc-qbe builds clean under -Wall -Wextra (gaps review H2)
 6d3953d qbe: a pointer object's access is not tainted by its pointee's qualifiers (chantier A9)
 d35c136 expr: a const pointer target satisfies __far (chantier B2, Phase 3)
 f32e712  Add the __far type qualifier (chantier B2, Phase 1): QUALFAR, `farram` access flag, section ".far"; objqual() fixes pointer-to-const globals sectioned into ROM

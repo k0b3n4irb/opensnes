@@ -12,7 +12,7 @@ VERSION    := 1.0.0
 DATESTRING := $(shell date +%Y%m%d)
 
 CC      := clang
-CFLAGS   = -g -Wall -O2 -pedantic -D__BUILD_DATE="\"$(DATESTRING)\"" -D__BUILD_VERSION="\"$(VERSION)\""
+CFLAGS   = -g -Wall -Wextra -O2 -pedantic -D__BUILD_DATE="\"$(DATESTRING)\"" -D__BUILD_VERSION="\"$(VERSION)\""
 
 ifeq ($(shell uname),Darwin)
 	EXT     :=

@@ -106,7 +106,7 @@ jobs:
             compiler/cproc
             compiler/qbe
             compiler/wla-dx
-          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md') }}
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
 
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'
@@ -130,7 +130,7 @@ jobs:
         if: matrix.name == 'linux'
         run: |
           export OPENSNES_HOME=$(pwd)
-          make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
+          make release TOOLCHAIN_WERROR=1 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
       - name: Build & Release OpenSNES for Windows
         if: matrix.name == 'windows'
@@ -348,7 +348,7 @@ jobs:
             compiler/cproc
             compiler/qbe
             compiler/wla-dx
-          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md') }}
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
 
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'
@@ -367,9 +367,11 @@ jobs:
         run: python3 devtools/verify_toolchain.py
 
       - name: Build SDK (toolchain + lib + examples)
+        # TOOLCHAIN_WERROR: cproc/QBE warnings are errors on Linux (clang
+        # versions elsewhere differ; their warnings stay advisory).
         run: |
           export OPENSNES_HOME=$(pwd)
-          make
+          make TOOLCHAIN_WERROR=1
 
       - name: Save prebuilt toolchain (cache miss only)
         if: steps.toolchain.outputs.cache-hit != 'true'
