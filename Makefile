@@ -159,6 +159,10 @@ tests: test-compiler
 	@# zero-fill pass.
 	@python3 tools/luna-test/luna_runner.py --coverage --power-on random=1
 	@python3 tools/luna-test/luna_runner.py --compare
+	@# The same visual baselines must hold from pseudo-random RAM: since
+	@# 2026-09-12 every example does (six audio examples cleared VRAM, the
+	@# vertical-scroll -1 landed in the lib), so this is a gate, not a report.
+	@python3 tools/luna-test/luna_runner.py --compare --power-on random=1
 	@# Measured ROM coverage of the public lib API (luna profile --pc-set):
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
