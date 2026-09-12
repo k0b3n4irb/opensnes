@@ -48,6 +48,10 @@ from symmap import rom_bank  # noqa: E402  (mirror folding, one source of truth)
 
 HEADERS = REPO_ROOT / "lib" / "include" / "snes"
 RATCHET = HERE / "baselines" / "never_executed.txt"
+# Functions executed ONLY by firmware-gated examples (dsp1b.rom): CI has no
+# firmware, skips those examples, and must not count these as newly never-
+# executed. Written by --update on a machine that has the firmware.
+FIRMWARE_ONLY = HERE / "baselines" / "executed_only_with_firmware.txt"
 REPORT = HERE / "ROM_COVERAGE.md"
 
 
@@ -121,11 +125,14 @@ def main() -> int:
     hits: dict[str, set[str]] = {}          # function -> examples that executed it
     tmp = Path("/tmp/luna-pcset"); tmp.mkdir(parents=True, exist_ok=True)
     roms = 0
+    skipped_fw: list[str] = []
+    gated = {k for k, v in manifest.get("examples", {}).items() if v.get("firmware")}
     for rom in discover_example_roms():
         key = example_key(rom)
         if args.only and args.only not in key:
             continue
         if missing_firmware(key, manifest):
+            skipped_fw.append(key)
             continue
         sym = rom.with_suffix(".sym")
         if not sym.is_file():
@@ -167,7 +174,9 @@ def main() -> int:
     lines += ["", "## Least-covered executed functions (one example only)", "",
               "| function | the one example |", "|---|---|"]
     lines += [f"| `{n}` | `{next(iter(ex))}` |" for n, ex in sorted(hits.items()) if len(ex) == 1]
-    if not args.only:
+    if args.update:
+        # The committed report is the full-coverage capture (firmware present);
+        # a check run (CI skips firmware-gated examples) leaves it alone.
         REPORT.write_text("\n".join(lines) + "\n")
     print(f"ROM coverage: {len(public) - len(never)}/{len(public)} public functions executed "
           f"by {roms} ROMs; {len(never)} never.")
@@ -175,12 +184,26 @@ def main() -> int:
     if args.only:
         return 0
     if args.update:
+        if skipped_fw:
+            print(f"ERROR: --update needs the coprocessor firmware installed (skipped: "
+                  f"{', '.join(skipped_fw)}) — the list must be captured with full coverage",
+                  file=sys.stderr)
+            return 2
         RATCHET.write_text("\n".join(never) + "\n")
-        print(f"wrote {RATCHET.relative_to(REPO_ROOT)} ({len(never)} names) and "
+        fw_only = sorted(n for n, ex in hits.items() if ex and ex <= gated)
+        FIRMWARE_ONLY.write_text("\n".join(fw_only) + "\n")
+        print(f"wrote {RATCHET.relative_to(REPO_ROOT)} ({len(never)} names), "
+              f"{FIRMWARE_ONLY.relative_to(REPO_ROOT)} ({len(fw_only)} names) and "
               f"{REPORT.relative_to(REPO_ROOT)}")
         return 0
     known = set(RATCHET.read_text().split()) if RATCHET.is_file() else set()
     new = sorted(set(never) - known)
+    if skipped_fw and FIRMWARE_ONLY.is_file():
+        exempt = set(FIRMWARE_ONLY.read_text().split())
+        dropped = [n for n in new if n in exempt]
+        new = [n for n in new if n not in exempt]
+        print(f"  note: {len(skipped_fw)} firmware-gated example(s) skipped; "
+              f"{len(dropped)} function(s) executed only by them are exempt from the check")
     gone = sorted(known - set(never))
     for n in new:
         print(f"  NEW never-executed public function: {n} ({public[n]}) — add an example or a "
