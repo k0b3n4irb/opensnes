@@ -97,11 +97,18 @@ static void pat_push(spc_pattern_t *p, u8 val)
 spc_source_t *spc_source_create(const itl_sample_data_t *src)
 {
     spc_source_t *s = calloc(1, sizeof(*s));
+    int length = 0, loop = 0;
     brr_encode(src->data8, src->data16, src->bits16,
                src->length, src->loop_start, src->loop_end,
                src->loop, src->bidi_loop,
-               &s->data, (int *)&s->length, (int *)&s->loop,
+               &s->data, &length, &loop,
                &s->tuning_factor);
+    /* brr_encode reports int; the source fields are u16 (a BRR sample
+     * is at most 64 KB). Writing through an (int *) cast on the u16
+     * fields, as this used to, stored 4 bytes over two 2-byte fields
+     * and only worked on little-endian hosts (UBSan: misaligned store). */
+    s->length = (u16)length;
+    s->loop = (u16)loop;
     return s;
 }
 

@@ -18,6 +18,13 @@ python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the cha
 python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
 ```
 
+The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,
+QBE, wla-dx and the asset tools with ASan + UBSan and runs the fixtures,
+the lib build, the tool goldens and the whole corpus under
+`halt_on_error=1` (CI job `sanitizers` in `lint.yml`). Run it after any
+change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
+`bin/`, so `make clean && make` afterwards.
+
 The WRAM oracle hashes every WRAM page at each vblank, **including the
 stack**, so it moves on any codegen change even when behaviour is
 identical. That is the point: it makes you justify the change rather

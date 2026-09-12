@@ -108,57 +108,11 @@ jobs:
           fi
 
       # --------------------------------------------------------
-      # Step 3: UBSan build + run (diagnostic detail on failure paths).
-      # ASan runtime is unavailable on MSYS2 MinGW targets; UBSan needs
-      # no runtime. Non-gating — extra signal only.
+      # Step 3 used to build cproc with UBSan (no ASan runtime on MinGW) and
+      # run the culprit files, non-gating. Retired 2026-09-12: the Linux
+      # `sanitizers` job in lint.yml builds the whole host toolchain with
+      # ASan + UBSan on every push and PR and gates on any report.
       # --------------------------------------------------------
-      - name: Build cproc with UBSan + debug
-        continue-on-error: true
-        shell: msys2 {0}
-        run: |
-          echo "=== Building cproc-qbe with UBSan + debug ==="
-          cd compiler/cproc
-          make clean
-          UBSAN="-fsanitize=undefined -fno-omit-frame-pointer -g -O1"
-          make CC="cc $UBSAN" LDFLAGS="-fsanitize=undefined" cproc-qbe 2>&1 || {
-            echo "UBSan build failed — skipping UBSan pass"
-            cd ../..
-            exit 0
-          }
-          cp cproc-qbe ../../bin/cproc-qbe-ubsan 2>/dev/null || \
-          cp cproc-qbe.exe ../../bin/cproc-qbe-ubsan.exe 2>/dev/null || true
-          cd ../..
-
-      - name: "UBSan: run culprit files"
-        continue-on-error: true
-        shell: msys2 {0}
-        run: |
-          BIN="./bin/cproc-qbe-ubsan"
-          [ -f "${BIN}.exe" ] && BIN="${BIN}.exe"
-          if [ ! -f "$BIN" ]; then
-            echo "UBSan binary not found, skipping"
-            exit 0
-          fi
-          export UBSAN_OPTIONS="halt_on_error=0:print_stacktrace=1"
-          mkdir -p /tmp/diag_preprocessed
-          for src in devtools/compiler-tests/cases/test_union.c \
-                     devtools/compiler-tests/cases/test_string_init.c \
-                     devtools/compiler-tests/cases/test_nested_struct.c \
-                     devtools/compiler-tests/cases/test_global_struct_init.c \
-                     devtools/compiler-tests/cases/test_struct_ptr_init.c; do
-            name=$(basename "$src" .c)
-            pp="/tmp/diag_preprocessed/${name}.pp.c"
-            cc -E -D__OPENSNES__=1 -Ilib/include "$src" > "$pp" 2>/dev/null || { echo "  preprocess FAILED: $name"; continue; }
-            for i in 1 2 3; do
-              "$BIN" "$pp" > /dev/null 2>/tmp/diag_ubsan_${name}_${i}.log && rc=0 || rc=$?
-              if [ $rc -ne 0 ] || [ -s /tmp/diag_ubsan_${name}_${i}.log ]; then
-                echo "=== UBSan $name run $i: EXIT=$rc ==="
-                cat /tmp/diag_ubsan_${name}_${i}.log
-              fi
-            done
-          done
-          echo "=== UBSan pass complete ==="
-
       # --------------------------------------------------------
       # Step 4: Full compiler pattern-check suite (comparison signal)
       # --------------------------------------------------------
@@ -177,7 +131,6 @@ jobs:
           mkdir -p diag_output
           cp /tmp/diag_*.txt diag_output/ 2>/dev/null || true
           cp /tmp/diag_*.log diag_output/ 2>/dev/null || true
-          cp /tmp/diag_preprocessed/*.pp.c diag_output/ 2>/dev/null || true
           echo "=== Collected files ==="
           ls -la diag_output/ 2>/dev/null || echo "(empty)"
 

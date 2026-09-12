@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -241,6 +241,32 @@ test-tools:
 	@python3 tools/palplan/tests/run_golden.py
 	@python3 tools/aseprite2snes/tests/run_golden.py
 
+# Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
+# QBE, wla-dx and the asset tools from clean with ASan + UBSan (SANITIZE=1:
+# compiler/Makefile and tools/*/Makefile swap -static and -O2 for the
+# sanitizer flags), then runs everything that exercises them: the compiler
+# fixtures, the lib build, the tool goldens and the whole example corpus.
+# halt_on_error turns every report into a non-zero exit, so one finding
+# fails the target; leaks are not checked (one-shot processes). The first
+# run found seven bugs in five programs (wla-65816 read before its token
+# buffer on one-character macro labels, wlalink READ_T signed-shift
+# overflow, QBE memset on a NULL table, smconv int stores through u16
+# fields and negative shifts in the BRR encoder, wav2brr negative shift,
+# tmx2snes offsetof through NULL). The tree is left with SANITIZED binaries
+# in bin/ — run `make clean && make` afterwards before anything else.
+SAN_ENV := ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1
+test-sanitizers:
+	$(MAKE) -C $(COMPILER_PATH) clean
+	$(MAKE) -C $(TOOLS_PATH) clean
+	$(MAKE) -C $(LIB_PATH) clean
+	$(MAKE) -C $(EXAMPLES_PATH) clean
+	$(MAKE) SANITIZE=1 compiler tools
+	$(SAN_ENV) python3 devtools/compiler-tests/run.py
+	$(SAN_ENV) $(MAKE) SANITIZE=1 lib
+	$(SAN_ENV) $(MAKE) SANITIZE=1 test-tools
+	$(SAN_ENV) $(MAKE) SANITIZE=1 examples
+	@echo "SANITIZERS: OK — cproc-qbe, qbe, wla-dx and the asset tools ran the fixtures, the lib, the goldens and the corpus without an ASan/UBSan report"
+
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds
 # the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
@@ -378,4 +404,5 @@ help:
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
 	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
+	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  help      - Show this help"

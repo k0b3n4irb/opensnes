@@ -613,7 +613,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 |---|---|---|---|---|---|
 | H1 | Upstream suites run on every PIN bump | G9 | M | **H** | run locally `make -C compiler/cproc check`, `make -C compiler/qbe check`, wla-dx `byte_tester`; record failures as KNOWN_FAIL; `toolchain-suites` job in `lint.yml` |
 | H2 | Compiler and tools built with warnings on | G10 | S | **H** | dry run `-O2 -Wall -Wextra` on cproc / QBE (`compiler/Makefile:70,83`); drop `-Wno-implicit-function-declaration` from `tools/tmx2snes/Makefile:5`; `-Werror` on Linux CI only |
-| H3 | ASan/UBSan job on Linux | G11 | M | **H** | §4 Sanitizers |
+| H3 | ASan/UBSan job on Linux | G11 | M | **H** | **done 2026-09-12** — `make test-sanitizers` (`SANITIZE=1` knob in `compiler/Makefile` and the nine `tools/*/Makefile`), CI job `sanitizers` in `lint.yml`; the first run found **seven bugs in five programs**: wla-65816 read one byte before its token buffer on every one-character label inside a macro (`-:` in snesmod.asm), wlalink `READ_T` shifted a byte >= 128 into the sign bit, QBE `memset` on a NULL temporary table, smconv stored `int` through `(int *)` casts of two `u16` fields (little-endian-only by accident) and shifted negative samples in the BRR encoder, wav2brr shifted a negative 8-bit sample, tmx2snes computed `offsetof` through a null pointer. All behaviour-neutral (byte-identical corpus). The Windows-only UBSan step is retired. §4 Sanitizers was the design |
 | H4 | Static analysis with cppcheck | G12 | S | M | §4 Static analysis |
 | H5 | Fuzzing the asset parsers | G13 | M (lodepng + IT) / L (all) | M | §4 Fuzzing |
 | H6 | Valgrind only on static release binaries, else delete the supp | G14 | S | L | §4 Valgrind |

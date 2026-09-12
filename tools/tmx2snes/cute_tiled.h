@@ -2995,7 +2995,7 @@ cute_tiled_err:
 
 void cute_tiled_free_map(cute_tiled_map_t* map)
 {
-	cute_tiled_map_internal_t* m = (cute_tiled_map_internal_t*)(((char*)map) - (size_t)(&((cute_tiled_map_internal_t*)0)->map));
+	cute_tiled_map_internal_t* m = (cute_tiled_map_internal_t*)(((char*)map) - offsetof(cute_tiled_map_internal_t, map));
 	cute_tiled_free_map_internal(m);
 }
 
