@@ -50,6 +50,24 @@ examples opt into MULTIPLE capture points via `manifest.toml`
 `frames = [a, b]` — `fbhash`/`frames` become lists, extra PNGs are
 `<label>@<frame>.png`, and a partial mismatch is reported as "phase drift?".
 
+## Power-on state and the A/B protocol
+
+Every runner pass accepts `--power-on zero|ones|random[=seed]`, handed to
+luna as is. `--power-on random=1` boots each ROM from pseudo-random
+WRAM/VRAM/CGRAM/OAM/ARAM with a fixed seed: a ROM that reads memory it
+never initialised fails deterministically instead of passing on luna's
+default zero-fill (the class of the v0.40.0 / v0.41.1 reset-vector fixes,
+which luna could not see before). `make tests` runs the liveness pass
+that way in addition to the default one.
+
+`diff_corpus.py --ref <dir>` is the Class A proof for a compiler or
+library change: for every example it runs `luna diff <ref rom> <new rom>
+--frames <manifest frames> --tolerance N` and prints MATCH (with the
+boot-length offset luna found) or DIFF (PNG pairs under `/tmp/luna-diff/`).
+The reference tree is the `examples/` ROMs built before the change; a
+DIFF is a rendering change to explain, never something to re-baseline
+over.
+
 ## Cross-arch baseline key
 
 The regression key is luna's **`--print-fbhash`** (v0.3.0) — a hash of the

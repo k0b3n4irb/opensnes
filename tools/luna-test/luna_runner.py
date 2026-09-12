@@ -58,6 +58,16 @@ LUNA_VERSION = (HERE / "luna.version").read_text().strip()
 # how much of each frame the ROM spends in `wai`). 200 frames ≈ 3.3 s NTSC —
 # past every example's boot/setup, at or beyond the old instruction-count points.
 DEFAULT_FRAMES = 200
+# Power-on RAM state handed to every luna run (`--power-on zero|ones|random[=seed]`).
+# None = luna's default (zero). `--power-on random=1` boots each ROM from
+# pseudo-random WRAM/VRAM/CGRAM/OAM/ARAM with a FIXED seed, so a ROM that reads
+# memory it never initialised fails deterministically instead of passing on
+# luna's zero-fill (the v0.40.0 / v0.41.1 boot-fix class). Set from --power-on.
+POWER_ON: str | None = None
+
+
+def power_on_args() -> list[str]:
+    return ["--power-on", POWER_ON] if POWER_ON else []
 
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
@@ -197,6 +207,7 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
     proc = subprocess.run(
         [luna, "run", *(["-n", str(steps)] if steps is not None
                         else ["--until-frame", str(frame)]),
+         *power_on_args(),
          "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
@@ -319,7 +330,8 @@ def render_state(luna: str, rom: Path, frame: int, png: Path) -> dict:
     """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
     png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
-        [luna, "state", "--until-frame", str(frame), "--out", "-", "--screenshot", str(png), str(rom)],
+        [luna, "state", "--until-frame", str(frame), *power_on_args(),
+         "--out", "-", "--screenshot", str(png), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0:
@@ -366,11 +378,14 @@ def coverage(luna: str) -> int:
         rows.append((key, status, why))
         print(f"  {status:9} {key}  ({why})")
 
+    # The committed report describes the default (zero-fill) pass; a
+    # --power-on pass prints its verdict but leaves the file alone.
     report = HERE / "CORPUS_COVERAGE.md"
     lines = [
         "# Luna corpus coverage (whole-suite headless liveness pass)",
         "",
-        f"luna {LUNA_VERSION} · `luna state --until-frame <N>` per ROM · {len(roms)} ROMs · "
+        f"luna {LUNA_VERSION} · `luna state --until-frame <N>`"
+        f"{' --power-on ' + POWER_ON if POWER_ON else ''} per ROM · {len(roms)} ROMs · "
         f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
         "",
         "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not "
@@ -384,10 +399,12 @@ def coverage(luna: str) -> int:
         "|---|---|---|",
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
-    report.write_text("\n".join(lines) + "\n")
-    print(f"\nCoverage: {ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL "
-          f"of {len(roms)}.")
-    print(f"Report: {report.relative_to(REPO_ROOT)}")
+    if not POWER_ON:
+        report.write_text("\n".join(lines) + "\n")
+    print(f"\nCoverage{' (--power-on ' + POWER_ON + ')' if POWER_ON else ''}: "
+          f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
+    if not POWER_ON:
+        print(f"Report: {report.relative_to(REPO_ROOT)}")
     return 1 if (dead or fail) else 0
 
 
@@ -400,7 +417,12 @@ def main() -> int:
     ap.add_argument("--list", action="store_true", help="print the manifest and exit")
     ap.add_argument("--coverage", action="store_true",
                     help="run EVERY built example ROM and write a compatibility report")
+    ap.add_argument("--power-on", metavar="MODE",
+                    help="luna power-on RAM state for every run: zero (default), ones, "
+                         "random[=seed]. `random=1` is the reproducible garbage-RAM pass")
     args = ap.parse_args()
+    global POWER_ON
+    POWER_ON = args.power_on
     if args.list:
         manifest = load_manifest()
         for rom in discover_example_roms():

@@ -152,6 +152,12 @@ tests: test-compiler
 	@python3 devtools/check_corpus_fresh.py
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage
+	@# Same liveness pass from pseudo-random RAM (fixed seed): a ROM that
+	@# reads memory it never initialised passes on luna's zero-fill and
+	@# fails here (gaps review item R1; the v0.40.0/v0.41.1 reset-vector
+	@# fix class). Report file untouched — the committed one is the
+	@# zero-fill pass.
+	@python3 tools/luna-test/luna_runner.py --coverage --power-on random=1
 	@python3 tools/luna-test/luna_runner.py --compare
 	@python3 tools/luna-test/probes/run_all.py
 	@$(MAKE) -s test-manifests

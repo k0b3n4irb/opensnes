@@ -426,6 +426,20 @@ specified by a transitory prototype).
 | G23 | No VBlank *time* budget. Manifests assert `max_vblank_bytes = 4096` (`manifests/dma_*.toml`) but no cycle or scanline headroom; `lib/source/profile.asm`'s scanline latch is read by no test | per-frame max cycles of a symbol absent | request (prototype: peek the `profile.asm` latch each frame) |
 | G24 | `luna frames` (consecutive-frame capture), `luna bench` (corpus anomaly sweep), `--native-res` (modes 5/6 are hashed at 256×224 only), `state --call-stack` unused | present | wiring |
 
+> **First run of R1 (2026-09-12, luna v1.18.0, `--power-on random=1`):**
+> liveness holds for all 85 examples, but the visual pass finds **nine
+> examples whose rendering depends on the power-on RAM state**. Six audio
+> examples (`audio/apu_switch`, `audio/echo`, `audio/pitch_mod`,
+> `audio/play_noise`, `audio/soundboard`, `audio/speech_synth`) never write
+> the tilemap/tiles they display — from zero-filled VRAM the screen is the
+> backdrop colour, from random VRAM it is garbage tiles, which is what real
+> hardware shows. Three examples (`backgrounds/mode0`, `color/hicolor_blend`,
+> `games/tetris`) differ on the last scanline only (y = 223, 191–256 px),
+> identically across three unrelated ROMs — systematic, to investigate
+> (SDK-side init of the last row, or luna-side) before blaming either.
+> Tracked as backlog item R10 below; the random pass gates liveness only
+> until these are resolved.
+
 Open luna observations parked in notes, to consolidate with the owner:
 luna #207, #210, #211, #212 OPEN in `status/luna_stress_campaign.md`; the
 observation there that `--input` is ignored when a run ends with
@@ -637,6 +651,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 | R6 | Audio regression by WAV hash | G21 | S | M | wiring (`--audio-out`); hash only | three examples: `audio/apu_switch`, one snesmod, one SFX |
 | R7 | Manifests for the 36 interactive examples; multitap and mouse probes | `ScanMPlay5`, `ReadMouse`, 24 examples with no manifest | L | M | wiring for pad 1; check manifest `port2` / `mouse` support, else **request** | start with `input/move_sprite`, `input/two_players`, then the 7 `games/` |
 | R8 | `luna bench` nightly, `--native-res` for modes 5/6, `--call-stack` on failure | G24 | S | L | wiring | nightly cron; hires manifests; the runner prints `state --call-stack` on a coverage failure |
+| R10 | Power-on-state dependencies found by R1 | R1 first run | S (audio ×6) / M (scanline 223) | **H** | wiring done; findings are ROM/lib bugs | the six audio examples must clear or write the VRAM they display (a `consoleInit`-level default is the lib question); the scanline-223 difference on `backgrounds/mode0`, `color/hicolor_blend`, `games/tetris` needs a luna `state` peek of the last row from both power-on modes to attribute it |
 | R9 | Consolidate open luna observations | luna #207 #210 #211 #212; "`--input` ignored after `--until-frame`" | S | M | owner validation | validate the `--input` / `--until-frame` repro; update `status/luna_input_replay_bug.md` (#126 fixed in v1.13.0) |
 
 ### Docs / agent knowledge
