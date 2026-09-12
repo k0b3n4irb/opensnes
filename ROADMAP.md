@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.41.1
+## Current Status: post-v0.42.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
@@ -283,8 +283,11 @@ The full catalog with severity tags lives in
   A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
   `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
-- **All C variables must be in bank $00, < $2000** — compiler emits
-  `sta.l $0000,x`
+- **Plain C RAM must sit below $2000** (compiler emits `sta.l $0000,x`);
+  bulk buffers go above it with `FAR` (chantier B2, v0.39.0) — see
+  [`docs/tutorials/far_ram.md`](docs/tutorials/far_ram.md)
+- **C const data lives in the asset banks by default** (#127.3, v0.41.0);
+  bank $00 keeps the code
 - **Push order is LEFT-TO-RIGHT** (vs PVSnesLib's right-to-left) — see
   [`compiler/ABI.md`](compiler/ABI.md) before porting an ASM helper
 
@@ -296,6 +299,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-08. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-12. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

@@ -6,6 +6,18 @@ type: tech
 
 # cc65816 Kl shift-by-constant — high half reads stale stack slot
 
+**Status (2026-09-11):** FIXED by chantier A7 (`Kl` codegen, v0.21.2).
+Re-verified on HEAD `470a8e58`: the repro below now spills the loaded value
+(`sta 4,s`), sign-extends it into a stored slot, copies both halves and
+shifts them with paired `asl`/`rol` on stored slots — no read of an
+unwritten slot. Pinned at runtime by the `r_shl8_ld` cell of
+`devtools/compiler-tests/runtime/a7_32bit` (a 16-bit value loaded from a
+table, widened to `s32`, shifted left 8). The asm `fix32Sin`/`fix32Cos` in
+`lib/source/fixed32.asm` stay as they are (they are also faster than the
+C form); their header comment still cites this bug as open and can be
+relaxed when someone next touches the file. The text below is the
+investigation as written on 2026-05-21.
+
 Found while writing `fix32Sin` as a one-line C inline:
 
 ```c

@@ -41,6 +41,11 @@ extern u8 spc_image[], spc_image_end[];
 
 int main(void) {
     consoleInit();
+    /* BG1 is on (TM=1) with its tilemap at VRAM $0400 and no tiles are ever
+     * loaded here: on real hardware VRAM powers up as garbage and would show
+     * through. Clear it once in forced blank (found by luna --power-on random,
+     * gaps review item R10). */
+    dmaClearVRAM();
 
     apuWaitBoot();
     apuUpload(spc_image, SPC_BASE, (u16)(spc_image_end - spc_image));

@@ -1,6 +1,13 @@
 # Codegen bug: a ternary yielding an address constant drops the bank byte
 
-**Status:** OPEN (unfixed), found 2026-08-12 while building
+**Status:** FIXED 2026-08-13 in `compiler/qbe` `w65816/emit.c` (`emitphimoves`
+now stores both halves of a Kl phi arg). Pinned by
+`devtools/compiler-tests/cases/ternary_addr_const.checks` (both bank pushes
+present) and the `ph2` runtime cell of `runtime/a6_farptr`. The rest of
+this note is the investigation as written on 2026-08-12; the status line
+was only corrected on 2026-09-11 (gaps review, item C3).
+
+**Original status:** OPEN (unfixed), found 2026-08-12 while building
 `examples/sprites/aseprite_pipeline`. Class A (compiler / QBE w65816 backend).
 Silent failure — wrong runtime data, no diagnostic.
 

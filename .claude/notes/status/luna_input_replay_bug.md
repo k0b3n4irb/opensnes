@@ -1,6 +1,11 @@
 # luna v1.9.0 — `state --input` misapplies checkpoint frames
 
-Status: found 2026-07-18 during the apu_switch example work. Filed
+Status: CLOSED — fixed in luna v1.13.0 (verified). The follow-up regression
+(`--input` silently dropped under `--until-frame`, a side effect of the #126
+chase spending the `-n` budget) was fixed in v1.20.0; see
+`luna_stress_campaign.md`. Kept for the symptom record.
+
+Original status: found 2026-07-18 during the apu_switch example work. Filed
 upstream as k0b3n4irb/luna#126. Affects
 `luna state --input` (the probes' input path). `luna run` has no
 `--input`, so coverage/visual baselines are NOT affected.

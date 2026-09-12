@@ -45,6 +45,11 @@ int main(void) {
     u16 keys;
 
     consoleInit();
+    /* BG1 is on (TM=1) with its tilemap at VRAM $0400 and no tiles are ever
+     * loaded here: on real hardware VRAM powers up as garbage and would show
+     * through. Clear it once in forced blank (found by luna --power-on random,
+     * gaps review item R10). */
+    dmaClearVRAM();
     audioInit();
 
     /* Stream the one-shot pop into APU RAM. */

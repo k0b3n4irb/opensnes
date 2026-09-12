@@ -51,6 +51,23 @@ BASELINE_DIR = HERE / "baselines"
 # Single source of truth for the pin: tools/luna-test/luna.version (what
 # install-luna.sh downloads). Read it here too so a version bump touches one file.
 LUNA_VERSION = (HERE / "luna.version").read_text().strip()
+# Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
+# a codegen change that shifts the instruction count of a frame cannot move the
+# capture onto another animation phase (luna issue #222; before v1.18.0 the
+# harness captured at `-n 3_000_000` instructions ≈ 73-183 frames depending on
+# how much of each frame the ROM spends in `wai`). 200 frames ≈ 3.3 s NTSC —
+# past every example's boot/setup, at or beyond the old instruction-count points.
+DEFAULT_FRAMES = 200
+# Power-on RAM state handed to every luna run (`--power-on zero|ones|random[=seed]`).
+# None = luna's default (zero). `--power-on random=1` boots each ROM from
+# pseudo-random WRAM/VRAM/CGRAM/OAM/ARAM with a FIXED seed, so a ROM that reads
+# memory it never initialised fails deterministically instead of passing on
+# luna's zero-fill (the v0.40.0 / v0.41.1 boot-fix class). Set from --power-on.
+POWER_ON: str | None = None
+
+
+def power_on_args() -> list[str]:
+    return ["--power-on", POWER_ON] if POWER_ON else []
 
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
@@ -91,15 +108,30 @@ def missing_firmware(key: str, manifest: dict) -> str | None:
 
 
 def load_manifest() -> dict:
-    """Per-example overrides from manifest.toml (default_steps + [examples.*])."""
+    """Per-example overrides from manifest.toml (default_frames + [examples.*])."""
     path = HERE / "manifest.toml"
     if not path.is_file():
-        return {"default_steps": 3_000_000, "examples": {}}
+        return {"default_frames": DEFAULT_FRAMES, "examples": {}}
     with path.open("rb") as f:
         m = tomllib.load(f)
-    m.setdefault("default_steps", 3_000_000)
+    m.setdefault("default_frames", DEFAULT_FRAMES)
     m.setdefault("examples", {})
     return m
+
+
+def frame_points(frames) -> list[int]:
+    """Normalize a manifest `frames` value (scalar or multi-point list) to a list.
+
+    Every consumer of manifest capture points MUST go through this — the
+    multi-frame opt-in means `frames` can be a list, and passing that raw to a
+    single-shot luna invocation is an error (caught in CI the first time: coverage
+    passed a two-point list to a single `luna state`)."""
+    return list(frames) if isinstance(frames, list) else [frames]
+
+
+def capture_frames(key: str, manifest: dict) -> list[int]:
+    """The PPU frame(s) at which `key` is captured (manifest override or default)."""
+    return frame_points(manifest["examples"].get(key, {}).get("frames", manifest["default_frames"]))
 
 
 def example_key(rom: Path) -> str:
@@ -155,18 +187,15 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def steps_points(steps) -> list[int]:
-    """Normalize a manifest `steps` value (scalar or multi-point list) to a list.
+def render(luna: str, rom: Path, frame: int, out_png: Path, *,
+           steps: int | None = None) -> tuple[str, bool]:
+    """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
 
-    Every consumer of manifest steps MUST go through this — the multi-frame
-    opt-in means `steps` can be a list, and passing that raw to a single-shot
-    luna invocation is an error (caught in CI the first time: coverage passed
-    `[3000000, 6000000]` to `luna state --steps`)."""
-    return list(steps) if isinstance(steps, list) else [steps]
-
-
-def render(luna: str, rom: Path, steps: int, out_png: Path) -> tuple[str, bool]:
-    """Render `rom` after `steps`; return (fbhash, wdm_fired).
+    `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
+    `frame`. User-project tests (project_test.py) still key on instruction
+    counts: their manifests document `steps`, and their input-driven tests
+    cannot move to `--until-frame` until luna applies `--input` under it
+    (open observation, status/luna_stress_campaign.md).
 
     fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
     as cross-architecture-stable) — the regression key, immune to PNG-encoder
@@ -176,8 +205,10 @@ def render(luna: str, rom: Path, steps: int, out_png: Path) -> tuple[str, bool]:
     out_png.parent.mkdir(parents=True, exist_ok=True)
     wdm = out_png.with_suffix(".wdm.txt")
     proc = subprocess.run(
-        [luna, "run", "-n", str(steps), "--print-fbhash",
-         "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
+        [luna, "run", *(["-n", str(steps)] if steps is not None
+                        else ["--until-frame", str(frame)]),
+         *power_on_args(),
+         "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out_png.is_file():
@@ -194,23 +225,23 @@ def run(update: bool, only: str | None) -> int:
     Key = luna's `--print-fbhash` (a cross-arch-stable hash of the rendered
     framebuffer pixels; the PNG is saved alongside for human diffing).
     Baselines: baselines/<label>.png + baselines.json (label = example path with
-    '/'→'_'). Steps come from manifest.toml (per-example override or default).
+    '/'→'_'). Capture frames come from manifest.toml (per-example override or
+    default) and are PPU frame indices (`luna run --until-frame N`).
 
-    Multi-frame opt-in: a manifest entry may set `steps = [a, b, ...]` (animated
-    examples) — each point is captured and compared independently, so a timing
-    shift breaks some-but-not-all points (diagnostic: drift) while a real visual
-    regression breaks them all. Point 1 keeps `<label>.png`; extra points write
-    `<label>@<steps>.png`. Single-point entries keep the scalar schema.
+    Multi-frame opt-in: a manifest entry may set `frames = [a, b, ...]` (animated
+    examples) — each point is captured and compared independently, so a
+    phase/timing shift breaks some-but-not-all points (diagnostic: drift) while a
+    real visual regression breaks them all. Point 1 keeps `<label>.png`; extra
+    points write `<label>@<frame>.png`. Single-point entries keep the scalar schema.
     """
     luna = find_luna()
     manifest = load_manifest()
-    default_steps = manifest["default_steps"]
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     manifest_path = BASELINE_DIR / "baselines.json"
     db = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
 
-    def _png_for(base_dir: Path, label: str, step: int, first: bool) -> Path:
-        return base_dir / (f"{label}.png" if first else f"{label}@{step}.png")
+    def _png_for(base_dir: Path, label: str, frame: int, first: bool) -> Path:
+        return base_dir / (f"{label}.png" if first else f"{label}@{frame}.png")
 
     failures, count = 0, 0
     for rom in discover_example_roms():
@@ -223,17 +254,16 @@ def run(update: bool, only: str | None) -> int:
             print(f"  SKIP  {label} (needs coprocessor firmware '{fw}' — not installed)")
             continue
         count += 1
-        steps = manifest["examples"].get(key, {}).get("steps", default_steps)
-        points = steps_points(steps)
+        points = capture_frames(key, manifest)
         if update:
             # fbhash of an all-black 256x224 frame — a broken ROM must not
             # be able to self-certify (fix32_orbit shipped a black baseline
             # for weeks, #115). Refuse it unless explicitly allowed.
             BLACK_FBHASH = "aacf80a995eb8c67"
             hashes, wdm_any = [], False
-            for i, step in enumerate(points):
-                png = _png_for(BASELINE_DIR, label, step, i == 0)
-                fbhash, wdm = render(luna, rom, step, png)
+            for i, frame in enumerate(points):
+                png = _png_for(BASELINE_DIR, label, frame, i == 0)
+                fbhash, wdm = render(luna, rom, frame, png)
                 hashes.append(fbhash)
                 wdm_any = wdm_any or wdm
             if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
@@ -243,7 +273,7 @@ def run(update: bool, only: str | None) -> int:
                 continue
             single = len(points) == 1
             db[label] = {"fbhash": hashes[0] if single else hashes,
-                         "steps": points[0] if single else points,
+                         "frames": points[0] if single else points,
                          "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
             print(f"  BASELINE  {label}  fbhash={','.join(hashes)}"
                   + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any else ""))
@@ -253,21 +283,26 @@ def run(update: bool, only: str | None) -> int:
                 print(f"  MISS  {label}: no baseline — run --update first")
                 failures += 1
                 continue
-            ref_points = steps_points(ref["steps"])
+            if "frames" not in ref:
+                print(f"  MISS  {label}: baseline is instruction-count keyed (pre-frame "
+                      f"harness) — run --update first")
+                failures += 1
+                continue
+            ref_points = frame_points(ref["frames"])
             ref_hashes = ref["fbhash"] if isinstance(ref["fbhash"], list) else [ref["fbhash"]]
             bad = []
             wdm_any = False
             err = None
-            for i, (step, want) in enumerate(zip(ref_points, ref_hashes)):
-                actual_png = _png_for(Path("/tmp/luna-test-actual"), label, step, i == 0)
+            for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
+                actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
                 try:
-                    fbhash, wdm = render(luna, rom, step, actual_png)
+                    fbhash, wdm = render(luna, rom, frame, actual_png)
                 except RuntimeError as e:
                     err = str(e)
                     break
                 wdm_any = wdm_any or wdm
                 if fbhash != want:
-                    bad.append(f"@{step}: {fbhash} != {want} ({actual_png})")
+                    bad.append(f"@frame {frame}: {fbhash} != {want} ({actual_png})")
             if err:
                 print(f"  ERROR {label}: {err}")
                 failures += 1
@@ -277,7 +312,7 @@ def run(update: bool, only: str | None) -> int:
             elif bad:
                 detail = "; ".join(bad)
                 note = ("" if len(bad) == len(ref_points) else
-                        f" [{len(bad)}/{len(ref_points)} points — timing drift?]")
+                        f" [{len(bad)}/{len(ref_points)} points — phase drift?]")
                 print(f"  FAIL  {label}: {detail}{note}")
                 failures += 1
             else:
@@ -291,11 +326,12 @@ def run(update: bool, only: str | None) -> int:
     return 1 if failures else 0
 
 
-def render_state(luna: str, rom: Path, steps: int, png: Path) -> dict:
-    """Run `luna state` → parsed EmulatorState JSON (+ write a PNG)."""
+def render_state(luna: str, rom: Path, frame: int, png: Path) -> dict:
+    """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
     png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
-        [luna, "state", "-n", str(steps), "--out", "-", "--screenshot", str(png), str(rom)],
+        [luna, "state", "--until-frame", str(frame), *power_on_args(),
+         "--out", "-", "--screenshot", str(png), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0:
@@ -314,17 +350,16 @@ def coverage(luna: str) -> int:
     out_dir = Path("/tmp/luna-test-corpus")
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = load_manifest()
-    default_steps = manifest["default_steps"]
     roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
     rows, ok, inputdep, dead, fail = [], 0, 0, 0, 0
     for rom in roms:
         key = example_key(rom)
         cfg = manifest["examples"].get(key, {})
-        # Liveness wants the LONGEST configured point (most frames = most signal).
-        steps = max(steps_points(cfg.get("steps", default_steps)))
+        # Liveness wants the LATEST configured point (most frames = most signal).
+        frame = max(capture_frames(key, manifest))
         png = out_dir / f"{key.replace('/', '_')}.png"
         try:
-            state = render_state(luna, rom, steps, png)
+            state = render_state(luna, rom, frame, png)
         except Exception as e:  # noqa: BLE001 — bench-style panic-safety
             fail += 1
             rows.append((key, "FAIL", str(e)[:80]))
@@ -343,11 +378,14 @@ def coverage(luna: str) -> int:
         rows.append((key, status, why))
         print(f"  {status:9} {key}  ({why})")
 
+    # The committed report describes the default (zero-fill) pass; a
+    # --power-on pass prints its verdict but leaves the file alone.
     report = HERE / "CORPUS_COVERAGE.md"
     lines = [
         "# Luna corpus coverage (whole-suite headless liveness pass)",
         "",
-        f"luna {LUNA_VERSION} · `luna state -n <steps>` per ROM · {len(roms)} ROMs · "
+        f"luna {LUNA_VERSION} · `luna state --until-frame <N>`"
+        f"{' --power-on ' + POWER_ON if POWER_ON else ''} per ROM · {len(roms)} ROMs · "
         f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
         "",
         "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not "
@@ -361,10 +399,12 @@ def coverage(luna: str) -> int:
         "|---|---|---|",
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
-    report.write_text("\n".join(lines) + "\n")
-    print(f"\nCoverage: {ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL "
-          f"of {len(roms)}.")
-    print(f"Report: {report.relative_to(REPO_ROOT)}")
+    if not POWER_ON:
+        report.write_text("\n".join(lines) + "\n")
+    print(f"\nCoverage{' (--power-on ' + POWER_ON + ')' if POWER_ON else ''}: "
+          f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
+    if not POWER_ON:
+        print(f"Report: {report.relative_to(REPO_ROOT)}")
     return 1 if (dead or fail) else 0
 
 
@@ -377,13 +417,18 @@ def main() -> int:
     ap.add_argument("--list", action="store_true", help="print the manifest and exit")
     ap.add_argument("--coverage", action="store_true",
                     help="run EVERY built example ROM and write a compatibility report")
+    ap.add_argument("--power-on", metavar="MODE",
+                    help="luna power-on RAM state for every run: zero (default), ones, "
+                         "random[=seed]. `random=1` is the reproducible garbage-RAM pass")
     args = ap.parse_args()
+    global POWER_ON
+    POWER_ON = args.power_on
     if args.list:
         manifest = load_manifest()
         for rom in discover_example_roms():
             key = example_key(rom)
-            steps = steps_points(manifest["examples"].get(key, {}).get("steps", manifest["default_steps"]))
-            print(f"  {key:40} -n {','.join(map(str, steps))}")
+            frames = capture_frames(key, manifest)
+            print(f"  {key:40} --until-frame {','.join(map(str, frames))}")
         return 0
     if args.coverage:
         return coverage(find_luna())

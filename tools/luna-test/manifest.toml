@@ -7,8 +7,11 @@
 # Keys under [examples."<path>"] use the example path relative to examples/
 # (the directory that holds main.c), e.g. "input/mouse", "audio/snesmod_music".
 
-default_steps = 3_000_000   # CPU instructions before capture (any fixed value is
-                            # fine for a deterministic baseline; past boot/setup)
+default_frames = 200   # PPU frame of the capture (`luna --until-frame N`, ≈ 3.3 s
+                       # NTSC — past every example's boot/setup). Frames, NOT
+                       # instructions: a codegen change that shifts the
+                       # instruction count of a frame cannot move the capture
+                       # onto another animation phase (luna issue #222).
 
 # --- Examples that idle in a device-detect state under the VISUAL pillar's
 # plain-pad boot (no scripted device input at capture time), so their capture
@@ -21,12 +24,9 @@ input_dependent = true
 [examples."input/superscope"]
 input_dependent = true
 
-# --- Examples wanting extra warm-up so the captured scene is representative.
-[examples."audio/snesmod_music"]
-steps = 4_000_000
-
-[examples."basics/random"]
-steps = 4_000_000   # cycles through values; later frame is more representative
+# --- Extra warm-up (audio/snesmod_music, basics/random) is no longer needed:
+# the old 4M-instruction points were 118 / 239 frames; the 200-frame default
+# already sits past the driver load / first value cycles.
 
 # --- Multi-frame opt-in: SELF-animating examples are captured at TWO points.
 # A real visual regression breaks both hashes; a pure timing shift breaks only
@@ -39,30 +39,30 @@ steps = 4_000_000   # cycles through values; later frame is more representative
 # fbhash) — a second point there is cost without coverage. Covering their
 # animations needs scripted input, which is the functional probes' domain.
 [examples."scrolling/parallax_scroll"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 [examples."color/transparency"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # palette cycling rotates CGRAM every frame with no input — self-animating.
 [examples."color/palette_cycle"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # hero16 walks in place via the anim module since #97 — self-animating.
 [examples."sprites/metasprite"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # raw HDMA wave (krom port) scrolls continuously — self-animating.
 [examples."hdma/hdma_wave_table"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # 32 sprites bounce continuously with no input — self-animating.
 [examples."sprites/sprite_swarm"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # Mode 2 offset-per-tile: a per-column sine wave that scrolls every frame.
 [examples."backgrounds/mode2"]
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # DSP-1 cube: the coprocessor rotates 8 corners every frame (self-animating,
 # two capture points). Firmware-gated — luna LLE-emulates the DSP-1 and needs
@@ -71,7 +71,7 @@ steps = [3_000_000, 6_000_000]
 # the coprocessor just stays inert). A dev/CI with the firmware gets full coverage.
 [examples."chips/dsp1_cube"]
 firmware = "dsp1b.rom"
-steps = [3_000_000, 6_000_000]
+frames = [200, 400]
 
 # DSP-1 ground: the coprocessor streams the floor every frame and the camera
 # idles, so one capture point suffices; firmware-gated like dsp1_cube.

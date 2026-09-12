@@ -1,0 +1,12 @@
+# Calls through a table entry lower to an indirect long jump via the tcc__r9
+# scratch register: execute_action, dispatch_rom, dispatch_ram, dispatch_grid,
+# dispatch_menu -> five. A regression that emits a direct `jsl` for a table
+# entry, or a QBE abort on the table shapes (the historical "assertion
+# failure"), fails this count.
+count 5 jml \[tcc__r9\]
+# A pointer holding a known constant is folded to a direct call — keep it that
+# way (the optimisation is the reason the two `f()` sites are not indirect).
+present jsl increment
+# The tables are data: 24-bit far pointers to the functions, not code.
+present \.dl increment
+present \.dl nothing

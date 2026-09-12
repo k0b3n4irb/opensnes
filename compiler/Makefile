@@ -66,8 +66,25 @@ endif
 	@cp scripts/cc65816 $(BIN_DIR)/cc65816
 	@chmod +x $(BIN_DIR)/cc65816
 
+# Host-side warning policy for the toolchain (gaps review item H2, 2026-09-12).
+# QBE's own Makefile already builds with -Wall -Wextra -Wpedantic; we keep that
+# list and add -O2 (its default has none). cproc gets -O2 -Wall -Wextra; the
+# -Wno-* entries silence upstream-style classes only (sign-compare, operator
+# precedence, field initialisers, unused parameters, and clang's
+# sometimes-uninitialized on a `fatal()` that is not declared noreturn) so
+# that the warnings left are ones a fork patch would introduce.
+# TOOLCHAIN_WERROR=1 (set on the Linux CI legs) turns them into errors.
+QBE_CFLAGS   := -std=c99 -O2 -g -Wall -Wextra -Wpedantic -Wno-missing-field-initializers
+CPROC_CFLAGS := -O2 -g -Wall -Wextra -Wno-sign-compare -Wno-bitwise-op-parentheses \
+                -Wno-missing-field-initializers -Wno-unused-parameter \
+                -Wno-sometimes-uninitialized
+ifeq ($(TOOLCHAIN_WERROR),1)
+    QBE_CFLAGS   += -Werror
+    CPROC_CFLAGS += -Werror
+endif
+
 $(QBE_DIR)/qbe:
-	$(MAKE) -C $(QBE_DIR) CC=clang LDFLAGS="$(STATIC_LDFLAGS)"
+	$(MAKE) -C $(QBE_DIR) CC=clang CFLAGS="$(QBE_CFLAGS)" LDFLAGS="$(STATIC_LDFLAGS)"
 
 # Generate cproc config.h from template (required for non-Linux platforms)
 # Using a template file is more maintainable than multi-line echo commands
@@ -78,7 +95,7 @@ $(CPROC_DIR)/config.h: config.h.in
 $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
 # Use clang for consistent builds across all platforms
-	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="-g" LDFLAGS="$(STATIC_LDFLAGS)" cproc-qbe
+	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="$(CPROC_CFLAGS)" LDFLAGS="$(STATIC_LDFLAGS)" cproc-qbe
 
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
