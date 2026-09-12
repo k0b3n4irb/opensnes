@@ -3,25 +3,25 @@
     "fbhash": "c5b94f246021a325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "d1f4f5bfc53053c635d60adc8b7cf20b7b2f6984b58e4347c33e3bdd329fe1bb"
+    "rom_sha256": "952db325c2812bcf53a14e959cbf133207fa599dbcad3e08f9bc1c1008b5ba96"
   },
   "audio_echo": {
     "fbhash": "8479be7724206325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "dc14ffce39d79a8e8012f70b422dffb4b953654faaa502b06c1bdf748463f10b"
+    "rom_sha256": "05d439e36ec021fc3b3db67adb7d5fb2372d44fe32c69603a9e74b3112f04fcf"
   },
   "audio_pitch_mod": {
     "fbhash": "15700ef1ad4ba325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "b0933406189dafd4da0327dad028c96ea8e42441fce00eeea0375bafbe9cc253"
+    "rom_sha256": "af1fc035a856e0647f5d2efa8e2872030e831838b3937cfaaa2a96290ecaaefd"
   },
   "audio_play_noise": {
     "fbhash": "3acf355abb2d2325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "d0d2baf7c621be004951973a279ca362e7d8c60c00fe69a93c14a30cd4ea5597"
+    "rom_sha256": "525a531ec165ff3c3c0e2721770c06a7f7afe75a9781e172a1458f3b9c838613"
   },
   "audio_sfx_from_wav": {
     "fbhash": "948f358893705a04",
@@ -51,13 +51,13 @@
     "fbhash": "25bd331298456325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "e154b096dca24f40d295a2f7e56e536300f03be2d9aad072ff418bb1feb6e358"
+    "rom_sha256": "210a9b167b9cbfb2edda6e057e882917a1086941c38e036c608b2b795758dfa5"
   },
   "audio_speech_synth": {
     "fbhash": "686ba861dfb86325",
     "frames": 200,
     "luna_version": "v1.21.0",
-    "rom_sha256": "8f58002da40c0f7f17b2ae8e2922ff5bb648d14a94ae8577c84d1e83411e14bb"
+    "rom_sha256": "0927ceb6e79ce687c60451a054595261160f023a4de94d24875e036781ad6705"
   },
   "backgrounds_mode0": {
     "fbhash": "0f77e29beeb7f015",

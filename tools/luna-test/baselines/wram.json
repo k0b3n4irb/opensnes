@@ -1,19 +1,19 @@
 {
   "audio_apu_switch": {
-    "stream": "3a20471a0e33d84af1ca2fc05c374f86da38e517915850746873fd2ccff051e8",
-    "rom_sha256": "d1f4f5bfc53053c635d60adc8b7cf20b7b2f6984b58e4347c33e3bdd329fe1bb"
+    "stream": "916f5a54f2879124ced23d45307a5a8de4ad1f3543fc42ddadc885155c33a825",
+    "rom_sha256": "952db325c2812bcf53a14e959cbf133207fa599dbcad3e08f9bc1c1008b5ba96"
   },
   "audio_echo": {
-    "stream": "7bea3e094e60fc74ab207658876d0d1c1a3ca00604c6b180bcb504dfd44ed7f0",
-    "rom_sha256": "dc14ffce39d79a8e8012f70b422dffb4b953654faaa502b06c1bdf748463f10b"
+    "stream": "bcf7615b2102927e0fa8fbeee8af48abd653e0db4dabdc6c1c995bf96ee599dc",
+    "rom_sha256": "05d439e36ec021fc3b3db67adb7d5fb2372d44fe32c69603a9e74b3112f04fcf"
   },
   "audio_pitch_mod": {
-    "stream": "5a068d2ecd6d14f58f29f1c7930744fe4a685a9f3009a2d967631b3642a84a28",
-    "rom_sha256": "b0933406189dafd4da0327dad028c96ea8e42441fce00eeea0375bafbe9cc253"
+    "stream": "edbd38b19c9e1b90f9573eceaadf839ed849713b230d8e185c4f26f78d3c9004",
+    "rom_sha256": "af1fc035a856e0647f5d2efa8e2872030e831838b3937cfaaa2a96290ecaaefd"
   },
   "audio_play_noise": {
-    "stream": "a3840d5d56766999288e9fb30d3d60bdd509f7b71dd1814ad506f65ffc776efd",
-    "rom_sha256": "d0d2baf7c621be004951973a279ca362e7d8c60c00fe69a93c14a30cd4ea5597"
+    "stream": "4f4a82ede3e29d422fbb57ead15c34f886d0e160a622434abf827ff871af764f",
+    "rom_sha256": "525a531ec165ff3c3c0e2721770c06a7f7afe75a9781e172a1458f3b9c838613"
   },
   "audio_sfx_from_wav": {
     "stream": "e2d2d6c32b28ba270bd864995de3a32cf3ab69b049a95a62aab023bf394af9fc",
@@ -32,12 +32,12 @@
     "rom_sha256": "4c41c2f60f9792566351cbbb72e8e5f4d5e3e31c12b372a8fa2bea7545258294"
   },
   "audio_soundboard": {
-    "stream": "6d271cd76f1754821e2f48c955fd5dfd2f0261f8c5664d5ec77610acc40d9a93",
-    "rom_sha256": "e154b096dca24f40d295a2f7e56e536300f03be2d9aad072ff418bb1feb6e358"
+    "stream": "7930a4d462710270452c8ca38e655cd3be788aec9e61d8ed4fdcaea493fa3bf7",
+    "rom_sha256": "210a9b167b9cbfb2edda6e057e882917a1086941c38e036c608b2b795758dfa5"
   },
   "audio_speech_synth": {
-    "stream": "b75cc6c92be111cead10af341727572445e43f9f354f79e2d08d749c2438007c",
-    "rom_sha256": "8f58002da40c0f7f17b2ae8e2922ff5bb648d14a94ae8577c84d1e83411e14bb"
+    "stream": "6f5003a95dcaf540ec21b74c775b129203ca8d299168404297c8aa102aa91af7",
+    "rom_sha256": "0927ceb6e79ce687c60451a054595261160f023a4de94d24875e036781ad6705"
   },
   "backgrounds_mode0": {
     "stream": "9231da6d60d0fbdfcbc2f92a8874f70032f487c231ff7cca1f36429e30a708df",
