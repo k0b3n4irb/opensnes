@@ -2,6 +2,102 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.42.0] — 2026-09-12
+
+The gate release: the harness captures at PPU frames, CI runs the same
+`make tests` / `make lint` a contributor runs, the toolchain builds with
+warnings as errors, and two new luna passes (random power-on RAM, A/B at
+equal frame) start finding what zero-filled emulation could not. luna is
+pinned at v1.21.0, which ships the fixes and features requested in the
+2026-09-11/12 reports. A written gaps review with a prioritised backlog
+drives the next releases.
+
+### Added
+- feat(luna-test): **`make tests` runs the corpus liveness pass a second
+  time from pseudo-random power-on RAM** (`luna_runner.py --power-on
+  random=1`, fixed seed). A ROM that reads memory it never initialised
+  passes on luna's zero-fill and fails here — the class of the v0.40.0
+  and v0.41.1 reset-vector fixes. First run found nine examples whose
+  rendering depends on the power-on state; six are fixed below, three
+  (`backgrounds/mode0`, `color/hicolor_blend`, `games/tetris`, last
+  scanline only) are still under investigation.
+- feat(luna-test): **`diff_corpus.py`, the Class A validation protocol** —
+  `luna diff <before> <after> --frames <manifest frames> --tolerance N`
+  over every example against the ROMs built before a change; MATCH with
+  the boot-length offset, or DIFF with PNG pairs. `testing.md` now requires
+  it before any re-baseline of a compiler or library change. First use
+  validated the `-O2` toolchain rebuild: 85/85 MATCH at ±0, ROMs
+  byte-identical.
+- feat(luna-test): `manifests/input_two_players.toml` — the first
+  two-controller functional probe (luna v1.21.0 `input2`), both `pad_keys`
+  words asserted over three legs.
+- test(devtools): the `a7_32bit` runtime ROM gains `r_shl8_ld` (a 16-bit
+  value loaded from a table, widened to `s32`, shifted left 8);
+  `test_function_ptr.c` covers const, RAM, 2D and struct function-pointer
+  tables and gets a `.checks` file (`MAX_UNCHECKED` 56 → 55).
+- docs(claude): **`.claude/notes/reviews/2026-09-11_gaps_review.md`** —
+  a review of what the project and its AI agent lack on three axes
+  (development information, the Cartouche SNES corpus, tooling), 43
+  backlog items in three tiers; and `.claude/notes/tech/cartouche_corpus.md`,
+  the in-repo list of corpus sources, index fingerprint and golden
+  queries behind the hardware-claims rule.
+
+### Changed
+- chore(luna-test): **visual baselines are captured at PPU frames**
+  (`--until-frame`; `manifest.toml` `default_frames = 200`, self-animating
+  examples `frames = [200, 400]`) instead of instruction counts, so a
+  codegen change can no longer move a capture onto another animation
+  phase. One re-baseline, justified by the old instruction-keyed points
+  all still matching first.
+- chore(luna-test): **luna pinned at v1.21.0** — fbhash v2 (FNV-1a 64
+  over the displayed RGBA, stable by construction), `--input` applied
+  under `--until-frame`, `input2`, `luna profile --pc-set`, the
+  `power_on`/`seed` pair in `luna test --report json`, `$43xx` readable
+  under `--peek`. All 85 baselines re-keyed; 26 sprite-bearing examples
+  also changed pixels because v1.18.0 drew every sprite one row too high
+  (luna measured v1.20.0 against Mesen2 on the SDK's own ROMs: 100 %
+  identical). One WRAM baseline (`chips/superfx_3d`) re-keyed for a
+  benign boot-timing shift documented in the commit.
+- ci: **the functional-tests job runs `make tests` and the lint workflow
+  runs `make lint`, verbatim.** Three linters, two runtime ROM tests and
+  the corpus-freshness guard enter CI for the first time; the no-op
+  "functional probes" step is gone; the user-project story
+  (init → build → test-update → test → FAIL path) is `make test-project`
+  inside `make tests`. The cached-toolchain stamp is "now" instead of 2030
+  so the freshness guard sees ROMs newer than `bin/cc65816`; the cache key
+  hashes `compiler/Makefile` as its comment always claimed.
+- build(compiler): **cproc-qbe and QBE build with `-O2` and warnings on;
+  `-Werror` on the Linux CI legs** (`TOOLCHAIN_WERROR=1`). cproc fork
+  `98ecf20` (18 patches) drops three dead fork-local symbols the flags
+  exposed. `tmx2snes` loses `-Wno-implicit-function-declaration`,
+  `tmx2snes` and `sa1-patch` gain `-Wextra`. ROMs byte-identical.
+- build(lib): `lib/source/*.c` gets the same clang
+  `-Wall -Wextra -Werror` pre-pass every example already had.
+- ci: the `symmap --check-overlap` step is blocking in the build matrix
+  and in `release.yml` (it used to end in `true`).
+- docs: `CLAUDE.md` and `ROADMAP.md` state the post-B2 / post-#127.3
+  memory model (`FAR` above $2000, C const data in the asset banks) — they
+  still described the pre-#127 SUPERFREE spill. `compiler/ABI.md` is the
+  arbiter for cc65816 ABI questions in the corpus (documented error on the
+  upstream QBE ABI doc).
+
+### Fixed
+- fix(examples): **six audio examples cleared VRAM nowhere** (`apu_switch`,
+  `echo`, `pitch_mod`, `play_noise`, `soundboard`, `speech_synth`): crt0
+  enables BG1 and `consoleInit()` points its tilemap at VRAM $0400, so on
+  real hardware the power-on garbage showed through the backdrop. Each now
+  calls `dmaClearVRAM()` after `consoleInit()`. Found by the random
+  power-on pass. Whether `consoleInit()` should clear VRAM by default is
+  an open design question in the review (R10).
+- fix(luna-test): user-project tests (`make test` in a scaffolded project)
+  broke for one push after the frame-capture rename; restored, and the
+  story now runs in `make tests` so it cannot regress unseen.
+- docs(claude): two compiler-bug notes said OPEN for bugs fixed on
+  2026-08-13 and in v0.21.2 (ternary address-constant bank drop, `Kl`
+  shift high half); corrected, with regression coverage added instead of
+  KNOWN_LIMITATIONS entries. The luna campaign note listed four luna
+  issues as open that closed in v1.16.0.
+
 ## [0.41.1] — 2026-09-08
 
 A boot-safety patch: the reset vector silences NMI and HDMA before the

@@ -101,8 +101,8 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 - **VRAM writes only work during VBlank or forced blank** — the PPU silently ignores writes during active display
 - **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
-- **Bank $00 overflow**: `static const` arrays get SUPERFREE sections. If bank $00 fills (32KB), data silently spills to bank $01+ but C code reads from bank $00 → garbage. Combine related const arrays.
-- **`sta.l $0000,x` always reads bank $00** — all C RAM must be below $2000
+- **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data (`static const` arrays, string literals, const structs) is placed in the asset banks by default and every C read of it is a far read. The one bank-blind path left is casting `const` away and reading through a plain pointer; `devtools/check_bank_reads.py` fails the link on it. The bank $00 free-space ratchet (`BANK0_FAIL_THRESHOLD`) still guards the code bank.
+- **Plain C RAM lives below $2000; `FAR` is the way above it** (since chantier B2, v0.39.0): `sta.l $0000,x` reads bank $00, so a plain global must sit in `$00:0000-$1FFF`. Declare bulk buffers `FAR` (`snes/types.h`) to place them in `$7E:2000-$FFFF` with bank-honouring codegen; `symmap.py --check-ram-budget` fails the link on a plain-band overflow. Tutorial: `docs/tutorials/far_ram.md`.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence

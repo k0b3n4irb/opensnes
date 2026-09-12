@@ -223,15 +223,32 @@ determinism oracles, DSP/APU visibility. Remaining needs:
 ## Filed / closed on luna so far
 - #126 — CLOSED (verified fixed on v1.13.0).
 - #205 — CLOSED: richer `luna test` asserts — SHIPPED in luna v1.15.0.
-- #207 — OPEN (question): STAT78 ($213F) reports 5C78/PPU2 version 2; Mesen2
-  reports 3. Modelling choice, not a bug — asked whether it's intentional.
-- #210 — OPEN (enh): [asserts.blocks] keys by offset; two spaces at the same
-  offset can't share a manifest (dma_cgram pinch). Suggested offset field / array.
-- #211 — OPEN (bug): audio_rms_min reads a silent ring (RMS 0.0) under luna
-- #212 — OPEN (enh): remaining manifest-coverage gaps (peripheral input,
-  DSP regs, footprint floor, DMA-budget, SRAM round-trip, firmware-skip) —
-  the last 10 probes, each probe = the spec.
-  test for a ROM that is playing (blocks audio + apu_switch migration).
+- #207 — CLOSED in v1.16.0 (2026-08-09): STAT78 reports PPU2 revision 3
+  like both references. (This note listed it OPEN until 2026-09-12.)
+- #210 — CLOSED in v1.16.0: [asserts.blocks] no longer keyed by offset.
+- #211 — CLOSED in v1.16.0: audio_rms_min reads the real pooled stream.
+- #212 — CLOSED in v1.16.0: peripheral input, DSP registers, footprint
+  floors, DMA ceilings, SRAM power-cycle, firmware-gated SKIP all shipped.
+- #224 — CLOSED in v1.20.0 (2026-09-12): power-on memory state — lot 1
+  (WRAM/VRAM/CGRAM/OAM/ARAM + manifest keys `power_on`/`seed`) in v1.18.0,
+  lot 2 (PPU registers, latches, both MDRs randomised on power) in v1.20.0.
+  luna's caveat: HDMAEN and the `$43xx` channel registers are NOT randomised
+  — luna brings the channel registers up at `$FF` (per ares `cpu.hpp` and
+  Mesen2's constructor) and `$420C` clear, so no console boots with HDMA
+  enabled; the `--power-on random` pass therefore cannot distinguish the
+  v0.41.0 → v0.41.1 crt0 change by itself. Corpus arbitration (2026-09-12,
+  `hardware_claims.md` gate): "HDMAEN = $00 on power-on and on reset" is
+  stated by snesdev-wiki (arbiter, DMA registers page); the `$43xx = $FF`
+  power-up value is NOT stated by any arbiter passage — treat it as an
+  emulator-consensus hypothesis (ares + Mesen2), not an arbitrated fact.
+  Consequence for the SDK either way: every DMA count must be written in
+  full (16-bit); audited 2026-09-12 — all `$43x5` writes in lib/, templates/
+  and the C `REG_DASL/REG_DASH` pairs are 16-bit or paired.
+- The `--input` under `--until-frame` observation below — FIXED in v1.20.0
+  (cause: the #126 chase spent the `-n` budget, which `state` defaults to
+  1000 instructions; now chased by frames). Re-verified 2026-09-12 on the
+  perspective ROM: sx = 120 / 50 / 30 for the three `--until-frame` cases.
+  Only `state` was affected; `frames` and `diff` were always correct.
 
 ## Resolved / no longer open
 - Cross-arch WRAM determinism — RESOLVED, no bug (CI x86==arm on v1.14.0;
@@ -316,7 +333,46 @@ slivers ≤ 34). luna == Mesen2 byte-for-byte (`0141414141414141`) == documented
 range/time interaction. No finding — luna's OBJ evaluation and the SDK's
 oamSet+NMI-OAM-DMA path both correct. Locked; test-manifests now 47.
 
-## Observation pending owner validation (2026-09-03, reduced 2026-09-05, luna v1.17.0)
+## Observation 2026-09-12 — luna v1.20.0 draws every sprite one line lower — RESOLVED the same day: v1.20.0 is right, v1.18.0 was one row too high
+
+luna's answer (reply of 2026-09-12 §1): on hardware a sprite with OAM Y = N
+first appears on picture row N (PPU scanline N+1, the picture being lines
+1..=224); sprites are fetched one line ahead of the line they appear on
+(ares `object.cpp:16-22,57-61`, Mesen2 `SnesPpu.cpp:595-625`). luna keyed
+sprites on the background line, so when the hardware line origin landed in
+v1.12.0 every sprite ended up one row too high; fixed in v1.19.0 (PR #236,
+not #240 as guessed below — the `obj_eval_latch` port only decides where a
+mid-picture `$2104` write lands). Measured by luna against Mesen2 headless
+on our own `simple_sprite` and `sprite_sizes` ROMs: 100 % pixel-identical
+at frame 200, sprite rows 95–126 for OAM Y = 95. Pin moved to v1.21.0 and
+the 26 sprite baselines re-keyed with that reference (fbhash v2 re-keys
+all 85 anyway). The paragraph below is the observation as written before
+the answer.
+
+
+Candidate pin bump to v1.20.0 (the release that fixes the `--input` bug
+below): `make tests` on the unchanged corpus gives coverage 83 OK (both
+power-on modes), compiler/lib/runtime ROMs green, but **visual 59/85 — the
+26 failures are every sprite-bearing example**. Evidence:
+
+- `sprites/simple_sprite`, `sprites/sprite_sizes`, `basics/fix32_orbit`:
+  the v1.20.0 frame equals the v1.18.0 baseline shifted **down by exactly
+  one scanline in the sprite area** (0 differing pixels after a dy=+1
+  shift of the crop); backgrounds unchanged.
+- Hardware OAM at frame 200 (`state --out - ... ppu.oam_full`) is
+  byte-identical to the SDK's WRAM shadow `oamMemory` (`70 5F 10 30 …`), so
+  no OAM write was redirected — the data is right, the rendering line moved.
+- PR luna#240 ("accesses during the picture") ports the sprite object
+  evaluation latch (`Ppu::obj_eval_latch`); a one-line evaluation offset is
+  the natural symptom of that port. The corpus passages retrieved
+  (fullsnes timing summary, anomie-regs "Drawing the Sprites") do not state
+  which line a sprite with OAM Y = N first appears on, so this note does not
+  claim which version is right — asked in the 2026-09-12 reply to luna.
+
+Until answered the pin stays at v1.18.0; re-baselining 26 sprite examples
+over an unexplained rendering change is exactly what `testing.md` forbids.
+
+## Observation — validated 2026-09-11 on v1.18.0, FIXED in luna v1.20.0 (see tracker above)
 
 - **`--input` is ignored when the run ends with `--until-frame`.** Minimal
   repro on a stock corpus ROM (mode7/perspective: D-pad Right increments `sx`

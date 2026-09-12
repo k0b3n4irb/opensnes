@@ -44,6 +44,24 @@ LD = ../bin/wlalink
 
 # Flags
 CFLAGS = -I$(INCDIR)
+
+# clang syntax pre-pass — the same warnings gate every example gets from
+# make/common.mk (cproc has no -W flags of its own). Runs once per source
+# object; SKIP_LINT=1 bypasses (environments without clang). Keep the flag
+# list in sync with CLANG_LINT_FLAGS in make/common.mk.
+CLANG_LINT_FLAGS = -fsyntax-only -Wall -Wextra -Werror \
+	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
+	-Wno-unused-parameter
+ifneq ($(SKIP_LINT),1)
+define LINT_C
+	@if command -v clang >/dev/null 2>&1; then \
+		clang $(CLANG_LINT_FLAGS) -I$(INCDIR) $< || \
+			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
+	fi
+endef
+else
+LINT_C =
+endif
 ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 
 # Source files
@@ -143,6 +161,7 @@ lorom: $(OBJECTS_LOROM)
 # C compilation for LoROM
 $(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
 	@echo "[CC-LOROM] $<"
+	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_LOROM)/$*.c.asm
 	@echo '.include "memmap.inc"' > $(BUILDDIR_LOROM)/$*.asm
 	@echo '' >> $(BUILDDIR_LOROM)/$*.asm
@@ -170,6 +189,7 @@ hirom: $(OBJECTS_HIROM)
 # C compilation for HiROM
 $(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
 	@echo "[CC-HIROM] $<"
+	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_HIROM)/$*.c.asm
 	@echo '.include "memmap_hirom.inc"' > $(BUILDDIR_HIROM)/$*.asm
 	@echo '' >> $(BUILDDIR_HIROM)/$*.asm
@@ -197,6 +217,7 @@ sa1: $(OBJECTS_SA1)
 # C compilation for SA-1
 $(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
 	@echo "[CC-SA1] $<"
+	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SA1)/$*.c.asm
 	@echo '.include "memmap_sa1.inc"' > $(BUILDDIR_SA1)/$*.asm
 	@echo '' >> $(BUILDDIR_SA1)/$*.asm
@@ -224,6 +245,7 @@ superfx: $(OBJECTS_SUPERFX)
 # C compilation for SuperFX
 $(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 	@echo "[CC-SUPERFX] $<"
+	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SUPERFX)/$*.c.asm
 	@echo '.include "memmap.inc"' > $(BUILDDIR_SUPERFX)/$*.asm
 	@echo '' >> $(BUILDDIR_SUPERFX)/$*.asm

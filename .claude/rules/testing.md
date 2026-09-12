@@ -10,9 +10,11 @@ binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
 ```bash
 scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
-python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `steps = [a, b]`)
+python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
 python3 tools/luna-test/probes/run_all.py            # functional probes (scripted input → WRAM asserts)
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
+python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
+python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
 ```
 
 The WRAM oracle hashes every WRAM page at each vblank, **including the
@@ -32,7 +34,7 @@ side channel. Migration off snes9x-WASM: `.claude/notes/chantiers/luna_migration
 
 | Class | What changed | Required validation |
 |-------|-------------|-------------------|
-| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples |
+| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples, **plus** the A/B proof: keep the ROMs built before the change (`rsync -a --include '*/' --include '*.sfc' --exclude '*' examples/ /tmp/examples_before/`) and run `python3 tools/luna-test/diff_corpus.py --ref /tmp/examples_before [--tolerance N]` — every example must MATCH at its manifest frames (a boot-length offset is reported, a DIFF is a rendering change to explain before any re-baseline) |
 | **B** | Library module (lib/source/) | `make lib` + `make tests` covering examples using that module |
 | **C** | Single example or new example | Build that example + `make tests` (`luna_runner.py --only <ex>`) |
 | **D** | Docs, Makefile, tools only | `make tests` only |

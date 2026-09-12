@@ -45,7 +45,7 @@ CC = REPO_ROOT / "bin" / "cc65816"
 # Ratchet on fixtures lacking a .checks file. 56 of 66 cases predate the
 # .checks DSL and run compile-only. Porting a fixture lowers this number;
 # it must NEVER go up — a new fixture ships with its assertions.
-MAX_UNCHECKED = 56  # new fixtures ship WITH checks; this one did
+MAX_UNCHECKED = 55  # new fixtures ship WITH checks; test_function_ptr got its .checks 2026-09-11
 
 
 def compile_asm(src: Path) -> str:

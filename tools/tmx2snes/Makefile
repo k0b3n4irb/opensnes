@@ -2,7 +2,7 @@ VERSION    := 1.0.1
 DATESTRING := $(shell date +%Y%m%d)
 
 CC     := clang
-CFLAGS := -g -O2 -Wall -Wno-implicit-function-declaration \
+CFLAGS := -g -O2 -Wall -Wextra -pedantic \
           -D__BUILD_DATE="\"$(DATESTRING)\"" \
           -D__BUILD_VERSION="\"$(VERSION)\""
 

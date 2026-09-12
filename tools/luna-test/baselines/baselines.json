@@ -1,560 +1,560 @@
 {
   "audio_apu_switch": {
-    "fbhash": "714a220e2daaa1e4",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "b97b2a9228ab1869e585b3f79669918fe0a203504200e466fb30c6c08e83bd9d",
-    "steps": 3000000
+    "fbhash": "c5b94f246021a325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "952db325c2812bcf53a14e959cbf133207fa599dbcad3e08f9bc1c1008b5ba96"
   },
   "audio_echo": {
-    "fbhash": "79e9f261b124a2d8",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "2463260f3d9446aded1c278bba7dd18f41913f5b6e90f9e27d8c4a14ff1fb93c",
-    "steps": 3000000
+    "fbhash": "8479be7724206325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "05d439e36ec021fc3b3db67adb7d5fb2372d44fe32c69603a9e74b3112f04fcf"
   },
   "audio_pitch_mod": {
-    "fbhash": "890db704a0837c49",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "d04151c61e60c739689e2c28ad97287cf72503320745d9687aace5cf0658ba5b",
-    "steps": 3000000
+    "fbhash": "15700ef1ad4ba325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "af1fc035a856e0647f5d2efa8e2872030e831838b3937cfaaa2a96290ecaaefd"
   },
   "audio_play_noise": {
-    "fbhash": "f4c59b6bfd479cec",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "591c3ddaf91e2a47cdf1678df27aec1650a379fe805d285724b379ec2a6b424d",
-    "steps": 3000000
+    "fbhash": "3acf355abb2d2325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "525a531ec165ff3c3c0e2721770c06a7f7afe75a9781e172a1458f3b9c838613"
   },
   "audio_sfx_from_wav": {
-    "fbhash": "923f406ce7d22eb2",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "c38a1c0a0a4ff0ad6467bc2f50cdf3660c2e4994914c6e2fd8cd3da14effd08b",
-    "steps": 3000000
+    "fbhash": "948f358893705a04",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "11e243d240adefa173d6475b3b997f7311361598d15607600c37fd32a4ac4f12"
   },
   "audio_snesmod_music": {
-    "fbhash": "17810e06a728f50e",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "b652d9f84f3a7b1c84f7e803229bad2ded4a0f88edcc0175b5cff5e240312f7d",
-    "steps": 4000000
+    "fbhash": "077543f58077d551",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c17037a9ae55965938c5999950bb4a23f90682f01e1a6dbadd125a18839d6e2e"
   },
   "audio_snesmod_music_large": {
-    "fbhash": "0a987365d176b660",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "35679d9756174a56f917396b68b44491dc441c61cadbd7452da9a0e6ee131aa7",
-    "steps": 3000000
+    "fbhash": "f530099f7224c861",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0effff5ced78e703281c46bcaeda47c5e25bddb94944d1b7a595617b2b9b3c82"
   },
   "audio_snesmod_sfx": {
-    "fbhash": "141c86497f0cb9a7",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "d65d781add257bb02ec3034a9fd3e0141d97693e6ca733d910e331d0fa1e71e7",
-    "steps": 3000000
+    "fbhash": "63364d4690b07709",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4c41c2f60f9792566351cbbb72e8e5f4d5e3e31c12b372a8fa2bea7545258294"
   },
   "audio_soundboard": {
-    "fbhash": "7676b6d1118f165a",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "7907f86fc0ef43366ab05195f90b5c515ac2a223a285ec468f5fab83412dc292",
-    "steps": 3000000
+    "fbhash": "25bd331298456325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "210a9b167b9cbfb2edda6e057e882917a1086941c38e036c608b2b795758dfa5"
   },
   "audio_speech_synth": {
-    "fbhash": "12eb69939da6fa6e",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "1d13bb837f2672b76ef8de6d1c8965a91c0e76460066bc3cc76f052013262b24",
-    "steps": 3000000
+    "fbhash": "686ba861dfb86325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0927ceb6e79ce687c60451a054595261160f023a4de94d24875e036781ad6705"
   },
   "backgrounds_mode0": {
-    "fbhash": "34a9df845e88ead0",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "ac8c6efd95891eb51a760582160f44e74676dc9aefbb53920036f1afae641f94",
-    "steps": 3000000
+    "fbhash": "0f77e29beeb7f015",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "62abfa263d81b9179217ace7b6e6fa039097fb7c459d0fd02f33142e0244dd1b"
   },
   "backgrounds_mode1": {
-    "fbhash": "e5e98e6e85bbb7bf",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "39b5312c409dcb55843aa1d41c36f2d20c7b63727b37efe0d257573453fbfd8d",
-    "steps": 3000000
+    "fbhash": "1fe06703f8d0fa95",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "53e7e08a23bd8b33c42c15e0a9c59e9e94bafc3e6134ec6d93a1c68c5996a55f"
   },
   "backgrounds_mode1_bg3_priority": {
-    "fbhash": "db3cb3a8ca93141b",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "6ded881bd70e4efe37bb6e393002020808a9f42ca43cfdd8e11589f3dcab5249",
-    "steps": 3000000
+    "fbhash": "3d618fac7bf25676",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "6f7a5d4e5f103f662a1874fba3a11204330ac306137936e059313a5a1d022346"
   },
   "backgrounds_mode1_lz77": {
-    "fbhash": "68720f0b1620030d",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "33078ac9a74cba2c91ba2dc60e9db1f1d88482baa4887a10bf38865dfe15ab6b",
-    "steps": 3000000
+    "fbhash": "9aa490fea8b1fa95",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "7f9649ad9ab2a2a67d054f3080776cdf8a87323e66919a3de5ce4c1dec796db4"
   },
   "backgrounds_mode2": {
     "fbhash": [
-      "b6847faec2fbadb5",
-      "73abf79c9f868099"
+      "33c55317b00667e5",
+      "dad67b83d35f5b45"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "47367e6077642dfb6492cb9dc81b1462e1642a64b4af5407797b7f4456d23b34",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "561f97c18150e0f9e9880db15c8ffdc40c7ae298e4460203267af7a487e89c82"
   },
   "backgrounds_mode3": {
-    "fbhash": "82e39d6de8ea2e82",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "27ce789db22ffdd30006ad048b864f6e484b5612129efe1e450ab9a3e3b69baa",
-    "steps": 3000000
+    "fbhash": "2eb0712a5aba5ece",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "1b0c395dcb4789a3c1a40f4cf0779dcc9b4b1cfba6cbe128bb4ef3044c315b0c"
   },
   "backgrounds_mode5": {
-    "fbhash": "143749238278b46c",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "5928c44672fd16e83113ad7cf8515386f7667597d9ef3f1047430c640ffa3b4c",
-    "steps": 3000000
+    "fbhash": "4e222d7b398352ed",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "ac1d7a555ac0d5009de70a4c8da44144c1284a1cca2c40ec5190d78a4b3b53be"
   },
   "backgrounds_mode5_hires": {
-    "fbhash": "f728f00f96110549",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "67abd5b731f1f08843760cbed3ae4ad9f4f8fcd36a28aa6004e37be23e908ba6",
-    "steps": 3000000
+    "fbhash": "8be8bcc91de7af06",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "9a9fcc826978a81eb1418dde0fe0bdf66be49db177b5e97239a2bc27befb421c"
   },
   "basics_aim_target": {
-    "fbhash": "a84067619c6a8f24",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "e9ff21f9dcaa9fdc8c7c6c291291eb5547d28d81e9743a465e469eeb185ffd80",
-    "steps": 3000000
+    "fbhash": "80d22a187219dbf4",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c766ee00ff4e8e77ca978ed327cb011be3cecd13e376e64d8c661fd9d4181988"
   },
   "basics_collision_demo": {
-    "fbhash": "8075399f487a346e",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "7be12e75f397e5a0203fc127b55ed3adc80cea1c33e15316c95530be3220d15f",
-    "steps": 3000000
+    "fbhash": "ef4e98faa3880bf5",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "10b7026a36abe379f3e0db130d26cedf68f0564662bdb7e7b44d42702766a444"
   },
   "basics_fix32_orbit": {
-    "fbhash": "75e66dd7ffb487f1",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "82c8127ac67d09132eb9dfe3adf3899f9d41e65d77a9195a1c5daa7c3a08313c",
-    "steps": 3000000
+    "fbhash": "990fecc145d63625",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0da111d1dbc9d0e14b74262c7790c07946b1cd4bb7121b60d4860401b70b3dde"
   },
   "basics_game_skeleton": {
-    "fbhash": "15bf47ab05cee630",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "0220a9deb3abaa29f6d719f5d0daf77b01c0e1a0af5fe0cc80d8bf432d45c678",
-    "steps": 3000000
+    "fbhash": "36c6d541629b9b4d",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "1bfb81248536ce0fc214e6df230257721f14b18d169a6a39b9e96e9b1e384eef"
   },
   "basics_panel_hud": {
-    "fbhash": "85fdec9dbe6b0836",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "2e6b76423507607fb50046485b590e88b0e2e95a218f6bc100d1faa4463cca21",
-    "steps": 3000000
+    "fbhash": "db6c6943cfbf4af5",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4e1b589417a73348c90361827ceb03bee1ece3c94869eb2c2ff290b298664b33"
   },
   "basics_random": {
-    "fbhash": "bf5c84663c99a322",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "7fdf038ac0ab54e7956fb620f2dfcf01f47e372ef95109aee86369454ccb8831",
-    "steps": 4000000
+    "fbhash": "6dff239427606824",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "63132edba9f5ecf477c95f9f15b95851f2247ae6c9d2d6b18ec7125fc44becf1"
   },
   "basics_scene_stack": {
-    "fbhash": "90063c0d56e1ad7d",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "1aae524d91ea9834a34b4d6d77de3f8adb2dbb9889c09b841caa788a5da71285",
-    "steps": 3000000
+    "fbhash": "7d671f4f52ba6b35",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "056cb9413edd6a7f5b042858dfc6b7c0c93313586d851ec4a2de85359e73b855"
   },
   "basics_timer": {
-    "fbhash": "c356a51baf965059",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "ba9618df788742dd59089708f5c2b0485e001934a42226e254054b5682c6caaa",
-    "steps": 3000000
+    "fbhash": "ad1f731c1cb7b87c",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "13e22b4bca145c42e5cfdd491cddf803e3ddb2d240ba0998317d4924c9ab75c0"
   },
   "chips_dsp1_cube": {
     "fbhash": [
-      "8db7a76186d4eab5",
-      "bfa791fde34e8337"
+      "448c3c6d0a9a7325",
+      "4359865325ba9325"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "87360e80f8301986501206c83173daf8f5d277b5c228e35f5f6eb152f69a9282",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c1e1645fc7b4ee334d9e5a5cd2b7a47b2953c06490fe70300a2bdd7e3b63c301"
   },
   "chips_sa1_hello": {
-    "fbhash": "dbf3a340fc71a836",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "33c5d2f58b1ce96459e1c3f033fbfaa4574b4dd40037ffc5ebc22e4963f6ede9",
-    "steps": 3000000
+    "fbhash": "ca5accf42e48fed5",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "8c0a6a0ec517120d2c81dbc47781e04330f3617133967a5c3facab8ed9e92ca8"
   },
   "chips_sa1_starfield": {
-    "fbhash": "fa0a169c09d32ba2",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "cf19915fbd02a8941015961ebae9c922d6b3da4f7ee554a4738af682b649fcfc",
-    "steps": 3000000
+    "fbhash": "84b073e05d705cca",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "2a2bff42f3405b116959646c7b6df32deac99d9f225c82115489d85de8db1b17"
   },
   "chips_superfx_3d": {
-    "fbhash": "2d3069f24d76dab8",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "00858fb08894bf93b5c35ffd174705f1b2f5aa924edf7c938bd6f424bcf72a60",
-    "steps": 3000000
+    "fbhash": "7746b52adb4c8725",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "08c9919366479a1a2b5a9344d6b399e4f0fdc27c30b67417c96181ba844a7f38"
   },
   "chips_superfx_hello": {
-    "fbhash": "7979be4cf418cc0e",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "bb8f0c10b72786c14ece831f0256680c643342c917a297463e14894d02838f97",
-    "steps": 3000000
+    "fbhash": "92e0192741993114",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "dbab7d877b673fe8712099167bad318896754023596708b97bc6ac4e65d699af"
   },
   "color_direct_color": {
-    "fbhash": "d9bedf5a3ab88e5b",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "6b1b4e47980ddaa45c383bb47e287dd77c0d2ae0ac929269656c9b2d0aabfcaa",
-    "steps": 3000000
+    "fbhash": "29f96a11c7eea925",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "50d006714c1cd6d7865506b00dac29b6decd0c4e027a678097d511a7d38222ee"
   },
   "color_gradient_9bit": {
-    "fbhash": "b979654917d19695",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "01232705ff5ece98c22e55bb91b976567019dda37425fc8a1cfa78bd92cb29d7",
-    "steps": 3000000
+    "fbhash": "6e661e6caaea3725",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "d0e085cd59f783343703a60aa790107c3e674d2f23d2975e82e9652ec529baa2"
   },
   "color_hicolor_1792": {
-    "fbhash": "86224bc803113ae7",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "5e2399d6a5434ca1a36c4d9e6f7885804de84bf2d1674beb0c2e000d886b930d",
-    "steps": 3000000
+    "fbhash": "6e58ca710dc2c028",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0c69bca074e18f905e2fd69701eac505c761682049531bbbe72fb721a372a1f1"
   },
   "color_hicolor_blend": {
-    "fbhash": "3d2bd441d0bdb489",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "25dbf236a3738bc22f67ab965952552ac852fb87d12fe9ada3d9f90496f81d15",
-    "steps": 3000000
+    "fbhash": "b63395ed311e7981",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "9fb8359b5004716ed24bac1b8a2700386f73422ba87b4dfcb42b608b39842a21"
   },
   "color_palette_cycle": {
     "fbhash": [
-      "3af587f586e7d04a",
-      "f3a60a2ad58cd3db"
+      "0a6af300bcce67a5",
+      "3f34395f59db9225"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "6bad0f7cc2b66091e043ee14380f582db815dfea9d7d82f7634e5216d45317bc",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "f62e9be6670c04a20414f54fd94f81f54694e32ceb4b8991bed1bca43d17d693"
   },
   "color_shadow_tint": {
-    "fbhash": "cf1768b327fd48ef",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "32e44d0d159361c269fabfda2c09951a9023ed2892f460987cb976e271a834a1",
-    "steps": 3000000
+    "fbhash": "7fcf9c3f915df925",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "b11ed9b9de90e74d4208d09d74d0fd0f70f3426b8c573b0129e29a944cae4163"
   },
   "color_transparency": {
     "fbhash": [
-      "b11e07d7ed512566",
-      "6f7f5ca804d1b655"
+      "6cd071b679fe8194",
+      "3c9de27c91cc2c4d"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "9b340f6ba77721bc88931bae852a928d8b84ff1a6e37c26c734e27c67fdcaf62",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c8512fa1b9ebc617d11b2d8afdd4df94566a613f962da6c47d604111288c96af"
   },
   "fundamentals_text_glyphs": {
-    "fbhash": "368f3a95243f90ee",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "90a714f4c7947be49cbefb2b64c396d1aa080273d549e36c3a03206a808adccf",
-    "steps": 3000000
+    "fbhash": "5079315ed29efd7e",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "b89a01059d60e3b585bb8b0cc4497241da78d53e7930ad1c8f407951bc30d38d"
   },
   "games_breakout": {
-    "fbhash": "b6463add269f6643",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "f34e2fbcee76b0813d96fabd2c72c44b24fbefe8338e09328ecd1aaa239eba24",
-    "steps": 3000000
+    "fbhash": "f5fa605e32d4b464",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "32818eb3259fc508ad006797b1b5ddf5d0d67645ce73efdc94211c40001a45be"
   },
   "games_likemario": {
-    "fbhash": "5ba31f91677b284f",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "251654557c69d34146f82697f52a8cbbd4dcdf452e5a44a2b439eebaf8f4bcd5",
-    "steps": 3000000
+    "fbhash": "6336d7919f6add99",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c2ef4205656f17e652a4cc7a1d1fbb67c83faa9d47b88898a92eeeb1c1fce5f2"
   },
   "games_mapandobjects": {
-    "fbhash": "bd70f9cbaf29fbf4",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "d9934a1447fe3c004812c9949aa786c3ac3f44e03695d190477ece6369a552c6",
-    "steps": 3000000
+    "fbhash": "5b15edfbfe84018c",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "31a620a2ea5846a177973261f797128ad475dda394b3b59d8efa72c071fcb880"
   },
   "games_mode7_flying": {
-    "fbhash": "c6135cf114e0ee64",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "c1799f9b4b918fbb17788ddead767e1b46ff281c684e84c6275b3c0858232e42",
-    "steps": 3000000
+    "fbhash": "7fd94b228248affa",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "f59d7ca442c5edc35894be8a13f83419a6735732f65ad98936ad03fbec4f16dc"
   },
   "games_mode7_racing": {
-    "fbhash": "f791b5edc6e1e95d",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "dd718bafdd7f8cafa2cf69ac09a1efbb2839aeefff3bbbd62d389c7930560589",
-    "steps": 3000000
+    "fbhash": "6f2e7ea77761b569",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "ab113517c9c86a309990c62b79ba064dbd8badf43d91e0c8fdb243597d08b963"
   },
   "games_rpg": {
-    "fbhash": "8b927558f9573c02",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "f7ebc4347880f3a513b141207262d18960ddf77dc95bec212b83295403b23b02",
-    "steps": 3000000
+    "fbhash": "6f3506b358a17776",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "28490f89621b8b520e8884e23ef4e56e6f339ad63fe9d3033e3ad76b4caec249"
   },
   "games_shmup_1942": {
-    "fbhash": "3a3fccb15c964e3d",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "54216ec58eea9abfafcf1ffce33761fa46998a99e07d89e9b3fcf278b138e94f",
-    "steps": 3000000
+    "fbhash": "1e1a5101ba18a2c8",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "54216ec58eea9abfafcf1ffce33761fa46998a99e07d89e9b3fcf278b138e94f"
   },
   "games_tetris": {
-    "fbhash": "40d38f9d97a703a7",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "43b0307157c2808f009a976ab1966f9a96e3af324be515bb0d266198f76ee065",
-    "steps": 3000000
+    "fbhash": "9111a6716cfe4a34",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c5c509654e28e99597bc2370464760aaf30813698c94c29fcc73bd8807cce397"
   },
   "hdma_gradient_colors": {
-    "fbhash": "04fe8d21b995ba62",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "03aba0709b1235ac97d7c583561b83d59a86248169dd91797e5c9aa18874a0ed",
-    "steps": 3000000
+    "fbhash": "3c2bef5e28e1bf55",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "3e3569857fdc838153f3cfac078f937dcf9c7a752b9db4c0762b4a10ffbba6bb"
   },
   "hdma_hdma_helpers": {
-    "fbhash": "fc160ff9fecae207",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "4d721e3c1533f2437f96506c081f738ed89e6961331765233127605360c88d6c",
-    "steps": 3000000
+    "fbhash": "35bfac481fd3ef40",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4944f2f8e8cea552625205e0cc4765ebd624b96913764ed8dbc48e8d96b436c0"
   },
   "hdma_hdma_indirect_gradient": {
-    "fbhash": "21e5cd52521966ca",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "cda332b58fc1e6f13762b8e7d7aa045f0660ab2cd059bfe40286d25ec99904fb",
-    "steps": 3000000
+    "fbhash": "b8f90cc683cf8325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "74e1a0460858e72ea33db61086154e2330d1f78cdeca9919e9da70a1e6d58519"
   },
   "hdma_hdma_wave": {
-    "fbhash": "5cc325d511c0be17",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "9fa60b6e3c510bdc60a9379daef265815330760f59907c21f0c851965d6c31e4",
-    "steps": 3000000
+    "fbhash": "304a81f27c966325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "339b03d327480280af73f86c9f7841924c8fcb369568e7fb86bbdd7afc4b0611"
   },
   "hdma_hdma_wave_table": {
     "fbhash": [
-      "10e49024bb4521ed",
-      "15ebc32623490f22"
+      "814a1de4deafdaa8",
+      "25059dcf0464c100"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "9e96fba4c6fd551cdfec3c12b054419c391f44f94552e4705d728d75fbf3cd0b",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "39975cd4f8e9d338f38389d0f9bf3eeadf953f498c03de46298d6efeae1dc605"
   },
   "input_controller": {
-    "fbhash": "c5652fd5bbcff110",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "50b37f9c8a651f798f4d411b79e3dc3f3d1e2f7e7fc5a43e73f7f73a4be2f0bd",
-    "steps": 3000000
+    "fbhash": "8d55b038736b9b2c",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "a881b0725b5afad780ed62e91a1a931374d92b1e1276632b5fa97bba414f2369"
   },
   "input_mouse": {
-    "fbhash": "ef00cd183416af1d",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "05ad2bbdd3aff438818e99bf909c755bb6cb46a9a1ddf5c649a8e5085612c2c9",
-    "steps": 3000000
+    "fbhash": "8a0040466f2d514d",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "7adc41c58faf438ca4246a800dcc1f78f5309e80cd800db5a3ec4ef11b8d9d42"
   },
   "input_move_sprite": {
-    "fbhash": "93d2c04e47d00ee6",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "1c3ce3fbba318abae65251e2d36e2d6fe1337de16093dc86e347e451ce51b65e",
-    "steps": 3000000
+    "fbhash": "ef4eff6c3e4e8914",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "60a23e743b6617271539809834dc91530308c9a13aebf465f444a84dd2958df1"
   },
   "input_superscope": {
-    "fbhash": "74ea0f46649b9c27",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "bd5e8f8a1ece71720e309c70e91c085546cf12278fd7008527169f8feb177ab0",
-    "steps": 3000000
+    "fbhash": "9852b09f0828f7b0",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "6963d8607d5cbab49e6ad9591a53843ea4f50f74901927db6d5cc1a0caceaab0"
   },
   "input_two_players": {
-    "fbhash": "3360996e76742609",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "e121a5e0633394b13c566c44a6b855fd3c94343eb1512850edd369ff03658994",
-    "steps": 3000000
+    "fbhash": "06a8a82a052be325",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c838fa98becef93d60608536ddd1942feb404c63d4989dca1315f24d031dccc0"
   },
   "maps_dynamic_map": {
-    "fbhash": "e02d1cbdc531d5b4",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "00a0069864ed37d9b29a4e06d1c5482274871eebb92b6efb3e90b18fde93088c",
-    "steps": 3000000
+    "fbhash": "e03d470c62001796",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "1e6b7333ca9a0310c792a4041c7ded3f54bd706adfd31ebe7c56f2a895b62dbc"
   },
   "maps_map_scroll": {
-    "fbhash": "e851e1ace246e572",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "7ecbf4136e1421293c7f42f100aafd350f22955f5b030e5028a52a6ad15c3c65",
-    "steps": 3000000
+    "fbhash": "9366b1d301b2daf5",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4f9343af922d243c0e57f30321aaf5ecebc20abb7e84d7a1f25e203d8893f360"
   },
   "maps_slope_collision": {
-    "fbhash": "ed9f22a0cf06753e",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "ac88b775b72f216c8be84d0f9d9f4e7fe4f861e1e6b1e4d83feb230c6b46d55e",
-    "steps": 3000000
+    "fbhash": "717518b98f70aeaf",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "dd1755b55fbd3138444b44a8f19f4d26c52ab88345b9020fb734ea2cfe7630ef"
   },
   "maps_tiled": {
-    "fbhash": "90876dfac246d1eb",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "6d605ef9cd609c151b1b28ab874995b7399c9270b57a860d9d5171ea5bc79bb4",
-    "steps": 3000000
+    "fbhash": "3cbd379137f4450b",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "3e4385cf07f09f02512a248b6d7657de08c28b9e6e8e27f679a42b9ad414c66b"
   },
   "memory_hirom_demo": {
-    "fbhash": "0bdfe85d259d22f9",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "8292d02028bcbab9c9bf522aac9a5b147442af7e39fc02531835adcf0c08816a",
-    "steps": 3000000
+    "fbhash": "775ae4f778ed09bd",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "d38e9c48594af919821eba66d6b503dadd76af83ec1660daa06689474ad28b4e"
   },
   "memory_save_game": {
-    "fbhash": "4b6bf4b38e9d5e9a",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "0db50a716fa9635d973940d9a7739bf601fe2d50d39fb223472880dd9a6d6b8d",
-    "steps": 3000000
+    "fbhash": "ae1887f1ffcafe15",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "6a3e73d42119dcc9b1ee8816f174c6c6a0ea7cb278e3272a0c7ce0082ff956ab"
   },
   "mode7_dsp1_ground": {
-    "fbhash": "5a69531b3c61b37e",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "3bd94a064df30474e23e1c3654fd9ce75b5e01040b1f4799ee858ea01e915554",
-    "steps": 3000000
+    "fbhash": "c8817c1e7daddc3e",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "56d5b395089cefc802c8f6329c34ab984e2eff7c277306008c05212144749a38"
   },
   "mode7_perspective": {
-    "fbhash": "30a5f23642c25bd9",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "a6b728d793c83af616e7de35d78af3007f9ad6de75847f42e648a08c3eac1783",
-    "steps": 3000000
+    "fbhash": "f94a171f8af19065",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "594703c86f2a88da5d4e345da897b44b4a1aea7e7b4fcd10ae174e99c62457f8"
   },
   "mode7_perspective_rotate": {
-    "fbhash": "24922789a3264ee6",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "47a380a6e4ab6b7a284dd872fcc386a60878b94ca6a2e3493dc7f8b257768f7b",
-    "steps": 3000000
+    "fbhash": "4666fbf298609007",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "b1b90391ed10233bfbe2cef18db17d831ab01fd4b85cb1a614fca7ad1846bcef"
   },
   "mode7_rotate_scale": {
-    "fbhash": "e20815b827c94ce6",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "276cd4fda1083d4f4b3185779cfd4b998f7e0957342b30849a9257a5176be74c",
-    "steps": 3000000
+    "fbhash": "f10e9345a576a183",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "3f4f69927e7579374f3049e6930eb3f3801b41a2ebd220571f31943daa9fec8e"
   },
   "scrolling_continuous_scroll": {
-    "fbhash": "db8946487a714f1d",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "45f8a95e0f06d0015a51efe6f782de6d8eb938f2ff6eca58f563cf5c79e1e913",
-    "steps": 3000000
+    "fbhash": "98dbc4e77fc4a707",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "90556a2aae6706fdf12eba1ec084eb476935e314199a61b2701441463963ce96"
   },
   "scrolling_mixed_scroll": {
-    "fbhash": "2c3e40b6aea0f4b3",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "4147c0e788cb4e0fe3e6a6346f46bba462aa8c429f5dcb9766a99c98dbc096da",
-    "steps": 3000000
+    "fbhash": "2b1d81568e9b749c",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c98a3b5a16297e0fa8cedc6e0685917273efdb026ecdc6afe1de866414cc5c29"
   },
   "scrolling_parallax_scroll": {
     "fbhash": [
-      "4b8c45862a99b904",
-      "87b2f5f3a9686c20"
+      "f746a5736d52c0a2",
+      "3e3d33a6fd71a7d7"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "44458567ec5375929246e996e1a272082c5e68d31970df97a5e6a7a75ebcd11c",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c8c067c52e0db951fc039c7e42ef204fb3a6d09ac7714766983e040305f6a7fe"
   },
   "sprites_animated_sprite": {
-    "fbhash": "1b8331f1f3e962ac",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "ef1297ed5a964b47a1192aa6123a54333ced984f521f524f8ad5737b1a4689cd",
-    "steps": 3000000
+    "fbhash": "e1978e48cc5436f6",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "544f3056b2e6c6c08cb8d546c5cf7b9ce9c639d450e26c1be290348d27ac1443"
   },
   "sprites_aseprite_pipeline": {
-    "fbhash": "1eee854ed6dc2b94",
-    "luna_version": "v1.17.0",
-    "rom_sha256": "5128b53d9e8ee98e16363b5729aa844bc011282ac635c21d111d8cb47e114ee4",
-    "steps": 3000000
+    "fbhash": "6a3bea23f64cf9bf",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0e5bd508971106e5120e4475457ef291f403d1083d394fd3b42a0986622d1ebb"
   },
   "sprites_dynamic_metasprite": {
-    "fbhash": "d8277d29bfd925c3",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "048f5ce1ebfeb545c22cd02a7ae867827b49720da6dd819761e9297bbe915860",
-    "steps": 3000000
+    "fbhash": "d4ff4d32f8d91588",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "2f3056466a630461c32f17aec1147a01f2c0ba52cfada7c3a546e79c9d1ca0ba"
   },
   "sprites_dynamic_sprite": {
-    "fbhash": "93e909981cff4b1c",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "99ad178e826572e8dca15555c73509e94c20a709f30045354819ef7f3f192fdc",
-    "steps": 3000000
+    "fbhash": "1ea31be6d66d5b25",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "0a766e5485f5d8062493ad55ee2640428a71056b6e9d2e80a4c45eaa3aa63a5a"
   },
   "sprites_metasprite": {
     "fbhash": [
-      "a76c4c22ae3b4e3c",
-      "a76c4c22ae3b4e3c"
+      "ac14a42dfa841704",
+      "7c61c1570cb2f2d4"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "cc3841ee7ff9197047e1f7b88fde44def25130f7ab6ee999c9cdb5a81d4c61fc",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "bb1c12f5fd6321d86240fcc8dd7427d6151a1dc6891d8d24ce454cc91711ede4"
   },
   "sprites_simple_sprite": {
-    "fbhash": "93d2c04e47d00ee6",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "d0e544114ba509d000cd3fe3df092c9b14b12f0d234170e0b0a6a37555a1d4e2",
-    "steps": 3000000
+    "fbhash": "ef4eff6c3e4e8914",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "d2c51835d5e0da9ef4c3f33e9f4f234b2697b12ef7ac12496fa89a320ac38fbc"
   },
   "sprites_sprite_sizes": {
-    "fbhash": "350d4559bb1fd78f",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "9d2594e7a9854767002ae2484f247695d357853e4577e7bb0a21280314621298",
-    "steps": 3000000
+    "fbhash": "00cbf1df8431a7ab",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "8b88e943668784e68abff9472f3c4313b5b3f69e10ea36f693b1592819dd4cbd"
   },
   "sprites_sprite_swarm": {
     "fbhash": [
-      "acf3b754c94138ca",
-      "687f268a7f6e414b"
+      "05d5682b072274a5",
+      "c3434d537ed1b6a5"
     ],
-    "luna_version": "v1.17.0",
-    "rom_sha256": "f89f63cccea73fe7fc3807ade114a71d866261ebf47b5f39a35d57f6387b8bd2",
-    "steps": [
-      3000000,
-      6000000
-    ]
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.21.0",
+    "rom_sha256": "7596d9c0eee23e8ba8db2e7de14ce6895e7ef0319ef396db153d2f856e4391b1"
   },
   "text_print_string": {
-    "fbhash": "f570dda115ef122a",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "69d5894741026a33c40f2c1bb750edec496a5a07ec2fc92bdd51251977174732",
-    "steps": 3000000
+    "fbhash": "06b91077eedc768e",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "c29a16c0dad11dcd434865cf0ec865e879ab835e93dcc88beb9078c7f1b8ea16"
   },
   "text_scroll_message": {
-    "fbhash": "191ee979d9729c37",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "c183d49440a97a3b08e6f67c0e38fbc45f43c48156703b3704c105f0a26713f7",
-    "steps": 3000000
+    "fbhash": "8ad05b29cee573f5",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "6a5d08f570cab3e402024b787a3ee0897ab3f6806c907f72e0eedbf133220c31"
   },
   "transitions_fading": {
-    "fbhash": "e5e98e6e85bbb7bf",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "5fb759524da652bbdeacbf8407d5926e1a56d8e7bb33e984ca334cc32aad26f3",
-    "steps": 3000000
+    "fbhash": "1fe06703f8d0fa95",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "3d6a091add1bd2dc01577b790b5e672ed975d85bd254dd0a618be0d19e80e9c0"
   },
   "transitions_mosaic": {
-    "fbhash": "e5e98e6e85bbb7bf",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "dc5f770991b10978093a8fc2e6c5572a0f0edc376d742c4ab8a65528e3442cc8",
-    "steps": 3000000
+    "fbhash": "1fe06703f8d0fa95",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "aa124ba385e8624efaad08bb9cb5812a4faf2a7b1cf5bd2947ae167fe28ebad9"
   },
   "windows_transparent_window": {
-    "fbhash": "f265ff93fc6c57f5",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "1ef9c7a7e0d0aeb3069fa18e01532377fdf4040a4a0e44ff516273e17614d32c",
-    "steps": 3000000
+    "fbhash": "76c1402fe49072c4",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4133ab8dbd1d107997411356f4007d5eb2fcae174767f04a1e8e7083be8ead44"
   },
   "windows_window": {
-    "fbhash": "2df0535c62a11154",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "60e35dd458ee6c3c133a0cbc24d2bc349a92ecab10d71cafc58e26e5aeddea20",
-    "steps": 3000000
+    "fbhash": "82d0beaedbf7b7c2",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "7bdf9590d917eb6d24a7ad3201af736cc189e7b148fc3a2497a35bd7b9ecc203"
   },
   "windows_window_multi_hdma": {
-    "fbhash": "b99717365a370973",
-    "luna_version": "v1.16.0",
-    "rom_sha256": "bae489b63b807d1452290ff79c43db037881ace23637a325b3e0e00265bab0e3",
-    "steps": 3000000
+    "fbhash": "c14d60d4352eb4dd",
+    "frames": 200,
+    "luna_version": "v1.21.0",
+    "rom_sha256": "4d25956182d83af3eb1c9048be4a92f250d6dad7320a781e20be8cfbc4836c82"
   }
 }

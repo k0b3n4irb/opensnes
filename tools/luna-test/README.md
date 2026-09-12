@@ -18,8 +18,8 @@ Compile-time cc65816 checks live in `devtools/compiler-tests/`.
 ## Requirements
 
 - The pinned luna binary — the exact version lives in
-  `tools/luna-test/luna.version` (the single source of truth; **`v1.14.0`** at
-  time of writing). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
+  `tools/luna-test/luna.version` (the single source of truth; this README
+  deliberately does not repeat the number). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
   `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
   `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
@@ -37,7 +37,7 @@ python3 tools/luna-test/luna_runner.py --only sa1  # one label substring
 
 ## How it works
 
-For each example the runner calls `luna run -n <steps> --print-fbhash
+For each example the runner calls `luna run --until-frame <N> --print-fbhash
 --screenshot <png>` and keys the regression on **luna's `fbhash`** — a hash of
 the pre-PNG pixels, byte-deterministic run-to-run and cross-arch-stable (see
 the note below); the PNG is kept next to it for human diffing (hash gate **+**
@@ -45,14 +45,35 @@ PNG debug). luna also provides `--assert BANK:OFFSET=HEX` (+ `-aram`/`-vram`)
 for direct WRAM assertions, used by the probes.
 
 Baselines live in `baselines/`: `<label>.png` + a single `baselines.json`
-manifest (`fbhash`, `steps`, `rom_sha256`, `luna_version`). Self-animating
+manifest (`fbhash`, `frames`, `rom_sha256`, `luna_version`). Self-animating
 examples opt into MULTIPLE capture points via `manifest.toml`
-`steps = [a, b]` — `fbhash`/`steps` become lists, extra PNGs are
-`<label>@<steps>.png`, and a partial mismatch is reported as "timing drift?".
+`frames = [a, b]` — `fbhash`/`frames` become lists, extra PNGs are
+`<label>@<frame>.png`, and a partial mismatch is reported as "phase drift?".
+
+## Power-on state and the A/B protocol
+
+Every runner pass accepts `--power-on zero|ones|random[=seed]`, handed to
+luna as is. `--power-on random=1` boots each ROM from pseudo-random
+WRAM/VRAM/CGRAM/OAM/ARAM with a fixed seed: a ROM that reads memory it
+never initialised fails deterministically instead of passing on luna's
+default zero-fill (the class of the v0.40.0 / v0.41.1 reset-vector fixes,
+which luna could not see before). `make tests` runs the liveness pass
+that way in addition to the default one.
+
+`diff_corpus.py --ref <dir>` is the Class A proof for a compiler or
+library change: for every example it runs `luna diff <ref rom> <new rom>
+--frames <manifest frames> --tolerance N` and prints MATCH (with the
+boot-length offset luna found) or DIFF (PNG pairs under `/tmp/luna-diff/`).
+The reference tree is the `examples/` ROMs built before the change; a
+DIFF is a rendering change to explain, never something to re-baseline
+over.
 
 ## Cross-arch baseline key
 
-The regression key is luna's **`--print-fbhash`** (v0.3.0) — a hash of the
+The regression key is luna's **`--print-fbhash`** (since v1.21.0 "fbhash v2":
+FNV-1a 64 over the raw RGBA bytes of the displayed frame, pinned by
+construction — the v1 key was Rust's `DefaultHasher`, not guaranteed stable
+across toolchains; every baseline was re-keyed once at the switch) — a hash of the
 pre-PNG pixels luna documents as **cross-architecture-stable**. So the baselines
 committed here (captured on aarch64) are expected to match on the x86_64 CI
 runner, and the CI visual step is a **hard gate** (no `continue-on-error`). The

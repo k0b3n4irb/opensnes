@@ -39,6 +39,7 @@ CASES = [
     ("r_slt",   2, 0x0001),
     ("r_sgt",   2, 0x0000),
     ("r_sar8",  4, 0xFFFFFFFF),
+    ("r_shl8_ld", 4, 0x00010000),   # (s32)tab[k] << 8 from a memory load
 ]
 
 

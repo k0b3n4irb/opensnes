@@ -36,6 +36,7 @@ from luna_runner import (  # noqa: E402  (reuse the harness's helpers)
     discover_example_roms,
     example_key,
     load_manifest,
+    capture_frames,
 )
 
 VRAM_MAX = 65536   # bytes
@@ -43,21 +44,16 @@ CGRAM_MAX = 256    # colours
 OAM_MAX = 544      # bytes (128 * 4 low table + 32 high table)
 
 
-def steps_for(key: str, manifest: dict) -> int:
-    """Warm-up instructions before the snapshot — respect per-example overrides
-    (audio needs a longer warm-up; self-animating examples list two points —
-    take the later/more-loaded one)."""
-    entry = manifest.get("examples", {}).get(key, {})
-    steps = entry.get("steps", manifest.get("default_steps", 3_000_000))
-    if isinstance(steps, list):
-        return max(steps) if steps else 3_000_000
-    return int(steps)
+def frame_for(key: str, manifest: dict) -> int:
+    """PPU frame of the snapshot — respect per-example overrides (self-animating
+    examples list two points — take the later/more-loaded one)."""
+    return max(capture_frames(key, manifest))
 
 
-def measure(luna: str, rom: Path, steps: int) -> dict | None:
+def measure(luna: str, rom: Path, frame: int) -> dict | None:
     """Return {'vram','cgram','oam'} non-zero counts, or None on failure."""
     proc = subprocess.run(
-        [luna, "state", "-n", str(steps), "--out", "-", str(rom)],
+        [luna, "state", "--until-frame", str(frame), "--out", "-", str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     try:
@@ -113,7 +109,7 @@ def main() -> int:
     rows = []
     for rom in roms:
         key = label(rom)
-        m = measure(luna, rom, steps_for(key, manifest))
+        m = measure(luna, rom, frame_for(key, manifest))
         if m is None:
             print(f"  ??  {key} (could not read PPU state)", file=sys.stderr)
             continue
