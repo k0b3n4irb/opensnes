@@ -333,7 +333,22 @@ slivers ≤ 34). luna == Mesen2 byte-for-byte (`0141414141414141`) == documented
 range/time interaction. No finding — luna's OBJ evaluation and the SDK's
 oamSet+NMI-OAM-DMA path both correct. Locked; test-manifests now 47.
 
-## Observation 2026-09-12 — luna v1.20.0 draws every sprite one line lower (pin held at v1.18.0)
+## Observation 2026-09-12 — luna v1.20.0 draws every sprite one line lower — RESOLVED the same day: v1.20.0 is right, v1.18.0 was one row too high
+
+luna's answer (reply of 2026-09-12 §1): on hardware a sprite with OAM Y = N
+first appears on picture row N (PPU scanline N+1, the picture being lines
+1..=224); sprites are fetched one line ahead of the line they appear on
+(ares `object.cpp:16-22,57-61`, Mesen2 `SnesPpu.cpp:595-625`). luna keyed
+sprites on the background line, so when the hardware line origin landed in
+v1.12.0 every sprite ended up one row too high; fixed in v1.19.0 (PR #236,
+not #240 as guessed below — the `obj_eval_latch` port only decides where a
+mid-picture `$2104` write lands). Measured by luna against Mesen2 headless
+on our own `simple_sprite` and `sprite_sizes` ROMs: 100 % pixel-identical
+at frame 200, sprite rows 95–126 for OAM Y = 95. Pin moved to v1.21.0 and
+the 26 sprite baselines re-keyed with that reference (fbhash v2 re-keys
+all 85 anyway). The paragraph below is the observation as written before
+the answer.
+
 
 Candidate pin bump to v1.20.0 (the release that fixes the `--input` bug
 below): `make tests` on the unchanged corpus gives coverage 83 OK (both

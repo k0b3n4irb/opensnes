@@ -1,0 +1,28 @@
+# Two controllers read every frame by the NMI auto-joypad path
+# (crt0 ReadPads): pad_keys[0] is port 1, pad_keys[1] is port 2. Each leg
+# holds a different button on each pad and asserts BOTH words, so a swap
+# or a leak between ports fails. `input2` is luna's second-pad script
+# (v1.21.0, gaps-review item R7's acceptance case); pad_keys[1] is
+# addressed as the word after pad_keys ($00:0041 + 2).
+rom = "../../../examples/input/two_players/two_players.sfc"
+[[checkpoint]]
+at_frame = 60
+input = "30:0x0800"            # pad 1: UP
+input2 = "30:0x0400"           # pad 2: DOWN
+[checkpoint.values]
+pad_keys = 0x0800
+"00:0043" = 0x0400
+[[checkpoint]]
+at_frame = 120
+input = "90:0x0200"            # pad 1: LEFT
+input2 = "90:0x0100"           # pad 2: RIGHT
+[checkpoint.values]
+pad_keys = 0x0200
+"00:0043" = 0x0100
+[[checkpoint]]
+at_frame = 180
+input = "150:0"                # pad 1 released
+input2 = "150:0x8000"          # pad 2: B alone
+[checkpoint.values]
+pad_keys = 0x0000
+"00:0043" = 0x8000

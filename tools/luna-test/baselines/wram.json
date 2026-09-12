@@ -116,7 +116,7 @@
     "rom_sha256": "2a2bff42f3405b116959646c7b6df32deac99d9f225c82115489d85de8db1b17"
   },
   "chips_superfx_3d": {
-    "stream": "ae5d8853f672351bdcc4a4c38dd95d8877a9733ac8959d7073fc7078083b52d0",
+    "stream": "9274133f12ab2cf38a8816e1b0675bb4c95c58f5a97e2243f010d851e295161d",
     "rom_sha256": "08c9919366479a1a2b5a9344d6b399e4f0fdc27c30b67417c96181ba844a7f38"
   },
   "chips_superfx_hello": {

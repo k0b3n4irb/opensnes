@@ -70,7 +70,10 @@ over.
 
 ## Cross-arch baseline key
 
-The regression key is luna's **`--print-fbhash`** (v0.3.0) — a hash of the
+The regression key is luna's **`--print-fbhash`** (since v1.21.0 "fbhash v2":
+FNV-1a 64 over the raw RGBA bytes of the displayed frame, pinned by
+construction — the v1 key was Rust's `DefaultHasher`, not guaranteed stable
+across toolchains; every baseline was re-keyed once at the switch) — a hash of the
 pre-PNG pixels luna documents as **cross-architecture-stable**. So the baselines
 committed here (captured on aarch64) are expected to match on the x86_64 CI
 runner, and the CI visual step is a **hard gate** (no `continue-on-error`). The
