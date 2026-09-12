@@ -45,7 +45,8 @@ extern void hicolorIrqStream(void);
 #define VRAM_GFX      0x0000
 /** @brief BG2 32x32 map base (word address) */
 #define VRAM_MAP_BASE 0x3C00
-/** @brief Map loads at row 4: BG2VOFS=31 makes screen line 0 show map row 4 */
+/** @brief Map loads at row 4: scroll y = 32 makes screen line 0 show map row 4
+ *  (the lib writes VOFS = y - 1 itself; krom's raw 31 is the same intent) */
 #define VRAM_MAP_LOAD 0x3C80
 
 /** @brief 16-bit offset of sunset_pal within its bank (IRQ stream source) */
@@ -104,7 +105,7 @@ int main(void) {
 
     /* krom: scroll BG2 31 pixels up — aligns tile-row boundaries with the
      * CGADD-reset cadence of the IRQ stream ((scanline & 15) == 8). */
-    bgSetScroll(1, 0, 31);
+    bgSetScroll(1, 0, 32);   /* map row 4 on line 0; the -1 is the lib's job */
 
     setMainScreen(LAYER_BG2);
 

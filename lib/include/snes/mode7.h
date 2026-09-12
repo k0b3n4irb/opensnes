@@ -107,7 +107,8 @@ void mode7SetCenter(s16 x, s16 y);
  * Sets the scroll offset for the Mode 7 plane.
  *
  * @param x Horizontal scroll (13-bit signed)
- * @param y Vertical scroll (13-bit signed)
+ * @param y Vertical scroll (13-bit signed); written as y - 1 to M7VOFS, the
+ *          same scanline-0 convention as bgSetScroll()
  */
 void mode7SetScroll(s16 x, s16 y);
 

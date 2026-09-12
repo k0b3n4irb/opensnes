@@ -107,6 +107,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
 - **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
+- **Vertical scroll is off by one on hardware** (the PPU never outputs scanline 0): the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you (`bgSetScroll`, map module, `mode7SetScroll`, reset default, since 2026-09-12), so `y = 0` shows tilemap row 0 on the first line. Data that reaches the register without the lib — HDMA tables on `BGnVOFS` — must carry the -1 itself. PVSnesLib writes the raw value.
 - **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM
 
 ## Auto-Loaded Rules

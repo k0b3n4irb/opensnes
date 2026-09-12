@@ -102,6 +102,25 @@ If bank $00 still runs out (code plus hand-written asm payload):
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
+### 🟢 Vertical scroll is off by one: the PPU never outputs scanline 0 (hidden by the lib)
+The OBJ data of every scanline is fetched during the previous line, so the
+PPU renders scanline 0 but never outputs it: a raw `BGnVOFS` of 0 shows
+tilemap lines 1-224, and the bottom picture line is the first line of the
+29th tile row. A program that fills 28 rows (a screen) leaves that line to
+whatever VRAM held at power-on — a strip of garbage on real hardware,
+invisible on an emulator that zero-fills VRAM. "Many games set their
+vertical scroll values to -1 rather than 0" (anomie-regs, BG Scrolling,
+arbitrated 2026-09-12; found by `luna --power-on random` on
+`backgrounds/mode0`, `color/hicolor_blend`, `games/tetris`).
+
+**Mitigation (lib, since 2026-09-12):** every vertical scroll the lib writes
+is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
+module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
+row 0 on the first picture line". PVSnesLib writes the raw value; when
+porting, do not subtract 1 yourself. The one path the lib cannot cover is
+data you hand to the hardware directly, such as an HDMA table on
+`BGnVOFS`: apply the -1 in the table.
+
 ### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
 `$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll
 in mode 7), and together with the Mode 7 registers `$211B`-`$2120` they go

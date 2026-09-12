@@ -105,7 +105,7 @@ void mode7Init(void) {
     W16(REG_M7Y, 128);
 
     W16(REG_M7HOFS, 0);         /* scroll centered on the mode 7 plane */
-    W16(REG_M7VOFS, 0x0180);
+    W16(REG_M7VOFS, 0x017F);       /* 0x180 - 1: VOFS = y - 1, scanline 0 is never output */
 }
 
 void mode7SetScale(u16 scale_x, u16 scale_y) {
@@ -146,7 +146,7 @@ void mode7SetCenter(s16 x, s16 y) {
 
 void mode7SetScroll(s16 x, s16 y) {
     W16(REG_M7HOFS, (u16)x);
-    W16(REG_M7VOFS, (u16)y);
+    W16(REG_M7VOFS, (u16)(y - 1)); /* VOFS = y - 1: the PPU never outputs scanline 0 */
 }
 
 void mode7Rotate(u16 degrees) {

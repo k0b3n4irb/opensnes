@@ -308,6 +308,23 @@ InitHardware:
     inx
     cpx #$2115
     bne -
+    ; Vertical scroll defaults to -1, not 0: the PPU does not output
+    ; scanline 0 (OBJ data for each line is fetched during the previous
+    ; one), so VOFS = 0 shows tilemap lines 1-224 and the last picture line
+    ; is the 29th tile row — usually never written, visible garbage on real
+    ; hardware. "Many games set their vertical scroll values to -1 rather
+    ; than 0" (anomie-regs, BG Scrolling). The NMI sync below and map.asm
+    ; apply the same -1, so bgSetScroll(bg, x, 0) puts tilemap row 0 on the
+    ; first picture line.
+    lda #$FF
+    sta $210E
+    sta $210E
+    sta $2110
+    sta $2110
+    sta $2112
+    sta $2112
+    sta $2114
+    sta $2114
 
     ; VRAM increment mode
     lda #$80
@@ -1039,7 +1056,9 @@ FastNmi:
     ; Opt 4: Only write dirty BGs (saves ~64-128 cycles when few BGs scroll)
     ; 8-bit A, data bank $00
     lda.w bg_scroll_dirty
-    beq @scroll_done      ; Nothing dirty → skip all
+    bne @scroll_go        ; Nothing dirty → skip all (the block outgrew a
+    jmp @scroll_done      ; short branch when VOFS gained the 16-bit -1)
+@scroll_go:
 
     bit #$01
     beq @bg1_done
@@ -1047,9 +1066,14 @@ FastNmi:
     sta $210D
     lda.w bg_scroll_x+1    ; BG1 H high
     sta $210D
-    lda.w bg_scroll_y      ; BG1 V low
+    rep #$20
+    .ACCU 16
+    lda.w bg_scroll_y    ; BG1 V: hardware wants y - 1 (scanline 0 is
+    dec a                  ; never output; anomie-regs "BG Scrolling")
+    sep #$20
+    .ACCU 8
     sta $210E
-    lda.w bg_scroll_y+1    ; BG1 V high
+    xba
     sta $210E
     lda.w bg_scroll_dirty   ; Reload for next test
 @bg1_done:
@@ -1060,9 +1084,14 @@ FastNmi:
     sta $210F
     lda.w bg_scroll_x+3    ; BG2 H high
     sta $210F
-    lda.w bg_scroll_y+2    ; BG2 V low
+    rep #$20
+    .ACCU 16
+    lda.w bg_scroll_y+2    ; BG2 V: hardware wants y - 1 (scanline 0 is
+    dec a                  ; never output; anomie-regs "BG Scrolling")
+    sep #$20
+    .ACCU 8
     sta $2110
-    lda.w bg_scroll_y+3    ; BG2 V high
+    xba
     sta $2110
     lda.w bg_scroll_dirty   ; Reload for next test
 @bg2_done:
@@ -1073,9 +1102,14 @@ FastNmi:
     sta $2111
     lda.w bg_scroll_x+5    ; BG3 H high
     sta $2111
-    lda.w bg_scroll_y+4    ; BG3 V low
+    rep #$20
+    .ACCU 16
+    lda.w bg_scroll_y+4    ; BG3 V: hardware wants y - 1 (scanline 0 is
+    dec a                  ; never output; anomie-regs "BG Scrolling")
+    sep #$20
+    .ACCU 8
     sta $2112
-    lda.w bg_scroll_y+5    ; BG3 V high
+    xba
     sta $2112
     lda.w bg_scroll_dirty   ; Reload for next test
 @bg3_done:
@@ -1086,9 +1120,14 @@ FastNmi:
     sta $2113
     lda.w bg_scroll_x+7    ; BG4 H high
     sta $2113
-    lda.w bg_scroll_y+6    ; BG4 V low
+    rep #$20
+    .ACCU 16
+    lda.w bg_scroll_y+6    ; BG4 V: hardware wants y - 1 (scanline 0 is
+    dec a                  ; never output; anomie-regs "BG Scrolling")
+    sep #$20
+    .ACCU 8
     sta $2114
-    lda.w bg_scroll_y+7    ; BG4 V high
+    xba
     sta $2114
 @bg4_done:
 
