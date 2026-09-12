@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 0efca5436da2d6115773db344889d32fb5abd6cc | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 7edea70bd9e8263b8c31a88dbde4ff7dbf24e9e2 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 7df4820c639fab2786d385013c54b639d20cea52 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 19 patches (upstream merge-base: 7051114)
+### compiler/cproc — 20 patches (upstream merge-base: 7051114)
 
 ```
+7edea70 util: arrayforeach forms no end pointer over an empty array (UBSan on clang 18, sanitizer job H3)
 0efca54 qbe: never form NULL + 0 over an empty growable array (UBSan on clang 18, sanitizer job H3)
 98ecf20 qbe: drop three dead fork-local symbols so cproc-qbe builds clean under -Wall -Wextra (gaps review H2)
 6d3953d qbe: a pointer object's access is not tainted by its pointee's qualifiers (chantier A9)
