@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.21.0 · `luna profile --pc-set` to each example's first manifest frame, no input · 85 ROMs · **133 of 301 public functions executed, 168 never**
+luna v1.21.0 · `luna profile --pc-set` to each example's first manifest frame, no input · 85 ROMs · **133 of 300 public functions executed, 167 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one example (boot + idle path; input-driven code is under-counted). The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
@@ -19,7 +19,7 @@ luna v1.21.0 · `luna profile --pc-set` to each example's first manifest frame, 
 | `fixed32.h` | `fix32Div` |
 | `hdma.h` | `hdmaBrightnessGradient`, `hdmaBrightnessGradientStop`, `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaDisableAll`, `hdmaGetEnabled`, `hdmaGradient`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWaveUpdate`, `hdmaWindowShape` |
 | `input.h` | `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseGetSensitivity`, `mouseGetX`, `mouseGetY`, `mouseIsConnected`, `mouseSetSensitivity`, `padIsConnected`, `padRaw`, `scopeButtonsDown`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeGetRawX`, `scopeGetRawY`, `scopeGetX`, `scopeGetY`, `scopeSetRepeatDelay`, `scopeSinceShot` |
-| `interrupt.h` | `irqClear`, `irqDisable`, `irqSet`, `irqSetVTimer`, `nmiClear`, `nmiSet`, `void` |
+| `interrupt.h` | `irqClear`, `irqDisable`, `irqSet`, `irqSetVTimer`, `nmiClear`, `nmiSet` |
 | `map.h` | `mapGetMetaTile`, `mapGetMetaTilesProp`, `mapSetMapOptions` |
 | `math.h` | `div16`, `fixAbs`, `fixClamp`, `fixDiv`, `fixLerp`, `fixSqrt`, `mod16`, `mul16` |
 | `mode7.h` | `mode7Rotate`, `mode7SetMatrix`, `mode7SetPivot`, `mode7Transform` |

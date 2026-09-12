@@ -61,7 +61,8 @@ def public_functions() -> dict[str, str]:
         for m in re.finditer(r"^\s*(?:extern\s+)?[A-Za-z_][\w\s\*]*?\b([a-zA-Z_]\w*)\s*\([^;{]*\)\s*;",
                              s, flags=re.M):
             name = m.group(1)
-            if name in ("if", "while", "for", "switch", "return", "sizeof"):
+            if name in ("if", "while", "for", "switch", "return", "sizeof", "void",
+                        "int", "char", "unsigned", "signed", "static", "inline"):
                 continue
             out.setdefault(name, h.name)
     return out

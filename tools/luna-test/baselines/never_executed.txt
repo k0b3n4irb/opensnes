@@ -158,7 +158,6 @@ textGetY
 videoSetObjInterlace
 videoSetOverscan
 videoSetPseudoHires
-void
 windowCentered
 windowDisable
 windowDisableAll
