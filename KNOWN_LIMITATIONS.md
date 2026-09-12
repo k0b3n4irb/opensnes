@@ -334,7 +334,9 @@ firings across sampled Windows CI builds (late June–July window) and
 zero ASan/UBSan/MSan findings on Linux over the full corpus, including
 a 200x stress of the five historical culprit files (that pass covered
 cproc; the standing `sanitizers` CI job added on 2026-09-12 covers the
-whole host toolchain and found bugs in QBE and wla-dx, none in cproc). The status is
+whole host toolchain and found bugs in QBE, wla-dx and cproc — the
+cproc ones are NULL + 0 pointer arithmetic over empty arrays, not the
+segfault class). The status is
 **under surveillance, not closed**: the make-level retry loop was
 dismantled on 2026-07-04 (it could also mask real build failures); the
 `cc65816`-level retry (x3 on exit 139) stays as cheap insurance while
