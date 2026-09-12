@@ -149,7 +149,8 @@ channel, M7C/M7D on the other) whose payload the chip fills directly;
 - **The D values are slopes relative to the imaginary centre line**, so
   M7VOFS must put the pivot (M7X/M7Y = Cx/Cy) on that line — the
   `mode7SetScroll` above. Get this wrong and the ground shears.
-- **Cost**: ≈ 50 µs per raster (per-word RQM handshake, 4 words), so a
+- **Cost** (measured on luna, not a datasheet figure): ≈ 50 µs per raster
+  (per-word RQM handshake, 4 words), so a
   126-line floor is ≈ 40 % of a frame. Super Mario Kart streams 96 lines
   per frame. Double-buffer the tables and fill the back set during active
   display, as the example does.

@@ -19,10 +19,12 @@ PPU register, off-CPU. The CPU stalls for the duration of the transfer
 (it does not keep running), but the per-byte cost is far below what a
 hand-rolled `lda`/`sta` loop would manage:
 
-- **Loop in CPU code**: ~10 master cycles per byte (8-bit `lda` / `sta`
-  with register-mode register write).
-- **DMA**: ~7 master cycles per byte (8 cycles per byte for the lib's
-  default mode, slightly less in optimal cases).
+- **Loop in CPU code**: an `lda abs,x` / `sta abs` / `inx` / `bne` loop is
+  about 15 CPU cycles per byte, i.e. roughly 90 master cycles per byte at
+  FastROM speed (6 master cycles per CPU cycle).
+- **DMA**: 8 master cycles per byte, whatever the memory speed, plus 8
+  master cycles of overhead per channel and 12-24 for the whole transfer
+  (anomie's timing and register docs) — about ten times faster per byte.
 
 The faster per-byte rate plus the lack of loop overhead means DMA is
 strictly better for any transfer over a handful of bytes. The lib uses
@@ -73,9 +75,9 @@ For DMA, the mode determines how the source is written to a PPU register
 | 2 | 2 | reg, reg (same register twice — for CGRAM via `$2122`) |
 | 3 | 4 | reg, reg, reg+1, reg+1 |
 | 4 | 4 | reg, reg+1, reg+2, reg+3 |
-| 5 | 4 | reg, reg+1, reg, reg+1 |
-| 6 | 2 | reg, reg |
-| 7 | 4 | reg, reg+1, reg+2, reg+3 |
+| 5 | 4 | reg, reg+1, reg, reg+1 (same bytes-to-registers result as mode 1) |
+| 6 | 2 | reg, reg (same as mode 2) |
+| 7 | 4 | reg, reg, reg+1, reg+1 (same as mode 3 — *not* four consecutive registers; that is mode 4) |
 
 The lib's `dmaCopyVram` uses mode 1 (16-bit VRAM word writes via
 `$2118`/`$2119`); `dmaCopyCGram` uses mode 0 with destination `$2122`
@@ -112,8 +114,9 @@ Two windows, two patterns:
    transfer more than ~4 KB at once. The screen goes black while it's
    set; users see this as a "loading flash" if it takes more than a
    frame.
-2. **VBlank** (~2,200 cycles per frame after NMI) — automatic, every
-   frame. Budget is small (~4 KB). The lib's NMI handler uses this for
+2. **VBlank** (37 scanlines on NTSC, about 50,500 master cycles or 8,400
+   CPU cycles, minus the NMI handler's own work) — automatic, every
+   frame. Budget is small (~4 KB of DMA). The lib's NMI handler uses this for
    the OAM DMA and the optional tilemap-streaming path.
 
 A `dmaCopyVram()` call outside both windows produces a build that

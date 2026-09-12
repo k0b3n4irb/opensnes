@@ -71,7 +71,10 @@ The SNES audio system is completely **separate** from the main CPU:
 | $2142 | $F6 | Port 2 |
 | $2143 | $F7 | Port 3 |
 
-**Important**: Use 8-bit writes only! 16-bit writes can corrupt port 3.
+**Important**: use 8-bit writes to the ports. The official manual (Book 1,
+§3-9-6) warns that a 16-bit write to `$2140`/`$2141` can also write `$2143`;
+the mechanism is disputed on nesdev, so treat it as a caution rather than a
+measured fact — 8-bit writes are safe either way.
 
 ---
 

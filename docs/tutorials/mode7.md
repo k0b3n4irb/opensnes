@@ -276,7 +276,9 @@ reads MPY — is never called while the split is live.
 ### 🔴 Single BG layer
 
 Mode 7 disables BG2, BG3, BG4 *in hardware*. `setMainScreen(TM_BG1 |
-TM_BG2)` does nothing useful; only BG1 renders. If you want a sky on
+TM_BG2)` does nothing useful; only BG1 renders (the one exception is
+EXTBG, SETINI bit 6, which turns BG2 into a priority-split copy of BG1 —
+not a second tilemap). If you want a sky on
 top of a Mode 7 ground, you HDMA the BGMODE register mid-frame
 (see the perspective example). There is no "Mode 7 + a normal
 tilemap" mode.
