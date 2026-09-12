@@ -1657,7 +1657,7 @@ static uint32_t cute_tiled_read_hex_int_internal(cute_tiled_map_internal_t* m, u
 
 	// When less than 6 characters, force an alpha channel of 255.
 	if (val_length <= 6) {
-		uint32_t alpha = 0xFF << 24;
+		uint32_t alpha = 0xFFu << 24;   /* unsigned: 0xFF << 24 overflows int (UBSan) */
 		*out = (*out & 0x00FFFFFF) | alpha;
 	}
 
