@@ -42,9 +42,9 @@ Mode 7 uses a special interleaved VRAM format:
 - **Odd bytes**: pixel data (256 tiles, 8x8, 256 colors each)
 
 This is completely different from Modes 0-3 where tilemap and tile data are in
-separate VRAM regions. The loading is handled by `asm_loadMode7Data()` in data.asm,
-which uses `dmaCopyVramMode7()` to write both the tilemap and tile data into the
-interleaved format the PPU expects.
+separate VRAM regions. `main.c` calls `dmaCopyVramMode7()`, which writes the
+tilemap and the tile data into the interleaved format the PPU expects (two
+DMAs with different VMAIN settings), then `dmaCopyCGram()` for the palette.
 
 ### 2. Initialize the transformation
 

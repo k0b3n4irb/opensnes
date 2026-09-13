@@ -34,7 +34,8 @@
  * - Tilemap in low bytes of VRAM words 0x0000-0x3FFF
  * - Tile data in high bytes of VRAM words 0x0000-0x3FFF
  *
- * Use mode7LoadGraphics() or set up DMA manually with interleaved data.
+ * Use dmaCopyVramMode7() (two DMAs: tilemap to the low bytes, tiles to the
+ * high bytes, from any bank) or set up DMA manually with interleaved data.
  *
  * @author OpenSNES Team
  * @copyright MIT License

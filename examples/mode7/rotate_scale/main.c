@@ -32,18 +32,12 @@
 
 #include <snes.h>
 
-/**
- * @brief Assembly helper to load Mode 7 tile data, tilemap, and palette.
- *
- * Mode 7 uses a unique interleaved VRAM format: each VRAM word has the tilemap
- * byte in the low byte and the 8bpp pixel data in the high byte. This requires
- * special DMA sequencing that cannot be done with the standard dmaCopyVram()
- * function. The assembly routine handles the interleaved write and also loads
- * the 256-color palette to CGRAM.
- *
- * Must be called during forced blank (screen off) since it writes to VRAM.
- */
-extern void asm_loadMode7Data(void);
+/** @brief Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), from data.asm. */
+extern u8 mode7_tiles[], mode7_tiles_end[];
+/** @brief Mode 7 tilemap (128x128 tile indices, one byte each), from data.asm. */
+extern u8 mode7_map[], mode7_map_end[];
+/** @brief 256-colour palette for the Mode 7 plane (512 bytes), from data.asm. */
+extern u8 mode7_pal[], mode7_pal_end[];
 
 /**
  * @brief Entry point -- interactive Mode 7 rotation and scaling demo.
@@ -66,9 +60,13 @@ int main(void) {
      * during active display on the SNES PPU. */
     setScreenOff();
 
-    /* Load Mode 7 tile data, tilemap, and palette via assembly helper.
-     * This must happen during forced blank because it performs bulk VRAM DMA. */
-    asm_loadMode7Data();
+    /* Load the Mode 7 plane. VRAM is interleaved in this mode (tilemap in
+     * the low bytes, 8bpp pixels in the high bytes), so dmaCopyVramMode7()
+     * runs the two DMAs with the right VMAIN each time; the palette is a
+     * plain CGRAM copy. Both need forced blank. */
+    dmaCopyVramMode7(mode7_map, (u16)(mode7_map_end - mode7_map),
+                     mode7_tiles, (u16)(mode7_tiles_end - mode7_tiles));
+    dmaCopyCGram(mode7_pal, 0, (u16)(mode7_pal_end - mode7_pal));
 
     /* Set Mode 7 and initialize the affine transformation matrix.
      * mode7Init() zeros the scroll center and offset registers (M7HOFS/M7VOFS,
