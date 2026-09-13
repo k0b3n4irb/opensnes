@@ -161,11 +161,19 @@ endif
 #------------------------------------------------------------------------------
 
 _DEP_sprite          := dma sprite_oamset
-_DEP_sprite_dynamic  := sprite_dynamic_dispatch sprite_dynamic_helpers
-_DEP_text            := dma background
+# The seven entries marked L2a were found by devtools/link_modules.py
+# (2026-09-13), which links every module ALONE: each of these modules
+# referenced a symbol of a module it never declared, and only linked in
+# practice because every example also listed console / sprite / dma.
+_DEP_sprite_dynamic  := sprite_dynamic_dispatch sprite_dynamic_helpers sprite sprite_lut   # L2a: oamInit, lkup32oamS
+_DEP_sprite_dynamic_dispatch := sprite_dynamic                                  # L2a: oamInitDynamicSprite
+_DEP_sprite_dynamic_meta     := sprite sprite_dynamic                           # L2a: oambuffer
+_DEP_text            := dma background console                                  # L2a: consoleInit
 _DEP_text4bpp        := dma
-_DEP_object          := map
+_DEP_object          := map sprite sprite_dynamic                               # L2a: oambuffer (sprite_dynamic's)
 _DEP_map             := dma
+_DEP_background      := dma                                                     # L2a: dmaCopyVram
+_DEP_fixed32         := math                                                    # L2a: sine_table
 _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)

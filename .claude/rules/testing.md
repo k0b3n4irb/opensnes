@@ -28,6 +28,12 @@ change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
 suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and
 runs inside the sanitizer job. A regression or an XPASS fails it.
+`make test-link-modules` links every lib module alone with only the
+dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
+all-together groups; a module that needs a symbol from a module it does
+not declare fails here instead of in a user's project. Runs in
+`make tests`. A new module or a new cross-module reference must come
+with its `_DEP_` line.
 
 The WRAM oracle hashes every WRAM page at each vblank, **including the
 stack**, so it moves on any codegen change even when behaviour is

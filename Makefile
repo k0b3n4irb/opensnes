@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -200,6 +200,7 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
+	@python3 devtools/link_modules.py
 	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
 
@@ -280,6 +281,14 @@ test-sanitizers:
 # test-sanitizers, so CI exercises the suites under ASan + UBSan.
 test-toolchain-suites:
 	@python3 devtools/toolchain_suites.py
+
+# Every lib module links — alone with its declared dependencies (a missing
+# _DEP_ in make/common.mk fails here, not in a user's project) and in two
+# all-together groups (a module no example lists still gets built). Gaps
+# review L2a; first run found seven undeclared dependencies and a fixed32
+# operand WLA sized as direct page. Also runs inside `make tests`.
+test-link-modules:
+	@python3 devtools/link_modules.py
 
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds
@@ -420,4 +429,5 @@ help:
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
+	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
 	@echo "  help      - Show this help"

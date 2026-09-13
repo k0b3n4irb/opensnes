@@ -46,9 +46,14 @@ def main() -> int:
         return 0
     # The lib itself must have been compiled by the current toolchain: a
     # lib object older than any compiler binary was produced by a previous
-    # compiler and would be linked into every example.
-    tool_m, tool_f = newest_mtime("bin/cc65816", "bin/qbe", "bin/cproc-qbe",
-                                  "bin/wla-65816", "bin/wlalink")
+    # compiler and would be linked into every example. The timestamps are
+    # the submodules' own build outputs, not bin/: `make compiler` re-copies
+    # bin/ on every top-level make (the install step is not conditional),
+    # so bin/ mtimes say when the toolchain was last INSTALLED, the build
+    # trees say when it was last BUILT.
+    tool_m, tool_f = newest_mtime("compiler/qbe/qbe", "compiler/cproc/cproc-qbe",
+                                  "compiler/wla-dx/binaries/wla-65816",
+                                  "compiler/wla-dx/binaries/wlalink")
     stale_lib = [o.relative_to(ROOT) for o in ROOT.glob("lib/build/**/*.o")
                  if o.stat().st_mtime < tool_m]
     if stale_lib:
