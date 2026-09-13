@@ -79,7 +79,7 @@ def grade(suite: str, results: dict[str, bool], expected_fail: set[str]) -> int:
 # cproc — mirrors compiler/cproc/runtests, one result per test
 # --------------------------------------------------------------------------
 
-def run_cproc() -> dict[str, bool]:
+def run_cproc(expected_fail: set[str]) -> dict[str, bool]:
     cdir = COMPILER / "cproc"
     ccqbe = cdir / "cproc-qbe"
     if not ccqbe.exists():
@@ -105,6 +105,12 @@ def run_cproc() -> dict[str, bool]:
             proc = subprocess.run(cmd, cwd=cdir, capture_output=True)
             ok = proc.returncode == 0 and got.exists() and got.read_bytes() == want.read_bytes()
             results[src.name] = ok
+            if not ok and src.name not in expected_fail:
+                print(f"--- cproc {src.name}: exit {proc.returncode}")
+                print(proc.stderr.decode(errors="replace")[-600:])
+                if got.exists():
+                    diff = subprocess.run(["diff", "-u", str(want), str(got)], capture_output=True, text=True)
+                    print(diff.stdout[:1200])
     return results
 
 
@@ -112,7 +118,7 @@ def run_cproc() -> dict[str, bool]:
 # QBE — tools/test.sh all, parsed per test
 # --------------------------------------------------------------------------
 
-def run_qbe() -> dict[str, bool]:
+def run_qbe(expected_fail: set[str]) -> dict[str, bool]:
     qdir = COMPILER / "qbe"
     qbe = qdir / "qbe"
     if not qbe.exists():
@@ -121,17 +127,28 @@ def run_qbe() -> dict[str, bool]:
     proc = subprocess.run(["sh", "tools/test.sh", "all"], cwd=qdir, env=env,
                           capture_output=True, text=True)
     results: dict[str, bool] = {}
+    output: dict[str, list[str]] = {}
     current = None
     for line in proc.stdout.splitlines():
         m = re.match(r"^(\S+\.ssa)\.\.\.", line)
         if m:
             current = m.group(1)
             results[current] = True
-        if current and re.search(r"\[[^\]]*fail\]", line):
-            results[current] = False
+            output[current] = []
+        if current:
+            output[current].append(line)
+            if re.search(r"\[[^\]]*fail\]", line):
+                results[current] = False
     if not results:
         print(proc.stdout[-2000:], proc.stderr[-2000:], file=sys.stderr)
         sys.exit("qbe: tools/test.sh produced no results (missing cc?)")
+    for t, ok in results.items():
+        if not ok and t not in expected_fail:
+            print(f"--- qbe {t}")
+            print("\n".join(output[t][-25:]))
+    if proc.stderr.strip():
+        print("--- qbe tools/test.sh stderr (tail)")
+        print(proc.stderr[-1500:])
     return results
 
 
@@ -142,7 +159,7 @@ def run_qbe() -> dict[str, bool]:
 PLATFORMS = ("65816", "spc-700", "superfx")
 
 
-def run_wla_dx() -> dict[str, bool]:
+def run_wla_dx(expected_fail: set[str]) -> dict[str, bool]:
     wdir = COMPILER / "wla-dx"
     binaries = wdir / "binaries"
     for b in ("wla-65816", "wla-spc700", "wla-superfx", "wlalink"):
@@ -164,12 +181,17 @@ def run_wla_dx() -> dict[str, bool]:
             name = f"{plat}/{tdir.name}"
             ok = True
             subprocess.run(["make", "-s", "clean"], cwd=tdir, env=env, capture_output=True)
-            if subprocess.run(["make", "-s"], cwd=tdir, env=env, capture_output=True).returncode != 0:
+            proc = subprocess.run(["make", "-s"], cwd=tdir, env=env, capture_output=True, text=True)
+            if proc.returncode != 0:
                 ok = False
             elif (tdir / "testsfile").exists():
-                if subprocess.run(["byte_tester", "testsfile"], cwd=tdir, env=env,
-                                  capture_output=True).returncode != 0:
+                proc = subprocess.run(["byte_tester", "testsfile"], cwd=tdir, env=env,
+                                      capture_output=True, text=True)
+                if proc.returncode != 0:
                     ok = False
+            if not ok and name not in expected_fail:
+                print(f"--- wla-dx {name}")
+                print((proc.stdout + proc.stderr)[-1200:])
             subprocess.run(["make", "-s", "clean"], cwd=tdir, env=env, capture_output=True)
             results[name] = ok
     return results
@@ -186,8 +208,9 @@ def main() -> int:
     for name, fn in SUITES.items():
         if args.only and name != args.only:
             continue
-        results = fn()
-        problems += grade(name, results, known_fail(name.replace("-", "_")))
+        expected_fail = known_fail(name.replace("-", "_"))
+        results = fn(expected_fail)
+        problems += grade(name, results, expected_fail)
     if problems:
         print(f"TOOLCHAIN SUITES: {problems} problem(s)")
         return 1
