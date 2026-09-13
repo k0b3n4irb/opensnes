@@ -14,8 +14,9 @@ name: Lint
 #   tools-golden / doc-render — checks that need a built tool or Doxygen.
 #   sanitizers      — `make test-sanitizers`: the host toolchain (cproc-qbe,
 #                     QBE, wla-dx) and the asset tools rebuilt with ASan +
-#                     UBSan, then run over the fixtures, the lib, the goldens
-#                     and the corpus. Its first run found seven latent bugs
+#                     UBSan, then run over the fixtures, the lib, the goldens,
+#                     the corpus and the submodules' own upstream suites (H1,
+#                     make test-toolchain-suites). Its first run found seven latent bugs
 #                     (2026-09-12); it is the one job here that builds the
 #                     compiler, and it must stay the only one.
 # Keep the other jobs free of the toolchain build so quick checks stay fast.
@@ -147,8 +148,9 @@ jobs:
         # Rebuilds the compiler and the tools with -fsanitize=address,undefined
         # (SANITIZE=1 drops -static: the sanitizer runtimes do not link
         # statically) and runs the compiler fixtures, `make lib`, `make
-        # test-tools` and `make examples` under halt_on_error=1 — any report
-        # is a failure. Nothing here runs a ROM, so no luna. Replaces the
+        # test-tools`, `make examples` and the cproc / QBE / wla-dx upstream
+        # suites (make test-toolchain-suites) under halt_on_error=1 — any
+        # report is a failure. Nothing here runs a ROM, so no luna. Replaces the
         # non-gating Windows-only UBSan step that msys2_cproc_diagnostic.yml
         # carried until 2026-09-12 (ASan has no MinGW runtime; this job has
         # both and gates).

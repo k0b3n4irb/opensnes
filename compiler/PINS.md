@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 7edea70bd9e8263b8c31a88dbde4ff7dbf24e9e2 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 7df4820c639fab2786d385013c54b639d20cea52 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | fe42eacbe7a226de86370f7c312202a930c0f5c2 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
 
@@ -71,11 +71,20 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 57 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 59 patches (the bulk of the SDK's compiler magic)
+
+Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
+scan"), located by blob matching on 2026-09-13 — the fork's root commit is
+a squash, so `git merge-base` cannot tell. The three upstream suites run
+on the fork binaries via `make test-toolchain-suites` (known-fail
+ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
+56/56 on the host target since `fe42eac`, and must stay so on every bump.
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+fe42eac parse: keep the type table alive until the collected functions are emitted (upstream suite H1: use-after-free at pass 2 on every target but w65816)
+22568cb emit: keep upstream's ELF emitters next to the WLA-DX ones, dispatched on the target (H1: lets tools/test.sh run)
 7df4820 parse: do not memset a NULL temporary hash table (UBSan, sanitizer job H3)
 ca50db8 Place C const data in the memory map's asset banks by default (chantier #127.3)
 852cea4 Only the volatile bit pins loads in loadopt / promote / gcm (chantier A9)

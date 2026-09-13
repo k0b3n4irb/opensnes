@@ -24,6 +24,10 @@ the lib build, the tool goldens and the whole corpus under
 `halt_on_error=1` (CI job `sanitizers` in `lint.yml`). Run it after any
 change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
 `bin/`, so `make clean && make` afterwards.
+`make test-toolchain-suites` runs the three submodules' own upstream
+suites on the fork binaries against known-fail ratchets
+(`devtools/toolchain-suites/`); it is the check for every PIN bump and
+runs inside the sanitizer job. A regression or an XPASS fails it.
 
 The WRAM oracle hashes every WRAM page at each vblank, **including the
 stack**, so it moves on any codegen change even when behaviour is

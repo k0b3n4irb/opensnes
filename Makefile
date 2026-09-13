@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -265,7 +265,18 @@ test-sanitizers:
 	$(SAN_ENV) $(MAKE) SANITIZE=1 lib
 	$(SAN_ENV) $(MAKE) SANITIZE=1 test-tools
 	$(SAN_ENV) $(MAKE) SANITIZE=1 examples
-	@echo "SANITIZERS: OK — cproc-qbe, qbe, wla-dx and the asset tools ran the fixtures, the lib, the goldens and the corpus without an ASan/UBSan report"
+	$(SAN_ENV) $(MAKE) test-toolchain-suites
+	@echo "SANITIZERS: OK — cproc-qbe, qbe, wla-dx and the asset tools ran the fixtures, the lib, the goldens, the corpus and the upstream suites without an ASan/UBSan report"
+
+# The upstream test suites of the three toolchain submodules, run on the
+# fork's own binaries against known-fail ratchets (gaps review H1,
+# devtools/toolchain-suites/*.txt). cproc: 63/170 expected (16-bit int, rodata
+# sectioning); QBE: 56/56 on the host target — the one execution test of the
+# shared passes the fork patched; wla-dx: 31/32 (base_test_1 is the .BASE
+# divergence the fork carries on purpose). Also run at the end of
+# test-sanitizers, so CI exercises the suites under ASan + UBSan.
+test-toolchain-suites:
+	@python3 devtools/toolchain_suites.py
 
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds
@@ -405,4 +416,5 @@ help:
 	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
+	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  help      - Show this help"
