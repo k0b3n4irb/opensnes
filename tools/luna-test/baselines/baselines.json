@@ -505,15 +505,15 @@
   },
   "sprites_sprite_swarm": {
     "fbhash": [
-      "05d5682b072274a5",
-      "c3434d537ed1b6a5"
+      "2b5c8c38402957a5",
+      "6545a822a2680965"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.21.0",
-    "rom_sha256": "b587dc2bab7ea559546cc7cb66596bf69915bbbab86b851318307a1c1e385955"
+    "rom_sha256": "1a53b224e76629f24539f0940c80c6c0a3d38bb2bdc94c7b8f3d437aad8c460d"
   },
   "text_print_string": {
     "fbhash": "937464355ee6168e",

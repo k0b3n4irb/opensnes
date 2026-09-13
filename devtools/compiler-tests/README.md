@@ -41,3 +41,26 @@ alongside the other `devtools/` linters. See
   and translating its assertions into a `.checks` file. A few checks are bespoke
   (ordered sequences, epilogue tax/txa proximity); extend the DSL in `run.py` if a
   rule doesn't fit `present`/`absent`/`count`/`in`/`section`.
+
+## Runtime fixture ROMs (`runtime/`)
+
+Pattern checks prove shapes; these ROMs prove results. Each directory is a
+one-TU ROM whose globals the sibling `test_*.py` asserts through
+`luna state --assert`, all rebuilt from clean and run by `make tests`:
+
+| ROM | Proves |
+|---|---|
+| `a7_32bit` | 32-bit (`Kl`) arithmetic: add/sub carry, mul, div, mod, shifts by constant, signed folds |
+| `a6_farptr` | the 4-byte pointer ABI: bank byte through every lib boundary |
+| `b2_far_ram` | `FAR` objects in bank $7E with bank-honouring codegen |
+| `debug_channel` | the debug channel to luna |
+| `c_features` | switch (dense / sparse / fall-through / negative / 32-bit), function pointers (const and RAM tables, callback, struct member), bit-fields, enum, goto, recursion, 32-bit `* / %` and variable shifts on runtime operands, promotions and truncations, signed division rounding, short-circuit side effects, `sizeof` of the target's types, const far reads (gaps review C2) |
+
+## Refusal fixtures (`cases/negative/`)
+
+`negative/<name>.c` must **fail** to compile and stderr must contain
+`<name>.expect`. They pin the three C features the toolchain does not
+implement — variadic functions, struct by value (parameter, return,
+assignment), inline assembly — as clean refusals that name the feature
+(gaps review C1/C2). A negative that starts compiling fails the run: the
+feature landed, promote it to `cases/` with real `.checks`.

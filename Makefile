@@ -185,6 +185,9 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit
 	@python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features clean
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features
+	@python3 devtools/compiler-tests/runtime/c_features/test_c_features.py
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel
 	@python3 devtools/compiler-tests/runtime/debug_channel/test_debug_channel.py

@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 0766f7d0727dcad5a68c4c2387fd6351488448cd | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | d5484d4b465c2eab1263e5d78544c64336e7e147 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 9e2307c4efb61455c3962c76cad7725a677dee27 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
 
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 21 patches (upstream merge-base: 7051114)
+### compiler/cproc — 22 patches (upstream merge-base: 7051114)
 
 ```
+d1f8745 qbe: bit-field extraction pads to the IR class width; long compares use the l class (c_features ROM, review C2)
 0766f7d pp: no NULL + 0 when a macro call collected no argument tokens (UBSan on clang 18, upstream suite H1)
 7edea70 util: arrayforeach forms no end pointer over an empty array (UBSan on clang 18, sanitizer job H3)
 0efca54 qbe: never form NULL + 0 over an empty growable array (UBSan on clang 18, sanitizer job H3)
@@ -72,7 +73,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 60 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 61 patches (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -84,6 +85,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+9e2307c w65816: five fixes from the c_features runtime ROM (variable Kl shifts, signed compares with overflow, Kl compare fusion, jnz on Kl, sign extension vs ldy) and a refusal that names the feature
 d5484d4 amd64: no NULL + 0 over the argument class array of a call without arguments (UBSan on clang 18, upstream suite H1 on x86_64)
 fe42eac parse: keep the type table alive until the collected functions are emitted (upstream suite H1: use-after-free at pass 2 on every target but w65816)
 22568cb emit: keep upstream's ELF emitters next to the WLA-DX ones, dispatched on the target (H1: lets tools/test.sh run)

@@ -440,6 +440,67 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 Five silent miscompilations found and fixed by the C-feature runtime ROM (2026-09-13)
+`devtools/compiler-tests/runtime/c_features` (gaps review C2) asserts the
+result of every C feature that had no runtime check before. Its first run
+found five ways cc65816 produced wrong code with no diagnostic; all are
+fixed in the same chantier and the ROM gates `make tests` at 64/64:
+
+- **bit-field reads returned 0** — cproc extracted a field with the 32-bit
+  idiom (shift left by `32 - width - offset`, right by `32 - width`) on a
+  target whose `w` class is 16 bits, shifting the field out of the register.
+  Bit-field *stores* were right, so a struct looked correct in memory and
+  every read of a narrow field came back 0.
+- **32-bit shifts by a variable count shifted the low word only** — the
+  emitter had constant-count `Kl` shifts and fell through to the 16-bit
+  loop otherwise (its own comment said no code produced them; every
+  `u32 << n` with a runtime `n` did). The high half was an unwritten slot.
+- **signed 32-bit compares read the low words** — cproc classed a `long`
+  compare as `csltw` (its size test predates the 2-byte `int`), and the
+  compare-and-branch fusion did the same for a genuine `csltl`.
+- **signed compares ignored overflow, 16-bit and 32-bit** — `cmp` then
+  `bmi` tests the sign of the difference, which is wrong whenever the
+  subtraction overflows: `-30000 < 30000` was false. Now `sbc` with the V
+  flag folded into N.
+- **`if (long_var)` tested the low word** — a value with only the high
+  half set was false. Likewise `s16 → s32` sign extension lost the sign
+  when the value went through a far frame slot, because the `ldy` that
+  addresses the slot rewrote the N flag the test relied on.
+
+**Mitigation:** none needed since 2026-09-13; the ROM keeps them fixed.
+If you carry an older toolchain: avoid bit-field reads, variable 32-bit
+shift counts, signed `long` comparisons and `if` on a `long`.
+
+### 🟡 Struct parameters, struct returns and struct assignment by value are refused
+cc65816 has no lowering for a struct passed or returned by value (QBE
+`parc` / `argc`) nor for a whole-struct copy (`blit`). The build stops with
+`cc65816/qbe: unhandled IR op N (parc) … struct parameters and struct
+returns by value are not supported on w65816; pass a pointer` — it never
+emits code for them (a whole-struct assignment *was* silently dropped until
+2026-07-19; the refusal is the fix).
+
+**Mitigation:** pass `struct T *`, return through an out-pointer, and copy
+field by field. Pinned by `devtools/compiler-tests/cases/negative/` (2026-09-13).
+
+### 🟡 Variadic functions are refused
+cproc parses `__builtin_va_start` / `__builtin_va_arg`, but the w65816
+backend has no `vastart` / `vaarg` lowering, and the SDK ships no
+`<stdarg.h>`. The build stops with `… (vastart) … variadic functions … are
+not supported on w65816; pass an array and a count`.
+
+**Mitigation:** an array plus a count, or a small struct of arguments by
+pointer. `PHILOSOPHY.md` rules out `printf` in the core lib for the same
+reason. Pinned by `cases/negative/varargs.c`.
+
+### 🟡 Inline assembly is refused
+cproc has no `asm` statement: `__asm__("nop")` stops the build with
+`inline assembly is not yet supported`.
+
+**Mitigation:** put the assembly in a `.asm` file (assembled by
+`wla-65816`, listed in the example's `ASMSRC`) and call it through the C
+ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
+pattern. Pinned by `cases/negative/inline_asm.c`.
+
 ## Performance traps
 
 ### 🟢 `oamSet()` framesize cliff — RESOLVED via ASM rewrite (2026-03-03)
