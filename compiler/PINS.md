@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 7edea70bd9e8263b8c31a88dbde4ff7dbf24e9e2 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | fe42eacbe7a226de86370f7c312202a930c0f5c2 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 0766f7d0727dcad5a68c4c2387fd6351488448cd | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | d5484d4b465c2eab1263e5d78544c64336e7e147 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
 
@@ -39,9 +39,10 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 20 patches (upstream merge-base: 7051114)
+### compiler/cproc — 21 patches (upstream merge-base: 7051114)
 
 ```
+0766f7d pp: no NULL + 0 when a macro call collected no argument tokens (UBSan on clang 18, upstream suite H1)
 7edea70 util: arrayforeach forms no end pointer over an empty array (UBSan on clang 18, sanitizer job H3)
 0efca54 qbe: never form NULL + 0 over an empty growable array (UBSan on clang 18, sanitizer job H3)
 98ecf20 qbe: drop three dead fork-local symbols so cproc-qbe builds clean under -Wall -Wextra (gaps review H2)
@@ -71,7 +72,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 59 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 60 patches (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -83,6 +84,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+d5484d4 amd64: no NULL + 0 over the argument class array of a call without arguments (UBSan on clang 18, upstream suite H1 on x86_64)
 fe42eac parse: keep the type table alive until the collected functions are emitted (upstream suite H1: use-after-free at pass 2 on every target but w65816)
 22568cb emit: keep upstream's ELF emitters next to the WLA-DX ones, dispatched on the target (H1: lets tools/test.sh run)
 7df4820 parse: do not memset a NULL temporary hash table (UBSan, sanitizer job H3)
