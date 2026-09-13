@@ -92,12 +92,13 @@ def run_cproc() -> dict[str, bool]:
         for src in sorted((cdir / "test").glob("*.c")):
             stem = src.with_suffix("")
             arch = stem.name.split("+", 1)[1] if "+" in stem.name else "x86_64-sysv"
+            rel = f"test/{src.name}"   # the path runtests passes; it shows in -E output
             if stem.with_suffix(".qbe").exists():
                 want = stem.with_suffix(".qbe")
-                cmd = [str(ccqbe), "-t", arch, "-o", str(got), str(src)]
+                cmd = [str(ccqbe), "-t", arch, "-o", str(got), rel]
             elif stem.with_suffix(".pp").exists():
                 want = stem.with_suffix(".pp")
-                cmd = [str(ccqbe), "-t", arch, "-E", "-o", str(got), str(src)]
+                cmd = [str(ccqbe), "-t", arch, "-E", "-o", str(got), rel]
             else:
                 continue
             got.unlink(missing_ok=True)
