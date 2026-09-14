@@ -109,8 +109,10 @@ Beyond visual/coverage, the harness exercises axes the old snes9x harness
 never could. **These checks now live as native luna manifests under
 `manifests/*.toml`** (run by `luna test` via `make test-manifests`); the
 Python probes that pioneered them were deleted after the migration —
-`probes/` retains only `lib.py` (helper API, used by `project_test.py`)
-and `run_all.py`. Same coverage, declarative form:
+`probes/` retains only `lib.py`, the `luna state --assert` / `--peek`
+helper every runtime ROM checker imports (`devtools/compiler-tests/runtime/*`,
+`devtools/libtests`, `project_test.py`); the `run_all.py` runner that globbed
+the emptied directory was deleted on 2026-09-14. Same coverage, declarative form:
 
 - **Coprocessor execution** (`manifests/coproc_*.toml`) — SA-1, Super FX
   and DSP-1 examples must execute ≥1 coprocessor instruction
@@ -126,10 +128,10 @@ and `run_all.py`. Same coverage, declarative form:
   liveness on the raw-APU driver fixture.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
-  invisible to the framebuffer. **Local, same-arch tool — not a CI gate:** raw
-  WRAM content (unlike the framebuffer) isn't a luna cross-arch guarantee
-  (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), so `--update` on your own
-  machine before `--compare`. Baseline entries carry `rom_sha256` provenance
+  invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`
+  on both luna legs; raw WRAM content isn't a luna cross-arch guarantee for two
+  examples (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), which the
+  oracle skips per arch. Baseline entries carry `rom_sha256` provenance
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example
   source-mtime check) so stale-ROM rebaselines fail at capture time.

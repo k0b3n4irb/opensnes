@@ -119,7 +119,7 @@ jobs:
         run: python3 devtools/test_asset_budget.py
 
   tools-golden:
-    name: Asset-tool golden outputs (gfx4snes, smconv)
+    name: Asset-tool golden outputs (make test-tools)
     runs-on: ubuntu-latest
     steps:
       - name: Check out OpenSNES (with submodules)
@@ -133,13 +133,13 @@ jobs:
         run: make tools
 
       - name: Run golden-output tests
-        # Byte-compares gfx4snes/smconv output against committed goldens.
-        # These converters feed every example's graphics/audio; a silent
-        # regression here previously only surfaced as an unlocalized
-        # visual-hash churn downstream. Also runs via `make test-tools`.
-        run: |
-          python3 tools/gfx4snes/tests/run_golden.py
-          python3 tools/smconv/tests/run_golden.py
+        # Byte-compares every asset tool's output against committed goldens
+        # (gfx4snes, tmx2snes, smconv, wav2brr, palplan, aseprite2snes,
+        # font2snes, img2snes). These converters feed the examples' assets; a
+        # silent regression here used to surface only as an unlocalised
+        # visual-hash churn downstream. The target is the contract — a
+        # hand-listed pair here was CI-blind to six tools until 2026-09-14.
+        run: make test-tools
 
   sanitizers:
     name: Host toolchain under ASan + UBSan (make test-sanitizers)

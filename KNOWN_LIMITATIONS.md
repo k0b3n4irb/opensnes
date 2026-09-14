@@ -121,6 +121,25 @@ porting, do not subtract 1 yourself. The one path the lib cannot cover is
 data you hand to the hardware directly, such as an HDMA table on
 `BGnVOFS`: apply the -1 in the table.
 
+### 🟡 A CGRAM write during the picture lands on the wrong entry
+CGRAM is reachable from the CPU only during V-blank, H-blank or forced
+blank; a write to CGDATA while the PPU is drawing "will write the data to
+the wrong CGRAM address" (snesdev-wiki, PPU registers / CGDATA — arbiter;
+luna models it since v1.23.0, as ares and Mesen2 do). This is the trap of
+every per-scanline palette stream: an H-timer IRQ fires at H = HTIME + 3.5
+dots (fullsnes), the handler's prologue then costs dots, and the DMA must
+start after H = 274 (hblank flag) and finish before dot 22 of the next
+line. `examples/color/hicolor_1792` shipped with krom's HTIME = 190 and a
+longer handler than his (register save, V-counter latch): on the faithful
+model its DMA spilled into the next picture and the screen broke into
+bands. The clean window for that handler is HTIME 80..175 (measured on
+luna v1.23.0); it runs at 128.
+
+**Mitigation:** put the CGRAM DMA in H-blank and measure the window on
+luna after any change to the handler — the lenient emulators of the past
+would not show the corruption. `dmaCopyCGram()` / `setPalette*()` from
+the main loop are safe: they run in VBlank or forced blank.
+
 ### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
 `$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll
 in mode 7), and together with the Mode 7 registers `$211B`-`$2120` they go

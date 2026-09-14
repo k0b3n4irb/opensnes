@@ -193,7 +193,6 @@ tests: test-compiler
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
 	@# (gaps review item R5).
 	@python3 tools/luna-test/rom_coverage.py
-	@python3 tools/luna-test/probes/run_all.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
@@ -262,8 +261,9 @@ clean-examples:
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
 
-# Golden-output tests for the asset tools (gfx4snes, smconv). Byte-compares
-# tool output against committed goldens — needs `make tools` first.
+# Golden-output tests for every asset tool. Byte-compares tool output
+# against committed goldens — needs `make tools` first. Also the CI job
+# `tools-golden` (lint.yml) runs exactly this target (review P4).
 test-tools:
 	@python3 tools/gfx4snes/tests/run_golden.py
 	@python3 tools/tmx2snes/tests/run_golden.py
@@ -271,6 +271,8 @@ test-tools:
 	@python3 tools/wav2brr/tests/run_golden.py
 	@python3 tools/palplan/tests/run_golden.py
 	@python3 tools/aseprite2snes/tests/run_golden.py
+	@python3 tools/font2snes/tests/run_golden.py
+	@python3 tools/img2snes/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
 # QBE, wla-dx and the asset tools from clean with ASan + UBSan (SANITIZE=1:

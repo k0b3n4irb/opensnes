@@ -600,9 +600,11 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 | id | title | gaps | eff | rel | first step |
 |---|---|---|---|---|---|
 | P1 | CI runs `make tests` and `make lint` verbatim on one Linux job | G1 G2 G3 G5 | M | **H** | **done 2026-09-11** (`8af66f53`: `functional-tests` runs `make tests`, `lint.yml` runs `make lint`, verbatim) — replace the hand lists in `opensnes_build.yml` (`functional-tests` job) and `lint.yml` with the two targets; the platform matrix keeps `make release` only |
-| P2 | Delete the dead Python probe runner, refresh harness docs | G2 G8 | S | M | remove `tools/luna-test/probes/run_all.py` and `lib.py` (check `project_test.py` imports first), `Makefile:157`, `.claude/rules/testing.md:14`, `tools/luna-test/README.md:21,95`, `release.yml:202` |
+| P2 | Delete the dead Python probe runner, refresh harness docs | G2 G8 | S | M | **done 2026-09-14** — `probes/run_all.py` deleted (it globbed an empty directory since the manifests migration); `lib.py` stays, it is the assert helper of every runtime ROM checker. `make tests`, CLAUDE.md and testing.md name `luna test` manifests instead; the harness README no longer calls the WRAM oracle "not a CI gate" (it gates `make tests` and CI since 2026-09-11) |
+
 | P3 | `symmap --check-overlap` becomes blocking | G6 | S | **H** | **done 2026-09-11** (`a5280ef3`) — drop the trailing `true` in `opensnes_build.yml:243,256` and the `release.yml` copy; confirm the corpus is clean first |
-| P4 | `make test-tools` in CI + goldens for font2snes / img2snes | G4 | M | M | `lint.yml:179` → `make test-tools`; new `tests/run_golden.py` modelled on gfx4snes's |
+| P4 | `make test-tools` in CI + goldens for font2snes / img2snes | G4 | M | M | **done 2026-09-14** — `tools/font2snes/tests` (3 cases: 2bpp, 4bpp, C header; synthetic 96-glyph sheet) and `tools/img2snes/tests` (2 cases: 16 colours, 4 colours rounded to BGR555; synthetic RGB gradient); `make test-tools` covers all eight tools and the CI job `tools-golden` runs that target instead of a hand-listed pair (six tools were CI-blind) |
+
 | P5 | Wire or delete orphans | G7 | S | L | `devtools/test_asset_budget.py` → the lint unit-test job or delete; `devtools/benchrom/` → consumed by R4 or artefacts ignored |
 | P6 | Supply-chain hygiene | G26 G27 | S | L | `.github/dependabot.yml` (github-actions), SHA-pin actions, `.editorconfig` |
 | P7 | Doxygen warnings gate | G25 | S | L | count current warnings, then `WARN_AS_ERROR = FAIL_ON_WARNINGS` in `docs/Doxyfile` |
