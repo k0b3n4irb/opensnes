@@ -66,9 +66,14 @@ typedef s16 fixed;
  * @code
  * fixed pos = FIX(50);   // 50.0 in fixed-point
  * fixed half = FIX(1) / 2;  // 0.5
+ * fixed back = FIX(-3);  // -3.0
  * @endcode
+ *
+ * @note The shift is done unsigned: `(-3) << 8` is undefined in C and the
+ *   build's clang pre-pass rejects it, so the value goes through u16 and
+ *   back. Same bits, same code, no diagnostic for a negative argument.
  */
-#define FIX(x) ((fixed)((x) << 8))
+#define FIX(x) ((fixed)(s16)((u16)(x) << 8))
 
 /**
  * @brief Convert fixed-point to integer (truncate)

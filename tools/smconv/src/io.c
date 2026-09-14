@@ -88,7 +88,7 @@ void io_write_ascii(io_file_t *f, const char *str)
 void io_write_asciif(io_file_t *f, const char *str, int length)
 {
     int i;
-    for (i = 0; str[i] && i < length; i++)
+    for (i = 0; i < length && str[i]; i++)
         io_write8(f, str[i]);
     for (; i < length; i++)
         io_write8(f, 0);

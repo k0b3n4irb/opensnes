@@ -9,7 +9,8 @@ return value that doesn't change pixels.
 
 Vectors covered (see main.c):
   - math: div16/mod16 (incl. divisor-0 contract and the 65535/1 worst
-    case of the old O(quotient) loop), mul16, sqrt16
+    case of the old O(quotient) loop), mul16, sqrt16, fixMul/fixDiv/fixLerp
+    and fix32Mul/fix32Div (L2b)
   - text: cursor_y wrap — the tilemapBuffer overflow guard
 """
 from __future__ import annotations
@@ -40,6 +41,12 @@ CASES = [
     ("r_nmi_div",  2, 4714),   # 33000/7 in the callback — 8-bit-divisor (hardware) path pre-fix
     ("r_nmi_mod",  2, 2),      # 33000%7 in the callback
     ("r_sqrt",     2, 12),
+    # fixed-point helpers (L2b, 2026-09-14): signs, fractions, zero divisor
+    ("r_fmul_a",    2, 0x0100), ("r_fmul_neg",  2, 0xFA00), ("r_fmul_frac", 2, 0x0240), ("r_fmul_nn", 2, 0x0100),
+    ("r_fdiv_a",    2, 5120),   ("r_fdiv_frac", 2, 64),     ("r_fdiv_neg",  2, 0xFD00), ("r_fdiv_zero", 2, 0),
+    ("r_lerp_mid",  2, 12800),  ("r_lerp_t0",   2, 2560),   ("r_lerp_down", 2, 3840),   ("r_lerp_t255", 2, 25500),
+    ("r_f32mul",    4, 0x00060000), ("r_f32mul_n", 4, 0xFFFA0000), ("r_f32mul_f", 4, 0x00024000),
+    ("r_f32div",    4, 0x00030000), ("r_f32div_n", 4, 0xFFFD0000), ("r_f32div_f", 4, 0x00004000), ("r_f32div_r", 4, 0x00005555),
     ("r_rmw_u8",      2, 200),
     ("r_anim_loop",   2, 10),
     ("r_anim_once",   2, 6),

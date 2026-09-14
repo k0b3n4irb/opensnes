@@ -6,7 +6,8 @@
  * return value or a bounds guard; only an execution check can.
  *
  * Current coverage:
- *   - math: div16/mod16 (bounded long division), mul16, sqrt16
+ *   - math: div16/mod16 (bounded long division), mul16, sqrt16,
+ *     fixMul/fixDiv/fixLerp (8.8) and fix32Mul/fix32Div (16.16) — L2b
  *   - text: cursor_y wrap — printing past row 31 must wrap to row 0
  *     instead of writing past tilemapBuffer[2048] into the RAM sections
  *     that follow it (text_config is the first casualty pre-fix)
@@ -21,6 +22,7 @@
 #include <snes/math.h>
 #include <snes/text.h>
 #include <snes/audio.h>
+#include <snes/fixed32.h>
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -30,6 +32,32 @@ u16 r_div_zero; /* div16(42, 0)     -> 0 (documented contract) */
 u16 r_mod_zero; /* mod16(42, 0)     -> 0 (documented contract) */
 u16 r_mul;      /* mul16(123, 45)   -> 5535 */
 u16 r_sqrt;     /* sqrt16(144)      -> 12 */
+
+/* --- fixed-point vectors (gaps review L2b, 2026-09-14): fixMul, fixDiv,
+ * fixLerp (8.8) and fix32Mul, fix32Div (16.16) had no runtime assert —
+ * the a7 / c_features ROMs prove the compiler's arithmetic, these prove
+ * the lib's. Signs, fractions and the documented zero-divisor contract. */
+u16 r_fmul_a;    /* fixMul(FIX(2), 128)         -> 1.0  = 0x0100 */
+u16 r_fmul_neg;  /* fixMul(FIX(-3), FIX(2))     -> -6.0 = 0xFA00 */
+u16 r_fmul_frac; /* fixMul(1.5, 1.5)            -> 2.25 = 0x0240 */
+u16 r_fmul_nn;   /* fixMul(FIX(-1), FIX(-1))    -> 1.0  = 0x0100 */
+u16 r_fdiv_a;    /* fixDiv(FIX(100), FIX(5))    -> 20.0 = 5120 */
+u16 r_fdiv_frac; /* fixDiv(FIX(1), FIX(4))      -> 0.25 = 64 */
+u16 r_fdiv_neg;  /* fixDiv(FIX(-6), FIX(2))     -> -3.0 = 0xFD00 */
+u16 r_fdiv_zero; /* fixDiv(FIX(7), 0)           -> 0 (documented contract) */
+u16 r_lerp_mid;  /* fixLerp(FIX(0), FIX(100), 128) -> 50.0 = 12800 */
+u16 r_lerp_t0;   /* fixLerp(FIX(10), FIX(20), 0)   -> 10.0 = 2560 */
+u16 r_lerp_down; /* fixLerp(FIX(20), FIX(10), 128) -> 15.0 = 3840 (negative delta) */
+u16 r_lerp_t255; /* fixLerp(FIX(0), FIX(100), 255) -> 25600*255/256 = 25500 */
+u32 r_f32mul;    /* fix32Mul(FIX32(3), FIX32(2))   -> 6.0  = 0x00060000 */
+u32 r_f32mul_n;  /* fix32Mul(FIX32(-3), FIX32(2))  -> -6.0 = 0xFFFA0000 */
+u32 r_f32mul_f;  /* fix32Mul(1.5, 1.5)             -> 2.25 = 0x00024000 */
+u32 r_f32div;    /* fix32Div(FIX32(6), FIX32(2))   -> 3.0  = 0x00030000 */
+u32 r_f32div_n;  /* fix32Div(FIX32(-6), FIX32(2))  -> -3.0 = 0xFFFD0000 */
+u32 r_f32div_f;  /* fix32Div(FIX32(1), FIX32(4))   -> 0.25 = 0x00004000 */
+u32 r_f32div_r;  /* fix32Div(FIX32(1), FIX32(3))   -> 0x00005555 (65536/3 truncated) */
+static volatile fixed fx_half = 128, fx_15 = 0x0180;
+static volatile fixed32 f32_15 = 0x00018000l;
 
 /* --- NMI-context math vectors (#113) --- */
 /* The C operators below run inside an nmiSet callback, where the
@@ -186,6 +214,25 @@ int main(void) {
         r_audio_active = vs.active;
     }
 
+    r_fmul_a    = (u16)fixMul(FIX(2), fx_half);
+    r_fmul_neg  = (u16)fixMul(FIX(-3), FIX(2));
+    r_fmul_frac = (u16)fixMul(fx_15, fx_15);
+    r_fmul_nn   = (u16)fixMul(FIX(-1), FIX(-1));
+    r_fdiv_a    = (u16)fixDiv(FIX(100), FIX(5));
+    r_fdiv_frac = (u16)fixDiv(FIX(1), FIX(4));
+    r_fdiv_neg  = (u16)fixDiv(FIX(-6), FIX(2));
+    r_fdiv_zero = (u16)fixDiv(FIX(7), 0);
+    r_lerp_mid  = (u16)fixLerp(FIX(0), FIX(100), 128);
+    r_lerp_t0   = (u16)fixLerp(FIX(10), FIX(20), 0);
+    r_lerp_down = (u16)fixLerp(FIX(20), FIX(10), 128);
+    r_lerp_t255 = (u16)fixLerp(FIX(0), FIX(100), 255);
+    r_f32mul    = (u32)fix32Mul(FIX32(3), FIX32(2));
+    r_f32mul_n  = (u32)fix32Mul(FIX32(-3), FIX32(2));
+    r_f32mul_f  = (u32)fix32Mul(f32_15, f32_15);
+    r_f32div    = (u32)fix32Div(FIX32(6), FIX32(2));
+    r_f32div_n  = (u32)fix32Div(FIX32(-6), FIX32(2));
+    r_f32div_f  = (u32)fix32Div(FIX32(1), FIX32(4));
+    r_f32div_r  = (u32)fix32Div(FIX32(1), FIX32(3));
     r_div_a    = div16(100, 7);
     r_mod_a    = mod16(100, 7);
     r_div_max  = div16(65535, 1);

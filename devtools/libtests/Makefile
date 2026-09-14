@@ -4,7 +4,7 @@ TARGET   := libtest.sfc
 ROM_NAME := LIB RUNTIME TEST
 
 USE_LIB  := 1
-LIB_MODULES := console sprite dma background text math anim map audio
+LIB_MODULES := console sprite dma background text math anim map audio fixed32
 
 CSRC   := main.c
 ASMSRC := data.asm

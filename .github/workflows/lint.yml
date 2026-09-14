@@ -6,7 +6,7 @@ name: Lint
 #   lint            — `make lint`, verbatim: the aggregate every contributor runs
 #                     before a PR (doc drift, ASM markers, lib rodata, bank-read
 #                     self-test, corpus freshness, ASM ABI, VRAM layout, commit
-#                     messages). Add a new linter to the Makefile target, never
+#                     messages, cppcheck). Add a new linter to the Makefile target, never
 #                     to this file — a hand-listed subset here diverged from the
 #                     Makefile twice (three linters were CI-blind on 2026-09-11).
 #   devtools-tests  — the unit tests OF the linters (they exercise the parsers
@@ -71,6 +71,12 @@ jobs:
               echo "range=${BEFORE}..HEAD" >> "$GITHUB_OUTPUT"
             fi
           fi
+
+      - name: Install cppcheck
+        # `make lint` runs lint-cppcheck (gaps review H4): the asset tools'
+        # sources and the lib's C, vendored decoders suppressed. The target
+        # skips itself where cppcheck is absent; here it must gate.
+        run: sudo apt-get install -y -qq cppcheck >/dev/null && cppcheck --version
 
       - name: make lint
         # No build here: check_corpus_fresh.py passes trivially on a tree with

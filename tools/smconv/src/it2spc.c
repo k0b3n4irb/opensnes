@@ -284,8 +284,14 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
 
         #define ROWBUF_PUSH(val) do { \
             if (row_buf_size >= row_buf_cap) { \
+                u8 *grown; \
                 row_buf_cap = row_buf_cap ? row_buf_cap * 2 : 64; \
-                row_buf = realloc(row_buf, row_buf_cap); \
+                grown = realloc(row_buf, row_buf_cap); \
+                if (!grown) { \
+                    fprintf(stderr, "smconv: out of memory (pattern row buffer)\n"); \
+                    exit(1); \
+                } \
+                row_buf = grown; \
             } \
             row_buf[row_buf_size++] = (val); \
         } while(0)
@@ -610,8 +616,8 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
                     "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
                     " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
                     "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
-                    "     Echo region: [%5i bytes]\n"
-                    "           Total: [%5i bytes]   *%i bytes free* *%i bytes free with 1st module*\n",
+                    "     Echo region: [%5u bytes]\n"
+                    "           Total: [%5u bytes]   *%u bytes free* *%u bytes free with 1st module*\n",
                     pattsize, mod->length, max_length,
                     sampsize, mod->pattern_count, max_patterns,
                     instrsize, mod->instrument_count, max_instruments,
@@ -625,8 +631,8 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
                     "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
                     " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
                     "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
-                    "     Echo region: [%5i bytes]\n"
-                    "           Total: [%5i bytes]   *%i bytes free*\n",
+                    "     Echo region: [%5u bytes]\n"
+                    "           Total: [%5u bytes]   *%u bytes free*\n",
                     pattsize, mod->length, max_length,
                     sampsize, mod->pattern_count, max_patterns,
                     instrsize, mod->instrument_count, max_instruments,
@@ -856,8 +862,8 @@ spc_bank_t *spc_bank_create(const itl_bank_t *bank, bool hirom, bool chksfx)
 
     if (g_verbose) {
         printf("-----------------------------------------------------------------------\n");
-        printf("  Total Modules Size: [%6i bytes]\n", totabanksize);
-        printf("       Total IT Size: [%6i bytes]\n", totalitsize);
+        printf("  Total Modules Size: [%6u bytes]\n", totabanksize);
+        printf("       Total IT Size: [%6u bytes]\n", totalitsize);
         fflush(stdout);
     }
 
@@ -1043,7 +1049,7 @@ static void export_inc(const spc_bank_t *b, const char *output)
             fprintf(fp, "#define %-32s\t%i\n", b->modules[i]->id, i);
             char size_id[512];
             snprintf(size_id, sizeof(size_id), "%s_SIZE", b->modules[i]->id);
-            fprintf(fp, "#define %-32s\t%i\n", size_id, b->modules[i]->totalsize);
+            fprintf(fp, "#define %-32s\t%u\n", size_id, b->modules[i]->totalsize);
         }
     }
     fprintf(fp, "\n");

@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -107,6 +107,30 @@ lint-commits:
 lint-docs:
 	@python3 devtools/check_doc_drift.py
 
+# Static analysis of the host C (gaps review H4): the asset tools' own
+# sources and the lib's C. cppcheck needs no compile database, so it
+# gates on a recursive-make tree as is. Vendored decoders are suppressed
+# (lodepng, stb_image: upstream code with its own noise), gfx4snes's
+# version macros are supplied. The w65816 backend is checked advisory
+# only (upstream QBE idioms). First run found a dangling context pointer
+# in cmdparser (both copies), an uninitialised read in aseprite2snes and
+# the free-then-fatal paths cppcheck could not see were fatal (noreturn).
+# Skips with a note when cppcheck is not installed; CI installs it.
+lint-cppcheck:
+	@if ! command -v cppcheck >/dev/null 2>&1; then \
+		echo "lint-cppcheck: cppcheck not installed, skipped (CI runs it)"; \
+	else \
+		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
+			--suppress='*:tools/gfx4snes/src/lodepng.c' --suppress='*:tools/img2snes/src/lodepng.c' \
+			--suppress='*:tools/font2snes/src/stb_image.h' \
+			-DGFX4SNESVERSION='"x"' -DGFX4SNESDATE='"x"' -D__BUILD_DATE='"x"' -D__BUILD_VERSION='"x"' -DVERSION='"x"' \
+			-Itools/smconv/src tools/*/src \
+		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
+			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
+		&& { cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
+		&& echo "lint-cppcheck: OK"; \
+	fi
+
 # ASM ↔ C signature ABI consistency. Catches the class of bug that bit us
 # at chantier A6+A7 hdmaSetupBank: hand-written ASM reading a param at an
 # offset that contradicts the C signature's calling-convention layout.
@@ -129,6 +153,7 @@ lint: lint-docs
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
+	@$(MAKE) lint-cppcheck
 	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain
@@ -201,6 +226,8 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
 	@python3 devtools/link_modules.py
+	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
+	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
 

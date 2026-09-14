@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 9e2307c4efb61455c3962c76cad7725a677dee27 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 1422c17ec969ef057539b42f03c739775c3b5e3c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
 
@@ -73,7 +73,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 61 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 62 patches (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -85,6 +85,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1422c17 w65816: print unsigned temp ids with %u in the emitter's debug comments (cppcheck, review H4)
 9e2307c w65816: five fixes from the c_features runtime ROM (variable Kl shifts, signed compares with overflow, Kl compare fusion, jnz on Kl, sign extension vs ldy) and a refusal that names the feature
 d5484d4 amd64: no NULL + 0 over the argument class array of a call without arguments (UBSan on clang 18, upstream suite H1 on x86_64)
 fe42eac parse: keep the type table alive until the collected functions are emitted (upstream suite H1: use-after-free at pass 2 on every target but w65816)

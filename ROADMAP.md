@@ -273,6 +273,20 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ---
 
+## Work in flight
+
+None on a branch. The live plan is the backlog of the 2026-09-11 gaps
+review (`.claude/notes/reviews/2026-09-11_gaps_review.md`, §10–§11):
+Tier 1 shipped 2026-09-11..13, Tier 2 is in progress on `develop`
+directly, one item per commit. The `wip/*` policy (`CONTRIBUTING.md`)
+still applies to multi-day chantiers; the four `wip/*` branches that
+existed on 2026-09-14 were all superseded by commits already on
+`develop` (three CI hygiene branches of 2026-09-07, one test-harness
+branch of 2026-06-22) and were deleted that day. The luna side of the
+plan lives with the luna team: their queue and ours are in
+`~/opensnes_reports/` (owner-side), the pinned release in
+`tools/luna-test/luna.version`.
+
 ## Known limitations
 
 The full catalog with severity tags lives in

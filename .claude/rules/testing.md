@@ -28,7 +28,8 @@ change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
 suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and
 runs inside the sanitizer job. A regression or an XPASS fails it.
-`make test-link-modules` links every lib module alone with only the
+`make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
+where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the
 dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
 all-together groups; a module that needs a symbol from a module it does
 not declare fails here instead of in a user's project. Runs in
