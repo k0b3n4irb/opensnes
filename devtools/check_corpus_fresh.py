@@ -39,8 +39,13 @@ def newest_mtime(*globs: str) -> tuple[float, Path | None]:
 
 
 def main() -> int:
+    # Toolchain timestamps come from the submodule build trees, not bin/:
+    # every top-level make re-copies bin/ (the install step is unconditional),
+    # so bin/ says when the toolchain was last installed, not built.
     lib_m, lib_f = newest_mtime("lib/build/**/*.o", "lib/build/**/*.asm",
-                                "bin/cc65816", "bin/qbe", "bin/wla-65816")
+                                "compiler/qbe/qbe", "compiler/cproc/cproc-qbe",
+                                "compiler/wla-dx/binaries/wla-65816",
+                                "compiler/wla-dx/binaries/wlalink")
     if lib_m == 0.0:
         print("corpus-fresh: no lib build outputs found — build the SDK first")
         return 0

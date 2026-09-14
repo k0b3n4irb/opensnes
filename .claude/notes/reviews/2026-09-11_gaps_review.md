@@ -618,7 +618,8 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 | H3 | ASan/UBSan job on Linux | G11 | M | **H** | **done 2026-09-12** — `make test-sanitizers` (`SANITIZE=1` knob in `compiler/Makefile` and the nine `tools/*/Makefile`), CI job `sanitizers` in `lint.yml`; the first run found **seven bugs in five programs**: wla-65816 read one byte before its token buffer on every one-character label inside a macro (`-:` in snesmod.asm), wlalink `READ_T` shifted a byte >= 128 into the sign bit, QBE `memset` on a NULL temporary table, smconv stored `int` through `(int *)` casts of two `u16` fields (little-endian-only by accident) and shifted negative samples in the BRR encoder, wav2brr shifted a negative 8-bit sample, tmx2snes computed `offsetof` through a null pointer. All behaviour-neutral (byte-identical corpus). The CI runs on ubuntu-24.04's clang 18 then added two more that clang 22 and gcc 16 no longer report: cproc formed NULL + 0 over empty growable arrays (`arrayforeach`, `emitfunc`, `arrayadd`) and tmx2snes shifted `0xFF << 24` as an int — nine findings in six programs; the CI compiler is reproduced locally with `podman run ubuntu:24.04` when a report does not show on the host. The Windows-only UBSan step is retired. §4 Sanitizers was the design |
 | H4 | Static analysis with cppcheck | G12 | S | M | **done 2026-09-14** — `make lint-cppcheck` (in `make lint`, cppcheck installed in the CI lint job): tools' sources and lib C gate, lodepng / stb_image suppressed, w65816 advisory. First run: a dangling context pointer in cmdparser (`ctx = &default_ctx` from a block-local, both vendored copies), an uninitialised `ticks[0]` for a frameless tag in aseprite2snes, gfx4snes's free-then-`fatal` paths read as double frees until `fatal` was declared noreturn (also gives it printf format checking) |
 
-| H5 | Fuzzing the asset parsers | G13 | M (lodepng + IT) / L (all) | M | §4 Fuzzing |
+| H5 | Fuzzing the asset parsers | G13 | M (lodepng + IT) / L (all) | M | **done 2026-09-14 (lodepng + IT loader; the rest is Tier 3)** — `tools/fuzz/`: libFuzzer harnesses under ASan+UBSan for lodepng (`lodepng_decode32`, the path gfx4snes and img2snes take) and smconv's `itl_module_create` (fed through a tmpfs file, it has no memory API); seeds are the golden fixtures; `make fuzz FUZZ_SECONDS=N`, nightly `fuzz.yml` at 600 s per target, `make fuzz-replay` in the sanitizer job runs the committed inputs under `tools/fuzz/crashes/`. **First 90 s: lodepng 6.6 M executions clean; the IT loader fell on its 9th input** — `itl_sample_load_data` allocated `length × 2` bytes with `length` read from the header (a 3.7 GB malloc). Bounded by the bytes left in the file (`io_remaining`), warning on truncation; the input is the first regression file. Also caught my own recipe masking the fuzzer's exit status behind `tail` |
+
 | H6 | Valgrind only on static release binaries, else delete the supp | G14 | S | L | §4 Valgrind |
 | H7 | Host coverage report (llvm-cov) | owner request | M | M | §4 Coverage |
 | H8 | `tools/common/` for lodepng + cmdparser | open note | S | M | move the duplicated `lodepng.c/h`, `cmdparser.h` out of gfx4snes / img2snes; one fuzz target follows |
@@ -679,7 +680,8 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 
 | id | title | gaps | eff | rel | first step |
 |---|---|---|---|---|---|
-| RAG1 | Missing-sources list handed to the owner | K7 (corpus side) | S (the list) | M | §9, verbatim; ingestion is the owner's |
+| RAG1 | Missing-sources list handed to the owner | K7 (corpus side) | S (the list) | M | **done 2026-09-11/12** — handed over as `opensnes_report_snes-rag_2026-09-11.md` and validated in `opensnes_report_snes-rag_2026-09-12_validation.md` (owner-side, `~/opensnes_reports/`); the corpus note in the repo is D6 |
+
 
 ---
 

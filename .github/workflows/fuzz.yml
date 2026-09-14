@@ -1,0 +1,36 @@
+name: Fuzz
+
+# Nightly libFuzzer session on the asset parsers (gaps review H5): lodepng
+# (the PNG decoder gfx4snes and img2snes vendor) and smconv's Impulse
+# Tracker loader, each for ten minutes under ASan + UBSan from the golden
+# fixtures. A crash fails the run and uploads the input; the fix commits it
+# under tools/fuzz/crashes/<target>/, which `make fuzz-replay` runs on every
+# push inside the sanitizer job, so a found bug stays fixed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: seconds per target
+        default: "600"
+  schedule:
+    - cron: '30 3 * * *'   # nightly, 03:30 UTC
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out OpenSNES
+        uses: actions/checkout@v5
+
+      - name: Fuzz the parsers
+        run: make fuzz FUZZ_SECONDS=${{ github.event.inputs.seconds || '600' }}
+
+      - name: Upload crashing inputs
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: fuzz-crashes
+          path: tools/fuzz/corpus/*/crash-*
+          if-no-files-found: ignore

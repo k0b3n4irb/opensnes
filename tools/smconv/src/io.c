@@ -120,6 +120,18 @@ u32 io_tell(io_file_t *f)
     return 0;
 }
 
+u32 io_remaining(io_file_t *f)
+{
+    if (!f->is_open || !f->fp)
+        return 0;
+    long here = ftell(f->fp);
+    if (here < 0 || fseek(f->fp, 0, SEEK_END) != 0)
+        return 0;
+    long end = ftell(f->fp);
+    fseek(f->fp, here, SEEK_SET);
+    return end > here ? (u32)(end - here) : 0;
+}
+
 bool io_file_exists(const char *filename)
 {
     FILE *fp = fopen(filename, "rb");

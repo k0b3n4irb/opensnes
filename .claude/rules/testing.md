@@ -28,7 +28,10 @@ change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
 suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and
 runs inside the sanitizer job. A regression or an XPASS fails it.
-`make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
+`make fuzz` runs the libFuzzer harnesses of `tools/fuzz/` (lodepng, the
+IT loader) for `FUZZ_SECONDS` each; the nightly `fuzz.yml` gives them ten
+minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
+crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
 where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the
 dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
 all-together groups; a module that needs a symbol from a module it does
