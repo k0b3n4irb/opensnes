@@ -252,11 +252,13 @@ INCLUDED_BY_GRAPH      = NO
 
 QUIET                  = NO
 WARNINGS               = YES
-# Warnings are errors (gaps review P7, 2026-09-15): the count reached 0 once
-# `MARKDOWN_ID_STYLE = GITHUB` resolved the GitHub-style `#anchor` links the
-# docs use, the seven `demo.gif` names became unique, and the two undefined
-# groups got a @defgroup. A new warning fails `make docs` and the doc-render job.
-WARN_AS_ERROR          = FAIL_ON_WARNINGS
+# Warnings are errors only in `make docs-strict` (gaps review P7, 2026-09-15),
+# which the doc-render CI job runs: Linux, pinned Doxygen 1.16.1, CSS submodule
+# checked out. The count reached 0 there once `MARKDOWN_ID_STYLE = GITHUB`
+# resolved the GitHub-style `#anchor` links the docs use, the seven `demo.gif`
+# names became unique, and the two undefined groups got a @defgroup. It is not
+# set here because `release` depends on `docs`: a Windows-only path quirk in
+# Doxygen's directory links must not break a release build.
 # Heading ids GitHub-style, so `[text](#my-heading)` links written for GitHub
 # resolve inside Doxygen too (they were 39 of the 56 warnings).
 MARKDOWN_ID_STYLE      = GITHUB

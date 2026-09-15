@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -437,8 +437,13 @@ asset-budget:
 bench:
 	@python3 devtools/cyclecount/bench.py
 
+# DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
+# errors. It is NOT the default: `release` depends on `docs`, and Doxygen
+# resolves some directory links differently on Windows, so a doc warning must
+# not be able to block a release build on another platform (it did, on the
+# first push of the gaps-review P7 gate).
 docs:
-	cd docs && doxygen Doxyfile
+	cd docs && { cat Doxyfile; $(if $(DOXY_STRICT),echo "WARN_AS_ERROR = FAIL_ON_WARNINGS";) } | doxygen -
 	@# The showcase landing page is the site's front door. Doxygen emits the
 	@# documentation hub (mainpage.md) as index.html; preserve it as
 	@# documentation.html, then install the showcase as the root index.html.
@@ -452,6 +457,11 @@ docs:
 	@echo "  index.html         -> showcase landing (docs/landing/index.html)"
 	@echo "  documentation.html -> Doxygen docs hub (mainpage.md)"
 	@echo "========================================="
+
+# The P7 gate: the same build with warnings as errors, run by the doc-render
+# job on Linux with the pinned Doxygen and the CSS submodule checked out.
+docs-strict: DOXY_STRICT := 1
+docs-strict: docs
 
 #------------------------------------------------------------------------------
 # Release packaging

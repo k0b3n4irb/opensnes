@@ -20,6 +20,7 @@ python3 tools/luna-test/audio_regress.py            # APU output hashed for four
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
 make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)
+make docs-strict                                     # Doxygen with warnings as errors (the doc-render job); plain `make docs` stays non-fatal so a doc warning cannot block a release build
 ```
 
 The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,

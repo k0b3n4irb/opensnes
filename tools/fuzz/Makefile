@@ -68,11 +68,14 @@ run: all $(addprefix corpus/,$(FUZZERS))
 	@echo "fuzz: OK (no crash in $(FUZZ_SECONDS)s per target)"
 
 replay: all
+	@mkdir -p corpus
 	@fail=0; for t in $(FUZZERS); do \
 		n=$$(ls crashes/$$t 2>/dev/null | wc -l); \
 		if [ $$n -gt 0 ]; then \
-			ASAN_OPTIONS=detect_leaks=0 ./fuzz_$$t -runs=0 crashes/$$t >/dev/null 2>&1 \
-				|| { echo "REPLAY FAIL: $$t"; fail=1; }; \
+			ASAN_OPTIONS=detect_leaks=0 ./fuzz_$$t -runs=0 crashes/$$t > corpus/replay_$$t.log 2>&1 \
+				|| { echo "REPLAY FAIL: $$t"; \
+				     grep -E "runtime error|ERROR:|SUMMARY|READ of|WRITE of" corpus/replay_$$t.log | head -6; \
+				     fail=1; }; \
 		fi; echo "replay $$t: $$n regression input(s)"; \
 	done; [ $$fail -eq 0 ] && echo "fuzz-replay: OK"
 

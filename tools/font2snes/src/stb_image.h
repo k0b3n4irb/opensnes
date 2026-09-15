@@ -1665,9 +1665,10 @@ static void stbi__skip(stbi__context *s, int n)
 #else
 static int stbi__getn(stbi__context *s, stbi_uc *buffer, int n)
 {
-   // OpenSNES: a zero-length read may arrive with a NULL buffer (an empty
-   // IDAT chunk); memcpy(NULL, p, 0) is undefined behaviour and UBSan stops
-   // on it (fuzz harness, 2026-09-15). Nothing to read, nothing to do.
+   // OpenSNES: nothing to read, nothing to do — and never hand memcpy a
+   // NULL buffer with a zero count, which is undefined behaviour. The PNG
+   // path that reached this is guarded at its own call site; this covers
+   // the TGA and HDR callers too (fuzz harness, 2026-09-15).
    if (n <= 0) return 1;
    if (s->io.read) {
       int blen = (int) (s->img_buffer_end - s->img_buffer);
@@ -5195,7 +5196,13 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
                p = (stbi_uc *) STBI_REALLOC_SIZED(z->idata, idata_limit_old, idata_limit); if (p == NULL) return stbi__err("outofmem", "Out of memory");
                z->idata = p;
             }
-            if (!stbi__getn(s, z->idata+ioff,c.length)) return stbi__err("outofdata","Corrupt PNG");
+            // OpenSNES: an empty IDAT chunk skips the allocation above, so
+            // `z->idata + ioff` computes NULL + 0 — undefined behaviour that
+            // clang 18 reports and clang 22 does not (fuzz harness,
+            // 2026-09-15). There is nothing to read for a zero-length chunk.
+            if (c.length) {
+               if (!stbi__getn(s, z->idata+ioff,c.length)) return stbi__err("outofdata","Corrupt PNG");
+            }
             ioff += c.length;
             break;
          }
