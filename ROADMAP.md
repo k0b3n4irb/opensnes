@@ -270,14 +270,21 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] **Mode 7 game example** — `examples/games/mode7_racing` and
       `examples/games/mode7_flying` (both shipped; luna manifests).
 - [ ] **Gaps-review backlog** — the prioritised list in
-      `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b) is
-      the working plan: Tier 1 and Tier 2 shipped 2026-09-12/15
-      (CI runs `make tests` and `make lint` verbatim, sanitizers,
-      cppcheck, fuzzing, upstream suites, lib link smoke, the
-      C-feature runtime ROM, fixed-point asserts). Tier 3 is grouped in
-      four lots (§11b): docs/notes hygiene, lib asserts + compiler-test
-      ratchet + PAL/audio passes, CI hygiene + host coverage +
-      per-frame NMI budget, then the long-tail docs.
+      `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b).
+      Tiers 1 and 2 shipped 2026-09-12/15; Tier 3's four lots shipped
+      2026-09-15. Delivered along the way: CI runs `make tests` and
+      `make lint` verbatim, host sanitizers, cppcheck, fuzzing of every
+      asset parser, the three upstream toolchain suites, a per-module
+      link smoke test, the C-feature and fixed-point runtime ROMs,
+      runtime asserts for collision / SRAM / IRQ / window / region, an
+      audio-output hash, a weekly PAL pass, nightly luna bench, host
+      coverage reporting, SHA-pinned actions, a Doxygen warning gate,
+      and the migration, FAQ, profiling and index docs.
+      **Two entries stay open**: R4 (the VBlank time budget) waits on
+      luna folding the NMI handler's child profile rows into their
+      parent, and R7 has covered the seven games plus
+      `input/move_sprite` — the remaining interactive manifests, the
+      multitap path and mouse sensitivity are still to do.
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
 - [ ] **Original-game release**
