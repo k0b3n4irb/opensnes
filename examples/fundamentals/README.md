@@ -8,7 +8,7 @@ hardware registers — so you can see exactly what the machine is doing.
 Read the API-first version in its topic family first; come here when you want
 to understand what that module hides.
 
-## Examples
+## Example ROMs
 
 | Example | Demystifies | Description |
 |---------|-------------|-------------|

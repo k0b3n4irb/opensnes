@@ -22,14 +22,14 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Check out OpenSNES
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Fuzz the parsers
         run: make fuzz FUZZ_SECONDS=${{ github.event.inputs.seconds || '600' }}
 
       - name: Upload crashing inputs
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: fuzz-crashes
           path: tools/fuzz/corpus/*/crash-*

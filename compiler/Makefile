@@ -87,6 +87,16 @@ endif
 # statically, so the static flags give way to the sanitizer link flags;
 # -O1 replaces -O2 for readable reports. Rebuild from clean: the objects
 # are not flag-tracked.
+# COVERAGE=1: clang source-based coverage build of QBE and cproc-qbe (the
+# host coverage report, `make coverage-host`, gaps review H7). Profiles land
+# where LLVM_PROFILE_FILE points; llvm-profdata/llvm-cov read them back.
+# Same caveats as SANITIZE: not static, rebuild from clean afterwards.
+ifeq ($(COVERAGE),1)
+    COV_FLAGS := -fprofile-instr-generate -fcoverage-mapping
+    STATIC_LDFLAGS := $(COV_FLAGS)
+    QBE_CFLAGS   := $(filter-out -O2,$(QBE_CFLAGS)) -O0 $(COV_FLAGS)
+    CPROC_CFLAGS := $(filter-out -O2,$(CPROC_CFLAGS)) -O0 $(COV_FLAGS)
+endif
 ifeq ($(SANITIZE),1)
     SAN_FLAGS := -fsanitize=address,undefined -fno-omit-frame-pointer
     STATIC_LDFLAGS := $(SAN_FLAGS)

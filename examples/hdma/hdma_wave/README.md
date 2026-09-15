@@ -4,7 +4,7 @@
 > Press A to toggle, D-pad to control amplitude and animation.
 > This is the same trick used for water reflections in Chrono Trigger.
 
-![Demo](demo.gif)
+![Demo](hdma_wave_demo.gif)
 
 ![Screenshot](hdma_wave.png)
 

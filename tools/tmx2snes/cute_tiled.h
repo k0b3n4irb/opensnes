@@ -1328,6 +1328,7 @@ struct cute_tiled_map_internal_t
 {
 	char* in;
 	char* end;
+	char* input_copy;   // OpenSNES: NUL-terminated copy of the caller's bytes
 	cute_tiled_map_t map;
 	strpool_embedded_t strpool;
 	void* mem_ctx;
@@ -1428,21 +1429,36 @@ static int cute_tiled_isspace(char c)
 
 static char cute_tiled_peak(cute_tiled_map_internal_t* m)
 {
-	while (cute_tiled_isspace(*m->in)) m->in++;
-	return *m->in;
+	// OpenSNES: bound every read by m->end. `m->in` is the caller's buffer
+	// (no copy, no NUL terminator, see cute_tiled_map_internal_alloc_internal),
+	// so a map ending in whitespace ran straight off it — heap-buffer-overflow,
+	// found by the fuzz harness 2026-09-15. At the end the parse falls into
+	// CUTE_TILED_CRASH() via the next next()/expect(), i.e. the error path.
+	while (m->in < m->end && cute_tiled_isspace(*m->in)) m->in++;
+	return m->in < m->end ? *m->in : 0;
 }
 
+// OpenSNES: overridable (upstream traps unconditionally). tmx2snes defines
+// it to print a message and exit; the fuzz harness longjmps out of the
+// parse so libFuzzer hunts memory bugs instead of the intended traps.
+#ifndef CUTE_TILED_CRASH
 #ifdef __clang__
     #define CUTE_TILED_CRASH() __builtin_trap()
 #else
     #define CUTE_TILED_CRASH() *(int*)0 = 0
 #endif
+#endif
 
 static char cute_tiled_next(cute_tiled_map_internal_t* m)
 {
 	char c;
-	if (m->in == m->end) CUTE_TILED_CRASH();
-	while (cute_tiled_isspace(c = *m->in++));
+	// OpenSNES: test the bound on every iteration. The original tested
+	// `in == end` once and then skipped whitespace unbounded (same overflow
+	// as cute_tiled_peak above).
+	do {
+		if (m->in == m->end) CUTE_TILED_CRASH();
+		c = *m->in++;
+	} while (cute_tiled_isspace(c));
 	return c;
 }
 
@@ -1468,7 +1484,7 @@ static int cute_tiled_try(cute_tiled_map_internal_t* m, char expect)
 #define cute_tiled_expect(m, expect) \
 	do { \
 		static char error[128]; \
-		CUTE_TILED_SNPRINTF(error, sizeof(error), "Found unexpected token '%c', expected '%c' (is this a valid JSON file?).", *m->in, expect); \
+		CUTE_TILED_SNPRINTF(error, sizeof(error), "Found unexpected token '%c', expected '%c' (is this a valid JSON file?).", (m)->in < (m)->end ? *(m)->in : '?', expect); \
 		CUTE_TILED_CHECK(cute_tiled_next(m) == (expect), error); \
 	} while (0)
 
@@ -1849,10 +1865,13 @@ cute_tiled_err:
 
 int cute_tiled_skip_until_after_internal(cute_tiled_map_internal_t* m, char c)
 {
-	while (*m->in != c) {
+	// OpenSNES: stop at the end of the buffer instead of scanning forever
+	// when `c` never appears (the terminator alone does not stop this loop).
+	while (m->in < m->end && *m->in != c) {
 		cute_tiled_error_line += *m->in == '\n';
 		m->in++;
 	}
+	CUTE_TILED_CHECK(m->in < m->end, "Unexpected end of file while skipping to a token.");
 	cute_tiled_expect(m, c);
 	return 1;
 
@@ -2906,6 +2925,7 @@ static void cute_tiled_free_map_internal(cute_tiled_map_internal_t* m)
 		page = next;
 	}
 
+	if (m->input_copy) CUTE_TILED_FREE(m->input_copy, m->mem_ctx);   // OpenSNES
 	CUTE_TILED_FREE(m, m->mem_ctx);
 }
 
@@ -2931,7 +2951,21 @@ static cute_tiled_map_internal_t* cute_tiled_map_internal_alloc_internal(void* m
 	strpool_embedded_config_t config;
 	cute_tiled_map_internal_t* m = (cute_tiled_map_internal_t*)CUTE_TILED_ALLOC(sizeof(cute_tiled_map_internal_t), mem_ctx);
 	CUTE_TILED_MEMSET(m, 0, sizeof(cute_tiled_map_internal_t));
-	m->in = (char*)memory;
+	// OpenSNES: parse a NUL-terminated COPY of the caller's bytes. The
+	// original pointed `in`/`end` straight at the caller's buffer, which is
+	// not terminated, and the parser reads past `end` in several places by
+	// design: the `cute_tiled_expect` message formats `*m->in` before any
+	// bounds check, single-char peeks (`if (*m->in == '"')`) are unguarded,
+	// and CUTE_TILED_STRTOULL / STRTOD scan until a non-digit. Two
+	// heap-buffer-overflows out of this class were found by the fuzz
+	// harness on 2026-09-15; the terminator closes all of them at once.
+	// The copy is freed by cute_tiled_free_map_internal, the single teardown
+	// used by both the error path and cute_tiled_free_map.
+	if (size_in_bytes < 0) size_in_bytes = 0;
+	m->input_copy = (char*)CUTE_TILED_ALLOC(size_in_bytes + 1, mem_ctx);
+	if (size_in_bytes) CUTE_TILED_MEMCPY(m->input_copy, memory, (size_t)size_in_bytes);
+	m->input_copy[size_in_bytes] = 0;
+	m->in = m->input_copy;
 	m->end = m->in + size_in_bytes;
 	m->mem_ctx = mem_ctx;
 	m->page_size = 1024 * 10;

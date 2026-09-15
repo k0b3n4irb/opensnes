@@ -1,6 +1,6 @@
 # Mode 7 -- Rotation and Scaling
 
-![Demo](demo.gif)
+![Demo](rotate_scale_demo.gif)
 
 ![Screenshot](rotate_scale.png)
 

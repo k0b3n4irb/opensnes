@@ -155,6 +155,13 @@ def capture_frames(key: str, manifest: dict) -> list[int]:
     return frame_points(manifest["examples"].get(key, {}).get("frames", manifest["default_frames"]))
 
 
+def res_args(key: str, manifest: dict) -> list[str]:
+    """`--native-res` for examples whose manifest entry sets `native_res = true`
+    (gaps review R8): hi-res modes 5/6 and interlace keep their 512×448
+    subpixels/fields in the screenshot and the fbhash instead of the averaged
+    256×224 view — a broken second subpixel column would otherwise blend away."""
+    return ["--native-res"] if manifest["examples"].get(key, {}).get("native_res") else []
+
 
 def example_key(rom: Path) -> str:
     """Example path relative to examples/ (the dir holding main.c)."""
@@ -210,7 +217,7 @@ def sha256_file(path: Path) -> str:
 
 
 def render(luna: str, rom: Path, frame: int, out_png: Path, *,
-           steps: int | None = None) -> tuple[str, bool]:
+           steps: int | None = None, extra: list[str] | None = None) -> tuple[str, bool]:
     """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
 
     `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
@@ -229,7 +236,7 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
     proc = subprocess.run(
         [luna, "run", *(["-n", str(steps)] if steps is not None
                         else ["--until-frame", str(frame)]),
-         *power_on_args(), *region_args(),
+         *power_on_args(), *region_args(), *(extra or []),
          "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
@@ -285,7 +292,7 @@ def run(update: bool, only: str | None) -> int:
             hashes, wdm_any = [], False
             for i, frame in enumerate(points):
                 png = _png_for(BASELINE_DIR, label, frame, i == 0)
-                fbhash, wdm = render(luna, rom, frame, png)
+                fbhash, wdm = render(luna, rom, frame, png, extra=res_args(key, manifest))
                 hashes.append(fbhash)
                 wdm_any = wdm_any or wdm
             if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
@@ -318,7 +325,7 @@ def run(update: bool, only: str | None) -> int:
             for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
                 actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
                 try:
-                    fbhash, wdm = render(luna, rom, frame, actual_png)
+                    fbhash, wdm = render(luna, rom, frame, actual_png, extra=res_args(key, manifest))
                 except RuntimeError as e:
                     err = str(e)
                     break
@@ -348,12 +355,13 @@ def run(update: bool, only: str | None) -> int:
     return 1 if failures else 0
 
 
-def render_state(luna: str, rom: Path, frame: int, png: Path) -> dict:
+def render_state(luna: str, rom: Path, frame: int, png: Path,
+                 extra: list[str] | None = None) -> dict:
     """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
     png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
         [luna, "state", "--until-frame", str(frame), *power_on_args(), *region_args(),
-         "--out", "-", "--screenshot", str(png), str(rom)],
+         *(extra or []), "--out", "-", "--screenshot", str(png), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0:
@@ -381,7 +389,7 @@ def coverage(luna: str) -> int:
         frame = max(capture_frames(key, manifest))
         png = out_dir / f"{key.replace('/', '_')}.png"
         try:
-            state = render_state(luna, rom, frame, png)
+            state = render_state(luna, rom, frame, png, extra=res_args(key, manifest))
         except Exception as e:  # noqa: BLE001 — bench-style panic-safety
             fail += 1
             rows.append((key, "FAIL", str(e)[:80]))

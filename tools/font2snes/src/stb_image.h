@@ -1665,6 +1665,10 @@ static void stbi__skip(stbi__context *s, int n)
 #else
 static int stbi__getn(stbi__context *s, stbi_uc *buffer, int n)
 {
+   // OpenSNES: a zero-length read may arrive with a NULL buffer (an empty
+   // IDAT chunk); memcpy(NULL, p, 0) is undefined behaviour and UBSan stops
+   // on it (fuzz harness, 2026-09-15). Nothing to read, nothing to do.
+   if (n <= 0) return 1;
    if (s->io.read) {
       int blen = (int) (s->img_buffer_end - s->img_buffer);
       if (blen < n) {

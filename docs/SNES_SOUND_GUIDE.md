@@ -41,7 +41,7 @@ The SNES audio system is completely **separate** from the main CPU:
 
 ## SPC700 CPU
 
-### Registers
+### SPC700 registers
 
 | Register | Size | Purpose |
 |----------|------|---------|

@@ -39,7 +39,9 @@ INPUT                  = mainpage.md \
                          hardware/ \
                          ../examples/ \
                          examples_group.md \
-                         ../CONTRIBUTING.md
+                         ../CONTRIBUTING.md \
+                         ../KNOWN_LIMITATIONS.md \
+                         API_INDEX.md
 
 # File patterns to process
 FILE_PATTERNS          = *.h *.md *.c
@@ -250,6 +252,16 @@ INCLUDED_BY_GRAPH      = NO
 
 QUIET                  = NO
 WARNINGS               = YES
+# Warnings are errors (gaps review P7, 2026-09-15): the count reached 0 once
+# `MARKDOWN_ID_STYLE = GITHUB` resolved the GitHub-style `#anchor` links the
+# docs use, the seven `demo.gif` names became unique, and the two undefined
+# groups got a @defgroup. A new warning fails `make docs` and the doc-render job.
+WARN_AS_ERROR          = FAIL_ON_WARNINGS
+# Heading ids GitHub-style, so `[text](#my-heading)` links written for GitHub
+# resolve inside Doxygen too (they were 39 of the 56 warnings).
+MARKDOWN_ID_STYLE      = GITHUB
+# Headings get anchors (levels 1-6) — without this no `#heading` link can resolve.
+TOC_INCLUDE_HEADINGS   = 6
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO

@@ -31,6 +31,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/* cute_tiled traps (SIGILL) on a truncated or malformed map by design; a
+ * CLI should say what happened instead. Found by the fuzz harness on an
+ * empty .tmj (gaps review H5, 2026-09-15). */
+static void tmx2snes_map_crash(void)
+{
+    fprintf(stderr, "tmx2snes: malformed or truncated Tiled JSON map (cute_tiled aborted the parse)\n");
+    exit(1);
+}
+#define CUTE_TILED_CRASH() tmx2snes_map_crash()
 #define CUTE_TILED_IMPLEMENTATION
 #include "cute_tiled.h"
 

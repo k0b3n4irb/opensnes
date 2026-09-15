@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -315,6 +315,53 @@ test-sanitizers:
 	$(SAN_ENV) $(MAKE) test-toolchain-suites
 	$(MAKE) -s fuzz-replay
 	@echo "SANITIZERS: OK — cproc-qbe, qbe, wla-dx and the asset tools ran the fixtures, the lib, the goldens, the corpus and the upstream suites without an ASan/UBSan report"
+
+# Host coverage of the compiler (gaps review H7): QBE and cproc-qbe rebuilt
+# with clang source-based coverage (COVERAGE=1), the compiler fixtures and
+# the lib build run through them, then llvm-cov reports line coverage —
+# the whole tree first, then the files this fork owns (the w65816 backend
+# and cproc's target/IR-emission side). A report, not a gate: the numbers
+# are the map of what the fixtures never reach. Leaves instrumented
+# binaries in bin/ — `make clean && make` afterwards.
+LLVM_PROFDATA ?= $(shell command -v llvm-profdata || command -v llvm-profdata-18 || ls /usr/lib64/llvm*/bin/llvm-profdata 2>/dev/null | tail -1)
+LLVM_COV      ?= $(shell command -v llvm-cov || command -v llvm-cov-18 || ls /usr/lib64/llvm*/bin/llvm-cov 2>/dev/null | tail -1)
+COV_DIR       := /tmp/opensnes_coverage
+coverage-host:
+	@test -n "$(LLVM_PROFDATA)" -a -n "$(LLVM_COV)" || { echo "coverage-host: llvm-profdata / llvm-cov not found (install llvm)"; exit 1; }
+	$(MAKE) -C $(COMPILER_PATH) clean
+	$(MAKE) -C $(LIB_PATH) clean
+	rm -rf $(COV_DIR) && mkdir -p $(COV_DIR)
+	$(MAKE) COVERAGE=1 compiler
+	LLVM_PROFILE_FILE=$(COV_DIR)/fixtures-%p.profraw python3 devtools/compiler-tests/run.py
+	LLVM_PROFILE_FILE=$(COV_DIR)/lib-%p.profraw $(MAKE) lib
+	$(LLVM_PROFDATA) merge -sparse $(COV_DIR)/*.profraw -o $(COV_DIR)/merged.profdata
+	$(LLVM_COV) report compiler/qbe/qbe -object compiler/cproc/cproc-qbe -instr-profile=$(COV_DIR)/merged.profdata > $(COV_DIR)/report_all.txt
+	$(LLVM_COV) report compiler/qbe/qbe -object compiler/cproc/cproc-qbe -instr-profile=$(COV_DIR)/merged.profdata \
+		-ignore-filename-regex='(cproc/(cpp|decl|expr|init|map|pp|scan|siphash|stmt|token|tree|util)\.c|qbe/(abi|alias|amd64|arm64|rv64|cfg|copy|fold|gcm|gvn|live|load|main|mem|parse|rega|simpl|spill|ssa|util)|test/)' > $(COV_DIR)/report_fork.txt
+	@echo "== coverage: fork-owned files (w65816 backend, cproc target side)"; cat $(COV_DIR)/report_fork.txt
+	@echo "== coverage: whole tree in $(COV_DIR)/report_all.txt"; tail -1 $(COV_DIR)/report_all.txt
+	$(LLVM_COV) export compiler/qbe/qbe -object compiler/cproc/cproc-qbe -instr-profile=$(COV_DIR)/merged.profdata -format=lcov > $(COV_DIR)/coverage.lcov
+	@echo "COVERAGE: reports in $(COV_DIR) (report_all.txt, report_fork.txt, coverage.lcov) — instrumented binaries left in bin/, run make clean && make"
+
+# luna bench over the whole corpus (gaps review R8): luna's own anomaly scan
+# — crashes, freezes, dead APU, missing firmware — with one markdown bug file
+# per finding. It wants a flat directory, so the ROMs are collected first.
+# Only a "bug" verdict fails the target; "suspect" is luna's word for a
+# screen that never changes while the CPU runs, which is what most examples
+# do on purpose (first run 2026-09-15: 28 ok, 0 bug, 57 suspect). The
+# report is the artifact to read. Nightly in luna-bench.yml; locally when a
+# luna release lands.
+BENCH_ROMS := /tmp/opensnes_bench_roms
+BENCH_OUT  := /tmp/opensnes_bench
+luna-bench:
+	@scripts/install-luna.sh
+	@rm -rf $(BENCH_ROMS) && mkdir -p $(BENCH_ROMS)
+	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
+		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
+		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
+	tools/luna-test/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
+	@ls $(BENCH_OUT); n=$$(ls $(BENCH_OUT)/*.md 2>/dev/null | grep -vc "report.md\|README"); \
+		echo "luna-bench: $$n bug file(s) under $(BENCH_OUT)"; [ "$$n" -eq 0 ]
 
 # The upstream test suites of the three toolchain submodules, run on the
 # fork's own binaries against known-fail ratchets (gaps review H1,

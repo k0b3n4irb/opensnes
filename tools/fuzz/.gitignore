@@ -1,3 +1,6 @@
 corpus/
 fuzz_lodepng
 fuzz_itloader
+fuzz_tiled
+fuzz_json
+fuzz_stbimage

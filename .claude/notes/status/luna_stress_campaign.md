@@ -394,3 +394,32 @@ over an unexplained rendering change is exactly what `testing.md` forbids.
   Workaround in the harness: keep `-n` for scripted-input runs (what
   `probes/lib.py` and the manifests do). Owner to validate, then file on
   `k0b3n4irb/luna` with the repro above.
+
+## Observation 2026-09-15 — `luna run --native-res --screenshot` writes the averaged 256×224 PNG
+
+Wiring the hi-res capture (gaps review R8) on `backgrounds/mode5_hires`:
+
+| command | fbhash | screenshot |
+|---|---|---|
+| `luna run --until-frame 200 --print-fbhash --screenshot x.png` | `5d0ad550c57d777e` | 256×224 |
+| `luna run --until-frame 200 --native-res --print-fbhash --screenshot x.png` | `aaf77640375cfea4` | **256×224** |
+| `luna state --until-frame 200 --native-res --screenshot x.png` | — | 512×448 |
+
+So `--native-res` reaches the **fbhash** under `luna run` (the hash changes, and
+that is the regression key the harness gates on) but not its `--screenshot`,
+while `luna state` honours it for both. The harness is therefore correct today
+— `baselines/backgrounds_mode5_hires.png` is simply the averaged view of a
+natively-hashed frame, which is confusing for a human diffing the PNG.
+
+**For the owner to validate before filing**: should `luna run --native-res`
+write the 512×448 PNG too, matching `luna state`? Nothing is blocked on it.
+
+## R4 still blocked (re-checked 2026-09-15 on v1.23.0)
+
+`luna profile` continues to report the NMI handler as five rows —
+`NmiHandler`, `NmiHandler@oam_done`, `NmiHandler@mp5_done`,
+`NmiHandler@dynamic_flush_done`, `NmiHandler@nmi_restore` — so
+`--budget NmiHandler=<mclk>` measures the entry stub only. Summing the
+children in the harness would be wrong (the per-frame *max* of a sum is not
+the sum of per-frame maxima), so the VBlank time budget waits on luna folding
+child labels into their parent. Request already with the owner.

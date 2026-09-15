@@ -165,7 +165,7 @@ int main(void) {
 
 The init order — `consoleInit` → `setMode` → DMAs → `bgSet*Ptr` →
 `setMainScreen` → `setScreenOn` — is the canonical pattern. See the
-[`new_example.md` rule](../../.claude/rules/new_example.md) for the
+[`new_example.md` rule](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/new_example.md) for the
 full checklist; getting it wrong produces a black screen or garbage
 on the first frame.
 
@@ -355,7 +355,7 @@ of VBlank budget).
   VRAM-during-active-display silent drop (🔴), VBlank DMA budget (🔴),
   bank `$00` overflow (🟢 caught at link time), WRAM data port NMI
   trap (🔴).
-- [`.claude/rules/bank0_budget.md`](../../.claude/rules/bank0_budget.md)
+- [`.claude/rules/bank0_budget.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/bank0_budget.md)
   — the bank `$00` ratchet that bites SUPERFREE spillover.
-- [`.claude/rules/nmi_audit.md`](../../.claude/rules/nmi_audit.md) —
+- [`.claude/rules/nmi_audit.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/nmi_audit.md) —
   what the NMI handler does with DMA channels 0 and 7 every frame.

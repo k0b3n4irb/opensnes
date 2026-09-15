@@ -18,6 +18,8 @@ python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the cha
 python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
 python3 tools/luna-test/audio_regress.py            # APU output hashed for four self-playing audio examples (luna --audio-out); baselines/audio.json
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
+make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
+make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)
 ```
 
 The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,
@@ -31,7 +33,7 @@ suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and
 runs inside the sanitizer job. A regression or an XPASS fails it.
 `make fuzz` runs the libFuzzer harnesses of `tools/fuzz/` (lodepng, the
-IT loader) for `FUZZ_SECONDS` each; the nightly `fuzz.yml` gives them ten
+IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; the nightly `fuzz.yml` gives them ten
 minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
 crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
 where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the

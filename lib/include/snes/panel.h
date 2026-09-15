@@ -1,4 +1,9 @@
 /**
+ * @defgroup ui UI
+ * @brief Opt-in user-interface helpers: 9-slice panels (panel.h).
+ */
+
+/**
  * @file panel.h
  * @brief Opt-in 9-slice panels — bordered boxes on a background layer.
  * @ingroup ui
@@ -66,7 +71,7 @@
 /**
  * @brief A 9-slice panel layer: one BG tilemap and the sheet to stamp from.
  *
- * The sheet is read in raster order from @ref base_tile:
+ * The sheet is read in raster order from `base_tile`:
  *
  *     base+0        base+1        base+2         <- top-left, top, top-right
  *     base+stride   base+stride+1 base+stride+2  <- left, centre, right

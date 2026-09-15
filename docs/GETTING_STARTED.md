@@ -305,7 +305,7 @@ make examples          # Rebuild examples only
 make -C examples/text/print_string  # Rebuild one example
 ```
 
-See [CLAUDE.md](../CLAUDE.md) for architecture details and coding conventions.
+See [CLAUDE.md](https://github.com/k0b3n4irb/opensnes/blob/develop/CLAUDE.md) for architecture details and coding conventions.
 
 ---
 
@@ -368,7 +368,7 @@ starting points:
 | SuperFX (GSU) | [tutorials/superfx.md](tutorials/superfx.md) |
 | Debugging | [tutorials/debugging.md](tutorials/debugging.md) |
 
-## Troubleshooting
+## Troubleshooting the setup
 
 ### "command not found: make"
 

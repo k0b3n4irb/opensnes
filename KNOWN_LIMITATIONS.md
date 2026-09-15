@@ -207,7 +207,7 @@ offsets read the wrong arguments — the first arg might be at offset 8,s instea
 of 6,s. The function compiles, links, and corrupts the stack at runtime.
 
 **Mitigation:** the full calling convention is documented in
-[`compiler/ABI.md`](compiler/ABI.md), with worked examples and a port checklist.
+[`compiler/ABI.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/compiler/ABI.md), with worked examples and a port checklist.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 

@@ -4,7 +4,7 @@ Full game implementations that combine multiple SNES subsystems: sprites, backgr
 input, scrolling, collision detection, and game state management. Study these after
 working through the individual topic examples.
 
-## Examples
+## Example ROMs
 
 | Example | Difficulty | Description |
 |---------|------------|-------------|
