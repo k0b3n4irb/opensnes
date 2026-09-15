@@ -35,6 +35,8 @@ INPUT                  = mainpage.md \
                          SNES_GRAPHICS_GUIDE.md \
                          SNES_SOUND_GUIDE.md \
                          TROUBLESHOOTING.md \
+                         FAQ.md \
+                         MIGRATING_FROM_PVSNESLIB.md \
                          THIRD_PARTY.md \
                          hardware/ \
                          ../examples/ \

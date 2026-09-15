@@ -1,0 +1,37 @@
+# Tetris is a state machine gated on START: stateTitle() spins until
+# KEY_START, then startGame() spawns the first piece and game_state goes
+# STATE_TITLE (0) -> STATE_PLAYING (1). The first leg pins the title
+# state; a ROM that started on its own would fail it.
+#
+# The other two legs prove the piece answers the pad AND respects the
+# wall. LEFT is held continuously from frame 200: the piece walks to
+# column 0 and STAYS there for the remaining 60 held frames — the
+# "cannot move through the wall" negative, free because the DAS repeat
+# would otherwise have carried it well past 0. The A pulse at 240 turns
+# cur_rot 0 -> 1 while LEFT is still held, so rotation is proven not to
+# be a side effect of the horizontal move. score stays 0 throughout: no
+# line can have been cleared this early.
+rom = "../../../examples/games/tetris/tetris.sfc"
+
+[[checkpoint]]                 # title screen
+at_frame = 90
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }       # STATE_TITLE
+score = 0
+
+[[checkpoint]]                 # START -> STATE_PLAYING; then LEFT to the wall
+at_frame = 230
+input = "90:0x1000,100:0,200:0x0200"
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }       # STATE_PLAYING
+cur_col = { eq = 0, width = 1 }          # spawned at 3, DAS'd to the left wall
+cur_rot = { eq = 0, width = 1 }
+score = 0
+
+[[checkpoint]]                 # A rotates; LEFT still held -> still against the wall
+at_frame = 260
+input = "240:0x0280,244:0x0200,259:0"
+[checkpoint.values]
+cur_rot = { eq = 1, width = 1 }
+cur_col = { eq = 0, width = 1 }
+score = 0

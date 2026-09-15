@@ -1,0 +1,41 @@
+# The car starts on the line at world (312, 272) in 12.4 fixed point
+# (312<<4 = 4992, 272<<4 = 4352), heading 64 = due east, speed 0.
+#
+# Leg 2 holds LEFT alone. Steering rotates car_heading by STEER_STEP per
+# frame (64 -> 202 over 59 frames, wrapping in u8) but the car is
+# stopped, so car_x, car_y and car_speed must NOT move — a stationary
+# car that drifts across the track while you turn the wheel fails here.
+# That is the negative this example most needs: those two words feed the
+# mode 7 centre and scroll every frame.
+#
+# Leg 3 holds A. The car accelerates along the heading leg 2 left it on
+# (202 ~ north-west), so both coordinates fall, and car_heading is
+# asserted exactly again: the throttle must not steer.
+rom = "../../../examples/games/mode7_racing/mode7_racing.sfc"
+
+[[checkpoint]]                 # on the start line, engine off
+at_frame = 60
+[checkpoint.values]
+car_x = 4992                             # 312 << 4
+car_y = 4352                             # 272 << 4
+car_speed = 0
+car_heading = { eq = 64, width = 1 }     # due east
+
+[[checkpoint]]                 # LEFT alone: the wheel turns, the car does not move
+at_frame = 120
+input = "60:0x0200,119:0"
+[checkpoint.values]
+car_heading = { eq = 202, width = 1 }    # 64 - 59*STEER_STEP, mod 256
+car_x = 4992
+car_y = 4352
+car_speed = 0
+
+[[checkpoint]]                 # A: accelerate along the new heading
+at_frame = 180
+input = "120:0x0080,179:0"
+[checkpoint.values]
+car_speed = 352
+car_heading = { eq = 202, width = 1 }    # throttle must not steer
+[checkpoint.delta]
+car_x = "decreased"                      # heading 202 -> north-west
+car_y = "decreased"

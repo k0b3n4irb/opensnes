@@ -19,6 +19,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage troubleshooting -- Common problems and solutions
 
+@subpage faq -- Frequently asked questions
+
+@subpage migrating_pvsneslib -- Migrating a PVSnesLib project
+
 ## Game-Craft
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
@@ -72,6 +76,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 @subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
 
 @subpage tutorial_debugging -- Debugging with luna
+
+@subpage tutorial_profiling -- Profiling: measuring where the frame goes
 
 ## Hardware Reference
 
