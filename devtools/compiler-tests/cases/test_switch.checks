@@ -1,0 +1,11 @@
+# switch lowers to a compare chain (bne for the case, bcs to split the
+# range) — no jump table anywhere.
+absent jmp \(
+absent jmp \[
+in test_simple_switch: present cmp\.w #1\n\tbne \+\n\tjmp @switch_case
+# Fall-through cases 0/1/2 share ONE body: three case labels stacked.
+in test_fallthrough: present @switch_case\.\d+:\n@switch_case\.\d+:\n@switch_case\.\d+:\n\tsep #\$20\n\tlda #100
+# Sparse 16-bit values are compared directly (no table for 0x1000).
+in test_sparse_values: present cmp\.w #4096
+# A switch without default emits no default block.
+in test_no_default: absent @switch_default

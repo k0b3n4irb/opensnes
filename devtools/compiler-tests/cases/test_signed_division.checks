@@ -1,0 +1,8 @@
+# Signed / and % call the signed helpers, never the unsigned ones.
+in signed_div: present jsl __sdiv16
+in signed_mod: present jsl __smod16
+count 1 jsl __div16
+count 1 jsl __mod16
+# Operands go through direct page (tcc__r0 = dividend a at 6,s,
+# tcc__r1 = divisor b at 4,s), not the stack.
+in signed_div: present lda 6,s\n\tsta\.b tcc__r0\n\tlda 4,s\n\tsta\.b tcc__r1\n\tjsl __sdiv16

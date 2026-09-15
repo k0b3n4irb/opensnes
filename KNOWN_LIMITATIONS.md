@@ -459,6 +459,17 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 `sramClear()` wrote a byte ramp instead of zeros (fixed 2026-09-15)
+
+`lib/source/sram.asm`'s clear loop compared the 16-bit index through the
+accumulator (`tya / cmp`) and never reloaded the `#$00` it was storing, so
+byte 0 was cleared and bytes 1..n-1 received their own offset (0, 1, 2,
+3, …). `sramSave`/`sramLoad` were right, and no example called
+`sramClear`, so the "delete save" path in the SRAM tutorial shipped
+broken until the lib fixture (`devtools/libtests`, gaps review L2c) did a
+save / clear / load round trip. The loop now compares Y directly
+(`cpy DP_SIZE`) and the fixture asserts the reloaded bytes are all zero.
+
 ### 🟢 Five silent miscompilations found and fixed by the C-feature runtime ROM (2026-09-13)
 `devtools/compiler-tests/runtime/c_features` (gaps review C2) asserts the
 result of every C feature that had no runtime check before. Its first run

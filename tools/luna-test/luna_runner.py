@@ -69,6 +69,27 @@ POWER_ON: str | None = None
 def power_on_args() -> list[str]:
     return ["--power-on", POWER_ON] if POWER_ON else []
 
+# Video standard forced on every luna run (`--force-region ntsc|pal`). None =
+# the ROM header's country byte (NTSC for the whole corpus). `--region pal`
+# is the PAL liveness pass (gaps review R2): 312 lines, 50 Hz — an example
+# that only works at 262 lines (a V-timer past line 261, a frame budget
+# tuned to 60 Hz) fails here. Report file untouched, like --power-on.
+REGION: str | None = None
+
+
+def region_args() -> list[str]:
+    return ["--force-region", REGION] if REGION else []
+
+
+def variant_label() -> str:
+    """Suffix naming the non-default pass, for the coverage verdict lines."""
+    parts = []
+    if POWER_ON:
+        parts.append("--power-on " + POWER_ON)
+    if REGION:
+        parts.append("--region " + REGION)
+    return f" ({' '.join(parts)})" if parts else ""
+
 def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
@@ -132,6 +153,7 @@ def frame_points(frames) -> list[int]:
 def capture_frames(key: str, manifest: dict) -> list[int]:
     """The PPU frame(s) at which `key` is captured (manifest override or default)."""
     return frame_points(manifest["examples"].get(key, {}).get("frames", manifest["default_frames"]))
+
 
 
 def example_key(rom: Path) -> str:
@@ -207,7 +229,7 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
     proc = subprocess.run(
         [luna, "run", *(["-n", str(steps)] if steps is not None
                         else ["--until-frame", str(frame)]),
-         *power_on_args(),
+         *power_on_args(), *region_args(),
          "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
@@ -330,7 +352,7 @@ def render_state(luna: str, rom: Path, frame: int, png: Path) -> dict:
     """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
     png.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
-        [luna, "state", "--until-frame", str(frame), *power_on_args(),
+        [luna, "state", "--until-frame", str(frame), *power_on_args(), *region_args(),
          "--out", "-", "--screenshot", str(png), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
@@ -399,11 +421,11 @@ def coverage(luna: str) -> int:
         "|---|---|---|",
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
-    if not POWER_ON:
+    if not POWER_ON and not REGION:
         report.write_text("\n".join(lines) + "\n")
-    print(f"\nCoverage{' (--power-on ' + POWER_ON + ')' if POWER_ON else ''}: "
+    print(f"\nCoverage{variant_label()}: "
           f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
-    if not POWER_ON:
+    if not POWER_ON and not REGION:
         print(f"Report: {report.relative_to(REPO_ROOT)}")
     return 1 if (dead or fail) else 0
 
@@ -420,9 +442,13 @@ def main() -> int:
     ap.add_argument("--power-on", metavar="MODE",
                     help="luna power-on RAM state for every run: zero (default), ones, "
                          "random[=seed]. `random=1` is the reproducible garbage-RAM pass")
+    ap.add_argument("--region", metavar="STD", choices=("ntsc", "pal"),
+                    help="luna --force-region for every run: the PAL liveness pass is "
+                         "`--coverage --region pal` (R2)")
     args = ap.parse_args()
-    global POWER_ON
+    global POWER_ON, REGION
     POWER_ON = args.power_on
+    REGION = args.region
     if args.list:
         manifest = load_manifest()
         for rom in discover_example_roms():

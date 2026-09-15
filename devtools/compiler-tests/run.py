@@ -48,10 +48,10 @@ CASES = Path(__file__).resolve().parent / "cases"
 NEGATIVE = CASES / "negative"
 CC = REPO_ROOT / "bin" / "cc65816"
 
-# Ratchet on fixtures lacking a .checks file. 56 of 66 cases predate the
-# .checks DSL and run compile-only. Porting a fixture lowers this number;
+# Ratchet on fixtures lacking a .checks file. 56 of 66 cases predated the
+# .checks DSL and ran compile-only. Porting a fixture lowers this number;
 # it must NEVER go up — a new fixture ships with its assertions.
-MAX_UNCHECKED = 55  # new fixtures ship WITH checks; test_function_ptr got its .checks 2026-09-11
+MAX_UNCHECKED = 41  # C4 batch 1, 2026-09-15: 14 fixtures got their .checks (55 -> 41)
 
 
 def compile_result(src: Path) -> tuple[bool, str]:

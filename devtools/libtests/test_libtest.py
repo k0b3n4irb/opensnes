@@ -12,8 +12,21 @@ Vectors covered (see main.c):
     case of the old O(quotient) loop), mul16, sqrt16, fixMul/fixDiv/fixLerp
     and fix32Mul/fix32Div (L2b)
   - text: cursor_y wrap — the tilemapBuffer overflow guard
+  - L2c (2026-09-15): collision (rect/point/tile), sram round trip in bank
+    $70, the raw IRQ path (V/H timer counts), console region + vblank
+    getters, and the window module asserted on luna's PPU register view
+    (`luna state` JSON: windows, w12sel, w34sel, wobjsel, wbglog, wobjlog,
+    tmw, tsw) — write-only registers the WRAM oracle cannot see.
+
+`--region pal` runs the same ROM under `--force-region pal`: getRegion() /
+isPAL() must then read 1 and every other vector must hold (the PAL pass of
+the gaps review, R2).
 """
 from __future__ import annotations
+
+import argparse
+import json
+import subprocess
 
 import sys
 from pathlib import Path
@@ -76,7 +89,45 @@ CASES = [
     # phase 3: the DSP->CPU read path — voice 0's envelope is live
     # (looping beep, full-sustain default ADSR) so active == 1.
     ("r_audio_active", 2, 1),
+    # L2c: collision — geometry in the main.c comments
+    ("r_col_rect", 2, 1), ("r_col_rect_no", 2, 0), ("r_col_pt_in", 2, 1), ("r_col_pt_edge", 2, 0),
+    ("r_col_ex", 2, 1), ("r_col_ex_ox", 2, 0xFFFA), ("r_col_ex_oy", 2, 0xFFFA),
+    ("r_col_ex_no", 2, 0), ("r_col_ex_no_ox", 2, 0),
+    ("r_col_tile", 2, 1), ("r_col_tile0", 2, 0), ("r_col_tile_neg", 2, 1), ("r_col_tile_far", 2, 1),
+    ("r_col_tile16", 2, 1), ("r_col_tile8x", 2, 2), ("r_col_rtile0", 2, 0), ("r_col_rtile1", 2, 1),
+    ("r_rect_x", 2, 5), ("r_rect_y", 2, 6), ("r_rect_w", 2, 7), ("r_rect_h", 2, 8),
+    ("r_rect_px", 2, 0xFFFD), ("r_rect_py", 2, 9), ("r_rect_cx", 2, 18), ("r_rect_cy", 2, 18),
+    ("r_rect_in", 2, 1), ("r_rect_out", 2, 0),
+    # L2c: sram — bank $70 round trip, offsets, XOR checksum, clear
+    ("r_sram_rt", 2, 16), ("r_sram_off", 2, 22), ("r_sram_off0", 2, 1),
+    ("r_sram_ck", 2, 32), ("r_sram_ck0", 2, 0), ("r_sram_clear", 2, 0),
+    # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
+    # the default handler after irqClear() acknowledges without counting
+    ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
+    # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
+    # The getters return TRUE, which snes/types.h defines as 0xFF (not 1).
+    ("r_invb_in", 2, 0xFF), ("r_invb_out", 2, 0),
     ("r_done",     2, 0xBEEF),
+]
+
+# Region getters: NTSC by default (the header's country byte), PAL under
+# `--region pal` (luna --force-region). Same ROM, same asserts otherwise.
+REGION_CASES = {
+    "ntsc": [("r_region", 2, 0), ("r_ispal", 2, 0)],
+    "pal":  [("r_region", 2, 1), ("r_ispal", 2, 0xFF)],   # isPAL() returns TRUE = 0xFF
+}
+
+# Window module: the PPU registers luna reports in `luna state` JSON (ppu.*)
+# after the windowSplit(100) / windowCentered(WINDOW_2, 64) tail of main.c.
+PPU_CASES = [
+    ("windows", [0, 99, 96, 159]),  # WH0..WH3
+    ("w12sel", 0x03),   # W1 on BG1, inverted
+    ("w34sel", 0x08),   # W2 on BG3
+    ("wobjsel", 0x02),  # W1 on OBJ; W2/MATH enabled then disabled
+    ("wbglog", 0x08),   # BG2 XOR
+    ("wobjlog", 0x01),  # OBJ AND
+    ("tmw", 0x11),      # main mask BG1 | OBJ
+    ("tsw", 0x04),      # sub mask BG3
 ]
 
 
@@ -96,14 +147,27 @@ def le_bytes(value: int, width: int) -> str:
     return "".join(f"{(value >> (8 * i)) & 0xFF:02X}" for i in range(width))
 
 
-def run() -> int:
+def ppu_state(luna: str, region: str) -> dict:
+    cmd = [luna, "state", "-n", str(STEPS), "--out", "-", *region_args(region), str(ROM)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300, check=True)
+    return json.loads(proc.stdout)["ppu"]
+
+
+def region_args(region: str) -> list[str]:
+    return ["--force-region", region] if region != "ntsc" else []
+
+
+def run(region: str = "ntsc") -> int:
     if not ROM.is_file():
         sys.exit(f"ROM missing: {ROM} (run `make` first)")
     luna = find_luna()
     fails = 0
-    for name, width, want in CASES:
+    extra = region_args(region)
+    if region != "ntsc":
+        print(f"  (luna --force-region {region})")
+    for name, width, want in CASES + REGION_CASES[region]:
         # luna resolves the symbol name itself (v1.7.0, auto-detected .sym)
-        ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))])
+        ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))], extra=extra)
         if name in KNOWN_FAIL:
             if ok:
                 print(f"  XPASS {name} == 0x{want:0{width*2}X}  <- fixed! promote out of KNOWN_FAIL")
@@ -115,9 +179,21 @@ def run() -> int:
         else:
             print(f"  FAIL  {name} == 0x{want:0{width*2}X}  [{detail}]")
             fails += 1
-    print(f"\nLib runtime assertions: {len(CASES) - fails}/{len(CASES)} ok")
+    ppu = ppu_state(luna, region)
+    for field, want in PPU_CASES:
+        got = ppu.get(field)
+        if got == want:
+            print(f"  PASS  ppu.{field} == {want}")
+        else:
+            print(f"  FAIL  ppu.{field} == {want}  [luna reports {got}]")
+            fails += 1
+    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES)
+    print(f"\nLib runtime assertions ({region}): {total - fails}/{total} ok")
     return 1 if fails else 0
 
 
 if __name__ == "__main__":
-    sys.exit(run())
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--region", choices=("ntsc", "pal"), default="ntsc",
+                    help="video standard forced on luna (default: the ROM header, NTSC)")
+    sys.exit(run(ap.parse_args().region))

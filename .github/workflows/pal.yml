@@ -1,0 +1,45 @@
+name: PAL pass
+
+# Weekly PAL liveness pass (gaps review R2): every example ROM booted under
+# `luna --force-region pal` (312 lines, 50 Hz) plus the lib fixture
+# asserting getRegion() / isPAL(). Everything else in CI runs the corpus as
+# NTSC, so a V-timer past line 261 or a frame budget that only fits 262
+# lines would go unnoticed until a PAL console. `make test-pal` locally.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 1'   # weekly, Monday 04:00 UTC
+
+jobs:
+  pal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out OpenSNES (with submodules)
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          submodules: recursive
+
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-ubuntu-latest-x86_64-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch {} + 2>/dev/null || true
+
+      - name: Build SDK
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make
+
+      - name: PAL corpus liveness + lib region asserts
+        run: make test-pal

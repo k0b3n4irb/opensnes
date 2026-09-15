@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -193,6 +193,10 @@ tests: test-compiler
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
 	@# (gaps review item R5).
 	@python3 tools/luna-test/rom_coverage.py
+	@# APU output hashed for four self-playing audio examples (luna
+	@# --audio-out, gaps review R6): a changed hash means "the sound
+	@# changed, go listen" — the only audio oracle beyond driver liveness.
+	@python3 tools/luna-test/audio_regress.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
@@ -229,6 +233,16 @@ tests: test-compiler
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
+
+# PAL pass (gaps review R2): the whole corpus booted at 312 lines / 50 Hz
+# (luna --force-region pal) plus the lib fixture asserting getRegion() /
+# isPAL(). Not in `make tests` (a second corpus pass for one video
+# standard); the weekly `pal.yml` workflow runs it, and so should anyone
+# touching V-timer, frame-budget or region code.
+test-pal:
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/luna_runner.py --coverage --region pal
+	@python3 devtools/libtests/test_libtest.py --region pal
 
 # User-project test story (init → build → test-update → test → FAIL path),
 # exactly as a user runs it. Was CI-only until 2026-09-11, when a harness

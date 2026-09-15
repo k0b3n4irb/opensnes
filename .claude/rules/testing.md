@@ -16,6 +16,8 @@ python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over
 python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
 python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
+python3 tools/luna-test/audio_regress.py            # APU output hashed for four self-playing audio examples (luna --audio-out); baselines/audio.json
+make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
 ```
 
 The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,

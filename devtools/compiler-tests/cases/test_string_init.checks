@@ -1,0 +1,12 @@
+# String literals in initialisers go to the asset banks as .ASC data...
+section test_string_init_string.1: present SEMISUPERFREE BANKS ASSET_BANKS
+count 9 \.ASC "
+# ...and the const struct holds a 24-bit far pointer to it (never .dw).
+present sword:\n\t\.dl test_string_init_string\.1\+0
+absent \.dw test_string_init_string
+# A non-const struct is RAM with a data_init record whose payload is the
+# far pointer to the ROM string.
+section player_weapon: present RAMSECTION
+present \.dw player_weapon\n\t\.db :player_weapon\n\t\.dw 6\n\t\.dl test_string_init_string\.9\+0
+# Reading a const struct member through the array is a far read.
+in test_string_access: present lda\.l inventory\+6

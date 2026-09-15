@@ -34,8 +34,15 @@ alongside the other `devtools/` linters. See
   (`feat/functional-probes` ref).
 - **Ported so far** (have a `.checks`, all passing): `const_data`,
   `section_directives`, `tail_call`, `nonleaf_frameless`, `arg_push_order`,
-  `shift_right`, `word_extend`, `multiply`, `return_value`, `static_vars`.
-- **TODO**: the remaining ~50 fixtures (`run.py --list`). Port each by reading its
+  `shift_right`, `word_extend`, `multiply`, `return_value`, `static_vars`,
+  plus the C4 batch 1 set (2026-09-15): `test_acache_pha`,
+  `test_cmp_dead_store`, `test_commutative_swap`,
+  `test_dead_store_elimination`, `test_mul_dead_store`, `test_inline_mul`,
+  `test_inline_boundaries`, `test_xba_shift`, `test_signed_division`,
+  `test_stack_adjust`, `test_volatiles`, `test_switch`,
+  `test_static_mutable`, `test_string_init`. The unchecked ratchet
+  (`MAX_UNCHECKED` in `run.py`) tracks the remainder.
+- **TODO**: the remaining fixtures (`run.py --list`). Port each by reading its
   original check in the opensnes-emu `compiler-tests.mjs`
   (`gh api repos/k0b3n4irb/opensnes-emu/contents/test/phases/compiler-tests.mjs?ref=feat/functional-probes`)
   and translating its assertions into a `.checks` file. A few checks are bespoke
