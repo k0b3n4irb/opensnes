@@ -121,10 +121,10 @@ lint-cppcheck:
 		echo "lint-cppcheck: cppcheck not installed, skipped (CI runs it)"; \
 	else \
 		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
-			--suppress='*:tools/gfx4snes/src/lodepng.c' --suppress='*:tools/img2snes/src/lodepng.c' \
+			--suppress='*:tools/common/lodepng.c' \
 			--suppress='*:tools/font2snes/src/stb_image.h' \
 			-DGFX4SNESVERSION='"x"' -DGFX4SNESDATE='"x"' -D__BUILD_DATE='"x"' -D__BUILD_VERSION='"x"' -DVERSION='"x"' \
-			-Itools/smconv/src tools/*/src \
+			-Itools/smconv/src -Itools/common tools/*/src tools/common \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
 		&& { cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \

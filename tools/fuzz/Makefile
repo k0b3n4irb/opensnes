@@ -15,15 +15,15 @@
 CLANG        ?= clang
 FUZZ_SECONDS ?= 60
 FUZZ_CFLAGS  := -g -O1 -fsanitize=fuzzer,address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined
-GFX          := ../gfx4snes/src
+COMMON       := ../common
 SMC          := ../smconv/src
 
 TARGETS := fuzz_lodepng fuzz_itloader
 
 all: $(TARGETS)
 
-fuzz_lodepng: fuzz_lodepng.c $(GFX)/lodepng.c
-	$(CLANG) $(FUZZ_CFLAGS) -I$(GFX) -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_DISK $^ -o $@
+fuzz_lodepng: fuzz_lodepng.c $(COMMON)/lodepng.c
+	$(CLANG) $(FUZZ_CFLAGS) -I$(COMMON) -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_DISK $^ -o $@
 
 fuzz_itloader: fuzz_itloader.c $(SMC)/itloader.c $(SMC)/io.c
 	$(CLANG) $(FUZZ_CFLAGS) -I$(SMC) $^ -o $@

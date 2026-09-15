@@ -523,7 +523,7 @@ chased; a clean rebuild on 2026-09-10 still printed 12 clock-skew warnings);
 `chantiers/a1_followup_long_is_kw.md` not bisected;
 `chantiers/b2_far_ram.md` §10b/§10f follow-ups;
 `chantiers/hardware_docs_audit.md` F1 doc rewrite pending;
-`tech/wla_span_upstream_report_DRAFT.md` never sent;
+`tech/wla_span_upstream_report.md` never sent;
 `tech/816_opt_analysis.md:45` TODO on a wla-dx branch-optimisation pass;
 `devtools/compiler-tests/README.md:38` — the ~50 fixtures still without
 `.checks`.
@@ -622,7 +622,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 
 | H6 | Valgrind only on static release binaries, else delete the supp | G14 | S | L | §4 Valgrind |
 | H7 | Host coverage report (llvm-cov) | owner request | M | M | §4 Coverage |
-| H8 | `tools/common/` for lodepng + cmdparser | open note | S | M | move the duplicated `lodepng.c/h`, `cmdparser.h` out of gfx4snes / img2snes; one fuzz target follows |
+| H8 | `tools/common/` for lodepng + cmdparser | open note | S | M | **done 2026-09-15** — the four files were byte-identical in both tools; now `tools/common/{lodepng,cmdparser}.{c,h}` with a README, compiled into each tool's `build/` via a `common_%.o` rule (`-I../common`); `tools/fuzz` and the cppcheck suppression point at the shared copy; goldens and fuzz replay unchanged |
 
 ### Lib C
 
@@ -674,7 +674,7 @@ the crash); K7 across D6 (the in-repo corpus note) and RAG1 (the corpus side).
 | D7 | ROADMAP "in flight" table for the five `wip/*` chantiers | K8 | S | M | **done 2026-09-14** — the premise had expired: no `wip/hicolor*`, `interlace`, `mode7-perspective` or `spc700` branch exists; the four `wip/*` on origin (three CI hygiene branches of 09-07, one harness branch of 06-22) were all superseded by develop and are deleted. ROADMAP has a "Work in flight" section that says so and points at this backlog |
 
 | D8 | PVSnesLib migration guide + FAQ | K10 | M | L | skeleton from `.claude/rules/porting.md` |
-| D9 | Close or advance stale notes | clock-skew root cause, `wla_span_upstream_report_DRAFT.md`, `816_opt_analysis.md:45`, inlining Phase 2, `a1_followup_long_is_kw.md` | S each | M (clock skew) | clock skew: locate the mtime source after a rebuild; the others: a status line and an owner decision |
+| D9 | Close or advance stale notes | clock-skew root cause, `wla_span_upstream_report.md`, `816_opt_analysis.md:45`, inlining Phase 2, `a1_followup_long_is_kw.md` | S each | M (clock skew) | **done 2026-09-15** — clock skew: 1802 submodule sources dated 2029–2030 (the retired CI `touch -d 2030` cache stamp), reset with `touch`, note CLOSED; SPAN report was filed as vhelin/wla-dx#729 on 2026-07-26, note renamed without `_DRAFT`; 816-opt TODO answered (WLA-DX has no branch relaxation); inlining note marked SHIPPED (`inline.c`); `b2_far_ram.md` §10b credited to A9, §10f re-checked; `hardware_docs_audit.md` F1 rewrite marked done; `a1_followup_long_is_kw.md` no longer exists |
 
 ### RAG
 
@@ -702,6 +702,26 @@ hole. Tier 2 builds oracles for surfaces that have none today (C1, C2, L2,
 R5) and the harness work that needs a few days. Tier 3 is adoption, hygiene
 and the long tail of manifests — worth doing, but no single item there
 catches a bug class the earlier tiers do not.
+
+### 11b. Tier 3 in four lots (agreed 2026-09-15)
+
+Tier 1 and Tier 2 shipped between 2026-09-12 and 2026-09-15 (rows marked
+**done** in §10; R4 waits on luna folding the `NmiHandler@<child>` profile
+rows into the parent). What remains is grouped so each lot is one theme,
+one validation shape and a few commits:
+
+| Lot | Items | Theme | Validation |
+|---|---|---|---|
+| **1** | ROADMAP stale lines, H8, D9 | docs and notes hygiene, one small refactor | `make tools`, `make test-tools`, `make fuzz-replay`, `make lint`, `make tests` |
+| **2** | L2c (collision, sram, window, interrupt, console asserts), C4, R6, R2 | oracles for the still-untested lib surface; the compiler-test ratchet; the PAL and audio-hash passes | libtests ROM + `make tests`; ratchet numbers move in the same commit |
+| **3** | H5 (remaining parsers), H7, P6, P7, P5, R4 (when luna folds child rows), R8 | host hygiene and coverage; the per-frame NMI budget; nightly luna bench | CI-only additions checked with the arm64 ubuntu-24.04 container before push |
+| **4** | D8, D4, D5, R7 | the long-tail docs (migration guide, docs index, profiling guide) and the interactive-example manifests | `make lint-docs`, `make docs`, `check_doc_render.py`; manifests through `make test-manifests` |
+
+Deliberately parked: **H6** (valgrind on static release binaries — ASan
+covers the same code paths since H3 and the release job already runs the
+corpus on both Linux arches) and **L3** (`memcpy`/`memset`/`strlen` in
+the lib — no lib or example caller needs them yet; bulk moves go through
+the DMA helpers, and a C loop covers the rest until a real user appears).
 
 ---
 

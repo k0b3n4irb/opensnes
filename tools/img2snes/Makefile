@@ -25,9 +25,12 @@ endif
 
 # Source and object file locations
 SRC := src
+COMMON := ../common
 OBJ := build
 SOURCES := $(wildcard $(SRC)/*.c)
-OBJS    := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+COMMON_SOURCES := $(COMMON)/lodepng.c $(COMMON)/cmdparser.c
+OBJS    := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES)) \
+           $(patsubst $(COMMON)/%.c, $(OBJ)/common_%.o, $(COMMON_SOURCES))
 
 # Executable binary file name
 EXE     := img2snes
@@ -50,7 +53,12 @@ $(OBJ):
 # Compiling
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	@echo "Compiling $<"
-	$(CC) $(CFLAGS) -I$(SRC) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
+
+# Sources shared by the asset tools (tools/common: lodepng, cmdparser)
+$(OBJ)/common_%.o: $(COMMON)/%.c | $(OBJ)
+	@echo "Compiling $<"
+	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
 
 # Install to OpenSNES bin/
 install: $(EXE)$(EXT)

@@ -389,6 +389,8 @@ chantier**: split the flag (bit 1 `cst` / bit 4 `farram` must not imply
 "volatile" in the optimiser passes; only bit 0 should), then fix whatever
 the promotion/forwarding exposes, with those three examples as the gate.
 The taint asymmetry is harmless meanwhile — it only ever adds a far path.
+*(Follow-up DONE by chantier A9, 2026-09-06 — `qbe_access_flag.md`: the
+flag is split, only bit 0 pins loads in the optimiser passes.)*
 
 ### 10c. Data + runtime
 
@@ -477,7 +479,9 @@ cartouche was back: anomie-regs marks `$43x8-9` and `$43xA` as required
 for a mid-frame start ("do the init process manually by setting
 $43x8-A"), the snesdev VBlank-routine page names the symptom, the
 sfc-dev-wiki gives the per-scanline order. Citations are in
-`lib/source/hdma.asm`.
+`lib/source/hdma.asm`. *(Re-checked 2026-09-15: the A2A/NTRL preset is
+live in all three `hdmaSetup*` (`lib/source/hdma.asm:149`, `:245`,
+`:339`), citations in place; nothing left open here.)*
 
 ### 10g. Lessons
 

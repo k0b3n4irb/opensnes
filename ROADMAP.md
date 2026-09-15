@@ -243,10 +243,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ### Next steps (audit-driven, prioritised)
 
-- [ ] **Sprite/text duplication audit** (P3.2) — `lib/source/` has parallel
-      C and ASM implementations of `sprite` and `text`. Benchmark each,
-      decide migration vs documentation, eliminate duplications. Largest
-      remaining cleanup item (2–3 weeks, perf-critical so risk is real).
+- [x] **Sprite/text duplication audit** (P3.2) — *(CLOSED 2026-09-13
+      by the D2/C2 refresh of `.claude/STRUCTURAL_DEFECTS.md`: the
+      sprite path is ASM-only since the OAM rewrite, the text path is
+      the console module; `make test-link-modules` links every module
+      alone and together so a parallel implementation cannot creep
+      back unnoticed.)*
 - [x] **SuperFX / SA-1 functional tests** (P3.4) — *(SUPERSEDED 2026-06-20: luna runs SA-1 / Super FX natively in the headless harness; the Mesen2 phase and the `opensnes-emu` submodule were removed. See `.claude/notes/chantiers/luna_migration.md`.)* Originally added a Mesen2-headless
       visual regression phase
       (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) running the
@@ -265,7 +267,17 @@ This stretch focused on closing process gaps surfaced by an internal audit
       drifted away from current emit-pass behaviour rather than
       anticipating future work. Markers removed, assertions converted
       to hard-fail, `--allow-known-bugs` dropped from CI.
-- [ ] **Mode 7 game example** (racing or flying)
+- [x] **Mode 7 game example** — `examples/games/mode7_racing` and
+      `examples/games/mode7_flying` (both shipped; luna manifests).
+- [ ] **Gaps-review backlog** — the prioritised list in
+      `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b) is
+      the working plan: Tier 1 and Tier 2 shipped 2026-09-12/15
+      (CI runs `make tests` and `make lint` verbatim, sanitizers,
+      cppcheck, fuzzing, upstream suites, lib link smoke, the
+      C-feature runtime ROM, fixed-point asserts). Tier 3 is grouped in
+      four lots (§11b): docs/notes hygiene, lib asserts + compiler-test
+      ratchet + PAL/audio passes, CI hygiene + host coverage +
+      per-frame NMI budget, then the long-tail docs.
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
 - [ ] **Original-game release**
@@ -313,6 +325,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-12. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-15. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*
