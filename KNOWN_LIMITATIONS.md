@@ -317,6 +317,22 @@ generate GSU code.
 under `examples/chips/superfx_*`. Plan accordingly: heavy compute lives in
 GSU assembly, not in your C main.
 
+### 🟡 The multitap (5-player) path is present but cannot be switched on
+`templates/crt0.asm` carries a complete `ScanMPlay5` routine — it bit-bangs
+pads 3 and 4 through `$4017` after flipping the multitap to its second
+controller pair, and takes pad 2 from the auto-joypad result. The NMI handler
+calls it whenever `snes_mplay5` is non-zero, and skips the mouse and Super
+Scope while it is (the devices are mutually exclusive).
+
+Nothing ever sets `snes_mplay5`. There is no detection routine, and `input.h`
+exposes no function to enable it, so the flag stays 0 for the life of every
+ROM and the routine never executes. Pads 3, 4 and 5 are unreachable today.
+
+**Mitigation:** none — write for two players. Closing this needs three things
+together: a detection routine (the protocol is on the SNES Development Wiki),
+a public API to arm it, and emulator support to test it — luna currently
+models `pad`, `mouse` and `superscope` on each port, but not a multitap.
+
 ### 🟢 Compiler submodule drift (caught by verify-toolchain)
 `compiler/{cproc,qbe,wla-dx}` are forks with downstream patches. A
 `git submodule update --remote` would advance them past tested commits and

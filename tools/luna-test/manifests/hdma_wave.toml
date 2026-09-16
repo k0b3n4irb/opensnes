@@ -1,0 +1,72 @@
+# hdma_wave — the whole control surface of the wave effect, none of which is
+# executed anywhere else in the corpus.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline run with NO input, and this ROM boots
+#     with the wave OFF (wave_on = 0, HDMAEN = 0). Every documented control —
+#     A toggles, LEFT/RIGHT change amplitude, UP/DOWN start/stop the scroll —
+#     is dead code to the current suite. The baseline frames only ever see
+#     the un-animated stripes.
+#   * The amplitude clamp is asserted as a NEGATIVE: four RIGHT pulses from
+#     the default index 3 must land on 6, not 7. Overrunning amp_idx indexes
+#     past amp_offsets[] and points HDMA at a table that does not exist —
+#     which the fbhash of a *frozen* wave would not obviously flag.
+#   * Turning the wave off must also reset the animation (animating, phase);
+#     the last checkpoint pins that the A toggle does the full teardown, not
+#     just the HDMAEN bit.
+#
+# Measured: `luna state --until-frame N --input … --peek wave_on:1
+# --peek amp_idx:1 --peek animating:1 --peek phase:1
+# --peek hdma_enabled_state:1`. hdma_enabled_state is the lib's shadow of
+# $420C; `luna state --out -` reported dma.hdmaen = 0 / 64 / 64 / 64 / 0 at
+# the same frames, and dma.channels[6].a_addr moved 37441 -> 40459 across the
+# amplitude legs (= amp_offsets[6] - amp_offsets[3] = 3018 bytes), so the
+# shadow is a faithful stand-in for the register.
+rom = "../../../examples/hdma/hdma_wave/hdma_wave.sfc"
+
+[[checkpoint]]                 # boot: channel configured but NOT enabled
+at_frame = 60
+[checkpoint.values]
+wave_on = { eq = 0, width = 1 }
+amp_idx = { eq = 3, width = 1 }                 # AMP_DEFAULT
+animating = { eq = 0, width = 1 }
+phase = { eq = 0, width = 1 }
+hdma_enabled_state = { eq = 0x00, width = 1 }   # hdmaDisable(0x40) every frame
+
+[[checkpoint]]                 # A pulse: wave on -> channel 6 armed
+at_frame = 120
+input = "60:0x0080,64:0"
+[checkpoint.values]
+wave_on = { eq = 1, width = 1 }
+hdma_enabled_state = { eq = 0x40, width = 1 }
+animating = { eq = 0, width = 1 }               # A must not start the scroll
+phase = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # 4 x RIGHT from index 3: clamps at 6, not 7
+at_frame = 180
+input = "120:0x0100,124:0,130:0x0100,134:0,140:0x0100,144:0,150:0x0100,154:0"
+[checkpoint.values]
+amp_idx = { eq = 6, width = 1 }                 # AMP_LEVELS - 1
+wave_on = { eq = 1, width = 1 }
+hdma_enabled_state = { eq = 0x40, width = 1 }
+animating = { eq = 0, width = 1 }               # amplitude must not animate
+phase = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # UP pulse: the table start pointer scrolls
+at_frame = 240
+input = "180:0x0800,184:0"
+[checkpoint.values]
+animating = { eq = 1, width = 1 }
+phase = { eq = 60, width = 1 }                  # one entry per frame, < 112
+amp_idx = { eq = 6, width = 1 }                 # UP must not change amplitude
+hdma_enabled_state = { eq = 0x40, width = 1 }
+
+[[checkpoint]]                 # A again: full teardown, not just HDMAEN
+at_frame = 300
+input = "240:0x0080,244:0"
+[checkpoint.values]
+wave_on = { eq = 0, width = 1 }
+animating = { eq = 0, width = 1 }
+phase = { eq = 0, width = 1 }
+hdma_enabled_state = { eq = 0x00, width = 1 }
+amp_idx = { eq = 6, width = 1 }                 # amplitude survives the toggle

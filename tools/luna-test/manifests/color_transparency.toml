@@ -1,0 +1,41 @@
+# transparency blends a 2bpp cloud layer (BG3, sub screen) additively over a
+# 4bpp landscape (BG1, main screen) in Mode 1 with BG3 priority high, and
+# scrolls the clouds one pixel per frame. There is no input and no game
+# state, so the whole example is invisible to the liveness pillar, and the
+# fbhash baseline samples a single frame — which cannot tell a scrolling
+# sub screen from a frozen one, nor a blended frame from an opaque one.
+#
+# What this pins:
+#   * the colour-math pair CGWSEL $02 (source = sub screen) + CGADSUB $21
+#     (add, half off, BG1 $01 + backdrop $20). Drop the sub-screen bit and
+#     the clouds become opaque rather than transparent.
+#   * the scroll shadows: BG3's bg_scroll_x advances by exactly 60 over 60
+#     frames (1 px/frame) across two legs, while BG1's stays 0 — the
+#     landscape must not drift with the clouds. bg_scroll_x lives at
+#     00:0061 as 4 u16 entries, so BG1 is 00:0061 and BG3 is 00:0065.
+#   * the two palettes landed at DIFFERENT CGRAM offsets: clouds at entry 0
+#     (2bpp) and the landscape at entry 16 (4bpp). An off-by-one in either
+#     dmaCopyCGram destination would silently overwrite the other.
+rom = "../../../examples/color/transparency/transparency.sfc"
+
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+cgwsel = { eq = 0x02, width = 1 }
+cgadsub = { eq = 0x21, width = 1 }
+"00:0065" = { eq = 58, width = 2 }        # BG3 h-scroll shadow, 1 px/frame
+"00:0061" = { eq = 0, width = 2 }         # BG1 must not move
+
+[[checkpoint]]
+at_frame = 120
+[checkpoint.values]
+cgwsel = { eq = 0x02, width = 1 }
+cgadsub = { eq = 0x21, width = 1 }
+"00:0065" = { eq = 118, width = 2 }       # +60 in 60 frames
+"00:0061" = { eq = 0, width = 2 }
+[checkpoint.delta]
+"00:0061" = "unchanged"
+
+[asserts.blocks]
+cloud_pal = { space = "cgram", offset = "0000", hex = "0000a438" }
+land_pal  = { space = "cgram", offset = "0020", hex = "0000347f957ff87fdd7f492dad2dc524200300025322183fd329783e4e191d53" }

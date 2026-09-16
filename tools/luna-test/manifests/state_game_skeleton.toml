@@ -1,0 +1,72 @@
+# game_skeleton is the "a game is a state machine around one frame loop"
+# capstone: TITLE --START--> PLAY --timer hits 0--> OVER --START--> TITLE.
+# Every transition needs input, and both existing pillars run the ROM with
+# none — so liveness and the fbhash baseline between them only ever see the
+# title screen. The entire example is untested by them.
+#
+# This plays one complete round, start to loop-back, and pins each stage.
+# Values measured on luna with this exact script (the coin spawn is
+# rand()-driven but seeded from seed_ctr, the title-screen frame count, so
+# a fixed script gives a fixed level):
+#
+#   frame   50  game_state 0   the title screen ignores the D-pad
+#   frame   70  game_state 1   START taken: px,py = (120,112), time_left 30,
+#                              coin spawned at (41, 36)
+#   frame  130  score 1        LEFT+UP for 40 frames -> (40,32), within the
+#                              8 px box of the coin; it respawns at (22,43)
+#   frame 1850  time_left 1    the one-second tick ran 29 times
+#   frame 1900  game_state 2   time_left hit 0 -> game over, score preserved
+#   frame 1960  game_state 0   START on the game-over screen loops back
+#
+# The (40, 32) player position is predicted from the script, not observed:
+# PLAYER_SPEED is 2, the diagonal hold is 40 frames, the start is (120,112).
+# So a movement or collision regression fails here on an arithmetic ground,
+# and a state-machine regression fails on game_state.
+rom = "../../../examples/basics/game_skeleton/game_skeleton.sfc"
+#        START        LEFT+UP for 40 frames              START (on game over)
+input = "60:0x1000,64:0,80:0x0A00,120:0,1900:0x1000,1904:0"
+
+[[checkpoint]]                 # title: nothing has started
+at_frame = 50
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }
+score      = { eq = 0, width = 2 }
+time_left  = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # START taken -> play, fresh round
+at_frame = 70
+[checkpoint.values]
+game_state = { eq = 1,   width = 1 }
+time_left  = { eq = 30,  width = 1 }
+score      = { eq = 0,   width = 2 }
+px         = { eq = 120, width = 1 }
+py         = { eq = 112, width = 1 }
+cx         = { eq = 41,  width = 1 }
+cy         = { eq = 36,  width = 1 }
+
+[[checkpoint]]                 # walked onto the coin: scored and respawned
+at_frame = 130
+[checkpoint.values]
+score = { eq = 1,  width = 2 }
+px    = { eq = 40, width = 1 }      # 120 - 40 frames * 2 px
+py    = { eq = 32, width = 1 }      # 112 - 40 frames * 2 px
+cx    = { eq = 22, width = 1 }      # the coin moved
+cy    = { eq = 43, width = 1 }
+
+[[checkpoint]]                 # one second left, still playing
+at_frame = 1850
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }
+time_left  = { eq = 1, width = 1 }
+
+[[checkpoint]]                 # clock ran out -> game over, score survives
+at_frame = 1900
+[checkpoint.values]
+game_state = { eq = 2, width = 1 }
+time_left  = { eq = 0, width = 1 }
+score      = { eq = 1, width = 2 }
+
+[[checkpoint]]                 # START on the game-over screen -> back to title
+at_frame = 1960
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }

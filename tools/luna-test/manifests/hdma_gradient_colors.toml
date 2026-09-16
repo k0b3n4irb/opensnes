@@ -1,0 +1,48 @@
+# gradient_colors — the A/B toggle really arms and disarms the HDMA channel,
+# and the gradient really reached CGRAM colour 0.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline both run this ROM with NO input, so
+#     the entire enableGradient()/disableGradient() path — the point of the
+#     example, per its README ("Press A to disable … Press B to re-enable") —
+#     is executed by nothing in the corpus today.
+#   * The pada/padb edge-detect flags are the example's own guard against
+#     re-triggering while a button is held; nothing reads them back.
+#   * The CGRAM block is the one assert here that does NOT go through a lib
+#     shadow: colour 0 holds $3EA6, the LAST entry of the ROM gradient table
+#     in data.asm, while the BG palette's own colour 0 is $0C42
+#     (res/opensnes.pal, bytes 42 0C). So CGRAM[0] == $3EA6 means the HDMA
+#     engine actually walked all 224 scanlines of the table and overwrote the
+#     backdrop — a claim no WRAM variable can make.
+#
+# Measured: `luna state --until-frame N --input … --peek pada:1 --peek padb:1
+# --peek hdma_enabled_state:1`, cross-checked against `dma.hdmaen` in
+# `luna state --out -` (64 / 0 / 64 — the lib shadow matched the register at
+# every checkpoint) and `ppu.cgram[0]` = 16038 = $3EA6.
+rom = "../../../examples/hdma/gradient_colors/gradient_colors.sfc"
+
+[[checkpoint]]                 # boot: enableGradient() ran, channel 6 armed
+at_frame = 60
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x40, width = 1 }   # 1 << HDMA_CHANNEL_6
+pada = { eq = 0, width = 1 }
+padb = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # A held: gradient off, edge flag latched
+at_frame = 120
+input = "60:0x0080"
+[checkpoint.values]
+pada = { eq = 1, width = 1 }                    # held, so the guard stays set
+hdma_enabled_state = { eq = 0x00, width = 1 }   # hdmaDisableAll()
+
+[[checkpoint]]                 # release A, hold B: gradient back on
+at_frame = 180
+input = "130:0,140:0x8000"
+[checkpoint.values]
+pada = { eq = 0, width = 1 }                    # released -> guard cleared
+padb = { eq = 1, width = 1 }
+hdma_enabled_state = { eq = 0x40, width = 1 }
+
+# HDMA wrote the gradient's last colour over the BG palette's backdrop.
+[asserts.blocks]
+backdrop_after_gradient = { space = "cgram", offset = "0000", hex = "A63E" }

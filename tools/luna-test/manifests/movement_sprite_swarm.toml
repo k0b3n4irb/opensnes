@@ -1,0 +1,60 @@
+# sprite_swarm makes two claims the other two pillars cannot check.
+#
+# 1. "32 dots at a rock-steady 60 fps." The visual baseline captures two
+#    frames of a moving cloud, which proves the picture changes — not that
+#    the game loop kept up. `swarm_frame` counts main-loop iterations, so
+#    if the per-sprite C update ever overran a frame the counter would fall
+#    behind the PPU. Measured on luna, swarm_frame == PPU frame - 8 at
+#    frames 60, 160 and 300 alike (8 = the boot frames before the loop
+#    starts): 292 iterations for 292 displayed frames, zero slip.
+#
+# 2. "each bounces independently, reversing at the edges." A frozen-velocity
+#    ROM still renders a moving cloud. So each leg pins sprite 0's velocity
+#    bytes across a real reversal: +2/+2 at frame 60, -2/-2 at frame 160
+#    (it has hit XMAX=248 and YMAX=208), +2 again in X at frame 300.
+#
+# Each leg also re-checks the hand-written OAM plumbing the example exists
+# to show: the loop writes bx into oamMemory[0] and by-1 into oamMemory[1]
+# by hand (the PPU's +1 scanline quirk), so oamMemory must equal bx and
+# by-1 exactly, at every leg. Measured:
+#   frame  60  bx0=110 by0=118  oam = (110, 117)
+#   frame 160  bx0=186 by0= 98  oam = (186,  97)
+#   frame 300  bx0=110 by0=202  oam = (110, 201)
+rom = "../../../examples/sprites/sprite_swarm/sprite_swarm.sfc"
+frames = 300
+
+[[checkpoint]]                 # outbound: both velocities positive
+at_frame = 60
+[checkpoint.values]
+swarm_frame  = { eq = 52, width = 2 }        # 60 - 8 boot frames
+bx           = { eq = 110, width = 1 }
+by           = { eq = 118, width = 1 }
+bvx          = { eq = 2, width = 1 }
+bvy          = { eq = 2, width = 1 }
+oamMemory    = { eq = 110, width = 1 }       # oamMemory[0] == bx[0]
+"7E:0301"    = { eq = 117, width = 1 }       # oamMemory[1] == by[0] - 1
+
+[[checkpoint]]                 # after both edge bounces: both negative
+at_frame = 160
+[checkpoint.values]
+swarm_frame  = { eq = 152, width = 2 }
+bx           = { eq = 186, width = 1 }
+by           = { eq = 98,  width = 1 }
+bvx          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
+bvy          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
+oamMemory    = { eq = 186, width = 1 }
+"7E:0301"    = { eq = 97,  width = 1 }
+
+[[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
+at_frame = 300
+[checkpoint.values]
+swarm_frame  = { eq = 292, width = 2 }       # 300 - 8: no frame was ever dropped
+bx           = { eq = 110, width = 1 }
+by           = { eq = 202, width = 1 }
+bvx          = { eq = 2, width = 1 }
+bvy          = { eq = 0xFE, width = 1 }
+oamMemory    = { eq = 110, width = 1 }
+"7E:0301"    = { eq = 201, width = 1 }
+
+[asserts.oam]                  # the whole flock really reaches the PPU
+visible = 32

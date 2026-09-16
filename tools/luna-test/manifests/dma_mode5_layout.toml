@@ -1,0 +1,40 @@
+# backgrounds/mode5 — the hi-res VRAM budget: 24 KB of interleaved tiles and a
+# tilemap parked clear of them.
+#
+# Mode 5's cost is space. The `-M 5` interleaved 4bpp tileset for a 512-pixel
+# page fills VRAM words $0000-$3120 (12514 non-zero bytes measured), which is
+# why main.c puts the tilemap at word $6000 — a comment in the source
+# ("chosen to avoid overlap with tile data") that nothing verified until now.
+# VRAM byte offset = word * 2, so the map lives at byte $C000.
+#
+# `footprint.vram` is the floor under the tileset: 12000 non-zero bytes. The
+# failure it closes is a short transfer — `tiles_end - tiles` resolving wrong
+# (a label that slipped out of its section, an `.incbin` that shrank) would DMA
+# a truncated tileset. The top of the page then draws from stale/zero VRAM
+# while the bottom is fine, which reads on screen as "the image changed" and
+# nothing more.
+#
+# Why liveness/fbhash would not catch a regression here: luna's default capture
+# averages Mode 5's two horizontal subpixels down to 256 columns, so the
+# rendering pillar for this example is already looking at a blend, not the
+# native page. A tilemap that drifted into the tile region, or a tileset that
+# grew past $6000 and ate the map, still produces a picture that hashes to
+# something. The block offsets name the address instead.
+rom = "../../../examples/backgrounds/mode5/mode5.sfc"
+frames = 200
+
+[asserts.blocks]
+bg_pal_slot0    = { space = "cgram", offset = "0000", hex = "8c31d5625977fe7b9542c961a374c20e6a2aad35292dfb1c3c0084180821ff03" }
+bg_tiles_w0000  = { space = "vram",  offset = "0A80", hex = "33cc33cccf30f30cf00fc33fff00cc33" }
+bg_map_w6000    = { space = "vram",  offset = "C390", hex = "3401360138013a013c013e01400142014401460148014a014c014e0150015201" }
+
+[asserts.footprint]
+vram = { nonzero_min = 12000 }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

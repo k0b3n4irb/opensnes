@@ -103,6 +103,50 @@ WRAM-stream regression (`wram_regress.py`), input sequences (`--input`),
 the full-corpus manifest, and the CI rewrite (both Linux arches). For
 interactive debugging, use `luna mcp` / luna's GUI.
 
+## Writing a manifest: the vocabulary, and what it cannot express
+
+Everything below was established by probing the pinned luna binary while
+writing the R7 manifests (2026-09-15/16) — `docs/tools/luna.md` is generated
+from `--help` and does not carry the schema.
+
+**Top-level assert namespaces**, exactly these (luna's own error text lists
+them): `wdm_empty`, `nocash_contains`, `fbhash`, `audio_rms_min`, `values`,
+`blocks`, `trace`, `dsp`, `footprint`, `dma`, `oam`. They are evaluated at the
+run bound, not per checkpoint.
+
+**Checkpoints** accept `at_frame`, `input`, `input2`, `mouse`, `superscope`,
+`values` and `delta` — and nothing else. So OAM, VRAM/CGRAM blocks and DSP
+registers can only be asserted once, at the end of the run: an example whose
+DSP state must be compared before and after an event needs **two manifests**,
+not two checkpoints.
+
+- `values` comparisons: `eq`, `ne`, `lt`, `le`, `gt`, `ge` (combinable, e.g.
+  `{ ge = 100, le = 200 }`), with `width` 1, 2 or 4. A `width = 4` read works,
+  but the expected value must still fit in 16 bits.
+- `delta` directions: `increased`, `decreased`, `changed`, `unchanged`.
+- Addresses are a `.sym` symbol or a raw `BANK:OFFSET` string; the run bound is
+  `frames = N` (or `steps = N` for instruction-count tests).
+- `blocks` keys must themselves be a symbol or `BANK:OFFSET`, even when
+  `space` and `offset` are given explicitly.
+
+**Input scripts are merged into one timeline.** Every checkpoint's `input` /
+`mouse` / `superscope` entries are frame-stamped and combined for the whole
+run, so a checkpoint observes every event scheduled before its frame, not only
+the ones written beside it. Reading a checkpoint as if it replayed its own
+script in isolation is the easiest way to write a wrong expectation.
+
+**There is no PPU-register assert.** `luna state --out -` prints the whole
+`ppu` block as JSON, but a manifest cannot compare against it, and reading an
+MMIO address through `values` returns 0 (it resolves WRAM). Today the route to
+those registers is the library's own WRAM shadows — `hdma_enabled_state` in
+`hdma.asm`, `w12sel`/`w34sel`/`wobjsel`/`wbglog` in `window.c`, `m7_sin` /
+`m7_cos` / `m7_scale` in `mode7.c` — and a shadow is only trustworthy for an
+example that goes through the module. `examples/windows/window` writes the
+window registers raw, so its shadow reads 0 while the hardware holds `$33`;
+that manifest asserts an `fbhash` instead of a value it would be lying about.
+The capability request is recorded in
+`.claude/notes/status/luna_stress_campaign.md` for owner validation.
+
 ## Hardening tests (luna scripted-input & trace capabilities)
 
 Beyond visual/coverage, the harness exercises axes the old snes9x harness

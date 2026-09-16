@@ -1,0 +1,22 @@
+# memory/hirom_demo — the A button still reaches the game in a HiROM build.
+#
+# The example's only interaction is `padHeld(0) & KEY_A` -> setColor(0,
+# RGB(0,0,31)). That is a small thing, but it is the one path in this ROM that
+# exercises the auto-joypad read, the input module and a CGRAM write in the
+# same frame, under the HiROM memory map — and it is the one path NO other
+# pillar touches, because both the liveness pass and the fbhash baseline for
+# this example run with the pad idle. Whatever A does here has never been
+# observed by the test suite before this file.
+#
+# A is held from frame 100 to the capture at 200. CGRAM colour 0 must be
+# RGB(0,0,31) = $7C00, little-endian `007c`. The white text colour is asserted
+# alongside it in the same block: setColor(0, ...) must touch colour 0 ONLY,
+# so a CGADD/CGDATA sequence that ran away would show up as colour 1 moving.
+#
+# The release half of the branch is `input_hirom_backdrop_release.toml`.
+rom = "../../../examples/memory/hirom_demo/hirom_demo.sfc"
+frames = 200
+input = "100:0x0080"
+
+[asserts.blocks]
+backdrop_light_blue = { space = "cgram", offset = "0000", hex = "007cff7f" }

@@ -1,0 +1,77 @@
+# sprite_sizes is the OBJSEL size-mode menu, and the thing it demonstrates
+# only exists in a register the framebuffer hash sees only indirectly and
+# the liveness pass not at all: bits 7-5 of OBJSEL pick the small/large
+# pixel pair for ALL 128 sprites, and each OAM high-table size bit picks
+# which of the two a sprite uses. The visual baseline is captured with no
+# input, so it only ever sees mode 0 (8x8 / 16x16) — the five other modes,
+# and the UP/DOWN clamping that reaches them, are untested by it entirely.
+#
+# This drives the menu the whole way down and pins the mode index at each
+# stop, then lets luna decode the final OAM through OBJSEL to check the two
+# sprites really render at 32x32 and 64x64.
+#
+# The first tap is UP on item 0 — the clamp. Measured on luna, OBJSEL stays
+# $02 through it, then walks $02 -> $22 -> $42 -> $62 -> $82 -> $A2 on the
+# five DOWN taps (mode << 5 | name base 2 = VRAM $4000), and further DOWN
+# taps leave it at $A2. selectedItem tracks it 0,0,1,2,3,4,5.
+#
+# The [asserts.oam] block is the payoff: at mode 5 (OBJ_SIZE32_L64) luna
+# reports sprite 0 as 32x32 and sprite 1 as 64x64 from the same OBJSEL the
+# ROM wrote — the small/large split the example is about. Positions and
+# tiles are the oamSet() arguments (y = 120 - 1, the lib's scroll-quirk
+# compensation), and the palettes are 0 / 1 as the source sets them.
+rom = "../../../examples/sprites/sprite_sizes/sprite_sizes.sfc"
+frames = 300
+#        UP (clamped)   then five DOWN taps, one per 40 frames
+input = "60:0x0800,64:0,100:0x0400,104:0,140:0x0400,144:0,180:0x0400,184:0,220:0x0400,224:0,260:0x0400,264:0"
+
+[[checkpoint]]                 # UP on item 0 must NOT wrap to item 5
+at_frame = 80
+[checkpoint.values]
+selectedItem = { eq = 0, width = 2 }
+
+[[checkpoint]]                 # 8x8 / 32x32
+at_frame = 120
+[checkpoint.values]
+selectedItem = { eq = 1, width = 2 }
+
+[[checkpoint]]                 # 8x8 / 64x64
+at_frame = 160
+[checkpoint.values]
+selectedItem = { eq = 2, width = 2 }
+
+[[checkpoint]]                 # 16x16 / 32x32
+at_frame = 200
+[checkpoint.values]
+selectedItem = { eq = 3, width = 2 }
+
+[[checkpoint]]                 # 16x16 / 64x64
+at_frame = 240
+[checkpoint.values]
+selectedItem = { eq = 4, width = 2 }
+
+[[checkpoint]]                 # 32x32 / 64x64 — the last one
+at_frame = 300
+[checkpoint.values]
+selectedItem = { eq = 5, width = 2 }
+
+[asserts.oam]
+visible = 2
+
+[asserts.oam.sprites.0]        # OBJ_SMALL under OBJ_SIZE32_L64
+x = 70
+y = 119
+tile = 16                      # ($4100 - $4000) / 16
+palette = 0
+priority = 3
+w = 32
+h = 32
+
+[asserts.oam.sprites.1]        # OBJ_LARGE under OBJ_SIZE32_L64
+x = 170
+y = 119
+tile = 80                      # ($4500 - $4000) / 16
+palette = 1
+priority = 3
+w = 64
+h = 64

@@ -1,0 +1,40 @@
+# The SNES Mouse reports its own sensitivity, and changing it is a protocol,
+# not a variable: mouseSetSensitivity() only queues a request, and the NMI
+# handler clocks the cycle command out to the mouse, which then reports the
+# new value back. Every step of that round trip is invisible to the other
+# pillars — the cursor moves the same way at any sensitivity, so neither the
+# framebuffer hash nor the existing mouse.toml (which saturates the clamped
+# cursor on purpose, "value independent of sensitivity") can see it break.
+#
+# The example cycles on each right click: 0 (low) -> 1 -> 2 (high) -> 0. The
+# right button (buttons bit 1) is pulsed for four frames at frames 60, 90 and
+# 120, and each checkpoint reads the library's shadow back once the NMI handler
+# has clocked that request out — measured to land within ~10 frames, so the
+# checkpoints sit at 80, 110 and 150. Note that luna merges every checkpoint's
+# `mouse` script into one timeline for the whole run, so each checkpoint sees
+# all the presses scheduled before its frame, not only the ones written beside
+# it. Port 1's byte is asserted unchanged at every step: a request must not
+# leak across ports.
+rom = "../../../examples/input/mouse/mouse.sfc"
+
+[[checkpoint]]                       # after the click at frame 60: low -> medium
+at_frame = 80
+mouse = "30:0,0,0;60:0,0,2;64:0,0,0"
+[checkpoint.values]
+mouse_con = { eq = 1, width = 1 }
+mouseSensitivity = { eq = 1, width = 1 }
+"00:0081" = { eq = 0, width = 1 }    # port 1: untouched
+
+[[checkpoint]]                       # after the click at frame 90: medium -> high
+at_frame = 110
+mouse = "90:0,0,2;94:0,0,0"
+[checkpoint.values]
+mouseSensitivity = { eq = 2, width = 1 }
+"00:0081" = { eq = 0, width = 1 }
+
+[[checkpoint]]                       # after the click at frame 120: high wraps to low
+at_frame = 150
+mouse = "120:0,0,2;124:0,0,0"
+[checkpoint.values]
+mouseSensitivity = { eq = 0, width = 1 }
+"00:0081" = { eq = 0, width = 1 }

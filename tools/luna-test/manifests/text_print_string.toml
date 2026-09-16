@@ -1,0 +1,32 @@
+# examples/text/print_string — the two VRAM writes the text module actually
+# makes, pinned byte-exactly and separately.
+#
+# fbhash already covers "the screen looks right", but it is one number over the
+# whole frame: it cannot say WHICH half of the text path broke. This example is
+# the SDK's canonical text smoke test and two independent mechanisms sit behind
+# its one visible line:
+#   1. textLoadFont(0x0000) DMAs the built-in 2bpp font to VRAM word 0. Asserted
+#      here as the 'T' glyph (tile 52 = font_tile 0 + 'T' - 32) at byte $0340 —
+#      the bitplanes .######. / ...##... x6. A wrong VRAM target, a wrong
+#      FONT_SIZE or a broken asm_textDMAFont moves or corrupts exactly this.
+#   2. textPrintAt(8, 14, "TEXT MODULE TEST") fills the RAM tilemap buffer and
+#      the NMI DMAs it to the tilemap at VRAM word $3800. Asserted as the 16
+#      tilemap entries at byte $7390 = ($3800 * 2) + (14 * 32 + 8) * 2 — each
+#      entry is font_tile + (c - 32) with palette 0, so the hex below literally
+#      spells T E X T _ M O D U L E _ T E S T. A build where the tilemap never
+#      flushed, where the cursor maths shifted by a row, or where build_tile_entry
+#      started emitting a palette/priority bit, fails on this block alone.
+# Both neighbours are asserted blank (columns 6-7 before the string, columns
+# 24-25 after it), so a print that spilled would fail even if the glyphs landed.
+#
+# Measured with `luna state ... --until-frame 60 --dump-vram`. VRAM block
+# offsets are byte offsets, and both are fixed by textModeInit(), not by link
+# order, so they are stable across rebuilds.
+rom = "../../../examples/text/print_string/print_string.sfc"
+frames = 60
+
+[asserts.blocks]
+font_glyph_T = { space = "vram", offset = "0340", hex = "7e001800180018001800180018000000" }
+row14_text   = { space = "vram", offset = "7390", hex = "340025003800340000002d002f00240035002c00250000003400250033003400" }
+row14_before = { space = "vram", offset = "738C", hex = "00000000" }
+row14_after  = { space = "vram", offset = "73B0", hex = "00000000" }

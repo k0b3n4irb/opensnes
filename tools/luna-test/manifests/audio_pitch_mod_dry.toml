@@ -1,0 +1,37 @@
+# examples/audio/pitch_mod, leg 1 of 2 — the cello sings alone; the LFO voice
+# is loaded and routed but NOT yet keyed.
+#
+# The example is a black-and-orange flat backdrop: nothing it demonstrates
+# reaches the framebuffer, so liveness and fbhash pass identically whether the
+# SPC image programmed PMON or not. The lesson is hardware vibrato — voice 0's
+# OUTPUT modulating voice 1's pitch — and it only exists in the DSP register
+# file. This leg pins the routing that is set up at boot and the state BEFORE
+# the modulator enters:
+#   PMON 0x02      voice 1 is pitch-modulated by voice 0 (THE feature)
+#   V0_PITCH $0003 the LFO's rate — inaudibly slow, a hardware oscillator
+#   V0_GAIN 0x02   the LFO's depth
+#   V0_ENVX 0x00   ...but the LFO has not been keyed on yet (leg 2 is 0x02)
+#   KON 0x02       the last key-on was the cello (voice 1), not the LFO
+# Measured with `--until-frame 60`; V0_ENVX is still 0 at frame 97 and 0x02 by
+# frame 100, so frame 60 has ~40 frames of margin. Pair: audio_pitch_mod_vibrato.toml.
+rom = "../../../examples/audio/pitch_mod/pitch_mod.sfc"
+frames = 60
+
+[asserts.dsp]
+PMON     = 0x02      # voice 1's pitch is multiplied by voice 0's output
+V0_PITCHL = 0x03     # LFO rate $0003
+V0_PITCHH = 0x00
+V0_GAIN  = 0x02      # LFO depth (direct GAIN, not ADSR)
+"08"     = 0x00      # V0_ENVX (DSP $08; luna has no name for ENVX): the
+                     # modulator is silent — no vibrato yet
+KON      = 0x02      # only the cello has been bowed so far
+V1_SRCN  = 0x01      # the cello sample, from the uploaded bank
+V1_PITCHL = 0xBB     # C5
+V1_PITCHH = 0x08
+V1_ADSR1 = 0xFF      # instant attack
+V1_ADSR2 = 0xE8      # ~7 s fade — the bow stroke
+EDL      = 0x0F      # the concert hall: max delay
+EFB      = 0x64
+EON      = 0x02
+ESA      = 0x88
+DIR      = 0x08

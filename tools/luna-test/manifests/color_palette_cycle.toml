@@ -1,0 +1,69 @@
+# palette_cycle's whole thesis is that NOTHING on screen moves: the tiles,
+# the tilemap and the scroll registers are frozen after init, and the
+# animation is 32 bytes of CGRAM rewritten every fourth frame. Liveness
+# cannot see that, and the fbhash baseline samples one frame of a rainbow
+# that looks equally plausible at any rotation — a cycle that stopped, ran
+# backwards, or skipped two slots per step would all hash to *a* valid
+# picture.
+#
+# The exact-bytes assert is the point. At frame 360 the ROM has performed
+# cycle_pos = 58 rotations, and CGRAM 0-15 is verified here to be the
+# example's 16-step HSV rainbow rotated by exactly 58 mod 16 = 10 slots
+# (entry 0 holds rainbow[10] = $7CE0, entry 6 holds rainbow[0] = $001F).
+# That single block ties the visible palette to the counter: rotate by two,
+# rotate the wrong way, or lose the seam at entry 15 -> 0 and it fails.
+#
+# The VRAM block is the negative. 32 bytes of tilemap row 0 at word $3C00
+# (byte $7800) still read 00,01,02...0F after 58 rotations — tile id
+# (row + col) & 15, untouched. If the "animation" ever became a tilemap
+# rewrite this is what would catch it.
+#
+# START is the third claim: it freezes the cycle (cycle_pos unchanged over
+# 60 whole frames, which is 15 rotations' worth) and a second press resumes
+# it. Neither press is exercised by any other pillar.
+rom = "../../../examples/color/palette_cycle/palette_cycle.sfc"
+
+[[checkpoint]]                 # cycling from boot, one rotation per 4 frames
+at_frame = 120
+[checkpoint.values]
+cycling = { eq = 1, width = 1 }
+cycle_pos = 28
+
+[[checkpoint]]                 # free-running: +15 rotations in 60 frames
+at_frame = 180
+[checkpoint.values]
+cycling = { eq = 1, width = 1 }
+cycle_pos = 43
+[checkpoint.delta]
+cycle_pos = "increased"
+
+[[checkpoint]]                 # START -> frozen; 60 frames pass, counter does not
+at_frame = 240
+input = "180:0x1000,185:0"
+[checkpoint.values]
+cycling = { eq = 0, width = 1 }
+cycle_pos = 43
+[checkpoint.delta]
+cycle_pos = "unchanged"
+
+[[checkpoint]]                 # still frozen 60 frames later
+at_frame = 300
+[checkpoint.values]
+cycling = { eq = 0, width = 1 }
+[checkpoint.delta]
+cycle_pos = "unchanged"
+
+[[checkpoint]]                 # START again -> resumes, exactly 15 more rotations
+at_frame = 360
+input = "300:0x1000,305:0"
+[checkpoint.values]
+cycling = { eq = 1, width = 1 }
+cycle_pos = 58
+[checkpoint.delta]
+cycle_pos = "increased"
+
+[asserts.blocks]
+# the rainbow rotated by 58 mod 16 = 10 slots
+wheel = { space = "cgram", offset = "0000", hex = "e07c047c107c1c7c1f5c1f2c1f009f011f03fb03ef03e303e023e053e07f607e" }
+# tilemap row 0 at word $3C00: tile id = col & 15, never rewritten
+tilemap_row0 = { space = "vram", offset = "7800", hex = "00000100020003000400050006000700080009000a000b000c000d000e000f00" }

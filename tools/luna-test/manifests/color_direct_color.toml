@@ -1,0 +1,42 @@
+# direct_color demonstrates ONE register bit re-reading the same VRAM bytes:
+# CGWSEL bit 0 (direct colour) makes the PPU decode an 8bpp pixel as BBGGGRRR
+# and ignore CGRAM entirely; clearing it sends the very same pixels back
+# through the (deliberately different) grayscale CGRAM ramp. Nothing is
+# re-uploaded on the toggle.
+#
+# Liveness and the fbhash baseline both sample the BOOT frame only, where
+# direct colour is already on — neither one presses A, so a colorMathSetDirectColor()
+# that stopped clearing bit 0 (or a shadow that drifted from the register)
+# would ship green. This manifest walks the toggle both ways and pins the
+# CGWSEL shadow byte each time.
+#
+# The CGRAM block is the negative: the grayscale ramp must be byte-identical
+# before and after the toggle, because the example re-uploads nothing. The
+# 32 bytes straddle entries $78-$87, i.e. the ramp's 15 -> 16 step at the
+# halfway point ($3DEF -> $4210) — a block of the ramp that cannot be
+# confused with cleared CGRAM.
+rom = "../../../examples/color/direct_color/direct_color.sfc"
+
+[[checkpoint]]                 # boot: 256 tiles + 512 B CGRAM uploaded, direct colour ON
+at_frame = 100
+[checkpoint.values]
+direct_on = { eq = 1, width = 1 }
+cgwsel = { eq = 0x01, width = 1 }        # bit 0 set: pixel byte IS the colour
+
+[[checkpoint]]                 # A -> direct colour OFF, pixels go through CGRAM
+at_frame = 160
+input = "100:0x0080,105:0"
+[checkpoint.values]
+direct_on = { eq = 0, width = 1 }
+cgwsel = { eq = 0x00, width = 1 }
+cgadsub = { eq = 0x00, width = 1 }       # the toggle must not touch colour math
+
+[[checkpoint]]                 # A again -> back to direct colour
+at_frame = 220
+input = "160:0x0080,165:0"
+[checkpoint.values]
+direct_on = { eq = 1, width = 1 }
+cgwsel = { eq = 0x01, width = 1 }
+
+[asserts.blocks]
+gray_ramp = { space = "cgram", offset = "00F0", hex = "ef3def3def3def3def3def3def3def3d10421042104210421042104210421042" }
