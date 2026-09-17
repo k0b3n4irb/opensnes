@@ -414,7 +414,15 @@ natively-hashed frame, which is confusing for a human diffing the PNG.
 **For the owner to validate before filing**: should `luna run --native-res`
 write the 512×448 PNG too, matching `luna state`? Nothing is blocked on it.
 
-## R4 still blocked (re-checked 2026-09-15 on v1.23.0)
+## R4 — UNBLOCKED 2026-09-17 (the section below is kept for the history)
+
+`luna profile --sym <file>` accepts an explicit symbol file, so the fold can be
+done on the input side: strip the `NmiHandler@…` child labels from a copy of
+the `.sym` and the handler comes back as a single row. `nmi_budget.py` does
+exactly that and gates six examples at 12 000 mclk. The request to luna is
+**withdrawn** — reported in `/tmp/opensnes_report_luna_2026-09-17_requests.md`.
+
+## R4 was blocked (re-checked 2026-09-15 on v1.23.0)
 
 `luna profile` continues to report the NMI handler as five rows —
 `NmiHandler`, `NmiHandler@oam_done`, `NmiHandler@mp5_done`,

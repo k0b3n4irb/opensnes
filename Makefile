@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -197,6 +197,10 @@ tests: test-compiler
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 tools/luna-test/audio_regress.py
+	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
+	@# by luna on a representative subset (gaps review R4). `make tests`
+	@# proved the handler correct but never short enough.
+	@python3 tools/luna-test/nmi_budget.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
@@ -233,6 +237,13 @@ tests: test-compiler
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
+
+# The VBlank time budget on its own (gaps review R4): the same gate `make
+# tests` runs, handy while tuning the NMI handler. `--report` prints the
+# numbers without failing.
+test-nmi-budget:
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/nmi_budget.py
 
 # PAL pass (gaps review R2): the whole corpus booted at 312 lines / 50 Hz
 # (luna --force-region pal) plus the lib fixture asserting getRegion() /
