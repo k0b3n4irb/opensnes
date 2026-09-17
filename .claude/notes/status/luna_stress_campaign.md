@@ -519,7 +519,33 @@ Values can be *measured* for all of these with `luna state`, so a prototype is
 not needed — the contract is "assert what the state JSON already prints".
 Per `.claude/rules/luna_tooling.md`, validate before filing.
 
-## Ready to land when luna ships `[asserts.ppu]` (measured 2026-09-17)
+## LANDED — luna v1.24.0 shipped all three (2026-09-17)
+
+The owner assigned the requests the same day and luna cut v1.24.0 with all
+three in it: `[asserts.ppu]` (top-level and per checkpoint, keys are the
+`luna state` JSON field names, `.` steps into arrays — no second name table,
+so the vocabulary cannot drift from the observable), `V0_ENVX`/`V0_OUTX`
+names, and `run --native-res --screenshot` now writing 512×448 like `state`
+already did. No emulation path was touched: every fbhash in our manifests
+stood, and the only baseline change was the recorded version string.
+
+What we did with them, same day:
+
+- `manifests/color_gradient_9bit.toml` — the 85th example, previously the one
+  with no functional test. Coverage is now **85 of 85**.
+- `window_triangle_modes.toml` — the four button legs assert the registers
+  the example writes raw (`w12sel` 0x33 / 0x30 / 0x33 / 0x03) instead of
+  leaning on the frame hash alone.
+- `mode7_rotate_scale.toml` — the matrix itself at all three poses, so a
+  regression that stopped writing M7A-M7D no longer passes every value
+  assert.
+- The two `audio_pitch_mod_*` manifests use `V0_ENVX` instead of the hex
+  index; `backgrounds_mode5_hires`'s baseline PNG is a native 512×448 frame.
+
+luna also kept the `--sym` finding from our withdrawal and documented it in
+their profiler guide, with our 652-vs-7258 mclk figure as the worked example.
+
+### The measurements (kept for the history)
 
 The owner assigned the request; luna is working on it. The values below are
 already measured, so the work on our side is writing three files, not
