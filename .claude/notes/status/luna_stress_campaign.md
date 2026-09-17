@@ -518,3 +518,44 @@ What it would buy, concretely:
 Values can be *measured* for all of these with `luna state`, so a prototype is
 not needed — the contract is "assert what the state JSON already prints".
 Per `.claude/rules/luna_tooling.md`, validate before filing.
+
+## Ready to land when luna ships `[asserts.ppu]` (measured 2026-09-17)
+
+The owner assigned the request; luna is working on it. The values below are
+already measured, so the work on our side is writing three files, not
+investigating. Re-measure before committing — these were taken on v1.23.0.
+
+**1. `color/gradient_9bit` — the one example with no manifest.** At frame 200
+the only non-zero PPU field is `inidisp = 5`: the brightness the HDMA channel
+left on the last scanline. Everything else reads 0 (`tm`, `ts`, every window
+and colour-math register), because the demo draws no BG and never calls
+`setScreenOn`. `bgmode = 1`. That single value discriminates: if the INIDISP
+channel stops, the register holds whatever the CPU last wrote instead.
+
+**2. `windows/window` — replace an `fbhash` with the truth.** The example
+writes the window registers raw, so the library's shadows read 0 while the
+hardware holds:
+
+| field | value |
+|---|---|
+| `w12sel` | 51 (`$33`) |
+| `wobjsel` | 51 (`$33`) |
+| `tm` | 3 |
+| `tmw` | 19 (`$13`) |
+| `windows` (WH0..WH3) | 255, 0, 0, 0 |
+
+Today that manifest asserts a frame hash because asserting the shadow would
+assert a falsehood. These asserts replace it.
+
+**3. `mode7/rotate_scale` — the matrix itself, not our bookkeeping.** The
+manifest asserts `m7_sin` / `m7_cos` / `m7_scale` (WRAM shadows). The
+registers, measured:
+
+| | boot (f60) | after A held (f200) |
+|---|---|---|
+| `m7a` / `m7d` | 254 / 254 | -196 / -196 |
+| `m7b` / `m7c` | 0 / 0 | -160 / 160 |
+| `m7x` / `m7y` | 128 / 128 | 128 / 128 |
+
+The `m7b = -m7c` antisymmetry is the rotation invariant worth pinning, and the
+pivot staying at (128,128) while the matrix turns is the free negative.
