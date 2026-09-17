@@ -56,3 +56,12 @@ gfx4snes -i bg.png -p -t -m -R             # BG with tilemap, no tile reduction
 | Stack offset 7,s for first arg | Wrong value (off by one) | First arg is at **6,s** |
 | `consoleDrawText()` | API doesn't exist | Use `textPrintAt()` + `textFlush()` |
 | Sprite palette at CGRAM 0 | Wrong colors | Sprite palettes start at CGRAM 128 |
+
+## Vertical scroll: the lib applies the -1
+
+PVSnesLib's `bgSetScroll` writes the raw y to `BGnVOFS`; OpenSNES writes
+`y - 1` (the PPU never outputs scanline 0 — see KNOWN_LIMITATIONS,
+"Vertical scroll is off by one"). A PVSnesLib example that passed `y - 1`
+itself, or an HDMA table of raw `VOFS` values that assumed the raw
+convention, ends up one line off after a port: pass the intended row, and
+keep the -1 only in data that reaches the register without the lib.

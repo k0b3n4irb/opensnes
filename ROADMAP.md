@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.42.0
+## Current Status: post-v0.43.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
@@ -243,10 +243,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ### Next steps (audit-driven, prioritised)
 
-- [ ] **Sprite/text duplication audit** (P3.2) — `lib/source/` has parallel
-      C and ASM implementations of `sprite` and `text`. Benchmark each,
-      decide migration vs documentation, eliminate duplications. Largest
-      remaining cleanup item (2–3 weeks, perf-critical so risk is real).
+- [x] **Sprite/text duplication audit** (P3.2) — *(CLOSED 2026-09-13
+      by the D2/C2 refresh of `.claude/STRUCTURAL_DEFECTS.md`: the
+      sprite path is ASM-only since the OAM rewrite, the text path is
+      the console module; `make test-link-modules` links every module
+      alone and together so a parallel implementation cannot creep
+      back unnoticed.)*
 - [x] **SuperFX / SA-1 functional tests** (P3.4) — *(SUPERSEDED 2026-06-20: luna runs SA-1 / Super FX natively in the headless harness; the Mesen2 phase and the `opensnes-emu` submodule were removed. See `.claude/notes/chantiers/luna_migration.md`.)* Originally added a Mesen2-headless
       visual regression phase
       (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) running the
@@ -265,13 +267,44 @@ This stretch focused on closing process gaps surfaced by an internal audit
       drifted away from current emit-pass behaviour rather than
       anticipating future work. Markers removed, assertions converted
       to hard-fail, `--allow-known-bugs` dropped from CI.
-- [ ] **Mode 7 game example** (racing or flying)
+- [x] **Mode 7 game example** — `examples/games/mode7_racing` and
+      `examples/games/mode7_flying` (both shipped; luna manifests).
+- [ ] **Gaps-review backlog** — the prioritised list in
+      `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b).
+      Tiers 1 and 2 shipped 2026-09-12/15; Tier 3's four lots shipped
+      2026-09-15. Delivered along the way: CI runs `make tests` and
+      `make lint` verbatim, host sanitizers, cppcheck, fuzzing of every
+      asset parser, the three upstream toolchain suites, a per-module
+      link smoke test, the C-feature and fixed-point runtime ROMs,
+      runtime asserts for collision / SRAM / IRQ / window / region, an
+      audio-output hash, a weekly PAL pass, nightly luna bench, host
+      coverage reporting, SHA-pinned actions, a Doxygen warning gate,
+      and the migration, FAQ, profiling and index docs.
+      **Two entries stay open**: R4 (the VBlank time budget) waits on
+      luna folding the NMI handler's child profile rows into their
+      parent, and R7 has covered the seven games plus
+      `input/move_sprite` — the remaining interactive manifests, the
+      multitap path and mouse sensitivity are still to do.
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
 - [ ] **Original-game release**
 - [ ] **Video tutorial series**
 
 ---
+
+## Work in flight
+
+None on a branch. The live plan is the backlog of the 2026-09-11 gaps
+review (`.claude/notes/reviews/2026-09-11_gaps_review.md`, §10–§11):
+Tier 1 shipped 2026-09-11..13, Tier 2 is in progress on `develop`
+directly, one item per commit. The `wip/*` policy (`CONTRIBUTING.md`)
+still applies to multi-day chantiers; the four `wip/*` branches that
+existed on 2026-09-14 were all superseded by commits already on
+`develop` (three CI hygiene branches of 2026-09-07, one test-harness
+branch of 2026-06-22) and were deleted that day. The luna side of the
+plan lives with the luna team: their queue and ours are in
+`~/opensnes_reports/` (owner-side), the pinned release in
+`tools/luna-test/luna.version`.
 
 ## Known limitations
 
@@ -299,6 +332,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-12. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-17. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

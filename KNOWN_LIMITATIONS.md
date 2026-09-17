@@ -102,6 +102,44 @@ If bank $00 still runs out (code plus hand-written asm payload):
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
+### 🟢 Vertical scroll is off by one: the PPU never outputs scanline 0 (hidden by the lib)
+The OBJ data of every scanline is fetched during the previous line, so the
+PPU renders scanline 0 but never outputs it: a raw `BGnVOFS` of 0 shows
+tilemap lines 1-224, and the bottom picture line is the first line of the
+29th tile row. A program that fills 28 rows (a screen) leaves that line to
+whatever VRAM held at power-on — a strip of garbage on real hardware,
+invisible on an emulator that zero-fills VRAM. "Many games set their
+vertical scroll values to -1 rather than 0" (anomie-regs, BG Scrolling,
+arbitrated 2026-09-12; found by `luna --power-on random` on
+`backgrounds/mode0`, `color/hicolor_blend`, `games/tetris`).
+
+**Mitigation (lib, since 2026-09-12):** every vertical scroll the lib writes
+is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
+module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
+row 0 on the first picture line". PVSnesLib writes the raw value; when
+porting, do not subtract 1 yourself. The one path the lib cannot cover is
+data you hand to the hardware directly, such as an HDMA table on
+`BGnVOFS`: apply the -1 in the table.
+
+### 🟡 A CGRAM write during the picture lands on the wrong entry
+CGRAM is reachable from the CPU only during V-blank, H-blank or forced
+blank; a write to CGDATA while the PPU is drawing "will write the data to
+the wrong CGRAM address" (snesdev-wiki, PPU registers / CGDATA — arbiter;
+luna models it since v1.23.0, as ares and Mesen2 do). This is the trap of
+every per-scanline palette stream: an H-timer IRQ fires at H = HTIME + 3.5
+dots (fullsnes), the handler's prologue then costs dots, and the DMA must
+start after H = 274 (hblank flag) and finish before dot 22 of the next
+line. `examples/color/hicolor_1792` shipped with krom's HTIME = 190 and a
+longer handler than his (register save, V-counter latch): on the faithful
+model its DMA spilled into the next picture and the screen broke into
+bands. The clean window for that handler is HTIME 80..175 (measured on
+luna v1.23.0); it runs at 128.
+
+**Mitigation:** put the CGRAM DMA in H-blank and measure the window on
+luna after any change to the handler — the lenient emulators of the past
+would not show the corruption. `dmaCopyCGram()` / `setPalette*()` from
+the main loop are safe: they run in VBlank or forced blank.
+
 ### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
 `$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll
 in mode 7), and together with the Mode 7 registers `$211B`-`$2120` they go
@@ -169,7 +207,7 @@ offsets read the wrong arguments — the first arg might be at offset 8,s instea
 of 6,s. The function compiles, links, and corrupts the stack at runtime.
 
 **Mitigation:** the full calling convention is documented in
-[`compiler/ABI.md`](compiler/ABI.md), with worked examples and a port checklist.
+[`compiler/ABI.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/compiler/ABI.md), with worked examples and a port checklist.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 
@@ -279,6 +317,22 @@ generate GSU code.
 under `examples/chips/superfx_*`. Plan accordingly: heavy compute lives in
 GSU assembly, not in your C main.
 
+### 🟡 The multitap (5-player) path is present but cannot be switched on
+`templates/crt0.asm` carries a complete `ScanMPlay5` routine — it bit-bangs
+pads 3 and 4 through `$4017` after flipping the multitap to its second
+controller pair, and takes pad 2 from the auto-joypad result. The NMI handler
+calls it whenever `snes_mplay5` is non-zero, and skips the mouse and Super
+Scope while it is (the devices are mutually exclusive).
+
+Nothing ever sets `snes_mplay5`. There is no detection routine, and `input.h`
+exposes no function to enable it, so the flag stays 0 for the life of every
+ROM and the routine never executes. Pads 3, 4 and 5 are unreachable today.
+
+**Mitigation:** none — write for two players. Closing this needs three things
+together: a detection routine (the protocol is on the SNES Development Wiki),
+a public API to arm it, and emulator support to test it — luna currently
+models `pad`, `mouse` and `superscope` on each port, but not a multitap.
+
 ### 🟢 Compiler submodule drift (caught by verify-toolchain)
 `compiler/{cproc,qbe,wla-dx}` are forks with downstream patches. A
 `git submodule update --remote` would advance them past tested commits and
@@ -313,7 +367,11 @@ layout-dependence explains both the non-determinism and the
 Windows-only footprint). A 2026-07-04 investigation found zero retry
 firings across sampled Windows CI builds (late June–July window) and
 zero ASan/UBSan/MSan findings on Linux over the full corpus, including
-a 200x stress of the five historical culprit files. The status is
+a 200x stress of the five historical culprit files (that pass covered
+cproc; the standing `sanitizers` CI job added on 2026-09-12 covers the
+whole host toolchain and found bugs in QBE, wla-dx and cproc — the
+cproc ones are NULL + 0 pointer arithmetic over empty arrays, not the
+segfault class). The status is
 **under surveillance, not closed**: the make-level retry loop was
 dismantled on 2026-07-04 (it could also mask real build failures); the
 `cc65816`-level retry (x3 on exit 139) stays as cheap insurance while
@@ -416,6 +474,78 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 (`PAL_n`) from OBJ (`OBJ_PAL_n`) palettes.
 
 ---
+
+### 🟢 `sramClear()` wrote a byte ramp instead of zeros (fixed 2026-09-15)
+
+`lib/source/sram.asm`'s clear loop compared the 16-bit index through the
+accumulator (`tya / cmp`) and never reloaded the `#$00` it was storing, so
+byte 0 was cleared and bytes 1..n-1 received their own offset (0, 1, 2,
+3, …). `sramSave`/`sramLoad` were right, and no example called
+`sramClear`, so the "delete save" path in the SRAM tutorial shipped
+broken until the lib fixture (`devtools/libtests`, gaps review L2c) did a
+save / clear / load round trip. The loop now compares Y directly
+(`cpy DP_SIZE`) and the fixture asserts the reloaded bytes are all zero.
+
+### 🟢 Five silent miscompilations found and fixed by the C-feature runtime ROM (2026-09-13)
+`devtools/compiler-tests/runtime/c_features` (gaps review C2) asserts the
+result of every C feature that had no runtime check before. Its first run
+found five ways cc65816 produced wrong code with no diagnostic; all are
+fixed in the same chantier and the ROM gates `make tests` at 64/64:
+
+- **bit-field reads returned 0** — cproc extracted a field with the 32-bit
+  idiom (shift left by `32 - width - offset`, right by `32 - width`) on a
+  target whose `w` class is 16 bits, shifting the field out of the register.
+  Bit-field *stores* were right, so a struct looked correct in memory and
+  every read of a narrow field came back 0.
+- **32-bit shifts by a variable count shifted the low word only** — the
+  emitter had constant-count `Kl` shifts and fell through to the 16-bit
+  loop otherwise (its own comment said no code produced them; every
+  `u32 << n` with a runtime `n` did). The high half was an unwritten slot.
+- **signed 32-bit compares read the low words** — cproc classed a `long`
+  compare as `csltw` (its size test predates the 2-byte `int`), and the
+  compare-and-branch fusion did the same for a genuine `csltl`.
+- **signed compares ignored overflow, 16-bit and 32-bit** — `cmp` then
+  `bmi` tests the sign of the difference, which is wrong whenever the
+  subtraction overflows: `-30000 < 30000` was false. Now `sbc` with the V
+  flag folded into N.
+- **`if (long_var)` tested the low word** — a value with only the high
+  half set was false. Likewise `s16 → s32` sign extension lost the sign
+  when the value went through a far frame slot, because the `ldy` that
+  addresses the slot rewrote the N flag the test relied on.
+
+**Mitigation:** none needed since 2026-09-13; the ROM keeps them fixed.
+If you carry an older toolchain: avoid bit-field reads, variable 32-bit
+shift counts, signed `long` comparisons and `if` on a `long`.
+
+### 🟡 Struct parameters, struct returns and struct assignment by value are refused
+cc65816 has no lowering for a struct passed or returned by value (QBE
+`parc` / `argc`) nor for a whole-struct copy (`blit`). The build stops with
+`cc65816/qbe: unhandled IR op N (parc) … struct parameters and struct
+returns by value are not supported on w65816; pass a pointer` — it never
+emits code for them (a whole-struct assignment *was* silently dropped until
+2026-07-19; the refusal is the fix).
+
+**Mitigation:** pass `struct T *`, return through an out-pointer, and copy
+field by field. Pinned by `devtools/compiler-tests/cases/negative/` (2026-09-13).
+
+### 🟡 Variadic functions are refused
+cproc parses `__builtin_va_start` / `__builtin_va_arg`, but the w65816
+backend has no `vastart` / `vaarg` lowering, and the SDK ships no
+`<stdarg.h>`. The build stops with `… (vastart) … variadic functions … are
+not supported on w65816; pass an array and a count`.
+
+**Mitigation:** an array plus a count, or a small struct of arguments by
+pointer. `PHILOSOPHY.md` rules out `printf` in the core lib for the same
+reason. Pinned by `cases/negative/varargs.c`.
+
+### 🟡 Inline assembly is refused
+cproc has no `asm` statement: `__asm__("nop")` stops the build with
+`inline assembly is not yet supported`.
+
+**Mitigation:** put the assembly in a `.asm` file (assembled by
+`wla-65816`, listed in the example's `ASMSRC`) and call it through the C
+ABI — `compiler/ABI.md` gives the stack layout, `lib/source/*.asm` the
+pattern. Pinned by `cases/negative/inline_asm.c`.
 
 ## Performance traps
 

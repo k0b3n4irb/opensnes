@@ -1,0 +1,11 @@
+# A-cache across pha: pushing the same param twice loads it ONCE, then
+# pushes A twice — a regression re-reads the slot before the second push.
+in call_same_twice: present lda 4,s\n\tpha\n\tpha\n\tjsl add_two
+count 1 lda 4,s
+# A computed arg is pushed straight from A: no intermediate slot store
+# between the add and the pha (dead store + A-cache pha).
+in call_with_computed: present adc\.w #5\n\tpha\n\tjsl do_something
+# 4-byte arg cleanup after a non-tail call is two plx, not tsa/adc/tas.
+in call_same_twice: present jsl add_two\n\tplx\n\tplx\n\trtl
+# The single-call wrapper needs no frame at all.
+present ; Function: call_same_twice \(framesize=0,

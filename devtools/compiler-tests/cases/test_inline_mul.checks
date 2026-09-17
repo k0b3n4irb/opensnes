@@ -1,0 +1,10 @@
+# Constant multiplies 11..15 are inlined as shift/add/sub sequences via
+# tcc__r9 — never a runtime call, never a frame.
+absent jsl
+count 5 framesize=0,
+# x*12 = (x*3)<<2
+in mul_by_12: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a\n\tasl a\n\trtl
+# x*14 = ((x<<3)-x)<<1
+in mul_by_14: present asl a\n\tasl a\n\tasl a\n\tsec\n\tsbc\.b tcc__r9\n\tasl a\n\trtl
+# x*15 = (x<<4)-x
+in mul_by_15: present asl a\n\tasl a\n\tasl a\n\tasl a\n\tsec\n\tsbc\.b tcc__r9\n\trtl

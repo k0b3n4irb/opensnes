@@ -1,0 +1,12 @@
+# QBE upstream suite — tests expected to FAIL on the OpenSNES fork.
+#
+# `tools/test.sh all` compiles test/*.ssa for the HOST target (amd64 on
+# the CI runner, arm64 on an Apple/ARM machine), links each with cc and
+# runs it. The fork kept the upstream ELF emitters next to the WLA-DX
+# ones (emit.c, target-dispatched) precisely so this suite can run: it is
+# the only execution test of the shared passes the fork patched (loadopt,
+# promote, gcm, load forwarding, fold, gvn, the 2-pass architecture).
+# Its first run found the 2-pass use-after-free of the type table (five
+# failures, all one bug). Expected: every test that runs on the host
+# green — this list is empty.
+# Same ratchet semantics as cproc_known_fail.txt.

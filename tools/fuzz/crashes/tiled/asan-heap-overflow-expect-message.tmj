@@ -1,0 +1,18 @@
+{
+ "compressionlevel": -1,
+ "infinite": falså,
+ "width": 64,
+ "height": 64,
+ "tilewidth": 8,
+ "tileheight": 8,
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "nextobjectid": 5,
+ 
+ "compressionlevel": -1,
+ "infinite": falså,
+ "width": 64,
+ "height": 64,
+ "tilewidth": 8,
+ "tileheight": 8,
+ "orientation": "orthogonal 64,dth"

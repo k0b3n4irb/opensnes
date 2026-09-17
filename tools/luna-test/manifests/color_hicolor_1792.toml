@@ -1,0 +1,33 @@
+# hicolor_1792 streams CGRAM from an H-timer IRQ: 16 bytes (8 colours) are
+# general-DMA'd into CGDATA on every scanline while the PPU draws, so each
+# 8-line tile row gets a fresh 64-colour set and the screen shows 28 x 64 =
+# 1792 palette slots. Nothing about that is visible to liveness (the NMI
+# would tick just as happily with the IRQ disabled), and a single fbhash
+# proves the composite picture without telling you whether the stream ran
+# ONE row or all twenty-eight.
+#
+# WHY THESE FRAMES, WHY THESE OFFSETS. A CGRAM write during active display
+# lands on whatever entry CGADD happens to hold, so CGRAM mid-frame is not
+# a stable oracle. The snapshot point here is the frame boundary, i.e. in
+# VBlank AFTER hicolorVblank() has rewound CGADD to 0 and DMA'd 128 bytes
+# from the top of sunset_pal. Measured bit-identical at frames 120, 121,
+# 122, 180 and 240 (same md5 over all 512 CGRAM bytes), so this is the one
+# phase of the frame where the streamed palette stands still.
+#
+# What the two blocks prove, and they are the two halves of the trick:
+#   0000  CGRAM 0-31 == sunset_pal[0:64] — the VBlank rewind ran. If
+#         nmiSetBank()'s callback stopped firing, the even-row bank would
+#         hold some other row's colours and the picture would tear.
+#   00C0  CGRAM 96-127 == sunset_pal[3520:3584], the LAST 32 colours of the
+#         3584-byte table (row 27, the bottom tile row). The DMA source
+#         auto-advances across transfers and is only reset in VBlank, so
+#         these bytes can only be here if the H-IRQ fired on essentially
+#         every scanline of the frame and walked the entire table. An IRQ
+#         that fired once, or an HTIME that let the DMA spill into the
+#         picture, does not land row 27 in the odd bank.
+rom = "../../../examples/color/hicolor_1792/hicolor_1792.sfc"
+frames = 180
+
+[asserts.blocks]
+even_bank_row0   = { space = "cgram", offset = "0000", hex = "00002324232423242324232422242224222422242224222022242220222022200000232423242324232423242324222422242224222422242220222022202220" }
+odd_bank_row27   = { space = "cgram", offset = "00C0", hex = "00000a1dca18aa14a91489108910881088106910881088106710670c680c470c0000891088106910680c690c680c670c490c480c480c480c480c470c470c2708" }

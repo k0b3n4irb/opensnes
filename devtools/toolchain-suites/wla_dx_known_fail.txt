@@ -1,0 +1,13 @@
+# wla-dx upstream suite — tests expected to FAIL on the OpenSNES fork.
+#
+# The runner assembles and links every project under tests/{65816,spc-700,
+# superfx} with the fork's binaries and checks the bytes byte_tester
+# expects (the other CPUs' assemblers are not built). Same ratchet
+# semantics as cproc_known_fail.txt. One "<platform>/<test>" per line.
+#
+# base_test_1 asserts upstream's semantics for `.BASE` on RAMSECTION
+# labels (`.dl label_ram_b0_2` → bank byte $C2). The fork's one wla-dx
+# patch (opensnes/ram-labels-ignore-base, compiler/PINS.md) reverses that
+# on purpose: a WRAM label keeps its real bank so `.BASE $C0` HiROM units
+# do not turn $7E into $13E. Upstream's own test documents the divergence.
+65816/base_test_1

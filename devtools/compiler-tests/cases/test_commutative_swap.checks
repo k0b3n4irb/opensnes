@@ -1,0 +1,8 @@
+# Commutative operand swap: the shifted value stays in A and the other
+# param is used as the memory operand — no reload, no slot store, no frame.
+count 2 framesize=0,
+absent sta \d+,s
+# base + (idx<<1): shift in A, then adc the param slot directly.
+in shift_and_add: present lda 6,s\n\tasl a\n\tclc\n\tadc 4,s\n\trtl
+# b | (a<<2): same shape with ora.
+in or_shifted: present asl a\n\tasl a\n\tora 4,s\n\trtl

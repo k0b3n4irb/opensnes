@@ -1,4 +1,11 @@
 /**
+ * @defgroup framework Framework
+ * @brief Opt-in runtime framework: game loop, scene stack, asset bundles
+ *        (gameloop.h, scene.h, asset.h). Nothing here is mandatory —
+ *        every piece is a module you link on purpose (PHILOSOPHY.md).
+ */
+
+/**
  * @file gameloop.h
  * @brief Opt-in game loop framework — write your update, the engine
  *        runs the VBlank synchronisation.

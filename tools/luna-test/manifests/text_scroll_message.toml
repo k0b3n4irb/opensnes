@@ -1,0 +1,54 @@
+# examples/text/scroll_message — the marquee really moves, it moves by exactly
+# one pixel per frame, and it moves WITHOUT touching VRAM.
+#
+# The corpus baseline for this example is a multi-frame fbhash, which proves the
+# picture differs between two capture points — it cannot say whether the text
+# travelled because the scroll register advanced (the lesson: "text is just a BG
+# layer, move it with bgSetScroll") or because something re-wrote the tilemap
+# every frame (exactly what the example claims NOT to do: "without a single
+# extra VRAM write"). Nor can it catch a drift in the rate.
+#
+# So: bg_scroll_x[0] (the lib's buffered scroll, flushed to BG1HOFS by the NMI)
+# is read at two checkpoints and pinned to PREDICTED values. main.c does one
+# scroll_x++ per frame-loop iteration, so the value is frame - 4 (4 boot frames
+# before the loop starts): 56 at frame 60, 116 at frame 120. The delta is
+# asserted `increased` on top, and bg_scroll_y[0] `unchanged` at 0 — a
+# bgSetScroll() that wrote both axes, or wrote the wrong BG's slot, fails there.
+#
+# The VRAM assert is the negative: at the END of the run, after 236 pixels of
+# scrolling, the tilemap row still holds the message written once at boot —
+# textPrintAt(2, 14, "OPENSNES -- TEXT THAT MOVES!"), 28 entries at byte
+# $7384 = ($3800 * 2) + (14 * 32 + 2) * 2, with blank entries either side. If a
+# regression made the marquee work by re-printing a shifted string each frame,
+# the picture would still animate and fbhash would still pass — and this block
+# would not.
+#
+# Measured with `--peek bg_scroll_x:4 --peek bg_scroll_y:4` at frames 60/120/240
+# and `--dump-vram` at frame 240.
+rom = "../../../examples/text/scroll_message/scroll_message.sfc"
+
+[[checkpoint]]                     # one increment per frame since boot
+at_frame = 60
+[checkpoint.values]
+bg_scroll_x = { eq = 56, width = 2 }
+bg_scroll_y = { eq = 0, width = 2 }
+
+[[checkpoint]]                     # 60 frames later, 60 pixels further
+at_frame = 120
+[checkpoint.values]
+bg_scroll_x = { eq = 116, width = 2 }
+bg_scroll_y = { eq = 0, width = 2 }
+[checkpoint.delta]
+bg_scroll_x = "increased"          # BG1 H-scroll is what carries the text
+bg_scroll_y = "unchanged"          # ...and only BG1 H-scroll
+
+[[checkpoint]]
+at_frame = 240
+[checkpoint.values]
+bg_scroll_x = { eq = 236, width = 2 }
+
+[asserts.blocks]
+# the tilemap is written once at boot and never again — still intact at frame 240
+row14_msg    = { space = "vram", offset = "7384", hex = "2f00300025002e0033002e002500330000000d000d00000034002500380034000000340028002100340000002d002f003600250033000100" }
+row14_before = { space = "vram", offset = "7380", hex = "00000000" }
+row14_after  = { space = "vram", offset = "73BC", hex = "00000000" }

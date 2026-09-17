@@ -1,0 +1,60 @@
+# fix32_orbit's whole subject is the 16.16 trig pipeline
+# (fix32Cos/fix32Sin -> fix32Mul -> UNFIX32), and its output is a *path*,
+# not a picture. Liveness only proves the ROM runs; the fbhash baseline
+# pins one frame of a dot on a black field — a ROM whose sin/cos were
+# swapped, whose radius scaling was off, or whose angle accumulator had
+# lost its fractional half would still hash "a dot somewhere" at any
+# single frame the baseline happens to sample.
+#
+# So this walks the orbit through all four quadrants at 64-LUT-step
+# intervals and pins the projected screen coordinate at each. g_angle8
+# advances exactly one LUT step per frame (g_omega = FIX32(1)), and the
+# ROM's first update lands on PPU frame 3, so angle8 = frame - 3.
+#
+# Measured on luna (g_radius = FIX32(60), centre (128, 96)):
+#   frame  35  angle8 0x20   (sx, sy) = (170, 138)   Q1  right + down
+#   frame  99  angle8 0x60   (sx, sy) = ( 85, 138)   Q2  left  + down
+#   frame 163  angle8 0xA0   (sx, sy) = ( 85,  53)   Q3  left  + up
+#   frame 227  angle8 0xE0   (sx, sy) = (170,  53)   Q4  right + up
+#   frame 291  angle8 0x20   (sx, sy) = (170, 138)   back to Q1
+# The +-42/43 px offsets are 60*cos(45 deg) = 42.4 — the radius scaling
+# is checked, not just the sign — a wrong g_radius or a lost fractional
+# half moves every coordinate. The last checkpoint repeats frame 35
+# exactly 256 frames later: the orbit closes on itself, so the 16.16
+# accumulator has not drifted over a full revolution.
+rom = "../../../examples/basics/fix32_orbit/fix32_orbit.sfc"
+
+[[checkpoint]]                 # Q1: cos > 0, sin > 0
+at_frame = 35
+[checkpoint.values]
+g_angle8 = { eq = 0x20, width = 1 }
+g_sx     = { eq = 170, width = 2 }
+g_sy     = { eq = 138, width = 2 }
+
+[[checkpoint]]                 # Q2: cos < 0, sin > 0
+at_frame = 99
+[checkpoint.values]
+g_angle8 = { eq = 0x60, width = 1 }
+g_sx     = { eq = 85,  width = 2 }
+g_sy     = { eq = 138, width = 2 }
+
+[[checkpoint]]                 # Q3: cos < 0, sin < 0
+at_frame = 163
+[checkpoint.values]
+g_angle8 = { eq = 0xA0, width = 1 }
+g_sx     = { eq = 85, width = 2 }
+g_sy     = { eq = 53, width = 2 }
+
+[[checkpoint]]                 # Q4: cos > 0, sin < 0
+at_frame = 227
+[checkpoint.values]
+g_angle8 = { eq = 0xE0, width = 1 }
+g_sx     = { eq = 170, width = 2 }
+g_sy     = { eq = 53,  width = 2 }
+
+[[checkpoint]]                 # exactly 256 steps after the Q1 sample
+at_frame = 291
+[checkpoint.values]
+g_angle8 = { eq = 0x20, width = 1 }
+g_sx     = { eq = 170, width = 2 }
+g_sy     = { eq = 138, width = 2 }

@@ -1,0 +1,105 @@
+# mosaic cycles four transitions on button presses: fadeOut(2), fadeIn(2),
+# mosaicFadeOut(3), mosaicFadeIn(3). Nothing happens until somebody presses
+# something, so liveness and the fbhash baseline both only ever see the
+# static full-brightness picture at mosaic size 0 — all four transitions are
+# untested today, and the MOSAIC register ($2106) is never observed at all.
+#
+# mosaic_size / mosaic_bg_mask are the lib's shadow of $2106 (the register
+# is write-only); checked against the PPU at frame 210, where the shadow
+# pair 15/1 matches ppu.mosaic = $F1, so the shadow is a faithful oracle
+# rather than a variable that merely counts.
+#
+# The ramps are pinned mid-flight, not just at their ends: 15 frames into
+# mosaicFadeOut(3) the size is 5, at 30 frames it is 10, at 50 it has
+# reached MOSAIC_MAX = 15 and STOPPED there (the clamp — a size that wrapped
+# to 0 would re-enter the loop and pixelate forever). Coming back, 15 frames
+# into mosaicFadeIn(3) it is 10 and then 5, and mosaicDisable() leaves the
+# pair at 0/0: the block size AND the per-BG enable bit both cleared.
+#
+# The two negatives are what the pillars can least afford to lose, because
+# these effects share a screen:
+#   * mosaic_size stays 0 through both brightness fades — fadeOut() must not
+#     reach $2106.
+#   * current_brightness stays 15 through both mosaic ramps — mosaicFade*()
+#     must not reach $2100. A mosaic that dimmed as it pixelated would look
+#     entirely reasonable on screen.
+# The fade legs also pin speed=2 independently: 10 frames in, brightness is
+# 11, where the fading example's speed=1 reaches 6 in the same 10 frames.
+rom = "../../../examples/transitions/mosaic/mosaic.sfc"
+
+[[checkpoint]]                 # idle: full bright, mosaic off
+at_frame = 60
+[checkpoint.values]
+current_brightness = { eq = 15, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeOut(2), 10 frames in -> 11 (speed 2)
+at_frame = 70
+input = "60:0x0080,64:0"
+[checkpoint.values]
+current_brightness = { eq = 11, width = 1 }
+mosaic_size = { eq = 0, width = 1 }        # the fade must not touch $2106
+
+[[checkpoint]]                 # fadeOut(2) complete
+at_frame = 95
+[checkpoint.values]
+current_brightness = { eq = 0, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeIn(2), 10 frames in
+at_frame = 120
+input = "110:0x0080,114:0"
+[checkpoint.values]
+current_brightness = { eq = 4, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeIn(2) complete
+at_frame = 145
+[checkpoint.values]
+current_brightness = { eq = 15, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # mosaicEnable(BG1) + mosaicFadeOut(3), 15 frames in
+at_frame = 175
+input = "160:0x0080,164:0"
+[checkpoint.values]
+mosaic_bg_mask = { eq = 1, width = 1 }     # MOSAIC_BG1
+mosaic_size = { eq = 5, width = 1 }
+current_brightness = { eq = 15, width = 1 }   # the mosaic must not touch $2100
+
+[[checkpoint]]                 # 30 frames in: 10 blocks, linear in speed
+at_frame = 190
+[checkpoint.values]
+mosaic_size = { eq = 10, width = 1 }
+[checkpoint.delta]
+mosaic_size = "increased"
+
+[[checkpoint]]                 # at MOSAIC_MAX and clamped there
+at_frame = 210
+[checkpoint.values]
+mosaic_size = { eq = 15, width = 1 }
+mosaic_bg_mask = { eq = 1, width = 1 }
+current_brightness = { eq = 15, width = 1 }
+
+[[checkpoint]]                 # mosaicFadeIn(3) unwinding
+at_frame = 245
+input = "230:0x0080,234:0"
+[checkpoint.values]
+mosaic_size = { eq = 10, width = 1 }
+[checkpoint.delta]
+mosaic_size = "decreased"
+
+[[checkpoint]]
+at_frame = 260
+[checkpoint.values]
+mosaic_size = { eq = 5, width = 1 }
+[checkpoint.delta]
+mosaic_size = "decreased"
+
+[[checkpoint]]                 # mosaicDisable(): size AND the BG bit cleared
+at_frame = 285
+[checkpoint.values]
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+current_brightness = { eq = 15, width = 1 }

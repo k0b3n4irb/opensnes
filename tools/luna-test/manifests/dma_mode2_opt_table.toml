@@ -1,0 +1,52 @@
+# backgrounds/mode2 — the offset-per-tile table, as the PPU will read it.
+#
+# In Mode 2 BG3 is not a picture, it is an offset table: per screen column the
+# PPU reads BG3 tile-row 0 for the H offset word and tile-row 1 for the V
+# offset word. The example writes only V words, each carrying the 0x2000 bit
+# that says "apply to BG1". BG3's map is at word $3000, so row 0 is VRAM byte
+# $6000 (32 words = 64 bytes) and row 1 is byte $6040.
+#
+# `opt_row1_v_offsets` is the whole example in 64 bytes: every word's high byte
+# is 0x20 (the BG1-enable bit) and the low bits walk a sine. The README lists
+# the three ways this goes wrong, and each is a distinct failure of this one
+# block:
+#   * "bands stay flat"          -> the row is zeros; the DMA missed VBlank.
+#   * "whole layer shifts"       -> high bytes are 0x00; the 0x2000 bit is gone.
+#   * "only column 0 is wrong"   -> hardware, not a bug; the block still passes.
+# `opt_row0_h_offsets` is the negative: this example writes NO horizontal
+# offsets, so row 0 must stay exactly zero for the whole run.
+#
+# `unsafe_writes = 0` is the assert that matches the README's own warning
+# verbatim: the offset table is built during ACTIVE display and DMA'd the
+# instant VBlank starts, because computing it after WaitForVBlank() pushes the
+# transfer past VBlank's end and the PPU silently drops it. A regression that
+# reorders those two lines is invisible to every other pillar — the ROM still
+# runs, still animates its counter, and the bands just stop rippling.
+#
+# The BG1 side is asserted with two self-evident blocks: the example builds 16
+# solid tiles where tile N is uniformly colour N, so tile 3 (0b0011) must be
+# bitplanes 0+1 set and 2+3 clear, tile 12 (0b1100) the exact mirror. The map
+# rows are "tile = row & 15", so map row 3 is 32 copies of tile 3.
+rom = "../../../examples/backgrounds/mode2/mode2.sfc"
+frames = 200
+
+[asserts.values]
+wave_phase = 352                  # +2 per loop iteration, 176 iterations by frame 200
+
+[asserts.blocks]
+opt_row0_h_offsets = { space = "vram", offset = "6000", hex = "00000000000000000000000000000000" }
+opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "63205c2054204b20422039202f2027201f2019201420112010201020122016201c2023202b2034203d20462050205820602066206b206e2070206f206d206920" }
+# BG1 chr at word $0000: tile N is solid colour N (2 low bitplanes then 2 high).
+bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
+bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
+# BG1 map at word $2000 (byte $4000): row R is 32 entries of tile R & 15.
+bg1_map_row3       = { space = "vram", offset = "40C0", hex = "03000300030003000300030003000300" }
+bg1_map_row12      = { space = "vram", offset = "4300", hex = "0c000c000c000c000c000c000c000c00" }
+
+# The only per-frame transfer in this example is the 64-byte offset row, and it
+# must happen inside VBlank. Measured: 64 screen-on VRAM bytes per frame. The
+# ceiling is set just above it so a transfer that grew (a whole-map upload
+# creeping into the loop) fails before it starts eating the VBlank budget.
+[asserts.dma]
+unsafe_writes    = 0
+max_vblank_bytes = 128

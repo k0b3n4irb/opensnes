@@ -1,0 +1,56 @@
+# rotate_scale — the Mode 7 matrix itself: rotation and zoom are independent
+# axes, and each one moves only its own half of the state.
+#
+# What this proves that the other pillars cannot:
+#   * The example's own angle and zscale are main() locals on the stack —
+#     invisible to every tool. What survives in WRAM is the mode7 module's
+#     state: m7_sin / m7_cos (the s8 sin/cos of the current angle) and
+#     m7_scale_x / m7_scale_y (8.8 fixed). Those four bytes ARE the matrix
+#     the lib writes to M7A-M7D, and nothing in the corpus reads them back.
+#   * Liveness and the fbhash baseline run with NO input, so both controls —
+#     A/B rotate, UP/DOWN zoom — are dead code to the current suite. The
+#     baseline only ever sees the identity pose.
+#   * Both legs carry a negative, which is the actual contract of this
+#     example's API-ordering comment (mode7SetAngle must be called after
+#     mode7SetScale): rotating must not touch the scale, and zooming must not
+#     touch sin/cos. A regression that folded the scale into the wrong term
+#     keeps rendering *a* Mode 7 plane — the fbhash changes, but nothing says
+#     which half of the matrix moved.
+#
+# Measured: `luna state --until-frame N --input … --peek m7_scale_x:2
+# --peek m7_scale_y:2 --peek m7_sin:1 --peek m7_cos:1`, with the PPU side
+# read back from `luna state --out -`:
+#   f60  identity-ish: m7a = m7d = 254, m7b = m7c = 0
+#   f120 after 60 frames of A: m7a = m7d = 30, m7b = -252, m7c = 252
+#   f180 after 60 frames of UP: m7a = m7d = 85, m7b = -717, m7c = 716
+# i.e. the WRAM values below really are what reached M7A-M7D.
+rom = "../../../examples/mode7/rotate_scale/rotate_scale.sfc"
+
+[[checkpoint]]                 # boot pose: angle 0, scale 2.0x
+at_frame = 60
+[checkpoint.values]
+m7_scale_x = 512                                # 0x0200 = 2.0 in 8.8
+m7_scale_y = 512
+m7_sin = { eq = 0, width = 1 }                  # sin(0)
+m7_cos = { eq = 127, width = 1 }                # cos(0) = +1.0 as s8
+
+[[checkpoint]]                 # A held: rotate only
+at_frame = 120
+input = "60:0x0080,119:0"
+[checkpoint.values]
+m7_sin = { eq = 126, width = 1 }                # angle 60/256 ~ 84.4 deg
+m7_cos = { eq = 15, width = 1 }
+m7_scale_x = 512                                # rotation must not zoom
+m7_scale_y = 512
+
+[[checkpoint]]                 # UP held: zoom only
+at_frame = 180
+input = "120:0x0800,179:0"
+[checkpoint.values]
+m7_scale_x = 1456                               # 512 + 59 * 16
+m7_scale_y = 1456
+m7_sin = { eq = 126, width = 1 }                # zoom must not rotate
+m7_cos = { eq = 15, width = 1 }
+[checkpoint.delta]
+m7_scale_x = "increased"
+m7_scale_y = "increased"

@@ -88,7 +88,7 @@ void io_write_ascii(io_file_t *f, const char *str)
 void io_write_asciif(io_file_t *f, const char *str, int length)
 {
     int i;
-    for (i = 0; str[i] && i < length; i++)
+    for (i = 0; i < length && str[i]; i++)
         io_write8(f, str[i]);
     for (; i < length; i++)
         io_write8(f, 0);
@@ -118,6 +118,18 @@ u32 io_tell(io_file_t *f)
     if (f->is_open)
         return ftell(f->fp);
     return 0;
+}
+
+u32 io_remaining(io_file_t *f)
+{
+    if (!f->is_open || !f->fp)
+        return 0;
+    long here = ftell(f->fp);
+    if (here < 0 || fseek(f->fp, 0, SEEK_END) != 0)
+        return 0;
+    long end = ftell(f->fp);
+    fseek(f->fp, here, SEEK_SET);
+    return end > here ? (u32)(end - here) : 0;
 }
 
 bool io_file_exists(const char *filename)

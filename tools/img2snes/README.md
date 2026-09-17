@@ -41,7 +41,7 @@ make clean        # removes build artifacts
 ```
 
 Requires `clang` (or set `CC=gcc`). Links against `-lm` only.
-All dependencies (lodepng, cmdparser) are embedded in `src/`.
+The shared dependencies (lodepng, cmdparser) live in `tools/common/`, used by gfx4snes and img2snes alike.
 
 ## Usage
 

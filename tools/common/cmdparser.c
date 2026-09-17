@@ -785,13 +785,15 @@ cmdp_flag_t cmdp_flag_always_hide(void)
 #endif
 int cmdp_run(int argc, char **argv, cmdp_command_st *root_command, cmdp_ctx *ctx)
 {
+    /* function scope: `ctx` keeps pointing at it after the else block
+     * (it was block-local — a dangling pointer, cppcheck invalidLifetime) */
+    cmdp_ctx default_ctx = {0};
     if (ctx)
     {
         cmdp_complete_context(ctx);
     }
     else
     {
-        cmdp_ctx default_ctx = {0};
         cmdp_set_default_context(&default_ctx);
         ctx = &default_ctx;
     }

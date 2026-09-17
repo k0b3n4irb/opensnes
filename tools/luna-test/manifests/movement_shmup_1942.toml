@@ -1,0 +1,38 @@
+# The whole game state lives in one struct, `game` ($00:0034), so the
+# fields are addressed by offset: player_x +0, player_y +2, fire_cd +10,
+# bullets[0] at +60 (x +60, y +62, active +64).
+#
+# Leg 2 holds LEFT for 60 frames. PLAYER_SPEED is 2 and the guard is
+# `player_x > PLAYER_MIN_X`, so the ship needs 52 frames to reach x = 8
+# and the remaining 8 held frames must not push it past — the clamp is
+# the negative. player_y must not move at all while only LEFT is held.
+#
+# Leg 3 pulses A. bullet_fire() spawns bullets[0] at player_x + 8, so
+# the bullet's X (16) is derived from the clamped ship position: a test
+# that only checked "a bullet exists" would pass on a ROM that fired
+# from the wrong place.
+rom = "../../../examples/games/shmup_1942/shmup_1942.sfc"
+
+[[checkpoint]]                 # spawn state, nothing fired
+at_frame = 60
+[checkpoint.values]
+"00:0034" = 112                          # game.player_x
+"00:0036" = 160                          # game.player_y
+"00:0074" = { eq = 0, width = 1 }        # game.bullets[0].active
+"00:0072" = 240                          # game.bullets[0].y == BULLET_HIDE_Y
+
+[[checkpoint]]                 # LEFT for 60 frames -> clamped at PLAYER_MIN_X
+at_frame = 120
+input = "60:0x0200,119:0"
+[checkpoint.values]
+"00:0034" = 8                            # PLAYER_MIN_X, not 112 - 120
+"00:0036" = 160                          # vertical axis untouched
+"00:0074" = { eq = 0, width = 1 }        # still nothing fired
+
+[[checkpoint]]                 # A -> one bullet, spawned over the ship's nose
+at_frame = 130
+input = "120:0x0080,124:0"
+[checkpoint.values]
+"00:0074" = { eq = 1, width = 1 }        # bullets[0].active
+"00:0070" = 16                           # bullets[0].x == player_x + 8
+"00:0034" = 8                            # the ship did not drift while firing

@@ -337,7 +337,7 @@ Common issues:
   I-RAM yet (not released from reset, or wrong reset vector)
 - **Counter not incrementing**: Check that `$2200` was written correctly ($00 = release)
 
-## Examples
+## Example ROMs
 
 | Example | What it demonstrates |
 |---------|---------------------|

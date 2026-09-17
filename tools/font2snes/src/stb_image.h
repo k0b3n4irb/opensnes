@@ -1665,6 +1665,11 @@ static void stbi__skip(stbi__context *s, int n)
 #else
 static int stbi__getn(stbi__context *s, stbi_uc *buffer, int n)
 {
+   // OpenSNES: nothing to read, nothing to do — and never hand memcpy a
+   // NULL buffer with a zero count, which is undefined behaviour. The PNG
+   // path that reached this is guarded at its own call site; this covers
+   // the TGA and HDR callers too (fuzz harness, 2026-09-15).
+   if (n <= 0) return 1;
    if (s->io.read) {
       int blen = (int) (s->img_buffer_end - s->img_buffer);
       if (blen < n) {
@@ -5181,6 +5186,17 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
             }
             if (c.length > (1u << 30)) return stbi__err("IDAT size limit", "IDAT section larger than 2^30 bytes");
             if ((int)(ioff + c.length) < (int)ioff) return 0;
+            // OpenSNES: the accumulator below is grown to fit the DECLARED
+            // chunk length before a single byte is read, so a tiny file that
+            // claims a huge IDAT makes stb ask for gigabytes and die — an
+            // 840-byte input reached realloc(2 GB) (fuzz harness 2026-09-16,
+            // the same allocation-bomb class as smconv's 3.7 GB sample).
+            // When the source is a memory buffer we know exactly what is left,
+            // so refuse a chunk the input cannot possibly supply. The
+            // callback/file path keeps stb's own 1 GB per-chunk cap above:
+            // the length is not knowable there without reading it.
+            if (s->io.read == NULL && c.length > (stbi__uint32)(s->img_buffer_end - s->img_buffer))
+               return stbi__err("outofdata", "Corrupt PNG");
             if (ioff + c.length > idata_limit) {
                stbi__uint32 idata_limit_old = idata_limit;
                stbi_uc *p;
@@ -5191,7 +5207,13 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
                p = (stbi_uc *) STBI_REALLOC_SIZED(z->idata, idata_limit_old, idata_limit); if (p == NULL) return stbi__err("outofmem", "Out of memory");
                z->idata = p;
             }
-            if (!stbi__getn(s, z->idata+ioff,c.length)) return stbi__err("outofdata","Corrupt PNG");
+            // OpenSNES: an empty IDAT chunk skips the allocation above, so
+            // `z->idata + ioff` computes NULL + 0 — undefined behaviour that
+            // clang 18 reports and clang 22 does not (fuzz harness,
+            // 2026-09-15). There is nothing to read for a zero-length chunk.
+            if (c.length) {
+               if (!stbi__getn(s, z->idata+ioff,c.length)) return stbi__err("outofdata","Corrupt PNG");
+            }
             ioff += c.length;
             break;
          }

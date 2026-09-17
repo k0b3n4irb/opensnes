@@ -1,0 +1,10 @@
+# Case 6 (trivial static inline) is inlined: the callee body vanishes
+# and the caller computes x+42 itself with no call.
+absent \ntrivial:
+in call_trivial: present lda 4,s\n\tclc\n\tadc\.w #42\n\trtl
+# Cases 1-5 (no keyword / control flow / nested call / recursion / too
+# big) stay real calls: six tail jumps in the file.
+count 6 \tjml \w
+in call_too_big: present jml too_big
+# The recursive inline candidate calls itself through a real jsl.
+in with_recursion: present jsl with_recursion

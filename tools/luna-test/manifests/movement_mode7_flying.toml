@@ -1,0 +1,53 @@
+# The plane spawns on the runway at world (200, 232) in 12.4 fixed point
+# (200<<4 = 3200, 232<<4 = 3712), heading 0 = due north, speed 0, alt 0.
+#
+# Leg 2 is the rule this example exists to teach, asserted as a
+# negative: KEY_UP only climbs when plane_speed >= MIN_FLY_SPEED, so 60
+# frames of UP at a standstill must leave plane_alt at 0 — and the plane
+# parked. A ROM that let you take off from zero airspeed passes a
+# "something moved" test and fails this one.
+#
+# Leg 3 opens the throttle (THROTTLE_STEP 4/frame -> 236 after 59
+# frames, past MIN_FLY_SPEED 128) and the plane rolls north: plane_y
+# drops while plane_x, on heading 0, must not move at all. Leg 4 repeats
+# the UP hold, now above the stall speed, and the altimeter finally
+# rises. landings stays 0 — nothing has touched down.
+rom = "../../../examples/games/mode7_flying/mode7_flying.sfc"
+
+[[checkpoint]]                 # on the runway, engine off
+at_frame = 60
+[checkpoint.values]
+plane_x = 3200                           # 200 << 4
+plane_y = 3712                           # 232 << 4
+plane_speed = 0
+plane_alt = 0
+plane_heading = { eq = 0, width = 1 }    # due north
+landings = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # UP with no airspeed: cannot climb, cannot move
+at_frame = 120
+input = "60:0x0800,119:0"
+[checkpoint.values]
+plane_alt = 0
+plane_speed = 0
+plane_x = 3200
+plane_y = 3712
+
+[[checkpoint]]                 # A: throttle up past MIN_FLY_SPEED, roll north
+at_frame = 180
+input = "120:0x0080,179:0"
+[checkpoint.values]
+plane_speed = 236                        # 59 * THROTTLE_STEP
+plane_y = 3232                           # rolled north
+plane_x = 3200                           # heading 0: no lateral drift
+plane_alt = 0                            # still on the deck
+plane_heading = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # UP again, now fast enough: it climbs
+at_frame = 240
+input = "180:0x0800,239:0"
+[checkpoint.values]
+plane_alt = 354
+landings = { eq = 0, width = 1 }
+[checkpoint.delta]
+plane_y = "decreased"

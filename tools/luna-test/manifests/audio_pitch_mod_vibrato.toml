@@ -1,0 +1,36 @@
+# examples/audio/pitch_mod, leg 2 of 2 — one second in, the LFO keys on and the
+# vibrato blooms. Everything else is bit-identical to leg 1.
+#
+# This is the half of the example a static snapshot cannot show: the demo's
+# "what to observe" is a CHANGE ("the cello enters dry; after ~1 s the vibrato
+# blooms") in a program whose screen never changes at all. Against
+# audio_pitch_mod_dry.toml this leg asserts exactly one moved register —
+# V0_ENVX 0x00 -> 0x02, the modulator voice becoming audible to the pitch
+# multiplier — and re-asserts every PMON/pitch/echo value as UNCHANGED, so an
+# SPC program that keyed the LFO by re-uploading or re-programming the voice
+# (instead of a bare KON) fails here.
+#
+# Measured with `--until-frame 150`. The key-on lands between frame 97 and 100,
+# so both legs sit well clear of the edge, and the cello is re-bowed only every
+# ~7 s (KON stays 0x01 through frame 240).
+rom = "../../../examples/audio/pitch_mod/pitch_mod.sfc"
+frames = 150
+
+[asserts.dsp]
+"08"     = 0x02      # V0_ENVX (DSP $08; luna has no name for ENVX)
+                     # CHANGED vs leg 1 (0x00): the LFO is running
+KON      = 0x01      # CHANGED vs leg 1 (0x02): voice 0 was the last key-on
+PMON     = 0x02      # unchanged — routing was never touched
+V0_PITCHL = 0x03     # unchanged — the LFO rate is still $0003
+V0_PITCHH = 0x00
+V0_GAIN  = 0x02      # unchanged — depth
+V1_SRCN  = 0x01      # unchanged — same cello, not re-loaded
+V1_PITCHL = 0xBB     # unchanged — the note itself never moves; the DSP does
+V1_PITCHH = 0x08
+V1_ADSR1 = 0xFF
+V1_ADSR2 = 0xE8
+EDL      = 0x0F
+EFB      = 0x64
+EON      = 0x02
+ESA      = 0x88
+DIR      = 0x08

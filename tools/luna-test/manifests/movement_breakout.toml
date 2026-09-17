@@ -1,0 +1,31 @@
+# Breakout only reacts once START has been pressed: main() spins on
+# pad_keys[0] & KEY_START before entering run_frame(). The first leg is
+# therefore the negative — 60 frames on the title screen with no input
+# must leave the paddle at its init X (80) and the ball frozen at its
+# init position (94, 109), because move_ball() has not run yet.
+#
+# The second leg presses START, then holds LEFT for exactly 20 frames.
+# move_paddle() steps px by 2 per frame without KEY_A, so px lands on
+# 80 - 40 = 40 — a value predicted from the script. score stays 0 (no
+# brick has been hit that early) and lives stays 4, so a ROM that ran
+# away or died would fail here too.
+rom = "../../../examples/games/breakout/breakout.sfc"
+
+[[checkpoint]]                 # title screen: nothing moves before START
+at_frame = 60
+[checkpoint.values]
+px = 80
+pos_x = 94
+pos_y = 109
+score = 0
+lives = 4
+
+[[checkpoint]]                 # START, then LEFT for 20 frames -> px = 80 - 40
+at_frame = 150
+input = "60:0x1000,64:0,80:0x0200,100:0"
+[checkpoint.values]
+px = 40
+score = 0
+lives = 4
+[checkpoint.delta]
+pos_y = "increased"            # the ball is in flight now, falling toward the paddle

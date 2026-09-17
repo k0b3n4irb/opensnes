@@ -26,6 +26,10 @@ static int brr_clamp_word(int n)
     return n;
 }
 
+/* Left shifts of a negative int are undefined in C (before C23), and the
+ * predictor and the quantiser below shift signed samples all the time, so
+ * every such shift is written as a multiplication by a power of two. The
+ * generated code is the same; the sanitizer job stays quiet. */
 static int brr_compute_filter(int x_2, int x_1, int filter)
 {
     int cp = 0;
@@ -38,16 +42,16 @@ static int brr_compute_filter(int x_2, int x_1, int filter)
         cp += -x_1 >> 4;
         break;
     case 2:
-        cp = x_1 << 1;
-        cp += -(x_1 + (x_1 << 1)) >> 5;
+        cp = x_1 * 2;
+        cp += -(x_1 + x_1 * 2) >> 5;
         cp += -x_2;
         cp += x_2 >> 4;
         break;
     case 3:
-        cp = x_1 << 1;
-        cp += -(x_1 + (x_1 << 2) + (x_1 << 3)) >> 6;
+        cp = x_1 * 2;
+        cp += -(x_1 + x_1 * 4 + x_1 * 8) >> 6;
         cp += -x_2;
-        cp += (x_2 + (x_2 << 1)) >> 4;
+        cp += (x_2 + x_2 * 2) >> 4;
         break;
     }
     return cp;
@@ -100,8 +104,8 @@ static void brr_compress_block(int *source, int *dest, brr_cresult_t *presult, i
                 s2 = (signed short)(c | 0x8000);
                 s1 -= cp;
                 s2 -= cp;
-                s1 <<= 1;
-                s2 <<= 1;
+                s1 *= 2;
+                s2 *= 2;
                 s1 += r_half;
                 s2 += r_half;
                 s1 >>= r_shift;
@@ -110,8 +114,8 @@ static void brr_compress_block(int *source, int *dest, brr_cresult_t *presult, i
                 s2 = brr_clamp_nibble(s2);
                 rs1 = s1;
                 rs2 = s2;
-                s1 = (s1 << r_shift) >> 1;
-                s2 = (s2 << r_shift) >> 1;
+                s1 = (s1 * (1 << r_shift)) >> 1;
+                s2 = (s2 * (1 << r_shift)) >> 1;
                 if (filter >= 2) {
                     s1 = brr_clamp_word(s1 + cp);
                     s2 = brr_clamp_word(s2 + cp);
@@ -119,8 +123,8 @@ static void brr_compress_block(int *source, int *dest, brr_cresult_t *presult, i
                     s1 = s1 + cp;
                     s2 = s2 + cp;
                 }
-                s1 = ((signed short)(s1 << 1)) >> 1;
-                s2 = ((signed short)(s2 << 1)) >> 1;
+                s1 = ((signed short)(s1 * 2)) >> 1;
+                s2 = ((signed short)(s2 * 2)) >> 1;
                 ra = c - s1;
                 rb = c - s2;
                 if (ra < 0) ra = -ra;

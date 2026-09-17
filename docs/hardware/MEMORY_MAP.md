@@ -88,8 +88,8 @@ struct OAM_Entry {
 
 | Range | Use |
 |-------|-----|
-| 0-255 | Background palettes (16 palettes x 16 colors) |
-| 256-511 | Sprite palettes (8 palettes x 16 colors) |
+| colours 0-127 | Background palettes (8 palettes x 16 colours in the 4bpp modes; 2bpp modes split them into 4-colour groups, Mode 3/4/7 8bpp use all 256) |
+| colours 128-255 | Sprite palettes (8 palettes x 16 colours; only palettes 4-7 take part in colour math) |
 
 Color format: `0BBBBBGGGGGRRRRR` (15-bit)
 
@@ -178,7 +178,7 @@ Address         Size      Description
 $2200-$23FF     512 B     SA-1 registers (CPU control, DMA, math, IRQ)
 $3000-$37FF     2 KB      I-RAM (shared between SNES CPU and SA-1)
 $6000-$7FFF     8 KB      BW-RAM window (8 KB view into BW-RAM)
-$40-$5F:0000    up to     BW-RAM (up to 256 KB of fast static RAM)
+$40-$4F:0000    up to     BW-RAM (up to 256 KB of fast static RAM; the rest of the range mirrors)
                 256 KB
 ```
 

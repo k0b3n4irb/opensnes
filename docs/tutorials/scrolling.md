@@ -8,6 +8,16 @@ The SNES PPU has two scroll registers per background layer: one horizontal (BGnH
 
 OpenSNES provides `bgSetScroll()` to set these values. The function writes to shadow variables and marks the background as dirty; the NMI handler then commits the values to hardware during VBlank.
 
+One hardware quirk is hidden for you: the PPU never outputs scanline 0 (the
+OBJ data of every line is fetched during the previous one), so a raw
+`BGnVOFS` of 0 shows tilemap lines 1 to 224 and the bottom picture line is
+the first line of the 29th tile row — which most programs never write, so
+real hardware shows a strip of garbage there. The lib therefore writes
+`y - 1` to the register ("many games set their vertical scroll values to -1
+rather than 0", anomie's register doc): `bgSetScroll(bg, x, 0)` really puts
+tilemap row 0 on the first line. If you drive `BGnVOFS` yourself, from an
+HDMA table for instance, apply the -1 in your data.
+
 ### Wrap Behavior
 
 Scroll offsets are 10 bits wide (0-1023). The tilemap wraps seamlessly:

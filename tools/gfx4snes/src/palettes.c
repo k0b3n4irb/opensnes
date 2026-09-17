@@ -334,7 +334,9 @@ void palette_rearrange_snes(unsigned char *imgbuf, int *palettesnes, int nbtiles
         else
             n = num[i] + 100;
 
-        // make the conversion table
+        // make the conversion table. A combined block stored its final's
+        // index as num[] = final - 100 above, so n is back in range here.
+        // cppcheck-suppress arrayIndexOutOfBoundsCond
         for (ii = 0; ii < num[final[n]]; ii++)
         {
             index = combos[final[n] * colortabinc + ii];

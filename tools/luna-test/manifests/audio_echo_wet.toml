@@ -1,0 +1,32 @@
+# examples/audio/echo, wet leg — the S-DSP echo unit is CONFIGURED AND ROUTED.
+#
+# What this proves that liveness/fbhash cannot: the example's whole lesson is
+# inaudible and invisible. Its framebuffer is a flat purple backdrop, so the
+# fbhash baseline passes unchanged if audioSetEcho/audioSetEchoFilter/
+# audioEnableEcho silently stop reaching the S-DSP (a dropped OP_ECHO_CFG
+# command, a swapped EFB/EDL packing, a FIR upload that never happens). This
+# manifest reads the DSP register file back and pins every value main.c asks
+# for:
+#   audioSetEcho(6, 90, 40, 40) -> EDL 6, EFB 90 (0x5A), EVOL_L/R 40 (0x28)
+#   audioSetEchoFilter({127,0,...}) -> FIR0 0x7F, FIR1..7 0
+#   audioEnableEcho(0xFF)          -> EON 0xFF, FLG bit5 (ECEN) CLEAR
+# Measured with `luna state examples/audio/echo/echo.sfc --until-frame 200`.
+# The dry counterpart is audio_echo_dry.toml — the pair IS the A/B the README
+# asks a listener to make by ear.
+rom = "../../../examples/audio/echo/echo.sfc"
+frames = 200
+
+[asserts.dsp]
+EDL    = 0x06        # delay arg: a 6 x 2 KB echo ring
+EFB    = 0x5A        # feedback 90 — the tail rings
+EVOL_L = 0x28        # wet volume 40, both sides
+EVOL_R = 0x28
+EON    = 0xFF        # every voice routed into the echo
+FLG    = 0x00        # ECEN clear: the DSP is writing the ring
+FIR0   = 0x7F        # tap 0 open — echo passes through unfiltered
+FIR1   = 0x00        # ...and only tap 0: the other 7 taps uploaded as 0
+FIR7   = 0x00
+ESA    = 0xC0        # ring at ARAM $C000 (the v2 driver's reserved page)
+DIR    = 0x0A        # sample directory — the pop was registered
+MVOL_L = 0x7F
+MVOL_R = 0x7F

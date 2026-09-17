@@ -1,0 +1,64 @@
+# perspective_rotate — four HDMA channels feed M7A/M7B/M7C/M7D from per-angle
+# tables, and they are re-armed on EVERY frame. This pins the angle selector,
+# the camera/pivot pair, and that the re-arming never drops a channel.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline run with NO input, so angle stays 0 and
+#     the L/R rotation — 48 tables of 673 bytes, the whole point of the port —
+#     is never selected. Nor is the camera moved.
+#   * repointTables() calls hdmaSetup() four times per VBlank, inside the
+#     window right after NMI returns. hdmaSetup configures but does not
+#     enable; if a refactor ever made it clear HDMAEN (or if one of the four
+#     calls were dropped), the matrix would go stale or the plane would
+#     collapse. hdma_enabled_state is asserted = 0x0F at every checkpoint;
+#     `luna state --out -` confirmed dma.hdmaen = 15 at each of them, so the
+#     lib shadow is a faithful stand-in for $420C here.
+#   * The example carries TWO coupled coordinate pairs — scr_x/scr_y (the BG1
+#     scroll) and pos_x/pos_y (the Mode 7 pivot, M7X/M7Y) — that the d-pad
+#     must move together, and that L/R must not move at all. That coupling is
+#     krom's camera and is exactly what a framebuffer hash cannot name: the
+#     picture looks plausible whether the pivot follows the scroll or not.
+#
+# Measured: `luna state --until-frame N --input … --peek angle:2 --peek
+# scr_x:2 --peek scr_y:2 --peek pos_x:2 --peek pos_y:2 --peek
+# hdma_enabled_state:1`, PPU side from `luna state --out -`:
+#   f60  m7x 512, m7y 1152, m7_hofs 384, m7_vofs 767 (= 768-1, the lib's
+#        documented vertical -1), m7sel 0x80, m7a = m7d = 91, m7b = m7c = 0
+#   f120 after L: m7a = m7d = 24, m7b = 88, m7c = -88 — the matrix rotated
+#   f180 after RIGHT: m7x 571, m7_hofs 442 — camera and pivot moved together
+rom = "../../../examples/mode7/perspective_rotate/perspective_rotate.sfc"
+
+[[checkpoint]]                 # krom's start pose, all four channels armed
+at_frame = 60
+[checkpoint.values]
+angle = 0
+scr_x = 384
+scr_y = 768
+pos_x = 512
+pos_y = 1152
+hdma_enabled_state = { eq = 0x0F, width = 1 }   # M7A, M7B, M7C, M7D
+
+[[checkpoint]]                 # L held: the angle selector advances, mod 48
+at_frame = 120
+input = "60:0x0020,119:0"
+[checkpoint.values]
+angle = 11                                      # 59 steps wrapped at ANGLES=48
+scr_x = 384                                     # rotating must not move the
+scr_y = 768                                     # camera or the pivot
+pos_x = 512
+pos_y = 1152
+hdma_enabled_state = { eq = 0x0F, width = 1 }   # re-arming kept all four
+
+[[checkpoint]]                 # RIGHT held: scroll and pivot move together
+at_frame = 180
+input = "120:0x0100,179:0"
+[checkpoint.values]
+scr_x = 443                                     # 384 + 59
+pos_x = 571                                     # 512 + 59, the same 59
+scr_y = 768                                     # and only on the X axis
+pos_y = 1152
+angle = 11                                      # panning must not rotate
+hdma_enabled_state = { eq = 0x0F, width = 1 }
+[checkpoint.delta]
+scr_x = "increased"
+pos_x = "increased"

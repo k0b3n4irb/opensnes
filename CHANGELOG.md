@@ -2,6 +2,104 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.43.0] — 2026-09-17
+
+The instrument release. The 2026-09-11 gaps review's whole prioritised
+backlog ships here — every tier, 42 of its 43 items — and what matters is
+not the instruments themselves but what they caught the first time they
+ran: a save-erase routine that wrote a byte ramp instead of zeros, five
+silent miscompilations, two heap overflows and two allocation bombs in
+vendored parsers, and seven latent host bugs. Functional test coverage of
+the example corpus went from 35 of 85 to 84 of 85. The one item still open
+(a per-frame VBlank time budget) waits on luna folding the NMI handler's
+child profile rows into their parent.
+
+### Added
+- feat(devtools,ci): **the host toolchain runs under ASan + UBSan**
+  (`make test-sanitizers`, `SANITIZE=1`, CI job). Its first run found
+  seven latent bugs in five programs, including a QBE use-after-free and
+  a wla-65816 read before its token buffer.
+- feat(devtools,ci): **the three submodules' own upstream suites run on
+  the fork binaries** against known-fail ratchets
+  (`make test-toolchain-suites`) — the check every PIN bump was missing.
+- feat(tools,ci): **libFuzzer harnesses for every asset parser**
+  (`tools/fuzz`, `make fuzz`, `make fuzz-replay`): lodepng, smconv's
+  Impulse Tracker loader, cute_tiled, the Aseprite JSON parser and
+  stb_image. Crashing inputs are committed and replayed on every push.
+- feat(devtools,ci): **compiler host coverage** (`make coverage-host`,
+  clang source-based, CI artifact). First measurement: 72.8 % of lines
+  over the fork-owned files, 84.1 % over the w65816 backend.
+- feat(luna-test): **an audio-output oracle** — `audio_regress.py` hashes
+  300 frames of APU output for four self-playing examples, in `make tests`.
+- feat(luna-test,ci): **a PAL pass** (`make test-pal`, weekly workflow):
+  the corpus booted at 312 lines and 50 Hz, plus `getRegion()` / `isPAL()`
+  asserts on the library fixture.
+- feat(luna-test,ci): **nightly `luna bench`** over the whole corpus
+  (`make luna-bench`), and `--native-res` capture for the hi-res example.
+- feat(devtools): **`make test-link-modules`** links every library module
+  alone and together — it found seven undeclared dependencies.
+- feat(devtools): runtime assertion ROMs for **C features** (64 asserts)
+  and for **collision, SRAM, the raw IRQ path, the window module and the
+  region getters** (the library fixture now carries 99 vectors).
+- feat(docs): **a PVSnesLib migration guide, an FAQ and a profiling
+  tutorial**, and a documentation index that finally lists all 24
+  tutorials, the craft guides and the tool pages — with a measured
+  header-to-tutorial map naming what is still undocumented.
+- feat(luna-test): **107 manifests, covering 84 of the 85 examples**
+  functionally (was 35). The seven games and the input examples answer
+  their pad; the rest assert what they demonstrate — VRAM and CGRAM
+  destinations, S-DSP state before and after an effect, HDMA channel
+  shadows, the Mode 7 matrix, OAM decoded through OBJSEL.
+- feat(ci): supply-chain hygiene — every action pinned to a commit SHA,
+  Dependabot, an `.editorconfig`, and a Doxygen warnings-as-errors gate
+  (`make docs-strict`) after driving 56 warnings to zero.
+
+### Fixed
+- fix(lib): **`sramClear()` wrote a byte ramp instead of zeros.** The loop
+  compared its index through the accumulator and never reloaded the zero,
+  so byte 0 was cleared and every byte after it received its own offset.
+  No example called it, so the tutorial's "delete save" path had shipped
+  broken; the library fixture's save/clear/load round trip found it.
+- fix(compiler): **five silent miscompilations**, found by the new
+  C-feature ROM — bit-field reads returning 0, 32-bit shifts by a variable
+  count shifting only the low word, signed 32-bit compares, `jnz` on a
+  32-bit value, and a sign-extension clobber.
+- fix(runtime,lib): vertical scroll writes `y - 1` — the PPU never outputs
+  scanline 0, so the library now applies the correction for you.
+- fix(compiler): four clang 18 null-plus-zero sites in cproc and QBE that
+  only the sanitizer job and the upstream suites reached.
+- fix(tools): **two heap-buffer-overflows in cute_tiled** (the whitespace
+  scan and the error message both read past the caller's buffer, which
+  the parser neither copies nor terminates) — fixed structurally by
+  parsing a NUL-terminated copy.
+- fix(tools): **two allocation bombs** — smconv's IT loader asked for
+  3.7 GB from a sample header, and an 840-byte PNG made stb_image ask for
+  2 GB from a declared IDAT length. Both bounded by what the input can
+  actually supply.
+- fix(tools): undefined behaviour in stb_image's PNG accumulator, and an
+  unsigned alpha mask in tmx2snes.
+- fix(examples): `hicolor_1792` spilled its CGRAM DMA past H-blank, which
+  luna v1.23.0 made visible; the H-timer moved to a measured clean window.
+- fix(ci): the Doxygen gate no longer sits in the Doxyfile, where it broke
+  release builds on two platforms.
+
+### Changed
+- chore(luna-test): **luna pinned at v1.23.0** (per-frame profile rows,
+  `--budget`, mid-picture CGRAM modelling, overscan).
+- refactor(tools): lodepng and cmdparser live in `tools/common` instead of
+  being duplicated byte for byte in two tools.
+- chore(devtools): 14 compiler fixtures gained assertions; the unchecked
+  ratchet went 55 to 41.
+- docs(claude): the structural-defect catalogue, the roadmap and eight
+  stale notes now describe the tree as it is.
+
+### Known
+- The multitap path is present but **unreachable**: nothing sets the flag
+  the NMI handler tests, so pads 3, 4 and 5 are never read. See
+  `KNOWN_LIMITATIONS.md`.
+- `color/gradient_9bit` has no functional manifest: its effect lives
+  entirely during the picture, and a manifest cannot assert a PPU register.
+
 ## [0.42.0] — 2026-09-12
 
 The gate release: the harness captures at PPU frames, CI runs the same

@@ -1,0 +1,9 @@
+# Inline constant multiply consumes the A-cached temp: no slot store, no
+# frame, no runtime multiply call in any of the three chains.
+count 3 framesize=0,
+absent sta \d+,s
+absent jsl
+# (a+b)*8: the sum stays in A and is shifted in place.
+in chain_shift: present adc 4,s\n\tasl a\n\tasl a\n\tasl a\n\trtl
+# (a*3+b)*5: the sum is parked in tcc__r9 (not a stack slot) for x*4+x.
+in chain_mul: present adc 4,s\n\tsta\.b tcc__r9\n\tasl a\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\trtl

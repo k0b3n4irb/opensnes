@@ -31,8 +31,9 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
 
 ## Critical Constraints
 
-- **Bank $00 is 32KB max**: `static const` arrays get SUPERFREE sections. If bank $00 fills, data spills to bank $01+ but C code reads from bank $00 → garbage.
-- **`sta.l $0000,x` always reads bank $00**: all C RAM must be below $2000.
+- **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data is placed in the asset banks and every C read of it is a far read; `devtools/check_bank_reads.py` fails the link on a bank-blind read. The bank $00 free-space ratchet still guards the code bank.
+- **Plain C RAM lives below $2000; `FAR` is the way above it** (since chantier B2): `sta.l $0000,x` reads bank $00, so a plain global sits in `$00:0000-$1FFF`; `FAR` objects go to `$7E:2000-$FFFF` with bank-honouring codegen.
+- **Refused, never miscompiled**: variadic functions, struct parameters / returns / assignment by value, inline assembly. cc65816 stops with a message naming the feature; `devtools/compiler-tests/cases/negative/` pins the refusal, `KNOWN_LIMITATIONS.md` (Type & ABI gotchas) gives the workaround.
 - **LEFT-TO-RIGHT argument push**: cc65816 pushes function args left-to-right, NOT right-to-left like tcc816/PVSnesLib.
 - **`volatile` is honoured** (since chantier A2, 2026-05-09): cproc tags volatile loads/stores with a `volat` IR keyword that QBE's loadopt/promote/gcm passes respect. The SDK still favours plain globals for NMI handshake patterns for cycle-cost equivalence, but user code can use `volatile` for MMIO without silent coalescing.
 - **`unsigned int` = 2 bytes, `unsigned long` = 4 bytes** on this target (since chantier A1, 2026-05-08).

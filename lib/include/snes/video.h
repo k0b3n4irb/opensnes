@@ -52,6 +52,7 @@
  * @brief Set background mode
  *
  * @param mode Background mode (BG_MODE0-BG_MODE7), optionally OR'd with priority flags
+ * @param flags Extra flags (bg_priority group, e.g. BG3_MODE1_PRIORITY_HIGH); 0 for none
  *
  * Mode overview:
  * - 0: 4 BG layers, 4 colors each

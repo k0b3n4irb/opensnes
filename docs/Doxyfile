@@ -35,11 +35,15 @@ INPUT                  = mainpage.md \
                          SNES_GRAPHICS_GUIDE.md \
                          SNES_SOUND_GUIDE.md \
                          TROUBLESHOOTING.md \
+                         FAQ.md \
+                         MIGRATING_FROM_PVSNESLIB.md \
                          THIRD_PARTY.md \
                          hardware/ \
                          ../examples/ \
                          examples_group.md \
-                         ../CONTRIBUTING.md
+                         ../CONTRIBUTING.md \
+                         ../KNOWN_LIMITATIONS.md \
+                         API_INDEX.md
 
 # File patterns to process
 FILE_PATTERNS          = *.h *.md *.c
@@ -250,6 +254,18 @@ INCLUDED_BY_GRAPH      = NO
 
 QUIET                  = NO
 WARNINGS               = YES
+# Warnings are errors only in `make docs-strict` (gaps review P7, 2026-09-15),
+# which the doc-render CI job runs: Linux, pinned Doxygen 1.16.1, CSS submodule
+# checked out. The count reached 0 there once `MARKDOWN_ID_STYLE = GITHUB`
+# resolved the GitHub-style `#anchor` links the docs use, the seven `demo.gif`
+# names became unique, and the two undefined groups got a @defgroup. It is not
+# set here because `release` depends on `docs`: a Windows-only path quirk in
+# Doxygen's directory links must not break a release build.
+# Heading ids GitHub-style, so `[text](#my-heading)` links written for GitHub
+# resolve inside Doxygen too (they were 39 of the 56 warnings).
+MARKDOWN_ID_STYLE      = GITHUB
+# Headings get anchors (levels 1-6) — without this no `#heading` link can resolve.
+TOC_INCLUDE_HEADINGS   = 6
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO

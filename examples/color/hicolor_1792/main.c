@@ -22,8 +22,9 @@
  * @par What to Observe
  * A sunset over water with perfectly smooth gradients — 357 distinct
  * colors on screen (measure any static 4bpp screen: max 128). The top
- * of each 8-pixel band is where the palette race lives; krom's HTIME
- * of 190 places the writes in H-blank.
+ * of each 8-pixel band is where the palette race lives; the H-timer is
+ * set so the DMA lands in H-blank for THIS handler (128, not krom's 190
+ * — see the comment at irqSetHTimer()).
  *
  * @par Modules Used
  * console, dma, background
@@ -45,7 +46,8 @@ extern void hicolorIrqStream(void);
 #define VRAM_GFX      0x0000
 /** @brief BG2 32x32 map base (word address) */
 #define VRAM_MAP_BASE 0x3C00
-/** @brief Map loads at row 4: BG2VOFS=31 makes screen line 0 show map row 4 */
+/** @brief Map loads at row 4: scroll y = 32 makes screen line 0 show map row 4
+ *  (the lib writes VOFS = y - 1 itself; krom's raw 31 is the same intent) */
 #define VRAM_MAP_LOAD 0x3C80
 
 /** @brief 16-bit offset of sunset_pal within its bank (IRQ stream source) */
@@ -104,7 +106,7 @@ int main(void) {
 
     /* krom: scroll BG2 31 pixels up — aligns tile-row boundaries with the
      * CGADD-reset cadence of the IRQ stream ((scanline & 15) == 8). */
-    bgSetScroll(1, 0, 31);
+    bgSetScroll(1, 0, 32);   /* map row 4 on line 0; the -1 is the lib's job */
 
     setMainScreen(LAYER_BG2);
 
@@ -122,7 +124,18 @@ int main(void) {
     nmiSetBank(hicolorVblank, (u8)((u32)(void *)hicolorVblank >> 16));
     irqSetBank((void *)hicolorIrqStream,
                (u8)((u32)(void *)hicolorIrqStream >> 16));
-    irqSetHTimer(190);
+    /* H-timer: the IRQ fires at H = HTIME + 3.5 dots (fullsnes) and the
+     * handler must reach its CGRAM DMA inside H-blank — a CGRAM write
+     * during the picture lands on the WRONG entry (snesdev-wiki, PPU
+     * registers / CGDATA: "Writing to CGRAM during active-display will
+     * write the data to the wrong CGRAM address"). krom's demo uses 190
+     * with a minimal handler; ours saves registers and latches the V
+     * counter first, so 190 pushes the 16-byte DMA past the blank into
+     * the next line's picture. Measured on luna v1.23.0 (which models the
+     * quirk): clean for HTIME 80..175, corrupt at 70 and below (DMA starts
+     * before H-blank) and at 180 and above (spills past it). 128 sits in
+     * the middle with ~45 dots of margin each way. */
+    irqSetHTimer(128);
     irqEnable(IRQ_HTIMER);
 
     setScreenOn();

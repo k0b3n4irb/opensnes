@@ -4,7 +4,7 @@ Thank you for your interest in contributing to OpenSNES!
 
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+Please read and follow our [Code of Conduct](https://github.com/k0b3n4irb/opensnes/blob/develop/CODE_OF_CONDUCT.md).
 SNES development is niche — every contributor matters.
 
 ## Reporting Bugs
@@ -17,7 +17,7 @@ SNES development is niche — every contributor matters.
 
 ## Suggesting Features
 
-1. Check the [Roadmap](ROADMAP.md) first
+1. Check the [Roadmap](https://github.com/k0b3n4irb/opensnes/blob/develop/ROADMAP.md) first
 2. Use the **Feature Request** template
 3. Explain the **use case**, not just the feature
 
@@ -164,7 +164,7 @@ When learning something project-specific, append to
 `.claude/notes/<category>/`. The category README explains the layout.
 Per-user cross-project preferences (your editor habits, etc.) belong in
 your personal `~/.claude/projects/.../memory/`, not here. The convention
-is documented in [`.claude/rules/memory_routing.md`](.claude/rules/memory_routing.md).
+is documented in [`.claude/rules/memory_routing.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/memory_routing.md).
 
 ## Documentation
 
@@ -178,7 +178,7 @@ Every new feature or example must have:
 
 For code style conventions, see [Code Style Guide](https://k0b3n4irb.github.io/opensnes/code_style.html).
 
-When using external code, add an entry to [ATTRIBUTION.md](ATTRIBUTION.md) with the
+When using external code, add an entry to [ATTRIBUTION.md](https://github.com/k0b3n4irb/opensnes/blob/develop/ATTRIBUTION.md) with the
 source, author, license, and description of modifications. Include a header
 comment in the source file.
 
@@ -192,5 +192,5 @@ for your first contribution to the project.
 
 - [Documentation](https://k0b3n4irb.github.io/opensnes/)
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
-- [Roadmap](ROADMAP.md)
-- [Changelog](CHANGELOG.md)
+- [Roadmap](https://github.com/k0b3n4irb/opensnes/blob/develop/ROADMAP.md)
+- [Changelog](https://github.com/k0b3n4irb/opensnes/blob/develop/CHANGELOG.md)

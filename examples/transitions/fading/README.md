@@ -1,6 +1,6 @@
 # Fading Example
 
-![Demo](demo.gif)
+![Demo](fading_demo.gif)
 
 ![Screenshot](fading.png)
 

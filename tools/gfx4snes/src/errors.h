@@ -6,7 +6,7 @@
 extern void info (const char *format, ...);
 extern void warning (const char *format, ...);
 extern void note (const char *format, ...);
-extern void fatal (const char *, ...);
+extern void fatal (const char *, ...) __attribute__((noreturn, format(printf, 1, 2)));
 extern void errorcontinue (const char *format, ...);
 
 #endif

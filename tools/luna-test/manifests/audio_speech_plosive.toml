@@ -1,0 +1,29 @@
+# examples/audio/speech_synth, leg 2 of 2 — a plosive: a different sample, a
+# different envelope, a different pitch, on the SAME voice.
+#
+# Speech on the SNES is not a sample being played; it is one DSP voice being
+# re-programmed per phoneme. A single snapshot cannot tell that apart from a
+# voice keyed once and left alone — and the screen never moves, so fbhash
+# certainly cannot. Against audio_speech_vowel.toml, three registers move
+# together, which is the whole technique:
+#   V0_SRCN   0x02 -> 0x04   a different phoneme selected from the bank
+#   V0_ADSR1/2 0xF7/0xFC -> 0xFF/0xE0   sustained vowel -> one-shot plosive
+#   V0_PITCHH 0x11 -> 0x10   the inflection returns to nominal
+# while the bank itself (DIR $08) and the voice's volume are unchanged: the
+# sequencer re-points the voice, it does not re-upload anything.
+#
+# Measured with `--until-frame 105`; this phoneme holds frames ~90-120.
+rom = "../../../examples/audio/speech_synth/speech_synth.sfc"
+frames = 105
+
+[asserts.dsp]
+V0_SRCN   = 0x04     # CHANGED: another phoneme from the same bank
+V0_ADSR1  = 0xFF     # CHANGED: plosive — instant attack, fast release
+V0_ADSR2  = 0xE0
+V0_PITCHH = 0x10     # CHANGED: back to the nominal pitch
+V0_PITCHL = 0x00
+DIR       = 0x08     # unchanged: same bank, never re-uploaded
+V0_VOLL   = 0x7F     # unchanged
+V0_VOLR   = 0x7F
+NON       = 0x00
+EON       = 0x00

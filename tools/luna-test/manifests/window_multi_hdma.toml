@@ -1,0 +1,63 @@
+# window_multi_hdma — the window ALGEBRA, register by register: two windows on
+# BG1, both inverted, combined with AND, masked on the main screen.
+#
+# What this proves that the other pillars cannot:
+#   * This is the only example that drives the `window` module's full API
+#     (windowEnable x2, windowSetInvert x2, windowSetLogic, windowSetMainMask)
+#     and the only one whose HDMA channel writes all four edge registers
+#     WH0-WH3 in one pass (HDMA_MODE_4REG). Liveness says nothing about any
+#     of it, and the fbhash baseline reduces "W1 and W2 are both enabled,
+#     both inverted, ANDed" to one 64-bit number: flip the logic to OR, or
+#     drop one invert bit, and you get a different picture with no name on
+#     the failure.
+#   * The lib keeps w12sel / w34sel / wobjsel / wbglog / wobjlog as WRAM
+#     shadows of $2123-$212A. `luna state --out -` confirmed at frame 60 that
+#     every shadow equals the PPU register luna decoded: w12sel 15, wbglog 1,
+#     w34sel/wobjsel/wobjlog 0, ppu.tmw 1, dma.hdmaen 1. So these asserts
+#     stand in for the registers themselves.
+#   * The scroll legs are the negative that matters here: bgSetScroll() runs
+#     on the same VBlank line as the HDMA table walk, and the window algebra
+#     must survive it untouched. A regression that re-wrote W12SEL from the
+#     scroll path — or a window helper that clobbered a neighbouring shadow —
+#     shows up as a changed byte, not as a subtly shifted image.
+#
+# w12sel 0x0F = BG1 W1 enable(0x02)+invert(0x01) | BG1 W2 enable(0x08)+invert(0x04)
+# wbglog 0x01 = BG1 mask logic AND
+# Measured: `luna state --until-frame N --input … --peek w12sel:1 … --peek
+# bg_scroll_x:2 --peek bg_scroll_y:2`.
+rom = "../../../examples/windows/window_multi_hdma/window_multi_hdma.sfc"
+
+[[checkpoint]]                 # krom's window algebra, as programmed
+at_frame = 60
+[checkpoint.values]
+w12sel = { eq = 0x0F, width = 1 }
+w34sel = { eq = 0x00, width = 1 }
+wobjsel = { eq = 0x00, width = 1 }
+wbglog = { eq = 0x01, width = 1 }               # WINDOW_LOGIC_AND on BG1
+wobjlog = { eq = 0x00, width = 1 }
+hdma_enabled_state = { eq = 0x01, width = 1 }   # one channel, four registers
+bg_scroll_x = 0
+bg_scroll_y = 0
+
+[[checkpoint]]                 # RIGHT: the plane scrolls, the algebra does not
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.values]
+bg_scroll_x = 59
+bg_scroll_y = 0
+w12sel = { eq = 0x0F, width = 1 }
+wbglog = { eq = 0x01, width = 1 }
+hdma_enabled_state = { eq = 0x01, width = 1 }
+
+[[checkpoint]]                 # UP: u16 scroll underflows cleanly to -59
+at_frame = 180
+input = "120:0x0800,179:0"
+[checkpoint.values]
+bg_scroll_y = 65477                             # 0xFFC5 = -59
+bg_scroll_x = 59                                # UP must not scroll sideways
+w12sel = { eq = 0x0F, width = 1 }
+w34sel = { eq = 0x00, width = 1 }
+wobjsel = { eq = 0x00, width = 1 }
+wbglog = { eq = 0x01, width = 1 }
+wobjlog = { eq = 0x00, width = 1 }
+hdma_enabled_state = { eq = 0x01, width = 1 }

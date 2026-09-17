@@ -87,11 +87,11 @@ Implications:
    pixel. 256 tiles × 64 bytes = 16 KB of pixel data — exactly half of
    the `$0000`–`$3FFF` range.
 
-The lib does not currently provide a `mode7LoadGraphics()` that hides
-this. Both shipped examples use an assembly helper (typically named
-`asm_loadMode7Data` or `asm_loadSkyData`) to do the interleaved DMA.
-Treat the asset-loading step as "write a small assembly routine, copy
-the pattern from the example".
+The lib hides this: `dmaCopyVramMode7(tilemap, tilemapSize, tiles,
+tilesSize)` runs the two DMAs (tilemap into the low bytes with VMAIN=$00,
+tiles into the high bytes with VMAIN=$80), reads each pointer's bank, and
+every Mode 7 example calls it once during forced blank. The asset-loading
+step is one call.
 
 ## Setup pattern
 
@@ -276,7 +276,9 @@ reads MPY — is never called while the split is live.
 ### 🔴 Single BG layer
 
 Mode 7 disables BG2, BG3, BG4 *in hardware*. `setMainScreen(TM_BG1 |
-TM_BG2)` does nothing useful; only BG1 renders. If you want a sky on
+TM_BG2)` does nothing useful; only BG1 renders (the one exception is
+EXTBG, SETINI bit 6, which turns BG2 into a priority-split copy of BG1 —
+not a second tilemap). If you want a sky on
 top of a Mode 7 ground, you HDMA the BGMODE register mid-frame
 (see the perspective example). There is no "Mode 7 + a normal
 tilemap" mode.
@@ -285,12 +287,12 @@ OBJ (sprites) work as normal in Mode 7 — they are not BG layers and are
 not affected by the mode switch. You can put sprites on top of a Mode 7
 plane.
 
-### 🔴 Interleaved VRAM, no `mode7LoadGraphics` helper today
+### 🟢 Interleaved VRAM: `dmaCopyVramMode7` does the two passes
 
 `dmaCopyVram()` writes to both bytes of each VRAM word; for Mode 7 you
 want only the low byte (tilemap) or only the high byte (tile data) per
-pass. The lib does not currently ship a function that hides this — both
-examples use an assembly helper. Pattern:
+pass. `dmaCopyVramMode7()` is that two-pass loader, and it is what the
+examples call. What it does, if you ever need a partial load by hand:
 
 ```asm
 ; Load Mode 7 tile pixel data: high-byte writes
@@ -308,7 +310,8 @@ stz.l $2116         ; VRAM address = $0000 again
 sta.l $420B
 ```
 
-Treat the assembly helper as standard furniture for any Mode 7 project.
+Reach for this only for a partial tile set or a map region; the whole-set
+case is the one call above.
 
 ### 🟠 Double-write register sequencing
 

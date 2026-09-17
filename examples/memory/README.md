@@ -3,7 +3,7 @@
 Learn SNES memory mapping features: HiROM mode for larger ROM bank windows, and
 battery-backed SRAM for persistent save data.
 
-## Examples
+## Example ROMs
 
 | Example | Difficulty | Description |
 |---------|------------|-------------|
