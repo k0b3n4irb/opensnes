@@ -1,25 +1,25 @@
 var examples_sprites =
 [
     [ "Animated Sprite -- Direction States and Sprite Sheets", "examples_sprites_animated_sprite.html", [
-      [ "The ladder", "examples_sprites.html#autotoc_md1685", null ],
-      [ "Reference — OAM in one screen", "examples_sprites.html#autotoc_md1686", [
-        [ "What This Example Shows", "examples_sprites_animated_sprite.html#autotoc_md1638", null ],
-        [ "Prerequisites", "examples_sprites_animated_sprite.html#autotoc_md1639", null ],
-        [ "Controls", "examples_sprites_animated_sprite.html#autotoc_md1640", null ],
-        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#autotoc_md1641", null ],
-        [ "How It Works", "examples_sprites_animated_sprite.html#autotoc_md1642", [
-          [ "1. Sprite sheet layout", "examples_sprites_animated_sprite.html#autotoc_md1643", null ],
-          [ "2. State machine", "examples_sprites_animated_sprite.html#autotoc_md1644", null ],
-          [ "3. Animation timing", "examples_sprites_animated_sprite.html#autotoc_md1645", null ],
-          [ "4. Tile calculation", "examples_sprites_animated_sprite.html#autotoc_md1646", null ]
+      [ "The ladder", "examples_sprites.html#the-ladder-9", null ],
+      [ "Reference — OAM in one screen", "examples_sprites.html#reference--oam-in-one-screen", [
+        [ "What This Example Shows", "examples_sprites_animated_sprite.html#what-this-example-shows-7", null ],
+        [ "Prerequisites", "examples_sprites_animated_sprite.html#prerequisites-8", null ],
+        [ "Controls", "examples_sprites_animated_sprite.html#controls-31", null ],
+        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-40", null ],
+        [ "How It Works", "examples_sprites_animated_sprite.html#how-it-works-15", [
+          [ "1. Sprite sheet layout", "examples_sprites_animated_sprite.html#autotoc_md1-sprite-sheet-layout", null ],
+          [ "2. State machine", "examples_sprites_animated_sprite.html#autotoc_md2-state-machine", null ],
+          [ "3. Animation timing", "examples_sprites_animated_sprite.html#autotoc_md3-animation-timing", null ],
+          [ "4. Tile calculation", "examples_sprites_animated_sprite.html#autotoc_md4-tile-calculation", null ]
         ] ],
-        [ "SNES Concepts", "examples_sprites_animated_sprite.html#autotoc_md1647", [
-          [ "OBJ_FLIPX &ndash; Hardware Horizontal Mirror", "examples_sprites_animated_sprite.html#autotoc_md1648", null ],
-          [ "Sprite Sheets in VRAM", "examples_sprites_animated_sprite.html#autotoc_md1649", null ],
-          [ "16x16 Tiles in OAM", "examples_sprites_animated_sprite.html#autotoc_md1650", null ]
+        [ "SNES Concepts", "examples_sprites_animated_sprite.html#snes-concepts-43", [
+          [ "OBJ_FLIPX &ndash; Hardware Horizontal Mirror", "examples_sprites_animated_sprite.html#obj_flipx----hardware-horizontal-mirror", null ],
+          [ "Sprite Sheets in VRAM", "examples_sprites_animated_sprite.html#sprite-sheets-in-vram", null ],
+          [ "16x16 Tiles in OAM", "examples_sprites_animated_sprite.html#autotoc_md16x16-tiles-in-oam", null ]
         ] ],
-        [ "Project Structure", "examples_sprites_animated_sprite.html#autotoc_md1651", null ],
-        [ "Going Further", "examples_sprites_animated_sprite.html#autotoc_md1652", null ]
+        [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-16", null ],
+        [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ]
       ] ]
     ] ],
     [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],

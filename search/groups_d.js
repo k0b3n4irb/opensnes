@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['volatile_20types_0',['Volatile Types',['../group__volatile__types.html',1,'']]],
-  ['volume_20control_1',['Volume Control',['../group__audio__volume.html',1,'Volume Control'],['../group__snesmod__volume.html',1,'Volume Control']]]
+  ['ui_0',['UI',['../group__ui.html',1,'']]]
 ];

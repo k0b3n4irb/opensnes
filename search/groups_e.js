@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['width_20types_0',['Fixed-Width Types',['../group__types.html',1,'']]]
+  ['volatile_20types_0',['Volatile Types',['../group__volatile__types.html',1,'']]],
+  ['volume_20control_1',['Volume Control',['../group__audio__volume.html',1,'Volume Control'],['../group__snesmod__volume.html',1,'Volume Control']]]
 ];

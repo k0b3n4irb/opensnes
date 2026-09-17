@@ -168,7 +168,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Mode 7 Support. </p>
 <p>Functions for Mode 7 rotation and scaling effects. Mode 7 is the SNES's hardware rotation/scaling mode, famously used in F-Zero, Super Mario Kart, and Pilotwings.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md47"></a>
+<h2 class="doxsection"><a class="anchor" id="usage-6"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -193,13 +193,13 @@ Usage</h2>
 <div class="ttc" id="amode7_8h_html_aa09e1447cada89498932411fc81452fe"><div class="ttname"><a href="#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a></div><div class="ttdeci">void mode7SetAngle(u8 angle)</div><div class="ttdoc">Set Mode 7 rotation angle.</div></div>
 <div class="ttc" id="amode7_8h_html_ab0ab87a9cdbf57823ba802fb068c5cbc"><div class="ttname"><a href="#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a></div><div class="ttdeci">void mode7Init(void)</div><div class="ttdoc">Initialize Mode 7.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="mode-7-vram-layout"></a>
 Mode 7 VRAM Layout</h2>
 <p>Mode 7 uses a special interleaved VRAM format:</p><ul>
 <li>Tilemap in low bytes of VRAM words 0x0000-0x3FFF</li>
 <li>Tile data in high bytes of VRAM words 0x0000-0x3FFF</li>
 </ul>
-<p>Use mode7LoadGraphics() or set up DMA manually with interleaved data.</p>
+<p>Use <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> (two DMAs: tilemap to the low bytes, tiles to the high bytes, from any bank) or set up DMA manually with interleaved data.</p>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -542,7 +542,7 @@ Mode 7 VRAM Layout</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Horizontal scroll (13-bit signed) </td></tr>
-    <tr><td class="paramname">y</td><td>Vertical scroll (13-bit signed) </td></tr>
+    <tr><td class="paramname">y</td><td>Vertical scroll (13-bit signed); written as y - 1 to M7VOFS, the same scanline-0 convention as <a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a> </td></tr>
   </table>
   </dd>
 </dl>

@@ -134,7 +134,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a428f0320bb5ca641965325535d637dc5" id="r_a428f0320bb5ca641965325535d637dc5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a428f0320bb5ca641965325535d637dc5">VRAM_MAP_BASE</a>&#160;&#160;&#160;0x3C00</td></tr>
 <tr class="memdesc:a428f0320bb5ca641965325535d637dc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG2 32x32 map base (word address).  <br /></td></tr>
 <tr class="memitem:a3264f29673f496af067bb4d72917153e" id="r_a3264f29673f496af067bb4d72917153e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3264f29673f496af067bb4d72917153e">VRAM_MAP_LOAD</a>&#160;&#160;&#160;0x3C80</td></tr>
-<tr class="memdesc:a3264f29673f496af067bb4d72917153e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map loads at row 4: BG2VOFS=31 makes screen line 0 show map row 4.  <br /></td></tr>
+<tr class="memdesc:a3264f29673f496af067bb4d72917153e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map loads at row 4: scroll y = 32 makes screen line 0 show map row 4 (the lib writes VOFS = y - 1 itself; krom's raw 31 is the same intent).  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -171,7 +171,7 @@ ceiling" technique. An H-timer IRQ fires on EVERY scanline and DMAs 16 bytes (8 
 <li>The NMITIMEN shadow: nmiSet/irqEnable compose instead of clobbering</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>A sunset over water with perfectly smooth gradients — 357 distinct colors on screen (measure any static 4bpp screen: max 128). The top of each 8-pixel band is where the palette race lives; krom's HTIME of 190 places the writes in H-blank.</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>A sunset over water with perfectly smooth gradients — 357 distinct colors on screen (measure any static 4bpp screen: max 128). The top of each 8-pixel band is where the palette race lives; the H-timer is set so the DMA lands in H-blank for THIS handler (128, not krom's 190 — see the comment at <a class="el" href="interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9" title="Set the H-timer target (0-339 dots).">irqSetHTimer()</a>).</dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/PeterLemon/SNES">https://github.com/PeterLemon/SNES</a> — original demo &amp; converter </dd>
 <dd>
@@ -221,7 +221,7 @@ ceiling" technique. An H-timer IRQ fires on EVERY scanline and DMAs 16 bytes (8 
       </table>
 </div><div class="memdoc">
 
-<p>Map loads at row 4: BG2VOFS=31 makes screen line 0 show map row 4. </p>
+<p>Map loads at row 4: scroll y = 32 makes screen line 0 show map row 4 (the lib writes VOFS = y - 1 itself; krom's raw 31 is the same intent). </p>
 
 </div>
 </div>

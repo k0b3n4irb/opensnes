@@ -194,7 +194,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Scrolling tilemap engine for Mode 1 backgrounds. </p>
 <p>Provides hardware-efficient tilemap streaming using metatiles (8x8 pixel blocks). Supports horizontal and vertical scrolling with incremental VRAM updates during VBlank.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md42"></a>
+<h2 class="doxsection"><a class="anchor" id="usage-5"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="map_8h.html">snes/map.h</a>&gt;</span></div>
@@ -236,7 +236,7 @@ Usage</h2>
 <div class="ttc" id="amap_8h_html_ac833e2572ce808bac75d10df2817df03"><div class="ttname"><a href="#ac833e2572ce808bac75d10df2817df03">mapUpdate</a></div><div class="ttdeci">void mapUpdate(void)</div><div class="ttdoc">Update map scroll buffers based on camera position.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Map engine uses VRAM address $6800 for the tilemap by default.</dd></dl>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md43"></a>
+<h2 class="doxsection"><a class="anchor" id="attribution-1"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib map engine by Alekmaul Original: undisbeliever's castle_platformer License: zlib (compatible with MIT) </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -668,7 +668,7 @@ Attribution</h2>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA.</dd>
 <dd>
-Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72" title="Full level tilemap from tmx2snes.">mapdata</a>[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
+Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72" title="Full level tilemap from tmx2snes.">mapdata</a>[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
 
 </div>
 </div>

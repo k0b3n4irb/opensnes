@@ -139,7 +139,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A 9-slice panel layer: one BG tilemap and the sheet to stamp from. </p>
-<p>The sheet is read in raster order from base_tile: </p><pre class="fragment">base+0        base+1        base+2         &lt;- top-left, top, top-right
+<p>The sheet is read in raster order from <span class="tt"><a class="el" href="#aeff36e6a927d63df4601b607ab001646">base_tile</a></span>: </p><pre class="fragment">base+0        base+1        base+2         &lt;- top-left, top, top-right
 base+stride   base+stride+1 base+stride+2  &lt;- left, centre, right
 base+2*stride …                            &lt;- bottom-left, bottom, bottom-right
 </pre><p><a class="el" href="#a6140dbe1b8e2aba1cec0a992ea454f61" title="stride">stride</a> is the sheet's width in tiles, which is 3 for a bare 9-slice and more when the sheet carries other art in later columns — <span class="tt">examples/games/rpg</span> uses a 4-wide sheet whose fourth column holds HUD icons. </p>

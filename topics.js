@@ -13,6 +13,7 @@ var topics =
     [ "Echo Effects", "group__audio__echo.html", "group__audio__echo" ],
     [ "Examples", "group__examples.html", "group__examples" ],
     [ "Fixed-Width Types", "group__types.html", "group__types" ],
+    [ "Framework", "group__framework.html", "group__framework" ],
     [ "Function Pointers", "group__func__ptr.html", "group__func__ptr" ],
     [ "Initialization", "group__audio__init.html", "group__audio__init" ],
     [ "Initialization", "group__snesmod__init.html", "group__snesmod__init" ],
@@ -31,6 +32,7 @@ var topics =
     [ "Sound Effects", "group__snesmod__sfx.html", "group__snesmod__sfx" ],
     [ "Streaming Audio", "group__snesmod__stream.html", "group__snesmod__stream" ],
     [ "Super Scope Input", "group__scope__input.html", "group__scope__input" ],
+    [ "UI", "group__ui.html", "group__ui" ],
     [ "Volatile Types", "group__volatile__types.html", "group__volatile__types" ],
     [ "Volume Control", "group__audio__volume.html", "group__audio__volume" ],
     [ "Volume Control", "group__snesmod__volume.html", "group__snesmod__volume" ]

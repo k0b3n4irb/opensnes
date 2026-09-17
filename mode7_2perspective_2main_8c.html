@@ -129,8 +129,6 @@ $(function(){initNavTree('mode7_2perspective_2main_8c.html','',''); });
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ade39154a095469eb17803cad6394217e" id="r_ade39154a095469eb17803cad6394217e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ade39154a095469eb17803cad6394217e">asm_loadSkyData</a> (void)</td></tr>
-<tr class="memdesc:ade39154a095469eb17803cad6394217e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load sky background tiles and tilemap to VRAM via assembly DMA.  <br /></td></tr>
 <tr class="memitem:ad3aafbc6c7613c06add64a85321eb473" id="r_ad3aafbc6c7613c06add64a85321eb473"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a>)</td></tr>
 <tr class="memdesc:ad3aafbc6c7613c06add64a85321eb473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build and activate the 4-channel HDMA perspective split.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -148,6 +146,11 @@ Variables</h2></td></tr>
 <tr class="memdesc:a104cbd84dfd0889dd256703da2382a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB).  <br /></td></tr>
 <tr class="memitem:a91488c47affe2c43b79535f7663eea90" id="r_a91488c47affe2c43b79535f7663eea90"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a91488c47affe2c43b79535f7663eea90">ground_tiles_end</a> []</td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
+<tr class="memitem:ac001861481b97e3b120708270175e27b" id="r_ac001861481b97e3b120708270175e27b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac001861481b97e3b120708270175e27b">sky_map</a> []</td></tr>
+<tr class="memitem:abfd96373e60ac0028427ffca2ca35f59" id="r_abfd96373e60ac0028427ffca2ca35f59"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abfd96373e60ac0028427ffca2ca35f59">sky_map_end</a> []</td></tr>
+<tr class="memitem:a013671df86165ee8fdc047bf262c29a5" id="r_a013671df86165ee8fdc047bf262c29a5"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a013671df86165ee8fdc047bf262c29a5">sky_tiles</a> []</td></tr>
+<tr class="memdesc:a013671df86165ee8fdc047bf262c29a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map).  <br /></td></tr>
+<tr class="memitem:adf4f0ba41d4a59380a2164323ea1af6d" id="r_adf4f0ba41d4a59380a2164323ea1af6d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf4f0ba41d4a59380a2164323ea1af6d">sky_tiles_end</a> []</td></tr>
 <tr class="memitem:ad20c28dc8fb00b3174dce460e3598548" id="r_ad20c28dc8fb00b3174dce460e3598548"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a></td></tr>
 <tr class="memitem:a79b6065ee73ca292d26db6390aa19d63" id="r_a79b6065ee73ca292d26db6390aa19d63"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a></td></tr>
 </table>
@@ -171,35 +174,6 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, input, mode7</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">mode7.h</a>, <a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ade39154a095469eb17803cad6394217e" name="ade39154a095469eb17803cad6394217e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade39154a095469eb17803cad6394217e">&#9670;&#160;</a></span>asm_loadSkyData()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void asm_loadSkyData </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Load sky background tiles and tilemap to VRAM via assembly DMA. </p>
-<p>Loads the Mode 3 sky image (tiles at VRAM $5000, tilemap at VRAM $4000). Uses assembly because the data may span multiple ROM banks (SUPERFREE sections), requiring correct bank byte handling that the C-level <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> cannot provide.</p>
-<p>Must be called during forced blank. </p>
-
-</div>
-</div>
 <a id="ad3aafbc6c7613c06add64a85321eb473" name="ad3aafbc6c7613c06add64a85321eb473"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad3aafbc6c7613c06add64a85321eb473">&#9670;&#160;</a></span>asm_setupHdmaPerspective()</h2>
 
@@ -395,6 +369,72 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Current joypad button state </p>
+
+</div>
+</div>
+<a id="ac001861481b97e3b120708270175e27b" name="ac001861481b97e3b120708270175e27b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac001861481b97e3b120708270175e27b">&#9670;&#160;</a></span>sky_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abfd96373e60ac0028427ffca2ca35f59" name="abfd96373e60ac0028427ffca2ca35f59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfd96373e60ac0028427ffca2ca35f59">&#9670;&#160;</a></span>sky_map_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a013671df86165ee8fdc047bf262c29a5" name="a013671df86165ee8fdc047bf262c29a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a013671df86165ee8fdc047bf262c29a5">&#9670;&#160;</a></span>sky_tiles</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map). </p>
+
+</div>
+</div>
+<a id="adf4f0ba41d4a59380a2164323ea1af6d" name="adf4f0ba41d4a59380a2164323ea1af6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf4f0ba41d4a59380a2164323ea1af6d">&#9670;&#160;</a></span>sky_tiles_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

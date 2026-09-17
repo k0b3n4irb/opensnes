@@ -172,7 +172,7 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Background Layer Management. </p>
 <p>Functions for configuring and scrolling background layers.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
+<h2 class="doxsection"><a class="anchor" id="overview"></a>
 Overview</h2>
 <p>The SNES has up to 4 background layers (BG1-BG4), though not all modes support all layers. Use these functions to configure tilemap addresses, tile graphics addresses, and scroll positions.</p>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
@@ -220,7 +220,7 @@ Overview</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fill with a specific tile entry (palette 2, tile 5)</span></div>
 <div class="line"><a class="code hl_define" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(0x0400, 0x1005, 2048);</div>
-<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:216</div></div>
+<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:220</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -529,7 +529,8 @@ Overview</h2>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background number (0-3 for BG1-BG4) </td></tr>
     <tr><td class="paramname">x</td><td>Horizontal scroll (0-1023) </td></tr>
-    <tr><td class="paramname">y</td><td>Vertical scroll (0-1023)</td></tr>
+    <tr><td class="paramname">y</td><td>Vertical scroll (0-1023): the tilemap pixel row shown on the first picture line. The lib writes y - 1 to BGnVOFS because the PPU never outputs scanline 0 (see KNOWN_LIMITATIONS, "Vertical scroll
+         is off by one"); code that writes BGnVOFS itself (HDMA tables) must apply the -1 on its own.</td></tr>
   </table>
   </dd>
 </dl>

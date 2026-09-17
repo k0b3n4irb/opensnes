@@ -289,7 +289,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Sprite (Object) Management. </p>
 <p>Functions for managing hardware sprites (OBJ).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md59"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-sprite-limits"></a>
 SNES Sprite Limits</h2>
 <ul>
 <li>128 sprites total</li>
@@ -297,7 +297,7 @@ SNES Sprite Limits</h2>
 <li>Sizes: 8x8, 16x16, 32x32, 64x64</li>
 <li>8 palettes (16 colors each, sharing color 0)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md60"></a>
+<h2 class="doxsection"><a class="anchor" id="usage-8"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Initialize sprite system (defaults: 8x8/16x16 sprites, tile base 0)</span></div>
 <div class="line"><a class="code hl_function" href="#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a>(<a class="code hl_define" href="#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a>, <a class="code hl_define" href="#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a>);</div>
@@ -316,7 +316,7 @@ Usage</h2>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License</dd></dl>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md61"></a>
+<h2 class="doxsection"><a class="anchor" id="attribution-4"></a>
 Attribution</h2>
 <p>Based on: PVSnesLib sprite system by Alekmaul </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -1600,8 +1600,8 @@ Attribution</h2>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
 <div class="ttc" id="amode7_2dsp1__ground_2main_8c_html_ad8796f8224c2283ea9888abc8ed40d37"><div class="ttname"><a href="mode7_2dsp1__ground_2main_8c.html#ad8796f8224c2283ea9888abc8ed40d37">cam_y</a></div><div class="ttdeci">static s16 cam_y</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
 <div class="ttc" id="amode7_2dsp1__ground_2main_8c_html_af3ac942bcc4b5319617d1265d27d0f5b"><div class="ttname"><a href="mode7_2dsp1__ground_2main_8c.html#af3ac942bcc4b5319617d1265d27d0f5b">cam_x</a></div><div class="ttdeci">static s16 cam_x</div><div class="ttdoc">Camera position on the ground plane (wraps with the 1024-unit texture).</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:85</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
 <div class="ttc" id="asprite_8h_html_a554b6c0dd569a866ecec6095ff058a7f"><div class="ttname"><a href="#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a></div><div class="ttdeci">void oamHide(u8 id)</div><div class="ttdoc">Park a sprite off screen.</div></div>
 </div><!-- fragment --><p>Sets Y to OBJ_HIDE_Y <b>and</b> X's high bit, because Y=240 alone still wraps for sprites taller than 16 px. That is why this is a function and not a <span class="tt">oamSetXY(id, 0, 240)</span> you write yourself.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1849,7 +1849,7 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: the old framesize=158 cliff (≈3 calls/frame caused jitter) was RESOLVED by an ASM rewrite — see KNOWN_LIMITATIONS.md ("oamSet() framesize cliff — RESOLVED"). <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is now cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) trim a little more overhead.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: the old framesize=158 cliff (≈3 calls/frame caused jitter) was RESOLVED by an ASM rewrite — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a> ("oamSet() framesize cliff — RESOLVED"). <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is now cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) trim a little more overhead.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd><b>Coordinate Variable Pattern</b>: Due to a compiler quirk, sprite coordinates MUST be stored in a struct with <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a> members for correct behavior. Using separate <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> variables causes jerky horizontal movement.</dd></dl>
 <p><b>CORRECT</b> (use struct with <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a>): </p><div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{ <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, y; } Position;</div>
 <div class="line">Position player = {100, 100};</div>

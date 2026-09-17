@@ -1,19 +1,19 @@
 var learning_path =
 [
     [ "Print a string", "examples_text_print_string.html", [
-      [ "Stage 0 — \"Does my setup even work?\"", "learning_path.html#autotoc_md583", null ],
-      [ "Stage 1 — \"Can I put something on screen?\"", "learning_path.html#autotoc_md584", null ],
-      [ "Stage 2 — \"Can the player act?\"", "learning_path.html#autotoc_md585", null ],
-      [ "Stage 3 — \"Can I build a world?\"", "learning_path.html#autotoc_md586", null ],
-      [ "Stage 4 — \"Can I make it feel good?\"", "learning_path.html#autotoc_md587", null ],
-      [ "Stage 5 — \"Can I hold it all together?\"", "learning_path.html#autotoc_md588", null ],
-      [ "Stage 6 — \"Can I finish and ship?\"", "learning_path.html#autotoc_md589", [
-        [ "More horsepower — the cartridge coprocessors", "learning_path.html#autotoc_md590", null ],
-        [ "What you'll learn", "examples_text_print_string.html#autotoc_md1724", null ],
-        [ "SNES concepts", "examples_text_print_string.html#autotoc_md1725", null ],
-        [ "How to build", "examples_text_print_string.html#autotoc_md1726", null ],
-        [ "Modules used", "examples_text_print_string.html#autotoc_md1727", null ],
-        [ "Next rung", "examples_text_print_string.html#autotoc_md1728", null ]
+      [ "Stage 0 — \"Does my setup even work?\"", "learning_path.html#stage-0--does-my-setup-even-work", null ],
+      [ "Stage 1 — \"Can I put something on screen?\"", "learning_path.html#stage-1--can-i-put-something-on-screen", null ],
+      [ "Stage 2 — \"Can the player act?\"", "learning_path.html#stage-2--can-the-player-act", null ],
+      [ "Stage 3 — \"Can I build a world?\"", "learning_path.html#stage-3--can-i-build-a-world", null ],
+      [ "Stage 4 — \"Can I make it feel good?\"", "learning_path.html#stage-4--can-i-make-it-feel-good", null ],
+      [ "Stage 5 — \"Can I hold it all together?\"", "learning_path.html#stage-5--can-i-hold-it-all-together", null ],
+      [ "Stage 6 — \"Can I finish and ship?\"", "learning_path.html#stage-6--can-i-finish-and-ship", [
+        [ "More horsepower — the cartridge coprocessors", "learning_path.html#more-horsepower--the-cartridge-coprocessors", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-36", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-49", null ],
+        [ "How to build", "examples_text_print_string.html#how-to-build-23", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-43", null ],
+        [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
     [ "Scroll a message", "examples_text_scroll_message.html", null ],

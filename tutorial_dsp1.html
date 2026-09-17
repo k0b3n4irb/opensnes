@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_dsp1.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The DSP-1 (a NEC µPD77C25 running Sony's fixed firmware) is the SNES's math coprocessor — the chip behind Pilotwings' and Super Mario Kart's pseudo-3D. Unlike the SA-1 and Super FX you do not program it: you invoke its built-in commands (matrix, vector, projection, trig) over a two-register port, and OpenSNES wraps that port as ordinary C calls. This tutorial covers the mental model, the shipped API, and the projection pipeline the <span class="tt">dsp1_cube</span> example uses.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md184"></a>
+<h2 class="doxsection"><a class="anchor" id="what-the-chip-actually-is"></a>
 What the chip actually is</h2>
 <p>A fixed-function DSP on the cartridge, mapped into the address space — not a second CPU. On the LoROM board this SDK targets, its two byte-wide registers live at (<a href="https://problemkaputt.de/fullsnes.htm#snescartdspnst010st011necupd77c25registersflagsoverview">fullsnes, DSP mapping</a>):</p>
 <table class="markdownTable">
@@ -135,10 +135,10 @@ What the chip actually is</h2>
 <td class="markdownTableBodyNone">SR (status)  </td><td class="markdownTableBodyNone"><span class="tt">$30:C000</span>  </td><td class="markdownTableBodyNone">bit 7 = RQM, the only handshake flag  </td></tr>
 </table>
 <p>Enable it with one Makefile line — <span class="tt">USE_DSP1 := 1</span> — which sets the ROM-header cartridge type to <span class="tt">$03</span> (ROM + DSP). The <span class="tt">dsp1</span> lib module is linked automatically.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md185"></a>
+<h2 class="doxsection"><a class="anchor" id="the-handshake-in-one-paragraph"></a>
 The handshake, in one paragraph</h2>
 <p>Every transfer is: <b>poll RQM until set, then move one byte</b>. Commands are a single byte; parameters and results are 16-bit words sent as two bytes, <b>LSB first</b>. That is the whole protocol — the lib's driver (<span class="tt">lib/source/dsp1.asm</span>) does it for you, so from C a command is just a function call that returns when the transaction is complete. Commands have fixed in/out word counts; the driver knows them, which is also why you should never poke <span class="tt">$30:8000</span> yourself mid-frame: a half-finished transaction desynchronises the chip (recover with <span class="tt"><a class="el" href="dsp1_8h.html#a07cbf1c377508911986a414336ad4fd8" title="Resynchronise the DSP-1 to a known command-wait state.">dsp1Init()</a></span>, which hammers the <span class="tt">$80</span> Sync/Reset byte).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md186"></a>
+<h2 class="doxsection"><a class="anchor" id="fixed-point-three-slot-types"></a>
 Fixed-point: three slot types</h2>
 <p>The DSP-1 types its operands per parameter slot:</p>
 <table class="markdownTable">
@@ -152,7 +152,7 @@ Fixed-point: three slot types</h2>
 <td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">angle  </td><td class="markdownTableBodyNone">signed 16-bit, full turn = 2^16 — <span class="tt">0x4000</span> = 90°  </td></tr>
 </table>
 <p>These are <b>not</b> the SDK's own formats (<span class="tt"><a class="el" href="math_8h.html#ac1976de9516b58f7a0352917f8d8bedd" title="8.8 signed fixed-point type">fixed</a></span> is 8.8, <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></span> angles are 8-bit). <span class="tt"><a class="el" href="dsp1_8h.html" title="DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C.">snes/dsp1.h</a></span> ships bridge macros: <span class="tt"><a class="el" href="dsp1_8h.html#adfbfa0a8d0b8c1dc29d8971396b07cfb" title="SDK 8.8 fixed → DSP-1 T (1.15). Valid for −1.0 ≤ f &lt; 1.0.">DSP1_T_FROM_FIX(f)</a></span>, <span class="tt"><a class="el" href="dsp1_8h.html#a139bcf3d0975fbfdb803d62084eaab5e" title="DSP-1 T (1.15) → SDK 8.8 fixed (truncating).">DSP1_FIX_FROM_T(t)</a></span>, <span class="tt"><a class="el" href="dsp1_8h.html#ad82a852b0a2b20a5aad1004a05b61a3b" title="SDK 8-bit angle (256 = full turn) → DSP-1 A (2^16 = full turn).">DSP1_A_FROM_FIX8(a)</a></span>. Mind the T range: it is −1..+1, so clamp before converting anything that can exceed ±1.0.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md187"></a>
+<h2 class="doxsection"><a class="anchor" id="the-api-at-a-glance"></a>
 The API at a glance</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -185,7 +185,7 @@ The API at a glance</h2>
 <td class="markdownTableBodyNone"><span class="tt">dsp1Range(x,y,z,r)</span>  </td><td class="markdownTableBodyNone"><span class="tt">$18</span>  </td><td class="markdownTableBodyNone">4 → 1  </td><td class="markdownTableBodyNone">sphere test: ≤0 = inside  </td></tr>
 </table>
 <p>Multi-word results land in the globals <span class="tt"><a class="el" href="dsp1_8h.html#a50d2a07715de61e5e3c706de54b856b4" title="Multi-word DSP-1 result registers (written by multi-output commands).">dsp1_o0</a></span>/<span class="tt"><a class="el" href="dsp1_8h.html#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a></span>/<span class="tt"><a class="el" href="dsp1_8h.html#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></span> (<span class="tt"><a class="el" href="dsp1_8h.html#af126a02087f50c1591f744aa50d3c5f9">dsp1_o3</a></span> for Parameter); single-word commands return their value.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md188"></a>
+<h2 class="doxsection"><a class="anchor" id="the-3d-pipeline-what-dsp1_cube-does"></a>
 The 3D pipeline (what dsp1_cube does)</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dsp1_8h.html#a07cbf1c377508911986a414336ad4fd8">dsp1Init</a>();</div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f">dsp1Present</a>()) {</div>
@@ -212,8 +212,8 @@ The 3D pipeline (what dsp1_cube does)</h2>
 <div class="ttc" id="adsp1_8h_html_a6b8c0440cf7578bc7c98e40d39a43f06"><div class="ttname"><a href="dsp1_8h.html#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></div><div class="ttdeci">volatile s16 dsp1_o2</div></div>
 <div class="ttc" id="adsp1_8h_html_a9f4e45822ce7d01f4a61a80c136e1aa9"><div class="ttname"><a href="dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9">dsp1Parameter</a></div><div class="ttdeci">void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs)</div><div class="ttdoc">Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).</div></div>
 <div class="ttc" id="adsp1_8h_html_ad09a7de4eb9586c1da0a738628af9b1f"><div class="ttname"><a href="dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f">dsp1Present</a></div><div class="ttdeci">u16 dsp1Present(void)</div><div class="ttdoc">Is a DSP-1 responding? Known-answer self-test.</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:85</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:84</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
 </div><!-- fragment --><p>Conventions in that snippet were characterised empirically on luna (DSP-1B firmware, 2026-09) — the references do not document them, so treat them as measured behaviour, not gospel:</p>
 <ul>
 <li>With <span class="tt">azs = 0x4000</span> (90°), the projection looks along <b>+Y</b>: X is across the screen, Z is up. The all-zero Parameter setup is <b>degenerate</b> — every point projects to (0,0). If your scene collapses to one dot, this is why.</li>
@@ -222,7 +222,7 @@ The 3D pipeline (what dsp1_cube does)</h2>
 <li><span class="tt"><a class="el" href="dsp1_8h.html#a39767ab0d98ace72ba92e541085e1b60" title="Project a world point to the screen (DSP-1 command $06, &quot;Project&quot;).">dsp1Project</a></span> also returns <b>M</b> (<span class="tt"><a class="el" href="dsp1_8h.html#a6b8c0440cf7578bc7c98e40d39a43f06">dsp1_o2</a></span>), a depth scale — the natural driver for sizing sprites with distance.</li>
 </ul>
 <p>Copy those two <span class="tt"><a class="el" href="dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1Parameter</a></span> values as your starting point and tune from there. Its four output words are <b>Vof, Vva, Cx, Cy</b> (official manual §5.4.1, verified on luna): the raster of the "imaginary centre", the horizon raster relative to it, and the ground point under that centre. They are what the ground pipeline below runs on.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md189"></a>
+<h2 class="doxsection"><a class="anchor" id="the-ground-what-dsp1_ground-does"></a>
 The ground (what dsp1_ground does)</h2>
 <p>The reason the chip was on the Super Mario Kart cartridge: the <b>Raster</b> command. Give it a camera and it streams, per scanline, the 2×2 Mode 7 matrix that projects the ground plane — perspective <em>and</em> rotation, A, B, C and D — as an open-ended stream the CPU stops with a sentinel. The lib wraps the whole transaction:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9">dsp1Parameter</a>(x, y, height, 96, 256, heading, tilt);</div>
@@ -253,10 +253,10 @@ The ground (what dsp1_ground does)</h2>
 <ul>
 <li><b>Raster numbers are down-positive and relative to the screen centre</b>, unlike <span class="tt"><a class="el" href="dsp1_8h.html#a39767ab0d98ace72ba92e541085e1b60" title="Project a world point to the screen (DSP-1 command $06, &quot;Project&quot;).">dsp1Project</a></span>'s up-positive V. The horizon is on screen line <span class="tt">112 + Vof + Vva</span>; <span class="tt">Vof</span> is where the firmware parks its reference line (0 when looking well down, positive when the horizon is near or below the centre).</li>
 <li><b>The D values are slopes relative to the imaginary centre line</b>, so M7VOFS must put the pivot (M7X/M7Y = Cx/Cy) on that line — the <span class="tt"><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll</a></span> above. Get this wrong and the ground shears.</li>
-<li><b>Cost</b>: ≈ 50 µs per raster (per-word RQM handshake, 4 words), so a 126-line floor is ≈ 40 % of a frame. Super Mario Kart streams 96 lines per frame. Double-buffer the tables and fill the back set during active display, as the example does.</li>
+<li><b>Cost</b> (measured on luna, not a datasheet figure): ≈ 50 µs per raster (per-word RQM handshake, 4 words), so a 126-line floor is ≈ 40 % of a frame. Super Mario Kart streams 96 lines per frame. Double-buffer the tables and fill the back set during active display, as the example does.</li>
 </ul>
 <p><span class="tt">dsp1Target(h, v)</span> is the inverse for the same plane: the ground point under a screen pixel, in raster coordinates (Target(0, 0) = Cx/Cy).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md190"></a>
+<h2 class="doxsection"><a class="anchor" id="distance-and-range-the-game-logic-commands"></a>
 Distance and Range: the game-logic commands</h2>
 <p>You do not need 3D graphics to profit from the chip:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> d = <a class="code hl_function" href="dsp1_8h.html#af8c54ae3bc3a6017516b2b06ccbd711c">dsp1Distance</a>(dx, dy, dz);     <span class="comment">/* true length, hardware sqrt */</span></div>
@@ -267,21 +267,21 @@ Distance and Range: the game-logic commands</h2>
 <div class="ttc" id="adsp1_8h_html_af8c54ae3bc3a6017516b2b06ccbd711c"><div class="ttname"><a href="dsp1_8h.html#af8c54ae3bc3a6017516b2b06ccbd711c">dsp1Distance</a></div><div class="ttdeci">u16 dsp1Distance(s16 x, s16 y, s16 z)</div><div class="ttdoc">Euclidean length of a 3D vector (DSP-1 command $28, &quot;Distance&quot;).</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --><p>Both are single calls where the 65816 would need three multiplies, two adds and (for Distance) a software square root.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md191"></a>
+<h2 class="doxsection"><a class="anchor" id="gotchas-2"></a>
 Gotchas</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md192"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-firmware-needed-by-low-level-emulators"></a>
 🟡 Firmware needed by low-level emulators</h3>
 <p>luna emulates the DSP-1 at low level and needs Sony's <span class="tt">dsp1b.rom</span> (copyrighted, not shipped). Install it once — <span class="tt">cp dsp1b.rom ~/.config/luna/firmware/</span> or <span class="tt">luna state --dsp1-rom &lt;path&gt; &lt;rom&gt;</span> — and it persists. Without it the ROM boots but the chip stays inert; that is why <span class="tt"><a class="el" href="dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f" title="Is a DSP-1 responding? Known-answer self-test.">dsp1Present()</a></span> exists and why the DSP-1 tests are firmware-gated (they SKIP, not fail, in CI). Target revision is DSP-1B, the bug-fixed one and the emulator default.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md193"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-not-nmi-callback-safe"></a>
 🟡 Not NMI-callback-safe</h3>
-<p>A command is a multi-byte DR transaction. If an <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a></span> callback issues a DSP-1 call while the main loop is mid-transaction, both are corrupted — same class as the <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a></span> restriction in <span class="tt">KNOWN_LIMITATIONS.md</span>. Keep all DSP-1 work in the main loop.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md194"></a>
+<p>A command is a multi-byte DR transaction. If an <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a></span> callback issues a DSP-1 call while the main loop is mid-transaction, both are corrupted — same class as the <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a></span> restriction in <span class="tt"><a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a></span>. Keep all DSP-1 work in the main loop.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-a-raster-stream-cannot-be-resynced--let-the-lib-close-it"></a>
 🟡 A Raster stream cannot be "resynced" — let the lib close it</h3>
 <p><span class="tt"><a class="el" href="dsp1_8h.html#a07cbf1c377508911986a414336ad4fd8" title="Resynchronise the DSP-1 to a known command-wait state.">dsp1Init()</a></span>'s <span class="tt">$80</span> Sync recovers an interrupted <em>fixed-length</em> command, not an open stream: inside a Raster stream every byte pair is swallowed as a 16-bit word, so a wedged stream never returns to command mode until <span class="tt">$8000</span> lands on a D slot. <span class="tt"><a class="el" href="dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster()</a></span> always closes its stream; do not hand-roll <span class="tt">$0A</span> (and never <span class="tt">$1A</span>, which the DSP-1B firmware never returns from — measured on luna, see the reference note).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md195"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-throughput-is-per-byte"></a>
 🟡 Throughput is per-byte</h3>
 <p>Every word costs two RQM-gated byte moves. The cube's 8 vertices × (Objective + Project) ≈ 100 word transfers per frame — fine at 60 fps, but budget before scaling up: reuse the Attitude matrix, only re-run Parameter when the camera moves, and batch what you can.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md196"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-2"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="dir_d192013b62f59c5237b598078a7a209a.html" title="/home/runner/work/opensnes/opensnes/examples/chips/dsp1_cube/README.md"><span class="tt">examples/chips/dsp1_cube</span></a> — the 3D pipeline example</li>

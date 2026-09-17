@@ -27,6 +27,8 @@ var NAVTREE =
   [ "OpenSNES", "index.html", [
     [ "OpenSNES Documentation", "index.html", "index" ],
     [ "DSP-1 Coprocessor Tutorial", "tutorial_dsp1.html", null ],
+    [ "Known Limitations", "KNOWN_LIMITATIONS.html", null ],
+    [ "API index — by what you are trying to do", "api_index.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -53,16 +55,16 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"anim_8h.html",
-"dir_4a33f256780b3d83d2a399a144270042.html",
-"examples_chips_superfx_3d.html",
-"examples_scrolling_mixed_scroll.html",
-"globals_vars_b.html",
-"group__ppu__regs.html#ga40b0af5f9d5abe1a520205d5a99c86ab",
-"input_2controller_2main_8c.html",
-"panel_8h.html#abe2d36e123f747f0d8d827388363f704",
-"sprite_8h.html#a719045957a857d18f56354a20313ae37",
-"superfx_8h.html#aa96dbf2933de566840e56b543630e5d6"
+"KNOWN_LIMITATIONS.html",
+"dir_540198a259c7f26f1ffb0bd7d64578e1.html",
+"examples_chips_superfx_hello.html",
+"examples_sprites.html",
+"globals_vars_g.html",
+"group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1",
+"input_2superscope_2main_8c.html",
+"piece_8c.html#a5469577e45e27a38a27d2e27b0ed2205",
+"sprite_8h.html#aa7fbd1a015711bb1b9dc0d71278ca4d3",
+"superfx_8h.html#ae2b2a9e892c216f6af9da730038274a8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

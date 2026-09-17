@@ -9,7 +9,7 @@ var indexSectionsWithContent =
   6: "s",
   7: "sw",
   8: "abcdefghiklmnoprstuvwxy",
-  9: "abcdefilmprstvw",
+  9: "abcdefilmprstuvw",
   10: "$0123456789abcdefghijklmnopqrstuvwxyz×–—→≥🔴🟠🟡🟢"
 };
 

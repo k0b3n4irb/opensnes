@@ -13,8 +13,9 @@ var searchData=
   ['math_2eh_10',['math.h',['../math_8h.html',1,'']]],
   ['math_2emd_11',['math.md',['../math_8md.html',1,'']]],
   ['memory_5fmap_2emd_12',['MEMORY_MAP.md',['../MEMORY__MAP_8md.html',1,'']]],
-  ['mode7_2eh_13',['mode7.h',['../mode7_8h.html',1,'']]],
-  ['mode7_2emd_14',['mode7.md',['../mode7_8md.html',1,'']]],
-  ['mosaic_2eh_15',['mosaic.h',['../mosaic_8h.html',1,'']]],
-  ['mosaic_2emd_16',['mosaic.md',['../mosaic_8md.html',1,'']]]
+  ['migrating_5ffrom_5fpvsneslib_2emd_13',['MIGRATING_FROM_PVSNESLIB.md',['../MIGRATING__FROM__PVSNESLIB_8md.html',1,'']]],
+  ['mode7_2eh_14',['mode7.h',['../mode7_8h.html',1,'']]],
+  ['mode7_2emd_15',['mode7.md',['../mode7_8md.html',1,'']]],
+  ['mosaic_2eh_16',['mosaic.h',['../mosaic_8h.html',1,'']]],
+  ['mosaic_2emd_17',['mosaic.md',['../mosaic_8md.html',1,'']]]
 ];
