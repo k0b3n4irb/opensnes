@@ -1,0 +1,96 @@
+# fading cycles six brightness ramps at three speeds: fadeOut/fadeIn(1),
+# then (3), then (6) — one VBlank wait per step, three, then six. Every
+# transition is gated on a button press, so the ROM sits on a full-bright
+# static picture forever if nobody presses anything: liveness sees a healthy
+# NMI and the fbhash baseline captures frame-N of that same idle picture.
+# Not one of the six ramps is exercised by either pillar today.
+#
+# The `speed` parameter is the subject, and the assert that proves it is the
+# reading taken exactly 10 frames after each press:
+#
+#     fadeOut(1) @60  -> brightness 6 at frame 70   (~1 step/frame)
+#     fadeOut(3) @140 -> brightness 12 at frame 150 (~1 step/3 frames)
+#     fadeOut(6) @300 -> brightness 14 at frame 310 (~1 step/6 frames)
+#
+# Same starting brightness, same elapsed frames, three different answers.
+# A fadeOut() that ignored `speed` (or a WaitForVBlank() that stopped
+# blocking) would collapse all three onto the same number; a fade that ran
+# off the end of the ramp would overshoot past 0 or 15. Both ends are
+# pinned too: the ramps land exactly on 0 and exactly on 15 and stop there.
+#
+# force_blanked is the negative. setBrightness(0) is NOT forced blank
+# (console.h carries that warning), so a fade to black must leave the
+# force-blank shadow at 0 — a fadeOut that blanked the screen instead of
+# dimming it would make VRAM writable mid-fade and look identical.
+rom = "../../../examples/transitions/fading/fading.sfc"
+
+[[checkpoint]]                 # idle at full brightness, waiting for the first press
+at_frame = 60
+[checkpoint.values]
+current_brightness = { eq = 15, width = 1 }
+force_blanked = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeOut(1), 10 frames in: fast
+at_frame = 70
+input = "60:0x0080,64:0"
+[checkpoint.values]
+current_brightness = { eq = 6, width = 1 }
+
+[[checkpoint]]                 # fadeOut(1) complete: exactly 0, and NOT force blank
+at_frame = 80
+[checkpoint.values]
+current_brightness = { eq = 0, width = 1 }
+force_blanked = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeIn(1), 10 frames in
+at_frame = 110
+input = "100:0x0080,104:0"
+[checkpoint.values]
+current_brightness = { eq = 9, width = 1 }
+
+[[checkpoint]]                 # fadeIn(1) complete: exactly 15, no overshoot
+at_frame = 120
+[checkpoint.values]
+current_brightness = { eq = 15, width = 1 }
+
+[[checkpoint]]                 # fadeOut(3), 10 frames in: three times slower
+at_frame = 150
+input = "140:0x0080,144:0"
+[checkpoint.values]
+current_brightness = { eq = 12, width = 1 }
+
+[[checkpoint]]                 # fadeOut(3) complete at ~48 frames
+at_frame = 190
+[checkpoint.values]
+current_brightness = { eq = 0, width = 1 }
+force_blanked = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeIn(3), 10 frames in
+at_frame = 230
+input = "220:0x0080,224:0"
+[checkpoint.values]
+current_brightness = { eq = 3, width = 1 }
+
+[[checkpoint]]                 # fadeIn(3) complete
+at_frame = 270
+[checkpoint.values]
+current_brightness = { eq = 15, width = 1 }
+
+[[checkpoint]]                 # fadeOut(6), 10 frames in: barely moved
+at_frame = 310
+input = "300:0x0080,304:0"
+[checkpoint.values]
+current_brightness = { eq = 14, width = 1 }
+
+[[checkpoint]]                 # still descending 30 frames later
+at_frame = 340
+[checkpoint.values]
+current_brightness = { eq = 9, width = 1 }
+[checkpoint.delta]
+current_brightness = "decreased"
+
+[[checkpoint]]                 # fadeOut(6) complete at ~96 frames
+at_frame = 400
+[checkpoint.values]
+current_brightness = { eq = 0, width = 1 }
+force_blanked = { eq = 0, width = 1 }

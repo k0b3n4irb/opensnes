@@ -1,0 +1,11 @@
+# Comparison+branch fusion: a compare feeding only a jnz never stores its
+# result, so all three conditional leaves are frameless (framesize=0).
+count 3 framesize=0,
+# ...and no stack-slot store survives anywhere in the file.
+absent sta \d+,s
+# Unsigned compare fuses to cmp + carry branch.
+in max_val: present cmp 6,s\n\tbcs \+
+# Signed compare uses the overflow-corrected sbc/bvc/eor sequence.
+in smax_val: present sbc 6,s\n\tbvc
+# Equality fuses to cmp + bne.
+in eq_check: present cmp 4,s\n\tbne \+

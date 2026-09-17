@@ -22,7 +22,7 @@ Browse by category: @ref examples_by_category
 - @ref mode1/main.c "Mode 1" — Standard 16-color 4bpp background
 - @ref mode3/main.c "Mode 3" — 256-color 8bpp with assembly DMA loader
 - @ref mode5/main.c "Mode 5" — Hi-res 512px with main+sub screen
-- @ref mode7/main.c "Mode 7" — Rotation and scaling
+- @ref rotate_scale/main.c "Mode 7" — Rotation and scaling
 - @ref mode1_lz77/main.c "LZ77 Compression" — Compressed tile data
 - @ref mode1_bg3_priority/main.c "BG3 Priority" — HUD overlay technique
 - @ref continuous_scroll/main.c "Continuous Scroll" — Streaming tile columns

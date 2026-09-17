@@ -1,0 +1,33 @@
+# hdma_indirect_gradient — the INDIRECT HDMA table is built correctly in WRAM
+# and channel 0 is armed with the payload bank the indirect mode needs.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness only says the ROM kept servicing NMI.
+#   * The fbhash baseline says "the 32-band red ramp still hashes the same".
+#     It cannot say WHY it broke: a wrong band pointer, a missing terminator,
+#     a DASB (indirect data bank) left at $FF and a wrong CGADD payload all
+#     produce one undifferentiated "picture changed".
+#   * itable is COMPUTED at runtime from `(u16)(u32)(void *)band_data[i]` —
+#     a pointer-truncation or stride bug in that expression is a codegen
+#     failure, and this is the only test in the corpus that reads the
+#     resulting pointer table back byte for byte.
+#
+# Measured with `luna state --until-frame 60 --peek itable:61 --peek band_data:80`
+# and cross-checked against `luna state --out -`:
+#   dma.hdmaen = 1, dma.channels[0].params = 0x43 (indirect | 2REG_2X),
+#   bbad = 0x21 (CGADD), dasb = 0 — hdma_enabled_state below is the lib's
+#   own shadow of $420C and matched dma.hdmaen exactly at the measurement.
+#
+# itable: 32 x [7 lines][ptr_lo][ptr_hi] + terminator. The pointers walk
+# $014D, $0151, $0155 … $01C9 — band_data with a 4-byte stride.
+# band_data: 32 x [0][0][red][0], a $1F..$00 ramp (CGADD=0 twice, then the
+# BGR555 backdrop colour).
+rom = "../../../examples/hdma/hdma_indirect_gradient/hdma_indirect_gradient.sfc"
+frames = 60
+
+[asserts.values]
+hdma_enabled_state = { eq = 0x01, width = 1 }   # channel 0 only
+
+[asserts.blocks]
+itable    = { space = "wram", offset = "itable", hex = "074D01075101075501075901075D01076101076501076901076D01077101077501077901077D01078101078501078901078D01079101079501079901079D0107A10107A50107A90107AD0107B10107B50107B90107BD0107C10107C50107C90100" }
+band_data = { space = "wram", offset = "band_data", hex = "00001F0000001E0000001D0000001C0000001B0000001A000000190000001800000017000000160000001500000014000000130000001200000011000000100000000F0000000E0000000D0000000C0000000B0000000A0000000900000008000000070000000600000005000000040000000300000002000000010000000000" }

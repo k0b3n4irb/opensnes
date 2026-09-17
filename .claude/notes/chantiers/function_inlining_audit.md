@@ -1,7 +1,11 @@
 # Function inlining — audit + design
 
 **Date**: 2026-05-12 (Phase 0 audit + Phase 1 design)
-**Status**: design ready, Phase 2 implementation pending
+**Status**: SHIPPED — Phase 2 landed in `compiler/qbe/inline.c`
+(eligibility + trace `29b0941`, splicing `77d07a0`, 2026-05-12) on the
+2-pass architecture (`freetyps()` keeps the type table alive until
+`emit_collected`, fixed 2026-09-12). This note is the design record;
+the live behaviour is described in `.claude/rules/compiler.md`.
 **Trigger**: user-stated priority #2 ("A7 puis function inlining") for
 "enterrer définitivement PVSnesLib en performance".
 

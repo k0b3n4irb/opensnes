@@ -857,9 +857,14 @@ _mapvbend:
     sta.l REG_BG1HOFS
     lda.l dispxofs_L1 + 1
     sta.l REG_BG1HOFS
+    rep #$20
+    .ACCU 16
     lda.l dispyofs_L1
+    dec a                   ; VOFS = y - 1 (scanline 0 is never output; see crt0)
+    sep #$20
+    .ACCU 8
     sta.l REG_BG1VOFS
-    lda.l dispyofs_L1 + 1
+    xba
     sta.l REG_BG1VOFS
     bra _mapvbend1
 
@@ -868,9 +873,14 @@ _mapvbbg2:
     sta.l REG_BG2HOFS
     lda.l dispxofs_L1 + 1
     sta.l REG_BG2HOFS
+    rep #$20
+    .ACCU 16
     lda.l dispyofs_L1
+    dec a                   ; VOFS = y - 1 (scanline 0 is never output; see crt0)
+    sep #$20
+    .ACCU 8
     sta.l REG_BG2VOFS
-    lda.l dispyofs_L1 + 1
+    xba
     sta.l REG_BG2VOFS
     bra _mapvbend1
 

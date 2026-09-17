@@ -209,13 +209,18 @@ fix32Mul:
 .MACRO @do_u16x16
     ; \1 = X address (low byte address; X.hi = +1)
     ; \2 = Y address (low byte address; Y.hi = +1)
+    ; `.w` on every operand: the f32_* temporaries are a RAMSECTION the
+    ; linker places, and an unsuffixed `\1 + 1` was sized as direct page
+    ; by WLA — fine while the section landed below $0100 (every example so
+    ; far), a link error the moment it did not (devtools/link_modules.py,
+    ; 2026-09-13: "out of 8-bit range" at $19B7).
     sep #$20
     .ACCU 8
 
     ; p0 = X.lo * Y.lo
-    lda \1
+    lda.w \1
     sta.l $4202
-    lda \2
+    lda.w \2
     sta.l $4203
     nop
     nop
@@ -228,9 +233,9 @@ fix32Mul:
     ; p1 = X.hi * Y.lo
     sep #$20
     .ACCU 8
-    lda \1 + 1
+    lda.w \1 + 1
     sta.l $4202
-    lda \2
+    lda.w \2
     sta.l $4203
     nop
     nop
@@ -243,9 +248,9 @@ fix32Mul:
     ; p2 = X.lo * Y.hi
     sep #$20
     .ACCU 8
-    lda \1
+    lda.w \1
     sta.l $4202
-    lda \2 + 1
+    lda.w \2 + 1
     sta.l $4203
     nop
     nop
@@ -258,9 +263,9 @@ fix32Mul:
     ; p3 = X.hi * Y.hi
     sep #$20
     .ACCU 8
-    lda \1 + 1
+    lda.w \1 + 1
     sta.l $4202
-    lda \2 + 1
+    lda.w \2 + 1
     sta.l $4203
     nop
     nop
@@ -297,7 +302,7 @@ fix32Mul:
                       ; Actually: A holds value V in low byte (00:V). After XBA, A = V:00. So now low byte=00, high byte=V.
     clc
     adc.w f32_p0
-    sta \1
+    sta.w \1
 
     ; carry out from above goes into bit 16 = result_hi low
     ; result_hi = (p1p2_lo >> 8) + (p1p2_hi-from-carry << 8 wait, p1p2 is 17-bit but stored as 16 + 1 carry)

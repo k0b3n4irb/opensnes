@@ -1,0 +1,31 @@
+# hicolor_blend is krom's HiColor3840: the image's green+blue channels live
+# on BG1 (CGRAM 16-255), the red channel on BG2 as a 16-level ramp (CGRAM
+# 0-15), and colour math ADDs the sub-screen into the main screen per pixel.
+# It is completely static — no input, no HDMA, no IRQ — so liveness proves
+# nothing beyond "the NMI ticks", and the fbhash baseline proves the final
+# picture without saying WHICH of the three ingredients produced it.
+#
+# The README's load-bearing claim is register parity with krom: CGWSEL $02
+# (sub-screen is the colour-math source) and CGADSUB $21 (add, half off,
+# BG1 $01 + backdrop $20). Those two bytes are the port. The lib reaches
+# them through four separate setters (SetSource / SetOp / SetHalf / Enable)
+# composing into one shadow each, so a setter that clobbers a neighbouring
+# bit lands here and nowhere else.
+#
+# The two CGRAM blocks are the channel split itself:
+#   0000  the BG2 red ramp, R = 0,2,4,...,28,31 with G = B = 0
+#   0100  16 GB palette entries, every one with its low 5 bits (red) ZERO
+# Red being absent from CGRAM 16-255 is the whole trick: the red in the
+# displayed image can only have come from the colour-math add. If the
+# converter ever leaked red into the GB palette the picture would still
+# look plausible — and this is the assert that would catch it.
+rom = "../../../examples/color/hicolor_blend/hicolor_blend.sfc"
+steps = 3000000
+
+[asserts.values]
+cgwsel = { eq = 0x02, width = 1 }        # krom CGWSEL $02
+cgadsub = { eq = 0x21, width = 1 }       # krom CGADSUB $21
+
+[asserts.blocks]
+red_ramp = { space = "cgram", offset = "0000", hex = "000002000400060008000a000c000e00100012001400160018001a001c001f00" }
+gb_no_red = { space = "cgram", offset = "0100", hex = "00010001e000e000c074a06880748064c000c000a000a0008000800080006000" }

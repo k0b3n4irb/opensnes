@@ -1,0 +1,51 @@
+# backgrounds/mode0 — the four-layer Mode 0 claim, byte by byte.
+#
+# Mode 0 is the only mode with FOUR BG layers, and its defining constraint is
+# that each layer is 2bpp with its OWN 4-colour palette bank. The example's
+# docblock states it ("BG0 uses palette 0-3, BG1 uses 4-7, BG2 uses 8-11,
+# BG3 uses 12-15") — this manifest is the machine check of that sentence:
+# BG_4COLORS0 must make bgInitTileSet() land each palette at CGRAM index
+# bg*32, and each tileset at its own char base (words $2000/$3000/$4000/$5000).
+#
+# Why liveness/fbhash would not catch a failure here: a palette-bank or
+# char-base regression that collapses two layers onto one bank still renders a
+# full, plausible parallax scene — four layers of art drawn with the wrong
+# four colours is a picture, not a black screen, and the fbhash baseline would
+# simply be re-blessed by whoever re-ran `--update`. The byte blocks name the
+# bank and the address, so the failure reads as "BG3's palette is not at CGRAM
+# 64" instead of "some pixels moved".
+#
+# The parallax ratio is the second claim. The loop scrolls every 3rd frame by
+# 3/2/1 px. Measured at frame 200: sxbg3 = 66 ticks (200/3), sxbg2 = 132,
+# sxbg1 = 198 — the 3:2:1 ratio AND the /3 throttle in three numbers. flip = 0
+# pins the throttle phase. A layer that stops scrolling, or one that loses the
+# throttle and runs every frame, is a wrong integer here.
+rom = "../../../examples/backgrounds/mode0/mode0.sfc"
+frames = 200
+
+[asserts.values]
+sxbg3 = 66                        # 200 frames / 3 = 66 scroll ticks, 1 px each
+sxbg2 = 132                       # 2 px per tick  -> exactly 2 * sxbg3
+sxbg1 = 198                       # 3 px per tick  -> exactly 3 * sxbg3
+flip  = 0                         # throttle counter wrapped, phase 0
+
+[asserts.blocks]
+# One 4-colour palette bank per BG, 32 CGRAM entries apart (BG_4COLORS0).
+# BG4 loaded 16 bytes of palette (8 colours), so its bank is twice as long.
+bg1_palette_bank0 = { space = "cgram", offset = "0000", hex = "1f7cff1e33019f33" }
+bg2_palette_bank1 = { space = "cgram", offset = "0040", hex = "1f7c0000a0026927" }
+bg3_palette_bank2 = { space = "cgram", offset = "0080", hex = "1f7c2f007f1e7f57" }
+bg4_palette_bank3 = { space = "cgram", offset = "00C0", hex = "1f7cbf6be77ea0011f7cbf7f6927e001" }
+# Four separate 2bpp tilesets, one per char base. VRAM byte offset = word * 2.
+bg1_tiles_w2000   = { space = "vram",  offset = "4010", hex = "ffff00ffff00ffffff00ff00ff00ff00" }
+bg2_tiles_w3000   = { space = "vram",  offset = "6010", hex = "7f00ff00e01fcf3fdf3fd33fc03fc03f" }
+bg3_tiles_w4000   = { space = "vram",  offset = "8010", hex = "07001807201f433c4c338b77976f976f" }
+bg4_tiles_w5000   = { space = "vram",  offset = "A000", hex = "00ff00ff00ff00ff00ff00ff00ff00ff" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

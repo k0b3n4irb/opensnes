@@ -34,7 +34,8 @@
  * - Tilemap in low bytes of VRAM words 0x0000-0x3FFF
  * - Tile data in high bytes of VRAM words 0x0000-0x3FFF
  *
- * Use mode7LoadGraphics() or set up DMA manually with interleaved data.
+ * Use dmaCopyVramMode7() (two DMAs: tilemap to the low bytes, tiles to the
+ * high bytes, from any bank) or set up DMA manually with interleaved data.
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -107,7 +108,8 @@ void mode7SetCenter(s16 x, s16 y);
  * Sets the scroll offset for the Mode 7 plane.
  *
  * @param x Horizontal scroll (13-bit signed)
- * @param y Vertical scroll (13-bit signed)
+ * @param y Vertical scroll (13-bit signed); written as y - 1 to M7VOFS, the
+ *          same scanline-0 convention as bgSetScroll()
  */
 void mode7SetScroll(s16 x, s16 y);
 

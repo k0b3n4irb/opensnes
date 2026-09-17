@@ -394,3 +394,119 @@ over an unexplained rendering change is exactly what `testing.md` forbids.
   Workaround in the harness: keep `-n` for scripted-input runs (what
   `probes/lib.py` and the manifests do). Owner to validate, then file on
   `k0b3n4irb/luna` with the repro above.
+
+## Observation 2026-09-15 — `luna run --native-res --screenshot` writes the averaged 256×224 PNG
+
+Wiring the hi-res capture (gaps review R8) on `backgrounds/mode5_hires`:
+
+| command | fbhash | screenshot |
+|---|---|---|
+| `luna run --until-frame 200 --print-fbhash --screenshot x.png` | `5d0ad550c57d777e` | 256×224 |
+| `luna run --until-frame 200 --native-res --print-fbhash --screenshot x.png` | `aaf77640375cfea4` | **256×224** |
+| `luna state --until-frame 200 --native-res --screenshot x.png` | — | 512×448 |
+
+So `--native-res` reaches the **fbhash** under `luna run` (the hash changes, and
+that is the regression key the harness gates on) but not its `--screenshot`,
+while `luna state` honours it for both. The harness is therefore correct today
+— `baselines/backgrounds_mode5_hires.png` is simply the averaged view of a
+natively-hashed frame, which is confusing for a human diffing the PNG.
+
+**For the owner to validate before filing**: should `luna run --native-res`
+write the 512×448 PNG too, matching `luna state`? Nothing is blocked on it.
+
+## R4 still blocked (re-checked 2026-09-15 on v1.23.0)
+
+`luna profile` continues to report the NMI handler as five rows —
+`NmiHandler`, `NmiHandler@oam_done`, `NmiHandler@mp5_done`,
+`NmiHandler@dynamic_flush_done`, `NmiHandler@nmi_restore` — so
+`--budget NmiHandler=<mclk>` measures the entry stub only. Summing the
+children in the harness would be wrong (the per-frame *max* of a sum is not
+the sum of per-frame maxima), so the VBlank time budget waits on luna folding
+child labels into their parent. Request already with the owner.
+
+## Capability request (owner to validate) 2026-09-16 — a multitap device on a port
+
+`luna state --port1/--port2` model `pad`, `mouse` and `superscope`. There is no
+multitap, so the 5-player path cannot be driven at all.
+
+On our side that path is currently unreachable anyway (`snes_mplay5` is never
+set — see the 🟡 entry in `KNOWN_LIMITATIONS.md`), so nothing is blocked *today*.
+The request only becomes useful once the SDK grows a detection routine and an
+API to arm it. Shape it would need, from `templates/crt0.asm`'s `ScanMPlay5`:
+
+- a device kind (say `multitap`) selectable per port;
+- four pad scripts behind it, since the adapter multiplexes pads 2-5;
+- the `$4017` bit-bang protocol modelled, not just the auto-joypad registers —
+  the routine reads pad 2 from `$421E/$421F` but clocks pads 3 and 4 out by
+  hand after clearing `WRIO` bit 7.
+
+**Do not file yet**: per `.claude/rules/luna_tooling.md` the owner validates a
+capability need before it becomes a luna issue, and this one has no caller.
+
+## Mouse sensitivity — covered 2026-09-16, luna models the protocol
+
+Verified before writing the test: `mouseSetSensitivity()` only queues a
+request, the NMI handler clocks the cycle command out, and the mouse reports
+the new value back. luna models the whole round trip — pulsing the right
+button (`--mouse "<frame>:0,0,2"`) walks the library's shadow 0 → 1 → 2 → 0,
+landing within ~10 frames of each press. `manifests/mouse_sensitivity.toml`
+pins it, and also pins that port 1's byte never moves.
+
+Worth knowing for anyone writing manifests: **luna merges every checkpoint's
+input script into one timeline for the whole run**. A checkpoint sees every
+event scheduled before its frame, not only the ones written beside it. The
+first draft of this manifest read the values as if each checkpoint replayed
+only its own script, and failed.
+
+## Observation 2026-09-16 — `asserts.dsp` has no name for ENVX / OUTX
+
+Reproduced directly:
+
+```
+asserts.dsp.V0_ENVX: unknown S-DSP register (name like FLG/EDL/V0_VOLL, or a hex index < 80)
+asserts.dsp.V0_OUTX: unknown S-DSP register (...)
+```
+
+luna's name table covers the configuration registers but not the two
+per-voice *readback* registers, `$x8` (ENVX, current envelope) and `$x9`
+(OUTX, current sample output) — the ones a test wants when it asks "is this
+voice actually sounding?". The quoted hex index works
+(`"08" = 0x00`), so nothing is blocked; `manifests/audio_pitch_mod_*.toml`
+use it with a comment naming the register. Cosmetic, low priority.
+
+## Capability request (owner to validate) 2026-09-16 — `[asserts.ppu]` in manifests
+
+Writing the R7 manifests hit the same wall in three example families. A
+manifest accepts exactly these assert namespaces (luna's own error text):
+
+```
+unknown field `ppu`, expected one of `wdm_empty`, `nocash_contains`, `fbhash`,
+`audio_rms_min`, `values`, `blocks`, `trace`, `dsp`, `footprint`, `dma`, `oam`
+```
+
+So a manifest cannot assert a **PPU register** — the BG mode, the window masks
+(`w12sel`, `w34sel`, `wobjsel`, WH0-3, `tmw`, `tsw`), the colour-math pair
+(`cgwsel`, `cgadsub`), the mosaic byte, the Mode 7 matrix (`m7a`-`m7d`, `m7x`,
+`m7y`). Reading the MMIO address through `values` does not work either: `luna
+test` resolves `00:2126` in WRAM and returns 0.
+
+Yet **`luna state --out -` already exposes every one of those fields** under
+`ppu`, and our own `devtools/libtests/test_libtest.py` asserts the window
+registers that way, from Python. The request is therefore small and
+well-specified: an `asserts.ppu` table whose keys are the existing `ppu` JSON
+field names, compared like `asserts.dsp` does for the S-DSP.
+
+What it would buy, concretely:
+
+- `examples/color/gradient_9bit` has **no manifest at all** today for want of
+  it — its whole effect is HDMA rewriting the backdrop and INIDISP per
+  scanline, and at a frame boundary the only observable is `ppu.inidisp`.
+- Mode 7 examples write the matrix straight to the registers with no WRAM
+  shadow, so the matrix can only be checked through the framebuffer hash.
+- Window and colour-math examples are checkable today only because the
+  library happens to keep WRAM shadows of those registers; anything written
+  directly is invisible.
+
+Values can be *measured* for all of these with `luna state`, so a prototype is
+not needed — the contract is "assert what the state JSON already prints".
+Per `.claude/rules/luna_tooling.md`, validate before filing.

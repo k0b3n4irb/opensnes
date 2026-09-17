@@ -16,10 +16,14 @@ CFLAGS   = -g -Wall -Wextra -O2 -pedantic -std=c11 \
 ifeq ($(shell uname),Darwin)
 	EXT     :=
 else ifeq ($(OS),Windows_NT)
+	ifneq ($(SANITIZE),1)
 	CFLAGS  += -static
+	endif
 	EXT     :=.exe
 else
+	ifneq ($(SANITIZE),1)
 	CFLAGS  += -static
+	endif
 	EXT     :=
 endif
 
@@ -61,3 +65,10 @@ clean:
 	@echo "[CLEAN] Removing smconv build files..."
 	@rm -rf $(OBJ)
 	@rm -f $(EXE)$(EXT)
+
+# SANITIZE=1: ASan + UBSan build for the host-side sanitizer job
+# (make test-sanitizers). Not static — the sanitizer runtimes do not link
+# statically — and -O1 for readable reports.
+ifeq ($(SANITIZE),1)
+CFLAGS += -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer
+endif

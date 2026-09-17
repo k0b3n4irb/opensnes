@@ -6,7 +6,7 @@ references those tiles to spell out words on screen.
 
 These examples teach the tile/tilemap fundamentals that underpin all SNES graphics.
 
-## Examples
+## Example ROMs
 
 A ladder of developer questions: *how do I show text? → how do I move it?*
 

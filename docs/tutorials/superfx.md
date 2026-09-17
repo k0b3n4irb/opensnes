@@ -297,7 +297,7 @@ setScreenOff();
 setScreenOn();
 ```
 
-## Examples
+## Example ROMs
 
 | Example | What it demonstrates |
 |---------|---------------------|

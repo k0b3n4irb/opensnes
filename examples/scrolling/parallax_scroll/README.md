@@ -1,6 +1,6 @@
 # Parallax Scrolling
 
-![Demo](demo.gif)
+![Demo](parallax_scroll_demo.gif)
 
 ![Screenshot](parallax_scroll.png)
 

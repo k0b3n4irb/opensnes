@@ -1,0 +1,42 @@
+# timer's whole subject is `frame_count`, the NMI heartbeat crt0.asm bumps
+# once per VBlank, and the one thing the example adds on top of reading it:
+# A resets it to zero. The visual baseline renders the digits, so it does
+# pin the counter at its own capture frames — but it runs with NO input,
+# so the reset path, and the "only A does it" part of it, is never reached.
+# Liveness sees neither.
+#
+# Measured on luna, undisturbed: frame_count == PPU frame - 2 at frames 60,
+# 150 and 300 alike — exactly one NMI per displayed frame over 300 frames,
+# no double-increment and no missed VBlank.
+#
+# The B leg is the negative: the source tests `padPressed(0) & KEY_A`, so a
+# mask that had drifted onto a neighbouring bit would reset here too.
+# Measured: still 148 at frame 150 after a B tap at frame 100.
+#
+# The A leg is the positive, and its value is predicted rather than read off
+# a screenshot: A is tapped at frame 200, the reset lands on frame 201
+# (frame_count == 1 at frame 202), so at frame 240 the counter must have
+# climbed back to exactly 240 - 201 = 39.
+rom = "../../../examples/basics/timer/timer.sfc"
+#        B tap (must NOT reset)   A tap (must reset)
+input = "100:0x8000,104:0,200:0x0080,204:0"
+
+[[checkpoint]]                 # the NMI heartbeat, before any input
+at_frame = 60
+[checkpoint.values]
+frame_count = { eq = 58, width = 2 }         # 60 - 2 boot frames
+
+[[checkpoint]]                 # B is not the reset button
+at_frame = 150
+[checkpoint.values]
+frame_count = { eq = 148, width = 2 }        # still frame - 2: B did nothing
+
+[[checkpoint]]                 # A landed: the counter restarted at 0
+at_frame = 202
+[checkpoint.values]
+frame_count = { eq = 1, width = 2 }
+
+[[checkpoint]]                 # ...and resumed at one per frame from there
+at_frame = 240
+[checkpoint.values]
+frame_count = { eq = 39, width = 2 }         # 240 - 201

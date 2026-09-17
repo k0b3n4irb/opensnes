@@ -1,0 +1,47 @@
+# scrolling/mixed_scroll — two layers, two palette slots, and only one of them
+# moves.
+#
+# The example composites a scrolling BG1 (shader pattern) under a stationary
+# BG2 (logo), and the README's own table is the specification: BG2 map at word
+# $1400, BG1 map at word $1800, BG1 tiles at word $4000, BG2 tiles at word
+# $5000, BG2 palette in CGRAM slot 0, BG1 palette in slot 1 (the gfx4snes
+# `-e 1` flag bakes slot 1 into BG1's tilemap entries). VRAM byte = word * 2.
+# Six destinations, six blocks.
+#
+# The palette-slot pair is the assert that earns its place. Slot 1 holds only
+# two non-black colours, so an `-e` regression that collapsed BG1 onto slot 0
+# would let BG1 render in the LOGO's 16-colour palette — a full, colourful,
+# completely wrong picture. `bg1_pal_slot1` says CGRAM 16-19 and nothing else.
+#
+# scrX/scrY pin the motion: +1 px on both axes per frame, diagonal, never
+# decoupled. At frame 200 both are 197 (boot costs a few frames before the loop
+# starts). Asserting them EQUAL to each other and to a fixed number is the
+# machine form of "the pattern scrolls diagonally and wraps seamlessly" — a
+# regression that scrolls one axis only, or double-steps X, is one wrong
+# integer here rather than a shifted image nobody can attribute.
+#
+# Why liveness/fbhash would not catch these: the visual baseline for this
+# example is a single frame-200 hash of a composited two-layer scene. Every
+# failure above is still a composited two-layer scene.
+rom = "../../../examples/scrolling/mixed_scroll/mixed_scroll.sfc"
+frames = 200
+
+[asserts.values]
+scrX = 197                        # +1 per frame from the loop, diagonal
+scrY = 197                        # must track scrX exactly — same increment site
+
+[asserts.blocks]
+bg2_pal_slot0   = { space = "cgram", offset = "0000", hex = "420c4b51f175a524ad450529a31c612be1267c305e0bc734d54ede7b00000000" }
+bg1_pal_slot1   = { space = "cgram", offset = "0020", hex = "1f7c1f0200000000" }
+bg2_map_w1400   = { space = "vram",  offset = "2BD0", hex = "12001200140015001600170018001900" }
+bg1_map_w1800   = { space = "vram",  offset = "34E0", hex = "00041604170405040504050405040504" }
+bg1_tiles_w4000 = { space = "vram",  offset = "81A0", hex = "ff00fe00fc00f800f000e000c0008000" }
+bg2_tiles_w5000 = { space = "vram",  offset = "A410", hex = "ff7eff70ff70ff70ff7fff7fff7fff00" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

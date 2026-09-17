@@ -273,7 +273,7 @@ int main(int argc, const char **argv)
 		int cols = snesimage.header.width / sw;
 		int rows = snesimage.header.height / sh;
 
-		fprintf(stdout, "\nSprite tile map (%dx%d sheet, %dx%d sprites):\n",
+		fprintf(stdout, "\nSprite tile map (%ux%u sheet, %dx%d sprites):\n",
 		        snesimage.header.width, snesimage.header.height, sw, sh);
 
 		for (int r = 0; r < rows; r++)

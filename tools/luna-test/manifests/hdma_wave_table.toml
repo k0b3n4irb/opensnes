@@ -1,0 +1,53 @@
+# hdma_wave_table — the krom cadence, asserted as a number: exactly ONE table
+# entry per frame, wrapping at entry 672.
+#
+# What this proves that the other pillars cannot:
+#   * The example never writes a table byte; the only thing that moves is the
+#     HDMA start pointer, one 3-byte entry per VBlank. The fbhash baseline
+#     samples a couple of early frames — it can tell you the ripple looks
+#     different, it cannot tell you the pointer advanced by two entries per
+#     frame instead of one, and it samples nowhere near the wrap.
+#   * WAVE_WRAP is the correctness-critical constant of this port (krom's
+#     sine has a non-integer quasi-period, so 672 is the only value that
+#     wraps seamlessly). The f672 -> f700 pair is the only place in the
+#     corpus where the wrap is executed at all: 668 -> 24, i.e. 696 mod 672.
+#     Past the wrap the start pointer must not walk off the end of the 896-
+#     entry ROM table.
+#
+# Measured: `luna state --until-frame N --peek wave_phase:2
+# --peek hdma_enabled_state:1` at 60/120/672/700/740 ->
+# 56 / 116 / 668 / 24 / 64, shadow = 0x01 throughout; `luna state --out -`
+# reported dma.hdmaen = 1 at the same frames.
+rom = "../../../examples/hdma/hdma_wave_table/hdma_wave_table.sfc"
+
+[[checkpoint]]                 # armed at boot, one channel
+at_frame = 60
+[checkpoint.values]
+wave_phase = 56
+hdma_enabled_state = { eq = 0x01, width = 1 }   # 1 << HDMA_CHANNEL_0
+
+[[checkpoint]]                 # exactly +1 entry per frame over 60 frames
+at_frame = 120
+[checkpoint.values]
+wave_phase = 116
+hdma_enabled_state = { eq = 0x01, width = 1 }
+[checkpoint.delta]
+wave_phase = "increased"
+
+[[checkpoint]]                 # just short of WAVE_WRAP (672)
+at_frame = 672
+[checkpoint.values]
+wave_phase = 668
+
+[[checkpoint]]                 # wrapped: 696 mod 672 — the seam krom needs
+at_frame = 700
+[checkpoint.values]
+wave_phase = 24
+hdma_enabled_state = { eq = 0x01, width = 1 }   # the wrap must not disarm it
+[checkpoint.delta]
+wave_phase = "decreased"
+
+[[checkpoint]]                 # and the cadence is unchanged after the seam
+at_frame = 740
+[checkpoint.values]
+wave_phase = 64

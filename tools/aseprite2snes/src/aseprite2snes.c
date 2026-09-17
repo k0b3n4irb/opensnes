@@ -349,6 +349,7 @@ static void emit_header(FILE *o, const char *src, const char *prefix,
         /* durations in ticks, and whether they are all equal (uniform path) */
         int ticks[MAX_FRAMES];
         int uniform = 1;
+        ticks[0] = 0;   /* a tag with no frames must not read it uninitialised */
         for (int i = 0; i < n; i++) {
             ticks[i] = ms_to_ticks(g_durations_ms[order[i]], fps, t->name);
             if (i && ticks[i] != ticks[0])

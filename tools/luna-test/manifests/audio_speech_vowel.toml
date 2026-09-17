@@ -1,0 +1,36 @@
+# examples/audio/speech_synth, leg 1 of 2 — a sustained vowel, and the phoneme
+# bank that makes speech possible at all.
+#
+# The console "speaks" over a static violet backdrop: liveness and fbhash see a
+# ROM that boots and renders one unchanging frame, exactly what they would see
+# if apuUpload() shipped a corrupt image or the phoneme sequencer never ran.
+# Two things are asserted that the framebuffer cannot carry:
+#
+#  1. the BANK reached ARAM. DIR = $08 puts the sample directory at ARAM $0800;
+#     the 20 bytes there are the 5 phoneme entries (start/loop pairs), and two
+#     of them (index 1 and 4) have loop = $0000 — the plosives, which are
+#     one-shots. A truncated or mis-addressed apuUpload changes these bytes.
+#  2. the SEQUENCER is mid-vowel: SRCN 0x02 with the sustained-vowel envelope
+#     (ADSR1 0xF7 / ADSR2 0xFC) and an UP-inflected pitch (PITCHH 0x11 vs the
+#     bank's nominal 0x10) — prosody, applied per phoneme by SPC code.
+#
+# Measured with `--until-frame 40` and `--dump-aram`; this phoneme holds frames
+# ~35-48. Pair: audio_speech_plosive.toml.
+rom = "../../../examples/audio/speech_synth/speech_synth.sfc"
+frames = 40
+
+[asserts.blocks]
+# 5 x 4-byte directory entries at ARAM $0800 — the uploaded phoneme bank.
+phoneme_dir = { space = "aram", offset = "0800", hex = "00090909ad0d0000930f9c0f40144914ed180000" }
+
+[asserts.dsp]
+DIR       = 0x08     # directory page $0800 (player.spc700.asm: WDSP $5D, $08)
+V0_SRCN   = 0x02     # currently speaking phoneme 2
+V0_PITCHH = 0x11     # prosody: inflected ABOVE the nominal 0x10
+V0_PITCHL = 0x00
+V0_ADSR1  = 0xF7     # sustained vowel shape
+V0_ADSR2  = 0xFC
+V0_VOLL   = 0x7F
+V0_VOLR   = 0x7F
+NON       = 0x00     # speech is sampled, not noise (cf. play_noise)
+EON       = 0x00     # no echo on this one — the voice is dry

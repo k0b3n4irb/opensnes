@@ -35,6 +35,7 @@ void io_write_align(io_file_t *f, u32 boundary);
 
 void io_skip(io_file_t *f, int amount);
 u32  io_tell(io_file_t *f);
+u32  io_remaining(io_file_t *f);   /* bytes from the current position to EOF (0 if unknown) */
 void io_seek(io_file_t *f, u32 offset);
 
 bool io_file_exists(const char *filename);

@@ -14,18 +14,25 @@ CFLAGS  = -g -Wall -O2 -pedantic -D__BUILD_DATE="\"$(DATESTRING)\"" -D__BUILD_VE
 ifeq ($(shell uname),Darwin)
 	EXT     :=
 else ifeq ($(OS),Windows_NT)
+    ifneq ($(SANITIZE),1)
     CFLAGS  += -static
+    endif
 	EXT     :=.exe
 else
+	ifneq ($(SANITIZE),1)
 	CFLAGS 	+= -static
+	endif
 	EXT     :=
 endif
 
 # Source and object file locations
 SRC := src
+COMMON := ../common
 OBJ := build
 SOURCES := $(wildcard $(SRC)/*.c)
-OBJS    := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+COMMON_SOURCES := $(COMMON)/lodepng.c $(COMMON)/cmdparser.c
+OBJS    := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES)) \
+           $(patsubst $(COMMON)/%.c, $(OBJ)/common_%.o, $(COMMON_SOURCES))
 
 # Executable binary file name
 EXE     := gfx4snes
@@ -45,7 +52,12 @@ $(OBJ):
 # Define the recipe for compiling object files
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	@echo "Compiling $<"
-	$(CC) $(CFLAGS) -I$(SRC) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
+
+# Sources shared by the asset tools (tools/common: lodepng, cmdparser)
+$(OBJ)/common_%.o: $(COMMON)/%.c | $(OBJ)
+	@echo "Compiling $<"
+	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
 
 # Define the install target (copy to OpenSNES bin/)
 install: $(EXE)$(EXT)
@@ -58,3 +70,10 @@ clean:
 
 # Declare the phony targets
 .PHONY: all clean install
+
+# SANITIZE=1: ASan + UBSan build for the host-side sanitizer job
+# (make test-sanitizers). Not static — the sanitizer runtimes do not link
+# statically — and -O1 for readable reports.
+ifeq ($(SANITIZE),1)
+CFLAGS += -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer
+endif

@@ -1,0 +1,7 @@
+# sp_adjust: locals sit at 12/14/16/18/20,s; each pha moves SP by 2, so
+# the stack-relative loads must climb 12,16,20,24,28 as args are pushed.
+in test_stack_adjust: present lda\.w ext_a\n\tsta 12,s
+in test_stack_adjust: present lda 12,s\n\tpha\n\tlda 16,s\n\tpha\n\tlda 20,s\n\tpha\n\tlda 24,s\n\tpha\n\tlda 28,s\n\tpha\n\tjsl receiver
+count 5 pha
+# Five 2-byte args are popped with a 10-byte SP adjust after the call.
+in test_stack_adjust: present jsl receiver\n\ttsa\n\tclc\n\tadc\.w #10\n\ttas

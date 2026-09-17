@@ -1,0 +1,44 @@
+# memory/hirom_demo — a HiROM build reads its own C `const` data correctly.
+#
+# This example's font is not an asset file: it is `static const u8 font_tiles[]`
+# in main.c, 11 tiles of 16 bytes, DMA'd to VRAM word $0000. Under HiROM that
+# array is the interesting part. HiROM units carry `.BASE $C0` so a label at
+# offset $0000 of linker bank N is addressed at `$CN:0000`, const data lives in
+# the asset banks (not bank $00), and every C read of it is a far read — a
+# stack whose failure mode is not a crash but a pointer that resolves into the
+# wrong bank and DMAs 176 bytes of something else.
+#
+# `font_tiles_w0000` is those 176 bytes, in declaration order: space, H, I, R,
+# O, M, D, E, L, B, +. They are readable as glyphs in the hex (H = 66 66 66 7e
+# 66 66 66 00 interleaved with its second bitplane), which is the point — if
+# the far read goes wrong this block is not "different bytes", it is bytes that
+# obviously are not a font.
+#
+# The two tilemap blocks check the other HiROM-sensitive path: write_tile()
+# pokes $2116/$2118 directly rather than going through DMA, so the text rows
+# are proof that the direct VRAM-register write works under the HiROM memory
+# map too. Row 12 (VRAM word $058B, byte $0B16) spells H I R O M _ M O D E as
+# tile indices 01 02 03 04 05 00 05 04 06 07; row 14 spells + _ L I B.
+#
+# Why liveness/fbhash would not catch a failure here: a HiROM mapping
+# regression that fetched the font from the wrong bank still boots, still
+# clears the tilemap, still enables the screen — it just draws garbage glyphs,
+# and the README's own troubleshooting line for that ("if the text appears
+# garbled, the HiROM configuration has an issue") is exactly the judgement a
+# framebuffer hash cannot make for you.
+rom = "../../../examples/memory/hirom_demo/hirom_demo.sfc"
+frames = 200
+
+[asserts.blocks]
+font_tiles_w0000 = { space = "vram", offset = "0000", hex = "000000000000000000000000000000006600660066007e0066006600660000003c00180018001800180018003c0000007c00660066007c006c006600660000003c00660066006600660066003c000000630077007f006b00630063006300000078006c006600660066006c00780000007e00600060007c00600060007e0000006000600060006000600060007e0000007c00660066007c00660066007c0000000000180018007e001800180000000000" }
+text_row12_hirom_mode = { space = "vram", offset = "0B16", hex = "0100020003000400050000000500040006000700" }
+text_row14_plus_lib   = { space = "vram", offset = "0B98", hex = "0a0000000800020009000000" }
+backdrop_dark_blue    = { space = "cgram", offset = "0000", hex = "0028ff7f" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

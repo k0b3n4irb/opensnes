@@ -1,0 +1,45 @@
+# backgrounds/mode1_bg3_priority — three layers, three VRAM regions, three
+# CGRAM slots, none of them overlapping.
+#
+# The example's headline (BG3 promoted above BG1/BG2 by BG3_MODE1_PRIORITY_HIGH)
+# lives in BGMODE bit 3, a write-only PPU register a manifest cannot read. What
+# a manifest CAN pin is the setup the priority trick sits on, and which the
+# README calls out as the thing that silently goes wrong: "The palette slot
+# passed to bgInitTileSet() must match what the map data expects. A mismatch
+# means tiles display with the wrong colors."
+#
+# So: three `bgLoad()` calls, each with its own map base (words $0000/$0400/
+# $0800), char base (words $2000/$3000/$4000) and palette slot (2, 4, 0 — i.e.
+# CGRAM byte $40, $80, $00). Nine destinations, six asserted here. The BG3
+# tileset is the 2bpp HUD layer, which is why its region is only ~77 bytes.
+#
+# Why liveness/fbhash would not catch a failure here: every one of these
+# regressions still composites three layers of art into a full screen. A
+# palette-slot slip recolours the HUD; a char-base slip draws the HUD out of
+# BG2's tiles. Both are "the picture changed", which is exactly the diagnosis
+# the fbhash pillar cannot give and this file can.
+rom = "../../../examples/backgrounds/mode1_bg3_priority/mode1_bg3_priority.sfc"
+frames = 200
+
+[asserts.blocks]
+# Palette slots: BG3 -> slot 0 (2bpp HUD, 4 colours), BG1 -> slot 2 (CGRAM 32),
+# BG2 -> slot 4 (CGRAM 64). Slot N starts at CGRAM byte N*32.
+bg3_pal_slot0  = { space = "cgram", offset = "0000", hex = "0000e003ff251861" }
+bg1_pal_slot2  = { space = "cgram", offset = "0040", hex = "5f088031400800000000000000000000" }
+bg2_pal_slot4  = { space = "cgram", offset = "0080", hex = "e07f0000186310420000000000000000" }
+# Tilemaps: words $0000 / $0400 / $0800  ->  bytes $0000 / $0800 / $1000.
+bg1_map_w0000  = { space = "vram",  offset = "0260", hex = "23080908000824082508010802080308" }
+bg2_map_w0400  = { space = "vram",  offset = "0E00", hex = "00100d100e100f100910101010101010" }
+bg3_map_w0800  = { space = "vram",  offset = "1080", hex = "00200020002001200220022002200220" }
+# Tilesets: words $2000 / $3000 / $4000  ->  bytes $4000 / $6000 / $8000.
+bg1_tiles_w2000 = { space = "vram", offset = "4700", hex = "07f80bf415ea2bd455aaab54d52afa05" }
+bg2_tiles_w3000 = { space = "vram", offset = "6320", hex = "3320f9c1ff0b1f04cf87d7c2f380e000" }
+bg3_tiles_w4000 = { space = "vram", offset = "8020", hex = "007f7fff7f807f807f807fff007f0000" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

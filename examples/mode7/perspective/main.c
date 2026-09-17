@@ -33,17 +33,9 @@
 
 #include <snes.h>
 
-/**
- * @brief Load sky background tiles and tilemap to VRAM via assembly DMA.
- *
- * Loads the Mode 3 sky image (tiles at VRAM $5000, tilemap at VRAM $4000).
- * Uses assembly because the data may span multiple ROM banks (SUPERFREE
- * sections), requiring correct bank byte handling that the C-level
- * dmaCopyVram() cannot provide.
- *
- * Must be called during forced blank.
- */
-extern void asm_loadSkyData(void);
+/** @brief Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm.
+ *  Loaded with dmaCopyVram() to VRAM $5000 (tiles) and $4000 (map). */
+extern u8 sky_tiles[], sky_tiles_end[], sky_map[], sky_map_end[];
 
 /**
  * @brief Build and activate the 4-channel HDMA perspective split.
@@ -109,9 +101,10 @@ int main(void) {
                      ground_tiles, ground_tiles_end - ground_tiles);
     dmaCopyCGram(ground_pal, 0, ground_pal_end - ground_pal);
 
-    /* Load sky tiles+map to VRAM $4000/$5000 via assembly DMA loader.
-     * The sky is a standard Mode 3 (8bpp) background displayed on BG2. */
-    asm_loadSkyData();
+    /* Load the sky tiles and map (a standard Mode 3 background on BG2) to
+     * VRAM $5000 / $4000 with plain word-mode DMA. */
+    dmaCopyVram(sky_map, 0x4000, (u16)(sky_map_end - sky_map));
+    dmaCopyVram(sky_tiles, 0x5000, (u16)(sky_tiles_end - sky_tiles));
 
     /* Configure BG2 for sky display (used during Mode 3 portion).
      * REG_BG2SC: bits 7-2 = tilemap base ($4000 >> 10 = 0x10, shifted left 2 = 0x40),

@@ -131,7 +131,7 @@ contrast mode, anchored citations, new sources incl. the official
 Nintendo dev manual). Re-audit of the remaining tutorials run with
 `exclude_sources=["opensnes-docs","opensnes-notes-tech"]`.
 
-### F1 — CLOSED as a question (doc rewrite still pending)
+### F1 — CLOSED (question settled below; doc rewrite done — `KNOWN_LIMITATIONS.md` 🟢 SIWP entry and the `templates/crt0.asm` comment carry the arbitrated polarity)
 Three independent documentary confirmations of bit=1 = write-enable,
 all retrieved verbatim through the v2 corpus:
 - fullsnes (anchored: `fullsnes.htm#snescartsa1memorycontrol`):

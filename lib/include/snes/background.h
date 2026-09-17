@@ -60,7 +60,11 @@
  *
  * @param bg Background number (0-3 for BG1-BG4)
  * @param x Horizontal scroll (0-1023)
- * @param y Vertical scroll (0-1023)
+ * @param y Vertical scroll (0-1023): the tilemap pixel row shown on the first
+ *          picture line. The lib writes y - 1 to BGnVOFS because the PPU
+ *          never outputs scanline 0 (see KNOWN_LIMITATIONS, "Vertical scroll
+ *          is off by one"); code that writes BGnVOFS itself (HDMA tables)
+ *          must apply the -1 on its own.
  *
  * @code
  * // Scroll BG1 right by 10 pixels

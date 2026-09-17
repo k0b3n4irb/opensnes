@@ -1,0 +1,60 @@
+# window (HDMA triangle) — the A/X/B layer-reselect path: it must re-arm HDMA
+# every time, and it must actually change what is masked.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline run with NO input, so setup_window()
+#     is only ever executed once, at boot, with both BGs selected. The three
+#     documented buttons — A = clip BG1 only, X = clip BG2 only, B = both —
+#     are untested by the corpus today.
+#   * setup_window() disables channels 4+5, reprograms TMW/W12SEL/WOBJSEL and
+#     the two HDMA tables, then re-enables. Drop the re-enable and the diamond
+#     disappears forever after the first button press; hdma_enabled_state
+#     (the lib's shadow of $420C, confirmed against dma.hdmaen = 48 by
+#     `luna state --out -`) must read back 0x30 after every leg.
+#   * This example writes W12SEL / WOBJSEL / TMW as raw registers — it does
+#     NOT call the window module, so its w12sel shadow stays 0 and asserting
+#     it would assert a lie. The render hash is therefore the only handle on
+#     "the reselect really reselected", and it is the last assert below: at
+#     frame 240 with A held, the frame hashes 2bf7ca93be56eea1, which differs
+#     from both-BGs 29d2968d214acaac (= the runner's no-input baseline) and
+#     from BG2-only 1cacd04683dd4ae5. Regenerate with `luna test --update`
+#     after an intended render change.
+#   * The two triangle tables are RAM arrays initialised from ROM by the
+#     data_init DMA loop; the blocks below pin that they arrived intact —
+#     60 disabled lines, then 0xC0 = repeat | 64, then the 0x7F->0x60->0x7F
+#     and 0x81->0xA0->0x81 ramps that make the diamond.
+#
+# Measured: `luna state --until-frame N --input … --peek hdma_enabled_state:1
+# --peek tablelefttriangle:44 --peek tablerighttriangle:44 --print-fbhash`.
+rom = "../../../examples/windows/window/window.sfc"
+
+[[checkpoint]]                 # boot: both BGs clipped, channels 4+5 armed
+at_frame = 60
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }
+
+[[checkpoint]]                 # X: BG2 only — reconfigure keeps HDMA armed
+at_frame = 120
+input = "60:0x0040,119:0"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }
+
+[[checkpoint]]                 # B: back to both BGs
+at_frame = 180
+input = "130:0x8000,179:0"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }
+
+[[checkpoint]]                 # A: BG1 only, held through the capture
+at_frame = 240
+input = "190:0x0080"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }
+
+# The diamond really moved to BG1 alone (not the both-BGs baseline hash).
+[asserts]
+fbhash = "2bf7ca93be56eea1"
+
+[asserts.blocks]
+tablelefttriangle  = { space = "wram", offset = "tablelefttriangle",  hex = "3CFFC07F7E7D7C7B7A797877767574737271706F6E6D6C6B6A696867666564636261606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7FFF00" }
+tablerighttriangle = { space = "wram", offset = "tablerighttriangle", hex = "3C00C08182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA09F9E9D9C9B9A999897969594939291908F8E8D8C8B8A8988878685848382810000" }

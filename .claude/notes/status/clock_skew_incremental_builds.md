@@ -22,6 +22,26 @@ before capturing baselines or trusting a green suite. (The dependency
 chain in make/common.mk itself is correct: `linkfile: $(LINK_OBJS)`
 includes the lib objects — verified during this incident.)
 
-Root cause of the future mtimes not yet chased (submodule checkout or
-an earlier wrong system clock). If the warnings persist after a fresh
-clone, investigate the machine clock / filesystem timestamps.
+## Root cause (found 2026-09-15, gaps review D9)
+
+`find . -newermt 2027-01-01` listed **1802 files**, every one under the
+`compiler/{cproc,qbe,wla-dx}` submodule trees, dated 2029–2030. Nothing
+in the repo writes such dates today; the source is the retired CI cache
+trick that stamped submodule build trees with `touch -d 2030` so a
+restored cache would never rebuild — the stamps came home through the
+working tree and survived every `make clean` (which removes objects,
+not sources). The machine clock was never wrong.
+
+Fixed locally by resetting the dates (`find . -path ./.git -prune -o
+-newermt 2027-01-01 -print0 | xargs -0 touch`) — the count is 0 and
+`make` prints no skew warning. The guards are also less naive since
+2026-09-13: `devtools/check_corpus_fresh.py` compares the lib objects
+and the ROMs against the *toolchain build-tree* timestamps
+(`compiler/qbe/qbe`, `compiler/cproc/cproc-qbe`,
+`compiler/wla-dx/binaries/*`), not against `bin/`, which every
+top-level `make` re-copies. A poisoned tree still shows up as a
+"file has modification time … in the future" line from make: treat it
+as a stop sign and run the `touch` above before anything incremental.
+
+**Status: CLOSED** — cause identified, local tree clean, guards
+hardened. Reopen only if a fresh clone reproduces the warning.

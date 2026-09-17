@@ -1,0 +1,18 @@
+# memory/hirom_demo — releasing A puts the backdrop back.
+#
+# The twin of `input_hirom_backdrop.toml`, and the half that actually finds
+# bugs. A is held for 50 frames and then released 50 frames before the capture;
+# CGRAM colour 0 must be back to RGB(0,0,10) = $2800 (`0028`).
+#
+# The failure this closes: `padHeld()` latching instead of tracking (a held
+# mask that is never cleared, a shadow that only ever ORs), which makes the
+# else-branch unreachable after the first press. Every no-input test in the
+# suite passes with that bug — the backdrop starts dark blue and simply never
+# changes — and `input_hirom_backdrop.toml` passes too, because the press
+# itself still works. Only a press FOLLOWED BY a release can see it.
+rom = "../../../examples/memory/hirom_demo/hirom_demo.sfc"
+frames = 200
+input = "100:0x0080,150:0"
+
+[asserts.blocks]
+backdrop_dark_blue = { space = "cgram", offset = "0000", hex = "0028ff7f" }

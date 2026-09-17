@@ -1,0 +1,85 @@
+# slope_collision is the objCollidMapWithSlopes() fixture: walking into a
+# diagonal tile must push the object's Y to the slope's surface height
+# instead of stopping it like a wall. That distinction is invisible to both
+# existing pillars — the example needs the D-pad to move at all, and both
+# liveness and the fbhash baseline run it with no input, so Mario stands on
+# his spawn tile for the entire captured run.
+#
+# Held RIGHT from frame 60, measured on luna (mariox/marioy are world
+# coordinates, Y growing downward):
+#
+#   frame  60  (32, 96)    spawn, settled on flat ground
+#   frame 120  (99, 96)    walked 67 px along the flat: Y untouched
+#   frame 144  (127, 89)   on the slope — the collision routine lifted him
+#                          7 px while he only moved 28 px right
+#   frame 216  (209, 96)   back down on flat ground past the slope
+#   frame 300  (209, 96)   RIGHT is STILL held: a solid tile blocks him, so
+#                          this is the wall case, distinct from the slope
+#
+# The camera leg is the map engine's half: mapUpdateCamera followed Mario,
+# so x_pos is 81 at frame 216 while it was 0 at frame 120 (he had not yet
+# left the first screen).
+#
+# The jump leg then checks the vertical half of the same collision routine:
+# A is only honoured when objWorkspace.tilestand says he is grounded, and
+# gravity must put him back. Measured: Y = 66 at frame 332 (airborne), 58
+# at 344 (near apex), and exactly 96 again at 420 — the same ground height,
+# with mariox unchanged, so he landed rather than drifting or falling out.
+rom = "../../../examples/maps/slope_collision/slope_collision.sfc"
+#        RIGHT held for 240 frames       A tap (jump)
+input = "60:0x0100,300:0,320:0x0080,340:0"
+
+[[checkpoint]]                 # spawn, settled
+at_frame = 60
+[checkpoint.values]
+mariox = { eq = 32, width = 2 }
+marioy = { eq = 96, width = 2 }
+x_pos  = { eq = 0,  width = 2 }
+
+[[checkpoint]]                 # walking the flat: Y must not move
+at_frame = 120
+[checkpoint.values]
+mariox = { eq = 99, width = 2 }
+marioy = { eq = 96, width = 2 }
+x_pos  = { eq = 0,  width = 2 }
+
+[[checkpoint]]                 # on the slope: pushed UP, not stopped
+at_frame = 144
+[checkpoint.values]
+mariox = { eq = 127, width = 2 }
+marioy = { eq = 89,  width = 2 }
+[checkpoint.delta]
+mariox = "increased"           # still advancing...
+marioy = "decreased"           # ...while the surface lifts him
+
+[[checkpoint]]                 # past the slope, back on flat, camera scrolled
+at_frame = 216
+[checkpoint.values]
+mariox = { eq = 209, width = 2 }
+marioy = { eq = 96,  width = 2 }
+x_pos  = { eq = 81,  width = 2 }
+
+[[checkpoint]]                 # a wall: RIGHT still held, X stops dead
+at_frame = 300
+[checkpoint.values]
+mariox = { eq = 209, width = 2 }
+marioy = { eq = 96,  width = 2 }
+[checkpoint.delta]
+mariox = "unchanged"
+
+[[checkpoint]]                 # A on the ground -> airborne
+at_frame = 332
+[checkpoint.values]
+marioy = { eq = 66,  width = 2 }
+mariox = { eq = 209, width = 2 }
+
+[[checkpoint]]                 # still rising toward the apex
+at_frame = 344
+[checkpoint.values]
+marioy = { eq = 58, width = 2 }
+
+[[checkpoint]]                 # gravity landed him on the same ground height
+at_frame = 420
+[checkpoint.values]
+marioy = { eq = 96,  width = 2 }
+mariox = { eq = 209, width = 2 }

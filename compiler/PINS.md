@@ -29,9 +29,9 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 98ecf206e9668584cc7ca4f4e88ddc188286879f | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | ca50db8ae000a28e80d8b6202cc65c9ff9ff53b9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 86df3317f3ba40c7815d358160e06188d2011e7c | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 1) |
+| compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 1422c17ec969ef057539b42f03c739775c3b5e3c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -39,9 +39,13 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 18 patches (upstream merge-base: 7051114)
+### compiler/cproc — 22 patches (upstream merge-base: 7051114)
 
 ```
+d1f8745 qbe: bit-field extraction pads to the IR class width; long compares use the l class (c_features ROM, review C2)
+0766f7d pp: no NULL + 0 when a macro call collected no argument tokens (UBSan on clang 18, upstream suite H1)
+7edea70 util: arrayforeach forms no end pointer over an empty array (UBSan on clang 18, sanitizer job H3)
+0efca54 qbe: never form NULL + 0 over an empty growable array (UBSan on clang 18, sanitizer job H3)
 98ecf20 qbe: drop three dead fork-local symbols so cproc-qbe builds clean under -Wall -Wextra (gaps review H2)
 6d3953d qbe: a pointer object's access is not tainted by its pointee's qualifiers (chantier A9)
 d35c136 expr: a const pointer target satisfies __far (chantier B2, Phase 3)
@@ -69,11 +73,24 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 56 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 62 patches (the bulk of the SDK's compiler magic)
+
+Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
+scan"), located by blob matching on 2026-09-13 — the fork's root commit is
+a squash, so `git merge-base` cannot tell. The three upstream suites run
+on the fork binaries via `make test-toolchain-suites` (known-fail
+ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
+56/56 on the host target since `fe42eac`, and must stay so on every bump.
 
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+1422c17 w65816: print unsigned temp ids with %u in the emitter's debug comments (cppcheck, review H4)
+9e2307c w65816: five fixes from the c_features runtime ROM (variable Kl shifts, signed compares with overflow, Kl compare fusion, jnz on Kl, sign extension vs ldy) and a refusal that names the feature
+d5484d4 amd64: no NULL + 0 over the argument class array of a call without arguments (UBSan on clang 18, upstream suite H1 on x86_64)
+fe42eac parse: keep the type table alive until the collected functions are emitted (upstream suite H1: use-after-free at pass 2 on every target but w65816)
+22568cb emit: keep upstream's ELF emitters next to the WLA-DX ones, dispatched on the target (H1: lets tools/test.sh run)
+7df4820 parse: do not memset a NULL temporary hash table (UBSan, sanitizer job H3)
 ca50db8 Place C const data in the memory map's asset banks by default (chantier #127.3)
 852cea4 Only the volatile bit pins loads in loadopt / promote / gcm (chantier A9)
 7118e4c w65816: bank-honouring codegen for far RAM (chantier B2, Phase 2)
@@ -106,13 +123,20 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 1 patch ahead of the **v10.7 release** (chantier #127.3, 2026-09-07)
+### compiler/wla-dx — 2 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12)
 
 ```
+9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
 
-The first local patch on this fork, a deliberate decision (see
+The second patch is what the ASan/UBSan job found on its first run
+(`make test-sanitizers`): `decode.c` read `g_tmp[-1]` on any
+one-character label inside a macro (`-:` in snesmod.asm), and wlalink's
+`READ_T` shifted a byte >= 128 into the sign bit of an int. Both are
+upstream bugs; both fixes are behaviour-neutral (byte-identical corpus).
+
+The first local patch on this fork was a deliberate decision (see
 `.claude/rules/bank0_budget.md`): HiROM needs `.BASE $C0` on every unit
 so data at offset $0000 of a high linker bank is addressed in the full
 64 KB view, and upstream adds the base to WRAM labels too ($7E → $13E).

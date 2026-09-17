@@ -11,11 +11,38 @@ binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
 scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
 python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
-python3 tools/luna-test/probes/run_all.py            # functional probes (scripted input → WRAM asserts)
+make test-manifests                                  # functional probes: `luna test` on tools/luna-test/manifests/*.toml (scripted input → WRAM asserts)
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
+python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
+python3 tools/luna-test/audio_regress.py            # APU output hashed for four self-playing audio examples (luna --audio-out); baselines/audio.json
+make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
+make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
+make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)
+make docs-strict                                     # Doxygen with warnings as errors (the doc-render job); plain `make docs` stays non-fatal so a doc warning cannot block a release build
 ```
+
+The host side has its own gate: `make test-sanitizers` rebuilds cproc-qbe,
+QBE, wla-dx and the asset tools with ASan + UBSan and runs the fixtures,
+the lib build, the tool goldens and the whole corpus under
+`halt_on_error=1` (CI job `sanitizers` in `lint.yml`). Run it after any
+change to `compiler/` or `tools/*/src`; it leaves sanitized binaries in
+`bin/`, so `make clean && make` afterwards.
+`make test-toolchain-suites` runs the three submodules' own upstream
+suites on the fork binaries against known-fail ratchets
+(`devtools/toolchain-suites/`); it is the check for every PIN bump and
+runs inside the sanitizer job. A regression or an XPASS fails it.
+`make fuzz` runs the libFuzzer harnesses of `tools/fuzz/` (lodepng, the
+IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; the nightly `fuzz.yml` gives them ten
+minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
+crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
+where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the
+dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
+all-together groups; a module that needs a symbol from a module it does
+not declare fails here instead of in a user's project. Runs in
+`make tests`. A new module or a new cross-module reference must come
+with its `_DEP_` line.
 
 The WRAM oracle hashes every WRAM page at each vblank, **including the
 stack**, so it moves on any codegen change even when behaviour is

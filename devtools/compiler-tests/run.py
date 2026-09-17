@@ -27,6 +27,11 @@ Run:  python3 devtools/compiler-tests/run.py        # all cases (checked + compi
     section <sym>: present <regex>   the .SECTION/.RAMSECTION line of <sym> matches
     section <sym>: absent  <regex>   ...does not match
 
+`cases/negative/<name>.c` + `<name>.expect` pin C the toolchain must REFUSE
+(variadic functions, struct by value, inline asm): the compile must fail and
+stderr must contain the `.expect` text. A refusal that turns into a compile is
+reported as a failure too — the feature landed, promote the fixture.
+
 Exit 0 = all pass, 1 = any failure / compile error.
 """
 from __future__ import annotations
@@ -40,12 +45,46 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 CASES = Path(__file__).resolve().parent / "cases"
+NEGATIVE = CASES / "negative"
 CC = REPO_ROOT / "bin" / "cc65816"
 
-# Ratchet on fixtures lacking a .checks file. 56 of 66 cases predate the
-# .checks DSL and run compile-only. Porting a fixture lowers this number;
+# Ratchet on fixtures lacking a .checks file. 56 of 66 cases predated the
+# .checks DSL and ran compile-only. Porting a fixture lowers this number;
 # it must NEVER go up — a new fixture ships with its assertions.
-MAX_UNCHECKED = 55  # new fixtures ship WITH checks; test_function_ptr got its .checks 2026-09-11
+MAX_UNCHECKED = 41  # C4 batch 1, 2026-09-15: 14 fixtures got their .checks (55 -> 41)
+
+
+def compile_result(src: Path) -> tuple[bool, str]:
+    """(compiled?, stderr+stdout) — for the negative fixtures."""
+    with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
+        out = Path(tf.name)
+    proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
+                           str(src), "-o", str(out)],
+                          capture_output=True, text=True, timeout=60)
+    ok = out.is_file() and out.stat().st_size > 0 and proc.returncode == 0
+    return ok, (proc.stderr or "") + (proc.stdout or "")
+
+
+def run_negative(only: str | None) -> tuple[int, int]:
+    """Refusal fixtures: must NOT compile, and must say why. Returns (pass, fail)."""
+    passed = failed = 0
+    for src in sorted(NEGATIVE.glob("*.c")):
+        name = f"negative/{src.stem}"
+        if only and only not in name:
+            continue
+        expect_file = src.with_suffix(".expect")
+        want = expect_file.read_text().strip() if expect_file.is_file() else ""
+        compiled, msg = compile_result(src)
+        if compiled:
+            print(f"  FAIL {name}: compiled — the feature landed? promote the fixture to cases/")
+            failed += 1
+        elif want and want not in msg:
+            print(f"  FAIL {name}: refused, but stderr lacks {want!r}: {msg.strip()[:200]}")
+            failed += 1
+        else:
+            print(f"  PASS {name} (refused: {want or 'any error'})")
+            passed += 1
+    return passed, failed
 
 
 def compile_asm(src: Path) -> str:
@@ -164,8 +203,11 @@ def run(only: str | None) -> int:
         else:
             print(f"  PASS {name}")
             passed += 1
+    neg_pass, neg_fail = run_negative(only)
+    failed += neg_fail
     print(f"\nCompiler checks: {passed} passed, {failed} failed"
-          f" (+{compile_only} compile-only; {unchecked}/{MAX_UNCHECKED} unchecked ratchet)")
+          f" (+{compile_only} compile-only; {unchecked}/{MAX_UNCHECKED} unchecked ratchet;"
+          f" {neg_pass}/{neg_pass + neg_fail} refusals pinned)")
     if only is None and unchecked > MAX_UNCHECKED:
         print(f"ERROR: {unchecked} fixtures lack a .checks file, ratchet allows "
               f"{MAX_UNCHECKED}. New fixtures ship with assertions — port the "

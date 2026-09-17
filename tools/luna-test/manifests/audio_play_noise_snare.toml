@@ -1,0 +1,34 @@
+# examples/audio/play_noise, leg 2 of 2 — the snare: same voice, same noise
+# source, a DIFFERENT noise clock and envelope.
+#
+# A single snapshot of this example could be satisfied by an SPC program that
+# sets one drum and loops forever — the backdrop never changes and nothing on
+# screen distinguishes a four-hit bar from a stuck note. Against
+# audio_play_noise_kick.toml this leg proves the sequencer actually walks the
+# bar: the two registers that carry the drum design MOVE
+#   FLG   0x0E -> 0x1D   (noise clock 14 rumble -> 29, the 8 kHz snare)
+#   ADSR  0x8E/0xF6 -> 0xFA/0xF8   (punchy kick -> hard attack + decay)
+# while everything that defines the instrument STAYS: NON 0x01 (still noise,
+# never a sample), the whole echo block, and the master volume. So a regression
+# that froze the sequencer, or one that re-programmed the voice per drum
+# instead of re-clocking it, fails here.
+#
+# Measured with `--until-frame 120`; the snare is the 960 ms tail of the bar
+# (frames ~90-145 of the 120-frame loop), so frame 120 sits mid-drum.
+rom = "../../../examples/audio/play_noise/play_noise.sfc"
+frames = 120
+
+[asserts.dsp]
+FLG      = 0x1D      # CHANGED vs the kick (0x0E): 8 kHz noise clock
+V0_ADSR1 = 0xFA      # CHANGED: snare envelope
+V0_ADSR2 = 0xF8
+NON      = 0x01      # unchanged: still the noise source, no sample anywhere
+V0_VOLL  = 0x7F      # unchanged
+V0_VOLR  = 0x7F
+EON      = 0x01      # unchanged: the room is not re-built per drum
+EDL      = 0x05
+EFB      = 0x50
+ESA      = 0x88
+FIR0     = 0x7F
+MVOL_L   = 0x3F
+MVOL_R   = 0x3F

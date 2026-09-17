@@ -1,0 +1,52 @@
+# The RPG boots into ST_FADEIN (0) and only reaches ST_EXPLORE (1) once
+# fade_level hits 30, so leg 1 pins the fade state and leg 2 pins the
+# transition — plus the negative that matters during a fade: the hero
+# must not move while the game is not yet accepting input.
+#
+# Movement is tile-locked: begin_step() only commits if tile_walkable(),
+# then slides 1 px per frame for 8 frames. Each hold is released 10
+# frames before its checkpoint so the in-flight step has landed and the
+# coordinate is on a tile boundary: 6 tiles left = 248 - 48 = 200, then
+# 5 tiles down = 272 + 40 = 312. hero_facing proves the direction
+# reached the state machine.
+#
+# gold and chest_opened stay 0 at every checkpoint — the hero never
+# walks onto the chest on this route, so a ROM that handed out gold
+# without a KEY_A on the chest tile fails here.
+rom = "../../../examples/games/rpg/rpg.sfc"
+
+[[checkpoint]]                 # fading in
+at_frame = 30
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }       # ST_FADEIN
+hero_x = 248
+hero_y = 272
+hero_facing = { eq = 1, width = 1 }      # FACE_UP (spawn facing)
+gold = 0
+
+[[checkpoint]]                 # fade done -> ST_EXPLORE, hero untouched by it
+at_frame = 90
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }       # ST_EXPLORE
+hero_x = 248
+hero_y = 272
+gold = 0
+
+[[checkpoint]]                 # LEFT: 6 walkable tiles west
+at_frame = 150
+input = "90:0x0200,139:0"
+[checkpoint.values]
+hero_x = 200                             # 248 - 6*8
+hero_y = 272                             # vertical axis untouched
+hero_facing = { eq = 2, width = 1 }      # FACE_LEFT
+gold = 0
+
+[[checkpoint]]                 # DOWN: 5 walkable tiles south
+at_frame = 200
+input = "150:0x0400,189:0"
+[checkpoint.values]
+hero_x = 200
+hero_y = 312                             # 272 + 5*8
+hero_facing = { eq = 0, width = 1 }      # FACE_DOWN
+gold = 0
+chest_opened = { eq = 0, width = 1 }

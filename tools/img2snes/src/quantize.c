@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*
  * img2snes - PNG RGB to indexed PNG converter for OpenSNES
  * Median-cut color quantization
@@ -232,8 +233,14 @@ int quantize_median_cut(
         }
         if (!n) {
             if (nucolors >= ucap) {
+                ucolor_t *grown;
                 ucap *= 2;
-                ucolors = realloc(ucolors, ucap * sizeof(ucolor_t));
+                grown = realloc(ucolors, ucap * sizeof(ucolor_t));
+                if (!grown) {
+                    fprintf(stderr, "img2snes: out of memory (unique colours)\n");
+                    exit(1);
+                }
+                ucolors = grown;
             }
             ucolors[nucolors].r = r;
             ucolors[nucolors].g = g;

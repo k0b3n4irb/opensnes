@@ -1,0 +1,11 @@
+# Volatile loads are not coalesced: 3 reads in test_volatile_read + 2 in
+# test_read_modify_write = 5 loads of hw_status.
+count 5 lda\.w hw_status
+# Redundant volatile stores all survive, in order.
+in test_volatile_write: present lda #1\n\tsta\.w hw_data\n\tlda #2\n\tsta\.w hw_data\n\tlda #3\n\tsta\.w hw_data\n\tlda #4\n\tsta\.w hw_data
+# Store order is preserved: address register before the two data writes.
+in test_volatile_sequence: present sta\.w hw_addr\n\tsep #\$20\n\tlda #85\n\tsta\.w hw_data\n\tlda #170\n\tsta\.w hw_data
+# The busy-wait re-reads the flag inside the loop body and loops back.
+in test_wait_for_flag: present @while_cond\.\d+:\n\tsep #\$20\n\tlda\.w vblank_flag
+# RMW re-reads after the write instead of reusing A.
+in test_read_modify_write: present sta\.w hw_status\n\tlda\.w hw_status

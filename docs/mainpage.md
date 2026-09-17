@@ -19,11 +19,15 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage troubleshooting -- Common problems and solutions
 
+@subpage faq -- Frequently asked questions
+
+@subpage migrating_pvsneslib -- Migrating a PVSnesLib project
+
 ## Game-Craft
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
 
-## Tools
+## Tools {#mainpage_tools}
 
 @subpage tools -- The asset pipeline: turn images, maps, fonts and audio into SNES data
 
@@ -73,6 +77,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_debugging -- Debugging with luna
 
+@subpage tutorial_profiling -- Profiling: measuring where the frame goes
+
 ## Hardware Reference
 
 @subpage hardware_overview -- CPU, PPU, APU architecture
@@ -106,7 +112,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 - @ref scene.h "Scene stack (scene.h)"
 - @ref asset.h "Asset bundle convention (asset.h)"
 
-## Contributing
+## Contributing {#mainpage_contributing}
 
 @subpage code_style -- Code style conventions
 

@@ -1,0 +1,56 @@
+# shadow_tint cycles colour math against the FIXED colour (COLDATA $2132):
+# none -> shadow (subtract grey 14) -> underwater tint (add 0,4,18) ->
+# sunset tint (add 20,8,0) -> none. The whole effect is a PPU pass: no
+# VRAM, CGRAM or OAM traffic, so liveness sees nothing and the fbhash
+# baseline samples the BOOT frame, where fx_state is 0 and colour math is
+# off. Every one of the four states below is therefore untested today.
+#
+# The register pair is the real subject. colorMathShadow() must set
+# CGADSUB bit 7 (subtract) and colorMathTint() must clear it, and both must
+# leave CGWSEL bit 1 clear (fixed-colour source, not sub-screen) — the
+# README's "only one is active at a time" claim lives in exactly those two
+# bits. A colorMathTint() that forgot SetOp(ADD) would inherit the previous
+# state's subtract bit and darken instead of tinting; fx_state would still
+# read 3 and the example would still be "alive".
+#
+# COLDATA has no read path and no RAM shadow (it is write-only, and the lib
+# does not mirror it), so the only proof the *intensities* reached the PPU
+# is the rendered frame. The fbhash below is measured on the sunset state
+# (fx_state 3, COLDATA r=20 g=8 b=0), which no baseline covers — regenerate
+# it with `luna test --update` after an intended render change.
+rom = "../../../examples/color/shadow_tint/shadow_tint.sfc"
+frames = 240
+
+[[checkpoint]]                 # boot: plain chart, colour math off
+at_frame = 60
+[checkpoint.values]
+fx_state = { eq = 0, width = 1 }
+cgadsub = { eq = 0x00, width = 1 }
+cgwsel = { eq = 0x00, width = 1 }
+
+[[checkpoint]]                 # A -> shadow: SUBTRACT (bit 7) grey from BG1 (bit 0)
+at_frame = 120
+input = "60:0x0080,65:0"
+[checkpoint.values]
+fx_state = { eq = 1, width = 1 }
+cgadsub = { eq = 0x81, width = 1 }       # $80 subtract | $01 BG1, half off
+cgwsel = { eq = 0x00, width = 1 }        # bit 1 clear: fixed colour, not sub-screen
+
+[[checkpoint]]                 # A -> underwater tint: ADD, subtract bit must be gone
+at_frame = 180
+input = "120:0x0080,125:0"
+[checkpoint.values]
+fx_state = { eq = 2, width = 1 }
+cgadsub = { eq = 0x01, width = 1 }
+cgwsel = { eq = 0x00, width = 1 }
+
+[[checkpoint]]                 # A -> sunset tint: same register pair, different COLDATA
+at_frame = 240
+input = "180:0x0080,185:0"
+[checkpoint.values]
+fx_state = { eq = 3, width = 1 }
+cgadsub = { eq = 0x01, width = 1 }
+cgwsel = { eq = 0x00, width = 1 }
+
+[asserts]
+fbhash = "8a07068c08f8b325"      # the sunset cast on all 16 swatches

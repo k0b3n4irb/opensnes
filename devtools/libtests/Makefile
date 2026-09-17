@@ -4,7 +4,10 @@ TARGET   := libtest.sfc
 ROM_NAME := LIB RUNTIME TEST
 
 USE_LIB  := 1
-LIB_MODULES := console sprite dma background text math anim map audio
+# L2c (2026-09-15): collision, window and sram get their runtime asserts
+# here; USE_SRAM maps bank $70 in the header (common.mk adds the module).
+USE_SRAM := 1
+LIB_MODULES := console sprite dma background text math anim map audio fixed32 collision window
 
 CSRC   := main.c
 ASMSRC := data.asm

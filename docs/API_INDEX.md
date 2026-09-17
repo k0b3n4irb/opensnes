@@ -1,4 +1,4 @@
-# API index — by what you are trying to do
+# API index — by what you are trying to do {#api_index}
 
 Doxygen lists the SDK by module, which only helps once you know the
 module's name. This page goes the other way: **what you want** → **what

@@ -1,0 +1,32 @@
+# examples/audio/play_noise, leg 1 of 2 — the kick: the drum kit IS the DSP
+# noise generator, and the noise clock is what makes this drum a kick.
+#
+# The screen is a flat teal backdrop for the whole run, so liveness and the
+# fbhash baseline are blind to every claim the example makes. Its headline —
+# "the whole kit ships zero bytes of sample data" — lives in one bit:
+#   NON = 0x01   voice 0 reads the white-noise source instead of a sample
+# and the per-drum design lives in the noise clock + envelope:
+#   FLG   = 0x0E  noise clock 14 (the low rumble), echo writes enabled
+#   ADSR1 = 0x8E / ADSR2 = 0xF6   the punchy kick envelope
+# (player.spc700.asm `drum_loop`, "kick — low noise clock, punchy envelope"
+# — the three values are krom's verbatim, so this manifest also pins the port.)
+#
+# Measured with `--until-frame 40`. The bar is a 120-frame loop; the kick holds
+# frames ~30-55, so frame 40 sits mid-drum. Pair: audio_play_noise_snare.toml.
+rom = "../../../examples/audio/play_noise/play_noise.sfc"
+frames = 40
+
+[asserts.dsp]
+NON      = 0x01      # THE lesson: voice 0 is the noise generator
+FLG      = 0x0E      # kick: noise clock 14, ECEN clear (echo ring live)
+V0_ADSR1 = 0x8E      # kick envelope
+V0_ADSR2 = 0xF6
+V0_VOLL  = 0x7F
+V0_VOLR  = 0x7F
+EON      = 0x01      # the drum room: voice 0 into the echo
+EDL      = 0x05
+EFB      = 0x50
+ESA      = 0x88
+FIR0     = 0x7F
+MVOL_L   = 0x3F
+MVOL_R   = 0x3F

@@ -107,4 +107,4 @@ make
 ## Licence
 
 Source artwork: CC0 from [Kenney](https://kenney.nl/assets/pixel-shmup).
-See [ATTRIBUTION.md](../../../ATTRIBUTION.md).
+See [ATTRIBUTION.md](https://github.com/k0b3n4irb/opensnes/blob/develop/ATTRIBUTION.md).

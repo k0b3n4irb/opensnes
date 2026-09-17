@@ -1,0 +1,43 @@
+# backgrounds/mode5_hires — the write-only SETINI shadow actually holds the
+# interlace bit, and the 32x64 map is the one that fits.
+#
+# SETINI ($2133) is write-only, so the lib composes its four bits through a
+# software shadow (`setini_shadow`, a crt0 sysvar) and writes the whole byte on
+# every change — the discipline video.h documents for
+# videoSetInterlace/ObjInterlace/Overscan/PseudoHires. `setini_shadow = 1` is
+# the direct check of that contract: after videoSetInterlace(1) the shadow must
+# hold exactly bit 0 and nothing else. A setter that wrote the register without
+# updating the shadow, or that clobbered the byte instead of OR-ing its bit,
+# leaves the register correct today and silently drops interlace the next time
+# any OTHER SETINI setter is called. No rendering pillar can see that — the
+# damage happens in a future write that this example never makes.
+#
+# The map assert pins the other trap this example exists to document. A 32x32
+# tilemap only covers 256 hi-res lines in interlace, so the page would wrap
+# vertically; the fix was SC_32x64, which puts the map at word $4000 (byte
+# $8000) and runs it to byte $8DA9 — `bg_map_second_half` is a block from the
+# part a 32x32 map would never have. The tileset is at word $8000, which wraps
+# in the PPU's 32K-word VRAM to word $0000 (byte $0000) — asserting a block
+# there is the check that the wrap is the intended one and not a lost transfer.
+#
+# Note this example is the one visual baseline captured with native_res = true
+# (512x448), so fbhash does see the hi-res field pair here. What it still
+# cannot see is the shadow byte.
+rom = "../../../examples/backgrounds/mode5_hires/mode5_hires.sfc"
+frames = 200
+
+[asserts.values]
+setini_shadow = { eq = 1, width = 1 }   # SETINI bit 0 = screen interlace, and only that bit
+
+[asserts.blocks]
+text_pal            = { space = "cgram", offset = "0000", hex = "0000ff7f2f7f3f1f" }   # black, white, cyan, gold
+text_tiles_w8000    = { space = "vram",  offset = "30C0", hex = "f6f6f6f63636f7f7e3e3030300000000" }
+bg_map_second_half  = { space = "vram",  offset = "8A40", hex = "c001c2010c020e021002120214021602" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

@@ -1,0 +1,124 @@
+# cproc upstream suite — tests expected to FAIL on the OpenSNES fork.
+#
+# `make -C compiler/cproc check` compares cproc-qbe's QBE IL against
+# expected outputs written for the host ABI. The fork targets w65816 with
+# `int` = 2 bytes, `long` = 4, and sections C const data into ".rodata",
+# so the expected files cannot match. Every entry below is one of those
+# facets (2026-09-13 audit of all 107: 104 IL diffs from type sizes /
+# struct layout / the rodata section line, 3 front-end errors that are the
+# 16-bit int itself — bit-field width, a `sizeof(enum)` static assert):
+# none is a crash and none is a wrong-code bug.
+#
+# Ratchet semantics (devtools/toolchain_suites.py):
+#   - a test NOT listed here that fails  → regression, the run fails;
+#   - a test listed here that passes     → XPASS, the run fails: remove
+#     it from this list (the fork got closer to upstream);
+#   - listed and failing                 → expected.
+# One name per line, as printed by cproc's `runtests` (test/<name>.c).
+add-int-pointer.c
+alignas-0.c
+alignas-local.c
+alignas-local-strict.c
+alignas-member.c
+alignas-type.c
+alignas-vla-strict.c
+array-address.c
+asm-label.c
+attribute-syntax.c
+binary-constant.c
+bitfield-assignment-sign-extend.c
+bitfield-compound-assign.c
+bitfield-initializer-overflow.c
+bitfield-integer-promotion.c
+bitfield-integer-promotion-long.c
+bitfield-load-signed.c
+bitfield-load-unsigned.c
+bitfield-non-adjacent.c
+bitfield-short.c
+bitfield-union.c
+bitfield-unnamed-size-align.c
+builtin-alloca.c
+builtin-constant-p.c
+builtin-expect.c
+builtin-offsetof.c
+builtin-types-compatible-p.c
+builtin-vaarg-vm.c
+builtin-va-copy+x86_64-sysv.c
+cast-vm.c
+char-sign+aarch64.c
+char-sign+riscv64.c
+char-sign+x86_64-sysv.c
+compatible-enum-types.c
+compatible-vla-types.c
+compound-assignment.c
+compound-literal-static.c
+conditional.c
+conditional-compound-literal.c
+const-array.c
+const-expr-cast.c
+const-expr-div.c
+const-expr-mod.c
+const-expr-shr.c
+const-init.c
+do-loop.c
+enum-large-value.c
+escaped-newline.c
+extern-initializer.c
+for-loop.c
+func-array-param.c
+func-noreturn.c
+func-param-scope.c
+func-vla.c
+generic.c
+hello.c
+initializer-address-subtract.c
+initializer-cast-float-int.c
+initializer-empty.c
+initializer-empty-struct.c
+initializer-member-static.c
+initializer-nested-array-address.c
+initializer-pointer-int-cast.c
+initializer-replace-local-string-wide.c
+initializer-replace-static-string-wide.c
+initializer-string-wide.c
+inline-definition.c
+logical-and.c
+logical-or.c
+lvalue-conversion.c
+nested-array.c
+nullptr.c
+sizeof-compound-literal.c
+sizeof-postfix.c
+sizeof-string-literal.c
+sizeof-vla.c
+string-concat.c
+string-octal.c
+struct-flexible-array.c
+struct-packed.c
+struct-passing.c
+struct-passing-call.c
+struct-return-1.c
+struct-return-2.c
+subtract-pointer.c
+tentative.c
+thread-local.c
+typedef.c
+typedef-name.c
+typedef-qual.c
+typeof-array.c
+typeof.c
+typeof_unqual.c
+typeof-vm.c
+union.c
+union-passing.c
+union-struct-flexible-array.c
+unreachable.c
+varargs+aarch64.c
+varargs+riscv64.c
+varargs+x86_64-sysv.c
+vla.c
+vla-deref.c
+vla-nested.c
+wchar-sign+aarch64.c
+wchar-sign+riscv64.c
+wchar-sign+x86_64-sysv.c

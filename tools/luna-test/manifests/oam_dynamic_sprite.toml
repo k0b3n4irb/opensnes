@@ -1,0 +1,64 @@
+# The point of dynamic_sprite is that the OAM entries never move: all four
+# sprites keep the same position, tile slot and attributes for the whole
+# run, and the animation happens entirely by DMAing a different frame's
+# tiles into the same VRAM slot every eighth frame. Neither existing pillar
+# separates those two halves — liveness sees "it runs", and the fbhash
+# baseline sees one composite picture in which a frozen OAM and a frozen
+# VRAM stream look the same as a wrong pairing of the two.
+#
+# So the checkpoints pin both halves independently. The four frame indices
+# advance in lockstep, exactly one step per 8 displayed frames (measured on
+# luna: 6 at frame 60, 7 at 68, 8 at 76), while oamMemory's first four
+# bytes — sprite 0's whole entry — are asserted unchanged across every leg.
+#
+# The last checkpoint is frame 60 + 192, one full 24-frame animation cycle
+# later at 8 frames a step: frame0 is back to 6 and the streamed tile data
+# in the large pool at VRAM $0000 is byte-identical to the frame-6 tiles
+# (the [asserts.blocks] hex below is the measured content there). A stalled
+# streamer, a slot allocator that drifted by one, or a queue that stopped
+# being flushed all break that, and none of them would move the OAM.
+rom = "../../../examples/sprites/dynamic_sprite/dynamic_sprite.sfc"
+frames = 252
+
+[[checkpoint]]                 # animation step 6
+at_frame = 60
+[checkpoint.values]
+frame0 = { eq = 6, width = 2 }
+frame1 = { eq = 6, width = 2 }
+frame2 = { eq = 6, width = 2 }
+frame3 = { eq = 6, width = 2 }
+
+[[checkpoint]]                 # +8 frames -> step 7, OAM untouched
+at_frame = 68
+[checkpoint.values]
+frame0 = { eq = 7, width = 2 }
+frame3 = { eq = 7, width = 2 }
+[checkpoint.delta]
+oamMemory = { dir = "unchanged", width = 4 }   # x, y, tile, attr of sprite 0
+
+[[checkpoint]]                 # +8 more -> step 8, OAM still untouched
+at_frame = 76
+[checkpoint.values]
+frame0 = { eq = 8, width = 2 }
+frame3 = { eq = 8, width = 2 }
+[checkpoint.delta]
+oamMemory = { dir = "unchanged", width = 4 }
+
+[[checkpoint]]                 # 192 frames after the first leg: cycle closed
+at_frame = 252
+[checkpoint.values]
+frame0 = { eq = 6, width = 2 }
+frame1 = { eq = 6, width = 2 }
+frame2 = { eq = 6, width = 2 }
+frame3 = { eq = 6, width = 2 }
+[checkpoint.delta]
+oamMemory = { dir = "unchanged", width = 4 }
+
+# Sprite 0's OAM entry, spelled out: x = xpos[0] = 64, y = 100, tile slot 0,
+# attr $30 (priority 3, palette 0). The dynamic engine owns this; a change
+# here means the allocator moved a sprite that should have stayed put.
+[asserts.blocks]
+oamMemory = "40640030"
+# The large-tile pool at VRAM word $0000 after a whole animation cycle:
+# the same 32 bytes the streamer put there at frame 60.
+dyn_tile0 = { space = "vram", offset = "0000", hex = "00ff7f80639c5ea167985fa0639c7f8000007f0063005e0067005f0063007f00" }

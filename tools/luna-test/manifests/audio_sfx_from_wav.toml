@@ -1,0 +1,43 @@
+# examples/audio/sfx_from_wav — the wav2brr pipeline is proved END TO END, from
+# the .wav in res/ to the bytes the S-DSP will read out of ARAM.
+#
+# This example's point is a build rule: res/blip.wav and res/coin.wav are never
+# committed as .brr, the build converts them on demand. Nothing about that
+# reaches the framebuffer — the screen is four lines of static text that the
+# fbhash baseline already covers, and it keeps passing if wav2brr emits garbage,
+# if audioLoadSample() uploads the wrong length, or if the sample directory is
+# built with swapped slots. The samples are also silent to `--coverage`.
+#
+# What is asserted, all measured from `--dump-aram` on this ROM:
+#  * the sample DIRECTORY at ARAM $0A00 (DIR = $0A): slot 0 start/loop $0B00,
+#    slot 1 start/loop $0DAC. A one-shot has loop == start (main.c passes
+#    loop = 0), and $0B00 + 684 = $0DAC, i.e. the blip's exact BRR length —
+#    so a truncated upload moves the second entry and fails here.
+#  * the first 16 bytes of each uploaded BRR, at those two addresses. These are
+#    wav2brr's own output bytes (`res/*.brr`, verified byte-identical to ARAM
+#    over the full 684 / 999 bytes), so this is a golden on the converter too.
+#  * the pad path: A then B are pressed, and the round-robin voice allocator is
+#    read back — the coin lands on voice 1 with V1_SRCN = 1 (sample slot 1) and
+#    ENDX = 0x03 says BOTH voices played a sample through to its end. A ROM that
+#    ignored the pad, or mapped both buttons to one slot, fails that.
+#
+# Measured with `--until-frame 140 --input "100:0x0080,104:0,130:0x8000,134:0"`
+# (A = $0080, B = $8000; padPressed() is edge-triggered, so short pulses).
+rom = "../../../examples/audio/sfx_from_wav/sfx_from_wav.sfc"
+frames = 140
+input = "100:0x0080,104:0,130:0x8000,134:0"
+
+[asserts.blocks]
+# slot 0: start $0B00 loop $0B00 | slot 1: start $0DAC loop $0DAC
+sample_dir = { space = "aram", offset = "0A00", hex = "000b000bac0dac0d" }
+# wav2brr output for res/blip.wav (684 B) and res/coin.wav (999 B), head bytes
+blip_brr   = { space = "aram", offset = "0B00", hex = "c06666666666666aaab40f0ff0ff08e1" }
+coin_brr   = { space = "aram", offset = "0DAC", hex = "c0555555bbbbbb5555c05bbbbbb55555" }
+
+[asserts.dsp]
+DIR      = 0x0A      # directory page $0A00
+V1_SRCN  = 0x01      # B -> sample slot 1 (coin), on the 2nd round-robin voice
+KON      = 0x02      # the last key-on was voice 1
+ENDX     = 0x03      # voices 0 AND 1 each reached a sample end -> both played
+V1_ADSR1 = 0x8F
+V1_ADSR2 = 0xE0

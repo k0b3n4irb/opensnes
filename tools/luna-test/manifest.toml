@@ -77,3 +77,10 @@ frames = [200, 400]
 # idles, so one capture point suffices; firmware-gated like dsp1_cube.
 [examples."mode7/dsp1_ground"]
 firmware = "dsp1b.rom"
+
+# --- Hi-res capture (gaps review R8): luna's default view averages the two
+# horizontal subpixels of modes 5/6 (512 dots) into 256; `native_res = true`
+# captures and hashes the native 512×448 frame instead, so a broken second
+# subpixel column cannot blend away.
+[examples."backgrounds/mode5_hires"]
+native_res = true

@@ -1,0 +1,30 @@
+# EditorConfig (gaps review P6). Matches CLAUDE.md "Code Style": C is 4 spaces,
+# K&R; hand-written ASM and Makefiles are tabs; Python follows PEP 8.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{c,h}]
+indent_style = space
+indent_size = 4
+
+[*.{asm,inc,sfx}]
+indent_style = tab
+
+[{Makefile,*.mk,makefile}]
+indent_style = tab
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,toml,json}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

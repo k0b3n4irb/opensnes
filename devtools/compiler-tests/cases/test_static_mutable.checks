@@ -1,0 +1,12 @@
+# Mutable statics live in RAM: zero-init, non-zero-init and byte-sized
+# ones all get a RAMSECTION, the uninitialised one lands in .bss.
+section zero_counter: present RAMSECTION
+section init_counter: present RAMSECTION
+section byte_counter: present RAMSECTION
+section uninit_counter: present \.bss
+# No static is emitted as ROM data.
+absent \.rodata
+# Each of the six initialised statics gets a data_init record; the
+# non-zero one carries its value.
+count 6 APPENDTO "\.data_init"
+present \.dw init_counter\n\t\.db :init_counter\n\t\.dw 2\n\t\.dw 100

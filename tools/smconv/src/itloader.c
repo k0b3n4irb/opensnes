@@ -131,6 +131,17 @@ static void itl_sample_load_data(itl_sample_t *s, io_file_t *f)
 {
     if (!s->compressed) {
         int offset = (s->convert & 1) ? 0 : (s->data.bits16 ? -32768 : -128);
+        /* The header's length is trusted nowhere else: a corrupt file asked
+         * for a 3.7 GB buffer here (found by tools/fuzz, 2026-09-14). A
+         * sample cannot hold more than what is left of the file. */
+        u32 avail = io_remaining(f) / (s->data.bits16 ? 2 : 1);
+        if (avail > 0x7FFFFFFFu)
+            avail = 0x7FFFFFFFu;   /* length is an int */
+        if ((u32)s->data.length > avail) {   /* a negative length is huge here: caught too */
+            printf("%s: " ERRORRED("warning") ": sample '%s' claims %u frames but the file has %u left — truncated\n",
+                   ERRORBRIGHT("smconv"), s->name, (unsigned)s->data.length, (unsigned)avail);
+            s->data.length = (int)avail;
+        }
         if (s->data.bits16) {
             s->data.data16 = malloc(s->data.length * sizeof(s16));
             for (int i = 0; i < s->data.length; i++)

@@ -32,8 +32,8 @@ For audio (SPC700, DSP, BRR, SNESMOD), see the [SNES Sound Guide](../SNES_SOUND_
 | Mode | Resolution |
 |------|------------|
 | NTSC | 256x224 or 256x239 |
-| PAL | 256x239 or 256x268 |
-| Hi-res | 512x224 (limited use) |
+| PAL | 256x239 or 256x224 (same picture sizes; more blank lines) |
+| Hi-res | 512x224 (Modes 5/6), 448/478 lines in interlace |
 
 ### Colors
 

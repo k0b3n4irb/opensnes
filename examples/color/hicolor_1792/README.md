@@ -34,7 +34,7 @@ land on screen — any static 4bpp screen caps at 128.
 | BG2VOFS | 31 | same (`bgSetScroll`, NMI-synced) | aligns rows with reset cadence |
 | TM | `%00000010` | same (`setMainScreen(LAYER_BG2)`) | BG2 only |
 | DMAP0/BBAD0 | `$00`/`$22` | same | 1 byte → CGDATA, inc source |
-| HTIME | 190 | same (`irqSetHTimer(190)`) | writes land in H-blank |
+| HTIME | 190 | **128** (`irqSetHTimer(128)`) | our handler saves registers and latches the V counter before the DMA, which krom's does not; with 190 the DMA spills past H-blank into the next line (a CGRAM write during the picture lands on the wrong entry). Measured clean window on luna v1.23.0: 80..175 |
 | NMITIMEN | `%10010000` | `%10010001` | we keep auto-joypad (SDK default) |
 | IRQ handler | HTIMERIRQ verbatim | + save/restore, `$213F` reset | ours interrupts arbitrary C |
 | VBlank rewind | VBLANKIRQ verbatim | C callback via `nmiSetBank` | CGADD=0, 128 B, source reset |

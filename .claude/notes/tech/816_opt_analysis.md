@@ -42,7 +42,11 @@ Saves 1 byte (16-bit immediate = 3 bytes, 8-bit immediate = 2 bytes)
 `jmp @label` (3 bytes) → `bra @label` (2 bytes) when target is within ±127 bytes
 **Challenge**: Don't know byte distances at emit time (WLA-DX resolves labels)
 **Alternative**: WLA-DX may already do this optimization internally
-**TODO**: Check if WLA-DX has a branch optimization pass
+**Answered 2026-09-15**: WLA-DX has **no** branch-relaxation pass — a
+`bra`/`beq` whose target is out of range is a hard assembler error
+(the crt0 `beq` → `bne`+`jmp` fix is the precedent), so the shortening
+would have to be done at emit time with a conservative distance
+estimate. Not worth 1 byte per jump; dropped.
 
 #### 5. LDX #0 + Indexed Addressing → Direct Addressing
 `ldx #0; lda.l addr,x` → `lda.l addr`

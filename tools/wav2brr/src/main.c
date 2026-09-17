@@ -148,7 +148,7 @@ static int parse_wav(const char *path, s16 **out_pcm, int *out_count,
             if (bits == 16)
                 s = (int16_t)rd_u16(sp);              /* signed LE */
             else
-                s = ((int)sp[0] - 128) << 8;          /* 8-bit is unsigned */
+                s = ((int)sp[0] - 128) * 256;         /* 8-bit is unsigned */
             acc += s;
         }
         pcm[i] = (s16)(acc / channels);              /* downmix to mono */

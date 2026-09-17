@@ -230,12 +230,11 @@ sramClear:
 @clear_loop:
     sta $0000,y                 ; Store 0 to SRAM (bank register = $70)
     iny
-    rep #$20
-    .ACCU 16
-    tya
-    cmp.b DP_SIZE
-    sep #$20
-    .ACCU 8
+    ; Compare the 16-bit index directly: the previous `tya / cmp` swapped
+    ; the counter into A, so from byte 1 on the loop stored the OFFSET
+    ; instead of zero (0,1,2,3,... — found by the libtest round trip,
+    ; 2026-09-15). A stays $00 for the whole loop now.
+    cpy.b DP_SIZE
     bcc @clear_loop
 
 @done:

@@ -1,0 +1,39 @@
+# transparent_window — the two WH0/WH1 HDMA tables the example BUILDS at
+# runtime, byte for byte, plus both channels armed.
+#
+# What this proves that the other pillars cannot:
+#   * The tables are computed in main() from RECT_X/RECT_Y/RECT_WIDTH/
+#     RECT_HEIGHT, not loaded from ROM. This is the only place the corpus
+#     reads that computation back, and it pins the geometry as numbers:
+#     $60 = 96 lines skipped (RECT_Y), $F0 = 0x80 | 112 (repeat flag +
+#     RECT_HEIGHT), $28 = 40 (RECT_X) on WH0, $D8 = 216 (RECT_X + RECT_WIDTH)
+#     on WH1.
+#   * The 0x80 repeat flag is the point of the example's own comment — WH0 and
+#     WH1 are write-only and must be refreshed every scanline — and it is
+#     exactly the kind of thing a framebuffer hash argues about badly: the
+#     same constant rectangle can be encoded with or without repeat mode, so
+#     "the picture is right" is not "the table format is right". Here the
+#     encoding itself is the assert.
+#   * The asymmetry is deliberate and pinned: the WH0 table ends with a
+#     1-line [$01][$FF] disable entry before its terminator, the WH1 table
+#     terminates straight after its 112 data bytes. Anyone "fixing" that
+#     asymmetry has to update this file on purpose.
+#   * There is no input in this example and no lib window call — W12SEL,
+#     WOBJSEL, CGWSEL, CGADSUB and COLDATA are raw register writes with no
+#     WRAM shadow, so they cannot be asserted here. `luna state --out -`
+#     reports them at frame 60 as w12sel $20, wobjsel $20, cgwsel $10,
+#     cgadsub $82, coldata (12,12,12), ppu.windows = [255, 216, 0, 0] — the
+#     colour-math half of the effect stays the fbhash baseline's job.
+#
+# Measured: `luna state --until-frame 60 --peek hdma_left:80 --peek
+# hdma_right:80 --peek hdma_enabled_state:1`; dma.hdmaen = 48 confirmed the
+# shadow.
+rom = "../../../examples/windows/transparent_window/transparent_window.sfc"
+frames = 60
+
+[asserts.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }   # channels 4 (WH0) + 5 (WH1)
+
+[asserts.blocks]
+hdma_left  = { space = "wram", offset = "hdma_left",  hex = "60FFF02828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282828282801FF0000000000000000000000" }
+hdma_right = { space = "wram", offset = "hdma_right", hex = "6000F0D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D8D800000000000000000000000000" }

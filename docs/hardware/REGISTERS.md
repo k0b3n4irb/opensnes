@@ -51,8 +51,8 @@ REG_INIDISP = 0x80;
 | 3 | 16x16 | 32x32 |
 | 4 | 16x16 | 64x64 |
 | 5 | 32x32 | 64x64 |
-| 6 | 16x32 | 32x64 |
-| 7 | 16x32 | 32x32 |
+| 6 | 16x32 | 32x64 (undocumented: fullsnes lists 6-7 as reserved; snesdev-wiki documents them) |
+| 7 | 16x32 | 32x32 (undocumented, idem) |
 
 ```c
 // 8x8 small, 16x16 large sprites, tiles at $0000
@@ -387,8 +387,8 @@ Each channel has 16 bytes of registers at $43x0-$43xF where x = channel (0-7).
 | 7 | Direction | 0 = A→B (CPU→PPU), 1 = B→A |
 | 6 | HDMA Mode | 0 = Absolute, 1 = Indirect |
 | 5 | - | Unused |
-| 4 | Auto Inc | 0 = Auto, 1 = Fixed source |
-| 3 | Fixed/Dec | 0 = Increment, 1 = Decrement |
+| 4 | Direction | A-bus address step direction: 0 = increment, 1 = decrement (ignored when bit 3 is set) |
+| 3 | Fixed | 1 = fixed A-bus address (no step) — e.g. `$08` for a fill from one byte |
 | 2-0 | Mode | Transfer mode (see table) |
 
 **Transfer Modes:**

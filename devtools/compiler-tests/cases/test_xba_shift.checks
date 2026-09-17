@@ -1,0 +1,9 @@
+# Every shift by >= 8 starts with one xba (six functions, six xba).
+count 6 xba
+# >>8 masks the low byte; <<8 masks the high byte — no shift loop.
+in shr8: present xba\n\tand\.w #\$00FF\n\trtl
+in shl8: present xba\n\tand\.w #\$FF00\n\trtl
+# Signed >>8 sign-extends the swapped byte with cmp/ora $FF00.
+in sar8: present xba\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00
+# shr12 does xba + 4 lsr, not 12 lsr: 4 lsr in the whole file.
+count 4 lsr a

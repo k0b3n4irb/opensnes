@@ -4,7 +4,7 @@ Core game mechanics that go beyond pure graphics or audio. These examples demons
 fundamental patterns -- collision detection, movement, and interactive logic -- that
 you will reuse in every game project.
 
-## Examples
+## Example ROMs
 
 | Example | Difficulty | Description |
 |---------|------------|-------------|

@@ -68,6 +68,19 @@ The reference tree is the `examples/` ROMs built before the change; a
 DIFF is a rendering change to explain, never something to re-baseline
 over.
 
+## Measured ROM coverage (the never-executed ratchet)
+
+`rom_coverage.py` asks luna for the set of executed PCs of every example
+(`luna profile --pc-set`, to the first manifest frame, no input), folds them
+onto the `.sym` labels (FastROM/HiROM mirrors folded like `symmap.py`) and
+unions the hits over the corpus. The public functions of
+`lib/include/snes/*.h` that no example executes are written to
+`baselines/never_executed.txt`; `make tests` fails if that set gains a
+name (a function shipped with no example and no libtest) and reports names
+that became executed so `--update` can shrink the list. `ROM_COVERAGE.md`
+is the human report. Input-driven code is under-counted by construction —
+the scripted manifest legs are the next step.
+
 ## Cross-arch baseline key
 
 The regression key is luna's **`--print-fbhash`** (since v1.21.0 "fbhash v2":
@@ -90,14 +103,60 @@ WRAM-stream regression (`wram_regress.py`), input sequences (`--input`),
 the full-corpus manifest, and the CI rewrite (both Linux arches). For
 interactive debugging, use `luna mcp` / luna's GUI.
 
+## Writing a manifest: the vocabulary, and what it cannot express
+
+Everything below was established by probing the pinned luna binary while
+writing the R7 manifests (2026-09-15/16) — `docs/tools/luna.md` is generated
+from `--help` and does not carry the schema.
+
+**Top-level assert namespaces**, exactly these (luna's own error text lists
+them): `wdm_empty`, `nocash_contains`, `fbhash`, `audio_rms_min`, `values`,
+`blocks`, `trace`, `dsp`, `footprint`, `dma`, `oam`. They are evaluated at the
+run bound, not per checkpoint.
+
+**Checkpoints** accept `at_frame`, `input`, `input2`, `mouse`, `superscope`,
+`values` and `delta` — and nothing else. So OAM, VRAM/CGRAM blocks and DSP
+registers can only be asserted once, at the end of the run: an example whose
+DSP state must be compared before and after an event needs **two manifests**,
+not two checkpoints.
+
+- `values` comparisons: `eq`, `ne`, `lt`, `le`, `gt`, `ge` (combinable, e.g.
+  `{ ge = 100, le = 200 }`), with `width` 1, 2 or 4. A `width = 4` read works,
+  but the expected value must still fit in 16 bits.
+- `delta` directions: `increased`, `decreased`, `changed`, `unchanged`.
+- Addresses are a `.sym` symbol or a raw `BANK:OFFSET` string; the run bound is
+  `frames = N` (or `steps = N` for instruction-count tests).
+- `blocks` keys must themselves be a symbol or `BANK:OFFSET`, even when
+  `space` and `offset` are given explicitly.
+
+**Input scripts are merged into one timeline.** Every checkpoint's `input` /
+`mouse` / `superscope` entries are frame-stamped and combined for the whole
+run, so a checkpoint observes every event scheduled before its frame, not only
+the ones written beside it. Reading a checkpoint as if it replayed its own
+script in isolation is the easiest way to write a wrong expectation.
+
+**There is no PPU-register assert.** `luna state --out -` prints the whole
+`ppu` block as JSON, but a manifest cannot compare against it, and reading an
+MMIO address through `values` returns 0 (it resolves WRAM). Today the route to
+those registers is the library's own WRAM shadows — `hdma_enabled_state` in
+`hdma.asm`, `w12sel`/`w34sel`/`wobjsel`/`wbglog` in `window.c`, `m7_sin` /
+`m7_cos` / `m7_scale` in `mode7.c` — and a shadow is only trustworthy for an
+example that goes through the module. `examples/windows/window` writes the
+window registers raw, so its shadow reads 0 while the hardware holds `$33`;
+that manifest asserts an `fbhash` instead of a value it would be lying about.
+The capability request is recorded in
+`.claude/notes/status/luna_stress_campaign.md` for owner validation.
+
 ## Hardening tests (luna scripted-input & trace capabilities)
 
 Beyond visual/coverage, the harness exercises axes the old snes9x harness
 never could. **These checks now live as native luna manifests under
 `manifests/*.toml`** (run by `luna test` via `make test-manifests`); the
 Python probes that pioneered them were deleted after the migration —
-`probes/` retains only `lib.py` (helper API, used by `project_test.py`)
-and `run_all.py`. Same coverage, declarative form:
+`probes/` retains only `lib.py`, the `luna state --assert` / `--peek`
+helper every runtime ROM checker imports (`devtools/compiler-tests/runtime/*`,
+`devtools/libtests`, `project_test.py`); the `run_all.py` runner that globbed
+the emptied directory was deleted on 2026-09-14. Same coverage, declarative form:
 
 - **Coprocessor execution** (`manifests/coproc_*.toml`) — SA-1, Super FX
   and DSP-1 examples must execute ≥1 coprocessor instruction
@@ -113,10 +172,10 @@ and `run_all.py`. Same coverage, declarative form:
   liveness on the raw-APU driver fixture.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
-  invisible to the framebuffer. **Local, same-arch tool — not a CI gate:** raw
-  WRAM content (unlike the framebuffer) isn't a luna cross-arch guarantee
-  (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), so `--update` on your own
-  machine before `--compare`. Baseline entries carry `rom_sha256` provenance
+  invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`
+  on both luna legs; raw WRAM content isn't a luna cross-arch guarantee for two
+  examples (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), which the
+  oracle skips per arch. Baseline entries carry `rom_sha256` provenance
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example
   source-mtime check) so stale-ROM rebaselines fail at capture time.

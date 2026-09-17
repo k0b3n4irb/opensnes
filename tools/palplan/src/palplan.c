@@ -68,6 +68,7 @@ static const char *TYPE_NAME[2] = { "bg", "sprite" };
  * helpers
  *--------------------------------------------------------------------------*/
 
+static void die(const char *fmt, ...) __attribute__((noreturn, format(printf, 1, 2)));
 static void die(const char *fmt, ...)
 {
     va_list ap;

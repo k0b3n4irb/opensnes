@@ -1,0 +1,85 @@
+# panel_hud exists to prove one thing: the HUD and the dialog share one
+# tilemap on one layer, and opening the dialog — a whole-2 KB panelFlush()
+# under forced blank — does not disturb the HUD. That is a statement about
+# what did NOT change, which no framebuffer hash can make: both boxes are
+# on screen in the baseline picture either way, and the baseline runs with
+# no input so the dialog never opens at all. Liveness sees neither.
+#
+# Addresses. panel_map (the caller-owned 32x32 u16 map) is at $00:0520.
+# The heart row is HUD_Y+1 = 2, so +2*32*2 = $80, and the first heart is at
+# HUD_X+1 = 2, so +4: $00:05A4, five words. The dialog's top-left corner is
+# DLG_Y = 20, DLG_X = 4: $0520 + 20*64 + 8 = $00:0A28. Panel entries carry
+# palette 1 and priority 1, hence the $2400 attribute bits: $240A filled
+# heart, $240B empty, $2401 the 9-slice top-left corner, $0000 blank.
+#
+# Measured on luna with this script: hearts 3 -> 2 -> 1 on two B taps, the
+# dialog opens on START with the heart row byte-identical across it, A puts
+# a heart back, START closes the dialog and the row is again untouched.
+rom = "../../../examples/basics/panel_hud/panel_hud.sfc"
+frames = 280
+#        B          B            START (open)  A            START (close)
+input = "60:0x8000,64:0,100:0x8000,104:0,140:0x1000,144:0,200:0x0080,204:0,240:0x1000,244:0"
+
+[[checkpoint]]                 # boot: hero_hp = 3, no dialog
+at_frame = 50
+[checkpoint.values]
+hero_hp      = { eq = 3, width = 1 }
+dialog_shown = { eq = 0, width = 1 }
+"00:05A4" = { eq = 0x240A, width = 2 }   # heart 0 filled
+"00:05A6" = { eq = 0x240A, width = 2 }
+"00:05A8" = { eq = 0x240A, width = 2 }
+"00:05AA" = { eq = 0x240B, width = 2 }   # heart 3 empty
+"00:05AC" = { eq = 0x240B, width = 2 }
+"00:0A28" = { eq = 0x0000, width = 2 }   # dialog area is blank tile 0
+
+[[checkpoint]]                 # one B tap
+at_frame = 80
+[checkpoint.values]
+hero_hp = { eq = 2, width = 1 }
+
+[[checkpoint]]                 # two B taps: only heart 0 is still filled
+at_frame = 120
+[checkpoint.values]
+hero_hp   = { eq = 1, width = 1 }
+"00:05A4" = { eq = 0x240A, width = 2 }
+"00:05A6" = { eq = 0x240B, width = 2 }
+"00:05A8" = { eq = 0x240B, width = 2 }
+
+[[checkpoint]]                 # THE POINT: panelFlush for the dialog leaves
+at_frame = 180                 # the HUD row byte-identical
+[checkpoint.values]
+dialog_shown = { eq = 1, width = 1 }
+hero_hp      = { eq = 1, width = 1 }
+"00:0A28"    = { eq = 0x2401, width = 2 }   # 9-slice top-left corner stamped
+[checkpoint.delta]
+"00:05A4" = "unchanged"
+"00:05A6" = "unchanged"
+"00:05A8" = "unchanged"
+"00:05AA" = "unchanged"
+"00:05AC" = "unchanged"
+
+[[checkpoint]]                 # A with the dialog still open: heart comes back
+at_frame = 220
+[checkpoint.values]
+hero_hp      = { eq = 2, width = 1 }
+dialog_shown = { eq = 1, width = 1 }
+"00:05A6"    = { eq = 0x240A, width = 2 }
+
+[[checkpoint]]                 # START again: panelClear wipes the dialog only
+at_frame = 280
+[checkpoint.values]
+dialog_shown = { eq = 0, width = 1 }
+hero_hp      = { eq = 2, width = 1 }
+"00:0A28"    = { eq = 0x0000, width = 2 }
+[checkpoint.delta]
+"00:05A4" = "unchanged"
+"00:05A6" = "unchanged"
+"00:05A8" = "unchanged"
+
+# The HUD row as the PPU actually holds it. panel_map is only RAM; the
+# example's flush_hud_row() pushes just this 64-byte row with an ordinary
+# VBlank DMA (no forced blank), so VRAM must mirror it. BG2_MAP is word
+# $4400 = byte $8800, plus row 2 = +$80 -> $8880. Two filled hearts, three
+# empty, between the box's left ($2404) and right ($2405) edge tiles.
+[asserts.blocks]
+hud_row = { space = "vram", offset = "8880", hex = "000004240a240a240b240b240b240524" }

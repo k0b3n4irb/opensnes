@@ -64,6 +64,43 @@ load-bearing for cross-session continuity).
 >   `.BASE $C0` + a wlalink patch). Everything else
 >   here is maintainer-internal.
 
+> **📊 Status refresh (2026-09-13, gaps review item D2).** Re-read against the
+> tree, not against the previous refresh. Four of the six items the 07-26
+> refresh listed as open had in fact been closed by chantiers that never
+> came back to update them:
+> - **B3 🟢** — `dmaCopyVramMode7()` *is* the interleaved loader (two DMAs,
+>   tilemap to the low bytes, tiles to the high bytes) and reads both
+>   pointers' bank bytes since A6; four of the six Mode 7 examples already
+>   called it and the last two asm loaders (`rotate_scale`, `perspective`'s
+>   sky) are migrated in this refresh's commit. The `mode7LoadGraphics()` the tutorial
+>   and `mode7.h` pointed at never existed — those docs are fixed in the
+>   same commit as this refresh.
+> - **B4 🟢** — `hdmaSetup()` programs A1B from the far pointer's bank byte
+>   since A6 (`lib/source/hdma.asm`, `lda 7,s`); the nine examples that call
+>   it keep their tables in the asset banks since #127.3 and render
+>   correctly under `make tests`. `hdma.h` still said "hardcodes bank $00" —
+>   fixed with this refresh. `hdmaSetupBank()` stays as the explicit-bank
+>   form. The 05-13 status cited `examples/graphics/effects/hdma_helpers`,
+>   which is `examples/hdma/hdma_helpers` since the 2026-07-31 reorg.
+> - **C2 🟢** — no function has two implementations any more: `sprite.c`
+>   is the C API, `sprite_oamset.asm` is `oamSet` alone (the A4 rewrite)
+>   plus its LUTs; `text.c` / `text4bpp.c` are the C API and `text.asm` /
+>   `text4bpp.asm` hold the font data and two DMA/fill inner loops. The
+>   "C API + ASM inner loop" shape C2 asked for is what the tree has.
+> - **D2 🟢** — the SIWP polarity was arbitrated against four sources
+>   (`KNOWN_LIMITATIONS.md`, 2026-09; corpus `snes_verify`), the crt0
+>   comment no longer says "maybe". A run on real hardware would be a
+>   bonus, not the closing condition.
+> - Still open: **A5 🟡** (fork divergence — now 21 cproc / 60 QBE / 2 wla-dx
+>   patches, gated by the upstream suites since H1, with three upstream
+>   reports queued: wla-dx macro-label read and `READ_T` shift, QBE amd64
+>   `selcall` NULL + 0), **A8 🟡** (the 2–3 month zero-telemetry window has
+>   elapsed; the retirement step is due), **D3** (intrinsic).
+> - `--allow-known-bugs` was removed with chantier A3 (`270cf31d`,
+>   2026-05-09); every mention below is historical.
+> §5–§7 are rewritten around this ledger; §1 and §4 stay as the baseline
+> record (read the banners, not §1, for status).
+
 **Baseline**: external review delivered 2026-05-07; 18 commits shipped on
 `develop` between 2026-05-07 and 2026-05-08 closing 9 / 10 of the Top 10
 audit items + the tutorials wave (8 / 8) + the cycle-count CI gate (soft
@@ -90,7 +127,7 @@ changes. Re-cost before deploying real effort.
    - [Category E — Runtime / NMI / hardware-level](#category-e--runtime--nmi--hardware-level)
 4. [Interactions matrix](#4-interactions-matrix)
 5. [Difficulty classification](#5-difficulty-classification)
-6. [Strategic sequencing — three deployment paths](#6-strategic-sequencing)
+6. [Strategic sequencing](#6-strategic-sequencing)
 7. [Acceptance criteria summary](#7-acceptance-criteria-summary)
 8. [How to use this document](#8-how-to-use-this-document)
 9. [References](#9-references)
@@ -631,7 +668,17 @@ allocator risks regressions on the 28 patches that already exist.
 
 ---
 
-#### A5. Compiler stack divergence (28+ QBE patches, 6 cproc patches) 🟡
+#### A5. Compiler stack divergence (60 QBE / 21 cproc / 2 wla-dx patches as of 2026-09-13) 🟡
+
+**2026-09-13**: 21 cproc, 60 QBE and 2 wla-dx patches (`compiler/PINS.md`);
+QBE's true upstream base is `120f316` (2025-05-30). Since gaps review H1
+every PIN bump is gated by the three upstream suites
+(`make test-toolchain-suites`), which is what turned "divergence" from a
+feeling into a number: QBE 56/56, wla-dx 31/32 (one deliberate
+divergence), cproc 63/170 (the 16-bit `int`). First upstream candidates,
+queued by owner decision ("plus tard"): wla-dx's one-character macro
+label read and `READ_T` shift overflow; QBE's amd64 `selcall` NULL + 0.
+The bulk of the QBE stack (w65816 backend) is not upstreamable by nature.
 
 **Symptom**: every sync with upstream `cproc` or `qbe` requires a
 non-trivial rebase of the local patch stack. The maintainer-facing
@@ -1192,7 +1239,13 @@ tests don't currently exercise 32-bit math).
 
 ---
 
-#### A8. MSYS2 cproc non-deterministic segfaults — BELIEVED FIXED, under telemetry 🟡 (2026-07-04)
+#### A8. MSYS2 cproc non-deterministic segfaults — BELIEVED FIXED, under telemetry 🟡 (2026-07-04; retirement step due since 2026-09-04)
+
+**2026-09-13**: the 2–3 month zero-count window set below has elapsed
+(since 2026-09-04). Remaining step: drop the `cc65816` x3 retry, keep the
+monthly stress monitor, close this entry and the `KNOWN_LIMITATIONS.md`
+note. The `sanitizers` CI job (2026-09-12) now covers cproc under ASan +
+UBSan on every push, which is the standing detector this entry lacked.
 
 Previously only a side-note in A3's log and KNOWN_LIMITATIONS; promoted to
 its own entry when the 2026-07-04 P3 investigation produced a verdict.
@@ -1565,7 +1618,25 @@ linker side requires care to avoid breaking existing examples.
 
 ---
 
-#### B3. No `mode7LoadGraphics` helper for non-bank-`$00` data 🟠
+#### B3. No `mode7LoadGraphics` helper for non-bank-`$00` data — RESOLVED 🟢 (A6 + `dmaCopyVramMode7`, confirmed 2026-09-13)
+
+**Status update 2026-09-13**: closed on both counts. The bank half went
+with A6 (v0.19.0): `dmaCopyVramMode7` takes far pointers and writes each
+one's bank byte to `$4304` (`lib/source/dma.asm`, `lda 15,s` / `lda 9,s`).
+The helper half was never missing: `dmaCopyVramMode7` *is* the interleaved
+loader (tilemap to VMDATAL with VMAIN=$00, tiles to VMDATAH with
+VMAIN=$80). Four of the six Mode 7 examples already called it; the D2
+refresh commit migrated the last two asm loaders (`rotate_scale`'s
+`asm_loadMode7Data`, which was the same two DMAs plus a CGRAM copy, and
+`perspective`'s `asm_loadSkyData`, two word-mode `dmaCopyVram` calls) —
+the original acceptance test, met. The
+`mode7LoadGraphics()` named by `docs/tutorials/mode7.md` and `mode7.h`
+never existed — both fixed in the D2 refresh commit.
+
+---
+
+**Original entry (preserved for context)**:
+
 
 **Symptom**: `dmaCopyVramMode7(tilemap, mapSize, tiles, tilesSize)`
 exists but assumes both pointers are in bank `$00`. The two shipped Mode 7
@@ -1613,10 +1684,24 @@ pass — same root cause, same review reviewer.
 
 ---
 
-#### B4. `hdmaSetup` hardcodes bank `$00` — PARTIAL 🟡 (API shipped; example migration pending)
+#### B4. `hdmaSetup` hardcodes bank `$00` — RESOLVED 🟢 (subsumed by A6, confirmed 2026-09-13)
+
+**Status update 2026-09-13**: `hdmaSetup()` reads the table's bank byte
+from the 4-byte pointer (`lib/source/hdma.asm`: `lda 7,s` → `$43x4`
+A1B) since A6, so the "unsafe form" of the 05-13 note no longer exists.
+Since #127.3 the nine examples that call it keep their tables in the
+asset banks, and the visual baselines are green — the migration the
+05-13 note asked for turned out unnecessary. `hdmaSetupBank()` stays for
+a bank chosen by hand (a table assembled outside C, a computed address).
+`hdma.h`'s "Bank Byte Limitation" paragraph was the last trace of the
+pre-A6 world; fixed in the same commit. Path correction: the example is
+`examples/hdma/hdma_helpers` (reorg of 2026-07-31).
+
+---
+
 
 **Status update 2026-05-13**: `hdmaSetupBank()` is shipped and
-documented. `examples/graphics/effects/hdma_helpers` uses the
+documented. `examples/hdma/hdma_helpers` (then `examples/graphics/effects/hdma_helpers`) uses the
 bank-aware variant. Four other HDMA examples (`hdma_wave`,
 `window`, `gradient_colors`, `transparent_window`) still use the
 unsafe `hdmaSetup()` form — they happen to keep their tables in
@@ -1873,7 +1958,20 @@ question:
 
 ---
 
-#### C2. Sprite/text C/ASM parallel implementations 🟠
+#### C2. Sprite/text C/ASM parallel implementations — RESOLVED 🟢 (confirmed 2026-09-13)
+
+**Status update 2026-09-13**: the duplication is gone. `sprite.c` (323
+LOC) is the C API; `sprite_oamset.asm` (173) is `oamSet` alone, the A4
+rewrite, and `sprite_lut.asm` (171) its lookup tables. `text.c` (269) and
+`text4bpp.c` (26) are the C API; `text.asm` (290) and `text4bpp.asm` (360)
+are the font bitmaps plus `asm_textDMAFont`, `asm_textFillBuffer`,
+`asm_textDMAFont4bpp`. No function name is defined in both a `.c` and an
+`.asm` file (checked across `lib/source/` in the D2 refresh). That is the
+"C API + ASM inner loop" shape the entry asked for; the audio v2 chantier
+(2026-07) removed the last legacy ASM module.
+
+---
+
 
 **Symptom**: `lib/source/` has both `sprite.c` (332 LOC) and the
 sprite_*.asm files (oamset 173, dynamic 1232, lut 171); both `text.c`
@@ -2030,7 +2128,20 @@ conventions and snes9x's ROM-load path.
 
 ---
 
-#### D2. SA-1 SIWP register init is "unsourced assumption" 🟡
+#### D2. SA-1 SIWP register init is "unsourced assumption" — RESOLVED 🟢 (corpus arbitration, 2026-09)
+
+**Status update 2026-09-13**: the premise ("unsourced") is gone. The
+polarity was arbitrated against the official Nintendo manual, fullsnes,
+nocash's notes and the SFC dev wiki (the one dissenting source) — see the
+🟢 entry in `KNOWN_LIMITATIONS.md` and the `snes_verify` sweep of
+2026-09-12 (`.claude/notes/reviews/2026-09-12_hardware_claims_verify.md`).
+`templates/crt0.asm` says "bit=1 = write-enable, $FF = fully writable"
+with the reference, not "maybe". A hardware run on an FXPak Pro would be a
+welcome confirmation but is not what closes the entry: the defect was the
+missing arbiter, and the corpus is that arbiter now (`hardware_claims.md`).
+
+---
+
 
 **Symptom**: `templates/crt0.asm:557+` initialises the SA-1 by writing
 `$FF` to register `$002229` (SIWP) with the inline comment "*maybe
@@ -2361,6 +2472,11 @@ Legend:
 
 ### Cluster summary
 
+> *(2026-09-13: the matrix and this summary are the baseline record. Every
+> cluster below has since collapsed — A6 shipped and absorbed B1–B4, C1/C2
+> and D1/D2 are closed; only A5, A8 and D3 remain, and none of them
+> interacts with another open item.)*
+
 - **Compiler cluster**: A1 (shipped partial) / A3 / A4 / A6 are
   inter-related; A5 is downstream of all of them (each adds patches).
   A2 is independent. **A6 is the new umbrella for the entire
@@ -2384,164 +2500,91 @@ Legend:
 
 ## 5. Difficulty classification
 
-Effort estimates assume **focused work** by a contributor with the
-relevant background (compiler, lib, ASM, hardware testing). Calendar
-time can be 2–3× longer for part-time work. Risk is the chance of
-unexpected scope expansion.
+*(Rewritten 2026-09-13 around the live ledger. The 2026-05-08 tier table
+is in git history — `git show 19085a13:.claude/STRUCTURAL_DEFECTS.md`.)*
 
 | Tier | Effort | Items | Risk profile |
 |---|---|---|---|
-| **Tier 0 — Done** | hours | **A1 partial (`int=2, long=4`)** — shipped 2026-05-08 | None remaining. |
-| **Tier 1 — Multi-month** (foundational) | — | (vacated; A1 was here pre-investigation) | — |
-| **Tier 2 — Multi-week (compiler — pointer ABI)** | 2–4 weeks | **A6** (pointer ABI + bank-byte preservation) | **Very high**. Touches the same emit code as the C.5 patch; affects every framework opt-in via indirect-call sequence. Subsumes B1 / B3 / B4 if it ships. |
-| **Tier 2 — Multi-week (compiler — allocator)** | 2–4 weeks | A4 (oamSet framesize) | High. Allocator work; could improve everything but could also regress. |
-| **Tier 2 — Multi-week (lib API)** | 2–3 weeks | B1 (+ B3, B4 absorbed) — *only if A6 is deferred* | Medium. API-additive (no breaking changes); audit-heavy. **Closed if A6 lands**. |
-| **Tier 2 — Multi-week (lib ABI)** | 2–3 weeks | B2 (C RAM <`$2000`) — *subset of A6* | Medium. **Closed if A6 lands**. |
-| **Tier 2 — Multi-week (ASM audit)** | 2–3 weeks | C2 (sprite/text dup) | Medium. Perf-critical, requires benchmark backing. |
-| **Tier 2 — Multi-week (ASM audit, larger)** | 4–6 weeks | C1 (5 ASM modules audit) | Medium. Subsumes C2; sequential per module. |
-| **Tier 3 — Weeks** | 1–2 weeks | A2 (volatile), A3 (TCO non-frameless), E2 (hard gate) | Low–Medium. Self-contained patches. |
-| **Tier 3 — Weeks (math expansion)** | 1 week each | B5 (fixed32), B6 (atan2/sqrt/pow) | Low. Additive helpers. |
-| **Tier 3 — Days–week (toolchain)** | 3–5 days | D1.a (Mesen2 mandatory), B3 / B4 standalone | Low. CI / API additions. |
-| **Tier 3 — Days–week (NMI lint)** | 1–2 weeks | E1 (depending on option) | Low–Medium. |
-| **Tier 4 — Days** | 1–5 days | D2 (SA-1 hardware test) | Low. Requires physical hardware. |
-| **Tier 5 — Long-term ongoing** | 3–6 months part-time | A5 (fork upstreaming) | Low per patch, high cumulatively. Depends on upstream review cycles. |
-| **Tier 6 — Not addressable** | N/A | D3 (SuperFX no C) | Documented for record only. |
+| **Ongoing** | per PIN bump | **A5** fork divergence — 21 cproc / 60 QBE / 2 wla-dx patches, gated by the upstream suites; three upstream reports queued | Low per patch. The cost is now measured (suite ratchets) rather than felt. |
+| **Days** | 1 day | **A8** — drop the `cc65816` x3 retry, close the entry and the `KNOWN_LIMITATIONS.md` note; keep the monthly stress monitor | Low. The sanitizer job is the standing detector. |
+| **Not addressable** | N/A | **D3** SuperFX has no C compiler | Documented for record only. |
 
-### Total addressable effort (revised)
+Resolved and not coming back: A1, A2, A3, A4, A6, A7, A9, B1, B2, B3, B4,
+B5, B6, C1, C2, D1, D2, E1, E2 — 19 of the 22 catalogued items, each with
+its evidence in the entry's status line and in §7.
 
-A6 lands → B1 + B2 + B3 + B4 are subsumed (closed without separate
-chantiers). The total effort for the addressable items reduces:
+### Remaining addressable effort
 
-- **If A6 lands**: ~5–7 person-months (was 6–9; A6 absorbs ~6 weeks
-  of B-cluster work).
-- **If A6 is deferred indefinitely**: ~6–9 person-months as before, but
-  the lib API ends up with redundant `*Bank` variants forever.
-
-A6 is therefore the highest-leverage chantier in the catalogue — it
-either replaces 4 separate B-cluster chantiers or stays as a known
-deficit. There is no in-between.
+About **one day** (A8) plus A5's per-bump upkeep. The 6–9 person-months
+of the 2026-05-08 estimate were spent between 2026-05 and 2026-09, most
+of them on A6/A7 (pointer ABI), B2 (far RAM) and #127.3 (const data
+placement), which between them closed the whole B cluster.
 
 ---
 
 ## 6. Strategic sequencing
 
-Three plausible deployment paths, optimising for different objectives.
+*(Rewritten 2026-09-13. The three 2026-05-08 paths — "risk reduction
+first", "adoption unlock", "foundational compiler work" — are superseded:
+their leading items (A6, D1.a Mesen2, A2, E1, B5/B6, A4) have all
+shipped or been closed by the luna migration.)*
 
-### Path 1 — Risk reduction first
+The live plan is no longer in this file. It is the backlog of the
+2026-09-11 gaps review (`.claude/notes/reviews/2026-09-11_gaps_review.md`,
+§10 backlog and §11 ordering): Tier 1 is done with this refresh, Tier 2
+is next (runtime C-feature ROM, struct-by-value decision, lib runtime
+asserts, cppcheck, fuzzing of the asset parsers, tool goldens in CI, an
+in-repo luna reference, the `wip/*` table in ROADMAP, a PAL pass, `luna
+profile` as the cycle instrument). That review is about instruments and
+knowledge gaps, which is where the leverage is now: each instrument it
+added in Tier 1 (warnings as errors, random power-on RAM, sanitizers,
+upstream suites, measured ROM coverage) found defects in code that had
+passed every previous gate.
 
-Order:
-1. **D1 path a (Mesen2 mandatory)** — 3–5 days. Closes the SuperFX
-   validation gap with minimum effort. Real risk reduction (chip ROMs
-   currently ship without runtime validation).
-2. **A2 (volatile crash)** — 1–2 weeks. A real compiler bug; fixing it
-   removes a documented `KNOWN_LIMITATIONS` 🟠 entry.
-3. **E1 (NMI lint, option 1 — source-level grep)** — 1–2 days. Cheap
-   quick-win on a 🔴 silent corruption mode.
-4. **D2 (SA-1 hardware test)** — 1–2 days, given hardware.
-5. **A3 (TCO non-frameless)** — 1–2 weeks. Closes `--allow-known-bugs`
-   in CI.
+What this catalogue still owns:
 
-Total: ~6–8 weeks. After this path, the SDK has no remaining 🔴 silent
-corruption modes documented as "user discipline mitigates" — every
-🔴 has either a fix or an automated check.
-
-**Pros**: every item is bounded, low-risk, individually shippable.
-**Cons**: doesn't unlock new capabilities (no new lib API, no fixed
-type sizes).
-
-### Path 2 — Adoption unlock (**revised after A1 partial / A6 emergence**)
-
-Order:
-1. **A6 (pointer ABI + bank-byte preservation)** — 2–4 weeks. The
-   single highest-leverage chantier in the catalogue. Subsumes B1 +
-   B2 + B3 + B4 if it lands cleanly. Lets user data live in any bank,
-   eliminates the 6-example bank-`$00`-strangled cluster, removes the
-   need for `*Bank` API variants forever.
-2. **D1.a (Mesen2 mandatory)** — 3–5 days. Ships in parallel; no
-   cost to combine.
-3. **B5 + B6 (fixed32 + math LUTs)** — 2 weeks combined. New helpers
-   that game developers will actually use. Independent of A6.
-4. **A4 (oamSet framesize)** — 2–4 weeks. Improves performance for
-   every user across the lib's helper functions.
-
-Total: ~3 months. After this path, the SDK is **substantially more
-capable for new users** — the structural friction blocking large
-projects (bank `$00` wall, 8.8 fixed-point only, oamSet perf cliff) is
-lifted.
-
-**Pros**: maximum adoption-impact per unit effort. Aligns with
-ROADMAP v1.0 must-haves. A6 first means B1/B2/B3/B4 evaporate.
-**Cons**: A6 is high-risk; if it fails to land, fall back to B1
-(lib API extension) which is lower-risk but less complete.
-
-### Path 3 — Foundational compiler work
-
-Order:
-1. **A6 (pointer ABI)** — 2–4 weeks. Replaces "A1 with pointers"
-   from the original Path 3 plan. A1 partial (`int=2, long=4`)
-   already landed.
-2. **A2 (volatile crash)** — 1–2 weeks. Independent.
-3. **A3 (TCO non-frameless)** — 1–2 weeks.
-4. **A4 (oamSet framesize)** — 2–4 weeks.
-5. **A5 (upstreaming campaign)** — long-term ongoing.
-
-Total: ~3–4 months. After this path, the SDK has a **substantially
-cleaner compiler foundation** — proper 24-bit pointers, no
-`--allow-known-bugs` flag, no `volatile` bug, the `oamSet` perf cliff
-gone, and (eventually) the patch divergence narrowed.
-
-**Pros**: addresses the deepest defects; future lib + tool work
-becomes easier.
-**Cons**: high risk on A6 (the same code paths that had the C.5
-bug), slow to ship anything user-visible.
-
-### Recommended path (default, revised 2026-05-08)
-
-**Path 2 (adoption unlock)** with **A6 as the leading chantier**, plus
-the **risk-reduction quick wins from Path 1** (D1.a, E1 option 1)
-running in parallel.
-
-Rationale:
-- A1 partial already shipped — the foundation is laid.
-- A6 is the natural next step. Successful A6 collapses 4 separate
-  Category-B chantiers into one chantier's deliverable.
-- Path 1's quick wins (D1.a, E1) are cheap and shippable in parallel
-  with A6's investigation phase.
-- A6 is genuinely higher-risk than the rest; if it fails to land
-  cleanly within the 2-4 week budget, fall back to B1 (the safer
-  lib-API extension path) without penalty — the work done on A6's
-  investigation informs B1's design.
-
-Expected calendar: **3–4 months**, depending on contributor
-availability and whether A6 succeeds on first attempt.
+1. **A8** — retire the retry (one day), the next time the Windows leg is
+   touched.
+2. **A5** — send the three queued upstream reports when the owner opens
+   that window; add the fork's base commit and the suite verdicts to each
+   PIN bump's commit message (the H1 runner prints them).
+3. **Intake rule** — a defect found by one of the review's instruments is
+   catalogued here only if it needs a multi-day chantier. The nine
+   sanitizer bugs, the QBE 2-pass use-after-free and the VOFS quirk were
+   all fixed in the commit that found them and never entered this file;
+   that is the intended path.
 
 ---
 
 ## 7. Acceptance criteria summary
 
-A condensed table of "how do we know each item is done":
+*(Rewritten 2026-09-13: one line per item, the acceptance test as
+originally set and the evidence that met it, or what is still owed.)*
 
-| ID | Acceptance test |
-|---|---|
-| A1 (partial — shipped 2026-05-08) | `sizeof(int) == 2`, `sizeof(long) == 4` on w65816; 264/265 quick suite green (1 baseline drift accepted on `basics/random`); 7 cproc patches in PINS.md (was 6); pointer change deferred to A6. |
-| A2 | `volatile` loop test compiles + runs; QBE patch (29th) submitted upstream. |
-| A3 | All 5 `[KNOWN_BUG]` cleared; `--allow-known-bugs` removed from CI. |
-| A4 | `oamSet` framesize ≤ 32 bytes; bench shows multi-arg helpers improved. |
-| A5 | ≥ half of patches accepted upstream; PINS.md updated. |
-| A6 | `sizeof(void *) == 4` (24-bit + 1 pad); indirect-call emit reads bank byte from pointer; 265/265 quick suite green; SA-1 / SuperFX function-pointer examples Mesen2-validated; B1 / B2 / B3 / B4 closed as subsumed; C.5 padding fix can be reverted. |
-| B1 | 12–15 `*Bank` variants shipped; 6 tightest examples ≥ 256 bytes free; ratchet bumped to 256. **Closed if A6 lands.** |
-| B2 | C variables at `$7E:2500` work; regression test green; templates updated. |
-| B3 | `dmaCopyVramMode7Bank` shipped; 2 Mode 7 examples migrated. |
-| B4 | All HDMA examples on bank-aware path; `hdmaSetup` deprecated for ROM tables. |
-| B5 | `fixed32` + helpers shipped; 16.16 example shipped; tutorial updated. |
-| B6 | `atan2_lut`, `sqrt_lut`, `pow_lut` shipped; tutorial updated. |
-| C1 | Per-module decision document; cycle bench stable; lib/ARCHITECTURE.md written. |
-| C2 | Single canonical form per duplicated function; bench ≤ +5 %. |
-| D1 | (a) Mesen2 mandatory in CI; or (b) snes9x detects GSU; baselines captured. |
-| D2 | `docs/hardware/SA1_VALIDATION.md` written; SIWP comment updated; severity → 🟢. |
-| D3 | Not applicable. |
-| E1 | NMI lint exists, runs in CI, fails on detection; regression test green. |
-| E2 | Hard-gate policy documented; override mechanism shipped; sample PR demonstrates. |
+| ID | Status | Acceptance test → evidence |
+|---|---|---|
+| A1 | 🟢 v0.20.0 | `sizeof(int) == 2`, `sizeof(long) == 4` on w65816 → `KNOWN_LIMITATIONS.md` "int and long sizes AND semantics"; A7 runtime ROM 19/19 |
+| A2 | 🟢 2026-05-09 | `volatile` honoured by QBE → the `volat` bit through loadopt / promote / gcm; `KNOWN_LIMITATIONS.md` 🟢 entry |
+| A3 | 🟢 2026-05-09 | `[KNOWN_BUG]` markers cleared, `--allow-known-bugs` removed (`270cf31d`) |
+| A4 | 🟢 2026-03-03 | `oamSet` framesize cliff → ASM rewrite (`sprite_oamset.asm`) |
+| A5 | 🟡 ongoing | PIN bump gated by `make test-toolchain-suites` (H1, 2026-09-13) — met; "≥ half of patches accepted upstream" — replaced by "generic fixes reported upstream", three queued |
+| A6 | 🟢 v0.19.0 | `sizeof(void *) == 4`, bank byte read at every lib boundary → A6 matrix 14/14, ASM ABI lint |
+| A7 | 🟢 v0.21.2 | `Kl` pair lowering → A7 runtime ROM 19/19 |
+| A8 | 🟡 due | zero retry firings for 2–3 months → met since 2026-09-04; owed: drop the retry, close the entry |
+| A9 | 🟢 2026-09-06 | access flag no longer pins loads → lib −4.25 % instructions, corpus byte-identical where expected |
+| B1 | 🟢 subsumed | closed by A6 + #122 + #127 — no `*Bank` API variants needed |
+| B2 | 🟢 2026-09-06 | C objects above `$2000` via `FAR` → B2 runtime ROM 25/25, `symmap --check-ram-budget` |
+| B3 | 🟢 2026-09-13 | bank-aware Mode 7 loader → `dmaCopyVramMode7` reads both banks (A6); six examples on it; docs corrected |
+| B4 | 🟢 2026-09-13 | HDMA tables in any bank → `hdmaSetup` reads the pointer bank (A6); nine examples' tables in the asset banks, baselines green; `hdma.h` corrected |
+| B5 | 🟢 | `fixed32` + helpers, 16.16 example, tutorial |
+| B6 | 🟢 | `atan2` / `sqrt` / `pow` LUT helpers, tutorial |
+| C1 | 🟢 | per-module ASM decision; audio v2 (2026-07) retired the last legacy ASM module |
+| C2 | 🟢 2026-09-13 | one implementation per function → no name defined in both a `.c` and an `.asm` under `lib/source/` |
+| D1 | 🟢 v0.21.0 | GSU executed under test → luna runs SA-1 / SuperFX / DSP-1 natively; SuperFX baselines in the corpus |
+| D2 | 🟢 2026-09 | SIWP value sourced → arbitrated against four sources, `KNOWN_LIMITATIONS.md` 🟢, crt0 comment without "maybe"; hardware run optional |
+| D3 | intrinsic | not applicable |
+| E1 | 🟢 | NMI → `$2180–$2183` lint in `make/common.mk`, fails the build |
+| E2 | 🟢 | cycle-count gate → `bench` in `functional-tests`; `luna profile` is the next instrument (review R4) |
 
 ---
 

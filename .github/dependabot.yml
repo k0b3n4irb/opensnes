@@ -1,0 +1,13 @@
+# Supply-chain hygiene (gaps review P6, 2026-09-15). Every `uses:` in the
+# workflows is pinned to a commit SHA with the tag as a trailing comment;
+# Dependabot keeps both in step. Submodules are NOT covered on purpose:
+# compiler/{cproc,qbe,wla-dx} are forks pinned by compiler/PINS.md and bumped
+# through `make verify-toolchain` + the upstream suites, never automatically.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [ci]

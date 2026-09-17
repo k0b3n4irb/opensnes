@@ -1,0 +1,29 @@
+# move_sprite has no game globals — x/y are locals in main() — so the
+# assertable state is the OAM shadow buffer the loop writes through
+# oamSetXY: oamMemory[0] is sprite 0's X low byte, oamMemory[1] its Y
+# (OAM stores y-1, hence 95 for the C-side y = 96). SPEED is 2 px/frame,
+# so each 29-frame hold is worth exactly 58 px — the value is predicted
+# from the script, not read off a screenshot. Each leg also asserts the
+# axis that was NOT pressed: holding RIGHT must not move Y, holding DOWN
+# must not move X.
+rom = "../../../examples/input/move_sprite/move_sprite.sfc"
+
+[[checkpoint]]                 # baseline: the sprite sits where main() put it
+at_frame = 60
+[checkpoint.values]
+oamMemory = { eq = 112, width = 1 }      # x = 112
+"7E:0301" = { eq = 95, width = 1 }       # y = 96 - 1
+
+[[checkpoint]]                 # RIGHT for 29 frames -> x += 58, y untouched
+at_frame = 120
+input = "60:0x0100,89:0"
+[checkpoint.values]
+oamMemory = { eq = 170, width = 1 }      # 112 + 29*2
+"7E:0301" = { eq = 95, width = 1 }
+
+[[checkpoint]]                 # DOWN for 29 frames -> y += 58, x untouched
+at_frame = 180
+input = "120:0x0400,149:0"
+[checkpoint.values]
+oamMemory = { eq = 170, width = 1 }
+"7E:0301" = { eq = 153, width = 1 }      # 95 + 29*2

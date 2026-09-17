@@ -63,12 +63,14 @@
  *          channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram).
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
- * ## Bank Byte Limitation
+ * ## Bank byte
  *
- * hdmaSetup() hardcodes bank $00 for ROM addresses (>= $8000). If the
- * linker places a SUPERFREE table in bank $01+, HDMA will read wrong data.
- * Use hdmaSetupBank() with an explicit bank byte for ROM tables, or use
- * RAM-based tables (always bank $00) for dynamic effects.
+ * The table pointer is a 4-byte far pointer (chantier A6, v0.19.0):
+ * hdmaSetup() programs the channel's source bank from the pointer's bank
+ * byte, so a table in any ROM bank (the asset banks, where C const data
+ * lives since #127.3) or in bank $7E RAM works as is. hdmaSetupBank()
+ * remains for a bank chosen by hand: a table assembled outside C, or an
+ * address computed at runtime.
  *
  * ## IMPORTANT: Scroll Registers Require Repeat Mode
  *
@@ -263,9 +265,10 @@ void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
 /**
  * @brief Set up an HDMA channel with explicit source bank byte.
  *
- * Same as hdmaSetup() but allows specifying the ROM bank for HDMA tables
- * in banks other than $00. Use this when your HDMA table is in a SUPERFREE
- * section that may be placed in bank $01+ by the linker.
+ * Same as hdmaSetup() but with the source bank given explicitly instead of
+ * taken from the pointer. hdmaSetup() already follows the pointer's bank
+ * byte (chantier A6), so this form is for tables addressed by a 16-bit
+ * offset you pair with a bank yourself (assembled outside C, computed).
  *
  * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or _7)
  * @param mode     Transfer mode (HDMA_MODE_*)

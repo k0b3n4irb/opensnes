@@ -298,7 +298,7 @@ Total audio RAM: 64KB
 3. **Test on hardware** - Emulator timing may differ
 4. **Use echo sparingly** - Takes 4KB+ of audio RAM
 
-## Examples
+## Example ROMs
 
 - `examples/audio/snesmod_music/` - Music playback demo
 - `examples/audio/snesmod_sfx/` - Sound effects demo

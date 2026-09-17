@@ -1,0 +1,31 @@
+# examples/audio/echo, dry leg — START really turns the echo OFF, and turns
+# off nothing else.
+#
+# The example exists for one A/B: press START and the hall vanishes. That A/B
+# is audible only; the backdrop tint (purple -> grey) is the only visible cue
+# and a CGRAM write would keep passing fbhash even if audioDisableEcho() never
+# reached the S-DSP. Here START is scripted and the DSP register file is read
+# back at frame 300:
+#   - the three registers that MUST change: EON 0xFF -> 0, EVOL_L/R 0x28 -> 0,
+#     FLG bit5 (ECEN, echo writes disabled) 0 -> 0x20;
+#   - the four that MUST NOT: EFB, EDL, ESA and FIR0 keep their configured
+#     values, because audioDisableEcho() is documented to mute and stop the
+#     ring, not to tear the echo configuration down. A driver that reset the
+#     whole echo block on mask 0 would pass a "does it go quiet?" test and
+#     fail here.
+# Measured with `--until-frame 300 --input "220:0x1000,225:0"`. START is a
+# padPressed() edge, so a 5-frame pulse toggles exactly once.
+rom = "../../../examples/audio/echo/echo.sfc"
+frames = 300
+input = "220:0x1000,225:0"
+
+[asserts.dsp]
+EON    = 0x00        # changed: no voice routed into the echo any more
+EVOL_L = 0x00        # changed: wet signal muted
+EVOL_R = 0x00
+FLG    = 0x20        # changed: ECEN set — the DSP stopped writing the ring
+EFB    = 0x5A        # unchanged: feedback survives the toggle
+EDL    = 0x06        # unchanged: the ring is still sized
+ESA    = 0xC0        # unchanged: still at $C000
+FIR0   = 0x7F        # unchanged: the FIR was not re-uploaded
+DIR    = 0x0A
