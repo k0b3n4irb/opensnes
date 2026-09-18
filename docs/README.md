@@ -158,28 +158,29 @@ naming most of the API.
 | `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `window.h` | [Window](tutorials/window.md) | ✅ |
 | `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
-| `debug.h` | [Debugging](tutorials/debugging.md) mentions the channel | ❌ the two functions are undocumented |
-| `fixed32.h` | — | ❌ no tutorial ([Math](tutorials/math.md) covers 8.8 only) |
+| `debug.h` | [Debugging](tutorials/debugging.md) — recipe 7 | ✅ |
+| `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
 | `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
-| `lzss.h` | — | ❌ no tutorial (decompression) |
+| `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
 | `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects, listed in the page's Gotchas |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
-The ❌ rows left are `fixed32.h`, `lzss.h` and `debug.h` — ten functions
-between them, each of which belongs in an existing page rather than one of
-its own (16.16 maths in the [Math](tutorials/math.md) tutorial, decompression
-in [Graphics](tutorials/graphics.md), the debug channel in
-[Debugging](tutorials/debugging.md)).
+**Every public header is now covered.** The last three were small enough to
+belong in an existing page rather than one of their own: 16.16 maths went
+into the [Math](tutorials/math.md) tutorial, LZ77 decompression into
+[Graphics](tutorials/graphics.md), and the in-ROM debug channel into
+[Debugging](tutorials/debugging.md) as recipe 7.
 
 The map is worth keeping honest for a reason the last two days made plain:
 **writing a page is a detection instrument.** Closing `object.h`, `text.h`,
 `gameloop.h` and `asset.h` turned up ten defects in the code being
 documented — a field comment that invited a buffer overrun, an action stored
 to the wrong entity, a connection test that called every idle pad unplugged,
-an example that taught readers to write VRAM outside VBlank, and two
-compiler-bug notes that had been fixed long ago and were still scaring
-people off correct C.
+an example that taught readers to write VRAM outside VBlank, two compiler-bug
+notes that had been fixed long ago and were still scaring people off correct
+C, and a compression example whose headline figures were wrong by an order of
+magnitude in the pessimistic direction.
 
 ## Building the documentation
 

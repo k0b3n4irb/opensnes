@@ -180,6 +180,58 @@ fixed lerped = fixLerp(FIX(0), FIX(100), 128);  /* 50.0 — t=128/256=0.5 */
 (returns `a`) to `256` (returns `b`). Linear; the canonical way to
 animate values smoothly between two endpoints.
 
+## 16.16 when 8.8 runs out of room
+
+`fixed` (8.8) holds ±127.99 in steps of 1/256. That is the right size for a
+velocity, a screen coordinate or a fade level, and it costs almost nothing.
+It is the wrong size for a world coordinate on a large map, an accumulator
+that integrates over many frames, or anything that must stay precise while
+also being large — 8.8 overflows at 128.
+
+`<snes/fixed32.h>` is the same idea one register wider: `fixed32` is an
+`s32` split 16 bits of integer and 16 of fraction, so ±32767 in steps of
+1/65536. Opt in with the module:
+
+```makefile
+LIB_MODULES += fixed32          # pulls in math for the sine table
+```
+
+```c
+fixed32 x     = FIX32(100);            /* 100.0 */
+fixed32 third = FIX32_MAKE(0, 21845);  /* 0.333... — integer and fraction parts */
+u16 frac      = FIX32_FRAC(third);     /* the raw fractional half */
+```
+
+The arithmetic you would expect is inline and free — `fix32Abs`,
+`fix32Clamp`, `fix32Min`, `fix32Max`, `fix32Lerp` — and addition and
+subtraction are plain C operators, because two 16.16 values add like any
+other integer.
+
+Four operations are not free, and their cost is the whole reason to think
+before reaching for 16.16:
+
+| Operation | Cost | Notes |
+|---|---|---|
+| `fix32Mul(a, b)` | ~280 cycles | four hardware 8×8 multiplies behind three partial products; overflow wraps modulo 2^32 |
+| `fix32Div(a, b)` | ~1500 cycles | one quotient bit per iteration over an 80-bit working register — use sparingly in a loop |
+| `fix32Sin(angle)` | table lookup | 8-bit angle, so 256 steps around the circle |
+| `fix32Cos(angle)` | table lookup | same table, quarter-turn offset |
+
+`fix32Lerp` is inline on top of `fix32Mul`, so it costs the multiply and
+nothing more, and it extrapolates happily outside `[0, FIX32(1)]`.
+
+A rule of thumb that holds on this machine: **keep the world in 16.16 and
+the screen in 8.8**. `examples/basics/fix32_orbit` does exactly that — the
+orbit is computed with `fix32Sin`/`fix32Cos` at 16.16 and only the final
+screen position is narrowed — and `examples/basics/aim_target` uses the
+wider type for the aiming maths behind an 8.8 presentation.
+
+@note `fix32Sin` and `fix32Cos` are implemented in assembly. Two compiler
+bugs once made the obvious C body wrong, which is why; both were fixed long
+ago, and `devtools/libtests` now computes that C expression alongside the
+assembly one and asserts they agree. The assembly stays because there is no
+reason to churn a working routine.
+
 ## Worked patterns
 
 ### Smooth sprite movement

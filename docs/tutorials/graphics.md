@@ -202,6 +202,41 @@ sprite_pal:
 sprite_pal_end:
 ```
 
+## Compressed tiles (LZ77)
+
+Tile data compresses well — it is repetitive by construction — and the SDK
+can decompress it straight into VRAM, so the ROM carries the small form and
+the PPU gets the big one. Add `-z` to the gfx4snes invocation and link the
+module:
+
+```makefile
+LIB_MODULES := console lzss background sprite
+...
+	$(GFX4SNES) -z -s 8 -o 16 -u 16 -e 0 -p -m -i $<
+```
+
+```c
+extern u8 patterns[];      /* the compressed .pic, as produced by -z */
+
+setScreenOff();            /* VRAM writes need forced blank */
+LzssDecodeVram(patterns, VRAM_BG_TILES);
+setScreenOn();
+```
+
+The saving is worth measuring rather than assuming. For the artwork in
+`examples/backgrounds/mode1_lz77`, the compressed `.pic` is **652 bytes**
+and its LZ77 header declares **2592 bytes** of tile data — the same 2592
+bytes that `examples/backgrounds/mode1` stores uncompressed for the same
+image. That is a quarter of the ROM footprint for one call at load time.
+
+The format is the familiar GBA-style LZ77: a `0x10` tag byte, a three-byte
+little-endian decompressed length, then flag bytes whose bits select a
+literal or a back-reference. Any tool that emits that layout will do.
+
+@warning `LzssDecodeVram` writes VRAM directly and disables interrupts
+while it runs. Call it during forced blank, with the rest of your setup —
+not from a running frame, where the PPU would drop the writes silently.
+
 ## Example: Complete Background Setup
 
 See `examples/scrolling/parallax_scroll/` for a complete parallax scrolling example.

@@ -5,10 +5,13 @@
  *
  * Demonstrates ROM space savings by storing tile data in LZ77-compressed
  * form and decompressing directly into VRAM at load time using
- * LzssDecodeVram(). The compressed .pic file occupies ~8.5 KB in ROM but
- * expands to ~12.5 KB of 4bpp tile data in VRAM, achieving a 31% size
- * reduction. The tilemap and palette are stored uncompressed and loaded
- * via standard DMA.
+ * LzssDecodeVram(). Measured on this example's own asset: the compressed
+ * .pic is 652 bytes and its LZ77 header declares 2592 bytes of tile data —
+ * the same 2592 bytes examples/backgrounds/mode1 stores uncompressed for
+ * the same image, so the ROM footprint is a quarter of the original. (An
+ * earlier version of this comment claimed ~8.5 KB expanding to ~12.5 KB
+ * for a 31% saving; both figures were wrong.) The tilemap and palette are
+ * stored uncompressed and loaded via standard DMA.
  *
  * The gfx4snes tool produces LZ77-compressed output when invoked with the
  * -z flag. LzssDecodeVram() handles the VRAM write timing internally.
