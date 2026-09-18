@@ -527,11 +527,18 @@ the shipped ROMs. Seven of the fifteen public functions
 `objKill`, `objKillAll`, `objRefreshAll`) are never executed by any example in
 the corpus — see `tools/luna-test/ROM_COVERAGE.md`. Treat them as untested.
 
-### 🔴 `objInitFunctions` hardcodes bank `$00` for your callbacks
+### 🟢 `objInitFunctions` stored garbage — fixed 2026-09-18
 
-Covered above. Your C callbacks are in bank `$01` today. Register types with
-an assembly routine using `:label`, as both examples do, or you will dispatch
-to the wrong bank with no diagnostic.
+It read its arguments with the **pre-A6 stack map**, from before pointers
+became four-byte slots, so every offset was wrong: what it took for the type
+was the update callback's bank byte. Its comment then claimed C could not
+pass a bank byte at all, and it wrote `$00` into all three. Both examples
+worked around it with a hand-written assembly routine using `:label`.
+
+The compiler pushes `pea.w :fn` alongside `pea.w fn` for every pointer, so
+the bank is on the stack — the routine now reads it. Both examples dropped
+their shim and register from C, and their manifests pass unchanged, which is
+what proves the dispatch reaches bank `$01` correctly.
 
 ### 🔴 A type with no registered callbacks jumps into nowhere
 
@@ -544,21 +551,23 @@ call `objRefreshAll()` — a null refresh pointer on an on-screen object is the
 same crash. Both examples store 0 in `objfctref` **and** never call
 `objRefreshAll()`; that pairing is load-bearing.
 
-### 🔴 `objLoadObjects` ignores the bank byte of the pointer you pass
+### 🟢 `objLoadObjects` ignored the bank byte of your pointer — fixed 2026-09-18
 
-The routine block-copies the table into its scratch buffer with the source
-bank hardcoded to `$00`. The examples get away with it because their `.o16`
-data sits in a `SUPERFREE` section that the linker happens to place in bank
-`$00`. Put the table in an `ASSET_SECTION` (which deliberately excludes bank
-`$00`, see `.claude/rules/bank0_budget.md`) and it will silently load garbage.
-Keep the object table in bank `$00` until this is fixed.
+The routine block-copied the table into its scratch buffer with the source
+bank forced to `$00`. The examples got away with it because their `.o16` data
+sits in a `SUPERFREE` section the linker happens to place in bank `$00` — an
+`ASSET_SECTION` table (banks 7-1 by design, see
+`.claude/rules/bank0_budget.md`) would have loaded garbage instead. The DMA
+now takes the bank the caller pushed, so the table can live anywhere.
 
-### 🟠 `objInitGravity`'s gravity argument does nothing
+### 🟢 `objInitGravity`'s gravity argument did nothing — fixed 2026-09-18
 
-`objInitGravity(gravity, friction)` stores both values, but the collision
-routines add the compile-time constant `GRAVITY` (41, i.e. 41/256 pixel per
-frame squared) rather than reading the stored value. The friction argument
-*is* honoured. Changing gravity today means editing `lib/contrib/object.asm`.
+`objInitGravity(gravity, friction)` stored both values, but the three
+collision routines added the assemble-time constant `GRAVITY` instead of
+reading the one you passed; only friction was honoured. They now read the
+variable, which `objInitEngine` still seeds with `GRAVITY` (41, i.e. 41/256
+pixel per frame squared), so the default is unchanged and the argument is
+finally real.
 
 ### 🟢 `ACT_BURN` and `ACT_DIE` went to slot 0 — fixed 2026-09-18
 

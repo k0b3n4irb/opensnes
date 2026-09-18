@@ -64,14 +64,6 @@ extern u8 objmario;
 /** @brief Shared sprite palette for all entity types (BGR555) */
 extern u8 palsprite;
 
-/**
- * @brief Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.
- *
- * Each object type has an update callback function pointer stored with its
- * ROM bank byte. Since C cannot express the `:label` bank-byte operator,
- * this assembly function handles registration for all three entity types.
- */
-extern void objRegisterTypes(void);
 
 /**
  * @brief Running count of active objects in the level.
@@ -124,9 +116,15 @@ int main(void) {
     /* Object engine */
     objInitEngine();
 
-    /* Register object type callbacks (ASM for correct bank bytes) */
+    /* Register the three object types. This used to need a hand-written
+     * ASM shim because objInitFunctions() read its arguments with the
+     * pre-A6 stack map and stored garbage; fixed 2026-09-18, so the
+     * callbacks — C functions the linker puts in bank $01 — register from
+     * C with their bank bytes intact. */
     nbobjects = 1; /* mario is always object 0 */
-    objRegisterTypes();
+    objInitFunctions(0, (void *)marioinit,        (void *)marioupdate,        (void *)0);
+    objInitFunctions(1, (void *)goombainit,       (void *)goombaupdate,       (void *)0);
+    objInitFunctions(2, (void *)koopatroopainit,  (void *)koopatroopaupdate,  (void *)0);
 
     /* Load objects from map data */
     objLoadObjects((u8 *)&objmario);

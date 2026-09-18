@@ -162,7 +162,7 @@ naming most of the API.
 | `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
 | `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
 | `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
-| `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects, listed in the page's Gotchas |
+| `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects; four are fixed, the rest are in the page's Gotchas |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 

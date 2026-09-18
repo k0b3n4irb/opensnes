@@ -362,27 +362,45 @@ objInitFunctions:
     pha
     plb
 
-    ; cproc L-to-R: ref(p4) SP+8, upd(p3) SP+10, init(p2) SP+12, type(p1) SP+14
-    ; cproc passes 16-bit function addresses only (no bank byte)
-    lda 14,s                                ; type (param 1)
+    ; Stack map, rewritten 2026-09-18. Pointers are FOUR-byte slots since
+    ; chantier A6, and the compiler pushes `pea.w :fn` then `pea.w fn` for
+    ; each one — so every offset below moved, and the bank byte we used to
+    ; invent is now handed to us. Verified against the emitted caller:
+    ;
+    ;     pea.w 0 / pea.w :init / pea.w init / pea.w :upd / pea.w upd
+    ;     / pea.w :ref / pea.w ref / jsl objInitFunctions   (14 arg bytes)
+    ;
+    ; After php+phb+phx (4) and the 3-byte JSL return, args start at 8,s,
+    ; last pushed first:
+    ;   8,s ref addr   10,s ref bank   12,s upd addr   14,s upd bank
+    ;  16,s init addr  18,s init bank  20,s type
+    ;
+    ; The old map read type from the update callback's bank byte, so this
+    ; routine stored garbage — which is why both examples registered their
+    ; callbacks with hand-written asm instead.
+    lda 20,s                                ; type (param 1, u8 in a 2-byte slot)
     rep #$20
+    .ACCU 16
     and #$00ff
     asl a
     asl a
     tax
 
-    lda 12,s                                ; init function (param 2) — 16-bit addr
+    lda 16,s                                ; init function — address
     sta objfctinit,x
-    lda 10,s                                ; update function (param 3)
+    lda 12,s                                ; update function — address
     sta objfctupd,x
-    lda 8,s                                 ; refresh function (param 4)
+    lda 8,s                                 ; refresh function — address
     sta objfctref,x
 
-    ; Set bank bytes to $00 (cproc LoROM: code in bank $00)
+    ; …and the bank byte of each, as the caller pushed it.
     sep #$20
-    lda #$00
+    .ACCU 8
+    lda 18,s                                ; init function — bank
     sta objfctinit+2,x
+    lda 14,s                                ; update function — bank
     sta objfctupd+2,x
+    lda 10,s                                ; refresh function — bank
     sta objfctref+2,x
 
     plx
@@ -1289,7 +1307,12 @@ _oicm5:
 _oicm61:
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi _oicm6
     lda #MAX_Y_VELOCITY
@@ -1408,7 +1431,12 @@ _oicmtstyn4:
     ldx objtmp2
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi _oicmtstyn5
     lda #MAX_Y_VELOCITY
@@ -2180,7 +2208,11 @@ objLoadObjects:
     sep #$20
     lda #$7e
     sta.l $2183
-    lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
+    ; The pointer is a 4-byte slot since A6: address at 10,s, bank at 12,s.
+    ; This used to force $00, which happened to work only while the object
+    ; table lived in bank $00 — ASSET_SECTION data (banks 7-1 by design)
+    ; would have loaded garbage. Fixed 2026-09-18.
+    lda 12,s                                ; sourceO bank (param 1, high word)
     sta.l $4304
     ldx #$8000
     stx $4300
@@ -2520,7 +2552,12 @@ _lutcolInv:
 .MACRO OE_SETVELOCYTY
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi \1
     lda #MAX_Y_VELOCITY
