@@ -102,8 +102,9 @@
  * `update`) and one direct call (`WaitForVBlank`) — same shape as
  * `gameLoopRun`. `scenePush` does an array bounds check, an index
  * update, and an optional indirect call to `init`. `scenePop` is a
- * single index decrement. RAM footprint: 8 pointers × 8 bytes per
- * cproc ABI = 64 bytes BSS plus a single byte for the stack depth.
+ * single index decrement. RAM footprint: 8 pointers × 4 bytes (the
+ * post-A6 pointer size on this target, see compiler/ABI.md) = 32 bytes
+ * of BSS, plus a single byte for the stack depth.
  *
  * @par Modules required
  * `scene` (and `gameloop`'s transitive `WaitForVBlank` from the

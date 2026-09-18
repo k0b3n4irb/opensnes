@@ -9,11 +9,10 @@
  * struct shape that lets callers stop juggling six externs and
  * eight positional parameters per scene.
  *
- * The DMA helpers take non-const `u8 *` for historical reasons; the
- * public Asset API keeps `const` pointers so users can store assets
- * in `static const` structs. The const cast is contained to this
- * file and is safe because the underlying DMA only reads the source
- * bytes.
+ * The public Asset API keeps `const` pointers so users can store assets
+ * in `static const` structs. The DMA helpers take `const u8 *` too
+ * (dma.h), so nothing is cast away here — an older version of this note
+ * described a const cast that the file no longer contains.
  */
 
 #include <snes.h>

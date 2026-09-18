@@ -223,6 +223,15 @@ u16 r_irq_b;        /* irqDisable, 3 more frames             -> 10 */
 u16 r_irq_c;        /* irqSetBank + H|V timer, 2 frames      -> 12 */
 u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
 
+/* fixed32: the C body that fixed32.h says it cannot use. The header and
+ * lib/source/math.c both claim a qbe bug makes
+ * `(u32)(s32)fixSin(angle) << 8` produce 0x00FF0000 instead of 0xFFFF0000
+ * for sin(270 deg) = -1.0, and that this is why fix32Sin lives in asm.
+ * These two vectors compute it both ways and compare. */
+u32 r_f32sin_asm;   /* fix32Sin(192)                        -> 0xFFFF0000 */
+u32 r_f32sin_c;     /* (u32)(s32)fixSin(192) << 8, in C     -> must agree */
+static volatile u8 sin_angle = 192;   /* 270 degrees */
+
 /* input: a connected pad reads as connected even with nothing pressed.
  * padIsConnected() used to reject $0000 as well as $FFFF, so an idle pad —
  * the state a pad is in almost every frame — reported unplugged. fullsnes:
@@ -434,6 +443,10 @@ int main(void) {
         r_sram_clear = 0;
         for (k = 0; k < 16; k++) r_sram_clear |= load_buf[k];
     }
+
+    /* --- fixed32: the asm sine against the C expression it replaced --- */
+    r_f32sin_asm = (u32)fix32Sin(sin_angle);
+    r_f32sin_c   = (u32)((u32)(s32)fixSin(sin_angle) << 8);
 
     /* --- input: the idle-pad connection test (see the comment above) --- */
     r_pad_conn  = padIsConnected(0);

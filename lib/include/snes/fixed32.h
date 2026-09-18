@@ -264,19 +264,18 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * fixed32 dx = fix32Mul(speed, fix32Sin(angle));
  * @endcode
  */
-/* Implemented in lib/source/fixed32.asm. Two qbe codegen bugs make the
- * one-line C body `(u32)(s32)fixSin(angle) << 8` produce wrong results:
+/* Implemented in lib/source/fixed32.asm. It was written that way because
+ * two qbe codegen bugs made the one-line C body
+ * `(u32)(s32)fixSin(angle) << 8` produce wrong results — a Kl
+ * shift-by-constant spill (fixed 2026-05-22) and a sign assumption on
+ * widening, which produced 0x00FF0000 instead of 0xFFFF0000 for
+ * sin(270°) = -1.
  *
- *   1. Kl shift-by-constant spill (fixed in qbe 2026-05-22): the high
- *      half was computed from an unstored stack slot. Resolved.
- *
- *   2. Kw → Kl widening sign assumption (UNFIXED): ref_is_high_zero()
- *      treats all Kw operands as zero-extended. Wrong for signed
- *      s16 → s32 — produces 0x00FF0000 instead of 0xFFFF0000 for
- *      sin(270°) = -1.
- *
- * The asm form sign-extends explicitly and avoids both. See
- * lib/source/math.c for the full notes. */
+ * BOTH ARE GONE (re-measured 2026-09-18). `devtools/libtests` now computes
+ * that exact C expression alongside this function and asserts they agree
+ * (r_f32sin_c / r_f32sin_asm), and `c_features` pins the widen-then-shift
+ * case on its own (r_widen_shl). The asm stays because there is no reason
+ * to churn a working routine, not because C cannot express it. */
 fixed32 fix32Sin(u8 angle);
 fixed32 fix32Cos(u8 angle);
 

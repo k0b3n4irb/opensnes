@@ -139,7 +139,9 @@ typedef struct {
 
 /**
  * @brief Load a tileset (tiles + palette) and configure a BG's tile
- *        graphics pointer — typed-value variant of `GFX_LOAD`.
+ *        graphics pointer. (It used to be described as the typed-value
+ *        variant of a `GFX_LOAD` macro; that macro was deleted in the H3
+ *        audit and this is the only interface now.)
  *
  * @param bg            Background number 0-3.
  * @param asset         Bundle to load. Must be non-NULL.
@@ -150,7 +152,9 @@ typedef struct {
 void gfxLoad(u8 bg, const GfxAsset *asset, u8 palette_slot, u16 tiles_vram);
 
 /**
- * @brief Load a full background bundle — typed-value variant of `BG_LOAD`.
+ * @brief Load a full background bundle: tiles, palette and tilemap in one
+ *        call. (The `BG_LOAD` macro this used to be paired with was deleted
+ *        in the H3 audit.)
  *
  * Composes `gfxLoad()` with `bgSetMapPtr()` and a `dmaCopyVram()` of
  * the tilemap. After the call the BG is fully addressable; the caller

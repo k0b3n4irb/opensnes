@@ -104,6 +104,9 @@ CASES = [
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
+    # fixed32: the asm sine and the C expression the header says is miscompiled
+    ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
+    ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
     # input: an idle connected pad must read as connected. padIsConnected()
     # rejected $0000 as well as $FFFF until 2026-09-18, so a pad with nothing
     # pressed — almost every frame — reported unplugged.

@@ -61,10 +61,18 @@ static void on_init(void) {
 /**
  * @brief Per-frame work. Called once per VBlank by the gameloop.
  *
- * The framework has already done WaitForVBlank() before calling us,
- * so we are inside the VBlank window — VRAM/CGRAM/OAM writes are
- * safe at this point. Nothing here exceeds the budget so we never
- * drop a frame.
+ * @warning This does NOT run inside VBlank, despite following
+ * WaitForVBlank(). The handshake is the other way round: WaitForVBlank
+ * raises vblank_flag and halts, and the NMI handler clears that flag as
+ * its LAST act — after the OAM DMA, the tilemap DMA, the scroll writes
+ * and the pad read. So by the time this callback runs, VBlank is spent
+ * and the PPU is drawing again. Writing VRAM, CGRAM or OAM here is the
+ * silent failure at the top of KNOWN_LIMITATIONS.md: the write is
+ * dropped with no error.
+ *
+ * What this callback may safely do is touch RAM — which is all the code
+ * below does. The text goes into the tilemap buffer and the NMI uploads
+ * it at the START of the next VBlank.
  */
 static void on_update(void) {
     if (padPressed(0) & KEY_A) {

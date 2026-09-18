@@ -34,6 +34,7 @@ volatile u16 in_1000 = 1000;
 volatile u16 in_30000 = 30000;
 volatile u16 in_30000b = 30000;
 volatile s16 in_neg7 = -7;
+volatile s16 in_neg256 = -256;   /* sin(270 deg) as 8.8 — the fixed32.h case */
 volatile s16 in_neg3 = -3;
 volatile s16 in_neg1 = -1;
 volatile s16 in_neg30000 = -30000;
@@ -186,6 +187,12 @@ u16 r_lnot32;       /* !in_65536 + 2*(in_65536 && in_one) + 4*(in_65536 || 0) ->
 /* ---- widths, promotions, truncations -------------------------------------- */
 u32 r_widen_u;      /* (u32)in_30000 * 4        -> 120000 */
 u32 r_widen_s;      /* (s32)in_neg7             -> 0xFFFFFFF9 */
+u32 r_widen_shl;    /* (u32)(s32)in_neg256 << 8 -> 0xFFFF0000. Widen-then-shift is
+                     * its own path: the emitter has a cheap form for a left
+                     * shift of 1-8 when it believes the high half is zero,
+                     * and a source comment in fixed32.h claims that belief is
+                     * wrong for a SIGNED widening (0x00FF0000 instead). This
+                     * is the case fix32Sin() avoids by living in asm. */
 u32 r_mul16to32;    /* (s32)in_neg3 * in_30000  -> -90000 = 0xFFFEA070 */
 u16 r_trunc16;      /* (u16)in_big              -> 0x2345 */
 u8  r_trunc8;       /* (u8)in_big               -> 0x45 */
@@ -308,6 +315,7 @@ nested_out:
     /* widths */
     r_widen_u = (u32)in_30000 * 4ul;
     r_widen_s = (u32)(s32)in_neg7;
+    r_widen_shl = (u32)((u32)(s32)in_neg256 << 8);
     r_mul16to32 = (u32)((s32)in_neg3 * (s32)in_30000);
     r_trunc16 = (u16)in_big;
     r_trunc8 = (u8)in_big;

@@ -25,7 +25,7 @@ map for people reading the repository on GitHub.
 
 ## Tutorials
 
-Twenty-six task-shaped walkthroughs under [tutorials/](tutorials/).
+Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
 
 **Drawing the screen**
 
@@ -55,6 +55,7 @@ Twenty-six task-shaped walkthroughs under [tutorials/](tutorials/).
 | [Controller Input](tutorials/input.md) | Button masks and multi-player |
 | [Collision Detection](tutorials/collision.md) | Rectangles, tiles, slopes |
 | [Game States](tutorials/game_states.md) | State machines and transitions |
+| [The Opt-In Framework](tutorials/framework.md) | Game loop and asset bundles |
 | [Text & Fonts](tutorials/text.md) | Printing, the tilemap buffer and the flush |
 | [The Object Engine](tutorials/object.md) | Entity pool, gravity, map collision |
 | [9-Slice Panels](tutorials/panel.md) | Dialog boxes and HUD frames |
@@ -156,19 +157,29 @@ naming most of the API.
 | `superfx.h` | [SuperFX](tutorials/superfx.md) | ✅ |
 | `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `window.h` | [Window](tutorials/window.md) | ✅ |
-| `asset.h` | — | ❌ no tutorial (asset bundles; see [API Index](API_INDEX.md)) |
+| `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
 | `debug.h` | [Debugging](tutorials/debugging.md) mentions the channel | ❌ the two functions are undocumented |
 | `fixed32.h` | — | ❌ no tutorial ([Math](tutorials/math.md) covers 8.8 only) |
-| `gameloop.h` | — | ❌ no tutorial (opt-in loop framework) |
+| `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
 | `lzss.h` | — | ❌ no tutorial (decompression) |
 | `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects, listed in the page's Gotchas |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
-The ❌ rows are the documentation backlog, in rough order of how much API is
-behind them: `fixed32.h`, `gameloop.h`, `asset.h`, `lzss.h`, `debug.h`. The
-two largest — `object.h` and `text.h` — were closed on 2026-09-18, and
-writing those two pages found six defects in the code they document.
+The ❌ rows left are `fixed32.h`, `lzss.h` and `debug.h` — ten functions
+between them, each of which belongs in an existing page rather than one of
+its own (16.16 maths in the [Math](tutorials/math.md) tutorial, decompression
+in [Graphics](tutorials/graphics.md), the debug channel in
+[Debugging](tutorials/debugging.md)).
+
+The map is worth keeping honest for a reason the last two days made plain:
+**writing a page is a detection instrument.** Closing `object.h`, `text.h`,
+`gameloop.h` and `asset.h` turned up ten defects in the code being
+documented — a field comment that invited a buffer overrun, an action stored
+to the wrong entity, a connection test that called every idle pad unplugged,
+an example that taught readers to write VRAM outside VBlank, and two
+compiler-bug notes that had been fixed long ago and were still scaring
+people off correct C.
 
 ## Building the documentation
 

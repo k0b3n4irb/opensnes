@@ -83,22 +83,23 @@ fixed (*const __opensnes_force_emit_fixCos)(u8) = fixCos;
 
 /* fix32Sin / fix32Cos are still implemented in lib/source/fixed32.asm.
  *
- * The qbe Kl shift-by-constant spill bug was fixed 2026-05-22, which
- * resolves the original "high half reads unstored slot" issue. But a
- * SECOND distinct bug surfaces here: ref_is_high_zero() in qbe's
- * emit.c returns TRUE for any Kw temp, on the assumption that Kw → Kl
- * widening is zero-extension. That's correct for unsigned widening
- * (Oextuw/Oextub, used by array indexing) but WRONG for signed
- * widening (Oextsw/Oextsb, used by `(s32)s16_value`).
+ * HISTORICAL — both bugs are gone, re-measured 2026-09-18.
  *
- * For fix32Sin(192) = -256: with the bug, the high half is computed
- * as `(low_byte_high) & 0x00FF` (drops sign) producing 0x00FF0000
- * instead of 0xFFFF0000. The asm form sign-extends explicitly.
+ * The qbe Kl shift-by-constant spill bug was fixed 2026-05-22. A second
+ * one was recorded here: ref_is_high_zero() in qbe's emit.c returns TRUE
+ * for any Kw temp, on the assumption that Kw → Kl widening is
+ * zero-extension, which is right for unsigned widening and was said to be
+ * wrong for signed. For fix32Sin(192) = -256 that produced 0x00FF0000
+ * instead of 0xFFFF0000.
  *
- * Resolution path for the second bug: track Kw signedness through the
- * IR (or have ref_is_high_zero look at the producing op — Oextub/uw
- * → high zero, Oextsb/sw → high sign-extended). Out of scope for the
- * one-bug-at-a-time policy. */
+ * It no longer reproduces. A signed widening yields a Kl temp that
+ * ref_is_high_zero does not mark, so the shortcut it describes is not
+ * taken; whether cproc's IR changed or the 2026-09-13 sign-extension work
+ * closed it, the observable is what counts and it is now pinned in two
+ * places: devtools/libtests computes `(u32)(s32)fixSin(192) << 8` in C and
+ * asserts it equals fix32Sin(192), and c_features asserts the
+ * widen-then-shift case on its own. Do not re-derive this from the prose
+ * above — run the fixtures. */
 
 /*============================================================================
  * Fixed-Point Arithmetic
