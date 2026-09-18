@@ -51,6 +51,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_game_states -- Game States & Transitions
 
+@subpage tutorial_text -- Text & Fonts
+
+@subpage tutorial_object -- The Object Engine (entities, gravity, map collision)
+
 @subpage tutorial_panel -- 9-Slice Panels (dialog boxes, HUDs)
 
 @subpage tutorial_dma -- DMA (direct memory access)

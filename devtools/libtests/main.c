@@ -27,6 +27,7 @@
 #include <snes/window.h>
 #include <snes/sram.h>
 #include <snes/interrupt.h>
+#include <snes/input.h>
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -221,6 +222,18 @@ u16 r_irq_a;        /* irqSet + VTIMER 100, 10 frames        -> 10 */
 u16 r_irq_b;        /* irqDisable, 3 more frames             -> 10 */
 u16 r_irq_c;        /* irqSetBank + H|V timer, 2 frames      -> 12 */
 u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
+
+/* input: a connected pad reads as connected even with nothing pressed.
+ * padIsConnected() used to reject $0000 as well as $FFFF, so an idle pad —
+ * the state a pad is in almost every frame — reported unplugged. fullsnes:
+ * the auto-joypad word's low nibble is the device signature and a standard
+ * joypad's is 0, so an idle pad reads exactly $0000. luna attaches a pad to
+ * port 1 by default and the fixture presses nothing, which is precisely the
+ * case that was broken. */
+u16 r_pad_conn;     /* padIsConnected(0) with no input -> TRUE (0xFF) */
+u16 r_pad_idle;     /* padHeld(0) with no input        -> 0 */
+u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> FALSE */
+u16 r_pad_oob;      /* padIsConnected(9) — out of range -> FALSE */
 
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
@@ -421,6 +434,12 @@ int main(void) {
         r_sram_clear = 0;
         for (k = 0; k < 16; k++) r_sram_clear |= load_buf[k];
     }
+
+    /* --- input: the idle-pad connection test (see the comment above) --- */
+    r_pad_conn  = padIsConnected(0);
+    r_pad_idle  = padHeld(0);
+    r_pad_conn4 = padIsConnected(4);
+    r_pad_oob   = padIsConnected(9);
 
     /* --- L2c: console region + vblank flag --- */
     r_region = getRegion();

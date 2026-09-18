@@ -25,7 +25,7 @@ map for people reading the repository on GitHub.
 
 ## Tutorials
 
-Twenty-four task-shaped walkthroughs under [tutorials/](tutorials/).
+Twenty-six task-shaped walkthroughs under [tutorials/](tutorials/).
 
 **Drawing the screen**
 
@@ -55,6 +55,8 @@ Twenty-four task-shaped walkthroughs under [tutorials/](tutorials/).
 | [Controller Input](tutorials/input.md) | Button masks and multi-player |
 | [Collision Detection](tutorials/collision.md) | Rectangles, tiles, slopes |
 | [Game States](tutorials/game_states.md) | State machines and transitions |
+| [Text & Fonts](tutorials/text.md) | Printing, the tilemap buffer and the flush |
+| [The Object Engine](tutorials/object.md) | Entity pool, gravity, map collision |
 | [9-Slice Panels](tutorials/panel.md) | Dialog boxes and HUD frames |
 | [Audio & Music](tutorials/audio.md) | SNESMOD playback and sound effects |
 | [Fixed-Point Math](tutorials/math.md) | 8.8 and 16.16 arithmetic |
@@ -159,13 +161,14 @@ naming most of the API.
 | `fixed32.h` | — | ❌ no tutorial ([Math](tutorials/math.md) covers 8.8 only) |
 | `gameloop.h` | — | ❌ no tutorial (opt-in loop framework) |
 | `lzss.h` | — | ❌ no tutorial (decompression) |
-| `object.h` | — | ❌ no tutorial (15 functions — the largest gap) |
-| `text.h` | — | ❌ no tutorial (14 functions; only [API Index](API_INDEX.md) lists them) |
+| `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects, listed in the page's Gotchas |
+| `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
 The ❌ rows are the documentation backlog, in rough order of how much API is
-behind them: `object.h`, `text.h`, `fixed32.h`, `gameloop.h`, `asset.h`,
-`lzss.h`, `debug.h`.
+behind them: `fixed32.h`, `gameloop.h`, `asset.h`, `lzss.h`, `debug.h`. The
+two largest — `object.h` and `text.h` — were closed on 2026-09-18, and
+writing those two pages found six defects in the code they document.
 
 ## Building the documentation
 

@@ -21,7 +21,11 @@ typedef struct {
     u16 font_tile;      /**< First tile number of font in VRAM */
     u8  palette;        /**< Palette number (0-7) */
     u8  priority;       /**< Priority bit (0 or 1) */
-    u8  map_width;      /**< Tilemap width (32 or 64 tiles) */
+    u8  map_width;      /**< Tilemap width in tiles. **32 only.** `textInit`
+                         *   sets it, `tilemapBuffer` is sized for 32x32 and
+                         *   the NMI's flush DMAs a fixed 2048 bytes, so
+                         *   writing 64 here indexes past the buffer instead
+                         *   of widening anything. */
 } TextConfig;
 
 /**
@@ -66,6 +70,11 @@ extern TextConfig text_config;
  * @param font_tile    Tile number of the first font glyph in VRAM
  *                     (use TEXT_DEFAULT_FONT_TILE for tile 0)
  * @param palette      Palette slot 0-7 (use TEXT_DEFAULT_PALETTE for 0)
+ *
+ * @warning This writes VRAM immediately — it clears the tilemap through the
+ *          synchronous flush, unlike `textFlush()`, which only raises a flag
+ *          for the NMI. Call it during forced blank, with the rest of your
+ *          setup, not from a running frame.
  *
  * @note As of v0.23.0 this takes a VRAM **word** address. It used to take a byte
  *       address (the lone SDK unit inconsistency, now removed); old call sites

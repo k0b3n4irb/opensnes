@@ -1218,14 +1218,26 @@ _oicm21:
     cmp #T_FIRES
     bne _oicm22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicmtstx
 
 _oicm22:
     cmp #T_SPIKE
     bne _oicm23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicmtstx
 
 _oicm23:
@@ -1752,14 +1764,26 @@ _oicm1d21:
     cmp #T_FIRES
     bne _oicm1d22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicm1dtstx
 
 _oicm1d22:
     cmp #T_SPIKE
     bne _oicm1d23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicm1dtstx
 
 _oicm1d23:
@@ -3006,14 +3030,26 @@ _oicms21:
     cmp #T_FIRES
     bne _oicms22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     jmp _oicmsend
 
 _oicms22:
     cmp #T_SPIKE
     bne _oicms23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     jmp _oicmsend
 
 _oicms23:

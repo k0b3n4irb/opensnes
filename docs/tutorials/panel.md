@@ -132,7 +132,7 @@ row reads the wrong tiles.
 
 ## See also
 
-- [Text rendering](sprites.md) and the `text` module — the text that goes in
+- [Text rendering](text.md) and the `text` module — the text that goes in
   the box.
 - [DMA & VBlank](dma.md) — why `setScreenOff()` and not `setBrightness(0)`.
 - `examples/games/rpg` — the module in a real dialog box + HUD.

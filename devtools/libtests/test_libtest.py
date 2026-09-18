@@ -104,6 +104,13 @@ CASES = [
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
+    # input: an idle connected pad must read as connected. padIsConnected()
+    # rejected $0000 as well as $FFFF until 2026-09-18, so a pad with nothing
+    # pressed — almost every frame — reported unplugged.
+    ("r_pad_conn",  2, 0xFF),   # TRUE
+    ("r_pad_idle",  2, 0),      # nothing pressed
+    ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
+    ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
     # The getters return TRUE, which snes/types.h defines as 0xFF (not 1).
     ("r_invb_in", 2, 0xFF), ("r_invb_out", 2, 0),
