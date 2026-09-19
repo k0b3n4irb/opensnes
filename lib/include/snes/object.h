@@ -187,14 +187,38 @@ void objInitEngine(void);
 void objInitGravity(u16 objgravity, u16 objfriction);
 
 /**
+ * @brief Opt into friction for objCollidMap1D()
+ *
+ * objCollidMap1D() stops an object on a wall but never decelerates it
+ * otherwise (PVSnesLib parity; its FRICTION1D constant was defined and never
+ * used). A non-zero value here makes every objCollidMap1D() call move xvel
+ * AND yvel toward zero by that amount, clamped at zero. objInitEngine()
+ * resets it to 0 (off).
+ *
+ * @param friction Deceleration per call, in 8.8 velocity units (0 = none;
+ *                 0x0100, PVSnesLib's unused constant, is one pixel per frame)
+ */
+void objInitFriction1D(u16 friction);
+
+/** @brief Init callback of an object type, called by objLoadObjects() per table entry */
+typedef void (*ObjInitFn)(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx);
+
+/** @brief Update / refresh callback of an object type; @p idx is the slot index */
+typedef void (*ObjUpdateFn)(u16 idx);
+
+/**
  * @brief Register callback functions for an object type
  *
+ * Typed since 2026-09-19: pass the functions directly, no `(void *)` cast. A
+ * callback with the wrong signature is now a compile error instead of a
+ * corrupted stack at run time. A null callback is safe — the engine skips it.
+ *
  * @param objtype Object type index (0-63)
- * @param initfct Init callback: void init(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx)
- * @param updfct  Update callback: void update(u16 idx) — called per frame
- * @param reffct  Refresh callback: void refresh(u16 idx) — called for on-screen objects (or NULL)
+ * @param initfct Init callback (or 0)
+ * @param updfct  Update callback, called per frame (or 0)
+ * @param reffct  Refresh callback, called for on-screen objects (or 0)
  */
-void objInitFunctions(u8 objtype, void *initfct, void *updfct, void *reffct);
+void objInitFunctions(u8 objtype, ObjInitFn initfct, ObjUpdateFn updfct, ObjUpdateFn reffct);
 
 /**
  * @brief Create a new object

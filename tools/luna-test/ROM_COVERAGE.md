@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.21.0 · `luna profile --pc-set` to each example's first manifest frame, no input · 85 ROMs · **133 of 300 public functions executed, 167 never**
+luna v1.24.0 · `luna profile --pc-set` to each example's first manifest frame, no input · 85 ROMs · **134 of 301 public functions executed, 167 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one example (boot + idle path; input-driven code is under-counted). The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
@@ -24,7 +24,7 @@ luna v1.21.0 · `luna profile --pc-set` to each example's first manifest frame, 
 | `math.h` | `div16`, `fixAbs`, `fixClamp`, `fixDiv`, `fixLerp`, `fixSqrt`, `mod16`, `mul16` |
 | `mode7.h` | `mode7Rotate`, `mode7SetMatrix`, `mode7SetPivot`, `mode7Transform` |
 | `mosaic.h` | `mosaicDisable`, `mosaicEnable`, `mosaicFadeIn`, `mosaicFadeOut`, `mosaicGetSize`, `mosaicSetSize` |
-| `object.h` | `objCollidMap1D`, `objCollidObj`, `objInitFunctions`, `objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll` |
+| `object.h` | `objCollidMap1D`, `objCollidObj`, `objInitFriction1D`, `objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll` |
 | `panel.h` | `panelClear` |
 | `profile.h` | `profileColorEnd`, `profileColorStart`, `profileGetFrameCount`, `profileGetLagFrames`, `profileGetScanline`, `profileInit`, `profileScanlineEnd`, `profileScanlineStart` |
 | `scene.h` | `scenePop`, `scenePush` |

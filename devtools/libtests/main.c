@@ -240,6 +240,10 @@ u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
 u16 r_obj_type;     /* peeker's type after the update   -> 0 (not 1)      */
 u16 r_obj_edit;     /* peeker's yvel, set before the peek -> 0x1234       */
 u16 r_obj_other;    /* the other object's yvel            -> 0x0BAD kept  */
+u16 r_obj_fr_off;   /* objCollidMap1D, friction off: xvel  -> 0x0300 kept  */
+u16 r_obj_fr_x;     /* friction 0x0100: xvel 0x0300       -> 0x0200       */
+u16 r_obj_fr_y;     /* friction 0x0100: yvel -0x0080      -> 0 (clamped)  */
+u16 r_obj_pool;     /* objNew successes after objKillAll  -> 80 (was 79)  */
 u16 r_obj_calls;    /* update callback invocations        -> 1            */
 u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
 static u16 obj_peeker, obj_other;
@@ -477,7 +481,7 @@ int main(void) {
      * Runs after mapLoad() above, so the camera globals the update pass
      * culls against are initialised. */
     objInitEngine();
-    objInitFunctions(0, (void *)objPeekUpdate, (void *)objPeekUpdate, (void *)0);
+    objInitFunctions(0, 0, objPeekUpdate, 0);   /* typed: no casts */
     /* type 1 is deliberately never registered */
     obj_peeker = objNew(0, 16, 16);
     objGetPointer(obj_peeker);
@@ -494,6 +498,26 @@ int main(void) {
     r_obj_edit = (u16)objWorkspace.yvel;
     objGetPointer(obj_other);
     r_obj_other = (u16)objWorkspace.yvel;
+
+    /* --- objCollidMap1D friction: off by default, opt-in, clamped at 0 --- */
+    objGetPointer(obj_peeker);
+    objWorkspace.xvel = 0x0300; objWorkspace.yvel = (s16)-0x0080;
+    objCollidMap1D(obj_peeker & 0xFF);
+    r_obj_fr_off = (u16)objWorkspace.xvel;          /* untouched: 0x0300 */
+    objInitFriction1D(0x0100);
+    objCollidMap1D(obj_peeker & 0xFF);
+    r_obj_fr_x = (u16)objWorkspace.xvel;            /* 0x0200 */
+    r_obj_fr_y = (u16)objWorkspace.yvel;            /* -0x80 + 0x100 clamps to 0 */
+
+    /* --- objKillAll must give the whole pool back. Slot 0 (type 0) is
+     * killed before slot 1 (type 1), so slot 1 ends up ahead of slot 0 on
+     * the free list — the case the old forced head-reset leaked. --- */
+    objInitEngine();
+    objNew(0, 16, 16);
+    objNew(1, 32, 16);
+    objKillAll();
+    r_obj_pool = 0;
+    while (objNew(1, 16, 16) != 0) r_obj_pool++;
 
     /* --- fixed32: the asm sine against the C expression it replaced --- */
     r_f32sin_asm = (u32)fix32Sin(sin_angle);

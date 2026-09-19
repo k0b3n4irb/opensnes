@@ -112,6 +112,10 @@ CASES = [
     ("r_obj_type",  2, 0),        # the peeker is still itself (was: a copy, type 1)
     ("r_obj_edit",  2, 0x1234),   # its pre-peek edit survived
     ("r_obj_other", 2, 0x0BAD),   # the object it looked at is untouched
+    ("r_obj_fr_off", 2, 0x0300),  # objCollidMap1D: no friction unless opted in
+    ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
+    ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
+    ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C

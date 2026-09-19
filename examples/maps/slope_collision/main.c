@@ -105,7 +105,7 @@ int main(void) {
      * a bank byte. Both were fixed on 2026-09-18 — the compiler pushes
      * `pea.w :fn` alongside `pea.w fn` for every pointer, so the bank is
      * right there on the stack. No refresh callback for this example. */
-    objInitFunctions(0, (void *)marioinit, (void *)marioupdate, (void *)0);
+    objInitFunctions(0, marioinit, marioupdate, 0);
 
     /* Load objects from map data */
     objLoadObjects((u8 *)&objmario);

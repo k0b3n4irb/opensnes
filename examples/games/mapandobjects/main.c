@@ -122,9 +122,9 @@ int main(void) {
      * callbacks — C functions the linker puts in bank $01 — register from
      * C with their bank bytes intact. */
     nbobjects = 1; /* mario is always object 0 */
-    objInitFunctions(0, (void *)marioinit,        (void *)marioupdate,        (void *)0);
-    objInitFunctions(1, (void *)goombainit,       (void *)goombaupdate,       (void *)0);
-    objInitFunctions(2, (void *)koopatroopainit,  (void *)koopatroopaupdate,  (void *)0);
+    objInitFunctions(0, marioinit,        marioupdate,        0);
+    objInitFunctions(1, goombainit,       goombaupdate,       0);
+    objInitFunctions(2, koopatroopainit,  koopatroopaupdate,  0);
 
     /* Load objects from map data */
     objLoadObjects((u8 *)&objmario);

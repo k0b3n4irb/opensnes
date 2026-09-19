@@ -104,7 +104,7 @@ oamDynamicSetSize
 oamSetTile
 objCollidMap1D
 objCollidObj
-objInitFunctions
+objInitFriction1D
 objInitGravity
 objKill
 objKillAll

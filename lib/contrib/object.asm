@@ -56,7 +56,9 @@
 .DEFINE GRAVITY             41
 .DEFINE MAX_Y_VELOCITY      (10*256)
 .DEFINE FRICTION            $10
-.DEFINE FRICTION1D          $0100
+; FRICTION1D ($0100) was defined here and never used, in PVSnesLib as well:
+; objCollidMap1D has no friction of its own. It is now opt-in through
+; objInitFriction1D() / objfriction1d, 0 (off) by default.
 
 ;------------------------------------------------------------------------------
 ; Object structure (64 bytes)
@@ -160,6 +162,7 @@ objcidx         DW                          ; index of current object in loop
 
 objgravity      DW                          ; gravity value
 objfriction     DW                          ; friction value
+objfriction1d   DW                          ; objCollidMap1D friction, 0 = none
 
 objneedrefresh  DB                          ; 1 if global sprite refresh needed
 
@@ -354,6 +357,7 @@ _oieR3:
     sta objgravity
     lda #FRICTION
     sta objfriction
+    stz objfriction1d                       ; top-down friction is opt-in
     lda #$FFFF
     sta.l objwsowner                        ; the workspace mirrors nothing yet
 
@@ -382,6 +386,29 @@ objInitGravity:
     sta objgravity
     lda 6,s                                 ; friction (param 2)
     sta objfriction
+
+    plb
+    plp
+
+    rtl
+
+;------------------------------------------------------------------------------
+; void objInitFriction1D(u16 friction)
+; Opt-in deceleration for objCollidMap1D, applied to BOTH axes each call.
+; 0 (the objInitEngine default) keeps the PVSnesLib behaviour: none.
+;------------------------------------------------------------------------------
+objInitFriction1D:
+    php
+    phb
+
+    sep #$20
+    lda #$7e
+    pha
+    plb
+
+    rep #$20
+    lda 6,s                                 ; friction (param 1)
+    sta objfriction1d
 
     plb
     plp
@@ -815,7 +842,11 @@ _oikal3:
 
     stz.w objnewid
     stz.w objgetid
-    stz.w objunused
+    ; objunused is NOT reset here (fixed 2026-09-19). objKill pushes every
+    ; slot it frees onto the free list, so after the loop the list is already
+    ; complete and objunused is its head. The old `stz objunused` forced the
+    ; head back to slot 0: every slot chained AHEAD of slot 0 — any slot freed
+    ; after it — became unreachable, and the pool shrank on each level change.
 
     rep #$20
     .ACCU 16
@@ -2233,6 +2264,45 @@ _oicm1dtstxnd:
     bne _oicm1dtstxnc
 
 _oicm1dend:
+    ; --- Opt-in friction (objInitFriction1D), both axes, toward zero ---
+    rep #$20
+    .ACCU 16
+    lda objfriction1d
+    beq _oicm1dfrdone
+    ldx objtmp2
+    lda objbuffers.1.xvel,x
+    beq _oicm1dfry
+    bmi _oicm1dfrxn
+    sec
+    sbc objfriction1d
+    bpl _oicm1dfrxs
+    lda #0
+    bra _oicm1dfrxs
+_oicm1dfrxn:
+    clc
+    adc objfriction1d
+    bmi _oicm1dfrxs
+    lda #0
+_oicm1dfrxs:
+    sta objbuffers.1.xvel,x
+_oicm1dfry:
+    lda objbuffers.1.yvel,x
+    beq _oicm1dfrdone
+    bmi _oicm1dfryn
+    sec
+    sbc objfriction1d
+    bpl _oicm1dfrys
+    lda #0
+    bra _oicm1dfrys
+_oicm1dfryn:
+    clc
+    adc objfriction1d
+    bmi _oicm1dfrys
+    lda #0
+_oicm1dfrys:
+    sta objbuffers.1.yvel,x
+_oicm1dfrdone:
+
     ; --- Sync objbuffers → workspace after collision ---
     ldx objtmp2
     SYNC_TO_WORKSPACE
@@ -2618,8 +2688,8 @@ _lutcolInv:
     .db $07,$06,$05,$04,$03,$02,$01,$00     ; 0020
     .db $00,$01,$02,$03,$04,$05,$06,$07     ; 0021
     .db $07,$07,$06,$06,$05,$05,$04,$04     ; 0022
-    .db $04,$04,$05,$05,$06,$06,$07,$07     ; 0024
-    .db $03,$03,$02,$02,$01,$01,$00,$00     ; 0023
+    .db $04,$04,$05,$05,$06,$06,$07,$07     ; 0023
+    .db $03,$03,$02,$02,$01,$01,$00,$00     ; 0024
     .db $00,$00,$01,$01,$02,$02,$03,$03     ; 0025
 
 ;note: objtmp1 = tileCount

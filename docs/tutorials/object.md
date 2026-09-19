@@ -76,69 +76,35 @@ Per-frame CPU cost is dominated by two 64-byte block copies per live,
 in-range object: one into the workspace before the callback, one back out
 after. Budget for that before putting 40 objects on screen.
 
-## Registering a type, and the bank-byte problem
-
-The documented entry point is:
+## Registering a type
 
 ```c
-void objInitFunctions(u8 objtype, void *initfct, void *updfct, void *reffct);
+typedef void (*ObjInitFn)(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx);
+typedef void (*ObjUpdateFn)(u16 idx);
+
+void objInitFunctions(u8 objtype, ObjInitFn initfct, ObjUpdateFn updfct,
+                      ObjUpdateFn reffct);
 ```
 
-**Neither shipped example uses it.** Both hand-write a small assembly routine
-instead, and the reason is load-bearing: `objInitFunctions` stores the three
-callbacks as 16-bit addresses and then hardcodes their bank byte to `$00`.
-The C compiler passes only a 16-bit function pointer, so the ASM has no bank
-to store — but C callbacks really do land outside bank `$00` today. In
-`slope_collision.sym`, `marioinit` is at `01:961c`; in
-`mapandobjects.sym`, all three update callbacks are in bank `$01`. Registering
-them through `objInitFunctions` would dispatch to bank `$00` and jump into
-whatever code happens to live at that offset.
+Call it once per type, after `objInitEngine()`, passing the functions
+directly:
 
-The workaround, in both examples' `data.asm`, writes the three tables
-directly using WLA-DX's `:label` bank-byte operator:
-
-```asm
-.SECTION ".objreg_text" SUPERFREE
-.accu 16
-.index 16
-.16bit
-
-objRegisterTypes:
-    php
-    phb
-    phx
-
-    sep #$20
-    lda #$7e                ; the callback tables live in bank $7E
-    pha
-    plb
-
-    ; Type 0: Mario
-    rep #$20
-    ldx #0*4                ; 4 bytes per type slot
-    lda #marioinit
-    sta objfctinit,x
-    lda #marioupdate
-    sta objfctupd,x
-    lda #0                  ; no refresh callback
-    sta objfctref,x
-    sep #$20
-    lda #:marioinit         ; ":" = bank byte, resolved at link time
-    sta objfctinit+2,x
-    lda #:marioupdate
-    sta objfctupd+2,x
-    lda #0
-    sta objfctref+2,x
-
-    plx
-    plb
-    plp
-    rtl
-.ENDS
+```c
+objInitEngine();
+objInitFunctions(0, marioinit,  marioupdate,  0);
+objInitFunctions(1, goombainit, goombaupdate, 0);
 ```
 
-Declare it `extern void objRegisterTypes(void);` on the C side and call it
-once. Copy the block per type, bumping the `ldx #N*4`.
+The parameters are typed, so a callback with the wrong signature is a compile
+error rather than a corrupted stack. Any of the three may be 0: the engine
+tests every pointer before dispatching and skips a null one.
+
+C callbacks routinely land outside bank `$00` — in `slope_collision.sym`,
+`marioinit` sits in bank `$01`. That works because the compiler pushes a
+function pointer as a four-byte slot, bank byte included, and
+`objInitFunctions` stores all three bytes. Until 2026-09-18 it did not (see
+the Gotchas), and both examples registered their types through a hand-written
+assembly routine; if you are porting code that copied that shim, delete it.
 
 The three callback signatures are:
 
@@ -528,10 +494,11 @@ your slot first).
 
 This module is inherited from PVSnesLib and has not had the audit the core
 modules have. The following are verified against `lib/contrib/object.asm` and
-the shipped ROMs. Seven of the fifteen public functions
-(`objCollidMap1D`, `objCollidObj`, `objInitFunctions`, `objInitGravity`,
-`objKill`, `objKillAll`, `objRefreshAll`) are never executed by any example in
-the corpus — see `tools/luna-test/ROM_COVERAGE.md`. Treat them as untested.
+the shipped ROMs. Three of the sixteen public functions (`objCollidObj`,
+`objInitGravity`, `objRefreshAll`) are executed by no example and by no test
+— treat them as untested. `objCollidMap1D`, `objInitFriction1D`, `objKill`
+and `objKillAll` are executed only by the library fixture
+(`devtools/libtests`), not by any example.
 
 ### 🟢 `objInitFunctions` stored garbage — fixed 2026-09-18
 
@@ -595,11 +562,14 @@ write-backs go to the owner. The cost is about 140 CPU cycles per callback —
 enough to move a late-frame write across a frame boundary, which is how the
 slope example's manifest noticed.
 
-### 🟡 `objCollidMap1D` applies no friction
+### 🟢 `objCollidMap1D` had no friction, and no way to get any — opt-in since 2026-09-19
 
-The routine zeroes velocity on a wall hit but never decelerates otherwise
-(the `FRICTION1D` constant in the source is defined and unused). Top-down
-movement therefore needs you to damp `xvel` / `yvel` yourself.
+The routine zeroes velocity on a wall hit but never decelerates otherwise;
+PVSnesLib's `FRICTION1D` constant was defined and never used. The default is
+unchanged — no friction, so ported code behaves the same — but
+`objInitFriction1D(amount)` now makes every `objCollidMap1D` call move `xvel`
+and `yvel` toward zero by `amount`, clamped at zero. `objInitEngine()` resets
+it to 0.
 
 ### 🟡 A screen-edge crossing forces a full sprite refresh
 
@@ -618,14 +588,14 @@ workspace (2026-09-19) the workspace has no owner at that point and nothing is
 written. `objgetid` itself is still stale, so keep guarding with the return
 value, as the examples do: `if (objNew(type, xp, yp) == 0) return;`.
 
-### 🟡 `objKillAll` may leak slots
+### 🟢 `objKillAll` leaked slots — fixed 2026-09-19
 
-After killing every live object it forces the free-list head back to slot 0
-without rebuilding the chain, so free slots that ended up ahead of slot 0 in
-the rebuilt chain can become unreachable. This is an unverified reading of the
-source — the function is never executed by the corpus — but if you rely on
-`objKillAll()` between levels, verify the pool still allocates 80 objects
-afterwards, or just re-run `objInitEngine()` instead.
+After killing every live object it forced the free-list head back to slot 0.
+`objKill` had already pushed each freed slot onto the list, so every slot
+chained ahead of slot 0 — anything killed after it — became unreachable. Two
+objects of different types were enough: the pool came back with 79 slots, and
+lost more on each level change. The reset is gone; the library fixture
+asserts that 80 allocations succeed after `objKillAll()`.
 
 ## When not to use the object engine
 
