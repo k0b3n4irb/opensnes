@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release hardware-kit
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -534,6 +534,11 @@ clean-release:
 # Help
 #------------------------------------------------------------------------------
 
+# The ROMs of the hardware verification protocol (docs/HARDWARE_VERIFICATION.md),
+# numbered in grid order, for a flash cart's SD card.
+hardware-kit:
+	@sh scripts/hardware-kit.sh
+
 help:
 	@echo "OpenSNES SDK Build System"
 	@echo ""
@@ -546,6 +551,7 @@ help:
 	@echo "  tests     - Build test ROMs"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
 	@echo "  release   - Create SDK release package (zip)"
+	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"

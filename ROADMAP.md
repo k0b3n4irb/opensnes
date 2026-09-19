@@ -225,7 +225,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Item | Status | Why it matters |
 |------|--------|----------------|
 | Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
-| Hardware verification docs | Not started | Credibility — document testing on real SNES via FXPak Pro |
+| Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows the 30 % improvement with data |
 | Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |

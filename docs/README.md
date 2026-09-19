@@ -13,6 +13,7 @@ map for people reading the repository on GitHub.
 | [Examples by Category](EXAMPLES_BY_CATEGORY.md) | The exhaustive index of the example corpus |
 | [API Index](API_INDEX.md) | The SDK indexed by *what you are trying to do* |
 | [FAQ](FAQ.md) | Short answers to the questions newcomers actually ask |
+| [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 22 ROMs, one check each, and the grid to fill in |
 | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
 | [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
 
