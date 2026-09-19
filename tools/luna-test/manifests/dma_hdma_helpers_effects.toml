@@ -1,0 +1,72 @@
+# hdma_helpers is the fixture for the HDMA effect helpers. Its committed
+# manifest (dma_hdma_helpers.toml) asserts DMA safety on the idle path, and
+# the idle path only calls hdmaSetup/hdmaEnable: every helper this example
+# exists to show — the brightness and colour gradients, the iris wipe, the
+# water ripple and their Stop counterparts — sits behind a button, and the
+# ROM-coverage ratchet listed all nine as never executed (2026-09-19).
+#
+# What is observable: the lib's own shadow of HDMAEN (`hdma_enabled_state`),
+# the example's `fx.active_effect` (first byte of `fx`), the window registers
+# the iris wipe drives (`w12sel`, `tmw`) and the ripple amplitude the wave
+# helper reads every frame (`hdma_wave_amplitude`). Measured on luna:
+#
+#   idle             enabled 0x40 (the example's own base channel 6), effect 0
+#   A  brightness    enabled 0xC0: channel 7 joins, effect 1
+#   B  colour        enabled 0x40: hdmaBrightnessGradientStop dropped 7, effect 2
+#   X  iris          effect 3, W12SEL 3 / TMW 1: the wipe masks BG1
+#   Y  ripple        effect 4, W12SEL back to 0: hdmaIrisWipeStop, amplitude 6
+#   UP on ripple     amplitude 8 (hdmaWaveUpdate reads it every frame)
+#   START            effect 0, enabled 0x40: everything stopped
+rom = "../../../examples/hdma/hdma_helpers/hdma_helpers.sfc"
+
+[[checkpoint]]                  # idle: only the example's base channel
+at_frame = 50
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x40, width = 1 }
+fx = { eq = 0, width = 1 }
+
+[[checkpoint]]                  # A: brightness gradient on channel 7
+at_frame = 75
+input = "60:0x0080,64:0"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0xC0, width = 1 }
+fx = { eq = 1, width = 1 }
+
+[[checkpoint]]                  # B: colour gradient replaces it (Stop ran)
+at_frame = 105
+input = "90:0x8000,94:0"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x40, width = 1 }
+fx = { eq = 2, width = 1 }
+
+[[checkpoint]]                  # X: iris wipe drives the window registers
+at_frame = 135
+input = "120:0x0040,124:0"
+[checkpoint.values]
+fx = { eq = 3, width = 1 }
+[checkpoint.ppu]
+w12sel = 3
+tmw = 1
+
+[[checkpoint]]                  # Y: water ripple; the iris is stopped
+at_frame = 165
+input = "150:0x4000,154:0"
+[checkpoint.values]
+fx = { eq = 4, width = 1 }
+hdma_wave_amplitude = { eq = 6, width = 1 }
+[checkpoint.ppu]
+w12sel = 0
+tmw = 0
+
+[[checkpoint]]                  # UP: amplitude grows, hdmaWaveUpdate follows
+at_frame = 195
+input = "180:0x0800,184:0"
+[checkpoint.values]
+hdma_wave_amplitude = { eq = 8, width = 1 }
+
+[[checkpoint]]                  # START: everything stopped
+at_frame = 225
+input = "210:0x1000,214:0"
+[checkpoint.values]
+fx = { eq = 0, width = 1 }
+hdma_enabled_state = { eq = 0x40, width = 1 }

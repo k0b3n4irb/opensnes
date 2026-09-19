@@ -141,17 +141,16 @@ run, so a checkpoint observes every event scheduled before its frame, not only
 the ones written beside it. Reading a checkpoint as if it replayed its own
 script in isolation is the easiest way to write a wrong expectation.
 
-**There is no PPU-register assert.** `luna state --out -` prints the whole
-`ppu` block as JSON, but a manifest cannot compare against it, and reading an
-MMIO address through `values` returns 0 (it resolves WRAM). Today the route to
-those registers is the library's own WRAM shadows — `hdma_enabled_state` in
-`hdma.asm`, `w12sel`/`w34sel`/`wobjsel`/`wbglog` in `window.c`, `m7_sin` /
-`m7_cos` / `m7_scale` in `mode7.c` — and a shadow is only trustworthy for an
-example that goes through the module. `examples/windows/window` writes the
-window registers raw, so its shadow reads 0 while the hardware holds `$33`;
-that manifest asserts an `fbhash` instead of a value it would be lying about.
-The capability request is recorded in
-`.claude/notes/status/luna_stress_campaign.md` for owner validation.
+**PPU registers are assertable since luna v1.24.0**: `[asserts.ppu]` at the
+run bound and `[checkpoint.ppu]` per checkpoint compare against the `ppu`
+block of `luna state --out -`, keyed by its JSON field names (`w12sel`,
+`tmw`, `inidisp`, `bgmode`, `m7a`…; `.` steps into arrays, the Mode 7
+fields are signed, there is no `width`). Reading an MMIO address through
+`values` still returns 0 (it resolves WRAM). The library's WRAM shadows —
+`hdma_enabled_state` in `hdma.asm`, `hdma_wave_amplitude`, `m7_sin` /
+`m7_cos` / `m7_scale` in `mode7.c` — remain useful for what the PPU block
+does not show (which HDMA channels the lib believes are on), and a shadow
+is only trustworthy for an example that goes through the module.
 
 ## Hardening tests (luna scripted-input & trace capabilities)
 

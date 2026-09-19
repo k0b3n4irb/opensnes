@@ -1,0 +1,16 @@
+# snesmodFadeVolume(0, 4): START at frame 60. Measured at frame 300: every
+# ENVX reads 0 while the idle run still has voices at 122 — the fade reached
+# silence through the driver's module volume (MVOL stays at 80: the fade is
+# not a master-volume ramp, which is why the assert is on the envelopes).
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+frames = 300
+input = "60:0x1000,64:0"
+[asserts.dsp]
+V0_ENVX = 0
+V1_ENVX = 0
+V2_ENVX = 0
+V3_ENVX = 0
+V4_ENVX = 0
+V5_ENVX = 0
+V6_ENVX = 0
+V7_ENVX = 0

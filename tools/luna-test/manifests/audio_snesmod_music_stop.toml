@@ -1,0 +1,17 @@
+# snesmodStop: B at frame 60. The committed manifest only asserts that the
+# module plays (audio_rms_min); nothing asserted that it can be stopped, and
+# the ratchet listed snesmodStop as never executed (2026-09-19). Measured:
+# every envelope reads 0 from the stop onward (the idle run has five active
+# voices with ENVX up to 122 at frame 200).
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+frames = 200
+input = "60:0x8000,64:0"
+[asserts.dsp]
+V0_ENVX = 0
+V1_ENVX = 0
+V2_ENVX = 0
+V3_ENVX = 0
+V4_ENVX = 0
+V5_ENVX = 0
+V6_ENVX = 0
+V7_ENVX = 0

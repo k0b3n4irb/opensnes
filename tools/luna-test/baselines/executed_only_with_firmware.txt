@@ -5,3 +5,4 @@ dsp1Parameter
 dsp1Present
 dsp1Project
 dsp1Raster
+dsp1Triangle

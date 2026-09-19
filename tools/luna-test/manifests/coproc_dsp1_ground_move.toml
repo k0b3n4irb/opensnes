@@ -1,0 +1,36 @@
+# dsp1_ground's movement leg: the committed coproc manifest boots the example
+# and checks the DSP-1 rasterised the floor; nothing pressed the D-pad, so
+# dsp1Triangle — the chip's sin/cos, the example's heading-to-vector step —
+# was listed as never executed (2026-09-19). Firmware-gated like its sibling.
+#
+# Holding UP calls dsp1Triangle(cam_aas, MOVE_STEP) every loop and moves the
+# camera along the heading: at heading 0 the sine is 0 and the cosine is the
+# step, so cam_x stays and cam_y decreases from its 0x0200 spawn. The loop is
+# not 60 Hz (dsp1Raster streams a whole frame's tables per iteration), so the
+# exact distance is not asserted, only the direction. LEFT then turns the
+# heading (cam_aas changes) without moving.
+rom = "../../../examples/mode7/dsp1_ground/dsp1_ground.sfc"
+firmware = "dsp1b.rom"
+
+[[checkpoint]]                  # spawn
+at_frame = 60
+[checkpoint.values]
+cam_x = { eq = 0x0200, width = 2 }
+cam_y = { eq = 0x0200, width = 2 }
+cam_aas = { eq = 0, width = 2 }
+dsp1_ok = { eq = 1, width = 2 }
+
+[[checkpoint]]                  # UP held: forward along heading 0
+at_frame = 200
+input = "60:0x0800"
+[checkpoint.delta]
+cam_y = "decreased"
+cam_x = "unchanged"
+cam_aas = "unchanged"
+
+[[checkpoint]]                  # LEFT held: turning, not moving
+at_frame = 260
+input = "200:0x0200"
+[checkpoint.delta]
+cam_aas = "changed"
+cam_y = "unchanged"

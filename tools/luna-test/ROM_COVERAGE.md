@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 86 ROMs (examples + the library fixture), 189 legs · **203 of 301 public functions executed, 98 never**
+luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 86 ROMs (examples + the library fixture), 196 legs · **218 of 301 public functions executed, 83 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
@@ -12,8 +12,8 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `console.h` | `consoleInitEx`, `resetFrameCount` |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` |
 | `dma.h` | `dmaCopyCGramBank`, `dmaCopyOam`, `dmaCopyVramBank`, `dmaTransfer` |
-| `dsp1.h` | `dsp1Distance`, `dsp1Multiply`, `dsp1Range`, `dsp1Rotate`, `dsp1Target`, `dsp1Triangle` |
-| `hdma.h` | `hdmaBrightnessGradient`, `hdmaBrightnessGradientStop`, `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaGetEnabled`, `hdmaGradient`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWaveUpdate`, `hdmaWindowShape` |
+| `dsp1.h` | `dsp1Distance`, `dsp1Multiply`, `dsp1Range`, `dsp1Rotate`, `dsp1Target` |
+| `hdma.h` | `hdmaGetEnabled`, `hdmaGradient`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWindowShape` |
 | `input.h` | `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseGetSensitivity`, `mouseGetX`, `mouseGetY`, `mouseIsConnected`, `mouseSetSensitivity`, `padRaw`, `scopeButtonsDown`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeGetRawX`, `scopeGetRawY`, `scopeGetX`, `scopeGetY`, `scopeSetRepeatDelay`, `scopeSinceShot` |
 | `interrupt.h` | `nmiSet` |
 | `map.h` | `mapSetMapOptions` |
@@ -22,7 +22,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mosaic.h` | `mosaicGetSize`, `mosaicSetSize` |
 | `object.h` | `objCollidObj`, `objInitGravity`, `objRefreshAll` |
 | `profile.h` | `profileColorEnd`, `profileColorStart`, `profileGetFrameCount`, `profileGetLagFrames`, `profileGetScanline`, `profileInit`, `profileScanlineEnd`, `profileScanlineStart` |
-| `snesmod.h` | `snesmodAllocateSoundRegion`, `snesmodFadeVolume`, `snesmodFlush`, `snesmodGetPosition`, `snesmodPause`, `snesmodPlayEffect`, `snesmodResume`, `snesmodSetSoundTable`, `snesmodStop` |
+| `snesmod.h` | `snesmodAllocateSoundRegion`, `snesmodFlush`, `snesmodGetPosition`, `snesmodSetSoundTable` |
 | `sprite.h` | `oamDrawMetaFlip`, `oamDynamicSetSize`, `oamSetTile` |
 | `text.h` | `textFlush`, `textGetX` |
 | `video.h` | `videoSetObjInterlace`, `videoSetOverscan`, `videoSetPseudoHires` |
@@ -58,6 +58,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `dsp1Objective` | `chips/dsp1_cube` |
 | `dsp1Project` | `chips/dsp1_cube` |
 | `dsp1Raster` | `mode7/dsp1_ground` |
+| `dsp1Triangle` | `mode7/dsp1_ground` |
 | `fix32Div` | `libtest` |
 | `fixDiv` | `libtest` |
 | `fixLerp` | `libtest` |
@@ -66,10 +67,19 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `gsuLaunch` | `chips/superfx_3d` |
 | `gsuSetupBitmapTilemap` | `chips/superfx_3d` |
 | `gsuSetupHdmaBlanking` | `chips/superfx_3d` |
+| `hdmaBrightnessGradient` | `hdma/hdma_helpers` |
+| `hdmaBrightnessGradientStop` | `hdma/hdma_helpers` |
+| `hdmaColorGradient` | `hdma/hdma_helpers` |
+| `hdmaColorGradientStop` | `hdma/hdma_helpers` |
 | `hdmaDisableAll` | `hdma/gradient_colors` |
+| `hdmaIrisWipe` | `hdma/hdma_helpers` |
+| `hdmaIrisWipeStop` | `hdma/hdma_helpers` |
 | `hdmaParallax` | `scrolling/parallax_scroll` |
 | `hdmaSetupBank` | `hdma/hdma_helpers` |
 | `hdmaSetupIndirect` | `hdma/hdma_indirect_gradient` |
+| `hdmaWaterRipple` | `hdma/hdma_helpers` |
+| `hdmaWaveStop` | `hdma/hdma_helpers` |
+| `hdmaWaveUpdate` | `hdma/hdma_helpers` |
 | `irqClear` | `libtest` |
 | `irqDisable` | `libtest` |
 | `irqSet` | `libtest` |
@@ -112,6 +122,11 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `sceneRun` | `basics/scene_stack` |
 | `scopeInit` | `input/superscope` |
 | `scopeIsConnected` | `input/superscope` |
+| `snesmodFadeVolume` | `audio/snesmod_music` |
+| `snesmodPause` | `audio/snesmod_music` |
+| `snesmodPlayEffect` | `audio/snesmod_sfx` |
+| `snesmodResume` | `audio/snesmod_music` |
+| `snesmodStop` | `audio/snesmod_music` |
 | `sramChecksum` | `libtest` |
 | `sramClear` | `libtest` |
 | `sramLoad` | `libtest` |
