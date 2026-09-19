@@ -25,6 +25,18 @@
 # gravity must put him back. Measured: Y = 66 at frame 332 (airborne), 58
 # at 344 (near apex), and exactly 96 again at 420 — the same ground height,
 # with mariox unchanged, so he landed rather than drifting or falling out.
+#
+# SAMPLING PHASE (2026-09-19). Mario's callback finishes late in the frame:
+# `mariox` is written on scanline 259-261 of 262, and luna samples a
+# checkpoint at the frame boundary. While he is MOVING, the value read is
+# therefore this frame's or the previous one's depending on a margin of one
+# or two scanlines — any change to the engine's cycle cost flips it, with the
+# trajectory itself unchanged. The owner-tracked workspace (+~140 CPU cycles
+# per callback) did exactly that on frames 120 and 144; `--trace-writes` on
+# mariox/marioy showed the two write sequences byte-identical, only one
+# scanline later. Moving checkpoints therefore accept both neighbours
+# (`ge`/`le`); checkpoints where he stands still, or sits at the apex, stay
+# exact. The `delta` legs keep the direction honest.
 rom = "../../../examples/maps/slope_collision/slope_collision.sfc"
 #        RIGHT held for 240 frames       A tap (jump)
 input = "60:0x0100,300:0,320:0x0080,340:0"
@@ -39,15 +51,15 @@ x_pos  = { eq = 0,  width = 2 }
 [[checkpoint]]                 # walking the flat: Y must not move
 at_frame = 120
 [checkpoint.values]
-mariox = { eq = 99, width = 2 }
+mariox = { ge = 98, le = 99, width = 2 }   # frame 119 or 120
 marioy = { eq = 96, width = 2 }
 x_pos  = { eq = 0,  width = 2 }
 
 [[checkpoint]]                 # on the slope: pushed UP, not stopped
 at_frame = 144
 [checkpoint.values]
-mariox = { eq = 127, width = 2 }
-marioy = { eq = 89,  width = 2 }
+mariox = { ge = 126, le = 127, width = 2 } # frame 143 or 144
+marioy = { ge = 89,  le = 90,  width = 2 } # 96 on the flat
 [checkpoint.delta]
 mariox = "increased"           # still advancing...
 marioy = "decreased"           # ...while the surface lifts him
@@ -70,7 +82,7 @@ mariox = "unchanged"
 [[checkpoint]]                 # A on the ground -> airborne
 at_frame = 332
 [checkpoint.values]
-marioy = { eq = 66,  width = 2 }
+marioy = { ge = 66,  le = 68,  width = 2 } # frame 331 or 332; 96 grounded
 mariox = { eq = 209, width = 2 }
 
 [[checkpoint]]                 # still rising toward the apex

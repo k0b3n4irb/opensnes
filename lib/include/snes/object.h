@@ -156,6 +156,11 @@ extern u16 objgetid;
 /* The actual object buffer array lives in Bank $7E:
  *   objbuffers[OB_MAX]  — 80 x 64 = 5120 bytes
  *   objfctinit/upd/ref  — function pointer tables (256 bytes each)
+ * The workspace is owner-tracked (since 2026-09-19): it remembers which slot
+ * it mirrors, flushes to that slot before any reload (objNew, objGetPointer,
+ * objKill), and every write-back goes to the owner. A callback may therefore
+ * look at another object without corrupting its own record.
+ *
  * Access these ONLY through the workspace pattern:
  *   objGetPointer(handle) copies objbuffers[N] → objWorkspace
  *   Engine functions copy objWorkspace → objbuffers[N] after callbacks

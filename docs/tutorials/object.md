@@ -251,7 +251,8 @@ The contract is a copy-in / copy-out sandwich around every callback:
    `objbuffers[idx]` into `objWorkspace`.
 2. Your callback reads and writes `objWorkspace` fields freely.
 3. When the callback returns, `objUpdateAll` copies `objWorkspace` **back**
-   into `objbuffers[idx]`, unconditionally.
+   into the slot it mirrors — see the next section for why that wording
+   matters.
 
 Engine functions you call from inside the callback keep the illusion intact:
 `objCollidMap`, `objCollidMapWithSlopes`, `objCollidMap1D` and `objUpdateXY`
@@ -273,33 +274,37 @@ if (objptr == 0) {
 u16 hp = objWorkspace.hitpoints;
 ```
 
-### What invalidates the workspace
+### What reloads the workspace
 
-There is only one workspace, so anything that loads a different object into
-it invalidates what you were holding. In practice:
+There is only one workspace, so anything that loads a different object
+replaces what you were looking at:
 
 - `objNew()` — leaves the *new* object in the workspace.
 - `objGetPointer()` — leaves the object you asked for in the workspace.
-- `objKill()` — calls `objGetPointer` internally, so it clobbers it too.
-- returning from a callback — the engine writes the workspace back.
+- `objKill()` — calls `objGetPointer` internally, so it reloads it too.
 
-The dangerous combination is the last one. Step 3 above copies the workspace
-back into the slot **that was being updated**, whatever the workspace now
-holds. So this, inside an update callback, silently overwrites the current
-object with a copy of the other one:
+Until 2026-09-19 this was a trap: the engine wrote the workspace back into
+the slot **it was iterating**, whatever the workspace held by then, so an
+update callback that peeked at the player returned with the player's 64 bytes
+written over the enemy's slot. The workspace now tracks its **owner** — the
+slot it mirrors. Every reload first flushes the current contents to that
+owner, and every write-back goes to the owner, not to the caller's index:
 
 ```c
 void enemy_update(u16 idx) {
-    objGetPointer(player_handle);        /* workspace now = the player */
+    objWorkspace.xvel = -64;             /* edit the enemy... */
+    objGetPointer(player_handle);        /* ...flushed to the enemy's slot;
+                                            workspace now = the player */
     u16 px = objWorkspace.xpos[1] | (objWorkspace.xpos[2] << 8);
-    /* ... and then we return. The engine writes the PLAYER's 64 bytes
-       into the ENEMY's slot. Two players, one of them an enemy. */
+    /* Returning here is safe: the write-back goes to the player's slot,
+       which it already matches. The enemy keeps its own record. */
 }
 ```
 
-The rule: if you look at another object during an update callback, read what
-you need into locals and then restore the workspace with
-`objGetPointer(my_own_handle)` before returning.
+What is still yours to manage: after the peek, `objWorkspace` **is** the
+player. Writing to it edits the player, and the collision routines you call
+next with the enemy's `idx` reload the enemy first. If you want to keep
+editing your own object, call `objGetPointer(my_own_handle)` to come back.
 
 ### Positions are 24-bit fixed point
 
@@ -516,7 +521,8 @@ it there does nothing until the next update pass.
 `objKill(handle)` takes a handle, unlike almost everything else in this API.
 It unlinks the object from its type's active list and returns the slot to the
 free list. Remember that it loads the victim into the workspace on the way,
-so it invalidates whatever you were holding.
+so the workspace is the victim afterwards (your own edits were flushed to
+your slot first).
 
 ## Gotchas {#object_gotchas}
 
@@ -540,16 +546,15 @@ the bank is on the stack — the routine now reads it. Both examples dropped
 their shim and register from C, and their manifests pass unchanged, which is
 what proves the dispatch reaches bank `$01` correctly.
 
-### 🔴 A type with no registered callbacks jumps into nowhere
+### 🟢 A type with no registered callbacks jumped into nowhere — fixed 2026-09-19
 
-`objInitEngine()` does not populate or validate the callback tables, and
-neither the update pass nor the refresh pass checks for a null pointer before
-dispatching. The tables start zeroed (the boot code zero-fills the far RAM
-band), so an object whose type was never registered calls address `$00:0000`.
-Register every type you spawn, and register a real refresh callback or never
-call `objRefreshAll()` — a null refresh pointer on an on-screen object is the
-same crash. Both examples store 0 in `objfctref` **and** never call
-`objRefreshAll()`; that pairing is load-bearing.
+Neither the update pass, the refresh pass nor the `objLoadObjects` init
+dispatch checked for a null pointer, and the tables start zeroed, so an object
+whose type was never registered called address `$00:0000`. All three sites now
+test the 24-bit pointer and skip the call. An unregistered type is inert: it
+keeps its slot, is never updated, and `objLoadObjects` skips its table entry.
+A null refresh callback is likewise safe, so `objRefreshAll()` no longer
+depends on every type having one.
 
 ### 🟢 `objLoadObjects` ignored the bank byte of your pointer — fixed 2026-09-18
 
@@ -581,11 +586,14 @@ The index register already held the object there — the neighbouring
 corpus carries `T_FIRES` or `T_SPIKE`, which is both why it survived and why
 the fix could not change any existing behaviour.
 
-### 🟠 Returning from a callback writes the workspace back unconditionally
+### 🟢 A callback that peeked at another object became a copy of it — fixed 2026-09-19
 
-The workspace-invalidation trap described above. It is the single most likely
-way to corrupt an object, and it produces no error — just an entity that has
-inexplicably become a copy of another one.
+The write-back after a callback went to the slot being iterated, whatever the
+workspace held. The workspace is now owner-tracked (see *What reloads the
+workspace* above): edits are flushed to their owner before any reload, and
+write-backs go to the owner. The cost is about 140 CPU cycles per callback —
+enough to move a late-frame write across a frame boundary, which is how the
+slope example's manifest noticed.
 
 ### 🟡 `objCollidMap1D` applies no friction
 
@@ -604,11 +612,11 @@ when you are chasing a dropped frame (see @ref tutorial_profiling).
 ### 🟡 `objNew` leaves `objgetid` stale when the pool is full
 
 On failure `objNew` returns 0 but does not clear `objgetid`, which still holds
-the previous successful handle. `objLoadObjects` tests `objgetid` to decide
-whether to sync the workspace back, so an init callback that fails to allocate
-during a bulk load can write the workspace into the previously created object.
-Always guard with the return value, as the examples do:
-`if (objNew(type, xp, yp) == 0) return;`.
+the previous successful handle. This used to let `objLoadObjects` write the
+workspace into the previously created object; since the owner-tracked
+workspace (2026-09-19) the workspace has no owner at that point and nothing is
+written. `objgetid` itself is still stale, so keep guarding with the return
+value, as the examples do: `if (objNew(type, xp, yp) == 0) return;`.
 
 ### 🟡 `objKillAll` may leak slots
 

@@ -104,6 +104,14 @@ CASES = [
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
+    # object engine (2026-09-18): the workspace is owner-tracked, so a callback
+    # that peeks at another object no longer overwrites itself with it; and a
+    # type with no registered callback is skipped instead of jumping to $00:0000
+    ("r_obj_alive", 2, 0xA11E),   # objUpdateAll returned at all
+    ("r_obj_calls", 2, 1),        # the registered callback ran once
+    ("r_obj_type",  2, 0),        # the peeker is still itself (was: a copy, type 1)
+    ("r_obj_edit",  2, 0x1234),   # its pre-peek edit survived
+    ("r_obj_other", 2, 0x0BAD),   # the object it looked at is untouched
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C

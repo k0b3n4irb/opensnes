@@ -163,6 +163,10 @@ objfriction     DW                          ; friction value
 
 objneedrefresh  DB                          ; 1 if global sprite refresh needed
 
+objwsowner      DW                          ; byte offset of the slot objWorkspace
+                                            ; currently mirrors, $FFFF = none
+                                            ; (see the sync macros below)
+
 objtmp1         DW                          ; temporary vars
 objtmp2         DW
 objtmp3         DW
@@ -188,12 +192,36 @@ objtmp4         DW
 ; SYNC_TO_WORKSPACE: objbuffers[X] → objWorkspace
 ; X = byte offset into objbuffers (preserved)
 .MACRO SYNC_TO_WORKSPACE
+    ; OWNER-TRACKED since 2026-09-18. There is one workspace, and it used to
+    ; be copied back blindly into whichever slot the engine was iterating —
+    ; so a callback that looked at another object (objGetPointer, objNew,
+    ; objKill all reload the workspace) returned with the OTHER object's 64
+    ; bytes written over its own slot: an entity that silently became a copy
+    ; of another. objwsowner records which slot the workspace mirrors; before
+    ; it is reloaded its contents are flushed to that owner, so edits made
+    ; before the peek survive, and every write-back goes to the owner rather
+    ; than to whatever index the caller had in X.
     phb                         ; save DBR (MVN will change it)
     phx
     phy
 
     rep #$30
     txa
+    cmp.l objwsowner
+    beq _stw_load\@             ; reloading the slot it already mirrors
+    lda.l objwsowner
+    cmp #$FFFF
+    beq _stw_load\@             ; nothing to flush
+    clc
+    adc #objbuffers.w
+    tay                         ; Y = owner's addr in Bank $7E
+    ldx #objWorkspace.w
+    lda #OB_SIZE - 1
+    mvn $00, $7E                ; flush: workspace -> owner
+
+_stw_load\@:
+    lda 3,s                     ; X as pushed above (Y at 1,s, X at 3,s)
+    sta.l objwsowner
     clc
     adc #objbuffers.w
     tax                         ; X = source addr in Bank $7E
@@ -208,15 +236,22 @@ objtmp4         DW
     plb                         ; restore DBR
 .ENDM
 
-; SYNC_FROM_WORKSPACE: objWorkspace → objbuffers[X]
-; X = byte offset into objbuffers (preserved)
+; SYNC_FROM_WORKSPACE: objWorkspace → the slot it mirrors
+; X = the slot the caller believes it is writing (preserved). The copy goes
+; to objwsowner, not to X: in well-formed use they are the same slot, and when
+; they are not (a callback left another object in the workspace) the owner is
+; the only destination that does not corrupt anything. With no owner — a
+; failed objNew, a killed object — nothing is written. The owner is cleared
+; afterwards: slot and workspace agree, so the next load need not flush.
 .MACRO SYNC_FROM_WORKSPACE
     phb                         ; save DBR (MVN will change it)
     phx
     phy
 
     rep #$30
-    txa
+    lda.l objwsowner
+    cmp #$FFFF
+    beq _sfw_done\@
     clc
     adc #objbuffers.w
     tay                         ; Y = dest addr in Bank $7E
@@ -226,6 +261,10 @@ objtmp4         DW
     lda #OB_SIZE - 1            ; A = byte count - 1
     mvn $00, $7E                ; WLA-DX: src=$00 (workspace), dest=$7E (buffers)
 
+    lda #$FFFF
+    sta.l objwsowner
+
+_sfw_done\@:
     ply
     plx
     plb                         ; restore DBR
@@ -315,6 +354,8 @@ _oieR3:
     sta objgravity
     lda #FRICTION
     sta objfriction
+    lda #$FFFF
+    sta.l objwsowner                        ; the workspace mirrors nothing yet
 
     ply
     plx
@@ -705,6 +746,12 @@ _oik4:
     bne _oik4
 
 _oikend:
+    ; The workspace still holds the dead object's bytes: disown it, or the
+    ; next load would flush them into a slot that is back on the free list.
+    rep #$20
+    .ACCU 16
+    lda #$FFFF
+    sta.l objwsowner
     ply
     plx
     plb
@@ -770,7 +817,13 @@ _oikal3:
     stz.w objgetid
     stz.w objunused
 
+    rep #$20
+    .ACCU 16
+    lda #$FFFF
+    sta.l objwsowner                        ; every slot is gone
+
     sep #$20
+    .ACCU 8
     lda #$1
     sta objnextid
 
@@ -926,6 +979,18 @@ _oiual321:
     lda objfctupd+2,y
     sta objfctcallh
 
+    ; A type nobody registered has a zero pointer, and dispatching it jumped
+    ; to $00:0000 (guard added 2026-09-18). An object without an update
+    ; callback simply is not updated.
+    and #$00ff                              ; bank byte (the 4th byte is padding)
+    ora objfctcall
+    bne _oiual_call
+    sep #$20
+    stz.w objtokill
+    rep #$20
+    bra _oiual_nocall
+_oiual_call:
+
     lda objcidx
     pha
 
@@ -934,6 +999,7 @@ _oiual321:
     jsl jslcallfct
     rep #$20
     pla
+_oiual_nocall:
 
     ; --- WORKSPACE PATTERN: copy workspace back to object after callback ---
     lda objcidx
@@ -1044,7 +1110,8 @@ _oiral3:
     bne _oiral32
 
     rep #$20
-    bra _oiral31
+    brl _oiral31                            ; brl: the owner-tracked sync macros
+                                            ; grew this span past a short branch
 
 _oiral32:
     ; --- WORKSPACE PATTERN: copy to workspace before refresh callback ---
@@ -1062,6 +1129,12 @@ _oiral32:
     lda objfctref+2,y
     sta objfctcallh
 
+    ; Null refresh callback: skip it (both examples register 0 here, and
+    ; used to stay alive only by never calling objRefreshAll).
+    and #$00ff
+    ora objfctcall
+    beq _oiral_nocall
+
     lda objcidx
     pha
 
@@ -1069,6 +1142,7 @@ _oiral32:
     jsl jslcallfct
     rep #$20
     pla
+_oiral_nocall:
 
     ; --- WORKSPACE PATTERN: copy back after refresh callback ---
     lda objcidx
@@ -2231,7 +2305,9 @@ objLoadObjects:
 _oilo1:
     lda objtmpbuf,x
     cmp #$ffff
-    beq _oiloend
+    bne _oilo1_go                           ; inverted + brl: the sync macro and
+    brl _oiloend                            ; the null guard grew this span
+_oilo1_go:
     ; Push params in cproc L-to-R order (first param pushed first → farthest from SP)
     ; init(xp, yp, type, minx, maxx)
     pha                                     ; x (param 1, already in A from cmp)
@@ -2263,7 +2339,19 @@ _oilo1:
     lda objfctinit+2,y
     sta objfctcallh
 
+    ; An object table naming a type with no init callback: skip the entry
+    ; instead of jumping to $00:0000. objgetid is cleared so the sync below
+    ; does not act on the previous entry's object.
+    and #$00ff
+    ora objfctcall
+    bne _oilo_call
+    lda #0
+    sta.l objgetid
+    bra _oilo_nocall
+_oilo_call:
+
     jsl jslcallfct
+_oilo_nocall:
 
     ; --- After init callback: sync workspace back for newly created object ---
     ; objNew already copied to workspace, init may have modified it.
@@ -2288,7 +2376,7 @@ _oilo_skip_sync:
     pla
     pla
     ldx objcidx
-    bra _oilo1
+    brl _oilo1                              ; brl: span grew (see _oilo1)
 
 _oiloend:
     ply

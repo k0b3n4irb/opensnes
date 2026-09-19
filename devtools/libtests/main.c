@@ -28,6 +28,7 @@
 #include <snes/sram.h>
 #include <snes/interrupt.h>
 #include <snes/input.h>
+#include <snes/object.h>
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -222,6 +223,34 @@ u16 r_irq_a;        /* irqSet + VTIMER 100, 10 frames        -> 10 */
 u16 r_irq_b;        /* irqDisable, 3 more frames             -> 10 */
 u16 r_irq_c;        /* irqSetBank + H|V timer, 2 frames      -> 12 */
 u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
+
+/* object engine: the two behaviours fixed on 2026-09-18.
+ *
+ *  - The workspace write-back. An update callback that looks at another
+ *    object leaves THAT object in the single workspace; the engine then
+ *    copied it over the slot being updated, so the enemy silently became a
+ *    copy of what it looked at. The workspace is owner-tracked now: the
+ *    edit made before the peek must survive (r_obj_edit), the peeking
+ *    object must keep its own type (r_obj_type), and the object peeked at
+ *    must be untouched (r_obj_other).
+ *  - The null-callback guard. Type 1 below is never registered. Updating an
+ *    object of that type used to dispatch to $00:0000; reaching r_obj_alive
+ *    at all is the assert.
+ */
+u16 r_obj_type;     /* peeker's type after the update   -> 0 (not 1)      */
+u16 r_obj_edit;     /* peeker's yvel, set before the peek -> 0x1234       */
+u16 r_obj_other;    /* the other object's yvel            -> 0x0BAD kept  */
+u16 r_obj_calls;    /* update callback invocations        -> 1            */
+u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
+static u16 obj_peeker, obj_other;
+static u16 obj_calls;
+
+static void objPeekUpdate(u16 idx) {
+    obj_calls++;
+    objWorkspace.yvel = 0x1234;        /* an edit made BEFORE the peek */
+    objGetPointer(obj_other);          /* workspace now holds the other one */
+    /* ...and we return without restoring it: the trap. */
+}
 
 /* fixed32: the C body that fixed32.h says it cannot use. The header and
  * lib/source/math.c both claim a qbe bug makes
@@ -443,6 +472,28 @@ int main(void) {
         r_sram_clear = 0;
         for (k = 0; k < 16; k++) r_sram_clear |= load_buf[k];
     }
+
+    /* --- object engine: owner-tracked workspace + null-callback guard ---
+     * Runs after mapLoad() above, so the camera globals the update pass
+     * culls against are initialised. */
+    objInitEngine();
+    objInitFunctions(0, (void *)objPeekUpdate, (void *)objPeekUpdate, (void *)0);
+    /* type 1 is deliberately never registered */
+    obj_peeker = objNew(0, 16, 16);
+    objGetPointer(obj_peeker);
+    objWorkspace.width = 8; objWorkspace.height = 8;
+    obj_other = objNew(1, 32, 16);
+    objGetPointer(obj_other);
+    objWorkspace.yvel = 0x0BAD;
+    objGetPointer(obj_peeker);         /* reloading flushes the edit above */
+    objUpdateAll();
+    r_obj_alive = 0xA11E;
+    r_obj_calls = obj_calls;
+    objGetPointer(obj_peeker);
+    r_obj_type = objWorkspace.type;
+    r_obj_edit = (u16)objWorkspace.yvel;
+    objGetPointer(obj_other);
+    r_obj_other = (u16)objWorkspace.yvel;
 
     /* --- fixed32: the asm sine against the C expression it replaced --- */
     r_f32sin_asm = (u32)fix32Sin(sin_angle);
