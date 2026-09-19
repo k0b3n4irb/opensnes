@@ -70,16 +70,22 @@ over.
 
 ## Measured ROM coverage (the never-executed ratchet)
 
-`rom_coverage.py` asks luna for the set of executed PCs of every example
-(`luna profile --pc-set`, to the first manifest frame, no input), folds them
-onto the `.sym` labels (FastROM/HiROM mirrors folded like `symmap.py`) and
-unions the hits over the corpus. The public functions of
-`lib/include/snes/*.h` that no example executes are written to
+`rom_coverage.py` asks luna for the set of executed PCs of every ROM
+(`luna profile --pc-set`), folds them onto the `.sym` labels (FastROM/HiROM
+mirrors folded like `symmap.py`) and unions the hits. Each example ROM is
+profiled once input-free to its first capture frame and once per `luna
+test` manifest that names it, replaying the manifest's joypad-1 script (the
+checkpoints merged into one timeline, as `luna test` does) to its last
+checkpoint or `frames` / `steps` bound; the library fixture
+(`devtools/libtests/libtest.sfc`) is profiled as well. The public
+functions of `lib/include/snes/*.h` that nothing executes are written to
 `baselines/never_executed.txt`; `make tests` fails if that set gains a
-name (a function shipped with no example and no libtest) and reports names
-that became executed so `--update` can shrink the list. `ROM_COVERAGE.md`
-is the human report. Input-driven code is under-counted by construction —
-the scripted manifest legs are the next step.
+name (a function shipped with no example, no manifest leg and no libtest)
+and reports names that became executed so `--update` can shrink the list.
+`ROM_COVERAGE.md` is the human report. Mouse and Super Scope scripts are
+not replayed — `luna profile` has `--input` only — so those examples'
+peripheral paths are still under-counted (2026-09-19: 167 → 98 never
+executed when the manifest legs and the fixture were added).
 
 ## Cross-arch baseline key
 

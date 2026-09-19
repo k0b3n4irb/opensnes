@@ -1,75 +1,92 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` to each example's first manifest frame, no input · 85 ROMs · **134 of 301 public functions executed, 167 never**
+luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 86 ROMs (examples + the library fixture), 189 legs · **203 of 301 public functions executed, 98 never**
 
-> Executed = at least one PC inside the function's `.sym` label range on at least one example (boot + idle path; input-driven code is under-counted). The never-executed list is the ratchet in `baselines/never_executed.txt`.
+> Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
 | header | never executed |
 |---|---|
-| `anim.h` | `animRestart` |
-| `apu.h` | `apuReset` |
-| `audio.h` | `audioDisableEcho`, `audioGetFreeMemory`, `audioGetSampleInfo`, `audioGetVoiceState`, `audioGetVolume`, `audioIsReady`, `audioSetGain`, `audioSetVoicePitch`, `audioSetVoiceVolume`, `audioSetVolume`, `audioStopAll`, `audioStopVoice`, `audioUnloadSample`, `audioUpdate` |
+| `audio.h` | `audioStopAll`, `audioStopVoice`, `audioUnloadSample`, `audioUpdate` |
 | `background.h` | `bgGetScrollX`, `bgGetScrollY`, `bgInit`, `bgInitTileSetData`, `bgSetScrollX`, `bgSetScrollY` |
-| `collision.h` | `collidePoint`, `collideRectEx`, `collideRectTile`, `collideTileEx`, `rectContains`, `rectGetCenter`, `rectInit`, `rectSetPos` |
-| `colormath.h` | `colorMathSetBrightness`, `colorMathSetChannel`, `colorMathSetCondition`, `colorMathSetFixedColor`, `colorMathShadow`, `colorMathTint`, `colorMathTransparency50` |
-| `console.h` | `consoleInitEx`, `fadeIn`, `fadeOut`, `getRegion`, `isInVBlank`, `isPAL`, `resetFrameCount`, `srand` |
+| `colormath.h` | `colorMathSetBrightness`, `colorMathSetChannel`, `colorMathSetCondition`, `colorMathTransparency50` |
+| `console.h` | `consoleInitEx`, `resetFrameCount` |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` |
 | `dma.h` | `dmaCopyCGramBank`, `dmaCopyOam`, `dmaCopyVramBank`, `dmaTransfer` |
 | `dsp1.h` | `dsp1Distance`, `dsp1Multiply`, `dsp1Range`, `dsp1Rotate`, `dsp1Target`, `dsp1Triangle` |
-| `fixed32.h` | `fix32Div` |
-| `hdma.h` | `hdmaBrightnessGradient`, `hdmaBrightnessGradientStop`, `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaDisableAll`, `hdmaGetEnabled`, `hdmaGradient`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWaveUpdate`, `hdmaWindowShape` |
-| `input.h` | `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseGetSensitivity`, `mouseGetX`, `mouseGetY`, `mouseIsConnected`, `mouseSetSensitivity`, `padIsConnected`, `padRaw`, `scopeButtonsDown`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeGetRawX`, `scopeGetRawY`, `scopeGetX`, `scopeGetY`, `scopeSetRepeatDelay`, `scopeSinceShot` |
-| `interrupt.h` | `irqClear`, `irqDisable`, `irqSet`, `irqSetVTimer`, `nmiClear`, `nmiSet` |
-| `map.h` | `mapGetMetaTile`, `mapGetMetaTilesProp`, `mapSetMapOptions` |
-| `math.h` | `div16`, `fixAbs`, `fixClamp`, `fixDiv`, `fixLerp`, `fixSqrt`, `mod16`, `mul16` |
+| `hdma.h` | `hdmaBrightnessGradient`, `hdmaBrightnessGradientStop`, `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaGetEnabled`, `hdmaGradient`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWaveUpdate`, `hdmaWindowShape` |
+| `input.h` | `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseGetSensitivity`, `mouseGetX`, `mouseGetY`, `mouseIsConnected`, `mouseSetSensitivity`, `padRaw`, `scopeButtonsDown`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeGetRawX`, `scopeGetRawY`, `scopeGetX`, `scopeGetY`, `scopeSetRepeatDelay`, `scopeSinceShot` |
+| `interrupt.h` | `nmiSet` |
+| `map.h` | `mapSetMapOptions` |
+| `math.h` | `fixAbs`, `fixClamp`, `fixSqrt` |
 | `mode7.h` | `mode7Rotate`, `mode7SetMatrix`, `mode7SetPivot`, `mode7Transform` |
-| `mosaic.h` | `mosaicDisable`, `mosaicEnable`, `mosaicFadeIn`, `mosaicFadeOut`, `mosaicGetSize`, `mosaicSetSize` |
-| `object.h` | `objCollidMap1D`, `objCollidObj`, `objInitFriction1D`, `objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll` |
-| `panel.h` | `panelClear` |
+| `mosaic.h` | `mosaicGetSize`, `mosaicSetSize` |
+| `object.h` | `objCollidObj`, `objInitGravity`, `objRefreshAll` |
 | `profile.h` | `profileColorEnd`, `profileColorStart`, `profileGetFrameCount`, `profileGetLagFrames`, `profileGetScanline`, `profileInit`, `profileScanlineEnd`, `profileScanlineStart` |
-| `scene.h` | `scenePop`, `scenePush` |
 | `snesmod.h` | `snesmodAllocateSoundRegion`, `snesmodFadeVolume`, `snesmodFlush`, `snesmodGetPosition`, `snesmodPause`, `snesmodPlayEffect`, `snesmodResume`, `snesmodSetSoundTable`, `snesmodStop` |
 | `sprite.h` | `oamDrawMetaFlip`, `oamDynamicSetSize`, `oamSetTile` |
-| `sram.h` | `sramChecksum`, `sramClear`, `sramLoad`, `sramLoadOffset`, `sramSave`, `sramSaveOffset` |
-| `text.h` | `textFlush`, `textGetX`, `textGetY` |
+| `text.h` | `textFlush`, `textGetX` |
 | `video.h` | `videoSetObjInterlace`, `videoSetOverscan`, `videoSetPseudoHires` |
-| `window.h` | `windowCentered`, `windowDisable`, `windowDisableAll`, `windowInit`, `windowSetPos`, `windowSetSubMask`, `windowSplit` |
 
-## Least-covered executed functions (one example only)
+## Least-covered executed functions (one ROM only)
 
-| function | the one example |
+| function | the one ROM |
 |---|---|
 | `LzssDecodeVram` | `backgrounds/mode1_lz77` |
+| `animRestart` | `libtest` |
+| `apuReset` | `audio/apu_switch` |
 | `atan2_8` | `basics/aim_target` |
-| `audioEnableEcho` | `audio/echo` |
-| `audioPlaySample` | `audio/echo` |
-| `audioPlaySampleEx` | `audio/echo` |
-| `audioSetADSR` | `audio/soundboard` |
-| `audioSetEcho` | `audio/echo` |
-| `audioSetEchoFilter` | `audio/echo` |
-| `collideRect` | `basics/collision_demo` |
-| `collideTile` | `basics/collision_demo` |
+| `audioDisableEcho` | `audio/echo` |
+| `audioGetFreeMemory` | `libtest` |
+| `audioGetSampleInfo` | `libtest` |
+| `audioGetVoiceState` | `libtest` |
+| `audioGetVolume` | `libtest` |
+| `audioIsReady` | `libtest` |
+| `audioSetGain` | `libtest` |
+| `audioSetVoicePitch` | `libtest` |
+| `audioSetVoiceVolume` | `libtest` |
+| `audioSetVolume` | `libtest` |
+| `collidePoint` | `libtest` |
+| `collideRectEx` | `libtest` |
+| `collideRectTile` | `libtest` |
+| `collideTileEx` | `libtest` |
 | `colorMathSetDirectColor` | `color/direct_color` |
-| `colorMathSetHalf` | `color/hicolor_blend` |
+| `colorMathSetFixedColor` | `color/shadow_tint` |
+| `colorMathShadow` | `color/shadow_tint` |
+| `colorMathTint` | `color/shadow_tint` |
+| `div16` | `libtest` |
 | `dsp1Attitude` | `chips/dsp1_cube` |
 | `dsp1Objective` | `chips/dsp1_cube` |
 | `dsp1Project` | `chips/dsp1_cube` |
 | `dsp1Raster` | `mode7/dsp1_ground` |
-| `fix32Mul` | `basics/fix32_orbit` |
+| `fix32Div` | `libtest` |
+| `fixDiv` | `libtest` |
+| `fixLerp` | `libtest` |
+| `getRegion` | `libtest` |
 | `gsuDmaFullFrame` | `chips/superfx_3d` |
 | `gsuLaunch` | `chips/superfx_3d` |
 | `gsuSetupBitmapTilemap` | `chips/superfx_3d` |
 | `gsuSetupHdmaBlanking` | `chips/superfx_3d` |
+| `hdmaDisableAll` | `hdma/gradient_colors` |
 | `hdmaParallax` | `scrolling/parallax_scroll` |
-| `hdmaSetTable` | `mode7/dsp1_ground` |
 | `hdmaSetupBank` | `hdma/hdma_helpers` |
 | `hdmaSetupIndirect` | `hdma/hdma_indirect_gradient` |
-| `irqEnable` | `color/hicolor_1792` |
-| `irqSetBank` | `color/hicolor_1792` |
-| `irqSetHTimer` | `color/hicolor_1792` |
+| `irqClear` | `libtest` |
+| `irqDisable` | `libtest` |
+| `irqSet` | `libtest` |
+| `irqSetVTimer` | `libtest` |
+| `isInVBlank` | `libtest` |
+| `isPAL` | `libtest` |
+| `mapGetMetaTile` | `libtest` |
+| `mapGetMetaTilesProp` | `libtest` |
+| `mod16` | `libtest` |
 | `mode7SetSettings` | `mode7/perspective_rotate` |
+| `mosaicDisable` | `transitions/mosaic` |
+| `mosaicEnable` | `transitions/mosaic` |
+| `mosaicFadeIn` | `transitions/mosaic` |
+| `mosaicFadeOut` | `transitions/mosaic` |
 | `mouseInit` | `input/mouse` |
-| `nmiSetBank` | `color/hicolor_1792` |
+| `mul16` | `libtest` |
+| `nmiClear` | `libtest` |
 | `oamDynamicDrainQueue` | `sprites/dynamic_metasprite` |
 | `oamHide` | `sprites/animated_sprite` |
 | `oamMetaDrawDyn` | `sprites/dynamic_metasprite` |
@@ -77,18 +94,34 @@ luna v1.24.0 · `luna profile --pc-set` to each example's first manifest frame, 
 | `oamSetXY` | `input/move_sprite` |
 | `oamSetY` | `input/move_sprite` |
 | `objCollidMap` | `games/mapandobjects` |
+| `objCollidMap1D` | `libtest` |
 | `objCollidMapWithSlopes` | `maps/slope_collision` |
+| `objInitFriction1D` | `libtest` |
+| `objKill` | `libtest` |
+| `objKillAll` | `libtest` |
+| `padIsConnected` | `libtest` |
 | `padReleased` | `maps/dynamic_map` |
-| `rand` | `basics/random` |
+| `panelClear` | `basics/panel_hud` |
+| `rectContains` | `libtest` |
+| `rectGetCenter` | `libtest` |
+| `rectInit` | `libtest` |
+| `rectSetPos` | `libtest` |
 | `sa1Init` | `chips/sa1_starfield` |
+| `scenePop` | `basics/scene_stack` |
+| `scenePush` | `basics/scene_stack` |
 | `sceneRun` | `basics/scene_stack` |
 | `scopeInit` | `input/superscope` |
 | `scopeIsConnected` | `input/superscope` |
-| `setBrightness` | `games/rpg` |
-| `snesmodSetModuleVolume` | `games/likemario` |
-| `sqrt16` | `basics/aim_target` |
+| `sramChecksum` | `libtest` |
+| `sramClear` | `libtest` |
+| `sramLoad` | `libtest` |
+| `sramSave` | `libtest` |
+| `textGetY` | `libtest` |
 | `videoSetInterlace` | `backgrounds/mode5_hires` |
-| `windowEnable` | `windows/window_multi_hdma` |
-| `windowSetInvert` | `windows/window_multi_hdma` |
-| `windowSetLogic` | `windows/window_multi_hdma` |
-| `windowSetMainMask` | `windows/window_multi_hdma` |
+| `windowCentered` | `libtest` |
+| `windowDisable` | `libtest` |
+| `windowDisableAll` | `libtest` |
+| `windowInit` | `libtest` |
+| `windowSetPos` | `libtest` |
+| `windowSetSubMask` | `libtest` |
+| `windowSplit` | `libtest` |
