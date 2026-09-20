@@ -9,10 +9,19 @@
  * SRAM (Static RAM) on SNES cartridges is battery-backed RAM that
  * persists when the console is powered off. It's used for save games.
  *
- * ## Memory Layout (LoROM)
+ * ## Memory Layout
  *
- * SRAM is mapped at bank $70, addresses $0000-$7FFF (32KB max).
- * Most games use 2KB-8KB of SRAM.
+ * - **LoROM**: bank $70, $0000-$7FFF (32 KB max).
+ * - **HiROM** (`USE_HIROM=1`): bank $30, $6000-$7FFF — the hardware exposes
+ *   battery RAM in 8 KB windows there, and this module addresses the first
+ *   one only, so `offset + size` must stay within 8 KB (the default
+ *   SRAM_SIZE). Until 2026-09-20 the LoROM address was used on HiROM too.
+ * - **SA-1**: not supported — `USE_SRAM=1` with `USE_SA1=1` is a build error.
+ *   SA-1 save memory is BW-RAM, which the SNES CPU may only write after
+ *   enabling it, and the library does not.
+ *
+ * Source pointers may be in any bank (a `const` save template in ROM works);
+ * destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.
  *
  * ## Usage Example
  *
@@ -98,7 +107,7 @@
  * sramSave(saveData, 64);
  * @endcode
  *
- * @note Uses bank $70 (LoROM SRAM), starting at address $0000
+ * @note Writes from SRAM offset 0 — $70:0000 on LoROM, $30:6000 on HiROM
  * @warning Ensure ROM header has SRAM enabled!
  */
 void sramSave(const u8 *data, u16 size);

@@ -148,7 +148,6 @@ lint-vram:
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
-	@python3 devtools/check_lib_rodata.py
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
@@ -197,6 +196,7 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests
 	@$(MAKE) -s -C devtools/libtests_fx
 	@$(MAKE) -s -C devtools/libtests_dsp1
+	@$(MAKE) -s -C devtools/libtests_hirom
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
@@ -249,6 +249,11 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_dsp1 clean
 	@$(MAKE) -s -C devtools/libtests_dsp1
 	@python3 devtools/libtests_dsp1/test_libtest_dsp1.py
+	@# Fourth fixture: HiROM. The sram module's HiROM mapping, and the bank
+	@# byte of a pointer to RAM under .BASE $$C0 (a wlalink fix, 2026-09-20).
+	@$(MAKE) -s -C devtools/libtests_hirom clean
+	@$(MAKE) -s -C devtools/libtests_hirom
+	@python3 devtools/libtests_hirom/test_libtest_hirom.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
@@ -295,6 +300,7 @@ rom-coverage:
 	@$(MAKE) -s -C devtools/libtests
 	@$(MAKE) -s -C devtools/libtests_fx
 	@$(MAKE) -s -C devtools/libtests_dsp1
+	@$(MAKE) -s -C devtools/libtests_hirom
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py

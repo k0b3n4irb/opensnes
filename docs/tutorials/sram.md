@@ -50,10 +50,20 @@ The SNES MMU maps SRAM into bank space differently for LoROM vs HiROM:
 | **HiROM** | `$30`–`$3F` (mirror to `$B0`–`$BF`) | `$30:6000–$3F:7FFF` | 8 KB per bank in the lower half, 32 KB max. |
 | **SA-1** | Different — see SA-1 chapter | — | SA-1 cart layouts depend on per-cart configuration. |
 
-The lib's `sramSave`/`sramLoad` hide these details. You pass a
-WRAM/RAM pointer and a byte count; the helper assembles the correct
-24-bit SRAM address. Unless you're writing custom SRAM access code,
-you don't need to know the bank/offset arithmetic.
+The lib's `sramSave`/`sramLoad` hide the LoROM / HiROM difference: you pass
+a pointer and a byte count, and the helper uses `$70:0000` on a LoROM build
+and `$30:6000` on a HiROM one. Two limits to know:
+
+- on **HiROM** the helpers address the first 8 KB window only
+  (`offset + size <= 8192`, the default `SRAM_SIZE`);
+- on **SA-1** they are not available: `USE_SRAM=1` with `USE_SA1=1` stops the
+  build with an explanation rather than linking a module that would write
+  nowhere.
+
+This paragraph claimed the helpers "hide these details" long before they
+did — until 2026-09-20 they used the LoROM address on every build. The HiROM
+mapping is pinned by `devtools/libtests_hirom`, which reads the bytes back
+from `$30:6000`.
 
 ## Build setup
 

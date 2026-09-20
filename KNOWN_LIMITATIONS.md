@@ -475,6 +475,31 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 HiROM: every C pointer to RAM carried a ROM bank (fixed 2026-09-20)
+
+HiROM units are assembled under `.BASE $C0`, and wlalink's `:label` operator
+added that base to the bank of a label even when the label was a RAM
+variable: `pea.w :var` pushed `$C0`. `$C0:xxxx` is ROM on HiROM, so any
+routine that honours the bank byte of the pointer it is given — which is the
+direction the whole library has been moving in — read or wrote ROM instead of
+work RAM when handed a RAM buffer on a HiROM build. LoROM was unaffected
+(`$80:xxxx`, the FastROM case, still mirrors work RAM below `$2000`).
+
+Fixed in the wlalink fork (`compiler/PINS.md`, third local patch). Found by
+the first HiROM library fixture, `devtools/libtests_hirom`: an SRAM save from
+a const template worked, the load into a RAM buffer wrote nowhere.
+
+### 🟢 SRAM used the LoROM address on every build (fixed 2026-09-20)
+
+`lib/source/sram.asm` hard-coded `$70:0000`. On HiROM, battery RAM is at
+`$30-$3F:$6000-$7FFF` (fullsnes, "SNES Memory Map / Battery-backed SRAM"), so
+a HiROM game saved into open bus. The module now maps per build; on HiROM it
+addresses the first 8 KB window only. **SA-1 + `USE_SRAM=1` is refused at
+build time**: SA-1 save memory is BW-RAM, writable from the SNES CPU only
+after enabling it, which the library does not do.
+
+**Mitigation (SA-1):** none in the library yet — write BW-RAM from SA-1 code.
+
 ### 🟢 `sramClear()` wrote a byte ramp instead of zeros (fixed 2026-09-15)
 
 `lib/source/sram.asm`'s clear loop compared the 16-bit index through the

@@ -31,7 +31,7 @@ reformat without updating the script.
 |------|-----|--------|
 | compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 1422c17ec969ef057539b42f03c739775c3b5e3c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
+| compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -123,12 +123,25 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 2 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12)
+### compiler/wla-dx — 3 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
 
 ```
+9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+The newest patch completes the first one. `86df331` fixed
+`get_snes_pc_bank()`; the calculation engine has a second path to a label's
+bank — the `:label` operator, `SI_OP_BANK` / `SI_OP_BANK_BYTE` — which added
+the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)
+`pea.w :var` pushed `$C0` for a variable in a bank-`$00` RAMSECTION, so
+**every C pointer to RAM carried a ROM bank on HiROM**, and any routine that
+honours the bank byte of its pointer read or wrote `$C0:xxxx` instead of work
+RAM. Found by an SRAM round trip on the HiROM fixture
+(`devtools/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
+change (the bank byte pushed for RAM pointers goes from `$C0` / `$80` to
+`$00`); LoROM SlowROM ROMs are byte-identical.
 
 The second patch is what the ASan/UBSan job found on its first run
 (`make test-sanitizers`): `decode.c` read `g_tmp[-1]` on any

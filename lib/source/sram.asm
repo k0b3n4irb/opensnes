@@ -22,8 +22,28 @@
 .endif
 .endif
 
-; SRAM bank for LoROM
+; Where the battery RAM sits, per mapping (fullsnes, "SNES Memory Map /
+; Battery-backed SRAM": "HiROM ---> SRAM at 30h-3Fh,B0h-BFh:6000h-7FFFh ;small
+; 8K SRAM bank(s) / LoROM ---> SRAM at 70h-7Dh,F0h-FFh:0000h-7FFFh ;big 32K
+; SRAM bank(s)"). Until 2026-09-20 the LoROM values were used for every
+; build, so a HiROM ROM saved into open bus and loaded garbage.
+;
+; HiROM exposes 8 KB per bank: this module addresses the FIRST bank only, so
+; offset + size must stay within $2000 (the default SRAM_SIZE, 8 KB). Larger
+; HiROM saves would have to step through banks $31-$3F; not implemented.
+;
+; SA-1 is not supported here: its save memory is BW-RAM ($40-$4F), which the
+; SNES CPU may only write after enabling SBWE ($2226), and crt0 does not.
+; make/common.mk refuses USE_SRAM=1 with USE_SA1=1 instead of building a
+; module that would silently do nothing.
+.ifdef HIROM
+.EQU SRAM_BANK $30
+.EQU SRAM_BASE $6000
+.else
 .EQU SRAM_BANK $70
+.EQU SRAM_BASE $0000
+.endif
+.EQU SRAM_LONG (SRAM_BANK << 16) + SRAM_BASE
 
 ; Direct page temporaries
 .EQU DP_SIZE   $00      ; 2 bytes - transfer size
@@ -69,7 +89,7 @@
     .ACCU 8
 @ssb_loop\@:
     lda [DP_SRC],y
-    sta.l SRAM_BANK << 16,x
+    sta.l SRAM_LONG,x
     inx
     iny
     cpy.b DP_SIZE
@@ -78,8 +98,12 @@
 @ssb_fast\@:
     rep #$20
     .ACCU 16
+    tya
+    clc
+    adc #SRAM_BASE              ; SRAM offset -> CPU address in the SRAM bank
+    tay
     lda.b DP_SIZE               ; A = byte count - 1
-    mvn $7E, $70                ; WLA-DX: mvn src_bank, dst_bank
+    mvn $7E, SRAM_BANK          ; WLA-DX: mvn src_bank, dst_bank
 @ssb_done\@:
 .ENDM
 
@@ -99,7 +123,7 @@
     sep #$20
     .ACCU 8
 @slb_loop\@:
-    lda.l SRAM_BANK << 16,x
+    lda.l SRAM_LONG,x
     sta [DP_SRC],y
     inx
     iny
@@ -109,8 +133,12 @@
 @slb_fast\@:
     rep #$20
     .ACCU 16
+    txa
+    clc
+    adc #SRAM_BASE              ; SRAM offset -> CPU address in the SRAM bank
+    tax
     lda.b DP_SIZE               ; A = byte count - 1
-    mvn $70, $7E                ; WLA-DX: mvn src_bank, dst_bank
+    mvn SRAM_BANK, $7E          ; WLA-DX: mvn src_bank, dst_bank
 @slb_done\@:
 .ENDM
 
@@ -291,7 +319,7 @@ sramClear:
     ldy #$0000                  ; Start at offset 0
 
 @clear_loop:
-    sta $0000,y                 ; Store 0 to SRAM (bank register = $70)
+    sta.w SRAM_BASE,y           ; Store 0 to SRAM (data bank = SRAM_BANK)
     iny
     ; Compare the 16-bit index directly: the previous `tya / cmp` swapped
     ; the counter into A, so from byte 1 on the loop stored the OFFSET
