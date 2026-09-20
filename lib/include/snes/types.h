@@ -273,4 +273,18 @@ typedef void (*VoidFn)(void);
 
 /** @} */
 
+/*============================================================================
+ * Deprecation
+ *============================================================================*/
+
+/**
+ * @brief Mark a public function as deprecated, with its replacement
+ *
+ * cproc accepts and ignores the attribute; the clang pre-pass that every C
+ * file goes through (make/common.mk) reports each use as a WARNING — the
+ * build system passes -Wno-error=deprecated-declarations, so deprecated code
+ * keeps building. Deprecated functions are removed at the next major version.
+ */
+#define OPENSNES_DEPRECATED(msg) __attribute__((deprecated(msg)))
+
 #endif /* OPENSNES_TYPES_H */

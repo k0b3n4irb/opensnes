@@ -16,6 +16,11 @@
  * may live in any bank (the header's "must be in bank 0" note is stale; the
  * function that does drop the bank is irqSet — API audit 2026-09-20, B2).
  */
+/* hdmaSetupBank is deprecated; while it ships it keeps its vector. */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include <snes.h>
 #include <snes/hdma.h>
 #include <snes/mode7.h>
@@ -96,6 +101,10 @@ int main(void) {
      * colour 0. Red at the top, blue at the bottom; the last chunk leaves
      * CGRAM[37] near-blue and CGRAM[0] untouched. */
     hdmaColorGradient(3, 37, 0x001F, 0x7C00);
+    /* The deprecated explicit-bank form: channel 2, the gradient table, with
+     * the bank passed by hand. Asserted on luna's DMA view, bank included. */
+    hdmaSetupBank(2, HDMA_MODE_1REG, HDMA_DEST_COLDATA, grad_table,
+                  (u8)((u32)(const void *)grad_table >> 16));
 
     /* mode 7: Transform and Rotate go through the PPU multiplier and leave
      * the matrix behind; SetMatrix and SetPivot then write known values the

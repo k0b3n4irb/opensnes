@@ -76,7 +76,11 @@ void nmiSet(VBlankCallback callback);
  *
  * @param callback Function to call during VBlank
  * @param bank ROM bank where the callback is located (0-255)
+ *
+ * @deprecated Since 2026-09-20: nmiSet() reads the bank from the function
+ *             pointer. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("nmiSet() takes the bank from the function pointer")
 void nmiSetBank(VBlankCallback callback, u8 bank);
 
 /**
@@ -127,7 +131,11 @@ void irqSet(void *handler);
  * @brief irqSet() with an explicit ROM bank for the handler
  * @param handler Address of the ASM handler
  * @param bank ROM bank containing the handler
+ *
+ * @deprecated Since 2026-09-20: irqSet() reads the bank from the handler
+ *             pointer. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("irqSet() takes the bank from the handler pointer")
 void irqSetBank(void *handler, u8 bank);
 
 /**

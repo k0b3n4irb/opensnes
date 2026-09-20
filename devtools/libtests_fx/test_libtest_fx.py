@@ -56,6 +56,8 @@ STATE_CASES = [
     # exact colour depends on the sampling phase — "not black" is the claim.
     ("ppu.cgram.37", ("ne", 0)),
     ("ppu.cgram.0", 0x0000),         # ...and colour 0, where every gradient used to land, is untouched
+    ("dma.channels.2.bbad", 0x32),   # hdmaSetupBank (deprecated): COLDATA, and...
+    ("dma.channels.2.a_bank", ("ne", 0)),   # ...the hand-passed bank of a const table (an asset bank)
     ("dma.channels.4.bbad", 0x26),   # hdmaWindowShape -> WH0, two registers
     ("dma.channels.4.params", 0x01),
     ("dma.channels.5.bbad", 0x32),   # hdmaGradient -> COLDATA, one register

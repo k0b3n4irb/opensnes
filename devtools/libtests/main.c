@@ -17,6 +17,12 @@
  * Globals live in bank $00 WRAM (< $2000), so `--assert 00:<off>=<bytes>`
  * reads them. Values are little-endian.
  */
+/* This fixture calls deprecated functions ON PURPOSE: as long as they are
+ * shipped they keep their vectors. Silence the clang pre-pass for them. */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include <snes.h>
 #include <snes/anim.h>
 #include <snes/math.h>

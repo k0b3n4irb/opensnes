@@ -103,7 +103,12 @@ void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
  * @param size     Number of bytes to transfer
  *
  * @warning Must be called during VBlank or force blank!
+ *
+ * @deprecated Since 2026-09-20: a C pointer is a far pointer and
+ *             dmaCopyVram() reads its bank. This variant IGNORES the bank of
+ *             @p source and uses @p bank. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("dmaCopyVram() takes the bank from the source pointer")
 void dmaCopyVramBank(const u8 *source, u8 bank, u16 vramAddr, u16 size);
 
 /**
@@ -192,7 +197,11 @@ void dmaCopyCGram(const u8 *source, u16 startColor, u16 size);
  * @param size       Number of bytes to transfer (2 bytes per color)
  *
  * @warning Must be called during VBlank or force blank!
+ *
+ * @deprecated Since 2026-09-20: use dmaCopyCGram(), which reads the bank
+ *             of @p source. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("dmaCopyCGram() takes the bank from the source pointer")
 void dmaCopyCGramBank(const u8 *source, u8 bank, u16 startColor, u16 size);
 
 /*============================================================================
@@ -219,6 +228,11 @@ void dmaCopyOam(const u8 *source, u16 size);
  * @brief Perform generic DMA transfer
  *
  * @param channel DMA channel (0-7)
+ * @note The source is passed as a separate bank and 16-bit address — a shape
+ *       that predates far pointers. It is slated to become a single
+ *       `const u8 *src` at the next major version (API audit 2026-09-20, §3.1);
+ *       the split form stays until then.
+ *
  * @param mode DMA mode byte
  * @param srcBank Source bank
  * @param srcAddr Source address

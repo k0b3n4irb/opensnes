@@ -237,7 +237,7 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     hdma_active_buffer = 0;
     hdma_wave_enabled = 1;
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -323,7 +323,7 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     }
     *p = 0x00;  /* End marker */
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -373,7 +373,7 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
     }
     *p = 0x00;  /* End marker */
 
-    hdmaSetupBank(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -455,7 +455,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 
     /* Setup and enable HDMA to drive WH0/WH1 per scanline.
      * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
-    hdmaSetupBank(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
     hdmaEnable(channel_mask(channel));
 
     /* Wait for HDMA to initialize (happens at start of VBlank).
@@ -538,6 +538,6 @@ void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed) {
     hdma_active_buffer = 0;
     hdma_wave_enabled = 1;
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
     hdmaEnable(channel_mask(channel));
 }

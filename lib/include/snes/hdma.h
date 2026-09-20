@@ -280,7 +280,12 @@ void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
  * @param destReg  Destination B-bus register (low byte of $21xx address)
  * @param table    Pointer to HDMA table in ROM or RAM
  * @param bank     Source bank byte ($00-$3F for LoROM)
+ *
+ * @deprecated Since 2026-09-20: use hdmaSetup(), which reads the bank of
+ *             @p table. This variant carries two banks and the explicit one
+ *             wins. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("hdmaSetup() takes the bank from the table pointer")
 void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank);
 
 /**

@@ -234,6 +234,9 @@ _Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offs
  * @param id Sprite index (0-127)
  * @param gfx Pointer to graphics data
  * @param bank ROM bank where graphics data is located (0-255)
+ *
+ * @deprecated Since 2026-09-20: OAM_SET_GFX() reads the bank from the
+ *             pointer. Removed at the next major version.
  */
 #define OAM_SET_GFX_BANK(id, gfx, bank) do { \
     oambuffer[id].oamgfxaddr = (u16)(gfx); \

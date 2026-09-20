@@ -54,11 +54,9 @@ the rest.
 
 The lib hides those four register writes behind two helpers:
 
-- **`hdmaSetup(channel, mode, destReg, table)`** — for tables in bank `$00`
-  (most cases — RAM, or const data that *fits* in bank `$00`'s 32 KB).
-- **`hdmaSetupBank(channel, mode, destReg, table, bank)`** — when the
-  table lives in any other bank. Required when const data spilled into
-  bank `$01+` (see the gotcha section below).
+- **`hdmaSetup(channel, mode, destReg, table)`** — for any table, RAM or
+  const, in any bank: the bank is read from the table pointer.
+- `hdmaSetupBank(…, table, bank)` is deprecated — it predates far pointers.
 
 …and a separate enable/disable pair:
 
@@ -215,7 +213,7 @@ table can live in const ROM.
 
 ### Helpers showcase — `examples/hdma/hdma_helpers`
 
-Walks through the lib's HDMA helpers (`hdmaSetup`, `hdmaSetupBank`,
+Walks through the lib's HDMA helpers (`hdmaSetup`,
 `hdmaEnable`, `hdmaDisable`, the brightness-gradient builder) on a
 single screen, with on-screen text labelling each. The example to skim
 when you want to remember the API surface.
@@ -299,25 +297,16 @@ prefer channels 1–6 for HDMA.
 This is enforced by convention, not by code. The lib's documentation
 (`lib/include/snes/hdma.h`) names the trap explicitly.
 
-### 🔴 Bank byte trap on `hdmaSetup`
+### 🟢 Bank byte trap on `hdmaSetup` (resolved)
 
-`hdmaSetup` hardcodes bank `$00` for ROM source addresses (≥ `$8000`).
-If your table is a `static const u8 mytable[] = …` and bank `$00`'s 32 KB
-filled up, the linker spills the table into bank `$01+` — but `hdmaSetup`
-still tells the PPU to read from bank `$00`, address X. The PPU happily
-reads garbage from wherever bank `$00` address X lands.
-
-Two fixes:
-
-- **`hdmaSetupBank(channel, mode, destReg, table, bank)`** with the
-  correct bank byte (typically `:mytable` resolved by the assembler).
-- **Use a RAM table.** RAM is in bank `$7E` (or its bank `$00` mirror),
-  always at predictable addresses. Animated tables that change per frame
-  want to be in RAM anyway, so this often happens naturally.
-
-The bank-overflow check (`make/common.mk` → `symmap.py`) flags when bank
-`$00` is filling up; pair that with an explicit choice of `hdmaSetupBank`
-when const tables get big.
+`hdmaSetup` used to hardcode bank `$00` for its table, so a `static const`
+table that the linker placed elsewhere was read from the wrong bank, and
+`hdmaSetupBank(…, bank)` existed to pass the right one by hand. Since
+pointers became far pointers (A6) `hdmaSetup` reads the bank byte of the
+table pointer itself: a const table works from any bank — which is where
+const data lives by default since v0.41.0 — and so does a RAM table, on
+LoROM and on HiROM. `hdmaSetupBank` is **deprecated** (2026-09-20): it
+carries two banks and the explicit one wins. Use `hdmaSetup`.
 
 ### 🟡 Repeat-mode discipline matters
 

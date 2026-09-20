@@ -244,7 +244,9 @@ void setMode(u8 mode, u8 flags) {
 /* Assembly helper to read REG_RDNMI - compiler optimizes away volatile reads */
 extern void clearNmiFlag(void);
 
-void nmiSetBank(VBlankCallback callback, u8 bank) {
+/* The one installer. nmiSet(), nmiClear() and the deprecated nmiSetBank() all
+ * come here, so the lib never calls its own deprecated entry point. */
+static void nmi_install(VBlankCallback callback, u8 bank) {
     /* Disable NMI during pointer write to prevent partial reads */
     REG_NMITIMEN = 0;
 
@@ -277,12 +279,16 @@ void nmiSet(VBlankCallback callback) {
      * in bits 16-23, so a callback in ANY bank works — derive the bank from the
      * pointer and let nmiSetBank do the rest. The old bug was only the literal
      * bank 0 here; the 4-byte pointer itself forwards correctly. */
-    nmiSetBank(callback, (u8)((u32)callback >> 16));
+    nmi_install(callback, (u8)((u32)callback >> 16));
+}
+
+void nmiSetBank(VBlankCallback callback, u8 bank) {
+    nmi_install(callback, bank);
 }
 
 void nmiClear(void) {
     /* Restore default callback and clear fast flag */
-    nmiSetBank((VBlankCallback)DefaultNmiCallback, 0);
+    nmi_install((VBlankCallback)DefaultNmiCallback, 0);
     nmi_has_callback = 0;
 }
 
@@ -290,7 +296,7 @@ void nmiClear(void) {
  * Hardware IRQ (H/V timer) — see interrupt.h for the raw-handler contract
  *============================================================================*/
 
-void irqSetBank(void *handler, u8 bank) {
+static void irq_install(void *handler, u8 bank) {
     /* Mask timer IRQ sources during the pointer write so a mid-update
      * JML [irq_callback] can't read a half-written vector. NMI stays on. */
     REG_NMITIMEN = nmitimen_shadow & (u8)~(IRQ_HTIMER | IRQ_VTIMER);
@@ -308,11 +314,15 @@ void irqSet(void *handler) {
      * above. This used to pass a literal 0: a handler the linker placed
      * outside bank $00 — any SUPERFREE section can be — was entered at the
      * same offset of bank $00 (fixed 2026-09-20). */
-    irqSetBank(handler, (u8)((u32)handler >> 16));
+    irq_install(handler, (u8)((u32)handler >> 16));
+}
+
+void irqSetBank(void *handler, u8 bank) {
+    irq_install(handler, bank);
 }
 
 void irqClear(void) {
-    irqSetBank((void *)DefaultIrqHandler, 0);
+    irq_install((void *)DefaultIrqHandler, 0);
 }
 
 void irqSetHTimer(u16 h) {
