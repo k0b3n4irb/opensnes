@@ -77,7 +77,9 @@ profiled once input-free to its first capture frame and once per `luna
 test` manifest that names it, replaying the manifest's joypad-1 script (the
 checkpoints merged into one timeline, as `luna test` does) to its last
 checkpoint or `frames` / `steps` bound; the library fixture
-(`devtools/libtests/libtest.sfc`) is profiled as well. The public
+(`devtools/libtests/libtest.sfc`), its sibling for the modules it has no
+RAM for (`devtools/libtests_fx/`: hdma, mode7, SNESMOD) and the compiler's
+five runtime ROMs are profiled as well. The public
 functions of `lib/include/snes/*.h` that nothing executes are written to
 `baselines/never_executed.txt`; `make tests` fails if that set gains a
 name (a function shipped with no example, no manifest leg and no libtest)

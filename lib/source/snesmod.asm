@@ -673,11 +673,18 @@ snesmodFlush:
     pha
     plb
 
+    ; xspcProcessMessages, not spcProcessMessages (fixed 2026-09-20). The
+    ; latter is the tail of snesmodProcess: it ends in plb / plp / rtl, for
+    ; the php / phb snesmodProcess pushed. Reached through a jsr it popped
+    ; this routine's saved DBR and P and returned long on a 2-byte address —
+    ; a crash whenever the queue was not already empty, which is the only
+    ; time a flush does anything. Nothing called snesmodFlush with pending
+    ; commands until the libtest_fx fixture did.
 @flush_loop:
     lda spc_fread
     cmp spc_fwrite
     beq @exit
-    jsr spcProcessMessages
+    jsr xspcProcessMessages
     bra @flush_loop
 
 @exit:

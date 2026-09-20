@@ -130,6 +130,11 @@ CASES = [
     ("r_obj_cobj",     2, 1),      ("r_obj_cobj_no",  2, 0),
     ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
     ("r_mosaic",       2, 15),
+    # coverage lot C (2026-09-20)
+    ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
+    ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
+    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xB500),
+    ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size", 1, 16),
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
@@ -174,6 +179,10 @@ PPU_CASES = [
     ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGramBank: red, green
     ("cgram.254", 0x7C00), ("cgram.255", 0x7FFF),      # dmaTransfer to CGDATA: blue, white
     ("oam_full.14", 0xAB), ("oam_full.15", 0x01),       # oamSetTile(3, 0x1AB) + dmaCopyOam
+    # lot C: oamDrawMetaFlip(10, x=100, y=50, flipX, box 16): item dx=0 -> 108, dx=8 -> 100;
+    # bit 6 of the attribute byte is the H-flip the mirror set
+    ("oam_full.40", 108), ("oam_full.41", 49), ("oam_full.44", 100), ("oam_full.45", 49),   # OAM Y = y - 1
+    ("oam_full.43", 0x40),
 ]
 
 # VRAM bytes written by bgInitTileSetData (16 at word 0x6000) and

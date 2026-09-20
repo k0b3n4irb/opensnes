@@ -195,6 +195,7 @@ tests: test-compiler
 	@# profiles, so it is built first (rebuilt clean for its own asserts below),
 	@# and so are the compiler's runtime ROMs.
 	@$(MAKE) -s -C devtools/libtests
+	@$(MAKE) -s -C devtools/libtests_fx
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
@@ -237,6 +238,11 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
+	@# Second fixture: hdma, mode7, SNESMOD, nmiSet (the first has no RAM
+	@# for the first two and boots the other audio driver).
+	@$(MAKE) -s -C devtools/libtests_fx clean
+	@$(MAKE) -s -C devtools/libtests_fx
+	@python3 devtools/libtests_fx/test_libtest_fx.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
@@ -281,6 +287,7 @@ test-project:
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage:
 	@$(MAKE) -s -C devtools/libtests
+	@$(MAKE) -s -C devtools/libtests_fx
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py

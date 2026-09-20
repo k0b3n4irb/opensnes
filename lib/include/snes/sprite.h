@@ -581,7 +581,9 @@ u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
  * @param width Metasprite width for flip calculations
  * @param height Metasprite height for flip calculations
  *
- * @return Number of hardware sprites used
+ * @return The next free sprite id (startId + the number of sprites drawn),
+ *         like oamDrawMeta() — chain calls with it. (The header said "number
+ *         of hardware sprites used" until 2026-09-20; the code never did.)
  */
 u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,

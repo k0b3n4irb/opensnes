@@ -26,6 +26,15 @@ tutorials' Gotchas.
   recorded and never applied, the getter keeps returning 0. By design (the
   NMI only talks to a device that answered), but worth a line in the header.
 - **`consoleInitEx(options)` ignores its argument** ("reserved").
+- **`oamDrawMeta` / `oamDrawMetaFlip` return the next free sprite id**, which
+  is what the metasprite example chains on; the Flip header said "number of
+  sprites used" (fixed 2026-09-20). Worth one name for the concept in both.
+- **`audioUpdate()` is a documented no-op** kept for source compatibility —
+  a candidate for removal at the freeze.
+- **`snesmodGetPosition` and `objCollidObj` both stored their result in
+  `tcc__r0` instead of returning it in A.** objCollidObj returned garbage
+  (fixed); snesmodGetPosition happens to leave the value in A's low byte.
+  Worth a sweep of every hand-written ASM function with a return value.
 
 ## For the build guards
 

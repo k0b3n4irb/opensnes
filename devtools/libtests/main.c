@@ -351,6 +351,53 @@ DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
 DECLARE_ANIM_CLIP(clip_b, ANIM_LOOP, 1, 77, 88);
 DECLARE_ANIM_CLIP(clip_once, ANIM_ONCE, 1, 5, 6);
 
+/* --- coverage lot C (2026-09-20): audio v2 stop/unload, two sprite helpers,
+ * consoleInitEx. Runs last: it silences the voice the audio block left
+ * playing (audio_v2.toml asserts DSP registers, not liveness). */
+u16 r_aud_v0_live;   /* voice 0 before the stop: active              -> 1 */
+u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
+u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
+u16 r_aud_all_stop;  /* audioStopAll(), 6 frames later: voice 1      -> 0 */
+u16 r_aud_unload;    /* audioGetSampleInfo(0) after audioUnloadSample -> AUDIO_ERR_NOT_LOADED (3) */
+u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xB500 */
+u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
+static const MetaspriteItem lotc_meta[] = {
+    METASPR_ITEM(0, 0, 0, 0),
+    METASPR_ITEM(8, 0, 1, 0),
+    METASPR_TERM,
+};
+
+static void coverage_lot_c(void) {
+    AudioVoiceState vs;
+    AudioSample smp;
+    u8 i;
+
+    audioUpdate();                          /* v2 no-op, kept for source compatibility */
+    audioGetVoiceState(0, &vs);
+    r_aud_v0_live = vs.active;
+    audioPlaySampleEx(0, 100, AUDIO_PAN_CENTER, 0x1000);   /* round-robin: voice 1 */
+    audioStopVoice(0);
+    for (i = 0; i < 6; i++) WaitForVBlank();
+    audioGetVoiceState(0, &vs);
+    r_aud_v0_stop = vs.active;
+    audioGetVoiceState(1, &vs);
+    r_aud_v1_live = vs.active;
+    audioStopAll();
+    for (i = 0; i < 6; i++) WaitForVBlank();
+    audioGetVoiceState(1, &vs);
+    r_aud_all_stop = vs.active;
+    audioUnloadSample(0);
+    r_aud_unload = audioGetSampleInfo(0, &smp);
+    r_aud_unfree = audioGetFreeMemory();
+
+    /* sprites: a two-item metasprite mirrored in a 16-px-wide box lands its
+     * items swapped (dx = 16 - dx - 8) with the flip bit set; asserted on
+     * luna's OAM view. oamDynamicSetSize writes the per-sprite size table. */
+    r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
+    oamDynamicSetSize(0, 16);
+    WaitForVBlank();
+}
+
 /* Lot B runs in its own function: main()'s frame already puts the stack
  * ~920 bytes deep during the audio driver's boot, and growing it with more
  * temporaries pushed the stack into the result globals (found by
@@ -725,6 +772,7 @@ int main(void) {
     irqDisable();
 
     coverage_lot_b();
+    coverage_lot_c();
 
     /* --- L2c: window registers, asserted from luna's PPU view. Left in
      * their final state: nothing below touches $2123-$212F. --- */

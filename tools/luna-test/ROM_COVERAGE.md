@@ -1,19 +1,12 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 91 ROMs (examples + the library fixture), 201 legs · **275 of 301 public functions executed, 26 never**
+luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 92 ROMs (examples + the library fixture), 202 legs · **296 of 301 public functions executed, 5 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
 | header | never executed |
 |---|---|
-| `audio.h` | `audioStopAll`, `audioStopVoice`, `audioUnloadSample`, `audioUpdate` |
-| `console.h` | `consoleInitEx` |
 | `dsp1.h` | `dsp1Distance`, `dsp1Multiply`, `dsp1Range`, `dsp1Rotate`, `dsp1Target` |
-| `hdma.h` | `hdmaGetEnabled`, `hdmaGradient`, `hdmaWaveH`, `hdmaWaveInit`, `hdmaWindowShape` |
-| `interrupt.h` | `nmiSet` |
-| `mode7.h` | `mode7Rotate`, `mode7SetMatrix`, `mode7SetPivot`, `mode7Transform` |
-| `snesmod.h` | `snesmodAllocateSoundRegion`, `snesmodFlush`, `snesmodGetPosition`, `snesmodSetSoundTable` |
-| `sprite.h` | `oamDrawMetaFlip`, `oamDynamicSetSize` |
 
 ## Least-covered executed functions (one ROM only)
 
@@ -33,6 +26,10 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `audioSetVoicePitch` | `libtest` |
 | `audioSetVoiceVolume` | `libtest` |
 | `audioSetVolume` | `libtest` |
+| `audioStopAll` | `libtest` |
+| `audioStopVoice` | `libtest` |
+| `audioUnloadSample` | `libtest` |
+| `audioUpdate` | `libtest` |
 | `bgGetScrollX` | `libtest` |
 | `bgGetScrollY` | `libtest` |
 | `bgInit` | `libtest` |
@@ -50,6 +47,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `colorMathShadow` | `color/shadow_tint` |
 | `colorMathTint` | `color/shadow_tint` |
 | `colorMathTransparency50` | `libtest` |
+| `consoleInitEx` | `libtest_fx` |
 | `consoleMesenBreakpoint` | `runtime/debug_channel` |
 | `consoleNocashMessage` | `runtime/debug_channel` |
 | `div16` | `libtest` |
@@ -77,15 +75,18 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `hdmaBrightnessGradientStop` | `hdma/hdma_helpers` |
 | `hdmaColorGradient` | `hdma/hdma_helpers` |
 | `hdmaColorGradientStop` | `hdma/hdma_helpers` |
-| `hdmaDisableAll` | `hdma/gradient_colors` |
+| `hdmaGetEnabled` | `libtest_fx` |
+| `hdmaGradient` | `libtest_fx` |
 | `hdmaIrisWipe` | `hdma/hdma_helpers` |
 | `hdmaIrisWipeStop` | `hdma/hdma_helpers` |
 | `hdmaParallax` | `scrolling/parallax_scroll` |
-| `hdmaSetupBank` | `hdma/hdma_helpers` |
 | `hdmaSetupIndirect` | `hdma/hdma_indirect_gradient` |
 | `hdmaWaterRipple` | `hdma/hdma_helpers` |
+| `hdmaWaveH` | `libtest_fx` |
+| `hdmaWaveInit` | `libtest_fx` |
 | `hdmaWaveStop` | `hdma/hdma_helpers` |
 | `hdmaWaveUpdate` | `hdma/hdma_helpers` |
+| `hdmaWindowShape` | `libtest_fx` |
 | `irqClear` | `libtest` |
 | `irqDisable` | `libtest` |
 | `irqSet` | `libtest` |
@@ -96,7 +97,11 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mapGetMetaTilesProp` | `libtest` |
 | `mapSetMapOptions` | `libtest` |
 | `mod16` | `libtest` |
+| `mode7Rotate` | `libtest_fx` |
+| `mode7SetMatrix` | `libtest_fx` |
+| `mode7SetPivot` | `libtest_fx` |
 | `mode7SetSettings` | `mode7/perspective_rotate` |
+| `mode7Transform` | `libtest_fx` |
 | `mosaicDisable` | `transitions/mosaic` |
 | `mosaicEnable` | `transitions/mosaic` |
 | `mosaicFadeIn` | `transitions/mosaic` |
@@ -112,8 +117,10 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mouseIsConnected` | `libtest` |
 | `mouseSetSensitivity` | `libtest` |
 | `mul16` | `libtest` |
-| `nmiClear` | `libtest` |
+| `nmiSet` | `libtest_fx` |
+| `oamDrawMetaFlip` | `libtest` |
 | `oamDynamicDrainQueue` | `sprites/dynamic_metasprite` |
+| `oamDynamicSetSize` | `libtest` |
 | `oamHide` | `sprites/animated_sprite` |
 | `oamMetaDrawDyn` | `sprites/dynamic_metasprite` |
 | `oamSetTile` | `libtest` |
@@ -160,10 +167,14 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `scopeIsConnected` | `input/superscope` |
 | `scopeSetRepeatDelay` | `libtest` |
 | `scopeSinceShot` | `libtest` |
+| `snesmodAllocateSoundRegion` | `libtest_fx` |
 | `snesmodFadeVolume` | `audio/snesmod_music` |
+| `snesmodFlush` | `libtest_fx` |
+| `snesmodGetPosition` | `libtest_fx` |
 | `snesmodPause` | `audio/snesmod_music` |
 | `snesmodPlayEffect` | `audio/snesmod_sfx` |
 | `snesmodResume` | `audio/snesmod_music` |
+| `snesmodSetSoundTable` | `libtest_fx` |
 | `snesmodStop` | `audio/snesmod_music` |
 | `sramChecksum` | `libtest` |
 | `sramClear` | `libtest` |

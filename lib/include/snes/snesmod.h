@@ -311,6 +311,11 @@ void snesmodSetSoundTable(const u8 *table);
  *
  * Reserves memory in SPC RAM for streaming audio.
  *
+ * @warning Call it BEFORE snesmodLoadModule(). The driver resizes its SPC
+ *          RAM layout on this command, and a module that is already loaded
+ *          stops playing (measured on the libtest_fx fixture: five active
+ *          voices when allocated before the load, none when after).
+ *
  * @param size Buffer size (in units specific to driver)
  */
 void snesmodAllocateSoundRegion(u8 size);
