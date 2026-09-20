@@ -196,6 +196,7 @@ tests: test-compiler
 	@# and so are the compiler's runtime ROMs.
 	@$(MAKE) -s -C devtools/libtests
 	@$(MAKE) -s -C devtools/libtests_fx
+	@$(MAKE) -s -C devtools/libtests_dsp1
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
@@ -243,6 +244,11 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_fx clean
 	@$(MAKE) -s -C devtools/libtests_fx
 	@python3 devtools/libtests_fx/test_libtest_fx.py
+	@# Third fixture: the DSP-1 commands no example calls. SKIPs without
+	@# the user-supplied dsp1b.rom (CI), like the firmware-gated manifests.
+	@$(MAKE) -s -C devtools/libtests_dsp1 clean
+	@$(MAKE) -s -C devtools/libtests_dsp1
+	@python3 devtools/libtests_dsp1/test_libtest_dsp1.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
@@ -288,6 +294,7 @@ test-project:
 rom-coverage:
 	@$(MAKE) -s -C devtools/libtests
 	@$(MAKE) -s -C devtools/libtests_fx
+	@$(MAKE) -s -C devtools/libtests_dsp1
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py

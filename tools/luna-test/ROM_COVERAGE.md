@@ -1,12 +1,11 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 92 ROMs (examples + the library fixture), 202 legs · **296 of 301 public functions executed, 5 never**
+luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 93 ROMs (examples + the library fixture), 203 legs · **301 of 301 public functions executed, 0 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
 | header | never executed |
 |---|---|
-| `dsp1.h` | `dsp1Distance`, `dsp1Multiply`, `dsp1Range`, `dsp1Rotate`, `dsp1Target` |
 
 ## Least-covered executed functions (one ROM only)
 
@@ -56,9 +55,14 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `dmaCopyVramBank` | `libtest` |
 | `dmaTransfer` | `libtest` |
 | `dsp1Attitude` | `chips/dsp1_cube` |
+| `dsp1Distance` | `libtest_dsp1` |
+| `dsp1Multiply` | `libtest_dsp1` |
 | `dsp1Objective` | `chips/dsp1_cube` |
 | `dsp1Project` | `chips/dsp1_cube` |
+| `dsp1Range` | `libtest_dsp1` |
 | `dsp1Raster` | `mode7/dsp1_ground` |
+| `dsp1Rotate` | `libtest_dsp1` |
+| `dsp1Target` | `libtest_dsp1` |
 | `dsp1Triangle` | `mode7/dsp1_ground` |
 | `fix32Div` | `libtest` |
 | `fixAbs` | `libtest` |

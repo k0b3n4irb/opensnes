@@ -1,8 +1,13 @@
 dsp1Attitude
+dsp1Distance
 dsp1Init
+dsp1Multiply
 dsp1Objective
 dsp1Parameter
 dsp1Present
 dsp1Project
+dsp1Range
 dsp1Raster
+dsp1Rotate
+dsp1Target
 dsp1Triangle

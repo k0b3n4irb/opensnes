@@ -67,8 +67,8 @@ that can exceed ±1.0.
 | `dsp1Project(x,y,z)` | `$06` | 3 → 3 | world point → screen H, V + scale M |
 | `dsp1Target(h,v)` | `$0E` | 2 → 2 | screen point → ground plane (pick / aim) |
 | `dsp1Raster(ab,cd,vs,n)` | `$0A` | 1 → 4·n (stream) | per-scanline Mode 7 matrices into HDMA payloads |
-| `dsp1Distance(x,y,z)` | `$28` | 3 → 1 | true 3D length (hardware sqrt) |
-| `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: ≤0 = inside |
+| `dsp1Distance(x,y,z)` | `$28` | 3 → 1 | 3D length (hardware sqrt; reads one low on exact lengths) |
+| `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: `(d² − r²) >> 15`, negative = inside |
 
 Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
 (`dsp1_o3` for Parameter); single-word commands return their value.
@@ -163,11 +163,19 @@ under a screen pixel, in raster coordinates (Target(0, 0) = Cx/Cy).
 You do not need 3D graphics to profit from the chip:
 
 ```c
-u16 d = dsp1Distance(dx, dy, dz);     /* true length, hardware sqrt */
-if (dsp1Range(dx, dy, dz, radius) <= 0) {  /* inside the sphere?    */
+u16 d = dsp1Distance(dx, dy, dz);     /* length, hardware sqrt (within 1) */
+if (dsp1Range(dx, dy, dz, radius) < 0) {   /* clearly inside the sphere? */
     /* proximity trigger, LOD switch, homing acquisition ... */
 }
 ```
+
+Two properties measured on luna's DSP-1B firmware and pinned by the library
+fixture (`devtools/libtests_dsp1`), neither stated by any hardware reference
+we could find. `dsp1Distance` reads one low on exact lengths — (3, 4, 12)
+gives 12 — so compare with `>=` / `<`, never `==`. `dsp1Range` returns the
+squared difference **shifted right by 15**, not the raw difference: a point
+less than 32768 squared-units outside the surface reads 0, the same as one
+exactly on it. Choose world units so that margin is small next to the radius.
 
 Both are single calls where the 65816 would need three multiplies, two
 adds and (for Distance) a software square root.

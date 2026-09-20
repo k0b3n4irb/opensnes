@@ -50,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "devtools" / "symmap"))
 from luna_runner import (  # noqa: E402
     HERE, REPO_ROOT, LUNA_VERSION, capture_frames, discover_example_roms, example_key,
-    find_luna, load_manifest, missing_firmware,
+    find_luna, firmware_dir, load_manifest, missing_firmware,
 )
 from symmap import rom_bank  # noqa: E402  (mirror folding, one source of truth)
 
@@ -68,6 +68,7 @@ MANIFESTS = HERE / "manifests"
 # The compiler's runtime ROMs count too: debug_channel is the only executor
 # of the WDM / nocash channel (consoleNocashMessage, consoleMesenBreakpoint)
 # and asserts on it; the others run in ~1 M instructions (their tests' STEPS).
+DSP1_FIXTURE = (REPO_ROOT / "devtools" / "libtests_dsp1" / "libtest_dsp1.sfc", "libtest_dsp1", 60)
 _RT = REPO_ROOT / "devtools" / "compiler-tests" / "runtime"
 FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120),
             # the second fixture reaches r_done around frame 170 (SNESMOD upload first)
@@ -207,6 +208,14 @@ def main() -> int:
             skipped_fw.append(key)
             continue
         targets.append((rom, key, capture_frames(key, manifest)[0]))
+    # The DSP-1 fixture is firmware-gated like the DSP-1 examples: without
+    # dsp1b.rom it is skipped and what only it executes is exempt (CI).
+    gated.add(DSP1_FIXTURE[1])
+    if (firmware_dir() / "dsp1b.rom").is_file():
+        if DSP1_FIXTURE[0].is_file():
+            targets.append(DSP1_FIXTURE)
+    else:
+        skipped_fw.append(DSP1_FIXTURE[1])
     targets += [(rom, key, frames) for rom, key, frames in FIXTURES if rom.is_file()]
     if not all(rom.is_file() for rom, _, _ in FIXTURES):
         missing = [key for rom, key, _ in FIXTURES if not rom.is_file()]
