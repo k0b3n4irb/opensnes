@@ -34,7 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
-from lib import find_luna, assert_mem  # noqa: E402
+from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
@@ -116,6 +116,20 @@ CASES = [
     ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
     ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
     ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
+    # coverage lot B (2026-09-19): the public functions nothing executed
+    ("r_fix_abs_n",    2, 0x0300), ("r_fix_abs_p",    2, 0x0200),
+    ("r_fix_clamp_lo", 2, 0xFF00), ("r_fix_clamp_hi", 2, 0x0100), ("r_fix_clamp_in", 2, 0x0080),
+    ("r_fix_sqrt",     2, 0x0400),
+    ("r_bg_sx",        2, 300),    ("r_bg_sy",        2, 77),     ("r_bg_init",      2, 0),
+    ("r_text_x",       2, 2),      ("r_text_flush",   2, 1),      ("r_frame_reset",  2, 0),
+    ("mapoptions",     1, 3),      ("r_pad_raw",      2, 0),     # mapSetMapOptions(1WAY|BG2), bank $7E byte
+    ("r_mouse",        2, 0),      ("r_mouse_sens",   2, 0),     # no mouse: the NMI never applies the request...
+    ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
+    ("r_scope",        2, 0),      ("r_scope_delay",  2, 7),
+    ("r_obj_grav",     2, 0x0040), ("r_obj_refresh",  2, 2),      # both objects are on screen
+    ("r_obj_cobj",     2, 1),      ("r_obj_cobj_no",  2, 0),
+    ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
+    ("r_mosaic",       2, 15),
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
@@ -150,6 +164,25 @@ PPU_CASES = [
     ("wobjlog", 0x01),  # OBJ AND
     ("tmw", 0x11),      # main mask BG1 | OBJ
     ("tsw", 0x04),      # sub mask BG3
+    # coverage lot B (2026-09-19). Dotted keys step into the JSON.
+    ("mosaic", 0xF0),               # mosaicSetSize(20) clamped to 15, no layer
+    ("setini", 0x06),               # OBJ interlace + overscan on, pseudo-hires set then cleared
+    ("cgadsub", 0x41),              # colorMathTransparency50(BG1): half + BG1, add
+    ("cgwsel", 0x12),               # colorMathSetCondition(INSIDE): bits 5-4 = 01; bit 1: sub-screen source
+    ("coldata_r", 10), ("coldata_g", 10), ("coldata_b", 20),   # SetBrightness(10) then SetChannel(BLUE, 20)
+    ("bgs.1.h_scroll", 300), ("bgs.1.v_scroll", 76),   # bgSetScrollX/Y(1, 300, 77): VOFS = y - 1
+    ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGramBank: red, green
+    ("cgram.254", 0x7C00), ("cgram.255", 0x7FFF),      # dmaTransfer to CGDATA: blue, white
+    ("oam_full.14", 0xAB), ("oam_full.15", 0x01),       # oamSetTile(3, 0x1AB) + dmaCopyOam
+]
+
+# VRAM bytes written by bgInitTileSetData (16 at word 0x6000) and
+# dmaCopyVramBank (16 more at word 0x6008): the fixture's lotb_vram pattern.
+VRAM_CASES = [
+    (0xC000, bytes([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+                    0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
+                    0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90,
+                    0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02])),
 ]
 
 
@@ -203,13 +236,27 @@ def run(region: str = "ntsc") -> int:
             fails += 1
     ppu = ppu_state(luna, region)
     for field, want in PPU_CASES:
-        got = ppu.get(field)
+        got = ppu
+        for step in field.split("."):
+            try:
+                got = got[int(step)] if isinstance(got, list) else got.get(step)
+            except (IndexError, ValueError, AttributeError):
+                got = None
+                break
         if got == want:
             print(f"  PASS  ppu.{field} == {want}")
         else:
             print(f"  FAIL  ppu.{field} == {want}  [luna reports {got}]")
             fails += 1
-    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES)
+    vram = dump_vram(luna, ROM, STEPS)
+    for addr, want in VRAM_CASES:
+        got = vram[addr:addr + len(want)]
+        if got == want:
+            print(f"  PASS  vram[{addr:#06x}..+{len(want)}] == pattern")
+        else:
+            print(f"  FAIL  vram[{addr:#06x}..+{len(want)}] == pattern  [got {got.hex()}]")
+            fails += 1
+    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES) + len(VRAM_CASES)
     print(f"\nLib runtime assertions ({region}): {total - fails}/{total} ok")
     return 1 if fails else 0
 

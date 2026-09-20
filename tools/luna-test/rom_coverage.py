@@ -65,7 +65,14 @@ MANIFESTS = HERE / "manifests"
 # Fixture ROMs profiled on top of the examples. The library fixture runs its
 # whole assertion path in ~90 frames (test_libtest.py's 3 M instructions end
 # at frame 90, the rest is WAI); 120 covers it with margin.
-FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120)]
+# The compiler's runtime ROMs count too: debug_channel is the only executor
+# of the WDM / nocash channel (consoleNocashMessage, consoleMesenBreakpoint)
+# and asserts on it; the others run in ~1 M instructions (their tests' STEPS).
+_RT = REPO_ROOT / "devtools" / "compiler-tests" / "runtime"
+FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120)] + [
+    (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
+    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel")
+]
 
 
 def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
@@ -199,6 +206,9 @@ def main() -> int:
             continue
         targets.append((rom, key, capture_frames(key, manifest)[0]))
     targets += [(rom, key, frames) for rom, key, frames in FIXTURES if rom.is_file()]
+    if not all(rom.is_file() for rom, _, _ in FIXTURES):
+        missing = [key for rom, key, _ in FIXTURES if not rom.is_file()]
+        print(f"  note: fixture ROM(s) not built, skipped: {', '.join(missing)}", file=sys.stderr)
     for rom, key, frame in targets:
         if args.only and args.only not in key:
             continue

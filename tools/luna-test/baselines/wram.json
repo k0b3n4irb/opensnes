@@ -164,8 +164,8 @@
     "rom_sha256": "9a7112c10544fa69422c16f697f239e97ee5f1887658f055aae8b24087e2dfe4"
   },
   "games_mapandobjects": {
-    "stream": "ae78746f6790fa2a5b21e8e8d58d10e838b962a90cdb61e162f6fc63319def58",
-    "rom_sha256": "b12be40ae843214f0552cfcff3dc8e45943241565ad516c46f3bb0d6ea6f4962"
+    "stream": "cf16fe481acca21d33048e1ca31a510b6de14354858504e0f1aa6f5338f4541b",
+    "rom_sha256": "d915c8a41b28e2f4f3793a51d0be6ec760f06a0ee776071b88655dc4e1499302"
   },
   "games_mode7_flying": {
     "stream": "2068ebc7e4ab593cb00d94864be718009b2e4847434632df3c53d2f49b252e8d",
@@ -236,8 +236,8 @@
     "rom_sha256": "28a082a9b2e3beac28b6cb31a0f9ebcd13f79f400f71d335e85055b873d8632b"
   },
   "maps_slope_collision": {
-    "stream": "0650af9be19dd3261eb063055bbdc8ee06a847b2a0b4f7e729b355fa3e65c748",
-    "rom_sha256": "c33b1fef2d926a0ff0aa32dba76d104e7e49f0a008ab2403c72e0bbf5f50fec6"
+    "stream": "c0cf7f8e3c9711139654d2c805afe367d8bd530a45d5247ac299a5df717704f0",
+    "rom_sha256": "3534a14decbdf001a78b308ad15e42548b707899a578e63303a66df401d98add"
   },
   "maps_tiled": {
     "stream": "fa85424664ae56d5c8a555c54327af5317afd3d6ef9a02858573c4ea4af6132c",

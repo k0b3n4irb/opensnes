@@ -29,6 +29,10 @@
 #include <snes/interrupt.h>
 #include <snes/input.h>
 #include <snes/object.h>
+#include <snes/colormath.h>
+#include <snes/mosaic.h>
+#include <snes/profile.h>
+#include <snes/registers.h>
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -256,6 +260,62 @@ static void objPeekUpdate(u16 idx) {
     /* ...and we return without restoring it: the trap. */
 }
 
+/* --- coverage lot B (2026-09-19): public functions nothing executed. Every
+ * vector asserts the function's EFFECT — a call with no observable result
+ * is not a test. PPU-side effects (colormath, video, mosaic, mode7, the
+ * DMA variants, oamSetTile) are asserted from luna's PPU view in
+ * test_libtest.py; the rest lands in these globals. The hdma module is not
+ * linked here: its wave tables take 1346 bytes of bank-$00 RAM and this
+ * fixture has 1266 free — its helpers get their own fixture (lot C). nmiSet
+ * is left out on
+ * purpose: it stores a 16-bit address and dispatches in bank $00, and this
+ * fixture's C code no longer fits in bank $00 — a callback registered with
+ * it would jump into whatever bank-$00 code shares the offset. That is a
+ * finding for the API audit, not a vector. */
+u16 r_fix_abs_n;    /* fixAbs(FIX(-3))                          -> 0x0300 */
+u16 r_fix_abs_p;    /* fixAbs(FIX(2))                           -> 0x0200 */
+u16 r_fix_clamp_lo; /* fixClamp(FIX(-9), FIX(-1), FIX(1))       -> 0xFF00 */
+u16 r_fix_clamp_hi; /* fixClamp(FIX(9),  FIX(-1), FIX(1))       -> 0x0100 */
+u16 r_fix_clamp_in; /* fixClamp(fx_half, FIX(-1), FIX(1))       -> 0x0080 */
+u16 r_fix_sqrt;     /* fixSqrt(FIX(16))                         -> 0x0400 */
+u16 r_bg_sx;        /* bgSetScrollX(1, 300); bgGetScrollX(1)    -> 300 */
+u16 r_bg_sy;        /* bgSetScrollY(1, 77);  bgGetScrollY(1)    -> 77 */
+u16 r_bg_init;      /* bgInit(2) after bgSetScrollX(2, 5)       -> 0 */
+u16 r_text_x;       /* textGetX after "AB" on a fresh line       -> 2 */
+u16 r_text_flush;   /* tilemap_update_flag right after textFlush -> 1 */
+u16 r_frame_reset;  /* frame_count right after resetFrameCount   -> 0 */
+u16 r_pad_raw;      /* padRaw(0) idle | padRaw(7) out of range   -> 0 */
+u16 r_mouse;        /* no mouse: connected|x|y|held|pressed      -> 0 */
+u16 r_mouse_sens;   /* mouseSetSensitivity(0, HIGH) is deferred to the NMI, which
+                     * only talks to a mouse that is there: the getter stays 0 and
+                     * the request byte (mouseRequestChangeSensitivity[0], asserted
+                     * by symbol) reads 0x82 */
+u16 r_scope;        /* no scope: held|down|pressed|x|y|rawx|rawy -> 0 */
+u16 r_scope_delay;  /* scopeSetRepeatDelay(7): scope_repdelay    -> 7 */
+u16 r_obj_grav;     /* objInitGravity(0x40,0); objCollidMap in the air: yvel -> 0x40 */
+u16 r_obj_refresh;  /* objRefreshAll: the refresh callback ran   -> 1 */
+u16 r_obj_cobj;     /* objCollidObj, two 8x8 objects 4 px apart  -> 1 */
+u16 r_obj_cobj_no;  /* objCollidObj, 40 px apart                 -> 0
+                     * (slot INDEXES, not handles: the routine shifts its
+                     * arguments by 64 with no mask, so a handle's id byte
+                     * lands in the offset — header fixed 2026-09-20) */
+u16 r_prof_frames;  /* profileGetFrameCount == frame_count       -> 1 */
+u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
+u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
+u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
+u16 r_mosaic;       /* mosaicSetSize(20) clamps: mosaicGetSize   -> 15 */
+static const u8 lotb_vram[32] = {
+    0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
+    0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02,
+};
+static const u8 lotb_pal[4]  = { 0x1F, 0x00, 0xE0, 0x03 };   /* colours 250, 251: red, green */
+static const u8 lotb_pal2[4] = { 0x00, 0x7C, 0xFF, 0x7F };   /* colours 254, 255: blue, white */
+static u16 obj_refresh_calls;
+static void objRefreshProbe(u16 idx) { (void)idx; obj_refresh_calls++; }
+extern volatile u8 tilemap_update_flag;
+extern volatile u16 frame_count;
+extern u16 scope_repdelay;
+
 /* fixed32: the C body that fixed32.h says it cannot use. The header and
  * lib/source/math.c both claim a qbe bug makes
  * `(u32)(s32)fixSin(angle) << 8` produce 0x00FF0000 instead of 0xFFFF0000
@@ -290,6 +350,110 @@ u16 r_done;     /* 0xBEEF once every assignment above has executed */
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
 DECLARE_ANIM_CLIP(clip_b, ANIM_LOOP, 1, 77, 88);
 DECLARE_ANIM_CLIP(clip_once, ANIM_ONCE, 1, 5, 6);
+
+/* Lot B runs in its own function: main()'s frame already puts the stack
+ * ~920 bytes deep during the audio driver's boot, and growing it with more
+ * temporaries pushed the stack into the result globals (found by
+ * --trace-writes on r_region: NmiHandler and cmd_send were the writers). */
+static void coverage_lot_b(void) {
+    u8 i;
+
+    r_fix_abs_n    = (u16)fixAbs(FIX(-3));
+    r_fix_abs_p    = (u16)fixAbs(FIX(2));
+    r_fix_clamp_lo = (u16)fixClamp(FIX(-9), FIX(-1), FIX(1));
+    r_fix_clamp_hi = (u16)fixClamp(FIX(9), FIX(-1), FIX(1));
+    r_fix_clamp_in = (u16)fixClamp(fx_half, FIX(-1), FIX(1));
+    r_fix_sqrt     = (u16)fixSqrt(FIX(16));
+
+    bgSetScrollX(1, 300);
+    bgSetScrollY(1, 77);
+    r_bg_sx = bgGetScrollX(1);
+    r_bg_sy = bgGetScrollY(1);
+    bgSetScrollX(2, 5);
+    bgInit(2);
+    r_bg_init = bgGetScrollX(2);
+    /* bgInitTileSetData: 32 bytes to VRAM word 0x6000 (byte 0xC000, unused
+     * by this fixture), gfx pointer left alone (0xFF); test_libtest.py
+     * dumps VRAM and compares. The two DMA bank variants land next to it
+     * and in CGRAM 250-251; dmaTransfer, the raw one, in CGRAM 254-255. */
+    bgInitTileSetData(0xFF, lotb_vram, 16, 0x6000);
+    dmaCopyVramBank(lotb_vram + 16, (u8)((u32)(const void *)lotb_vram >> 16), 0x6008, 16);
+    dmaCopyCGramBank(lotb_pal, (u8)((u32)(const void *)lotb_pal >> 16), 250, 4);
+    WaitForVBlank();
+    REG_CGADD = 254;
+    dmaTransfer(1, 0x00, (u8)((u32)(const void *)lotb_pal2 >> 16), (u16)(u32)(const void *)lotb_pal2, 0x22, 4);
+    oamSetTile(3, 0x1AB);                   /* OAM byte 14 = 0xAB, byte 15 bit 0 = 1 */
+    WaitForVBlank();
+    dmaCopyOam(oamMemory, 544);             /* what the NMI does, done by hand */
+
+    textPutChar('\n');
+    textPrint("AB");
+    r_text_x = textGetX();
+    textFlush();
+    r_text_flush = tilemap_update_flag;
+    resetFrameCount();
+    r_frame_reset = frame_count;
+    mapSetMapOptions(MAP_OPT_1WAY | MAP_OPT_BG2);   /* mapoptions ($7E) asserted by symbol */
+    r_pad_raw = padRaw(0) | padRaw(7);
+    r_mouse = mouseIsConnected(0) | (u16)mouseGetX(0) | (u16)mouseGetY(0)
+            | mouseButtonsHeld(0) | mouseButtonsPressed(0);
+    mouseSetSensitivity(0, MOUSE_SENS_HIGH);
+    r_mouse_sens = mouseGetSensitivity(0);
+    r_scope = scopeButtonsHeld() | scopeButtonsDown() | scopeButtonsPressed()
+            | scopeGetX() | scopeGetY() | scopeGetRawX() | scopeGetRawY();
+    scopeSetRepeatDelay(7);
+    r_scope_delay = scope_repdelay;
+    (void)scopeSinceShot();
+
+    /* object engine: gravity, refresh, object-object collision */
+    objInitEngine();
+    objInitFunctions(0, 0, 0, objRefreshProbe);
+    objInitGravity(0x0040, 0);
+    obj_peeker = objNew(0, 16, 16);        /* in the air over the loaded map */
+    objGetPointer(obj_peeker);
+    objWorkspace.width = 8; objWorkspace.height = 8; objWorkspace.yvel = 0;
+    objCollidMap(obj_peeker & 0xFF);
+    r_obj_grav = (u16)objWorkspace.yvel;
+    obj_other = objNew(0, 20, 20);          /* overlaps the first one */
+    objGetPointer(obj_other);
+    objWorkspace.width = 8; objWorkspace.height = 8;
+    objUpdateAll();                         /* computes onscreen for both */
+    obj_refresh_calls = 0;
+    objRefreshAll();
+    r_obj_refresh = obj_refresh_calls;
+    r_obj_cobj = objCollidObj(obj_peeker & 0xFF, obj_other & 0xFF);
+    objGetPointer(obj_other);
+    objWorkspace.xpos[1] = 60;              /* 40 px to the right: apart */
+    objUpdateAll();
+    r_obj_cobj_no = objCollidObj(obj_peeker & 0xFF, obj_other & 0xFF);
+
+    /* profile: the frame counter it reads is crt0's; a scanline is < 262 */
+    profileInit();
+    r_prof_frames = (profileGetFrameCount() == frame_count) ? 1 : 0;
+    r_prof_scan   = (profileGetScanline() < 262) ? 1 : 0;
+    r_prof_lag    = profileGetLagFrames();
+    profileColorStart(2);
+    profileScanlineStart();
+    for (i = 0; i < 200; i++) { r_prof_lines = (u16)(r_prof_lines + i); if (i == 255) break; }
+    r_prof_lines = profileScanlineEnd();
+    profileColorEnd();
+
+    /* PPU-side, asserted in test_libtest.py: mosaic, SETINI, colour math.
+     * profileInit wrote CGADSUB/COLDATA above; colour math last. (Mode 7 is
+     * not linked here: its sine table is 256 bytes of bank-$00 RAM this
+     * fixture does not have — see the second fixture, lot C.) */
+    mosaicSetSize(20);
+    r_mosaic = mosaicGetSize();
+    videoSetObjInterlace(1);
+    videoSetOverscan(1);
+    videoSetPseudoHires(1);
+    videoSetPseudoHires(0);
+    colorMathTransparency50(COLORMATH_BG1);
+    colorMathSetCondition(COLORMATH_INSIDE);
+    colorMathSetBrightness(10);
+    colorMathSetChannel(COLDATA_BLUE, 20);
+
+}
 
 int main(void) {
     u8 i;
@@ -559,6 +723,8 @@ int main(void) {
     for (i = 0; i < 2; i++) WaitForVBlank();
     r_irq_d = irq_count;
     irqDisable();
+
+    coverage_lot_b();
 
     /* --- L2c: window registers, asserted from luna's PPU view. Left in
      * their final state: nothing below touches $2123-$212F. --- */

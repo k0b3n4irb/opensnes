@@ -209,18 +209,20 @@ objtmp4         DW
     phy
 
     rep #$30
-    txa
-    cmp.l objwsowner
-    beq _stw_load\@             ; reloading the slot it already mirrors
     lda.l objwsowner
     cmp #$FFFF
     beq _stw_load\@             ; nothing to flush
+    ; No shortcut when X is the owner itself (2026-09-20): the workspace may
+    ; hold edits made since the last load — objNew, then objGetPointer on the
+    ; same object, then field writes, then objUpdateAll — and skipping the
+    ; flush reloaded the slot over them. The redundant 64-byte copy is cheaper
+    ; than an edit that silently vanishes (libtest vector r_obj_cobj_no).
     clc
-    adc #objbuffers.w
-    tay                         ; Y = owner's addr in Bank $7E
-    ldx #objWorkspace.w
-    lda #OB_SIZE - 1
-    mvn $00, $7E                ; flush: workspace -> owner
+    adc #objbuffers.w + 4
+    tay                         ; Y = owner's addr in Bank $7E, past the links
+    ldx #objWorkspace.w + 4
+    lda #OB_SIZE - 5
+    mvn $00, $7E                ; flush: workspace -> owner, bytes 4..63
 
 _stw_load\@:
     lda 3,s                     ; X as pushed above (Y at 1,s, X at 3,s)
@@ -240,6 +242,13 @@ _stw_load\@:
 .ENDM
 
 ; SYNC_FROM_WORKSPACE: objWorkspace → the slot it mirrors
+; Bytes 4..63 only, in both macros (2026-09-20): the first two words are the
+; active-list links (next, prev), which objNew and objKill rewrite IN THE
+; SLOT while the workspace still holds the copy taken at load time. Writing
+; the copy back put a stale link over the engine's — objNew of a second
+; object then unlinked the first (libtest r_obj_refresh saw one object where
+; two were active). The links are engine-private; the write-back never
+; carries them.
 ; X = the slot the caller believes it is writing (preserved). The copy goes
 ; to objwsowner, not to X: in well-formed use they are the same slot, and when
 ; they are not (a callback left another object in the workspace) the owner is
@@ -256,12 +265,12 @@ _stw_load\@:
     cmp #$FFFF
     beq _sfw_done\@
     clc
-    adc #objbuffers.w
-    tay                         ; Y = dest addr in Bank $7E
+    adc #objbuffers.w + 4
+    tay                         ; Y = dest addr in Bank $7E, past the links
 
-    ldx #objWorkspace.w         ; X = source addr in Bank $00
+    ldx #objWorkspace.w + 4     ; X = source addr in Bank $00, past the links
 
-    lda #OB_SIZE - 1            ; A = byte count - 1
+    lda #OB_SIZE - 5            ; A = byte count - 1 (bytes 4..63)
     mvn $00, $7E                ; WLA-DX: src=$00 (workspace), dest=$7E (buffers)
 
     lda #$FFFF
@@ -906,6 +915,11 @@ objUpdateAll:
     stz objneedrefresh
 
     rep #$20
+    ; Flush a pending workspace edit BEFORE the pass writes slot fields
+    ; itself (onscreen, the refresh flags): a flush that came later put the
+    ; workspace's stale copy of those fields back over the engine's fresh
+    ; ones (2026-09-20; libtest vector r_obj_refresh).
+    SYNC_FROM_WORKSPACE
     ldx #$0000
 
 _oiual1:
@@ -1114,6 +1128,11 @@ objRefreshAll:
     stz objneedrefresh
 
     rep #$20
+    ; Flush a pending workspace edit BEFORE the pass writes slot fields
+    ; itself (onscreen, the refresh flags): a flush that came later put the
+    ; workspace's stale copy of those fields back over the engine's fresh
+    ; ones (2026-09-20; libtest vector r_obj_refresh).
+    SYNC_FROM_WORKSPACE
     ldx #$0000
 
 _oiral1:
@@ -2486,8 +2505,14 @@ objCollidObj:
     rep #$20
     stz.w tcc__r0
 
-    ; cproc L-to-R: handle2(p2) SP+10, handle1(p1) SP+12
-    lda 10,s                                ; handle2 (param 2, closest)
+    ; The workspace may hold an edit of one of the two objects (a callback
+    ; that moved itself, then tests the contact): flush it first, as the map
+    ; collision routines do. Without this the test read the slot's stale
+    ; coordinates (fixed 2026-09-20; the libtest vector r_obj_cobj_no).
+    SYNC_FROM_WORKSPACE
+
+    ; cproc L-to-R: idx2 (p2) SP+10, idx1 (p1) SP+12 — slot indexes, not handles
+    lda 10,s                                ; idx2 (param 2, closest)
     asl a
     asl a
     asl a
@@ -2501,7 +2526,7 @@ objCollidObj:
     bmi _oicoend
     sta objtmp1
 
-    lda 12,s                                ; handle1 (param 1, farthest)
+    lda 12,s                                ; idx1 (param 1, farthest)
     asl a
     asl a
     asl a
@@ -2563,7 +2588,11 @@ _oicor5:
     sta.w tcc__r0
 
 _oicoend:
-
+    ; The value is returned in A (cc65816), not in tcc__r0: every "no
+    ; contact" exit used to return whatever A held — x + width, a y
+    ; coordinate — and only the contact path returned 1 by accident
+    ; (fixed 2026-09-20; libtest vector r_obj_cobj_no read 0x18).
+    lda.w tcc__r0
     ply
     plx
     plb

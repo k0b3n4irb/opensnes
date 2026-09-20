@@ -320,11 +320,17 @@ void objCollidMap1D(u16 objhandle);
  *
  * Uses AABB (axis-aligned bounding box) collision.
  *
- * @param objhandle1 First object index
- * @param objhandle2 Second object index
+ * @warning Takes slot INDEXES (0-79), unlike objKill() and objGetPointer()
+ *          which take handles. The routine shifts each argument by 64 with
+ *          no mask, so a handle's id byte lands in the buffer offset and the
+ *          test reads two unrelated slots. From a callback pass @c idx; from
+ *          a handle pass @c handle & 0xFF.
+ *
+ * @param idx1 First object slot index
+ * @param idx2 Second object slot index
  * @return 1 if collision detected, 0 otherwise
  */
-u16 objCollidObj(u16 objhandle1, u16 objhandle2);
+u16 objCollidObj(u16 idx1, u16 idx2);
 
 /**
  * @brief Update object position from velocity

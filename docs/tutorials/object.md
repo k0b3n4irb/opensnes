@@ -426,12 +426,12 @@ u16 objCollidObj(u16 idx1, u16 idx2);
 ```
 
 A plain AABB test between two objects' boxes (`xpos + xofs`, `width`,
-`ypos + yofs`, `height`), returning 1 on overlap. Two things to know: it also
-takes **indices**, despite the parameter names; and it reads the records in
-bank `$7E` directly rather than the workspace, so from inside an update
-callback it sees the *pre-callback* state of the object you are currently
-updating. If you have just moved the current object this frame, call
-`objUpdateXY(idx)` first so the record is up to date, then test.
+`ypos + yofs`, `height`), returning 1 on overlap and 0 otherwise. It takes
+slot **indices**, not handles: the routine shifts its arguments by 64 with no
+mask, so a handle's id byte ends up in the buffer offset and the test reads
+two unrelated slots. From a callback pass `idx`; from a handle pass
+`handle & 0xFF`. Like the map collision routines it flushes the workspace on
+entry, so an object that has just moved itself is tested where it now is.
 
 ## Slopes, and what the tests pin
 
@@ -494,11 +494,11 @@ your slot first).
 
 This module is inherited from PVSnesLib and has not had the audit the core
 modules have. The following are verified against `lib/contrib/object.asm` and
-the shipped ROMs. Three of the sixteen public functions (`objCollidObj`,
-`objInitGravity`, `objRefreshAll`) are executed by no example and by no test
-— treat them as untested. `objCollidMap1D`, `objInitFriction1D`, `objKill`
-and `objKillAll` are executed only by the library fixture
-(`devtools/libtests`), not by any example.
+the shipped ROMs. Every public function is now executed by a test, but seven
+of the sixteen (`objCollidMap1D`, `objCollidObj`, `objInitFriction1D`,
+`objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll`) only by the
+library fixture (`devtools/libtests`), not by any example — they have
+assertions, not mileage.
 
 ### 🟢 `objInitFunctions` stored garbage — fixed 2026-09-18
 
@@ -561,6 +561,32 @@ workspace* above): edits are flushed to their owner before any reload, and
 write-backs go to the owner. The cost is about 140 CPU cycles per callback —
 enough to move a late-frame write across a frame boundary, which is how the
 slope example's manifest noticed.
+
+### 🟢 `objCollidObj` returned garbage for "no contact" — fixed 2026-09-20
+
+The routine stored its result in a scratch variable and returned without
+loading it, so the caller got whatever the accumulator held: 1 on contact by
+accident, and on every "no contact" exit an intermediate such as `x + width`
+— non-zero, so truthy. Nothing in the corpus called it, which is how it
+survived. It also read the slots without flushing the workspace first, so a
+callback that had just moved its object tested the old position. Both fixed;
+the first call from a test found them.
+
+### 🟢 Three ways a pending workspace edit could be lost or do damage — fixed 2026-09-20
+
+The owner-tracked workspace of 2026-09-19 had three holes, all found by the
+first test that edited an object *outside* a callback and then let the engine
+run:
+
+- Reloading the slot the workspace already mirrored skipped the flush and
+  reloaded, discarding the edit (`objNew`, `objGetPointer` on the same
+  object, field writes, `objUpdateAll`). Every reload now flushes first.
+- The write-back carried all 64 bytes, including the active-list links the
+  engine rewrites in the slot while the workspace holds the copy taken at
+  load time. The write-back now covers bytes 4 to 63; the links never travel.
+- `objUpdateAll` and `objRefreshAll` wrote `onscreen` into the slot and only
+  then flushed a pending edit, putting the workspace's stale `onscreen` back
+  over it. Both passes now flush on entry.
 
 ### 🟢 `objCollidMap1D` had no friction, and no way to get any — opt-in since 2026-09-19
 

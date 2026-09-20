@@ -192,8 +192,11 @@ tests: test-compiler
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
 	@# (gaps review item R5). The library fixture is one of the ROMs it
-	@# profiles, so it is built first (rebuilt clean for its own asserts below).
+	@# profiles, so it is built first (rebuilt clean for its own asserts below),
+	@# and so are the compiler's runtime ROMs.
 	@$(MAKE) -s -C devtools/libtests
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 	@# APU output hashed for four self-playing audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
@@ -278,6 +281,8 @@ test-project:
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage:
 	@$(MAKE) -s -C devtools/libtests
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
