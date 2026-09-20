@@ -108,16 +108,23 @@ u8 collidePoint(s16 x, s16 y, Rect *r);
  *
  * @param a First rectangle
  * @param b Second rectangle
- * @param overlapX Pointer to store X overlap (negative = left, positive = right)
- * @param overlapY Pointer to store Y overlap (negative = up, positive = down)
+ * @param overlapX Receives the X displacement that moves @p a OUT of @p b
+ *                 (negative = move a left, positive = move a right)
+ * @param overlapY Receives the Y displacement (negative = up, positive = down)
  * @return 1 if rectangles overlap, 0 otherwise
+ *
+ * The values are displacements to ADD to @p a. Both axes are always filled;
+ * applying both moves the object diagonally, so resolve the smaller one.
+ * (This example subtracted them until 2026-09-20, which pushes the player
+ * deeper into the wall: for a = {10,10,16,16}, b = {20,20,16,16} the function
+ * returns dx = -6, and a must move LEFT.)
  *
  * @code
  * s16 dx, dy;
  * if (collideRectEx(&player, &wall, &dx, &dy)) {
- *     // Push player out of wall
- *     player_x = player_x - dx;
- *     player_y = player_y - dy;
+ *     // Push player out of wall along the axis of least penetration
+ *     if ((dx < 0 ? -dx : dx) < (dy < 0 ? -dy : dy)) player_x += dx;
+ *     else                                           player_y += dy;
  * }
  * @endcode
  */

@@ -30,6 +30,7 @@ CASES = [
     # hdma: the wave helper enables its channel, the table helpers do not
     ("r_hdma_init",  2, 0x0000),
     ("r_hdma_wave",  2, 0x0040),
+    ("hdma_wave_amplitude", 1, 60),   # hdmaWaveH(…, 200, …): clamped, as the header always said
     ("r_hdma_setup", 2, 0x0040),
     ("r_hdma_both",  2, 0x0070),
     # nmiSet: one callback per frame, none after nmiClear

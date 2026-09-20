@@ -214,6 +214,11 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
         default: return;
     }
 
+    /* The header has always said "clamped internally"; only hdmaWaterRipple
+     * did it. fillWaveTable multiplies an 8-bit sine by the amplitude in an
+     * s16, which overflows from 129 up (fixed 2026-09-20). */
+    if (amplitude > 60) amplitude = 60;
+
     /* Store parameters */
     hdma_wave_channel = channel;
     hdma_wave_amplitude = amplitude;

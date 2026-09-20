@@ -76,6 +76,7 @@ int main(void) {
     for (i = 0; i < 5; i++) { WaitForVBlank(); snesmodProcess(); }
     nmiClear();
     r_nmi_calls = nmi_calls;
+    nmiSet(0);      /* documented as "disable": used to install a jump to $00:0000 */
     for (i = 0; i < 3; i++) { WaitForVBlank(); snesmodProcess(); }
     r_nmi_after = nmi_calls;
 
@@ -83,7 +84,7 @@ int main(void) {
      * a channel up and leave enabling to the caller */
     hdmaWaveInit();
     r_hdma_init = hdmaGetEnabled();
-    hdmaWaveH(6, 0, 8, 4);
+    hdmaWaveH(6, 0, 200, 4);                /* amplitude clamps to 60 (header's promise) */
     r_hdma_wave = hdmaGetEnabled();
     hdmaGradient(5, grad_table);
     hdmaWindowShape(4, win_table);

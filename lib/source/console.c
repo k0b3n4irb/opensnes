@@ -266,6 +266,13 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
 }
 
 void nmiSet(VBlankCallback callback) {
+    /* interrupt.h documents nmiSet(NULL) as "disable" and nmiClear() as its
+     * equivalent. It was not: a null pointer was stored and flagged as a
+     * live callback, so the NMI did `jml` to $00:0000 (fixed 2026-09-20). */
+    if (!callback) {
+        nmiClear();
+        return;
+    }
     /* Post-A6 a function pointer is a 4-byte far pointer carrying its own bank
      * in bits 16-23, so a callback in ANY bank works — derive the bank from the
      * pointer and let nmiSetBank do the rest. The old bug was only the literal

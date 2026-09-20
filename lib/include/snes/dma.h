@@ -128,10 +128,12 @@ void dmaCopyVramMode7(const u8 *tilemap, u16 tilemapSize, const u8 *tiles, u16 t
 /**
  * @brief Set VRAM to a value
  *
- * @param value Value to fill (repeated as word)
+ * @param value 16-bit word to fill with (low byte to the even VRAM byte, high
+ *              byte to the odd one). Until 2026-09-20 only the low byte was
+ *              used, for both halves.
  * @param dest Destination word address in VRAM
- * @param size Number of bytes to fill — 0 means 65536 (the full VRAM),
- *             which is how dmaClearVRAM() uses it
+ * @param size Number of bytes to fill, rounded up to a whole word — 0 means
+ *             65536 (the full VRAM), which is how dmaClearVRAM() uses it
  *
  * @note Uses DMA channel 0 with a fixed source address, like the other
  * lib DMA helpers (oamUpdate, dmaCopyVram). Safe when calls are

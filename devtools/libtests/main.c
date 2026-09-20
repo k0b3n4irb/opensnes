@@ -357,6 +357,7 @@ u16 r_bank_irq;      /* plain irqSet on a handler in banks 7-1, 4 frames  -> 4 *
 u16 r_bank_irq_bk;   /* that handler is outside bank $00                   -> 1 */
 u16 r_bank_sram;     /* const template -> SRAM @0x300 -> RAM: equal bytes -> 16 */
 u16 r_bank_ck;       /* sramChecksum(const template) = XOR(0xA1..0xB0)    -> 0x10 */
+u16 r_f32div_zero;   /* fix32Div(FIX32(7), 0): the family convention        -> 0 */
 u16 r_bank_tpl_bk;   /* the template is outside bank $00                   -> 1 */
 static const u8 save_tpl[16] = {
     0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8,
@@ -388,6 +389,10 @@ static void coverage_bank_bytes(void) {
     r_bank_sram = 0;
     for (i = 0; i < 16; i++) if (bank_load[i] == save_tpl[i]) r_bank_sram++;
     r_bank_ck     = sramChecksum(save_tpl, 16);
+    {
+        u32 q = (u32)fix32Div(FIX32(7), 0);
+        r_f32div_zero = (u16)(q | (q >> 16));   /* every bit of the result */
+    }
     r_bank_tpl_bk = ((u8)((u32)(const void *)save_tpl >> 16) != 0) ? 1 : 0;
 }
 
@@ -468,6 +473,7 @@ static void coverage_lot_b(void) {
      * dumps VRAM and compares. The two DMA bank variants land next to it
      * and in CGRAM 250-251; dmaTransfer, the raw one, in CGRAM 254-255. */
     bgInitTileSetData(0xFF, lotb_vram, 16, 0x6000);
+    dmaFillVRAM(0x1234, 0x6100, 8);         /* a WORD fill: 34 12 34 12 ... (was 34 34) */
     dmaCopyVramBank(lotb_vram + 16, (u8)((u32)(const void *)lotb_vram >> 16), 0x6008, 16);
     dmaCopyCGramBank(lotb_pal, (u8)((u32)(const void *)lotb_pal >> 16), 250, 4);
     WaitForVBlank();

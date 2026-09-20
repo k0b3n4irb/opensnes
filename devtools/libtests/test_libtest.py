@@ -134,6 +134,7 @@ CASES = [
     ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
     ("r_bank_sram",    2, 16),     # const template saved and read back intact
     ("r_bank_ck",      2, 0x10),   # sramChecksum read the ROM bytes, not WRAM
+    ("r_f32div_zero",  2, 0),      # fix32Div by zero: 0 like the rest of the family (was 0xFFFFFFFF)
     ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # coverage lot C (2026-09-20)
@@ -201,6 +202,8 @@ VRAM_CASES = [
                     0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
                     0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90,
                     0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02])),
+    # dmaFillVRAM(0x1234, word 0x6100, 8 bytes): a word fill (was 34 34 34 34 ...)
+    (0xC200, bytes([0x34, 0x12] * 4)),
 ]
 
 
