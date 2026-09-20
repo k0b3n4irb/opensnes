@@ -12,9 +12,9 @@
  *           snesmodGetPosition
  *   console consoleInitEx, nmiSet
  *
- * nmiSet dispatches in bank $00 (it stores a 16-bit address). That holds
- * here because this fixture's C code fits in bank $00; it does not hold in
- * general since #127.3 — see .claude/notes/status/api_audit_findings.md.
+ * nmiSet takes the bank from the far pointer it is given, so the callback
+ * may live in any bank (the header's "must be in bank 0" note is stale; the
+ * function that does drop the bank is irqSet — API audit 2026-09-20, B2).
  */
 #include <snes.h>
 #include <snes/hdma.h>

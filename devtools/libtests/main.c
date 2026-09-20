@@ -266,12 +266,8 @@ static void objPeekUpdate(u16 idx) {
  * DMA variants, oamSetTile) are asserted from luna's PPU view in
  * test_libtest.py; the rest lands in these globals. The hdma module is not
  * linked here: its wave tables take 1346 bytes of bank-$00 RAM and this
- * fixture has 1266 free — its helpers get their own fixture (lot C). nmiSet
- * is left out on
- * purpose: it stores a 16-bit address and dispatches in bank $00, and this
- * fixture's C code no longer fits in bank $00 — a callback registered with
- * it would jump into whatever bank-$00 code shares the offset. That is a
- * finding for the API audit, not a vector. */
+ * fixture has 1266 free — its helpers get their own fixture (lot C), which
+ * also holds nmiSet. */
 u16 r_fix_abs_n;    /* fixAbs(FIX(-3))                          -> 0x0300 */
 u16 r_fix_abs_p;    /* fixAbs(FIX(2))                           -> 0x0200 */
 u16 r_fix_clamp_lo; /* fixClamp(FIX(-9), FIX(-1), FIX(1))       -> 0xFF00 */

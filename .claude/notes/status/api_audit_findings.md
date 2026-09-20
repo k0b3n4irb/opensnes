@@ -1,5 +1,8 @@
 # API audit — findings collected on the way (running list)
 
+> Superseded where they overlap by the full review,
+> `.claude/notes/reviews/2026-09-20_api_audit.md` (2026-09-20).
+
 Started 2026-09-20 while covering the never-executed public functions (road
 to v1.0, step 3). Each entry is something the coverage work surfaced that
 belongs to the API audit before the freeze (step 4), or to the luna team.
@@ -8,13 +11,11 @@ tutorials' Gotchas.
 
 ## For the API audit
 
-- **`nmiSet(callback)` dispatches in bank `$00`.** It stores a 16-bit address;
-  the header says the callback must live in bank 0. Since #127.3 C code that
-  does not fit bank `$00` moves to other banks (the libtest fixture has 71
-  bytes free there), so a callback registered with `nmiSet` can silently land
-  elsewhere and the NMI jumps into whatever shares the offset. `nmiSetBank`
-  is the safe one. Candidates: make `nmiSet` take the far pointer it is
-  already handed (function pointers are 4-byte slots), or deprecate it.
+- ~~`nmiSet(callback)` dispatches in bank `$00`~~ — **wrong, corrected
+  2026-09-20**: `nmiSet` derives the bank from the far pointer
+  (`console.c:268-274`); only the header's "must be in bank 0" note is stale.
+  The function that drops the bank is `irqSet` (`irqSetBank(handler, 0)`).
+  See `.claude/notes/reviews/2026-09-20_api_audit.md` §2 B2 and §6.
 - **`objCollidObj(idx1, idx2)` takes slot indices** where `objKill` and
   `objGetPointer` take handles. Documented now; an API that masks its
   arguments (`and #$00ff`) would accept both and remove the trap.
