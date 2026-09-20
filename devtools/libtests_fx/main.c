@@ -61,6 +61,10 @@ int main(void) {
     snesmodLoadModule(MOD_POLLEN8);
     snesmodPlay(0);
     snesmodSetModuleVolume(90);
+    /* Asymmetric, non-zero arguments on purpose: a fade to 45 at speed 3.
+     * snesmodFadeVolume read the wrong stack byte for the target (always 0),
+     * and its only test used target 0. spc_pr holds the last command sent. */
+    snesmodFadeVolume(45, 3);
     snesmodFlush();
     r_mod_flush = (spc_fread == spc_fwrite) ? 1 : 0;
     for (i = 0; i < 30; i++) { WaitForVBlank(); snesmodProcess(); }
@@ -86,6 +90,11 @@ int main(void) {
     r_hdma_setup = hdmaGetEnabled();
     hdmaEnable((1 << 5) | (1 << 4));
     r_hdma_both = hdmaGetEnabled();
+    /* hdmaColorGradient on colour 37 (not 0): the index was written as
+     * [index, 0] to a register written twice, so every gradient landed on
+     * colour 0. Red at the top, blue at the bottom; the last chunk leaves
+     * CGRAM[37] near-blue and CGRAM[0] untouched. */
+    hdmaColorGradient(3, 37, 0x001F, 0x7C00);
 
     /* mode 7: Transform and Rotate go through the PPU multiplier and leave
      * the matrix behind; SetMatrix and SetPivot then write known values the

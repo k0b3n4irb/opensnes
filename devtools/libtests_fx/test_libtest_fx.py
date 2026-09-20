@@ -40,6 +40,9 @@ CASES = [
     # snesmod: the 24-bit table pointer (bank byte included), a clean u16
     # position, an emptied queue whose last command was the volume (0x5A)
     ("r_mod_flush",  2, 1),
+    # last command sent after the flush: CMD_FADE (6), 0, speed 3, target 45.
+    # Asymmetric on purpose — the target used to be read from the wrong byte.
+    ("spc_pr",       4, 0x2D030006),
     ("r_mod_pos",    2, 0),
 ]
 
@@ -47,6 +50,8 @@ CASES = [
 STATE_CASES = [
     ("ppu.m7a", 256), ("ppu.m7b", 32), ("ppu.m7c", -32), ("ppu.m7d", 128),   # mode7SetMatrix
     ("ppu.m7x", 64), ("ppu.m7y", 48),                                         # mode7SetPivot
+    ("ppu.cgram.37", 0x7801),        # hdmaColorGradient(3, 37, red, blue): the index is honoured
+    ("ppu.cgram.0", 0x0000),         # ...and colour 0, where every gradient used to land, is untouched
     ("dma.channels.4.bbad", 0x26),   # hdmaWindowShape -> WH0, two registers
     ("dma.channels.4.params", 0x01),
     ("dma.channels.5.bbad", 0x32),   # hdmaGradient -> COLDATA, one register

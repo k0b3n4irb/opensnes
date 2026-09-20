@@ -350,8 +350,12 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
         u16 color = (u16)(((u16)b << 10) | ((u16)g << 5) | (u16)r);
 
         *p++ = 4;                          /* 4 scanlines, non-repeat */
-        *p++ = colorIndex;                  /* CGADD low */
-        *p++ = 0x00;                        /* CGADD high */
+        /* CGADD is ONE 8-bit register and mode 2REG_2X writes it twice
+         * (p, p, p+1, p+1): both bytes must be the index. The second was 0
+         * ("CGADD high"), and the last write wins — every gradient landed on
+         * colour 0 whatever colorIndex said (fixed 2026-09-20). */
+        *p++ = colorIndex;                  /* CGADD, first write */
+        *p++ = colorIndex;                  /* CGADD, second write */
         *p++ = (u8)(color & 0xFF);          /* CGDATA low */
         *p++ = (u8)((color >> 8) & 0xFF);   /* CGDATA high */
     }
