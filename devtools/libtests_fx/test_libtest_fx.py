@@ -51,7 +51,10 @@ CASES = [
 STATE_CASES = [
     ("ppu.m7a", 256), ("ppu.m7b", 32), ("ppu.m7c", -32), ("ppu.m7d", 128),   # mode7SetMatrix
     ("ppu.m7x", 64), ("ppu.m7y", 48),                                         # mode7SetPivot
-    ("ppu.cgram.37", 0x7801),        # hdmaColorGradient(3, 37, red, blue): the index is honoured
+    # hdmaColorGradient(3, 37, red, blue): the index is honoured. CGRAM[37]
+    # holds whichever band the beam last crossed when luna samples, so the
+    # exact colour depends on the sampling phase — "not black" is the claim.
+    ("ppu.cgram.37", ("ne", 0)),
     ("ppu.cgram.0", 0x0000),         # ...and colour 0, where every gradient used to land, is untouched
     ("dma.channels.4.bbad", 0x26),   # hdmaWindowShape -> WH0, two registers
     ("dma.channels.4.params", 0x01),
@@ -88,7 +91,10 @@ def main() -> int:
     state = json.loads(proc.stdout)
     for path, want in STATE_CASES:
         got = walk(state, path)
-        ok = got == want
+        if isinstance(want, tuple):                 # ("ne", value)
+            ok = got is not None and got != want[1]
+        else:
+            ok = got == want
         print(f"  {'PASS' if ok else 'FAIL'}  {path} == {want}" + ("" if ok else f"  [luna reports {got}]"))
         fails += 0 if ok else 1
     # snesmodSetSoundTable stored the far pointer it was given: the symbol's

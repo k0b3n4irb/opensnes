@@ -4,7 +4,7 @@ name: Lint
 #
 # Three kinds of job:
 #   lint            — `make lint`, verbatim: the aggregate every contributor runs
-#                     before a PR (doc drift, ASM markers, lib rodata, bank-read
+#                     before a PR (doc drift, ASM markers, bank-read
 #                     self-test, corpus freshness, ASM ABI, VRAM layout, commit
 #                     messages, cppcheck). Add a new linter to the Makefile target, never
 #                     to this file — a hand-listed subset here diverged from the

@@ -274,6 +274,13 @@ u16 r_fix_clamp_lo; /* fixClamp(FIX(-9), FIX(-1), FIX(1))       -> 0xFF00 */
 u16 r_fix_clamp_hi; /* fixClamp(FIX(9),  FIX(-1), FIX(1))       -> 0x0100 */
 u16 r_fix_clamp_in; /* fixClamp(fx_half, FIX(-1), FIX(1))       -> 0x0080 */
 u16 r_fix_sqrt;     /* fixSqrt(FIX(16))                         -> 0x0400 */
+u16 r_atan_e;       /* atan2_8(dy 0,   dx 10): +X               -> 0   */
+u16 r_atan_s;       /* atan2_8(dy 10,  dx 0):  +Y, down         -> 64  */
+u16 r_atan_w;       /* atan2_8(dy 0,   dx -10)                  -> 128 */
+u16 r_atan_n;       /* atan2_8(dy -10, dx 0)                    -> 192 */
+u16 r_atan_se;      /* atan2_8(dy 10,  dx 10): the LUT's last entry, now a
+                     * const table read far from an asset bank   -> 32  */
+u16 r_atan_lut;     /* atan2_8(dy 5,   dx 10): mid-LUT (atan 0.5 = 26.57 deg) -> 19 */
 u16 r_bg_sx;        /* bgSetScrollX(1, 300); bgGetScrollX(1)    -> 300 */
 u16 r_bg_sy;        /* bgSetScrollY(1, 77);  bgGetScrollY(1)    -> 77 */
 u16 r_bg_init;      /* bgInit(2) after bgSetScrollX(2, 5)       -> 0 */
@@ -460,6 +467,12 @@ static void coverage_lot_b(void) {
     r_fix_clamp_hi = (u16)fixClamp(FIX(9), FIX(-1), FIX(1));
     r_fix_clamp_in = (u16)fixClamp(fx_half, FIX(-1), FIX(1));
     r_fix_sqrt     = (u16)fixSqrt(FIX(16));
+    r_atan_e   = atan2_8(0, 10);
+    r_atan_s   = atan2_8(10, 0);
+    r_atan_w   = atan2_8(0, -10);
+    r_atan_n   = atan2_8(-10, 0);
+    r_atan_se  = atan2_8(10, 10);
+    r_atan_lut = atan2_8(5, 10);
 
     bgSetScrollX(1, 300);
     bgSetScrollY(1, 77);

@@ -89,7 +89,14 @@ void hdmaWindowShape(u8 channel, const void *windowTable) {
  * data_init DMA loop and read from WRAM, which is always safe. Cost: 64
  * bytes of RAM in ROMs linking the hdma module.
  */
-static u8 sine_quarter[64] = {
+/* const since 2026-09-20. It was a plain static — bank-$00 RAM copied from
+ * ROM at boot for a table nothing writes — because devtools/check_lib_rodata.py
+ * forbade const data in lib C modules: before #121 a const table that the
+ * linker placed outside bank $00 was read with bank-$00 addressing. Every C
+ * read of const data is a far read now (#121), const data goes to the asset
+ * banks by design (#127.3) and check_bank_reads.py fails the link on a
+ * bank-blind read, so the lint only cost RAM. Retired with this change. */
+static const u8 sine_quarter[64] = {
       0,   6,  13,  19,  25,  31,  37,  44,
      50,  56,  62,  68,  74,  80,  86,  92,
      98, 103, 109, 115, 120, 126, 131, 136,

@@ -219,15 +219,30 @@ fixed fixClamp(fixed x, fixed min, fixed max) {
  * dependent placement) where the 16-bit C deref reads garbage; the
  * symmap ratchet hard-fails the build when it happens.
  */
-static u8 atan_lut[65] = {
-     0,  1,  1,  2,  3,  4,  5,  6,
-     6,  7,  8,  9, 10, 10, 11, 12,
-    13, 14, 14, 15, 16, 17, 17, 18,
-    19, 19, 20, 21, 21, 22, 23, 23,
-    24, 24, 25, 25, 26, 26, 27, 27,
-    27, 28, 28, 28, 29, 29, 29, 30,
-    30, 30, 30, 31, 31, 31, 31, 31,
-    31, 32, 32, 32, 32, 32, 32, 32,
+/* const since 2026-09-20. It was a plain static — bank-$00 RAM copied from
+ * ROM at boot for a table nothing writes — because devtools/check_lib_rodata.py
+ * forbade const data in lib C modules: before #121 a const table that the
+ * linker placed outside bank $00 was read with bank-$00 addressing. Every C
+ * read of const data is a far read now (#121), const data goes to the asset
+ * banks by design (#127.3) and check_bank_reads.py fails the link on a
+ * bank-blind read, so the lint only cost RAM. Retired with this change. */
+/* atan(i/64) in the first octant, as an 8-bit angle: round(atan(i/64) /
+ * (pi/4) * 32), i = 0..64. REGENERATED 2026-09-20: the table shipped with
+ * B6 was not an arctangent at all — it tracks sin(t*pi/2) (sum of absolute
+ * differences 32, against 191 for the true curve) and was up to 5 units,
+ * 7 degrees, too high in mid-octant: atan2_8(5, 10) returned 24 where
+ * atan(0.5) = 26.57 deg = 18.9 units. The axes and the diagonal were right
+ * (0, 64, 128, 192, 32), which is all any test had looked at; a mid-LUT
+ * libtest vector found it. */
+static const u8 atan_lut[65] = {
+     0,  1,  1,  2,  3,  3,  4,  4,
+     5,  6,  6,  7,  8,  8,  9,  9,
+    10, 11, 11, 12, 12, 13, 13, 14,
+    15, 15, 16, 16, 17, 17, 18, 18,
+    19, 19, 20, 20, 21, 21, 22, 22,
+    23, 23, 24, 24, 25, 25, 25, 26,
+    26, 27, 27, 27, 28, 28, 29, 29,
+    29, 30, 30, 30, 31, 31, 31, 32,
     32,
 };
 

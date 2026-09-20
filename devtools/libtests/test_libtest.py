@@ -120,6 +120,9 @@ CASES = [
     ("r_fix_abs_n",    2, 0x0300), ("r_fix_abs_p",    2, 0x0200),
     ("r_fix_clamp_lo", 2, 0xFF00), ("r_fix_clamp_hi", 2, 0x0100), ("r_fix_clamp_in", 2, 0x0080),
     ("r_fix_sqrt",     2, 0x0400),
+    # atan2_8: four axes, the diagonal, and a mid-LUT value (26.57 deg = 18.9 -> 19)
+    ("r_atan_e", 2, 0), ("r_atan_s", 2, 64), ("r_atan_w", 2, 128), ("r_atan_n", 2, 192),
+    ("r_atan_se", 2, 32), ("r_atan_lut", 2, 19),
     ("r_bg_sx",        2, 300),    ("r_bg_sy",        2, 77),     ("r_bg_init",      2, 0),
     ("r_text_x",       2, 2),      ("r_text_flush",   2, 1),      ("r_frame_reset",  2, 0),
     ("mapoptions",     1, 3),      ("r_pad_raw",      2, 0),     # mapSetMapOptions(1WAY|BG2), bank $7E byte
