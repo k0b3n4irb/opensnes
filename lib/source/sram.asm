@@ -6,9 +6,10 @@
 ; SRAM Memory Map (LoROM):
 ;   Bank $70: $0000-$7FFF (32KB SRAM)
 ;
-; Calling convention (cdecl, right-to-left push):
+; Calling convention (cc65816, arguments pushed LEFT-TO-RIGHT):
 ;   - Rightmost argument is closest to SP after call
 ;   - Leftmost argument is furthest from SP
+;   - A pointer is a 4-byte far slot: address, then bank byte, then padding
 ;==============================================================================
 
 .ifdef SA1
@@ -35,6 +36,84 @@
 ;------------------------------------------------------------------------------
 .include "blockcopy.inc"
 
+;------------------------------------------------------------------------------
+; Bank-honouring block copies (2026-09-20)
+;
+; The four copy routines used a literal `mvn $7E, $70` / `mvn $70, $7E`: the
+; bank byte of the far pointer they are handed was never read, so a save
+; template declared `static const` — asset banks since #127.3 — was saved as
+; whatever WRAM held at the same offset. MVN's banks are immediate operands,
+; so they cannot follow a pointer; the macros keep MVN for the two banks that
+; mean work RAM ($00, the low mirror, and $7E) and fall back to a long-
+; indirect byte loop for anything else (ROM on save, $7F on load).
+;
+; In:  X = CPU-side address, Y = SRAM offset (SAVE) / X = SRAM offset,
+;      Y = CPU-side address (LOAD); DP_SIZE = byte count - 1; 16-bit A/X/Y.
+;      \1 = stack offset of the pointer's bank byte.
+;------------------------------------------------------------------------------
+.MACRO SRAM_SAVE_BLOCK
+    sep #$20
+    .ACCU 8
+    lda \1,s                    ; bank byte of the source pointer
+    beq @ssb_fast\@
+    cmp #$7E
+    beq @ssb_fast\@
+    sta.b DP_SRC+2              ; [DP_SRC] = 24-bit source
+    rep #$20
+    .ACCU 16
+    stx.b DP_SRC
+    inc.b DP_SIZE               ; count-1 -> count
+    tyx                         ; X = SRAM offset
+    ldy #$0000
+    sep #$20
+    .ACCU 8
+@ssb_loop\@:
+    lda [DP_SRC],y
+    sta.l SRAM_BANK << 16,x
+    inx
+    iny
+    cpy.b DP_SIZE
+    bne @ssb_loop\@
+    bra @ssb_done\@
+@ssb_fast\@:
+    rep #$20
+    .ACCU 16
+    lda.b DP_SIZE               ; A = byte count - 1
+    mvn $7E, $70                ; WLA-DX: mvn src_bank, dst_bank
+@ssb_done\@:
+.ENDM
+
+.MACRO SRAM_LOAD_BLOCK
+    sep #$20
+    .ACCU 8
+    lda \1,s                    ; bank byte of the destination pointer
+    beq @slb_fast\@
+    cmp #$7E
+    beq @slb_fast\@
+    sta.b DP_SRC+2              ; [DP_SRC] = 24-bit destination
+    rep #$20
+    .ACCU 16
+    sty.b DP_SRC
+    inc.b DP_SIZE               ; count-1 -> count
+    ldy #$0000                  ; X = SRAM offset already
+    sep #$20
+    .ACCU 8
+@slb_loop\@:
+    lda.l SRAM_BANK << 16,x
+    sta [DP_SRC],y
+    inx
+    iny
+    cpy.b DP_SIZE
+    bne @slb_loop\@
+    bra @slb_done\@
+@slb_fast\@:
+    rep #$20
+    .ACCU 16
+    lda.b DP_SIZE               ; A = byte count - 1
+    mvn $70, $7E                ; WLA-DX: mvn src_bank, dst_bank
+@slb_done\@:
+.ENDM
+
 .SECTION ".sram_asm" SUPERFREE
 
 ;------------------------------------------------------------------------------
@@ -46,8 +125,8 @@
 ;   1,s = P (processor status)
 ;   2,s = B (data bank)
 ;   3-5,s = return address (3 bytes from JSL)
-;   6-7,s = size (rightmost arg)
-;   8-9,s = data pointer (leftmost arg)
+;   6-7,s  = size (rightmost arg)
+;   8-11,s = data pointer (leftmost arg; 4-byte far pointer, bank at 10,s)
 ;------------------------------------------------------------------------------
 sramSave:
     php
@@ -67,11 +146,7 @@ sramSave:
 
     ldy #$0000                  ; Y = dest (SRAM at $0000)
 
-    lda.b DP_SIZE               ; A = byte count - 1
-
-    ; Block move: source bank $7E, dest bank $70
-    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
-    mvn $7E, $70
+    SRAM_SAVE_BLOCK 10          ; pointer at 8-11,s: bank byte at 10,s
 
 @done:
     plb
@@ -84,8 +159,8 @@ sramSave:
 ; Copy data from SRAM to Work RAM using block move.
 ;
 ; Stack layout (after PHP/PHB):
-;   6-7,s = size
-;   8-9,s = data pointer
+;   6-7,s  = size
+;   8-11,s = data pointer (4-byte far pointer, bank at 10,s)
 ;------------------------------------------------------------------------------
 sramLoad:
     php
@@ -105,11 +180,7 @@ sramLoad:
     lda 8,s                     ; dest pointer (WRAM)
     tay                         ; Y = dest
 
-    lda.b DP_SIZE               ; A = byte count - 1
-
-    ; Block move: source bank $70, dest bank $7E
-    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
-    mvn $70, $7E
+    SRAM_LOAD_BLOCK 10          ; pointer at 8-11,s: bank byte at 10,s
 
 @done:
     plb
@@ -122,9 +193,9 @@ sramLoad:
 ; Copy data from Work RAM to SRAM at specified offset.
 ;
 ; Stack layout (after PHP/PHB):
-;   6-7,s = offset (rightmost)
-;   8-9,s = size
-;   10-11,s = data pointer (leftmost)
+;   6-7,s   = offset (rightmost)
+;   8-9,s   = size
+;   10-13,s = data pointer (leftmost; 4-byte far pointer, bank at 12,s)
 ;------------------------------------------------------------------------------
 sramSaveOffset:
     php
@@ -145,11 +216,7 @@ sramSaveOffset:
     lda 6,s                     ; offset
     tay                         ; Y = dest (SRAM offset)
 
-    lda.b DP_SIZE               ; A = byte count - 1
-
-    ; Block move: source bank $7E, dest bank $70
-    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
-    mvn $7E, $70
+    SRAM_SAVE_BLOCK 12          ; pointer at 10-13,s: bank byte at 12,s
 
 @done:
     plb
@@ -162,9 +229,9 @@ sramSaveOffset:
 ; Copy data from SRAM at specified offset to Work RAM.
 ;
 ; Stack layout (after PHP/PHB):
-;   6-7,s = offset (rightmost)
-;   8-9,s = size
-;   10-11,s = data pointer (leftmost)
+;   6-7,s   = offset (rightmost)
+;   8-9,s   = size
+;   10-13,s = data pointer (leftmost; 4-byte far pointer, bank at 12,s)
 ;------------------------------------------------------------------------------
 sramLoadOffset:
     php
@@ -185,11 +252,7 @@ sramLoadOffset:
     lda 10,s                    ; dest pointer (WRAM)
     tay                         ; Y = dest
 
-    lda.b DP_SIZE               ; A = byte count - 1
-
-    ; Block move: source bank $70, dest bank $7E
-    ; WLA-DX MVN syntax: mvn src_bank, dst_bank (WDC convention)
-    mvn $70, $7E
+    SRAM_LOAD_BLOCK 12          ; pointer at 10-13,s: bank byte at 12,s
 
 @done:
     plb
@@ -249,8 +312,8 @@ sramClear:
 ; Returns 8-bit checksum in A (low byte).
 ;
 ; Stack layout (after PHP):
-;   5-6,s = size (rightmost)
-;   7-8,s = data pointer (leftmost)
+;   5-6,s  = size (rightmost)
+;   7-10,s = data pointer (leftmost; 4-byte far pointer, bank at 9,s)
 ;------------------------------------------------------------------------------
 sramChecksum:
     php
@@ -263,60 +326,28 @@ sramChecksum:
     beq @zero
     sta.b DP_SIZE
 
-    lda 7,s                     ; data pointer
+    lda 7,s                     ; data pointer (4-byte far pointer at 7-10,s)
     sta.b DP_SRC
 
     sep #$20
     .ACCU 8
-    lda #$00                    ; Initialize checksum
-    sta.b DP_TEMP
+    lda 9,s                     ; its bank byte: the data may be const (ROM)
+    sta.b DP_SRC+2              ; [DP_SRC] = 24-bit source
+    lda #$00                    ; running checksum
+    ldy #$0000
 
-    rep #$30
-    .ACCU 16
-    .INDEX 16
-    ldx #$0000                  ; X = counter
-
+    ; One long-indirect read per byte. The old loop hard-coded bank $7E
+    ; (`lda.l $7E0000,x`), loaded every byte twice and rebuilt the offset
+    ; from the address with a subtraction each pass.
 @checksum_loop:
-    ; Calculate source address and load byte
-    txa
-    clc
-    adc.b DP_SRC                ; source + offset
-    tay                         ; Y = address (in bank $7E)
-
-    sep #$20
-    .ACCU 8
-    lda.l $7E0000,x             ; Load byte - use X index
-    ; We need to recalculate with proper address
-    rep #$20
-    .ACCU 16
-    txa
-    clc
-    adc.b DP_SRC
-    tax                         ; X = actual address
-
-    sep #$20
-    .ACCU 8
-    lda.l $7E0000,x             ; Load byte from WRAM
-    eor.b DP_TEMP               ; XOR with running checksum
-    sta.b DP_TEMP
+    eor [DP_SRC],y
+    iny
+    cpy.b DP_SIZE
+    bne @checksum_loop
 
     rep #$20
     .ACCU 16
-    txa
-    sec
-    sbc.b DP_SRC                ; Get back to offset
-    tax
-    inx                         ; Next byte
-    txa
-    cmp.b DP_SIZE
-    bcc @checksum_loop
-
-    sep #$20
-    .ACCU 8
-    lda.b DP_TEMP               ; Load final checksum
-    rep #$20
-    .ACCU 16
-    and #$00FF                  ; Ensure high byte is 0
+    and #$00FF                  ; u8 result, clean high byte
     plp
     rtl
 

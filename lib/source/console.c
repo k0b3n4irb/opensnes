@@ -297,8 +297,11 @@ void irqSetBank(void *handler, u8 bank) {
 }
 
 void irqSet(void *handler) {
-    /* cc65816 code lives in bank 0 by default; use irqSetBank otherwise. */
-    irqSetBank(handler, 0);
+    /* The far pointer carries its bank in bits 16-23, exactly as in nmiSet
+     * above. This used to pass a literal 0: a handler the linker placed
+     * outside bank $00 — any SUPERFREE section can be — was entered at the
+     * same offset of bank $00 (fixed 2026-09-20). */
+    irqSetBank(handler, (u8)((u32)handler >> 16));
 }
 
 void irqClear(void) {

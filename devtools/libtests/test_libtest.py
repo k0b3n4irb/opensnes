@@ -130,6 +130,12 @@ CASES = [
     ("r_obj_cobj",     2, 1),      ("r_obj_cobj_no",  2, 0),
     ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
     ("r_mosaic",       2, 15),
+    # bank-byte chantier (2026-09-20): data outside bank $00, asymmetric values
+    ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
+    ("r_bank_sram",    2, 16),     # const template saved and read back intact
+    ("r_bank_ck",      2, 0x10),   # sramChecksum read the ROM bytes, not WRAM
+    ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
+    ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
@@ -179,6 +185,9 @@ PPU_CASES = [
     ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGramBank: red, green
     ("cgram.254", 0x7C00), ("cgram.255", 0x7FFF),      # dmaTransfer to CGDATA: blue, white
     ("oam_full.14", 0xAB), ("oam_full.15", 0x01),       # oamSetTile(3, 0x1AB) + dmaCopyOam
+    # bank-byte chantier: dmaCopyOam from a const (ROM) table
+    ("oam_full.0", 0x4D), ("oam_full.1", 0x58), ("oam_full.2", 0x5A), ("oam_full.3", 0x31),
+    ("oam_full.4", 0x21), ("oam_full.5", 0x43), ("oam_full.6", 0x65), ("oam_full.7", 0x07),
     # lot C: oamDrawMetaFlip(10, x=100, y=50, flipX, box 16): item dx=0 -> 108, dx=8 -> 100;
     # bit 6 of the attribute byte is the H-flip the mirror set
     ("oam_full.40", 108), ("oam_full.41", 49), ("oam_full.44", 100), ("oam_full.45", 49),   # OAM Y = y - 1

@@ -233,7 +233,10 @@ dmaCopyOam:
 
     sep #$20
     .ACCU 8
-    lda #$7E                ; Source bank = $7E (Work RAM)
+    lda 9,s                 ; source bank: the far pointer's own (7-10,s). Was a
+                            ; literal $7E, so a const OAM table in ROM was
+                            ; read from work RAM instead (fixed 2026-09-20).
+                            ; oamMemory's bank byte is $00 = the WRAM mirror.
     sta.l $4304             ; DMA source bank
 
     lda #$00

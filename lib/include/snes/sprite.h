@@ -209,24 +209,27 @@ _Static_assert(__builtin_offsetof(t_sprites, oamgfxaddr) == 8, "oamgfxaddr offse
 _Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offset mismatch");
 
 /**
- * @brief Set sprite graphics address (bank $00 only)
+ * @brief Set sprite graphics address — any bank
  *
- * Sets the 16-bit graphics address with bank byte = 0.
- * cc65816 passes 16-bit pointers, so the bank byte is always lost
- * before this macro runs. Use OAM_SET_GFX_BANK() for data in other banks.
+ * Stores the address AND the bank byte of @p gfx: a C pointer is a far
+ * pointer, so the macro reads the bank from it. Until 2026-09-20 it wrote
+ * bank 0 (a pre-A6 leftover: "cc65816 passes 16-bit pointers"), which only
+ * worked while the linker happened to put the tiles in bank $00 — and read
+ * the wrong bank, silently, for tiles declared with ASSET_SECTION.
  *
  * @param id Sprite index (0-127)
- * @param gfx Pointer to graphics data in bank $00
+ * @param gfx Pointer to graphics data (any bank)
  */
 #define OAM_SET_GFX(id, gfx) do { \
-    oambuffer[id].oamgfxaddr = (u16)(gfx); \
-    oambuffer[id].oamgfxbank = 0; \
+    oambuffer[id].oamgfxaddr = (u16)(u32)(const void *)(gfx); \
+    oambuffer[id].oamgfxbank = (u8)((u32)(const void *)(gfx) >> 16); \
 } while(0)
 
 /**
  * @brief Set sprite graphics address with explicit bank byte
  *
- * Use this when sprite data is in a bank other than $00.
+ * Only needed when @p gfx is a bare 16-bit address rather than a pointer.
+ * With a pointer, OAM_SET_GFX() already takes the bank from it.
  *
  * @param id Sprite index (0-127)
  * @param gfx Pointer to graphics data

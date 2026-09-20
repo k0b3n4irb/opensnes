@@ -340,12 +340,56 @@ u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> TRUE (0xFF) */
 u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 
 extern void irqTestHandler(void);   /* data.asm, bank 0 */
+extern void irqTestHandlerFar(void);/* data.asm, banks 7-1 */
 
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
 DECLARE_ANIM_CLIP(clip_b, ANIM_LOOP, 1, 77, 88);
 DECLARE_ANIM_CLIP(clip_once, ANIM_ONCE, 1, 5, 6);
+
+/* --- bank-byte chantier (API audit 2026-09-20): functions that were handed
+ * a far pointer and dropped its bank. Every vector puts its data where the
+ * SDK puts const data by default — outside bank $00 — and uses values that
+ * differ from each other and from zero. */
+volatile u16 irq_count_far;
+u16 r_bank_irq;      /* plain irqSet on a handler in banks 7-1, 4 frames  -> 4 */
+u16 r_bank_irq_bk;   /* that handler is outside bank $00                   -> 1 */
+u16 r_bank_sram;     /* const template -> SRAM @0x300 -> RAM: equal bytes -> 16 */
+u16 r_bank_ck;       /* sramChecksum(const template) = XOR(0xA1..0xB0)    -> 0x10 */
+u16 r_bank_tpl_bk;   /* the template is outside bank $00                   -> 1 */
+static const u8 save_tpl[16] = {
+    0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8,
+    0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0,
+};
+static const u8 oam_rom[8] = {              /* sprites 0 and 1, from ROM */
+    0x4D, 0x58, 0x5A, 0x31,
+    0x21, 0x43, 0x65, 0x07,
+};
+u8 bank_load[16];
+
+static void coverage_bank_bytes(void) {
+    u8 i;
+
+    irq_count_far = 0;
+    irqSet((void *)irqTestHandlerFar);
+    irqSetVTimer(120);
+    WaitForVBlank();
+    irqEnable(IRQ_VTIMER);
+    for (i = 0; i < 4; i++) WaitForVBlank();
+    irqDisable();
+    irqClear();
+    r_bank_irq    = irq_count_far;
+    r_bank_irq_bk = ((u8)((u32)(void *)irqTestHandlerFar >> 16) != 0) ? 1 : 0;
+
+    for (i = 0; i < 16; i++) bank_load[i] = 0x55;
+    sramSaveOffset(save_tpl, 16, 0x300);
+    sramLoadOffset(bank_load, 16, 0x300);
+    r_bank_sram = 0;
+    for (i = 0; i < 16; i++) if (bank_load[i] == save_tpl[i]) r_bank_sram++;
+    r_bank_ck     = sramChecksum(save_tpl, 16);
+    r_bank_tpl_bk = ((u8)((u32)(const void *)save_tpl >> 16) != 0) ? 1 : 0;
+}
 
 /* --- coverage lot C (2026-09-20): audio v2 stop/unload, two sprite helpers,
  * consoleInitEx. Runs last: it silences the voice the audio block left
@@ -392,6 +436,10 @@ static void coverage_lot_c(void) {
     r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
     oamDynamicSetSize(0, 16);
     WaitForVBlank();
+    /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we
+     * are inside VBlank, and nothing re-arms the NMI's own OAM upload after
+     * this, so luna's final OAM view holds these two sprites. */
+    dmaCopyOam(oam_rom, 8);
 }
 
 /* Lot B runs in its own function: main()'s frame already puts the stack
@@ -767,6 +815,7 @@ int main(void) {
     r_irq_d = irq_count;
     irqDisable();
 
+    coverage_bank_bytes();
     coverage_lot_b();
     coverage_lot_c();
 
