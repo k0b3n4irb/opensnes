@@ -135,7 +135,10 @@ void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize);
  * Configures where the background's tile graphics (CHR) are located in VRAM.
  *
  * @param bg Background number (0-3)
- * @param vramAddr VRAM word address (must be 8KB aligned, i.e., multiple of 0x2000)
+ * @param vramAddr VRAM WORD address, a multiple of 0x1000 words (the register
+ *                 holds `vramAddr >> 12`; lower bits are dropped silently).
+ *                 Said "multiple of 0x2000" until 2026-09-20 — that is the
+ *                 same step counted in bytes.
  *
  * @code
  * // Set BG1 tiles at VRAM $2000
@@ -173,7 +176,7 @@ void bgInit(u8 bg);
  * @param tileSize Size of tile data in bytes
  * @param paletteSize Size of palette data in bytes
  * @param colorMode Color mode (BG_4COLORS, BG_16COLORS, BG_256COLORS)
- * @param vramAddr VRAM address for tiles (must be 4KB aligned)
+ * @param vramAddr VRAM WORD address for tiles, a multiple of 0x1000 words (see bgSetGfxPtr())
  *
  * @code
  * extern char tiles[], tiles_end[];

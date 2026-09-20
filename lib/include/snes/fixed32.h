@@ -19,10 +19,9 @@
  * - Two values multiplied risk overflowing 8.8 (e.g. velocity × time).
  *
  * @code
- * fixed32 angle = 0;
- * fixed32 omega = FIX32(1) / 360;       // 1°/frame in radians (~0.0028)
- * angle += omega;                        // free — just s32 += s32
- * fixed32 vx = fix32Mul(FIX32(2), fix32Sin(angle));
+ * u8 angle = 0;                           // 0-255 = one full turn
+ * angle += 1;                             // ~1.4 degrees per frame
+ * fixed32 vx = fix32Mul(FIX32(2), fix32Sin(angle));   // fix32Sin takes a u8
  * @endcode
  *
  * ## Operations available
@@ -35,8 +34,9 @@
  * | Clamp             | `fix32Clamp`     | inline               |
  * | Multiply          | `fix32Mul`       | ~280 (16 × 8x8 hw)   |
  *
- * Division, sin/cos, and lerp are deferred to follow-up chantiers
- * (see `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`).
+ * Division (`fix32Div`, 0 on a zero divisor), sine / cosine (`fix32Sin`,
+ * `fix32Cos`) and `fix32Lerp` are declared below. (This line called them
+ * "deferred" long after they shipped.)
  *
  * ## Sign convention
  *
@@ -82,14 +82,13 @@ typedef s32 fixed32;
 #define FIX32(x) ((fixed32)((u32)(s32)(x) << 16))
 
 /**
- * @brief Convert fixed32 to integer (truncate toward zero)
+ * @brief Convert fixed32 to integer (floor)
  * @param x fixed32 value
  * @return Integer part as s16
  *
- * Truncation rounds toward zero for both signs (C99 semantics for
- * arithmetic right-shift on signed types is implementation-defined,
- * but the cc65816 backend implements arithmetic shift, so this works
- * as expected on this target).
+ * Rounds toward MINUS infinity, not toward zero: the cc65816 backend
+ * implements the signed right shift as arithmetic, so UNFIX32 of -0.5 is -1.
+ * (This block claimed "toward zero for both signs" until 2026-09-20.)
  *
  * @code
  * fixed32 pos = FIX32(1000) + 32768;  // 1000.5
@@ -187,6 +186,11 @@ inline fixed32 fix32Max(fixed32 a, fixed32 b) {
  * fixed32 area = fix32Mul(FIX32(width), FIX32(height));
  * fixed32 dy = fix32Mul(velocity, FIX32(dt));
  * @endcode
+ *
+ * @warning NOT safe inside an nmiSet() callback, like fixMul(): it drives the
+ *          hardware multiplier ($4202/$4203) and uses static scratch, so an
+ *          NMI-context call corrupts a main-thread call in flight. fix32Div()
+ *          and fix32Lerp() share the scratch and the restriction.
  */
 fixed32 fix32Mul(fixed32 a, fixed32 b);
 
@@ -203,6 +207,9 @@ fixed32 fix32Mul(fixed32 a, fixed32 b);
  * 80-bit working register.
  *
  * Cycles: ~1500 (much slower than fix32Mul; use sparingly in hot loops).
+ *
+ * A zero divisor returns 0, like fixDiv() / div16() / mod16().
+ * @warning Not callable from an nmiSet() callback — see fix32Mul().
  *
  * @code
  * fixed32 velocity = fix32Div(distance, time);
@@ -287,6 +294,6 @@ fixed32 fix32Cos(u8 angle);
  * fixed32 dy = fix32Mul(speed, fix32Cos(angle));
  * @endcode
  */
-/* fix32Cos declared above with fix32Sin — both bodies in math.c. */
+/* fix32Cos declared above with fix32Sin — both bodies in fixed32.asm. */
 
 #endif /* OPENSNES_FIXED32_H */

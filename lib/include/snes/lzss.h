@@ -40,15 +40,18 @@
  * @brief Decompress LZ77 data directly to VRAM
  *
  * Reads LZ77-compressed data from ROM/RAM and writes decompressed
- * output directly to VRAM via PPU registers. Disables interrupts
- * during decompression to prevent NMI handler from interfering.
+ * output directly to VRAM via PPU registers. It masks IRQs (`sei`) for the
+ * duration; it does NOT mask NMI — `sei` cannot — so call it under forced
+ * blank, where the NMI handler's own VRAM traffic is not a concern.
  *
  * @param source Pointer to LZ77-compressed data (tag byte 0x10)
  * @param address VRAM word address to write decompressed data
  *
  * @note The source data must start with the LZ77 tag byte (0x10).
  *       If the tag doesn't match, the function returns immediately.
- * @note Interrupts are disabled during decompression and restored after.
+ * @note IRQs are masked during decompression and restored after; NMI is not.
+ * @note The source may be in any bank (the bank byte of the pointer is
+ *       honoured since 2026-09-20). VMAIN is left at $00 on return.
  */
 void LzssDecodeVram(const u8 *source, u16 address);
 

@@ -275,7 +275,13 @@ void snesmodFadeVolume(u8 targetVolume, u8 speed);
  * - Command buffer overflow
  * - Desynchronization with module playback
  *
- * Call in your main loop or NMI handler:
+ * Call it from the MAIN LOOP, once per frame — not from an nmiSet()
+ * callback: it shares its command staging bytes with snesmodPlayEffect(),
+ * snesmodPlay(), snesmodFadeVolume() and snesmodSetModuleVolume(), so an NMI
+ * landing between one of those staging its parameters and queueing them
+ * corrupts the command. (This line offered "or NMI handler" until
+ * 2026-09-20.)
+ *
  * @code
  * while (1) {
  *     WaitForVBlank();

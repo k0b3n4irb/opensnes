@@ -37,10 +37,11 @@
  * DSP-1 work in the main loop.
  *
  * @code
- * // rotate the point (100, 0) by 90 degrees -> (0, 100)
+ * // rotate the point (100, 0) by 90 degrees -> (0, -99): clockwise with Y
+ * // down, and the chip's sine of 90 degrees is 0x7FFF, not 1.0
  * dsp1Rotate(0x4000, 100, 0);
- * s16 x = dsp1_o0;   // ~0
- * s16 y = dsp1_o1;   // ~100
+ * s16 x = dsp1_o0;   // 0
+ * s16 y = dsp1_o1;   // -99
  * @endcode
  *
  * @see .claude/notes/tech/dsp1_reference.md — the full command reference.

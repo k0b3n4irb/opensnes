@@ -54,12 +54,16 @@
 /**
  * @brief Initialize SNES hardware
  *
- * Must be called at the start of your program. Performs:
- * - PPU initialization (screen blank, registers cleared)
- * - CPU register setup
- * - Work RAM clearing
- * - Default palette loading
- * - VBlank interrupt setup
+ * Must be called at the start of your program. What it does, exactly:
+ * - forces blank, brightness shadow = 15
+ * - detects PAL / NTSC
+ * - seeds rand() from the H/V counters
+ * - BG mode 1, BG1 tilemap at VRAM $0400 (32x32), BG1 tiles at $0000
+ * - mosaic off, all 256 CGRAM entries cleared to black
+ * - enables NMI + auto-joypad, and DROPS any armed H/V timer IRQ bits
+ *
+ * It does not clear work RAM or set up the CPU (crt0 did that before main),
+ * and it loads no palette — this list claimed all three until 2026-09-20.
  *
  * After calling, screen is blanked (black). Call setScreenOn() to enable
  * display after you've set up your graphics.
@@ -99,8 +103,11 @@ void consoleInitEx(u16 options);
 /**
  * @brief Enable screen display
  *
- * Turns on the display after initialization or a screen blank.
- * Sets full brightness (15).
+ * Turns on the display after initialization or a screen blank, at the LAST
+ * brightness set (15 after consoleInit). After fadeOut() that level is 0, so
+ * the screen stays black until fadeIn() or setBrightness() — which is what
+ * the fade example below relies on. (Documented as "full brightness" until
+ * 2026-09-20.)
  *
  * Inlined for zero-call-overhead access (saves ~28 cycles per call).
  * Shares the same `force_blanked` and `current_brightness` shadows as
@@ -182,9 +189,11 @@ void setBrightness(u8 brightness);
  * - `speed=6` → 96 frames (~1.60 s, dramatic)
  *
  * @param speed VBlank frames to wait between each brightness step.
- *              `speed=0` falls through with no inter-step delay (visible
- *              flash, ~16 frames if every step still hits VBlank via
- *              loop overhead — not typically useful).
+ *              `speed=0` waits for nothing: all 16 steps are written in one
+ *              burst, i.e. an instant cut, not a fade.
+ *
+ * @note Under forced blank the brightness writes are skipped (the shadow
+ *       still moves), so a fade does nothing visible until setScreenOn().
  *
  * @code
  * fadeOut(3);              // ~0.8 s cinematic fade
@@ -250,6 +259,12 @@ inline u8 getBrightness(void) {
  * @endcode
  *
  * @note VBlank occurs ~60 times/second (NTSC) or ~50 times/second (PAL)
+ * @note On return the NMI handler has ALREADY run: the OAM upload, the text
+ *       tilemap flush, the scroll sync, your nmiSet() callback and the
+ *       auto-joypad wait have used part of VBlank. What is left is safe for
+ *       VRAM / CGRAM writes, but it is not the whole VBlank.
+ * @warning Hangs forever if NMI is disabled (NMITIMEN bit 7 clear): it sleeps
+ *          until the NMI handler clears the handshake flag.
  */
 void WaitForVBlank(void);
 
@@ -324,7 +339,8 @@ u8 getRegion(void);
  *
  * Returns a pseudo-random number using a linear feedback shift register.
  *
- * @return Random value 0-65535
+ * @return Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero
+ *         seed is replaced, see srand())
  *
  * @code
  * u16 enemy_x = rand() % 256;

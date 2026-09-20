@@ -100,7 +100,8 @@
  *
  * Returns buttons that were just pressed (not held from previous frame).
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of newly pressed buttons
  *
  * @code
@@ -116,7 +117,8 @@ u16 padPressed(u8 pad);
  *
  * Returns all buttons currently being pressed.
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of held buttons
  *
  * @code
@@ -132,7 +134,8 @@ u16 padHeld(u8 pad);
  *
  * Returns buttons that were just released (held last frame, not now).
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of released buttons
  */
 u16 padReleased(u8 pad);
@@ -142,7 +145,8 @@ u16 padReleased(u8 pad);
  *
  * Returns the raw hardware state without edge detection.
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Raw button state
  */
 u16 padRaw(u8 pad);
@@ -150,8 +154,16 @@ u16 padRaw(u8 pad);
 /**
  * @brief Check if controller is connected
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return TRUE if connected, FALSE otherwise
+ *
+ * @warning Not reliable today for pads 0 and 1: the NMI handler zeroes any
+ *          joypad word whose device signature is not a standard pad before
+ *          storing it, so the $FFFF "nothing plugged" pattern this function
+ *          looks for can never reach it, and an empty port reads as an idle
+ *          pad — TRUE. Open item B12 of the 2026-09-20 API audit; the fix
+ *          needs crt0 to publish a per-port validity flag.
  */
 u8 padIsConnected(u8 pad);
 

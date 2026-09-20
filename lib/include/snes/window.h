@@ -23,11 +23,17 @@
  * ## Usage Example
  *
  * @code
- * // Create a spotlight effect - show only inside window
- * windowSetPos(WINDOW_1, 80, 176);     // Window from x=80 to x=176
- * windowEnable(WINDOW_1, WINDOW_BG1);  // Apply to BG1
- * windowSetMask(WINDOW_BG1, WINDOW_MASK_INSIDE);  // Show inside only
+ * // Create a spotlight effect - show BG1 only inside the window
+ * windowSetPos(WINDOW_1, 80, 176);          // Window from x=80 to x=176
+ * windowEnable(WINDOW_1, WINDOW_BG1);       // Window 1 applies to BG1
+ * windowSetInvert(WINDOW_1, WINDOW_BG1, 1); // mask OUTSIDE it = show inside
+ * windowSetMainMask(WINDOW_BG1);            // ...and let it mask the main screen
  * @endcode
+ *
+ * The last call is the one that makes anything happen: windowEnable() only
+ * selects which window applies to which layer; the main- / sub-screen mask
+ * (TMW / TSW) is what hides pixels. This example called a `windowSetMask()`
+ * that has never existed, until 2026-09-20.
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -96,10 +102,15 @@
  * Window Masking Modes
  *============================================================================*/
 
-/** @brief Show layer inside window, hide outside */
+/* These two are used by nothing in the library — the polarity is set with
+ * windowSetInvert(). Their comments had it backwards (fullsnes, "2123h
+ * W12SEL": an enabled, non-inverted window masks the area INSIDE it), so the
+ * values are kept and the meaning is now stated as the hardware has it. */
+
+/** @brief invert = 0: the layer is HIDDEN inside the window, shown outside */
 #define WINDOW_MASK_INSIDE  0
 
-/** @brief Show layer outside window, hide inside */
+/** @brief invert = 1: the layer is HIDDEN outside the window, shown inside */
 #define WINDOW_MASK_OUTSIDE 1
 
 /*============================================================================
@@ -176,7 +187,10 @@ void windowDisableAll(void);
  *
  * @param window Window number (WINDOW_1 or WINDOW_2)
  * @param layers Layer mask
- * @param invert 0 = mask inside (show inside), 1 = mask outside (show outside)
+ * @param invert 0 = the layer is hidden INSIDE the window (shown outside);
+ *               1 = hidden OUTSIDE (shown inside — the spotlight / iris case).
+ *               Documented the other way round until 2026-09-20; arbiter:
+ *               fullsnes, "2123h W12SEL" window area Inside / Outside.
  */
 void windowSetInvert(u8 window, u8 layers, u8 invert);
 

@@ -2,7 +2,7 @@
  * @file text.c
  * @brief Text rendering implementation for OpenSNES
  *
- * Text is written to a RAM buffer (tilemapBuffer at $7E:3000), then
+ * Text is written to a RAM buffer (tilemapBuffer, in the plain C RAM band), then
  * DMA-transferred to VRAM during VBlank. This avoids VRAM write timing
  * issues and removes the need for forced blank during text updates.
  *

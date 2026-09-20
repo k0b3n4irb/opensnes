@@ -123,7 +123,7 @@
 
 /** @brief Echo delay (delay_ms = value * 16ms) */
 #define AUDIO_ECHO_DELAY_MIN    1   /**< 16ms */
-#define AUDIO_ECHO_DELAY_MAX    15  /**< 240ms */
+#define AUDIO_ECHO_DELAY_MAX    7   /**< 112 ms — audioSetEcho() clamps here: EDL 8-15 would run the echo ring into the IPL region. Was 15, a value the function never accepted */
 
 /** @brief Error codes */
 #define AUDIO_OK                0   /**< Success */
@@ -229,7 +229,11 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
  * @brief Unload a sample from a slot
  * @param id Sample slot (0-63)
  *
- * Any voices playing this sample will be stopped.
+ * It does NOT stop a voice that is playing the sample — stop it first. The
+ * allocator is a bump pointer: SPC memory comes back only when the sample
+ * unloaded is the most recently loaded one, and loading a slot that is
+ * already loaded leaks the old block. (The "voices will be stopped" sentence
+ * that stood here was never implemented.)
  */
 void audioUnloadSample(u8 id);
 

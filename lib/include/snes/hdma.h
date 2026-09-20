@@ -29,16 +29,20 @@
  * Use for registers that hold their value (COLDATA, CGADD).
  * Efficient: 1 data set per group, regardless of line count.
  *
- * Repeat mode (bit 7 = 1): Write same data EVERY scanline for N lines
+ * Repeat mode (bit 7 = 1): the entry carries ONE DATA SET PER SCANLINE —
+ * N lines means N data sets follow the count byte, each written on its line.
  * ```
- * .db $82      ; Write data every scanline for 2 lines ($80 | 2)
- * .db $1F, $00 ; Data written on each of the 2 scanlines
- * .db $85      ; Write data every scanline for 5 lines
- * .db $1F, $08 ; Data
+ * .db $82      ; repeat, 2 lines: TWO data sets follow
+ * .db $1F, $00 ; line 1
+ * .db $1F, $08 ; line 2
+ * .db $81      ; repeat, 1 line: one data set (the common per-line form)
+ * .db $1F, $10
  * .db 0        ; End of table
  * ```
- * REQUIRED for scroll registers (BG1HOFS, etc.) and other write-twice/
- * latched registers that need re-writing every scanline.
+ * Use it when the value changes every line (a wave, a perspective table).
+ * A table of `$81, data` triples is the simplest per-scanline layout.
+ * (Until 2026-09-20 this block showed `$82` followed by a single data set:
+ * the hardware would have read the next entry's count byte as line 2's data.)
  *
  * ## Usage Example
  *
@@ -53,7 +57,7 @@
  *
  * // Set up HDMA channel 6 to write to fixed color register
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, gradient_table);
- * hdmaEnable(HDMA_CHANNEL_6);
+ * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  *
  * // In main loop, HDMA runs automatically each frame
  * @endcode
@@ -72,26 +76,27 @@
  * remains for a bank chosen by hand: a table assembled outside C, or an
  * address computed at runtime.
  *
- * ## IMPORTANT: Scroll Registers Require Repeat Mode
+ * ## Which mode for which register
  *
- * BG scroll registers (BG1HOFS, BG1VOFS, etc.) are latched registers that
- * require being written EVERY scanline to maintain their value. Use REPEAT
- * mode (bit 7 = 1) in the HDMA line count for these registers.
+ * Any PPU register HOLDS the value HDMA wrote until something writes it
+ * again, scroll registers included: a non-repeat entry (`32, lo, hi`) writes
+ * once and the value stays for the 32 lines. Repeat mode is not about the
+ * register "forgetting" — it is needed exactly when the DATA differs from
+ * line to line, because only repeat entries carry per-line data.
  *
- * Non-repeat mode (bit 7 = 0) writes data only ONCE per group, so the
- * scroll value is lost on subsequent scanlines — causing visible glitches.
+ * This section said the opposite until 2026-09-20 ("scroll registers require
+ * repeat mode … the value is lost"), with an example (`$A0, $20, $00`) that
+ * was itself malformed — a 32-line repeat entry needs 32 data sets. The claim
+ * came from a misread table format; the references state it plainly:
+ * snesdev-wiki, "DMA registers / HDMA table format" ("$01-$80: write once,
+ * then wait for X scanlines; $81-$FF: write every scanline for X-$80
+ * scanlines"; in repeat mode "the total size of the data section is the
+ * number of scanlines multiplied by the number of bytes in the pattern"), and
+ * anomie's register doc, same wording. See also
+ * `.claude/rules/hardware_claims.md`.
  *
- * ```
- * // WRONG - Non-repeat writes once then skips, scroll value lost:
- * .db 32, $20, $00    ; Writes on line 1 only, lines 2-32 get stale value
- *
- * // CORRECT - Repeat writes every scanline, scroll value maintained:
- * .db $A0, $20, $00   ; $A0 = $80 | 32 = write every scanline for 32 lines
- * ```
- *
- * Summary:
- * - COLDATA ($2132), CGADD/CGDATA: non-repeat OK (registers hold value)
- * - BG scroll, window, Mode 7 matrix: MUST use repeat mode
+ * - constant over a band (a colour band, a fixed split scroll): non-repeat
+ * - different every line (wave, Mode 7 perspective): repeat, `$81` per line
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -250,14 +255,14 @@
  * Configures an HDMA channel with the specified parameters. The channel
  * is NOT enabled automatically - call hdmaEnable() to start it.
  *
- * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or _7)
+ * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
  * @param mode Transfer mode (HDMA_MODE_*)
  * @param destReg Destination B-bus register (low byte of $21xx address)
  * @param table Pointer to HDMA table in ROM or RAM
  *
  * @code
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_COLDATA, my_table);
- * hdmaEnable(HDMA_CHANNEL_6);
+ * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  * @endcode
  */
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
@@ -270,7 +275,7 @@ void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
  * byte (chantier A6), so this form is for tables addressed by a 16-bit
  * offset you pair with a bank yourself (assembled outside C, computed).
  *
- * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or _7)
+ * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
  * @param mode     Transfer mode (HDMA_MODE_*)
  * @param destReg  Destination B-bus register (low byte of $21xx address)
  * @param table    Pointer to HDMA table in ROM or RAM
@@ -311,7 +316,7 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
  *
  * @code
  * hdmaEnable(1 << HDMA_CHANNEL_6);              // Enable channel 6
- * hdmaEnable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_7)); // Enable 6 and 7
+ * hdmaEnable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_5)); // Enable 6 and 5
  * @endcode
  */
 void hdmaEnable(u8 channelMask);
@@ -403,8 +408,11 @@ void hdmaWindowShape(u8 channel, const void *windowTable);
 /**
  * @brief Initialize HDMA wave effect system
  *
- * Must be called once before using wave effects. Allocates internal
- * buffers and sets up the wave state.
+ * Must be called once before using wave effects. Resets the wave state (the
+ * buffers are static — nothing is allocated).
+ *
+ * @warning It starts with hdmaDisableAll(): EVERY HDMA channel is switched
+ *          off, yours included. Call it before setting up your own channels.
  */
 void hdmaWaveInit(void);
 
@@ -416,7 +424,7 @@ void hdmaWaveInit(void);
  * - Heat shimmer
  * - Dream/flashback sequences
  *
- * @param channel HDMA channel to use (6 or 7 recommended)
+ * @param channel HDMA channel to use (6 or lower; 7 belongs to the NMI OAM DMA)
  * @param bg Background layer to affect (0=BG1, 1=BG2, 2=BG3)
  * @param amplitude Wave amplitude in pixels (1-60, clamped internally)
  * @param frequency Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.
@@ -475,12 +483,12 @@ inline void hdmaWaveSetSpeed(u8 speed) {
  * - Spotlight / vignette effects
  * - Underwater depth dimming
  *
- * @param channel HDMA channel (6 or 7 recommended)
+ * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
  * @param topBrightness Brightness at top of screen (0-15, 15=full)
  * @param bottomBrightness Brightness at bottom of screen (0-15)
  *
  * @code
- * hdmaBrightnessGradient(HDMA_CHANNEL_7, 15, 0);  // Fade to black
+ * hdmaBrightnessGradient(HDMA_CHANNEL_5, 15, 0);  // Fade to black
  * @endcode
  */
 void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness);
@@ -505,7 +513,7 @@ void hdmaBrightnessGradientStop(u8 channel);
  * - Water depth color shifts
  * - Background atmosphere effects
  *
- * @param channel HDMA channel (6 or 7 recommended)
+ * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
  * @param colorIndex CGRAM color index to modify (0-255)
  * @param topColor 15-bit SNES color at top of screen (use RGB() macro)
  * @param bottomColor 15-bit SNES color at bottom of screen
@@ -540,7 +548,7 @@ void hdmaColorGradientStop(u8 channel);
  * - Spotlight effects
  * - Circular vignette
  *
- * @param channel HDMA channel (6 or 7 recommended)
+ * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
  * @param layers Layer bitmask to apply window masking (TM_BG1, TM_BG2, etc.)
  * @param centerX Horizontal center of circle (0-255)
  * @param centerY Vertical center of circle (0-223)
@@ -582,7 +590,7 @@ void hdmaIrisWipeStop(u8 channel);
  * simulating underwater refraction or heat haze. Uses the wave system's
  * double-buffered tables internally.
  *
- * @param channel HDMA channel (6 or 7 recommended)
+ * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
  * @param bg Background layer (0=BG1, 1=BG2, 2=BG3)
  * @param amplitude Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped)
  * @param speed Animation speed (1=slow, 4=fast)

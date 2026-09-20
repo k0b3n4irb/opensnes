@@ -42,8 +42,10 @@
  * @endcode
  *
  * @par Behaviour
- * - `init` runs once on the first push of a scene. It does NOT re-run
- *   on resume after `scenePop`. If a scene needs "did I just resume?"
+ * - `init` runs once per PUSH — every time the scene is pushed, not only the
+ *   first — and it is deferred: it runs at the top of the next frame, after
+ *   WaitForVBlank, not inside scenePush(). It does NOT re-run on resume
+ *   after `scenePop`. If a scene needs "did I just resume?"
  *   logic, it owns that bookkeeping in its own state.
  * - `update` runs every VBlank while the scene is on top of the stack.
  *   Suspended scenes (below the top) get no callbacks.
@@ -100,8 +102,8 @@
  * @par Performance
  * `sceneRun` adds one indirect call per frame (the top scene's
  * `update`) and one direct call (`WaitForVBlank`) — same shape as
- * `gameLoopRun`. `scenePush` does an array bounds check, an index
- * update, and an optional indirect call to `init`. `scenePop` is a
+ * `gameLoopRun`. `scenePush` does an array bounds check and an index
+ * update (the `init` call is deferred to the next frame). `scenePop` is a
  * single index decrement. RAM footprint: 8 pointers × 4 bytes (the
  * post-A6 pointer size on this target, see compiler/ABI.md) = 32 bytes
  * of BSS, plus a single byte for the stack depth.
@@ -189,8 +191,9 @@ void sceneRun(const Scene *initial);
 /**
  * @brief Push a scene onto the stack. Suspends the current top.
  *
- * Calls `next->init` if non-NULL. The caller's currently-executing
- * `update` finishes its frame; the next VBlank dispatches to `next`.
+ * Does NOT call `next->init` itself: it records the scene, and sceneRun()
+ * calls `init` (if non-NULL) at the top of the next frame, then `update`.
+ * The caller's currently-executing `update` finishes its frame first.
  *
  * Silently ignored when the stack is already at `SCENE_STACK_MAX`.
  *

@@ -374,7 +374,7 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * player_x += 1;  // Jerky movement!
  * @endcode
  *
- * See examples/graphics/backgrounds/continuous_scroll for details on this pattern.
+ * See examples/scrolling/continuous_scroll for details on this pattern.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
@@ -547,7 +547,12 @@ typedef MetaspriteItem t_metasprite;
  * @param basePalette Base palette (0-7) when item doesn't specify one
  * @param size Size selection for all sprites (OBJ_SMALL or OBJ_LARGE)
  *
- * @return Number of hardware sprites used
+ * @return The next free sprite id (startId + the number of sprites drawn) —
+ *         chain calls with it, as examples/sprites/metasprite does. Items
+ *         that fall off screen are skipped WITHOUT consuming an id, so the
+ *         count varies per frame: hide the ids you used last frame and no
+ *         longer use. (Documented as "number of sprites used" until
+ *         2026-09-20; the code never did that.)
  *
  * @code
  * // Define a 32x32 metasprite using 4 16x16 sprites

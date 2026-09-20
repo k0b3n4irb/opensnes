@@ -51,6 +51,11 @@ extern TextConfig text_config;
 /**
  * @brief Tilemap buffer height in rows.
  *
+ * @par Cost
+ * Linking the text module takes 2048 bytes of the 8 KB plain C RAM band
+ * (`$00:0000-$1FFF`) for that buffer — a quarter of it — and the NMI flushes
+ * all 2048 bytes by DMA on every frame the buffer changed.
+ *
  * The RAM tilemap buffer is 32×32 entries (2048 bytes). The cursor wraps
  * back to row 0 past the last row — text output never writes outside the
  * buffer.
