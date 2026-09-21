@@ -472,6 +472,9 @@ u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO
 u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
 u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
 u16 r_aud_noplay;    /* audioPlaySample(63), a slot never loaded        -> AUDIO_VOICE_NONE (0xFF) */
+u16 r_aud_on;        /* audioPlaySampleOn(6, 0, 100, CENTER, 0x1A2B): the voice asked for -> 6 */
+u16 r_aud_on_bad;    /* audioPlaySampleOn(8, ...): no such voice                   -> AUDIO_VOICE_NONE (0xFF) */
+u16 r_aud_on_rr;     /* the explicit voice did not advance the round-robin: next Ex -> 1 */
 u16 r_aud_v0_live;   /* voice 0 before the stop: active              -> 1 */
 u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
 u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
@@ -502,7 +505,9 @@ static void coverage_lot_c(void) {
     r_aud_noplay   = audioPlaySample(63);
     audioGetVoiceState(0, &vs);
     r_aud_v0_live = vs.active;
-    audioPlaySampleEx(0, 100, AUDIO_PAN_CENTER, 0x1000);   /* round-robin: voice 1 */
+    r_aud_on     = audioPlaySampleOn(6, 0, 100, AUDIO_PAN_CENTER, 0x1A2B);
+    r_aud_on_bad = audioPlaySampleOn(8, 0, 100, AUDIO_PAN_CENTER, 0x1000);
+    r_aud_on_rr  = audioPlaySampleEx(0, 100, AUDIO_PAN_CENTER, 0x1000);   /* round-robin: voice 1 */
     audioStopVoice(0);
     for (i = 0; i < 6; i++) WaitForVBlank();
     audioGetVoiceState(0, &vs);

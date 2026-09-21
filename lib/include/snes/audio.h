@@ -78,7 +78,8 @@
 /** @brief Maximum number of voices */
 #define AUDIO_MAX_VOICES    8
 
-/** @brief Auto-allocate voice in audioPlaySampleEx */
+/** @brief Let audioPlaySampleOn() pick the voice (round-robin), as
+ *         audioPlaySample() / audioPlaySampleEx() always do */
 #define AUDIO_VOICE_AUTO    0xFF
 
 /** @brief Returned by audioPlaySample() / audioPlaySampleEx() when nothing was
@@ -298,6 +299,34 @@ u8 audioPlaySample(u8 sampleId);
  * @endcode
  */
 u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
+
+/**
+ * @brief Play a sample on a voice YOU choose
+ *
+ * audioPlaySample() and audioPlaySampleEx() pick the voice round-robin and
+ * only tell you afterwards. That is too late for anything that must be set
+ * BEFORE key-on — audioSetADSR() / audioSetGain() shape the attack — and it
+ * lets a long sound be stolen by the eighth effect after it. Choosing the
+ * voice fixes both: reserve, say, voice 7 for the engine hum, aim its envelope
+ * once, and keep effects on the automatic voices. (Added 2026-09-21;
+ * AUDIO_VOICE_AUTO had been defined since v2 with nothing to pass it to.)
+ *
+ * An explicit voice does not advance the round-robin counter.
+ *
+ * @param voice Voice 0-7, or AUDIO_VOICE_AUTO for the round-robin choice
+ * @param sampleId Sample slot (0-63)
+ * @param volume Volume level (0-127)
+ * @param pan Pan position (0=left, 8=center, 15=right)
+ * @param pitch Pitch value ($1000 = normal)
+ * @return The voice used (0-7), or AUDIO_VOICE_NONE: voice out of range,
+ *         sample not loaded, driver not ready
+ *
+ * @code
+ * audioSetADSR(7, 4, 7, 7, 0);                 // slow attack, on voice 7
+ * audioPlaySampleOn(7, SFX_ENGINE, 90, AUDIO_PAN_CENTER, 0x1000);
+ * @endcode
+ */
+u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch);
 
 /**
  * @brief Stop a specific voice

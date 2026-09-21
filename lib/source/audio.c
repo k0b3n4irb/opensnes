@@ -371,7 +371,11 @@ static void pan_to_lr(u8 vol, u8 pan, u8 *l, u8 *r) {
 }
 
 u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
-    u8 voice, l, r;
+    return audioPlaySampleOn(AUDIO_VOICE_AUTO, sampleId, volume, pan, pitch);
+}
+
+u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
+    u8 l, r;
 
     if (sampleId >= AUDIO_MAX_SAMPLES || !sample_mirror[sampleId].flags
             || !audio_ready) {
@@ -384,8 +388,12 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
         pitch = 0x3FFF;
     }
 
-    voice = audio_rr_voice;
-    audio_rr_voice = (u8)((audio_rr_voice + 1) & (AUDIO_MAX_VOICES - 1));
+    if (voice == AUDIO_VOICE_AUTO) {
+        voice = audio_rr_voice;
+        audio_rr_voice = (u8)((audio_rr_voice + 1) & (AUDIO_MAX_VOICES - 1));
+    } else if (voice >= AUDIO_MAX_VOICES) {
+        return AUDIO_VOICE_NONE;
+    }
 
     pan_to_lr(volume, pan, &l, &r);
     if (cmd_send(OP_VVOL, voice, (u16)((u16)r << 8 | l)) != AUDIO_OK ||
