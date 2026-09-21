@@ -305,6 +305,10 @@ u16 r_scope_delay;  /* scopeSetRepeatDelay(7): scope_repdelay    -> 7 */
 u16 r_obj_grav;     /* objInitGravity(0x40,0); objCollidMap in the air: yvel -> 0x40 */
 u16 r_obj_refresh;  /* objRefreshAll: the refresh callback ran   -> 1 */
 u16 r_obj_cobj;     /* objCollidObj, two 8x8 objects 4 px apart  -> 1 */
+u16 r_obj_cobj_h;   /* objCollidObj(handle, handle) on the two objects 40 px APART: the
+                     * index routines mask the id byte -> 0, plus 0x100 proving the handle
+                     * had an id byte to mask -> 0x0100. (Unmasked, both offsets land in
+                     * zeroed RAM past the pool and two empty boxes "touch": 0x0101.) */
 u16 r_obj_cobj_no;  /* objCollidObj, 40 px apart                 -> 0
                      * (slot INDEXES, not handles: the routine shifts its
                      * arguments by 64 with no mask, so a handle's id byte
@@ -628,6 +632,7 @@ static void coverage_lot_b(void) {
     objWorkspace.xpos[1] = 60;              /* 40 px to the right: apart */
     objUpdateAll();
     r_obj_cobj_no = objCollidObj(obj_peeker & 0xFF, obj_other & 0xFF);
+    r_obj_cobj_h = objCollidObj(obj_peeker, obj_other) | ((obj_peeker >> 8) ? 0x100 : 0);
 
     /* profile: the frame counter it reads is crt0's; a scanline is < 262 */
     profileInit();

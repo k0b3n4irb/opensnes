@@ -297,43 +297,47 @@ void objRefreshAll(void);
  * Updates tilestand, tileabove, tilesprop, tilebprop in objWorkspace.
  * Applies friction to X velocity. Applies gravity if airborne.
  *
- * @param objhandle Object index (as received in update callback)
+ * @param objindex Slot index (as received in an update callback) or the
+ *                 handle from objNew() — see "Index or handle" below
  *
  * @note Syncs objWorkspace before and after — safe to call from C callbacks.
  */
-void objCollidMap(u16 objhandle);
+void objCollidMap(u16 objindex);
 
 /**
  * @brief Check object collision with map tiles including slopes
  *
  * Like objCollidMap but also handles slope tiles (T_SLOPEU1..T_SLOPEUD2).
  *
- * @param objhandle Object index
+ * @param objindex Slot index or handle
  */
-void objCollidMapWithSlopes(u16 objhandle);
+void objCollidMapWithSlopes(u16 objindex);
 
 /**
  * @brief Check object collision with map (no gravity)
  *
  * For top-down movement without gravity.
  *
- * @param objhandle Object index
+ * @param objindex Slot index or handle
  */
-void objCollidMap1D(u16 objhandle);
+void objCollidMap1D(u16 objindex);
 
 /**
  * @brief Test collision between two objects
  *
  * Uses AABB (axis-aligned bounding box) collision.
  *
- * @warning Takes slot INDEXES (0-79), unlike objKill() and objGetPointer()
- *          which take handles. The routine shifts each argument by 64 with
- *          no mask, so a handle's id byte lands in the buffer offset and the
- *          test reads two unrelated slots. From a callback pass @c idx; from
- *          a handle pass @c handle & 0xFF.
+ * @par Index or handle
+ * A handle is `(id << 8) | index`. objKill() and objGetPointer() need the
+ * whole handle (the id byte is how a stale one is detected); this function,
+ * objCollidMap(), objCollidMapWithSlopes(), objCollidMap1D() and
+ * objUpdateXY() work on a live slot and use the index only. Since 2026-09-21
+ * they mask the id byte themselves, so a callback's @c idx and a handle both
+ * work. Before that a handle's id byte was shifted into the buffer offset and
+ * the routine silently worked on memory past the pool.
  *
- * @param idx1 First object slot index
- * @param idx2 Second object slot index
+ * @param idx1 First object: slot index or handle
+ * @param idx2 Second object: slot index or handle
  * @return 1 if collision detected, 0 otherwise
  */
 u16 objCollidObj(u16 idx1, u16 idx2);
@@ -343,9 +347,8 @@ u16 objCollidObj(u16 idx1, u16 idx2);
  *
  * Adds xvel/yvel to xpos/ypos (24-bit fixed point).
  *
- * @param objindex Raw object index (0-79), NOT the handle from objNew.
- *                 Use the index passed to your update callback, or
- *                 extract from handle with (handle & 0xFF).
+ * @param objindex Slot index (the one passed to your update callback) or
+ *                 the handle from objNew()
  *
  * @note Syncs objWorkspace before and after.
  */

@@ -427,10 +427,12 @@ u16 objCollidObj(u16 idx1, u16 idx2);
 
 A plain AABB test between two objects' boxes (`xpos + xofs`, `width`,
 `ypos + yofs`, `height`), returning 1 on overlap and 0 otherwise. It takes
-slot **indices**, not handles: the routine shifts its arguments by 64 with no
-mask, so a handle's id byte ends up in the buffer offset and the test reads
-two unrelated slots. From a callback pass `idx`; from a handle pass
-`handle & 0xFF`. Like the map collision routines it flushes the workspace on
+a callback's `idx` or a handle, as do `objCollidMap`, `objCollidMapWithSlopes`,
+`objCollidMap1D` and `objUpdateXY`: they work on a live slot and mask the
+handle's id byte themselves (since 2026-09-21 — before that a handle sent them
+to memory past the pool, silently). Only `objKill` and `objGetPointer` need
+the whole handle, because the id byte is how they detect a stale one. Like the
+map collision routines it flushes the workspace on
 entry, so an object that has just moved itself is tested where it now is.
 
 ## Slopes, and what the tests pin

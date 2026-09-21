@@ -130,7 +130,7 @@ CASES = [
     ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
     ("r_scope",        2, 0),      ("r_scope_delay",  2, 7),
     ("r_obj_grav",     2, 0x0040), ("r_obj_refresh",  2, 2),      # both objects are on screen
-    ("r_obj_cobj",     2, 1),      ("r_obj_cobj_no",  2, 0),
+    ("r_obj_cobj",     2, 1), ("r_obj_cobj_h", 2, 0x0100),      ("r_obj_cobj_no",  2, 0),
     ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
     ("r_mosaic",       2, 15),
     # bank-byte chantier (2026-09-20): data outside bank $00, asymmetric values

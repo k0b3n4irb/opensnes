@@ -1238,7 +1238,7 @@ _oiraend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objCollidMap(u16 objhandle)
+; void objCollidMap(u16 objindex)  (index, or a handle: id byte masked)
 ;
 ; Workspace sync: copies workspace → buffer before, buffer → workspace after.
 ;------------------------------------------------------------------------------
@@ -1256,6 +1256,7 @@ objCollidMap:
 
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers before collision ---
     asl a
@@ -1796,7 +1797,7 @@ _oicmend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objCollidMap1D(u16 objhandle)
+; void objCollidMap1D(u16 objindex)  (index, or a handle: id byte masked)
 ;------------------------------------------------------------------------------
 objCollidMap1D:
     php
@@ -1812,6 +1813,7 @@ objCollidMap1D:
 
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -2488,7 +2490,7 @@ _oiloend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; u16 objCollidObj(u16 objhandle1, u16 objhandle2)
+; u16 objCollidObj(u16 idx1, u16 idx2)  (indexes, or handles: id byte masked)
 ; Stack: 5-6 7-8
 ;------------------------------------------------------------------------------
 objCollidObj:
@@ -2512,8 +2514,9 @@ objCollidObj:
     ; coordinates (fixed 2026-09-20; the libtest vector r_obj_cobj_no).
     SYNC_FROM_WORKSPACE
 
-    ; cproc L-to-R: idx2 (p2) SP+10, idx1 (p1) SP+12 — slot indexes, not handles
+    ; cproc L-to-R: idx2 (p2) SP+10, idx1 (p1) SP+12 — slot indexes (a handle is masked down to one)
     lda 10,s                                ; idx2 (param 2, closest)
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
@@ -2528,6 +2531,7 @@ objCollidObj:
     sta objtmp1
 
     lda 12,s                                ; idx1 (param 1, farthest)
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
@@ -2613,7 +2617,7 @@ _oicoend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objUpdateXY(u16 objhandle)
+; void objUpdateXY(u16 objindex)  (index, or a handle: id byte masked)
 ;
 ; Workspace sync: copies workspace → buffer before, buffer → workspace after.
 ;------------------------------------------------------------------------------
@@ -2630,6 +2634,7 @@ objUpdateXY:
 
     rep #$20
     lda 8,s                                 ; get index (5+1+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -2902,6 +2907,7 @@ _lutcolInv:
 
 .MACRO OE_SETOBJHANDLE_STK
     lda \1,s
+    and #$00FF                              ; index, or a handle's index byte
     xba
     lsr a
     lsr a
@@ -2910,7 +2916,7 @@ _lutcolInv:
 .ENDM
 
 ;------------------------------------------------------------------------------
-; void objCollidMapWithSlopes(u16 objhandle)
+; void objCollidMapWithSlopes(u16 objindex)  (index, or a handle: id byte masked)
 ;------------------------------------------------------------------------------
 objCollidMapWithSlopes:
     php
@@ -2926,6 +2932,7 @@ objCollidMapWithSlopes:
 
     ; --- Sync workspace → objbuffers ---
     lda 10,s                                ; get index
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
