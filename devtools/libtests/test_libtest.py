@@ -149,6 +149,8 @@ CASES = [
     # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
     ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
+    # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256
+    ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),

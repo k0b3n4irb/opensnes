@@ -93,8 +93,13 @@ void dsp1Init(void);
  * @param a first factor (T, signed 1.15)
  * @param b second factor (T, signed 1.15)
  * @return the product in signed 1.15 (rounded to 15 bits)
+ *
+ * Typed `s16` like every other signed DSP-1 quantity (and like
+ * DSP1_T_FROM_FIX(), which produces one). Until 2026-09-21 the three were
+ * `u16`: `dsp1Multiply(x, y) < 0` was always false and `>> 7` on the result
+ * was a logical shift. Same stack slots, same bits.
  */
-u16 dsp1Multiply(u16 a, u16 b);
+s16 dsp1Multiply(s16 a, s16 b);
 
 /**
  * @brief Scaled sine and cosine of an angle (DSP-1 command $04, "Triangle").

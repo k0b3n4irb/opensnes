@@ -291,7 +291,10 @@ fixed fixClamp(fixed x, fixed min, fixed max);
  *
  * @param a Start value
  * @param b End value
- * @param t Interpolation factor (0-256 = 0.0-1.0)
+ * @param t Interpolation factor, 0-256 = 0.0-1.0. 256 and above return `b`
+ *          exactly. (`t` was a `u8` until 2026-09-21, which made the
+ *          documented 1.0 unreachable: 256 was truncated to 0 and returned `a`.
+ *          Same stack slot — no ABI change.)
  * @return Interpolated value
  *
  * @code
@@ -300,7 +303,7 @@ fixed fixClamp(fixed x, fixed min, fixed max);
  * fixed mid = fixLerp(start, end, 128);  // 50.0
  * @endcode
  */
-fixed fixLerp(fixed a, fixed b, u8 t);
+fixed fixLerp(fixed a, fixed b, u16 t);
 
 /*============================================================================
  * Square Root and Inverse Trigonometry

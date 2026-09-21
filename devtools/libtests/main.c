@@ -463,6 +463,11 @@ u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
 u16 r_aud_all_stop;  /* audioStopAll(), 6 frames later: voice 1      -> 0 */
 u16 r_aud_unload;    /* audioGetSampleInfo(0) after audioUnloadSample -> AUDIO_ERR_NOT_LOADED (3) */
 u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xB500 */
+extern u8 oamMemory[];   /* crt0's OAM shadow ($7E:0300, mirrored in bank $00), read back here only */
+u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u8 t gave a = 2560) */
+u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
+u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
+                      * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
 u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
 static const MetaspriteItem lotc_meta[] = {
     METASPR_ITEM(0, 0, 0, 0),
@@ -500,6 +505,18 @@ static void coverage_lot_c(void) {
     /* sprites: a two-item metasprite mirrored in a 16-px-wide box lands its
      * items swapped (dx = 16 - dx - 8) with the flip bit set; asserted on
      * luna's OAM view. oamDynamicSetSize writes the per-sprite size table. */
+    {
+        u16 wide = 256;                     /* a variable: a literal 256 into a u8
+                                             * parameter is a compile error, the
+                                             * truncation of a variable is silent */
+        r_lerp_t256 = (u16)fixLerp(FIX(10), FIX(37), wide);
+        r_lerp_t300 = (u16)fixLerp(FIX(10), FIX(37), wide + 44);
+        oamSetX(0, 0x21);
+        oamSetY(1, 0x43);                   /* stored as y - 1 = 0x42 */
+        oamSetX(wide, 0x99);
+        oamSetY(wide + 1, 0x77);
+        r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
+    }
     r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
     oamDynamicSetSize(0, 16);
     WaitForVBlank();

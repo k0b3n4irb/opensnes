@@ -340,6 +340,11 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * Sprite Properties
  *============================================================================*/
 
+/* Sprite ids are u16 in every function below. The setters other than oamSet()
+ * took a u8 until 2026-09-21: an id of 256 was truncated to 0 BEFORE the
+ * `id >= 128` check could refuse it, and silently overwrote sprite 0. Same
+ * stack slot either way — no ABI change, and a u8 variable still converts. */
+
 /**
  * @brief Set sprite properties
  *
@@ -357,27 +362,13 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * freely. For extreme sprite counts the `oamSetFast()` / `oamSetXYFast()` macros
  * (see "Fast Macro Sprite API" below) trim a little more overhead.
  *
- * @warning **Coordinate Variable Pattern**: Due to a compiler quirk, sprite
- * coordinates MUST be stored in a struct with s16 members for correct behavior.
- * Using separate u16 variables causes jerky horizontal movement.
- *
- * **CORRECT** (use struct with s16):
- * @code
- * typedef struct { s16 x, y; } Position;
- * Position player = {100, 100};
- * oamSet(0, player.x, player.y, 0, 0, 3, 0);
- * player.x += 1;  // Smooth movement
- * @endcode
- *
- * **WRONG** (separate u16 variables - causes bugs):
- * @code
- * u16 player_x = 100;  // DON'T do this!
- * u16 player_y = 100;
- * oamSet(0, player_x, player_y, 0, 0, 3, 0);
- * player_x += 1;  // Jerky movement!
- * @endcode
- *
- * See examples/scrolling/continuous_scroll for details on this pattern.
+ * @note Any integer type works for the coordinates you keep on your side
+ * (`u16`, `s16`, struct members or plain variables). Until 2026-09-21 this
+ * block warned that separate `u16` variables gave jerky movement and that an
+ * `s16` struct was mandatory; that was a compiler defect of early 2026, long
+ * fixed — `examples/input/move_sprite` uses plain `u16` and its manifest pins
+ * the motion to the pixel. Prefer `s16` when a sprite can leave the screen by
+ * the left or the top, so the off-screen test is a signed compare.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
@@ -387,7 +378,7 @@ void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags
  * @param id Sprite ID (0-127)
  * @param x X position
  */
-void oamSetX(u8 id, u16 x);
+void oamSetX(u16 id, u16 x);
 
 /**
  * @brief Set sprite Y position
@@ -395,7 +386,7 @@ void oamSetX(u8 id, u16 x);
  * @param id Sprite ID (0-127)
  * @param y Y position
  */
-void oamSetY(u8 id, u8 y);
+void oamSetY(u16 id, u16 y);
 
 /**
  * @brief Set sprite position
@@ -404,7 +395,7 @@ void oamSetY(u8 id, u8 y);
  * @param x X position
  * @param y Y position
  */
-void oamSetXY(u8 id, u16 x, u8 y);
+void oamSetXY(u16 id, u16 x, u16 y);
 
 /**
  * @brief Set sprite tile
@@ -412,7 +403,7 @@ void oamSetXY(u8 id, u16 x, u8 y);
  * @param id Sprite ID (0-127)
  * @param tile Tile number (0-511)
  */
-void oamSetTile(u8 id, u16 tile);
+void oamSetTile(u16 id, u16 tile);
 
 /* Note: there is deliberately no oamSetVisible(id, show) — SNES sprite
  * visibility is Y-position-based, so a "show" call can't know which Y to
@@ -448,7 +439,7 @@ void oamSetTile(u8 id, u16 tile);
  *
  * @see examples/games/rpg — culls its villagers this way
  */
-void oamHide(u8 id);
+void oamHide(u16 id);
 
 /**
  * @brief Set sprite size (large/small)
@@ -571,7 +562,7 @@ typedef MetaspriteItem t_metasprite;
  * oamDrawMeta(0, 100, 80, hero_frame0, 0, 0, OBJ_LARGE);
  * @endcode
  */
-u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
+u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size);
 
 /**
@@ -596,7 +587,7 @@ u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
  *         like oamDrawMeta() — chain calls with it. (The header said "number
  *         of hardware sprites used" until 2026-09-20; the code never did.)
  */
-u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
+u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,
                    u8 flipX, u8 flipY, u8 width, u8 height);
 

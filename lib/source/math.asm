@@ -173,16 +173,18 @@ fixMul:
     rtl
 
 ;------------------------------------------------------------------------------
-; fixed fixLerp(fixed a, fixed b, u8 t)
+; fixed fixLerp(fixed a, fixed b, u16 t)
 ;
 ; Linear interpolation: a + (b - a) * t / 256
-; where t is 0-255 (0.0 to ~1.0).
+; where t is 0-256 (0.0 to 1.0); t >= 256 returns b exactly.
+; (t was a u8 until 2026-09-21: the documented 1.0 was unreachable, and a
+; caller passing 256 got t = 0, i.e. a.)
 ;
 ; The multiply (b-a)*t can overflow 16 bits, so we use the hardware
-; multiplier for a correct 16×8 → 24-bit result, then >>8.
+; multiplier for a correct 16x8 -> 24-bit result, then >>8.
 ;
 ; Stack after PHP + JSL:
-;   5-6,s = t (u8 in 16-bit slot, rightmost)
+;   5-6,s = t (rightmost)
 ;   7-8,s = b (leftmost+1)
 ;   9-10,s = a (leftmost)
 ;------------------------------------------------------------------------------
@@ -191,6 +193,15 @@ fixLerp:
     rep #$30
     .ACCU 16
     .INDEX 16
+
+    ; t >= 256 is 1.0: the 8-bit multiplier below cannot express it
+    lda 5,s                     ; t
+    cmp #256
+    bcc @lerp_frac
+        lda 7,s                 ; b
+        plp
+        rtl
+@lerp_frac:
 
     ; diff = b - a
     lda 7,s                     ; b
@@ -206,7 +217,7 @@ fixLerp:
         sta.w fmul_a           ; |diff|
 @diff_pos:
 
-    ; t is in 5,s (8-bit value)
+    ; t < 256 here: its low byte is the whole value
     sep #$20
     .ACCU 8
 

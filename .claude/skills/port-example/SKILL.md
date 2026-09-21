@@ -296,18 +296,12 @@ hdmaEnable(1 << 3);   // CORRECT: enable channel 3
 hdmaEnable(3);         // WRONG: enables channels 0+1 !
 ```
 
-### 2. oamSet() is catastrophically slow
-`oamSet()` has framesize=158. More than 2-3 calls per frame = jerky movement.
-Write directly to `oamMemory[]` instead:
-```c
-extern u8 oamMemory[];
-extern volatile u8 oam_update_flag;
-oamMemory[id*4 + 0] = (u8)x;
-oamMemory[id*4 + 1] = (u8)y;
-oamMemory[id*4 + 2] = tile;
-oamMemory[id*4 + 3] = attr;  // vhoopppc
-oam_update_flag = 1;
-```
+### 2. oamSet() is cheap — do not bypass it
+(Stale advice removed 2026-09-21.) `oamSet()` was rewritten in assembly; the
+framesize=158 cliff is RESOLVED (see KNOWN_LIMITATIONS.md). Do NOT write to
+`oamMemory[]` by hand: it skips the Y-1 adjustment, the X high bit and the
+`oam_max_id` tracking the NMI upload relies on. For extreme sprite counts use
+`oamSetFast()` / `oamSetXYFast()`.
 
 ### 3. cc65816 pushes args LEFT-TO-RIGHT (not like PVSnesLib's tcc816)
 PVSnesLib ASM functions ported verbatim have SWAPPED stack offsets.
