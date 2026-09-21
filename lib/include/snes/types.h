@@ -160,10 +160,12 @@ typedef volatile s32 vs32;
  */
 
 /*
- * Bool type compatibility:
- * - C11 compilers (cproc) have built-in bool/_Bool
- * - Legacy compilers (816-tcc) need typedef
- * We check for __STDC_VERSION__ >= C99 as indicator of modern compiler
+ * Bool type compatibility — CORRECTED 2026-09-20. C11 has `_Bool` built in,
+ * but `bool` / `true` / `false` come from <stdbool.h>, which this freestanding
+ * SDK does not ship: on cproc (the only supported compiler) `bool` is NOT
+ * defined, and the branch below — for pre-C99 compilers — is dead. No public
+ * function uses `bool`; predicates return `u8` (0 / 1, or TRUE = 0xFF for the
+ * older ones — see the API audit, 3.2, for the plan to unify them).
  */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef unsigned char bool;

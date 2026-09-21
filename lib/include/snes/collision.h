@@ -78,8 +78,15 @@ typedef struct {
  *     // Collision detected
  * }
  * @endcode
+ *
+ * @note Read-only rectangles are `const Rect *` since 2026-09-20 — in this
+ *       module that is correctness, not style. A `static const Rect` lives in
+ *       an asset bank, and only a const-qualified read is a far read: through
+ *       the old `Rect *` parameter (with the cast it forced on the caller) the
+ *       fields were read from bank $00. Callers passing a plain `Rect *` are
+ *       unaffected.
  */
-u8 collideRect(Rect *a, Rect *b);
+u8 collideRect(const Rect *a, const Rect *b);
 
 /**
  * @brief Check point vs rectangle collision
@@ -98,7 +105,7 @@ u8 collideRect(Rect *a, Rect *b);
  * }
  * @endcode
  */
-u8 collidePoint(s16 x, s16 y, Rect *r);
+u8 collidePoint(s16 x, s16 y, const Rect *r);
 
 /**
  * @brief Check if two rectangles overlap and return overlap amount
@@ -128,7 +135,7 @@ u8 collidePoint(s16 x, s16 y, Rect *r);
  * }
  * @endcode
  */
-u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY);
+u8 collideRectEx(const Rect *a, const Rect *b, s16 *overlapX, s16 *overlapY);
 
 /*============================================================================
  * Tile-Based Collision Functions
@@ -195,7 +202,7 @@ u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize);
  * }
  * @endcode
  */
-u8 collideRectTile(Rect *r, const u8 *tilemap, u16 mapWidth);
+u8 collideRectTile(const Rect *r, const u8 *tilemap, u16 mapWidth);
 
 /*============================================================================
  * Helper Functions
@@ -228,7 +235,7 @@ void rectSetPos(Rect *r, s16 x, s16 y);
  * @param cx Pointer to store center X
  * @param cy Pointer to store center Y
  */
-void rectGetCenter(Rect *r, s16 *cx, s16 *cy);
+void rectGetCenter(const Rect *r, s16 *cx, s16 *cy);
 
 /**
  * @brief Check if rectangle is completely inside another
@@ -237,6 +244,6 @@ void rectGetCenter(Rect *r, s16 *cx, s16 *cy);
  * @param outer Outer rectangle (container)
  * @return 1 if inner is completely inside outer, 0 otherwise
  */
-u8 rectContains(Rect *inner, Rect *outer);
+u8 rectContains(const Rect *inner, const Rect *outer);
 
 #endif /* OPENSNES_COLLISION_H */

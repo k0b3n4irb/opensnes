@@ -143,7 +143,8 @@ _Static_assert(__builtin_offsetof(t_objs, onscreen) == 56, "onscreen offset mism
  */
 extern t_objs objWorkspace;
 
-/** @brief Current object pointer (byte offset, for internal use) */
+/** @brief Slot index + 1 of the last objGetPointer(), 0 if its handle was stale.
+ *  Prefer the return value of objGetPointer(); this global predates it. */
 extern u16 objptr;
 
 /** @brief Set to 1 inside a callback to kill the current object */
@@ -238,11 +239,16 @@ u16 objNew(u8 objtype, u16 x, u16 y);
  * @brief Get pointer to an object from its handle
  *
  * Validates the handle and populates objWorkspace with the object's data.
- * Sets objptr to the buffer offset (1-based), or 0 if invalid.
  *
  * @param objhandle Object handle (from objNew/objgetid)
+ * @return The slot index + 1 if the handle is live, 0 if it is stale (the
+ *         object was killed, or the slot reused) — in which case the
+ *         workspace is left alone. The same value is stored in `objptr`,
+ *         which was the only way to learn it until 2026-09-20 (the function
+ *         returned void); `objptr` was also documented as a "buffer offset",
+ *         which it is not.
  */
-void objGetPointer(u16 objhandle);
+u16 objGetPointer(u16 objhandle);
 
 /**
  * @brief Kill an object

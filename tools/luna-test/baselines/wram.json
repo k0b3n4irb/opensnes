@@ -76,8 +76,8 @@
     "rom_sha256": "3a037e769f4c7e6bd288dc6889b7ead9eeae3a93e752a98703fdee2b19ed0fe9"
   },
   "basics_collision_demo": {
-    "stream": "8b219b83813b3377be71ddad779be7322f2fb3f69bf861c30780b2707bf81d59",
-    "rom_sha256": "c7ee8b1fe830d4bef2241d01ecc3cb3dfd6c8ea65b75ea0a20db36c594f03a0a"
+    "stream": "0e89a5ce2b3471a347a9f368266fb7cb361c7c1372d557098a19adf59c2fdbe7",
+    "rom_sha256": "d50dc31188c9434d4501121dfee4af8e017ffa49913bb7ad667f5df8af6bf102"
   },
   "basics_fix32_orbit": {
     "stream": "2916610d6cc1bd1fa947b0a19d5199493befbbe51dba6070c68e2b4a674d1775",
@@ -96,8 +96,8 @@
     "rom_sha256": "5a4fb8e57421e584bfadf2e0062397b25b7d88be5e08704892a77595ac6b5799"
   },
   "basics_scene_stack": {
-    "stream": "c31743140914144ddefa89c7fb986d527c12fffd28a2b0f2e105674996ebc6ca",
-    "rom_sha256": "d6759cfbdf1773f01273ad03b146f0dc01e99f7d37e82adebb64ed2c3c3cd825"
+    "stream": "801ec9ddb268f273ac18add6e4fce3f0dead67ba070c12fdb71f389b02a31272",
+    "rom_sha256": "dca0e700ec5d951f903d1f8609321c2487c7028ec558834a4db6a62b7cc8c80f"
   },
   "basics_timer": {
     "stream": "e813260208ddc8a40bf61512009a55a57b78daabebb44bb03541ace4e5bf03d7",
@@ -164,8 +164,8 @@
     "rom_sha256": "185694997cd6f32a7cd6cd0550e419c07538c2c3277b91afae5e30e3e4e46f19"
   },
   "games_mapandobjects": {
-    "stream": "c34979e4490c57c987d3fe66b15f8eeaa17ac72238d17799adfbe0ea668e5e66",
-    "rom_sha256": "d986415cc7de9d9fa2011a0b0652ad07d172048a1c09fcd1789e510fd9bfbcb5"
+    "stream": "13bd7f0b7ddfc268a24f211467db9da4b2aafd1c168f5efc916349d0bde2f5ad",
+    "rom_sha256": "1f06edb783d331d87e0c04232b5879a44e3877efb09c3d20780f593c5ea903e6"
   },
   "games_mode7_flying": {
     "stream": "62a9cfaba27dc4e4d919b13805fb6c18949b715713ad804f0cf51f98d9ee085b",
@@ -176,8 +176,8 @@
     "rom_sha256": "a8cbc0f682d4ef3372b0b0dfdfe4c41fcc18fe98d5189fd9b4202bc675db70e9"
   },
   "games_rpg": {
-    "stream": "acf865ca8082cb6c005049b7f8f48b6de4acfa47b39d2515f1c96605031442bd",
-    "rom_sha256": "b5305dcc688bde7f49afc4dd2bfe53a39c8615b7a5c80f1d5920f392332d7549"
+    "stream": "97828d361cb3b3b624b838c0105d6a03faf2b8399f23cf12a1f3ee96f62900d8",
+    "rom_sha256": "1a88b985e042eebd609855e040e52cfe4b95051aea87345d8a8a01bc5cc1ef5c"
   },
   "games_shmup_1942": {
     "stream": "7210d6844df1c6a2eac3bfbeadcdddae941cfae76b98ab8f18f5b812e7f409b2",
@@ -236,8 +236,8 @@
     "rom_sha256": "b18a9dca2f5e05b5d43078392e0260283c410be5dd5af7c28f3a801babeaeaa3"
   },
   "maps_slope_collision": {
-    "stream": "3405f56af39f754d821787bb015734373333239252dd1dcd4d4b821563057682",
-    "rom_sha256": "77bf4545f547f73ba4cb9c89c5aaf08b8d202d815ac4f8b14eeefd57b6297ee4"
+    "stream": "0dd57430edb83566ebf165c363b87b78c8e3e95f81ceab969a37e6b77a9b7ee0",
+    "rom_sha256": "1c96477293e801ebf3410068ad082f076e83c80e023edf1ece7dcaa682d4fd45"
   },
   "maps_tiled": {
     "stream": "e430030d8a72ec3dc6f4f4faeaf83b92db27f89a1e60b897c0445daf695228d1",

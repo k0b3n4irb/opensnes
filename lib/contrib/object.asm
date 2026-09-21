@@ -662,6 +662,7 @@ _oigp1:
     SYNC_TO_WORKSPACE
 
 _oigp2:
+    lda.l objptr                            ; return value (u16): slot + 1, or 0
     ply
     plx
     plb

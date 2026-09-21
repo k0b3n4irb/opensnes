@@ -137,6 +137,12 @@ CASES = [
     ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
     ("r_bank_sram",    2, 16),     # const template saved and read back intact
     ("r_bank_ck",      2, 0x10),   # sramChecksum read the ROM bytes, not WRAM
+    # const Rect in an asset bank, read far through the now-const parameters
+    ("r_crect_hit", 2, 1), ("r_crect_miss", 2, 0), ("r_crect_cx", 2, 18), ("r_crect_cy", 2, 24),
+    ("r_crect_bk", 2, 1),          # premise: the const Rect is outside bank $00
+    # functions that could not report failure (API audit 3.5)
+    ("r_getptr_live", 2, 2), ("r_getptr_stale", 2, 0),
+    ("r_scene_push", 2, 8), ("r_scene_full", 2, 0), ("r_scene_pop", 2, 1),
     ("r_f32div_zero",  2, 0),      # fix32Div by zero: 0 like the rest of the family (was 0xFFFFFFFF)
     ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template

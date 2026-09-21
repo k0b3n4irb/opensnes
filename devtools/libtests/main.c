@@ -35,6 +35,7 @@
 #include <snes/interrupt.h>
 #include <snes/input.h>
 #include <snes/object.h>
+#include <snes/scene.h>
 #include <snes/colormath.h>
 #include <snes/mosaic.h>
 #include <snes/profile.h>
@@ -370,6 +371,21 @@ u16 r_bank_irq;      /* plain irqSet on a handler in banks 7-1, 4 frames  -> 4 *
 u16 r_bank_irq_bk;   /* that handler is outside bank $00                   -> 1 */
 u16 r_bank_sram;     /* const template -> SRAM @0x300 -> RAM: equal bytes -> 16 */
 u16 r_bank_ck;       /* sramChecksum(const template) = XOR(0xA1..0xB0)    -> 0x10 */
+u16 r_crect_hit;     /* collideRect on two `static const Rect` (asset bank)  -> 1 */
+u16 r_crect_miss;    /* ... against a const Rect 100 px away                -> 0 */
+u16 r_crect_cx;      /* rectGetCenter of the const {10,20,16,8}: cx         -> 18 */
+u16 r_crect_cy;      /*                                          cy         -> 24 */
+u16 r_crect_bk;      /* the const Rect really is outside bank $00           -> 1 */
+static const Rect c_ra = { 10, 20, 16, 8 };
+static const Rect c_rb = { 20, 24, 16, 8 };
+static const Rect c_rc = { 110, 20, 16, 8 };
+u16 r_getptr_live;   /* objGetPointer(live handle): slot + 1                 -> 2 (slot 1) */
+u16 r_getptr_stale;  /* objGetPointer(handle of a killed object)            -> 0 */
+u16 r_scene_push;    /* scenePush successes on an empty 8-deep stack        -> 8 */
+u16 r_scene_full;    /* the ninth scenePush                                 -> 0 */
+u16 r_scene_pop;     /* scenePop with 8 scenes stacked                      -> 1 */
+static void sceneNop(void) {}
+static const Scene lot_scene = { 0, sceneNop };
 u16 r_f32div_zero;   /* fix32Div(FIX32(7), 0): the family convention        -> 0 */
 u16 r_bank_tpl_bk;   /* the template is outside bank $00                   -> 1 */
 static const u8 save_tpl[16] = {
@@ -402,6 +418,30 @@ static void coverage_bank_bytes(void) {
     r_bank_sram = 0;
     for (i = 0; i < 16; i++) if (bank_load[i] == save_tpl[i]) r_bank_sram++;
     r_bank_ck     = sramChecksum(save_tpl, 16);
+    {
+        u16 h0, h1;
+        objInitEngine();
+        h0 = objNew(0, 8, 8);                  /* slot 0 */
+        h1 = objNew(0, 24, 8);                 /* slot 1 */
+        r_getptr_live = objGetPointer(h1);
+        objKill(h1);
+        r_getptr_stale = objGetPointer(h1);
+        (void)h0;
+        r_scene_push = 0;
+        for (i = 0; i < 8; i++) if (scenePush(&lot_scene)) r_scene_push++;
+        r_scene_full = scenePush(&lot_scene) ? 1 : 0;
+        sceneReplace(&lot_scene);
+        r_scene_pop = scenePop() ? 1 : 0;
+    }
+    {
+        s16 ccx, ccy;
+        r_crect_hit  = collideRect(&c_ra, &c_rb);
+        r_crect_miss = collideRect(&c_ra, &c_rc);
+        rectGetCenter(&c_ra, &ccx, &ccy);
+        r_crect_cx = (u16)ccx;
+        r_crect_cy = (u16)ccy;
+        r_crect_bk = ((u8)((u32)(const void *)&c_ra >> 16) != 0) ? 1 : 0;
+    }
     {
         u32 q = (u32)fix32Div(FIX32(7), 0);
         r_f32div_zero = (u16)(q | (q >> 16));   /* every bit of the result */

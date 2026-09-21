@@ -92,10 +92,11 @@
  *   shared state — `examples/basics/scene_stack` does this with
  *   `static u16 counter_value`, which survives the counter→pause→
  *   counter cycle because counter's `init` runs once on first push.
- * - No `sceneSwap()` primitive. To replace the top scene without
- *   keeping it on the stack, call `scenePop(); scenePush(&next);`.
- *   The combo is intentional — the framework keeps the API surface
- *   minimal and lets the user spell the intent explicitly.
+ * - To replace the top scene without keeping it on the stack, call
+ *   `sceneReplace(&next)`. (Until 2026-09-20 this list recommended
+ *   `scenePop(); scenePush(&next);`, which cannot replace the BOTTOM scene:
+ *   the pop is refused at depth 1, so the push stacks — a title → game →
+ *   title cycle leaked one slot per lap until pushes were dropped.)
  * - No NMI integration. Pushing/popping from inside an NMI callback
  *   is undefined; do it from `update` only.
  *
@@ -195,12 +196,13 @@ void sceneRun(const Scene *initial);
  * calls `init` (if non-NULL) at the top of the next frame, then `update`.
  * The caller's currently-executing `update` finishes its frame first.
  *
- * Silently ignored when the stack is already at `SCENE_STACK_MAX`.
- *
  * @param next Scene to push. Same lifetime contract as `sceneRun`'s
  *             `initial`.
+ * @return 1 if pushed; 0 if the stack is already at
+ *         `SCENE_STACK_MAX` and nothing happened. (It returned nothing, and
+ *         failed silently, until 2026-09-20.)
  */
-void scenePush(const Scene *next);
+u8 scenePush(const Scene *next);
 
 /**
  * @brief Pop the top scene. Resumes the scene below.
@@ -209,10 +211,25 @@ void scenePush(const Scene *next);
  * runs on the next VBlank. The resumed scene's `init` is NOT
  * re-invoked — it ran once at first push.
  *
- * Silently ignored when the stack contains only the bottom scene
- * (i.e. depth 1) — the stack is never empty after `sceneRun` is
- * called.
+ * @return 1 if a scene was popped; 0 at depth 1 — the stack is never
+ *         empty after `sceneRun` — where nothing happens. Note that
+ *         `scenePop(); scenePush(&next);` therefore cannot replace the BOTTOM
+ *         scene: the pop fails and the push stacks on top. Use sceneReplace().
  */
-void scenePop(void);
+u8 scenePop(void);
+
+/**
+ * @brief Replace the top scene with another, at any depth — the bottom one
+ *        included.
+ *
+ * The scene-swap primitive `scenePop(); scenePush(&next);` only approximates:
+ * that idiom leaks a stack slot per swap when the scene being replaced is the
+ * bottom one, until the 8-deep stack silently drops pushes. `next->init` runs
+ * at the top of the next frame, like after a push.
+ *
+ * @param next Scene that takes the top slot. Same lifetime contract as
+ *             `sceneRun`'s `initial`.
+ */
+void sceneReplace(const Scene *next);
 
 #endif /* SNES_SCENE_H */

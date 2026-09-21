@@ -63,11 +63,34 @@ tutorials' Gotchas.
   `--input2`. The ROM-coverage ratchet therefore cannot replay the mouse and
   Super Scope manifests; ten `input.h` functions stay "never executed" by
   any example leg (the fixture executes them with no device).
-- `--dsp1-rom ""` (an empty path) **installs an empty file over the existing
-  firmware** in `~/.config/luna/firmware/` and reports success. Happened on
-  2026-09-19 (restored from another copy, MD5-verified). A size / hash check
-  before install, or refusing an empty path, would prevent it.
+- ~~`--dsp1-rom ""` installs an empty file~~ — **corrected by the luna team,
+  2026-09-20**: clap rejects an empty argument; what we passed was a path to
+  a file that existed and was EMPTY, and `install_firmware` copied it over a
+  good dump. Worse, the 0-byte blob was then accepted as firmware, so
+  `missing_firmware` read `null` and luna's existing "needs firmware" warning
+  never fired. Fixed on luna `develop`: content vetted (8192 bytes) before the
+  destination is touched, staged write + rename, wrong-size blobs refused.
 - A **minimum-SP report** (deepest stack reach over a run) in `luna state`
   JSON would turn the stack-vs-globals collision above into a gate; today it
   was found by `--trace-writes` on a corrupted variable, then measured from
   stack residue in zero-initialised RAM.
+
+## luna's reply, 2026-09-20 (`/tmp/luna_report_opensnes_2026-09-20.md`)
+
+All four requests are on luna `develop` (`4808f6e`), untagged; our reply
+(`/tmp/opensnes_reply_to_luna_2026-09-21.md`) asks for the tag. Queued behind
+it:
+
+- `luna profile` takes the mouse / Super Scope / pad-2 flags → replay those
+  manifests in `rom_coverage.py`, drop the README's under-count sentence.
+- `cpu.sp_min` + `--stack-floor` → a measured stack gate next to the RAM
+  budget (floor = top of the C RAM band, read from the `.sym`). Only native-
+  mode pushes move the mark — fine for us, crt0 goes native at once.
+- **`padIsConnected` (audit B12) — the premise was wrong.** An empty port and
+  an idle pad both AUTO-read `$0000`; the NMI filter hides nothing. The
+  difference is past bit 16 of a manual serial read: a pad's line idles high
+  (1s for ever), an empty port returns 0s (ares and Mesen2 agree; neither
+  documents a measurement, our corpus does not state it → hypothesis, on the
+  real-console checklist). Fix: crt0 clocks `$4016/$4017` once more per port
+  after the auto-read and publishes a per-port flag; test with
+  `port2 = "none"`.
