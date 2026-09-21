@@ -31,6 +31,8 @@ PEEKS = [
     ("r_off3:2",     "4800"),
     ("r_ck:2",       "8c00"),   # sramChecksum over the const template
     ("r_clear:2",    "0000"),   # sramClear zeroed what sramLoad then read
+    ("r_ok:2",       "0000"),   # SRAM_OK
+    ("r_range:2",    "0100"),   # SRAM_ERR_RANGE: past the 8 KB HiROM window, nothing written
     # where the HARDWARE puts it: HiROM battery RAM is $30:6000 + offset
     ("30:6000:C",    "c1d2e3f415263748596a7b8c"),
     ("30:6123:4",    "15263748"),

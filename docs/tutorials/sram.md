@@ -123,6 +123,9 @@ declarations (Makefile says 8 KB, header says 2 KB) produce silent
 | `sramClear(size)` | Zero `size` bytes of SRAM starting at offset 0. Used for "delete save". |
 | `sramChecksum(data, size)` | Compute an 8-bit XOR checksum of `data`. Use this for save-integrity validation. |
 
+The five copying functions return `SRAM_OK` (0), `SRAM_ERR_RANGE` or
+`SRAM_ERR_NO_SRAM`; a refused call copies nothing (see the gotcha below).
+
 The byte arrays are flat — there's no filesystem on SRAM, just a
 linear address space starting at offset 0. You pick the layout.
 
@@ -287,17 +290,25 @@ random patterns. Your validation must catch both:
 - **Version field** (advanced): track save format version so old
   saves from a previous game build can be migrated or rejected.
 
-### 🔴 `SRAM_SIZE` mismatch between Makefile and code
+### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused since 2026-09-21
 
-The lib's `sramSave/sramLoad` will happily write past the size
-declared in the ROM header. On emulators, the `.srm` file may be
-truncated; on real hardware, writes past the actual chip size wrap
-around or vanish. Always set `SRAM_SIZE` in your Makefile to match
-or exceed the largest offset your code writes.
+Every function of the family except `sramChecksum` returns a code:
+`SRAM_OK`, `SRAM_ERR_RANGE` (`offset + size` exceeds the declared SRAM) or
+`SRAM_ERR_NO_SRAM` (the header declares none — `USE_SRAM := 1` is missing).
+A refused call copies nothing. The capacity is read from your ROM's own
+header, so it always matches the `SRAM_SIZE` you built with (capped at what
+the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).
 
-A common bug: `SRAM_SIZE := 1` (2 KB) in Makefile, then code uses
-`SLOT_SIZE = 1024` × 4 slots = 4 KB. Slots 2 and 3 silently fail
-to persist on hardware that respects the header.
+Before that the family returned `void` and copied whatever it was asked,
+past the declared size. The classic bug — `SRAM_SIZE := 1` (2 KB) in the
+Makefile, then `SLOT_SIZE = 1024` × 4 slots — now fails loudly on slot 2 if
+you look at the return value:
+
+```c
+if (sramSaveOffset((u8 *)&save, sizeof(save), SLOT_OFFSET(slot)) != SRAM_OK) {
+    /* this slot does not exist on this cartridge */
+}
+```
 
 ### 🟠 SRAM access requires no special timing
 

@@ -137,6 +137,9 @@ CASES = [
     ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
     ("r_bank_sram",    2, 16),     # const template saved and read back intact
     ("r_bank_ck",      2, 0x10),   # sramChecksum read the ROM bytes, not WRAM
+    # sram bounds: capacity from the ROM header's SRAMSIZE byte (8 KB here); a refusal copies nothing
+    ("r_sram_edge", 2, 0), ("r_sram_range", 2, 1), ("r_sram_kept", 2, 8),
+    ("r_sram_ldrange", 2, 0x5A01), ("r_sram_wrap", 2, 1),
     # const Rect in an asset bank, read far through the now-const parameters
     ("r_crect_hit", 2, 1), ("r_crect_miss", 2, 0), ("r_crect_cx", 2, 18), ("r_crect_cy", 2, 24),
     ("r_crect_bk", 2, 1),          # premise: the const Rect is outside bank $00

@@ -370,6 +370,11 @@ volatile u16 irq_count_far;
 u16 r_bank_irq;      /* plain irqSet on a handler in banks 7-1, 4 frames  -> 4 */
 u16 r_bank_irq_bk;   /* that handler is outside bank $00                   -> 1 */
 u16 r_bank_sram;     /* const template -> SRAM @0x300 -> RAM: equal bytes -> 16 */
+u16 r_sram_edge;     /* sramSaveOffset(tpl, 8, 0x1FF8): ends exactly at 8 KB        -> SRAM_OK (0) */
+u16 r_sram_range;    /* sramSaveOffset(tpl + 8, 16, 0x1FF8): 8 bytes too far        -> SRAM_ERR_RANGE (1) */
+u16 r_sram_kept;     /* ... and wrote nothing: the 8 edge bytes still match         -> 8 */
+u16 r_sram_ldrange;  /* sramLoadOffset(.., 16, 0x1FF8): code | buf[0] << 8, buffer untouched -> 0x5A01 */
+u16 r_sram_wrap;     /* sramSaveOffset(tpl, 16, 0xFFF8): offset + size wraps 64 KB  -> 1 */
 u16 r_bank_ck;       /* sramChecksum(const template) = XOR(0xA1..0xB0)    -> 0x10 */
 u16 r_crect_hit;     /* collideRect on two `static const Rect` (asset bank)  -> 1 */
 u16 r_crect_miss;    /* ... against a const Rect 100 px away                -> 0 */
@@ -418,6 +423,16 @@ static void coverage_bank_bytes(void) {
     r_bank_sram = 0;
     for (i = 0; i < 16; i++) if (bank_load[i] == save_tpl[i]) r_bank_sram++;
     r_bank_ck     = sramChecksum(save_tpl, 16);
+    /* bounds (2026-09-21): the fixture declares 8 KB (SRAM_SIZE default) */
+    r_sram_edge  = sramSaveOffset(save_tpl, 8, 0x1FF8);
+    r_sram_range = sramSaveOffset(save_tpl + 8, 16, 0x1FF8);
+    for (i = 0; i < 16; i++) bank_load[i] = 0x5A;
+    r_sram_ldrange = sramLoadOffset(bank_load, 16, 0x1FF8);
+    r_sram_ldrange |= (u16)bank_load[0] << 8;
+    sramLoadOffset(bank_load, 8, 0x1FF8);
+    r_sram_kept = 0;
+    for (i = 0; i < 8; i++) if (bank_load[i] == save_tpl[i]) r_sram_kept++;
+    r_sram_wrap  = sramSaveOffset(save_tpl, 16, 0xFFF8);
     {
         u16 h0, h1;
         objInitEngine();
@@ -637,50 +652,15 @@ static void coverage_lot_b(void) {
 
 }
 
-int main(void) {
+/* main() used to hold everything below in ONE frame: 734 bytes, which with
+ * the audio boot, the NMI and cmd_send on top reached down into the result
+ * globals (second time: s_map_width / s_cursor_y, 2026-09-21; the first is
+ * told above coverage_lot_b). Each part has its own frame now, released
+ * before the next one runs; the order of execution is unchanged. */
+static void part_math_anim(void) {
     u8 i;
     AnimPlayer ap = ANIM_PLAYER_INIT;
     RmwProbe rmw;
-
-    /* audio v2 first: audioInit blocks on the APU boot + driver upload
-     * (the longest single step of the fixture — see STEPS in
-     * test_libtest.py). Known DSP vectors for the spc-dump probe:
-     * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
-    r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
-    r_audio_ready = audioIsReady();
-    audioSetVolume(100);
-    r_audio_vol = audioGetVolume();
-    audioSetVoiceVolume(2, 80, 40);
-    audioSetVoicePitch(3, 0x1234);
-    audioSetADSR(1, 15, 7, 7, 8);
-    audioSetGain(4, 0x5A);
-
-    /* phase 2: stream the beep into ARAM, then key it on voice 0
-     * (round-robin starts there). Probe asserts the ARAM bytes, the
-     * directory entry, and the playing voice's DSP state. */
-    r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
-    r_audio_free = audioGetFreeMemory();
-    {
-        AudioSample s;
-        if (audioGetSampleInfo(0, &s) == AUDIO_OK) {
-            r_audio_addr = s.spcAddress;
-        }
-    }
-    r_audio_voice = audioPlaySampleEx(0, 127, AUDIO_PAN_CENTER, 0x1000);
-
-    /* phase 3: hall on voice 0's beep + live envelope readback. The
-     * echo values are arbitrary-but-distinct probe vectors. */
-    audioSetEcho(3, 40, 20, 20);
-    {
-        static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
-        audioSetEchoFilter(fir);
-    }
-    audioEnableEcho(0x01);
-    {
-        AudioVoiceState vs;
-        audioGetVoiceState(0, &vs);
-        r_audio_active = vs.active;
-    }
 
     r_fmul_a    = (u16)fixMul(FIX(2), fx_half);
     r_fmul_neg  = (u16)fixMul(FIX(-3), FIX(2));
@@ -766,7 +746,9 @@ int main(void) {
         WaitForVBlank();
     }
     nmiClear();
+}
 
+static void part_collision_sram(void) {
     /* --- L2c: collision --- */
     {
         Rect a, b, c, in, r;
@@ -822,6 +804,10 @@ int main(void) {
         r_sram_clear = 0;
         for (k = 0; k < 16; k++) r_sram_clear |= load_buf[k];
     }
+}
+
+static void part_objects_irq(void) {
+    u8 i;
 
     /* --- object engine: owner-tracked workspace + null-callback guard ---
      * Runs after mapLoad() above, so the camera globals the update pass
@@ -905,6 +891,54 @@ int main(void) {
     for (i = 0; i < 2; i++) WaitForVBlank();
     r_irq_d = irq_count;
     irqDisable();
+}
+
+int main(void) {
+
+    /* audio v2 first: audioInit blocks on the APU boot + driver upload
+     * (the longest single step of the fixture — see STEPS in
+     * test_libtest.py). Known DSP vectors for the spc-dump probe:
+     * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
+    r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
+    r_audio_ready = audioIsReady();
+    audioSetVolume(100);
+    r_audio_vol = audioGetVolume();
+    audioSetVoiceVolume(2, 80, 40);
+    audioSetVoicePitch(3, 0x1234);
+    audioSetADSR(1, 15, 7, 7, 8);
+    audioSetGain(4, 0x5A);
+
+    /* phase 2: stream the beep into ARAM, then key it on voice 0
+     * (round-robin starts there). Probe asserts the ARAM bytes, the
+     * directory entry, and the playing voice's DSP state. */
+    r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    r_audio_free = audioGetFreeMemory();
+    {
+        AudioSample s;
+        if (audioGetSampleInfo(0, &s) == AUDIO_OK) {
+            r_audio_addr = s.spcAddress;
+        }
+    }
+    r_audio_voice = audioPlaySampleEx(0, 127, AUDIO_PAN_CENTER, 0x1000);
+
+    /* phase 3: hall on voice 0's beep + live envelope readback. The
+     * echo values are arbitrary-but-distinct probe vectors. */
+    audioSetEcho(3, 40, 20, 20);
+    {
+        static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
+        audioSetEchoFilter(fir);
+    }
+    audioEnableEcho(0x01);
+    {
+        AudioVoiceState vs;
+        audioGetVoiceState(0, &vs);
+        r_audio_active = vs.active;
+    }
+
+    part_math_anim();
+    part_collision_sram();
+    part_objects_irq();
+
 
     coverage_bank_bytes();
     coverage_lot_b();

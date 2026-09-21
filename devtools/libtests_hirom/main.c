@@ -17,6 +17,8 @@ u16 r_rt;        /* bytes equal after sramSave / sramLoad of 12        -> 12 */
 u16 r_off;       /* sramSaveOffset(tpl+4, 4, 0x123) / LoadOffset: [0]  -> 0x15 */
 u16 r_off3;      /*                                              [3]  -> 0x48 */
 u16 r_ck;        /* sramChecksum(tpl, 12)                              -> XOR of the 12 */
+u16 r_ok;        /* sramSave(tpl, 12) on HiROM                          -> SRAM_OK (0) */
+u16 r_range;     /* sramSaveOffset(tpl, 12, 0x1FF8): past the 8 KB window -> SRAM_ERR_RANGE (1) */
 u16 r_clear;     /* OR of the first 12 bytes after sramClear(12)       -> 0 */
 u16 r_bank_ram;  /* bank byte the compiler gives a pointer to a bank-0 RAM variable */
 u16 r_bank_rom;  /* ... and to a const table */
@@ -44,7 +46,8 @@ int main(void) {
     r_clear = 0;
     for (i = 0; i < 12; i++) r_clear |= back[i];
 
-    sramSave(tpl, 12);          /* leave the pattern in SRAM for the manifest */
+    r_range = sramSaveOffset(tpl, 12, 0x1FF8);
+    r_ok = sramSave(tpl, 12);   /* leave the pattern in SRAM for the manifest */
     setScreenOn();
     r_done = 0xBEEF;
     while (1) { WaitForVBlank(); }

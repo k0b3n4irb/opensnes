@@ -145,7 +145,62 @@
 .SECTION ".sram_asm" SUPERFREE
 
 ;------------------------------------------------------------------------------
-; void sramSave(u8 *data, u16 size)
+; sram_bounds (internal) — refuse a transfer the cartridge cannot hold
+;
+; Until 2026-09-21 the whole family returned void and copied whatever it was
+; asked: an offset + size past the save chip went wherever the mapping sent it.
+; The capacity is the one the ROM itself declares — the SRAMSIZE byte of the
+; header ($00:FFD8, 1 KB << n; make/common.mk's SRAM_SIZE) — capped by what
+; this module can address in one bank (32 KB LoROM, 8 KB HiROM). Reading the
+; header keeps the prebuilt library independent of the project's SRAM_SIZE.
+;
+; In:  A = offset, DP_TEMP = size (non-zero); 16-bit A/X/Y.
+; Out: carry clear = fits. Carry set = refused, A = SRAM_ERR_RANGE /
+;      SRAM_ERR_NO_SRAM. Trashes X and DP_TEMP.
+;------------------------------------------------------------------------------
+.EQU SRAM_OK           0
+.EQU SRAM_ERR_RANGE    1
+.EQU SRAM_ERR_NO_SRAM  2
+.ifdef HIROM
+.EQU SRAM_MAX_N 3               ; 8 KB window
+.else
+.EQU SRAM_MAX_N 5               ; 32 KB bank
+.endif
+
+sram_bounds:
+    .ACCU 16
+    .INDEX 16
+    clc
+    adc.b DP_TEMP               ; end = offset + size
+    bcs @range                  ; wrapped past 64 KB
+    sta.b DP_TEMP
+    lda.l $00FFD8               ; SRAMSIZE (low byte)
+    and #$00FF
+    beq @none
+    cmp #SRAM_MAX_N+1
+    bcc +
+    lda #SRAM_MAX_N
++:  asl a
+    tax
+    lda.l sram_capacity,x       ; bytes this cartridge holds
+    cmp.b DP_TEMP
+    bcc @range                  ; capacity < end
+    clc
+    rts
+@none:
+    lda #SRAM_ERR_NO_SRAM
+    sec
+    rts
+@range:
+    lda #SRAM_ERR_RANGE
+    sec
+    rts
+
+sram_capacity:
+    .dw $0000, $0800, $1000, $2000, $4000, $8000
+
+;------------------------------------------------------------------------------
+; u8 sramSave(u8 *data, u16 size)
 ;
 ; Copy data from Work RAM to SRAM using block move.
 ;
@@ -165,7 +220,12 @@ sramSave:
     .INDEX 16
 
     lda 6,s                     ; size
-    beq @done                   ; if size == 0, skip
+    beq @ok                     ; nothing to copy
+    sta.b DP_TEMP
+    lda #$0000                  ; offset 0
+    jsr sram_bounds
+    bcs @done                   ; refused: A = error code
+    lda 6,s                     ; size
     dec a                       ; MVN uses count-1
     sta.b DP_SIZE
 
@@ -176,13 +236,18 @@ sramSave:
 
     SRAM_SAVE_BLOCK 10          ; pointer at 8-11,s: bank byte at 10,s
 
+@ok:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda #SRAM_OK
 @done:
     plb
     plp
     rtl
 
 ;------------------------------------------------------------------------------
-; void sramLoad(u8 *data, u16 size)
+; u8 sramLoad(u8 *data, u16 size)
 ;
 ; Copy data from SRAM to Work RAM using block move.
 ;
@@ -199,7 +264,12 @@ sramLoad:
     .INDEX 16
 
     lda 6,s                     ; size
-    beq @done                   ; if size == 0, skip
+    beq @ok                     ; nothing to copy
+    sta.b DP_TEMP
+    lda #$0000                  ; offset 0
+    jsr sram_bounds
+    bcs @done                   ; refused: A = error code
+    lda 6,s                     ; size
     dec a                       ; MVN uses count-1
     sta.b DP_SIZE
 
@@ -210,13 +280,18 @@ sramLoad:
 
     SRAM_LOAD_BLOCK 10          ; pointer at 8-11,s: bank byte at 10,s
 
+@ok:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda #SRAM_OK
 @done:
     plb
     plp
     rtl
 
 ;------------------------------------------------------------------------------
-; void sramSaveOffset(u8 *data, u16 size, u16 offset)
+; u8 sramSaveOffset(u8 *data, u16 size, u16 offset)
 ;
 ; Copy data from Work RAM to SRAM at specified offset.
 ;
@@ -234,7 +309,12 @@ sramSaveOffset:
     .INDEX 16
 
     lda 8,s                     ; size
-    beq @done
+    beq @ok                     ; nothing to copy
+    sta.b DP_TEMP
+    lda 6,s                     ; offset
+    jsr sram_bounds
+    bcs @done                   ; refused: A = error code
+    lda 8,s                     ; size
     dec a                       ; MVN uses count-1
     sta.b DP_SIZE
 
@@ -246,13 +326,18 @@ sramSaveOffset:
 
     SRAM_SAVE_BLOCK 12          ; pointer at 10-13,s: bank byte at 12,s
 
+@ok:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda #SRAM_OK
 @done:
     plb
     plp
     rtl
 
 ;------------------------------------------------------------------------------
-; void sramLoadOffset(u8 *data, u16 size, u16 offset)
+; u8 sramLoadOffset(u8 *data, u16 size, u16 offset)
 ;
 ; Copy data from SRAM at specified offset to Work RAM.
 ;
@@ -270,7 +355,12 @@ sramLoadOffset:
     .INDEX 16
 
     lda 8,s                     ; size
-    beq @done
+    beq @ok                     ; nothing to copy
+    sta.b DP_TEMP
+    lda 6,s                     ; offset
+    jsr sram_bounds
+    bcs @done                   ; refused: A = error code
+    lda 8,s                     ; size
     dec a
     sta.b DP_SIZE
 
@@ -282,13 +372,18 @@ sramLoadOffset:
 
     SRAM_LOAD_BLOCK 12          ; pointer at 10-13,s: bank byte at 12,s
 
+@ok:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda #SRAM_OK
 @done:
     plb
     plp
     rtl
 
 ;------------------------------------------------------------------------------
-; void sramClear(u16 size)
+; u8 sramClear(u16 size)
 ;
 ; Clear SRAM to zero (byte-by-byte to avoid needing a source buffer).
 ;
@@ -304,7 +399,12 @@ sramClear:
     .INDEX 16
 
     lda 6,s                     ; size
-    beq @done
+    beq @ok                     ; nothing to copy
+    sta.b DP_TEMP
+    lda #$0000                  ; offset 0
+    jsr sram_bounds
+    bcs @done                   ; refused: A = error code
+    lda 6,s                     ; size
     sta.b DP_SIZE
 
     sep #$20                    ; 8-bit A
@@ -328,6 +428,11 @@ sramClear:
     cpy.b DP_SIZE
     bcc @clear_loop
 
+@ok:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda #SRAM_OK
 @done:
     plb
     plp
