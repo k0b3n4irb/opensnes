@@ -123,7 +123,7 @@ static u8 cmd_send(u8 op, u8 p0, u16 p1) {
  * Initialization
  *============================================================================*/
 
-void audioInit(void) {
+u8 audioInit(void) {
     u8 i;
 
     audio_ready = 0;
@@ -152,7 +152,9 @@ void audioInit(void) {
     /* Handshake: the driver answers PING with its version on result0 */
     if (cmd_send(OP_PING, 0, 0) == AUDIO_OK && APU_IO1 == DRIVER_VERSION) {
         audio_ready = 1;
+        return AUDIO_OK;
     }
+    return AUDIO_ERR_TIMEOUT;
 }
 
 u8 audioIsReady(void) {
@@ -168,13 +170,16 @@ void audioUpdate(void) {
  * Master volume
  *============================================================================*/
 
-void audioSetVolume(u8 volume) {
+u8 audioSetVolume(u8 volume) {
+    u8 err;
     if (volume > AUDIO_VOL_MAX) {
         volume = AUDIO_VOL_MAX;
     }
-    if (cmd_send(OP_MVOL, volume, 0) == AUDIO_OK) {
+    err = cmd_send(OP_MVOL, volume, 0);
+    if (err == AUDIO_OK) {
         audio_mvol = volume;
     }
+    return err;
 }
 
 u8 audioGetVolume(void) {
@@ -185,60 +190,70 @@ u8 audioGetVolume(void) {
  * Voice control
  *============================================================================*/
 
-void audioStopVoice(u8 voice) {
+u8 audioStopVoice(u8 voice) {
     if (voice >= AUDIO_MAX_VOICES) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
-    cmd_send(OP_KOFF, (u8)(1 << voice), 0);
+    return cmd_send(OP_KOFF, (u8)(1 << voice), 0);
 }
 
-void audioStopAll(void) {
-    cmd_send(OP_KOFF, 0xFF, 0);
+u8 audioStopAll(void) {
+    return cmd_send(OP_KOFF, 0xFF, 0);
 }
 
-void audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
+u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
+    u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
-    if (cmd_send(OP_VVOL, voice,
-                 (u16)((u16)volumeR << 8 | volumeL)) == AUDIO_OK) {
+    err = cmd_send(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
+    if (err == AUDIO_OK) {
         /* mirror keeps the max of both for state reporting */
         voice_mirror[voice].volume = volumeL > volumeR ? volumeL : volumeR;
     }
+    return err;
 }
 
-void audioSetVoicePitch(u8 voice, u16 pitch) {
+u8 audioSetVoicePitch(u8 voice, u16 pitch) {
+    u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
     if (pitch > 0x3FFF) {
         pitch = 0x3FFF;        /* DSP pitch is 14-bit */
     }
-    if (cmd_send(OP_VPITCH, voice, pitch) == AUDIO_OK) {
+    err = cmd_send(OP_VPITCH, voice, pitch);
+    if (err == AUDIO_OK) {
         voice_mirror[voice].pitch = pitch;
     }
+    return err;
 }
 
-void audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
-    u8 adsr1, adsr2;
+u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
+    u8 adsr1, adsr2, err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
     adsr1 = (u8)(0x80 | ((decay & 0x07) << 4) | (attack & 0x0F));
     adsr2 = (u8)(((sustain & 0x07) << 5) | (release & 0x1F));
-    if (cmd_send(OP_VADSR, voice, (u16)((u16)adsr2 << 8 | adsr1)) == AUDIO_OK) {
+    err = cmd_send(OP_VADSR, voice, (u16)((u16)adsr2 << 8 | adsr1));
+    if (err == AUDIO_OK) {
         voice_mirror[voice].env_set = 1;
     }
+    return err;
 }
 
-void audioSetGain(u8 voice, u8 mode) {
+u8 audioSetGain(u8 voice, u8 mode) {
+    u8 err;
     if (voice >= AUDIO_MAX_VOICES) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
     /* driver also zeroes VxADSR1 so GAIN mode actually applies */
-    if (cmd_send(OP_VGAIN, voice, mode) == AUDIO_OK) {
+    err = cmd_send(OP_VGAIN, voice, mode);
+    if (err == AUDIO_OK) {
         voice_mirror[voice].env_set = 1;
     }
+    return err;
 }
 
 /*============================================================================
@@ -360,7 +375,7 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
 
     if (sampleId >= AUDIO_MAX_SAMPLES || !sample_mirror[sampleId].flags
             || !audio_ready) {
-        return 0xFF;
+        return AUDIO_VOICE_NONE;
     }
     if (volume > AUDIO_VOL_MAX) {
         volume = AUDIO_VOL_MAX;
@@ -375,16 +390,16 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
     pan_to_lr(volume, pan, &l, &r);
     if (cmd_send(OP_VVOL, voice, (u16)((u16)r << 8 | l)) != AUDIO_OK ||
         cmd_send(OP_VPITCH, voice, pitch) != AUDIO_OK) {
-        return 0xFF;
+        return AUDIO_VOICE_NONE;
     }
     if (!voice_mirror[voice].env_set) {
         if (cmd_send(OP_VADSR, voice,
                      (u16)(DEFAULT_ADSR2 << 8 | DEFAULT_ADSR1)) != AUDIO_OK) {
-            return 0xFF;
+            return AUDIO_VOICE_NONE;
         }
     }
     if (cmd_send(OP_KON, voice, sampleId) != AUDIO_OK) {
-        return 0xFF;
+        return AUDIO_VOICE_NONE;
     }
 
     voice_mirror[voice].sample_id = sampleId;
@@ -419,7 +434,8 @@ void audioGetVoiceState(u8 voice, AudioVoiceState *state) {
  * Echo
  *============================================================================*/
 
-void audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
+u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
+    u8 err;
     if (delay < AUDIO_ECHO_DELAY_MIN) {
         delay = AUDIO_ECHO_DELAY_MIN;
     }
@@ -430,30 +446,33 @@ void audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
     }
     /* EFB rides the FIR command as tap index 8 (same signed-byte shape),
      * keeping ECHO_CFG's params free for EDL + both volumes. */
-    if (cmd_send(OP_ECHO_FIR, 8, (u16)(u8)feedback) != AUDIO_OK) {
-        return;
+    err = cmd_send(OP_ECHO_FIR, 8, (u16)(u8)feedback);
+    if (err != AUDIO_OK) {
+        return err;
     }
-    cmd_send(OP_ECHO_CFG, delay,
-             (u16)((u16)(u8)volumeR << 8 | (u8)volumeL));
+    return cmd_send(OP_ECHO_CFG, delay,
+                    (u16)((u16)(u8)volumeR << 8 | (u8)volumeL));
 }
 
-void audioSetEchoFilter(const s8 fir[8]) {
-    u8 i;
+u8 audioSetEchoFilter(const s8 fir[8]) {
+    u8 i, err;
     if (!fir) {
-        return;
+        return AUDIO_ERR_INVALID_ID;
     }
     for (i = 0; i < 8; i++) {
-        if (cmd_send(OP_ECHO_FIR, i, (u16)(u8)fir[i]) != AUDIO_OK) {
-            return;
+        err = cmd_send(OP_ECHO_FIR, i, (u16)(u8)fir[i]);
+        if (err != AUDIO_OK) {
+            return err;
         }
     }
+    return AUDIO_OK;
 }
 
-void audioEnableEcho(u8 voiceMask) {
-    cmd_send(OP_ECHO_ON, voiceMask, 0);
+u8 audioEnableEcho(u8 voiceMask) {
+    return cmd_send(OP_ECHO_ON, voiceMask, 0);
 }
 
-void audioDisableEcho(void) {
+u8 audioDisableEcho(void) {
     /* Mask 0 makes the driver also mute EVOL and stop ring writes. */
-    cmd_send(OP_ECHO_ON, 0, 0);
+    return cmd_send(OP_ECHO_ON, 0, 0);
 }

@@ -452,6 +452,11 @@ static void coverage_bank_bytes(void) {
 /* --- coverage lot C (2026-09-20): audio v2 stop/unload, two sprite helpers,
  * consoleInitEx. Runs last: it silences the voice the audio block left
  * playing (audio_v2.toml asserts DSP registers, not liveness). */
+u16 r_aud_init;      /* audioInit()                                     -> AUDIO_OK (0) */
+u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
+u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
+u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
+u16 r_aud_noplay;    /* audioPlaySample(63), a slot never loaded        -> AUDIO_VOICE_NONE (0xFF) */
 u16 r_aud_v0_live;   /* voice 0 before the stop: active              -> 1 */
 u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
 u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
@@ -471,6 +476,10 @@ static void coverage_lot_c(void) {
     u8 i;
 
     audioUpdate();                          /* v2 no-op, kept for source compatibility */
+    r_aud_badvoice = audioSetVoiceVolume(9, 60, 30);
+    r_aud_badstop  = audioStopVoice(8);
+    r_aud_setvol   = audioSetVolume(100);  /* 100: audio_v2.toml pins MVOL to it */
+    r_aud_noplay   = audioPlaySample(63);
     audioGetVoiceState(0, &vs);
     r_aud_v0_live = vs.active;
     audioPlaySampleEx(0, 100, AUDIO_PAN_CENTER, 0x1000);   /* round-robin: voice 1 */
@@ -620,7 +629,7 @@ int main(void) {
      * (the longest single step of the fixture — see STEPS in
      * test_libtest.py). Known DSP vectors for the spc-dump probe:
      * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
-    audioInit();
+    r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
     r_audio_ready = audioIsReady();
     audioSetVolume(100);
     r_audio_vol = audioGetVolume();

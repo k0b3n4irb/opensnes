@@ -81,6 +81,11 @@
 /** @brief Auto-allocate voice in audioPlaySampleEx */
 #define AUDIO_VOICE_AUTO    0xFF
 
+/** @brief Returned by audioPlaySample() / audioPlaySampleEx() when nothing was
+ *  played (driver not ready, unknown or unloaded sample, command timeout).
+ *  Was a bare 0xFF in the code until 2026-09-21. */
+#define AUDIO_VOICE_NONE    0xFF
+
 /** @brief Maximum volume value */
 #define AUDIO_VOL_MAX       127
 #define AUDIO_VOL_MIN       0
@@ -180,8 +185,15 @@ typedef struct {
  * @note Blocks for the duration of the upload (~a frame for the small
  *       driver). Interrupts stay enabled; the NMI handler does not
  *       touch the APU ports.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT if the driver did not answer the
+ *         handshake (audioIsReady() then reads 0). Returned nothing until
+ *         2026-09-21; so did the setters below, which now return the AUDIO_*
+ *         code of the command they sent (AUDIO_ERR_INVALID_ID for a voice
+ *         out of range) instead of swallowing it. Existing callers that
+ *         ignore the value are unaffected.
  */
-void audioInit(void);
+u8 audioInit(void);
 
 /**
  * @brief Check if audio system is ready
@@ -291,12 +303,12 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch);
  * @brief Stop a specific voice
  * @param voice Voice number (0-7)
  */
-void audioStopVoice(u8 voice);
+u8 audioStopVoice(u8 voice);
 
 /**
  * @brief Stop all audio playback
  */
-void audioStopAll(void);
+u8 audioStopAll(void);
 
 /** @} */
 
@@ -313,7 +325,7 @@ void audioStopAll(void);
  * @brief Set master volume
  * @param volume Volume level (0-127)
  */
-void audioSetVolume(u8 volume);
+u8 audioSetVolume(u8 volume);
 
 /**
  * @brief Get current master volume
@@ -327,14 +339,14 @@ u8 audioGetVolume(void);
  * @param volumeL Left channel volume (0-127)
  * @param volumeR Right channel volume (0-127)
  */
-void audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR);
+u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR);
 
 /**
  * @brief Set pitch for a specific voice
  * @param voice Voice number (0-7)
  * @param pitch Pitch value ($1000 = normal)
  */
-void audioSetVoicePitch(u8 voice, u16 pitch);
+u8 audioSetVoicePitch(u8 voice, u16 pitch);
 
 /**
  * @brief Get current state of a voice
@@ -363,14 +375,14 @@ void audioGetVoiceState(u8 voice, AudioVoiceState *state);
  * @param sustain Sustain level (0-7, higher = louder)
  * @param release Release rate (0-31, higher = faster)
  */
-void audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release);
+u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release);
 
 /**
  * @brief Set GAIN mode for a voice (alternative to ADSR)
  * @param voice Voice number (0-7)
  * @param mode GAIN mode and value
  */
-void audioSetGain(u8 voice, u8 mode);
+u8 audioSetGain(u8 voice, u8 mode);
 
 /** @} */
 
@@ -397,24 +409,24 @@ void audioSetGain(u8 voice, u8 mode);
  * writes (~9 ms per delay unit) — call at scene setup, not per frame.
  * Call this BEFORE audioEnableEcho().
  */
-void audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
+u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
 
 /**
  * @brief Set FIR filter coefficients for echo
  * @param fir Array of 8 signed coefficients
  */
-void audioSetEchoFilter(const s8 fir[8]);
+u8 audioSetEchoFilter(const s8 fir[8]);
 
 /**
  * @brief Enable echo for specific voices
  * @param voiceMask Bitmask (bit 0 = voice 0, etc.)
  */
-void audioEnableEcho(u8 voiceMask);
+u8 audioEnableEcho(u8 voiceMask);
 
 /**
  * @brief Disable echo for all voices
  */
-void audioDisableEcho(void);
+u8 audioDisableEcho(void);
 
 /** @} */
 

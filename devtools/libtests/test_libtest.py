@@ -146,6 +146,9 @@ CASES = [
     ("r_f32div_zero",  2, 0),      # fix32Div by zero: 0 like the rest of the family (was 0xFFFFFFFF)
     ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
+    # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
+    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
+    ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
