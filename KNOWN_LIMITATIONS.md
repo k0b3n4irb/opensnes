@@ -475,6 +475,23 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 The address of a local variable had an undefined bank (fixed 2026-09-21)
+
+`&local` is a far pointer like any other, but the compiler stored only its
+16-bit stack address: the bank half of the pointer kept whatever the stack
+held in that slot. Harmless for a bank-blind access (a plain `T *`
+dereference ignores the bank), wrong for every reader that honours it — a
+`const T *` parameter (far reads since #121), a library routine reading the
+bank byte of its argument. It survived because a slot never used before reads
+0 after power-on, which happens to be the stack's bank; once earlier calls
+had dirtied the slot the callee read a wild bank.
+
+Found by the library fixture: `collideRect(&a, &b)` on two local `Rect`s
+started returning 0 when an unrelated audio vector changed the stack residue
+— two commits after the collision parameters became `const Rect *`. Fixed in
+the QBE fork (`compiler/PINS.md`); pinned by
+`devtools/compiler-tests/cases/addr_of_local_bank`.
+
 ### 🟢 HiROM: every C pointer to RAM carried a ROM bank (fixed 2026-09-20)
 
 HiROM units are assembled under `.BASE $C0`, and wlalink's `:label` operator
