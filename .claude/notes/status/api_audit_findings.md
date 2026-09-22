@@ -86,6 +86,19 @@ it:
 - `cpu.sp_min` + `--stack-floor` → a measured stack gate next to the RAM
   budget (floor = top of the C RAM band, read from the `.sym`). Only native-
   mode pushes move the mark — fine for us, crt0 goes native at once.
+  **Hazard (luna's 1.26.0 note):** `nmi_budget.py` reads its verdict from
+  the exit code (`OVER` iff 1), and `--stack-floor` also exits 1. Run the
+  stack gate as its OWN `profile` invocation (it does not need `--budget`'s
+  symbol) — or parse the `budget:` / `stack:` lines, which are unambiguous —
+  never both gates in one call, or a stack failure reads as "NmiHandler OVER".
+- **What to expect from the 1.26.0 pin bump** (same note): `install-luna.sh`
+  needs no edit beyond `luna.version` (checked against the real 1.25.0
+  assets). `baselines.json` fbhash may move on timing-sensitive ROMs and
+  `audio.json` may move by a few samples: the tag samples NMI/IRQ one cycle
+  before an instruction's last bus access (where ares and Mesen2 do) instead
+  of at the boundary — delivery moves by at most one instruction. `wram.json`
+  should hold (one logic step per NMI). Re-baseline only after `luna diff`
+  says MATCH at a small offset, as for every bump.
 - **`padIsConnected` (audit B12) — the premise was wrong.** An empty port and
   an idle pad both AUTO-read `$0000`; the NMI filter hides nothing. The
   difference is past bit 16 of a manual serial read: a pad's line idles high
@@ -93,4 +106,7 @@ it:
   documents a measurement, our corpus does not state it → hypothesis, on the
   real-console checklist). Fix: crt0 clocks `$4016/$4017` once more per port
   after the auto-read and publishes a per-port flag; test with
-  `port2 = "none"`.
+  `port2 = "none"`. **Mask the read** (luna's 1.26.0 note, 2026-09-22,
+  arbitrated by fullsnes + snesdev-wiki): `$4017` bits 2-4 are tied high,
+  bits 5-7 open bus, `$4016` bits 2-7 open bus — `if (REG_JOYB)` is always
+  true; test `& 1` / `& 3`. Written into `padIsConnected()`'s header.

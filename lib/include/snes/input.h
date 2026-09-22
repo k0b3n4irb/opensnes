@@ -168,6 +168,15 @@ u16 padRaw(u8 pad);
  *          B12 of the 2026-09-20 API audit; the fix needs crt0 to clock that
  *          17th bit and publish a per-port flag, and a luna release with an
  *          unplugged port to test it against.
+ *
+ * @warning For whoever writes that fix: **mask the serial ports before
+ *          testing them.** `REG_JOYA` (`$4016`) and `REG_JOYB` (`$4017`) are
+ *          whole-byte reads; only bits 0-1 are the port's data lines. On
+ *          `$4017` bits 2-4 are tied and always read 1, bits 5-7 are open
+ *          bus; on `$4016` bits 2-7 are open bus (fullsnes, "Unused bits in
+ *          ports"; snesdev-wiki, JOYSER1: "D4-2 always 1"). So
+ *          `if (REG_JOYB)` is true on every console and every emulator —
+ *          test `REG_JOYB & 1` (data 1) or `& 3` (both lines).
  */
 u8 padIsConnected(u8 pad);
 
