@@ -57,7 +57,7 @@ that can exceed ±1.0.
 | Call | DSP command | In → Out | Use for |
 |---|---|---|---|
 | `dsp1Init()` | `$80` ×128 | — | resync at boot / after a desync |
-| `dsp1Present()` | `$00` KAT | — → 1/0 | probe the chip (bounded, never hangs) |
+| `dsp1IsPresent()` | `$00` KAT | — → 1/0 | probe the chip (bounded, never hangs) |
 | `dsp1Multiply(a,b)` | `$00` | 2 → 1 | 1.15 product |
 | `dsp1Triangle(a,r)` | `$04` | 2 → 2 | r·sin, r·cos |
 | `dsp1Rotate(a,x,y)` | `$0C` | 3 → 2 | 2D rotate |
@@ -77,7 +77,7 @@ Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
 
 ```c
 dsp1Init();
-if (dsp1Present()) {
+if (dsp1IsPresent()) {
     /* once: camera at the origin looking along +Y (azs = 0x4000).
      * Effective focal length ≈ lfe + les. */
     dsp1Parameter(0, 0, 0, 96, 256, 0, 0x4000);
@@ -188,7 +188,7 @@ luna emulates the DSP-1 at low level and needs Sony's `dsp1b.rom`
 (copyrighted, not shipped). Install it once —
 `cp dsp1b.rom ~/.config/luna/firmware/` or
 `luna state --dsp1-rom <path> <rom>` — and it persists. Without it the
-ROM boots but the chip stays inert; that is why `dsp1Present()` exists
+ROM boots but the chip stays inert; that is why `dsp1IsPresent()` exists
 and why the DSP-1 tests are firmware-gated (they SKIP, not fail, in
 CI). Target revision is DSP-1B, the bug-fixed one and the emulator
 default.

@@ -6,8 +6,13 @@
  */
 #include <snes.h>
 #include <snes/dsp1.h>
+/* dsp1Present is the deprecated name of dsp1IsPresent; it keeps its vector. */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
-volatile u16 dsp1_ok;   /* dsp1Present()                                -> 1 */
+volatile u16 dsp1_ok;   /* dsp1IsPresent()                              -> 1 */
+volatile u16 dsp1_ok_old; /* dsp1Present(), the deprecated alias        -> 1 */
 u16 r_mul;       /* dsp1Multiply(0x4000, 0x4000): 0.5 x 0.5 in 1.15     -> 0x2000 */
 u16 r_mul_sign;  /* the product is an s16: (-0.5 x 0.5) < 0                -> 1 (always 0 while it was u16) */
 u16 r_mul_neg;   /* dsp1Multiply(0xC000, 0x4000): -0.5 x 0.5            -> 0xE000 */
@@ -31,7 +36,8 @@ int main(void) {
 
     consoleInit();
     dsp1Init();
-    dsp1_ok = dsp1Present();
+    dsp1_ok = dsp1IsPresent();
+    dsp1_ok_old = dsp1Present();       /* the deprecated name: same routine, same answer */
 
     r_mul       = (u16)dsp1Multiply(0x4000, 0x4000);
     r_mul_neg   = (u16)dsp1Multiply(-0x4000, 0x4000);

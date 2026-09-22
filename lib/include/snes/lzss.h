@@ -19,7 +19,7 @@
  *
  * // Decompress to VRAM during force blank
  * REG_INIDISP = 0x80;  // Force blank (required for VRAM writes)
- * LzssDecodeVram(compressed_tiles, 0x0000);
+ * lzssDecodeVram(compressed_tiles, 0x0000);
  * REG_INIDISP = 0x0F;  // Screen on, full brightness
  * @endcode
  *
@@ -53,6 +53,11 @@
  * @note The source may be in any bank (the bank byte of the pointer is
  *       honoured since 2026-09-20). VMAIN is left at $00 on return.
  */
+void lzssDecodeVram(const u8 *source, u16 address);
+
+/** @brief The pre-2026-09-22 spelling of lzssDecodeVram() — the one
+ *         capitalised function of the SDK. Same routine. */
+OPENSNES_DEPRECATED("use lzssDecodeVram() (lower-case l, like every other function)")
 void LzssDecodeVram(const u8 *source, u16 address);
 
 #endif /* OPENSNES_LZSS_H */

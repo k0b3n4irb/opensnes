@@ -272,10 +272,14 @@ s16 dsp1Range(s16 x, s16 y, s16 z, u16 r);
  *         0 if the status port never raised RQM or the product was wrong.
  *
  * Unlike the other calls this one cannot hang on a missing chip (bounded
- * poll). Use it at boot the way sa1IsReady()/superfxIsPresent() are used —
+ * poll). Use it at boot the way sa1IsReady() / gsuIsPresent() are used —
  * e.g. to fall back to software math when running on the wrong board or on
- * an emulator without the firmware.
+ * an emulator without the firmware. (Named dsp1Present() until 2026-09-22.)
  */
+u8 dsp1IsPresent(void);
+
+/** @brief The pre-2026-09-22 name of dsp1IsPresent(). Same routine. */
+OPENSNES_DEPRECATED("use dsp1IsPresent()")
 u16 dsp1Present(void);
 
 #endif /* SNES_DSP1_H */

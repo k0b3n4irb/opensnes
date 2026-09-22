@@ -57,7 +57,7 @@
  * Must be called at the start of your program. What it does, exactly:
  * - forces blank, brightness shadow = 15
  * - detects PAL / NTSC
- * - seeds rand() from the H/V counters
+ * - seeds rngNext() from the H/V counters
  * - BG mode 1, BG1 tilemap at VRAM $0400 (32x32), BG1 tiles at $0000
  * - mosaic off, all 256 CGRAM entries cleared to black
  * - enables NMI + auto-joypad, and DROPS any armed H/V timer IRQ bits
@@ -337,29 +337,38 @@ u8 getRegion(void);
  *============================================================================*/
 
 /**
- * @brief Get random 16-bit number
+ * @brief Next pseudo-random 16-bit number
  *
- * Returns a pseudo-random number using a linear feedback shift register.
+ * A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1).
+ * Named rand() until 2026-09-22 — a libc name for a function that is not the
+ * libc one (no RAND_MAX, 1-65535, a u16), which collides the day any C
+ * library code is linked.
  *
  * @return Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero
- *         seed is replaced, see srand())
+ *         seed is replaced, see rngSeed())
  *
  * @code
- * u16 enemy_x = rand() % 256;
+ * u16 enemy_x = rngNext() % 256;
  * @endcode
  */
-u16 rand(void);
+u16 rngNext(void);
 
 /**
- * @brief Seed random number generator
+ * @brief Seed the generator (named srand() until 2026-09-22)
  *
- * @param seed Initial seed value
+ * consoleInit() seeds it from the H/V counters; reseed from a player action
+ * (`rngSeed(getFrameCount())` on START) for a different game each run.
  *
- * @code
- * // Seed from player input timing for variety
- * srand(getFrameCount());
- * @endcode
+ * @param seed Initial seed value; 0 is replaced by a fixed non-zero state
  */
+void rngSeed(u16 seed);
+
+/** @brief The pre-2026-09-22 name of rngNext(). Same generator. */
+OPENSNES_DEPRECATED("use rngNext() — this is not libc's rand()")
+u16 rand(void);
+
+/** @brief The pre-2026-09-22 name of rngSeed(). */
+OPENSNES_DEPRECATED("use rngSeed() — this is not libc's srand()")
 void srand(u16 seed);
 
 #endif /* OPENSNES_CONSOLE_H */

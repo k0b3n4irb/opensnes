@@ -79,21 +79,21 @@ int main(void) {
     colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
     colorMathSetOp(COLORMATH_ADD);
     colorMathSetHalf(1);
-    colorMathEnable(COLORMATH_BG1);   /* math applies on BG1 pixels */
+    colorMathSetLayers(COLORMATH_BG1);   /* math applies on BG1 pixels */
 
     setScreenOn();
     while (1) WaitForVBlank();
 }
 ```
 
-The non-obvious bit: **`colorMathEnable(layer)` selects which
+The non-obvious bit: **`colorMathSetLayers(layer)` selects which
 *destination* layer participates in the math, not which source.** The
 source is always determined by `colorMathSetSource` (sub screen or
 fixed colour); the layer mask says "for pixels on BG1 (or BG2, or OBJ),
 allow this pixel to be modified by math".
 
 A typical "let everything blend" setup would be
-`colorMathEnable(COLORMATH_ALL)` — but more often you restrict it to a
+`colorMathSetLayers(COLORMATH_ALL)` — but more often you restrict it to a
 specific layer to control which surfaces look transparent.
 
 ## Fade-to-black / fade-to-white
@@ -109,7 +109,7 @@ for (u8 step = 0; step <= 15; step++) {
     colorMathSetFixedColor(c, c, c);
     colorMathSetSource(COLORMATH_SRC_FIXED);
     colorMathSetOp(COLORMATH_SUB);
-    colorMathEnable(COLORMATH_ALL);
+    colorMathSetLayers(COLORMATH_ALL);
     WaitForVBlank();
 }
 ```
@@ -137,7 +137,7 @@ colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
 colorMathSetHalf(1);
 colorMathSetMaskMain(COLORMATH_INSIDE);       /* math inside window only */
-colorMathEnable(COLORMATH_BG1);
+colorMathSetLayers(COLORMATH_BG1);
 ```
 
 The four constants for `colorMathSetMaskMain(condition)`:
@@ -158,7 +158,7 @@ gate for "blend with sub-screen colour only inside the window".
 | Function | Purpose |
 |---|---|
 | `colorMathInit()` | Reset all colour-math registers to "off". Call before configuring a new scene. |
-| `colorMathEnable(layers)` | Bitmask of which layers' pixels can be modified by math (`COLORMATH_BG1`, …, `COLORMATH_OBJ`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`). |
+| `colorMathSetLayers(layers)` | Bitmask of which layers' pixels can be modified by math (`COLORMATH_BG1`, …, `COLORMATH_OBJ`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`). |
 | `colorMathDisable(layers)` | Take layers out of the per-pixel math gate. |
 | `colorMathSetOp(op)` | `COLORMATH_ADD` or `COLORMATH_SUB`. |
 | `colorMathSetHalf(half)` | 0 = don't divide result, 1 = divide by 2 (true 50 % blend). |

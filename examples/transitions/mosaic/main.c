@@ -12,7 +12,7 @@
  *
  * @par SNES Concepts
  * - Master brightness fading via setBrightness() (register $2100)
- * - Hardware mosaic filter via mosaicEnable() / mosaicFadeIn/Out() (register $2106)
+ * - Hardware mosaic filter via mosaicSetLayers() / mosaicFadeIn/Out() (register $2106)
  * - Frame-paced transitions using WaitForVBlank() timing
  *
  * @par What to Observe
@@ -62,7 +62,7 @@ void WaitForKey(void) {
  * This effect is commonly used in RPG battle transitions (e.g., Final Fantasy).
  */
 void doMosaicOut(void) {
-    mosaicEnable(MOSAIC_BG1);
+    mosaicSetLayers(MOSAIC_BG1);
     mosaicFadeOut(3);
 }
 

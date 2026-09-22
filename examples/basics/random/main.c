@@ -14,8 +14,8 @@
  * Ported from PVSnesLib "random" example by alekmaul.
  *
  * @par SNES Concepts
- * - rand() — 16-bit LFSR pseudo-random number generator
- * - srand() — seed the PRNG (use frame_count for unpredictable sequences)
+ * - rngNext() — 16-bit LFSR pseudo-random number generator
+ * - rngSeed() — seed the PRNG (use frame_count for unpredictable sequences)
  * - Text module for hex and decimal display
  * - padPressed() for single-press button detection
  *
@@ -46,7 +46,7 @@ static void on_init(void) {
     textPrintAt(5, 4, "RANDOM NUMBER GENERATOR");
     textPrintAt(3, 8, "PRESS A FOR NEW NUMBER");
     textPrintAt(3, 9, "PRESS B TO RE-SEED");
-    current_value = rand();
+    current_value = rngNext();
     WaitForVBlank();
     setScreenOn();
 }
@@ -63,12 +63,12 @@ static void on_update(void) {
     u16 pad = padPressed(0);
 
     if (pad & KEY_A) {
-        current_value = rand();
+        current_value = rngNext();
     }
 
     if (pad & KEY_B) {
-        srand(getFrameCount());
-        current_value = rand();
+        rngSeed(getFrameCount());
+        current_value = rngNext();
         textPrintAt(6, 18, "** RE-SEEDED **");
     }
 

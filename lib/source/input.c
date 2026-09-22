@@ -244,15 +244,19 @@ u16 scopeGetRawY(void) {
     return scope_shotvraw;
 }
 
-u16 scopeButtonsDown(void) {
+u16 scopeButtonsHeld(void) {
     return scope_down;
+}
+
+u16 scopeButtonsDown(void) {
+    return scope_down;          /* deprecated name of scopeButtonsHeld() */
 }
 
 u16 scopeButtonsPressed(void) {
     return scope_now;
 }
 
-u16 scopeButtonsHeld(void) {
+u16 scopeButtonsRepeat(void) {
     return scope_held;
 }
 

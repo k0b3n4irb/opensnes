@@ -26,6 +26,8 @@
 #include <snes/mode7.h>
 #include <snes/snesmod.h>
 #include <snes/interrupt.h>
+#include <snes/sa1.h>
+#include <snes/superfx.h>
 #include "soundbank.h"
 
 u16 r_hdma_init;     /* hdmaGetEnabled() after hdmaWaveInit            -> 0 */
@@ -34,6 +36,8 @@ u16 r_hdma_setup;    /* ... after hdmaGradient(5) + hdmaWindowShape(4): setup
                       * does not enable                                 -> 0x40 */
 u16 r_hdma_both;     /* ... after hdmaEnable(ch 5 | ch 4)              -> 0x70 */
 u16 r_m7_rot_sin;    /* m7_sin after mode7Rotate(90): table[64]         -> 127 */
+u16 r_chips;         /* plain LoROM: sa1IsReady | sa1Init<<1 | gsuIsPresent<<2, all 0; bit 4 = the
+                      * deprecated sa1Init agrees with sa1IsReady                     -> 0x10 */
 u16 r_nmi_calls;     /* nmiSet callback invocations over 5 frames       -> 5 */
 u16 r_nmi_after;     /* ... 3 more frames after nmiClear                -> 5 */
 u16 r_mod_pos;       /* snesmodGetPosition() as a u16: high byte clean  -> lt 0x100 */
@@ -81,6 +85,12 @@ int main(void) {
     for (i = 0; i < 5; i++) { WaitForVBlank(); snesmodProcess(); }
     nmiClear();
     r_nmi_calls = nmi_calls;
+    /* N4: the chip presence getters on a cartridge with no chip (crt0 left
+     * sa1_status / superfx_status at 0); the deprecated sa1Init keeps its
+     * vector while it ships. gsuInit is not callable here — its GSU state
+     * lives in superfx.asm, a SuperFX-only object — superfx_hello runs it. */
+    r_chips = (u16)sa1IsReady() | ((u16)sa1Init() << 1) | ((u16)gsuIsPresent() << 2)
+            | ((sa1IsReady() == sa1Init()) ? 0x10 : 0);
     nmiSet(0);      /* documented as "disable": used to install a jump to $00:0000 */
     for (i = 0; i < 3; i++) { WaitForVBlank(); snesmodProcess(); }
     r_nmi_after = nmi_calls;

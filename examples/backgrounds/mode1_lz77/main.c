@@ -5,7 +5,7 @@
  *
  * Demonstrates ROM space savings by storing tile data in LZ77-compressed
  * form and decompressing directly into VRAM at load time using
- * LzssDecodeVram(). Measured on this example's own asset: the compressed
+ * lzssDecodeVram(). Measured on this example's own asset: the compressed
  * .pic is 652 bytes and its LZ77 header declares 2592 bytes of tile data —
  * the same 2592 bytes examples/backgrounds/mode1 stores uncompressed for
  * the same image, so the ROM footprint is a quarter of the original. (An
@@ -14,12 +14,12 @@
  * stored uncompressed and loaded via standard DMA.
  *
  * The gfx4snes tool produces LZ77-compressed output when invoked with the
- * -z flag. LzssDecodeVram() handles the VRAM write timing internally.
+ * -z flag. lzssDecodeVram() handles the VRAM write timing internally.
  *
  * Based on the PVSnesLib "Mode1LZ77" example by Alekmaul.
  *
  * @par SNES Concepts
- * - LZSS/LZ77 decompression: LzssDecodeVram() streams compressed data to VRAM word-by-word
+ * - LZSS/LZ77 decompression: lzssDecodeVram() streams compressed data to VRAM word-by-word
  * - gfx4snes -z flag enables LZ77 compression for tile data at build time
  * - Mode 1 BG1 at 4bpp (16 colors) with tilemap at $0000, tiles at $4000
  * - Force blank via REG_INIDISP during decompression (slower than DMA, needs full blanking)
@@ -45,7 +45,7 @@
 
 /** @name Graphics data pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 patterns[];           /**< LZ77-compressed 4bpp tile data (decompressed to VRAM by LzssDecodeVram) */
+extern u8 patterns[];           /**< LZ77-compressed 4bpp tile data (decompressed to VRAM by lzssDecodeVram) */
 extern u8 palette[], palette_end[]; /**< Uncompressed 16-color BGR555 palette */
 extern u8 map[], map_end[];     /**< Uncompressed 32x32 tilemap entries */
 /** @} */
@@ -53,7 +53,7 @@ extern u8 map[], map_end[];     /**< Uncompressed 32x32 tilemap entries */
 /**
  * @brief Entry point -- decompress LZ77 tiles to VRAM and display Mode 1 image
  *
- * Initializes the console, forces blank, then uses LzssDecodeVram() to
+ * Initializes the console, forces blank, then uses lzssDecodeVram() to
  * stream LZ77-compressed tile data directly into VRAM at $4000. Unlike
  * DMA (which copies raw data at ~1 byte per CPU cycle), LZSS decompression
  * is CPU-driven and slower, so the screen must remain in forced blank for
@@ -73,7 +73,7 @@ int main(void) {
     setScreenOff();
 
     /* Decompress tiles directly to VRAM at $4000 (LZ77 → VRAM) */
-    LzssDecodeVram(patterns, VRAM_BG_TILES);
+    lzssDecodeVram(patterns, VRAM_BG_TILES);
 
     /* Load palette (16 colors) */
     dmaCopyCGram(palette, 0,

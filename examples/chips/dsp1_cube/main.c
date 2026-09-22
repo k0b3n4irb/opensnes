@@ -13,7 +13,7 @@
  * - DSP-1 coprocessor command interface (matrix + vector transform)
  * - Fixed-point 3D rotation offloaded from the CPU
  * - Hardware perspective projection (Parameter -> Project pipeline)
- * - dsp1Present() known-answer probe before relying on the chip
+ * - dsp1IsPresent() known-answer probe before relying on the chip
  *
  * @par What to Observe
  * - A cube of 8 dots rotating smoothly about two axes
@@ -84,7 +84,7 @@ int main(void) {
 
     dsp1Init();                 /* resync the DSP-1 before the first command */
 
-    dsp1_ok = dsp1Present();
+    dsp1_ok = dsp1IsPresent();
     if (dsp1_ok) {
         /* Camera at the origin looking along +Y (VIEW_AZS). Cx/Cy raster
          * coefficients land in dsp1_o0/o1; we recentre manually below so

@@ -9,6 +9,6 @@ ROM_NAME := LIB RUNTIME TEST FX
 USE_LIB  := 1
 USE_SNESMOD   := 1
 SOUNDBANK_SRC := $(OPENSNES)/examples/audio/snesmod_music/music/pollen8.it
-LIB_MODULES := console dma hdma mode7
+LIB_MODULES := console dma hdma mode7 sa1   # sa1: the presence getter on a plain LoROM
 CSRC   := main.c
 include $(OPENSNES)/make/common.mk

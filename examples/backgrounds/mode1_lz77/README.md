@@ -1,7 +1,7 @@
 # Mode 1 LZ77
 
 Demonstrates loading **LZ77-compressed tile data** directly into VRAM using the
-`LzssDecodeVram()` function. The compressed tile file is 8.5 KB in ROM but
+`lzssDecodeVram()` function. The compressed tile file is 8.5 KB in ROM but
 decompresses to 12.5 KB of 4bpp tile data -- a 31% size reduction. On a real
 cartridge with limited ROM space, compression like this is essential for fitting
 large tilesets, and the SNES hardware can decompress data fast enough to load
@@ -12,7 +12,7 @@ during force blank.
 ## What You'll Learn
 
 - How to use LZ77 (LZSS) compression to reduce ROM usage for tile data
-- How to decompress tiles directly to VRAM with `LzssDecodeVram()`
+- How to decompress tiles directly to VRAM with `lzssDecodeVram()`
 - The difference between compressed tiles and uncompressed tilemaps/palettes
 - How to set up a static Mode 1 background from ROM data
 
@@ -25,7 +25,7 @@ sequences with back-references (offset + length pairs). The LZSS variant used
 here stores a header with the uncompressed size, followed by flag bytes that
 indicate whether the next chunk is a literal byte or a back-reference. The
 `gfx4snes` tool generates LZ77-compressed tile data when invoked with the `-z`
-flag. The OpenSNES library provides `LzssDecodeVram()` which decompresses
+flag. The OpenSNES library provides `lzssDecodeVram()` which decompresses
 directly into VRAM via the PPU data port ($2118/$2119), avoiding the need for a
 large RAM buffer.
 
@@ -64,12 +64,12 @@ REG_INIDISP = 0x80;    /* Force blank: PPU off, VRAM writable */
 
 ### 2. Decompress Tiles to VRAM
 
-`LzssDecodeVram()` reads the compressed data from ROM and writes the
+`lzssDecodeVram()` reads the compressed data from ROM and writes the
 decompressed 4bpp tile data directly to VRAM at word address $4000. No
 intermediate RAM buffer is needed:
 
 ```c
-LzssDecodeVram(patterns, 0x4000);
+lzssDecodeVram(patterns, 0x4000);
 ```
 
 ### 3. Load Palette and Tilemap (Uncompressed)

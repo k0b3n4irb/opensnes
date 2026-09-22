@@ -35,6 +35,7 @@ CASES = [
     ("r_hdma_both",  2, 0x0070),
     # nmiSet: one callback per frame, none after nmiClear
     ("r_nmi_calls",  2, 5),
+    ("r_chips",      2, 0x10),   # no SA-1, no GSU on this LoROM; old and new names agree
     ("r_nmi_after",  2, 5),
     # mode7Rotate(90) -> angle 63 -> sine table entry 126
     ("m7_sin",       1, 126),

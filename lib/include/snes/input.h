@@ -378,12 +378,19 @@ u16 scopeGetRawX(void);
 u16 scopeGetRawY(void);
 
 /**
- * @brief Get currently held buttons.
+ * @brief Buttons currently down — the same meaning as padHeld() and
+ *        mouseButtonsHeld().
+ *
+ * Until 2026-09-22 this name returned the auto-repeat mask (now
+ * scopeButtonsRepeat()) and "currently down" was scopeButtonsDown(): the
+ * one word had the opposite meaning on the third device. A caller that
+ * wanted the repeat behaviour from this name must move to
+ * scopeButtonsRepeat().
  *
  * @return Button mask (SSC_FIRE, SSC_CURSOR, SSC_TURBO, SSC_PAUSE,
  *         SSC_OFFSCREEN, SSC_NOISE)
  */
-u16 scopeButtonsDown(void);
+u16 scopeButtonsHeld(void);
 
 /**
  * @brief Get newly pressed buttons this frame.
@@ -393,14 +400,17 @@ u16 scopeButtonsDown(void);
 u16 scopeButtonsPressed(void);
 
 /**
- * @brief Get buttons held past the hold delay threshold.
+ * @brief Buttons held past the hold delay, re-triggering every repeat
+ *        delay (see scopeSetRepeatDelay()) — a keyboard-style auto-repeat.
  *
- * After holding a button for holddelay frames, it triggers as "held".
- * Then it re-triggers every repdelay frames.
- *
- * @return Button mask of held buttons
+ * @return Button mask of auto-repeating buttons (scopeButtonsHeld() until
+ *         2026-09-22)
  */
-u16 scopeButtonsHeld(void);
+u16 scopeButtonsRepeat(void);
+
+/** @brief The pre-2026-09-22 name of scopeButtonsHeld(). Same value. */
+OPENSNES_DEPRECATED("use scopeButtonsHeld() — it means \"currently down\" like padHeld()")
+u16 scopeButtonsDown(void);
 
 /**
  * @brief Calibrate aim from a center-screen shot.

@@ -20,7 +20,7 @@ from luna_runner import firmware_dir  # noqa: E402
 STEPS = 2_000_000
 
 CASES = [
-    ("r_done",      2, 0xBEEF), ("dsp1_ok",     2, 1),
+    ("r_done",      2, 0xBEEF), ("dsp1_ok",     2, 1), ("dsp1_ok_old", 2, 1),
     ("r_mul",       2, 0x2000), ("r_mul_neg",   2, 0xE000), ("r_mul_sign", 2, 1),
     # Distance reads one low on exact lengths (measured, see dsp1.h)
     ("r_dist",      2, 12),     ("r_dist_mid",  2, 499),    ("r_dist_big", 2, 9999),

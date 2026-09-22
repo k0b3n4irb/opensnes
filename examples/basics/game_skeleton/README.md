@@ -24,7 +24,7 @@ TITLE  --START-->  PLAY  --timer hits 0-->  OVER  --START-->  TITLE
 
 It recombines rungs you've climbed: **input** drives the arrow sprite,
 a second **sprite** is the coin, a **bounding-box** test scores it, **text**
-is the HUD, and `rand()`/`srand()` scatter the coin. Motion and collision are
+is the HUD, and `rngNext()`/`rngSeed()` scatter the coin. Motion and collision are
 deliberately trivial — the lesson is the *structure*, not the mechanics.
 
 When the enum + switch starts to sprawl in a bigger game, the opt-in `scene`

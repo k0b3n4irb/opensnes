@@ -128,11 +128,11 @@ CASES = [
     ("mapoptions",     1, 3),      ("r_pad_raw",      2, 0),     # mapSetMapOptions(1WAY|BG2), bank $7E byte
     ("r_mouse",        2, 0),      ("r_mouse_sens",   2, 0),     # no mouse: the NMI never applies the request...
     ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
-    ("r_scope",        2, 0),      ("r_scope_delay",  2, 7),
+    ("r_scope",        2, 0), ("r_scope_names", 2, 1),      ("r_scope_delay",  2, 7),
     ("r_obj_grav",     2, 0x0040), ("r_obj_refresh",  2, 2),      # both objects are on screen
     ("r_obj_cobj",     2, 1), ("r_obj_cobj_h", 2, 0x0100),      ("r_obj_cobj_no",  2, 0),
     ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
-    ("r_mosaic",       2, 15),
+    ("r_mosaic",       2, 15),    ("r_cm_layers", 2, 1),
     # bank-byte chantier (2026-09-20): data outside bank $00, asymmetric values
     ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
     ("r_bank_sram",    2, 16),     # const template saved and read back intact
@@ -171,7 +171,7 @@ CASES = [
     ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
     ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
-    ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1),
+    ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1), ("r_rng", 2, 0x091A), ("r_rng_names", 2, 1),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -194,7 +194,7 @@ PPU_CASES = [
     ("tmw", 0x11),      # main mask BG1 | OBJ
     ("tsw", 0x04),      # sub mask BG3
     # coverage lot B (2026-09-19). Dotted keys step into the JSON.
-    ("mosaic", 0xF0),               # mosaicSetSize(20) clamped to 15, no layer
+    ("mosaic", 0xF1),               # mosaicSetSize(20) clamped to 15; SetLayers(BG1) replaced BG2
     ("setini", 0x06),               # OBJ interlace + overscan on, pseudo-hires set then cleared
     ("cgadsub", 0x41),              # colorMathTransparency50(BG1): half + BG1, add
     ("cgwsel", 0x12),               # colorMathSetCondition(INSIDE): bits 5-4 = 01; bit 1: sub-screen source

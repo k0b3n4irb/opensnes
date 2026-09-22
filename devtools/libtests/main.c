@@ -40,6 +40,11 @@
 #include <snes/mosaic.h>
 #include <snes/profile.h>
 #include <snes/registers.h>
+/* Deprecated names keep their vector while they ship (scopeButtonsDown,
+ * mosaicEnable, colorMathEnable, rand, srand). */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -300,6 +305,8 @@ u16 r_mouse_sens;   /* mouseSetSensitivity(0, HIGH) is deferred to the NMI, whic
                      * only talks to a mouse that is there: the getter stays 0 and
                      * the request byte (mouseRequestChangeSensitivity[0], asserted
                      * by symbol) reads 0x82 */
+extern u16 scope_down, scope_held;   /* crt0 words behind the scope getters */
+u16 r_scope_names;  /* scopeButtonsHeld reads scope_down, scopeButtonsRepeat scope_held -> 1 */
 u16 r_scope;        /* no scope: held|down|pressed|x|y|rawx|rawy -> 0 */
 u16 r_scope_delay;  /* scopeSetRepeatDelay(7): scope_repdelay    -> 7 */
 u16 r_obj_grav;     /* objInitGravity(0x40,0); objCollidMap in the air: yvel -> 0x40 */
@@ -317,6 +324,7 @@ u16 r_prof_frames;  /* profileGetFrameCount == frame_count       -> 1 */
 u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
 u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
 u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
+u16 r_cm_layers;    /* colorMathSetLayers(BG1) after (BG2): BG1 only -> 1 */
 u16 r_mosaic;       /* mosaicSetSize(20) clamps: mosaicGetSize   -> 15 */
 static const u8 lotb_vram[32] = {
     0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
@@ -353,6 +361,8 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
+u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
+u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
 u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
 u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
 u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> 1 */
@@ -606,7 +616,13 @@ static void coverage_lot_b(void) {
             | mouseButtonsHeld(0) | mouseButtonsPressed(0);
     mouseSetSensitivity(0, MOUSE_SENS_HIGH);
     r_mouse_sens = mouseGetSensitivity(0);
-    r_scope = scopeButtonsHeld() | scopeButtonsDown() | scopeButtonsPressed()
+    /* N2: which name reads which crt0 word. No scope is plugged, so the NMI
+     * leaves these words alone and the fixture can plant them. */
+    scope_down = 0x0011; scope_held = 0x0022;
+    r_scope_names = (scopeButtonsHeld() == 0x0011 && scopeButtonsRepeat() == 0x0022
+                     && scopeButtonsDown() == 0x0011) ? 1 : 0;
+    scope_down = 0; scope_held = 0;
+    r_scope = scopeButtonsHeld() | scopeButtonsRepeat() | scopeButtonsPressed()
             | scopeGetX() | scopeGetY() | scopeGetRawX() | scopeGetRawY();
     scopeSetRepeatDelay(7);
     r_scope_delay = scope_repdelay;
@@ -652,6 +668,13 @@ static void coverage_lot_b(void) {
      * fixture does not have — see the second fixture, lot C.) */
     mosaicSetSize(20);
     r_mosaic = mosaicGetSize();
+    /* N3: the "SetLayers" pair REPLACES the set — the deprecated name is the
+     * first call so it stays executed while it ships. MOSAIC ends 0xF1. */
+    mosaicEnable(MOSAIC_BG2);
+    mosaicSetLayers(MOSAIC_BG1);
+    colorMathEnable(COLORMATH_BG2);
+    colorMathSetLayers(COLORMATH_BG1);
+    r_cm_layers = cgadsub & 0x3F;
     videoSetObjInterlace(1);
     videoSetOverscan(1);
     videoSetPseudoHires(1);
@@ -875,6 +898,11 @@ static void part_objects_irq(void) {
     /* --- L2c: console region + vblank flag --- */
     r_region = getRegion();
     r_ispal  = isPAL();
+    /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
+     * generator: same seed, same first value, never 0. */
+    rngSeed(0x1234); r_rng = rngNext();
+    srand(0x1234);
+    r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
     r_true_one = (isPAL() == getRegion() && TRUE == 1) ? 1 : 0;   /* N1: one truth value */
     WaitForVBlank();
     r_invb_in = isInVBlank();

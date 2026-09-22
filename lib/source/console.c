@@ -210,7 +210,7 @@ u8 getRegion(void) {
  * Random Number Generation
  *============================================================================*/
 
-u16 rand(void) {
+u16 rngNext(void) {
     /* 16-bit LFSR (Linear Feedback Shift Register) */
     /* Polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
     u16 bit = ((rand_seed >> 0) ^ (rand_seed >> 2) ^
@@ -219,9 +219,18 @@ u16 rand(void) {
     return rand_seed;
 }
 
-void srand(u16 seed) {
+void rngSeed(u16 seed) {
     rand_seed = seed;
     if (rand_seed == 0) rand_seed = 0xACE1;  /* Avoid zero state */
+}
+
+/* The deprecated libc-looking names, kept until the next major. */
+u16 rand(void) {
+    return rngNext();
+}
+
+void srand(u16 seed) {
+    rngSeed(seed);
 }
 
 /*============================================================================

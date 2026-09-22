@@ -134,13 +134,22 @@
  *============================================================================*/
 
 /**
- * @brief Initialize and start the SA-1 coprocessor
+ * @brief Did the SA-1 boot? (crt0 starts it; this only reads the outcome)
  *
- * Writes the SA-1 reset vector, enables I-RAM/BW-RAM write access,
- * releases the SA-1 from reset, and waits for the ready flag in I-RAM.
+ * crt0 writes the SA-1 reset vector, enables I-RAM/BW-RAM access, releases
+ * the chip from reset and waits for its ready byte in I-RAM — all before
+ * main(). This function reads that outcome. Until 2026-09-22 it was named
+ * sa1Init(), whose doc claimed it did the boot itself; docs cited
+ * sa1IsReady() for years before it existed.
  *
- * @return 1 if SA-1 started successfully, 0 if timeout
+ * @return 1 if the SA-1 wrote SA1_READY_MAGIC ($A5) to I-RAM, 0 if crt0
+ *         timed out (no chip, or a boot failure — KNOWN_LIMITATIONS.md)
  */
+u8 sa1IsReady(void);
+
+/** @brief The pre-2026-09-22 name of sa1IsReady(). It never initialised
+ *         anything — crt0 does that before main(). Same value. */
+OPENSNES_DEPRECATED("use sa1IsReady() — crt0 boots the SA-1; this only reads its status")
 u8 sa1Init(void);
 
 #endif /* OPENSNES_SA1_H */

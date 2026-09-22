@@ -50,7 +50,7 @@ int main(void) {
     setMainScreen(LAYER_BG1);
 
     mosaicInit();                          /* default state */
-    mosaicEnable(MOSAIC_BG1);               /* mosaic affects BG1 */
+    mosaicSetLayers(MOSAIC_BG1);               /* mosaic affects BG1 */
     mosaicSetSize(8);                       /* 9 × 9 pixel blocks */
 
     setScreenOn();
@@ -67,7 +67,7 @@ RPG-style transition:
 
 ```c
 /* "Pixelate the screen, then load a new level, then resolve into it" */
-mosaicEnable(MOSAIC_BG_ALL);
+mosaicSetLayers(MOSAIC_BG_ALL);
 mosaicFadeOut(2);          /* 0 → 15 over ~30 frames at speed=2 */
 
 loadNewLevel();             /* swap tiles/tilemap/palette in WRAM */
@@ -90,7 +90,7 @@ If you need non-blocking animation (e.g., mosaic plus other moving
 elements), use the manual loop:
 
 ```c
-mosaicEnable(MOSAIC_BG_ALL);
+mosaicSetLayers(MOSAIC_BG_ALL);
 for (u8 size = 0; size <= 15; size++) {
     mosaicSetSize(size);
     /* … other per-frame work here … */
@@ -104,7 +104,7 @@ for (u8 size = 0; size <= 15; size++) {
 | Function | Purpose |
 |---|---|
 | `mosaicInit()` | Reset all mosaic state — disable, size 0. Call before configuring a new scene. |
-| `mosaicEnable(bgMask)` | Enable mosaic on the layers in the bitmask (`MOSAIC_BG1`, …, `MOSAIC_BG_ALL`). |
+| `mosaicSetLayers(bgMask)` | Enable mosaic on the layers in the bitmask (`MOSAIC_BG1`, …, `MOSAIC_BG_ALL`). |
 | `mosaicDisable()` | Disable mosaic on all layers. |
 | `mosaicSetSize(size)` | Set the block size, 0–15 (`MOSAIC_MIN` to `MOSAIC_MAX`). |
 | `mosaicGetSize()` | Read the current block size. |

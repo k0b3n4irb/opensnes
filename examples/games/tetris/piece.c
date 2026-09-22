@@ -100,7 +100,7 @@ s8 pieceSpawnCol(u8 type) {
 }
 
 u8 pieceRandom(void) {
-    u16 r = rand();
+    u16 r = rngNext();
     u8 val = (u8)(r % 7);
     return val + 1;
 }

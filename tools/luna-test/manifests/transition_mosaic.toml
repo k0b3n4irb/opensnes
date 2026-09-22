@@ -60,7 +60,7 @@ at_frame = 145
 current_brightness = { eq = 15, width = 1 }
 mosaic_bg_mask = { eq = 0, width = 1 }
 
-[[checkpoint]]                 # mosaicEnable(BG1) + mosaicFadeOut(3), 15 frames in
+[[checkpoint]]                 # mosaicSetLayers(BG1) + mosaicFadeOut(3), 15 frames in
 at_frame = 175
 input = "160:0x0080,164:0"
 [checkpoint.values]

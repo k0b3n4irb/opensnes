@@ -1,6 +1,6 @@
 # API naming decisions — owner's call before the v1.0 freeze
 
-Status: owner said go on N1 then N2-N6 (2026-09-22); D1-D5 still open.
+Status: N1-N6 done 2026-09-22 (owner: "go N1, puis N2 à N6"); D1-D5 open.
 Written 2026-09-21.
 Source: `.claude/notes/reviews/2026-09-20_api_audit.md` §3.2 / §3.3.
 
@@ -18,11 +18,11 @@ rename inside the repo.
 | # | Today | Proposal | Uses | Why |
 |---|---|---|---|---|
 | N1 ✅ 2026-09-22 | `TRUE` = `0xFF`; predicates return `0xFF` (`isPAL`, `isInVBlank`, `padIsConnected`), `1` (`getRegion`, `mouse*`) or a raw flag (`scopeIsConnected`) | every predicate returns 0 / 1; `TRUE` = 1 | 2 | `if (isPAL() == 1)` is false today. Two in-repo comparisons to check. Not aliasable: it is a value change, do it before the freeze or never |
-| N2 | `scopeButtonsHeld` = auto-repeat; "currently down" is `scopeButtonsDown`, while `padHeld` / `mouseButtonsHeld` = currently down | `scopeButtonsHeld` = currently down, `scopeButtonsRepeat` = the auto-repeat one; `scopeButtonsDown` deprecated | 1 | same word, opposite meaning on the third device |
-| N3 | `colorMathEnable(mask)` / `mosaicEnable(mask)` **replace** the layer set; `windowEnable` / `hdmaEnable` **OR** into it | `colorMathSetLayers` / `mosaicSetLayers` for the replacing pair, old names deprecated | 18 | "Enable" that disables what you enabled a line earlier |
-| N4 | `sa1Init()` initialises nothing (crt0 does) and returns the status; `dsp1Present()`; `gsuInit()` returns presence *and* sets defaults | `sa1IsReady()`, `dsp1IsPresent()`, `gsuIsPresent()` (+ `gsuInit` keeps the defaults part) | 14 | docs already cite a `sa1IsReady()` that does not exist |
-| N5 | `LzssDecodeVram` — the only capitalised public function | `lzssDecodeVram` | 14 | one-letter rename, alias is free |
-| N6 | `rand()` / `srand()` with non-libc signatures | `rngNext()` / `rngSeed()` (or `randU16` / `randSeed`) | 25 | a libc name that is not the libc function collides the day a user links any C library code |
+| N2 ✅ 2026-09-22 | `scopeButtonsHeld` = auto-repeat; "currently down" is `scopeButtonsDown`, while `padHeld` / `mouseButtonsHeld` = currently down | `scopeButtonsHeld` = currently down, `scopeButtonsRepeat` = the auto-repeat one; `scopeButtonsDown` deprecated | 1 | same word, opposite meaning on the third device |
+| N3 ✅ 2026-09-22 | `colorMathEnable(mask)` / `mosaicEnable(mask)` **replace** the layer set; `windowEnable` / `hdmaEnable` **OR** into it | `colorMathSetLayers` / `mosaicSetLayers` for the replacing pair, old names deprecated | 18 | "Enable" that disables what you enabled a line earlier |
+| N4 ✅ 2026-09-22 | `sa1Init()` initialises nothing (crt0 does) and returns the status; `dsp1Present()`; `gsuInit()` returns presence *and* sets defaults | `sa1IsReady()`, `dsp1IsPresent()`, `gsuIsPresent()` (+ `gsuInit` keeps the defaults part) | 14 | docs already cite a `sa1IsReady()` that does not exist |
+| N5 ✅ 2026-09-22 | `LzssDecodeVram` — the only capitalised public function | `lzssDecodeVram` | 14 | one-letter rename, alias is free |
+| N6 ✅ 2026-09-22 | `rand()` / `srand()` with non-libc signatures | `rngNext()` / `rngSeed()` (or `randU16` / `randSeed`) | 25 | a libc name that is not the libc function collides the day a user links any C library code |
 
 ## Recommended: decide, either answer is defensible
 
@@ -43,6 +43,16 @@ rename inside the repo.
   land any time; renaming the struct is a break with no alias path.
 - `dmaTransfer`'s signature, removal of the five `*Bank` functions: already
   scheduled for the breaking release (`30fe59ce`).
+
+## Deprecated aliases shipped by N2-N6 (removed at the next major)
+
+`scopeButtonsDown` → `scopeButtonsHeld` (and the old `scopeButtonsHeld`
+meaning is `scopeButtonsRepeat`); `colorMathEnable` → `colorMathSetLayers`;
+`mosaicEnable` → `mosaicSetLayers`; `sa1Init` → `sa1IsReady`; `dsp1Present`
+→ `dsp1IsPresent` (`gsuIsPresent` added, `gsuInit` kept for the defaults);
+`LzssDecodeVram` → `lzssDecodeVram`; `rand` / `srand` → `rngNext` /
+`rngSeed`. Each alias stays executed by a fixture (or, for the asm ones, is
+a second label on the same routine) so the coverage ratchet keeps 0 never.
 
 ## How a decision lands
 

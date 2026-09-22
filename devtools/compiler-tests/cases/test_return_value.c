@@ -8,7 +8,7 @@
  * Fix: Save/restore A around stack cleanup using tax/txa.
  *
  * Functions that were broken: padPressed(), padHeld(), getFrameCount(),
- * rand(), and any user function returning a value with local variables.
+ * rngNext(), and any user function returning a value with local variables.
  */
 
 typedef unsigned short u16;
