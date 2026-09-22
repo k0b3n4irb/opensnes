@@ -1914,7 +1914,9 @@ DefaultIrqHandler:
 ; Tilemap Flush (DMA tilemap buffer to VRAM)
 ;==============================================================================
 ; Called during VBlank by NMI handler when tilemap_update_flag is set.
-; DMA transfers 2048 bytes from tilemapBuffer ($7E:3000) to VRAM.
+; DMA transfers 2048 bytes from tilemapBuffer to VRAM. The buffer is a plain
+; C global, so the linker places it in the bank $00 band below $2000 and the
+; source bank below is $00 — not $7E:3000, which an older comment claimed.
 ; Uses DMA channel 1 to avoid conflicting with OAM on channel 0/7.
 ;==============================================================================
 

@@ -35,7 +35,7 @@ extern u8 oam_max_id; /* Defined in crt0.asm - highest sprite ID written */
 #define oam_buffer oamMemory
 
 /* Update oam_max_id tracking (inline to avoid function call overhead) */
-#define OAM_TRACK_MAX(id) do { if ((id) > oam_max_id) oam_max_id = (id); } while(0)
+#define OAM_TRACK_MAX(id) do { if ((id) > oam_max_id) oam_max_id = (u8)(id); } while(0)
 
 /*============================================================================
  * Initialization
@@ -83,7 +83,7 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * The C version had framesize=158 (~100+ cycles overhead per call).
  * The assembly version eliminates all frame allocation. */
 
-void oamSetX(u8 id, u16 x) {
+void oamSetX(u16 id, u16 x) {
     if (id >= MAX_SPRITES) return;
 
     u16 offset = id << 2;
@@ -91,7 +91,7 @@ void oamSetX(u8 id, u16 x) {
 
     /* Update X high bit in extension table */
     u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u8 slot = id & 0x03;
+    u16 slot = id & 0x03;
 
     if (x & 0x100) {
         oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
@@ -103,7 +103,7 @@ void oamSetX(u8 id, u16 x) {
     oam_update_flag = 1;
 }
 
-void oamSetY(u8 id, u8 y) {
+void oamSetY(u16 id, u16 y) {
     if (id >= MAX_SPRITES) return;
     /* SNES PPU quirk: OAM_Y = N renders sprite on scanlines N+1..N+8.
      * Subtract 1 so caller's y matches the sprite's rendered top scanline. */
@@ -112,12 +112,12 @@ void oamSetY(u8 id, u8 y) {
     oam_update_flag = 1;
 }
 
-void oamSetXY(u8 id, u16 x, u8 y) {
+void oamSetXY(u16 id, u16 x, u16 y) {
     oamSetX(id, x);
     oamSetY(id, y);
 }
 
-void oamSetTile(u8 id, u16 tile) {
+void oamSetTile(u16 id, u16 tile) {
     if (id >= MAX_SPRITES) return;
 
     u16 offset = id << 2;
@@ -130,7 +130,7 @@ void oamSetTile(u8 id, u16 tile) {
     oam_update_flag = 1;
 }
 
-void oamHide(u8 id) {
+void oamHide(u16 id) {
     if (id >= MAX_SPRITES) return;
     /* Y=240 + X=256 (high bit set) to hide off-screen.
      * Y=240 alone wraps for sprites > 16px tall.
@@ -140,7 +140,7 @@ void oamHide(u8 id) {
 
     /* Set X high bit in extension table */
     u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u8 slot = id & 0x03;
+    u16 slot = id & 0x03;
     oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
 
     OAM_TRACK_MAX(id);
@@ -160,7 +160,7 @@ void oamSetSize(u16 id, u16 large) {
         oam_buffer[ext_offset] &= ~OAM_SIZE_BIT(slot);
     }
 
-    OAM_TRACK_MAX((u8)id);
+    OAM_TRACK_MAX(id);
     oam_update_flag = 1;
 }
 
@@ -227,9 +227,9 @@ void oamClear(void) {
  * Metasprite Functions
  *============================================================================*/
 
-u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
+u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size) {
-    u8 id = startId;
+    u16 id = startId;
 
     while (meta->dx != metasprite_end && id < MAX_SPRITES) {
         /* Calculate sprite position */
@@ -267,10 +267,10 @@ u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
     return id;
 }
 
-u8 oamDrawMetaFlip(u8 startId, s16 x, s16 y, const MetaspriteItem *meta,
+u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,
                    u8 flipX, u8 flipY, u8 width, u8 height) {
-    u8 id = startId;
+    u16 id = startId;
 
     /* Sprite size for offset calculations (depends on size mode) */
     /* For now, assume 16x16 when large, 8x8 when small */

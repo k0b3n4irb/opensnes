@@ -196,7 +196,7 @@ int main(void) {
 
         case STATE_CALIBRATE:
             if (!fire_armed) {
-                if (!(scopeButtonsDown() & SSC_FIRE))
+                if (!(scopeButtonsHeld() & SSC_FIRE))
                     fire_armed = 1;
             } else {
                 pressed = scopeButtonsPressed();

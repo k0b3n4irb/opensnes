@@ -17,7 +17,7 @@ rom = "../../../examples/audio/pitch_mod/pitch_mod.sfc"
 frames = 150
 
 [asserts.dsp]
-"08"     = 0x02      # V0_ENVX (DSP $08; luna has no name for ENVX)
+V0_ENVX     = 0x02      # luna v1.24.0 named the read-back registers
                      # CHANGED vs leg 1 (0x00): the LFO is running
 KON      = 0x01      # CHANGED vs leg 1 (0x02): voice 0 was the last key-on
 PMON     = 0x02      # unchanged — routing was never touched

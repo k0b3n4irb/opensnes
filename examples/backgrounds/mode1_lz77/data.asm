@@ -8,7 +8,10 @@
 ;==============================================================================
 
 ; LZ77-compressed tile data
-.section ".rodata_tiles" superfree
+; ASSET_SECTION (banks 7-1, never bank $00): the compressed tiles sit where
+; the SDK now puts assets by default, which is what proves lzssDecodeVram
+; honours the bank byte of the pointer it is given (it used to read bank $00).
+ASSET_SECTION "lz77_tiles"
 
 patterns:
 .incbin "res/opensnes.pic"

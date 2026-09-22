@@ -66,7 +66,7 @@ extern u16 pad_keys[];
 /**
  * @brief Global frame counter incremented by the NMI handler.
  *
- * Used to seed srand() at game start -- the player's variable-length
+ * Used to seed rngSeed() at game start -- the player's variable-length
  * wait on the title screen produces a different seed each game, ensuring
  * different piece sequences.
  */
@@ -405,7 +405,7 @@ static void startGame(void) {
     prev_pad = 0;
     flash_timer = 0;
 
-    srand(frame_count);  /* seed RNG from frame count — varies with player timing on title screen */
+    rngSeed(frame_count);  /* seed RNG from frame count — varies with player timing on title screen */
     next_type = pieceRandom();
 
     /* Start music */

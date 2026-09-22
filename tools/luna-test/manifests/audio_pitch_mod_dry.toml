@@ -22,7 +22,7 @@ PMON     = 0x02      # voice 1's pitch is multiplied by voice 0's output
 V0_PITCHL = 0x03     # LFO rate $0003
 V0_PITCHH = 0x00
 V0_GAIN  = 0x02      # LFO depth (direct GAIN, not ADSR)
-"08"     = 0x00      # V0_ENVX (DSP $08; luna has no name for ENVX): the
+V0_ENVX  = 0x00      # luna v1.24.0 named the read-back registers: the
                      # modulator is silent — no vibrato yet
 KON      = 0x02      # only the cello has been bowed so far
 V1_SRCN  = 0x01      # the cello sample, from the uploaded bank

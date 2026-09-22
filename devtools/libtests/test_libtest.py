@@ -34,7 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
-from lib import find_luna, assert_mem  # noqa: E402
+from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
@@ -104,9 +104,74 @@ CASES = [
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
+    # object engine (2026-09-18): the workspace is owner-tracked, so a callback
+    # that peeks at another object no longer overwrites itself with it; and a
+    # type with no registered callback is skipped instead of jumping to $00:0000
+    ("r_obj_alive", 2, 0xA11E),   # objUpdateAll returned at all
+    ("r_obj_calls", 2, 1),        # the registered callback ran once
+    ("r_obj_type",  2, 0),        # the peeker is still itself (was: a copy, type 1)
+    ("r_obj_edit",  2, 0x1234),   # its pre-peek edit survived
+    ("r_obj_other", 2, 0x0BAD),   # the object it looked at is untouched
+    ("r_obj_fr_off", 2, 0x0300),  # objCollidMap1D: no friction unless opted in
+    ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
+    ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
+    ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
+    # coverage lot B (2026-09-19): the public functions nothing executed
+    ("r_fix_abs_n",    2, 0x0300), ("r_fix_abs_p",    2, 0x0200),
+    ("r_fix_clamp_lo", 2, 0xFF00), ("r_fix_clamp_hi", 2, 0x0100), ("r_fix_clamp_in", 2, 0x0080),
+    ("r_fix_sqrt",     2, 0x0400),
+    # atan2_8: four axes, the diagonal, and a mid-LUT value (26.57 deg = 18.9 -> 19)
+    ("r_atan_e", 2, 0), ("r_atan_s", 2, 64), ("r_atan_w", 2, 128), ("r_atan_n", 2, 192),
+    ("r_atan_se", 2, 32), ("r_atan_lut", 2, 19),
+    ("r_bg_sx",        2, 300),    ("r_bg_sy",        2, 77),     ("r_bg_init",      2, 0),
+    ("r_text_x",       2, 2),      ("r_text_flush",   2, 1),      ("r_frame_reset",  2, 0),
+    ("mapoptions",     1, 3),      ("r_pad_raw",      2, 0),     # mapSetMapOptions(1WAY|BG2), bank $7E byte
+    ("r_mouse",        2, 0),      ("r_mouse_sens",   2, 0),     # no mouse: the NMI never applies the request...
+    ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
+    ("r_scope",        2, 0), ("r_scope_names", 2, 1),      ("r_scope_delay",  2, 7),
+    ("r_obj_grav",     2, 0x0040), ("r_obj_refresh",  2, 2),      # both objects are on screen
+    ("r_obj_cobj",     2, 1), ("r_obj_cobj_h", 2, 0x0100),      ("r_obj_cobj_no",  2, 0),
+    ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
+    ("r_mosaic",       2, 15),    ("r_cm_layers", 2, 1),
+    # bank-byte chantier (2026-09-20): data outside bank $00, asymmetric values
+    ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
+    ("r_bank_sram",    2, 16),     # const template saved and read back intact
+    ("r_bank_ck",      2, 0x10),   # sramChecksum read the ROM bytes, not WRAM
+    # sram bounds: capacity from the ROM header's SRAMSIZE byte (8 KB here); a refusal copies nothing
+    ("r_sram_edge", 2, 0), ("r_sram_range", 2, 1), ("r_sram_kept", 2, 8),
+    ("r_sram_ldrange", 2, 0x5A01), ("r_sram_wrap", 2, 1),
+    # const Rect in an asset bank, read far through the now-const parameters
+    ("r_crect_hit", 2, 1), ("r_crect_miss", 2, 0), ("r_crect_cx", 2, 18), ("r_crect_cy", 2, 24),
+    ("r_crect_bk", 2, 1),          # premise: the const Rect is outside bank $00
+    # functions that could not report failure (API audit 3.5)
+    ("r_getptr_live", 2, 2), ("r_getptr_stale", 2, 0),
+    ("r_scene_push", 2, 8), ("r_scene_full", 2, 0), ("r_scene_pop", 2, 1),
+    ("r_f32div_zero",  2, 0),      # fix32Div by zero: 0 like the rest of the family (was 0xFFFFFFFF)
+    ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
+    ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
+    # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
+    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
+    ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
+    ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
+    # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256
+    ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
+    # coverage lot C (2026-09-20)
+    ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
+    ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
+    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xB500),
+    ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size", 1, 16),
+    # fixed32: the asm sine and the C expression the header says is miscompiled
+    ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
+    ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
+    # input: an idle connected pad must read as connected. padIsConnected()
+    # rejected $0000 as well as $FFFF until 2026-09-18, so a pad with nothing
+    # pressed — almost every frame — reported unplugged.
+    ("r_pad_conn",  2, 1),      # TRUE = 1 since 2026-09-22 (was 0xFF)
+    ("r_pad_idle",  2, 0),      # nothing pressed
+    ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
+    ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
-    # The getters return TRUE, which snes/types.h defines as 0xFF (not 1).
-    ("r_invb_in", 2, 0xFF), ("r_invb_out", 2, 0),
+    ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1), ("r_rng", 2, 0x091A), ("r_rng_names", 2, 1),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -114,7 +179,7 @@ CASES = [
 # `--region pal` (luna --force-region). Same ROM, same asserts otherwise.
 REGION_CASES = {
     "ntsc": [("r_region", 2, 0), ("r_ispal", 2, 0)],
-    "pal":  [("r_region", 2, 1), ("r_ispal", 2, 0xFF)],   # isPAL() returns TRUE = 0xFF
+    "pal":  [("r_region", 2, 1), ("r_ispal", 2, 1)],
 }
 
 # Window module: the PPU registers luna reports in `luna state` JSON (ppu.*)
@@ -128,6 +193,34 @@ PPU_CASES = [
     ("wobjlog", 0x01),  # OBJ AND
     ("tmw", 0x11),      # main mask BG1 | OBJ
     ("tsw", 0x04),      # sub mask BG3
+    # coverage lot B (2026-09-19). Dotted keys step into the JSON.
+    ("mosaic", 0xF1),               # mosaicSetSize(20) clamped to 15; SetLayers(BG1) replaced BG2
+    ("setini", 0x06),               # OBJ interlace + overscan on, pseudo-hires set then cleared
+    ("cgadsub", 0x41),              # colorMathTransparency50(BG1): half + BG1, add
+    ("cgwsel", 0x12),               # colorMathSetCondition(INSIDE): bits 5-4 = 01; bit 1: sub-screen source
+    ("coldata_r", 10), ("coldata_g", 10), ("coldata_b", 20),   # SetBrightness(10) then SetChannel(BLUE, 20)
+    ("bgs.1.h_scroll", 300), ("bgs.1.v_scroll", 76),   # bgSetScrollX/Y(1, 300, 77): VOFS = y - 1
+    ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGramBank: red, green
+    ("cgram.254", 0x7C00), ("cgram.255", 0x7FFF),      # dmaTransfer to CGDATA: blue, white
+    ("oam_full.14", 0xAB), ("oam_full.15", 0x01),       # oamSetTile(3, 0x1AB) + dmaCopyOam
+    # bank-byte chantier: dmaCopyOam from a const (ROM) table
+    ("oam_full.0", 0x4D), ("oam_full.1", 0x58), ("oam_full.2", 0x5A), ("oam_full.3", 0x31),
+    ("oam_full.4", 0x21), ("oam_full.5", 0x43), ("oam_full.6", 0x65), ("oam_full.7", 0x07),
+    # lot C: oamDrawMetaFlip(10, x=100, y=50, flipX, box 16): item dx=0 -> 108, dx=8 -> 100;
+    # bit 6 of the attribute byte is the H-flip the mirror set
+    ("oam_full.40", 108), ("oam_full.41", 49), ("oam_full.44", 100), ("oam_full.45", 49),   # OAM Y = y - 1
+    ("oam_full.43", 0x40),
+]
+
+# VRAM bytes written by bgInitTileSetData (16 at word 0x6000) and
+# dmaCopyVramBank (16 more at word 0x6008): the fixture's lotb_vram pattern.
+VRAM_CASES = [
+    (0xC000, bytes([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+                    0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
+                    0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90,
+                    0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02])),
+    # dmaFillVRAM(0x1234, word 0x6100, 8 bytes): a word fill (was 34 34 34 34 ...)
+    (0xC200, bytes([0x34, 0x12] * 4)),
 ]
 
 
@@ -181,13 +274,27 @@ def run(region: str = "ntsc") -> int:
             fails += 1
     ppu = ppu_state(luna, region)
     for field, want in PPU_CASES:
-        got = ppu.get(field)
+        got = ppu
+        for step in field.split("."):
+            try:
+                got = got[int(step)] if isinstance(got, list) else got.get(step)
+            except (IndexError, ValueError, AttributeError):
+                got = None
+                break
         if got == want:
             print(f"  PASS  ppu.{field} == {want}")
         else:
             print(f"  FAIL  ppu.{field} == {want}  [luna reports {got}]")
             fails += 1
-    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES)
+    vram = dump_vram(luna, ROM, STEPS)
+    for addr, want in VRAM_CASES:
+        got = vram[addr:addr + len(want)]
+        if got == want:
+            print(f"  PASS  vram[{addr:#06x}..+{len(want)}] == pattern")
+        else:
+            print(f"  FAIL  vram[{addr:#06x}..+{len(want)}] == pattern  [got {got.hex()}]")
+            fails += 1
+    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES) + len(VRAM_CASES)
     print(f"\nLib runtime assertions ({region}): {total - fails}/{total} ok")
     return 1 if fails else 0
 

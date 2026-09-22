@@ -372,7 +372,14 @@ mapLoad:
     and #$FFFE
     sta.l maprowsize
 
+    ; Clamp like the height below (2026-09-20): a map narrower than the
+    ; screen gave maxx_pos = $FFxx, and mapUpdateCamera's unsigned compare
+    ; then let x_pos run off the right edge of the map.
     lda.l mapwidth
+    cmp.w #256
+    bcs _mini0
+    lda #256
+_mini0:
     sec
     sbc #256
     sta.l maxx_pos

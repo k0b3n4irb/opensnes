@@ -31,11 +31,18 @@
  * - 0 = 0°, 64 = 90°, 128 = 180°, 192 = 270°
  *
  * @code
- * u8 angle = 64;                       // 90 degrees
- * fixed dx = fixSin(angle);            // 1.0 (256)
- * fixed dy = fixCos(angle);            // 0.0 (0)
+ * u8 angle = 64;                       // 90 degrees: +Y, down the screen
+ * fixed dx = fixCos(angle);            // 0.0 (0)
+ * fixed dy = fixSin(angle);            // 1.0 (256)
  * player_x = player_x + fixMul(speed, dx);
+ * player_y = player_y + fixMul(speed, dy);
  * @endcode
+ *
+ * One convention everywhere: 0 points along +X, angles grow toward +Y
+ * (clockwise on a screen), so **dx = fixCos, dy = fixSin** — the convention
+ * atan2_8() returns and examples/basics/aim_target uses. (This example had
+ * the two swapped until 2026-09-20: feeding it an atan2_8() angle fired 90
+ * degrees off, mirrored.)
  *
  * @author OpenSNES Team
  * @copyright MIT License
@@ -76,9 +83,11 @@ typedef s16 fixed;
 #define FIX(x) ((fixed)(s16)((u16)(x) << 8))
 
 /**
- * @brief Convert fixed-point to integer (truncate)
+ * @brief Convert fixed-point to integer (floor)
  * @param x Fixed-point value
- * @return Integer part (truncated toward zero)
+ * @return Integer part, rounded toward MINUS infinity: the shift is
+ *         arithmetic, so UNFIX(-0.5) is -1, not 0. (Documented as "truncated
+ *         toward zero" until 2026-09-20.)
  *
  * @code
  * fixed pos = FIX(50) + 128;  // 50.5
@@ -211,9 +220,11 @@ inline fixed fixCos(u8 angle) {
 /**
  * @brief Safe 16-bit multiplication
  *
- * Multiplies two 16-bit values safely. Use this instead of the
- * compiler's * operator for important calculations, as the compiler's
- * runtime multiplication can have bugs.
+ * A shift-and-add multiply in C. The compiler's `*` is correct — and
+ * faster, and safe in an NMI callback — so there is no reason left to prefer
+ * this (the header told users the opposite until 2026-09-20; see fixMul's
+ * note below, which has said the operators are correct since #113). Kept for
+ * source compatibility; a candidate for removal at the API freeze.
  *
  * @param a First operand
  * @param b Second operand
@@ -280,7 +291,10 @@ fixed fixClamp(fixed x, fixed min, fixed max);
  *
  * @param a Start value
  * @param b End value
- * @param t Interpolation factor (0-256 = 0.0-1.0)
+ * @param t Interpolation factor, 0-256 = 0.0-1.0. 256 and above return `b`
+ *          exactly. (`t` was a `u8` until 2026-09-21, which made the
+ *          documented 1.0 unreachable: 256 was truncated to 0 and returned `a`.
+ *          Same stack slot — no ABI change.)
  * @return Interpolated value
  *
  * @code
@@ -289,7 +303,7 @@ fixed fixClamp(fixed x, fixed min, fixed max);
  * fixed mid = fixLerp(start, end, 128);  // 50.0
  * @endcode
  */
-fixed fixLerp(fixed a, fixed b, u8 t);
+fixed fixLerp(fixed a, fixed b, u16 t);
 
 /*============================================================================
  * Square Root and Inverse Trigonometry
@@ -323,12 +337,10 @@ u16 sqrt16(u16 n);
  * @brief Square root in 8.8 fixed-point
  *
  * Computes the square root of an 8.8 fixed-point value. Internally
- * delegates to `sqrt16(x)` and shifts the result by 4 bits to
- * recover 5 bits of fractional precision in the answer (the
- * remaining 3 bits are zero — this is a lib-side limit, not a
- * mathematical one; precision can be raised once the QBE 32-bit
- * codegen lands — see chantier A7 in the structural-defects
- * catalogue).
+ * delegates to `sqrt16(x)` and shifts the result left by 4, so the answer
+ * carries FOUR fractional bits (steps of 1/16); the low four are always
+ * zero. A lib-side limit, not a mathematical one — 32-bit arithmetic exists
+ * now (fixed32.h), so the precision could be raised; it has not been.
  *
  * @param x Input value in 8.8 fixed-point. Must be ≥ 0; negative
  *          inputs return 0.

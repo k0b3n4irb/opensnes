@@ -29,7 +29,7 @@
  * REG_TM = TM_BG1 | TM_BG2;   // Both on main screen
  * REG_TS = TM_BG2;            // BG2 also on sub screen
  *
- * colorMathEnable(COLORMATH_BG2);  // Apply math to BG2
+ * colorMathSetLayers(COLORMATH_BG2);  // Apply math to BG2
  * colorMathSetOp(COLORMATH_ADD);   // Add mode
  * colorMathSetHalf(1);              // Divide by 2 = 50%
  * colorMathSetSource(COLORMATH_SRC_SUBSCREEN);  // Blend with sub screen
@@ -40,7 +40,7 @@
  * colorMathSetFixedColor(0, 0, 0);  // Black
  * colorMathSetSource(COLORMATH_SRC_FIXED);
  * colorMathSetOp(COLORMATH_SUB);    // Subtract = darken
- * colorMathEnable(COLORMATH_ALL);   // Apply to all layers
+ * colorMathSetLayers(COLORMATH_ALL);   // Apply to all layers
  * @endcode
  *
  * @author OpenSNES Team
@@ -54,7 +54,7 @@
 #include <snes/registers.h>  /* REG_CGWSEL / REG_CGADSUB / REG_COLDATA */
 
 /*============================================================================
- * Layer Masks (for colorMathEnable)
+ * Layer Masks (for colorMathSetLayers)
  *============================================================================*/
 
 /** @brief Apply color math to BG1 */
@@ -155,18 +155,26 @@ inline void colorMathInit(void) {
 }
 
 /**
- * @brief Enable color math for specified layers
+ * @brief Set the layers colour math applies to — REPLACES the previous set
  *
- * Enables color math blending for the given layers.
- * Inlined for zero-call-overhead access (wave 4 retrofit).
+ * `colorMathSetLayers(COLORMATH_BG1)` after `colorMathSetLayers(COLORMATH_BG2)`
+ * leaves only BG1 blended. This is the function colorMathEnable() was until
+ * 2026-09-22; it is renamed because "Enable" reads as additive — windowEnable()
+ * IS additive — and the old name silently undid the previous call.
+ * Inlined for zero-call-overhead access.
  *
- * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, etc.)
+ * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, ...; 0 disables)
  */
-inline void colorMathEnable(u8 layers) {
+inline void colorMathSetLayers(u8 layers) {
     /* Set layer enable bits (bits 0-5 of CGADSUB) */
     cgadsub = (cgadsub & 0xC0) | (layers & 0x3F);
     REG_CGADSUB = cgadsub;
 }
+
+/** @brief The pre-2026-09-22 name of colorMathSetLayers(). Same behaviour:
+ *         it REPLACES the layer set. */
+OPENSNES_DEPRECATED("use colorMathSetLayers() — this call replaces the layer set, it does not add to it")
+void colorMathEnable(u8 layers);
 
 /**
  * @brief Disable all color math

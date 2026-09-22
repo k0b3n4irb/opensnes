@@ -131,6 +131,9 @@ _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 # SRAM/SNESMOD/SuperFX auto-add modules (duplicates are harmless — the
 # dependency resolver below runs $(sort) which dedups)
 LIB_MODULES ?= console
+ifeq ($(USE_SRAM)$(USE_SA1),11)
+$(error USE_SRAM=1 with USE_SA1=1 is not supported: on SA-1 the save memory is BW-RAM ($$40-$$4F), which the SNES CPU can only write after enabling SBWE, and the sram module does not do that. See lib/source/sram.asm and KNOWN_LIMITATIONS.md)
+endif
 ifeq ($(USE_SRAM),1)
 LIB_MODULES += sram
 endif
@@ -337,7 +340,7 @@ endef
 # specific objects ignore — the ABI requires them).
 CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
-	-Wno-unused-parameter
+	-Wno-unused-parameter -Wno-error=deprecated-declarations
 
 # C sources → objects
 # Step 1: clang syntax check (cproc has no built-in -W flags so a sibling

@@ -2,6 +2,151 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.44.0] — 2026-09-22
+
+The audit release. Every public function of the SDK is now executed by a
+test — 311 of 311, from 167 "never executed" at the start of the cycle —
+and an API audit read all 36 headers against their implementations before
+the v1.0 freeze. What the two found is the release: the audit's 20 verified
+defects, 19 of them fixed here, and a dozen more the tests turned up —
+including two silent miscompilations and an arctangent table that was a
+sine. Plus a naming pass that gives one meaning to each word while the
+aliases are still free, and one breaking change, `TRUE`, because a value
+cannot be aliased.
+
+### Breaking
+- **`TRUE` is 1, and every predicate returns 0 or 1.** `TRUE` was `0xFF`, a
+  PVSnesLib habit, and three functions returned it (`isPAL`, `isInVBlank`,
+  `padIsConnected`) while every other predicate returned 1 — so
+  `isPAL() == 1` was false on a PAL console and `x == TRUE` failed on the
+  majority. `getRegion()` and `isPAL()` are now the same value. Code that
+  compares with a literal `0xFF`, or uses `TRUE` as a mask, must change;
+  `if (pred())` and `!pred()` — the documented idiom — never noticed
+  either value.
+
+### Deprecated
+Thirteen functions and one macro keep working with a compile-time warning
+and are removed at the next major. Renamed so that one word means one
+thing:
+
+| Deprecated | Use instead | Why |
+|---|---|---|
+| `scopeButtonsDown` | `scopeButtonsHeld` | "Held" meant the opposite of `padHeld` on the scope; the auto-repeat mask is now `scopeButtonsRepeat` |
+| `colorMathEnable` | `colorMathSetLayers` | it REPLACES the layer set — "Enable" reads as additive, and `windowEnable` is |
+| `mosaicEnable` | `mosaicSetLayers` | same |
+| `sa1Init` | `sa1IsReady` | it never initialised anything; crt0 boots the SA-1 before `main()` |
+| `dsp1Present` | `dsp1IsPresent` | consistency with the other chip getters (`gsuIsPresent` is new) |
+| `LzssDecodeVram` | `lzssDecodeVram` | the one capitalised function of the SDK |
+| `rand` / `srand` | `rngNext` / `rngSeed` | libc names for a generator that is not libc's |
+| `nmiSetBank`, `irqSetBank`, `dmaCopyVramBank`, `dmaCopyCGramBank`, `hdmaSetupBank`, `OAM_SET_GFX_BANK` | `nmiSet`, `irqSet`, `dmaCopyVram`, `dmaCopyCGram`, `hdmaSetup`, `OAM_SET_GFX` | the plain forms read the bank from the pointer (chantier A6); the explicit-bank forms predate it |
+
+`scopeButtonsHeld` is the one behaviour change: it now means "currently
+down". A caller that wanted the auto-repeat mask must move to
+`scopeButtonsRepeat`.
+
+### Fixed
+- fix(compiler): **on HiROM, every C pointer to a RAM variable carried a
+  ROM bank.** HiROM units assemble under `.BASE $C0` and wlalink added
+  that base to a RAM label's bank, so `pea.w :var` pushed `$C0` — ROM on
+  HiROM. Any routine honouring the bank byte of a pointer it was handed
+  read or wrote ROM instead of work RAM. LoROM was unaffected. Fixed in
+  the wlalink fork; found by the first HiROM library fixture.
+- fix(compiler): **the address of a local variable had an undefined
+  bank.** `&local` is a far pointer, but the backend stored only its
+  16-bit stack address and left the bank half holding whatever the stack
+  had in that slot. Harmless for a bank-blind dereference, wrong for every
+  reader that honours it — a `const T *` parameter, a library routine
+  reading the bank byte. It survived because an unused stack slot reads 0
+  after power-on, which is the stack's own bank.
+- fix(lib): **`atan2_8()`'s lookup table was not an arctangent** — it
+  tracked a sine, up to 7° off mid-octant. The axes and the diagonal,
+  which every test had checked, were right. Regenerated; one mid-table
+  vector found it.
+- fix(lib): **`sramSave`/`sramLoad` used the LoROM address on every
+  build.** HiROM battery RAM is at `$30-$3F:6000`, not `$70:0000`, so a
+  HiROM save went to open bus and loaded garbage.
+- fix(lib): **`snesmodFlush` crashed whenever it had something to flush**
+  — it reached the SPC message pump through a `jsr` into a routine that
+  ends in `plb`/`plp`/`rtl`.
+- fix(lib): **five functions were handed a far pointer and dropped its
+  bank** (`irqSet`, the LZSS decoder, `dmaCopyOam`, the SRAM block copies,
+  `OAM_SET_GFX`) — a table outside bank $00 was read from the wrong one.
+- fix(lib): **three argument bugs that symmetric test inputs were
+  hiding** — `snesmodFadeVolume` read the wrong stack slot,
+  `gsuSetupHdmaBlanking` had two arguments swapped, `hdmaColorGradient`
+  emitted a malformed table — plus `snesmodPlayEffect` not masking its
+  packed fields. Equal or zero values for distinct parameters is why they
+  had survived; every new vector uses distinct ones.
+- fix(lib): **`objCollidObj` returned garbage on its first call**, and the
+  object workspace wrote back list links over `onscreen`. Plus a pool leak
+  in `objKillAll`, unguarded null callbacks, and the documented scene-swap
+  idiom leaking a stack slot per lap.
+- fix(lib): **the five object routines that take a slot index now accept a
+  handle.** They shifted the argument with no mask, so the natural call —
+  with the handle `objNew()` returned — put the id byte into the buffer
+  offset and worked on memory past the pool.
+- fix(lib): **a `u8` sprite id of 256 silently overwrote sprite 0.** The
+  truncation happened before the range check could refuse it. Sprite ids
+  and coordinates are `u16` everywhere now (same stack slot, no ABI
+  change), `fixLerp`'s `t` is a `u16` so the documented 1.0 is reachable,
+  and `dsp1Multiply` is signed.
+- fix(lib): nine more verified defects — a two-pass `dmaFillVRAM`,
+  `nmiSet(NULL)`, `fix32Div` by zero, a `mapLoad` clamp, an
+  `hdmaWaveH` clamp, an `oamMetaDrawDyn` bound, the profile module, the
+  SA-1 CCNT constants.
+- fix(lib,docs): two DSP-1 commands contradicted their own documentation,
+  which running the real firmware settled: `Distance` reads one low on
+  exact lengths ((3,4,12) gives 12), and `Range` returns the squared
+  difference shifted right by 15, not the raw difference. No hardware
+  reference we could find states either.
+
+### Added
+- feat(lib): **the audio and SRAM APIs report their failures.**
+  `audioInit` and eleven setters return their `AUDIO_*` code instead of
+  dropping it; the five SRAM copy functions return `SRAM_OK`,
+  `SRAM_ERR_RANGE` or `SRAM_ERR_NO_SRAM` and a refused transfer copies
+  nothing — the capacity is read from the ROM's own header.
+- feat(lib): **`audioPlaySampleOn(voice, ...)`** — the caller picks the
+  voice, so an envelope can be aimed before key-on and a long sound cannot
+  be stolen by the eighth effect. `AUDIO_VOICE_AUTO` finally has a
+  function to be passed to.
+- feat(lib): **`sceneReplace()`** — the documented `scenePop(); scenePush()`
+  swap cannot replace the bottom scene, so a title → game → title cycle
+  leaked a slot per lap until the stack silently dropped pushes.
+  `scenePush` / `scenePop` now return 1 or 0, and `objGetPointer` returns
+  the slot instead of reporting failure through a global.
+- feat(lib): **`const` on every read-only pointer parameter** — on this
+  target that is correctness, not style: const data lives in the asset
+  banks and only a const-qualified load is a far read.
+- feat(docs,build): **a hardware verification protocol** — 22 ROMs, one
+  check each, and `make hardware-kit` to collect them for a console
+  session. Claims that no reference settles are marked as such.
+- feat(luna-test): **ROM coverage is measured, not assumed** — each
+  manifest's input script is replayed through `luna profile --pc-set` and
+  the library fixtures are counted. 311 of 311 public functions execute;
+  the ratchet fails a new one.
+- feat(devtools): **four library fixtures, 282 runtime assertions** —
+  the main ROM, a second for HDMA/Mode 7/SNESMOD, a firmware-gated DSP-1
+  one, and a HiROM one that proved the pointer-bank defect above.
+
+### Changed
+- chore(devtools,ci): Dependabot's action bumps applied, targeting
+  `develop`.
+- docs: the header documentation that described designs which no longer
+  exist — twenty headers and `compiler/ABI.md` — now describes the tree as
+  it is. The "coordinates MUST live in an `s16` struct" warning on
+  `oamSet` is gone: it described a compiler defect of early 2026, and the
+  `move_sprite` manifest pins plain-`u16` motion to the pixel.
+
+### Known
+- `padIsConnected()` answers 1 for an empty port. Auto-joypad reading
+  cannot distinguish an empty port from an idle pad; the difference is
+  past bit 16 of a manual serial read. The fix needs a luna release that
+  can model an unplugged port.
+- The `superfx` module cannot be linked into a LoROM ROM: its object
+  force-emits `gsuInit`, which references state defined in a SuperFX-only
+  object. It is auto-added under `USE_SUPERFX=1`, where it works.
+
 ## [0.43.0] — 2026-09-17
 
 The instrument release. The 2026-09-11 gaps review's whole prioritised

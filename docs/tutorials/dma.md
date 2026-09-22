@@ -214,11 +214,11 @@ setScreenOn();
 | Function | What it does |
 |---|---|
 | `dmaCopyVram(src, vramAddr, size)` | Copy bytes from WRAM/ROM to VRAM. The bank is taken from `src`'s own bank byte, so the source may live in any bank. Mode 1 (write `$2118`/`$2119`). The workhorse. |
-| `dmaCopyVramBank(src, bank, vramAddr, size)` | Same, for when the address and bank are held separately (16-bit offset + explicit bank byte). |
+| `dmaCopyVramBank(src, bank, vramAddr, size)` | **Deprecated** (2026-09-20). Predates far pointers: it ignores the bank of `src` and uses `bank`. Use `dmaCopyVram`. |
 | `dmaFillVRAM(value, dest, size)` | Fill a VRAM region with a fixed 16-bit value (fixed-source mode). Used to clear tilemaps. |
 | `dmaClearVRAM(void)` | Zero all 64 KB of VRAM. Boot-time use only (force blank required). |
 | `dmaCopyCGram(src, startColor, size)` | Copy palette data to CGRAM. Mode 0 (write `$2122`). |
-| `dmaCopyCGramBank(src, bank, startColor, size)` | Same, with explicit source bank. |
+| `dmaCopyCGramBank(src, bank, startColor, size)` | **Deprecated** (2026-09-20). Use `dmaCopyCGram`. |
 | `dmaCopyOam(src, size)` | One-shot OAM transfer, write `$2104`. Mostly used at init — the NMI handler does the per-frame OAM DMA automatically. |
 | `dmaCopyVramMode7(tilemap, mapSize, tiles, tilesSize)` | Two-pass interleaved DMA for Mode 7's split low-byte/high-byte VRAM layout. See the [Mode 7 tutorial](mode7.md). |
 | `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)` | Generic DMA — pick your own channel, mode, destination register. Use when the named helpers don't fit (e.g., transfers to `$2180` WRAM data port, or experimental modes). |
@@ -271,8 +271,8 @@ pattern — `KNOWN_LIMITATIONS.md` documents the canonical form).
 own bank byte, so an asset the linker placed in bank `$01` or higher
 (because bank `$00`'s 32 KB ROM filled up — see
 `.claude/rules/bank0_budget.md`) transfers correctly with no extra
-work. `dmaCopyVramBank()` remains for the rarer case where the address
-and bank are held separately.
+work. `dmaCopyVramBank()` is deprecated (2026-09-20): it predates far
+pointers, ignores the bank of `src` and uses the explicit one.
 
 ### 🟠 Channel 0 vs HDMA on channel 0
 

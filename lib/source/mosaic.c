@@ -30,7 +30,7 @@ u8 mosaic_bg_mask;
  * Internal Helper
  *============================================================================*/
 
-/* Marked `static inline` so the 5 intra-TU callers (mosaicEnable etc.)
+/* Marked `static inline` so the 5 intra-TU callers (mosaicSetLayers etc.)
  * splice the 1-line body directly instead of jsl'ing a wrapper. The
  * deferred-emit pass then drops the unused standalone in the .asm. */
 static inline void mosaic_update_register(void) {
@@ -45,9 +45,15 @@ static inline void mosaic_update_register(void) {
  * via address-taking so non-inlining callers (fn-ptr, etc.) link. */
 void (*const __opensnes_force_emit_mosaicInit)(void) = mosaicInit;
 
-void mosaicEnable(u8 bgMask) {
+void mosaicSetLayers(u8 bgMask) {
     mosaic_bg_mask = bgMask & 0x0F;
     mosaic_update_register();
+}
+
+/* The deprecated name, out of line (a definition of a deprecated symbol does
+ * not warn; a use would, and the lib build is strict). */
+void mosaicEnable(u8 bgMask) {
+    mosaicSetLayers(bgMask);
 }
 
 void mosaicDisable(void) {

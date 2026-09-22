@@ -1,0 +1,4 @@
+# Each alloc'd local whose address escapes gets its bank word zeroed (bank $00:
+# the stack) right after the address is stored — two locals, two pairs.
+in two_locals: present tsa\n\tclc\n\tadc\.w #\d+\n\tsta \d+,s\n\tlda\.w #0\n\tsta \d+,s
+count 2 lda\.w #0\n\tsta \d+,s

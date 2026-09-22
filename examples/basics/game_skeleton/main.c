@@ -31,7 +31,7 @@
  * - The frame loop: WaitForVBlank -> read input -> update -> the NMI flushes
  * - A plain `enum` + `switch` state machine (title / play / over)
  * - Sprites (player + coin) via the OAM buffer; text HUD via the auto-flush
- * - Bounding-box collision; rand()/srand() seeded for varied coin spawns
+ * - Bounding-box collision; rngNext()/rngSeed() seeded for varied coin spawns
  *
  * @par What to Observe
  * Title shows "PRESS START". In play, moving onto the coin bumps SCORE and
@@ -108,8 +108,8 @@ static void build_tile(const u8 *rows, u8 idx, u16 tile) {
 
 /** @brief Move the coin to a fresh pseudo-random spot. */
 static void spawn_coin(void) {
-    cx = (u8)(16 + (rand() % 216));
-    cy = (u8)(PY_MIN + (rand() % (PY_MAX - PY_MIN)));
+    cx = (u8)(16 + (rngNext() % 216));
+    cy = (u8)(PY_MIN + (rngNext() % (PY_MAX - PY_MIN)));
 }
 
 /** @brief Draw the two gameplay sprites into the OAM buffer. */
@@ -149,7 +149,7 @@ static void draw_time(void) {
 
 /** @brief Enter the play state: reset score/timer, centre the player. */
 static void start_game(void) {
-    srand(seed_ctr);          /* varied coin spawns per run */
+    rngSeed(seed_ctr);          /* varied coin spawns per run */
     score = 0;
     time_left = START_TIME;
     tick = 0;

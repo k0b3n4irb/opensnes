@@ -56,14 +56,7 @@ extern u8 mapmario;
 /** @brief Object layer data (entity spawn positions and types within the map) */
 extern u8 objmario;
 
-/**
- * @brief Register Mario's object type callback with correct bank byte.
- *
- * Implemented in assembly because the object engine stores function
- * pointers with bank bytes for cross-bank calls. C cannot express
- * the `:label` bank-byte operator, so an ASM wrapper is required.
- */
-extern void objRegisterTypes(void);
+#include "mario.h"
 
 /**
  * @brief Main entry point -- slope collision platformer demo.
@@ -106,8 +99,13 @@ int main(void) {
     /* Object engine */
     objInitEngine();
 
-    /* Register Mario object type (ASM for correct bank bytes) */
-    objRegisterTypes();
+    /* Register Mario's callbacks. This used to need a hand-written ASM
+     * shim: objInitFunctions() read its arguments with the pre-A6 stack
+     * map, so it stored garbage, and its comment claimed C could not pass
+     * a bank byte. Both were fixed on 2026-09-18 — the compiler pushes
+     * `pea.w :fn` alongside `pea.w fn` for every pointer, so the bank is
+     * right there on the stack. No refresh callback for this example. */
+    objInitFunctions(0, marioinit, marioupdate, 0);
 
     /* Load objects from map data */
     objLoadObjects((u8 *)&objmario);

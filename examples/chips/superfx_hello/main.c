@@ -52,7 +52,7 @@ int main(void) {
     textPrintAt(3, 2, "SUPERFX HELLO");
     textPrintAt(3, 3, "GSU COPROCESSOR");
 
-    if (gsuInit()) {
+    if (gsuInit()) {   /* sets the defaults; gsuIsPresent() alone answers the question */
         version = superfx_status;
 
         buf[0] = '$';

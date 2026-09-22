@@ -673,11 +673,18 @@ snesmodFlush:
     pha
     plb
 
+    ; xspcProcessMessages, not spcProcessMessages (fixed 2026-09-20). The
+    ; latter is the tail of snesmodProcess: it ends in plb / plp / rtl, for
+    ; the php / phb snesmodProcess pushed. Reached through a jsr it popped
+    ; this routine's saved DBR and P and returned long on a 2-byte address —
+    ; a crash whenever the queue was not already empty, which is the only
+    ; time a flush does anything. Nothing called snesmodFlush with pending
+    ; commands until the libtest_fx fixture did.
 @flush_loop:
     lda spc_fread
     cmp spc_fwrite
     beq @exit
-    jsr spcProcessMessages
+    jsr xspcProcessMessages
     bra @flush_loop
 
 @exit:
@@ -931,7 +938,10 @@ snesmodFadeVolume:
 
     lda 6,s                     ; speed
     sta spc1
-    lda 7,s                     ; target volume
+    lda 8,s                     ; targetVolume. Was `lda 7,s` — the HIGH byte of
+                                ; the speed slot, always 0 — so every fade went to
+                                ; silence whatever the target (fixed 2026-09-20; the
+                                ; one caller passed 0). Named so the ABI lint checks it.
     sta spc1+1
     lda #CMD_FADE
     jmp QueueMessage
@@ -960,8 +970,11 @@ snesmodPlayEffect:
     rep #$20
     .ACCU 16
     lda 6,s                     ; pitch (u16)
+    and #$000F                  ; four bits reach the driver; more would spill
+                                ; into the effect-id nibble it is OR'd with
     sta spc2                    ; Save pitch
     lda 12,s                    ; effectId (u16)
+    and #$000F                  ; 16 effect slots
     tax                         ; X = effectId
     sep #$20
     .ACCU 8

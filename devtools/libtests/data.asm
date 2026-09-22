@@ -58,3 +58,26 @@ irqTestHandler:
     rti
 
 .ends
+
+; The same handler again, forced OUT of bank 0 (ASSET banks 7-1), counting
+; into irq_count_far: plain irqSet() must reach it through the bank byte of
+; the far pointer it is given. It used to pass a literal bank 0 — the IRQ
+; then entered bank $00 at this offset (bank-byte chantier, 2026-09-20).
+.section ".irq_test_far" semisuperfree banks 7-1
+
+irqTestHandlerFar:
+    rep #$20
+    .ACCU 16
+    pha
+    sep #$20
+    .ACCU 8
+    lda.l $004211           ; TIMEUP: acknowledge the IRQ line
+    rep #$20
+    .ACCU 16
+    lda.l irq_count_far
+    inc a
+    sta.l irq_count_far
+    pla
+    rti
+
+.ends

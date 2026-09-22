@@ -46,8 +46,11 @@ static const Scene pause = { NULL,       pause_update };   // init may be NULL
   scene (one below the top) gets no callbacks — that is your pause-freeze
   for free.
 - **`scenePush`/`scenePop`** record the change; the new top's `init`/`update`
-  dispatch on the next VBlank. To *replace* rather than stack, call
-  `scenePop(); scenePush(&next);`.
+  dispatch on the next VBlank; both return 1 on success and 0 when refused
+  (full stack, or a pop at depth 1). To *replace* rather than stack, call
+  `sceneReplace(&next)` — it works for the bottom scene too, which
+  `scenePop(); scenePush(&next);` does not (the pop is refused at depth 1
+  and the push then stacks, leaking a slot per swap).
 
 Pair it with **`gameLoopRun`** (`gameloop` module) so you don't even write
 the `while (1) WaitForVBlank()` loop:

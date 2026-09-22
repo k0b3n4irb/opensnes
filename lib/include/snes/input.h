@@ -100,7 +100,8 @@
  *
  * Returns buttons that were just pressed (not held from previous frame).
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of newly pressed buttons
  *
  * @code
@@ -116,7 +117,8 @@ u16 padPressed(u8 pad);
  *
  * Returns all buttons currently being pressed.
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of held buttons
  *
  * @code
@@ -132,7 +134,8 @@ u16 padHeld(u8 pad);
  *
  * Returns buttons that were just released (held last frame, not now).
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Button mask of released buttons
  */
 u16 padReleased(u8 pad);
@@ -142,7 +145,8 @@ u16 padReleased(u8 pad);
  *
  * Returns the raw hardware state without edge detection.
  *
- * @param pad Controller number (0-3)
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
  * @return Raw button state
  */
 u16 padRaw(u8 pad);
@@ -150,8 +154,29 @@ u16 padRaw(u8 pad);
 /**
  * @brief Check if controller is connected
  *
- * @param pad Controller number (0-3)
- * @return TRUE if connected, FALSE otherwise
+ * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
+ *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
+ * @return 1 if connected, 0 otherwise (0xFF for "yes" until 2026-09-22)
+ *
+ * @warning Not reliable today for pads 0 and 1: it answers 1 for an empty
+ *          port. Auto-joypad reading cannot tell the two cases apart — an
+ *          empty port and an idle pad both auto-read $0000; the difference
+ *          only exists past bit 16 of a manual serial read (a pad's line
+ *          idles high, an empty port returns 0s) — modelled identically by
+ *          luna, ares and Mesen2, not measured on a console (it is on the
+ *          real-hardware checklist, docs/HARDWARE_VERIFICATION.md). Open item
+ *          B12 of the 2026-09-20 API audit; the fix needs crt0 to clock that
+ *          17th bit and publish a per-port flag, and a luna release with an
+ *          unplugged port to test it against.
+ *
+ * @warning For whoever writes that fix: **mask the serial ports before
+ *          testing them.** `REG_JOYA` (`$4016`) and `REG_JOYB` (`$4017`) are
+ *          whole-byte reads; only bits 0-1 are the port's data lines. On
+ *          `$4017` bits 2-4 are tied and always read 1, bits 5-7 are open
+ *          bus; on `$4016` bits 2-7 are open bus (fullsnes, "Unused bits in
+ *          ports"; snesdev-wiki, JOYSER1: "D4-2 always 1"). So
+ *          `if (REG_JOYB)` is true on every console and every emulator —
+ *          test `REG_JOYB & 1` (data 1) or `& 3` (both lines).
  */
 u8 padIsConnected(u8 pad);
 
@@ -362,12 +387,19 @@ u16 scopeGetRawX(void);
 u16 scopeGetRawY(void);
 
 /**
- * @brief Get currently held buttons.
+ * @brief Buttons currently down — the same meaning as padHeld() and
+ *        mouseButtonsHeld().
+ *
+ * Until 2026-09-22 this name returned the auto-repeat mask (now
+ * scopeButtonsRepeat()) and "currently down" was scopeButtonsDown(): the
+ * one word had the opposite meaning on the third device. A caller that
+ * wanted the repeat behaviour from this name must move to
+ * scopeButtonsRepeat().
  *
  * @return Button mask (SSC_FIRE, SSC_CURSOR, SSC_TURBO, SSC_PAUSE,
  *         SSC_OFFSCREEN, SSC_NOISE)
  */
-u16 scopeButtonsDown(void);
+u16 scopeButtonsHeld(void);
 
 /**
  * @brief Get newly pressed buttons this frame.
@@ -377,14 +409,17 @@ u16 scopeButtonsDown(void);
 u16 scopeButtonsPressed(void);
 
 /**
- * @brief Get buttons held past the hold delay threshold.
+ * @brief Buttons held past the hold delay, re-triggering every repeat
+ *        delay (see scopeSetRepeatDelay()) — a keyboard-style auto-repeat.
  *
- * After holding a button for holddelay frames, it triggers as "held".
- * Then it re-triggers every repdelay frames.
- *
- * @return Button mask of held buttons
+ * @return Button mask of auto-repeating buttons (scopeButtonsHeld() until
+ *         2026-09-22)
  */
-u16 scopeButtonsHeld(void);
+u16 scopeButtonsRepeat(void);
+
+/** @brief The pre-2026-09-22 name of scopeButtonsHeld(). Same value. */
+OPENSNES_DEPRECATED("use scopeButtonsHeld() — it means \"currently down\" like padHeld()")
+u16 scopeButtonsDown(void);
 
 /**
  * @brief Calibrate aim from a center-screen shot.

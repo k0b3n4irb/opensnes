@@ -37,6 +37,7 @@ INPUT                  = mainpage.md \
                          TROUBLESHOOTING.md \
                          FAQ.md \
                          MIGRATING_FROM_PVSNESLIB.md \
+                         HARDWARE_VERIFICATION.md \
                          THIRD_PARTY.md \
                          hardware/ \
                          ../examples/ \

@@ -70,16 +70,24 @@ over.
 
 ## Measured ROM coverage (the never-executed ratchet)
 
-`rom_coverage.py` asks luna for the set of executed PCs of every example
-(`luna profile --pc-set`, to the first manifest frame, no input), folds them
-onto the `.sym` labels (FastROM/HiROM mirrors folded like `symmap.py`) and
-unions the hits over the corpus. The public functions of
-`lib/include/snes/*.h` that no example executes are written to
+`rom_coverage.py` asks luna for the set of executed PCs of every ROM
+(`luna profile --pc-set`), folds them onto the `.sym` labels (FastROM/HiROM
+mirrors folded like `symmap.py`) and unions the hits. Each example ROM is
+profiled once input-free to its first capture frame and once per `luna
+test` manifest that names it, replaying the manifest's joypad-1 script (the
+checkpoints merged into one timeline, as `luna test` does) to its last
+checkpoint or `frames` / `steps` bound; the library fixture
+(`devtools/libtests/libtest.sfc`), its sibling for the modules it has no
+RAM for (`devtools/libtests_fx/`: hdma, mode7, SNESMOD) and the compiler's
+five runtime ROMs are profiled as well. The public
+functions of `lib/include/snes/*.h` that nothing executes are written to
 `baselines/never_executed.txt`; `make tests` fails if that set gains a
-name (a function shipped with no example and no libtest) and reports names
-that became executed so `--update` can shrink the list. `ROM_COVERAGE.md`
-is the human report. Input-driven code is under-counted by construction —
-the scripted manifest legs are the next step.
+name (a function shipped with no example, no manifest leg and no libtest)
+and reports names that became executed so `--update` can shrink the list.
+`ROM_COVERAGE.md` is the human report. Mouse and Super Scope scripts are
+not replayed — `luna profile` has `--input` only — so those examples'
+peripheral paths are still under-counted (2026-09-19: 167 → 98 never
+executed when the manifest legs and the fixture were added).
 
 ## Cross-arch baseline key
 
@@ -135,17 +143,16 @@ run, so a checkpoint observes every event scheduled before its frame, not only
 the ones written beside it. Reading a checkpoint as if it replayed its own
 script in isolation is the easiest way to write a wrong expectation.
 
-**There is no PPU-register assert.** `luna state --out -` prints the whole
-`ppu` block as JSON, but a manifest cannot compare against it, and reading an
-MMIO address through `values` returns 0 (it resolves WRAM). Today the route to
-those registers is the library's own WRAM shadows — `hdma_enabled_state` in
-`hdma.asm`, `w12sel`/`w34sel`/`wobjsel`/`wbglog` in `window.c`, `m7_sin` /
-`m7_cos` / `m7_scale` in `mode7.c` — and a shadow is only trustworthy for an
-example that goes through the module. `examples/windows/window` writes the
-window registers raw, so its shadow reads 0 while the hardware holds `$33`;
-that manifest asserts an `fbhash` instead of a value it would be lying about.
-The capability request is recorded in
-`.claude/notes/status/luna_stress_campaign.md` for owner validation.
+**PPU registers are assertable since luna v1.24.0**: `[asserts.ppu]` at the
+run bound and `[checkpoint.ppu]` per checkpoint compare against the `ppu`
+block of `luna state --out -`, keyed by its JSON field names (`w12sel`,
+`tmw`, `inidisp`, `bgmode`, `m7a`…; `.` steps into arrays, the Mode 7
+fields are signed, there is no `width`). Reading an MMIO address through
+`values` still returns 0 (it resolves WRAM). The library's WRAM shadows —
+`hdma_enabled_state` in `hdma.asm`, `hdma_wave_amplitude`, `m7_sin` /
+`m7_cos` / `m7_scale` in `mode7.c` — remain useful for what the PPU block
+does not show (which HDMA channels the lib believes are on), and a shadow
+is only trustworthy for an example that goes through the module.
 
 ## Hardening tests (luna scripted-input & trace capabilities)
 

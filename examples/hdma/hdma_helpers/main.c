@@ -105,7 +105,7 @@ static void stopCurrentEffect(void) {
 
     /* Re-enable ch6 with a null (terminator) table to keep HDMA init happy */
     hdma_table_a[0] = 0x00;
-    hdmaSetupBank(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a, 0x00);
+    hdmaSetup(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a);
     hdmaEnable(1 << 6);
 
     /* Restore original palette from ROM source during VBlank */
@@ -153,7 +153,7 @@ int main(void) {
     /* Pre-enable HDMA ch6 with a null table so it's initialized at
      * every VBlank HDMA init. Prevents stale A2A on first effect use. */
     hdma_table_a[0] = 0x00;
-    hdmaSetupBank(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a, 0x00);
+    hdmaSetup(6, HDMA_MODE_1REG, HDMA_DEST_BG1HOFS, hdma_table_a);
     hdmaEnable(1 << 6);
 
     while (1) {

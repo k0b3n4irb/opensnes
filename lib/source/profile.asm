@@ -86,7 +86,11 @@ profileColorStart:
     .ACCU 16
     .INDEX 16
     lda 6,s                     ; color index (php+phb = +2, JSL ret = +3, arg at +6)
-    and #$0007                  ; clamp to 0-7
+    and #$0007
+    cmp #$0007                  ; the table has SEVEN entries (0-6): index 7
+    bne +                       ; read the first bytes of profileInit's code
+    lda #$0006                  ; as a colour (fixed 2026-09-20)
++
     ; Multiply by 3 (table entry size)
     sta.l tcc__r9               ; temp
     asl a                       ; *2
@@ -209,7 +213,21 @@ profileScanlineEnd:
     sbc.w profile_scanline_start
     bpl @no_wrap
     clc
-    adc #262
+    adc #262                    ; NTSC frame...
+    pha
+    sep #$20
+    .ACCU 8
+    lda.l $00213F               ; STAT78 bit 4: PAL
+    and #$10
+    rep #$20                    ; (rep leaves Z alone)
+    .ACCU 16
+    beq @ntsc
+    pla
+    clc
+    adc #50                     ; ...312 lines on PAL: the header advertises
+    bra @no_wrap                ; PAL and the wrap was NTSC-only (2026-09-20)
+@ntsc:
+    pla
 @no_wrap:
     plp
     rtl

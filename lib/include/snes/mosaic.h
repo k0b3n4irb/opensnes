@@ -60,16 +60,27 @@ inline void mosaicInit(void) {
 }
 
 /**
- * @brief Enable mosaic effect for specified backgrounds
+ * @brief Set the backgrounds the mosaic applies to — REPLACES the previous set
  *
- * @param bgMask Bitmask of backgrounds (MOSAIC_BG1 | MOSAIC_BG2 | etc.)
+ * `mosaicSetLayers(MOSAIC_BG1)` after `mosaicSetLayers(MOSAIC_BG2)` leaves
+ * only BG1 pixelated. This is the function mosaicEnable() was until
+ * 2026-09-22, renamed because "Enable" reads as additive — windowEnable() IS
+ * additive — and the old name silently undid the previous call.
+ *
+ * @param bgMask Bitmask of backgrounds (MOSAIC_BG1 | MOSAIC_BG2 | ...; 0
+ *               disables, like mosaicDisable())
  *
  * Example:
  * @code
- * mosaicEnable(MOSAIC_BG1 | MOSAIC_BG2);  // Enable for BG1 and BG2
- * mosaicEnable(MOSAIC_BG_ALL);            // Enable for all backgrounds
+ * mosaicSetLayers(MOSAIC_BG1 | MOSAIC_BG2);  // BG1 and BG2, nothing else
+ * mosaicSetLayers(MOSAIC_BG_ALL);            // every background
  * @endcode
  */
+void mosaicSetLayers(u8 bgMask);
+
+/** @brief The pre-2026-09-22 name of mosaicSetLayers(). Same behaviour: it
+ *         REPLACES the background set. */
+OPENSNES_DEPRECATED("use mosaicSetLayers() — this call replaces the background set, it does not add to it")
 void mosaicEnable(u8 bgMask);
 
 /**
@@ -84,7 +95,7 @@ void mosaicDisable(void);
  *             0 = 1x1 pixels (no visible effect)
  *             15 = 16x16 pixel blocks (maximum pixelation)
  *
- * Note: Mosaic must be enabled with mosaicEnable() to see the effect.
+ * Note: a background must be selected with mosaicSetLayers() to see the effect.
  */
 void mosaicSetSize(u8 size);
 

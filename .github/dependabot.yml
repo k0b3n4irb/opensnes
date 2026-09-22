@@ -7,6 +7,13 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    # PRs land on develop like everything else; main only moves through a
+    # release PR (.claude/rules/release.md). Without this, Dependabot targets
+    # the default branch — its first five PRs (#153-#157) were opened against
+    # main and had to be re-applied on develop by hand. Note that Dependabot
+    # reads THIS file from the default branch, so the setting takes effect
+    # once a release carries it to main.
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday

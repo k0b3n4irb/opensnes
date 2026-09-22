@@ -66,18 +66,6 @@ extern u8 tiles_til[], tiles_tilend[];
 extern u8 tiles_pal[], tiles_palend[];
 extern u8 mario_sprite_pal[], mario_sprite_palend[];
 
-/**
- * @brief Get the ROM bank byte of mario_sprite_til.
- *
- * The dynamic sprite engine needs the bank byte to set up DMA source
- * addresses for sprite tile uploads. Since the tiles are in a SUPERFREE
- * section, their bank is determined at link time and only available
- * via the `:label` assembly operator.
- *
- * @return Bank byte (e.g., 0x00, 0x01) of the mario_sprite_til data
- */
-extern u8 getSpriteTilBank(void);
-
 /*============================================================================
  * Constants
  *============================================================================*/
@@ -407,9 +395,10 @@ static void map_update(void) {
  *
  * Places Mario at a safe spawn point, sets the dynamic sprite engine's
  * frame to the standing pose, and configures the sprite attribute byte
- * (priority 3, H-flip for facing right). The bank byte for sprite tile
- * data is retrieved via getSpriteTilBank() because the tile data may
- * reside in any ROM bank due to SUPERFREE section placement.
+ * (priority 3, H-flip for facing right). The tile data may sit in any ROM
+ * bank (SUPERFREE placement); OAM_SET_GFX() records the bank byte of the
+ * pointer it is given. Until 2026-09-20 it recorded bank 0, and this example
+ * carried a hand-written getSpriteTilBank() helper to work around it.
  */
 static void mario_init(void) {
     mario_x = 48;
@@ -424,7 +413,7 @@ static void mario_init(void) {
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
-    OAM_SET_GFX_BANK(0, mario_sprite_til, getSpriteTilBank());
+    OAM_SET_GFX(0, mario_sprite_til);
 }
 
 /**

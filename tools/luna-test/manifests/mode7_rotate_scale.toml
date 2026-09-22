@@ -18,12 +18,16 @@
 #     which half of the matrix moved.
 #
 # Measured: `luna state --until-frame N --input … --peek m7_scale_x:2
-# --peek m7_scale_y:2 --peek m7_sin:1 --peek m7_cos:1`, with the PPU side
-# read back from `luna state --out -`:
-#   f60  identity-ish: m7a = m7d = 254, m7b = m7c = 0
-#   f120 after 60 frames of A: m7a = m7d = 30, m7b = -252, m7c = 252
-#   f180 after 60 frames of UP: m7a = m7d = 85, m7b = -717, m7c = 716
-# i.e. the WRAM values below really are what reached M7A-M7D.
+# --peek m7_scale_y:2 --peek m7_sin:1 --peek m7_cos:1`, and — since luna
+# v1.24.0 — the matrix itself through `[checkpoint.ppu]`, which asserts the
+# registers instead of our shadow of them. The two halves are both here on
+# purpose: the values say the module computed the right thing, the ppu block
+# says it reached M7A-M7D. A regression that stopped writing the registers
+# would keep every value assert green.
+#
+# The matrix invariants each leg pins: m7a == m7d and m7b == -m7c is what a
+# rotation-with-uniform-scale matrix looks like, and the pivot (m7x, m7y)
+# must not move when either control is used.
 rom = "../../../examples/mode7/rotate_scale/rotate_scale.sfc"
 
 [[checkpoint]]                 # boot pose: angle 0, scale 2.0x
@@ -33,6 +37,14 @@ m7_scale_x = 512                                # 0x0200 = 2.0 in 8.8
 m7_scale_y = 512
 m7_sin = { eq = 0, width = 1 }                  # sin(0)
 m7_cos = { eq = 127, width = 1 }                # cos(0) = +1.0 as s8
+[checkpoint.ppu]
+m7a = 254                                       # 2.0x with no rotation
+m7d = 254
+m7b = 0
+m7c = 0
+m7x = 128                                       # pivot: screen centre
+m7y = 128
+bgmode = 7
 
 [[checkpoint]]                 # A held: rotate only
 at_frame = 120
@@ -42,6 +54,13 @@ m7_sin = { eq = 126, width = 1 }                # angle 60/256 ~ 84.4 deg
 m7_cos = { eq = 15, width = 1 }
 m7_scale_x = 512                                # rotation must not zoom
 m7_scale_y = 512
+[checkpoint.ppu]
+m7a = 30                                        # the matrix really turned
+m7d = 30
+m7b = -252
+m7c = 252
+m7x = 128                                       # …around an unmoved pivot
+m7y = 128
 
 [[checkpoint]]                 # UP held: zoom only
 at_frame = 180
@@ -51,6 +70,13 @@ m7_scale_x = 1456                               # 512 + 59 * 16
 m7_scale_y = 1456
 m7_sin = { eq = 126, width = 1 }                # zoom must not rotate
 m7_cos = { eq = 15, width = 1 }
+[checkpoint.ppu]
+m7a = 85                                        # zoomed: every term grew
+m7d = 85
+m7b = -717
+m7c = 716
+m7x = 128
+m7y = 128
 [checkpoint.delta]
 m7_scale_x = "increased"
 m7_scale_y = "increased"

@@ -115,6 +115,41 @@ tools/luna-test/bin/luna frames -n 3000000 --count 8 --out /tmp/frames game.sfc
 captures strictly consecutive PPU frames, each tagged with its frame number
 and forced-blank state.
 
+## Recipe 7 — the ROM tells you itself
+
+Everything above is the host asking questions of the ROM. `<snes/debug.h>`
+is the other direction: three one-line tools that let the ROM speak, and
+that cost nothing on real hardware.
+
+```makefile
+LIB_MODULES += debug
+```
+
+```c
+#include <snes/debug.h>
+
+SNES_NOCASH("level 2 loaded");      /* a line in luna's nocash log */
+SNES_ASSERT(enemy_count <= MAX);    /* breaks if the invariant fails */
+SNES_BREAK();                       /* break here, unconditionally */
+```
+
+- `SNES_BREAK()` emits `WDM $00`. luna captures it as an assert event and
+  Mesen2 halts on it. On a real console `WDM` is a two-byte no-op, so the
+  call is inert rather than harmful if it ships.
+- `SNES_NOCASH(msg)` writes a null-terminated string byte by byte to the
+  debug port at `$21FC`, which luna, Mesen2 and no$sns all log. It takes a
+  plain string — there is no format-string support.
+- `SNES_ASSERT(cond)` is `SNES_BREAK()` behind a test, and compiles to
+  nothing when `NDEBUG` is defined, so assertions can stay in the source.
+
+**The harness already listens.** Every visual-regression capture runs with
+`--wdm-out`, and the runner records whether the channel fired: an assertion
+that trips during a corpus run shows up as a failure without anyone writing
+a test for it. Manifests can also assert on it directly — `wdm_empty` for
+"nothing tripped", `nocash_contains` for a specific message. So an invariant
+you write as `SNES_ASSERT` in your game is checked on every push, for free,
+by the same pass that compares pixels.
+
 ## What Mesen2 is still for
 
 Nothing is *required* anymore: the workflows above cover the watch /

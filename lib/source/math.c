@@ -83,22 +83,23 @@ fixed (*const __opensnes_force_emit_fixCos)(u8) = fixCos;
 
 /* fix32Sin / fix32Cos are still implemented in lib/source/fixed32.asm.
  *
- * The qbe Kl shift-by-constant spill bug was fixed 2026-05-22, which
- * resolves the original "high half reads unstored slot" issue. But a
- * SECOND distinct bug surfaces here: ref_is_high_zero() in qbe's
- * emit.c returns TRUE for any Kw temp, on the assumption that Kw → Kl
- * widening is zero-extension. That's correct for unsigned widening
- * (Oextuw/Oextub, used by array indexing) but WRONG for signed
- * widening (Oextsw/Oextsb, used by `(s32)s16_value`).
+ * HISTORICAL — both bugs are gone, re-measured 2026-09-18.
  *
- * For fix32Sin(192) = -256: with the bug, the high half is computed
- * as `(low_byte_high) & 0x00FF` (drops sign) producing 0x00FF0000
- * instead of 0xFFFF0000. The asm form sign-extends explicitly.
+ * The qbe Kl shift-by-constant spill bug was fixed 2026-05-22. A second
+ * one was recorded here: ref_is_high_zero() in qbe's emit.c returns TRUE
+ * for any Kw temp, on the assumption that Kw → Kl widening is
+ * zero-extension, which is right for unsigned widening and was said to be
+ * wrong for signed. For fix32Sin(192) = -256 that produced 0x00FF0000
+ * instead of 0xFFFF0000.
  *
- * Resolution path for the second bug: track Kw signedness through the
- * IR (or have ref_is_high_zero look at the producing op — Oextub/uw
- * → high zero, Oextsb/sw → high sign-extended). Out of scope for the
- * one-bug-at-a-time policy. */
+ * It no longer reproduces. A signed widening yields a Kl temp that
+ * ref_is_high_zero does not mark, so the shortcut it describes is not
+ * taken; whether cproc's IR changed or the 2026-09-13 sign-extension work
+ * closed it, the observable is what counts and it is now pinned in two
+ * places: devtools/libtests computes `(u32)(s32)fixSin(192) << 8` in C and
+ * asserts it equals fix32Sin(192), and c_features asserts the
+ * widen-then-shift case on its own. Do not re-derive this from the prose
+ * above — run the fixtures. */
 
 /*============================================================================
  * Fixed-Point Arithmetic
@@ -218,15 +219,30 @@ fixed fixClamp(fixed x, fixed min, fixed max) {
  * dependent placement) where the 16-bit C deref reads garbage; the
  * symmap ratchet hard-fails the build when it happens.
  */
-static u8 atan_lut[65] = {
-     0,  1,  1,  2,  3,  4,  5,  6,
-     6,  7,  8,  9, 10, 10, 11, 12,
-    13, 14, 14, 15, 16, 17, 17, 18,
-    19, 19, 20, 21, 21, 22, 23, 23,
-    24, 24, 25, 25, 26, 26, 27, 27,
-    27, 28, 28, 28, 29, 29, 29, 30,
-    30, 30, 30, 31, 31, 31, 31, 31,
-    31, 32, 32, 32, 32, 32, 32, 32,
+/* const since 2026-09-20. It was a plain static — bank-$00 RAM copied from
+ * ROM at boot for a table nothing writes — because devtools/check_lib_rodata.py
+ * forbade const data in lib C modules: before #121 a const table that the
+ * linker placed outside bank $00 was read with bank-$00 addressing. Every C
+ * read of const data is a far read now (#121), const data goes to the asset
+ * banks by design (#127.3) and check_bank_reads.py fails the link on a
+ * bank-blind read, so the lint only cost RAM. Retired with this change. */
+/* atan(i/64) in the first octant, as an 8-bit angle: round(atan(i/64) /
+ * (pi/4) * 32), i = 0..64. REGENERATED 2026-09-20: the table shipped with
+ * B6 was not an arctangent at all — it tracks sin(t*pi/2) (sum of absolute
+ * differences 32, against 191 for the true curve) and was up to 5 units,
+ * 7 degrees, too high in mid-octant: atan2_8(5, 10) returned 24 where
+ * atan(0.5) = 26.57 deg = 18.9 units. The axes and the diagonal were right
+ * (0, 64, 128, 192, 32), which is all any test had looked at; a mid-LUT
+ * libtest vector found it. */
+static const u8 atan_lut[65] = {
+     0,  1,  1,  2,  3,  3,  4,  4,
+     5,  6,  6,  7,  8,  8,  9,  9,
+    10, 11, 11, 12, 12, 13, 13, 14,
+    15, 15, 16, 16, 17, 17, 18, 18,
+    19, 19, 20, 20, 21, 21, 22, 22,
+    23, 23, 24, 24, 25, 25, 25, 26,
+    26, 27, 27, 27, 28, 28, 29, 29,
+    29, 30, 30, 30, 31, 31, 31, 32,
     32,
 };
 

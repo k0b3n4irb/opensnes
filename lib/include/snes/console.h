@@ -54,12 +54,16 @@
 /**
  * @brief Initialize SNES hardware
  *
- * Must be called at the start of your program. Performs:
- * - PPU initialization (screen blank, registers cleared)
- * - CPU register setup
- * - Work RAM clearing
- * - Default palette loading
- * - VBlank interrupt setup
+ * Must be called at the start of your program. What it does, exactly:
+ * - forces blank, brightness shadow = 15
+ * - detects PAL / NTSC
+ * - seeds rngNext() from the H/V counters
+ * - BG mode 1, BG1 tilemap at VRAM $0400 (32x32), BG1 tiles at $0000
+ * - mosaic off, all 256 CGRAM entries cleared to black
+ * - enables NMI + auto-joypad, and DROPS any armed H/V timer IRQ bits
+ *
+ * It does not clear work RAM or set up the CPU (crt0 did that before main),
+ * and it loads no palette — this list claimed all three until 2026-09-20.
  *
  * After calling, screen is blanked (black). Call setScreenOn() to enable
  * display after you've set up your graphics.
@@ -99,8 +103,11 @@ void consoleInitEx(u16 options);
 /**
  * @brief Enable screen display
  *
- * Turns on the display after initialization or a screen blank.
- * Sets full brightness (15).
+ * Turns on the display after initialization or a screen blank, at the LAST
+ * brightness set (15 after consoleInit). After fadeOut() that level is 0, so
+ * the screen stays black until fadeIn() or setBrightness() — which is what
+ * the fade example below relies on. (Documented as "full brightness" until
+ * 2026-09-20.)
  *
  * Inlined for zero-call-overhead access (saves ~28 cycles per call).
  * Shares the same `force_blanked` and `current_brightness` shadows as
@@ -182,9 +189,11 @@ void setBrightness(u8 brightness);
  * - `speed=6` → 96 frames (~1.60 s, dramatic)
  *
  * @param speed VBlank frames to wait between each brightness step.
- *              `speed=0` falls through with no inter-step delay (visible
- *              flash, ~16 frames if every step still hits VBlank via
- *              loop overhead — not typically useful).
+ *              `speed=0` waits for nothing: all 16 steps are written in one
+ *              burst, i.e. an instant cut, not a fade.
+ *
+ * @note Under forced blank the brightness writes are skipped (the shadow
+ *       still moves), so a fade does nothing visible until setScreenOn().
  *
  * @code
  * fadeOut(3);              // ~0.8 s cinematic fade
@@ -250,13 +259,20 @@ inline u8 getBrightness(void) {
  * @endcode
  *
  * @note VBlank occurs ~60 times/second (NTSC) or ~50 times/second (PAL)
+ * @note On return the NMI handler has ALREADY run: the OAM upload, the text
+ *       tilemap flush, the scroll sync, your nmiSet() callback and the
+ *       auto-joypad wait have used part of VBlank. What is left is safe for
+ *       VRAM / CGRAM writes, but it is not the whole VBlank.
+ * @warning Hangs forever if NMI is disabled (NMITIMEN bit 7 clear): it sleeps
+ *          until the NMI handler clears the handshake flag.
  */
 void WaitForVBlank(void);
 
 /**
  * @brief Check if currently in VBlank
  *
- * @return TRUE if in VBlank, FALSE if in active display
+ * @return 1 if in VBlank, 0 in active display (0xFF for "yes" until
+ *         2026-09-22)
  */
 u8 isInVBlank(void);
 
@@ -298,7 +314,8 @@ void resetFrameCount(void);
 /**
  * @brief Check if PAL system
  *
- * @return TRUE if PAL (50Hz), FALSE if NTSC (60Hz)
+ * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) — the same value as getRegion()
+ *         since 2026-09-22 (it returned 0xFF for PAL before)
  *
  * @code
  * if (isPAL()) {
@@ -320,28 +337,38 @@ u8 getRegion(void);
  *============================================================================*/
 
 /**
- * @brief Get random 16-bit number
+ * @brief Next pseudo-random 16-bit number
  *
- * Returns a pseudo-random number using a linear feedback shift register.
+ * A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1).
+ * Named rand() until 2026-09-22 — a libc name for a function that is not the
+ * libc one (no RAND_MAX, 1-65535, a u16), which collides the day any C
+ * library code is linked.
  *
- * @return Random value 0-65535
+ * @return Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero
+ *         seed is replaced, see rngSeed())
  *
  * @code
- * u16 enemy_x = rand() % 256;
+ * u16 enemy_x = rngNext() % 256;
  * @endcode
  */
-u16 rand(void);
+u16 rngNext(void);
 
 /**
- * @brief Seed random number generator
+ * @brief Seed the generator (named srand() until 2026-09-22)
  *
- * @param seed Initial seed value
+ * consoleInit() seeds it from the H/V counters; reseed from a player action
+ * (`rngSeed(getFrameCount())` on START) for a different game each run.
  *
- * @code
- * // Seed from player input timing for variety
- * srand(getFrameCount());
- * @endcode
+ * @param seed Initial seed value; 0 is replaced by a fixed non-zero state
  */
+void rngSeed(u16 seed);
+
+/** @brief The pre-2026-09-22 name of rngNext(). Same generator. */
+OPENSNES_DEPRECATED("use rngNext() — this is not libc's rand()")
+u16 rand(void);
+
+/** @brief The pre-2026-09-22 name of rngSeed(). */
+OPENSNES_DEPRECATED("use rngSeed() — this is not libc's srand()")
 void srand(u16 seed);
 
 #endif /* OPENSNES_CONSOLE_H */

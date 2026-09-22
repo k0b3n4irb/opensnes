@@ -74,11 +74,24 @@ u16 padRaw(u8 pad) {
 }
 
 u8 padIsConnected(u8 pad) {
-    if (pad >= 5) return FALSE;
-    /* Check if any buttons are valid (bit 0 of high byte is always 0 for valid controller) */
-    /* A disconnected controller reads as $FFFF or $0000 depending on pull-ups */
-    u16 state = pad_keys[pad];
-    return (state != 0xFFFF && state != 0x0000) ? TRUE : FALSE;
+    if (pad >= 5) return 0;
+    /* The auto-joypad word ends in a 4-bit device signature, and a standard
+     * controller's is 0000 (fullsnes, "SNES Controllers I/O Ports - Automatic
+     * Reading": bits 3-0 are "0 (High)" for a joypad, and "no buttons pressed
+     * will return 0"). So an IDLE connected pad reads exactly $0000 — the old
+     * test also rejected that and reported every quiet frame as unplugged.
+     * $FFFF is the floating-line pattern of a port with nothing in it.
+     *
+     * Caveat kept honest: no source in the corpus pins the empty-port value,
+     * so this detects "no valid device answering" rather than proving a
+     * cable. A non-joypad device (the mouse signs 0001) answers with its own
+     * signature and is not a pad. */
+    /* Pads 2-4 come only from ScanMPlay5, which nothing in the SDK can arm
+     * (see the multitap entry in KNOWN_LIMITATIONS.md), so their slots hold
+     * 0 forever — no reading at all, rather than a reading of "idle". Saying
+     * FALSE is the truthful answer until the multitap path is reachable. */
+    if (pad >= 2) return 0;
+    return (pad_keys[pad] != 0xFFFF) ? 1 : 0;
 }
 
 /*============================================================================
@@ -231,15 +244,19 @@ u16 scopeGetRawY(void) {
     return scope_shotvraw;
 }
 
-u16 scopeButtonsDown(void) {
+u16 scopeButtonsHeld(void) {
     return scope_down;
+}
+
+u16 scopeButtonsDown(void) {
+    return scope_down;          /* deprecated name of scopeButtonsHeld() */
 }
 
 u16 scopeButtonsPressed(void) {
     return scope_now;
 }
 
-u16 scopeButtonsHeld(void) {
+u16 scopeButtonsRepeat(void) {
     return scope_held;
 }
 

@@ -153,8 +153,13 @@ void panelPut(const Panel *p, u8 x, u8 y, u16 tile);
  * setScreenOff() / setScreenOn() because 2 KB does not reliably fit
  * VBlank — see the file header.
  *
- * @warning Restores full brightness on exit. If you are mid-fade, upload
- *          before starting the fade rather than during it.
+ * @warning It ends with setScreenOn(): the display is ON when it returns,
+ *          at the last brightness set — even if you called it under forced
+ *          blank during setup, which therefore un-blanks before the rest of
+ *          your init. Flush last, or call setScreenOff() again afterwards.
+ *          It also blanks wherever the beam is: call it right after
+ *          WaitForVBlank() to avoid a partial black frame. (This warning said
+ *          "restores full brightness" until 2026-09-20; it does not.)
  *
  * @param p The panel layer.
  */

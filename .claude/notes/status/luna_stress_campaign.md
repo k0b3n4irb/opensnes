@@ -414,7 +414,15 @@ natively-hashed frame, which is confusing for a human diffing the PNG.
 **For the owner to validate before filing**: should `luna run --native-res`
 write the 512×448 PNG too, matching `luna state`? Nothing is blocked on it.
 
-## R4 still blocked (re-checked 2026-09-15 on v1.23.0)
+## R4 — UNBLOCKED 2026-09-17 (the section below is kept for the history)
+
+`luna profile --sym <file>` accepts an explicit symbol file, so the fold can be
+done on the input side: strip the `NmiHandler@…` child labels from a copy of
+the `.sym` and the handler comes back as a single row. `nmi_budget.py` does
+exactly that and gates six examples at 12 000 mclk. The request to luna is
+**withdrawn** — reported in `/tmp/opensnes_report_luna_2026-09-17_requests.md`.
+
+## R4 was blocked (re-checked 2026-09-15 on v1.23.0)
 
 `luna profile` continues to report the NMI handler as five rows —
 `NmiHandler`, `NmiHandler@oam_done`, `NmiHandler@mp5_done`,
@@ -510,3 +518,70 @@ What it would buy, concretely:
 Values can be *measured* for all of these with `luna state`, so a prototype is
 not needed — the contract is "assert what the state JSON already prints".
 Per `.claude/rules/luna_tooling.md`, validate before filing.
+
+## LANDED — luna v1.24.0 shipped all three (2026-09-17)
+
+The owner assigned the requests the same day and luna cut v1.24.0 with all
+three in it: `[asserts.ppu]` (top-level and per checkpoint, keys are the
+`luna state` JSON field names, `.` steps into arrays — no second name table,
+so the vocabulary cannot drift from the observable), `V0_ENVX`/`V0_OUTX`
+names, and `run --native-res --screenshot` now writing 512×448 like `state`
+already did. No emulation path was touched: every fbhash in our manifests
+stood, and the only baseline change was the recorded version string.
+
+What we did with them, same day:
+
+- `manifests/color_gradient_9bit.toml` — the 85th example, previously the one
+  with no functional test. Coverage is now **85 of 85**.
+- `window_triangle_modes.toml` — the four button legs assert the registers
+  the example writes raw (`w12sel` 0x33 / 0x30 / 0x33 / 0x03) instead of
+  leaning on the frame hash alone.
+- `mode7_rotate_scale.toml` — the matrix itself at all three poses, so a
+  regression that stopped writing M7A-M7D no longer passes every value
+  assert.
+- The two `audio_pitch_mod_*` manifests use `V0_ENVX` instead of the hex
+  index; `backgrounds_mode5_hires`'s baseline PNG is a native 512×448 frame.
+
+luna also kept the `--sym` finding from our withdrawal and documented it in
+their profiler guide, with our 652-vs-7258 mclk figure as the worked example.
+
+### The measurements (kept for the history)
+
+The owner assigned the request; luna is working on it. The values below are
+already measured, so the work on our side is writing three files, not
+investigating. Re-measure before committing — these were taken on v1.23.0.
+
+**1. `color/gradient_9bit` — the one example with no manifest.** At frame 200
+the only non-zero PPU field is `inidisp = 5`: the brightness the HDMA channel
+left on the last scanline. Everything else reads 0 (`tm`, `ts`, every window
+and colour-math register), because the demo draws no BG and never calls
+`setScreenOn`. `bgmode = 1`. That single value discriminates: if the INIDISP
+channel stops, the register holds whatever the CPU last wrote instead.
+
+**2. `windows/window` — replace an `fbhash` with the truth.** The example
+writes the window registers raw, so the library's shadows read 0 while the
+hardware holds:
+
+| field | value |
+|---|---|
+| `w12sel` | 51 (`$33`) |
+| `wobjsel` | 51 (`$33`) |
+| `tm` | 3 |
+| `tmw` | 19 (`$13`) |
+| `windows` (WH0..WH3) | 255, 0, 0, 0 |
+
+Today that manifest asserts a frame hash because asserting the shadow would
+assert a falsehood. These asserts replace it.
+
+**3. `mode7/rotate_scale` — the matrix itself, not our bookkeeping.** The
+manifest asserts `m7_sin` / `m7_cos` / `m7_scale` (WRAM shadows). The
+registers, measured:
+
+| | boot (f60) | after A held (f200) |
+|---|---|---|
+| `m7a` / `m7d` | 254 / 254 | -196 / -196 |
+| `m7b` / `m7c` | 0 / 0 | -160 / 160 |
+| `m7x` / `m7y` | 128 / 128 | 128 / 128 |
+
+The `m7b = -m7c` antisymmetry is the rotation invariant worth pinning, and the
+pivot staying at (128,128) while the matrix turns is the free negative.

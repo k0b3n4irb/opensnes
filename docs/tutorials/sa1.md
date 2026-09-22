@@ -147,7 +147,7 @@ int main(void) {
     consoleInit();
     setMode(BG_MODE1, 0);
 
-    if (sa1Init()) {
+    if (sa1IsReady()) {
         // SA-1 is running!
     } else {
         // SA-1 failed to boot (wrong emulator or cartridge)
@@ -159,7 +159,7 @@ int main(void) {
 }
 ```
 
-`sa1Init()` returns 1 if the SA-1 wrote the $A5 magic byte to I-RAM $3000
+`sa1IsReady()` returns 1 if the SA-1 wrote the $A5 magic byte to I-RAM $3000
 within the timeout. The boot sequence (in `crt0.asm`) handles all the
 register setup: reset vector, I-RAM write protection, and SA-1 release.
 

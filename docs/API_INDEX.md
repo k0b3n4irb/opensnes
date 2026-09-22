@@ -86,7 +86,7 @@ nothing you do not list is linked.
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
-| decompress | `LzssDecodeVram` | `lzss` | |
+| decompress | `lzssDecodeVram` | `lzss` | |
 
 ## 3D math on the DSP-1 coprocessor
 
@@ -95,7 +95,7 @@ nothing you do not list is linked.
 | rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1Parameter`) | `dsp1` | [chips/dsp1_cube](../examples/chips/dsp1_cube/) — needs `USE_DSP1 := 1` |
 | true 3D distance / sphere test | `dsp1Distance`, `dsp1Range` | `dsp1` | hardware sqrt — collision, LOD, homing |
 | sin/cos scaled by a radius | `dsp1Triangle` | `dsp1` | 16-bit angles (full turn = 2^16) |
-| check the chip is there | `dsp1Present` | `dsp1` | known-answer probe, never hangs |
+| check the chip is there | `dsp1IsPresent` | `dsp1` | known-answer probe, never hangs |
 
 ## Going faster
 

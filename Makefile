@@ -54,7 +54,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release hardware-kit
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -148,7 +148,6 @@ lint-vram:
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
-	@python3 devtools/check_lib_rodata.py
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
@@ -191,12 +190,24 @@ tests: test-compiler
 	@# Measured ROM coverage of the public lib API (luna profile --pc-set):
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
-	@# (gaps review item R5).
+	@# (gaps review item R5). The library fixture is one of the ROMs it
+	@# profiles, so it is built first (rebuilt clean for its own asserts below),
+	@# and so are the compiler's runtime ROMs.
+	@$(MAKE) -s -C devtools/libtests
+	@$(MAKE) -s -C devtools/libtests_fx
+	@$(MAKE) -s -C devtools/libtests_dsp1
+	@$(MAKE) -s -C devtools/libtests_hirom
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 	@# APU output hashed for four self-playing audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 tools/luna-test/audio_regress.py
+	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
+	@# by luna on a representative subset (gaps review R4). `make tests`
+	@# proved the handler correct but never short enough.
+	@python3 tools/luna-test/nmi_budget.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
@@ -228,11 +239,33 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
+	@# Second fixture: hdma, mode7, SNESMOD, nmiSet (the first has no RAM
+	@# for the first two and boots the other audio driver).
+	@$(MAKE) -s -C devtools/libtests_fx clean
+	@$(MAKE) -s -C devtools/libtests_fx
+	@python3 devtools/libtests_fx/test_libtest_fx.py
+	@# Third fixture: the DSP-1 commands no example calls. SKIPs without
+	@# the user-supplied dsp1b.rom (CI), like the firmware-gated manifests.
+	@$(MAKE) -s -C devtools/libtests_dsp1 clean
+	@$(MAKE) -s -C devtools/libtests_dsp1
+	@python3 devtools/libtests_dsp1/test_libtest_dsp1.py
+	@# Fourth fixture: HiROM. The sram module's HiROM mapping, and the bank
+	@# byte of a pointer to RAM under .BASE $$C0 (a wlalink fix, 2026-09-20).
+	@$(MAKE) -s -C devtools/libtests_hirom clean
+	@$(MAKE) -s -C devtools/libtests_hirom
+	@python3 devtools/libtests_hirom/test_libtest_hirom.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
 	@echo "ALL CHECKS PASSED (luna)"
+
+# The VBlank time budget on its own (gaps review R4): the same gate `make
+# tests` runs, handy while tuning the NMI handler. `--report` prints the
+# numbers without failing.
+test-nmi-budget:
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/nmi_budget.py
 
 # PAL pass (gaps review R2): the whole corpus booted at 312 lines / 50 Hz
 # (luna --force-region pal) plus the lib fixture asserting getRegion() /
@@ -264,6 +297,12 @@ test-project:
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage:
+	@$(MAKE) -s -C devtools/libtests
+	@$(MAKE) -s -C devtools/libtests_fx
+	@$(MAKE) -s -C devtools/libtests_dsp1
+	@$(MAKE) -s -C devtools/libtests_hirom
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
@@ -523,6 +562,11 @@ clean-release:
 # Help
 #------------------------------------------------------------------------------
 
+# The ROMs of the hardware verification protocol (docs/HARDWARE_VERIFICATION.md),
+# numbered in grid order, for a flash cart's SD card.
+hardware-kit:
+	@sh scripts/hardware-kit.sh
+
 help:
 	@echo "OpenSNES SDK Build System"
 	@echo ""
@@ -535,6 +579,7 @@ help:
 	@echo "  tests     - Build test ROMs"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
 	@echo "  release   - Create SDK release package (zip)"
+	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"

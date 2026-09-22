@@ -285,10 +285,17 @@ Use `collideRectEx()` to get the overlap amount and push objects apart. This is 
 ```c
 s16 dx, dy;
 if (collideRectEx(&player, &wall, &dx, &dy)) {
-    player_x -= dx;
-    player_y -= dy;
+    /* dx, dy are the displacements that move `player` OUT of `wall`:
+     * ADD them. Resolve the axis of least penetration only — applying
+     * both pushes the object out diagonally. */
+    if ((dx < 0 ? -dx : dx) < (dy < 0 ? -dy : dy)) player_x += dx;
+    else                                           player_y += dy;
 }
 ```
+
+This snippet subtracted the overlap until 2026-09-20, which drove the player
+deeper into the wall; the library fixture pins the sign (`dx = -6` for a
+player to the left of the wall).
 
 ### Bouncing (Breakout Pattern)
 

@@ -89,7 +89,14 @@ void hdmaWindowShape(u8 channel, const void *windowTable) {
  * data_init DMA loop and read from WRAM, which is always safe. Cost: 64
  * bytes of RAM in ROMs linking the hdma module.
  */
-static u8 sine_quarter[64] = {
+/* const since 2026-09-20. It was a plain static — bank-$00 RAM copied from
+ * ROM at boot for a table nothing writes — because devtools/check_lib_rodata.py
+ * forbade const data in lib C modules: before #121 a const table that the
+ * linker placed outside bank $00 was read with bank-$00 addressing. Every C
+ * read of const data is a far read now (#121), const data goes to the asset
+ * banks by design (#127.3) and check_bank_reads.py fails the link on a
+ * bank-blind read, so the lint only cost RAM. Retired with this change. */
+static const u8 sine_quarter[64] = {
       0,   6,  13,  19,  25,  31,  37,  44,
      50,  56,  62,  68,  74,  80,  86,  92,
      98, 103, 109, 115, 120, 126, 131, 136,
@@ -214,6 +221,11 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
         default: return;
     }
 
+    /* The header has always said "clamped internally"; only hdmaWaterRipple
+     * did it. fillWaveTable multiplies an 8-bit sine by the amplitude in an
+     * s16, which overflows from 129 up (fixed 2026-09-20). */
+    if (amplitude > 60) amplitude = 60;
+
     /* Store parameters */
     hdma_wave_channel = channel;
     hdma_wave_amplitude = amplitude;
@@ -225,7 +237,7 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     hdma_active_buffer = 0;
     hdma_wave_enabled = 1;
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -311,7 +323,7 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     }
     *p = 0x00;  /* End marker */
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -350,14 +362,18 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
         u16 color = (u16)(((u16)b << 10) | ((u16)g << 5) | (u16)r);
 
         *p++ = 4;                          /* 4 scanlines, non-repeat */
-        *p++ = colorIndex;                  /* CGADD low */
-        *p++ = 0x00;                        /* CGADD high */
+        /* CGADD is ONE 8-bit register and mode 2REG_2X writes it twice
+         * (p, p, p+1, p+1): both bytes must be the index. The second was 0
+         * ("CGADD high"), and the last write wins — every gradient landed on
+         * colour 0 whatever colorIndex said (fixed 2026-09-20). */
+        *p++ = colorIndex;                  /* CGADD, first write */
+        *p++ = colorIndex;                  /* CGADD, second write */
         *p++ = (u8)(color & 0xFF);          /* CGDATA low */
         *p++ = (u8)((color >> 8) & 0xFF);   /* CGDATA high */
     }
     *p = 0x00;  /* End marker */
 
-    hdmaSetupBank(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
     hdmaEnable(channel_mask(channel));
 }
 
@@ -439,7 +455,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 
     /* Setup and enable HDMA to drive WH0/WH1 per scanline.
      * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
-    hdmaSetupBank(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table, 0x00);
+    hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
     hdmaEnable(channel_mask(channel));
 
     /* Wait for HDMA to initialize (happens at start of VBlank).
@@ -522,6 +538,6 @@ void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed) {
     hdma_active_buffer = 0;
     hdma_wave_enabled = 1;
 
-    hdmaSetupBank(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a, 0x00);
+    hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
     hdmaEnable(channel_mask(channel));
 }

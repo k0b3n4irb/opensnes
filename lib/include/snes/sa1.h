@@ -119,10 +119,14 @@
 /** @brief I-RAM address for SA-1 ready flag */
 #define SA1_READY_ADDR  SA1_IRAM_BASE
 
-/* CCNT ($2200) bit definitions */
+/* CCNT ($2200) bit definitions. Arbiter: fullsnes, "2200h SNES CCNT - SA-1
+ * CPU Control (W)" — bit 4 NMI, bit 5 Reset (1 = reset), bit 6 Wait, bit 7
+ * IRQ; the Nintendo development manual, 4.1.1, agrees (RESB "0: Cancel,
+ * 1: Reset"). Two of these constants were wrong until 2026-09-20. */
 #define SA1_CCNT_SA1_IRQ    0x80  /**< Send IRQ to SA-1 */
-#define SA1_CCNT_SA1_RDYB   0x60  /**< SA-1 ready bits */
-#define SA1_CCNT_SA1_RESB   0x20  /**< SA-1 reset (0=reset, 1=release) */
+#define SA1_CCNT_SA1_RDYB   0x40  /**< Bit 6: SA-1 wait (0 = ready, 1 = wait). Was 0x60, which also set RESB */
+#define SA1_CCNT_SA1_RESB   0x20  /**< Bit 5: SA-1 reset (1 = reset, 0 = run — crt0 writes $00 to release). The comment had the polarity inverted */
+#define SA1_CCNT_SA1_NMI    0x10  /**< Bit 4: send NMI to the SA-1 */
 #define SA1_CCNT_MSG        0x0F  /**< Message to SA-1 (4 bits) */
 
 /*============================================================================
@@ -130,13 +134,22 @@
  *============================================================================*/
 
 /**
- * @brief Initialize and start the SA-1 coprocessor
+ * @brief Did the SA-1 boot? (crt0 starts it; this only reads the outcome)
  *
- * Writes the SA-1 reset vector, enables I-RAM/BW-RAM write access,
- * releases the SA-1 from reset, and waits for the ready flag in I-RAM.
+ * crt0 writes the SA-1 reset vector, enables I-RAM/BW-RAM access, releases
+ * the chip from reset and waits for its ready byte in I-RAM — all before
+ * main(). This function reads that outcome. Until 2026-09-22 it was named
+ * sa1Init(), whose doc claimed it did the boot itself; docs cited
+ * sa1IsReady() for years before it existed.
  *
- * @return 1 if SA-1 started successfully, 0 if timeout
+ * @return 1 if the SA-1 wrote SA1_READY_MAGIC ($A5) to I-RAM, 0 if crt0
+ *         timed out (no chip, or a boot failure — KNOWN_LIMITATIONS.md)
  */
+u8 sa1IsReady(void);
+
+/** @brief The pre-2026-09-22 name of sa1IsReady(). It never initialised
+ *         anything — crt0 does that before main(). Same value. */
+OPENSNES_DEPRECATED("use sa1IsReady() — crt0 boots the SA-1; this only reads its status")
 u8 sa1Init(void);
 
 #endif /* OPENSNES_SA1_H */

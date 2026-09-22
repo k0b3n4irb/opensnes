@@ -14,30 +14,37 @@
  * VRAM Transfers
  *============================================================================*/
 
-void dmaFillVRAM(u16 value, u16 dest, u16 size) {
-    /* For fill, we use fixed source mode */
-    /* Set VRAM address */
+/* One fixed-source DMA pass: `count` copies of *src to $2118 or $2119. */
+static void fill_pass(u8 vmain, u8 bbad, u16 src, u16 dest, u16 count) {
+    REG_VMAIN = vmain;
     REG_VMADDL = dest & 0xFF;
     REG_VMADDH = (dest >> 8) & 0xFF;
-    REG_VMAIN = 0x80;
-
-    /* Store value in a temp location */
-    static u16 fill_value;
-    fill_value = value;
-
-    /* DMA channel 0 - fixed source mode (bit 3 = 1) */
-    REG_DMAP(0) = 0x09;  /* Fixed source, write to 2 registers */
-
-    REG_BBAD(0) = 0x18;
-
-    REG_A1TL(0) = (u16)&fill_value & 0xFF;
-    REG_A1TH(0) = ((u16)&fill_value >> 8) & 0xFF;
-    REG_A1B(0) = 0x7E;
-
-    REG_DASL(0) = size & 0xFF;
-    REG_DASH(0) = (size >> 8) & 0xFF;
-
+    REG_DMAP(0) = 0x08;          /* fixed source, one register */
+    REG_BBAD(0) = bbad;
+    REG_A1TL(0) = src & 0xFF;
+    REG_A1TH(0) = (src >> 8) & 0xFF;
+    REG_A1B(0) = 0x7E;           /* bank-$00 RAM through its $7E mirror */
+    REG_DASL(0) = count & 0xFF;
+    REG_DASH(0) = (count >> 8) & 0xFF;
     REG_MDMAEN = 0x01;
+}
+
+void dmaFillVRAM(u16 value, u16 dest, u16 size) {
+    /* The header promises a WORD fill. The old single pass used a fixed
+     * source with the two-register mode ($2118 then $2119): a fixed source
+     * never advances, so both registers received the LOW byte and
+     * dmaFillVRAM(0x1234, ...) wrote $3434. Latent — every caller passed 0 —
+     * until the API audit (2026-09-20). Two passes instead: the low bytes
+     * with the address stepping on $2118 (VMAIN $00), then the high bytes
+     * with it stepping on $2119 (VMAIN $80, the lib's resting value). Same
+     * bus time for the same size. */
+    static u8 fill_lo, fill_hi;
+    u16 words = (size == 0) ? 0x8000 : (u16)((size >> 1) + (size & 1));
+
+    fill_lo = (u8)(value & 0xFF);
+    fill_hi = (u8)(value >> 8);
+    fill_pass(0x00, 0x18, (u16)&fill_lo, dest, words);
+    fill_pass(0x80, 0x19, (u16)&fill_hi, dest, words);
 }
 
 void dmaClearVRAM(void) {

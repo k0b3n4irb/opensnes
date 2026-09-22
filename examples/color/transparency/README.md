@@ -62,7 +62,7 @@ setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
 colorMathInit();
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);  /* Blend source = sub screen */
 colorMathSetOp(COLORMATH_ADD);                /* Addition (brightens) */
-colorMathEnable(COLORMATH_BG1 | COLORMATH_BACKDROP);  /* What gets blended */
+colorMathSetLayers(COLORMATH_BG1 | COLORMATH_BACKDROP);  /* What gets blended */
 ```
 
 The `COLORMATH_BACKDROP` flag ensures clouds also blend over empty areas (CGRAM entry 0).

@@ -130,12 +130,19 @@ under FastROM silently gave `$FE`). `compiler/wla-dx` therefore carries
 `compiler/PINS.md`). `symmap.py` and `check_bank_reads.py` fold the
 `$C0`/`$80` window back to the linker bank when they read a `.sym`.
 
-Corpus effect: the bank-$00 minimum went from **12 bytes** (tetris,
-likemario, mapandobjects) to **2168** (mode5_hires); the 2026-07 note's
-"honest ceiling" — hand-written asm payload such as tetris's `data.asm`
-strings or snesmod's driver — is what remains in bank $00 by choice.
-Tightening `BANK0_FAIL_THRESHOLD` from 8 is now possible and is the
-deliberate audit step below, not part of the flip.
+Corpus effect at the flip: the bank-$00 minimum went from **12 bytes**
+(tetris, likemario, mapandobjects) to **2168** (mode5_hires); the 2026-07
+note's "honest ceiling" — hand-written asm payload such as tetris's
+`data.asm` strings or snesmod's driver — is what remains in bank $00 by
+choice.
+
+**Measured again 2026-09-22: the minimum is back to 12 bytes**
+(`continuous_scroll`, `likemario`; then a plateau of 28 across six more).
+Code growth since the flip ate the headroom it bought, so the margin above
+`BANK0_FAIL_THRESHOLD = 8` is **4 bytes** on two examples. Tightening the
+threshold is therefore NOT currently possible — the audit step below has to
+start by refactoring those two. Re-measure with the loop at the end of this
+file before quoting any figure here; this one has now been stale twice.
 
 ## When to bump `BANK0_FAIL_THRESHOLD` tighter
 

@@ -42,7 +42,10 @@ extern u8 oamMemory[];
  * Set to 1 to request OAM buffer DMA during the next VBlank.
  * The NMI handler clears this after the transfer.
  *
- * @note Defined in crt0.asm. Automatically set by WaitForVBlank().
+ * @note Defined in crt0.asm. WaitForVBlank() does NOT set it: every
+ *       OAM-mutating function of sprite.h (and the oamSetFast macros) sets it
+ *       itself, and code that writes oamMemory[] directly must do the same —
+ *       otherwise the change never reaches the PPU.
  */
 extern volatile u8 oam_update_flag;
 
@@ -51,17 +54,14 @@ extern volatile u8 oam_update_flag;
  *============================================================================*/
 
 /**
- * @brief VBlank flag (set by NMI handler each frame)
+ * @brief Main-thread / NMI handshake flag — internal, do not write
  *
- * Set to 1 by the NMI handler at the start of each VBlank.
- * WaitForVBlank() polls this flag and clears it.
- *
- * For manual VBlank timing after heavy computation, clear this flag
- * before calling WaitForVBlank() to avoid using a stale flag:
- * @code
- * vblank_flag = 0;  // Clear stale flag
- * WaitForVBlank();  // Wait for next real VBlank
- * @endcode
+ * WaitForVBlank() sets it to 1 ("the main thread is ready") and sleeps; the
+ * NMI handler does its VBlank work only when it finds 1, then clears it to 0,
+ * which is what wakes WaitForVBlank(). An NMI that finds 0 is a lag frame: it
+ * counts it and skips all VBlank work, the user callback included. There is
+ * no stale flag to clear — this text described the opposite protocol until
+ * 2026-09-20. Writing the flag from user code breaks the handshake.
  *
  * @note Defined in crt0.asm.
  */

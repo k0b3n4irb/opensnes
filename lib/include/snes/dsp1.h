@@ -37,10 +37,11 @@
  * DSP-1 work in the main loop.
  *
  * @code
- * // rotate the point (100, 0) by 90 degrees -> (0, 100)
+ * // rotate the point (100, 0) by 90 degrees -> (0, -99): clockwise with Y
+ * // down, and the chip's sine of 90 degrees is 0x7FFF, not 1.0
  * dsp1Rotate(0x4000, 100, 0);
- * s16 x = dsp1_o0;   // ~0
- * s16 y = dsp1_o1;   // ~100
+ * s16 x = dsp1_o0;   // 0
+ * s16 y = dsp1_o1;   // -99
  * @endcode
  *
  * @see .claude/notes/tech/dsp1_reference.md — the full command reference.
@@ -92,8 +93,13 @@ void dsp1Init(void);
  * @param a first factor (T, signed 1.15)
  * @param b second factor (T, signed 1.15)
  * @return the product in signed 1.15 (rounded to 15 bits)
+ *
+ * Typed `s16` like every other signed DSP-1 quantity (and like
+ * DSP1_T_FROM_FIX(), which produces one). Until 2026-09-21 the three were
+ * `u16`: `dsp1Multiply(x, y) < 0` was always false and `>> 7` on the result
+ * was a logical shift. Same stack slots, same bits.
  */
-u16 dsp1Multiply(u16 a, u16 b);
+s16 dsp1Multiply(s16 a, s16 b);
 
 /**
  * @brief Scaled sine and cosine of an angle (DSP-1 command $04, "Triangle").
@@ -111,7 +117,8 @@ void dsp1Triangle(u16 angle, s16 radius);
  * @param y point Y (I)
  *
  * Writes @ref dsp1_o0 = x' and @ref dsp1_o1 = y'. Rotation is clockwise in the
- * SNES screen convention (Y down): (100,0) at 90° gives (0,-100).
+ * SNES screen convention (Y down): (100,0) at 90° gives (0,-99) — the chip's
+ * sine of 90° is 0x7FFF, not 1.0, so a full-scale result reads one short.
  */
 void dsp1Rotate(u16 angle, s16 x, s16 y);
 
@@ -228,7 +235,11 @@ void dsp1Raster(u8 FAR *ab, u8 FAR *cd, s16 vs, u16 count);
  * @param x vector X (I)
  * @param y vector Y (I)
  * @param z vector Z (I)
- * @return sqrt(x²+y²+z²), rounded (u16)
+ * @return sqrt(x²+y²+z²) as a u16 — not rounded: measured on luna (which
+ *         runs the real DSP-1B firmware), every exact length reads ONE LOW:
+ *         (3,4,12) -> 12, (300,400,0) -> 499, (0,0,10000) -> 9999. Treat the
+ *         result as exact to within 1, and compare with `>=` / `<`, never
+ *         `==`. Observed; no hardware reference states the rounding.
  *
  * Hardware square root — handy for homing missiles, audio attenuation,
  * anything that needs a true distance rather than a compare.
@@ -241,7 +252,14 @@ u16 dsp1Distance(s16 x, s16 y, s16 z);
  * @param y offset Y (I)
  * @param z offset Z (I)
  * @param r sphere radius (I)
- * @return (x²+y²+z²) − r² : ≤ 0 means inside the sphere
+ * @return ((x²+y²+z²) − r²) >> 15, arithmetic shift — NOT the raw difference
+ *         (it would not fit 16 bits). Measured on luna's DSP-1B:
+ *         (3000,4000,0, r 1000) -> 732 = 24 000 000 / 32768;
+ *         (0,0,0, r 1000) -> -31. Negative means inside; but anything within
+ *         32768 squared-units outside the surface reads 0, and (30,40,0, r 5)
+ *         — ten radii away in small units — reads 0 too. Use world units
+ *         large enough for the shell you care about, and test `< 0` for
+ *         "clearly inside". Observed; no hardware reference gives the scaling.
  *
  * One call replaces three multiplies and two adds — cheap 3D proximity /
  * LOD tests without ever leaving 16-bit C.
@@ -254,10 +272,14 @@ s16 dsp1Range(s16 x, s16 y, s16 z, u16 r);
  *         0 if the status port never raised RQM or the product was wrong.
  *
  * Unlike the other calls this one cannot hang on a missing chip (bounded
- * poll). Use it at boot the way sa1IsReady()/superfxIsPresent() are used —
+ * poll). Use it at boot the way sa1IsReady() / gsuIsPresent() are used —
  * e.g. to fall back to software math when running on the wrong board or on
- * an emulator without the firmware.
+ * an emulator without the firmware. (Named dsp1Present() until 2026-09-22.)
  */
+u8 dsp1IsPresent(void);
+
+/** @brief The pre-2026-09-22 name of dsp1IsPresent(). Same routine. */
+OPENSNES_DEPRECATED("use dsp1IsPresent()")
 u16 dsp1Present(void);
 
 #endif /* SNES_DSP1_H */

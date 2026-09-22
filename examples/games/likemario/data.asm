@@ -6,9 +6,9 @@
 ; Post-A6+A7 (v0.19.0), C pointers carry the bank byte natively; dmaCopyVram
 ; and dmaCopyCGram read it from the caller's Kl pointer. The legacy
 ; loadGraphics() ASM loader is gone — main.c calls dma helpers directly.
-; getSpriteTilBank() below is still needed for the dynamic sprite engine,
-; which sets up its own DMA from the bank byte rather than going through
-; a Kl-pointer helper.
+; The dynamic sprite engine gets its bank byte from OAM_SET_GFX(), which
+; reads it from the pointer (the getSpriteTilBank() helper that lived here
+; worked around a macro that recorded bank 0; removed 2026-09-20).
 
 ;----------------------------------------------------------------------
 ; Tile and sprite graphics (DMA-only access, any bank is fine)
@@ -40,22 +40,3 @@ tilesetatt:     .incbin "res/map_1_1.b16"
 
 .ends
 
-
-;----------------------------------------------------------------------
-; u8 getSpriteTilBank(void)
-;
-; Returns the bank byte of mario_sprite_til so C code can use
-; OAM_SET_GFX_BANK() for correct dynamic sprite DMA.
-;----------------------------------------------------------------------
-.section ".bank_helpers" superfree
-
-getSpriteTilBank:
-    php
-    sep #$20
-    lda #:mario_sprite_til      ; bank byte from linker
-    rep #$20
-    and #$00FF                  ; zero-extend to 16-bit return value
-    plp
-    rtl
-
-.ends

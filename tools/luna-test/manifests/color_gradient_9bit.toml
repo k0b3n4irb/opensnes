@@ -1,0 +1,39 @@
+# gradient_9bit — 224 backdrop colours and 224 brightness levels, one per
+# scanline, from two HDMA channels and nothing else. This was the last example
+# in the corpus with no functional test, and the reason is worth recording:
+# the whole effect lives DURING the picture. At a frame boundary — the only
+# phase a manifest observes — CGRAM entry 0 has already come back to $0000 and
+# there is no BG, no sprite and no VRAM content to inspect. Until luna v1.24.0
+# a manifest could not read a PPU register, so there was simply nothing here to
+# assert; `[asserts.ppu]` is what makes this file possible.
+#
+# What it proves that the other pillars cannot:
+#   * INIDISP is owned by channel 1 — the demo deliberately never calls
+#     setScreenOn(). So `inidisp` at the frame boundary is whatever the LAST
+#     line of the brightness table left behind: 5. If channel 1 stops being
+#     re-armed, the register keeps the value the CPU last wrote (0, forced
+#     blank, at boot) and the screen goes black. The liveness pass would still
+#     call this ROM alive, and it is exactly the regression the fbhash reports
+#     as "some pixels changed" without saying which half broke.
+#   * `hdma_enabled_state` = 0x03 is the library's shadow of $420C: both
+#     channels armed, every frame, not just the first.
+#   * The negatives say the gradient is what the demo claims it is: `tm` and
+#     `ts` are 0 (no layer is enabled — the colour IS the backdrop), `cgwsel`
+#     and `cgadsub` are 0 (no colour maths involved), `bgmode` is 1 and unused.
+#
+# Measured on luna v1.24.0 at frames 100, 150, 200 and 250 — identical at all
+# four, i.e. the reading is a steady state and not a phase of the animation.
+rom = "../../../examples/color/gradient_9bit/gradient_9bit.sfc"
+frames = 200
+
+[asserts.values]
+hdma_enabled_state = { eq = 0x03, width = 1 }   # channels 0 and 1, re-armed
+
+[asserts.ppu]
+inidisp = 5          # the brightness the last scanline of the table left
+bgmode = 1           # set once at boot; nothing draws through it
+tm = 0               # no main-screen layer: the gradient is the backdrop
+ts = 0               # no sub-screen layer either
+cgwsel = 0           # and no colour maths
+cgadsub = 0
+backdrop = 0         # entry 0 rewound by the time the frame ends

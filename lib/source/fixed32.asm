@@ -536,14 +536,25 @@ fix32Mul:
 ;   9,10,s  = a_lo
 ;   11,12,s = a_hi
 ;
-; Division by zero: undefined (the loop produces 0xFFFFFFFF and the
-; remainder is meaningless). Caller's responsibility to range-check.
+; Division by zero returns 0, like fixDiv / div16 / mod16 (2026-09-20). It
+; used to run the loop anyway and return 0xFFFFFFFF, sign-adjusted — the one
+; member of the family with a different answer.
 ;------------------------------------------------------------------------------
 fix32Div:
     php
     rep #$30
     .ACCU 16
     .INDEX 16
+
+    ; ---- Zero divisor: 0, the family convention ----
+    lda 5,s                 ; b_lo
+    ora 7,s                 ; b_hi
+    bne @nonzero
+    stz.b tcc__retval_hi
+    lda #0
+    plp
+    rtl
+@nonzero:
 
     ; ---- Sign tracking ----
     lda 11,s                ; a_hi

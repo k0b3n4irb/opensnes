@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.43.0
+## Current Status: post-v0.44.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
@@ -225,11 +225,11 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Item | Status | Why it matters |
 |------|--------|----------------|
 | Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
-| Hardware verification docs | Not started | Credibility — document testing on real SNES via FXPak Pro |
+| Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows the 30 % improvement with data |
-| Migration guide PVSnesLib → OpenSNES | Not started | Smoothest adoption path for existing PVSnesLib users |
-| FAQ | Not started | Reduces support load |
+| Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
+| FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
 | `examples/maps/dynamic_map` cleanup | **Done (2026-07-12)** | Dead code removed: unused `maputil.c` TU, `getSprite*`/`updateSprite*`/`calculateSprite*` engine paths, `sram*` ASM helpers + 16 KB dead `$7F` RAMSECTION; stale C64-converter claims corrected |
 
 ### Nice-to-have
@@ -269,10 +269,10 @@ This stretch focused on closing process gaps surfaced by an internal audit
       to hard-fail, `--allow-known-bugs` dropped from CI.
 - [x] **Mode 7 game example** — `examples/games/mode7_racing` and
       `examples/games/mode7_flying` (both shipped; luna manifests).
-- [ ] **Gaps-review backlog** — the prioritised list in
+- [x] **Gaps-review backlog** — the prioritised list in
       `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b).
       Tiers 1 and 2 shipped 2026-09-12/15; Tier 3's four lots shipped
-      2026-09-15. Delivered along the way: CI runs `make tests` and
+      2026-09-15; the last two entries closed 2026-09-17 (see below). Delivered along the way: CI runs `make tests` and
       `make lint` verbatim, host sanitizers, cppcheck, fuzzing of every
       asset parser, the three upstream toolchain suites, a per-module
       link smoke test, the C-feature and fixed-point runtime ROMs,
@@ -280,11 +280,13 @@ This stretch focused on closing process gaps surfaced by an internal audit
       audio-output hash, a weekly PAL pass, nightly luna bench, host
       coverage reporting, SHA-pinned actions, a Doxygen warning gate,
       and the migration, FAQ, profiling and index docs.
-      **Two entries stay open**: R4 (the VBlank time budget) waits on
-      luna folding the NMI handler's child profile rows into their
-      parent, and R7 has covered the seven games plus
-      `input/move_sprite` — the remaining interactive manifests, the
-      multitap path and mouse sensitivity are still to do.
+      R4 closed with luna v1.24.0's `profile --budget`: the NMI
+      handler's worst frame is gated at 12 000 master cycles on a
+      representative subset (`make test-nmi-budget`). R7 closed with
+      the 47 remaining manifests: every example has a functional test
+      (108 manifests, 85/85), mouse sensitivity included; the multitap
+      path is documented in `KNOWN_LIMITATIONS.md` as untestable until
+      luna exposes a multitap.
 - [ ] **Streaming audio support**
 - [ ] **Hardware verification documentation**
 - [ ] **Original-game release**
@@ -294,10 +296,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ## Work in flight
 
-None on a branch. The live plan is the backlog of the 2026-09-11 gaps
-review (`.claude/notes/reviews/2026-09-11_gaps_review.md`, §10–§11):
-Tier 1 shipped 2026-09-11..13, Tier 2 is in progress on `develop`
-directly, one item per commit. The `wip/*` policy (`CONTRIBUTING.md`)
+None on a branch. The 2026-09-11 gaps-review backlog is closed (43 of
+43, 2026-09-17). Since then the work on `develop` is the module
+audit-by-tutorial (text, object, framework — twelve stale claims and
+nine object-engine defects fixed) and the road to v1.0 above: the
+hardware verification protocol, then coverage of the public functions
+no example executes, then the API audit before the freeze. The `wip/*` policy (`CONTRIBUTING.md`)
 still applies to multi-day chantiers; the four `wip/*` branches that
 existed on 2026-09-14 were all superseded by commits already on
 `develop` (three CI hygiene branches of 2026-09-07, one test-harness
@@ -332,6 +336,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-17. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-22. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

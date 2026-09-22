@@ -50,10 +50,20 @@ The SNES MMU maps SRAM into bank space differently for LoROM vs HiROM:
 | **HiROM** | `$30`–`$3F` (mirror to `$B0`–`$BF`) | `$30:6000–$3F:7FFF` | 8 KB per bank in the lower half, 32 KB max. |
 | **SA-1** | Different — see SA-1 chapter | — | SA-1 cart layouts depend on per-cart configuration. |
 
-The lib's `sramSave`/`sramLoad` hide these details. You pass a
-WRAM/RAM pointer and a byte count; the helper assembles the correct
-24-bit SRAM address. Unless you're writing custom SRAM access code,
-you don't need to know the bank/offset arithmetic.
+The lib's `sramSave`/`sramLoad` hide the LoROM / HiROM difference: you pass
+a pointer and a byte count, and the helper uses `$70:0000` on a LoROM build
+and `$30:6000` on a HiROM one. Two limits to know:
+
+- on **HiROM** the helpers address the first 8 KB window only
+  (`offset + size <= 8192`, the default `SRAM_SIZE`);
+- on **SA-1** they are not available: `USE_SRAM=1` with `USE_SA1=1` stops the
+  build with an explanation rather than linking a module that would write
+  nowhere.
+
+This paragraph claimed the helpers "hide these details" long before they
+did — until 2026-09-20 they used the LoROM address on every build. The HiROM
+mapping is pinned by `devtools/libtests_hirom`, which reads the bytes back
+from `$30:6000`.
 
 ## Build setup
 
@@ -112,6 +122,9 @@ declarations (Makefile says 8 KB, header says 2 KB) produce silent
 | `sramLoadOffset(data, size, offset)` | Load from SRAM at byte `offset`. |
 | `sramClear(size)` | Zero `size` bytes of SRAM starting at offset 0. Used for "delete save". |
 | `sramChecksum(data, size)` | Compute an 8-bit XOR checksum of `data`. Use this for save-integrity validation. |
+
+The five copying functions return `SRAM_OK` (0), `SRAM_ERR_RANGE` or
+`SRAM_ERR_NO_SRAM`; a refused call copies nothing (see the gotcha below).
 
 The byte arrays are flat — there's no filesystem on SRAM, just a
 linear address space starting at offset 0. You pick the layout.
@@ -277,17 +290,25 @@ random patterns. Your validation must catch both:
 - **Version field** (advanced): track save format version so old
   saves from a previous game build can be migrated or rejected.
 
-### 🔴 `SRAM_SIZE` mismatch between Makefile and code
+### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused since 2026-09-21
 
-The lib's `sramSave/sramLoad` will happily write past the size
-declared in the ROM header. On emulators, the `.srm` file may be
-truncated; on real hardware, writes past the actual chip size wrap
-around or vanish. Always set `SRAM_SIZE` in your Makefile to match
-or exceed the largest offset your code writes.
+Every function of the family except `sramChecksum` returns a code:
+`SRAM_OK`, `SRAM_ERR_RANGE` (`offset + size` exceeds the declared SRAM) or
+`SRAM_ERR_NO_SRAM` (the header declares none — `USE_SRAM := 1` is missing).
+A refused call copies nothing. The capacity is read from your ROM's own
+header, so it always matches the `SRAM_SIZE` you built with (capped at what
+the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).
 
-A common bug: `SRAM_SIZE := 1` (2 KB) in Makefile, then code uses
-`SLOT_SIZE = 1024` × 4 slots = 4 KB. Slots 2 and 3 silently fail
-to persist on hardware that respects the header.
+Before that the family returned `void` and copied whatever it was asked,
+past the declared size. The classic bug — `SRAM_SIZE := 1` (2 KB) in the
+Makefile, then `SLOT_SIZE = 1024` × 4 slots — now fails loudly on slot 2 if
+you look at the return value:
+
+```c
+if (sramSaveOffset((u8 *)&save, sizeof(save), SLOT_OFFSET(slot)) != SRAM_OK) {
+    /* this slot does not exist on this cartridge */
+}
+```
 
 ### 🟠 SRAM access requires no special timing
 

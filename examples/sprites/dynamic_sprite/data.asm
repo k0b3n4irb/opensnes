@@ -2,7 +2,9 @@
 ; Dynamic Sprite Engine Example - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+; ASSET_SECTION (banks 7-1): the dynamic sprite engine DMAs these tiles from
+; whatever bank OAM_SET_GFX() recorded — it used to record bank $00 always.
+ASSET_SECTION "spr16"
 
 ; 16x16 sprite tiles (4bpp)
 ; Source: sprite16_grid.png = 128x48 = 24 frames of 16x16 sprites

@@ -69,6 +69,7 @@ CASES = [
     # widths, promotions, truncations
     ("r_widen_u",   4, 120000),
     ("r_widen_s",   4, 0xFFFFFFF9),
+    ("r_widen_shl", 4, 0xFFFF0000),   # widen-then-shift: the fixed32.h claim
     ("r_mul16to32", 4, 0xFFFEA070),
     ("r_trunc16",   2, 0x2345),
     ("r_trunc8",    1, 0x45),

@@ -45,8 +45,14 @@ u8 cgadsub;
  * here via address-taking so fn-pointer / fallback callers can link. */
 void (*const __opensnes_force_emit_colorMathInit)(void) = colorMathInit;
 
-/* colorMathEnable() is `inline` in colormath.h. Force-emit canonical here. */
-void (*const __opensnes_force_emit_colorMathEnable)(u8) = colorMathEnable;
+/* colorMathSetLayers() is `inline` in colormath.h. Force-emit canonical here. */
+void (*const __opensnes_force_emit_colorMathSetLayers)(u8) = colorMathSetLayers;
+
+/* The deprecated name, out of line: a use of a deprecated symbol is an error
+ * in this strict build, a definition is not. Removed at the next major. */
+void colorMathEnable(u8 layers) {
+    colorMathSetLayers(layers);
+}
 
 /* colorMathDisable() is `inline` in colormath.h. Same force-emit pattern. */
 void (*const __opensnes_force_emit_colorMathDisable)(void) = colorMathDisable;
@@ -111,7 +117,7 @@ void colorMathSetChannel(u8 channel, u8 intensity) {
 
 void colorMathTransparency50(u8 layers) {
     /* Enable add mode with half = 50% blend */
-    colorMathEnable(layers);
+    colorMathSetLayers(layers);
     colorMathSetOp(COLORMATH_ADD);
     colorMathSetHalf(1);
     colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
@@ -119,7 +125,7 @@ void colorMathTransparency50(u8 layers) {
 
 void colorMathShadow(u8 layers, u8 intensity) {
     /* Subtract fixed gray to darken */
-    colorMathEnable(layers);
+    colorMathSetLayers(layers);
     colorMathSetOp(COLORMATH_SUB);
     colorMathSetHalf(0);
     colorMathSetSource(COLORMATH_SRC_FIXED);
@@ -128,7 +134,7 @@ void colorMathShadow(u8 layers, u8 intensity) {
 
 void colorMathTint(u8 layers, u8 r, u8 g, u8 b) {
     /* Add fixed color to tint */
-    colorMathEnable(layers);
+    colorMathSetLayers(layers);
     colorMathSetOp(COLORMATH_ADD);
     colorMathSetHalf(0);
     colorMathSetSource(COLORMATH_SRC_FIXED);

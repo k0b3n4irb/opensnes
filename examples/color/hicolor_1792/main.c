@@ -120,10 +120,9 @@ int main(void) {
 
     /* Rewind each frame in VBlank; stream each scanline via H-IRQ.
      * BOTH handlers live in SUPERFREE sections that may land outside
-     * bank 0 — always pass the real bank (nmiSet/irqSet assume 0). */
-    nmiSetBank(hicolorVblank, (u8)((u32)(void *)hicolorVblank >> 16));
-    irqSetBank((void *)hicolorIrqStream,
-               (u8)((u32)(void *)hicolorIrqStream >> 16));
+     * bank 0; nmiSet / irqSet take the bank from the far pointer. */
+    nmiSet(hicolorVblank);
+    irqSet((void *)hicolorIrqStream);
     /* H-timer: the IRQ fires at H = HTIME + 3.5 dots (fullsnes) and the
      * handler must reach its CGRAM DMA inside H-blank — a CGRAM write
      * during the picture lands on the WRONG entry (snesdev-wiki, PPU

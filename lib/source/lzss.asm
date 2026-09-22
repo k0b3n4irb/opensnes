@@ -64,7 +64,7 @@ lzss_m6     DW      ; bit counter
 .16bit
 
 ;---------------------------------------------------------------------------------
-; void LzssDecodeVram(u8 *source, u16 address)
+; void lzssDecodeVram(const u8 *source, u16 address)   (LzssDecodeVram: deprecated alias, same address)
 ;
 ; Decompresses LZ77-encoded data directly to VRAM.
 ;
@@ -85,7 +85,8 @@ lzss_m6     DW      ; bit counter
 ; IMPORTANT: Disables interrupts during decompression to prevent
 ;            NMI handler from corrupting VRAM writes.
 ;---------------------------------------------------------------------------------
-LzssDecodeVram:
+lzssDecodeVram:
+LzssDecodeVram:                         ; deprecated spelling, kept until the next major
     php
     phb
     phx
@@ -104,7 +105,11 @@ LzssDecodeVram:
     sta tcc__r0                     ; tcc__r0 = source address
     sep #$20
     .ACCU 8
-    lda #$00                        ; Bank $00 (cc65816 passes 16-bit pointers)
+    lda 14,s                        ; bank byte of the far source pointer (12-15,s).
+                                    ; Was a literal $00 ("cc65816 passes 16-bit
+                                    ; pointers", pre-A6): compressed data outside
+                                    ; bank $00 — the default since #127.3 —
+                                    ; decompressed as garbage (fixed 2026-09-20).
     sta tcc__r0h
 
     rep #$20

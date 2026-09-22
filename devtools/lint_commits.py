@@ -70,6 +70,11 @@ ALLOWED_SCOPES = {
     # tech notes (2026-07-26): real path .claude/notes/tech/ (sibling of
     # `chantiers`/`conventions` above — technical references and analyses).
     "tech",
+    # status notes (2026-09-22): real path .claude/notes/status/ (sibling of
+    # `tech`/`conventions` above — the current state of a moving target).
+    # Used since 7408483c; the lint only noticed at the v0.44.0 release,
+    # because a push lints its own commits, never the accumulated range.
+    "status",
     # game-craft docs (2026-08-02): real path docs/craft/ (sibling of
     # docs/tutorials/ — design/decision guides, not API reference).
     "craft",

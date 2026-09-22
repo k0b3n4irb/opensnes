@@ -48,9 +48,11 @@ For `f(a, b, c)`, cc65816 emits:
     plx
 ```
 
-Each argument occupies 2 bytes on the stack regardless of declared C type:
-`u8`, `u16`, and pointers are all 2-byte slots (a `u8` is zero-extended to
-16 bits before pushing). `u32` and `s32` use 4 bytes (one 16-bit pea each).
+`u8` and `u16` occupy a 2-byte slot (a `u8` is zero-extended to 16 bits
+before pushing). `u32`, `s32` **and pointers** use 4 bytes (two 16-bit
+pushes): since chantier A6 a pointer is a far pointer — address, then bank
+byte, then a padding byte. (This paragraph still listed pointers as 2-byte
+slots until 2026-09-20, contradicting the worked examples below.)
 
 ### Callee side
 

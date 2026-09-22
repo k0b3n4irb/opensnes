@@ -59,7 +59,7 @@ dsp1Init_loop:
     rtl
 
 ;------------------------------------------------------------------------------
-; u16 dsp1Multiply(u16 a, u16 b)  ->  A   (command $00, 1.15 product)
+; s16 dsp1Multiply(s16 a, s16 b)  ->  A   (command $00, 1.15 product)
 ;------------------------------------------------------------------------------
 dsp1Multiply:
     php
@@ -621,14 +621,15 @@ dsp1Raster_done:
     rtl
 
 ;------------------------------------------------------------------------------
-; u16 dsp1Present(void)  ->  A   (1 = DSP-1 responding, 0 = absent/inert)
+; u8 dsp1IsPresent(void) / u16 dsp1Present(void)  ->  A   (1 = DSP-1 responding, 0 = absent/inert)
 ;   Known-answer test: Multiply $4000 x $4000 must return $2000 (0.5*0.5=0.25
 ;   in 1.15). On a board without the chip (or an emulator without firmware)
 ;   the open-bus/inert reads cannot produce the exact product.
 ;   Bounded poll: unlike dsp1_rqm, gives up after ~64K reads so a missing
 ;   chip returns 0 instead of hanging.
 ;------------------------------------------------------------------------------
-dsp1Present:
+dsp1IsPresent:                          ; the name since 2026-09-22
+dsp1Present:                            ; deprecated alias: same address, same routine
     php
     sep #$20
     .ACCU 8

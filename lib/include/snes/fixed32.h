@@ -19,10 +19,9 @@
  * - Two values multiplied risk overflowing 8.8 (e.g. velocity × time).
  *
  * @code
- * fixed32 angle = 0;
- * fixed32 omega = FIX32(1) / 360;       // 1°/frame in radians (~0.0028)
- * angle += omega;                        // free — just s32 += s32
- * fixed32 vx = fix32Mul(FIX32(2), fix32Sin(angle));
+ * u8 angle = 0;                           // 0-255 = one full turn
+ * angle += 1;                             // ~1.4 degrees per frame
+ * fixed32 vx = fix32Mul(FIX32(2), fix32Sin(angle));   // fix32Sin takes a u8
  * @endcode
  *
  * ## Operations available
@@ -35,8 +34,9 @@
  * | Clamp             | `fix32Clamp`     | inline               |
  * | Multiply          | `fix32Mul`       | ~280 (16 × 8x8 hw)   |
  *
- * Division, sin/cos, and lerp are deferred to follow-up chantiers
- * (see `.claude/notes/chantiers/b5_fix32_orbit_sketch.md`).
+ * Division (`fix32Div`, 0 on a zero divisor), sine / cosine (`fix32Sin`,
+ * `fix32Cos`) and `fix32Lerp` are declared below. (This line called them
+ * "deferred" long after they shipped.)
  *
  * ## Sign convention
  *
@@ -82,14 +82,13 @@ typedef s32 fixed32;
 #define FIX32(x) ((fixed32)((u32)(s32)(x) << 16))
 
 /**
- * @brief Convert fixed32 to integer (truncate toward zero)
+ * @brief Convert fixed32 to integer (floor)
  * @param x fixed32 value
  * @return Integer part as s16
  *
- * Truncation rounds toward zero for both signs (C99 semantics for
- * arithmetic right-shift on signed types is implementation-defined,
- * but the cc65816 backend implements arithmetic shift, so this works
- * as expected on this target).
+ * Rounds toward MINUS infinity, not toward zero: the cc65816 backend
+ * implements the signed right shift as arithmetic, so UNFIX32 of -0.5 is -1.
+ * (This block claimed "toward zero for both signs" until 2026-09-20.)
  *
  * @code
  * fixed32 pos = FIX32(1000) + 32768;  // 1000.5
@@ -187,6 +186,11 @@ inline fixed32 fix32Max(fixed32 a, fixed32 b) {
  * fixed32 area = fix32Mul(FIX32(width), FIX32(height));
  * fixed32 dy = fix32Mul(velocity, FIX32(dt));
  * @endcode
+ *
+ * @warning NOT safe inside an nmiSet() callback, like fixMul(): it drives the
+ *          hardware multiplier ($4202/$4203) and uses static scratch, so an
+ *          NMI-context call corrupts a main-thread call in flight. fix32Div()
+ *          and fix32Lerp() share the scratch and the restriction.
  */
 fixed32 fix32Mul(fixed32 a, fixed32 b);
 
@@ -203,6 +207,9 @@ fixed32 fix32Mul(fixed32 a, fixed32 b);
  * 80-bit working register.
  *
  * Cycles: ~1500 (much slower than fix32Mul; use sparingly in hot loops).
+ *
+ * A zero divisor returns 0, like fixDiv() / div16() / mod16().
+ * @warning Not callable from an nmiSet() callback — see fix32Mul().
  *
  * @code
  * fixed32 velocity = fix32Div(distance, time);
@@ -264,19 +271,18 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * fixed32 dx = fix32Mul(speed, fix32Sin(angle));
  * @endcode
  */
-/* Implemented in lib/source/fixed32.asm. Two qbe codegen bugs make the
- * one-line C body `(u32)(s32)fixSin(angle) << 8` produce wrong results:
+/* Implemented in lib/source/fixed32.asm. It was written that way because
+ * two qbe codegen bugs made the one-line C body
+ * `(u32)(s32)fixSin(angle) << 8` produce wrong results — a Kl
+ * shift-by-constant spill (fixed 2026-05-22) and a sign assumption on
+ * widening, which produced 0x00FF0000 instead of 0xFFFF0000 for
+ * sin(270°) = -1.
  *
- *   1. Kl shift-by-constant spill (fixed in qbe 2026-05-22): the high
- *      half was computed from an unstored stack slot. Resolved.
- *
- *   2. Kw → Kl widening sign assumption (UNFIXED): ref_is_high_zero()
- *      treats all Kw operands as zero-extended. Wrong for signed
- *      s16 → s32 — produces 0x00FF0000 instead of 0xFFFF0000 for
- *      sin(270°) = -1.
- *
- * The asm form sign-extends explicitly and avoids both. See
- * lib/source/math.c for the full notes. */
+ * BOTH ARE GONE (re-measured 2026-09-18). `devtools/libtests` now computes
+ * that exact C expression alongside this function and asserts they agree
+ * (r_f32sin_c / r_f32sin_asm), and `c_features` pins the widen-then-shift
+ * case on its own (r_widen_shl). The asm stays because there is no reason
+ * to churn a working routine, not because C cannot express it. */
 fixed32 fix32Sin(u8 angle);
 fixed32 fix32Cos(u8 angle);
 
@@ -288,6 +294,6 @@ fixed32 fix32Cos(u8 angle);
  * fixed32 dy = fix32Mul(speed, fix32Cos(angle));
  * @endcode
  */
-/* fix32Cos declared above with fix32Sin — both bodies in math.c. */
+/* fix32Cos declared above with fix32Sin — both bodies in fixed32.asm. */
 
 #endif /* OPENSNES_FIXED32_H */
