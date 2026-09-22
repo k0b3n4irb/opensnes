@@ -156,14 +156,18 @@ u16 padRaw(u8 pad);
  *
  * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
  *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
- * @return TRUE if connected, FALSE otherwise
+ * @return 1 if connected, 0 otherwise (0xFF for "yes" until 2026-09-22)
  *
- * @warning Not reliable today for pads 0 and 1: the NMI handler zeroes any
- *          joypad word whose device signature is not a standard pad before
- *          storing it, so the $FFFF "nothing plugged" pattern this function
- *          looks for can never reach it, and an empty port reads as an idle
- *          pad — TRUE. Open item B12 of the 2026-09-20 API audit; the fix
- *          needs crt0 to publish a per-port validity flag.
+ * @warning Not reliable today for pads 0 and 1: it answers 1 for an empty
+ *          port. Auto-joypad reading cannot tell the two cases apart — an
+ *          empty port and an idle pad both auto-read $0000; the difference
+ *          only exists past bit 16 of a manual serial read (a pad's line
+ *          idles high, an empty port returns 0s) — modelled identically by
+ *          luna, ares and Mesen2, not measured on a console (it is on the
+ *          real-hardware checklist, docs/HARDWARE_VERIFICATION.md). Open item
+ *          B12 of the 2026-09-20 API audit; the fix needs crt0 to clock that
+ *          17th bit and publish a per-port flag, and a luna release with an
+ *          unplugged port to test it against.
  */
 u8 padIsConnected(u8 pad);
 

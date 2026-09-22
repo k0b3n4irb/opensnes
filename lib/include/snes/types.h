@@ -164,8 +164,8 @@ typedef volatile s32 vs32;
  * but `bool` / `true` / `false` come from <stdbool.h>, which this freestanding
  * SDK does not ship: on cproc (the only supported compiler) `bool` is NOT
  * defined, and the branch below — for pre-C99 compilers — is dead. No public
- * function uses `bool`; predicates return `u8` (0 / 1, or TRUE = 0xFF for the
- * older ones — see the API audit, 3.2, for the plan to unify them).
+ * function uses `bool`; every predicate returns `u8` 0 / 1 (unified
+ * 2026-09-22, API audit 3.2 — TRUE was 0xFF until then).
  */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef unsigned char bool;
@@ -173,9 +173,13 @@ typedef unsigned char bool;
 #define true  1
 #endif
 
-/* SNES-specific TRUE/FALSE (0xFF for TRUE is common in SNES code) */
+/* TRUE is 1 since 2026-09-22. It was 0xFF (a PVSnesLib habit): `isPAL() ==
+ * 1` was false on PAL, and `if (x == TRUE)` failed on every predicate that
+ * returned 1. Every predicate of this SDK now returns 0 or 1, and the three
+ * that returned TRUE (isPAL, isInVBlank, padIsConnected) return 1. Compare
+ * with `if (pred())`, never with a literal — that works under both values. */
 #define FALSE 0
-#define TRUE  0xFF
+#define TRUE  1
 
 /** @} */
 

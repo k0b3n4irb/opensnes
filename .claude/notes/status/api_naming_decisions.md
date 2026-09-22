@@ -1,6 +1,7 @@
 # API naming decisions — owner's call before the v1.0 freeze
 
-Status: **open, waiting for the owner** (written 2026-09-21).
+Status: owner said go on N1 then N2-N6 (2026-09-22); D1-D5 still open.
+Written 2026-09-21.
 Source: `.claude/notes/reviews/2026-09-20_api_audit.md` §3.2 / §3.3.
 
 Everything in the audit that was a *defect* or a *same-slot retype* is done
@@ -16,7 +17,7 @@ rename inside the repo.
 
 | # | Today | Proposal | Uses | Why |
 |---|---|---|---|---|
-| N1 | `TRUE` = `0xFF`; predicates return `0xFF` (`isPAL`, `isInVBlank`, `padIsConnected`), `1` (`getRegion`, `mouse*`) or a raw flag (`scopeIsConnected`) | every predicate returns 0 / 1; `TRUE` = 1 | 2 | `if (isPAL() == 1)` is false today. Two in-repo comparisons to check. Not aliasable: it is a value change, do it before the freeze or never |
+| N1 ✅ 2026-09-22 | `TRUE` = `0xFF`; predicates return `0xFF` (`isPAL`, `isInVBlank`, `padIsConnected`), `1` (`getRegion`, `mouse*`) or a raw flag (`scopeIsConnected`) | every predicate returns 0 / 1; `TRUE` = 1 | 2 | `if (isPAL() == 1)` is false today. Two in-repo comparisons to check. Not aliasable: it is a value change, do it before the freeze or never |
 | N2 | `scopeButtonsHeld` = auto-repeat; "currently down" is `scopeButtonsDown`, while `padHeld` / `mouseButtonsHeld` = currently down | `scopeButtonsHeld` = currently down, `scopeButtonsRepeat` = the auto-repeat one; `scopeButtonsDown` deprecated | 1 | same word, opposite meaning on the third device |
 | N3 | `colorMathEnable(mask)` / `mosaicEnable(mask)` **replace** the layer set; `windowEnable` / `hdmaEnable` **OR** into it | `colorMathSetLayers` / `mosaicSetLayers` for the replacing pair, old names deprecated | 18 | "Enable" that disables what you enabled a line earlier |
 | N4 | `sa1Init()` initialises nothing (crt0 does) and returns the status; `dsp1Present()`; `gsuInit()` returns presence *and* sets defaults | `sa1IsReady()`, `dsp1IsPresent()`, `gsuIsPresent()` (+ `gsuInit` keeps the defaults part) | 14 | docs already cite a `sa1IsReady()` that does not exist |

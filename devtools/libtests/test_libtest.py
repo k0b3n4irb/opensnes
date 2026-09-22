@@ -166,13 +166,12 @@ CASES = [
     # input: an idle connected pad must read as connected. padIsConnected()
     # rejected $0000 as well as $FFFF until 2026-09-18, so a pad with nothing
     # pressed — almost every frame — reported unplugged.
-    ("r_pad_conn",  2, 0xFF),   # TRUE
+    ("r_pad_conn",  2, 1),      # TRUE = 1 since 2026-09-22 (was 0xFF)
     ("r_pad_idle",  2, 0),      # nothing pressed
     ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
     ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
-    # The getters return TRUE, which snes/types.h defines as 0xFF (not 1).
-    ("r_invb_in", 2, 0xFF), ("r_invb_out", 2, 0),
+    ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -180,7 +179,7 @@ CASES = [
 # `--region pal` (luna --force-region). Same ROM, same asserts otherwise.
 REGION_CASES = {
     "ntsc": [("r_region", 2, 0), ("r_ispal", 2, 0)],
-    "pal":  [("r_region", 2, 1), ("r_ispal", 2, 0xFF)],   # isPAL() returns TRUE = 0xFF
+    "pal":  [("r_region", 2, 1), ("r_ispal", 2, 1)],
 }
 
 # Window module: the PPU registers luna reports in `luna state` JSON (ppu.*)

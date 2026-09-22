@@ -271,7 +271,8 @@ void WaitForVBlank(void);
 /**
  * @brief Check if currently in VBlank
  *
- * @return TRUE if in VBlank, FALSE if in active display
+ * @return 1 if in VBlank, 0 in active display (0xFF for "yes" until
+ *         2026-09-22)
  */
 u8 isInVBlank(void);
 
@@ -313,7 +314,8 @@ void resetFrameCount(void);
 /**
  * @brief Check if PAL system
  *
- * @return TRUE if PAL (50Hz), FALSE if NTSC (60Hz)
+ * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) — the same value as getRegion()
+ *         since 2026-09-22 (it returned 0xFF for PAL before)
  *
  * @code
  * if (isPAL()) {

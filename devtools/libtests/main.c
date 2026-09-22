@@ -346,15 +346,16 @@ static volatile u8 sin_angle = 192;   /* 270 degrees */
  * joypad's is 0, so an idle pad reads exactly $0000. luna attaches a pad to
  * port 1 by default and the fixture presses nothing, which is precisely the
  * case that was broken. */
-u16 r_pad_conn;     /* padIsConnected(0) with no input -> TRUE (0xFF) */
+u16 r_pad_conn;     /* padIsConnected(0) with no input -> 1 (TRUE was 0xFF until 2026-09-22) */
 u16 r_pad_idle;     /* padHeld(0) with no input        -> 0 */
-u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> FALSE */
-u16 r_pad_oob;      /* padIsConnected(9) — out of range -> FALSE */
+u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> 0 */
+u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
-u16 r_ispal;        /* isPAL()     -> FALSE 0 (TRUE = 0xFF under pal) */
-u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> TRUE (0xFF) */
+u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
+u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
+u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> 1 */
 u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 
 extern void irqTestHandler(void);   /* data.asm, bank 0 */
@@ -874,6 +875,7 @@ static void part_objects_irq(void) {
     /* --- L2c: console region + vblank flag --- */
     r_region = getRegion();
     r_ispal  = isPAL();
+    r_true_one = (isPAL() == getRegion() && TRUE == 1) ? 1 : 0;   /* N1: one truth value */
     WaitForVBlank();
     r_invb_in = isInVBlank();
     while (isInVBlank()) { }

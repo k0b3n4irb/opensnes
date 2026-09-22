@@ -74,7 +74,7 @@ u16 padRaw(u8 pad) {
 }
 
 u8 padIsConnected(u8 pad) {
-    if (pad >= 5) return FALSE;
+    if (pad >= 5) return 0;
     /* The auto-joypad word ends in a 4-bit device signature, and a standard
      * controller's is 0000 (fullsnes, "SNES Controllers I/O Ports - Automatic
      * Reading": bits 3-0 are "0 (High)" for a joypad, and "no buttons pressed
@@ -90,8 +90,8 @@ u8 padIsConnected(u8 pad) {
      * (see the multitap entry in KNOWN_LIMITATIONS.md), so their slots hold
      * 0 forever — no reading at all, rather than a reading of "idle". Saying
      * FALSE is the truthful answer until the multitap path is reachable. */
-    if (pad >= 2) return FALSE;
-    return (pad_keys[pad] != 0xFFFF) ? TRUE : FALSE;
+    if (pad >= 2) return 0;
+    return (pad_keys[pad] != 0xFFFF) ? 1 : 0;
 }
 
 /*============================================================================

@@ -64,7 +64,7 @@ void consoleInit(void) {
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
     /* Detect PAL/NTSC */
-    is_pal_system = (REG_STAT78 & 0x10) ? TRUE : FALSE;
+    is_pal_system = (REG_STAT78 & 0x10) ? 1 : 0;
 
     /* Set default brightness (screen still blanked) */
     current_brightness = 15;
@@ -180,7 +180,7 @@ u8 (*const __opensnes_force_emit_getBrightness)(void) = getBrightness;
  * instruction for power savings and reduced bus contention (Opt 1). */
 
 u8 isInVBlank(void) {
-    return (REG_HVBJOY & 0x80) ? TRUE : FALSE;
+    return (REG_HVBJOY & 0x80) ? 1 : 0;
 }
 
 /*============================================================================
@@ -203,7 +203,7 @@ u8 isPAL(void) {
 }
 
 u8 getRegion(void) {
-    return is_pal_system ? 1 : 0;
+    return is_pal_system;           /* the same 0 / 1 as isPAL() since 2026-09-22 */
 }
 
 /*============================================================================
