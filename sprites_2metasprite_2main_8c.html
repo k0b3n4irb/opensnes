@@ -136,7 +136,7 @@ $(function(){initNavTree('sprites_2metasprite_2main_8c.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:acac94c2679c53549cb9dacfcfb08be1a" id="r_acac94c2679c53549cb9dacfcfb08be1a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acac94c2679c53549cb9dacfcfb08be1a">BASE_TILE_16</a>&#160;&#160;&#160;(<a class="el" href="#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a>)</td></tr>
 <tr class="memitem:a185b25d8300b5a4e465ed3f581b633d3" id="r_a185b25d8300b5a4e465ed3f581b633d3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a185b25d8300b5a4e465ed3f581b633d3">BASE_TILE_32</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:a185b25d8300b5a4e465ed3f581b633d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base tile numbers for <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>.  <br /></td></tr>
+<tr class="memdesc:a185b25d8300b5a4e465ed3f581b633d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base tile numbers for <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>.  <br /></td></tr>
 <tr class="memitem:a9071483b8a3b1fc7e806c58f5a4f08cb" id="r_a9071483b8a3b1fc7e806c58f5a4f08cb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a9071483b8a3b1fc7e806c58f5a4f08cb">BASE_TILE_8</a>&#160;&#160;&#160;(<a class="el" href="#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a> + <a class="el" href="#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a>)</td></tr>
 <tr class="memitem:a6bfff52a25b42cefaa6314f09d416da6" id="r_a6bfff52a25b42cefaa6314f09d416da6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a>&#160;&#160;&#160;96</td></tr>
 <tr class="memdesc:a6bfff52a25b42cefaa6314f09d416da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of tiles in the 16x16 hero sprite sheet.  <br /></td></tr>
@@ -162,7 +162,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a2dda27b37416157c96a876cd65710e7f" id="r_a2dda27b37416157c96a876cd65710e7f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2dda27b37416157c96a876cd65710e7f">drawMenu</a> (void)</td></tr>
 <tr class="memdesc:a2dda27b37416157c96a876cd65710e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redraw the on-screen menu showing all three OBJ size modes.  <br /></td></tr>
 <tr class="memitem:ad6eba0f1fac53c1e89b6ad3f444b3f09" id="r_ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">drawSprites</a> (void)</td></tr>
-<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render metasprites using <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode.  <br /></td></tr>
+<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render metasprites using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: metasprite demo with switchable OBJ size modes.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -185,7 +185,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Metasprite composition with switchable OBJ size modes. </p>
-<p>Demonstrates metasprites: large characters built from multiple hardware OAM entries using <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. The SNES OBJSEL register ($2101) provides two sprite sizes (small and large) that all 128 OAM entries share. This example lets the user switch between three size combinations to see how the same character is composed from differently-sized pieces.</p>
+<p>Demonstrates metasprites: large characters built from multiple hardware OAM entries using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. The SNES OBJSEL register ($2101) provides two sprite sizes (small and large) that all 128 OAM entries share. This example lets the user switch between three size combinations to see how the same character is composed from differently-sized pieces.</p>
 <p>Three sprite sheets (8x8, 16x16, 32x32) are pre-loaded to contiguous VRAM. The gfx4snes -T flag transposes the sprite sheet tiles into SNES OBJ VRAM layout, and the -P flag generates metasprite frame definitions (tile offsets + positions) included as C arrays.</p>
 <p>When the OBJ size mode changes, OBJSEL and OAM must be updated atomically within the same VBlank to avoid one frame of garbled sprites.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
@@ -232,8 +232,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Base tile numbers for <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. </p>
-<p><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> adds the baseTile offset to each metasprite entry's relative tile number to compute the final OAM tile index. Since all three sprite sheets are loaded contiguously in VRAM, each sheet's base tile is the cumulative tile count of all preceding sheets. First tile of 32x32 sheet </p>
+<p>Base tile numbers for <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. </p>
+<p><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> adds the baseTile offset to each metasprite entry's relative tile number to compute the final OAM tile index. Since all three sprite sheets are loaded contiguously in VRAM, each sheet's base tile is the cumulative tile count of all preceding sheets. First tile of 32x32 sheet </p>
 
 </div>
 </div>
@@ -493,8 +493,8 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Render metasprites using <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode. </p>
-<p><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
+<p>Render metasprites using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode. </p>
+<p><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
 <p>Each size mode uses a different combination of LARGE and SMALL sprites to render two characters: one larger (left) and one smaller (right). </p>
 <p>&lt; First tile of 16x16 sheet (192)</p>
 <p>&lt; First tile of 8x8 sheet (288)</p>
@@ -576,7 +576,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="asprites_2dynamic__metasprite_2main_8c_html_ae2ffd37454763f04bc54b520f8e8c323"><div class="ttname"><a href="sprites_2dynamic__metasprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero16_frame0[]</div><div class="ttdoc">16x16 metasprite: 32x48 character (2x3 grid of 16x16)</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
 </div><!-- fragment -->
 <p>Metasprite frame definitions generated by gfx4snes -P. </p>
-<p>Each .inc file defines arrays (e.g., hero8_frame0[]) that describe how to compose a character from multiple OAM entries. Each entry in the array contains the relative X/Y offset and tile number for one hardware sprite. <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads these arrays to populate OAM.</p>
+<p>Each .inc file defines arrays (e.g., hero8_frame0[]) that describe how to compose a character from multiple OAM entries. Each entry in the array contains the relative X/Y offset and tile number for one hardware sprite. <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads these arrays to populate OAM.</p>
 <p>Frame-pointer table the clip's <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> frame values index into </p>
 
 </div>

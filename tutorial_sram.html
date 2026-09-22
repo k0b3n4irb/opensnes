@@ -137,7 +137,7 @@ What SRAM actually is</h2>
 <li><b>Battery dies</b> (typically after 10–20 years) → SRAM contents become garbage on next boot.</li>
 <li><b>Cartridge corruption</b> (cold-boot timing, marginal voltages) → SRAM contents become garbage <em>during</em> play.</li>
 </ol>
-<p>Both are silent failures. Your code <b>must</b> validate SRAM on every load — magic number, checksum, version field. A blind <span class="tt"><a class="el" href="sram_8h.html#a27d8f498726727694f6631de1aa41b9f" title="Load data from SRAM.">sramLoad()</a></span> into a struct gives you whatever was in that battery-backed memory, correct or not.</p>
+<p>Both are silent failures. Your code <b>must</b> validate SRAM on every load — magic number, checksum, version field. A blind <span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad()</a></span> into a struct gives you whatever was in that battery-backed memory, correct or not.</p>
 <h2 class="doxsection"><a class="anchor" id="memory-map"></a>
 Memory map</h2>
 <p>The SNES MMU maps SRAM into bank space differently for LoROM vs HiROM:</p>
@@ -151,7 +151,12 @@ Memory map</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>SA-1</b>  </td><td class="markdownTableBodyNone">Different — see SA-1 chapter  </td><td class="markdownTableBodyNone">—  </td><td class="markdownTableBodyNone">SA-1 cart layouts depend on per-cart configuration.  </td></tr>
 </table>
-<p>The lib's <span class="tt"><a class="el" href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a27d8f498726727694f6631de1aa41b9f" title="Load data from SRAM.">sramLoad</a></span> hide these details. You pass a WRAM/RAM pointer and a byte count; the helper assembles the correct 24-bit SRAM address. Unless you're writing custom SRAM access code, you don't need to know the bank/offset arithmetic.</p>
+<p>The lib's <span class="tt"><a class="el" href="sram_8h.html#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad</a></span> hide the LoROM / HiROM difference: you pass a pointer and a byte count, and the helper uses <span class="tt">$70:0000</span> on a LoROM build and <span class="tt">$30:6000</span> on a HiROM one. Two limits to know:</p>
+<ul>
+<li>on <b>HiROM</b> the helpers address the first 8 KB window only (<span class="tt">offset + size &lt;= 8192</span>, the default <span class="tt">SRAM_SIZE</span>);</li>
+<li>on <b>SA-1</b> they are not available: <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span> stops the build with an explanation rather than linking a module that would write nowhere.</li>
+</ul>
+<p>This paragraph claimed the helpers "hide these details" long before they did — until 2026-09-20 they used the LoROM address on every build. The HiROM mapping is pinned by <span class="tt">devtools/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="build-setup"></a>
 Build setup</h2>
 <p>Two changes to enable SRAM in a project:</p>
@@ -208,6 +213,7 @@ The lib API</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">sramChecksum(data, size)</span>  </td><td class="markdownTableBodyNone">Compute an 8-bit XOR checksum of <span class="tt">data</span>. Use this for save-integrity validation.  </td></tr>
 </table>
+<p>The five copying functions return <span class="tt"><a class="el" href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7" title="The transfer fits and was done (a size of 0 is also OK).">SRAM_OK</a></span> (0), <span class="tt"><a class="el" href="sram_8h.html#a4b63695b18f1219d4bd926a2018fbaa5" title="offset + size exceeds the declared SRAM; nothing was copied.">SRAM_ERR_RANGE</a></span> or <span class="tt"><a class="el" href="sram_8h.html#ac212fcfc7b67cd50eb15d00e099a3b82" title="The ROM header declares no SRAM (USE_SRAM := 1 is missing).">SRAM_ERR_NO_SRAM</a></span>; a refused call copies nothing (see the gotcha below).</p>
 <p>The byte arrays are flat — there's no filesystem on SRAM, just a linear address space starting at offset 0. You pick the layout.</p>
 <h2 class="doxsection"><a class="anchor" id="the-minimum-viable-save"></a>
 The minimum viable save</h2>
@@ -235,7 +241,7 @@ The minimum viable save</h2>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">int</span> loadSave(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_function" href="sram_8h.html#a27d8f498726727694f6631de1aa41b9f">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save));</div>
+<div class="line">    <a class="code hl_function" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save));</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Validate magic */</span></div>
 <div class="line">    <span class="keywordflow">if</span> (save.magic[0] != <span class="charliteral">&#39;S&#39;</span> || save.magic[1] != <span class="charliteral">&#39;A&#39;</span> ||</div>
@@ -257,7 +263,7 @@ The minimum viable save</h2>
 <div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> writeSave(<span class="keywordtype">void</span>) {</div>
 <div class="line">    save.checksum = 0;</div>
 <div class="line">    save.checksum = <a class="code hl_function" href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save));</div>
-<div class="line">    <a class="code hl_function" href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save));</div>
+<div class="line">    <a class="code hl_function" href="sram_8h.html#ae59c751326cb355338a21605adb09325">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save));</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
@@ -279,8 +285,8 @@ The minimum viable save</h2>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asram_8h_html"><div class="ttname"><a href="sram_8h.html">sram.h</a></div><div class="ttdoc">SNES SRAM (Save RAM) Functions.</div></div>
 <div class="ttc" id="asram_8h_html_a1112f8f7d8aaf47129938cc4c35d0309"><div class="ttname"><a href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a></div><div class="ttdeci">u8 sramChecksum(const u8 *data, u16 size)</div><div class="ttdoc">Calculate simple checksum.</div></div>
-<div class="ttc" id="asram_8h_html_a27d8f498726727694f6631de1aa41b9f"><div class="ttname"><a href="sram_8h.html#a27d8f498726727694f6631de1aa41b9f">sramLoad</a></div><div class="ttdeci">void sramLoad(u8 FAR *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
-<div class="ttc" id="asram_8h_html_a7415ce406c368ab48f4224101eef11bf"><div class="ttname"><a href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf">sramSave</a></div><div class="ttdeci">void sramSave(const u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
+<div class="ttc" id="asram_8h_html_a271e24b7e809f10b1d8d2979b512bb0b"><div class="ttname"><a href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a></div><div class="ttdeci">u8 sramLoad(u8 FAR *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
+<div class="ttc" id="asram_8h_html_ae59c751326cb355338a21605adb09325"><div class="ttname"><a href="sram_8h.html#ae59c751326cb355338a21605adb09325">sramSave</a></div><div class="ttdeci">u8 sramSave(const u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
 </div><!-- fragment --><p>The two non-obvious bits:</p>
 <ol type="1">
 <li><b>Always validate</b>. SRAM contents on first boot are undefined — real hardware gives you whatever was in those memory cells when the cartridge was assembled. Magic-number-or-die is the canonical fix.</li>
@@ -293,28 +299,28 @@ Multi-slot saves</h2>
 <div class="line"><span class="preprocessor">#define SLOT_OFFSET(n)  ((n) * SLOT_SIZE)</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">void</span> writeSlot(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> slot, SaveData *data) {</div>
-<div class="line">    <a class="code hl_function" href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)data, <span class="keyword">sizeof</span>(SaveData), SLOT_OFFSET(slot));</div>
+<div class="line">    <a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)data, <span class="keyword">sizeof</span>(SaveData), SLOT_OFFSET(slot));</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> loadSlot(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> slot, SaveData *data) {</div>
-<div class="line">    <a class="code hl_function" href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)data, <span class="keyword">sizeof</span>(SaveData), SLOT_OFFSET(slot));</div>
+<div class="line">    <a class="code hl_function" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)data, <span class="keyword">sizeof</span>(SaveData), SLOT_OFFSET(slot));</div>
 <div class="line">    <span class="comment">/* … validate magic + checksum as above … */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="asram_8h_html_a33eaa8d30319fe6c1a8a2f1586c09752"><div class="ttname"><a href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a></div><div class="ttdeci">void sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
-<div class="ttc" id="asram_8h_html_adc31b500d6dd4534bbaae396faa69df6"><div class="ttname"><a href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
+<div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
+<div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
 </div><!-- fragment --><p>The SDK's <span class="tt">examples/memory/save_game</span> is exactly this pattern: two slots, distinct offsets, full struct round-trip with on-screen verification of the loaded values.</p>
 <h2 class="doxsection"><a class="anchor" id="delete-save"></a>
 "Delete save"</h2>
 <p>Zero the relevant region:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a>(<span class="keyword">sizeof</span>(SaveData));        <span class="comment">/* slot 0 only */</span></div>
-<div class="line"><a class="code hl_function" href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a>(N_SLOTS * SLOT_SIZE);     <span class="comment">/* all slots */</span></div>
-<div class="ttc" id="asram_8h_html_a5fb4001e2b3432597a28e97af0a907c0"><div class="ttname"><a href="sram_8h.html#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a></div><div class="ttdeci">void sramClear(u16 size)</div><div class="ttdoc">Clear SRAM to zero.</div></div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="sram_8h.html#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a>(<span class="keyword">sizeof</span>(SaveData));        <span class="comment">/* slot 0 only */</span></div>
+<div class="line"><a class="code hl_function" href="sram_8h.html#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a>(N_SLOTS * SLOT_SIZE);     <span class="comment">/* all slots */</span></div>
+<div class="ttc" id="asram_8h_html_a373d9d4cbabd4f432cac5fbf80d88ff4"><div class="ttname"><a href="sram_8h.html#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a></div><div class="ttdeci">u8 sramClear(u16 size)</div><div class="ttdoc">Clear SRAM to zero.</div></div>
 </div><!-- fragment --><p>The next load attempt fails magic-number validation and falls back to defaults. (Don't try "delete by setting magic to invalid" — a direct write is simpler and survives partial-write failures.)</p>
 <h2 class="doxsection"><a class="anchor" id="worked-pattern-the-shipped-example-1"></a>
 Worked pattern (the shipped example)</h2>
 <p><span class="tt">examples/memory/save_game</span> — two save slots, each holding a <span class="tt"><a class="el" href="structSaveState.html" title="Data structure representing one save slot&#39;s persistent state.">SaveState</a> { posX, posY, camX, camY }</span>. Press <b>A</b> to save test data to slot 1, <b>B</b> to load it back; <b>X</b>/**Y** for slot 2. Loaded values are displayed as hex on screen so you can verify round-trip integrity. The example exercises:</p>
 <ul>
-<li><span class="tt"><a class="el" href="sram_8h.html#a33eaa8d30319fe6c1a8a2f1586c09752" title="Save data to SRAM at offset.">sramSaveOffset</a></span> / <span class="tt"><a class="el" href="sram_8h.html#adc31b500d6dd4534bbaae396faa69df6" title="Load data from SRAM at offset.">sramLoadOffset</a></span> for multi-slot.</li>
+<li><span class="tt"><a class="el" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset</a></span> / <span class="tt"><a class="el" href="sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset</a></span> for multi-slot.</li>
 <li>Struct serialisation through a flat byte array.</li>
 <li>The Makefile + header pair (<span class="tt">USE_SRAM := 1</span>, <span class="tt">SRAM_SIZE := 3</span>) — this is the example to copy when starting a new save-supporting project.</li>
 </ul>
@@ -327,7 +333,7 @@ Gotchas</h2>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (save.magic != <span class="stringliteral">&quot;SAVE&quot;</span> || <a class="code hl_function" href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a>(...) != save.checksum) {</div>
 <div class="line">    initDefaults();</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>This is <em>not optional</em>. A <span class="tt"><a class="el" href="sram_8h.html#a27d8f498726727694f6631de1aa41b9f" title="Load data from SRAM.">sramLoad</a></span> into a struct without validation gives you garbage and your game silently boots into corrupted state. The save_game example (which doesn't validate) is fine for a tech demo; production code is not.</p>
+</div><!-- fragment --><p>This is <em>not optional</em>. A <span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad</a></span> into a struct without validation gives you garbage and your game silently boots into corrupted state. The save_game example (which doesn't validate) is fine for a tech demo; production code is not.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-battery-dies--silent-corruption"></a>
 🔴 Battery dies → silent corruption</h3>
 <p>A 10–20-year-old cartridge's coin-cell battery can fail. When it does, SRAM contents drift toward "all $00" or "all $FF" or random patterns. Your validation must catch both:</p>
@@ -336,14 +342,18 @@ Gotchas</h2>
 <li><b>Checksum</b>: deterministic — fails on partial corruption (one bad byte mid-struct).</li>
 <li><b>Version field</b> (advanced): track save format version so old saves from a previous game build can be migrated or rejected.</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md-sram_size-mismatch-between-makefile-and-code"></a>
-🔴 <span class="tt">SRAM_SIZE</span> mismatch between Makefile and code</h3>
-<p>The lib's <span class="tt">sramSave/sramLoad</span> will happily write past the size declared in the ROM header. On emulators, the <span class="tt">.srm</span> file may be truncated; on real hardware, writes past the actual chip size wrap around or vanish. Always set <span class="tt">SRAM_SIZE</span> in your Makefile to match or exceed the largest offset your code writes.</p>
-<p>A common bug: <span class="tt">SRAM_SIZE := 1</span> (2 KB) in Makefile, then code uses <span class="tt">SLOT_SIZE = 1024</span> × 4 slots = 4 KB. Slots 2 and 3 silently fail to persist on hardware that respects the header.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md-sram-access-requires-no-special-timing"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-sram_size-mismatch-between-makefile-and-code--refused-since-2026-09-21"></a>
+🟢 <span class="tt">SRAM_SIZE</span> mismatch between Makefile and code — refused since 2026-09-21</h3>
+<p>Every function of the family except <span class="tt"><a class="el" href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309" title="Calculate simple checksum.">sramChecksum</a></span> returns a code: <span class="tt"><a class="el" href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7" title="The transfer fits and was done (a size of 0 is also OK).">SRAM_OK</a></span>, <span class="tt"><a class="el" href="sram_8h.html#a4b63695b18f1219d4bd926a2018fbaa5" title="offset + size exceeds the declared SRAM; nothing was copied.">SRAM_ERR_RANGE</a></span> (<span class="tt">offset + size</span> exceeds the declared SRAM) or <span class="tt"><a class="el" href="sram_8h.html#ac212fcfc7b67cd50eb15d00e099a3b82" title="The ROM header declares no SRAM (USE_SRAM := 1 is missing).">SRAM_ERR_NO_SRAM</a></span> (the header declares none — <span class="tt">USE_SRAM := 1</span> is missing). A refused call copies nothing. The capacity is read from your ROM's own header, so it always matches the <span class="tt">SRAM_SIZE</span> you built with (capped at what the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).</p>
+<p>Before that the family returned <span class="tt">void</span> and copied whatever it was asked, past the declared size. The classic bug — <span class="tt">SRAM_SIZE := 1</span> (2 KB) in the Makefile, then <span class="tt">SLOT_SIZE = 1024</span> × 4 slots — now fails loudly on slot 2 if you look at the return value:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), SLOT_OFFSET(slot)) != <a class="code hl_define" href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7">SRAM_OK</a>) {</div>
+<div class="line">    <span class="comment">/* this slot does not exist on this cartridge */</span></div>
+<div class="line">}</div>
+<div class="ttc" id="asram_8h_html_a03d071b39713a7e13ca63eac2cba04f7"><div class="ttname"><a href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7">SRAM_OK</a></div><div class="ttdeci">#define SRAM_OK</div><div class="ttdoc">The transfer fits and was done (a size of 0 is also OK).</div><div class="ttdef"><b>Definition</b> sram.h:108</div></div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md-sram-access-requires-no-special-timing"></a>
 🟠 SRAM access requires no special timing</h3>
 <p>Unlike VRAM/CGRAM/OAM (which need VBlank or force blank), SRAM is plain RAM mapped into the CPU's address space. You can read or write it at any time during active display. The lib's helpers do not call <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> and don't need to.</p>
-<p>This is good news ergonomically — <span class="tt"><a class="el" href="sram_8h.html#a7415ce406c368ab48f4224101eef11bf" title="Save data to SRAM.">sramSave</a></span> mid-frame is fine — but newcomers from a "VBlank everything" mental model sometimes add unnecessary <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> calls around SRAM operations.</p>
+<p>This is good news ergonomically — <span class="tt"><a class="el" href="sram_8h.html#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave</a></span> mid-frame is fine — but newcomers from a "VBlank everything" mental model sometimes add unnecessary <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> calls around SRAM operations.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-cannot-store-pointers-in-sram"></a>
 🟠 Cannot store pointers in SRAM</h3>
 <p>A pointer in WRAM points to bank <span class="tt">$00</span> (or <span class="tt">$7E</span>) at some specific address; that address is meaningful only while the cartridge runs this exact ROM. If you save a pointer and reload it on a future boot, the pointer might be valid (same ROM) or not (different game or emulator's memory layout). Always serialise structs as plain-old-data: counts, flags, indices, NEVER pointers.</p>
@@ -370,7 +380,7 @@ Cycle cost</h2>
 </ul>
 <p>A full 8 KB save: ~57 K CPU cycles ≈ 430 K master cycles — slightly <em>more</em> than one full frame (a frame is ~357 K master cycles). SRAM access needs no VBlank window, so nothing corrupts, but the frame that runs the save arrives late. For multi-KB auto-saves during gameplay, split the save across frames (say 2 KB per frame) or accept the one-off hitch.</p>
 <p>There is no DMA path for SRAM — general DMA cannot copy between two A-bus addresses (WRAM and cartridge SRAM both live on the A bus), so MVN is the fastest option available.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-11"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-13"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">lib/include/snes/sram.h</a></span> — full API reference.</li>

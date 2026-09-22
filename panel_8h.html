@@ -297,7 +297,7 @@ Functions</h2></td></tr>
 
 <p>Upload the tilemap to VRAM under forced blank. </p>
 <p>One 2 KB DMA covering every panel in the layer. Wraps itself in <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> / <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> because 2 KB does not reliably fit VBlank — see the file header.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Restores full brightness on exit. If you are mid-fade, upload before starting the fade rather than during it.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It ends with <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>: the display is ON when it returns, at the last brightness set — even if you called it under forced blank during setup, which therefore un-blanks before the rest of your init. Flush last, or call <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> again afterwards. It also blanks wherever the beam is: call it right after <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> to avoid a partial black frame. (This warning said "restores full brightness" until 2026-09-20; it does not.)</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">p</td><td>The panel layer. </td></tr>

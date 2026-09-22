@@ -177,6 +177,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga5068f6438c4c46d041f3cbf31a35421b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if mouse is connected on port.  <br /></td></tr>
 <tr class="memitem:gaf222011bc82c48e1e935a20ad3a0443d" id="r_gaf222011bc82c48e1e935a20ad3a0443d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d">mouseSetSensitivity</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> port, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sensitivity)</td></tr>
 <tr class="memdesc:gaf222011bc82c48e1e935a20ad3a0443d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set mouse sensitivity.  <br /></td></tr>
+<tr class="memitem:ga72b3ab97bb0675eaa1bbceb420769133" id="r_ga72b3ab97bb0675eaa1bbceb420769133"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga72b3ab97bb0675eaa1bbceb420769133">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a>() — it means \&quot;currently down\&quot; like <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>()&quot;) u16 scopeButtonsDown(void)</td></tr>
+<tr class="memdesc:ga72b3ab97bb0675eaa1bbceb420769133"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0" title="Buttons currently down — the same meaning as padHeld() and mouseButtonsHeld().">scopeButtonsHeld()</a>. Same value.  <br /></td></tr>
 <tr class="memitem:a4f095dc343f6b5ac5712cc69e1bd20b5" id="r_a4f095dc343f6b5ac5712cc69e1bd20b5"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a4f095dc343f6b5ac5712cc69e1bd20b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons currently held.  <br /></td></tr>
 <tr class="memitem:a81de395bc8d5dc741526d1378981a261" id="r_a81de395bc8d5dc741526d1378981a261"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a81de395bc8d5dc741526d1378981a261">padIsConnected</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
@@ -187,12 +189,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:abcf020412a5fcc70c31c207517f97a48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get raw button state.  <br /></td></tr>
 <tr class="memitem:a2ef786c923fe4841a3b4f1d2f7350dda" id="r_a2ef786c923fe4841a3b4f1d2f7350dda"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2ef786c923fe4841a3b4f1d2f7350dda">padReleased</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a2ef786c923fe4841a3b4f1d2f7350dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons released this frame.  <br /></td></tr>
-<tr class="memitem:ga1e54dc68c7f0b0b70f98efbd0ce247c9" id="r_ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1e54dc68c7f0b0b70f98efbd0ce247c9">scopeButtonsDown</a> (void)</td></tr>
-<tr class="memdesc:ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get currently held buttons.  <br /></td></tr>
 <tr class="memitem:ga1baff359c18cc5b5811aa718f6cc3aa0" id="r_ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a> (void)</td></tr>
-<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons held past the hold delay threshold.  <br /></td></tr>
+<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons currently down — the same meaning as <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> and <a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a>.  <br /></td></tr>
 <tr class="memitem:ga81b12c4a14aec097adf26b2e99080ef6" id="r_ga81b12c4a14aec097adf26b2e99080ef6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a> (void)</td></tr>
 <tr class="memdesc:ga81b12c4a14aec097adf26b2e99080ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get newly pressed buttons this frame.  <br /></td></tr>
+<tr class="memitem:ga1f9c6c7b3ae5feb1f4025caa938d088f" id="r_ga1f9c6c7b3ae5feb1f4025caa938d088f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1f9c6c7b3ae5feb1f4025caa938d088f">scopeButtonsRepeat</a> (void)</td></tr>
+<tr class="memdesc:ga1f9c6c7b3ae5feb1f4025caa938d088f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons held past the hold delay, re-triggering every repeat delay (see <a class="el" href="group__scope__input.html#gab8752dda2561271655c015698a4787af" title="Set repeat delay (frames between repeat fires after hold).">scopeSetRepeatDelay()</a>) — a keyboard-style auto-repeat.  <br /></td></tr>
 <tr class="memitem:ga5e28e1c68fdfa123dacdb209abdc478e" id="r_ga5e28e1c68fdfa123dacdb209abdc478e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a> (void)</td></tr>
 <tr class="memitem:gac2ec7014e3673e2ecc39dc6571cabed4" id="r_gac2ec7014e3673e2ecc39dc6571cabed4"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#gac2ec7014e3673e2ecc39dc6571cabed4">scopeGetRawX</a> (void)</td></tr>
 <tr class="memdesc:gac2ec7014e3673e2ecc39dc6571cabed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get raw (uncalibrated) H position from PPU.  <br /></td></tr>
@@ -293,7 +295,7 @@ Usage</h2>
 <p>Returns all buttons currently being pressed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number (0-3) </td></tr>
+    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
   </table>
   </dd>
 </dl>
@@ -323,11 +325,15 @@ Usage</h2>
 <p>Check if controller is connected. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number (0-3) </td></tr>
+    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>TRUE if connected, FALSE otherwise </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if connected, 0 otherwise (0xFF for "yes" until 2026-09-22)</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Not reliable today for pads 0 and 1: it answers 1 for an empty port. Auto-joypad reading cannot tell the two cases apart — an empty port and an idle pad both auto-read $0000; the difference only exists past bit 16 of a manual serial read (a pad's line idles high, an empty port returns 0s) — modelled identically by luna, ares and Mesen2, not measured on a console (it is on the real-hardware checklist, <a class="el" href="HARDWARE__VERIFICATION_8md.html">docs/HARDWARE_VERIFICATION.md</a>). Open item B12 of the 2026-09-20 API audit; the fix needs crt0 to clock that 17th bit and publish a per-port flag, and a luna release with an unplugged port to test it against.</dd>
+<dd>
+For whoever writes that fix: <b>mask the serial ports before testing them.</b> <span class="tt"><a class="el" href="group__cpu__regs.html#ga673eec1ab77f89bf77852155a00dd859" title="Joypad Port A data/strobe (R/W: read serial data, write bit 0 to latch).">REG_JOYA</a></span> (<span class="tt">$4016</span>) and <span class="tt"><a class="el" href="group__cpu__regs.html#ga29726d437128e77d311fe8b94b61387f" title="Joypad Port B data (R: read serial data for port 2).">REG_JOYB</a></span> (<span class="tt">$4017</span>) are whole-byte reads; only bits 0-1 are the port's data lines. On <span class="tt">$4017</span> bits 2-4 are tied and always read 1, bits 5-7 are open bus; on <span class="tt">$4016</span> bits 2-7 are open bus (fullsnes, "Unused bits in
+         ports"; snesdev-wiki, JOYSER1: "D4-2 always 1"). So <span class="tt">if (<a class="el" href="group__cpu__regs.html#ga29726d437128e77d311fe8b94b61387f" title="Joypad Port B data (R: read serial data for port 2).">REG_JOYB</a>)</span> is true on every console and every emulator — test <span class="tt"><a class="el" href="group__cpu__regs.html#ga29726d437128e77d311fe8b94b61387f" title="Joypad Port B data (R: read serial data for port 2).">REG_JOYB</a> &amp; 1</span> (data 1) or <span class="tt">&amp; 3</span> (both lines). </dd></dl>
 
 </div>
 </div>
@@ -350,7 +356,7 @@ Usage</h2>
 <p>Returns buttons that were just pressed (not held from previous frame).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number (0-3) </td></tr>
+    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
   </table>
   </dd>
 </dl>
@@ -380,7 +386,7 @@ Usage</h2>
 <p>Returns the raw hardware state without edge detection.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number (0-3) </td></tr>
+    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
   </table>
   </dd>
 </dl>
@@ -407,7 +413,7 @@ Usage</h2>
 <p>Returns buttons that were just released (held last frame, not now).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number (0-3) </td></tr>
+    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
   </table>
   </dd>
 </dl>

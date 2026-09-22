@@ -21,5 +21,5 @@ var tools =
     [ "smconv — tracker modules to SNESMOD soundbanks", "tools_smconv.html", null ],
     [ "palplan — project shared-palette planner", "tools_palplan.html", null ],
     [ "aseprite2snes — Aseprite animations → AnimClip tables", "tools_aseprite2snes.html", null ],
-    [ "luna — command reference (pinned v1.23.0)", "tools_luna.html", null ]
+    [ "luna — command reference (pinned v1.24.0)", "tools_luna.html", null ]
 ];

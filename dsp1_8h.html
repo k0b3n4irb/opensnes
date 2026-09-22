@@ -149,14 +149,16 @@ Functions</h2></td></tr>
 <tr class="memdesc:af8c54ae3bc3a6017516b2b06ccbd711c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Euclidean length of a 3D vector (DSP-1 command $28, "Distance").  <br /></td></tr>
 <tr class="memitem:a07cbf1c377508911986a414336ad4fd8" id="r_a07cbf1c377508911986a414336ad4fd8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a07cbf1c377508911986a414336ad4fd8">dsp1Init</a> (void)</td></tr>
 <tr class="memdesc:a07cbf1c377508911986a414336ad4fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resynchronise the DSP-1 to a known command-wait state.  <br /></td></tr>
-<tr class="memitem:a56e4866725fffcfcf7710d4dd1ae6dac" id="r_a56e4866725fffcfcf7710d4dd1ae6dac"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a56e4866725fffcfcf7710d4dd1ae6dac">dsp1Multiply</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
-<tr class="memdesc:a56e4866725fffcfcf7710d4dd1ae6dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed 1.15 × 1.15 multiply (DSP-1 command $00).  <br /></td></tr>
+<tr class="memitem:a81b161546a1a9a9ee0cadf6f103c3244" id="r_a81b161546a1a9a9ee0cadf6f103c3244"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a81b161546a1a9a9ee0cadf6f103c3244">dsp1IsPresent</a> (void)</td></tr>
+<tr class="memdesc:a81b161546a1a9a9ee0cadf6f103c3244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is a DSP-1 responding? Known-answer self-test.  <br /></td></tr>
+<tr class="memitem:a8de00734310d578780eb7243d5e9dda2" id="r_a8de00734310d578780eb7243d5e9dda2"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8de00734310d578780eb7243d5e9dda2">dsp1Multiply</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
+<tr class="memdesc:a8de00734310d578780eb7243d5e9dda2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed 1.15 × 1.15 multiply (DSP-1 command $00).  <br /></td></tr>
 <tr class="memitem:a351e716537c49d2587a195d327448f57" id="r_a351e716537c49d2587a195d327448f57"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a351e716537c49d2587a195d327448f57">dsp1Objective</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
 <tr class="memdesc:a351e716537c49d2587a195d327448f57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a point by matrix A: local → world (DSP-1 command $0D, "Objective").  <br /></td></tr>
 <tr class="memitem:a9f4e45822ce7d01f4a61a80c136e1aa9" id="r_a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9f4e45822ce7d01f4a61a80c136e1aa9">dsp1Parameter</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="hdma_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0">fx</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fy, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fz, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> lfe, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> les, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> aas, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> azs)</td></tr>
 <tr class="memdesc:a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the projection plane (DSP-1 command $02, "Parameter").  <br /></td></tr>
 <tr class="memitem:ad09a7de4eb9586c1da0a738628af9b1f" id="r_ad09a7de4eb9586c1da0a738628af9b1f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad09a7de4eb9586c1da0a738628af9b1f">dsp1Present</a> (void)</td></tr>
-<tr class="memdesc:ad09a7de4eb9586c1da0a738628af9b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is a DSP-1 responding? Known-answer self-test.  <br /></td></tr>
+<tr class="memdesc:ad09a7de4eb9586c1da0a738628af9b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#a81b161546a1a9a9ee0cadf6f103c3244" title="Is a DSP-1 responding? Known-answer self-test.">dsp1IsPresent()</a>. Same routine.  <br /></td></tr>
 <tr class="memitem:a39767ab0d98ace72ba92e541085e1b60" id="r_a39767ab0d98ace72ba92e541085e1b60"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a39767ab0d98ace72ba92e541085e1b60">dsp1Project</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
 <tr class="memdesc:a39767ab0d98ace72ba92e541085e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world point to the screen (DSP-1 command $06, "Project").  <br /></td></tr>
 <tr class="memitem:a152f59d6d62b0d9f544e08db046de212" id="r_a152f59d6d62b0d9f544e08db046de212"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a152f59d6d62b0d9f544e08db046de212">dsp1Range</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> r)</td></tr>
@@ -192,10 +194,11 @@ Variables</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>luna emulates the DSP-1 at low level and needs Sony's <span class="tt">dsp1b.rom</span> firmware installed (<span class="tt">~/.config/luna/firmware/</span> or via <span class="tt">luna state --dsp1-rom &lt;path&gt; &lt;rom&gt;</span> once — the setting persists). It is copyrighted and not shipped; DSP-1 examples are firmware-gated in CI.</dd>
 <dd>
 DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callbacks. A command is a multi-byte DR transaction; if NMI interrupts one mid-sequence and the callback issues its own DSP-1 command, both transactions are corrupted (same class as the <a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a> restriction in <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>). Keep all DSP-1 work in the main loop.</dd></dl>
-<div class="fragment"><div class="line"><span class="comment">// rotate the point (100, 0) by 90 degrees -&gt; (0, 100)</span></div>
+<div class="fragment"><div class="line"><span class="comment">// rotate the point (100, 0) by 90 degrees -&gt; (0, -99): clockwise with Y</span></div>
+<div class="line"><span class="comment">// down, and the chip&#39;s sine of 90 degrees is 0x7FFF, not 1.0</span></div>
 <div class="line"><a class="code hl_function" href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a>(0x4000, 100, 0);</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x = <a class="code hl_variable" href="#a50d2a07715de61e5e3c706de54b856b4">dsp1_o0</a>;   <span class="comment">// ~0</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y = <a class="code hl_variable" href="#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a>;   <span class="comment">// ~100</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x = <a class="code hl_variable" href="#a50d2a07715de61e5e3c706de54b856b4">dsp1_o0</a>;   <span class="comment">// 0</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y = <a class="code hl_variable" href="#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a>;   <span class="comment">// -99</span></div>
 <div class="ttc" id="adsp1_8h_html_a173400a4c478dc40a8754b8b7117cc67"><div class="ttname"><a href="#a173400a4c478dc40a8754b8b7117cc67">dsp1_o1</a></div><div class="ttdeci">volatile s16 dsp1_o1</div></div>
 <div class="ttc" id="adsp1_8h_html_a50d2a07715de61e5e3c706de54b856b4"><div class="ttname"><a href="#a50d2a07715de61e5e3c706de54b856b4">dsp1_o0</a></div><div class="ttdeci">volatile s16 dsp1_o0</div><div class="ttdoc">Multi-word DSP-1 result registers (written by multi-output commands).</div></div>
 <div class="ttc" id="adsp1_8h_html_adb861416d471a3218480f16d3331f55f"><div class="ttname"><a href="#adb861416d471a3218480f16d3331f55f">dsp1Rotate</a></div><div class="ttdeci">void dsp1Rotate(u16 angle, s16 x, s16 y)</div><div class="ttdoc">Rotate a 2D point about the origin (DSP-1 command $0C, &quot;Rotate&quot;).</div></div>
@@ -342,7 +345,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>sqrt(x²+y²+z²), rounded (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>sqrt(x²+y²+z²) as a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> — not rounded: measured on luna (which runs the real DSP-1B firmware), every exact length reads ONE LOW: (3,4,12) -&gt; 12, (300,400,0) -&gt; 499, (0,0,10000) -&gt; 9999. Treat the result as exact to within 1, and compare with <span class="tt">&gt;=</span> / <span class="tt">&lt;</span>, never <span class="tt">==</span>. Observed; no hardware reference states the rounding.</dd></dl>
 <p>Hardware square root — handy for homing missiles, audio attenuation, anything that needs a true distance rather than a compare. </p>
 
 </div>
@@ -367,21 +370,42 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 
 </div>
 </div>
-<a id="a56e4866725fffcfcf7710d4dd1ae6dac" name="a56e4866725fffcfcf7710d4dd1ae6dac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56e4866725fffcfcf7710d4dd1ae6dac">&#9670;&#160;</a></span>dsp1Multiply()</h2>
+<a id="a81b161546a1a9a9ee0cadf6f103c3244" name="a81b161546a1a9a9ee0cadf6f103c3244"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81b161546a1a9a9ee0cadf6f103c3244">&#9670;&#160;</a></span>dsp1IsPresent()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dsp1Multiply </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> dsp1IsPresent </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is a DSP-1 responding? Known-answer self-test. </p>
+<dl class="section return"><dt>Returns</dt><dd>1 if the chip answered dsp1Multiply(0x4000, 0x4000) == 0x2000, 0 if the status port never raised RQM or the product was wrong.</dd></dl>
+<p>Unlike the other calls this one cannot hang on a missing chip (bounded poll). Use it at boot the way <a class="el" href="sa1_8h.html#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a> / <a class="el" href="superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a> are used — e.g. to fall back to software math when running on the wrong board or on an emulator without the firmware. (Named <a class="el" href="#ad09a7de4eb9586c1da0a738628af9b1f" title="The pre-2026-09-22 name of dsp1IsPresent(). Same routine.">dsp1Present()</a> until 2026-09-22.) </p>
+
+</div>
+</div>
+<a id="a8de00734310d578780eb7243d5e9dda2" name="a8de00734310d578780eb7243d5e9dda2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8de00734310d578780eb7243d5e9dda2">&#9670;&#160;</a></span>dsp1Multiply()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> dsp1Multiply </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>b</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>b</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -394,7 +418,8 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the product in signed 1.15 (rounded to 15 bits) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the product in signed 1.15 (rounded to 15 bits)</dd></dl>
+<p>Typed <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> like every other signed DSP-1 quantity (and like <a class="el" href="#adfbfa0a8d0b8c1dc29d8971396b07cfb" title="SDK 8.8 fixed → DSP-1 T (1.15). Valid for −1.0 ≤ f &lt; 1.0.">DSP1_T_FROM_FIX()</a>, which produces one). Until 2026-09-21 the three were <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>: <span class="tt">dsp1Multiply(x, y) &lt; 0</span> was always false and <span class="tt">&gt;&gt; 7</span> on the result was a logical shift. Same stack slots, same bits. </p>
 
 </div>
 </div>
@@ -516,9 +541,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
       </table>
 </div><div class="memdoc">
 
-<p>Is a DSP-1 responding? Known-answer self-test. </p>
-<dl class="section return"><dt>Returns</dt><dd>1 if the chip answered dsp1Multiply(0x4000, 0x4000) == 0x2000, 0 if the status port never raised RQM or the product was wrong.</dd></dl>
-<p>Unlike the other calls this one cannot hang on a missing chip (bounded poll). Use it at boot the way sa1IsReady()/superfxIsPresent() are used — e.g. to fall back to software math when running on the wrong board or on an emulator without the firmware. </p>
+<p>The pre-2026-09-22 name of <a class="el" href="#a81b161546a1a9a9ee0cadf6f103c3244" title="Is a DSP-1 responding? Known-answer self-test.">dsp1IsPresent()</a>. Same routine. </p>
 
 </div>
 </div>
@@ -598,7 +621,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>(x²+y²+z²) − r² : ≤ 0 means inside the sphere</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>((x²+y²+z²) − r²) &gt;&gt; 15, arithmetic shift — NOT the raw difference (it would not fit 16 bits). Measured on luna's DSP-1B: (3000,4000,0, r 1000) -&gt; 732 = 24 000 000 / 32768; (0,0,0, r 1000) -&gt; -31. Negative means inside; but anything within 32768 squared-units outside the surface reads 0, and (30,40,0, r 5) — ten radii away in small units — reads 0 too. Use world units large enough for the shell you care about, and test <span class="tt">&lt; 0</span> for "clearly inside". Observed; no hardware reference gives the scaling.</dd></dl>
 <p>One call replaces three multiplies and two adds — cheap 3D proximity / LOD tests without ever leaving 16-bit C. </p>
 
 </div>
@@ -681,7 +704,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = x' and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = y'. Rotation is clockwise in the SNES screen convention (Y down): (100,0) at 90° gives (0,-100). </p>
+<p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = x' and <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = y'. Rotation is clockwise in the SNES screen convention (Y down): (100,0) at 90° gives (0,-99) — the chip's sine of 90° is 0x7FFF, not 1.0, so a full-scale result reads one short. </p>
 
 </div>
 </div>

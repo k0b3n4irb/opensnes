@@ -138,7 +138,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a09aaa6debbf920f664f5024c4828645d" id="r_a09aaa6debbf920f664f5024c4828645d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a09aaa6debbf920f664f5024c4828645d">FIX_MAKE</a>(<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>,  f)</td></tr>
 <tr class="memdesc:a09aaa6debbf920f664f5024c4828645d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create fixed-point from integer and fraction.  <br /></td></tr>
 <tr class="memitem:a05738893be2affe52229eb12b99f4fba" id="r_a05738893be2affe52229eb12b99f4fba"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a>(x)</td></tr>
-<tr class="memdesc:a05738893be2affe52229eb12b99f4fba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert fixed-point to integer (truncate).  <br /></td></tr>
+<tr class="memdesc:a05738893be2affe52229eb12b99f4fba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert fixed-point to integer (floor).  <br /></td></tr>
 <tr class="memitem:a78f48b221690b41e9f1b59cc6b056ceb" id="r_a78f48b221690b41e9f1b59cc6b056ceb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a78f48b221690b41e9f1b59cc6b056ceb">UNFIX_ROUND</a>(x)</td></tr>
 <tr class="memdesc:a78f48b221690b41e9f1b59cc6b056ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert fixed-point to integer (rounded).  <br /></td></tr>
 </table><table class="memberdecls">
@@ -165,8 +165,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a0a04487d24a25131a75e3c35b4edcabb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get cosine value for angle.  <br /></td></tr>
 <tr class="memitem:ac1b5b08f47109af37b8874161e3a87d9" id="r_ac1b5b08f47109af37b8874161e3a87d9"><td class="memItemLeft"><a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac1b5b08f47109af37b8874161e3a87d9">fixDiv</a> (<a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
 <tr class="memdesc:ac1b5b08f47109af37b8874161e3a87d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divide two fixed-point values.  <br /></td></tr>
-<tr class="memitem:a7b242d1463b266b75f1ef4ffa222cabd" id="r_a7b242d1463b266b75f1ef4ffa222cabd"><td class="memItemLeft"><a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7b242d1463b266b75f1ef4ffa222cabd">fixLerp</a> (<a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> t)</td></tr>
-<tr class="memdesc:a7b242d1463b266b75f1ef4ffa222cabd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Linear interpolation.  <br /></td></tr>
+<tr class="memitem:ae34cfd84f2c85f3ad0d03ae9fd61a332" id="r_ae34cfd84f2c85f3ad0d03ae9fd61a332"><td class="memItemLeft"><a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae34cfd84f2c85f3ad0d03ae9fd61a332">fixLerp</a> (<a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> t)</td></tr>
+<tr class="memdesc:ae34cfd84f2c85f3ad0d03ae9fd61a332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Linear interpolation.  <br /></td></tr>
 <tr class="memitem:aaa8ca4460928f28892217658eca661bf" id="r_aaa8ca4460928f28892217658eca661bf"><td class="memItemLeft"><a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight"><a class="el" href="#aaa8ca4460928f28892217658eca661bf">fixMul</a> (<a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>)</td></tr>
 <tr class="memdesc:aaa8ca4460928f28892217658eca661bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply two fixed-point values.  <br /></td></tr>
 <tr class="memitem:abc155bebfc5f7c5240e9c2a3d9f5835c" id="r_abc155bebfc5f7c5240e9c2a3d9f5835c"><td class="memItemLeft"><a class="el" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>&#160;</td><td class="memItemRight"><a class="el" href="#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>)</td></tr>
@@ -209,25 +209,28 @@ Fixed-Point Format</h2>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> screen_x = <a class="code hl_define" href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a>);   <span class="comment">// 100 (truncated)</span></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a03956d7bf1f05c56957071e0c5e4dba7"><div class="ttname"><a href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></div><div class="ttdeci">static s16 pos_x</div><div class="ttdef"><b>Definition</b> main.c:177</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
-<div class="ttc" id="amath_8h_html_a05738893be2affe52229eb12b99f4fba"><div class="ttname"><a href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a></div><div class="ttdeci">#define UNFIX(x)</div><div class="ttdoc">Convert fixed-point to integer (truncate).</div><div class="ttdef"><b>Definition</b> math.h:88</div></div>
-<div class="ttc" id="amath_8h_html_a740431a9a1d25e39e670cd5f48454ce4"><div class="ttname"><a href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a></div><div class="ttdeci">#define FIX(x)</div><div class="ttdoc">Convert integer to fixed-point.</div><div class="ttdef"><b>Definition</b> math.h:76</div></div>
-<div class="ttc" id="amath_8h_html_ac1976de9516b58f7a0352917f8d8bedd"><div class="ttname"><a href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a></div><div class="ttdeci">s16 fixed</div><div class="ttdoc">8.8 signed fixed-point type</div><div class="ttdef"><b>Definition</b> math.h:59</div></div>
+<div class="ttc" id="amath_8h_html_a05738893be2affe52229eb12b99f4fba"><div class="ttname"><a href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a></div><div class="ttdeci">#define UNFIX(x)</div><div class="ttdoc">Convert fixed-point to integer (floor).</div><div class="ttdef"><b>Definition</b> math.h:97</div></div>
+<div class="ttc" id="amath_8h_html_a740431a9a1d25e39e670cd5f48454ce4"><div class="ttname"><a href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a></div><div class="ttdeci">#define FIX(x)</div><div class="ttdoc">Convert integer to fixed-point.</div><div class="ttdef"><b>Definition</b> math.h:83</div></div>
+<div class="ttc" id="amath_8h_html_ac1976de9516b58f7a0352917f8d8bedd"><div class="ttname"><a href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a></div><div class="ttdeci">s16 fixed</div><div class="ttdoc">8.8 signed fixed-point type</div><div class="ttdef"><b>Definition</b> math.h:66</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="angles"></a>
 Angles</h2>
 <p>Angles are 8-bit values (0-255) representing 0-360 degrees:</p><ul>
 <li>0 = 0°, 64 = 90°, 128 = 180°, 192 = 270°</li>
 </ul>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a> = 64;                       <span class="comment">// 90 degrees</span></div>
-<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> dx = <a class="code hl_function" href="#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);            <span class="comment">// 1.0 (256)</span></div>
-<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> dy = <a class="code hl_function" href="#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);            <span class="comment">// 0.0 (0)</span></div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a> = 64;                       <span class="comment">// 90 degrees: +Y, down the screen</span></div>
+<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> dx = <a class="code hl_function" href="#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);            <span class="comment">// 0.0 (0)</span></div>
+<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> dy = <a class="code hl_function" href="#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);            <span class="comment">// 1.0 (256)</span></div>
 <div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> + <a class="code hl_function" href="#aaa8ca4460928f28892217658eca661bf">fixMul</a>(speed, dx);</div>
+<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> + <a class="code hl_function" href="#aaa8ca4460928f28892217658eca661bf">fixMul</a>(speed, dy);</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="amath_8h_html_a0a04487d24a25131a75e3c35b4edcabb"><div class="ttname"><a href="#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a></div><div class="ttdeci">fixed fixCos(u8 angle)</div><div class="ttdoc">Get cosine value for angle.</div><div class="ttdef"><b>Definition</b> math.h:202</div></div>
+<div class="ttc" id="amath_8h_html_a0a04487d24a25131a75e3c35b4edcabb"><div class="ttname"><a href="#a0a04487d24a25131a75e3c35b4edcabb">fixCos</a></div><div class="ttdeci">fixed fixCos(u8 angle)</div><div class="ttdoc">Get cosine value for angle.</div><div class="ttdef"><b>Definition</b> math.h:211</div></div>
 <div class="ttc" id="amath_8h_html_aaa8ca4460928f28892217658eca661bf"><div class="ttname"><a href="#aaa8ca4460928f28892217658eca661bf">fixMul</a></div><div class="ttdeci">fixed fixMul(fixed a, fixed b)</div><div class="ttdoc">Multiply two fixed-point values.</div></div>
-<div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdef"><b>Definition</b> math.h:186</div></div>
+<div class="ttc" id="amath_8h_html_abc155bebfc5f7c5240e9c2a3d9f5835c"><div class="ttname"><a href="#abc155bebfc5f7c5240e9c2a3d9f5835c">fixSin</a></div><div class="ttdeci">fixed fixSin(u8 angle)</div><div class="ttdef"><b>Definition</b> math.h:195</div></div>
 <div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Rotation step index, 0..47.</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
-</div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
+</div><!-- fragment --><p>One convention everywhere: 0 points along +X, angles grow toward +Y (clockwise on a screen), so <b>dx = fixCos, dy = fixSin</b> — the convention <a class="el" href="#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8()</a> returns and examples/basics/aim_target uses. (This example had the two swapped until 2026-09-20: feeding it an <a class="el" href="#ac0e3632ad4ed7071906c0aaae0fd50b5" title="8-bit two-argument arctangent">atan2_8()</a> angle fired 90 degrees off, mirrored.)</p>
+<dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a740431a9a1d25e39e670cd5f48454ce4" name="a740431a9a1d25e39e670cd5f48454ce4"></a>
@@ -322,7 +325,7 @@ Angles</h2>
 <dl class="section return"><dt>Returns</dt><dd>Fixed-point value</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> half = <a class="code hl_define" href="#a09aaa6debbf920f664f5024c4828645d">FIX_MAKE</a>(0, 128);  <span class="comment">// 0.5</span></div>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> quarter = <a class="code hl_define" href="#a09aaa6debbf920f664f5024c4828645d">FIX_MAKE</a>(0, 64);  <span class="comment">// 0.25</span></div>
-<div class="ttc" id="amath_8h_html_a09aaa6debbf920f664f5024c4828645d"><div class="ttname"><a href="#a09aaa6debbf920f664f5024c4828645d">FIX_MAKE</a></div><div class="ttdeci">#define FIX_MAKE(i, f)</div><div class="ttdoc">Create fixed-point from integer and fraction.</div><div class="ttdef"><b>Definition</b> math.h:120</div></div>
+<div class="ttc" id="amath_8h_html_a09aaa6debbf920f664f5024c4828645d"><div class="ttname"><a href="#a09aaa6debbf920f664f5024c4828645d">FIX_MAKE</a></div><div class="ttdeci">#define FIX_MAKE(i, f)</div><div class="ttdoc">Create fixed-point from integer and fraction.</div><div class="ttdef"><b>Definition</b> math.h:129</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -342,14 +345,15 @@ Angles</h2>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)((x) &gt;&gt; 8))</div>
 </div><!-- fragment -->
-<p>Convert fixed-point to integer (truncate). </p>
+<p>Convert fixed-point to integer (floor). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Fixed-point value </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Integer part (truncated toward zero)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Integer part, rounded toward MINUS infinity: the shift is arithmetic, so UNFIX(-0.5) is -1, not 0. (Documented as "truncated
+        toward zero" until 2026-09-20.)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> pos = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(50) + 128;  <span class="comment">// 50.5</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> screen_pos = <a class="code hl_define" href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a>(pos);  <span class="comment">// 50</span></div>
 </div><!-- fragment --> 
@@ -381,7 +385,7 @@ Angles</h2>
 <dl class="section return"><dt>Returns</dt><dd>Integer part (rounded to nearest)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> pos = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(50) + 128;  <span class="comment">// 50.5</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> screen_pos = <a class="code hl_define" href="#a78f48b221690b41e9f1b59cc6b056ceb">UNFIX_ROUND</a>(pos);  <span class="comment">// 51</span></div>
-<div class="ttc" id="amath_8h_html_a78f48b221690b41e9f1b59cc6b056ceb"><div class="ttname"><a href="#a78f48b221690b41e9f1b59cc6b056ceb">UNFIX_ROUND</a></div><div class="ttdeci">#define UNFIX_ROUND(x)</div><div class="ttdoc">Convert fixed-point to integer (rounded).</div><div class="ttdef"><b>Definition</b> math.h:100</div></div>
+<div class="ttc" id="amath_8h_html_a78f48b221690b41e9f1b59cc6b056ceb"><div class="ttname"><a href="#a78f48b221690b41e9f1b59cc6b056ceb">UNFIX_ROUND</a></div><div class="ttdeci">#define UNFIX_ROUND(x)</div><div class="ttdoc">Convert fixed-point to integer (rounded).</div><div class="ttdef"><b>Definition</b> math.h:109</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -445,7 +449,6 @@ Angles</h2>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_angle = <a class="code hl_function" href="#ac0e3632ad4ed7071906c0aaae0fd50b5">atan2_8</a>(dy, dx);</div>
 <div class="line">fire_projectile(aim_angle);</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_a49bfa517490e1db79447e8458479040c"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#a49bfa517490e1db79447e8458479040c">enemy_y</a></div><div class="ttdeci">static s16 enemy_y[4]</div><div class="ttdoc">Y positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
 <div class="ttc" id="amath_8h_html_ac0e3632ad4ed7071906c0aaae0fd50b5"><div class="ttname"><a href="#ac0e3632ad4ed7071906c0aaae0fd50b5">atan2_8</a></div><div class="ttdeci">u8 atan2_8(s16 dy, s16 dx)</div><div class="ttdoc">8-bit two-argument arctangent</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Precision is ≤ 1 angle unit (≈ 1.4°) for inputs whose magnitudes fit in 8 bits; coarser for larger inputs after reduction (still useful for game-side aiming logic). </dd></dl>
@@ -521,7 +524,7 @@ Angles</h2>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> alpha = <a class="code hl_function" href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a>(t);</div>
 <div class="line">    <span class="comment">// ... draw with alpha ...</span></div>
 <div class="line">}</div>
-<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:420</div></div>
+<div class="ttc" id="amath_8h_html_a8a300b912155f22476053ffc3cc15d33"><div class="ttname"><a href="#a8a300b912155f22476053ffc3cc15d33">ease_in_quad</a></div><div class="ttdeci">u8 ease_in_quad(u8 t)</div><div class="ttdoc">Ease-in quadratic: t² curve, output [0, 255].</div><div class="ttdef"><b>Definition</b> math.h:432</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -696,8 +699,8 @@ Angles</h2>
 
 </div>
 </div>
-<a id="a7b242d1463b266b75f1ef4ffa222cabd" name="a7b242d1463b266b75f1ef4ffa222cabd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b242d1463b266b75f1ef4ffa222cabd">&#9670;&#160;</a></span>fixLerp()</h2>
+<a id="ae34cfd84f2c85f3ad0d03ae9fd61a332" name="ae34cfd84f2c85f3ad0d03ae9fd61a332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae34cfd84f2c85f3ad0d03ae9fd61a332">&#9670;&#160;</a></span>fixLerp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -715,7 +718,7 @@ Angles</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>t</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>t</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -725,15 +728,15 @@ Angles</h2>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></td><td>Start value </td></tr>
     <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></td><td>End value </td></tr>
-    <tr><td class="paramname">t</td><td>Interpolation factor (0-256 = 0.0-1.0) </td></tr>
+    <tr><td class="paramname">t</td><td>Interpolation factor, 0-256 = 0.0-1.0. 256 and above return <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></span> exactly. (<span class="tt">t</span> was a <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span> until 2026-09-21, which made the documented 1.0 unreachable: 256 was truncated to 0 and returned <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></span>. Same stack slot — no ABI change.) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Interpolated value</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> start = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(0);</div>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> end = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(100);</div>
-<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> mid = <a class="code hl_function" href="#a7b242d1463b266b75f1ef4ffa222cabd">fixLerp</a>(start, end, 128);  <span class="comment">// 50.0</span></div>
-<div class="ttc" id="amath_8h_html_a7b242d1463b266b75f1ef4ffa222cabd"><div class="ttname"><a href="#a7b242d1463b266b75f1ef4ffa222cabd">fixLerp</a></div><div class="ttdeci">fixed fixLerp(fixed a, fixed b, u8 t)</div><div class="ttdoc">Linear interpolation.</div></div>
+<div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> mid = <a class="code hl_function" href="#ae34cfd84f2c85f3ad0d03ae9fd61a332">fixLerp</a>(start, end, 128);  <span class="comment">// 50.0</span></div>
+<div class="ttc" id="amath_8h_html_ae34cfd84f2c85f3ad0d03ae9fd61a332"><div class="ttname"><a href="#ae34cfd84f2c85f3ad0d03ae9fd61a332">fixLerp</a></div><div class="ttdeci">fixed fixLerp(fixed a, fixed b, u16 t)</div><div class="ttdoc">Linear interpolation.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -769,7 +772,7 @@ Angles</h2>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> scale = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(1) / 2;  <span class="comment">// 0.5</span></div>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> result = <a class="code hl_function" href="#aaa8ca4460928f28892217658eca661bf">fixMul</a>(speed, scale);  <span class="comment">// 1.0</span></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Uses 32-bit intermediate for accuracy</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>NOT safe inside an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: uses the hardware multiplier (garbage during the auto-joypad window callbacks run in) plus shared WRAM temporaries. Plain C <span class="tt">*</span> / <span class="tt">/</span> / <span class="tt">%</span> ARE callback-safe (the runtime switches to a software path there — see .claude/notes/tech/nmi_context_hardware_muldiv.md). <a class="el" href="#a7b242d1463b266b75f1ef4ffa222cabd" title="Linear interpolation.">fixLerp()</a> carries the same restriction. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>NOT safe inside an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: uses the hardware multiplier (garbage during the auto-joypad window callbacks run in) plus shared WRAM temporaries. Plain C <span class="tt">*</span> / <span class="tt">/</span> / <span class="tt">%</span> ARE callback-safe (the runtime switches to a software path there — see .claude/notes/tech/nmi_context_hardware_muldiv.md). <a class="el" href="#ae34cfd84f2c85f3ad0d03ae9fd61a332" title="Linear interpolation.">fixLerp()</a> carries the same restriction. </dd></dl>
 
 </div>
 </div>
@@ -814,7 +817,7 @@ Angles</h2>
 </div><div class="memdoc">
 
 <p>Square root in 8.8 fixed-point. </p>
-<p>Computes the square root of an 8.8 fixed-point value. Internally delegates to <span class="tt">sqrt16(x)</span> and shifts the result by 4 bits to recover 5 bits of fractional precision in the answer (the remaining 3 bits are zero — this is a lib-side limit, not a mathematical one; precision can be raised once the QBE 32-bit codegen lands — see chantier A7 in the structural-defects catalogue).</p>
+<p>Computes the square root of an 8.8 fixed-point value. Internally delegates to <span class="tt">sqrt16(x)</span> and shifts the result left by 4, so the answer carries FOUR fractional bits (steps of 1/16); the low four are always zero. A lib-side limit, not a mathematical one — 32-bit arithmetic exists now (<a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">fixed32.h</a>), so the precision could be raised; it has not been.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Input value in 8.8 fixed-point. Must be ≥ 0; negative inputs return 0. </td></tr>
@@ -882,7 +885,7 @@ Angles</h2>
 </div><div class="memdoc">
 
 <p>Safe 16-bit multiplication. </p>
-<p>Multiplies two 16-bit values safely. Use this instead of the compiler's * operator for important calculations, as the compiler's runtime multiplication can have bugs.</p>
+<p>A shift-and-add multiply in C. The compiler's <span class="tt">*</span> is correct — and faster, and safe in an NMI callback — so there is no reason left to prefer this (the header told users the opposite until 2026-09-20; see fixMul's note below, which has said the operators are correct since #113). Kept for source compatibility; a candidate for removal at the API freeze.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></td><td>First operand </td></tr>

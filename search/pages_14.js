@@ -7,9 +7,10 @@ var searchData=
   ['joypad_20registers_4',['Joypad Registers',['../registers.html#joypad-registers',1,'']]],
   ['joypad_20status_5',['$4212 - HVBJOY (Blank/Joypad Status)',['../registers.html#autotoc_md4212---hvbjoy-blankjoypad-status',1,'']]],
   ['juice_20on_20real_20hardware_6',['Game feel: juice on real hardware',['../craft_game_feel.html',1,'craft']]],
-  ['just_20building_20it_7',['Designing the level, not just building it',['../craft_tiles_to_levels.html#designing-the-level-not-just-building-it',1,'']]],
-  ['just_20move_20the_20pointer_8',['5. Animation = Just Move the Pointer',['../examples_hdma_hdma_wave.html#autotoc_md5-animation--just-move-the-pointer',1,'']]],
-  ['just_20pixels_9',['A tile carries meaning, not just pixels',['../craft_tiles_to_levels.html#a-tile-carries-meaning-not-just-pixels',1,'']]],
-  ['just_20work_10',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md-superfree-assets-in-any-bank-just-work',1,'']]],
-  ['just_20works_11',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#why-pvsneslib-just-works',1,'']]]
+  ['jumped_20into_20nowhere_20—_20fixed_202026_2009_2019_7',['🟢 A type with no registered callbacks jumped into nowhere — fixed 2026-09-19',['../tutorial_object.html#autotoc_md-a-type-with-no-registered-callbacks-jumped-into-nowhere--fixed-2026-09-19',1,'']]],
+  ['just_20building_20it_8',['Designing the level, not just building it',['../craft_tiles_to_levels.html#designing-the-level-not-just-building-it',1,'']]],
+  ['just_20move_20the_20pointer_9',['5. Animation = Just Move the Pointer',['../examples_hdma_hdma_wave.html#autotoc_md5-animation--just-move-the-pointer',1,'']]],
+  ['just_20pixels_10',['A tile carries meaning, not just pixels',['../craft_tiles_to_levels.html#a-tile-carries-meaning-not-just-pixels',1,'']]],
+  ['just_20work_11',['🟢 SUPERFREE assets in any bank just work',['../tutorial_dma.html#autotoc_md-superfree-assets-in-any-bank-just-work',1,'']]],
+  ['just_20works_12',['Why PVSnesLib &quot;Just Works&quot;',['../oam.html#why-pvsneslib-just-works',1,'']]]
 ];

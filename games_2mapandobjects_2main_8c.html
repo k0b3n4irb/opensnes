@@ -136,8 +136,6 @@ $(function(){initNavTree('games_2mapandobjects_2main_8c.html','',''); });
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; scrolling platformer with map and object engines.  <br /></td></tr>
-<tr class="memitem:a74052cbd6e76b231e97756db972f22a8" id="r_a74052cbd6e76b231e97756db972f22a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a74052cbd6e76b231e97756db972f22a8">objRegisterTypes</a> (void)</td></tr>
-<tr class="memdesc:a74052cbd6e76b231e97756db972f22a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -206,34 +204,6 @@ Variables</h2></td></tr>
 <p>Active display: <a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a> + <a class="el" href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83" title="Update all active objects.">objUpdateAll()</a> + sprite end-frame VBlank: <a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a> + oamVramQueueUpdate()</p>
 <p>Object callbacks (Mario, Goomba, Koopa Troopa) handle their own physics, collision, animation, and sprite drawing within <a class="el" href="object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83" title="Update all active objects.">objUpdateAll()</a>.</p>
 <dl class="section return"><dt>Returns</dt><dd>0 (never reached &ndash; infinite game loop) </dd></dl>
-
-</div>
-</div>
-<a id="a74052cbd6e76b231e97756db972f22a8" name="a74052cbd6e76b231e97756db972f22a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74052cbd6e76b231e97756db972f22a8">&#9670;&#160;</a></span>objRegisterTypes()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void objRegisterTypes </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Register all object type callbacks (Mario, Goomba, Koopa) with correct bank bytes. </p>
-<p>Each object type has an update callback function pointer stored with its ROM bank byte. Since C cannot express the <span class="tt">:label</span> bank-byte operator, this assembly function handles registration for all three entity types. </p>
 
 </div>
 </div>

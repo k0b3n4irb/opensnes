@@ -1,14 +1,14 @@
 var collision_8h =
 [
     [ "Rect", "structRect.html", "structRect" ],
-    [ "collidePoint", "collision_8h.html#a3338c2f2bdb97bdb7923fb93c7fdc001", null ],
-    [ "collideRect", "collision_8h.html#abb09495fb18f03c5f57e7d91afbbaba8", null ],
-    [ "collideRectEx", "collision_8h.html#a93325eeffd4b23ba218f704af54cbbc2", null ],
-    [ "collideRectTile", "collision_8h.html#ab81c5ee739f7437ff6abc0232198b47b", null ],
+    [ "collidePoint", "collision_8h.html#a369b9ed72f46cf5f7303842fbdfc67dc", null ],
+    [ "collideRect", "collision_8h.html#a098ddee8de49c9dff2b3a5add5c32260", null ],
+    [ "collideRectEx", "collision_8h.html#a6ec1523913770fc516397a08aeb25d75", null ],
+    [ "collideRectTile", "collision_8h.html#ab6cf997e9029e9da5313a23059aecc6e", null ],
     [ "collideTile", "collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04", null ],
     [ "collideTileEx", "collision_8h.html#a68ea9ae72befca266d053e9e26d71597", null ],
-    [ "rectContains", "collision_8h.html#ad8b6456ccb2d1dc48a3480b360345c38", null ],
-    [ "rectGetCenter", "collision_8h.html#ab786de0e9a658dff50d90916b459c98d", null ],
+    [ "rectContains", "collision_8h.html#a3ee90a0875e6322256ff812a8194125b", null ],
+    [ "rectGetCenter", "collision_8h.html#aeb55d05daee34983fa0f85f14cc74d95", null ],
     [ "rectInit", "collision_8h.html#a55350cc76bea6eb0be78c1fbafbebb9d", null ],
     [ "rectSetPos", "collision_8h.html#a808f2d23e3ad3d0c5c1751b1e8a4bb0d", null ]
 ];

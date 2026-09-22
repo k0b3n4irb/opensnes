@@ -149,17 +149,21 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1bb80e4838ae89136bf886d0bc9ddfc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if currently in VBlank.  <br /></td></tr>
 <tr class="memitem:a3b56ab7f353055ded8e2960b94d6ba57" id="r_a3b56ab7f353055ded8e2960b94d6ba57"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57">isPAL</a> (void)</td></tr>
 <tr class="memdesc:a3b56ab7f353055ded8e2960b94d6ba57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if PAL system.  <br /></td></tr>
-<tr class="memitem:af907eeb70a7322d16123cbab3094c2a2" id="r_af907eeb70a7322d16123cbab3094c2a2"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af907eeb70a7322d16123cbab3094c2a2">rand</a> (void)</td></tr>
-<tr class="memdesc:af907eeb70a7322d16123cbab3094c2a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get random 16-bit number.  <br /></td></tr>
+<tr class="memitem:a0a8330f5fde79854d4f2ad10e9388485" id="r_a0a8330f5fde79854d4f2ad10e9388485"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0a8330f5fde79854d4f2ad10e9388485">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() — this is not libc's rand()&quot;) u16 rand(void)</td></tr>
+<tr class="memdesc:a0a8330f5fde79854d4f2ad10e9388485"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a>. Same generator.  <br /></td></tr>
+<tr class="memitem:ac08a84fbd42326227013eeb91984cee2" id="r_ac08a84fbd42326227013eeb91984cee2"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ac08a84fbd42326227013eeb91984cee2">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a>() — this is not libc's srand()&quot;) void srand(<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> seed)</td></tr>
+<tr class="memdesc:ac08a84fbd42326227013eeb91984cee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>.  <br /></td></tr>
 <tr class="memitem:a66b5cb8d7cb64a0afb9392e880020a0b" id="r_a66b5cb8d7cb64a0afb9392e880020a0b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a66b5cb8d7cb64a0afb9392e880020a0b">resetFrameCount</a> (void)</td></tr>
 <tr class="memdesc:a66b5cb8d7cb64a0afb9392e880020a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset frame counter.  <br /></td></tr>
+<tr class="memitem:af00b46ef13a81876e2a8806eee9dde8c" id="r_af00b46ef13a81876e2a8806eee9dde8c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a> (void)</td></tr>
+<tr class="memdesc:af00b46ef13a81876e2a8806eee9dde8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Next pseudo-random 16-bit number.  <br /></td></tr>
+<tr class="memitem:a82344e91af2df5885fa4f7e92fa42efd" id="r_a82344e91af2df5885fa4f7e92fa42efd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> seed)</td></tr>
+<tr class="memdesc:a82344e91af2df5885fa4f7e92fa42efd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seed the generator (named srand() until 2026-09-22).  <br /></td></tr>
 <tr class="memitem:a5a1bfaf2babf4d8dac31cafc468c735f" id="r_a5a1bfaf2babf4d8dac31cafc468c735f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness)</td></tr>
 <tr class="memdesc:a5a1bfaf2babf4d8dac31cafc468c735f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set screen brightness.  <br /></td></tr>
 <tr class="memitem:a5380410c3dc97fbaa3b36b095d631512" id="r_a5380410c3dc97fbaa3b36b095d631512"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a> (void)</td></tr>
 <tr class="memitem:af8cb701c5b08484903555e77347f460a" id="r_af8cb701c5b08484903555e77347f460a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a> (void)</td></tr>
 <tr class="memdesc:af8cb701c5b08484903555e77347f460a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable screen display.  <br /></td></tr>
-<tr class="memitem:ad0d76da31c2ffab064e9e44f523e8f0a" id="r_ad0d76da31c2ffab064e9e44f523e8f0a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad0d76da31c2ffab064e9e44f523e8f0a">srand</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> seed)</td></tr>
-<tr class="memdesc:ad0d76da31c2ffab064e9e44f523e8f0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seed random number generator.  <br /></td></tr>
 <tr class="memitem:abd33830487e4764e5ec22ec98b749f4b" id="r_abd33830487e4764e5ec22ec98b749f4b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a> (void)</td></tr>
 <tr class="memdesc:abd33830487e4764e5ec22ec98b749f4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for next VBlank period.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -222,13 +226,15 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Initialize SNES hardware. </p>
-<p>Must be called at the start of your program. Performs:</p><ul>
-<li>PPU initialization (screen blank, registers cleared)</li>
-<li>CPU register setup</li>
-<li>Work RAM clearing</li>
-<li>Default palette loading</li>
-<li>VBlank interrupt setup</li>
+<p>Must be called at the start of your program. What it does, exactly:</p><ul>
+<li>forces blank, brightness shadow = 15</li>
+<li>detects PAL / NTSC</li>
+<li>seeds <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a> from the H/V counters</li>
+<li>BG mode 1, BG1 tilemap at VRAM $0400 (32x32), BG1 tiles at $0000</li>
+<li>mosaic off, all 256 CGRAM entries cleared to black</li>
+<li>enables NMI + auto-joypad, and DROPS any armed H/V timer IRQ bits</li>
 </ul>
+<p>It does not clear work RAM or set up the CPU (crt0 did that before main), and it loads no palette — this list claimed all three until 2026-09-20.</p>
 <p>After calling, screen is blanked (black). Call <a class="el" href="#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a> to enable display after you've set up your graphics.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
@@ -242,7 +248,7 @@ Attribution</h2>
 <div class="line">        <a class="code hl_function" href="#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -323,16 +329,17 @@ Attribution</h2>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">speed</td><td>VBlank frames to wait between each brightness step. <span class="tt">speed=0</span> falls through with no inter-step delay (visible flash, ~16 frames if every step still hits VBlank via loop overhead — not typically useful).</td></tr>
+    <tr><td class="paramname">speed</td><td>VBlank frames to wait between each brightness step. <span class="tt">speed=0</span> waits for nothing: all 16 steps are written in one burst, i.e. an instant cut, not a fade.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>Under forced blank the brightness writes are skipped (the shadow still moves), so a fade does nothing visible until <a class="el" href="#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>.</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a>(3);              <span class="comment">// ~0.8 s cinematic fade</span></div>
 <div class="line"><a class="code hl_function" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();          <span class="comment">// force-blank for VRAM swap</span></div>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(new_tiles, 0, ...);</div>
 <div class="line"><a class="code hl_function" href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"><a class="code hl_function" href="#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a>(3);</div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:147</div></div>
 <div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
 <div class="ttc" id="aconsole_8h_html_a6c68f9393684a2b251292a9e93891a02"><div class="ttname"><a href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a></div><div class="ttdeci">void fadeOut(u8 speed)</div><div class="ttdoc">Fade the screen from full brightness (15) down to black (0).</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
@@ -393,7 +400,7 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:282</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:298</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --> 
 </div>
@@ -434,7 +441,7 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Check if currently in VBlank. </p>
-<dl class="section return"><dt>Returns</dt><dd>TRUE if in VBlank, FALSE if in active display </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if in VBlank, 0 in active display (0xFF for "yes" until 2026-09-22) </dd></dl>
 
 </div>
 </div>
@@ -454,7 +461,7 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Check if PAL system. </p>
-<dl class="section return"><dt>Returns</dt><dd>TRUE if PAL (50Hz), FALSE if NTSC (60Hz)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if PAL (50Hz), 0 if NTSC (60Hz) — the same value as <a class="el" href="#a2dc1e4cf693184256120eada1beaca14" title="Get system region.">getRegion()</a> since 2026-09-22 (it returned 0xFF for PAL before)</dd></dl>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#a3b56ab7f353055ded8e2960b94d6ba57">isPAL</a>()) {</div>
 <div class="line">    <span class="comment">// Adjust game speed for 50Hz</span></div>
 <div class="line">}</div>
@@ -462,29 +469,42 @@ Attribution</h2>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="af907eeb70a7322d16123cbab3094c2a2" name="af907eeb70a7322d16123cbab3094c2a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af907eeb70a7322d16123cbab3094c2a2">&#9670;&#160;</a></span>rand()</h2>
+<a id="a0a8330f5fde79854d4f2ad10e9388485" name="a0a8330f5fde79854d4f2ad10e9388485"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a8330f5fde79854d4f2ad10e9388485">&#9670;&#160;</a></span>OPENSNES_DEPRECATED() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> rand </td>
+          <td class="memname">OPENSNES_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">&quot;use <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() — this is not libc's rand()&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get random 16-bit number. </p>
-<p>Returns a pseudo-random number using a linear feedback shift register.</p>
-<dl class="section return"><dt>Returns</dt><dd>Random value 0-65535</dd></dl>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;</div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
-<div class="ttc" id="aconsole_8h_html_af907eeb70a7322d16123cbab3094c2a2"><div class="ttname"><a href="#af907eeb70a7322d16123cbab3094c2a2">rand</a></div><div class="ttdeci">u16 rand(void)</div><div class="ttdoc">Get random 16-bit number.</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --> 
+<p>The pre-2026-09-22 name of <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a>. Same generator. </p>
+
+</div>
+</div>
+<a id="ac08a84fbd42326227013eeb91984cee2" name="ac08a84fbd42326227013eeb91984cee2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac08a84fbd42326227013eeb91984cee2">&#9670;&#160;</a></span>OPENSNES_DEPRECATED() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OPENSNES_DEPRECATED </td>
+          <td>(</td>
+          <td class="paramtype">&quot;use <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a>() — this is not libc's srand()&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The pre-2026-09-22 name of <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>. </p>
+
 </div>
 </div>
 <a id="a66b5cb8d7cb64a0afb9392e880020a0b" name="a66b5cb8d7cb64a0afb9392e880020a0b"></a>
@@ -504,6 +524,57 @@ Attribution</h2>
 
 <p>Reset frame counter. </p>
 <p>Sets frame counter to 0. Useful for timing game events. </p>
+
+</div>
+</div>
+<a id="af00b46ef13a81876e2a8806eee9dde8c" name="af00b46ef13a81876e2a8806eee9dde8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af00b46ef13a81876e2a8806eee9dde8c">&#9670;&#160;</a></span>rngNext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> rngNext </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Next pseudo-random 16-bit number. </p>
+<p>A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1). Named rand() until 2026-09-22 — a libc name for a function that is not the libc one (no RAND_MAX, 1-65535, a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>), which collides the day any C library code is linked.</p>
+<dl class="section return"><dt>Returns</dt><dd>Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero seed is replaced, see <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>)</dd></dl>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 256;</div>
+<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
+<div class="ttc" id="aconsole_8h_html_af00b46ef13a81876e2a8806eee9dde8c"><div class="ttname"><a href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a></div><div class="ttdeci">u16 rngNext(void)</div><div class="ttdoc">Next pseudo-random 16-bit number.</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="a82344e91af2df5885fa4f7e92fa42efd" name="a82344e91af2df5885fa4f7e92fa42efd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82344e91af2df5885fa4f7e92fa42efd">&#9670;&#160;</a></span>rngSeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void rngSeed </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>seed</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Seed the generator (named srand() until 2026-09-22). </p>
+<p><a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a> seeds it from the H/V counters; reseed from a player action (<span class="tt">rngSeed(getFrameCount())</span> on START) for a different game each run.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">seed</td><td>Initial seed value; 0 is replaced by a fixed non-zero state </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -590,39 +661,11 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Enable screen display. </p>
-<p>Turns on the display after initialization or a screen blank. Sets full brightness (15).</p>
+<p>Turns on the display after initialization or a screen blank, at the LAST brightness set (15 after consoleInit). After <a class="el" href="#a6c68f9393684a2b251292a9e93891a02" title="Fade the screen from full brightness (15) down to black (0).">fadeOut()</a> that level is 0, so the screen stays black until <a class="el" href="#a54ab05fa0c4c26a7efb81e86d57661fb" title="Fade the screen from black (0) up to full brightness (15).">fadeIn()</a> or <a class="el" href="#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a> — which is what the fade example below relies on. (Documented as "full brightness" until 2026-09-20.)</p>
 <p>Inlined for zero-call-overhead access (saves ~28 cycles per call). Shares the same <span class="tt"><a class="el" href="#a8ba3fc43e69c483b4fcd603363de1f09" title="Disable screen display (blank).">force_blanked</a></span> and <span class="tt"><a class="el" href="#a70e5d6b33bccb97aec6b0d706fb1a6d7" title="Get current brightness.">current_brightness</a></span> shadows as <a class="el" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a>; both are declared extern below.</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"><span class="comment">// ... load graphics ...</span></div>
 <div class="line"><a class="code hl_function" href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();  <span class="comment">// Display is now visible</span></div>
-</div><!-- fragment --> 
-</div>
-</div>
-<a id="ad0d76da31c2ffab064e9e44f523e8f0a" name="ad0d76da31c2ffab064e9e44f523e8f0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad0d76da31c2ffab064e9e44f523e8f0a">&#9670;&#160;</a></span>srand()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void srand </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>seed</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Seed random number generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">seed</td><td>Initial seed value</td></tr>
-  </table>
-  </dd>
-</dl>
-<div class="fragment"><div class="line"><span class="comment">// Seed from player input timing for variety</span></div>
-<div class="line"><a class="code hl_function" href="#ad0d76da31c2ffab064e9e44f523e8f0a">srand</a>(<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>());</div>
-<div class="ttc" id="aconsole_8h_html_ad0d76da31c2ffab064e9e44f523e8f0a"><div class="ttname"><a href="#ad0d76da31c2ffab064e9e44f523e8f0a">srand</a></div><div class="ttdeci">void srand(u16 seed)</div><div class="ttdoc">Seed random number generator.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -660,7 +703,10 @@ Attribution</h2>
 <div class="line">    updateOAM();</div>
 <div class="line">    scrollBackground();</div>
 <div class="line">}</div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>VBlank occurs ~60 times/second (NTSC) or ~50 times/second (PAL) </dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>VBlank occurs ~60 times/second (NTSC) or ~50 times/second (PAL) </dd>
+<dd>
+On return the NMI handler has ALREADY run: the OAM upload, the text tilemap flush, the scroll sync, your <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback and the auto-joypad wait have used part of VBlank. What is left is safe for VRAM / CGRAM writes, but it is not the whole VBlank. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Hangs forever if NMI is disabled (NMITIMEN bit 7 clear): it sleeps until the NMI handler clears the handshake flag. </dd></dl>
 
 </div>
 </div>

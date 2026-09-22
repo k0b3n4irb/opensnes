@@ -158,9 +158,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a73efc78fac240b9d643517de57d31428" id="r_a73efc78fac240b9d643517de57d31428"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a73efc78fac240b9d643517de57d31428">WINDOW_MAIN_SCREEN</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:a73efc78fac240b9d643517de57d31428"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply window to main screen.  <br /></td></tr>
 <tr class="memitem:a3018096c6aeb991d21ff66ef7e88fc0b" id="r_a3018096c6aeb991d21ff66ef7e88fc0b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a3018096c6aeb991d21ff66ef7e88fc0b">WINDOW_MASK_INSIDE</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:a3018096c6aeb991d21ff66ef7e88fc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show layer inside window, hide outside.  <br /></td></tr>
+<tr class="memdesc:a3018096c6aeb991d21ff66ef7e88fc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">invert = 0: the layer is HIDDEN inside the window, shown outside  <br /></td></tr>
 <tr class="memitem:ab616fac963148473399729a2457b41d9" id="r_ab616fac963148473399729a2457b41d9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab616fac963148473399729a2457b41d9">WINDOW_MASK_OUTSIDE</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:ab616fac963148473399729a2457b41d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show layer outside window, hide inside.  <br /></td></tr>
+<tr class="memdesc:ab616fac963148473399729a2457b41d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">invert = 1: the layer is HIDDEN outside the window, shown inside  <br /></td></tr>
 <tr class="memitem:ae4bd6eff3175f2ca17357d2a2a1b8177" id="r_ae4bd6eff3175f2ca17357d2a2a1b8177"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae4bd6eff3175f2ca17357d2a2a1b8177">WINDOW_MATH</a>&#160;&#160;&#160;<a class="el" href="group__macros.html#ga3a8ea58898cb58fc96013383d39f482c">BIT</a>(5)</td></tr>
 <tr class="memdesc:ae4bd6eff3175f2ca17357d2a2a1b8177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Color math (affects color blending).  <br /></td></tr>
 <tr class="memitem:ad6547b6cae8f4e3aa2b6c8b2b21c875e" id="r_ad6547b6cae8f4e3aa2b6c8b2b21c875e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad6547b6cae8f4e3aa2b6c8b2b21c875e">WINDOW_OBJ</a>&#160;&#160;&#160;<a class="el" href="group__macros.html#ga3a8ea58898cb58fc96013383d39f482c">BIT</a>(4)</td></tr>
@@ -209,16 +209,19 @@ Window Logic</h2>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="usage-example-4"></a>
 Usage Example</h2>
-<div class="fragment"><div class="line"><span class="comment">// Create a spotlight effect - show only inside window</span></div>
-<div class="line"><a class="code hl_function" href="#a69900cfa7ecb5f94e7f6195024ac9e10">windowSetPos</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, 80, 176);     <span class="comment">// Window from x=80 to x=176</span></div>
-<div class="line"><a class="code hl_function" href="#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>);  <span class="comment">// Apply to BG1</span></div>
-<div class="line">windowSetMask(<a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>, <a class="code hl_define" href="#a3018096c6aeb991d21ff66ef7e88fc0b">WINDOW_MASK_INSIDE</a>);  <span class="comment">// Show inside only</span></div>
-<div class="ttc" id="awindow_8h_html_a3018096c6aeb991d21ff66ef7e88fc0b"><div class="ttname"><a href="#a3018096c6aeb991d21ff66ef7e88fc0b">WINDOW_MASK_INSIDE</a></div><div class="ttdeci">#define WINDOW_MASK_INSIDE</div><div class="ttdoc">Show layer inside window, hide outside.</div><div class="ttdef"><b>Definition</b> window.h:100</div></div>
+<div class="fragment"><div class="line"><span class="comment">// Create a spotlight effect - show BG1 only inside the window</span></div>
+<div class="line"><a class="code hl_function" href="#a69900cfa7ecb5f94e7f6195024ac9e10">windowSetPos</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, 80, 176);          <span class="comment">// Window from x=80 to x=176</span></div>
+<div class="line"><a class="code hl_function" href="#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>);       <span class="comment">// Window 1 applies to BG1</span></div>
+<div class="line"><a class="code hl_function" href="#ace412a79a04227a3b380fa54723a749a">windowSetInvert</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>, 1); <span class="comment">// mask OUTSIDE it = show inside</span></div>
+<div class="line"><a class="code hl_function" href="#a6ab27f7c632399c2a56dafa591e2e51c">windowSetMainMask</a>(<a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a>);            <span class="comment">// ...and let it mask the main screen</span></div>
 <div class="ttc" id="awindow_8h_html_a69900cfa7ecb5f94e7f6195024ac9e10"><div class="ttname"><a href="#a69900cfa7ecb5f94e7f6195024ac9e10">windowSetPos</a></div><div class="ttdeci">void windowSetPos(u8 window, u8 left, u8 right)</div><div class="ttdoc">Set window boundaries.</div></div>
-<div class="ttc" id="awindow_8h_html_a71619eed8f2329bee6c02b8ffcedca44"><div class="ttname"><a href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a></div><div class="ttdeci">#define WINDOW_BG1</div><div class="ttdoc">BG1 layer.</div><div class="ttdef"><b>Definition</b> window.h:56</div></div>
-<div class="ttc" id="awindow_8h_html_acfb87c43c4940497f7e2a21a08008155"><div class="ttname"><a href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a></div><div class="ttdeci">#define WINDOW_1</div><div class="ttdoc">Window 1.</div><div class="ttdef"><b>Definition</b> window.h:46</div></div>
+<div class="ttc" id="awindow_8h_html_a6ab27f7c632399c2a56dafa591e2e51c"><div class="ttname"><a href="#a6ab27f7c632399c2a56dafa591e2e51c">windowSetMainMask</a></div><div class="ttdeci">void windowSetMainMask(u8 layers)</div><div class="ttdoc">Set main screen window masking.</div></div>
+<div class="ttc" id="awindow_8h_html_a71619eed8f2329bee6c02b8ffcedca44"><div class="ttname"><a href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a></div><div class="ttdeci">#define WINDOW_BG1</div><div class="ttdoc">BG1 layer.</div><div class="ttdef"><b>Definition</b> window.h:62</div></div>
+<div class="ttc" id="awindow_8h_html_ace412a79a04227a3b380fa54723a749a"><div class="ttname"><a href="#ace412a79a04227a3b380fa54723a749a">windowSetInvert</a></div><div class="ttdeci">void windowSetInvert(u8 window, u8 layers, u8 invert)</div><div class="ttdoc">Set window inversion for layers.</div></div>
+<div class="ttc" id="awindow_8h_html_acfb87c43c4940497f7e2a21a08008155"><div class="ttname"><a href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a></div><div class="ttdeci">#define WINDOW_1</div><div class="ttdoc">Window 1.</div><div class="ttdef"><b>Definition</b> window.h:52</div></div>
 <div class="ttc" id="awindow_8h_html_ae1bc6577dfc89cd5fb01cddeef631017"><div class="ttname"><a href="#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a></div><div class="ttdeci">void windowEnable(u8 window, u8 layers)</div><div class="ttdoc">Enable window for specified layers.</div></div>
-</div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
+</div><!-- fragment --><p>The last call is the one that makes anything happen: <a class="el" href="#ae1bc6577dfc89cd5fb01cddeef631017" title="Enable window for specified layers.">windowEnable()</a> only selects which window applies to which layer; the main- / sub-screen mask (TMW / TSW) is what hides pixels. This example called a <span class="tt">windowSetMask()</span> that has never existed, until 2026-09-20.</p>
+<dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="acfb87c43c4940497f7e2a21a08008155" name="acfb87c43c4940497f7e2a21a08008155"></a>
@@ -441,7 +444,7 @@ Usage Example</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Show layer inside window, hide outside. </p>
+<p>invert = 0: the layer is HIDDEN inside the window, shown outside </p>
 
 </div>
 </div>
@@ -457,7 +460,7 @@ Usage Example</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Show layer outside window, hide inside. </p>
+<p>invert = 1: the layer is HIDDEN outside the window, shown inside </p>
 
 </div>
 </div>
@@ -620,7 +623,7 @@ Usage Example</h2>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><a class="code hl_function" href="#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a>(<a class="code hl_define" href="#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a>, <a class="code hl_define" href="#a71619eed8f2329bee6c02b8ffcedca44">WINDOW_BG1</a> | <a class="code hl_define" href="#ad6547b6cae8f4e3aa2b6c8b2b21c875e">WINDOW_OBJ</a>);  <span class="comment">// Affect BG1 and sprites</span></div>
-<div class="ttc" id="awindow_8h_html_ad6547b6cae8f4e3aa2b6c8b2b21c875e"><div class="ttname"><a href="#ad6547b6cae8f4e3aa2b6c8b2b21c875e">WINDOW_OBJ</a></div><div class="ttdeci">#define WINDOW_OBJ</div><div class="ttdoc">Sprites (OBJ) layer.</div><div class="ttdef"><b>Definition</b> window.h:68</div></div>
+<div class="ttc" id="awindow_8h_html_ad6547b6cae8f4e3aa2b6c8b2b21c875e"><div class="ttname"><a href="#ad6547b6cae8f4e3aa2b6c8b2b21c875e">WINDOW_OBJ</a></div><div class="ttdeci">#define WINDOW_OBJ</div><div class="ttdoc">Sprites (OBJ) layer.</div><div class="ttdef"><b>Definition</b> window.h:74</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -674,7 +677,7 @@ Usage Example</h2>
   <table class="params">
     <tr><td class="paramname">window</td><td>Window number (WINDOW_1 or WINDOW_2) </td></tr>
     <tr><td class="paramname">layers</td><td>Layer mask </td></tr>
-    <tr><td class="paramname">invert</td><td>0 = mask inside (show inside), 1 = mask outside (show outside) </td></tr>
+    <tr><td class="paramname">invert</td><td>0 = the layer is hidden INSIDE the window (shown outside); 1 = hidden OUTSIDE (shown inside — the spotlight / iris case). Documented the other way round until 2026-09-20; arbiter: fullsnes, "2123h W12SEL" window area Inside / Outside. </td></tr>
   </table>
   </dd>
 </dl>

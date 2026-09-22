@@ -150,7 +150,7 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>audioSetEcho(delay, feedback, volL, volR) sizes the echo ring and sets how long the tail rings (feedback) and how loud the wet signal is — call it BEFORE enabling</li>
 <li>audioSetEchoFilter(fir[8]) is the 8-tap FIR on the echo path; tap 0 = 127 passes the echo straight through</li>
-<li>audioEnableEcho(voiceMask) routes voices into the echo; <a class="el" href="group__audio__echo.html#ga98ebf2573587509ddebcc27fdc3ab479" title="Disable echo for all voices.">audioDisableEcho()</a> turns it off</li>
+<li>audioEnableEcho(voiceMask) routes voices into the echo; <a class="el" href="group__audio__echo.html#ga9d4ca0a00107c3c5cdb4ef80cf75e875" title="Disable echo for all voices.">audioDisableEcho()</a> turns it off</li>
 <li>Echo costs ARAM — the ring buffer is real memory, sized by the delay</li>
 </ul>
 </dd></dl>
@@ -159,7 +159,7 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, audio, input</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">audio.h</a> (<a class="el" href="group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7" title="Configure echo parameters.">audioSetEcho</a> / <a class="el" href="group__audio__echo.html#ga663f776667e4907fbed12543f2c83bc1" title="Enable echo for specific voices.">audioEnableEcho</a>), audio/soundboard </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">audio.h</a> (<a class="el" href="group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho</a> / <a class="el" href="group__audio__echo.html#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho</a>), audio/soundboard </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a7f50867bfc0b6f31a1ba4cc0ebc7e406" name="a7f50867bfc0b6f31a1ba4cc0ebc7e406"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7f50867bfc0b6f31a1ba4cc0ebc7e406">&#9670;&#160;</a></span>SMP_POP</h2>

@@ -174,7 +174,8 @@ Functions</h2></td></tr>
 <li>Command buffer overflow</li>
 <li>Desynchronization with module playback</li>
 </ul>
-<p>Call in your main loop or NMI handler: </p><div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
+<p>Call it from the MAIN LOOP, once per frame — not from an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: it shares its command staging bytes with <a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a>, <a class="el" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1" title="Start module playback.">snesmodPlay()</a>, <a class="el" href="group__snesmod__volume.html#ga9681d3b7715b34884cd81e2caf51d477" title="Fade module volume.">snesmodFadeVolume()</a> and <a class="el" href="group__snesmod__volume.html#ga256f12e62b2fae20a93a5ab05a53db5f" title="Set module volume.">snesmodSetModuleVolume()</a>, so an NMI landing between one of those staging its parameters and queueing them corrupts the command. (This line offered "or NMI handler" until 2026-09-20.)</p>
+<div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <a class="code hl_function" href="#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a>();</div>
 <div class="line">    <span class="comment">// ... game logic</span></div>

@@ -300,11 +300,11 @@ Getting Started</h2>
 <div class="ttc" id="achips_2superfx__hello_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div><div class="ttdoc">Launch GSU program, wait for completion (defined in gsu_loader.asm).</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asuperfx_8h_html"><div class="ttname"><a href="superfx_8h.html">superfx.h</a></div><div class="ttdoc">SuperFX (GSU) coprocessor library — registers, config, and API.</div></div>
-<div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Initialize SuperFX — detect hardware, set default config.</div><div class="ttdef"><b>Definition</b> superfx.h:109</div></div>
+<div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Set the GSU default configuration; returns gsuIsPresent().</div><div class="ttdef"><b>Definition</b> superfx.h:122</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="the-exclusive-bus"></a>
 The Exclusive Bus</h2>
 <p>When SCMR has RON=1, the GSU owns the ROM bus. <b>The SNES CPU cannot read ROM &ndash; not even its own code.</b> This is why:</p>
@@ -380,7 +380,7 @@ SRAM to VRAM Transfer</h3>
 <div class="line"><span class="comment">/* DMA 16KB from SRAM $70:0000 to VRAM $0000 */</span></div>
 <div class="line"><span class="comment">/* (see gsu_loader.asm dmaBitmapToVRAM function) */</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:147</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="example-roms-2"></a>
 Example ROMs</h2>
 <table class="markdownTable">

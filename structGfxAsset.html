@@ -132,19 +132,19 @@ $(function(){initNavTree('structGfxAsset.html','','structGfxAsset-members'); });
 Public Attributes</h2></td></tr>
 <tr class="memitem:a5acf752e53bfafcc243d041ecb3d5a80" id="r_a5acf752e53bfafcc243d041ecb3d5a80"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5acf752e53bfafcc243d041ecb3d5a80">color_mode</a></td></tr>
 <tr class="memdesc:a5acf752e53bfafcc243d041ecb3d5a80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Color depth selector. Use one of: <span class="tt"><a class="el" href="group__bg__colors.html#ga774d2a0de276a94af89173eb592803c0">BG_4COLORS</a></span>, <span class="tt"><a class="el" href="group__bg__colors.html#gaf195eec5c93ea5507399f3c85109f3d0">BG_4COLORS0</a></span> (Mode 0), <span class="tt"><a class="el" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></span>, <span class="tt"><a class="el" href="group__bg__colors.html#gaab497f5051249668123af8a5363b8bf8">BG_256COLORS</a></span>. Determines how the runtime computes the CGRAM destination from <span class="tt">palette_slot</span>.  <br /></td></tr>
-<tr class="memitem:a6d10f06932092fd1fadb8fa829055c1f" id="r_a6d10f06932092fd1fadb8fa829055c1f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a6d10f06932092fd1fadb8fa829055c1f">palette</a></td></tr>
-<tr class="memdesc:a6d10f06932092fd1fadb8fa829055c1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to BGR555 palette data.  <br /></td></tr>
-<tr class="memitem:a02c32dc422e65053c8839b7b74588e58" id="r_a02c32dc422e65053c8839b7b74588e58"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a02c32dc422e65053c8839b7b74588e58">palette_end</a></td></tr>
-<tr class="memdesc:a02c32dc422e65053c8839b7b74588e58"><td class="mdescLeft">&#160;</td><td class="mdescRight">One past the end of the palette data.  <br /></td></tr>
-<tr class="memitem:abd618ae4229a6fabeb976d2291cc4cef" id="r_abd618ae4229a6fabeb976d2291cc4cef"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#abd618ae4229a6fabeb976d2291cc4cef">tiles</a></td></tr>
-<tr class="memdesc:abd618ae4229a6fabeb976d2291cc4cef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to tile graphics data.  <br /></td></tr>
-<tr class="memitem:ae5ad1a58a0c6588768c83dacd2bcc3aa" id="r_ae5ad1a58a0c6588768c83dacd2bcc3aa"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#ae5ad1a58a0c6588768c83dacd2bcc3aa">tiles_end</a></td></tr>
-<tr class="memdesc:ae5ad1a58a0c6588768c83dacd2bcc3aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">One past the end of tile graphics. Size is computed at load time as <span class="tt"><a class="el" href="#ae5ad1a58a0c6588768c83dacd2bcc3aa" title="One past the end of tile graphics. Size is computed at load time as tiles_end - tiles.">tiles_end</a> - <a class="el" href="#abd618ae4229a6fabeb976d2291cc4cef" title="Pointer to tile graphics data.">tiles</a></span>.  <br /></td></tr>
+<tr class="memitem:adfcbc5e111ed2b9e6d584096eecfd75b" id="r_adfcbc5e111ed2b9e6d584096eecfd75b"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#adfcbc5e111ed2b9e6d584096eecfd75b">palette</a></td></tr>
+<tr class="memdesc:adfcbc5e111ed2b9e6d584096eecfd75b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to BGR555 palette data.  <br /></td></tr>
+<tr class="memitem:af8a22c98f1cb142fd462383236258620" id="r_af8a22c98f1cb142fd462383236258620"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#af8a22c98f1cb142fd462383236258620">palette_end</a></td></tr>
+<tr class="memdesc:af8a22c98f1cb142fd462383236258620"><td class="mdescLeft">&#160;</td><td class="mdescRight">One past the end of the palette data.  <br /></td></tr>
+<tr class="memitem:a70d79bc6ba8eb71d625f8842dcc98c81" id="r_a70d79bc6ba8eb71d625f8842dcc98c81"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a70d79bc6ba8eb71d625f8842dcc98c81">tiles</a></td></tr>
+<tr class="memdesc:a70d79bc6ba8eb71d625f8842dcc98c81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to tile graphics data.  <br /></td></tr>
+<tr class="memitem:a09a2e4801bdab6a0073840aff5272f97" id="r_a09a2e4801bdab6a0073840aff5272f97"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a09a2e4801bdab6a0073840aff5272f97">tiles_end</a></td></tr>
+<tr class="memdesc:a09a2e4801bdab6a0073840aff5272f97"><td class="mdescLeft">&#160;</td><td class="mdescRight">One past the end of tile graphics. Size is computed at load time as <span class="tt"><a class="el" href="#a09a2e4801bdab6a0073840aff5272f97" title="One past the end of tile graphics. Size is computed at load time as tiles_end - tiles.">tiles_end</a> - <a class="el" href="#a70d79bc6ba8eb71d625f8842dcc98c81" title="Pointer to tile graphics data.">tiles</a></span>.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A tileset bundle: graphics + palette + color depth. </p>
 <p>Use cases: runtime-built tilemaps, BGs that only ship a tileset without a static map, or any "load tiles + palette" call where you want the asset to be a first-class value (passed to a function, stored in a level table, etc.).</p>
-<p>The struct stores begin/end pointer pairs rather than precomputed sizes because pointer subtraction between two extern symbols is not a compile-time constant in C — sizes are computed at load time by <span class="tt"><a class="el" href="asset_8h.html#aaf916715396120737fe434ef16a8db2f" title="Load a tileset (tiles + palette) and configure a BG&#39;s tile graphics pointer — typed-value variant of ...">gfxLoad()</a></span>. This keeps the struct usable in <span class="tt">static const</span> storage.</p>
+<p>The struct stores begin/end pointer pairs rather than precomputed sizes because pointer subtraction between two extern symbols is not a compile-time constant in C — sizes are computed at load time by <span class="tt"><a class="el" href="asset_8h.html#aaf916715396120737fe434ef16a8db2f" title="Load a tileset (tiles + palette) and configure a BG&#39;s tile graphics pointer. (It used to be described...">gfxLoad()</a></span>. This keeps the struct usable in <span class="tt">static const</span> storage.</p>
 <p>Field stability: this struct is part of the public API. New fields may be added at the END only — keep the first five fields where they are. Callers SHOULD use designated initialisers. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a5acf752e53bfafcc243d041ecb3d5a80" name="a5acf752e53bfafcc243d041ecb3d5a80"></a>
@@ -163,14 +163,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a6d10f06932092fd1fadb8fa829055c1f" name="a6d10f06932092fd1fadb8fa829055c1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d10f06932092fd1fadb8fa829055c1f">&#9670;&#160;</a></span>palette</h2>
+<a id="adfcbc5e111ed2b9e6d584096eecfd75b" name="adfcbc5e111ed2b9e6d584096eecfd75b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfcbc5e111ed2b9e6d584096eecfd75b">&#9670;&#160;</a></span>palette</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::palette</td>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::palette</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -179,14 +179,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a02c32dc422e65053c8839b7b74588e58" name="a02c32dc422e65053c8839b7b74588e58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02c32dc422e65053c8839b7b74588e58">&#9670;&#160;</a></span>palette_end</h2>
+<a id="af8a22c98f1cb142fd462383236258620" name="af8a22c98f1cb142fd462383236258620"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8a22c98f1cb142fd462383236258620">&#9670;&#160;</a></span>palette_end</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::palette_end</td>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::palette_end</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -195,14 +195,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abd618ae4229a6fabeb976d2291cc4cef" name="abd618ae4229a6fabeb976d2291cc4cef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd618ae4229a6fabeb976d2291cc4cef">&#9670;&#160;</a></span>tiles</h2>
+<a id="a70d79bc6ba8eb71d625f8842dcc98c81" name="a70d79bc6ba8eb71d625f8842dcc98c81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70d79bc6ba8eb71d625f8842dcc98c81">&#9670;&#160;</a></span>tiles</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::tiles</td>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::tiles</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -211,19 +211,19 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae5ad1a58a0c6588768c83dacd2bcc3aa" name="ae5ad1a58a0c6588768c83dacd2bcc3aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5ad1a58a0c6588768c83dacd2bcc3aa">&#9670;&#160;</a></span>tiles_end</h2>
+<a id="a09a2e4801bdab6a0073840aff5272f97" name="a09a2e4801bdab6a0073840aff5272f97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09a2e4801bdab6a0073840aff5272f97">&#9670;&#160;</a></span>tiles_end</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::tiles_end</td>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>* GfxAsset::tiles_end</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>One past the end of tile graphics. Size is computed at load time as <span class="tt"><a class="el" href="#ae5ad1a58a0c6588768c83dacd2bcc3aa" title="One past the end of tile graphics. Size is computed at load time as tiles_end - tiles.">tiles_end</a> - <a class="el" href="#abd618ae4229a6fabeb976d2291cc4cef" title="Pointer to tile graphics data.">tiles</a></span>. </p>
+<p>One past the end of tile graphics. Size is computed at load time as <span class="tt"><a class="el" href="#a09a2e4801bdab6a0073840aff5272f97" title="One past the end of tile graphics. Size is computed at load time as tiles_end - tiles.">tiles_end</a> - <a class="el" href="#a70d79bc6ba8eb71d625f8842dcc98c81" title="Pointer to tile graphics data.">tiles</a></span>. </p>
 
 </div>
 </div>

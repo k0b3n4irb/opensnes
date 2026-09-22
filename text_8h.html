@@ -252,6 +252,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Tilemap buffer height in rows. </p>
+<dl class="section user"><dt>Cost</dt><dd>Linking the text module takes 2048 bytes of the 8 KB plain C RAM band (<span class="tt">$00:0000-$1FFF</span>) for that buffer — a quarter of it — and the NMI flushes all 2048 bytes by DMA on every frame the buffer changed.</dd></dl>
 <p>The RAM tilemap buffer is 32×32 entries (2048 bytes). The cursor wraps back to row 0 past the last row — text output never writes outside the buffer. </p>
 
 </div>
@@ -413,6 +414,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section warning"><dt>Warning</dt><dd>This writes VRAM immediately — it clears the tilemap through the synchronous flush, unlike <span class="tt"><a class="el" href="#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span>, which only raises a flag for the NMI. Call it during forced blank, with the rest of your setup, not from a running frame.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>As of v0.23.0 this takes a VRAM <b>word</b> address. It used to take a byte address (the lone SDK unit inconsistency, now removed); old call sites that passed <span class="tt">W * 2</span> should now pass <span class="tt">W</span>. </dd></dl>
 
 </div>
@@ -504,10 +506,10 @@ Variables</h2></td></tr>
 <div class="ttc" id="agroup__bg__size_html_ga034f9e445b3659542009666f92520fd3"><div class="ttname"><a href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a></div><div class="ttdeci">#define BG_MAP_32x32</div><div class="ttdef"><b>Definition</b> background.h:30</div></div>
 <div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
 <div class="ttc" id="atext_8h_html_a1bd8589dd96d7cbbdc80905483892a1f"><div class="ttname"><a href="#a1bd8589dd96d7cbbdc80905483892a1f">textLoadFont</a></div><div class="ttdeci">void textLoadFont(u16 vram_addr)</div><div class="ttdoc">Load font tiles to VRAM.</div></div>
-<div class="ttc" id="atext_8h_html_a6aeb037193a9aff1d616ceed3becbdce"><div class="ttname"><a href="#a6aeb037193a9aff1d616ceed3becbdce">TEXT_DEFAULT_FONT_TILE</a></div><div class="ttdeci">#define TEXT_DEFAULT_FONT_TILE</div><div class="ttdoc">Default first font tile (zero — font occupies tiles 0-95).</div><div class="ttdef"><b>Definition</b> text.h:44</div></div>
-<div class="ttc" id="atext_8h_html_a71516b8ec619ca3a786d4d3784ff8839"><div class="ttname"><a href="#a71516b8ec619ca3a786d4d3784ff8839">TEXT_DEFAULT_PALETTE</a></div><div class="ttdeci">#define TEXT_DEFAULT_PALETTE</div><div class="ttdoc">Default palette slot (palette 0).</div><div class="ttdef"><b>Definition</b> text.h:46</div></div>
+<div class="ttc" id="atext_8h_html_a6aeb037193a9aff1d616ceed3becbdce"><div class="ttname"><a href="#a6aeb037193a9aff1d616ceed3becbdce">TEXT_DEFAULT_FONT_TILE</a></div><div class="ttdeci">#define TEXT_DEFAULT_FONT_TILE</div><div class="ttdoc">Default first font tile (zero — font occupies tiles 0-95).</div><div class="ttdef"><b>Definition</b> text.h:48</div></div>
+<div class="ttc" id="atext_8h_html_a71516b8ec619ca3a786d4d3784ff8839"><div class="ttname"><a href="#a71516b8ec619ca3a786d4d3784ff8839">TEXT_DEFAULT_PALETTE</a></div><div class="ttdeci">#define TEXT_DEFAULT_PALETTE</div><div class="ttdoc">Default palette slot (palette 0).</div><div class="ttdef"><b>Definition</b> text.h:50</div></div>
 <div class="ttc" id="atext_8h_html_a9a7338f84dc102993e17953ceaaf2a8e"><div class="ttname"><a href="#a9a7338f84dc102993e17953ceaaf2a8e">textInit</a></div><div class="ttdeci">void textInit(u16 tilemap_addr, u16 font_tile, u8 palette)</div><div class="ttdoc">Initialize the text rendering system.</div></div>
-<div class="ttc" id="atext_8h_html_afdb3005611dd240d7b9850474c575548"><div class="ttname"><a href="#afdb3005611dd240d7b9850474c575548">TEXT_DEFAULT_TILEMAP_ADDR</a></div><div class="ttdeci">#define TEXT_DEFAULT_TILEMAP_ADDR</div><div class="ttdoc">Default tilemap WORD address — 32×32 tilemap at VRAM word $3800.</div><div class="ttdef"><b>Definition</b> text.h:42</div></div>
+<div class="ttc" id="atext_8h_html_afdb3005611dd240d7b9850474c575548"><div class="ttname"><a href="#afdb3005611dd240d7b9850474c575548">TEXT_DEFAULT_TILEMAP_ADDR</a></div><div class="ttdeci">#define TEXT_DEFAULT_TILEMAP_ADDR</div><div class="ttdoc">Default tilemap WORD address — 32×32 tilemap at VRAM word $3800.</div><div class="ttdef"><b>Definition</b> text.h:46</div></div>
 <div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:133</div></div>
 <div class="ttc" id="avideo_8h_html_a4a118ad3ee36468a3fa616977a64864e"><div class="ttname"><a href="video_8h.html#a4a118ad3ee36468a3fa616977a64864e">RGB</a></div><div class="ttdeci">#define RGB(r, g, b)</div><div class="ttdoc">Create RGB color value.</div><div class="ttdef"><b>Definition</b> video.h:88</div></div>
 <div class="ttc" id="avideo_8h_html_aac65457ee33ca72f75a6ae3cc8af2f7c"><div class="ttname"><a href="video_8h.html#aac65457ee33ca72f75a6ae3cc8af2f7c">setColor</a></div><div class="ttdeci">#define setColor(index, color)</div><div class="ttdoc">Set a single CGRAM color.</div><div class="ttdef"><b>Definition</b> video.h:168</div></div>

@@ -149,8 +149,8 @@ Variables</h2></td></tr>
 <p>Every game needs randomness — enemy spawn positions, item drops, damage variance, shuffle order. The SNES has no hardware RNG, so we use a software PRNG seeded from the frame counter at game start.</p>
 <p>Ported from PVSnesLib "random" example by alekmaul.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a> — 16-bit LFSR pseudo-random number generator</li>
-<li><a class="el" href="console_8h.html#ad0d76da31c2ffab064e9e44f523e8f0a" title="Seed random number generator.">srand()</a> — seed the PRNG (use frame_count for unpredictable sequences)</li>
+<li><a class="el" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a> — 16-bit LFSR pseudo-random number generator</li>
+<li><a class="el" href="console_8h.html#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a> — seed the PRNG (use frame_count for unpredictable sequences)</li>
 <li>Text module for hex and decimal display</li>
 <li><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a> for single-press button detection</li>
 </ul>
@@ -163,7 +163,7 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, gameloop</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a> (<a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand</a>, <a class="el" href="console_8h.html#ad0d76da31c2ffab064e9e44f523e8f0a" title="Seed random number generator.">srand</a>) </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a> (rand, srand) </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>

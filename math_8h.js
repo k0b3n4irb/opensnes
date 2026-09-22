@@ -14,7 +14,7 @@ var math_8h =
     [ "fixClamp", "math_8h.html#a5b18775a4f5e401550270ef08ab62a1e", null ],
     [ "fixCos", "math_8h.html#a0a04487d24a25131a75e3c35b4edcabb", null ],
     [ "fixDiv", "math_8h.html#ac1b5b08f47109af37b8874161e3a87d9", null ],
-    [ "fixLerp", "math_8h.html#a7b242d1463b266b75f1ef4ffa222cabd", null ],
+    [ "fixLerp", "math_8h.html#ae34cfd84f2c85f3ad0d03ae9fd61a332", null ],
     [ "fixMul", "math_8h.html#aaa8ca4460928f28892217658eca661bf", null ],
     [ "fixSin", "math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c", null ],
     [ "fixSqrt", "math_8h.html#a5da2bf6880e934a85f84e9f070d612f5", null ],

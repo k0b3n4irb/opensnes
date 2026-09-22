@@ -161,7 +161,7 @@ The minimum viable mosaic</h2>
 <div class="line">    <a class="code hl_define" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a>);</div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_function" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649">mosaicInit</a>();                          <span class="comment">/* default state */</span></div>
-<div class="line">    <a class="code hl_function" href="mosaic_8h.html#a7409ed07840cb4960b91cc990c35deac">mosaicEnable</a>(<a class="code hl_define" href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a>);               <span class="comment">/* mosaic affects BG1 */</span></div>
+<div class="line">    <a class="code hl_function" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a>(<a class="code hl_define" href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a>);               <span class="comment">/* mosaic affects BG1 */</span></div>
 <div class="line">    <a class="code hl_function" href="mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823">mosaicSetSize</a>(8);                       <span class="comment">/* 9 × 9 pixel blocks */</span></div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
@@ -170,12 +170,12 @@ The minimum viable mosaic</h2>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
 <div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
 <div class="ttc" id="amosaic_8h_html_a0333ef4f70cfb2c89a88ef320a2fc823"><div class="ttname"><a href="mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823">mosaicSetSize</a></div><div class="ttdeci">void mosaicSetSize(u8 size)</div><div class="ttdoc">Set mosaic pixel block size.</div></div>
 <div class="ttc" id="amosaic_8h_html_a2f5de63e60c8e8345a1a170e533ca649"><div class="ttname"><a href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649">mosaicInit</a></div><div class="ttdeci">void mosaicInit(void)</div><div class="ttdef"><b>Definition</b> mosaic.h:56</div></div>
-<div class="ttc" id="amosaic_8h_html_a7409ed07840cb4960b91cc990c35deac"><div class="ttname"><a href="mosaic_8h.html#a7409ed07840cb4960b91cc990c35deac">mosaicEnable</a></div><div class="ttdeci">void mosaicEnable(u8 bgMask)</div><div class="ttdoc">Enable mosaic effect for specified backgrounds.</div></div>
+<div class="ttc" id="amosaic_8h_html_ab9d8f44d0140477e5b748ac9773d34df"><div class="ttname"><a href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a></div><div class="ttdeci">void mosaicSetLayers(u8 bgMask)</div><div class="ttdoc">Set the backgrounds the mosaic applies to — REPLACES the previous set.</div></div>
 <div class="ttc" id="amosaic_8h_html_aeae429c8e286da71bda14e930468367c"><div class="ttname"><a href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a></div><div class="ttdeci">#define MOSAIC_BG1</div><div class="ttdef"><b>Definition</b> mosaic.h:31</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:133</div></div>
@@ -185,7 +185,7 @@ The minimum viable mosaic</h2>
 Animated transitions</h2>
 <p>The lib ships two helpers that block-and-animate, the canonical RPG-style transition:</p>
 <div class="fragment"><div class="line"><span class="comment">/* &quot;Pixelate the screen, then load a new level, then resolve into it&quot; */</span></div>
-<div class="line"><a class="code hl_function" href="mosaic_8h.html#a7409ed07840cb4960b91cc990c35deac">mosaicEnable</a>(<a class="code hl_define" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a>);</div>
+<div class="line"><a class="code hl_function" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a>(<a class="code hl_define" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a>);</div>
 <div class="line"><a class="code hl_function" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a>(2);          <span class="comment">/* 0 → 15 over ~30 frames at speed=2 */</span></div>
 <div class="line"> </div>
 <div class="line">loadNewLevel();             <span class="comment">/* swap tiles/tilemap/palette in WRAM */</span></div>
@@ -199,7 +199,7 @@ Animated transitions</h2>
 <div class="ttc" id="amosaic_8h_html_a706149f9c377234abaca910959bddb0d"><div class="ttname"><a href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a></div><div class="ttdeci">void mosaicFadeOut(u8 speed)</div><div class="ttdoc">Animate mosaic fade out (clear -&gt; pixelated).</div></div>
 </div><!-- fragment --><p>The <span class="tt">speed</span> parameter is "frames to wait between steps". <span class="tt">1</span> = fast (~16 frames total), <span class="tt">2</span> = medium (~30 frames), <span class="tt">4</span> = dramatic (~60 frames). The functions block — they call <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> internally — so during the fade the main thread is idle. Schedule any heavy gameplay logic (level swap, palette change, DMA) <b>at the midpoint</b> when the screen is fully pixelated and the artefacts are masked.</p>
 <p>If you need non-blocking animation (e.g., mosaic plus other moving elements), use the manual loop:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="mosaic_8h.html#a7409ed07840cb4960b91cc990c35deac">mosaicEnable</a>(<a class="code hl_define" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a>);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a>(<a class="code hl_define" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a>);</div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size = 0; size &lt;= 15; size++) {</div>
 <div class="line">    <a class="code hl_function" href="mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823">mosaicSetSize</a>(size);</div>
 <div class="line">    <span class="comment">/* … other per-frame work here … */</span></div>
@@ -215,7 +215,7 @@ The lib API</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649">mosaicInit()</a></span>  </td><td class="markdownTableBodyNone">Reset all mosaic state — disable, size 0. Call before configuring a new scene.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">mosaicEnable(bgMask)</span>  </td><td class="markdownTableBodyNone">Enable mosaic on the layers in the bitmask (<span class="tt"><a class="el" href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a></span>, …, <span class="tt"><a class="el" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a></span>).  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">mosaicSetLayers(bgMask)</span>  </td><td class="markdownTableBodyNone">Enable mosaic on the layers in the bitmask (<span class="tt"><a class="el" href="mosaic_8h.html#aeae429c8e286da71bda14e930468367c">MOSAIC_BG1</a></span>, …, <span class="tt"><a class="el" href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a></span>).  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0" title="Disable mosaic effect for all backgrounds.">mosaicDisable()</a></span>  </td><td class="markdownTableBodyNone">Disable mosaic on all layers.  </td></tr>
 <tr class="markdownTableRowEven">
@@ -281,7 +281,7 @@ just the boss layer while the player keeps moving".</p>
 Cycle cost</h2>
 <p>Mosaic costs <b>zero CPU</b> during display — the PPU does the pixel-block sampling in hardware. The configuration writes are a single byte to <span class="tt">$2106</span> per change (~10 cycles total).</p>
 <p>The blocking fade helpers (<span class="tt"><a class="el" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e" title="Animate mosaic fade in (pixelated -&gt; clear).">mosaicFadeIn</a></span>/<span class="tt"><a class="el" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d" title="Animate mosaic fade out (clear -&gt; pixelated).">mosaicFadeOut</a></span>) cost the duration of the fade in real time (16 × <span class="tt">speed</span> frames), but that's a gameplay-pacing decision, not a CPU-budget one.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-8"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-9"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></span> — full API reference.</li>

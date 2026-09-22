@@ -141,10 +141,12 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9c1b9f65115eaa7dc76e813a76331564" id="r_a9c1b9f65115eaa7dc76e813a76331564"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9c1b9f65115eaa7dc76e813a76331564">scenePop</a> (void)</td></tr>
-<tr class="memdesc:a9c1b9f65115eaa7dc76e813a76331564"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the top scene. Resumes the scene below.  <br /></td></tr>
-<tr class="memitem:ac96680bc9b45e756a5bb8f15803bfdb6" id="r_ac96680bc9b45e756a5bb8f15803bfdb6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6">scenePush</a> (const <a class="el" href="structScene.html">Scene</a> *next)</td></tr>
-<tr class="memdesc:ac96680bc9b45e756a5bb8f15803bfdb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a scene onto the stack. Suspends the current top.  <br /></td></tr>
+<tr class="memitem:a4be3914125f147f2a8b311de43b2a2ab" id="r_a4be3914125f147f2a8b311de43b2a2ab"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab">scenePop</a> (void)</td></tr>
+<tr class="memdesc:a4be3914125f147f2a8b311de43b2a2ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pop the top scene. Resumes the scene below.  <br /></td></tr>
+<tr class="memitem:a23bdf064f954ad6f595dc7c648bd1c4b" id="r_a23bdf064f954ad6f595dc7c648bd1c4b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b">scenePush</a> (const <a class="el" href="structScene.html">Scene</a> *next)</td></tr>
+<tr class="memdesc:a23bdf064f954ad6f595dc7c648bd1c4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a scene onto the stack. Suspends the current top.  <br /></td></tr>
+<tr class="memitem:aa96236208e25eb3b1fd7bf260ae7cf05" id="r_aa96236208e25eb3b1fd7bf260ae7cf05"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa96236208e25eb3b1fd7bf260ae7cf05">sceneReplace</a> (const <a class="el" href="structScene.html">Scene</a> *next)</td></tr>
+<tr class="memdesc:aa96236208e25eb3b1fd7bf260ae7cf05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the top scene with another, at any depth — the bottom one included.  <br /></td></tr>
 <tr class="memitem:a1ad2becb75aa6654192bdabf7e97820b" id="r_a1ad2becb75aa6654192bdabf7e97820b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b">sceneRun</a> (const <a class="el" href="structScene.html">Scene</a> *initial)</td></tr>
 <tr class="memdesc:a1ad2becb75aa6654192bdabf7e97820b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the scene stack with <span class="tt">initial</span> at the bottom. Never returns.  <br /></td></tr>
 </table>
@@ -182,21 +184,21 @@ Functions</h2></td></tr>
 <div class="ttc" id="abasics_2scene__stack_2main_8c_html_a03ef4aa620bf0f5ab11a9255146dff6c"><div class="ttname"><a href="basics_2scene__stack_2main_8c.html#a03ef4aa620bf0f5ab11a9255146dff6c">pause_init</a></div><div class="ttdeci">static void pause_init(void)</div><div class="ttdef"><b>Definition</b> main.c:123</div></div>
 <div class="ttc" id="abasics_2scene__stack_2main_8c_html_a2c550c4e8527adc3ce18a8828012b845"><div class="ttname"><a href="basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845">title_init</a></div><div class="ttdeci">static void title_init(void)</div><div class="ttdef"><b>Definition</b> main.c:79</div></div>
 <div class="ttc" id="ascene_8h_html_a1ad2becb75aa6654192bdabf7e97820b"><div class="ttname"><a href="#a1ad2becb75aa6654192bdabf7e97820b">sceneRun</a></div><div class="ttdeci">void sceneRun(const Scene *initial)</div><div class="ttdoc">Run the scene stack with initial at the bottom. Never returns.</div></div>
-<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
+<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:148</div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Behaviour</dt><dd><ul>
-<li><span class="tt">init</span> runs once on the first push of a scene. It does NOT re-run on resume after <span class="tt"><a class="el" href="#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span>. If a scene needs "did I just resume?" logic, it owns that bookkeeping in its own state.</li>
+<li><span class="tt">init</span> runs once per PUSH — every time the scene is pushed, not only the first — and it is deferred: it runs at the top of the next frame, after WaitForVBlank, not inside <a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush()</a>. It does NOT re-run on resume after <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span>. If a scene needs "did I just resume?" logic, it owns that bookkeeping in its own state.</li>
 <li><span class="tt">update</span> runs every VBlank while the scene is on top of the stack. Suspended scenes (below the top) get no callbacks.</li>
 <li>The stack has a fixed capacity (<span class="tt"><a class="el" href="#a437432b9f2edd6543cedc3053889fe1a" title="Maximum scene stack depth.">SCENE_STACK_MAX</a> = 8</span>). Push beyond that is a silent no-op — the new scene is dropped, the active scene continues. Pop on a stack of size 1 is also a silent no-op: the bottom scene stays active (the stack is never empty after <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> is called).</li>
-<li><span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> does not run the new scene's <span class="tt">update</span> synchronously. The currently-executing <span class="tt">update</span> finishes its frame; the next VBlank dispatches to the new top.</li>
+<li><span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> does not run the new scene's <span class="tt">update</span> synchronously. The currently-executing <span class="tt">update</span> finishes its frame; the next VBlank dispatches to the new top.</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>init timing — eager for the initial scene, deferred for pushes</dt><dd><ul>
 <li>The scene passed to <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> has its <span class="tt">init</span> called <b>eagerly</b>, before the first <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>. This matches <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun</a></span>'s pattern and is required because the canonical init body (<span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit</a> → <a class="el" href="video_8h.html#ad89d023577743a32d3407027e535b0ff" title="Set background mode.">setMode</a> → palettes → <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn</a></span>) must finish before the first NMI runs its DMAs.</li>
-<li>Scenes pushed via <span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> have their <span class="tt">init</span> <b>deferred</b> to the next VBlank dispatch — <span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> only records the new top, the dispatcher calls init right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> returns. This guarantees a fresh ~33 K-cycle VBlank budget for init's DMAs (palette load, tile upload, tilemap copy) instead of sharing whatever the caller's <span class="tt">update</span> already consumed.</li>
+<li>Scenes pushed via <span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> have their <span class="tt">init</span> <b>deferred</b> to the next VBlank dispatch — <span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> only records the new top, the dispatcher calls init right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> returns. This guarantees a fresh ~33 K-cycle VBlank budget for init's DMAs (palette load, tile upload, tilemap copy) instead of sharing whatever the caller's <span class="tt">update</span> already consumed.</li>
 <li>Edge cases:<ul>
-<li>Calling <span class="tt"><a class="el" href="#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> from inside <span class="tt">init</span> pops the scene before its <span class="tt">update</span> ever runs; the scene below resumes on the same frame. The popped scene effectively "ran init then bailed".</li>
-<li>Calling <span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> from inside <span class="tt">init</span> cascades: the newly pushed scene's <span class="tt">init</span> also runs in the same VBlank window, chained right after the current init returns. If both inits do heavy DMAs and the combined cost exceeds the VBlank budget, move part of the work into <span class="tt">update</span> (which has a full new VBlank window of its own).</li>
+<li>Calling <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> from inside <span class="tt">init</span> pops the scene before its <span class="tt">update</span> ever runs; the scene below resumes on the same frame. The popped scene effectively "ran init then bailed".</li>
+<li>Calling <span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> from inside <span class="tt">init</span> cascades: the newly pushed scene's <span class="tt">init</span> also runs in the same VBlank window, chained right after the current init returns. If both inits do heavy DMAs and the combined cost exceeds the VBlank budget, move part of the work into <span class="tt">update</span> (which has a full new VBlank window of its own).</li>
 </ul>
 </li>
 </ul>
@@ -206,11 +208,11 @@ Functions</h2></td></tr>
 <li>No <span class="tt">resume</span>/<span class="tt">cleanup</span> callbacks. Most scenes don't need them; if yours does, the first 1-2 frames of <span class="tt">update</span> post-pop can do the work.</li>
 <li>No serialization, save-state, or scope substacks. A scene is just a pair of function pointers; you keep the data.</li>
 <li>No inter-scene argument passing. Use a file-scope global for shared state — <span class="tt">examples/basics/scene_stack</span> does this with <span class="tt">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> <a class="el" href="basics_2scene__stack_2main_8c.html#a6d6fa96aac96b2643656c7cd3c5c3b17" title="Counter value, lives across pause/resume because counter&#39;s init runs once on push,...">counter_value</a></span>, which survives the counter→pause→ counter cycle because counter's <span class="tt">init</span> runs once on first push.</li>
-<li>No <span class="tt">sceneSwap()</span> primitive. To replace the top scene without keeping it on the stack, call <span class="tt"><a class="el" href="#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop()</a>; <a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a>(&amp;next);</span>. The combo is intentional — the framework keeps the API surface minimal and lets the user spell the intent explicitly.</li>
+<li>To replace the top scene without keeping it on the stack, call <span class="tt"><a class="el" href="#aa96236208e25eb3b1fd7bf260ae7cf05" title="Replace the top scene with another, at any depth — the bottom one included.">sceneReplace</a>(&amp;next)</span>. (Until 2026-09-20 this list recommended <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop()</a>; <a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a>(&amp;next);</span>, which cannot replace the BOTTOM scene: the pop is refused at depth 1, so the push stacks — a title → game → title cycle leaked one slot per lap until pushes were dropped.)</li>
 <li>No NMI integration. Pushing/popping from inside an NMI callback is undefined; do it from <span class="tt">update</span> only.</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Performance</dt><dd><span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> adds one indirect call per frame (the top scene's <span class="tt">update</span>) and one direct call (<span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>) — same shape as <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun</a></span>. <span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> does an array bounds check, an index update, and an optional indirect call to <span class="tt">init</span>. <span class="tt"><a class="el" href="#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> is a single index decrement. RAM footprint: 8 pointers × 8 bytes per cproc ABI = 64 bytes BSS plus a single byte for the stack depth.</dd></dl>
+<dl class="section user"><dt>Performance</dt><dd><span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> adds one indirect call per frame (the top scene's <span class="tt">update</span>) and one direct call (<span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span>) — same shape as <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun</a></span>. <span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> does an array bounds check and an index update (the <span class="tt">init</span> call is deferred to the next frame). <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> is a single index decrement. RAM footprint: 8 pointers × 4 bytes (the post-A6 pointer size on this target, see compiler/ABI.md) = 32 bytes of BSS, plus a single byte for the stack depth.</dd></dl>
 <dl class="section user"><dt>Modules required</dt><dd><span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> (and <span class="tt">gameloop</span>'s transitive <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank</a></span> from the runtime). No other lib module is pulled in by sceneRun itself.</dd></dl>
 <dl class="section user"><dt>Relationship with <span class="tt">gameloop</span> (D.1)</dt><dd><span class="tt"><a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856" title="Game loop callbacks. Alias for Scene from &lt;snes/scene.h&gt;.">GameLoopConfig</a></span> from <span class="tt">&lt;<a class="el" href="gameloop_8h.html" title="Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation.">snes/gameloop.h</a>&gt;</span> is an alias for <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span>. The two types are interchangeable; <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun</a>(&amp;cfg)</span> is semantically equivalent to running a single-scene stack with <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a>(&amp;cfg)</span>. Pick whichever name fits the use site: <span class="tt"><a class="el" href="gameloop_8h.html#abd4907749765c5550a229850c698c856" title="Game loop callbacks. Alias for Scene from &lt;snes/scene.h&gt;.">GameLoopConfig</a></span> for "this is just a main loop", <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> for "this
 is one of several swappable screens".</dd></dl>
@@ -229,19 +231,19 @@ is one of several swappable screens".</dd></dl>
 </div><div class="memdoc">
 
 <p>Maximum scene stack depth. </p>
-<p><span class="tt"><a class="el" href="#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> beyond this depth is a silent no-op. 8 is enough for realistic SNES game shapes (title → menu → play → pause → over leaves 3 spare slots). </p>
+<p><span class="tt"><a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> beyond this depth is a silent no-op. 8 is enough for realistic SNES game shapes (title → menu → play → pause → over leaves 3 spare slots). </p>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a9c1b9f65115eaa7dc76e813a76331564" name="a9c1b9f65115eaa7dc76e813a76331564"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c1b9f65115eaa7dc76e813a76331564">&#9670;&#160;</a></span>scenePop()</h2>
+<a id="a4be3914125f147f2a8b311de43b2a2ab" name="a4be3914125f147f2a8b311de43b2a2ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4be3914125f147f2a8b311de43b2a2ab">&#9670;&#160;</a></span>scenePop()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scenePop </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> scenePop </td>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -251,18 +253,18 @@ is one of several swappable screens".</dd></dl>
 
 <p>Pop the top scene. Resumes the scene below. </p>
 <p>The popped scene gets no callbacks; the resumed scene's <span class="tt">update</span> runs on the next VBlank. The resumed scene's <span class="tt">init</span> is NOT re-invoked — it ran once at first push.</p>
-<p>Silently ignored when the stack contains only the bottom scene (i.e. depth 1) — the stack is never empty after <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> is called. </p>
+<dl class="section return"><dt>Returns</dt><dd>1 if a scene was popped; 0 at depth 1 — the stack is never empty after <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> — where nothing happens. Note that <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop()</a>; <a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a>(&amp;next);</span> therefore cannot replace the BOTTOM scene: the pop fails and the push stacks on top. Use <a class="el" href="#aa96236208e25eb3b1fd7bf260ae7cf05" title="Replace the top scene with another, at any depth — the bottom one included.">sceneReplace()</a>. </dd></dl>
 
 </div>
 </div>
-<a id="ac96680bc9b45e756a5bb8f15803bfdb6" name="ac96680bc9b45e756a5bb8f15803bfdb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac96680bc9b45e756a5bb8f15803bfdb6">&#9670;&#160;</a></span>scenePush()</h2>
+<a id="a23bdf064f954ad6f595dc7c648bd1c4b" name="a23bdf064f954ad6f595dc7c648bd1c4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23bdf064f954ad6f595dc7c648bd1c4b">&#9670;&#160;</a></span>scenePush()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scenePush </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> scenePush </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structScene.html">Scene</a> *</td>          <td class="paramname"><span class="paramname"><em>next</em></span></td><td>)</td>
           <td></td>
@@ -271,11 +273,37 @@ is one of several swappable screens".</dd></dl>
 </div><div class="memdoc">
 
 <p>Push a scene onto the stack. Suspends the current top. </p>
-<p>Calls <span class="tt">next-&gt;init</span> if non-NULL. The caller's currently-executing <span class="tt">update</span> finishes its frame; the next VBlank dispatches to <span class="tt">next</span>.</p>
-<p>Silently ignored when the stack is already at <span class="tt"><a class="el" href="#a437432b9f2edd6543cedc3053889fe1a" title="Maximum scene stack depth.">SCENE_STACK_MAX</a></span>.</p>
+<p>Does NOT call <span class="tt">next-&gt;init</span> itself: it records the scene, and <a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun()</a> calls <span class="tt">init</span> (if non-NULL) at the top of the next frame, then <span class="tt">update</span>. The caller's currently-executing <span class="tt">update</span> finishes its frame first.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">next</td><td><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> to push. Same lifetime contract as <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span>'s <span class="tt">initial</span>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if pushed; 0 if the stack is already at <span class="tt"><a class="el" href="#a437432b9f2edd6543cedc3053889fe1a" title="Maximum scene stack depth.">SCENE_STACK_MAX</a></span> and nothing happened. (It returned nothing, and failed silently, until 2026-09-20.) </dd></dl>
+
+</div>
+</div>
+<a id="aa96236208e25eb3b1fd7bf260ae7cf05" name="aa96236208e25eb3b1fd7bf260ae7cf05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa96236208e25eb3b1fd7bf260ae7cf05">&#9670;&#160;</a></span>sceneReplace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sceneReplace </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structScene.html">Scene</a> *</td>          <td class="paramname"><span class="paramname"><em>next</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Replace the top scene with another, at any depth — the bottom one included. </p>
+<p>The scene-swap primitive <span class="tt"><a class="el" href="#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop()</a>; <a class="el" href="#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a>(&amp;next);</span> only approximates: that idiom leaks a stack slot per swap when the scene being replaced is the bottom one, until the 8-deep stack silently drops pushes. <span class="tt">next-&gt;init</span> runs at the top of the next frame, like after a push.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">next</td><td><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> that takes the top slot. Same lifetime contract as <span class="tt"><a class="el" href="#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span>'s <span class="tt">initial</span>. </td></tr>
   </table>
   </dd>
 </dl>

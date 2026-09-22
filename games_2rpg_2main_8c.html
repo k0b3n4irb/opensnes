@@ -1058,7 +1058,7 @@ Variables</h2></td></tr>
 <p>Draw a 16x16 character straddling its 8x8 tile, or hide it. </p>
 <p>Two things happen here, both of them load-bearing.</p>
 <p><b>The straddle</b> is what makes collision feel exact: the character's logical position is one tile; the sprite is drawn 4 px left and 8 px up of it, so its feet stand on that tile and its body overhangs upward — the standard top-down RPG convention. Drawing the sprite at the tile's corner instead (the naive version) puts the visible body half a tile away from what collides.</p>
-<p><b>The cull</b> is not an optimisation, it is correctness. OAM X is 9 bits and Y is 8, so an entity standing outside the camera does not quietly vanish — its coordinates WRAP and it reappears somewhere plausible-looking on screen. A villager two screens away shows up standing inside the town wall. Anything off-camera goes to <a class="el" href="sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f" title="Park a sprite off screen.">oamHide()</a>, which parks it properly (Y AND the X high bit — Y alone still wraps for sprites over 16 px tall). </p>
+<p><b>The cull</b> is not an optimisation, it is correctness. OAM X is 9 bits and Y is 8, so an entity standing outside the camera does not quietly vanish — its coordinates WRAP and it reappears somewhere plausible-looking on screen. A villager two screens away shows up standing inside the town wall. Anything off-camera goes to <a class="el" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a>, which parks it properly (Y AND the X high bit — Y alone still wraps for sprites over 16 px tall). </p>
 
 </div>
 </div>

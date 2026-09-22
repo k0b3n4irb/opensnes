@@ -243,7 +243,7 @@ Hiding Sprites</h2>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 0;    <span class="comment">// X low byte (don&#39;t care)</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = 240;  <span class="comment">// Y = 240</span></div>
 <div class="line"><span class="comment">// ...and set bit 0 of the sprite&#39;s extended-table pair (X bit 8).</span></div>
-</div><!-- fragment --><p>Y=240 alone only hides sprites up to 16 px tall: sprite Y wraps vertically, so a 32x32 sprite at Y=240 shows its last ~16 rows at the <b>top of the screen</b>, and no Y value can fully hide a 64x64. This is exactly what the lib's <span class="tt"><a class="el" href="sprite_8h.html#a554b6c0dd569a866ecec6095ff058a7f" title="Park a sprite off screen.">oamHide()</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8" title="Clear all sprites.">oamClear()</a></span> do — prefer them over manual pokes.</p>
+</div><!-- fragment --><p>Y=240 alone only hides sprites up to 16 px tall: sprite Y wraps vertically, so a 32x32 sprite at Y=240 shows its last ~16 rows at the <b>top of the screen</b>, and no Y value can fully hide a 64x64. This is exactly what the lib's <span class="tt"><a class="el" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8" title="Clear all sprites.">oamClear()</a></span> do — prefer them over manual pokes.</p>
 <p>One refinement worth knowing: a sprite at X=256 is still treated as X=0 for the per-scanline range/time evaluation. A hidden <em>large</em> sprite whose Y wraps onto visible lines therefore still consumes the 32-sprites / 34-slivers budget on those lines — if the top of your screen drops sprites mysteriously, audit your hidden large sprites.</p>
 <h2 class="doxsection"><a class="anchor" id="sprite-y-1-scanline-quirk"></a>
 Sprite Y +1 Scanline Quirk</h2>
@@ -271,7 +271,7 @@ OpenSNES SDK convention</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">oamSetY(id, y)</span> / <span class="tt">oamSetXY(...)</span>  </td><td class="markdownTableBodyNone">auto Y-1 in <span class="tt">sprite.c</span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#aabedfca9210feb740c636184ed205501" title="Draw a metasprite with flip support.">oamDrawMetaFlip</a></span>  </td><td class="markdownTableBodyNone">call <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a36a4547bfc96bf252dfda694a60cdede" title="Draw a metasprite with flip support.">oamDrawMetaFlip</a></span>  </td><td class="markdownTableBodyNone">call <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>  </td></tr>
 </table>
 <p><b>Camp 2 — Y is the legacy PVSnesLib <span class="tt">y_logical</span> (= <span class="tt">visual_top - 1</span>)</b></p>
 <p>The dynamic sprite engine inherits PVSnesLib's collision-and-render contract: collision math sets <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[id].oamy = visual_top - 1</span>, the engine writes that raw to OAM, and the PPU's +1 quirk lifts it back to <span class="tt">visual_top</span> on screen. <b>Do not pre-subtract</b> when feeding these APIs.</p>
@@ -327,7 +327,7 @@ Common Pitfalls</h2>
 <li><b>Forgetting extended table</b> - Large sprites need size bit set</li>
 <li><b>X position &gt; 255</b> - Need to set bit 0 in extended table</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="see-also-13"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-16"></a>
 See Also</h2>
 <ul>
 <li><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Registers</a> - Full register reference</li>

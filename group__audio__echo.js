@@ -1,7 +1,7 @@
 var group__audio__echo =
 [
-    [ "audioDisableEcho", "group__audio__echo.html#ga98ebf2573587509ddebcc27fdc3ab479", null ],
-    [ "audioEnableEcho", "group__audio__echo.html#ga663f776667e4907fbed12543f2c83bc1", null ],
-    [ "audioSetEcho", "group__audio__echo.html#gaba30ae602813a15baddd3b96a20c65f7", null ],
-    [ "audioSetEchoFilter", "group__audio__echo.html#gab056f4a5918e9a8d7efa634ebd4a75b6", null ]
+    [ "audioDisableEcho", "group__audio__echo.html#ga9d4ca0a00107c3c5cdb4ef80cf75e875", null ],
+    [ "audioEnableEcho", "group__audio__echo.html#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c", null ],
+    [ "audioSetEcho", "group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07", null ],
+    [ "audioSetEchoFilter", "group__audio__echo.html#gac6dba35011e0371c1fef74f7a55ae20f", null ]
 ];

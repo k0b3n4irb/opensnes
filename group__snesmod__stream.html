@@ -149,6 +149,7 @@ Functions</h2></td></tr>
 
 <p>Allocate SPC RAM for streaming buffer. </p>
 <p>Reserves memory in SPC RAM for streaming audio.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Call it BEFORE <a class="el" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358" title="Load a module from the soundbank.">snesmodLoadModule()</a>. The driver resizes its SPC RAM layout on this command, and a module that is already loaded stops playing (measured on the libtest_fx fixture: five active voices when allocated before the load, none when after).</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Buffer size (in units specific to driver) </td></tr>

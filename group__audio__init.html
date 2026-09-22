@@ -125,8 +125,8 @@ $(function(){initNavTree('group__audio__init.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaca805f5c6782ded195a7d479cffb5e5f" id="r_gaca805f5c6782ded195a7d479cffb5e5f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#gaca805f5c6782ded195a7d479cffb5e5f">audioInit</a> (void)</td></tr>
-<tr class="memdesc:gaca805f5c6782ded195a7d479cffb5e5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the audio system.  <br /></td></tr>
+<tr class="memitem:ga7d44cacb545a813f38250020bbfa5ecd" id="r_ga7d44cacb545a813f38250020bbfa5ecd"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga7d44cacb545a813f38250020bbfa5ecd">audioInit</a> (void)</td></tr>
+<tr class="memdesc:ga7d44cacb545a813f38250020bbfa5ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the audio system.  <br /></td></tr>
 <tr class="memitem:ga4149a6d84a9f9c0368e3657f65c1dd52" id="r_ga4149a6d84a9f9c0368e3657f65c1dd52"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga4149a6d84a9f9c0368e3657f65c1dd52">audioIsReady</a> (void)</td></tr>
 <tr class="memdesc:ga4149a6d84a9f9c0368e3657f65c1dd52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if audio system is ready.  <br /></td></tr>
 <tr class="memitem:gac25577949f0b4226318e6fb714cc6ef9" id="r_gac25577949f0b4226318e6fb714cc6ef9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#gac25577949f0b4226318e6fb714cc6ef9">audioUpdate</a> (void)</td></tr>
@@ -134,14 +134,14 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"></div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="gaca805f5c6782ded195a7d479cffb5e5f" name="gaca805f5c6782ded195a7d479cffb5e5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaca805f5c6782ded195a7d479cffb5e5f">&#9670;&#160;</a></span>audioInit()</h2>
+<a id="ga7d44cacb545a813f38250020bbfa5ecd" name="ga7d44cacb545a813f38250020bbfa5ecd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7d44cacb545a813f38250020bbfa5ecd">&#9670;&#160;</a></span>audioInit()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void audioInit </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioInit </td>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -151,7 +151,8 @@ Functions</h2></td></tr>
 
 <p>Initialize the audio system. </p>
 <p>Uploads the SPC700 driver (built into the lib as audio_driver_blob) through the IPL boot-ROM protocol and starts it, then verifies the command channel with a PING. Call once during game initialization; check <a class="el" href="#ga4149a6d84a9f9c0368e3657f65c1dd52" title="Check if audio system is ready.">audioIsReady()</a> afterwards.</p>
-<dl class="section note"><dt>Note</dt><dd>Blocks for the duration of the upload (~a frame for the small driver). Interrupts stay enabled; the NMI handler does not touch the APU ports. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Blocks for the duration of the upload (~a frame for the small driver). Interrupts stay enabled; the NMI handler does not touch the APU ports.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK, or AUDIO_ERR_TIMEOUT if the driver did not answer the handshake (<a class="el" href="#ga4149a6d84a9f9c0368e3657f65c1dd52" title="Check if audio system is ready.">audioIsReady()</a> then reads 0). Returned nothing until 2026-09-21; so did the setters below, which now return the AUDIO_* code of the command they sent (AUDIO_ERR_INVALID_ID for a voice out of range) instead of swallowing it. Existing callers that ignore the value are unaffected. </dd></dl>
 
 </div>
 </div>

@@ -235,7 +235,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Per-frame work. Called once per VBlank by the gameloop. </p>
-<p>The framework has already done <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> before calling us, so we are inside the VBlank window — VRAM/CGRAM/OAM writes are safe at this point. Nothing here exceeds the budget so we never drop a frame. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This does NOT run inside VBlank, despite following <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>. The handshake is the other way round: WaitForVBlank raises vblank_flag and halts, and the NMI handler clears that flag as its LAST act — after the OAM DMA, the tilemap DMA, the scroll writes and the pad read. So by the time this callback runs, VBlank is spent and the PPU is drawing again. Writing VRAM, CGRAM or OAM here is the silent failure at the top of <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>: the write is dropped with no error.</dd></dl>
+<p>What this callback may safely do is touch RAM — which is all the code below does. The text goes into the tilemap buffer and the NMI uploads it at the START of the next VBlank. </p>
 
 </div>
 </div>

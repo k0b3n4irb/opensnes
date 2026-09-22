@@ -130,7 +130,7 @@ $(function(){initNavTree('group__bool__type.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:gaa93f0eb578d23995850d61f7d61c55c1" id="r_gaa93f0eb578d23995850d61f7d61c55c1"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:ga65e9886d74aaee76545e83dd09011727" id="r_ga65e9886d74aaee76545e83dd09011727"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga65e9886d74aaee76545e83dd09011727">false</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memitem:gaa8cecfc5c5c054d2875c03e77b7be15d" id="r_gaa8cecfc5c5c054d2875c03e77b7be15d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>&#160;&#160;&#160;0xFF</td></tr>
+<tr class="memitem:gaa8cecfc5c5c054d2875c03e77b7be15d" id="r_gaa8cecfc5c5c054d2875c03e77b7be15d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:ga41f9c5fb8b08eb5dc3edce4dcb37fee7" id="r_ga41f9c5fb8b08eb5dc3edce4dcb37fee7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>&#160;&#160;&#160;1</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -143,8 +143,8 @@ Typedefs</h2></td></tr>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (flag) { }         <span class="comment">// Good</span></div>
 <div class="line"><span class="keywordflow">if</span> (flag != <a class="code hl_define" href="#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a>) {} <span class="comment">// Good</span></div>
 <div class="line"><span class="keywordflow">if</span> (flag == <a class="code hl_define" href="#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>) {}  <span class="comment">// Bad! Will fail for non-0xFF truthy values</span></div>
-<div class="ttc" id="agroup__bool__type_html_gaa8cecfc5c5c054d2875c03e77b7be15d"><div class="ttname"><a href="#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a></div><div class="ttdeci">#define TRUE</div><div class="ttdef"><b>Definition</b> types.h:176</div></div>
-<div class="ttc" id="agroup__bool__type_html_gaa93f0eb578d23995850d61f7d61c55c1"><div class="ttname"><a href="#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a></div><div class="ttdeci">#define FALSE</div><div class="ttdef"><b>Definition</b> types.h:175</div></div>
+<div class="ttc" id="agroup__bool__type_html_gaa8cecfc5c5c054d2875c03e77b7be15d"><div class="ttname"><a href="#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a></div><div class="ttdeci">#define TRUE</div><div class="ttdef"><b>Definition</b> types.h:182</div></div>
+<div class="ttc" id="agroup__bool__type_html_gaa93f0eb578d23995850d61f7d61c55c1"><div class="ttname"><a href="#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a></div><div class="ttdeci">#define FALSE</div><div class="ttdef"><b>Definition</b> types.h:181</div></div>
 </div><!-- fragment --> </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="gaa93f0eb578d23995850d61f7d61c55c1" name="gaa93f0eb578d23995850d61f7d61c55c1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaa93f0eb578d23995850d61f7d61c55c1">&#9670;&#160;</a></span>FALSE</h2>
@@ -181,7 +181,7 @@ Typedefs</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define TRUE&#160;&#160;&#160;0xFF</td>
+          <td class="memname">#define TRUE&#160;&#160;&#160;1</td>
         </tr>
       </table>
 </div><div class="memdoc">

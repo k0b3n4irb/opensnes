@@ -143,22 +143,31 @@ Macros</h2></td></tr>
 <tr class="memitem:a581c7decbbc7e3358c880dc77aff92c0" id="r_a581c7decbbc7e3358c880dc77aff92c0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a581c7decbbc7e3358c880dc77aff92c0">OB_TYPE_MAX</a>&#160;&#160;&#160;64</td></tr>
 <tr class="memdesc:a581c7decbbc7e3358c880dc77aff92c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of object types.  <br /></td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a3fe1cc9973a9916aa23e2a5b976045b2" id="r_a3fe1cc9973a9916aa23e2a5b976045b2"><td class="memItemLeft">typedef void(*&#160;</td><td class="memItemRight"><a class="el" href="#a3fe1cc9973a9916aa23e2a5b976045b2">ObjInitFn</a>) (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> xp, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> yp, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> type, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> minx, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> maxx)</td></tr>
+<tr class="memdesc:a3fe1cc9973a9916aa23e2a5b976045b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Init callback of an object type, called by <a class="el" href="#aa14cd55e5ffb19f7030a32f47e84f2a5" title="Load objects from a data table.">objLoadObjects()</a> per table entry.  <br /></td></tr>
+<tr class="memitem:aa02a167f5798147f70c15c69282b97d2" id="r_aa02a167f5798147f70c15c69282b97d2"><td class="memItemLeft">typedef void(*&#160;</td><td class="memItemRight"><a class="el" href="#aa02a167f5798147f70c15c69282b97d2">ObjUpdateFn</a>) (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td></tr>
+<tr class="memdesc:aa02a167f5798147f70c15c69282b97d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update / refresh callback of an object type; <code class="param">idx</code> is the slot index.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a69633332bdfb7f5ef7d1225003dc680e" id="r_a69633332bdfb7f5ef7d1225003dc680e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a69633332bdfb7f5ef7d1225003dc680e">objCollidMap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
-<tr class="memdesc:a69633332bdfb7f5ef7d1225003dc680e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map tiles.  <br /></td></tr>
-<tr class="memitem:a5f727bc253e37de8d471c292e51112bc" id="r_a5f727bc253e37de8d471c292e51112bc"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5f727bc253e37de8d471c292e51112bc">objCollidMap1D</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
-<tr class="memdesc:a5f727bc253e37de8d471c292e51112bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map (no gravity).  <br /></td></tr>
-<tr class="memitem:a2e1f315373d6fa48c4cc67d59f72f669" id="r_a2e1f315373d6fa48c4cc67d59f72f669"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2e1f315373d6fa48c4cc67d59f72f669">objCollidMapWithSlopes</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
-<tr class="memdesc:a2e1f315373d6fa48c4cc67d59f72f669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map tiles including slopes.  <br /></td></tr>
-<tr class="memitem:ae9af6dda4c7589adeb6ba6a478eab8ae" id="r_ae9af6dda4c7589adeb6ba6a478eab8ae"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae9af6dda4c7589adeb6ba6a478eab8ae">objCollidObj</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle1, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle2)</td></tr>
-<tr class="memdesc:ae9af6dda4c7589adeb6ba6a478eab8ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test collision between two objects.  <br /></td></tr>
-<tr class="memitem:a7000f80d8c2991bbb9cd69489ab8f774" id="r_a7000f80d8c2991bbb9cd69489ab8f774"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7000f80d8c2991bbb9cd69489ab8f774">objGetPointer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
-<tr class="memdesc:a7000f80d8c2991bbb9cd69489ab8f774"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointer to an object from its handle.  <br /></td></tr>
+<tr class="memitem:a550404601c3ea5018c859871fc99ebd4" id="r_a550404601c3ea5018c859871fc99ebd4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a550404601c3ea5018c859871fc99ebd4">objCollidMap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objindex)</td></tr>
+<tr class="memdesc:a550404601c3ea5018c859871fc99ebd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map tiles.  <br /></td></tr>
+<tr class="memitem:a4ceea4ba8ad22e6ac49e9392f1671545" id="r_a4ceea4ba8ad22e6ac49e9392f1671545"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545">objCollidMap1D</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objindex)</td></tr>
+<tr class="memdesc:a4ceea4ba8ad22e6ac49e9392f1671545"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map (no gravity).  <br /></td></tr>
+<tr class="memitem:a828cd84eb41cd28c18ba0625cad1fd2a" id="r_a828cd84eb41cd28c18ba0625cad1fd2a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a828cd84eb41cd28c18ba0625cad1fd2a">objCollidMapWithSlopes</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objindex)</td></tr>
+<tr class="memdesc:a828cd84eb41cd28c18ba0625cad1fd2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check object collision with map tiles including slopes.  <br /></td></tr>
+<tr class="memitem:aefe003a2fb685e0f08d4b5f35ef0257c" id="r_aefe003a2fb685e0f08d4b5f35ef0257c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aefe003a2fb685e0f08d4b5f35ef0257c">objCollidObj</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx1, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx2)</td></tr>
+<tr class="memdesc:aefe003a2fb685e0f08d4b5f35ef0257c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test collision between two objects.  <br /></td></tr>
+<tr class="memitem:a7cbfce19a3d4ed39620f93a7562ba2e3" id="r_a7cbfce19a3d4ed39620f93a7562ba2e3"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3">objGetPointer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
+<tr class="memdesc:a7cbfce19a3d4ed39620f93a7562ba2e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointer to an object from its handle.  <br /></td></tr>
 <tr class="memitem:a6a0d13021b69bdb55f9239d5577ae490" id="r_a6a0d13021b69bdb55f9239d5577ae490"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6a0d13021b69bdb55f9239d5577ae490">objInitEngine</a> (void)</td></tr>
 <tr class="memdesc:a6a0d13021b69bdb55f9239d5577ae490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the object engine.  <br /></td></tr>
-<tr class="memitem:ae8ccb58640772fcab4c280315373eff3" id="r_ae8ccb58640772fcab4c280315373eff3"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae8ccb58640772fcab4c280315373eff3">objInitFunctions</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> objtype, void *initfct, void *updfct, void *reffct)</td></tr>
-<tr class="memdesc:ae8ccb58640772fcab4c280315373eff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register callback functions for an object type.  <br /></td></tr>
+<tr class="memitem:a8e4ece797bd4a68b80223e346bd84538" id="r_a8e4ece797bd4a68b80223e346bd84538"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8e4ece797bd4a68b80223e346bd84538">objInitFriction1D</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> friction)</td></tr>
+<tr class="memdesc:a8e4ece797bd4a68b80223e346bd84538"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opt into friction for <a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545" title="Check object collision with map (no gravity).">objCollidMap1D()</a>.  <br /></td></tr>
+<tr class="memitem:a3e0d469cd5e4ef1da5fb674bcd765afa" id="r_a3e0d469cd5e4ef1da5fb674bcd765afa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3e0d469cd5e4ef1da5fb674bcd765afa">objInitFunctions</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> objtype, <a class="el" href="#a3fe1cc9973a9916aa23e2a5b976045b2">ObjInitFn</a> initfct, <a class="el" href="#aa02a167f5798147f70c15c69282b97d2">ObjUpdateFn</a> updfct, <a class="el" href="#aa02a167f5798147f70c15c69282b97d2">ObjUpdateFn</a> reffct)</td></tr>
+<tr class="memdesc:a3e0d469cd5e4ef1da5fb674bcd765afa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register callback functions for an object type.  <br /></td></tr>
 <tr class="memitem:ad308f742d023cc15efdb73ec4ed362aa" id="r_ad308f742d023cc15efdb73ec4ed362aa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad308f742d023cc15efdb73ec4ed362aa">objInitGravity</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objgravity, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objfriction)</td></tr>
 <tr class="memdesc:ad308f742d023cc15efdb73ec4ed362aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set gravity and friction values.  <br /></td></tr>
 <tr class="memitem:a4ad7c03653fa3b7fdc7c36b3e82a9565" id="r_a4ad7c03653fa3b7fdc7c36b3e82a9565"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4ad7c03653fa3b7fdc7c36b3e82a9565">objKill</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objhandle)</td></tr>
@@ -181,7 +190,7 @@ Variables</h2></td></tr>
 <tr class="memitem:ad4b2cf3a008d2011baf65b7ed74eaf65" id="r_ad4b2cf3a008d2011baf65b7ed74eaf65"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad4b2cf3a008d2011baf65b7ed74eaf65">objgetid</a></td></tr>
 <tr class="memdesc:ad4b2cf3a008d2011baf65b7ed74eaf65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle of the last object created by <a class="el" href="#a5f3dd63b163cced3299b0d1d48d2b17a" title="Create a new object.">objNew()</a>.  <br /></td></tr>
 <tr class="memitem:a9e81915d1e68d22798a93bb27eb74188" id="r_a9e81915d1e68d22798a93bb27eb74188"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9e81915d1e68d22798a93bb27eb74188">objptr</a></td></tr>
-<tr class="memdesc:a9e81915d1e68d22798a93bb27eb74188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current object pointer (byte offset, for internal use).  <br /></td></tr>
+<tr class="memdesc:a9e81915d1e68d22798a93bb27eb74188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Slot index + 1 of the last <a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3" title="Get pointer to an object from its handle.">objGetPointer()</a>, 0 if its handle was stale. Prefer the return value of <a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3" title="Get pointer to an object from its handle.">objGetPointer()</a>; this global predates it.  <br /></td></tr>
 <tr class="memitem:adbc29a5fc1d8493c4a23d739727aaef3" id="r_adbc29a5fc1d8493c4a23d739727aaef3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adbc29a5fc1d8493c4a23d739727aaef3">objtokill</a></td></tr>
 <tr class="memdesc:adbc29a5fc1d8493c4a23d739727aaef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set to 1 inside a callback to kill the current object.  <br /></td></tr>
 <tr class="memitem:aff685114554f887d186a87bacbe786b9" id="r_aff685114554f887d186a87bacbe786b9"><td class="memItemLeft"><a class="el" href="structt__objs.html">t_objs</a>&#160;</td><td class="memItemRight"><a class="el" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a></td></tr>
@@ -209,7 +218,7 @@ Workspace Pattern</h2>
 <div class="line">        <a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xvel = 0x0100;</div>
 <div class="line">    }</div>
 <div class="line">    <span class="comment">// Call engine functions (they sync workspace automatically)</span></div>
-<div class="line">    <a class="code hl_function" href="#a69633332bdfb7f5ef7d1225003dc680e">objCollidMap</a>(idx);</div>
+<div class="line">    <a class="code hl_function" href="#a550404601c3ea5018c859871fc99ebd4">objCollidMap</a>(idx);</div>
 <div class="line">    <a class="code hl_function" href="#af27124be823e35daf579362d3820738d">objUpdateXY</a>(idx);</div>
 <div class="line">    <span class="comment">// Read updated position from workspace</span></div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> screenx = <a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xpos[1] | (<a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xpos[2] &lt;&lt; 8);</div>
@@ -217,7 +226,7 @@ Workspace Pattern</h2>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="amap_8h_html_a912cfae6ccf6375f3c2831d65646c76b"><div class="ttname"><a href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a></div><div class="ttdeci">#define ACT_WALK</div><div class="ttdef"><b>Definition</b> map.h:94</div></div>
 <div class="ttc" id="aobject_8h_html"><div class="ttname"><a href="object_8h.html">object.h</a></div><div class="ttdoc">Game object engine with physics and collision (CONTRIB module).</div></div>
-<div class="ttc" id="aobject_8h_html_a69633332bdfb7f5ef7d1225003dc680e"><div class="ttname"><a href="#a69633332bdfb7f5ef7d1225003dc680e">objCollidMap</a></div><div class="ttdeci">void objCollidMap(u16 objhandle)</div><div class="ttdoc">Check object collision with map tiles.</div></div>
+<div class="ttc" id="aobject_8h_html_a550404601c3ea5018c859871fc99ebd4"><div class="ttname"><a href="#a550404601c3ea5018c859871fc99ebd4">objCollidMap</a></div><div class="ttdeci">void objCollidMap(u16 objindex)</div><div class="ttdoc">Check object collision with map tiles.</div></div>
 <div class="ttc" id="aobject_8h_html_af27124be823e35daf579362d3820738d"><div class="ttname"><a href="#af27124be823e35daf579362d3820738d">objUpdateXY</a></div><div class="ttdeci">void objUpdateXY(u16 objindex)</div><div class="ttdoc">Update object position from velocity.</div></div>
 <div class="ttc" id="aobject_8h_html_aff685114554f887d186a87bacbe786b9"><div class="ttname"><a href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a></div><div class="ttdeci">t_objs objWorkspace</div><div class="ttdoc">Object workspace (Bank $00).</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -273,9 +282,42 @@ Attribution</h2>
 
 </div>
 </div>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+<a id="a3fe1cc9973a9916aa23e2a5b976045b2" name="a3fe1cc9973a9916aa23e2a5b976045b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fe1cc9973a9916aa23e2a5b976045b2">&#9670;&#160;</a></span>ObjInitFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* ObjInitFn) (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> xp, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> yp, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> type, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> minx, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> maxx)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Init callback of an object type, called by <a class="el" href="#aa14cd55e5ffb19f7030a32f47e84f2a5" title="Load objects from a data table.">objLoadObjects()</a> per table entry. </p>
+
+</div>
+</div>
+<a id="aa02a167f5798147f70c15c69282b97d2" name="aa02a167f5798147f70c15c69282b97d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa02a167f5798147f70c15c69282b97d2">&#9670;&#160;</a></span>ObjUpdateFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(* ObjUpdateFn) (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update / refresh callback of an object type; <code class="param">idx</code> is the slot index. </p>
+
+</div>
+</div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a69633332bdfb7f5ef7d1225003dc680e" name="a69633332bdfb7f5ef7d1225003dc680e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69633332bdfb7f5ef7d1225003dc680e">&#9670;&#160;</a></span>objCollidMap()</h2>
+<a id="a550404601c3ea5018c859871fc99ebd4" name="a550404601c3ea5018c859871fc99ebd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a550404601c3ea5018c859871fc99ebd4">&#9670;&#160;</a></span>objCollidMap()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -283,7 +325,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void objCollidMap </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objindex</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -293,7 +335,7 @@ Attribution</h2>
 <p>Tests collision in Y (gravity/jumping) then X (walls). Updates tilestand, tileabove, tilesprop, tilebprop in objWorkspace. Applies friction to X velocity. Applies gravity if airborne.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">objhandle</td><td>Object index (as received in update callback)</td></tr>
+    <tr><td class="paramname">objindex</td><td>Slot index (as received in an update callback) or the handle from <a class="el" href="#a5f3dd63b163cced3299b0d1d48d2b17a" title="Create a new object.">objNew()</a> — see "Index or handle" below</td></tr>
   </table>
   </dd>
 </dl>
@@ -301,8 +343,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a5f727bc253e37de8d471c292e51112bc" name="a5f727bc253e37de8d471c292e51112bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f727bc253e37de8d471c292e51112bc">&#9670;&#160;</a></span>objCollidMap1D()</h2>
+<a id="a4ceea4ba8ad22e6ac49e9392f1671545" name="a4ceea4ba8ad22e6ac49e9392f1671545"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ceea4ba8ad22e6ac49e9392f1671545">&#9670;&#160;</a></span>objCollidMap1D()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -310,7 +352,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void objCollidMap1D </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objindex</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -320,15 +362,15 @@ Attribution</h2>
 <p>For top-down movement without gravity.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">objhandle</td><td>Object index </td></tr>
+    <tr><td class="paramname">objindex</td><td>Slot index or handle </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a2e1f315373d6fa48c4cc67d59f72f669" name="a2e1f315373d6fa48c4cc67d59f72f669"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e1f315373d6fa48c4cc67d59f72f669">&#9670;&#160;</a></span>objCollidMapWithSlopes()</h2>
+<a id="a828cd84eb41cd28c18ba0625cad1fd2a" name="a828cd84eb41cd28c18ba0625cad1fd2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a828cd84eb41cd28c18ba0625cad1fd2a">&#9670;&#160;</a></span>objCollidMapWithSlopes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -336,7 +378,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void objCollidMapWithSlopes </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objindex</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -346,15 +388,15 @@ Attribution</h2>
 <p>Like objCollidMap but also handles slope tiles (T_SLOPEU1..T_SLOPEUD2).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">objhandle</td><td>Object index </td></tr>
+    <tr><td class="paramname">objindex</td><td>Slot index or handle </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ae9af6dda4c7589adeb6ba6a478eab8ae" name="ae9af6dda4c7589adeb6ba6a478eab8ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9af6dda4c7589adeb6ba6a478eab8ae">&#9670;&#160;</a></span>objCollidObj()</h2>
+<a id="aefe003a2fb685e0f08d4b5f35ef0257c" name="aefe003a2fb685e0f08d4b5f35ef0257c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefe003a2fb685e0f08d4b5f35ef0257c">&#9670;&#160;</a></span>objCollidObj()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,22 +404,23 @@ Attribution</h2>
         <tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objCollidObj </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle1</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>idx1</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle2</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>idx2</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Test collision between two objects. </p>
 <p>Uses AABB (axis-aligned bounding box) collision.</p>
+<dl class="section user"><dt>Index or handle</dt><dd>A handle is <span class="tt">(id &lt;&lt; 8) | index</span>. <a class="el" href="#a4ad7c03653fa3b7fdc7c36b3e82a9565" title="Kill an object.">objKill()</a> and <a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3" title="Get pointer to an object from its handle.">objGetPointer()</a> need the whole handle (the id byte is how a stale one is detected); this function, <a class="el" href="#a550404601c3ea5018c859871fc99ebd4" title="Check object collision with map tiles.">objCollidMap()</a>, <a class="el" href="#a828cd84eb41cd28c18ba0625cad1fd2a" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a>, <a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545" title="Check object collision with map (no gravity).">objCollidMap1D()</a> and <a class="el" href="#af27124be823e35daf579362d3820738d" title="Update object position from velocity.">objUpdateXY()</a> work on a live slot and use the index only. Since 2026-09-21 they mask the id byte themselves, so a callback's <code>idx</code> and a handle both work. Before that a handle's id byte was shifted into the buffer offset and the routine silently worked on memory past the pool.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">objhandle1</td><td>First object index </td></tr>
-    <tr><td class="paramname">objhandle2</td><td>Second object index </td></tr>
+    <tr><td class="paramname">idx1</td><td>First object: slot index or handle </td></tr>
+    <tr><td class="paramname">idx2</td><td>Second object: slot index or handle </td></tr>
   </table>
   </dd>
 </dl>
@@ -385,14 +428,14 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a7000f80d8c2991bbb9cd69489ab8f774" name="a7000f80d8c2991bbb9cd69489ab8f774"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7000f80d8c2991bbb9cd69489ab8f774">&#9670;&#160;</a></span>objGetPointer()</h2>
+<a id="a7cbfce19a3d4ed39620f93a7562ba2e3" name="a7cbfce19a3d4ed39620f93a7562ba2e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cbfce19a3d4ed39620f93a7562ba2e3">&#9670;&#160;</a></span>objGetPointer()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void objGetPointer </td>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> objGetPointer </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>objhandle</em></span></td><td>)</td>
           <td></td>
@@ -401,13 +444,14 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Get pointer to an object from its handle. </p>
-<p>Validates the handle and populates objWorkspace with the object's data. Sets objptr to the buffer offset (1-based), or 0 if invalid.</p>
+<p>Validates the handle and populates objWorkspace with the object's data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">objhandle</td><td>Object handle (from objNew/objgetid) </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The slot index + 1 if the handle is live, 0 if it is stale (the object was killed, or the slot reused) — in which case the workspace is left alone. The same value is stored in <span class="tt"><a class="el" href="#a9e81915d1e68d22798a93bb27eb74188" title="Slot index + 1 of the last objGetPointer(), 0 if its handle was stale. Prefer the return value of obj...">objptr</a></span>, which was the only way to learn it until 2026-09-20 (the function returned void); <span class="tt"><a class="el" href="#a9e81915d1e68d22798a93bb27eb74188" title="Slot index + 1 of the last objGetPointer(), 0 if its handle was stale. Prefer the return value of obj...">objptr</a></span> was also documented as a "buffer offset", which it is not. </dd></dl>
 
 </div>
 </div>
@@ -431,8 +475,34 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="ae8ccb58640772fcab4c280315373eff3" name="ae8ccb58640772fcab4c280315373eff3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8ccb58640772fcab4c280315373eff3">&#9670;&#160;</a></span>objInitFunctions()</h2>
+<a id="a8e4ece797bd4a68b80223e346bd84538" name="a8e4ece797bd4a68b80223e346bd84538"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e4ece797bd4a68b80223e346bd84538">&#9670;&#160;</a></span>objInitFriction1D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void objInitFriction1D </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>friction</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Opt into friction for <a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545" title="Check object collision with map (no gravity).">objCollidMap1D()</a>. </p>
+<p><a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545" title="Check object collision with map (no gravity).">objCollidMap1D()</a> stops an object on a wall but never decelerates it otherwise (PVSnesLib parity; its FRICTION1D constant was defined and never used). A non-zero value here makes every <a class="el" href="#a4ceea4ba8ad22e6ac49e9392f1671545" title="Check object collision with map (no gravity).">objCollidMap1D()</a> call move xvel AND yvel toward zero by that amount, clamped at zero. <a class="el" href="#a6a0d13021b69bdb55f9239d5577ae490" title="Initialize the object engine.">objInitEngine()</a> resets it to 0 (off).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">friction</td><td>Deceleration per call, in 8.8 velocity units (0 = none; 0x0100, PVSnesLib's unused constant, is one pixel per frame) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3e0d469cd5e4ef1da5fb674bcd765afa" name="a3e0d469cd5e4ef1da5fb674bcd765afa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e0d469cd5e4ef1da5fb674bcd765afa">&#9670;&#160;</a></span>objInitFunctions()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,28 +515,29 @@ Attribution</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>initfct</em></span>, </td>
+          <td class="paramtype"><a class="el" href="#a3fe1cc9973a9916aa23e2a5b976045b2">ObjInitFn</a></td>          <td class="paramname"><span class="paramname"><em>initfct</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>updfct</em></span>, </td>
+          <td class="paramtype"><a class="el" href="#aa02a167f5798147f70c15c69282b97d2">ObjUpdateFn</a></td>          <td class="paramname"><span class="paramname"><em>updfct</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>reffct</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="#aa02a167f5798147f70c15c69282b97d2">ObjUpdateFn</a></td>          <td class="paramname"><span class="paramname"><em>reffct</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Register callback functions for an object type. </p>
+<p>Typed since 2026-09-19: pass the functions directly, no <span class="tt">(void *)</span> cast. A callback with the wrong signature is now a compile error instead of a corrupted stack at run time. A null callback is safe — the engine skips it.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">objtype</td><td>Object type index (0-63) </td></tr>
-    <tr><td class="paramname">initfct</td><td>Init callback: void init(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) </td></tr>
-    <tr><td class="paramname">updfct</td><td>Update callback: void update(u16 idx) — called per frame </td></tr>
-    <tr><td class="paramname">reffct</td><td>Refresh callback: void refresh(u16 idx) — called for on-screen objects (or NULL) </td></tr>
+    <tr><td class="paramname">initfct</td><td>Init callback (or 0) </td></tr>
+    <tr><td class="paramname">updfct</td><td>Update callback, called per frame (or 0) </td></tr>
+    <tr><td class="paramname">reffct</td><td>Refresh callback, called for on-screen objects (or 0) </td></tr>
   </table>
   </dd>
 </dl>
@@ -670,7 +741,7 @@ Attribution</h2>
 <p>Adds xvel/yvel to xpos/ypos (24-bit fixed point).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">objindex</td><td>Raw object index (0-79), NOT the handle from objNew. Use the index passed to your update callback, or extract from handle with (handle &amp; 0xFF).</td></tr>
+    <tr><td class="paramname">objindex</td><td>Slot index (the one passed to your update callback) or the handle from <a class="el" href="#a5f3dd63b163cced3299b0d1d48d2b17a" title="Create a new object.">objNew()</a></td></tr>
   </table>
   </dd>
 </dl>
@@ -723,7 +794,7 @@ Attribution</h2>
 </table>
 </div><div class="memdoc">
 
-<p>Current object pointer (byte offset, for internal use). </p>
+<p>Slot index + 1 of the last <a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3" title="Get pointer to an object from its handle.">objGetPointer()</a>, 0 if its handle was stale. Prefer the return value of <a class="el" href="#a7cbfce19a3d4ed39620f93a7562ba2e3" title="Get pointer to an object from its handle.">objGetPointer()</a>; this global predates it. </p>
 
 </div>
 </div>

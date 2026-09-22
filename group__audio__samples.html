@@ -257,7 +257,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Any voices playing this sample will be stopped. </p>
+<p>It does NOT stop a voice that is playing the sample — stop it first. The allocator is a bump pointer: SPC memory comes back only when the sample unloaded is the most recently loaded one, and loading a slot that is already loaded leaks the old block. (The "voices will be stopped" sentence that stood here was never implemented.) </p>
 
 </div>
 </div>

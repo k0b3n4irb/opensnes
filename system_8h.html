@@ -138,7 +138,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a7c7ba6f353be470fff7b41590a12a0e9" id="r_a7c7ba6f353be470fff7b41590a12a0e9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a> []</td></tr>
 <tr class="memdesc:a7c7ba6f353be470fff7b41590a12a0e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hardware OAM buffer (544 bytes at $7E:0300).  <br /></td></tr>
 <tr class="memitem:aaaa70a72e192e5cc318437192516fe9c" id="r_aaaa70a72e192e5cc318437192516fe9c"><td class="memItemLeft">volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aaaa70a72e192e5cc318437192516fe9c">vblank_flag</a></td></tr>
-<tr class="memdesc:aaaa70a72e192e5cc318437192516fe9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">VBlank flag (set by NMI handler each frame).  <br /></td></tr>
+<tr class="memdesc:aaaa70a72e192e5cc318437192516fe9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main-thread / NMI handshake flag — internal, do not write.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES System Variables (crt0.asm exports). </p>
@@ -194,7 +194,7 @@ Variables</h2></td></tr>
 
 <p>OAM DMA trigger flag. </p>
 <p>Set to 1 to request OAM buffer DMA during the next VBlank. The NMI handler clears this after the transfer.</p>
-<dl class="section note"><dt>Note</dt><dd>Defined in crt0.asm. Automatically set by <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Defined in crt0.asm. <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> does NOT set it: every OAM-mutating function of <a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a> (and the oamSetFast macros) sets it itself, and code that writes oamMemory[] directly must do the same — otherwise the change never reaches the PPU. </dd></dl>
 
 </div>
 </div>
@@ -254,13 +254,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>VBlank flag (set by NMI handler each frame). </p>
-<p>Set to 1 by the NMI handler at the start of each VBlank. <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> polls this flag and clears it.</p>
-<p>For manual VBlank timing after heavy computation, clear this flag before calling <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> to avoid using a stale flag: </p><div class="fragment"><div class="line"><a class="code hl_variable" href="#aaaa70a72e192e5cc318437192516fe9c">vblank_flag</a> = 0;  <span class="comment">// Clear stale flag</span></div>
-<div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();  <span class="comment">// Wait for next real VBlank</span></div>
-<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="asystem_8h_html_aaaa70a72e192e5cc318437192516fe9c"><div class="ttname"><a href="#aaaa70a72e192e5cc318437192516fe9c">vblank_flag</a></div><div class="ttdeci">volatile u8 vblank_flag</div><div class="ttdoc">VBlank flag (set by NMI handler each frame).</div></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Defined in crt0.asm. </dd></dl>
+<p>Main-thread / NMI handshake flag — internal, do not write. </p>
+<p><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> sets it to 1 ("the main thread is ready") and sleeps; the NMI handler does its VBlank work only when it finds 1, then clears it to 0, which is what wakes <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>. An NMI that finds 0 is a lag frame: it counts it and skips all VBlank work, the user callback included. There is no stale flag to clear — this text described the opposite protocol until 2026-09-20. Writing the flag from user code breaks the handshake.</p>
+<dl class="section note"><dt>Note</dt><dd>Defined in crt0.asm. </dd></dl>
 
 </div>
 </div>

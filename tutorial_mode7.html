@@ -213,10 +213,10 @@ Setup pattern</h2>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:147</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 <div class="ttc" id="agroup__bg__modes_html_gac2995da5a6139bd6ca1091ae3358d4f3"><div class="ttname"><a href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a></div><div class="ttdeci">#define BG_MODE7</div><div class="ttdef"><b>Definition</b> video.h:41</div></div>
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:445</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
@@ -357,7 +357,7 @@ Cycle cost</h2>
 <li>A direct <span class="tt"><a class="el" href="mode7_8h.html#a86be6a317594dfefb05d0786baecf98c" title="Set Mode 7 matrix directly.">mode7SetMatrix()</a></span> — just the four PPU writes ≈ 30–40 cycles.</li>
 </ul>
 <p>Per-frame matrix updates are cheap (well under 0.1 % of the frame). Per-scanline updates via HDMA are more expensive — see the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial's cycle-cost section</a>. The 4-channel perspective example consumes ~6 % of CPU during active display.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-7"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-8"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">lib/include/snes/mode7.h</a></span> — full API reference.</li>

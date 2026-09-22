@@ -163,7 +163,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a656a4fc2908d4968baf82e82fa45f040" id="r_a656a4fc2908d4968baf82e82fa45f040"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a656a4fc2908d4968baf82e82fa45f040">OAM_EXT_SIZE</a>&#160;&#160;&#160;32</td></tr>
 <tr class="memdesc:a656a4fc2908d4968baf82e82fa45f040"><td class="mdescLeft">&#160;</td><td class="mdescRight">OAM extension table size in bytes (2 bits per sprite, 128 sprites).  <br /></td></tr>
 <tr class="memitem:a1c1735026f1119e7fd947aa6eed9a2ec" id="r_a1c1735026f1119e7fd947aa6eed9a2ec"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1c1735026f1119e7fd947aa6eed9a2ec">OAM_SET_GFX</a>(id,  gfx)</td></tr>
-<tr class="memdesc:a1c1735026f1119e7fd947aa6eed9a2ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite graphics address (bank $00 only).  <br /></td></tr>
+<tr class="memdesc:a1c1735026f1119e7fd947aa6eed9a2ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite graphics address — any bank.  <br /></td></tr>
 <tr class="memitem:a52fbb2ea1761f60d6a026f6b711efa28" id="r_a52fbb2ea1761f60d6a026f6b711efa28"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a52fbb2ea1761f60d6a026f6b711efa28">OAM_SET_GFX_BANK</a>(id,  gfx,  bank)</td></tr>
 <tr class="memdesc:a52fbb2ea1761f60d6a026f6b711efa28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite graphics address with explicit bank byte.  <br /></td></tr>
 <tr class="memitem:acff706d06b2ad507e4c73dc0afb3055d" id="r_acff706d06b2ad507e4c73dc0afb3055d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a>(_slot)</td></tr>
@@ -226,10 +226,10 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a7ffabc8e75e6d2ca0ae455c38c9ebfe8" id="r_a7ffabc8e75e6d2ca0ae455c38c9ebfe8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7ffabc8e75e6d2ca0ae455c38c9ebfe8">oamClear</a> (void)</td></tr>
 <tr class="memdesc:a7ffabc8e75e6d2ca0ae455c38c9ebfe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear all sprites.  <br /></td></tr>
-<tr class="memitem:a19ef362e8093598fdbcc437ca54e15e4" id="r_a19ef362e8093598fdbcc437ca54e15e4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> baseTile, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> basePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size)</td></tr>
-<tr class="memdesc:a19ef362e8093598fdbcc437ca54e15e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite (PVSnesLib compatible).  <br /></td></tr>
-<tr class="memitem:aabedfca9210feb740c636184ed205501" id="r_aabedfca9210feb740c636184ed205501"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aabedfca9210feb740c636184ed205501">oamDrawMetaFlip</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> baseTile, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> basePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipX, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipY, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> width, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> height)</td></tr>
-<tr class="memdesc:aabedfca9210feb740c636184ed205501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite with flip support.  <br /></td></tr>
+<tr class="memitem:a51c770c211be49217be7014b858a003c" id="r_a51c770c211be49217be7014b858a003c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a51c770c211be49217be7014b858a003c">oamDrawMeta</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> baseTile, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> basePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size)</td></tr>
+<tr class="memdesc:a51c770c211be49217be7014b858a003c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite (PVSnesLib compatible).  <br /></td></tr>
+<tr class="memitem:a36a4547bfc96bf252dfda694a60cdede" id="r_a36a4547bfc96bf252dfda694a60cdede"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a36a4547bfc96bf252dfda694a60cdede">oamDrawMetaFlip</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> startId, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, const <a class="el" href="structMetaspriteItem.html">MetaspriteItem</a> *meta, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> baseTile, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> basePalette, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipX, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flipY, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> width, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> height)</td></tr>
+<tr class="memdesc:a36a4547bfc96bf252dfda694a60cdede"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a metasprite with flip support.  <br /></td></tr>
 <tr class="memitem:aca7db2b4a23c0c7a4aaa392b77bc4410" id="r_aca7db2b4a23c0c7a4aaa392b77bc4410"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aca7db2b4a23c0c7a4aaa392b77bc4410">oamDynamicDrainQueue</a> (void)</td></tr>
 <tr class="memdesc:aca7db2b4a23c0c7a4aaa392b77bc4410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block until the dynamic-sprite VRAM tile queue is empty.  <br /></td></tr>
 <tr class="memitem:a6160a02efb71cd4b2bac8c1553f9f57c" id="r_a6160a02efb71cd4b2bac8c1553f9f57c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id)</td></tr>
@@ -238,8 +238,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a333ce995f2762b9da596948ab43c5d54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the dynamic sprite engine from a config struct.  <br /></td></tr>
 <tr class="memitem:a03bb66dc46250292ae42316de3bf8451" id="r_a03bb66dc46250292ae42316de3bf8451"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a03bb66dc46250292ae42316de3bf8451">oamDynamicSetSize</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size)</td></tr>
 <tr class="memdesc:a03bb66dc46250292ae42316de3bf8451"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override the dispatched pixel size for a dynamic sprite slot.  <br /></td></tr>
-<tr class="memitem:a554b6c0dd569a866ecec6095ff058a7f" id="r_a554b6c0dd569a866ecec6095ff058a7f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id)</td></tr>
-<tr class="memdesc:a554b6c0dd569a866ecec6095ff058a7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Park a sprite off screen.  <br /></td></tr>
+<tr class="memitem:ab3ca644deefaf56572cb0cb18e533279" id="r_ab3ca644deefaf56572cb0cb18e533279"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab3ca644deefaf56572cb0cb18e533279">oamHide</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id)</td></tr>
+<tr class="memdesc:ab3ca644deefaf56572cb0cb18e533279"><td class="mdescLeft">&#160;</td><td class="mdescRight">Park a sprite off screen.  <br /></td></tr>
 <tr class="memitem:a0ab1cfd8e05842654a0e146b83d62664" id="r_a0ab1cfd8e05842654a0e146b83d62664"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> name_base)</td></tr>
 <tr class="memdesc:a0ab1cfd8e05842654a0e146b83d62664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the sprite (OAM) system.  <br /></td></tr>
 <tr class="memitem:aadaab0bfc2df6de17aee9515212c290c" id="r_aadaab0bfc2df6de17aee9515212c290c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tileSource, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tileSize, const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *tilePalette, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> paletteSize, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> paletteEntry, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oamSize)</td></tr>
@@ -250,14 +250,14 @@ Functions</h2></td></tr>
 <tr class="memdesc:a697c4b66632525f55f21fb6008582b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite properties.  <br /></td></tr>
 <tr class="memitem:a2ffba63a8844c983761138b1fbf81bd5" id="r_a2ffba63a8844c983761138b1fbf81bd5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ffba63a8844c983761138b1fbf81bd5">oamSetSize</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> large)</td></tr>
 <tr class="memdesc:a2ffba63a8844c983761138b1fbf81bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite size (large/small).  <br /></td></tr>
-<tr class="memitem:a07b133e4cd2416bcb648b2ece69d34fe" id="r_a07b133e4cd2416bcb648b2ece69d34fe"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a07b133e4cd2416bcb648b2ece69d34fe">oamSetTile</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile)</td></tr>
-<tr class="memdesc:a07b133e4cd2416bcb648b2ece69d34fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite tile.  <br /></td></tr>
-<tr class="memitem:a18ffc9139d3f1b342b8034df01dde5df" id="r_a18ffc9139d3f1b342b8034df01dde5df"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a18ffc9139d3f1b342b8034df01dde5df">oamSetX</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x)</td></tr>
-<tr class="memdesc:a18ffc9139d3f1b342b8034df01dde5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite X position.  <br /></td></tr>
-<tr class="memitem:a5f6e7cb46f76cc6b03e2309b08e2092a" id="r_a5f6e7cb46f76cc6b03e2309b08e2092a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5f6e7cb46f76cc6b03e2309b08e2092a">oamSetXY</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y)</td></tr>
-<tr class="memdesc:a5f6e7cb46f76cc6b03e2309b08e2092a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite position.  <br /></td></tr>
-<tr class="memitem:acdbad6134f010bc9372ce360328f5179" id="r_acdbad6134f010bc9372ce360328f5179"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acdbad6134f010bc9372ce360328f5179">oamSetY</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y)</td></tr>
-<tr class="memdesc:acdbad6134f010bc9372ce360328f5179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite Y position.  <br /></td></tr>
+<tr class="memitem:adb68723edfe9fcb5f46620c5753e293b" id="r_adb68723edfe9fcb5f46620c5753e293b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb68723edfe9fcb5f46620c5753e293b">oamSetTile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> tile)</td></tr>
+<tr class="memdesc:adb68723edfe9fcb5f46620c5753e293b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite tile.  <br /></td></tr>
+<tr class="memitem:aee7801788489ccf4dd20f3a23c4eadea" id="r_aee7801788489ccf4dd20f3a23c4eadea"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aee7801788489ccf4dd20f3a23c4eadea">oamSetX</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x)</td></tr>
+<tr class="memdesc:aee7801788489ccf4dd20f3a23c4eadea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite X position.  <br /></td></tr>
+<tr class="memitem:a7797ff0c3210fcbd0cbbe0e55d23a83c" id="r_a7797ff0c3210fcbd0cbbe0e55d23a83c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7797ff0c3210fcbd0cbbe0e55d23a83c">oamSetXY</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
+<tr class="memdesc:a7797ff0c3210fcbd0cbbe0e55d23a83c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite position.  <br /></td></tr>
+<tr class="memitem:a1e502976736192dfc725c51f471a24d6" id="r_a1e502976736192dfc725c51f471a24d6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1e502976736192dfc725c51f471a24d6">oamSetY</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
+<tr class="memdesc:a1e502976736192dfc725c51f471a24d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set sprite Y position.  <br /></td></tr>
 <tr class="memitem:a880416b4272104d4e9b83ea5331b6260" id="r_a880416b4272104d4e9b83ea5331b6260"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a> (void)</td></tr>
 <tr class="memdesc:a880416b4272104d4e9b83ea5331b6260"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy OAM buffer to hardware.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -310,8 +310,8 @@ Usage</h2>
 <div class="line"><a class="code hl_function" href="#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a>();  <span class="comment">// Copy OAM buffer to hardware</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="asprite_8h_html_a0ab1cfd8e05842654a0e146b83d62664"><div class="ttname"><a href="#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a></div><div class="ttdeci">void oamInit(u16 size, u16 name_base)</div><div class="ttdoc">Initialize the sprite (OAM) system.</div></div>
-<div class="ttc" id="asprite_8h_html_a209aae598e419d8117a9e2813dabc667"><div class="ttname"><a href="#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a></div><div class="ttdeci">#define OAM_DEFAULT_SIZE</div><div class="ttdoc">Default sprite size mode — small=8×8 / large=16×16.</div><div class="ttdef"><b>Definition</b> sprite.h:261</div></div>
-<div class="ttc" id="asprite_8h_html_a2ae2a968b390cd097d6362def10c0e11"><div class="ttname"><a href="#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a></div><div class="ttdeci">#define OAM_DEFAULT_TILE_BASE</div><div class="ttdoc">Default sprite tile base — 0 = tiles at VRAM word $0000.</div><div class="ttdef"><b>Definition</b> sprite.h:263</div></div>
+<div class="ttc" id="asprite_8h_html_a209aae598e419d8117a9e2813dabc667"><div class="ttname"><a href="#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a></div><div class="ttdeci">#define OAM_DEFAULT_SIZE</div><div class="ttdoc">Default sprite size mode — small=8×8 / large=16×16.</div><div class="ttdef"><b>Definition</b> sprite.h:267</div></div>
+<div class="ttc" id="asprite_8h_html_a2ae2a968b390cd097d6362def10c0e11"><div class="ttname"><a href="#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a></div><div class="ttdeci">#define OAM_DEFAULT_TILE_BASE</div><div class="ttdoc">Default sprite tile base — 0 = tiles at VRAM word $0000.</div><div class="ttdef"><b>Definition</b> sprite.h:269</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
@@ -566,18 +566,19 @@ Attribution</h2>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
-<div class="line">    <a class="code hl_variable" href="#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[id].oamgfxaddr = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(gfx); \</div>
-<div class="line">    <a class="code hl_variable" href="#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[id].oamgfxbank = 0; \</div>
+<div class="line">    <a class="code hl_variable" href="#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[id].oamgfxaddr = (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_typedef" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a>)(<span class="keyword">const</span> <span class="keywordtype">void</span> *)(gfx); \</div>
+<div class="line">    <a class="code hl_variable" href="#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[id].oamgfxbank = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)((<a class="code hl_typedef" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a>)(<span class="keyword">const</span> <span class="keywordtype">void</span> *)(gfx) &gt;&gt; 16); \</div>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
+<div class="ttc" id="agroup__types_html_ga10e94b422ef0c20dcdec20d31a1f5049"><div class="ttname"><a href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a></div><div class="ttdeci">unsigned int u32</div><div class="ttdoc">32-bit unsigned integer (0 to 4294967295)</div><div class="ttdef"><b>Definition</b> types.h:90</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="asprite_8h_html_a26ae9bbf7a98025a5d9b529bbe403a7f"><div class="ttname"><a href="#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a></div><div class="ttdeci">t_sprites oambuffer[128]</div><div class="ttdoc">Dynamic sprite buffer (128 entries, 2048 bytes).</div></div>
 </div><!-- fragment -->
-<p>Set sprite graphics address (bank $00 only). </p>
-<p>Sets the 16-bit graphics address with bank byte = 0. cc65816 passes 16-bit pointers, so the bank byte is always lost before this macro runs. Use <a class="el" href="#a52fbb2ea1761f60d6a026f6b711efa28" title="Set sprite graphics address with explicit bank byte.">OAM_SET_GFX_BANK()</a> for data in other banks.</p>
+<p>Set sprite graphics address — any bank. </p>
+<p>Stores the address AND the bank byte of <code class="param">gfx:</code> a C pointer is a far pointer, so the macro reads the bank from it. Until 2026-09-20 it wrote bank 0 (a pre-A6 leftover: "cc65816 passes 16-bit pointers"), which only worked while the linker happened to put the tiles in bank $00 — and read the wrong bank, silently, for tiles declared with ASSET_SECTION.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>Sprite index (0-127) </td></tr>
-    <tr><td class="paramname">gfx</td><td>Pointer to graphics data in bank $00 </td></tr>
+    <tr><td class="paramname">gfx</td><td>Pointer to graphics data (any bank) </td></tr>
   </table>
   </dd>
 </dl>
@@ -613,15 +614,16 @@ Attribution</h2>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
 </div><!-- fragment -->
 <p>Set sprite graphics address with explicit bank byte. </p>
-<p>Use this when sprite data is in a bank other than $00.</p>
+<p>Only needed when <code class="param">gfx</code> is a bare 16-bit address rather than a pointer. With a pointer, <a class="el" href="#a1c1735026f1119e7fd947aa6eed9a2ec" title="Set sprite graphics address — any bank.">OAM_SET_GFX()</a> already takes the bank from it.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>Sprite index (0-127) </td></tr>
     <tr><td class="paramname">gfx</td><td>Pointer to graphics data </td></tr>
-    <tr><td class="paramname">bank</td><td>ROM bank where graphics data is located (0-255) </td></tr>
+    <tr><td class="paramname">bank</td><td>ROM bank where graphics data is located (0-255)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a1c1735026f1119e7fd947aa6eed9a2ec" title="Set sprite graphics address — any bank.">OAM_SET_GFX()</a> reads the bank from the pointer. Removed at the next major version. </dd></dl>
 
 </div>
 </div>
@@ -721,8 +723,8 @@ Attribution</h2>
 <div class="line">        oamMemory[_ext] &amp;= ~_xhi; \</div>
 <div class="line">    <a class="code hl_variable" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a> = 1; \</div>
 <div class="line">} <span class="keywordflow">while</span>(0)</div>
-<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:776</div></div>
-<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:788</div></div>
+<div class="ttc" id="asprite_8h_html_a5fa5799545b94ba8e1ca643a9425ba71"><div class="ttname"><a href="#a5fa5799545b94ba8e1ca643a9425ba71">OAM_ATTR</a></div><div class="ttdeci">#define OAM_ATTR(_tile, _pal, _prio, _fl)</div><div class="ttdoc">Pre-compute OAM attribute byte (vhoopppc).</div><div class="ttdef"><b>Definition</b> sprite.h:780</div></div>
+<div class="ttc" id="asprite_8h_html_acff706d06b2ad507e4c73dc0afb3055d"><div class="ttname"><a href="#acff706d06b2ad507e4c73dc0afb3055d">OAM_XHI_MASK</a></div><div class="ttdeci">#define OAM_XHI_MASK(_slot)</div><div class="ttdoc">X-high-bit mask for a sprite slot (0-3 within a high-table byte).</div><div class="ttdef"><b>Definition</b> sprite.h:792</div></div>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
 </div><!-- fragment -->
@@ -932,7 +934,7 @@ Attribution</h2>
 <p>Convert a VRAM <b>word</b> address into an OBJ name base (0-7). </p>
 <p>OBJSEL stores the sprite tile area as a 3-bit <em>page number</em>, not an address: page N means word address <span class="tt">N &lt;&lt; 13</span>. Passing a VRAM address to <a class="el" href="#a0ab1cfd8e05842654a0e146b83d62664" title="Initialize the sprite (OAM) system.">oamInit()</a> directly is therefore wrong — it is masked to 3 bits, so <span class="tt">0x6000</span> becomes base 0 and the sprites render whatever tiles happen to live at word 0 (usually the background's). Nothing reports it.</p>
 <p>Use this macro and the intent survives the call: </p><div class="fragment"><div class="line"><a class="code hl_function" href="#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a>(<a class="code hl_define" href="#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a>, <a class="code hl_define" href="#a3ffc1c6494c1ac6cfec29f637278758f">OBJ_NAME_BASE</a>(0x6000));   <span class="comment">// base 3</span></div>
-<div class="ttc" id="asprite_8h_html_a3ffc1c6494c1ac6cfec29f637278758f"><div class="ttname"><a href="#a3ffc1c6494c1ac6cfec29f637278758f">OBJ_NAME_BASE</a></div><div class="ttdeci">#define OBJ_NAME_BASE(vram_word_addr)</div><div class="ttdoc">Convert a VRAM word address into an OBJ name base (0-7).</div><div class="ttdef"><b>Definition</b> sprite.h:307</div></div>
+<div class="ttc" id="asprite_8h_html_a3ffc1c6494c1ac6cfec29f637278758f"><div class="ttname"><a href="#a3ffc1c6494c1ac6cfec29f637278758f">OBJ_NAME_BASE</a></div><div class="ttdeci">#define OBJ_NAME_BASE(vram_word_addr)</div><div class="ttdoc">Convert a VRAM word address into an OBJ name base (0-7).</div><div class="ttdef"><b>Definition</b> sprite.h:313</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet).</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1284,16 +1286,16 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a19ef362e8093598fdbcc437ca54e15e4" name="a19ef362e8093598fdbcc437ca54e15e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19ef362e8093598fdbcc437ca54e15e4">&#9670;&#160;</a></span>oamDrawMeta()</h2>
+<a id="a51c770c211be49217be7014b858a003c" name="a51c770c211be49217be7014b858a003c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51c770c211be49217be7014b858a003c">&#9670;&#160;</a></span>oamDrawMeta()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oamDrawMeta </td>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> oamDrawMeta </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>startId</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>startId</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1342,7 +1344,7 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of hardware sprites used</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The next free sprite id (startId + the number of sprites drawn) — chain calls with it, as examples/sprites/metasprite does. Items that fall off screen are skipped WITHOUT consuming an id, so the count varies per frame: hide the ids you used last frame and no longer use. (Documented as "number of sprites used" until 2026-09-20; the code never did that.)</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Define a 32x32 metasprite using 4 16x16 sprites</span></div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_struct" href="structMetaspriteItem.html">MetaspriteItem</a> hero_frame0[] = {</div>
 <div class="line">    <a class="code hl_define" href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(0,  0,  0, <a class="code hl_define" href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(2)),   <span class="comment">// Top-left</span></div>
@@ -1353,26 +1355,26 @@ Attribution</h2>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Draw at position (100, 80)</span></div>
-<div class="line"><a class="code hl_function" href="#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a>(0, 100, 80, hero_frame0, 0, 0, <a class="code hl_define" href="#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a>);</div>
-<div class="ttc" id="asprite_8h_html_a19ef362e8093598fdbcc437ca54e15e4"><div class="ttname"><a href="#a19ef362e8093598fdbcc437ca54e15e4">oamDrawMeta</a></div><div class="ttdeci">u8 oamDrawMeta(u8 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">Draw a metasprite (PVSnesLib compatible).</div></div>
+<div class="line"><a class="code hl_function" href="#a51c770c211be49217be7014b858a003c">oamDrawMeta</a>(0, 100, 80, hero_frame0, 0, 0, <a class="code hl_define" href="#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a>);</div>
 <div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:100</div></div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:521</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:509</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:512</div></div>
-<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:497</div></div>
+<div class="ttc" id="asprite_8h_html_a51c770c211be49217be7014b858a003c"><div class="ttname"><a href="#a51c770c211be49217be7014b858a003c">oamDrawMeta</a></div><div class="ttdeci">u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">Draw a metasprite (PVSnesLib compatible).</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:518</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:506</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:509</div></div>
+<div class="ttc" id="astructMetaspriteItem_html"><div class="ttname"><a href="structMetaspriteItem.html">MetaspriteItem</a></div><div class="ttdoc">Metasprite item structure (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:494</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="aabedfca9210feb740c636184ed205501" name="aabedfca9210feb740c636184ed205501"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabedfca9210feb740c636184ed205501">&#9670;&#160;</a></span>oamDrawMetaFlip()</h2>
+<a id="a36a4547bfc96bf252dfda694a60cdede" name="a36a4547bfc96bf252dfda694a60cdede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36a4547bfc96bf252dfda694a60cdede">&#9670;&#160;</a></span>oamDrawMetaFlip()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oamDrawMetaFlip </td>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> oamDrawMetaFlip </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>startId</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>startId</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1445,7 +1447,8 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of hardware sprites used </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The next free sprite id (startId + the number of sprites drawn), like <a class="el" href="#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> — chain calls with it. (The header said "number
+        of hardware sprites used" until 2026-09-20; the code never did.) </dd></dl>
 
 </div>
 </div>
@@ -1472,8 +1475,8 @@ Attribution</h2>
 <div class="line">drawAllSprites();                <span class="comment">// queues many tile uploads</span></div>
 <div class="line"><a class="code hl_function" href="#aca7db2b4a23c0c7a4aaa392b77bc4410">oamDynamicDrainQueue</a>();          <span class="comment">// wait until VRAM matches OAM</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();                   <span class="comment">// first frame renders correctly</span></div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:140</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:115</div></div>
+<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:147</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 <div class="ttc" id="asprite_8h_html_a333ce995f2762b9da596948ab43c5d54"><div class="ttname"><a href="#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a></div><div class="ttdeci">void oamDynamicInit(const OamDynamicConfig *cfg)</div><div class="ttdoc">Initialize the dynamic sprite engine from a config struct.</div></div>
 <div class="ttc" id="asprite_8h_html_aca7db2b4a23c0c7a4aaa392b77bc4410"><div class="ttname"><a href="#aca7db2b4a23c0c7a4aaa392b77bc4410">oamDynamicDrainQueue</a></div><div class="ttdeci">void oamDynamicDrainQueue(void)</div><div class="ttdoc">Block until the dynamic-sprite VRAM tile queue is empty.</div></div>
 </div><!-- fragment --> 
@@ -1537,7 +1540,7 @@ Attribution</h2>
 <div class="line">    .sizeMode       = <a class="code hl_define" href="#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>,</div>
 <div class="line">};</div>
 <div class="line"><a class="code hl_function" href="#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a>(&amp;dyn);</div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:601</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:605</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -1573,8 +1576,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a554b6c0dd569a866ecec6095ff058a7f" name="a554b6c0dd569a866ecec6095ff058a7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a554b6c0dd569a866ecec6095ff058a7f">&#9670;&#160;</a></span>oamHide()</h2>
+<a id="ab3ca644deefaf56572cb0cb18e533279" name="ab3ca644deefaf56572cb0cb18e533279"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3ca644deefaf56572cb0cb18e533279">&#9670;&#160;</a></span>oamHide()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1582,7 +1585,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void oamHide </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1593,7 +1596,7 @@ Attribution</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a> = (<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)world_x - (<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)<a class="code hl_variable" href="mode7_2dsp1__ground_2main_8c.html#af3ac942bcc4b5319617d1265d27d0f5b">cam_x</a>;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a> = (<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)world_y - (<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)<a class="code hl_variable" href="mode7_2dsp1__ground_2main_8c.html#ad8796f8224c2283ea9888abc8ed40d37">cam_y</a>;</div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx &lt; -16 || sx &gt;</a> 255 || <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy &lt; -16 || sy &gt;</a> 223) {</div>
-<div class="line">    <a class="code hl_function" href="#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a>(<span class="keywordtype">id</span>);</div>
+<div class="line">    <a class="code hl_function" href="#ab3ca644deefaf56572cb0cb18e533279">oamHide</a>(<span class="keywordtype">id</span>);</div>
 <div class="line">} <span class="keywordflow">else</span> {</div>
 <div class="line">    <a class="code hl_function" href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(<span class="keywordtype">id</span>, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)<a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)<a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>, tile, <a class="code hl_variable" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a>, prio, 0);</div>
 <div class="line">}</div>
@@ -1602,7 +1605,7 @@ Attribution</h2>
 <div class="ttc" id="amode7_2dsp1__ground_2main_8c_html_af3ac942bcc4b5319617d1265d27d0f5b"><div class="ttname"><a href="mode7_2dsp1__ground_2main_8c.html#af3ac942bcc4b5319617d1265d27d0f5b">cam_x</a></div><div class="ttdeci">static s16 cam_x</div><div class="ttdoc">Camera position on the ground plane (wraps with the 1024-unit texture).</div><div class="ttdef"><b>Definition</b> main.c:96</div></div>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
-<div class="ttc" id="asprite_8h_html_a554b6c0dd569a866ecec6095ff058a7f"><div class="ttname"><a href="#a554b6c0dd569a866ecec6095ff058a7f">oamHide</a></div><div class="ttdeci">void oamHide(u8 id)</div><div class="ttdoc">Park a sprite off screen.</div></div>
+<div class="ttc" id="asprite_8h_html_ab3ca644deefaf56572cb0cb18e533279"><div class="ttname"><a href="#ab3ca644deefaf56572cb0cb18e533279">oamHide</a></div><div class="ttdeci">void oamHide(u16 id)</div><div class="ttdoc">Park a sprite off screen.</div></div>
 </div><!-- fragment --><p>Sets Y to OBJ_HIDE_Y <b>and</b> X's high bit, because Y=240 alone still wraps for sprites taller than 16 px. That is why this is a function and not a <span class="tt">oamSetXY(id, 0, 240)</span> you write yourself.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1849,19 +1852,9 @@ Attribution</h2>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: the old framesize=158 cliff (≈3 calls/frame caused jitter) was RESOLVED by an ASM rewrite — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a> ("oamSet() framesize cliff — RESOLVED"). <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is now cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) trim a little more overhead.</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd><b>Coordinate Variable Pattern</b>: Due to a compiler quirk, sprite coordinates MUST be stored in a struct with <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a> members for correct behavior. Using separate <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> variables causes jerky horizontal movement.</dd></dl>
-<p><b>CORRECT</b> (use struct with <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a>): </p><div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{ <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, y; } Position;</div>
-<div class="line">Position player = {100, 100};</div>
-<div class="line"><a class="code hl_function" href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, player.x, player.y, 0, 0, 3, 0);</div>
-<div class="line">player.x += 1;  <span class="comment">// Smooth movement</span></div>
-</div><!-- fragment --><p><b>WRONG</b> (separate <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> variables - causes bugs): </p><div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = 100;  <span class="comment">// DON&#39;T do this!</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = 100;</div>
-<div class="line"><a class="code hl_function" href="#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 0, 0, 3, 0);</div>
-<div class="line"><a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> += 1;  <span class="comment">// Jerky movement!</span></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
-</div><!-- fragment --><p>See examples/graphics/backgrounds/continuous_scroll for details on this pattern. </p>
+<dl class="section note"><dt>Note</dt><dd><b>Performance</b>: the old framesize=158 cliff (≈3 calls/frame caused jitter) was RESOLVED by an ASM rewrite — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a> ("oamSet() framesize cliff — RESOLVED"). <span class="tt"><a class="el" href="#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> is now cheap; use it freely. For extreme sprite counts the <span class="tt"><a class="el" href="#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast()</a></span> / <span class="tt"><a class="el" href="#ac83845cbc50f6c9f19844a317b59b66f" title="Update sprite position only (most common per-frame operation).">oamSetXYFast()</a></span> macros (see "Fast Macro Sprite API" below) trim a little more overhead.</dd>
+<dd>
+Any integer type works for the coordinates you keep on your side (<span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, struct members or plain variables). Until 2026-09-21 this block warned that separate <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables gave jerky movement and that an <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> struct was mandatory; that was a compiler defect of early 2026, long fixed — <span class="tt">examples/input/move_sprite</span> uses plain <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> and its manifest pins the motion to the pixel. Prefer <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> when a sprite can leave the screen by the left or the top, so the off-screen test is a signed compare. </dd></dl>
 
 </div>
 </div>
@@ -1895,8 +1888,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a07b133e4cd2416bcb648b2ece69d34fe" name="a07b133e4cd2416bcb648b2ece69d34fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07b133e4cd2416bcb648b2ece69d34fe">&#9670;&#160;</a></span>oamSetTile()</h2>
+<a id="adb68723edfe9fcb5f46620c5753e293b" name="adb68723edfe9fcb5f46620c5753e293b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb68723edfe9fcb5f46620c5753e293b">&#9670;&#160;</a></span>oamSetTile()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1904,7 +1897,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void oamSetTile </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1925,8 +1918,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a18ffc9139d3f1b342b8034df01dde5df" name="a18ffc9139d3f1b342b8034df01dde5df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18ffc9139d3f1b342b8034df01dde5df">&#9670;&#160;</a></span>oamSetX()</h2>
+<a id="aee7801788489ccf4dd20f3a23c4eadea" name="aee7801788489ccf4dd20f3a23c4eadea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee7801788489ccf4dd20f3a23c4eadea">&#9670;&#160;</a></span>oamSetX()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1934,7 +1927,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void oamSetX </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1955,8 +1948,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="a5f6e7cb46f76cc6b03e2309b08e2092a" name="a5f6e7cb46f76cc6b03e2309b08e2092a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f6e7cb46f76cc6b03e2309b08e2092a">&#9670;&#160;</a></span>oamSetXY()</h2>
+<a id="a7797ff0c3210fcbd0cbbe0e55d23a83c" name="a7797ff0c3210fcbd0cbbe0e55d23a83c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7797ff0c3210fcbd0cbbe0e55d23a83c">&#9670;&#160;</a></span>oamSetXY()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1964,7 +1957,7 @@ Attribution</h2>
         <tr>
           <td class="memname">void oamSetXY </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1974,7 +1967,7 @@ Attribution</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1991,8 +1984,8 @@ Attribution</h2>
 
 </div>
 </div>
-<a id="acdbad6134f010bc9372ce360328f5179" name="acdbad6134f010bc9372ce360328f5179"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acdbad6134f010bc9372ce360328f5179">&#9670;&#160;</a></span>oamSetY()</h2>
+<a id="a1e502976736192dfc725c51f471a24d6" name="a1e502976736192dfc725c51f471a24d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e502976736192dfc725c51f471a24d6">&#9670;&#160;</a></span>oamSetY()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2000,12 +1993,12 @@ Attribution</h2>
         <tr>
           <td class="memname">void oamSetY </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>id</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

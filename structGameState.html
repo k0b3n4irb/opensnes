@@ -143,20 +143,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Centralized game state structure. </p>
-<dl class="section note"><dt>Note</dt><dd>IMPORTANT COMPILER PATTERN: Using a global struct with <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a> types is the REQUIRED pattern for sprite coordinates in OpenSNES. The following patterns FAIL:</dd></dl>
-<div class="fragment"><div class="line"><span class="comment">// BAD - causes LEFT/RIGHT movement to fail while UP/DOWN works:</span></div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="#acad6079a04372bf6b88f5cddf28bbb3e">player_x</a>;</div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="#a6fe0c090fa3af40a42b5b7ad11f843aa">player_y</a>;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// GOOD - all movement directions work correctly:</span></div>
-<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{ <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, y; } <a class="code hl_struct" href="structPlayer.html">Player</a>;</div>
-<div class="line"><a class="code hl_struct" href="structPlayer.html">Player</a> player = {100, 100};</div>
-<div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="astructGameState_html_a6fe0c090fa3af40a42b5b7ad11f843aa"><div class="ttname"><a href="#a6fe0c090fa3af40a42b5b7ad11f843aa">GameState::player_y</a></div><div class="ttdeci">s16 player_y</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
-<div class="ttc" id="astructGameState_html_acad6079a04372bf6b88f5cddf28bbb3e"><div class="ttname"><a href="#acad6079a04372bf6b88f5cddf28bbb3e">GameState::player_x</a></div><div class="ttdeci">s16 player_x</div><div class="ttdef"><b>Definition</b> main.c:102</div></div>
-<div class="ttc" id="astructPlayer_html"><div class="ttname"><a href="structPlayer.html">Player</a></div><div class="ttdoc">Per-player position state.</div><div class="ttdef"><b>Definition</b> main.c:95</div></div>
-</div><!-- fragment --><p>This is due to a compiler quirk where separate static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> variables generate different (broken) code compared to struct member access. See .claude/KNOWLEDGE.md for detailed documentation.</p>
+<p>Coordinates are <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> because the scroll thresholds subtract and compare them: a signed type keeps "left of the threshold" a plain <span class="tt">&lt;</span>. (This comment used to claim that separate <span class="tt">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> coordinates were miscompiled and that the struct was REQUIRED. That described a compiler of early 2026; <span class="tt">examples/input/move_sprite</span> moves a sprite from plain <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> locals and its luna manifest pins the motion to the pixel.)</p>
 <dl class="section see"><dt>See also</dt><dd>animated_sprite example for reference implementation </dd></dl>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="ac63759cbb1d5e2dfee0ac788e5bc6df2" name="ac63759cbb1d5e2dfee0ac788e5bc6df2"></a>
@@ -286,7 +273,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> X position (screen coords) - MUST be <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a> </p>
+<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> X position (screen coords) </p>
 
 </div>
 </div>
@@ -301,7 +288,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> Y position (screen coords) - MUST be <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a> </p>
+<p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> Y position (screen coords) </p>
 
 </div>
 </div>

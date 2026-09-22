@@ -220,7 +220,7 @@ Overview</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fill with a specific tile entry (palette 2, tile 5)</span></div>
 <div class="line"><a class="code hl_define" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(0x0400, 0x1005, 2048);</div>
-<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:220</div></div>
+<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:223</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -363,7 +363,7 @@ Overview</h2>
     <tr><td class="paramname">tileSize</td><td>Size of tile data in bytes </td></tr>
     <tr><td class="paramname">paletteSize</td><td>Size of palette data in bytes </td></tr>
     <tr><td class="paramname">colorMode</td><td>Color mode (BG_4COLORS, BG_16COLORS, BG_256COLORS) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM address for tiles (must be 4KB aligned)</td></tr>
+    <tr><td class="paramname">vramAddr</td><td>VRAM WORD address for tiles, a multiple of 0x1000 words (see <a class="el" href="#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a>)</td></tr>
   </table>
   </dd>
 </dl>
@@ -444,7 +444,7 @@ Overview</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background number (0-3) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address (must be 8KB aligned, i.e., multiple of 0x2000)</td></tr>
+    <tr><td class="paramname">vramAddr</td><td>VRAM WORD address, a multiple of 0x1000 words (the register holds <span class="tt">vramAddr &gt;&gt; 12</span>; lower bits are dropped silently). Said "multiple of 0x2000" until 2026-09-20 — that is the same step counted in bytes.</td></tr>
   </table>
   </dd>
 </dl>

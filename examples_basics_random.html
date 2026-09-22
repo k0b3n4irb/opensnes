@@ -130,8 +130,8 @@ Screenshot</div></div>
     <h2 class="doxsection"><a class="anchor" id="what-youll-learn-8"></a>
 What You'll Learn</h2>
 <ul>
-<li>How to generate random numbers with <span class="tt"><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></span> (returns 0-65535)</li>
-<li>How to seed the PRNG with <span class="tt"><a class="el" href="console_8h.html#ad0d76da31c2ffab064e9e44f523e8f0a" title="Seed random number generator.">srand()</a></span> for unpredictable sequences</li>
+<li>How to generate random numbers with <span class="tt"><a class="el" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a></span> (returns 0-65535)</li>
+<li>How to seed the PRNG with <span class="tt"><a class="el" href="console_8h.html#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a></span> for unpredictable sequences</li>
 <li>Why seeding from <span class="tt"><a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a></span> at a player-triggered moment gives good randomness</li>
 <li>How to display numbers in both hex and decimal with the text module</li>
 </ul>
@@ -149,14 +149,14 @@ Controls</h2>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="why-seed-matters"></a>
 Why Seed Matters</h3>
-<p><span class="tt"><a class="el" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2" title="Get random 16-bit number.">rand()</a></span> produces a deterministic sequence — the same seed always gives the same numbers. For a game, you want unpredictability. The trick: call <span class="tt">srand(getFrameCount())</span> when the player presses START on the title screen. Since the player presses at an unpredictable frame, the seed varies each playthrough.</p>
-<h3 class="doxsection"><a class="anchor" id="using-rand-in-games"></a>
-Using rand() in Games</h3>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 256;        <span class="comment">// Random X position (0-255)</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> damage = 10 + (<a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 6);    <span class="comment">// Damage 10-15</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> drop = (<a class="code hl_function" href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a>() % 100) &lt; 20;     <span class="comment">// 20% chance of item drop</span></div>
+<p><span class="tt"><a class="el" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a></span> produces a deterministic sequence — the same seed always gives the same numbers. For a game, you want unpredictability. The trick: call <span class="tt">rngSeed(getFrameCount())</span> when the player presses START on the title screen. Since the player presses at an unpredictable frame, the seed varies each playthrough.</p>
+<h3 class="doxsection"><a class="anchor" id="using-rngnext-in-games"></a>
+Using rngNext() in Games</h3>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 256;        <span class="comment">// Random X position (0-255)</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> damage = 10 + (<a class="code hl_function" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 6);    <span class="comment">// Damage 10-15</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> drop = (<a class="code hl_function" href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 100) &lt; 20;     <span class="comment">// 20% chance of item drop</span></div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
-<div class="ttc" id="aconsole_8h_html_af907eeb70a7322d16123cbab3094c2a2"><div class="ttname"><a href="console_8h.html#af907eeb70a7322d16123cbab3094c2a2">rand</a></div><div class="ttdeci">u16 rand(void)</div><div class="ttdoc">Get random 16-bit number.</div></div>
+<div class="ttc" id="aconsole_8h_html_af00b46ef13a81876e2a8806eee9dde8c"><div class="ttname"><a href="console_8h.html#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a></div><div class="ttdeci">u16 rngNext(void)</div><div class="ttdoc">Next pseudo-random 16-bit number.</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-14"></a>

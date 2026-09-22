@@ -137,12 +137,14 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga1e54dc68c7f0b0b70f98efbd0ce247c9" id="r_ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga1e54dc68c7f0b0b70f98efbd0ce247c9">scopeButtonsDown</a> (void)</td></tr>
-<tr class="memdesc:ga1e54dc68c7f0b0b70f98efbd0ce247c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get currently held buttons.  <br /></td></tr>
+<tr class="memitem:ga72b3ab97bb0675eaa1bbceb420769133" id="r_ga72b3ab97bb0675eaa1bbceb420769133"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ga72b3ab97bb0675eaa1bbceb420769133">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a>() — it means \&quot;currently down\&quot; like <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>()&quot;) u16 scopeButtonsDown(void)</td></tr>
+<tr class="memdesc:ga72b3ab97bb0675eaa1bbceb420769133"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0" title="Buttons currently down — the same meaning as padHeld() and mouseButtonsHeld().">scopeButtonsHeld()</a>. Same value.  <br /></td></tr>
 <tr class="memitem:ga1baff359c18cc5b5811aa718f6cc3aa0" id="r_ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a> (void)</td></tr>
-<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons held past the hold delay threshold.  <br /></td></tr>
+<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons currently down — the same meaning as <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> and <a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a>.  <br /></td></tr>
 <tr class="memitem:ga81b12c4a14aec097adf26b2e99080ef6" id="r_ga81b12c4a14aec097adf26b2e99080ef6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a> (void)</td></tr>
 <tr class="memdesc:ga81b12c4a14aec097adf26b2e99080ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get newly pressed buttons this frame.  <br /></td></tr>
+<tr class="memitem:ga1f9c6c7b3ae5feb1f4025caa938d088f" id="r_ga1f9c6c7b3ae5feb1f4025caa938d088f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga1f9c6c7b3ae5feb1f4025caa938d088f">scopeButtonsRepeat</a> (void)</td></tr>
+<tr class="memdesc:ga1f9c6c7b3ae5feb1f4025caa938d088f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons held past the hold delay, re-triggering every repeat delay (see <a class="el" href="#gab8752dda2561271655c015698a4787af" title="Set repeat delay (frames between repeat fires after hold).">scopeSetRepeatDelay()</a>) — a keyboard-style auto-repeat.  <br /></td></tr>
 <tr class="memitem:ga5e28e1c68fdfa123dacdb209abdc478e" id="r_ga5e28e1c68fdfa123dacdb209abdc478e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a> (void)</td></tr>
 <tr class="memitem:gac2ec7014e3673e2ecc39dc6571cabed4" id="r_gac2ec7014e3673e2ecc39dc6571cabed4"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#gac2ec7014e3673e2ecc39dc6571cabed4">scopeGetRawX</a> (void)</td></tr>
 <tr class="memdesc:gac2ec7014e3673e2ecc39dc6571cabed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get raw (uncalibrated) H position from PPU.  <br /></td></tr>
@@ -196,8 +198,8 @@ Usage</h2>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agroup__scope__input_html_ga344f48f7c3fce32fbc23768dff4e0b57"><div class="ttname"><a href="#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a></div><div class="ttdeci">#define SSC_FIRE</div><div class="ttdef"><b>Definition</b> input.h:311</div></div>
-<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdef"><b>Definition</b> input.h:400</div></div>
+<div class="ttc" id="agroup__scope__input_html_ga344f48f7c3fce32fbc23768dff4e0b57"><div class="ttname"><a href="#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a></div><div class="ttdeci">#define SSC_FIRE</div><div class="ttdef"><b>Definition</b> input.h:336</div></div>
+<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdef"><b>Definition</b> input.h:435</div></div>
 <div class="ttc" id="agroup__scope__input_html_ga81b12c4a14aec097adf26b2e99080ef6"><div class="ttname"><a href="#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a></div><div class="ttdeci">u16 scopeButtonsPressed(void)</div><div class="ttdoc">Get newly pressed buttons this frame.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaa7b48b9a04fc0ba5acd4b9e955e0a52c"><div class="ttname"><a href="#gaa7b48b9a04fc0ba5acd4b9e955e0a52c">scopeGetX</a></div><div class="ttdeci">u16 scopeGetX(void)</div><div class="ttdoc">Get calibration-adjusted H position.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaaf4c02e6cd035506e27613290014ef2d"><div class="ttname"><a href="#gaaf4c02e6cd035506e27613290014ef2d">scopeInit</a></div><div class="ttdeci">u8 scopeInit(void)</div><div class="ttdoc">Detect Super Scope on port 2.</div></div>
@@ -295,23 +297,22 @@ Usage</h2>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ga1e54dc68c7f0b0b70f98efbd0ce247c9" name="ga1e54dc68c7f0b0b70f98efbd0ce247c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1e54dc68c7f0b0b70f98efbd0ce247c9">&#9670;&#160;</a></span>scopeButtonsDown()</h2>
+<a id="ga72b3ab97bb0675eaa1bbceb420769133" name="ga72b3ab97bb0675eaa1bbceb420769133"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga72b3ab97bb0675eaa1bbceb420769133">&#9670;&#160;</a></span>OPENSNES_DEPRECATED()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scopeButtonsDown </td>
+          <td class="memname">OPENSNES_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">&quot;use <a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a>() — it means \&quot;currently down\&quot; like <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>()&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get currently held buttons. </p>
-<dl class="section return"><dt>Returns</dt><dd>Button mask (SSC_FIRE, SSC_CURSOR, SSC_TURBO, SSC_PAUSE, SSC_OFFSCREEN, SSC_NOISE) </dd></dl>
+<p>The pre-2026-09-22 name of <a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0" title="Buttons currently down — the same meaning as padHeld() and mouseButtonsHeld().">scopeButtonsHeld()</a>. Same value. </p>
 
 </div>
 </div>
@@ -330,9 +331,9 @@ Usage</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Get buttons held past the hold delay threshold. </p>
-<p>After holding a button for holddelay frames, it triggers as "held". Then it re-triggers every repdelay frames.</p>
-<dl class="section return"><dt>Returns</dt><dd>Button mask of held buttons </dd></dl>
+<p>Buttons currently down — the same meaning as <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> and <a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a>. </p>
+<p>Until 2026-09-22 this name returned the auto-repeat mask (now <a class="el" href="#ga1f9c6c7b3ae5feb1f4025caa938d088f" title="Buttons held past the hold delay, re-triggering every repeat delay (see scopeSetRepeatDelay()) — a ke...">scopeButtonsRepeat()</a>) and "currently down" was scopeButtonsDown(): the one word had the opposite meaning on the third device. A caller that wanted the repeat behaviour from this name must move to <a class="el" href="#ga1f9c6c7b3ae5feb1f4025caa938d088f" title="Buttons held past the hold delay, re-triggering every repeat delay (see scopeSetRepeatDelay()) — a ke...">scopeButtonsRepeat()</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd>Button mask (SSC_FIRE, SSC_CURSOR, SSC_TURBO, SSC_PAUSE, SSC_OFFSCREEN, SSC_NOISE) </dd></dl>
 
 </div>
 </div>
@@ -353,6 +354,26 @@ Usage</h2>
 
 <p>Get newly pressed buttons this frame. </p>
 <dl class="section return"><dt>Returns</dt><dd>Button mask of buttons pressed this frame (edge detection) </dd></dl>
+
+</div>
+</div>
+<a id="ga1f9c6c7b3ae5feb1f4025caa938d088f" name="ga1f9c6c7b3ae5feb1f4025caa938d088f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1f9c6c7b3ae5feb1f4025caa938d088f">&#9670;&#160;</a></span>scopeButtonsRepeat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scopeButtonsRepeat </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Buttons held past the hold delay, re-triggering every repeat delay (see <a class="el" href="#gab8752dda2561271655c015698a4787af" title="Set repeat delay (frames between repeat fires after hold).">scopeSetRepeatDelay()</a>) — a keyboard-style auto-repeat. </p>
+<dl class="section return"><dt>Returns</dt><dd>Button mask of auto-repeating buttons (<a class="el" href="#ga1baff359c18cc5b5811aa718f6cc3aa0" title="Buttons currently down — the same meaning as padHeld() and mouseButtonsHeld().">scopeButtonsHeld()</a> until 2026-09-22) </dd></dl>
 
 </div>
 </div>

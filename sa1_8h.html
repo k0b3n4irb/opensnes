@@ -179,7 +179,8 @@ Macros</h2></td></tr>
 <tr class="memitem:abfc222d75c43c66b189d60f814a91c63" id="r_abfc222d75c43c66b189d60f814a91c63"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#abfc222d75c43c66b189d60f814a91c63">REG_SA1_VCRL</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x2304)</td></tr>
 <tr class="memitem:a0b7acde42fc2f4400c87bfc3dad2f913" id="r_a0b7acde42fc2f4400c87bfc3dad2f913"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a0b7acde42fc2f4400c87bfc3dad2f913">SA1_CCNT_MSG</a>&#160;&#160;&#160;0x0F</td></tr>
 <tr class="memitem:a0c4909da3c09c366f5a400355a4dd3c1" id="r_a0c4909da3c09c366f5a400355a4dd3c1"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a0c4909da3c09c366f5a400355a4dd3c1">SA1_CCNT_SA1_IRQ</a>&#160;&#160;&#160;0x80</td></tr>
-<tr class="memitem:ae61a4dad95b96da33079b29bbb1b88ec" id="r_ae61a4dad95b96da33079b29bbb1b88ec"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae61a4dad95b96da33079b29bbb1b88ec">SA1_CCNT_SA1_RDYB</a>&#160;&#160;&#160;0x60</td></tr>
+<tr class="memitem:a6495d29920e98919dbfda318b5ef613e" id="r_a6495d29920e98919dbfda318b5ef613e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6495d29920e98919dbfda318b5ef613e">SA1_CCNT_SA1_NMI</a>&#160;&#160;&#160;0x10</td></tr>
+<tr class="memitem:ae61a4dad95b96da33079b29bbb1b88ec" id="r_ae61a4dad95b96da33079b29bbb1b88ec"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae61a4dad95b96da33079b29bbb1b88ec">SA1_CCNT_SA1_RDYB</a>&#160;&#160;&#160;0x40</td></tr>
 <tr class="memitem:aaf899dbd8211e5e54113778ddcff513d" id="r_aaf899dbd8211e5e54113778ddcff513d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aaf899dbd8211e5e54113778ddcff513d">SA1_CCNT_SA1_RESB</a>&#160;&#160;&#160;0x20</td></tr>
 <tr class="memitem:addf35b0478c1c74b824e760ac72b8bbb" id="r_addf35b0478c1c74b824e760ac72b8bbb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#addf35b0478c1c74b824e760ac72b8bbb">SA1_IRAM</a>&#160;&#160;&#160;((volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)<a class="el" href="#ad3220ac929acba35cdddba5b2c5d35ba">SA1_IRAM_BASE</a>)</td></tr>
 <tr class="memdesc:addf35b0478c1c74b824e760ac72b8bbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">I-RAM as a byte pointer.  <br /></td></tr>
@@ -195,7 +196,9 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:acd5594c8f4e4a51d822db1fa86f35f87" id="r_acd5594c8f4e4a51d822db1fa86f35f87"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acd5594c8f4e4a51d822db1fa86f35f87">sa1Init</a> (void)</td></tr>
-<tr class="memdesc:acd5594c8f4e4a51d822db1fa86f35f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize and start the SA-1 coprocessor.  <br /></td></tr>
+<tr class="memdesc:acd5594c8f4e4a51d822db1fa86f35f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a>. It never initialised anything — crt0 does that before <a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a>. Same value.  <br /></td></tr>
+<tr class="memitem:aa2c5d1881453f27ceaa36ab5ebf122fc" id="r_aa2c5d1881453f27ceaa36ab5ebf122fc"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa2c5d1881453f27ceaa36ab5ebf122fc">sa1IsReady</a> (void)</td></tr>
+<tr class="memdesc:aa2c5d1881453f27ceaa36ab5ebf122fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Did the SA-1 boot? (crt0 starts it; this only reads the outcome).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SA-1 Enhancement Chip Interface. </p>
@@ -934,6 +937,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a6495d29920e98919dbfda318b5ef613e" name="a6495d29920e98919dbfda318b5ef613e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6495d29920e98919dbfda318b5ef613e">&#9670;&#160;</a></span>SA1_CCNT_SA1_NMI</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SA1_CCNT_SA1_NMI&#160;&#160;&#160;0x10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bit 4: send NMI to the SA-1 </p>
+
+</div>
+</div>
 <a id="ae61a4dad95b96da33079b29bbb1b88ec" name="ae61a4dad95b96da33079b29bbb1b88ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae61a4dad95b96da33079b29bbb1b88ec">&#9670;&#160;</a></span>SA1_CCNT_SA1_RDYB</h2>
 
@@ -941,11 +959,11 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SA1_CCNT_SA1_RDYB&#160;&#160;&#160;0x60</td>
+          <td class="memname">#define SA1_CCNT_SA1_RDYB&#160;&#160;&#160;0x40</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>SA-1 ready bits </p>
+<p>Bit 6: SA-1 wait (0 = ready, 1 = wait). Was 0x60, which also set RESB </p>
 
 </div>
 </div>
@@ -960,7 +978,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>SA-1 reset (0=reset, 1=release) </p>
+<p>Bit 5: SA-1 reset (1 = reset, 0 = run — crt0 writes $00 to release). The comment had the polarity inverted </p>
 
 </div>
 </div>
@@ -1060,9 +1078,28 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize and start the SA-1 coprocessor. </p>
-<p>Writes the SA-1 reset vector, enables I-RAM/BW-RAM write access, releases the SA-1 from reset, and waits for the ready flag in I-RAM.</p>
-<dl class="section return"><dt>Returns</dt><dd>1 if SA-1 started successfully, 0 if timeout </dd></dl>
+<p>The pre-2026-09-22 name of <a class="el" href="#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a>. It never initialised anything — crt0 does that before <a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a>. Same value. </p>
+
+</div>
+</div>
+<a id="aa2c5d1881453f27ceaa36ab5ebf122fc" name="aa2c5d1881453f27ceaa36ab5ebf122fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2c5d1881453f27ceaa36ab5ebf122fc">&#9670;&#160;</a></span>sa1IsReady()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sa1IsReady </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Did the SA-1 boot? (crt0 starts it; this only reads the outcome). </p>
+<p>crt0 writes the SA-1 reset vector, enables I-RAM/BW-RAM access, releases the chip from reset and waits for its ready byte in I-RAM — all before <a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a>. This function reads that outcome. Until 2026-09-22 it was named <a class="el" href="#acd5594c8f4e4a51d822db1fa86f35f87" title="The pre-2026-09-22 name of sa1IsReady(). It never initialised anything — crt0 does that before main()...">sa1Init()</a>, whose doc claimed it did the boot itself; docs cited <a class="el" href="#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a> for years before it existed.</p>
+<dl class="section return"><dt>Returns</dt><dd>1 if the SA-1 wrote SA1_READY_MAGIC ($A5) to I-RAM, 0 if crt0 timed out (no chip, or a boot failure — <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </dd></dl>
 
 </div>
 </div>

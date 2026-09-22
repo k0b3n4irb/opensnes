@@ -1,7 +1,6 @@
 var maps_2slope__collision_2main_8c =
 [
     [ "main", "maps_2slope__collision_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "objRegisterTypes", "maps_2slope__collision_2main_8c.html#a74052cbd6e76b231e97756db972f22a8", null ],
     [ "mapmario", "maps_2slope__collision_2main_8c.html#ae208c82b7ea35ddcb77dd3f611a76eea", null ],
     [ "objmario", "maps_2slope__collision_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3", null ],
     [ "tilepal", "maps_2slope__collision_2main_8c.html#a0d2bf0890862c06bf78aa4cf5b761f0a", null ],

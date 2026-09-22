@@ -176,7 +176,7 @@ Functions</h2></td></tr>
 <tr class="memitem:ae94260b8411da5bb9f06386b65e6d6cb" id="r_ae94260b8411da5bb9f06386b65e6d6cb"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae94260b8411da5bb9f06386b65e6d6cb">colorMathDisable</a> (void)</td></tr>
 <tr class="memdesc:ae94260b8411da5bb9f06386b65e6d6cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable all color math.  <br /></td></tr>
 <tr class="memitem:a6f41bf26504344d98f9d5ba58694c3e2" id="r_a6f41bf26504344d98f9d5ba58694c3e2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers)</td></tr>
-<tr class="memdesc:a6f41bf26504344d98f9d5ba58694c3e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable color math for specified layers.  <br /></td></tr>
+<tr class="memdesc:a6f41bf26504344d98f9d5ba58694c3e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#aeed6fe5024742ca88a85202fb516ffc8" title="Set the layers colour math applies to — REPLACES the previous set.">colorMathSetLayers()</a>. Same behaviour: it REPLACES the layer set.  <br /></td></tr>
 <tr class="memitem:aeb012e74893e9b0761ee5dd2f18bd1ef" id="r_aeb012e74893e9b0761ee5dd2f18bd1ef"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a> (void)</td></tr>
 <tr class="memdesc:aeb012e74893e9b0761ee5dd2f18bd1ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize color math to defaults.  <br /></td></tr>
 <tr class="memitem:a8e6f8bf8a5bf314b1c3317f24a886087" id="r_a8e6f8bf8a5bf314b1c3317f24a886087"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8e6f8bf8a5bf314b1c3317f24a886087">colorMathSetBrightness</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness)</td></tr>
@@ -191,6 +191,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a94502e76334cf02b8e862126427f62c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set fixed color for blending.  <br /></td></tr>
 <tr class="memitem:aa5667a2a54eb543bd71dbbd9cd41bd10" id="r_aa5667a2a54eb543bd71dbbd9cd41bd10"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> enable)</td></tr>
 <tr class="memdesc:aa5667a2a54eb543bd71dbbd9cd41bd10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable half mode.  <br /></td></tr>
+<tr class="memitem:aeed6fe5024742ca88a85202fb516ffc8" id="r_aeed6fe5024742ca88a85202fb516ffc8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layers)</td></tr>
+<tr class="memdesc:aeed6fe5024742ca88a85202fb516ffc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the layers colour math applies to — REPLACES the previous set.  <br /></td></tr>
 <tr class="memitem:ac014d3ff6d4d18a0b5e597560636d38f" id="r_ac014d3ff6d4d18a0b5e597560636d38f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> op)</td></tr>
 <tr class="memdesc:ac014d3ff6d4d18a0b5e597560636d38f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set color math operation (add or subtract).  <br /></td></tr>
 <tr class="memitem:aef8378fb9997edbbb3fd8281bc42c084" id="r_aef8378fb9997edbbb3fd8281bc42c084"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> source)</td></tr>
@@ -230,16 +232,16 @@ Usage Example</h2>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;   <span class="comment">// Both on main screen</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga6e0a07f0768e62ec6e48802bdd442e30">REG_TS</a> = <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;            <span class="comment">// BG2 also on sub screen</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="#a546876b0dadd1d28989de89def196c27">COLORMATH_BG2</a>);  <span class="comment">// Apply math to BG2</span></div>
+<div class="line"><a class="code hl_function" href="#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="#a546876b0dadd1d28989de89def196c27">COLORMATH_BG2</a>);  <span class="comment">// Apply math to BG2</span></div>
 <div class="line"><a class="code hl_function" href="#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);   <span class="comment">// Add mode</span></div>
 <div class="line"><a class="code hl_function" href="#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a>(1);              <span class="comment">// Divide by 2 = 50%</span></div>
 <div class="line"><a class="code hl_function" href="#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a>);  <span class="comment">// Blend with sub screen</span></div>
 <div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:96</div></div>
 <div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens).</div><div class="ttdef"><b>Definition</b> colormath.h:86</div></div>
 <div class="ttc" id="acolormath_8h_html_a546876b0dadd1d28989de89def196c27"><div class="ttname"><a href="#a546876b0dadd1d28989de89def196c27">COLORMATH_BG2</a></div><div class="ttdeci">#define COLORMATH_BG2</div><div class="ttdoc">Apply color math to BG2.</div><div class="ttdef"><b>Definition</b> colormath.h:64</div></div>
-<div class="ttc" id="acolormath_8h_html_a6f41bf26504344d98f9d5ba58694c3e2"><div class="ttname"><a href="#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a></div><div class="ttdeci">void colorMathEnable(u8 layers)</div><div class="ttdoc">Enable color math for specified layers.</div><div class="ttdef"><b>Definition</b> colormath.h:165</div></div>
 <div class="ttc" id="acolormath_8h_html_aa5667a2a54eb543bd71dbbd9cd41bd10"><div class="ttname"><a href="#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a></div><div class="ttdeci">void colorMathSetHalf(u8 enable)</div><div class="ttdoc">Enable or disable half mode.</div></div>
 <div class="ttc" id="acolormath_8h_html_ac014d3ff6d4d18a0b5e597560636d38f"><div class="ttname"><a href="#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a></div><div class="ttdeci">void colorMathSetOp(u8 op)</div><div class="ttdoc">Set color math operation (add or subtract).</div></div>
+<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div><div class="ttdef"><b>Definition</b> colormath.h:168</div></div>
 <div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga6e0a07f0768e62ec6e48802bdd442e30"><div class="ttname"><a href="group__ppu__regs.html#ga6e0a07f0768e62ec6e48802bdd442e30">REG_TS</a></div><div class="ttdeci">#define REG_TS</div><div class="ttdoc">Sub screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:190</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
@@ -249,7 +251,7 @@ Usage Example</h2>
 <div class="line"><a class="code hl_function" href="#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(0, 0, 0);  <span class="comment">// Black</span></div>
 <div class="line"><a class="code hl_function" href="#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a>);</div>
 <div class="line"><a class="code hl_function" href="#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="#abcda76899184da13fe9c9a4637ca82ea">COLORMATH_SUB</a>);    <span class="comment">// Subtract = darken</span></div>
-<div class="line"><a class="code hl_function" href="#a6f41bf26504344d98f9d5ba58694c3e2">colorMathEnable</a>(<a class="code hl_define" href="#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>);   <span class="comment">// Apply to all layers</span></div>
+<div class="line"><a class="code hl_function" href="#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a>);   <span class="comment">// Apply to all layers</span></div>
 <div class="ttc" id="acolormath_8h_html_a6c2c8c46d31bdc310520d1d11f3e68b8"><div class="ttname"><a href="#a6c2c8c46d31bdc310520d1d11f3e68b8">COLORMATH_ALL</a></div><div class="ttdeci">#define COLORMATH_ALL</div><div class="ttdoc">Apply color math to all layers.</div><div class="ttdef"><b>Definition</b> colormath.h:79</div></div>
 <div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
 <div class="ttc" id="acolormath_8h_html_aba2a18b87756e861ed9c66e8766f2579"><div class="ttname"><a href="#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a></div><div class="ttdeci">#define COLORMATH_SRC_FIXED</div><div class="ttdoc">Use fixed color as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:99</div></div>
@@ -595,9 +597,6 @@ Usage Example</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void colorMathEnable </td>
@@ -606,21 +605,9 @@ Usage Example</h2>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Enable color math for specified layers. </p>
-<p>Enables color math blending for the given layers. Inlined for zero-call-overhead access (wave 4 retrofit).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">layers</td><td>Layer mask (COLORMATH_BG1, COLORMATH_BG2, etc.) </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>The pre-2026-09-22 name of <a class="el" href="#aeed6fe5024742ca88a85202fb516ffc8" title="Set the layers colour math applies to — REPLACES the previous set.">colorMathSetLayers()</a>. Same behaviour: it REPLACES the layer set. </p>
 
 </div>
 </div>
@@ -817,6 +804,40 @@ Usage Example</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">enable</td><td>1 = divide by 2, 0 = full result </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aeed6fe5024742ca88a85202fb516ffc8" name="aeed6fe5024742ca88a85202fb516ffc8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeed6fe5024742ca88a85202fb516ffc8">&#9670;&#160;</a></span>colorMathSetLayers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void colorMathSetLayers </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>layers</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the layers colour math applies to — REPLACES the previous set. </p>
+<p><span class="tt">colorMathSetLayers(COLORMATH_BG1)</span> after <span class="tt">colorMathSetLayers(COLORMATH_BG2)</span> leaves only BG1 blended. This is the function <a class="el" href="#a6f41bf26504344d98f9d5ba58694c3e2" title="The pre-2026-09-22 name of colorMathSetLayers(). Same behaviour: it REPLACES the layer set.">colorMathEnable()</a> was until 2026-09-22; it is renamed because "Enable" reads as additive — <a class="el" href="window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017" title="Enable window for specified layers.">windowEnable()</a> IS additive — and the old name silently undid the previous call. Inlined for zero-call-overhead access.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layers</td><td>Layer mask (COLORMATH_BG1, COLORMATH_BG2, ...; 0 disables) </td></tr>
   </table>
   </dd>
 </dl>

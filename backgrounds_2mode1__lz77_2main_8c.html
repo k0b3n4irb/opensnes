@@ -149,11 +149,11 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>LZ77-compressed tile loading with LZSS decompression to VRAM. </p>
-<p>Demonstrates ROM space savings by storing tile data in LZ77-compressed form and decompressing directly into VRAM at load time using <a class="el" href="lzss_8h.html#a73d3df913983c4b7ee22f1cdbe61e1ed" title="Decompress LZ77 data directly to VRAM.">LzssDecodeVram()</a>. The compressed .pic file occupies ~8.5 KB in ROM but expands to ~12.5 KB of 4bpp tile data in VRAM, achieving a 31% size reduction. The tilemap and palette are stored uncompressed and loaded via standard DMA.</p>
-<p>The gfx4snes tool produces LZ77-compressed output when invoked with the -z flag. <a class="el" href="lzss_8h.html#a73d3df913983c4b7ee22f1cdbe61e1ed" title="Decompress LZ77 data directly to VRAM.">LzssDecodeVram()</a> handles the VRAM write timing internally.</p>
+<p>Demonstrates ROM space savings by storing tile data in LZ77-compressed form and decompressing directly into VRAM at load time using <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a>. Measured on this example's own asset: the compressed .pic is 652 bytes and its LZ77 header declares 2592 bytes of tile data — the same 2592 bytes examples/backgrounds/mode1 stores uncompressed for the same image, so the ROM footprint is a quarter of the original. (An earlier version of this comment claimed ~8.5 KB expanding to ~12.5 KB for a 31% saving; both figures were wrong.) The tilemap and palette are stored uncompressed and loaded via standard DMA.</p>
+<p>The gfx4snes tool produces LZ77-compressed output when invoked with the -z flag. <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> handles the VRAM write timing internally.</p>
 <p>Based on the PVSnesLib "Mode1LZ77" example by Alekmaul.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>LZSS/LZ77 decompression: <a class="el" href="lzss_8h.html#a73d3df913983c4b7ee22f1cdbe61e1ed" title="Decompress LZ77 data directly to VRAM.">LzssDecodeVram()</a> streams compressed data to VRAM word-by-word</li>
+<li>LZSS/LZ77 decompression: <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> streams compressed data to VRAM word-by-word</li>
 <li>gfx4snes -z flag enables LZ77 compression for tile data at build time</li>
 <li>Mode 1 BG1 at 4bpp (16 colors) with tilemap at $0000, tiles at $4000</li>
 <li>Force blank via REG_INIDISP during decompression (slower than DMA, needs full blanking)</li>
@@ -185,7 +185,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Entry point &ndash; decompress LZ77 tiles to VRAM and display Mode 1 image. </p>
-<p>Initializes the console, forces blank, then uses <a class="el" href="lzss_8h.html#a73d3df913983c4b7ee22f1cdbe61e1ed" title="Decompress LZ77 data directly to VRAM.">LzssDecodeVram()</a> to stream LZ77-compressed tile data directly into VRAM at $4000. Unlike DMA (which copies raw data at ~1 byte per CPU cycle), LZSS decompression is CPU-driven and slower, so the screen must remain in forced blank for the entire decode. Palette and tilemap are loaded uncompressed via standard DMA calls.</p>
+<p>Initializes the console, forces blank, then uses <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> to stream LZ77-compressed tile data directly into VRAM at $4000. Unlike DMA (which copies raw data at ~1 byte per CPU cycle), LZSS decompression is CPU-driven and slower, so the screen must remain in forced blank for the entire decode. Palette and tilemap are loaded uncompressed via standard DMA calls.</p>
 <p>The benefit is ROM space savings: compressed tiles occupy ~30% less ROM than raw tile data, which matters when ROM banks are limited to 32KB.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
 
@@ -285,7 +285,7 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>LZ77-compressed 4bpp tile data (decompressed to VRAM by LzssDecodeVram) </p>
+<p>LZ77-compressed 4bpp tile data (decompressed to VRAM by lzssDecodeVram) </p>
 
 </div>
 </div>

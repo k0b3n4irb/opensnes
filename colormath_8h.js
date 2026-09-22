@@ -28,6 +28,7 @@ var colormath_8h =
     [ "colorMathSetDirectColor", "colormath_8h.html#aec2f316006392f5dca68003a3fb0f280", null ],
     [ "colorMathSetFixedColor", "colormath_8h.html#a94502e76334cf02b8e862126427f62c7", null ],
     [ "colorMathSetHalf", "colormath_8h.html#aa5667a2a54eb543bd71dbbd9cd41bd10", null ],
+    [ "colorMathSetLayers", "colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8", null ],
     [ "colorMathSetOp", "colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f", null ],
     [ "colorMathSetSource", "colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084", null ],
     [ "colorMathShadow", "colormath_8h.html#a74617df72273156acc7bf429ed1d25d5", null ],

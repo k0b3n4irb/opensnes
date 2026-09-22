@@ -176,7 +176,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ae76c8e0f8bfa078d0bc18b4be1f4f6a8" id="r_ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">gsuDmaFullFrame</a> (void)</td></tr>
 <tr class="memdesc:ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).  <br /></td></tr>
 <tr class="memitem:addfe64b4f0c5ffe4847f2e0d56c5ef10" id="r_addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a> (void)</td></tr>
-<tr class="memdesc:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize SuperFX — detect hardware, set default config.  <br /></td></tr>
+<tr class="memdesc:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the GSU default configuration; returns <a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a>.  <br /></td></tr>
+<tr class="memitem:ad737693bad4b2b768309bfebf6b5ece8" id="r_ad737693bad4b2b768309bfebf6b5ece8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8">gsuIsPresent</a> (void)</td></tr>
+<tr class="memdesc:ad737693bad4b2b768309bfebf6b5ece8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).  <br /></td></tr>
 <tr class="memitem:afa2477b5e4a9d17cf5cf4103cc5ca5a8" id="r_afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a> (void)</td></tr>
 <tr class="memdesc:afa2477b5e4a9d17cf5cf4103cc5ca5a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Launch GSU program and wait for completion (WRAM-safe).  <br /></td></tr>
 <tr class="memitem:a1fd575a6b7ae455fdf3ca7205b221f50" id="r_a1fd575a6b7ae455fdf3ca7205b221f50"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vramAddr)</td></tr>
@@ -811,9 +813,38 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize SuperFX — detect hardware, set default config. </p>
+<p>Set the GSU default configuration; returns <a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if GSU detected, 0 if not</dd></dl>
-<p>Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00. Inlined for zero-call-overhead access. </p>
+<p>Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00. Detection itself is crt0's (superfx_status); call this once at boot, and <a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a> when you only want the answer. Inlined. </p>
+
+</div>
+</div>
+<a id="ad737693bad4b2b768309bfebf6b5ece8" name="ad737693bad4b2b768309bfebf6b5ece8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad737693bad4b2b768309bfebf6b5ece8">&#9670;&#160;</a></span>gsuIsPresent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsuIsPresent </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Is a GSU on this cartridge? (crt0 detects it; this reads the outcome). </p>
+<dl class="section return"><dt>Returns</dt><dd>1 if crt0 read a non-zero chip version from the VCR, 0 if not</dd></dl>
+<p>The presence test <a class="el" href="#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Set the GSU default configuration; returns gsuIsPresent().">gsuInit()</a> also returns, without the side effects — use it anywhere after the defaults are set. Inlined. (Added 2026-09-22; docs cited a superfxIsPresent() that never existed.) </p>
 
 </div>
 </div>

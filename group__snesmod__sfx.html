@@ -192,19 +192,21 @@ Functions</h2></td></tr>
 <p>Triggers a sound effect, potentially interrupting module playback on one channel temporarily.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">effectId</td><td>Effect slot ID (from snesmodLoadEffect or soundbank.h) </td></tr>
-    <tr><td class="paramname">volume</td><td>Volume level (0-127) </td></tr>
-    <tr><td class="paramname">pan</td><td>Pan position (0=left, 128=center, 255=right) </td></tr>
-    <tr><td class="paramname">pitch</td><td>Pitch value ($1000 = normal, $2000 = octave up) </td></tr>
+    <tr><td class="paramname">effectId</td><td>Effect slot ID (from snesmodLoadEffect or soundbank.h), 0-15: the driver command carries it in four bits </td></tr>
+    <tr><td class="paramname">volume</td><td>Volume level (0-127; the command keeps its top 4 bits, so 16 steps) </td></tr>
+    <tr><td class="paramname">pan</td><td>Pan position (0=left, 128=center, 255=right; 16 steps) </td></tr>
+    <tr><td class="paramname">pitch</td><td>Playback rate, <b>0-15</b>: use SNESMOD_PITCH_LOW (4, 16 kHz), SNESMOD_PITCH_NORMAL (8, 32 kHz) or SNESMOD_PITCH_HIGH (12, 48 kHz). NOT the $1000-style pitch of <a class="el" href="audio_8h.html" title="OpenSNES Audio System.">audio.h</a>: only the low four bits are sent (the routine masks the rest, 2026-09-20 — it used to OR the whole low byte into the effect-id nibble, so 0x1000 played at rate 0 and 0x1800 too). </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Channel used for effect</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Unspecified. The command is only queued for the SPC700; no channel is known on the CPU side. (Documented as "channel used" until 2026-09-20; the value was the packed command byte. The return type is an open item of the API audit.)</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Play jump sound at full volume, center pan, normal pitch</span></div>
-<div class="line"><a class="code hl_function" href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_JUMP, 127, 128, 0x1000);</div>
+<div class="line"><a class="code hl_function" href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_JUMP, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Play with higher pitch</span></div>
-<div class="line"><a class="code hl_function" href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_JUMP, 127, 128, 0x1800);</div>
+<div class="line"><a class="code hl_function" href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_JUMP, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a>);</div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6ade25aca1fe55755fcaa90121865cd7"><div class="ttname"><a href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a></div><div class="ttdeci">#define SNESMOD_PITCH_NORMAL</div><div class="ttdef"><b>Definition</b> snesmod.h:350</div></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:351</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
 </div><!-- fragment --> 
 </div>

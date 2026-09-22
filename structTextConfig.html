@@ -165,7 +165,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Tilemap width (32 or 64 tiles) </p>
+<p>Tilemap width in tiles. <b>32 only.</b> <span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit</a></span> sets it, <span class="tt">tilemapBuffer</span> is sized for 32x32 and the NMI's flush DMAs a fixed 2048 bytes, so writing 64 here indexes past the buffer instead of widening anything. </p>
 
 </div>
 </div>

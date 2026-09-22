@@ -215,8 +215,8 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Draw metasprites for the current OBJSEL configuration. </p>
-<p>Render metasprites using <a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode.</p>
-<p><a class="el" href="sprite_8h.html#a19ef362e8093598fdbcc437ca54e15e4" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
+<p>Render metasprites using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode.</p>
+<p><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
 <p>Each size mode uses a different combination of LARGE and SMALL sprites to render two characters: one larger (left) and one smaller (right). </p>
 <p>&lt; First tile of 16x16 sheet (192)</p>
 <p>&lt; First tile of 8x8 sheet (288)</p>
@@ -294,10 +294,10 @@ Variables</h2></td></tr>
 <div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 32, 5, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
 <div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
 <div class="line">}</div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:521</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:509</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:512</div></div>
-<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:518</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:518</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:506</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:509</div></div>
+<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:515</div></div>
 </div><!-- fragment -->
 <p>16x16 metasprite: 32x48 character (2x3 grid of 16x16) </p>
 

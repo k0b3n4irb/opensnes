@@ -32,6 +32,7 @@ var group__audio__const =
     [ "AUDIO_SUSTAIN_HALF", "group__audio__const.html#gae5ffb90e18975b7fbb11c37a4b61df9c", null ],
     [ "AUDIO_SUSTAIN_QUARTER", "group__audio__const.html#ga17a903e4f0b23c86dec083e829ad7f65", null ],
     [ "AUDIO_VOICE_AUTO", "group__audio__const.html#ga0c63b9dbba747f347b4f891ed23984e0", null ],
+    [ "AUDIO_VOICE_NONE", "group__audio__const.html#ga2d0e09462926a1635668eb8e70ba6798", null ],
     [ "AUDIO_VOL_MAX", "group__audio__const.html#ga802876f35e06c414097934625ad6665d", null ],
     [ "AUDIO_VOL_MIN", "group__audio__const.html#ga1c0f4cddb150c094211fd7467dc88737", null ]
 ];

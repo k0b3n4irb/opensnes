@@ -143,21 +143,31 @@ Macros</h2></td></tr>
 <tr class="memdesc:a07095ff815cfb5f1ef99aab2e81a10ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">8KB SRAM (64Kbit) - Most common  <br /></td></tr>
 <tr class="memitem:ac561bf6108641babc18b93efa8b028d3" id="r_ac561bf6108641babc18b93efa8b028d3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac561bf6108641babc18b93efa8b028d3">SRAM_SIZE_NONE</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memdesc:ac561bf6108641babc18b93efa8b028d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">No SRAM (0KB).  <br /></td></tr>
+<tr id="define-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">SRAM return codes</div></td></tr>
+<tr><td colspan="2" class="ititle"><div class="groupText"><p>Returned by <a class="el" href="#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave()</a>, <a class="el" href="#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad()</a>, <a class="el" href="#a8c9b2eba46831adcd280dcdca9e6e04d" title="Save data to SRAM at offset.">sramSaveOffset()</a>, <a class="el" href="#a63735ab921a0a3f6e5920dc35985efb8" title="Load data from SRAM at offset.">sramLoadOffset()</a> and <a class="el" href="#a373d9d4cbabd4f432cac5fbf80d88ff4" title="Clear SRAM to zero.">sramClear()</a>. The family returned nothing until 2026-09-21 and copied whatever it was asked; a refused transfer now copies NOTHING.</p>
+<p>The capacity checked against is the one your ROM declares: the SRAMSIZE byte of its header (<span class="tt">SRAM_SIZE</span> in your Makefile, 8 KB by default), capped by what this module addresses in one bank (32 KB on LoROM, 8 KB on HiROM). </p>
+</div></td></tr>
+<tr class="memitem:ac212fcfc7b67cd50eb15d00e099a3b82" id="r_ac212fcfc7b67cd50eb15d00e099a3b82"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac212fcfc7b67cd50eb15d00e099a3b82">SRAM_ERR_NO_SRAM</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memdesc:ac212fcfc7b67cd50eb15d00e099a3b82"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ROM header declares no SRAM (<span class="tt">USE_SRAM := 1</span> is missing).  <br /></td></tr>
+<tr class="memitem:a4b63695b18f1219d4bd926a2018fbaa5" id="r_a4b63695b18f1219d4bd926a2018fbaa5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a4b63695b18f1219d4bd926a2018fbaa5">SRAM_ERR_RANGE</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a4b63695b18f1219d4bd926a2018fbaa5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><span class="tt">offset + size</span> exceeds the declared SRAM; nothing was copied.  <br /></td></tr>
+<tr class="memitem:a03d071b39713a7e13ca63eac2cba04f7" id="r_a03d071b39713a7e13ca63eac2cba04f7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a03d071b39713a7e13ca63eac2cba04f7">SRAM_OK</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:a03d071b39713a7e13ca63eac2cba04f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The transfer fits and was done (a <span class="tt">size</span> of 0 is also OK).  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a1112f8f7d8aaf47129938cc4c35d0309" id="r_a1112f8f7d8aaf47129938cc4c35d0309"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a1112f8f7d8aaf47129938cc4c35d0309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate simple checksum.  <br /></td></tr>
-<tr class="memitem:a5fb4001e2b3432597a28e97af0a907c0" id="r_a5fb4001e2b3432597a28e97af0a907c0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a5fb4001e2b3432597a28e97af0a907c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear SRAM to zero.  <br /></td></tr>
-<tr class="memitem:a27d8f498726727694f6631de1aa41b9f" id="r_a27d8f498726727694f6631de1aa41b9f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a27d8f498726727694f6631de1aa41b9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM.  <br /></td></tr>
-<tr class="memitem:adc31b500d6dd4534bbaae396faa69df6" id="r_adc31b500d6dd4534bbaae396faa69df6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
-<tr class="memdesc:adc31b500d6dd4534bbaae396faa69df6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM at offset.  <br /></td></tr>
-<tr class="memitem:a7415ce406c368ab48f4224101eef11bf" id="r_a7415ce406c368ab48f4224101eef11bf"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
-<tr class="memdesc:a7415ce406c368ab48f4224101eef11bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save data to SRAM.  <br /></td></tr>
-<tr class="memitem:a33eaa8d30319fe6c1a8a2f1586c09752" id="r_a33eaa8d30319fe6c1a8a2f1586c09752"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
-<tr class="memdesc:a33eaa8d30319fe6c1a8a2f1586c09752"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save data to SRAM at offset.  <br /></td></tr>
+<tr class="memitem:a373d9d4cbabd4f432cac5fbf80d88ff4" id="r_a373d9d4cbabd4f432cac5fbf80d88ff4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a373d9d4cbabd4f432cac5fbf80d88ff4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear SRAM to zero.  <br /></td></tr>
+<tr class="memitem:a271e24b7e809f10b1d8d2979b512bb0b" id="r_a271e24b7e809f10b1d8d2979b512bb0b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:a271e24b7e809f10b1d8d2979b512bb0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM.  <br /></td></tr>
+<tr class="memitem:a63735ab921a0a3f6e5920dc35985efb8" id="r_a63735ab921a0a3f6e5920dc35985efb8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
+<tr class="memdesc:a63735ab921a0a3f6e5920dc35985efb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load data from SRAM at offset.  <br /></td></tr>
+<tr class="memitem:ae59c751326cb355338a21605adb09325" id="r_ae59c751326cb355338a21605adb09325"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae59c751326cb355338a21605adb09325">sramSave</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
+<tr class="memdesc:ae59c751326cb355338a21605adb09325"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save data to SRAM.  <br /></td></tr>
+<tr class="memitem:a8c9b2eba46831adcd280dcdca9e6e04d" id="r_a8c9b2eba46831adcd280dcdca9e6e04d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *data, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> offset)</td></tr>
+<tr class="memdesc:a8c9b2eba46831adcd280dcdca9e6e04d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save data to SRAM at offset.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES SRAM (Save RAM) Functions. </p>
@@ -165,9 +175,14 @@ Functions</h2></td></tr>
 <h2 class="doxsection"><a class="anchor" id="sram-overview"></a>
 SRAM Overview</h2>
 <p>SRAM (Static RAM) on SNES cartridges is battery-backed RAM that persists when the console is powered off. It's used for save games.</p>
-<h2 class="doxsection"><a class="anchor" id="memory-layout-lorom"></a>
-Memory Layout (LoROM)</h2>
-<p>SRAM is mapped at bank $70, addresses $0000-$7FFF (32KB max). Most games use 2KB-8KB of SRAM.</p>
+<h2 class="doxsection"><a class="anchor" id="memory-layout"></a>
+Memory Layout</h2>
+<ul>
+<li><b>LoROM</b>: bank $70, $0000-$7FFF (32 KB max).</li>
+<li><b>HiROM</b> (<span class="tt">USE_HIROM=1</span>): bank $30, $6000-$7FFF — the hardware exposes battery RAM in 8 KB windows there, and this module addresses the first one only, so <span class="tt">offset + size</span> must stay within 8 KB (the default SRAM_SIZE). Until 2026-09-20 the LoROM address was used on HiROM too.</li>
+<li><b>SA-1</b>: not supported — <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span> is a build error. SA-1 save memory is BW-RAM, which the SNES CPU may only write after enabling it, and the library does not.</li>
+</ul>
+<p>Source pointers may be in any bank (a <span class="tt">const</span> save template in ROM works); destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.</p>
 <h2 class="doxsection"><a class="anchor" id="usage-example-3"></a>
 Usage Example</h2>
 <div class="fragment"><div class="line"><span class="comment">// Define your save data structure</span></div>
@@ -182,7 +197,7 @@ Usage Example</h2>
 <div class="line">SaveData save;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Load save data at game start</span></div>
-<div class="line"><a class="code hl_function" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
+<div class="line"><a class="code hl_function" href="#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
 <div class="line"><span class="keywordflow">if</span> (save.magic[0] != <span class="charliteral">&#39;S&#39;</span> || save.magic[1] != <span class="charliteral">&#39;A&#39;</span>) {</div>
 <div class="line">    <span class="comment">// No valid save, initialize defaults</span></div>
 <div class="line">    save.score = 0;</div>
@@ -193,14 +208,14 @@ Usage Example</h2>
 <div class="line"><span class="comment">// Save when needed (e.g., at checkpoint)</span></div>
 <div class="line">save.magic[0] = <span class="charliteral">&#39;S&#39;</span>; save.magic[1] = <span class="charliteral">&#39;A&#39;</span>;</div>
 <div class="line">save.magic[2] = <span class="charliteral">&#39;V&#39;</span>; save.magic[3] = <span class="charliteral">&#39;E&#39;</span>;</div>
-<div class="line"><a class="code hl_function" href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
+<div class="line"><a class="code hl_function" href="#ae59c751326cb355338a21605adb09325">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(SaveData));</div>
 <div class="ttc" id="abasics_2game__skeleton_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="basics_2game__skeleton_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">u16 score</div><div class="ttdoc">Probe oracle: coins collected.</div><div class="ttdef"><b>Definition</b> main.c:69</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:165</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:164</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="asram_8h_html_a27d8f498726727694f6631de1aa41b9f"><div class="ttname"><a href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a></div><div class="ttdeci">void sramLoad(u8 FAR *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
-<div class="ttc" id="asram_8h_html_a7415ce406c368ab48f4224101eef11bf"><div class="ttname"><a href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a></div><div class="ttdeci">void sramSave(const u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
+<div class="ttc" id="asram_8h_html_a271e24b7e809f10b1d8d2979b512bb0b"><div class="ttname"><a href="#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a></div><div class="ttdeci">u8 sramLoad(u8 FAR *data, u16 size)</div><div class="ttdoc">Load data from SRAM.</div></div>
+<div class="ttc" id="asram_8h_html_ae59c751326cb355338a21605adb09325"><div class="ttname"><a href="#ae59c751326cb355338a21605adb09325">sramSave</a></div><div class="ttdeci">u8 sramSave(const u8 *data, u16 size)</div><div class="ttdoc">Save data to SRAM.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="rom-header-requirement"></a>
 ROM Header Requirement</h2>
 <p>To enable SRAM, your ROM header (hdr.asm) must set:</p><ul>
@@ -210,6 +225,54 @@ ROM Header Requirement</h2>
 <dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="ac212fcfc7b67cd50eb15d00e099a3b82" name="ac212fcfc7b67cd50eb15d00e099a3b82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac212fcfc7b67cd50eb15d00e099a3b82">&#9670;&#160;</a></span>SRAM_ERR_NO_SRAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SRAM_ERR_NO_SRAM&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The ROM header declares no SRAM (<span class="tt">USE_SRAM := 1</span> is missing). </p>
+
+</div>
+</div>
+<a id="a4b63695b18f1219d4bd926a2018fbaa5" name="a4b63695b18f1219d4bd926a2018fbaa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b63695b18f1219d4bd926a2018fbaa5">&#9670;&#160;</a></span>SRAM_ERR_RANGE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SRAM_ERR_RANGE&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><span class="tt">offset + size</span> exceeds the declared SRAM; nothing was copied. </p>
+
+</div>
+</div>
+<a id="a03d071b39713a7e13ca63eac2cba04f7" name="a03d071b39713a7e13ca63eac2cba04f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03d071b39713a7e13ca63eac2cba04f7">&#9670;&#160;</a></span>SRAM_OK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SRAM_OK&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The transfer fits and was done (a <span class="tt">size</span> of 0 is also OK). </p>
+
+</div>
+</div>
 <a id="af76808429d7047bbc8848169d41905c9" name="af76808429d7047bbc8848169d41905c9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af76808429d7047bbc8848169d41905c9">&#9670;&#160;</a></span>SRAM_SIZE_16KB</h2>
 
@@ -339,7 +402,7 @@ ROM Header Requirement</h2>
 <div class="fragment"><div class="line"><span class="comment">// Before saving:</span></div>
 <div class="line">save.checksum = 0;</div>
 <div class="line">save.checksum = <a class="code hl_function" href="#a1112f8f7d8aaf47129938cc4c35d0309">sramChecksum</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(save));</div>
-<div class="line"><a class="code hl_function" href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(save));</div>
+<div class="line"><a class="code hl_function" href="#ae59c751326cb355338a21605adb09325">sramSave</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)&amp;save, <span class="keyword">sizeof</span>(save));</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// After loading:</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> storedChecksum = save.checksum;</div>
@@ -351,14 +414,14 @@ ROM Header Requirement</h2>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a5fb4001e2b3432597a28e97af0a907c0" name="a5fb4001e2b3432597a28e97af0a907c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fb4001e2b3432597a28e97af0a907c0">&#9670;&#160;</a></span>sramClear()</h2>
+<a id="a373d9d4cbabd4f432cac5fbf80d88ff4" name="a373d9d4cbabd4f432cac5fbf80d88ff4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a373d9d4cbabd4f432cac5fbf80d88ff4">&#9670;&#160;</a></span>sramClear()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void sramClear </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sramClear </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
           <td></td>
@@ -370,24 +433,25 @@ ROM Header Requirement</h2>
 <p>Erases all SRAM contents by filling with zeros. Useful for "delete save" functionality.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Number of bytes to clear (usually your save data size)</td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes to clear (usually your save data size) </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing cleared)</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Clear first 256 bytes (one save slot)</span></div>
-<div class="line"><a class="code hl_function" href="#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a>(256);</div>
-<div class="ttc" id="asram_8h_html_a5fb4001e2b3432597a28e97af0a907c0"><div class="ttname"><a href="#a5fb4001e2b3432597a28e97af0a907c0">sramClear</a></div><div class="ttdeci">void sramClear(u16 size)</div><div class="ttdoc">Clear SRAM to zero.</div></div>
+<div class="line"><a class="code hl_function" href="#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a>(256);</div>
+<div class="ttc" id="asram_8h_html_a373d9d4cbabd4f432cac5fbf80d88ff4"><div class="ttname"><a href="#a373d9d4cbabd4f432cac5fbf80d88ff4">sramClear</a></div><div class="ttdeci">u8 sramClear(u16 size)</div><div class="ttdoc">Clear SRAM to zero.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a27d8f498726727694f6631de1aa41b9f" name="a27d8f498726727694f6631de1aa41b9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27d8f498726727694f6631de1aa41b9f">&#9670;&#160;</a></span>sramLoad()</h2>
+<a id="a271e24b7e809f10b1d8d2979b512bb0b" name="a271e24b7e809f10b1d8d2979b512bb0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a271e24b7e809f10b1d8d2979b512bb0b">&#9670;&#160;</a></span>sramLoad()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void sramLoad </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sramLoad </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
@@ -404,24 +468,25 @@ ROM Header Requirement</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>Pointer to destination buffer in Work RAM — a bank-0 object or a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> (bank $7E) one; the copy runs as a block move into bank $7E, whose first 8 KB mirror bank 0 </td></tr>
-    <tr><td class="paramname">size</td><td>Number of bytes to load (max 32KB)</td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes to load </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (<span class="tt">data</span> untouched)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> saveData[64];</div>
-<div class="line"><a class="code hl_function" href="#a27d8f498726727694f6631de1aa41b9f">sramLoad</a>(saveData, 64);</div>
+<div class="line"><a class="code hl_function" href="#a271e24b7e809f10b1d8d2979b512bb0b">sramLoad</a>(saveData, 64);</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>If no valid save exists, SRAM contents are undefined </dd></dl>
 
 </div>
 </div>
-<a id="adc31b500d6dd4534bbaae396faa69df6" name="adc31b500d6dd4534bbaae396faa69df6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc31b500d6dd4534bbaae396faa69df6">&#9670;&#160;</a></span>sramLoadOffset()</h2>
+<a id="a63735ab921a0a3f6e5920dc35985efb8" name="a63735ab921a0a3f6e5920dc35985efb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63735ab921a0a3f6e5920dc35985efb8">&#9670;&#160;</a></span>sramLoadOffset()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void sramLoadOffset </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sramLoadOffset </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
@@ -439,29 +504,30 @@ ROM Header Requirement</h2>
 </div><div class="memdoc">
 
 <p>Load data from SRAM at offset. </p>
-<p>Like <a class="el" href="#a27d8f498726727694f6631de1aa41b9f" title="Load data from SRAM.">sramLoad()</a> but reads from a specific offset within SRAM. Useful for multiple save slots.</p>
+<p>Like <a class="el" href="#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad()</a> but reads from a specific offset within SRAM. Useful for multiple save slots.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>Pointer to destination buffer in Work RAM </td></tr>
     <tr><td class="paramname">size</td><td>Number of bytes to load </td></tr>
-    <tr><td class="paramname">offset</td><td>Starting offset in SRAM (0-32767)</td></tr>
+    <tr><td class="paramname">offset</td><td>Starting offset in SRAM </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (<span class="tt">data</span> untouched)</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Load slot 2 (each slot is 256 bytes)</span></div>
-<div class="line"><a class="code hl_function" href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a>(saveData, 256, 512);</div>
-<div class="ttc" id="asram_8h_html_adc31b500d6dd4534bbaae396faa69df6"><div class="ttname"><a href="#adc31b500d6dd4534bbaae396faa69df6">sramLoadOffset</a></div><div class="ttdeci">void sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
+<div class="line"><a class="code hl_function" href="#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a>(saveData, 256, 512);</div>
+<div class="ttc" id="asram_8h_html_a63735ab921a0a3f6e5920dc35985efb8"><div class="ttname"><a href="#a63735ab921a0a3f6e5920dc35985efb8">sramLoadOffset</a></div><div class="ttdeci">u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset)</div><div class="ttdoc">Load data from SRAM at offset.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a7415ce406c368ab48f4224101eef11bf" name="a7415ce406c368ab48f4224101eef11bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7415ce406c368ab48f4224101eef11bf">&#9670;&#160;</a></span>sramSave()</h2>
+<a id="ae59c751326cb355338a21605adb09325" name="ae59c751326cb355338a21605adb09325"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae59c751326cb355338a21605adb09325">&#9670;&#160;</a></span>sramSave()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void sramSave </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sramSave </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
@@ -478,25 +544,26 @@ ROM Header Requirement</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>Pointer to data in Work RAM to save </td></tr>
-    <tr><td class="paramname">size</td><td>Number of bytes to save (max 32KB)</td></tr>
+    <tr><td class="paramname">size</td><td>Number of bytes to save </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing written)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> saveData[64] = { ... };</div>
-<div class="line"><a class="code hl_function" href="#a7415ce406c368ab48f4224101eef11bf">sramSave</a>(saveData, 64);</div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Uses bank $70 (LoROM SRAM), starting at address $0000 </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Ensure ROM header has SRAM enabled! </dd></dl>
+<div class="line"><a class="code hl_function" href="#ae59c751326cb355338a21605adb09325">sramSave</a>(saveData, 64);</div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Writes from SRAM offset 0 — $70:0000 on LoROM, $30:6000 on HiROM </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>The ROM header must declare SRAM (<span class="tt">USE_SRAM := 1</span>); without it this returns SRAM_ERR_NO_SRAM. </dd></dl>
 
 </div>
 </div>
-<a id="a33eaa8d30319fe6c1a8a2f1586c09752" name="a33eaa8d30319fe6c1a8a2f1586c09752"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33eaa8d30319fe6c1a8a2f1586c09752">&#9670;&#160;</a></span>sramSaveOffset()</h2>
+<a id="a8c9b2eba46831adcd280dcdca9e6e04d" name="a8c9b2eba46831adcd280dcdca9e6e04d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c9b2eba46831adcd280dcdca9e6e04d">&#9670;&#160;</a></span>sramSaveOffset()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void sramSaveOffset </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sramSaveOffset </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>data</em></span>, </td>
         </tr>
@@ -514,18 +581,19 @@ ROM Header Requirement</h2>
 </div><div class="memdoc">
 
 <p>Save data to SRAM at offset. </p>
-<p>Like <a class="el" href="#a7415ce406c368ab48f4224101eef11bf" title="Save data to SRAM.">sramSave()</a> but writes to a specific offset within SRAM. Useful for multiple save slots.</p>
+<p>Like <a class="el" href="#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave()</a> but writes to a specific offset within SRAM. Useful for multiple save slots.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>Pointer to data in Work RAM to save </td></tr>
     <tr><td class="paramname">size</td><td>Number of bytes to save </td></tr>
-    <tr><td class="paramname">offset</td><td>Starting offset in SRAM (0-32767)</td></tr>
+    <tr><td class="paramname">offset</td><td>Starting offset in SRAM </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing written)</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Save slot 2 (each slot is 256 bytes)</span></div>
-<div class="line"><a class="code hl_function" href="#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a>(saveData, 256, 512);</div>
-<div class="ttc" id="asram_8h_html_a33eaa8d30319fe6c1a8a2f1586c09752"><div class="ttname"><a href="#a33eaa8d30319fe6c1a8a2f1586c09752">sramSaveOffset</a></div><div class="ttdeci">void sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
+<div class="line"><a class="code hl_function" href="#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>(saveData, 256, 512);</div>
+<div class="ttc" id="asram_8h_html_a8c9b2eba46831adcd280dcdca9e6e04d"><div class="ttname"><a href="#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a></div><div class="ttdeci">u8 sramSaveOffset(const u8 *data, u16 size, u16 offset)</div><div class="ttdoc">Save data to SRAM at offset.</div></div>
 </div><!-- fragment --> 
 </div>
 </div>

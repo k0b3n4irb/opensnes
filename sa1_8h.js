@@ -48,6 +48,7 @@ var sa1_8h =
     [ "REG_SA1_VCRL", "sa1_8h.html#abfc222d75c43c66b189d60f814a91c63", null ],
     [ "SA1_CCNT_MSG", "sa1_8h.html#a0b7acde42fc2f4400c87bfc3dad2f913", null ],
     [ "SA1_CCNT_SA1_IRQ", "sa1_8h.html#a0c4909da3c09c366f5a400355a4dd3c1", null ],
+    [ "SA1_CCNT_SA1_NMI", "sa1_8h.html#a6495d29920e98919dbfda318b5ef613e", null ],
     [ "SA1_CCNT_SA1_RDYB", "sa1_8h.html#ae61a4dad95b96da33079b29bbb1b88ec", null ],
     [ "SA1_CCNT_SA1_RESB", "sa1_8h.html#aaf899dbd8211e5e54113778ddcff513d", null ],
     [ "SA1_IRAM", "sa1_8h.html#addf35b0478c1c74b824e760ac72b8bbb", null ],
@@ -55,5 +56,6 @@ var sa1_8h =
     [ "SA1_IRAM_SIZE", "sa1_8h.html#a7a2caa74d77a1917b615c36ccfc330af", null ],
     [ "SA1_READY_ADDR", "sa1_8h.html#a252c3f3a7303781b97c3c4ed31ead2c0", null ],
     [ "SA1_READY_MAGIC", "sa1_8h.html#a6e7c292405db3658c4a73d93802d99bc", null ],
-    [ "sa1Init", "sa1_8h.html#acd5594c8f4e4a51d822db1fa86f35f87", null ]
+    [ "sa1Init", "sa1_8h.html#acd5594c8f4e4a51d822db1fa86f35f87", null ],
+    [ "sa1IsReady", "sa1_8h.html#aa2c5d1881453f27ceaa36ab5ebf122fc", null ]
 ];

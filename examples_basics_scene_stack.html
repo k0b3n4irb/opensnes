@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_basics_scene_stack.html','',''); });
   <div class="headertitle"><div class="title">Scene Stack </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Demonstrates the opt-in <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> framework: title → counter → pause overlay, three <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs swapping via <span class="tt"><a class="el" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> / <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> instead of a hand-rolled state machine.</p>
+<div class="textblock"><p>Demonstrates the opt-in <span class="tt"><a class="el" href="games_2rpg_2main_8c.html#a4c49fe7e113021067c955387e4f9babf">scene</a></span> framework: title → counter → pause overlay, three <a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a> structs swapping via <span class="tt"><a class="el" href="scene_8h.html#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> / <span class="tt"><a class="el" href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> instead of a hand-rolled state machine.</p>
 <div class="image">
 <img src="scene_stack.png" alt=""/>
 <div class="caption">
@@ -131,8 +131,8 @@ Screenshot</div></div>
 What You'll Learn</h2>
 <ul>
 <li>How to split a game into <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> callbacks (<span class="tt">init</span> + <span class="tt">update</span>)</li>
-<li>How <span class="tt"><a class="el" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> suspends the current scene and runs the new one's <span class="tt">init</span> once</li>
-<li>How <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> resumes a suspended scene <b>without</b> re-running its <span class="tt">init</span></li>
+<li>How <span class="tt"><a class="el" href="scene_8h.html#a23bdf064f954ad6f595dc7c648bd1c4b" title="Push a scene onto the stack. Suspends the current top.">scenePush</a></span> suspends the current scene and runs the new one's <span class="tt">init</span> once</li>
+<li>How <span class="tt"><a class="el" href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> resumes a suspended scene <b>without</b> re-running its <span class="tt">init</span></li>
 <li>How <span class="tt"><a class="el" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b" title="Run the scene stack with initial at the bottom. Never returns.">sceneRun</a></span> replaces the standard <span class="tt">while (1) { <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>; update(); }</span> loop</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="controls-6"></a>
@@ -157,14 +157,14 @@ The Scene struct</h3>
 <div class="line">    void (*init)(void);    <span class="comment">// optional, NULL skip; runs once on first push</span></div>
 <div class="line">    void (*update)(void);  <span class="comment">// required; runs every VBlank while on top</span></div>
 <div class="line">} <a class="code hl_struct" href="structScene.html">Scene</a>;</div>
-<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
+<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:148</div></div>
 </div><!-- fragment --><p>Three callbacks live in this example: <span class="tt">title_init/update</span>, <span class="tt">counter_init/update</span>, <span class="tt">pause_init/update</span>. Each is a small function (8-15 lines) that does one thing.</p>
 <h3 class="doxsection"><a class="anchor" id="pushpop-semantics"></a>
 Push/pop semantics</h3>
 <ul>
 <li><b>Push</b> suspends the currently-executing scene's <span class="tt">update</span> finishes its frame, then the next VBlank dispatches to the new top scene. <span class="tt">init</span> runs exactly once on push.</li>
 <li><b>Pop</b> removes the top scene; the resumed scene's <span class="tt">update</span> runs on the next VBlank — no <span class="tt">init</span> re-run, so its state survives. The counter's <span class="tt"><a class="el" href="basics_2scene__stack_2main_8c.html#a6d6fa96aac96b2643656c7cd3c5c3b17" title="Counter value, lives across pause/resume because counter&#39;s init runs once on push,...">counter_value</a></span> global persists across pause/resume because of this.</li>
-<li>The bottom of the stack is immortal. <span class="tt"><a class="el" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> on a stack of size 1 is a silent no-op (the title screen can't accidentally exit).</li>
+<li>The bottom of the stack is immortal. <span class="tt"><a class="el" href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab" title="Pop the top scene. Resumes the scene below.">scenePop</a></span> on a stack of size 1 is a silent no-op (the title screen can't accidentally exit).</li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="why-a-framework-instead-of-a-switch"></a>
 Why a framework instead of a switch</h3>

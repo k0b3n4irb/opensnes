@@ -13,8 +13,10 @@ var searchData=
   ['key_20features_10',['Key Features',['../examples_audio_snesmod_music.html#key-features',1,'']]],
   ['key_20memory_20regions_11',['Key Memory Regions',['../memory_map.html#key-memory-regions',1,'']]],
   ['kit_20with_20zero_20samples_12',['play_noise — a drum kit with zero samples',['../examples_audio_play_noise.html',1,'examples_audio']]],
-  ['knowing_20up_20front_13',['knowing up front',['../tools_font2snes.html#gotchas-worth-knowing-up-front',1,'Gotchas worth knowing up front'],['../tools_gfx4snes.html#gotchas-worth-knowing-up-front-1',1,'Gotchas worth knowing up front'],['../tools_img2snes.html#gotchas-worth-knowing-up-front-2',1,'Gotchas worth knowing up front'],['../tools_palplan.html#gotchas-worth-knowing-up-front-3',1,'Gotchas worth knowing up front'],['../tools_smconv.html#gotchas-worth-knowing-up-front-4',1,'Gotchas worth knowing up front'],['../tools_tmx2snes.html#gotchas-worth-knowing-up-front-5',1,'Gotchas worth knowing up front'],['../tools_wav2brr.html#gotchas-worth-knowing-up-front-6',1,'Gotchas worth knowing up front']]],
-  ['knowledge_20in_20claude_14',['Project knowledge in &lt;span class=&quot;tt&quot;&gt;.claude/&lt;/span&gt;',['../contributing.html#project-knowledge-in-claude',1,'']]],
-  ['known_20limitations_15',['Known Limitations',['../KNOWN_LIMITATIONS.html',1,'']]],
-  ['krom_20s_20map_16',['Controls (krom&apos;s map)',['../examples_mode7_perspective_rotate.html#controls-kroms-map',1,'']]]
+  ['knowing_13',['Sharp edges worth knowing',['../tutorial_framework.html#sharp-edges-worth-knowing',1,'']]],
+  ['knowing_20up_20front_14',['knowing up front',['../tools_font2snes.html#gotchas-worth-knowing-up-front',1,'Gotchas worth knowing up front'],['../tools_gfx4snes.html#gotchas-worth-knowing-up-front-1',1,'Gotchas worth knowing up front'],['../tools_img2snes.html#gotchas-worth-knowing-up-front-2',1,'Gotchas worth knowing up front'],['../tools_palplan.html#gotchas-worth-knowing-up-front-3',1,'Gotchas worth knowing up front'],['../tools_smconv.html#gotchas-worth-knowing-up-front-4',1,'Gotchas worth knowing up front'],['../tools_tmx2snes.html#gotchas-worth-knowing-up-front-5',1,'Gotchas worth knowing up front'],['../tools_wav2brr.html#gotchas-worth-knowing-up-front-6',1,'Gotchas worth knowing up front']]],
+  ['knowledge_20in_20claude_15',['Project knowledge in &lt;span class=&quot;tt&quot;&gt;.claude/&lt;/span&gt;',['../contributing.html#project-knowledge-in-claude',1,'']]],
+  ['known_20limitations_16',['Known Limitations',['../KNOWN_LIMITATIONS.html',1,'']]],
+  ['ko_17',['What to do with a KO',['../hardware_verification.html#what-to-do-with-a-ko',1,'']]],
+  ['krom_20s_20map_18',['Controls (krom&apos;s map)',['../examples_mode7_perspective_rotate.html#controls-kroms-map',1,'']]]
 ];

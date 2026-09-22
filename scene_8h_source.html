@@ -123,35 +123,39 @@ $(function(){initNavTree('scene_8h_source.html','',''); });
 </div><!--header-->
 <div class="contents">
 <a href="scene_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="preprocessor">#ifndef SNES_SCENE_H</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="preprocessor">#define SNES_SCENE_H</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span></div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno"><a class="line" href="scene_8h.html#a437432b9f2edd6543cedc3053889fe1a">  135</a></span><span class="preprocessor">#define SCENE_STACK_MAX 8</span></div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span></div>
-<div class="foldopen" id="foldopen00144" data-start="{" data-end="};">
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno"><a class="line" href="structScene.html">  144</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno"><a class="line" href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">  153</a></span>    void (*<a class="code hl_variable" href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">init</a>)(void);</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span></div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno"><a class="line" href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">  168</a></span>    void (*<a class="code hl_variable" href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">update</a>)(void);</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>} <a class="code hl_struct" href="structScene.html">Scene</a>;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span><span class="preprocessor">#ifndef SNES_SCENE_H</span></div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="preprocessor">#define SNES_SCENE_H</span></div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">snes/types.h</a>&gt;</span></div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="scene_8h.html#a437432b9f2edd6543cedc3053889fe1a">  139</a></span><span class="preprocessor">#define SCENE_STACK_MAX 8</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span></div>
+<div class="foldopen" id="foldopen00148" data-start="{" data-end="};">
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno"><a class="line" href="structScene.html">  148</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno"><a class="line" href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">  157</a></span>    void (*<a class="code hl_variable" href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">init</a>)(void);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span></div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno"><a class="line" href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">  172</a></span>    void (*<a class="code hl_variable" href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">update</a>)(void);</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>} <a class="code hl_struct" href="structScene.html">Scene</a>;</div>
 </div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span></div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno"><a class="line" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b">  186</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b">sceneRun</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> *initial);</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span></div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno"><a class="line" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6">  199</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6">scenePush</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> *next);</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span></div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564">  212</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564">scenePop</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span><span class="preprocessor">#endif </span><span class="comment">/* SNES_SCENE_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno"><a class="line" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b">  190</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b">sceneRun</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> *initial);</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno"><a class="line" href="scene_8h.html#a23bdf064f954ad6f595dc7c648bd1c4b">  205</a></span><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_function" href="scene_8h.html#a23bdf064f954ad6f595dc7c648bd1c4b">scenePush</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> *next);</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno"><a class="line" href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab">  219</a></span><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_function" href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab">scenePop</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span></div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno"><a class="line" href="scene_8h.html#aa96236208e25eb3b1fd7bf260ae7cf05">  233</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="scene_8h.html#aa96236208e25eb3b1fd7bf260ae7cf05">sceneReplace</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structScene.html">Scene</a> *next);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span><span class="preprocessor">#endif </span><span class="comment">/* SNES_SCENE_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="ascene_8h_html_a1ad2becb75aa6654192bdabf7e97820b"><div class="ttname"><a href="scene_8h.html#a1ad2becb75aa6654192bdabf7e97820b">sceneRun</a></div><div class="ttdeci">void sceneRun(const Scene *initial)</div><div class="ttdoc">Run the scene stack with initial at the bottom. Never returns.</div></div>
-<div class="ttc" id="ascene_8h_html_a9c1b9f65115eaa7dc76e813a76331564"><div class="ttname"><a href="scene_8h.html#a9c1b9f65115eaa7dc76e813a76331564">scenePop</a></div><div class="ttdeci">void scenePop(void)</div><div class="ttdoc">Pop the top scene. Resumes the scene below.</div></div>
-<div class="ttc" id="ascene_8h_html_ac96680bc9b45e756a5bb8f15803bfdb6"><div class="ttname"><a href="scene_8h.html#ac96680bc9b45e756a5bb8f15803bfdb6">scenePush</a></div><div class="ttdeci">void scenePush(const Scene *next)</div><div class="ttdoc">Push a scene onto the stack. Suspends the current top.</div></div>
-<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:144</div></div>
-<div class="ttc" id="astructScene_html_a792c89d6cc91c1e09330819a3f15fe10"><div class="ttname"><a href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">Scene::init</a></div><div class="ttdeci">void(* init)(void)</div><div class="ttdoc">Called once when the scene is first pushed onto the stack.</div><div class="ttdef"><b>Definition</b> scene.h:153</div></div>
-<div class="ttc" id="astructScene_html_a9a6cd35d69b576cebbe215d578f7f4d2"><div class="ttname"><a href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">Scene::update</a></div><div class="ttdeci">void(* update)(void)</div><div class="ttdoc">Called every VBlank while the scene is on top of the stack.</div><div class="ttdef"><b>Definition</b> scene.h:168</div></div>
+<div class="ttc" id="ascene_8h_html_a23bdf064f954ad6f595dc7c648bd1c4b"><div class="ttname"><a href="scene_8h.html#a23bdf064f954ad6f595dc7c648bd1c4b">scenePush</a></div><div class="ttdeci">u8 scenePush(const Scene *next)</div><div class="ttdoc">Push a scene onto the stack. Suspends the current top.</div></div>
+<div class="ttc" id="ascene_8h_html_a4be3914125f147f2a8b311de43b2a2ab"><div class="ttname"><a href="scene_8h.html#a4be3914125f147f2a8b311de43b2a2ab">scenePop</a></div><div class="ttdeci">u8 scenePop(void)</div><div class="ttdoc">Pop the top scene. Resumes the scene below.</div></div>
+<div class="ttc" id="ascene_8h_html_aa96236208e25eb3b1fd7bf260ae7cf05"><div class="ttname"><a href="scene_8h.html#aa96236208e25eb3b1fd7bf260ae7cf05">sceneReplace</a></div><div class="ttdeci">void sceneReplace(const Scene *next)</div><div class="ttdoc">Replace the top scene with another, at any depth — the bottom one included.</div></div>
+<div class="ttc" id="astructScene_html"><div class="ttname"><a href="structScene.html">Scene</a></div><div class="ttdoc">A single scene&#39;s callbacks.</div><div class="ttdef"><b>Definition</b> scene.h:148</div></div>
+<div class="ttc" id="astructScene_html_a792c89d6cc91c1e09330819a3f15fe10"><div class="ttname"><a href="structScene.html#a792c89d6cc91c1e09330819a3f15fe10">Scene::init</a></div><div class="ttdeci">void(* init)(void)</div><div class="ttdoc">Called once when the scene is first pushed onto the stack.</div><div class="ttdef"><b>Definition</b> scene.h:157</div></div>
+<div class="ttc" id="astructScene_html_a9a6cd35d69b576cebbe215d578f7f4d2"><div class="ttname"><a href="structScene.html#a9a6cd35d69b576cebbe215d578f7f4d2">Scene::update</a></div><div class="ttdeci">void(* update)(void)</div><div class="ttdoc">Called every VBlank while the scene is on top of the stack.</div><div class="ttdef"><b>Definition</b> scene.h:172</div></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">OpenSNES Standard Types.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

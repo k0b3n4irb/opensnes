@@ -135,7 +135,7 @@ Macros</h2></td></tr>
 <tr class="memitem:ga35f7d781e9c70ec004fe775caaa3367a" id="r_ga35f7d781e9c70ec004fe775caaa3367a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga35f7d781e9c70ec004fe775caaa3367a">AUDIO_DECAY_NONE</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga35f7d781e9c70ec004fe775caaa3367a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ADSR decay rates.  <br /></td></tr>
 <tr class="memitem:gad17616a886e4d3a9c6dd9b624cab5488" id="r_gad17616a886e4d3a9c6dd9b624cab5488"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gad17616a886e4d3a9c6dd9b624cab5488">AUDIO_DECAY_SLOW</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memitem:gab0fbec89961f7279fac65054ec8762fc" id="r_gab0fbec89961f7279fac65054ec8762fc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gab0fbec89961f7279fac65054ec8762fc">AUDIO_ECHO_DELAY_MAX</a>&#160;&#160;&#160;15</td></tr>
+<tr class="memitem:gab0fbec89961f7279fac65054ec8762fc" id="r_gab0fbec89961f7279fac65054ec8762fc"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gab0fbec89961f7279fac65054ec8762fc">AUDIO_ECHO_DELAY_MAX</a>&#160;&#160;&#160;7</td></tr>
 <tr class="memitem:gad20bcf962bd76dfdacd985212346681a" id="r_gad20bcf962bd76dfdacd985212346681a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gad20bcf962bd76dfdacd985212346681a">AUDIO_ECHO_DELAY_MIN</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:gad20bcf962bd76dfdacd985212346681a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Echo delay (delay_ms = value * 16ms).  <br /></td></tr>
 <tr class="memitem:gae937ff313a454632fea964fc90d84608" id="r_gae937ff313a454632fea964fc90d84608"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gae937ff313a454632fea964fc90d84608">AUDIO_ERR_INVALID_ID</a>&#160;&#160;&#160;2</td></tr>
@@ -168,7 +168,9 @@ Macros</h2></td></tr>
 <tr class="memitem:gae5ffb90e18975b7fbb11c37a4b61df9c" id="r_gae5ffb90e18975b7fbb11c37a4b61df9c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gae5ffb90e18975b7fbb11c37a4b61df9c">AUDIO_SUSTAIN_HALF</a>&#160;&#160;&#160;3</td></tr>
 <tr class="memitem:ga17a903e4f0b23c86dec083e829ad7f65" id="r_ga17a903e4f0b23c86dec083e829ad7f65"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga17a903e4f0b23c86dec083e829ad7f65">AUDIO_SUSTAIN_QUARTER</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:ga0c63b9dbba747f347b4f891ed23984e0" id="r_ga0c63b9dbba747f347b4f891ed23984e0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga0c63b9dbba747f347b4f891ed23984e0">AUDIO_VOICE_AUTO</a>&#160;&#160;&#160;0xFF</td></tr>
-<tr class="memdesc:ga0c63b9dbba747f347b4f891ed23984e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auto-allocate voice in audioPlaySampleEx.  <br /></td></tr>
+<tr class="memdesc:ga0c63b9dbba747f347b4f891ed23984e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Let <a class="el" href="group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020" title="Play a sample on a voice YOU choose.">audioPlaySampleOn()</a> pick the voice (round-robin), as <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> / <a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> always do.  <br /></td></tr>
+<tr class="memitem:ga2d0e09462926a1635668eb8e70ba6798" id="r_ga2d0e09462926a1635668eb8e70ba6798"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga2d0e09462926a1635668eb8e70ba6798">AUDIO_VOICE_NONE</a>&#160;&#160;&#160;0xFF</td></tr>
+<tr class="memdesc:ga2d0e09462926a1635668eb8e70ba6798"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returned by <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> / <a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> when nothing was played (driver not ready, unknown or unloaded sample, command timeout). Was a bare 0xFF in the code until 2026-09-21.  <br /></td></tr>
 <tr class="memitem:ga802876f35e06c414097934625ad6665d" id="r_ga802876f35e06c414097934625ad6665d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga802876f35e06c414097934625ad6665d">AUDIO_VOL_MAX</a>&#160;&#160;&#160;127</td></tr>
 <tr class="memdesc:ga802876f35e06c414097934625ad6665d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum volume value.  <br /></td></tr>
 <tr class="memitem:ga1c0f4cddb150c094211fd7467dc88737" id="r_ga1c0f4cddb150c094211fd7467dc88737"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga1c0f4cddb150c094211fd7467dc88737">AUDIO_VOL_MIN</a>&#160;&#160;&#160;0</td></tr>
@@ -298,11 +300,11 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define AUDIO_ECHO_DELAY_MAX&#160;&#160;&#160;15</td>
+          <td class="memname">#define AUDIO_ECHO_DELAY_MAX&#160;&#160;&#160;7</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>240ms </p>
+<p>112 ms — <a class="el" href="group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho()</a> clamps here: EDL 8-15 would run the echo ring into the IPL region. Was 15, a value the function never accepted </p>
 
 </div>
 </div>
@@ -653,7 +655,23 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Auto-allocate voice in audioPlaySampleEx. </p>
+<p>Let <a class="el" href="group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020" title="Play a sample on a voice YOU choose.">audioPlaySampleOn()</a> pick the voice (round-robin), as <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> / <a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> always do. </p>
+
+</div>
+</div>
+<a id="ga2d0e09462926a1635668eb8e70ba6798" name="ga2d0e09462926a1635668eb8e70ba6798"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2d0e09462926a1635668eb8e70ba6798">&#9670;&#160;</a></span>AUDIO_VOICE_NONE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define AUDIO_VOICE_NONE&#160;&#160;&#160;0xFF</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returned by <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> / <a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> when nothing was played (driver not ready, unknown or unloaded sample, command timeout). Was a bare 0xFF in the code until 2026-09-21. </p>
 
 </div>
 </div>

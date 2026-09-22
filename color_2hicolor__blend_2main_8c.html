@@ -158,7 +158,7 @@ Variables</h2></td></tr>
 <p>This is the corpus's first pure colormath dogfood: the audit rated <a class="el" href="colormath_8h.html" title="SNES Color Math (Blending/Transparency).">colormath.h</a> "good primitives" on inspection; this port proves SetSource/SetOp/Enable against a reference.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>RGB channel splitting across main/sub screens</li>
-<li>colorMathSetSource(SUBSCREEN) + colorMathSetOp(ADD) + colorMathEnable(BG1|BACKDROP) — CGWSEL $02 / CGADSUB $21</li>
+<li>colorMathSetSource(SUBSCREEN) + colorMathSetOp(ADD) + colorMathSetLayers(BG1|BACKDROP) — CGWSEL $02 / CGADSUB $21</li>
 <li>Mode 3: 8bpp BG1 + 4bpp BG2 sharing VRAM</li>
 </ul>
 </dd></dl>

@@ -20,7 +20,6 @@ var games_2likemario_2main_8c =
     [ "VRAM_SPR_LARGE", "games_2likemario_2main_8c.html#a307f7a66d00de9b68d22f059e6490ee3", null ],
     [ "VRAM_SPR_SMALL", "games_2likemario_2main_8c.html#a7969a37ad80a90f7ec11c8eccd822291", null ],
     [ "asr8", "games_2likemario_2main_8c.html#ab9e45c26644c427a0c4a665d44d2c2bd", null ],
-    [ "getSpriteTilBank", "games_2likemario_2main_8c.html#a50b0f07ee9375582d2f51bc2ef8c4a0f", null ],
     [ "main", "games_2likemario_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "map_flush_column", "games_2likemario_2main_8c.html#a6e673294f4ea577471b6a8b49aeb0575", null ],
     [ "map_get_tile_prop", "games_2likemario_2main_8c.html#a239872ea5ac806101f72b27dca4fcea4", null ],

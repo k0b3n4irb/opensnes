@@ -344,10 +344,11 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">handler</td><td>Address of the ASM handler </td></tr>
-    <tr><td class="paramname">bank</td><td>ROM bank containing the handler </td></tr>
+    <tr><td class="paramname">bank</td><td>ROM bank containing the handler</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> reads the bank from the handler pointer. Removed at the next major version. </dd></dl>
 
 </div>
 </div>
@@ -427,13 +428,14 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
 </div><div class="memdoc">
 
 <p>Register a VBlank callback function. </p>
-<p>The registered callback will be called during every VBlank interrupt, BEFORE the vblank_flag is set. This allows time-critical operations (like DMA transfers) to be performed reliably during VBlank.</p>
+<p>The callback runs inside the NMI handler, once per frame the main thread was waiting for — NOT on lag frames (an NMI that arrives while the main loop is still computing skips all VBlank work, this callback included). It runs AFTER the library's own VBlank work: the OAM upload, the text tilemap flush and the background scroll sync have already used part of VBlank.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">callback</td><td>Function to call during VBlank, or NULL to disable</td></tr>
+    <tr><td class="paramname">callback</td><td>Function to call during VBlank, or NULL to disable (same as <a class="el" href="#a4a0a4690d2c70b58584eed95377325a1" title="Clear the VBlank callback.">nmiClear()</a>)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section warning"><dt>Warning</dt><dd>Inside the callback: never call <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a> (it waits for an NMI that cannot arrive — deadlock); never touch the WRAM data port $2180-$2183; never use a lib DMA helper while the main thread may be setting one up (they all share DMA channel 0). Plain C multiply / divide are safe (the runtime avoids the hardware unit in NMI context); fixMul and fix32Mul are not.</dd></dl>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> myVBlankHandler(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <span class="comment">// DMA transfer, scroll updates, etc.</span></div>
 <div class="line">}</div>
@@ -450,11 +452,11 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="ainterrupt_8h_html_a54a7e26f751984f6f3241ed2d2c5eda7"><div class="ttname"><a href="#a54a7e26f751984f6f3241ed2d2c5eda7">nmiSet</a></div><div class="ttdeci">void nmiSet(VBlankCallback callback)</div><div class="ttdoc">Register a VBlank callback function.</div></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Keep callbacks short! VBlank time is limited (~2200 CPU cycles on NTSC) </dd>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Keep callbacks short: VBlank is short and the library has already spent part of it. <span class="tt">make test-nmi-budget</span> measures the handler. </dd>
 <dd>
 Callback runs with interrupts disabled </dd>
 <dd>
-The callback function must be in the same ROM bank as the main code (bank 0). For larger projects, use <a class="el" href="#af408cb8d09dc9ab56ae7245c18792c2d" title="Register a VBlank callback with explicit bank.">nmiSetBank()</a> to specify the bank explicitly. </dd></dl>
+The callback may live in any ROM bank: the bank is taken from the function pointer. (This note said "must be in bank 0" until 2026-09-20; that was only ever true of irqSet, fixed the same day.) </dd></dl>
 
 </div>
 </div>
@@ -478,14 +480,15 @@ The callback function must be in the same ROM bank as the main code (bank 0). Fo
 </div><div class="memdoc">
 
 <p>Register a VBlank callback with explicit bank. </p>
-<p>Use this when the callback function might not be in bank 0.</p>
+<p>Not needed from C — <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the pointer. Kept for callers that only have a 16-bit address (assembly).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">callback</td><td>Function to call during VBlank </td></tr>
-    <tr><td class="paramname">bank</td><td>ROM bank where the callback is located (0-255) </td></tr>
+    <tr><td class="paramname">bank</td><td>ROM bank where the callback is located (0-255)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the function pointer. Removed at the next major version. </dd></dl>
 
 </div>
 </div>
