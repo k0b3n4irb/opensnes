@@ -1,6 +1,7 @@
 dsp1Attitude
 dsp1Distance
 dsp1Init
+dsp1IsPresent
 dsp1Multiply
 dsp1Objective
 dsp1Parameter

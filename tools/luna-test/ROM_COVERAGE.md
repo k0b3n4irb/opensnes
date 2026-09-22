@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 93 ROMs (examples + the library fixture), 203 legs · **301 of 301 public functions executed, 0 never**
+luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 94 ROMs (examples + the library fixture), 204 legs · **311 of 311 public functions executed, 0 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
@@ -14,7 +14,6 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `LzssDecodeVram` | `backgrounds/mode1_lz77` |
 | `animRestart` | `libtest` |
 | `apuReset` | `audio/apu_switch` |
-| `atan2_8` | `basics/aim_target` |
 | `audioDisableEcho` | `audio/echo` |
 | `audioGetFreeMemory` | `libtest` |
 | `audioGetSampleInfo` | `libtest` |
@@ -39,6 +38,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `collideRectEx` | `libtest` |
 | `collideRectTile` | `libtest` |
 | `collideTileEx` | `libtest` |
+| `colorMathEnable` | `libtest` |
 | `colorMathSetBrightness` | `libtest` |
 | `colorMathSetChannel` | `libtest` |
 | `colorMathSetCondition` | `libtest` |
@@ -77,13 +77,13 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `gsuSetupHdmaBlanking` | `chips/superfx_3d` |
 | `hdmaBrightnessGradient` | `hdma/hdma_helpers` |
 | `hdmaBrightnessGradientStop` | `hdma/hdma_helpers` |
-| `hdmaColorGradient` | `hdma/hdma_helpers` |
 | `hdmaColorGradientStop` | `hdma/hdma_helpers` |
 | `hdmaGetEnabled` | `libtest_fx` |
 | `hdmaGradient` | `libtest_fx` |
 | `hdmaIrisWipe` | `hdma/hdma_helpers` |
 | `hdmaIrisWipeStop` | `hdma/hdma_helpers` |
 | `hdmaParallax` | `scrolling/parallax_scroll` |
+| `hdmaSetupBank` | `libtest_fx` |
 | `hdmaSetupIndirect` | `hdma/hdma_indirect_gradient` |
 | `hdmaWaterRipple` | `hdma/hdma_helpers` |
 | `hdmaWaveH` | `libtest_fx` |
@@ -93,10 +93,11 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `hdmaWindowShape` | `libtest_fx` |
 | `irqClear` | `libtest` |
 | `irqDisable` | `libtest` |
-| `irqSet` | `libtest` |
+| `irqSetBank` | `libtest` |
 | `irqSetVTimer` | `libtest` |
 | `isInVBlank` | `libtest` |
 | `isPAL` | `libtest` |
+| `lzssDecodeVram` | `backgrounds/mode1_lz77` |
 | `mapGetMetaTile` | `libtest` |
 | `mapGetMetaTilesProp` | `libtest` |
 | `mapSetMapOptions` | `libtest` |
@@ -107,7 +108,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mode7SetSettings` | `mode7/perspective_rotate` |
 | `mode7Transform` | `libtest_fx` |
 | `mosaicDisable` | `transitions/mosaic` |
-| `mosaicEnable` | `transitions/mosaic` |
+| `mosaicEnable` | `libtest` |
 | `mosaicFadeIn` | `transitions/mosaic` |
 | `mosaicFadeOut` | `transitions/mosaic` |
 | `mosaicGetSize` | `libtest` |
@@ -121,16 +122,14 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mouseIsConnected` | `libtest` |
 | `mouseSetSensitivity` | `libtest` |
 | `mul16` | `libtest` |
-| `nmiSet` | `libtest_fx` |
+| `nmiSetBank` | `libtest` |
 | `oamDrawMetaFlip` | `libtest` |
 | `oamDynamicDrainQueue` | `sprites/dynamic_metasprite` |
 | `oamDynamicSetSize` | `libtest` |
 | `oamHide` | `sprites/animated_sprite` |
 | `oamMetaDrawDyn` | `sprites/dynamic_metasprite` |
 | `oamSetTile` | `libtest` |
-| `oamSetX` | `input/move_sprite` |
 | `oamSetXY` | `input/move_sprite` |
-| `oamSetY` | `input/move_sprite` |
 | `objCollidMap1D` | `libtest` |
 | `objCollidMapWithSlopes` | `maps/slope_collision` |
 | `objCollidObj` | `libtest` |
@@ -151,18 +150,19 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `profileInit` | `libtest` |
 | `profileScanlineEnd` | `libtest` |
 | `profileScanlineStart` | `libtest` |
+| `rand` | `libtest` |
 | `rectContains` | `libtest` |
 | `rectGetCenter` | `libtest` |
 | `rectInit` | `libtest` |
 | `rectSetPos` | `libtest` |
 | `resetFrameCount` | `libtest` |
-| `sa1Init` | `chips/sa1_starfield` |
-| `scenePop` | `basics/scene_stack` |
-| `scenePush` | `basics/scene_stack` |
+| `sa1Init` | `libtest_fx` |
+| `sceneReplace` | `libtest` |
 | `sceneRun` | `basics/scene_stack` |
 | `scopeButtonsDown` | `libtest` |
 | `scopeButtonsHeld` | `libtest` |
 | `scopeButtonsPressed` | `libtest` |
+| `scopeButtonsRepeat` | `libtest` |
 | `scopeGetRawX` | `libtest` |
 | `scopeGetRawY` | `libtest` |
 | `scopeGetX` | `libtest` |
@@ -172,7 +172,6 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `scopeSetRepeatDelay` | `libtest` |
 | `scopeSinceShot` | `libtest` |
 | `snesmodAllocateSoundRegion` | `libtest_fx` |
-| `snesmodFadeVolume` | `audio/snesmod_music` |
 | `snesmodFlush` | `libtest_fx` |
 | `snesmodGetPosition` | `libtest_fx` |
 | `snesmodPause` | `audio/snesmod_music` |
@@ -180,10 +179,7 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `snesmodResume` | `audio/snesmod_music` |
 | `snesmodSetSoundTable` | `libtest_fx` |
 | `snesmodStop` | `audio/snesmod_music` |
-| `sramChecksum` | `libtest` |
-| `sramClear` | `libtest` |
-| `sramLoad` | `libtest` |
-| `sramSave` | `libtest` |
+| `srand` | `libtest` |
 | `textFlush` | `libtest` |
 | `textGetX` | `libtest` |
 | `textGetY` | `libtest` |
