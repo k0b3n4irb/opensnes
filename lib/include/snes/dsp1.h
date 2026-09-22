@@ -239,7 +239,10 @@ void dsp1Raster(u8 FAR *ab, u8 FAR *cd, s16 vs, u16 count);
  *         runs the real DSP-1B firmware), every exact length reads ONE LOW:
  *         (3,4,12) -> 12, (300,400,0) -> 499, (0,0,10000) -> 9999. Treat the
  *         result as exact to within 1, and compare with `>=` / `<`, never
- *         `==`. Observed; no hardware reference states the rounding.
+ *         `==`. Measured on the DSP-1B firmware; the official manual (Book II
+ *         §5.2.3, code 28H) states no rounding, and sneslab notes the
+ *         command "bugged in DSP1/DSP1A, fixed in DSP1B" without saying
+ *         what the bug was — so on the 1/1A revisions the result may differ.
  *
  * Hardware square root — handy for homing missiles, audio attenuation,
  * anything that needs a true distance rather than a compare.
@@ -259,7 +262,12 @@ u16 dsp1Distance(s16 x, s16 y, s16 z);
  *         32768 squared-units outside the surface reads 0, and (30,40,0, r 5)
  *         — ten radii away in small units — reads 0 too. Use world units
  *         large enough for the shell you care about, and test `< 0` for
- *         "clearly inside". Observed; no hardware reference gives the scaling.
+ *         "clearly inside". The squared difference is what the official manual
+ *         states (Book II §5.2.2, code 18H: "subtracts the square of the
+ *         specified range from the square of the vector size", output type
+ *         H2); the >> 15 is the H2 scaling as measured on the firmware.
+ *         (Until 2026-09-22 this note claimed no reference gave it — the
+ *         manual, in the corpus, did.)
  *
  * One call replaces three multiplies and two adds — cheap 3D proximity /
  * LOD tests without ever leaving 16-bit C.

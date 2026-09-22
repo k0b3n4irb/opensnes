@@ -17,9 +17,12 @@ working reference, not a hunch.
 1. **PROTOTYPE** — write the smallest internal script that proves the capability
    and pins its exact shape (what input, what output, what assertion). Use it for
    real work in the meantime. Keep it under `tools/luna-test/`.
-2. **VALIDATE with the owner** — show that the prototype does what's needed; get
-   explicit sign-off. Do **not** file a luna issue on a guess — the owner
-   validates internally what's missing first.
+2. **VALIDATE** — prove the prototype does what's needed on real work, with
+   its inputs, outputs and a negative control written down. Do **not** file
+   a luna issue on a guess. (Until 2026-09-22 this step was "the owner
+   signs off"; the owner now expects the three teams to talk directly — see
+   `partners.md` — so the validation is ours, in writing, and the report
+   goes to luna's engineers as is.)
 3. **FILE the luna issue** — only when sure. Describe precisely what luna should
    expose; the prototype **is** the spec (paste its I/O contract). This is the
    "challenge luna" step.

@@ -23,10 +23,10 @@ the same day, with what you tried and what you needed. Concretely:
 - **To luna** (active partner, answers and ships): when a measurement,
   flag, device, oracle or diagnostic is missing; when its output
   contradicts a reference; when a note it sent us needs an answer.
-  Lifecycle in `luna_tooling.md`: prototype → owner validates → luna issue
-  (`gh issue create --repo k0b3n4irb/luna`) → luna ships → we delete the
-  prototype. A *report* (several requests, priorities, what luna made
-  possible since the last one) goes through the owner as a file.
+  Lifecycle in `luna_tooling.md`: prototype → we validate it in writing →
+  luna issue (`gh issue create --repo k0b3n4irb/luna`) → luna ships → we
+  delete the prototype. A *report* (several requests, priorities, what luna
+  made possible since the last one) is a file luna's engineers read as is.
 - **To snes-rag** (passive partner: it waits for our feedback and luna's,
   it does not come to us): when `snes_search` / `snes_verify` returns
   nothing, the wrong source, an `unsettled` on a point some reference does
@@ -51,7 +51,7 @@ forwards our `to_` files and drops the partner's replies in as `from_`
 files (or in `/tmp`, from where we copy them in).
 
 Every `to_` report has the same spine: header (who, which pin / index
-fingerprint, status "proposal — owner validates before filing"), what the
+fingerprint, status: sent as is, or still accumulating), what the
 partner made possible since the last report (first — it is the context for
 the asks), the requests **simplest first** with kind, cost and the exact
 I/O contract we would use, a priority table, small observations without an
@@ -66,8 +66,13 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
 2. **When a partner falls short**, append the item to the *open* report for
    that partner (`partners/<partner>/OPEN_<partner>.md`, created on first
    need) — one line is enough: date, what was asked, what came back, what
-   was needed. The owner decides when it is sent; a sent report is renamed
-   to its date.
+   was needed. A sent report is renamed to its date. **Nobody validates
+   it for us** — the owner has said so (2026-09-22: "je ne valide rien,
+   j'attends à ce que vous parliez entre vous"). Twenty engineers across
+   the three projects read these reports as engineers: every claim in one
+   must have been re-checked the day it is sent, with the exact query,
+   command or chunk id that lets them reproduce it, and a claim we cannot
+   reproduce is not sent.
 3. **When a partner sends something**, answer it in full and in writing
    (`to_..._reply.md`), correction by correction: what we take, what we
    withdraw, what we still need. Their corrections of *us* go into our

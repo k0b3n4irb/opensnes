@@ -4,7 +4,7 @@
 |---|---|
 | **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop`, post-v0.44.0) |
 | **Corpus seen** | 201 of 223 sources, 30848 chunks, fingerprint `e2a738a553ec` (built 2026-09-12) — unchanged since our last validation report |
-| **Status** | proposal — the owner validates before sending (`.claude/rules/partners.md`); items are appended as they come up, the file is renamed to its date when sent |
+| **Status** | accumulating; every claim re-checked against the corpus on 2026-09-22 with the query and chunk ids given, so it can be sent as is (`.claude/rules/partners.md`) |
 
 ## 1. What the corpus made possible since the 2026-09-12 validation
 
@@ -32,6 +32,12 @@ for: `--port1 none` / `--port2 none`, `luna profile --stack-floor` and
 None of that is queryable today, so golden queries 4-6 and 9 of
 `cartouche_corpus.md` answer for an older tool.
 
+Reproduce: `snes_search("luna profile --stack-floor sp_min deepest stack
+pointer gate exit code", exclude_sources=[opensnes-docs, opensnes-notes-tech])`
+→ two WDC-manual fragments and one `luna-docs` chunk (`33ab516edca6fb25`)
+that shows `--from-frame --until-frame --top`, no `--stack-floor`
+(2026-09-22).
+
 **Ask:** re-capture `luna-docs` (README, docs, CHANGELOG) at every luna
 tag. luna can tell you directly when it tags — we have asked them to, and
 we will re-run the golden queries at each pin bump and report if the
@@ -51,40 +57,67 @@ idles high (1s for ever) and an empty port returns 0s — but that is an
 emulator consensus, not a measurement; luna's own caveat is that a floating
 line on real silicon may read high.
 
+Reproduce (2026-09-22): `snes_search("What does an unplugged (empty)
+controller port read: auto-joypad $4218/$4219 value with no controller, and
+manual $4016/$4017 serial clocking past bit 16 — data line idle high or
+low?", exclude_sources=[…], k=6)` → sfc-dev-wiki JOY1L/JOYSER1 bit maps
+(`d867f1d7f4d8c40a`, `36528163bfc15466`), anomie-timing's auto-read timing
+(`60e7a00b7d843371`), wikibooks' "0000 = standard controller"
+(`5dee6ebd90c1db9d`) — the bit layouts and the timing, never the value of
+an empty port.
+
 **Ask:** either point us to a source that states it (we would rather cite
 than measure), or carry it as what it is — *"modelled identically by three
 emulators, unmeasured"* — so the next person who asks gets that answer
 instead of nothing. It is on our real-console checklist
 (`docs/HARDWARE_VERIFICATION.md`); we will send the trace when we have one.
 
-### S3 — two DSP-1 facts measured on the real firmware that no reference states
+### S3 — DSP-1 `Distance`: one fact measured on the real firmware, and a bug sneslab names but does not describe
 
-**Kind:** measured facts, provenance = luna running the DSP-1B firmware.
-**Cost:** editorial.
+**Kind:** a measured fact + a passage to complete. **Cost:** editorial.
 
-Running the real `dsp1b.rom` in luna contradicted our own header twice, and
-we could find no reference (mame-upd7725, the NEC bitsavers manuals,
-jsgroth-dsp1, nesdev-thread-dsp1-homebrew) that states either:
+First, a correction of our own record. Our 2026-09-20 note to luna said
+that "no hardware reference we could find states" what `Range` returns.
+That was wrong, and the corpus proves it: the official manual, Book II
+§5.2.2 (`nintendo-devmanual-book2`, chunk `5aaea1619232b3b3`), gives
+`Range` = code 18H, output `D[T/H2]`, and "subtracts the square of the
+specified range from the square of the vector size". Our header had
+described a raw difference; the manual said squared all along. Withdrawn
+as a corpus gap — it was a reading gap, and a query would have caught it.
 
-- `Distance` ($28): reads **one low on exact lengths** — (3, 4, 12) returns
-  12, not 13; (300, 400, 0) returns 499.
-- `Range` ($1A): returns **(x² + y² + z² − r²) >> 15**, the squared
-  difference shifted, not the raw difference the docs describe.
+What remains, on `Distance` (code 28H, manual §5.2.3, chunk
+`a0ebc4dee389b377`, output `R[I/T]`, no statement about rounding):
 
-Both are pinned by `devtools/libtests_dsp1` (17 vectors against the real
-firmware) and documented in `lib/include/snes/dsp1.h`.
+- **Measured on the DSP-1B firmware in luna** (`devtools/libtests_dsp1`,
+  17 vectors): `Distance` reads **one low on exact lengths** — (3, 4, 12)
+  returns 12, not 13; (300, 400, 0) returns 499; (0, 0, 10000) returns 9999.
+- **sneslab-wiki** (`DSP1/Distance`, chunk `d789432d05d502eb`) says "It is
+  bugged in DSP1/DSP1A and fixed in DSP1B" and cites bsnes
+  `dsp1emu.cpp#L395` — but never says what the bug is. Our one-low result
+  is on the *fixed* chip, so either the 1B behaviour is the intended
+  rounding (truncation of √), or the "fix" is something else.
 
-**Ask:** which source should carry these — a re-capture of
-`opensnes-notes-tech` / `opensnes-docs` (see S4), or a dedicated "measured
-facts" entry with the provenance above? We will keep them marked *measured,
-not referenced* until a reference appears.
+**Ask:** (a) capture the bsnes `dsp1emu.cpp` comment sneslab points to, or
+whatever states what the DSP1/1A bug was, so the passage stops being a
+dangling claim; (b) carry the 1B measurement as *"measured on DSP-1B
+firmware under luna, 2026-09-20; consistent with truncating √"* until a
+reference states the rounding.
+
+Reproduce our queries:
+`snes_search("DSP-1 command $28 Distance exact result rounding … command $1A Range …")`
+→ sneslab `d789432d05d502eb`, `d6a1ce185520a302`; the manual surfaced only
+on the second, sneslab-vocabulary query (`snes_search("sneslab DSP1 Range
+opcode 1A input parameters output D …")` → `5aaea1619232b3b3`). Note the
+first query used the wrong code ($1A for $18) and still found sneslab, not
+the manual — the manual's "Code: 18H" is the token that ranks it.
 
 ### S4 — our own two sources are three weeks stale
 
 **Kind:** re-capture. **Cost:** small.
 
 `opensnes-docs` and `opensnes-notes-tech` were captured 2026-09-03. Since
-then: 20 headers rewritten, 24 tutorials (three new), the hardware
+then: 20 headers rewritten, 27 tutorials (three new: framework, object,
+text), the hardware
 verification protocol, `KNOWN_LIMITATIONS.md` with the v0.44.0 entries,
 and the DSP-1 facts above. They are the negative-control source of our
 golden queries (`N`: cc65816 push order must be answered by us, never by
@@ -100,7 +133,7 @@ release tag from now on (the tag is the natural capture point).
 | S1 | re-capture `luna-docs` at every luna tag | the corpus is how a session learns luna's flags without re-reading `--help` |
 | S4 | re-capture our two sources at `v0.44.0` | our negative control, and the DSP-1 facts ride along |
 | S2 | the unplugged-port model, as a stated hypothesis | blocks one public function's fix from being *cited* rather than *asserted* |
-| S3 | a home for measured facts | so the next SDK does not rediscover them |
+| S3 | the `Distance` bug named, the 1B rounding carried | so the next SDK does not rediscover it — and so we stop citing "no reference" when there is one |
 
 ## 4. Small observations (no ask)
 

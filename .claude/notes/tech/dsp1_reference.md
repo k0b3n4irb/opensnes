@@ -80,8 +80,12 @@ Each operand slot is **typed** — there is no single global format. ★
 - ◆ One source's summary mislabels A as "8-bit" — treated as a transcription
   error; every command reads a full 16-bit angle word.
 - `Multiply` ($00) rounds to ≤15 bits (1.15×1.15→1.15), **not** a full 32-bit
-  product. `Radius` (squared length) and `Distance` (rounded length) are the
-  magnitude ops.
+  product. `Radius` (squared length) and `Distance` (length, **one low on exact
+  lengths** as measured on the 1B firmware — (3,4,12) → 12; sneslab says
+  the command was bugged on DSP1/1A and fixed on 1B, bug unspecified) are
+  the magnitude ops. `Range` is magnitude² − range², **stated by the
+  official manual** (Book II §5.2.2, code 18H, output H2) — our header had
+  read it as a raw difference until 2026-09-20.
 
 ## 5. Command table (full firmware set)
 
@@ -99,8 +103,8 @@ In/Out = number of **16-bit words**. Consolidated from snes9x `dsp1.cpp`
 | Opcode | Name | In | Out | Purpose |
 |--------|------|----|----|---------|
 | `$08` | Radius | 3 (I×3) | 2 (32-bit) | x²+y²+z² (squared) ★ |
-| `$18`,`$38` | Range | 4 | 1 | magnitude²−range² (sphere test / LOD) ★ |
-| `$28` | Distance | 3 | 1 | √(x²+y²+z²) rounded ★ |
+| `$18`,`$38` | Range | 4 | 1 | (magnitude²−range²) >> 15 — manual Book II §5.2.2 (sphere test / LOD) ★ |
+| `$28` | Distance | 3 | 1 | √(x²+y²+z²), one low on exact lengths on 1B (measured) ★ |
 
 ### Rotation
 | Opcode | Name | In | Out | Purpose |
