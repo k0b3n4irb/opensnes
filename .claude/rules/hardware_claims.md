@@ -71,3 +71,7 @@ moment of doubt*.
 - `.claude/notes/chantiers/hardware_docs_audit.md` — the 2026-09 audit
   that motivated this rule (10 findings, all documentation-side; the
   lib was already correct everywhere).
+- `.claude/rules/partners.md` — the corpus (snes-rag) is one of the two
+  partners this project stands on, and a query that comes back empty,
+  wrong or unsettled is owed to it in writing
+  (`.claude/notes/partners/snes-rag/OPEN_snes-rag.md`), the same day.

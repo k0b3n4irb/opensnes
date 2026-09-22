@@ -67,3 +67,6 @@ scaffolding. The finished building is luna.
   the transitory-tooling discipline on top.
 - The owner runs luna engineering: validated capability requests become luna
   issues (`gh issue create --repo k0b3n4irb/luna`), tracked to deletion here.
+- `.claude/rules/partners.md` — luna is one of the two partners this project
+  stands on; reports to and from it live in `.claude/notes/partners/luna/`,
+  and every note luna sends gets a written answer.

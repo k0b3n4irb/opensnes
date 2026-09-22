@@ -80,5 +80,8 @@ generic compiler words; the lexical side of the ranking is strong.
 - `.claude/rules/hardware_claims.md` — the rule this note serves.
 - `.claude/notes/chantiers/hardware_docs_audit.md` — the 2026-09 audit
   whose golden queries lived outside the repo until this note.
-- `~/opensnes_reports/opensnes_report_snes-rag_2026-09-1{1,2}*.md` — the
-  request and validation reports sent to the corpus team (owner's machine).
+- `.claude/notes/partners/snes-rag/` — the request and validation reports
+  sent to the corpus team (2026-09-11, 2026-09-12; moved into the repo from
+  the owner's machine on 2026-09-22) and `OPEN_snes-rag.md`, the report
+  being accumulated for the next send. The contract with the corpus team
+  is `.claude/rules/partners.md`.

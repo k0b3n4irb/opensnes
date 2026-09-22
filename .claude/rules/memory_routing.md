@@ -24,6 +24,7 @@ versioned, shared, and survives clones. Migration completed 2026-05-10.
 | FIXED bugs preserved for context | `.claude/notes/archive/` | mktype UB, JSL codegen bug |
 | Structured project reviews | `.claude/notes/reviews/` | dated `YYYY-MM-DD_topic.md` |
 | Sub-project notes | `.claude/notes/projects/` | RPG project asset references |
+| Reports to / from luna and snes-rag | `.claude/notes/partners/<partner>/` | a capability request, the partner's reply, the open list of gaps (`.claude/rules/partners.md`) |
 | **User-specific cross-project preferences** | `~/.claude/projects/.../memory/` | personal grep style, editor habits |
 
 ## Routing rule for new entries
