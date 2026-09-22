@@ -72,10 +72,11 @@ down". A caller that wanted the auto-repeat mask must move to
   bank** (`irqSet`, the LZSS decoder, `dmaCopyOam`, the SRAM block copies,
   `OAM_SET_GFX`) — a table outside bank $00 was read from the wrong one.
 - fix(lib): **three argument bugs that symmetric test inputs were
-  hiding**: `snesmodFadeVolume` read the wrong stack slot,
+  hiding** — `snesmodFadeVolume` read the wrong stack slot,
   `gsuSetupHdmaBlanking` had two arguments swapped, `hdmaColorGradient`
-  emitted a malformed table, and `snesmodPlayEffect` did not mask its
-  packed fields.
+  emitted a malformed table — plus `snesmodPlayEffect` not masking its
+  packed fields. Equal or zero values for distinct parameters is why they
+  had survived; every new vector uses distinct ones.
 - fix(lib): **`objCollidObj` returned garbage on its first call**, and the
   object workspace wrote back list links over `onscreen`. Plus a pool leak
   in `objKillAll`, unguarded null callbacks, and the documented scene-swap
@@ -93,9 +94,11 @@ down". A caller that wanted the auto-repeat mask must move to
   `nmiSet(NULL)`, `fix32Div` by zero, a `mapLoad` clamp, an
   `hdmaWaveH` clamp, an `oamMetaDrawDyn` bound, the profile module, the
   SA-1 CCNT constants.
-- fix(lib,docs): two DSP-1 commands did the opposite of their
-  documentation: `Distance` reads one low on exact lengths, `Range`
-  returns the squared difference shifted right by 15.
+- fix(lib,docs): two DSP-1 commands contradicted their own documentation,
+  which running the real firmware settled: `Distance` reads one low on
+  exact lengths ((3,4,12) gives 12), and `Range` returns the squared
+  difference shifted right by 15, not the raw difference. No hardware
+  reference we could find states either.
 
 ### Added
 - feat(lib): **the audio and SRAM APIs report their failures.**
