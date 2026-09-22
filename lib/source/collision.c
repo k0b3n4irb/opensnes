@@ -27,7 +27,7 @@
  * Rectangle Collision Functions
  *============================================================================*/
 
-u8 collideRect(Rect *a, Rect *b) {
+u8 collideRect(const Rect *a, const Rect *b) {
     s16 aRight, aBottom;
     s16 bRight, bBottom;
 
@@ -47,7 +47,7 @@ u8 collideRect(Rect *a, Rect *b) {
     return 1;
 }
 
-u8 collidePoint(s16 x, s16 y, Rect *r) {
+u8 collidePoint(s16 x, s16 y, const Rect *r) {
     s16 rRight, rBottom;
 
     rRight = r->x + r->width;
@@ -61,7 +61,7 @@ u8 collidePoint(s16 x, s16 y, Rect *r) {
     return 1;
 }
 
-u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY) {
+u8 collideRectEx(const Rect *a, const Rect *b, s16 *overlapX, s16 *overlapY) {
     s16 aRight, aBottom;
     s16 bRight, bBottom;
     s16 dx1, dx2, dy1, dy2;
@@ -167,7 +167,7 @@ u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize) {
     return tilemap[offset];
 }
 
-u8 collideRectTile(Rect *r, const u8 *tilemap, u16 mapWidth) {
+u8 collideRectTile(const Rect *r, const u8 *tilemap, u16 mapWidth) {
     s16 right, bottom;
 
     right = r->x + r->width - 1;
@@ -198,12 +198,12 @@ void rectSetPos(Rect *r, s16 x, s16 y) {
     r->y = y;
 }
 
-void rectGetCenter(Rect *r, s16 *cx, s16 *cy) {
+void rectGetCenter(const Rect *r, s16 *cx, s16 *cy) {
     *cx = r->x + (r->width >> 1);
     *cy = r->y + (r->height >> 1);
 }
 
-u8 rectContains(Rect *inner, Rect *outer) {
+u8 rectContains(const Rect *inner, const Rect *outer) {
     s16 innerRight, innerBottom;
     s16 outerRight, outerBottom;
 

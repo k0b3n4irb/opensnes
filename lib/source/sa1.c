@@ -11,6 +11,11 @@
 /* sa1_status is set by crt0.asm during SA-1 init ($A5=OK, $00=failed) */
 extern u8 sa1_status;
 
-u8 sa1Init(void) {
+u8 sa1IsReady(void) {
     return (sa1_status == SA1_READY_MAGIC) ? 1 : 0;
+}
+
+/* The deprecated name, kept until the next major. */
+u8 sa1Init(void) {
+    return sa1IsReady();
 }

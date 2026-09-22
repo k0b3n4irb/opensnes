@@ -1,0 +1,16 @@
+# snesmodPause: X at frame 60, never resumed. Measured: the sequencer stops
+# and every envelope is 0 at 200, 300 and 400; the idle run has voices
+# sounding at each of those frames. (First measured with the wrong mask —
+# 0x4000 is Y, X is 0x0040 — which "proved" pause a no-op; it is not.)
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+frames = 300
+input = "60:0x0040,64:0"
+[asserts.dsp]
+V0_ENVX = 0
+V1_ENVX = 0
+V2_ENVX = 0
+V3_ENVX = 0
+V4_ENVX = 0
+V5_ENVX = 0
+V6_ENVX = 0
+V7_ENVX = 0

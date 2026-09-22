@@ -475,6 +475,48 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 The address of a local variable had an undefined bank (fixed 2026-09-21)
+
+`&local` is a far pointer like any other, but the compiler stored only its
+16-bit stack address: the bank half of the pointer kept whatever the stack
+held in that slot. Harmless for a bank-blind access (a plain `T *`
+dereference ignores the bank), wrong for every reader that honours it — a
+`const T *` parameter (far reads since #121), a library routine reading the
+bank byte of its argument. It survived because a slot never used before reads
+0 after power-on, which happens to be the stack's bank; once earlier calls
+had dirtied the slot the callee read a wild bank.
+
+Found by the library fixture: `collideRect(&a, &b)` on two local `Rect`s
+started returning 0 when an unrelated audio vector changed the stack residue
+— two commits after the collision parameters became `const Rect *`. Fixed in
+the QBE fork (`compiler/PINS.md`); pinned by
+`devtools/compiler-tests/cases/addr_of_local_bank`.
+
+### 🟢 HiROM: every C pointer to RAM carried a ROM bank (fixed 2026-09-20)
+
+HiROM units are assembled under `.BASE $C0`, and wlalink's `:label` operator
+added that base to the bank of a label even when the label was a RAM
+variable: `pea.w :var` pushed `$C0`. `$C0:xxxx` is ROM on HiROM, so any
+routine that honours the bank byte of the pointer it is given — which is the
+direction the whole library has been moving in — read or wrote ROM instead of
+work RAM when handed a RAM buffer on a HiROM build. LoROM was unaffected
+(`$80:xxxx`, the FastROM case, still mirrors work RAM below `$2000`).
+
+Fixed in the wlalink fork (`compiler/PINS.md`, third local patch). Found by
+the first HiROM library fixture, `devtools/libtests_hirom`: an SRAM save from
+a const template worked, the load into a RAM buffer wrote nowhere.
+
+### 🟢 SRAM used the LoROM address on every build (fixed 2026-09-20)
+
+`lib/source/sram.asm` hard-coded `$70:0000`. On HiROM, battery RAM is at
+`$30-$3F:$6000-$7FFF` (fullsnes, "SNES Memory Map / Battery-backed SRAM"), so
+a HiROM game saved into open bus. The module now maps per build; on HiROM it
+addresses the first 8 KB window only. **SA-1 + `USE_SRAM=1` is refused at
+build time**: SA-1 save memory is BW-RAM, writable from the SNES CPU only
+after enabling it, which the library does not do.
+
+**Mitigation (SA-1):** none in the library yet — write BW-RAM from SA-1 code.
+
 ### 🟢 `sramClear()` wrote a byte ramp instead of zeros (fixed 2026-09-15)
 
 `lib/source/sram.asm`'s clear loop compared the 16-bit index through the

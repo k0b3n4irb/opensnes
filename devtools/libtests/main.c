@@ -17,6 +17,12 @@
  * Globals live in bank $00 WRAM (< $2000), so `--assert 00:<off>=<bytes>`
  * reads them. Values are little-endian.
  */
+/* This fixture calls deprecated functions ON PURPOSE: as long as they are
+ * shipped they keep their vectors. Silence the clang pre-pass for them. */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include <snes.h>
 #include <snes/anim.h>
 #include <snes/math.h>
@@ -27,6 +33,18 @@
 #include <snes/window.h>
 #include <snes/sram.h>
 #include <snes/interrupt.h>
+#include <snes/input.h>
+#include <snes/object.h>
+#include <snes/scene.h>
+#include <snes/colormath.h>
+#include <snes/mosaic.h>
+#include <snes/profile.h>
+#include <snes/registers.h>
+/* Deprecated names keep their vector while they ship (scopeButtonsDown,
+ * mosaicEnable, colorMathEnable, rand, srand). */
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -222,13 +240,136 @@ u16 r_irq_b;        /* irqDisable, 3 more frames             -> 10 */
 u16 r_irq_c;        /* irqSetBank + H|V timer, 2 frames      -> 12 */
 u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
 
+/* object engine: the two behaviours fixed on 2026-09-18.
+ *
+ *  - The workspace write-back. An update callback that looks at another
+ *    object leaves THAT object in the single workspace; the engine then
+ *    copied it over the slot being updated, so the enemy silently became a
+ *    copy of what it looked at. The workspace is owner-tracked now: the
+ *    edit made before the peek must survive (r_obj_edit), the peeking
+ *    object must keep its own type (r_obj_type), and the object peeked at
+ *    must be untouched (r_obj_other).
+ *  - The null-callback guard. Type 1 below is never registered. Updating an
+ *    object of that type used to dispatch to $00:0000; reaching r_obj_alive
+ *    at all is the assert.
+ */
+u16 r_obj_type;     /* peeker's type after the update   -> 0 (not 1)      */
+u16 r_obj_edit;     /* peeker's yvel, set before the peek -> 0x1234       */
+u16 r_obj_other;    /* the other object's yvel            -> 0x0BAD kept  */
+u16 r_obj_fr_off;   /* objCollidMap1D, friction off: xvel  -> 0x0300 kept  */
+u16 r_obj_fr_x;     /* friction 0x0100: xvel 0x0300       -> 0x0200       */
+u16 r_obj_fr_y;     /* friction 0x0100: yvel -0x0080      -> 0 (clamped)  */
+u16 r_obj_pool;     /* objNew successes after objKillAll  -> 80 (was 79)  */
+u16 r_obj_calls;    /* update callback invocations        -> 1            */
+u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
+static u16 obj_peeker, obj_other;
+static u16 obj_calls;
+
+static void objPeekUpdate(u16 idx) {
+    obj_calls++;
+    objWorkspace.yvel = 0x1234;        /* an edit made BEFORE the peek */
+    objGetPointer(obj_other);          /* workspace now holds the other one */
+    /* ...and we return without restoring it: the trap. */
+}
+
+/* --- coverage lot B (2026-09-19): public functions nothing executed. Every
+ * vector asserts the function's EFFECT — a call with no observable result
+ * is not a test. PPU-side effects (colormath, video, mosaic, mode7, the
+ * DMA variants, oamSetTile) are asserted from luna's PPU view in
+ * test_libtest.py; the rest lands in these globals. The hdma module is not
+ * linked here: its wave tables take 1346 bytes of bank-$00 RAM and this
+ * fixture has 1266 free — its helpers get their own fixture (lot C), which
+ * also holds nmiSet. */
+u16 r_fix_abs_n;    /* fixAbs(FIX(-3))                          -> 0x0300 */
+u16 r_fix_abs_p;    /* fixAbs(FIX(2))                           -> 0x0200 */
+u16 r_fix_clamp_lo; /* fixClamp(FIX(-9), FIX(-1), FIX(1))       -> 0xFF00 */
+u16 r_fix_clamp_hi; /* fixClamp(FIX(9),  FIX(-1), FIX(1))       -> 0x0100 */
+u16 r_fix_clamp_in; /* fixClamp(fx_half, FIX(-1), FIX(1))       -> 0x0080 */
+u16 r_fix_sqrt;     /* fixSqrt(FIX(16))                         -> 0x0400 */
+u16 r_atan_e;       /* atan2_8(dy 0,   dx 10): +X               -> 0   */
+u16 r_atan_s;       /* atan2_8(dy 10,  dx 0):  +Y, down         -> 64  */
+u16 r_atan_w;       /* atan2_8(dy 0,   dx -10)                  -> 128 */
+u16 r_atan_n;       /* atan2_8(dy -10, dx 0)                    -> 192 */
+u16 r_atan_se;      /* atan2_8(dy 10,  dx 10): the LUT's last entry, now a
+                     * const table read far from an asset bank   -> 32  */
+u16 r_atan_lut;     /* atan2_8(dy 5,   dx 10): mid-LUT (atan 0.5 = 26.57 deg) -> 19 */
+u16 r_bg_sx;        /* bgSetScrollX(1, 300); bgGetScrollX(1)    -> 300 */
+u16 r_bg_sy;        /* bgSetScrollY(1, 77);  bgGetScrollY(1)    -> 77 */
+u16 r_bg_init;      /* bgInit(2) after bgSetScrollX(2, 5)       -> 0 */
+u16 r_text_x;       /* textGetX after "AB" on a fresh line       -> 2 */
+u16 r_text_flush;   /* tilemap_update_flag right after textFlush -> 1 */
+u16 r_frame_reset;  /* frame_count right after resetFrameCount   -> 0 */
+u16 r_pad_raw;      /* padRaw(0) idle | padRaw(7) out of range   -> 0 */
+u16 r_mouse;        /* no mouse: connected|x|y|held|pressed      -> 0 */
+u16 r_mouse_sens;   /* mouseSetSensitivity(0, HIGH) is deferred to the NMI, which
+                     * only talks to a mouse that is there: the getter stays 0 and
+                     * the request byte (mouseRequestChangeSensitivity[0], asserted
+                     * by symbol) reads 0x82 */
+extern u16 scope_down, scope_held;   /* crt0 words behind the scope getters */
+u16 r_scope_names;  /* scopeButtonsHeld reads scope_down, scopeButtonsRepeat scope_held -> 1 */
+u16 r_scope;        /* no scope: held|down|pressed|x|y|rawx|rawy -> 0 */
+u16 r_scope_delay;  /* scopeSetRepeatDelay(7): scope_repdelay    -> 7 */
+u16 r_obj_grav;     /* objInitGravity(0x40,0); objCollidMap in the air: yvel -> 0x40 */
+u16 r_obj_refresh;  /* objRefreshAll: the refresh callback ran   -> 1 */
+u16 r_obj_cobj;     /* objCollidObj, two 8x8 objects 4 px apart  -> 1 */
+u16 r_obj_cobj_h;   /* objCollidObj(handle, handle) on the two objects 40 px APART: the
+                     * index routines mask the id byte -> 0, plus 0x100 proving the handle
+                     * had an id byte to mask -> 0x0100. (Unmasked, both offsets land in
+                     * zeroed RAM past the pool and two empty boxes "touch": 0x0101.) */
+u16 r_obj_cobj_no;  /* objCollidObj, 40 px apart                 -> 0
+                     * (slot INDEXES, not handles: the routine shifts its
+                     * arguments by 64 with no mask, so a handle's id byte
+                     * lands in the offset — header fixed 2026-09-20) */
+u16 r_prof_frames;  /* profileGetFrameCount == frame_count       -> 1 */
+u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
+u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
+u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
+u16 r_cm_layers;    /* colorMathSetLayers(BG1) after (BG2): BG1 only -> 1 */
+u16 r_mosaic;       /* mosaicSetSize(20) clamps: mosaicGetSize   -> 15 */
+static const u8 lotb_vram[32] = {
+    0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
+    0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02,
+};
+static const u8 lotb_pal[4]  = { 0x1F, 0x00, 0xE0, 0x03 };   /* colours 250, 251: red, green */
+static const u8 lotb_pal2[4] = { 0x00, 0x7C, 0xFF, 0x7F };   /* colours 254, 255: blue, white */
+static u16 obj_refresh_calls;
+static void objRefreshProbe(u16 idx) { (void)idx; obj_refresh_calls++; }
+extern volatile u8 tilemap_update_flag;
+extern volatile u16 frame_count;
+extern u16 scope_repdelay;
+
+/* fixed32: the C body that fixed32.h says it cannot use. The header and
+ * lib/source/math.c both claim a qbe bug makes
+ * `(u32)(s32)fixSin(angle) << 8` produce 0x00FF0000 instead of 0xFFFF0000
+ * for sin(270 deg) = -1.0, and that this is why fix32Sin lives in asm.
+ * These two vectors compute it both ways and compare. */
+u32 r_f32sin_asm;   /* fix32Sin(192)                        -> 0xFFFF0000 */
+u32 r_f32sin_c;     /* (u32)(s32)fixSin(192) << 8, in C     -> must agree */
+static volatile u8 sin_angle = 192;   /* 270 degrees */
+
+/* input: a connected pad reads as connected even with nothing pressed.
+ * padIsConnected() used to reject $0000 as well as $FFFF, so an idle pad —
+ * the state a pad is in almost every frame — reported unplugged. fullsnes:
+ * the auto-joypad word's low nibble is the device signature and a standard
+ * joypad's is 0, so an idle pad reads exactly $0000. luna attaches a pad to
+ * port 1 by default and the fixture presses nothing, which is precisely the
+ * case that was broken. */
+u16 r_pad_conn;     /* padIsConnected(0) with no input -> 1 (TRUE was 0xFF until 2026-09-22) */
+u16 r_pad_idle;     /* padHeld(0) with no input        -> 0 */
+u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> 0 */
+u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
+
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
-u16 r_ispal;        /* isPAL()     -> FALSE 0 (TRUE = 0xFF under pal) */
-u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> TRUE (0xFF) */
+u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
+u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
+u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
+u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
+u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> 1 */
 u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 
 extern void irqTestHandler(void);   /* data.asm, bank 0 */
+extern void irqTestHandlerFar(void);/* data.asm, banks 7-1 */
 
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
@@ -236,50 +377,324 @@ DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
 DECLARE_ANIM_CLIP(clip_b, ANIM_LOOP, 1, 77, 88);
 DECLARE_ANIM_CLIP(clip_once, ANIM_ONCE, 1, 5, 6);
 
-int main(void) {
+/* --- bank-byte chantier (API audit 2026-09-20): functions that were handed
+ * a far pointer and dropped its bank. Every vector puts its data where the
+ * SDK puts const data by default — outside bank $00 — and uses values that
+ * differ from each other and from zero. */
+volatile u16 irq_count_far;
+u16 r_bank_irq;      /* plain irqSet on a handler in banks 7-1, 4 frames  -> 4 */
+u16 r_bank_irq_bk;   /* that handler is outside bank $00                   -> 1 */
+u16 r_bank_sram;     /* const template -> SRAM @0x300 -> RAM: equal bytes -> 16 */
+u16 r_sram_edge;     /* sramSaveOffset(tpl, 8, 0x1FF8): ends exactly at 8 KB        -> SRAM_OK (0) */
+u16 r_sram_range;    /* sramSaveOffset(tpl + 8, 16, 0x1FF8): 8 bytes too far        -> SRAM_ERR_RANGE (1) */
+u16 r_sram_kept;     /* ... and wrote nothing: the 8 edge bytes still match         -> 8 */
+u16 r_sram_ldrange;  /* sramLoadOffset(.., 16, 0x1FF8): code | buf[0] << 8, buffer untouched -> 0x5A01 */
+u16 r_sram_wrap;     /* sramSaveOffset(tpl, 16, 0xFFF8): offset + size wraps 64 KB  -> 1 */
+u16 r_bank_ck;       /* sramChecksum(const template) = XOR(0xA1..0xB0)    -> 0x10 */
+u16 r_crect_hit;     /* collideRect on two `static const Rect` (asset bank)  -> 1 */
+u16 r_crect_miss;    /* ... against a const Rect 100 px away                -> 0 */
+u16 r_crect_cx;      /* rectGetCenter of the const {10,20,16,8}: cx         -> 18 */
+u16 r_crect_cy;      /*                                          cy         -> 24 */
+u16 r_crect_bk;      /* the const Rect really is outside bank $00           -> 1 */
+static const Rect c_ra = { 10, 20, 16, 8 };
+static const Rect c_rb = { 20, 24, 16, 8 };
+static const Rect c_rc = { 110, 20, 16, 8 };
+u16 r_getptr_live;   /* objGetPointer(live handle): slot + 1                 -> 2 (slot 1) */
+u16 r_getptr_stale;  /* objGetPointer(handle of a killed object)            -> 0 */
+u16 r_scene_push;    /* scenePush successes on an empty 8-deep stack        -> 8 */
+u16 r_scene_full;    /* the ninth scenePush                                 -> 0 */
+u16 r_scene_pop;     /* scenePop with 8 scenes stacked                      -> 1 */
+static void sceneNop(void) {}
+static const Scene lot_scene = { 0, sceneNop };
+u16 r_f32div_zero;   /* fix32Div(FIX32(7), 0): the family convention        -> 0 */
+u16 r_bank_tpl_bk;   /* the template is outside bank $00                   -> 1 */
+static const u8 save_tpl[16] = {
+    0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8,
+    0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0,
+};
+static const u8 oam_rom[8] = {              /* sprites 0 and 1, from ROM */
+    0x4D, 0x58, 0x5A, 0x31,
+    0x21, 0x43, 0x65, 0x07,
+};
+u8 bank_load[16];
+
+static void coverage_bank_bytes(void) {
+    u8 i;
+
+    irq_count_far = 0;
+    irqSet((void *)irqTestHandlerFar);
+    irqSetVTimer(120);
+    WaitForVBlank();
+    irqEnable(IRQ_VTIMER);
+    for (i = 0; i < 4; i++) WaitForVBlank();
+    irqDisable();
+    irqClear();
+    r_bank_irq    = irq_count_far;
+    r_bank_irq_bk = ((u8)((u32)(void *)irqTestHandlerFar >> 16) != 0) ? 1 : 0;
+
+    for (i = 0; i < 16; i++) bank_load[i] = 0x55;
+    sramSaveOffset(save_tpl, 16, 0x300);
+    sramLoadOffset(bank_load, 16, 0x300);
+    r_bank_sram = 0;
+    for (i = 0; i < 16; i++) if (bank_load[i] == save_tpl[i]) r_bank_sram++;
+    r_bank_ck     = sramChecksum(save_tpl, 16);
+    /* bounds (2026-09-21): the fixture declares 8 KB (SRAM_SIZE default) */
+    r_sram_edge  = sramSaveOffset(save_tpl, 8, 0x1FF8);
+    r_sram_range = sramSaveOffset(save_tpl + 8, 16, 0x1FF8);
+    for (i = 0; i < 16; i++) bank_load[i] = 0x5A;
+    r_sram_ldrange = sramLoadOffset(bank_load, 16, 0x1FF8);
+    r_sram_ldrange |= (u16)bank_load[0] << 8;
+    sramLoadOffset(bank_load, 8, 0x1FF8);
+    r_sram_kept = 0;
+    for (i = 0; i < 8; i++) if (bank_load[i] == save_tpl[i]) r_sram_kept++;
+    r_sram_wrap  = sramSaveOffset(save_tpl, 16, 0xFFF8);
+    {
+        u16 h0, h1;
+        objInitEngine();
+        h0 = objNew(0, 8, 8);                  /* slot 0 */
+        h1 = objNew(0, 24, 8);                 /* slot 1 */
+        r_getptr_live = objGetPointer(h1);
+        objKill(h1);
+        r_getptr_stale = objGetPointer(h1);
+        (void)h0;
+        r_scene_push = 0;
+        for (i = 0; i < 8; i++) if (scenePush(&lot_scene)) r_scene_push++;
+        r_scene_full = scenePush(&lot_scene) ? 1 : 0;
+        sceneReplace(&lot_scene);
+        r_scene_pop = scenePop() ? 1 : 0;
+    }
+    {
+        s16 ccx, ccy;
+        r_crect_hit  = collideRect(&c_ra, &c_rb);
+        r_crect_miss = collideRect(&c_ra, &c_rc);
+        rectGetCenter(&c_ra, &ccx, &ccy);
+        r_crect_cx = (u16)ccx;
+        r_crect_cy = (u16)ccy;
+        r_crect_bk = ((u8)((u32)(const void *)&c_ra >> 16) != 0) ? 1 : 0;
+    }
+    {
+        u32 q = (u32)fix32Div(FIX32(7), 0);
+        r_f32div_zero = (u16)(q | (q >> 16));   /* every bit of the result */
+    }
+    r_bank_tpl_bk = ((u8)((u32)(const void *)save_tpl >> 16) != 0) ? 1 : 0;
+}
+
+/* --- coverage lot C (2026-09-20): audio v2 stop/unload, two sprite helpers,
+ * consoleInitEx. Runs last: it silences the voice the audio block left
+ * playing (audio_v2.toml asserts DSP registers, not liveness). */
+u16 r_aud_init;      /* audioInit()                                     -> AUDIO_OK (0) */
+u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
+u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
+u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
+u16 r_aud_noplay;    /* audioPlaySample(63), a slot never loaded        -> AUDIO_VOICE_NONE (0xFF) */
+u16 r_aud_on;        /* audioPlaySampleOn(6, 0, 100, CENTER, 0x1A2B): the voice asked for -> 6 */
+u16 r_aud_on_bad;    /* audioPlaySampleOn(8, ...): no such voice                   -> AUDIO_VOICE_NONE (0xFF) */
+u16 r_aud_on_rr;     /* the explicit voice did not advance the round-robin: next Ex -> 1 */
+u16 r_aud_v0_live;   /* voice 0 before the stop: active              -> 1 */
+u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
+u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
+u16 r_aud_all_stop;  /* audioStopAll(), 6 frames later: voice 1      -> 0 */
+u16 r_aud_unload;    /* audioGetSampleInfo(0) after audioUnloadSample -> AUDIO_ERR_NOT_LOADED (3) */
+u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xB500 */
+extern u8 oamMemory[];   /* crt0's OAM shadow ($7E:0300, mirrored in bank $00), read back here only */
+u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u8 t gave a = 2560) */
+u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
+u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
+                      * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
+u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
+static const MetaspriteItem lotc_meta[] = {
+    METASPR_ITEM(0, 0, 0, 0),
+    METASPR_ITEM(8, 0, 1, 0),
+    METASPR_TERM,
+};
+
+static void coverage_lot_c(void) {
+    AudioVoiceState vs;
+    AudioSample smp;
+    u8 i;
+
+    audioUpdate();                          /* v2 no-op, kept for source compatibility */
+    r_aud_badvoice = audioSetVoiceVolume(9, 60, 30);
+    r_aud_badstop  = audioStopVoice(8);
+    r_aud_setvol   = audioSetVolume(100);  /* 100: audio_v2.toml pins MVOL to it */
+    r_aud_noplay   = audioPlaySample(63);
+    audioGetVoiceState(0, &vs);
+    r_aud_v0_live = vs.active;
+    r_aud_on     = audioPlaySampleOn(6, 0, 100, AUDIO_PAN_CENTER, 0x1A2B);
+    r_aud_on_bad = audioPlaySampleOn(8, 0, 100, AUDIO_PAN_CENTER, 0x1000);
+    r_aud_on_rr  = audioPlaySampleEx(0, 100, AUDIO_PAN_CENTER, 0x1000);   /* round-robin: voice 1 */
+    audioStopVoice(0);
+    for (i = 0; i < 6; i++) WaitForVBlank();
+    audioGetVoiceState(0, &vs);
+    r_aud_v0_stop = vs.active;
+    audioGetVoiceState(1, &vs);
+    r_aud_v1_live = vs.active;
+    audioStopAll();
+    for (i = 0; i < 6; i++) WaitForVBlank();
+    audioGetVoiceState(1, &vs);
+    r_aud_all_stop = vs.active;
+    audioUnloadSample(0);
+    r_aud_unload = audioGetSampleInfo(0, &smp);
+    r_aud_unfree = audioGetFreeMemory();
+
+    /* sprites: a two-item metasprite mirrored in a 16-px-wide box lands its
+     * items swapped (dx = 16 - dx - 8) with the flip bit set; asserted on
+     * luna's OAM view. oamDynamicSetSize writes the per-sprite size table. */
+    {
+        u16 wide = 256;                     /* a variable: a literal 256 into a u8
+                                             * parameter is a compile error, the
+                                             * truncation of a variable is silent */
+        r_lerp_t256 = (u16)fixLerp(FIX(10), FIX(37), wide);
+        r_lerp_t300 = (u16)fixLerp(FIX(10), FIX(37), wide + 44);
+        oamSetX(0, 0x21);
+        oamSetY(1, 0x43);                   /* stored as y - 1 = 0x42 */
+        oamSetX(wide, 0x99);
+        oamSetY(wide + 1, 0x77);
+        r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
+    }
+    r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
+    oamDynamicSetSize(0, 16);
+    WaitForVBlank();
+    /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we
+     * are inside VBlank, and nothing re-arms the NMI's own OAM upload after
+     * this, so luna's final OAM view holds these two sprites. */
+    dmaCopyOam(oam_rom, 8);
+}
+
+/* Lot B runs in its own function: main()'s frame already puts the stack
+ * ~920 bytes deep during the audio driver's boot, and growing it with more
+ * temporaries pushed the stack into the result globals (found by
+ * --trace-writes on r_region: NmiHandler and cmd_send were the writers). */
+static void coverage_lot_b(void) {
+    u8 i;
+
+    r_fix_abs_n    = (u16)fixAbs(FIX(-3));
+    r_fix_abs_p    = (u16)fixAbs(FIX(2));
+    r_fix_clamp_lo = (u16)fixClamp(FIX(-9), FIX(-1), FIX(1));
+    r_fix_clamp_hi = (u16)fixClamp(FIX(9), FIX(-1), FIX(1));
+    r_fix_clamp_in = (u16)fixClamp(fx_half, FIX(-1), FIX(1));
+    r_fix_sqrt     = (u16)fixSqrt(FIX(16));
+    r_atan_e   = atan2_8(0, 10);
+    r_atan_s   = atan2_8(10, 0);
+    r_atan_w   = atan2_8(0, -10);
+    r_atan_n   = atan2_8(-10, 0);
+    r_atan_se  = atan2_8(10, 10);
+    r_atan_lut = atan2_8(5, 10);
+
+    bgSetScrollX(1, 300);
+    bgSetScrollY(1, 77);
+    r_bg_sx = bgGetScrollX(1);
+    r_bg_sy = bgGetScrollY(1);
+    bgSetScrollX(2, 5);
+    bgInit(2);
+    r_bg_init = bgGetScrollX(2);
+    /* bgInitTileSetData: 32 bytes to VRAM word 0x6000 (byte 0xC000, unused
+     * by this fixture), gfx pointer left alone (0xFF); test_libtest.py
+     * dumps VRAM and compares. The two DMA bank variants land next to it
+     * and in CGRAM 250-251; dmaTransfer, the raw one, in CGRAM 254-255. */
+    bgInitTileSetData(0xFF, lotb_vram, 16, 0x6000);
+    dmaFillVRAM(0x1234, 0x6100, 8);         /* a WORD fill: 34 12 34 12 ... (was 34 34) */
+    dmaCopyVramBank(lotb_vram + 16, (u8)((u32)(const void *)lotb_vram >> 16), 0x6008, 16);
+    dmaCopyCGramBank(lotb_pal, (u8)((u32)(const void *)lotb_pal >> 16), 250, 4);
+    WaitForVBlank();
+    REG_CGADD = 254;
+    dmaTransfer(1, 0x00, (u8)((u32)(const void *)lotb_pal2 >> 16), (u16)(u32)(const void *)lotb_pal2, 0x22, 4);
+    oamSetTile(3, 0x1AB);                   /* OAM byte 14 = 0xAB, byte 15 bit 0 = 1 */
+    WaitForVBlank();
+    dmaCopyOam(oamMemory, 544);             /* what the NMI does, done by hand */
+
+    textPutChar('\n');
+    textPrint("AB");
+    r_text_x = textGetX();
+    textFlush();
+    r_text_flush = tilemap_update_flag;
+    resetFrameCount();
+    r_frame_reset = frame_count;
+    mapSetMapOptions(MAP_OPT_1WAY | MAP_OPT_BG2);   /* mapoptions ($7E) asserted by symbol */
+    r_pad_raw = padRaw(0) | padRaw(7);
+    r_mouse = mouseIsConnected(0) | (u16)mouseGetX(0) | (u16)mouseGetY(0)
+            | mouseButtonsHeld(0) | mouseButtonsPressed(0);
+    mouseSetSensitivity(0, MOUSE_SENS_HIGH);
+    r_mouse_sens = mouseGetSensitivity(0);
+    /* N2: which name reads which crt0 word. No scope is plugged, so the NMI
+     * leaves these words alone and the fixture can plant them. */
+    scope_down = 0x0011; scope_held = 0x0022;
+    r_scope_names = (scopeButtonsHeld() == 0x0011 && scopeButtonsRepeat() == 0x0022
+                     && scopeButtonsDown() == 0x0011) ? 1 : 0;
+    scope_down = 0; scope_held = 0;
+    r_scope = scopeButtonsHeld() | scopeButtonsRepeat() | scopeButtonsPressed()
+            | scopeGetX() | scopeGetY() | scopeGetRawX() | scopeGetRawY();
+    scopeSetRepeatDelay(7);
+    r_scope_delay = scope_repdelay;
+    (void)scopeSinceShot();
+
+    /* object engine: gravity, refresh, object-object collision */
+    objInitEngine();
+    objInitFunctions(0, 0, 0, objRefreshProbe);
+    objInitGravity(0x0040, 0);
+    obj_peeker = objNew(0, 16, 16);        /* in the air over the loaded map */
+    objGetPointer(obj_peeker);
+    objWorkspace.width = 8; objWorkspace.height = 8; objWorkspace.yvel = 0;
+    objCollidMap(obj_peeker & 0xFF);
+    r_obj_grav = (u16)objWorkspace.yvel;
+    obj_other = objNew(0, 20, 20);          /* overlaps the first one */
+    objGetPointer(obj_other);
+    objWorkspace.width = 8; objWorkspace.height = 8;
+    objUpdateAll();                         /* computes onscreen for both */
+    obj_refresh_calls = 0;
+    objRefreshAll();
+    r_obj_refresh = obj_refresh_calls;
+    r_obj_cobj = objCollidObj(obj_peeker & 0xFF, obj_other & 0xFF);
+    objGetPointer(obj_other);
+    objWorkspace.xpos[1] = 60;              /* 40 px to the right: apart */
+    objUpdateAll();
+    r_obj_cobj_no = objCollidObj(obj_peeker & 0xFF, obj_other & 0xFF);
+    r_obj_cobj_h = objCollidObj(obj_peeker, obj_other) | ((obj_peeker >> 8) ? 0x100 : 0);
+
+    /* profile: the frame counter it reads is crt0's; a scanline is < 262 */
+    profileInit();
+    r_prof_frames = (profileGetFrameCount() == frame_count) ? 1 : 0;
+    r_prof_scan   = (profileGetScanline() < 262) ? 1 : 0;
+    r_prof_lag    = profileGetLagFrames();
+    profileColorStart(2);
+    profileScanlineStart();
+    for (i = 0; i < 200; i++) { r_prof_lines = (u16)(r_prof_lines + i); if (i == 255) break; }
+    r_prof_lines = profileScanlineEnd();
+    profileColorEnd();
+
+    /* PPU-side, asserted in test_libtest.py: mosaic, SETINI, colour math.
+     * profileInit wrote CGADSUB/COLDATA above; colour math last. (Mode 7 is
+     * not linked here: its sine table is 256 bytes of bank-$00 RAM this
+     * fixture does not have — see the second fixture, lot C.) */
+    mosaicSetSize(20);
+    r_mosaic = mosaicGetSize();
+    /* N3: the "SetLayers" pair REPLACES the set — the deprecated name is the
+     * first call so it stays executed while it ships. MOSAIC ends 0xF1. */
+    mosaicEnable(MOSAIC_BG2);
+    mosaicSetLayers(MOSAIC_BG1);
+    colorMathEnable(COLORMATH_BG2);
+    colorMathSetLayers(COLORMATH_BG1);
+    r_cm_layers = cgadsub & 0x3F;
+    videoSetObjInterlace(1);
+    videoSetOverscan(1);
+    videoSetPseudoHires(1);
+    videoSetPseudoHires(0);
+    colorMathTransparency50(COLORMATH_BG1);
+    colorMathSetCondition(COLORMATH_INSIDE);
+    colorMathSetBrightness(10);
+    colorMathSetChannel(COLDATA_BLUE, 20);
+
+}
+
+/* main() used to hold everything below in ONE frame: 734 bytes, which with
+ * the audio boot, the NMI and cmd_send on top reached down into the result
+ * globals (second time: s_map_width / s_cursor_y, 2026-09-21; the first is
+ * told above coverage_lot_b). Each part has its own frame now, released
+ * before the next one runs; the order of execution is unchanged. */
+static void part_math_anim(void) {
     u8 i;
     AnimPlayer ap = ANIM_PLAYER_INIT;
     RmwProbe rmw;
-
-    /* audio v2 first: audioInit blocks on the APU boot + driver upload
-     * (the longest single step of the fixture — see STEPS in
-     * test_libtest.py). Known DSP vectors for the spc-dump probe:
-     * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
-    audioInit();
-    r_audio_ready = audioIsReady();
-    audioSetVolume(100);
-    r_audio_vol = audioGetVolume();
-    audioSetVoiceVolume(2, 80, 40);
-    audioSetVoicePitch(3, 0x1234);
-    audioSetADSR(1, 15, 7, 7, 8);
-    audioSetGain(4, 0x5A);
-
-    /* phase 2: stream the beep into ARAM, then key it on voice 0
-     * (round-robin starts there). Probe asserts the ARAM bytes, the
-     * directory entry, and the playing voice's DSP state. */
-    r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
-    r_audio_free = audioGetFreeMemory();
-    {
-        AudioSample s;
-        if (audioGetSampleInfo(0, &s) == AUDIO_OK) {
-            r_audio_addr = s.spcAddress;
-        }
-    }
-    r_audio_voice = audioPlaySampleEx(0, 127, AUDIO_PAN_CENTER, 0x1000);
-
-    /* phase 3: hall on voice 0's beep + live envelope readback. The
-     * echo values are arbitrary-but-distinct probe vectors. */
-    audioSetEcho(3, 40, 20, 20);
-    {
-        static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
-        audioSetEchoFilter(fir);
-    }
-    audioEnableEcho(0x01);
-    {
-        AudioVoiceState vs;
-        audioGetVoiceState(0, &vs);
-        r_audio_active = vs.active;
-    }
 
     r_fmul_a    = (u16)fixMul(FIX(2), fx_half);
     r_fmul_neg  = (u16)fixMul(FIX(-3), FIX(2));
@@ -365,7 +780,9 @@ int main(void) {
         WaitForVBlank();
     }
     nmiClear();
+}
 
+static void part_collision_sram(void) {
     /* --- L2c: collision --- */
     {
         Rect a, b, c, in, r;
@@ -421,10 +838,72 @@ int main(void) {
         r_sram_clear = 0;
         for (k = 0; k < 16; k++) r_sram_clear |= load_buf[k];
     }
+}
+
+static void part_objects_irq(void) {
+    u8 i;
+
+    /* --- object engine: owner-tracked workspace + null-callback guard ---
+     * Runs after mapLoad() above, so the camera globals the update pass
+     * culls against are initialised. */
+    objInitEngine();
+    objInitFunctions(0, 0, objPeekUpdate, 0);   /* typed: no casts */
+    /* type 1 is deliberately never registered */
+    obj_peeker = objNew(0, 16, 16);
+    objGetPointer(obj_peeker);
+    objWorkspace.width = 8; objWorkspace.height = 8;
+    obj_other = objNew(1, 32, 16);
+    objGetPointer(obj_other);
+    objWorkspace.yvel = 0x0BAD;
+    objGetPointer(obj_peeker);         /* reloading flushes the edit above */
+    objUpdateAll();
+    r_obj_alive = 0xA11E;
+    r_obj_calls = obj_calls;
+    objGetPointer(obj_peeker);
+    r_obj_type = objWorkspace.type;
+    r_obj_edit = (u16)objWorkspace.yvel;
+    objGetPointer(obj_other);
+    r_obj_other = (u16)objWorkspace.yvel;
+
+    /* --- objCollidMap1D friction: off by default, opt-in, clamped at 0 --- */
+    objGetPointer(obj_peeker);
+    objWorkspace.xvel = 0x0300; objWorkspace.yvel = (s16)-0x0080;
+    objCollidMap1D(obj_peeker & 0xFF);
+    r_obj_fr_off = (u16)objWorkspace.xvel;          /* untouched: 0x0300 */
+    objInitFriction1D(0x0100);
+    objCollidMap1D(obj_peeker & 0xFF);
+    r_obj_fr_x = (u16)objWorkspace.xvel;            /* 0x0200 */
+    r_obj_fr_y = (u16)objWorkspace.yvel;            /* -0x80 + 0x100 clamps to 0 */
+
+    /* --- objKillAll must give the whole pool back. Slot 0 (type 0) is
+     * killed before slot 1 (type 1), so slot 1 ends up ahead of slot 0 on
+     * the free list — the case the old forced head-reset leaked. --- */
+    objInitEngine();
+    objNew(0, 16, 16);
+    objNew(1, 32, 16);
+    objKillAll();
+    r_obj_pool = 0;
+    while (objNew(1, 16, 16) != 0) r_obj_pool++;
+
+    /* --- fixed32: the asm sine against the C expression it replaced --- */
+    r_f32sin_asm = (u32)fix32Sin(sin_angle);
+    r_f32sin_c   = (u32)((u32)(s32)fixSin(sin_angle) << 8);
+
+    /* --- input: the idle-pad connection test (see the comment above) --- */
+    r_pad_conn  = padIsConnected(0);
+    r_pad_idle  = padHeld(0);
+    r_pad_conn4 = padIsConnected(4);
+    r_pad_oob   = padIsConnected(9);
 
     /* --- L2c: console region + vblank flag --- */
     r_region = getRegion();
     r_ispal  = isPAL();
+    /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
+     * generator: same seed, same first value, never 0. */
+    rngSeed(0x1234); r_rng = rngNext();
+    srand(0x1234);
+    r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
+    r_true_one = (isPAL() == getRegion() && TRUE == 1) ? 1 : 0;   /* N1: one truth value */
     WaitForVBlank();
     r_invb_in = isInVBlank();
     while (isInVBlank()) { }
@@ -452,6 +931,58 @@ int main(void) {
     for (i = 0; i < 2; i++) WaitForVBlank();
     r_irq_d = irq_count;
     irqDisable();
+}
+
+int main(void) {
+
+    /* audio v2 first: audioInit blocks on the APU boot + driver upload
+     * (the longest single step of the fixture — see STEPS in
+     * test_libtest.py). Known DSP vectors for the spc-dump probe:
+     * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
+    r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
+    r_audio_ready = audioIsReady();
+    audioSetVolume(100);
+    r_audio_vol = audioGetVolume();
+    audioSetVoiceVolume(2, 80, 40);
+    audioSetVoicePitch(3, 0x1234);
+    audioSetADSR(1, 15, 7, 7, 8);
+    audioSetGain(4, 0x5A);
+
+    /* phase 2: stream the beep into ARAM, then key it on voice 0
+     * (round-robin starts there). Probe asserts the ARAM bytes, the
+     * directory entry, and the playing voice's DSP state. */
+    r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    r_audio_free = audioGetFreeMemory();
+    {
+        AudioSample s;
+        if (audioGetSampleInfo(0, &s) == AUDIO_OK) {
+            r_audio_addr = s.spcAddress;
+        }
+    }
+    r_audio_voice = audioPlaySampleEx(0, 127, AUDIO_PAN_CENTER, 0x1000);
+
+    /* phase 3: hall on voice 0's beep + live envelope readback. The
+     * echo values are arbitrary-but-distinct probe vectors. */
+    audioSetEcho(3, 40, 20, 20);
+    {
+        static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
+        audioSetEchoFilter(fir);
+    }
+    audioEnableEcho(0x01);
+    {
+        AudioVoiceState vs;
+        audioGetVoiceState(0, &vs);
+        r_audio_active = vs.active;
+    }
+
+    part_math_anim();
+    part_collision_sram();
+    part_objects_irq();
+
+
+    coverage_bank_bytes();
+    coverage_lot_b();
+    coverage_lot_c();
 
     /* --- L2c: window registers, asserted from luna's PPU view. Left in
      * their final state: nothing below touches $2123-$212F. --- */

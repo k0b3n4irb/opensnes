@@ -78,8 +78,15 @@ typedef struct {
  *     // Collision detected
  * }
  * @endcode
+ *
+ * @note Read-only rectangles are `const Rect *` since 2026-09-20 — in this
+ *       module that is correctness, not style. A `static const Rect` lives in
+ *       an asset bank, and only a const-qualified read is a far read: through
+ *       the old `Rect *` parameter (with the cast it forced on the caller) the
+ *       fields were read from bank $00. Callers passing a plain `Rect *` are
+ *       unaffected.
  */
-u8 collideRect(Rect *a, Rect *b);
+u8 collideRect(const Rect *a, const Rect *b);
 
 /**
  * @brief Check point vs rectangle collision
@@ -98,7 +105,7 @@ u8 collideRect(Rect *a, Rect *b);
  * }
  * @endcode
  */
-u8 collidePoint(s16 x, s16 y, Rect *r);
+u8 collidePoint(s16 x, s16 y, const Rect *r);
 
 /**
  * @brief Check if two rectangles overlap and return overlap amount
@@ -108,20 +115,27 @@ u8 collidePoint(s16 x, s16 y, Rect *r);
  *
  * @param a First rectangle
  * @param b Second rectangle
- * @param overlapX Pointer to store X overlap (negative = left, positive = right)
- * @param overlapY Pointer to store Y overlap (negative = up, positive = down)
+ * @param overlapX Receives the X displacement that moves @p a OUT of @p b
+ *                 (negative = move a left, positive = move a right)
+ * @param overlapY Receives the Y displacement (negative = up, positive = down)
  * @return 1 if rectangles overlap, 0 otherwise
+ *
+ * The values are displacements to ADD to @p a. Both axes are always filled;
+ * applying both moves the object diagonally, so resolve the smaller one.
+ * (This example subtracted them until 2026-09-20, which pushes the player
+ * deeper into the wall: for a = {10,10,16,16}, b = {20,20,16,16} the function
+ * returns dx = -6, and a must move LEFT.)
  *
  * @code
  * s16 dx, dy;
  * if (collideRectEx(&player, &wall, &dx, &dy)) {
- *     // Push player out of wall
- *     player_x = player_x - dx;
- *     player_y = player_y - dy;
+ *     // Push player out of wall along the axis of least penetration
+ *     if ((dx < 0 ? -dx : dx) < (dy < 0 ? -dy : dy)) player_x += dx;
+ *     else                                           player_y += dy;
  * }
  * @endcode
  */
-u8 collideRectEx(Rect *a, Rect *b, s16 *overlapX, s16 *overlapY);
+u8 collideRectEx(const Rect *a, const Rect *b, s16 *overlapX, s16 *overlapY);
 
 /*============================================================================
  * Tile-Based Collision Functions
@@ -188,7 +202,7 @@ u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize);
  * }
  * @endcode
  */
-u8 collideRectTile(Rect *r, const u8 *tilemap, u16 mapWidth);
+u8 collideRectTile(const Rect *r, const u8 *tilemap, u16 mapWidth);
 
 /*============================================================================
  * Helper Functions
@@ -221,7 +235,7 @@ void rectSetPos(Rect *r, s16 x, s16 y);
  * @param cx Pointer to store center X
  * @param cy Pointer to store center Y
  */
-void rectGetCenter(Rect *r, s16 *cx, s16 *cy);
+void rectGetCenter(const Rect *r, s16 *cx, s16 *cy);
 
 /**
  * @brief Check if rectangle is completely inside another
@@ -230,6 +244,6 @@ void rectGetCenter(Rect *r, s16 *cx, s16 *cy);
  * @param outer Outer rectangle (container)
  * @return 1 if inner is completely inside outer, 0 otherwise
  */
-u8 rectContains(Rect *inner, Rect *outer);
+u8 rectContains(const Rect *inner, const Rect *outer);
 
 #endif /* OPENSNES_COLLISION_H */

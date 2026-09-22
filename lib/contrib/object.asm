@@ -56,7 +56,9 @@
 .DEFINE GRAVITY             41
 .DEFINE MAX_Y_VELOCITY      (10*256)
 .DEFINE FRICTION            $10
-.DEFINE FRICTION1D          $0100
+; FRICTION1D ($0100) was defined here and never used, in PVSnesLib as well:
+; objCollidMap1D has no friction of its own. It is now opt-in through
+; objInitFriction1D() / objfriction1d, 0 (off) by default.
 
 ;------------------------------------------------------------------------------
 ; Object structure (64 bytes)
@@ -160,8 +162,13 @@ objcidx         DW                          ; index of current object in loop
 
 objgravity      DW                          ; gravity value
 objfriction     DW                          ; friction value
+objfriction1d   DW                          ; objCollidMap1D friction, 0 = none
 
 objneedrefresh  DB                          ; 1 if global sprite refresh needed
+
+objwsowner      DW                          ; byte offset of the slot objWorkspace
+                                            ; currently mirrors, $FFFF = none
+                                            ; (see the sync macros below)
 
 objtmp1         DW                          ; temporary vars
 objtmp2         DW
@@ -188,12 +195,38 @@ objtmp4         DW
 ; SYNC_TO_WORKSPACE: objbuffers[X] → objWorkspace
 ; X = byte offset into objbuffers (preserved)
 .MACRO SYNC_TO_WORKSPACE
+    ; OWNER-TRACKED since 2026-09-18. There is one workspace, and it used to
+    ; be copied back blindly into whichever slot the engine was iterating —
+    ; so a callback that looked at another object (objGetPointer, objNew,
+    ; objKill all reload the workspace) returned with the OTHER object's 64
+    ; bytes written over its own slot: an entity that silently became a copy
+    ; of another. objwsowner records which slot the workspace mirrors; before
+    ; it is reloaded its contents are flushed to that owner, so edits made
+    ; before the peek survive, and every write-back goes to the owner rather
+    ; than to whatever index the caller had in X.
     phb                         ; save DBR (MVN will change it)
     phx
     phy
 
     rep #$30
-    txa
+    lda.l objwsowner
+    cmp #$FFFF
+    beq _stw_load\@             ; nothing to flush
+    ; No shortcut when X is the owner itself (2026-09-20): the workspace may
+    ; hold edits made since the last load — objNew, then objGetPointer on the
+    ; same object, then field writes, then objUpdateAll — and skipping the
+    ; flush reloaded the slot over them. The redundant 64-byte copy is cheaper
+    ; than an edit that silently vanishes (libtest vector r_obj_cobj_no).
+    clc
+    adc #objbuffers.w + 4
+    tay                         ; Y = owner's addr in Bank $7E, past the links
+    ldx #objWorkspace.w + 4
+    lda #OB_SIZE - 5
+    mvn $00, $7E                ; flush: workspace -> owner, bytes 4..63
+
+_stw_load\@:
+    lda 3,s                     ; X as pushed above (Y at 1,s, X at 3,s)
+    sta.l objwsowner
     clc
     adc #objbuffers.w
     tax                         ; X = source addr in Bank $7E
@@ -208,24 +241,42 @@ objtmp4         DW
     plb                         ; restore DBR
 .ENDM
 
-; SYNC_FROM_WORKSPACE: objWorkspace → objbuffers[X]
-; X = byte offset into objbuffers (preserved)
+; SYNC_FROM_WORKSPACE: objWorkspace → the slot it mirrors
+; Bytes 4..63 only, in both macros (2026-09-20): the first two words are the
+; active-list links (next, prev), which objNew and objKill rewrite IN THE
+; SLOT while the workspace still holds the copy taken at load time. Writing
+; the copy back put a stale link over the engine's — objNew of a second
+; object then unlinked the first (libtest r_obj_refresh saw one object where
+; two were active). The links are engine-private; the write-back never
+; carries them.
+; X = the slot the caller believes it is writing (preserved). The copy goes
+; to objwsowner, not to X: in well-formed use they are the same slot, and when
+; they are not (a callback left another object in the workspace) the owner is
+; the only destination that does not corrupt anything. With no owner — a
+; failed objNew, a killed object — nothing is written. The owner is cleared
+; afterwards: slot and workspace agree, so the next load need not flush.
 .MACRO SYNC_FROM_WORKSPACE
     phb                         ; save DBR (MVN will change it)
     phx
     phy
 
     rep #$30
-    txa
+    lda.l objwsowner
+    cmp #$FFFF
+    beq _sfw_done\@
     clc
-    adc #objbuffers.w
-    tay                         ; Y = dest addr in Bank $7E
+    adc #objbuffers.w + 4
+    tay                         ; Y = dest addr in Bank $7E, past the links
 
-    ldx #objWorkspace.w         ; X = source addr in Bank $00
+    ldx #objWorkspace.w + 4     ; X = source addr in Bank $00, past the links
 
-    lda #OB_SIZE - 1            ; A = byte count - 1
+    lda #OB_SIZE - 5            ; A = byte count - 1 (bytes 4..63)
     mvn $00, $7E                ; WLA-DX: src=$00 (workspace), dest=$7E (buffers)
 
+    lda #$FFFF
+    sta.l objwsowner
+
+_sfw_done\@:
     ply
     plx
     plb                         ; restore DBR
@@ -315,6 +366,9 @@ _oieR3:
     sta objgravity
     lda #FRICTION
     sta objfriction
+    stz objfriction1d                       ; top-down friction is opt-in
+    lda #$FFFF
+    sta.l objwsowner                        ; the workspace mirrors nothing yet
 
     ply
     plx
@@ -348,6 +402,29 @@ objInitGravity:
     rtl
 
 ;------------------------------------------------------------------------------
+; void objInitFriction1D(u16 friction)
+; Opt-in deceleration for objCollidMap1D, applied to BOTH axes each call.
+; 0 (the objInitEngine default) keeps the PVSnesLib behaviour: none.
+;------------------------------------------------------------------------------
+objInitFriction1D:
+    php
+    phb
+
+    sep #$20
+    lda #$7e
+    pha
+    plb
+
+    rep #$20
+    lda 6,s                                 ; friction (param 1)
+    sta objfriction1d
+
+    plb
+    plp
+
+    rtl
+
+;------------------------------------------------------------------------------
 ; void objInitFunctions(u8 objtype, void *initfct, void *updfct, void *reffct)
 ; Stack: 5 6-9 10-13 14-16
 ;------------------------------------------------------------------------------
@@ -362,27 +439,45 @@ objInitFunctions:
     pha
     plb
 
-    ; cproc L-to-R: ref(p4) SP+8, upd(p3) SP+10, init(p2) SP+12, type(p1) SP+14
-    ; cproc passes 16-bit function addresses only (no bank byte)
-    lda 14,s                                ; type (param 1)
+    ; Stack map, rewritten 2026-09-18. Pointers are FOUR-byte slots since
+    ; chantier A6, and the compiler pushes `pea.w :fn` then `pea.w fn` for
+    ; each one — so every offset below moved, and the bank byte we used to
+    ; invent is now handed to us. Verified against the emitted caller:
+    ;
+    ;     pea.w 0 / pea.w :init / pea.w init / pea.w :upd / pea.w upd
+    ;     / pea.w :ref / pea.w ref / jsl objInitFunctions   (14 arg bytes)
+    ;
+    ; After php+phb+phx (4) and the 3-byte JSL return, args start at 8,s,
+    ; last pushed first:
+    ;   8,s ref addr   10,s ref bank   12,s upd addr   14,s upd bank
+    ;  16,s init addr  18,s init bank  20,s type
+    ;
+    ; The old map read type from the update callback's bank byte, so this
+    ; routine stored garbage — which is why both examples registered their
+    ; callbacks with hand-written asm instead.
+    lda 20,s                                ; type (param 1, u8 in a 2-byte slot)
     rep #$20
+    .ACCU 16
     and #$00ff
     asl a
     asl a
     tax
 
-    lda 12,s                                ; init function (param 2) — 16-bit addr
+    lda 16,s                                ; init function — address
     sta objfctinit,x
-    lda 10,s                                ; update function (param 3)
+    lda 12,s                                ; update function — address
     sta objfctupd,x
-    lda 8,s                                 ; refresh function (param 4)
+    lda 8,s                                 ; refresh function — address
     sta objfctref,x
 
-    ; Set bank bytes to $00 (cproc LoROM: code in bank $00)
+    ; …and the bank byte of each, as the caller pushed it.
     sep #$20
-    lda #$00
+    .ACCU 8
+    lda 18,s                                ; init function — bank
     sta objfctinit+2,x
+    lda 14,s                                ; update function — bank
     sta objfctupd+2,x
+    lda 10,s                                ; refresh function — bank
     sta objfctref+2,x
 
     plx
@@ -567,6 +662,7 @@ _oigp1:
     SYNC_TO_WORKSPACE
 
 _oigp2:
+    lda.l objptr                            ; return value (u16): slot + 1, or 0
     ply
     plx
     plb
@@ -687,6 +783,12 @@ _oik4:
     bne _oik4
 
 _oikend:
+    ; The workspace still holds the dead object's bytes: disown it, or the
+    ; next load would flush them into a slot that is back on the free list.
+    rep #$20
+    .ACCU 16
+    lda #$FFFF
+    sta.l objwsowner
     ply
     plx
     plb
@@ -750,9 +852,19 @@ _oikal3:
 
     stz.w objnewid
     stz.w objgetid
-    stz.w objunused
+    ; objunused is NOT reset here (fixed 2026-09-19). objKill pushes every
+    ; slot it frees onto the free list, so after the loop the list is already
+    ; complete and objunused is its head. The old `stz objunused` forced the
+    ; head back to slot 0: every slot chained AHEAD of slot 0 — any slot freed
+    ; after it — became unreachable, and the pool shrank on each level change.
+
+    rep #$20
+    .ACCU 16
+    lda #$FFFF
+    sta.l objwsowner                        ; every slot is gone
 
     sep #$20
+    .ACCU 8
     lda #$1
     sta objnextid
 
@@ -804,6 +916,11 @@ objUpdateAll:
     stz objneedrefresh
 
     rep #$20
+    ; Flush a pending workspace edit BEFORE the pass writes slot fields
+    ; itself (onscreen, the refresh flags): a flush that came later put the
+    ; workspace's stale copy of those fields back over the engine's fresh
+    ; ones (2026-09-20; libtest vector r_obj_refresh).
+    SYNC_FROM_WORKSPACE
     ldx #$0000
 
 _oiual1:
@@ -908,6 +1025,18 @@ _oiual321:
     lda objfctupd+2,y
     sta objfctcallh
 
+    ; A type nobody registered has a zero pointer, and dispatching it jumped
+    ; to $00:0000 (guard added 2026-09-18). An object without an update
+    ; callback simply is not updated.
+    and #$00ff                              ; bank byte (the 4th byte is padding)
+    ora objfctcall
+    bne _oiual_call
+    sep #$20
+    stz.w objtokill
+    rep #$20
+    bra _oiual_nocall
+_oiual_call:
+
     lda objcidx
     pha
 
@@ -916,6 +1045,7 @@ _oiual321:
     jsl jslcallfct
     rep #$20
     pla
+_oiual_nocall:
 
     ; --- WORKSPACE PATTERN: copy workspace back to object after callback ---
     lda objcidx
@@ -999,6 +1129,11 @@ objRefreshAll:
     stz objneedrefresh
 
     rep #$20
+    ; Flush a pending workspace edit BEFORE the pass writes slot fields
+    ; itself (onscreen, the refresh flags): a flush that came later put the
+    ; workspace's stale copy of those fields back over the engine's fresh
+    ; ones (2026-09-20; libtest vector r_obj_refresh).
+    SYNC_FROM_WORKSPACE
     ldx #$0000
 
 _oiral1:
@@ -1026,7 +1161,8 @@ _oiral3:
     bne _oiral32
 
     rep #$20
-    bra _oiral31
+    brl _oiral31                            ; brl: the owner-tracked sync macros
+                                            ; grew this span past a short branch
 
 _oiral32:
     ; --- WORKSPACE PATTERN: copy to workspace before refresh callback ---
@@ -1044,6 +1180,12 @@ _oiral32:
     lda objfctref+2,y
     sta objfctcallh
 
+    ; Null refresh callback: skip it (both examples register 0 here, and
+    ; used to stay alive only by never calling objRefreshAll).
+    and #$00ff
+    ora objfctcall
+    beq _oiral_nocall
+
     lda objcidx
     pha
 
@@ -1051,6 +1193,7 @@ _oiral32:
     jsl jslcallfct
     rep #$20
     pla
+_oiral_nocall:
 
     ; --- WORKSPACE PATTERN: copy back after refresh callback ---
     lda objcidx
@@ -1095,7 +1238,7 @@ _oiraend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objCollidMap(u16 objhandle)
+; void objCollidMap(u16 objindex)  (index, or a handle: id byte masked)
 ;
 ; Workspace sync: copies workspace → buffer before, buffer → workspace after.
 ;------------------------------------------------------------------------------
@@ -1113,6 +1256,7 @@ objCollidMap:
 
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers before collision ---
     asl a
@@ -1218,14 +1362,26 @@ _oicm21:
     cmp #T_FIRES
     bne _oicm22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicmtstx
 
 _oicm22:
     cmp #T_SPIKE
     bne _oicm23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicmtstx
 
 _oicm23:
@@ -1277,7 +1433,12 @@ _oicm5:
 _oicm61:
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi _oicm6
     lda #MAX_Y_VELOCITY
@@ -1396,7 +1557,12 @@ _oicmtstyn4:
     ldx objtmp2
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi _oicmtstyn5
     lda #MAX_Y_VELOCITY
@@ -1631,7 +1797,7 @@ _oicmend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objCollidMap1D(u16 objhandle)
+; void objCollidMap1D(u16 objindex)  (index, or a handle: id byte masked)
 ;------------------------------------------------------------------------------
 objCollidMap1D:
     php
@@ -1647,6 +1813,7 @@ objCollidMap1D:
 
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -1752,14 +1919,26 @@ _oicm1d21:
     cmp #T_FIRES
     bne _oicm1d22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicm1dtstx
 
 _oicm1d22:
     cmp #T_SPIKE
     bne _oicm1d23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     brl _oicm1dtstx
 
 _oicm1d23:
@@ -2107,6 +2286,45 @@ _oicm1dtstxnd:
     bne _oicm1dtstxnc
 
 _oicm1dend:
+    ; --- Opt-in friction (objInitFriction1D), both axes, toward zero ---
+    rep #$20
+    .ACCU 16
+    lda objfriction1d
+    beq _oicm1dfrdone
+    ldx objtmp2
+    lda objbuffers.1.xvel,x
+    beq _oicm1dfry
+    bmi _oicm1dfrxn
+    sec
+    sbc objfriction1d
+    bpl _oicm1dfrxs
+    lda #0
+    bra _oicm1dfrxs
+_oicm1dfrxn:
+    clc
+    adc objfriction1d
+    bmi _oicm1dfrxs
+    lda #0
+_oicm1dfrxs:
+    sta objbuffers.1.xvel,x
+_oicm1dfry:
+    lda objbuffers.1.yvel,x
+    beq _oicm1dfrdone
+    bmi _oicm1dfryn
+    sec
+    sbc objfriction1d
+    bpl _oicm1dfrys
+    lda #0
+    bra _oicm1dfrys
+_oicm1dfryn:
+    clc
+    adc objfriction1d
+    bmi _oicm1dfrys
+    lda #0
+_oicm1dfrys:
+    sta objbuffers.1.yvel,x
+_oicm1dfrdone:
+
     ; --- Sync objbuffers → workspace after collision ---
     ldx objtmp2
     SYNC_TO_WORKSPACE
@@ -2156,7 +2374,11 @@ objLoadObjects:
     sep #$20
     lda #$7e
     sta.l $2183
-    lda #$00                                ; bank = $00 (cproc: 16-bit pointers)
+    ; The pointer is a 4-byte slot since A6: address at 10,s, bank at 12,s.
+    ; This used to force $00, which happened to work only while the object
+    ; table lived in bank $00 — ASSET_SECTION data (banks 7-1 by design)
+    ; would have loaded garbage. Fixed 2026-09-18.
+    lda 12,s                                ; sourceO bank (param 1, high word)
     sta.l $4304
     ldx #$8000
     stx $4300
@@ -2175,7 +2397,9 @@ objLoadObjects:
 _oilo1:
     lda objtmpbuf,x
     cmp #$ffff
-    beq _oiloend
+    bne _oilo1_go                           ; inverted + brl: the sync macro and
+    brl _oiloend                            ; the null guard grew this span
+_oilo1_go:
     ; Push params in cproc L-to-R order (first param pushed first → farthest from SP)
     ; init(xp, yp, type, minx, maxx)
     pha                                     ; x (param 1, already in A from cmp)
@@ -2207,7 +2431,19 @@ _oilo1:
     lda objfctinit+2,y
     sta objfctcallh
 
+    ; An object table naming a type with no init callback: skip the entry
+    ; instead of jumping to $00:0000. objgetid is cleared so the sync below
+    ; does not act on the previous entry's object.
+    and #$00ff
+    ora objfctcall
+    bne _oilo_call
+    lda #0
+    sta.l objgetid
+    bra _oilo_nocall
+_oilo_call:
+
     jsl jslcallfct
+_oilo_nocall:
 
     ; --- After init callback: sync workspace back for newly created object ---
     ; objNew already copied to workspace, init may have modified it.
@@ -2232,7 +2468,7 @@ _oilo_skip_sync:
     pla
     pla
     ldx objcidx
-    bra _oilo1
+    brl _oilo1                              ; brl: span grew (see _oilo1)
 
 _oiloend:
     ply
@@ -2254,7 +2490,7 @@ _oiloend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; u16 objCollidObj(u16 objhandle1, u16 objhandle2)
+; u16 objCollidObj(u16 idx1, u16 idx2)  (indexes, or handles: id byte masked)
 ; Stack: 5-6 7-8
 ;------------------------------------------------------------------------------
 objCollidObj:
@@ -2272,8 +2508,15 @@ objCollidObj:
     rep #$20
     stz.w tcc__r0
 
-    ; cproc L-to-R: handle2(p2) SP+10, handle1(p1) SP+12
-    lda 10,s                                ; handle2 (param 2, closest)
+    ; The workspace may hold an edit of one of the two objects (a callback
+    ; that moved itself, then tests the contact): flush it first, as the map
+    ; collision routines do. Without this the test read the slot's stale
+    ; coordinates (fixed 2026-09-20; the libtest vector r_obj_cobj_no).
+    SYNC_FROM_WORKSPACE
+
+    ; cproc L-to-R: idx2 (p2) SP+10, idx1 (p1) SP+12 — slot indexes (a handle is masked down to one)
+    lda 10,s                                ; idx2 (param 2, closest)
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
@@ -2287,7 +2530,8 @@ objCollidObj:
     bmi _oicoend
     sta objtmp1
 
-    lda 12,s                                ; handle1 (param 1, farthest)
+    lda 12,s                                ; idx1 (param 1, farthest)
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
@@ -2349,7 +2593,11 @@ _oicor5:
     sta.w tcc__r0
 
 _oicoend:
-
+    ; The value is returned in A (cc65816), not in tcc__r0: every "no
+    ; contact" exit used to return whatever A held — x + width, a y
+    ; coordinate — and only the contact path returned 1 by accident
+    ; (fixed 2026-09-20; libtest vector r_obj_cobj_no read 0x18).
+    lda.w tcc__r0
     ply
     plx
     plb
@@ -2369,7 +2617,7 @@ _oicoend:
 .16bit
 
 ;------------------------------------------------------------------------------
-; void objUpdateXY(u16 objhandle)
+; void objUpdateXY(u16 objindex)  (index, or a handle: id byte masked)
 ;
 ; Workspace sync: copies workspace → buffer before, buffer → workspace after.
 ;------------------------------------------------------------------------------
@@ -2386,6 +2634,7 @@ objUpdateXY:
 
     rep #$20
     lda 8,s                                 ; get index (5+1+2)
+    and #$00FF                              ; a handle works too: drop its id byte
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -2474,8 +2723,8 @@ _lutcolInv:
     .db $07,$06,$05,$04,$03,$02,$01,$00     ; 0020
     .db $00,$01,$02,$03,$04,$05,$06,$07     ; 0021
     .db $07,$07,$06,$06,$05,$05,$04,$04     ; 0022
-    .db $04,$04,$05,$05,$06,$06,$07,$07     ; 0024
-    .db $03,$03,$02,$02,$01,$01,$00,$00     ; 0023
+    .db $04,$04,$05,$05,$06,$06,$07,$07     ; 0023
+    .db $03,$03,$02,$02,$01,$01,$00,$00     ; 0024
     .db $00,$00,$01,$01,$02,$02,$03,$03     ; 0025
 
 ;note: objtmp1 = tileCount
@@ -2496,7 +2745,12 @@ _lutcolInv:
 .MACRO OE_SETVELOCYTY
     lda objbuffers.1.yvel,x
     clc
-    adc #GRAVITY
+    adc objgravity                          ; was `adc #GRAVITY`: the variable
+                                            ; objInitEngine/objInitGravity write
+                                            ; was never read, so the gravity
+                                            ; argument did nothing (2026-09-18).
+                                            ; objInitEngine seeds it with
+                                            ; GRAVITY, so the default is unchanged.
     cmp #MAX_Y_VELOCITY+1
     bmi \1
     lda #MAX_Y_VELOCITY
@@ -2653,6 +2907,7 @@ _lutcolInv:
 
 .MACRO OE_SETOBJHANDLE_STK
     lda \1,s
+    and #$00FF                              ; index, or a handle's index byte
     xba
     lsr a
     lsr a
@@ -2661,7 +2916,7 @@ _lutcolInv:
 .ENDM
 
 ;------------------------------------------------------------------------------
-; void objCollidMapWithSlopes(u16 objhandle)
+; void objCollidMapWithSlopes(u16 objindex)  (index, or a handle: id byte masked)
 ;------------------------------------------------------------------------------
 objCollidMapWithSlopes:
     php
@@ -2677,6 +2932,7 @@ objCollidMapWithSlopes:
 
     ; --- Sync workspace → objbuffers ---
     lda 10,s                                ; get index
+    and #$00FF                              ; a handle works too: drop its id byte
     asl a
     asl a
     asl a
@@ -3006,14 +3262,26 @@ _oicms21:
     cmp #T_FIRES
     bne _oicms22
     lda #ACT_BURN
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     jmp _oicmsend
 
 _oicms22:
     cmp #T_SPIKE
     bne _oicms23
     lda #ACT_DIE
-    sta objbuffers.1.action
+    sta objbuffers.1.action,x   ; ,x added 2026-09-18: X holds the object
+                                ; index here (ldx objtmp2 above, and the
+                                ; neighbouring tilesprop stores use it) — the
+                                ; unindexed form set slot 0's action instead
+                                ; of the colliding object's. No map in the
+                                ; corpus carries T_FIRES or T_SPIKE, so this
+                                ; path was never exercised.
     jmp _oicmsend
 
 _oicms23:

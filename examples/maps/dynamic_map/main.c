@@ -420,14 +420,14 @@ int main(void) {
         /* Random sprite placement */
         if (pad0 & KEY_X) {
             if (is_map32x32) {
-                u8 rx = rand() % 31;
-                u8 ry = rand() % 31;
+                u8 rx = rngNext() % 31;
+                u8 ry = rngNext() % 31;
                 drawSprite32x32(rx, ry, element2sprite32x32(SPRITE_GARGOYLE));
                 WaitForVBlank();
                 screenRefreshPos32x32(rx, ry, VRAM_SPRITEMAP);
             } else {
-                u8 rx = rand() % 63;
-                u8 ry = rand() % 63;
+                u8 rx = rngNext() % 63;
+                u8 ry = rngNext() % 63;
                 drawSprite64x64(rx, ry, element2sprite64x64(SPRITE_GARGOYLE));
                 WaitForVBlank();
                 screenRefreshPos64x64(rx, ry, VRAM_SPRITEMAP);

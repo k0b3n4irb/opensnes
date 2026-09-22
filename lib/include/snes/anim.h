@@ -33,13 +33,12 @@
  * upload only happens when a frame actually changes (the dynamic
  * engine's existing budget).
  *
- * @warning Clips declared with DECLARE_ANIM_CLIP are ROM const data and
- * count against the bank $00 budget (see KNOWN_LIMITATIONS.md): if bank
- * $00 is full they spill to bank $01+ and are read as garbage. The build
- * hard-fails when that happens (symmap ratchet). Mitigation for a
- * nearly-full ROM: declare the clip and its frames array as initialized
- * non-const statics — RAM-backed clips have the identical layout and API
- * (see examples/games/likemario).
+ * @note Clips declared with DECLARE_ANIM_CLIP are ROM const data. Since
+ * v0.41.0 (#127.3) const data lives in the asset banks and every C read of
+ * it is a far read, so a clip works from any bank and costs no bank-$00
+ * space. The warning that stood here — "they spill to bank $01+ and are read
+ * as garbage; use non-const RAM clips" — described the pre-#121 compiler;
+ * following it now only wastes RAM.
  *
  * Requires 'anim' in LIB_MODULES.
  *

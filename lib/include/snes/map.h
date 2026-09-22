@@ -215,6 +215,10 @@ u16 mapGetMetaTilesProp(u16 xpos, u16 ypos);
 /**
  * @brief Set map engine options
  *
+ * @warning Call it AFTER mapLoad(): mapLoad() clears the options (and zeroes
+ *          the camera, x_pos / y_pos), so options set before it are lost
+ *          without a trace.
+ *
  * @param optmap Options bitmask (MAP_OPT_1WAY, MAP_OPT_BG2)
  */
 void mapSetMapOptions(u8 optmap);

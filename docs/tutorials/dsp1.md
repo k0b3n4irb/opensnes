@@ -57,7 +57,7 @@ that can exceed ±1.0.
 | Call | DSP command | In → Out | Use for |
 |---|---|---|---|
 | `dsp1Init()` | `$80` ×128 | — | resync at boot / after a desync |
-| `dsp1Present()` | `$00` KAT | — → 1/0 | probe the chip (bounded, never hangs) |
+| `dsp1IsPresent()` | `$00` KAT | — → 1/0 | probe the chip (bounded, never hangs) |
 | `dsp1Multiply(a,b)` | `$00` | 2 → 1 | 1.15 product |
 | `dsp1Triangle(a,r)` | `$04` | 2 → 2 | r·sin, r·cos |
 | `dsp1Rotate(a,x,y)` | `$0C` | 3 → 2 | 2D rotate |
@@ -67,8 +67,8 @@ that can exceed ±1.0.
 | `dsp1Project(x,y,z)` | `$06` | 3 → 3 | world point → screen H, V + scale M |
 | `dsp1Target(h,v)` | `$0E` | 2 → 2 | screen point → ground plane (pick / aim) |
 | `dsp1Raster(ab,cd,vs,n)` | `$0A` | 1 → 4·n (stream) | per-scanline Mode 7 matrices into HDMA payloads |
-| `dsp1Distance(x,y,z)` | `$28` | 3 → 1 | true 3D length (hardware sqrt) |
-| `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: ≤0 = inside |
+| `dsp1Distance(x,y,z)` | `$28` | 3 → 1 | 3D length (hardware sqrt; reads one low on exact lengths) |
+| `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: `(d² − r²) >> 15`, negative = inside |
 
 Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
 (`dsp1_o3` for Parameter); single-word commands return their value.
@@ -77,7 +77,7 @@ Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
 
 ```c
 dsp1Init();
-if (dsp1Present()) {
+if (dsp1IsPresent()) {
     /* once: camera at the origin looking along +Y (azs = 0x4000).
      * Effective focal length ≈ lfe + les. */
     dsp1Parameter(0, 0, 0, 96, 256, 0, 0x4000);
@@ -163,11 +163,19 @@ under a screen pixel, in raster coordinates (Target(0, 0) = Cx/Cy).
 You do not need 3D graphics to profit from the chip:
 
 ```c
-u16 d = dsp1Distance(dx, dy, dz);     /* true length, hardware sqrt */
-if (dsp1Range(dx, dy, dz, radius) <= 0) {  /* inside the sphere?    */
+u16 d = dsp1Distance(dx, dy, dz);     /* length, hardware sqrt (within 1) */
+if (dsp1Range(dx, dy, dz, radius) < 0) {   /* clearly inside the sphere? */
     /* proximity trigger, LOD switch, homing acquisition ... */
 }
 ```
+
+Two properties measured on luna's DSP-1B firmware and pinned by the library
+fixture (`devtools/libtests_dsp1`), neither stated by any hardware reference
+we could find. `dsp1Distance` reads one low on exact lengths — (3, 4, 12)
+gives 12 — so compare with `>=` / `<`, never `==`. `dsp1Range` returns the
+squared difference **shifted right by 15**, not the raw difference: a point
+less than 32768 squared-units outside the surface reads 0, the same as one
+exactly on it. Choose world units so that margin is small next to the radius.
 
 Both are single calls where the 65816 would need three multiplies, two
 adds and (for Distance) a software square root.
@@ -180,7 +188,7 @@ luna emulates the DSP-1 at low level and needs Sony's `dsp1b.rom`
 (copyrighted, not shipped). Install it once —
 `cp dsp1b.rom ~/.config/luna/firmware/` or
 `luna state --dsp1-rom <path> <rom>` — and it persists. Without it the
-ROM boots but the chip stays inert; that is why `dsp1Present()` exists
+ROM boots but the chip stays inert; that is why `dsp1IsPresent()` exists
 and why the DSP-1 tests are firmware-gated (they SKIP, not fail, in
 CI). Target revision is DSP-1B, the bug-fixed one and the emulator
 default.

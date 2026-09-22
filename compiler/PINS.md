@@ -30,8 +30,8 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 1422c17ec969ef057539b42f03c739775c3b5e3c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 9c784dccfb2ae774c59202152c230eabd13c96a0 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 2) |
+| compiler/qbe | c3c205d6889e32f561ad62772b94fe2744d5dfb2 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -73,7 +73,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 62 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 63 patches (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -85,6 +85,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+c3c205d w65816: the address of a local carries its bank (lib fixture: collideRect(&a, &b) read a wild bank)
 1422c17 w65816: print unsigned temp ids with %u in the emitter's debug comments (cppcheck, review H4)
 9e2307c w65816: five fixes from the c_features runtime ROM (variable Kl shifts, signed compares with overflow, Kl compare fusion, jnz on Kl, sign extension vs ldy) and a refusal that names the feature
 d5484d4 amd64: no NULL + 0 over the argument class array of a call without arguments (UBSan on clang 18, upstream suite H1 on x86_64)
@@ -123,12 +124,25 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 2 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12)
+### compiler/wla-dx — 3 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
 
 ```
+9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+The newest patch completes the first one. `86df331` fixed
+`get_snes_pc_bank()`; the calculation engine has a second path to a label's
+bank — the `:label` operator, `SI_OP_BANK` / `SI_OP_BANK_BYTE` — which added
+the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)
+`pea.w :var` pushed `$C0` for a variable in a bank-`$00` RAMSECTION, so
+**every C pointer to RAM carried a ROM bank on HiROM**, and any routine that
+honours the bank byte of its pointer read or wrote `$C0:xxxx` instead of work
+RAM. Found by an SRAM round trip on the HiROM fixture
+(`devtools/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
+change (the bank byte pushed for RAM pointers goes from `$C0` / `$80` to
+`$00`); LoROM SlowROM ROMs are byte-identical.
 
 The second patch is what the ASan/UBSan job found on its first run
 (`make test-sanitizers`): `decode.c` read `g_tmp[-1]` on any

@@ -53,12 +53,12 @@ smooth ~0.5 second transition.
 
 ```c
 void doMosaicOut(void) {
-    mosaicEnable(MOSAIC_BG1);
+    mosaicSetLayers(MOSAIC_BG1);
     mosaicFadeOut(3);
 }
 ```
 
-The library functions `mosaicEnable()` and `mosaicFadeOut()` write to register
+The library functions `mosaicSetLayers()` and `mosaicFadeOut()` write to register
 $2106 (MOSAIC). The parameter `3` controls the speed of the transition.
 
 Register $2106 layout:

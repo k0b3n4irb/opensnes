@@ -235,7 +235,11 @@ gsuDmaFullFrame:
 ;==============================================================================
 ; gsuSetupHdmaBlanking — HDMA on INIDISP for DMA bandwidth
 ;==============================================================================
-; Input: arg1 (5,s) = top blank scanlines, arg2 (7,s) = bottom blank scanlines
+; void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank)
+; Stack (php only, arguments pushed left to right): 5,s = bottomBlank,
+; 7,s = topBlank. The two were read swapped until 2026-09-20 (PVSnesLib-order
+; offsets); the only caller passed (40, 40), which is why nothing showed. The
+; comments below name the parameters so check_asm_abi.py verifies the offsets.
 ; Visible = 224 - top - bottom.
 ;==============================================================================
 .SECTION ".gsu_hdma_setup" SEMIFREE
@@ -251,7 +255,7 @@ gsuSetupHdmaBlanking:
     .INDEX 16
 
     ; Read parameters
-    lda 5,s                  ; top blank scanlines
+    lda 7,s                  ; topBlank
     sta.l gsu_hdma_table     ; entry 0: count = top
     lda #$80
     sta.l gsu_hdma_table+1   ; entry 0: value = forced blank
@@ -260,8 +264,8 @@ gsuSetupHdmaBlanking:
     ; HDMA count max = 127 (bit 7 = repeat flag). Split if > 127.
     lda #224
     sec
-    sbc 5,s                  ; 224 - top
-    sbc 7,s                  ; 224 - top - bottom = visible
+    sbc 7,s                  ; topBlank: 224 - top
+    sbc 5,s                  ; bottomBlank: 224 - top - bottom = visible
 
     ; Split visible into two entries if > 127
     cmp #128
@@ -281,7 +285,7 @@ gsuSetupHdmaBlanking:
     sta.l gsu_hdma_table+5
 
     ; Bottom blank
-    lda 7,s
+    lda 5,s                  ; bottomBlank
     sta.l gsu_hdma_table+6
     lda #$80
     sta.l gsu_hdma_table+7
@@ -296,7 +300,7 @@ _vis_single:
     sta.l gsu_hdma_table+3
 
     ; Bottom blank
-    lda 7,s
+    lda 5,s                  ; bottomBlank
     sta.l gsu_hdma_table+4
     lda #$80
     sta.l gsu_hdma_table+5

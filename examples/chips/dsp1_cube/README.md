@@ -23,7 +23,7 @@ enhancement-chip family alongside SA-1 and Super FX.
   `dsp1Project()` returns screen H/V and a depth scale M per point; corners
   swinging toward the camera visibly spread apart. The DSP-1 does no
   rasterisation, so the CPU just places the 8 corner sprites
-- **`dsp1Present()`** — known-answer probe (Multiply 0.5×0.5 == 0.25) before
+- **`dsp1IsPresent()`** — known-answer probe (Multiply 0.5×0.5 == 0.25) before
   relying on the chip; keeps the ROM well-behaved on firmware-less emulators
 - **`dsp1Init()`** — issues the `$80` resync handshake so the chip starts in a
   known command-wait state

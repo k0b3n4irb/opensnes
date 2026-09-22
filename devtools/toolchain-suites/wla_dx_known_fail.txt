@@ -11,3 +11,12 @@
 # on purpose: a WRAM label keeps its real bank so `.BASE $C0` HiROM units
 # do not turn $7E into $13E. Upstream's own test documents the divergence.
 65816/base_test_1
+#
+# bank_number is the same divergence reached through the other path: its
+# TEST-06 asserts `:test_var` = $9E for a RAMSECTION label in bank $7E under
+# `.base $20` (bank + base). The fork's third patch (2026-09-20) makes the
+# `:label` / bank() operators return the WRAM label's real bank, $7E — the
+# first patch had only covered get_snes_pc_bank(). Verified by hand: TEST-06
+# reads 7E 7F 7E, and every ROM-label case of the test (TEST-05 22 22 44,
+# TEST-07 21 21 21 21) is unchanged.
+65816/bank_number

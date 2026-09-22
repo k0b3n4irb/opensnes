@@ -100,11 +100,24 @@ extern u8 superfx_status;
  *============================================================================*/
 
 /**
- * @brief Initialize SuperFX — detect hardware, set default config
+ * @brief Is a GSU on this cartridge? (crt0 detects it; this reads the outcome)
+ * @return 1 if crt0 read a non-zero chip version from the VCR, 0 if not
+ *
+ * The presence test gsuInit() also returns, without the side effects — use it
+ * anywhere after the defaults are set. Inlined. (Added 2026-09-22; docs
+ * cited a superfxIsPresent() that never existed.)
+ */
+inline u8 gsuIsPresent(void) {
+    return superfx_status != 0;
+}
+
+/**
+ * @brief Set the GSU default configuration; returns gsuIsPresent()
  * @return 1 if GSU detected, 0 if not
  *
  * Sets defaults: gsu_cfgr=$80, gsu_scmr=$19, gsu_scbr=$00, gsu_dma_src_hi=$00.
- * Inlined for zero-call-overhead access.
+ * Detection itself is crt0's (superfx_status); call this once at boot, and
+ * gsuIsPresent() when you only want the answer. Inlined.
  */
 inline u8 gsuInit(void) {
     gsu_cfgr = 0x80;        /* IRQ mask, no fast multiply */

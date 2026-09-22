@@ -54,18 +54,27 @@ void sceneRun(const Scene *initial) {
     }
 }
 
-void scenePush(const Scene *next) {
+u8 scenePush(const Scene *next) {
     if (scene_top >= SCENE_STACK_MAX)
-        return;
+        return 0;
     scene_stack[scene_top] = next;
     scene_init_done[scene_top] = 0;
     scene_top++;
+    return 1;
 }
 
-void scenePop(void) {
+u8 scenePop(void) {
     if (scene_top <= 1)
-        return;
+        return 0;
     scene_top--;
     /* scene_init_done[scene_top] stays set; if the same slot is
      * re-used by a future scenePush, push resets it to 0. */
+    return 1;
+}
+
+void sceneReplace(const Scene *next) {
+    /* Works at depth 1 too, where scenePop() refuses: the top slot — the
+     * bottom one included — is overwritten in place and its init re-armed. */
+    scene_stack[scene_top - 1] = next;
+    scene_init_done[scene_top - 1] = 0;
 }

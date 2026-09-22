@@ -28,11 +28,21 @@ typedef void (*VBlankCallback)(void);
 /**
  * @brief Register a VBlank callback function
  *
- * The registered callback will be called during every VBlank interrupt,
- * BEFORE the vblank_flag is set. This allows time-critical operations
- * (like DMA transfers) to be performed reliably during VBlank.
+ * The callback runs inside the NMI handler, once per frame the main thread
+ * was waiting for — NOT on lag frames (an NMI that arrives while the main
+ * loop is still computing skips all VBlank work, this callback included). It
+ * runs AFTER the library's own VBlank work: the OAM upload, the text tilemap
+ * flush and the background scroll sync have already used part of VBlank.
  *
- * @param callback Function to call during VBlank, or NULL to disable
+ * @param callback Function to call during VBlank, or NULL to disable (same as
+ *                 nmiClear())
+ *
+ * @warning Inside the callback: never call WaitForVBlank() (it waits for an
+ *          NMI that cannot arrive — deadlock); never touch the WRAM data port
+ *          $2180-$2183; never use a lib DMA helper while the main thread may
+ *          be setting one up (they all share DMA channel 0). Plain C
+ *          multiply / divide are safe (the runtime avoids the hardware unit
+ *          in NMI context); fixMul and fix32Mul are not.
  *
  * @code
  * void myVBlankHandler(void) {
@@ -49,21 +59,28 @@ typedef void (*VBlankCallback)(void);
  * }
  * @endcode
  *
- * @note Keep callbacks short! VBlank time is limited (~2200 CPU cycles on NTSC)
+ * @note Keep callbacks short: VBlank is short and the library has already
+ *       spent part of it. `make test-nmi-budget` measures the handler.
  * @note Callback runs with interrupts disabled
- * @note The callback function must be in the same ROM bank as the main code (bank 0).
- *       For larger projects, use nmiSetBank() to specify the bank explicitly.
+ * @note The callback may live in any ROM bank: the bank is taken from the
+ *       function pointer. (This note said "must be in bank 0" until
+ *       2026-09-20; that was only ever true of irqSet, fixed the same day.)
  */
 void nmiSet(VBlankCallback callback);
 
 /**
  * @brief Register a VBlank callback with explicit bank
  *
- * Use this when the callback function might not be in bank 0.
+ * Not needed from C — nmiSet() reads the bank from the pointer. Kept for
+ * callers that only have a 16-bit address (assembly).
  *
  * @param callback Function to call during VBlank
  * @param bank ROM bank where the callback is located (0-255)
+ *
+ * @deprecated Since 2026-09-20: nmiSet() reads the bank from the function
+ *             pointer. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("nmiSet() takes the bank from the function pointer")
 void nmiSetBank(VBlankCallback callback, u8 bank);
 
 /**
@@ -114,7 +131,11 @@ void irqSet(void *handler);
  * @brief irqSet() with an explicit ROM bank for the handler
  * @param handler Address of the ASM handler
  * @param bank ROM bank containing the handler
+ *
+ * @deprecated Since 2026-09-20: irqSet() reads the bank from the handler
+ *             pointer. Removed at the next major version.
  */
+OPENSNES_DEPRECATED("irqSet() takes the bank from the handler pointer")
 void irqSetBank(void *handler, u8 bank);
 
 /**

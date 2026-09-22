@@ -64,7 +64,7 @@ void consoleInit(void) {
     REG_INIDISP = INIDISP_FORCE_BLANK;
 
     /* Detect PAL/NTSC */
-    is_pal_system = (REG_STAT78 & 0x10) ? TRUE : FALSE;
+    is_pal_system = (REG_STAT78 & 0x10) ? 1 : 0;
 
     /* Set default brightness (screen still blanked) */
     current_brightness = 15;
@@ -180,7 +180,7 @@ u8 (*const __opensnes_force_emit_getBrightness)(void) = getBrightness;
  * instruction for power savings and reduced bus contention (Opt 1). */
 
 u8 isInVBlank(void) {
-    return (REG_HVBJOY & 0x80) ? TRUE : FALSE;
+    return (REG_HVBJOY & 0x80) ? 1 : 0;
 }
 
 /*============================================================================
@@ -203,14 +203,14 @@ u8 isPAL(void) {
 }
 
 u8 getRegion(void) {
-    return is_pal_system ? 1 : 0;
+    return is_pal_system;           /* the same 0 / 1 as isPAL() since 2026-09-22 */
 }
 
 /*============================================================================
  * Random Number Generation
  *============================================================================*/
 
-u16 rand(void) {
+u16 rngNext(void) {
     /* 16-bit LFSR (Linear Feedback Shift Register) */
     /* Polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
     u16 bit = ((rand_seed >> 0) ^ (rand_seed >> 2) ^
@@ -219,9 +219,18 @@ u16 rand(void) {
     return rand_seed;
 }
 
-void srand(u16 seed) {
+void rngSeed(u16 seed) {
     rand_seed = seed;
     if (rand_seed == 0) rand_seed = 0xACE1;  /* Avoid zero state */
+}
+
+/* The deprecated libc-looking names, kept until the next major. */
+u16 rand(void) {
+    return rngNext();
+}
+
+void srand(u16 seed) {
+    rngSeed(seed);
 }
 
 /*============================================================================
@@ -244,7 +253,9 @@ void setMode(u8 mode, u8 flags) {
 /* Assembly helper to read REG_RDNMI - compiler optimizes away volatile reads */
 extern void clearNmiFlag(void);
 
-void nmiSetBank(VBlankCallback callback, u8 bank) {
+/* The one installer. nmiSet(), nmiClear() and the deprecated nmiSetBank() all
+ * come here, so the lib never calls its own deprecated entry point. */
+static void nmi_install(VBlankCallback callback, u8 bank) {
     /* Disable NMI during pointer write to prevent partial reads */
     REG_NMITIMEN = 0;
 
@@ -266,16 +277,27 @@ void nmiSetBank(VBlankCallback callback, u8 bank) {
 }
 
 void nmiSet(VBlankCallback callback) {
+    /* interrupt.h documents nmiSet(NULL) as "disable" and nmiClear() as its
+     * equivalent. It was not: a null pointer was stored and flagged as a
+     * live callback, so the NMI did `jml` to $00:0000 (fixed 2026-09-20). */
+    if (!callback) {
+        nmiClear();
+        return;
+    }
     /* Post-A6 a function pointer is a 4-byte far pointer carrying its own bank
      * in bits 16-23, so a callback in ANY bank works — derive the bank from the
      * pointer and let nmiSetBank do the rest. The old bug was only the literal
      * bank 0 here; the 4-byte pointer itself forwards correctly. */
-    nmiSetBank(callback, (u8)((u32)callback >> 16));
+    nmi_install(callback, (u8)((u32)callback >> 16));
+}
+
+void nmiSetBank(VBlankCallback callback, u8 bank) {
+    nmi_install(callback, bank);
 }
 
 void nmiClear(void) {
     /* Restore default callback and clear fast flag */
-    nmiSetBank((VBlankCallback)DefaultNmiCallback, 0);
+    nmi_install((VBlankCallback)DefaultNmiCallback, 0);
     nmi_has_callback = 0;
 }
 
@@ -283,7 +305,7 @@ void nmiClear(void) {
  * Hardware IRQ (H/V timer) — see interrupt.h for the raw-handler contract
  *============================================================================*/
 
-void irqSetBank(void *handler, u8 bank) {
+static void irq_install(void *handler, u8 bank) {
     /* Mask timer IRQ sources during the pointer write so a mid-update
      * JML [irq_callback] can't read a half-written vector. NMI stays on. */
     REG_NMITIMEN = nmitimen_shadow & (u8)~(IRQ_HTIMER | IRQ_VTIMER);
@@ -297,12 +319,19 @@ void irqSetBank(void *handler, u8 bank) {
 }
 
 void irqSet(void *handler) {
-    /* cc65816 code lives in bank 0 by default; use irqSetBank otherwise. */
-    irqSetBank(handler, 0);
+    /* The far pointer carries its bank in bits 16-23, exactly as in nmiSet
+     * above. This used to pass a literal 0: a handler the linker placed
+     * outside bank $00 — any SUPERFREE section can be — was entered at the
+     * same offset of bank $00 (fixed 2026-09-20). */
+    irq_install(handler, (u8)((u32)handler >> 16));
+}
+
+void irqSetBank(void *handler, u8 bank) {
+    irq_install(handler, bank);
 }
 
 void irqClear(void) {
-    irqSetBank((void *)DefaultIrqHandler, 0);
+    irq_install((void *)DefaultIrqHandler, 0);
 }
 
 void irqSetHTimer(u16 h) {

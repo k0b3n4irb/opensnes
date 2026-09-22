@@ -70,29 +70,18 @@ extern u8 char_pal[], char_pal_end[];
  * @struct GameState
  * @brief Centralized game state structure
  *
- * @note IMPORTANT COMPILER PATTERN:
- * Using a global struct with s16 types is the REQUIRED pattern for sprite
- * coordinates in OpenSNES. The following patterns FAIL:
- *
- * @code
- * // BAD - causes LEFT/RIGHT movement to fail while UP/DOWN works:
- * static u16 player_x;
- * static u16 player_y;
- *
- * // GOOD - all movement directions work correctly:
- * typedef struct { s16 x, y; } Player;
- * Player player = {100, 100};
- * @endcode
- *
- * This is due to a compiler quirk where separate static u16 variables
- * generate different (broken) code compared to struct member access.
- * See .claude/KNOWLEDGE.md for detailed documentation.
+ * Coordinates are `s16` because the scroll thresholds subtract and compare
+ * them: a signed type keeps "left of the threshold" a plain `<`. (This
+ * comment used to claim that separate `static u16` coordinates were
+ * miscompiled and that the struct was REQUIRED. That described a compiler
+ * of early 2026; `examples/input/move_sprite` moves a sprite from plain
+ * `u16` locals and its luna manifest pins the motion to the pixel.)
  *
  * @see animated_sprite example for reference implementation
  */
 typedef struct {
-    s16 player_x;       /**< Player X position (screen coords) - MUST be s16 */
-    s16 player_y;       /**< Player Y position (screen coords) - MUST be s16 */
+    s16 player_x;       /**< Player X position (screen coords) */
+    s16 player_y;       /**< Player Y position (screen coords) */
     s16 bg1_scroll_x;   /**< BG1 horizontal scroll offset */
     s16 bg1_scroll_y;   /**< BG1 vertical scroll offset */
     s16 bg2_scroll_x;   /**< BG2 horizontal scroll offset (parallax) */

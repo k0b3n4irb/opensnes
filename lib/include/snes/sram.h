@@ -9,10 +9,19 @@
  * SRAM (Static RAM) on SNES cartridges is battery-backed RAM that
  * persists when the console is powered off. It's used for save games.
  *
- * ## Memory Layout (LoROM)
+ * ## Memory Layout
  *
- * SRAM is mapped at bank $70, addresses $0000-$7FFF (32KB max).
- * Most games use 2KB-8KB of SRAM.
+ * - **LoROM**: bank $70, $0000-$7FFF (32 KB max).
+ * - **HiROM** (`USE_HIROM=1`): bank $30, $6000-$7FFF — the hardware exposes
+ *   battery RAM in 8 KB windows there, and this module addresses the first
+ *   one only, so `offset + size` must stay within 8 KB (the default
+ *   SRAM_SIZE). Until 2026-09-20 the LoROM address was used on HiROM too.
+ * - **SA-1**: not supported — `USE_SRAM=1` with `USE_SA1=1` is a build error.
+ *   SA-1 save memory is BW-RAM, which the SNES CPU may only write after
+ *   enabling it, and the library does not.
+ *
+ * Source pointers may be in any bank (a `const` save template in ROM works);
+ * destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.
  *
  * ## Usage Example
  *
@@ -81,6 +90,29 @@
 #define SRAM_SIZE_32KB    0x05
 
 /*============================================================================
+ * Return Codes
+ *============================================================================*/
+
+/**
+ * @name SRAM return codes
+ * Returned by sramSave(), sramLoad(), sramSaveOffset(), sramLoadOffset() and
+ * sramClear(). The family returned nothing until 2026-09-21 and copied
+ * whatever it was asked; a refused transfer now copies NOTHING.
+ *
+ * The capacity checked against is the one your ROM declares: the SRAMSIZE
+ * byte of its header (`SRAM_SIZE` in your Makefile, 8 KB by default), capped
+ * by what this module addresses in one bank (32 KB on LoROM, 8 KB on HiROM).
+ * @{
+ */
+/** @brief The transfer fits and was done (a `size` of 0 is also OK). */
+#define SRAM_OK           0
+/** @brief `offset + size` exceeds the declared SRAM; nothing was copied. */
+#define SRAM_ERR_RANGE    1
+/** @brief The ROM header declares no SRAM (`USE_SRAM := 1` is missing). */
+#define SRAM_ERR_NO_SRAM  2
+/** @} */
+
+/*============================================================================
  * SRAM Functions
  *============================================================================*/
 
@@ -91,17 +123,19 @@
  * persist when the console is powered off.
  *
  * @param data Pointer to data in Work RAM to save
- * @param size Number of bytes to save (max 32KB)
+ * @param size Number of bytes to save
+ * @return SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing written)
  *
  * @code
  * u8 saveData[64] = { ... };
  * sramSave(saveData, 64);
  * @endcode
  *
- * @note Uses bank $70 (LoROM SRAM), starting at address $0000
- * @warning Ensure ROM header has SRAM enabled!
+ * @note Writes from SRAM offset 0 — $70:0000 on LoROM, $30:6000 on HiROM
+ * @warning The ROM header must declare SRAM (`USE_SRAM := 1`); without it
+ *          this returns SRAM_ERR_NO_SRAM.
  */
-void sramSave(const u8 *data, u16 size);
+u8 sramSave(const u8 *data, u16 size);
 
 /**
  * @brief Load data from SRAM
@@ -111,7 +145,8 @@ void sramSave(const u8 *data, u16 size);
  * @param data Pointer to destination buffer in Work RAM — a bank-0 object
  *             or a `FAR` (bank $7E) one; the copy runs as a block move into
  *             bank $7E, whose first 8 KB mirror bank 0
- * @param size Number of bytes to load (max 32KB)
+ * @param size Number of bytes to load
+ * @return SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (`data` untouched)
  *
  * @code
  * u8 saveData[64];
@@ -120,7 +155,7 @@ void sramSave(const u8 *data, u16 size);
  *
  * @note If no valid save exists, SRAM contents are undefined
  */
-void sramLoad(u8 FAR *data, u16 size);
+u8 sramLoad(u8 FAR *data, u16 size);
 
 /**
  * @brief Save data to SRAM at offset
@@ -130,14 +165,15 @@ void sramLoad(u8 FAR *data, u16 size);
  *
  * @param data Pointer to data in Work RAM to save
  * @param size Number of bytes to save
- * @param offset Starting offset in SRAM (0-32767)
+ * @param offset Starting offset in SRAM
+ * @return SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing written)
  *
  * @code
  * // Save slot 2 (each slot is 256 bytes)
  * sramSaveOffset(saveData, 256, 512);
  * @endcode
  */
-void sramSaveOffset(const u8 *data, u16 size, u16 offset);
+u8 sramSaveOffset(const u8 *data, u16 size, u16 offset);
 
 /**
  * @brief Load data from SRAM at offset
@@ -147,14 +183,15 @@ void sramSaveOffset(const u8 *data, u16 size, u16 offset);
  *
  * @param data Pointer to destination buffer in Work RAM
  * @param size Number of bytes to load
- * @param offset Starting offset in SRAM (0-32767)
+ * @param offset Starting offset in SRAM
+ * @return SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (`data` untouched)
  *
  * @code
  * // Load slot 2 (each slot is 256 bytes)
  * sramLoadOffset(saveData, 256, 512);
  * @endcode
  */
-void sramLoadOffset(u8 FAR *data, u16 size, u16 offset);
+u8 sramLoadOffset(u8 FAR *data, u16 size, u16 offset);
 
 /**
  * @brief Clear SRAM to zero
@@ -163,13 +200,14 @@ void sramLoadOffset(u8 FAR *data, u16 size, u16 offset);
  * Useful for "delete save" functionality.
  *
  * @param size Number of bytes to clear (usually your save data size)
+ * @return SRAM_OK, or SRAM_ERR_RANGE / SRAM_ERR_NO_SRAM (nothing cleared)
  *
  * @code
  * // Clear first 256 bytes (one save slot)
  * sramClear(256);
  * @endcode
  */
-void sramClear(u16 size);
+u8 sramClear(u16 size);
 
 /**
  * @brief Calculate simple checksum

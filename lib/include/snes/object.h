@@ -143,7 +143,8 @@ _Static_assert(__builtin_offsetof(t_objs, onscreen) == 56, "onscreen offset mism
  */
 extern t_objs objWorkspace;
 
-/** @brief Current object pointer (byte offset, for internal use) */
+/** @brief Slot index + 1 of the last objGetPointer(), 0 if its handle was stale.
+ *  Prefer the return value of objGetPointer(); this global predates it. */
 extern u16 objptr;
 
 /** @brief Set to 1 inside a callback to kill the current object */
@@ -156,6 +157,11 @@ extern u16 objgetid;
 /* The actual object buffer array lives in Bank $7E:
  *   objbuffers[OB_MAX]  — 80 x 64 = 5120 bytes
  *   objfctinit/upd/ref  — function pointer tables (256 bytes each)
+ * The workspace is owner-tracked (since 2026-09-19): it remembers which slot
+ * it mirrors, flushes to that slot before any reload (objNew, objGetPointer,
+ * objKill), and every write-back goes to the owner. A callback may therefore
+ * look at another object without corrupting its own record.
+ *
  * Access these ONLY through the workspace pattern:
  *   objGetPointer(handle) copies objbuffers[N] → objWorkspace
  *   Engine functions copy objWorkspace → objbuffers[N] after callbacks
@@ -182,14 +188,38 @@ void objInitEngine(void);
 void objInitGravity(u16 objgravity, u16 objfriction);
 
 /**
+ * @brief Opt into friction for objCollidMap1D()
+ *
+ * objCollidMap1D() stops an object on a wall but never decelerates it
+ * otherwise (PVSnesLib parity; its FRICTION1D constant was defined and never
+ * used). A non-zero value here makes every objCollidMap1D() call move xvel
+ * AND yvel toward zero by that amount, clamped at zero. objInitEngine()
+ * resets it to 0 (off).
+ *
+ * @param friction Deceleration per call, in 8.8 velocity units (0 = none;
+ *                 0x0100, PVSnesLib's unused constant, is one pixel per frame)
+ */
+void objInitFriction1D(u16 friction);
+
+/** @brief Init callback of an object type, called by objLoadObjects() per table entry */
+typedef void (*ObjInitFn)(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx);
+
+/** @brief Update / refresh callback of an object type; @p idx is the slot index */
+typedef void (*ObjUpdateFn)(u16 idx);
+
+/**
  * @brief Register callback functions for an object type
  *
+ * Typed since 2026-09-19: pass the functions directly, no `(void *)` cast. A
+ * callback with the wrong signature is now a compile error instead of a
+ * corrupted stack at run time. A null callback is safe — the engine skips it.
+ *
  * @param objtype Object type index (0-63)
- * @param initfct Init callback: void init(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx)
- * @param updfct  Update callback: void update(u16 idx) — called per frame
- * @param reffct  Refresh callback: void refresh(u16 idx) — called for on-screen objects (or NULL)
+ * @param initfct Init callback (or 0)
+ * @param updfct  Update callback, called per frame (or 0)
+ * @param reffct  Refresh callback, called for on-screen objects (or 0)
  */
-void objInitFunctions(u8 objtype, void *initfct, void *updfct, void *reffct);
+void objInitFunctions(u8 objtype, ObjInitFn initfct, ObjUpdateFn updfct, ObjUpdateFn reffct);
 
 /**
  * @brief Create a new object
@@ -209,11 +239,16 @@ u16 objNew(u8 objtype, u16 x, u16 y);
  * @brief Get pointer to an object from its handle
  *
  * Validates the handle and populates objWorkspace with the object's data.
- * Sets objptr to the buffer offset (1-based), or 0 if invalid.
  *
  * @param objhandle Object handle (from objNew/objgetid)
+ * @return The slot index + 1 if the handle is live, 0 if it is stale (the
+ *         object was killed, or the slot reused) — in which case the
+ *         workspace is left alone. The same value is stored in `objptr`,
+ *         which was the only way to learn it until 2026-09-20 (the function
+ *         returned void); `objptr` was also documented as a "buffer offset",
+ *         which it is not.
  */
-void objGetPointer(u16 objhandle);
+u16 objGetPointer(u16 objhandle);
 
 /**
  * @brief Kill an object
@@ -262,49 +297,58 @@ void objRefreshAll(void);
  * Updates tilestand, tileabove, tilesprop, tilebprop in objWorkspace.
  * Applies friction to X velocity. Applies gravity if airborne.
  *
- * @param objhandle Object index (as received in update callback)
+ * @param objindex Slot index (as received in an update callback) or the
+ *                 handle from objNew() — see "Index or handle" below
  *
  * @note Syncs objWorkspace before and after — safe to call from C callbacks.
  */
-void objCollidMap(u16 objhandle);
+void objCollidMap(u16 objindex);
 
 /**
  * @brief Check object collision with map tiles including slopes
  *
  * Like objCollidMap but also handles slope tiles (T_SLOPEU1..T_SLOPEUD2).
  *
- * @param objhandle Object index
+ * @param objindex Slot index or handle
  */
-void objCollidMapWithSlopes(u16 objhandle);
+void objCollidMapWithSlopes(u16 objindex);
 
 /**
  * @brief Check object collision with map (no gravity)
  *
  * For top-down movement without gravity.
  *
- * @param objhandle Object index
+ * @param objindex Slot index or handle
  */
-void objCollidMap1D(u16 objhandle);
+void objCollidMap1D(u16 objindex);
 
 /**
  * @brief Test collision between two objects
  *
  * Uses AABB (axis-aligned bounding box) collision.
  *
- * @param objhandle1 First object index
- * @param objhandle2 Second object index
+ * @par Index or handle
+ * A handle is `(id << 8) | index`. objKill() and objGetPointer() need the
+ * whole handle (the id byte is how a stale one is detected); this function,
+ * objCollidMap(), objCollidMapWithSlopes(), objCollidMap1D() and
+ * objUpdateXY() work on a live slot and use the index only. Since 2026-09-21
+ * they mask the id byte themselves, so a callback's @c idx and a handle both
+ * work. Before that a handle's id byte was shifted into the buffer offset and
+ * the routine silently worked on memory past the pool.
+ *
+ * @param idx1 First object: slot index or handle
+ * @param idx2 Second object: slot index or handle
  * @return 1 if collision detected, 0 otherwise
  */
-u16 objCollidObj(u16 objhandle1, u16 objhandle2);
+u16 objCollidObj(u16 idx1, u16 idx2);
 
 /**
  * @brief Update object position from velocity
  *
  * Adds xvel/yvel to xpos/ypos (24-bit fixed point).
  *
- * @param objindex Raw object index (0-79), NOT the handle from objNew.
- *                 Use the index passed to your update callback, or
- *                 extract from handle with (handle & 0xFF).
+ * @param objindex Slot index (the one passed to your update callback) or
+ *                 the handle from objNew()
  *
  * @note Syncs objWorkspace before and after.
  */

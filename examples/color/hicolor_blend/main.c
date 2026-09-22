@@ -17,7 +17,7 @@
  * @par SNES Concepts
  * - RGB channel splitting across main/sub screens
  * - colorMathSetSource(SUBSCREEN) + colorMathSetOp(ADD) +
- *   colorMathEnable(BG1|BACKDROP) — CGWSEL $02 / CGADSUB $21
+ *   colorMathSetLayers(BG1|BACKDROP) — CGWSEL $02 / CGADSUB $21
  * - Mode 3: 8bpp BG1 + 4bpp BG2 sharing VRAM
  *
  * @par What to Observe
@@ -73,7 +73,7 @@ int main(void) {
     colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
     colorMathSetOp(COLORMATH_ADD);
     colorMathSetHalf(0);
-    colorMathEnable(COLORMATH_BG1 | COLORMATH_BACKDROP);
+    colorMathSetLayers(COLORMATH_BG1 | COLORMATH_BACKDROP);
 
     setScreenOn();
 

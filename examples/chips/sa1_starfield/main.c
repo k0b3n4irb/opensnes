@@ -88,7 +88,7 @@ int main(void) {
 
     setMainScreen(LAYER_OBJ);
 
-    if (!sa1Init()) {
+    if (!sa1IsReady()) {
         setScreenOn();
         while (1) { WaitForVBlank(); }
     }

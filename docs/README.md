@@ -13,6 +13,7 @@ map for people reading the repository on GitHub.
 | [Examples by Category](EXAMPLES_BY_CATEGORY.md) | The exhaustive index of the example corpus |
 | [API Index](API_INDEX.md) | The SDK indexed by *what you are trying to do* |
 | [FAQ](FAQ.md) | Short answers to the questions newcomers actually ask |
+| [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 22 ROMs, one check each, and the grid to fill in |
 | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
 | [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
 
@@ -25,7 +26,7 @@ map for people reading the repository on GitHub.
 
 ## Tutorials
 
-Twenty-four task-shaped walkthroughs under [tutorials/](tutorials/).
+Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
 
 **Drawing the screen**
 
@@ -55,6 +56,9 @@ Twenty-four task-shaped walkthroughs under [tutorials/](tutorials/).
 | [Controller Input](tutorials/input.md) | Button masks and multi-player |
 | [Collision Detection](tutorials/collision.md) | Rectangles, tiles, slopes |
 | [Game States](tutorials/game_states.md) | State machines and transitions |
+| [The Opt-In Framework](tutorials/framework.md) | Game loop and asset bundles |
+| [Text & Fonts](tutorials/text.md) | Printing, the tilemap buffer and the flush |
+| [The Object Engine](tutorials/object.md) | Entity pool, gravity, map collision |
 | [9-Slice Panels](tutorials/panel.md) | Dialog boxes and HUD frames |
 | [Audio & Music](tutorials/audio.md) | SNESMOD playback and sound effects |
 | [Fixed-Point Math](tutorials/math.md) | 8.8 and 16.16 arithmetic |
@@ -154,18 +158,30 @@ naming most of the API.
 | `superfx.h` | [SuperFX](tutorials/superfx.md) | ✅ |
 | `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `window.h` | [Window](tutorials/window.md) | ✅ |
-| `asset.h` | — | ❌ no tutorial (asset bundles; see [API Index](API_INDEX.md)) |
-| `debug.h` | [Debugging](tutorials/debugging.md) mentions the channel | ❌ the two functions are undocumented |
-| `fixed32.h` | — | ❌ no tutorial ([Math](tutorials/math.md) covers 8.8 only) |
-| `gameloop.h` | — | ❌ no tutorial (opt-in loop framework) |
-| `lzss.h` | — | ❌ no tutorial (decompression) |
-| `object.h` | — | ❌ no tutorial (15 functions — the largest gap) |
-| `text.h` | — | ❌ no tutorial (14 functions; only [API Index](API_INDEX.md) lists them) |
+| `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
+| `debug.h` | [Debugging](tutorials/debugging.md) — recipe 7 | ✅ |
+| `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
+| `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
+| `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
+| `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects; four are fixed, the rest are in the page's Gotchas |
+| `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
-The ❌ rows are the documentation backlog, in rough order of how much API is
-behind them: `object.h`, `text.h`, `fixed32.h`, `gameloop.h`, `asset.h`,
-`lzss.h`, `debug.h`.
+**Every public header is now covered.** The last three were small enough to
+belong in an existing page rather than one of their own: 16.16 maths went
+into the [Math](tutorials/math.md) tutorial, LZ77 decompression into
+[Graphics](tutorials/graphics.md), and the in-ROM debug channel into
+[Debugging](tutorials/debugging.md) as recipe 7.
+
+The map is worth keeping honest for a reason the last two days made plain:
+**writing a page is a detection instrument.** Closing `object.h`, `text.h`,
+`gameloop.h` and `asset.h` turned up ten defects in the code being
+documented — a field comment that invited a buffer overrun, an action stored
+to the wrong entity, a connection test that called every idle pad unplugged,
+an example that taught readers to write VRAM outside VBlank, two compiler-bug
+notes that had been fixed long ago and were still scaring people off correct
+C, and a compression example whose headline figures were wrong by an order of
+magnitude in the pessimistic direction.
 
 ## Building the documentation
 

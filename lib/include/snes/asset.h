@@ -100,14 +100,14 @@
  */
 typedef struct {
     /** @brief Pointer to tile graphics data. */
-    u8 *tiles;
+    const u8 *tiles;
     /** @brief One past the end of tile graphics. Size is computed at
      *         load time as `tiles_end - tiles`. */
-    u8 *tiles_end;
+    const u8 *tiles_end;
     /** @brief Pointer to BGR555 palette data. */
-    u8 *palette;
+    const u8 *palette;
     /** @brief One past the end of the palette data. */
-    u8 *palette_end;
+    const u8 *palette_end;
     /**
      * @brief Color depth selector. Use one of:
      *        `BG_4COLORS`, `BG_4COLORS0` (Mode 0), `BG_16COLORS`,
@@ -127,9 +127,9 @@ typedef struct {
     /** @brief Tileset (tiles + palette + color mode). */
     GfxAsset gfx;
     /** @brief Pointer to tilemap data (gfx4snes `.map`). */
-    u8 *tilemap;
+    const u8 *tilemap;
     /** @brief One past the end of the tilemap data. */
-    u8 *tilemap_end;
+    const u8 *tilemap_end;
     /**
      * @brief Tilemap layout. Use one of `SC_32x32`, `SC_64x32`,
      *        `SC_32x64`, `SC_64x64`.
@@ -139,7 +139,9 @@ typedef struct {
 
 /**
  * @brief Load a tileset (tiles + palette) and configure a BG's tile
- *        graphics pointer — typed-value variant of `GFX_LOAD`.
+ *        graphics pointer. (It used to be described as the typed-value
+ *        variant of a `GFX_LOAD` macro; that macro was deleted in the H3
+ *        audit and this is the only interface now.)
  *
  * @param bg            Background number 0-3.
  * @param asset         Bundle to load. Must be non-NULL.
@@ -150,7 +152,9 @@ typedef struct {
 void gfxLoad(u8 bg, const GfxAsset *asset, u8 palette_slot, u16 tiles_vram);
 
 /**
- * @brief Load a full background bundle — typed-value variant of `BG_LOAD`.
+ * @brief Load a full background bundle: tiles, palette and tilemap in one
+ *        call. (The `BG_LOAD` macro this used to be paired with was deleted
+ *        in the H3 audit.)
  *
  * Composes `gfxLoad()` with `bgSetMapPtr()` and a `dmaCopyVram()` of
  * the tilemap. After the call the BG is fully addressable; the caller
@@ -178,8 +182,8 @@ void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
  * @endcode
  */
 #define DECLARE_GFX_ASSET(name, color_mode_)                                  \
-    extern u8 name##_tiles[], name##_tiles_end[];                             \
-    extern u8 name##_pal[],   name##_pal_end[];                               \
+    extern const u8 name##_tiles[], name##_tiles_end[];                             \
+    extern const u8 name##_pal[],   name##_pal_end[];                               \
     static const GfxAsset name = {                                            \
         .tiles       = name##_tiles,                                          \
         .tiles_end   = name##_tiles_end,                                      \
@@ -200,9 +204,9 @@ void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
  * @endcode
  */
 #define DECLARE_BG_ASSET(name, color_mode_, map_size_)                        \
-    extern u8 name##_tiles[], name##_tiles_end[];                             \
-    extern u8 name##_pal[],   name##_pal_end[];                               \
-    extern u8 name##_map[],   name##_map_end[];                               \
+    extern const u8 name##_tiles[], name##_tiles_end[];                             \
+    extern const u8 name##_pal[],   name##_pal_end[];                               \
+    extern const u8 name##_map[],   name##_map_end[];                               \
     static const BgAsset name = {                                             \
         .gfx = {                                                              \
             .tiles       = name##_tiles,                                      \

@@ -54,7 +54,14 @@ static s8 m7_cos;
  * check_lib_rodata.py documents), is bank-safe by construction, and
  * indexes faster than any ROM access. Cost: 256 B of WRAM + the
  * 256 B init image, only for examples linking mode7. */
-static s8 m7_sincos_table[256] = {
+/* const since 2026-09-20. It was a plain static — bank-$00 RAM copied from
+ * ROM at boot for a table nothing writes — because devtools/check_lib_rodata.py
+ * forbade const data in lib C modules: before #121 a const table that the
+ * linker placed outside bank $00 was read with bank-$00 addressing. Every C
+ * read of const data is a far read now (#121), const data goes to the asset
+ * banks by design (#127.3) and check_bank_reads.py fails the link on a
+ * bank-blind read, so the lint only cost RAM. Retired with this change. */
+static const s8 m7_sincos_table[256] = {
       0,   3,   6,   9,  12,  15,  18,  21,  24,  27,  30,  33,  36,  39,  42,  45,
      48,  51,  54,  57,  59,  62,  65,  67,  70,  73,  75,  78,  80,  82,  85,  87,
      89,  91,  94,  96,  98, 100, 102, 103, 105, 107, 108, 110, 112, 113, 114, 116,

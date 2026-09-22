@@ -160,7 +160,7 @@ int main(void) {
     mode7Init();
 
     dsp1Init();
-    dsp1_ok = dsp1Present();
+    dsp1_ok = dsp1IsPresent();
     cam_x = 512; cam_y = 512; cam_aas = 0;
     cameraUpdate();
 

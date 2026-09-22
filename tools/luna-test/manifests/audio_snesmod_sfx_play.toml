@@ -1,0 +1,12 @@
+# snesmodPlayEffect: RIGHT twice selects the high pitch, A fires SFX_TADA.
+# The committed manifest (footprint_sfx_aram.toml) only checks the samples
+# were uploaded; nothing pressed a button, and the ratchet listed
+# snesmodPlayEffect as never executed (2026-09-19). Measured at frame 100
+# with A at 80: one active voice, voice 7, ENVX 127; idle: no active voice.
+rom = "../../../examples/audio/snesmod_sfx/sfx.sfc"
+frames = 100
+input = "40:0x0100,44:0,50:0x0100,54:0,80:0x0080,84:0"
+[asserts]
+audio_rms_min = 50.0
+[asserts.dsp]
+V7_ENVX = { ge = 1 }

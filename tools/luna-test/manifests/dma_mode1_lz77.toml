@@ -2,7 +2,7 @@
 # byte of the last tile.
 #
 # The example replaces `dmaCopyVram(tiles, ...)` with
-# `LzssDecodeVram(patterns, $4000)`: 652 compressed ROM bytes expand to 2592
+# `lzssDecodeVram(patterns, $4000)`: 652 compressed ROM bytes expand to 2592
 # bytes of 4bpp tile data streamed through the PPU data port. The oracle is
 # free and exact — backgrounds/mode1 DMAs the *uncompressed* form of the same
 # artwork, so the decompressed VRAM must be byte-identical to it. Verified:

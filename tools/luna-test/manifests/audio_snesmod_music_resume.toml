@@ -1,0 +1,10 @@
+# snesmodPause then snesmodResume: X at 60, X again at 120. The pause
+# manifest shows silence from 60 on; here the music must be back. Measured
+# at frame 300: voice 7 ENVX 61 (voices 3-5 at 8), so the test asks for any
+# audible signal rather than one voice's exact envelope, which depends on
+# where in the pattern the resume lands.
+rom = "../../../examples/audio/snesmod_music/music.sfc"
+frames = 300
+input = "60:0x0040,64:0,120:0x0040,124:0"
+[asserts]
+audio_rms_min = 100.0

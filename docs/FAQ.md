@@ -105,7 +105,9 @@ and 50 Hz to keep it that way. Read the region at runtime with `getRegion()` or
 Yes. The ROMs are plain `.sfc` files; a flash cart runs them. The library's
 hardware claims are arbitrated against a corpus of hardware documentation
 before they are written down, and the emulator is cycle-accurate, but a
-hardware check before release is still the honest final step.
+hardware check before release is still the honest final step —
+@ref hardware_verification is that session, with `make hardware-kit` to
+collect its ROMs.
 
 ## Contributing to OpenSNES
 

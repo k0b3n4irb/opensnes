@@ -1,11 +1,11 @@
 {
-  "luna": "v1.23.0",
+  "luna": "v1.24.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "88fa5d8d721109728cd19efdbea493128b7e6f95e9fc7f44c062a2b2afcd1b06",
+      "sha256": "eecbce38476c4f5764e3b2f7c6a75c0941a8d224e5db8f4fda765be4cd14258a",
       "samples": 159936,
-      "peak": 21551
+      "peak": 21204
     },
     "audio/snesmod_music": {
       "sha256": "e062c5e2592867d77e6d350d0b634a9dca262fc9e539c8d098ab180e6ccbc138",
@@ -13,14 +13,14 @@
       "peak": 20923
     },
     "audio/pitch_mod": {
-      "sha256": "78c8b90b12d9f9f050014f55bc21092c7c186a307838ec11679401337567066c",
+      "sha256": "5465f1baf9ee980a8ba2c26bf09cc492c9eb904da9e216d7e3a2662d9e00b455",
       "samples": 159936,
       "peak": 22617
     },
     "audio/play_noise": {
-      "sha256": "c949b4ea6a95e88901fe9e4ff56c33100b0cf95ca8eb1f6f1f9fa181b6ba85dc",
+      "sha256": "29f045073c8c8c70e7b61468314adbb336cbe469786d2f8d399490d2764f18e9",
       "samples": 159936,
-      "peak": 21551
+      "peak": 21204
     }
   }
 }
