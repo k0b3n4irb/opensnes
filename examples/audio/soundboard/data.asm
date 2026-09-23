@@ -4,14 +4,14 @@
 ; in this example at all).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 brr_cello:      .incbin "res/cello.brr"
 brr_cello_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 brr_au:         .incbin "res/au.brr"
 brr_au_end:

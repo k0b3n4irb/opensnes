@@ -67,7 +67,7 @@ TEMPLATES := $(OPENSNES)/templates
 # at every call site shaved ~12-16 bytes off tight examples. Bumping back to
 # 16 is a follow-up once lib code-size optimisations or section-routing land.
 # See .claude/rules/bank0_budget.md for the policy.
-BANK0_FAIL_THRESHOLD ?= 8
+BANK0_FAIL_THRESHOLD ?= 1024
 
 # C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
 # above (structural defect B2: all C-accessible RAM must sit in the 8 KB

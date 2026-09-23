@@ -6,7 +6,7 @@
 ; Converted with: gfx4snes -s 8 -o 16 -u 16 -p -m -i res/background.png
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tiles:
 .incbin "res/background.pic"

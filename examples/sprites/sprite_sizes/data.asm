@@ -5,7 +5,7 @@
 ;------------------------------------------------------------------------------
 ; 8x8 sprite (4bpp)
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 sprite8: .incbin "res/sprite8.pic"
 sprite8_end:
@@ -18,7 +18,7 @@ palsprite8_end:
 ;------------------------------------------------------------------------------
 ; 16x16 sprite (4bpp)
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 sprite16: .incbin "res/sprite16.pic"
 sprite16_end:
@@ -31,7 +31,7 @@ palsprite16_end:
 ;------------------------------------------------------------------------------
 ; 32x32 sprite (4bpp)
 ;------------------------------------------------------------------------------
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 sprite32: .incbin "res/sprite32.pic"
 sprite32_end:
@@ -44,7 +44,7 @@ palsprite32_end:
 ;------------------------------------------------------------------------------
 ; 64x64 sprite (4bpp)
 ;------------------------------------------------------------------------------
-.section ".rodata4" superfree
+ASSET_SECTION ".rodata4"
 
 sprite64: .incbin "res/sprite64.pic"
 sprite64_end:

@@ -529,10 +529,20 @@ depends on every type having one.
 
 The routine block-copied the table into its scratch buffer with the source
 bank forced to `$00`. The examples got away with it because their `.o16` data
-sits in a `SUPERFREE` section the linker happens to place in bank `$00` — an
+sat in a `SUPERFREE` section the linker happened to place in bank `$00` — an
 `ASSET_SECTION` table (banks 7-1 by design, see
 `.claude/rules/bank0_budget.md`) would have loaded garbage instead. The DMA
 now takes the bank the caller pushed, so the table can live anywhere.
+
+### 🟢 The collision routines read the map from bank `$00` — fixed 2026-09-23
+
+Same family, one week later. `objCollidMap`, `objCollidMapWithSlopes` and
+`objCollidMap1D` set the data bank to a hardcoded `$00` at their thirteen
+tile reads, while `mapLoad` had been storing the map's real bank since
+chantier B1. The day the examples' maps moved to the asset banks, Mario sank
+into the ground in `slope_collision`. The reads now use the bank `mapLoad`
+stored; the library fixture pins it with a map in bank `$02`. See
+`KNOWN_LIMITATIONS.md`.
 
 ### 🟢 `objInitGravity`'s gravity argument did nothing — fixed 2026-09-18
 

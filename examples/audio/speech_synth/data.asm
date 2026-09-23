@@ -4,7 +4,7 @@
 ; (gen_phonemes.py, committed).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 spc_image:      .incbin "player.spc700.bin"
 spc_image_end:

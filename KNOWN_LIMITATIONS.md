@@ -475,6 +475,28 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 The object engine read the map from bank $00 whatever bank it was in (fixed 2026-09-23)
+
+`objCollidMap()`, `objCollidMapWithSlopes()` and `objCollidMap1D()` look up
+the tile under and around an object in the map that `mapLoad()` installed.
+At their thirteen read sites `lib/contrib/object.asm` set the data bank to a
+hardcoded `$00` before the read — the same hardcode chantier B1 had removed
+from `map.asm`, which stores the map's bank (`maptile_L1b`) and honours it.
+So the object engine only worked with a map in bank $00. Nobody noticed
+because no map had ever left bank $00: every example declared its data
+`SUPERFREE`, and the linker's first bank that fits is bank $00. The day the
+examples' assets moved to the asset banks (`ASSET_SECTION`, 2026-09-23),
+two of them changed picture: `mapandobjects` scrolled to a different height,
+`slope_collision` sank Mario into the ground — collisions computed against
+code bytes.
+
+Fixed: the thirteen sites read `maptile_L1b`. Pinned by the library fixture,
+whose map has lived in bank $02 since it was written: an object placed inside
+the solid ground band reads `tilestand == T_SOLID` (the old engine read 0).
+The lesson is the one `devtools/check_bank_reads.py` cannot teach — it
+checks C, and this was assembly: a bank stored by one routine and hardcoded
+by its neighbour.
+
 ### 🟢 The address of a local variable had an undefined bank (fixed 2026-09-21)
 
 `&local` is a far pointer like any other, but the compiler stored only its

@@ -129,7 +129,7 @@ CASES = [
     ("r_mouse",        2, 0),      ("r_mouse_sens",   2, 0),     # no mouse: the NMI never applies the request...
     ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
     ("r_scope",        2, 0), ("r_scope_names", 2, 1),      ("r_scope_delay",  2, 7),
-    ("r_obj_grav",     2, 0x0040), ("r_obj_refresh",  2, 2),      # both objects are on screen
+    ("r_obj_grav",     2, 0x0040), ("r_obj_air", 2, 0), ("r_obj_stand", 2, 0xFF00), ("r_obj_refresh",  2, 2),      # both objects are on screen
     ("r_obj_cobj",     2, 1), ("r_obj_cobj_h", 2, 0x0100),      ("r_obj_cobj_no",  2, 0),
     ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
     ("r_mosaic",       2, 15),    ("r_cm_layers", 2, 1),

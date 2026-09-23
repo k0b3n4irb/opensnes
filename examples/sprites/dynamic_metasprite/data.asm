@@ -2,7 +2,7 @@
 ; Dynamic Metasprite Example - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ; 32x32 metasprite tiles (4bpp, transposed for OBJ VRAM layout)
 ; Source: spritehero32.png = 64x64 sheet, 3 animation frames
@@ -17,7 +17,7 @@ spritehero32_pal_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 ; 16x16 metasprite tiles (4bpp, transposed)
 ; Source: spritehero16.png = 32x48 sheet, 4 animation frames
@@ -27,7 +27,7 @@ spritehero16_til_end:
 
 .ends
 
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 ; 8x8 metasprite tiles (4bpp, transposed)
 ; Source: spritehero8.png = 16x16 sheet, 4 animation frames

@@ -142,7 +142,7 @@ ready-to-paste `audioLoadSample()` line.
 end label, exactly as the example does:
 
 ```asm
-.section ".samples" superfree
+ASSET_SECTION "samples"          ; templates/assets.inc: any bank but $00
 brr_jump:     .incbin "res/jump.brr"
 brr_jump_end:
 .ends

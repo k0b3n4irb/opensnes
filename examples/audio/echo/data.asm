@@ -3,7 +3,7 @@
 ; audioLoadSample() (the pop sample is shared with soundboard).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 brr_pop:    .incbin "res/pp.brr"
 brr_pop_end:

@@ -5,7 +5,7 @@
 ; R layer: 4bpp red ramp on palette 0 (CGRAM 1-15).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 gb_tiles:       .incbin "res/gb.pic"
 gb_tiles_end:
@@ -15,7 +15,7 @@ gb_map_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 r_tiles:        .incbin "res/r.pic"
 r_tiles_end:

@@ -6,7 +6,7 @@
 ; matching _end labels. Here the prefix is `bg` (single static background).
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ;------------------------------------------------------------------------------
 ; Background tiles (4bpp, 16 colors)

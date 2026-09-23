@@ -55,9 +55,9 @@
 /** @brief Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine */
 extern u8 mario_sprite_til[];
 /** @brief Map data (tile indices + header with width/height) */
-extern u8 mapmario[];
+extern const u8 mapmario[];   /* asset bank: every C read must be a far read, hence const */
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
-extern u8 tilesetatt[];
+extern const u8 tilesetatt[];
 
 /** @brief Asset symbols from data.asm (.incbin sections in SUPERFREE banks).
  * Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram
@@ -124,8 +124,8 @@ extern u8 mario_sprite_pal[], mario_sprite_palend[];
 
 static u16 map_width;          /**< Map width in tiles (parsed from map header) */
 static u16 map_height;         /**< Map height in tiles (parsed from map header) */
-static u16 *map_data;          /**< Pointer to the tile index array within mapmario */
-static u16 *tile_props;        /**< Pointer to the tile property table (T_SOLID/T_EMPTY) */
+static const u16 *map_data;          /**< Pointer to the tile index array within mapmario */
+static const u16 *tile_props;        /**< Pointer to the tile property table (T_SOLID/T_EMPTY) */
 
 /**
  * @brief Precomputed row pointers into map_data for fast tile lookup.
@@ -134,7 +134,7 @@ static u16 *tile_props;        /**< Pointer to the tile property table (T_SOLID/
  * map_row_ptrs[row] points directly to the start of that row's tile data.
  * Maximum 32 rows for SC_64x32 tilemap height.
  */
-static u16 *map_row_ptrs[32];
+static const u16 *map_row_ptrs[32];
 
 static s16 camera_x;          /**< Current camera X scroll offset in pixels */
 static s16 last_tile_x;       /**< Last tile column for which streaming was performed */
@@ -260,14 +260,14 @@ static void write_vram_column(u16 map_col, u16 vram_col) {
  */
 static void map_load(void) {
     u16 col, row;
-    u16 *hdr, *ptr;
+    const u16 *hdr, *ptr;
 
-    hdr = (u16 *)mapmario;
+    hdr = (const u16 *)mapmario;
     map_width = hdr[0] >> 3;
     map_height = hdr[1] >> 3;
     map_data = &hdr[3];
 
-    tile_props = (u16 *)tilesetatt;
+    tile_props = (const u16 *)tilesetatt;
 
     /* Build row pointer table for fast access */
     ptr = map_data;

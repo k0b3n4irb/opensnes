@@ -5,7 +5,7 @@
 ;------------------------------------------------------------------------------
 ; Tileset graphics and palette (from gfx4snes)
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tileset:
 .incbin "res/tileslevel1.pic"

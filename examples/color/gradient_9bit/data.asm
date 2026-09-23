@@ -6,7 +6,7 @@
 ; sub-5-bit gradient steps).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 color_table:        .incbin "res/color_table.bin"
 brightness_table:   .incbin "res/brightness_table.bin"

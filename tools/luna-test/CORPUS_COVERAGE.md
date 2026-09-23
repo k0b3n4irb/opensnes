@@ -46,7 +46,7 @@ luna v1.24.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `color/transparency` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
-| `games/likemario` | OK | live (200f/190nmi) |
+| `games/likemario` | OK | live (200f/189nmi) |
 | `games/mapandobjects` | OK | live (200f/198nmi) |
 | `games/mode7_flying` | OK | live (200f/198nmi) |
 | `games/mode7_racing` | OK | live (200f/198nmi) |

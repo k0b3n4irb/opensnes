@@ -2,7 +2,7 @@
 ; HDMA Helpers Demo - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tiles: .incbin "res/bg.pic"
 tiles_end:

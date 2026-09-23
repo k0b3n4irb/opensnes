@@ -112,12 +112,19 @@ The `-e N` offset ensures tilemap entries reference the correct banks.
 
 ### Phase 3 — Assembly Data File (data.asm)
 
-Use the **assembly DMA loader pattern** for all asset loading. This handles
-SUPERFREE bank bytes correctly (C's dmaCopyVram hardcodes bank $00).
+Declare the assets with `ASSET_SECTION` (`templates/assets.inc`, included in
+every assembled file) and load them **from C** with the lib's DMA helpers:
+`dmaCopyVram()`, `dmaCopyCGram()`, `bgInitTileSet()`, `oamInitGfxSet()` all
+read the bank from the pointer they are given (chantier A6). Do NOT write an
+assembly loader and do NOT declare a bare `superfree` section — the linker's
+first bank that fits is bank $00, and 14 examples sat within 28 bytes of a
+full code bank that way until 2026-09-23. (This section used to say
+"C's dmaCopyVram hardcodes bank $00" and to recommend a hand-written loader;
+both were stale since v0.19.0.)
 
 ```asm
-;--- Data sections (SUPERFREE = linker places optimally) ---
-.section ".rodata1" superfree
+;--- data.asm: any bank but $00, highest first ---
+ASSET_SECTION "rodata1"
 tiles:
 .incbin "res/background.pic"
 tiles_end:
@@ -128,61 +135,18 @@ palette:
 .incbin "res/background.pal"
 palette_end:
 .ends
-
-;--- Assembly DMA loader (handles bank bytes) ---
-.section ".loader" superfree
-loadGraphics:
-    php
-
-    ; Set VMAIN for word increment
-    sep #$20
-    lda #$80
-    sta.l $2115
-
-    ; DMA tiles to VRAM
-    rep #$20
-    lda #<vram_addr>
-    sta.l $2116
-    lda #(tiles_end - tiles)
-    sta.l $4305
-    lda #tiles
-    sta.l $4302
-    sep #$20
-    lda #:tiles             ; bank byte from LINKER — the key!
-    sta.l $4304
-    lda #$01
-    sta.l $4300             ; mode: word write
-    lda #$18
-    sta.l $4301             ; dest: VMDATAL ($2118)
-    lda #$01
-    sta.l $420B             ; start DMA ch0
-
-    ; DMA palette to CGRAM
-    sep #$20
-    lda #<start_color>
-    sta.l $2121             ; CGADD
-    rep #$20
-    lda #(palette_end - palette)
-    sta.l $4305
-    lda #palette
-    sta.l $4302
-    sep #$20
-    lda #:palette
-    sta.l $4304
-    lda #$00
-    sta.l $4300             ; mode: byte write
-    lda #$22
-    sta.l $4301             ; dest: CGDATA ($2122)
-    lda #$01
-    sta.l $420B
-
-    ; DMA tilemap to VRAM (same pattern as tiles)
-    ; ...
-
-    plp
-    rtl
-.ends
 ```
+
+```c
+extern u8 tiles[], tiles_end[], tilemap[], tilemap_end[], palette[], palette_end[];
+dmaCopyVram(tiles, VRAM_TILES, tiles_end - tiles);
+dmaCopyVram(tilemap, VRAM_MAP, tilemap_end - tilemap);
+dmaCopyCGram(palette, 0, palette_end - palette);
+```
+
+If C must READ the data (a collision table, a level header), declare the
+extern `const` — `extern const u8 tilesetatt[];` — so every read is a far
+read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 
 ### Phase 4 — C Main File (main.c)
 
@@ -333,10 +297,14 @@ PIL's quantizer creates an entirely different palette. Either:
 NMI handler reads joypads directly. Don't call padUpdate().
 Use `padPressed(0)` for new presses, `padHeld(0)` for held buttons.
 
-### 10. SUPERFREE bank $00 overflow
-Each `static const` array gets its own SUPERFREE section. If bank $00
-($8000-$FFFF = 32KB) fills up, data spills to bank $01+ and
-`lda.l $0000,x` reads garbage. Combine related const arrays.
+### 10. Bank $00 is for code
+`static const` data goes to the asset banks by itself (#127.3) and every C
+read of it is a far read; asm payload goes there with `ASSET_SECTION`. What
+remains in bank $00 is code and whatever asm keeps there on purpose (the
+snesmod driver, sprite LUTs). The link fails loudly, never silently, on a
+bank-blind C read (`check_bank_reads.py`) or a bank-$00 overflow
+(`BANK0_FAIL_THRESHOLD`). What no lint sees: an asm routine that reads data
+with a hardcoded bank — the object engine did until 2026-09-23.
 
 ## Audio Porting (SNESMOD)
 

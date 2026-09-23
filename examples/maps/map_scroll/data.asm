@@ -3,7 +3,7 @@
 ;==============================================================================
 
 ;--- Tileset graphics and palette ---
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tileset:
 .incbin "res/tilesMario.pic"
@@ -38,7 +38,7 @@ tilesetdef:
 .ends
 
 ;--- Sprite graphics ---
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 gfxsprite:
 .incbin "res/mario.pic"

@@ -5,7 +5,7 @@
 ;------------------------------------------------------------------------------
 ; BG1 tiles and palette (4bpp, palette slot 2)
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 bg1_tiles: .incbin "res/BG1.pic"
 bg1_tiles_end:
@@ -18,7 +18,7 @@ bg1_pal_end:
 ;------------------------------------------------------------------------------
 ; BG2 tiles and palette (4bpp, palette slot 4)
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 bg2_tiles: .incbin "res/BG2.pic"
 bg2_tiles_end:
@@ -31,7 +31,7 @@ bg2_pal_end:
 ;------------------------------------------------------------------------------
 ; BG3 tiles and palette (2bpp, palette slot 0)
 ;------------------------------------------------------------------------------
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 bg3_tiles: .incbin "res/BG3.pic"
 bg3_tiles_end:
@@ -44,7 +44,7 @@ bg3_pal_end:
 ;------------------------------------------------------------------------------
 ; Tilemaps (all 32x32 = 2048 bytes each)
 ;------------------------------------------------------------------------------
-.section ".rodata4" superfree
+ASSET_SECTION ".rodata4"
 
 bg1_map: .incbin "res/BG1.map"
 bg1_map_end:

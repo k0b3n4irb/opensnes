@@ -5,7 +5,7 @@
 ; in C using library functions (bgInitTileSet, dmaCopyVram).
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ;------------------------------------------------------------------------------
 ; Background tiles (4bpp, 16 colors)

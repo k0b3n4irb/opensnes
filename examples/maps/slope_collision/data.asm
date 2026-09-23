@@ -5,7 +5,7 @@
 ; Single object type (Mario) with slope collision.
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tileset:
 .incbin "res/tiles.pic"
@@ -23,7 +23,7 @@ mariopal:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 mapmario:
 .incbin "res/BG1.m16"

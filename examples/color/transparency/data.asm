@@ -4,7 +4,7 @@
 ;==============================================================================
 
 ;--- Landscape: 4bpp tiles + tilemap + palette (palette bank 1) ---
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 land_tiles:
 .incbin "res/backgrounds.pic"
@@ -21,7 +21,7 @@ land_pal_end:
 .ends
 
 ;--- Clouds: 2bpp tiles + tilemap + palette (palette bank 0) ---
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 cloud_tiles:
 .incbin "res/clouds.pic"

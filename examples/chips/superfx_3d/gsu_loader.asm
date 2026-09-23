@@ -16,7 +16,7 @@
 ;------------------------------------------------------------------------------
 ; GSU program binary
 ;------------------------------------------------------------------------------
-.SECTION ".gsu_code" SUPERFREE
+ASSET_SECTION ".gsu_code"
 gsu_program:
     .incbin "gsu_3d.sfx.bin"
 gsu_program_end:

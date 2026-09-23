@@ -1,7 +1,7 @@
 ; Simple Sprite - Sprite Data
 ; 32x32 sprite tiles and palette
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 sprite32:
 .incbin "res/sprite32.pic"
