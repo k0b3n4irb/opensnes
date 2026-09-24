@@ -475,6 +475,22 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
+
+`make/common.mk` defaulted the header's `ROMSIZE` byte to `$08` (256 KB)
+for every mapping while the HiROM memory map links 8 × 64 KB = 512 KB. The
+byte is computed from the bank count now, and the bank count is a project
+knob (`ROM_BANKS`, default 8): a Super FX or a large game sets
+`ROM_BANKS := 32` for 1 MB and the linker, the header and the asset bank
+range follow. wlalink takes the largest bank count among the objects, so
+the prebuilt library needs no rebuild. Found while sizing what a Super FX
+game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
+
+In the same change the Super FX header gained the extended header it never
+had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
+cartridge could read the Game Pak RAM size; it is declared at `$FFBD`
+(`GSU_RAM_KB`, default 64) with `$FFDA = $33`, as both arbiters describe.
+
 ### 🟢 The object engine read the map from bank $00 whatever bank it was in (fixed 2026-09-23)
 
 `objCollidMap()`, `objCollidMapWithSlopes()` and `objCollidMap1D()` look up

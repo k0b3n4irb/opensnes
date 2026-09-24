@@ -123,7 +123,7 @@ wireframe; Star Fox is filled polygons with depth sort), sprite scale /
 rotate in OBJ mode (Yoshi's Island), 8bpp blit. Tools: OBJ → vertex/edge/
 face lists, PLOT palettes, `gfx4snes` has nothing for framebuffers.
 
-### G5 — ROM and RAM sizing (cheap, blocks a big game first)
+### G5 — ROM and RAM sizing (cheap, blocks a big game first) — **done 2026-09-24** (`ROM_BANKS`, `GSU_RAM_KB`, extended header, `BANK $70 SLOT 3`)
 
 `ROMBANKS 8` is hardcoded in `memmap.inc` and the headers: 256 KB. Star Fox
 is 1 MB, and a GSU game carries 3D data plus fat GSU code. ROM size must

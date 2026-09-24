@@ -95,10 +95,13 @@ linker tries the highest bank first and walks down; bank $00 is simply
 not a candidate. The RPG went from 12 to **9393** free bytes in bank $00
 this way, with a pixel-identical ROM.
 
-The list is literal because it must be: a `.DEFINE` is not expanded
-inside a `BANKS` clause (wlalink: "malformed BANKS list") and a bank
-outside the memory map is a hard link error ("out of range [0, 8]").
-Banks 1-7 exist in every ROM memory map the SDK ships.
+The range is a *string* define: `BANKS ASSET_BANKS` with
+`.DEFINE ASSET_BANKS "7-1"` is substituted as text and works (that is what
+`assets.inc` has always done); a numeric expression there is what wlalink
+rejects ("malformed BANKS list"). Since 2026-09-24 the string comes from
+make (`-D 'ASSET_BANKS_VAL="N-1"'`, N = `ROM_BANKS` − 1) so a 32-bank ROM
+puts assets in banks 31 down to 1; the prebuilt library's own asm sections
+keep the literal "7-1", which exists in every memory map the SDK ships.
 
 Every link now also prints how much declared payload ended up in bank
 $00 (`report_bank0_asset_payload` in `symmap.py`). It matches section

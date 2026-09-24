@@ -37,7 +37,11 @@
 .ENDME
 
 .ROMBANKSIZE $8000          ; 32KB banks (LoROM)
-.ROMBANKS 8                 ; 256KB ROM
+.IFDEF ROM_BANKS_VAL
+.ROMBANKS ROM_BANKS_VAL     ; project knob (make ROM_BANKS=…)
+.ELSE
+.ROMBANKS 8
+.ENDIF
 
 ;------------------------------------------------------------------------------
 ; SNES Header (located at $00:FFB0-FFDF)
@@ -52,9 +56,21 @@
 ; snes9x may misdetect if this area contains non-$FF values.
 ;------------------------------------------------------------------------------
 .BANK 0 SLOT 0
+; Extended header ($FFB0-$FFBF), recognised when the licensee code at $FFDA
+; is $33 (snesdev-wiki "ROM header / Expanded cartridge header"; fullsnes
+; "Extended Header"). A Super FX cart declares its Game Pak RAM HERE, at
+; $FFBD (1 KB << n), and leaves $FFD8 at $00 — both arbiters agree. Until
+; 2026-09-24 this block was sixteen $FF bytes and $FFDA was $00: no
+; expansion RAM declared, no extended header at all.
 .ORG $7FB0
 .SECTION ".extended_header" FORCE
-.db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+.db "OS"                    ; $FFB0 maker code (2 ASCII)
+.db "GSU0"                  ; $FFB2 game code (4 ASCII)
+.db $00,$00,$00,$00,$00,$00 ; $FFB6 reserved
+.db $00                     ; $FFBC expansion FLASH size (none)
+.db GSU_RAM_SIZE_VAL        ; $FFBD expansion RAM size: 1 KB << n (make GSU_RAM_KB=…)
+.db $00                     ; $FFBE special version
+.db $00                     ; $FFBF chipset sub-type
 .ENDS
 
 .SNESHEADER
@@ -67,9 +83,9 @@
     LOROM                   ; LoROM addressing
     CARTRIDGETYPE CARTRIDGETYPE  ; $13=ROM+GSU (Star Fox compatible)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
-    SRAMSIZE $00            ; $00 in standard field (SuperFX quirk)
+    SRAMSIZE $00            ; $00 here: Game Pak RAM is declared at $FFBD (see above)
     COUNTRY $01             ; North America (NTSC)
-    LICENSEECODE $00        ; Unlicensed
+    LICENSEECODE $33        ; $33 = "extended header present" (not a licensee)
     VERSION $00             ; Version 1.0
 .ENDSNES
 

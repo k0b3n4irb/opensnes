@@ -56,6 +56,15 @@ include $(OPENSNES)/make/common.mk
 `GSUSRC` lists your SuperFX assembly files (`.sfx`). The build system
 assembles them with `wla-superfx` and produces flat binaries (`.sfx.bin`).
 
+Two knobs matter for a GSU project (since 2026-09-24): `ROM_BANKS := 32`
+gives a 1 MB ROM (Star Fox's size; the default 8 is 256 KB) — the header's
+size byte and the asset bank range follow — and `GSU_RAM_KB := 64` is the
+Game Pak RAM the cartridge declares in the extended header at `$FFBD`
+(fullsnes, snesdev-wiki: Super FX carts declare RAM there and leave `$FFD8`
+at zero; the header's licensee byte `$FFDA` is `$33` so the extended header
+is recognised). A GSU-side variable is a `.RAMSECTION "name" BANK $70
+SLOT 3` on the 65816 side.
+
 ### 2. Write GSU Assembly Code
 
 Create `gsu_code.sfx` -- this runs on the SuperFX at up to 21.47 MHz:

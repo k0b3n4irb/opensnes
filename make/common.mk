@@ -22,6 +22,10 @@
 #   USE_HIROM     - Set to 1 for HiROM mode (64KB banks instead of 32KB)
 #   USE_FASTROM   - Set to 1 for FastROM (~33% faster ROM access)
 #   USE_SRAM      - Set to 1 to enable battery-backed save (8KB default)
+#   ROM_BANKS     - Linker bank count (default 8: 256 KB LoROM / 512 KB HiROM);
+#                   the header's ROMSIZE byte and the asset bank range follow it
+#   GSU_RAM_KB    - Super FX Game Pak RAM declared in the extended header
+#                   ($FFBD; default 64)
 #
 # SNESMOD audio options:
 #   USE_SNESMOD   - Set to 1 to enable SNESMOD tracker audio
@@ -110,7 +114,18 @@ SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
 GSUSRC      ?=
-ROMSIZE     ?= $$08
+# ROM size as a project knob (2026-09-24). ROM_BANKS is the linker's bank
+# count (32 KB banks on LoROM / SA-1 / Super FX, 64 KB on HiROM); the header
+# byte ROMSIZE (1 KB << n) and the asset bank range follow it unless set by
+# hand. Defaults reproduce the historical 8 banks: 256 KB LoROM, 512 KB HiROM
+# (whose header used to claim 256 KB — a lie fixed by computing it).
+ROM_BANKS   ?= 8
+ROM_BANK_KB := $(if $(filter 1,$(USE_HIROM)),64,32)
+ROMSIZE     ?= $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(ROM_BANKS) * $(ROM_BANK_KB))))")
+ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
+# Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
+GSU_RAM_KB  ?= 64
+GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
 
 # Derived configuration (one-liners using $(if))
 LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
@@ -148,7 +163,7 @@ LIB_MODULES += dsp1
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 
 # Check library is built (skip for 'clean')
@@ -371,6 +386,7 @@ project_config.inc:
 	@echo '.DEFINE CARTRIDGETYPE $(CARTRIDGETYPE)' > $@
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
+	@echo '.DEFINE GSU_RAM_SIZE_VAL $(GSU_RAM_SIZE_VAL)' >> $@
 
 # Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
 project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
