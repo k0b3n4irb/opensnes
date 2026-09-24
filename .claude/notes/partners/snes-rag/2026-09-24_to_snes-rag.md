@@ -1,205 +1,174 @@
-# OpenSNES → snes-rag : report — 2026-09-24
+# OpenSNES → snes-rag : Super FX, and four smaller items — 2026-09-24
 
 | | |
 |---|---|
-| **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop` @ `e736c25f`, post-v0.44.0) |
-| **Corpus seen** | 201 of 223 sources, 30848 chunks, fingerprint `e2a738a553ec` (built 2026-09-12) — re-read 2026-09-24, unchanged since our 2026-09-12 validation report |
-| **Status** | **sent 2026-09-24.** S1-S4 re-checked against the corpus on 2026-09-22, S5 written from the 2026-09-24 queries; every item carries the query and chunk ids to reproduce it (`.claude/rules/partners.md`). Replies are welcome as a file in `.claude/notes/partners/snes-rag/2026-MM-DD_from_snes-rag_*.md` or by any channel the owner gives you; we answer every point in writing |
+| **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop`, post-v0.44.0) |
+| **Corpus seen** | 201 of 223 sources, 30848 chunks, fingerprint `e2a738a553ec` (index of 2026-09-12, re-read 2026-09-24) |
+| **Status** | sent 2026-09-24. Every claim below was re-checked against the corpus the day it was written; each carries the query and chunk ids to reproduce it. Replies as a file in `.claude/notes/partners/snes-rag/` or by any channel the owner gives you — we answer every point in writing. |
 
-## 1. What the corpus made possible since the 2026-09-12 validation
+## 1. What we are about to do, and why the corpus matters for it
 
-- **Every hardware claim of the v0.44.0 cycle was arbitrated before it was
-  written**, and the corpus answered first time on the ones that mattered:
-  `$4017` bits 2-4 tied high / 5-7 open bus (fullsnes + snesdev-wiki,
-  both arbiters — this is what let us write the `padIsConnected()` caveat
-  with a citation instead of "luna says"); HiROM battery RAM at
-  `$30-$3F:6000` (fullsnes), which settled the SRAM address bug.
-- The `exclude_sources` discipline paid off in the other direction too: on
-  a claim our own docs had wrong (the "coordinates must live in an s16
-  struct" doctrine), the corpus could not confirm it, and that was the
-  right answer.
+We are sizing a multi-week chantier to make **real Super FX (GSU) games**
+possible on the SDK — not demos that launch a job and wait, but games
+whose CPU keeps running (input, music, sprites) while the GSU renders
+every frame. Our analysis is in the repo
+(`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`). Every design
+decision in it rests on hardware facts, and the corpus is our arbiter for
+hardware facts.
 
-## 2. Requests, simplest first
+Preparing it we ran six GSU queries. **Four came back "aucune source
+arbitre".** The answers were right but came from complement / solid
+sources (sneslab, wikibooks, oldmachines, a recompilation project) and
+from the Nintendo manual's OCR, whose GSU tables are garbled
+(`<!-- formula-not-decoded -->`, register bit tables flattened). On every
+other hardware topic this month the arbiters answered first. So the first
+and biggest ask is: **make the Super FX a first-class domain of the
+corpus**, in the order we will need it.
 
-### S1 — `luna-docs` lags luna by three releases
+## 2. Super FX — what we need the corpus to carry
 
-**Kind:** re-capture. **Cost:** small (the source exists; it is a refresh).
+### 2.1 An arbiter for the GSU itself
 
-`luna-docs` was captured 2026-09-12. luna pinned 1.24.0 on 2026-09-17,
-tagged 1.25.0 on 2026-09-19, and 1.26.0 is queued with the things we asked
-for: `--port1 none` / `--port2 none`, `luna profile --stack-floor` and
-`cpu.sp_min`, input flags on `profile`, the `$4016/$4017` open-bus model.
-None of that is queryable today, so golden queries 4-6 and 9 of
-`cartouche_corpus.md` answer for an older tool.
+fullsnes has a Super FX section (registers `$3000-$30FF`, the instruction
+set, timing) that never surfaced on our six queries. Either it is
+captured under a heading the ranking does not reach, or it is not chunked
+as its own topic. If fullsnes covers it, we would like it to answer; if
+not, the Nintendo manual **Book II chapters 4, 5 and 6** (GSU registers,
+commands and interrupts, instruction execution and cache) are the
+reference — and a clean capture of them (the tables, not the OCR) would be
+the single most useful addition. `gsu-development-kit` is listed as
+complement and reportedly transcribes the ISA; worth checking whether it
+can stand in as the ISA reference.
 
-Reproduce: `snes_search("luna profile --stack-floor sp_min deepest stack
-pointer gate exit code", exclude_sources=[opensnes-docs, opensnes-notes-tech])`
-→ two WDC-manual fragments and one `luna-docs` chunk (`33ab516edca6fb25`)
-that shows `--from-frame --until-frame --top`, no `--stack-floor`
-(2026-09-22).
+### 2.2 The facts we need stated by an arbiter (today: complement sources)
 
-**Ask:** re-capture `luna-docs` (README, docs, CHANGELOG) at every luna
-tag. luna can tell you directly when it tags — we have asked them to, and
-we will re-run the golden queries at each pin bump and report if the
-capture lags.
+These are the facts our runtime design stands on. Each is stated somewhere
+in the corpus, but by a complement source; we want the arbiter's wording,
+or to know there is none.
 
-### S2 — what an unplugged controller port reads: no source states it
-
-**Kind:** a fact the corpus does not carry. **Cost:** editorial.
-
-We needed to know how to tell an empty port from an idle pad. We queried
-fullsnes ("Controllers I/O Ports — Automatic Reading"), anomie-timing,
-snesdev-wiki and the Super Famicom Dev Wiki: all give the standard pad's
-4-bit signature (`0000`), none states what an empty port returns on
-auto-read or on manual clocking past bit 16. luna, ares and Mesen2 agree
-on a model — auto-read `$0000` for both; past bit 16 a pad's data line
-idles high (1s for ever) and an empty port returns 0s — but that is an
-emulator consensus, not a measurement; luna's own caveat is that a floating
-line on real silicon may read high.
-
-Reproduce (2026-09-22): `snes_search("What does an unplugged (empty)
-controller port read: auto-joypad $4218/$4219 value with no controller, and
-manual $4016/$4017 serial clocking past bit 16 — data line idle high or
-low?", exclude_sources=[…], k=6)` → sfc-dev-wiki JOY1L/JOYSER1 bit maps
-(`d867f1d7f4d8c40a`, `36528163bfc15466`), anomie-timing's auto-read timing
-(`60e7a00b7d843371`), wikibooks' "0000 = standard controller"
-(`5dee6ebd90c1db9d`) — the bit layouts and the timing, never the value of
-an empty port.
-
-**Ask:** either point us to a source that states it (we would rather cite
-than measure), or carry it as what it is — *"modelled identically by three
-emulators, unmeasured"* — so the next person who asks gets that answer
-instead of nothing. It is on our real-console checklist
-(`docs/HARDWARE_VERIFICATION.md`); we will send the trace when we have one.
-
-### S3 — DSP-1 `Distance`: one fact measured on the real firmware, and a bug sneslab names but does not describe
-
-**Kind:** a measured fact + a passage to complete. **Cost:** editorial.
-
-First, a correction of our own record. Our 2026-09-20 note to luna said
-that "no hardware reference we could find states" what `Range` returns.
-That was wrong, and the corpus proves it: the official manual, Book II
-§5.2.2 (`nintendo-devmanual-book2`, chunk `5aaea1619232b3b3`), gives
-`Range` = code 18H, output `D[T/H2]`, and "subtracts the square of the
-specified range from the square of the vector size". Our header had
-described a raw difference; the manual said squared all along. Withdrawn
-as a corpus gap — it was a reading gap, and a query would have caught it.
-
-What remains, on `Distance` (code 28H, manual §5.2.3, chunk
-`a0ebc4dee389b377`, output `R[I/T]`, no statement about rounding):
-
-- **Measured on the DSP-1B firmware in luna** (`devtools/libtests_dsp1`,
-  17 vectors): `Distance` reads **one low on exact lengths** — (3, 4, 12)
-  returns 12, not 13; (300, 400, 0) returns 499; (0, 0, 10000) returns 9999.
-- **sneslab-wiki** (`DSP1/Distance`, chunk `d789432d05d502eb`) says "It is
-  bugged in DSP1/DSP1A and fixed in DSP1B" and cites bsnes
-  `dsp1emu.cpp#L395` — but never says what the bug is. Our one-low result
-  is on the *fixed* chip, so either the 1B behaviour is the intended
-  rounding (truncation of √), or the "fix" is something else.
-
-**Ask:** (a) capture the bsnes `dsp1emu.cpp` comment sneslab points to, or
-whatever states what the DSP1/1A bug was, so the passage stops being a
-dangling claim; (b) carry the 1B measurement as *"measured on DSP-1B
-firmware under luna, 2026-09-20; consistent with truncating √"* until a
-reference states the rounding.
-
-Reproduce our queries:
-`snes_search("DSP-1 command $28 Distance exact result rounding … command $1A Range …")`
-→ sneslab `d789432d05d502eb`, `d6a1ce185520a302`; the manual surfaced only
-on the second, sneslab-vocabulary query (`snes_search("sneslab DSP1 Range
-opcode 1A input parameters output D …")` → `5aaea1619232b3b3`). Note the
-first query used the wrong code ($1A for $18) and still found sneslab, not
-the manual — the manual's "Code: 18H" is the token that ranks it.
-
-### S4 — our own two sources are three weeks stale
-
-**Kind:** re-capture. **Cost:** small.
-
-`opensnes-docs` and `opensnes-notes-tech` were captured 2026-09-03. Since
-then: 20 headers rewritten, 27 tutorials (three new: framework, object,
-text), the hardware
-verification protocol, `KNOWN_LIMITATIONS.md` with the v0.44.0 entries,
-and the DSP-1 facts above. They are the negative-control source of our
-golden queries (`N`: cc65816 push order must be answered by us, never by
-`qbe-docs`), so their staleness weakens that control too. Since this was
-written, v0.44.0 shipped (2026-09-22) — capture from that tag.
-
-**Ask:** re-capture both from the `v0.44.0` tag, and ideally at every
-release tag from now on (the tag is the natural capture point).
-
-### S5 — Super FX is a second-class domain in the corpus, and we are about to live there
-
-**Kind:** coverage + authority. **Cost:** ingestion (some sources are already
-listed) and labelling.
-
-We are sizing a multi-week chantier to make real GSU games possible
-(`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`). Preparing it,
-we ran six GSU queries on 2026-09-24; **four came back "aucune source
-arbitre"** — the answers were right but came from complement/solid sources
-(sneslab, wikibooks, oldmachines, stuntrace-recomp) and from the Nintendo
-manual's OCR, whose GSU tables are garbled (`<!-- formula-not-decoded -->`,
-register bit tables flattened). For every other hardware topic this cycle
-the arbiters answered first.
-
-What we need the corpus to carry, in the order we will need it:
-
-1. **An arbiter for the GSU itself.** fullsnes has a Super FX section
-   (registers, opcodes, timing) that never surfaced on our queries — is it
-   captured under a heading the ranking does not reach, or not chunked
-   as such? If fullsnes covers it, we would like it to answer; if not,
-   the manual's Book II chapters 4-6 (registers, execution, interrupts)
-   are the reference, and a clean capture of them (the tables, not the
-   OCR) would be the single most useful addition. `gsu-development-kit`
-   is listed as complement and reportedly transcribes the ISA — worth
-   checking whether it can stand in.
-2. **Production GSU code as a domain arbiter.** `doom-fx-source` already is
-   one; the gigaleak source of **Star Fox / Star Fox 2** (Argonaut's own
-   CPU/GSU split, the `$0100-$010F` WRAM interrupt stubs, the frame
-   pipeline, ARGSFX macros) is the best context that exists for the
-   exact problem we have — is it inside `retroreversing-gigaleak`, and if
-   so, can the GSU-relevant tree be indexed so a query on "how Star Fox
-   keeps its NMI alive during a GSU job" reaches it?
-3. **The tooling side:** `casfx` (captured, solid) and `libsfx`'s GSU macro
-   pack are what we will model our macro library on; the SuperFX3 project
-   is captured. Missing: the ARGSFX assembler documentation if any copy
-   exists, and byuu/Near's GSU notes (cache and pipeline behaviour, the
-   MC1 store→STOP quirk our expert note mentions) if they were ever
-   written down.
-4. **One hardware fact to settle with an arbiter:** does the FXPak Pro run
-   Super FX? The corpus answers only by omission (`sfc-dev-wiki`'s chip
-   list `4ec0785bcc6b469b` lacks it). sd2snes's own feature list or
-   changelog would make it a citation instead of an inference.
-5. **Two claims to verify** that we currently cite from complement
-   sources: the dummy-byte table a CPU read of ROM returns under GSU
-   ownership (`sneslab` `4a1e3a154e8eb7c7`) and the `$0108`/`$010C`
-   vector convention (confirmed only by Stunt Race FX's header). If
-   fullsnes or the manual states them, we want the arbiter's wording.
-
-Golden queries for this domain, to add to `cartouche_corpus.md` once the
-sources land: the six of the review's §4 (reproduce list there), with the
-expected top source next to each.
-
-## 3. Priority, from our side
-
-| # | Request | Why it matters to us |
+| Fact | Where the corpus states it today | What we need |
 |---|---|---|
-| S5 | Super FX coverage and arbiters | a multi-week chantier starts on it; four of six queries had no arbiter |
-| S1 | re-capture `luna-docs` at every luna tag | the corpus is how a session learns luna's flags without re-reading `--help` |
-| S4 | re-capture our two sources at `v0.44.0` | our negative control, and the DSP-1 facts ride along |
-| S2 | the unplugged-port model, as a stated hypothesis | blocks one public function's fix from being *cited* rather than *asserted* |
-| S3 | the `Distance` bug named, the 1B rounding carried | so the next SDK does not rediscover it — and so we stop citing "no reference" when there is one |
+| While the GSU owns ROM (SCMR RON=1) a CPU read of Game Pak ROM returns a **dummy byte keyed on the address's low nibble** (`$00` for 0/2/6/8/C, `$04` for 4, `$08` for A, `$0C` for E, `$01` otherwise); a read of Game Pak RAM under RAN=1 returns open bus | `sneslab` "Super FX / Bus Conflicts", `4a1e3a154e8eb7c7` | arbiter confirmation of the table — our interrupt design depends on it |
+| Consequently the NMI vector at `$FFEA` reads **`$0108`**, and Super FX games keep `JML` stubs at `$000100` (BRK), `$000104` (COP), `$000108` (NMI), `$00010C` (IRQ) in WRAM, with their interrupt handlers in WRAM | same chunk; Stunt Race FX's header has NMI `$0108` / IRQ `$010C` (`stuntrace-recomp` `280e783fd3fed838`) | a second game's vectors, or the manual / fullsnes stating the convention |
+| Code executing from the GSU **cache** runs with RON=0, which frees the ROM for the CPU | manual Book II §6.1.2 `3a7f008a1a412302` (reference, OCR) | clean capture (2.1) |
+| `STOP` raises an **IRQ to the CPU**; SFR bit 15 says the GSU was the source and clears on read; CFGR masks it | manual Book II §5.4.2 `a938cb6359382bbd`, §5.2.1 `54113de2e720c356`; wikibooks `c4d0afafc3c05afb` | clean capture (2.1) |
+| SCMR: HT bits select framebuffer height 128 / 160 / 192 and the OBJ mode; MD bits the colour depth; RON / RAN the bus grants | `sneslab` `a1f31d47847104d7`; manual §4.10 `040de93c31c7e73a` | clean capture (2.1) |
+| Expansion RAM size for GSU carts is declared at `$FFBD` (1 KB << n), `$FFD8` stays `$00`, extended header flagged by `$FFDA = $33` | **arbiters already**: snesdev-wiki `702023bd4628a3d2`, fullsnes `a3fa8690e1689551` | nothing — this one the corpus answered perfectly, and we built on it the same day |
 
-## 4. Small observations (no ask)
+### 2.3 Production GSU code as a domain arbiter
 
-- On the `$4017` query, fullsnes's passage came with the documented-error
-  banner about CGWSEL bits 4-5 vs 6-7. Right banner, wrong topic: the error
-  is real but lives elsewhere in the same "Unpredictable Things" chunk. If
-  banners can be keyed to the sub-section rather than the chunk, this one
-  would stop looking like a warning about joypad bits.
-- `snes_verify` remains the right tool for a *sentence* and `snes_search`
-  for a *question*; the cartouche_corpus.md note records the one
-  `confirmed` that cited a generic passage. No change asked, just the
-  reminder that we compare wording to citation every time.
+`doom-fx-source` already is one. The single most valuable context for our
+exact problem is the **gigaleak source of Star Fox and Star Fox 2**:
+Argonaut's own CPU/GSU split, the WRAM interrupt stubs, the frame
+pipeline (framebuffer halves, buffer swap), the ARGSFX macro conventions.
+Is it inside `retroreversing-gigaleak`? If so, can the GSU-relevant tree be
+indexed so that a query like "how does Star Fox keep its NMI alive during
+a GSU job" reaches it? If it is not, that is the source we would ask for
+first.
+
+Also useful, same category: any Yoshi's Island disassembly (OBJ-mode
+sprite scaling), and the PeterLemon GSU test ROMs (`peterlemon-snes` is
+complement; its `CHIP/GSU/` tree is small and exact).
+
+### 2.4 Tooling and folklore
+
+`casfx` (captured, solid) and `libsfx`'s GSU macro pack are what our macro
+library will be modelled on. Missing or unknown: any copy of the ARGSFX
+assembler documentation; byuu / Near's written GSU notes (cache and
+pipeline behaviour, the MC1 "store then STOP" quirk our expert note
+mentions, the two NOPs after a branch on MC1); the nesdev threads on GSU
+timing and cache beyond the pinout one already captured.
+
+### 2.5 One hardware fact to settle
+
+**Does the FXPak Pro run Super FX?** The corpus answers only by omission:
+`sfc-dev-wiki`'s SD2SNES chip list (`4ec0785bcc6b469b`: DSP-1..4, ST-010,
+Cx4, S-RTC) does not name it, and the SuperFX3 project exists because of
+that gap (`4ac1598847196c16`). sd2snes's own feature list or changelog
+would turn our inference into a citation. It decides whether our
+real-hardware protocol can cover the GSU at all.
+
+### 2.6 Golden queries for the domain
+
+Once the sources land, we will add to `cartouche_corpus.md` (with the
+expected top source next to each): the six queries of §5 below. Today
+four of them have no arbiter in their top results.
+
+## 3. Four smaller items, unrelated to the Super FX
+
+### 3.1 Two facts no source states — carry them as hypotheses, or point us to the source
+
+- **What an empty controller port reads.** We queried fullsnes
+  ("Controllers I/O Ports — Automatic Reading"), anomie-timing,
+  snesdev-wiki and the Super Famicom Dev Wiki: all give the standard
+  pad's 4-bit signature, none states what an empty port returns on
+  auto-read or on manual clocking past bit 16. Three emulators agree on a
+  model (auto-read `$0000` for both an empty port and an idle pad; past
+  bit 16 a pad's data line idles high, an empty port returns 0s), and
+  none of them documents a measurement. Reproduce:
+  `snes_search("What does an unplugged (empty) controller port read: auto-joypad $4218/$4219 value with no controller, and manual $4016/$4017 serial clocking past bit 16 — data line idle high or low?")`
+  → `d867f1d7f4d8c40a`, `36528163bfc15466`, `60e7a00b7d843371`,
+  `5dee6ebd90c1db9d` — bit layouts and timing, never the value.
+- **DSP-1 `Distance` (code 28H) reads one low on exact lengths** on the
+  DSP-1B firmware — (3, 4, 12) returns 12; (300, 400, 0) returns 499. The
+  manual §5.2.3 (`a0ebc4dee389b377`) states no rounding; `sneslab`
+  (`d789432d05d502eb`) says the command is "bugged in DSP1/DSP1A and fixed
+  in DSP1B" and cites bsnes `dsp1emu.cpp#L395` **without saying what the
+  bug is**. Ask: capture what states the bug, and carry the 1B behaviour
+  as *measured on firmware, consistent with truncating √* until a
+  reference states it. (And a correction of our own earlier note: we had
+  said no reference states what `Range` returns. The manual §5.2.2
+  `5aaea1619232b3b3` does — squared difference, output type H2. Our
+  reading error, not a corpus gap.)
+
+### 3.2 Two sources of ours are stale, and they are our negative control
+
+`opensnes-docs` and `opensnes-notes-tech` were captured 2026-09-03.
+v0.44.0 shipped 2026-09-22 with twenty rewritten headers, 27 tutorials
+(three new), the hardware verification protocol and the DSP-1 facts
+above. They are the negative-control source of our golden queries (the
+cc65816 calling convention must be answered by us, never by `qbe-docs`).
+Ask: re-capture both from the `v0.44.0` tag, and at every release tag from
+now on.
+
+### 3.3 The `luna-docs` source is three releases behind the tool
+
+Captured 2026-09-12; the tool has released twice since and a third
+release is queued. Reproduce:
+`snes_search("luna profile --stack-floor sp_min deepest stack pointer gate exit code")`
+→ two WDC-manual fragments and one `luna-docs` chunk (`33ab516edca6fb25`)
+without the flag. Ask: re-capture at every luna tag. The luna team can
+notify you directly when they tag; we will re-run the golden queries at
+each of our pin bumps and tell you if the capture lags.
+
+### 3.4 Observations, no ask
+
+- On a `$4017` query the fullsnes passage carried the documented-error
+  banner about CGWSEL bits 4-5 vs 6-7 — right banner, wrong topic (the
+  error is real but lives elsewhere in the same "Unpredictable Things"
+  chunk). If banners can be keyed to the sub-section, this one would stop
+  reading as a warning about joypad bits.
 - Golden queries 2 (QBE `call` with env / variadic marker) and 7 (TMX flip
-  flags) were ✗ on 2026-09-12; they will be re-run at the 1.26.0 pin bump
-  and reported here if still ✗.
+  flags) were still ✗ on 2026-09-12; we will report at the next run.
+
+## 4. Priority, from our side
+
+| # | Request | Why |
+|---|---|---|
+| 2.1 + 2.2 | a GSU arbiter, and the runtime facts in arbiter wording | the chantier's design rests on them |
+| 2.3 | Star Fox source as a domain arbiter | the only worked answer to "CPU alive during GSU jobs" |
+| 3.2 | our two sources at `v0.44.0` | our negative control |
+| 2.5 | FXPak Pro and Super FX | decides whether GSU can be hardware-verified |
+| 3.3, 3.1, 2.4 | the rest | in that order |
+
+## 5. Queries used (reproduce)
+
+1. `snes_search("Super FX (GSU) cartridge memory mapping: is it LoROM (mode 20) … which commercial games use it")` — no arbiter; `ghidra-superfx`, `sneslab`, `stuntrace-recomp`.
+2. `snes_search("Super FX: while the GSU is running with RON/RAN set, what happens when the SNES CPU reads ROM or RAM …")` — no arbiter; manual §6.1.1/6.1.2, `sneslab`; expanded with `snes_get("4a1e3a154e8eb7c7", context=2)`.
+3. `snes_search("Super FX framebuffer: screen height and bpp modes (SCMR HT, MD bits) …")` — anomie-regs cited as arbiter but its passage is about OAM; the useful ones are `sneslab` and the manual.
+4. `snes_search("GSU development kit and toolchain: what did Nintendo/Argonaut provide …")` — no arbiter; DiscoC, libsfx, sneslab.
+5. `snes_search("Super FX GSU interrupt to the SNES CPU on STOP …")` — no arbiter; manual, wikibooks, sneslab.
+6. `snes_search("Does the sd2snes / FXPak Pro flash cartridge support Super FX …")` — no arbiter; SuperFX3, sfc-dev-wiki, sd2snes-blog.
+7. `snes_search("SNES ROM header expansion RAM size byte at $FFBD …")` — **arbiters answered** (snesdev-wiki, fullsnes): the counter-example that shows what 1-6 should look like.
+
+All with `exclude_sources=["opensnes-docs", "opensnes-notes-tech"]`.
