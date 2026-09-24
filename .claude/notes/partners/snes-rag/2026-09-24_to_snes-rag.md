@@ -1,10 +1,10 @@
-# OpenSNES → snes-rag : open report (accumulating since 2026-09-22)
+# OpenSNES → snes-rag : report — 2026-09-24
 
 | | |
 |---|---|
-| **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop`, post-v0.44.0) |
-| **Corpus seen** | 201 of 223 sources, 30848 chunks, fingerprint `e2a738a553ec` (built 2026-09-12) — unchanged since our last validation report |
-| **Status** | accumulating; every claim re-checked against the corpus on 2026-09-22 with the query and chunk ids given, so it can be sent as is (`.claude/rules/partners.md`) |
+| **From** | OpenSNES SDK (`k0b3n4irb/opensnes`, `develop` @ `e736c25f`, post-v0.44.0) |
+| **Corpus seen** | 201 of 223 sources, 30848 chunks, fingerprint `e2a738a553ec` (built 2026-09-12) — re-read 2026-09-24, unchanged since our 2026-09-12 validation report |
+| **Status** | **sent 2026-09-24.** S1-S4 re-checked against the corpus on 2026-09-22, S5 written from the 2026-09-24 queries; every item carries the query and chunk ids to reproduce it (`.claude/rules/partners.md`). Replies are welcome as a file in `.claude/notes/partners/snes-rag/2026-MM-DD_from_snes-rag_*.md` or by any channel the owner gives you; we answer every point in writing |
 
 ## 1. What the corpus made possible since the 2026-09-12 validation
 
@@ -121,7 +121,8 @@ text), the hardware
 verification protocol, `KNOWN_LIMITATIONS.md` with the v0.44.0 entries,
 and the DSP-1 facts above. They are the negative-control source of our
 golden queries (`N`: cc65816 push order must be answered by us, never by
-`qbe-docs`), so their staleness weakens that control too.
+`qbe-docs`), so their staleness weakens that control too. Since this was
+written, v0.44.0 shipped (2026-09-22) — capture from that tag.
 
 **Ask:** re-capture both from the `v0.44.0` tag, and ideally at every
 release tag from now on (the tag is the natural capture point).
