@@ -126,10 +126,63 @@ golden queries (`N`: cc65816 push order must be answered by us, never by
 **Ask:** re-capture both from the `v0.44.0` tag, and ideally at every
 release tag from now on (the tag is the natural capture point).
 
+### S5 — Super FX is a second-class domain in the corpus, and we are about to live there
+
+**Kind:** coverage + authority. **Cost:** ingestion (some sources are already
+listed) and labelling.
+
+We are sizing a multi-week chantier to make real GSU games possible
+(`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`). Preparing it,
+we ran six GSU queries on 2026-09-24; **four came back "aucune source
+arbitre"** — the answers were right but came from complement/solid sources
+(sneslab, wikibooks, oldmachines, stuntrace-recomp) and from the Nintendo
+manual's OCR, whose GSU tables are garbled (`<!-- formula-not-decoded -->`,
+register bit tables flattened). For every other hardware topic this cycle
+the arbiters answered first.
+
+What we need the corpus to carry, in the order we will need it:
+
+1. **An arbiter for the GSU itself.** fullsnes has a Super FX section
+   (registers, opcodes, timing) that never surfaced on our queries — is it
+   captured under a heading the ranking does not reach, or not chunked
+   as such? If fullsnes covers it, we would like it to answer; if not,
+   the manual's Book II chapters 4-6 (registers, execution, interrupts)
+   are the reference, and a clean capture of them (the tables, not the
+   OCR) would be the single most useful addition. `gsu-development-kit`
+   is listed as complement and reportedly transcribes the ISA — worth
+   checking whether it can stand in.
+2. **Production GSU code as a domain arbiter.** `doom-fx-source` already is
+   one; the gigaleak source of **Star Fox / Star Fox 2** (Argonaut's own
+   CPU/GSU split, the `$0100-$010F` WRAM interrupt stubs, the frame
+   pipeline, ARGSFX macros) is the best context that exists for the
+   exact problem we have — is it inside `retroreversing-gigaleak`, and if
+   so, can the GSU-relevant tree be indexed so a query on "how Star Fox
+   keeps its NMI alive during a GSU job" reaches it?
+3. **The tooling side:** `casfx` (captured, solid) and `libsfx`'s GSU macro
+   pack are what we will model our macro library on; the SuperFX3 project
+   is captured. Missing: the ARGSFX assembler documentation if any copy
+   exists, and byuu/Near's GSU notes (cache and pipeline behaviour, the
+   MC1 store→STOP quirk our expert note mentions) if they were ever
+   written down.
+4. **One hardware fact to settle with an arbiter:** does the FXPak Pro run
+   Super FX? The corpus answers only by omission (`sfc-dev-wiki`'s chip
+   list `4ec0785bcc6b469b` lacks it). sd2snes's own feature list or
+   changelog would make it a citation instead of an inference.
+5. **Two claims to verify** that we currently cite from complement
+   sources: the dummy-byte table a CPU read of ROM returns under GSU
+   ownership (`sneslab` `4a1e3a154e8eb7c7`) and the `$0108`/`$010C`
+   vector convention (confirmed only by Stunt Race FX's header). If
+   fullsnes or the manual states them, we want the arbiter's wording.
+
+Golden queries for this domain, to add to `cartouche_corpus.md` once the
+sources land: the six of the review's §4 (reproduce list there), with the
+expected top source next to each.
+
 ## 3. Priority, from our side
 
 | # | Request | Why it matters to us |
 |---|---|---|
+| S5 | Super FX coverage and arbiters | a multi-week chantier starts on it; four of six queries had no arbiter |
 | S1 | re-capture `luna-docs` at every luna tag | the corpus is how a session learns luna's flags without re-reading `--help` |
 | S4 | re-capture our two sources at `v0.44.0` | our negative control, and the DSP-1 facts ride along |
 | S2 | the unplugged-port model, as a stated hypothesis | blocks one public function's fix from being *cited* rather than *asserted* |
