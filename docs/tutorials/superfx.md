@@ -193,11 +193,28 @@ int main(void) {
 ## The Exclusive Bus
 
 When SCMR has RON=1, the GSU owns the ROM bus. **The SNES CPU cannot
-read ROM -- not even its own code.** This is why:
+read ROM -- not even its own code or its own interrupt vectors.** The
+hardware plans for it: while the GSU owns the ROM, a vector fetch returns a
+dummy vector — `$0108` for NMI, `$010C` for IRQ, `$0104` COP, `$0100`
+BRK/ABORT (Nintendo dev manual Book II §5.4.1) — and a Super FX cartridge
+keeps a jump at each of those WRAM addresses. The SDK does this for you in
+every `USE_SUPERFX=1` build (since 2026-09-24/25):
 
-1. The launch/poll code must execute from **WRAM**
-2. **NMI must be disabled** (the NMI vector is in ROM)
-3. All reference projects (casfx, DOOM-FX, PeterLemon) use WRAM execution
+1. crt0 installs the four WRAM stubs at boot, and the header's vectors
+   point at them, so an interrupt takes the same path whether the GSU is
+   running or not;
+2. the NMI stub enters a small WRAM handler: while a GSU job runs
+   (`gsuLaunch` sets `gsu_owns_cart`) it acknowledges the NMI, advances
+   `frame_count` and uploads OAM if you flagged it; the rest of the VBlank
+   work — tilemap, scroll, pads, your NMI callback — is ROM code and is
+   **deferred** to the next VBlank after the job, not lost;
+3. the launch/poll code itself still executes from WRAM, as in every
+   reference project (casfx, DOOM-FX, PeterLemon).
+
+The NMI is **not** disabled during a job any more. It used to be, and one
+VBlank in three was lost in `superfx_3d` (game time ran at two thirds of
+real time); `gsuLaunch` also re-enabled NMI with a hardcoded `$81`, which
+silently cancelled an H/V-timer IRQ the game had armed.
 
 ## SuperFX Assembly Rules
 

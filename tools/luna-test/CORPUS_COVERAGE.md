@@ -35,7 +35,7 @@ luna v1.24.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `chips/dsp1_cube` | OK | live (400f/398nmi) |
 | `chips/sa1_hello` | OK | live (200f/198nmi) |
 | `chips/sa1_starfield` | OK | live (200f/198nmi) |
-| `chips/superfx_3d` | OK | live (200f/134nmi) |
+| `chips/superfx_3d` | OK | live (200f/198nmi) |
 | `chips/superfx_hello` | OK | live (200f/198nmi) |
 | `color/direct_color` | OK | live (200f/198nmi) |
 | `color/gradient_9bit` | OK | live (200f/198nmi) |

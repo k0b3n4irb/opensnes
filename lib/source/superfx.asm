@@ -63,9 +63,13 @@ _gsu_wram_stub:
     sep #$20
     .ACCU 8
 
-    ; Disable NMI (vector is in ROM — inaccessible when GSU runs)
-    lda #$00
-    sta.l $4200
+    ; The NMI stays enabled (phase B, 2026-09-25): flag that the GSU is about
+    ; to own the Game Pak, and the $0108 WRAM NMI does the ROM-free VBlank
+    ; work until the flag drops. Before, this stub disabled NMI — one VBlank
+    ; in three was lost in superfx_3d — and re-enabled it with a hardcoded
+    ; $81, silently cancelling any IRQ the game had armed.
+    lda #$01
+    sta.l gsu_owns_cart
 
     ; Configure GSU from WRAM variables
     lda.l gsu_cfgr
@@ -110,13 +114,10 @@ _gsu_wram_stub:
     and #$20
     bne -
 
-    ; Reclaim all buses
+    ; Reclaim all buses, then drop the flag: from here the normal NMI runs
     lda #$00
     sta.l $303A
-
-    ; Re-enable NMI
-    lda #$81
-    sta.l $4200
+    sta.l gsu_owns_cart
 
     rtl
 _gsu_wram_stub_end:

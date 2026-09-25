@@ -119,8 +119,8 @@ gsu_vector_stubs:
     .dw EmptyHandler
     .db :EmptyHandler
     .db $5C
-    .dw NmiHandler
-    .db :NmiHandler
+    .dw gsu_nmi_wram        ; phase B: the WRAM NMI, which falls through to
+    .db :gsu_nmi_wram       ; NmiHandler whenever the GSU is idle
     .db $5C
     .dw IrqHandler
     .db :IrqHandler

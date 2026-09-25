@@ -11,3 +11,4 @@ gsu_vec_brk = { eq = 0x5C, width = 1 }
 gsu_vec_cop = { eq = 0x5C, width = 1 }
 gsu_vec_nmi = { eq = 0x5C, width = 1 }
 gsu_vec_irq = { eq = 0x5C, width = 1 }
+

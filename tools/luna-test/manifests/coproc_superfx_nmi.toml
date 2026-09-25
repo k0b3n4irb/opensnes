@@ -1,0 +1,10 @@
+rom = "../../../examples/chips/superfx_3d/superfx_3d.sfc"
+# superfx-runtime phase B (2026-09-25): the NMI survives GSU jobs. gsuLaunch
+# used to disable NMI for each job, and superfx_3d lost one VBlank in three —
+# frame_count read 400 at frame 600. The $0108 stub now enters a WRAM NMI
+# that counts the frame while the GSU owns the Game Pak; frame_count tracks
+# real frames minus the boot (597 at frame 600 on luna v1.24.0).
+[[checkpoint]]
+at_frame = 600
+[checkpoint.values]
+frame_count = { ge = 590, le = 600, width = 2 }

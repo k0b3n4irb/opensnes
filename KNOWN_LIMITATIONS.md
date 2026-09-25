@@ -475,6 +475,22 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)
+
+`gsuLaunch()` disabled NMI for the duration of each GSU job (the NMI vector
+and handler are in the Game Pak ROM, which the CPU cannot read while the GSU
+owns it) and re-enabled it with a hardcoded `$81`. Measured on luna:
+`superfx_3d` read `frame_count = 400` at frame 600 — one VBlank in three
+lost, game time at two thirds of real time — and any H/V-timer IRQ the game
+had armed was cancelled by the `$81`.
+
+Fixed by the interrupt design the hardware provides (Nintendo dev manual
+Book II §5.4.1): the header's vectors point at WRAM stubs at `$0100-$010F`,
+and the NMI stub enters a WRAM handler that counts the frame and uploads OAM
+while the GSU owns the cartridge, deferring the ROM-side work (tilemap,
+scroll, pads, user callback) to the next VBlank. `gsuLaunch` no longer
+touches `$4200`. Pinned by `tools/luna-test/manifests/coproc_superfx_nmi.toml`.
+
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
 
 `make/common.mk` defaulted the header's `ROMSIZE` byte to `$08` (256 KB)
