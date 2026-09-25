@@ -1,9 +1,10 @@
 name: Fuzz
 
 # Nightly libFuzzer session on the asset parsers (gaps review H5): lodepng
-# (the PNG decoder gfx4snes and img2snes vendor) and smconv's Impulse
-# Tracker loader, each for ten minutes under ASan + UBSan from the golden
-# fixtures. A crash fails the run and uploads the input; the fix commits it
+# (the PNG decoder gfx4snes and img2snes vendor), smconv's Impulse Tracker
+# loader, cute_tiled (tmx2snes), the Aseprite JSON parser and stb_image
+# (font2snes) — five targets, each for ten minutes under ASan + UBSan from
+# the golden fixtures, one after the other. A crash fails the run and uploads the input; the fix commits it
 # under tools/fuzz/crashes/<target>/, which `make fuzz-replay` runs on every
 # push inside the sanitizer job, so a found bug stays fixed.
 
@@ -19,7 +20,12 @@ on:
 jobs:
   fuzz:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # 5 targets x 600 s = 50 min of fuzzing, plus building the harnesses.
+    # It was 40 when there were two targets; three were added without it,
+    # so every night that found nothing was killed at 40 min and shown as
+    # "cancelled" (2026-09-20, -21, -23, -25): the workflow could never pass.
+    # Raise it with the target list or the seconds.
+    timeout-minutes: 70
     steps:
       - name: Check out OpenSNES
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
