@@ -125,6 +125,29 @@
 ; System Variables
 ;------------------------------------------------------------------------------
 
+.ifdef SUPERFX
+;------------------------------------------------------------------------------
+; Super FX: the interrupt vectors live in WRAM at $0100-$010F
+;
+; While the GSU owns the Game Pak ROM (SCMR RON = 1) the 65816 cannot read
+; it — not even its own interrupt vectors. The GSU answers a vector fetch
+; with a DUMMY vector instead (Nintendo dev manual Book II §5.4.1, table
+; 2-5-1): $FFE4 COP -> $0104, $FFE6 BRK -> $0100, $FFE8 ABORT -> $0100,
+; $FFEA NMI -> $0108, $FFEE IRQ -> $010C. So a Super FX cartridge keeps a
+; `JML` to each real handler at those four WRAM addresses, and the header's
+; own vectors (hdr_superfx.asm) hold the same four values so the path is
+; identical whether the GSU owns the bus or not. Installed at boot from the
+; ROM table gsu_vector_stubs (hdr_superfx.asm) — chantier superfx-runtime,
+; phase A, 2026-09-24.
+;------------------------------------------------------------------------------
+.RAMSECTION ".gsu_vectors" BANK 0 SLOT 1 ORGA $0100 FORCE
+    gsu_vec_brk     dsb 4   ; $0100: JML <BRK handler>   (also ABORT)
+    gsu_vec_cop     dsb 4   ; $0104: JML <COP handler>
+    gsu_vec_nmi     dsb 4   ; $0108: JML <NMI handler>
+    gsu_vec_irq     dsb 4   ; $010C: JML <IRQ handler>
+.ENDS
+.endif
+
 .RAMSECTION ".system" BANK 0 SLOT 1
     vblank_flag     dsb 1   ; Handshake: set by WaitForVBlank, cleared by NMI
     oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
@@ -770,6 +793,16 @@ _sa1_init_done:
     lda.l $303B             ; VCR (Version Code Register)
     sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
 
+    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
+    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l gsu_vector_stubs,x
+    sta.l gsu_vec_brk,x
+    inx
+    cpx #16
+    bne -
     rep #$20
     .ACCU 16
 .endif

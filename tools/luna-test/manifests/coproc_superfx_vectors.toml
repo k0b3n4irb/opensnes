@@ -1,0 +1,13 @@
+# superfx-runtime phase A (2026-09-24): crt0 installs the four WRAM vector
+# stubs at $0100-$010F — a JML ($5C) + 24-bit handler each — and the
+# header's native vectors point at them (manual Book II §5.4.1, table
+# 2-5-1), so an NMI while the GSU owns the ROM lands on the same handler as
+# an NMI while it does not. Opcode byte of each stub:
+rom = "../../../examples/chips/superfx_hello/superfx_hello.sfc"
+[[checkpoint]]
+at_frame = 30
+[checkpoint.values]
+gsu_vec_brk = { eq = 0x5C, width = 1 }
+gsu_vec_cop = { eq = 0x5C, width = 1 }
+gsu_vec_nmi = { eq = 0x5C, width = 1 }
+gsu_vec_irq = { eq = 0x5C, width = 1 }

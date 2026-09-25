@@ -95,12 +95,36 @@
 ;------------------------------------------------------------------------------
 
 .SNESNATIVEVECTOR
-    COP EmptyHandler
-    BRK EmptyHandler
-    ABORT EmptyHandler
-    NMI NmiHandler
-    IRQ IrqHandler
+    ; Super FX: every native vector is a WRAM address — the GSU answers a
+    ; vector fetch with exactly these values while it owns the ROM (manual
+    ; Book II §5.4.1, table 2-5-1), and crt0 installs a `JML handler` at
+    ; each of them at boot (.gsu_vectors, from gsu_vector_stubs below).
+    ; Same path, GSU idle or busy.
+    COP $0104
+    BRK $0100
+    ABORT $0100
+    NMI $0108
+    IRQ $010C
 .ENDNATIVEVECTOR
+
+; The four WRAM vector stubs as bytes — `JML` ($5C) + 24-bit handler — in
+; the order of crt0's .gsu_vectors: BRK/ABORT, COP, NMI, IRQ. crt0 copies
+; the 16 bytes to $0100 at boot.
+.SECTION ".gsu_vector_stubs" SEMIFREE BANK 0
+gsu_vector_stubs:
+    .db $5C
+    .dw EmptyHandler
+    .db :EmptyHandler
+    .db $5C
+    .dw EmptyHandler
+    .db :EmptyHandler
+    .db $5C
+    .dw NmiHandler
+    .db :NmiHandler
+    .db $5C
+    .dw IrqHandler
+    .db :IrqHandler
+.ENDS
 
 ;------------------------------------------------------------------------------
 ; Emulation Mode Interrupt Vectors ($00:FFF0-FFFF)
