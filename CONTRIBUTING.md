@@ -194,3 +194,4 @@ for your first contribution to the project.
 - [Open issues](https://github.com/k0b3n4irb/opensnes/issues)
 - [Roadmap](https://github.com/k0b3n4irb/opensnes/blob/develop/ROADMAP.md)
 - [Changelog](https://github.com/k0b3n4irb/opensnes/blob/develop/CHANGELOG.md)
+- [Maintaining](https://github.com/k0b3n4irb/opensnes/blob/develop/MAINTAINING.md) — pins, forks, CI, releases, what is not in the repository
