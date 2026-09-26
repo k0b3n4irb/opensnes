@@ -28,9 +28,8 @@ registers, hardware PLOT for pixel rendering, and an instruction cache.
 
 | Emulator | Status |
 |----------|--------|
-| **Mesen2** | Recommended -- detects the GSU correctly and runs all current SuperFX examples |
+| **luna** | The SDK's emulator and test backend: runs the GSU natively, and exposes its state (`luna state` → `gsu`), bus violations and per-job profile |
 | **bsnes** | Cycle-accurate -- useful as a second reference |
-| **luna** | Detects and runs the GSU natively (the headless test harness validates SuperFX end-to-end) |
 | **snes9x** | Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED") |
 
 ## Getting Started
@@ -92,73 +91,16 @@ gsu_main:
 
 ### 3. Create the GSU Loader (65816 ASM)
 
-Create `gsu_loader.asm` -- this embeds the GSU binary and provides
-the WRAM-based launch function:
+Create `gsu_loader.asm`: it only embeds the GSU binary. The launch is the
+library's.
 
 ```asm
 .ifdef SUPERFX
-
-; Embed GSU binary
-.SECTION ".gsu_code" SUPERFREE
+; The GSU binary, in any ROM bank (the library reads the bank from the pointer)
+ASSET_SECTION ".gsu_code"
 gsu_program:
     .incbin "gsu_code.sfx.bin"
 gsu_program_end:
-.ENDS
-
-; WRAM area for the launch stub
-.RAMSECTION ".gsu_vars" BANK 0 SLOT 1
-gsu_wram_area: dsb 64
-.ENDS
-
-; Launch function + WRAM stub (same section for label arithmetic)
-.SECTION ".gsu_launcher" SEMIFREE
-.ACCU 16
-.INDEX 16
-
-launchGSU:
-    php
-    ; Copy stub to WRAM
-    sep #$20
-    rep #$10
-    ldx #$0000
--   lda.l _wram_stub,x
-    sta.l gsu_wram_area,x
-    inx
-    cpx #(_wram_stub_end - _wram_stub)
-    bne -
-    jsl gsu_wram_area    ; Execute from WRAM
-    plp
-    rtl
-
-_wram_stub:
-    sep #$20
-    .ACCU 8
-    lda #$00
-    sta.l $4200          ; Disable NMI (vector is in ROM!)
-    lda #$80
-    sta.l $3037          ; CFGR: IRQ mask
-    lda #$01
-    sta.l $3039          ; CLSR: 21.47 MHz
-    lda #$18
-    sta.l $303A          ; SCMR: RAN + RON
-    lda #:gsu_program
-    sta.l $3034          ; PBR
-    rep #$20
-    .ACCU 16
-    lda #gsu_program
-    sta.l $301E          ; R15 -> GO!
-    sep #$20
-    .ACCU 8
--   lda.l $3030
-    and #$20             ; Poll SFR GO flag
-    bne -
-    lda #$00
-    sta.l $303A          ; Reclaim buses
-    lda #$81
-    sta.l $4200          ; Re-enable NMI
-    rtl
-_wram_stub_end:
-
 .ENDS
 .endif
 ```
@@ -169,17 +111,18 @@ _wram_stub_end:
 #include <snes.h>
 #include <snes/superfx.h>
 
-extern void launchGSU(void);
+extern const u8 gsu_program[];   /* the label before the .incbin */
 
 int main(void) {
     consoleInit();
 
-    if (!gsuInit()) {
+    if (!gsuInit()) {            /* sets gsu_cfgr / gsu_scmr / gsu_scbr defaults */
         /* No SuperFX hardware */
         while (1) { WaitForVBlank(); }
     }
 
-    launchGSU();
+    gsuSetProgram(gsu_program);  /* once: where the GSU program lives */
+    gsuLaunch();                 /* runs the job from WRAM, returns at STOP */
 
     /* Read result from GSU R0 */
     u16 result = *(volatile u16*)0x3000;
@@ -190,14 +133,42 @@ int main(void) {
 }
 ```
 
+`gsuLaunch()` copies nothing and disables nothing: the CPU waits in a WRAM
+loop while the GSU owns the cartridge, and interrupts keep working (next
+section). Adjust `gsu_cfgr` (IRQ mask, fast multiply) and `gsu_scmr`
+(colour depth, bus grants) before the call when your program needs it —
+`examples/chips/superfx_hello` sets both. (Until 2026-09-26 this page showed
+a hand-written WRAM launcher that disabled NMI for the job.)
+
 ## The Exclusive Bus
 
 When SCMR has RON=1, the GSU owns the ROM bus. **The SNES CPU cannot
-read ROM -- not even its own code.** This is why:
+read ROM -- not even its own code or its own interrupt vectors.** The
+hardware plans for it: while the GSU owns the ROM, a vector fetch returns a
+dummy vector — `$0108` for NMI, `$010C` for IRQ, `$0104` COP, `$0100`
+BRK/ABORT (Nintendo dev manual Book II §5.4.1) — and a Super FX cartridge
+keeps a jump at each of those WRAM addresses. The SDK does this for you in
+every `USE_SUPERFX=1` build (since 2026-09-24/25):
 
-1. The launch/poll code must execute from **WRAM**
-2. **NMI must be disabled** (the NMI vector is in ROM)
-3. All reference projects (casfx, DOOM-FX, PeterLemon) use WRAM execution
+1. crt0 installs the four WRAM stubs at boot, and the header's vectors
+   point at them, so an interrupt takes the same path whether the GSU is
+   running or not;
+2. the NMI stub enters a small WRAM handler: while a GSU job runs
+   (`gsuLaunch` sets `gsu_owns_cart`) it acknowledges the NMI, advances
+   `frame_count` and uploads OAM if you flagged it; the rest of the VBlank
+   work — tilemap, scroll, pads, your NMI callback — is ROM code and is
+   **deferred** to the next VBlank after the job, not lost;
+3. the IRQ stub enters a WRAM handler too: during a job it acknowledges an
+   H/V-timer IRQ (`$4211`) and a GSU IRQ (SFR high byte) and returns — your
+   IRQ handler is ROM code and runs again after the job; BRK and COP land on
+   a WRAM `rti` (since 2026-09-26);
+4. the launch/poll code itself still executes from WRAM, as in every
+   reference project (casfx, DOOM-FX, PeterLemon).
+
+The NMI is **not** disabled during a job any more. It used to be, and one
+VBlank in three was lost in `superfx_3d` (game time ran at two thirds of
+real time); `gsuLaunch` also re-enabled NMI with a hardcoded `$81`, which
+silently cancelled an H/V-timer IRQ the game had armed.
 
 ## SuperFX Assembly Rules
 

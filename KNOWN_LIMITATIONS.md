@@ -487,6 +487,27 @@ there (anomie's register doc). What an *empty* port returns is stated by no
 reference — luna, ares and Mesen2 return 0 — and has not been measured on
 a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
 with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
+### 🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)
+
+`gsuLaunch()` disabled NMI for the duration of each GSU job (the NMI vector
+and handler are in the Game Pak ROM, which the CPU cannot read while the GSU
+owns it) and re-enabled it with a hardcoded `$81`. Measured on luna:
+`superfx_3d` read `frame_count = 400` at frame 600 — one VBlank in three
+lost, game time at two thirds of real time — and any H/V-timer IRQ the game
+had armed was cancelled by the `$81`.
+
+Fixed by the interrupt design the hardware provides (Nintendo dev manual
+Book II §5.4.1): the header's vectors point at WRAM stubs at `$0100-$010F`,
+and the NMI stub enters a WRAM handler that counts the frame and uploads OAM
+while the GSU owns the cartridge, deferring the ROM-side work (tilemap,
+scroll, pads, user callback) to the next VBlank. `gsuLaunch` no longer
+touches `$4200`. Since 2026-09-26 the IRQ vector takes the same route: its
+`$010C` stub pointed into ROM until then, so an H/V-timer IRQ that fired
+during a job ran garbage (measured with the old stub: CPU lost, 5446 GSU bus
+violations); now a WRAM handler acknowledges it (and a GSU IRQ) during the
+job, and the game's handler runs again after it. BRK and COP land on a WRAM
+`rti`. Pinned by `tools/luna-test/manifests/coproc_superfx_nmi.toml`
+(frame count, IRQs counted by superfx_3d, `bus_violations = 0`).
 
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
 

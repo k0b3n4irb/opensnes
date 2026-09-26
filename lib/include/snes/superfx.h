@@ -128,11 +128,33 @@ inline u8 gsuInit(void) {
 }
 
 /**
+ * @brief Tell the library where the GSU program lives
+ * @param program The first byte of the assembled GSU binary (the `.sfx.bin`
+ *                the build `.incbin`s), in any ROM bank — the bank comes
+ *                from the pointer
+ *
+ * Sets gsu_prog_bank and gsu_prog_addr, which gsuLaunch() reads. Call it
+ * once before the first gsuLaunch(), and again only to switch programs.
+ * (Until 2026-09-26 this header asked for it but only the superfx_3d example
+ * defined it, in asm.)
+ *
+ * @code
+ * extern const u8 gsu_program[];   // label before the .incbin in your .asm
+ * gsuSetProgram(gsu_program);
+ * @endcode
+ */
+void gsuSetProgram(const void *program);
+
+/**
  * @brief Launch GSU program and wait for completion (WRAM-safe)
  *
  * Call gsuSetProgram() first to set the GSU binary address.
  * Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration.
- * Disables NMI during execution (ROM inaccessible).
+ * The CPU waits in WRAM while the GSU owns the Game Pak. Interrupts keep
+ * working (since 2026-09-25/26): the vectors point into WRAM, the NMI
+ * counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged;
+ * the ROM-side work (your NMI callback, your IRQ handler) waits for the end
+ * of the job.
  */
 extern void gsuLaunch(void);
 

@@ -297,9 +297,10 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ## Work in flight
 
-`wip/superfx-runtime` (pushed): the Super FX runtime chantier —
-phase A (interrupt vectors in WRAM) and phase B (the NMI survives GSU
-jobs) done, phases C-F open (`.claude/notes/chantiers/superfx_runtime.md`).
+None on a branch. The Super FX runtime chantier merged its phases A
+(interrupt vectors in WRAM), B (the NMI survives GSU jobs) and C0 (IRQ,
+BRK and COP too) on 2026-09-26; phases C-F are open
+(`.claude/notes/chantiers/superfx_runtime.md`).
 The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
 the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of
 43, 2026-09-17). Since then the work on `develop` is the module

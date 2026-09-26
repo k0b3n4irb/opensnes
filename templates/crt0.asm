@@ -125,6 +125,41 @@
 ; System Variables
 ;------------------------------------------------------------------------------
 
+.ifdef SUPERFX
+;------------------------------------------------------------------------------
+; Super FX: the interrupt vectors live in WRAM at $0100-$010F
+;
+; While the GSU owns the Game Pak ROM (SCMR RON = 1) the 65816 cannot read
+; it — not even its own interrupt vectors. The GSU answers a vector fetch
+; with a DUMMY vector instead (Nintendo dev manual Book II §5.4.1, table
+; 2-5-1): $FFE4 COP -> $0104, $FFE6 BRK -> $0100, $FFE8 ABORT -> $0100,
+; $FFEA NMI -> $0108, $FFEE IRQ -> $010C. So a Super FX cartridge keeps a
+; `JML` to each real handler at those four WRAM addresses, and the header's
+; own vectors (hdr_superfx.asm) hold the same four values so the path is
+; identical whether the GSU owns the bus or not. Installed at boot from the
+; ROM table gsu_vector_stubs (hdr_superfx.asm) — chantier superfx-runtime,
+; phase A, 2026-09-24.
+;------------------------------------------------------------------------------
+.RAMSECTION ".gsu_vectors" BANK 0 SLOT 1 ORGA $0100 FORCE
+    gsu_vec_brk     dsb 4   ; $0100: JML <BRK handler>   (also ABORT)
+    gsu_vec_cop     dsb 4   ; $0104: JML <COP handler>
+    gsu_vec_nmi     dsb 4   ; $0108: JML <NMI handler>
+    gsu_vec_irq     dsb 4   ; $010C: JML <IRQ handler>
+.ENDS
+
+; Phase B (2026-09-25): the NMI must survive a GSU job. gsuLaunch sets
+; gsu_owns_cart while the GSU holds the Game Pak bus; the NMI stub at $0108
+; jumps to gsu_nmi_wram, a copy of gsu_nmi_blob (below) made at boot, which
+; runs the ROM-free part of the VBlank work when the flag is set and falls
+; through to the normal NmiHandler otherwise.
+.RAMSECTION ".gsu_runtime" BANK 0 SLOT 1
+    gsu_owns_cart   dsb 1   ; 1 while a GSU job holds the Game Pak bus
+.ENDS
+.RAMSECTION ".gsu_nmi_wram" BANK $7E SLOT 2
+    gsu_nmi_wram    dsb 160 ; the copied blobs: NMI, IRQ, RTI (gsu_nmi_blob_end - gsu_nmi_blob <= 160)
+.ENDS
+.endif
+
 .RAMSECTION ".system" BANK 0 SLOT 1
     vblank_flag     dsb 1   ; Handshake: set by WaitForVBlank, cleared by NMI
     oam_update_flag dsb 1   ; Set when OAM buffer needs transfer
@@ -771,6 +806,25 @@ _sa1_init_done:
     lda.l $303B             ; VCR (Version Code Register)
     sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
 
+    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
+    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l gsu_vector_stubs,x
+    sta.l gsu_vec_brk,x
+    inx
+    cpx #16
+    bne -
+    ; ...and the WRAM NMI (phase B): gsu_nmi_blob -> $7E:gsu_nmi_wram.
+    ldx #$0000
+-   lda.l gsu_nmi_blob,x
+    sta.l gsu_nmi_wram,x
+    inx
+    cpx #(gsu_nmi_blob_end - gsu_nmi_blob)
+    bne -
+    lda #$00
+    sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
     rep #$20
     .ACCU 16
 .endif
@@ -2022,3 +2076,127 @@ tilemapFlush:
 ;==============================================================================
 ; Note: main() is defined in the compiled C code that follows this file.
 ; oamUpdate is provided by either the library or oam_helpers.asm.
+
+.ifdef SUPERFX
+;==============================================================================
+; gsu_nmi_blob — the NMI that runs while the GSU owns the Game Pak
+;==============================================================================
+; Copied to $7E:gsu_nmi_wram at boot and entered from the $0108 WRAM stub
+; (phase A). Position-independent: every internal jump is a relative branch;
+; every data reference is to WRAM or an I/O register, never to the Game Pak.
+;
+; Flag clear (the usual case): pop what it pushed and JML to NmiHandler —
+; one flag test more per NMI than before, in Super FX builds only.
+;
+; Flag set (a GSU job is running): the CPU cannot fetch ROM, so the handler
+; does only what needs no ROM code and no Game Pak data —
+;   - acknowledge the NMI ($4210) and advance frame_count, so game time does
+;     not stop during a job (before 2026-09-25 gsuLaunch disabled NMI and one
+;     VBlank in three was lost in superfx_3d: frame_count 400 at frame 600);
+;   - upload OAM if the main thread flagged it (oamMemory is WRAM).
+; Everything else is DEFERRED, not lost: the tilemap and scroll dirty flags,
+; the user callback, the pads and the mouse/scope are all ROM code or depend
+; on the main thread's WaitForVBlank handshake, and the next ROM NMI after
+; the job does them. vblank_flag is not touched: the main thread is parked in
+; gsuLaunch's WRAM loop, not in WaitForVBlank.
+;==============================================================================
+.SECTION ".gsu_nmi_blob" SEMIFREE BANK 0
+gsu_nmi_blob:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    pha
+    lda.l gsu_owns_cart
+    and #$00FF
+    bne @gsu_owned
+    pla
+    jml NmiHandler
+@gsu_owned:
+    phx
+    phy
+    phd
+    phb
+    pea $0000
+    plb
+    plb                     ; DB = $00: I/O and the low-WRAM mirror
+    sep #$20
+    .ACCU 8
+    lda.w $4210             ; acknowledge NMI
+    rep #$20
+    .ACCU 16
+    inc.w frame_count
+    sep #$20
+    .ACCU 8
+    lda.w oam_update_flag
+    beq @oam_done
+    stz.w oam_update_flag
+    rep #$20
+    .ACCU 16
+    stz.w $2102             ; OAMADD = 0
+    lda.w #$0400
+    sta.w $4370             ; ch7: mode 0, B-bus $04 (OAMDATA)
+    lda.w #oamMemory
+    sta.w $4372
+    sep #$20
+    .ACCU 8
+    lda.b #:oamMemory
+    sta.w $4374
+    rep #$20
+    .ACCU 16
+    lda.w #$0220
+    sta.w $4375             ; 544 bytes
+    sep #$20
+    .ACCU 8
+    lda.b #$80
+    sta.w $420B             ; MDMAEN ch7
+@oam_done:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    plb
+    pld
+    ply
+    plx
+    pla
+    rti
+
+; gsu_irq_blob — the IRQ entry, reached from the $010C WRAM stub (2026-09-26;
+; until then that stub pointed at IrqHandler in ROM, which a job makes
+; unreadable). Flag clear: straight to IrqHandler and the user's handler.
+; Flag set: the handler is ROM code, so acknowledge both possible sources and
+; return — an H/V-timer IRQ ($4211 TIMEUP) and the GSU's IRQ on STOP (reading
+; SFR's high byte resets its IRQ flag, bit 15 — Nintendo dev manual Book II
+; §5.4.2; CFGR bit 7 masks it, fullsnes). Leaving either unacknowledged would
+; re-enter the IRQ forever.
+gsu_irq_blob:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    pha
+    lda.l gsu_owns_cart
+    and #$00FF
+    bne @irq_gsu_owned
+    pla
+    jml IrqHandler
+@irq_gsu_owned:
+    phb
+    pea $0000
+    plb
+    plb                     ; DB = $00
+    sep #$20
+    .ACCU 8
+    lda.w $4211             ; TIMEUP: acknowledge an H/V-timer IRQ
+    lda.w $3031             ; SFR high byte: acknowledge a GSU IRQ (bit 15)
+    rep #$20
+    .ACCU 16
+    plb
+    pla
+    rti
+
+; gsu_rti_blob — BRK and COP land here (stubs $0100 / $0104): their ROM
+; handler is a bare RTI, which a job would make unreadable too.
+gsu_rti_blob:
+    rti
+gsu_nmi_blob_end:
+.ENDS
+.endif

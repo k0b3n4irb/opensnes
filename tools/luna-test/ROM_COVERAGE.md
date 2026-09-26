@@ -1,8 +1,8 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 94 ROMs (examples + the library fixture), 204 legs · **311 of 311 public functions executed, 0 never**
+luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 94 ROMs (examples + the library fixture), 206 legs · **312 of 312 public functions executed, 0 never**
 
-> Executed = at least one PC inside the function's `.sym` label range on at least one leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / `--superscope`), so those legs run input-free. The never-executed list is the ratchet in `baselines/never_executed.txt`.
+> Executed = at least one PC inside the function's `.sym` label range on at least one leg. Joypad-2, mouse (port 1) and Super Scope (port 2) scripts are replayed like joypad 1. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
 | header | never executed |
 |---|---|
@@ -72,7 +72,6 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `fixSqrt` | `libtest` |
 | `getRegion` | `libtest` |
 | `gsuDmaFullFrame` | `chips/superfx_3d` |
-| `gsuLaunch` | `chips/superfx_3d` |
 | `gsuSetupBitmapTilemap` | `chips/superfx_3d` |
 | `gsuSetupHdmaBlanking` | `chips/superfx_3d` |
 | `hdmaBrightnessGradient` | `hdma/hdma_helpers` |
@@ -94,7 +93,6 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `irqClear` | `libtest` |
 | `irqDisable` | `libtest` |
 | `irqSetBank` | `libtest` |
-| `irqSetVTimer` | `libtest` |
 | `isInVBlank` | `libtest` |
 | `isPAL` | `libtest` |
 | `lzssDecodeVram` | `backgrounds/mode1_lz77` |
@@ -113,14 +111,8 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mosaicFadeOut` | `transitions/mosaic` |
 | `mosaicGetSize` | `libtest` |
 | `mosaicSetSize` | `libtest` |
-| `mouseButtonsHeld` | `libtest` |
-| `mouseButtonsPressed` | `libtest` |
-| `mouseGetSensitivity` | `libtest` |
-| `mouseGetX` | `libtest` |
-| `mouseGetY` | `libtest` |
 | `mouseInit` | `input/mouse` |
 | `mouseIsConnected` | `libtest` |
-| `mouseSetSensitivity` | `libtest` |
 | `mul16` | `libtest` |
 | `nmiSetBank` | `libtest` |
 | `oamDrawMetaFlip` | `libtest` |
@@ -160,13 +152,9 @@ luna v1.24.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `sceneReplace` | `libtest` |
 | `sceneRun` | `basics/scene_stack` |
 | `scopeButtonsDown` | `libtest` |
-| `scopeButtonsHeld` | `libtest` |
-| `scopeButtonsPressed` | `libtest` |
 | `scopeButtonsRepeat` | `libtest` |
 | `scopeGetRawX` | `libtest` |
 | `scopeGetRawY` | `libtest` |
-| `scopeGetX` | `libtest` |
-| `scopeGetY` | `libtest` |
 | `scopeInit` | `input/superscope` |
 | `scopeIsConnected` | `input/superscope` |
 | `scopeSetRepeatDelay` | `libtest` |
