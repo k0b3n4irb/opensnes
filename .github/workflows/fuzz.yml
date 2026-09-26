@@ -10,7 +10,9 @@ name: Fuzz
 # bug stays fixed.
 #
 # When (owner decision 2026-09-26): the parsers only change with tools/, so
-# the 50-minute session runs when a push or a pull request touches tools/,
+# the 50-minute session runs when a push or a pull request touches tools/
+# (not tools/luna-test/, the test harness: no parser there, and it changes
+# with most commits — 2026-09-26),
 # plus once a week on develop to keep exploring — not every night on code
 # that did not move.
 
@@ -22,9 +24,9 @@ on:
         default: "600"
   push:
     branches: [develop]
-    paths: ['tools/**', '.github/workflows/fuzz.yml']
+    paths: ['tools/**', '!tools/luna-test/**', '.github/workflows/fuzz.yml']
   pull_request:
-    paths: ['tools/**', '.github/workflows/fuzz.yml']
+    paths: ['tools/**', '!tools/luna-test/**', '.github/workflows/fuzz.yml']
   schedule:
     - cron: '30 3 * * 0'   # weekly, Sunday 03:30 UTC
 
