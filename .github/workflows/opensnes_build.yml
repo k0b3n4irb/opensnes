@@ -138,28 +138,10 @@ jobs:
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          # The MSYS2 cproc segfault class is believed FIXED since cproc
-          # ea95cac (2026-03-07, mktype uninitialized fields); the make-level
-          # retry loop was dismantled 2026-07-04 (it could also mask real
-          # build failures). The cc65816-level retry (x3 on exit 139) stays
-          # as cheap insurance, with its firings counted below — see
-          # KNOWN_LIMITATIONS.md (MSYS2 note).
-          export CC65816_RETRY_LOG=$(pwd)/cproc_retries.log
+          # The MSYS2 cproc segfault class is fixed since cproc ea95cac
+          # (2026-03-07); both retry layers are retired (make-level 2026-07-04,
+          # cc65816-level 2026-09-26, zero firings measured).
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
-
-      - name: Report cproc segfault-retry count (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          n=0
-          [ -f cproc_retries.log ] && n=$(wc -l < cproc_retries.log)
-          echo "### cproc segfault retries: $n" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$n" -gt 0 ]; then
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            cat cproc_retries.log >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            echo "::warning::cproc segfault retry fired $n time(s) — the MSYS2 segfault class may have resurfaced (see KNOWN_LIMITATIONS.md)"
-          fi
 
       - name: Build & Release OpenSNES for macOS
         if: matrix.name == 'darwin'

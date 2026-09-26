@@ -363,7 +363,7 @@ reports the actual optimisation state per function (not always 1
 or always 0), so reading it is reliable.
 
 MSYS2-specific cproc segfaults (struct pointer init, nested structs,
-unions, string initializers) are **believed fixed** since cproc
+unions, string initializers) are **fixed** since cproc
 `ea95cac` (2026-03-07, "initialize all struct type fields in mktype()
 to prevent UB" — uninitialized type fields read heap garbage, whose
 layout-dependence explains both the non-determinism and the
@@ -374,16 +374,13 @@ a 200x stress of the five historical culprit files (that pass covered
 cproc; the standing `sanitizers` CI job added on 2026-09-12 covers the
 whole host toolchain and found bugs in QBE, wla-dx and cproc — the
 cproc ones are NULL + 0 pointer arithmetic over empty arrays, not the
-segfault class). The status is
-**under surveillance, not closed**: the make-level retry loop was
-dismantled on 2026-07-04 (it could also mask real build failures); the
-`cc65816`-level retry (x3 on exit 139) stays as cheap insurance while
-telemetry proves the fix out — every Windows build reports its retry
-count in the job summary, and
-`.github/workflows/msys2_cproc_diagnostic.yml` stress-tests the
-culprit files 100x monthly and fails on any segfault. Remaining
-retirement step: after 2–3 months of zero-count telemetry, drop the
-cc65816 retry too and close this entry. Full investigation log:
+segfault class). **Closed 2026-09-26**: the make-level retry loop was
+dismantled on 2026-07-04 and the `cc65816`-level retry (x3 on exit 139)
+on 2026-09-26, after its telemetry counted zero firings over the
+observation window and over the last 25 Windows CI builds. A cproc
+segfault is now reported as a compiler crash, not retried;
+`.github/workflows/msys2_cproc_diagnostic.yml` still stress-tests the
+culprit files 100x monthly and fails on any segfault. Full investigation log:
 `.claude/notes/tech/cproc_msys2_segfault_investigation.md`.
 
 ---
