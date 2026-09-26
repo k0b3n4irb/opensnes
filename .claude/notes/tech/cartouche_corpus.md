@@ -25,7 +25,7 @@ chunk count stayed the same. The six sources dated 2026-09-24
 (`ultrastarfox`, `argsfx-sasm-docs`, `peterlemon-gsu`, `sd2snes-changelog`,
 `cartouche-fiches`, `cartouche-fiches-jeux`) never surface in targeted
 queries — listed, apparently not indexed. Reported to snes-rag
-(`partners/snes-rag/OPEN_snes-rag.md`). Until it is answered, compare the
+(`partners/snes-rag/2026-09-26_to_snes-rag.md`). Until it is answered, compare the
 build date and the chunk count as well as the fingerprint, and rerun the
 golden queries whenever any of the three moves.
 
