@@ -157,12 +157,10 @@ Emulator Compatibility</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator  </th><th class="markdownTableHeadNone">Status  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Mesen2</b>  </td><td class="markdownTableBodyNone">Recommended &ndash; detects the GSU correctly and runs all current SuperFX examples  </td></tr>
+<td class="markdownTableBodyNone"><b>luna</b>  </td><td class="markdownTableBodyNone">The SDK's emulator and test backend: runs the GSU natively, and exposes its state (<span class="tt">luna state</span> → <span class="tt">gsu</span>), bus violations and per-job profile  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>bsnes</b>  </td><td class="markdownTableBodyNone">Cycle-accurate &ndash; useful as a second reference  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>luna</b>  </td><td class="markdownTableBodyNone">Detects and runs the GSU natively (the headless test harness validates SuperFX end-to-end)  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>snes9x</b>  </td><td class="markdownTableBodyNone">Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED")  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="getting-started-1"></a>
@@ -183,6 +181,8 @@ Getting Started</h2>
 <div class="line"> </div>
 <div class="line">include $(OPENSNES)/make/common.mk</div>
 </div><!-- fragment --><p><span class="tt">GSUSRC</span> lists your SuperFX assembly files (<span class="tt">.sfx</span>). The build system assembles them with <span class="tt">wla-superfx</span> and produces flat binaries (<span class="tt">.sfx.bin</span>).</p>
+<p>Two knobs matter for a GSU project (since 2026-09-24): <span class="tt">ROM_BANKS := 32</span> gives a 1 MB ROM (Star Fox's size; the default 8 is 256 KB) — the header's size byte and the asset bank range follow — and <span class="tt">GSU_RAM_KB := 64</span> is the Game Pak RAM the cartridge declares in the extended header at <span class="tt">$FFBD</span> (fullsnes, snesdev-wiki: Super FX carts declare RAM there and leave <span class="tt">$FFD8</span> at zero; the header's licensee byte <span class="tt">$FFDA</span> is <span class="tt">$33</span> so the extended header is recognised). A GSU-side variable is a <span class="tt">.RAMSECTION "name" BANK $70
+SLOT 3</span> on the 65816 side.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-write-gsu-assembly-code"></a>
 2. Write GSU Assembly Code</h3>
 <p>Create <span class="tt">gsu_code.sfx</span> &ndash; this runs on the SuperFX at up to 21.47 MHz:</p>
@@ -206,70 +206,13 @@ Getting Started</h2>
 <div class="line">    NOP                  ; dummy after STOP (required)</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md3-create-the-gsu-loader-65816-asm"></a>
 3. Create the GSU Loader (65816 ASM)</h3>
-<p>Create <span class="tt">gsu_loader.asm</span> &ndash; this embeds the GSU binary and provides the WRAM-based launch function:</p>
+<p>Create <span class="tt">gsu_loader.asm</span>: it only embeds the GSU binary. The launch is the library's.</p>
 <div class="fragment"><div class="line">.ifdef SUPERFX</div>
-<div class="line"> </div>
-<div class="line">; Embed GSU binary</div>
-<div class="line">.SECTION &quot;.gsu_code&quot; SUPERFREE</div>
+<div class="line">; The GSU binary, in any ROM bank (the library reads the bank from the pointer)</div>
+<div class="line">ASSET_SECTION &quot;.gsu_code&quot;</div>
 <div class="line">gsu_program:</div>
 <div class="line">    .incbin &quot;gsu_code.sfx.bin&quot;</div>
 <div class="line">gsu_program_end:</div>
-<div class="line">.ENDS</div>
-<div class="line"> </div>
-<div class="line">; WRAM area for the launch stub</div>
-<div class="line">.RAMSECTION &quot;.gsu_vars&quot; BANK 0 SLOT 1</div>
-<div class="line">gsu_wram_area: dsb 64</div>
-<div class="line">.ENDS</div>
-<div class="line"> </div>
-<div class="line">; Launch function + WRAM stub (same section for label arithmetic)</div>
-<div class="line">.SECTION &quot;.gsu_launcher&quot; SEMIFREE</div>
-<div class="line">.ACCU 16</div>
-<div class="line">.INDEX 16</div>
-<div class="line"> </div>
-<div class="line">launchGSU:</div>
-<div class="line">    php</div>
-<div class="line">    ; Copy stub to WRAM</div>
-<div class="line">    sep #$20</div>
-<div class="line">    rep #$10</div>
-<div class="line">    ldx #$0000</div>
-<div class="line">-   lda.l _wram_stub,x</div>
-<div class="line">    sta.l gsu_wram_area,x</div>
-<div class="line">    inx</div>
-<div class="line">    cpx #(_wram_stub_end - _wram_stub)</div>
-<div class="line">    bne -</div>
-<div class="line">    jsl gsu_wram_area    ; Execute from WRAM</div>
-<div class="line">    plp</div>
-<div class="line">    rtl</div>
-<div class="line"> </div>
-<div class="line">_wram_stub:</div>
-<div class="line">    sep #$20</div>
-<div class="line">    .ACCU 8</div>
-<div class="line">    lda #$00</div>
-<div class="line">    sta.l $4200          ; Disable NMI (vector is in ROM!)</div>
-<div class="line">    lda #$80</div>
-<div class="line">    sta.l $3037          ; CFGR: IRQ mask</div>
-<div class="line">    lda #$01</div>
-<div class="line">    sta.l $3039          ; CLSR: 21.47 MHz</div>
-<div class="line">    lda #$18</div>
-<div class="line">    sta.l $303A          ; SCMR: RAN + RON</div>
-<div class="line">    lda #:gsu_program</div>
-<div class="line">    sta.l $3034          ; PBR</div>
-<div class="line">    rep #$20</div>
-<div class="line">    .ACCU 16</div>
-<div class="line">    lda #gsu_program</div>
-<div class="line">    sta.l $301E          ; R15 -&gt; GO!</div>
-<div class="line">    sep #$20</div>
-<div class="line">    .ACCU 8</div>
-<div class="line">-   lda.l $3030</div>
-<div class="line">    and #$20             ; Poll SFR GO flag</div>
-<div class="line">    bne -</div>
-<div class="line">    lda #$00</div>
-<div class="line">    sta.l $303A          ; Reclaim buses</div>
-<div class="line">    lda #$81</div>
-<div class="line">    sta.l $4200          ; Re-enable NMI</div>
-<div class="line">    rtl</div>
-<div class="line">_wram_stub_end:</div>
-<div class="line"> </div>
 <div class="line">.ENDS</div>
 <div class="line">.endif</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md4-launch-from-c"></a>
@@ -277,17 +220,18 @@ Getting Started</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="superfx_8h.html">snes/superfx.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> <a class="code hl_function" href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a>[];   <span class="comment">/* the label before the .incbin */</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="line"> </div>
-<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a>()) {</div>
+<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a>()) {            <span class="comment">/* sets gsu_cfgr / gsu_scmr / gsu_scbr defaults */</span></div>
 <div class="line">        <span class="comment">/* No SuperFX hardware */</span></div>
 <div class="line">        <span class="keywordflow">while</span> (1) { <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>(); }</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    <a class="code hl_function" href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a>();</div>
+<div class="line">    <a class="code hl_function" href="superfx_8h.html#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a>(<a class="code hl_variable" href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a>);  <span class="comment">/* once: where the GSU program lives */</span></div>
+<div class="line">    <a class="code hl_function" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a>();                 <span class="comment">/* runs the job from WRAM, returns at STOP */</span></div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Read result from GSU R0 */</span></div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> result = *(<span class="keyword">volatile</span> <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3000;</div>
@@ -297,22 +241,28 @@ Getting Started</h2>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
-<div class="ttc" id="achips_2superfx__hello_2main_8c_html_a8141a91b5386629cef8fbfb1d8e546eb"><div class="ttname"><a href="chips_2superfx__hello_2main_8c.html#a8141a91b5386629cef8fbfb1d8e546eb">launchGSU</a></div><div class="ttdeci">void launchGSU(void)</div><div class="ttdoc">Launch GSU program, wait for completion (defined in gsu_loader.asm).</div></div>
+<div class="ttc" id="achips_2superfx__3d_2main_8c_html_a2861225d7574bbcdac86c81668b650c3"><div class="ttname"><a href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a></div><div class="ttdeci">const u8 gsu_program[]</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="asuperfx_8h_html"><div class="ttname"><a href="superfx_8h.html">superfx.h</a></div><div class="ttdoc">SuperFX (GSU) coprocessor library — registers, config, and API.</div></div>
+<div class="ttc" id="asuperfx_8h_html_a54c1329e34940920937be4e71bce9d99"><div class="ttname"><a href="superfx_8h.html#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a></div><div class="ttdeci">void gsuSetProgram(const void *program)</div><div class="ttdoc">Tell the library where the GSU program lives.</div></div>
 <div class="ttc" id="asuperfx_8h_html_addfe64b4f0c5ffe4847f2e0d56c5ef10"><div class="ttname"><a href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a></div><div class="ttdeci">u8 gsuInit(void)</div><div class="ttdoc">Set the GSU default configuration; returns gsuIsPresent().</div><div class="ttdef"><b>Definition</b> superfx.h:122</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="the-exclusive-bus"></a>
+<div class="ttc" id="asuperfx_8h_html_afa2477b5e4a9d17cf5cf4103cc5ca5a8"><div class="ttname"><a href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a></div><div class="ttdeci">void gsuLaunch(void)</div><div class="ttdoc">Launch GSU program and wait for completion (WRAM-safe).</div></div>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> copies nothing and disables nothing: the CPU waits in a WRAM loop while the GSU owns the cartridge, and interrupts keep working (next section). Adjust <span class="tt"><a class="el" href="superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d" title="CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply).">gsu_cfgr</a></span> (IRQ mask, fast multiply) and <span class="tt"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995" title="SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).">gsu_scmr</a></span> (colour depth, bus grants) before the call when your program needs it — <span class="tt">examples/chips/superfx_hello</span> sets both. (Until 2026-09-26 this page showed a hand-written WRAM launcher that disabled NMI for the job.)</p>
+<h2 class="doxsection"><a class="anchor" id="the-exclusive-bus"></a>
 The Exclusive Bus</h2>
-<p>When SCMR has RON=1, the GSU owns the ROM bus. <b>The SNES CPU cannot read ROM &ndash; not even its own code.</b> This is why:</p>
+<p>When SCMR has RON=1, the GSU owns the ROM bus. <b>The SNES CPU cannot read ROM &ndash; not even its own code or its own interrupt vectors.</b> The hardware plans for it: while the GSU owns the ROM, a vector fetch returns a dummy vector — <span class="tt">$0108</span> for NMI, <span class="tt">$010C</span> for IRQ, <span class="tt">$0104</span> COP, <span class="tt">$0100</span> BRK/ABORT (Nintendo dev manual Book II §5.4.1) — and a Super FX cartridge keeps a jump at each of those WRAM addresses. The SDK does this for you in every <span class="tt">USE_SUPERFX=1</span> build (since 2026-09-24/25):</p>
 <ol type="1">
-<li>The launch/poll code must execute from <b>WRAM</b></li>
-<li><b>NMI must be disabled</b> (the NMI vector is in ROM)</li>
-<li>All reference projects (casfx, DOOM-FX, PeterLemon) use WRAM execution</li>
+<li>crt0 installs the four WRAM stubs at boot, and the header's vectors point at them, so an interrupt takes the same path whether the GSU is running or not;</li>
+<li>the NMI stub enters a small WRAM handler: while a GSU job runs (<span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch</a></span> sets <span class="tt">gsu_owns_cart</span>) it acknowledges the NMI, advances <span class="tt"><a class="el" href="system_8h.html#a393cdd9777ac31290693d930c63d2a83" title="Frame counter incremented every VBlank by the NMI handler.">frame_count</a></span> and uploads OAM if you flagged it; the rest of the VBlank work — tilemap, scroll, pads, your NMI callback — is ROM code and is <b>deferred</b> to the next VBlank after the job, not lost;</li>
+<li>the IRQ stub enters a WRAM handler too: during a job it acknowledges an H/V-timer IRQ (<span class="tt">$4211</span>) and a GSU IRQ (SFR high byte) and returns — your IRQ handler is ROM code and runs again after the job; BRK and COP land on a WRAM <span class="tt">rti</span> (since 2026-09-26);</li>
+<li>the launch/poll code itself still executes from WRAM, as in every reference project (casfx, DOOM-FX, PeterLemon).</li>
 </ol>
+<p>The NMI is <b>not</b> disabled during a job any more. It used to be, and one VBlank in three was lost in <span class="tt">superfx_3d</span> (game time ran at two thirds of real time); <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch</a></span> also re-enabled NMI with a hardcoded <span class="tt">$81</span>, which silently cancelled an H/V-timer IRQ the game had armed.</p>
 <h2 class="doxsection"><a class="anchor" id="superfx-assembly-rules"></a>
 SuperFX Assembly Rules</h2>
 <p>Four mandatory rules for all GSU programs:</p>

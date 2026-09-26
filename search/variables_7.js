@@ -48,10 +48,11 @@ var searchData=
   ['gsu_5ffmult_5ftest2_45',['gsu_fmult_test2',['../chips_2superfx__hello_2main_8c.html#a40f514996898ae3ec983ed3930f676c7',1,'main.c']]],
   ['gsu_5fprog_5faddr_46',['gsu_prog_addr',['../superfx_8h.html#aa96dbf2933de566840e56b543630e5d6',1,'superfx.h']]],
   ['gsu_5fprog_5fbank_47',['gsu_prog_bank',['../superfx_8h.html#a37f6cfe16760b75f19f649ecaaef14da',1,'superfx.h']]],
-  ['gsu_5fresult_48',['gsu_result',['../chips_2superfx__hello_2main_8c.html#a6c8473de37b20dc95d9bc4cec1e11544',1,'main.c']]],
-  ['gsu_5fscbr_49',['gsu_scbr',['../superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06',1,'superfx.h']]],
-  ['gsu_5fscmr_50',['gsu_scmr',['../superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995',1,'superfx.h']]],
-  ['gsu_5fsram_5fbyte0_51',['gsu_sram_byte0',['../chips_2superfx__hello_2main_8c.html#aa882c498f78689f39c3987fcfba0fcda',1,'main.c']]],
-  ['gsu_5fsram_5fbyte1_52',['gsu_sram_byte1',['../chips_2superfx__hello_2main_8c.html#ad633a57bce552d45930a77ce98334e5b',1,'main.c']]],
-  ['gsu_5fsram_5fword_53',['gsu_sram_word',['../chips_2superfx__hello_2main_8c.html#ae17450f5f60c61ed81c1b9006b36db0f',1,'main.c']]]
+  ['gsu_5fprogram_48',['gsu_program',['../chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3',1,'gsu_program:&#160;main.c'],['../chips_2superfx__hello_2main_8c.html#a2861225d7574bbcdac86c81668b650c3',1,'gsu_program:&#160;main.c']]],
+  ['gsu_5fresult_49',['gsu_result',['../chips_2superfx__hello_2main_8c.html#a6c8473de37b20dc95d9bc4cec1e11544',1,'main.c']]],
+  ['gsu_5fscbr_50',['gsu_scbr',['../superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06',1,'superfx.h']]],
+  ['gsu_5fscmr_51',['gsu_scmr',['../superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995',1,'superfx.h']]],
+  ['gsu_5fsram_5fbyte0_52',['gsu_sram_byte0',['../chips_2superfx__hello_2main_8c.html#aa882c498f78689f39c3987fcfba0fcda',1,'main.c']]],
+  ['gsu_5fsram_5fbyte1_53',['gsu_sram_byte1',['../chips_2superfx__hello_2main_8c.html#ad633a57bce552d45930a77ce98334e5b',1,'main.c']]],
+  ['gsu_5fsram_5fword_54',['gsu_sram_word',['../chips_2superfx__hello_2main_8c.html#ae17450f5f60c61ed81c1b9006b36db0f',1,'main.c']]]
 ];

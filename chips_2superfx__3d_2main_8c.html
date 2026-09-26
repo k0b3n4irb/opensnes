@@ -132,10 +132,10 @@ $(function(){initNavTree('chips_2superfx__3d_2main_8c.html','',''); });
 Functions</h2></td></tr>
 <tr class="memitem:a9ab89667514f31b155bfd2bd2ada0b00" id="r_a9ab89667514f31b155bfd2bd2ada0b00"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9ab89667514f31b155bfd2bd2ada0b00">buildEdges</a> (void)</td></tr>
 <tr class="memdesc:a9ab89667514f31b155bfd2bd2ada0b00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build edge buffer from projected vertices.  <br /></td></tr>
-<tr class="memitem:a8a3a6360cd7628baa3d69f4b7d50c35e" id="r_a8a3a6360cd7628baa3d69f4b7d50c35e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8a3a6360cd7628baa3d69f4b7d50c35e">gsuSetProgram</a> (void)</td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memitem:aefc8f0e95be47bb6ec917f4ed4169dfc" id="r_aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aefc8f0e95be47bb6ec917f4ed4169dfc">rotateVertex</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td></tr>
 <tr class="memdesc:aefc8f0e95be47bb6ec917f4ed4169dfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate one vertex, store projected screen coords (clamped).  <br /></td></tr>
+<tr class="memitem:aaced606d15114e57daf910271b6f2800" id="r_aaced606d15114e57daf910271b6f2800"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aaced606d15114e57daf910271b6f2800">vtimer_irq</a> (void)</td></tr>
 <tr class="memitem:a17000e52c641974ad31ef2386e695fe1" id="r_a17000e52c641974ad31ef2386e695fe1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a17000e52c641974ad31ef2386e695fe1">writeEdgesToSRAM</a> (void)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
@@ -152,6 +152,8 @@ Variables</h2></td></tr>
 <tr class="memitem:a6916c278063c57e5b9085cde768ce6d2" id="r_a6916c278063c57e5b9085cde768ce6d2"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6916c278063c57e5b9085cde768ce6d2">g_py</a> [8]</td></tr>
 <tr class="memitem:aac1f89a29701ca7a1c6d291d4b251722" id="r_aac1f89a29701ca7a1c6d291d4b251722"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aac1f89a29701ca7a1c6d291d4b251722">g_sax</a></td></tr>
 <tr class="memitem:a6ebe2671b17e48d52f625e0878feccef" id="r_a6ebe2671b17e48d52f625e0878feccef"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6ebe2671b17e48d52f625e0878feccef">g_say</a></td></tr>
+<tr class="memitem:a2861225d7574bbcdac86c81668b650c3" id="r_a2861225d7574bbcdac86c81668b650c3"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2861225d7574bbcdac86c81668b650c3">gsu_program</a> []</td></tr>
+<tr class="memitem:a318736b11f40a1ff053c0852ccadfcf8" id="r_a318736b11f40a1ff053c0852ccadfcf8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a318736b11f40a1ff053c0852ccadfcf8">irq_ticks</a></td></tr>
 <tr class="memitem:a74ca0597b23b1a8087c84123159f022f" id="r_a74ca0597b23b1a8087c84123159f022f"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a74ca0597b23b1a8087c84123159f022f">sin_tab</a> [256]</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
@@ -167,7 +169,8 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>A wireframe cube rotates continuously on two axes (X and Y).</li>
 <li>No input — the rotation is autonomous; reset to restart from the initial angle.</li>
-<li>GSU presence is detected via the ROM header bits; Mesen2 is the canonical emulator for this example (snes9x's GSU detection is unreliable on our header layout — see KNOWN_LIMITATIONS).</li>
+<li>GSU presence is detected via the ROM header bits; luna (the SDK's emulator) and bsnes run it (snes9x's GSU detection is unreliable on our header layout).</li>
+<li>A V-timer IRQ stays armed through GSU jobs (vtimer_irq, irq_ticks).</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, input, superfx</dd></dl>
@@ -189,31 +192,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Build edge buffer from projected vertices. </p>
-
-</div>
-</div>
-<a id="a8a3a6360cd7628baa3d69f4b7d50c35e" name="a8a3a6360cd7628baa3d69f4b7d50c35e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a3a6360cd7628baa3d69f4b7d50c35e">&#9670;&#160;</a></span>gsuSetProgram()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void gsuSetProgram </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -250,6 +228,31 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Rotate one vertex, store projected screen coords (clamped). </p>
+
+</div>
+</div>
+<a id="aaced606d15114e57daf910271b6f2800" name="aaced606d15114e57daf910271b6f2800"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaced606d15114e57daf910271b6f2800">&#9670;&#160;</a></span>vtimer_irq()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vtimer_irq </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -501,6 +504,50 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> g_say</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2861225d7574bbcdac86c81668b650c3" name="a2861225d7574bbcdac86c81668b650c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2861225d7574bbcdac86c81668b650c3">&#9670;&#160;</a></span>gsu_program</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_program[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a318736b11f40a1ff053c0852ccadfcf8" name="a318736b11f40a1ff053c0852ccadfcf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a318736b11f40a1ff053c0852ccadfcf8">&#9670;&#160;</a></span>irq_ticks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> irq_ticks</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

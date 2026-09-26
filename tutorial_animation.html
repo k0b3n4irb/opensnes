@@ -249,7 +249,7 @@ Converting Sprite Sheets with gfx4snes</h3>
 <div class="fragment"><div class="line"># 16x16 sprites, 4bpp, with palette output</div>
 <div class="line">gfx4snes -s 16 -o 16 -u 16 -p -i sprites.png</div>
 </div><!-- fragment --><p>Include the output in an assembly data file:</p>
-<div class="fragment"><div class="line">.section &quot;.rodata1&quot; superfree</div>
+<div class="fragment"><div class="line">ASSET_SECTION &quot;sprites&quot;          ; templates/assets.inc: any bank but $00</div>
 <div class="line">sprite_tiles: .incbin &quot;res/sprites.pic&quot;</div>
 <div class="line">sprite_tiles_end:</div>
 <div class="line">sprite_pal:   .incbin &quot;res/sprites.pal&quot;</div>
@@ -317,7 +317,7 @@ Input and State Changes</h3>
 <div class="line">    <a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.state = <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d">W_DOWN</a>;</div>
 <div class="line">    <a class="code hl_variable" href="sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024">monster</a>.flipx = 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:167</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>

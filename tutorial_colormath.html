@@ -222,7 +222,7 @@ Fade-to-black / fade-to-white</h2>
 <div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
 <div class="ttc" id="acolormath_8h_html_aba2a18b87756e861ed9c66e8766f2579"><div class="ttname"><a href="colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579">COLORMATH_SRC_FIXED</a></div><div class="ttdeci">#define COLORMATH_SRC_FIXED</div><div class="ttdoc">Use fixed color as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:99</div></div>
 <div class="ttc" id="acolormath_8h_html_abcda76899184da13fe9c9a4637ca82ea"><div class="ttname"><a href="colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea">COLORMATH_SUB</a></div><div class="ttdeci">#define COLORMATH_SUB</div><div class="ttdoc">Subtract colors (darkens).</div><div class="ttdef"><b>Definition</b> colormath.h:89</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_afff0ae4fe505f5b27afed49e21dea41d"><div class="ttname"><a href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></div><div class="ttdeci">static u16 c</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_afff0ae4fe505f5b27afed49e21dea41d"><div class="ttname"><a href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></div><div class="ttdeci">static u16 c</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --><p>The <span class="tt"><a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">lib/include/snes/video.h</a></span> <span class="tt"><a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a></span> is a <em>different</em> mechanism — it scales every channel uniformly by a 4-bit factor via <span class="tt">INIDISP</span>, and is the right tool for "global brightness". Colour math gives finer control: per-layer fades, asymmetric R/G/B fades for underwater tints, etc.</p>
 <h2 class="doxsection"><a class="anchor" id="the-window-gate"></a>
@@ -237,8 +237,9 @@ The window gate</h2>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a>);</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aa5667a2a54eb543bd71dbbd9cd41bd10">colorMathSetHalf</a>(1);</div>
-<div class="line">colorMathSetMaskMain(<a class="code hl_define" href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3">COLORMATH_INSIDE</a>);       <span class="comment">/* math inside window only */</span></div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#a15da8aea1fb4d880f7547dd3dfe2320c">colorMathSetCondition</a>(<a class="code hl_define" href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3">COLORMATH_INSIDE</a>);      <span class="comment">/* math inside window only */</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482">COLORMATH_BG1</a>);</div>
+<div class="ttc" id="acolormath_8h_html_a15da8aea1fb4d880f7547dd3dfe2320c"><div class="ttname"><a href="colormath_8h.html#a15da8aea1fb4d880f7547dd3dfe2320c">colorMathSetCondition</a></div><div class="ttdeci">void colorMathSetCondition(u8 condition)</div><div class="ttdoc">Set when color math is enabled (window control).</div></div>
 <div class="ttc" id="acolormath_8h_html_a4071dbd0a7992b17481aa199e5c8a3c3"><div class="ttname"><a href="colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3">COLORMATH_INSIDE</a></div><div class="ttdeci">#define COLORMATH_INSIDE</div><div class="ttdoc">Enable inside window only.</div><div class="ttdef"><b>Definition</b> colormath.h:109</div></div>
 <div class="ttc" id="awindow_8h_html_a69900cfa7ecb5f94e7f6195024ac9e10"><div class="ttname"><a href="window_8h.html#a69900cfa7ecb5f94e7f6195024ac9e10">windowSetPos</a></div><div class="ttdeci">void windowSetPos(u8 window, u8 left, u8 right)</div><div class="ttdoc">Set window boundaries.</div></div>
 <div class="ttc" id="awindow_8h_html_a6ab27f7c632399c2a56dafa591e2e51c"><div class="ttname"><a href="window_8h.html#a6ab27f7c632399c2a56dafa591e2e51c">windowSetMainMask</a></div><div class="ttdeci">void windowSetMainMask(u8 layers)</div><div class="ttdoc">Set main screen window masking.</div></div>
@@ -248,7 +249,7 @@ The window gate</h2>
 <div class="ttc" id="awindow_8h_html_acfb87c43c4940497f7e2a21a08008155"><div class="ttname"><a href="window_8h.html#acfb87c43c4940497f7e2a21a08008155">WINDOW_1</a></div><div class="ttdeci">#define WINDOW_1</div><div class="ttdoc">Window 1.</div><div class="ttdef"><b>Definition</b> window.h:52</div></div>
 <div class="ttc" id="awindow_8h_html_ae1bc6577dfc89cd5fb01cddeef631017"><div class="ttname"><a href="window_8h.html#ae1bc6577dfc89cd5fb01cddeef631017">windowEnable</a></div><div class="ttdeci">void windowEnable(u8 window, u8 layers)</div><div class="ttdoc">Enable window for specified layers.</div></div>
 <div class="ttc" id="awindow_8h_html_ae4bd6eff3175f2ca17357d2a2a1b8177"><div class="ttname"><a href="window_8h.html#ae4bd6eff3175f2ca17357d2a2a1b8177">WINDOW_MATH</a></div><div class="ttdeci">#define WINDOW_MATH</div><div class="ttdoc">Color math (affects color blending).</div><div class="ttdef"><b>Definition</b> window.h:77</div></div>
-</div><!-- fragment --><p>The four constants for <span class="tt">colorMathSetMaskMain(condition)</span>:</p>
+</div><!-- fragment --><p><span class="tt">colorMathSetCondition(condition)</span> writes CGWSEL bits 5-4, the region where colour math is allowed. The four constants:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone"><span class="tt">COLORMATH_*</span>  </th><th class="markdownTableHeadNone">Math fires when…  </th></tr>
@@ -261,7 +262,8 @@ The window gate</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">_NEVER</span>  </td><td class="markdownTableBodyNone">never (use to disable math without unwinding all enables)  </td></tr>
 </table>
-<p>The pair <span class="tt">colorMathSetMaskSub(condition)</span> does the same for the sub screen — usually less interesting, but <span class="tt">_INSIDE</span> on sub is the right gate for "blend with sub-screen colour only inside the window".</p>
+<p>The other half of CGWSEL, bits 7-6, uses the same four regions for a different effect: it clips the main screen's colours to <b>black</b> before the math (never / outside / inside / always). There is no sub-screen twin of the math region — see <a href="https://www.romhacking.net/documents/196/">anomie's register doc</a> ("cc = Clip colors to
+black before math, mm = Prevent color math") and <a href="https://snes.nesdev.org/wiki/PPU_registers#CGWSEL">snesdev-wiki</a>. The lib has no function for the clip bits yet.</p>
 <h2 class="doxsection"><a class="anchor" id="the-lib-api"></a>
 The lib API</h2>
 <table class="markdownTable">
@@ -282,9 +284,7 @@ The lib API</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">colorMathSetFixedColor(r, g, b)</span>  </td><td class="markdownTableBodyNone">Set the fixed-colour value (5-bit per channel). Used when source is <span class="tt">_FIXED</span>.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">colorMathSetMaskMain(condition)</span>  </td><td class="markdownTableBodyNone">Window gate for the main-screen path: <span class="tt">_ALWAYS</span> / <span class="tt">_INSIDE</span> / <span class="tt">_OUTSIDE</span> / <span class="tt">_NEVER</span>.  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">colorMathSetMaskSub(condition)</span>  </td><td class="markdownTableBodyNone">Same for the sub screen.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">colorMathSetCondition(condition)</span>  </td><td class="markdownTableBodyNone">Window region where math is allowed: <span class="tt">_ALWAYS</span> / <span class="tt">_INSIDE</span> / <span class="tt">_OUTSIDE</span> / <span class="tt">_NEVER</span> (CGWSEL bits 5-4).  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="worked-patterns-the-two-shipped-examples"></a>
 Worked patterns (the two shipped examples)</h2>

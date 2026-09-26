@@ -148,7 +148,7 @@ Variables</h2></td></tr>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>On boot you see "SA1 status: NN" where NN is the byte the SA-1 wrote to its shared status slot. Any non-zero value confirms the coprocessor ran. The expected value here is <span class="tt">0xA5</span> (set by the bundled <span class="tt">sa1_boot.asm</span>).</li>
-<li>If status is 0x00, the SA-1 didn't run — check that the emulator recognises SA-1 from the ROM header (Mesen2 is reliable; some snes9x builds miss it).</li>
+<li>If status is 0x00, the SA-1 didn't run — check that the emulator recognises SA-1 from the ROM header (luna and bsnes do; some snes9x builds miss it).</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, sa1</dd></dl>

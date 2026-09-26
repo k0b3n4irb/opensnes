@@ -128,13 +128,14 @@ Build Issues</h2>
 <h3 class="doxsection"><a class="anchor" id="opensnes-not-defined-or-no-rule-to-make-target-commonmk"></a>
 "OPENSNES not defined" or "No rule to make target 'common.mk'"</h3>
 <p><b>Cause</b>: The Makefile can't find the OpenSNES installation.</p>
-<p><b>Fix</b>: Set <span class="tt">OPENSNES</span> in your Makefile or set the environment variable:</p>
-<div class="fragment"><div class="line"># Option 1: Set in Makefile (recommended for project portability)</div>
+<p><b>Fix</b>: Set <span class="tt">OPENSNES</span> in your Makefile, or pass it on the command line:</p>
+<div class="fragment"><div class="line"># Option 1: in the Makefile (recommended for project portability)</div>
 <div class="line">OPENSNES := /path/to/opensnes</div>
 <div class="line"> </div>
-<div class="line"># Option 2: Set environment variable</div>
-<div class="line">export OPENSNES_HOME=/path/to/opensnes</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="empty-compiler-directories-or-cc65816-not-found"></a>
+<div class="line"># Option 2: on the command line (make reads variables, not OPENSNES_HOME)</div>
+<div class="line">make OPENSNES=/path/to/opensnes</div>
+</div><!-- fragment --><p><span class="tt">OPENSNES_HOME</span> is read by the <span class="tt">opensnes</span> CLI only, not by <span class="tt">make</span>.</p>
+<h3 class="doxsection"><a class="anchor" id="empty-compiler-directories-or-cc65816-not-found"></a>
 Empty <span class="tt">compiler/</span> directories or "cc65816 not found"</h3>
 <p><b>Cause</b>: Submodules weren't cloned.</p>
 <p><b>Fix</b>: </p><div class="fragment"><div class="line">cd /path/to/opensnes</div>
@@ -159,28 +160,11 @@ Empty <span class="tt">compiler/</span> directories or "cc65816 not found"</h3>
 <div class="line"> </div>
 <div class="line"># Windows MSYS2 (UCRT64)</div>
 <div class="line">pacman -S mingw-w64-ucrt-x86_64-clang</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="build-fails-with-unhandled-op-xxx"></a>
-Build fails with "unhandled op: XXX"</h3>
-<p><b>Cause</b>: The QBE backend doesn't support a specific operation (usually 32-bit or complex expressions).</p>
-<p><b>Fix</b>: Simplify your code: </p><div class="fragment"><div class="line"><span class="comment">// BAD: 32-bit operations are slow and may not work</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a> bigValue = x * 1000;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// GOOD: Use 16-bit when possible</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value = x * 10;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// BAD: Complex expressions in one line</span></div>
-<div class="line">result = (<a class="code hl_variable" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a> * <a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a> + <a class="code hl_variable" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a>) / d;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// GOOD: Break it down</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> temp = <a class="code hl_variable" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a> * <a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>;</div>
-<div class="line">temp += <a class="code hl_variable" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a>;</div>
-<div class="line">result = temp / d;</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_afff0ae4fe505f5b27afed49e21dea41d"><div class="ttname"><a href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a></div><div class="ttdeci">static u16 c</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
-<div class="ttc" id="agroup__types_html_ga10e94b422ef0c20dcdec20d31a1f5049"><div class="ttname"><a href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049">u32</a></div><div class="ttdeci">unsigned int u32</div><div class="ttdoc">32-bit unsigned integer (0 to 4294967295)</div><div class="ttdef"><b>Definition</b> types.h:90</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="static-variables-with-initializers"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="build-fails-with-refusing-to-emit-silently-wrong-code-1"></a>
+Build fails with "refusing to emit silently-wrong code"</h3>
+<p><b>Cause</b>: The code uses a C feature the 65816 backend does not lower. The message names it: struct assignment, a struct passed or returned by value, a variadic function, or inline assembly (<span class="tt">asm</span>).</p>
+<p><b>Fix</b>: pass a pointer to the struct, copy it field by field (or with a loop), give the function a fixed argument list, or move the assembly into a <span class="tt">.asm</span> file of the project. 32-bit arithmetic (<span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>, <span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span>, <span class="tt">*</span>, <span class="tt">/</span>, <span class="tt">%</span>, shifts) is supported and tested — prefer <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> for speed, not for correctness.</p>
+<h3 class="doxsection"><a class="anchor" id="static-variables-with-initializers"></a>
 Static variables with initializers</h3>
 <p>Initialized static variables now work correctly: </p><div class="fragment"><div class="line"><span class="comment">// Both work correctly:</span></div>
 <div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> counter = 0;   <span class="comment">// Initial value copied from ROM to RAM at startup</span></div>
@@ -260,6 +244,7 @@ Controller input not working</h3>
 <div class="line"><span class="keywordflow">if</span> (pressed &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) { }    <span class="comment">// B button (bit 15)</span></div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gad2ae94d1ffed5c399aa6f8c40c0fc3c7"><div class="ttname"><a href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></div><div class="ttdeci">#define KEY_B</div><div class="ttdef"><b>Definition</b> input.h:71</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="ainput_8h_html_a2ef786c923fe4841a3b4f1d2f7350dda"><div class="ttname"><a href="input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda">padReleased</a></div><div class="ttdeci">u16 padReleased(u8 pad)</div><div class="ttdoc">Get buttons released this frame.</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>

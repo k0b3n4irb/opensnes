@@ -122,7 +122,7 @@ $(function(){initNavTree('tools_smconv.html','',''); });
   <div class="headertitle"><div class="title">smconv — tracker modules to SNESMOD soundbanks </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><span class="tt">smconv</span> turns music written in a tracker — Impulse Tracker <span class="tt">.it</span> modules — into a <b>SNESMOD soundbank</b>: the packed music, samples, and effect data the SPC700 plays. It is how you get real, multi-channel music (and sound-effect banks) into a game, driven from C by a few <span class="tt">spcLoad</span> / <span class="tt">spcPlay</span> calls.</p>
+<div class="textblock"><p><span class="tt">smconv</span> turns music written in a tracker — Impulse Tracker <span class="tt">.it</span> modules — into a <b>SNESMOD soundbank</b>: the packed music, samples, and effect data the SPC700 plays. It is how you get real, multi-channel music (and sound-effect banks) into a game, driven from C by a few <span class="tt">snesmod*</span> calls (<span class="tt"><a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snes/snesmod.h</a></span>).</p>
 <h2 class="doxsection"><a class="anchor" id="what-goes-in-what-comes-out-4"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> one or more <span class="tt">.it</span> files (each becomes a numbered module — songs and/or SFX banks).</p>
@@ -146,10 +146,26 @@ How you actually use it</h2>
 </div><!-- fragment --><p>Under the hood that becomes:</p>
 <div class="fragment"><div class="line">smconv -s -o soundbank -b 1 -n -p soundbank music/mysong.it</div>
 </div><!-- fragment --><p>Then, in C, load and play by module number (the <span class="tt">.h</span> gives you the names):</p>
-<div class="fragment"><div class="line">spcLoad(MOD_MYSONG);   <span class="comment">// load a module</span></div>
-<div class="line">spcPlay(0);            <span class="comment">// play it</span></div>
-<div class="line">spcPlaySound(SFX_JUMP);<span class="comment">// trigger a sound effect from an SFX bank</span></div>
-</div><!-- fragment --><p>See <a class="el" href="tutorial_audio.html" title="Audio &amp; Music Tutorial">Audio &amp; Music Tutorial</a> and <a class="el" href="snes_sound_guide.html" title="SNES Sound Programming Guide">SNES Sound Programming Guide</a> for the runtime side.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a>(SOUNDBANK_BANK);</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a>(MOD_MYSONG);            <span class="comment">// load a module</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> jump = <a class="code hl_function" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a>(SFX_JUMP);    <span class="comment">// load an effect, keep its slot</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);                           <span class="comment">// play from pattern 0</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* in the game loop */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(jump, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a>); <span class="comment">// volume, pan, pitch</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a>();                         <span class="comment">// once per frame</span></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga4ee30188309d91d30e4d147b6292cae3"><div class="ttname"><a href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a></div><div class="ttdeci">void snesmodSetSoundbank(u8 bank)</div><div class="ttdoc">Set the soundbank bank number.</div></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
+<div class="ttc" id="agroup__snesmod__module_html_ga8299a9a929e131b1c7c145fae1a1e2f1"><div class="ttname"><a href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a></div><div class="ttdeci">void snesmodPlay(u8 startPosition)</div><div class="ttdoc">Start module playback.</div></div>
+<div class="ttc" id="agroup__snesmod__module_html_gae805748fae02839bafc3b2c2e3a82358"><div class="ttname"><a href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a></div><div class="ttdeci">void snesmodLoadModule(u16 moduleId)</div><div class="ttdoc">Load a module from the soundbank.</div></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6ade25aca1fe55755fcaa90121865cd7"><div class="ttname"><a href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a></div><div class="ttdeci">#define SNESMOD_PITCH_NORMAL</div><div class="ttdef"><b>Definition</b> snesmod.h:350</div></div>
+<div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+</div><!-- fragment --><p><span class="tt">examples/games/likemario</span> does exactly this. (<span class="tt">spcLoad</span> / <span class="tt">spcPlay</span> are the PVSnesLib names — see <a class="el" href="migrating_pvsneslib.html" title="Migrating from PVSnesLib">Migrating from PVSnesLib</a>.)</p>
+<p>See <a class="el" href="tutorial_audio.html" title="Audio &amp; Music Tutorial">Audio &amp; Music Tutorial</a> and <a class="el" href="snes_sound_guide.html" title="SNES Sound Programming Guide">SNES Sound Programming Guide</a> for the runtime side.</p>
 <h2 class="doxsection"><a class="anchor" id="the-flags-behind-the-makefile"></a>
 The flags behind the Makefile</h2>
 <table class="markdownTable">
@@ -174,7 +190,7 @@ The flags behind the Makefile</h2>
 Gotchas worth knowing up front</h2>
 <ul>
 <li><b>Declare, don't invoke.</b> For a game build, set <span class="tt">USE_SNESMOD</span> and <span class="tt">SOUNDBANK_SRC</span>; the bank (<span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a> 1</span>), no-header (<span class="tt">-n</span>) and prefix flags are OpenSNES-specific and the Makefile gets them right. Calling smconv by hand with SNESMOD's defaults will not link.</li>
-<li><b>Many modules, one bank.</b> Pass several <span class="tt">.it</span> files to get several modules — music via <span class="tt">spcLoad(N)</span> + <span class="tt">spcPlay(0)</span>, effects via <span class="tt">spcPlaySound(N)</span>.</li>
+<li><b>Many modules, one bank.</b> Pass several <span class="tt">.it</span> files to get several modules — music via <span class="tt">snesmodLoadModule(N)</span> + <span class="tt">snesmodPlay(0)</span>, effects via <span class="tt">snesmodLoadEffect(N)</span> + <span class="tt"><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect</a>(slot, …)</span>.</li>
 <li><b>SPC700 limits are real.</b> Up to 8 channels; samples auto-convert to BRR at 32 kHz max; <span class="tt">-V</span> reports how much of the SPC's 64 KB you are using — watch it, because music and samples share that space.</li>
 <li><b>HiROM builds</b> relocate the soundbank origin (the build handles the <span class="tt">.ORG</span> fix-up for you).</li>
 </ul>

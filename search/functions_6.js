@@ -9,10 +9,11 @@ var searchData=
   ['goombainit_6',['goombainit',['../goomba_8c.html#af617d06b9acb34e2aa36d86b0214a946',1,'goombainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx):&#160;goomba.c'],['../goomba_8h.html#af617d06b9acb34e2aa36d86b0214a946',1,'goombainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx):&#160;goomba.c']]],
   ['goombaupdate_7',['goombaupdate',['../goomba_8c.html#ac62bb43c675907218c9a136966349273',1,'goombaupdate(u16 idx):&#160;goomba.c'],['../goomba_8h.html#ac62bb43c675907218c9a136966349273',1,'goombaupdate(u16 idx):&#160;goomba.c']]],
   ['gsudmafullframe_8',['gsuDmaFullFrame',['../superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8',1,'superfx.h']]],
-  ['gsuinit_9',['gsuInit',['../superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10',1,'superfx.h']]],
-  ['gsuispresent_10',['gsuIsPresent',['../superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8',1,'superfx.h']]],
-  ['gsulaunch_11',['gsuLaunch',['../superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8',1,'superfx.h']]],
-  ['gsusetprogram_12',['gsuSetProgram',['../chips_2superfx__3d_2main_8c.html#a8a3a6360cd7628baa3d69f4b7d50c35e',1,'main.c']]],
-  ['gsusetupbitmaptilemap_13',['gsuSetupBitmapTilemap',['../superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50',1,'superfx.h']]],
-  ['gsusetuphdmablanking_14',['gsuSetupHdmaBlanking',['../superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a',1,'superfx.h']]]
+  ['gsuhelloreadresults_9',['gsuHelloReadResults',['../chips_2superfx__hello_2main_8c.html#a93b87a75654d9246b4cb46a3cbc169bd',1,'main.c']]],
+  ['gsuinit_10',['gsuInit',['../superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10',1,'superfx.h']]],
+  ['gsuispresent_11',['gsuIsPresent',['../superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8',1,'superfx.h']]],
+  ['gsulaunch_12',['gsuLaunch',['../superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8',1,'superfx.h']]],
+  ['gsusetprogram_13',['gsuSetProgram',['../superfx_8h.html#a54c1329e34940920937be4e71bce9d99',1,'superfx.h']]],
+  ['gsusetupbitmaptilemap_14',['gsuSetupBitmapTilemap',['../superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50',1,'superfx.h']]],
+  ['gsusetuphdmablanking_15',['gsuSetupHdmaBlanking',['../superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a',1,'superfx.h']]]
 ];

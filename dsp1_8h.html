@@ -220,7 +220,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)((<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>) &lt;&lt; 8))</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:157</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_ae1fba7bfd4f26a466097c410bef1473a"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></div><div class="ttdeci">static u16 a</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment -->
@@ -345,7 +345,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>sqrt(x²+y²+z²) as a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> — not rounded: measured on luna (which runs the real DSP-1B firmware), every exact length reads ONE LOW: (3,4,12) -&gt; 12, (300,400,0) -&gt; 499, (0,0,10000) -&gt; 9999. Treat the result as exact to within 1, and compare with <span class="tt">&gt;=</span> / <span class="tt">&lt;</span>, never <span class="tt">==</span>. Observed; no hardware reference states the rounding.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>sqrt(x²+y²+z²) as a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> — not rounded: measured on luna (which runs the real DSP-1B firmware), every exact length reads ONE LOW: (3,4,12) -&gt; 12, (300,400,0) -&gt; 499, (0,0,10000) -&gt; 9999. Treat the result as exact to within 1, and compare with <span class="tt">&gt;=</span> / <span class="tt">&lt;</span>, never <span class="tt">==</span>. Measured on the DSP-1B firmware; the official manual (Book II §5.2.3, code 28H) states no rounding, and sneslab notes the command "bugged in DSP1/DSP1A, fixed in DSP1B" without saying what the bug was — so on the 1/1A revisions the result may differ.</dd></dl>
 <p>Hardware square root — handy for homing missiles, audio attenuation, anything that needs a true distance rather than a compare. </p>
 
 </div>
@@ -621,7 +621,8 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>((x²+y²+z²) − r²) &gt;&gt; 15, arithmetic shift — NOT the raw difference (it would not fit 16 bits). Measured on luna's DSP-1B: (3000,4000,0, r 1000) -&gt; 732 = 24 000 000 / 32768; (0,0,0, r 1000) -&gt; -31. Negative means inside; but anything within 32768 squared-units outside the surface reads 0, and (30,40,0, r 5) — ten radii away in small units — reads 0 too. Use world units large enough for the shell you care about, and test <span class="tt">&lt; 0</span> for "clearly inside". Observed; no hardware reference gives the scaling.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>((x²+y²+z²) − r²) &gt;&gt; 15, arithmetic shift — NOT the raw difference (it would not fit 16 bits). Measured on luna's DSP-1B: (3000,4000,0, r 1000) -&gt; 732 = 24 000 000 / 32768; (0,0,0, r 1000) -&gt; -31. Negative means inside; but anything within 32768 squared-units outside the surface reads 0, and (30,40,0, r 5) — ten radii away in small units — reads 0 too. Use world units large enough for the shell you care about, and test <span class="tt">&lt; 0</span> for "clearly inside". The squared difference is what the official manual states (Book II §5.2.2, code 18H: "subtracts the square of the
+        specified range from the square of the vector size", output type H2); the &gt;&gt; 15 is the H2 scaling as measured on the firmware. (Until 2026-09-22 this note claimed no reference gave it — the manual, in the corpus, did.)</dd></dl>
 <p>One call replaces three multiplies and two adds — cheap 3D proximity / LOD tests without ever leaving 16-bit C. </p>
 
 </div>

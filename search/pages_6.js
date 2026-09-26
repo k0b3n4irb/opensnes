@@ -21,7 +21,8 @@ var searchData=
   ['5_20two_20colors_20four_20bytes_18',['5. Two Colors, Four Bytes',['../examples_fundamentals_text_glyphs.html#autotoc_md5-two-colors-four-bytes',1,'']]],
   ['512×256_20background_19',['Mode 5 — Hi-Res 512×256 Background',['../examples_backgrounds_mode5.html',1,'examples_backgrounds']]],
   ['512_20×_20448_20',['Hi-res text — BG Mode 5 + interlace (512 × 448)',['../examples_backgrounds_mode5_hires.html',1,'examples_backgrounds']]],
-  ['544_20bytes_20total_21',['OAM Structure (544 bytes total)',['../snes_graphics_guide.html#oam-structure-544-bytes-total',1,'']]],
-  ['58_20mhz_22',['The CPU budget: ~3.58 MHz',['../craft_frame_budget.html#the-cpu-budget-358-mhz',1,'']]],
-  ['5_3a_20const_20data_20is_20far_20and_20casting_20const_20away_20breaks_20it_23',['Trap 5: const data is far, and casting &lt;span class=&quot;tt&quot;&gt;const&lt;/span&gt; away breaks it',['../migrating_pvsneslib.html#trap-5-const-data-is-far-and-casting-const-away-breaks-it',1,'']]]
+  ['512_20kb_20rom_20rom_20size_20is_20a_20knob_20now_20fixed_202026_2009_2024_21',['🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)',['../KNOWN_LIMITATIONS.html#autotoc_md-the-hirom-header-claimed-256-kb-for-a-512-kb-rom-rom-size-is-a-knob-now-fixed-2026-09-24',1,'']]],
+  ['544_20bytes_20total_22',['OAM Structure (544 bytes total)',['../snes_graphics_guide.html#oam-structure-544-bytes-total',1,'']]],
+  ['58_20mhz_23',['The CPU budget: ~3.58 MHz',['../craft_frame_budget.html#the-cpu-budget-358-mhz',1,'']]],
+  ['5_3a_20const_20data_20is_20far_20and_20casting_20const_20away_20breaks_20it_24',['Trap 5: const data is far, and casting &lt;span class=&quot;tt&quot;&gt;const&lt;/span&gt; away breaks it',['../migrating_pvsneslib.html#trap-5-const-data-is-far-and-casting-const-away-breaks-it',1,'']]]
 ];

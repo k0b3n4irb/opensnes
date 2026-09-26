@@ -105,10 +105,11 @@ var searchData=
   ['ground_20what_20dsp1_5fground_20does_102',['The ground (what dsp1_ground does)',['../tutorial_dsp1.html#the-ground-what-dsp1_ground-does',1,'']]],
   ['gsu_103',['SuperFX (GSU)',['../examples_by_category.html#superfx-gsu',1,'']]],
   ['gsu_20assembly_20code_104',['2. Write GSU Assembly Code',['../tutorial_superfx.html#autotoc_md2-write-gsu-assembly-code',1,'']]],
-  ['gsu_20loader_2065816_20asm_105',['3. Create the GSU Loader (65816 ASM)',['../tutorial_superfx.html#autotoc_md3-create-the-gsu-loader-65816-asm',1,'']]],
-  ['gsu_20registers_20_243000_20_24303f_106',['SuperFX / GSU Registers ($3000-$303F)',['../registers.html#superfx--gsu-registers-3000-303f',1,'']]],
-  ['gsu_20tutorial_107',['SuperFX (GSU) Tutorial',['../tutorial_superfx.html',1,'index']]],
-  ['guide_108',['Guide',['../code_style.html',1,'OpenSNES Code Style Guide'],['../snes_graphics_guide.html',1,'SNES Graphics Programming Guide'],['../snes_sound_guide.html',1,'SNES Sound Programming Guide']]],
-  ['guides_109',['Guides',['../craft.html',1,'Game-Craft Guides'],['../index.html#guides',1,'Guides']]],
-  ['guides_110',['The guides',['../craft.html#the-guides',1,'']]]
+  ['gsu_20job_20fixed_202026_2009_2025_105',['🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)',['../KNOWN_LIMITATIONS.html#autotoc_md-super-fx-vblanks-were-lost-during-every-gsu-job-fixed-2026-09-25',1,'']]],
+  ['gsu_20loader_2065816_20asm_106',['3. Create the GSU Loader (65816 ASM)',['../tutorial_superfx.html#autotoc_md3-create-the-gsu-loader-65816-asm',1,'']]],
+  ['gsu_20registers_20_243000_20_24303f_107',['SuperFX / GSU Registers ($3000-$303F)',['../registers.html#superfx--gsu-registers-3000-303f',1,'']]],
+  ['gsu_20tutorial_108',['SuperFX (GSU) Tutorial',['../tutorial_superfx.html',1,'index']]],
+  ['guide_109',['Guide',['../code_style.html',1,'OpenSNES Code Style Guide'],['../snes_graphics_guide.html',1,'SNES Graphics Programming Guide'],['../snes_sound_guide.html',1,'SNES Sound Programming Guide']]],
+  ['guides_110',['Guides',['../craft.html',1,'Game-Craft Guides'],['../index.html#guides',1,'Guides']]],
+  ['guides_111',['The guides',['../craft.html#the-guides',1,'']]]
 ];

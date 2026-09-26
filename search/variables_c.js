@@ -12,7 +12,7 @@ var searchData=
   ['len_9',['len',['../structAnimClip.html#a262d98c3d53c1153e6c23acb44c4227b',1,'AnimClip']]],
   ['level_10',['level',['../games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf',1,'level:&#160;main.c'],['../games_2tetris_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf',1,'level:&#160;main.c']]],
   ['level2_11',['level2',['../games_2breakout_2main_8c.html#a5506ea5c47423839abfd44c82ed97ece',1,'main.c']]],
-  ['line_5fscores_12',['line_scores',['../games_2tetris_2main_8c.html#aff7b79ce64d621677447b8b4c0f57ea4',1,'main.c']]],
+  ['line_5fscores_12',['line_scores',['../games_2tetris_2main_8c.html#a4f402be94828bc15ea2122185184cdff',1,'main.c']]],
   ['lines_5funtil_5flevelup_13',['lines_until_levelup',['../games_2tetris_2main_8c.html#a02305f14a2f396c35ce29aa7d7f2a380',1,'main.c']]],
   ['lives_14',['lives',['../games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa',1,'main.c']]],
   ['lkup16idb_15',['lkup16idB',['../sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e',1,'sprite.h']]],

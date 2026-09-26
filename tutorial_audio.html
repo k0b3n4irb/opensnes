@@ -250,7 +250,7 @@ One-shot samples from WAV (wav2brr)</h3>
 <div class="line">wav2brr --loop 2048 8192 res/cello.wav res/cello.brr</div>
 </div><!-- fragment --><p>Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep the source at or below <b>32 kHz</b>; that is the DSP's ceiling, and a higher rate just plays back sharp. Pass <span class="tt">-v</span> to see the block count, loop offset, and a ready-to-paste <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> line.</p>
 <p><b>2. Bake the <span class="tt">.brr</span> into the ROM.</b> Put it in a <span class="tt">data.asm</span> with a label and an end label, exactly as the example does:</p>
-<div class="fragment"><div class="line">.section &quot;.samples&quot; superfree</div>
+<div class="fragment"><div class="line">ASSET_SECTION &quot;samples&quot;          ; templates/assets.inc: any bank but $00</div>
 <div class="line">brr_jump:     .incbin &quot;res/jump.brr&quot;</div>
 <div class="line">brr_jump_end:</div>
 <div class="line">.ends</div>

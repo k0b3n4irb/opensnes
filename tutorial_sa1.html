@@ -214,10 +214,11 @@ Getting Started</h2>
 <div class="line">    sep #$20</div>
 <div class="line">    .ACCU 8</div>
 <div class="line"> </div>
-<div class="line">    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable on Mesen2/snes9x;</div>
-<div class="line">    ; polarity is disputed vs the wiki — see the gotcha box above.</div>
+<div class="line">    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable: fullsnes, the</div>
+<div class="line">    ; Nintendo manual §4.1.25 and nocash agree (resolved 2026-09-02; the</div>
+<div class="line">    ; sfc-dev-wiki states the inverse — see the box above).</div>
 <div class="line">    lda #$FF</div>
-<div class="line">    sta.l $00222A           ; CIWP = $FF (writable per our emulators)</div>
+<div class="line">    sta.l $00222A           ; CIWP = $FF (all I-RAM writable)</div>
 <div class="line"> </div>
 <div class="line">    ; Signal ready to main CPU</div>
 <div class="line">    lda #$A5</div>
@@ -303,7 +304,7 @@ Pattern 1: Flag Sync (Producer/Consumer)</h3>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="achips_2sa1__starfield_2main_8c_html_a3b678e9cebb84d04a8964c8abd69da0e"><div class="ttname"><a href="chips_2sa1__starfield_2main_8c.html#a3b678e9cebb84d04a8964c8abd69da0e">SA1_SYNC</a></div><div class="ttdeci">#define SA1_SYNC</div><div class="ttdef"><b>Definition</b> main.c:27</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="pattern-2-free-running-counter"></a>
 Pattern 2: Free-Running Counter</h3>
 <p>The SA-1 increments a value continuously. The main CPU reads it whenever needed. No synchronization required — just atomic reads. See sa1_hello for register readback examples.</p>
@@ -380,17 +381,17 @@ Explicit <span class="tt">.ACCU</span> After Every <span class="tt">rep</span>/<
 <div class="line">sep #$20</div>
 <div class="line">.ACCU 8             ; ALWAYS add this!</div>
 <div class="line">; ... 8-bit code ...</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="debugging-in-mesen2"></a>
-Debugging in Mesen2</h2>
-<p>Mesen2 has a dedicated SA-1 debugger:</p>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="debugging-1"></a>
+Debugging</h2>
+<p>luna, the SDK's emulator, runs the SA-1 natively:</p>
 <ol type="1">
-<li><b>Debug → SA-1 Debugger</b> — separate window for SA-1 registers, disassembly</li>
-<li><b>Uncheck "Break on Power/Reset"</b> — otherwise the SA-1 freezes at boot</li>
-<li><b>Memory viewer</b> — switch to "SA-1 Bus" to see I-RAM from SA-1's perspective</li>
-<li><b>Watch $3000</b> — verify the $A5 magic byte appears after boot</li>
+<li><b><span class="tt">luna state rom.sfc --until-frame 60 --out -</span></b> — the <span class="tt">sa1</span> block gives the SA-1's <span class="tt">pc</span>, <span class="tt">pb</span>, <span class="tt">p</span> and whether it is <span class="tt">running</span></li>
+<li><b><span class="tt">--peek 00:3000:4</span></b> — read I-RAM (shared by both CPUs) to check the <span class="tt">$A5</span> handshake byte after boot</li>
+<li><b><span class="tt">luna mcp</span></b> — step, breakpoints and memory reads over MCP (<span class="tt"><a class="el" href="debugging_8md.html">docs/tutorials/debugging.md</a></span>)</li>
 </ol>
+<p>A GUI emulator with an SA-1 debugger (Mesen2, bsnes-plus) remains useful for stepping the SA-1 side by hand.</p>
 <p>Common issues:</p><ul>
-<li><b>SA-1 PC stuck at $0000</b>: reset vector ($2203/$2204) wrong, or I-RAM write-protection (CIWP $222A) left in the protected state so the SA-1 can't write its handshake — set it the same way the crt0 does (<span class="tt">$FF</span> on Mesen2/snes9x; see the polarity note above)</li>
+<li><b>SA-1 PC stuck at $0000</b>: reset vector ($2203/$2204) wrong, or I-RAM write-protection (CIWP $222A) left in the protected state so the SA-1 can't write its handshake — set it the same way the crt0 does (<span class="tt">$FF</span>, write-enabled; see the polarity note above)</li>
 <li><b>I-RAM reads return $FF</b>: SIWP/CIWP only gate <em>writes</em>, never reads — so this is not a protection problem; the SA-1 simply hasn't written I-RAM yet (not released from reset, or wrong reset vector)</li>
 <li><b>Counter not incrementing</b>: Check that <span class="tt">$2200</span> was written correctly ($00 = release)</li>
 </ul>

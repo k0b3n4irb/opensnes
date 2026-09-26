@@ -310,7 +310,7 @@ color_mode)</a></span> is the same without the map pair. You choose the prefix o
 <div class="fragment"><div class="line">res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png</div>
 <div class="line">    @$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $&lt;</div>
 </div><!-- fragment --><p>The three outputs are then given labels in <span class="tt">data.asm</span>, which is the entire contract between the converter and the macro:</p>
-<div class="fragment"><div class="line">.section &quot;.rodata1&quot; superfree</div>
+<div class="fragment"><div class="line">ASSET_SECTION &quot;rodata1&quot;          ; templates/assets.inc: any bank but $00</div>
 <div class="line"> </div>
 <div class="line">bg_tiles: .incbin &quot;res/opensnes.pic&quot;</div>
 <div class="line">bg_tiles_end:</div>
@@ -326,7 +326,7 @@ color_mode)</a></span> is the same without the map pair. You choose the prefix o
 <div class="fragment"><div class="line"><a class="code hl_define" href="asset_8h.html#aea88e2dfa140bbe8b0a06a6e5a556b73">DECLARE_BG_ASSET</a>(<a class="code hl_variable" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a>, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 </div><!-- fragment --><p>The macro is sugar; the struct is the contract. Nothing stops you from filling a <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span> yourself when the symbols do not follow the convention, or when the pointers are computed rather than linked.</p>
 <blockquote class="doxtable">
-<p>New asset sections should prefer the <span class="tt">ASSET_SECTION</span> macro from <span class="tt">templates/assets.inc</span> over a bare <span class="tt">superfree</span> section — it keeps payload out of bank $00. The examples above predate it. </p>
+<p><span class="tt">ASSET_SECTION</span> (<span class="tt">templates/assets.inc</span>, included in every assembled file) is the way to declare asset data: <span class="tt">SEMISUPERFREE BANKS 7-1</span>, so bank $00 is never a candidate. A bare <span class="tt">superfree</span> section lets the linker pick the first bank that fits — bank $00 — which is how 14 examples ended up within 28 bytes of a full code bank before the corpus moved over on 2026-09-23. </p>
 </blockquote>
 <h2 class="doxsection"><a class="anchor" id="side-by-side-with-the-hand-written-equivalent"></a>
 Side by side with the hand-written equivalent</h2>

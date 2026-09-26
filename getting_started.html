@@ -315,11 +315,7 @@ B2. Clone and Build</h3>
 <div class="line"> </div>
 <div class="line"># Build everything: compiler → tools → library → examples</div>
 <div class="line">make</div>
-</div><!-- fragment --><p>This takes a few minutes. Expected output: </p><div class="fragment"><div class="line">Building cc65816 compiler...</div>
-<div class="line">Building WLA-DX assembler...</div>
-<div class="line">Building OpenSNES library...</div>
-<div class="line">Building examples... (74 ROMs)</div>
-<div class="line">OpenSNES SDK build complete!</div>
+</div><!-- fragment --><p>The first build compiles the toolchain (cproc, QBE, WLA-DX) and takes a few minutes; later builds take seconds. It ends with: </p><div class="fragment"><div class="line">OpenSNES SDK build complete!</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="b3-run-tests"></a>
 B3. Run Tests</h3>
 <div class="fragment"><div class="line">make tests   # luna: coverage + visual regression + probes</div>
@@ -359,7 +355,7 @@ What's Next?</h2>
 <p>Browse all examples: </p><div class="fragment"><div class="line">ls examples/*/</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="tutorials-1"></a>
 Tutorials</h2>
-<p>The full set (all 19 tutorials, always current) is on the docs home page — see <a class="el" href="index.html" title="OpenSNES Documentation">the tutorial navigation in mainpage</a>. The most common starting points:</p>
+<p>The full set of tutorials, always current, is on the docs home page — see <a class="el" href="index.html" title="OpenSNES Documentation">the tutorial navigation in mainpage</a>. The most common starting points:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Topic  </th><th class="markdownTableHeadNone">Guide  </th></tr>
@@ -421,12 +417,9 @@ Black screen when running ROM</h3>
 <li>Wrong <span class="tt">LIB_MODULES</span> — check that you include all needed modules</li>
 </ol>
 <p>See <a class="el" href="TROUBLESHOOTING_8md.html" title="/home/runner/work/opensnes/opensnes/docs/TROUBLESHOOTING.md">TROUBLESHOOTING.md</a> for more solutions.</p>
-<h3 class="doxsection"><a class="anchor" id="build-fails-with-unhandled-op-or-assembly-errors"></a>
-Build fails with "unhandled op" or assembly errors</h3>
-<p>This is usually a compiler limitation. Check:</p><ul>
-<li>Are you using <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>/<span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span>? Prefer <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>/<span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> when possible</li>
-<li>Use <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a></span>, <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span> types from <span class="tt"><a class="el" href="snes_8h.html" title="OpenSNES common-case master header.">snes.h</a></span> (not <span class="tt">int</span> or <span class="tt">long</span>)</li>
-</ul>
+<h3 class="doxsection"><a class="anchor" id="build-fails-with-refusing-to-emit-silently-wrong-code"></a>
+Build fails with "refusing to emit silently-wrong code"</h3>
+<p>The compiler stops, with the feature named, rather than generate wrong code for what it does not support: struct assignment, structs passed or returned by value, variadic functions and inline assembly. Pass a pointer, copy the fields, or move the code to a <span class="tt">.asm</span> file. 32-bit <span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>/<span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span> arithmetic is fully supported (it is slower than 16-bit, not wrong). See <span class="tt"><a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a></span> for the full list.</p>
 <h2 class="doxsection"><a class="anchor" id="getting-help"></a>
 Getting Help</h2>
 <ul>

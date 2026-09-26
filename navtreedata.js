@@ -66,7 +66,7 @@ var NAVTREEINDEX =
 "index.html#license",
 "object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3",
 "sprite_8h.html#a697c4b66632525f55f21fb6008582b3f",
-"superfx_8h.html#a899c06adcd9aa7a0d4fda1d782a94218"
+"superfx_8h.html#a869b87d99cfa28f0eeae829dcf3f6da3"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.24.0)</title>
+<title>luna — command reference (pinned v1.27.0)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.24.0) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.27.0) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">tools/luna-test/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -322,13 +322,22 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --input2 &lt;INPUT2&gt;</div>
 <div class="line">          Scripted joypad-2 input, same `frame:hex` grammar as `--input` (a two-player probe, or replaying an MCP `script_p2` capture)</div>
 <div class="line"> </div>
+<div class="line">      --input3 &lt;INPUT3&gt;</div>
+<div class="line">          Scripted input for Super Multitap pads B, C, D — players 3, 4, 5 with `--port2 multitap` (pad A is player 2, `--input2`). Same grammar as `--input`</div>
+<div class="line"> </div>
+<div class="line">      --input4 &lt;INPUT4&gt;</div>
+<div class="line">          Player 4 (multitap pad C) — see `--input3`</div>
+<div class="line"> </div>
+<div class="line">      --input5 &lt;INPUT5&gt;</div>
+<div class="line">          Player 5 (multitap pad D) — see `--input3`</div>
+<div class="line"> </div>
 <div class="line">      --port1 &lt;PORT1&gt;</div>
-<div class="line">          Controller port-1 device: `pad` (default), `mouse`, or `superscope`</div>
+<div class="line">          Controller port-1 device: `pad` (default), `mouse`, `superscope`, `multitap`, or `none` for an unplugged port (its data lines read 0 for ever, where a pad&#39;s idle high — auto-read cannot tell them apart, only a manual read past bit 15 can)</div>
 <div class="line">          </div>
 <div class="line">          [default: pad]</div>
 <div class="line"> </div>
 <div class="line">      --port2 &lt;PORT2&gt;</div>
-<div class="line">          Controller port-2 device: `pad` (default), `mouse`, or `superscope`</div>
+<div class="line">          Controller port-2 device: `pad` (default), `mouse`, `superscope`, `multitap` (players 2-5: `--input2` … `--input5`), or `none` for an unplugged port — see `--port1`</div>
 <div class="line">          </div>
 <div class="line">          [default: pad]</div>
 <div class="line"> </div>
@@ -392,6 +401,14 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">      --superfx-trace-max &lt;SUPERFX_TRACE_MAX&gt;</div>
 <div class="line">          Cap the Super FX instruction trace at this many events (default 200 000)</div>
+<div class="line">          </div>
+<div class="line">          [default: 200000]</div>
+<div class="line"> </div>
+<div class="line">      --gsu-bus-trace &lt;GSU_BUS_TRACE&gt;</div>
+<div class="line">          Optional Super FX bus-ownership trace: every CPU read of Game Pak ROM or RAM made while the GSU owned it, as CSV (`seq,frame,line,mclk,pc,addr,kind`). Those reads return the busy vector or open bus — silently, on hardware too — so this names the instruction that did it. `gsu.bus_violations` in `--out -` counts them without the trace</div>
+<div class="line"> </div>
+<div class="line">      --gsu-bus-trace-max &lt;GSU_BUS_TRACE_MAX&gt;</div>
+<div class="line">          Cap the Super FX bus-ownership trace (default 200 000)</div>
 <div class="line">          </div>
 <div class="line">          [default: 200000]</div>
 <div class="line"> </div>
@@ -531,11 +548,21 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --until-frame &lt;UNTIL_FRAME&gt;    Profile until PPU frame N instead of the `-n` count</div>
 <div class="line">      --from-frame &lt;FROM_FRAME&gt;      Start profiling at PPU frame N (warm-up before it is not counted) — e.g. skip the boot to profile the game loop [default: 0]</div>
 <div class="line">      --input &lt;INPUT&gt;                Scripted joypad-1 input (`state --input` grammar)</div>
+<div class="line">      --input2 &lt;INPUT2&gt;              Scripted joypad-2 input (`state --input2` grammar)</div>
+<div class="line">      --input3 &lt;INPUT3&gt;              Multitap pads B, C, D — players 3, 4, 5 (`state --input3`)</div>
+<div class="line">      --input4 &lt;INPUT4&gt;              Player 4 (multitap pad C) — see `--input3`</div>
+<div class="line">      --input5 &lt;INPUT5&gt;              Player 5 (multitap pad D) — see `--input3`</div>
+<div class="line">      --port1 &lt;PORT1&gt;                Controller port-1 device: `pad` (default), `mouse`, `superscope`, `multitap`, or `none` for an unplugged port (its data lines read 0 for ever, where a pad&#39;s idle high — auto-read cannot tell them apart, only a manual read past bit 15 can) [default: pad]</div>
+<div class="line">      --port2 &lt;PORT2&gt;                Controller port-2 device: `pad` (default), `mouse`, `superscope`, `multitap`, or `none` for an unplugged port — see `--port1` [default: pad]</div>
+<div class="line">      --mouse &lt;MOUSE&gt;                Scripted SNES Mouse motion (`state --mouse` grammar), applied to whichever port is set to `mouse`</div>
+<div class="line">      --superscope &lt;SUPERSCOPE&gt;      Scripted Super Scope aim (`state --superscope` grammar), applied to whichever port is set to `superscope`</div>
 <div class="line">      --sym &lt;SYM&gt;                    WLA-DX `.sym` to fold PCs onto (overrides the `&lt;rom&gt;.sym` auto-detection)</div>
 <div class="line">      --top &lt;TOP&gt;                    Rows to print (the JSON report always has them all) [default: 25]</div>
 <div class="line">      --out &lt;OUT&gt;                    Write the full report as JSON (`-` = stdout after the table)</div>
 <div class="line">      --pc-set &lt;PC_SET&gt;              Write the set of executed 24-bit PCs (sorted, deduplicated, little-endian `u32` each) to this file — the input a code-coverage tool folds onto symbols and source lines. Whole 24-bit space: `HiROM` `$C0-$FF`, `FastROM` mirrors and WRAM-resident code included</div>
 <div class="line">      --budget &lt;BUDGET&gt;              Gate: `SYMBOL=MCLK` — the symbol&#39;s worst completed frame must not exceed MCLK master cycles, else exit 1 (repeatable; an unknown symbol is a usage error, exit 2). The VBlank-budget check for CI: `--budget NmiHandler=6000`</div>
+<div class="line">      --stack-floor &lt;STACK_FLOOR&gt;    Gate: the stack must never reach below this address, else exit 1 — the RAM-budget check a link-time guess cannot make (`--stack-floor 0x1C60`). Accepts `0x`-hex or decimal. The figure is reported either way, with the routine that went deepest when a `.sym` is loaded</div>
+<div class="line">      --gsu-pc-set &lt;GSU_PC_SET&gt;      Write the set of executed **GSU** PCs (same encoding as `--pc-set`): a separate file, because a GSU PC and a 65816 PC can be the same number and mean different code — merging them would mis-attribute coverage. Lets a coverage tool count `.sfx`</div>
 <div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;  Force a cartridge mapper (lorom, hirom, exhirom, sa1, superfx)</div>
 <div class="line">      --force-region &lt;FORCE_REGION&gt;  Force the video standard (ntsc, pal)</div>
 <div class="line">      --power-on &lt;POWER_ON&gt;          Power-on RAM state (`zero`, `ones`, `random[=&lt;seed&gt;]`)</div>
