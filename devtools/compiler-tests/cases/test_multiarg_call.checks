@@ -1,0 +1,8 @@
+# Seven arguments: pushed left to right (the first argument deepest), and
+# the caller drops exactly 7 x 2 = 14 bytes after the call (ported from
+# opensnes-emu test_multiarg_call_offsets, which only rejected unhandled
+# ops). The locals are constants and fold into pea, so the original bug —
+# a local's stack offset not adjusted as arguments are pushed — is not
+# reachable from this fixture any more (it would need non-constant locals).
+in test_multiarg_call: present pea\.w 100\n\tpea\.w 200\n\tpea\.w 300\n\tpea\.w 400\n\tpea\.w 500\n\tpea\.w 600\n\tpea\.w 700\n\tjsl testfunc\n\ttsa\n\tclc\n\tadc\.w #14\n\ttas
+absent ; unhandled op

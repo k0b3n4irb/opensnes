@@ -1,0 +1,9 @@
+# A global struct initialised with the address of another global: the
+# pointer field is emitted as a symbol reference (24-bit .dl + a zero 4th
+# byte), not a corrupted one — QBE's static-buffer bug once printed
+# `.dl z+0` (ported from opensnes-emu test_struct_ptr_init).
+present \.dw myAnim\n\t\.db :myAnim\n\t\.dw 6\n\t\.dl myFrames\+0\n\t\.dsb 1, 0\n\t\.db 3\n
+absent \.dl [a-z]\+0\n
+present \.dw myFrames\n\t\.db :myFrames\n\t\.dw 3\n\t\.db 10\n\t\.db 20\n\t\.db 30\n
+# The read goes through the pointer loaded from myAnim.
+in main: present lda\.w myAnim\n[\s\S]*tax\n\tsep #\$20\n\tlda\.l \$0000,x

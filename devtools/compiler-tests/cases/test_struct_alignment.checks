@@ -1,0 +1,20 @@
+# Struct layout follows C alignment on this target: u16 fields are 2-byte
+# aligned, u8 fields are not (ported from opensnes-emu test_struct_alignment,
+# which read the dsb sizes and the field offsets).
+# sizeof: Simple 4, Mixed 6, Nested 10, ThreeWords 6, OneByte 1.
+present simple:\n\tdsb 4\n
+present mixed:\n\tdsb 6\n
+present nested:\n\tdsb 10\n
+present three:\n\tdsb 6\n
+present one:\n\tdsb 1\n
+# Field offsets: the u16 after a u8 is padded to offset 2.
+in test_simple_access: present sta\.w simple\n
+in test_simple_access: present sta\.w simple\+2\n
+in test_mixed_access: present sta\.w mixed\+2\n[\s\S]*sta\.w mixed\+4\n\tlda #238\n\tsta\.w mixed\+5\n
+# Nested: Mixed starts at 4 (after Simple's 4 bytes), its fields at 4/6/8/9.
+in test_nested_access: present sta\.w nested\+4\n[\s\S]*sta\.w nested\+6\n[\s\S]*sta\.w nested\+8\n\tlda #8\n\tsta\.w nested\+9\n
+in test_threewords: present sta\.w three\+4\n
+# Array of Simple: element stride 4, so .b fields at base+2, +6, +10 and
+# .a fields of elements 1 and 2 at base+4, +8.
+in test_array_stride: present adc\.w #2\n[\s\S]*adc\.w #4\n[\s\S]*adc\.w #6\n[\s\S]*adc\.w #8\n[\s\S]*adc\.w #10\n
+in test_array_stride: present adc\.w #10\n\tsta \d+,s\n\tlda\.w #300\n

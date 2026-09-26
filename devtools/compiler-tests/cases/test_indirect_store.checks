@@ -1,0 +1,7 @@
+# arr[idx] = val through a plain pointer: address = arr + idx*2, the value
+# preserved across `tax` with pha/pla, stored with sta.l $0000,x (ported
+# from opensnes-emu test_indirect_store_acache; its pre-A6 frameless
+# assertions no longer apply, see that file's note). The load of the
+# address after pha reads 2 bytes above where it was stored.
+in array_write: present lda \d+,s\n\tasl a\n\tsta (\d+),s\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta 26,s
+in array_write: present lda 34,s\n\tpha\n\tlda 28,s\n\ttax\n\tpla\n\tsta\.l \$0000,x

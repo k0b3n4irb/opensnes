@@ -1,0 +1,24 @@
+# Casts between widths and signedness produce the C value: zero- or
+# sign-extension on widening, truncation on narrowing (ported from
+# opensnes-emu test_type_cast, which only required it to compile; most
+# casts fold, so the folded constants are the check).
+# (u32)(u16)0xCDEF: high word 0.
+in test_widen_unsigned: present lda\.w #52719\n\tsta\.w u32_val\n\tlda\.w #0\n\tsta\.w u32_val\+2\n
+# (s16)(s8)-10 = 0xFFF6 = 65526; (s16)(s8)10 = 10.
+in test_widen_signed: present lda\.w #65526\n\tsta\.w s16_val\n
+in test_widen_signed: present lda\.w #10\n\tsta\.w s16_val\n
+# (u8)0x1234 = 0x34; (u16)0x12345678 = 0x5678; (u8) of a u32 is its low
+# byte, stored with an 8-bit store.
+in test_narrow: present lda #52\n\tsta\.w u8_val\n
+in test_narrow: present lda\.w #22136\n\tsta\.w u32_val\n\tlda\.w #4660\n\tsta\.w u32_val\+2\n\tlda\.w #22136\n\tsta\.w u16_val\n
+in test_narrow: present lda\.w u32_val\n\tsta (\d+),s\n[\s\S]*?lda \1,s\n\tsep #\$20\n\tsta\.w u8_val\n
+# Same bits both ways: 200 <-> -56, -10 <-> 246.
+in test_sign_cast: present lda #200\n\tsta\.w s8_val\n\tlda #246\n\tsta\.w s8_val\n\tlda #246\n\tsta\.w u8_val\n
+# (hi << 8) | lo rebuilds 0xABCD.
+in test_snes_patterns: present lda\.w #43981\n\tsta\.w u16_val\n\tlda\.w #43981\n\tsta\.w u16_val\n
+# A u16 read through a u16* cast of a byte array reads two bytes little
+# endian (a 16-bit load of the array's first word); bp[1] is an 8-bit read.
+in test_pointer_cast: present lda 2,s\n\tsta\.w u16_val\n
+in test_pointer_cast: present tax\n\tsep #\$20\n\tlda\.l \$0000,x\n\trep #\$20\n\tand\.w #\$00FF\n\tsep #\$20\n\tsta\.w u8_val
+# u8 < u16: the u8 is zero-extended and compared unsigned.
+in test_implicit: present lda\.w u8_val\n\trep #\$20\n\tand\.w #\$00FF\n\tcmp\.w #200\n\tbcc \+

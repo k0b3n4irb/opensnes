@@ -1,0 +1,14 @@
+# The bgSetScrollX pattern: a u8 parameter used as an array index and as
+# a shift count. After `pha` the count must be read 2 bytes above the slot
+# it was stored to (ported from opensnes-emu test_variable_shift_u8_compound).
+# The offsets below are today's frame layout: if a frame change moves them,
+# re-derive "shift load = zero-extended bg store + 2" before updating.
+# u8: bg is zero-extended into 10,s, the shift reads it back at 12,s.
+in set_scroll_u8: present and\.w #\$00FF\n\tsta 10,s
+in set_scroll_u8: present lda\.w #1\n\tpha\n\tlda 12,s\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tasl a
+# u16: bg stays in its parameter slot, 36,s; after pha it is 38,s.
+in set_scroll_u16: present lda\.w #1\n\tpha\n\tlda 38,s\n\ttax\n\tpla\n\tcpx #0
+# The array store goes through X with the value preserved across tax.
+in set_scroll_u8: present pha\n\tlda \d+,s\n\ttax\n\tpla\n\tsta\.l \$0000,x
+# cpx #0 needs 16-bit index assembly.
+present \.INDEX 16

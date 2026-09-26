@@ -1,0 +1,24 @@
+# Loop-carried accumulators (phis), one layer of complexity per level. The
+# property: on the back edge, each accumulator's slot receives the value
+# computed FROM THAT SAME SLOT — the historical bug crossed them. The
+# backreferences tie the update's source slot (\1) to the write-back's
+# destination. No original check existed (opensnes-emu only compiled it).
+# L1: acc = acc + 1.
+in level1_single_acc: present @for_cont\.\d+:[\s\S]*?lda (\d+),s\n\tinc a\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @for_cond
+# L2: acc1 + 1 and acc2 + 2 each go back to their own slot.
+in level2_two_acc: present lda (\d+),s\n\tclc\n\tadc\.w #2\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level2_two_acc: present @for_cont\.\d+:\n\tlda \d+,s\n\tinc a\n\tsta \d+,s\n\tlda (\d+),s\n\tinc a\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+# L3: acc | val, val from the call.
+in level3_or_acc: present jsl get_value\n\tsta (\d+),s\n[\s\S]*?lda \1,s\n\tora (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \3,s\n\tsta \2,s\n\tjmp @for_cond
+# L4: an OR accumulator and a sum accumulator over the same val.
+in level4_mixed_acc: present ora (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level4_mixed_acc: present clc\n\tadc (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+# L5: a conditional update: both arms feed one merge slot (\2) — the
+# unchanged acc on one side, acc | val on the other — and the merge slot
+# goes back to acc.
+in level5_cond_acc: present and\.w #128\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @for_cond
+# L6: three conditional accumulators (+1, |val, +val), each on its own
+# slot pair.
+in level6_multi_cond: present and\.w #1\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \1,s\n\tinc a\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level6_multi_cond: present and\.w #2\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level6_multi_cond: present and\.w #4\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond

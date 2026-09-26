@@ -1,0 +1,18 @@
+# A small game's shapes compile without unhandled ops: const tables read by
+# index, register writes through volatile pointers in loops, and a table
+# lookup at a computed index (ported from opensnes-emu
+# test_animation_patterns, which rejected unhandled ops and assembled it).
+absent ; unhandled op
+# Const tables live in the asset banks: C reads them with the indexed
+# long form, whose bank comes from the symbol (#121, #127.3).
+in load_tiles: present tax\n\tsep #\$20\n\tlda\.l tile_data,x\n
+in load_palette: present tax\n\tlda\.l palette,x\n
+in get_tile_for_state: present tax\n\tsep #\$20\n\tlda\.l frame_tiles,x\n
+# Each branch writes its port through the pointer: 8-bit store via X,
+# within the branch (the match may not cross a jmp or a label).
+in load_tiles: present lda\.w REG_VMDATAL\n((?!jmp|@)[\s\S])*?pla\n\tsep #\$20\n\tsta\.l \$0000,x
+in load_tiles: present lda\.w REG_VMDATAH\n((?!jmp|@)[\s\S])*?pla\n\tsep #\$20\n\tsta\.l \$0000,x
+# The palette's high byte is color >> 8.
+in load_palette: present lda \d+,s\n\txba\n\tand\.w #\$00FF
+# state * 3 = (state << 1) + state.
+in get_tile_for_state: present and\.w #\$00FF\n\tsta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9

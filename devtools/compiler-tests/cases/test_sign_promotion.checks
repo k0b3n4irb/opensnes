@@ -1,0 +1,23 @@
+# Widening u8 zero-extends, widening s8 sign-extends (and.w #$00FF, then
+# cmp.w #$0080 / ora.w #$FF00), and signed compares test N xor V (ported
+# from opensnes-emu test_sign_promotion, which counted the three idioms;
+# here per function).
+in zext_u8: present and\.w #\$00FF\n\trtl
+in zext_u8: absent ora\.w #\$FF00
+in sext_s8: present and\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\trtl
+in add_s8_s16: present and\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\tclc\n\tadc 4,s
+# u8 + u8 is computed in 16 bits: both zero-extended, then added (200+100
+# must give 300).
+in add_u8_u8: present and\.w #\$00FF\n\tclc\n\tadc \d+,s
+in add_u8_u8: absent cmp\.w #\$0080
+# Mixed: the u8 is zero-extended, the s8 sign-extended.
+in mixed_arith: present lda 22,s\n\tand\.w #\$00FF\n\tsta 10,s\n\tlda 20,s\n\tand\.w #\$00FF\n\tcmp\.w #\$0080
+# -s8: sign-extend first, then two's complement.
+in negate_s8: present ora\.w #\$FF00\n\+\n\teor\.w #\$FFFF\n\tinc a
+# (s16)(s8)val re-extends from bit 7.
+in narrow_widen: present cmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00
+# s8 < s8: both sign-extended, then the signed-overflow-corrected branch.
+in compare_s8: present sbc \d+,s\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbpl \+
+# s16 >> 1 is arithmetic; u16 >> 8 to u8 is the high byte.
+in arith_shr: present cmp\.w #\$8000\n\tror a
+in extract_high: present xba\n\tand\.w #\$00FF

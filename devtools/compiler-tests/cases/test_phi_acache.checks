@@ -1,0 +1,13 @@
+# Several phi moves in a row each load their own source: the A-cache must
+# not believe A still holds a value a previous move replaced (the
+# writestring() regression). Ported from opensnes-emu test_phi_acache
+# (at least 3 lda between @if_join and the back edge); the backreferences
+# also pin that the moves read the slots the branches wrote.
+# The back edge moves sp, pos and both words of st: four load/store pairs.
+in writestring: present @if_join\.\d+:\n[\s\S]*?(\tlda \d+,s\n\tsta \d+,s\n){4}\tjmp @while_cond
+# The '\n' branch writes sp+32 into both phi slots (pos = sp)...
+in writestring: present adc\.w #32\n\tsta \d+,s\n\tsta (\d+),s\n\tsta (\d+),s\n@if_join\.\d+:[\s\S]*?\tlda \1,s\n\tsta \d+,s\n\tlda \2,s\n\tsta \d+,s
+# ...the other branch writes them with a load each, not A reused.
+in writestring: present \tlda \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @if_join
+# st is a 4-byte far pointer: *st reads through [tcc__r9] with its bank.
+in writestring: present sta\.b tcc__r9\n\tlda \d+,s\n\tsta\.b tcc__r9\+2\n\tsep #\$20\n\tlda \[tcc__r9\]

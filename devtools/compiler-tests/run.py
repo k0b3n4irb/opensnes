@@ -51,7 +51,7 @@ CC = REPO_ROOT / "bin" / "cc65816"
 # Ratchet on fixtures lacking a .checks file. 56 of 66 cases predated the
 # .checks DSL and ran compile-only. Porting a fixture lowers this number;
 # it must NEVER go up — a new fixture ships with its assertions.
-MAX_UNCHECKED = 41  # C4 batch 1, 2026-09-15: 14 fixtures got their .checks (55 -> 41)
+MAX_UNCHECKED = 0  # C4 batch 2, 2026-09-26: the last 41 fixtures got their .checks (41 -> 0; batch 1, 2026-09-15: 55 -> 41)
 
 
 def compile_result(src: Path) -> tuple[bool, str]:

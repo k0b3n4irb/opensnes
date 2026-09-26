@@ -1,0 +1,9 @@
+# The compiler's pseudo-registers live in the direct page and are addressed
+# with .b (2 bytes, 1 cycle less than .w); __div16/__mod16 return in A,
+# so nothing reloads tcc__r0 after the call (ported from opensnes-emu
+# test_dp_registers).
+absent \t(sta|lda|adc|sbc)\.w tcc__
+in div_by_10: present lda 4,s\n\tsta\.b tcc__r0\n\tlda\.w #10\n\tsta\.b tcc__r1\n\tjsl __div16\n\trtl
+in mod_by_10: present lda 4,s\n\tsta\.b tcc__r0\n\tlda\.w #10\n\tsta\.b tcc__r1\n\tjsl __mod16\n\trtl
+# x*7 = (x<<3) - x, the scratch in tcc__r9 via direct page.
+in mul_by_7: present sta\.b tcc__r9\n\tasl a\n\tasl a\n\tasl a\n\tsec\n\tsbc\.b tcc__r9

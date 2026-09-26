@@ -1,0 +1,19 @@
+# Stack frames past what `N,s` can reach (8-bit offset, <= 255) switch to
+# large-frame mode: S is saved in tcc__fp once, and slots are reached with
+# `ldy.w #N; lda/sta [tcc__fp],y` (ported from opensnes-emu
+# test_large_local, which only checked the function existed).
+# 64-byte buffer: small frame, stack-relative only.
+in test_small_local: present sbc\.w #74\n
+in test_small_local: absent tcc__fp
+in test_small_local: present lda 72,s\n\ttax\n\tpla\n\tsep #\$20\n\tsta\.l \$0000,x
+# 512-byte buffer: the frame pointer is taken right after the frame is made.
+in test_large_local: present sbc\.w #526\n\ttas\n\ttsa\n\tsta\.b tcc__fp\n
+in test_large_local: present ldy\.w #\d{3}\n\tsta \[tcc__fp\],y
+# Slots above 255 never use the 8-bit stack-relative form.
+absent \t[a-z]{3} (\d{4,}|[3-9]\d\d|2[6-9]\d|25[6-9]),s
+# tcc__fp is taken before any push, so a slot read after `pha` keeps its
+# offset (unlike N,s, which shifts by 2).
+in test_large_local: present ldy\.w #518\n\tsta \[tcc__fp\],y\n[\s\S]*?pha\n\tldy\.w #518\n\tlda \[tcc__fp\],y\n\ttax\n\tpla
+in test_very_large_local: present sta\.b tcc__fp
+# buf2 starts 256 bytes above buf1: its first byte is fp+258.
+in test_multiple_large: present lda #2\n\tldy\.w #258\n\tsta \[tcc__fp\],y

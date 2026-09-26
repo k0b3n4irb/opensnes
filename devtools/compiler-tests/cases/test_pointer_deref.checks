@@ -1,0 +1,12 @@
+# Pointers are 4 bytes (offset + bank word): storing an address writes both
+# halves, a dereference of a known address folds to that address, and an
+# indirect call pushes a JSL-shaped return frame. No original check existed
+# (opensnes-emu only compiled it).
+present ptr:\n\tdsb 4\n
+# ptr = &array[2]: offset array+4, then the bank.
+in read_via_pointer: present lda\.w #array\+4\n\tsta\.w ptr\n\tlda\.w #:array\n\tsta\.w ptr\+2\n\tlda\.w array\+4\n\trtl
+in write_via_pointer: present lda\.w #array\+2\n\tsta\.w ptr\n\tlda\.w #:array\n\tsta\.w ptr\+2\n\tlda 4,s\n\tsta\.w array\+2\n
+in pointer_arithmetic: present lda\.w array\+4\n\trtl
+# cb(): the 4-byte function pointer staged in tcc__r9 (bank included),
+# then PBR and return-1 pushed the way JSL does, then jml [..].
+in call_indirect: present sta\.b tcc__r9\n\tlda \d+,s\n\tsta\.b tcc__r9\+2\n\tphk\n\tpea (\S+)-1\n\tjml \[tcc__r9\]\n\1\n
