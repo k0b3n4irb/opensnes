@@ -120,6 +120,13 @@ jobs:
       # Drift between submodule pointer and compiler/PINS.md fails fast before
       # any build cost. Skipped on Windows because the MSYS2 shell wraps make
       # itself, but the Linux/macOS legs cover the same submodule SHAs.
+      # The checkout's submodules are shallow, so verify_toolchain.py skips
+      # the patch counts of PINS.md; one leg fetches their history to check
+      # them (a few MB, seconds).
+      - name: Fetch submodule history (PINS.md patch counts)
+        if: matrix.name == 'linux' && matrix.arch == 'x86_64'
+        run: git submodule foreach --quiet 'git fetch --quiet --unshallow --tags origin'
+
       - name: Verify compiler toolchain pins
         if: matrix.name != 'windows'
         run: python3 devtools/verify_toolchain.py

@@ -39,7 +39,12 @@ reformat without updating the script.
 These commits exist only on the OpenSNES forks and must survive any sync
 with upstream. Listed newest-first.
 
-### compiler/cproc — 22 patches (upstream merge-base: 7051114)
+Each heading's count is `git rev-list --count <base>..HEAD` in the
+submodule, and `devtools/verify_toolchain.py` fails when it is not (a
+shallow clone skips the check with a note). Update the number in the
+commit that moves the pin.
+
+### compiler/cproc — 26 patches since upstream merge-base 7051114
 
 ```
 d1f8745 qbe: bit-field extraction pads to the IR class width; long compares use the l class (c_features ROM, review C2)
@@ -73,7 +78,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 65 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 83 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -125,7 +130,7 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 3 patches ahead of the **v10.7 release** (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
+### compiler/wla-dx — 3 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
 
 ```
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
