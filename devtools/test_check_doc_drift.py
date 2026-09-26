@@ -5,6 +5,8 @@ soft-wrap multi-line scan), path-existence extraction, category-row parsing,
 and the ROADMAP footer-date anchor."""
 import unittest
 
+import check_doc_drift
+
 from check_doc_drift import (COUNT_PATTERNS, ROADMAP_FOOTER_RE,
                              declared_lib_modules, deprecated_citations_in_text,
                              modules_missing_from_readme,
@@ -167,6 +169,22 @@ class TestExampleModules(unittest.TestCase):
     def test_missing_module_and_missing_section(self):
         self.assertEqual(modules_missing_from_readme("## Modules\n`console`\n", ["console", "gameloop"]), ["gameloop"])
         self.assertIsNone(modules_missing_from_readme("## Build\n", ["console"]))
+
+
+class BuildKnobs(unittest.TestCase):
+    MK = "CSRC ?= main.c\nUSE_HIROM   ?= 0\n# NOTE ?= in a comment\nX := 1\nUSE_HIROM ?= 1\n"
+
+    def test_knobs_in_order_once(self):
+        self.assertEqual(check_doc_drift.makefile_knobs(self.MK), ["CSRC", "USE_HIROM"])
+
+    def test_missing_knob(self):
+        page = "| `CSRC` | main.c |\nUSE_HIROM without backticks"
+        self.assertEqual(check_doc_drift.knobs_missing(["CSRC", "USE_HIROM"], page),
+                         ["USE_HIROM"])
+
+    def test_real_tree_is_clean(self):
+        self.assertEqual(check_doc_drift.check_build_knobs(), [])
+
 
 if __name__ == "__main__":
     unittest.main()

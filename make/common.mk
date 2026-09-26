@@ -16,7 +16,9 @@
 #               (one-shot SFX; --loop samples: run wav2brr by hand)
 #   CFLAGS    - Additional C compiler flags
 #   SPRITE_SIZE - Sprite/tile size for gfx4snes (default: 8)
-#   BPP       - Bits per pixel for graphics (default: 4)
+#
+# Every variable, with its default: docs/tools/build.md (the doc sentinel
+# fails when a `?=` variable below is missing from that page).
 #
 # ROM configuration options:
 #   USE_HIROM     - Set to 1 for HiROM mode (64KB banks instead of 32KB)
@@ -64,13 +66,9 @@ ASEPRITE2SNES := $(OPENSNES)/bin/aseprite2snes
 TEMPLATES := $(OPENSNES)/templates
 
 # Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
-# 8 sits below the current example minimum on the A6+A7 chantier branch
-# (12 bytes free in likemario / tetris / mapandobjects post-A6 — see
-# .claude/notes/archive/a6_a7_unified_audit.md). Pre-chantier it was 16
-# (28-byte minimum in mapscroll.sfc as of v0.16.0); A6's 4-byte pointer push
-# at every call site shaved ~12-16 bytes off tight examples. Bumping back to
-# 16 is a follow-up once lib code-size optimisations or section-routing land.
-# See .claude/rules/bank0_budget.md for the policy.
+# 1024 since 2026-09-23, when the examples' data moved to ASSET_SECTION and
+# the corpus minimum rose from 12 bytes to 1912 (tetris). History, policy
+# and the re-measure loop: .claude/rules/bank0_budget.md.
 BANK0_FAIL_THRESHOLD ?= 1024
 
 # C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
@@ -100,7 +98,6 @@ ASMSRC      ?=
 SPCSRC      ?=
 GFXSRC      ?=
 SPRITE_SIZE ?= 8
-BPP         ?= 4
 USE_LIB     ?= 0
 USE_HIROM   ?= 0
 USE_FASTROM ?= 0

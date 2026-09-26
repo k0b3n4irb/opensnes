@@ -931,6 +931,37 @@ def check_example_modules() -> list[str]:
     return drifts
 
 
+# Anchor 12: every `?=` variable of make/common.mk is on the knobs page.
+# A knob only the Makefile knows about is one no user can find (audit
+# 2026-09-26: eight of them, USE_FASTROM among them, named in no page).
+_KNOB_RE = re.compile(r"^([A-Z_][A-Z0-9_]*)\s*\?=", re.M)
+BUILD_KNOBS_PAGE = "docs/tools/build.md"
+
+
+def makefile_knobs(mk_text: str) -> list[str]:
+    """The `?=` variables of a Makefile, in order of first appearance."""
+    seen: list[str] = []
+    for name in _KNOB_RE.findall(mk_text):
+        if name not in seen:
+            seen.append(name)
+    return seen
+
+
+def knobs_missing(knobs: list[str], page_text: str) -> list[str]:
+    """Knobs not named as `NAME` (backticked) on the page."""
+    return [k for k in knobs if f"`{k}`" not in page_text]
+
+
+def check_build_knobs() -> list[str]:
+    page = repo_path(BUILD_KNOBS_PAGE)
+    if not page.is_file():
+        return [f"{BUILD_KNOBS_PAGE} is missing (the Makefile knobs reference)"]
+    knobs = makefile_knobs(repo_path("make/common.mk").read_text(encoding="utf-8"))
+    missing = knobs_missing(knobs, page.read_text(encoding="utf-8"))
+    return [f"{BUILD_KNOBS_PAGE}: make/common.mk reads `{k} ?= ...` but the page "
+            f"does not name `{k}`" for k in missing]
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -954,6 +985,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())
     all_drifts.extend(check_example_modules())
+    all_drifts.extend(check_build_knobs())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

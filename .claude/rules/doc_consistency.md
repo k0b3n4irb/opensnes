@@ -73,6 +73,11 @@ opt-in list.
     2026-09-26): Mesen2, opensnes-emu, `tests/*.sh` — caught as the
     snes-engine-reviewer agent committed with all three.
 
+12. **Every `?=` variable of `make/common.mk` is on `docs/tools/build.md`**
+    (since 2026-09-26), backticked. Caught as eight knobs named in no page
+    (`USE_FASTROM`, `ROMSIZE`, `SPCSRC`, the three thresholds…) and one,
+    `BPP`, that nothing read.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the
