@@ -15,5 +15,3 @@ include $(OPENSNES)/make/common.mk
 res/bg.pic res/bg.map res/bg.pal: res/bg.bmp
 	@echo "[GFX] $< -> Mode 3 assets (256 colors)"
 	@$(GFX4SNES) -s 8 -o 256 -u 256 -p -m -t bmp -i $<
-
-combined.asm: res/bg.pic res/bg.map res/bg.pal

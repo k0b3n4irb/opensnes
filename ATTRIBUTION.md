@@ -55,8 +55,33 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Author**: Lode Vandevenne
 - **License**: zlib
 - **Version**: 20260119
-- **Used in**: `tools/gfx4snes/`, `tools/img2snes/`
+- **Location**: `tools/common/lodepng.{c,h}` (shared since the tools/common move)
+- **Used in**: `gfx4snes`, `img2snes` and the other PNG-reading tools
 - **What it does**: PNG decoding/encoding
+
+### cmdparser
+- **Author**: XUJINKAI (github.com/XUJINKAI/cmdparser)
+- **License**: Apache License 2.0 — full text and notice in
+  `tools/common/LICENSE-cmdparser`, shipped next to the source
+- **Location**: `tools/common/cmdparser.{c,h}`
+- **Used in**: `gfx4snes`, `img2snes` (inherited from PVSnesLib's gfx4snes)
+- **What it does**: command-line option parsing
+
+### stb_image
+- **Author**: Sean Barrett (nothings.org)
+- **License**: public domain (Unlicense) or MIT, at the user's choice
+- **Version**: 2.30
+- **Location**: `tools/font2snes/src/stb_image.h`
+- **What it does**: image loading for font2snes
+
+### cute_tiled
+- **Author**: Randy Gaul; embeds a component by Mattias Gustavsson
+- **License**: zlib or public domain (Unlicense) for cute_tiled; MIT or
+  public domain (Unlicense) for the embedded component — both blocks at the
+  end of the file
+- **Version**: 1.06
+- **Location**: `tools/tmx2snes/cute_tiled.h`
+- **What it does**: Tiled `.tmx` / `.tmj` map parsing for tmx2snes
 
 
 ## Tools

@@ -38,7 +38,13 @@
 ; captured the 16-bit offset at .DEFINE parse-time, before BANK 7 placement,
 ; so `__mul32` resolved to $00:8000 and collided with tcc_mul16. Dropping
 ; the alias and emitting `jsl tcc_mul32` directly from qbe is the fix.
-.SECTION ".mul32" BANK 7 FREE
+; Any bank but $00, highest first — the same placement as the asset
+; sections (templates/assets.inc). Reached by `jsl` only, so any bank works;
+; it was pinned `BANK 7 FREE`, which left no room once assets moved to the
+; asset banks (2026-09-23: four examples failed to link, "No room for
+; section .mul32 in ROM bank 7"). The literal list is deliberate: a .DEFINE
+; is not expanded inside BANKS, and banks 1-7 exist in every memory map.
+.SECTION ".mul32" SEMISUPERFREE BANKS 7-1
 
 .ACCU 16
 .INDEX 16

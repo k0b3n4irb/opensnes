@@ -53,13 +53,32 @@ def main() -> int:
                 elif not filecmp.cmp(got, want, shallow=False):
                     errs.append(f"{out}: differs from golden ({got.stat().st_size} "
                                 f"vs {want.stat().st_size} bytes)")
+    # Negative case (2026-09-26): a file that is not an IT module must fail
+    # the run and write nothing. It used to exit 0 with an empty soundbank.
+    neg_errs = []
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        (work / "not_an_it.it").write_bytes(b"\x89PNG\r\n\x1a\n" + bytes(64))
+        proc = subprocess.run([str(TOOL), *FLAGS, "not_an_it.it"],
+                              cwd=work, capture_output=True, text=True, timeout=60)
+        if proc.returncode == 0:
+            neg_errs.append("exit 0 on a non-IT file")
+        if "IMPM" not in proc.stdout + proc.stderr:
+            neg_errs.append("no message naming the IMPM signature")
+        left = [out for out in OUTPUTS if (work / out).exists()]
+        if left:
+            neg_errs.append(f"wrote {', '.join(left)}")
+    ok = (0 if errs else 1) + (0 if neg_errs else 1)
     if errs:
         print(f"  FAIL {FIXTURE}: " + "; ".join(errs))
-        print("\nsmconv golden: 0/1 ok")
-        return 1
-    print(f"  PASS {FIXTURE} ({len(OUTPUTS)} outputs match)")
-    print("\nsmconv golden: 1/1 ok")
-    return 0
+    else:
+        print(f"  PASS {FIXTURE} ({len(OUTPUTS)} outputs match)")
+    if neg_errs:
+        print("  FAIL not_an_it.it: " + "; ".join(neg_errs))
+    else:
+        print("  PASS not_an_it.it (refused, nothing written)")
+    print(f"\nsmconv golden: {ok}/2 ok")
+    return 0 if ok == 2 else 1
 
 
 if __name__ == "__main__":

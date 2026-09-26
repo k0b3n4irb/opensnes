@@ -8,7 +8,7 @@
 ;------------------------------------------------------------------------------
 ; BG1 - Main scrolling background
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 bg1_tiles: .incbin "res/BG1.pic"
 bg1_tiles_end:
@@ -24,7 +24,7 @@ bg1_map_end:
 ;------------------------------------------------------------------------------
 ; BG2 - Sub scrolling background (parallax)
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 bg2_tiles: .incbin "res/BG2.pic"
 bg2_tiles_end:
@@ -40,7 +40,7 @@ bg2_map_end:
 ;------------------------------------------------------------------------------
 ; BG3 - Static HUD/overlay
 ;------------------------------------------------------------------------------
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 bg3_tiles: .incbin "res/BG3.pic"
 bg3_tiles_end:
@@ -56,7 +56,7 @@ bg3_map_end:
 ;------------------------------------------------------------------------------
 ; Character sprite
 ;------------------------------------------------------------------------------
-.section ".rodata4" superfree
+ASSET_SECTION ".rodata4"
 
 char_tiles: .incbin "res/character.pic"
 char_tiles_end:

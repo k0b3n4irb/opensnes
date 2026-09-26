@@ -112,12 +112,19 @@ The `-e N` offset ensures tilemap entries reference the correct banks.
 
 ### Phase 3 — Assembly Data File (data.asm)
 
-Use the **assembly DMA loader pattern** for all asset loading. This handles
-SUPERFREE bank bytes correctly (C's dmaCopyVram hardcodes bank $00).
+Declare the assets with `ASSET_SECTION` (`templates/assets.inc`, included in
+every assembled file) and load them **from C** with the lib's DMA helpers:
+`dmaCopyVram()`, `dmaCopyCGram()`, `bgInitTileSet()`, `oamInitGfxSet()` all
+read the bank from the pointer they are given (chantier A6). Do NOT write an
+assembly loader and do NOT declare a bare `superfree` section — the linker's
+first bank that fits is bank $00, and 14 examples sat within 28 bytes of a
+full code bank that way until 2026-09-23. (This section used to say
+"C's dmaCopyVram hardcodes bank $00" and to recommend a hand-written loader;
+both were stale since v0.19.0.)
 
 ```asm
-;--- Data sections (SUPERFREE = linker places optimally) ---
-.section ".rodata1" superfree
+;--- data.asm: any bank but $00, highest first ---
+ASSET_SECTION "rodata1"
 tiles:
 .incbin "res/background.pic"
 tiles_end:
@@ -128,61 +135,18 @@ palette:
 .incbin "res/background.pal"
 palette_end:
 .ends
-
-;--- Assembly DMA loader (handles bank bytes) ---
-.section ".loader" superfree
-loadGraphics:
-    php
-
-    ; Set VMAIN for word increment
-    sep #$20
-    lda #$80
-    sta.l $2115
-
-    ; DMA tiles to VRAM
-    rep #$20
-    lda #<vram_addr>
-    sta.l $2116
-    lda #(tiles_end - tiles)
-    sta.l $4305
-    lda #tiles
-    sta.l $4302
-    sep #$20
-    lda #:tiles             ; bank byte from LINKER — the key!
-    sta.l $4304
-    lda #$01
-    sta.l $4300             ; mode: word write
-    lda #$18
-    sta.l $4301             ; dest: VMDATAL ($2118)
-    lda #$01
-    sta.l $420B             ; start DMA ch0
-
-    ; DMA palette to CGRAM
-    sep #$20
-    lda #<start_color>
-    sta.l $2121             ; CGADD
-    rep #$20
-    lda #(palette_end - palette)
-    sta.l $4305
-    lda #palette
-    sta.l $4302
-    sep #$20
-    lda #:palette
-    sta.l $4304
-    lda #$00
-    sta.l $4300             ; mode: byte write
-    lda #$22
-    sta.l $4301             ; dest: CGDATA ($2122)
-    lda #$01
-    sta.l $420B
-
-    ; DMA tilemap to VRAM (same pattern as tiles)
-    ; ...
-
-    plp
-    rtl
-.ends
 ```
+
+```c
+extern u8 tiles[], tiles_end[], tilemap[], tilemap_end[], palette[], palette_end[];
+dmaCopyVram(tiles, VRAM_TILES, tiles_end - tiles);
+dmaCopyVram(tilemap, VRAM_MAP, tilemap_end - tilemap);
+dmaCopyCGram(palette, 0, palette_end - palette);
+```
+
+If C must READ the data (a collision table, a level header), declare the
+extern `const` — `extern const u8 tilesetatt[];` — so every read is a far
+read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 
 ### Phase 4 — C Main File (main.c)
 
@@ -194,16 +158,16 @@ loadGraphics:
 | `setMode(BG_MODE1, 0)` | `setMode(BG_MODE1, 0)` | Same |
 | `setScreenOn()` | `setScreenOn()` | Same |
 | `WaitForVBlank()` | `WaitForVBlank()` | Same |
-| `bgInitTileSet(bg, ...)` | Assembly DMA loader | See Phase 3 |
-| `bgInitMapSet(bg, ...)` | Assembly DMA loader | See Phase 3 |
+| `bgInitTileSet(bg, ...)` | `bgInitTileSet(bg, ...)` | Same shape; the bank comes from the pointer (Phase 3) |
+| `bgInitMapSet(bg, ...)` | `dmaCopyVram(map, vramAddr, size)` + `bgSetMapPtr(...)` | No single call; see docs/MIGRATING_FROM_PVSNESLIB.md |
 | `bgSetScroll(bg, x, y)` | `bgSetScroll(bg, x, y)` | Same (bg 0-indexed) |
 | `bgSetDisable(bg)` | `setMainScreen(LAYER_BG1 \| ...)` | Use bitmask |
 | `bgSetEnableSub(bg)` | `setSubScreen(LAYER_BGx)` | Macro in video.h |
 | `setColorEffect(a, b)` | `colorMathInit()` + library calls | See below |
 | `padsCurrent(0)` | `padHeld(0)` | Held buttons |
 | `padsDown(0)` | `padPressed(0)` | New presses |
-| `oamSet(...)` | Direct `oamMemory[]` writes | oamSet has framesize=158! |
-| `oamSetEx(...)` | Direct `oamMemory[512+]` writes | High table |
+| `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
+| `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
 | `hdmaEnable(ch)` | `hdmaEnable(1 << ch)` | **BITMASK not channel number!** |
 
@@ -282,8 +246,10 @@ clean-example:
 ### Phase 6 — Build and Verify
 
 1. Full rebuild: `make clean && make`
-2. Compiler tests: `./tests/compiler/run_tests.sh --allow-known-bugs`
-3. Example validation: `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick`
+2. The example alone: `python3 tools/luna-test/luna_runner.py --coverage --only <category>/<name>`
+   then `--compare --only …` once a baseline exists (`--update` for a new example)
+3. A `luna test` manifest under `tools/luna-test/manifests/` if the example
+   takes input (scripted input → WRAM asserts), then `make tests`
 4. **STOP** — Ask user to validate interactively (luna GUI / `luna mcp`;
    Category C protocol)
 5. Compare side-by-side with PVSnesLib ROM if possible
@@ -307,10 +273,11 @@ framesize=158 cliff is RESOLVED (see KNOWN_LIMITATIONS.md). Do NOT write to
 PVSnesLib ASM functions ported verbatim have SWAPPED stack offsets.
 `f(a, b)` → our compiler: b at lower SP offset, a at higher.
 
-### 4. HDMA bank byte bug
-`hdmaSetup()` hardcodes bank $00 for ROM addresses. SUPERFREE const data
-may be in bank $01+. Use non-const tables (RAM = bank $7E = $00 mirror)
-or `hdmaSetupBank()` with explicit bank.
+### 4. HDMA tables may live in any bank
+`hdmaSetup()` reads the bank from the table pointer (chantier A6); a `const`
+table works wherever the linker puts it. (This pitfall used to say it
+hardcoded bank $00; `hdmaSetupBank()` is deprecated since 2026-09-20.)
+Tables on `BGnVOFS` carry the vertical-scroll -1 themselves (KNOWN_LIMITATIONS).
 
 ### 5. Tilemap padding for 256×224 images
 gfx4snes generates 32×28 tilemap (1792 bytes). SC_32x32 needs 2048 bytes.
@@ -321,8 +288,9 @@ Unwritten rows 28-31 show VRAM garbage. Pad .map to 2048 bytes or use
 NMI overhead (~8600 cycles) leaves ~41K cycles. DMA = 8 cycles/byte.
 For large transfers, use forced blank (`REG_INIDISP = 0x80`) before DMA.
 
-### 7. `unsigned int` is 4 bytes, `unsigned long` is 8 bytes
-NOT the x86 convention. Use `u16` / `u32` explicitly.
+### 7. `unsigned int` is 2 bytes, `unsigned long` is 4 bytes, pointers 4
+NOT the x86 convention (chantier A1; pointers carry their bank since A6).
+Use `u8` / `u16` / `u32` explicitly.
 
 ### 8. Never use PIL quantize() on BMP→PNG conversion
 PIL's quantizer creates an entirely different palette. Either:
@@ -333,10 +301,14 @@ PIL's quantizer creates an entirely different palette. Either:
 NMI handler reads joypads directly. Don't call padUpdate().
 Use `padPressed(0)` for new presses, `padHeld(0)` for held buttons.
 
-### 10. SUPERFREE bank $00 overflow
-Each `static const` array gets its own SUPERFREE section. If bank $00
-($8000-$FFFF = 32KB) fills up, data spills to bank $01+ and
-`lda.l $0000,x` reads garbage. Combine related const arrays.
+### 10. Bank $00 is for code
+`static const` data goes to the asset banks by itself (#127.3) and every C
+read of it is a far read; asm payload goes there with `ASSET_SECTION`. What
+remains in bank $00 is code and whatever asm keeps there on purpose (the
+snesmod driver, sprite LUTs). The link fails loudly, never silently, on a
+bank-blind C read (`check_bank_reads.py`) or a bank-$00 overflow
+(`BANK0_FAIL_THRESHOLD`). What no lint sees: an asm routine that reads data
+with a hardcoded bank — the object engine did until 2026-09-23.
 
 ## Audio Porting (SNESMOD)
 
@@ -346,20 +318,23 @@ USE_SNESMOD    := 1
 SOUNDBANK_SRC  := res/music.it res/sfx.it
 ```
 
-PVSnesLib audio API maps 1:1:
-- `spcLoad(0)` → `spcLoad(0)`
-- `spcPlay(0)` → `spcPlay(0)`
-- `spcPlaySound(sfx)` → `spcPlaySound(sfx)`
-- `spcProcess()` → `spcProcess()`
+PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
+- `spcBoot()` → `snesmodInit()` + `snesmodSetSoundbank(SOUNDBANK_BANK)`
+- `spcLoad(n)` → `snesmodLoadModule(n)`
+- `spcPlay(0)` → `snesmodPlay(0)`
+- `spcPlaySound(sfx)` → `slot = snesmodLoadEffect(sfx)` once, then
+  `snesmodPlayEffect(slot, volume, pan, pitch)`
+- `spcProcess()` → `snesmodProcess()`, once per frame
+`examples/games/likemario` shows the whole sequence.
 
 ## Checklist Before Requesting User Validation
 
 - [ ] All source assets (.bmp/.png/.it/.brr) in `res/`
 - [ ] gfx4snes flags match PVSnesLib exactly
-- [ ] Assembly DMA loader with `:label` bank bytes
+- [ ] Assets in `ASSET_SECTION`, loaded from C with the DMA helpers (Phase 3)
 - [ ] Palette loaded at correct CGRAM offset (check `-e` flag)
 - [ ] `hdmaEnable(1 << ch)` not `hdmaEnable(ch)`
-- [ ] No `oamSet()` in hot loops (use `oamMemory[]`)
+- [ ] Sprites through `oamSet()` / `oamSetFast()` (no hand-written `oamMemory[]`)
 - [ ] `make clean && make` passes
-- [ ] `validate_examples.sh --quick` passes
+- [ ] `luna_runner.py --coverage --only <example>` and `make tests` pass
 - [ ] Side-by-side screenshot comparison prepared

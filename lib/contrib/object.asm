@@ -1318,7 +1318,7 @@ _oicm1:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1338,7 +1338,7 @@ _oicm2:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1492,7 +1492,7 @@ _oicmtstyn:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1511,7 +1511,7 @@ _oicmtstyn1:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1631,7 +1631,7 @@ _oicmtstx13:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1731,7 +1731,7 @@ _oicmtstxnc:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1875,7 +1875,7 @@ _oicm1d1:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -1895,7 +1895,7 @@ _oicm1d2:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -2034,7 +2034,7 @@ _oicm1dtstyn:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -2053,7 +2053,7 @@ _oicm1dtstyn1:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -2150,7 +2150,7 @@ _oicm1dtstx13:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -2243,7 +2243,7 @@ _oicm1dtstxnc:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20
@@ -2762,7 +2762,7 @@ _lutcolInv:
     tax
     phb
     sep #$20
-    lda #$00
+    lda.l maptile_L1b        ; the map's bank (mapLoad stored it); was #$00 hardcoded
     pha
     plb
     rep #$20

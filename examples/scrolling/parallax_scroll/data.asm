@@ -6,7 +6,7 @@
 ; Converted with: gfx4snes -s 8 -o 32 -u 16 -p -m -i res/back.png
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tiles:
 .incbin "res/back.pic"
@@ -14,7 +14,7 @@ tiles_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 tilemap:
 .incbin "res/back.map"

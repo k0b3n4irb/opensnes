@@ -10,7 +10,7 @@
 ; blob keeps each within a single LoROM bank.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ground_pc7:     .incbin "res/ground.pc7"
 ground_pc7_end:
@@ -23,19 +23,19 @@ ground_pal_end:
 
 .ends
 
-.section ".rodata_m7cos" superfree
+ASSET_SECTION ".rodata_m7cos"
 
 m7cos:          .incbin "res/m7cos.bin"
 
 .ends
 
-.section ".rodata_m7sin" superfree
+ASSET_SECTION ".rodata_m7sin"
 
 m7sin:          .incbin "res/m7sin.bin"
 
 .ends
 
-.section ".rodata_m7nsin" superfree
+ASSET_SECTION ".rodata_m7nsin"
 
 m7nsin:         .incbin "res/m7nsin.bin"
 

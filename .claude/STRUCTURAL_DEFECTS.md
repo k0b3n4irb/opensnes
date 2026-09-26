@@ -1239,7 +1239,13 @@ tests don't currently exercise 32-bit math).
 
 ---
 
-#### A8. MSYS2 cproc non-deterministic segfaults — BELIEVED FIXED, under telemetry 🟡 (2026-07-04; retirement step due since 2026-09-04)
+#### A8. MSYS2 cproc non-deterministic segfaults — CLOSED 🟢 (2026-09-26: cc65816 retry retired)
+
+**2026-09-26**: retirement done. Zero retries in the last 25 Windows CI
+builds (the step summary printed "segfault retry fired" in none); the x3
+loop is gone from `compiler/scripts/cc65816`, a SIGSEGV is reported as a
+compiler crash, and the two workflows no longer export `CC65816_RETRY_LOG`.
+The monthly MSYS2 stress workflow stays.
 
 **2026-09-13**: the 2–3 month zero-count window set below has elapsed
 (since 2026-09-04). Remaining step: drop the `cc65816` x3 retry, keep the
@@ -2431,6 +2437,27 @@ operated on enough PRs to surface its actual signal-to-noise ratio.
 - `docs/BENCHMARK.md` (CI gate section).
 
 ---
+
+
+#### E3. Super FX runtime: the CPU during GSU jobs — IN PROGRESS 🟠 (`wip/superfx-runtime`, since 2026-09-24)
+
+**Problem**: while the GSU owns the cartridge (SCMR RON/RAN), a 65816 read
+of Game Pak ROM returns dummy bytes and cart RAM reads open bus. Until
+2026-09-25 the SDK's NMI and IRQ vectors pointed into ROM, so `gsuLaunch`
+disabled NMI for the whole job: one VBlank in three was lost on
+`superfx_3d`, no input, music or sprites during a job.
+
+**Plan and state** (`.claude/notes/chantiers/superfx_runtime.md`): phase A,
+interrupt vectors in WRAM at `$0100-$010F` — done; phase B, the NMI survives
+GSU jobs through a position-independent handler in WRAM — done (597 frames
+of 600, was 400); phase C, non-blocking launch and IRQ on STOP (the IRQ/BRK/
+COP stubs still point into ROM, the next step); D, `gsuPresent` split-frame
+double buffer; E, GSU code in RAM; F, a C ↔ GSU contract. Effort: several
+weeks. Risk: high (crt0, memory model). luna v1.27.0 gives the oracles it
+needs: `[asserts.gsu] bus_violations`, per-job profile.
+
+**Cross-references**: `KNOWN_LIMITATIONS.md` (the NMI entry of 2026-09-25),
+`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`.
 
 ## 4. Interactions matrix
 

@@ -142,7 +142,7 @@ gfx4snes -s 16 -o 16 -u 16 -p -i sprites.png
 Include the output in an assembly data file:
 
 ```asm
-.section ".rodata1" superfree
+ASSET_SECTION "sprites"          ; templates/assets.inc: any bank but $00
 sprite_tiles: .incbin "res/sprites.pic"
 sprite_tiles_end:
 sprite_pal:   .incbin "res/sprites.pal"

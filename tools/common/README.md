@@ -11,4 +11,14 @@ review H8). A tool that needs them adds `../common` to its include path
 and compiles `$(COMMON)/<name>.c` into its own `build/` — see the
 `common_%.o` rule in `tools/gfx4snes/Makefile`. The cppcheck pass in
 `make lint-cppcheck` scans this directory with the tools and suppresses
-lodepng (upstream code, left untouched).
+lodepng (upstream code).
+
+## Local patches
+
+- `lodepng.c` `zlib_decompress` (2026-09-25): the pre-inflate reservation
+  is capped at 1032 x the compressed size (deflate's maximum expansion).
+  Upstream reserves the size the IHDR declares, so a 114-byte PNG claiming
+  1073741872 x 16 pixels asked for 17 GB before inflating anything (found
+  by the nightly fuzzer). A genuine image still gets its buffer in one
+  allocation; a lying header fails with lodepng error 91. Re-apply on any
+  lodepng update — regression input `tools/fuzz/crashes/lodepng/`.

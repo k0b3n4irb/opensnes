@@ -313,7 +313,7 @@ the clang syntax lint since host compilers have no address spaces).
   now xfail; only the bank byte of `&far_obj` is green. `make test-compiler`
   green (5/5 + 13 xfail), corpus visual 85/85, WRAM 85/85 after the one
   justified update.
-- **Clock skew bit again** (`clock_skew_incremental_builds.md`): the first
+- **Clock skew bit again** (`archive/clock_skew_incremental_builds.md`): the first
   `make compiler` after the edits rebuilt nothing — objects were dated 23
   minutes in the future. Every compiler rebuild in this chantier is
   `make -C compiler/{cproc,qbe} clean && make compiler`, and the corpus was

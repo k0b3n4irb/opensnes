@@ -3,3 +3,12 @@ rom = "../../../examples/chips/superfx_hello/superfx_hello.sfc"
 steps = 1000000
 [asserts.trace]
 superfx = { min = 1 }
+
+# luna v1.27.0 (2026-09-26): the GSU's own state. bus_violations counts CPU
+# reads of Game Pak ROM / RAM while the GSU owns them (RON / RAN) — garbage
+# on hardware, silent everywhere. Vector fetches during a job are counted
+# apart (bus_vector_fetches) because they are the interrupt mechanism, not a
+# fault. On a cart with no GSU this table fails instead of passing vacuously.
+[asserts.gsu]
+bus_violations = 0
+instructions_executed = { gt = 0 }   # the hello program is 37 GSU instructions

@@ -24,5 +24,3 @@ res/tileslevel1.pic res/tileslevel1.pal res/tileslevel1.map: res/tileslevel1.png
 res/BG1.m16 res/maplevel01.t16 res/maplevel01.b16: res/maplevel01.tmj res/tileslevel1.map
 	@echo "[TMX] $< -> map binaries"
 	@cd res && $(TMX2SNES) maplevel01.tmj tileslevel1.map
-
-combined.asm: res/tileslevel1.pic res/BG1.m16

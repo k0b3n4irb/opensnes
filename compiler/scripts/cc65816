@@ -105,37 +105,22 @@ export CC65816_TU
 # Using a pipe hides cproc crashes: QBE receives truncated IR and reports
 # misleading parse errors. With a temp file, cproc failures are caught cleanly.
 #
-# cproc occasionally segfaults on MSYS2 (Windows). Retry up to 2 times on
-# signal 139 (SIGSEGV) before giving up. This does not mask real errors —
-# compilation failures with exit code != 139 are not retried.
-CPROC_RETRIES=3
-for _try in $(seq 1 $CPROC_RETRIES); do
-    set +e
-    "$CPROC" "$TMPFILE" > "$IRFILE" 2>"$CPROC_ERR"
-    CPROC_EXIT=$?
-    set -e
-
-    if [[ $CPROC_EXIT -eq 0 ]]; then
-        break
-    fi
-
-    # Exit code 139 = killed by signal 11 (SIGSEGV)
-    if [[ $CPROC_EXIT -eq 139 ]] && [[ $_try -lt $CPROC_RETRIES ]]; then
-        echo "cc65816: cproc segfault (attempt $_try/$CPROC_RETRIES), retrying..." >&2
-        # Telemetry: the segfault class is believed FIXED since cproc ea95cac
-        # (mktype uninitialized fields, 2026-03-07). CI sets CC65816_RETRY_LOG
-        # and reports the count per build, so any resurgence is visible
-        # instead of silently absorbed. See KNOWN_LIMITATIONS.md (MSYS2 note).
-        if [[ -n "${CC65816_RETRY_LOG:-}" ]]; then
-            echo "$(basename "$INPUT") attempt=$_try exit=139" >> "$CC65816_RETRY_LOG"
-        fi
-        continue
-    fi
-
-    # Not a segfault or last retry — propagate the error
+# The retry-on-SIGSEGV loop that lived here (MSYS2 cproc segfaults, fixed by
+# cproc ea95cac, 2026-03-07) was retired on 2026-09-26 (STRUCTURAL_DEFECTS
+# A8): its telemetry counted zero retries over the observation window and
+# over the last 25 Windows CI builds. A segfault is now an error like any
+# other, named as such, instead of being absorbed.
+set +e
+"$CPROC" "$TMPFILE" > "$IRFILE" 2>"$CPROC_ERR"
+CPROC_EXIT=$?
+set -e
+if [[ $CPROC_EXIT -ne 0 ]]; then
     cat "$CPROC_ERR" >&2
+    if [[ $CPROC_EXIT -eq 139 ]]; then
+        echo "cc65816: cproc crashed (SIGSEGV) on $(basename "$INPUT") — a compiler bug, please report it with this file" >&2
+    fi
     exit $CPROC_EXIT
-done
+fi
 
 # Audit aid: CC65816_KEEP_IR=<dir> keeps a copy of every TU's QBE IR
 # (<dir>/<tu>.ssa) so corpus-wide IR properties can be counted — access

@@ -4,14 +4,14 @@
 ; main.c (krom's exact 14-band values).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 rings_pic:      .incbin "res/rings.pic"
 rings_pic_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 rings_map:      .incbin "res/rings.map"
 rings_map_end:

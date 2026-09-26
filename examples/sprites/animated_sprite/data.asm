@@ -2,7 +2,7 @@
 ; Animated Sprite - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ;------------------------------------------------------------------------------
 ; Sprite tiles (4bpp, 16x16 sprites)

@@ -6,7 +6,7 @@
 ; make/common.mk), because this .incbin makes the .brr a prerequisite.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 blip_brr:       .incbin "res/blip.brr"
 blip_brr_end:

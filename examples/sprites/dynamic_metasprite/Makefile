@@ -28,8 +28,6 @@ res/spritehero8.pic res/spritehero8.pal: res/spritehero8.png
 	@echo "[GFX] Converting 8x8 metasprite..."
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -T -X 16 -Y 16 -P 2 -i $<
 
-combined.asm: res/spritehero32.pic res/spritehero16.pic res/spritehero8.pic
-
 clean: clean-dynamic_metasprite
 .PHONY: clean-dynamic_metasprite
 clean-dynamic_metasprite:

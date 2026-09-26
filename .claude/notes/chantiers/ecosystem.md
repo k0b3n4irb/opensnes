@@ -1,6 +1,8 @@
 # Chantier: OpenSNES ecosystem — game-craft docs + dev tools
 
-Status: **in progress** (Phase 1 = game-craft docs), started 2026-08-02.
+Status: **dormant since 2026-08-08** (Phase 1 = game-craft docs, started
+2026-08-02; the `docs/craft/` pages it produced shipped). Resume or close it
+explicitly — noted by the 2026-09-26 état des lieux.
 Full plan: was `~/.claude/plans/jolly-wiggling-pascal.md`. This note is the
 durable in-repo copy so the roadmap survives.
 

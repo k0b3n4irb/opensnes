@@ -8,7 +8,7 @@
 ; hicolor precedents so builds don't depend on Pillow.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 text_pic:       .incbin "res/text.pic"
 text_pic_end:

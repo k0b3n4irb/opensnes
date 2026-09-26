@@ -1,7 +1,7 @@
 ;; Sprite tile data and palettes for metasprite demo
 ;; Each sprite sheet gets its own SUPERFREE section to avoid bank $00 overflow
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 spritehero32_til:
 .incbin "res/spritehero32.pic"
@@ -13,7 +13,7 @@ spritehero32_palend:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 spritehero16_til:
 .incbin "res/spritehero16.pic"
@@ -25,7 +25,7 @@ spritehero16_palend:
 
 .ends
 
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 spritehero8_til:
 .incbin "res/spritehero8.pic"

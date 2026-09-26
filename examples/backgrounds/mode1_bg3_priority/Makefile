@@ -30,8 +30,6 @@ res/BG3.pic res/BG3.pal res/BG3.map: res/BG3.png
 	@echo "[GFX] Converting BG3..."
 	@$(GFX4SNES) -g -s 8 -o 4 -u 16 -e 0 -p -m -i $<
 
-combined.asm: res/BG1.pic res/BG2.pic res/BG3.pic
-
 clean: clean-mode1_bg3_priority
 .PHONY: clean-mode1_bg3_priority
 clean-mode1_bg3_priority:

@@ -17,7 +17,7 @@ for the rows that need no enhancement chip.
 | Item | Notes |
 |---|---|
 | A Super Nintendo or Super Famicom | Record the model (SNS-001, SNS-101 / 1CHIP, SHVC-001) and the region. Timing rows differ between NTSC and PAL, and the 1CHIP revision has a different video output stage. |
-| A flash cart | Record the firmware version. The DSP-series chips are emulated natively by the sd2snes/FXPak family; support for SA-1 and Super FX depends on the firmware — check its changelog before counting a chip row as testable. |
+| A flash cart | Record the firmware version. The sd2snes / FXPak family runs the DSP-series chips, and SA-1 and Super FX as FPGA cores since firmware 1.10.x, on Mk.II and Pro: the v1.10.3 notes (April 2019) fix "SA-1 and SuperFX RAM write cycles" on both ([sd2snes blog](https://sd2snes.de/blog/archives/date/2019/04)). Those cores are reimplementations: confirm a chip-row failure on a second reference before blaming the SDK. |
 | A display | Record what it is and how the console is connected (composite, S-Video, RGB, an upscaler and its model). A CRT is the reference for anything about timing or interlace. A light gun generally needs a CRT; on an LCD, mark the Super Scope row as not testable rather than failed. |
 | Two pads | Port 2 is used by the two-player and Super Scope rows. |
 | Optional | A SNES Mouse, a Super Scope. |

@@ -5,7 +5,7 @@
 ; `scene`) plus a sprite tile + palette pair for the player ship.
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 scene_tiles: .incbin "res/scene.pic"
 scene_tiles_end:

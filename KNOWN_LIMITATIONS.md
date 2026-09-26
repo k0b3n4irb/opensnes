@@ -55,7 +55,7 @@ main thread resumes writing garbage to a wrong location.
 **Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
 runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
 the call graph from every NMI callback root (NmiHandler + functions
-registered via `nmiSet`/`nmiSetBank`) and **fails the build** if any
+registered via `nmiSet`) and **fails the build** if any
 reachable function writes to `$2180-$2183`. Lib + crt0 are audited and
 treated as a black box; the lint targets user code in NMI callbacks,
 where the actual risk lives. Bypass for a single build with
@@ -70,7 +70,7 @@ bank $00 keeps the code. This is safe because every way C reaches const
 data carries the bank:
 
 - **Passed to a lib DMA/asset function — any bank.** `dmaCopyVram`,
-  `dmaCopyCGram`, `dmaCopyVramMode7`, `LzssDecodeVram`, `mapLoad`, etc. take a
+  `dmaCopyCGram`, `dmaCopyVramMode7`, `lzssDecodeVram`, `mapLoad`, etc. take a
   4-byte pointer whose high byte is the real bank, and the asm reads it
   (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register).
 - **Dereferenced in C (`tab[i]`, `*p`, `p->field`) — any bank.** A read
@@ -97,8 +97,11 @@ If bank $00 still runs out (code plus hand-written asm payload):
 - Declare `.incbin` / `.db` payload with `ASSET_SECTION` (`templates/assets.inc`)
   instead of a bank-$00 `.SECTION` — it takes the same asset banks the
   compiler uses.
-- For a runtime-computed bank, the explicit `dmaCopyVramBank(src, bank, …)` /
-  `dmaCopyCGramBank(src, bank, …)` variants take the bank as a parameter.
+- Payload handed to the lib needs no bank of its own: every `dmaCopy*`
+  helper reads the bank from the far pointer. For a bank computed at
+  runtime, `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)`
+  takes it as a parameter. (Deprecated since 2026-09-20:
+  `dmaCopyVramBank` / `dmaCopyCGramBank`.)
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
@@ -313,7 +316,7 @@ written in GSU assembly (built via the `wla-superfx` assembler). The C side
 of a SuperFX project orchestrates GSU jobs and reads results — it doesn't
 generate GSU code.
 
-**Mitigation:** documented in `docs/tutorials/sa1.md` and the SuperFX example
+**Mitigation:** documented in `docs/tutorials/superfx.md` and the SuperFX example
 under `examples/chips/superfx_*`. Plan accordingly: heavy compute lives in
 GSU assembly, not in your C main.
 
@@ -360,7 +363,7 @@ reports the actual optimisation state per function (not always 1
 or always 0), so reading it is reliable.
 
 MSYS2-specific cproc segfaults (struct pointer init, nested structs,
-unions, string initializers) are **believed fixed** since cproc
+unions, string initializers) are **fixed** since cproc
 `ea95cac` (2026-03-07, "initialize all struct type fields in mktype()
 to prevent UB" — uninitialized type fields read heap garbage, whose
 layout-dependence explains both the non-determinism and the
@@ -371,16 +374,13 @@ a 200x stress of the five historical culprit files (that pass covered
 cproc; the standing `sanitizers` CI job added on 2026-09-12 covers the
 whole host toolchain and found bugs in QBE, wla-dx and cproc — the
 cproc ones are NULL + 0 pointer arithmetic over empty arrays, not the
-segfault class). The status is
-**under surveillance, not closed**: the make-level retry loop was
-dismantled on 2026-07-04 (it could also mask real build failures); the
-`cc65816`-level retry (x3 on exit 139) stays as cheap insurance while
-telemetry proves the fix out — every Windows build reports its retry
-count in the job summary, and
-`.github/workflows/msys2_cproc_diagnostic.yml` stress-tests the
-culprit files 100x monthly and fails on any segfault. Remaining
-retirement step: after 2–3 months of zero-count telemetry, drop the
-cc65816 retry too and close this entry. Full investigation log:
+segfault class). **Closed 2026-09-26**: the make-level retry loop was
+dismantled on 2026-07-04 and the `cc65816`-level retry (x3 on exit 139)
+on 2026-09-26, after its telemetry counted zero firings over the
+observation window and over the last 25 Windows CI builds. A cproc
+segfault is now reported as a compiler crash, not retried;
+`.github/workflows/msys2_cproc_diagnostic.yml` still stress-tests the
+culprit files 100x monthly and fails on any segfault. Full investigation log:
 `.claude/notes/tech/cproc_msys2_segfault_investigation.md`.
 
 ---
@@ -432,35 +432,20 @@ targets happened to land in bank 0 via SUPERFREE'd lib code. Any
 pointer to a bank-1+ function would have silently jumped to bank 0.
 That trap is gone.
 
-### 🟡 C function returning `long` does not propagate the high half through the call
+### 🟢 C function returning `long` propagates the high half (fixed 2026-05-21)
 
-A latent issue surfaced (but not fixed) during the A1-followup chantier
-(Session 7, 2026-05-16). For a C function `long f(...)`:
+Surfaced during the A1-followup chantier (2026-05-16): a function returning
+`long` / `u32` / `s32` / `fixed32` carried only its low 16 bits across the
+call. Fixed on 2026-05-21 (qbe `3e79c8c`): the callee returns the low half in
+`A` and the high half in the direct-page global `tcc__retval_hi`, and the
+caller reads both back. `compiler/ABI.md` ("32-bit values") documents the
+convention for hand-written asm. This entry said "not fixed" until
+2026-09-26, four months after the fix.
 
-- Cproc emits `Jretl` which `emitload`s only the low 16 of the return
-  value into `A` before `rtl`.
-- The caller's `emitstore(i->to)` after the `jsl` only writes A to the
-  low half of the destination Kl temp. The high half is left at whatever
-  the slot previously contained.
-
-In practice no shipping SDK code returns a `long` whose high half is
-read by the caller (lib functions return `s16` / `u16` / `fixed`; the
-A1-followup test harness exercises Omul / Odiv via runtime helpers, not
-return values). The five originally-tracked A1-followup bugs all pass
-because they go through the helper path (which uses named scratch slots
-for the high half) or only inspect the low half.
-
-**Mitigation today:** don't write a `long`-returning C function whose
-high half is consumed across the call. If you need a 32-bit return,
-either inline the math at the call site, route it through a runtime
-helper that stores into a named bank-0 slot, or pass a `long *out`
-parameter.
-
-**Proper fix (when this becomes a real problem):** extend `Jretl` to
-also store the high half to a known location (e.g., `tcc__r0+2`) before
-`rtl`, and have the Ocall path read it back. Estimated 1-2 days of
-chantier work; not yet tracked in `STRUCTURAL_DEFECTS.md` because no
-shipping code triggers it.
+**Pinned by:** `devtools/libtests` asserts all 32 bits of `fix32Sin`, an asm
+callee using the convention. No runtime fixture yet calls a *C* function
+returning `u32` and consumes the full value (tracked in the 2026-09-26
+état des lieux).
 
 ### 🟡 Sprite palettes start at CGRAM offset 128, not 0
 Standard SNES quirk that surprises everyone once. The first 128 colours of
@@ -474,6 +459,93 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 (`PAL_n`) from OBJ (`OBJ_PAL_n`) palettes.
 
 ---
+
+### 🟢 SNESMOD stop and pause sometimes left a voice sounding (fixed 2026-09-26)
+
+The SNESMOD SPC700 driver (mukunda's, shared with PVSnesLib) silences the
+DSP in `ResetSound` by writing KOFF = $FF and then KOFF = $00 about 60 SPC
+cycles later. The S-DSP polls KON/KOFF only every other sample, every 64
+SPC cycles, so the key-off was sometimes never seen and a voice kept
+playing after `snesmodStop()` or `snesmodPause()`. anomie's S-DSP doc states
+this exact sequence ("KOFF = $ff then KOFF = 0 → *usually* all voices
+remain playing"); snesdev-wiki: "Clearing KOFF too early can cause the voice
+to not key-off". Measured on luna over 161 press frames: 8 stuck voices on
+v1.24.0, 10 on v1.27.0. Found when the luna 1.27.0 pin moved the unlucky
+frames onto a manifest's.
+
+**Fix:** the instruction that followed the second write now sits between
+the two (same bytes, same size; the gap is 65 cycles, over one poll).
+0 stuck voices in 161 × 2 × 2 runs (pause and stop, both luna versions).
+Pinned by `tools/luna-test/manifests/audio_snesmod_music_{pause,stop}.toml`.
+
+### 🟢 `padIsConnected()` answered 1 for an empty port (fixed 2026-09-26)
+
+An empty port and an idle pad both auto-read `$0000`, so the old test could
+not tell them apart. The NMI handler now reads one serial bit past the 16 of
+auto-read on each port whose signature is a pad's: a joypad returns 1s
+there (anomie's register doc). What an *empty* port returns is stated by no
+reference — luna, ares and Mesen2 return 0 — and has not been measured on
+a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
+with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
+### 🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)
+
+`gsuLaunch()` disabled NMI for the duration of each GSU job (the NMI vector
+and handler are in the Game Pak ROM, which the CPU cannot read while the GSU
+owns it) and re-enabled it with a hardcoded `$81`. Measured on luna:
+`superfx_3d` read `frame_count = 400` at frame 600 — one VBlank in three
+lost, game time at two thirds of real time — and any H/V-timer IRQ the game
+had armed was cancelled by the `$81`.
+
+Fixed by the interrupt design the hardware provides (Nintendo dev manual
+Book II §5.4.1): the header's vectors point at WRAM stubs at `$0100-$010F`,
+and the NMI stub enters a WRAM handler that counts the frame and uploads OAM
+while the GSU owns the cartridge, deferring the ROM-side work (tilemap,
+scroll, pads, user callback) to the next VBlank. `gsuLaunch` no longer
+touches `$4200`. Since 2026-09-26 the IRQ vector takes the same route: its
+`$010C` stub pointed into ROM until then, so an H/V-timer IRQ that fired
+during a job ran garbage (measured with the old stub: CPU lost, 5446 GSU bus
+violations); now a WRAM handler acknowledges it (and a GSU IRQ) during the
+job, and the game's handler runs again after it. BRK and COP land on a WRAM
+`rti`. Pinned by `tools/luna-test/manifests/coproc_superfx_nmi.toml`
+(frame count, IRQs counted by superfx_3d, `bus_violations = 0`).
+
+### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
+
+`make/common.mk` defaulted the header's `ROMSIZE` byte to `$08` (256 KB)
+for every mapping while the HiROM memory map links 8 × 64 KB = 512 KB. The
+byte is computed from the bank count now, and the bank count is a project
+knob (`ROM_BANKS`, default 8): a Super FX or a large game sets
+`ROM_BANKS := 32` for 1 MB and the linker, the header and the asset bank
+range follow. wlalink takes the largest bank count among the objects, so
+the prebuilt library needs no rebuild. Found while sizing what a Super FX
+game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
+
+In the same change the Super FX header gained the extended header it never
+had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
+cartridge could read the Game Pak RAM size; it is declared at `$FFBD`
+(`GSU_RAM_KB`, default 64) with `$FFDA = $33`, as both arbiters describe.
+
+### 🟢 The object engine read the map from bank $00 whatever bank it was in (fixed 2026-09-23)
+
+`objCollidMap()`, `objCollidMapWithSlopes()` and `objCollidMap1D()` look up
+the tile under and around an object in the map that `mapLoad()` installed.
+At their thirteen read sites `lib/contrib/object.asm` set the data bank to a
+hardcoded `$00` before the read — the same hardcode chantier B1 had removed
+from `map.asm`, which stores the map's bank (`maptile_L1b`) and honours it.
+So the object engine only worked with a map in bank $00. Nobody noticed
+because no map had ever left bank $00: every example declared its data
+`SUPERFREE`, and the linker's first bank that fits is bank $00. The day the
+examples' assets moved to the asset banks (`ASSET_SECTION`, 2026-09-23),
+two of them changed picture: `mapandobjects` scrolled to a different height,
+`slope_collision` sank Mario into the ground — collisions computed against
+code bytes.
+
+Fixed: the thirteen sites read `maptile_L1b`. Pinned by the library fixture,
+whose map has lived in bank $02 since it was written: an object placed inside
+the solid ground band reads `tilestand == T_SOLID` (the old engine read 0).
+The lesson is the one `devtools/check_bank_reads.py` cannot teach — it
+checks C, and this was assembly: a bank stored by one routine and hardcoded
+by its neighbour.
 
 ### 🟢 The address of a local variable had an undefined bank (fixed 2026-09-21)
 

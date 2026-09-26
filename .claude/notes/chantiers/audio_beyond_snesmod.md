@@ -110,7 +110,7 @@ command engine: v2's reactive loop keeps running (SFX + live C control), a
   tempo, position-jump/pattern-break, volume fade. Wave 2: tremolo, sample
   offset, note cut/delay, retrigger. Everything else → converter rejects loud.
 - **Note-off:** prefer ADSR **release** (KOFF bit) over hard KOFF — the
-  `apu_switch` lesson (`spc700_arc.md:86`: hard KOFF truncates audibly).
+  `apu_switch` lesson (`archive/spc700_arc.md`: hard KOFF truncates audibly).
 - **Voice allocation — music ⇄ SFX (the real design problem):** static split
   + **priority stealing** (SNESMOD's model made explicit). Each voice tagged
   `MUSIC`/`SFX`/`FREE` + priority. `audioPlaySampleEx` picks FREE → lowest-ENVX
@@ -225,7 +225,7 @@ double-migrating those ROMs.
 
 ## Prior art to read at kickoff
 
-`spc700_arc.md` (#119 raw-APU path), `audio_v2.md` (the shipped v2 engine),
+`archive/spc700_arc.md` (#119 raw-APU path), `audio_v2.md` (the shipped v2 engine),
 `.claude/notes/tech/audio_legacy_pvsneslib_abi.md`, `lib/source/audio.c`,
 `lib/source/audio_driver.spc700.asm`, `lib/source/snesmod.asm`,
 `tools/smconv/`, `probes/audio_v2.py`.

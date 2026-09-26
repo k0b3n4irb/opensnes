@@ -34,37 +34,37 @@ spilled right through the ratchet and shipped a dead animation before
 this. Sections holding only `__opensnes_force_emit_*` anchors are exempt
 (linker-only data, never C-deref'd).
 
-## Default threshold (8 bytes on wip/a6-a7-atomic-v3; 16 on develop)
+## Default threshold: 1024 bytes (since 2026-09-23)
 
-The threshold is **always set just below the current example minimum**
-so the next const literal that lands somewhere in that margin fails
-fast rather than producing a silently broken ROM. The current
-minimum drifts with chantier work; the threshold tracks it.
+| State                                   | Corpus min free            | Threshold |
+|-----------------------------------------|----------------------------|-----------|
+| v0.16.0 (`mapscroll.sfc`)               | 28 bytes                   | 16        |
+| wip/a6-a7-atomic-v3 (post-A6)           | 12 bytes                   | 8         |
+| #127.3 flip (2026-09-07)                | 2168 (mode5_hires)         | 8 (kept)  |
+| 2026-09-22, measured                    | **12** (continuous_scroll, likemario) | 8 |
+| **2026-09-23, examples on ASSET_SECTION** | **1912** (tetris); next 5359 (likemario) | **1024** |
 
-| State                          | Min free | Threshold |
-|--------------------------------|----------|-----------|
-| v0.16.0 (`mapscroll.sfc`)      | 28 bytes | 16        |
-| v0.18.0 (post-inline retrofit) | 28 bytes | 16        |
-| wip/a6-a7-atomic-v3 (post-A6)  | 12 bytes | 8         |
+What happened on 2026-09-23: every data-only `superfree` section of the
+examples (94 sections, 53 files) became `ASSET_SECTION`, and the six
+sections forced `SEMIFREE BANK 0` (breakout, tetris, likemario) followed
+once their C readers were `const`. Bank $00 went from "14 examples within
+28 bytes of full" to one example under 5 KB. That one, tetris, keeps the
+SNESMOD driver blob (`.sm_spc`, 5.5 KB) and its code in bank $00 by
+choice — the next lever if it ever needs more.
 
-The 12-byte minimum on the A6+A7 chantier branch is structural:
-post-A6 pointer args push `pea.w :sym` *plus* `pea.w sym` (4 bytes
-of ROM) at every call site instead of one `pea.w sym` (2 bytes
-pre-A6). The 3 affected examples (likemario, tetris, mapandobjects)
-have many lib-call sites in their main TUs. Re-tightening to 16
-requires either: (a) lib code-size optimisations that recover the
-4 bytes back per call; or (b) routing the canonical force-emit
-anchors out of bank $00 — first attempted 2026-05-14 via
-`.SECTION X BANK 1 FREE` in qbe `emitdat`, abandoned because audio
-examples have bank 1 packed solid with SPC sample data; FREE BANK 1
-hard-fails to fit. A robust scheme needs multi-bank fallback or a
-SUPERFREE name-grouping trick — left for a dedicated chantier.
+The move also cost two link failures and one real bug, both worth
+remembering: `.mul32` / `.div32` were pinned `BANK 7 FREE` and had no room
+once assets filled bank 7 highest-first (now `SEMISUPERFREE BANKS 7-1` like
+the assets); and the object engine read the map with a hardcoded bank $00
+at thirteen sites — invisible for as long as no map had ever left bank $00
+(`KNOWN_LIMITATIONS.md`, fixed the same day, pinned by the fixture whose
+map is in bank $02).
 
-This is a **ratchet**: never RAISE the threshold (= weaken the gate)
-unless the current build's actual minimum dropped below it. The drop
-from 16 → 8 on wip is justified by the documented post-A6 minimum;
-the goal is to claw it back to 16 once one of the recovery paths
-above lands.
+The threshold is a **ratchet**: never RAISE it (= weaken the gate) unless
+the current build's actual minimum dropped below it after a refactor was
+tried. 1024 sits 888 bytes under tetris and leaves the 2048 soft warning to
+name it at every build. Re-measure with the loop at the end of this file
+before quoting any figure here.
 
 ## Keeping assets out of bank $00 in the first place (since 2026-07-22)
 
@@ -95,10 +95,13 @@ linker tries the highest bank first and walks down; bank $00 is simply
 not a candidate. The RPG went from 12 to **9393** free bytes in bank $00
 this way, with a pixel-identical ROM.
 
-The list is literal because it must be: a `.DEFINE` is not expanded
-inside a `BANKS` clause (wlalink: "malformed BANKS list") and a bank
-outside the memory map is a hard link error ("out of range [0, 8]").
-Banks 1-7 exist in every ROM memory map the SDK ships.
+The range is a *string* define: `BANKS ASSET_BANKS` with
+`.DEFINE ASSET_BANKS "7-1"` is substituted as text and works (that is what
+`assets.inc` has always done); a numeric expression there is what wlalink
+rejects ("malformed BANKS list"). Since 2026-09-24 the string comes from
+make (`-D 'ASSET_BANKS_VAL="N-1"'`, N = `ROM_BANKS` − 1) so a 32-bank ROM
+puts assets in banks 31 down to 1; the prebuilt library's own asm sections
+keep the literal "7-1", which exists in every memory map the SDK ships.
 
 Every link now also prints how much declared payload ended up in bank
 $00 (`report_bank0_asset_payload` in `symmap.py`). It matches section
@@ -136,6 +139,8 @@ note's "honest ceiling" — hand-written asm payload such as tetris's
 `data.asm` strings or snesmod's driver — is what remains in bank $00 by
 choice.
 
+**(Superseded 2026-09-23 — see the table at the top: the examples moved to
+`ASSET_SECTION` and the threshold went to 1024. Kept as history.)**
 **Measured again 2026-09-22: the minimum is back to 12 bytes**
 (`continuous_scroll`, `likemario`; then a plateau of 28 across six more).
 Code growth since the flip ate the headroom it bought, so the margin above

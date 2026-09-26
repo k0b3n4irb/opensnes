@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: luna v1.13.0 (closed). Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # luna v1.9.0 — `state --input` misapplies checkpoint frames
 
 Status: CLOSED — fixed in luna v1.13.0 (verified). The follow-up regression

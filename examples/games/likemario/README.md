@@ -296,25 +296,23 @@ res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
 
 ### Data Placement
 
-`data.asm` uses two different section types for a reason:
+`data.asm` declares every asset with `ASSET_SECTION` (`templates/assets.inc`):
+the linker puts it in the asset banks, never in bank $00, which is kept for
+code.
 
 ```asm
-; Graphics — accessed only via DMA, can be in any ROM bank
-.SECTION ".rodata1" SUPERFREE
-tiles_til:        .INCBIN "res/tiles.pic"
-mario_sprite_til: .INCBIN "res/mario_sprite.pic"
-.ENDS
-
-; Map data — accessed directly by C code, must be in bank $00
-.SECTION ".rodata2" SEMIFREE BANK 0
-mapmario:    .INCBIN "res/BG1.m16"       ; Tilemap (u16 per tile)
-tilesetatt:  .INCBIN "res/map_1_1.b16"   ; Collision properties
-.ENDS
+; Graphics — handed to the DMA helpers, which read the bank from the pointer
+ASSET_SECTION ".rodata1"
+tiles_til:        .incbin "res/tiles.pic"
+mario_sprite_til: .incbin "res/mario_sprite.pic"
+.ends
 ```
 
-The map data is in `SEMIFREE BANK 0` because the compiler generates `lda.l $0000,x`
-for array accesses — which always reads from bank $00. If the map were in bank $01,
-every tile lookup would return garbage.
+The map and collision data are read by C too, and that works from any bank:
+the C side declares them `const`, and every C read of const data is a far
+read (since v0.41.0). Until 2026-09-23 they sat in `SEMIFREE BANK 0` "because
+the compiler reads bank $00" — true before far pointers, and what this page
+said until 2026-09-26.
 
 ---
 

@@ -25,7 +25,7 @@ $(EXE): $(OBJS)
 	@echo "Linking $@"
 	$(CC) $(CFLAGS) $(OBJS) -o $@ -lm
 
-%.o: %.c
+%.o: %.c $(wildcard *.h)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) -c $<
 

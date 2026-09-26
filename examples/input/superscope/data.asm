@@ -2,7 +2,7 @@
 ; Super Scope Example - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ; Background: aim calibration target (256x224, 2bpp, 126 tiles)
 aim_target_tiles:
@@ -21,7 +21,7 @@ aim_target_pal_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 ; Sprite tiles (128x192 sheet, 4bpp, 384 tiles)
 sprites_tiles:

@@ -20,7 +20,7 @@ patterns_end:
 .ends
 
 ; Tilemap and palette (uncompressed)
-.section ".rodata_map" superfree
+ASSET_SECTION ".rodata_map"
 
 map:
 .incbin "res/opensnes.map"

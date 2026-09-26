@@ -7,7 +7,7 @@
 ;------------------------------------------------------------------------------
 ; Sprite graphics for 32x32 mode (8x8 tile size, 256 bytes per 16x16 sprite)
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 sprite16:
 .incbin "res/sprite16.pic"
@@ -22,7 +22,7 @@ palsprite16_end:
 ;------------------------------------------------------------------------------
 ; Sprite graphics for 64x64 mode (16x16 tile size, 2048 bytes per sprite)
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 sprite16_64x64:
 .incbin "res/sprite16_64x64.pic"

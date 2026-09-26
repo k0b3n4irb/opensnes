@@ -1,10 +1,10 @@
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 tiles:
 .incbin "res/opensnes.pic"
 tiles_end:
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 tilemap:
 .incbin "res/opensnes.map"
 tilemap_end:

@@ -90,7 +90,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **LoROM** | Stable | Default. Production-ready. |
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
-| **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP register init is an assumption, not a published spec. |
+| **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP/CIWP write-protect polarity resolved 2026-09-02 against four references (see `KNOWN_LIMITATIONS.md`). |
 | **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by [luna](https://github.com/k0b3n4irb/luna)**, which detects and executes the GSU natively in the headless test harness. |
 
 ---
@@ -100,7 +100,7 @@ values) — required reading before porting any function from PVSnesLib.
 | | |
 |---|---|
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
-| **30 hardware modules** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
+| **36 library headers** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
 | **85 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |

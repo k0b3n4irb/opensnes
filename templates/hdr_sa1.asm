@@ -39,7 +39,11 @@
 .ENDME
 
 .ROMBANKSIZE $8000          ; 32KB banks (LoROM-based)
-.ROMBANKS 8                 ; 256KB ROM
+.IFDEF ROM_BANKS_VAL
+.ROMBANKS ROM_BANKS_VAL     ; project knob (make ROM_BANKS=…)
+.ELSE
+.ROMBANKS 8
+.ENDIF
 
 ;------------------------------------------------------------------------------
 ; SNES Header (located at $00:FFB0-FFDF)

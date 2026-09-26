@@ -21,7 +21,7 @@
 ; hdma helpers can reach the data regardless of placement.
 ;==============================================================================
 
-.section ".rodata_hdma_wave_tables" superfree
+ASSET_SECTION ".rodata_hdma_wave_tables"
 
 hdma_tables:
     .incbin "res/hdma_wave_tables.bin"

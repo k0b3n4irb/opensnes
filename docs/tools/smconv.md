@@ -3,7 +3,7 @@
 `smconv` turns music written in a tracker — Impulse Tracker `.it` modules — into
 a **SNESMOD soundbank**: the packed music, samples, and effect data the SPC700
 plays. It is how you get real, multi-channel music (and sound-effect banks) into
-a game, driven from C by a few `spcLoad` / `spcPlay` calls.
+a game, driven from C by a few `snesmod*` calls (`snes/snesmod.h`).
 
 ## What goes in, what comes out
 
@@ -40,10 +40,19 @@ smconv -s -o soundbank -b 1 -n -p soundbank music/mysong.it
 Then, in C, load and play by module number (the `.h` gives you the names):
 
 ```c
-spcLoad(MOD_MYSONG);   // load a module
-spcPlay(0);            // play it
-spcPlaySound(SFX_JUMP);// trigger a sound effect from an SFX bank
+snesmodInit();
+snesmodSetSoundbank(SOUNDBANK_BANK);
+snesmodLoadModule(MOD_MYSONG);            // load a module
+u8 jump = snesmodLoadEffect(SFX_JUMP);    // load an effect, keep its slot
+snesmodPlay(0);                           // play from pattern 0
+
+/* in the game loop */
+snesmodPlayEffect(jump, 127, 128, SNESMOD_PITCH_NORMAL); // volume, pan, pitch
+snesmodProcess();                         // once per frame
 ```
+
+`examples/games/likemario` does exactly this. (`spcLoad` / `spcPlay` are
+the PVSnesLib names — see @ref migrating_pvsneslib.)
 
 See @ref tutorial_audio and @ref snes_sound_guide for the runtime side.
 
@@ -66,7 +75,8 @@ See @ref tutorial_audio and @ref snes_sound_guide for the runtime side.
   OpenSNES-specific and the Makefile gets them right. Calling smconv by hand with
   SNESMOD's defaults will not link.
 - **Many modules, one bank.** Pass several `.it` files to get several modules —
-  music via `spcLoad(N)` + `spcPlay(0)`, effects via `spcPlaySound(N)`.
+  music via `snesmodLoadModule(N)` + `snesmodPlay(0)`, effects via
+  `snesmodLoadEffect(N)` + `snesmodPlayEffect(slot, …)`.
 - **SPC700 limits are real.** Up to 8 channels; samples auto-convert to BRR at
   32 kHz max; `-V` reports how much of the SPC's 64 KB you are using — watch it,
   because music and samples share that space.

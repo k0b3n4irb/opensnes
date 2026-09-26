@@ -14,11 +14,31 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
-## Index state (2026-09-12)
+## Index state (2026-09-26)
 
-`snes_sources` → 201 sources captured of 223 listed; **30848 chunks, built
-2026-09-12T09:12:20Z, chunker v6, fingerprint `e2a738a553ec`**. A different
-fingerprint means the corpus changed: rerun the golden queries below.
+`snes_sources` → 207 sources captured of 234 listed; **30848 chunks, built
+2026-09-25T18:28:45Z, chunker v7, fingerprint `e2a738a553ec`**.
+
+**The fingerprint test no longer works.** Between 2026-09-12 (201 sources,
+chunker v6) and 2026-09-25 (207 sources, chunker v7) the fingerprint and the
+chunk count stayed the same. The six sources dated 2026-09-24
+(`ultrastarfox`, `argsfx-sasm-docs`, `peterlemon-gsu`, `sd2snes-changelog`,
+`cartouche-fiches`, `cartouche-fiches-jeux`) never surface in targeted
+queries — listed, apparently not indexed. Reported to snes-rag
+(`partners/snes-rag/2026-09-26_to_snes-rag.md`). Until it is answered, compare the
+build date and the chunk count as well as the fingerprint, and rerun the
+golden queries whenever any of the three moves.
+
+Previous state (2026-09-12): 201 of 223, 30848 chunks, built
+2026-09-12T09:12:20Z, chunker v6, fingerprint `e2a738a553ec`.
+
+New since 2026-09-12: domain arbiter **sd2snes-changelog** (not reachable,
+see above); solid `ultrastarfox`, `argsfx-sasm-docs`; complement
+`peterlemon-gsu`, `cartouche-fiches`, `cartouche-fiches-jeux`. The fullsnes
+Super FX section now answers as arbiter (`725e8061d576404e` SCMR,
+`b56b9ef201d2e8e1` bitmap opcodes). `opensnes-docs` / `opensnes-notes-tech`
+recaptured 2026-09-24. `luna-docs` still the 2026-09-12 capture (luna is at
+v1.27.0).
 
 General arbiters: snesdev-wiki, fullsnes, anomie-regs, anomie-timing,
 anomie-sdsp, anomie-spc700, undisbeliever-snesdev.
@@ -30,7 +50,7 @@ set requested by the gaps review: **qbe-docs**, **cproc-docs**,
 **luna-docs**, **tiled-tmx-format**, **aseprite-file-spec** (plus
 `snes-sdk-hecht`, solid).
 
-Ours, indexed: `opensnes-docs`, `opensnes-notes-tech` (2026-09-03). They are
+Ours, indexed: `opensnes-docs`, `opensnes-notes-tech` (recaptured 2026-09-24). They are
 the reason for the mandatory exclusion.
 
 Still not captured (2026-09-12): Calypsi / WDC816CC / vbcc 65816 manuals
@@ -80,5 +100,8 @@ generic compiler words; the lexical side of the ranking is strong.
 - `.claude/rules/hardware_claims.md` — the rule this note serves.
 - `.claude/notes/chantiers/hardware_docs_audit.md` — the 2026-09 audit
   whose golden queries lived outside the repo until this note.
-- `~/opensnes_reports/opensnes_report_snes-rag_2026-09-1{1,2}*.md` — the
-  request and validation reports sent to the corpus team (owner's machine).
+- `.claude/notes/partners/snes-rag/` — the request and validation reports
+  sent to the corpus team (2026-09-11, 2026-09-12; moved into the repo from
+  the owner's machine on 2026-09-22) and `OPEN_snes-rag.md`, the report
+  being accumulated for the next send. The contract with the corpus team
+  is `.claude/rules/partners.md`.

@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/color/hicolor_1792, hicolor_blend. Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Chantier: HiColor port (#107) — H-IRQ surface + CGRAM streaming
 
 Status: IN PROGRESS (started 2026-07-13). Branch: `wip/hicolor`.

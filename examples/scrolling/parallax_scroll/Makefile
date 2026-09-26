@@ -19,9 +19,6 @@ res/back.pic res/back.map res/back.pal: res/back.png
 	@echo "[GFX] $< -> res/back.pic/.map/.pal"
 	@$(GFX4SNES) -s 8 -o 32 -u 16 -p -m -i $<
 
-# Ensure assets are converted before assembly (data.asm .incbin references them)
-combined.asm: res/back.pic res/back.map res/back.pal
-
 # Extended clean
 clean: clean-parallax_scroll
 .PHONY: clean-parallax_scroll

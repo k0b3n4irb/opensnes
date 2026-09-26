@@ -24,6 +24,7 @@
 extern u16 pad_keys[5];      /* Current button state (5 pads × 16 bits) */
 extern u16 pad_keysold[5];   /* Previous frame button state */
 extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
+extern u8  pad_present[2];   /* [port] 1 = a pad answered its 17th serial bit (crt0 NMI) */
 
 /* Mouse state — PVSnesLib-compatible indexed layout.
  * All 2-byte arrays: [0] = port 1, [1] = port 2.
@@ -74,24 +75,20 @@ u16 padRaw(u8 pad) {
 }
 
 u8 padIsConnected(u8 pad) {
-    if (pad >= 5) return 0;
-    /* The auto-joypad word ends in a 4-bit device signature, and a standard
-     * controller's is 0000 (fullsnes, "SNES Controllers I/O Ports - Automatic
-     * Reading": bits 3-0 are "0 (High)" for a joypad, and "no buttons pressed
-     * will return 0"). So an IDLE connected pad reads exactly $0000 — the old
-     * test also rejected that and reported every quiet frame as unplugged.
-     * $FFFF is the floating-line pattern of a port with nothing in it.
+    /* crt0's NMI handler reads one serial bit past the 16 of auto-read on
+     * each port whose device signature is a pad's (0000): a joypad returns
+     * 1s after its 16 bits (anomie-regs, Joypads), so pad_present[port] is
+     * 1 when a pad answered. Until 2026-09-26 this function compared the
+     * auto-read word with $FFFF instead, which a connected pad and an empty
+     * port both avoid (both auto-read $0000), so it answered 1 for an
+     * empty port. What an empty port returns past bit 16 is modelled as 0
+     * by luna, ares and Mesen2 and not yet measured on a console.
      *
-     * Caveat kept honest: no source in the corpus pins the empty-port value,
-     * so this detects "no valid device answering" rather than proving a
-     * cable. A non-joypad device (the mouse signs 0001) answers with its own
-     * signature and is not a pad. */
-    /* Pads 2-4 come only from ScanMPlay5, which nothing in the SDK can arm
-     * (see the multitap entry in KNOWN_LIMITATIONS.md), so their slots hold
-     * 0 forever — no reading at all, rather than a reading of "idle". Saying
-     * FALSE is the truthful answer until the multitap path is reachable. */
+     * Pads 2-4 come only from ScanMPlay5, which nothing in the SDK can arm
+     * (see the multitap entry in KNOWN_LIMITATIONS.md): no reading at all,
+     * so FALSE. */
     if (pad >= 2) return 0;
-    return (pad_keys[pad] != 0xFFFF) ? 1 : 0;
+    return pad_present[pad];
 }
 
 /*============================================================================

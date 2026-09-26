@@ -310,6 +310,12 @@ u16 r_scope_names;  /* scopeButtonsHeld reads scope_down, scopeButtonsRepeat sco
 u16 r_scope;        /* no scope: held|down|pressed|x|y|rawx|rawy -> 0 */
 u16 r_scope_delay;  /* scopeSetRepeatDelay(7): scope_repdelay    -> 7 */
 u16 r_obj_grav;     /* objInitGravity(0x40,0); objCollidMap in the air: yvel -> 0x40 */
+u16 r_obj_air;      /* ... and tilestand in the sky (map row 2)              -> 0 */
+u16 r_obj_stand;    /* objCollidMap with the object INSIDE the solid ground (y 216, rows 26-29
+                     * of the map are T_SOLID across the width): tilestand -> 0xFF00.
+                     * The map lives in bank $02 (data.asm): this is the read the object
+                     * engine did with DB hardcoded to $00 until 2026-09-23. */
+static u16 obj_ground;
 u16 r_obj_refresh;  /* objRefreshAll: the refresh callback ran   -> 1 */
 u16 r_obj_cobj;     /* objCollidObj, two 8x8 objects 4 px apart  -> 1 */
 u16 r_obj_cobj_h;   /* objCollidObj(handle, handle) on the two objects 40 px APART: the
@@ -356,6 +362,7 @@ static volatile u8 sin_angle = 192;   /* 270 degrees */
  * case that was broken. */
 u16 r_pad_conn;     /* padIsConnected(0) with no input -> 1 (TRUE was 0xFF until 2026-09-22) */
 u16 r_pad_idle;     /* padHeld(0) with no input        -> 0 */
+u16 r_pad_conn1;    /* padIsConnected(1): pad on port 2 -> 1; with --port2 none -> 0 */
 u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> 0 */
 u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 
@@ -637,6 +644,13 @@ static void coverage_lot_b(void) {
     objWorkspace.width = 8; objWorkspace.height = 8; objWorkspace.yvel = 0;
     objCollidMap(obj_peeker & 0xFF);
     r_obj_grav = (u16)objWorkspace.yvel;
+    r_obj_air  = objWorkspace.tilestand;
+    obj_ground = objNew(0, 64, 216);       /* deep in the solid ground band */
+    objGetPointer(obj_ground);
+    objWorkspace.width = 8; objWorkspace.height = 8; objWorkspace.yvel = 0;
+    objCollidMap(obj_ground & 0xFF);
+    r_obj_stand = objWorkspace.tilestand;
+    objKill(obj_ground);                    /* leave the pool as the later vectors expect */
     obj_other = objNew(0, 20, 20);          /* overlaps the first one */
     objGetPointer(obj_other);
     objWorkspace.width = 8; objWorkspace.height = 8;
@@ -892,6 +906,7 @@ static void part_objects_irq(void) {
     /* --- input: the idle-pad connection test (see the comment above) --- */
     r_pad_conn  = padIsConnected(0);
     r_pad_idle  = padHeld(0);
+    r_pad_conn1 = padIsConnected(1);
     r_pad_conn4 = padIsConnected(4);
     r_pad_oob   = padIsConnected(9);
 

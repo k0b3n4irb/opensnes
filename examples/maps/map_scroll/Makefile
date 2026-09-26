@@ -27,5 +27,3 @@ res/mario.pic res/mario.pal: res/mario.png
 res/BG1.m16 res/tiledMario.t16 res/tiledMario.b16: res/tiledMario.tmj res/tilesMario.map
 	@echo "[TMX] $< -> map binaries"
 	@cd res && $(TMX2SNES) tiledMario.tmj tilesMario.map
-
-combined.asm: res/tilesMario.pic res/mario.pic res/BG1.m16

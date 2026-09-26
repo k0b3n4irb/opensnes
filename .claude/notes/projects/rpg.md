@@ -34,6 +34,6 @@ present). Asset and style preferences:
 
 ## Cross-reference
 
-- `memory/feedback_mesen2_redundancy.md` — `projects/rpg/` changes do
+- (the former `feedback_mesen2_redundancy.md`, deleted 2026-09-26 with Mesen2 retired) — `projects/rpg/` changes do
   NOT require Mesen2 validation of the 7 SDK reference examples; only
   the project being modified needs validation.

@@ -12,29 +12,33 @@
 #   * the scroll shadows: BG3's bg_scroll_x advances by exactly 60 over 60
 #     frames (1 px/frame) across two legs, while BG1's stays 0 — the
 #     landscape must not drift with the clouds. bg_scroll_x lives at
-#     00:0061 as 4 u16 entries, so BG1 is 00:0061 and BG3 is 00:0065.
+#     00:0063 as 4 u16 entries, so BG1 is 00:0063 and BG3 is 00:0067.
 #   * the two palettes landed at DIFFERENT CGRAM offsets: clouds at entry 0
 #     (2bpp) and the landscape at entry 16 (4bpp). An off-by-one in either
 #     dmaCopyCGram destination would silently overwrite the other.
 rom = "../../../examples/color/transparency/transparency.sfc"
+# Raw addresses: luna resolves a symbol or BANK:OFFSET, not symbol+N, and
+# these read array elements. They moved by +2 on 2026-09-26 when crt0 gained
+# pad_present; derive them from the .sym (`bg_scroll_x`) when RAM moves again.
+# (symbol+N keys asked of luna, partners/luna/OPEN_luna.md)
 
 [[checkpoint]]
 at_frame = 60
 [checkpoint.values]
 cgwsel = { eq = 0x02, width = 1 }
 cgadsub = { eq = 0x21, width = 1 }
-"00:0065" = { eq = 58, width = 2 }        # BG3 h-scroll shadow, 1 px/frame
-"00:0061" = { eq = 0, width = 2 }         # BG1 must not move
+"00:0067" = { eq = 58, width = 2 }        # BG3 h-scroll shadow, 1 px/frame
+"00:0063" = { eq = 0, width = 2 }         # BG1 must not move
 
 [[checkpoint]]
 at_frame = 120
 [checkpoint.values]
 cgwsel = { eq = 0x02, width = 1 }
 cgadsub = { eq = 0x21, width = 1 }
-"00:0065" = { eq = 118, width = 2 }       # +60 in 60 frames
-"00:0061" = { eq = 0, width = 2 }
+"00:0067" = { eq = 118, width = 2 }       # +60 in 60 frames
+"00:0063" = { eq = 0, width = 2 }
 [checkpoint.delta]
-"00:0061" = "unchanged"
+"00:0063" = "unchanged"
 
 [asserts.blocks]
 cloud_pal = { space = "cgram", offset = "0000", hex = "0000a438" }
