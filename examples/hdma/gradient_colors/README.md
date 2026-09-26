@@ -113,3 +113,7 @@ writes every scanline.
 - **Explore related examples**:
   - `effects/transparency` -- Color math blending (another way to modify colors)
   - `mode7/perspective` -- HDMA for per-scanline Mode 7 transforms
+
+## Modules Used
+
+`console`, `dma`, `background`, `sprite`, `hdma`, `input` (`LIB_MODULES` in the Makefile).

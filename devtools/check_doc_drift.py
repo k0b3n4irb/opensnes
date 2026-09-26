@@ -877,6 +877,60 @@ def check_no_retired_tools() -> list[str]:
     return drifts
 
 
+# --------------------------------------------------------------------------
+# Check: every example README names the modules its Makefile links
+# (2026-09-26)
+#
+# `.claude/rules/new_example.md` asks for a "Modules Used" section; the docs
+# audit found 33 READMEs without one and 26 that omitted modules their
+# Makefile declares (gameloop, anim, math…). The check reads LIB_MODULES
+# (`:=`/`?=`/`+=`) and accepts any format in the section — table, list,
+# backticks or not — as long as each declared module name appears in it.
+# --------------------------------------------------------------------------
+
+_MODULES_HEADING_RE = re.compile(r"^(#{2,3}) Modules[^\n]*\n(.*?)(?=^#{1,3} |\Z)", re.M | re.S)
+
+
+def declared_lib_modules(makefile_text: str) -> list[str]:
+    mods: list[str] = []
+    for m in re.finditer(r"^LIB_MODULES\s*[:?+]?=\s*([^#\n]*)", makefile_text, re.M):
+        for tok in m.group(1).split():
+            if tok not in mods:
+                mods.append(tok)
+    return mods
+
+
+def modules_missing_from_readme(readme_text: str, declared: list[str]) -> list[str] | None:
+    """None when the README has no Modules section; else the declared
+    modules the section does not name."""
+    m = _MODULES_HEADING_RE.search(readme_text)
+    if not m:
+        return None
+    words = set(re.findall(r"[a-z0-9_]+", m.group(2)))
+    return [mod for mod in declared if mod not in words]
+
+
+def check_example_modules() -> list[str]:
+    root = repo_path()
+    drifts: list[str] = []
+    for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
+        readme = mk.parent / "README.md"
+        if not readme.is_file():
+            continue
+        declared = declared_lib_modules(mk.read_text(encoding="utf-8"))
+        if not declared:
+            continue
+        rel = readme.relative_to(root).as_posix()
+        missing = modules_missing_from_readme(readme.read_text(encoding="utf-8"), declared)
+        if missing is None:
+            drifts.append(f"{rel}: no 'Modules Used' section (the Makefile links "
+                          f"{', '.join(declared)}) — see .claude/rules/new_example.md")
+        elif missing:
+            drifts.append(f"{rel}: 'Modules Used' omits {', '.join(missing)}, "
+                          f"which the Makefile links")
+    return drifts
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -899,6 +953,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_screenshot_basenames())
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())
+    all_drifts.extend(check_example_modules())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

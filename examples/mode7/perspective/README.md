@@ -112,3 +112,7 @@ channels risks running out of HBlank time (1364 master cycles per scanline).
 - **Explore related examples**:
   - `effects/gradient_colors` -- Another HDMA technique (color gradients)
   - `games/likemario` -- Scrolling backgrounds with sprites (different approach)
+
+## Modules Used
+
+`console`, `dma`, `background`, `sprite`, `input`, `mode7` (`LIB_MODULES` in the Makefile).

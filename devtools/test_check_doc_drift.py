@@ -6,7 +6,8 @@ and the ROADMAP footer-date anchor."""
 import unittest
 
 from check_doc_drift import (COUNT_PATTERNS, ROADMAP_FOOTER_RE,
-                             deprecated_citations_in_text,
+                             declared_lib_modules, deprecated_citations_in_text,
+                             modules_missing_from_readme,
                              extract_example_paths, parse_category_rows,
                              phantom_names_in_code, retired_tool_lines,
                              sdk_phantoms_in_text,
@@ -152,6 +153,20 @@ class TestRetiredTools(unittest.TestCase):
 
     def test_allows_saying_it_is_retired(self):
         self.assertEqual(retired_tool_lines("Mesen2 was retired on 2026-07-05\n"), [])
+
+
+class TestExampleModules(unittest.TestCase):
+    def test_declared_reads_all_assignment_forms(self):
+        mk = "LIB_MODULES := console dma   # c\nLIB_MODULES += sprite\n"
+        self.assertEqual(declared_lib_modules(mk), ["console", "dma", "sprite"])
+
+    def test_any_format_counts(self):
+        readme = "## Modules Used\n\n| Module | Why |\n|---|---|\n| console | init |\n\nconsole, dma\n## Next\n"
+        self.assertEqual(modules_missing_from_readme(readme, ["console", "dma"]), [])
+
+    def test_missing_module_and_missing_section(self):
+        self.assertEqual(modules_missing_from_readme("## Modules\n`console`\n", ["console", "gameloop"]), ["gameloop"])
+        self.assertIsNone(modules_missing_from_readme("## Build\n", ["console"]))
 
 if __name__ == "__main__":
     unittest.main()

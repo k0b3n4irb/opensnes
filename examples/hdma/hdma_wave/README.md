@@ -250,6 +250,10 @@ a simple loop, no asset file needed.
 
 ---
 
+## Modules Used
+
+`console`, `dma`, `sprite`, `input`, `hdma` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

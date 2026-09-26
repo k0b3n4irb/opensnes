@@ -57,6 +57,22 @@ opt-in list.
    LIMITATION" header contradicting its own per-function stack maps —
    prose the ABI lint (which only reads `lda N,s` annotations) can't see.
 
+9. **Example READMEs name the modules their Makefile links** (since
+   2026-09-26): each `examples/*/*/README.md` has a "Modules" section in
+   which every `LIB_MODULES` name of the Makefile appears (any format).
+   Caught as 33 READMEs without the section and 5 omitting `gameloop`,
+   `math` or `fixed32`.
+
+10. **Docs cite only functions that exist, and deprecated ones as
+    deprecated** (since 2026-09-26): an SDK-shaped call no header declares,
+    or an `OPENSNES_DEPRECATED` name cited without saying so on that line or
+    the one before, fails. Caught as `colorMathSetMaskMain/Sub`,
+    `objRegisterTypes`, `spcLoad/spcPlay`, `mosaicEnable` in API_INDEX.
+
+11. **No retired tool in `.claude/agents`, `skills`, `hooks`** (since
+    2026-09-26): Mesen2, opensnes-emu, `tests/*.sh` — caught as the
+    snes-engine-reviewer agent committed with all three.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the

@@ -123,3 +123,7 @@ automatically.
 - **Explore related examples**:
   - `memory/save_game` -- SRAM persistence (works in both LoROM and HiROM)
   - `games/likemario` -- A larger project that benefits from understanding memory layout
+
+## Modules Used
+
+`console`, `dma`, `input`, `sprite`, `background` (`LIB_MODULES` in the Makefile).

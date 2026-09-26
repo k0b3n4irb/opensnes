@@ -341,6 +341,10 @@ This tells `make/common.mk` to run `gfx4snes` on each PNG, producing `.pic` (til
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `input` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

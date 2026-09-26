@@ -148,3 +148,7 @@ make -C examples/input/mouse
 
 Then open `mouse.sfc` in your emulator (Mesen2 recommended). Enable SNES Mouse
 emulation in your emulator's input configuration and assign it to port 1.
+
+## Modules Used
+
+`console`, `input`, `sprite`, `dma`, `text`, `background` (`LIB_MODULES` in the Makefile).

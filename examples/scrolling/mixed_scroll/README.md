@@ -140,3 +140,7 @@ make -C examples/scrolling/mixed_scroll
 
 Then open `mixed_scroll.sfc` in your emulator (Mesen2 recommended). You should
 see a logo image with a colorful pattern scrolling diagonally behind/over it.
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `background` (`LIB_MODULES` in the Makefile).

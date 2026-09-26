@@ -104,3 +104,7 @@ make -C examples/maps/dynamic_map
 ```
 
 Then open `dynamic_map.sfc` in your emulator (Mesen2 recommended).
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `text`, `text4bpp`, `input` (`LIB_MODULES` in the Makefile).
