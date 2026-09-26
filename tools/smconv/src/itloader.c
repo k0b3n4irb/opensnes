@@ -326,12 +326,22 @@ itl_module_t *itl_module_create(const char *filename)
 
     io_file_t f;
     io_init(&f);
-    io_open(&f, filename, IO_MODE_READ);
+    if (!io_open(&f, filename, IO_MODE_READ)) {
+        printf("%s: " ERRORRED("error") ": cannot open '%s'\n", ERRORBRIGHT("smconv"), filename);
+        m->invalid = 1;
+        return m;
+    }
 
-    if (io_read8(&f) != 'I') { io_close(&f); return m; }
-    if (io_read8(&f) != 'M') { io_close(&f); return m; }
-    if (io_read8(&f) != 'P') { io_close(&f); return m; }
-    if (io_read8(&f) != 'M') { io_close(&f); return m; }
+    /* An Impulse Tracker module starts with "IMPM". Anything else used to
+     * give an empty module and a successful run — a PNG passed by mistake
+     * built a silent soundbank (2026-09-26 build audit). */
+    if (io_read8(&f) != 'I' || io_read8(&f) != 'M' || io_read8(&f) != 'P' || io_read8(&f) != 'M') {
+        printf("%s: " ERRORRED("error") ": '%s' is not an Impulse Tracker module "
+               "(no IMPM signature)\n", ERRORBRIGHT("smconv"), filename);
+        m->invalid = 1;
+        io_close(&f);
+        return m;
+    }
 
     for (int i = 0; i < 26; i++)
         m->title[i] = io_read8(&f);
@@ -383,6 +393,7 @@ itl_module_t *itl_module_create(const char *filename)
                ERRORBRIGHT("smconv"), filename, (unsigned)m->instrument_count,
                (unsigned)m->sample_count, (unsigned)m->pattern_count);
         m->instrument_count = m->sample_count = m->pattern_count = 0;
+        m->invalid = 1;
         io_close(&f);
         return m;
     }

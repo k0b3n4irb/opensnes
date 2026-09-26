@@ -119,6 +119,9 @@ void itl_sample_destroy(itl_sample_t *s);
 /*--- Module ---*/
 typedef struct {
     char filename[1024];
+    /* set when the file was refused (missing, not IMPM, corrupt counts):
+     * the module is empty and main() must fail the run (2026-09-26) */
+    int invalid;
     char title[26];
     u16 pattern_highlight;
     u16 length;

@@ -51,12 +51,12 @@ $(OBJ):
 	@mkdir -p $(OBJ)
 
 # Compiling
-$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
+$(OBJ)/%.o: $(SRC)/%.c $(wildcard $(SRC)/*.h) | $(OBJ)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
 
 # Sources shared by the asset tools (tools/common: lodepng, cmdparser)
-$(OBJ)/common_%.o: $(COMMON)/%.c | $(OBJ)
+$(OBJ)/common_%.o: $(COMMON)/%.c $(wildcard $(COMMON)/*.h) | $(OBJ)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) -I$(SRC) -I$(COMMON) -c $< -o $@
 
