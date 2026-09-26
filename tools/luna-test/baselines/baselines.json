@@ -264,16 +264,16 @@
     "rom_sha256": "d5d0bc20b3dbbc5252db0b0c30f13d73c516e60e2c2b27d16b4f8668206d7a74"
   },
   "games_likemario": {
-    "fbhash": "f3cd33e1b833bf19",
+    "fbhash": "4db82829e113c485",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "5b2173d26c6269e2c4db769077d6a63f8824e7b4d354c69abe4de4d3d0611dab"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "ebb0b1e5a19ecebacd879cfcb4be19124d41c5b3d8e15d057697b4b8f50befdc"
   },
   "games_mapandobjects": {
-    "fbhash": "f5156e9965bb87c0",
+    "fbhash": "7f269da1647d3df8",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "1ba71d42f6e668845a71ceb32763625788ff598cfe42b624a8328ca3b7e2c9cf"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "7eb15edf20566ae95d90e483f6fdeae77c98f944dc8371e2821b5edd8893ddbc"
   },
   "games_mode7_flying": {
     "fbhash": "3cc0063b1aa5ba27",
@@ -378,10 +378,10 @@
     "rom_sha256": "651c3073c4853b5d5cb29c0ac076a6ee31bc0c67198577641740377ece460258"
   },
   "maps_slope_collision": {
-    "fbhash": "ef8623c06d1783d6",
+    "fbhash": "570e14171228cc8e",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "094a0f03c9d48f3904e901ce5018b102ad103609eccc9c41015584e8cc188b56"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "41d6f1bb61f1fc22e8c6f1a00ec5a83c6d9eb732e428691693aa83c77c7b0c2d"
   },
   "maps_tiled": {
     "fbhash": "fa945dbcf13d540b",
@@ -462,16 +462,16 @@
     "rom_sha256": "2d94cd3ac671272343e4ed55aae62e4a5ed0577c6710a749ddda952d6e5ead91"
   },
   "sprites_dynamic_metasprite": {
-    "fbhash": "fd3e944d112a9588",
+    "fbhash": "ca629b19611f9588",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "1e758caa894cb015a781378d5f70118877671848762aec83968a24a78f6cdd7f"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "da654871c263623c86d7c4c7252ef1d3c994525fc8eeb91c41f32a32f2f6e19d"
   },
   "sprites_dynamic_sprite": {
-    "fbhash": "1ea31be6d66d5b25",
+    "fbhash": "d64531ba39ed5b25",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "87a16fef9f5cb165efabfc30ee5394f296499e05d8a8add0ae886f1966f4e0eb"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "6c0b3099536b13a56ba1d6c71c9e4ef1fbb79eacbb2fbad542fa9a18299985a8"
   },
   "sprites_metasprite": {
     "fbhash": [

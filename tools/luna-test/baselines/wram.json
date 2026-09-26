@@ -160,12 +160,12 @@
     "rom_sha256": "3c87b57fad91e56a42adf4876c0a4654d81c91eb7f23b158d7489b7ac1a82b98"
   },
   "games_likemario": {
-    "stream": "e8d243c6b9254b0e3f31ff99b937f8780f5da387f22cf77a8f9b2211bbb6eb9d",
-    "rom_sha256": "47adccfefb7cea2060fc214a6f85e1e0300970a9cdf784c95fb03afcd3ab3987"
+    "stream": "a331bb7c3bd5606bec309fd239d7e0f26f221bb2fe5a4fab6ed61260e5ebd39e",
+    "rom_sha256": "ebb0b1e5a19ecebacd879cfcb4be19124d41c5b3d8e15d057697b4b8f50befdc"
   },
   "games_mapandobjects": {
-    "stream": "5a5bd1bef8788020443bc621e6ddd2d85a924c57745b3b2ec611e16d94e39d76",
-    "rom_sha256": "4326eb24deffec17a72e1658057acaaabcfa436b505b1294ab9239bce6893469"
+    "stream": "1916c07e9d5cfe433960ab30e00b02f832d03370d2da0f76bf03b8ed386ae4a8",
+    "rom_sha256": "7eb15edf20566ae95d90e483f6fdeae77c98f944dc8371e2821b5edd8893ddbc"
   },
   "games_mode7_flying": {
     "stream": "0eff7acbdaf5fc583fef602db861b59f46ecbd6e2f55afa4435bfcb40cb60a6e",
@@ -232,8 +232,8 @@
     "rom_sha256": "872a1a48a4d27dea464970d84d52d2877b511212af5ebf48ca50c4275cd3dfcb"
   },
   "maps_slope_collision": {
-    "stream": "c7834be5f4c543705396bb0e0b01ca1edc7ee3bd0c28671a2c522031e4f43b2e",
-    "rom_sha256": "c703135dfd3a5e2df810e28b605f6141a204455bb0c03fd06dc7d39b46776786"
+    "stream": "13a822cec534e4725d0b7aad3e4266a5105ab88d93968eea6b44e22f8d8e5d06",
+    "rom_sha256": "41d6f1bb61f1fc22e8c6f1a00ec5a83c6d9eb732e428691693aa83c77c7b0c2d"
   },
   "maps_tiled": {
     "stream": "0f1679943bf5fc03f26fd34fb3ff270adfa094449ac9c6a0048a3f36d26e2c79",
@@ -284,12 +284,12 @@
     "rom_sha256": "c392e1b24f7b472888c19d2ae17d4a00d3b98737cfca733e3b89b2b8480a0165"
   },
   "sprites_dynamic_metasprite": {
-    "stream": "82fadcef22a63eb18fa23d039af0c809d141b078470a71fd970a607310990be2",
-    "rom_sha256": "02ae74176f4fc7962ce690c68a87c58024eea16589e9bdb1cf4fa53b5312475a"
+    "stream": "a94fbd74db922f352f692c247bd947065507f2300b457b536fdc525f0cc094c6",
+    "rom_sha256": "da654871c263623c86d7c4c7252ef1d3c994525fc8eeb91c41f32a32f2f6e19d"
   },
   "sprites_dynamic_sprite": {
-    "stream": "aff7520ee87c4b468119dbf928f68583a2c448989179c3c0d17183f034eb2887",
-    "rom_sha256": "c34ea6b146f13aa8928d0e23d621fca8e66a54532ab08e70fa25697e7f44105b"
+    "stream": "e35e96c3eda3738504970a172f47ad475529e6001a3efba5bc8072dff5721185",
+    "rom_sha256": "6c0b3099536b13a56ba1d6c71c9e4ef1fbb79eacbb2fbad542fa9a18299985a8"
   },
   "sprites_metasprite": {
     "stream": "fe9c8f549fd9329da34e2577b307b411d111bd8642998daf5775f87d0f089d95",

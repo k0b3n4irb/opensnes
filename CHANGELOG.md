@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- fix(lib): **sprites drawn by the dynamic sprite engine sit on the line
+  you asked for.** `oamSet()` and `oamDrawMeta()` store y − 1 (the PPU
+  draws an OAM Y of N from line N+1); the dynamic engine
+  (`oamDynamic*Draw`, `oamDynamicMetaDraw`) stored y itself, so the same
+  y drew one line lower. Five examples move their sprites up one line:
+  dynamic_sprite, dynamic_metasprite, slope_collision, mapandobjects,
+  likemario.
 - fix(luna-test): project tests (`make test`) run on Windows. The harness
   passed `--out /dev/null` to luna, which `luna.exe` cannot open; the
   failure was reported as "all assertions pass" next to a FAIL. It now

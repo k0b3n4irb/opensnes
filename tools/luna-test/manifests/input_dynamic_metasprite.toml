@@ -64,12 +64,14 @@ inidisp = 0x0F
 
 [asserts.oam.sprites.0]        # hero32 piece 0, LARGE in 16/32, name table 0
 x = 64
+y = 139                        # drawn at y = 140: OAM holds y - 1, like oamSet (fixed 2026-09-26)
 tile = 0
 w = 32
 h = 32
 
 [asserts.oam.sprites.4]        # hero16 piece 0, SMALL, name table 1 (tile 256+)
 x = 192
+y = 139
 tile = 256
 w = 16
 h = 16
