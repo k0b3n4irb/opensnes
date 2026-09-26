@@ -139,6 +139,8 @@ note's "honest ceiling" — hand-written asm payload such as tetris's
 `data.asm` strings or snesmod's driver — is what remains in bank $00 by
 choice.
 
+**(Superseded 2026-09-23 — see the table at the top: the examples moved to
+`ASSET_SECTION` and the threshold went to 1024. Kept as history.)**
 **Measured again 2026-09-22: the minimum is back to 12 bytes**
 (`continuous_scroll`, `likemario`; then a plateau of 28 across six more).
 Code growth since the flip ate the headroom it bought, so the margin above

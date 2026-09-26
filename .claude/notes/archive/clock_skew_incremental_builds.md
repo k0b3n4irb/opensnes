@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: closed (cause identified). Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Clock skew on this machine defeats mtime-based guards
 
 Incident 2026-07-18, during the apuReset chantier. `make` prints

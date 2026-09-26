@@ -121,6 +121,8 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `porting.md` — PVSnesLib→OpenSNES porting guide, API mapping, argument order
 - `nmi_audit.md` — NMI handler rules, must consult before crt0.asm changes
 - `regression_method.md` — Mandatory bisection-based debugging, never guess
+- `debugging.md` — root cause, never the symptom: identify the layer (compiler, library, templates, build) before any fix; never work around in an example.
+- `memory_routing.md` — project knowledge goes to `.claude/notes/` in the repo, not to the per-user memory directory.
 - `release.md` — Release workflow, CHANGELOG format, version tagging
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
 - `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.

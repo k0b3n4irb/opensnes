@@ -58,7 +58,7 @@ throughout this chantier.
      - Data-section pointer width change (A6.4) shifting struct
        layouts that ASM lib code accesses.
    - Document the mechanism in
-     `.claude/notes/chantiers/a6_a7_unified_audit.md` under a new
+     `.claude/notes/archive/a6_a7_unified_audit.md` under a new
      `## 2026-05-XX Mesen2 diagnostic` section BEFORE applying any
      fix.
 
@@ -122,7 +122,7 @@ context drift via `git apply`'s 3-way merge.
 
 ## Cross-references
 
-- `.claude/notes/chantiers/a6_a7_unified_audit.md` — full chantier
+- `.claude/notes/archive/a6_a7_unified_audit.md` — full chantier
   history (5 sessions, 3 audit-implement cycles, ~700+ lines of
   diagnostic notes).
 - `.claude/notes/chantiers/a7_phase0_handoff.md` — Phase 0 repro source.

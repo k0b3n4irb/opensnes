@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: chantiers A6 + A7, v0.19.0 (2026-05-15). Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 ---
 name: A6+A7 unified chantier — audit phase findings
 description: Comprehensive audit of every site touching pointer ABI (8B IR) and u32 arithmetic (Kw class with ILOADL/ISTOREL mismatch) in cproc + QBE w65816. Maps the structural fix that closes both A6 and A7. Audit date 2026-05-10.

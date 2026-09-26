@@ -66,7 +66,7 @@ TEMPLATES := $(OPENSNES)/templates
 # Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
 # 8 sits below the current example minimum on the A6+A7 chantier branch
 # (12 bytes free in likemario / tetris / mapandobjects post-A6 — see
-# .claude/notes/chantiers/a6_a7_unified_audit.md). Pre-chantier it was 16
+# .claude/notes/archive/a6_a7_unified_audit.md). Pre-chantier it was 16
 # (28-byte minimum in mapscroll.sfc as of v0.16.0); A6's 4-byte pointer push
 # at every call site shaved ~12-16 bytes off tight examples. Bumping back to
 # 16 is a follow-up once lib code-size optimisations or section-routing land.
