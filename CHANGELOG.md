@@ -2,6 +2,26 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- fix(luna-test): project tests (`make test`) run on Windows. The harness
+  passed `--out /dev/null` to luna, which `luna.exe` cannot open; the
+  failure was reported as "all assertions pass" next to a FAIL. It now
+  uses the platform's null device and reports luna's own error.
+- fix(build): a zip built from `develop` is named after the tree's
+  version (`snes.h`), not after v0.17.0 (the last tag `git describe`
+  reaches from develop).
+
+### Changed
+- feat(compiler): **the emitter checks the class of bug that produced four
+  silent miscompiles in three months** — a 32-bit value whose high word no
+  instruction wrote. Every high-word read now requires a prior write, or
+  compilation stops with an internal compiler error naming the value and
+  the function (`QBE_KL_CHECK_WARN=1` lists every hit instead). A copy of
+  a 32-bit value now moves both words. 0 hits over the library, every
+  example and the compiler fixtures; ROMs byte-identical.
+
 ## [0.45.0] — 2026-09-26
 
 The state-of-the-project release. Eight audit agents read the SDK aspect by
