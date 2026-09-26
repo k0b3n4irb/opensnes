@@ -463,6 +463,24 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 SNESMOD stop and pause sometimes left a voice sounding (fixed 2026-09-26)
+
+The SNESMOD SPC700 driver (mukunda's, shared with PVSnesLib) silences the
+DSP in `ResetSound` by writing KOFF = $FF and then KOFF = $00 about 60 SPC
+cycles later. The S-DSP polls KON/KOFF only every other sample, every 64
+SPC cycles, so the key-off was sometimes never seen and a voice kept
+playing after `snesmodStop()` or `snesmodPause()`. anomie's S-DSP doc states
+this exact sequence ("KOFF = $ff then KOFF = 0 → *usually* all voices
+remain playing"); snesdev-wiki: "Clearing KOFF too early can cause the voice
+to not key-off". Measured on luna over 161 press frames: 8 stuck voices on
+v1.24.0, 10 on v1.27.0. Found when the luna 1.27.0 pin moved the unlucky
+frames onto a manifest's.
+
+**Fix:** the instruction that followed the second write now sits between
+the two (same bytes, same size; the gap is 65 cycles, over one poll).
+0 stuck voices in 161 × 2 × 2 runs (pause and stop, both luna versions).
+Pinned by `tools/luna-test/manifests/audio_snesmod_music_{pause,stop}.toml`.
+
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
 
 `make/common.mk` defaulted the header's `ROMSIZE` byte to `$08` (256 KB)

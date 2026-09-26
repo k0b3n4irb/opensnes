@@ -19,12 +19,20 @@
 
 .define SM_SPC_SIZE $1592
 
+; OpenSNES patch (2026-09-26): ResetSound (driver offset $006D) cleared KOF
+; about 60 SPC cycles after setting it, under the S-DSP's 64-cycle KON/KOFF
+; poll, so a stop or pause sometimes left a voice sounding (anomie-sdsp:
+; "KOFF = $ff then KOFF = 0 -> *usually* all voices remain playing";
+; snesdev-wiki: "Clearing KOFF too early can cause the voice to not
+; key-off"). The `mov sfx_mask,#0` that followed now sits between the two
+; KOF writes: same bytes, same size, a 65-cycle gap. Measured on luna
+; 1.24.0 and 1.27.0 over 161 pause and 161 stop press frames (commit message).
 SM_SPC:
 	.byte $CD, $00, $E8, $00, $AF, $C8, $F0, $D0, $FB, $8F, $00, $F5, $8F, $00, $F6, $8F, $00, $F7, $8F, $00, $F1, $8F, $FF, $FB, $8F, $FF, $14, $8F, $FF, $15, $3F, $6D
 	.byte $04, $8F, $0C, $F2, $8F, $50, $F3, $8F, $1C, $F2, $8F, $50, $F3, $8F, $5D, $F2, $8F, $02, $F3, $3F, $63, $04, $3F, $CB, $17, $8F, $06, $F1, $2F, $08, $3F, $A3
 	.byte $06, $E8, $00, $3F, $AD, $06, $01, $3F, $9B, $04, $01, $3F, $51, $07, $01, $3F, $87, $07, $01, $3F, $5C, $04, $01, $3F, $BD, $17, $2F, $EA, $FA, $BF, $F6, $FA
 	.byte $1A, $F7, $6F, $8F, $00, $00, $8F, $1A, $01, $8F, $00, $10, $6F, $8F, $5C, $F2, $8F, $FF, $F3, $8F, $6C, $F2, $8F, $20, $F3, $8F, $2D, $F2, $8F, $00, $F3, $8F
-	.byte $2C, $F2, $8F, $00, $F3, $8F, $3C, $F2, $8F, $00, $F3, $8F, $3D, $F2, $8F, $00, $F3, $8F, $5C, $F2, $8F, $00, $F3, $8F, $00, $C1, $6F, $69, $F5, $11, $D0, $01
+	.byte $2C, $F2, $8F, $00, $F3, $8F, $3C, $F2, $8F, $00, $F3, $8F, $3D, $F2, $8F, $00, $F3, $8F, $00, $C1, $8F, $5C, $F2, $8F, $00, $F3, $6F, $69, $F5, $11, $D0, $01
 	.byte $6F, $FA, $F5, $11, $E4, $F4, $00, $64, $F4, $D0, $F6, $28, $7F, $1C, $5D, $1F, $B6, $04, $FA, $11, $F5, $6F, $CE, $04, $3C, $05, $5D, $05, $6F, $05, $80, $05
 	.byte $86, $05, $8F, $05, $9E, $05, $AB, $05, $B5, $05, $C0, $05, $C6, $05, $3F, $A3, $06, $3F, $63, $04, $3F, $0E, $05, $8F, $00, $04, $69, $F5, $11, $F0, $FB, $FA
 	.byte $F5, $11, $78, $00, $F4, $F0, $0E, $EB, $04, $60, $98, $04, $04, $3F, $F8, $04, $3F, $0E, $05, $2F, $E5, $5F, $B2, $04, $E4, $00, $D6, $00, $02, $60, $84, $F6
@@ -193,7 +201,6 @@ SM_SPC:
 	.byte $18, $CC, $8E, $18, $BC, $F0, $37, $C5, $92, $18, $CC, $93, $18, $BC, $F0, $32, $C5, $99, $18, $CC, $9A, $18, $BC, $F0, $2D, $C5, $A3, $18, $CC, $A4, $18, $BC
 	.byte $F0, $28, $C5, $A8, $18, $CC, $A9, $18, $BC, $F0, $23, $C5, $AF, $18, $CC, $B0, $18, $6F, $FC, $5F, $2C, $19, $FC, $5F, $35, $19, $FC, $5F, $3E, $19, $FC, $5F
 	.byte $47, $19, $FC, $5F, $50, $19, $FC, $5F, $59, $19, $FC, $5F, $62, $19, $FC, $5F, $6B, $19
-
 SM_SPC_end:
 
 .ENDS

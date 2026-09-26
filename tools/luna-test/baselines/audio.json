@@ -1,5 +1,5 @@
 {
-  "luna": "v1.24.0",
+  "luna": "v1.27.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
@@ -8,9 +8,9 @@
       "peak": 21204
     },
     "audio/snesmod_music": {
-      "sha256": "e062c5e2592867d77e6d350d0b634a9dca262fc9e539c8d098ab180e6ccbc138",
+      "sha256": "79741c2d8fc73e987e98368547fd81df2e0b4df1540640ee6917329b61fbd81e",
       "samples": 159936,
-      "peak": 20923
+      "peak": 20881
     },
     "audio/pitch_mod": {
       "sha256": "5465f1baf9ee980a8ba2c26bf09cc492c9eb904da9e216d7e3a2662d9e00b455",
