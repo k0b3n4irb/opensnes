@@ -278,6 +278,9 @@ test-nmi-budget:
 test-pal:
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/luna_runner.py --coverage --region pal
+	@# The fixture is not built by `make` (only by `make tests`): the weekly
+	@# pal.yml job never got past this line until 2026-09-26.
+	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py --region pal
 
 # User-project test story (init → build → test-update → test → FAIL path),
