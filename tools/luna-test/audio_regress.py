@@ -74,13 +74,13 @@ def main() -> int:
         got[key] = capture(luna, rom)
     if args.update:
         BASELINE.write_text(json.dumps({"luna": LUNA_VERSION, "frames": FRAMES, "examples": got},
-                                       indent=2) + "\n")
+                                       indent=2) + "\n", encoding="utf-8")
         print(f"wrote {BASELINE.relative_to(REPO_ROOT)} ({len(got)} examples)")
         return 0
     if not BASELINE.is_file():
         print(f"no baseline: run with --update first ({BASELINE.relative_to(REPO_ROOT)})")
         return 1
-    want = json.loads(BASELINE.read_text())["examples"]
+    want = json.loads(BASELINE.read_text(encoding="utf-8"))["examples"]
     fails = 0
     for key, cur in got.items():
         ref = want.get(key)

@@ -132,7 +132,7 @@ def main() -> int:
                          "NEVER commit a baseline captured with this)")
     args = ap.parse_args()
     luna = find_luna()
-    db = json.loads(BASELINE.read_text()) if BASELINE.is_file() else {}
+    db = json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.is_file() else {}
 
     if args.update and not args.force_stale and not corpus_is_fresh():
         print("REFUSED: --update from a stale tree writes wrong baselines "
@@ -201,7 +201,7 @@ def main() -> int:
 
     if args.update:
         BASELINE.parent.mkdir(parents=True, exist_ok=True)
-        BASELINE.write_text(json.dumps(dict(sorted(db.items())), indent=2) + "\n")
+        BASELINE.write_text(json.dumps(dict(sorted(db.items())), indent=2) + "\n", encoding="utf-8")
         print(f"\nwrote {BASELINE.relative_to(HERE.parent.parent)} ({updated} entries)")
     print(f"\nWRAM regression: {count - fails}/{count} ok"
           + (f", {fails} drift/err" if fails else "")

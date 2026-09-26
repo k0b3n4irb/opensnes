@@ -117,7 +117,7 @@ def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
     runs = []
     for toml in sorted(MANIFESTS.glob("*.toml")):
         try:
-            m = tomllib.loads(toml.read_text())
+            m = tomllib.loads(toml.read_text(encoding="utf-8"))
         except tomllib.TOMLDecodeError:
             continue
         target = (toml.parent / m.get("rom", "")).resolve()
@@ -184,7 +184,7 @@ def public_functions() -> dict[str, str]:
     """name -> header, for every function declared in lib/include/snes/*.h."""
     out: dict[str, str] = {}
     for h in sorted(HEADERS.glob("*.h")):
-        s = h.read_text()
+        s = h.read_text(encoding="utf-8")
         s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
         s = re.sub(r"//.*", "", s)
         for m in re.finditer(r"^\s*(?:extern\s+)?[A-Za-z_][\w\s\*]*?\b([a-zA-Z_]\w*)\s*\([^;{]*\)\s*;",
@@ -327,7 +327,7 @@ def main() -> int:
     if args.update:
         # The committed report is the full-coverage capture (firmware present);
         # a check run (CI skips firmware-gated examples) leaves it alone.
-        REPORT.write_text("\n".join(lines) + "\n")
+        REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"ROM coverage: {len(public) - len(never)}/{len(public)} public functions executed "
           f"by {roms} ROMs; {len(never)} never.")
     if stack_margins:
@@ -350,17 +350,17 @@ def main() -> int:
                   f"{', '.join(skipped_fw)}) — the list must be captured with full coverage",
                   file=sys.stderr)
             return 2
-        RATCHET.write_text("\n".join(never) + "\n")
+        RATCHET.write_text("\n".join(never) + "\n", encoding="utf-8")
         fw_only = sorted(n for n, ex in hits.items() if ex and ex <= gated)
-        FIRMWARE_ONLY.write_text("\n".join(fw_only) + "\n")
+        FIRMWARE_ONLY.write_text("\n".join(fw_only) + "\n", encoding="utf-8")
         print(f"wrote {RATCHET.relative_to(REPO_ROOT)} ({len(never)} names), "
               f"{FIRMWARE_ONLY.relative_to(REPO_ROOT)} ({len(fw_only)} names) and "
               f"{REPORT.relative_to(REPO_ROOT)}")
         return 0
-    known = set(RATCHET.read_text().split()) if RATCHET.is_file() else set()
+    known = set(RATCHET.read_text(encoding="utf-8").split()) if RATCHET.is_file() else set()
     new = sorted(set(never) - known)
     if skipped_fw and FIRMWARE_ONLY.is_file():
-        exempt = set(FIRMWARE_ONLY.read_text().split())
+        exempt = set(FIRMWARE_ONLY.read_text(encoding="utf-8").split())
         dropped = [n for n in new if n in exempt]
         new = [n for n in new if n not in exempt]
         print(f"  note: {len(skipped_fw)} firmware-gated example(s) skipped; "

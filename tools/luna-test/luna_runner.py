@@ -50,7 +50,7 @@ HERE = Path(__file__).resolve().parent
 BASELINE_DIR = HERE / "baselines"
 # Single source of truth for the pin: tools/luna-test/luna.version (what
 # install-luna.sh downloads). Read it here too so a version bump touches one file.
-LUNA_VERSION = (HERE / "luna.version").read_text().strip()
+LUNA_VERSION = (HERE / "luna.version").read_text(encoding="utf-8").strip()
 # Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
 # a codegen change that shifts the instruction count of a frame cannot move the
 # capture onto another animation phase (luna issue #222; before v1.18.0 the
@@ -268,7 +268,7 @@ def run(update: bool, only: str | None) -> int:
     manifest = load_manifest()
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     manifest_path = BASELINE_DIR / "baselines.json"
-    db = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
+    db = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
 
     def _png_for(base_dir: Path, label: str, frame: int, first: bool) -> Path:
         return base_dir / (f"{label}.png" if first else f"{label}@{frame}.png")
@@ -349,7 +349,7 @@ def run(update: bool, only: str | None) -> int:
                 print(f"  PASS  {label}" + (f" ({len(ref_points)} points)" if len(ref_points) > 1 else ""))
 
     if update:
-        manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n")
+        manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"\nWrote {manifest_path.relative_to(REPO_ROOT)} ({count} entries).")
     print(f"\n{'UPDATE' if update else 'COMPARE'}: {count - failures}/{count} ok"
           + (f", {failures} failed" if failures else ""))
@@ -431,7 +431,7 @@ def coverage(luna: str) -> int:
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
     if not POWER_ON and not REGION:
-        report.write_text("\n".join(lines) + "\n")
+        report.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"\nCoverage{variant_label()}: "
           f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
     if not POWER_ON and not REGION:

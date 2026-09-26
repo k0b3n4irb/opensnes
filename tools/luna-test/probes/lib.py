@@ -128,7 +128,7 @@ _SIZE_RE = re.compile(r"^([0-9A-Fa-f]{8})\s+_sizeof_(\S+)")
 
 def sym_size(rom: Path, name: str) -> int:
     """`_sizeof_<name>` from the .sym (wlalink emits one per data symbol)."""
-    for line in rom.with_suffix(".sym").read_text().splitlines():
+    for line in rom.with_suffix(".sym").read_text(encoding="utf-8").splitlines():
         m = _SIZE_RE.match(line)
         if m and m.group(2) == name:
             return int(m.group(1), 16)
@@ -183,7 +183,7 @@ def trace_lines(luna: str, rom: Path, steps: int, flag: str,
             cmd += ["--input", input_script]
         cmd.append(str(rom))
         subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        lines = Path(tf.name).read_text().splitlines()
+        lines = Path(tf.name).read_text(encoding="utf-8").splitlines()
     return max(0, len(lines) - 1)  # drop the CSV header row
 
 

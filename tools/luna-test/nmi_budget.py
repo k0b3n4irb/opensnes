@@ -86,7 +86,7 @@ def folded_sym(rom: Path, out_dir: Path) -> Path:
     if not src.is_file():
         sys.exit(f"nmi-budget: {src.relative_to(REPO_ROOT)} missing")
     dst = out_dir / src.name
-    dst.write_text("".join(l for l in src.read_text().splitlines(keepends=True)
+    dst.write_text("".join(l for l in src.read_text(encoding="utf-8").splitlines(keepends=True)
                            if "NmiHandler@" not in l))
     return dst
 

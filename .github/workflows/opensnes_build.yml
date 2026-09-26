@@ -166,6 +166,7 @@ jobs:
         shell: msys2 {0}
         env:
           GH_TOKEN: ${{ github.token }}
+          PYTHONUTF8: '1'   # the reports carry non-ASCII; cp1252 crashed the first run
         run: |
           scripts/install-luna.sh
           python3 tools/luna-test/luna_runner.py --coverage
@@ -181,6 +182,8 @@ jobs:
       - name: Smoke-test the release zip (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
+        env:
+          PYTHONUTF8: '1'
         run: make release-smoke
 
       # Cooper source-level debug path: a normal build must stay debug-free
