@@ -19,6 +19,12 @@ All notable changes to OpenSNES are documented in this file.
   at boot, pixel-identical to the old `hdma_wave_table` at both capture
   points, then A hands the ripple to the `hdma` module's `hdmaWaveH` with
   LEFT/RIGHT for the amplitude. The corpus goes from 85 to 84 examples.
+- fix(compiler): four upstream cproc fixes and one QBE fix are absorbed
+  without a resync: character constants with a hex or octal escape above
+  0x7F (`'\xFF'`), overflow while parsing escapes, overflow in array
+  growth, and QBE's exponential time in `usewidthle()`. Every ROM of the
+  corpus is byte-identical; the forks' own suites pass with no new
+  known-fail.
 - feat(compiler): **the emitter checks the class of bug that produced four
   silent miscompiles in three months** — a 32-bit value whose high word no
   instruction wrote. Every high-word read now requires a prior write, or

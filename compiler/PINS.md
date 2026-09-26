@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | ceead633b95a26ea0a12971a683c5f63227d264c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 771bdf010d8ac854792b1e369c32c4e84d74a653 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 77998b50d09a766228f806bdd54e488d64b8e46f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
 <!-- END PINS -->
 
@@ -44,9 +44,14 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 26 patches since upstream merge-base 7051114
+### compiler/cproc — 31 patches since upstream merge-base 7051114
 
 ```
+771bdf0 expr: typechar.u.basic, not u.arith, in the fork's type layout (adapts 23c57a7)
+c7e96cc util: Check for overflow in array grow (upstream a964406, merged with 0efca54's empty-array rule)
+b9ff678 test: Add some tests for VM declarations and character constant escapes (upstream 057381e)
+19b6342 expr: Prevent overflow during escape parsing in char/string literals (upstream 3ea7d07)
+f285832 Fix ordinary character constants with hex/octal escapes larger than 0x7F (upstream 23c57a7)
 d1f8745 qbe: bit-field extraction pads to the IR class width; long compares use the l class (c_features ROM, review C2)
 0766f7d pp: no NULL + 0 when a macro call collected no argument tokens (UBSan on clang 18, upstream suite H1)
 7edea70 util: arrayforeach forms no end pointer over an empty array (UBSan on clang 18, sanitizer job H3)
@@ -78,7 +83,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 83 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 84 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -90,6 +95,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)
 ceead63 w65816: every Kl read of a high word checks that a producer wrote it (Kl high-half invariant); Ocopy Kl moves both words
 c3c205d w65816: the address of a local carries its bank (lib fixture: collideRect(&a, &b) read a wild bank)
 1422c17 w65816: print unsigned temp ids with %u in the emitter's debug comments (cppcheck, review H4)
