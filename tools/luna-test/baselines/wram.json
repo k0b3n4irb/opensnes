@@ -4,8 +4,8 @@
     "rom_sha256": "6bd6858b64ffbb920a2d39dafd237f3ff487245984107d0d9852ac15b1170f31"
   },
   "audio_echo": {
-    "stream": "41b716c2f03bdab412a2b111547150b02f3a38e815c4064624194168210cf6f8",
-    "rom_sha256": "7cc16e5c01eb0d0bab622f71293eaf65732b3a93d9bb9e08fd83bb8252dc79e3"
+    "stream": "340596c6e83f149c1ca27ddaf6231c173bb2f2580587ff16ce296481a0562b84",
+    "rom_sha256": "7594d6b0f60b4515bdc7836d14a92e44a2c53404d58c15a32d5124f65c3c83a7"
   },
   "audio_pitch_mod": {
     "stream": "46a8c74dc94d89c9e052494d2aefd37a6f98f5f7bc781be5709ab806f1181cf7",
@@ -16,8 +16,8 @@
     "rom_sha256": "126a3c7478993f1f7bdc8154a2cbbeb0c7c8a72bb2426ba3c0b89d090e302fe6"
   },
   "audio_sfx_from_wav": {
-    "stream": "d1402aa2af4e6fd01d8b5f9ec2077568c9e80535e52c422c45094822b0c9e8a8",
-    "rom_sha256": "28188d7e8fe55f3a78f7b106daef05a78cb9df2e050183dd2b70712ffeeaf186"
+    "stream": "80e5cc001248de05120a13c5f92f98db79ba4fe49db037234ca38a038ca533cd",
+    "rom_sha256": "429b2c8ef8857d4a27778729367336740846c2515703aab253d1d97884b3166c"
   },
   "audio_snesmod_music": {
     "stream": "68046d88b9e95228646c4e3f3207c3b199907951c10c92d460850b1ad69cafad",
@@ -32,8 +32,8 @@
     "rom_sha256": "2da672347302c26dd89a1b3d1842ab7fca415d29fb974ca9c21ca6ad04839fa7"
   },
   "audio_soundboard": {
-    "stream": "f4365c056eeb6c3922dde8012569a82e42b956960a049d29bc938cb9b6e98509",
-    "rom_sha256": "c303a018737727cde647aa81915a00254dd2830f265b88ce11b75a330a34d947"
+    "stream": "5f96e8ade3a9057100e4492f061e17499001680fc4e09db5caa7aa46a9cc5a30",
+    "rom_sha256": "5792a2a6fecb2c1af6aec11ba94cd75a36d18a441add004fc6fb93f58c377aae"
   },
   "audio_speech_synth": {
     "stream": "9942241698ed970b738fad991d383fc7a4d5ef0236d971560bcbfcc689dc11c1",
@@ -104,8 +104,8 @@
     "rom_sha256": "ccd198cf9aa65275c8719b264fa4ac25342340769150f42631a8c85c75b5312b"
   },
   "chips_dsp1_cube": {
-    "stream": "394ec4fd3934aacdf6f042b4405bff5bcbbb807af01cb610ee01a27c025a6313",
-    "rom_sha256": "f414c70499792ed102fb17aac764c7836d00131622fbf14ebc3b4a6a7799dcda"
+    "stream": "0c9f9cb9495307543072445badc3ca106699d726f4f6c07c4940ac29ed0a07b9",
+    "rom_sha256": "637dc9b4745d119fa4ede6a918c8b501492cd9a4a26ef03428fb177289fff0d8"
   },
   "chips_sa1_hello": {
     "stream": "ac7353864d4e27e788b12fd2017872bb100c9380d1922d2da5527029eece92db",
@@ -156,8 +156,8 @@
     "rom_sha256": "fe3f6f9ff3cf44b5c1ea4eef711edc14bffd7c5339c2165585d174d00239a770"
   },
   "games_breakout": {
-    "stream": "71d934d078841ec6352a21a7abf3625b07e0e3d6aaeb7090c3a2dcedd212113f",
-    "rom_sha256": "86d5df12587a933438efa5d8aa0244b23d4e5763def0d0c34448a161d8d84484"
+    "stream": "7ab96220ea573841b8d753bb54ddb02978a06afd5ac0584870af49fd57d1737a",
+    "rom_sha256": "3c87b57fad91e56a42adf4876c0a4654d81c91eb7f23b158d7489b7ac1a82b98"
   },
   "games_likemario": {
     "stream": "0b82ba011d16a322857cddc7bfdd63f8e65c3cb3daedfcfeb27c3138a765ed21",
@@ -176,16 +176,16 @@
     "rom_sha256": "541a6f069adc017974c86df50eb432f7fb8f1380415071e4d1a07d394bd60254"
   },
   "games_rpg": {
-    "stream": "eb9e2c7b7150fb20a25fe72d217389ace62f675a1d4626074940e3f751641c8b",
-    "rom_sha256": "3b2c387fcb0eb43a6200fff9dcd4e5c5f42b2d4709154180849af60520169ee5"
+    "stream": "f715c6c5ba340dfa8ba854100b898042fff3b74b8eb23eb5687ebb66e222c955",
+    "rom_sha256": "b5d456322fb118843d65b1af4ff3a77e383a425e8fe461fece984b60e73bad2e"
   },
   "games_shmup_1942": {
-    "stream": "80cb20e669085214d05d38b5d57201cd62c3eb699a91c9ade09656acc78d9aac",
-    "rom_sha256": "1b6e8b4ae040dd9a78ebacb51afc79f9792d6da2066b024a77b87b75efaff4b0"
+    "stream": "7ab186c5e58a804bffdb147e2e4ceae1797ebb9ffdf430bd1c100d9e1abac208",
+    "rom_sha256": "69d8a5ce844d4c53ed9142f39d52a36c3bc1f9482149117743c067afd7d0dfac"
   },
   "games_tetris": {
-    "stream": "b07b35534827521c4662f30de7ecb1fab4c44b9f2142f58c94e6a387552b9b4d",
-    "rom_sha256": "8f08656644f82a1e018f771a2f3d7bb9d74c6383cadc305d10cf99d1900a5f41"
+    "stream": "cb9f5b39ec99ec45170ec890e4a22289289e265e2b512a6f64163349c8ee659c",
+    "rom_sha256": "e70b030204c23a76bc8ad0d1839bc2bc61a2a0148f0c7f2d71cca325f77562eb"
   },
   "hdma_gradient_colors": {
     "stream": "742c5a72d7980fb3184adbf4d1d3c0fa648b00d972b67c0874a0b1da7127684a",

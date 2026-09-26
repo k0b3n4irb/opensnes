@@ -31,6 +31,7 @@ volatile u16 in_one = 1;
 volatile u16 in_seven = 7;
 volatile u16 in_100 = 100;
 volatile u16 in_1000 = 1000;
+volatile u16 in_60000 = 60000;  /* a u16 whose x*10 overflows 16 bits */
 volatile u16 in_30000 = 30000;
 volatile u16 in_30000b = 30000;
 volatile s16 in_neg7 = -7;
@@ -168,6 +169,11 @@ static u16 is_odd(u16 n)  { return n == 0 ? 0 : is_even(n - 1); }
 
 /* ---- 32-bit arithmetic with runtime operands ------------------------------ */
 u32 r_mul32;        /* 0x12345 * 0x100          -> 0x01234500 */
+u32 r_mulk_u8;      /* (u32)(u8)7 * 10: inlined since 2026-09-26 */
+u32 r_mulk_u8x24;   /* (u32)(u8)7 * 24: composite 3 * 8 */
+u32 r_mulk_u16;     /* (u32)60000 * 10 = 600000: must NOT be inlined */
+u16 r_mulk_2d;      /* big[row][col] with a byte row: the tetris case */
+u8 big2d[24][10];
 u32 r_mul32_wrap;   /* 0xFFFFFFFF * 2           -> 0xFFFFFFFE */
 u32 r_div32;        /* 0xFFFFFFFF / 0x10000     -> 0x0000FFFF */
 u32 r_mod32;        /* 0x12345 % 0x10000        -> 0x00002345 */
@@ -345,6 +351,11 @@ nested_out:
     r_postinc = (u16)((i << 8) | a);
     r_str = (u8)msg[in_one + 1];
     r_2d = grid[in_one + 1][3];
+    r_mulk_u8 = (u32)(u8)in_seven * 10;
+    r_mulk_u8x24 = (u32)(u8)in_seven * 24;
+    r_mulk_u16 = (u32)in_60000 * 10;
+    big2d[(u8)(in_seven + 16)][(u8)(in_seven + 2)] = 0x5A;
+    r_mulk_2d = big2d[(u8)(in_seven + 16)][(u8)(in_seven + 2)];
     recs[0].id = 1; recs[0].v = 100; recs[1].id = 2; recs[1].v = 200;
     rp = &recs[in_one];
     r_struct_arr = rp->v;

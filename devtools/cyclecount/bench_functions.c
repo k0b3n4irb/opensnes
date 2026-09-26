@@ -201,3 +201,11 @@ unsigned short mul_const_40(unsigned short a) {
 unsigned short mul_const_96(unsigned short a) {
     return a * 96;
 }
+
+/* --- 34. 2D array read with a byte row: `grid[row][col]` (added 2026-09-26).
+ * The index is widened to 32 bits and scaled by the row size (10); that
+ * multiply called tcc_mul32 until the Kl constant-multiply inlining. --- */
+unsigned char grid2d[24][10];
+unsigned char array2d_read(unsigned char row, unsigned char col) {
+    return grid2d[row][col];
+}

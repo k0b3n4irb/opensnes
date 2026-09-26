@@ -51,6 +51,12 @@ CASES = [
     ("r_mutual", 2, 1),
     # 32-bit with runtime operands
     ("r_mul32",      4, 0x01234500),
+    # Kl multiply by a constant (2026-09-26): inlined when the product fits
+    # 16 bits, still the real 32-bit multiply when it may not
+    ("r_mulk_u8",    4, 70),
+    ("r_mulk_u8x24", 4, 168),
+    ("r_mulk_u16",   4, 600000),
+    ("r_mulk_2d",    2, 0x5A),
     ("r_mul32_wrap", 4, 0xFFFFFFFE),
     ("r_div32",      4, 0x0000FFFF),
     ("r_mod32",      4, 0x00002345),

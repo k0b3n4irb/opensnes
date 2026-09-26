@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | d1f8745e55185f099c32047bc858efb85b220a96 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | c3c205d6889e32f561ad62772b94fe2744d5dfb2 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 9a1701046d21828ac97f87253b9392ab8f85c71e | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
 <!-- END PINS -->
 
@@ -73,7 +73,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 63 patches (the bulk of the SDK's compiler magic)
+### compiler/qbe — 64 patches (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
