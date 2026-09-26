@@ -8,15 +8,17 @@ Common issues and their solutions.
 
 **Cause**: The Makefile can't find the OpenSNES installation.
 
-**Fix**: Set `OPENSNES` in your Makefile or set the environment variable:
+**Fix**: Set `OPENSNES` in your Makefile, or pass it on the command line:
 
 ```bash
-# Option 1: Set in Makefile (recommended for project portability)
+# Option 1: in the Makefile (recommended for project portability)
 OPENSNES := /path/to/opensnes
 
-# Option 2: Set environment variable
-export OPENSNES_HOME=/path/to/opensnes
+# Option 2: on the command line (make reads variables, not OPENSNES_HOME)
+make OPENSNES=/path/to/opensnes
 ```
+
+`OPENSNES_HOME` is read by the `opensnes` CLI only, not by `make`.
 
 ### Empty `compiler/` directories or "cc65816 not found"
 
@@ -58,26 +60,17 @@ sudo dnf install clang
 pacman -S mingw-w64-ucrt-x86_64-clang
 ```
 
-### Build fails with "unhandled op: XXX"
+### Build fails with "refusing to emit silently-wrong code"
 
-**Cause**: The QBE backend doesn't support a specific operation (usually 32-bit or complex expressions).
+**Cause**: The code uses a C feature the 65816 backend does not lower. The
+message names it: struct assignment, a struct passed or returned by value,
+a variadic function, or inline assembly (`asm`).
 
-**Fix**: Simplify your code:
-```c
-// BAD: 32-bit operations are slow and may not work
-u32 bigValue = x * 1000;
-
-// GOOD: Use 16-bit when possible
-u16 value = x * 10;
-
-// BAD: Complex expressions in one line
-result = (a * b + c) / d;
-
-// GOOD: Break it down
-u16 temp = a * b;
-temp += c;
-result = temp / d;
-```
+**Fix**: pass a pointer to the struct, copy it field by field (or with a
+loop), give the function a fixed argument list, or move the assembly into a
+`.asm` file of the project. 32-bit arithmetic (`u32`, `s32`, `*`, `/`, `%`,
+shifts) is supported and tested — prefer `u16` for speed, not for
+correctness.
 
 ### Static variables with initializers
 

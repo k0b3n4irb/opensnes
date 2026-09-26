@@ -1,7 +1,7 @@
 # Example Source Code {#example_sources}
 
 @defgroup examples Examples
-@brief All 41 OpenSNES example programs with annotated source code.
+@brief Every OpenSNES example program, with annotated source code.
 
 Each example demonstrates specific SNES hardware concepts. The source files
 include `@par SNES Concepts` (what hardware features are used),

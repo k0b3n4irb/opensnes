@@ -145,14 +145,23 @@ adc.w #F / tas / txa` (save A in X, fix SP, restore A) — never `tsa` then
 
 Convention depends on call shape:
 
-**Compiler-generated `jsl` to a C function returning `long`** (post-A1-followup
-2026-05-16): callee returns the low 16 bits in `A`. The high 16 bits are
-currently **not** explicitly conveyed across the call — the destination
-Kl temp's high half is left at whatever the caller's emit_store_high
-produces, which for a fresh temp slot is the slot's prior contents. In
-practice the SDK does not yet ship any C function whose `long` return is
-consumed as a full 32-bit value; this is a latent issue tracked in
-`KNOWN_LIMITATIONS.md`.
+**A function returning a 32-bit value** (`u32`, `s32`, `long`, `fixed32`,
+since qbe `3e79c8c`, 2026-05-21): the callee returns the **low 16 bits in
+`A`** and the **high 16 bits in the direct-page global `tcc__retval_hi`**
+(`templates/crt0.asm`), written just before the return:
+
+```asm
+    lda.w result_hi
+    sta.b tcc__retval_hi    ; high half first — A is reloaded below
+    lda.w result_lo         ; low half in A
+    rtl
+```
+
+After the `jsl`, the caller stores `A` to the low half of the destination
+and `lda.b tcc__retval_hi` to its high half. Hand-written asm that returns a
+32-bit value must follow this (`lib/source/fixed32.asm`, `fix32Sin`, is the
+reference; `devtools/libtests` asserts its full 32 bits at run time). The
+direct page must be `$0000` at the `sta.b`, as it is for all C code.
 
 **Runtime helpers (`__mul32`, `__[s]divmod32`)**: low 16 returned in `A`,
 high 16 (and remainder halves where applicable) returned in named scratch
@@ -448,6 +457,11 @@ with one DMA to `$2180` (22 ms). See `docs/tutorials/far_ram.md`.
 - **Inline assembly** (`asm volatile (...)`): not supported. Write the
   routine in a separate `.asm` file and call it via the convention
   documented above.
+- **Structs by value**: assigning a struct (`a = b;`), passing a struct as
+  an argument, or returning one. The compiler refuses with an error naming
+  the feature ("refusing to emit silently-wrong code") rather than emit a
+  wrong copy. Pass a pointer, or copy field by field. Pinned by
+  `devtools/compiler-tests/cases/negative/struct_*`.
 
 ---
 

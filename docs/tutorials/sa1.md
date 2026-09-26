@@ -114,10 +114,11 @@ SA1Start:
     sep #$20
     .ACCU 8
 
-    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable on Mesen2/snes9x;
-    ; polarity is disputed vs the wiki — see the gotcha box above.
+    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable: fullsnes, the
+    ; Nintendo manual §4.1.25 and nocash agree (resolved 2026-09-02; the
+    ; sfc-dev-wiki states the inverse — see the box above).
     lda #$FF
-    sta.l $00222A           ; CIWP = $FF (writable per our emulators)
+    sta.l $00222A           ; CIWP = $FF (all I-RAM writable)
 
     ; Signal ready to main CPU
     lda #$A5

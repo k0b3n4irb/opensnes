@@ -12,7 +12,7 @@ and **what is next**.
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code 30 % faster than PVSnesLib + 816-opt on the benchmark suite. 85
+produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 85
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -198,7 +198,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] Published benchmark: 30 % faster than PVSnesLib + 816-opt
+- [x] Published benchmark: about 20 % faster than PVSnesLib + 816-opt overall, slower on pointer-heavy functions (re-measured 2026-09-26)
 - [x] CHANGELOG, CONTRIBUTING (with branching policy), GitHub templates
 
 ### Developer tooling
@@ -228,7 +228,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress, **outside this repository**: the RPG prototype ("Giuseppe", ~3000 lines of C) moved to its own repository on 2026-09-26 and builds against the SDK from there. Not verifiable from a clone of this repo until it is published | Proves the SDK can ship a complete game |
 | Asset provenance cleanup | **Planned, deferred (owner decision 2026-09-26)**: 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa); replace them with original art and credit every remaining one in `ATTRIBUTION.md` | A 1.0 release zip must not redistribute third-party IP under the MIT banner |
-| Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows the 30 % improvement with data |
+| Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows where cc65816 wins and loses, with data |
 | Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
 | FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
 | `examples/maps/dynamic_map` cleanup | **Done (2026-07-12)** | Dead code removed: unused `maputil.c` TU, `getSprite*`/`updateSprite*`/`calculateSprite*` engine paths, `sram*` ASM helpers + 16 KB dead `$7F` RAMSECTION; stale C64-converter claims corrected |

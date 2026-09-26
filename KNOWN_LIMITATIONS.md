@@ -55,7 +55,7 @@ main thread resumes writing garbage to a wrong location.
 **Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
 runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
 the call graph from every NMI callback root (NmiHandler + functions
-registered via `nmiSet`/`nmiSetBank`) and **fails the build** if any
+registered via `nmiSet`) and **fails the build** if any
 reachable function writes to `$2180-$2183`. Lib + crt0 are audited and
 treated as a black box; the lint targets user code in NMI callbacks,
 where the actual risk lives. Bypass for a single build with
@@ -70,7 +70,7 @@ bank $00 keeps the code. This is safe because every way C reaches const
 data carries the bank:
 
 - **Passed to a lib DMA/asset function — any bank.** `dmaCopyVram`,
-  `dmaCopyCGram`, `dmaCopyVramMode7`, `LzssDecodeVram`, `mapLoad`, etc. take a
+  `dmaCopyCGram`, `dmaCopyVramMode7`, `lzssDecodeVram`, `mapLoad`, etc. take a
   4-byte pointer whose high byte is the real bank, and the asm reads it
   (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register).
 - **Dereferenced in C (`tab[i]`, `*p`, `p->field`) — any bank.** A read
@@ -97,8 +97,11 @@ If bank $00 still runs out (code plus hand-written asm payload):
 - Declare `.incbin` / `.db` payload with `ASSET_SECTION` (`templates/assets.inc`)
   instead of a bank-$00 `.SECTION` — it takes the same asset banks the
   compiler uses.
-- For a runtime-computed bank, the explicit `dmaCopyVramBank(src, bank, …)` /
-  `dmaCopyCGramBank(src, bank, …)` variants take the bank as a parameter.
+- Payload handed to the lib needs no bank of its own: every `dmaCopy*`
+  helper reads the bank from the far pointer. For a bank computed at
+  runtime, `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)`
+  takes it as a parameter. (Deprecated since 2026-09-20:
+  `dmaCopyVramBank` / `dmaCopyCGramBank`.)
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
@@ -313,7 +316,7 @@ written in GSU assembly (built via the `wla-superfx` assembler). The C side
 of a SuperFX project orchestrates GSU jobs and reads results — it doesn't
 generate GSU code.
 
-**Mitigation:** documented in `docs/tutorials/sa1.md` and the SuperFX example
+**Mitigation:** documented in `docs/tutorials/superfx.md` and the SuperFX example
 under `examples/chips/superfx_*`. Plan accordingly: heavy compute lives in
 GSU assembly, not in your C main.
 
@@ -432,35 +435,20 @@ targets happened to land in bank 0 via SUPERFREE'd lib code. Any
 pointer to a bank-1+ function would have silently jumped to bank 0.
 That trap is gone.
 
-### 🟡 C function returning `long` does not propagate the high half through the call
+### 🟢 C function returning `long` propagates the high half (fixed 2026-05-21)
 
-A latent issue surfaced (but not fixed) during the A1-followup chantier
-(Session 7, 2026-05-16). For a C function `long f(...)`:
+Surfaced during the A1-followup chantier (2026-05-16): a function returning
+`long` / `u32` / `s32` / `fixed32` carried only its low 16 bits across the
+call. Fixed on 2026-05-21 (qbe `3e79c8c`): the callee returns the low half in
+`A` and the high half in the direct-page global `tcc__retval_hi`, and the
+caller reads both back. `compiler/ABI.md` ("32-bit values") documents the
+convention for hand-written asm. This entry said "not fixed" until
+2026-09-26, four months after the fix.
 
-- Cproc emits `Jretl` which `emitload`s only the low 16 of the return
-  value into `A` before `rtl`.
-- The caller's `emitstore(i->to)` after the `jsl` only writes A to the
-  low half of the destination Kl temp. The high half is left at whatever
-  the slot previously contained.
-
-In practice no shipping SDK code returns a `long` whose high half is
-read by the caller (lib functions return `s16` / `u16` / `fixed`; the
-A1-followup test harness exercises Omul / Odiv via runtime helpers, not
-return values). The five originally-tracked A1-followup bugs all pass
-because they go through the helper path (which uses named scratch slots
-for the high half) or only inspect the low half.
-
-**Mitigation today:** don't write a `long`-returning C function whose
-high half is consumed across the call. If you need a 32-bit return,
-either inline the math at the call site, route it through a runtime
-helper that stores into a named bank-0 slot, or pass a `long *out`
-parameter.
-
-**Proper fix (when this becomes a real problem):** extend `Jretl` to
-also store the high half to a known location (e.g., `tcc__r0+2`) before
-`rtl`, and have the Ocall path read it back. Estimated 1-2 days of
-chantier work; not yet tracked in `STRUCTURAL_DEFECTS.md` because no
-shipping code triggers it.
+**Pinned by:** `devtools/libtests` asserts all 32 bits of `fix32Sin`, an asm
+callee using the convention. No runtime fixture yet calls a *C* function
+returning `u32` and consumes the full value (tracked in the 2026-09-26
+état des lieux).
 
 ### 🟡 Sprite palettes start at CGRAM offset 128, not 0
 Standard SNES quirk that surprises everyone once. The first 128 colours of

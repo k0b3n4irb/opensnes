@@ -126,7 +126,8 @@ anything.
 
 ```c
 objInitEngine();
-objRegisterTypes();
+objInitFunctions(0, marioinit,  marioupdate,  0);   /* the calls shown above */
+objInitFunctions(1, goombainit, goombaupdate, 0);
 objLoadObjects((u8 *)&objmario);
 ```
 

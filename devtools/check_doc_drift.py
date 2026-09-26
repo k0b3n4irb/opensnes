@@ -722,6 +722,161 @@ def check_abi_signatures() -> list[str]:
 # --------------------------------------------------------------------------
 
 
+# --------------------------------------------------------------------------
+# Check: SDK-shaped calls in the docs must exist, and deprecated names must
+# not be taught as current (added 2026-09-26)
+#
+# check_phantom_api() above reads C code blocks of three files only. The
+# 2026-09-26 audit found `colorMathSetMaskMain/Sub` in the colormath
+# tutorial, `objRegisterTypes` in the object tutorial and PVSnesLib's
+# `spcLoad/spcPlay` in the smconv page — all outside that list. This check
+# reads every doc, prose and code alike, but only flags names that *look
+# like SDK API*: a lower-case module prefix that at least two public
+# functions share (`colorMath…`, `obj…`, `oam…`), or a retired PVSnesLib
+# prefix. The user's own functions in snippets (`startGame`, `renderBoard`)
+# are not flagged, nor is a name the same text defines.
+#
+# The second half flags a name the headers mark OPENSNES_DEPRECATED when a
+# doc line cites it without saying so (no "deprecat", "renamed", "alias",
+# "former", "old name", "pre-", "until", "used to"… on that line or the one
+# before it, since prose wraps).
+# --------------------------------------------------------------------------
+
+_SDK_DOC_GLOBS = ["docs/**/*.md", "KNOWN_LIMITATIONS.md", "README.md",
+                  "examples/README.md"]
+# Pages whose job is to name other APIs (PVSnesLib's) — exempt.
+_SDK_DOC_EXEMPT = {"docs/MIGRATING_FROM_PVSNESLIB.md"}
+# Prefixes no current API uses but that a PVSnesLib habit brings back.
+_RETIRED_PREFIXES = {"spc"}
+# Module prefixes too generic to mean "SDK call" (a user writes setFoo too).
+_GENERIC_PREFIXES = {"get", "set", "is", "on", "update", "player", "init"}
+_CALL_RE = re.compile(r"\b([a-z]+)([A-Z]\w*)\s*\(")
+_DEFINED_RE = re.compile(r"\b(?:void|u8|u16|s16|u32|s32|int|static|fixed|bool)\s+\**\s*(\w+)\s*\(")
+_DEPRECATION_WORDS = re.compile(
+    r"deprecat|renamed|alias|former|old name|pre-20|until 20|named .* until|was called|used to|existed|resolved",
+    re.IGNORECASE)
+
+
+def _sdk_doc_paths() -> list[Path]:
+    root = repo_path()
+    seen: dict[str, Path] = {}
+    for pattern in _SDK_DOC_GLOBS:
+        for p in sorted(root.glob(pattern)):
+            rel = p.relative_to(root).as_posix()
+            if "/build/" in rel or rel in _SDK_DOC_EXEMPT or not p.is_file():
+                continue
+            seen[rel] = p
+    return [seen[k] for k in sorted(seen)]
+
+
+def sdk_prefixes(api: set[str]) -> set[str]:
+    """Module prefixes shared by at least two public camelCase functions."""
+    counts: dict[str, int] = {}
+    for name in api:
+        m = re.match(r"^([a-z]+)[A-Z]", name)
+        if m:
+            counts[m.group(1)] = counts.get(m.group(1), 0) + 1
+    return ({p for p, n in counts.items() if n >= 2} - _GENERIC_PREFIXES) | _RETIRED_PREFIXES
+
+
+def sdk_phantoms_in_text(text: str, api: set[str], prefixes: set[str]) -> list[tuple[str, int]]:
+    """Pure core (unit-testable): (name, line) of SDK-shaped calls not in `api`."""
+    defined = set(_DEFINED_RE.findall(text))
+    out: list[tuple[str, int]] = []
+    seen: set[str] = set()
+    for m in _CALL_RE.finditer(text):
+        name = m.group(1) + m.group(2)
+        if m.group(1) not in prefixes or name in api or name in defined or name in seen:
+            continue
+        seen.add(name)
+        out.append((name, text.count("\n", 0, m.start()) + 1))
+    return out
+
+
+def deprecated_api_names() -> set[str]:
+    names: set[str] = set()
+    for hdr in sorted(repo_path("lib/include/snes").glob("*.h")):
+        text = hdr.read_text(encoding="utf-8", errors="replace")
+        for m in re.finditer(r"OPENSNES_DEPRECATED\([^\n]*\)\s*\n[^(\n]*?\b(\w+)\s*\(", text):
+            names.add(m.group(1))
+    return names
+
+
+def deprecated_citations_in_text(text: str, deprecated: set[str]) -> list[tuple[str, int]]:
+    """Pure core: (name, line) where a deprecated name is cited as current."""
+    out: list[tuple[str, int]] = []
+    lines = text.splitlines()
+    for lineno, line in enumerate(lines, 1):
+        # Prose wraps: the word may sit on the line before the name.
+        window = (lines[lineno - 2] + " " if lineno > 1 else "") + line
+        if _DEPRECATION_WORDS.search(window):
+            continue
+        for name in deprecated:
+            if re.search(r"`" + re.escape(name) + r"\b|\b" + re.escape(name) + r"\s*\(", line):
+                out.append((name, lineno))
+    return out
+
+
+def check_sdk_names_in_docs() -> list[str]:
+    api = _public_api_names()
+    prefixes = sdk_prefixes(api)
+    deprecated = deprecated_api_names() - {"rand", "srand"}  # libc names: too common in prose
+    root = repo_path()
+    drifts: list[str] = []
+    for path in _sdk_doc_paths():
+        rel = path.relative_to(root).as_posix()
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for name, lineno in sdk_phantoms_in_text(text, api, prefixes):
+            drifts.append(f"{rel}:{lineno}: `{name}(...)` looks like an SDK call but no "
+                          f"header declares it (renamed? PVSnesLib name?)")
+        for name, lineno in deprecated_citations_in_text(text, deprecated):
+            drifts.append(f"{rel}:{lineno}: `{name}` is deprecated in lib/include/snes "
+                          f"(OPENSNES_DEPRECATED) but cited as current — use the new "
+                          f"name, or say on that line that it is deprecated")
+    return drifts
+
+
+# --------------------------------------------------------------------------
+# Check: no retired tool in the agent / skill / hook definitions (2026-09-26)
+#
+# `.claude/agents/snes-engine-reviewer.md` was committed on 2026-09-23 telling
+# every review to validate in Mesen2 and run `node run-all-tests.mjs` from the
+# opensnes-emu submodule — both retired months earlier (luna is the only
+# backend). Agents, skills and hooks are instructions: a stale one does not
+# rot quietly like a note, it steers the next session wrong.
+# --------------------------------------------------------------------------
+
+_RETIRED_TOOLS_RE = re.compile(
+    r"mesen|opensnes-emu|run-all-tests\.mjs|tests/run_tests\.sh|tests/mesen/",
+    re.IGNORECASE)
+# A line may name a retired tool to say it is retired.
+_RETIRED_CONTEXT_RE = re.compile(
+    r"retired|removed|no longer|replaced|obsolete|fausse|périm|stale|false",
+    re.IGNORECASE)
+
+
+def retired_tool_lines(text: str) -> list[int]:
+    """Pure core: line numbers naming a retired tool as if current."""
+    return [n for n, line in enumerate(text.splitlines(), 1)
+            if _RETIRED_TOOLS_RE.search(line) and not _RETIRED_CONTEXT_RE.search(line)]
+
+
+def check_no_retired_tools() -> list[str]:
+    root = repo_path()
+    drifts: list[str] = []
+    for sub in (".claude/agents", ".claude/skills", ".claude/hooks"):
+        base = repo_path(sub)
+        if not base.is_dir():
+            continue
+        for path in sorted(p for p in base.rglob("*") if p.is_file()):
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for lineno in retired_tool_lines(text):
+                drifts.append(f"{path.relative_to(root).as_posix()}:{lineno}: names a "
+                              f"retired tool (Mesen2 / opensnes-emu / tests/*.sh) — "
+                              f"luna is the only backend (.claude/rules/luna_tooling.md)")
+    return drifts
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -742,6 +897,8 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_roadmap_footer_date(canonical_date))
     all_drifts.extend(check_asm_bank_comments())
     all_drifts.extend(check_screenshot_basenames())
+    all_drifts.extend(check_sdk_names_in_docs())
+    all_drifts.extend(check_no_retired_tools())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)
