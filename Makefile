@@ -468,10 +468,10 @@ test-manifests:
 		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
-# CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
-# (mapandobjects, slope_collision) are skipped by default; add --all on a machine
-# matching the baseline capture arch. Re-baseline after an intentional change
-# with `python3 tools/luna-test/wram_regress.py --update` (same commit).
+# CI-gated on every example, both arches (the old arch-dependent pair was a
+# stale-luna artefact, re-verified 2026-08-09); the stack's pages are left
+# out. Re-baseline after an intentional change with
+# `python3 tools/luna-test/wram_regress.py --update` (same commit).
 test-wram:
 	@python3 tools/luna-test/wram_regress.py
 

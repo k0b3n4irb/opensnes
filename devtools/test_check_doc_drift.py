@@ -185,6 +185,17 @@ class BuildKnobs(unittest.TestCase):
     def test_real_tree_is_clean(self):
         self.assertEqual(check_doc_drift.check_build_knobs(), [])
 
+class SlashCount(unittest.TestCase):
+    def test_makefile_form(self):
+        text = "# CI-gated on 54/56 examples — the two whose"
+        self.assertTrue(any(int(m.group(1)) == 56 for r in COUNT_PATTERNS
+                            for m in r.finditer(text)))
+
+    def test_ratio_prose_is_not_a_count(self):
+        text = "a 3/4 examples ratio"          # single digits: out of range
+        self.assertFalse(any(10 <= int(m.group(1)) <= 999 for r in COUNT_PATTERNS
+                             for m in r.finditer(text)))
+
 
 if __name__ == "__main__":
     unittest.main()

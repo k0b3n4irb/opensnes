@@ -20,7 +20,9 @@ opt-in list.
    v0.16.0 — three minor versions stale.
 
 3. **Examples count claims in active docs** (`ROADMAP.md`, `README.md`,
-   `.claude/rules/*.md`) must match `find examples -name 'main.c' | wc -l`.
+   `.claude/rules/*.md`, and since 2026-09-26 the `Makefile`, the
+   workflows and `tools/luna-test/README.md`) must match
+   `find examples -name 'main.c' | wc -l`.
    Caught historically as the pre-v0.16.0 count (one off the current
    total) sticking around in `testing.md` and `nmi_audit.md` after
    v0.16.0 shipped the new `scene_stack` example. `CHANGELOG.md` is

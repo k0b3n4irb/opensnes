@@ -199,6 +199,7 @@ COUNT_PATTERNS = [
     re.compile(r"\bExamples?\s*\((\d{2,3})\)", re.IGNORECASE),  # "### Examples (56)" heading
     re.compile(r"\((\d{2,3})\s*/\s*\d{2,3}\)"),   # "(56 / 56)" completion claim, numerator
     re.compile(r"\(\d{2,3}\s*/\s*(\d{2,3})\)"),   # ...and its denominator
+    re.compile(r"\b\d{2,3}/(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "54/56 examples" (Makefile comment)
     # Targeted phrasings only (NOT a bare "\d examples") so prose like
     # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
@@ -220,6 +221,15 @@ def _gather_active_doc_paths() -> list[Path]:
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)
+    # Build, CI and harness files (since 2026-09-26, audit tests 11): their
+    # comments quoted "54/56 examples" long after the corpus moved.
+    for rel in ("Makefile", "tools/luna-test/README.md"):
+        p = repo_path(rel)
+        if p.is_file():
+            paths.append(p)
+    workflows = repo_path(".github/workflows")
+    if workflows.is_dir():
+        paths.extend(sorted(workflows.glob("*.yml")))
     return paths
 
 
