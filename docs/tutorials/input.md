@@ -338,7 +338,8 @@ and `SSC_NOISE`:
 
 `scopeSetHoldDelay(frames)` (default 60) and `scopeSetRepeatDelay(frames)`
 (default 20) tune the auto-repeat. `scopeIsConnected()` returns whether
-`scopeInit()` found the gun; it is not re-detected afterwards, so call
+`scopeInit()` found the gun, and drops to 0 if the gun is unplugged; a gun
+plugged in later is not detected on its own, so call
 `scopeInit()` again (for example once per frame on a "connect the Super
 Scope" screen) to notice a gun plugged in later.
 
