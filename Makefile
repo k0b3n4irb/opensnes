@@ -155,6 +155,7 @@ lint-vram:
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
+	@cd tools/luna-test && python3 -m unittest -q test_harness
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
