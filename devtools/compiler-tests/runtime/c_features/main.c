@@ -129,6 +129,21 @@ u16 r_fp_cb;        /* apply(dbl, 21)        -> 42 */
 u16 r_fp_struct;    /* op_rec.f(op_rec.k)    -> 16 */
 u16 r_fp_eq;        /* (p == dbl) + 2*(p != inc) -> 3 */
 
+/* ---- 32-bit return values -------------------------------------------------
+ * A u32 or a far pointer comes back in two words (A + tcc__retval_hi, see
+ * compiler/ABI.md); the caller must consume both. Until 2026-09-26 no
+ * runtime fixture called a C function returning a 32-bit value. */
+u32 mk32(u16 hi, u16 lo) { return ((u32)hi << 16) | lo; }
+s32 neg32(u16 v) { return -(s32)v * 1000; }
+static const u8 ret_tab[4] = { 0x11, 0x22, 0x33, 0x44 };
+const u8 *ret_ptr(u16 i) { return &ret_tab[i & 3]; }
+
+u32 r_ret32;        /* mk32(1, 0x2345)                  -> 0x00012345 */
+u32 r_ret32_carry;  /* mk32(1, 0xFFFF) + mk32(0, 1)     -> 0x00020000 */
+u16 r_ret32_cmp;    /* mk32(1, 0) > mk32(0, 0xFFFF)     -> 1 */
+u32 r_ret32_neg;    /* neg32(100)                       -> -100000 */
+u16 r_ret32_ptr;    /* *ret_ptr(7): a far pointer into ROM -> 0x44 */
+
 static u16 apply(fn_t f, u16 v) { return f(v); }
 
 /* ---- bit-fields, enum ----------------------------------------------------- */
@@ -267,6 +282,13 @@ sw_done:
     r_fp_struct = op_rec.f(op_rec.k);
     f = in_one ? dbl : inc;
     r_fp_eq = (f == dbl ? 1 : 0) + (f != inc ? 2 : 0);
+
+    /* 32-bit return values */
+    r_ret32 = mk32(in_one, 0x2345);
+    r_ret32_carry = mk32(in_one, 0xFFFF) + mk32(0, in_one);
+    r_ret32_cmp = mk32(in_one, 0) > mk32(0, 0xFFFF);
+    r_ret32_neg = (u32)neg32(in_100);
+    r_ret32_ptr = *ret_ptr(in_seven);
 
     /* bit-fields, enum */
     bf.a = 5; bf.b = 17; bf.c = (u16)in_200;

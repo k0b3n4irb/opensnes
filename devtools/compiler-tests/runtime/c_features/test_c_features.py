@@ -35,6 +35,11 @@ CASES = [
     ("r_fp_cb",      2, 42),
     ("r_fp_struct",  2, 16),
     ("r_fp_eq",      2, 3),
+    ("r_ret32",       4, 0x00012345),
+    ("r_ret32_carry", 4, 0x00020000),
+    ("r_ret32_cmp",   2, 1),
+    ("r_ret32_neg",   4, (-100000) & 0xFFFFFFFF),
+    ("r_ret32_ptr",   2, 0x44),
     # bit-fields, enum
     ("r_bf_sum",     2, 222),
     ("r_bf_ovf",     2, 1),
