@@ -1,6 +1,6 @@
 # SA-1 Starfield (Murmuration)
 
-> 128 dots in Lissajous sine patterns computed by SA-1 at 10.74 MHz
+> 128 dots in Lissajous sine patterns computed by the SA-1 coprocessor
 
 ![Screenshot](sa1_starfield.png)
 
@@ -26,7 +26,7 @@ Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
 - 128 dots moving in smooth, coordinated flock-like patterns
 - The pattern resembles a murmuration (starling flock)
 - 4 brightness levels create a subtle depth effect
-- All math computed by SA-1 coprocessor at 10.74 MHz
+- All math computed by the SA-1 (clocked at 10.74 MHz; ~5.4 MHz effective here, since both CPUs run from ROM — see the SA-1 tutorial)
 
 ## Modules Used
 

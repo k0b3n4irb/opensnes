@@ -1,18 +1,36 @@
 # SA-1 Enhancement Chip Tutorial {#tutorial_sa1}
 
-This tutorial covers the SA-1 coprocessor — a second 65816 CPU running at 10.74 MHz
-inside the cartridge, giving your SNES game 3× the processing power.
+This tutorial covers the SA-1 coprocessor — a second 65816 CPU clocked at 10.74 MHz
+inside the cartridge, running in parallel with the main CPU.
 
 ## What Is SA-1?
 
 The SA-1 is a **65c816 clone** clocked at 10.74 MHz (vs 3.58 MHz for the main CPU).
-It shares the same instruction set, so you already know how to program it. Games like
+It shares the same instruction set, so you already know how to program it — in
+assembly: the SDK does not run C on it, because the C runtime lives in work RAM,
+which the SA-1 cannot see (table below).
+
+**How fast it really runs depends on memory, not on the clock.** The higan SA-1
+speed tests measured ([higan test ROMs](https://gitlab.com/higan/snes-test-roms),
+"SA-1 Speed Test"):
+
+| Main CPU runs from | SA-1 runs from | SA-1 effective speed |
+|---|---|---|
+| WRAM or ROM | I-RAM | ~10.7 MHz (~3.7 MHz if the main CPU also works in I-RAM) |
+| WRAM | ROM | ~10 MHz |
+| ROM | ROM | **~5.4 MHz** — the two CPUs share the ROM bus |
+| any | BW-RAM | ~5.4 MHz, ~2.7 MHz if both use BW-RAM |
+
+So "3× the main CPU" holds only for SA-1 code that keeps off the ROM while the
+main CPU is on it. `examples/chips/sa1_starfield` runs its SA-1 code from ROM
+while the main CPU also runs from ROM: the ~5.4 MHz case. (Until 2026-09-26 this
+page promised 3× flat. luna does not yet report SA-1 cycles; asked of it.) Games like
 *Kirby Super Star*, *Super Mario RPG*, and *Kirby's Dream Land 3* used it to handle
 AI, physics, and decompression that the main CPU couldn't keep up with.
 
 | Feature | Main CPU | SA-1 |
 |---------|----------|------|
-| Clock | 3.58 MHz | 10.74 MHz |
+| Clock | 3.58 MHz | 10.74 MHz (effective speed: see above) |
 | Instruction set | 65c816 | 65c816 (identical) |
 | WRAM access | Yes (128 KB) | **No** |
 | PPU access | Yes | **No** |
@@ -89,7 +107,7 @@ include $(OPENSNES)/make/common.mk
 ### 2. Write Your SA-1 Boot Code
 
 Create `sa1_boot.asm` **in your example directory** (not in templates/).
-This code runs on the SA-1 at 10.74 MHz:
+This code runs on the SA-1:
 
 ```asm
 .ifdef SA1
