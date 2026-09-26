@@ -38,9 +38,6 @@ res/koopatroopa.pic res/koopatroopa.pal: res/koopatroopa.png
 	@echo "[GFX] Converting koopatroopa sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-# Ensure graphics are converted before assembly
-combined.asm: res/tilesMario.pic res/mario.pic res/goomba.pic res/koopatroopa.pic
-
 # Extended clean
 clean: clean-mapandobjects
 .PHONY: clean-mapandobjects

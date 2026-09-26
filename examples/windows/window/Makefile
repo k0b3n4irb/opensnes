@@ -28,9 +28,6 @@ res/bg2.pic res/bg2.map res/bg2.pal: res/bg2.png
 	@echo "[GFX] $< -> res/bg2.pic/.map/.pal (palette slot 1)"
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -e 1 -p -m -i $<
 
-# Ensure assets are converted before assembly (data.asm .incbin references them)
-combined.asm: res/bg1.pic res/bg1.map res/bg1.pal res/bg2.pic res/bg2.map res/bg2.pal
-
 # Extended clean
 clean: clean-window
 .PHONY: clean-window

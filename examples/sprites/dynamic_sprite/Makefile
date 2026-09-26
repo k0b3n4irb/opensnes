@@ -24,8 +24,6 @@ res/sprite32.pic res/sprite32.pal: res/sprite32.png
 	@echo "[GFX] Converting 32x32 sprite..."
 	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
 
-combined.asm: res/sprite16_grid.pic res/sprite32.pic
-
 clean: clean-dynamic_sprite
 .PHONY: clean-dynamic_sprite
 clean-dynamic_sprite:

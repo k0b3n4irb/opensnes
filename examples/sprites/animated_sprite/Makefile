@@ -20,8 +20,6 @@ res/sprites.pic res/sprites.pal: res/sprites.png
 	@echo "[GFX] Converting sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-combined.asm: res/sprites.pic
-
 clean: clean-animated_sprite
 .PHONY: clean-animated_sprite
 clean-animated_sprite:

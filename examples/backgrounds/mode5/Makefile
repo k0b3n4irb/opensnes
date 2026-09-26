@@ -15,5 +15,3 @@ include $(OPENSNES)/make/common.mk
 res/bg.pic res/bg.map res/bg.pal: res/bg.png
 	@echo "[GFX] $< -> Mode 5 assets"
 	@$(GFX4SNES) -i $< -m -u 16 -M 5
-
-combined.asm: res/bg.pic res/bg.map res/bg.pal

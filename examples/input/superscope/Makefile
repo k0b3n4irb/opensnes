@@ -32,8 +32,6 @@ res/aim_adjust_target.pic res/aim_adjust_target.pal res/aim_adjust_target.map: r
 	@echo "[GFX] Converting aim target background..."
 	@$(GFX4SNES) -s 8 -o 4 -u 4 -p -m -i $<
 
-combined.asm: res/sprites.pic res/aim_adjust_target.pic
-
 clean: clean-superscope
 .PHONY: clean-superscope
 clean-superscope:

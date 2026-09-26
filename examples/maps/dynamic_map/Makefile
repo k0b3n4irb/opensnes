@@ -32,8 +32,6 @@ res/sprite16_64x64.pic res/sprite16_64x64.pal: res/sprite16_64x64.png
 	@echo "[GFX] Converting 8bpp sprite (64x64 map)..."
 	@$(GFX4SNES) -s 16 -o 256 -u 256 -p -i $<
 
-combined.asm: res/sprite16.pic res/sprite16_64x64.pic
-
 clean: clean-dynamic_map
 .PHONY: clean-dynamic_map
 clean-dynamic_map:

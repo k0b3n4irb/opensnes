@@ -24,9 +24,6 @@ res/background.pic res/background.map res/background.pal: res/background.png
 	@echo "[GFX] $< -> res/background.pic/.map/.pal"
 	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
 
-# Ensure assets are converted before assembly
-combined.asm: res/background.pic res/background.map res/background.pal
-
 # Extended clean
 clean: clean-transparent_window
 .PHONY: clean-transparent_window
