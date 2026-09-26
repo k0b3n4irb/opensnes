@@ -87,7 +87,10 @@ def main() -> int:
         if not (starter / "game.sfc").is_file():
             sys.exit("release-smoke: FAIL: the starter build produced no game.sfc")
 
-        run("scaffold a project", [str(sdk / "bin" / "opensnes"), "init", "smoke-game",
+        # `bin/opensnes` is a bash script: through bash, since Windows'
+        # CreateProcess cannot start a script (WinError 193, 2026-09-26 CI).
+        bash = shutil.which("bash") or "bash"
+        run("scaffold a project", [bash, str(sdk / "bin" / "opensnes"), "init", "smoke-game",
                                    "--template", "game"], work, env)
         project = work / "smoke-game"
         penv = dict(env, OPENSNES_HOME=str(sdk))
