@@ -49,6 +49,7 @@ Exit 0 = no new never-executed function, 1 = the ratchet grew, 2 = usage.
 from __future__ import annotations
 
 import argparse
+import os
 import bisect
 import re
 import struct
@@ -164,7 +165,7 @@ def profile_pcs(luna: str, rom: Path, sym: Path, bound: list[str], script: str |
     Exit 1 with a `stack:` line ending in UNDER is the stack gate, not an error:
     no --budget is passed here, so it is the only gate that can fail."""
     cmd = [luna, "profile", str(rom), *bound, "--sym", str(sym),
-           "--pc-set", str(pcs), "--out", "/dev/null", "--top", "0"]
+           "--pc-set", str(pcs), "--out", os.devnull, "--top", "0"]
     if script:
         cmd += ["--input", script]
     if floor is not None:

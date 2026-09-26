@@ -49,7 +49,11 @@ RELEASE_DIR := release
 # devtools scripts that make/common.mk executes on every user build — the
 # release zip must ship each of them (see the `release` recipe).
 RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
-VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
+# The version of the tree, not the nearest tag: release tags sit on main's
+# merge commits, which develop never contains, so `git describe` on develop
+# named its zips after v0.17.0. snes.h is held equal to CHANGELOG by
+# `make lint-docs`; release.yml still passes VERSION=<tag> explicitly.
+VERSION ?= v$(shell sed -n 's/^\#define OPENSNES_VERSION_STRING "\(.*\)"/\1/p' lib/include/snes.h)
 ifneq ($(VERSION),)
     RELEASE_NAME := opensnes_$(VERSION)_$(PLATFORM)_$(ARCH)
 else

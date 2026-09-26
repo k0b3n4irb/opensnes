@@ -15,6 +15,7 @@ on a held value, so exact frame landing is not required.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -76,7 +77,7 @@ def dump_vram(luna: str, rom: Path, steps: int) -> bytes:
     import tempfile
     with tempfile.NamedTemporaryFile(suffix=".vram") as tf:
         proc = subprocess.run(
-            [luna, "state", "-n", str(steps), "--out", "/dev/null",
+            [luna, "state", "-n", str(steps), "--out", os.devnull,
              "--dump-vram", tf.name, str(rom)],
             capture_output=True, text=True, timeout=300)
         if proc.returncode != 0:
@@ -152,7 +153,7 @@ def assert_mem(luna: str, rom: Path, steps: int,
     `extra` (luna v1.1.0) injects extra luna flags, e.g. peripheral input
     `["--port1", "mouse", "--mouse", "30:20,20,0"]`.
     """
-    cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null"]
+    cmd = [luna, "state", "-n", str(steps), "--out", os.devnull]
     if input_script:
         cmd += ["--input", input_script]
     if srm_in:
@@ -163,7 +164,12 @@ def assert_mem(luna: str, rom: Path, steps: int,
         cmd += ["--assert", f"{_addr_spec(addr)}={hexb}"]
     cmd.append(str(rom))
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-    detail = " ".join(l.strip() for l in proc.stdout.splitlines() if "FAIL" in l) or "all assertions pass"
+    detail = " ".join(l.strip() for l in proc.stdout.splitlines() if "FAIL" in l)
+    if not detail:
+        # No FAIL line: either every assertion passed, or luna itself failed
+        # (bad flag, unwritable path) — never report the latter as a pass.
+        detail = ("all assertions pass" if proc.returncode == 0 else
+                  f"luna exited {proc.returncode}: {proc.stderr.strip()[:200]}")
     return proc.returncode == 0, detail
 
 
@@ -178,7 +184,7 @@ def trace_lines(luna: str, rom: Path, steps: int, flag: str,
     """
     import tempfile
     with tempfile.NamedTemporaryFile(suffix=".csv") as tf:
-        cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null", flag, tf.name]
+        cmd = [luna, "state", "-n", str(steps), "--out", os.devnull, flag, tf.name]
         if input_script:
             cmd += ["--input", input_script]
         cmd.append(str(rom))
@@ -194,7 +200,7 @@ def capture_srm(luna: str, rom: Path, steps: int, input_script: str,
     The write half of a power-cycle test: drive the ROM to save into SRAM, then
     read the persisted `.srm` back (feed it to `assert_mem(..., srm_in=…)`).
     """
-    cmd = [luna, "state", "-n", str(steps), "--out", "/dev/null",
+    cmd = [luna, "state", "-n", str(steps), "--out", os.devnull,
            "--input", input_script, "--srm-out", str(srm_out), str(rom)]
     subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     return Path(srm_out).read_bytes()
