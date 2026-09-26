@@ -257,6 +257,11 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_hirom clean
 	@$(MAKE) -s -C devtools/libtests_hirom
 	@python3 devtools/libtests_hirom/test_libtest_hirom.py
+	@# Fifth fixture: the sram module on SA-1 — BW-RAM at $$40:0000, writable
+	@# once crt0 sets SBWE (2026-09-26; USE_SRAM with USE_SA1 was refused).
+	@$(MAKE) -s -C devtools/libtests_sa1_sram clean
+	@$(MAKE) -s -C devtools/libtests_sa1_sram
+	@python3 devtools/libtests_sa1_sram/test_libtest_sa1_sram.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check

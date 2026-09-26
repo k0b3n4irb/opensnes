@@ -741,6 +741,14 @@ FastStart:
     lda #$FF
     sta.l $002229           ; SIWP = $FF (I-RAM fully writable)
 
+    ; 1b. Let the SNES CPU write BW-RAM (the SA-1 cart's battery RAM, seen at
+    ;     $40-$4F): SBWE ($2226) bit 7, 0 = protect, 1 = write enable
+    ;     (fullsnes, SA-1 memory control, cartouche 9521b0ad16facd8b; initial
+    ;     value $00). Without it the sram module's writes to $40:xxxx were
+    ;     dropped — measured on luna 2026-09-26 — and USE_SRAM was refused.
+    lda #$80
+    sta.l $002226           ; SBWE: SNES CPU BW-RAM writes enabled
+
     ; 2. SELF-TEST: verify SNES CPU can write/read I-RAM
     ;    Use STA.L/LDA.L to force bank $00 (bypass DB)
     lda #$42

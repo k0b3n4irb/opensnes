@@ -179,9 +179,6 @@ endif
 ifeq ($(shell [ "$(ROM_BANKS)" -gt 0 ] 2>/dev/null && echo ok),)
 $(error ROM_BANKS=$(ROM_BANKS) must be a positive number of banks)
 endif
-ifeq ($(USE_SRAM)$(USE_SA1),11)
-$(error USE_SRAM=1 with USE_SA1=1 is not supported: on SA-1 the save memory is BW-RAM ($$40-$$4F), which the SNES CPU can only write after enabling SBWE, and the sram module does not do that. See lib/source/sram.asm and KNOWN_LIMITATIONS.md)
-endif
 ifeq ($(USE_SRAM),1)
 LIB_MODULES += sram
 endif

@@ -16,9 +16,9 @@
  *   battery RAM in 8 KB windows there, and this module addresses the first
  *   one only, so `offset + size` must stay within 8 KB (the default
  *   SRAM_SIZE). Until 2026-09-20 the LoROM address was used on HiROM too.
- * - **SA-1**: not supported — `USE_SRAM=1` with `USE_SA1=1` is a build error.
- *   SA-1 save memory is BW-RAM, which the SNES CPU may only write after
- *   enabling it, and the library does not.
+ * - **SA-1** (`USE_SA1=1`, since 2026-09-26): BW-RAM at bank $40, $0000-$7FFF
+ *   (the header declares 32 KB). crt0 enables SNES-side writes (SBWE); before
+ *   that the combination was refused because the writes were dropped.
  *
  * Source pointers may be in any bank (a `const` save template in ROM works);
  * destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.
