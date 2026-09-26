@@ -226,7 +226,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
 |------|--------|----------------|
 | Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
 | Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
-| Showcase game (not a port) | In progress (RPG project) | Proves the SDK can ship a complete game |
+| Showcase game (not a port) | In progress, **outside this repository**: the RPG prototype ("Giuseppe", ~3000 lines of C) moved to its own repository on 2026-09-26 and builds against the SDK from there. Not verifiable from a clone of this repo until it is published | Proves the SDK can ship a complete game |
+| Asset provenance cleanup | **Planned, deferred (owner decision 2026-09-26)**: 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa); replace them with original art and credit every remaining one in `ATTRIBUTION.md` | A 1.0 release zip must not redistribute third-party IP under the MIT banner |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows the 30 % improvement with data |
 | Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
 | FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
@@ -237,7 +238,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Item | Status | Why it matters |
 |------|--------|----------------|
 | Pixel mode (Mode 3 direct drawing) | Not started | Feature parity with PVSnesLib (niche) |
-| Tiled map editor integration | Not started | Workflow convenience for level designers |
+| Tiled map editor integration | **Shipped**: `tools/tmx2snes`, `examples/maps/tiled`, `examples/games/rpg` (maps, collision, entities and dialogue in `.tmj`) | Workflow convenience for level designers |
 | Video tutorials | Not started | Wider audience reach |
 | Project scaffolding (`opensnes init`) | **Shipped (v0.25.0)** — `opensnes` CLI: init/build/run/doctor | Reduce friction for new users |
 
@@ -296,7 +297,11 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ## Work in flight
 
-None on a branch. The 2026-09-11 gaps-review backlog is closed (43 of
+`wip/superfx-runtime` (pushed): the Super FX runtime chantier —
+phase A (interrupt vectors in WRAM) and phase B (the NMI survives GSU
+jobs) done, phases C-F open (`.claude/notes/chantiers/superfx_runtime.md`).
+The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
+the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of
 43, 2026-09-17). Since then the work on `develop` is the module
 audit-by-tutorial (text, object, framework — twelve stale claims and
 nine object-engine defects fixed) and the road to v1.0 above: the
@@ -336,6 +341,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-22. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-26. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*
