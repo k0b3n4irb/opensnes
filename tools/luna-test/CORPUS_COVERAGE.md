@@ -1,8 +1,8 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.27.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.27.0 · `luna state --until-frame <N>` per ROM · 84 ROMs · **82 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
-> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
+> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the NMI count still advancing 30 frames later) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
 | Example | Status | Detail |
 |---|---|---|
@@ -56,8 +56,7 @@ luna v1.27.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `hdma/gradient_colors` | OK | live (200f/198nmi), +30nmi/30f |
 | `hdma/hdma_helpers` | OK | live (200f/198nmi), +30nmi/30f |
 | `hdma/hdma_indirect_gradient` | OK | live (200f/198nmi), +30nmi/30f |
-| `hdma/hdma_wave` | OK | live (200f/198nmi), +30nmi/30f |
-| `hdma/hdma_wave_table` | OK | live (400f/398nmi), +30nmi/30f |
+| `hdma/hdma_wave` | OK | live (400f/398nmi), +30nmi/30f |
 | `input/controller` | OK | live (200f/198nmi), +30nmi/30f |
 | `input/mouse` | INPUT-DEP | live (200f/198nmi), +30nmi/30f |
 | `input/move_sprite` | OK | live (200f/198nmi), +30nmi/30f |

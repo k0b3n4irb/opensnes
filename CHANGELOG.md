@@ -14,6 +14,11 @@ All notable changes to OpenSNES are documented in this file.
   reaches from develop).
 
 ### Changed
+- refactor(examples): **`hdma/hdma_wave` and `hdma/hdma_wave_table` are one
+  example** (decided 2026-09-05): the hand-built table animated krom-style
+  at boot, pixel-identical to the old `hdma_wave_table` at both capture
+  points, then A hands the ripple to the `hdma` module's `hdmaWaveH` with
+  LEFT/RIGHT for the amplitude. The corpus goes from 85 to 84 examples.
 - feat(compiler): **the emitter checks the class of bug that produced four
   silent miscompiles in three months** — a 32-bit value whose high word no
   instruction wrote. Every high-word read now requires a prior write, or

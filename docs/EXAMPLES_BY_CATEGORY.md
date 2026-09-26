@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 85 examples organized by topic. For a progressive learning path, see
+All 84 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -92,8 +92,7 @@ Change a register every scanline.
 |---------|-------------|
 | @subpage examples_hdma_gradient_colors | HDMA + CGRAM color gradients |
 | @subpage examples_hdma_hdma_indirect_gradient | Indirect HDMA pointer-table gradient (krom port) |
-| @subpage examples_hdma_hdma_wave | HDMA scanline wave distortion |
-| @subpage examples_hdma_hdma_wave_table | Raw HDMA table in C, krom-style repoint animation |
+| @subpage examples_hdma_hdma_wave | HDMA wave: a hand-built table (krom port), then the hdma module's helper |
 | @subpage examples_hdma_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
 
 ---

@@ -200,12 +200,8 @@
     "rom_sha256": "ec58c7a6f7233c4f20ade5f82002f8daf01562dfc9debf7fc3f45fcac87fc642"
   },
   "hdma_hdma_wave": {
-    "stream": "59b705ad198735ea8b80c3e920c1977aedc2564dc69cfa060464deb3a796d9e1",
-    "rom_sha256": "51790ffebf3b0fa419360afe98ac43ada8bc79fb8c8280e2d2e9c72dfee13487"
-  },
-  "hdma_hdma_wave_table": {
-    "stream": "097a0a292507c789a388699e89bbce2c840e3a5512952840bb8388c2cb0f8100",
-    "rom_sha256": "6470ac66b2a69fc4d109e5afe16be7f9aa35193a68f6b66ca537d851d60e73c1"
+    "stream": "c41b5366fa11601b34d27cbe57cc1cc2a15b83ef6c080c15058ea58c9fe6083f",
+    "rom_sha256": "9c3a662e409cb98f374d4b815f394152d03d9fc3c9016242c74abb768fde5d29"
   },
   "input_controller": {
     "stream": "f9d66ae6143b6af4d58e7b08c0ae98f71a1fe72bebdff4c88ccc81f8221be9bc",

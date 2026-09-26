@@ -185,14 +185,15 @@ Every shipped example exercises a distinct HDMA case. Read the
 `@par What to Observe` block at the top of each `main.c` for the
 interactive demo; the patterns themselves are reusable building blocks.
 
-### Per-scanline wave distortion — `examples/hdma/hdma_wave`
+### Per-scanline wave: by hand, then by the module — `examples/hdma/hdma_wave`
 
-Pre-computes seven sine tables (224 + 111 wrap entries each) at amplitudes
-0–24 pixels, then runs HDMA channel 6 in `HDMA_MODE_1REG_2X` to write
-both bytes of `BG1HOFS` ($210D) every scanline. Animation advances the
-table pointer by 3 bytes per frame to scroll the wave continuously. The
-alternating solid/empty tile pattern in the background makes the
-distortion clearly visible.
+At boot, krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries on
+channel 0 in `HDMA_MODE_1REG_2X` (both bytes of `BG1HOFS`, $210D, every
+line), and the per-frame "animation" is just `hdmaSetup(..., table +
+phase * 3)` — a zero-copy pointer bump, cheaper than regenerating the
+table and immune to the VBlank budget. Press A and `hdmaWaveH()` /
+`hdmaWaveUpdate()` produce nearly the same ripple on channel 6 from a
+table the module computes in RAM, with the amplitude as a parameter.
 
 ### Parallax scrolling — `examples/scrolling/parallax_scroll`
 
@@ -243,13 +244,6 @@ data blocks. The example reproduces krom's RedSpace gradient pixel-exactly
 with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to
 blocks goes in `$43x7` — pass it with the bank-extraction idiom
 (`(u8)((u32)(void *)table >> 16)`).
-
-### Table repointing as animation — `examples/hdma/hdma_wave_table`
-
-krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries, and the
-per-frame "animation" is just `hdmaSetup(..., table + phase * 3)` — a
-zero-copy pointer bump. Cheaper than regenerating tables and immune to
-the VBlank budget.
 
 ### Full Mode 7 matrix per line — `examples/mode7/perspective_rotate`
 

@@ -324,12 +324,6 @@
     "rom_sha256": "16767c2696889a7adb10075cfa707e1166db11c25fd78fa401bd805609805de6"
   },
   "hdma_hdma_wave": {
-    "fbhash": "304a81f27c966325",
-    "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "0cde2c58342202fc9bb94e4a058b709aee4e71fcf611fb3b5655dc919953a29e"
-  },
-  "hdma_hdma_wave_table": {
     "fbhash": [
       "5b90a92820ae5d6d",
       "6ee8438edbcf21b1"

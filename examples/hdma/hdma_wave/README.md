@@ -1,10 +1,8 @@
 # HDMA Wave
 
-> A wavy distortion effect that bends the entire screen like a funhouse mirror.
-> Press A to toggle, D-pad to control amplitude and animation.
-> This is the same trick used for water reflections in Chrono Trigger.
-
-![Demo](hdma_wave_demo.gif)
+> One water image, one per-scanline ripple, made two ways: first by an HDMA
+> table written by hand and animated krom-style, then by the `hdma` module's
+> wave helper. Press A to switch between them.
 
 ![Screenshot](hdma_wave.png)
 
@@ -12,262 +10,171 @@
 
 | Button | Action |
 |--------|--------|
-| A | Toggle wave on/off |
-| D-Pad Left/Right | Decrease/increase amplitude |
-| D-Pad Up | Start animation |
-| D-Pad Down | Stop animation (freeze) |
+| A | Switch between the hand-built table and the `hdma` module |
+| D-Pad Left/Right | Module mode: amplitude 2 to 24 pixels, in steps of 2 |
+
+The ripple runs from boot, with no input.
 
 ## Build & Run
 
 ```bash
-cd $OPENSNES_HOME
 make -C examples/hdma/hdma_wave
 ```
 
-Then open `hdma_wave.sfc` in your emulator (Mesen2 recommended).
+Then open `hdma_wave.sfc` in luna (`luna-gui hdma_wave.sfc`) or any SNES
+emulator.
 
 ## What You'll Learn
 
-- What HDMA is and why it's one of the SNES's most powerful features
-- How to bend the screen per-scanline by changing BG scroll registers mid-frame
-- The HDMA table format: line counts, repeat mode, and data bytes
-- Pre-computing animation tables in ROM to avoid any runtime math
+- What HDMA does that DMA cannot: a different register value on every scanline
+- The HDMA table format: a line count, the register payload, a `0x00` terminator
+- Animation by moving the table's start pointer, without rewriting a byte
+- What the `hdma` module's `hdmaWaveH` / `hdmaWaveUpdate` do for you, and
+  how to hand a channel from your own table to the module and back
 
 ---
 
 ## Walkthrough
 
-### 1. What Is HDMA?
+### 1. The table, by hand
 
-Normal DMA transfers a block of data from one place to another — useful for loading
-tiles during VBlank. **HDMA** (Horizontal DMA) is different: it feeds a small amount
-of data to a PPU register *every single scanline* while the screen is being drawn.
+The PPU draws 224 lines per frame. HDMA feeds a PPU register a new value at
+the start of each line from a table: give BG1's horizontal scroll (`BG1HOFS`,
+`$210D`) a sine, one value per line, and each line of the image shifts by a
+different amount.
 
-Think about it: the PPU draws 224 horizontal lines per frame. If you change the
-BG1 horizontal scroll register between each line, every line on screen shifts by
-a different amount. Feed it a sine wave pattern and the whole screen undulates.
-
-That's exactly what this demo does.
-
-### 2. The HDMA Table Format
-
-An HDMA table is a sequence of entries in RAM or ROM. The hardware reads one entry
-per group of scanlines:
+The table here is krom's, verbatim (`res/wavetable.bin`, 896 entries):
 
 ```
-[0x81] [lo] [hi]   ← Repeat 1 scanline, write (lo, hi) to target register
-[0x81] [lo] [hi]   ← Next scanline, different scroll value
+[0x01] [lo] [hi]   one scanline, then write (lo, hi) to BG1HOFS
+[0x01] [lo] [hi]   next scanline, next value
 ...
-[0x00]              ← End of table
+[0x00]             end of table
 ```
 
-The `0x81` byte means: repeat mode (bit 7 = 1), for 1 scanline (bits 6-0 = 1).
-Repeat mode writes the data on every scanline in the group. Without it, the data
-is written once and held — fine for registers that latch, but scroll registers need
-fresh writes every line.
+`HDMA_MODE_1REG_2X` writes two bytes to the same register, which is the
+shape the 16-bit scroll registers expect (low byte, then high byte).
 
-This demo has 335 entries per table (224 visible lines + 111 extra for animation
-phase wrapping) × 3 bytes each + 1 end marker = 1006 bytes per amplitude level.
-
-### 3. Seven Amplitude Levels
-
-The demo pre-computes tables for 7 wave amplitudes (0, 4, 8, 12, 16, 20, 24 pixels):
+### 2. Animation = move the start pointer
 
 ```c
-#define AMP_LEVELS    7
-#define TABLE_ENTRIES 335
-#define TABLE_SIZE    1006
-
-static const u8 hdma_tables[AMP_LEVELS * TABLE_SIZE] = {
-    /* Amplitude 0: all entries are (0x81, 0x00, 0x00) — no displacement */
-    /* Amplitude 1: sine wave with peak ±4 pixels */
-    /* ... */
-    /* Amplitude 6: sine wave with peak ±24 pixels */
-};
+wave_phase++;
+if (wave_phase >= WAVE_WRAP)       /* 672: krom's seamless wrap */
+    wave_phase = 0;
+hdmaSetup(CH_HAND, HDMA_MODE_1REG_2X, HDMA_DEST_BG1HOFS,
+          wavetable + wave_phase * ENTRY_BYTES);
 ```
 
-All 7 × 1006 = 7042 bytes live in ROM. Zero runtime math — the CPU just points the
-HDMA channel at the right offset and the hardware does the rest.
+Line L reads entry `phase + L`, so the crests flow up the screen one line
+per frame. The table holds 672 + 224 entries so that every start phase
+still has a full screen of valid lines. Nothing is ever written to it, so
+HDMA can never read a half-updated entry, and the per-frame cost is one
+`hdmaSetup` call. HDMA reloads its table address at the start of every
+frame, so repointing during VBlank is safe.
 
-> **Why 335 entries instead of 224?** Animation works by shifting the starting offset
-> into the table. With only 224 entries, the phase offset would run off the end.
-> The extra 111 entries (one full sine period = 112, minus 1) provide wrap-around
-> space so animation can cycle smoothly without bounds checking.
-
-### 4. Setting Up the HDMA Channel
-
-The SNES has 8 DMA channels (0-7). This demo uses channel 6 for HDMA:
+### 3. The same ripple from the `hdma` module
 
 ```c
-HW_DMAP6 = 0x02;    /* Mode 2: write 2 bytes to same register, twice */
-HW_BBAD6 = 0x0D;    /* Target: BG1HOFS ($210D) */
-HW_A1B6  = 0x00;    /* Source bank 0 (ROM) */
+hdmaWaveInit();                          /* switches every channel off */
+hdmaWaveH(CH_LIB, 0, amp, WAVE_FREQ);    /* BG1, amplitude, frequency */
+hdmaEnable(1 << CH_LIB);
+...
+hdmaWaveUpdate();                        /* once per frame */
 ```
 
-Mode 2 writes two bytes to the target register, which is exactly what BG1HOFS needs —
-it's a 16-bit register written as two consecutive bytes to the same address.
+The module computes the sine table in RAM, double-buffers it and advances
+it each frame. Amplitude 10 at frequency 10 (a 25.6-line period) is close
+to krom's table (`round(10 * sin)`, a ~25.8-line quasi-period), so the
+ripple barely changes when you switch. What you gain is the parameter:
+LEFT/RIGHT call `hdmaWaveH` again with a new amplitude.
 
-> **Why $210D specifically?** BG1HOFS (BG1 Horizontal Offset) controls how far BG1
-> is scrolled horizontally. By writing a different value to it on every scanline,
-> each line of pixels shifts by a different amount. That's the wave.
+### 4. Handing the channel over and back
 
-### 5. Animation = Just Move the Pointer
-
-Each frame, the main loop advances the phase and recalculates the table address:
-
-```c
-if (animating) {
-    phase = phase + 1;
-    if (phase >= 112) phase = 0;  /* Sine period = 112 entries */
-}
-
-if (wave_on) {
-    phase_off = (u16)phase * 3;   /* 3 bytes per entry */
-    tbl_addr = (u16)hdma_tables + amp_offsets[amp_idx] + phase_off;
-    HW_A1T6L = (u8)(tbl_addr & 0xFF);
-    HW_A1T6H = (u8)((tbl_addr >> 8) & 0xFF);
-    HW_HDMAEN = 0x40;  /* Enable channel 6 */
-}
-```
-
-`amp_offsets[]` is a pre-computed lookup table to avoid multiplying by 1006 at runtime:
-
-```c
-static const u16 amp_offsets[AMP_LEVELS] = {
-    0, 1006, 2012, 3018, 4024, 5030, 6036
-};
-```
-
-The animation "moves" by starting the HDMA read from a different point in the sine table.
-Phase 0 starts at the beginning, phase 56 starts halfway through the sine cycle. The wave
-appears to flow because each frame shifts the starting position by one entry.
-
-### 6. The Checkerboard Background
-
-To make the wave visible, the demo fills BG1 with alternating black and white tiles:
-
-```c
-for (i = 0; i < 1024; i++) {
-    if (i & 1) {
-        *(vu8*)0x2118 = 0x01;  /* White tile */
-    } else {
-        *(vu8*)0x2118 = 0x00;  /* Black tile */
-    }
-    *(vu8*)0x2119 = 0x00;
-}
-```
-
-Without some visual pattern, the wave would be invisible — you'd just see a flat
-color shifting left and right. The checkerboard makes the distortion obvious.
+The hand-built table runs on channel 0 (krom's), the module's wave on
+channel 6. `hdmaWaveInit()` switches off every HDMA channel, yours
+included, so it comes before arming the module's. Going back,
+`hdmaWaveStop()` releases channel 6 and restores BG1's scroll, then the
+hand-built table is re-armed from the phase it had reached.
 
 ---
+
+## Fidelity to the original (hand mode; measured, not assumed)
+
+Register-level — krom's writes vs what this ROM's generated code does:
+
+| Register | krom (ASM) | this example (via the C API) |
+|---|---|---|
+| `$4300` DMAP0 | `%00000010` | `hdmaSetup` mode = `HDMA_MODE_1REG_2X` (0x02) |
+| `$4301` BBAD0 | `$0D` (BG1HOFS) | `HDMA_DEST_BG1HOFS` (0x0D) |
+| `$4302-3` A1T0 | table start, **+3 bytes/frame** | `hdmaSetup(…, wavetable + wave_phase*3)` per VBlank (hand mode) |
+| `$4304` A1B0 | `$00` | the far pointer's bank byte (the table's ROM bank) |
+| `$420C` HDMAEN | `%1` once | `hdmaEnable(1 << CH_HAND)` at boot (and on the way back from module mode) |
+| `$2105` BGMODE | `$0B` (mode 3 + BG3-prio bit, no-op in mode 3) | `setMode(BG_MODE3, 0)` → mode 3 |
+| `$2107` BG1SC | `$FC` (word $FC00 → mirrors $7C00) | `bgSetMapPtr(0, 0x7C00, SC_32x32)` |
+
+One deliberate difference: krom rewrites only `A1T0L` each frame; this
+example re-runs `hdmaSetup` (same five values) — semantically identical.
+
+Behavioral — proven EXACT (luna v1.9.0 `dma.channels[]` + displacement-field
+analysis on `luna frames` sequences of both ROMs):
+
+| Proof | Result |
+|---|---|
+| HDMA table | **byte-identical**: krom's 896 entries extracted verbatim (`res/wavetable.bin`) |
+| This ROM's rendering | displacement field == table prediction, **residual 0** over 1400 line-measurements |
+| This ROM's cadence | exactly one +3-byte A1T0 step per frame, at VBlank (register-level, `dma.channels[0].a_addr`) |
+| Reference's rendering | every frame pair fits the same table with **residual 0** |
+| Reference's cadence in luna | irregular 2,1,1 entries/frame — a luna `$4210` polling emulation issue (luna#107), not a demo or port defect; on hardware both ROMs advance +3/frame |
 
 ## Tips & Tricks
 
-- **Wave is invisible?** You need a visible pattern on the background. A solid color
-  won't show horizontal displacement — there's nothing to distinguish shifted from
-  non-shifted lines.
-
-- **Wave looks jerky?** Make sure `animating` is set (press Up). Without animation,
-  the wave is static and only changes when you adjust amplitude.
-
-- **Screen tears when toggling?** HDMA enable/disable should happen during VBlank.
-  This demo writes `HW_HDMAEN` in the main loop after `WaitForVBlank()`, which is
-  safe because we're still in VBlank at that point.
-
-- **Want to apply this to a real background?** Replace the checkerboard with actual
-  tile art. The wave effect works on any background — it just shifts the scroll register.
-  Water reflections in RPGs use this exact technique on a duplicated background layer.
-
----
+- **Nothing moves?** An HDMA channel that is set up but not enabled does
+  nothing: `hdmaSetup()` configures, `hdmaEnable()` arms. luna's
+  `dma.hdmaen` in `luna state --out -` shows which channels are on.
+- **Channel 7 is taken** by the NMI handler's OAM DMA; do not put HDMA on it.
+- **A flat colour hides the effect.** The wave only shifts pixels
+  horizontally: it needs an image with vertical detail to be seen.
 
 ## Go Further
 
-- **Vertical wave:** Instead of BG1HOFS, target BG1VOFS ($210E). Now the wave goes
-  up and down instead of left and right. Combine both for a truly psychedelic effect.
-
-- **Apply to sprites:** You can't HDMA sprite positions, but you can simulate it by
-  moving sprites vertically in sync with the wave table.
-
-- **Layer-specific waves:** Use a second HDMA channel on BG2HOFS with a different
-  amplitude or frequency. Two layers waving independently creates impressive depth.
-
-- **Next example:** [HDMA Helpers](../hdma_helpers/) — the high-level helper
-  API for brightness gradients, color gradients, iris wipes, and water
-  ripples, all in one interactive showcase.
-
----
-
-## Under the Hood: The Build
-
-### The Makefile
-
-```makefile
-TARGET      := hdma_wave.sfc
-CSRC        := main.c
-ASMSRC      := data.asm
-USE_LIB     := 1
-LIB_MODULES := console dma sprite input hdma
-```
-
-### Where the Data Lives
-
-The 7042-byte HDMA table (7 amplitudes × 1006 bytes) is a binary blob
-in `res/hdma_wave_tables.bin`, brought in by `data.asm` via a single
-`.incbin` directive. `main.c` declares it as `extern u8 hdma_tables[];`
-and indexes into it with `&hdma_tables[amp_offsets[idx]]`.
-
-Up to v0.20.x this lived inline in `main.c` as a ~408-line
-`static const u8 hdma_tables[] = { 0x81, 0x00, 0x00, ... };`. The
-inline form pinned the table to bank `$00` (where C const data lands
-unless coaxed otherwise) and made `main.c` 661 lines. Lifting it to
-`.incbin` lets the linker place the bytes in any free bank — bank 0
-gains ~7 KB of headroom — and shrinks `main.c` to ~250 lines.
-
-The checkerboard background tiles are still generated at runtime with
-a simple loop, no asset file needed.
-
-> **When should data go in C vs. assembly `.incbin`?** Rule of thumb:
-> if the data is binary, large, or could spill bank 0, put it in
-> `.incbin` (SUPERFREE section, linker picks the bank, C pointer
-> carries the bank byte post-A6+A7). If it's small and immutable
-> (≤ ~256 bytes), a `static const` array in C is simpler and keeps
-> everything in one place.
-
-### Why These Modules?
-
-| Module | Why it's here |
-|--------|--------------|
-| `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler |
-| `dma` | Required by sprite module (OAM DMA). Not used directly — HDMA is configured via raw register writes, not library functions. |
-| `sprite` | OAM buffer for the NMI handler. Even with no visible sprites, the NMI handler DMAs the OAM buffer every frame. |
-| `input` | Joypad reading — the NMI handler fills `pad_keys[]` for the A/D-pad controls. |
-
-> **"Where's the HDMA module?"** The library has `hdma.c`/`hdma.asm`, but this example
-> doesn't use them. HDMA setup is just 5 register writes — `DMAP6`, `BBAD6`, `A1T6L/H`,
-> `A1B6`, `HDMAEN` — simple enough to do inline. The library's HDMA API is more useful
-> when you need to manage multiple HDMA channels dynamically.
+- **Vertical wave:** target `BG1VOFS` (`HDMA_DEST_BG1VOFS`) instead; the
+  lib writes `y - 1` for you, but an HDMA table on `BGnVOFS` must carry the
+  -1 itself (see `KNOWN_LIMITATIONS.md`).
+- **Two layers:** a second channel on `BG2HOFS` with another amplitude.
+- **Next example:** [HDMA Helpers](../hdma_helpers/) — the module's other
+  effects (brightness and colour gradients, iris wipe, water ripple).
 
 ---
 
 ## Modules Used
 
-`console`, `dma`, `sprite`, `input`, `hdma` (`LIB_MODULES` in the Makefile).
+`console`, `dma`, `background`, `input`, `hdma` (`LIB_MODULES` in the Makefile).
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | `consoleInit()`, `WaitForVBlank()`, the NMI handler |
+| `dma` | `dmaCopyVram` / `dmaCopyCGram` for the image and its palette |
+| `background` | `bgSetGfxPtr`, `bgSetMapPtr` |
+| `input` | `padPressed()` for A and LEFT/RIGHT |
+| `hdma` | `hdmaSetup` / `hdmaEnable` for the hand-built table, `hdmaWaveH` and friends for the module's wave |
 
 ## Technical Reference
 
 | Register | Address | Role in this example |
 |----------|---------|---------------------|
-| BG1HOFS  | $210D   | HDMA target — per-scanline horizontal scroll |
-| DMAP6    | $4360   | Channel 6 mode (mode 2 = 2 bytes to same reg) |
-| BBAD6    | $4361   | Channel 6 target register ($0D = BG1HOFS) |
-| A1T6L/H  | $4362-63 | Channel 6 source address (table pointer) |
-| A1B6     | $4364   | Channel 6 source bank |
-| HDMAEN   | $420C   | HDMA channel enable (bit 6 = channel 6) |
+| BG1HOFS | $210D | HDMA target — per-scanline horizontal scroll |
+| DMAP0 / DMAP6 | $4300 / $4360 | Channel mode (`HDMA_MODE_1REG_2X`) |
+| BBAD0 / BBAD6 | $4301 / $4361 | Target register ($0D = BG1HOFS) |
+| A1T0 | $4302-$4304 | Table address, +3 bytes per frame in hand mode |
+| HDMAEN | $420C | Bit 0 in hand mode, bit 6 in module mode |
+| BGMODE | $2105 | Mode 3 (8bpp BG1) |
 
 ## Files
 
 | File | What's in it |
 |------|-------------|
-| `main.c` | Everything — sine tables, HDMA setup, input loop (~573 lines, mostly data) |
-| `Makefile` | `LIB_MODULES := console dma sprite input hdma` |
+| `main.c` | Setup, the hand-built repoint loop, the switch to the `hdma` module |
+| `data.asm` | The Mode 3 image (tiles in two sections, map, palette) and krom's table |
+| `res/water.bmp` | Original art: procedurally generated water caustics (256 colours) |
+| `res/wavetable.bin` | krom's 896-entry HDMA table, extracted verbatim |
+| `Makefile` | `LIB_MODULES`, and the `gfx4snes` rule for the 8bpp image |
