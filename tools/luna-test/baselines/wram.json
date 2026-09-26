@@ -200,8 +200,8 @@
     "rom_sha256": "ec58c7a6f7233c4f20ade5f82002f8daf01562dfc9debf7fc3f45fcac87fc642"
   },
   "hdma_hdma_wave": {
-    "stream": "c168f3acf32278f75a7ac2ae5b926c74ea04b8451c001dada9ebd32d4584e8a9",
-    "rom_sha256": "3f8282a82ed084e64862d5ca14bbed27dda57e08afd65b6e216013607637ea18"
+    "stream": "55707acab1c028a16c70c8f29b2c55bc92042c27cb258c3a40b555adc4968c82",
+    "rom_sha256": "51790ffebf3b0fa419360afe98ac43ada8bc79fb8c8280e2d2e9c72dfee13487"
   },
   "hdma_hdma_wave_table": {
     "stream": "f39319c8e7cae660ad969a1e11c6d0a214fda3c1bff26a8b11ae54b1534cb690",
@@ -328,12 +328,12 @@
     "rom_sha256": "376edd822145e984257e6f64cd7551b83f78e06697e20cfdf08c74cf338ca6b7"
   },
   "windows_transparent_window": {
-    "stream": "472e0ce76a806fbea709aad16222233c8a4e5a106972019bf49c56318421e6c7",
-    "rom_sha256": "900d9c0830c4651fc1b824be57e77a37fa03dcd970c7ce6c5e058cab3ce3930c"
+    "stream": "51c10af1d80dcfba16f2745c28a2420ca4335b300f1f284e726b6c433716b3bb",
+    "rom_sha256": "080e1ea4914c32c1d06c38274de276177b8de884a4f35c098d1f174b4f744b1b"
   },
   "windows_window": {
-    "stream": "3e3c46fe1c2ea2d3e06a4c9b5a6aea141b127fe8c787bfceca8b395c849efef9",
-    "rom_sha256": "493e70113888990fca5308f61de69d3f2ef3c060100463109d539133dde0213e"
+    "stream": "91af7a4a8e751afd5c4109383018856fcd0475c347e33f0effe2b872570b245d",
+    "rom_sha256": "ffc124892bcb1af4d7e3438efc5ec4589be31ad6ff781a996d016193e31441fc"
   },
   "windows_window_multi_hdma": {
     "stream": "a380c93f16b469269499e61431f15e66081ec29c2c310b1906d5c3d7bc6feac2",

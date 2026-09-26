@@ -15,7 +15,8 @@
  * outside the triangle are masked (clipped to black).
  *
  * Ported from PVSnesLib "Window" example.
- * Uses bare-metal register writes to match PVSnesLib behavior exactly.
+ * Uses the window module (windowEnable / windowSetInvert / windowSetMainMask)
+ * with PVSnesLib's register values, so the frames match its original.
  *
  * @par SNES Concepts
  * - Window masking via W12SEL ($2123) and TMW ($212E) registers
@@ -132,8 +133,8 @@ u8 tablerighttriangle[] = {
  * @brief Configure HDMA-driven window masking on the specified BG layers.
  *
  * Sets up the SNES window hardware and HDMA channels to clip the specified
- * background layers using the triangle-shaped boundary tables. Uses bare-metal
- * PPU register writes to match PVSnesLib's setModeHdmaWindow() behavior exactly.
+ * background layers using the triangle-shaped boundary tables, with the same
+ * register values as PVSnesLib's setModeHdmaWindow().
  *
  * The window "inverts" masking (via the invert bits in W12SEL), so pixels
  * OUTSIDE the triangle shape are clipped to black, while pixels inside remain
@@ -150,14 +151,20 @@ static void setup_window(u8 layers, u8 w12sel_val) {
     /* Disable HDMA first to prevent partial table reads during reconfiguration */
     hdmaDisable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
-    /* TMW ($212E): main screen window mask. Bits enable window clipping per
-     * layer. 0x10 includes OBJ in the mask (PVSnesLib convention). */
-    REG_TMW = layers | 0x10;
-    /* W12SEL ($2123): enable Window 1 for the target BGs with inversion. */
-    REG_W12SEL = w12sel_val;
-    /* WOBJSEL ($2125): PVSnesLib also writes the same value here to control
-     * color math window and OBJ window behavior. */
-    REG_WOBJSEL = w12sel_val;
+    /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
+     * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
+     * bits mirrored into WOBJSEL: OBJ with BG1, the colour window with BG2.
+     * Through the window module since 2026-09-26 (it wrote W12SEL, WOBJSEL
+     * and TMW by hand); luna diff shows the same frames. */
+    {
+        u8 w1 = 0;
+        if (w12sel_val & 0x02) w1 |= WINDOW_BG1 | WINDOW_OBJ;
+        if (w12sel_val & 0x20) w1 |= WINDOW_BG2 | WINDOW_MATH;
+        windowDisableAll();
+        windowEnable(WINDOW_1, w1);
+        windowSetInvert(WINDOW_1, w1, 1);
+        windowSetMainMask(layers | WINDOW_OBJ);
+    }
 
     /* Configure HDMA: channel 4 drives WH0 (left boundary),
      * channel 5 drives WH1 (right boundary). Mode 1REG = one byte per

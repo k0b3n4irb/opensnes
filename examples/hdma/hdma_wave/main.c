@@ -39,23 +39,29 @@
 #include <snes/hdma.h>
 
 /**
- * @brief Minimal 4bpp tile data: one empty tile and one solid tile.
+ * @brief Minimal 4bpp tile data: one empty tile and one solid tile, in VRAM
+ *        byte order (the order dmaCopyVram writes).
  *
- * SNES 4bpp tiles are 32 bytes each (8x8 pixels, 4 bitplanes). The first 16
- * bytes contain interleaved bitplanes 0 and 1, the next 16 contain bitplanes
- * 2 and 3. For a "solid color 1" tile, only bitplane 0 needs to be set (all
- * 0xFF), with all other bitplanes zero. The alternating empty/solid pattern
- * in the tilemap creates vertical stripes that make the wave distortion
- * clearly visible.
+ * A 4bpp tile is 32 bytes: rows 0-7 of bitplanes 0 and 1 interleaved
+ * (plane 0 byte, plane 1 byte), then rows 0-7 of planes 2 and 3. "Solid
+ * colour 1" sets plane 0 on every row and nothing else, so the tile is
+ * eight {0xFF, 0x00} pairs followed by sixteen zeros. The alternating
+ * empty/solid tilemap draws vertical stripes that make the wave visible.
  */
-static const u8 tiles[] = {
-    /* Tile 0: empty (all pixels = color 0 = transparent/black) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    /* Tile 1: solid color 1 (bitplane 0 = all 1s, bitplane 1 = all 0s) */
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+static const u8 tiles[64] = {
+    /* Tile 0: empty (colour 0) */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    /* Tile 1: solid colour 1 — plane 0 = 0xFF on each row, planes 1-3 = 0 */
+    0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0, 0xFF, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
+
+/** @brief Palette: colour 0 black, colour 1 white (BGR555). */
+static const u16 palette[2] = { 0x0000, 0x7FFF };
+
+/** @brief BG1 tilemap built at boot: tile 0 / tile 1 alternating (32x32). */
+static u16 FAR stripes[1024];
 
 #define AMP_LEVELS    7     /**< Number of amplitude levels (0, 4, 8, 12, 16, 20, 24 pixels) */
 #define TABLE_ENTRIES 335   /**< Entries per table: 224 visible scanlines + 111 wrap entries for smooth animation */
@@ -140,46 +146,19 @@ int main(void) {
     phase = 0;
 
     consoleInit();
-    setMode(1, 0);
+    setMode(BG_MODE1, 0);
 
-    /* Upload 2 tiles (4bpp, 32 bytes total) to VRAM at word address 0x0000.
-     * Bare-metal approach: write directly to PPU registers instead of using
-     * dmaCopyVram(). This avoids library overhead for tiny transfers.
-     * $2115 (VMAIN): 0x80 = auto-increment VRAM address after high-byte write.
-     * $2116/$2117 (VMADDL/H): set VRAM word address to 0x0000.
-     * $2118/$2119 (VMDATAL/H): write low/high bytes of each VRAM word. */
-    *(vu8*)0x2115 = 0x80;
-    *(vu8*)0x2116 = 0x00;
-    *(vu8*)0x2117 = 0x00;
-    for (i = 0; i < 32; i++) {
-        *(vu8*)0x2118 = tiles[i];
-        *(vu8*)0x2119 = 0x00;
-    }
-
-    /* Set palette: color 0 = black (0x0000), color 1 = white (0x7FFF).
-     * $2121 (CGADD): palette index to write. CGRAM auto-increments after
-     * each color (2 writes = 1 color, 15-bit BGR format). */
-    *(vu8*)0x2121 = 0;
-    *(vu8*)0x2122 = 0x00;    /* color 0 low byte  (black) */
-    *(vu8*)0x2122 = 0x00;    /* color 0 high byte (black) */
-    *(vu8*)0x2122 = 0xFF;    /* color 1 low byte  (white) */
-    *(vu8*)0x2122 = 0x7F;    /* color 1 high byte (white) */
-
-    /* Fill BG1 tilemap at VRAM word address 0x0400 with alternating
-     * tile 0 (empty) and tile 1 (solid) to create vertical stripes.
-     * The stripes make the wave distortion visually obvious.
-     * 1024 entries = 32x32 tilemap (SC_32x32). */
-    *(vu8*)0x2115 = 0x80;
-    *(vu8*)0x2116 = 0x00;
-    *(vu8*)0x2117 = 0x04;
+    /* Everything below happens in force blank (consoleInit leaves the screen
+     * off), so the DMA helpers may write VRAM and CGRAM at any time. BG1's
+     * tilemap is at VRAM $0400 and its tiles at $0000 (consoleInit's
+     * defaults). Until 2026-09-26 this example wrote $2115-$2122 by hand —
+     * the opposite of what an example should teach. */
+    dmaCopyVram(tiles, 0x0000, sizeof(tiles));
+    dmaCopyCGram((const u8 *)palette, 0, sizeof(palette));
     for (i = 0; i < 1024; i++) {
-        if (i & 1) {
-            *(vu8*)0x2118 = 0x01;   /* Tile 1 (solid) */
-        } else {
-            *(vu8*)0x2118 = 0x00;   /* Tile 0 (empty) */
-        }
-        *(vu8*)0x2119 = 0x00;       /* High byte: no flip, palette 0, priority 0 */
+        stripes[i] = i & 1;           /* tile 1 on odd columns, 0 on even */
     }
+    dmaCopyVram((const u8 *)stripes, 0x0400, sizeof(stripes));
 
     /* Configure HDMA channel 6 in write-twice mode (1REG_2X) targeting
      * BG1HOFS ($210D). In this mode, each HDMA entry writes 2 bytes to the
@@ -248,9 +227,9 @@ int main(void) {
         if (wave_on) {
             hdmaSetTable(HDMA_CHANNEL_6,
                          &hdma_tables[amp_offsets[amp_idx] + (u16)phase * 3]);
-            hdmaEnable(0x40);
+            hdmaEnable(1 << HDMA_CHANNEL_6);
         } else {
-            hdmaDisable(0x40);
+            hdmaDisable(1 << HDMA_CHANNEL_6);
         }
     }
     return 0;
